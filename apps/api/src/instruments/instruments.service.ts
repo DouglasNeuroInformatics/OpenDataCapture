@@ -28,6 +28,7 @@ import type {
   InstrumentInfo,
   ScalarInstrumentBundleContainer
 } from '@opendatacapture/schemas/instrument';
+import { pick } from 'lodash-es';
 
 import type { EntityOperationOptions } from '@/core/types';
 
@@ -46,6 +47,7 @@ type InstrumentQuery<TKind extends InstrumentKind> = {
 @Injectable()
 export class InstrumentsService {
   constructor(
+    @InjectModel('Group') private readonly groupModel: Model<'Group'>,
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
     private readonly cryptoService: CryptoService,
     private readonly loggingService: LoggingService,
@@ -87,6 +89,21 @@ export class InstrumentsService {
       if (!result.success) {
         throw new UnprocessableEntityException(result.message);
       }
+    } else if (instance.internal.edition > 1) {
+      await this.groupModel.updateMany({
+        data: {
+          accessibleInstrumentIds: {
+            push: [id]
+          }
+        },
+        where: {
+          accessibleInstrumentIds: {
+            has: this.generateScalarInstrumentId({
+              internal: { edition: instance.internal.edition - 1, name: instance.internal.name }
+            })
+          }
+        }
+      });
     }
 
     await this.instrumentModel.create({ data: { bundle, id } });
@@ -163,15 +180,28 @@ export class InstrumentsService {
     options: EntityOperationOptions = {}
   ): Promise<InstrumentInfo[]> {
     const instances = await this.find(query, options);
-    return instances.map(({ __runtimeVersion, clientDetails, details, id, kind, language, tags }) => ({
-      __runtimeVersion,
-      clientDetails,
-      details,
-      id,
-      kind,
-      language,
-      tags
-    }));
+    const results = new Map<string, InstrumentInfo>();
+    for (const instance of instances) {
+      const info = pick(instance, [
+        '__runtimeVersion',
+        'clientDetails',
+        'details',
+        'id',
+        'internal',
+        'kind',
+        'language',
+        'tags'
+      ]);
+      if (!info.internal) {
+        results.set(info.id, info);
+        continue;
+      }
+      const currentEntry = results.get(info.internal.name);
+      if (!currentEntry || info.internal.edition > currentEntry.internal!.edition) {
+        results.set(info.internal.name, info);
+      }
+    }
+    return Array.from(results.values());
   }
 
   generateInstrumentId(instrument: AnyInstrument) {

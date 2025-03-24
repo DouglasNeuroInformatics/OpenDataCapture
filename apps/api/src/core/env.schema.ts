@@ -2,7 +2,6 @@ import { $BooleanLike, $NumberLike, $UrlLike } from '@douglasneuroinformatics/li
 import { $BaseEnv } from '@douglasneuroinformatics/libnest';
 import { z } from 'zod';
 
-export type Env = z.infer<typeof $Env>;
 export const $Env = $BaseEnv
   .omit({ API_PORT: true })
   .extend({

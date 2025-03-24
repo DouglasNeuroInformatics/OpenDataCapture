@@ -18,7 +18,9 @@ export const InstrumentShowcase: React.FC<{
   onSelect: (instrument: TranslatedInstrumentInfo) => void;
 }> = ({ data: availableInstruments, onSelect }) => {
   const { t } = useTranslation();
-  const [filteredInstruments, setFilteredInstruments] = useState<TranslatedInstrumentInfo[]>(availableInstruments);
+  const [filteredInstruments, setFilteredInstruments] = useState<TranslatedInstrumentInfo[]>(
+    availableInstruments.toSorted((a, b) => a.details.title.localeCompare(b.details.title))
+  );
   const [tagOptions, setTagOptions] = useState<ListboxDropdownOption[]>([]);
   const [selectedKinds, setSelectedKinds] = useState<InstrumentShowcaseKindOption[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<InstrumentShowcaseLanguageOption[]>([]);
@@ -26,26 +28,30 @@ export const InstrumentShowcase: React.FC<{
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    setFilteredInstruments(
-      availableInstruments.filter(({ details, kind, supportedLanguages, tags }) => {
-        if (selectedKinds.length && !selectedKinds.some(({ key }) => key === kind)) {
-          return false;
-        } else if (selectedLanguages.length && !selectedLanguages.some(({ key }) => supportedLanguages.includes(key))) {
-          return false;
-        } else if (selectedTags.length && !selectedTags.some(({ key }) => tags.includes(key))) {
-          return false;
-        }
-        return details.title.toUpperCase().includes(searchTerm.toUpperCase());
-      })
-    );
+    const updatedFilteredInstruments = availableInstruments.filter(({ details, kind, supportedLanguages, tags }) => {
+      if (selectedKinds.length && !selectedKinds.some(({ key }) => key === kind)) {
+        return false;
+      } else if (selectedLanguages.length && !selectedLanguages.some(({ key }) => supportedLanguages.includes(key))) {
+        return false;
+      } else if (selectedTags.length && !selectedTags.some(({ key }) => tags.includes(key))) {
+        return false;
+      }
+      return details.title.toUpperCase().includes(searchTerm.toUpperCase());
+    });
+    updatedFilteredInstruments.sort((a, b) => {
+      return a.details.title.localeCompare(b.details.title);
+    });
+    setFilteredInstruments(updatedFilteredInstruments);
   }, [availableInstruments, selectedKinds, selectedLanguages, selectedTags, searchTerm]);
 
   useEffect(() => {
     setTagOptions(
-      Array.from(new Set(filteredInstruments.flatMap((item) => item.tags))).map((item) => ({
-        key: item,
-        label: item
-      }))
+      Array.from(new Set(filteredInstruments.flatMap((item) => item.tags)))
+        .map((item) => ({
+          key: item,
+          label: item
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label))
     );
   }, [availableInstruments]);
 

@@ -37,6 +37,7 @@ export const SubjectAssignmentsPage = () => {
 
   const instrumentOptions = Object.fromEntries(
     (instrumentInfoQuery.data ?? [])
+      .sort((a, b) => a.details.title.localeCompare(b.details.title))
       .filter((instrument) => {
         return currentGroup?.accessibleInstrumentIds.includes(instrument.id) ?? true;
       })
