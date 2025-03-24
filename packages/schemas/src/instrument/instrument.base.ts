@@ -174,12 +174,16 @@ const $UnilingualScalarInstrument = $ScalarInstrument.extend({
  */
 type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = Omit<T, 'content'> & {
   id: string;
+  internal?: {
+    edition: number;
+  };
 };
+
 const $InstrumentInfo = $BaseInstrument
   .omit({
     content: true
   })
-  .extend({ id: z.string() }) satisfies z.ZodType<InstrumentInfo>;
+  .extend({ id: z.string(), internal: $ScalarInstrumentInternal.optional() }) satisfies z.ZodType<InstrumentInfo>;
 
 /** @internal */
 type UnilingualInstrumentInfo = Simplify<InstrumentInfo<BaseInstrument<Language>>>;
