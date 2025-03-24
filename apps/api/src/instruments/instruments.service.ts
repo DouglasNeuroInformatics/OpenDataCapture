@@ -28,6 +28,7 @@ import type {
   InstrumentInfo,
   ScalarInstrumentBundleContainer
 } from '@opendatacapture/schemas/instrument';
+import { pick } from 'lodash-es';
 
 import type { EntityOperationOptions } from '@/core/types';
 
@@ -179,16 +180,28 @@ export class InstrumentsService {
     options: EntityOperationOptions = {}
   ): Promise<InstrumentInfo[]> {
     const instances = await this.find(query, options);
-    return instances.map(({ __runtimeVersion, clientDetails, details, id, internal, kind, language, tags }) => ({
-      __runtimeVersion,
-      clientDetails,
-      details,
-      id,
-      internal,
-      kind,
-      language,
-      tags
-    }));
+    const results = new Map<string, InstrumentInfo>();
+    for (const instance of instances) {
+      const info = pick(instance, [
+        '__runtimeVersion',
+        'clientDetails',
+        'details',
+        'id',
+        'internal',
+        'kind',
+        'language',
+        'tags'
+      ]);
+      if (!info.internal) {
+        results.set(info.id, info);
+        continue;
+      }
+      const currentEntry = results.get(info.internal.name);
+      if (!currentEntry || info.internal.edition > currentEntry.internal!.edition) {
+        results.set(info.internal.name, info);
+      }
+    }
+    return Array.from(results.values());
   }
 
   generateInstrumentId(instrument: AnyInstrument) {
