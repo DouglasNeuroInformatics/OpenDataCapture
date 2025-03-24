@@ -8,6 +8,7 @@ declare type SeriesInstrument<TLanguage extends InstrumentLanguage = InstrumentL
   BaseInstrument<TLanguage>,
   {
     content: ScalarInstrumentInternal[];
+    internal?: never;
     kind: 'SERIES';
   }
 >;
