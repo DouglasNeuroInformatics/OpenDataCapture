@@ -31,11 +31,11 @@ const instrument: SeriesInstrument = {
   },
   content: [
     {
-      name: 'GENERAL_CONSENT_FORM',
+      name: 'DNP_GENERAL_CONSENT_FORM',
       edition: 1
     },
     {
-      name: 'HAPPINESS_QUESTIONNAIRE',
+      name: 'DNP_HAPPINESS_QUESTIONNAIRE',
       edition: 1
     }
   ]
