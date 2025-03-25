@@ -58,12 +58,18 @@ export class UsersService {
         lastName,
         sex,
         username: username
+      },
+      omit: {
+        hashedPassword: true
       }
     });
   }
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
     return this.userModel.delete({
+      omit: {
+        hashedPassword: true
+      },
       where: { AND: [accessibleQuery(ability, 'delete', 'User')], id }
     });
   }
@@ -72,12 +78,18 @@ export class UsersService {
   async deleteByUsername(username: string, { ability }: EntityOperationOptions = {}) {
     const user = await this.findByUsername(username);
     return this.userModel.delete({
+      omit: {
+        hashedPassword: true
+      },
       where: { AND: [accessibleQuery(ability, 'delete', 'User')], id: user.id }
     });
   }
 
   async find({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
     return this.userModel.findMany({
+      omit: {
+        hashedPassword: true
+      },
       where: {
         AND: [accessibleQuery(ability, 'read', 'User'), { groupIds: groupId ? { has: groupId } : undefined }]
       }
@@ -86,6 +98,9 @@ export class UsersService {
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
     const user = await this.userModel.findFirst({
+      omit: {
+        hashedPassword: true
+      },
       where: { AND: [accessibleQuery(ability, 'read', 'User')], id }
     });
     if (!user) {
@@ -97,6 +112,9 @@ export class UsersService {
   async findByUsername(username: string, { ability }: EntityOperationOptions = {}) {
     const user = await this.userModel.findFirst({
       include: { groups: true },
+      omit: {
+        hashedPassword: true
+      },
       where: { AND: [accessibleQuery(ability, 'read', 'User'), { username }] }
     });
     if (!user) {
@@ -112,6 +130,9 @@ export class UsersService {
         groups: {
           connect: groupIds?.map((id) => ({ id }))
         }
+      },
+      omit: {
+        hashedPassword: true
       },
       where: { AND: [accessibleQuery(ability, 'update', 'User')], id }
     });
