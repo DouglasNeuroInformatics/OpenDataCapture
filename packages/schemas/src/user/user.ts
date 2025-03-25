@@ -23,7 +23,6 @@ export const $User = $BaseModel.extend({
   firstName: z.string().min(1),
   groupIds: z.array(z.string()),
   lastName: z.string().min(1),
-  password: z.string().min(1),
   sex: $Sex.nullish(),
   username: z.string().min(1)
 });
@@ -35,11 +34,11 @@ export const $CreateUserData = $User
     firstName: true,
     groupIds: true,
     lastName: true,
-    password: true,
     username: true
   })
   .extend({
     dateOfBirth: z.coerce.date().optional(),
+    password: z.string().min(1),
     sex: $Sex.optional()
   });
 

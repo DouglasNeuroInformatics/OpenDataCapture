@@ -2,8 +2,9 @@ import { deepFreeze } from '@douglasneuroinformatics/libjs';
 import type { CreateGroupData } from '@opendatacapture/schemas/group';
 import type { User } from '@opendatacapture/schemas/user';
 
-type DemoUser = Pick<User, 'basePermissionLevel' | 'firstName' | 'lastName' | 'password' | 'username'> & {
+type DemoUser = Pick<User, 'basePermissionLevel' | 'firstName' | 'lastName' | 'username'> & {
   groupNames: readonly string[];
+  password: string;
 };
 
 type DemoGroup = CreateGroupData & { dummyIdPrefix?: string };
