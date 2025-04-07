@@ -15,6 +15,7 @@ import type {
 import { Prisma } from '@prisma/client';
 import type { Session } from '@prisma/client';
 import { isNumber, pickBy } from 'lodash-es';
+import pLimit from 'p-limit';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -275,46 +276,49 @@ export class InstrumentRecordsService {
 
     const createdSessionsArray: Session[] = [];
 
+    const transactionLimit = pLimit(10);
     try {
       const preProcessedRecords = await Promise.all(
-        records.map(async (record) => {
-          const { data: rawData, date, subjectId } = record;
+        records.map((record) =>
+          transactionLimit(async () => {
+            const { data: rawData, date, subjectId } = record;
 
-          // Validate data
-          const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
-          if (!parseResult.success) {
-            console.error(parseResult.error.issues);
-            throw new UnprocessableEntityException(
-              `Data received for record does not pass validation schema of instrument '${instrument.id}'`
-            );
-          }
+            // Validate data
+            const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
+            if (!parseResult.success) {
+              console.error(parseResult.error.issues);
+              throw new UnprocessableEntityException(
+                `Data received for record does not pass validation schema of instrument '${instrument.id}'`
+              );
+            }
 
-          // Ensure subject exists
-          await this.createSubjectIfNotFound(subjectId);
+            // Ensure subject exists
+            await this.createSubjectIfNotFound(subjectId);
 
-          const session = await this.sessionsService.create({
-            date: date,
-            groupId: groupId ?? null,
-            subjectData: { id: subjectId },
-            type: 'RETROSPECTIVE'
-          });
+            const session = await this.sessionsService.create({
+              date: date,
+              groupId: groupId ?? null,
+              subjectData: { id: subjectId },
+              type: 'RETROSPECTIVE'
+            });
 
-          createdSessionsArray.push(session);
+            createdSessionsArray.push(session);
 
-          const computedMeasures = instrument.measures
-            ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
-            : null;
+            const computedMeasures = instrument.measures
+              ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
+              : null;
 
-          return {
-            computedMeasures,
-            data: this.serializeData(parseResult.data),
-            date,
-            groupId,
-            instrumentId,
-            sessionId: session.id,
-            subjectId
-          };
-        })
+            return {
+              computedMeasures,
+              data: this.serializeData(parseResult.data),
+              date,
+              groupId,
+              instrumentId,
+              sessionId: session.id,
+              subjectId
+            };
+          })
+        )
       );
 
       await this.instrumentRecordModel.createMany({
