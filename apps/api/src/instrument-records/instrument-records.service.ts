@@ -339,30 +339,6 @@ export class InstrumentRecordsService {
     }
   }
 
-  private async createSubjectIfNotFound(subjectId: string) {
-    try {
-      return await this.subjectsService.findById(subjectId);
-    } catch (exception) {
-      if (exception instanceof NotFoundException) {
-        const addedSubject: CreateSubjectDto = {
-          id: subjectId
-        };
-        try {
-          return await this.subjectsService.create(addedSubject);
-        } catch (prismaError) {
-          if (prismaError instanceof Prisma.PrismaClientKnownRequestError && prismaError.code === 'P2002') {
-            console.error(prismaError);
-            return await this.subjectsService.findById(subjectId);
-          } else {
-            throw prismaError;
-          }
-        }
-      } else {
-        throw exception;
-      }
-    }
-  }
-
   private parseJson(data: unknown) {
     return JSON.parse(JSON.stringify(data), reviver) as unknown;
   }
