@@ -284,10 +284,7 @@ export class InstrumentRecordsService {
         return subjectToAdd;
       });
 
-      // await this.subjectsService.createMany({
-      //   data: subjectIdList,
-      //   skipDuplicates: true
-      // });
+      await this.subjectsService.createMany(subjectIdList);
 
       const preProcessedRecords = await Promise.all(
         records.map(async (record) => {
@@ -301,9 +298,6 @@ export class InstrumentRecordsService {
               `Data received for record does not pass validation schema of instrument '${instrument.id}'`
             );
           }
-
-          // Ensure subject exists
-          await this.createSubjectIfNotFound(subjectId);
 
           const session = await this.sessionsService.create({
             date: date,
