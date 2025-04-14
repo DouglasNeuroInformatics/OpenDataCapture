@@ -20,7 +20,7 @@ import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
-import type { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
+import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
@@ -276,6 +276,19 @@ export class InstrumentRecordsService {
     const createdSessionsArray: Session[] = [];
 
     try {
+      const subjectIdList = records.map((record) => {
+        const { subjectId: subjectId } = record;
+
+        const subjectToAdd: CreateSubjectDto = { id: subjectId };
+
+        return subjectToAdd;
+      });
+
+      // await this.subjectsService.createMany({
+      //   data: subjectIdList,
+      //   skipDuplicates: true
+      // });
+
       const preProcessedRecords = await Promise.all(
         records.map(async (record) => {
           const { data: rawData, date, subjectId } = record;
