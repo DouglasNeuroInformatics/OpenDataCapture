@@ -277,7 +277,7 @@ export class InstrumentRecordsService {
 
     try {
       const subjectIdList = records.map((record) => {
-        const { subjectId: subjectId } = record;
+        const { subjectId } = record;
 
         const subjectToAdd: CreateSubjectDto = { id: subjectId };
 
