@@ -42,18 +42,14 @@ export class SubjectsService {
   }
 
   async createMany(data: CreateSubjectDto[]) {
-    //filter out all duplicate ids that are planned to be created
+    //filter out all duplicate ids that are planned to be created via a set
+    const noDuplicatesSet = new Set(
+      data.map((record) => {
+        return record.id;
+      })
+    );
 
-    const seen = new Set();
-    const noDuplicateSubjectsList = data.filter((record) => {
-      if (!seen.has(record.id)) {
-        seen.add(record.id);
-        return true;
-      }
-      return false;
-    });
-
-    const subjectIds = noDuplicateSubjectsList.map((record) => record.id);
+    const subjectIds = Array.from(noDuplicatesSet);
 
     //find the list of subject ids that already exist
     const existingSubjects = await this.subjectModel.findMany({
@@ -67,7 +63,13 @@ export class SubjectsService {
     const existingIds = new Set(existingSubjects.map((subj) => subj.id));
 
     //Filter out records whose IDs already exist
-    const subjectsToCreate = noDuplicateSubjectsList.filter((record) => !existingIds.has(record.id));
+    const subjectsToCreateIds = subjectIds.filter((record) => !existingIds.has(record));
+
+    const subjectsToCreate: CreateSubjectDto[] = subjectsToCreateIds.map((record) => {
+      return {
+        id: record
+      };
+    });
 
     //if there are none left to create do not follow through with the command
     if (subjectsToCreate.length < 1) {
