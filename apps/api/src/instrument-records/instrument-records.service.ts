@@ -276,9 +276,7 @@ export class InstrumentRecordsService {
     const createdSessionsArray: Session[] = [];
 
     try {
-      const subjectIdList = records.map((record) => {
-        const { subjectId } = record;
-
+      const subjectIdList = records.map(({ subjectId }) => {
         const subjectToAdd: CreateSubjectDto = { id: subjectId };
 
         return subjectToAdd;
