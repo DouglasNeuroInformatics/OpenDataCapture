@@ -41,7 +41,7 @@ export class SubjectsService {
     });
   }
 
-  async createMany(data: CreateSubjectDto[]) {
+  async createMany(data: CreateSubjectDto[], { ability }: EntityOperationOptions = {}) {
     //filter out all duplicate ids that are planned to be created via a set
     const noDuplicatesSet = new Set(
       data.map((record) => {
@@ -55,7 +55,8 @@ export class SubjectsService {
     const existingSubjects = await this.subjectModel.findMany({
       select: { id: true },
       where: {
-        id: { in: subjectIds }
+        id: { in: subjectIds },
+        AND: [accessibleQuery(ability, 'read', 'Subject')]
       }
     });
 
@@ -76,7 +77,8 @@ export class SubjectsService {
       return subjectsToCreate;
     }
     return this.subjectModel.createMany({
-      data: subjectsToCreate
+      data: subjectsToCreate,
+      ...accessibleQuery(ability, 'create', 'Subject')
     });
   }
 
