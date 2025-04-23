@@ -41,6 +41,47 @@ export class SubjectsService {
     });
   }
 
+  async createMany(data: CreateSubjectDto[], { ability }: EntityOperationOptions = {}) {
+    //filter out all duplicate ids that are planned to be created via a set
+    const noDuplicatesSet = new Set(
+      data.map((record) => {
+        return record.id;
+      })
+    );
+
+    const subjectIds = Array.from(noDuplicatesSet);
+
+    //find the list of subject ids that already exist
+    const existingSubjects = await this.subjectModel.findMany({
+      select: { id: true },
+      where: {
+        id: { in: subjectIds },
+        AND: [accessibleQuery(ability, 'read', 'Subject')]
+      }
+    });
+
+    //create a set of existing ids in the database to filter our to-be-created ids with
+    const existingIds = new Set(existingSubjects.map((subj) => subj.id));
+
+    //Filter out records whose IDs already exist
+    const subjectsToCreateIds = subjectIds.filter((record) => !existingIds.has(record));
+
+    const subjectsToCreate: CreateSubjectDto[] = subjectsToCreateIds.map((record) => {
+      return {
+        id: record
+      };
+    });
+
+    //if there are none left to create do not follow through with the command
+    if (subjectsToCreate.length < 1) {
+      return subjectsToCreate;
+    }
+    return this.subjectModel.createMany({
+      data: subjectsToCreate,
+      ...accessibleQuery(ability, 'create', 'Subject')
+    });
+  }
+
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
     const subject = await this.findById(id);
     return this.subjectModel.delete({

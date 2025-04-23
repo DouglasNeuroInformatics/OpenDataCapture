@@ -20,7 +20,7 @@ import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
-import type { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
+import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
@@ -276,6 +276,14 @@ export class InstrumentRecordsService {
     const createdSessionsArray: Session[] = [];
 
     try {
+      const subjectIdList = records.map(({ subjectId }) => {
+        const subjectToAdd: CreateSubjectDto = { id: subjectId };
+
+        return subjectToAdd;
+      });
+
+      await this.subjectsService.createMany(subjectIdList);
+
       const preProcessedRecords = await Promise.all(
         records.map(async (record) => {
           const { data: rawData, date, subjectId } = record;
@@ -288,9 +296,6 @@ export class InstrumentRecordsService {
               `Data received for record does not pass validation schema of instrument '${instrument.id}'`
             );
           }
-
-          // Ensure subject exists
-          await this.createSubjectIfNotFound(subjectId);
 
           const session = await this.sessionsService.create({
             date: date,
@@ -316,7 +321,6 @@ export class InstrumentRecordsService {
           };
         })
       );
-
       await this.instrumentRecordModel.createMany({
         data: preProcessedRecords
       });
@@ -330,30 +334,6 @@ export class InstrumentRecordsService {
     } catch (err) {
       await this.sessionsService.deleteByIds(createdSessionsArray.map((session) => session.id));
       throw err;
-    }
-  }
-
-  private async createSubjectIfNotFound(subjectId: string) {
-    try {
-      return await this.subjectsService.findById(subjectId);
-    } catch (exception) {
-      if (exception instanceof NotFoundException) {
-        const addedSubject: CreateSubjectDto = {
-          id: subjectId
-        };
-        try {
-          return await this.subjectsService.create(addedSubject);
-        } catch (prismaError) {
-          if (prismaError instanceof Prisma.PrismaClientKnownRequestError && prismaError.code === 'P2002') {
-            console.error(prismaError);
-            return await this.subjectsService.findById(subjectId);
-          } else {
-            throw prismaError;
-          }
-        }
-      } else {
-        throw exception;
-      }
     }
   }
 
