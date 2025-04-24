@@ -55,8 +55,8 @@ export class SubjectsService {
     const existingSubjects = await this.subjectModel.findMany({
       select: { id: true },
       where: {
-        id: { in: subjectIds },
-        AND: [accessibleQuery(ability, 'read', 'Subject')]
+        AND: [accessibleQuery(ability, 'read', 'Subject')],
+        id: { in: subjectIds }
       }
     });
 

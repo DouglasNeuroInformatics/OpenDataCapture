@@ -2,7 +2,7 @@ import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
 import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import type { ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
