@@ -279,9 +279,6 @@ importers:
       neverthrow:
         specifier: ^8.2.0
         version: 8.2.0
-      p-limit:
-        specifier: ^6.2.0
-        version: 6.2.0
       reflect-metadata:
         specifier: ^0.1.14
         version: 0.1.14
