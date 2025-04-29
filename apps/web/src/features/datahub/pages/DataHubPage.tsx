@@ -42,6 +42,13 @@ export const DataHubPage = () => {
 
   const handleExportSelection = (option: 'CSV' | 'Excel' | 'JSON') => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
+    addNotification({
+      message: t({
+        en: 'Downloading entries, please wait...',
+        fr: 'Téléchargement des entrées, veuillez patienter...'
+      }),
+      type: 'info'
+    });
     getExportRecords()
       .then((data): any => {
         switch (option) {
