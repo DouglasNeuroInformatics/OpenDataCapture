@@ -44,7 +44,7 @@ export const DataHubPage = () => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     addNotification({
       message: t({
-        en: 'Downloading entries, please wait...',
+        en: 'Exporting entries, please wait...',
         fr: 'Téléchargement des entrées, veuillez patienter...'
       }),
       type: 'info'
