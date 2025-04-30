@@ -148,7 +148,6 @@ export class InstrumentRecordsService {
         instrument = (await this.instrumentsService.findById(record.instrumentId)) as ScalarInstrument;
         instruments.set(record.instrumentId, instrument);
       }
-
       for (const [dataKey, dataValue] of Object.entries(record.data as object[])) {
         let newDataValue;
         if (typeof dataValue === 'object' && dataValue && JSON.stringify(dataValue)) {
