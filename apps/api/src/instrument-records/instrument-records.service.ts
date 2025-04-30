@@ -3,7 +3,7 @@ import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import type { ScalarInstrument } from '@opendatacapture/runtime-core';
+import type { InstrumentMeasureValue, ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -149,11 +149,15 @@ export class InstrumentRecordsService {
         instruments.set(record.instrumentId, instrument);
       }
 
-      for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
+      for (const [dataKey, dataValue] of Object.entries(record.data as object[])) {
+        let newDataValue;
+        if (typeof dataValue === 'object' && dataValue && JSON.stringify(dataValue)) {
+          newDataValue = JSON.stringify(dataValue);
+        }
         data.push({
           instrumentEdition: instrument.internal.edition,
           instrumentName: instrument.internal.name,
-          measure: measureKey,
+          measure: dataKey,
           sessionDate: record.session.date.toISOString(),
           sessionId: record.session.id,
           sessionType: record.session.type,
@@ -161,7 +165,7 @@ export class InstrumentRecordsService {
           subjectId: record.subject.id,
           subjectSex: record.subject.sex,
           timestamp: record.date.toISOString(),
-          value: measureValue
+          value: newDataValue ?? (dataValue as InstrumentMeasureValue)
         });
       }
     }
