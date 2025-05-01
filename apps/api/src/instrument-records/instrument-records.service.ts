@@ -148,33 +148,12 @@ export class InstrumentRecordsService {
         instrument = (await this.instrumentsService.findById(record.instrumentId)) as ScalarInstrument;
         instruments.set(record.instrumentId, instrument);
       }
-      for (const [dataKey, dataValue] of Object.entries(record.data as object[])) {
-        if (typeof dataValue === 'object' && dataValue && JSON.stringify(dataValue)) {
-          for (const [, subDataValue] of Object.entries(dataValue)) {
-            // eslint-disable-next-line max-depth
-            for (const [superSubKey, superSubValue] of Object.entries(subDataValue as object)) {
-              data.push({
-                instrumentEdition: instrument.internal.edition,
-                instrumentName: instrument.internal.name,
-                measure: superSubKey,
-                sessionDate: record.session.date.toISOString(),
-                sessionId: record.session.id,
-                sessionType: record.session.type,
-                subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-                subjectId: record.subject.id,
-                subjectSex: record.subject.sex,
-                timestamp: record.date.toISOString(),
-                value: JSON.stringify(superSubValue)
-              });
-            }
-          }
 
-          continue;
-        }
+      for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
         data.push({
           instrumentEdition: instrument.internal.edition,
           instrumentName: instrument.internal.name,
-          measure: dataKey,
+          measure: measureKey,
           sessionDate: record.session.date.toISOString(),
           sessionId: record.session.id,
           sessionType: record.session.type,
@@ -182,7 +161,7 @@ export class InstrumentRecordsService {
           subjectId: record.subject.id,
           subjectSex: record.subject.sex,
           timestamp: record.date.toISOString(),
-          value: dataValue as InstrumentMeasureValue
+          value: measureValue
         });
       }
     }
