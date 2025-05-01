@@ -149,9 +149,27 @@ export class InstrumentRecordsService {
         instruments.set(record.instrumentId, instrument);
       }
       for (const [dataKey, dataValue] of Object.entries(record.data as object[])) {
-        let newDataValue;
         if (typeof dataValue === 'object' && dataValue && JSON.stringify(dataValue)) {
-          newDataValue = JSON.stringify(dataValue);
+          for (const [, subDataValue] of Object.entries(dataValue)) {
+            // eslint-disable-next-line max-depth
+            for (const [superSubKey, superSubValue] of Object.entries(subDataValue as object)) {
+              data.push({
+                instrumentEdition: instrument.internal.edition,
+                instrumentName: instrument.internal.name,
+                measure: superSubKey,
+                sessionDate: record.session.date.toISOString(),
+                sessionId: record.session.id,
+                sessionType: record.session.type,
+                subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+                subjectId: record.subject.id,
+                subjectSex: record.subject.sex,
+                timestamp: record.date.toISOString(),
+                value: JSON.stringify(superSubValue)
+              });
+            }
+          }
+
+          continue;
         }
         data.push({
           instrumentEdition: instrument.internal.edition,
@@ -164,7 +182,7 @@ export class InstrumentRecordsService {
           subjectId: record.subject.id,
           subjectSex: record.subject.sex,
           timestamp: record.date.toISOString(),
-          value: newDataValue ?? (dataValue as InstrumentMeasureValue)
+          value: dataValue as InstrumentMeasureValue
         });
       }
     }
