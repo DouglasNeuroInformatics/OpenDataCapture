@@ -3,7 +3,7 @@ import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import type { InstrumentMeasureValue, ScalarInstrument } from '@opendatacapture/runtime-core';
+import type { ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
