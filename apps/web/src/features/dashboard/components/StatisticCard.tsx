@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import type { JSX } from 'react';
 
 import { Card } from '@douglasneuroinformatics/libui/components';
 import { motion, useSpring, useTransform } from 'motion/react';

@@ -6,6 +6,7 @@
   "license": "Apache-2.0",
   "exports": {
     ".": "./src/index.ts",
+    "./globals.css": "./src/globals.css",
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -15,24 +16,33 @@
   },
   "peerDependencies": {
     "axios": "catalog:",
-    "react": "workspace:react__18.x@*",
-    "react-dom": "workspace:react-dom__18.x@*",
-    "tailwindcss": "3.x",
+    "react": "workspace:react__19.x@*",
+    "react-dom": "workspace:react-dom__19.x@*",
+    "tailwindcss": "catalog:",
     "zod": "workspace:zod__3.23.x@*"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libjs": "^2.4.0",
-    "@douglasneuroinformatics/libui": "catalog:",
+    "@douglasneuroinformatics/libjs": "catalog:",
+    "@douglasneuroinformatics/libui": "^4.2.1",
+    "@opendatacapture/evaluate-instrument": "workspace:*",
+    "@opendatacapture/instrument-interpreter": "workspace:*",
+    "@opendatacapture/instrument-utils": "workspace:*",
+    "@opendatacapture/licenses": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
+    "@opendatacapture/runtime-v1": "workspace:*",
+    "@opendatacapture/schemas": "workspace:*",
+    "@opendatacapture/subject-utils": "workspace:*",
     "http-status-codes": "^2.3.0",
+    "lodash-es": "workspace:lodash-es__4.x@*",
     "lucide-react": "^0.473.0",
     "motion": "catalog:",
     "serialize-error": "^11.0.3",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.5.1",
+    "@opendatacapture/instrument-stubs": "workspace:*",
+    "@storybook/react-vite": "catalog:",
+    "type-fest": "workspace:type-fest__4.x@*",
     "vite": "catalog:"
   }
 }

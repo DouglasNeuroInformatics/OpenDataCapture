@@ -29,15 +29,15 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
       <ArrowLeftIcon />
     </button>
     <div
-      class="scrollbar-none flex w-full max-w-screen-md snap-x snap-mandatory overflow-x-scroll scroll-smooth"
+      class="scrollbar-hidden flex w-full max-w-screen-md snap-x snap-mandatory overflow-x-scroll scroll-smooth"
       id="testimonials-slider"
     >
       {
         testimonials.map(({ fullName, image, quote, position, suffix }) => (
-          <div class="testimonial flex h-full w-full flex-shrink-0 snap-center snap-always flex-col items-center justify-center gap-6 transition-all duration-1000">
+          <div class="testimonial flex h-full w-full shrink-0 snap-center snap-always flex-col items-center justify-center gap-6 transition-all duration-1000">
             <Headshot alt={fullName} className="h-24 w-24" src={image} />
             <blockquote class="text-muted-foreground max-w-prose text-center">{quote[resolvedLanguage]}</blockquote>
-            <span class="inline-block h-1 w-10 rounded bg-sky-700" />
+            <span class="inline-block h-1 w-10 rounded-sm bg-sky-700" />
             <div class="flex flex-col items-center">
               <h5 class="text-foreground overflow-hidden text-ellipsis whitespace-nowrap font-semibold tracking-wide md:text-lg">
                 {`${fullName}${suffix ? `, ${suffix}` : ''}`}

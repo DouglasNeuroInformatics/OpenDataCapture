@@ -4,7 +4,7 @@ import { Spinner } from '@douglasneuroinformatics/libui/components';
 import { useInterval } from '@douglasneuroinformatics/libui/hooks';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 import { bundle } from '@opendatacapture/instrument-bundler';
-import { ScalarInstrumentRenderer } from '@opendatacapture/instrument-renderer';
+import { ScalarInstrumentRenderer } from '@opendatacapture/react-core';
 import { ErrorBoundary } from 'react-error-boundary';
 import { match, P } from 'ts-pattern';
 

@@ -148,7 +148,7 @@ export const SubjectGraphPage = () => {
         </div>
       </div>
       <div
-        className="bg-card text-muted-foreground rounded-md border p-6 tracking-tight shadow-sm"
+        className="bg-card text-muted-foreground shadow-xs rounded-md border p-6 tracking-tight"
         ref={graphContainerRef}
       >
         <LineGraph

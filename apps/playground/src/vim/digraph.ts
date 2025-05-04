@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable */
 
 import { kCompressedDigraphs } from './digraph.b64';
 

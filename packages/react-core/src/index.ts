@@ -3,5 +3,8 @@ export * from './components/CopyButton';
 export * from './components/ErrorFallback';
 export * from './components/ErrorPage';
 export * from './components/InstrumentIcon';
+export { InstrumentRenderer, type InstrumentRendererProps } from './components/InstrumentRenderer';
+export { ScalarInstrumentRenderer, type ScalarInstrumentRendererProps } from './components/InstrumentRenderer';
 export * from './components/LoadingPage';
 export * from './components/Logo';
+export * from './types';

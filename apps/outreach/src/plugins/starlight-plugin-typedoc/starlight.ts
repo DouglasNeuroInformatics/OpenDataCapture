@@ -265,4 +265,4 @@ type LinkItem = {
 
 type AsideType = 'caution' | 'danger' | 'note' | 'tip';
 
-type StarlightUserConfigSidebar = Parameters<StarlightPlugin['hooks']['setup']>[0]['config']['sidebar'];
+type StarlightUserConfigSidebar = Parameters<NonNullable<StarlightPlugin['hooks']['setup']>>[0]['config']['sidebar'];

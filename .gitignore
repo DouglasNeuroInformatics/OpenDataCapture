@@ -65,3 +65,7 @@ sqlite/
 
 # runtime core intermediate build
 packages/runtime-core/lib/
+
+# storybook
+*storybook.log
+storybook-static

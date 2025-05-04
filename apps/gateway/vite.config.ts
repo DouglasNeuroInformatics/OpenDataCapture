@@ -1,9 +1,8 @@
 import path from 'path';
 
 import { runtime } from '@opendatacapture/vite-plugin-runtime';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react-swc';
-import autoprefixer from 'autoprefixer';
-import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 
 export default defineConfig(({ mode }) => ({
@@ -12,11 +11,6 @@ export default defineConfig(({ mode }) => ({
     emptyOutDir: false,
     sourcemap: true,
     target: 'es2022'
-  },
-  css: {
-    postcss: {
-      plugins: [autoprefixer(), tailwindcss()]
-    }
   },
   optimizeDeps: {
     esbuildOptions: {
@@ -28,7 +22,8 @@ export default defineConfig(({ mode }) => ({
     react(),
     runtime({
       disabled: mode === 'test'
-    })
+    }),
+    tailwindcss()
   ],
   resolve: {
     alias: {

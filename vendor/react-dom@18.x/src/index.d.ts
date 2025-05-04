@@ -130,5 +130,3 @@ export interface Renderer {
     callback?: () => void
   ): Component<any, ComponentState> | Element | void;
 }
-
-export as namespace ReactDOM;

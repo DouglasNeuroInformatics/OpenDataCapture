@@ -1,12 +1,4 @@
-/* eslint-disable import/exports-last */
-/* eslint-disable no-fallthrough */
-
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-this-alias */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable no-dupe-class-members */
+/* eslint-disable */
 
 /**
  * An adapter to make CodeMirror's vim bindings work with monaco
@@ -468,7 +460,7 @@ export default class EditorAdapter {
 
     const query = typeof pattern === 'string' ? pattern : pattern.source;
 
-    if (pos.ch == undefined) pos.ch = Number.MAX_VALUE;
+    pos.ch ??= Number.MAX_VALUE;
 
     const monacoPos = toMonacoPos(pos);
     const context = this;
@@ -910,9 +902,7 @@ export default class EditorAdapter {
   on(event: 'vim-mode-change', handler: (mode: ModeChangeEvent) => void): void;
   on(event: 'vim-keypress', handler: (key: string) => void): void;
   on(event: string, handler: (...args: any) => void): void {
-    if (!this.listeners[event]) {
-      this.listeners[event] = [];
-    }
+    this.listeners[event] ??= [];
 
     this.listeners[event].push(handler);
   }

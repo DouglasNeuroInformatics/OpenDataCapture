@@ -1,9 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "paths": {
+      "/runtime/v1/*": ["../../runtime/v1/dist/*"]
+    },
     "types": ["vite/client"]
   },
-  "include": [".storybook/*", "src/**/*", "tailwind.config.cjs"]
+  "include": ["src/**/*"]
 }

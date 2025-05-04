@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Button, ClientTable, Heading, SearchBar, Sheet } from '@douglasneuroinformatics/libui/components';
@@ -60,7 +60,7 @@ export const ManageUsersPage = () => {
       </PageHeader>
       <div className="mb-3 flex gap-3">
         <SearchBar
-          className="flex-grow"
+          className="grow"
           placeholder={t({
             en: 'Search by Username',
             fr: "Recherche par nom d'utilisateur"
@@ -111,7 +111,7 @@ export const ManageUsersPage = () => {
             })}
           </Sheet.Description>
         </Sheet.Header>
-        <Sheet.Body className="flex-grow overflow-y-scroll px-6 pb-6">
+        <Sheet.Body className="grow overflow-y-scroll px-6 pb-6">
           <WithFallback
             Component={UpdateUserForm}
             minDelay={1000}

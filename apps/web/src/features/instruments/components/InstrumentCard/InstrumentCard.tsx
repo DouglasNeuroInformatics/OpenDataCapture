@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Card, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { licenses } from '@opendatacapture/licenses';
@@ -128,12 +130,12 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
       onClick={onClick}
       onKeyDown={onClick}
     >
-      <div className="hidden flex-shrink-0 items-center justify-center sm:flex md:min-w-24 lg:min-w-32">
+      <div className="hidden shrink-0 items-center justify-center sm:flex md:min-w-24 lg:min-w-32">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-indigo-500">
           <InstrumentIcon className="rounded-full" kind={instrument.kind} style={{ height: 'auto', width: '32px' }} />
         </div>
       </div>
-      <div className="col-span-6 flex flex-grow flex-col gap-2">
+      <div className="col-span-6 flex grow flex-col gap-2">
         <Heading variant="h4">{instrument.details.title}</Heading>
         <div className="flex flex-col gap-2 text-sm tracking-tight">
           {content.map((item) => {

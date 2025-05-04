@@ -86,10 +86,10 @@ export const DataHubPage = () => {
         </Heading>
       </PageHeader>
       <React.Suspense fallback={<LoadingFallback />}>
-        <div className="flex flex-grow flex-col">
+        <div className="flex grow flex-col">
           <div className="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
             <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
-              <Dialog.Trigger className="flex-grow">
+              <Dialog.Trigger className="grow">
                 <SearchBar
                   className="[&>input]:text-foreground [&>input]:placeholder-foreground"
                   id="subject-lookup-search-bar"
@@ -107,7 +107,7 @@ export const DataHubPage = () => {
                 <IdentificationForm onSubmit={(data) => void lookupSubject(data)} />
               </Dialog.Content>
             </Dialog>
-            <div className="flex min-w-60 gap-2 lg:flex-shrink">
+            <div className="flex min-w-60 gap-2 lg:shrink">
               <ActionDropdown
                 widthFull
                 data-spotlight-type="export-data-dropdown"

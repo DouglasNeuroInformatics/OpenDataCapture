@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { ListboxDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
 import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
@@ -58,7 +58,7 @@ export const InstrumentShowcase: React.FC<{
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center gap-2.5">
-        <SearchBar className="flex-grow" value={searchTerm} onValueChange={setSearchTerm} />
+        <SearchBar className="grow" value={searchTerm} onValueChange={setSearchTerm} />
         <div className="flex items-center gap-2.5">
           <InstrumentKindDropdown selected={selectedKinds} setSelected={setSelectedKinds} />
           <ListboxDropdown

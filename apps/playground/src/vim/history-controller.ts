@@ -7,9 +7,7 @@ export class HistoryController {
   // until we start autocompletion in which case it is the autocompleted.
   nextMatch(input: string, up: boolean) {
     const dir = up ? -1 : 1;
-    if (this.initialPrefix === undefined) {
-      this.initialPrefix = input;
-    }
+    this.initialPrefix ??= input;
     let i = 0;
     for (i = this.iterator + dir; up ? i >= 0 : i < this.historyBuffer.length; i += dir) {
       const element = this.historyBuffer[i]!;

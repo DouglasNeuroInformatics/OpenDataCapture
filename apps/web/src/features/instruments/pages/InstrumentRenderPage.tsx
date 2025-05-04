@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 
 import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
-import type { InstrumentSubmitHandler } from '@opendatacapture/instrument-renderer';
+import { InstrumentRenderer } from '@opendatacapture/react-core';
+import type { InstrumentSubmitHandler } from '@opendatacapture/react-core';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
 import axios from 'axios';
@@ -51,13 +51,13 @@ export const InstrumentRenderPage = () => {
   }
 
   return (
-    <div className="flex flex-grow flex-col">
+    <div className="flex grow flex-col">
       <PageHeader>
         <Heading className="text-center" variant="h2">
           {title ?? t('core.instrument')}
         </Heading>
       </PageHeader>
-      <div className="flex-grow">
+      <div className="grow">
         <InstrumentRenderer
           className="mx-auto max-w-3xl"
           subject={currentSession?.subject}

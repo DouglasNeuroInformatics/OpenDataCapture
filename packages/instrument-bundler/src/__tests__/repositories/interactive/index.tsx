@@ -1,5 +1,5 @@
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { createRoot } from '/runtime/v1/react-dom@18.x/client';
+import { createRoot } from '/runtime/v1/react-dom@19.x/client';
 import { z } from '/runtime/v1/zod@3.23.x';
 
 const { sum } = await import('/runtime/v1/lodash-es@4.x');

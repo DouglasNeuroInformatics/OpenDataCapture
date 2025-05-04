@@ -1,5 +1,5 @@
 import { Heading } from '@douglasneuroinformatics/libui/components';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PageHeader } from './PageHeader';
 type Story = StoryObj<typeof PageHeader>;

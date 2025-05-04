@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable no-dupe-class-members */
+/* eslint-disable */
 
 export class StringStream {
   lastColumnPos = 0;

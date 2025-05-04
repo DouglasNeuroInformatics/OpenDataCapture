@@ -81,6 +81,7 @@ loader.config({ monaco });
     forceConsistentCasingInFileNames: true,
     isolatedModules: true,
     jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
+    jsxImportSource: '/runtime/v1/react@19.x',
     module: monaco.languages.typescript.ModuleKind.ESNext,
     moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
     newLine: monaco.languages.typescript.NewLineKind.LineFeed,

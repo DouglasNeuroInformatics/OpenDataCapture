@@ -40,7 +40,7 @@ export async function build({ inputs }: { inputs: BundlerInput[] }): Promise<Bui
       charset: 'ascii',
       format: 'esm',
       jsx: 'automatic',
-      jsxImportSource: '/runtime/v1/react@18.x',
+      jsxImportSource: '/runtime/v1/react@19.x',
       keepNames: true,
       metafile: true,
       minify: false,

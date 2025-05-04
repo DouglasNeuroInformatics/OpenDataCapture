@@ -5,7 +5,7 @@ import { i18n } from '@douglasneuroinformatics/libui/i18n';
 
 import { App } from './App';
 
-import '@douglasneuroinformatics/libui/tailwind/globals.css';
+import '@opendatacapture/react-core/globals.css';
 
 const root = document.getElementById('root')!;
 

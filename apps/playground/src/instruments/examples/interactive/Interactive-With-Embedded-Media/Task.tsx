@@ -1,4 +1,4 @@
-import { useEffect, useState } from '/runtime/v1/react@18.x';
+import React, { useEffect, useState } from '/runtime/v1/react@19.x';
 import { match } from '/runtime/v1/ts-pattern@5.x';
 import { z } from '/runtime/v1/zod@3.23.x';
 

@@ -1,4 +1,4 @@
-import { AppContainer } from '@douglasneuroinformatics/libnest';
+import { AppFactory } from '@douglasneuroinformatics/libnest';
 
 import { AssignmentsModule } from './assignments/assignments.module';
 import { $Env } from './core/env.schema';
@@ -13,7 +13,7 @@ import { SummaryModule } from './summary/summary.module';
 import { UsersModule } from './users/users.module';
 import { ConfiguredAuthModule } from './vendor/configured.auth.module';
 
-export default AppContainer.create({
+export default AppFactory.create({
   docs: {
     contact: {
       email: 'support@douglasneuroinformatics.ca',

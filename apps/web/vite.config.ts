@@ -3,9 +3,8 @@ import path from 'path';
 import importMetaEnv from '@import-meta-env/unplugin';
 import { getReleaseInfo } from '@opendatacapture/release-info';
 import { runtime } from '@opendatacapture/vite-plugin-runtime';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react-swc';
-import autoprefixer from 'autoprefixer';
-import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
@@ -15,11 +14,6 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     target: 'es2022'
-  },
-  css: {
-    postcss: {
-      plugins: [autoprefixer(), tailwindcss()]
-    }
   },
   define: {
     __RELEASE__: JSON.stringify(await getReleaseInfo())
@@ -36,7 +30,8 @@ export default defineConfig({
     importMetaEnv.vite({
       example: path.resolve(import.meta.dirname, '.env.public')
     }),
-    runtime()
+    runtime(),
+    tailwindcss()
   ],
   resolve: {
     alias: {

@@ -1,5 +1,5 @@
 import { InstrumentBundlerError } from '@opendatacapture/instrument-bundler';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { ViewerErrorFallback } from './ViewerErrorFallback';
 

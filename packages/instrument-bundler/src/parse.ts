@@ -19,7 +19,7 @@
  * limitations under the License.
  */
 
-import { parse as _parse, init } from 'es-module-lexer';
+import { parse as _parse, ImportType, init } from 'es-module-lexer';
 import { removeSlashes } from 'slashes';
 
 import { InstrumentBundlerError } from './error.js';
@@ -284,14 +284,6 @@ export function parseModuleSpecifier(moduleSpecifierString: string, { isDynamicI
   } as const;
 }
 
-const IMPORT_TYPES = {
-  1: 'Static',
-  2: 'Dynamic',
-  3: 'ImportMeta',
-  4: 'StaticSourcePhase',
-  5: 'DynamicSourcePhase'
-};
-
 export function parse(code: string) {
   const [imports, exports] = _parse(code);
   return {
@@ -299,7 +291,7 @@ export function parse(code: string) {
     imports: imports.map(({ d, e, n, s, se, ss, t }) => ({
       dynamicImportStartIndex: d,
       importPath: n,
-      importType: IMPORT_TYPES[t],
+      importType: ImportType[t],
       moduleSpecifierEndIndexExclusive: e,
       moduleSpecifierStartIndex: s,
       statement: code.slice(ss, se),

@@ -30,7 +30,7 @@ export const ManageGroupsPage = () => {
       </PageHeader>
       <div className="mb-3 flex gap-3">
         <SearchBar
-          className="flex-grow"
+          className="grow"
           placeholder={t({
             en: 'Search by Group Name',
             fr: 'Recherche par nom de groupe'

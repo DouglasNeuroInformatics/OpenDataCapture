@@ -20,7 +20,7 @@ import { z } from 'zod';
                 ability.can('manage', 'all');
                 break;
               case 'GROUP_MANAGER':
-                ability.can('manage', 'Assignment');
+                ability.can('manage', 'Assignment', { groupId: { in: groupIds } });
                 ability.can('manage', 'Group', { id: { in: groupIds } });
                 ability.can('read', 'Instrument');
                 ability.can('create', 'InstrumentRecord');

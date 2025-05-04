@@ -1,7 +1,4 @@
-/* eslint-disable import/exports-last */
-/* eslint-disable @typescript-eslint/prefer-for-of */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+/* eslint-disable */
 
 import EditorAdapter, { CmSelection } from './adapter';
 import {

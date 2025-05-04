@@ -1,0 +1,33 @@
+{
+  "name": "@opendatacapture/storybook",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "scripts": {
+    "format": "prettier --write config package.json tsconfig.json vite.config.js",
+    "lint": "tsc && eslint --fix config vite.config.js",
+    "storybook": "NODE_OPTIONS='--import=tsx' env-cmd -f ../.env storybook dev -c config --no-open -p 6006"
+  },
+  "dependencies": {
+    "axios": "catalog:",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19",
+    "tailwindcss": "catalog:",
+    "zod": "workspace:zod__3.23.x@*"
+  },
+  "devDependencies": {
+    "@douglasneuroinformatics/libui": "^4.2.1",
+    "@opendatacapture/instrument-stubs": "workspace:*",
+    "@opendatacapture/react-core": "workspace:*",
+    "@opendatacapture/vite-plugin-runtime": "workspace:*",
+    "@storybook/addon-docs": "catalog:",
+    "@storybook/addon-themes": "catalog:",
+    "@storybook/react-vite": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "esbuild-wasm": "catalog:",
+    "storybook": "catalog:",
+    "type-fest": "workspace:type-fest__4.x@*",
+    "vite": "^6.3.3"
+  }
+}
