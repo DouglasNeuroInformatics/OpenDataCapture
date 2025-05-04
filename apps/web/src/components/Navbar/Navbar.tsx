@@ -30,7 +30,7 @@ export const Navbar = () => {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <div className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
+      <div className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow-sm backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
         <div className="h-full w-full bg-inherit">
           <div className="container flex items-center justify-between bg-inherit py-2 font-medium">
             <Branding className="[&>span]:hidden" />
@@ -52,7 +52,7 @@ export const Navbar = () => {
           <Branding className="h-10" fontSize="md" />
         </Sheet.Header>
         <Separator />
-        <nav className="flex w-full flex-grow flex-col divide-y divide-slate-200 dark:divide-slate-700">
+        <nav className="flex w-full grow flex-col divide-y divide-slate-200 dark:divide-slate-700">
           {navItems.map((items, i) => (
             <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
               {items.map(({ disabled, url, ...props }) => (

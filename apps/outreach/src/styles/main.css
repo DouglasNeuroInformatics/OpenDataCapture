@@ -1,4 +1,14 @@
+@plugin "@tailwindcss/typography";
 @import '@douglasneuroinformatics/libui/tailwind/globals.css';
 @import './common.css';
 
-@config "../../tailwind.config.cjs";
+@layer utilities {
+  .container {
+    @media (width >= theme(--breakpoint-xl)) {
+      max-width: theme(--breakpoint-2xl);
+    }
+  }
+  .sl-anchor-link {
+    display: none;
+  }
+}

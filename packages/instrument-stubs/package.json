@@ -16,7 +16,7 @@
     "@opendatacapture/runtime-core": "workspace:*"
   },
   "dependencies": {
-    "@douglasneuroinformatics/libjs": "^2.4.0",
+    "@douglasneuroinformatics/libjs": "catalog:",
     "zod": "workspace:zod__3.23.x@*"
   }
 }

@@ -6,5 +6,5 @@
       "@/*": ["*"]
     }
   },
-  "include": ["astro.config.ts", "src/**/*", "tailwind.config.cjs", "tailwind.starlight.config.js"]
+  "include": ["astro.config.ts", "src/**/*"]
 }

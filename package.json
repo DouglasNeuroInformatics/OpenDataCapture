@@ -40,14 +40,6 @@
     "@douglasneuroinformatics/eslint-config": "^5.3.1",
     "@douglasneuroinformatics/prettier-config": "^0.0.2",
     "@douglasneuroinformatics/tsconfig": "^1.0.3",
-    "@storybook/addon-essentials": "^8.5.0",
-    "@storybook/addon-interactions": "^8.5.0",
-    "@storybook/addon-links": "^8.5.0",
-    "@storybook/addon-themes": "^8.5.0",
-    "@storybook/blocks": "^8.5.0",
-    "@storybook/icons": "^1.3.0",
-    "@storybook/react": "^8.5.0",
-    "@storybook/react-vite": "^8.5.0",
     "@swc-node/register": "^1.10.9",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.9",
@@ -59,7 +51,7 @@
     "@vitest/coverage-v8": "^2.0.5",
     "dotenv": "^16.4.7",
     "env-cmd": "^10.1.0",
-    "eslint": "^9.18.0",
+    "eslint": "9.23.x",
     "expect-type": "^0.20.0",
     "husky": "^9.1.7",
     "js-yaml": "^4.1.0",
@@ -68,7 +60,6 @@
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.6.10",
     "start-server-and-test": "^2.0.10",
-    "storybook": "^8.5.0",
     "tsx": "catalog:",
     "turbo": "^2.3.3",
     "typescript": "5.6.x",
@@ -90,14 +81,10 @@
   },
   "pnpm": {
     "overrides": {
-      "@mdx-js/react>@types/react": "18.x",
+      "@types/react": "-",
+      "@types/react-dom": "-",
       "framer-motion": "11.15.0",
       "typescript": "5.6.x"
-    },
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "@mdx-js/react>@types/react": "18.x"
-      }
     }
   },
   "__isODCRepo": true

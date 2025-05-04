@@ -82,8 +82,8 @@ export const UploadPage = () => {
       if (error instanceof Error)
         addNotification({
           message: t({
-            en: `An error has happended within the request \n '${error.message}'`,
-            fr: `Une erreur s'est produite lors du téléversement \n '${error.message}'.`
+            en: `An error has happened within the request: '${error.message}'`,
+            fr: `Une erreur s'est produite lors du téléversement :'${error.message}'.`
           }),
           type: 'error'
         });
@@ -107,7 +107,7 @@ export const UploadPage = () => {
         </Heading>
       </PageHeader>
       {!isLoading ? (
-        <div className="mx-auto flex w-full max-w-3xl flex-grow flex-col justify-center">
+        <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center">
           <FileDropzone
             acceptedFileTypes={{
               'text/csv': ['.csv']
@@ -117,7 +117,7 @@ export const UploadPage = () => {
             setFile={setFile}
           />
           <div className="mt-4 flex justify-between space-x-2">
-            <Button disabled={!(file && instrument)} variant={'primary'} onClick={handleInstrumentCSV}>
+            <Button disabled={!(file && instrument)} variant={'primary'} onClick={() => void handleInstrumentCSV()}>
               {t('core.submit')}
             </Button>
             <div className="flex justify-between space-x-1">
@@ -147,7 +147,7 @@ export const UploadPage = () => {
         </div>
       ) : (
         <>
-          <div className="mx-auto flex w-full max-w-3xl flex-grow flex-col justify-center">
+          <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center">
             <Spinner className="mx-auto size-1/2"></Spinner>
             <Heading className="text-center" variant="h3">
               {t({

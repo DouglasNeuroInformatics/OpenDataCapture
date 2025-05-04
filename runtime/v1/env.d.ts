@@ -44,7 +44,3 @@ declare module '*.json' {
   const src: any;
   export default src;
 }
-
-declare module 'react/jsx-runtime' {
-  export * from '/runtime/v1/react@18.x/jsx-runtime';
-}

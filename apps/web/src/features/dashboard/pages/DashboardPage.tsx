@@ -41,7 +41,7 @@ export const DashboardPage = () => {
   }
 
   return (
-    <div className="flex flex-grow flex-col">
+    <div className="flex grow flex-col">
       <PageHeader className="text-center">
         <Heading variant="h2">
           {t({
@@ -50,7 +50,7 @@ export const DashboardPage = () => {
           })}
         </Heading>
       </PageHeader>
-      <section className="flex flex-grow flex-col gap-5">
+      <section className="flex grow flex-col gap-5">
         <div className="flex w-full flex-col flex-wrap justify-between gap-3 md:flex-row md:items-center">
           <Heading className="whitespace-nowrap" variant="h3">
             {welcome}

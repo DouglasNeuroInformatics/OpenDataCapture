@@ -1,8 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable no-case-declarations */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/prefer-for-of */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+/* eslint-disable */
 
 import EditorAdapter from './adapter';
 import { defaultKeymap } from './default-key-map';

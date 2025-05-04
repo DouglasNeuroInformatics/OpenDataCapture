@@ -1,6 +1,4 @@
-/* eslint-disable no-case-declarations */
-/* eslint-disable @typescript-eslint/prefer-for-of */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+/* eslint-disable */
 
 import { actions } from './actions';
 import EditorAdapter, { CmSelection } from './adapter';

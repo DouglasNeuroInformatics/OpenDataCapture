@@ -1,6 +1,6 @@
 /* eslint-disable react/function-component-definition */
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { LoadingFallback } from './LoadingFallback';
 

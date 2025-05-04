@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { formatByteSize } from '@douglasneuroinformatics/libjs';
 import { Heading, Input, Popover, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { CopyButton } from '@opendatacapture/react-core';
 import { Share2Icon } from 'lucide-react';
@@ -7,7 +8,6 @@ import { Share2Icon } from 'lucide-react';
 import { useFilesRef } from '@/hooks/useFilesRef';
 import { useAppStore } from '@/store';
 import { encodeShareURL } from '@/utils/encode';
-import { formatSize } from '@/utils/format';
 
 export const ShareButton = () => {
   const label = useAppStore((store) => store.selectedInstrument.label);
@@ -43,7 +43,7 @@ export const ShareButton = () => {
             <Heading variant="h5">Share Instrument</Heading>
             <p className="text-muted-foreground text-sm">
               Anyone with this link can open a snapshot of the current code in your playground. The total size of the
-              URL-encoded source files for this instrument is {formatSize(shareURL.size)}.
+              URL-encoded source files for this instrument is {formatByteSize(shareURL.size)}.
             </p>
           </div>
           <div className="flex gap-2 pt-4">

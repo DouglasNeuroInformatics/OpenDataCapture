@@ -25,6 +25,11 @@ export const $ReleaseInfo = z.union([$DevelopmentReleaseInfo, $ProductionRelease
 
 export type SetupState = z.infer<typeof $SetupState>;
 export const $SetupState = z.object({
+  branding: z
+    .object({
+      customLogoSvg: z.string().optional()
+    })
+    .nullish(),
   isDemo: z.boolean(),
   isExperimentalFeaturesEnabled: z.boolean().nullish(),
   isGatewayEnabled: z.boolean(),
@@ -36,6 +41,7 @@ export const $SetupState = z.object({
 export type UpdateSetupStateData = z.infer<typeof $UpdateSetupStateData>;
 export const $UpdateSetupStateData = $SetupState
   .pick({
+    branding: true,
     isExperimentalFeaturesEnabled: true
   })
   .partial();

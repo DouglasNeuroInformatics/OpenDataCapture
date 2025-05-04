@@ -19,6 +19,6 @@
     "vite": "catalog:"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/libjs": "^2.4.0"
+    "@douglasneuroinformatics/libjs": "catalog:"
   }
 }

@@ -66,9 +66,7 @@ export const Editor = () => {
   useEffect(() => {
     if (isEditorMounted) {
       if (isVimModeEnabled) {
-        if (!vimModeRef.current) {
-          vimModeRef.current = new VimMode(editorPaneRef.current!.editor!);
-        }
+        vimModeRef.current ??= new VimMode(editorPaneRef.current!.editor!);
         vimModeRef.current.enable();
       } else {
         vimModeRef.current?.disable();
@@ -102,7 +100,7 @@ export const Editor = () => {
       <div className="flex h-full overflow-hidden">
         <motion.div
           animate={{ width: isSidebarOpen ? 320 : 0 }}
-          className="h-full flex-shrink-0 overflow-scroll border-r border-slate-900/10 shadow-sm dark:border-slate-100/25"
+          className="shadow-xs h-full shrink-0 overflow-scroll border-r border-slate-900/10 dark:border-slate-100/25"
           initial={{ width: 0 }}
         >
           <div className="h-full w-full">

@@ -4,7 +4,7 @@ import path from 'path';
 
 import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
-import tailwind from '@astrojs/tailwind';
+import tailwind from '@tailwindcss/vite';
 import { defineConfig, sharpImageService } from 'astro/config';
 import { toString } from 'mdast-util-to-string';
 import getReadingTime from 'reading-time';
@@ -99,18 +99,18 @@ export default defineConfig({
         },
         starlightTypeDocSidebarGroup
       ],
-      social: {
-        github: 'https://github.com/DouglasNeuroInformatics/OpenDataCapture'
-      },
+      social: [
+        {
+          href: 'https://github.com/DouglasNeuroInformatics/OpenDataCapture',
+          icon: 'github',
+          label: 'GitHub'
+        }
+      ],
       tableOfContents: {
         maxHeadingLevel: 4,
         minHeadingLevel: 2
       },
       title: 'Open Data Capture'
-    }),
-    tailwind({
-      applyBaseStyles: false,
-      configFile: path.resolve(import.meta.dirname, 'tailwind.config.cjs')
     })
   ],
   markdown: {
@@ -143,7 +143,8 @@ export default defineConfig({
           'docs/en/docs': '../../docs/en',
           'docs/fr/docs': '../../docs/fr'
         }
-      })
+      }),
+      tailwind()
     ],
     // this is necessary because the MDX imports will attempt to resolve from their actual location
     resolve: {

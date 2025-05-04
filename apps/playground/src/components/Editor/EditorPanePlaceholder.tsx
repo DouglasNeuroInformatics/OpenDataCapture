@@ -6,7 +6,7 @@ export type EditorPanePlaceholderProps = {
 
 export const EditorPanePlaceholder = ({ children }: EditorPanePlaceholderProps) => {
   return (
-    <div className="flex flex-grow flex-col items-center justify-center text-center">
+    <div className="flex grow flex-col items-center justify-center text-center">
       <Heading className="font-medium" variant="h5">
         {children}
       </Heading>

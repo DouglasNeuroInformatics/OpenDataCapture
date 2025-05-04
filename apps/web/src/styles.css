@@ -1,13 +1,7 @@
-@import '@douglasneuroinformatics/libui/tailwind/globals.css';
-
-@layer components {
-  .spotlight {
-    @apply pointer-events-none z-40 rounded-md shadow-2xl;
-  }
-}
+@import '@opendatacapture/react-core/globals.css';
 
 [data-spotlight='true'] {
-  @apply spotlight;
+  @apply pointer-events-none z-40 rounded-md shadow-2xl;
 }
 
 [data-spotlight-type='nav-button'][data-spotlight='true'] {

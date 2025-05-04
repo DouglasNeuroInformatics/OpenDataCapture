@@ -1,6 +1,4 @@
-/* eslint-disable import/exports-last */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable */
 
 import * as monaco from 'monaco-editor';
 import type { IKeyboardEvent } from 'monaco-editor';

@@ -30,7 +30,7 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
     {
       team.map(({ data: { fullName, suffix, position, image, description } }) => (
         <li class="translate-y-6 opacity-0 transition-all duration-500 ease-in-out">
-          <div class="relative grid h-full gap-8 rounded-md border border-slate-300 bg-slate-50 p-5 shadow-sm md:grid-cols-4 md:rounded-none md:border-none md:bg-inherit md:p-0 md:shadow-none lg:grid-cols-3 dark:border-slate-600 dark:bg-slate-800 md:dark:bg-inherit">
+          <div class="shadow-xs relative grid h-full gap-8 rounded-md border border-slate-300 bg-slate-50 p-5 md:grid-cols-4 md:rounded-none md:border-none md:bg-inherit md:p-0 md:shadow-none lg:grid-cols-3 dark:border-slate-600 dark:bg-slate-800 md:dark:bg-inherit">
             <div class="absolute left-5 top-5 h-14 w-14 md:static md:flex md:h-auto md:w-auto md:items-center md:justify-center">
               <Headshot className="md:rounded-lg md:shadow-lg" src={image} alt={fullName} />
             </div>

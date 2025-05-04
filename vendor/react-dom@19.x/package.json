@@ -1,0 +1,37 @@
+{
+  "name": "react-dom__19.x",
+  "type": "module",
+  "version": "19.1.0",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./client": {
+      "types": "./src/client.d.ts",
+      "default": "./src/client.js"
+    },
+    "./server": {
+      "types": "./src/server.d.ts",
+      "default": "./src/server.js"
+    },
+    "./profiling": {
+      "types": "./src/profiling.d.ts",
+      "default": "./src/profiling.js"
+    },
+    "./static": {
+      "types": "./src/static.d.ts",
+      "default": "./src/static.js"
+    },
+    "./test-utils": {
+      "types": "./src/test-utils.d.ts",
+      "default": "./src/test-utils.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "react-dom": "catalog:react19",
+    "react__19.x": "workspace:"
+  }
+}

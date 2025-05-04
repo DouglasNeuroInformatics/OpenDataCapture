@@ -1,4 +1,4 @@
-import { useState } from '/runtime/v1/react@18.x';
+import { useState } from '/runtime/v1/react@19.x';
 
 import reactLogo from './react.svg';
 

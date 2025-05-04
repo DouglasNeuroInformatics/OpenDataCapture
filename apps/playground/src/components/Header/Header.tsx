@@ -14,7 +14,7 @@ import { UploadButton } from './UploadButton';
 export const Header = () => {
   return (
     <header className="flex flex-col gap-4 py-4 md:flex-row md:gap-2">
-      <div className="hidden flex-grow md:flex md:items-center">
+      <div className="hidden grow md:flex md:items-center">
         <Branding
           className={cn(
             '[&>span]:hidden lg:[&>span]:inline',

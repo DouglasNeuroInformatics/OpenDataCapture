@@ -2,9 +2,8 @@ import { useEffect, useRef } from 'react';
 
 import { LanguageToggle, NotificationHub, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import { InstrumentRenderer } from '@opendatacapture/instrument-renderer';
-import type { InstrumentSubmitHandler } from '@opendatacapture/instrument-renderer';
-import { Branding } from '@opendatacapture/react-core';
+import { Branding, InstrumentRenderer } from '@opendatacapture/react-core';
+import type { InstrumentSubmitHandler } from '@opendatacapture/react-core';
 import type { UpdateRemoteAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import axios from 'axios';
@@ -54,7 +53,7 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
 
   return (
     <div className="flex h-screen flex-col" ref={ref} style={{ display: 'none' }}>
-      <header className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
+      <header className="fixed top-0 z-10 w-full bg-white/80 text-slate-700 shadow-sm backdrop-blur-lg dark:bg-slate-800/75 dark:text-slate-300">
         <div className="container flex items-center justify-between py-3 font-medium">
           <Branding className="[&>span]:hidden sm:[&>span]:block" fontSize="md" />
           <div className="flex gap-3">
@@ -69,7 +68,7 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
           </div>
         </div>
       </header>
-      <main className="container flex min-h-0 max-w-3xl flex-grow flex-col pb-16 pt-32 xl:max-w-5xl">
+      <main className="container flex min-h-0 max-w-3xl grow flex-col pb-16 pt-32 xl:max-w-5xl">
         <InstrumentRenderer
           className="min-h-full w-full"
           initialSeriesIndex={initialSeriesIndex}

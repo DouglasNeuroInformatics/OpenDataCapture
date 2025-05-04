@@ -14,17 +14,26 @@ export const AppSettingsForm = ({ initialValues, onSubmit }: AppSettingsFormProp
   return (
     <Form
       className="mx-auto max-w-3xl"
-      content={{
-        isExperimentalFeaturesEnabled: {
-          kind: 'boolean',
-          label: t('setup.enableExperimentalFeatures'),
-          variant: 'radio'
+      content={[
+        {
+          fields: {
+            isExperimentalFeaturesEnabled: {
+              kind: 'boolean',
+              label: t('setup.enableExperimentalFeatures'),
+              variant: 'radio'
+            }
+          },
+          title: t({
+            en: 'Features',
+            fr: 'Fonctionnalités'
+          })
         }
-      }}
+      ]}
       initialValues={initialValues}
       preventResetValuesOnReset={true}
       validationSchema={
         z.object({
+          customLogoSvg: z.string().optional(),
           isExperimentalFeaturesEnabled: z.boolean()
         }) satisfies z.ZodType<SetNonNullable<UpdateSetupStateData>>
       }

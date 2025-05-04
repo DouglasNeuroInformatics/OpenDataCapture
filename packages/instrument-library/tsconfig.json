@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
+    "jsxImportSource": "/runtime/v1/react@19.x",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "paths": {
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]

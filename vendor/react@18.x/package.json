@@ -21,6 +21,6 @@
   "dependencies": {
     "csstype__3.x": "workspace:*",
     "prop-types__15.x": "workspace:*",
-    "react": "18.x"
+    "react": "18.3.1"
   }
 }

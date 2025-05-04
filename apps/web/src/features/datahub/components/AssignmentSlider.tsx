@@ -24,7 +24,7 @@ export const AssignmentSlider = ({ assignment, isOpen, onCancel, setIsOpen }: As
           <Sheet.Title>{instrument?.details.title}</Sheet.Title>
           <Sheet.Description>{t('datahub.assignments.assignmentSliderDesc')}</Sheet.Description>
         </Sheet.Header>
-        <Sheet.Body className="flex-grow">
+        <Sheet.Body className="grow">
           {instrument && (
             <div className="flex flex-col gap-3">
               <Label asChild>

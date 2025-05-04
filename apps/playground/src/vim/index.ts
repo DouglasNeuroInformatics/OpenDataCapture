@@ -1,7 +1,4 @@
-/* eslint-disable import/exports-last */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/unbound-method */
-/* eslint-disable no-dupe-class-members */
+/* eslint-disable */
 
 import * as monaco from 'monaco-editor';
 

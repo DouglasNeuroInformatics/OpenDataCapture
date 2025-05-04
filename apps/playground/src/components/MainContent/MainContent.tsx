@@ -7,7 +7,7 @@ import { Viewer } from '../Viewer';
 export const MainContent = () => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   return (
-    <main className="flex flex-grow flex-col overflow-hidden py-4">
+    <main className="flex grow flex-col overflow-hidden py-4">
       {isDesktop ? (
         <Resizable.PanelGroup direction="horizontal">
           <Resizable.Panel defaultSize={66} minSize={25}>
@@ -19,15 +19,15 @@ export const MainContent = () => {
           </Resizable.Panel>
         </Resizable.PanelGroup>
       ) : (
-        <Tabs className="flex flex-grow flex-col overflow-hidden" defaultValue="editor">
+        <Tabs className="flex grow flex-col overflow-hidden" defaultValue="editor">
           <Tabs.List className="grid w-full grid-cols-2">
             <Tabs.Trigger value="editor">Editor</Tabs.Trigger>
             <Tabs.Trigger value="viewer">Viewer</Tabs.Trigger>
           </Tabs.List>
-          <Tabs.Content className="flex-grow" value="editor">
+          <Tabs.Content className="grow" value="editor">
             <Editor />
           </Tabs.Content>
-          <Tabs.Content className="flex-grow overflow-hidden pt-6" value="viewer">
+          <Tabs.Content className="grow overflow-hidden pt-6" value="viewer">
             <Viewer />
           </Tabs.Content>
         </Tabs>

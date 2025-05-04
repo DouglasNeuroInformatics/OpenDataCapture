@@ -10,5 +10,5 @@
     },
     "types": ["@opendatacapture/runtime-v1/env", "vite/client"]
   },
-  "include": [".storybook/*", "src/**/*", "tailwind.config.cjs", "vite.config.ts"]
+  "include": ["src/**/*", "vite.config.ts"]
 }

@@ -35,7 +35,7 @@
   "devDependencies": {
     "@opendatacapture/instrument-stubs": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
-    "react": "workspace:react__18.x@*",
-    "react-dom": "workspace:react-dom__18.x@*"
+    "react": "workspace:react__19.x@*",
+    "react-dom": "workspace:react-dom__19.x@*"
   }
 }

@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@casl/ability": "catalog:",
-    "@douglasneuroinformatics/libjs": "^2.4.0",
+    "@douglasneuroinformatics/libjs": "catalog:",
     "@faker-js/faker": "^9.4.0",
     "@opendatacapture/schemas": "workspace:",
     "cypress": "^13.14.2"
