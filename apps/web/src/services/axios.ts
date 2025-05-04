@@ -13,7 +13,11 @@ axios.interceptors.request.use((config) => {
   config.headers.setAccept('application/json');
 
   // Do not set timeout for setup (can be CPU intensive, especially on slow server)
-  if (config.url !== '/v1/setup' && config.url !== '/v1/instrument-records/upload') {
+  if (
+    config.url !== '/v1/setup' &&
+    config.url !== '/v1/instrument-records/upload' &&
+    config.url !== '/v1/instrument-records/export'
+  ) {
     config.timeout = 10000; // abort request after 10 seconds
     config.timeoutErrorMessage = i18n.t({
       en: 'Network Error',
