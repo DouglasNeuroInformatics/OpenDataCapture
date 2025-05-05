@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 
 import { Root } from './Root';
 
-import '@douglasneuroinformatics/libui/tailwind/globals.css';
+import '@opendatacapture/react-core/globals.css';
 
 const ROOT_PROPS = window.__ROOT_PROPS__;
 
