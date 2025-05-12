@@ -38,7 +38,7 @@ export const InstrumentShowcase: React.FC<{
       }
       return (
         details.title.toUpperCase().includes(searchTerm.toUpperCase()) ||
-        tags.join().toUpperCase().includes(searchTerm.toUpperCase())
+        tags.join(', ').toUpperCase().includes(searchTerm.toUpperCase())
       );
     });
     updatedFilteredInstruments.sort((a, b) => {
