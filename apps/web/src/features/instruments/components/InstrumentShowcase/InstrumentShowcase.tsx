@@ -36,7 +36,12 @@ export const InstrumentShowcase: React.FC<{
       } else if (selectedTags.length && !selectedTags.some(({ key }) => tags.includes(key))) {
         return false;
       }
-      return details.title.toUpperCase().includes(searchTerm.toUpperCase());
+      console.log(searchTerm);
+      console.log(tags);
+      return (
+        details.title.toUpperCase().includes(searchTerm.toUpperCase()) ||
+        tags.join().toUpperCase().includes(searchTerm.toUpperCase())
+      );
     });
     updatedFilteredInstruments.sort((a, b) => {
       return a.details.title.localeCompare(b.details.title);
