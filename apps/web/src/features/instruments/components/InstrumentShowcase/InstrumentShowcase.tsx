@@ -36,8 +36,6 @@ export const InstrumentShowcase: React.FC<{
       } else if (selectedTags.length && !selectedTags.some(({ key }) => tags.includes(key))) {
         return false;
       }
-      console.log(searchTerm);
-      console.log(tags);
       return (
         details.title.toUpperCase().includes(searchTerm.toUpperCase()) ||
         tags.join().toUpperCase().includes(searchTerm.toUpperCase())
