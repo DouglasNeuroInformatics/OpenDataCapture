@@ -16,6 +16,7 @@ services:
       - '' #load by default without having to specify docker compose --profile
       - gateway
       - fullstack
+      - nogateway
   api:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-api:${RELEASE_CHANNEL}
     build:
@@ -48,6 +49,7 @@ services:
     profiles:
       - '' #load by default without having to specify docker compose --profile
       - fullstack
+      - nogateway
   gateway:
     image: ghcr.io/douglasneuroinformatics/open-data-capture-gateway:${RELEASE_CHANNEL}
     build:
@@ -90,6 +92,7 @@ services:
     profiles:
       - '' #load by default without having to specify docker compose --profile
       - fullstack
+      - nogateway
     restart: unless-stopped
   mongo:
     image: mongo:${MONGODB_VERSION}
@@ -110,6 +113,7 @@ services:
     profiles:
       - '' #load by default without having to specify docker compose --profile
       - fullstack
+      - nogateway
   playground:
     build:
       context: .
@@ -122,3 +126,4 @@ services:
     profiles:
       - fullstack
       - playground
+      - nogateway
