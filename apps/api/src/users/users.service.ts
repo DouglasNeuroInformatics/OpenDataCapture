@@ -123,13 +123,22 @@ export class UsersService {
     return user;
   }
 
-  async updateById(id: string, { groupIds, ...data }: UpdateUserDto, { ability }: EntityOperationOptions = {}) {
+  async updateById(
+    id: string,
+    { groupIds, password, ...data }: UpdateUserDto,
+    { ability }: EntityOperationOptions = {}
+  ) {
+    let hashedPassword: string | undefined;
+    if (password) {
+      hashedPassword = await this.cryptoService.hashPassword(password);
+    }
     return this.userModel.update({
       data: {
         ...data,
         groups: {
           connect: groupIds?.map((id) => ({ id }))
-        }
+        },
+        hashedPassword
       },
       omit: {
         hashedPassword: true
