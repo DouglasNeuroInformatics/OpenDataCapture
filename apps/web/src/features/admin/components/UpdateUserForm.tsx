@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { isAllUndefined } from '@douglasneuroinformatics/libjs';
+import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Button, Dialog, Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
@@ -9,34 +10,12 @@ import type { UserPermission } from '@opendatacapture/schemas/user';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
 
-const $UpdateUserFormData = z
-  .object({
-    additionalPermissions: z.array($UserPermission.partial()).optional(),
-    groupIds: z.set(z.string())
-  })
-  .transform((arg) => {
-    const firstPermission = arg.additionalPermissions?.[0];
-    if (firstPermission && isAllUndefined(firstPermission)) {
-      arg.additionalPermissions?.pop();
-    }
-    return arg;
-  })
-  .superRefine((arg, ctx) => {
-    arg.additionalPermissions?.forEach((permission, i) => {
-      Object.entries(permission).forEach(([key, val]) => {
-        if ((val satisfies string) === undefined) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.invalid_type,
-            expected: 'string',
-            path: ['additionalPermissions', i, key],
-            received: 'undefined'
-          });
-        }
-      });
-    });
-  });
-
-type UpdateUserFormData = z.infer<typeof $UpdateUserFormData>;
+type UpdateUserFormData = {
+  additionalPermissions?: Partial<UserPermission>[];
+  confirmPassword?: string | undefined;
+  groupIds: Set<string>;
+  password?: string | undefined;
+};
 
 export type UpdateUserFormInputData = {
   disableDelete: boolean;
@@ -52,8 +31,47 @@ export const UpdateUserForm: React.FC<{
   onSubmit: (data: UpdateUserFormData & { additionalPermissions?: UserPermission[] }) => Promisable<void>;
 }> = ({ data, onDelete, onSubmit }) => {
   const { disableDelete, groupOptions, initialValues } = data;
-  const { t } = useTranslation();
+  const { resolvedLanguage, t } = useTranslation();
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+
+  const $UpdateUserFormData = useMemo(() => {
+    return z
+      .object({
+        additionalPermissions: z.array($UserPermission.partial()).optional(),
+        groupIds: z.set(z.string()),
+        password: z.string().min(1).optional()
+      })
+      .transform((arg) => {
+        const firstPermission = arg.additionalPermissions?.[0];
+        if (firstPermission && isAllUndefined(firstPermission)) {
+          arg.additionalPermissions?.pop();
+        }
+        return arg;
+      })
+      .superRefine((arg, ctx) => {
+        if (arg.password && !estimatePasswordStrength(arg.password).success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            fatal: true,
+            message: t('common.insufficientPasswordStrength'),
+            path: ['password']
+          });
+          return z.NEVER;
+        }
+        arg.additionalPermissions?.forEach((permission, i) => {
+          Object.entries(permission).forEach(([key, val]) => {
+            if ((val satisfies string) === undefined) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.invalid_type,
+                expected: 'string',
+                path: ['additionalPermissions', i, key],
+                received: 'undefined'
+              });
+            }
+          });
+        });
+      }) satisfies z.ZodType<UpdateUserFormData>;
+  }, [resolvedLanguage]);
 
   return (
     <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
@@ -68,6 +86,22 @@ export const UpdateUserForm: React.FC<{
           )
         }}
         content={[
+          {
+            fields: {
+              password: {
+                calculateStrength: (password) => {
+                  return estimatePasswordStrength(password).score;
+                },
+                kind: 'string',
+                label: t('common.password'),
+                variant: 'password'
+              }
+            },
+            title: t({
+              en: 'Login Credentials',
+              fr: 'Identifiants de connexion'
+            })
+          },
           {
             description: t({
               en: 'IMPORTANT: These permissions are not specific to any group. To manage granular permissions, please use the API.',
