@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { isAllUndefined } from '@douglasneuroinformatics/libjs';
-import { Button, Form } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog, Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
 import { $UserPermission } from '@opendatacapture/schemas/user';
@@ -53,132 +53,161 @@ export const UpdateUserForm: React.FC<{
 }> = ({ data, onDelete, onSubmit }) => {
   const { disableDelete, groupOptions, initialValues } = data;
   const { t } = useTranslation();
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 
   return (
-    <Form
-      additionalButtons={{
-        left: (
-          <Button className="w-full" disabled={disableDelete} type="button" variant="danger" onClick={onDelete}>
-            {t('core.delete')}
-          </Button>
-        )
-      }}
-      content={[
-        {
-          description: t({
-            en: 'IMPORTANT: These permissions are not specific to any group. To manage granular permissions, please use the API.',
-            fr: "IMPORTANT : Ces autorisations ne sont pas spécifiques à un groupe. Pour gérer des autorisations granulaires, veuillez utiliser l'API."
-          }),
-          fields: {
-            additionalPermissions: {
-              fieldset: {
-                action: {
-                  kind: 'string',
-                  label: t({
-                    en: 'Action',
-                    fr: 'Action'
-                  }),
-                  options: {
-                    create: t({
-                      en: 'Create',
-                      fr: 'Créer'
+    <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
+      <Form
+        additionalButtons={{
+          left: (
+            <Dialog.Trigger asChild>
+              <Button className="w-full" disabled={disableDelete} type="button" variant="danger">
+                {t('core.delete')}
+              </Button>
+            </Dialog.Trigger>
+          )
+        }}
+        content={[
+          {
+            description: t({
+              en: 'IMPORTANT: These permissions are not specific to any group. To manage granular permissions, please use the API.',
+              fr: "IMPORTANT : Ces autorisations ne sont pas spécifiques à un groupe. Pour gérer des autorisations granulaires, veuillez utiliser l'API."
+            }),
+            fields: {
+              additionalPermissions: {
+                fieldset: {
+                  action: {
+                    kind: 'string',
+                    label: t({
+                      en: 'Action',
+                      fr: 'Action'
                     }),
-                    delete: t({
-                      en: 'Delete',
-                      fr: 'Effacer'
-                    }),
-                    manage: t({
-                      en: 'Manage (All)',
-                      fr: 'Gérer (Tout)'
-                    }),
-                    read: t({
-                      en: 'Read',
-                      fr: 'Lire'
-                    }),
-                    update: t({
-                      en: 'Update',
-                      fr: 'Mettre à jour'
-                    })
+                    options: {
+                      create: t({
+                        en: 'Create',
+                        fr: 'Créer'
+                      }),
+                      delete: t({
+                        en: 'Delete',
+                        fr: 'Effacer'
+                      }),
+                      manage: t({
+                        en: 'Manage (All)',
+                        fr: 'Gérer (Tout)'
+                      }),
+                      read: t({
+                        en: 'Read',
+                        fr: 'Lire'
+                      }),
+                      update: t({
+                        en: 'Update',
+                        fr: 'Mettre à jour'
+                      })
+                    },
+                    variant: 'select'
                   },
-                  variant: 'select'
+                  subject: {
+                    kind: 'string',
+                    label: t({
+                      en: 'Resource',
+                      fr: 'Resource'
+                    }),
+                    options: {
+                      all: t({
+                        en: 'All',
+                        fr: 'Tous'
+                      }),
+                      Assignment: t({
+                        en: 'Assignment',
+                        fr: 'Devoir'
+                      }),
+                      Group: t({
+                        en: 'Group',
+                        fr: 'Groupe'
+                      }),
+                      Instrument: t({
+                        en: 'Instrument',
+                        fr: 'Instrument'
+                      }),
+                      InstrumentRecord: t({
+                        en: 'Instrument Record',
+                        fr: "Enregistrement de l'instrument"
+                      }),
+                      Session: t({
+                        en: 'Session',
+                        fr: 'Session'
+                      }),
+                      Subject: t({
+                        en: 'Subject',
+                        fr: 'Client'
+                      }),
+                      User: t({
+                        en: 'User',
+                        fr: 'Utilisateur'
+                      })
+                    },
+                    variant: 'select'
+                  }
                 },
-                subject: {
-                  kind: 'string',
-                  label: t({
-                    en: 'Resource',
-                    fr: 'Resource'
-                  }),
-                  options: {
-                    all: t({
-                      en: 'All',
-                      fr: 'Tous'
-                    }),
-                    Assignment: t({
-                      en: 'Assignment',
-                      fr: 'Devoir'
-                    }),
-                    Group: t({
-                      en: 'Group',
-                      fr: 'Groupe'
-                    }),
-                    Instrument: t({
-                      en: 'Instrument',
-                      fr: 'Instrument'
-                    }),
-                    InstrumentRecord: t({
-                      en: 'Instrument Record',
-                      fr: "Enregistrement de l'instrument"
-                    }),
-                    Session: t({
-                      en: 'Session',
-                      fr: 'Session'
-                    }),
-                    Subject: t({
-                      en: 'Subject',
-                      fr: 'Client'
-                    }),
-                    User: t({
-                      en: 'User',
-                      fr: 'Utilisateur'
-                    })
-                  },
-                  variant: 'select'
-                }
-              },
-              kind: 'record-array',
-              label: t({
-                en: 'Permission',
-                fr: 'Autorisations supplémentaires'
-              })
-            }
+                kind: 'record-array',
+                label: t({
+                  en: 'Permission',
+                  fr: 'Autorisations supplémentaires'
+                })
+              }
+            },
+            title: t({
+              en: 'Authorization',
+              fr: 'Autorisation'
+            })
           },
-          title: t({
-            en: 'Authorization',
-            fr: 'Autorisation'
-          })
-        },
-        {
-          fields: {
-            groupIds: {
-              kind: 'set',
-              label: 'Group IDs',
-              options: groupOptions,
-              variant: 'listbox'
-            }
-          },
-          title: t({
-            en: 'Groups',
-            fr: 'Groupes'
-          })
+          {
+            fields: {
+              groupIds: {
+                kind: 'set',
+                label: 'Group IDs',
+                options: groupOptions,
+                variant: 'listbox'
+              }
+            },
+            title: t({
+              en: 'Groups',
+              fr: 'Groupes'
+            })
+          }
+        ]}
+        initialValues={initialValues}
+        key={JSON.stringify(initialValues)}
+        submitBtnLabel={t('core.save')}
+        validationSchema={$UpdateUserFormData}
+        onSubmit={({ additionalPermissions, ...data }) =>
+          onSubmit({ additionalPermissions: additionalPermissions as undefined | UserPermission[], ...data })
         }
-      ]}
-      initialValues={initialValues}
-      key={JSON.stringify(initialValues)}
-      submitBtnLabel={t('core.save')}
-      validationSchema={$UpdateUserFormData}
-      onSubmit={({ additionalPermissions, ...data }) =>
-        onSubmit({ additionalPermissions: additionalPermissions as undefined | UserPermission[], ...data })
-      }
-    />
+      />
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>
+            {t({
+              en: 'Are you absolutely sure?',
+              fr: 'Êtes-vous absolument sûr ?'
+            })}
+          </Dialog.Title>
+          <Dialog.Description>
+            {t({
+              en: 'This action will permanently delete the account and cannot be undone.',
+              fr: 'Cette action supprimera définitivement le compte et ne pourra pas être annulée.'
+            })}
+          </Dialog.Description>
+        </Dialog.Header>
+        <Dialog.Footer>
+          <Button className="min-w-16" type="button" variant="danger" onClick={onDelete}>
+            {t('core.yes')}
+          </Button>
+          <Button className="min-w-16" type="button" variant="outline" onClick={() => setIsConfirmDeleteOpen(false)}>
+            {t('core.no')}
+          </Button>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog>
   );
 };
