@@ -60,6 +60,9 @@ export default defineConfig({
           label: 'Français'
         }
       },
+      markdown: {
+        headingLinks: false
+      },
       plugins: [
         starlightTypeDocPlugin({
           entryPoints: [path.resolve(runtimeCoreRoot, 'lib/index.d.ts')],

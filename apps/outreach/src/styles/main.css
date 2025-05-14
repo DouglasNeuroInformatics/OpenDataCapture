@@ -8,7 +8,4 @@
       max-width: theme(--breakpoint-2xl);
     }
   }
-  .sl-anchor-link {
-    display: none;
-  }
 }
