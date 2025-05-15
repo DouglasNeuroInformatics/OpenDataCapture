@@ -126,4 +126,3 @@ services:
     profiles:
       - fullstack
       - playground
-      - nogateway
