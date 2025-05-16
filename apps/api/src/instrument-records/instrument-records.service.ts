@@ -158,6 +158,8 @@ export class InstrumentRecordsService {
           sessionId: record.session.id,
           sessionType: record.session.type,
           subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+          // eslint-disable-next-line perfectionist/sort-objects
+          groupId: record.subject.groupIds.join(' ') ?? 'root',
           subjectId: record.subject.id,
           subjectSex: record.subject.sex,
           timestamp: record.date.toISOString(),
