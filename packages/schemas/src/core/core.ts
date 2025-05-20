@@ -6,6 +6,8 @@ import type { Json, JsonLiteral, Language } from '@opendatacapture/runtime-core'
 import type { Simplify } from 'type-fest';
 import { z } from 'zod';
 
+export const DEFAULT_GROUP_NAME = 'root';
+
 export type AppAction = z.infer<typeof $AppAction>;
 export const $AppAction = z.enum(['create', 'delete', 'manage', 'read', 'update']);
 
