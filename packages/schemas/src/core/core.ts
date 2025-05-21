@@ -23,7 +23,14 @@ export const $AppSubjectName = z.enum([
 
 export type BaseAppAbility = PureAbility<[AppAction, AppSubjectName]>;
 
-export type Permissions = RawRuleOf<BaseAppAbility>[];
+export type UserPermission = z.infer<typeof $UserPermission>;
+export const $UserPermission = z.object({
+  action: $AppAction,
+  subject: $AppSubjectName
+}) satisfies z.ZodType<RawRuleOf<BaseAppAbility>>;
+
+export type Permissions = z.infer<typeof $Permissions>;
+export const $Permissions = z.array($UserPermission);
 
 export const $Language: z.ZodType<Language> = z.enum(['en', 'fr']);
 
