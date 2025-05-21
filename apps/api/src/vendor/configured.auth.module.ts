@@ -3,6 +3,7 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { Module } from '@nestjs/common';
 import { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { JwtPayload } from '@opendatacapture/schemas/auth';
+import { $Permissions } from '@opendatacapture/schemas/core';
 import { $Group } from '@opendatacapture/schemas/group';
 import { $BasePermissionLevel } from '@opendatacapture/schemas/user';
 import { z } from 'zod';
@@ -13,7 +14,7 @@ import { z } from 'zod';
       inject: [getModelToken('User')],
       useFactory: (userModel: Model<'User'>) => {
         return {
-          defineAbility: (ability, payload) => {
+          defineAbility: (ability, payload, metadata) => {
             const groupIds = payload.groups.map((group) => group.id);
             switch (payload.basePermissionLevel) {
               case 'ADMIN':
@@ -41,9 +42,15 @@ import { z } from 'zod';
                 ability.can('read', 'Subject', { groupIds: { hasSome: groupIds } });
                 break;
             }
+            metadata.additionalPermissions?.forEach(({ action, subject }) => {
+              ability.can(action, subject);
+            });
           },
           schemas: {
             loginCredentials: $LoginCredentials,
+            metadata: z.object({
+              additionalPermissions: $Permissions.optional()
+            }),
             tokenPayload: z.object({
               basePermissionLevel: $BasePermissionLevel.nullable(),
               firstName: z.string().nullable(),
@@ -62,6 +69,9 @@ import { z } from 'zod';
             }
             return {
               hashedPassword: user.hashedPassword,
+              metadata: {
+                additionalPermissions: user.additionalPermissions
+              },
               tokenPayload: {
                 basePermissionLevel: user.basePermissionLevel,
                 firstName: user.firstName,

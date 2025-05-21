@@ -5,8 +5,8 @@ import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Button, Dialog, Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
-import { $UserPermission } from '@opendatacapture/schemas/user';
-import type { UserPermission } from '@opendatacapture/schemas/user';
+import { $UserPermission } from '@opendatacapture/schemas/core';
+import type { UserPermission } from '@opendatacapture/schemas/core';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
 
