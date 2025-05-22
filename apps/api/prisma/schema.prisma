@@ -83,6 +83,7 @@ model Group {
   sessions                Session[]
   subjects                Subject[]          @relation(fields: [subjectIds], references: [id])
   subjectIds              String[]
+  subjectDisplayLength    String?             
   type                    GroupType
   userIds                 String[]           @db.ObjectId
   users                   User[]             @relation(fields: [userIds], references: [id])
