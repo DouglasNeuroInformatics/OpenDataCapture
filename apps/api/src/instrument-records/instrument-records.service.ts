@@ -155,21 +155,65 @@ export class InstrumentRecordsService {
       }
 
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-        data.push({
-          instrumentEdition: instrument.internal.edition,
-          instrumentName: instrument.internal.name,
-          measure: measureKey,
-          sessionDate: record.session.date.toISOString(),
-          sessionId: record.session.id,
-          sessionType: record.session.type,
-          subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-          // eslint-disable-next-line perfectionist/sort-objects
-          groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-          subjectId: record.subject.id,
-          subjectSex: record.subject.sex,
-          timestamp: record.date.toISOString(),
-          value: measureValue
-        });
+        if (typeof measureValue === 'string') {
+          try {
+            const list = [JSON.parse(measureValue)];
+
+            // eslint-disable-next-line max-depth
+            for (const listEntry of list) {
+              // eslint-disable-next-line max-depth
+              if (Array.isArray(listEntry)) {
+                // eslint-disable-next-line max-depth
+                for (const objectEntry of listEntry) {
+                  // eslint-disable-next-line no-empty, max-depth
+                  for (const [dataKey, dataValue] of Object.entries(objectEntry)) {
+                    data.push({
+                      instrumentEdition: instrument.internal.edition,
+                      instrumentName: instrument.internal.name,
+                      measure: typeof dataValue === 'string' ? dataKey : JSON.stringify(dataKey),
+                      sessionDate: record.session.date.toISOString(),
+                      sessionId: record.session.id,
+                      sessionType: record.session.type,
+                      subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+                      subjectId: record.subject.id,
+                      subjectSex: record.subject.sex,
+                      timestamp: record.date.toISOString(),
+                      value: typeof dataValue === 'string' ? dataValue : JSON.stringify(dataValue)
+                    });
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            data.push({
+              instrumentEdition: instrument.internal.edition,
+              instrumentName: instrument.internal.name,
+              measure: measureKey,
+              sessionDate: record.session.date.toISOString(),
+              sessionId: record.session.id,
+              sessionType: record.session.type,
+              subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+              subjectId: record.subject.id,
+              subjectSex: record.subject.sex,
+              timestamp: record.date.toISOString(),
+              value: measureValue
+            });
+          }
+        } else {
+          data.push({
+            instrumentEdition: instrument.internal.edition,
+            instrumentName: instrument.internal.name,
+            measure: measureKey,
+            sessionDate: record.session.date.toISOString(),
+            sessionId: record.session.id,
+            sessionType: record.session.type,
+            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+            subjectId: record.subject.id,
+            subjectSex: record.subject.sex,
+            timestamp: record.date.toISOString(),
+            value: measureValue
+          });
+        }
       }
     }
 
