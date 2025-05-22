@@ -61,6 +61,16 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
         },
         {
           fields: {
+            subjectIdDisplayLength: {
+              kind: 'number',
+              label: 'Enter preferred ID display length',
+              variant: 'input'
+            }
+          },
+          title: 'Subject ID display length'
+        },
+        {
+          fields: {
             defaultIdentificationMethod: {
               kind: 'string',
               label: t('group.manage.defaultSubjectIdMethod'),
@@ -129,7 +139,8 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
         defaultIdentificationMethod: $SubjectIdentificationMethod.optional(),
         idValidationRegex: $RegexString.optional(),
         idValidationRegexErrorMessageEn: z.string().optional(),
-        idValidationRegexErrorMessageFr: z.string().optional()
+        idValidationRegexErrorMessageFr: z.string().optional(),
+        subjectIdDisplayLength: z.number().int().min(1)
       })}
       onSubmit={(data) => {
         void onSubmit({
