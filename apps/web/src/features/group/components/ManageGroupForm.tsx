@@ -22,6 +22,7 @@ export type ManageGroupFormProps = {
       accessibleInteractiveInstrumentIds: Set<string>;
       defaultIdentificationMethod?: SubjectIdentificationMethod;
       idValidationRegex?: null | string;
+      subjectIdDisplayLength?: number;
     };
   };
   onSubmit: (data: Partial<UpdateGroupData>) => Promisable<any>;
@@ -151,7 +152,8 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
             idValidationRegexErrorMessage: {
               en: data.idValidationRegexErrorMessageEn,
               fr: data.idValidationRegexErrorMessageFr
-            }
+            },
+            subjectIdDisplayLength: data.subjectIdDisplayLength
           }
         });
       }}
