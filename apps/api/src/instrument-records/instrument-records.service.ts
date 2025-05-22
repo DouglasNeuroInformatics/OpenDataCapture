@@ -4,6 +4,7 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import type { ScalarInstrument } from '@opendatacapture/runtime-core';
+import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -158,6 +159,8 @@ export class InstrumentRecordsService {
           sessionId: record.session.id,
           sessionType: record.session.type,
           subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+          // eslint-disable-next-line perfectionist/sort-objects
+          groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
           subjectId: record.subject.id,
           subjectSex: record.subject.sex,
           timestamp: record.date.toISOString(),
