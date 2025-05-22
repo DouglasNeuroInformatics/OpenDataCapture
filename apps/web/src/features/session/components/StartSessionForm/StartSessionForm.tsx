@@ -3,6 +3,7 @@
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
+import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import { $SessionType } from '@opendatacapture/schemas/session';
 import type { CreateSessionData } from '@opendatacapture/schemas/session';
@@ -253,7 +254,7 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
           });
         } else {
           subjectId = encodeScopedSubjectId(subjectId, {
-            groupName: currentGroup?.name ?? 'root'
+            groupName: currentGroup?.name ?? DEFAULT_GROUP_NAME
           });
         }
         await onSubmit({
