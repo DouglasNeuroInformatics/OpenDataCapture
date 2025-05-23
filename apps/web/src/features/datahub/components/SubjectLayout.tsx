@@ -28,9 +28,7 @@ export const SubjectLayout = () => {
               en: 'Instrument Records for Subject {}',
               fr: "Dossiers d'instruments pour le client {}"
             },
-            subjectIdDisplaySetting
-              ? removeSubjectIdScope(subjectId).slice(0, subjectIdDisplaySetting)
-              : removeSubjectIdScope(subjectId).slice(0, 9)
+            removeSubjectIdScope(subjectId).slice(0, subjectIdDisplaySetting ?? 9)
           )}
         </Heading>
       </PageHeader>

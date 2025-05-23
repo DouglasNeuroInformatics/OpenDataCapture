@@ -18,10 +18,7 @@ export const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
     <ClientTable<Subject>
       columns={[
         {
-          field: (subject) =>
-            subjectIdDisplaySetting
-              ? removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting)
-              : removeSubjectIdScope(subject.id).slice(0, 9),
+          field: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
           label: t('datahub.index.table.subject')
         },
         {
