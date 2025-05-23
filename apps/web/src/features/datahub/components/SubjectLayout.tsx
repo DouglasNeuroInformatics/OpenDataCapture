@@ -8,6 +8,7 @@ import { Outlet, useParams } from 'react-router-dom';
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { PageHeader } from '@/components/PageHeader';
 import { config } from '@/config';
+import { useAppStore } from '@/store';
 
 import { TabLink } from './TabLink';
 
@@ -16,6 +17,7 @@ export const SubjectLayout = () => {
   const { t } = useTranslation('datahub');
   const subjectId = params.subjectId!;
   const basePathname = `/datahub/${subjectId}`;
+  const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
 
   return (
     <React.Fragment>
@@ -26,7 +28,7 @@ export const SubjectLayout = () => {
               en: 'Instrument Records for Subject {}',
               fr: "Dossiers d'instruments pour le client {}"
             },
-            removeSubjectIdScope(subjectId).slice(0, 9)
+            removeSubjectIdScope(subjectId).slice(0, subjectIdDisplaySetting ?? 9)
           )}
         </Heading>
       </PageHeader>

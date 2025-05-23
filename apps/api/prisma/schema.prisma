@@ -68,6 +68,7 @@ type GroupSettings {
   defaultIdentificationMethod   SubjectIdentificationMethod
   idValidationRegex             String?
   idValidationRegexErrorMessage ErrorMessage?
+  subjectIdDisplayLength        Int?  
 }
 
 model Group {
@@ -82,7 +83,7 @@ model Group {
   settings                GroupSettings
   sessions                Session[]
   subjects                Subject[]          @relation(fields: [subjectIds], references: [id])
-  subjectIds              String[]
+  subjectIds              String[]           
   type                    GroupType
   userIds                 String[]           @db.ObjectId
   users                   User[]             @relation(fields: [userIds], references: [id])

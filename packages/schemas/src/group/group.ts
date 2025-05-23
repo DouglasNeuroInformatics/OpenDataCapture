@@ -12,7 +12,8 @@ export const $GroupSettings = z.object({
       en: z.string().nullish(),
       fr: z.string().nullish()
     })
-    .nullish()
+    .nullish(),
+  subjectIdDisplayLength: z.number().nullish()
 });
 
 export type GroupType = z.infer<typeof $GroupType>;
