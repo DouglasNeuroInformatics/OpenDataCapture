@@ -64,11 +64,17 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
           fields: {
             subjectIdDisplayLength: {
               kind: 'number',
-              label: 'Enter preferred ID display length',
+              label: t({
+                en: 'Enter preferred ID display length',
+                fr: 'Entrez la longueur d\'affichage préférée de l\'ID'
+              }),
               variant: 'input'
             }
           },
-          title: 'Subject ID display length'
+          title: t({
+            en: 'Subject ID display length',
+            fr: 'Longueur d\'affichage de l\'ID du sujet'
+          })
         },
         {
           fields: {
