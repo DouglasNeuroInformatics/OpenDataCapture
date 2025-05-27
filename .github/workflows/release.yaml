@@ -12,4 +12,4 @@ jobs:
     with:
       org: DouglasNeuroinformatics
       packages: open-data-capture-api, open-data-capture-gateway, open-data-capture-api
-      validate_command: GATEWAY_DATABASE_URL=/dev/null pnpm lint
+      validate_command: GATEWAY_DATABASE_URL=file:/dev/null pnpm lint
