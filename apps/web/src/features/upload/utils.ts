@@ -602,4 +602,4 @@ export async function processInstrumentCSV(
   });
 }
 
-export { getZodTypeName, interpretZodArray, interpretZodObjectValue, interpretZodValue, reformatInstrumentData };
+export { getZodTypeName, interpretZodArray, reformatInstrumentData };

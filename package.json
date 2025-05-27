@@ -59,6 +59,7 @@
     "prettier": "^3.4.2",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.6.10",
+    "sort-json": "^2.0.1",
     "start-server-and-test": "^2.0.10",
     "tsx": "catalog:",
     "turbo": "^2.3.3",

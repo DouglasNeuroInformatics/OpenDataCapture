@@ -15,7 +15,7 @@ type TextCardItem = BaseCardItem & { kind: 'text'; text?: string };
 
 type CardItem = LinkCardItem | TextCardItem;
 
-export type InstrumentCardProps = {
+type InstrumentCardProps = {
   instrument: TranslatedInstrumentInfo;
   onClick: () => void;
 };

@@ -7,14 +7,14 @@ import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subje
 import type { Promisable } from 'type-fest';
 import { z } from 'zod';
 
-export type AvailableInstrumentOptions = {
+type AvailableInstrumentOptions = {
   form: { [key: string]: string };
   interactive: { [key: string]: string };
   series: { [key: string]: string };
   unknown: { [key: string]: string };
 };
 
-export type ManageGroupFormProps = {
+type ManageGroupFormProps = {
   data: {
     availableInstrumentOptions: AvailableInstrumentOptions;
     initialValues: {
@@ -166,3 +166,5 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
     />
   );
 };
+
+export type { AvailableInstrumentOptions };

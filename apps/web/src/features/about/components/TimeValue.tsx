@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from 'react';
 import { parseDuration } from '@douglasneuroinformatics/libjs';
 import { useInterval } from '@douglasneuroinformatics/libui/hooks';
 
-export type TimeValueProps = {
+type TimeValueProps = {
   value: number;
 };
 

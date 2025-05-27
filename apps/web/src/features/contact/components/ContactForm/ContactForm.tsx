@@ -2,12 +2,12 @@ import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { z } from 'zod';
 
-export type ContactFormData = {
+type ContactFormData = {
   contactReason: 'bug' | 'feedback' | 'other' | 'request';
   message: string;
 };
 
-export type ContactFormProps = {
+type ContactFormProps = {
   onSubmit: (data: ContactFormData) => void;
 };
 
@@ -42,3 +42,5 @@ export const ContactForm = ({ onSubmit }: ContactFormProps) => {
     />
   );
 };
+
+export type { ContactFormData };

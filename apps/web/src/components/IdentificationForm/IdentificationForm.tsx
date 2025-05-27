@@ -9,7 +9,7 @@ import { z } from 'zod';
 
 import { useAppStore } from '@/store';
 
-export type IdentificationFormProps = {
+type IdentificationFormProps = {
   onSubmit: (data: { id: string }) => Promisable<void>;
 };
 

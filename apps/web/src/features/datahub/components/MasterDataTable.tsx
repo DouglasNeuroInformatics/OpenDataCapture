@@ -6,7 +6,7 @@ import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 import { useAppStore } from '@/store';
 
-export type MasterDataTableProps = {
+type MasterDataTableProps = {
   data: Subject[];
   onSelect: (subject: Subject) => void;
 };

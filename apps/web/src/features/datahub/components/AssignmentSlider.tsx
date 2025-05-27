@@ -5,7 +5,7 @@ import type { Assignment } from '@opendatacapture/schemas/assignment';
 
 import { useInstrument } from '@/hooks/useInstrument';
 
-export type AssignmentSliderProps = {
+type AssignmentSliderProps = {
   assignment: Assignment | null;
   isOpen: boolean;
   onCancel: (assignment: Assignment) => void;

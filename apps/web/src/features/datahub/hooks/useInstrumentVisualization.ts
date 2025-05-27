@@ -9,13 +9,13 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 
-export type InstrumentVisualizationRecord = {
+type InstrumentVisualizationRecord = {
   [key: string]: unknown;
   __date__: Date;
   __time__: number;
 };
 
-export type UseInstrumentVisualizationOptions = {
+type UseInstrumentVisualizationOptions = {
   params: {
     kind?: InstrumentKind;
     subjectId: string;
@@ -110,3 +110,5 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   return { dl, instrument, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate };
 }
+
+export type { InstrumentVisualizationRecord };

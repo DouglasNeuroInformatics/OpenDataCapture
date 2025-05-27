@@ -15,7 +15,7 @@ const COLOR_PALETTE: readonly string[] = [
   '#4075A3'
 ];
 
-export type UseGraphLinesOptions = {
+type UseGraphLinesOptions = {
   selectedMeasures: ListboxDropdownOption[];
 };
 

@@ -1,6 +1,6 @@
 import { TimeValue } from './TimeValue';
 
-export type InfoBlockProps = {
+type InfoBlockProps = {
   items: {
     [key: string]: string;
   };

@@ -4,7 +4,7 @@ import type { SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/
 import type { Promisable, SetNonNullable } from 'type-fest';
 import { z } from 'zod';
 
-export type AppSettingsFormProps = {
+type AppSettingsFormProps = {
   initialValues: SetupState;
   onSubmit: (data: UpdateSetupStateData) => Promisable<any>;
 };
