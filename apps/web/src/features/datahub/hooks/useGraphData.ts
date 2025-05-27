@@ -6,12 +6,12 @@ import { pickBy } from 'lodash-es';
 
 import type { InstrumentVisualizationRecord } from './useInstrumentVisualization';
 
-export type GraphRecord = {
+type GraphRecord = {
   [key: string]: number;
   __time__: number;
 };
 
-export type UseGraphDataOptions = {
+type UseGraphDataOptions = {
   models?: LinearRegressionResults;
   records: InstrumentVisualizationRecord[];
   selectedMeasures: ListboxDropdownOption[];

@@ -8,7 +8,7 @@ import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrume
 
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 
-export type AssignmentTableProps = {
+type AssignmentTableProps = {
   assignments: Assignment[];
   onSelection: (assignment: Assignment) => void;
 };

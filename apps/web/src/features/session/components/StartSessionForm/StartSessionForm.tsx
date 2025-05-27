@@ -19,7 +19,7 @@ const EIGHTEEN_YEARS = 568025136000; // milliseconds
 
 const MIN_DATE_OF_BIRTH = new Date(currentDate.getTime() - EIGHTEEN_YEARS);
 
-export type StartSessionFormData = {
+type StartSessionFormData = {
   sessionDate: Date;
   sessionType: 'IN_PERSON' | 'RETROSPECTIVE';
   subjectDateOfBirth?: Date;
@@ -30,7 +30,7 @@ export type StartSessionFormData = {
   subjectSex?: Sex;
 };
 
-export type StartSessionFormProps = {
+type StartSessionFormProps = {
   currentGroup: Group | null;
   initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
   onSubmit: (data: CreateSessionData) => Promisable<void>;
@@ -273,3 +273,5 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
     />
   );
 };
+
+export type { StartSessionFormData };

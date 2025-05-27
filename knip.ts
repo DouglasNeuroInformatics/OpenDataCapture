@@ -6,6 +6,9 @@ const config: KnipConfig = {
       entry: ['src/main.ts', 'libnest.config.ts'],
       ignoreDependencies: ['@opendatacapture/runtime-v1', 'prisma-json-types-generator', 'lodash-es', 'ts-pattern'],
       project: '**/*.{js,ts}'
+    },
+    'apps/web': {
+      ignoreDependencies: ['lodash-es', 'papaparse', 'ts-pattern']
     }
   }
 };

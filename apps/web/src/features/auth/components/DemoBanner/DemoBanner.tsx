@@ -5,7 +5,7 @@ import { DEMO_USERS } from '@opendatacapture/demo';
 import type { LoginCredentials } from '@opendatacapture/schemas/auth';
 import { InfoIcon, LogInIcon } from 'lucide-react';
 
-export type DemoBannerProps = {
+type DemoBannerProps = {
   onLogin: (credentials: LoginCredentials) => void;
 };
 

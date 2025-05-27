@@ -5,7 +5,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { LoginCredentials } from '@opendatacapture/schemas/auth';
 import { z } from 'zod';
 
-export type LoginFormProps = {
+type LoginFormProps = {
   onSubmit: (credentials: LoginCredentials) => void;
 };
 

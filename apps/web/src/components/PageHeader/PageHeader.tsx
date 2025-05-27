@@ -3,7 +3,7 @@ import React from 'react';
 import { Separator } from '@douglasneuroinformatics/libui/components';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 
-export type PageHeaderProps = {
+type PageHeaderProps = {
   children: React.ReactNode;
   className?: string;
 };

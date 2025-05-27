@@ -1,7 +1,7 @@
 import { Select } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
-export type SelectInstrumentProps = {
+type SelectInstrumentProps = {
   onSelect: (id: string) => void;
   options: { [key: string]: string };
 };

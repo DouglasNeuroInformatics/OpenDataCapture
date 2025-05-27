@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 import type { NavItem } from '@/hooks/useNavItems';
 
-export type NavButtonProps = NavItem & {
+type NavButtonProps = NavItem & {
   activeClassName?: string;
   className?: string;
   isActive: boolean;

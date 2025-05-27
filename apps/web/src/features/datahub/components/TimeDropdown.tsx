@@ -1,7 +1,7 @@
 import { Select } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
-export type TimeDropdownProps = {
+type TimeDropdownProps = {
   disabled?: boolean;
   setMinTime: (value: Date | null) => void;
 };

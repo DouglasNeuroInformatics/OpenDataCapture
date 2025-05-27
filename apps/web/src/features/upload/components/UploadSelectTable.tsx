@@ -2,7 +2,7 @@ import { ClientTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 
-export type UploadSelectTableProps = {
+type UploadSelectTableProps = {
   data: UnilingualInstrumentInfo[];
   onSelect: (instrument: UnilingualInstrumentInfo) => void;
 };

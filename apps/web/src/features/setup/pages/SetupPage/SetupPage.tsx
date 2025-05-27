@@ -9,21 +9,6 @@ import { z } from 'zod';
 import { useCreateSetupState } from '../../hooks/useCreateSetupState';
 import { SetupLoadingPage } from '../SetupLoadingPage';
 
-type SetupData = {
-  dummySubjectCount?: number | undefined;
-  enableExperimentalFeatures: boolean;
-  firstName: string;
-  initDemo: boolean;
-  lastName: string;
-  password: string;
-  recordsPerSubject?: number | undefined;
-  username: string;
-};
-
-export type SetupPageProps = {
-  onSubmit: (data: SetupData) => void;
-};
-
 export const SetupPage = () => {
   const createSetupStateMutation = useCreateSetupState();
   const { t } = useTranslation();
