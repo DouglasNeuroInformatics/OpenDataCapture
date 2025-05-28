@@ -12,6 +12,7 @@ import type { NavigateOptions } from 'react-router-dom';
 import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
 
+import { config } from '@/config';
 import type { StartSessionFormData } from '@/features/session/components/StartSessionForm';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useAppStore } from '@/store';
@@ -429,7 +430,7 @@ export const WalkthroughProvider: React.FC<{ children: React.ReactElement }> = (
   const isDesktop = useIsDesktop();
 
   useEffect(() => {
-    if (isDisclaimerAccepted && !isWalkthroughComplete) {
+    if (isDisclaimerAccepted && !isWalkthroughComplete && !(import.meta.env.DEV && config.dev.disableTutorial)) {
       setIsWalkthroughOpen(true);
     }
   }, [isDisclaimerAccepted, isWalkthroughComplete]);
