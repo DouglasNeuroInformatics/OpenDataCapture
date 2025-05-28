@@ -1,4 +1,5 @@
 import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
+import { err, ok } from '@douglasneuroinformatics/libjs/vendor/neverthrow';
 import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
@@ -155,17 +156,30 @@ export class InstrumentRecordsService {
       }
 
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-        if (typeof measureValue === 'string') {
-          try {
-            const list = [JSON.parse(measureValue)];
-
-            for (const listEntry of list) {
-              console.log('list entry', listEntry);
-              if (Array.isArray(listEntry)) {
-                this.expandData(data, listEntry, instrument, record);
-              }
-            }
-          } catch (e) {
+        let list;
+        try {
+          if (typeof measureValue === 'string') list = [JSON.parse(measureValue)];
+        } catch (err) {
+          data.push({
+            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+            instrumentEdition: instrument.internal.edition,
+            instrumentName: instrument.internal.name,
+            measure: measureKey,
+            sessionDate: record.session.date.toISOString(),
+            sessionId: record.session.id,
+            sessionType: record.session.type,
+            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+            subjectId: record.subject.id,
+            subjectSex: record.subject.sex,
+            timestamp: record.date.toISOString(),
+            value: measureValue
+          });
+          console.error(err);
+          continue;
+        }
+        if (list && list[0] !== undefined) {
+          const expandDataResult = this.expandData(data, list[0], instrument, record);
+          if (expandDataResult.isErr()) {
             data.push({
               groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
               instrumentEdition: instrument.internal.edition,
@@ -181,21 +195,6 @@ export class InstrumentRecordsService {
               value: measureValue
             });
           }
-        } else {
-          data.push({
-            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-            instrumentEdition: instrument.internal.edition,
-            instrumentName: instrument.internal.name,
-            measure: measureKey,
-            sessionDate: record.session.date.toISOString(),
-            sessionId: record.session.id,
-            sessionType: record.session.type,
-            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-            subjectId: record.subject.id,
-            subjectSex: record.subject.sex,
-            timestamp: record.date.toISOString(),
-            value: measureValue
-          });
         }
       }
     }
@@ -405,24 +404,29 @@ export class InstrumentRecordsService {
     }
   }
 
-  private expandData(data: InstrumentRecordsExport, listEntry: any[], instrument: ScalarInstrument, record: any) {
-    for (const objectEntry of listEntry) {
-      for (const [dataKey, dataValue] of Object.entries(objectEntry)) {
-        data.push({
-          groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-          instrumentEdition: instrument.internal.edition,
-          instrumentName: instrument.internal.name,
-          measure: typeof dataValue === 'string' ? dataKey : JSON.stringify(dataKey),
-          sessionDate: record.session.date.toISOString(),
-          sessionId: record.session.id,
-          sessionType: record.session.type,
-          subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-          subjectId: record.subject.id,
-          subjectSex: record.subject.sex,
-          timestamp: record.date.toISOString(),
-          value: typeof dataValue === 'string' ? dataValue : JSON.stringify(dataValue)
-        });
+  private expandData(data: InstrumentRecordsExport, listEntry: any, instrument: ScalarInstrument, record: any) {
+    if (Array.isArray(listEntry)) {
+      for (const objectEntry of listEntry) {
+        for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
+          data.push({
+            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+            instrumentEdition: instrument.internal.edition,
+            instrumentName: instrument.internal.name,
+            measure: typeof dataValue === 'string' ? dataKey : JSON.stringify(dataKey),
+            sessionDate: record.session.date.toISOString(),
+            sessionId: record.session.id,
+            sessionType: record.session.type,
+            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+            subjectId: record.subject.id,
+            subjectSex: record.subject.sex,
+            timestamp: record.date.toISOString(),
+            value: typeof dataValue === 'string' ? dataValue : JSON.stringify(dataValue)
+          });
+        }
       }
+      return ok('Success');
+    } else {
+      return err('Not an Array');
     }
   }
   private getInstrumentById(instrumentId: string) {
