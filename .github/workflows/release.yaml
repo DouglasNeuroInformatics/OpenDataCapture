@@ -11,5 +11,5 @@ jobs:
     uses: DouglasNeuroinformatics/.github/.github/workflows/app-release.yaml@main
     with:
       org: DouglasNeuroinformatics
-      packages: open-data-capture-api, open-data-capture-gateway, open-data-capture-api
+      packages: open-data-capture-api, open-data-capture-gateway, open-data-capture-web
       validate_command: GATEWAY_DATABASE_URL=file:${TMPDIR}tmp.db pnpm lint

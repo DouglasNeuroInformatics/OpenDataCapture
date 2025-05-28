@@ -2,12 +2,13 @@
 
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@douglasneuroinformatics/libui/i18n';
-import type { AnyUnilingualInstrument, Json } from '@opendatacapture/runtime-core';
+import type { AnyUnilingualInstrument, Json, RuntimeNotification } from '@opendatacapture/runtime-core';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import type { Promisable } from 'type-fest';
 
 declare global {
   interface GlobalEventHandlersEventMap {
+    addNotification: CustomEvent<RuntimeNotification>;
     changeLanguage: CustomEvent<Language>;
     changeTheme: CustomEvent<Theme>;
     done: CustomEvent<Json>;

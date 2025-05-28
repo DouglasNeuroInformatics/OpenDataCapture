@@ -1,5 +1,6 @@
 export * from './define.js';
 export * from './i18n.js';
+export * from './notifications.js';
 export type * from './types/core.js';
 export type * from './types/instrument.base.js';
 export type * from './types/instrument.core.js';
