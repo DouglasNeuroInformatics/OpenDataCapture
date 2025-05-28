@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button, Separator } from '@douglasneuroinformatics/libui/components';
-import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
-import type { Language } from '@opendatacapture/runtime-core';
+import type { Language, RuntimeNotification } from '@opendatacapture/runtime-core';
 import { $Json } from '@opendatacapture/schemas/core';
 import type { Json } from '@opendatacapture/schemas/core';
 import { FullscreenIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
@@ -20,6 +20,7 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
   bundle,
   onSubmit
 }) {
+  const addNotification = useNotificationsStore((store) => store.addNotification);
   const { changeLanguage, resolvedLanguage } = useTranslation();
   const [_, updateTheme] = useTheme();
   const [scale, setScale] = useState(100);
@@ -79,6 +80,12 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
     document.addEventListener('done', handleDoneEvent, false);
     return () => document.removeEventListener('done', handleDoneEvent, false);
   }, [handleDoneEvent]);
+
+  useEffect(() => {
+    const handler = (event: CustomEvent<RuntimeNotification>) => addNotification(event.detail);
+    document.addEventListener('addNotification', handler, false);
+    return () => document.removeEventListener('addNotification', handler, false);
+  }, []);
 
   const dimensions = `${(100 / scale) * 100}%`;
 
