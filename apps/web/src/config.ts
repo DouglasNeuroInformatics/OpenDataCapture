@@ -10,6 +10,7 @@ const $Config = z.object({
     })
     .optional(),
   dev: z.object({
+    disableTutorial: $BooleanString.optional(),
     isBypassAuthEnabled: $BooleanString.optional(),
     isForceClearQueryCacheEnabled: $BooleanString.optional(),
     networkLatency: z.coerce.number().int().nonnegative().optional(),
@@ -38,6 +39,7 @@ export const config = await $Config
           }
         : undefined,
     dev: {
+      disableTutorial: import.meta.env.VITE_DEV_DISABLE_TUTORIAL,
       isBypassAuthEnabled: import.meta.env.VITE_DEV_BYPASS_AUTH,
       isForceClearQueryCacheEnabled: import.meta.env.VITE_DEV_FORCE_CLEAR_QUERY_CACHE,
       networkLatency: import.meta.env.VITE_DEV_NETWORK_LATENCY,
