@@ -15,8 +15,8 @@ import type {
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
 import { Prisma } from '@prisma/client';
-import type { Session } from '@prisma/client';
-import { isNumber, mergeWith, pickBy } from 'lodash-es';
+import type { $Enums, Session } from '@prisma/client';
+import { isNumber,mergeWith, pickBy } from 'lodash-es';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -26,6 +26,17 @@ import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
+
+type RecordObject = {
+  groupId: string;
+  sessionDate: string;
+  sessionId: string;
+  sessionType: $Enums.SessionType;
+  subjectAge: null | number;
+  subjectId: string;
+  subjectSex: $Enums.Sex | null;
+  timestamp: string;
+};
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -178,7 +189,18 @@ export class InstrumentRecordsService {
           continue;
         }
         if (list && list[0] !== undefined) {
-          const expandDataResult = this.expandData(data, list[0], instrument, record);
+          const objectRecord: RecordObject = {
+            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+            sessionDate: record.session.date.toISOString(),
+            sessionId: record.session.id,
+            sessionType: record.session.type,
+            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+            subjectId: record.subject.id,
+            subjectSex: record.subject.sex,
+            timestamp: record.date.toISOString()
+          };
+
+          const expandDataResult = this.expandData(data, list[0], instrument, objectRecord);
           if (expandDataResult.isErr()) {
             data.push({
               groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
@@ -198,7 +220,6 @@ export class InstrumentRecordsService {
         }
       }
     }
-
     return data;
   }
 
@@ -404,22 +425,27 @@ export class InstrumentRecordsService {
     }
   }
 
-  private expandData(data: InstrumentRecordsExport, listEntry: any, instrument: ScalarInstrument, record: any) {
+  private expandData(
+    data: InstrumentRecordsExport,
+    listEntry: any,
+    instrument: ScalarInstrument,
+    record: RecordObject
+  ) {
     if (Array.isArray(listEntry)) {
       for (const objectEntry of listEntry) {
         for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
           data.push({
-            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+            groupId: record.groupId ?? DEFAULT_GROUP_NAME,
             instrumentEdition: instrument.internal.edition,
             instrumentName: instrument.internal.name,
             measure: typeof dataValue === 'string' ? dataKey : JSON.stringify(dataKey),
-            sessionDate: record.session.date.toISOString(),
-            sessionId: record.session.id,
-            sessionType: record.session.type,
-            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-            subjectId: record.subject.id,
-            subjectSex: record.subject.sex,
-            timestamp: record.date.toISOString(),
+            sessionDate: record.sessionDate,
+            sessionId: record.sessionId,
+            sessionType: record.sessionType,
+            subjectAge: record.subjectAge,
+            subjectId: record.subjectId,
+            subjectSex: record.subjectSex,
+            timestamp: record.timestamp,
             value: typeof dataValue === 'string' ? dataValue : JSON.stringify(dataValue)
           });
         }
