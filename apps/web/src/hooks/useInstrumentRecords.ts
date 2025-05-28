@@ -1,3 +1,4 @@
+import { reviver } from '@douglasneuroinformatics/libjs';
 import { $InstrumentRecord } from '@opendatacapture/schemas/instrument-records';
 import type { InstrumentRecordQueryParams } from '@opendatacapture/schemas/instrument-records';
 import { useQuery } from '@tanstack/react-query';
@@ -18,7 +19,8 @@ export const useInstrumentRecords = (
     enabled,
     queryFn: async () => {
       const response = await axios.get('/v1/instrument-records', {
-        params
+        params,
+        transformResponse: [(data: string) => JSON.parse(data, reviver) as unknown]
       });
       return $InstrumentRecord.array().parseAsync(response.data);
     },
