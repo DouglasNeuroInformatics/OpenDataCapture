@@ -70,6 +70,7 @@
     "simple-statistics__7.x": "workspace:*",
     "ts-pattern__5.x": "workspace:*",
     "type-fest__4.x": "workspace:*",
-    "zod__3.23.x": "workspace:*"
+    "zod__3.23.x": "workspace:*",
+    "zod__3.x": "workspace:*"
   }
 }

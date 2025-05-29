@@ -1,0 +1,28 @@
+{
+  "name": "zod__3.x",
+  "type": "module",
+  "version": "3.25.36",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./v3": {
+      "types": "./src/v3/index.d.ts",
+      "import": "./src/v3/index.js"
+    },
+    "./v4": {
+      "types": "./src/v4/index.d.ts",
+      "import": "./src/v4/index.js"
+    },
+    "./v4-mini": {
+      "types": "./src/v4-mini/index.d.ts",
+      "import": "./src/v4-mini/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "zod": "^3.25.36"
+  }
+}
