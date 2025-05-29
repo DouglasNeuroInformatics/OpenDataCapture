@@ -40,7 +40,8 @@ export default {
     'simple-statistics__7.x',
     'ts-pattern__5.x',
     'type-fest__4.x',
-    'zod__3.23.x'
+    'zod__3.23.x',
+    'zod__3.x'
   ],
   mode: 'production',
   outdir: 'dist'
