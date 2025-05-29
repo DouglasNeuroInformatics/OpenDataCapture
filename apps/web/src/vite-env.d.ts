@@ -3,6 +3,7 @@
 // All of these should be undefined in production
 interface ImportMetaDevEnv {
   readonly VITE_DEV_BYPASS_AUTH?: string;
+  readonly VITE_DEV_DISABLE_TUTORIAL?: string;
   readonly VITE_DEV_FORCE_CLEAR_QUERY_CACHE?: string;
   readonly VITE_DEV_NETWORK_LATENCY?: string;
   readonly VITE_DEV_PASSWORD?: string;
