@@ -438,7 +438,7 @@ export class InstrumentRecordsService {
             groupId: record.groupId ?? DEFAULT_GROUP_NAME,
             instrumentEdition: instrument.internal.edition,
             instrumentName: instrument.internal.name,
-            measure: typeof dataValue === 'string' ? dataKey : JSON.stringify(dataKey),
+            measure: dataKey,
             sessionDate: record.sessionDate,
             sessionId: record.sessionId,
             sessionType: record.sessionType,
