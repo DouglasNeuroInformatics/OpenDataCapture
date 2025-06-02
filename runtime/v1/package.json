@@ -1,7 +1,7 @@
 {
   "name": "@opendatacapture/runtime-v1",
   "type": "module",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "author": {
     "name": "Douglas Neuroinformatics",
     "email": "support@douglasneuroinformatics.ca"
@@ -70,6 +70,7 @@
     "simple-statistics__7.x": "workspace:*",
     "ts-pattern__5.x": "workspace:*",
     "type-fest__4.x": "workspace:*",
-    "zod__3.23.x": "workspace:*"
+    "zod__3.23.x": "workspace:*",
+    "zod__3.x": "workspace:*"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "zod__3.23.x",
   "type": "module",
-  "version": "3.23.8",
+  "version": "3.25.36",
   "license": "MIT",
   "exports": {
     ".": {
@@ -11,6 +11,6 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "zod": "3.23.8"
+    "zod__3.x": "workspace:*"
   }
 }
