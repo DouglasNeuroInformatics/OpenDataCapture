@@ -431,7 +431,7 @@ export class InstrumentRecordsService {
     instrument: ScalarInstrument,
     record: RecordObject
   ) {
-    if (Array.isArray(listEntry)) {
+    if (Array.isArray(listEntry) && listEntry.length > 0) {
       for (const objectEntry of listEntry) {
         for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
           data.push({
