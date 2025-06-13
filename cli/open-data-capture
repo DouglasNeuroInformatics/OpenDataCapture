@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 from __future__ import annotations
 
 import sys
@@ -12,21 +13,42 @@ if sys.version_info[:2] < (3, 8):
 import json
 import os
 
-from argparse import ArgumentTypeError, ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 from typing import Any, Callable
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
-from urllib.request import HTTPError, Request, urlopen
+from urllib.request import Request, urlopen
 from urllib.response import addinfourl
-from urllib.error import URLError
+
+# --- Global Variables ---
 
 PROGRAM_NAME = os.path.basename(sys.argv[0])
+PROGRAM_DESCRIPTION = """
+ODC CLI Tool
+
+This command-line tool allows system administrators to interact with the
+Open Data Capture (ODC) API. It provides commands for configuring the API
+endpoint, authenticating with credentials, and managing resources.
+
+Requires:
+    - Python 3.8+
+
+Features:
+    - Login with username and password
+    - Store and retrieve configuration (e.g., base URL)
+"""
+
 USER_CONFIG_FILEPATH = os.path.expanduser('~/.odc-cli.json')
 
+config: Config  # initialized in main
 
-config: Config
+
+# --- Decorators ---
 
 
 def require_url(fn: Callable[..., Any]) -> Callable[..., Any]:
+    """Decorator to ensure a base URL is configured before executing the function"""
+
     def wrapper(*args: Any, **kwargs: Any) -> None:
         if config.base_url is None:
             raise RuntimeError(f'URL must be defined (hint: use {PROGRAM_NAME} config set-url)')
@@ -35,10 +57,13 @@ def require_url(fn: Callable[..., Any]) -> Callable[..., Any]:
     return wrapper
 
 
+# --- Utilities ---
+
+
 class ArgumentTypes:
     @staticmethod
-    def valid_url_or_null(url: str) -> str | None:
-        if url == 'null':
+    def valid_url_or_none(url: str) -> str | None:
+        if url == 'None':
             return None
         parsed = urlparse(url)
         if not all([parsed.scheme, parsed.netloc]):
@@ -47,6 +72,8 @@ class ArgumentTypes:
 
 
 class Config:
+    """Manages user configuration stored in a JSON file"""
+
     _dict: dict[str, Any]
     _filepath = os.path.expanduser('~/.odc-cli.json')
 
@@ -79,6 +106,8 @@ class Config:
 
 
 class HttpResponse:
+    """Represents an HTTP response with JSON data and status"""
+
     def __init__(self, data: Any, status: int | None):
         self.data = data
         self.status = status
@@ -102,6 +131,8 @@ class HttpResponse:
 
 
 class HttpClient:
+    """Simplified HTTP client for making requests"""
+
     @classmethod
     def post(cls, url: str, data: Any) -> HttpResponse:
         headers: dict[str, str] = {'Content-Type': 'application/json'}
@@ -143,6 +174,9 @@ class HttpClient:
         return HttpResponse(data=data, status=response.getcode())
 
 
+# --- Command Handlers ---
+
+
 class AuthCommands:
     @require_url
     @staticmethod
@@ -158,19 +192,22 @@ class AuthCommands:
 class ConfigCommands:
     @staticmethod
     def get_url() -> None:
-        print(config.base_url or 'null')
+        print(config.base_url)
 
     @staticmethod
-    def set_url(url: str) -> None:
+    def set_url(url: str | None) -> None:
         config.base_url = url
         config.write()
+
+
+# --- Main CLI Entrypoint ---
 
 
 def main() -> None:
     global config
     config = Config()
 
-    parser = ArgumentParser(prog=PROGRAM_NAME)
+    parser = ArgumentParser(prog=PROGRAM_NAME, description=PROGRAM_DESCRIPTION)
     subparsers = parser.add_subparsers(help='subcommand help', required=True)
 
     ## AUTH
@@ -191,7 +228,7 @@ def main() -> None:
     get_config_url_parser.set_defaults(fn=ConfigCommands.get_url)
 
     set_config_parser = config_subparsers.add_parser('set-url')
-    set_config_parser.add_argument('url', type=ArgumentTypes.valid_url_or_null)
+    set_config_parser.add_argument('url', type=ArgumentTypes.valid_url_or_none)
     set_config_parser.set_defaults(fn=ConfigCommands.set_url)
 
     kwargs = vars(parser.parse_args())
