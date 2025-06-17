@@ -9,12 +9,12 @@ if sys.version_info[:2] < (3, 8):
     print('Error: Python 3.8 or higher is required', file=sys.stderr)
     sys.exit(1)
 
-
+import base64
 import json
 import os
 
-from argparse import ArgumentParser, ArgumentTypeError
-from typing import Any, Callable
+from argparse import _SubParsersAction, ArgumentParser, ArgumentTypeError
+from typing import Any, Callable, TypedDict
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -38,10 +38,11 @@ Features:
     - Store and retrieve configuration (e.g., base URL)
 """
 
-USER_CONFIG_FILEPATH = os.path.expanduser('~/.odc-cli.json')
-
 config: Config  # initialized in main
 
+# --- Types ---
+
+JwtPayload = TypedDict('JwtPayload', {'basePermissionLevel': str})
 
 # --- Decorators ---
 
@@ -51,7 +52,20 @@ def require_url(fn: Callable[..., Any]) -> Callable[..., Any]:
 
     def wrapper(*args: Any, **kwargs: Any) -> None:
         if config.base_url is None:
-            raise RuntimeError(f'URL must be defined (hint: use {PROGRAM_NAME} config set-url)')
+            print(f'Error: URL must be defined (hint: use {PROGRAM_NAME} config set-url)', file=sys.stderr)
+            sys.exit(1)
+        fn(*args, **kwargs)
+
+    return wrapper
+
+
+def require_token(fn: Callable[..., Any]) -> Callable[..., Any]:
+    """Decorator to ensure that the user is logged in before executing the function"""
+
+    def wrapper(*args: Any, **kwargs: Any) -> None:
+        if config.access_token is None:
+            print(f'Error: Must be logged in (hint: use {PROGRAM_NAME} auth login)', file=sys.stderr)
+            sys.exit(1)
         fn(*args, **kwargs)
 
     return wrapper
@@ -61,6 +75,8 @@ def require_url(fn: Callable[..., Any]) -> Callable[..., Any]:
 
 
 class ArgumentTypes:
+    """Static methods to validate cli args"""
+
     @staticmethod
     def valid_url_or_none(url: str) -> str | None:
         if url == 'None':
@@ -71,8 +87,31 @@ class ArgumentTypes:
         return url
 
 
+class JWTDecoder:
+    """Decodes the payload of a JSON Web Token (JWT) without validating its signature"""
+
+    @classmethod
+    def decode_payload(cls, token: str) -> dict[str, Any]:
+        try:
+            parts = token.split('.')
+            if len(parts) != 3:
+                raise ValueError('Invalid JWT format: expected header.payload.signature')
+            payload_b64 = parts[1]
+            decoded_bytes = cls._base64url_decode(payload_b64)
+            payload = json.loads(decoded_bytes.decode('utf-8'))
+            return payload
+        except Exception as e:
+            raise RuntimeError('Failed to decode JWT payload') from e
+
+    @staticmethod
+    def _base64url_decode(input_str: str):
+        padding = '=' * (-len(input_str) % 4)
+        input_str += padding
+        return base64.urlsafe_b64decode(input_str)
+
+
 class Config:
-    """Manages user configuration stored in a JSON file"""
+    """Manages program configuration stored in a JSON file"""
 
     _dict: dict[str, Any]
     _filepath = os.path.expanduser('~/.odc-cli.json')
@@ -99,6 +138,8 @@ class Config:
     @base_url.setter
     def base_url(self, value: str | None) -> None:
         self._dict['base_url'] = value
+        if value is None:
+            self._dict['access_token'] = None
 
     def write(self) -> None:
         with open(self._filepath, 'w') as file:
@@ -133,11 +174,17 @@ class HttpResponse:
 class HttpClient:
     """Simplified HTTP client for making requests"""
 
+    _default_headers: dict[str, str] = {'Content-Type': 'application/json'}
+
+    @classmethod
+    def get(cls, url: str) -> HttpResponse:
+        req = Request(url, headers=cls._default_headers, method='GET')
+        return cls._send(req)
+
     @classmethod
     def post(cls, url: str, data: Any) -> HttpResponse:
-        headers: dict[str, str] = {'Content-Type': 'application/json'}
         json_data = json.dumps(data).encode('utf-8')
-        req = Request(url, data=json_data, headers=headers, method='POST')
+        req = Request(url, data=json_data, headers=cls._default_headers, method='POST')
         return cls._send(req)
 
     @staticmethod
@@ -187,6 +234,7 @@ class AuthCommands:
             return None
         config.access_token = response.data['accessToken']
         print('Success!')
+        config.write()
 
 
 class ConfigCommands:
@@ -199,41 +247,81 @@ class ConfigCommands:
         config.base_url = url
         config.write()
 
+    @require_url
+    @require_token
+    @staticmethod
+    def get_permissions() -> None:
+        assert config.access_token is not None
+        payload = JWTDecoder.decode_payload(config.access_token)
+        permissions = payload.get('permissions')
+        assert isinstance(permissions, list)
+        print(json.dumps(permissions, indent=2))
+
+
+class SetupCommands:
+    @require_url
+    @staticmethod
+    def get_status() -> None:
+        response = HttpClient.get(f'{config.base_url}/v1/setup')
+        print(response)
+
 
 # --- Main CLI Entrypoint ---
+
+
+class CLI:
+    parser: ArgumentParser
+    subparsers: _SubParsersAction[ArgumentParser]
+
+    def __init__(self) -> None:
+        self.parser = ArgumentParser(prog=PROGRAM_NAME, description=PROGRAM_DESCRIPTION)
+        self.subparsers = self.parser.add_subparsers(help='subcommand help', required=True)
+        self._create_auth_parser()
+        self._create_config_parser()
+        self._create_setup_parser()
+
+    def run(self) -> None:
+        kwargs = vars(self.parser.parse_args())
+        fn = kwargs.pop('fn')
+        fn(**kwargs)
+
+    def _create_auth_parser(self):
+        parser = self.subparsers.add_parser('auth')
+        subparsers = parser.add_subparsers(required=True)
+
+        login_parser = subparsers.add_parser('login')
+        login_parser.add_argument('--username', type=str, required=True)
+        login_parser.add_argument('--password', type=str, required=True)
+        login_parser.set_defaults(fn=AuthCommands.login)
+
+    def _create_config_parser(self):
+        parser = self.subparsers.add_parser('config')
+        subparsers = parser.add_subparsers(required=True)
+
+        get_config_url_parser = subparsers.add_parser('get-url')
+        get_config_url_parser.set_defaults(fn=ConfigCommands.get_url)
+
+        set_config_parser = subparsers.add_parser('set-url')
+        set_config_parser.add_argument('url', type=ArgumentTypes.valid_url_or_none)
+        set_config_parser.set_defaults(fn=ConfigCommands.set_url)
+
+        get_permissions_parser = subparsers.add_parser('get-permissions')
+        get_permissions_parser.set_defaults(fn=ConfigCommands.get_permissions)
+
+    def _create_setup_parser(self):
+        setup_parser = self.subparsers.add_parser('setup')
+        setup_subparsers = setup_parser.add_subparsers(required=True)
+
+        get_setup_state_parser = setup_subparsers.add_parser('get-state')
+        get_setup_state_parser.set_defaults(fn=SetupCommands.get_status)
 
 
 def main() -> None:
     global config
     config = Config()
 
-    parser = ArgumentParser(prog=PROGRAM_NAME, description=PROGRAM_DESCRIPTION)
-    subparsers = parser.add_subparsers(help='subcommand help', required=True)
-
-    ## AUTH
-    auth_parser = subparsers.add_parser('auth')
-    auth_subparsers = auth_parser.add_subparsers(required=True)
-
-    login_parser = auth_subparsers.add_parser('login')
-    login_parser.add_argument('--username', type=str, required=True)
-    login_parser.add_argument('--password', type=str, required=True)
-    login_parser.set_defaults(fn=AuthCommands.login)
-
-    ## CONFIG
-
-    config_parser = subparsers.add_parser('config')
-    config_subparsers = config_parser.add_subparsers(required=True)
-
-    get_config_url_parser = config_subparsers.add_parser('get-url')
-    get_config_url_parser.set_defaults(fn=ConfigCommands.get_url)
-
-    set_config_parser = config_subparsers.add_parser('set-url')
-    set_config_parser.add_argument('url', type=ArgumentTypes.valid_url_or_none)
-    set_config_parser.set_defaults(fn=ConfigCommands.set_url)
-
-    kwargs = vars(parser.parse_args())
-    fn = kwargs.pop('fn')
-    fn(**kwargs)
+    cli = CLI()
+    cli.run()
 
 
 if __name__ == '__main__':
