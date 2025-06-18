@@ -40,4 +40,11 @@ export class InstrumentsController {
   ): Promise<InstrumentInfo[]> {
     return this.instrumentsService.findInfo({ kind, subjectId }, { ability });
   }
+
+  @ApiOperation({ summary: 'List Instruments' })
+  @Get('list')
+  @RouteAccess({ action: 'read', subject: 'Instrument' })
+  async list(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
+    return this.instrumentsService.list({ kind }, ability);
+  }
 }
