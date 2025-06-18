@@ -1,13 +1,14 @@
 /* eslint-disable perfectionist/sort-classes */
 
-import { CurrentUser, ParseSchemaPipe, RouteAccess } from '@douglasneuroinformatics/libnest';
+import { CurrentUser, ParseSchemaPipe, RouteAccess, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
 import type { AppAbility } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import { z } from 'zod';
 
 import { CreateInstrumentRecordDto } from './dto/create-instrument-record.dto';
+import { UpdateInstrumentRecordDto } from './dto/update-instrument-record.dto';
 import { UploadInstrumentRecordsDto } from './dto/upload-instrument-record.dto';
 import { InstrumentRecordsService } from './instrument-records.service';
 
@@ -51,6 +52,14 @@ export class InstrumentRecordsController {
     return this.instrumentRecordsService.find({ groupId, instrumentId, kind, minDate, subjectId }, { ability });
   }
 
+  @ApiOperation({ summary: 'Delete Record' })
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @RouteAccess({ action: 'delete', subject: 'InstrumentRecord' })
+  async deleteById(@Param('id', ValidObjectIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+    await this.instrumentRecordsService.deleteById(id, { ability });
+  }
+
   @ApiOperation({ summary: 'Export Records' })
   @Get('export')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
@@ -67,5 +76,16 @@ export class InstrumentRecordsController {
     @Query('groupId') groupId?: string
   ): Promise<{ [key: string]: { intercept: number; slope: number; stdErr: number } }> {
     return this.instrumentRecordsService.linearModel({ groupId, instrumentId }, { ability });
+  }
+
+  @ApiOperation({ summary: 'Update Instrument Record' })
+  @Patch(':id')
+  @RouteAccess({ action: 'delete', subject: 'InstrumentRecord' })
+  updateById(
+    @Param('id', ValidObjectIdPipe) id: string,
+    @Body() { data }: UpdateInstrumentRecordDto,
+    @CurrentUser('ability') ability: AppAbility
+  ) {
+    return this.instrumentRecordsService.updateById(id, data, { ability });
   }
 }

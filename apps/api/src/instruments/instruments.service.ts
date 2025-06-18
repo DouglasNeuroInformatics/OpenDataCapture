@@ -5,7 +5,7 @@ import {
   LoggingService,
   VirtualizationService
 } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { AppAbility, Model } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
 import {
   ConflictException,
@@ -232,6 +232,16 @@ export class InstrumentsService {
       this.virtualizationService.context.instruments.set(instrument.id, instance);
     }
     return instance;
+  }
+
+  async list<TKind extends InstrumentKind>(query: InstrumentQuery<TKind> = {}, ability: AppAbility) {
+    return this.find(query, { ability }).then((arr) => {
+      return arr.map((instrument) => ({
+        id: instrument.id,
+        internal: instrument.internal,
+        title: instrument.details.title
+      }));
+    });
   }
 
   private async instantiate(instruments: Pick<InstrumentBundleContainer, 'bundle' | 'id'>[]) {

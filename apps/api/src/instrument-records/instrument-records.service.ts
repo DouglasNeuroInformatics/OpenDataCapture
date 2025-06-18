@@ -2,8 +2,8 @@ import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
 import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import type { ScalarInstrument } from '@opendatacapture/runtime-core';
+import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type {
   CreateInstrumentRecordData,
@@ -15,7 +15,7 @@ import type {
 } from '@opendatacapture/schemas/instrument-records';
 import { Prisma } from '@prisma/client';
 import type { Session } from '@prisma/client';
-import { isNumber, pickBy } from 'lodash-es';
+import { isNumber, mergeWith, pickBy } from 'lodash-es';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -105,6 +105,10 @@ export class InstrumentRecordsService {
   }
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
+    const isExisting = await this.instrumentRecordModel.exists({ id });
+    if (!isExisting) {
+      throw new NotFoundException(`Could not find record with ID '${id}'`);
+    }
     return this.instrumentRecordModel.delete({
       where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], id }
     });
@@ -189,12 +193,7 @@ export class InstrumentRecordsService {
 
     const records = await this.instrumentRecordModel.findMany({
       include: {
-        instrument: {
-          select: {
-            bundle: true,
-            id: true
-          }
-        }
+        instrument: false
       },
       where: {
         AND: [
@@ -218,9 +217,7 @@ export class InstrumentRecordsService {
     if (groupId) {
       await this.groupsService.findById(groupId);
     }
-    const instrument = await this.instrumentsService
-      .findById(instrumentId)
-      .then((instrument) => this.instrumentsService.getInstrumentInstance(instrument));
+    const instrument = await this.getInstrumentById(instrumentId);
 
     if (instrument.kind === 'SERIES') {
       throw new UnprocessableEntityException(`Cannot create linear model for series instrument '${instrument.id}'`);
@@ -259,6 +256,47 @@ export class InstrumentRecordsService {
       results[measure] = linearRegression(new Float64Array(data[measure]![0]), new Float64Array(data[measure]![1]));
     }
     return results;
+  }
+
+  async updateById(id: string, data: unknown[] | { [key: string]: unknown }, { ability }: EntityOperationOptions = {}) {
+    const instrumentRecord = await this.instrumentRecordModel.findFirst({
+      where: { id }
+    });
+    if (!instrumentRecord) {
+      throw new NotFoundException(`Could not find record with ID '${id}'`);
+    }
+
+    if (Array.isArray(instrumentRecord.data) && !Array.isArray(data)) {
+      throw new BadRequestException('Data must be an array when the instrument record data is an array');
+    }
+
+    // all records must be attached to scalar instruments
+    const instrument = (await this.getInstrumentById(instrumentRecord.instrumentId)) as ScalarInstrument;
+
+    const updatedData = mergeWith(instrumentRecord.data, data, (updatedValue: unknown, sourceValue: unknown) => {
+      if (Array.isArray(sourceValue)) {
+        return updatedValue;
+      }
+      return undefined;
+    });
+
+    const parseResult = await instrument.validationSchema.safeParseAsync(updatedData);
+    if (!parseResult.success) {
+      throw new BadRequestException({
+        issues: parseResult.error.issues,
+        message: 'Merged data does not match validation schema'
+      });
+    }
+
+    return this.instrumentRecordModel.update({
+      data: {
+        computedMeasures: instrument.measures
+          ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data as Json)
+          : null,
+        data: parseResult.data
+      },
+      where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], id }
+    });
   }
 
   async upload(
@@ -338,6 +376,12 @@ export class InstrumentRecordsService {
       await this.sessionsService.deleteByIds(createdSessionsArray.map((session) => session.id));
       throw err;
     }
+  }
+
+  private getInstrumentById(instrumentId: string) {
+    return this.instrumentsService
+      .findById(instrumentId)
+      .then((instrument) => this.instrumentsService.getInstrumentInstance(instrument));
   }
 
   private parseJson(data: unknown) {

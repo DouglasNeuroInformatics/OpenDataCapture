@@ -1,0 +1,486 @@
+#!/usr/bin/env python3
+
+
+from __future__ import annotations
+
+import sys
+
+if sys.version_info[:2] < (3, 8):
+    print('Error: Python 3.8 or higher is required', file=sys.stderr)
+    sys.exit(1)
+
+import base64
+import json
+import os
+
+from argparse import _SubParsersAction, ArgumentParser, ArgumentTypeError, RawTextHelpFormatter
+from datetime import datetime
+from typing import Any, Callable, TypedDict
+from urllib.error import HTTPError, URLError
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+from urllib.request import Request, urlopen
+from urllib.response import addinfourl
+
+# --- Global Variables ---
+
+PROGRAM_NAME = os.path.basename(sys.argv[0])
+PROGRAM_DESCRIPTION = """
+ODC CLI Tool
+
+This command-line tool allows system administrators to interact with the
+Open Data Capture (ODC) API. It provides commands for configuring the API
+endpoint, authenticating with credentials, and managing resources.
+
+Features:
+    - Login with username and password
+    - Store and retrieve configuration (e.g., base URL)
+    - Retrieve a list of instruments in the database
+    - Update and delete instrument records
+    - Get the current status of an ODC instance
+
+Requires:
+- Python 3.8+
+
+"""
+
+config: Config  # initialized in main
+
+# --- Types ---
+
+JwtPayload = TypedDict('JwtPayload', {'basePermissionLevel': str})
+
+# --- Decorators ---
+
+
+def require_url(fn: Callable[..., Any]) -> Callable[..., Any]:
+    """Decorator to ensure a base URL is configured before executing the function"""
+
+    def wrapper(*args: Any, **kwargs: Any) -> None:
+        if config.base_url is None:
+            print(f'Error: URL must be defined (hint: use {PROGRAM_NAME} config set-url)', file=sys.stderr)
+            sys.exit(1)
+        fn(*args, **kwargs)
+
+    return wrapper
+
+
+def require_token(fn: Callable[..., Any]) -> Callable[..., Any]:
+    """Decorator to ensure that the user is logged in before executing the function"""
+
+    def wrapper(*args: Any, **kwargs: Any) -> None:
+        if config.access_token is None:
+            print(f'Error: Must be logged in (hint: use {PROGRAM_NAME} auth login)', file=sys.stderr)
+            sys.exit(1)
+        fn(*args, **kwargs)
+
+    return wrapper
+
+
+# --- Utilities ---
+
+
+def build_url_with_params(base_url: str, params: dict[str, Any]):
+    filtered_params = {k: v for k, v in params.items() if v is not None}
+
+    url_parts = list(urlparse(base_url))
+
+    existing_params = dict(parse_qsl(url_parts[4]))
+    existing_params.update(filtered_params)
+
+    url_parts[4] = urlencode(existing_params)
+
+    return urlunparse(url_parts)
+
+
+def to_json(obj: dict[str, Any] | list[Any]) -> str:
+    return json.dumps(obj, indent=2, ensure_ascii=False)
+
+
+class ArgumentTypes:
+    """Static methods to validate cli args"""
+
+    @staticmethod
+    def json(value: str) -> Any:
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            raise ArgumentTypeError(f'Invalid JSON: "{value}"')
+
+    @staticmethod
+    def valid_datetime(s: str) -> datetime:
+        for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d'):
+            try:
+                return datetime.strptime(s, fmt)
+            except ValueError:
+                continue
+        raise ArgumentTypeError(f"Not a valid date/time: '{s}'. Expected format: 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'")
+
+    @staticmethod
+    def valid_url_or_none(url: str) -> str | None:
+        if url == 'None':
+            return None
+        parsed = urlparse(url)
+        if not all([parsed.scheme, parsed.netloc]):
+            raise ArgumentTypeError(f'invalid url: {url}')
+        return url
+
+
+class JWTDecoder:
+    """Decodes the payload of a JSON Web Token (JWT) without validating its signature"""
+
+    @classmethod
+    def decode_payload(cls, token: str) -> dict[str, Any]:
+        try:
+            parts = token.split('.')
+            if len(parts) != 3:
+                raise ValueError('Invalid JWT format: expected header.payload.signature')
+            payload_b64 = parts[1]
+            decoded_bytes = cls._base64url_decode(payload_b64)
+            payload = json.loads(decoded_bytes.decode('utf-8'))
+            return payload
+        except Exception as e:
+            raise RuntimeError('Failed to decode JWT payload') from e
+
+    @staticmethod
+    def _base64url_decode(input_str: str):
+        padding = '=' * (-len(input_str) % 4)
+        input_str += padding
+        return base64.urlsafe_b64decode(input_str)
+
+
+class Config:
+    """Manages program configuration stored in a JSON file"""
+
+    _dict: dict[str, Any]
+    _filepath = os.path.expanduser('~/.odc-cli.json')
+
+    def __init__(self) -> None:
+        if not os.path.exists(self._filepath):
+            self._dict = {}
+            return None
+        with open(self._filepath, 'r') as file:
+            self._dict = json.load(file)
+
+    @property
+    def access_token(self) -> str | None:
+        return self._dict.get('access_token')
+
+    @access_token.setter
+    def access_token(self, value: str | None) -> None:
+        self._dict['access_token'] = value
+
+    @property
+    def base_url(self) -> str | None:
+        return self._dict.get('base_url')
+
+    @base_url.setter
+    def base_url(self, value: str | None) -> None:
+        self._dict['base_url'] = value
+        if value is None:
+            self._dict['access_token'] = None
+
+    def write(self) -> None:
+        with open(self._filepath, 'w') as file:
+            json.dump(self._dict, file)
+
+
+class HttpResponse:
+    """Represents an HTTP response with JSON data and status"""
+
+    def __init__(self, data: Any, status: int | None):
+        self.data = data
+        self.status = status
+
+    def __str__(self) -> str:
+        return self.to_json(include_data=True)
+
+    def to_json(self, include_data: bool) -> str:
+        props: dict[str, Any] = {}
+        if self.ok:
+            if include_data:
+                props['data'] = self.data
+            props['statusCode'] = self.status or 'N/A'
+        elif not self.ok:
+            props.update(**self.data)
+        return to_json(props)
+
+    @property
+    def ok(self) -> bool:
+        return self.status is not None and 200 <= self.status < 300
+
+
+class HttpClient:
+    """Simplified HTTP client for making requests"""
+
+    @classmethod
+    def get(cls, url: str) -> HttpResponse:
+        return cls._request('GET', url)
+
+    @classmethod
+    def delete(cls, url: str) -> HttpResponse:
+        return cls._request('DELETE', url)
+
+    @classmethod
+    def post(cls, url: str, data: Any) -> HttpResponse:
+        return cls._request('POST', url, data)
+
+    @classmethod
+    def patch(cls, url: str, data: Any) -> HttpResponse:
+        return cls._request('PATCH', url, data)
+
+    @classmethod
+    def _request(cls, method: str, url: str, data: Any = None) -> HttpResponse:
+        headers = cls._get_default_headers()
+        body = json.dumps(data).encode('utf-8') if data is not None else None
+        request = Request(url, data=body, headers=headers, method=method)
+        return cls._send(request)
+
+    @classmethod
+    def _send(cls, req: Request) -> HttpResponse:
+        try:
+            with urlopen(req, timeout=2) as response:
+                return cls._build_response(response)
+        except HTTPError as err:
+            return cls._build_response(err)
+        except URLError as err:
+            reason = err.reason
+            message = (
+                f'Network error: {reason.strerror or str(reason)}'
+                if isinstance(reason, OSError)
+                else f'Failed to reach the server: {reason}'
+            )
+            return HttpResponse(
+                data={
+                    'error': 'URLError',
+                    'message': message,
+                    'hint': 'Please check if the URL is correct and the server is reachable',
+                    'url': req.get_full_url(),
+                },
+                status=None,
+            )
+
+    @staticmethod
+    def _build_response(response: addinfourl) -> HttpResponse:
+        body = response.read()
+        if not body:
+            return HttpResponse(data=None, status=response.getcode())
+        try:
+            data = json.loads(body.decode(errors='replace'))
+        except json.JSONDecodeError:
+            data = {'error': 'Invalid JSON response'}
+        return HttpResponse(data=data, status=response.getcode())
+
+    @staticmethod
+    def _get_default_headers() -> dict[str, str]:
+        headers = {'Content-Type': 'application/json'}
+        if config.access_token:
+            headers['Authorization'] = f'Bearer {config.access_token}'
+        return headers
+
+
+# --- Command Handlers ---
+
+
+class AuthCommands:
+    @require_url
+    @staticmethod
+    def login(username: str, password: str) -> None:
+        response = HttpClient.post(f'{config.base_url}/v1/auth/login', {'username': username, 'password': password})
+        if response.ok:
+            config.access_token = response.data['accessToken']
+            config.write()
+        print(response.to_json(include_data=False))
+
+    @staticmethod
+    def logout() -> None:
+        config.access_token = None
+        config.write()
+
+    @classmethod
+    def status(cls, raw: bool | None) -> None:
+        if raw:
+            cls._print_raw_status()
+        else:
+            cls._print_minimal_status()
+
+    @staticmethod
+    def _print_minimal_status() -> None:
+        status_dict: dict[str, Any] = {}
+        if config.access_token is None:
+            status_dict['Token Exists'] = False
+        else:
+            token_payload = JWTDecoder.decode_payload(config.access_token)
+            status_dict['Token Exists'] = True
+            status_dict['Token Expiry'] = datetime.fromtimestamp(token_payload['exp'])
+        for key, value in status_dict.items():
+            print(f'{key}: {value}')
+
+    @require_url
+    @require_token
+    @staticmethod
+    def _print_raw_status() -> None:
+        assert config.access_token is not None
+        token_payload = JWTDecoder.decode_payload(config.access_token)
+        print(to_json(token_payload))
+
+
+class ConfigCommands:
+    @staticmethod
+    def get_url() -> None:
+        print(config.base_url)
+
+    @staticmethod
+    def set_url(url: str | None) -> None:
+        config.base_url = url
+        config.write()
+
+
+class InstrumentRecordsCommands:
+    @require_url
+    @require_token
+    @staticmethod
+    def delete(id: str) -> None:
+        url = f'{config.base_url}/v1/instrument-records/{id}'
+        response = HttpClient.delete(url)
+        print(response)
+
+    @require_url
+    @require_token
+    @staticmethod
+    def find(min_date: datetime | None, instrument_id: str | None, subject_id: str | None) -> None:
+        url = build_url_with_params(
+            f'{config.base_url}/v1/instrument-records',
+            {'minDate': min_date, 'instrumentId': instrument_id, 'subjectId': subject_id},
+        )
+        response = HttpClient.get(url)
+        print(response)
+
+    @require_url
+    @require_token
+    @staticmethod
+    def update(id: str, data: Any) -> None:
+        url = f'{config.base_url}/v1/instrument-records/{id}'
+        response = HttpClient.patch(url, {'data': data})
+        print(response)
+
+
+class InstrumentsCommands:
+    @require_url
+    @require_token
+    @staticmethod
+    def list(kind: str | None) -> None:
+        url = build_url_with_params(f'{config.base_url}/v1/instruments/list', {'kind': kind})
+        response = HttpClient.get(url)
+        print(json.dumps(response.data, indent=2))
+
+
+class SetupCommands:
+    @require_url
+    @staticmethod
+    def get_status() -> None:
+        response = HttpClient.get(f'{config.base_url}/v1/setup')
+        print(response)
+
+
+# --- Main CLI Entrypoint ---
+
+
+class CLI:
+    parser: ArgumentParser
+    subparsers: _SubParsersAction[ArgumentParser]
+
+    def __init__(self) -> None:
+        self.parser = ArgumentParser(
+            prog=PROGRAM_NAME, description=PROGRAM_DESCRIPTION, formatter_class=RawTextHelpFormatter
+        )
+        self.subparsers = self.parser.add_subparsers(
+            required=True,
+            metavar='<command>',
+            help=f'use "{PROGRAM_NAME} <command> --help" for more info',
+            title='Available Commands',
+        )
+        self._create_auth_parser()
+        self._create_config_parser()
+        self._create_instrument_records_parser()
+        self._create_instruments_parser()
+        self._create_setup_parser()
+
+    def run(self) -> None:
+        kwargs = vars(self.parser.parse_args())
+        fn = kwargs.pop('fn')
+        fn(**kwargs)
+
+    def _create_auth_parser(self):
+        subparsers = self._create_subcommand_subparsers('auth')
+
+        login_parser = subparsers.add_parser('login', help='authenticate with the ODC API and store the JWT locally')
+        login_parser.add_argument('--username', type=str, required=True)
+        login_parser.add_argument('--password', type=str, required=True)
+        login_parser.set_defaults(fn=AuthCommands.login)
+
+        logout_parser = subparsers.add_parser('logout', help='remove the stored JWT (recommended for security)')
+        logout_parser.set_defaults(fn=AuthCommands.logout)
+
+        status_parser = subparsers.add_parser('status', help='print information on the current authentication state')
+        status_parser.add_argument('--raw', action='store_true')
+        status_parser.set_defaults(fn=AuthCommands.status)
+
+    def _create_config_parser(self):
+        subparsers = self._create_subcommand_subparsers('config')
+
+        get_config_url_parser = subparsers.add_parser(
+            'get-url', help='get the configured base URL for your ODC instance'
+        )
+        get_config_url_parser.set_defaults(fn=ConfigCommands.get_url)
+
+        set_config_parser = subparsers.add_parser('set-url', help='set the base URL for your ODC instance')
+        set_config_parser.add_argument('url', type=ArgumentTypes.valid_url_or_none)
+        set_config_parser.set_defaults(fn=ConfigCommands.set_url)
+
+    def _create_instrument_records_parser(self):
+        subparsers = self._create_subcommand_subparsers('instrument-records')
+
+        delete_parser = subparsers.add_parser('delete', help='delete an instrument record by id')
+        delete_parser.add_argument('--id', required=True, help='id of the instrument record to delete')
+        delete_parser.set_defaults(fn=InstrumentRecordsCommands.delete)
+
+        find_parser = subparsers.add_parser('find', help='search instrument records by optional filters')
+        find_parser.add_argument('--min-date', type=ArgumentTypes.valid_datetime, help='filter records created after this date (format: yyyy-mm-dd or yyyy-mm-dd hh:mm:ss)')
+        find_parser.add_argument('--instrument-id', help='filter by instrument id')
+        find_parser.add_argument('--subject-id', help='filter by subject id')
+        find_parser.set_defaults(fn=InstrumentRecordsCommands.find)
+
+        update_parser = subparsers.add_parser(
+            'update',
+            help='update an instrument record with a partial json object (merged recursively)',
+        )
+        update_parser.add_argument('--id', required=True, help='id of the instrument record to update')
+        update_parser.add_argument('--data', required=True, type=ArgumentTypes.json, help='partial json object with fields to update')
+        update_parser.set_defaults(fn=InstrumentRecordsCommands.update)
+
+    def _create_instruments_parser(self):
+        subparsers = self._create_subcommand_subparsers('instruments')
+        get_parser = subparsers.add_parser('list', help='list all instruments, optionally filtered by kind')
+        get_parser.add_argument('--kind', choices=('FORM', 'INTERACTIVE'), help='filter instruments by kind')
+        get_parser.set_defaults(fn=InstrumentsCommands.list)
+
+    def _create_setup_parser(self):
+        subparsers = self._create_subcommand_subparsers('setup')
+        get_setup_state_parser = subparsers.add_parser('get-state', help='get the current setup status of the ODC instance')
+        get_setup_state_parser.set_defaults(fn=SetupCommands.get_status)
+
+    def _create_subcommand_subparsers(self, name: str):
+        parser = self.subparsers.add_parser(name, help='')
+        return parser.add_subparsers(required=True, title='Available Commands', metavar='<command>')
+
+
+def main() -> None:
+    global config
+    config = Config()
+
+    cli = CLI()
+    cli.run()
+
+
+if __name__ == '__main__':
+    main()
