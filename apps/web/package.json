@@ -19,7 +19,7 @@
     "@casl/ability": "catalog:",
     "@douglasneuroinformatics/libjs": "catalog:",
     "@douglasneuroinformatics/libpasswd": "catalog:",
-    "@douglasneuroinformatics/libui": "^4.2.1",
+    "@douglasneuroinformatics/libui": "catalog:",
     "@heroicons/react": "^2.2.0",
     "@import-meta-env/cli": "^0.7.3",
     "@import-meta-env/unplugin": "^0.6.2",
@@ -51,7 +51,7 @@
     "ts-pattern": "workspace:ts-pattern__5.x@*",
     "type-fest": "workspace:type-fest__4.x@*",
     "xlsx": "^0.18.5",
-    "zod": "workspace:zod__3.23.x@*",
+    "zod": "workspace:zod__3.x@*",
     "zustand": "^4.5.6"
   },
   "devDependencies": {

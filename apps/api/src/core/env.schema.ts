@@ -1,6 +1,6 @@
 import { $BooleanLike, $NumberLike, $UrlLike } from '@douglasneuroinformatics/libjs';
 import { $BaseEnv } from '@douglasneuroinformatics/libnest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const $Env = $BaseEnv
   .omit({ API_PORT: true })

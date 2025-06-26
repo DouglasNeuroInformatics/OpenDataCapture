@@ -1,6 +1,7 @@
 import type { LicenseIdentifier } from '@opendatacapture/licenses';
 import type { ConditionalKeys, Merge, SetRequired } from 'type-fest';
-import type { z } from 'zod';
+import type { z as z3 } from 'zod/v3';
+import type { z as z4 } from 'zod/v4';
 
 import type { Language } from './core.js';
 
@@ -157,6 +158,9 @@ type UnilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Langu
 type MultilingualInstrumentMeasures<TData = any> = InstrumentMeasures<TData, Language[]>;
 
 /** @public */
+type InstrumentValidationSchema<TData = any> = z3.ZodType<TData> | z4.ZodType<TData>;
+
+/** @public */
 type BaseInstrument<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
   /** The runtime version for this instrument, which is set automatically by the `defineInstrument` function */
   __runtimeVersion: 1;
@@ -203,7 +207,7 @@ type ScalarInstrument<TData = any, TLanguage extends InstrumentLanguage = Instru
     measures: InstrumentMeasures<TData, TLanguage> | null;
 
     /** The zod validation schema for the instrument data */
-    validationSchema: z.ZodType<TData>;
+    validationSchema: InstrumentValidationSchema<TData>;
   }
 >;
 
@@ -221,6 +225,7 @@ export type {
   InstrumentMeasureValue,
   InstrumentMeasureVisibility,
   InstrumentUIOption,
+  InstrumentValidationSchema,
   MultilingualClientInstrumentDetails,
   MultilingualInstrumentDetails,
   MultilingualInstrumentMeasures,

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Dialog, Form, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { CopyPlusIcon } from 'lucide-react';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { useFilesRef } from '@/hooks/useFilesRef';
 import type { InstrumentRepository } from '@/models/instrument-repository.model';

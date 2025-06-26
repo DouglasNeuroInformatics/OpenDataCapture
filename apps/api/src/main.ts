@@ -1,4 +1,5 @@
 import { AppFactory } from '@douglasneuroinformatics/libnest';
+import { PrismaClient } from '@prisma/client';
 
 import { AssignmentsModule } from './assignments/assignments.module';
 import { $Env } from './core/env.schema';
@@ -54,6 +55,9 @@ export default AppFactory.create({
     }
   ],
   prisma: {
+    client: {
+      constructor: PrismaClient
+    },
     dbPrefix: 'data-capture'
   },
   version: '1'

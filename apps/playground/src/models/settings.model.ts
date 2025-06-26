@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const $Settings = z.object({
   apiBaseUrl: z.string().optional(),

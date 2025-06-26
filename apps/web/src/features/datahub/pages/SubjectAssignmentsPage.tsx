@@ -7,7 +7,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import type { Assignment, CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import { useParams } from 'react-router-dom';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';

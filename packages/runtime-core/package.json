@@ -23,7 +23,7 @@
     "@opendatacapture/licenses": "workspace:*",
     "lodash-es": "workspace:lodash-es__4.x@*",
     "type-fest": "workspace:type-fest__4.x@*",
-    "zod": "workspace:zod__3.23.x@*"
+    "zod": "workspace:zod__3.x@*"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",

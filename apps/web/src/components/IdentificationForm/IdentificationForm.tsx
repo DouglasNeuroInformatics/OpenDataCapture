@@ -5,7 +5,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $Sex, $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import type { Promisable } from 'type-fest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { useAppStore } from '@/store';
 

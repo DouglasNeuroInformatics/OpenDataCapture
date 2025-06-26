@@ -9,7 +9,9 @@ import '@opendatacapture/react-core/globals.css';
 
 const root = document.getElementById('root')!;
 
-i18n.init();
+i18n.init({
+  translations: {}
+});
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>

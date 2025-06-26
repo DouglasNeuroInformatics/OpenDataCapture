@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { $ReleaseInfo } from '../setup/setup';
 
@@ -18,4 +18,7 @@ export const $GatewayHealthcheckFailureResult = z.object({
 });
 
 export type GatewayHealthcheckResult = z.infer<typeof $GatewayHealthcheckResult>;
-export const $GatewayHealthcheckResult = z.union([$GatewayHealthcheckSuccessResult, $GatewayHealthcheckFailureResult]);
+export const $GatewayHealthcheckResult = z.discriminatedUnion('ok', [
+  $GatewayHealthcheckSuccessResult,
+  $GatewayHealthcheckFailureResult
+]);

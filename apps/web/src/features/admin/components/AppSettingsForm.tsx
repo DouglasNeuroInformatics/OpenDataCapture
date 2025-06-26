@@ -2,7 +2,7 @@ import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 import type { Promisable, SetNonNullable } from 'type-fest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 type AppSettingsFormProps = {
   initialValues: SetupState;

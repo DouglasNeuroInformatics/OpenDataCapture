@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export type Summary = z.infer<typeof $Summary>;
 export const $Summary = z.object({

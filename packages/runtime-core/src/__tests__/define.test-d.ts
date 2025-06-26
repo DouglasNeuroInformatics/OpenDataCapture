@@ -1,5 +1,6 @@
 import { expectTypeOf } from 'expect-type';
-import { z } from 'zod';
+import { z as z3 } from 'zod/v3';
+import { z as z4 } from 'zod/v4';
 
 import { defineInstrument } from '../define.js';
 
@@ -20,34 +21,47 @@ expectTypeOf<DiscriminatedInstrument<'INTERACTIVE', 'en', { foo: string }>>().to
 >();
 expectTypeOf<DiscriminatedInstrument<'INTERACTIVE', 'en', undefined>>().toBeNever();
 
+const happinessQuestionnaire = {
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['Please answer the questions based on your current feelings.']
+  },
+  content: {
+    overallHappiness: {
+      kind: 'number',
+      label: 'Overall Happiness',
+      variant: 'input'
+    } as const
+  },
+  details: {
+    description: 'The Happiness Questionnaire is a questionnaire about happiness.',
+    license: 'Apache-2.0' as const,
+    title: 'Happiness Questionnaire'
+  },
+  internal: {
+    edition: 1,
+    name: 'HAPPINESS_QUESTIONNAIRE'
+  },
+  kind: 'FORM' as const,
+  language: 'en' as const,
+  measures: {},
+  tags: ['Well-Being']
+};
+
 expectTypeOf(
   defineInstrument({
-    clientDetails: {
-      estimatedDuration: 1,
-      instructions: ['Please answer the questions based on your current feelings.']
-    },
-    content: {
-      overallHappiness: {
-        kind: 'number',
-        label: 'Overall Happiness',
-        variant: 'input'
-      }
-    },
-    details: {
-      description: 'The Happiness Questionnaire is a questionnaire about happiness.',
-      license: 'Apache-2.0',
-      title: 'Happiness Questionnaire'
-    },
-    internal: {
-      edition: 1,
-      name: 'HAPPINESS_QUESTIONNAIRE'
-    },
-    kind: 'FORM',
-    language: 'en',
-    measures: {},
-    tags: ['Well-Being'],
-    validationSchema: z.object({
-      overallHappiness: z.number()
+    ...happinessQuestionnaire,
+    validationSchema: z4.object({
+      overallHappiness: z4.number()
+    })
+  })
+).toMatchTypeOf<FormInstrument<{ overallHappiness: number }, 'en'>>();
+
+expectTypeOf(
+  defineInstrument({
+    ...happinessQuestionnaire,
+    validationSchema: z3.object({
+      overallHappiness: z3.number()
     })
   })
 ).toMatchTypeOf<FormInstrument<{ overallHappiness: number }, 'en'>>();
@@ -67,7 +81,6 @@ expectTypeOf(
     },
     details: {
       description: 'The Happiness Questionnaire is a questionnaire about happiness.',
-
       license: 'Apache-2.0',
       title: 'Happiness Questionnaire'
     },
@@ -79,8 +92,8 @@ expectTypeOf(
     language: 'fr',
     measures: {},
     tags: ['Well-Being'],
-    validationSchema: z.object({
-      overallHappiness: z.number()
+    validationSchema: z4.object({
+      overallHappiness: z4.number()
     })
   })
 ).toMatchTypeOf<FormInstrument<{ overallHappiness: number }, 'fr'>>();
@@ -127,8 +140,8 @@ expectTypeOf(
       en: ['Well-Being'],
       fr: ['Bien-être']
     },
-    validationSchema: z.object({
-      overallHappiness: z.number()
+    validationSchema: z4.object({
+      overallHappiness: z4.number()
     })
   })
 ).toMatchTypeOf<FormInstrument<{ overallHappiness: number }, ('en' | 'fr')[]>>();
@@ -162,8 +175,8 @@ expectTypeOf(
     language: 'en',
     measures: {},
     tags: ['<PLACEHOLDER>'],
-    validationSchema: z.object({
-      message: z.string()
+    validationSchema: z4.object({
+      message: z4.string()
     })
   })
 ).toMatchTypeOf<InteractiveInstrument<{ message: string }, 'en'>>();

@@ -13,7 +13,12 @@ import base64
 import json
 import os
 
-from argparse import _SubParsersAction, ArgumentParser, ArgumentTypeError, RawTextHelpFormatter
+from argparse import (
+    _SubParsersAction,
+    ArgumentParser,
+    ArgumentTypeError,
+    RawTextHelpFormatter,
+)
 from datetime import datetime
 from typing import Any, Callable, TypedDict
 from urllib.error import HTTPError, URLError
@@ -57,7 +62,10 @@ def require_url(fn: Callable[..., Any]) -> Callable[..., Any]:
 
     def wrapper(*args: Any, **kwargs: Any) -> None:
         if config.base_url is None:
-            print(f'Error: URL must be defined (hint: use {PROGRAM_NAME} config set-url)', file=sys.stderr)
+            print(
+                f'Error: URL must be defined (hint: use {PROGRAM_NAME} config set-url)',
+                file=sys.stderr,
+            )
             sys.exit(1)
         fn(*args, **kwargs)
 
@@ -69,7 +77,10 @@ def require_token(fn: Callable[..., Any]) -> Callable[..., Any]:
 
     def wrapper(*args: Any, **kwargs: Any) -> None:
         if config.access_token is None:
-            print(f'Error: Must be logged in (hint: use {PROGRAM_NAME} auth login)', file=sys.stderr)
+            print(
+                f'Error: Must be logged in (hint: use {PROGRAM_NAME} auth login)',
+                file=sys.stderr,
+            )
             sys.exit(1)
         fn(*args, **kwargs)
 
@@ -285,7 +296,10 @@ class AuthCommands:
     @require_url
     @staticmethod
     def login(username: str, password: str) -> None:
-        response = HttpClient.post(f'{config.base_url}/v1/auth/login', {'username': username, 'password': password})
+        response = HttpClient.post(
+            f'{config.base_url}/v1/auth/login',
+            {'username': username, 'password': password},
+        )
         if response.ok:
             config.access_token = response.data['accessToken']
             config.write()
@@ -350,7 +364,11 @@ class InstrumentRecordsCommands:
     def find(min_date: datetime | None, instrument_id: str | None, subject_id: str | None) -> None:
         url = build_url_with_params(
             f'{config.base_url}/v1/instrument-records',
-            {'minDate': min_date, 'instrumentId': instrument_id, 'subjectId': subject_id},
+            {
+                'minDate': min_date,
+                'instrumentId': instrument_id,
+                'subjectId': subject_id,
+            },
         )
         response = HttpClient.get(url)
         print(response)
@@ -381,6 +399,36 @@ class SetupCommands:
         response = HttpClient.get(f'{config.base_url}/v1/setup')
         print(response)
 
+    @require_url
+    @staticmethod
+    def init(
+        admin_first_name: str,
+        admin_last_name: str,
+        admin_username: str,
+        admin_password: str,
+        enable_experimental_features: bool,
+        init_demo: bool,
+        dummy_subject_count: int | None,
+        records_per_subject: int | None,
+    ) -> None:
+        payload = {
+            'admin': {
+                'firstName': admin_first_name,
+                'lastName': admin_last_name,
+                'username': admin_username,
+                'password': admin_password,
+            },
+            'enableExperimentalFeatures': enable_experimental_features,
+            'initDemo': init_demo,
+        }
+        if dummy_subject_count is not None:
+            payload['dummySubjectCount'] = dummy_subject_count
+        if records_per_subject is not None:
+            payload['recordsPerSubject'] = records_per_subject
+
+        response = HttpClient.post(f'{config.base_url}/v1/setup', data=payload)
+        print(response)
+
 
 # --- Main CLI Entrypoint ---
 
@@ -391,7 +439,9 @@ class CLI:
 
     def __init__(self) -> None:
         self.parser = ArgumentParser(
-            prog=PROGRAM_NAME, description=PROGRAM_DESCRIPTION, formatter_class=RawTextHelpFormatter
+            prog=PROGRAM_NAME,
+            description=PROGRAM_DESCRIPTION,
+            formatter_class=RawTextHelpFormatter,
         )
         self.subparsers = self.parser.add_subparsers(
             required=True,
@@ -445,7 +495,11 @@ class CLI:
         delete_parser.set_defaults(fn=InstrumentRecordsCommands.delete)
 
         find_parser = subparsers.add_parser('find', help='search instrument records by optional filters')
-        find_parser.add_argument('--min-date', type=ArgumentTypes.valid_datetime, help='filter records created after this date (format: yyyy-mm-dd or yyyy-mm-dd hh:mm:ss)')
+        find_parser.add_argument(
+            '--min-date',
+            type=ArgumentTypes.valid_datetime,
+            help='filter records created after this date (format: yyyy-mm-dd or yyyy-mm-dd hh:mm:ss)',
+        )
         find_parser.add_argument('--instrument-id', help='filter by instrument id')
         find_parser.add_argument('--subject-id', help='filter by subject id')
         find_parser.set_defaults(fn=InstrumentRecordsCommands.find)
@@ -455,7 +509,12 @@ class CLI:
             help='update an instrument record with a partial json object (merged recursively)',
         )
         update_parser.add_argument('--id', required=True, help='id of the instrument record to update')
-        update_parser.add_argument('--data', required=True, type=ArgumentTypes.json, help='partial json object with fields to update')
+        update_parser.add_argument(
+            '--data',
+            required=True,
+            type=ArgumentTypes.json,
+            help='partial json object with fields to update',
+        )
         update_parser.set_defaults(fn=InstrumentRecordsCommands.update)
 
     def _create_instruments_parser(self):
@@ -466,8 +525,45 @@ class CLI:
 
     def _create_setup_parser(self):
         subparsers = self._create_subcommand_subparsers('setup')
-        get_setup_state_parser = subparsers.add_parser('get-state', help='get the current setup status of the ODC instance')
+        get_setup_state_parser = subparsers.add_parser(
+            'get-state', help='get the current setup status of the ODC instance'
+        )
         get_setup_state_parser.set_defaults(fn=SetupCommands.get_status)
+
+        init_parser = subparsers.add_parser(
+            'init',
+            help='initialize an ODC instance with an admin user and other settings'
+        )
+
+        admin_group = init_parser.add_argument_group('Admin User Options')
+        admin_group.add_argument('--admin-first-name', required=True, help="administrator's first name")
+        admin_group.add_argument('--admin-last-name', required=True, help="administrator's last name")
+        admin_group.add_argument('--admin-username', required=True, help="administrator's username")
+        admin_group.add_argument('--admin-password', required=True, help="administrator's password")
+        
+        app_group = init_parser.add_argument_group('General Application Options')
+        app_group.add_argument(
+            '--enable-experimental-features',
+            action='store_true',
+            help='flag to enable experimental features',
+        )
+        app_group.add_argument(
+            '--init-demo',
+            action='store_true',
+            help='flag to initialize the application with demo data',
+        )
+        app_group.add_argument(
+            '--dummy-subject-count',
+            type=int,
+            help='.umber of dummy subjects to create for the demo',
+        )
+        app_group.add_argument(
+            '--records-per-subject',
+            type=int,
+            help='number of records to create per dummy subject.',
+        )
+
+        init_parser.set_defaults(fn=SetupCommands.init)
 
     def _create_subcommand_subparsers(self, name: str):
         parser = self.subparsers.add_parser(name, help='')

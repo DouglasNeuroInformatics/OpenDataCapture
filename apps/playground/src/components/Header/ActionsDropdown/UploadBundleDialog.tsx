@@ -7,12 +7,12 @@ import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { AuthPayload } from '@opendatacapture/schemas/auth';
 import axios, { isAxiosError } from 'axios';
 import type { AxiosResponse } from 'axios';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { useAppStore } from '@/store';
 
 const $UploadBundleData = z.object({
-  apiBaseUrl: z.string().url(),
+  apiBaseUrl: z.url(),
   username: z.string().min(1),
   password: z.string().min(1)
 });

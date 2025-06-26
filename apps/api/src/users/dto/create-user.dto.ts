@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import type { Sex } from '@opendatacapture/schemas/subject';
 import { $CreateUserData } from '@opendatacapture/schemas/user';
 import type { BasePermissionLevel, CreateUserData } from '@opendatacapture/schemas/user';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 @ValidationSchema(
   $CreateUserData.extend({

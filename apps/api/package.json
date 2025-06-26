@@ -17,7 +17,7 @@
   "dependencies": {
     "@douglasneuroinformatics/libcrypto": "catalog:",
     "@douglasneuroinformatics/libjs": "catalog:",
-    "@douglasneuroinformatics/libnest": "^5.3.1",
+    "@douglasneuroinformatics/libnest": "^7.0.1",
     "@douglasneuroinformatics/libpasswd": "catalog:",
     "@douglasneuroinformatics/libstats": "catalog:",
     "@faker-js/faker": "^9.4.0",
@@ -43,7 +43,7 @@
     "reflect-metadata": "^0.1.14",
     "rxjs": "^7.8.2",
     "ts-pattern": "workspace:ts-pattern__5.x@*",
-    "zod": "workspace:zod__3.23.x@*"
+    "zod": "workspace:zod__3.x@*"
   },
   "devDependencies": {
     "@nestjs/testing": "^11.0.11",

@@ -1,5 +1,5 @@
 import type { InstrumentKind, InstrumentMeasureValue } from '@opendatacapture/runtime-core';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { $BaseModel, $Json } from '../core/core.js';
 import { $InstrumentMeasureValue } from '../instrument/instrument.js';
@@ -34,7 +34,7 @@ export type UploadInstrumentRecordsData = z.infer<typeof $UploadInstrumentRecord
 
 export const $InstrumentRecord = $BaseModel.extend({
   assignmentId: z.string().nullish(),
-  computedMeasures: z.record($InstrumentMeasureValue).nullish(),
+  computedMeasures: z.record(z.string(), $InstrumentMeasureValue).nullish(),
   data: z.unknown(),
   date: z.coerce.date(),
   groupId: z.string().nullish(),
@@ -60,6 +60,7 @@ export type InstrumentRecordsExport = {
 }[];
 
 export const $LinearRegressionResults = z.record(
+  z.string(),
   z.object({
     intercept: z.number(),
     slope: z.number(),

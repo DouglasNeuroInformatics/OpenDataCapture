@@ -1,9 +1,8 @@
 /// <reference types="../../../runtime/v1/global.d.ts" />
 
 import type { ApprovedLicense } from '@opendatacapture/licenses';
-import type { z } from 'zod';
 
-import type { InstrumentKind, InstrumentLanguage } from './types/instrument.base.js';
+import type { InstrumentKind, InstrumentLanguage, InstrumentValidationSchema } from './types/instrument.base.js';
 import type { FormInstrument } from './types/instrument.form.js';
 import type { InteractiveInstrument } from './types/instrument.interactive.js';
 
@@ -11,6 +10,14 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-empty-object-type
   interface OpenDataCaptureContext {}
 }
+
+type InternalLicensingRequirements = OpenDataCaptureContext extends { isRepo: true }
+  ? {
+      details: {
+        license: ApprovedLicense;
+      };
+    }
+  : unknown;
 
 /** @public */
 // prettier-ignore
@@ -32,29 +39,24 @@ export type DiscriminatedInstrument<
 export type InstrumentDef<
   TKind extends InstrumentKind,
   TLanguage extends InstrumentLanguage,
-  TSchema extends z.ZodTypeAny
-> = Omit<
-  DiscriminatedInstrument<TKind, TLanguage, z.TypeOf<TSchema>>,
-  '__runtimeVersion' | 'kind' | 'language' | 'validationSchema'
-> & {
-  kind: TKind;
-  language: TLanguage;
-  validationSchema: TSchema;
-} & (OpenDataCaptureContext extends { isRepo: true }
-    ? {
-        details: {
-          license: ApprovedLicense;
-        };
-      }
-    : unknown);
+  TSchema extends InstrumentValidationSchema
+> = InternalLicensingRequirements &
+  Omit<
+    DiscriminatedInstrument<TKind, TLanguage, TSchema['_output']>,
+    '__runtimeVersion' | 'kind' | 'language' | 'validationSchema'
+  > & {
+    kind: TKind;
+    language: TLanguage;
+    validationSchema: TSchema;
+  };
 
 /** @public */
 export function defineInstrument<
   TKind extends InstrumentKind,
   TLanguage extends InstrumentLanguage,
-  TSchema extends z.ZodTypeAny
+  TSchema extends InstrumentValidationSchema
 >(def: InstrumentDef<TKind, TLanguage, TSchema>) {
   return Object.assign(def, {
     __runtimeVersion: 1
-  }) as unknown as DiscriminatedInstrument<TKind, TLanguage, z.TypeOf<TSchema>>;
+  }) as unknown as DiscriminatedInstrument<TKind, TLanguage, TSchema['_output']>;
 }

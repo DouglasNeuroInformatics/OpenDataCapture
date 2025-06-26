@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 type Config = z.infer<typeof $Config>;
 const $Config = z.object({

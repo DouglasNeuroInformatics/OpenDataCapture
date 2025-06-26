@@ -17,6 +17,6 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
-    "zod": "workspace:zod__3.23.x@*"
+    "zod": "workspace:zod__3.x@*"
   }
 }

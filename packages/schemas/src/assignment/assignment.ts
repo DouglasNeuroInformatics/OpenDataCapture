@@ -1,8 +1,8 @@
-import { z } from 'zod';
+import { $Uint8ArrayLike } from '@douglasneuroinformatics/libjs';
+import { z } from 'zod/v4';
 
-import { $BaseModel, $Json, $Uint8Array } from '../core/core.js';
+import { $BaseModel, $Json } from '../core/core.js';
 import { $InstrumentBundleContainer } from '../instrument/instrument.base.js';
-
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
 export type AssignmentStatus = z.infer<typeof $AssignmentStatus>;
@@ -40,7 +40,7 @@ export const $CreateAssignmentData = z.object({
 export type CreateRemoteAssignmentInputData = z.input<typeof $CreateRemoteAssignmentData>;
 export const $CreateRemoteAssignmentData = $RemoteAssignment.omit({ encryptedData: true, symmetricKey: true }).extend({
   instrumentContainer: $InstrumentBundleContainer,
-  publicKey: $Uint8Array
+  publicKey: $Uint8ArrayLike
 });
 
 export type MutateAssignmentResponseBody = z.infer<typeof $MutateAssignmentResponseBody>;

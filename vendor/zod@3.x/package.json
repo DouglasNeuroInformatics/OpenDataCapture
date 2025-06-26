@@ -9,20 +9,20 @@
       "import": "./src/index.js"
     },
     "./v3": {
-      "types": "./src/v3/index.d.ts",
-      "import": "./src/v3/index.js"
+      "types": "./src/v3.d.ts",
+      "import": "./src/v3.js"
     },
     "./v4": {
-      "types": "./src/v4/index.d.ts",
-      "import": "./src/v4/index.js"
+      "types": "./src/v4.d.ts",
+      "import": "./src/v4.js"
     },
     "./v4-mini": {
-      "types": "./src/v4-mini/index.d.ts",
-      "import": "./src/v4-mini/index.js"
+      "types": "./src/v4-mini.d.ts",
+      "import": "./src/v4-mini.js"
     },
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "zod": "^3.25.36"
+    "zod": "^3.25.67"
   }
 }

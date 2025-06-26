@@ -1,6 +1,6 @@
 import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import { describe, expect, it, test } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import {
   $$InstrumentUIOption,

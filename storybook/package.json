@@ -14,10 +14,10 @@
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
     "tailwindcss": "catalog:",
-    "zod": "workspace:zod__3.23.x@*"
+    "zod": "workspace:zod__3.x@*"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/libui": "^4.2.1",
+    "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/instrument-stubs": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",

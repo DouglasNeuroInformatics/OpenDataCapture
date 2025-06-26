@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { $CreateUserData } from '../user/user.js';
 
@@ -21,7 +21,7 @@ export const $ProductionReleaseInfo = z.object({
 });
 
 export type ReleaseInfo = z.infer<typeof $ReleaseInfo>;
-export const $ReleaseInfo = z.union([$DevelopmentReleaseInfo, $ProductionReleaseInfo]);
+export const $ReleaseInfo = z.discriminatedUnion('type', [$DevelopmentReleaseInfo, $ProductionReleaseInfo]);
 
 export type SetupState = z.infer<typeof $SetupState>;
 export const $SetupState = z.object({
