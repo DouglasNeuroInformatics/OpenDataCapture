@@ -1,9 +1,10 @@
+import { $AnyFunction } from '@douglasneuroinformatics/libjs';
 import type { InteractiveInstrument } from '@opendatacapture/runtime-core';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { $InstrumentDetails, $ScalarInstrument } from './instrument.base.js';
 
-const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $ScalarInstrument.extend({
+const $InteractiveInstrument = $ScalarInstrument.extend({
   content: z.object({
     __injectHead: z
       .object({
@@ -11,10 +12,10 @@ const $InteractiveInstrument: z.ZodType<InteractiveInstrument> = $ScalarInstrume
       })
       .optional()
       .readonly(),
-    render: z.function().args(z.any()).returns(z.any())
+    render: $AnyFunction
   }),
   details: $InstrumentDetails,
   kind: z.literal('INTERACTIVE')
-});
+}) satisfies z.ZodType<InteractiveInstrument>;
 
 export { $InteractiveInstrument };

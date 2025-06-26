@@ -8,7 +8,7 @@ import type { FormTypes } from '@opendatacapture/runtime-core';
 import { $UserPermission } from '@opendatacapture/schemas/core';
 import type { UserPermission } from '@opendatacapture/schemas/core';
 import type { Promisable } from 'type-fest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 type UpdateUserFormData = {
   additionalPermissions?: Partial<UserPermission>[];
@@ -48,22 +48,24 @@ export const UpdateUserForm: React.FC<{
         }
         return arg;
       })
-      .superRefine((arg, ctx) => {
-        if (arg.password && !estimatePasswordStrength(arg.password).success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+      .check((ctx) => {
+        if (ctx.value.password && !estimatePasswordStrength(ctx.value.password).success) {
+          ctx.issues.push({
+            code: 'custom',
             fatal: true,
+            input: ctx.value.password,
             message: t('common.insufficientPasswordStrength'),
             path: ['password']
           });
           return z.NEVER;
         }
-        arg.additionalPermissions?.forEach((permission, i) => {
+        ctx.value.additionalPermissions?.forEach((permission, i) => {
           Object.entries(permission).forEach(([key, val]) => {
             if ((val satisfies string) === undefined) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.invalid_type,
+              ctx.issues.push({
+                code: 'invalid_type',
                 expected: 'string',
+                input: val,
                 path: ['additionalPermissions', i, key],
                 received: 'undefined'
               });

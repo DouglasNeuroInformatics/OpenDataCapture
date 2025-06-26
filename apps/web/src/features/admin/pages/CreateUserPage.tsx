@@ -6,7 +6,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $BasePermissionLevel, $CreateUserData } from '@opendatacapture/schemas/user';
 import type { CreateUserData } from '@opendatacapture/schemas/user';
 import { useNavigate } from 'react-router-dom';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { PageHeader } from '@/components/PageHeader';
 
@@ -137,19 +137,21 @@ export const CreateUserPage = () => {
             groupIds: z.set(z.string()).optional(),
             confirmPassword: z.string().min(1)
           })
-          .superRefine((arg, ctx) => {
-            if (!estimatePasswordStrength(arg.password).success) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+          .check((ctx) => {
+            if (!estimatePasswordStrength(ctx.value.password).success) {
+              ctx.issues.push({
+                code: 'custom',
                 fatal: true,
+                input: ctx.value.password,
                 message: t('common.insufficientPasswordStrength'),
                 path: ['password']
               });
               return z.NEVER;
             }
-            if (arg.confirmPassword !== arg.password) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+            if (ctx.value.confirmPassword !== ctx.value.password) {
+              ctx.issues.push({
+                code: 'custom',
+                input: ctx.value.confirmPassword,
                 message: t('common.passwordsMustMatch'),
                 path: ['confirmPassword']
               });

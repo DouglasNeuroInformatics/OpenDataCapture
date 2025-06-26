@@ -16,14 +16,17 @@ catalogs:
       specifier: ^0.0.4
       version: 0.0.4
     '@douglasneuroinformatics/libjs':
-      specifier: ^2.9.0
-      version: 2.9.0
+      specifier: ^3.1.0
+      version: 3.1.0
     '@douglasneuroinformatics/libpasswd':
       specifier: latest
       version: 0.0.3
     '@douglasneuroinformatics/libstats':
       specifier: latest
       version: 0.2.0
+    '@douglasneuroinformatics/libui':
+      specifier: ^4.4.1
+      version: 4.4.1
     '@douglasneuroinformatics/libui-form-types':
       specifier: latest
       version: 0.11.0
@@ -31,8 +34,8 @@ catalogs:
       specifier: ^7.47.6
       version: 7.52.8
     '@prisma/client':
-      specifier: ^6.6.0
-      version: 6.8.2
+      specifier: ^6.9.0
+      version: 6.10.1
     '@storybook/addon-docs':
       specifier: 9.0.0-beta.3
       version: 9.0.0-beta.3
@@ -64,8 +67,8 @@ catalogs:
       specifier: ^3.1.9
       version: 3.1.10
     prisma:
-      specifier: ^6.6.0
-      version: 6.8.2
+      specifier: ^6.9.0
+      version: 6.10.1
     storybook:
       specifier: 9.0.0-beta.3
       version: 9.0.0-beta.3
@@ -199,10 +202,10 @@ importers:
         version: 0.0.4
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 2.9.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)
+        version: 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libnest':
-        specifier: ^5.3.1
-        version: 5.3.1(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.2)(@nestjs/platform-express@11.1.2)(@nestjs/testing@11.1.2(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.2)(@nestjs/platform-express@11.1.2))(@prisma/client@6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.21)(express@5.1.0)(mongodb@6.16.0(socks@2.8.4))(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(reflect-metadata@0.1.14)(rollup@4.41.1)(rxjs@7.8.2)(socks@2.8.4)(typescript@5.6.3)(zod@vendor+zod@3.23.x)
+        specifier: ^7.0.1
+        version: 7.1.0(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.2)(@nestjs/platform-express@11.1.2)(@nestjs/testing@11.1.2(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.2)(@nestjs/platform-express@11.1.2))(@prisma/client@6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.21)(express@5.1.0)(mongodb@6.16.0(socks@2.8.4))(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(reflect-metadata@0.1.14)(rollup@4.41.1)(rxjs@7.8.2)(socks@2.8.4)(typescript@5.6.3)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libpasswd':
         specifier: 'catalog:'
         version: 0.0.3(typescript@5.6.3)
@@ -253,7 +256,7 @@ importers:
         version: link:../../packages/subject-utils
       '@prisma/client':
         specifier: 'catalog:'
-        version: 6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3)
+        version: 6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3)
       axios:
         specifier: 'catalog:'
         version: 1.9.0(debug@4.4.1)
@@ -279,8 +282,8 @@ importers:
         specifier: workspace:ts-pattern__5.x@*
         version: link:../../vendor/ts-pattern@5.x
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
     devDependencies:
       '@nestjs/testing':
         specifier: ^11.0.11
@@ -290,10 +293,10 @@ importers:
         version: 5.0.2
       prisma:
         specifier: 'catalog:'
-        version: 6.8.2(typescript@5.6.3)
+        version: 6.10.1(typescript@5.6.3)
       prisma-json-types-generator:
         specifier: ^3.2.2
-        version: 3.4.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3)
+        version: 3.4.2(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3)
 
   apps/gateway:
     dependencies:
@@ -301,8 +304,8 @@ importers:
         specifier: 'catalog:'
         version: 0.0.4
       '@douglasneuroinformatics/libui':
-        specifier: ^4.2.1
-        version: 4.3.0(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.23.x)
+        specifier: 'catalog:'
+        version: 4.4.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
@@ -317,7 +320,7 @@ importers:
         version: link:../../packages/schemas
       '@prisma/client':
         specifier: 'catalog:'
-        version: 6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3)
+        version: 6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3)
       axios:
         specifier: 'catalog:'
         version: 1.9.0(debug@4.4.1)
@@ -349,12 +352,12 @@ importers:
         specifier: ^5.1.7
         version: 5.1.7
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
     devDependencies:
       '@douglasneuroinformatics/esbuild-plugin-prisma':
         specifier: 'catalog:'
-        version: 1.0.1(@prisma/client@6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3))(@prisma/engines@6.8.2)(esbuild@0.23.1)(prisma@6.8.2(typescript@5.6.3))
+        version: 1.0.1(@prisma/client@6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3))(@prisma/engines@6.10.1)(esbuild@0.23.1)(prisma@6.10.1(typescript@5.6.3))
       '@opendatacapture/release-info':
         specifier: workspace:*
         version: link:../../packages/release-info
@@ -381,7 +384,7 @@ importers:
         version: 3.1.10
       prisma:
         specifier: 'catalog:'
-        version: 6.8.2(typescript@5.6.3)
+        version: 6.10.1(typescript@5.6.3)
       tailwindcss:
         specifier: 'catalog:'
         version: 4.1.8
@@ -395,8 +398,8 @@ importers:
   apps/outreach:
     dependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^4.2.1
-        version: 4.3.0(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@19.1.0))(zod@3.25.36)
+        specifier: 'catalog:'
+        version: 4.4.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@19.1.0))(zod@3.25.36)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -466,10 +469,10 @@ importers:
         version: 0.0.4
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 2.9.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)
+        version: 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
-        specifier: ^4.2.1
-        version: 4.3.0(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.23.x)
+        specifier: 'catalog:'
+        version: 4.4.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.52.2)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
@@ -534,11 +537,11 @@ importers:
         specifier: workspace:ts-pattern__5.x@*
         version: link:../../vendor/ts-pattern@5.x
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
       zod-validation-error:
         specifier: ^3.4.0
-        version: 3.4.1(zod@vendor+zod@3.23.x)
+        version: 3.4.1(zod@vendor+zod@3.x)
       zustand:
         specifier: ^5.0.3
         version: 5.0.5(immer@10.1.1)(react@vendor+react@19.x)(use-sync-external-store@1.5.0(react@vendor+react@19.x))
@@ -572,13 +575,13 @@ importers:
         version: 6.7.3
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 2.9.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)
+        version: 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libpasswd':
         specifier: 'catalog:'
         version: 0.0.3(typescript@5.6.3)
       '@douglasneuroinformatics/libui':
-        specifier: ^4.2.1
-        version: 4.3.0(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.23.x)
+        specifier: 'catalog:'
+        version: 4.4.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@vendor+react@19.x)
@@ -673,8 +676,8 @@ importers:
         specifier: ^0.18.5
         version: 0.18.5
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
       zustand:
         specifier: ^4.5.6
         version: 4.5.7(immer@10.1.1)(react@vendor+react@19.x)
@@ -711,7 +714,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 2.9.0(neverthrow@8.2.0)(zod@3.25.36)
+        version: 3.1.0(neverthrow@8.2.0)(zod@3.25.67)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -748,8 +751,8 @@ importers:
         specifier: workspace:type-fest__4.x@*
         version: link:../../vendor/type-fest@4.x
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
     devDependencies:
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
@@ -794,19 +797,19 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 2.9.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)
+        version: 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
 
   packages/instrument-utils:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 2.9.0(neverthrow@8.2.0)(zod@3.25.36)
+        version: 3.1.0(neverthrow@8.2.0)(zod@3.25.67)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
@@ -826,10 +829,10 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 2.9.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)
+        version: 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
-        specifier: ^4.2.1
-        version: 4.3.0(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.23.x)
+        specifier: 'catalog:'
+        version: 4.4.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/evaluate-instrument':
         specifier: workspace:*
         version: link:../evaluate-instrument
@@ -885,8 +888,8 @@ importers:
         specifier: workspace:ts-pattern__5.x@*
         version: link:../../vendor/ts-pattern@5.x
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
     devDependencies:
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
@@ -910,20 +913,20 @@ importers:
         specifier: workspace:type-fest__4.x@*
         version: link:../../vendor/type-fest@4.x
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
 
   packages/runtime-bundler:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 2.9.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)
+        version: 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       esbuild:
         specifier: 'catalog:'
         version: 0.23.1
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
 
   packages/runtime-core:
     dependencies:
@@ -940,8 +943,8 @@ importers:
         specifier: workspace:type-fest__4.x@*
         version: link:../../vendor/type-fest@4.x
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -957,7 +960,7 @@ importers:
         version: 6.7.3
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 2.9.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)
+        version: 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
@@ -965,12 +968,12 @@ importers:
         specifier: workspace:*
         version: link:../runtime-core
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
     devDependencies:
       '@casl/prisma':
         specifier: ^1.5.1
-        version: 1.5.1(@casl/ability@6.7.3)(@prisma/client@6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3))
+        version: 1.5.1(@casl/ability@6.7.3)(@prisma/client@6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3))
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
         version: link:../instrument-stubs
@@ -1005,7 +1008,7 @@ importers:
     devDependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 2.9.0(neverthrow@8.2.0)(zod@3.25.36)
+        version: 3.1.0(neverthrow@8.2.0)(zod@3.25.67)
 
   runtime/v1:
     devDependencies:
@@ -1151,12 +1154,12 @@ importers:
         specifier: 'catalog:'
         version: 4.1.8
       zod:
-        specifier: workspace:zod__3.23.x@*
-        version: link:../vendor/zod@3.23.x
+        specifier: workspace:zod__3.x@*
+        version: link:../vendor/zod@3.x
     devDependencies:
       '@douglasneuroinformatics/libui':
-        specifier: ^4.2.1
-        version: 4.3.0(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@19.1.0))(zod@vendor+zod@3.23.x)
+        specifier: 'catalog:'
+        version: 4.4.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@19.1.0))(zod@vendor+zod@3.x)
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
         version: link:../packages/instrument-stubs
@@ -1198,7 +1201,7 @@ importers:
         version: 6.7.3
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 2.9.0(neverthrow@8.2.0)(zod@3.25.36)
+        version: 3.1.0(neverthrow@8.2.0)(zod@3.25.67)
       '@faker-js/faker':
         specifier: ^9.4.0
         version: 9.8.0
@@ -1511,8 +1514,8 @@ importers:
   vendor/zod@3.x:
     dependencies:
       zod:
-        specifier: ^3.25.36
-        version: 3.25.36
+        specifier: ^3.25.67
+        version: 3.25.67
 
 packages:
   '@actions/core@1.11.1':
@@ -1860,16 +1863,16 @@ packages:
     resolution:
       { integrity: sha512-tiI4ThtlBUXGEVN3hZBcX/Ul4gdHBLdfMza/KwmGdE0tjG1u556Yn4HQhwnZyDn/c1/q7j4sL+XZc+yZy8TCOQ== }
 
-  '@douglasneuroinformatics/libjs@2.9.0':
+  '@douglasneuroinformatics/libjs@3.1.0':
     resolution:
-      { integrity: sha512-STRdWvmXfWFnoxQoMkSSNOUOVlCdLFwbZN5WFkchHUtIjr6VlRgCXPPEm4srf0SX6EHmPeHRbGoYPTioV4verg== }
+      { integrity: sha512-VeaEJLcfOBRcqSMOF7zE3pPTJ2JOWi1UCSPN/pDFmAY5b0sXY0DmxoumO1/atzAkog6BBn6OQy8JZAUaDJ+VyA== }
     peerDependencies:
       neverthrow: ^8.2.0
-      zod: ^3.22.6
+      zod: ^3.25.x
 
-  '@douglasneuroinformatics/libnest@5.3.1':
+  '@douglasneuroinformatics/libnest@7.1.0':
     resolution:
-      { integrity: sha512-JGR/GRduGJNeUDccYFyGpudV5twiuu0ypTWPJ2c/8usuyBNRpAN8uZlA6Ut1CE/ZBUW8p7BKjK4AJ6GAuRXFSQ== }
+      { integrity: sha512-jKUFfNLAvVI+tFWund0kGWGgKXt/NvbFLrkCGbHoyljUQNL3xz/nI33Bb8YeKQKGjtT/0pkgcx05qAJs5Pbw9A== }
     engines: { node: 22.x }
     hasBin: true
     peerDependencies:
@@ -1877,7 +1880,7 @@ packages:
       '@nestjs/core': ^11.0.11
       '@nestjs/platform-express': ^11.0.11
       '@nestjs/testing': ^11.0.11
-      '@prisma/client': ^6.5.0
+      '@prisma/client': ^6.9.0
       express: ^5.0.1
       mongodb: ^6.14.2
       neverthrow: ^8.2.0
@@ -1885,7 +1888,7 @@ packages:
       react-dom: ^19.1.0
       reflect-metadata: ~0.1.13
       rxjs: ^7.8.2
-      zod: ^3.22.6
+      zod: ^3.25.x
     peerDependenciesMeta:
       react:
         optional: true
@@ -1963,15 +1966,15 @@ packages:
     resolution:
       { integrity: sha512-erds8oNXFrWSJfCglR8S7I3Yfkgx2Vz6RIQTa5OFtVAVx8DTSFf5FbnHpp49l6BcQ4FCU5w/PLO5NWdx08cNUg== }
 
-  '@douglasneuroinformatics/libui@4.3.0':
+  '@douglasneuroinformatics/libui@4.4.1':
     resolution:
-      { integrity: sha512-+RmNjxbM5vv7SRyfk02JnMDFveM7+irovPosQpq8h/i+z3I5tp80WKML7Y574e8oJZW6ZNnWFjsyf9HWQ6pItw== }
+      { integrity: sha512-1CctC/SKTCZb9fDiCerNlKGd1bHtD1Z9XHkxuhtFUP8RwmoJu7n0Ks0Zpgbe6+m82aKs9X2tC9yqbxflAkalMw== }
     engines: { node: 22.x }
     peerDependencies:
       react: ^19.1.0
       react-dom: ^19.1.0
       tailwindcss: ^4.1.0
-      zod: ^3.23.6
+      zod: ^3.25.x
 
   '@douglasneuroinformatics/prettier-config@0.0.2':
     resolution:
@@ -3815,9 +3818,9 @@ packages:
     resolution:
       { integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww== }
 
-  '@prisma/client@6.8.2':
+  '@prisma/client@6.10.1':
     resolution:
-      { integrity: sha512-5II+vbyzv4si6Yunwgkj0qT/iY0zyspttoDrL3R4BYgLdp42/d2C8xdi9vqkrYtKt9H32oFIukvyw3Koz5JoDg== }
+      { integrity: sha512-Re4pMlcUsQsUTAYMK7EJ4Bw2kg3WfZAAlr8GjORJaK4VOP6LxRQUQ1TuLnxcF42XqGkWQ36q5CQF1yVadANQ6w== }
     engines: { node: '>=18.18' }
     peerDependencies:
       prisma: '*'
@@ -3828,13 +3831,17 @@ packages:
       typescript:
         optional: true
 
-  '@prisma/config@6.8.2':
+  '@prisma/config@6.10.1':
     resolution:
-      { integrity: sha512-ZJY1fF4qRBPdLQ/60wxNtX+eu89c3AkYEcP7L3jkp0IPXCNphCYxikTg55kPJLDOG6P0X+QG5tCv6CmsBRZWFQ== }
+      { integrity: sha512-kz4/bnqrOrzWo8KzYguN0cden4CzLJJ+2VSpKtF8utHS3l1JS0Lhv6BLwpOX6X9yNreTbZQZwewb+/BMPDCIYQ== }
 
   '@prisma/debug@5.22.0':
     resolution:
       { integrity: sha512-AUt44v3YJeggO2ZU5BkXI7M4hu9BF2zzH2iF2V5pyXT/lRTyWiElZ7It+bRH1EshoMRxHgpYg4VB6rCM+mG5jQ== }
+
+  '@prisma/debug@6.10.1':
+    resolution:
+      { integrity: sha512-k2YT53cWxv9OLjW4zSYTZ6Z7j0gPfCzcr2Mj99qsuvlxr8WAKSZ2NcSR0zLf/mP4oxnYG842IMj3utTgcd7CaA== }
 
   '@prisma/debug@6.8.2':
     resolution:
@@ -3844,17 +3851,17 @@ packages:
     resolution:
       { integrity: sha512-okGJF/7hQZam/2wt+Y0hPyNxyY5S+L0FzAgtL932Q3YxUWHusRllrN39bCV45oF3QWY992g7rTWYdL2Rynt1qg== }
 
-  '@prisma/engines-version@6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e':
+  '@prisma/engines-version@6.10.1-1.9b628578b3b7cae625e8c927178f15a170e74a9c':
     resolution:
-      { integrity: sha512-Rkik9lMyHpFNGaLpPF3H5q5TQTkm/aE7DsGM5m92FZTvWQsvmi6Va8On3pWvqLHOt5aPUvFb/FeZTmphI4CPiQ== }
+      { integrity: sha512-ZJFTsEqapiTYVzXya6TUKYDFnSWCNegfUiG5ik9fleQva5Sk3DNyyUi7X1+0ZxWFHwHDr6BZV5Vm+iwP+LlciA== }
 
-  '@prisma/engines@6.8.2':
+  '@prisma/engines@6.10.1':
     resolution:
-      { integrity: sha512-XqAJ//LXjqYRQ1RRabs79KOY4+v6gZOGzbcwDQl0D6n9WBKjV7qdrbd042CwSK0v0lM9MSHsbcFnU2Yn7z8Zlw== }
+      { integrity: sha512-Q07P5rS2iPwk2IQr/rUQJ42tHjpPyFcbiH7PXZlV81Ryr9NYIgdxcUrwgVOWVm5T7ap02C0dNd1dpnNcSWig8A== }
 
-  '@prisma/fetch-engine@6.8.2':
+  '@prisma/fetch-engine@6.10.1':
     resolution:
-      { integrity: sha512-lCvikWOgaLOfqXGacEKSNeenvj0n3qR5QvZUOmPE2e1Eh8cMYSobxonCg9rqM6FSdTfbpqp9xwhSAOYfNqSW0g== }
+      { integrity: sha512-clmbG/Jgmrc/n6Y77QcBmAUlq9LrwI9Dbgy4pq5jeEARBpRCWJDJ7PWW1P8p0LfFU0i5fsyO7FqRzRB8mkdS4g== }
 
   '@prisma/generator-helper@6.8.2':
     resolution:
@@ -3868,9 +3875,9 @@ packages:
     resolution:
       { integrity: sha512-pHhpQdr1UPFpt+zFfnPazhulaZYCUqeIcPpJViYoq9R+D/yw4fjE+CtnsnKzPYm0ddUbeXUzjGVGIRVgPDCk4Q== }
 
-  '@prisma/get-platform@6.8.2':
+  '@prisma/get-platform@6.10.1':
     resolution:
-      { integrity: sha512-vXSxyUgX3vm1Q70QwzwkjeYfRryIvKno1SXbIqwSptKwqKzskINnDUcx85oX+ys6ooN2ATGSD0xN2UTfg6Zcow== }
+      { integrity: sha512-4CY5ndKylcsce9Mv+VWp5obbR2/86SHOLVV053pwIkhVtT9C9A83yqiqI/5kJM9T1v1u1qco/bYjDKycmei9HA== }
 
   '@radix-ui/number@1.1.1':
     resolution:
@@ -10411,9 +10418,9 @@ packages:
       prisma: ^6.7
       typescript: 5.6.x
 
-  prisma@6.8.2:
+  prisma@6.10.1:
     resolution:
-      { integrity: sha512-JNricTXQxzDtRS7lCGGOB4g5DJ91eg3nozdubXze3LpcMl1oWwcFddrj++Up3jnRE6X/3gB/xz3V+ecBk/eEGA== }
+      { integrity: sha512-khhlC/G49E4+uyA3T3H5PRBut486HD2bDqE2+rvkU0pwk9IAqGFacLFUyIx9Uw+W2eCtf6XGwsp+/strUwMNPw== }
     engines: { node: '>=18.18' }
     hasBin: true
     peerDependencies:
@@ -12839,6 +12846,10 @@ packages:
     resolution:
       { integrity: sha512-eRFS3i8T0IrpGdL8HQyqFAugGOn7jOjyGgGdtv5NY4Wkhi7lJDk732bNZ609YMIGFbLoaj6J69O1Mura23gfIw== }
 
+  zod@3.25.67:
+    resolution:
+      { integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw== }
+
   zustand@4.5.7:
     resolution:
       { integrity: sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw== }
@@ -13194,10 +13205,10 @@ snapshots:
     dependencies:
       '@ucast/mongo2js': 1.4.0
 
-  '@casl/prisma@1.5.1(@casl/ability@6.7.3)(@prisma/client@6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3))':
+  '@casl/prisma@1.5.1(@casl/ability@6.7.3)(@prisma/client@6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3))':
     dependencies:
       '@casl/ability': 6.7.3
-      '@prisma/client': 6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3)
+      '@prisma/client': 6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3)
       '@ucast/core': 1.10.2
       '@ucast/js': 3.0.4
 
@@ -13344,13 +13355,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@douglasneuroinformatics/esbuild-plugin-prisma@1.0.1(@prisma/client@6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3))(@prisma/engines@6.8.2)(esbuild@0.23.1)(prisma@6.8.2(typescript@5.6.3))':
+  '@douglasneuroinformatics/esbuild-plugin-prisma@1.0.1(@prisma/client@6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3))(@prisma/engines@6.10.1)(esbuild@0.23.1)(prisma@6.10.1(typescript@5.6.3))':
     dependencies:
-      '@prisma/client': 6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3)
-      '@prisma/engines': 6.8.2
+      '@prisma/client': 6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3)
+      '@prisma/engines': 6.10.1
       '@prisma/get-platform': 5.22.0
       esbuild: 0.23.1
-      prisma: 6.8.2(typescript@5.6.3)
+      prisma: 6.10.1(typescript@5.6.3)
 
   '@douglasneuroinformatics/eslint-config@5.3.4(@typescript-eslint/parser@8.33.0(eslint@9.23.0(jiti@2.4.2))(typescript@5.6.3))(eslint@9.23.0(jiti@2.4.2))(typescript@5.6.3)':
     dependencies:
@@ -13382,7 +13393,7 @@ snapshots:
     dependencies:
       '@hpke/core': 1.7.2
 
-  '@douglasneuroinformatics/libjs@2.9.0(neverthrow@8.2.0)(zod@3.25.36)':
+  '@douglasneuroinformatics/libjs@3.1.0(neverthrow@8.2.0)(zod@3.25.36)':
     dependencies:
       clean-stack: 5.2.0
       extract-stack: 3.0.0
@@ -13392,7 +13403,7 @@ snapshots:
       type-fest: 4.41.0
       zod: 3.25.36
 
-  '@douglasneuroinformatics/libjs@2.9.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)':
+  '@douglasneuroinformatics/libjs@3.1.0(neverthrow@8.2.0)(zod@3.25.67)':
     dependencies:
       clean-stack: 5.2.0
       extract-stack: 3.0.0
@@ -13400,13 +13411,23 @@ snapshots:
       serialize-error: 12.0.0
       stringify-object: 5.0.0
       type-fest: 4.41.0
-      zod: link:vendor/zod@3.23.x
+      zod: 3.25.67
 
-  '@douglasneuroinformatics/libnest@5.3.1(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.2)(@nestjs/platform-express@11.1.2)(@nestjs/testing@11.1.2(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.2)(@nestjs/platform-express@11.1.2))(@prisma/client@6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.21)(express@5.1.0)(mongodb@6.16.0(socks@2.8.4))(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(reflect-metadata@0.1.14)(rollup@4.41.1)(rxjs@7.8.2)(socks@2.8.4)(typescript@5.6.3)(zod@vendor+zod@3.23.x)':
+  '@douglasneuroinformatics/libjs@3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)':
+    dependencies:
+      clean-stack: 5.2.0
+      extract-stack: 3.0.0
+      neverthrow: 8.2.0
+      serialize-error: 12.0.0
+      stringify-object: 5.0.0
+      type-fest: 4.41.0
+      zod: link:vendor/zod@3.x
+
+  '@douglasneuroinformatics/libnest@7.1.0(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.2)(@nestjs/platform-express@11.1.2)(@nestjs/testing@11.1.2(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.2)(@nestjs/platform-express@11.1.2))(@prisma/client@6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.21)(express@5.1.0)(mongodb@6.16.0(socks@2.8.4))(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(reflect-metadata@0.1.14)(rollup@4.41.1)(rxjs@7.8.2)(socks@2.8.4)(typescript@5.6.3)(zod@vendor+zod@3.x)':
     dependencies:
       '@casl/ability': 6.7.3
-      '@casl/prisma': 1.5.1(@casl/ability@6.7.3)(@prisma/client@6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3))
-      '@douglasneuroinformatics/libjs': 2.9.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)
+      '@casl/prisma': 1.5.1(@casl/ability@6.7.3)(@prisma/client@6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3))
+      '@douglasneuroinformatics/libjs': 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@nestjs/common': 11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2)
       '@nestjs/core': 11.1.2(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/platform-express@11.1.2)(reflect-metadata@0.1.14)(rxjs@7.8.2)
       '@nestjs/jwt': 11.0.0(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))
@@ -13415,9 +13436,9 @@ snapshots:
       '@nestjs/swagger': 11.2.0(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.2)(reflect-metadata@0.1.14)
       '@nestjs/testing': 11.1.2(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.2)(@nestjs/platform-express@11.1.2)
       '@nestjs/throttler': 6.4.0(@nestjs/common@11.1.2(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.2)(reflect-metadata@0.1.14)
-      '@prisma/client': 6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3)
-      '@prisma/engines': 6.8.2
-      '@prisma/get-platform': 6.8.2
+      '@prisma/client': 6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3)
+      '@prisma/engines': 6.10.1
+      '@prisma/get-platform': 6.10.1
       '@swc-node/register': 1.10.10(@swc/core@1.11.29(@swc/helpers@0.5.17))(@swc/types@0.1.21)(typescript@5.6.3)
       '@swc/core': 1.11.29(@swc/helpers@0.5.17)
       '@swc/helpers': 0.5.17
@@ -13444,7 +13465,7 @@ snapshots:
       ts-morph: 25.0.1
       type-fest: 4.41.0
       unplugin-swc: 1.5.3(@swc/core@1.11.29(@swc/helpers@0.5.17))(rollup@4.41.1)
-      zod: link:vendor/zod@3.23.x
+      zod: link:vendor/zod@3.x
     optionalDependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
@@ -13512,9 +13533,9 @@ snapshots:
     dependencies:
       type-fest: 4.41.0
 
-  '@douglasneuroinformatics/libui@4.3.0(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@19.1.0))(zod@3.25.36)':
+  '@douglasneuroinformatics/libui@4.4.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@19.1.0))(zod@3.25.36)':
     dependencies:
-      '@douglasneuroinformatics/libjs': 2.9.0(neverthrow@8.2.0)(zod@3.25.36)
+      '@douglasneuroinformatics/libjs': 3.1.0(neverthrow@8.2.0)(zod@3.25.36)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
       '@radix-ui/react-accordion': 1.2.11(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@radix-ui/react-alert-dialog': 1.1.14(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -13567,9 +13588,9 @@ snapshots:
       - neverthrow
       - use-sync-external-store
 
-  '@douglasneuroinformatics/libui@4.3.0(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@19.1.0))(zod@vendor+zod@3.23.x)':
+  '@douglasneuroinformatics/libui@4.4.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@19.1.0))(zod@vendor+zod@3.x)':
     dependencies:
-      '@douglasneuroinformatics/libjs': 2.9.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)
+      '@douglasneuroinformatics/libjs': 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
       '@radix-ui/react-accordion': 1.2.11(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@radix-ui/react-alert-dialog': 1.1.14(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -13612,7 +13633,7 @@ snapshots:
       tw-animate-css: 1.3.2
       type-fest: 4.41.0
       vaul: 1.1.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      zod: link:vendor/zod@3.23.x
+      zod: link:vendor/zod@3.x
       zustand: 5.0.5(immer@10.1.1)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0))
     transitivePeerDependencies:
       - '@emotion/is-prop-valid'
@@ -13622,9 +13643,9 @@ snapshots:
       - neverthrow
       - use-sync-external-store
 
-  '@douglasneuroinformatics/libui@4.3.0(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.23.x)':
+  '@douglasneuroinformatics/libui@4.4.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.8)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)':
     dependencies:
-      '@douglasneuroinformatics/libjs': 2.9.0(neverthrow@8.2.0)(zod@vendor+zod@3.23.x)
+      '@douglasneuroinformatics/libjs': 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
       '@radix-ui/react-accordion': 1.2.11(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
       '@radix-ui/react-alert-dialog': 1.1.14(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
@@ -13667,7 +13688,7 @@ snapshots:
       tw-animate-css: 1.3.2
       type-fest: 4.41.0
       vaul: 1.1.2(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
-      zod: link:vendor/zod@3.23.x
+      zod: link:vendor/zod@3.x
       zustand: 5.0.5(immer@10.1.1)(react@vendor+react@19.x)(use-sync-external-store@1.5.0(react@vendor+react@19.x))
     transitivePeerDependencies:
       - '@emotion/is-prop-valid'
@@ -14860,35 +14881,37 @@ snapshots:
 
   '@polka/url@1.0.0-next.29': {}
 
-  '@prisma/client@6.8.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3)':
+  '@prisma/client@6.10.1(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3)':
     optionalDependencies:
-      prisma: 6.8.2(typescript@5.6.3)
+      prisma: 6.10.1(typescript@5.6.3)
       typescript: 5.6.3
 
-  '@prisma/config@6.8.2':
+  '@prisma/config@6.10.1':
     dependencies:
       jiti: 2.4.2
 
   '@prisma/debug@5.22.0': {}
 
+  '@prisma/debug@6.10.1': {}
+
   '@prisma/debug@6.8.2': {}
 
   '@prisma/dmmf@6.8.2': {}
 
-  '@prisma/engines-version@6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e': {}
+  '@prisma/engines-version@6.10.1-1.9b628578b3b7cae625e8c927178f15a170e74a9c': {}
 
-  '@prisma/engines@6.8.2':
+  '@prisma/engines@6.10.1':
     dependencies:
-      '@prisma/debug': 6.8.2
-      '@prisma/engines-version': 6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e
-      '@prisma/fetch-engine': 6.8.2
-      '@prisma/get-platform': 6.8.2
+      '@prisma/debug': 6.10.1
+      '@prisma/engines-version': 6.10.1-1.9b628578b3b7cae625e8c927178f15a170e74a9c
+      '@prisma/fetch-engine': 6.10.1
+      '@prisma/get-platform': 6.10.1
 
-  '@prisma/fetch-engine@6.8.2':
+  '@prisma/fetch-engine@6.10.1':
     dependencies:
-      '@prisma/debug': 6.8.2
-      '@prisma/engines-version': 6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e
-      '@prisma/get-platform': 6.8.2
+      '@prisma/debug': 6.10.1
+      '@prisma/engines-version': 6.10.1-1.9b628578b3b7cae625e8c927178f15a170e74a9c
+      '@prisma/get-platform': 6.10.1
 
   '@prisma/generator-helper@6.8.2':
     dependencies:
@@ -14902,9 +14925,9 @@ snapshots:
     dependencies:
       '@prisma/debug': 5.22.0
 
-  '@prisma/get-platform@6.8.2':
+  '@prisma/get-platform@6.10.1':
     dependencies:
-      '@prisma/debug': 6.8.2
+      '@prisma/debug': 6.10.1
 
   '@radix-ui/number@1.1.1': {}
 
@@ -21655,17 +21678,17 @@ snapshots:
       ansi-styles: 5.2.0
       react-is: 17.0.2
 
-  prisma-json-types-generator@3.4.2(prisma@6.8.2(typescript@5.6.3))(typescript@5.6.3):
+  prisma-json-types-generator@3.4.2(prisma@6.10.1(typescript@5.6.3))(typescript@5.6.3):
     dependencies:
       '@prisma/generator-helper': 6.8.2
-      prisma: 6.8.2(typescript@5.6.3)
+      prisma: 6.10.1(typescript@5.6.3)
       tslib: 2.8.1
       typescript: 5.6.3
 
-  prisma@6.8.2(typescript@5.6.3):
+  prisma@6.10.1(typescript@5.6.3):
     dependencies:
-      '@prisma/config': 6.8.2
-      '@prisma/engines': 6.8.2
+      '@prisma/config': 6.10.1
+      '@prisma/engines': 6.10.1
     optionalDependencies:
       typescript: 5.6.3
 
@@ -23975,11 +23998,13 @@ snapshots:
     dependencies:
       zod: 3.25.36
 
-  zod-validation-error@3.4.1(zod@vendor+zod@3.23.x):
+  zod-validation-error@3.4.1(zod@vendor+zod@3.x):
     dependencies:
-      zod: link:vendor/zod@3.23.x
+      zod: link:vendor/zod@3.x
 
   zod@3.25.36: {}
+
+  zod@3.25.67: {}
 
   zustand@4.5.7(immer@10.1.1)(react@vendor+react@19.x):
     dependencies:

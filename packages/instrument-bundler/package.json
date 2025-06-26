@@ -30,7 +30,7 @@
     "slashes": "^3.0.12",
     "ts-pattern": "workspace:ts-pattern__5.x@*",
     "type-fest": "workspace:type-fest__4.x@*",
-    "zod": "workspace:zod__3.23.x@*"
+    "zod": "workspace:zod__3.x@*"
   },
   "devDependencies": {
     "@opendatacapture/instrument-stubs": "workspace:*",

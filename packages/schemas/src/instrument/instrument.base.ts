@@ -1,4 +1,4 @@
-import { isUnique } from '@douglasneuroinformatics/libjs';
+import { $AnyFunction, isUnique, isZodType } from '@douglasneuroinformatics/libjs';
 import type {
   BaseInstrument,
   ClientInstrumentDetails,
@@ -11,15 +11,16 @@ import type {
   InstrumentMeasureValue,
   InstrumentMeasureVisibility,
   InstrumentUIOption,
+  InstrumentValidationSchema,
   ScalarInstrument,
   UnilingualClientInstrumentDetails,
   UnilingualInstrumentDetails,
   UnilingualInstrumentMeasures
 } from '@opendatacapture/runtime-core';
 import type { Simplify } from 'type-fest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
-import { $Language, $LicenseIdentifier, $ZodTypeAny } from '../core/core.js';
+import { $Language, $LicenseIdentifier } from '../core/core.js';
 
 import type { Language } from '../core/core.js';
 
@@ -34,6 +35,10 @@ const $InstrumentLanguage = z.union([
       message: 'Array must contain unique values'
     })
 ]) satisfies z.ZodType<InstrumentLanguage>;
+
+const $InstrumentValidationSchema = z.custom<InstrumentValidationSchema>((arg) => {
+  return isZodType(arg, { version: 3 }) || isZodType(arg, { version: 4 });
+});
 
 const $$InstrumentUIOption = <TSchema extends z.ZodTypeAny, TLanguage extends InstrumentLanguage>(
   $Schema: TSchema,
@@ -95,20 +100,18 @@ const $InstrumentMeasureValue: z.ZodType<InstrumentMeasureValue> = z.union([
   z.undefined()
 ]);
 
-const $ComputeMeasureFunction = z.function().args(z.any()).returns($InstrumentMeasureValue);
-
 const $ComputedInstrumentMeasure = z.object({
   hidden: z.boolean().optional(),
   kind: z.literal('computed'),
   label: $$InstrumentUIOption(z.string()),
-  value: $ComputeMeasureFunction
+  value: $AnyFunction
 }) satisfies z.ZodType<ComputedInstrumentMeasure>;
 
 const $UnilingualComputedInstrumentMeasure = z.object({
   hidden: z.boolean().optional(),
   kind: z.literal('computed'),
   label: z.string(),
-  value: $ComputeMeasureFunction,
+  value: $AnyFunction,
   visibility: $InstrumentMeasureVisibility.optional()
 }) satisfies z.ZodType<ComputedInstrumentMeasure<any, Language>>;
 
@@ -129,11 +132,13 @@ const $UnilingualConstantInstrumentMeasure = z.object({
 }) satisfies z.ZodType<ConstantInstrumentMeasure<any, Language>>;
 
 const $InstrumentMeasures = z.record(
-  z.union([$ComputedInstrumentMeasure, $ConstantInstrumentMeasure])
+  z.string(),
+  z.discriminatedUnion('kind', [$ComputedInstrumentMeasure, $ConstantInstrumentMeasure])
 ) satisfies z.ZodType<InstrumentMeasures>;
 
 const $UnilingualInstrumentMeasures = z.record(
-  z.union([$UnilingualComputedInstrumentMeasure, $UnilingualConstantInstrumentMeasure])
+  z.string(),
+  z.discriminatedUnion('kind', [$UnilingualComputedInstrumentMeasure, $UnilingualConstantInstrumentMeasure])
 ) satisfies z.ZodType<UnilingualInstrumentMeasures>;
 
 const $BaseInstrument = z.object({
@@ -156,7 +161,7 @@ const $ScalarInstrument = $BaseInstrument.extend({
   defaultMeasureVisibility: $InstrumentMeasureVisibility.optional(),
   internal: $ScalarInstrumentInternal,
   measures: $InstrumentMeasures.nullable(),
-  validationSchema: $ZodTypeAny
+  validationSchema: $InstrumentValidationSchema
 }) satisfies z.ZodType<ScalarInstrument>;
 
 const $UnilingualScalarInstrument = $ScalarInstrument.extend({
@@ -219,7 +224,7 @@ const $SeriesInstrumentBundleContainer = $BaseInstrumentBundleContainer.extend({
 });
 
 type InstrumentBundleContainer = ScalarInstrumentBundleContainer | SeriesInstrumentBundleContainer;
-const $InstrumentBundleContainer: z.ZodType<InstrumentBundleContainer> = z.union([
+const $InstrumentBundleContainer: z.ZodType<InstrumentBundleContainer> = z.discriminatedUnion('kind', [
   $ScalarInstrumentBundleContainer,
   $SeriesInstrumentBundleContainer
 ]);
@@ -235,6 +240,7 @@ export {
   $InstrumentKind,
   $InstrumentLanguage,
   $InstrumentMeasureValue,
+  $InstrumentValidationSchema,
   $ScalarInstrument,
   $ScalarInstrumentBundleContainer,
   $ScalarInstrumentInternal,

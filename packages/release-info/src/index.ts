@@ -6,7 +6,7 @@ import util from 'util';
 import { $DevelopmentReleaseInfo, $ProductionReleaseInfo } from '@opendatacapture/schemas/setup';
 import type { DevelopmentReleaseInfo, ProductionReleaseInfo, ReleaseInfo } from '@opendatacapture/schemas/setup';
 import type { PackageJson } from 'type-fest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const exec = util.promisify(cp.exec);
 

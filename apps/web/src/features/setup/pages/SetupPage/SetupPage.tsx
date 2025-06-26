@@ -4,7 +4,7 @@ import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Card, Form, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Logo } from '@opendatacapture/react-core';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { useCreateSetupState } from '../../hooks/useCreateSetupState';
 import { SetupLoadingPage } from '../SetupLoadingPage';
@@ -130,10 +130,11 @@ export const SetupPage = () => {
                 recordsPerSubject: z.number().int().nonnegative().optional(),
                 dummySubjectCount: z.number().int().nonnegative().optional()
               })
-              .superRefine((arg, ctx) => {
-                if (arg.confirmPassword !== arg.password) {
-                  ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+              .check((ctx) => {
+                if (ctx.value.confirmPassword !== ctx.value.password) {
+                  ctx.issues.push({
+                    code: 'custom',
+                    input: ctx.value.confirmPassword,
                     message: t('common.passwordsMustMatch'),
                     path: ['confirmPassword']
                   });

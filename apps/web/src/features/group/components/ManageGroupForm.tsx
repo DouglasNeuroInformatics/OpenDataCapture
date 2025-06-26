@@ -5,7 +5,7 @@ import type { UpdateGroupData } from '@opendatacapture/schemas/group';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { Promisable } from 'type-fest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 type AvailableInstrumentOptions = {
   form: { [key: string]: string };

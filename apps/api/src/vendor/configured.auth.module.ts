@@ -2,11 +2,6 @@ import { AuthModule, getModelToken } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { Module } from '@nestjs/common';
 import { $LoginCredentials } from '@opendatacapture/schemas/auth';
-import type { JwtPayload } from '@opendatacapture/schemas/auth';
-import { $Permissions } from '@opendatacapture/schemas/core';
-import { $Group } from '@opendatacapture/schemas/group';
-import { $BasePermissionLevel } from '@opendatacapture/schemas/user';
-import { z } from 'zod';
 
 @Module({
   imports: [
@@ -47,17 +42,7 @@ import { z } from 'zod';
             });
           },
           schemas: {
-            loginCredentials: $LoginCredentials,
-            metadata: z.object({
-              additionalPermissions: $Permissions.optional()
-            }),
-            tokenPayload: z.object({
-              basePermissionLevel: $BasePermissionLevel.nullable(),
-              firstName: z.string().nullable(),
-              groups: z.array($Group),
-              lastName: z.string().nullable(),
-              username: z.string()
-            }) satisfies z.ZodType<Omit<JwtPayload, 'permissions'>>
+            loginCredentials: $LoginCredentials
           },
           userQuery: async ({ username }) => {
             const user = await userModel.findFirst({

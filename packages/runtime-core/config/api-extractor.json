@@ -29,6 +29,9 @@
       "ae-internal-missing-underscore": {
         "logLevel": "none"
       },
+      "ae-forgotten-export": {
+        "logLevel": "none"
+      },
       "ae-missing-getter": {
         "logLevel": "none"
       }

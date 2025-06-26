@@ -27,7 +27,7 @@
     "@douglasneuroinformatics/libjs": "catalog:",
     "@opendatacapture/licenses": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
-    "zod": "workspace:zod__3.23.x@*"
+    "zod": "workspace:zod__3.x@*"
   },
   "devDependencies": {
     "@casl/prisma": "^1.5.1",

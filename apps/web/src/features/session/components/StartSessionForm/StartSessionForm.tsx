@@ -11,7 +11,7 @@ import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { Sex, SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import type { Promisable } from 'type-fest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const currentDate = new Date();
 
@@ -258,7 +258,7 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
           });
         }
         await onSubmit({
-          date: sessionDate!,
+          date: sessionDate,
           groupId: currentGroup?.id ?? null,
           type: sessionType,
           subjectData: {

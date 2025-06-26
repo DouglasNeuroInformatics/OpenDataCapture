@@ -19,8 +19,9 @@ type DtsPluginOptions = {
 function parseImportPath(importPath: string) {
   const segments = importPath.split('/');
   const sliceIndex = importPath.startsWith('@') ? 2 : 1;
+  const relpath = segments.slice(sliceIndex).join('/');
   return {
-    exportKey: segments.slice(sliceIndex).join('/') || '.',
+    exportKey: relpath ? `./${relpath}` : '.',
     packageId: segments.slice(0, sliceIndex).join('/')
   };
 }

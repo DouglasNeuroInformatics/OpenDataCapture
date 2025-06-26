@@ -1,11 +1,11 @@
-import type { JwtPayload } from '@opendatacapture/schemas/auth';
+import type { TokenPayload } from '@opendatacapture/schemas/auth';
 import type { BaseAppAbility } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { Session } from '@opendatacapture/schemas/session';
 import type { Simplify } from 'type-fest';
 import type { StateCreator } from 'zustand';
 
-export type CurrentUser = Omit<JwtPayload, 'permissions'> & {
+export type CurrentUser = Omit<TokenPayload, 'basePermissionLevel' | 'permissions'> & {
   ability: BaseAppAbility;
 };
 

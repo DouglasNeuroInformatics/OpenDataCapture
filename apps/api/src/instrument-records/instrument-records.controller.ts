@@ -5,7 +5,7 @@ import type { AppAbility } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { CreateInstrumentRecordDto } from './dto/create-instrument-record.dto';
 import { UpdateInstrumentRecordDto } from './dto/update-instrument-record.dto';

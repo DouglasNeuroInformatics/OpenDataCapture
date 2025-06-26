@@ -1,5 +1,5 @@
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { $EditorFile } from '@/models/editor-file.model';
 import type { EditorFile } from '@/models/editor-file.model';

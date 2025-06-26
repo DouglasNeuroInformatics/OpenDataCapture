@@ -14,6 +14,6 @@
   "dependencies": {
     "@opendatacapture/schemas": "workspace:*",
     "type-fest": "workspace:type-fest__4.x@*",
-    "zod": "workspace:zod__3.23.x@*"
+    "zod": "workspace:zod__3.x@*"
   }
 }

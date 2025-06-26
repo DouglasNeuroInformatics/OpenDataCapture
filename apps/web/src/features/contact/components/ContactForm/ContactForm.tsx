@@ -1,6 +1,6 @@
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 type ContactFormData = {
   contactReason: 'bug' | 'feedback' | 'other' | 'request';
@@ -36,7 +36,7 @@ export const ContactForm = ({ onSubmit }: ContactFormProps) => {
       }}
       validationSchema={z.object({
         contactReason: z.enum(['bug', 'feedback', 'other', 'request']),
-        message: z.string()
+        message: z.string().min(1)
       })}
       onSubmit={onSubmit}
     />

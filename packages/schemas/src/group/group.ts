@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { $BaseModel, $RegexString } from '../core/core.js';
 import { $SubjectIdentificationMethod } from '../subject/subject.js';

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { $BaseModel } from '../core/core.js';
 import { $CreateSubjectData, $Subject } from '../subject/subject.js';
