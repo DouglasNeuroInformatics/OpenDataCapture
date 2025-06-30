@@ -1,6 +1,6 @@
 import * as path from 'node:path';
 
-import { runtime } from '@opendatacapture/vite-plugin-runtime';
+import runtime from '@opendatacapture/vite-plugin-runtime';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
