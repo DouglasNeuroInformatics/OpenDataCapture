@@ -4,7 +4,7 @@ import PreloadPlugin from '/runtime/v1/@jspsych/plugin-preload@2.x';
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import { initJsPsych } from '/runtime/v1/jspsych@8.x';
 import type { TimelineArray } from '/runtime/v1/jspsych@8.x';
-import { z } from '/runtime/v1/zod@3.23.x';
+import { z } from '/runtime/v1/zod@3.x';
 
 import blue from './blue.png';
 import orange from './orange.png';

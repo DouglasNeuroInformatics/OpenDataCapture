@@ -1,6 +1,6 @@
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import { createRoot } from '/runtime/v1/react-dom@19.x/client.js';
-import { z } from '/runtime/v1/zod@3.23.x';
+import { z } from '/runtime/v1/zod@3.x';
 
 import { App } from './App.tsx';
 

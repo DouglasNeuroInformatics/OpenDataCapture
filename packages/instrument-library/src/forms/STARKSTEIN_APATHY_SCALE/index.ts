@@ -1,5 +1,5 @@
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { z } from '/runtime/v1/zod@3.23.x';
+import { z } from '/runtime/v1/zod@3.x';
 
 const $FieldOptionsValidation = z.number().int().gte(0).lte(3);
 const fieldOptionsLikertScale = {

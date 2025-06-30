@@ -1,6 +1,6 @@
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import type { Language } from '/runtime/v1/@opendatacapture/runtime-core';
-import { z } from '/runtime/v1/zod@3.23.x';
+import { z } from '/runtime/v1/zod@3.x';
 
 type MultilingualOptions = { [key: string]: { [L in Language]: string } };
 

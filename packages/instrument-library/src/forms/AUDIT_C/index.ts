@@ -1,6 +1,6 @@
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import { sum } from '/runtime/v1/lodash-es@4.x';
-import { z } from '/runtime/v1/zod@3.23.x';
+import { z } from '/runtime/v1/zod@3.x';
 
 export default defineInstrument({
   kind: 'FORM',
