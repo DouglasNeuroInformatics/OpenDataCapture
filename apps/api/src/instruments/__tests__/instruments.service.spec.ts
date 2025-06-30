@@ -15,6 +15,7 @@ describe('InstrumentsService', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         InstrumentsService,
+        MockFactory.createForModelToken(getModelToken('Group')),
         MockFactory.createForModelToken(getModelToken('Instrument')),
         MockFactory.createForService(CryptoService),
         MockFactory.createForService(LoggingService),
