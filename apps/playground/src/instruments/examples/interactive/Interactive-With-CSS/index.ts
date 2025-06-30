@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { z } from '/runtime/v1/zod@3.23.x';
+import { z } from '/runtime/v1/zod@3.x';
 
 import logoSrc from './logo.png';
 

@@ -2,7 +2,7 @@ import path from 'path';
 
 import importMetaEnv from '@import-meta-env/unplugin';
 import { getReleaseInfo } from '@opendatacapture/release-info';
-import { runtime } from '@opendatacapture/vite-plugin-runtime';
+import runtime from '@opendatacapture/vite-plugin-runtime';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
