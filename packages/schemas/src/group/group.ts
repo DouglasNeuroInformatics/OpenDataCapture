@@ -13,7 +13,8 @@ export const $GroupSettings = z.object({
       fr: z.string().nullish()
     })
     .nullish(),
-  subjectIdDisplayLength: z.number().nullish()
+  subjectIdDisplayLength: z.number().nullish(),
+  speciesVisible: z.boolean()
 });
 
 export type GroupType = z.infer<typeof $GroupType>;
