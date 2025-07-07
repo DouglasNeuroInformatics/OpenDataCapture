@@ -74,7 +74,7 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
             speciesVisible: {
               kind: 'boolean',
               label: t({
-                en: 'Allow for species to be entered and visible in Datahub',
+                en: 'Allow For Species To Be Entered and Visible in Datahub',
                 fr: "Permettre aux espèces d'être saisies et visibles dans Datahub"
               }),
               variant: 'radio'
@@ -156,7 +156,7 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
         idValidationRegex: $RegexString.optional(),
         idValidationRegexErrorMessageEn: z.string().optional(),
         idValidationRegexErrorMessageFr: z.string().optional(),
-        subjectIdDisplayLength: z.number().int().min(1),
+        subjectIdDisplayLength: z.number().int().min(1).optional(),
         speciesVisible: z.boolean().optional()
       })}
       onSubmit={(data) => {
