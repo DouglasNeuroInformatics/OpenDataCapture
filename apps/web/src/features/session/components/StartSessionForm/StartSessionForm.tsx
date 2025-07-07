@@ -1,6 +1,5 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import { useAppStore } from '@/store';
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
@@ -13,6 +12,8 @@ import type { Sex, SubjectIdentificationMethod } from '@opendatacapture/schemas/
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
+
+import { useAppStore } from '@/store';
 
 const currentDate = new Date();
 

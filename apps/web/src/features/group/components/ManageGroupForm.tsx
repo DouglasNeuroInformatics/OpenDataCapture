@@ -22,8 +22,8 @@ type ManageGroupFormProps = {
       accessibleInteractiveInstrumentIds: Set<string>;
       defaultIdentificationMethod?: SubjectIdentificationMethod;
       idValidationRegex?: null | string;
-      subjectIdDisplayLength?: number;
       speciesVisible?: boolean;
+      subjectIdDisplayLength?: number;
     };
   };
   onSubmit: (data: Partial<UpdateGroupData>) => Promisable<any>;
@@ -63,14 +63,6 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
         },
         {
           fields: {
-            subjectIdDisplayLength: {
-              kind: 'number',
-              label: t({
-                en: 'Preferred Subject ID Display Length',
-                fr: "La longueur d'affichage préférée de l'ID"
-              }),
-              variant: 'input'
-            },
             speciesVisible: {
               kind: 'boolean',
               label: t({
@@ -78,6 +70,14 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
                 fr: "Permettre aux espèces d'être saisies et visibles dans Datahub"
               }),
               variant: 'radio'
+            },
+            subjectIdDisplayLength: {
+              kind: 'number',
+              label: t({
+                en: 'Preferred Subject ID Display Length',
+                fr: "La longueur d'affichage préférée de l'ID"
+              }),
+              variant: 'input'
             }
           },
           title: t({
@@ -156,8 +156,8 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
         idValidationRegex: $RegexString.optional(),
         idValidationRegexErrorMessageEn: z.string().optional(),
         idValidationRegexErrorMessageFr: z.string().optional(),
-        subjectIdDisplayLength: z.number().int().min(1).optional(),
-        speciesVisible: z.boolean().optional()
+        speciesVisible: z.boolean().optional(),
+        subjectIdDisplayLength: z.number().int().min(1).optional()
       })}
       onSubmit={(data) => {
         void onSubmit({
@@ -169,8 +169,8 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
               en: data.idValidationRegexErrorMessageEn,
               fr: data.idValidationRegexErrorMessageFr
             },
-            subjectIdDisplayLength: data.subjectIdDisplayLength,
-            speciesVisible: data.speciesVisible
+            speciesVisible: data.speciesVisible,
+            subjectIdDisplayLength: data.subjectIdDisplayLength
           }
         });
       }}
