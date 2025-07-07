@@ -68,7 +68,8 @@ type GroupSettings {
   defaultIdentificationMethod   SubjectIdentificationMethod
   idValidationRegex             String?
   idValidationRegexErrorMessage ErrorMessage?
-  subjectIdDisplayLength        Int?  
+  subjectIdDisplayLength        Int? 
+  speciesVisible                Boolean?  
 }
 
 model Group {
@@ -159,6 +160,7 @@ model Subject {
   lastName          String?
   sessions          Session[]
   sex               Sex?
+  species           String?
   instrumentRecords InstrumentRecord[]
   assignments       Assignment[]
 
