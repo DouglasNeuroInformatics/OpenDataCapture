@@ -1,5 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import { useAppStore } from '@/store';
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
@@ -28,6 +29,7 @@ type StartSessionFormData = {
   subjectIdentificationMethod: SubjectIdentificationMethod;
   subjectLastName?: string;
   subjectSex?: Sex;
+  subjectSpecies?: string;
 };
 
 type StartSessionFormProps = {
@@ -39,6 +41,7 @@ type StartSessionFormProps = {
 
 export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubmit }: StartSessionFormProps) => {
   const { resolvedLanguage, t } = useTranslation();
+  const speciesVisible = useAppStore((store) => store.currentGroup?.settings.speciesVisible);
   return (
     <Form
       preventResetValuesOnReset
@@ -133,6 +136,26 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
                     }
                   : null;
               }
+            },
+            subjectSpecies: {
+              kind: 'dynamic',
+              deps: ['subjectIdentificationMethod'],
+              render({ subjectIdentificationMethod }) {
+                return subjectIdentificationMethod === 'CUSTOM_ID' && speciesVisible
+                  ? {
+                      description: t({
+                        en: 'Please enter the species of the animal',
+                        fr: 'Entrer la Espèce animale'
+                      }),
+                      kind: 'string',
+                      label: t({
+                        en: 'Species',
+                        fr: 'Entrer la Espèce animale'
+                      }),
+                      variant: 'input'
+                    }
+                  : null;
+              }
             }
           }
         },
@@ -189,6 +212,7 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
             .max(MIN_DATE_OF_BIRTH, { message: t('session.errors.mustBeAdult') })
             .optional(),
           subjectSex: z.enum(['MALE', 'FEMALE']).optional(),
+          subjectSpecies: z.string().optional(),
           sessionType: $SessionType.exclude(['REMOTE']),
           sessionDate: z
             .date()
@@ -243,7 +267,8 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
         subjectFirstName,
         subjectLastName,
         subjectDateOfBirth,
-        subjectSex
+        subjectSex,
+        subjectSpecies
       }) => {
         if (!subjectId) {
           subjectId = await generateSubjectHash({
@@ -266,7 +291,8 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
             firstName: subjectFirstName,
             lastName: subjectLastName,
             dateOfBirth: subjectDateOfBirth,
-            sex: subjectSex
+            sex: subjectSex,
+            species: subjectSpecies
           }
         });
       }}
