@@ -23,6 +23,7 @@ type ManageGroupFormProps = {
       defaultIdentificationMethod?: SubjectIdentificationMethod;
       idValidationRegex?: null | string;
       subjectIdDisplayLength?: number;
+      speciesVisible?: boolean;
     };
   };
   onSubmit: (data: Partial<UpdateGroupData>) => Promisable<any>;
@@ -69,6 +70,14 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
                 fr: "La longueur d'affichage préférée de l'ID"
               }),
               variant: 'input'
+            },
+            speciesVisible: {
+              kind: 'boolean',
+              label: t({
+                en: 'Allow for species to be entered and visible in Datahub',
+                fr: "Permettre aux espèces d'être saisies et visibles dans Datahub"
+              }),
+              variant: 'radio'
             }
           },
           title: t({
@@ -147,7 +156,8 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
         idValidationRegex: $RegexString.optional(),
         idValidationRegexErrorMessageEn: z.string().optional(),
         idValidationRegexErrorMessageFr: z.string().optional(),
-        subjectIdDisplayLength: z.number().int().min(1)
+        subjectIdDisplayLength: z.number().int().min(1),
+        speciesVisible: z.boolean().optional()
       })}
       onSubmit={(data) => {
         void onSubmit({
@@ -159,7 +169,8 @@ export const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormPro
               en: data.idValidationRegexErrorMessageEn,
               fr: data.idValidationRegexErrorMessageFr
             },
-            subjectIdDisplayLength: data.subjectIdDisplayLength
+            subjectIdDisplayLength: data.subjectIdDisplayLength,
+            speciesVisible: data.speciesVisible
           }
         });
       }}
