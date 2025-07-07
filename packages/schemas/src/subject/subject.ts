@@ -22,7 +22,8 @@ export const $Subject = $BaseModel.extend({
   firstName: z.string().min(1).nullish(),
   groupIds: z.array(z.string().min(1)),
   lastName: z.string().min(1).nullish(),
-  sex: $Sex.nullish()
+  sex: $Sex.nullish(),
+  species: z.string().optional().nullish()
 });
 
 export type CreateSubjectData = z.infer<typeof $CreateSubjectData>;
@@ -31,5 +32,6 @@ export const $CreateSubjectData = $Subject.pick({
   firstName: true,
   id: true,
   lastName: true,
-  sex: true
+  sex: true,
+  species: true
 });
