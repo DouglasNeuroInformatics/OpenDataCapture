@@ -120,7 +120,7 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
               kind: 'dynamic',
               deps: ['subjectIdentificationMethod'],
               render({ subjectIdentificationMethod }) {
-                return subjectIdentificationMethod === 'PERSONAL_INFO'
+                return subjectIdentificationMethod === 'PERSONAL_INFO' || subjectIdentificationMethod === 'CUSTOM_ID'
                   ? {
                       description: t('core.identificationData.sex.description'),
                       kind: 'string',
