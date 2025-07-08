@@ -108,7 +108,7 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
               kind: 'dynamic',
               deps: ['subjectIdentificationMethod'],
               render({ subjectIdentificationMethod }) {
-                return subjectIdentificationMethod === 'PERSONAL_INFO'
+                return subjectIdentificationMethod === 'PERSONAL_INFO' || subjectIdentificationMethod === 'CUSTOM_ID'
                   ? {
                       kind: 'date',
                       label: t('core.identificationData.dateOfBirth.label')
