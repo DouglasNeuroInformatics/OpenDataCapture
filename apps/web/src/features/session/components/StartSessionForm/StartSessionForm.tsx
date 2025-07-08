@@ -106,32 +106,28 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
             },
             subjectDateOfBirth: {
               kind: 'dynamic',
-              deps: ['subjectIdentificationMethod'],
-              render({ subjectIdentificationMethod }) {
-                return subjectIdentificationMethod === 'PERSONAL_INFO' || subjectIdentificationMethod === 'CUSTOM_ID'
-                  ? {
-                      kind: 'date',
-                      label: t('core.identificationData.dateOfBirth.label')
-                    }
-                  : null;
+              deps: [],
+              render() {
+                return {
+                  kind: 'date',
+                  label: t('core.identificationData.dateOfBirth.label')
+                };
               }
             },
             subjectSex: {
               kind: 'dynamic',
-              deps: ['subjectIdentificationMethod'],
-              render({ subjectIdentificationMethod }) {
-                return subjectIdentificationMethod === 'PERSONAL_INFO' || subjectIdentificationMethod === 'CUSTOM_ID'
-                  ? {
-                      description: t('core.identificationData.sex.description'),
-                      kind: 'string',
-                      label: t('core.identificationData.sex.label'),
-                      options: {
-                        FEMALE: t('core.identificationData.sex.female'),
-                        MALE: t('core.identificationData.sex.male')
-                      },
-                      variant: 'select'
-                    }
-                  : null;
+              deps: [],
+              render() {
+                return {
+                  description: t('core.identificationData.sex.description'),
+                  kind: 'string',
+                  label: t('core.identificationData.sex.label'),
+                  options: {
+                    FEMALE: t('core.identificationData.sex.female'),
+                    MALE: t('core.identificationData.sex.male')
+                  },
+                  variant: 'select'
+                };
               }
             }
           }
