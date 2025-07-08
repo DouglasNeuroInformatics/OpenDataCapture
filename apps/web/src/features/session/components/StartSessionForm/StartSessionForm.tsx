@@ -105,30 +105,18 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
               }
             },
             subjectDateOfBirth: {
-              kind: 'dynamic',
-              deps: [],
-              render() {
-                return {
-                  kind: 'date',
-                  label: t('core.identificationData.dateOfBirth.label')
-                };
-              }
+              kind: 'date',
+              label: t('core.identificationData.dateOfBirth.label')
             },
             subjectSex: {
-              kind: 'dynamic',
-              deps: [],
-              render() {
-                return {
-                  description: t('core.identificationData.sex.description'),
-                  kind: 'string',
-                  label: t('core.identificationData.sex.label'),
-                  options: {
-                    FEMALE: t('core.identificationData.sex.female'),
-                    MALE: t('core.identificationData.sex.male')
-                  },
-                  variant: 'select'
-                };
-              }
+              description: t('core.identificationData.sex.description'),
+              kind: 'string',
+              label: t('core.identificationData.sex.label'),
+              options: {
+                FEMALE: t('core.identificationData.sex.female'),
+                MALE: t('core.identificationData.sex.male')
+              },
+              variant: 'select'
             }
           }
         },
