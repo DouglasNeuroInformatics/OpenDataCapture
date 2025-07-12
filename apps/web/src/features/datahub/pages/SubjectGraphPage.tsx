@@ -60,7 +60,9 @@ export const SubjectGraphPage = () => {
         const formType = instrument.details.title;
         const subjectId = params.subjectId!.slice(0, 7);
 
-        graphDesc.innerText = t('datahub.downloadInfo.subjectText', formType ?? '', subjectId ?? '');
+        graphDesc.innerText = t('datahub.downloadInfo.subjectText', {
+          args: [formType ?? '', subjectId ?? '']
+        });
 
         graphDesc.className = 'p-2 font-semibold text-center';
         element.prepend(graphDesc);
