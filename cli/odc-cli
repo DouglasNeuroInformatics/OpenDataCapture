@@ -382,6 +382,30 @@ class InstrumentRecordsCommands:
         print(response)
 
 
+class SubjectCommands:
+    @require_url
+    @require_token
+    @staticmethod
+    def delete(id: str) -> None:
+        url = f'{config.base_url}/v1/subjects/{id}'
+        response = HttpClient.delete(url)
+        print(response)
+
+    @require_url
+    @require_token
+    @staticmethod
+    def find(min_date: datetime | None, subject_id: str | None) -> None:
+        url = build_url_with_params(
+            f'{config.base_url}/v1/subjects',
+            {
+                'minDate': min_date,
+                'subjectId': subject_id,
+            },
+        )
+        response = HttpClient.get(url)
+        print(response)
+
+
 class InstrumentsCommands:
     @require_url
     @require_token
@@ -516,6 +540,22 @@ class CLI:
             help='partial json object with fields to update',
         )
         update_parser.set_defaults(fn=InstrumentRecordsCommands.update)
+
+    def _create_subjects_parser(self):
+        subparsers = self._create_subcommand_subparsers('subjects')
+
+        delete_parser = subparsers.add_parser('delete', help='delete an subject record by id')
+        delete_parser.add_argument('--id', required=True, help='id of the subject record to delete')
+        delete_parser.set_defaults(fn=InstrumentRecordsCommands.delete)
+
+        find_parser = subparsers.add_parser('find', help='search subject records by optional filters')
+        find_parser.add_argument(
+            '--min-date',
+            type=ArgumentTypes.valid_datetime,
+            help='filter records created after this date (format: yyyy-mm-dd or yyyy-mm-dd hh:mm:ss)',
+        )
+        find_parser.add_argument('--subject-id', help='filter by subject id')
+        find_parser.set_defaults(fn=InstrumentRecordsCommands.find)
 
     def _create_instruments_parser(self):
         subparsers = self._create_subcommand_subparsers('instruments')
