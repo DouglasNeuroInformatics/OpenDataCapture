@@ -478,6 +478,7 @@ class CLI:
         self._create_config_parser()
         self._create_instrument_records_parser()
         self._create_instruments_parser()
+        self._create_subjects_parser()
         self._create_setup_parser()
 
     def run(self) -> None:
@@ -547,7 +548,7 @@ class CLI:
 
         delete_parser = subparsers.add_parser('delete', help='delete an subject record by id')
         delete_parser.add_argument('--id', required=True, help='id of the subject record to delete')
-        delete_parser.set_defaults(fn=InstrumentRecordsCommands.delete)
+        delete_parser.set_defaults(fn=SubjectCommands.delete)
 
         find_parser = subparsers.add_parser('find', help='search subject records by optional filters')
         find_parser.add_argument(
@@ -556,7 +557,7 @@ class CLI:
             help='filter records created after this date (format: yyyy-mm-dd or yyyy-mm-dd hh:mm:ss)',
         )
         find_parser.add_argument('--subject-id', help='filter by subject id')
-        find_parser.set_defaults(fn=InstrumentRecordsCommands.find)
+        find_parser.set_defaults(fn=SubjectCommands.find)
 
     def _create_instruments_parser(self):
         subparsers = self._create_subcommand_subparsers('instruments')
