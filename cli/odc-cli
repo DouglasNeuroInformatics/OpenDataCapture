@@ -41,6 +41,7 @@ Features:
     - Store and retrieve configuration (e.g., base URL)
     - Retrieve a list of instruments in the database
     - Update and delete instrument records
+    - Find and delete subjects
     - Get the current status of an ODC instance
 
 Requires:
