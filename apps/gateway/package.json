@@ -47,6 +47,7 @@
     "nodemon": "catalog:",
     "prisma": "catalog:",
     "tailwindcss": "catalog:",
+    "tsx": "catalog:",
     "type-fest": "workspace:type-fest__4.x@*",
     "vite": "catalog:"
   },

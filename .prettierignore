@@ -2,3 +2,4 @@
 
 /dist
 /coverage
+apps/web/src/route-tree.ts

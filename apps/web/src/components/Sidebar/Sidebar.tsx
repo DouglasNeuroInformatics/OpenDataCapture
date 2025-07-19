@@ -3,9 +3,9 @@ import { AlertDialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformati
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding } from '@opendatacapture/react-core';
 import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { StopCircle } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
@@ -60,7 +60,7 @@ export const Sidebar = () => {
                       className="min-w-24"
                       onClick={() => {
                         endSession();
-                        navigate('/session/start-session');
+                        void navigate({ to: '/session/start-session' });
                       }}
                     >
                       {t('core.yes')}

@@ -31,6 +31,7 @@ export default config(
   {
     files: ['**/*.tsx'],
     rules: {
+      '@typescript-eslint/only-throw-error': 'off',
       'jsx-a11y/media-has-caption': 'off'
     }
   },

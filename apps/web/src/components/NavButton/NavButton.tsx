@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { cn } from '@douglasneuroinformatics/libui/utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 
 import type { NavItem } from '@/hooks/useNavItems';
 
@@ -34,7 +34,7 @@ export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(fun
         if (onClick) {
           onClick(url);
         } else {
-          navigate(url);
+          void navigate({ to: url });
         }
       }}
       {...props}

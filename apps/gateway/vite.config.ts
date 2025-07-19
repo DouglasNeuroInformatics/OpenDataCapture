@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 
+// @ts-expect-error - conflict with vite version of subdependency, but works with v6
 export default defineConfig(({ mode }) => ({
   build: {
     chunkSizeWarningLimit: 1000,

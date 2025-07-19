@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { MemoryRouter } from 'react-router-dom';
 
 import { UserDropup } from './UserDropup';
 
@@ -8,13 +7,7 @@ type Story = StoryObj<typeof UserDropup>;
 export default { component: UserDropup } as Meta<typeof UserDropup>;
 
 export const Default: Story = {
-  decorators: [
-    (Story) => (
-      <MemoryRouter>
-        <Story />
-      </MemoryRouter>
-    )
-  ],
+  decorators: [(Story) => <Story />],
   parameters: {
     layout: 'centered'
   }

@@ -4,16 +4,15 @@ import { Button, Card } from '@douglasneuroinformatics/libui/components';
 import { useEventListener, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
 import type { Session } from '@opendatacapture/schemas/session';
+import { useNavigate } from '@tanstack/react-router';
 import { mean } from 'lodash-es';
 import { XIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
-import type { NavigateOptions } from 'react-router-dom';
 import { match } from 'ts-pattern';
 import type { Promisable } from 'type-fest';
 
+import type { StartSessionFormData } from '@/components/StartSessionForm';
 import { config } from '@/config';
-import type { StartSessionFormData } from '@/features/session/components/StartSessionForm';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useAppStore } from '@/store';
 
@@ -42,12 +41,16 @@ const SESSION_DATA: Session = {
 
 type WalkthroughStep = {
   content: React.ReactNode;
-  navigateOptions?: NavigateOptions;
+  navigateOptions?: {
+    state?: {
+      [key: string]: any;
+    };
+    to: string;
+  };
   onBeforeQuery?: () => Promisable<void>;
   position: 'bottom-center' | 'bottom-left' | 'bottom-right' | 'top-left';
   target: string;
   title: string;
-  url: `/${string}`;
 };
 
 const Walkthrough = () => {
@@ -85,13 +88,15 @@ const Walkthrough = () => {
             })}
           </p>
         ),
+        navigateOptions: {
+          to: '/dashboard'
+        },
         position: 'bottom-left',
         target: '#sidebar-branding-container',
         title: t({
           en: 'Welcome to Open Data Capture 👋',
           fr: 'Bienvenue à Open Data Capture 👋'
-        }),
-        url: '/dashboard'
+        })
       },
       {
         content: (
@@ -102,13 +107,15 @@ const Walkthrough = () => {
             })}
           </p>
         ),
+        navigateOptions: {
+          to: '/dashboard'
+        },
         position: 'bottom-left',
         target: 'button[data-nav-url="/dashboard"]',
         title: t({
           en: 'Dashboard',
           fr: 'Tableau de bord'
-        }),
-        url: '/dashboard'
+        })
       },
       {
         content: (
@@ -119,13 +126,15 @@ const Walkthrough = () => {
             })}
           </p>
         ),
+        navigateOptions: {
+          to: '/datahub'
+        },
         position: 'bottom-left',
         target: 'button[data-nav-url="/datahub"]',
         title: t({
           en: 'Data Hub',
           fr: 'Centre de données'
-        }),
-        url: '/datahub'
+        })
       },
       {
         content: (
@@ -136,26 +145,30 @@ const Walkthrough = () => {
             })}
           </p>
         ),
+        navigateOptions: {
+          to: '/datahub'
+        },
         position: 'bottom-left',
         target: '#subject-lookup-search-bar',
         title: t({
           en: 'Subject Lookup',
           fr: 'Recherche de client'
-        }),
-        url: '/datahub'
+        })
       },
       {
         content: t({
           en: 'Here, you can export all your data in various formats.',
           fr: 'Ici, vous pouvez exporter toutes vos données dans différents formats.'
         }),
+        navigateOptions: {
+          to: '/datahub'
+        },
         position: 'bottom-right',
         target: '[data-spotlight-type="export-data-dropdown"]',
         title: t({
           en: 'Bulk Data Export',
           fr: 'Exportation de données'
-        }),
-        url: '/datahub'
+        })
       },
       {
         content: t({
@@ -165,60 +178,69 @@ const Walkthrough = () => {
         navigateOptions: {
           state: {
             initialValues: START_SESSION_DATA
-          }
+          },
+          to: '/session/start-session'
         },
         position: 'bottom-left',
         target: 'button[data-nav-url="/session/start-session"]',
         title: t({
           en: 'Start Session',
           fr: 'Commencer une session'
-        }),
-        url: '/session/start-session'
+        })
       },
       {
         content: t({
           en: "You can start a session with a custom ID or let the system create one using the subject's personal information. If you choose the auto-generate option, the ID is created in your browser, so the subject's first and last names are never sent to our server.",
           fr: "Vous pouvez démarrer une session avec un identifiant personnalisé ou laisser le système en créer un à l'aide des informations personnelles du client. Si vous choisissez l'option de génération automatique, l'identifiant est créé dans votre navigateur, de sorte que les nom et prénom du client ne sont jamais envoyés à notre serveur."
         }),
+        navigateOptions: {
+          to: '/session/start-session'
+        },
         position: 'bottom-left',
         target: 'div[data-field-group="subjectIdentificationMethod"]',
         title: t({
           en: 'Identification Method',
           fr: "Méthode d'identification"
-        }),
-        url: '/session/start-session'
+        })
       },
       {
         content: t({
           en: 'You can use any ID you like; your group name will automatically be appended to ensure it is unique.',
           fr: "Vous pouvez utiliser l'identifiant de votre choix ; le nom de votre groupe sera automatiquement ajouté pour garantir son unicité."
         }),
+        navigateOptions: {
+          to: '/session/start-session'
+        },
         position: 'bottom-left',
         target: 'div[data-field-group="subjectId"]',
         title: t({
           en: 'Identifier',
           fr: 'Identification du client'
-        }),
-        url: '/session/start-session'
+        })
       },
       {
         content: t({
           en: 'You can choose either an in-person session (the default) or a retrospective session to enter data previously collected using a different system.',
           fr: "Vous pouvez choisir une session en personne (par défaut) ou une session rétrospective pour saisir des données précédemment collectées à l'aide d'un autre système."
         }),
+        navigateOptions: {
+          to: '/session/start-session'
+        },
         position: 'top-left',
         target: 'div[data-field-group="sessionType"]',
         title: t({
           en: 'Type of Assessment',
           fr: "Type d'évaluation"
-        }),
-        url: '/session/start-session'
+        })
       },
       {
         content: t({
           en: 'Here, you can see the current session in progress.',
           fr: 'Ici, vous pouvez voir la session en cours.'
         }),
+        navigateOptions: {
+          to: '/session/start-session'
+        },
         onBeforeQuery() {
           startSession(SESSION_DATA);
         },
@@ -227,8 +249,7 @@ const Walkthrough = () => {
         title: t({
           en: 'Session in Progress',
           fr: 'Session en cours'
-        }),
-        url: '/session/start-session'
+        })
       },
       {
         content: t({
@@ -238,80 +259,90 @@ const Walkthrough = () => {
         navigateOptions: {
           state: {
             initialValues: START_SESSION_DATA
-          }
+          },
+          to: '/instruments/accessible-instruments'
         },
         position: 'bottom-left',
         target: 'button[data-nav-url="/instruments/accessible-instruments"]',
         title: t({
           en: 'Administer Instrument',
           fr: 'Administrer un instrument'
-        }),
-        url: '/instruments/accessible-instruments'
+        })
       },
       {
         content: t({
           en: 'On this page, you can view the data for the subject of the current session. To access data for other subjects, use the lookup button on the Data Hub page.',
           fr: "Sur cette page, vous pouvez consulter les données du client pour lequel la session est en cours. Pour accéder aux données d'autres clients, utilisez le bouton de recherche sur la page du centre de données."
         }),
+        navigateOptions: {
+          to: '/datahub/123/table'
+        },
         position: 'bottom-left',
         target: 'button[data-nav-url="/datahub/123/table"]',
         title: t({
           en: 'View Subject',
           fr: 'Voir le client'
-        }),
-        url: '/datahub/123/table'
+        })
       },
       {
         content: t({
           en: 'Here, you can view the records this subject has completed for a given instrument.',
           fr: 'Ici, vous pouvez voir les enregistrements que ce client a complétés pour un instrument donné'
         }),
+        navigateOptions: {
+          to: '/datahub/123/table'
+        },
         position: 'bottom-center',
         target: 'a[data-nav-url="/datahub/123/table"]',
         title: t({
           en: 'Table',
           fr: 'Tableau'
-        }),
-        url: '/datahub/123/table'
+        })
       },
       {
         content: t({
           en: 'Here, you can export the data in the table to CSV or JSON format.',
           fr: 'Ici, vous pouvez exporter les données du tableau au format CSV ou JSON.'
         }),
+        navigateOptions: {
+          to: '/datahub/123/table'
+        },
         position: 'bottom-right',
         target: 'div[data-spotlight-type="export-data-dropdown"]',
         title: t({
           en: 'Data Export',
           fr: 'Exportation de données'
-        }),
-        url: '/datahub/123/table'
+        })
       },
       {
         content: t({
           en: 'Here, you can create custom graphs to visualize longitudinal data for a given subject.',
           fr: "Ici, vous pouvez créer des graphiques personnalisés pour visualiser les données longitudinales d'un client donné."
         }),
+        navigateOptions: {
+          to: '/datahub/123/graph'
+        },
         position: 'bottom-right',
         target: 'a[data-nav-url="/datahub/123/graph"]',
         title: t({
           en: 'Graph',
           fr: 'Graphique'
-        }),
-        url: '/datahub/123/graph'
+        })
       },
       {
         content: t({
           en: 'Here, you can create and view assignments, which are instruments for a subject to complete at home.',
           fr: 'Ici, vous pouvez créer et visualiser des devoirs, qui sont des instruments que le client doit compléter à la maison.'
         }),
+        navigateOptions: {
+          to: '/datahub/123/assignments'
+        },
         position: 'bottom-left',
         target: 'a[data-nav-url="/datahub/123/assignments"]',
         title: t({
           en: 'Assignments',
           fr: 'Devoirs'
-        }),
-        url: '/datahub/123/assignments'
+        })
       }
     ];
   }, [resolvedLanguage]);
@@ -331,8 +362,8 @@ const Walkthrough = () => {
   };
 
   useLayoutEffect(() => {
-    if (window.location.pathname !== currentStep.url) {
-      navigate(currentStep.url, currentStep.navigateOptions);
+    if (window.location.pathname !== currentStep.navigateOptions?.to) {
+      void navigate({ state: currentStep.navigateOptions?.state, to: currentStep.navigateOptions?.to });
     }
     void (async function () {
       await currentStep.onBeforeQuery?.();

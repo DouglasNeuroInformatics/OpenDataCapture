@@ -15,7 +15,7 @@ import {
 
 import { useAppStore } from '@/store';
 
-import { useSetupState } from './useSetupState';
+import { useSetupStateQuery } from './useSetupStateQuery';
 
 export type NavItem = {
   disabled?: boolean;
@@ -36,7 +36,7 @@ export function useNavItems() {
   const currentUser = useAppStore((store) => store.currentUser);
   const [navItems, setNavItems] = useState<NavItem[][]>([[], []]);
   const { resolvedLanguage, t } = useTranslation();
-  const setupState = useSetupState();
+  const setupStateQuery = useSetupStateQuery();
 
   useEffect(() => {
     const ability = currentUser?.ability;
@@ -63,7 +63,7 @@ export function useNavItems() {
     if (
       ability?.can('read', 'Subject') &&
       ability.can('create', 'InstrumentRecord') &&
-      setupState.data?.isExperimentalFeaturesEnabled
+      setupStateQuery.data.isExperimentalFeaturesEnabled
     ) {
       globalItems.push({
         icon: UploadIcon,
@@ -133,7 +133,7 @@ export function useNavItems() {
       });
     }
     setNavItems([globalItems, adminItems, sessionItems].filter((arr) => arr.length));
-  }, [currentSession, currentUser, resolvedLanguage, setupState.data?.isExperimentalFeaturesEnabled]);
+  }, [currentSession, currentUser, resolvedLanguage, setupStateQuery.data.isExperimentalFeaturesEnabled]);
 
   return navItems;
 }

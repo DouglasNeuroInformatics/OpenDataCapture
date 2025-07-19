@@ -28,6 +28,6 @@
     "esbuild-wasm": "catalog:",
     "storybook": "catalog:",
     "type-fest": "workspace:type-fest__4.x@*",
-    "vite": "^6.3.3"
+    "vite": "catalog:"
   }
 }

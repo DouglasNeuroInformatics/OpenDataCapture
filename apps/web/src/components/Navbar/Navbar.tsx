@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { Button, LanguageToggle, Separator, Sheet, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding } from '@opendatacapture/react-core';
+import { useNavigate } from '@tanstack/react-router';
 import { MenuIcon, StopCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useNavItems } from '@/hooks/useNavItems';
@@ -65,7 +65,7 @@ export const Navbar = () => {
                   url={url}
                   onClick={() => {
                     setIsOpen(false);
-                    navigate(url);
+                    void navigate({ to: url });
                   }}
                   {...props}
                 />
