@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { MemoryRouter } from 'react-router-dom';
 
 import { useAppStore } from '@/store';
 import { currentSession, currentUser } from '@/testing/stubs';
@@ -17,11 +16,7 @@ export default { component: Layout } as Meta<typeof Layout>;
 export const Default: Story = {
   decorators: [
     (Story) => {
-      return (
-        <MemoryRouter>
-          <Story />
-        </MemoryRouter>
-      );
+      return <Story />;
     }
   ],
   parameters: {

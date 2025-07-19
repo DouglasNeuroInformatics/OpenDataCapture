@@ -1,5 +1,5 @@
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 import { config } from '@/config';
 

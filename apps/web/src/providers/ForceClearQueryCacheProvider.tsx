@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '@tanstack/react-router';
 
 import { config } from '@/config';
 

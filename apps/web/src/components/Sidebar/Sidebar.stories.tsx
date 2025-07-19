@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { MemoryRouter } from 'react-router-dom';
 
 import { useAppStore } from '@/store';
 import { currentSession, currentUser } from '@/testing/stubs';
@@ -18,11 +17,7 @@ export default { component: Sidebar } as Meta<typeof Sidebar>;
 export const Default: Story = {
   decorators: [
     (Story) => {
-      return (
-        <MemoryRouter>
-          <Story />
-        </MemoryRouter>
-      );
+      return <Story />;
     }
   ],
   parameters: {
