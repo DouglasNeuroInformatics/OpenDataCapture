@@ -1,4 +1,5 @@
 import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
+import { err, ok } from '@douglasneuroinformatics/libjs/vendor/neverthrow';
 import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
@@ -14,8 +15,8 @@ import type {
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
 import { Prisma } from '@prisma/client';
-import type { Session } from '@prisma/client';
-import { isNumber, mergeWith, pickBy } from 'lodash-es';
+import type { $Enums, Session } from '@prisma/client';
+import { isNumber,mergeWith, pickBy } from 'lodash-es';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -25,6 +26,17 @@ import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
+
+type RecordObject = {
+  groupId: string;
+  sessionDate: string;
+  sessionId: string;
+  sessionType: $Enums.SessionType;
+  subjectAge: null | number;
+  subjectId: string;
+  subjectSex: $Enums.Sex | null;
+  timestamp: string;
+};
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -155,24 +167,59 @@ export class InstrumentRecordsService {
       }
 
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-        data.push({
-          instrumentEdition: instrument.internal.edition,
-          instrumentName: instrument.internal.name,
-          measure: measureKey,
-          sessionDate: record.session.date.toISOString(),
-          sessionId: record.session.id,
-          sessionType: record.session.type,
-          subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-          // eslint-disable-next-line perfectionist/sort-objects
-          groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-          subjectId: record.subject.id,
-          subjectSex: record.subject.sex,
-          timestamp: record.date.toISOString(),
-          value: measureValue
-        });
+        let list;
+        try {
+          if (typeof measureValue === 'string') list = [JSON.parse(measureValue)];
+        } catch (err) {
+          data.push({
+            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+            instrumentEdition: instrument.internal.edition,
+            instrumentName: instrument.internal.name,
+            measure: measureKey,
+            sessionDate: record.session.date.toISOString(),
+            sessionId: record.session.id,
+            sessionType: record.session.type,
+            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+            subjectId: record.subject.id,
+            subjectSex: record.subject.sex,
+            timestamp: record.date.toISOString(),
+            value: measureValue
+          });
+          console.error(err);
+          continue;
+        }
+        if (list && list[0] !== undefined) {
+          const objectRecord: RecordObject = {
+            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+            sessionDate: record.session.date.toISOString(),
+            sessionId: record.session.id,
+            sessionType: record.session.type,
+            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+            subjectId: record.subject.id,
+            subjectSex: record.subject.sex,
+            timestamp: record.date.toISOString()
+          };
+
+          const expandDataResult = this.expandData(data, list[0], instrument, objectRecord);
+          if (expandDataResult.isErr()) {
+            data.push({
+              groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+              instrumentEdition: instrument.internal.edition,
+              instrumentName: instrument.internal.name,
+              measure: measureKey,
+              sessionDate: record.session.date.toISOString(),
+              sessionId: record.session.id,
+              sessionType: record.session.type,
+              subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+              subjectId: record.subject.id,
+              subjectSex: record.subject.sex,
+              timestamp: record.date.toISOString(),
+              value: measureValue
+            });
+          }
+        }
       }
     }
-
     return data;
   }
 
@@ -378,6 +425,36 @@ export class InstrumentRecordsService {
     }
   }
 
+  private expandData(
+    data: InstrumentRecordsExport,
+    listEntry: any,
+    instrument: ScalarInstrument,
+    record: RecordObject
+  ) {
+    if (Array.isArray(listEntry) && listEntry.length > 0) {
+      for (const objectEntry of listEntry) {
+        for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
+          data.push({
+            groupId: record.groupId ?? DEFAULT_GROUP_NAME,
+            instrumentEdition: instrument.internal.edition,
+            instrumentName: instrument.internal.name,
+            measure: dataKey,
+            sessionDate: record.sessionDate,
+            sessionId: record.sessionId,
+            sessionType: record.sessionType,
+            subjectAge: record.subjectAge,
+            subjectId: record.subjectId,
+            subjectSex: record.subjectSex,
+            timestamp: record.timestamp,
+            value: typeof dataValue === 'string' ? dataValue : JSON.stringify(dataValue)
+          });
+        }
+      }
+      return ok('Success');
+    } else {
+      return err('Not an Array');
+    }
+  }
   private getInstrumentById(instrumentId: string) {
     return this.instrumentsService
       .findById(instrumentId)
