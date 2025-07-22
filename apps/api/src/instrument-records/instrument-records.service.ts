@@ -42,7 +42,7 @@ export class InstrumentRecordsService {
     private readonly instrumentsService: InstrumentsService,
     private readonly sessionsService: SessionsService,
     @Inject(forwardRef(() => SubjectsService))
-    private readonly subjectsService: SubjectsService
+    private readonly subjectsService: InstanceType<typeof SubjectsService>
   ) {}
 
   async count(

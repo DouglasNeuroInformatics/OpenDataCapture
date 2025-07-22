@@ -4,7 +4,6 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import type { Prisma } from '@prisma/client';
 
 import type { EntityOperationOptions } from '@/core/types';
-import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
 
