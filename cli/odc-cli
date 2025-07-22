@@ -388,11 +388,8 @@ class SubjectCommands:
     @require_token
     @staticmethod
     def delete(id: str) -> None:
-        instrumentUrl = f'{config.base_url}/v1/instrument-records/bySubject/{id}'
-        print(instrumentUrl)
         url = f'{config.base_url}/v1/subjects/{id}'
-        response = HttpClient.delete(instrumentUrl)
-        # response = HttpClient.delete(url)
+        response = HttpClient.delete(url)
         print(response)
 
     @require_url
