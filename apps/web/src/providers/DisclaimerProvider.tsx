@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AlertDialog } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
 import { useAppStore } from '@/store';
@@ -14,30 +14,32 @@ export const DisclaimerProvider: React.FC<{ children: React.ReactElement }> = ({
   return (
     <React.Fragment>
       {children}
-      <AlertDialog open={!isDisclaimerAccepted}>
-        <AlertDialog.Content onOpenAutoFocus={(event) => event.preventDefault()}>
-          <AlertDialog.Header>
-            <AlertDialog.Title>
+      <Dialog open={!isDisclaimerAccepted}>
+        <Dialog.Content onOpenAutoFocus={(event) => event.preventDefault()}>
+          <Dialog.Header>
+            <Dialog.Title>
               {t({
                 en: 'Disclaimer',
                 fr: 'Avis'
               })}
-            </AlertDialog.Title>
-            <AlertDialog.Description>
+            </Dialog.Title>
+            <Dialog.Description>
               {t({
                 en: 'This platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.',
                 fr: "Cette plateforme n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques."
               })}
-            </AlertDialog.Description>
-          </AlertDialog.Header>
-          <AlertDialog.Footer>
-            <AlertDialog.Action onClick={() => setIsDisclaimerAccepted(true)}>
+            </Dialog.Description>
+          </Dialog.Header>
+          <Dialog.Footer>
+            <Button type="button" onClick={() => setIsDisclaimerAccepted(true)}>
               {t({ en: 'Accept', fr: 'Accepter' })}
-            </AlertDialog.Action>
-            <AlertDialog.Cancel onClick={logout}>{t({ en: 'Decline', fr: 'Refuser' })}</AlertDialog.Cancel>
-          </AlertDialog.Footer>
-        </AlertDialog.Content>
-      </AlertDialog>
+            </Button>
+            <Button type="button" variant="outline" onClick={logout}>
+              {t({ en: 'Decline', fr: 'Refuser' })}
+            </Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
     </React.Fragment>
   );
 };
