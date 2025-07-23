@@ -2,7 +2,14 @@ import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
 import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
-import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  // forwardRef,
+  // Inject,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type {
@@ -34,7 +41,8 @@ export class InstrumentRecordsService {
     private readonly instrumentMeasuresService: InstrumentMeasuresService,
     private readonly instrumentsService: InstrumentsService,
     private readonly sessionsService: SessionsService,
-    private readonly subjectsService: SubjectsService
+    // @Inject(forwardRef(() => SubjectsService))
+    private readonly subjectsService: InstanceType<typeof SubjectsService>
   ) {}
 
   async count(
@@ -111,6 +119,12 @@ export class InstrumentRecordsService {
     }
     return this.instrumentRecordModel.delete({
       where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], id }
+    });
+  }
+
+  async deleteBySubjectId(id: string, { ability }: EntityOperationOptions = {}) {
+    return this.instrumentRecordModel.deleteMany({
+      where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], subjectId: id }
     });
   }
 

@@ -4,12 +4,16 @@ import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/commo
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
+import { SubjectsDataService } from './subjects-data.service';
 import { SubjectsService } from './subjects.service';
 
 @ApiTags('Subjects')
 @Controller('subjects')
 export class SubjectsController {
-  constructor(private readonly subjectsService: SubjectsService) {}
+  constructor(
+    private readonly subjectsService: SubjectsService,
+    private readonly subjectsDataService: SubjectsDataService
+  ) {}
 
   @ApiOperation({ summary: 'Create Subject' })
   @Post()
@@ -22,7 +26,7 @@ export class SubjectsController {
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Subject' })
   deleteById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
-    return this.subjectsService.deleteById(id, { ability });
+    return this.subjectsDataService.deleteById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Get All Subjects' })
