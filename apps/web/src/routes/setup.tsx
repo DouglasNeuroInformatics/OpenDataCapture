@@ -5,7 +5,7 @@ import { Card, Form, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroi
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { LoadingPage, Logo } from '@opendatacapture/react-core';
 import { createFileRoute, Navigate, redirect, useRouter } from '@tanstack/react-router';
-import z from 'zod/v4';
+import { z } from 'zod/v4';
 
 import { useCreateSetupStateMutation } from '@/hooks/useCreateSetupStateMutation';
 import { setupStateQueryOptions } from '@/hooks/useSetupStateQuery';
