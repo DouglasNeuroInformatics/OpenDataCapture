@@ -1,57 +1,58 @@
-name: Bug
-description: Report a bug
-labels: ["Bug"]
+name: Bug Report
+description: Report a bug or issue
+labels: ['Bug']
 body:
-- type: textarea
-  attributes:
-    label: Current Behavior
-    description: A concise description of what you're experiencing.
-    placeholder: |
-      Example: If there are errors in a form and the user changes the language, the error messages are not translated into the new language.
-  validations:
-    required: true
-- type: textarea
-  attributes:
-    label: Expected Behavior
-    description: A concise description of what you expected to happen.
-    placeholder: |
-      Example: If a user changes languages, any error messages in the form should be translated into the new language.
-  validations:
-    required: true
-- type: dropdown
-  id: browsers
-  attributes:
-    label: Browser
-    description: What browsers are you seeing the problem on?
-    multiple: true
-    options:
-      - Firefox
-      - Chrome
-      - Safari
-      - Edge
-- type: textarea
-  attributes:
-    label: Steps To Reproduce
-    description: Steps to reproduce the behavior.
-    placeholder: |
-      Example:
-      1. Open a form with required fields
-      2. Attempt to submit the empty form
-      3. Change the language
-  validations:
-    required: false
-- type: textarea
-  attributes:
-    label: Additional Details
-  validations:
-    required: false
-- type: dropdown
-  id: priority
-  attributes:
-    label: Priority
-    options:
-      - High
-      - Medium
-      - Low
-  validations:
-    required: true
+  - type: textarea
+    attributes:
+      label: What Happened?
+      description: Describe the issue you encountered.
+      placeholder: |
+        Example: Error messages in a form don't update when switching languages.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What Did You Expect?
+      description: Describe what you expected to happen instead.
+      placeholder: |
+        Example: Error messages should reflect the newly selected language.
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: OS and version where the issue occurred (e.g., Windows 11, macOS 14, Ubuntu 22.04).
+      placeholder: Windows 11, macOS 14.1, Ubuntu 22.04, iOS 17, Android 14
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: Browser (if applicable)
+      description: Only if this is a browser-related issue.
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce the issue?
+      placeholder: |
+        Example:
+        1. Open form
+        2. Submit with errors
+        3. Change language
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Anything Else?
+      description: Add logs, screenshots, or other context.
+    validations:
+      required: false
