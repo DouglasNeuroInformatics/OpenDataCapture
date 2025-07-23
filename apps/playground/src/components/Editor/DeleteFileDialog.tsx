@@ -1,4 +1,4 @@
-import { AlertDialog, Button } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 
 import { useAppStore } from '@/store';
 
@@ -11,13 +11,13 @@ export type DeleteFileDialogProps = {
 export const DeleteFileDialog = ({ filename, isOpen, setIsOpen }: DeleteFileDialogProps) => {
   const deleteFile = useAppStore((store) => store.deleteFile);
   return filename ? (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialog.Content>
-        <AlertDialog.Header>
-          <AlertDialog.Title>{`Are you sure you want to delete "${filename}"?`}</AlertDialog.Title>
-          <AlertDialog.Description>Once deleted, this file cannot be restored</AlertDialog.Description>
-        </AlertDialog.Header>
-        <AlertDialog.Footer>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>{`Are you sure you want to delete "${filename}"?`}</Dialog.Title>
+          <Dialog.Description>Once deleted, this file cannot be restored</Dialog.Description>
+        </Dialog.Header>
+        <Dialog.Footer>
           <Button
             variant="danger"
             onClick={() => {
@@ -27,9 +27,11 @@ export const DeleteFileDialog = ({ filename, isOpen, setIsOpen }: DeleteFileDial
           >
             Delete
           </Button>
-          <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-        </AlertDialog.Footer>
-      </AlertDialog.Content>
-    </AlertDialog>
+          <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog>
   ) : null;
 };
