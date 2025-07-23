@@ -1,4 +1,4 @@
-import { AlertDialog, Button } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 
 import { useAppStore } from '@/store';
@@ -14,13 +14,13 @@ export const DeleteInstrumentDialog = ({ isOpen, setIsOpen }: DeleteInstrumentDi
   const selectedInstrument = useAppStore((store) => store.selectedInstrument);
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialog.Content>
-        <AlertDialog.Header>
-          <AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
-          <AlertDialog.Description>This instrument will be deleted from local storage.</AlertDialog.Description>
-        </AlertDialog.Header>
-        <AlertDialog.Footer>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>Are you absolutely sure?</Dialog.Title>
+          <Dialog.Description>This instrument will be deleted from local storage.</Dialog.Description>
+        </Dialog.Header>
+        <Dialog.Footer>
           <Button
             variant="danger"
             onClick={() => {
@@ -31,9 +31,11 @@ export const DeleteInstrumentDialog = ({ isOpen, setIsOpen }: DeleteInstrumentDi
           >
             Delete
           </Button>
-          <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-        </AlertDialog.Footer>
-      </AlertDialog.Content>
-    </AlertDialog>
+          <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog>
   );
 };

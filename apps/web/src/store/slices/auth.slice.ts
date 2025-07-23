@@ -5,7 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 
 import type { AuthSlice, SliceCreator } from '../types';
 
-export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
+export const createAuthSlice: SliceCreator<AuthSlice> = (set) => ({
   accessToken: null,
   changeGroup: (group) => {
     set({ currentGroup: group, currentSession: null });
@@ -22,12 +22,6 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
     });
   },
   logout: () => {
-    get().endSession();
-    set((state) => {
-      state.accessToken = null;
-      state.currentGroup = null;
-      state.currentUser = null;
-      state.isDisclaimerAccepted = false;
-    });
+    window.location.reload();
   }
 });

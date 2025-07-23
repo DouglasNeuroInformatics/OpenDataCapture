@@ -1,4 +1,4 @@
-import { AlertDialog, Button } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 
 import { useAppStore } from '@/store';
@@ -14,16 +14,16 @@ export const RestoreDefaultsDialog = ({ isOpen, setIsOpen }: RestoreDefaultsDial
   const resetSettings = useAppStore((store) => store.resetSettings);
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialog.Content>
-        <AlertDialog.Header>
-          <AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
-          <AlertDialog.Description>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>Are you absolutely sure?</Dialog.Title>
+          <Dialog.Description>
             This action will <span className="font-bold uppercase">delete all user-defined instruments</span> in local
             storage and restore the default configuration.
-          </AlertDialog.Description>
-        </AlertDialog.Header>
-        <AlertDialog.Footer>
+          </Dialog.Description>
+        </Dialog.Header>
+        <Dialog.Footer>
           <Button
             variant="danger"
             onClick={() => {
@@ -35,9 +35,11 @@ export const RestoreDefaultsDialog = ({ isOpen, setIsOpen }: RestoreDefaultsDial
           >
             Reset
           </Button>
-          <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-        </AlertDialog.Footer>
-      </AlertDialog.Content>
-    </AlertDialog>
+          <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog>
   );
 };
