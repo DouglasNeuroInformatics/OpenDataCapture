@@ -22,7 +22,7 @@ from argparse import (
 from datetime import datetime
 from typing import Any, Callable, TypedDict
 from urllib.error import HTTPError, URLError
-from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse, quote
 from urllib.request import Request, urlopen
 from urllib.response import addinfourl
 
@@ -41,6 +41,7 @@ Features:
     - Store and retrieve configuration (e.g., base URL)
     - Retrieve a list of instruments in the database
     - Update and delete instrument records
+    - Find and delete subjects
     - Get the current status of an ODC instance
 
 Requires:
@@ -382,6 +383,39 @@ class InstrumentRecordsCommands:
         print(response)
 
 
+class SubjectCommands:
+    @require_url
+    @require_token
+    @staticmethod
+    def delete(id: str) -> None:
+        entry = input("Are you sure you want to delete this subject? Type DELETE to Confirm: ")
+        if entry == "DELETE":
+            url =build_url_with_params(
+                f'{config.base_url}/v1/subjects/{quote(id, safe="")}',
+                {
+                    'force': True
+                }
+            )
+            response = HttpClient.delete(url)
+            print(response)
+        else:
+            print("Cancelling delete command")
+
+    @require_url
+    @require_token
+    @staticmethod
+    def find(min_date: datetime | None, subject_id: str | None) -> None:
+        url = build_url_with_params(
+            f'{config.base_url}/v1/subjects',
+            {
+                'minDate': min_date,
+                'subjectId': subject_id,
+            },
+        )
+        response = HttpClient.get(url)
+        print(response)
+
+
 class InstrumentsCommands:
     @require_url
     @require_token
@@ -453,6 +487,7 @@ class CLI:
         self._create_config_parser()
         self._create_instrument_records_parser()
         self._create_instruments_parser()
+        self._create_subjects_parser()
         self._create_setup_parser()
 
     def run(self) -> None:
@@ -516,6 +551,22 @@ class CLI:
             help='partial json object with fields to update',
         )
         update_parser.set_defaults(fn=InstrumentRecordsCommands.update)
+
+    def _create_subjects_parser(self):
+        subparsers = self._create_subcommand_subparsers('subjects')
+
+        delete_parser = subparsers.add_parser('delete', help='delete an subject record by id')
+        delete_parser.add_argument('--id', required=True, help='id of the subject record to delete')
+        delete_parser.set_defaults(fn=SubjectCommands.delete)
+
+        find_parser = subparsers.add_parser('find', help='search subject records by optional filters')
+        find_parser.add_argument(
+            '--min-date',
+            type=ArgumentTypes.valid_datetime,
+            help='filter records created after this date (format: yyyy-mm-dd or yyyy-mm-dd hh:mm:ss)',
+        )
+        find_parser.add_argument('--subject-id', help='filter by subject id')
+        find_parser.set_defaults(fn=SubjectCommands.find)
 
     def _create_instruments_parser(self):
         subparsers = self._create_subcommand_subparsers('instruments')
