@@ -34,7 +34,7 @@ export class InstrumentRecordsService {
     private readonly instrumentMeasuresService: InstrumentMeasuresService,
     private readonly instrumentsService: InstrumentsService,
     private readonly sessionsService: SessionsService,
-    private readonly subjectsService: InstanceType<typeof SubjectsService>
+    private readonly subjectsService: SubjectsService
   ) {}
 
   async count(
