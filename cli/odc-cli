@@ -389,9 +389,9 @@ class SubjectCommands:
     @staticmethod
     def delete(id: str) -> None:
         entry = input("Are you sure you want to delete this subject? Type DELETE to Confirm: ")
-        if(entry == "DELETE"):
+        if entry == "DELETE":
             url =build_url_with_params(
-                f'{config.base_url}' + quote(f'/v1/subjects/{id}', safe='/'),
+                f'{config.base_url}/v1/subjects/{quote(id, safe="")}',
                 {
                     'force': True
                 }
