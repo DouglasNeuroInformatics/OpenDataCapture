@@ -3,6 +3,7 @@ import { CurrentUser, ParseSchemaPipe, RouteAccess } from '@douglasneuroinformat
 import type { AppAbility } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import z from 'zod/v4';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { SubjectsService } from './subjects.service';
@@ -23,7 +24,8 @@ export class SubjectsController {
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Subject' })
   deleteById(
-    @Param('id') id: string,
+    @Param('id', new ParseSchemaPipe({ schema: z.string().transform((value) => decodeURIComponent(value)) }))
+    id: string,
     @Query('force', new ParseSchemaPipe({ isOptional: true, schema: $BooleanLike })) force: boolean | undefined,
     @CurrentUser('ability') ability: AppAbility
   ) {
