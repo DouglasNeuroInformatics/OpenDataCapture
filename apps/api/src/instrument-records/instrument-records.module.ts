@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 import { GroupsModule } from '@/groups/groups.module';
 import { InstrumentsModule } from '@/instruments/instruments.module';
@@ -12,7 +12,7 @@ import { InstrumentRecordsService } from './instrument-records.service';
 @Module({
   controllers: [InstrumentRecordsController],
   exports: [InstrumentRecordsService],
-  imports: [GroupsModule, InstrumentsModule, SessionsModule, forwardRef(() => SubjectsModule)],
+  imports: [GroupsModule, InstrumentsModule, SessionsModule, SubjectsModule],
   providers: [InstrumentMeasuresService, InstrumentRecordsService]
 })
 export class InstrumentRecordsModule {}
