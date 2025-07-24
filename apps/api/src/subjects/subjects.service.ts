@@ -1,5 +1,5 @@
-import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import { accessibleQuery, InjectModel, InjectPrismaClient } from '@douglasneuroinformatics/libnest';
+import type { ExtendedPrismaClient, Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 
@@ -9,7 +9,10 @@ import { CreateSubjectDto } from './dto/create-subject.dto';
 
 @Injectable()
 export class SubjectsService {
-  constructor(@InjectModel('Subject') private readonly subjectModel: Model<'Subject'>) {}
+  constructor(
+    @InjectPrismaClient() private readonly prismaClient: ExtendedPrismaClient,
+    @InjectModel('Subject') private readonly subjectModel: Model<'Subject'>
+  ) {}
 
   async addGroupForSubject(subjectId: string, groupId: string, { ability }: EntityOperationOptions = {}) {
     return this.subjectModel.update({
@@ -82,11 +85,36 @@ export class SubjectsService {
     });
   }
 
-  async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
+  async deleteById(id: string, { ability, force }: EntityOperationOptions & { force?: boolean } = {}) {
     const subject = await this.findById(id);
-    return this.subjectModel.delete({
-      where: { AND: [accessibleQuery(ability, 'delete', 'Subject')], id: subject.id }
-    });
+    if (!force) {
+      await this.subjectModel.delete({
+        where: { AND: [accessibleQuery(ability, 'delete', 'Subject')], id: subject.id }
+      });
+      return { success: true };
+    }
+    await this.prismaClient.$transaction([
+      this.prismaClient.session.deleteMany({
+        where: {
+          subject: {
+            id: subject.id
+          }
+        }
+      }),
+      this.prismaClient.instrumentRecord.deleteMany({
+        where: {
+          subject: {
+            id: subject.id
+          }
+        }
+      }),
+      this.prismaClient.subject.deleteMany({
+        where: {
+          id: subject.id
+        }
+      })
+    ]);
+    return { success: true };
   }
 
   async find({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {

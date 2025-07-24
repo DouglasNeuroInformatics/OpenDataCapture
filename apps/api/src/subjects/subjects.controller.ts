@@ -1,4 +1,5 @@
-import { CurrentUser, RouteAccess } from '@douglasneuroinformatics/libnest';
+import { $BooleanLike } from '@douglasneuroinformatics/libjs';
+import { CurrentUser, ParseSchemaPipe, RouteAccess } from '@douglasneuroinformatics/libnest';
 import type { AppAbility } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -21,8 +22,12 @@ export class SubjectsController {
   @ApiOperation({ summary: 'Delete Subject' })
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Subject' })
-  deleteById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
-    return this.subjectsService.deleteById(id, { ability });
+  deleteById(
+    @Param('id') id: string,
+    @Query('force', new ParseSchemaPipe({ isOptional: true, schema: $BooleanLike })) force: boolean | undefined,
+    @CurrentUser('ability') ability: AppAbility
+  ) {
+    return this.subjectsService.deleteById(id, { ability, force });
   }
 
   @ApiOperation({ summary: 'Get All Subjects' })
