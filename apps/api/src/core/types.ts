@@ -5,4 +5,5 @@ export type EntityOperationOptions = {
 };
 
 //This indentity type is used as a quick fix to resolve the swc compiling issue with fowardRef nestjs services
+// https://docs.nestjs.com/recipes/swc#common-pitfalls
 export type Identity<T> = T;
