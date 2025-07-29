@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libui": "catalog:",
+    "@opendatacapture/licenses": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "clsx": "^2.1.1",
     "lodash-es": "workspace:lodash-es__4.x@*",

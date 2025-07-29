@@ -403,6 +403,9 @@ importers:
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 4.5.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@19.1.0))(zod@3.25.76)
+      '@opendatacapture/licenses':
+        specifier: workspace:*
+        version: link:../../packages/licenses
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
