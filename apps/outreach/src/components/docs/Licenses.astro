@@ -16,13 +16,18 @@ const approvedLicenseIds: ApprovedLicense[] = [
   'WTFPL'
 ];
 
-const approvedLicenses = Array.from(licenses.entries())
+const openApprovedLicenses = Array.from(licenses.entries())
   .filter(([id]) => approvedLicenseIds.includes(id as any))
   .map(([id, license]) => ({ id, ...license }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
-const openSourceNonApprovedLicenses = Array.from(licenses.entries())
-  .filter(([id, license]) => !approvedLicenseIds.includes(id as any) && license.isOpenSource)
+const openNonApprovedLicenses = Array.from(licenses.entries())
+  .filter(([id, license]) => !approvedLicenseIds.includes(id as any) && license.isOpenSource && license.isCopyleft)
+  .map(([id, license]) => ({ id, ...license }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+const openUnreviewedLicenses = Array.from(licenses.entries())
+  .filter(([id, license]) => !approvedLicenseIds.includes(id as any) && license.isOpenSource && !license.isCopyleft)
   .map(([id, license]) => ({ id, ...license }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -34,13 +39,14 @@ const proprietaryLicenses = Array.from(licenses.entries())
 
 <div class="space-y-8">
   <section>
-    <h3>Licenses Approved for Inclusion in ODC Repository</h3>
+    <h3>Open Source Licenses (Approved)</h3>
     <p class="mb-4 text-slate-700">
-      The following licenses are pre-approved for direct inclusion and public distribution:
+      The following licenses are pre-approved for direct inclusion in the Open Data Capture repository and public
+      distribution:
     </p>
     <ul class="tracking-tight">
       {
-        approvedLicenses.map((license) => (
+        openApprovedLicenses.map((license) => (
           <li>
             <a
               class="font-bold hover:underline"
@@ -58,13 +64,37 @@ const proprietaryLicenses = Array.from(licenses.entries())
     <p class="text-slate-700">Please note that instruments in the public domain instruments are also permitted.</p>
   </section>
   <section>
-    <h3>Open Source Licenses (Review Required)</h3>
+    <h3>Open Source Licenses (Non-Approved)</h3>
     <p class="mb-4 text-slate-700">
-      These open source licenses are acceptable for public distribution but require team review before inclusion:
+      These open source licenses are acceptable for public distribution, but due to various clauses are not able to be
+      included directly in the Open Data Capture repository.
     </p>
     <ul class="tracking-tight">
       {
-        openSourceNonApprovedLicenses.map((license) => (
+        openNonApprovedLicenses.map((license) => (
+          <li>
+            <a
+              class="font-bold hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+              href={license.reference}
+              style="text-decoration-line: none;"
+            >
+              {license.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+  <section>
+    <h3>Open Source Licenses (Review Required)</h3>
+    <p class="mb-4 text-slate-700">
+      The following licenses are considered open source, but have not been reviewed by our team.
+    </p>
+    <ul class="tracking-tight">
+      {
+        openUnreviewedLicenses.map((license) => (
           <li>
             <a
               class="font-bold hover:underline"
@@ -83,8 +113,8 @@ const proprietaryLicenses = Array.from(licenses.entries())
   <section>
     <h3>Proprietary and Non-Free Licenses</h3>
     <p class="mb-4 text-slate-700">
-      These licenses may not be published publicly by our team. Licenses with commercial use restrictions are considered
-      non-free, consistent with FSF and OSI definitions:
+      These licenses may not be published publicly by our team. This list includes non-free licenses, as well as any
+      licenses with restrictions on commercial use.
     </p>
     <ul class="tracking-tight">
       {

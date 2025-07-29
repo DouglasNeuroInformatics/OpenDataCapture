@@ -108,6 +108,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/Afmparse.html'
   },
   'AGPL-1.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Affero General Public License v1.0',
     reference: 'https://spdx.org/licenses/AGPL-1.0.html'
@@ -123,16 +124,19 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/AGPL-1.0-or-later.html'
   },
   'AGPL-3.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Affero General Public License v3.0',
     reference: 'https://spdx.org/licenses/AGPL-3.0.html'
   },
   'AGPL-3.0-only': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Affero General Public License v3.0 only',
     reference: 'https://spdx.org/licenses/AGPL-3.0-only.html'
   },
   'AGPL-3.0-or-later': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Affero General Public License v3.0 or later',
     reference: 'https://spdx.org/licenses/AGPL-3.0-or-later.html'
@@ -533,6 +537,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/Caldera-no-preamble.html'
   },
   'CATOSL-1.1': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Computer Associates Trusted Open Source License 1.1',
     reference: 'https://spdx.org/licenses/CATOSL-1.1.html'
@@ -793,6 +798,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/CC-BY-SA-3.0-IGO.html'
   },
   'CC-BY-SA-4.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Creative Commons Attribution Share Alike 4.0 International',
     reference: 'https://spdx.org/licenses/CC-BY-SA-4.0.html'
@@ -803,6 +809,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/CC-PDDC.html'
   },
   'CDDL-1.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Common Development and Distribution License 1.0',
     reference: 'https://spdx.org/licenses/CDDL-1.0.html'
@@ -843,11 +850,13 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/CECILL-1.1.html'
   },
   'CECILL-2.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'CeCILL Free Software License Agreement v2.0',
     reference: 'https://spdx.org/licenses/CECILL-2.0.html'
   },
   'CECILL-2.1': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'CeCILL Free Software License Agreement v2.1',
     reference: 'https://spdx.org/licenses/CECILL-2.1.html'
@@ -878,11 +887,13 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/CERN-OHL-P-2.0.html'
   },
   'CERN-OHL-S-2.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'CERN Open Hardware Licence Version 2 - Strongly Reciprocal',
     reference: 'https://spdx.org/licenses/CERN-OHL-S-2.0.html'
   },
   'CERN-OHL-W-2.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'CERN Open Hardware Licence Version 2 - Weakly Reciprocal',
     reference: 'https://spdx.org/licenses/CERN-OHL-W-2.0.html'
@@ -968,6 +979,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/CPAL-1.0.html'
   },
   'CPL-1.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Common Public License 1.0',
     reference: 'https://spdx.org/licenses/CPL-1.0.html'
@@ -1113,11 +1125,13 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/EPICS.html'
   },
   'EPL-1.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Eclipse Public License 1.0',
     reference: 'https://spdx.org/licenses/EPL-1.0.html'
   },
   'EPL-2.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Eclipse Public License 2.0',
     reference: 'https://spdx.org/licenses/EPL-2.0.html'
@@ -1143,11 +1157,13 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/EUPL-1.0.html'
   },
   'EUPL-1.1': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'European Union Public License 1.1',
     reference: 'https://spdx.org/licenses/EUPL-1.1.html'
   },
   'EUPL-1.2': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'European Union Public License 1.2',
     reference: 'https://spdx.org/licenses/EUPL-1.2.html'
@@ -1398,21 +1414,25 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/GPL-1.0-or-later.html'
   },
   'GPL-2.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU General Public License v2.0 only',
     reference: 'https://spdx.org/licenses/GPL-2.0.html'
   },
   'GPL-2.0+': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU General Public License v2.0 or later',
     reference: 'https://spdx.org/licenses/GPL-2.0+.html'
   },
   'GPL-2.0-only': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU General Public License v2.0 only',
     reference: 'https://spdx.org/licenses/GPL-2.0-only.html'
   },
   'GPL-2.0-or-later': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU General Public License v2.0 or later',
     reference: 'https://spdx.org/licenses/GPL-2.0-or-later.html'
@@ -1443,21 +1463,25 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/GPL-2.0-with-GCC-exception.html'
   },
   'GPL-3.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU General Public License v3.0 only',
     reference: 'https://spdx.org/licenses/GPL-3.0.html'
   },
   'GPL-3.0+': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU General Public License v3.0 or later',
     reference: 'https://spdx.org/licenses/GPL-3.0+.html'
   },
   'GPL-3.0-only': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU General Public License v3.0 only',
     reference: 'https://spdx.org/licenses/GPL-3.0-only.html'
   },
   'GPL-3.0-or-later': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU General Public License v3.0 or later',
     reference: 'https://spdx.org/licenses/GPL-3.0-or-later.html'
@@ -1468,6 +1492,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/GPL-3.0-with-autoconf-exception.html'
   },
   'GPL-3.0-with-GCC-exception': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU General Public License v3.0 w/GCC Runtime Library exception',
     reference: 'https://spdx.org/licenses/GPL-3.0-with-GCC-exception.html'
@@ -1738,61 +1763,73 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/Leptonica.html'
   },
   'LGPL-2.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Library General Public License v2 only',
     reference: 'https://spdx.org/licenses/LGPL-2.0.html'
   },
   'LGPL-2.0+': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Library General Public License v2 or later',
     reference: 'https://spdx.org/licenses/LGPL-2.0+.html'
   },
   'LGPL-2.0-only': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Library General Public License v2 only',
     reference: 'https://spdx.org/licenses/LGPL-2.0-only.html'
   },
   'LGPL-2.0-or-later': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Library General Public License v2 or later',
     reference: 'https://spdx.org/licenses/LGPL-2.0-or-later.html'
   },
   'LGPL-2.1': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Lesser General Public License v2.1 only',
     reference: 'https://spdx.org/licenses/LGPL-2.1.html'
   },
   'LGPL-2.1+': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Lesser General Public License v2.1 or later',
     reference: 'https://spdx.org/licenses/LGPL-2.1+.html'
   },
   'LGPL-2.1-only': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Lesser General Public License v2.1 only',
     reference: 'https://spdx.org/licenses/LGPL-2.1-only.html'
   },
   'LGPL-2.1-or-later': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Lesser General Public License v2.1 or later',
     reference: 'https://spdx.org/licenses/LGPL-2.1-or-later.html'
   },
   'LGPL-3.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Lesser General Public License v3.0 only',
     reference: 'https://spdx.org/licenses/LGPL-3.0.html'
   },
   'LGPL-3.0+': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Lesser General Public License v3.0 or later',
     reference: 'https://spdx.org/licenses/LGPL-3.0+.html'
   },
   'LGPL-3.0-only': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Lesser General Public License v3.0 only',
     reference: 'https://spdx.org/licenses/LGPL-3.0-only.html'
   },
   'LGPL-3.0-or-later': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'GNU Lesser General Public License v3.0 or later',
     reference: 'https://spdx.org/licenses/LGPL-3.0-or-later.html'
@@ -1833,11 +1870,13 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/LiLiQ-P-1.1.html'
   },
   'LiLiQ-R-1.1': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Licence Libre du Québec – Réciprocité version 1.1',
     reference: 'https://spdx.org/licenses/LiLiQ-R-1.1.html'
   },
   'LiLiQ-Rplus-1.1': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Licence Libre du Québec – Réciprocité forte version 1.1',
     reference: 'https://spdx.org/licenses/LiLiQ-Rplus-1.1.html'
@@ -2058,21 +2097,25 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/mpich2.html'
   },
   'MPL-1.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Mozilla Public License 1.0',
     reference: 'https://spdx.org/licenses/MPL-1.0.html'
   },
   'MPL-1.1': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Mozilla Public License 1.1',
     reference: 'https://spdx.org/licenses/MPL-1.1.html'
   },
   'MPL-2.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Mozilla Public License 2.0',
     reference: 'https://spdx.org/licenses/MPL-2.0.html'
   },
   'MPL-2.0-no-copyleft-exception': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Mozilla Public License 2.0 (no copyleft exception)',
     reference: 'https://spdx.org/licenses/MPL-2.0-no-copyleft-exception.html'
@@ -2093,6 +2136,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/MS-PL.html'
   },
   'MS-RL': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Microsoft Reciprocal License',
     reference: 'https://spdx.org/licenses/MS-RL.html'
@@ -2168,6 +2212,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/Newsletr.html'
   },
   NGPL: {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Nethack General Public License',
     reference: 'https://spdx.org/licenses/NGPL.html'
@@ -2213,6 +2258,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/Nokia.html'
   },
   NOSL: {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Netizen Open Source License',
     reference: 'https://spdx.org/licenses/NOSL.html'
@@ -2233,6 +2279,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/NPL-1.1.html'
   },
   'NPOSL-3.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Non-Profit Open Software License 3.0',
     reference: 'https://spdx.org/licenses/NPOSL-3.0.html'
@@ -2473,26 +2520,31 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/OSET-PL-2.1.html'
   },
   'OSL-1.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Open Software License 1.0',
     reference: 'https://spdx.org/licenses/OSL-1.0.html'
   },
   'OSL-1.1': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Open Software License 1.1',
     reference: 'https://spdx.org/licenses/OSL-1.1.html'
   },
   'OSL-2.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Open Software License 2.0',
     reference: 'https://spdx.org/licenses/OSL-2.0.html'
   },
   'OSL-2.1': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Open Software License 2.1',
     reference: 'https://spdx.org/licenses/OSL-2.1.html'
   },
   'OSL-3.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Open Software License 3.0',
     reference: 'https://spdx.org/licenses/OSL-3.0.html'
@@ -2593,6 +2645,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/Qhull.html'
   },
   'QPL-1.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Q Public License 1.0',
     reference: 'https://spdx.org/licenses/QPL-1.0.html'
@@ -2618,11 +2671,13 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/RHeCos-1.1.html'
   },
   'RPL-1.1': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Reciprocal Public License 1.1',
     reference: 'https://spdx.org/licenses/RPL-1.1.html'
   },
   'RPL-1.5': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Reciprocal Public License 1.5',
     reference: 'https://spdx.org/licenses/RPL-1.5.html'
@@ -2638,6 +2693,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/RSA-MD.html'
   },
   RSCPL: {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Ricoh Source Code Public License',
     reference: 'https://spdx.org/licenses/RSCPL.html'
@@ -2718,6 +2774,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/SHL-0.51.html'
   },
   'SimPL-2.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Simple Public License 2.0',
     reference: 'https://spdx.org/licenses/SimPL-2.0.html'
@@ -2738,6 +2795,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/SL.html'
   },
   Sleepycat: {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Sleepycat License',
     reference: 'https://spdx.org/licenses/Sleepycat.html'
@@ -2783,6 +2841,7 @@ const spdxLicenses = {
     reference: 'https://spdx.org/licenses/Spencer-99.html'
   },
   'SPL-1.0': {
+    isCopyleft: true,
     isOpenSource: true,
     name: 'Sun Public License v1.0',
     reference: 'https://spdx.org/licenses/SPL-1.0.html'
