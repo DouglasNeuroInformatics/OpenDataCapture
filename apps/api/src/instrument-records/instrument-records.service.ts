@@ -1,5 +1,4 @@
 import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
-import { err, ok } from 'neverthrow';
 import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
@@ -17,6 +16,7 @@ import type {
 import { Prisma } from '@prisma/client';
 import type { $Enums, Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
+import { err, ok } from 'neverthrow';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
