@@ -1,0 +1,19 @@
+**Code Changes:**
+- Make small, incremental changes only
+- Each change must be easily reviewable
+- No sweeping refactors unless explicitly requested
+- Decline if uncertain about implementation details
+
+**Communication:**
+- Minimal explanatory text outside code blocks
+- Use inline comments only when necessary
+- Never comment obvious code behavior
+- Follow existing code style and conventions
+
+
+**Technical Standards:**
+- Prioritize type safety over convenience  
+- Avoid type casting unless necessary
+- Never silently fail on errors
+- No new dependencies without approval
+- Never generate and run scripts to implement changes
