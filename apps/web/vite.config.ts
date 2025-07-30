@@ -33,10 +33,9 @@ export default defineConfig({
     }),
     react(),
     viteCompression(),
-    // @ts-expect-error - conflict with vite version of subdependency, but works with v6
     importMetaEnv.vite({
       example: path.resolve(import.meta.dirname, '.env.public')
-    }),
+    }) as any,
     runtime(),
     tailwindcss()
   ],
