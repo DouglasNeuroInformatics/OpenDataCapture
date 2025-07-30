@@ -672,6 +672,9 @@ importers:
       react-dom:
         specifier: workspace:react-dom__19.x@*
         version: link:../../vendor/react-dom@19.x
+      recharts:
+        specifier: ^2.15.2
+        version: 2.15.4(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
       ts-pattern:
         specifier: workspace:ts-pattern__5.x@*
         version: link:../../vendor/ts-pattern@5.x

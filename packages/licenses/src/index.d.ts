@@ -633,6 +633,7 @@ type SPDXLicenseIdentifier =
 export type LicenseIdentifier = CustomLicenseIdentifier | SPDXLicenseIdentifier;
 
 export type License = {
+  isCopyleft?: boolean;
   isOpenSource: boolean;
   name: string;
   reference: string;

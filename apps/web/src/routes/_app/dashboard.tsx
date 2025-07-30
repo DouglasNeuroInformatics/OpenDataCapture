@@ -1,8 +1,12 @@
+import React from 'react';
+
 import { Heading, Select, StatisticCard } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
 import type { AppSubjectName } from '@opendatacapture/schemas/core';
 import { createFileRoute, redirect } from '@tanstack/react-router';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { PageHeader } from '@/components/PageHeader';
 import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
@@ -13,7 +17,60 @@ const RouteComponent = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation();
+  const [theme] = useTheme();
   const summaryQuery = useSummaryQuery({ params: { groupId: currentGroup?.id } });
+
+  const chartColors = {
+    records: {
+      fill: theme === 'dark' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(37, 99, 235, 0.1)',
+      gradient: theme === 'dark' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(37, 99, 235, 0.2)',
+      stroke: theme === 'dark' ? '#3b82f6' : '#2563eb' // blue-500/blue-600
+    },
+    sessions: {
+      fill: theme === 'dark' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(5, 150, 105, 0.1)',
+      gradient: theme === 'dark' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(5, 150, 105, 0.2)',
+      stroke: theme === 'dark' ? '#10b981' : '#059669' // emerald-500/emerald-600
+    },
+    subjects: {
+      fill: theme === 'dark' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(217, 119, 6, 0.1)',
+      gradient: theme === 'dark' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(217, 119, 6, 0.2)',
+      stroke: theme === 'dark' ? '#f59e0b' : '#d97706' // amber-500/amber-600
+    }
+  };
+
+  const strokeColors: { [K in Theme]: string } = {
+    dark: '#cbd5e1', // slate-300
+    light: '#475569' // slate-600
+  };
+
+  const tooltipStyles: { [K in Theme]: React.CSSProperties } = {
+    dark: {
+      backgroundColor: '#1e293b', // slate-800
+      border: '1px solid',
+      borderColor: '#475569', // slate-600
+      borderRadius: '8px',
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)',
+      padding: '12px'
+    },
+    light: {
+      backgroundColor: '#ffffff',
+      border: '1px solid',
+      borderColor: '#e2e8f0', // slate-200
+      borderRadius: '8px',
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+      padding: '12px'
+    }
+  };
+
+  // Merge records and sessions data for combined chart
+  const combinedTrendsData =
+    summaryQuery.data?.trends.records
+      .map((record, index) => ({
+        records: record.value,
+        sessions: summaryQuery.data?.trends.sessions[index]?.value ?? 0,
+        timestamp: record.timestamp
+      }))
+      .reverse() ?? [];
 
   let welcome: string;
   if (currentGroup?.type === 'CLINICAL') {
@@ -48,7 +105,7 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <section className="flex grow flex-col gap-5">
+      <section className="flex grow flex-col gap-8 p-6">
         <div className="flex w-full flex-col flex-wrap justify-between gap-3 md:flex-row md:items-center">
           <Heading className="whitespace-nowrap" variant="h3">
             {welcome}
@@ -75,39 +132,272 @@ const RouteComponent = () => {
           )}
         </div>
         <div className="body-font">
-          <div className="grid grid-cols-1 gap-5 text-center lg:grid-cols-2">
-            <StatisticCard
-              icon={<UsersIcon className="h-12 w-12" />}
-              label={t({
-                en: 'Total Users',
-                fr: "Nombre d'utilisateurs"
-              })}
-              value={summaryQuery.data.counts.users}
-            />
-            <StatisticCard
-              icon={<UserIcon className="h-12 w-12" />}
-              label={t({
-                en: 'Total Subjects',
-                fr: 'Nombre de clients'
-              })}
-              value={summaryQuery.data.counts.subjects}
-            />
-            <StatisticCard
-              icon={<ClipboardDocumentIcon className="h-12 w-12" />}
-              label={t({
-                en: 'Total Instruments',
-                fr: "Nombre d'instruments"
-              })}
-              value={summaryQuery.data.counts.instruments}
-            />
-            <StatisticCard
-              icon={<DocumentTextIcon className="h-12 w-12" />}
-              label={t({
-                en: 'Total Records',
-                fr: "Nombre d'enregistrements"
-              })}
-              value={summaryQuery.data.counts.records}
-            />
+          <div className="grid grid-cols-1 gap-6 text-center lg:grid-cols-2 xl:grid-cols-4">
+            <div className="group transform transition-all duration-300 hover:scale-105">
+              <StatisticCard
+                icon={
+                  <UsersIcon className="h-12 w-12 text-blue-600 transition-transform duration-300 group-hover:scale-110 dark:text-blue-400" />
+                }
+                label={t({
+                  en: 'Total Users',
+                  fr: "Nombre d'utilisateurs"
+                })}
+                value={summaryQuery.data.counts.users}
+              />
+            </div>
+            <div className="group transform transition-all duration-300 hover:scale-105">
+              <StatisticCard
+                icon={
+                  <UserIcon className="h-12 w-12 text-emerald-600 transition-transform duration-300 group-hover:scale-110 dark:text-emerald-400" />
+                }
+                label={t({
+                  en: 'Total Subjects',
+                  fr: 'Nombre de clients'
+                })}
+                value={summaryQuery.data.counts.subjects}
+              />
+            </div>
+            <div className="group transform transition-all duration-300 hover:scale-105">
+              <StatisticCard
+                icon={
+                  <ClipboardDocumentIcon className="h-12 w-12 text-amber-600 transition-transform duration-300 group-hover:scale-110 dark:text-amber-400" />
+                }
+                label={t({
+                  en: 'Total Instruments',
+                  fr: "Nombre d'instruments"
+                })}
+                value={summaryQuery.data.counts.instruments}
+              />
+            </div>
+            <div className="group transform transition-all duration-300 hover:scale-105">
+              <StatisticCard
+                icon={
+                  <DocumentTextIcon className="h-12 w-12 text-purple-600 transition-transform duration-300 group-hover:scale-110 dark:text-purple-400" />
+                }
+                label={t({
+                  en: 'Total Records',
+                  fr: "Nombre d'enregistrements"
+                })}
+                value={summaryQuery.data.counts.records}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div className="group rounded-2xl border border-slate-200/60 bg-white/90 shadow-xl backdrop-blur-sm transition-all duration-300 hover:border-blue-300/60 hover:shadow-2xl dark:border-slate-700/60 dark:bg-slate-800/90 dark:hover:border-blue-600/60">
+            <div className="p-8 pb-4">
+              <div className="flex items-center gap-4">
+                <div className="rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-600/20 p-3 transition-all duration-300 group-hover:from-blue-500/30 group-hover:to-indigo-600/30">
+                  <DocumentTextIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
+                    {t({
+                      en: 'Records & Sessions Trend',
+                      fr: 'Tendance des enregistrements et sessions'
+                    })}
+                  </Heading>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                    {t({
+                      en: 'Activity over time',
+                      fr: 'Activité au fil du temps'
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="p-8 pt-2">
+              <ResponsiveContainer height={320} width="100%">
+                <AreaChart data={combinedTrendsData} margin={{ bottom: 0, left: 0, right: 30, top: 10 }}>
+                  <defs>
+                    <linearGradient id="recordsGradient" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="5%" stopColor={chartColors.records.stroke} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={chartColors.records.stroke} stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="sessionsGradient" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="5%" stopColor={chartColors.sessions.stroke} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={chartColors.sessions.stroke} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    stroke={theme === 'dark' ? '#334155' : '#e2e8f0'}
+                    strokeDasharray="3 3"
+                    strokeOpacity={0.6}
+                  />
+                  <XAxis
+                    axisLine={false}
+                    dataKey="timestamp"
+                    domain={['auto', 'auto']}
+                    stroke={strokeColors[theme]}
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(timestamp: number) => {
+                      const date = new Date(timestamp);
+                      return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+                    }}
+                    tickLine={false}
+                    type="number"
+                  />
+                  <YAxis
+                    axisLine={false}
+                    stroke={strokeColors[theme]}
+                    tick={{ fontSize: 12 }}
+                    tickLine={false}
+                    width={50}
+                  />
+                  <Tooltip
+                    content={({ active, label, payload }) => {
+                      if (active && payload?.length) {
+                        const date = new Date(label as number);
+                        return (
+                          <div style={tooltipStyles[theme]}>
+                            <p className="mb-2 text-sm font-medium">
+                              {date.toLocaleDateString(undefined, {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                              })}
+                            </p>
+                            <div className="space-y-1">
+                              <p className="font-semibold text-blue-600 dark:text-blue-400">
+                                {t({
+                                  en: 'Records',
+                                  fr: 'Enregistrements'
+                                })}
+                                : {payload.find((p) => p.dataKey === 'records')?.value ?? 0}
+                              </p>
+                              <p className="font-semibold text-emerald-600 dark:text-emerald-400">
+                                {t({
+                                  en: 'Sessions',
+                                  fr: 'Sessions'
+                                })}
+                                : {payload.find((p) => p.dataKey === 'sessions')?.value ?? 0}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Area
+                    activeDot={{ fill: chartColors.records.stroke, r: 6, stroke: '#fff', strokeWidth: 2 }}
+                    dataKey="records"
+                    dot={{ fill: chartColors.records.stroke, r: 4, strokeWidth: 2 }}
+                    fill="url(#recordsGradient)"
+                    stroke={chartColors.records.stroke}
+                    strokeWidth={3}
+                    type="monotone"
+                  />
+                  <Area
+                    activeDot={{ fill: chartColors.sessions.stroke, r: 6, stroke: '#fff', strokeWidth: 2 }}
+                    dataKey="sessions"
+                    dot={{ fill: chartColors.sessions.stroke, r: 4, strokeWidth: 2 }}
+                    fill="url(#sessionsGradient)"
+                    stroke={chartColors.sessions.stroke}
+                    strokeWidth={3}
+                    type="monotone"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="group rounded-2xl border border-slate-200/60 bg-white/90 shadow-xl backdrop-blur-sm transition-all duration-300 hover:border-amber-300/60 hover:shadow-2xl dark:border-slate-700/60 dark:bg-slate-800/90 dark:hover:border-amber-600/60">
+            <div className="p-8 pb-4">
+              <div className="flex items-center gap-4">
+                <div className="rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-600/20 p-3 transition-all duration-300 group-hover:from-amber-500/30 group-hover:to-orange-600/30">
+                  <UserIcon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div>
+                  <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
+                    {t({
+                      en: 'Subjects Growth',
+                      fr: 'Croissance des sujets'
+                    })}
+                  </Heading>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                    {t({
+                      en: 'Growth trajectory',
+                      fr: 'Trajectoire de croissance'
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="p-8 pt-2">
+              <ResponsiveContainer height={320} width="100%">
+                <AreaChart
+                  data={summaryQuery.data.trends.subjects.slice().reverse()}
+                  margin={{ bottom: 20, left: 0, right: 30, top: 10 }}
+                >
+                  <defs>
+                    <linearGradient id="subjectsGradient" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="5%" stopColor={chartColors.subjects.stroke} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={chartColors.subjects.stroke} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    stroke={theme === 'dark' ? '#334155' : '#e2e8f0'}
+                    strokeDasharray="3 3"
+                    strokeOpacity={0.6}
+                  />
+                  <XAxis
+                    axisLine={false}
+                    dataKey="timestamp"
+                    domain={['auto', 'auto']}
+                    stroke={strokeColors[theme]}
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(timestamp: number) => {
+                      const date = new Date(timestamp);
+                      return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+                    }}
+                    tickLine={false}
+                    type="number"
+                  />
+                  <YAxis
+                    axisLine={false}
+                    stroke={strokeColors[theme]}
+                    tick={{ fontSize: 12 }}
+                    tickLine={false}
+                    width={50}
+                  />
+                  <Tooltip
+                    content={({ active, label, payload }) => {
+                      if (active && payload?.length) {
+                        const date = new Date(label as number);
+                        return (
+                          <div style={tooltipStyles[theme]}>
+                            <p className="mb-2 text-sm font-medium">
+                              {date.toLocaleDateString(undefined, {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                              })}
+                            </p>
+                            <p className="font-semibold text-amber-600 dark:text-amber-400">
+                              {t({
+                                en: 'Subjects',
+                                fr: 'Sujets'
+                              })}
+                              : {payload[0]?.value}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Area
+                    activeDot={{ fill: chartColors.subjects.stroke, r: 6, stroke: '#fff', strokeWidth: 2 }}
+                    dataKey="value"
+                    dot={{ fill: chartColors.subjects.stroke, r: 4, strokeWidth: 2 }}
+                    fill="url(#subjectsGradient)"
+                    stroke={chartColors.subjects.stroke}
+                    strokeWidth={3}
+                    type="monotone"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       </section>
@@ -121,7 +411,7 @@ export const Route = createFileRoute('/_app/dashboard')({
     const { currentGroup, currentUser } = useAppStore.getState();
 
     const ability = currentUser?.ability;
-    const subjects: AppSubjectName[] = ['Instrument', 'InstrumentRecord', 'Subject', 'User'];
+    const subjects: AppSubjectName[] = ['Instrument', 'InstrumentRecord', 'Session', 'Subject', 'User'];
     const isAuthorized = subjects.every((subject) => ability?.can('read', subject));
 
     if (!isAuthorized) {

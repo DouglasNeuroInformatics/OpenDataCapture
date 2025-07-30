@@ -31,7 +31,13 @@ export class SubjectsService {
     });
   }
 
-  async create({ id, ...data }: CreateSubjectDto) {
+  async create({
+    id,
+    ...data
+  }: CreateSubjectDto & {
+    /** for demo purposes need to set createdAt manually */
+    createdAt?: Date;
+  }) {
     if (await this.subjectModel.exists({ id })) {
       throw new ConflictException('A subject with the provided demographic information already exists');
     }
