@@ -202,6 +202,7 @@ model User {
   basePermissionLevel   BasePermissionLevel?
   additionalPermissions AuthRule[]
   firstName             String
+  sessions              Session[]
   groupIds              String[]             @db.ObjectId
   groups                Group[]              @relation(fields: [groupIds], references: [id])
   lastName              String
@@ -229,6 +230,8 @@ model Session {
   instrumentRecords InstrumentRecord[]
   subject           Subject?           @relation(fields: [subjectId], references: [id])
   subjectId         String
+  user              User?              @relation(fields: [userId], references: [id])         
+  userId            String?
   type              SessionType
 
   @@map("SessionModel")

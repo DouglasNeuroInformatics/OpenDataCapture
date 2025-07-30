@@ -5,11 +5,12 @@ import { InternalServerErrorException, NotFoundException } from '@nestjs/common/
 import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { Prisma, Session, Subject } from '@prisma/client';
+import type { Prisma, Session, Subject, User } from '@prisma/client';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { SubjectsService } from '@/subjects/subjects.service';
+import { UsersService } from '@/users/users.service';
 
 @Injectable()
 export class SessionsService {
@@ -17,7 +18,8 @@ export class SessionsService {
     @InjectModel('Session') private readonly sessionModel: Model<'Session'>,
     private readonly groupsService: GroupsService,
     private readonly loggingService: LoggingService,
-    private readonly subjectsService: SubjectsService
+    private readonly subjectsService: SubjectsService,
+    private readonly userService: UsersService
   ) {}
 
   async count(where: Prisma.SessionWhereInput = {}, { ability }: EntityOperationOptions = {}) {
@@ -26,9 +28,15 @@ export class SessionsService {
     });
   }
 
-  async create({ date, groupId, subjectData, type }: CreateSessionData): Promise<Session> {
+  async create({ date, groupId, subjectData, type, userId }: CreateSessionData): Promise<Session> {
     this.loggingService.debug({ message: 'Attempting to create session' });
     const subject = await this.resolveSubject(subjectData);
+
+    let user: null | Omit<User, 'hashedPassword'> = null;
+
+    if (userId) {
+      user = await this.userService.findById(userId);
+    }
 
     // If the subject is not yet associated with the group, check it exists then append it
     let group: Group | null = null;
@@ -48,7 +56,12 @@ export class SessionsService {
         subject: {
           connect: { id: subject.id }
         },
-        type
+        type,
+        user: user
+          ? {
+              connect: { id: user.id }
+            }
+          : undefined
       }
     });
 
