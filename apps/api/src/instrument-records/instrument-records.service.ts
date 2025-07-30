@@ -130,6 +130,9 @@ export class InstrumentRecordsService {
     return this.instrumentRecordModel.exists(where);
   }
 
+  //TODO
+  // Chech if instrument schema is zod4 version, if so use the toJSONSchema method to convert to json
+  // and expand the data from there
   async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
     const data: InstrumentRecordsExport = [];
     const records = await this.instrumentRecordModel.findMany({
