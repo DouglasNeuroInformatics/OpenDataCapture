@@ -107,13 +107,16 @@ export class DemoService {
           researchId++;
         }
 
+        const date = faker.date.past({ years: 1 });
+
         const subject = await this.subjectsService.create({
+          createdAt: date,
           ...subjectIdData,
           id: subjectId
         });
 
         const session = await this.sessionsService.create({
-          date: new Date(),
+          date,
           groupId: group.id,
           subjectData: subject,
           type: 'IN_PERSON'
@@ -132,7 +135,7 @@ export class DemoService {
           }
           await this.instrumentRecordsService.create({
             data: data as Json,
-            date: faker.date.past({ years: 2 }),
+            date,
             groupId: group.id,
             instrumentId: hq.id,
             sessionId: session.id,

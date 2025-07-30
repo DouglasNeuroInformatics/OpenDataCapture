@@ -13,6 +13,7 @@ export class SummaryController {
   @RouteAccess([
     { action: 'read', subject: 'Instrument' },
     { action: 'read', subject: 'InstrumentRecord' },
+    { action: 'read', subject: 'Session' },
     { action: 'read', subject: 'Subject' },
     { action: 'read', subject: 'User' }
   ])

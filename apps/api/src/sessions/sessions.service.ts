@@ -5,7 +5,7 @@ import { InternalServerErrorException, NotFoundException } from '@nestjs/common/
 import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { Session, Subject } from '@prisma/client';
+import type { Prisma, Session, Subject } from '@prisma/client';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -19,6 +19,12 @@ export class SessionsService {
     private readonly loggingService: LoggingService,
     private readonly subjectsService: SubjectsService
   ) {}
+
+  async count(where: Prisma.SessionWhereInput = {}, { ability }: EntityOperationOptions = {}) {
+    return this.sessionModel.count({
+      where: { AND: [accessibleQuery(ability, 'read', 'Session'), where] }
+    });
+  }
 
   async create({ date, groupId, subjectData, type }: CreateSessionData): Promise<Session> {
     this.loggingService.debug({ message: 'Attempting to create session' });

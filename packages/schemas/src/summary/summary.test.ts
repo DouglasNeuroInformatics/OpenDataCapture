@@ -9,8 +9,23 @@ describe('$Summary', () => {
         counts: {
           instruments: 0,
           records: 0,
+          sessions: 0,
           subjects: 0,
           users: 0
+        },
+        trends: {
+          records: [
+            { timestamp: 0, value: 0 },
+            { timestamp: 0, value: 0 }
+          ],
+          sessions: [
+            { timestamp: 0, value: 0 },
+            { timestamp: 0, value: 0 }
+          ],
+          subjects: [
+            { timestamp: 0, value: 0 },
+            { timestamp: 0, value: 0 }
+          ]
         }
       })
     ).resolves.toBeTypeOf('object');
@@ -21,8 +36,14 @@ describe('$Summary', () => {
         counts: {
           instruments: -1,
           records: 0,
+          sessions: 0,
           subjects: 0,
           users: 0
+        },
+        trends: {
+          records: [],
+          sessions: [],
+          subjects: []
         }
       })
     ).rejects.toThrowError();
@@ -33,8 +54,14 @@ describe('$Summary', () => {
         counts: {
           instruments: 0,
           records: 0,
+          sessions: 0,
           subjects: NaN,
           users: 0
+        },
+        trends: {
+          records: [],
+          sessions: [],
+          subjects: []
         }
       })
     ).rejects.toThrowError();
