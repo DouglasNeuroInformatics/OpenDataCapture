@@ -15,6 +15,7 @@ const RouteComponent = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentSession = useAppStore((store) => store.currentSession);
   const startSession = useAppStore((store) => store.startSession);
+  const currentUser = useAppStore((store) => store.currentUser);
   const location = useLocation();
   const defaultInitialValues = {
     sessionType: 'IN_PERSON',
@@ -42,6 +43,7 @@ const RouteComponent = () => {
       </PageHeader>
       <StartSessionForm
         currentGroup={currentGroup}
+        currentUse={currentUser}
         initialValues={initialValues}
         readOnly={currentSession !== null || createSessionMutation.isPending}
         onSubmit={async (formData) => {
