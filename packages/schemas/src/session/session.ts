@@ -13,7 +13,7 @@ export const $Session = $BaseModel.extend({
   subject: $Subject,
   subjectId: z.string(),
   type: $SessionType,
-  userId: z.string().nullable()
+  userId: z.string().nullish()
 });
 
 export type CreateSessionData = z.infer<typeof $CreateSessionData>;
