@@ -1,5 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import type { CurrentUser } from '@/store/types';
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
@@ -9,7 +10,6 @@ import { $SessionType } from '@opendatacapture/schemas/session';
 import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { Sex, SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
-import type { User } from '@opendatacapture/schemas/user';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
@@ -33,7 +33,7 @@ type StartSessionFormData = {
 
 type StartSessionFormProps = {
   currentGroup: Group | null;
-  currentUser: User | null;
+  currentUser: CurrentUser | null;
   initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
   onSubmit: (data: CreateSessionData) => Promisable<void>;
   readOnly: boolean;
@@ -252,7 +252,7 @@ export const StartSessionForm = ({
         await onSubmit({
           date: sessionDate,
           groupId: currentGroup?.id ?? null,
-          userId: currentUser?.id ?? null,
+          userId: currentUser?.username ?? null,
           type: sessionType,
           subjectData: {
             id: subjectId,
