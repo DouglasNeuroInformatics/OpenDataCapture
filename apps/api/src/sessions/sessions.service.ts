@@ -1,5 +1,5 @@
-import { accessibleQuery, InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import { accessibleQuery, InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
+import type { ExtendedPrismaClient, Model } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
 import type { Group } from '@opendatacapture/schemas/group';
@@ -15,6 +15,7 @@ import { UsersService } from '@/users/users.service';
 @Injectable()
 export class SessionsService {
   constructor(
+    @InjectPrismaClient() private readonly prismaClient: ExtendedPrismaClient,
     @InjectModel('Session') private readonly sessionModel: Model<'Session'>,
     private readonly groupsService: GroupsService,
     private readonly loggingService: LoggingService,
@@ -35,7 +36,12 @@ export class SessionsService {
     let user: null | Omit<User, 'hashedPassword'> = null;
 
     if (userId) {
-      user = await this.userService.findById(userId);
+      user = await this.prismaClient.user.findUnique({
+        where: {
+          username: userId
+        }
+      });
+      // user = await this.userService.findById(userId);
     }
 
     // If the subject is not yet associated with the group, check it exists then append it
