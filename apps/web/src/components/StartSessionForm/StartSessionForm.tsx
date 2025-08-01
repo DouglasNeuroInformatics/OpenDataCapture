@@ -9,6 +9,7 @@ import { $SessionType } from '@opendatacapture/schemas/session';
 import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { Sex, SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
+import type { User } from '@opendatacapture/schemas/user';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
@@ -32,12 +33,19 @@ type StartSessionFormData = {
 
 type StartSessionFormProps = {
   currentGroup: Group | null;
+  currentUser: User | null;
   initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
   onSubmit: (data: CreateSessionData) => Promisable<void>;
   readOnly: boolean;
 };
 
-export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubmit }: StartSessionFormProps) => {
+export const StartSessionForm = ({
+  currentGroup,
+  currentUser,
+  initialValues,
+  readOnly,
+  onSubmit
+}: StartSessionFormProps) => {
   const { resolvedLanguage, t } = useTranslation();
   return (
     <Form
@@ -244,6 +252,7 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
         await onSubmit({
           date: sessionDate,
           groupId: currentGroup?.id ?? null,
+          userId: currentUser?.id ?? null,
           type: sessionType,
           subjectData: {
             id: subjectId,
