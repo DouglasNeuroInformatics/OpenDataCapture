@@ -36,7 +36,7 @@ export class SessionsService {
     let user: null | Omit<User, 'hashedPassword'> = null;
 
     if (userId) {
-      user = await this.prismaClient.user.findUnique({
+      user = await this.prismaClient.user.findFirst({
         where: {
           username: userId
         }
