@@ -4,13 +4,14 @@ import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $BasePermissionLevel, $CreateUserData } from '@opendatacapture/schemas/user';
-import type { CreateUserData } from '@opendatacapture/schemas/user';
+import type { CreateUserData, User } from '@opendatacapture/schemas/user';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
+import axios from 'axios';
 
 const RouteComponent = () => {
   const { t } = useTranslation();
@@ -136,7 +137,7 @@ const RouteComponent = () => {
             groupIds: z.set(z.string()).optional(),
             confirmPassword: z.string().min(1)
           })
-          .check((ctx) => {
+          .check(async (ctx) => {
             if (!estimatePasswordStrength(ctx.value.password).success) {
               ctx.issues.push({
                 code: 'custom',
@@ -154,6 +155,19 @@ const RouteComponent = () => {
                 message: t('common.passwordsMustMatch'),
                 path: ['confirmPassword']
               });
+            }
+
+            const existingUsers = await axios.get(`/v1/users`);
+            if (existingUsers.data) {
+              const usersList = existingUsers.data as Omit<User, 'hashedpassword'>[];
+
+              if (usersList.some((usersList) => usersList.username === ctx.value.username))
+                ctx.issues.push({
+                  code: 'custom',
+                  input: ctx.value.username,
+                  message: 'Username already exists',
+                  path: ['username']
+                });
             }
           })}
         onSubmit={(data) => handleSubmit({ ...data, groupIds: Array.from(data.groupIds ?? []) })}
