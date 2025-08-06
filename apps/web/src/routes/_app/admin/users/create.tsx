@@ -165,7 +165,7 @@ const RouteComponent = () => {
                 ctx.issues.push({
                   code: 'custom',
                   input: ctx.value.username,
-                  message: 'Username already exists',
+                  message: t('common.usernameExists'),
                   path: ['username']
                 });
             }
