@@ -12,6 +12,13 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiOperation({ summary: 'Get User by Username' })
+  @Get('/check-username/:username')
+  @RouteAccess({ action: 'read', subject: 'User' })
+  checkUsernameExists(@Param('username') username: string, @CurrentUser('ability') ability: AppAbility) {
+    return this.usersService.checkUsernameExists(username, { ability });
+  }
+
   @ApiOperation({ summary: 'Create User' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'User' })
@@ -38,13 +45,6 @@ export class UsersController {
   @RouteAccess({ action: 'read', subject: 'User' })
   findById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
     return this.usersService.findById(id, { ability });
-  }
-
-  @ApiOperation({ summary: 'Get User by Username' })
-  @Get('/check-username/:username')
-  @RouteAccess({ action: 'read', subject: 'User' })
-  findByUsername(@Param('username') username: string, @CurrentUser('ability') ability: AppAbility) {
-    return this.usersService.findByUsername(username, { ability });
   }
 
   @ApiOperation({ summary: 'Update User' })
