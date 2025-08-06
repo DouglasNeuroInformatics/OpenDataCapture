@@ -17,7 +17,7 @@ export class UsersService {
     private readonly groupsService: GroupsService
   ) {}
 
-  async checkUsernameExists(username: string, { ability }: EntityOperationOptions = {}) {
+  async checkUsernameExists(username: string, { ability }: EntityOperationOptions = {}): Promise<{ success: boolean }> {
     const user = await this.userModel.findFirst({
       include: { groups: true },
       omit: {
@@ -26,9 +26,9 @@ export class UsersService {
       where: { AND: [accessibleQuery(ability, 'read', 'User'), { username }] }
     });
     if (!user) {
-      return false;
+      return { success: false };
     }
-    return user;
+    return { success: true };
   }
 
   async count(

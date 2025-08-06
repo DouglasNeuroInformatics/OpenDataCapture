@@ -22,15 +22,17 @@ const RouteComponent = () => {
 
   const handleSubmit = async (data: CreateUserData) => {
     // check if username exists
-    const existingUsername = await axios.get(`/v1/users/check-username/${encodeURIComponent(data.username)}`);
+    const existingUsername = await axios.get<{ success: boolean }>(
+      `/v1/users/check-username/${encodeURIComponent(data.username)}`
+    );
 
-    if (existingUsername.data !== false) {
+    if (existingUsername.data.success === true) {
       notification.addNotification({
         type: 'error',
         message: t('common.usernameExists')
       });
     } else {
-      createUserMutation.mutate({ data });
+      void createUserMutation.mutateAsync({ data });
 
       void navigate({ to: '..' });
     }
