@@ -10,7 +10,6 @@ import type { Prisma, Session, Subject, User } from '@prisma/client';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { SubjectsService } from '@/subjects/subjects.service';
-import { UsersService } from '@/users/users.service';
 
 @Injectable()
 export class SessionsService {
@@ -19,8 +18,7 @@ export class SessionsService {
     @InjectModel('Session') private readonly sessionModel: Model<'Session'>,
     private readonly groupsService: GroupsService,
     private readonly loggingService: LoggingService,
-    private readonly subjectsService: SubjectsService,
-    private readonly userService: UsersService
+    private readonly subjectsService: SubjectsService
   ) {}
 
   async count(where: Prisma.SessionWhereInput = {}, { ability }: EntityOperationOptions = {}) {
