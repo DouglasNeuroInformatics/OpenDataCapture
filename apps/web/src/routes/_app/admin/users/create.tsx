@@ -24,6 +24,7 @@ const RouteComponent = () => {
     // check if username exists
 
     const exisitingUsername = await axios.get(`/v1/users/check-username/${encodeURIComponent(data.username)}`);
+
     if (exisitingUsername) {
       return { success: false, errorMessage: t('common.usernameExists') };
     }
@@ -147,7 +148,7 @@ const RouteComponent = () => {
             groupIds: z.set(z.string()).optional(),
             confirmPassword: z.string().min(1)
           })
-          .check(async (ctx) => {
+          .check((ctx) => {
             if (!estimatePasswordStrength(ctx.value.password).success) {
               ctx.issues.push({
                 code: 'custom',
