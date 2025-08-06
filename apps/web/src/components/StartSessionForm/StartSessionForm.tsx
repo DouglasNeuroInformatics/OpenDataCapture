@@ -35,7 +35,7 @@ type StartSessionFormProps = {
   initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
   onSubmit: (data: CreateSessionData) => Promisable<void>;
   readOnly: boolean;
-  username: string | undefined;
+  username?: null | string;
 };
 
 export const StartSessionForm = ({
