@@ -23,9 +23,9 @@ const RouteComponent = () => {
   const handleSubmit: FormProps<any>['onSubmit'] = async (data: CreateUserData) => {
     // check if username exists
 
-    const exisitingUsername = await axios.get(`/v1/users/check-username/${encodeURIComponent(data.username)}`);
+    const existingUsername = await axios.get(`/v1/users/check-username/${encodeURIComponent(data.username)}`);
 
-    if (exisitingUsername) {
+    if (existingUsername) {
       return { success: false, errorMessage: t('common.usernameExists') };
     }
 
