@@ -13,8 +13,6 @@ import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/sub
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
 
-import type { CurrentUser } from '@/store/types';
-
 const currentDate = new Date();
 
 const EIGHTEEN_YEARS = 568025136000; // milliseconds
@@ -34,15 +32,15 @@ type StartSessionFormData = {
 
 type StartSessionFormProps = {
   currentGroup: Group | null;
-  currentUser: CurrentUser | null;
   initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
   onSubmit: (data: CreateSessionData) => Promisable<void>;
   readOnly: boolean;
+  username: string | undefined;
 };
 
 export const StartSessionForm = ({
   currentGroup,
-  currentUser,
+  username,
   initialValues,
   readOnly,
   onSubmit
@@ -253,7 +251,7 @@ export const StartSessionForm = ({
         await onSubmit({
           date: sessionDate,
           groupId: currentGroup?.id ?? null,
-          username: currentUser?.username ?? null,
+          username: username ?? null,
           type: sessionType,
           subjectData: {
             id: subjectId,

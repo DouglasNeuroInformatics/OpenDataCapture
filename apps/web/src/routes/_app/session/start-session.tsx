@@ -43,9 +43,9 @@ const RouteComponent = () => {
       </PageHeader>
       <StartSessionForm
         currentGroup={currentGroup}
-        currentUser={currentUser}
         initialValues={initialValues}
         readOnly={currentSession !== null || createSessionMutation.isPending}
+        username={currentUser?.username}
         onSubmit={async (formData) => {
           const session = await createSessionMutation.mutateAsync(formData);
           startSession({ ...session, type: formData.type });
