@@ -40,6 +40,13 @@ export class UsersController {
     return this.usersService.findById(id, { ability });
   }
 
+  @ApiOperation({ summary: 'Get User by Username' })
+  @Get('/Check-Username/:username')
+  @RouteAccess({ action: 'read', subject: 'User' })
+  findByUsername(@Param('username') username: string, @CurrentUser('ability') ability: AppAbility) {
+    return this.usersService.findByUsername(username, { ability });
+  }
+
   @ApiOperation({ summary: 'Update User' })
   @Patch(':id')
   @RouteAccess({ action: 'update', subject: 'User' })

@@ -2,9 +2,10 @@
 
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Form, Heading } from '@douglasneuroinformatics/libui/components';
+import type { FormProps } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $BasePermissionLevel, $CreateUserData } from '@opendatacapture/schemas/user';
-import type { CreateUserData, User } from '@opendatacapture/schemas/user';
+import type { CreateUserData } from '@opendatacapture/schemas/user';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 import { z } from 'zod/v4';
@@ -13,18 +14,25 @@ import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 
-const RouteComponent = async () => {
+const RouteComponent = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const groupsQuery = useGroupsQuery();
   const createUserMutation = useCreateUserMutation();
 
-  const handleSubmit = (data: CreateUserData) => {
-    createUserMutation.mutate({ data });
-    void navigate({ to: '..' });
-  };
+  const handleSubmit: FormProps<any>['onSubmit'] = async (data: CreateUserData) => {
+    // check if username exists
 
-  const existingUsers = await axios.get(`/v1/users`);
+    const exisitingUsername = await axios.get(`/v1/users/check-username/${encodeURIComponent(data.username)}`);
+    if (exisitingUsername) {
+      return { success: false, errorMessage: t('common.usernameExists') };
+    }
+
+    createUserMutation.mutate({ data });
+
+    void navigate({ to: '..' });
+    return { success: true };
+  };
 
   return (
     <div>
@@ -157,18 +165,6 @@ const RouteComponent = async () => {
                 message: t('common.passwordsMustMatch'),
                 path: ['confirmPassword']
               });
-            }
-
-            if (existingUsers.data) {
-              const usersList = existingUsers.data as Omit<User, 'hashedpassword'>[];
-
-              if (usersList.some((usersList) => usersList.username === ctx.value.username))
-                ctx.issues.push({
-                  code: 'custom',
-                  input: ctx.value.username,
-                  message: t('common.usernameExists'),
-                  path: ['username']
-                });
             }
           })}
         onSubmit={(data) => handleSubmit({ ...data, groupIds: Array.from(data.groupIds ?? []) })}
