@@ -1,11 +1,11 @@
-import { accessibleQuery, InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import { accessibleQuery, InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
+import type { ExtendedPrismaClient, Model } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { Prisma, Session, Subject } from '@prisma/client';
+import type { Prisma, Session, Subject, User } from '@prisma/client';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -14,6 +14,7 @@ import { SubjectsService } from '@/subjects/subjects.service';
 @Injectable()
 export class SessionsService {
   constructor(
+    @InjectPrismaClient() private readonly prismaClient: ExtendedPrismaClient,
     @InjectModel('Session') private readonly sessionModel: Model<'Session'>,
     private readonly groupsService: GroupsService,
     private readonly loggingService: LoggingService,
@@ -26,9 +27,19 @@ export class SessionsService {
     });
   }
 
-  async create({ date, groupId, subjectData, type }: CreateSessionData): Promise<Session> {
+  async create({ date, groupId, subjectData, type, username }: CreateSessionData): Promise<Session> {
     this.loggingService.debug({ message: 'Attempting to create session' });
     const subject = await this.resolveSubject(subjectData);
+
+    let user: null | Omit<User, 'hashedPassword'> = null;
+
+    if (username) {
+      user = await this.prismaClient.user.findFirst({
+        where: {
+          username: username
+        }
+      });
+    }
 
     // If the subject is not yet associated with the group, check it exists then append it
     let group: Group | null = null;
@@ -48,7 +59,12 @@ export class SessionsService {
         subject: {
           connect: { id: subject.id }
         },
-        type
+        type,
+        user: user
+          ? {
+              connect: { id: user.id }
+            }
+          : undefined
       }
     });
 

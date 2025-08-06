@@ -15,6 +15,7 @@ const RouteComponent = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentSession = useAppStore((store) => store.currentSession);
   const startSession = useAppStore((store) => store.startSession);
+  const currentUser = useAppStore((store) => store.currentUser);
   const location = useLocation();
   const defaultInitialValues = {
     sessionType: 'IN_PERSON',
@@ -44,6 +45,7 @@ const RouteComponent = () => {
         currentGroup={currentGroup}
         initialValues={initialValues}
         readOnly={currentSession !== null || createSessionMutation.isPending}
+        username={currentUser?.username}
         onSubmit={async (formData) => {
           const session = await createSessionMutation.mutateAsync(formData);
           startSession({ ...session, type: formData.type });

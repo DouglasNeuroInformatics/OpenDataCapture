@@ -22,6 +22,7 @@ export const $Subject = $BaseModel.extend({
   firstName: z.string().min(1).nullish(),
   groupIds: z.array(z.string().min(1)),
   lastName: z.string().min(1).nullish(),
+  sessionIds: z.array(z.string()).nullish(),
   sex: $Sex.nullish()
 });
 

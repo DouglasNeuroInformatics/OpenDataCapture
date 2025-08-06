@@ -2,10 +2,11 @@
 
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Form, Heading } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $BasePermissionLevel, $CreateUserData } from '@opendatacapture/schemas/user';
 import type { CreateUserData } from '@opendatacapture/schemas/user';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import axios from 'axios';
 import { z } from 'zod/v4';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -17,10 +18,24 @@ const RouteComponent = () => {
   const navigate = useNavigate();
   const groupsQuery = useGroupsQuery();
   const createUserMutation = useCreateUserMutation();
+  const notification = useNotificationsStore();
 
-  const handleSubmit = (data: CreateUserData) => {
-    createUserMutation.mutate({ data });
-    void navigate({ to: '..' });
+  const handleSubmit = async (data: CreateUserData) => {
+    // check if username exists
+    const existingUsername = await axios.get<{ success: boolean }>(
+      `/v1/users/check-username/${encodeURIComponent(data.username)}`
+    );
+
+    if (existingUsername.data.success === true) {
+      notification.addNotification({
+        type: 'error',
+        message: t('common.usernameExists')
+      });
+    } else {
+      void createUserMutation.mutateAsync({ data });
+
+      void navigate({ to: '..' });
+    }
   };
 
   return (

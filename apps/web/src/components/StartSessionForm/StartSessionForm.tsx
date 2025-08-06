@@ -35,9 +35,16 @@ type StartSessionFormProps = {
   initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
   onSubmit: (data: CreateSessionData) => Promisable<void>;
   readOnly: boolean;
+  username?: null | string;
 };
 
-export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubmit }: StartSessionFormProps) => {
+export const StartSessionForm = ({
+  currentGroup,
+  username,
+  initialValues,
+  readOnly,
+  onSubmit
+}: StartSessionFormProps) => {
   const { resolvedLanguage, t } = useTranslation();
   return (
     <Form
@@ -244,6 +251,7 @@ export const StartSessionForm = ({ currentGroup, initialValues, readOnly, onSubm
         await onSubmit({
           date: sessionDate,
           groupId: currentGroup?.id ?? null,
+          username: username ?? null,
           type: sessionType,
           subjectData: {
             id: subjectId,

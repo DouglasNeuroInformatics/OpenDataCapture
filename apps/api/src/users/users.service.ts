@@ -17,6 +17,20 @@ export class UsersService {
     private readonly groupsService: GroupsService
   ) {}
 
+  async checkUsernameExists(username: string, { ability }: EntityOperationOptions = {}): Promise<{ success: boolean }> {
+    const user = await this.userModel.findFirst({
+      include: { groups: true },
+      omit: {
+        hashedPassword: true
+      },
+      where: { AND: [accessibleQuery(ability, 'read', 'User'), { username }] }
+    });
+    if (!user) {
+      return { success: false };
+    }
+    return { success: true };
+  }
+
   async count(
     filter: NonNullable<Parameters<Model<'User'>['count']>[0]>['where'] = {},
     { ability }: EntityOperationOptions = {}

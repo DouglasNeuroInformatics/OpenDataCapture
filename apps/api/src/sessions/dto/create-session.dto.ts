@@ -9,4 +9,5 @@ export class CreateSessionDto {
   groupId: null | string;
   subjectData: CreateSubjectData;
   type: SessionType;
+  userId?: null | string;
 }
