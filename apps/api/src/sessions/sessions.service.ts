@@ -41,7 +41,6 @@ export class SessionsService {
           username: username
         }
       });
-      // user = await this.userService.findById(userId);
     }
 
     // If the subject is not yet associated with the group, check it exists then append it

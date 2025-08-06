@@ -6,14 +6,14 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $BasePermissionLevel, $CreateUserData } from '@opendatacapture/schemas/user';
 import type { CreateUserData, User } from '@opendatacapture/schemas/user';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import axios from 'axios';
 import { z } from 'zod/v4';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
-import axios from 'axios';
 
-const RouteComponent = () => {
+const RouteComponent = async () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const groupsQuery = useGroupsQuery();
@@ -23,6 +23,8 @@ const RouteComponent = () => {
     createUserMutation.mutate({ data });
     void navigate({ to: '..' });
   };
+
+  const existingUsers = await axios.get(`/v1/users`);
 
   return (
     <div>
@@ -157,7 +159,6 @@ const RouteComponent = () => {
               });
             }
 
-            const existingUsers = await axios.get(`/v1/users`);
             if (existingUsers.data) {
               const usersList = existingUsers.data as Omit<User, 'hashedpassword'>[];
 
