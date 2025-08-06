@@ -22,5 +22,5 @@ export const $CreateSessionData = z.object({
   groupId: z.string().nullable(),
   subjectData: $CreateSubjectData,
   type: $SessionType,
-  userId: z.string().nullish()
+  username: z.string().nullish()
 });

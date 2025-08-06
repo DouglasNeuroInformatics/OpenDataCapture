@@ -29,16 +29,16 @@ export class SessionsService {
     });
   }
 
-  async create({ date, groupId, subjectData, type, userId }: CreateSessionData): Promise<Session> {
+  async create({ date, groupId, subjectData, type, username }: CreateSessionData): Promise<Session> {
     this.loggingService.debug({ message: 'Attempting to create session' });
     const subject = await this.resolveSubject(subjectData);
 
     let user: null | Omit<User, 'hashedPassword'> = null;
 
-    if (userId) {
+    if (username) {
       user = await this.prismaClient.user.findFirst({
         where: {
-          username: userId
+          username: username
         }
       });
       // user = await this.userService.findById(userId);

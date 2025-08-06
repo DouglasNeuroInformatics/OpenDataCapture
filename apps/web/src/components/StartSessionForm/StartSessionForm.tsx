@@ -253,7 +253,7 @@ export const StartSessionForm = ({
         await onSubmit({
           date: sessionDate,
           groupId: currentGroup?.id ?? null,
-          userId: currentUser?.username ?? null,
+          username: currentUser?.username ?? null,
           type: sessionType,
           subjectData: {
             id: subjectId,
