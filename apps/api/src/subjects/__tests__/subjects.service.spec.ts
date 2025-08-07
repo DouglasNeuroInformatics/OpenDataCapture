@@ -95,6 +95,10 @@ describe('SubjectsService', () => {
       expect(prismaClient.subject.deleteMany).toHaveBeenCalled();
       expect(prismaClient.$transaction).toHaveBeenCalledOnce();
     });
+    it('should throw NotFoundException when subject does not exist', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce(null);
+      await expect(subjectsService.deleteById('123')).rejects.toBeInstanceOf(NotFoundException);
+    });
   });
 
   describe('findById', () => {
