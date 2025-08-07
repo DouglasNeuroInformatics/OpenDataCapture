@@ -1,28 +1,39 @@
 import { CryptoService, getModelToken } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { ExtendedPrismaClient, Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { pick } from 'lodash-es';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { PRISMA_CLIENT_TOKEN } from 'node_modules/@douglasneuroinformatics/libnest/dist/modules/prisma/prisma.config';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SubjectsService } from '../subjects.service';
 
 describe('SubjectsService', () => {
   let subjectsService: SubjectsService;
   let subjectModel: MockedInstance<Model<'Subject'>>;
+  let prismaClient: MockedInstance<ExtendedPrismaClient> & {
+    [key: string]: any;
+  };
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         MockFactory.createForService(CryptoService),
         SubjectsService,
-        MockFactory.createForModelToken(getModelToken('Subject'))
+        MockFactory.createForModelToken(getModelToken('Subject')),
+        {
+          provide: PRISMA_CLIENT_TOKEN,
+          useValue: {
+            $transaction: vi.fn()
+          }
+        }
       ]
     }).compile();
     subjectModel = moduleRef.get(getModelToken('Subject'));
     subjectsService = moduleRef.get(SubjectsService);
+    prismaClient = moduleRef.get(PRISMA_CLIENT_TOKEN);
   });
 
   describe('create', () => {
@@ -56,6 +67,20 @@ describe('SubjectsService', () => {
     it('should return the array returned by the subject model', async () => {
       subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
       await expect(subjectsService.find()).resolves.toMatchObject([{ id: '123' }]);
+    });
+  });
+
+  describe('deleteById', () => {
+    it('should delete the subject via the subject model and not call $transaction, if force is falsy', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      await subjectsService.deleteById('123');
+      expect(subjectModel.delete).toHaveBeenCalledOnce();
+      expect(prismaClient.$transaction).not.toHaveBeenCalled();
+    });
+    it('should use $transaction if force is set to true', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      await subjectsService.deleteById('123', { force: true });
+      expect(subjectModel.delete).not.toHaveBeenCalled();
     });
   });
 
