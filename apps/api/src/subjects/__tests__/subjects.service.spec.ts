@@ -93,6 +93,7 @@ describe('SubjectsService', () => {
       expect(prismaClient.session.deleteMany).toHaveBeenCalled();
       expect(prismaClient.instrumentRecord.deleteMany).toHaveBeenCalled();
       expect(prismaClient.subject.deleteMany).toHaveBeenCalled();
+      expect(prismaClient.$transaction).toHaveBeenCalledOnce();
     });
   });
 
