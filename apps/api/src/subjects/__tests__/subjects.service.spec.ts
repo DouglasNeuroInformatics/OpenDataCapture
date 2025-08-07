@@ -26,7 +26,16 @@ describe('SubjectsService', () => {
         {
           provide: PRISMA_CLIENT_TOKEN,
           useValue: {
-            $transaction: vi.fn()
+            $transaction: vi.fn(),
+            instrumentRecord: {
+              deleteMany: vi.fn()
+            },
+            session: {
+              deleteMany: vi.fn()
+            },
+            subject: {
+              deleteMany: vi.fn()
+            }
           }
         }
       ]
@@ -81,6 +90,9 @@ describe('SubjectsService', () => {
       subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
       await subjectsService.deleteById('123', { force: true });
       expect(subjectModel.delete).not.toHaveBeenCalled();
+      expect(prismaClient.session.deleteMany).toHaveBeenCalled();
+      expect(prismaClient.instrumentRecord.deleteMany).toHaveBeenCalled();
+      expect(prismaClient.subject.deleteMany).toHaveBeenCalled();
     });
   });
 
