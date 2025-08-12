@@ -1,4 +1,4 @@
-import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
+import { isZodType, replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
 import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
@@ -17,6 +17,7 @@ import { Prisma } from '@prisma/client';
 import type { $Enums, Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
 import { err, ok } from 'neverthrow';
+import z from 'zod/v4';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -131,7 +132,7 @@ export class InstrumentRecordsService {
   }
 
   //TODO
-  // Chech if instrument schema is zod4 version, if so use the toJSONSchema method to convert to json
+  // Check if instrument schema is zod4 version, if so use the toJSONSchema method to convert to json
   // and expand the data from there
   async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
     const data: InstrumentRecordsExport = [];
@@ -168,6 +169,11 @@ export class InstrumentRecordsService {
         instrument = (await this.instrumentsService.findById(record.instrumentId)) as ScalarInstrument;
         instruments.set(record.instrumentId, instrument);
       }
+
+      // if (isZodType(instrument.validationSchema, { version: 4})) {
+      //   const zodToJson = z.toJSONSchema(instrument.validationSchema)
+
+      // }
 
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
         let list;
