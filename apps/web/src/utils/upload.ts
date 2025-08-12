@@ -1,4 +1,4 @@
-import { isNumberLike, isObjectLike, isPlainObject, parseNumber } from '@douglasneuroinformatics/libjs';
+import { isNumberLike, isObjectLike, isPlainObject, isZodType, parseNumber } from '@douglasneuroinformatics/libjs';
 import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
@@ -6,6 +6,7 @@ import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instr
 import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import { parse, unparse } from 'papaparse';
 import { z } from 'zod';
+import { z as z2 } from 'zod/v4';
 
 // TODO - refine ZodTypeNameResult to reflect specific ZodType variants (i.e., object)
 
@@ -433,6 +434,10 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
 
     if (!isZodObject(instrumentSchema)) {
       throw new Error('Validation schema for this instrument is invalid');
+    }
+
+    if (isZodType(instrumentSchema, { version: 4 })) {
+      const zodJsonSchema = z2.toJSONSchema(instrumentSchema as z2.ZodSchema);
     }
 
     const instrumentSchemaDef: unknown = instrument.validationSchema._def;
