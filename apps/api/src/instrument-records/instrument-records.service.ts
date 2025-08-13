@@ -1,4 +1,4 @@
-import { isZodType, replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
+import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
 import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
@@ -17,7 +17,6 @@ import { Prisma } from '@prisma/client';
 import type { $Enums, Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
 import { err, ok } from 'neverthrow';
-import z from 'zod/v4';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
