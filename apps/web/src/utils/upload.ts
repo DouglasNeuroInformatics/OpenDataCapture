@@ -428,12 +428,69 @@ function generateSampleData({
   }
 }
 
+function zod4Helper(jsonInstrumentSchema: z2.core.JSONSchema.BaseSchema) {
+  if (
+    jsonInstrumentSchema.properties &&
+    jsonInstrumentSchema.required &&
+    Array.isArray(jsonInstrumentSchema.required)
+  ) {
+    const jsonColumnNames = Object.keys(jsonInstrumentSchema.properties);
+
+    let optional = false;
+    const jsonCSVColumns = INTERNAL_HEADERS.concat(jsonColumnNames);
+    const jsonSampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
+
+    for (const col of jsonColumnNames) {
+      let data: ZodTypeNameResult;
+      if (jsonInstrumentSchema.required.includes(col)) {
+        optional = true;
+      }
+      console.log(jsonInstrumentSchema.properties[col]);
+
+      if (jsonInstrumentSchema.properties[col].enum) {
+        data = {
+          enumValues: jsonInstrumentSchema.properties[col].enum as readonly string[],
+          isOptional: optional,
+          success: true,
+          typeName: 'ZodString'
+        };
+      }
+
+      if (jsonInstrumentSchema.properties[col].type === 'array') {
+        console.log('here');
+        const keys = Object.keys(jsonInstrumentSchema.properties[col].items.properties);
+        const values = Object.values(jsonInstrumentSchema.properties[col].items.properties);
+
+        // console.log(keys)
+        // console.log(values)
+
+        // data = {
+        // isOptional: optional,
+        // multiKeys: keys,
+        // multiValues: Object.values(values),
+        // success: true,
+        // typeName: "ZodObject"
+        // }
+      }
+    }
+  }
+}
+
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
   try {
     const instrumentSchema = instrument.validationSchema;
 
+    /**
+     * Steps for zod4 schemas
+     * convert schema to json schema
+     * Check properties for all questions
+     * for optional questions check if it exists in required, if not then make it optional
+     * Use the types provided by the schema to generate the sample data
+     * **/
+
     if (isZodType(instrumentSchema, { version: 4 })) {
       const jsonInstrumentSchema = z2.toJSONSchema(instrumentSchema as z2.ZodSchema);
+      zod4Helper(jsonInstrumentSchema);
       console.log(jsonInstrumentSchema);
     }
 
