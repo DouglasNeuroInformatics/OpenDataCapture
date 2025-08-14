@@ -457,7 +457,6 @@ function zod4Helper(jsonInstrumentSchema: z2.core.JSONSchema.BaseSchema) {
     const jsonSampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
 
     for (const col of jsonColumnNames) {
-      console.log(col);
       let optional = false;
       let data: ZodTypeNameResult = {
         message: 'Failed to interpret JSON value from schema',
@@ -471,15 +470,17 @@ function zod4Helper(jsonInstrumentSchema: z2.core.JSONSchema.BaseSchema) {
         const keys = Object.keys(jsonInstrumentSchema.properties[col].items.properties);
         const values = Object.values(jsonInstrumentSchema.properties[col].items.properties);
         const multiVals: ZodTypeNameResult[] = [];
+        let i = 0;
 
         for (const val of values) {
           // eslint-disable-next-line max-depth
-          if (val.type) {
+          if (val.type && Array.isArray(jsonInstrumentSchema.properties[col].items.required)) {
             multiVals.push({
-              isOptional: false,
+              isOptional: jsonInstrumentSchema.properties[col].items.required.includes(keys[i]),
               success: true,
               typeName: jsonToZod(val.type)
             });
+            i++;
           }
         }
 
