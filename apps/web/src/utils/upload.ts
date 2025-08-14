@@ -427,7 +427,24 @@ function generateSampleData({
       throw new Error(`Invalid zod schema: unexpected type name '${typeName satisfies never}'`);
   }
 }
-
+function jsonToZod(givenType: unknown): RequiredZodTypeName {
+  if (typeof givenType === 'string') {
+    switch (givenType) {
+      case 'boolean':
+        return 'ZodBoolean';
+      case 'date':
+        return 'ZodDate';
+      case 'number':
+        return 'ZodNumber';
+      case 'set':
+        return 'ZodSet';
+      case 'string':
+        return 'ZodString';
+      default:
+    }
+  }
+  throw new Error('Failed to interpret json value');
+}
 function zod4Helper(jsonInstrumentSchema: z2.core.JSONSchema.BaseSchema) {
   if (
     jsonInstrumentSchema.properties &&
@@ -436,44 +453,70 @@ function zod4Helper(jsonInstrumentSchema: z2.core.JSONSchema.BaseSchema) {
   ) {
     const jsonColumnNames = Object.keys(jsonInstrumentSchema.properties);
 
-    let optional = false;
     const jsonCSVColumns = INTERNAL_HEADERS.concat(jsonColumnNames);
     const jsonSampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
 
     for (const col of jsonColumnNames) {
-      let data: ZodTypeNameResult;
+      console.log(col);
+      let optional = false;
+      let data: ZodTypeNameResult = {
+        message: 'Failed to interpret JSON value from schema',
+        success: false
+      };
       if (jsonInstrumentSchema.required.includes(col)) {
         optional = true;
       }
-      console.log(jsonInstrumentSchema.properties[col]);
 
-      if (jsonInstrumentSchema.properties[col].enum) {
+      if (jsonInstrumentSchema.properties[col].type === 'array') {
+        const keys = Object.keys(jsonInstrumentSchema.properties[col].items.properties);
+        const values = Object.values(jsonInstrumentSchema.properties[col].items.properties);
+        const multiVals: ZodTypeNameResult[] = [];
+
+        for (const val of values) {
+          // eslint-disable-next-line max-depth
+          if (val.type) {
+            multiVals.push({
+              isOptional: false,
+              success: true,
+              typeName: jsonToZod(val.type)
+            });
+          }
+        }
+
+        data = {
+          isOptional: optional,
+          multiKeys: keys,
+          multiValues: multiVals,
+          success: true,
+          typeName: 'ZodObject'
+        };
+      } else if (jsonInstrumentSchema.properties[col].enum) {
+        console.log('Enum stuff ', jsonInstrumentSchema.properties[col].enum as readonly string[]);
         data = {
           enumValues: jsonInstrumentSchema.properties[col].enum as readonly string[],
           isOptional: optional,
           success: true,
-          typeName: 'ZodString'
+          typeName: 'ZodEnum'
+        };
+      } else {
+        data = {
+          isOptional: optional,
+          success: true,
+          typeName: jsonToZod(jsonInstrumentSchema.properties[col].type)
         };
       }
 
-      if (jsonInstrumentSchema.properties[col].type === 'array') {
-        console.log('here');
-        const keys = Object.keys(jsonInstrumentSchema.properties[col].items.properties);
-        const values = Object.values(jsonInstrumentSchema.properties[col].items.properties);
-
-        // console.log(keys)
-        // console.log(values)
-
-        // data = {
-        // isOptional: optional,
-        // multiKeys: keys,
-        // multiValues: Object.values(values),
-        // success: true,
-        // typeName: "ZodObject"
-        // }
+      if (!data.success) {
+        throw new Error(data.message);
       }
+      jsonSampleData.push(generateSampleData(data));
     }
+
+    const zod4TemplateData = unparse([jsonCSVColumns, jsonSampleData]);
+
+    return zod4TemplateData;
   }
+  throw new Error('Failed to interpret JSON schema');
 }
 
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
@@ -490,8 +533,12 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
 
     if (isZodType(instrumentSchema, { version: 4 })) {
       const jsonInstrumentSchema = z2.toJSONSchema(instrumentSchema as z2.ZodSchema);
-      zod4Helper(jsonInstrumentSchema);
-      console.log(jsonInstrumentSchema);
+      const zod4TemplateData = zod4Helper(jsonInstrumentSchema);
+
+      return {
+        content: zod4TemplateData,
+        fileName: `${instrument.internal.name}_${instrument.internal.edition}_template.csv`
+      };
     }
 
     if (!isZodObject(instrumentSchema)) {
