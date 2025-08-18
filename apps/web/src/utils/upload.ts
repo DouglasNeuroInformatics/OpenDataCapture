@@ -497,18 +497,22 @@ function zod4Helper(jsonInstrumentSchema: z2.core.JSONSchema.BaseSchema) {
           typeName: 'ZodObject'
         };
       } else if (jsonInstrumentSchema.properties[col].enum) {
-        console.log('Enum stuff ', jsonInstrumentSchema.properties[col].enum as readonly string[]);
         data = {
           enumValues: jsonInstrumentSchema.properties[col].enum as readonly string[],
           isOptional: optional,
           success: true,
           typeName: 'ZodEnum'
         };
-      } else {
+      } else if (jsonToZod(jsonInstrumentSchema.properties[col].type)) {
         data = {
           isOptional: optional,
           success: true,
           typeName: jsonToZod(jsonInstrumentSchema.properties[col].type)
+        };
+      } else {
+        data = {
+          message: 'Failed to interpret JSON value from schema',
+          success: false
         };
       }
 
