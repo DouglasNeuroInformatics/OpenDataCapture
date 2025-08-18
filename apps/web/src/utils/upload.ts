@@ -57,6 +57,10 @@ type UploadOperationResult<T> =
       value: T;
     };
 
+type PropertySchema = {
+  [key: string]: unknown;
+};
+
 type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 
 type AnyZodArrayDef = z.ZodArrayDef & { type: z.AnyZodObject };
@@ -466,6 +470,7 @@ function zod4Helper(jsonInstrumentSchema: z2.core.JSONSchema.BaseSchema) {
         optional = true;
       }
 
+      const typeSafety: PropertySchema = jsonInstrumentSchema.properties[col];
       if (jsonInstrumentSchema.properties[col].type === 'array') {
         const keys = Object.keys(jsonInstrumentSchema.properties[col].items.properties);
         const values = Object.values(jsonInstrumentSchema.properties[col].items.properties);
@@ -680,7 +685,7 @@ export async function processInstrumentCSV(
                 typeNameResult.multiKeys
               );
               // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
-              //Dealt with via else statement for now
+              // Dealt with via else statement for now
             } else {
               interpreterResult.message = 'Record Array keys do not exist';
             }
