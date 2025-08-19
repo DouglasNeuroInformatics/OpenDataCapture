@@ -145,6 +145,46 @@ function reformatInstrumentData({
 
 function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
   const def: unknown = schema._def;
+  if (isZodType(schema, { version: 4 })) {
+    if (def.type === 'optional') {
+      return getZodTypeName(def.innerType, true);
+    } else if (def.type === 'enum') {
+      return {
+        enumValues: def.values,
+        isOptional: Boolean(isOptional),
+        success: true,
+        typeName: jsonToZod(def.type)
+      };
+    } else if (def.type === 'array') {
+      const arrayName = jsonToZod(def.type) as z.ZodFirstPartyTypeKind.ZodArray;
+
+      return interpretZodArray(schema, arrayName, isOptional);
+    } else if (def.type === 'set') {
+      const innerDef: unknown = def.valueType._def;
+
+      if (!isZodTypeDef(innerDef)) {
+        return {
+          message: 'Invalid inner type: ZodSet value type must have a valid type definition',
+          success: false
+        };
+      }
+
+      if (isZodEnumDef(innerDef)) {
+        return {
+          enumValues: innerDef.values,
+          isOptional: Boolean(isOptional),
+          success: true,
+          typeName: jsonToZod(def.type)
+        };
+      }
+    }
+
+    return {
+      isOptional: Boolean(isOptional),
+      success: true,
+      typeName: jsonToZod(def.type)
+    };
+  }
   if (isZodTypeDef(def)) {
     if (isZodOptionalDef(def)) {
       return getZodTypeName(def.innerType, true);
@@ -195,6 +235,34 @@ function interpretZodArray(
   const def: unknown = schema._def;
   const listOfZodElements: ZodTypeNameResult[] = [];
   const listOfZodKeys: string[] = [];
+
+  if (isZodType(schema, { version: 4 })) {
+    const shape = def.element.shape as { [key: string]: z.ZodTypeAny };
+
+    for (const [key, insideType] of Object.entries(shape)) {
+      const def: unknown = insideType._def;
+      if (def.type) {
+        const innerTypeName = getZodTypeName(insideType);
+        listOfZodElements.push(innerTypeName);
+        listOfZodKeys.push(key);
+      } else {
+        console.error({ def });
+        throw new Error(`Unhandled case!`);
+      }
+    }
+
+    if (listOfZodElements.length === 0) {
+      return { message: 'Failure to interpret Zod Object or Array', success: false };
+    }
+
+    return {
+      isOptional: Boolean(isOptional),
+      multiKeys: listOfZodKeys,
+      multiValues: listOfZodElements,
+      success: true,
+      typeName: originalName
+    };
+  }
 
   if (!isZodTypeDef(def)) {
     throw new Error(`Unexpected value for _def in schema: ${JSON.stringify(def)}`);
@@ -434,6 +502,8 @@ function generateSampleData({
 function jsonToZod(givenType: unknown): RequiredZodTypeName {
   if (typeof givenType === 'string') {
     switch (givenType) {
+      case 'array':
+        return 'ZodArray';
       case 'boolean':
         return 'ZodBoolean';
       case 'date':
@@ -469,7 +539,6 @@ function zod4Helper(jsonInstrumentSchema: z2.core.JSONSchema.BaseSchema) {
 
       const typeSafety: PropertySchema = jsonInstrumentSchema.properties[col];
       if (typeSafety.type === 'array') {
-        console.log('here');
         const keys = Object.keys(jsonInstrumentSchema.properties[col].items.properties);
         const values = Object.values(jsonInstrumentSchema.properties[col].items.properties);
         const multiVals: ZodTypeNameResult[] = [];
@@ -669,6 +738,7 @@ export async function processInstrumentCSV(
             });
           }
           const typeNameResult = getZodTypeName(shape[key]);
+          // console.log("results: ", typeNameResult)
           if (!typeNameResult.success) {
             return resolve({ message: typeNameResult.message, success: false });
           }
@@ -686,6 +756,8 @@ export async function processInstrumentCSV(
                 typeNameResult.multiValues,
                 typeNameResult.multiKeys
               );
+              console.log('interpreted result: ', interpreterResult);
+
               // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
               // Dealt with via else statement for now
             } else {
@@ -693,6 +765,7 @@ export async function processInstrumentCSV(
             }
           } else {
             interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
+            console.log('interpreted result: ', interpreterResult);
           }
           if (!interpreterResult.success) {
             return resolve({
@@ -703,6 +776,7 @@ export async function processInstrumentCSV(
           jsonLine[headers[j]!] = interpreterResult.value;
         }
         const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
+
         if (!zodCheck.success) {
           console.error(zodCheck.error.issues);
           const zodIssues = zodCheck.error.issues.map((issue) => {
