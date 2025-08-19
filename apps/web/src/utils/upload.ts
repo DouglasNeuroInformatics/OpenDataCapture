@@ -765,7 +765,6 @@ export async function processInstrumentCSV(
             }
           } else {
             interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
-            console.log('interpreted result: ', interpreterResult);
           }
           if (!interpreterResult.success) {
             return resolve({
@@ -775,6 +774,7 @@ export async function processInstrumentCSV(
           }
           jsonLine[headers[j]!] = interpreterResult.value;
         }
+        //fix this for zod4 stuff :(
         const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
 
         if (!zodCheck.success) {
