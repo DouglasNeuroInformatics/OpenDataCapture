@@ -97,6 +97,7 @@ const $InstrumentMeasureValue: z.ZodType<InstrumentMeasureValue> = z.union([
   z.boolean(),
   z.number(),
   z.date(),
+  z.array(z.any()),
   z.undefined()
 ]);
 
