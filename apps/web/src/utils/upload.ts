@@ -146,8 +146,8 @@ function reformatInstrumentData({
 function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
   const def: unknown = schema._def;
   if (isZodType(schema, { version: 4 })) {
-    const Zod4Result = getZod4TypeName(def, isOptional);
-    return Zod4Result;
+    const getZod4TypeNameResult = getZod4TypeName(def, schema, isOptional);
+    return getZod4TypeNameResult;
   }
   if (isZodTypeDef(def)) {
     if (isZodOptionalDef(def)) {
@@ -191,7 +191,7 @@ function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeName
   return { message: 'Unexpected Error', success: false };
 }
 
-function getZod4TypeName(def: unknown, isOptional?: boolean): ZodTypeNameResult {
+function getZod4TypeName(def: unknown, schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
   if (def.type === 'optional') {
     return getZodTypeName(def.innerType, true);
   } else if (def.type === 'enum') {
@@ -695,6 +695,7 @@ export async function processInstrumentCSV(
     .regex(/^[^$\s]+$/, 'Subject ID has to be at least 1 character long, without a $ and no whitespaces');
 
   if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
+    console.log('here123123');
     if (!isZodObject(instrumentSchemaDef.schema)) {
       return { message: 'Invalid instrument schema', success: false };
     }
