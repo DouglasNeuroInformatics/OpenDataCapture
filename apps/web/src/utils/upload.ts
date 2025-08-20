@@ -204,6 +204,16 @@ function getZod4TypeName(
   if (def.type === 'optional' && def.innerType) {
     return getZodTypeName(def.innerType, true);
   } else if (def.type === 'enum') {
+    if (def.entries) {
+      const entries = Object.keys(def.entries as object);
+
+      return {
+        enumValues: entries,
+        isOptional: Boolean(isOptional),
+        success: true,
+        typeName: jsonToZod(def.type)
+      };
+    }
     return {
       enumValues: def.values,
       isOptional: Boolean(isOptional),
@@ -533,6 +543,8 @@ function jsonToZod(givenType: unknown): RequiredZodTypeName {
         return 'ZodBoolean';
       case 'date':
         return 'ZodDate';
+      case 'enum':
+        return 'ZodEnum';
       case 'number':
         return 'ZodNumber';
       case 'set':
@@ -715,6 +727,7 @@ export async function processInstrumentCSV(
     });
     shape = (instrumentSchemaWithInternal._def as z.ZodObjectDef).shape() as { [key: string]: z.ZodTypeAny };
   } else {
+    console.log('here2', instrumentSchema);
     if (instrumentSchema instanceof z4.ZodObject) {
       const result = processInstrumentCSVZod4(input, instrument);
       return result;
