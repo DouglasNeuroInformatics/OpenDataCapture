@@ -242,31 +242,8 @@ function interpretZodArray(
   const listOfZodKeys: string[] = [];
 
   if (isZodType(schema, { version: 4 })) {
-    const shape = def.element.shape as { [key: string]: z.ZodTypeAny };
-
-    for (const [key, insideType] of Object.entries(shape)) {
-      const def: unknown = insideType._def;
-      if (def.type) {
-        const innerTypeName = getZodTypeName(insideType);
-        listOfZodElements.push(innerTypeName);
-        listOfZodKeys.push(key);
-      } else {
-        console.error({ def });
-        throw new Error(`Unhandled case!`);
-      }
-    }
-
-    if (listOfZodElements.length === 0) {
-      return { message: 'Failure to interpret Zod Object or Array', success: false };
-    }
-
-    return {
-      isOptional: Boolean(isOptional),
-      multiKeys: listOfZodKeys,
-      multiValues: listOfZodElements,
-      success: true,
-      typeName: originalName
-    };
+    const Zod4ArrayResult = interpretZod4Array(def, originalName, isOptional);
+    return Zod4ArrayResult;
   }
 
   if (!isZodTypeDef(def)) {
@@ -282,6 +259,40 @@ function interpretZodArray(
   for (const [key, insideType] of Object.entries(shape)) {
     const def: unknown = insideType._def;
     if (isZodTypeDef(def)) {
+      const innerTypeName = getZodTypeName(insideType);
+      listOfZodElements.push(innerTypeName);
+      listOfZodKeys.push(key);
+    } else {
+      console.error({ def });
+      throw new Error(`Unhandled case!`);
+    }
+  }
+
+  if (listOfZodElements.length === 0) {
+    return { message: 'Failure to interpret Zod Object or Array', success: false };
+  }
+
+  return {
+    isOptional: Boolean(isOptional),
+    multiKeys: listOfZodKeys,
+    multiValues: listOfZodElements,
+    success: true,
+    typeName: originalName
+  };
+}
+
+function interpretZod4Array(
+  def: unknown,
+  originalName: z.ZodFirstPartyTypeKind.ZodArray,
+  isOptional?: boolean
+): ZodTypeNameResult {
+  const listOfZodElements: ZodTypeNameResult[] = [];
+  const listOfZodKeys: string[] = [];
+  const shape = def.element.shape as { [key: string]: z.ZodTypeAny };
+
+  for (const [key, insideType] of Object.entries(shape)) {
+    const def: unknown = insideType._def;
+    if (def.type) {
       const innerTypeName = getZodTypeName(insideType);
       listOfZodElements.push(innerTypeName);
       listOfZodKeys.push(key);
