@@ -6,7 +6,7 @@ import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instr
 import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import { parse, unparse } from 'papaparse';
 import { z } from 'zod';
-import { z as z2 } from 'zod/v4';
+import { z as z4 } from 'zod/v4';
 
 // TODO - refine ZodTypeNameResult to reflect specific ZodType variants (i.e., object)
 
@@ -519,7 +519,7 @@ function jsonToZod(givenType: unknown): RequiredZodTypeName {
   }
   throw new Error('Failed to interpret json value');
 }
-function zod4Helper(jsonInstrumentSchema: z2.core.JSONSchema.BaseSchema) {
+function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
   if (
     jsonInstrumentSchema.properties &&
     jsonInstrumentSchema.required &&
@@ -609,7 +609,7 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
      * **/
 
     if (isZodType(instrumentSchema, { version: 4 })) {
-      const jsonInstrumentSchema = z2.toJSONSchema(instrumentSchema as z2.ZodSchema);
+      const jsonInstrumentSchema = z4.toJSONSchema(instrumentSchema as z4.ZodSchema);
       const zod4TemplateData = zod4Helper(jsonInstrumentSchema);
 
       return {
