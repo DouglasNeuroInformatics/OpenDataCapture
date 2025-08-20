@@ -1,5 +1,10 @@
 import { isNumberLike, isObjectLike, isPlainObject, isZodType, parseNumber } from '@douglasneuroinformatics/libjs';
-import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
+import type {
+  AnyUnilingualFormInstrument,
+  FormTypes,
+  InstrumentValidationSchema,
+  Json
+} from '@opendatacapture/runtime-core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
@@ -143,7 +148,7 @@ function reformatInstrumentData({
   return reformatForSending;
 }
 
-function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
+function getZodTypeName(schema: z4.ZodType<unknown, unknown> | z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
   const def: unknown = schema._def;
   if (isZodType(schema, { version: 4 })) {
     const getZod4TypeNameResult = getZod4TypeName(def, schema, isOptional);
@@ -191,8 +196,12 @@ function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeName
   return { message: 'Unexpected Error', success: false };
 }
 
-function getZod4TypeName(def: unknown, schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
-  if (def.type === 'optional') {
+function getZod4TypeName(
+  def: unknown,
+  schema: z4.ZodType<unknown, unknown> | z.ZodTypeAny,
+  isOptional?: boolean
+): ZodTypeNameResult {
+  if (def.type === 'optional' && def.innerType) {
     return getZodTypeName(def.innerType, true);
   } else if (def.type === 'enum') {
     return {
@@ -687,30 +696,35 @@ export async function processInstrumentCSV(
 ): Promise<UploadOperationResult<FormTypes.Data[]>> {
   const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
   let shape: { [key: string]: z.ZodTypeAny } = {};
+
   let instrumentSchemaWithInternal: z.AnyZodObject;
 
   const instrumentSchemaDef: unknown = instrumentSchema._def;
-  const $SubjectIdValidation = z
-    .string()
-    .regex(/^[^$\s]+$/, 'Subject ID has to be at least 1 character long, without a $ and no whitespaces');
+  const subjectIdRegex = [
+    /^[^$\s]+$/,
+    'Subject ID has to be at least 1 character long, without a $ and no whitespaces'
+  ] as const;
 
   if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
-    console.log('here123123');
     if (!isZodObject(instrumentSchemaDef.schema)) {
       return { message: 'Invalid instrument schema', success: false };
     }
     instrumentSchemaWithInternal = instrumentSchemaDef.schema.extend({
       date: z.coerce.date(),
-      subjectID: $SubjectIdValidation
+      subjectID: z.string().regex(...subjectIdRegex)
     });
-
-    shape = instrumentSchemaWithInternal._def.shape() as { [key: string]: z.ZodTypeAny };
+    shape = (instrumentSchemaWithInternal._def as z.ZodObjectDef).shape() as { [key: string]: z.ZodTypeAny };
   } else {
-    instrumentSchemaWithInternal = instrumentSchema.extend({
-      date: z.coerce.date(),
-      subjectID: $SubjectIdValidation
-    });
-    shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
+    if (instrumentSchema instanceof z4.ZodObject) {
+      const result = processInstrumentCSVZod4(input, instrument);
+      return result;
+    } else {
+      instrumentSchemaWithInternal = instrumentSchema.extend({
+        date: z.coerce.date(),
+        subjectID: z.string().regex(...subjectIdRegex)
+      });
+      shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
+    }
   }
 
   return new Promise<UploadOperationResult<FormTypes.Data[]>>((resolve) => {
@@ -773,7 +787,133 @@ export async function processInstrumentCSV(
                 typeNameResult.multiValues,
                 typeNameResult.multiKeys
               );
-              console.log('interpreted result: ', interpreterResult);
+              // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
+              // Dealt with via else statement for now
+            } else {
+              interpreterResult.message = 'Record Array keys do not exist';
+            }
+          } else {
+            interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
+          }
+          if (!interpreterResult.success) {
+            return resolve({
+              message: `${interpreterResult.message} at column name: '${key}' and row number ${rowNumber}`,
+              success: false
+            });
+          }
+          jsonLine[headers[j]!] = interpreterResult.value;
+        }
+
+        const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
+
+        if (!zodCheck.success) {
+          console.error(zodCheck.error.issues);
+          const zodIssues = zodCheck.error.issues.map((issue) => {
+            return `issue message: \n ${issue.message} \n path: ${issue.path.toString()}`;
+          });
+          console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
+          return resolve({ message: zodIssues.join(), success: false });
+        }
+        result.push(zodCheck.data);
+        rowNumber++;
+      }
+      resolve({ success: true, value: result });
+    };
+    reader.readAsText(input);
+  });
+}
+
+export async function processInstrumentCSVZod4(
+  input: File,
+  instrument: AnyUnilingualFormInstrument
+): Promise<UploadOperationResult<FormTypes.Data[]>> {
+  const instrumentSchema = instrument.validationSchema as z4.ZodObject;
+  let shape: { [key: string]: z4.ZodTypeAny } = {};
+
+  // const instrumentSchemaContainer: { schema: z4.ZodObject; v: 4,} | { schema: z.AnyZodObject; v: 3 } | { v: null} = {}
+
+  let instrumentSchemaWithInternal: z4.ZodObject;
+
+  const instrumentSchemaDef: unknown = instrumentSchema.def;
+  const subjectIdRegex = [
+    /^[^$\s]+$/,
+    'Subject ID has to be at least 1 character long, without a $ and no whitespaces'
+  ] as const;
+
+  if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
+    return {
+      message: 'Wrong schema',
+      success: false
+    };
+  } else {
+    if (instrumentSchema instanceof z4.ZodObject) {
+      instrumentSchemaWithInternal = instrumentSchema.extend({
+        date: z4.coerce.date(),
+        subjectID: z4.string().regex(...subjectIdRegex)
+      });
+      shape = instrumentSchemaWithInternal.shape;
+    }
+  }
+
+  return new Promise<UploadOperationResult<FormTypes.Data[]>>((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = reader.result as string;
+      const parseResultCsv = parse<string[]>(text, {
+        header: false,
+        skipEmptyLines: true
+      });
+
+      const [headers, ...dataLines] = parseResultCsv.data;
+
+      //remove sample data if included
+      if (dataLines[0]?.[0]?.startsWith(MONGOLIAN_VOWEL_SEPARATOR)) {
+        dataLines.shift();
+      }
+
+      if (dataLines.length === 0) {
+        return resolve({ message: 'data lines is empty array', success: false });
+      }
+
+      const result: FormTypes.Data[] = [];
+
+      if (!headers?.length) {
+        return resolve({ message: 'headers is undefined or empty array', success: false });
+      }
+      let rowNumber = 1;
+      for (const elements of dataLines) {
+        const jsonLine: { [key: string]: unknown } = {};
+        for (let j = 0; j < headers.length; j++) {
+          const key = headers[j]!.trim();
+          const rawValue = elements[j]!.trim();
+
+          if (rawValue === '\n') {
+            continue;
+          }
+          if (shape[key] === undefined) {
+            return resolve({
+              message: `Schema value at column ${j} is not defined! Please check if Column has been edited/deleted from original template`,
+              success: false
+            });
+          }
+          const typeNameResult = getZodTypeName(shape[key]);
+          if (!typeNameResult.success) {
+            return resolve({ message: typeNameResult.message, success: false });
+          }
+
+          let interpreterResult: UploadOperationResult<FormTypes.FieldValue> = {
+            message: 'Could not interpret a correct value',
+            success: false
+          };
+
+          if (typeNameResult.typeName === 'ZodArray' || typeNameResult.typeName === 'ZodObject') {
+            if (typeNameResult.multiKeys && typeNameResult.multiValues) {
+              interpreterResult = interpretZodObjectValue(
+                rawValue,
+                typeNameResult.isOptional,
+                typeNameResult.multiValues,
+                typeNameResult.multiKeys
+              );
 
               // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
               // Dealt with via else statement for now
@@ -791,9 +931,8 @@ export async function processInstrumentCSV(
           }
           jsonLine[headers[j]!] = interpreterResult.value;
         }
-        //fix this for zod4 stuff :(
-        const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
 
+        const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
         if (!zodCheck.success) {
           console.error(zodCheck.error.issues);
           const zodIssues = zodCheck.error.issues.map((issue) => {
@@ -802,7 +941,7 @@ export async function processInstrumentCSV(
           console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
           return resolve({ message: zodIssues.join(), success: false });
         }
-        result.push(zodCheck.data);
+        result.push(zodCheck.data as FormTypes.Data);
         rowNumber++;
       }
       resolve({ success: true, value: result });
