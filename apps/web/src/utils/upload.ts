@@ -146,44 +146,8 @@ function reformatInstrumentData({
 function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
   const def: unknown = schema._def;
   if (isZodType(schema, { version: 4 })) {
-    if (def.type === 'optional') {
-      return getZodTypeName(def.innerType, true);
-    } else if (def.type === 'enum') {
-      return {
-        enumValues: def.values,
-        isOptional: Boolean(isOptional),
-        success: true,
-        typeName: jsonToZod(def.type)
-      };
-    } else if (def.type === 'array') {
-      const arrayName = jsonToZod(def.type) as z.ZodFirstPartyTypeKind.ZodArray;
-
-      return interpretZodArray(schema, arrayName, isOptional);
-    } else if (def.type === 'set') {
-      const innerDef: unknown = def.valueType._def;
-
-      if (!isZodTypeDef(innerDef)) {
-        return {
-          message: 'Invalid inner type: ZodSet value type must have a valid type definition',
-          success: false
-        };
-      }
-
-      if (isZodEnumDef(innerDef)) {
-        return {
-          enumValues: innerDef.values,
-          isOptional: Boolean(isOptional),
-          success: true,
-          typeName: jsonToZod(def.type)
-        };
-      }
-    }
-
-    return {
-      isOptional: Boolean(isOptional),
-      success: true,
-      typeName: jsonToZod(def.type)
-    };
+    const Zod4Result = getZod4TypeName(def, isOptional);
+    return Zod4Result;
   }
   if (isZodTypeDef(def)) {
     if (isZodOptionalDef(def)) {
@@ -225,6 +189,47 @@ function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeName
   }
   console.error(`Cannot parse ZodType from schema: ${JSON.stringify(schema)}`);
   return { message: 'Unexpected Error', success: false };
+}
+
+function getZod4TypeName(def: unknown, isOptional?: boolean): ZodTypeNameResult {
+  if (def.type === 'optional') {
+    return getZodTypeName(def.innerType, true);
+  } else if (def.type === 'enum') {
+    return {
+      enumValues: def.values,
+      isOptional: Boolean(isOptional),
+      success: true,
+      typeName: jsonToZod(def.type)
+    };
+  } else if (def.type === 'array') {
+    const arrayName = jsonToZod(def.type) as z.ZodFirstPartyTypeKind.ZodArray;
+
+    return interpretZodArray(schema, arrayName, isOptional);
+  } else if (def.type === 'set') {
+    const innerDef: unknown = def.valueType._def;
+
+    if (!isZodTypeDef(innerDef)) {
+      return {
+        message: 'Invalid inner type: ZodSet value type must have a valid type definition',
+        success: false
+      };
+    }
+
+    if (isZodEnumDef(innerDef)) {
+      return {
+        enumValues: innerDef.values,
+        isOptional: Boolean(isOptional),
+        success: true,
+        typeName: jsonToZod(def.type)
+      };
+    }
+  }
+
+  return {
+    isOptional: Boolean(isOptional),
+    success: true,
+    typeName: jsonToZod(def.type)
+  };
 }
 
 function interpretZodArray(
@@ -537,7 +542,7 @@ function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
         optional = false;
       }
 
-      const typeSafety: PropertySchema = jsonInstrumentSchema.properties[col];
+      const typeSafety: PropertySchema = jsonInstrumentSchema.properties[col] as PropertySchema;
       if (typeSafety.type === 'array') {
         const keys = Object.keys(jsonInstrumentSchema.properties[col].items.properties);
         const values = Object.values(jsonInstrumentSchema.properties[col].items.properties);
