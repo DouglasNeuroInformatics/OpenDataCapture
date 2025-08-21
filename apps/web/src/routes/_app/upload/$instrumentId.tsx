@@ -107,17 +107,6 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       {!isLoading ? (
-        // isZodType(instrument.validationSchema, { version: 4 }) ? (
-        //   <div className="mb-2 flex items-center gap-2 rounded-md bg-red-300 p-4 dark:bg-red-800">
-        //     <CircleAlertIcon style={{ height: '20px', strokeWidth: '2px', width: '20px' }} />
-        //     <h5 className="font-medium tracking-tight">
-        //       {t({
-        //         en: 'Upload is Not Supported for Zod v4 Instruments',
-        //         fr: "Le téléchargement n'est pas pris en charge pour les instruments utilisant Zod v4"
-        //       })}
-        //     </h5>
-        //   </div>
-        // ) :
         <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center">
           <FileDropzone
             acceptedFileTypes={{
