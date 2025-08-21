@@ -1,11 +1,17 @@
-import { isNumberLike, isObjectLike, isPlainObject, parseNumber } from '@douglasneuroinformatics/libjs';
-import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
+import { isNumberLike, isObjectLike, isPlainObject, isZodType, parseNumber } from '@douglasneuroinformatics/libjs';
+import type {
+  AnyUnilingualFormInstrument,
+  FormTypes,
+  InstrumentValidationSchema,
+  Json
+} from '@opendatacapture/runtime-core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import { parse, unparse } from 'papaparse';
 import { z } from 'zod';
+import { z as z4 } from 'zod/v4';
 
 // TODO - refine ZodTypeNameResult to reflect specific ZodType variants (i.e., object)
 
@@ -55,6 +61,10 @@ type UploadOperationResult<T> =
       success: true;
       value: T;
     };
+
+type PropertySchema = {
+  [key: string]: unknown;
+};
 
 type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 
@@ -138,8 +148,12 @@ function reformatInstrumentData({
   return reformatForSending;
 }
 
-function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
+function getZodTypeName(schema: z4.ZodType<unknown, unknown> | z.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
   const def: unknown = schema._def;
+  if (isZodType(schema, { version: 4 })) {
+    const getZod4TypeNameResult = getZod4TypeName(def, schema, isOptional);
+    return getZod4TypeNameResult;
+  }
   if (isZodTypeDef(def)) {
     if (isZodOptionalDef(def)) {
       return getZodTypeName(def.innerType, true);
@@ -182,6 +196,61 @@ function getZodTypeName(schema: z.ZodTypeAny, isOptional?: boolean): ZodTypeName
   return { message: 'Unexpected Error', success: false };
 }
 
+function getZod4TypeName(
+  def: unknown,
+  schema: z4.ZodType<unknown, unknown> | z.ZodTypeAny,
+  isOptional?: boolean
+): ZodTypeNameResult {
+  if (def.type === 'optional' && def.innerType) {
+    return getZodTypeName(def.innerType, true);
+  } else if (def.type === 'enum') {
+    if (def.entries) {
+      const entries = Object.keys(def.entries as object);
+
+      return {
+        enumValues: entries,
+        isOptional: Boolean(isOptional),
+        success: true,
+        typeName: jsonToZod(def.type)
+      };
+    }
+    return {
+      enumValues: def.values,
+      isOptional: Boolean(isOptional),
+      success: true,
+      typeName: jsonToZod(def.type)
+    };
+  } else if (def.type === 'array') {
+    const arrayName = jsonToZod(def.type) as z.ZodFirstPartyTypeKind.ZodArray;
+
+    return interpretZodArray(schema, arrayName, isOptional);
+  } else if (def.type === 'set') {
+    const innerDef: unknown = def.valueType._def;
+
+    if (!isZodTypeDef(innerDef)) {
+      return {
+        message: 'Invalid inner type: ZodSet value type must have a valid type definition',
+        success: false
+      };
+    }
+
+    if (isZodEnumDef(innerDef)) {
+      return {
+        enumValues: innerDef.values,
+        isOptional: Boolean(isOptional),
+        success: true,
+        typeName: jsonToZod(def.type)
+      };
+    }
+  }
+
+  return {
+    isOptional: Boolean(isOptional),
+    success: true,
+    typeName: jsonToZod(def.type)
+  };
+}
+
 function interpretZodArray(
   schema: z.ZodTypeAny,
   originalName: z.ZodFirstPartyTypeKind.ZodArray,
@@ -190,6 +259,11 @@ function interpretZodArray(
   const def: unknown = schema._def;
   const listOfZodElements: ZodTypeNameResult[] = [];
   const listOfZodKeys: string[] = [];
+
+  if (isZodType(schema, { version: 4 })) {
+    const Zod4ArrayResult = interpretZod4Array(def, originalName, isOptional);
+    return Zod4ArrayResult;
+  }
 
   if (!isZodTypeDef(def)) {
     throw new Error(`Unexpected value for _def in schema: ${JSON.stringify(def)}`);
@@ -204,6 +278,40 @@ function interpretZodArray(
   for (const [key, insideType] of Object.entries(shape)) {
     const def: unknown = insideType._def;
     if (isZodTypeDef(def)) {
+      const innerTypeName = getZodTypeName(insideType);
+      listOfZodElements.push(innerTypeName);
+      listOfZodKeys.push(key);
+    } else {
+      console.error({ def });
+      throw new Error(`Unhandled case!`);
+    }
+  }
+
+  if (listOfZodElements.length === 0) {
+    return { message: 'Failure to interpret Zod Object or Array', success: false };
+  }
+
+  return {
+    isOptional: Boolean(isOptional),
+    multiKeys: listOfZodKeys,
+    multiValues: listOfZodElements,
+    success: true,
+    typeName: originalName
+  };
+}
+
+function interpretZod4Array(
+  def: unknown,
+  originalName: z.ZodFirstPartyTypeKind.ZodArray,
+  isOptional?: boolean
+): ZodTypeNameResult {
+  const listOfZodElements: ZodTypeNameResult[] = [];
+  const listOfZodKeys: string[] = [];
+  const shape = def.element.shape as { [key: string]: z.ZodTypeAny };
+
+  for (const [key, insideType] of Object.entries(shape)) {
+    const def: unknown = insideType._def;
+    if (def.type) {
       const innerTypeName = getZodTypeName(insideType);
       listOfZodElements.push(innerTypeName);
       listOfZodKeys.push(key);
@@ -426,10 +534,126 @@ function generateSampleData({
       throw new Error(`Invalid zod schema: unexpected type name '${typeName satisfies never}'`);
   }
 }
+function jsonToZod(givenType: unknown): RequiredZodTypeName {
+  if (typeof givenType === 'string') {
+    switch (givenType) {
+      case 'array':
+        return 'ZodArray';
+      case 'boolean':
+        return 'ZodBoolean';
+      case 'date':
+        return 'ZodDate';
+      case 'enum':
+        return 'ZodEnum';
+      case 'number':
+        return 'ZodNumber';
+      case 'set':
+        return 'ZodSet';
+      case 'string':
+        return 'ZodString';
+      default:
+    }
+  }
+  throw new Error('Failed to interpret json value');
+}
+function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
+  if (
+    jsonInstrumentSchema.properties &&
+    jsonInstrumentSchema.required &&
+    Array.isArray(jsonInstrumentSchema.required)
+  ) {
+    const jsonColumnNames = Object.keys(jsonInstrumentSchema.properties);
+
+    const jsonCSVColumns = INTERNAL_HEADERS.concat(jsonColumnNames);
+    const jsonSampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
+
+    for (const col of jsonColumnNames) {
+      let optional = true;
+      let data: ZodTypeNameResult;
+      if (jsonInstrumentSchema.required.includes(col)) {
+        optional = false;
+      }
+
+      const typeSafety: PropertySchema = jsonInstrumentSchema.properties[col] as PropertySchema;
+      if (typeSafety.type === 'array') {
+        const keys = Object.keys(jsonInstrumentSchema.properties[col].items.properties);
+        const values = Object.values(jsonInstrumentSchema.properties[col].items.properties);
+        const multiVals: ZodTypeNameResult[] = [];
+        let i = 0;
+
+        for (const val of values) {
+          // eslint-disable-next-line max-depth
+          if (val.type && Array.isArray(jsonInstrumentSchema.properties[col].items.required)) {
+            multiVals.push({
+              isOptional: jsonInstrumentSchema.properties[col].items.required.includes(keys[i]),
+              success: true,
+              typeName: jsonToZod(val.type)
+            });
+            i++;
+          }
+        }
+
+        data = {
+          isOptional: optional,
+          multiKeys: keys,
+          multiValues: multiVals,
+          success: true,
+          typeName: 'ZodObject'
+        };
+      } else if (jsonInstrumentSchema.properties[col].enum) {
+        data = {
+          enumValues: jsonInstrumentSchema.properties[col].enum as readonly string[],
+          isOptional: optional,
+          success: true,
+          typeName: 'ZodEnum'
+        };
+      } else if (jsonToZod(jsonInstrumentSchema.properties[col].type)) {
+        data = {
+          isOptional: optional,
+          success: true,
+          typeName: jsonToZod(jsonInstrumentSchema.properties[col].type)
+        };
+      } else {
+        data = {
+          message: 'Failed to interpret JSON value from schema',
+          success: false
+        };
+      }
+
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+      jsonSampleData.push(generateSampleData(data));
+    }
+
+    const zod4TemplateData = unparse([jsonCSVColumns, jsonSampleData]);
+
+    return zod4TemplateData;
+  }
+  throw new Error('Failed to interpret JSON schema');
+}
 
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
   try {
     const instrumentSchema = instrument.validationSchema;
+
+    /**
+     * Steps for zod4 schemas
+     * convert schema to json schema
+     * Check properties for all questions
+     * for optional questions check if it exists in required, if not then make it optional
+     * Use the types provided by the schema to generate the sample data
+     * **/
+
+    if (isZodType(instrumentSchema, { version: 4 })) {
+      const jsonInstrumentSchema = z4.toJSONSchema(instrumentSchema as z4.ZodSchema);
+      const zod4TemplateData = zod4Helper(jsonInstrumentSchema);
+
+      return {
+        content: zod4TemplateData,
+        fileName: `${instrument.internal.name}_${instrument.internal.edition}_template.csv`
+      };
+    }
 
     if (!isZodObject(instrumentSchema)) {
       throw new Error('Validation schema for this instrument is invalid');
@@ -484,12 +708,14 @@ export async function processInstrumentCSV(
 ): Promise<UploadOperationResult<FormTypes.Data[]>> {
   const instrumentSchema = instrument.validationSchema as z.AnyZodObject;
   let shape: { [key: string]: z.ZodTypeAny } = {};
+
   let instrumentSchemaWithInternal: z.AnyZodObject;
 
   const instrumentSchemaDef: unknown = instrumentSchema._def;
-  const $SubjectIdValidation = z
-    .string()
-    .regex(/^[^$\s]+$/, 'Subject ID has to be at least 1 character long, without a $ and no whitespaces');
+  const subjectIdRegex = [
+    /^[^$\s]+$/,
+    'Subject ID has to be at least 1 character long, without a $ and no whitespaces'
+  ] as const;
 
   if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
     if (!isZodObject(instrumentSchemaDef.schema)) {
@@ -497,16 +723,149 @@ export async function processInstrumentCSV(
     }
     instrumentSchemaWithInternal = instrumentSchemaDef.schema.extend({
       date: z.coerce.date(),
-      subjectID: $SubjectIdValidation
+      subjectID: z.string().regex(...subjectIdRegex)
     });
-
-    shape = instrumentSchemaWithInternal._def.shape() as { [key: string]: z.ZodTypeAny };
+    shape = (instrumentSchemaWithInternal._def as z.ZodObjectDef).shape() as { [key: string]: z.ZodTypeAny };
   } else {
-    instrumentSchemaWithInternal = instrumentSchema.extend({
-      date: z.coerce.date(),
-      subjectID: $SubjectIdValidation
-    });
-    shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
+    console.log('here2', instrumentSchema);
+    if (instrumentSchema instanceof z4.ZodObject) {
+      const result = processInstrumentCSVZod4(input, instrument);
+      return result;
+    } else {
+      instrumentSchemaWithInternal = instrumentSchema.extend({
+        date: z.coerce.date(),
+        subjectID: z.string().regex(...subjectIdRegex)
+      });
+      shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
+    }
+  }
+
+  return new Promise<UploadOperationResult<FormTypes.Data[]>>((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = reader.result as string;
+      const parseResultCsv = parse<string[]>(text, {
+        header: false,
+        skipEmptyLines: true
+      });
+
+      const [headers, ...dataLines] = parseResultCsv.data;
+
+      //remove sample data if included
+      if (dataLines[0]?.[0]?.startsWith(MONGOLIAN_VOWEL_SEPARATOR)) {
+        dataLines.shift();
+      }
+
+      if (dataLines.length === 0) {
+        return resolve({ message: 'data lines is empty array', success: false });
+      }
+
+      const result: FormTypes.Data[] = [];
+
+      if (!headers?.length) {
+        return resolve({ message: 'headers is undefined or empty array', success: false });
+      }
+      let rowNumber = 1;
+      for (const elements of dataLines) {
+        const jsonLine: { [key: string]: unknown } = {};
+        for (let j = 0; j < headers.length; j++) {
+          const key = headers[j]!.trim();
+          const rawValue = elements[j]!.trim();
+
+          if (rawValue === '\n') {
+            continue;
+          }
+          if (shape[key] === undefined) {
+            return resolve({
+              message: `Schema value at column ${j} is not defined! Please check if Column has been edited/deleted from original template`,
+              success: false
+            });
+          }
+          const typeNameResult = getZodTypeName(shape[key]);
+          // console.log("results: ", typeNameResult)
+          if (!typeNameResult.success) {
+            return resolve({ message: typeNameResult.message, success: false });
+          }
+
+          let interpreterResult: UploadOperationResult<FormTypes.FieldValue> = {
+            message: 'Could not interpret a correct value',
+            success: false
+          };
+
+          if (typeNameResult.typeName === 'ZodArray' || typeNameResult.typeName === 'ZodObject') {
+            if (typeNameResult.multiKeys && typeNameResult.multiValues) {
+              interpreterResult = interpretZodObjectValue(
+                rawValue,
+                typeNameResult.isOptional,
+                typeNameResult.multiValues,
+                typeNameResult.multiKeys
+              );
+              // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
+              // Dealt with via else statement for now
+            } else {
+              interpreterResult.message = 'Record Array keys do not exist';
+            }
+          } else {
+            interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
+          }
+          if (!interpreterResult.success) {
+            return resolve({
+              message: `${interpreterResult.message} at column name: '${key}' and row number ${rowNumber}`,
+              success: false
+            });
+          }
+          jsonLine[headers[j]!] = interpreterResult.value;
+        }
+
+        const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
+
+        if (!zodCheck.success) {
+          console.error(zodCheck.error.issues);
+          const zodIssues = zodCheck.error.issues.map((issue) => {
+            return `issue message: \n ${issue.message} \n path: ${issue.path.toString()}`;
+          });
+          console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
+          return resolve({ message: zodIssues.join(), success: false });
+        }
+        result.push(zodCheck.data);
+        rowNumber++;
+      }
+      resolve({ success: true, value: result });
+    };
+    reader.readAsText(input);
+  });
+}
+
+export async function processInstrumentCSVZod4(
+  input: File,
+  instrument: AnyUnilingualFormInstrument
+): Promise<UploadOperationResult<FormTypes.Data[]>> {
+  const instrumentSchema = instrument.validationSchema as z4.ZodObject;
+  let shape: { [key: string]: z4.ZodTypeAny } = {};
+
+  // const instrumentSchemaContainer: { schema: z4.ZodObject; v: 4,} | { schema: z.AnyZodObject; v: 3 } | { v: null} = {}
+
+  let instrumentSchemaWithInternal: z4.ZodObject;
+
+  const instrumentSchemaDef: unknown = instrumentSchema.def;
+  const subjectIdRegex = [
+    /^[^$\s]+$/,
+    'Subject ID has to be at least 1 character long, without a $ and no whitespaces'
+  ] as const;
+
+  if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
+    return {
+      message: 'Wrong schema',
+      success: false
+    };
+  } else {
+    if (instrumentSchema instanceof z4.ZodObject) {
+      instrumentSchemaWithInternal = instrumentSchema.extend({
+        date: z4.coerce.date(),
+        subjectID: z4.string().regex(...subjectIdRegex)
+      });
+      shape = instrumentSchemaWithInternal.shape;
+    }
   }
 
   return new Promise<UploadOperationResult<FormTypes.Data[]>>((resolve) => {
@@ -568,8 +927,9 @@ export async function processInstrumentCSV(
                 typeNameResult.multiValues,
                 typeNameResult.multiKeys
               );
+
               // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
-              //Dealt with via else statement for now
+              // Dealt with via else statement for now
             } else {
               interpreterResult.message = 'Record Array keys do not exist';
             }
@@ -584,6 +944,7 @@ export async function processInstrumentCSV(
           }
           jsonLine[headers[j]!] = interpreterResult.value;
         }
+
         const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
         if (!zodCheck.success) {
           console.error(zodCheck.error.issues);
@@ -593,7 +954,7 @@ export async function processInstrumentCSV(
           console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
           return resolve({ message: zodIssues.join(), success: false });
         }
-        result.push(zodCheck.data);
+        result.push(zodCheck.data as FormTypes.Data);
         rowNumber++;
       }
       resolve({ success: true, value: result });
