@@ -26,6 +26,7 @@ import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
+import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
 
 type RecordObject = {
   groupId: string;
@@ -168,13 +169,23 @@ export class InstrumentRecordsService {
         instrument = (await this.instrumentsService.findById(record.instrumentId)) as ScalarInstrument;
         instruments.set(record.instrumentId, instrument);
       }
-
-      // if (isZodType(instrument.validationSchema, { version: 4})) {
-      //   const zodToJson = z.toJSONSchema(instrument.validationSchema)
-
-      // }
-
+      console.log();
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
+        if (Array.isArray(measureValue)) {
+          const objectRecord: RecordObject = {
+            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+            sessionDate: record.session.date.toISOString(),
+            sessionId: record.session.id,
+            sessionType: record.session.type,
+            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+            subjectId: record.subject.id,
+            subjectSex: record.subject.sex,
+            timestamp: record.date.toISOString()
+          };
+          this.expandData(data, measureValue, instrument, objectRecord);
+          continue;
+        }
+
         let list;
         try {
           if (typeof measureValue === 'string') list = [JSON.parse(measureValue)];
