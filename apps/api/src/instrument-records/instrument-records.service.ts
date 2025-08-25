@@ -26,7 +26,6 @@ import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
-import { computeInstrumentMeasures } from '@opendatacapture/instrument-utils';
 
 type RecordObject = {
   groupId: string;
