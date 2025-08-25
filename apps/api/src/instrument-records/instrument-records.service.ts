@@ -180,7 +180,10 @@ export class InstrumentRecordsService {
             subjectSex: record.subject.sex,
             timestamp: record.date.toISOString()
           };
-          this.expandData(data, measureValue, instrument, objectRecord);
+          const arrayResult = this.expandData(data, measureValue, instrument, objectRecord);
+          if (arrayResult.isErr()) {
+            throw new Error('Error interpreting array computed measure');
+          }
           continue;
         }
         let list;
