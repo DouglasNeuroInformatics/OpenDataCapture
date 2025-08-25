@@ -169,7 +169,6 @@ export class InstrumentRecordsService {
         instrument = (await this.instrumentsService.findById(record.instrumentId)) as ScalarInstrument;
         instruments.set(record.instrumentId, instrument);
       }
-      console.log();
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
         if (Array.isArray(measureValue)) {
           const objectRecord: RecordObject = {
@@ -185,7 +184,6 @@ export class InstrumentRecordsService {
           this.expandData(data, measureValue, instrument, objectRecord);
           continue;
         }
-
         let list;
         try {
           if (typeof measureValue === 'string') list = [JSON.parse(measureValue)];
@@ -471,7 +469,7 @@ export class InstrumentRecordsService {
       }
       return ok('Success');
     } else {
-      return err('Not an Array');
+      return err('Error interpretting array');
     }
   }
   private getInstrumentById(instrumentId: string) {
