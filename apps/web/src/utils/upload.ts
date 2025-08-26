@@ -752,7 +752,7 @@ export async function processInstrumentCSV(
     });
     shape = (instrumentSchemaWithInternal._def as z.ZodObjectDef).shape() as { [key: string]: z.ZodTypeAny };
   } else {
-    if (instrumentSchema instanceof z4.ZodObject) {
+    if (instrumentSchema instanceof z4.ZodObject && isZodType(instrumentSchema, { version: 4 })) {
       const result = processInstrumentCSVZod4(input, instrument);
       return result;
     } else {
