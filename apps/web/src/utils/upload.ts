@@ -242,7 +242,7 @@ function getZod4TypeName(
   } else if (def.type === 'array') {
     const arrayName = jsonToZod(def.type) as z.ZodFirstPartyTypeKind.ZodArray;
 
-    return interpretZodArray(schema, arrayName, isOptional);
+    return interpretZodArray(schema as z.ZodTypeAny, arrayName, isOptional);
   } else if (def.type === 'set') {
     const innerDef: unknown = def.valueType._def;
 
@@ -594,6 +594,7 @@ function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
       }
 
       const typeSafety: PropertySchema = jsonInstrumentSchema.properties[col] as PropertySchema;
+
       if (typeSafety.type === 'array') {
         const keys = Object.keys(jsonInstrumentSchema.properties[col].items.properties);
         const values = Object.values(jsonInstrumentSchema.properties[col].items.properties);
@@ -602,11 +603,15 @@ function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
 
         for (const val of values) {
           // eslint-disable-next-line max-depth
-          if (val.type && Array.isArray(jsonInstrumentSchema.properties[col].items.required)) {
+          if (
+            (val as Zod4Object).type &&
+            Array.isArray(jsonInstrumentSchema.properties[col].items.required) &&
+            keys[i]
+          ) {
             multiVals.push({
-              isOptional: jsonInstrumentSchema.properties[col].items.required.includes(keys[i]),
+              isOptional: (jsonInstrumentSchema.properties[col].items.required as string[]).includes(keys[i]!),
               success: true,
-              typeName: jsonToZod(val.type)
+              typeName: jsonToZod((val as Zod4Object).type)
             });
             i++;
           }
@@ -619,18 +624,18 @@ function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
           success: true,
           typeName: 'ZodObject'
         };
-      } else if (jsonInstrumentSchema.properties[col].enum) {
+      } else if (typeSafety.enum) {
         data = {
-          enumValues: jsonInstrumentSchema.properties[col].enum as readonly string[],
+          enumValues: typeSafety.enum as readonly string[],
           isOptional: optional,
           success: true,
           typeName: 'ZodEnum'
         };
-      } else if (jsonToZod(jsonInstrumentSchema.properties[col].type)) {
+      } else if (jsonToZod(typeSafety.type)) {
         data = {
           isOptional: optional,
           success: true,
-          typeName: jsonToZod(jsonInstrumentSchema.properties[col].type)
+          typeName: jsonToZod(typeSafety.type)
         };
       } else {
         data = {
@@ -860,9 +865,6 @@ export async function processInstrumentCSVZod4(
 ): Promise<UploadOperationResult<FormTypes.Data[]>> {
   const instrumentSchema = instrument.validationSchema as z4.ZodObject;
   let shape: { [key: string]: z4.ZodTypeAny } = {};
-
-  // const instrumentSchemaContainer: { schema: z4.ZodObject; v: 4,} | { schema: z.AnyZodObject; v: 3 } | { v: null} = {}
-
   let instrumentSchemaWithInternal: z4.ZodObject;
 
   const instrumentSchemaDef: unknown = instrumentSchema.def;
