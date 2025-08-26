@@ -727,7 +727,6 @@ export async function processInstrumentCSV(
     });
     shape = (instrumentSchemaWithInternal._def as z.ZodObjectDef).shape() as { [key: string]: z.ZodTypeAny };
   } else {
-    console.log('here2', instrumentSchema);
     if (instrumentSchema instanceof z4.ZodObject) {
       const result = processInstrumentCSVZod4(input, instrument);
       return result;
@@ -782,7 +781,7 @@ export async function processInstrumentCSV(
             });
           }
           const typeNameResult = getZodTypeName(shape[key]);
-          // console.log("results: ", typeNameResult)
+
           if (!typeNameResult.success) {
             return resolve({ message: typeNameResult.message, success: false });
           }
