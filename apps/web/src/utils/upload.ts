@@ -1,10 +1,5 @@
 import { isNumberLike, isObjectLike, isPlainObject, isZodType, parseNumber } from '@douglasneuroinformatics/libjs';
-import type {
-  AnyUnilingualFormInstrument,
-  FormTypes,
-  InstrumentValidationSchema,
-  Json
-} from '@opendatacapture/runtime-core';
+import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
@@ -69,6 +64,18 @@ type PropertySchema = {
 type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 
 type AnyZodArrayDef = z.ZodArrayDef & { type: z.AnyZodObject };
+
+type Zod4Object = {
+  entries?: unknown;
+  innerType?: z4.ZodType<unknown, unknown> | z.ZodTypeAny;
+  type: string;
+  values?: string[];
+  valueType: Zod4ValueType;
+};
+
+type Zod4ValueType = {
+  _def: unknown;
+};
 
 //check for edge cases since the were using reversed hierachical logic (if object has a _def that AnyZodTypeDef then object is AnyZodObject)
 function isZodObject(value: unknown): value is z.AnyZodObject {
@@ -197,10 +204,22 @@ function getZodTypeName(schema: z4.ZodType<unknown, unknown> | z.ZodTypeAny, isO
 }
 
 function getZod4TypeName(
-  def: unknown,
+  defUnkown: unknown,
   schema: z4.ZodType<unknown, unknown> | z.ZodTypeAny,
   isOptional?: boolean
 ): ZodTypeNameResult {
+  if (!defUnkown) {
+    return { message: 'Invalid Zod v4 definition structure', success: false };
+  }
+
+  const def = defUnkown as Zod4Object;
+
+  if (!def.type) {
+    return { message: 'Invalid Zod v4 definition structure', success: false };
+  }
+  if (!isObjectLike(def) || typeof def.type !== 'string') {
+    return { message: 'Invalid Zod v4 definition structure', success: false };
+  }
   if (def.type === 'optional' && def.innerType) {
     return getZodTypeName(def.innerType, true);
   } else if (def.type === 'enum') {
