@@ -29,6 +29,11 @@ const MONGOLIAN_VOWEL_SEPARATOR = String.fromCharCode(32, 6158);
 
 const INTERNAL_HEADERS_SAMPLE_DATA = [MONGOLIAN_VOWEL_SEPARATOR + 'string', MONGOLIAN_VOWEL_SEPARATOR + 'yyyy-mm-dd'];
 
+const SUBJECT_ID_REGEX = [
+  /^[^$\s]+$/,
+  'Subject ID has to be at least 1 character long, without a $ and no whitespaces'
+] as const;
+
 type ZodTypeName = Extract<`${z.ZodFirstPartyTypeKind}`, (typeof ZOD_TYPE_NAMES)[number]>;
 
 type RequiredZodTypeName = Exclude<ZodTypeName, 'ZodEffects' | 'ZodOptional'>;
@@ -736,10 +741,6 @@ export async function processInstrumentCSV(
   let instrumentSchemaWithInternal: z.AnyZodObject;
 
   const instrumentSchemaDef: unknown = instrumentSchema._def;
-  const subjectIdRegex = [
-    /^[^$\s]+$/,
-    'Subject ID has to be at least 1 character long, without a $ and no whitespaces'
-  ] as const;
 
   if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
     if (!isZodObject(instrumentSchemaDef.schema)) {
@@ -747,7 +748,7 @@ export async function processInstrumentCSV(
     }
     instrumentSchemaWithInternal = instrumentSchemaDef.schema.extend({
       date: z.coerce.date(),
-      subjectID: z.string().regex(...subjectIdRegex)
+      subjectID: z.string().regex(...SUBJECT_ID_REGEX)
     });
     shape = (instrumentSchemaWithInternal._def as z.ZodObjectDef).shape() as { [key: string]: z.ZodTypeAny };
   } else {
@@ -757,7 +758,7 @@ export async function processInstrumentCSV(
     } else {
       instrumentSchemaWithInternal = instrumentSchema.extend({
         date: z.coerce.date(),
-        subjectID: z.string().regex(...subjectIdRegex)
+        subjectID: z.string().regex(...SUBJECT_ID_REGEX)
       });
       shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
     }
@@ -868,10 +869,6 @@ export async function processInstrumentCSVZod4(
   let instrumentSchemaWithInternal: z4.ZodObject;
 
   const instrumentSchemaDef: unknown = instrumentSchema.def;
-  const subjectIdRegex = [
-    /^[^$\s]+$/,
-    'Subject ID has to be at least 1 character long, without a $ and no whitespaces'
-  ] as const;
 
   if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
     return {
@@ -882,7 +879,7 @@ export async function processInstrumentCSVZod4(
     if (instrumentSchema instanceof z4.ZodObject) {
       instrumentSchemaWithInternal = instrumentSchema.extend({
         date: z4.coerce.date(),
-        subjectID: z4.string().regex(...subjectIdRegex)
+        subjectID: z4.string().regex(...SUBJECT_ID_REGEX)
       });
       shape = instrumentSchemaWithInternal.shape;
     }
