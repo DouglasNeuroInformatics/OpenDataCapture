@@ -63,7 +63,10 @@ type UploadOperationResult<T> =
     };
 
 type PropertySchema = {
-  [key: string]: unknown;
+  items?: {
+    properties?: { [key: string]: unknown };
+  };
+  type: string;
 };
 
 type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
@@ -614,8 +617,8 @@ function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
       const typeSafety: PropertySchema = jsonInstrumentSchema.properties[col] as PropertySchema;
 
       if (typeSafety.type === 'array') {
-        const keys = Object.keys(jsonInstrumentSchema.properties[col].items.properties);
-        const values = Object.values(jsonInstrumentSchema.properties[col].items.properties);
+        const keys = Object.keys(typeSafety.items.properties);
+        const values = Object.values(typeSafety.items.properties);
         const multiVals: ZodTypeNameResult[] = [];
         let i = 0;
 
