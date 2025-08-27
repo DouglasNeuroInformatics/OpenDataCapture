@@ -626,6 +626,7 @@ function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
             Array.isArray(jsonInstrumentSchema.properties[col].items.required) &&
             keys[i]
           ) {
+            // optional is false if the key is included in the required items
             multiVals.push({
               isOptional: !(jsonInstrumentSchema.properties[col].items.required as string[]).includes(keys[i]!),
               success: true,
