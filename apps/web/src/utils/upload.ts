@@ -5,7 +5,7 @@ import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrume
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import { parse, unparse } from 'papaparse';
-import { z } from 'zod';
+import { z, type ZodTypeAny } from 'zod';
 import { z as z4 } from 'zod/v4';
 
 // TODO - refine ZodTypeNameResult to reflect specific ZodType variants (i.e., object)
@@ -71,6 +71,7 @@ type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 type AnyZodArrayDef = z.ZodArrayDef & { type: z.AnyZodObject };
 
 type Zod4Object = {
+  element?: ElementShape;
   entries?: unknown;
   innerType?: z4.ZodType<unknown, unknown> | z.ZodTypeAny;
   type: string;
@@ -80,6 +81,10 @@ type Zod4Object = {
 
 type Zod4ValueType = {
   _def: unknown;
+};
+
+type ElementShape = {
+  [key: string]: z.ZodTypeAny;
 };
 
 //check for edge cases since the were using reversed hierachical logic (if object has a _def that AnyZodTypeDef then object is AnyZodObject)
@@ -331,12 +336,20 @@ function interpretZod4Array(
 ): ZodTypeNameResult {
   const listOfZodElements: ZodTypeNameResult[] = [];
   const listOfZodKeys: string[] = [];
-  const shape = def.element.shape as { [key: string]: z.ZodTypeAny };
+  const castedDef = def as Zod4Object;
+  if (!castedDef.element) {
+    return { message: 'Failure to interpret Zod Object or Array', success: false };
+  }
+  const shape = castedDef.element.shape;
+
+  if (!shape || shape === undefined) {
+    return { message: 'Failure to interpret Zod Object or Array', success: false };
+  }
 
   for (const [key, insideType] of Object.entries(shape)) {
     const def: unknown = insideType._def;
     if (def.type) {
-      const innerTypeName = getZodTypeName(insideType);
+      const innerTypeName = getZodTypeName(insideType as ZodTypeAny);
       listOfZodElements.push(innerTypeName);
       listOfZodKeys.push(key);
     } else {
@@ -614,7 +627,7 @@ function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
             keys[i]
           ) {
             multiVals.push({
-              isOptional: (jsonInstrumentSchema.properties[col].items.required as string[]).includes(keys[i]!),
+              isOptional: !(jsonInstrumentSchema.properties[col].items.required as string[]).includes(keys[i]!),
               success: true,
               typeName: jsonToZod((val as Zod4Object).type)
             });
@@ -752,7 +765,7 @@ export async function processInstrumentCSV(
     });
     shape = (instrumentSchemaWithInternal._def as z.ZodObjectDef).shape() as { [key: string]: z.ZodTypeAny };
   } else {
-    if (instrumentSchema instanceof z4.ZodObject && isZodType(instrumentSchema, { version: 4 })) {
+    if (isZodType(instrumentSchema, { version: 4 })) {
       const result = processInstrumentCSVZod4(input, instrument);
       return result;
     } else {
