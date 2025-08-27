@@ -5,7 +5,7 @@ import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrume
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import { parse, unparse } from 'papaparse';
-import { z, type ZodTypeAny } from 'zod';
+import { z } from 'zod';
 import { z as z4 } from 'zod/v4';
 
 // TODO - refine ZodTypeNameResult to reflect specific ZodType variants (i.e., object)
@@ -349,7 +349,7 @@ function interpretZod4Array(
   for (const [key, insideType] of Object.entries(shape)) {
     const def: unknown = insideType._def;
     if (def.type) {
-      const innerTypeName = getZodTypeName(insideType as ZodTypeAny);
+      const innerTypeName = getZodTypeName(insideType as z.ZodTypeAny);
       listOfZodElements.push(innerTypeName);
       listOfZodKeys.push(key);
     } else {
