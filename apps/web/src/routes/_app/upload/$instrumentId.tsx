@@ -1,17 +1,34 @@
 import React, { useState } from 'react';
 
-import { isZodType } from '@douglasneuroinformatics/libjs';
+import { serializeError } from '@douglasneuroinformatics/libjs';
 import { Button, FileDropzone, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
-import { createFileRoute } from '@tanstack/react-router';
-import { BadgeHelpIcon, CircleAlertIcon, DownloadIcon } from 'lucide-react';
+import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { BadgeHelpIcon, DownloadIcon } from 'lucide-react';
+import z from 'zod/v4';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useUploadInstrumentRecordsMutation } from '@/hooks/useUploadInstrumentRecordsMutation';
 import { useAppStore } from '@/store';
 import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData } from '@/utils/upload';
+
+const $UploadError = z.object({
+  message: z.string().nullable(),
+  title: z.object({
+    en: z.string(),
+    fr: z.string()
+  })
+});
+
+type UploadError = {
+  message: null | string;
+  title: {
+    [L in Language]: string;
+  };
+};
 
 const RouteComponent = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -22,6 +39,9 @@ const RouteComponent = () => {
   const uploadInstrumentRecordsMutation = useUploadInstrumentRecordsMutation();
 
   const params = Route.useParams();
+  const { error } = Route.useSearch();
+  const navigate = Route.useNavigate();
+
   const instrument = useInstrument(params.instrumentId) as (AnyUnilingualFormInstrument & { id: string }) | null;
   const { t } = useTranslation();
 
@@ -30,24 +50,19 @@ const RouteComponent = () => {
       const { content, fileName } = createUploadTemplateCSV(instrument!);
       void download(fileName, content);
     } catch (error) {
-      if (error instanceof Error) {
-        addNotification({
-          message: t({
-            en: `Error occurred downloading sample template with the following message:  ${error.message}`,
-            fr: `Un occurence d'un erreur quand le csv document est telecharger avec la message suivant: ${error.message}`
-          }),
-          type: 'error'
-        });
-      } else {
-        addNotification({
-          message: t({
-            en: `Error occurred downloading sample template.`,
-            fr: `Un occurence d'un erreur quand le csv est telecharger. `
-          }),
-          type: 'error'
-        });
-      }
       console.error(error);
+      void navigate({
+        search: {
+          error: {
+            message: error instanceof Error ? error.message : t('core.unknownError'),
+            title: {
+              en: `Error Occurred Downloading Sample Template`,
+              fr: `Un occurence d'un erreur quand le csv est telecharger`
+            }
+          }
+        },
+        to: '.'
+      });
     }
   };
 
@@ -91,6 +106,41 @@ const RouteComponent = () => {
       setIsLoading(false);
     }
   };
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-1 p-3 text-center">
+        <h3 className="sm:text-3x text-2xl font-extrabold tracking-tight">{t(error.title)}</h3>
+        <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">{error.message}</p>
+        <div className="mt-6 flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              void download('error.json', JSON.stringify(serializeError(error), null, 2));
+            }}
+          >
+            {t({
+              en: 'Error Report',
+              fr: "Rapport d'erreur"
+            })}
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={() => {
+              void navigate({ to: '.' });
+            }}
+          >
+            {t({
+              en: 'Try Again',
+              fr: 'Réessayer'
+            })}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (!instrument) {
     return null;
@@ -163,5 +213,8 @@ const RouteComponent = () => {
 };
 
 export const Route = createFileRoute('/_app/upload/$instrumentId')({
-  component: RouteComponent
+  component: RouteComponent,
+  validateSearch: z.object({
+    error: $UploadError.optional()
+  })
 });
