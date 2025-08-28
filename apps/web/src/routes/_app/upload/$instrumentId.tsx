@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 import { serializeError } from '@douglasneuroinformatics/libjs';
 import { Button, FileDropzone, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
-import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { BadgeHelpIcon, DownloadIcon } from 'lucide-react';
 import z from 'zod/v4';
 
@@ -22,13 +21,6 @@ const $UploadError = z.object({
     fr: z.string()
   })
 });
-
-type UploadError = {
-  message: null | string;
-  title: {
-    [L in Language]: string;
-  };
-};
 
 const RouteComponent = () => {
   const [file, setFile] = useState<File | null>(null);

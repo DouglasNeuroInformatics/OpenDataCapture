@@ -31,7 +31,10 @@ const INTERNAL_HEADERS_SAMPLE_DATA = [MONGOLIAN_VOWEL_SEPARATOR + 'string', MONG
 
 const SUBJECT_ID_REGEX = [
   /^[^$\s]+$/,
-  'Subject ID has to be at least 1 character long, without a $ and no whitespaces'
+  {
+    en: 'Subject ID has to be at least 1 character long, without a $ and no whitespaces',
+    fr: "L'ID du sujet doit comporter au moins 1 caractère, sans $ et sans espaces"
+  }
 ] as const;
 
 type ZodTypeName = Extract<`${z.ZodFirstPartyTypeKind}`, (typeof ZOD_TYPE_NAMES)[number]>;
@@ -48,13 +51,13 @@ type ZodTypeNameResult =
       typeName: RequiredZodTypeName;
     }
   | {
-      message: string;
+      message: { en: string; fr: string };
       success: false;
     };
 
 type UploadOperationResult<T> =
   | {
-      message: string;
+      message: { en: string; fr: string };
       success: false;
     }
   | {
@@ -126,7 +129,9 @@ function isZodObjectDef(def: AnyZodTypeDef): def is z.ZodObjectDef {
 function extractSetEntry(entry: string) {
   const result = /SET\(\s*(.*?)\s*\)/.exec(entry);
   if (!result?.[1]) {
-    throw new Error(`Failed to extract set value from entry: '${entry}'`);
+    throw new Error(
+      `Failed to extract set value from entry: '${entry}' / Échec de l'extraction de la valeur de l'ensemble de l'entrée : '${entry}'`
+    );
   }
   return result[1];
 }
@@ -134,7 +139,9 @@ function extractSetEntry(entry: string) {
 function extractRecordArrayEntry(entry: string) {
   const result = /RECORD_ARRAY\(\s*(.*?)[\s;]*\)/.exec(entry);
   if (!result?.[1]) {
-    throw new Error(`Failed to extract record array value from entry: '${entry}'`);
+    throw new Error(
+      `Failed to extract record array value from entry: '${entry}' / Échec de l'extraction de la valeur du tableau d'enregistrements de l'entrée : '${entry}'`
+    );
   }
   return result[1];
 }
@@ -191,7 +198,10 @@ function getZodTypeName(schema: z4.ZodType<unknown, unknown> | z.ZodTypeAny, isO
 
       if (!isZodTypeDef(innerDef)) {
         return {
-          message: 'Invalid inner type: ZodSet value type must have a valid type definition',
+          message: {
+            en: 'Invalid inner type: ZodSet value type must have a valid type definition',
+            fr: 'Type interne invalide : le type de valeur ZodSet doit avoir une définition de type valide'
+          },
           success: false
         };
       }
@@ -213,7 +223,7 @@ function getZodTypeName(schema: z4.ZodType<unknown, unknown> | z.ZodTypeAny, isO
     };
   }
   console.error(`Cannot parse ZodType from schema: ${JSON.stringify(schema)}`);
-  return { message: 'Unexpected Error', success: false };
+  return { message: { en: 'Unexpected Error', fr: 'Erreur inattendue' }, success: false };
 }
 
 function getZod4TypeName(
@@ -222,16 +232,25 @@ function getZod4TypeName(
   isOptional?: boolean
 ): ZodTypeNameResult {
   if (!defUnkown) {
-    return { message: 'Invalid Zod v4 definition structure', success: false };
+    return {
+      message: { en: 'Invalid Zod v4 definition structure', fr: 'Structure de définition Zod v4 invalide' },
+      success: false
+    };
   }
 
   const def = defUnkown as Zod4Object;
 
   if (!def.type) {
-    return { message: 'Invalid Zod v4 definition structure', success: false };
+    return {
+      message: { en: 'Invalid Zod v4 definition structure', fr: 'Structure de définition Zod v4 invalide' },
+      success: false
+    };
   }
   if (!isObjectLike(def) || typeof def.type !== 'string') {
-    return { message: 'Invalid Zod v4 definition structure', success: false };
+    return {
+      message: { en: 'Invalid Zod v4 definition structure', fr: 'Structure de définition Zod v4 invalide' },
+      success: false
+    };
   }
   if (def.type === 'optional' && def.innerType) {
     return getZodTypeName(def.innerType, true);
@@ -261,7 +280,10 @@ function getZod4TypeName(
 
     if (!isZodTypeDef(innerDef)) {
       return {
-        message: 'Invalid inner type: ZodSet value type must have a valid type definition',
+        message: {
+          en: 'Invalid inner type: ZodSet value type must have a valid type definition',
+          fr: 'Type interne invalide : le type de valeur ZodSet doit avoir une définition de type valide'
+        },
         success: false
       };
     }
@@ -298,10 +320,12 @@ function interpretZodArray(
   }
 
   if (!isZodTypeDef(def)) {
-    throw new Error(`Unexpected value for _def in schema: ${JSON.stringify(def)}`);
+    throw new Error(
+      `Unexpected value for _def in schema: ${JSON.stringify(def)} / Valeur inattendue pour _def dans le schéma : ${JSON.stringify(def)}`
+    );
   } else if (!isZodArrayDef(def)) {
     throw new Error(
-      `Unexpected value '${def.typeName}' for property _def.typeName in schema: must be '${z.ZodFirstPartyTypeKind.ZodArray}'`
+      `Unexpected value '${def.typeName}' for property _def.typeName in schema: must be '${z.ZodFirstPartyTypeKind.ZodArray}' / Valeur inattendue '${def.typeName}' pour la propriété _def.typeName dans le schéma : doit être '${z.ZodFirstPartyTypeKind.ZodArray}'`
     );
   }
 
@@ -315,12 +339,18 @@ function interpretZodArray(
       listOfZodKeys.push(key);
     } else {
       console.error({ def });
-      throw new Error(`Unhandled case!`);
+      throw new Error(`Unhandled case! / Cas non géré !`);
     }
   }
 
   if (listOfZodElements.length === 0) {
-    return { message: 'Failure to interpret Zod Object or Array', success: false };
+    return {
+      message: {
+        en: 'Failure to interpret Zod Object or Array',
+        fr: "Échec de l'interprétation de l'objet ou du tableau Zod"
+      },
+      success: false
+    };
   }
 
   return {
@@ -341,12 +371,24 @@ function interpretZod4Array(
   const listOfZodKeys: string[] = [];
   const castedDef = def as Zod4Object;
   if (!castedDef.element) {
-    return { message: 'Failure to interpret Zod Object or Array', success: false };
+    return {
+      message: {
+        en: 'Failure to interpret Zod Object or Array',
+        fr: "Échec de l'interprétation de l'objet ou du tableau Zod"
+      },
+      success: false
+    };
   }
   const shape = castedDef.element.shape;
 
   if (!shape || shape === undefined) {
-    return { message: 'Failure to interpret Zod Object or Array', success: false };
+    return {
+      message: {
+        en: 'Failure to interpret Zod Object or Array',
+        fr: "Échec de l'interprétation de l'objet ou du tableau Zod"
+      },
+      success: false
+    };
   }
 
   for (const [key, insideType] of Object.entries(shape)) {
@@ -357,12 +399,18 @@ function interpretZod4Array(
       listOfZodKeys.push(key);
     } else {
       console.error({ def });
-      throw new Error(`Unhandled case!`);
+      throw new Error(`Unhandled case! / Cas non géré !`);
     }
   }
 
   if (listOfZodElements.length === 0) {
-    return { message: 'Failure to interpret Zod Object or Array', success: false };
+    return {
+      message: {
+        en: 'Failure to interpret Zod Object or Array',
+        fr: "Échec de l'interprétation de l'objet ou du tableau Zod"
+      },
+      success: false
+    };
   }
 
   return {
@@ -389,11 +437,17 @@ function interpretZodValue(
       } else if (entry.toLowerCase() === 'false') {
         return { success: true, value: false };
       }
-      return { message: `Undecipherable Boolean Type: '${entry}'`, success: false };
+      return {
+        message: { en: `Undecipherable Boolean Type: '${entry}'`, fr: `Type booléen indéchiffrable : '${entry}'` },
+        success: false
+      };
     case 'ZodDate': {
       const date = new Date(entry);
       if (Number.isNaN(date.getTime())) {
-        return { message: `Failed to parse date: '${entry}'`, success: false };
+        return {
+          message: { en: `Failed to parse date: '${entry}'`, fr: `Échec de l'analyse de la date : '${entry}'` },
+          success: false
+        };
       }
       return { success: true, value: date };
     }
@@ -403,7 +457,10 @@ function interpretZodValue(
       if (isNumberLike(entry)) {
         return { success: true, value: parseNumber(entry) };
       }
-      return { message: `Invalid number type: '${entry}'`, success: false };
+      return {
+        message: { en: `Invalid number type: '${entry}'`, fr: `Type de nombre invalide : '${entry}'` },
+        success: false
+      };
     case 'ZodSet':
       try {
         if (entry.startsWith('SET(')) {
@@ -413,19 +470,31 @@ function interpretZodValue(
             .map((s) => s.trim())
             .filter(Boolean);
           if (values.length === 0) {
-            return { message: 'Empty set is not allowed', success: false };
+            return {
+              message: { en: 'Empty set is not allowed', fr: "Un ensemble vide n'est pas autorisé" },
+              success: false
+            };
           }
           return { success: true, value: new Set(values) };
         }
       } catch {
-        return { message: 'Error occurred interpreting set entry', success: false };
+        return {
+          message: {
+            en: 'Error occurred interpreting set entry',
+            fr: "Une erreur s'est produite lors de l'interprétation de l'entrée de l'ensemble"
+          },
+          success: false
+        };
       }
 
-      return { message: `Invalid ZodSet: '${entry}'`, success: false };
+      return { message: { en: `Invalid ZodSet: '${entry}'`, fr: `ZodSet invalide : '${entry}'` }, success: false };
     case 'ZodString':
       return { success: true, value: entry };
     default:
-      return { message: `Invalid ZodType: ${zType satisfies never}`, success: false };
+      return {
+        message: { en: `Invalid ZodType: ${zType satisfies never}`, fr: `ZodType invalide : ${zType satisfies never}` },
+        success: false
+      };
   }
 }
 
@@ -439,7 +508,7 @@ function interpretZodObjectValue(
     if (entry === '' && isOptional) {
       return { success: true, value: undefined };
     } else if (!entry.startsWith('RECORD_ARRAY(')) {
-      return { message: `Invalid ZodType`, success: false };
+      return { message: { en: `Invalid ZodType`, fr: `ZodType invalide` }, success: false };
     }
 
     const recordArray: { [key: string]: any }[] = [];
@@ -456,24 +525,48 @@ function interpretZodObjectValue(
       const record = listData.split(',');
 
       if (!record) {
-        return { message: `Record in the record array was left undefined`, success: false };
+        return {
+          message: {
+            en: `Record in the record array was left undefined`,
+            fr: `L'enregistrement dans le tableau d'enregistrements n'est pas défini`
+          },
+          success: false
+        };
       }
       if (record.some((str) => str === '')) {
-        return { message: `One or more of the record array fields was left empty`, success: false };
+        return {
+          message: {
+            en: `One or more of the record array fields was left empty`,
+            fr: `Un ou plusieurs champs du tableau d'enregistrements ont été laissés vides`
+          },
+          success: false
+        };
       }
       if (!(zList.length === zKeys.length && zList.length === record.length)) {
-        return { message: `Incorrect number of entries for record array`, success: false };
+        return {
+          message: {
+            en: `Incorrect number of entries for record array`,
+            fr: `Nombre incorrect d'entrées pour le tableau d'enregistrements`
+          },
+          success: false
+        };
       }
       for (let i = 0; i < record.length; i++) {
         if (!record[i]) {
-          return { message: `Failed to interpret field '${i}'`, success: false };
+          return {
+            message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
+            success: false
+          };
         }
 
         const recordValue = record[i]!.split(':')[1]!.trim();
 
         const zListResult = zList[i]!;
         if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
-          return { message: `Failed to interpret field '${i}'`, success: false };
+          return {
+            message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
+            success: false
+          };
         }
         const interpretZodValueResult: UploadOperationResult<FormTypes.FieldValue> = interpretZodValue(
           recordValue,
@@ -482,7 +575,10 @@ function interpretZodObjectValue(
         );
         if (!interpretZodValueResult.success) {
           return {
-            message: `failed to interpret value at entry ${i} in record array row ${listData}`,
+            message: {
+              en: `failed to interpret value at entry ${i} in record array row ${listData}`,
+              fr: `échec de l'interprétation de la valeur à l'entrée ${i} dans la ligne de tableau d'enregistrements ${listData}`
+            },
             success: false
           };
         }
@@ -495,7 +591,10 @@ function interpretZodObjectValue(
     return { success: true, value: recordArray };
   } catch {
     return {
-      message: `failed to interpret record array entries`,
+      message: {
+        en: `failed to interpret record array entries`,
+        fr: `échec de l'interprétation des entrées du tableau d'enregistrements`
+      },
       success: false
     };
   }
@@ -525,7 +624,9 @@ function generateSampleData({
 
         return formatTypeInfo('SET(a,b,c)', isOptional);
       } catch {
-        throw new Error(`Failed to generate sample data for ZodSet`);
+        throw new Error(
+          `Failed to generate sample data for ZodSet / Échec de la génération de données d'exemple pour ZodSet`
+        );
       }
 
     case 'ZodString':
@@ -539,7 +640,7 @@ function generateSampleData({
         possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
         return formatTypeInfo(possibleEnumOutputs, isOptional);
       } catch {
-        throw new Error('Invalid Enum error');
+        throw new Error('Invalid Enum error / Erreur Enum invalide');
       }
     case 'ZodArray':
     case 'ZodObject':
@@ -551,7 +652,9 @@ function generateSampleData({
             // eslint-disable-next-line max-depth
             if (!inputData?.success) {
               console.error({ inputData });
-              throw new Error(`input data is undefined or unsuccessful`);
+              throw new Error(
+                `input data is undefined or unsuccessful / les données d'entrée ne sont pas définies ou ne sont pas réussies`
+              );
             }
             // eslint-disable-next-line max-depth
             if (i === multiValues.length - 1 && multiValues[i] !== undefined) {
@@ -564,14 +667,18 @@ function generateSampleData({
         }
         return multiString;
       } catch (e) {
-        if (e instanceof Error && e.message === 'input data is undefined or unsuccessful') {
-          throw new Error('Unsuccessful input data transfer or undefined data');
+        if (e instanceof Error && e.message.includes('input data is undefined or unsuccessful')) {
+          throw new Error(
+            "Unsuccessful input data transfer or undefined data / Transfert de données d'entrée non réussi ou données non définies"
+          );
         }
 
-        throw new Error('Invalid Record Array Error');
+        throw new Error("Invalid Record Array Error / Erreur de tableau d'enregistrements invalide");
       }
     default:
-      throw new Error(`Invalid zod schema: unexpected type name '${typeName satisfies never}'`);
+      throw new Error(
+        `Invalid zod schema: unexpected type name '${typeName satisfies never}' / Schéma zod invalide : nom de type inattendu '${typeName satisfies never}'`
+      );
   }
 }
 function jsonToZod(givenType: unknown): RequiredZodTypeName {
@@ -594,7 +701,7 @@ function jsonToZod(givenType: unknown): RequiredZodTypeName {
       default:
     }
   }
-  throw new Error('Failed to interpret json value');
+  throw new Error("Failed to interpret json value / Échec de l'interprétation de la valeur json");
 }
 function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
   if (
@@ -661,13 +768,16 @@ function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
         };
       } else {
         data = {
-          message: 'Failed to interpret JSON value from schema',
+          message: {
+            en: 'Failed to interpret JSON value from schema',
+            fr: "Échec de l'interprétation de la valeur JSON du schéma"
+          },
           success: false
         };
       }
 
       if (!data.success) {
-        throw new Error(data.message);
+        throw new Error(`${data.message.en} / ${data.message.fr}`);
       }
       jsonSampleData.push(generateSampleData(data));
     }
@@ -676,7 +786,7 @@ function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
 
     return zod4TemplateData;
   }
-  throw new Error('Failed to interpret JSON schema');
+  throw new Error("Failed to interpret JSON schema / Échec de l'interprétation du schéma JSON");
 }
 
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
@@ -702,7 +812,9 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
     }
 
     if (!isZodObject(instrumentSchema)) {
-      throw new Error('Validation schema for this instrument is invalid');
+      throw new Error(
+        'Validation schema for this instrument is invalid / Le schéma de validation de cet instrument est invalide'
+      );
     }
 
     const instrumentSchemaDef: unknown = instrument.validationSchema._def;
@@ -726,7 +838,7 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
     for (const col of columnNames) {
       const typeNameResult = getZodTypeName(shape[col]!);
       if (!typeNameResult.success) {
-        throw new Error(typeNameResult.message);
+        throw new Error(`${typeNameResult.message.en} / ${typeNameResult.message.fr}`);
       }
       sampleData.push(generateSampleData(typeNameResult));
     }
@@ -742,7 +854,7 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
       throw e;
     }
 
-    throw new Error('Error generating Sample CSV template', {
+    throw new Error("Error generating Sample CSV template / Erreur lors de la génération du modèle CSV d'exemple", {
       cause: e
     });
   }
@@ -761,7 +873,7 @@ export async function processInstrumentCSV(
 
   if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
     if (!isZodObject(instrumentSchemaDef.schema)) {
-      return { message: 'Invalid instrument schema', success: false };
+      return { message: { en: 'Invalid instrument schema', fr: "Schéma d'instrument invalide" }, success: false };
     }
     instrumentSchemaWithInternal = instrumentSchemaDef.schema.extend({
       date: z.coerce.date(),
@@ -798,13 +910,22 @@ export async function processInstrumentCSV(
       }
 
       if (dataLines.length === 0) {
-        return resolve({ message: 'data lines is empty array', success: false });
+        return resolve({
+          message: { en: 'data lines is empty array', fr: 'les lignes de données sont un tableau vide' },
+          success: false
+        });
       }
 
       const result: FormTypes.Data[] = [];
 
       if (!headers?.length) {
-        return resolve({ message: 'headers is undefined or empty array', success: false });
+        return resolve({
+          message: {
+            en: 'headers is undefined or empty array',
+            fr: 'les en-têtes ne sont pas définis ou constituent un tableau vide'
+          },
+          success: false
+        });
       }
       let rowNumber = 1;
       for (const elements of dataLines) {
@@ -818,7 +939,10 @@ export async function processInstrumentCSV(
           }
           if (shape[key] === undefined) {
             return resolve({
-              message: `Schema value at column ${j} is not defined! Please check if Column has been edited/deleted from original template`,
+              message: {
+                en: `Schema value at column ${j} is not defined! Please check if Column has been edited/deleted from original template`,
+                fr: `La valeur du schéma à la colonne ${j} n'est pas définie ! Veuillez vérifier si la colonne a été modifiée/supprimée du modèle original`
+              },
               success: false
             });
           }
@@ -829,7 +953,7 @@ export async function processInstrumentCSV(
           }
 
           let interpreterResult: UploadOperationResult<FormTypes.FieldValue> = {
-            message: 'Could not interpret a correct value',
+            message: { en: 'Could not interpret a correct value', fr: "Impossible d'interpréter une valeur correcte" },
             success: false
           };
 
@@ -844,14 +968,20 @@ export async function processInstrumentCSV(
               // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
               // Dealt with via else statement for now
             } else {
-              interpreterResult.message = 'Record Array keys do not exist';
+              interpreterResult.message = {
+                en: 'Record Array keys do not exist',
+                fr: "Les clés du tableau d'enregistrements n'existent pas"
+              };
             }
           } else {
             interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
           }
           if (!interpreterResult.success) {
             return resolve({
-              message: `${interpreterResult.message} at column name: '${key}' and row number ${rowNumber}`,
+              message: {
+                en: `${interpreterResult.message.en} at column name: '${key}' and row number ${rowNumber}`,
+                fr: `${interpreterResult.message.fr} au nom de colonne : '${key}' et numéro de ligne ${rowNumber}`
+              },
               success: false
             });
           }
@@ -866,7 +996,7 @@ export async function processInstrumentCSV(
             return `issue message: \n ${issue.message} \n path: ${issue.path.toString()}`;
           });
           console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
-          return resolve({ message: zodIssues.join(), success: false });
+          return resolve({ message: { en: zodIssues.join(), fr: zodIssues.join() }, success: false });
         }
         result.push(zodCheck.data);
         rowNumber++;
@@ -889,7 +1019,7 @@ export async function processInstrumentCSVZod4(
 
   if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
     return {
-      message: 'Wrong schema',
+      message: { en: 'Wrong schema', fr: 'Mauvais schéma' },
       success: false
     };
   } else {
@@ -919,13 +1049,22 @@ export async function processInstrumentCSVZod4(
       }
 
       if (dataLines.length === 0) {
-        return resolve({ message: 'data lines is empty array', success: false });
+        return resolve({
+          message: { en: 'data lines is empty array', fr: 'les lignes de données sont un tableau vide' },
+          success: false
+        });
       }
 
       const result: FormTypes.Data[] = [];
 
       if (!headers?.length) {
-        return resolve({ message: 'headers is undefined or empty array', success: false });
+        return resolve({
+          message: {
+            en: 'headers is undefined or empty array',
+            fr: 'les en-têtes ne sont pas définis ou constituent un tableau vide'
+          },
+          success: false
+        });
       }
       let rowNumber = 1;
       for (const elements of dataLines) {
@@ -939,7 +1078,10 @@ export async function processInstrumentCSVZod4(
           }
           if (shape[key] === undefined) {
             return resolve({
-              message: `Schema value at column ${j} is not defined! Please check if Column has been edited/deleted from original template`,
+              message: {
+                en: `Schema value at column ${j} is not defined! Please check if Column has been edited/deleted from original template`,
+                fr: `La valeur du schéma à la colonne ${j} n'est pas définie ! Veuillez vérifier si la colonne a été modifiée/supprimée du modèle original`
+              },
               success: false
             });
           }
@@ -949,7 +1091,7 @@ export async function processInstrumentCSVZod4(
           }
 
           let interpreterResult: UploadOperationResult<FormTypes.FieldValue> = {
-            message: 'Could not interpret a correct value',
+            message: { en: 'Could not interpret a correct value', fr: "Impossible d'interpréter une valeur correcte" },
             success: false
           };
 
@@ -965,14 +1107,20 @@ export async function processInstrumentCSVZod4(
               // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
               // Dealt with via else statement for now
             } else {
-              interpreterResult.message = 'Record Array keys do not exist';
+              interpreterResult.message = {
+                en: 'Record Array keys do not exist',
+                fr: "Les clés du tableau d'enregistrements n'existent pas"
+              };
             }
           } else {
             interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
           }
           if (!interpreterResult.success) {
             return resolve({
-              message: `${interpreterResult.message} at column name: '${key}' and row number ${rowNumber}`,
+              message: {
+                en: `${interpreterResult.message.en} at column name: '${key}' and row number ${rowNumber}`,
+                fr: `${interpreterResult.message.fr} au nom de colonne : '${key}' et numéro de ligne ${rowNumber}`
+              },
               success: false
             });
           }
@@ -986,7 +1134,7 @@ export async function processInstrumentCSVZod4(
             return `issue message: \n ${issue.message} \n path: ${issue.path.toString()}`;
           });
           console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
-          return resolve({ message: zodIssues.join(), success: false });
+          return resolve({ message: { en: zodIssues.join(), fr: zodIssues.join() }, success: false });
         }
         result.push(zodCheck.data as FormTypes.Data);
         rowNumber++;
