@@ -36,7 +36,7 @@
     "lodash-es": "workspace:lodash-es__4.x@*",
     "lucide-react": "^0.473.0",
     "motion": "catalog:",
-    "serialize-error": "^11.0.3",
+    "serialize-error": "catalog:",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {
