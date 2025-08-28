@@ -53,13 +53,13 @@ function getTemplateFilename(instrumentInternal: AnyUnilingualFormInstrument['in
 namespace Zod3 {
   type ZodTypeName = Extract<`${z3.ZodFirstPartyTypeKind}`, (typeof ZOD_TYPE_NAMES)[number]>;
 
-  type RequiredZodTypeName = Exclude<ZodTypeName, 'ZodEffects' | 'ZodOptional'>;
+  export type RequiredZodTypeName = Exclude<ZodTypeName, 'ZodEffects' | 'ZodOptional'>;
 
   type AnyZodTypeDef = z3.ZodTypeDef & { typeName: ZodTypeName };
 
   type ZodObjectArrayDef = z3.ZodArrayDef & { type: z3.AnyZodObject };
 
-  type ZodTypeNameResult = {
+  export type ZodTypeNameResult = {
     enumValues?: readonly string[];
     isOptional: boolean;
     multiKeys?: string[];
@@ -178,7 +178,7 @@ namespace Zod3 {
     return isOptional ? `${s} (optional)` : s;
   }
 
-  function generateSampleData({
+  export function generateSampleData({
     enumValues,
     isOptional,
     multiKeys,
@@ -286,6 +286,112 @@ namespace Zod3 {
 }
 
 namespace Zod4 {
+  function jsonToZod(givenType: unknown): Zod3.RequiredZodTypeName {
+    if (typeof givenType === 'string') {
+      switch (givenType) {
+        case 'array':
+          return 'ZodArray';
+        case 'boolean':
+          return 'ZodBoolean';
+        case 'date':
+          return 'ZodDate';
+        case 'enum':
+          return 'ZodEnum';
+        case 'number':
+          return 'ZodNumber';
+        case 'set':
+          return 'ZodSet';
+        case 'string':
+          return 'ZodString';
+        default:
+      }
+    }
+    throw new Error("Failed to interpret json value / Échec de l'interprétation de la valeur json");
+  }
+
+  function parseJSONSchema(jsonInstrumentSchema: z4.core.JSONSchema.ObjectSchema) {
+    // TODO - these could actually not exist
+    // prettier-ignore
+    if (!(jsonInstrumentSchema.properties && jsonInstrumentSchema.required && Array.isArray(jsonInstrumentSchema.required))) {
+       throw new UploadError({
+        en: "Failed to interpret JSON schema",
+        fr: "Échec de l'interprétation du schéma JSON"
+       });
+    }
+
+    const jsonColumnNames = Object.keys(jsonInstrumentSchema.properties);
+
+    const jsonCSVColumns = INTERNAL_HEADERS.concat(jsonColumnNames);
+    const jsonSampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
+
+    for (const col of jsonColumnNames) {
+      let optional = true;
+      // let data: ZodTypeNameResult;
+      if (jsonInstrumentSchema.required.includes(col)) {
+        optional = false;
+      }
+
+      let data: Zod3.ZodTypeNameResult;
+      const propertySchema = jsonInstrumentSchema.properties[col] as z4.core.JSONSchema.Schema;
+
+      if (propertySchema.type === 'array') {
+        if (!propertySchema.items) {
+          throw new UploadError({
+            en: "Property 'items' must be defined for array schema"
+          });
+        } else if (Array.isArray(propertySchema.items)) {
+          throw new UploadError({
+            en: "Property 'items' must not be array: only JSON schema 2020 or later is supported"
+          });
+        }
+        const itemsSchema = propertySchema.items as z4.core.JSONSchema.ObjectSchema;
+        const keys = Object.keys(itemsSchema.properties!);
+        const values = Object.values(itemsSchema.properties!);
+        const multiVals: Zod3.ZodTypeNameResult[] = [];
+
+        let i = 0;
+
+        for (const val of values) {
+          if (val.type && Array.isArray(itemsSchema.required) && keys[i]) {
+            // optional is false if the key is included in the required items
+            multiVals.push({
+              isOptional: !itemsSchema.required.includes(keys[i]!),
+              typeName: jsonToZod(val.type)
+            });
+            i++;
+          }
+        }
+        data = {
+          isOptional: optional,
+          multiKeys: keys,
+          multiValues: multiVals,
+          typeName: 'ZodObject'
+        };
+      } else if (propertySchema.enum) {
+        data = {
+          enumValues: propertySchema.enum as readonly string[],
+          isOptional: optional,
+          typeName: 'ZodEnum'
+        };
+      } else if (jsonToZod(propertySchema.type)) {
+        data = {
+          isOptional: optional,
+          typeName: jsonToZod(propertySchema.type)
+        };
+      } else {
+        throw new UploadError({
+          en: 'Failed to interpret JSON value from schema',
+          fr: "Échec de l'interprétation de la valeur JSON du schéma"
+        });
+      }
+      jsonSampleData.push(Zod3.generateSampleData(data));
+    }
+
+    const zod4TemplateData = unparse([jsonCSVColumns, jsonSampleData]);
+
+    return zod4TemplateData;
+  }
+
   export function createUploadTemplateCSV(
     instrumentSchema: z4.ZodType<FormTypes.Data>,
     instrumentInternal: AnyUnilingualFormInstrument['internal']
@@ -296,9 +402,9 @@ namespace Zod4 {
         en: `Expected form validation schema to be of type object, got ${jsonInstrumentSchema.type}`
       });
     }
-    const zod4TemplateData = ''; // zod4Helper(jsonInstrumentSchema);
+
     return {
-      content: zod4TemplateData,
+      content: parseJSONSchema(jsonInstrumentSchema),
       filename: getTemplateFilename(instrumentInternal)
     };
   }
