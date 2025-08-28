@@ -103,8 +103,38 @@ namespace Zod3 {
     return isZodArrayDef(def) && isZodObject(def.type);
   }
 
-  function interpetZodArray(..._args: any[]): ZodTypeNameResult {
-    return null!;
+  function interpretZodArray(def: ZodObjectArrayDef, isOptional?: boolean): ZodTypeNameResult {
+    const listOfZodElements: ZodTypeNameResult[] = [];
+    const listOfZodKeys: string[] = [];
+
+    const shape = def.type.shape as { [key: string]: z3.ZodTypeAny };
+
+    for (const [key, insideType] of Object.entries(shape)) {
+      const def: unknown = insideType._def;
+      if (isZodTypeDef(def)) {
+        const innerTypeName = getZodTypeName(insideType);
+        listOfZodElements.push(innerTypeName);
+        listOfZodKeys.push(key);
+      } else {
+        console.error({ def });
+        throw new UploadError({
+          en: `Unhandled case!`,
+          fr: `Cas non géré !`
+        });
+      }
+    }
+    if (listOfZodElements.length === 0) {
+      throw new UploadError({
+        en: 'Failure to interpret Zod Object or Array',
+        fr: "Échec de l'interprétation de l'objet ou du tableau Zod"
+      });
+    }
+    return {
+      isOptional: Boolean(isOptional),
+      multiKeys: listOfZodKeys,
+      multiValues: listOfZodElements,
+      typeName: def.typeName
+    };
   }
 
   function getZodTypeName(schema: z3.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
@@ -121,7 +151,7 @@ namespace Zod3 {
         typeName: def.typeName
       };
     } else if (isZodObjectArrayDef(def)) {
-      return interpetZodArray(schema, def.typeName, isOptional);
+      return interpretZodArray(def, isOptional);
     } else if (isZodSetDef(def)) {
       const innerDef: unknown = def.valueType._def;
       if (!isZodTypeDef(innerDef)) {
