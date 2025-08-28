@@ -59,6 +59,14 @@ namespace Zod3 {
 
   type ZodObjectArrayDef = z3.ZodArrayDef & { type: z3.AnyZodObject };
 
+  type ZodTypeNameResult = {
+    enumValues?: readonly string[];
+    isOptional: boolean;
+    multiKeys?: string[];
+    multiValues?: ZodTypeNameResult[];
+    typeName: RequiredZodTypeName;
+  };
+
   function isZodEffects(value: unknown): value is z3.ZodEffects<z3.ZodType> {
     return isObjectLike(value) && value.constructor.name === 'ZodEffects';
   }
@@ -95,11 +103,11 @@ namespace Zod3 {
     return isZodArrayDef(def) && isZodObject(def.type);
   }
 
-  function interpetZodArray(..._args: any[]) {
-    return null as unknown;
+  function interpetZodArray(..._args: any[]): ZodTypeNameResult {
+    return null!;
   }
 
-  function getZodTypeName(schema: z3.ZodTypeAny, isOptional?: boolean): unknown {
+  function getZodTypeName(schema: z3.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
     const def: unknown = schema._def;
     if (!isZodTypeDef(def)) {
       console.error(`Cannot parse ZodType from schema: ${JSON.stringify(schema)}`);
@@ -110,7 +118,6 @@ namespace Zod3 {
       return {
         enumValues: def.values,
         isOptional: Boolean(isOptional),
-        success: true,
         typeName: def.typeName
       };
     } else if (isZodObjectArrayDef(def)) {
@@ -127,16 +134,92 @@ namespace Zod3 {
         return {
           enumValues: innerDef.values,
           isOptional: Boolean(isOptional),
-          success: true,
           typeName: def.typeName
         };
       }
     }
     return {
       isOptional: Boolean(isOptional),
-      success: true,
       typeName: def.typeName satisfies ZodTypeName as RequiredZodTypeName
     };
+  }
+
+  function formatTypeInfo(s: string, isOptional: boolean) {
+    return isOptional ? `${s} (optional)` : s;
+  }
+
+  function generateSampleData({
+    enumValues,
+    isOptional,
+    multiKeys,
+    multiValues,
+    typeName
+  }: Exclude<ZodTypeNameResult, 'ZodEffects'>) {
+    switch (typeName) {
+      case 'ZodBoolean':
+        return formatTypeInfo('true/false', isOptional);
+      case 'ZodDate':
+        return formatTypeInfo('yyyy-mm-dd', isOptional);
+      case 'ZodNumber':
+        return formatTypeInfo('number', isOptional);
+      case 'ZodSet':
+        try {
+          if (enumValues) {
+            return formatTypeInfo(`SET(${enumValues.join('/')}, ...)`, isOptional);
+          }
+          return formatTypeInfo('SET(a,b,c)', isOptional);
+        } catch {
+          throw new UploadError({
+            en: `Failed to generate sample data for ZodSet`,
+            fr: `Échec de la génération de données d'exemple pour ZodSet`
+          });
+        }
+      case 'ZodString':
+        return formatTypeInfo('string', isOptional);
+      case 'ZodEnum':
+        try {
+          let possibleEnumOutputs = '';
+          for (const val of enumValues!) {
+            possibleEnumOutputs += val + '/';
+          }
+          possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
+          return formatTypeInfo(possibleEnumOutputs, isOptional);
+        } catch {
+          throw new UploadError({
+            en: 'Invalid Enum error',
+            fr: 'Erreur Enum invalide'
+          });
+        }
+      case 'ZodArray':
+      case 'ZodObject':
+        try {
+          let multiString = 'RECORD_ARRAY( ';
+          if (multiValues && multiKeys) {
+            for (let i = 0; i < multiValues.length; i++) {
+              const inputData = multiValues[i]!;
+              // eslint-disable-next-line max-depth
+              if (i === multiValues.length - 1 && multiValues[i] !== undefined) {
+                multiString += multiKeys[i] + ':' + generateSampleData(inputData);
+              } else {
+                multiString += multiKeys[i] + ':' + generateSampleData(inputData) + ',';
+              }
+            }
+            multiString += ';)';
+          }
+          return multiString;
+        } catch (e) {
+          throw new UploadError({
+            en: `Invalid Record Array Error` + (e instanceof UploadError ? `: ${e.description.en}` : ''),
+            // prettier-ignore
+            fr: `Erreur de tableau d'enregistrements invalide` + (e instanceof UploadError ? ` : ${e.description.fr}` : '')
+          });
+        }
+      default:
+        throw new UploadError({
+          en: `Invalid zod schema: unexpected type name '${typeName satisfies never}'`,
+          fr: `Schéma zod invalide : nom de type inattendu '${typeName satisfies never}'`
+        });
+    }
   }
 
   export function createUploadTemplateCSV(
