@@ -107,56 +107,44 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       {!isLoading ? (
-        isZodType(instrument.validationSchema, { version: 4 }) ? (
-          <div className="mb-2 flex items-center gap-2 rounded-md bg-red-300 p-4 dark:bg-red-800">
-            <CircleAlertIcon style={{ height: '20px', strokeWidth: '2px', width: '20px' }} />
-            <h5 className="font-medium tracking-tight">
-              {t({
-                en: 'Upload is Not Supported for Zod v4 Instruments',
-                fr: "Le téléchargement n'est pas pris en charge pour les instruments utilisant Zod v4"
-              })}
-            </h5>
-          </div>
-        ) : (
-          <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center">
-            <FileDropzone
-              acceptedFileTypes={{
-                'text/csv': ['.csv']
-              }}
-              className="flex h-80 w-full flex-col"
-              file={file}
-              setFile={setFile}
-            />
-            <div className="mt-4 flex justify-between space-x-2">
-              <Button disabled={!(file && instrument)} variant={'primary'} onClick={() => void handleInstrumentCSV()}>
-                {t('core.submit')}
+        <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center">
+          <FileDropzone
+            acceptedFileTypes={{
+              'text/csv': ['.csv']
+            }}
+            className="flex h-80 w-full flex-col"
+            file={file}
+            setFile={setFile}
+          />
+          <div className="mt-4 flex justify-between space-x-2">
+            <Button disabled={!(file && instrument)} variant={'primary'} onClick={() => void handleInstrumentCSV()}>
+              {t('core.submit')}
+            </Button>
+            <div className="flex justify-between space-x-1">
+              <Button className="gap-1" disabled={!instrument} variant={'primary'} onClick={handleTemplateDownload}>
+                <DownloadIcon />
+                {t({
+                  en: 'Download Template',
+                  fr: 'Télécharger le modèle'
+                })}
               </Button>
-              <div className="flex justify-between space-x-1">
-                <Button className="gap-1" disabled={!instrument} variant={'primary'} onClick={handleTemplateDownload}>
-                  <DownloadIcon />
-                  {t({
-                    en: 'Download Template',
-                    fr: 'Télécharger le modèle'
-                  })}
-                </Button>
-                <Button
-                  className="gap-1"
-                  disabled={!instrument}
-                  variant={'primary'}
-                  onClick={() => {
-                    window.open('https://opendatacapture.org/en/docs/guides/how-to-upload-data/');
-                  }}
-                >
-                  <BadgeHelpIcon />
-                  {t({
-                    en: 'Help',
-                    fr: 'Aide'
-                  })}
-                </Button>
-              </div>
+              <Button
+                className="gap-1"
+                disabled={!instrument}
+                variant={'primary'}
+                onClick={() => {
+                  window.open('https://opendatacapture.org/en/docs/guides/how-to-upload-data/');
+                }}
+              >
+                <BadgeHelpIcon />
+                {t({
+                  en: 'Help',
+                  fr: 'Aide'
+                })}
+              </Button>
             </div>
           </div>
-        )
+        </div>
       ) : (
         <>
           <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center">
