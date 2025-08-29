@@ -29,13 +29,7 @@ const MONGOLIAN_VOWEL_SEPARATOR = String.fromCharCode(32, 6158);
 
 const INTERNAL_HEADERS_SAMPLE_DATA = [MONGOLIAN_VOWEL_SEPARATOR + 'string', MONGOLIAN_VOWEL_SEPARATOR + 'yyyy-mm-dd'];
 
-const SUBJECT_ID_REGEX = [
-  /^[^$\s]+$/,
-  {
-    en: 'Subject ID has to be at least 1 character long, without a $ and no whitespaces',
-    fr: "L'ID du sujet doit comporter au moins 1 caractère, sans $ et sans espaces"
-  }
-] as const;
+const SUBJECT_ID_REGEX = /^[^$\s]+$/;
 
 type ZodTypeName = Extract<`${z.ZodFirstPartyTypeKind}`, (typeof ZOD_TYPE_NAMES)[number]>;
 
@@ -120,10 +114,6 @@ function isZodArrayDef(def: AnyZodTypeDef): def is AnyZodArrayDef {
 
 function isZodEffectsDef(def: AnyZodTypeDef): def is z.ZodEffectsDef {
   return def.typeName === z.ZodFirstPartyTypeKind.ZodEffects;
-}
-
-function isZodObjectDef(def: AnyZodTypeDef): def is z.ZodObjectDef {
-  return def.typeName === z.ZodFirstPartyTypeKind.ZodObject;
 }
 
 function extractSetEntry(entry: string) {
@@ -622,162 +612,6 @@ function jsonToZod(givenType: unknown): RequiredZodTypeName {
   }
   throw new Error("Failed to interpret json value / Échec de l'interprétation de la valeur json");
 }
-function zod4Helper(jsonInstrumentSchema: z4.core.JSONSchema.BaseSchema) {
-  if (
-    jsonInstrumentSchema.properties &&
-    jsonInstrumentSchema.required &&
-    Array.isArray(jsonInstrumentSchema.required)
-  ) {
-    const jsonColumnNames = Object.keys(jsonInstrumentSchema.properties);
-
-    const jsonCSVColumns = INTERNAL_HEADERS.concat(jsonColumnNames);
-    const jsonSampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
-
-    for (const col of jsonColumnNames) {
-      let optional = true;
-      let data: ZodTypeNameResult;
-      if (jsonInstrumentSchema.required.includes(col)) {
-        optional = false;
-      }
-
-      const typeSafety: PropertySchema = jsonInstrumentSchema.properties[col] as PropertySchema;
-
-      if (typeSafety.type === 'array') {
-        const keys = Object.keys(typeSafety.items.properties);
-        const values = Object.values(typeSafety.items.properties);
-        const multiVals: ZodTypeNameResult[] = [];
-        let i = 0;
-
-        for (const val of values) {
-          // eslint-disable-next-line max-depth
-          if (
-            (val as Zod4Object).type &&
-            Array.isArray(jsonInstrumentSchema.properties[col].items.required) &&
-            keys[i]
-          ) {
-            // optional is false if the key is included in the required items
-            multiVals.push({
-              isOptional: !(jsonInstrumentSchema.properties[col].items.required as string[]).includes(keys[i]!),
-              success: true,
-              typeName: jsonToZod((val as Zod4Object).type)
-            });
-            i++;
-          }
-        }
-
-        data = {
-          isOptional: optional,
-          multiKeys: keys,
-          multiValues: multiVals,
-          success: true,
-          typeName: 'ZodObject'
-        };
-      } else if (typeSafety.enum) {
-        data = {
-          enumValues: typeSafety.enum as readonly string[],
-          isOptional: optional,
-          success: true,
-          typeName: 'ZodEnum'
-        };
-      } else if (jsonToZod(typeSafety.type)) {
-        data = {
-          isOptional: optional,
-          success: true,
-          typeName: jsonToZod(typeSafety.type)
-        };
-      } else {
-        data = {
-          message: {
-            en: 'Failed to interpret JSON value from schema',
-            fr: "Échec de l'interprétation de la valeur JSON du schéma"
-          },
-          success: false
-        };
-      }
-
-      if (!data.success) {
-        throw new Error(`${data.message.en} / ${data.message.fr}`);
-      }
-      jsonSampleData.push(generateSampleData(data));
-    }
-
-    const zod4TemplateData = unparse([jsonCSVColumns, jsonSampleData]);
-
-    return zod4TemplateData;
-  }
-  throw new Error("Failed to interpret JSON schema / Échec de l'interprétation du schéma JSON");
-}
-
-export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
-  try {
-    const instrumentSchema = instrument.validationSchema;
-
-    /**
-     * Steps for zod4 schemas
-     * convert schema to json schema
-     * Check properties for all questions
-     * for optional questions check if it exists in required, if not then make it optional
-     * Use the types provided by the schema to generate the sample data
-     * **/
-
-    if (isZodType(instrumentSchema, { version: 4 })) {
-      const jsonInstrumentSchema = z4.toJSONSchema(instrumentSchema as z4.ZodSchema);
-      const zod4TemplateData = zod4Helper(jsonInstrumentSchema);
-
-      return {
-        content: zod4TemplateData,
-        fileName: `${instrument.internal.name}_${instrument.internal.edition}_template.csv`
-      };
-    }
-
-    if (!isZodObject(instrumentSchema)) {
-      throw new Error(
-        'Validation schema for this instrument is invalid / Le schéma de validation de cet instrument est invalide'
-      );
-    }
-
-    const instrumentSchemaDef: unknown = instrument.validationSchema._def;
-
-    let shape: { [key: string]: z.ZodTypeAny } = {};
-
-    if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
-      const innerSchemaDef: unknown = instrumentSchemaDef.schema._def;
-      if (isZodTypeDef(innerSchemaDef) && isZodObjectDef(innerSchemaDef)) {
-        shape = innerSchemaDef.shape() as { [key: string]: z.ZodTypeAny };
-      }
-    } else {
-      shape = instrumentSchema.shape as { [key: string]: z.ZodTypeAny };
-    }
-
-    const columnNames = Object.keys(shape);
-
-    const csvColumns = INTERNAL_HEADERS.concat(columnNames);
-
-    const sampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
-    for (const col of columnNames) {
-      const typeNameResult = getZodTypeName(shape[col]!);
-      if (!typeNameResult.success) {
-        throw new Error(`${typeNameResult.message.en} / ${typeNameResult.message.fr}`);
-      }
-      sampleData.push(generateSampleData(typeNameResult));
-    }
-
-    unparse([csvColumns, sampleData]);
-
-    return {
-      content: unparse([csvColumns, sampleData]),
-      fileName: `${instrument.internal.name}_${instrument.internal.edition}_template.csv`
-    };
-  } catch (e) {
-    if (e instanceof Error && e.message) {
-      throw e;
-    }
-
-    throw new Error("Error generating Sample CSV template / Erreur lors de la génération du modèle CSV d'exemple", {
-      cause: e
-    });
-  }
-}
 
 export async function processInstrumentCSV(
   input: File,
@@ -796,7 +630,7 @@ export async function processInstrumentCSV(
     }
     instrumentSchemaWithInternal = instrumentSchemaDef.schema.extend({
       date: z.coerce.date(),
-      subjectID: z.string().regex(...SUBJECT_ID_REGEX)
+      subjectID: z.string().regex(SUBJECT_ID_REGEX)
     });
     shape = (instrumentSchemaWithInternal._def as z.ZodObjectDef).shape() as { [key: string]: z.ZodTypeAny };
   } else {
@@ -806,7 +640,7 @@ export async function processInstrumentCSV(
     } else {
       instrumentSchemaWithInternal = instrumentSchema.extend({
         date: z.coerce.date(),
-        subjectID: z.string().regex(...SUBJECT_ID_REGEX)
+        subjectID: z.string().regex(SUBJECT_ID_REGEX)
       });
       shape = instrumentSchemaWithInternal.shape as { [key: string]: z.ZodTypeAny };
     }
