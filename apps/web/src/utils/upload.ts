@@ -779,7 +779,7 @@ export async function processInstrumentCSVZod4(
     if (instrumentSchema instanceof z4.ZodObject) {
       instrumentSchemaWithInternal = instrumentSchema.extend({
         date: z4.coerce.date(),
-        subjectID: z4.string().regex(...SUBJECT_ID_REGEX)
+        subjectID: z4.string().regex(SUBJECT_ID_REGEX)
       });
       shape = instrumentSchemaWithInternal.shape;
     }
