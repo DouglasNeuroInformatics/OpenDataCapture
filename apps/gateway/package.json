@@ -8,7 +8,7 @@
     "build": "rm -rf dist && pnpm build:client && pnpm build:server && NODE_ENV=production tsx scripts/build.ts",
     "build:client": "vite build --ssrManifest --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
-    "db:generate": "prisma generate",
+    "db:generate": "prisma generate --no-hints",
     "db:push": "env-cmd --silent -f ../../.env prisma db push --skip-generate",
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx scripts/dev.ts && env-cmd -f ../../.env node dist/main.js",
     "dev:test": "NODE_ENV=test env-cmd -f ../../.env tsx scripts/dev.ts && env-cmd -f ../../.env node dist/main.js",
