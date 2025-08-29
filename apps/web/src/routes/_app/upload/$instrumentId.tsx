@@ -12,7 +12,8 @@ import { PageHeader } from '@/components/PageHeader';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useUploadInstrumentRecordsMutation } from '@/hooks/useUploadInstrumentRecordsMutation';
 import { useAppStore } from '@/store';
-import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData } from '@/utils/upload';
+import { processInstrumentCSV, reformatInstrumentData } from '@/utils/upload';
+import { createUploadTemplateCSV } from '@/utils/upload2';
 
 const $UploadError = z.object({
   message: z.string().nullable(),
@@ -39,8 +40,8 @@ const RouteComponent = () => {
 
   const handleTemplateDownload = () => {
     try {
-      const { content, fileName } = createUploadTemplateCSV(instrument!);
-      void download(fileName, content);
+      const { content, filename } = createUploadTemplateCSV(instrument!);
+      void download(filename, content);
     } catch (error) {
       console.error(error);
       void navigate({
@@ -80,7 +81,10 @@ const RouteComponent = () => {
         await uploadInstrumentRecordsMutation.mutateAsync(reformattedData);
       } else {
         addNotification({
-          message: processedDataResult.message,
+          message: t({
+            en: processedDataResult.message.en,
+            fr: processedDataResult.message.fr
+          }),
           type: 'error'
         });
       }
