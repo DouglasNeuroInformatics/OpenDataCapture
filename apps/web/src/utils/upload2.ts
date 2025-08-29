@@ -312,7 +312,7 @@ namespace Zod4 {
   function parseJSONSchema(jsonInstrumentSchema: z4.core.JSONSchema.ObjectSchema) {
     // TODO - these could actually not exist
     // prettier-ignore
-    if (!(jsonInstrumentSchema.properties && jsonInstrumentSchema.required && Array.isArray(jsonInstrumentSchema.required))) {
+    if (!(jsonInstrumentSchema.properties)) {
        throw new UploadError({
         en: "Failed to interpret JSON schema",
         fr: "Échec de l'interprétation du schéma JSON"
@@ -326,8 +326,12 @@ namespace Zod4 {
 
     for (const col of jsonColumnNames) {
       let optional = true;
-      // let data: ZodTypeNameResult;
-      if (jsonInstrumentSchema.required.includes(col)) {
+
+      if (
+        jsonInstrumentSchema.required &&
+        Array.isArray(jsonInstrumentSchema.required) &&
+        jsonInstrumentSchema.required.includes(col)
+      ) {
         optional = false;
       }
 
@@ -352,12 +356,21 @@ namespace Zod4 {
         let i = 0;
 
         for (const val of values) {
-          if (val.type && Array.isArray(itemsSchema.required) && keys[i]) {
+          if (val.type && keys[i]) {
             // optional is false if the key is included in the required items
-            multiVals.push({
-              isOptional: !itemsSchema.required.includes(keys[i]!),
-              typeName: jsonToZod(val.type)
-            });
+
+            if (itemsSchema && Array.isArray(itemsSchema.required)) {
+              multiVals.push({
+                isOptional: !itemsSchema.required.includes(keys[i]!),
+                typeName: jsonToZod(val.type)
+              });
+            } else {
+              multiVals.push({
+                isOptional: false,
+                typeName: jsonToZod(val.type)
+              });
+            }
+
             i++;
           }
         }
