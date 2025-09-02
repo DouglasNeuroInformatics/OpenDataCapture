@@ -4,7 +4,7 @@ import type { Group } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
-import { parse, unparse } from 'papaparse';
+import { parse } from 'papaparse';
 import { z } from 'zod';
 import { z as z4 } from 'zod/v4';
 
@@ -23,11 +23,7 @@ const ZOD_TYPE_NAMES = [
   'ZodEffects'
 ] as const;
 
-const INTERNAL_HEADERS = ['subjectID', 'date'];
-
 const MONGOLIAN_VOWEL_SEPARATOR = String.fromCharCode(32, 6158);
-
-const INTERNAL_HEADERS_SAMPLE_DATA = [MONGOLIAN_VOWEL_SEPARATOR + 'string', MONGOLIAN_VOWEL_SEPARATOR + 'yyyy-mm-dd'];
 
 const SUBJECT_ID_REGEX = /^[^$\s]+$/;
 
@@ -58,13 +54,6 @@ type UploadOperationResult<T> =
       success: true;
       value: T;
     };
-
-type PropertySchema = {
-  items?: {
-    properties?: { [key: string]: unknown };
-  };
-  type: string;
-};
 
 type AnyZodTypeDef = z.ZodTypeDef & { typeName: ZodTypeName };
 
