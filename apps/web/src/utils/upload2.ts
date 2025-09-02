@@ -2,7 +2,7 @@
 import { isObjectLike, isPlainObject, isZodType } from '@douglasneuroinformatics/libjs';
 import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import type { AnyUnilingualFormInstrument, FormTypes } from '@opendatacapture/runtime-core';
-import { unparse } from 'papaparse';
+import { parse, unparse } from 'papaparse';
 import { z as z3 } from 'zod/v3';
 import { z as z4 } from 'zod/v4';
 
@@ -29,6 +29,18 @@ type CSVUploadTemplate = {
   content: string;
   filename: string;
 };
+
+type UploadOperationResult<T> =
+  | {
+      message: { en: string; fr: string };
+      success: false;
+    }
+  | {
+      success: true;
+      value: T;
+    };
+
+const SUBJECT_ID_REGEX = /^[^$\s]+$/;
 
 class UploadError extends Error {
   description: {
@@ -101,6 +113,10 @@ namespace Zod3 {
 
   function isZodObjectArrayDef(def: AnyZodTypeDef): def is ZodObjectArrayDef {
     return isZodArrayDef(def) && isZodObject(def.type);
+  }
+
+  function isZodEffectsDef(def: AnyZodTypeDef): def is z3.ZodEffectsDef {
+    return def.typeName === z3.ZodFirstPartyTypeKind.ZodEffects;
   }
 
   function interpretZodArray(def: ZodObjectArrayDef, isOptional?: boolean): ZodTypeNameResult {
@@ -283,6 +299,163 @@ namespace Zod3 {
       filename: getTemplateFilename(instrumentInternal)
     };
   }
+
+  //new processInstrumentCSV code
+  export function processInstrumentCSV(input: File, instrument: AnyUnilingualFormInstrument) {
+    const instrumentSchema = instrument.validationSchema as z3.AnyZodObject;
+    let shape: { [key: string]: z3.ZodTypeAny } = {};
+
+    let instrumentSchemaWithInternal: z3.AnyZodObject;
+    const instrumentSchemaDef: unknown = instrumentSchema._def;
+    if (isZodTypeDef(instrumentSchemaDef) && isZodEffectsDef(instrumentSchemaDef)) {
+      if (!isZodObject(instrumentSchemaDef.schema)) {
+        return { message: { en: 'Invalid instrument schema', fr: "Schéma d'instrument invalide" }, success: false };
+      }
+      instrumentSchemaWithInternal = instrumentSchemaDef.schema.extend({
+        date: z3.coerce.date(),
+        subjectID: z3.string().regex(SUBJECT_ID_REGEX)
+      });
+      shape = (instrumentSchemaWithInternal._def as z3.ZodObjectDef).shape() as { [key: string]: z3.ZodTypeAny };
+    } else {
+      instrumentSchemaWithInternal = instrumentSchema.extend({
+        date: z3.coerce.date(),
+        subjectID: z3.string().regex(SUBJECT_ID_REGEX)
+      });
+      shape = instrumentSchemaWithInternal.shape as { [key: string]: z3.ZodTypeAny };
+    }
+    return new Promise<UploadOperationResult<FormTypes.Data[]>>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = reader.result as string;
+        const parseResultCsv = parse<string[]>(text, {
+          header: false,
+          skipEmptyLines: true
+        });
+
+        const [headers, ...dataLines] = parseResultCsv.data;
+
+        //remove sample data if included
+        if (dataLines[0]?.[0]?.startsWith(MONGOLIAN_VOWEL_SEPARATOR)) {
+          dataLines.shift();
+        }
+
+        if (dataLines.length === 0) {
+          return resolve({
+            message: { en: 'data lines is empty array', fr: 'les lignes de données sont un tableau vide' },
+            success: false
+          });
+        }
+
+        const result: FormTypes.Data[] = [];
+
+        if (!headers?.length) {
+          return resolve({
+            message: {
+              en: 'headers is undefined or empty array',
+              fr: 'les en-têtes ne sont pas définis ou constituent un tableau vide'
+            },
+            success: false
+          });
+        }
+        let rowNumber = 1;
+        for (const elements of dataLines) {
+          const jsonLine: { [key: string]: unknown } = {};
+          for (let j = 0; j < headers.length; j++) {
+            const key = headers[j]!.trim();
+            const rawValue = elements[j]!.trim();
+
+            if (rawValue === '\n') {
+              continue;
+            }
+            if (shape[key] === undefined) {
+              return resolve({
+                message: {
+                  en: `Schema value at column ${j} is not defined! Please check if Column has been edited/deleted from original template`,
+                  fr: `La valeur du schéma à la colonne ${j} n'est pas définie ! Veuillez vérifier si la colonne a été modifiée/supprimée du modèle original`
+                },
+                success: false
+              });
+            }
+            try {
+              const typeNameResult = getZodTypeName(shape[key]);
+
+              let interpreterResult: UploadOperationResult<FormTypes.FieldValue> = {
+                message: {
+                  en: 'Could not interpret a correct value',
+                  fr: "Impossible d'interpréter une valeur correcte"
+                },
+                success: false
+              };
+
+              if (typeNameResult.typeName === 'ZodArray' || typeNameResult.typeName === 'ZodObject') {
+                // eslint-disable-next-line max-depth
+                if (typeNameResult.multiKeys && typeNameResult.multiValues) {
+                  interpreterResult = interpretZodObjectValue(
+                    rawValue,
+                    typeNameResult.isOptional,
+                    typeNameResult.multiValues,
+                    typeNameResult.multiKeys
+                  );
+                  // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
+                  // Dealt with via else statement for now
+                } else {
+                  interpreterResult.message = {
+                    en: 'Record Array keys do not exist',
+                    fr: "Les clés du tableau d'enregistrements n'existent pas"
+                  };
+                }
+              } else {
+                interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
+              }
+              if (!interpreterResult.success) {
+                return resolve({
+                  message: {
+                    en: `${interpreterResult.message.en} at column name: '${key}' and row number ${rowNumber}`,
+                    fr: `${interpreterResult.message.fr} au nom de colonne : '${key}' et numéro de ligne ${rowNumber}`
+                  },
+                  success: false
+                });
+              }
+              jsonLine[headers[j]!] = interpreterResult.value;
+            } catch (error: unknown) {
+              if (error instanceof UploadError) {
+                return resolve({
+                  message: {
+                    en: `${UploadError.description.en} at column name: '${key}' and row number`,
+                    fr: `${UploadError.description.fr} au nom de colonne : '${key}'`
+                  },
+                  success: false
+                });
+              } else {
+                return resolve({
+                  message: {
+                    en: `Error parsing CSV`,
+                    fr: `Erreur avec la CSV`
+                  },
+                  success: false
+                });
+              }
+            }
+          }
+
+          const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
+
+          if (!zodCheck.success) {
+            console.error(zodCheck.error.issues);
+            const zodIssues = zodCheck.error.issues.map((issue) => {
+              return `issue message: \n ${issue.message} \n path: ${issue.path.toString()}`;
+            });
+            console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
+            return resolve({ message: { en: zodIssues.join(), fr: zodIssues.join() }, success: false });
+          }
+          result.push(zodCheck.data);
+          rowNumber++;
+        }
+        resolve({ success: true, value: result });
+      };
+      reader.readAsText(input);
+    });
+  }
 }
 
 namespace Zod4 {
@@ -421,6 +594,10 @@ namespace Zod4 {
       filename: getTemplateFilename(instrumentInternal)
     };
   }
+  //to be filled
+  export function processInstrumentCSV(input: File, instrument: AnyUnilingualFormInstrument) {
+    return undefined;
+  }
 }
 
 export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument) {
@@ -429,4 +606,12 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
     return Zod4.createUploadTemplateCSV(instrumentSchema, instrument.internal);
   }
   return Zod3.createUploadTemplateCSV(instrumentSchema, instrument.internal);
+}
+
+//new process instrument csv methods
+export function processInstrumentCSV(input: File, instrument: AnyUnilingualFormInstrument) {
+  if (isZodType(instrument, { version: 4 })) {
+    return Zod4.processInstrumentCSV(input, instrument);
+  }
+  return Zod3.processInstrumentCSV(input, instrument);
 }
