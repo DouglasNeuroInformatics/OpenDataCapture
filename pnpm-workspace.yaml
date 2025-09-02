@@ -25,6 +25,7 @@ catalog:
   prisma: '^6.9.0'
   tailwindcss: '^4.1.4'
   tsx: '4.8.2'
+  serialize-error: '^11.0.3'
   vite: '^6.3.3'
   '@storybook/addon-docs': '9.0.0-beta.3'
   '@storybook/addon-themes': '9.0.0-beta.3'

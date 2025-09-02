@@ -49,6 +49,7 @@
     "react": "workspace:react__19.x@*",
     "react-dom": "workspace:react-dom__19.x@*",
     "recharts": "^2.15.2",
+    "serialize-error": "catalog:",
     "ts-pattern": "workspace:ts-pattern__5.x@*",
     "type-fest": "workspace:type-fest__4.x@*",
     "xlsx": "^0.18.5",

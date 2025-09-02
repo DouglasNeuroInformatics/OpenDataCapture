@@ -6,7 +6,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "rm -rf dist && NODE_ENV=production libnest build -c libnest.config.ts",
-    "db:generate": "prisma generate",
+    "db:generate": "prisma generate --no-hints",
     "dev": "NODE_ENV=development NODE_OPTIONS='--conditions=development' env-cmd -f ../../.env libnest dev -c libnest.config.ts",
     "dev:test": "NODE_ENV=test env-cmd -f ../../.env libnest dev -c libnest.config.ts",
     "format": "prettier --write src",
