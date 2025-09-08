@@ -52,6 +52,16 @@ if (!bundle) {
 }
 
 const instrument = await evaluateInstrument(bundle);
+
+/** @type {string[] | undefined} */
+const scripts = instrument.content.__injectHead?.scripts;
+scripts?.forEach((encodedScript) => {
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.textContent = atob(encodedScript);
+  document.head.appendChild(script);
+});
+
 const encodedStyle = instrument.content.__injectHead?.style;
 if (encodedStyle) {
   const style = atob(encodedStyle);
