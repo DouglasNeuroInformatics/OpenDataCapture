@@ -20,8 +20,10 @@ declare type InteractiveInstrument<
     content: {
       /** attributes to inject in the iframe head */
       readonly __injectHead?: {
+        /** an array of base64 encoded legacy scripts */
+        readonly scripts?: readonly string[];
         /** base64 encoded css */
-        readonly style: string;
+        readonly style?: string;
       };
       render: (done: (data: TData) => void) => Promisable<void>;
     };

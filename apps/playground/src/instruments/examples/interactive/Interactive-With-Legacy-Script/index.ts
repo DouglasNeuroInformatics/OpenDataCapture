@@ -3,7 +3,7 @@
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import { z } from '/runtime/v1/zod@3.x';
 
-import './legacy.js';
+import './legacy.js?legacy';
 
 export default defineInstrument({
   kind: 'INTERACTIVE',
