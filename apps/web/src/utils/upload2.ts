@@ -421,8 +421,8 @@ namespace Zod3 {
               if (error instanceof UploadError) {
                 return resolve({
                   message: {
-                    en: `${UploadError.description.en} at column name: '${key}' and row number`,
-                    fr: `${UploadError.description.fr} au nom de colonne : '${key}'`
+                    en: `${error.description.en} at column name: '${key}' and row number`,
+                    fr: `${error.description.fr} au nom de colonne : '${key}'`
                   },
                   success: false
                 });
