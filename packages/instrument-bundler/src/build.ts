@@ -28,7 +28,7 @@ function parseBuildResult(result: BuildResult): BuildOutput {
       `Unexpected number of exports in output file: expected '0', found '${exportsCount}'`
     );
   }
-  return { css: cssOutput?.text, js: jsOutput.text };
+  return { css: cssOutput?.text, js: jsOutput.text, legacyScripts: result.legacyScripts };
 }
 
 export async function build({ inputs }: { inputs: BundlerInput[] }): Promise<BuildOutput> {

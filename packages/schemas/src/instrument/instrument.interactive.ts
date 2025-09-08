@@ -8,7 +8,8 @@ const $InteractiveInstrument = $ScalarInstrument.extend({
   content: z.object({
     __injectHead: z
       .object({
-        style: z.string().readonly()
+        scripts: z.array(z.string().readonly()).readonly().optional(),
+        style: z.string().readonly().optional()
       })
       .optional()
       .readonly(),

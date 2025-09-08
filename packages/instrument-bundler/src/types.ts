@@ -17,4 +17,5 @@ export type BundlerInputFileExtension =
 export type BuildOutput = {
   css?: string;
   js: string;
+  legacyScripts?: string[];
 };

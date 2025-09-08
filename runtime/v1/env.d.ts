@@ -49,3 +49,8 @@ declare module '*?raw' {
   const src: string;
   export default src;
 }
+
+declare module '*?legacy' {
+  const src: void;
+  export default src;
+}

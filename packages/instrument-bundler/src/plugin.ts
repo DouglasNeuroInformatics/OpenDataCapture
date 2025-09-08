@@ -9,6 +9,7 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
     name: 'instrument-bundler-plugin',
     setup(build) {
       const namespaces = { bundle: 'bundle' };
+      const legacyScripts: string[] = [];
       build.onResolve({ filter: /.*/ }, (args) => {
         // css @import statement
         if (args.kind === 'import-rule') {
@@ -43,6 +44,21 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
         }
         return { contents: input?.content, loader: 'text' };
       });
+      build.onLoad({ filter: /.+\?legacy$/, namespace: namespaces.bundle }, (args) => {
+        const input = resolveInput(/(.+)\?legacy$/.exec(args.path)![1]!, options.inputs);
+        if (!input) {
+          return {
+            errors: [
+              {
+                location: { file: args.path },
+                text: `Failed to resolve '${args.path}' from input filenames: ${options.inputs.map((file) => `'${file.name}'`).join(', ')}`
+              }
+            ]
+          };
+        }
+        legacyScripts.push(input.content as string);
+        return { contents: input.content, loader: 'empty' };
+      });
       build.onLoad({ filter: /^\/runtime\/v1\/.*.css$/, namespace: namespaces.bundle }, (args) => {
         return { contents: `@import "${args.path}";`, loader: 'css' };
       });
@@ -66,6 +82,9 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
           contents = input.content;
         }
         return { contents, loader };
+      });
+      build.onEnd((result) => {
+        result.legacyScripts = legacyScripts;
       });
     }
   };

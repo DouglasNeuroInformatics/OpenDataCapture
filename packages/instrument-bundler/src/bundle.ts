@@ -42,8 +42,12 @@ const GLOBALS = `
  */
 export async function createBundle(output: BuildOutput, options: { minify: boolean }) {
   let inject = '';
-  if (output.css) {
-    inject = `Object.defineProperty(__exports.content, '__injectHead', { value: Object.freeze({ style: "${btoa(output.css)}" }), writable: false });`;
+  const style = output.css ? `"${btoa(output.css)}"` : undefined;
+  const scripts = output.legacyScripts
+    ? `[${output.legacyScripts.map((content) => `"${btoa(content)}"`).join(', ')}]`
+    : undefined;
+  if (style || scripts) {
+    inject = `Object.defineProperty(__exports.content, '__injectHead', { value: Object.freeze({ scripts: ${scripts}, style: ${style} }), writable: false });`;
   }
   const bundle = `(async () => {
     ${GLOBALS}
