@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { isObjectLike, isPlainObject, isZodType } from '@douglasneuroinformatics/libjs';
+import { isNumberLike, isObjectLike, isPlainObject, isZodType, parseNumber } from '@douglasneuroinformatics/libjs';
 import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import type { AnyUnilingualFormInstrument, FormTypes } from '@opendatacapture/runtime-core';
 import { parse, unparse } from 'papaparse';
@@ -60,6 +60,27 @@ class UploadError extends Error {
 
 function getTemplateFilename(instrumentInternal: AnyUnilingualFormInstrument['internal']) {
   return `${instrumentInternal.name}_${instrumentInternal.edition}_template.csv`;
+}
+
+//functions to extract set and record array strings into values
+export function extractSetEntry(entry: string) {
+  const result = /SET\(\s*(.*?)\s*\)/.exec(entry);
+  if (!result?.[1]) {
+    throw new Error(
+      `Failed to extract set value from entry: '${entry}' / Échec de l'extraction de la valeur de l'ensemble de l'entrée : '${entry}'`
+    );
+  }
+  return result[1];
+}
+
+export function extractRecordArrayEntry(entry: string) {
+  const result = /RECORD_ARRAY\(\s*(.*?)[\s;]*\)/.exec(entry);
+  if (!result?.[1]) {
+    throw new Error(
+      `Failed to extract record array value from entry: '${entry}' / Échec de l'extraction de la valeur du tableau d'enregistrements de l'entrée : '${entry}'`
+    );
+  }
+  return result[1];
 }
 
 namespace Zod3 {
@@ -407,16 +428,16 @@ namespace Zod3 {
               } else {
                 interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
               }
-              if (!interpreterResult.success) {
-                return resolve({
-                  message: {
-                    en: `${interpreterResult.message.en} at column name: '${key}' and row number ${rowNumber}`,
-                    fr: `${interpreterResult.message.fr} au nom de colonne : '${key}' et numéro de ligne ${rowNumber}`
-                  },
-                  success: false
-                });
-              }
-              jsonLine[headers[j]!] = interpreterResult.value;
+              // if (!interpreterResult.success) {
+              //   return resolve({
+              //     message: {
+              //       en: `${interpreterResult.message.en} at column name: '${key}' and row number ${rowNumber}`,
+              //       fr: `${interpreterResult.message.fr} au nom de colonne : '${key}' et numéro de ligne ${rowNumber}`
+              //     },
+              //     success: false
+              //   });
+              // }
+              if (interpreterResult.success) jsonLine[headers[j]!] = interpreterResult!.value;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
                 return resolve({
@@ -455,6 +476,189 @@ namespace Zod3 {
       };
       reader.readAsText(input);
     });
+  }
+
+  //insert zodObjectValue function
+  export function interpretZodObjectValue(
+    entry: string,
+    isOptional: boolean,
+    zList: ZodTypeNameResult[],
+    zKeys: string[]
+  ): UploadOperationResult<FormTypes.FieldValue> {
+    try {
+      if (entry === '' && isOptional) {
+        return { success: true, value: undefined };
+      } else if (!entry.startsWith('RECORD_ARRAY(')) {
+        return { message: { en: `Invalid ZodType`, fr: `ZodType invalide` }, success: false };
+      }
+
+      const recordArray: { [key: string]: any }[] = [];
+      const recordArrayDataEntry = extractRecordArrayEntry(entry);
+      const recordArrayDataList = recordArrayDataEntry.split(';');
+
+      if (recordArrayDataList.at(-1) === '') {
+        recordArrayDataList.pop();
+      }
+
+      for (const listData of recordArrayDataList) {
+        const recordArrayObject: { [key: string]: any } = {};
+
+        const record = listData.split(',');
+
+        if (!record) {
+          return {
+            message: {
+              en: `Record in the record array was left undefined`,
+              fr: `L'enregistrement dans le tableau d'enregistrements n'est pas défini`
+            },
+            success: false
+          };
+        }
+        if (record.some((str) => str === '')) {
+          return {
+            message: {
+              en: `One or more of the record array fields was left empty`,
+              fr: `Un ou plusieurs champs du tableau d'enregistrements ont été laissés vides`
+            },
+            success: false
+          };
+        }
+        if (!(zList.length === zKeys.length && zList.length === record.length)) {
+          return {
+            message: {
+              en: `Incorrect number of entries for record array`,
+              fr: `Nombre incorrect d'entrées pour le tableau d'enregistrements`
+            },
+            success: false
+          };
+        }
+        for (let i = 0; i < record.length; i++) {
+          if (!record[i]) {
+            return {
+              message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
+              success: false
+            };
+          }
+
+          const recordValue = record[i]!.split(':')[1]!.trim();
+
+          const zListResult = zList[i]!;
+          if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
+            return {
+              message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
+              success: false
+            };
+          }
+          const interpretZodValueResult: UploadOperationResult<FormTypes.FieldValue> = interpretZodValue(
+            recordValue,
+            zListResult.typeName,
+            zListResult.isOptional
+          );
+          if (!interpretZodValueResult.success) {
+            return {
+              message: {
+                en: `failed to interpret value at entry ${i} in record array row ${listData}`,
+                fr: `échec de l'interprétation de la valeur à l'entrée ${i} dans la ligne de tableau d'enregistrements ${listData}`
+              },
+              success: false
+            };
+          }
+
+          recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
+        }
+        recordArray.push(recordArrayObject);
+      }
+
+      return { success: true, value: recordArray };
+    } catch {
+      return {
+        message: {
+          en: `failed to interpret record array entries`,
+          fr: `échec de l'interprétation des entrées du tableau d'enregistrements`
+        },
+        success: false
+      };
+    }
+  }
+
+  //insert interpretZodValue Function
+  export function interpretZodValue(
+    entry: string,
+    zType: Exclude<ZodTypeName, 'ZodArray' | 'ZodEffects' | 'ZodObject' | 'ZodOptional'>,
+    isOptional: boolean
+  ): UploadOperationResult<FormTypes.FieldValue> {
+    if (entry === '' && isOptional) {
+      return { success: true, value: undefined };
+    }
+    switch (zType) {
+      case 'ZodBoolean':
+        if (entry.toLowerCase() === 'true') {
+          return { success: true, value: true };
+        } else if (entry.toLowerCase() === 'false') {
+          return { success: true, value: false };
+        }
+        return {
+          message: { en: `Undecipherable Boolean Type: '${entry}'`, fr: `Type booléen indéchiffrable : '${entry}'` },
+          success: false
+        };
+      case 'ZodDate': {
+        const date = new Date(entry);
+        if (Number.isNaN(date.getTime())) {
+          return {
+            message: { en: `Failed to parse date: '${entry}'`, fr: `Échec de l'analyse de la date : '${entry}'` },
+            success: false
+          };
+        }
+        return { success: true, value: date };
+      }
+      case 'ZodEnum':
+        return interpretZodValue(entry, 'ZodString', isOptional);
+      case 'ZodNumber':
+        if (isNumberLike(entry)) {
+          return { success: true, value: parseNumber(entry) };
+        }
+        return {
+          message: { en: `Invalid number type: '${entry}'`, fr: `Type de nombre invalide : '${entry}'` },
+          success: false
+        };
+      case 'ZodSet':
+        try {
+          if (entry.startsWith('SET(')) {
+            const setData = extractSetEntry(entry);
+            const values = setData
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean);
+            if (values.length === 0) {
+              return {
+                message: { en: 'Empty set is not allowed', fr: "Un ensemble vide n'est pas autorisé" },
+                success: false
+              };
+            }
+            return { success: true, value: new Set(values) };
+          }
+        } catch {
+          return {
+            message: {
+              en: 'Error occurred interpreting set entry',
+              fr: "Une erreur s'est produite lors de l'interprétation de l'entrée de l'ensemble"
+            },
+            success: false
+          };
+        }
+
+        return { message: { en: `Invalid ZodSet: '${entry}'`, fr: `ZodSet invalide : '${entry}'` }, success: false };
+      case 'ZodString':
+        return { success: true, value: entry };
+      default:
+        return {
+          message: {
+            en: `Invalid ZodType: ${zType satisfies never}`,
+            fr: `ZodType invalide : ${zType satisfies never}`
+          },
+          success: false
+        };
+    }
   }
 }
 
