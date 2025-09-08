@@ -543,7 +543,7 @@ namespace Zod3 {
           const recordValue = record[i]!.split(':')[1]!.trim();
 
           const zListResult = zList[i]!;
-          if (!(zListResult.success && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
+          if (!(zListResult && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
             return {
               message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
               success: false
