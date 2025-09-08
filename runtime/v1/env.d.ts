@@ -44,3 +44,8 @@ declare module '*.json' {
   const src: any;
   export default src;
 }
+
+declare module '*?raw' {
+  const src: string;
+  export default src;
+}

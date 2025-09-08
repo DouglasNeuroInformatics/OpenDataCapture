@@ -29,6 +29,20 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
           path: args.path
         };
       });
+      build.onLoad({ filter: /.+\?raw$/, namespace: namespaces.bundle }, (args) => {
+        const input = resolveInput(/(.+)\?raw$/.exec(args.path)![1]!, options.inputs);
+        if (!input) {
+          return {
+            errors: [
+              {
+                location: { file: args.path },
+                text: `Failed to resolve '${args.path}' from input filenames: ${options.inputs.map((file) => `'${file.name}'`).join(', ')}`
+              }
+            ]
+          };
+        }
+        return { contents: input?.content, loader: 'text' };
+      });
       build.onLoad({ filter: /^\/runtime\/v1\/.*.css$/, namespace: namespaces.bundle }, (args) => {
         return { contents: `@import "${args.path}";`, loader: 'css' };
       });
