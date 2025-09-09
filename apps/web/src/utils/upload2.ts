@@ -116,7 +116,7 @@ namespace Zod3 {
     return isObjectLike(value) && value.constructor.name === 'ZodObject';
   }
 
-  function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
+  export function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
     return isPlainObject(value) && ZOD_TYPE_NAMES.includes(value.typeName as ZodTypeName);
   }
 
@@ -124,7 +124,7 @@ namespace Zod3 {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodOptional;
   }
 
-  function isZodEnumDef(def: AnyZodTypeDef): def is z3.ZodEnumDef {
+  export function isZodEnumDef(def: AnyZodTypeDef): def is z3.ZodEnumDef {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodEnum;
   }
 
@@ -144,7 +144,7 @@ namespace Zod3 {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodEffects;
   }
 
-  function interpretZodArray(def: ZodObjectArrayDef, isOptional?: boolean): ZodTypeNameResult {
+  export function interpretZodArray(def: ZodObjectArrayDef, isOptional?: boolean): ZodTypeNameResult {
     const listOfZodElements: ZodTypeNameResult[] = [];
     const listOfZodKeys: string[] = [];
 
@@ -810,13 +810,136 @@ namespace Zod4 {
       filename: getTemplateFilename(instrumentInternal)
     };
   }
-  //to be filled
+
+  //getzod4typename
+
+  function getZodTypeName(schema: z4.ZodType<unknown, unknown>, isOptional?: boolean): Zod3.ZodTypeNameResult {
+    const defUnknown: unknown = schema._def;
+    if (!defUnknown) {
+      throw new UploadError({
+        en: 'Invalid Zod v4 definition structure',
+        fr: 'Structure de définition Zod v4 invalide'
+      });
+    }
+
+    const def = defUnknown;
+
+    if (!def.type) {
+      throw new UploadError({
+        en: 'Invalid Zod v4 definition structure',
+        fr: 'Structure de définition Zod v4 invalide'
+      });
+    }
+    if (!isObjectLike(def) || typeof def.type !== 'string') {
+      throw new UploadError({
+        en: 'Invalid Zod v4 definition structure',
+        fr: 'Structure de définition Zod v4 invalide'
+      });
+    }
+    if (def.type === 'optional' && def.innerType) {
+      return getZodTypeName(def.innerType, true);
+    } else if (def.type === 'enum') {
+      if (def.entries) {
+        const entries = Object.keys(def.entries as object);
+
+        return {
+          enumValues: entries,
+          isOptional: Boolean(isOptional),
+          typeName: jsonToZod(def.type)
+        };
+      }
+      return {
+        enumValues: def.values,
+        isOptional: Boolean(isOptional),
+        typeName: jsonToZod(def.type)
+      };
+    } else if (def.type === 'array') {
+      const arrayName = jsonToZod(def.type) as z3.ZodFirstPartyTypeKind.ZodArray;
+
+      return interpretZod4Array(schema, arrayName, isOptional);
+    } else if (def.type === 'set') {
+      const innerDef: unknown = def.valueType._def;
+
+      if (!Zod3.isZodTypeDef(innerDef)) {
+        throw new UploadError({
+          en: 'Invalid inner type: ZodSet value type must have a valid type definition',
+          fr: 'Type interne invalide : le type de valeur ZodSet doit avoir une définition de type valide'
+        });
+      }
+
+      if (Zod3.isZodEnumDef(innerDef)) {
+        return {
+          enumValues: innerDef.values,
+          isOptional: Boolean(isOptional),
+          typeName: jsonToZod(def.type)
+        };
+      }
+    }
+
+    return {
+      isOptional: Boolean(isOptional),
+      typeName: jsonToZod(def.type)
+    };
+  }
+
+  //function to interpret zod 4 arrays
+  function interpretZod4Array(
+    def: unknown,
+    originalName: z3.ZodFirstPartyTypeKind.ZodArray,
+    isOptional?: boolean
+  ): Zod3.ZodTypeNameResult {
+    const listOfZodElements: Zod3.ZodTypeNameResult[] = [];
+    const listOfZodKeys: string[] = [];
+    const castedDef = def as z4.core.$ZodAny;
+    if (!castedDef.element) {
+      throw new UploadError({
+        en: 'Failure to interpret Zod Object or Array',
+        fr: "Échec de l'interprétation de l'objet ou du tableau Zod"
+      });
+    }
+    const shape = castedDef.element.shape;
+
+    if (!shape || shape === undefined) {
+      throw new UploadError({
+        en: 'Failure to interpret Zod Object or Array',
+        fr: "Échec de l'interprétation de l'objet ou du tableau Zod"
+      });
+    }
+
+    for (const [key, insideType] of Object.entries(shape)) {
+      const def: unknown = insideType._def;
+      if (def.type) {
+        const innerTypeName = getZodTypeName(insideType as z4.ZodTypeAny);
+        listOfZodElements.push(innerTypeName);
+        listOfZodKeys.push(key);
+      } else {
+        console.error({ def });
+        throw new Error(`Unhandled case! / Cas non géré !`);
+      }
+    }
+
+    if (listOfZodElements.length === 0) {
+      throw new UploadError({
+        en: 'Failure to interpret Zod Object or Array',
+        fr: "Échec de l'interprétation de l'objet ou du tableau Zod"
+      });
+    }
+
+    return {
+      isOptional: Boolean(isOptional),
+      multiKeys: listOfZodKeys,
+      multiValues: listOfZodElements,
+      typeName: originalName
+    };
+  }
+
+  //process instrument CSV zod4 method
   export async function processInstrumentCSV(
     input: File,
     instrument: AnyUnilingualFormInstrument
   ): Promise<UploadOperationResult<FormTypes.Data[]>> {
     const instrumentSchema = instrument.validationSchema as z4.ZodObject;
-    let shape: { [key: string]: z3.ZodTypeAny } = {};
+    let shape: { [key: string]: z4.ZodTypeAny } = {};
     let instrumentSchemaWithInternal: z4.ZodObject;
 
     if (instrumentSchema instanceof z4.ZodObject) {
@@ -881,7 +1004,7 @@ namespace Zod4 {
               });
             }
             try {
-              const typeNameResult = Zod3.getZodTypeName(shape[key]);
+              const typeNameResult = getZodTypeName(shape[key]);
 
               let interpreterResult: UploadOperationResult<FormTypes.FieldValue> = {
                 message: {
@@ -915,15 +1038,6 @@ namespace Zod4 {
                   typeNameResult.isOptional
                 );
               }
-              // if (!interpreterResult.success) {
-              //   return resolve({
-              //     message: {
-              //       en: `${interpreterResult.message.en} at column name: '${key}' and row number ${rowNumber}`,
-              //       fr: `${interpreterResult.message.fr} au nom de colonne : '${key}' et numéro de ligne ${rowNumber}`
-              //     },
-              //     success: false
-              //   });
-              // }
               if (interpreterResult.success) jsonLine[headers[j]!] = interpreterResult.value;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
@@ -975,7 +1089,8 @@ export function createUploadTemplateCSV(instrument: AnyUnilingualFormInstrument)
 
 //new process instrument csv methods
 export function processInstrumentCSV(input: File, instrument: AnyUnilingualFormInstrument) {
-  if (isZodType(instrument, { version: 4 })) {
+  const instrumentSchema = instrument.validationSchema;
+  if (isZodType(instrumentSchema, { version: 4 })) {
     return Zod4.processInstrumentCSV(input, instrument);
   }
   return Zod3.processInstrumentCSV(input, instrument);
