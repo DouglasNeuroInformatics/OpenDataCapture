@@ -63,7 +63,7 @@ function getTemplateFilename(instrumentInternal: AnyUnilingualFormInstrument['in
 }
 
 //functions to extract set and record array strings into values
-export function extractSetEntry(entry: string) {
+function extractSetEntry(entry: string) {
   const result = /SET\(\s*(.*?)\s*\)/.exec(entry);
   if (!result?.[1]) {
     throw new Error(
@@ -73,7 +73,7 @@ export function extractSetEntry(entry: string) {
   return result[1];
 }
 
-export function extractRecordArrayEntry(entry: string) {
+function extractRecordArrayEntry(entry: string) {
   const result = /RECORD_ARRAY\(\s*(.*?)[\s;]*\)/.exec(entry);
   if (!result?.[1]) {
     throw new Error(
@@ -437,13 +437,13 @@ namespace Zod3 {
               //     success: false
               //   });
               // }
-              if (interpreterResult.success) jsonLine[headers[j]!] = interpreterResult!.value;
+              if (interpreterResult.success) jsonLine[headers[j]!] = interpreterResult.value;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
                 return resolve({
                   message: {
-                    en: `${error.description.en} at column name: '${key}' and row number`,
-                    fr: `${error.description.fr} au nom de colonne : '${key}'`
+                    en: `${error.description.en} at column name: '${key}' and row number '${rowNumber}'`,
+                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}`
                   },
                   success: false
                 });
