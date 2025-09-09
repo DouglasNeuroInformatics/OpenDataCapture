@@ -51,9 +51,13 @@ if (!bundle) {
   throw new Error("Failed to get 'data-bundle' attribute from frame element");
 }
 
+/** @type {import('@opendatacapture/runtime-core').InteractiveInstrument }*/
 const instrument = await evaluateInstrument(bundle);
 
-/** @type {string[] | undefined} */
+if (instrument.content.html) {
+  document.body.insertAdjacentHTML('beforeend', instrument.content.html);
+}
+
 const scripts = instrument.content.__injectHead?.scripts;
 scripts?.forEach((encodedScript) => {
   const script = document.createElement('script');
