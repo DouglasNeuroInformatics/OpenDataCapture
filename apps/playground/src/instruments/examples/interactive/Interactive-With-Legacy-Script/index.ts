@@ -3,6 +3,8 @@
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import { z } from '/runtime/v1/zod@3.x';
 
+import html from './index.html';
+
 import './legacy.js?legacy';
 
 export default defineInstrument({
@@ -15,13 +17,12 @@ export default defineInstrument({
   tags: ['Legacy', 'Internet Explorer 6'],
   content: {
     render(done) {
-      const button = document.createElement('button');
-      button.textContent = 'Submit Instrument';
-      document.body.appendChild(button);
+      const button = document.getElementById('submit-btn')!;
       button.addEventListener('click', () => {
         done({ message });
       });
-    }
+    },
+    html
   },
   clientDetails: {
     estimatedDuration: 1,

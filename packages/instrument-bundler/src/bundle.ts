@@ -43,7 +43,7 @@ const GLOBALS = `
 export async function createBundle(output: BuildOutput, options: { minify: boolean }) {
   let inject = '';
   const style = output.css ? `"${btoa(output.css)}"` : undefined;
-  const scripts = output.legacyScripts
+  const scripts = output.legacyScripts?.length
     ? `[${output.legacyScripts.map((content) => `"${btoa(content)}"`).join(', ')}]`
     : undefined;
   if (style || scripts) {

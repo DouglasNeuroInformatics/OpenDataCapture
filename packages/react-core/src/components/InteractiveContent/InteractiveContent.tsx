@@ -121,7 +121,19 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
           lang={resolvedLanguage}
           name="interactive-instrument"
           ref={iFrameRef}
-          srcDoc={`<script type="module">${bootstrapScript}</script>`}
+          srcDoc={[
+            `<!DOCTYPE html>`,
+            `<html>`,
+            `<head>`,
+            `<meta charset="UTF-8">`,
+            `<meta name="viewport" content="width=device-width, initial-scale=1.0">`,
+            `<title>Document</title>`,
+            `<script type="module">${bootstrapScript}</script>`,
+            `</head>`,
+            `<body>`,
+            `</body>`,
+            `</html>`
+          ].join('')}
           style={{ backgroundColor: 'white', height: dimensions, scale: `${scale}%`, width: dimensions }}
           title="Open Data Capture - Interactive Instrument"
         />

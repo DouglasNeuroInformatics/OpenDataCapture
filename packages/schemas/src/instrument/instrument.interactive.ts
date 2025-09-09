@@ -13,6 +13,8 @@ const $InteractiveInstrument = $ScalarInstrument.extend({
       })
       .optional()
       .readonly(),
+    html: z.string().optional(),
+    meta: z.record(z.string(), z.string()).optional(),
     render: $AnyFunction
   }),
   details: $InstrumentDetails,
