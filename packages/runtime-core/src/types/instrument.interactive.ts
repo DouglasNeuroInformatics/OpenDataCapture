@@ -25,6 +25,7 @@ declare type InteractiveInstrument<
         /** base64 encoded css */
         readonly style?: string;
       };
+      html?: string;
       render: (done: (data: TData) => void) => Promisable<void>;
     };
     kind: 'INTERACTIVE';
