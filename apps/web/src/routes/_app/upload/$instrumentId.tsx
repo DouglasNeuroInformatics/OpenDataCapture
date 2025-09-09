@@ -12,8 +12,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useUploadInstrumentRecordsMutation } from '@/hooks/useUploadInstrumentRecordsMutation';
 import { useAppStore } from '@/store';
-import { processInstrumentCSV, reformatInstrumentData } from '@/utils/upload';
-import { createUploadTemplateCSV } from '@/utils/upload2';
+import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData } from '@/utils/upload2';
 
 const $UploadError = z.object({
   message: z.string().nullable(),
