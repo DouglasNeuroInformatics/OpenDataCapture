@@ -53,11 +53,6 @@ class UploadError extends Error {
     [L in Language]?: string;
   };
 
-  title = {
-    en: `Error Occurred Downloading Sample Template`,
-    fr: `Une erreur s'est produite lors du téléchargement du CSV`
-  };
-
   constructor(description: { [L in Language]?: string }) {
     super();
     this.description = description;
@@ -1068,3 +1063,5 @@ export function reformatInstrumentData({
   };
   return reformatForSending;
 }
+
+export { UploadError };
