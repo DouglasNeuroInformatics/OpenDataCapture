@@ -1,4 +1,6 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-namespace */
+
 import { isNumberLike, isObjectLike, isPlainObject, isZodType, parseNumber } from '@douglasneuroinformatics/libjs';
 import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapture/runtime-core';
@@ -8,13 +10,11 @@ import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instr
 import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import { parse, unparse } from 'papaparse';
 import { z as z3 } from 'zod/v3';
-import { z as z4 } from 'zod/v4';
+import z, { z as z4 } from 'zod/v4';
 
 const INTERNAL_HEADERS = ['subjectID', 'date'];
 
-const MONGOLIAN_VOWEL_SEPARATOR = String.fromCharCode(32, 6158);
-
-const INTERNAL_HEADERS_SAMPLE_DATA = [MONGOLIAN_VOWEL_SEPARATOR + 'string', MONGOLIAN_VOWEL_SEPARATOR + 'yyyy-mm-dd'];
+const INTERNAL_HEADERS_SAMPLE_DATA = ['string', 'yyyy-mm-dd'];
 
 const ZOD_TYPE_NAMES = [
   'ZodNumber',
@@ -74,7 +74,12 @@ function extractSetEntry(entry: string) {
       `Failed to extract set value from entry: '${entry}' / Échec de l'extraction de la valeur de l'ensemble de l'entrée : '${entry}'`
     );
   }
-  return result[1];
+  return new Set(
+    result[1]
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  );
 }
 
 function extractRecordArrayEntry(entry: string) {
@@ -83,6 +88,80 @@ function extractRecordArrayEntry(entry: string) {
     throw new Error(
       `Failed to extract record array value from entry: '${entry}' / Échec de l'extraction de la valeur du tableau d'enregistrements de l'entrée : '${entry}'`
     );
+  }
+  const recordArrayDataList = result[1].split(';');
+
+  if (recordArrayDataList.at(-1) === '') {
+    recordArrayDataList.pop();
+  }
+
+  for (const listData of recordArrayDataList) {
+    const recordArrayObject: { [key: string]: any } = {};
+
+    const record = listData.split(',');
+
+    if (!record) {
+      return {
+        message: {
+          en: `Record in the record array was left undefined`,
+          fr: `L'enregistrement dans le tableau d'enregistrements n'est pas défini`
+        },
+        success: false
+      };
+    }
+    if (record.some((str) => str === '')) {
+      return {
+        message: {
+          en: `One or more of the record array fields was left empty`,
+          fr: `Un ou plusieurs champs du tableau d'enregistrements ont été laissés vides`
+        },
+        success: false
+      };
+    }
+    if (!(zList.length === zKeys.length && zList.length === record.length)) {
+      return {
+        message: {
+          en: `Incorrect number of entries for record array`,
+          fr: `Nombre incorrect d'entrées pour le tableau d'enregistrements`
+        },
+        success: false
+      };
+    }
+    for (let i = 0; i < record.length; i++) {
+      if (!record[i]) {
+        return {
+          message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
+          success: false
+        };
+      }
+
+      const recordValue = record[i]!.split(':')[1]!.trim();
+
+      const zListResult = zList[i]!;
+      if (!(zListResult && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
+        return {
+          message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
+          success: false
+        };
+      }
+      const interpretZodValueResult: UploadOperationResult<FormTypes.FieldValue> = interpretZodValue(
+        recordValue,
+        zListResult.typeName,
+        zListResult.isOptional
+      );
+      if (!interpretZodValueResult.success) {
+        return {
+          message: {
+            en: `failed to interpret value at entry ${i} in record array row ${listData}`,
+            fr: `échec de l'interprétation de la valeur à l'entrée ${i} dans la ligne de tableau d'enregistrements ${listData}`
+          },
+          success: false
+        };
+      }
+
+      recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
+    }
+    recordArray.push(recordArrayObject);
   }
   return result[1];
 }
@@ -374,16 +453,19 @@ namespace Zod3 {
 
         const [headers, ...dataLines] = parseResultCsv.data;
 
-        //remove sample data if included
-        if (dataLines[0]?.[0]?.startsWith(MONGOLIAN_VOWEL_SEPARATOR)) {
-          dataLines.shift();
-        }
-
-        if (dataLines.length === 0) {
+        if (!dataLines[0]) {
           return resolve({
             message: { en: 'data lines is empty array', fr: 'les lignes de données sont un tableau vide' },
             success: false
           });
+        }
+
+        //remove sample data if included
+        if (
+          dataLines[0][0] === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
+          dataLines[0][1] === INTERNAL_HEADERS_SAMPLE_DATA[1]
+        ) {
+          dataLines.shift();
         }
 
         const result: FormTypes.Data[] = [];
@@ -673,290 +755,279 @@ namespace Zod3 {
 }
 
 namespace Zod4 {
-  function jsonToZod(givenType: unknown): Zod3.RequiredZodTypeName {
-    if (typeof givenType === 'string') {
-      switch (givenType) {
-        case 'array':
-          return 'ZodArray';
-        case 'boolean':
-          return 'ZodBoolean';
-        case 'date':
-          return 'ZodDate';
-        case 'enum':
-          return 'ZodEnum';
-        case 'number':
-          return 'ZodNumber';
-        case 'set':
-          return 'ZodSet';
-        case 'string':
-          return 'ZodString';
-        default:
-      }
-    }
-    throw new Error("Failed to interpret json value / Échec de l'interprétation de la valeur json");
-  }
-
-  function parseJSONSchema(jsonInstrumentSchema: z4.core.JSONSchema.ObjectSchema) {
-    // TODO - these could actually not exist
-    // prettier-ignore
-    if (!(jsonInstrumentSchema.properties)) {
-       throw new UploadError({
-        en: "Failed to interpret JSON schema",
-        fr: "Échec de l'interprétation du schéma JSON"
-       });
-    }
-
-    const jsonColumnNames = Object.keys(jsonInstrumentSchema.properties);
-
-    const jsonCSVColumns = INTERNAL_HEADERS.concat(jsonColumnNames);
-    const jsonSampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
-
-    for (const col of jsonColumnNames) {
-      let optional = true;
-
-      if (
-        jsonInstrumentSchema.required &&
-        Array.isArray(jsonInstrumentSchema.required) &&
-        jsonInstrumentSchema.required.includes(col)
-      ) {
-        optional = false;
-      }
-
-      let data: Zod3.ZodTypeNameResult;
-      const propertySchema = jsonInstrumentSchema.properties[col] as z4.core.JSONSchema.Schema;
-
-      if (propertySchema.type === 'array') {
-        if (!propertySchema.items) {
-          throw new UploadError({
-            en: "Property 'items' must be defined for array schema",
-            fr: "La propriété 'items' doit être définie pour le schéma de tableau"
-          });
-        } else if (Array.isArray(propertySchema.items)) {
-          throw new UploadError({
-            en: "Property 'items' must not be array: only JSON schema 2020 or later is supported",
-            fr: `Le schéma de validation du formulaire devrait être de type object, reçu ${jsonInstrumentSchema.type}`
-          });
-        }
-        const itemsSchema = propertySchema.items as z4.core.JSONSchema.ObjectSchema;
-        const keys = Object.keys(itemsSchema.properties!);
-        const values = Object.values(itemsSchema.properties!);
-        const multiVals: Zod3.ZodTypeNameResult[] = [];
-
-        let i = 0;
-
-        for (const val of values) {
-          if (val.type && keys[i]) {
-            // optional is false if the key is included in the required items
-            let makeOptional = false;
-
-            if (itemsSchema && Array.isArray(itemsSchema.required)) {
-              makeOptional = !itemsSchema.required.includes(keys[i]!);
-            }
-
-            if (val.enum) {
-              multiVals.push({
-                enumValues: val.enum as readonly string[],
-                isOptional: makeOptional,
-                typeName: 'ZodEnum'
-              });
-            } else {
-              multiVals.push({
-                isOptional: makeOptional,
-                typeName: jsonToZod(val.type)
-              });
-            }
-
-            i++;
-          }
-        }
-        data = {
-          isOptional: optional,
-          multiKeys: keys,
-          multiValues: multiVals,
+  function parseZodSchema(schema: unknown, isOptional = false): Zod3.ZodTypeNameResult {
+    switch (true) {
+      case schema instanceof z4.ZodArray:
+        return {
+          isOptional,
+          multiValues: [parseZodSchema(schema.element)],
+          typeName: 'ZodArray'
+        };
+      case schema instanceof z4.ZodObject:
+        const multiValues: Zod3.ZodTypeNameResult[] = [];
+        const multiKeys: string[] = [];
+        Object.entries(schema.shape).forEach(([key, value]) => {
+          multiKeys.push(key);
+          multiValues.push(parseZodSchema(value));
+        });
+        return {
+          isOptional,
+          multiKeys,
+          multiValues,
           typeName: 'ZodObject'
         };
-      } else if (propertySchema.enum) {
-        data = {
-          enumValues: propertySchema.enum as readonly string[],
-          isOptional: optional,
+      case schema instanceof z4.ZodBoolean:
+        return {
+          isOptional,
+          typeName: 'ZodBoolean'
+        };
+      case schema instanceof z4.ZodDate:
+        return {
+          isOptional,
+          typeName: 'ZodDate'
+        };
+      case schema instanceof z4.ZodEnum:
+        return {
+          enumValues: schema.options.map(String),
+          isOptional,
           typeName: 'ZodEnum'
         };
-      } else if (jsonToZod(propertySchema.type)) {
-        data = {
-          isOptional: optional,
-          typeName: jsonToZod(propertySchema.type)
+      case schema instanceof z4.ZodNumber:
+        return {
+          isOptional,
+          typeName: 'ZodNumber'
         };
-      } else {
+      case schema instanceof z4.ZodSet:
+        return {
+          isOptional,
+          typeName: 'ZodSet'
+        };
+      case schema instanceof z4.ZodString:
+        return {
+          isOptional,
+          typeName: 'ZodString'
+        };
+      case schema instanceof z4.ZodOptional:
+        return parseZodSchema(schema.def.innerType, true);
+      default:
         throw new UploadError({
-          en: 'Failed to interpret JSON value from schema',
-          fr: "Échec de l'interprétation de la valeur JSON du schéma"
+          en: `Unsupported schema type: ${(schema as z4.ZodType)?.def?.type}`
         });
-      }
-      jsonSampleData.push(Zod3.generateSampleData(data));
     }
+  }
 
-    const zod4TemplateData = unparse([jsonCSVColumns, jsonSampleData]);
+  //insert zodObjectValue function
+  export function interpretZodObjectValue(
+    entry: string,
+    isOptional: boolean,
+    zList: ZodTypeNameResult[],
+    zKeys: string[]
+  ): UploadOperationResult<FormTypes.FieldValue> {
+    try {
+      if (entry === '' && isOptional) {
+        return { success: true, value: undefined };
+      } else if (!entry.startsWith('RECORD_ARRAY(')) {
+        return { message: { en: `Invalid ZodType`, fr: `ZodType invalide` }, success: false };
+      }
 
-    return zod4TemplateData;
+      const recordArray: { [key: string]: any }[] = [];
+      const recordArrayDataEntry = extractRecordArrayEntry(entry);
+      const recordArrayDataList = recordArrayDataEntry.split(';');
+
+      if (recordArrayDataList.at(-1) === '') {
+        recordArrayDataList.pop();
+      }
+
+      for (const listData of recordArrayDataList) {
+        const recordArrayObject: { [key: string]: any } = {};
+
+        const record = listData.split(',');
+
+        if (!record) {
+          return {
+            message: {
+              en: `Record in the record array was left undefined`,
+              fr: `L'enregistrement dans le tableau d'enregistrements n'est pas défini`
+            },
+            success: false
+          };
+        }
+        if (record.some((str) => str === '')) {
+          return {
+            message: {
+              en: `One or more of the record array fields was left empty`,
+              fr: `Un ou plusieurs champs du tableau d'enregistrements ont été laissés vides`
+            },
+            success: false
+          };
+        }
+        if (!(zList.length === zKeys.length && zList.length === record.length)) {
+          return {
+            message: {
+              en: `Incorrect number of entries for record array`,
+              fr: `Nombre incorrect d'entrées pour le tableau d'enregistrements`
+            },
+            success: false
+          };
+        }
+        for (let i = 0; i < record.length; i++) {
+          if (!record[i]) {
+            return {
+              message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
+              success: false
+            };
+          }
+
+          const recordValue = record[i]!.split(':')[1]!.trim();
+
+          const zListResult = zList[i]!;
+          if (!(zListResult && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
+            return {
+              message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
+              success: false
+            };
+          }
+          const interpretZodValueResult: UploadOperationResult<FormTypes.FieldValue> = interpretZodValue(
+            recordValue,
+            zListResult.typeName,
+            zListResult.isOptional
+          );
+          if (!interpretZodValueResult.success) {
+            return {
+              message: {
+                en: `failed to interpret value at entry ${i} in record array row ${listData}`,
+                fr: `échec de l'interprétation de la valeur à l'entrée ${i} dans la ligne de tableau d'enregistrements ${listData}`
+              },
+              success: false
+            };
+          }
+
+          recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
+        }
+        recordArray.push(recordArrayObject);
+      }
+
+      return { success: true, value: recordArray };
+    } catch {
+      return {
+        message: {
+          en: `failed to interpret record array entries`,
+          fr: `échec de l'interprétation des entrées du tableau d'enregistrements`
+        },
+        success: false
+      };
+    }
+  }
+
+  function interpetZodTypeResult(zodTypeNameResult: Zod3.ZodTypeNameResult, entry: string) {
+    if (entry === '' && zodTypeNameResult.isOptional) {
+      return { success: true, value: undefined };
+    }
+    switch (zodTypeNameResult.typeName) {
+      case 'ZodArray':
+
+      case 'ZodBoolean':
+        if (entry.toLowerCase() === 'true') {
+          return { success: true, value: true };
+        } else if (entry.toLowerCase() === 'false') {
+          return { success: true, value: false };
+        }
+        return {
+          message: { en: `Undecipherable Boolean Type: '${entry}'`, fr: `Type booléen indéchiffrable : '${entry}'` },
+          success: false
+        };
+      case 'ZodDate': {
+        const date = new Date(entry);
+        if (Number.isNaN(date.getTime())) {
+          return {
+            message: { en: `Failed to parse date: '${entry}'`, fr: `Échec de l'analyse de la date : '${entry}'` },
+            success: false
+          };
+        }
+        return { success: true, value: date };
+      }
+      case 'ZodEnum':
+        return { success: true, value: entry };
+      case 'ZodNumber':
+        if (isNumberLike(entry)) {
+          return { success: true, value: parseNumber(entry) };
+        }
+        return {
+          message: { en: `Invalid number type: '${entry}'`, fr: `Type de nombre invalide : '${entry}'` },
+          success: false
+        };
+      case 'ZodSet':
+        try {
+          const set = extractSetEntry(entry);
+          if (set.size === 0) {
+            return {
+              message: { en: 'Empty set is not allowed', fr: "Un ensemble vide n'est pas autorisé" },
+              success: false
+            };
+          }
+          return { success: true, value: set };
+        } catch {
+          return {
+            message: {
+              en: 'Error occurred interpreting set entry',
+              fr: "Une erreur s'est produite lors de l'interprétation de l'entrée de l'ensemble"
+            },
+            success: false
+          };
+        }
+      case 'ZodString':
+        return { success: true, value: entry };
+      default:
+        return {
+          message: {
+            en: `Invalid ZodType: ${zodTypeNameResult.typeName satisfies never}`,
+            fr: `ZodType invalide : ${zodTypeNameResult.typeName satisfies never}`
+          },
+          success: false
+        };
+    }
   }
 
   export function createUploadTemplateCSV(
     instrumentSchema: z4.ZodType<FormTypes.Data>,
     instrumentInternal: AnyUnilingualFormInstrument['internal']
   ) {
-    const jsonInstrumentSchema = z4.toJSONSchema(instrumentSchema) as z4.core.JSONSchema.Schema;
-    if (jsonInstrumentSchema.type !== 'object') {
+    if (!(instrumentSchema instanceof z.ZodObject)) {
       throw new UploadError({
-        en: `Expected form validation schema to be of type object, got ${jsonInstrumentSchema.type}`
+        en: 'Expected schema to be instance of ZodObject'
       });
     }
 
+    const csvColumns = [...INTERNAL_HEADERS];
+    const sampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
+
+    Object.entries(instrumentSchema.shape).forEach(([key, subschema]) => {
+      csvColumns.push(key);
+      sampleData.push(Zod3.generateSampleData(parseZodSchema(subschema)));
+    });
+
     return {
-      content: parseJSONSchema(jsonInstrumentSchema),
+      content: unparse([csvColumns, sampleData]),
       filename: getTemplateFilename(instrumentInternal)
     };
   }
 
-  //getzod4typename
-
-  function getZodTypeName(schema: z4.ZodType<unknown, unknown>, isOptional?: boolean): Zod3.ZodTypeNameResult {
-    const defUnknown: unknown = schema._def;
-    if (!defUnknown) {
-      throw new UploadError({
-        en: 'Invalid Zod v4 definition structure',
-        fr: 'Structure de définition Zod v4 invalide'
-      });
-    }
-
-    const def = defUnknown;
-
-    if (!def.type) {
-      throw new UploadError({
-        en: 'Invalid Zod v4 definition structure',
-        fr: 'Structure de définition Zod v4 invalide'
-      });
-    }
-
-    if (!isObjectLike(def) || typeof def.type !== 'string') {
-      throw new UploadError({
-        en: 'Invalid Zod v4 definition structure',
-        fr: 'Structure de définition Zod v4 invalide'
-      });
-    }
-
-    if (def.type === 'optional' && def.innerType) {
-      return getZodTypeName(def.innerType, true);
-    } else if (def.type === 'enum') {
-      if (def.entries) {
-        const entries = Object.keys(def.entries as object);
-
-        return {
-          enumValues: entries,
-          isOptional: Boolean(isOptional),
-          typeName: jsonToZod(def.type)
-        };
-      }
-      return {
-        enumValues: def.values,
-        isOptional: Boolean(isOptional),
-        typeName: jsonToZod(def.type)
-      };
-    } else if (def.type === 'array') {
-      const arrayName = jsonToZod(def.type) as z3.ZodFirstPartyTypeKind.ZodArray;
-
-      return interpretZod4Array(schema, arrayName, isOptional);
-    } else if (def.type === 'set') {
-      const innerDef: unknown = def.valueType._def;
-
-      if (!Zod3.isZodTypeDef(innerDef)) {
-        throw new UploadError({
-          en: 'Invalid inner type: ZodSet value type must have a valid type definition',
-          fr: 'Type interne invalide : le type de valeur ZodSet doit avoir une définition de type valide'
-        });
-      }
-
-      if (Zod3.isZodEnumDef(innerDef)) {
-        return {
-          enumValues: innerDef.values,
-          isOptional: Boolean(isOptional),
-          typeName: jsonToZod(def.type)
-        };
-      }
-    }
-
-    return {
-      isOptional: Boolean(isOptional),
-      typeName: jsonToZod(def.type)
-    };
-  }
-
-  //function to interpret zod 4 arrays
-  function interpretZod4Array(
-    def: unknown,
-    originalName: z3.ZodFirstPartyTypeKind.ZodArray,
-    isOptional?: boolean
-  ): Zod3.ZodTypeNameResult {
-    const listOfZodElements: Zod3.ZodTypeNameResult[] = [];
-    const listOfZodKeys: string[] = [];
-    const castedDef = def as z4.core.$ZodObjectDef;
-    if (!castedDef.element) {
-      throw new UploadError({
-        en: 'Failure to interpret Zod Object or Array',
-        fr: "Échec de l'interprétation de l'objet ou du tableau Zod"
-      });
-    }
-    const shape = castedDef.element.shape;
-
-    if (!shape || shape === undefined) {
-      throw new UploadError({
-        en: 'Failure to interpret Zod Object or Array',
-        fr: "Échec de l'interprétation de l'objet ou du tableau Zod"
-      });
-    }
-
-    for (const [key, insideType] of Object.entries(shape)) {
-      const def: unknown = insideType._def;
-      if (def.type) {
-        const innerTypeName = getZodTypeName(insideType as z4.ZodTypeAny);
-        listOfZodElements.push(innerTypeName);
-        listOfZodKeys.push(key);
-      } else {
-        console.error({ def });
-        throw new Error(`Unhandled case! / Cas non géré !`);
-      }
-    }
-
-    if (listOfZodElements.length === 0) {
-      throw new UploadError({
-        en: 'Failure to interpret Zod Object or Array',
-        fr: "Échec de l'interprétation de l'objet ou du tableau Zod"
-      });
-    }
-
-    return {
-      isOptional: Boolean(isOptional),
-      multiKeys: listOfZodKeys,
-      multiValues: listOfZodElements,
-      typeName: originalName
-    };
-  }
-
-  //process instrument CSV zod4 method
   export async function processInstrumentCSV(
     input: File,
     instrument: AnyUnilingualFormInstrument
   ): Promise<UploadOperationResult<FormTypes.Data[]>> {
-    const instrumentSchema = instrument.validationSchema as z4.ZodObject;
-    let shape: { [key: string]: z4.ZodTypeAny } = {};
-    let instrumentSchemaWithInternal: z4.ZodObject;
-
-    if (instrumentSchema instanceof z4.ZodObject) {
-      instrumentSchemaWithInternal = instrumentSchema.extend({
-        date: z4.coerce.date(),
-        subjectID: z4.string().regex(SUBJECT_ID_REGEX)
+    if (!(instrument.validationSchema instanceof z.ZodObject)) {
+      throw new UploadError({
+        en: 'Expected schema to be instance of ZodObject'
       });
-      shape = instrumentSchemaWithInternal.shape;
     }
+
+    const instrumentSchema = instrument.validationSchema.extend({
+      date: z4.coerce.date(),
+      subjectID: z4.string().regex(SUBJECT_ID_REGEX)
+    });
+
+    const shape = instrumentSchema.shape as { [key: string]: z4.ZodType };
 
     return new Promise<UploadOperationResult<FormTypes.Data[]>>((resolve) => {
       const reader = new FileReader();
@@ -967,52 +1038,48 @@ namespace Zod4 {
           skipEmptyLines: true
         });
 
-        const [headers, ...dataLines] = parseResultCsv.data;
+        const [headers, ...dataLines] = parseResultCsv.data satisfies string[][] as [string[], ...string[][]];
 
-        //remove sample data if included
-        if (dataLines[0]?.[0]?.startsWith(MONGOLIAN_VOWEL_SEPARATOR)) {
-          dataLines.shift();
-        }
-
-        if (dataLines.length === 0) {
-          return resolve({
-            message: { en: 'data lines is empty array', fr: 'les lignes de données sont un tableau vide' },
-            success: false
-          });
-        }
-
-        const result: FormTypes.Data[] = [];
-
-        if (!headers?.length) {
+        if (!dataLines?.[0]) {
           return resolve({
             message: {
-              en: 'headers is undefined or empty array',
-              fr: 'les en-têtes ne sont pas définis ou constituent un tableau vide'
+              en: 'CSV does not contain any rows of data',
+              fr: 'Le fichier CSV ne contient aucune ligne de données'
             },
             success: false
           });
         }
+
+        //remove sample data if included
+        if (
+          dataLines[0][0] === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
+          dataLines[0][1] === INTERNAL_HEADERS_SAMPLE_DATA[1]
+        ) {
+          dataLines.shift();
+        }
+
+        const result: FormTypes.Data[] = [];
+
         let rowNumber = 1;
         for (const elements of dataLines) {
           const jsonLine: { [key: string]: unknown } = {};
-          for (let j = 0; j < headers.length; j++) {
-            const key = headers[j]!.trim();
-            const rawValue = elements[j]!.trim();
-
+          for (let i = 0; i < headers.length; i++) {
+            const key = headers[i]!.trim();
+            const rawValue = elements[i]!.trim();
             if (rawValue === '\n') {
               continue;
             }
             if (shape[key] === undefined) {
               return resolve({
                 message: {
-                  en: `Schema value at column ${j} is not defined! Please check if Column has been edited/deleted from original template`,
-                  fr: `La valeur du schéma à la colonne ${j} n'est pas définie ! Veuillez vérifier si la colonne a été modifiée/supprimée du modèle original`
+                  en: `Schema value at column ${i} is not defined! Please check if Column has been edited/deleted from original template`,
+                  fr: `La valeur du schéma à la colonne ${i} n'est pas définie ! Veuillez vérifier si la colonne a été modifiée/supprimée du modèle original`
                 },
                 success: false
               });
             }
             try {
-              const typeNameResult = getZodTypeName(shape[key]);
+              const typeNameResult = parseZodSchema(shape[key]);
 
               let interpreterResult: UploadOperationResult<FormTypes.FieldValue> = {
                 message: {
