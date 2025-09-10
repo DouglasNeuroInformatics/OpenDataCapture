@@ -271,18 +271,21 @@ namespace Zod3 {
       case 'ZodObject':
         try {
           let multiString = 'RECORD_ARRAY( ';
-          if (multiValues && multiKeys) {
-            for (let i = 0; i < multiValues.length; i++) {
-              const inputData = multiValues[i]!;
-              // eslint-disable-next-line max-depth
-              if (i === multiValues.length - 1 && multiValues[i] !== undefined) {
-                multiString += multiKeys[i] + ':' + generateSampleData(inputData);
-              } else {
-                multiString += multiKeys[i] + ':' + generateSampleData(inputData) + ',';
-              }
-            }
-            multiString += ';)';
+          if (!(multiValues && multiKeys)) {
+            throw new UploadError({
+              en: 'Record Array is empty or does not exist',
+              fr: 'Erreur record array invalide'
+            });
           }
+          for (let i = 0; i < multiValues.length; i++) {
+            const inputData = multiValues[i]!;
+            if (i === multiValues.length - 1 && multiValues[i] !== undefined) {
+              multiString += multiKeys[i] + ':' + generateSampleData(inputData);
+            } else {
+              multiString += multiKeys[i] + ':' + generateSampleData(inputData) + ',';
+            }
+          }
+          multiString += ';)';
           return multiString;
         } catch (e) {
           throw new UploadError({
@@ -836,12 +839,14 @@ namespace Zod4 {
         fr: 'Structure de définition Zod v4 invalide'
       });
     }
+
     if (!isObjectLike(def) || typeof def.type !== 'string') {
       throw new UploadError({
         en: 'Invalid Zod v4 definition structure',
         fr: 'Structure de définition Zod v4 invalide'
       });
     }
+
     if (def.type === 'optional' && def.innerType) {
       return getZodTypeName(def.innerType, true);
     } else if (def.type === 'enum') {
@@ -896,7 +901,7 @@ namespace Zod4 {
   ): Zod3.ZodTypeNameResult {
     const listOfZodElements: Zod3.ZodTypeNameResult[] = [];
     const listOfZodKeys: string[] = [];
-    const castedDef = def as z4.core.$ZodAny;
+    const castedDef = def as z4.core.$ZodObjectDef;
     if (!castedDef.element) {
       throw new UploadError({
         en: 'Failure to interpret Zod Object or Array',
