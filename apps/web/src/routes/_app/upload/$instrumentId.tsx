@@ -12,15 +12,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useUploadInstrumentRecordsMutation } from '@/hooks/useUploadInstrumentRecordsMutation';
 import { useAppStore } from '@/store';
-import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData } from '@/utils/upload2';
-
-const $UploadError = z.object({
-  message: z.string().nullable(),
-  title: z.object({
-    en: z.string(),
-    fr: z.string()
-  })
-});
+import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData, UploadError } from '@/utils/upload2';
 
 const RouteComponent = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -46,7 +38,7 @@ const RouteComponent = () => {
       void navigate({
         search: {
           error: {
-            message: error instanceof Error ? error.message : t('core.unknownError'),
+            description: error instanceof UploadError ? error.description : undefined,
             title: {
               en: `Error Occurred Downloading Sample Template`,
               fr: `Une erreur s'est produite lors du téléchargement du CSV`
@@ -106,7 +98,9 @@ const RouteComponent = () => {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-1 p-3 text-center">
         <h3 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t(error.title)}</h3>
-        <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">{error.message}</p>
+        {error.description && (
+          <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">{t(error.description)}</p>
+        )}
         <div className="mt-6 flex gap-2">
           <Button
             type="button"
@@ -210,6 +204,20 @@ const RouteComponent = () => {
 export const Route = createFileRoute('/_app/upload/$instrumentId')({
   component: RouteComponent,
   validateSearch: z.object({
-    error: $UploadError.optional()
+    error: z
+      .object({
+        description: z
+          .object({
+            en: z.string(),
+            fr: z.string()
+          })
+          .partial()
+          .optional(),
+        title: z.object({
+          en: z.string(),
+          fr: z.string()
+        })
+      })
+      .optional()
   })
 });
