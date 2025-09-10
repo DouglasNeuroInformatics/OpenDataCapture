@@ -461,7 +461,7 @@ namespace Zod3 {
                 return resolve({
                   message: {
                     en: `Error parsing CSV`,
-                    fr: `Erreur avec la CSV`
+                    fr: `Erreur lors de l'analyse du CSV`
                   },
                   success: false
                 });
@@ -747,15 +747,21 @@ namespace Zod4 {
         for (const val of values) {
           if (val.type && keys[i]) {
             // optional is false if the key is included in the required items
+            let makeOptional = false;
 
             if (itemsSchema && Array.isArray(itemsSchema.required)) {
+              makeOptional = !itemsSchema.required.includes(keys[i]!);
+            }
+
+            if (val.enum) {
               multiVals.push({
-                isOptional: !itemsSchema.required.includes(keys[i]!),
-                typeName: jsonToZod(val.type)
+                enumValues: val.enum as readonly string[],
+                isOptional: makeOptional,
+                typeName: 'ZodEnum'
               });
             } else {
               multiVals.push({
-                isOptional: false,
+                isOptional: makeOptional,
                 typeName: jsonToZod(val.type)
               });
             }
