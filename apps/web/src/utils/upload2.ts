@@ -215,7 +215,7 @@ namespace Zod3 {
     };
   }
 
-  function formatTypeInfo(s: string, isOptional: boolean) {
+  function formatOptionalEntry(s: string, isOptional: boolean) {
     return isOptional ? `${s} (optional)` : s;
   }
 
@@ -228,17 +228,17 @@ namespace Zod3 {
   }: Exclude<ZodTypeNameResult, 'ZodEffects'>) {
     switch (typeName) {
       case 'ZodBoolean':
-        return formatTypeInfo('true/false', isOptional);
+        return formatOptionalEntry('true/false', isOptional);
       case 'ZodDate':
-        return formatTypeInfo('yyyy-mm-dd', isOptional);
+        return formatOptionalEntry('yyyy-mm-dd', isOptional);
       case 'ZodNumber':
-        return formatTypeInfo('number', isOptional);
+        return formatOptionalEntry('number', isOptional);
       case 'ZodSet':
         try {
           if (enumValues) {
-            return formatTypeInfo(`SET(${enumValues.join('/')}, ...)`, isOptional);
+            return formatOptionalEntry(`SET(${enumValues.join('/')}, ...)`, isOptional);
           }
-          return formatTypeInfo('SET(a,b,c)', isOptional);
+          return formatOptionalEntry('SET(a,b,c)', isOptional);
         } catch {
           throw new UploadError({
             en: `Failed to generate sample data for ZodSet`,
@@ -246,7 +246,7 @@ namespace Zod3 {
           });
         }
       case 'ZodString':
-        return formatTypeInfo('string', isOptional);
+        return formatOptionalEntry('string', isOptional);
       case 'ZodEnum':
         try {
           let possibleEnumOutputs = '';
@@ -260,7 +260,7 @@ namespace Zod3 {
             possibleEnumOutputs += val + '/';
           }
           possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
-          return formatTypeInfo(possibleEnumOutputs, isOptional);
+          return formatOptionalEntry(possibleEnumOutputs, isOptional);
         } catch {
           throw new UploadError({
             en: 'Invalid Enum error',
@@ -447,15 +447,6 @@ namespace Zod3 {
               } else {
                 interpreterResult = interpretZodValue(rawValue, typeNameResult.typeName, typeNameResult.isOptional);
               }
-              // if (!interpreterResult.success) {
-              //   return resolve({
-              //     message: {
-              //       en: `${interpreterResult.message.en} at column name: '${key}' and row number ${rowNumber}`,
-              //       fr: `${interpreterResult.message.fr} au nom de colonne : '${key}' et numéro de ligne ${rowNumber}`
-              //     },
-              //     success: false
-              //   });
-              // }
               if (interpreterResult.success) jsonLine[headers[j]!] = interpreterResult.value;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
