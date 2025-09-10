@@ -8,7 +8,9 @@ import type { Group } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
+import { mapValues } from 'lodash-es';
 import { parse, unparse } from 'papaparse';
+import type { Merge } from 'type-fest';
 import { z as z3 } from 'zod/v3';
 import z, { z as z4 } from 'zod/v4';
 
@@ -82,88 +84,46 @@ function extractSetEntry(entry: string) {
   );
 }
 
-function extractRecordArrayEntry(entry: string) {
+function extractRecordArrayEntry(entry: string): { [key: string]: string }[] {
   const result = /RECORD_ARRAY\(\s*(.*?)[\s;]*\)/.exec(entry);
   if (!result?.[1]) {
     throw new Error(
       `Failed to extract record array value from entry: '${entry}' / Échec de l'extraction de la valeur du tableau d'enregistrements de l'entrée : '${entry}'`
     );
   }
+
   const recordArrayDataList = result[1].split(';');
 
   if (recordArrayDataList.at(-1) === '') {
     recordArrayDataList.pop();
   }
 
-  for (const listData of recordArrayDataList) {
-    const recordArrayObject: { [key: string]: any } = {};
-
-    const record = listData.split(',');
-
-    if (!record) {
-      return {
-        message: {
-          en: `Record in the record array was left undefined`,
-          fr: `L'enregistrement dans le tableau d'enregistrements n'est pas défini`
-        },
-        success: false
-      };
+  return recordArrayDataList.map((listData) => {
+    const recordsList = listData.split(',');
+    if (!recordsList) {
+      throw new UploadError({
+        en: `Record in the record array was left undefined`,
+        fr: `L'enregistrement dans le tableau d'enregistrements n'est pas défini`
+      });
     }
-    if (record.some((str) => str === '')) {
-      return {
-        message: {
-          en: `One or more of the record array fields was left empty`,
-          fr: `Un ou plusieurs champs du tableau d'enregistrements ont été laissés vides`
-        },
-        success: false
-      };
+    if (recordsList.some((str) => str === '')) {
+      throw new UploadError({
+        en: `One or more of the record array fields was left empty`,
+        fr: `Un ou plusieurs champs du tableau d'enregistrements ont été laissés vides`
+      });
     }
-    if (!(zList.length === zKeys.length && zList.length === record.length)) {
-      return {
-        message: {
-          en: `Incorrect number of entries for record array`,
-          fr: `Nombre incorrect d'entrées pour le tableau d'enregistrements`
-        },
-        success: false
-      };
-    }
-    for (let i = 0; i < record.length; i++) {
-      if (!record[i]) {
-        return {
-          message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
-          success: false
-        };
+    const records: { [key: string]: string } = {};
+    recordsList.forEach((rawRecord, i) => {
+      const [recordKey, recordValue] = rawRecord.split(':').map((s) => s.trim());
+      if (!(recordKey && recordValue)) {
+        throw new UploadError({
+          en: `Malformed record at index ${i}`
+        });
       }
-
-      const recordValue = record[i]!.split(':')[1]!.trim();
-
-      const zListResult = zList[i]!;
-      if (!(zListResult && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
-        return {
-          message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
-          success: false
-        };
-      }
-      const interpretZodValueResult: UploadOperationResult<FormTypes.FieldValue> = interpretZodValue(
-        recordValue,
-        zListResult.typeName,
-        zListResult.isOptional
-      );
-      if (!interpretZodValueResult.success) {
-        return {
-          message: {
-            en: `failed to interpret value at entry ${i} in record array row ${listData}`,
-            fr: `échec de l'interprétation de la valeur à l'entrée ${i} dans la ligne de tableau d'enregistrements ${listData}`
-          },
-          success: false
-        };
-      }
-
-      recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
-    }
-    recordArray.push(recordArrayObject);
-  }
-  return result[1];
+      records[recordKey] = recordValue;
+    });
+    return records;
+  });
 }
 
 namespace Zod3 {
@@ -755,25 +715,55 @@ namespace Zod3 {
 }
 
 namespace Zod4 {
-  function parseZodSchema(schema: unknown, isOptional = false): Zod3.ZodTypeNameResult {
+  type BaseZodConvertResult = {
+    isOptional: boolean;
+    typeName: Exclude<Zod3.RequiredZodTypeName, 'ZodArray' | 'ZodEnum' | 'ZodObject'>;
+  };
+
+  type ArrayZodConvertResult = Merge<
+    BaseZodConvertResult,
+    {
+      innerType: ZodConvertResult;
+      typeName: 'ZodArray';
+    }
+  >;
+
+  type EnumZodConvertResult = Merge<
+    BaseZodConvertResult,
+    {
+      enumValues?: readonly string[];
+      typeName: 'ZodEnum';
+    }
+  >;
+
+  type ObjectZodConvertResult = Merge<
+    BaseZodConvertResult,
+    {
+      dimensions: {
+        [key: string]: ZodConvertResult;
+      };
+      typeName: 'ZodObject';
+    }
+  >;
+
+  type ZodConvertResult = ArrayZodConvertResult | BaseZodConvertResult | EnumZodConvertResult | ObjectZodConvertResult;
+
+  function parseZodSchema(schema: unknown, isOptional = false): ZodConvertResult {
     switch (true) {
       case schema instanceof z4.ZodArray:
         return {
+          innerType: parseZodSchema(schema.element),
           isOptional,
-          multiValues: [parseZodSchema(schema.element)],
           typeName: 'ZodArray'
         };
       case schema instanceof z4.ZodObject:
-        const multiValues: Zod3.ZodTypeNameResult[] = [];
-        const multiKeys: string[] = [];
+        const dimensions: { [key: string]: ZodConvertResult } = {};
         Object.entries(schema.shape).forEach(([key, value]) => {
-          multiKeys.push(key);
-          multiValues.push(parseZodSchema(value));
+          dimensions[key] = parseZodSchema(value);
         });
         return {
+          dimensions,
           isOptional,
-          multiKeys,
-          multiValues,
           typeName: 'ZodObject'
         };
       case schema instanceof z4.ZodBoolean:
@@ -815,117 +805,29 @@ namespace Zod4 {
         });
     }
   }
-
-  //insert zodObjectValue function
-  export function interpretZodObjectValue(
-    entry: string,
-    isOptional: boolean,
-    zList: ZodTypeNameResult[],
-    zKeys: string[]
-  ): UploadOperationResult<FormTypes.FieldValue> {
-    try {
-      if (entry === '' && isOptional) {
-        return { success: true, value: undefined };
-      } else if (!entry.startsWith('RECORD_ARRAY(')) {
-        return { message: { en: `Invalid ZodType`, fr: `ZodType invalide` }, success: false };
-      }
-
-      const recordArray: { [key: string]: any }[] = [];
-      const recordArrayDataEntry = extractRecordArrayEntry(entry);
-      const recordArrayDataList = recordArrayDataEntry.split(';');
-
-      if (recordArrayDataList.at(-1) === '') {
-        recordArrayDataList.pop();
-      }
-
-      for (const listData of recordArrayDataList) {
-        const recordArrayObject: { [key: string]: any } = {};
-
-        const record = listData.split(',');
-
-        if (!record) {
-          return {
-            message: {
-              en: `Record in the record array was left undefined`,
-              fr: `L'enregistrement dans le tableau d'enregistrements n'est pas défini`
-            },
-            success: false
-          };
-        }
-        if (record.some((str) => str === '')) {
-          return {
-            message: {
-              en: `One or more of the record array fields was left empty`,
-              fr: `Un ou plusieurs champs du tableau d'enregistrements ont été laissés vides`
-            },
-            success: false
-          };
-        }
-        if (!(zList.length === zKeys.length && zList.length === record.length)) {
-          return {
-            message: {
-              en: `Incorrect number of entries for record array`,
-              fr: `Nombre incorrect d'entrées pour le tableau d'enregistrements`
-            },
-            success: false
-          };
-        }
-        for (let i = 0; i < record.length; i++) {
-          if (!record[i]) {
-            return {
-              message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
-              success: false
-            };
-          }
-
-          const recordValue = record[i]!.split(':')[1]!.trim();
-
-          const zListResult = zList[i]!;
-          if (!(zListResult && zListResult.typeName !== 'ZodArray' && zListResult.typeName !== 'ZodObject')) {
-            return {
-              message: { en: `Failed to interpret field '${i}'`, fr: `Échec de l'interprétation du champ '${i}'` },
-              success: false
-            };
-          }
-          const interpretZodValueResult: UploadOperationResult<FormTypes.FieldValue> = interpretZodValue(
-            recordValue,
-            zListResult.typeName,
-            zListResult.isOptional
-          );
-          if (!interpretZodValueResult.success) {
-            return {
-              message: {
-                en: `failed to interpret value at entry ${i} in record array row ${listData}`,
-                fr: `échec de l'interprétation de la valeur à l'entrée ${i} dans la ligne de tableau d'enregistrements ${listData}`
-              },
-              success: false
-            };
-          }
-
-          recordArrayObject[zKeys[i]!] = interpretZodValueResult.value;
-        }
-        recordArray.push(recordArrayObject);
-      }
-
-      return { success: true, value: recordArray };
-    } catch {
-      return {
-        message: {
-          en: `failed to interpret record array entries`,
-          fr: `échec de l'interprétation des entrées du tableau d'enregistrements`
-        },
-        success: false
-      };
-    }
-  }
-
-  function interpetZodTypeResult(zodTypeNameResult: Zod3.ZodTypeNameResult, entry: string) {
-    if (entry === '' && zodTypeNameResult.isOptional) {
+  function interpetZodConvertResult(convertResult: ZodConvertResult, entry: string) {
+    if (entry === '' && convertResult.isOptional) {
       return { success: true, value: undefined };
     }
-    switch (zodTypeNameResult.typeName) {
+    switch (convertResult.typeName) {
       case 'ZodArray':
-
+        try {
+          const parsedRecords = extractRecordArrayEntry(entry).map((parsedRecord) => {
+            return mapValues(parsedRecord, (entry): unknown => interpetZodTypeResult(convertResult.innerType, entry));
+          });
+          return {
+            success: true,
+            value: parsedRecords
+          };
+        } catch {
+          return {
+            message: {
+              en: `failed to interpret record array entries`,
+              fr: `échec de l'interprétation des entrées du tableau d'enregistrements`
+            },
+            success: false
+          };
+        }
       case 'ZodBoolean':
         if (entry.toLowerCase() === 'true') {
           return { success: true, value: true };
@@ -980,8 +882,8 @@ namespace Zod4 {
       default:
         return {
           message: {
-            en: `Invalid ZodType: ${zodTypeNameResult.typeName satisfies never}`,
-            fr: `ZodType invalide : ${zodTypeNameResult.typeName satisfies never}`
+            en: `Invalid ZodType: ${convertResult.typeName}`,
+            fr: `ZodType invalide : ${convertResult.typeName}`
           },
           success: false
         };
@@ -1079,41 +981,8 @@ namespace Zod4 {
               });
             }
             try {
-              const typeNameResult = parseZodSchema(shape[key]);
-
-              let interpreterResult: UploadOperationResult<FormTypes.FieldValue> = {
-                message: {
-                  en: 'Could not interpret a correct value',
-                  fr: "Impossible d'interpréter une valeur correcte"
-                },
-                success: false
-              };
-
-              if (typeNameResult.typeName === 'ZodArray' || typeNameResult.typeName === 'ZodObject') {
-                // eslint-disable-next-line max-depth
-                if (typeNameResult.multiKeys && typeNameResult.multiValues) {
-                  interpreterResult = Zod3.interpretZodObjectValue(
-                    rawValue,
-                    typeNameResult.isOptional,
-                    typeNameResult.multiValues,
-                    typeNameResult.multiKeys
-                  );
-                  // TODO - what if this is not the case? Once generics are handled correctly should not be a problem
-                  // Dealt with via else statement for now
-                } else {
-                  interpreterResult.message = {
-                    en: 'Record Array keys do not exist',
-                    fr: "Les clés du tableau d'enregistrements n'existent pas"
-                  };
-                }
-              } else {
-                interpreterResult = Zod3.interpretZodValue(
-                  rawValue,
-                  typeNameResult.typeName,
-                  typeNameResult.isOptional
-                );
-              }
-              if (interpreterResult.success) jsonLine[headers[j]!] = interpreterResult.value;
+              const result = interpetZodConvertResult(parseZodSchema(shape[key]), rawValue);
+              jsonLine[headers[i]!] = result;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
                 return resolve({
@@ -1135,7 +1004,7 @@ namespace Zod4 {
             }
           }
 
-          const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
+          const zodCheck = instrumentSchema.safeParse(jsonLine);
           if (!zodCheck.success) {
             console.error(zodCheck.error.issues);
             const zodIssues = zodCheck.error.issues.map((issue) => {
