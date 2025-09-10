@@ -49,7 +49,7 @@ const RouteComponent = () => {
             message: error instanceof Error ? error.message : t('core.unknownError'),
             title: {
               en: `Error Occurred Downloading Sample Template`,
-              fr: `Un occurence d'un erreur quand le csv est telecharger`
+              fr: `Une erreur s'est produite lors du téléchargement du CSV`
             }
           }
         },
@@ -105,7 +105,7 @@ const RouteComponent = () => {
   if (error) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-1 p-3 text-center">
-        <h3 className="sm:text-3x text-2xl font-extrabold tracking-tight">{t(error.title)}</h3>
+        <h3 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t(error.title)}</h3>
         <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">{error.message}</p>
         <div className="mt-6 flex gap-2">
           <Button

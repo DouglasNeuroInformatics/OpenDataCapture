@@ -53,7 +53,7 @@ class UploadError extends Error {
 
   title = {
     en: `Error Occurred Downloading Sample Template`,
-    fr: `Un occurence d'un erreur quand le csv est telecharger`
+    fr: `Une erreur s'est produite lors du téléchargement du CSV`
   };
 
   constructor(description: { [L in Language]?: string }) {
@@ -250,7 +250,13 @@ namespace Zod3 {
       case 'ZodEnum':
         try {
           let possibleEnumOutputs = '';
-          for (const val of enumValues!) {
+          if (!enumValues) {
+            throw new UploadError({
+              en: 'Enum values do not exist',
+              fr: `Values d'Enum n'existe pas`
+            });
+          }
+          for (const val of enumValues) {
             possibleEnumOutputs += val + '/';
           }
           possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
@@ -316,8 +322,6 @@ namespace Zod3 {
       const typeNameResult = getZodTypeName(shape[col]!);
       sampleData.push(generateSampleData(typeNameResult));
     }
-
-    unparse([csvColumns, sampleData]);
 
     return {
       content: unparse([csvColumns, sampleData]),
@@ -730,11 +734,13 @@ namespace Zod4 {
       if (propertySchema.type === 'array') {
         if (!propertySchema.items) {
           throw new UploadError({
-            en: "Property 'items' must be defined for array schema"
+            en: "Property 'items' must be defined for array schema",
+            fr: "La propriété 'items' doit être définie pour le schéma de tableau"
           });
         } else if (Array.isArray(propertySchema.items)) {
           throw new UploadError({
-            en: "Property 'items' must not be array: only JSON schema 2020 or later is supported"
+            en: "Property 'items' must not be array: only JSON schema 2020 or later is supported",
+            fr: `Le schéma de validation du formulaire devrait être de type object, reçu ${jsonInstrumentSchema.type}`
           });
         }
         const itemsSchema = propertySchema.items as z4.core.JSONSchema.ObjectSchema;
