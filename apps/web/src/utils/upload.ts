@@ -7,7 +7,7 @@ import type { Group } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
-import { mapValues, reject } from 'lodash-es';
+import { mapValues } from 'lodash-es';
 import { parse, unparse } from 'papaparse';
 import type { Merge } from 'type-fest';
 import { z as z3 } from 'zod/v3';
@@ -18,6 +18,50 @@ const INTERNAL_HEADERS = ['subjectID', 'date'];
 const INTERNAL_HEADERS_SAMPLE_DATA = ['string', 'yyyy-mm-dd'];
 
 const SUBJECT_ID_REGEX = /^[^$\s]+$/;
+
+function parseBooleanEntry(entry: string): boolean {
+  if (entry.toLowerCase() === 'true') {
+    return true;
+  } else if (entry.toLowerCase() === 'false') {
+    return false;
+  }
+  throw new UploadError({
+    en: `Undecipherable Boolean Type: '${entry}'`,
+    fr: `Type booléen indéchiffrable : '${entry}'`
+  });
+}
+
+function parseDateEntry(entry: string): Date {
+  const date = new Date(entry);
+  if (Number.isNaN(date.getTime())) {
+    throw new UploadError({
+      en: `Failed to parse date: '${entry}'`,
+      fr: `Échec de l'analyse de la date : '${entry}'`
+    });
+  }
+  return date;
+}
+
+function parseNumberEntry(entry: string): number {
+  if (isNumberLike(entry)) {
+    return parseNumber(entry);
+  }
+  throw new UploadError({
+    en: `Invalid number type: '${entry}'`,
+    fr: `Type de nombre invalide : '${entry}'`
+  });
+}
+
+function parseSetEntry(entry: string): Set<string> {
+  const set = extractSetEntry(entry);
+  if (set.size === 0) {
+    throw new UploadError({
+      en: 'Empty set is not allowed',
+      fr: "Un ensemble vide n'est pas autorisé"
+    });
+  }
+  return set;
+}
 
 const ZOD_TYPE_NAMES = [
   'ZodNumber',
@@ -333,7 +377,7 @@ export namespace Zod3 {
     }
   }
 
-  function interpetZodConvertResult(convertResult: ZodTypeNameResult, entry: string): unknown {
+  function interpretZodConvertResult(convertResult: ZodTypeNameResult, entry: string): unknown {
     if (entry === '' && convertResult.isOptional) {
       return undefined;
     }
@@ -351,46 +395,22 @@ export namespace Zod3 {
           convertResult.multiKeys!.forEach((key, index) => {
             const rawValue = parsedRecord[key];
             if (rawValue !== undefined) {
-              result[key] = interpetZodConvertResult(convertResult.multiValues![index]!, rawValue);
+              result[key] = interpretZodConvertResult(convertResult.multiValues![index]!, rawValue);
             }
           });
           return result;
         });
 
       case 'ZodBoolean':
-        if (entry.toLowerCase() === 'true') {
-          return true;
-        } else if (entry.toLowerCase() === 'false') {
-          return false;
-        }
-        throw new UploadError({
-          en: `Undecipherable Boolean Type: '${entry}'`,
-          fr: `Type booléen indéchiffrable : '${entry}'`
-        });
-      case 'ZodDate': {
-        const date = new Date(entry);
-        if (Number.isNaN(date.getTime())) {
-          throw new UploadError({
-            en: `Failed to parse date: '${entry}'`,
-            fr: `Échec de l'analyse de la date : '${entry}'`
-          });
-        }
-        return date;
-      }
+        return parseBooleanEntry(entry);
+      case 'ZodDate':
+        return parseDateEntry(entry);
       case 'ZodEnum':
         return entry;
       case 'ZodNumber':
-        if (isNumberLike(entry)) {
-          return parseNumber(entry);
-        }
-        throw new UploadError({ en: `Invalid number type: '${entry}'`, fr: `Type de nombre invalide : '${entry}'` });
-      case 'ZodSet': {
-        const set = extractSetEntry(entry);
-        if (set.size === 0) {
-          throw new UploadError({ en: 'Empty set is not allowed', fr: "Un ensemble vide n'est pas autorisé" });
-        }
-        return set;
-      }
+        return parseNumberEntry(entry);
+      case 'ZodSet':
+        return parseSetEntry(entry);
       case 'ZodString':
         return entry;
       default:
@@ -505,7 +525,7 @@ export namespace Zod3 {
               );
             }
             try {
-              const result = interpetZodConvertResult(getZodTypeName(shape[key]), rawValue);
+              const result = interpretZodConvertResult(getZodTypeName(shape[key]), rawValue);
               jsonLine[headers[i]!] = result;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
@@ -655,51 +675,27 @@ export namespace Zod4 {
     }
   }
 
-  function interpetZodConvertResult(convertResult: ZodConvertResult, entry: string): unknown {
+  function interpretZodConvertResult(convertResult: ZodConvertResult, entry: string): unknown {
     if (entry === '' && convertResult.isOptional) {
       return undefined;
     }
     switch (convertResult.typeName) {
       case 'array':
         return extractRecordArrayEntry(entry).map((parsedRecord) => {
-          return mapValues(parsedRecord, (entry): unknown => interpetZodConvertResult(convertResult.innerType, entry));
+          return mapValues(parsedRecord, (entry): unknown => interpretZodConvertResult(convertResult.innerType, entry));
         });
 
       case 'boolean':
-        if (entry.toLowerCase() === 'true') {
-          return true;
-        } else if (entry.toLowerCase() === 'false') {
-          return false;
-        }
-        throw new UploadError({
-          en: `Undecipherable Boolean Type: '${entry}'`,
-          fr: `Type booléen indéchiffrable : '${entry}'`
-        });
-      case 'date': {
-        const date = new Date(entry);
-        if (Number.isNaN(date.getTime())) {
-          throw new UploadError({
-            en: `Failed to parse date: '${entry}'`,
-            fr: `Échec de l'analyse de la date : '${entry}'`
-          });
-        }
-        return date;
-      }
+        return parseBooleanEntry(entry);
+      case 'date':
+        return parseDateEntry(entry);
       case 'enum':
         return entry;
       case 'int':
       case 'number':
-        if (isNumberLike(entry)) {
-          return parseNumber(entry);
-        }
-        throw new UploadError({ en: `Invalid number type: '${entry}'`, fr: `Type de nombre invalide : '${entry}'` });
-      case 'set': {
-        const set = extractSetEntry(entry);
-        if (set.size === 0) {
-          throw new UploadError({ en: 'Empty set is not allowed', fr: "Un ensemble vide n'est pas autorisé" });
-        }
-        return set;
-      }
+        return parseNumberEntry(entry);
+      case 'set':
+        return parseSetEntry(entry);
       case 'string':
         return entry;
       default:
@@ -790,7 +786,7 @@ export namespace Zod4 {
 
     const shape = instrumentSchema.shape as { [key: string]: z4.ZodType };
 
-    return new Promise<FormTypes.Data[]>((resolve) => {
+    return new Promise<FormTypes.Data[]>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
         const text = reader.result as string;
@@ -837,7 +833,7 @@ export namespace Zod4 {
               );
             }
             try {
-              const result = interpetZodConvertResult(parseZodSchema(shape[key]), rawValue);
+              const result = interpretZodConvertResult(parseZodSchema(shape[key]), rawValue);
               jsonLine[headers[i]!] = result;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
