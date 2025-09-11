@@ -12,7 +12,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useUploadInstrumentRecordsMutation } from '@/hooks/useUploadInstrumentRecordsMutation';
 import { useAppStore } from '@/store';
-import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData, UploadError } from '@/utils/upload2';
+import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData, UploadError } from '@/utils/upload';
 
 const RouteComponent = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -54,41 +54,35 @@ const RouteComponent = () => {
     try {
       setIsLoading(true);
       const processedDataResult = await processInstrumentCSV(file!, instrument!);
-      if (processedDataResult.success) {
-        const reformattedData = reformatInstrumentData({
-          currentGroup,
-          data: processedDataResult.value,
-          instrument: instrument!
-        });
-        if (reformattedData.records.length > 1000) {
-          addNotification({
-            message: t({
-              en: 'Lots of entries loading, please wait...',
-              fr: 'Beaucoup de données, veuillez patienter...'
-            }),
-            type: 'info'
-          });
-        }
-        await uploadInstrumentRecordsMutation.mutateAsync(reformattedData);
-      } else {
+      const reformattedData = reformatInstrumentData({
+        currentGroup,
+        data: processedDataResult,
+        instrument: instrument!
+      });
+      if (reformattedData.records.length > 1000) {
         addNotification({
           message: t({
-            en: processedDataResult.message.en,
-            fr: processedDataResult.message.fr
+            en: 'Lots of entries loading, please wait...',
+            fr: 'Beaucoup de données, veuillez patienter...'
           }),
-          type: 'error'
+          type: 'info'
         });
       }
+      await uploadInstrumentRecordsMutation.mutateAsync(reformattedData);
       setFile(null);
     } catch (error) {
-      if (error instanceof Error)
-        addNotification({
-          message: t({
-            en: `An error has happened within the request: '${error.message}'`,
-            fr: `Une erreur s'est produite lors du téléversement :'${error.message}'.`
-          }),
-          type: 'error'
-        });
+      void navigate({
+        search: {
+          error: {
+            description: error instanceof UploadError ? error.description : undefined,
+            title: {
+              en: `An error has happened within the request`,
+              fr: `Une erreur s'est produite lors du téléversement`
+            }
+          }
+        },
+        to: '.'
+      });
     } finally {
       setIsLoading(false);
     }
