@@ -94,13 +94,15 @@ class UnexpectedZodTypeError extends UploadError {
 
   static forTypeName(typeName: string | undefined) {
     return new this({
-      en: `Unexpected Zod type name '${typeName}'`
+      en: `Unexpected Zod type name '${typeName}'`,
+      fr: `Nom de type Zod inattendu '${typeName}'`
     });
   }
 }
 
 function extractSetEntry(entry: string) {
   const result = /SET\(\s*(.*?)\s*\)/.exec(entry);
+
   if (!result?.[1]) {
     throw new UploadError({
       en: `Failed to extract set value from entry: '${entry}'`,
@@ -116,15 +118,18 @@ function extractSetEntry(entry: string) {
 }
 
 function extractRecordArrayEntry(entry: string): { [key: string]: string }[] {
-  const result = /RECORD_ARRAY\(\s*(.*?)[\s;]*\)/.exec(entry);
-  if (!result?.[1]) {
+  entry = entry.trim();
+  const opening = 'RECORD_ARRAY(';
+  const closing = ')';
+  if (!entry.startsWith(opening) && !entry.endsWith(closing)) {
     throw new UploadError({
-      en: `Failed to extract record array value from entry: '${entry}'`,
-      fr: `Échec de l'extraction de la valeur du tableau d'enregistrements de l'entrée : '${entry}'`
+      en: `Syntax error in RECORD_ARRAY declaration: ${entry}`,
+      fr: `Erreur de syntaxe dans la déclaration RECORD_ARRAY : ${entry}`
     });
   }
+  const result = entry.slice(opening.length, -1);
 
-  const recordArrayDataList = result[1].split(';');
+  const recordArrayDataList = result.split(';');
 
   if (recordArrayDataList.at(-1) === '') {
     recordArrayDataList.pop();
@@ -149,7 +154,8 @@ function extractRecordArrayEntry(entry: string): { [key: string]: string }[] {
       const [recordKey, recordValue] = rawRecord.split(':').map((s) => s.trim());
       if (!(recordKey && recordValue)) {
         throw new UploadError({
-          en: `Malformed record at index ${i}`
+          en: `Malformed record at index ${i}`,
+          fr: `Enregistrement mal formé à l'index ${i}`
         });
       }
       records[recordKey] = recordValue;
@@ -365,8 +371,9 @@ export namespace Zod3 {
         } catch (e) {
           throw new UploadError({
             en: `Invalid Record Array Error` + (e instanceof UploadError ? `: ${e.description.en}` : ''),
-            // prettier-ignore
-            fr: `Erreur de tableau d'enregistrements invalide` + (e instanceof UploadError ? ` : ${e.description.fr}` : '')
+            fr:
+              `Erreur de tableau d'enregistrements invalide` +
+              (e instanceof UploadError ? ` : ${e.description.fr}` : '')
           });
         }
       default:
@@ -682,9 +689,16 @@ export namespace Zod4 {
     switch (convertResult.typeName) {
       case 'array':
         return extractRecordArrayEntry(entry).map((parsedRecord) => {
-          return mapValues(parsedRecord, (entry): unknown => interpretZodConvertResult(convertResult.innerType, entry));
+          if (convertResult.innerType.typeName !== 'object') {
+            throw new UploadError({
+              en: `Unsupported type for innerType of array record '${convertResult.innerType.typeName}': must be 'object'`,
+              fr: `Type non pris en charge pour innerType d'enregistrement de tableau '${convertResult.innerType.typeName}': doit être « objet »`
+            });
+          }
+          return mapValues(parsedRecord, (value, key): unknown =>
+            interpretZodConvertResult((convertResult.innerType as ObjectZodConvertResult).dimensions[key]!, value)
+          );
         });
-
       case 'boolean':
         return parseBooleanEntry(entry);
       case 'date':
@@ -751,7 +765,8 @@ export namespace Zod4 {
   ) {
     if (!(instrumentSchema instanceof z4.ZodObject)) {
       throw new UploadError({
-        en: 'Expected schema to be instance of ZodObject'
+        en: 'Expected schema to be instance of ZodObject',
+        fr: 'Le schéma attendu doit être une instance de ZodObject'
       });
     }
 
@@ -775,7 +790,8 @@ export namespace Zod4 {
   ): Promise<FormTypes.Data[]> {
     if (!(instrument.validationSchema instanceof z4.ZodObject)) {
       throw new UploadError({
-        en: 'Expected schema to be instance of ZodObject'
+        en: 'Expected schema to be instance of ZodObject',
+        fr: 'Le schéma attendu doit être une instance de ZodObject'
       });
     }
 
@@ -859,7 +875,8 @@ export namespace Zod4 {
             console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
             return reject(
               new UploadError({
-                en: 'Schema parsing failed: refer to the browser console for further details'
+                en: 'Schema parsing failed: refer to the browser console for further details',
+                fr: `Échec de l'analyse du schéma : reportez-vous à la console du navigateur pour plus de détails`
               })
             );
           }
