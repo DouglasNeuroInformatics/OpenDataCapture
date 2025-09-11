@@ -657,7 +657,7 @@ export namespace Zod4 {
 
   function interpetZodConvertResult(convertResult: ZodConvertResult, entry: string): unknown {
     if (entry === '' && convertResult.isOptional) {
-      return { success: true, value: undefined };
+      return undefined;
     }
     switch (convertResult.typeName) {
       case 'array':
