@@ -152,13 +152,14 @@ function extractRecordArrayEntry(entry: string): { [key: string]: string }[] {
     const records: { [key: string]: string } = {};
     recordsList.forEach((rawRecord, i) => {
       const [recordKey, recordValue] = rawRecord.split(':').map((s) => s.trim());
-      if (!(recordKey && recordValue)) {
+      if (!recordKey) {
         throw new UploadError({
           en: `Malformed record at index ${i}`,
           fr: `Enregistrement mal formé à l'index ${i}`
         });
       }
-      records[recordKey] = recordValue;
+      //recordValue can be empty if the value is optional
+      records[recordKey] = recordValue!;
     });
     return records;
   });
@@ -397,6 +398,7 @@ export namespace Zod3 {
             fr: "Les clés ou valeurs du tableau d'enregistrements n'existent pas"
           });
         }
+
         return extractRecordArrayEntry(entry).map((parsedRecord) => {
           const result: { [key: string]: unknown } = {};
           convertResult.multiKeys!.forEach((key, index) => {
