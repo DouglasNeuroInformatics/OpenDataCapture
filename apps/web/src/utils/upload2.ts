@@ -808,7 +808,9 @@ namespace Zod4 {
       case 'ZodArray':
         try {
           const parsedRecords = extractRecordArrayEntry(entry).map((parsedRecord) => {
-            return mapValues(parsedRecord, (entry): unknown => interpetZodTypeResult(convertResult.innerType, entry));
+            return mapValues(parsedRecord, (entry): unknown =>
+              interpetZodConvertResult(convertResult.innerType, entry)
+            );
           });
           return {
             success: true,
