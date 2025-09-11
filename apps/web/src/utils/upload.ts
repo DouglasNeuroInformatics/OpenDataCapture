@@ -504,10 +504,10 @@ export namespace Zod3 {
           );
         }
 
-        //remove sample data if included
+        //remove sample data if included remove any mongolian vowel separators
         if (
-          dataLines[0][0] === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
-          dataLines[0][1] === INTERNAL_HEADERS_SAMPLE_DATA[1]
+          dataLines[0][0]?.replace(/[\u200B-\u200D\uFEFF\u180E]/g, '').trim() === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
+          dataLines[0][1]?.replace(/[\u200B-\u200D\uFEFF\u180E]/g, '').trim() === INTERNAL_HEADERS_SAMPLE_DATA[1]
         ) {
           dataLines.shift();
         }
@@ -821,10 +821,11 @@ export namespace Zod4 {
           );
         }
 
-        //remove sample data if included
+        //remove sample data if included (account for old mongolian vowel separator templates)
+
         if (
-          dataLines[0][0] === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
-          dataLines[0][1] === INTERNAL_HEADERS_SAMPLE_DATA[1]
+          dataLines[0][0]?.replace(/[\u200B-\u200D\uFEFF\u180E]/g, '').trim() === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
+          dataLines[0][1]?.replace(/[\u200B-\u200D\uFEFF\u180E]/g, '').trim() === INTERNAL_HEADERS_SAMPLE_DATA[1]
         ) {
           dataLines.shift();
         }
