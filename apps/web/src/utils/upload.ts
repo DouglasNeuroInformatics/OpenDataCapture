@@ -706,7 +706,7 @@ export namespace Zod4 {
   export function generateSampleData(convertResult: ZodConvertResult): string {
     switch (convertResult.typeName) {
       case 'array': {
-        return `RECORD_ARRAY(${generateSampleData(convertResult.innerType)};)`;
+        return `RECORD_ARRAY(${generateSampleData(convertResult.innerType)}; ...)`;
       }
       case 'boolean':
         return formatOptionalEntry('true/false', convertResult.isOptional);

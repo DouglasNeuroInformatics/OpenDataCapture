@@ -71,6 +71,7 @@ const RouteComponent = () => {
       await uploadInstrumentRecordsMutation.mutateAsync(reformattedData);
       setFile(null);
     } catch (error) {
+      console.error(error);
       void navigate({
         search: {
           error: {
