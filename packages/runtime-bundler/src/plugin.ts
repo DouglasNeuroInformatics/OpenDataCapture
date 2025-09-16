@@ -126,3 +126,24 @@ export function dtsPlugin(options: DtsPluginOptions): Plugin {
     }
   };
 }
+
+export function htmlPlugin(): Plugin {
+  return {
+    name: 'html-plugin',
+    setup(build) {
+      const namespace = 'html';
+      build.onResolve({ filter: /.+\.html$/ }, (args) => {
+        return {
+          namespace,
+          path: args.path
+        };
+      });
+      build.onLoad({ filter: /.*/, namespace }, async (args) => {
+        return {
+          contents: await fs.readFile(args.path, 'utf-8'),
+          loader: 'copy'
+        };
+      });
+    }
+  };
+}

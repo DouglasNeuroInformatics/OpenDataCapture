@@ -152,6 +152,6 @@ export class Resolver {
   }
 
   private resolveSourceExport(exp: string, packageRoot: string): string {
-    return this.resolveExportFilepath(exp, packageRoot, ['.css', '.json', '.js', '.mjs']);
+    return this.resolveExportFilepath(exp, packageRoot, ['.css', '.json', '.js', '.mjs', '.html']);
   }
 }
