@@ -51,9 +51,28 @@ if (!bundle) {
   throw new Error("Failed to get 'data-bundle' attribute from frame element");
 }
 
+/** @type {import('@opendatacapture/runtime-core').InteractiveInstrument }*/
 const instrument = await evaluateInstrument(bundle);
 
-/** @type {string[] | undefined} */
+if (instrument.content.meta) {
+  Object.entries(instrument.content.meta).forEach(([name, content]) => {
+    const meta = document.createElement('meta');
+    meta.name = name;
+    meta.content = content;
+    document.head.appendChild(meta);
+  });
+}
+
+const encodedStyle = instrument.content.__injectHead?.style;
+if (encodedStyle) {
+  const style = atob(encodedStyle);
+  document.head.insertAdjacentHTML('beforeend', `<style>${style}</style>`);
+}
+
+if (instrument.content.html) {
+  document.body.insertAdjacentHTML('beforeend', instrument.content.html);
+}
+
 const scripts = instrument.content.__injectHead?.scripts;
 scripts?.forEach((encodedScript) => {
   const script = document.createElement('script');
@@ -61,11 +80,5 @@ scripts?.forEach((encodedScript) => {
   script.textContent = atob(encodedScript);
   document.head.appendChild(script);
 });
-
-const encodedStyle = instrument.content.__injectHead?.style;
-if (encodedStyle) {
-  const style = atob(encodedStyle);
-  document.head.insertAdjacentHTML('beforeend', `<style>${style}</style>`);
-}
 
 await instrument.content.render(done);

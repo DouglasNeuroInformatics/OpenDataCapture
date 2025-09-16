@@ -28,8 +28,9 @@ export class InstrumentInterpreter {
     options?: InterpretOptions<TKind>
   ): Promise<SomeInstrument<TKind>> {
     let instrument: AnyInstrument;
+    let value: unknown;
     try {
-      const value: unknown = await evaluateInstrument(bundle);
+      value = await evaluateInstrument(bundle);
       if (!options?.validate) {
         instrument = value as SomeInstrument<TKind>;
       } else if (options.kind === 'FORM') {
@@ -44,6 +45,12 @@ export class InstrumentInterpreter {
         throw new Error(`Unexpected kind: ${options.kind}`);
       }
     } catch (error) {
+      if (value) {
+        console.error({
+          message: 'Validation Error',
+          value
+        });
+      }
       throw new Error(`Failed to evaluate instrument bundle`, { cause: error });
     }
     instrument.id = options?.id;

@@ -8,7 +8,7 @@ import { loadAssetAsBase64 } from '@/utils/load';
 // Instruments in development
 const EXCLUDED_LABELS: string[] = [];
 
-const textFiles: { [key: string]: string } = import.meta.glob('./**/*.{css,js,jsx,json,ts,tsx,svg}', {
+const textFiles: { [key: string]: string } = import.meta.glob('./**/*.{css,js,jsx,json,ts,tsx,svg,html}', {
   eager: true,
   import: 'default',
   query: '?raw'

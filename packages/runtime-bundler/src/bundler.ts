@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import esbuild from 'esbuild';
 
-import { dtsPlugin } from './plugin.js';
+import { dtsPlugin, htmlPlugin } from './plugin.js';
 import { Resolver } from './resolver.js';
 
 import type { BundlerOptions, EntryPoint, ExportCondition, ResolvedPackage } from './types.js';
@@ -44,7 +44,8 @@ export class Bundler {
           entryPoints,
           outdir: this.options.outdir,
           packages
-        })
+        }),
+        htmlPlugin()
       ],
       sourcemap: 'linked',
       sourcesContent: true,
