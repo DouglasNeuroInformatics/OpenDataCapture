@@ -181,7 +181,6 @@ export class InstrumentRecordsService {
           if (arrayResult.isErr()) {
             throw new Error('Error interpreting array computed measure');
           }
-          continue;
         } else {
           data.push({
             groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
@@ -407,11 +406,11 @@ export class InstrumentRecordsService {
 
   private expandData(
     data: InstrumentRecordsExport,
-    listEntry: any,
+    listEntry: any[],
     instrument: ScalarInstrument,
     record: RecordObject
   ) {
-    if (Array.isArray(listEntry) && listEntry.length > 0) {
+    if (listEntry.length > 0) {
       for (const objectEntry of listEntry) {
         for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
           data.push({
