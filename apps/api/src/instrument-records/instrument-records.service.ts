@@ -130,9 +130,6 @@ export class InstrumentRecordsService {
     return this.instrumentRecordModel.exists(where);
   }
 
-  //TODO
-  // Check if instrument schema is zod4 version, if so use the toJSONSchema method to convert to json
-  // and expand the data from there
   async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
     const data: InstrumentRecordsExport = [];
     const records = await this.instrumentRecordModel.findMany({
@@ -185,11 +182,7 @@ export class InstrumentRecordsService {
             throw new Error('Error interpreting array computed measure');
           }
           continue;
-        }
-        let list;
-        try {
-          if (typeof measureValue === 'string') list = [JSON.parse(measureValue)];
-        } catch (err) {
+        } else {
           data.push({
             groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
             instrumentEdition: instrument.internal.edition,
@@ -204,38 +197,6 @@ export class InstrumentRecordsService {
             timestamp: record.date.toISOString(),
             value: measureValue
           });
-          console.error(err);
-          continue;
-        }
-        if (list && list[0] !== undefined) {
-          const objectRecord: RecordObject = {
-            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-            sessionDate: record.session.date.toISOString(),
-            sessionId: record.session.id,
-            sessionType: record.session.type,
-            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-            subjectId: record.subject.id,
-            subjectSex: record.subject.sex,
-            timestamp: record.date.toISOString()
-          };
-
-          const expandDataResult = this.expandData(data, list[0], instrument, objectRecord);
-          if (expandDataResult.isErr()) {
-            data.push({
-              groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-              instrumentEdition: instrument.internal.edition,
-              instrumentName: instrument.internal.name,
-              measure: measureKey,
-              sessionDate: record.session.date.toISOString(),
-              sessionId: record.session.id,
-              sessionType: record.session.type,
-              subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-              subjectId: record.subject.id,
-              subjectSex: record.subject.sex,
-              timestamp: record.date.toISOString(),
-              value: measureValue
-            });
-          }
         }
       }
     }
