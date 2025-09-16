@@ -169,9 +169,7 @@ export class InstrumentRecordsService {
         instruments.set(record.instrumentId, instrument);
       }
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-        console.log(typeof measureValue);
         if (Array.isArray(measureValue)) {
-          console.log('here2');
           const objectRecord: RecordObject = {
             groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
             sessionDate: record.session.date.toISOString(),
