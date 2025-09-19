@@ -244,6 +244,7 @@ export {
   $InstrumentLanguage,
   $InstrumentMeasureValue,
   $InstrumentValidationSchema,
+  $RecordArrayFieldValue,
   $ScalarInstrument,
   $ScalarInstrumentBundleContainer,
   $ScalarInstrumentInternal,
