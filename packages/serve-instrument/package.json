@@ -11,6 +11,7 @@
     "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/instrument-bundler": "workspace:",
     "@opendatacapture/react-core": "workspace:*",
+    "@opendatacapture/runtime-internal": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "@tailwindcss/vite": "catalog:",

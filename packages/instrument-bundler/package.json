@@ -22,6 +22,7 @@
     "tsx": "catalog:"
   },
   "dependencies": {
+    "@opendatacapture/runtime-internal": "workspace:*",
     "commander": "^12.1.0",
     "es-module-lexer": "^1.6.0",
     "esbuild": "catalog:",

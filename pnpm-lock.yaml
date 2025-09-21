@@ -730,6 +730,9 @@ importers:
 
   packages/instrument-bundler:
     dependencies:
+      '@opendatacapture/runtime-internal':
+        specifier: workspace:*
+        version: link:../runtime-internal
       commander:
         specifier: ^12.1.0
         version: 12.1.0
@@ -1001,6 +1004,9 @@ importers:
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../react-core
+      '@opendatacapture/runtime-internal':
+        specifier: workspace:*
+        version: link:../runtime-internal
       '@opendatacapture/runtime-v1':
         specifier: workspace:*
         version: link:../../runtime/v1
