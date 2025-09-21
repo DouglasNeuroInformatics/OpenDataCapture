@@ -1,5 +1,5 @@
-import { evaluateInstrument } from '@opendatacapture/evaluate-instrument';
 import type { AnyInstrument, InstrumentKind, SomeInstrument } from '@opendatacapture/runtime-core';
+import { evaluateInstrument } from '@opendatacapture/runtime-internal';
 import {
   $AnyInstrument,
   $FormInstrument,

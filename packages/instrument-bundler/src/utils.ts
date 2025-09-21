@@ -5,8 +5,10 @@ import { InstrumentBundlerError } from './error.js';
 import type { BundlerInputFileExtension } from './types.js';
 import type { Loader } from './vendor/esbuild.js';
 
+export const BUNDLER_FILE_EXT_REGEX = /\.(css|html|jpeg|jpg|js|jsx|json|mp3|mp4|png|svg|ts|tsx|webp)$/i;
+
 export function extractInputFileExtension(filename: string) {
-  const ext = /\.(css|html|jpeg|jpg|js|jsx|json|mp3|mp4|png|svg|ts|tsx|webp)$/i.exec(filename)?.[0];
+  const ext = BUNDLER_FILE_EXT_REGEX.exec(filename)?.[0];
   return (ext ?? null) as BundlerInputFileExtension | null;
 }
 

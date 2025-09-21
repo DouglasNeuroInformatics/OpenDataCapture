@@ -6,6 +6,7 @@ import * as path from 'path';
  *
  * @typedef {Object} RuntimeManifest
  * @property {string[]} declarations - Relative paths to TypeScript declaration files (.d.ts).
+ * @property {string[]} html - Relative paths HTML files (.html).
  * @property {string[]} sources - Relative paths to JavaScript source files (.js).
  * @property {string[]} styles - Relative paths to CSS stylesheets (.css).
  */
@@ -16,7 +17,7 @@ import * as path from 'path';
  * @typedef {Object} RuntimeVersionMetadata
  * @property {string} baseDir - Absolute path to the root directory where runtime files are located.
  * @property {string[]} importPaths - List of fully-qualified import paths available at runtime.
- * @property {RuntimeManifest} manifest - Manifest containing relative paths to declarations, sources, and styles.
+ * @property {RuntimeManifest} manifest - Manifest containing relative paths to declarations, html, sources, and styles.
  *
  * @example
  * {
@@ -30,6 +31,7 @@ import * as path from 'path';
  *       "@opendatacapture/runtime-core/index.d.ts",
  *       ...
  *     ],
+ *     html: [],
  *     sources: [
  *       "@opendatacapture/runtime-core/index.js",
  *       ...
@@ -63,8 +65,8 @@ const isDirectory = async (path) => fs.existsSync(path) && fs.lstatSync(path).is
  * @returns {Promise<RuntimeManifest>}
  */
 export async function generateManifest(baseDir) {
-  /** @type {{ declarations: string[], sources: string[], styles: string[] }} */
-  const results = { declarations: [], sources: [], styles: [] };
+  /** @type {{ declarations: string[], html: string[], sources: string[], styles: string[] }} */
+  const results = { declarations: [], html: [], sources: [], styles: [] };
   /** @param {string} dir */
   await (async function resolveDir(dir) {
     const files = await fs.promises.readdir(dir, 'utf-8');
@@ -78,6 +80,8 @@ export async function generateManifest(baseDir) {
         results.sources.push(abspath.replace(`${baseDir}/`, ''));
       } else if (abspath.endsWith('.d.ts')) {
         results.declarations.push(abspath.replace(`${baseDir}/`, ''));
+      } else if (abspath.endsWith('.html')) {
+        results.html.push(abspath.replace(`${baseDir}/`, ''));
       }
     }
   })(baseDir);
@@ -94,12 +98,13 @@ export async function generateMetadataForVersion(version) {
   if (!(await isDirectory(baseDir))) {
     throw new Error(`Not a directory: ${baseDir}`);
   }
-  const { declarations, sources, styles } = await generateManifest(baseDir);
+  const { declarations, html, sources, styles } = await generateManifest(baseDir);
   return {
     baseDir,
     importPaths: sources.map((filename) => `/runtime/${version}/${filename}`),
     manifest: {
       declarations,
+      html,
       sources,
       styles
     }
@@ -162,6 +167,11 @@ export async function plugin(options) {
           resource = {
             content: await fs.promises.readFile(path.resolve(baseDir, filepath), 'utf-8'),
             contentType: 'text/plain'
+          };
+        } else if (manifest.html.includes(filepath)) {
+          resource = {
+            content: await fs.promises.readFile(path.resolve(baseDir, filepath), 'utf-8'),
+            contentType: 'text/html'
           };
         } else if (manifest.styles.includes(filepath)) {
           resource = {

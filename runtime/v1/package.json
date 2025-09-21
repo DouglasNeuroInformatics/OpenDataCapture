@@ -1,7 +1,7 @@
 {
   "name": "@opendatacapture/runtime-v1",
   "type": "module",
-  "version": "1.8.4",
+  "version": "1.8.7",
   "author": {
     "name": "Douglas Neuroinformatics",
     "email": "support@douglasneuroinformatics.ca"
@@ -45,10 +45,10 @@
     "@jspsych/plugin-survey-html-form__2.x": "workspace:*",
     "@jspsych/plugin-survey-text__1.x": "workspace:*",
     "@jspsych/plugin-survey-text__2.x": "workspace:*",
-    "@opendatacapture/evaluate-instrument": "workspace:*",
     "@opendatacapture/licenses": "workspace:*",
     "@opendatacapture/runtime-bundler": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
+    "@opendatacapture/runtime-internal": "workspace:*",
     "csstype__3.x": "workspace:*",
     "dompurify__3.x": "workspace:*",
     "jquery-ui__1.x": "workspace:*",

@@ -49,7 +49,7 @@ export class Bundler {
       ],
       sourcemap: 'linked',
       sourcesContent: true,
-      splitting: true,
+      splitting: false,
       target: 'es2022'
     });
   }

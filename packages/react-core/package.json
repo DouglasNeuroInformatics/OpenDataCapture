@@ -24,11 +24,11 @@
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
     "@douglasneuroinformatics/libui": "catalog:",
-    "@opendatacapture/evaluate-instrument": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
     "@opendatacapture/licenses": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
+    "@opendatacapture/runtime-internal": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@opendatacapture/subject-utils": "workspace:*",

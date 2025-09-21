@@ -15,7 +15,8 @@ const $InteractiveInstrument = $ScalarInstrument.extend({
       .readonly(),
     html: z.string().optional(),
     meta: z.record(z.string(), z.string()).optional(),
-    render: $AnyFunction
+    render: $AnyFunction,
+    staticAssets: z.record(z.string(), z.string()).optional()
   }),
   details: $InstrumentDetails,
   kind: z.literal('INTERACTIVE')

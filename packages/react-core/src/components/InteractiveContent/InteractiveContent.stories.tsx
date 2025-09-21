@@ -20,6 +20,9 @@ export default {
 
 export const Default: Story = {
   args: {
-    bundle: interactiveInstrument.bundle
+    bundle: interactiveInstrument.bundle,
+    onSubmit(data) {
+      alert(JSON.stringify(data, null, 2));
+    }
   }
 };

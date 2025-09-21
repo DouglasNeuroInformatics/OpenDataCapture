@@ -1,8 +1,8 @@
 /** @type {import('@opendatacapture/runtime-bundler').Config} */
 export default {
   include: [
-    '@opendatacapture/evaluate-instrument',
     '@opendatacapture/runtime-core',
+    '@opendatacapture/runtime-internal',
     '@opendatacapture/licenses',
     '@jspsych/plugin-html-button-response__1.x',
     '@jspsych/plugin-html-button-response__2.x',
