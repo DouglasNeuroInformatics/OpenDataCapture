@@ -7,3 +7,9 @@
  * PLAYGROUND).**
  */
 export declare function evaluateInstrument(bundle: string): Promise<any>;
+
+/** Encodes a Unicode string into a Base64 string */
+export declare function encodeUnicodeToBase64(s: string): string;
+
+/** Decodes a Base64 string back into a Unicode string. */
+export declare function decodeBase64ToUnicode(s: string): string;

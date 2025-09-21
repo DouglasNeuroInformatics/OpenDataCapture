@@ -5,6 +5,7 @@ import * as path from 'node:path';
 
 import { bundle, BUNDLER_FILE_EXT_REGEX, inferLoader } from '@opendatacapture/instrument-bundler';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
+import { encodeUnicodeToBase64 } from '@opendatacapture/runtime-internal';
 import runtime from '@opendatacapture/vite-plugin-runtime';
 import tailwindcss from '@tailwindcss/vite';
 import { Command, InvalidArgumentError } from 'commander';
@@ -55,7 +56,7 @@ program.action(async (target: string) => {
         name: path.basename(filepath)
       });
     }
-    return btoa(await bundle({ inputs }));
+    return encodeUnicodeToBase64(await bundle({ inputs }));
   };
 
   const server = await createServer({

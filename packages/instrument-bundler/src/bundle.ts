@@ -1,3 +1,5 @@
+import { encodeUnicodeToBase64 } from '@opendatacapture/runtime-internal';
+
 import { build } from './build.js';
 import { preprocess } from './preprocess.js';
 import { transformImports } from './transform.js';
@@ -42,9 +44,9 @@ const GLOBALS = `
  */
 export async function createBundle(output: BuildOutput, options: { minify: boolean }) {
   let inject = '';
-  const style = output.css ? `"${btoa(output.css)}"` : undefined;
+  const style = output.css ? `"${encodeUnicodeToBase64(output.css)}"` : undefined;
   const scripts = output.legacyScripts?.length
-    ? `[${output.legacyScripts.map((content) => `"${btoa(content)}"`).join(', ')}]`
+    ? `[${output.legacyScripts.map((content) => `"${encodeUnicodeToBase64(content)}"`).join(', ')}]`
     : undefined;
   if (style || scripts) {
     inject = `Object.defineProperty(__exports.content, '__injectHead', { value: Object.freeze({ scripts: ${scripts}, style: ${style} }), writable: false });`;

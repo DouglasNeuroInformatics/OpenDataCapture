@@ -42,7 +42,7 @@ if (!bundle) {
 }
 
 (async function () {
-  const { evaluateInstrument } = await import('../index.js');
+  const { decodeBase64ToUnicode, evaluateInstrument } = await import('../index.js');
 
   /** @type {import('../../../runtime-core/src/types/instrument.interactive.js').InteractiveInstrument} */
   const instrument = await evaluateInstrument(bundle);
@@ -69,7 +69,7 @@ if (!bundle) {
 
   const encodedStyle = instrument.content.__injectHead?.style;
   if (encodedStyle) {
-    const style = atob(encodedStyle);
+    const style = decodeBase64ToUnicode(encodedStyle);
     document.head.insertAdjacentHTML('beforeend', `<style>${style}</style>`);
   }
 
@@ -81,7 +81,7 @@ if (!bundle) {
   scripts?.forEach((encodedScript) => {
     const script = document.createElement('script');
     script.type = 'text/javascript';
-    script.textContent = atob(encodedScript);
+    script.textContent = decodeBase64ToUnicode(encodedScript);
     document.head.appendChild(script);
   });
 
