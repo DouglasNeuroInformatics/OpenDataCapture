@@ -34,9 +34,6 @@
     "ws": "./scripts/workspace.sh $@"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.6.1",
-    "@commitlint/config-conventional": "^19.6.0",
-    "@commitlint/types": "^19.5.0",
     "@douglasneuroinformatics/eslint-config": "^5.3.1",
     "@douglasneuroinformatics/prettier-config": "^0.0.2",
     "@douglasneuroinformatics/tsconfig": "^1.0.3",
@@ -75,11 +72,6 @@
     "x64",
     "arm64"
   ],
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
   "pnpm": {
     "overrides": {
       "@types/react": "-",

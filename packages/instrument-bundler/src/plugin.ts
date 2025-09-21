@@ -9,7 +9,7 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
     name: 'instrument-bundler-plugin',
     setup(build) {
       const namespaces = { bundle: 'bundle' };
-      const legacyScripts: string[] = [];
+      const legacyScripts = new Map<string, string>();
       build.onResolve({ filter: /.*/ }, (args) => {
         // css @import statement
         if (args.kind === 'import-rule') {
@@ -56,7 +56,7 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
             ]
           };
         }
-        legacyScripts.push(input.content as string);
+        legacyScripts.set(args.path, input.content as string);
         return { contents: input.content, loader: 'empty' };
       });
       build.onLoad({ filter: /^\/runtime\/v1\/.*.css$/, namespace: namespaces.bundle }, (args) => {
@@ -84,7 +84,14 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
         return { contents, loader };
       });
       build.onEnd((result) => {
-        result.legacyScripts = legacyScripts;
+        result.legacyScripts = [];
+        Object.keys(result.metafile!.inputs).forEach((path) => {
+          const script = legacyScripts.get(path.replace('bundle:', ''));
+          if (!script) {
+            return;
+          }
+          result.legacyScripts!.push(script);
+        });
       });
     }
   };

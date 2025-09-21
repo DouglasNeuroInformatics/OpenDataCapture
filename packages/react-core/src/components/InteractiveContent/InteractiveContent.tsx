@@ -9,8 +9,6 @@ import type { Json } from '@opendatacapture/schemas/core';
 import { FullscreenIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 import type { Promisable } from 'type-fest';
 
-import bootstrapScript from './bootstrap?raw';
-
 export type InteractiveContentProps = {
   bundle: string;
   onSubmit: (data: Json) => Promisable<void>;
@@ -121,19 +119,7 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
           lang={resolvedLanguage}
           name="interactive-instrument"
           ref={iFrameRef}
-          srcDoc={[
-            `<!DOCTYPE html>`,
-            `<html>`,
-            `<head>`,
-            `<meta charset="UTF-8">`,
-            `<meta name="viewport" content="width=device-width, initial-scale=1.0">`,
-            `<title>Document</title>`,
-            `<script type="module">${bootstrapScript}</script>`,
-            `</head>`,
-            `<body>`,
-            `</body>`,
-            `</html>`
-          ].join('')}
+          src="/runtime/v1/@opendatacapture/runtime-internal/interactive/iframe.html"
           style={{ backgroundColor: 'white', height: dimensions, scale: `${scale}%`, width: dimensions }}
           title="Open Data Capture - Interactive Instrument"
         />

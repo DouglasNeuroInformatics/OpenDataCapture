@@ -30,6 +30,9 @@ declare type InteractiveInstrument<
         [name: string]: string;
       };
       render: (done: (data: TData) => void) => Promisable<void>;
+      staticAssets?: {
+        [key: string]: string;
+      };
     };
     kind: 'INTERACTIVE';
   }
