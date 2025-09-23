@@ -862,8 +862,18 @@ export namespace Zod4 {
           for (let i = 0; i < headers.length; i++) {
             const key = headers[i]!.trim();
             const rawValue = elements[i]!.trim();
+            const nonVisibleCharCheck = /[\u200B-\u200D\uFEFF\u180E]/g.exec(rawValue);
             if (rawValue === '\n') {
               continue;
+            }
+            //Check for non visible char in every row, return error if present
+            if (!nonVisibleCharCheck?.[1]) {
+              return reject(
+                new UploadError({
+                  en: `Value at row ${rowNumber} and column ${key} contains Non-visisble characters`,
+                  fr: `Date à la ligne ${rowNumber} et column ${key} contient des caractères non visibles`
+                })
+              );
             }
             if (shape[key] === undefined) {
               return reject(
