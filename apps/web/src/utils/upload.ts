@@ -824,6 +824,29 @@ export namespace Zod4 {
         }
 
         //remove sample data if included (account for old mongolian vowel separator templates)
+        //return an error if non space charaters are found
+
+        let rowNumber = 1;
+
+        const regexResultSubject = /[\u200B-\u200D\uFEFF\u180E]/g.exec(dataLines[0][0]!);
+        const regexResultDate = /[\u200B-\u200D\uFEFF\u180E]/g.exec(dataLines[0][0]!);
+
+        if (!regexResultSubject?.[1]) {
+          return reject(
+            new UploadError({
+              en: `Subject ID at row ${rowNumber} contains Non-visisble characters`,
+              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles`
+            })
+          );
+        }
+        if (!regexResultDate?.[1]) {
+          return reject(
+            new UploadError({
+              en: `Date at row ${rowNumber} contains Non-visisble characters`,
+              fr: `Date à la ligne ${rowNumber} contient des caractères non visibles`
+            })
+          );
+        }
 
         if (
           dataLines[0][0]?.replace(/[\u200B-\u200D\uFEFF\u180E]/g, '').trim() === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
@@ -834,7 +857,6 @@ export namespace Zod4 {
 
         const result: FormTypes.Data[] = [];
 
-        let rowNumber = 1;
         for (const elements of dataLines) {
           const jsonLine: { [key: string]: unknown } = {};
           for (let i = 0; i < headers.length; i++) {
