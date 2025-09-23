@@ -63,6 +63,17 @@ function parseSetEntry(entry: string): Set<string> {
   return set;
 }
 
+function nonVisibleCharChecker(entry: string | undefined) {
+  if (!entry) {
+    throw new UploadError({
+      en: 'Undefined value',
+      fr: 'Valeur non définie'
+    });
+  }
+  const nonVisibleCharCheck = /[\u200B-\u200D\uFEFF\u180E]/g.exec(entry);
+  return nonVisibleCharCheck;
+}
+
 const ZOD_TYPE_NAMES = [
   'ZodNumber',
   'ZodString',
@@ -506,6 +517,27 @@ export namespace Zod3 {
           );
         }
 
+        let rowNumber = 1;
+        const regexResultSubject = nonVisibleCharChecker(dataLines[0][0]);
+        const regexResultDate = nonVisibleCharChecker(dataLines[0][1]);
+
+        if (!regexResultSubject?.[1]) {
+          return reject(
+            new UploadError({
+              en: `Subject ID at row ${rowNumber} contains Non-visisble characters`,
+              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles`
+            })
+          );
+        }
+        if (!regexResultDate?.[1]) {
+          return reject(
+            new UploadError({
+              en: `Date at row ${rowNumber} contains Non-visisble characters`,
+              fr: `Date à la ligne ${rowNumber} contient des caractères non visibles`
+            })
+          );
+        }
+
         //remove sample data if included remove any mongolian vowel separators
         if (
           dataLines[0][0]?.replace(/[\u200B-\u200D\uFEFF\u180E]/g, '').trim() === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
@@ -516,7 +548,6 @@ export namespace Zod3 {
 
         const result: FormTypes.Data[] = [];
 
-        let rowNumber = 1;
         for (const elements of dataLines) {
           const jsonLine: { [key: string]: unknown } = {};
           for (let i = 0; i < headers.length; i++) {
@@ -525,6 +556,19 @@ export namespace Zod3 {
             if (rawValue === '\n') {
               continue;
             }
+
+            const nonVisibleCharCheck = nonVisibleCharChecker(rawValue);
+
+            //Check for non visible char in every row, return error if present
+            if (!nonVisibleCharCheck?.[1]) {
+              return reject(
+                new UploadError({
+                  en: `Value at row ${rowNumber} and column ${key} contains Non-visisble characters`,
+                  fr: `Date à la ligne ${rowNumber} et column ${key} contient des caractères non visibles`
+                })
+              );
+            }
+
             if (shape[key] === undefined) {
               return reject(
                 new UploadError({
@@ -828,8 +872,8 @@ export namespace Zod4 {
 
         let rowNumber = 1;
 
-        const regexResultSubject = /[\u200B-\u200D\uFEFF\u180E]/g.exec(dataLines[0][0]!);
-        const regexResultDate = /[\u200B-\u200D\uFEFF\u180E]/g.exec(dataLines[0][0]!);
+        const regexResultSubject = nonVisibleCharChecker(dataLines[0][0]);
+        const regexResultDate = nonVisibleCharChecker(dataLines[0][1]);
 
         if (!regexResultSubject?.[1]) {
           return reject(
@@ -862,10 +906,13 @@ export namespace Zod4 {
           for (let i = 0; i < headers.length; i++) {
             const key = headers[i]!.trim();
             const rawValue = elements[i]!.trim();
-            const nonVisibleCharCheck = /[\u200B-\u200D\uFEFF\u180E]/g.exec(rawValue);
+
             if (rawValue === '\n') {
               continue;
             }
+
+            const nonVisibleCharCheck = nonVisibleCharChecker(rawValue);
+
             //Check for non visible char in every row, return error if present
             if (!nonVisibleCharCheck?.[1]) {
               return reject(
