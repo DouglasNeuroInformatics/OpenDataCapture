@@ -5,6 +5,7 @@ import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
+import { $RecordArrayFieldValue } from '@opendatacapture/schemas/instrument';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -413,6 +414,8 @@ export class InstrumentRecordsService {
     if (listEntry.length > 0) {
       for (const objectEntry of listEntry) {
         for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
+          const parseResult = $RecordArrayFieldValue.safeParse(dataValue);
+          if (!parseResult.success) return err('Invalid data value');
           data.push({
             groupId: record.groupId ?? DEFAULT_GROUP_NAME,
             instrumentEdition: instrument.internal.edition,
