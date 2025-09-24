@@ -65,7 +65,7 @@ function parseSetEntry(entry: string): Set<string> {
 
 function nonVisibleCharChecker(entry: string | undefined) {
   if (!entry) {
-    return false;
+    return null;
   }
   const nonVisibleCharCheck = /[\u200B-\u200D\uFEFF\u180E]/g.exec(entry);
   return nonVisibleCharCheck;
@@ -558,7 +558,7 @@ export namespace Zod3 {
             const nonVisibleCharCheck = nonVisibleCharChecker(rawValue);
 
             //Check for non visible char in every row, return error if present
-            if (nonVisibleCharCheck !== null && nonVisibleCharCheck !== false) {
+            if (nonVisibleCharCheck !== null) {
               return reject(
                 new UploadError({
                   en: `Value at row ${rowNumber} and column ${key} contains Non-visible characters`,
@@ -913,7 +913,7 @@ export namespace Zod4 {
             const nonVisibleCharCheck = nonVisibleCharChecker(rawValue);
 
             //Check for non visible char in every row, return error if present
-            if (nonVisibleCharCheck !== null && nonVisibleCharCheck !== false) {
+            if (nonVisibleCharCheck !== null) {
               return reject(
                 new UploadError({
                   en: `Value at row ${rowNumber} and column ${key} contains Non-visible characters`,
