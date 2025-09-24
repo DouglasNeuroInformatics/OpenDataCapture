@@ -581,7 +581,7 @@ export namespace Zod3 {
                 return reject(
                   new UploadError({
                     en: `${error.description.en} at column name: '${key}' and row number '${rowNumber}'`,
-                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}`
+                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}'`
                   })
                 );
               }
@@ -933,7 +933,7 @@ export namespace Zod4 {
                 return reject(
                   new UploadError({
                     en: `${error.description.en} at column name: '${key}' and row number '${rowNumber}'`,
-                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}`
+                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}'`
                   })
                 );
               }
