@@ -562,7 +562,7 @@ export namespace Zod3 {
               return reject(
                 new UploadError({
                   en: `Value at row ${rowNumber} and column ${key} contains Non-visible characters`,
-                  fr: `Date à la ligne ${rowNumber} et column ${key} contient des caractères non visibles`
+                  fr: `Date à la ligne ${rowNumber} et colonne ${key} contient des caractères non visibles`
                 })
               );
             }
@@ -602,7 +602,8 @@ export namespace Zod3 {
             console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
             return reject(
               new UploadError({
-                en: 'Schema parsing failed: refer to the browser console for further details'
+                en: 'Schema parsing failed: refer to the browser console for further details',
+                fr: `Échec de l'analyse du schéma : reportez-vous à la console du navigateur pour plus de détails`
               })
             );
           }
