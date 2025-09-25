@@ -27,16 +27,11 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
-type ExpandDataType =
-  | {
-      measure: string;
-      measureValue: boolean | Date | number | string | undefined;
-      success: true;
-    }
-  | {
-      message: string;
-      success: false;
-    };
+type ExpandDataType = {
+  measure: string;
+  measureValue: boolean | Date | number | string | undefined;
+  success: true;
+};
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -166,26 +161,28 @@ export class InstrumentRecordsService {
         instruments.set(record.instrumentId, instrument);
       }
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-        if (Array.isArray(measureValue) && measureValue.length > 1) {
-          const arrayResult = this.expandData(measureValue);
-
-          for (const recordArrayItem of arrayResult) {
-            // eslint-disable-next-line max-depth
-            if (!recordArrayItem.success) throw new Error(recordArrayItem.message);
-            data.push({
-              groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-              instrumentEdition: instrument.internal.edition,
-              instrumentName: instrument.internal.name,
-              measure: recordArrayItem.measure,
-              sessionDate: record.session.date.toISOString(),
-              sessionId: record.session.id,
-              sessionType: record.session.type,
-              subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-              subjectId: record.subject.id,
-              subjectSex: record.subject.sex,
-              timestamp: record.date.toISOString(),
-              value: recordArrayItem.measureValue
+        //early return statement
+        if (Array.isArray(measureValue) && measureValue.length >= 1) {
+          try {
+            const arrayResult = this.expandData(measureValue);
+            arrayResult.map((arrayEntry: ExpandDataType) => {
+              data.push({
+                groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+                instrumentEdition: instrument.internal.edition,
+                instrumentName: instrument.internal.name,
+                measure: arrayEntry.measure,
+                sessionDate: record.session.date.toISOString(),
+                sessionId: record.session.id,
+                sessionType: record.session.type,
+                subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+                subjectId: record.subject.id,
+                subjectSex: record.subject.sex,
+                timestamp: record.date.toISOString(),
+                value: arrayEntry.measureValue
+              });
             });
+          } catch (e) {
+            throw new Error((e as Error).message);
           }
         } else {
           data.push({
@@ -419,10 +416,7 @@ export class InstrumentRecordsService {
       for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
         const parseResult = $RecordArrayFieldValue.safeParse(dataValue);
         if (!parseResult.success) {
-          validRecordArrayList.push({
-            message: `Invalid data type ${dataKey} for Record array entry at key ${dataKey}`,
-            success: false
-          });
+          throw new Error(`Invalid data type ${dataKey} for Record array entry at key ${dataKey}`);
         }
         validRecordArrayList.push({
           measure: dataKey,
