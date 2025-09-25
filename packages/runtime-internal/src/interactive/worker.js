@@ -6,27 +6,38 @@ const staticAssets = new Map();
 /**
  * Converts a data URL (base64 or plain) into a Fetch API Response object.
  *
- * @param {string} dataUrl - The data URL to convert. Example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+ * @param {string} dataUrl - The data URL to convert. Example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..." or "data:text/plain,Hello%20World"
  * @returns {Response} A Response object representing the decoded data URL content.
  */
 function dataUrlToResponse(dataUrl) {
-  const match = /^data:(image\/[a-zA-Z+]+);base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl);
-  if (!match) {
-    throw new Error('Invalid or unsupported data URL: must be a base64-encoded image');
+  // Try base64 image format first
+  const base64Match = /^data:(image\/[a-zA-Z+]+);base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl);
+  if (base64Match) {
+    const [, mimeType, base64Data] = /** @type {any[]} */ (base64Match);
+
+    // Decode base64 to Uint8Array
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    return new Response(bytes, {
+      headers: { 'Content-Type': mimeType }
+    });
   }
 
-  const [, mimeType, base64Data] = /** @type {any[]} */ (match);
-
-  // Decode base64 to Uint8Array
-  const binaryString = atob(base64Data);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
+  // Try plain text format
+  const textMatch = /^data:(text\/[a-zA-Z+]+),(.*)$/.exec(dataUrl);
+  if (textMatch) {
+    const [, mimeType, textData] = /** @type {any[]} */ (textMatch);
+    const decodedText = decodeURIComponent(textData);
+    return new Response(decodedText, {
+      headers: { 'Content-Type': mimeType }
+    });
   }
 
-  return new Response(bytes, {
-    headers: { 'Content-Type': mimeType }
-  });
+  throw new Error('Invalid or unsupported data URL: must be a base64-encoded image or plain text');
 }
 
 addEventListener('message', (event) => {

@@ -27,6 +27,8 @@ program.argument('<target>', 'the directory containing the instrument', (target:
   return target;
 });
 
+program.option('-f --force', 'force dependency reoptimization');
+
 program.option(
   '-p --port <number>',
   'the port to run the dev server on',
@@ -41,7 +43,7 @@ program.option(
 );
 
 program.action(async (target: string) => {
-  const { port } = program.opts<{ port: number }>();
+  const { force, port } = program.opts<{ force?: boolean; port: number }>();
 
   const getEncodedBundle = async () => {
     const inputs: BundlerInput[] = [];
@@ -60,6 +62,7 @@ program.action(async (target: string) => {
   };
 
   const server = await createServer({
+    forceOptimizeDeps: force,
     plugins: [
       {
         configureServer: (server): void => {
