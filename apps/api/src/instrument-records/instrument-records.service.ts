@@ -17,7 +17,6 @@ import type {
 import { Prisma } from '@prisma/client';
 import type { $Enums, Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
-import { err, ok } from 'neverthrow';
 
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -38,6 +37,17 @@ type RecordObject = {
   subjectSex: $Enums.Sex | null;
   timestamp: string;
 };
+
+type ExpandDataType =
+  | {
+      measure: string;
+      measureValue: boolean | Date | number | string | undefined;
+      success: true;
+    }
+  | {
+      message: string;
+      success: false;
+    };
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -167,20 +177,26 @@ export class InstrumentRecordsService {
         instruments.set(record.instrumentId, instrument);
       }
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-        if (Array.isArray(measureValue)) {
-          const objectRecord: RecordObject = {
-            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-            sessionDate: record.session.date.toISOString(),
-            sessionId: record.session.id,
-            sessionType: record.session.type,
-            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-            subjectId: record.subject.id,
-            subjectSex: record.subject.sex,
-            timestamp: record.date.toISOString()
-          };
-          const arrayResult = this.expandData(data, measureValue, instrument, objectRecord);
-          if (arrayResult.isErr()) {
-            throw new Error('Error interpreting array computed measure');
+        if (Array.isArray(measureValue) && measureValue.length > 1) {
+          const arrayResult = this.expandData(measureValue);
+
+          for (const recordArrayItem of arrayResult) {
+            // eslint-disable-next-line max-depth
+            if (!recordArrayItem.success) throw new Error(recordArrayItem.message);
+            data.push({
+              groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+              instrumentEdition: instrument.internal.edition,
+              instrumentName: instrument.internal.name,
+              measure: recordArrayItem.measure,
+              sessionDate: record.session.date.toISOString(),
+              sessionId: record.session.id,
+              sessionType: record.session.type,
+              subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+              subjectId: record.subject.id,
+              subjectSex: record.subject.sex,
+              timestamp: record.date.toISOString(),
+              value: recordArrayItem.measureValue
+            });
           }
         } else {
           data.push({
@@ -405,38 +421,30 @@ export class InstrumentRecordsService {
     }
   }
 
-  private expandData(
-    data: InstrumentRecordsExport,
-    listEntry: any[],
-    instrument: ScalarInstrument,
-    record: RecordObject
-  ) {
-    if (listEntry.length > 0) {
-      for (const objectEntry of listEntry) {
-        for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
-          const parseResult = $RecordArrayFieldValue.safeParse(dataValue);
-          if (!parseResult.success) return err('Invalid data value');
-          data.push({
-            groupId: record.groupId ?? DEFAULT_GROUP_NAME,
-            instrumentEdition: instrument.internal.edition,
-            instrumentName: instrument.internal.name,
-            measure: dataKey,
-            sessionDate: record.sessionDate,
-            sessionId: record.sessionId,
-            sessionType: record.sessionType,
-            subjectAge: record.subjectAge,
-            subjectId: record.subjectId,
-            subjectSex: record.subjectSex,
-            timestamp: record.timestamp,
-            value: typeof dataValue === 'string' ? dataValue : JSON.stringify(dataValue)
+  private expandData(listEntry: any[]): ExpandDataType[] {
+    const validRecordArrayList: ExpandDataType[] = [];
+    if (listEntry.length < 1) {
+      throw new Error('Record Array is Empty');
+    }
+    for (const objectEntry of Object.values(listEntry)) {
+      for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
+        const parseResult = $RecordArrayFieldValue.safeParse(dataValue);
+        if (!parseResult.success) {
+          validRecordArrayList.push({
+            message: `Invalid data type ${dataKey} for Record array entry at key ${dataKey}`,
+            success: false
           });
         }
+        validRecordArrayList.push({
+          measure: dataKey,
+          measureValue: parseResult.data,
+          success: true
+        });
       }
-      return ok('Success');
-    } else {
-      return err('Error interpreting array');
     }
+    return validRecordArrayList;
   }
+
   private getInstrumentById(instrumentId: string) {
     return this.instrumentsService
       .findById(instrumentId)
