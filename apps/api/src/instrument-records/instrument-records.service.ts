@@ -27,17 +27,6 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
-type RecordObject = {
-  groupId: string;
-  sessionDate: string;
-  sessionId: string;
-  sessionType: $Enums.SessionType;
-  subjectAge: null | number;
-  subjectId: string;
-  subjectSex: $Enums.Sex | null;
-  timestamp: string;
-};
-
 type ExpandDataType =
   | {
       measure: string;
