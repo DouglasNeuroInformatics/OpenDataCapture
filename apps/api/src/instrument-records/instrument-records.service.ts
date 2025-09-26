@@ -34,8 +34,8 @@ type ExpandDataType =
       success: true;
     }
   | {
-      success: false;
       message: string;
+      success: false;
     };
 
 @Injectable()
@@ -166,7 +166,7 @@ export class InstrumentRecordsService {
         instruments.set(record.instrumentId, instrument);
       }
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-        if (!measureValue) {
+        if (measureValue == null) {
           continue;
         }
 
@@ -191,7 +191,7 @@ export class InstrumentRecordsService {
 
         if (Array.isArray(measureValue) && measureValue.length >= 1) {
           const arrayResult = this.expandData(measureValue);
-          arrayResult.map((arrayEntry: ExpandDataType) => {
+          arrayResult.forEach((arrayEntry: ExpandDataType) => {
             if (!arrayEntry.success) throw new Error(arrayEntry.message);
             data.push({
               groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
