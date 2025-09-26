@@ -92,11 +92,14 @@ const $UnilingualInstrumentDetails = $InstrumentDetails.extend({
 
 const $InstrumentMeasureVisibility: z.ZodType<InstrumentMeasureVisibility> = z.enum(['hidden', 'visible']);
 
+const $RecordArrayFieldValue = z.union([z.string(), z.boolean(), z.number(), z.date(), z.undefined()]);
+
 const $InstrumentMeasureValue: z.ZodType<InstrumentMeasureValue> = z.union([
   z.string(),
   z.boolean(),
   z.number(),
   z.date(),
+  z.array($RecordArrayFieldValue),
   z.undefined()
 ]);
 
@@ -241,6 +244,7 @@ export {
   $InstrumentLanguage,
   $InstrumentMeasureValue,
   $InstrumentValidationSchema,
+  $RecordArrayFieldValue,
   $ScalarInstrument,
   $ScalarInstrumentBundleContainer,
   $ScalarInstrumentInternal,
