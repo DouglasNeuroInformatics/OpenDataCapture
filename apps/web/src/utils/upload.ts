@@ -522,7 +522,7 @@ export namespace Zod3 {
         if (regexResultSubject !== null) {
           return reject(
             new UploadError({
-              en: `Subject ID at row ${rowNumber} contains Non-visible characters`,
+              en: `Subject ID at row ${rowNumber} contains non-visible characters`,
               fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles`
             })
           );
@@ -530,7 +530,7 @@ export namespace Zod3 {
         if (regexResultDate !== null) {
           return reject(
             new UploadError({
-              en: `Date at row ${rowNumber} contains Non-visible characters`,
+              en: `Date at row ${rowNumber} contains non-visible characters`,
               fr: `Date à la ligne ${rowNumber} contient des caractères non visibles`
             })
           );
@@ -559,7 +559,7 @@ export namespace Zod3 {
             if (nonVisibleCharChecker(rawValue) !== null) {
               return reject(
                 new UploadError({
-                  en: `Value at row ${rowNumber} and column ${key} contains Non-visible characters`,
+                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters`,
                   fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles`
                 })
               );
@@ -875,7 +875,7 @@ export namespace Zod4 {
         if (regexResultSubject !== null) {
           return reject(
             new UploadError({
-              en: `Subject ID at row ${rowNumber} contains Non-visible characters`,
+              en: `Subject ID at row ${rowNumber} contains non-visible characters`,
               fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles`
             })
           );
@@ -883,7 +883,7 @@ export namespace Zod4 {
         if (regexResultDate !== null) {
           return reject(
             new UploadError({
-              en: `Date at row ${rowNumber} contains Non-visible characters`,
+              en: `Date at row ${rowNumber} contains non-visible characters`,
               fr: `Date à la ligne ${rowNumber} contient des caractères non visibles`
             })
           );
@@ -912,7 +912,7 @@ export namespace Zod4 {
             if (nonVisibleCharChecker(rawValue) !== null) {
               return reject(
                 new UploadError({
-                  en: `Value at row ${rowNumber} and column ${key} contains Non-visible characters`,
+                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters`,
                   fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles`
                 })
               );
