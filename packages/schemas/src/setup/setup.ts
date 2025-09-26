@@ -8,7 +8,7 @@ export type DevelopmentReleaseInfo = z.infer<typeof $DevelopmentReleaseInfo>;
 export const $DevelopmentReleaseInfo = z.object({
   branch: z.string().min(1),
   buildTime: z.number(),
-  commit: z.string().length(8),
+  commit: z.string().min(1),
   type: z.enum(['development', 'test']),
   version: $ReleaseVersion
 });
