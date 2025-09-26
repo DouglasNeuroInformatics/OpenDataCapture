@@ -902,12 +902,9 @@ export namespace Zod4 {
           const jsonLine: { [key: string]: unknown } = {};
           for (let i = 0; i < headers.length; i++) {
             const key = headers[i]!.trim();
-            const rawValue = elements[i]!.trim();
-
-            if (rawValue === '\n') {
-              continue;
-            }
-
+            const cell = elements[i];
+            const rawValue = cell == null ? '' : cell.trim();
+            if (rawValue === '\n') continue;
             // Return error if any non‑visible character is present
             if (nonVisibleCharChecker(rawValue) !== null) {
               return reject(
