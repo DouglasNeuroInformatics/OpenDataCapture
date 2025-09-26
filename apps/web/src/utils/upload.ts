@@ -63,6 +63,14 @@ function parseSetEntry(entry: string): Set<string> {
   return set;
 }
 
+function nonVisibleCharChecker(entry: string | undefined) {
+  if (!entry) {
+    return null;
+  }
+  const nonVisibleCharCheck = /[\u200B-\u200D\uFEFF\u180E]/g.exec(entry);
+  return nonVisibleCharCheck;
+}
+
 const ZOD_TYPE_NAMES = [
   'ZodNumber',
   'ZodString',
@@ -506,17 +514,38 @@ export namespace Zod3 {
           );
         }
 
+        let rowNumber = 1;
+
+        const regexResultSubject = nonVisibleCharChecker(dataLines[0][0]);
+        const regexResultDate = nonVisibleCharChecker(dataLines[0][1]);
+
+        if (regexResultSubject !== null) {
+          return reject(
+            new UploadError({
+              en: `Subject ID at row ${rowNumber} contains non-visible characters`,
+              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles`
+            })
+          );
+        }
+        if (regexResultDate !== null) {
+          return reject(
+            new UploadError({
+              en: `Date at row ${rowNumber} contains non-visible characters`,
+              fr: `Date à la ligne ${rowNumber} contient des caractères non visibles`
+            })
+          );
+        }
+
         //remove sample data if included remove any mongolian vowel separators
         if (
-          dataLines[0][0]?.replace(/[\u200B-\u200D\uFEFF\u180E]/g, '').trim() === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
-          dataLines[0][1]?.replace(/[\u200B-\u200D\uFEFF\u180E]/g, '').trim() === INTERNAL_HEADERS_SAMPLE_DATA[1]
+          dataLines[0][0]?.trim() === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
+          dataLines[0][1]?.trim() === INTERNAL_HEADERS_SAMPLE_DATA[1]
         ) {
           dataLines.shift();
         }
 
         const result: FormTypes.Data[] = [];
 
-        let rowNumber = 1;
         for (const elements of dataLines) {
           const jsonLine: { [key: string]: unknown } = {};
           for (let i = 0; i < headers.length; i++) {
@@ -525,6 +554,17 @@ export namespace Zod3 {
             if (rawValue === '\n') {
               continue;
             }
+
+            //Check for non visible char in every row, return error if present
+            if (nonVisibleCharChecker(rawValue) !== null) {
+              return reject(
+                new UploadError({
+                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters`,
+                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles`
+                })
+              );
+            }
+
             if (shape[key] === undefined) {
               return reject(
                 new UploadError({
@@ -541,7 +581,7 @@ export namespace Zod3 {
                 return reject(
                   new UploadError({
                     en: `${error.description.en} at column name: '${key}' and row number '${rowNumber}'`,
-                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}`
+                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}'`
                   })
                 );
               }
@@ -560,7 +600,8 @@ export namespace Zod3 {
             console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
             return reject(
               new UploadError({
-                en: 'Schema parsing failed: refer to the browser console for further details'
+                en: 'Schema parsing failed: refer to the browser console for further details',
+                fr: `Échec de l'analyse du schéma : reportez-vous à la console du navigateur pour plus de détails`
               })
             );
           }
@@ -824,24 +865,54 @@ export namespace Zod4 {
         }
 
         //remove sample data if included (account for old mongolian vowel separator templates)
+        //return an error if non space charaters are found
+
+        let rowNumber = 1;
+
+        const regexResultSubject = nonVisibleCharChecker(dataLines[0][0]);
+        const regexResultDate = nonVisibleCharChecker(dataLines[0][1]);
+
+        if (regexResultSubject !== null) {
+          return reject(
+            new UploadError({
+              en: `Subject ID at row ${rowNumber} contains non-visible characters`,
+              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles`
+            })
+          );
+        }
+        if (regexResultDate !== null) {
+          return reject(
+            new UploadError({
+              en: `Date at row ${rowNumber} contains non-visible characters`,
+              fr: `Date à la ligne ${rowNumber} contient des caractères non visibles`
+            })
+          );
+        }
 
         if (
-          dataLines[0][0]?.replace(/[\u200B-\u200D\uFEFF\u180E]/g, '').trim() === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
-          dataLines[0][1]?.replace(/[\u200B-\u200D\uFEFF\u180E]/g, '').trim() === INTERNAL_HEADERS_SAMPLE_DATA[1]
+          dataLines[0][0]?.trim() === INTERNAL_HEADERS_SAMPLE_DATA[0] &&
+          dataLines[0][1]?.trim() === INTERNAL_HEADERS_SAMPLE_DATA[1]
         ) {
           dataLines.shift();
         }
 
         const result: FormTypes.Data[] = [];
 
-        let rowNumber = 1;
         for (const elements of dataLines) {
           const jsonLine: { [key: string]: unknown } = {};
           for (let i = 0; i < headers.length; i++) {
             const key = headers[i]!.trim();
-            const rawValue = elements[i]!.trim();
-            if (rawValue === '\n') {
-              continue;
+            const cell = elements[i];
+            const rawValue = cell == null ? '' : cell.trim();
+            if (rawValue === '\n') continue;
+            // Return error if any non‑visible character is present
+            if (nonVisibleCharChecker(rawValue) !== null) {
+              return reject(
+                new UploadError({
+                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters`,
+                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles`
+                })
+              );
             }
             if (shape[key] === undefined) {
               return reject(
@@ -859,7 +930,7 @@ export namespace Zod4 {
                 return reject(
                   new UploadError({
                     en: `${error.description.en} at column name: '${key}' and row number '${rowNumber}'`,
-                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}`
+                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}'`
                   })
                 );
               }
