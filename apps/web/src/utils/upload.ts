@@ -912,8 +912,8 @@ export namespace Zod4 {
             if (nonVisibleChars !== null) {
               return reject(
                 new UploadError({
-                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters ${nonVisibleChar[0]}`,
-                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles ${nonVisibleChar[0]}`
+                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters ${nonVisibleChars[0]}`,
+                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles ${nonVisibleChars[0]}`
                 })
               );
             }
