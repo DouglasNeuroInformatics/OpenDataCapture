@@ -67,7 +67,8 @@ function nonVisibleCharChecker(entry: string | undefined) {
   if (!entry) {
     return null;
   }
-  const nonVisibleCharCheck = /[\u200B-\u200D\uFEFF\u180E]/g.exec(entry);
+  const nonVisibleCharCheck = /[^\u0009\u000A\u000D\u0020-\u007E\u00C0-\u024F]+/g.exec(entry);
+  // old regex /[\u200B-\u200D\uFEFF\u180E]/g
   return nonVisibleCharCheck;
 }
 
@@ -522,16 +523,16 @@ export namespace Zod3 {
         if (regexResultSubject !== null) {
           return reject(
             new UploadError({
-              en: `Subject ID at row ${rowNumber} contains non-visible characters`,
-              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles`
+              en: `Subject ID at row ${rowNumber} contains non-visible character(s) ${regexResultSubject[0]}`,
+              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visible(s) ${regexResultSubject[0]}`
             })
           );
         }
         if (regexResultDate !== null) {
           return reject(
             new UploadError({
-              en: `Date at row ${rowNumber} contains non-visible characters`,
-              fr: `Date à la ligne ${rowNumber} contient des caractères non visibles`
+              en: `Date at row ${rowNumber} contains non-visible character(s) ${regexResultDate[0]}`,
+              fr: `Date à la ligne ${rowNumber} contient des caractères non visible(s)  ${regexResultDate[0]}`
             })
           );
         }
@@ -556,11 +557,12 @@ export namespace Zod3 {
             }
 
             //Check for non visible char in every row, return error if present
-            if (nonVisibleCharChecker(rawValue) !== null) {
+            const nonVisibleChars = nonVisibleCharChecker(rawValue);
+            if (nonVisibleChars !== null) {
               return reject(
                 new UploadError({
-                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters`,
-                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles`
+                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters ${nonVisibleChars[0]}`,
+                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles ${nonVisibleChars[0]}`
                 })
               );
             }
@@ -875,16 +877,16 @@ export namespace Zod4 {
         if (regexResultSubject !== null) {
           return reject(
             new UploadError({
-              en: `Subject ID at row ${rowNumber} contains non-visible characters`,
-              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles`
+              en: `Subject ID at row ${rowNumber} contains non-visible characters ${regexResultSubject[0]}`,
+              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles ${regexResultSubject[0]}`
             })
           );
         }
         if (regexResultDate !== null) {
           return reject(
             new UploadError({
-              en: `Date at row ${rowNumber} contains non-visible characters`,
-              fr: `Date à la ligne ${rowNumber} contient des caractères non visibles`
+              en: `Date at row ${rowNumber} contains non-visible characters ${regexResultDate[0]}`,
+              fr: `Date à la ligne ${rowNumber} contient des caractères non visibles ${regexResultDate[0]}`
             })
           );
         }
@@ -906,11 +908,12 @@ export namespace Zod4 {
             const rawValue = cell == null ? '' : cell.trim();
             if (rawValue === '\n') continue;
             // Return error if any non‑visible character is present
-            if (nonVisibleCharChecker(rawValue) !== null) {
+            const nonVisibleChars = nonVisibleCharChecker(rawValue);
+            if (nonVisibleChars !== null) {
               return reject(
                 new UploadError({
-                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters`,
-                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles`
+                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters ${nonVisibleChar[0]}`,
+                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles ${nonVisibleChar[0]}`
                 })
               );
             }
