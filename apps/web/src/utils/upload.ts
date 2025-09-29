@@ -67,7 +67,8 @@ function nonVisibleCharChecker(entry: string | undefined) {
   if (!entry) {
     return null;
   }
-  const nonVisibleCharCheck = /[^\u0009\u000A\u000D\u0020-\u007E\u00C0-\u024F]+/g.exec(entry);
+  const nonVisibleCharCheck = /[\u200B-\u200D\uFEFF\u180E\u00AD\u2060-\u2064\u206A-\u206F]/g.exec(entry);
+  // /[^\u0009\u000A\u000D\u0020-\u007E\u00C0-\u024F]+/g
   // old regex /[\u200B-\u200D\uFEFF\u180E]/g
   return nonVisibleCharCheck;
 }
