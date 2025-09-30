@@ -116,8 +116,6 @@ const RouteComponent = () => {
           type: 'error'
         });
       });
-      })
-      .catch(console.error);
   };
 
   const lookupSubject = async ({ id }: { id: string }) => {
