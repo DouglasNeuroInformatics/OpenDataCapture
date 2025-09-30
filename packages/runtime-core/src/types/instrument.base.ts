@@ -1,3 +1,4 @@
+import type { RecordArrayFieldValue } from '@douglasneuroinformatics/libui-form-types';
 import type { LicenseIdentifier } from '@opendatacapture/licenses';
 import type { ConditionalKeys, Merge, SetRequired } from 'type-fest';
 import type { z as z3 } from 'zod/v3';
@@ -104,7 +105,7 @@ type UnilingualClientInstrumentDetails = ClientInstrumentDetails<Language>;
 type MultilingualClientInstrumentDetails = ClientInstrumentDetails<Language[]>;
 
 /** @public */
-type InstrumentMeasureValue = boolean | Date | number | string | undefined;
+type InstrumentMeasureValue = boolean | Date | number | RecordArrayFieldValue[] | string | undefined;
 
 /** @public */
 type InstrumentMeasureVisibility = 'hidden' | 'visible';
