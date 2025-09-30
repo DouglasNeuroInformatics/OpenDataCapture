@@ -192,7 +192,8 @@ export class InstrumentRecordsService {
         if (Array.isArray(measureValue) && measureValue.length >= 1) {
           const arrayResult = this.expandData(measureValue);
           arrayResult.forEach((arrayEntry: ExpandDataType) => {
-            if (!arrayEntry.success) throw new Error(arrayEntry.message);
+            if (!arrayEntry.success)
+              throw new Error(`exportRecords: ${instrument.internal.name}.${measureKey} — ${arrayEntry.message}`);
             data.push({
               groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
               instrumentEdition: instrument.internal.edition,
