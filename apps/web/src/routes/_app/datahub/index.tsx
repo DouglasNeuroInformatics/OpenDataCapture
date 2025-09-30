@@ -102,13 +102,20 @@ const RouteComponent = () => {
           case 'JSON':
             return download(`${baseFilename}.json`, JSON.stringify(data, null, 2));
         }
+      })
+      .then(() => {
         addNotification({
-          message: t({
-            en: 'Export successful',
-            fr: 'Exportation réussie'
-          }),
+          message: t({ en: 'Export successful', fr: 'Exportation réussie' }),
           type: 'success'
         });
+      })
+      .catch((err) => {
+        console.error(err);
+        addNotification({
+          message: t({ en: 'Export failed', fr: "Échec de l'exportation" }),
+          type: 'error'
+        });
+      });
       })
       .catch(console.error);
   };
