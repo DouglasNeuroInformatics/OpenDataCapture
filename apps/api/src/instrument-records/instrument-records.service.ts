@@ -198,7 +198,7 @@ export class InstrumentRecordsService {
               groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
               instrumentEdition: instrument.internal.edition,
               instrumentName: instrument.internal.name,
-              measure: arrayEntry.measure,
+              measure: `${measureKey} - ${arrayEntry.measure}`,
               sessionDate: record.session.date.toISOString(),
               sessionId: record.session.id,
               sessionType: record.session.type,
