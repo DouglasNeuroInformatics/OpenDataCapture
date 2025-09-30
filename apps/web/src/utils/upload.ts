@@ -560,10 +560,11 @@ export namespace Zod3 {
             //Check for non visible char in every row, return error if present
             const nonVisibleChars = nonVisibleCharChecker(rawValue);
             if (nonVisibleChars !== null) {
+              const charCode = nonVisibleChars[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
               return reject(
                 new UploadError({
-                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters ${nonVisibleChars[0]}`,
-                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles ${nonVisibleChars[0]}`
+                  en: `Value at row ${rowNumber} and column '${key}' contains non-visible character(s) (U+${charCode})`,
+                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractère(s) non visibles (U+${charCode})`
                 })
               );
             }
@@ -911,10 +912,11 @@ export namespace Zod4 {
             // Return error if any non‑visible character is present
             const nonVisibleChars = nonVisibleCharChecker(rawValue);
             if (nonVisibleChars !== null) {
+              const charCode = nonVisibleChars[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
               return reject(
                 new UploadError({
-                  en: `Value at row ${rowNumber} and column ${key} contains non-visible characters ${nonVisibleChars[0]}`,
-                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles ${nonVisibleChars[0]}`
+                  en: `Value at row ${rowNumber} and column '${key}' contains non-visible characters (U+${charCode})`,
+                  fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles (U+${charCode})`
                 })
               );
             }
