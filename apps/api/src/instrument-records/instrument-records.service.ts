@@ -426,7 +426,7 @@ export class InstrumentRecordsService {
       const parseResult = $RecordArrayFieldValue.safeParse(objectEntry);
       if (!parseResult.success) {
         validRecordArrayList.push({
-          message: `Error interpreting value of record array entry`,
+          message: `Error interpreting value of record array entry ${objectEntry}`,
           success: false
         });
       }
