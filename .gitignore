@@ -69,3 +69,6 @@ packages/runtime-core/lib/
 # storybook
 *storybook.log
 storybook-static
+
+# claude
+.claude/settings.local.json
