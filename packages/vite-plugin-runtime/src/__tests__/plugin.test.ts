@@ -68,6 +68,7 @@ describe('plugin', () => {
       const manifest = JSON.parse(fs.promises.writeFile.mock.lastCall![1] as string);
       expect(manifest).toStrictEqual({
         declarations: ['@opendatacapture/runtime-core/index.d.ts'],
+        html: [],
         sources: ['@opendatacapture/runtime-core/index.js'],
         styles: ['@opendatacapture/runtime-core/styles/index.css']
       });
