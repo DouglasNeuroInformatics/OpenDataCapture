@@ -423,19 +423,17 @@ export class InstrumentRecordsService {
       throw new Error('Record Array is Empty');
     }
     for (const objectEntry of Object.values(listEntry)) {
-      const parseResult = $RecordArrayFieldValue.safeParse(objectEntry);
-      if (!parseResult.success) {
-        validRecordArrayList.push({
-          message: `Error interpreting value of record array entry ${objectEntry}`,
-          success: false
-        });
-      }
-      for (const [dataKey, dataValue] of Object.entries(
-        objectEntry as { [key: string]: boolean | Date | number | string | undefined }
-      )) {
+      for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
+        const parseResult = $RecordArrayFieldValue.safeParse(dataValue);
+        if (!parseResult.success) {
+          validRecordArrayList.push({
+            message: `Error interpreting value ${dataValue} and record array key ${dataKey}`,
+            success: false
+          });
+        }
         validRecordArrayList.push({
           measure: dataKey,
-          measureValue: dataValue,
+          measureValue: parseResult.data,
           success: true
         });
       }
