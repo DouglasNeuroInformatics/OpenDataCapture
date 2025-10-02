@@ -94,12 +94,14 @@ const $InstrumentMeasureVisibility: z.ZodType<InstrumentMeasureVisibility> = z.e
 
 const $RecordArrayFieldValue = z.union([z.string(), z.boolean(), z.number(), z.date(), z.undefined()]);
 
+const $RecordArrayPair = z.record(z.string(), $RecordArrayFieldValue);
+
 const $InstrumentMeasureValue: z.ZodType<InstrumentMeasureValue> = z.union([
   z.string(),
   z.boolean(),
   z.number(),
   z.date(),
-  z.array($RecordArrayFieldValue),
+  z.array($RecordArrayPair),
   z.undefined()
 ]);
 
