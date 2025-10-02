@@ -1,210 +1,298 @@
-// // pnpm exec vitest --dir src/features/upload/ -c /dev/null --run
+import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
+import { unparse } from 'papaparse';
+import { describe, expect, it } from 'vitest';
+import { z as z3 } from 'zod/v3';
+import { z as z4 } from 'zod/v4';
 
-// import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
-// import { unparse } from 'papaparse';
-// import { describe, expect, it } from 'vitest';
-// import { z } from 'zod';
+import { Zod3, Zod4 } from '../upload';
 
-// import { getZodTypeName, interpretZodArray, processInstrumentCSV } from '../upload';
+describe('Zod3', () => {
+  describe('getZodTypeName', () => {
+    it('should parse basic string type', () => {
+      const result = Zod3.getZodTypeName(z3.string());
+      expect(result).toMatchObject({
+        isOptional: false,
+        typeName: 'ZodString'
+      });
+    });
 
-// describe('getZodTypeName', () => {
-//   it('should parse a z.string()', () => {
-//     expect(getZodTypeName(z.string())).toMatchObject({ isOptional: false, success: true, typeName: 'ZodString' });
-//   });
-//   it('should parse a z.number()', () => {
-//     expect(getZodTypeName(z.number())).toMatchObject({ isOptional: false, success: true, typeName: 'ZodNumber' });
-//   });
-//   it('should parse a z.boolean()', () => {
-//     expect(getZodTypeName(z.boolean())).toMatchObject({ isOptional: false, success: true, typeName: 'ZodBoolean' });
-//   });
-//   it('should parse a z.set(z.enum([]))', () => {
-//     expect(getZodTypeName(z.set(z.enum(['a', 'b', 'c'])))).toMatchObject({
-//       isOptional: false,
-//       success: true,
-//       typeName: 'ZodSet'
-//     });
-//   });
-//   it('should parse a z.string().optional()', () => {
-//     expect(getZodTypeName(z.string().optional())).toMatchObject({
-//       isOptional: true,
-//       success: true,
-//       typeName: 'ZodString'
-//     });
-//   });
-//   it('Should parse z.enum()', () => {
-//     expect(getZodTypeName(z.enum(['test1', 'test2']))).toMatchObject({
-//       enumValues: ['test1', 'test2'],
-//       isOptional: false,
-//       success: true,
-//       typeName: 'ZodEnum'
-//     });
-//   });
-//   it('should parse z.array(z.object({foo: z.string()}))', () => {
-//     expect(getZodTypeName(z.array(z.object({ foo: z.string() })))).toMatchObject({
-//       isOptional: false,
-//       multiKeys: ['foo'],
-//       multiValues: [
-//         {
-//           isOptional: false,
-//           success: true,
-//           typeName: 'ZodString'
-//         }
-//       ],
-//       success: true,
-//       typeName: 'ZodArray'
-//     });
-//   });
-//   it('should parse z.array(z.object({foo: z.string()}).optional()', () => {
-//     expect(getZodTypeName(z.array(z.object({ foo: z.string() })).optional())).toMatchObject({
-//       isOptional: true,
-//       multiKeys: ['foo'],
-//       multiValues: [
-//         {
-//           isOptional: false,
-//           success: true,
-//           typeName: 'ZodString'
-//         }
-//       ],
-//       success: true,
-//       typeName: 'ZodArray'
-//     });
-//   });
-//   it('should parse z.array(z.object({foo: z.string()}).optional()', () => {
-//     expect(getZodTypeName(z.array(z.object({ foo: z.string().optional() })))).toMatchObject({
-//       isOptional: false,
-//       multiKeys: ['foo'],
-//       multiValues: [
-//         {
-//           isOptional: true,
-//           success: true,
-//           typeName: 'ZodString'
-//         }
-//       ],
-//       success: true,
-//       typeName: 'ZodArray'
-//     });
-//   });
-//   it('should parse z.array(z.object({foo: z.enum()})', () => {
-//     expect(getZodTypeName(z.array(z.object({ foo: z.enum(['test1', 'test2']) })))).toMatchObject({
-//       isOptional: false,
-//       multiKeys: ['foo'],
-//       multiValues: [
-//         {
-//           enumValues: ['test1', 'test2'],
-//           isOptional: false,
-//           success: true,
-//           typeName: 'ZodEnum'
-//         }
-//       ],
-//       success: true,
-//       typeName: 'ZodArray'
-//     });
-//   });
-// });
+    it('should parse optional string type', () => {
+      const result = Zod3.getZodTypeName(z3.string().optional());
+      expect(result).toMatchObject({
+        isOptional: true,
+        typeName: 'ZodString'
+      });
+    });
 
-// describe('interpretZodArray', () => {
-//   it('Should parse array', () => {
-//     expect(
-//       interpretZodArray(z.array(z.object({ foo: z.string() })), z.ZodFirstPartyTypeKind.ZodArray, false)
-//     ).toMatchObject({
-//       isOptional: false,
-//       multiKeys: ['foo'],
-//       multiValues: [
-//         {
-//           isOptional: false,
-//           success: true,
-//           typeName: 'ZodString'
-//         }
-//       ],
-//       success: true,
-//       typeName: 'ZodArray'
-//     });
-//   });
-//   it('Should parse optional array', () => {
-//     expect(
-//       interpretZodArray(z.array(z.object({ foo: z.string() })), z.ZodFirstPartyTypeKind.ZodArray, true)
-//     ).toMatchObject({
-//       isOptional: true,
-//       multiKeys: ['foo'],
-//       multiValues: [
-//         {
-//           isOptional: false,
-//           success: true,
-//           typeName: 'ZodString'
-//         }
-//       ],
-//       success: true,
-//       typeName: 'ZodArray'
-//     });
-//   });
-//   it('Should parse array with optional field', () => {
-//     expect(
-//       interpretZodArray(z.array(z.object({ foo: z.string().optional() })), z.ZodFirstPartyTypeKind.ZodArray, false)
-//     ).toMatchObject({
-//       isOptional: false,
-//       multiKeys: ['foo'],
-//       multiValues: [
-//         {
-//           isOptional: true,
-//           success: true,
-//           typeName: 'ZodString'
-//         }
-//       ],
-//       success: true,
-//       typeName: 'ZodArray'
-//     });
-//   });
-// });
+    it('should parse enum type', () => {
+      const result = Zod3.getZodTypeName(z3.enum(['foo', 'bar', 'baz']));
+      expect(result).toMatchObject({
+        enumValues: ['foo', 'bar', 'baz'],
+        isOptional: false,
+        typeName: 'ZodEnum'
+      });
+    });
 
-// describe('processInstrumentCSV', () => {
-//   const mockInstrument = { validationSchema: z.object({ foo: z.string() }) } satisfies Pick<
-//     AnyUnilingualFormInstrument,
-//     'validationSchema'
-//   > as any;
+    it('should parse array of objects', () => {
+      const result = Zod3.getZodTypeName(z3.array(z3.object({ name: z3.string(), age: z3.number() })));
+      expect(result).toMatchObject({
+        isOptional: false,
+        multiKeys: ['name', 'age'],
+        typeName: 'ZodArray'
+      });
+      expect(result.multiValues).toHaveLength(2);
+      expect(result.multiValues?.[0]).toMatchObject({ typeName: 'ZodString' });
+      expect(result.multiValues?.[1]).toMatchObject({ typeName: 'ZodNumber' });
+    });
 
-//   const mockInstrumentSet = { validationSchema: z.object({ foo: z.set(z.enum(['foo', 'bar'])) }) } satisfies Pick<
-//     AnyUnilingualFormInstrument,
-//     'validationSchema'
-//   > as any;
+    it('should parse set type', () => {
+      const result = Zod3.getZodTypeName(z3.set(z3.enum(['a', 'b', 'c'])));
+      expect(result).toMatchObject({
+        enumValues: ['a', 'b', 'c'],
+        isOptional: false,
+        typeName: 'ZodSet'
+      });
+    });
+  });
 
-//   const mockInstrumentArray = {
-//     validationSchema: z.object({
-//       foo: z.array(
-//         z.object({
-//           bar: z.string(),
-//           foo2: z.string()
-//         })
-//       )
-//     })
-//   } satisfies Pick<AnyUnilingualFormInstrument, 'validationSchema'> as any;
+  describe('processInstrumentCSV', () => {
+    const mockInstrument = {
+      validationSchema: z3.object({
+        score: z3.number(),
+        notes: z3.string()
+      })
+    } as AnyUnilingualFormInstrument;
 
-//   it('should fail to process an empty csv', async () => {
-//     const file = new File([''], 'data.csv', { type: 'text/csv' });
-//     await expect(processInstrumentCSV(file, mockInstrument)).resolves.toMatchObject({ success: false });
-//   });
+    it('should process valid CSV data', async () => {
+      const csvContent = unparse([
+        ['subjectID', 'date', 'score', 'notes'],
+        ['subject1', '2024-01-01', '85', 'Good performance']
+      ]);
+      const file = new File([csvContent], 'data.csv', { type: 'text/csv' });
 
-//   it('should process a valid csv', async () => {
-//     const file = new File(['subjectID,date,foo\n1,2024-01-01,bar'], 'data.csv', { type: 'text/csv' });
-//     await expect(processInstrumentCSV(file, mockInstrument)).resolves.toMatchObject({ success: true });
-//   });
+      const result = await Zod3.processInstrumentCSV(file, mockInstrument);
 
-//   it('should process a valid csv with a set', async () => {
-//     const papaString = unparse([
-//       ['subjectID', 'date', 'foo'],
-//       ['1', '2024-01-01', 'SET(foo,bar)']
-//     ]);
-//     const file = new File([papaString], 'data.csv', { type: 'text/csv' });
-//     await expect(processInstrumentCSV(file, mockInstrumentSet)).resolves.toMatchObject({ success: true });
-//   });
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        subjectID: 'subject1',
+        score: 85,
+        notes: 'Good performance'
+      });
+    });
 
-//   it('should process a valid csv with a record array', async () => {
-//     const papaString = unparse([
-//       ['subjectID', 'date', 'foo'],
-//       ['1', '2024-01-01', 'RECORD_ARRAY(bar:test1,foo2:test2;)']
-//     ]);
-//     const file = new File([papaString], 'data.csv', {
-//       type: 'text/csv'
-//     });
-//     await expect(processInstrumentCSV(file, mockInstrumentArray)).resolves.toMatchObject({ success: true });
-//   });
-// });
+    it('should reject empty CSV', async () => {
+      const file = new File([''], 'data.csv', { type: 'text/csv' });
+
+      await expect(Zod3.processInstrumentCSV(file, mockInstrument)).rejects.toThrow();
+    });
+
+    it('should handle optional fields', async () => {
+      const instrumentWithOptional = {
+        validationSchema: z3.object({
+          required: z3.string(),
+          optional: z3.string().optional()
+        })
+      } as AnyUnilingualFormInstrument;
+
+      const csvContent = unparse([
+        ['subjectID', 'date', 'required', 'optional'],
+        ['subject1', '2024-01-01', 'value', '']
+      ]);
+      const file = new File([csvContent], 'data.csv', { type: 'text/csv' });
+
+      const result = await Zod3.processInstrumentCSV(file, instrumentWithOptional);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        required: 'value',
+        optional: undefined
+      });
+    });
+
+    it('should process boolean values', async () => {
+      const instrumentWithBoolean = {
+        validationSchema: z3.object({
+          completed: z3.boolean()
+        })
+      } as AnyUnilingualFormInstrument;
+
+      const csvContent = unparse([
+        ['subjectID', 'date', 'completed'],
+        ['subject1', '2024-01-01', 'true']
+      ]);
+      const file = new File([csvContent], 'data.csv', { type: 'text/csv' });
+
+      const result = await Zod3.processInstrumentCSV(file, instrumentWithBoolean);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]?.completed).toBe(true);
+    });
+
+    it('should process set values', async () => {
+      const instrumentWithSet = {
+        validationSchema: z3.object({
+          tags: z3.set(z3.enum(['tag1', 'tag2', 'tag3']))
+        })
+      } as AnyUnilingualFormInstrument;
+
+      const csvContent = unparse([
+        ['subjectID', 'date', 'tags'],
+        ['subject1', '2024-01-01', 'SET(tag1,tag2)']
+      ]);
+      const file = new File([csvContent], 'data.csv', { type: 'text/csv' });
+
+      const result = await Zod3.processInstrumentCSV(file, instrumentWithSet);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]?.tags).toBeInstanceOf(Set);
+      expect(result[0]?.tags).toEqual(new Set(['tag1', 'tag2']));
+    });
+  });
+});
+
+describe('Zod4', () => {
+  describe('generateSampleData', () => {
+    it('should generate sample data for string type', () => {
+      const result = Zod4.generateSampleData({
+        isOptional: false,
+        typeName: 'string'
+      });
+      expect(result).toBe('string');
+    });
+
+    it('should generate sample data for optional number type', () => {
+      const result = Zod4.generateSampleData({
+        isOptional: true,
+        typeName: 'number'
+      });
+      expect(result).toBe('number (optional)');
+    });
+
+    it('should generate sample data for enum type', () => {
+      const result = Zod4.generateSampleData({
+        enumValues: ['option1', 'option2', 'option3'],
+        isOptional: false,
+        typeName: 'enum'
+      });
+      expect(result).toBe('option1/option2/option3');
+    });
+
+    it('should generate sample data for boolean type', () => {
+      const result = Zod4.generateSampleData({
+        isOptional: false,
+        typeName: 'boolean'
+      });
+      expect(result).toBe('true/false');
+    });
+
+    it('should generate sample data for date type', () => {
+      const result = Zod4.generateSampleData({
+        isOptional: false,
+        typeName: 'date'
+      });
+      expect(result).toBe('yyyy-mm-dd');
+    });
+  });
+
+  describe('processInstrumentCSV', () => {
+    const mockInstrument = {
+      validationSchema: z4.object({
+        score: z4.number(),
+        feedback: z4.string()
+      })
+    } as AnyUnilingualFormInstrument;
+
+    it('should process valid CSV data', async () => {
+      const csvContent = unparse([
+        ['subjectID', 'date', 'score', 'feedback'],
+        ['subject1', '2024-01-15', '92', 'Excellent work']
+      ]);
+      const file = new File([csvContent], 'data.csv', { type: 'text/csv' });
+
+      const result = await Zod4.processInstrumentCSV(file, mockInstrument);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        subjectID: 'subject1',
+        score: 92,
+        feedback: 'Excellent work'
+      });
+    });
+
+    it('should reject CSV with invalid schema', async () => {
+      const csvContent = unparse([
+        ['subjectID', 'date', 'score', 'feedback'],
+        ['subject1', '2024-01-15', 'invalid_number', 'text']
+      ]);
+      const file = new File([csvContent], 'data.csv', { type: 'text/csv' });
+
+      await expect(Zod4.processInstrumentCSV(file, mockInstrument)).rejects.toThrow();
+    });
+
+    it('should handle dates correctly', async () => {
+      const instrumentWithDate = {
+        validationSchema: z4.object({
+          eventDate: z4.date()
+        })
+      } as AnyUnilingualFormInstrument;
+
+      const csvContent = unparse([
+        ['subjectID', 'date', 'eventDate'],
+        ['subject1', '2024-01-01', '2024-06-15']
+      ]);
+      const file = new File([csvContent], 'data.csv', { type: 'text/csv' });
+
+      const result = await Zod4.processInstrumentCSV(file, instrumentWithDate);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]?.eventDate).toBeInstanceOf(Date);
+    });
+
+    it('should process enum values', async () => {
+      const instrumentWithEnum = {
+        validationSchema: z4.object({
+          status: z4.enum(['pending', 'active', 'completed'])
+        })
+      } as AnyUnilingualFormInstrument;
+
+      const csvContent = unparse([
+        ['subjectID', 'date', 'status'],
+        ['subject1', '2024-01-01', 'active']
+      ]);
+      const file = new File([csvContent], 'data.csv', { type: 'text/csv' });
+
+      const result = await Zod4.processInstrumentCSV(file, instrumentWithEnum);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]?.status).toBe('active');
+    });
+
+    it('should process array of objects', async () => {
+      const instrumentWithArray = {
+        validationSchema: z4.object({
+          items: z4.array(
+            z4.object({
+              name: z4.string(),
+              quantity: z4.number()
+            })
+          )
+        })
+      } as AnyUnilingualFormInstrument;
+
+      const csvContent = unparse([
+        ['subjectID', 'date', 'items'],
+        ['subject1', '2024-01-01', 'RECORD_ARRAY(name:item1,quantity:5;name:item2,quantity:3;)']
+      ]);
+      const file = new File([csvContent], 'data.csv', { type: 'text/csv' });
+
+      const result = await Zod4.processInstrumentCSV(file, instrumentWithArray);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]?.items).toHaveLength(2);
+      expect(result[0]?.items).toEqual([
+        { name: 'item1', quantity: 5 },
+        { name: 'item2', quantity: 3 }
+      ]);
+    });
+  });
+});
