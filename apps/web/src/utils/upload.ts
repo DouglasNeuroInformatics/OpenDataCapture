@@ -69,15 +69,14 @@ function nonVisibleCharChecker(entry: string | undefined) {
   }
   const ansiEscapeCode = '[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-PRZcf-nqry=><]',
     zeroWidthCharacterExceptNewline =
-      '\u0000-\u0008\u000B-\u0019\u001b\u009b\u00ad\u200b\u2028\u2029\ufeff\ufe00-\ufe0f',
-    zeroWidthCharacter = '\n' + zeroWidthCharacterExceptNewline;
+      '\u0000-\u0008\u000B-\u0019\u001b\u009b\u00ad\u200b\u2028\u2029\ufeff\ufe00-\ufe0f';
+
   const zeroWidthCharactersExceptNewline = new RegExp(
     '(?:' + ansiEscapeCode + ')|[' + zeroWidthCharacterExceptNewline + ']',
     'g'
   );
-  const nonVisibleCharCheck = /[\u200B-\u200D\uFEFF\u180E\u00AD\u2060-\u2064\u206A-\u206F]/g.exec(entry);
-  // /[^\u0009\u000A\u000D\u0020-\u007E\u00C0-\u024F]+/g
-  // old regex /[\u200B-\u200D\uFEFF\u180E]/g
+  const nonVisibleCharCheck = zeroWidthCharactersExceptNewline.exec(entry);
+
   return nonVisibleCharCheck;
 }
 
