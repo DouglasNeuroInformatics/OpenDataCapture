@@ -34,7 +34,7 @@ describe('Zod3', () => {
     });
 
     it('should parse array of objects', () => {
-      const result = Zod3.getZodTypeName(z3.array(z3.object({ name: z3.string(), age: z3.number() })));
+      const result = Zod3.getZodTypeName(z3.array(z3.object({ age: z3.number(), name: z3.string() })));
       expect(result).toMatchObject({
         isOptional: false,
         multiKeys: ['name', 'age'],
@@ -58,8 +58,8 @@ describe('Zod3', () => {
   describe('processInstrumentCSV', () => {
     const mockInstrument = {
       validationSchema: z3.object({
-        score: z3.number(),
-        notes: z3.string()
+        notes: z3.string(),
+        score: z3.number()
       })
     } as unknown as AnyUnilingualFormInstrument;
 
@@ -74,9 +74,9 @@ describe('Zod3', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        subjectID: 'subject1',
+        notes: 'Good performance',
         score: 85,
-        notes: 'Good performance'
+        subjectID: 'subject1'
       });
     });
 
@@ -89,8 +89,8 @@ describe('Zod3', () => {
     it('should handle optional fields', async () => {
       const instrumentWithOptional = {
         validationSchema: z3.object({
-          required: z3.string(),
-          optional: z3.string().optional()
+          optional: z3.string().optional(),
+          required: z3.string()
         })
       } as unknown as AnyUnilingualFormInstrument;
 
@@ -104,8 +104,8 @@ describe('Zod3', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        required: 'value',
-        optional: undefined
+        optional: undefined,
+        required: 'value'
       });
     });
 
@@ -197,8 +197,8 @@ describe('Zod4', () => {
   describe('processInstrumentCSV', () => {
     const mockInstrument = {
       validationSchema: z4.object({
-        score: z4.number(),
-        feedback: z4.string()
+        feedback: z4.string(),
+        score: z4.number()
       })
     } as unknown as AnyUnilingualFormInstrument;
 
@@ -213,9 +213,9 @@ describe('Zod4', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        subjectID: 'subject1',
+        feedback: 'Excellent work',
         score: 92,
-        feedback: 'Excellent work'
+        subjectID: 'subject1'
       });
     });
 
