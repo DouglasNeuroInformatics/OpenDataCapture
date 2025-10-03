@@ -61,7 +61,7 @@ describe('Zod3', () => {
         score: z3.number(),
         notes: z3.string()
       })
-    } as AnyUnilingualFormInstrument;
+    } as unknown as AnyUnilingualFormInstrument;
 
     it('should process valid CSV data', async () => {
       const csvContent = unparse([
@@ -92,7 +92,7 @@ describe('Zod3', () => {
           required: z3.string(),
           optional: z3.string().optional()
         })
-      } as AnyUnilingualFormInstrument;
+      } as unknown as AnyUnilingualFormInstrument;
 
       const csvContent = unparse([
         ['subjectID', 'date', 'required', 'optional'],
@@ -114,7 +114,7 @@ describe('Zod3', () => {
         validationSchema: z3.object({
           completed: z3.boolean()
         })
-      } as AnyUnilingualFormInstrument;
+      } as unknown as AnyUnilingualFormInstrument;
 
       const csvContent = unparse([
         ['subjectID', 'date', 'completed'],
@@ -133,7 +133,7 @@ describe('Zod3', () => {
         validationSchema: z3.object({
           tags: z3.set(z3.enum(['tag1', 'tag2', 'tag3']))
         })
-      } as AnyUnilingualFormInstrument;
+      } as unknown as AnyUnilingualFormInstrument;
 
       const csvContent = unparse([
         ['subjectID', 'date', 'tags'],
@@ -200,7 +200,7 @@ describe('Zod4', () => {
         score: z4.number(),
         feedback: z4.string()
       })
-    } as AnyUnilingualFormInstrument;
+    } as unknown as AnyUnilingualFormInstrument;
 
     it('should process valid CSV data', async () => {
       const csvContent = unparse([
@@ -234,7 +234,7 @@ describe('Zod4', () => {
         validationSchema: z4.object({
           eventDate: z4.date()
         })
-      } as AnyUnilingualFormInstrument;
+      } as unknown as AnyUnilingualFormInstrument;
 
       const csvContent = unparse([
         ['subjectID', 'date', 'eventDate'],
@@ -253,7 +253,7 @@ describe('Zod4', () => {
         validationSchema: z4.object({
           status: z4.enum(['pending', 'active', 'completed'])
         })
-      } as AnyUnilingualFormInstrument;
+      } as unknown as AnyUnilingualFormInstrument;
 
       const csvContent = unparse([
         ['subjectID', 'date', 'status'],
@@ -277,7 +277,7 @@ describe('Zod4', () => {
             })
           )
         })
-      } as AnyUnilingualFormInstrument;
+      } as unknown as AnyUnilingualFormInstrument;
 
       const csvContent = unparse([
         ['subjectID', 'date', 'items'],
