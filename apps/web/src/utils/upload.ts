@@ -64,7 +64,8 @@ function parseSetEntry(entry: string): Set<string> {
 }
 
 const ansiEscapeCode = '[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-PRZcf-nqry=><]',
-  zeroWidthCharacterExceptNewline = '\u0000-\u0008\u000B-\u0019\u001b\u009b\u00ad\u200b\u2028\u2029\ufeff\ufe00-\ufe0f';
+  zeroWidthCharacterExceptNewline =
+    '\u0000-\u0008\u000B-\u0019\u001b\u180e\u009b\u00ad\u200b\u2028\u2029\ufeff\ufe00-\ufe0f';
 
 const zeroWidthCharactersExceptNewline = new RegExp(
   '(?:' + ansiEscapeCode + ')|[' + zeroWidthCharacterExceptNewline + ']',
@@ -75,9 +76,9 @@ function nonVisibleCharChecker(entry: string | undefined) {
   if (!entry) {
     return null;
   }
+
   zeroWidthCharactersExceptNewline.lastIndex = 0;
   const nonVisibleCharCheck = zeroWidthCharactersExceptNewline.exec(entry);
-
   return nonVisibleCharCheck;
 }
 
