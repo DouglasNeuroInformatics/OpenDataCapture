@@ -530,18 +530,20 @@ export namespace Zod3 {
         const regexResultDate = nonVisibleCharChecker(dataLines[0][1]);
 
         if (regexResultSubject !== null) {
+          const charCode = regexResultSubject[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
           return reject(
             new UploadError({
-              en: `Subject ID at row ${rowNumber} contains non-visible character(s) ${regexResultSubject[0]}`,
-              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visible(s) ${regexResultSubject[0]}`
+              en: `Subject ID at row ${rowNumber} contains non-visible character(s) (U+${charCode})`,
+              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visible(s) (U+${charCode})`
             })
           );
         }
         if (regexResultDate !== null) {
+          const charCode = regexResultDate[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
           return reject(
             new UploadError({
-              en: `Date at row ${rowNumber} contains non-visible character(s) ${regexResultDate[0]}`,
-              fr: `Date à la ligne ${rowNumber} contient des caractères non visible(s)  ${regexResultDate[0]}`
+              en: `Date at row ${rowNumber} contains non-visible character(s) (U+${charCode})`,
+              fr: `Date à la ligne ${rowNumber} contient des caractères non visible(s)  (U+${charCode})`
             })
           );
         }
@@ -885,18 +887,20 @@ export namespace Zod4 {
         const regexResultDate = nonVisibleCharChecker(dataLines[0][1]);
 
         if (regexResultSubject !== null) {
+          const charCode = regexResultSubject[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
           return reject(
             new UploadError({
-              en: `Subject ID at row ${rowNumber} contains non-visible characters ${regexResultSubject[0]}`,
-              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles ${regexResultSubject[0]}`
+              en: `Subject ID at row ${rowNumber} contains non-visible characters (U+${charCode})`,
+              fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles (U+${charCode})`
             })
           );
         }
         if (regexResultDate !== null) {
+          const charCode = regexResultDate[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
           return reject(
             new UploadError({
-              en: `Date at row ${rowNumber} contains non-visible characters ${regexResultDate[0]}`,
-              fr: `Date à la ligne ${rowNumber} contient des caractères non visibles ${regexResultDate[0]}`
+              en: `Date at row ${rowNumber} contains non-visible characters (U+${charCode})`,
+              fr: `Date à la ligne ${rowNumber} contient des caractères non visibles (U+${charCode})`
             })
           );
         }
