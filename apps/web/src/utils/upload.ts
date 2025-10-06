@@ -80,7 +80,6 @@ function nonVisibleCharChecker(entry: string | undefined) {
 
   return nonVisibleCharCheck;
 }
-}
 
 const ZOD_TYPE_NAMES = [
   'ZodNumber',
