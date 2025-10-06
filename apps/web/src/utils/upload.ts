@@ -75,9 +75,11 @@ function nonVisibleCharChecker(entry: string | undefined) {
   if (!entry) {
     return null;
   }
+  zeroWidthCharactersExceptNewline.lastIndex = 0;
   const nonVisibleCharCheck = zeroWidthCharactersExceptNewline.exec(entry);
 
   return nonVisibleCharCheck;
+}
 }
 
 const ZOD_TYPE_NAMES = [
