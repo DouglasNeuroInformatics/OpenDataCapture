@@ -74,6 +74,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
           const rows = exportRecords.map((item) => {
             const obj: { [key: string]: any } = {};
+            obj.subjectId = params.subjectId;
             for (const key of columnNames) {
               const val = item[key];
               if (key === '__date__') {
@@ -97,15 +98,20 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
           return csv;
         });
         break;
-      case 'JSON':
+      case 'JSON': {
+        exportRecords.map((item) => {
+          item.subjectID = params.subjectId;
+        });
         void download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(exportRecords, null, 2)));
         break;
+      }
       case 'TSV':
         void download(`${baseFilename}.tsv`, () => {
           const columnNames = Object.keys(exportRecords[0]!);
 
           const rows = exportRecords.map((item) => {
             const obj: { [key: string]: any } = {};
+            obj.subjectId = params.subjectId;
             for (const key of columnNames) {
               const val = item[key];
               if (key === '__date__') {
