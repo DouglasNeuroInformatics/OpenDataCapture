@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
 import { omit } from 'lodash-es';
@@ -64,18 +65,21 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       instrument.internal.edition
     }_${new Date().toISOString()}`;
 
-    const exportRecords = records.map((record) => omit(record, ['__date__', '__time__']));
+    const exportRecords = records.map((record) => omit(record, ['__time__']));
 
     switch (option) {
       case 'CSV':
         void download(`${baseFilename}.csv`, () => {
           const columnNames = Object.keys(exportRecords[0]!);
 
-          //fill object array with export record items
           const rows = exportRecords.map((item) => {
             const obj: { [key: string]: any } = {};
             for (const key of columnNames) {
               const val = item[key];
+              if (key === '__date__') {
+                obj.Date = toBasicISOString(val as Date);
+                continue;
+              }
               obj[key] = typeof val === 'object' ? JSON.stringify(val) : val;
             }
             return obj;
@@ -98,15 +102,31 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         break;
       case 'TSV':
         void download(`${baseFilename}.tsv`, () => {
-          const columnNames = Object.keys(exportRecords[0]!).join('\t');
-          const rows = exportRecords
-            .map((item) =>
-              Object.values(item)
-                .map((val) => JSON.stringify(val))
-                .join('\t')
-            )
-            .join('\n');
-          return columnNames + '\n' + rows;
+          const columnNames = Object.keys(exportRecords[0]!);
+
+          const rows = exportRecords.map((item) => {
+            const obj: { [key: string]: any } = {};
+            for (const key of columnNames) {
+              const val = item[key];
+              if (key === '__date__') {
+                obj.Date = toBasicISOString(val as Date);
+                continue;
+              }
+              obj[key] = typeof val === 'object' ? JSON.stringify(val) : val;
+            }
+            return obj;
+          });
+
+          const tsv = unparse(rows, {
+            delimiter: '\t',
+            escapeChar: '"',
+            header: true,
+            quoteChar: '"',
+            quotes: false,
+            skipEmptyLines: true
+          });
+
+          return tsv;
         });
         break;
     }
