@@ -3,12 +3,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
 import { omit } from 'lodash-es';
+import { unparse } from 'papaparse';
 
 import { useInstrument } from '@/hooks/useInstrument';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
-import { parse, unparse } from 'papaparse';
 
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
@@ -51,7 +51,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
-  const dl = (option: 'JSON' | 'TSV' | 'CSV') => {
+  const dl = (option: 'CSV' | 'JSON' | 'TSV') => {
     if (!instrument) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
       return;
@@ -67,6 +67,32 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     const exportRecords = records.map((record) => omit(record, ['__date__', '__time__']));
 
     switch (option) {
+      case 'CSV':
+        void download(`${baseFilename}.csv`, () => {
+          const columnNames = Object.keys(exportRecords[0]!);
+
+          //fill object array with export record items
+          const rows = exportRecords.map((item) => {
+            const obj: { [key: string]: any } = {};
+            for (const key of columnNames) {
+              const val = item[key];
+              obj[key] = typeof val === 'object' ? JSON.stringify(val) : val;
+            }
+            return obj;
+          });
+
+          const csv = unparse(rows, {
+            delimiter: ',',
+            escapeChar: '"',
+            header: true,
+            quoteChar: '"',
+            quotes: false,
+            skipEmptyLines: true
+          });
+
+          return csv;
+        });
+        break;
       case 'JSON':
         void download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(exportRecords, null, 2)));
         break;
@@ -81,28 +107,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             )
             .join('\n');
           return columnNames + '\n' + rows;
-        });
-        break;
-      case 'CSV':
-        void download(`${baseFilename}.csv`, () => {
-          const columnNames = Object.keys(exportRecords[0]!).join(',');
-          const rows = exportRecords
-            .map((item) =>
-              Object.values(item)
-                .map((val) => '"' + JSON.stringify(val) + '"')
-                .join(',')
-            )
-            .join('\n');
-
-          const transformed = columnNames + '\n' + rows;
-
-          const parsed = parse(transformed, {
-            header: true,
-            skipEmptyLines: true,
-            dynamicTyping: true
-          });
-
-          return transformed;
         });
         break;
     }
