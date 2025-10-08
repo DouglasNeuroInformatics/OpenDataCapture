@@ -881,7 +881,7 @@ export namespace Zod4 {
         }
 
         //remove sample data if included (account for old mongolian vowel separator templates)
-        //return an error if non space characters are found
+        // Return an error if non-visible characters are found
 
         let rowNumber = 1;
 
