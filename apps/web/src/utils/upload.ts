@@ -69,7 +69,7 @@ const ansiEscapeCode = '[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0
 
 const zeroWidthCharactersExceptNewline = new RegExp(
   // eslint-disable-next-line no-misleading-character-class
-  '(?:' + ansiEscapeCode + ')|[' + zeroWidthCharacterExceptNewline + ']|(?: {3})',
+  '(?:' + ansiEscapeCode + ')|[' + zeroWidthCharacterExceptNewline + ']',
   'g'
 );
 
