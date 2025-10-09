@@ -15,7 +15,9 @@ jobs:
         with:
           cache: 'pnpm'
           node-version-file: '.nvmrc'
-      - name: Install dependencies
+      - name: Generate Environment
+        run: ./scripts/generate-env.sh
+      - name: Install Dependencies
         run: pnpm install --frozen-lockfile
       - name: Lint
         run: pnpm lint
