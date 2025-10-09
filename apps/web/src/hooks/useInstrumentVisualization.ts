@@ -52,7 +52,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
-  const dl = (option: 'CSV' | 'JSON' | 'TSV') => {
+  const dl = (option: 'CSV' | 'CSV Long' | 'JSON' | 'TSV' | 'TSV Long') => {
     if (!instrument) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
       return;
@@ -67,24 +67,26 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
     const exportRecords = records.map((record) => omit(record, ['__time__']));
 
+    const makeWideRows = () => {
+      const columnNames = Object.keys(exportRecords[0]!);
+      return exportRecords.map((item) => {
+        const obj: { [key: string]: any } = { subjectId: params.subjectId };
+        for (const key of columnNames) {
+          const val = item[key];
+          if (key === '__date__') {
+            obj.Date = toBasicISOString(val as Date);
+            continue;
+          }
+          obj[key] = typeof val === 'object' ? JSON.stringify(val) : val;
+        }
+        return obj;
+      });
+    };
+
     switch (option) {
       case 'CSV':
         void download(`${baseFilename}.csv`, () => {
-          const columnNames = Object.keys(exportRecords[0]!);
-
-          const rows = exportRecords.map((item) => {
-            const obj: { [key: string]: any } = {};
-            obj.subjectId = params.subjectId;
-            for (const key of columnNames) {
-              const val = item[key];
-              if (key === '__date__') {
-                obj.Date = toBasicISOString(val as Date);
-                continue;
-              }
-              obj[key] = typeof val === 'object' ? JSON.stringify(val) : val;
-            }
-            return obj;
-          });
+          const rows = makeWideRows();
 
           const csv = unparse(rows, {
             delimiter: ',',
@@ -107,21 +109,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       }
       case 'TSV':
         void download(`${baseFilename}.tsv`, () => {
-          const columnNames = Object.keys(exportRecords[0]!);
-
-          const rows = exportRecords.map((item) => {
-            const obj: { [key: string]: any } = {};
-            obj.subjectId = params.subjectId;
-            for (const key of columnNames) {
-              const val = item[key];
-              if (key === '__date__') {
-                obj.Date = toBasicISOString(val as Date);
-                continue;
-              }
-              obj[key] = typeof val === 'object' ? JSON.stringify(val) : val;
-            }
-            return obj;
-          });
+          const rows = makeWideRows();
 
           const tsv = unparse(rows, {
             delimiter: '\t',

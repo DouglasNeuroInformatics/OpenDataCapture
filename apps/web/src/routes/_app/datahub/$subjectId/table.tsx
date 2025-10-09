@@ -38,7 +38,7 @@ const RouteComponent = () => {
               widthFull
               data-spotlight-type="export-data-dropdown"
               disabled={!instrumentId}
-              options={['TSV', 'JSON', 'CSV']}
+              options={['TSV', 'TSV Long', 'JSON', 'CSV', 'CSV Long']}
               title={t('core.download')}
               triggerClassName="min-w-32"
               onSelection={dl}
