@@ -100,6 +100,8 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
           return csv;
         });
         break;
+      case 'CSV Long':
+        break;
       case 'JSON': {
         exportRecords.map((item) => {
           item.subjectID = params.subjectId;
@@ -122,6 +124,8 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
           return tsv;
         });
+        break;
+      case 'TSV Long':
         break;
     }
   };
