@@ -83,6 +83,39 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       });
     };
 
+    const makeLongRows = () => {
+      let date: Date;
+      const longRecord: object[] = [];
+      return exportRecords.map((item) => {
+        for (const [objKey, objVal] of Object.entries(item)) {
+          if (objKey === '__date__') {
+            date = objVal as Date;
+            continue;
+          }
+          if (Array.isArray(objVal)) {
+            objVal.map((arrayItem) => {
+              for (const [arrKey, arrItem] of Object.entries(arrayItem as object)) {
+                longRecord.push({
+                  Date: date.toISOString(),
+                  SubjectID: params.subjectId,
+                  Value: arrItem as string,
+                  Variable: objKey + '-' + arrKey
+                });
+              }
+            });
+            continue;
+          }
+          longRecord.push({
+            Date: date.toISOString(),
+            SubjectID: params.subjectId,
+            Value: objVal,
+            Variable: objKey
+          });
+        }
+        return longRecord;
+      });
+    };
+
     switch (option) {
       case 'CSV':
         void download(`${baseFilename}.csv`, () => {
@@ -100,8 +133,11 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
           return csv;
         });
         break;
-      case 'CSV Long':
+      case 'CSV Long': {
+        const rows = makeLongRows();
+        console.log(rows);
         break;
+      }
       case 'JSON': {
         exportRecords.map((item) => {
           item.subjectID = params.subjectId;
