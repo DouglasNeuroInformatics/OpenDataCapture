@@ -135,7 +135,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       case 'CSV':
         void download(`${baseFilename}.csv`, () => {
           const rows = makeWideRows();
-
           const csv = parseHelper(rows, ',');
 
           return csv;
