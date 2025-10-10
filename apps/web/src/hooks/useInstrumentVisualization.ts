@@ -116,26 +116,33 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       });
     };
 
+    const parseHelper = (rows: unknown[], delimiter: string) => {
+      return unparse(rows, {
+        delimiter: delimiter,
+        escapeChar: '"',
+        header: true,
+        quoteChar: '"',
+        quotes: false,
+        skipEmptyLines: true
+      });
+    };
+
     switch (option) {
       case 'CSV':
         void download(`${baseFilename}.csv`, () => {
           const rows = makeWideRows();
 
-          const csv = unparse(rows, {
-            delimiter: ',',
-            escapeChar: '"',
-            header: true,
-            quoteChar: '"',
-            quotes: false,
-            skipEmptyLines: true
-          });
+          const csv = parseHelper(rows, ',');
 
           return csv;
         });
         break;
       case 'CSV Long': {
-        const rows = makeLongRows();
-        console.log(rows);
+        void download(`${baseFilename}.csv`, () => {
+          const rows = makeLongRows();
+          const csv = parseHelper(rows, ',');
+          return csv;
+        });
         break;
       }
       case 'JSON': {
@@ -149,19 +156,19 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         void download(`${baseFilename}.tsv`, () => {
           const rows = makeWideRows();
 
-          const tsv = unparse(rows, {
-            delimiter: '\t',
-            escapeChar: '"',
-            header: true,
-            quoteChar: '"',
-            quotes: false,
-            skipEmptyLines: true
-          });
+          const tsv = parseHelper(rows, '\t');
 
           return tsv;
         });
         break;
       case 'TSV Long':
+        void download(`${baseFilename}.tsv`, () => {
+          const rows = makeLongRows();
+
+          const tsv = parseHelper(rows, '\t');
+
+          return tsv;
+        });
         break;
     }
   };
