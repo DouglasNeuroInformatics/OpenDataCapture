@@ -101,7 +101,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
                 longRecord.push({
                   Date: toBasicISOString(date),
                   SubjectID: params.subjectId,
-                  Value: arrItem as string,
+                  Value: arrItem,
                   Variable: `${objKey}-${arrKey}`
                 });
               });
@@ -159,9 +159,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       case 'TSV':
         void download(`${baseFilename}.tsv`, () => {
           const rows = makeWideRows();
-
-          console.log(rows);
-
           const tsv = parseHelper(rows, '\t');
 
           return tsv;
@@ -170,8 +167,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       case 'TSV Long':
         void download(`${baseFilename}.tsv`, () => {
           const rows = makeLongRows();
-          console.log(rows);
-
           const tsv = parseHelper(rows, '\t');
 
           return tsv;
