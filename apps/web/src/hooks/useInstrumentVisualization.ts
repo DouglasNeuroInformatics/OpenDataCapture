@@ -84,36 +84,40 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     };
 
     const makeLongRows = () => {
-      let date: Date;
-      const longRecord: object[] = [];
-      return exportRecords.map((item) => {
-        for (const [objKey, objVal] of Object.entries(item)) {
+      const longRecord: any[] = [];
+
+      exportRecords.forEach((item) => {
+        let date: Date;
+
+        Object.entries(item).forEach(([objKey, objVal]) => {
           if (objKey === '__date__') {
             date = objVal as Date;
-            continue;
+            return;
           }
+
           if (Array.isArray(objVal)) {
-            objVal.map((arrayItem) => {
-              for (const [arrKey, arrItem] of Object.entries(arrayItem as object)) {
+            objVal.forEach((arrayItem) => {
+              Object.entries(arrayItem as object).forEach(([arrKey, arrItem]) => {
                 longRecord.push({
-                  Date: date.toISOString(),
+                  Date: toBasicISOString(date),
                   SubjectID: params.subjectId,
                   Value: arrItem as string,
-                  Variable: objKey + '-' + arrKey
+                  Variable: `${objKey}-${arrKey}`
                 });
-              }
+              });
             });
-            continue;
+          } else {
+            longRecord.push({
+              Date: toBasicISOString(date),
+              SubjectID: params.subjectId,
+              Value: objVal,
+              Variable: objKey
+            });
           }
-          longRecord.push({
-            Date: date.toISOString(),
-            SubjectID: params.subjectId,
-            Value: objVal,
-            Variable: objKey
-          });
-        }
-        return longRecord;
+        });
       });
+
+      return longRecord;
     };
 
     const parseHelper = (rows: unknown[], delimiter: string) => {
@@ -156,6 +160,8 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         void download(`${baseFilename}.tsv`, () => {
           const rows = makeWideRows();
 
+          console.log(rows);
+
           const tsv = parseHelper(rows, '\t');
 
           return tsv;
@@ -164,6 +170,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       case 'TSV Long':
         void download(`${baseFilename}.tsv`, () => {
           const rows = makeLongRows();
+          console.log(rows);
 
           const tsv = parseHelper(rows, '\t');
 
