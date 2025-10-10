@@ -19,7 +19,7 @@ catalog:
   axios: '^1.8.2'
   esbuild: '0.23.x'
   esbuild-wasm: '0.23.x'
-  happy-dom: '^15.7.4'
+  happy-dom: '^20.0.0'
   motion: '11.15.0'
   nodemon: '^3.1.9'
   prisma: '^6.9.0'
