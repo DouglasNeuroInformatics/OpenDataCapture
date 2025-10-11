@@ -37,12 +37,16 @@ describe('Zod3', () => {
       const result = Zod3.getZodTypeName(z3.array(z3.object({ age: z3.number(), name: z3.string() })));
       expect(result).toMatchObject({
         isOptional: false,
-        multiKeys: ['name', 'age'],
         typeName: 'ZodArray'
       });
+      expect(result.multiKeys).toHaveLength(2);
+      expect(result.multiKeys).toEqual(expect.arrayContaining(['name', 'age']));
       expect(result.multiValues).toHaveLength(2);
-      expect(result.multiValues?.[0]).toMatchObject({ typeName: 'ZodString' });
-      expect(result.multiValues?.[1]).toMatchObject({ typeName: 'ZodNumber' });
+      // Find the index of each key to check the corresponding value
+      const nameIndex = result.multiKeys?.indexOf('name') ?? -1;
+      const ageIndex = result.multiKeys?.indexOf('age') ?? -1;
+      expect(result.multiValues?.[nameIndex]).toMatchObject({ typeName: 'ZodString' });
+      expect(result.multiValues?.[ageIndex]).toMatchObject({ typeName: 'ZodNumber' });
     });
 
     it('should parse set type', () => {

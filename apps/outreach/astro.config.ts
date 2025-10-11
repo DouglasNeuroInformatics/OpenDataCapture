@@ -12,7 +12,7 @@ import getReadingTime from 'reading-time';
 import symlink from './src/plugins/astro-plugin-symlink';
 import { starlightTypeDocPlugin, starlightTypeDocSidebarGroup } from './src/plugins/starlight-plugin-typedoc';
 
-const require = module.createRequire(import.meta.dirname);
+const require = module.createRequire(import.meta.url);
 
 const runtimeCoreRoot = path.dirname(require.resolve('@opendatacapture/runtime-core/package.json'));
 
