@@ -20,6 +20,14 @@ export class SetupService {
     return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN', groupIds: [] });
   }
 
+  async delete(): Promise<void> {
+    const isTest = this.configService.get('NODE_ENV') === 'test';
+    if (!isTest) {
+      throw new ForbiddenException('Cannot access outside of test');
+    }
+    await this.prismaService.dropDatabase();
+  }
+
   async getState() {
     const savedOptions = await this.getSavedOptions();
     return {
