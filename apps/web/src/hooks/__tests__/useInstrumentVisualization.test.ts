@@ -92,6 +92,11 @@ describe('useInstrumentVisualization tests', () => {
       });
       act(() => dl('CSV'));
       expect(records).toBeDefined();
+      expect(mockUseDownload).toHaveBeenCalledTimes(1);
+
+      const [filename, getContentFn] = mockUseDownload.mock.calls[0];
+      expect(filename).toContain('.csv');
+      const csvContents = getContentFn();
     });
   });
 });
