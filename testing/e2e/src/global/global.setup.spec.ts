@@ -5,16 +5,18 @@ import type { LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { InitAppOptions } from '@opendatacapture/schemas/setup';
 import { expect, test } from '@playwright/test';
 
-const initOptions: InitAppOptions = {
+const initOptions = {
   admin: {
     firstName: 'Jane',
     lastName: 'Doe',
     password: 'DataCapture2025',
     username: 'admin'
   },
+  dummySubjectCount: 10,
   enableExperimentalFeatures: false,
-  initDemo: true
-};
+  initDemo: true,
+  recordsPerSubject: 10
+} satisfies InitAppOptions;
 
 declare global {
   namespace NodeJS {
@@ -36,12 +38,20 @@ test.describe.serial(() => {
       expect(response.status()).toBe(200);
       await expect(response.json()).resolves.toMatchObject({ isSetup: false });
     });
-    test('successful setup', async ({ request }) => {
-      const response = await request.post('/api/v1/setup', {
-        data: initOptions
-      });
-      expect(response.status()).toBe(201);
-      await expect(response.json()).resolves.toStrictEqual({ success: true });
+    test('successful setup', async ({ page }) => {
+      await page.goto('/setup');
+      await expect(page).toHaveURL('/setup');
+      const setupForm = page.locator('form[data-cy="setup-form"]');
+      await setupForm.locator('input[name="firstName"]').fill(initOptions.admin.firstName);
+      await setupForm.locator('input[name="lastName"]').fill(initOptions.admin.lastName);
+      await setupForm.locator('input[name="username"]').fill(initOptions.admin.username);
+      await setupForm.locator('input[name="password"]').fill(initOptions.admin.password);
+      await setupForm.locator('input[name="confirmPassword"]').fill(initOptions.admin.password);
+      await setupForm.locator('#initDemo-true').click();
+      await setupForm.locator('input[name="dummySubjectCount"]').fill(initOptions.dummySubjectCount.toString());
+      await setupForm.locator('input[name="recordsPerSubject"]').fill(initOptions.recordsPerSubject.toString());
+      await setupForm.getByLabel('Submit').click();
+      await expect(page).toHaveURL('/dashboard');
     });
     test('setup state after initialization', async ({ request }) => {
       const response = await request.get('/api/v1/setup');

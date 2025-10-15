@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "tsc && eslint --fix .",
     "test": "env-cmd -f ../../.env playwright test",
-    "test:dev": "playwright test --ui"
+    "test:dev": "env-cmd -f ../../.env playwright test --ui"
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
