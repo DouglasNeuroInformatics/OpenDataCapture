@@ -1,5 +1,5 @@
 import { RouteAccess } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { SetupState } from '@opendatacapture/schemas/setup';
 
@@ -11,6 +11,12 @@ import { SetupService } from './setup.service';
 @Controller({ path: 'setup' })
 export class SetupController {
   constructor(private readonly setupService: SetupService) {}
+
+  @Delete()
+  @RouteAccess({ action: 'delete', subject: 'all' })
+  async delete(): Promise<void> {
+    return this.setupService.delete();
+  }
 
   @ApiOperation({
     description: 'Return the current setup state',
