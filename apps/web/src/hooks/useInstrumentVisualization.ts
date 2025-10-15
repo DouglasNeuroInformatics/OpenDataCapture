@@ -84,7 +84,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     };
 
     const makeLongRows = () => {
-      const longRecord: any[] = [];
+      const longRecord: { [key: string]: any }[] = [];
 
       exportRecords.forEach((item) => {
         let date: Date;
@@ -101,8 +101,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
                 longRecord.push({
                   Date: toBasicISOString(date),
                   SubjectID: params.subjectId,
-                  Value: arrItem,
-                  Variable: `${objKey}-${arrKey}`
+                  Variable: `${objKey}-${arrKey}`,
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, perfectionist/sort-objects
+                  Value: arrItem
                 });
               });
             });
