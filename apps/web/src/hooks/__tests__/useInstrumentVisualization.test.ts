@@ -4,6 +4,7 @@ import { act } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useInstrumentVisualization } from '../useInstrumentVisualization';
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 
 const mockUseInstrument = vi.hoisted(() =>
   vi.fn(() => ({
@@ -33,6 +34,8 @@ const mockStore = {
     }
   }))
 };
+
+const mockBasicIsoString = '2025-04-30';
 
 const mockUseDownload = vi.fn();
 
@@ -79,6 +82,10 @@ vi.mock('@/hooks/useInstrumentRecords', () => ({
   useInstrumentRecords: () => mockInstrumentRecords
 }));
 
+vi.mock('@douglasneuroinformatics/libjs', () => ({
+  toBasicISOString: vi.fn(() => mockBasicIsoString)
+}));
+
 describe('useInstrumentVisualization tests', () => {
   afterEach(() => {
     vi.clearAllMocks();
@@ -97,6 +104,7 @@ describe('useInstrumentVisualization tests', () => {
       const [filename, getContentFn] = mockUseDownload.mock.calls[0];
       expect(filename).toContain('.csv');
       const csvContents = getContentFn();
+      expect(csvContents).toMatch('subjectId,Date,someValue\r\ntestId,2025-04-30,abc');
     });
   });
 });
