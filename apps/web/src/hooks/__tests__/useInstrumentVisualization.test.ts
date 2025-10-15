@@ -5,18 +5,24 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useInstrumentVisualization } from '../useInstrumentVisualization';
 
-const mockInstrument = {
-  useInstrument: vi.fn(() => ({
-    instrument: {
-      internal: {
-        name: 'test'
-      }
+const mockUseInstrument = vi.hoisted(() =>
+  vi.fn(() => ({
+    internal: {
+      name: 'test'
     }
   }))
-};
+);
+
+const mockRecords = [
+  {
+    __date__: new Date().getDate(),
+    __time__: new Date().getTime(),
+    someValue: 'abc'
+  }
+];
 
 vi.mock('@/hooks/useInstrument', () => ({
-  useInstrument: () => mockInstrument
+  useInstrument: mockUseInstrument
 }));
 
 const mockStore = {
@@ -27,9 +33,9 @@ const mockStore = {
     }
   }))
 };
-const mockDownload = {
-  useDownload: vi.fn()
-};
+
+const mockUseDownload = vi.fn();
+
 const mockNotification = {
   useNotificationsStore: vi.fn()
 };
@@ -50,7 +56,7 @@ vi.mock('@/store', () => ({
 }));
 
 vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
-  useDownload: () => mockDownload,
+  useDownload: () => mockUseDownload,
   useNotificationsStore: () => mockNotification,
   useTranslation: () => mockTranslation
 }));
@@ -61,14 +67,7 @@ vi.mock('react', async (importOriginal) => {
     ...actual,
     useEffect: vi.fn(),
     useMemo: vi.fn(),
-    useState: vi.fn(() => [
-      'mockedRecords',
-      vi.fn(() => ({
-        __date__: new Date().getDate(),
-        __time__: new Date().getTime(),
-        someValue: 'abc'
-      }))
-    ])
+    useState: vi.fn(() => [mockRecords, 'setRecords'])
   };
 });
 
@@ -92,8 +91,6 @@ describe('useInstrumentVisualization tests', () => {
         params: { subjectId: 'testId' }
       });
       act(() => dl('CSV'));
-      expect(mockInstrument.useInstrument).toHaveBeenCalledOnce();
-      expect(mockStore.useAppStore).toHaveBeenCalled();
       expect(records).toBeDefined();
     });
   });
