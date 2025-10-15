@@ -1,0 +1,16 @@
+{
+  "name": "@opendatacapture/test",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "tsc && eslint --fix .",
+    "test": "env-cmd -f ../../.env playwright test",
+    "test:dev": "playwright test --ui"
+  },
+  "dependencies": {
+    "@douglasneuroinformatics/libjs": "catalog:",
+    "@opendatacapture/schemas": "workspace:*",
+    "@playwright/test": "^1.51.1"
+  }
+}
