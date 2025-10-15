@@ -6,7 +6,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useInstrumentVisualization } from '../useInstrumentVisualization';
 
 const mockInstrument = {
-  useInstrument: vi.fn()
+  useInstrument: vi.fn(() => ({
+    instrument: {
+      internal: {
+        name: 'test'
+      }
+    }
+  }))
 };
 
 vi.mock('@/hooks/useInstrument', () => ({
@@ -14,7 +20,12 @@ vi.mock('@/hooks/useInstrument', () => ({
 }));
 
 const mockStore = {
-  useAppStore: vi.fn()
+  useAppStore: vi.fn(() => ({
+    store: {
+      currentGroup: 'testGroup',
+      currentUser: 'testUser'
+    }
+  }))
 };
 const mockDownload = {
   useDownload: vi.fn()
@@ -50,7 +61,14 @@ vi.mock('react', async (importOriginal) => {
     ...actual,
     useEffect: vi.fn(),
     useMemo: vi.fn(),
-    useState: vi.fn(() => ['mockedRecords', vi.fn()])
+    useState: vi.fn(() => [
+      'mockedRecords',
+      vi.fn(() => ({
+        __date__: new Date().getDate(),
+        __time__: new Date().getTime(),
+        someValue: 'abc'
+      }))
+    ])
   };
 });
 
