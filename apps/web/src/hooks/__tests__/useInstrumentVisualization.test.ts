@@ -35,13 +35,6 @@ const mockBasicIsoString = '2025-04-30';
 
 const mockUseDownload = vi.fn();
 
-const mockNotification = {
-  useNotificationsStore: vi.fn()
-};
-const mockTranslation = {
-  useTranslation: vi.fn()
-};
-
 const mockInfoQuery = {
   useInstrumentInfoQuery: vi.fn()
 };
@@ -56,8 +49,8 @@ vi.mock('@/store', () => ({
 
 vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
   useDownload: () => mockUseDownload,
-  useNotificationsStore: () => mockNotification,
-  useTranslation: () => mockTranslation
+  useNotificationsStore: () => ({ addNotification: vi.fn() }),
+  useTranslation: () => ({ t: vi.fn((key) => key) })
 }));
 
 vi.mock('react', async (importOriginal) => {
