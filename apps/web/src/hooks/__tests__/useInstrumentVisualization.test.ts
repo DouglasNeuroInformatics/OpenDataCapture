@@ -26,12 +26,8 @@ vi.mock('@/hooks/useInstrument', () => ({
 }));
 
 const mockStore = {
-  useAppStore: vi.fn(() => ({
-    store: {
-      currentGroup: 'testGroup',
-      currentUser: 'testUser'
-    }
-  }))
+  currentGroup: { id: 'testGroupId' },
+  currentUser: { username: 'testUser' }
 };
 
 const mockBasicIsoString = '2025-04-30';
@@ -54,7 +50,7 @@ const mockInstrumentRecords = {
 };
 
 vi.mock('@/store', () => ({
-  useAppStore: () => mockStore
+  useAppStore: vi.fn((selector) => selector(mockStore))
 }));
 
 vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
@@ -92,7 +88,6 @@ describe('useInstrumentVisualization tests', () => {
 
   describe('CSV', () => {
     it('Should download', () => {
-      vi.spyOn(React, 'useEffect').mockImplementation((fn) => fn());
       const { dl, records } = useInstrumentVisualization({
         params: { subjectId: 'testId' }
       });
@@ -108,7 +103,6 @@ describe('useInstrumentVisualization tests', () => {
   });
   describe('TSV', () => {
     it('Should download', () => {
-      vi.spyOn(React, 'useEffect').mockImplementation((fn) => fn());
       const { dl, records } = useInstrumentVisualization({
         params: { subjectId: 'testId' }
       });
@@ -124,7 +118,6 @@ describe('useInstrumentVisualization tests', () => {
   });
   describe('CSV Long', () => {
     it('Should download', () => {
-      vi.spyOn(React, 'useEffect').mockImplementation((fn) => fn());
       const { dl, records } = useInstrumentVisualization({
         params: { subjectId: 'testId' }
       });
@@ -140,7 +133,6 @@ describe('useInstrumentVisualization tests', () => {
   });
   describe('TSV Long', () => {
     it('Should download', () => {
-      vi.spyOn(React, 'useEffect').mockImplementation((fn) => fn());
       const { dl, records } = useInstrumentVisualization({
         params: { subjectId: 'testId' }
       });
@@ -156,7 +148,6 @@ describe('useInstrumentVisualization tests', () => {
   });
   describe('JSON', () => {
     it('Should download', async () => {
-      vi.spyOn(React, 'useEffect').mockImplementation((fn) => fn());
       const { dl, records } = useInstrumentVisualization({
         params: { subjectId: 'testId' }
       });
