@@ -8,6 +8,7 @@ import { useInstrumentVisualization } from '../useInstrumentVisualization';
 const mockUseInstrument = vi.hoisted(() =>
   vi.fn(() => ({
     internal: {
+      edition: 1,
       name: 'test'
     }
   }))
