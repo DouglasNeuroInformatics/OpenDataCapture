@@ -31,6 +31,7 @@ afterEach(() => {
     STORE_RESET_FUNCTIONS.forEach((resetFn) => {
       resetFn();
     });
+    STORE_RESET_FUNCTIONS.clear();
   });
 });
 

@@ -15,7 +15,7 @@ const mockUseInstrument = vi.hoisted(() =>
 
 const mockRecords = [
   {
-    __date__: new Date().getDate(),
+    __date__: new Date(),
     __time__: new Date().getTime(),
     someValue: 'abc'
   }
