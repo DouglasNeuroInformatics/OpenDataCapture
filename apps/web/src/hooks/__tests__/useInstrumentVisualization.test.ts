@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useInstrumentVisualization } from '../useInstrumentVisualization';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { useInstrumentVisualization } from '../useInstrumentVisualization';
 
 const mockUseInstrument = vi.hoisted(() =>
   vi.fn(() => ({
@@ -27,9 +28,9 @@ const FIXED_TEST_DATE = new Date('2025-04-30T12:00:00Z');
 const mockInstrumentRecords = {
   data: [
     {
-      date: FIXED_TEST_DATE,
       computedMeasures: {},
-      data: { someValue: 'abc' }
+      data: { someValue: 'abc' },
+      date: FIXED_TEST_DATE
     }
   ]
 };
@@ -68,8 +69,7 @@ describe('useInstrumentVisualization', () => {
       act(() => result.current.dl('CSV'));
       expect(records).toBeDefined();
       expect(mockDownloadFn).toHaveBeenCalledTimes(1);
-
-      const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
+      const [filename, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
       expect(filename).toContain('.csv');
       const csvContents = getContentFn();
       expect(csvContents).toMatch(`subjectId,Date,someValue\r\ntestId,${toBasicISOString(FIXED_TEST_DATE)},abc`);
@@ -82,8 +82,7 @@ describe('useInstrumentVisualization', () => {
       act(() => dl('TSV'));
       expect(records).toBeDefined();
       expect(mockDownloadFn).toHaveBeenCalledTimes(1);
-
-      const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
+      const [filename, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
       expect(filename).toContain('.tsv');
       const tsvContents = getContentFn();
       expect(tsvContents).toMatch(`subjectId\tDate\tsomeValue\r\ntestId\t${toBasicISOString(FIXED_TEST_DATE)}\tabc`);
@@ -97,7 +96,7 @@ describe('useInstrumentVisualization', () => {
       expect(records).toBeDefined();
       expect(mockDownloadFn).toHaveBeenCalledTimes(1);
 
-      const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
+      const [filename, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
       expect(filename).toContain('.csv');
       const csvLongContents = getContentFn();
       expect(csvLongContents).toMatch(
@@ -113,7 +112,7 @@ describe('useInstrumentVisualization', () => {
       expect(records).toBeDefined();
       expect(mockDownloadFn).toHaveBeenCalledTimes(1);
 
-      const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
+      const [filename, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
       expect(filename).toMatch('.tsv');
       const tsvLongContents = getContentFn();
       expect(tsvLongContents).toMatch(
@@ -129,7 +128,7 @@ describe('useInstrumentVisualization', () => {
       expect(records).toBeDefined();
       expect(mockDownloadFn).toHaveBeenCalledTimes(1);
 
-      const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
+      const [filename, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
       expect(filename).toMatch('.json');
       const jsonContents = await getContentFn();
       expect(jsonContents).toContain('"someValue": "abc"');
