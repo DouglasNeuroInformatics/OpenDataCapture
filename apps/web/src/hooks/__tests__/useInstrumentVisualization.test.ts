@@ -23,10 +23,11 @@ const mockInfoQuery = {
   data: []
 };
 
+const FIXED_TEST_DATE = new Date('2025-04-30T12:00:00Z');
 const mockInstrumentRecords = {
   data: [
     {
-      date: new Date(),
+      date: FIXED_TEST_DATE,
       computedMeasures: {},
       data: { someValue: 'abc' }
     }
@@ -71,7 +72,7 @@ describe('useInstrumentVisualization', () => {
       const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
       expect(filename).toContain('.csv');
       const csvContents = getContentFn();
-      expect(csvContents).toMatch(`subjectId,Date,someValue\r\ntestId,${toBasicISOString(new Date())},abc`);
+      expect(csvContents).toMatch(`subjectId,Date,someValue\r\ntestId,${toBasicISOString(FIXED_TEST_DATE)},abc`);
     });
   });
   describe('TSV', () => {
@@ -85,7 +86,7 @@ describe('useInstrumentVisualization', () => {
       const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
       expect(filename).toContain('.tsv');
       const tsvContents = getContentFn();
-      expect(tsvContents).toMatch(`subjectId\tDate\tsomeValue\r\ntestId\t${toBasicISOString(new Date())}\tabc`);
+      expect(tsvContents).toMatch(`subjectId\tDate\tsomeValue\r\ntestId\t${toBasicISOString(FIXED_TEST_DATE)}\tabc`);
     });
   });
   describe('CSV Long', () => {
@@ -100,7 +101,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvLongContents = getContentFn();
       expect(csvLongContents).toMatch(
-        `Date,SubjectID,Value,Variable\r\n${toBasicISOString(new Date())},testId,abc,someValue`
+        `Date,SubjectID,Value,Variable\r\n${toBasicISOString(FIXED_TEST_DATE)},testId,abc,someValue`
       );
     });
   });
@@ -116,7 +117,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toMatch('.tsv');
       const tsvLongContents = getContentFn();
       expect(tsvLongContents).toMatch(
-        `Date\tSubjectID\tValue\tVariable\r\n${toBasicISOString(new Date())}\ttestId\tabc\tsomeValue`
+        `Date\tSubjectID\tValue\tVariable\r\n${toBasicISOString(FIXED_TEST_DATE)}\ttestId\tabc\tsomeValue`
       );
     });
   });
