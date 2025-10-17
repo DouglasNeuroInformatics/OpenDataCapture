@@ -41,7 +41,6 @@
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.9",
     "@swc/helpers": "^0.5.15",
-    "@types/github-script": "https://github.com/actions/github-script/archive/refs/tags/v7.0.1.tar.gz",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "22.x",
     "@vitest/browser": "^3.2.4",
