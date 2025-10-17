@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useInstrumentVisualization } from '../useInstrumentVisualization';
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 
 const mockUseInstrument = vi.hoisted(() =>
   vi.fn(() => ({
@@ -56,10 +57,6 @@ vi.mock('@/hooks/useInstrumentRecords', () => ({
   useInstrumentRecords: () => mockInstrumentRecords
 }));
 
-vi.mock('@douglasneuroinformatics/libjs', () => ({
-  toBasicISOString: vi.fn(() => mockBasicIsoString)
-}));
-
 describe('useInstrumentVisualization', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -76,7 +73,7 @@ describe('useInstrumentVisualization', () => {
       const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
       expect(filename).toContain('.csv');
       const csvContents = getContentFn();
-      expect(csvContents).toMatch('subjectId,Date,someValue\r\ntestId,2025-04-30,abc');
+      expect(csvContents).toMatch(`subjectId,Date,someValue\r\ntestId,${toBasicISOString(new Date())},abc`);
     });
   });
   describe('TSV', () => {
@@ -90,7 +87,7 @@ describe('useInstrumentVisualization', () => {
       const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
       expect(filename).toContain('.tsv');
       const tsvContents = getContentFn();
-      expect(tsvContents).toMatch('subjectId\tDate\tsomeValue\r\ntestId\t2025-04-30\tabc');
+      expect(tsvContents).toMatch(`subjectId\tDate\tsomeValue\r\ntestId\t${toBasicISOString(new Date())}\tabc`);
     });
   });
   describe('CSV Long', () => {
@@ -104,7 +101,9 @@ describe('useInstrumentVisualization', () => {
       const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
       expect(filename).toContain('.csv');
       const csvLongContents = getContentFn();
-      expect(csvLongContents).toMatch('Date,SubjectID,Value,Variable\r\n2025-04-30,testId,abc,someValue');
+      expect(csvLongContents).toMatch(
+        `Date,SubjectID,Value,Variable\r\n${toBasicISOString(new Date())},testId,abc,someValue`
+      );
     });
   });
   describe('TSV Long', () => {
@@ -118,7 +117,9 @@ describe('useInstrumentVisualization', () => {
       const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
       expect(filename).toMatch('.tsv');
       const tsvLongContents = getContentFn();
-      expect(tsvLongContents).toMatch('Date\tSubjectID\tValue\tVariable\r\n2025-04-30\ttestId\tabc\tsomeValue');
+      expect(tsvLongContents).toMatch(
+        `Date\tSubjectID\tValue\tVariable\r\n${toBasicISOString(new Date())}\ttestId\tabc\tsomeValue`
+      );
     });
   });
   describe('JSON', () => {
