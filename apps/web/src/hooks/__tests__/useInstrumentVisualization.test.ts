@@ -1,8 +1,5 @@
-import React from 'react';
-
-import { act } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
 import { useInstrumentVisualization } from '../useInstrumentVisualization';
 
 const mockUseInstrument = vi.hoisted(() =>
@@ -14,18 +11,6 @@ const mockUseInstrument = vi.hoisted(() =>
   }))
 );
 
-const mockRecords = [
-  {
-    __date__: new Date(),
-    __time__: new Date().getTime(),
-    someValue: 'abc'
-  }
-];
-
-vi.mock('@/hooks/useInstrument', () => ({
-  useInstrument: mockUseInstrument
-}));
-
 const mockStore = {
   currentGroup: { id: 'testGroupId' },
   currentUser: { username: 'testUser' }
@@ -33,35 +18,35 @@ const mockStore = {
 
 const mockBasicIsoString = '2025-04-30';
 
-const mockUseDownload = vi.fn();
+const mockDownloadFn = vi.fn();
 
 const mockInfoQuery = {
   useInstrumentInfoQuery: vi.fn()
 };
 
 const mockInstrumentRecords = {
-  useInstrumentRecords: vi.fn()
+  data: [
+    {
+      date: new Date(),
+      computedMeasures: {},
+      data: { someValue: 'abc' }
+    }
+  ]
 };
+
+vi.mock('@/hooks/useInstrument', () => ({
+  useInstrument: mockUseInstrument
+}));
 
 vi.mock('@/store', () => ({
   useAppStore: vi.fn((selector) => selector(mockStore))
 }));
 
 vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
-  useDownload: () => mockUseDownload,
+  useDownload: vi.fn(() => mockDownloadFn),
   useNotificationsStore: () => ({ addNotification: vi.fn() }),
   useTranslation: () => ({ t: vi.fn((key) => key) })
 }));
-
-vi.mock('react', async (importOriginal) => {
-  const actual = await importOriginal<typeof React>();
-  return {
-    ...actual,
-    useEffect: vi.fn(),
-    useMemo: vi.fn(),
-    useState: vi.fn(() => [mockRecords, 'setRecords'])
-  };
-});
 
 vi.mock('@/hooks/useInstrumentInfoQuery', () => ({
   useInstrumentInfoQuery: () => mockInfoQuery
@@ -76,20 +61,19 @@ vi.mock('@douglasneuroinformatics/libjs', () => ({
 }));
 
 describe('useInstrumentVisualization', () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe('CSV', () => {
     it('Should download', () => {
-      const { dl, records } = useInstrumentVisualization({
-        params: { subjectId: 'testId' }
-      });
-      act(() => dl('CSV'));
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
+      const { records } = result.current;
+      act(() => result.current.dl('CSV'));
       expect(records).toBeDefined();
-      expect(mockUseDownload).toHaveBeenCalledTimes(1);
+      expect(mockDownloadFn).toHaveBeenCalledTimes(1);
 
-      const [filename, getContentFn] = mockUseDownload.mock.calls[0];
+      const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
       expect(filename).toContain('.csv');
       const csvContents = getContentFn();
       expect(csvContents).toMatch('subjectId,Date,someValue\r\ntestId,2025-04-30,abc');
@@ -97,14 +81,13 @@ describe('useInstrumentVisualization', () => {
   });
   describe('TSV', () => {
     it('Should download', () => {
-      const { dl, records } = useInstrumentVisualization({
-        params: { subjectId: 'testId' }
-      });
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
+      const { dl, records } = result.current;
       act(() => dl('TSV'));
       expect(records).toBeDefined();
-      expect(mockUseDownload).toHaveBeenCalledTimes(1);
+      expect(mockDownloadFn).toHaveBeenCalledTimes(1);
 
-      const [filename, getContentFn] = mockUseDownload.mock.calls[0];
+      const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
       expect(filename).toContain('.tsv');
       const tsvContents = getContentFn();
       expect(tsvContents).toMatch('subjectId\tDate\tsomeValue\r\ntestId\t2025-04-30\tabc');
@@ -112,14 +95,13 @@ describe('useInstrumentVisualization', () => {
   });
   describe('CSV Long', () => {
     it('Should download', () => {
-      const { dl, records } = useInstrumentVisualization({
-        params: { subjectId: 'testId' }
-      });
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
+      const { dl, records } = result.current;
       act(() => dl('CSV Long'));
       expect(records).toBeDefined();
-      expect(mockUseDownload).toHaveBeenCalledTimes(1);
+      expect(mockDownloadFn).toHaveBeenCalledTimes(1);
 
-      const [filename, getContentFn] = mockUseDownload.mock.calls[0];
+      const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
       expect(filename).toContain('.csv');
       const csvLongContents = getContentFn();
       expect(csvLongContents).toMatch('Date,SubjectID,Value,Variable\r\n2025-04-30,testId,abc,someValue');
@@ -127,14 +109,13 @@ describe('useInstrumentVisualization', () => {
   });
   describe('TSV Long', () => {
     it('Should download', () => {
-      const { dl, records } = useInstrumentVisualization({
-        params: { subjectId: 'testId' }
-      });
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
+      const { dl, records } = result.current;
       act(() => dl('TSV Long'));
       expect(records).toBeDefined();
-      expect(mockUseDownload).toHaveBeenCalledTimes(1);
+      expect(mockDownloadFn).toHaveBeenCalledTimes(1);
 
-      const [filename, getContentFn] = mockUseDownload.mock.calls[0];
+      const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
       expect(filename).toMatch('.tsv');
       const tsvLongContents = getContentFn();
       expect(tsvLongContents).toMatch('Date\tSubjectID\tValue\tVariable\r\n2025-04-30\ttestId\tabc\tsomeValue');
@@ -142,14 +123,13 @@ describe('useInstrumentVisualization', () => {
   });
   describe('JSON', () => {
     it('Should download', async () => {
-      const { dl, records } = useInstrumentVisualization({
-        params: { subjectId: 'testId' }
-      });
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
+      const { dl, records } = result.current;
       act(() => dl('JSON'));
       expect(records).toBeDefined();
-      expect(mockUseDownload).toHaveBeenCalledTimes(1);
+      expect(mockDownloadFn).toHaveBeenCalledTimes(1);
 
-      const [filename, getContentFn] = mockUseDownload.mock.calls[0];
+      const [filename, getContentFn] = mockDownloadFn.mock.calls[0];
       expect(filename).toMatch('.json');
       const jsonContents = await getContentFn();
       expect(jsonContents).toContain('"someValue": "abc"');
