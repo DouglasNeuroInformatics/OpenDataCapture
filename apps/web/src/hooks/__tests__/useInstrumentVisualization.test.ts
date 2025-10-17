@@ -75,7 +75,7 @@ vi.mock('@douglasneuroinformatics/libjs', () => ({
   toBasicISOString: vi.fn(() => mockBasicIsoString)
 }));
 
-describe('useInstrumentVisualization tests', () => {
+describe('useInstrumentVisualization', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
