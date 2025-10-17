@@ -17,12 +17,10 @@ const mockStore = {
   currentUser: { username: 'testUser' }
 };
 
-const mockBasicIsoString = '2025-04-30';
-
 const mockDownloadFn = vi.fn();
 
 const mockInfoQuery = {
-  useInstrumentInfoQuery: vi.fn()
+  data: []
 };
 
 const mockInstrumentRecords = {
