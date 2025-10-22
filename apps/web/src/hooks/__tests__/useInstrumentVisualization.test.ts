@@ -20,6 +20,8 @@ const mockStore = {
 
 const mockDownloadFn = vi.fn();
 
+const mockExcelDownloadFn = vi.hoisted(() => vi.fn());
+
 const mockInfoQuery = {
   data: []
 };
@@ -51,6 +53,10 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
 
 vi.mock('@/hooks/useInstrumentInfoQuery', () => ({
   useInstrumentInfoQuery: () => mockInfoQuery
+}));
+
+vi.mock('@/utils/excel', () => ({
+  downloadSubjectTableExcel: mockExcelDownloadFn
 }));
 
 vi.mock('@/hooks/useInstrumentRecords', () => ({
@@ -122,6 +128,51 @@ describe('useInstrumentVisualization', () => {
       expect(tsvLongContents).toMatch(
         `GroupID\tDate\tSubjectID\tValue\tVariable\r\ntestGroupId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestId\tabc\tsomeValue`
       );
+    });
+  });
+  describe('Excel', () => {
+    it('Should download', () => {
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
+      const { dl, records } = result.current;
+      act(() => dl('Excel'));
+      expect(records).toBeDefined();
+      expect(mockExcelDownloadFn).toHaveBeenCalledTimes(1);
+      const [filename, getContentFn] = mockExcelDownloadFn.mock.calls[0] ?? [];
+      expect(filename).toMatch('.xlsx');
+      const excelContents = getContentFn;
+
+      expect(excelContents).toEqual([
+        {
+          GroupID: 'testGroupId',
+          subjectId: 'testId',
+          // eslint-disable-next-line perfectionist/sort-objects
+          Date: '2025-04-30',
+          someValue: 'abc'
+        }
+      ]);
+    });
+  });
+  describe('Excel Long', () => {
+    it('Should download', () => {
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
+      const { dl, records } = result.current;
+      act(() => dl('Excel Long'));
+      expect(records).toBeDefined();
+      expect(mockExcelDownloadFn).toHaveBeenCalledTimes(1);
+
+      const [filename, getContentFn] = mockExcelDownloadFn.mock.calls[0] ?? [];
+      expect(filename).toMatch('.xlsx');
+      const excelContents = getContentFn;
+
+      expect(excelContents).toEqual([
+        {
+          Date: '2025-04-30',
+          GroupID: 'testGroupId',
+          SubjectID: 'testId',
+          Value: 'abc',
+          Variable: 'someValue'
+        }
+      ]);
     });
   });
   describe('JSON', () => {
