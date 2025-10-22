@@ -14,6 +14,7 @@ import type {
   LinearRegressionResults,
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
+import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { Prisma } from '@prisma/client';
 import type { Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
@@ -37,14 +38,6 @@ type ExpandDataType =
       message: string;
       success: false;
     };
-
-function afterFirstDollar(str: string) {
-  if (!str) return str;
-  const match = /\$(.*)/.exec(str);
-  if (!match) return str;
-  if (!match[1]) return str;
-  return match[1];
-}
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -188,7 +181,7 @@ export class InstrumentRecordsService {
             sessionId: record.session.id,
             sessionType: record.session.type,
             subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-            subjectId: afterFirstDollar(record.subject.id),
+            subjectId: removeSubjectIdScope(record.subject.id),
             subjectSex: record.subject.sex,
             timestamp: record.date.toISOString(),
             value: measureValue
@@ -211,7 +204,7 @@ export class InstrumentRecordsService {
               sessionId: record.session.id,
               sessionType: record.session.type,
               subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-              subjectId: afterFirstDollar(record.subject.id),
+              subjectId: removeSubjectIdScope(record.subject.id),
               subjectSex: record.subject.sex,
               timestamp: record.date.toISOString(),
               value: arrayEntry.measureValue

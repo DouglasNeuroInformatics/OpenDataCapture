@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
+import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { omit } from 'lodash-es';
 import { unparse } from 'papaparse';
 
@@ -35,14 +36,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   const [records, setRecords] = useState<InstrumentVisualizationRecord[]>([]);
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [instrumentId, setInstrumentId] = useState<null | string>(null);
-
-  function afterFirstDollar(str: string) {
-    if (!str) return str;
-    const match = /\$(.*)/.exec(str);
-    if (!match) return str;
-    if (!match[1]) return str;
-    return match[1];
-  }
 
   const instrument = useInstrument(instrumentId) as AnyUnilingualScalarInstrument;
 
@@ -80,7 +73,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       return exportRecords.map((item) => {
         const obj: { [key: string]: any } = {
           GroupID: currentGroup ? currentGroup.id : 'root',
-          subjectId: afterFirstDollar(params.subjectId)
+          subjectId: removeSubjectIdScope(params.subjectId)
         };
         for (const key of columnNames) {
           const val = item[key];
@@ -113,7 +106,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
                   GroupID: currentGroup ? currentGroup.id : 'root',
                   // eslint-disable-next-line perfectionist/sort-objects
                   Date: toBasicISOString(date),
-                  SubjectID: afterFirstDollar(params.subjectId),
+                  SubjectID: removeSubjectIdScope(params.subjectId),
                   Variable: `${objKey}-${arrKey}`,
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, perfectionist/sort-objects
                   Value: arrItem
@@ -125,7 +118,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
               GroupID: currentGroup ? currentGroup.id : 'root',
               // eslint-disable-next-line perfectionist/sort-objects
               Date: toBasicISOString(date),
-              SubjectID: afterFirstDollar(params.subjectId),
+              SubjectID: removeSubjectIdScope(params.subjectId),
               Value: objVal,
               Variable: objKey
             });
