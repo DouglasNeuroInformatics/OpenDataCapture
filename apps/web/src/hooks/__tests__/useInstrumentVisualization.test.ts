@@ -72,7 +72,9 @@ describe('useInstrumentVisualization', () => {
       const [filename, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
       expect(filename).toContain('.csv');
       const csvContents = getContentFn();
-      expect(csvContents).toMatch(`subjectId,Date,someValue\r\ntestId,${toBasicISOString(FIXED_TEST_DATE)},abc`);
+      expect(csvContents).toMatch(
+        `GroupID,subjectId,Date,someValue\r\ntestGroupId,testId,${toBasicISOString(FIXED_TEST_DATE)},abc`
+      );
     });
   });
   describe('TSV', () => {
@@ -85,7 +87,9 @@ describe('useInstrumentVisualization', () => {
       const [filename, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
       expect(filename).toContain('.tsv');
       const tsvContents = getContentFn();
-      expect(tsvContents).toMatch(`subjectId\tDate\tsomeValue\r\ntestId\t${toBasicISOString(FIXED_TEST_DATE)}\tabc`);
+      expect(tsvContents).toMatch(
+        `GroupID\tsubjectId\tDate\tsomeValue\r\ntestGroupId\ttestId\t${toBasicISOString(FIXED_TEST_DATE)}\tabc`
+      );
     });
   });
   describe('CSV Long', () => {
@@ -100,7 +104,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvLongContents = getContentFn();
       expect(csvLongContents).toMatch(
-        `Date,SubjectID,Value,Variable\r\n${toBasicISOString(FIXED_TEST_DATE)},testId,abc,someValue`
+        `GroupID,Date,SubjectID,Value,Variable\r\ntestGroupId,${toBasicISOString(FIXED_TEST_DATE)},testId,abc,someValue`
       );
     });
   });
@@ -116,7 +120,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toMatch('.tsv');
       const tsvLongContents = getContentFn();
       expect(tsvLongContents).toMatch(
-        `Date\tSubjectID\tValue\tVariable\r\n${toBasicISOString(FIXED_TEST_DATE)}\ttestId\tabc\tsomeValue`
+        `GroupID\tDate\tSubjectID\tValue\tVariable\r\ntestGroupId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestId\tabc\tsomeValue`
       );
     });
   });

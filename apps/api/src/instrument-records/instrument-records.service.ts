@@ -38,6 +38,14 @@ type ExpandDataType =
       success: false;
     };
 
+function afterFirstDollar(str: string) {
+  if (!str) return str;
+  const match = /\$(.*)/.exec(str);
+  if (!match) return str;
+  if (!match[1]) return str;
+  return match[1];
+}
+
 @Injectable()
 export class InstrumentRecordsService {
   constructor(
@@ -180,7 +188,7 @@ export class InstrumentRecordsService {
             sessionId: record.session.id,
             sessionType: record.session.type,
             subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-            subjectId: record.subject.id,
+            subjectId: afterFirstDollar(record.subject.id),
             subjectSex: record.subject.sex,
             timestamp: record.date.toISOString(),
             value: measureValue
@@ -203,7 +211,7 @@ export class InstrumentRecordsService {
               sessionId: record.session.id,
               sessionType: record.session.type,
               subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-              subjectId: record.subject.id,
+              subjectId: afterFirstDollar(record.subject.id),
               subjectSex: record.subject.sex,
               timestamp: record.date.toISOString(),
               value: arrayEntry.measureValue

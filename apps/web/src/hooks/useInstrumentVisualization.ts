@@ -36,6 +36,14 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [instrumentId, setInstrumentId] = useState<null | string>(null);
 
+  function afterFirstDollar(str: string) {
+    if (!str) return str;
+    const match = /\$(.*)/.exec(str);
+    if (!match) return str;
+    if (!match[1]) return str;
+    return match[1];
+  }
+
   const instrument = useInstrument(instrumentId) as AnyUnilingualScalarInstrument;
 
   const instrumentInfoQuery = useInstrumentInfoQuery({
@@ -70,7 +78,10 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     const makeWideRows = () => {
       const columnNames = Object.keys(exportRecords[0]!);
       return exportRecords.map((item) => {
-        const obj: { [key: string]: any } = { subjectId: params.subjectId };
+        const obj: { [key: string]: any } = {
+          GroupID: currentGroup ? currentGroup.id : 'root',
+          subjectId: afterFirstDollar(params.subjectId)
+        };
         for (const key of columnNames) {
           const val = item[key];
           if (key === '__date__') {
@@ -99,8 +110,10 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             objVal.forEach((arrayItem) => {
               Object.entries(arrayItem as object).forEach(([arrKey, arrItem]) => {
                 longRecord.push({
+                  GroupID: currentGroup ? currentGroup.id : 'root',
+                  // eslint-disable-next-line perfectionist/sort-objects
                   Date: toBasicISOString(date),
-                  SubjectID: params.subjectId,
+                  SubjectID: afterFirstDollar(params.subjectId),
                   Variable: `${objKey}-${arrKey}`,
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, perfectionist/sort-objects
                   Value: arrItem
@@ -109,8 +122,10 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             });
           } else {
             longRecord.push({
+              GroupID: currentGroup ? currentGroup.id : 'root',
+              // eslint-disable-next-line perfectionist/sort-objects
               Date: toBasicISOString(date),
-              SubjectID: params.subjectId,
+              SubjectID: afterFirstDollar(params.subjectId),
               Value: objVal,
               Variable: objKey
             });
