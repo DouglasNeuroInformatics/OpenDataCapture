@@ -36,13 +36,11 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [instrumentId, setInstrumentId] = useState<null | string>(null);
 
-  function splitFirstDollar(str: string) {
-    const match = /^(.*?)\$(.*)$/.exec(str);
-    if (!match) {
-      return [str, str];
-    }
-    const [, before, after] = match;
-    return [before, after];
+  function afterFirstDollar(str: string) {
+    const match = /\$(.*)/.exec(str);
+    if (!match) return str;
+    if (!match[1]) return str;
+    return match[1];
   }
 
   const instrument = useInstrument(instrumentId) as AnyUnilingualScalarInstrument;
@@ -80,8 +78,8 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       const columnNames = Object.keys(exportRecords[0]!);
       return exportRecords.map((item) => {
         const obj: { [key: string]: any } = {
-          GroupID: splitFirstDollar(params.subjectId)[0],
-          subjectId: splitFirstDollar(params.subjectId)[1]
+          GroupID: currentGroup ? currentGroup.id : 'root',
+          subjectId: afterFirstDollar(params.subjectId)
         };
         for (const key of columnNames) {
           const val = item[key];
@@ -111,10 +109,10 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             objVal.forEach((arrayItem) => {
               Object.entries(arrayItem as object).forEach(([arrKey, arrItem]) => {
                 longRecord.push({
-                  GroupID: splitFirstDollar(params.subjectId)[0],
+                  GroupID: currentGroup ? currentGroup.id : 'root',
                   // eslint-disable-next-line perfectionist/sort-objects
                   Date: toBasicISOString(date),
-                  SubjectID: splitFirstDollar(params.subjectId)[1],
+                  SubjectID: afterFirstDollar(params.subjectId),
                   Variable: `${objKey}-${arrKey}`,
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, perfectionist/sort-objects
                   Value: arrItem
@@ -123,10 +121,10 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             });
           } else {
             longRecord.push({
-              GroupID: splitFirstDollar(params.subjectId)[0],
+              GroupID: currentGroup ? currentGroup.id : 'root',
               // eslint-disable-next-line perfectionist/sort-objects
               Date: toBasicISOString(date),
-              SubjectID: splitFirstDollar(params.subjectId)[1],
+              SubjectID: afterFirstDollar(params.subjectId),
               Value: objVal,
               Variable: objKey
             });
