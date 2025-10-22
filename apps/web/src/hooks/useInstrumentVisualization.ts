@@ -11,6 +11,7 @@ import { useInstrument } from '@/hooks/useInstrument';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
+import { downloadSubjectTableExcel } from '@/utils/excel';
 
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
@@ -53,7 +54,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
-  const dl = (option: 'CSV' | 'CSV Long' | 'JSON' | 'TSV' | 'TSV Long') => {
+  const dl = (option: 'CSV' | 'CSV Long' | 'Excel' | 'Excel Long' | 'JSON' | 'TSV' | 'TSV Long') => {
     if (!instrument) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
       return;
@@ -155,6 +156,16 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
           const csv = parseHelper(rows, ',');
           return csv;
         });
+        break;
+      }
+      case 'Excel': {
+        const rows = makeWideRows();
+        downloadSubjectTableExcel(`${baseFilename}.xlsx`, rows);
+        break;
+      }
+      case 'Excel Long': {
+        const rows = makeLongRows();
+        downloadSubjectTableExcel(`${baseFilename}.xlsx`, rows);
         break;
       }
       case 'JSON': {
