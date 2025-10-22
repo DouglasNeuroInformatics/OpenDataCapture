@@ -37,6 +37,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   const [instrumentId, setInstrumentId] = useState<null | string>(null);
 
   function afterFirstDollar(str: string) {
+    if (!str) return str;
     const match = /\$(.*)/.exec(str);
     if (!match) return str;
     if (!match[1]) return str;
