@@ -36,6 +36,15 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   const [minDate, setMinDate] = useState<Date | null>(null);
   const [instrumentId, setInstrumentId] = useState<null | string>(null);
 
+  function splitFirstDollar(str: string) {
+    const match = /^(.*?)\$(.*)$/.exec(str);
+    if (!match) {
+      return [str, str];
+    }
+    const [, before, after] = match;
+    return [before, after];
+  }
+
   const instrument = useInstrument(instrumentId) as AnyUnilingualScalarInstrument;
 
   const instrumentInfoQuery = useInstrumentInfoQuery({
@@ -70,7 +79,10 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     const makeWideRows = () => {
       const columnNames = Object.keys(exportRecords[0]!);
       return exportRecords.map((item) => {
-        const obj: { [key: string]: any } = { subjectId: params.subjectId };
+        const obj: { [key: string]: any } = {
+          GroupID: splitFirstDollar(params.subjectId)[0],
+          subjectId: splitFirstDollar(params.subjectId)[1]
+        };
         for (const key of columnNames) {
           const val = item[key];
           if (key === '__date__') {
@@ -99,8 +111,10 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             objVal.forEach((arrayItem) => {
               Object.entries(arrayItem as object).forEach(([arrKey, arrItem]) => {
                 longRecord.push({
+                  GroupID: splitFirstDollar(params.subjectId)[0],
+                  // eslint-disable-next-line perfectionist/sort-objects
                   Date: toBasicISOString(date),
-                  SubjectID: params.subjectId,
+                  SubjectID: splitFirstDollar(params.subjectId)[1],
                   Variable: `${objKey}-${arrKey}`,
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, perfectionist/sort-objects
                   Value: arrItem
@@ -109,8 +123,10 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             });
           } else {
             longRecord.push({
+              GroupID: splitFirstDollar(params.subjectId)[0],
+              // eslint-disable-next-line perfectionist/sort-objects
               Date: toBasicISOString(date),
-              SubjectID: params.subjectId,
+              SubjectID: splitFirstDollar(params.subjectId)[1],
               Value: objVal,
               Variable: objKey
             });
