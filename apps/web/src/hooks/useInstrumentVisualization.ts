@@ -160,12 +160,12 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       }
       case 'Excel': {
         const rows = makeWideRows();
-        downloadSubjectTableExcel(`${baseFilename}.xlsx`, rows);
+        downloadSubjectTableExcel(`${baseFilename}.xlsx`, rows, removeSubjectIdScope(params.subjectId));
         break;
       }
       case 'Excel Long': {
         const rows = makeLongRows();
-        downloadSubjectTableExcel(`${baseFilename}.xlsx`, rows);
+        downloadSubjectTableExcel(`${baseFilename}.xlsx`, rows, removeSubjectIdScope(params.subjectId));
         break;
       }
       case 'JSON': {

@@ -7,8 +7,8 @@ export function downloadExcel(filename: string, recordsExport: InstrumentRecords
   writeFileXLSX(workbook, filename);
 }
 
-export function downloadSubjectTableExcel(filename: string, records: { [key: string]: any }[]) {
+export function downloadSubjectTableExcel(filename: string, records: { [key: string]: any }[], name: string) {
   const workbook = utils.book_new();
-  utils.book_append_sheet(workbook, utils.json_to_sheet(records), 'ULTRA_LONG');
+  utils.book_append_sheet(workbook, utils.json_to_sheet(records), name);
   writeFileXLSX(workbook, filename);
 }
