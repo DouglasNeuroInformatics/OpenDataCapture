@@ -7,8 +7,15 @@ export function downloadExcel(filename: string, recordsExport: InstrumentRecords
   writeFileXLSX(workbook, filename);
 }
 
-export function downloadSubjectTableExcel(filename: string, records: { [key: string]: any }[]) {
+export function downloadSubjectTableExcel(filename: string, records: { [key: string]: any }[], name: string) {
+  const sanitizedName =
+    name
+      .replace(/[\\/?*[\]:]/g, '_') // Replace invalid chars
+      .slice(0, 31) // Max 31 chars
+      .replace(/^'|'$/g, '') // Remove leading/trailing apostrophes
+      .trim() || 'Subject'; // Fallback if empty
   const workbook = utils.book_new();
-  utils.book_append_sheet(workbook, utils.json_to_sheet(records), 'ULTRA_LONG');
+  utils.book_append_sheet(workbook, utils.json_to_sheet(records), sanitizedName);
+  utils.book_append_sheet(workbook, utils.json_to_sheet(records), name);
   writeFileXLSX(workbook, filename);
 }
