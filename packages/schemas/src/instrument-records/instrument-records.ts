@@ -46,6 +46,7 @@ export type InstrumentRecord = z.infer<typeof $InstrumentRecord>;
 
 export type InstrumentRecordsExport = {
   groupId: string;
+  userId: string;
   instrumentEdition: number;
   instrumentName: string;
   measure: string;
