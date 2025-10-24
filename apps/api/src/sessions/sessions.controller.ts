@@ -1,5 +1,5 @@
 import { RouteAccess } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Session } from '@prisma/client';
 
@@ -15,5 +15,12 @@ export class SessionsController {
   @RouteAccess({ action: 'create', subject: 'Session' })
   create(@Body() data: CreateSessionDto): Promise<Session> {
     return this.sessionsService.create(data);
+  }
+
+  @ApiOperation({ description: 'Find Session by ID' })
+  @Get()
+  @RouteAccess({ action: 'read', subject: 'Session' })
+  findByID(id: string): Promise<Session> {
+    return this.sessionsService.findById(id);
   }
 }

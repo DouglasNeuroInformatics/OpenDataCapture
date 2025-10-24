@@ -3,7 +3,6 @@ import { z } from 'zod/v4';
 
 import { $BaseModel, $Json } from '../core/core.js';
 import { $InstrumentMeasureValue } from '../instrument/instrument.js';
-
 import type { SessionType } from '../session/session.js';
 
 export const $CreateInstrumentRecordData = z.object({
@@ -39,7 +38,8 @@ export const $InstrumentRecord = $BaseModel.extend({
   date: z.coerce.date(),
   groupId: z.string().nullish(),
   instrumentId: z.string(),
-  subjectId: z.string()
+  subjectId: z.string(),
+  sessionId: z.string()
 });
 
 export type InstrumentRecord = z.infer<typeof $InstrumentRecord>;
