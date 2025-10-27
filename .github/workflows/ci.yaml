@@ -13,7 +13,7 @@ jobs:
         ports:
           - 27017:27017
         options: >-
-          --health-cmd echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }" | mongosh --port 27017 --quiet
+          --health-cmd "echo \"try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }\" | mongosh --port 27017 --quiet"
           --health-interval 5s
           --health-retries 30
           --health-start-interval 1s
