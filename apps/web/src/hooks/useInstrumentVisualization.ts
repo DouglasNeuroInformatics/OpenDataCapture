@@ -12,6 +12,7 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
+import { useFindSession } from './useFindSession';
 
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
@@ -53,6 +54,19 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       subjectId: params.subjectId
     }
   });
+
+  const usersQuery = recordsQuery.data?.map((item) => {
+    const sessionInfo = useFindSession({
+      enabled: true,
+      params: { id: item.sessionId }
+    });
+    if (sessionInfo.data) {
+      return sessionInfo.data.userId;
+    }
+    return 'N/A';
+  });
+
+  console.log(usersQuery);
 
   const dl = (option: 'CSV' | 'CSV Long' | 'Excel' | 'Excel Long' | 'JSON' | 'TSV' | 'TSV Long') => {
     if (!instrument) {
