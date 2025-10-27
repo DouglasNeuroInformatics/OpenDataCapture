@@ -4,6 +4,7 @@ import { parseNumber } from '@douglasneuroinformatics/libjs';
 import { defineConfig, devices } from '@playwright/test';
 
 const API_PORT = parseNumber(process.env.API_DEV_SERVER_PORT);
+const GATEWAY_PORT = parseNumber(process.env.GATEWAY_DEV_SERVER_PORT);
 const WEB_PORT = parseNumber(process.env.WEB_DEV_SERVER_PORT);
 
 export default defineConfig({
@@ -52,7 +53,18 @@ export default defineConfig({
         signal: 'SIGINT',
         timeout: 1000
       },
+      timeout: 10_000,
       url: `http://localhost:${API_PORT}`
+    },
+    {
+      command: 'pnpm dev:test',
+      cwd: path.resolve(import.meta.dirname, '../../apps/gateway'),
+      gracefulShutdown: {
+        signal: 'SIGINT',
+        timeout: 1000
+      },
+      timeout: 10_000,
+      url: `http://localhost:${GATEWAY_PORT}/api/healthcheck`
     },
     {
       command: 'pnpm dev:test',
@@ -61,6 +73,7 @@ export default defineConfig({
         signal: 'SIGINT',
         timeout: 1000
       },
+      timeout: 10_000,
       url: `http://localhost:${WEB_PORT}`
     }
   ]
