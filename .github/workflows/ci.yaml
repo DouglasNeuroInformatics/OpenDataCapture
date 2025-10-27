@@ -13,6 +13,12 @@ jobs:
         ports:
           - 27017:27017
         options: >-
+          --health-cmd echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }" | mongosh --port 27017 --quiet
+          --health-interval 5s
+          --health-retries 30
+          --health-start-interval 1s
+          --health-start-period 0s
+          --health-timeout 30s
           --name mongo
     steps:
       - name: Checkout Code
@@ -28,9 +34,6 @@ jobs:
         run: ./scripts/generate-env.sh
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
-      - name: Init Mongo
-        run: |
-          docker run mongo mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
       - name: Install Playwright
         run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps
       - name: Lint
