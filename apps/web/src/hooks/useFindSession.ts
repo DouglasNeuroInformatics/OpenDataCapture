@@ -23,7 +23,7 @@ export const useFindSession = (
         params,
         transformResponse: [(data: string) => JSON.parse(data, reviver) as unknown]
       });
-      return $Session.array().parseAsync(response.data);
+      return $Session.parseAsync(response.data);
     },
     queryKey: ['sessions', ...Object.values(params)]
   });
