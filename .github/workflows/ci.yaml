@@ -20,6 +20,8 @@ jobs:
         run: ./scripts/generate-env.sh
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+      - name: Install Playwright
+        run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps
       - name: Lint
         run: pnpm lint
       - name: Test
