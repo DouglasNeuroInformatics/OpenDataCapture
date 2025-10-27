@@ -24,5 +24,7 @@ jobs:
         run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps
       - name: Lint
         run: pnpm lint
-      - name: Test
+      - name: Unit Tests
         run: pnpm test
+      - name: End-to-End Tests
+        run: pnpm --filter "@opendatacapture/e2e" test
