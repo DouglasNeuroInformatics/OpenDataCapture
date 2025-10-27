@@ -31,7 +31,9 @@ jobs:
           cache: 'pnpm'
           node-version-file: '.nvmrc'
       - name: Generate Environment
-        run: ./scripts/generate-env.sh
+        run: |
+          ./scripts/generate-env.sh
+          sed -i 's/^MONGO_URI=.*/MONGO_URI=mongodb:\/\/mongo:27017/' .env
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
       - name: Install Playwright
