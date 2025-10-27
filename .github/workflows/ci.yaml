@@ -6,6 +6,18 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    container: node:lts-jod
+    services:
+      mongo:
+        image: mongo
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --name mongo
     steps:
       - name: Checkout Code
         uses: actions/checkout@v5
@@ -20,6 +32,9 @@ jobs:
         run: ./scripts/generate-env.sh
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+      - name: Init Mongo
+        run: |
+          docker run mongo mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
       - name: Install Playwright
         run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps
       - name: Lint
