@@ -9,7 +9,7 @@ jobs:
     container: node:lts-jod
     services:
       mongo:
-        image: mongo
+        image: mongo:7
         ports:
           - 27017:27017
         options: >-
