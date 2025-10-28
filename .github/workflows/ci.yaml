@@ -6,19 +6,6 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
-    services:
-      mongo:
-        image: mongo:7
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "echo \"try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }\" | mongosh --port 27017 --quiet"
-          --health-interval 5s
-          --health-retries 30
-          --health-start-interval 1s
-          --health-start-period 0s
-          --health-timeout 30s
-          --name mongo
     steps:
       - name: Checkout Code
         uses: actions/checkout@v5
@@ -35,6 +22,7 @@ jobs:
       #     sed -i 's/^MONGO_URI=.*/MONGO_URI=mongodb:\/\/mongo:27017/' .env
       - name: Setup Mongo
         run: |
+          docker run -d --name mongo -p 27017:27017 --replSet rs0
           docker exec mongo mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
       - name: Configure Git
         run: |
