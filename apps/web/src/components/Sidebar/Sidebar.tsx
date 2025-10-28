@@ -22,8 +22,11 @@ export const Sidebar = () => {
 
   const { t } = useTranslation();
   return (
-    <div className="flex h-screen w-[19rem] flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700">
-      <div id="sidebar-branding-container">
+    <div
+      className="flex h-screen w-[19rem] flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700"
+      data-testid="sidebar"
+    >
+      <div data-testid="sidebar-branding-container" id="sidebar-branding-container">
         <Branding className="h-12" fontSize="md" logoVariant="light" />
       </div>
       <hr className="my-2 h-[1px] border-none bg-slate-700" />

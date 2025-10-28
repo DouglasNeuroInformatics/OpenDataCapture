@@ -113,6 +113,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
           }
         }
       ]}
+      data-testid="identification-form"
       initialValues={{
         identificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'PERSONAL_INFO'
       }}

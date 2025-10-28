@@ -6,6 +6,7 @@ export const UserIcon = (props: React.SVGProps<SVGSVGElement>) => {
       aria-hidden="true"
       className="h-6 w-6"
       data-slot="icon"
+      data-testid="user-icon"
       fill="currentColor"
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
