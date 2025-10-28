@@ -22,7 +22,7 @@ jobs:
       #     sed -i 's/^MONGO_URI=.*/MONGO_URI=mongodb:\/\/mongo:27017/' .env
       - name: Setup Mongo
         run: |
-          docker run -d --name mongo -p 27017:27017 --replSet rs0
+          docker run -d --name mongo -p 27017:27017 mongo:7 --replSet rs0
           docker exec mongo mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
       - name: Configure Git
         run: |
