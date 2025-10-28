@@ -6,7 +6,6 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
-    container: node:lts-jod
     services:
       mongo:
         image: mongo:7
@@ -30,10 +29,10 @@ jobs:
         with:
           cache: 'pnpm'
           node-version-file: '.nvmrc'
-      - name: Generate Environment
-        run: |
-          ./scripts/generate-env.sh
-          sed -i 's/^MONGO_URI=.*/MONGO_URI=mongodb:\/\/mongo:27017/' .env
+      # - name: Generate Environment
+      #   run: |
+      #     ./scripts/generate-env.sh
+      #     sed -i 's/^MONGO_URI=.*/MONGO_URI=mongodb:\/\/mongo:27017/' .env
       - name: Setup Mongo
         run: |
           docker exec mongo mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
