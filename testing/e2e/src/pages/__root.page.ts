@@ -15,5 +15,6 @@ export abstract class RootPage {
 
   async goto() {
     await this.$ref.goto(this.defaultUrl);
+    await this.$ref.waitForURL(this.defaultUrl);
   }
 }
