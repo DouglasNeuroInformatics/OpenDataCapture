@@ -27,6 +27,7 @@ export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(fun
       )}
       data-nav-url={url}
       data-spotlight-type="nav-button"
+      data-testid={`nav-button-${url}`}
       disabled={disabled}
       ref={ref}
       type="button"

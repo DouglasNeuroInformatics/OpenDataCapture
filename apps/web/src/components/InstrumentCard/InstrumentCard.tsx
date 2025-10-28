@@ -125,6 +125,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
   return (
     <Card
       className="group flex gap-8 p-6 transition-transform duration-300 ease-in-out hover:scale-[1.03] hover:cursor-pointer sm:p-8"
+      data-testid={`instrument-card-${instrument.id}`}
       role="button"
       tabIndex={0}
       onClick={onClick}

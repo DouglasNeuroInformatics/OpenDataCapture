@@ -155,7 +155,7 @@ export const StartSessionForm = ({
           }
         }
       ]}
-      data-cy="start-session-form"
+      data-testid="start-session-form"
       initialValues={initialValues}
       readOnly={readOnly}
       submitBtnLabel={t('core.submit')}

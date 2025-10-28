@@ -1,5 +1,5 @@
 {
-  "name": "@opendatacapture/test",
+  "name": "@opendatacapture/e2e",
   "type": "module",
   "version": "0.0.0",
   "private": true,

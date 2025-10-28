@@ -22,8 +22,11 @@ export const Sidebar = () => {
 
   const { t } = useTranslation();
   return (
-    <div className="flex h-screen w-[19rem] flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700">
-      <div id="sidebar-branding-container">
+    <div
+      className="flex h-screen w-[19rem] flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700"
+      data-testid="sidebar"
+    >
+      <div data-testid="sidebar-branding-container" id="sidebar-branding-container">
         <Branding className="h-12" fontSize="md" logoVariant="light" />
       </div>
       <hr className="my-2 h-[1px] border-none bg-slate-700" />
@@ -86,7 +89,7 @@ export const Sidebar = () => {
             <h5 className="text-sm font-medium">{t('common.sessionInProgress')}</h5>
             <hr className="my-1.5 h-[1px] border-none bg-slate-700" />
             {isSubjectWithPersonalInfo(currentSession.subject) ? (
-              <div data-cy="current-session-info">
+              <div data-testid="current-session-info">
                 <p>{`${t('core.fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
                 <p>
                   {`${t('core.identificationData.dateOfBirth.label')}: ${toBasicISOString(currentSession.subject.dateOfBirth)}`}{' '}
@@ -96,7 +99,7 @@ export const Sidebar = () => {
                 </p>
               </div>
             ) : (
-              <div data-cy="current-session-info">
+              <div data-testid="current-session-info">
                 <p>ID: {removeSubjectIdScope(currentSession.subject.id)}</p>
               </div>
             )}

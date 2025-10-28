@@ -9,7 +9,7 @@ export const Footer = () => {
   const { t } = useTranslation('layout');
 
   return (
-    <footer className="text-muted-foreground container py-3 text-sm">
+    <footer className="text-muted-foreground container py-3 text-sm" data-testid="footer">
       <hr className="my-3 border-slate-200 dark:border-slate-700" />
       <div className="flex items-center justify-center">
         <div className="mb-1 flex flex-row flex-wrap font-medium lg:flex-nowrap">

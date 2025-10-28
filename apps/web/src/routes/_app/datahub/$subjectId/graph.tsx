@@ -105,7 +105,7 @@ const RouteComponent = () => {
       <div className="mb-2">
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex flex-col gap-2 lg:flex-row">
-            <div data-cy="instrument-select-dropdown-container">
+            <div data-testid="instrument-select-dropdown-container">
               <SelectInstrument
                 options={instrumentOptions}
                 onSelect={(id) => {
@@ -116,7 +116,7 @@ const RouteComponent = () => {
             </div>
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
-            <div data-cy="measure-select-dropdown-container">
+            <div data-testid="measure-select-dropdown-container">
               <ListboxDropdown
                 widthFull
                 checkPosition="right"
@@ -129,10 +129,10 @@ const RouteComponent = () => {
                 variant="secondary"
               />
             </div>
-            <div data-cy="time-select-dropdown-container">
+            <div data-testid="time-select-dropdown-container">
               <TimeDropdown disabled={!instrumentId} setMinTime={setMinDate} />
             </div>
-            <div className="relative w-full whitespace-nowrap" data-cy="download-button-container">
+            <div className="relative w-full whitespace-nowrap" data-testid="download-button-container">
               <ActionDropdown
                 widthFull
                 disabled={!instrumentId}

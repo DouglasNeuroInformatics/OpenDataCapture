@@ -116,7 +116,7 @@ const RouteComponent = () => {
               value={currentGroup.id}
               onValueChange={(id) => changeGroup(currentUser!.groups.find((group) => group.id === id)!)!}
             >
-              <Select.Trigger className="w-full md:w-[180px]">
+              <Select.Trigger className="w-full md:w-[180px]" data-testid="dashboard-group-select">
                 <Select.Value />
               </Select.Trigger>
               <Select.Content>
@@ -131,9 +131,9 @@ const RouteComponent = () => {
             </Select>
           )}
         </div>
-        <div className="body-font">
+        <div className="body-font" data-testid="dashboard-statistics">
           <div className="grid grid-cols-1 gap-6 text-center lg:grid-cols-2 xl:grid-cols-4">
-            <div className="group transform transition-all duration-300 hover:scale-105">
+            <div className="group transform transition-all duration-300 hover:scale-105" data-testid="statistic-users">
               <StatisticCard
                 icon={
                   <UsersIcon className="h-12 w-12 text-blue-600 transition-transform duration-300 group-hover:scale-110 dark:text-blue-400" />
@@ -145,7 +145,10 @@ const RouteComponent = () => {
                 value={summaryQuery.data.counts.users}
               />
             </div>
-            <div className="group transform transition-all duration-300 hover:scale-105">
+            <div
+              className="group transform transition-all duration-300 hover:scale-105"
+              data-testid="statistic-subjects"
+            >
               <StatisticCard
                 icon={
                   <UserIcon className="h-12 w-12 text-emerald-600 transition-transform duration-300 group-hover:scale-110 dark:text-emerald-400" />
@@ -157,7 +160,10 @@ const RouteComponent = () => {
                 value={summaryQuery.data.counts.subjects}
               />
             </div>
-            <div className="group transform transition-all duration-300 hover:scale-105">
+            <div
+              className="group transform transition-all duration-300 hover:scale-105"
+              data-testid="statistic-instruments"
+            >
               <StatisticCard
                 icon={
                   <ClipboardDocumentIcon className="h-12 w-12 text-amber-600 transition-transform duration-300 group-hover:scale-110 dark:text-amber-400" />
@@ -169,7 +175,10 @@ const RouteComponent = () => {
                 value={summaryQuery.data.counts.instruments}
               />
             </div>
-            <div className="group transform transition-all duration-300 hover:scale-105">
+            <div
+              className="group transform transition-all duration-300 hover:scale-105"
+              data-testid="statistic-records"
+            >
               <StatisticCard
                 icon={
                   <DocumentTextIcon className="h-12 w-12 text-purple-600 transition-transform duration-300 group-hover:scale-110 dark:text-purple-400" />
@@ -184,7 +193,10 @@ const RouteComponent = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <div className="group rounded-2xl border border-slate-200/60 bg-white/90 shadow-xl backdrop-blur-sm transition-all duration-300 hover:border-blue-300/60 hover:shadow-2xl dark:border-slate-700/60 dark:bg-slate-800/90 dark:hover:border-blue-600/60">
+          <div
+            className="group rounded-2xl border border-slate-200/60 bg-white/90 shadow-xl backdrop-blur-sm transition-all duration-300 hover:border-blue-300/60 hover:shadow-2xl dark:border-slate-700/60 dark:bg-slate-800/90 dark:hover:border-blue-600/60"
+            data-testid="dashboard-chart-records-sessions"
+          >
             <div className="p-8 pb-4">
               <div className="flex items-center gap-4">
                 <div className="rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-600/20 p-3 transition-all duration-300 group-hover:from-blue-500/30 group-hover:to-indigo-600/30">
@@ -301,7 +313,10 @@ const RouteComponent = () => {
               </ResponsiveContainer>
             </div>
           </div>
-          <div className="group rounded-2xl border border-slate-200/60 bg-white/90 shadow-xl backdrop-blur-sm transition-all duration-300 hover:border-amber-300/60 hover:shadow-2xl dark:border-slate-700/60 dark:bg-slate-800/90 dark:hover:border-amber-600/60">
+          <div
+            className="group rounded-2xl border border-slate-200/60 bg-white/90 shadow-xl backdrop-blur-sm transition-all duration-300 hover:border-amber-300/60 hover:shadow-2xl dark:border-slate-700/60 dark:bg-slate-800/90 dark:hover:border-amber-600/60"
+            data-testid="dashboard-chart-subjects-growth"
+          >
             <div className="p-8 pb-4">
               <div className="flex items-center gap-4">
                 <div className="rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-600/20 p-3 transition-all duration-300 group-hover:from-amber-500/30 group-hover:to-orange-600/30">
