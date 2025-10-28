@@ -46,10 +46,13 @@ const RouteComponent = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col">
+    <div className="flex min-h-screen w-full flex-col" data-testid="login-page">
       {setupStateQuery.data.isDemo && <DemoBanner onLogin={(credentials) => void handleLogin(credentials)} />}
       <div className="flex w-full grow flex-col items-center justify-center">
-        <Card className="sm:bg-card w-full max-w-sm border-none bg-inherit px-2.5 py-1.5 sm:border-solid">
+        <Card
+          className="sm:bg-card w-full max-w-sm border-none bg-inherit px-2.5 py-1.5 sm:border-solid"
+          data-testid="login-card"
+        >
           <Card.Header className="flex items-center justify-center">
             <Logo className="m-1.5 h-auto w-16" variant="auto" />
             <Heading variant="h2">{t('login')}</Heading>
@@ -57,7 +60,7 @@ const RouteComponent = () => {
           <Card.Content>
             <LoginForm onSubmit={(credentials) => void handleLogin(credentials)} />
           </Card.Content>
-          <Card.Footer className="text-muted-foreground flex justify-between">
+          <Card.Footer className="text-muted-foreground flex justify-between" data-testid="login-footer-toggles">
             <LanguageToggle
               align="start"
               options={{

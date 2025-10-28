@@ -144,6 +144,7 @@ const RouteComponent = () => {
             <Dialog.Trigger className="grow">
               <SearchBar
                 className="[&>input]:text-foreground [&>input]:placeholder-foreground"
+                data-testid="datahub-subject-lookup-search"
                 id="subject-lookup-search-bar"
                 placeholder={t({
                   en: 'Click to Search',
@@ -152,7 +153,7 @@ const RouteComponent = () => {
                 readOnly={true}
               />
             </Dialog.Trigger>
-            <Dialog.Content data-spotlight-type="subject-lookup-modal">
+            <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
               <Dialog.Header>
                 <Dialog.Title>{t('datahub.index.lookup.title')}</Dialog.Title>
               </Dialog.Header>
@@ -163,6 +164,7 @@ const RouteComponent = () => {
             <ActionDropdown
               widthFull
               data-spotlight-type="export-data-dropdown"
+              data-testid="datahub-export-dropdown"
               options={['CSV', 'JSON', 'Excel']}
               title={t('datahub.index.table.export')}
               onSelection={handleExportSelection}
