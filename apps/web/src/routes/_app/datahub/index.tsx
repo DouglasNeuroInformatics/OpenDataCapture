@@ -51,7 +51,7 @@ const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
         }
       ]}
       data={data}
-      data-cy="master-data-table"
+      data-testid="master-data-table"
       entriesPerPage={15}
       minRows={15}
       onEntryClick={onSelect}

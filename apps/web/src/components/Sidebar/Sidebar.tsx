@@ -86,7 +86,7 @@ export const Sidebar = () => {
             <h5 className="text-sm font-medium">{t('common.sessionInProgress')}</h5>
             <hr className="my-1.5 h-[1px] border-none bg-slate-700" />
             {isSubjectWithPersonalInfo(currentSession.subject) ? (
-              <div data-cy="current-session-info">
+              <div data-testid="current-session-info">
                 <p>{`${t('core.fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
                 <p>
                   {`${t('core.identificationData.dateOfBirth.label')}: ${toBasicISOString(currentSession.subject.dateOfBirth)}`}{' '}
@@ -96,7 +96,7 @@ export const Sidebar = () => {
                 </p>
               </div>
             ) : (
-              <div data-cy="current-session-info">
+              <div data-testid="current-session-info">
                 <p>ID: {removeSubjectIdScope(currentSession.subject.id)}</p>
               </div>
             )}
