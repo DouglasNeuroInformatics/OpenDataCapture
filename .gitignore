@@ -74,5 +74,4 @@ storybook-static
 .claude/settings.local.json
 
 # playwright
-testing/e2e/.output/
-testing/e2e/playwright/.cache/
+test/.playwright

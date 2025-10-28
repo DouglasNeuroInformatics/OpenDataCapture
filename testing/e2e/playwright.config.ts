@@ -1,50 +1,69 @@
 import * as path from 'node:path';
 
-import { parseNumber } from '@douglasneuroinformatics/libjs';
+import { parseNumber, range, unwrap } from '@douglasneuroinformatics/libjs';
 import { defineConfig, devices } from '@playwright/test';
+import type { Project } from '@playwright/test';
 
-const API_PORT = parseNumber(process.env.API_DEV_SERVER_PORT);
-const GATEWAY_PORT = parseNumber(process.env.GATEWAY_DEV_SERVER_PORT);
-const WEB_PORT = parseNumber(process.env.WEB_DEV_SERVER_PORT);
+import type { BrowserTarget, ProjectMetadata } from './src/helpers/types';
+
+const apiPort = parseNumber(process.env.API_DEV_SERVER_PORT);
+const gatewayPort = parseNumber(process.env.GATEWAY_DEV_SERVER_PORT);
+const webPort = parseNumber(process.env.WEB_DEV_SERVER_PORT);
+
+if (Number.isNaN(apiPort)) {
+  throw new Error(`Expected API_DEV_SERVER_PORT to be number, got ${process.env.API_DEV_SERVER_PORT}`);
+} else if (!gatewayPort) {
+  throw new Error(`Expected GATEWAY_DEV_SERVER_PORT to be number, got ${process.env.GATEWAY_DEV_SERVER_PORT}`);
+} else if (Number.isNaN(webPort)) {
+  throw new Error(`Expected WEB_DEV_SERVER_PORT to be number, got ${process.env.WEB_DEV_SERVER_PORT}`);
+}
+
+const baseURL = `http://localhost:${webPort}`;
+
+const browsers: { target: BrowserTarget; use: Project['use'] }[] = [
+  { target: 'Desktop Chrome', use: { ...devices['Desktop Chrome'], channel: 'chromium', headless: true } },
+  { target: 'Desktop Firefox', use: { ...devices['Desktop Firefox'], headless: true } },
+  { target: 'Desktop Safari', use: devices['Desktop Safari'] }
+] as const;
 
 export default defineConfig({
-  fullyParallel: true,
-  outputDir: path.resolve(import.meta.dirname, '.output/results'),
+  maxFailures: 1,
+  outputDir: path.resolve(import.meta.dirname, '.playwright/output'),
   projects: [
     {
       name: 'Global Setup',
       teardown: 'Global Teardown',
-      testMatch: '**/global/global.setup.spec.ts'
+      testMatch: '**/global/global.setup.spec.ts',
+      use: {
+        baseURL
+      }
     },
     {
       name: 'Global Teardown',
-      testMatch: '**/global/global.teardown.spec.ts'
+      testMatch: '**/global/global.teardown.spec.ts',
+      use: {
+        baseURL
+      }
     },
-    {
-      dependencies: ['Global Setup'],
-      name: 'Desktop Chrome',
-      testIgnore: '**/global/**',
-      use: { ...devices['Desktop Chrome'] }
-    },
-    {
-      dependencies: ['Global Setup'],
-      name: 'Desktop Firefox',
-      testIgnore: '**/global/**',
-      use: { ...devices['Desktop Firefox'] }
-    },
-    {
-      dependencies: ['Global Setup'],
-      name: 'Desktop Safari',
-      testIgnore: '**/global/**',
-      use: { ...devices['Desktop Safari'] }
-    }
+    ...unwrap(range(1, 4)).flatMap((i) => {
+      return browsers.map((browser) => {
+        return {
+          dependencies: i === 1 ? ['Global Setup'] : [`${i - 1}.x - ${browser.target}`],
+          metadata: {
+            browserTarget: browser.target
+          } satisfies ProjectMetadata,
+          name: `${i}.x - ${browser.target}`,
+          testMatch: `**/${i}.*.spec.ts`,
+          use: {
+            ...browser.use,
+            baseURL
+          }
+        };
+      });
+    })
   ],
   reporter: [['html', { open: 'never', outputFolder: path.resolve(import.meta.dirname, '.output/report') }]],
   testDir: path.resolve(import.meta.dirname, 'src'),
-  use: {
-    baseURL: `http://localhost:${WEB_PORT}`,
-    trace: 'on-first-retry'
-  },
   webServer: [
     {
       command: 'pnpm dev:test',
@@ -54,7 +73,7 @@ export default defineConfig({
         timeout: 1000
       },
       timeout: 10_000,
-      url: `http://localhost:${API_PORT}`
+      url: `http://localhost:${apiPort}`
     },
     {
       command: 'pnpm dev:test',
@@ -64,7 +83,7 @@ export default defineConfig({
         timeout: 1000
       },
       timeout: 10_000,
-      url: `http://localhost:${GATEWAY_PORT}/api/healthcheck`
+      url: `http://localhost:${gatewayPort}/api/healthcheck`
     },
     {
       command: 'pnpm dev:test',
@@ -74,7 +93,8 @@ export default defineConfig({
         timeout: 1000
       },
       timeout: 10_000,
-      url: `http://localhost:${WEB_PORT}`
+      url: `http://localhost:${webPort}`
     }
-  ]
+  ],
+  workers: process.env.CI ? 1 : undefined
 });
