@@ -62,7 +62,7 @@ export default defineConfig({
       });
     })
   ],
-  reporter: [['html', { open: 'never', outputFolder: path.resolve(import.meta.dirname, '.output/report') }]],
+  reporter: [['html', { open: 'never', outputFolder: path.resolve(import.meta.dirname, '.playwright/report') }]],
   testDir: path.resolve(import.meta.dirname, 'src'),
   webServer: [
     {
