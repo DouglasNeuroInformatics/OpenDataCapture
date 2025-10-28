@@ -16,10 +16,8 @@ jobs:
         with:
           cache: 'pnpm'
           node-version-file: '.nvmrc'
-      # - name: Generate Environment
-      #   run: |
-      #     ./scripts/generate-env.sh
-      #     sed -i 's/^MONGO_URI=.*/MONGO_URI=mongodb:\/\/mongo:27017/' .env
+      - name: Generate Environment
+        run: ./scripts/generate-env.sh
       - name: Setup Mongo
         run: |
           docker run -d --name mongo -p 27017:27017 mongo:7 --replSet rs0
