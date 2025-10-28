@@ -37,7 +37,7 @@ jobs:
       - name: Configure Git
         run: |
           # necessary for the git commands used for release info
-          git config --global --add safe.directory ${{ github.workspace }}
+          git config --global --add safe.directory /__w/OpenDataCapture/OpenDataCapture
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
       - name: Install Playwright
