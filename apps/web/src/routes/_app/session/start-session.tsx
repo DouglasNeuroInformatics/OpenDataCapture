@@ -53,10 +53,10 @@ const RouteComponent = () => {
           }}
         />
         {currentSession !== null && (
-          <div className="mx-auto block max-w-3xl rounded-lg border border-gray-200 bg-white p-6 opacity-75 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <div className="mx-auto block max-h-fit max-w-3xl rounded-lg border border-gray-200 bg-white p-6 opacity-70 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <p className="max-w-4xl text-center text-yellow-600 dark:text-yellow-300">
               {t({
-                en: 'The current session must be ended before starting the form again',
+                en: 'The current session must be ended before starting the form again.',
                 fr: 'La session en cours doit être terminée avant de recommencer le formulaire.'
               })}
             </p>
