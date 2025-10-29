@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { CheckCircle } from 'lucide-react';
 import type { FormTypes } from '@opendatacapture/runtime-core';
 import { createFileRoute, useLocation } from '@tanstack/react-router';
+import { CheckCircle } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -43,7 +43,7 @@ const RouteComponent = () => {
           {t('startSession')}
         </Heading>
       </PageHeader>
-      {currentSession == null && (
+      {currentSession === null && (
         <StartSessionForm
           currentGroup={currentGroup}
           initialValues={initialValues}
@@ -59,22 +59,23 @@ const RouteComponent = () => {
         {currentSession !== null && (
           <motion.div
             animate={{ opacity: 1, scale: 1 }}
+            className="flex grow"
             exit={{ opacity: 0, scale: 0 }}
             initial={{ opacity: 0, scale: 0 }}
             key="modal"
           >
-            <div className="flex h-screen items-center justify-center">
+            <div className="flex grow items-center justify-center">
               {currentSession !== null && (
-                <div className="center mx-auto block max-w-3xl rounded-lg border border-gray-200 bg-white p-4 opacity-70 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                  <p className="flex max-w-4xl gap-x-3 text-center text-green-600 dark:text-green-300">
-                    <span>
-                      <CheckCircle />{' '}
-                    </span>
-                    {t({
-                      en: 'The current session must be ended before starting the form again.',
-                      fr: 'La session en cours doit être terminée avant de recommencer le formulaire.'
-                    })}
-                  </p>
+                <div className="mx-auto block max-w-3xl rounded-lg border border-gray-200 bg-white p-8 text-green-600 opacity-70 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-green-300">
+                  <div className="flex flex-col items-center justify-center gap-y-12">
+                    <CheckCircle className="!size-20" />
+                    <p className="max-w-2xl text-center text-xl">
+                      {t({
+                        en: 'The current session must be ended before starting the form again.',
+                        fr: 'La session en cours doit être terminée avant de recommencer le formulaire.'
+                      })}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
