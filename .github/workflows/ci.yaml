@@ -2,24 +2,37 @@ name: CI
 on:
   pull_request:
     branches: ['main']
+  workflow_dispatch:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup PNPM
         uses: pnpm/action-setup@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           cache: 'pnpm'
           node-version-file: '.nvmrc'
       - name: Generate Environment
         run: ./scripts/generate-env.sh
+      - name: Setup Mongo
+        run: |
+          docker run -d --name mongo -p 27017:27017 mongo:7 --replSet rs0
+          docker exec mongo mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
+      - name: Configure Git
+        run: |
+          # necessary for the git commands used for release info
+          git config --global --add safe.directory /__w/OpenDataCapture/OpenDataCapture
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+      - name: Install Playwright
+        run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps
       - name: Lint
         run: pnpm lint
-      - name: Test
+      - name: Unit Tests
         run: pnpm test
+      - name: End-to-End Tests
+        run: pnpm --filter "@opendatacapture/e2e" test

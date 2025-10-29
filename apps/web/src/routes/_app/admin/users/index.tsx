@@ -231,6 +231,7 @@ const UpdateUserForm: React.FC<{
             })
           }
         ]}
+        data-testid="update-user-form"
         initialValues={initialValues}
         key={JSON.stringify(initialValues)}
         submitBtnLabel={t('core.save')}
@@ -309,6 +310,7 @@ const RouteComponent = () => {
       <div className="mb-3 flex gap-3">
         <SearchBar
           className="grow"
+          data-testid="admin-users-search"
           placeholder={t({
             en: 'Search by Username',
             fr: "Recherche par nom d'utilisateur"
@@ -345,11 +347,12 @@ const RouteComponent = () => {
           }
         ]}
         data={filteredData}
+        data-testid="admin-users-table"
         entriesPerPage={15}
         minRows={15}
         onEntryClick={setSelectedUser}
       />
-      <Sheet.Content className="flex flex-col p-0">
+      <Sheet.Content className="flex flex-col p-0" data-testid="admin-user-edit-sheet">
         <Sheet.Header className="px-6 pt-6">
           <Sheet.Title>{selectedUser?.username}</Sheet.Title>
           <Sheet.Description>

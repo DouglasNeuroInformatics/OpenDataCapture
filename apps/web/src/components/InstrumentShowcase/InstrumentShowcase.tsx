@@ -59,19 +59,30 @@ export const InstrumentShowcase: React.FC<{
   }, [availableInstruments]);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5" data-testid="instrument-showcase">
       <div className="flex items-center gap-2.5">
-        <SearchBar className="grow" value={searchTerm} onValueChange={setSearchTerm} />
+        <SearchBar
+          className="grow"
+          data-testid="instrument-search-bar"
+          value={searchTerm}
+          onValueChange={setSearchTerm}
+        />
         <div className="flex items-center gap-2.5">
-          <InstrumentKindDropdown selected={selectedKinds} setSelected={setSelectedKinds} />
-          <ListboxDropdown
-            widthFull
-            options={tagOptions}
-            selected={selectedTags}
-            setSelected={setSelectedTags}
-            title={t('core.tags')}
-          />
-          <InstrumentLanguageDropdown selected={selectedLanguages} setSelected={setSelectedLanguages} />
+          <div data-testid="instrument-kind-filter">
+            <InstrumentKindDropdown selected={selectedKinds} setSelected={setSelectedKinds} />
+          </div>
+          <div data-testid="instrument-tag-filter">
+            <ListboxDropdown
+              widthFull
+              options={tagOptions}
+              selected={selectedTags}
+              setSelected={setSelectedTags}
+              title={t('core.tags')}
+            />
+          </div>
+          <div data-testid="instrument-language-filter">
+            <InstrumentLanguageDropdown selected={selectedLanguages} setSelected={setSelectedLanguages} />
+          </div>
         </div>
       </div>
       <ul className="flex flex-col gap-5">

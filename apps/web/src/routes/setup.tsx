@@ -114,7 +114,7 @@ const RouteComponent = () => {
                 title: t('setup.demo.title')
               }
             ]}
-            data-cy="setup-form"
+            data-testid="setup-form"
             initialValues={{
               enableExperimentalFeatures: false
             }}

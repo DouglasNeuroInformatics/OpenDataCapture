@@ -11,7 +11,9 @@ type PageHeaderProps = {
 export const PageHeader = ({ children, className }: PageHeaderProps) => {
   return (
     <React.Fragment>
-      <div className={cn('mt-5 w-full', className)}>{children}</div>
+      <div className={cn('mt-5 w-full', className)} data-testid="page-header">
+        {children}
+      </div>
       <Separator className="my-5 w-full" />
     </React.Fragment>
   );

@@ -11,7 +11,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { config } from '@/config';
 import { useAppStore } from '@/store';
 
-const TabLink = ({ dataCy, label, pathname }: { dataCy?: string; label: string; pathname: string }) => {
+const TabLink = ({ label, pathname, testId }: { label: string; pathname: string; testId?: string }) => {
   const location = useLocation();
   const isActive = location.pathname === pathname;
   return (
@@ -20,9 +20,9 @@ const TabLink = ({ dataCy, label, pathname }: { dataCy?: string; label: string; 
         'grow border-b px-1 py-3 text-center font-medium',
         isActive ? 'border-sky-500 text-slate-900 dark:text-slate-100' : 'border-slate-300 dark:border-slate-700'
       )}
-      data-cy={dataCy}
       data-nav-url={pathname}
       data-spotlight-type="tab-link"
+      data-testid={testId}
       to={pathname}
     >
       {label}
@@ -55,13 +55,13 @@ const RouteComponent = () => {
       <div className="mb-5 flex">
         {config.setup.isGatewayEnabled && (
           <TabLink
-            dataCy="subject-assignment"
             label={t('layout.tabs.assignments')}
             pathname={`${basePathname}/assignments`}
+            testId="subject-assignment"
           />
         )}
-        <TabLink dataCy="subject-table" label={t('layout.tabs.table')} pathname={`${basePathname}/table`} />
-        <TabLink dataCy="subject-graph" label={t('layout.tabs.graph')} pathname={`${basePathname}/graph`} />
+        <TabLink label={t('layout.tabs.table')} pathname={`${basePathname}/table`} testId="subject-table" />
+        <TabLink label={t('layout.tabs.graph')} pathname={`${basePathname}/graph`} testId="subject-graph" />
       </div>
       <React.Suspense fallback={<LoadingFallback />}>
         <Outlet />

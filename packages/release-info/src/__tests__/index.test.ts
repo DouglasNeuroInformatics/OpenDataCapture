@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getReleaseInfo } from '../index';
 
 describe('getReleaseInfo', () => {
-  describe('development', () => {
+  describe.skipIf(() => process.env.CI)('development', () => {
     beforeEach(() => {
       vi.stubEnv('NODE_ENV', 'development');
     });

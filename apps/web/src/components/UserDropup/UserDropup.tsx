@@ -21,7 +21,11 @@ export const UserDropup = () => {
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenu.Trigger asChild className="flex items-center gap-1.5 focus-visible:ring-0">
+      <DropdownMenu.Trigger
+        asChild
+        className="flex items-center gap-1.5 focus-visible:ring-0"
+        data-testid="user-dropup-trigger"
+      >
         <ArrowToggle
           className="flex flex-row-reverse items-center p-2 hover:bg-slate-700 hover:text-slate-100"
           isToggled={isOpen}
@@ -39,6 +43,7 @@ export const UserDropup = () => {
       <DropdownMenu.Content
         align="start"
         className="w-56 border-slate-700 bg-slate-800 text-slate-300 shadow-md"
+        data-testid="user-dropup-menu"
         side="top"
       >
         <DropdownMenu.Label className="text-slate-300">{currentUser?.username}</DropdownMenu.Label>
@@ -46,6 +51,7 @@ export const UserDropup = () => {
         <DropdownMenu.Group>
           <DropdownMenu.Item
             className="gap-2 hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100 focus:ring-0"
+            data-testid="user-dropup-about"
             onClick={() => {
               void navigate({ to: '/about' });
             }}
@@ -58,6 +64,7 @@ export const UserDropup = () => {
           </DropdownMenu.Item>
           <DropdownMenu.Item
             className="gap-2 hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100"
+            data-testid="user-dropup-preferences"
             onClick={() => {
               void navigate({ to: '/user' });
             }}
@@ -70,6 +77,7 @@ export const UserDropup = () => {
           </DropdownMenu.Item>
           <DropdownMenu.Item
             className="gap-2 hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100"
+            data-testid="user-dropup-tutorial"
             disabled={currentSession !== null}
             onClick={() => {
               setIsWalkthroughOpen(true);
@@ -83,6 +91,7 @@ export const UserDropup = () => {
           </DropdownMenu.Item>
           <DropdownMenu.Item
             className="gap-2 hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100 focus:ring-0"
+            data-testid="user-dropup-logout"
             onClick={logout}
           >
             <LogOutIcon />

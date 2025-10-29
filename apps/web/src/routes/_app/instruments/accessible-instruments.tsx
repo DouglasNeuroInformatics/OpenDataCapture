@@ -17,7 +17,7 @@ const RouteComponent = () => {
   const instrumentInfoQuery = useInstrumentInfoQuery();
 
   return (
-    <React.Fragment>
+    <div data-testid="accessible-instruments-page">
       <PageHeader>
         <Heading className="text-center" variant="h2">
           {t('instruments.accessible.title')}
@@ -40,7 +40,7 @@ const RouteComponent = () => {
           }
         }}
       />
-    </React.Fragment>
+    </div>
   );
 };
 

@@ -57,7 +57,7 @@ const RouteComponent = () => {
           ...fields
         ]}
         data={records}
-        data-cy="subject-table"
+        data-testid="subject-table"
         entriesPerPage={15}
         minRows={15}
       />
