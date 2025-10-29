@@ -175,7 +175,6 @@ export class InstrumentRecordsService {
         if (!Array.isArray(measureValue)) {
           data.push({
             groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-            userId: record.session.user?.username ?? 'N/A',
             instrumentEdition: instrument.internal.edition,
             instrumentName: instrument.internal.name,
             measure: measureKey,
@@ -186,6 +185,7 @@ export class InstrumentRecordsService {
             subjectId: removeSubjectIdScope(record.subject.id),
             subjectSex: record.subject.sex,
             timestamp: record.date.toISOString(),
+            userId: record.session.user?.username ?? 'N/A',
             value: measureValue
           });
         }
@@ -199,7 +199,6 @@ export class InstrumentRecordsService {
               throw new Error(`exportRecords: ${instrument.internal.name}.${measureKey} — ${arrayEntry.message}`);
             data.push({
               groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-              userId: record.session.user?.username ?? 'N/A',
               instrumentEdition: instrument.internal.edition,
               instrumentName: instrument.internal.name,
               measure: `${measureKey} - ${arrayEntry.measure}`,
@@ -210,6 +209,7 @@ export class InstrumentRecordsService {
               subjectId: removeSubjectIdScope(record.subject.id),
               subjectSex: record.subject.sex,
               timestamp: record.date.toISOString(),
+              userId: record.session.user?.username ?? 'N/A',
               value: arrayEntry.measureValue
             });
           });
