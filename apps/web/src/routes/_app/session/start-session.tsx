@@ -42,16 +42,18 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       <div className="space-y-4">
-        <StartSessionForm
-          currentGroup={currentGroup}
-          initialValues={initialValues}
-          readOnly={currentSession !== null || createSessionMutation.isPending}
-          username={currentUser?.username}
-          onSubmit={async (formData) => {
-            const session = await createSessionMutation.mutateAsync(formData);
-            startSession({ ...session, type: formData.type });
-          }}
-        />
+        {currentSession == null && (
+          <StartSessionForm
+            currentGroup={currentGroup}
+            initialValues={initialValues}
+            readOnly={currentSession !== null || createSessionMutation.isPending}
+            username={currentUser?.username}
+            onSubmit={async (formData) => {
+              const session = await createSessionMutation.mutateAsync(formData);
+              startSession({ ...session, type: formData.type });
+            }}
+          />
+        )}
         {currentSession !== null && (
           <div className="mx-auto block max-h-fit max-w-3xl rounded-lg border border-gray-200 bg-white p-6 opacity-70 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <p className="max-w-4xl text-center text-yellow-600 dark:text-yellow-300">
