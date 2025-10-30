@@ -4,6 +4,8 @@ import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
 import { createFileRoute, useLocation } from '@tanstack/react-router';
+import { CheckCircle } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 
 import { PageHeader } from '@/components/PageHeader';
 import { StartSessionForm } from '@/components/StartSessionForm';
@@ -41,16 +43,45 @@ const RouteComponent = () => {
           {t('startSession')}
         </Heading>
       </PageHeader>
-      <StartSessionForm
-        currentGroup={currentGroup}
-        initialValues={initialValues}
-        readOnly={currentSession !== null || createSessionMutation.isPending}
-        username={currentUser?.username}
-        onSubmit={async (formData) => {
-          const session = await createSessionMutation.mutateAsync(formData);
-          startSession({ ...session, type: formData.type });
-        }}
-      />
+      {currentSession === null && (
+        <StartSessionForm
+          currentGroup={currentGroup}
+          initialValues={initialValues}
+          readOnly={currentSession !== null || createSessionMutation.isPending}
+          username={currentUser?.username}
+          onSubmit={async (formData) => {
+            const session = await createSessionMutation.mutateAsync(formData);
+            startSession({ ...session, type: formData.type });
+          }}
+        />
+      )}
+      <AnimatePresence>
+        {currentSession !== null && (
+          <motion.div
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex grow"
+            exit={{ opacity: 0, scale: 0 }}
+            initial={{ opacity: 0, scale: 0 }}
+            key="modal"
+          >
+            <div className="flex grow items-center justify-center">
+              {currentSession !== null && (
+                <div className="mx-auto block max-w-3xl rounded-lg border border-gray-200 bg-white p-8 text-green-600 opacity-70 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-green-300">
+                  <div className="flex flex-col items-center justify-center gap-y-12">
+                    <CheckCircle className="!size-20" />
+                    <p className="max-w-2xl text-center text-xl">
+                      {t({
+                        en: 'The current session must be ended before starting the form again.',
+                        fr: 'La session en cours doit être terminée avant de recommencer le formulaire.'
+                      })}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </React.Fragment>
   );
 };

@@ -18,6 +18,7 @@ export const Navbar = () => {
   const navItems = useNavItems();
   const { t } = useTranslation('layout');
   const navigate = useNavigate();
+  const endSession = useAppStore((store) => store.endSession);
 
   // This is to prevent ugly styling when resizing the viewport
   const isDesktop = useIsDesktop();
@@ -83,6 +84,10 @@ export const Navbar = () => {
                   isActive={false}
                   label={t('navLinks.endSession')}
                   url="#"
+                  onClick={() => {
+                    endSession();
+                    void navigate({ to: '/session/start-session' });
+                  }}
                 />
               )}
             </div>
