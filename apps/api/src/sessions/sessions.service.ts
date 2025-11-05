@@ -1,7 +1,6 @@
 import { InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
-import { Injectable } from '@nestjs/common';
-import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import type { CreateSubjectData } from '@opendatacapture/schemas/subject';

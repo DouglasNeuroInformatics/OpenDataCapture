@@ -1,12 +1,12 @@
 import { CryptoService, InjectModel, LoggingService, VirtualizationService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
-import { Injectable } from '@nestjs/common';
 import {
   ConflictException,
+  Injectable,
   InternalServerErrorException,
   NotFoundException,
   UnprocessableEntityException
-} from '@nestjs/common/exceptions';
+} from '@nestjs/common';
 import { isScalarInstrument, isSeriesInstrument } from '@opendatacapture/instrument-utils';
 import type {
   AnyInstrument,
