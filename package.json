@@ -80,6 +80,7 @@
     },
     "onlyBuiltDependencies": [
       "@nestjs/core",
+      "mongodb-memory-server",
       "sharp"
     ]
   },
