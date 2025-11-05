@@ -5,27 +5,33 @@ import { expect, test } from '../helpers/fixtures';
 
 test.describe.serial(() => {
   test.describe.serial('setup', () => {
-    test('initial setup', async ({ request }) => {
+    test('should initially not be setup', async ({ request }) => {
       const response = await request.get('/api/v1/setup');
       expect(response.status()).toBe(200);
       await expect(response.json()).resolves.toMatchObject({ isSetup: false });
     });
-    test('successful setup', async ({ setupPage }) => {
+    test('should successfully setup', async ({ setupPage }) => {
       await setupPage.fillSetupForm(initAppOptions);
-      await setupPage.expect.toHaveURL('/auth/login');
+      await setupPage.expect.toHaveURL('/dashboard');
     });
-    test('setup state after initialization', async ({ request }) => {
+    test('should be setup after initialization', async ({ request }) => {
       const response = await request.get('/api/v1/setup');
       expect(response.status()).toBe(200);
       await expect(response.json()).resolves.toMatchObject({ isSetup: true });
     });
-    test('redirect to login page if setup', async ({ page }) => {
+    test('should redirect to login page if setup', async ({ page }) => {
       await page.goto('/setup');
       await expect(page).toHaveURL('/auth/login');
     });
+    test('should block any further setup requests', async ({ request }) => {
+      const response = await request.post('/api/v1/setup', {
+        data: initAppOptions
+      });
+      expect(response.status()).toBe(403);
+    });
   });
   test.describe.serial('auth', () => {
-    test('login', async ({ request }) => {
+    test('should login with the admin credentials', async ({ request }) => {
       const { password, username } = initAppOptions.admin;
       const response = await request.post('/api/v1/auth/login', {
         data: { password, username } satisfies $LoginCredentials
@@ -36,7 +42,6 @@ test.describe.serial(() => {
       process.env.ADMIN_ACCESS_TOKEN = accessToken;
       process.env.ADMIN_USERNAME = username;
       process.env.ADMIN_PASSWORD = password;
-      process.env.GLOBAL_SETUP_COMPLETE = '1';
     });
   });
 });
