@@ -1,10 +1,5 @@
-import { LibnestPrismaExtension } from '@douglasneuroinformatics/libnest';
-import type {
-  ConfigService,
-  PrismaModelKey,
-  PrismaModelName,
-  PrismaModuleOptions
-} from '@douglasneuroinformatics/libnest';
+import { ConfigService, LibnestPrismaExtension } from '@douglasneuroinformatics/libnest';
+import type { PrismaModelKey, PrismaModelName, PrismaModuleOptions } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
 import type { OnApplicationShutdown } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
