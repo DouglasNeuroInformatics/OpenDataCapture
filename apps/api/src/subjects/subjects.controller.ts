@@ -1,9 +1,11 @@
 import { $BooleanLike } from '@douglasneuroinformatics/libjs';
-import { CurrentUser, ParseSchemaPipe, RouteAccess } from '@douglasneuroinformatics/libnest';
-import type { AppAbility } from '@douglasneuroinformatics/libnest';
+import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import z from 'zod/v4';
+
+import type { AppAbility } from '@/auth/auth.types';
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { SubjectsService } from './subjects.service';

@@ -1,24 +1,21 @@
-/* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
+/* eslint-disable @typescript-eslint/no-namespace */
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as url from 'node:url';
 
 import { defineUserConfig } from '@douglasneuroinformatics/libnest/user-config';
-import type { InferUserConfig } from '@douglasneuroinformatics/libnest/user-config';
 import { getReleaseInfo } from '@opendatacapture/release-info';
-import type { TokenPayload } from '@opendatacapture/schemas/auth';
-import type { Permissions } from '@opendatacapture/schemas/core';
+
+import type { RuntimePrismaClient } from '@/core/prisma.client.js';
+import type { $Env } from '@/core/schemas/env.schema.js';
 
 declare module '@douglasneuroinformatics/libnest/user-config' {
-  export interface UserConfig extends InferUserConfig<typeof config> {}
   export namespace UserTypes {
-    export interface JwtPayload extends TokenPayload {}
-    export interface UserQueryMetadata {
-      additionalPermissions?: Permissions;
-    }
+    export interface Env extends $Env {}
+    export interface PrismaClient extends RuntimePrismaClient {}
   }
 }
 

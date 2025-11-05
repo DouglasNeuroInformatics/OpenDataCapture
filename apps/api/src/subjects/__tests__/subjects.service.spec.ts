@@ -1,5 +1,5 @@
 import { CryptoService, getModelToken, PRISMA_CLIENT_TOKEN } from '@douglasneuroinformatics/libnest';
-import type { ExtendedPrismaClient, Model } from '@douglasneuroinformatics/libnest';
+import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
@@ -7,12 +7,14 @@ import { Test } from '@nestjs/testing';
 import { pick } from 'lodash-es';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { RuntimePrismaClient } from '@/core/prisma.client';
+
 import { SubjectsService } from '../subjects.service';
 
 describe('SubjectsService', () => {
   let subjectsService: SubjectsService;
   let subjectModel: MockedInstance<Model<'Subject'>>;
-  let prismaClient: MockedInstance<ExtendedPrismaClient> & {
+  let prismaClient: MockedInstance<RuntimePrismaClient> & {
     [key: string]: any;
   };
 

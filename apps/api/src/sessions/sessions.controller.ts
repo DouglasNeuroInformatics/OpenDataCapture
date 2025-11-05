@@ -1,7 +1,8 @@
-import { RouteAccess } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Session } from '@prisma/client';
+
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateSessionDto } from './dto/create-session.dto';
 import { SessionsService } from './sessions.service';

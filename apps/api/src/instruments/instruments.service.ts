@@ -1,11 +1,5 @@
-import {
-  accessibleQuery,
-  CryptoService,
-  InjectModel,
-  LoggingService,
-  VirtualizationService
-} from '@douglasneuroinformatics/libnest';
-import type { AppAbility, Model } from '@douglasneuroinformatics/libnest';
+import { CryptoService, InjectModel, LoggingService, VirtualizationService } from '@douglasneuroinformatics/libnest';
+import type { Model } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
 import {
   ConflictException,
@@ -30,6 +24,8 @@ import type {
 } from '@opendatacapture/schemas/instrument';
 import { pick } from 'lodash-es';
 
+import { accessibleQuery } from '@/auth/ability.utils';
+import type { AppAbility } from '@/auth/auth.types';
 import type { EntityOperationOptions } from '@/core/types';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';

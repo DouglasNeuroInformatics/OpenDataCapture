@@ -1,4 +1,4 @@
-import type { LoginCredentials } from '@opendatacapture/schemas/auth';
+import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 
 import { initAppOptions } from '../helpers/data';
 import { expect, test } from '../helpers/fixtures';
@@ -26,7 +26,7 @@ test.describe.serial(() => {
     test('login', async ({ request }) => {
       const { password, username } = initAppOptions.admin;
       const response = await request.post('/api/v1/auth/login', {
-        data: { password, username } satisfies LoginCredentials
+        data: { password, username } satisfies $LoginCredentials
       });
       expect(response.status()).toBe(200);
       const { accessToken } = await response.json();

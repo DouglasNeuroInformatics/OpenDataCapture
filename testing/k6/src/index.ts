@@ -1,5 +1,5 @@
 import { DEMO_USERS } from '@opendatacapture/demo';
-import type { AuthPayload, LoginCredentials } from '@opendatacapture/schemas/auth';
+import type { $LoginCredentials, AuthPayload } from '@opendatacapture/schemas/auth';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { SetupState } from '@opendatacapture/schemas/setup';
@@ -51,7 +51,7 @@ export default function () {
   sleep(0.5);
 
   // login and get an access token
-  const loginResponse = client.post<LoginCredentials, AuthPayload>('/v1/auth/login', {
+  const loginResponse = client.post<$LoginCredentials, AuthPayload>('/v1/auth/login', {
     password: user.password,
     username: user.username
   });

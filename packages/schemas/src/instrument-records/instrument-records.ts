@@ -6,6 +6,7 @@ import { $InstrumentMeasureValue } from '../instrument/instrument.js';
 
 import type { SessionType } from '../session/session.js';
 
+export type $CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecordData>;
 export const $CreateInstrumentRecordData = z.object({
   assignmentId: z.string().optional(),
   data: $Json,
@@ -16,6 +17,12 @@ export const $CreateInstrumentRecordData = z.object({
   subjectId: z.string()
 });
 
+export type $UpdateInstrumentRecordData = z.infer<typeof $UpdateInstrumentRecordData>;
+export const $UpdateInstrumentRecordData = z.object({
+  data: z.union([z.record(z.string(), z.any()), z.array(z.any())])
+});
+
+export type $UploadInstrumentRecordsData = z.infer<typeof $UploadInstrumentRecordsData>;
 export const $UploadInstrumentRecordsData = z.object({
   groupId: z.string().optional(),
   instrumentId: z.string(),

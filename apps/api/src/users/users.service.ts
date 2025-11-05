@@ -1,7 +1,8 @@
-import { accessibleQuery, CryptoService, InjectModel } from '@douglasneuroinformatics/libnest';
+import { CryptoService, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
+import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 
@@ -123,11 +124,14 @@ export class UsersService {
     return user;
   }
 
-  async findByUsername(username: string, { ability }: EntityOperationOptions = {}) {
+  async findByUsername(
+    username: string,
+    { ability, includeHashedPassword }: EntityOperationOptions & { includeHashedPassword?: boolean } = {}
+  ) {
     const user = await this.userModel.findFirst({
       include: { groups: true },
       omit: {
-        hashedPassword: true
+        hashedPassword: !includeHashedPassword
       },
       where: { AND: [accessibleQuery(ability, 'read', 'User'), { username }] }
     });

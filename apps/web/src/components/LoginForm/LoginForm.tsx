@@ -2,11 +2,11 @@
 
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { LoginCredentials } from '@opendatacapture/schemas/auth';
+import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import { z } from 'zod/v4';
 
 type LoginFormProps = {
-  onSubmit: (credentials: LoginCredentials) => void;
+  onSubmit: (credentials: $LoginCredentials) => void;
 };
 
 export const LoginForm = ({ onSubmit }: LoginFormProps) => {

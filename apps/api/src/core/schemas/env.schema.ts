@@ -1,9 +1,11 @@
 import { $BooleanLike, $NumberLike, $UrlLike } from '@douglasneuroinformatics/libjs';
-import { $BaseEnv } from '@douglasneuroinformatics/libnest';
+import { $BaseEnv, $MongoEnv } from '@douglasneuroinformatics/libnest';
 import { z } from 'zod/v4';
 
+export type $Env = z.infer<typeof $Env>;
 export const $Env = $BaseEnv
   .omit({ API_PORT: true })
+  .extend($MongoEnv.shape)
   .extend({
     API_DEV_SERVER_PORT: $NumberLike.pipe(z.number().int().nonnegative()).optional(),
     GATEWAY_API_KEY: z.string().min(32),

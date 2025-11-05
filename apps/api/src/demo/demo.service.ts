@@ -1,7 +1,7 @@
 import { randomValue, toUpperCase } from '@douglasneuroinformatics/libjs';
-import { LoggingService, PrismaService } from '@douglasneuroinformatics/libnest';
+import { InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
 import { faker } from '@faker-js/faker';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
 import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-library/forms/DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE.js';
 import generalConsentForm from '@opendatacapture/instrument-library/forms/DNP_GENERAL_CONSENT_FORM.js';
@@ -14,6 +14,8 @@ import type { Json, Language, WithID } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 
+import type { RuntimePrismaClient } from '@/core/prisma.client';
+import { $MongoStats } from '@/core/schemas/mongo-stats.schema';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
@@ -33,11 +35,11 @@ faker.seed(123);
 @Injectable()
 export class DemoService {
   constructor(
+    @InjectPrismaClient() private readonly prismaClient: RuntimePrismaClient,
     private readonly groupsService: GroupsService,
     private readonly instrumentRecordsService: InstrumentRecordsService,
     private readonly instrumentsService: InstrumentsService,
     private readonly loggingService: LoggingService,
-    private readonly prismaService: PrismaService,
     private readonly sessionsService: SessionsService,
     private readonly subjectsService: SubjectsService,
     private readonly usersService: UsersService
@@ -51,7 +53,7 @@ export class DemoService {
     recordsPerSubject: number;
   }): Promise<void> {
     try {
-      const dbName = await this.prismaService.getDbName();
+      const dbName = await this.getDbName();
       this.loggingService.log(`Initializing demo for database: '${dbName}'`);
 
       const hq = (await this.instrumentsService.create({ bundle: happinessQuestionnaire })) as WithID<
@@ -151,5 +153,21 @@ export class DemoService {
       }
       throw err;
     }
+  }
+
+  private async getDbName(): Promise<string> {
+    const { db } = await this.getDbStats();
+    return db;
+  }
+
+  private async getDbStats(): Promise<$MongoStats> {
+    const commandOutput = await this.prismaClient.$runCommandRaw({ dbStats: 1 });
+    const result = await $MongoStats.safeParseAsync(commandOutput);
+    if (!result.success) {
+      throw new InternalServerErrorException('Raw mongodb command returned unexpected value', {
+        cause: result.error
+      });
+    }
+    return result.data;
   }
 }

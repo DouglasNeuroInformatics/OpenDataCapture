@@ -1,5 +1,5 @@
 import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
-import { accessibleQuery, InjectModel } from '@douglasneuroinformatics/libnest';
+import { InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
@@ -19,6 +19,7 @@ import { Prisma } from '@prisma/client';
 import type { Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
 
+import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentsService } from '@/instruments/instruments.service';

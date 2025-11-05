@@ -2,11 +2,11 @@ import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Card, Dialog, Table, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { DEMO_USERS } from '@opendatacapture/demo';
-import type { LoginCredentials } from '@opendatacapture/schemas/auth';
+import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import { InfoIcon, LogInIcon } from 'lucide-react';
 
 type DemoBannerProps = {
-  onLogin: (credentials: LoginCredentials) => void;
+  onLogin: (credentials: $LoginCredentials) => void;
 };
 
 export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
