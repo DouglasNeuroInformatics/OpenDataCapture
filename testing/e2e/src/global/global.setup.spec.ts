@@ -3,8 +3,6 @@ import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import { initAppOptions } from '../helpers/data';
 import { expect, test } from '../helpers/fixtures';
 
-test.skip(() => process.env.GLOBAL_SETUP_COMPLETE === '1');
-
 test.describe.serial(() => {
   test.describe.serial('setup', () => {
     test('initial setup', async ({ request }) => {
