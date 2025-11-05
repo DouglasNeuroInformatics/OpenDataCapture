@@ -4,7 +4,7 @@ import type { PrismaQuery } from '@casl/prisma';
 import { createAccessibleByFactory } from '@casl/prisma/runtime';
 import type { AppSubject, Prisma } from '@prisma/client';
 
-import type { PrismaModelWhereInputMap } from '@/core/prisma.client';
+import type { PrismaModelWhereInputMap } from '@/core/prisma';
 
 import type { AppAbilities, AppAbility, AppAction, Permission } from './auth.types';
 

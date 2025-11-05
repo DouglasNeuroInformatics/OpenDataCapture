@@ -8,7 +8,7 @@ import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
 import type { Prisma, Session, Subject, User } from '@prisma/client';
 
 import { accessibleQuery } from '@/auth/ability.utils';
-import type { RuntimePrismaClient } from '@/core/prisma.client';
+import type { RuntimePrismaClient } from '@/core/prisma';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { SubjectsService } from '@/subjects/subjects.service';

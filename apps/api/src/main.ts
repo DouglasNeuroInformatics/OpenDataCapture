@@ -2,7 +2,7 @@ import { AppFactory, ConfigService, PrismaModule } from '@douglasneuroinformatic
 
 import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
-import { createPrismaClient } from './core/prisma.client';
+import { createPrismaClient } from './core/prisma';
 import { $Env } from './core/schemas/env.schema';
 import { GatewayModule } from './gateway/gateway.module';
 import { GroupsModule } from './groups/groups.module';

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import type { CreateAdminData, InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
-import type { RuntimePrismaClient } from '@/core/prisma.client';
+import type { RuntimePrismaClient } from '@/core/prisma';
 import { DemoService } from '@/demo/demo.service';
 import { UsersService } from '@/users/users.service';
 

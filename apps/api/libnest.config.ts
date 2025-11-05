@@ -9,7 +9,7 @@ import * as url from 'node:url';
 import { defineUserConfig } from '@douglasneuroinformatics/libnest/user-config';
 import { getReleaseInfo } from '@opendatacapture/release-info';
 
-import type { RuntimePrismaClient } from '@/core/prisma.client.js';
+import type { RuntimePrismaClient } from '@/core/prisma.js';
 import type { $Env } from '@/core/schemas/env.schema.js';
 
 declare module '@douglasneuroinformatics/libnest/user-config' {
