@@ -4,6 +4,7 @@ import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
+import axios from 'axios';
 import { omit } from 'lodash-es';
 import { unparse } from 'papaparse';
 
@@ -12,6 +13,7 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
+import type { Session } from '@opendatacapture/schemas/session';
 
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
@@ -53,6 +55,21 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       subjectId: params.subjectId
     }
   });
+
+  const userInfo = async (sessionId: string) => {
+    const userData = await axios
+      .get(`/v1/sessions/${sessionId}`)
+      .then(function (response) {
+        if (response.data) {
+          return response.data as Session;
+        }
+        return null;
+      })
+      .catch(function (error) {
+        console.error('Error fetching users:', error);
+      });
+    return userData;
+  };
 
   const dl = (option: 'CSV' | 'CSV Long' | 'Excel' | 'Excel Long' | 'JSON' | 'TSV' | 'TSV Long') => {
     if (!instrument) {
@@ -199,6 +216,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       const records: InstrumentVisualizationRecord[] = [];
       for (const record of recordsQuery.data) {
         const props = record.data && typeof record.data === 'object' ? record.data : {};
+        const userData = userInfo(record.sessionId);
         records.push({
           __date__: record.date,
           __time__: record.date.getTime(),
