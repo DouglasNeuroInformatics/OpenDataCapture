@@ -1,4 +1,5 @@
-import { RouteAccess } from '@douglasneuroinformatics/libnest';
+import { CurrentUser, RouteAccess } from '@douglasneuroinformatics/libnest';
+import type { AppAbility } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Session } from '@prisma/client';
@@ -20,7 +21,7 @@ export class SessionsController {
   @ApiOperation({ description: 'Find Session by ID' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Session' })
-  findByID(@Param('id') id: string): Promise<Session> {
-    return this.sessionsService.findById(id);
+  findByID(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility): Promise<Session> {
+    return this.sessionsService.findById(id, { ability });
   }
 }
