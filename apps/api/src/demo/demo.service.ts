@@ -6,7 +6,6 @@ import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
 import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-library/forms/DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE.js';
 import generalConsentForm from '@opendatacapture/instrument-library/forms/DNP_GENERAL_CONSENT_FORM.js';
 import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/DNP_HAPPINESS_QUESTIONNAIRE.js';
-import patientHealthQuestionnaire9 from '@opendatacapture/instrument-library/forms/PHQ_9.js';
 import breakoutTask from '@opendatacapture/instrument-library/interactive/DNP_BREAKOUT_TASK.js';
 import happinessQuestionnaireWithConsent from '@opendatacapture/instrument-library/series/DNP_HAPPINESS_QUESTIONNAIRE_WITH_CONSENT.js';
 import type { FormInstrument } from '@opendatacapture/runtime-core';
@@ -62,8 +61,7 @@ export class DemoService {
 
       await Promise.all([
         this.instrumentsService.create({ bundle: enhancedDemographicsQuestionnaire }),
-        this.instrumentsService.create({ bundle: generalConsentForm }),
-        this.instrumentsService.create({ bundle: patientHealthQuestionnaire9 })
+        this.instrumentsService.create({ bundle: generalConsentForm })
       ]);
 
       this.loggingService.debug('Done creating forms');
