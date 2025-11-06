@@ -139,7 +139,8 @@ export class InstrumentRecordsService {
           select: {
             date: true,
             id: true,
-            type: true
+            type: true,
+            user: true
           }
         },
         subject: true
@@ -184,6 +185,7 @@ export class InstrumentRecordsService {
             subjectId: removeSubjectIdScope(record.subject.id),
             subjectSex: record.subject.sex,
             timestamp: record.date.toISOString(),
+            userId: record.session.user?.username ?? 'N/A',
             value: measureValue
           });
         }
@@ -207,6 +209,7 @@ export class InstrumentRecordsService {
               subjectId: removeSubjectIdScope(record.subject.id),
               subjectSex: record.subject.sex,
               timestamp: record.date.toISOString(),
+              userId: record.session.user?.username ?? 'N/A',
               value: arrayEntry.measureValue
             });
           });

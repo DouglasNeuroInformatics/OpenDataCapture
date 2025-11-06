@@ -39,6 +39,7 @@ export const $InstrumentRecord = $BaseModel.extend({
   date: z.coerce.date(),
   groupId: z.string().nullish(),
   instrumentId: z.string(),
+  sessionId: z.string(),
   subjectId: z.string()
 });
 
@@ -56,6 +57,7 @@ export type InstrumentRecordsExport = {
   subjectId: string;
   subjectSex: null | string;
   timestamp: string;
+  userId: string;
   value: InstrumentMeasureValue;
 }[];
 
