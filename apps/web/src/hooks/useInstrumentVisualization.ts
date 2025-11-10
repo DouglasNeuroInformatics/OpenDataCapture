@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
+import type { Session } from '@opendatacapture/schemas/session';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import axios from 'axios';
 import { omit } from 'lodash-es';
@@ -13,7 +14,6 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
-import type { Session } from '@opendatacapture/schemas/session';
 
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
@@ -56,19 +56,14 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
-  const userInfo = async (sessionId: string) => {
-    const userData = await axios
-      .get(`/v1/sessions/${sessionId}`)
-      .then(function (response) {
-        if (response.data) {
-          return response.data as Session;
-        }
-        return null;
-      })
-      .catch(function (error) {
-        console.error('Error fetching users:', error);
-      });
-    return userData;
+  const userInfo = async (sessionId: string): Promise<null | Session> => {
+    try {
+      const response = await axios.get(`/v1/sessions/${sessionId}`);
+      return response.data ? (response.data as Session) : null;
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      return null; // ensures a resolved value instead of `void`
+    }
   };
 
   const dl = (option: 'CSV' | 'CSV Long' | 'Excel' | 'Excel Long' | 'JSON' | 'TSV' | 'TSV Long') => {
@@ -212,20 +207,38 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   };
 
   useEffect(() => {
-    if (recordsQuery.data) {
-      const records: InstrumentVisualizationRecord[] = [];
-      for (const record of recordsQuery.data) {
-        const props = record.data && typeof record.data === 'object' ? record.data : {};
-        const userData = userInfo(record.sessionId);
-        records.push({
-          __date__: record.date,
-          __time__: record.date.getTime(),
-          ...record.computedMeasures,
-          ...props
-        });
+    const fetchRecords = async () => {
+      if (recordsQuery.data) {
+        const records: InstrumentVisualizationRecord[] = [];
+
+        for (const record of recordsQuery.data) {
+          const props = record.data && typeof record.data === 'object' ? record.data : {};
+
+          const userData = await userInfo(record.sessionId);
+          if (userData?.userId) {
+            // safely check since userData can be null
+            records.push({
+              __date__: record.date,
+              __time__: record.date.getTime(),
+              username: userData.userId,
+              ...record.computedMeasures,
+              ...props
+            });
+            continue;
+          }
+          records.push({
+            __date__: record.date,
+            __time__: record.date.getTime(),
+            username: 'N/A',
+            ...record.computedMeasures,
+            ...props
+          });
+        }
+
+        setRecords(records);
       }
-      setRecords(records);
-    }
+    };
+    void fetchRecords();
   }, [recordsQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
