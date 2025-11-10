@@ -220,7 +220,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             records.push({
               __date__: record.date,
               __time__: record.date.getTime(),
-              username: userData.userId,
+              userId: userData.userId,
               ...record.computedMeasures,
               ...props
             });
@@ -229,7 +229,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
           records.push({
             __date__: record.date,
             __time__: record.date.getTime(),
-            username: 'N/A',
+            userId: 'N/A',
             ...record.computedMeasures,
             ...props
           });
