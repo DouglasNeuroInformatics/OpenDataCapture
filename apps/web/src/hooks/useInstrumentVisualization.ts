@@ -4,6 +4,7 @@ import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
 import type { Session } from '@opendatacapture/schemas/session';
+import type { User } from '@opendatacapture/schemas/user';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import axios from 'axios';
 import { omit } from 'lodash-es';
@@ -56,10 +57,20 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
-  const userInfo = async (sessionId: string): Promise<null | Session> => {
+  const sessionInfo = async (sessionId: string): Promise<null | Session> => {
     try {
       const response = await axios.get(`/v1/sessions/${sessionId}`);
       return response.data ? (response.data as Session) : null;
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      return null; // ensures a resolved value instead of `void`
+    }
+  };
+
+  const userInfo = async (userId: string): Promise<null | User> => {
+    try {
+      const response = await axios.get(`/v1/users/${userId}`);
+      return response.data ? (response.data as User) : null;
     } catch (error) {
       console.error('Error fetching user:', error);
       return null; // ensures a resolved value instead of `void`
@@ -214,22 +225,25 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         for (const record of recordsQuery.data) {
           const props = record.data && typeof record.data === 'object' ? record.data : {};
 
-          const userData = await userInfo(record.sessionId);
-          if (userData?.userId) {
-            // safely check since userData can be null
+          const sessionData = await sessionInfo(record.sessionId);
+
+          if (!sessionData?.userId) {
             records.push({
               __date__: record.date,
               __time__: record.date.getTime(),
-              userId: userData.userId,
+              userId: 'N/A',
               ...record.computedMeasures,
               ...props
             });
             continue;
           }
+
+          const userData = await userInfo(sessionData.userId);
+          // safely check since userData can be null
           records.push({
             __date__: record.date,
             __time__: record.date.getTime(),
-            userId: 'N/A',
+            userId: userData?.username ?? 'N/A',
             ...record.computedMeasures,
             ...props
           });
