@@ -37,6 +37,14 @@ const mockInstrumentRecords = {
   ]
 };
 
+const mockSession = {
+  sessionId: 123
+};
+
+const mockUser = {
+  username: 'testusername'
+};
+
 vi.mock('@/hooks/useInstrument', () => ({
   useInstrument: mockUseInstrument
 }));
@@ -61,6 +69,14 @@ vi.mock('@/utils/excel', () => ({
 
 vi.mock('@/hooks/useInstrumentRecords', () => ({
   useInstrumentRecords: () => mockInstrumentRecords
+}));
+
+vi.mock('@/hooks/useFindSession', () => ({
+  sessionInfo: () => mockSession
+}));
+
+vi.mock('@/hooks/useFindUser', () => ({
+  userInfo: () => mockUser
 }));
 
 describe('useInstrumentVisualization', () => {
