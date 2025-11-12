@@ -3,10 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
-import type { Session } from '@opendatacapture/schemas/session';
-import type { User } from '@opendatacapture/schemas/user';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import axios from 'axios';
 import { omit } from 'lodash-es';
 import { unparse } from 'papaparse';
 
@@ -15,6 +12,9 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
+
+import { sessionInfo } from './useFindSession';
+import { userInfo } from './useFindUser';
 
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
@@ -56,26 +56,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       subjectId: params.subjectId
     }
   });
-
-  const sessionInfo = async (sessionId: string): Promise<null | Session> => {
-    try {
-      const response = await axios.get(`/v1/sessions/${sessionId}`);
-      return response.data ? (response.data as Session) : null;
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      return null; // ensures a resolved value instead of `void`
-    }
-  };
-
-  const userInfo = async (userId: string): Promise<null | User> => {
-    try {
-      const response = await axios.get(`/v1/users/${userId}`);
-      return response.data ? (response.data as User) : null;
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      return null; // ensures a resolved value instead of `void`
-    }
-  };
 
   const dl = (option: 'CSV' | 'CSV Long' | 'Excel' | 'Excel Long' | 'JSON' | 'TSV' | 'TSV Long') => {
     if (!instrument) {
