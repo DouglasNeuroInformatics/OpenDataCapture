@@ -1,5 +1,5 @@
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useInstrumentVisualization } from '../useInstrumentVisualization';
@@ -32,13 +32,14 @@ const mockInstrumentRecords = {
     {
       computedMeasures: {},
       data: { someValue: 'abc' },
-      date: FIXED_TEST_DATE
+      date: FIXED_TEST_DATE,
+      sessionId: '123'
     }
   ]
 };
 
 const mockSession = {
-  sessionId: 123
+  userId: '111'
 };
 
 const mockUser = {
@@ -85,9 +86,12 @@ describe('useInstrumentVisualization', () => {
   });
 
   describe('CSV', () => {
-    it('Should download', () => {
+    it('Should download', async () => {
       const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
       const { records } = result.current;
+      await waitFor(() => {
+        expect(result.current.records.length).toBeGreaterThan(0);
+      });
       act(() => result.current.dl('CSV'));
       expect(records).toBeDefined();
       expect(mockDownloadFn).toHaveBeenCalledTimes(1);
@@ -95,30 +99,36 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvContents = getContentFn();
       expect(csvContents).toMatch(
-        `GroupID,subjectId,Date,someValue\r\ntestGroupId,testId,${toBasicISOString(FIXED_TEST_DATE)},abc`
+        `GroupID,subjectId,Date,userId,someValue\r\ntestGroupId,testId,${toBasicISOString(FIXED_TEST_DATE)},testusername,abc`
       );
     });
   });
   describe('TSV', () => {
-    it('Should download', () => {
+    it('Should download', async () => {
       const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
-      const { dl, records } = result.current;
-      act(() => dl('TSV'));
+      const { records } = result.current;
+      await waitFor(() => {
+        expect(result.current.records.length).toBeGreaterThan(0);
+      });
+      act(() => result.current.dl('TSV'));
       expect(records).toBeDefined();
       expect(mockDownloadFn).toHaveBeenCalledTimes(1);
       const [filename, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
       expect(filename).toContain('.tsv');
       const tsvContents = getContentFn();
       expect(tsvContents).toMatch(
-        `GroupID\tsubjectId\tDate\tsomeValue\r\ntestGroupId\ttestId\t${toBasicISOString(FIXED_TEST_DATE)}\tabc`
+        `GroupID\tsubjectId\tDate\tuserId\tsomeValue\r\ntestGroupId\ttestId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestusername\tabc`
       );
     });
   });
   describe('CSV Long', () => {
-    it('Should download', () => {
+    it('Should download', async () => {
       const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
-      const { dl, records } = result.current;
-      act(() => dl('CSV Long'));
+      const { records } = result.current;
+      await waitFor(() => {
+        expect(result.current.records.length).toBeGreaterThan(0);
+      });
+      act(() => result.current.dl('CSV Long'));
       expect(records).toBeDefined();
       expect(mockDownloadFn).toHaveBeenCalledTimes(1);
 
@@ -126,15 +136,18 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvLongContents = getContentFn();
       expect(csvLongContents).toMatch(
-        `GroupID,Date,SubjectID,Value,Variable\r\ntestGroupId,${toBasicISOString(FIXED_TEST_DATE)},testId,abc,someValue`
+        `GroupID,Date,SubjectID,Value,Variable\r\ntestGroupId,${toBasicISOString(FIXED_TEST_DATE)},testId,testusername,userId\r\ntestGroupId,${toBasicISOString(FIXED_TEST_DATE)},testId,abc,someValue`
       );
     });
   });
   describe('TSV Long', () => {
-    it('Should download', () => {
+    it('Should download', async () => {
       const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
-      const { dl, records } = result.current;
-      act(() => dl('TSV Long'));
+      const { records } = result.current;
+      await waitFor(() => {
+        expect(result.current.records.length).toBeGreaterThan(0);
+      });
+      act(() => result.current.dl('TSV Long'));
       expect(records).toBeDefined();
       expect(mockDownloadFn).toHaveBeenCalledTimes(1);
 
@@ -142,15 +155,18 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toMatch('.tsv');
       const tsvLongContents = getContentFn();
       expect(tsvLongContents).toMatch(
-        `GroupID\tDate\tSubjectID\tValue\tVariable\r\ntestGroupId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestId\tabc\tsomeValue`
+        `GroupID\tDate\tSubjectID\tValue\tVariable\r\ntestGroupId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestId\ttestusername\tuserId\r\ntestGroupId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestId\tabc\tsomeValue`
       );
     });
   });
   describe('Excel', () => {
-    it('Should download', () => {
+    it('Should download', async () => {
       const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
-      const { dl, records } = result.current;
-      act(() => dl('Excel'));
+      const { records } = result.current;
+      await waitFor(() => {
+        expect(result.current.records.length).toBeGreaterThan(0);
+      });
+      act(() => result.current.dl('Excel'));
       expect(records).toBeDefined();
       expect(mockExcelDownloadFn).toHaveBeenCalledTimes(1);
       const [filename, getContentFn] = mockExcelDownloadFn.mock.calls[0] ?? [];
@@ -163,16 +179,20 @@ describe('useInstrumentVisualization', () => {
           subjectId: 'testId',
           // eslint-disable-next-line perfectionist/sort-objects
           Date: '2025-04-30',
-          someValue: 'abc'
+          someValue: 'abc',
+          userId: 'testusername'
         }
       ]);
     });
   });
   describe('Excel Long', () => {
-    it('Should download', () => {
+    it('Should download', async () => {
       const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
-      const { dl, records } = result.current;
-      act(() => dl('Excel Long'));
+      const { records } = result.current;
+      await waitFor(() => {
+        expect(result.current.records.length).toBeGreaterThan(0);
+      });
+      act(() => result.current.dl('Excel Long'));
       expect(records).toBeDefined();
       expect(mockExcelDownloadFn).toHaveBeenCalledTimes(1);
 
@@ -181,6 +201,13 @@ describe('useInstrumentVisualization', () => {
       const excelContents = getContentFn;
 
       expect(excelContents).toEqual([
+        {
+          Date: '2025-04-30',
+          GroupID: 'testGroupId',
+          SubjectID: 'testId',
+          Value: 'testusername',
+          Variable: 'userId'
+        },
         {
           Date: '2025-04-30',
           GroupID: 'testGroupId',
@@ -194,8 +221,11 @@ describe('useInstrumentVisualization', () => {
   describe('JSON', () => {
     it('Should download', async () => {
       const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
-      const { dl, records } = result.current;
-      act(() => dl('JSON'));
+      const { records } = result.current;
+      await waitFor(() => {
+        expect(result.current.records.length).toBeGreaterThan(0);
+      });
+      act(() => result.current.dl('JSON'));
       expect(records).toBeDefined();
       expect(mockDownloadFn).toHaveBeenCalledTimes(1);
 
