@@ -49,14 +49,6 @@ const mockSessionWithUsername = {
   ]
 };
 
-const mockSession = {
-  sessionId: 123
-};
-
-const mockUser = {
-  username: 'testusername'
-};
-
 vi.mock('@/hooks/useInstrument', () => ({
   useInstrument: mockUseInstrument
 }));
