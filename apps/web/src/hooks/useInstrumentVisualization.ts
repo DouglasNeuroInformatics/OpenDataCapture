@@ -96,10 +96,15 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
       exportRecords.forEach((item) => {
         let date: Date;
+        let username: string;
 
         Object.entries(item).forEach(([objKey, objVal]) => {
           if (objKey === '__date__') {
             date = objVal as Date;
+            return;
+          }
+          if (objKey === 'userId') {
+            username = objVal as string;
             return;
           }
 
@@ -110,6 +115,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
                   GroupID: currentGroup ? currentGroup.id : 'root',
                   // eslint-disable-next-line perfectionist/sort-objects
                   Date: toBasicISOString(date),
+                  Username: username,
                   SubjectID: removeSubjectIdScope(params.subjectId),
                   Variable: `${objKey}-${arrKey}`,
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, perfectionist/sort-objects
@@ -122,6 +128,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
               GroupID: currentGroup ? currentGroup.id : 'root',
               // eslint-disable-next-line perfectionist/sort-objects
               Date: toBasicISOString(date),
+              Username: username,
               SubjectID: removeSubjectIdScope(params.subjectId),
               Value: objVal,
               Variable: objKey
