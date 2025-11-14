@@ -136,7 +136,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvLongContents = getContentFn();
       expect(csvLongContents).toMatch(
-        `GroupID,Date,SubjectID,Value,Variable\r\ntestGroupId,${toBasicISOString(FIXED_TEST_DATE)},testId,testusername,userId\r\ntestGroupId,${toBasicISOString(FIXED_TEST_DATE)},testId,abc,someValue`
+        `GroupID,Date,Username,SubjectID,Value,Variable\r\ntestGroupId,${toBasicISOString(FIXED_TEST_DATE)},testusername,testId,abc,someValue`
       );
     });
   });
@@ -155,7 +155,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toMatch('.tsv');
       const tsvLongContents = getContentFn();
       expect(tsvLongContents).toMatch(
-        `GroupID\tDate\tSubjectID\tValue\tVariable\r\ntestGroupId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestId\ttestusername\tuserId\r\ntestGroupId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestId\tabc\tsomeValue`
+        `GroupID\tDate\tUsername\tSubjectID\tValue\tVariable\r\ntestGroupId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestusername\ttestId\tabc\tsomeValue`
       );
     });
   });
@@ -205,13 +205,7 @@ describe('useInstrumentVisualization', () => {
           Date: '2025-04-30',
           GroupID: 'testGroupId',
           SubjectID: 'testId',
-          Value: 'testusername',
-          Variable: 'userId'
-        },
-        {
-          Date: '2025-04-30',
-          GroupID: 'testGroupId',
-          SubjectID: 'testId',
+          Username: 'testusername',
           Value: 'abc',
           Variable: 'someValue'
         }
