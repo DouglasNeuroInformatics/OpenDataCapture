@@ -1,4 +1,5 @@
-import { type User, $User } from '@opendatacapture/schemas/user';
+import { $User } from '@opendatacapture/schemas/user';
+import type { User } from '@opendatacapture/schemas/user';
 import axios from 'axios';
 
 export const userInfo = async (userId: string): Promise<null | User> => {
