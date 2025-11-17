@@ -104,21 +104,6 @@ export class SessionsService {
     return session;
   }
 
-  async findSessionList(ids: string[], { ability }: EntityOperationOptions = {}) {
-    const sessionsArray = await Promise.all(
-      ids.map(async (id) => {
-        const session = await this.sessionModel.findFirst({
-          where: { AND: [accessibleQuery(ability, 'read', 'Session')], id }
-        });
-        if (!session) {
-          throw new NotFoundException(`Failed to find session with ID: ${id}`);
-        }
-        return session;
-      })
-    );
-    return sessionsArray;
-  }
-
   /** Get the subject if they exist, otherwise create them */
   private async resolveSubject(subjectData: CreateSubjectData) {
     this.loggingService.debug({ message: 'Attempting to resolve subject', subjectData });
