@@ -6,7 +6,7 @@ export const sessionInfo = async (sessionId: string): Promise<null | Session> =>
     const response = await axios.get(`/v1/sessions/${sessionId}`);
     return response.data ? (response.data as Session) : null;
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error('Error fetching session:', error);
     return null; // ensures a resolved value instead of `void`
   }
 };
