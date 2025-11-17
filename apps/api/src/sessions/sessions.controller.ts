@@ -38,7 +38,7 @@ export class SessionsController {
     return this.sessionsService.findById(id, { ability });
   }
 
-  @ApiOperation({ description: 'Find Session by ID' })
+  @ApiOperation({ description: 'Find Sessions by ID' })
   @Post('list')
   @RouteAccess({ action: 'read', subject: 'Session' })
   findSessionList(@Query('ids') ids: string[]): Promise<Session[]> {
