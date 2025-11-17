@@ -138,7 +138,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
                   GroupID: currentGroup ? currentGroup.id : 'root',
                   // eslint-disable-next-line perfectionist/sort-objects
                   Date: toBasicISOString(date),
-                  Username: username,
                   SubjectID: removeSubjectIdScope(params.subjectId),
                   Username: username,
                   Variable: `${objKey}-${arrKey}`,
@@ -152,7 +151,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
               GroupID: currentGroup ? currentGroup.id : 'root',
               // eslint-disable-next-line perfectionist/sort-objects
               Date: toBasicISOString(date),
-              Username: username,
               SubjectID: removeSubjectIdScope(params.subjectId),
               Username: username,
               Value: objVal,
