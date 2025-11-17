@@ -41,8 +41,8 @@ export class SessionsController {
   @ApiOperation({ description: 'Find Sessions by ID' })
   @Post('list')
   @RouteAccess({ action: 'read', subject: 'Session' })
-  findSessionList(@Query('ids') ids: string[]): Promise<Session[]> {
+  findSessionList(@Query('ids') ids: string[], @CurrentUser('ability') ability: AppAbility): Promise<Session[]> {
     const idArray = Array.isArray(ids) ? ids : (ids as string).split(',');
-    return this.sessionsService.findSessionList(idArray);
+    return this.sessionsService.findSessionList(idArray, { ability });
   }
 }
