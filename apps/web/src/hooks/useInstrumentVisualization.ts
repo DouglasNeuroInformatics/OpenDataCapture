@@ -96,14 +96,14 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
       exportRecords.forEach((item) => {
         let date: Date;
-        let username: string;
+        let username: string = 'N/A';
 
         Object.entries(item).forEach(([objKey, objVal]) => {
           if (objKey === '__date__') {
             date = objVal as Date;
             return;
           }
-          if (objKey === 'userId') {
+          if (objKey === 'username') {
             username = objVal as string;
             return;
           }
@@ -219,7 +219,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
               records.push({
                 __date__: record.date,
                 __time__: record.date.getTime(),
-                userId: 'N/A',
+                username: 'N/A',
                 ...record.computedMeasures,
                 ...props
               });
@@ -231,7 +231,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             records.push({
               __date__: record.date,
               __time__: record.date.getTime(),
-              userId: userData?.username ?? 'N/A',
+              username: userData?.username ?? 'N/A',
               ...record.computedMeasures,
               ...props
             });
