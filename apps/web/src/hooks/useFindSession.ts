@@ -7,6 +7,6 @@ export const sessionInfo = async (sessionId: string): Promise<null | Session> =>
     return response.data ? (response.data as Session) : null;
   } catch (error) {
     console.error('Error fetching session:', error);
-    return null; // ensures a resolved value instead of `void`
+    throw error;
   }
 };
