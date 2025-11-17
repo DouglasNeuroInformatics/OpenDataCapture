@@ -7,6 +7,6 @@ export const userInfo = async (userId: string): Promise<null | User> => {
     return response.data ? (response.data as User) : null;
   } catch (error) {
     console.error('Error fetching user:', error);
-    return null; // ensures a resolved value instead of `void`
+    throw error;
   }
 };

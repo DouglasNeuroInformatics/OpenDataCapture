@@ -206,37 +206,41 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   useEffect(() => {
     const fetchRecords = async () => {
-      if (recordsQuery.data) {
-        const records: InstrumentVisualizationRecord[] = [];
+      try {
+        if (recordsQuery.data) {
+          const records: InstrumentVisualizationRecord[] = [];
 
-        for (const record of recordsQuery.data) {
-          const props = record.data && typeof record.data === 'object' ? record.data : {};
+          for (const record of recordsQuery.data) {
+            const props = record.data && typeof record.data === 'object' ? record.data : {};
 
-          const sessionData = await sessionInfo(record.sessionId);
+            const sessionData = await sessionInfo(record.sessionId);
 
-          if (!sessionData?.userId) {
+            if (!sessionData?.userId) {
+              records.push({
+                __date__: record.date,
+                __time__: record.date.getTime(),
+                userId: 'N/A',
+                ...record.computedMeasures,
+                ...props
+              });
+              continue;
+            }
+
+            const userData = await userInfo(sessionData.userId);
+            // safely check since userData can be null
             records.push({
               __date__: record.date,
               __time__: record.date.getTime(),
-              userId: 'N/A',
+              userId: userData?.username ?? 'N/A',
               ...record.computedMeasures,
               ...props
             });
-            continue;
           }
 
-          const userData = await userInfo(sessionData.userId);
-          // safely check since userData can be null
-          records.push({
-            __date__: record.date,
-            __time__: record.date.getTime(),
-            userId: userData?.username ?? 'N/A',
-            ...record.computedMeasures,
-            ...props
-          });
+          setRecords(records);
         }
-
-        setRecords(records);
+      } catch (error) {
+        console.error('Error occurred: ', error);
       }
     };
     void fetchRecords();
