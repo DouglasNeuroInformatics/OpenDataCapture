@@ -1,4 +1,5 @@
-import { type Session, $Session } from '@opendatacapture/schemas/session';
+import { $Session } from '@opendatacapture/schemas/session';
+import type { Session } from '@opendatacapture/schemas/session';
 import axios from 'axios';
 
 export const sessionInfo = async (sessionId: string): Promise<null | Session> => {
