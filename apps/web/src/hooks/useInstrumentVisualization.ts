@@ -245,6 +245,13 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         }
       } catch (error) {
         console.error('Error occurred: ', error);
+        notifications.addNotification({
+          message: t({
+            en: 'Error occurred finding records',
+            fr: "Une erreur s'est produite lors de la recherche des enregistrements."
+          }),
+          type: 'error'
+        });
       }
     };
     void fetchRecords();
