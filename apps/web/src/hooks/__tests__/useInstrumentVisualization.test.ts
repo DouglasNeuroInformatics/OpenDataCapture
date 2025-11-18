@@ -99,7 +99,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvContents = getContentFn();
       expect(csvContents).toMatch(
-        `GroupID,subjectId,Date,username,someValue\r\ntestGroupId,testId,${toBasicISOString(FIXED_TEST_DATE)},testusername,abc`
+        `GroupID,subjectId,Date,Username,someValue\r\ntestGroupId,testId,${toBasicISOString(FIXED_TEST_DATE)},testusername,abc`
       );
     });
   });
@@ -117,7 +117,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.tsv');
       const tsvContents = getContentFn();
       expect(tsvContents).toMatch(
-        `GroupID\tsubjectId\tDate\tusername\tsomeValue\r\ntestGroupId\ttestId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestusername\tabc`
+        `GroupID\tsubjectId\tDate\tUsername\tsomeValue\r\ntestGroupId\ttestId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestusername\tabc`
       );
     });
   });
@@ -180,7 +180,7 @@ describe('useInstrumentVisualization', () => {
           subjectId: 'testId',
           // eslint-disable-next-line perfectionist/sort-objects
           someValue: 'abc',
-          username: 'testusername'
+          Username: 'testusername'
         }
       ]);
     });
