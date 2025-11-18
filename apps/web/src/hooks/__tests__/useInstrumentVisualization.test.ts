@@ -178,6 +178,7 @@ describe('useInstrumentVisualization', () => {
           Date: '2025-04-30',
           GroupID: 'testGroupId',
           subjectId: 'testId',
+          // eslint-disable-next-line perfectionist/sort-objects
           someValue: 'abc',
           username: 'testusername'
         }
