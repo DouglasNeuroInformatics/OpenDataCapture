@@ -10,7 +10,7 @@ export type Session = z.infer<typeof $Session>;
 export const $Session = $BaseModel.extend({
   date: z.coerce.date(),
   groupId: z.string().nullable(),
-  subject: $Subject.optional(),
+  subject: $Subject,
   subjectId: z.string(),
   type: $SessionType,
   userId: z.string().nullish()
