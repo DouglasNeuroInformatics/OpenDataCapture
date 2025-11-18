@@ -73,11 +73,11 @@ vi.mock('@/hooks/useInstrumentRecords', () => ({
 }));
 
 vi.mock('@/hooks/useFindSession', () => ({
-  sessionInfo: () => mockSession
+  sessionInfo: () => Promise.resolve(mockSession)
 }));
 
 vi.mock('@/hooks/useFindUser', () => ({
-  userInfo: () => mockUser
+  userInfo: () => Promise.resolve(mockUser)
 }));
 
 describe('useInstrumentVisualization', () => {
