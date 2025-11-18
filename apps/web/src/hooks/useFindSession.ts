@@ -1,7 +1,7 @@
 import type { Session } from '@opendatacapture/schemas/session';
 import axios from 'axios';
 
-export const sessionInfo = async (sessionId: string): Promise<null | Session> => {
+export const sessionInfo = async (sessionId: string): Promise<Session> => {
   try {
     const response = await axios.get(`/v1/sessions/${sessionId}`);
     if (!response.data) {
