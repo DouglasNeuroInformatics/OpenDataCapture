@@ -85,6 +85,10 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             obj.Date = toBasicISOString(val as Date);
             continue;
           }
+          if (key === 'username') {
+            obj.Username = val;
+            continue;
+          }
           obj[key] = typeof val === 'object' ? JSON.stringify(val) : val;
         }
         return obj;
