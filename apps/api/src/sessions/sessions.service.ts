@@ -94,6 +94,21 @@ export class SessionsService {
     });
   }
 
+  async findAllIncludeUsernames(groupId: string, { ability }: EntityOperationOptions = {}) {
+    return this.sessionModel.findMany({
+      include: {
+        user: {
+          select: {
+            username: true
+          }
+        }
+      },
+      where: {
+        AND: [accessibleQuery(ability, 'read', 'Session'), { groupId }]
+      }
+    });
+  }
+
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
     const session = await this.sessionModel.findFirst({
       where: { AND: [accessibleQuery(ability, 'read', 'Session')], id }
