@@ -212,34 +212,31 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     const fetchRecords = async () => {
       try {
         if (recordsQuery.data) {
-          const records: InstrumentVisualizationRecord[] = [];
+          // Fetch all sessions in parallel
+          const sessionPromises = recordsQuery.data.map((record) => sessionInfo(record.sessionId));
+          const sessions = await Promise.all(sessionPromises);
 
-          for (const record of recordsQuery.data) {
+          // Extract unique userIds and fetch users in parallel
+          const userIds = [...new Set(sessions.filter((s) => s?.userId).map((s) => s.userId))];
+
+          const userPromises = userIds.map((userId) => userInfo(userId!));
+          const users = await Promise.all(userPromises);
+          const userMap = new Map(users.filter((u) => u).map((u) => [u!.id, u!.username]));
+
+          // Build records with looked-up data
+          const records: InstrumentVisualizationRecord[] = recordsQuery.data.map((record, i) => {
             const props = record.data && typeof record.data === 'object' ? record.data : {};
+            const session = sessions[i];
+            const username = session?.userId ? (userMap.get(session.userId) ?? 'N/A') : 'N/A';
 
-            const sessionData = await sessionInfo(record.sessionId);
-
-            if (!sessionData?.userId) {
-              records.push({
-                __date__: record.date,
-                __time__: record.date.getTime(),
-                username: 'N/A',
-                ...record.computedMeasures,
-                ...props
-              });
-              continue;
-            }
-
-            const userData = await userInfo(sessionData.userId);
-            // safely check since userData can be null
-            records.push({
+            return {
               __date__: record.date,
               __time__: record.date.getTime(),
-              username: userData?.username ?? 'N/A',
+              username: username,
               ...record.computedMeasures,
               ...props
-            });
-          }
+            };
+          });
 
           setRecords(records);
         }
