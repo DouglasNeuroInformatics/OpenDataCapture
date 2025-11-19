@@ -1,5 +1,6 @@
 import { CryptoService } from '@douglasneuroinformatics/libnest';
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { $LoginCredentials, TokenPayload } from '@opendatacapture/schemas/auth';
 import type { Group, User } from '@prisma/client';
@@ -16,6 +17,18 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService
   ) {}
+
+  async getCreateInstrumentToken(currentUser: RequestUser) {
+    if (!currentUser.ability.can('create', 'Instrument')) {
+      throw new ForbiddenException();
+    }
+
+    const limitedAbility = this.abilityFactory.createForPermissions([{ action: 'create', subject: 'Instrument' }]);
+
+    return {
+      accessToken: await this.jwtService.signAsync({ permissions: limitedAbility.rules }, { expiresIn: '1h' })
+    };
+  }
 
   async login(credentials: $LoginCredentials): Promise<{ accessToken: string }> {
     let user: User & {
