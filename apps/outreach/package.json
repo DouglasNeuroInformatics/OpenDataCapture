@@ -28,7 +28,7 @@
     "@opendatacapture/runtime-core": "workspace:*",
     "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "^4.1.5",
-    "astro": "^5.13.1",
+    "astro": "^5.15.6",
     "github-slugger": "^2.0.0",
     "sharp": "^0.33.5",
     "tailwindcss": "catalog:",
