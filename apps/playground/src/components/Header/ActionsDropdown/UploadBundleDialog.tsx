@@ -11,10 +11,11 @@ import { useAppStore } from '@/store';
 
 export type UploadBundleDialogProps = {
   isOpen: boolean;
+  onLoginRequired: () => void;
   setIsOpen: (value: boolean) => void;
 };
 
-export const UploadBundleDialog = ({ isOpen, setIsOpen }: UploadBundleDialogProps) => {
+export const UploadBundleDialog = ({ isOpen, setIsOpen, onLoginRequired }: UploadBundleDialogProps) => {
   const addNotification = useNotificationsStore((store) => store.addNotification);
 
   const auth = useAppStore((store) => store.auth);
@@ -90,7 +91,16 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen }: UploadBundleDialogProp
           </Dialog.Description>
         </Dialog.Header>
         <Dialog.Body className="grid gap-4">
-          <Button type="button" onClick={() => void handleSubmit().then(() => setIsOpen(false))}>
+          {!auth && (
+            <p className="mb-3 text-sm font-medium">
+              Please{' '}
+              <button className="text-sky-700 hover:underline" type="button" onClick={onLoginRequired}>
+                login to your account
+              </button>{' '}
+              to upload a bundle.
+            </p>
+          )}
+          <Button disabled={!auth} type="button" onClick={() => void handleSubmit().then(() => setIsOpen(false))}>
             Upload
           </Button>
         </Dialog.Body>

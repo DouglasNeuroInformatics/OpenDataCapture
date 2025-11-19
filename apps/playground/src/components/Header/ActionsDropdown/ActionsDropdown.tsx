@@ -77,7 +77,14 @@ export const ActionsDropdown = () => {
       <UserSettingsDialog isOpen={showUserSettingsDialog} setIsOpen={setShowUserSettingsDialog} />
       <DeleteInstrumentDialog isOpen={showDeleteInstrumentDialog} setIsOpen={setShowDeleteInstrumentDialog} />
       <RestoreDefaultsDialog isOpen={showRestoreDefaultsDialog} setIsOpen={setShowRestoreDefaultsDialog} />
-      <UploadBundleDialog isOpen={showUploadBundleDialog} setIsOpen={setShowUploadBundleDialog} />
+      <UploadBundleDialog
+        isOpen={showUploadBundleDialog}
+        setIsOpen={setShowUploadBundleDialog}
+        onLoginRequired={() => {
+          setShowUploadBundleDialog(false);
+          setShowLoginDialog(true);
+        }}
+      />
       <LoginDialog isOpen={showLoginDialog} setIsOpen={setShowLoginDialog} />
     </React.Fragment>
   );
