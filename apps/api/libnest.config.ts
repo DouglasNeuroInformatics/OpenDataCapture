@@ -8,7 +8,9 @@ import * as url from 'node:url';
 
 import { defineUserConfig } from '@douglasneuroinformatics/libnest/user-config';
 import { getReleaseInfo } from '@opendatacapture/release-info';
+import type { TokenPayload } from '@opendatacapture/schemas/auth';
 
+import type { AppAbility } from '@/auth/auth.types.js';
 import type { RuntimePrismaClient } from '@/core/prisma.js';
 import type { $Env } from '@/core/schemas/env.schema.js';
 
@@ -16,6 +18,9 @@ declare module '@douglasneuroinformatics/libnest/user-config' {
   export namespace UserTypes {
     export interface Env extends $Env {}
     export interface PrismaClient extends RuntimePrismaClient {}
+    export interface RequestUser extends TokenPayload {
+      ability: AppAbility;
+    }
   }
 }
 
