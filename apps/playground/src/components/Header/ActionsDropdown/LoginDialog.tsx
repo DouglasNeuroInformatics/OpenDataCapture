@@ -5,6 +5,7 @@ import { Dialog, Form } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import axios from 'axios';
+import { CheckIcon, XIcon } from 'lucide-react';
 import { err, ok } from 'neverthrow';
 import type { ResultAsync } from 'neverthrow';
 import { z } from 'zod/v4';
@@ -25,6 +26,7 @@ export type LoginDialogProps = {
 
 export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
   const apiBaseUrl = useAppStore((store) => store.settings.apiBaseUrl);
+  const isAuthorized = useAppStore((store) => !!store.auth);
   const updateSettings = useAppStore((store) => store.updateSettings);
 
   const addNotification = useNotificationsStore((store) => store.addNotification);
@@ -68,6 +70,23 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
             Login to your Open Data Capture instance. A special access token is used that grants permissions to create
             instruments only. You must have permission to create instruments to use this functionality.
           </Dialog.Description>
+          <div className="mt-2 flex items-center gap-1 text-sm font-medium">
+            {isAuthorized ? (
+              <>
+                <div className="flex h-4 w-4 items-center justify-center rounded-full bg-green-600">
+                  <CheckIcon className="text-white" style={{ height: '12px', width: '12px' }} />
+                </div>
+                <span>You are already logged in</span>
+              </>
+            ) : (
+              <>
+                <div className="flex h-4 w-4 items-center justify-center rounded-full bg-red-600">
+                  <XIcon className="text-white" style={{ height: '12px', width: '12px' }} />
+                </div>
+                <span>You are not currently logged in</span>
+              </>
+            )}
+          </div>
         </Dialog.Header>
         <Dialog.Body className="grid gap-4">
           <Form
