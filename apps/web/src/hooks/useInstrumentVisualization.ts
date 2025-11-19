@@ -209,6 +209,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   };
 
   useEffect(() => {
+    let cancelled = false;
     const fetchRecords = async () => {
       try {
         if (recordsQuery.data) {
@@ -219,6 +220,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
           // Extract unique userIds and fetch users in parallel
           const userIds = [...new Set(sessions.filter((s) => s?.userId).map((s) => s.userId))];
 
+          //assume userId exists in userId set as we already filtered out the non-existing userIds
           const userPromises = userIds.map((userId) => userInfo(userId!));
           const users = await Promise.all(userPromises);
           const userMap = new Map(users.filter((u) => u).map((u) => [u!.id, u!.username]));
@@ -238,7 +240,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             };
           });
 
-          setRecords(records);
+          if (!cancelled) {
+            setRecords(records);
+          }
         }
       } catch (error) {
         console.error('Error occurred: ', error);
@@ -252,6 +256,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       }
     };
     void fetchRecords();
+    return () => {
+      cancelled = true;
+    };
   }, [recordsQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
