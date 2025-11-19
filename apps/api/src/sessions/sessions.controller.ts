@@ -20,6 +20,16 @@ export class SessionsController {
     return this.sessionsService.create(data);
   }
 
+  @ApiOperation({ description: 'Find all sessions and usernames attached to them' })
+  @Get()
+  @RouteAccess({ action: 'read', subject: 'Session' })
+  findAllIncludeUsernames(
+    @Query('groupId') groupId: string,
+    @CurrentUser('ability') ability: AppAbility
+  ) {
+    return this.sessionsService.findAllIncludeUsernames(groupId, { ability });
+  }
+
   @ApiOperation({ description: 'Find Session by ID' })
   @Get(':id')
   @RouteAccess({ action: 'read', subject: 'Session' })
