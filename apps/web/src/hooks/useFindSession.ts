@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const sessionInfo = async (sessionId: string): Promise<Session> => {
   try {
-    const response = await axios.get(`/v1/sessions/${sessionId}`);
+    const response = await axios.get(`/v1/sessions/${encodeURIComponent(sessionId)}`);
     if (!response.data) {
       throw new Error('Session data does not exist');
     }
