@@ -40,10 +40,13 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
     revalidateToken();
   }, [isOpen]);
 
-  const getAdminToken = (credentials: $LoginCredentials): ResultAsync<{ accessToken: string }, string> => {
+  const getAdminToken = (
+    credentials: $LoginCredentials,
+    baseUrl: string
+  ): ResultAsync<{ accessToken: string }, string> => {
     return asyncResultify(async () => {
       try {
-        const response = await axios.post(`${apiBaseUrl}/v1/auth/login`, credentials, {
+        const response = await axios.post(`${baseUrl}/v1/auth/login`, credentials, {
           headers: {
             Accept: 'application/json'
           },
@@ -60,10 +63,10 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
     });
   };
 
-  const getLimitedToken = (adminToken: string): ResultAsync<{ accessToken: string }, string> => {
+  const getLimitedToken = (adminToken: string, baseUrl: string): ResultAsync<{ accessToken: string }, string> => {
     return asyncResultify(async () => {
       try {
-        const response = await axios.get(`${apiBaseUrl}/v1/auth/create-instrument-token`, {
+        const response = await axios.get(`${baseUrl}/v1/auth/create-instrument-token`, {
           headers: {
             Accept: 'application/json',
             Authorization: `Bearer ${adminToken}`
@@ -83,7 +86,7 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
 
   const handleSubmit = async ({ apiBaseUrl, legacyLogin, ...credentials }: $LoginData) => {
     updateSettings({ apiBaseUrl });
-    const adminTokenResult = await getAdminToken(credentials);
+    const adminTokenResult = await getAdminToken(credentials, apiBaseUrl);
     if (adminTokenResult.isErr()) {
       addNotification({ type: 'error', title: 'Login Failed', message: adminTokenResult.error });
       return;
@@ -92,7 +95,7 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
     if (legacyLogin) {
       login(adminTokenResult.value.accessToken);
     } else {
-      const limitedTokenResult = await getLimitedToken(adminTokenResult.value.accessToken);
+      const limitedTokenResult = await getLimitedToken(adminTokenResult.value.accessToken, apiBaseUrl);
       if (limitedTokenResult.isErr()) {
         addNotification({ type: 'error', title: 'Failed to Get Limited Token', message: limitedTokenResult.error });
         return;
