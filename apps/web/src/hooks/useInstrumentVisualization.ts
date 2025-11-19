@@ -63,18 +63,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
-  // Create a new sessionsUsernameQuery which uses the useFindSessionQuery hook
-  // have use a different return type with
-
-  const userInfo = async (userId: string): Promise<null | User> => {
-    try {
-      const response = await axios.get(`/v1/users/${userId}`);
-      return response.data ? (response.data as User) : null;
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      return null; // ensures a resolved value instead of `void`
-    }
-  };
+ 
 
   const dl = (option: 'CSV' | 'CSV Long' | 'Excel' | 'Excel Long' | 'JSON' | 'TSV' | 'TSV Long') => {
     if (!instrument) {
@@ -250,7 +239,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             };
           });
 
-          setRecords(records);
+          if (!cancelled) {
+            setRecords(records);
+          }
         }
       } catch (error) {
         console.error('Error occurred: ', error);
@@ -264,6 +255,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       }
     };
     void fetchRecords();
+    return () => {
+      cancelled = true;
+    };
   }, [recordsQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
