@@ -20,8 +20,13 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen, onLoginRequired }: Uploa
 
   const auth = useAppStore((store) => store.auth);
   const apiBaseUrl = useAppStore((store) => store.settings.apiBaseUrl);
+  const revalidateToken = useAppStore((store) => store.revalidateToken);
 
   const transpilerStateRef = useRef(useAppStore.getState().transpilerState);
+
+  useEffect(() => {
+    revalidateToken();
+  }, [isOpen]);
 
   useEffect(() => {
     useAppStore.subscribe(

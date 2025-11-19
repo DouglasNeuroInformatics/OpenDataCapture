@@ -1,5 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import { useEffect } from 'react';
+
 import { asyncResultify } from '@douglasneuroinformatics/libjs';
 import { Dialog, Form } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
@@ -29,8 +31,13 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
   const isAuthorized = useAppStore((store) => !!store.auth);
   const updateSettings = useAppStore((store) => store.updateSettings);
   const login = useAppStore((store) => store.login);
+  const revalidateToken = useAppStore((store) => store.revalidateToken);
 
   const addNotification = useNotificationsStore((store) => store.addNotification);
+
+  useEffect(() => {
+    revalidateToken();
+  }, [isOpen]);
 
   const getAdminToken = (credentials: $LoginCredentials): ResultAsync<{ accessToken: string }, string> => {
     return asyncResultify(async () => {
