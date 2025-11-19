@@ -8,6 +8,7 @@ import { useAppStore } from '@/store';
 import { DeleteInstrumentDialog } from './DeleteInstrumentDialog';
 import { LoginDialog } from './LoginDialog';
 import { RestoreDefaultsDialog } from './RestoreDefaultsDialog';
+import { StorageUsageDialog } from './StorageUsageDialog';
 import { UploadBundleDialog } from './UploadBundleDialog';
 import { UserSettingsDialog } from './UserSettingsDialog';
 
@@ -17,6 +18,7 @@ export const ActionsDropdown = () => {
   const [showRestoreDefaultsDialog, setShowRestoreDefaultsDialog] = useState(false);
   const [showUploadBundleDialog, setShowUploadBundleDialog] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showStorageUsageDialog, setShowStorageUsageDialog] = useState(false);
 
   const selectedInstrument = useAppStore((store) => store.selectedInstrument);
 
@@ -54,6 +56,11 @@ export const ActionsDropdown = () => {
               User Settings
             </button>
           </DropdownMenu.Item>
+          <DropdownMenu.Item asChild onSelect={() => setShowStorageUsageDialog(true)}>
+            <button className="w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
+              Storage Usage
+            </button>
+          </DropdownMenu.Item>
           <DropdownMenu.Separator />
           <DropdownMenu.Item asChild onSelect={() => setShowDeleteInstrumentDialog(true)}>
             <button
@@ -86,6 +93,7 @@ export const ActionsDropdown = () => {
         }}
       />
       <LoginDialog isOpen={showLoginDialog} setIsOpen={setShowLoginDialog} />
+      <StorageUsageDialog isOpen={showStorageUsageDialog} setIsOpen={setShowStorageUsageDialog} />
     </React.Fragment>
   );
 };
