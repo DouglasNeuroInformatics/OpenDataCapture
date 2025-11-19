@@ -28,10 +28,11 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
   const apiBaseUrl = useAppStore((store) => store.settings.apiBaseUrl);
   const isAuthorized = useAppStore((store) => !!store.auth);
   const updateSettings = useAppStore((store) => store.updateSettings);
+  const login = useAppStore((store) => store.login);
 
   const addNotification = useNotificationsStore((store) => store.addNotification);
 
-  const login = (credentials: $LoginCredentials): ResultAsync<{ accessToken: string }, string> => {
+  const getAdminToken = (credentials: $LoginCredentials): ResultAsync<{ accessToken: string }, string> => {
     return asyncResultify(async () => {
       try {
         const response = await axios.post(`${apiBaseUrl}/v1/auth/login`, credentials, {
@@ -46,17 +47,46 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
         return ok(await z.object({ accessToken: z.jwt() }).parseAsync(response.data));
       } catch (error) {
         console.error(error);
-        return err('Login Failed: Unknown Error');
+        return err('Unknown Error');
+      }
+    });
+  };
+
+  const getLimitedToken = (adminToken: string): ResultAsync<{ accessToken: string }, string> => {
+    return asyncResultify(async () => {
+      try {
+        const response = await axios.get(`${apiBaseUrl}/v1/auth/create-instrument-token`, {
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${adminToken}`
+          },
+          validateStatus: () => true
+        });
+        if (response.status !== 200) {
+          return err(`${response.status}: ${response.statusText}`);
+        }
+        return ok(await z.object({ accessToken: z.jwt() }).parseAsync(response.data));
+      } catch (error) {
+        console.error(error);
+        return err('Unknown Error');
       }
     });
   };
 
   const handleSubmit = async ({ apiBaseUrl, ...credentials }: $LoginData) => {
     updateSettings({ apiBaseUrl });
-    const loginResult = await login(credentials);
-    if (loginResult.isErr()) {
-      addNotification({ type: 'error', message: loginResult.error });
+    const adminTokenResult = await getAdminToken(credentials);
+    if (adminTokenResult.isErr()) {
+      addNotification({ type: 'error', title: 'Login Failed', message: adminTokenResult.error });
+      return;
     }
+    const limitedTokenResult = await getLimitedToken(adminTokenResult.value.accessToken);
+    if (limitedTokenResult.isErr()) {
+      addNotification({ type: 'error', title: 'Failed to Get Limited Token', message: limitedTokenResult.error });
+      return;
+    }
+
+    login(limitedTokenResult.value.accessToken);
 
     addNotification({ type: 'success' });
   };
