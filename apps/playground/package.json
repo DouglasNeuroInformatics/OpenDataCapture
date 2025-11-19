@@ -23,6 +23,7 @@
     "@opendatacapture/schemas": "workspace:*",
     "axios": "catalog:",
     "esbuild-wasm": "catalog:",
+    "idb-keyval": "^6.2.2",
     "immer": "^10.1.1",
     "jszip": "^3.10.1",
     "jwt-decode": "^4.0.0",

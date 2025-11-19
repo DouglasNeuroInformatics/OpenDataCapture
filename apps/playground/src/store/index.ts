@@ -1,8 +1,10 @@
 /* eslint-disable import/exports-last */
+import { del, get, set } from 'idb-keyval';
 import { jwtDecode } from 'jwt-decode';
 import { pick } from 'lodash-es';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist, subscribeWithSelector } from 'zustand/middleware';
+import type { StateStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 import { resolveIndexFilename } from '@/utils/file';
@@ -15,6 +17,18 @@ import { createTranspilerSlice } from './slices/transpiler.slice';
 import { createViewerSlice } from './slices/viewer.slice';
 
 import type { AppStore } from './types';
+
+const storage: StateStorage = {
+  getItem: async (name: string): Promise<null | string> => {
+    return (await get(name)) ?? null;
+  },
+  removeItem: async (name: string): Promise<void> => {
+    await del(name);
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    await set(name, value);
+  }
+};
 
 export const useAppStore = create(
   devtools(
@@ -64,7 +78,7 @@ export const useAppStore = create(
             _accessToken: state.auth?.accessToken
           };
         },
-        storage: createJSONStorage(() => localStorage),
+        storage: createJSONStorage(() => storage),
         version: 1
       }
     )
