@@ -57,6 +57,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
+  // Create a new sessionsUsernameQuery which uses the useFindSessionQuery hook
+  // have use a different return type with
+
   const dl = (option: 'CSV' | 'CSV Long' | 'Excel' | 'Excel Long' | 'JSON' | 'TSV' | 'TSV Long') => {
     if (!instrument) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
