@@ -63,6 +63,9 @@ catalogs:
     motion:
       specifier: 11.15.0
       version: 11.15.0
+    neverthrow:
+      specifier: ^8.2.0
+      version: 8.2.0
     nodemon:
       specifier: ^3.1.9
       version: 3.1.10
@@ -273,7 +276,7 @@ importers:
         specifier: ^6.15.0
         version: 6.17.0(socks@2.8.6)
       neverthrow:
-        specifier: ^8.2.0
+        specifier: 'catalog:'
         version: 8.2.0
       passport:
         specifier: ^0.7.0
@@ -545,6 +548,9 @@ importers:
       motion:
         specifier: 'catalog:'
         version: 11.15.0(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
+      neverthrow:
+        specifier: 'catalog:'
+        version: 8.2.0
       react:
         specifier: workspace:react__19.x@*
         version: link:../../vendor/react@19.x
