@@ -1,4 +1,5 @@
 /* eslint-disable import/exports-last */
+import { jwtDecode } from 'jwt-decode';
 import { pick } from 'lodash-es';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist, subscribeWithSelector } from 'zustand/middleware';
@@ -31,7 +32,7 @@ export const useAppStore = create(
       {
         merge: (_persistedState, currentState) => {
           const persistedState = _persistedState as
-            | Partial<Pick<AppStore, 'instruments' | 'selectedInstrument' | 'settings'>>
+            | (Partial<Pick<AppStore, 'instruments' | 'selectedInstrument' | 'settings'>> & { _accessToken?: string })
             | undefined;
           const instruments = [
             ...currentState.instruments,
@@ -43,10 +44,26 @@ export const useAppStore = create(
             instruments.find(({ id }) => id === persistedState?.selectedInstrument?.id) ??
             currentState.selectedInstrument;
           const settings = persistedState?.settings ?? currentState.settings;
-          return { ...currentState, instruments, selectedInstrument, settings };
+          const state: AppStore = { ...currentState, instruments, selectedInstrument, settings };
+          if (persistedState?._accessToken) {
+            try {
+              state.auth = {
+                accessToken: persistedState._accessToken,
+                payload: jwtDecode(persistedState._accessToken)
+              };
+            } catch (_) {
+              // if token is expired, ignore
+            }
+          }
+          return state;
         },
         name: 'app',
-        partialize: (state) => pick(state, ['instruments', 'selectedInstrument', 'settings']),
+        partialize: (state) => {
+          return {
+            ...pick(state, ['instruments', 'selectedInstrument', 'settings']),
+            _accessToken: state.auth?.accessToken
+          };
+        },
         storage: createJSONStorage(() => localStorage),
         version: 1
       }
