@@ -18,7 +18,8 @@ type $LoginData = z.infer<typeof $LoginData>;
 const $LoginData = z.object({
   apiBaseUrl: z.url(),
   username: z.string().min(1),
-  password: z.string().min(1)
+  password: z.string().min(1),
+  legacyLogin: z.boolean()
 });
 
 export type LoginDialogProps = {
@@ -39,10 +40,13 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
     revalidateToken();
   }, [isOpen]);
 
-  const getAdminToken = (credentials: $LoginCredentials): ResultAsync<{ accessToken: string }, string> => {
+  const getAdminToken = (
+    credentials: $LoginCredentials,
+    baseUrl: string
+  ): ResultAsync<{ accessToken: string }, string> => {
     return asyncResultify(async () => {
       try {
-        const response = await axios.post(`${apiBaseUrl}/v1/auth/login`, credentials, {
+        const response = await axios.post(`${baseUrl}/v1/auth/login`, credentials, {
           headers: {
             Accept: 'application/json'
           },
@@ -59,10 +63,10 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
     });
   };
 
-  const getLimitedToken = (adminToken: string): ResultAsync<{ accessToken: string }, string> => {
+  const getLimitedToken = (adminToken: string, baseUrl: string): ResultAsync<{ accessToken: string }, string> => {
     return asyncResultify(async () => {
       try {
-        const response = await axios.get(`${apiBaseUrl}/v1/auth/create-instrument-token`, {
+        const response = await axios.get(`${baseUrl}/v1/auth/create-instrument-token`, {
           headers: {
             Accept: 'application/json',
             Authorization: `Bearer ${adminToken}`
@@ -80,20 +84,24 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
     });
   };
 
-  const handleSubmit = async ({ apiBaseUrl, ...credentials }: $LoginData) => {
+  const handleSubmit = async ({ apiBaseUrl, legacyLogin, ...credentials }: $LoginData) => {
     updateSettings({ apiBaseUrl });
-    const adminTokenResult = await getAdminToken(credentials);
+    const adminTokenResult = await getAdminToken(credentials, apiBaseUrl);
     if (adminTokenResult.isErr()) {
       addNotification({ type: 'error', title: 'Login Failed', message: adminTokenResult.error });
       return;
     }
-    const limitedTokenResult = await getLimitedToken(adminTokenResult.value.accessToken);
-    if (limitedTokenResult.isErr()) {
-      addNotification({ type: 'error', title: 'Failed to Get Limited Token', message: limitedTokenResult.error });
-      return;
-    }
 
-    login(limitedTokenResult.value.accessToken);
+    if (legacyLogin) {
+      login(adminTokenResult.value.accessToken);
+    } else {
+      const limitedTokenResult = await getLimitedToken(adminTokenResult.value.accessToken, apiBaseUrl);
+      if (limitedTokenResult.isErr()) {
+        addNotification({ type: 'error', title: 'Failed to Get Limited Token', message: limitedTokenResult.error });
+        return;
+      }
+      login(limitedTokenResult.value.accessToken);
+    }
 
     addNotification({ type: 'success' });
   };
@@ -137,6 +145,20 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
                     placeholder: 'e.g., https://demo.opendatacapture.org/api',
                     label: 'API Base URL',
                     variant: 'input'
+                  },
+                  legacyLogin: {
+                    description: [
+                      "Use the user's full access token instead of a granular access token.",
+                      'Note that this can introduce security risks and should not be used on shared machines.',
+                      'It is required only for ODC versions prior to v1.12.0.'
+                    ].join(''),
+                    kind: 'boolean',
+                    label: 'Legacy Login Mode',
+                    variant: 'radio',
+                    options: {
+                      false: 'No (Recommended)',
+                      true: 'Yes'
+                    }
                   }
                 }
               },
@@ -156,7 +178,7 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
                 }
               }
             ]}
-            initialValues={{ apiBaseUrl }}
+            initialValues={{ apiBaseUrl, legacyLogin: false }}
             validationSchema={$LoginData}
             onSubmit={async (data) => {
               await handleSubmit(data);
