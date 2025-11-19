@@ -1,7 +1,12 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import { asyncResultify } from '@douglasneuroinformatics/libjs';
 import { Dialog, Form } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
+import axios from 'axios';
+import { err, ok } from 'neverthrow';
+import type { ResultAsync } from 'neverthrow';
 import { z } from 'zod/v4';
 
 import { useAppStore } from '@/store';
@@ -24,8 +29,33 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
 
   const addNotification = useNotificationsStore((store) => store.addNotification);
 
-  const handleSubmit = ({ apiBaseUrl }: $LoginData) => {
+  const login = (credentials: $LoginCredentials): ResultAsync<{ accessToken: string }, string> => {
+    return asyncResultify(async () => {
+      try {
+        const response = await axios.post(`${apiBaseUrl}/v1/auth/login`, credentials, {
+          headers: {
+            Accept: 'application/json'
+          },
+          validateStatus: () => true
+        });
+        if (response.status !== 200) {
+          return err(`${response.status}: ${response.statusText}`);
+        }
+        return ok(await z.object({ accessToken: z.jwt() }).parseAsync(response.data));
+      } catch (error) {
+        console.error(error);
+        return err('Login Failed: Unknown Error');
+      }
+    });
+  };
+
+  const handleSubmit = async ({ apiBaseUrl, ...credentials }: $LoginData) => {
     updateSettings({ apiBaseUrl });
+    const loginResult = await login(credentials);
+    if (loginResult.isErr()) {
+      addNotification({ type: 'error', message: loginResult.error });
+    }
+
     addNotification({ type: 'success' });
   };
 
@@ -72,8 +102,8 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
             ]}
             initialValues={{ apiBaseUrl }}
             validationSchema={$LoginData}
-            onSubmit={(data) => {
-              void handleSubmit(data);
+            onSubmit={async (data) => {
+              await handleSubmit(data);
               setIsOpen(false);
             }}
           />
