@@ -84,7 +84,7 @@ export class InstrumentRecordsController {
 
   @ApiOperation({ summary: 'Update Instrument Record' })
   @Patch(':id')
-  @RouteAccess({ action: 'delete', subject: 'InstrumentRecord' })
+  @RouteAccess({ action: 'update', subject: 'InstrumentRecord' })
   updateById(
     @Param('id', ValidObjectIdPipe) id: string,
     @Body() { data }: $UpdateInstrumentRecordData,
