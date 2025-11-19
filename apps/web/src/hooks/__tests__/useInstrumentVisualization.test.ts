@@ -43,6 +43,7 @@ const mockSession = {
 };
 
 const mockUser = {
+  id: '111',
   username: 'testusername'
 };
 
