@@ -221,7 +221,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
           const userIds = [...new Set(sessions.filter((s) => s?.userId).map((s) => s.userId))];
 
           //assume userId exists in userId set as we already filtered out the non-existing userIds
-          const userPromises = userIds.map((userId) => userInfo(userId!));
+          const userPromises = userIds.map((userId) => userInfo(userId!).catch(() => null));
           const users = await Promise.all(userPromises);
           const userMap = new Map(users.filter((u) => u).map((u) => [u!.id, u!.username]));
 
