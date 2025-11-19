@@ -41,6 +41,7 @@ export type AuthSlice = {
     payload: JwtPayload;
   };
   login: (accessToken: string) => void;
+  revalidateToken: () => void;
 };
 
 export type EditorState = {
