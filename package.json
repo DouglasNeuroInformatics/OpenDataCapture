@@ -1,7 +1,7 @@
 {
   "name": "opendatacapture",
   "type": "module",
-  "version": "1.11.2",
+  "version": "1.12.0",
   "private": true,
   "packageManager": "pnpm@10.7.0",
   "license": "Apache-2.0",
@@ -80,6 +80,7 @@
     },
     "onlyBuiltDependencies": [
       "@nestjs/core",
+      "mongodb-memory-server",
       "sharp"
     ]
   },

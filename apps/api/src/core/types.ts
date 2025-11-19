@@ -1,4 +1,4 @@
-import type { AppAbility } from '@douglasneuroinformatics/libnest';
+import type { AppAbility } from '@/auth/auth.types';
 
 export type EntityOperationOptions = {
   ability?: AppAbility;

@@ -1,8 +1,10 @@
-import { accessibleQuery, InjectModel, InjectPrismaClient } from '@douglasneuroinformatics/libnest';
-import type { ExtendedPrismaClient, Model } from '@douglasneuroinformatics/libnest';
+import { InjectModel, InjectPrismaClient } from '@douglasneuroinformatics/libnest';
+import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 
+import { accessibleQuery } from '@/auth/ability.utils';
+import type { RuntimePrismaClient } from '@/core/prisma';
 import type { EntityOperationOptions } from '@/core/types';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
@@ -10,7 +12,7 @@ import { CreateSubjectDto } from './dto/create-subject.dto';
 @Injectable()
 export class SubjectsService {
   constructor(
-    @InjectPrismaClient() private readonly prismaClient: ExtendedPrismaClient,
+    @InjectPrismaClient() private readonly prismaClient: RuntimePrismaClient,
     @InjectModel('Subject') private readonly subjectModel: Model<'Subject'>
   ) {}
 

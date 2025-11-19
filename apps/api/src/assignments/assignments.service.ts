@@ -1,11 +1,12 @@
 import crypto from 'node:crypto';
 
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
-import { accessibleQuery, ConfigService, InjectModel } from '@douglasneuroinformatics/libnest';
+import { ConfigService, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Assignment, UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
 
+import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GatewayService } from '@/gateway/gateway.service';
 

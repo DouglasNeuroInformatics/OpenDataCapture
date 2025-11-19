@@ -2,32 +2,31 @@
 
 import { useEffect, useRef } from 'react';
 
-import { Dialog, Form } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { AuthPayload } from '@opendatacapture/schemas/auth';
 import axios, { isAxiosError } from 'axios';
 import type { AxiosResponse } from 'axios';
-import { z } from 'zod/v4';
 
 import { useAppStore } from '@/store';
 
-const $UploadBundleData = z.object({
-  apiBaseUrl: z.url(),
-  username: z.string().min(1),
-  password: z.string().min(1)
-});
-
-type UploadBundleData = z.infer<typeof $UploadBundleData>;
-
 export type UploadBundleDialogProps = {
   isOpen: boolean;
+  onLoginRequired: () => void;
   setIsOpen: (value: boolean) => void;
 };
 
-export const UploadBundleDialog = ({ isOpen, setIsOpen }: UploadBundleDialogProps) => {
+export const UploadBundleDialog = ({ isOpen, setIsOpen, onLoginRequired }: UploadBundleDialogProps) => {
   const addNotification = useNotificationsStore((store) => store.addNotification);
-  const defaultApiBaseUrl = useAppStore((store) => store.settings.apiBaseUrl);
+
+  const auth = useAppStore((store) => store.auth);
+  const apiBaseUrl = useAppStore((store) => store.settings.apiBaseUrl);
+  const revalidateToken = useAppStore((store) => store.revalidateToken);
+
   const transpilerStateRef = useRef(useAppStore.getState().transpilerState);
+
+  useEffect(() => {
+    revalidateToken();
+  }, [isOpen]);
 
   useEffect(() => {
     useAppStore.subscribe(
@@ -38,7 +37,7 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen }: UploadBundleDialogProp
     );
   }, []);
 
-  const handleSubmit = async ({ apiBaseUrl, username, password }: UploadBundleData) => {
+  const handleSubmit = async () => {
     const state = transpilerStateRef.current;
     if (state.status === 'building' || state.status === 'initial') {
       addNotification({ message: 'Upload Failed: Transpilation Incomplete', type: 'error' });
@@ -46,37 +45,14 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen }: UploadBundleDialogProp
     } else if (state.status === 'error') {
       addNotification({ message: 'Upload Failed: Transpilation Error', type: 'error' });
       return;
-    }
-
-    const bundle = state.bundle;
-    const loginPath = `${apiBaseUrl}/v1/auth/login`;
-    const createInstrumentPath = `${apiBaseUrl}/v1/instruments`;
-
-    let loginResponse: AxiosResponse<AuthPayload>;
-    try {
-      loginResponse = await axios.post(
-        loginPath,
-        { username, password },
-        {
-          headers: {
-            Accept: 'application/json'
-          },
-          validateStatus: (status) => status === 200
-        }
-      );
-    } catch (err) {
-      console.error(err);
-      let message: string;
-      if (isAxiosError(err)) {
-        message = err.response ? `${err.response.status} ${err.response.statusText}` : err.message;
-      } else {
-        message = 'Unknown Error';
-      }
-      addNotification({ message, type: 'error', title: 'HTTP Request Failed' });
+    } else if (!auth) {
+      addNotification({ message: 'Login Required', type: 'error' });
       return;
     }
 
-    const accessToken = loginResponse.data.accessToken;
+    const accessToken = auth.accessToken;
+    const bundle = state.bundle;
+    const createInstrumentPath = `${apiBaseUrl}/v1/instruments`;
 
     let createInstrumentResponse: AxiosResponse;
     try {
@@ -120,45 +96,18 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen }: UploadBundleDialogProp
           </Dialog.Description>
         </Dialog.Header>
         <Dialog.Body className="grid gap-4">
-          <Form
-            content={[
-              {
-                title: 'Instance Settings',
-                fields: {
-                  apiBaseUrl: {
-                    description: 'The base path for your Open Data Capture REST API.',
-                    kind: 'string',
-                    placeholder: 'e.g., https://demo.opendatacapture.org/api',
-                    label: 'API Base URL',
-                    variant: 'input'
-                  }
-                }
-              },
-              {
-                title: 'Login Credentials',
-                fields: {
-                  username: {
-                    kind: 'string',
-                    label: 'Username',
-                    variant: 'input'
-                  },
-                  password: {
-                    kind: 'string',
-                    label: 'Password',
-                    variant: 'password'
-                  }
-                }
-              }
-            ]}
-            initialValues={{
-              apiBaseUrl: defaultApiBaseUrl
-            }}
-            validationSchema={$UploadBundleData}
-            onSubmit={(data) => {
-              void handleSubmit(data);
-              setIsOpen(false);
-            }}
-          />
+          {!auth && (
+            <p className="mb-3 text-sm font-medium">
+              Please{' '}
+              <button className="text-sky-700 hover:underline" type="button" onClick={onLoginRequired}>
+                login to your account
+              </button>{' '}
+              to upload a bundle.
+            </p>
+          )}
+          <Button disabled={!auth} type="button" onClick={() => void handleSubmit().then(() => setIsOpen(false))}>
+            Upload
+          </Button>
         </Dialog.Body>
       </Dialog.Content>
     </Dialog>

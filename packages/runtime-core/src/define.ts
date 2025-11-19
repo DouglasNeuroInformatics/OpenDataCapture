@@ -5,6 +5,7 @@ import type { ApprovedLicense } from '@opendatacapture/licenses';
 import type { InstrumentKind, InstrumentLanguage, InstrumentValidationSchema } from './types/instrument.base.js';
 import type { FormInstrument } from './types/instrument.form.js';
 import type { InteractiveInstrument } from './types/instrument.interactive.js';
+import type { SeriesInstrument } from './types/instrument.series.js';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-empty-object-type
@@ -59,4 +60,13 @@ export function defineInstrument<
   return Object.assign(def, {
     __runtimeVersion: 1
   }) as unknown as DiscriminatedInstrument<TKind, TLanguage, TSchema['_output']>;
+}
+
+/** @public */
+export function defineSeriesInstrument<TLanguage extends InstrumentLanguage>(
+  def: Omit<SeriesInstrument<TLanguage>, '__runtimeVersion'>
+): SeriesInstrument<TLanguage> {
+  return Object.assign(def, {
+    __runtimeVersion: 1 as const
+  });
 }

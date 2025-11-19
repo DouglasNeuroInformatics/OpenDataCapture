@@ -1,7 +1,7 @@
 import { Card, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Logo } from '@opendatacapture/react-core';
-import type { AuthPayload, LoginCredentials } from '@opendatacapture/schemas/auth';
+import type { $LoginCredentials, AuthPayload } from '@opendatacapture/schemas/auth';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 
@@ -12,7 +12,7 @@ import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStat
 import { useAppStore } from '@/store';
 
 const loginRequest = async (
-  credentials: LoginCredentials
+  credentials: $LoginCredentials
 ): Promise<{ accessToken: string; success: true } | { success: false }> => {
   const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {
     validateStatus: (status) => status === 200 || status === 401
@@ -31,7 +31,7 @@ const RouteComponent = () => {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
 
-  const handleLogin = async (credentials: LoginCredentials) => {
+  const handleLogin = async (credentials: $LoginCredentials) => {
     const result = await loginRequest(credentials);
     if (!result.success) {
       notifications.addNotification({

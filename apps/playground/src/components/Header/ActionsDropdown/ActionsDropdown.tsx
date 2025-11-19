@@ -6,6 +6,7 @@ import { EllipsisVerticalIcon } from 'lucide-react';
 import { useAppStore } from '@/store';
 
 import { DeleteInstrumentDialog } from './DeleteInstrumentDialog';
+import { LoginDialog } from './LoginDialog';
 import { RestoreDefaultsDialog } from './RestoreDefaultsDialog';
 import { UploadBundleDialog } from './UploadBundleDialog';
 import { UserSettingsDialog } from './UserSettingsDialog';
@@ -15,6 +16,7 @@ export const ActionsDropdown = () => {
   const [showDeleteInstrumentDialog, setShowDeleteInstrumentDialog] = useState(false);
   const [showRestoreDefaultsDialog, setShowRestoreDefaultsDialog] = useState(false);
   const [showUploadBundleDialog, setShowUploadBundleDialog] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   const selectedInstrument = useAppStore((store) => store.selectedInstrument);
 
@@ -36,6 +38,11 @@ export const ActionsDropdown = () => {
             >
               <span>GitHub</span>
             </a>
+          </DropdownMenu.Item>
+          <DropdownMenu.Item asChild onSelect={() => setShowLoginDialog(true)}>
+            <button className="w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
+              Login
+            </button>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild onSelect={() => setShowUploadBundleDialog(true)}>
             <button className="w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
@@ -70,7 +77,15 @@ export const ActionsDropdown = () => {
       <UserSettingsDialog isOpen={showUserSettingsDialog} setIsOpen={setShowUserSettingsDialog} />
       <DeleteInstrumentDialog isOpen={showDeleteInstrumentDialog} setIsOpen={setShowDeleteInstrumentDialog} />
       <RestoreDefaultsDialog isOpen={showRestoreDefaultsDialog} setIsOpen={setShowRestoreDefaultsDialog} />
-      <UploadBundleDialog isOpen={showUploadBundleDialog} setIsOpen={setShowUploadBundleDialog} />
+      <UploadBundleDialog
+        isOpen={showUploadBundleDialog}
+        setIsOpen={setShowUploadBundleDialog}
+        onLoginRequired={() => {
+          setShowUploadBundleDialog(false);
+          setShowLoginDialog(true);
+        }}
+      />
+      <LoginDialog isOpen={showLoginDialog} setIsOpen={setShowLoginDialog} />
     </React.Fragment>
   );
 };

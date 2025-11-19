@@ -1,9 +1,11 @@
-import { CurrentUser, RouteAccess } from '@douglasneuroinformatics/libnest';
-import type { AppAbility } from '@douglasneuroinformatics/libnest';
+import { CurrentUser } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import type { InstrumentBundleContainer, InstrumentInfo } from '@opendatacapture/schemas/instrument';
+
+import type { AppAbility } from '@/auth/auth.types';
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
 import { InstrumentsService } from './instruments.service';

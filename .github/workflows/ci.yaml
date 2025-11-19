@@ -18,10 +18,6 @@ jobs:
           node-version-file: '.nvmrc'
       - name: Generate Environment
         run: ./scripts/generate-env.sh
-      - name: Setup Mongo
-        run: |
-          docker run -d --name mongo -p 27017:27017 mongo:7 --replSet rs0
-          docker exec mongo mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"
       - name: Configure Git
         run: |
           # necessary for the git commands used for release info

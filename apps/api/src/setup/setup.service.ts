@@ -1,19 +1,26 @@
-import { ConfigService, InjectModel, PrismaService } from '@douglasneuroinformatics/libnest';
+import { isPlainObject } from '@douglasneuroinformatics/libjs';
+import { ConfigService, InjectModel, InjectPrismaClient } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
-import { ForbiddenException, Injectable, ServiceUnavailableException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  ServiceUnavailableException
+} from '@nestjs/common';
 import type { CreateAdminData, InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
+import type { RuntimePrismaClient } from '@/core/prisma';
 import { DemoService } from '@/demo/demo.service';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
 export class SetupService {
   constructor(
+    @InjectPrismaClient() private readonly prismaClient: RuntimePrismaClient,
     @InjectModel('SetupState') private readonly setupStateModel: Model<'SetupState'>,
     private readonly configService: ConfigService,
     private readonly demoService: DemoService,
-    private readonly usersService: UsersService,
-    private readonly prismaService: PrismaService
+    private readonly usersService: UsersService
   ) {}
 
   async createAdmin(admin: CreateAdminData) {
@@ -25,7 +32,7 @@ export class SetupService {
     if (!isTest) {
       throw new ForbiddenException('Cannot access outside of test');
     }
-    await this.prismaService.dropDatabase();
+    await this.dropDatabase();
   }
 
   async getState() {
@@ -46,7 +53,7 @@ export class SetupService {
     if (savedOptions?.isSetup && !isDev) {
       throw new ForbiddenException();
     }
-    await this.prismaService.dropDatabase();
+    await this.dropDatabase();
     await this.createAdmin(admin);
     if (initDemo) {
       await this.demoService.init({
@@ -71,6 +78,15 @@ export class SetupService {
         id: setupState.id
       }
     });
+  }
+
+  private async dropDatabase(): Promise<void> {
+    const result = await this.prismaClient.$runCommandRaw({ dropDatabase: 1 });
+    if (!isPlainObject(result) || result.ok !== 1) {
+      throw new InternalServerErrorException('Failed to drop database: raw mongodb command returned unexpected value', {
+        cause: result
+      });
+    }
   }
 
   private async getSavedOptions() {

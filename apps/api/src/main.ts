@@ -1,8 +1,9 @@
-import { AppFactory } from '@douglasneuroinformatics/libnest';
-import { PrismaClient } from '@prisma/client';
+import { AppFactory, PrismaModule } from '@douglasneuroinformatics/libnest';
 
 import { AssignmentsModule } from './assignments/assignments.module';
-import { $Env } from './core/env.schema';
+import { AuthModule } from './auth/auth.module';
+import { PrismaModuleOptionsFactory } from './core/prisma';
+import { $Env } from './core/schemas/env.schema';
 import { GatewayModule } from './gateway/gateway.module';
 import { GroupsModule } from './groups/groups.module';
 import { InstrumentRecordsModule } from './instrument-records/instrument-records.module';
@@ -12,7 +13,6 @@ import { SetupModule } from './setup/setup.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { SummaryModule } from './summary/summary.module';
 import { UsersModule } from './users/users.module';
-import { ConfiguredAuthModule } from './vendor/configured.auth.module';
 
 export default AppFactory.create({
   docs: {
@@ -36,10 +36,13 @@ export default AppFactory.create({
   },
   envSchema: $Env,
   imports: [
-    ConfiguredAuthModule,
+    AuthModule,
     GroupsModule,
     InstrumentRecordsModule,
     InstrumentsModule,
+    PrismaModule.forRootAsync({
+      useClass: PrismaModuleOptionsFactory
+    }),
     SessionsModule,
     SetupModule,
     SubjectsModule,
@@ -54,11 +57,5 @@ export default AppFactory.create({
       when: 'GATEWAY_ENABLED'
     }
   ],
-  prisma: {
-    client: {
-      constructor: PrismaClient
-    },
-    dbPrefix: 'data-capture'
-  },
   version: '1'
 });

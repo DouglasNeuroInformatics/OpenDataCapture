@@ -1,8 +1,10 @@
-import { CurrentUser, RouteAccess } from '@douglasneuroinformatics/libnest';
-import type { AppAbility } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common/decorators';
+import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
+
+import type { AppAbility } from '@/auth/auth.types';
+import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { AssignmentsService } from './assignments.service';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';

@@ -1,3 +1,4 @@
+import type { JwtPayload } from 'jwt-decode';
 import type { Simplify } from 'type-fest';
 import type { StateCreator } from 'zustand';
 
@@ -32,6 +33,15 @@ export type TranspilerState =
 export type TranspilerSlice = {
   setTranspilerState: (state: TranspilerState) => void;
   transpilerState: TranspilerState;
+};
+
+export type AuthSlice = {
+  auth: null | {
+    accessToken: string;
+    payload: JwtPayload;
+  };
+  login: (accessToken: string) => void;
+  revalidateToken: () => void;
 };
 
 export type EditorState = {
@@ -77,7 +87,7 @@ export type ViewerSlice = {
   };
 };
 
-export type AppStore = EditorSlice & InstrumentSlice & SettingsSlice & TranspilerSlice & ViewerSlice;
+export type AppStore = AuthSlice & EditorSlice & InstrumentSlice & SettingsSlice & TranspilerSlice & ViewerSlice;
 
 export type SliceCreator<T extends { [key: string]: unknown }> = StateCreator<
   AppStore,
