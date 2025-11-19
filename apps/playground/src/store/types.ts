@@ -34,6 +34,11 @@ export type TranspilerSlice = {
   transpilerState: TranspilerState;
 };
 
+export type AuthSlice = {
+  accessToken: null | string;
+  setAccessToken: (accessToken: null | string) => void;
+};
+
 export type EditorState = {
   files: EditorFile[];
   indexFilename: null | string;
@@ -77,7 +82,7 @@ export type ViewerSlice = {
   };
 };
 
-export type AppStore = EditorSlice & InstrumentSlice & SettingsSlice & TranspilerSlice & ViewerSlice;
+export type AppStore = AuthSlice & EditorSlice & InstrumentSlice & SettingsSlice & TranspilerSlice & ViewerSlice;
 
 export type SliceCreator<T extends { [key: string]: unknown }> = StateCreator<
   AppStore,
