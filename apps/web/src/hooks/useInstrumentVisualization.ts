@@ -13,7 +13,7 @@ import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
 
-import { sessionInfo } from './useFindSession';
+import { sessionInfo, useFindSessionQuery } from './useFindSessionQuery';
 import { userInfo } from './useFindUser';
 
 type InstrumentVisualizationRecord = {
@@ -56,6 +56,13 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       subjectId: params.subjectId
     }
   });
+
+  // const sessionsUsernameQuery = useFindSessionQuery({
+  //   enabled: instrumentId !== null,
+  //   params: {
+  //     groupId: currentGroup?.id
+  //   }
+  // });
 
   // Create a new sessionsUsernameQuery which uses the useFindSessionQuery hook
   // have use a different return type with
