@@ -46,7 +46,9 @@ export class SessionsService {
     let group: Group | null = null;
     if (groupId && !subject.groupIds.includes(groupId)) {
       group = await this.groupsService.findById(groupId);
-      await this.subjectsService.addGroupForSubject(subject.id, group.id);
+      if (group) {
+        await this.subjectsService.addGroupForSubject(subject.id, group.id);
+      }
     }
 
     const { id } = await this.sessionModel.create({
