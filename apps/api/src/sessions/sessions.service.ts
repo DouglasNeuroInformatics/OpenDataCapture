@@ -94,6 +94,26 @@ export class SessionsService {
     });
   }
 
+  async findAllIncludeUsernames(groupId?: string, { ability }: EntityOperationOptions = {}) {
+    const sessionsWithUsers = await this.sessionModel.findMany({
+      include: {
+        user: {
+          select: {
+            username: true
+          }
+        },
+        subject: true
+      },
+      where: {
+        AND: [accessibleQuery(ability, 'read', 'Session'), { groupId }]
+      }
+    });
+    if (!sessionsWithUsers) {
+      throw new NotFoundException(`Failed to find users`);
+    }
+    return sessionsWithUsers;
+  }
+
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
     const session = await this.sessionModel.findFirst({
       where: { AND: [accessibleQuery(ability, 'read', 'Session')], id }

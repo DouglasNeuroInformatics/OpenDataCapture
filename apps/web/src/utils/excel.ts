@@ -16,6 +16,5 @@ export function downloadSubjectTableExcel(filename: string, records: { [key: str
       .trim() || 'Subject'; // Fallback if empty
   const workbook = utils.book_new();
   utils.book_append_sheet(workbook, utils.json_to_sheet(records), sanitizedName);
-  utils.book_append_sheet(workbook, utils.json_to_sheet(records), name);
   writeFileXLSX(workbook, filename);
 }

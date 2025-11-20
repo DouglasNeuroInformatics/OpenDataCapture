@@ -13,6 +13,9 @@ import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
 
+import { sessionInfo, useFindSessionQuery } from './useFindSessionQuery';
+import { userInfo } from './useFindUser';
+
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
   __date__: Date;
@@ -54,6 +57,16 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
+  // const sessionsUsernameQuery = useFindSessionQuery({
+  //   enabled: instrumentId !== null,
+  //   params: {
+  //     groupId: currentGroup?.id
+  //   }
+  // });
+
+  // Create a new sessionsUsernameQuery which uses the useFindSessionQuery hook
+  // have use a different return type with
+
   const dl = (option: 'CSV' | 'CSV Long' | 'Excel' | 'Excel Long' | 'JSON' | 'TSV' | 'TSV Long') => {
     if (!instrument) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
@@ -82,6 +95,10 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             obj.Date = toBasicISOString(val as Date);
             continue;
           }
+          if (key === 'username') {
+            obj.Username = val;
+            continue;
+          }
           obj[key] = typeof val === 'object' ? JSON.stringify(val) : val;
         }
         return obj;
@@ -93,10 +110,15 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
       exportRecords.forEach((item) => {
         let date: Date;
+        let username = 'N/A';
 
         Object.entries(item).forEach(([objKey, objVal]) => {
           if (objKey === '__date__') {
             date = objVal as Date;
+            return;
+          }
+          if (objKey === 'username') {
+            username = objVal as string;
             return;
           }
 
@@ -108,6 +130,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
                   // eslint-disable-next-line perfectionist/sort-objects
                   Date: toBasicISOString(date),
                   SubjectID: removeSubjectIdScope(params.subjectId),
+                  Username: username,
                   Variable: `${objKey}-${arrKey}`,
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, perfectionist/sort-objects
                   Value: arrItem
@@ -120,6 +143,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
               // eslint-disable-next-line perfectionist/sort-objects
               Date: toBasicISOString(date),
               SubjectID: removeSubjectIdScope(params.subjectId),
+              Username: username,
               Value: objVal,
               Variable: objKey
             });
@@ -195,19 +219,56 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   };
 
   useEffect(() => {
-    if (recordsQuery.data) {
-      const records: InstrumentVisualizationRecord[] = [];
-      for (const record of recordsQuery.data) {
-        const props = record.data && typeof record.data === 'object' ? record.data : {};
-        records.push({
-          __date__: record.date,
-          __time__: record.date.getTime(),
-          ...record.computedMeasures,
-          ...props
+    let cancelled = false;
+    const fetchRecords = async () => {
+      try {
+        if (recordsQuery.data) {
+          // Fetch all sessions in parallel
+          const sessionPromises = recordsQuery.data.map((record) => sessionInfo(record.sessionId));
+          const sessions = await Promise.all(sessionPromises);
+
+          // Extract unique userIds and fetch users in parallel
+          const userIds = [...new Set(sessions.filter((s) => s?.userId).map((s) => s.userId))];
+
+          //assume userId exists in userId set as we already filtered out the non-existing userIds
+          const userPromises = userIds.map((userId) => userInfo(userId!).catch(() => null));
+          const users = await Promise.all(userPromises);
+          const userMap = new Map(users.filter((u) => u).map((u) => [u!.id, u!.username]));
+
+          // Build records with looked-up data
+          const records: InstrumentVisualizationRecord[] = recordsQuery.data.map((record, i) => {
+            const props = record.data && typeof record.data === 'object' ? record.data : {};
+            const session = sessions[i];
+            const username = session?.userId ? (userMap.get(session.userId) ?? 'N/A') : 'N/A';
+
+            return {
+              __date__: record.date,
+              __time__: record.date.getTime(),
+              username: username,
+              ...record.computedMeasures,
+              ...props
+            };
+          });
+
+          if (!cancelled) {
+            setRecords(records);
+          }
+        }
+      } catch (error) {
+        console.error('Error occurred: ', error);
+        notifications.addNotification({
+          message: t({
+            en: 'Error occurred finding records',
+            fr: "Une erreur s'est produite lors de la recherche des enregistrements."
+          }),
+          type: 'error'
         });
       }
-      setRecords(records);
-    }
+    };
+    void fetchRecords();
+    return () => {
+      cancelled = true;
+    };
   }, [recordsQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {

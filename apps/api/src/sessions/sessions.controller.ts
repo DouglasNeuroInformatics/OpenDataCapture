@@ -1,5 +1,5 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Session } from '@prisma/client';
 
@@ -8,6 +8,7 @@ import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateSessionDto } from './dto/create-session.dto';
 import { SessionsService } from './sessions.service';
+import type { SessionWithUser } from '@opendatacapture/schemas/session';
 
 @Controller('sessions')
 export class SessionsController {
@@ -18,6 +19,16 @@ export class SessionsController {
   @RouteAccess({ action: 'create', subject: 'Session' })
   create(@Body() data: CreateSessionDto): Promise<Session> {
     return this.sessionsService.create(data);
+  }
+
+  @ApiOperation({ description: 'Find all sessions and usernames attached to them' })
+  @Get()
+  @RouteAccess({ action: 'read', subject: 'Session' })
+  findAllIncludeUsernames(
+    @CurrentUser('ability') ability: AppAbility,
+    @Query('groupId') groupId?: string
+  ): Promise<SessionWithUser[]> {
+    return this.sessionsService.findAllIncludeUsernames(groupId, { ability });
   }
 
   @ApiOperation({ description: 'Find Session by ID' })
