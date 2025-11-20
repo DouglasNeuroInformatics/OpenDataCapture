@@ -101,7 +101,8 @@ export class SessionsService {
           select: {
             username: true
           }
-        }
+        },
+        subject: true
       },
       where: {
         AND: [accessibleQuery(ability, 'read', 'Session'), { groupId }]
