@@ -13,7 +13,7 @@ import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
 
-import { sessionInfo, useFindSessionQuery } from './useFindSessionQuery';
+import { useFindSessionQuery } from './useFindSessionQuery';
 import { userInfo } from './useFindUser';
 
 type InstrumentVisualizationRecord = {
@@ -57,12 +57,12 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
-  // const sessionsUsernameQuery = useFindSessionQuery({
-  //   enabled: instrumentId !== null,
-  //   params: {
-  //     groupId: currentGroup?.id
-  //   }
-  // });
+  const sessionsUsernameQuery = useFindSessionQuery({
+    enabled: instrumentId !== null,
+    params: {
+      groupId: currentGroup?.id
+    }
+  });
 
   // Create a new sessionsUsernameQuery which uses the useFindSessionQuery hook
   // have use a different return type with
@@ -222,24 +222,16 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     let cancelled = false;
     const fetchRecords = async () => {
       try {
-        if (recordsQuery.data) {
+        const sessions = await sessionsUsernameQuery.data;
+        if (recordsQuery.data && sessions) {
           // Fetch all sessions in parallel
-          const sessionPromises = recordsQuery.data.map((record) => sessionInfo(record.sessionId));
-          const sessions = await Promise.all(sessionPromises);
-
-          // Extract unique userIds and fetch users in parallel
-          const userIds = [...new Set(sessions.filter((s) => s?.userId).map((s) => s.userId))];
-
-          //assume userId exists in userId set as we already filtered out the non-existing userIds
-          const userPromises = userIds.map((userId) => userInfo(userId!).catch(() => null));
-          const users = await Promise.all(userPromises);
-          const userMap = new Map(users.filter((u) => u).map((u) => [u!.id, u!.username]));
 
           // Build records with looked-up data
           const records: InstrumentVisualizationRecord[] = recordsQuery.data.map((record, i) => {
             const props = record.data && typeof record.data === 'object' ? record.data : {};
-            const session = sessions[i];
-            const username = session?.userId ? (userMap.get(session.userId) ?? 'N/A') : 'N/A';
+            const usersSessions = sessions.filter((s) => s.id === record.sessionId);
+            const session = usersSessions[0];
+            const username = session?.user?.username ?? 'N/A';
 
             return {
               __date__: record.date,
