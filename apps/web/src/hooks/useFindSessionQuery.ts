@@ -1,10 +1,5 @@
-import { reviver } from '@douglasneuroinformatics/libjs';
-import {
-  $SessionWithUser,
-  type Session,
-  type SessionWithUser,
-  type SessionWithUserQueryParams
-} from '@opendatacapture/schemas/session';
+import { $SessionWithUser } from '@opendatacapture/schemas/session';
+import type { Session, SessionWithUserQueryParams } from '@opendatacapture/schemas/session';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
