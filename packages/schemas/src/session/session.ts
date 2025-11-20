@@ -25,9 +25,13 @@ export const $CreateSessionData = z.object({
   username: z.string().nullish()
 });
 
-export type $SessionWithUser = z.infer<typeof $SessionWithUser>;
+export type SessionWithUser = z.infer<typeof $SessionWithUser>;
 export const $SessionWithUser = $Session.extend({
   user: z.object({
     username: z.string().nullish()
   })
 });
+
+export type SessionWithUserQueryParams = {
+  groupId?: string;
+};

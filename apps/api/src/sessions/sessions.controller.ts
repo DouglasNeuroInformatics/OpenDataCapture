@@ -8,6 +8,7 @@ import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateSessionDto } from './dto/create-session.dto';
 import { SessionsService } from './sessions.service';
+import type { SessionWithUser } from '@opendatacapture/schemas/session';
 
 @Controller('sessions')
 export class SessionsController {
@@ -24,9 +25,9 @@ export class SessionsController {
   @Get()
   @RouteAccess({ action: 'read', subject: 'Session' })
   findAllIncludeUsernames(
-    @Query('groupId') groupId: string,
-    @CurrentUser('ability') ability: AppAbility
-  ) {
+    @CurrentUser('ability') ability: AppAbility,
+    @Query('groupId') groupId?: string
+  ): Promise<SessionWithUser[]> {
     return this.sessionsService.findAllIncludeUsernames(groupId, { ability });
   }
 
