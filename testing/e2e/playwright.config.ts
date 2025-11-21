@@ -75,7 +75,7 @@ export default defineConfig({
       stderr: 'pipe',
       stdout: process.env.CI ? 'pipe' : 'ignore',
       timeout: 10_000,
-      url: `http://localhost:${apiPort}`
+      url: `http://localhost:${apiPort}/v1/setup`
     },
     {
       command: 'pnpm dev:test',
