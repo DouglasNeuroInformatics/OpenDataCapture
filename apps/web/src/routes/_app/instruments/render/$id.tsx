@@ -42,7 +42,7 @@ const RouteComponent = () => {
       groupId: currentGroup?.id,
       instrumentId,
       sessionId: currentSession!.id,
-      subjectId: currentSession!.subject.id
+      subjectId: currentSession!.subject!.id
     } satisfies CreateInstrumentRecordData);
     notifications.addNotification({ type: 'success' });
   };
@@ -61,7 +61,7 @@ const RouteComponent = () => {
       <div className="grow">
         <InstrumentRenderer
           className="mx-auto max-w-3xl"
-          subject={currentSession?.subject}
+          subject={currentSession?.subject ?? undefined}
           target={instrumentBundleQuery.data}
           onSubmit={handleSubmit}
         />

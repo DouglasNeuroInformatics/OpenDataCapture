@@ -1,5 +1,5 @@
 import { $SessionWithUser } from '@opendatacapture/schemas/session';
-import type { Session, SessionWithUserQueryParams } from '@opendatacapture/schemas/session';
+import type { SessionWithUserQueryParams } from '@opendatacapture/schemas/session';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -14,19 +14,6 @@ type UseSessionOptions = {
   params: SessionWithUserQueryParams;
 };
 
-export const sessionInfo = async (sessionId: string): Promise<Session> => {
-  try {
-    const response = await axios.get(`/v1/sessions/${encodeURIComponent(sessionId)}`);
-    if (!response.data) {
-      throw new Error('Session data does not exist');
-    }
-    return response.data as Session;
-  } catch (error) {
-    console.error('Error fetching session:', error);
-    throw error;
-  }
-};
-
 export const useFindSessionQuery = (
   { enabled, params }: UseSessionOptions = {
     enabled: true,
@@ -36,10 +23,14 @@ export const useFindSessionQuery = (
   return useQuery({
     enabled,
     queryFn: async () => {
-      const response = await axios.get('/v1/sessions/', {
+      const response = await axios.get('/v1/sessions', {
         params
       });
-      return $SessionWithUser.array().parseAsync(response.data);
+      const parsedData = $SessionWithUser.array().safeParseAsync(response.data);
+      if ((await parsedData).error) {
+        throw new Error(`cant find data`);
+      }
+      return (await parsedData).data;
     },
     queryKey: ['sessions', ...Object.values(params)]
   });

@@ -88,7 +88,7 @@ export const Sidebar = () => {
           >
             <h5 className="text-sm font-medium">{t('common.sessionInProgress')}</h5>
             <hr className="my-1.5 h-[1px] border-none bg-slate-700" />
-            {isSubjectWithPersonalInfo(currentSession.subject) ? (
+            {isSubjectWithPersonalInfo(currentSession.subject!) ? (
               <div data-testid="current-session-info">
                 <p>{`${t('core.fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
                 <p>
@@ -100,7 +100,7 @@ export const Sidebar = () => {
               </div>
             ) : (
               <div data-testid="current-session-info">
-                <p>ID: {removeSubjectIdScope(currentSession.subject.id)}</p>
+                <p>ID: {removeSubjectIdScope(currentSession.subject!.id)}</p>
               </div>
             )}
           </motion.div>

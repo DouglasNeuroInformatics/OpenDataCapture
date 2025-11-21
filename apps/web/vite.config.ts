@@ -1,5 +1,6 @@
 import path from 'path';
 
+import { parseNumber } from '@douglasneuroinformatics/libjs';
 import importMetaEnv from '@import-meta-env/unplugin';
 import { getReleaseInfo } from '@opendatacapture/release-info';
 import runtime from '@opendatacapture/vite-plugin-runtime';
@@ -8,6 +9,15 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
+
+const apiPort = parseNumber(process.env.API_DEV_SERVER_PORT);
+const webPort = parseNumber(process.env.WEB_DEV_SERVER_PORT);
+
+if (Number.isNaN(apiPort)) {
+  throw new Error(`Expected API_DEV_SERVER_PORT to be number, got ${process.env.API_DEV_SERVER_PORT}`);
+} else if (Number.isNaN(webPort)) {
+  throw new Error(`Expected WEB_DEV_SERVER_PORT to be number, got ${process.env.WEB_DEV_SERVER_PORT}`);
+}
 
 export default defineConfig({
   build: {
@@ -45,13 +55,13 @@ export default defineConfig({
     }
   },
   server: {
-    port: parseInt(process.env.WEB_DEV_SERVER_PORT ?? '3000'),
+    port: webPort,
     proxy: {
       '/api/': {
         rewrite: (path) => path.replace(/^\/api/, ''),
         target: {
           host: 'localhost',
-          port: parseInt(process.env.API_DEV_SERVER_PORT ?? '5500')
+          port: apiPort
         }
       }
     }

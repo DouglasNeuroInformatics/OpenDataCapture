@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 export abstract class RootPage {
-  protected readonly $ref: Page;
+  readonly $ref: Page;
   protected abstract readonly defaultUrl: string;
 
   constructor(page: Page) {
