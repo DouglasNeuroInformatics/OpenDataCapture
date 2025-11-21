@@ -99,12 +99,12 @@ export class SessionsService {
   async findAllIncludeUsernames(groupId?: string, { ability }: EntityOperationOptions = {}) {
     const sessionsWithUsers = await this.sessionModel.findMany({
       include: {
+        subject: true,
         user: {
           select: {
             username: true
           }
-        },
-        subject: true
+        }
       },
       where: {
         AND: [accessibleQuery(ability, 'read', 'Session'), { groupId }]
