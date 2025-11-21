@@ -227,9 +227,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
           // Build records with looked-up data
           const records: InstrumentVisualizationRecord[] = recordsQuery.data.map((record) => {
             const props = record.data && typeof record.data === 'object' ? record.data : {};
-            const usersSessions = sessions.filter((s) => s.id === record.sessionId);
-            const session = usersSessions[0];
-            const username = session?.user?.username ?? 'N/A';
+            const usersSession = sessions.find((s) => s.id === record.sessionId);
+
+            const username = usersSession?.user?.username ?? 'N/A';
 
             return {
               __date__: record.date,
