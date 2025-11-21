@@ -38,13 +38,15 @@ const mockInstrumentRecords = {
   ]
 };
 
-const mockSession = {
-  userId: '111'
-};
-
-const mockUser = {
-  id: '111',
-  username: 'testusername'
+const mockSessionWithUsername = {
+  data: [
+    {
+      id: '123',
+      user: {
+        username: 'testusername'
+      }
+    }
+  ]
 };
 
 vi.mock('@/hooks/useInstrument', () => ({
@@ -73,12 +75,8 @@ vi.mock('@/hooks/useInstrumentRecords', () => ({
   useInstrumentRecords: () => mockInstrumentRecords
 }));
 
-vi.mock('@/hooks/useFindSession', () => ({
-  sessionInfo: () => Promise.resolve(mockSession)
-}));
-
-vi.mock('@/hooks/useFindUser', () => ({
-  userInfo: () => Promise.resolve(mockUser)
+vi.mock('@/hooks/useFindSessionQuery', () => ({
+  useFindSessionQuery: () => mockSessionWithUsername
 }));
 
 describe('useInstrumentVisualization', () => {
