@@ -12,7 +12,7 @@ test.describe.serial(() => {
     });
     test('should successfully setup', async ({ setupPage }) => {
       await setupPage.fillSetupForm(initAppOptions);
-      await setupPage.expect.toHaveURL('/dashboard');
+      await setupPage.expect.toHaveURL('/auth/login');
     });
     test('should be setup after initialization', async ({ request }) => {
       const response = await request.get('/api/v1/setup');
