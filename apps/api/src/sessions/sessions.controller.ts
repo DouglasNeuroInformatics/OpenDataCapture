@@ -1,6 +1,7 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
+import type { SessionWithUser } from '@opendatacapture/schemas/session';
 import type { Session } from '@prisma/client';
 
 import type { AppAbility } from '@/auth/auth.types';
@@ -8,7 +9,6 @@ import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateSessionDto } from './dto/create-session.dto';
 import { SessionsService } from './sessions.service';
-import type { SessionWithUser } from '@opendatacapture/schemas/session';
 
 @Controller('sessions')
 export class SessionsController {
