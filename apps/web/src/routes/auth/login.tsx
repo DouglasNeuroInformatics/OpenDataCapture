@@ -80,7 +80,7 @@ const RouteComponent = () => {
 
 export const Route = createFileRoute('/auth/login')({
   beforeLoad: async () => {
-    if (import.meta.env.DEV && config.dev.isBypassAuthEnabled) {
+    if (import.meta.env.DEV && import.meta.env.MODE !== 'test' && config.dev.isBypassAuthEnabled) {
       const { login } = useAppStore.getState();
       const response = await loginRequest({
         password: config.dev.password!,

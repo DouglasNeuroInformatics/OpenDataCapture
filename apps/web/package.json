@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc && NODE_ENV=production NODE_OPTIONS='--import=tsx' pnpm exec vite build",
     "dev": "NODE_ENV=development NODE_OPTIONS='--import=tsx' env-cmd -f ../../.env pnpm exec vite",
-    "dev:test": "NODE_ENV=test NODE_OPTIONS='--import=tsx' env-cmd -f ../../.env pnpm exec vite",
+    "dev:test": "NODE_ENV=test NODE_OPTIONS='--import=tsx' env-cmd -f ../../.env pnpm exec vite --mode test",
     "format": "prettier --write src",
     "format:translations": "find src/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
     "inject": "pnpm exec import-meta-env -x .env.public -p dist/index.html",
