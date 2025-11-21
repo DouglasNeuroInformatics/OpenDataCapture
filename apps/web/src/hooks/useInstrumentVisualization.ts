@@ -218,7 +218,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   };
 
   useEffect(() => {
-    let cancelled = false;
     const fetchRecords = () => {
       try {
         const sessions = sessionsUsernameQuery.data;
@@ -241,9 +240,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             };
           });
 
-          if (!cancelled) {
-            setRecords(records);
-          }
+          setRecords(records);
         }
       } catch (error) {
         console.error('Error occurred: ', error);
@@ -257,9 +254,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       }
     };
     void fetchRecords();
-    return () => {
-      cancelled = true;
-    };
   }, [recordsQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
