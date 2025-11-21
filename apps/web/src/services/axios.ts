@@ -5,7 +5,7 @@ import axios, { isAxiosError } from 'axios';
 import { config } from '@/config';
 import { useAppStore } from '@/store';
 
-axios.defaults.baseURL = import.meta.env.MODE !== 'test' ? config.setup.apiBaseUrl : undefined;
+axios.defaults.baseURL = config.setup.apiBaseUrl;
 
 axios.interceptors.request.use((config) => {
   const accessToken = useAppStore.getState().accessToken;
