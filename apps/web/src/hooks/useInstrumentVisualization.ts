@@ -14,7 +14,6 @@ import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
 
 import { useFindSessionQuery } from './useFindSessionQuery';
-import { userInfo } from './useFindUser';
 
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
@@ -220,14 +219,14 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   useEffect(() => {
     let cancelled = false;
-    const fetchRecords = async () => {
+    const fetchRecords = () => {
       try {
-        const sessions = await sessionsUsernameQuery.data;
+        const sessions = sessionsUsernameQuery.data;
         if (recordsQuery.data && sessions) {
           // Fetch all sessions in parallel
 
           // Build records with looked-up data
-          const records: InstrumentVisualizationRecord[] = recordsQuery.data.map((record, i) => {
+          const records: InstrumentVisualizationRecord[] = recordsQuery.data.map((record) => {
             const props = record.data && typeof record.data === 'object' ? record.data : {};
             const usersSessions = sessions.filter((s) => s.id === record.sessionId);
             const session = usersSessions[0];
