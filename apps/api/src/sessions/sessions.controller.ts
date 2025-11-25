@@ -9,7 +9,6 @@ import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateSessionDto } from './dto/create-session.dto';
 import { SessionsService } from './sessions.service';
-import type { SessionWithUser } from '@opendatacapture/schemas/session';
 
 @Controller('sessions')
 export class SessionsController {
