@@ -28,7 +28,8 @@ export const useFindSessionQuery = (
       });
       const parsedData = $SessionWithUser.array().safeParseAsync(response.data);
       if ((await parsedData).error) {
-        throw new Error(`cant find data`);
+        const message = (await parsedData).error?.message;
+        throw new Error(message);
       }
       return (await parsedData).data;
     },
