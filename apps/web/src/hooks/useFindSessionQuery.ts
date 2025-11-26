@@ -26,12 +26,7 @@ export const useFindSessionQuery = (
       const response = await axios.get('/v1/sessions', {
         params
       });
-      const parsedData = $SessionWithUser.array().safeParseAsync(response.data);
-      if ((await parsedData).error) {
-        const message = (await parsedData).error?.message;
-        throw new Error(message);
-      }
-      return (await parsedData).data;
+      return $SessionWithUser.array().parseAsync(response.data);
     },
     queryKey: ['sessions', ...Object.values(params)]
   });
