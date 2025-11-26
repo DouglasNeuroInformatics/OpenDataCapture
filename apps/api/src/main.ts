@@ -16,11 +16,12 @@ import { UsersModule } from './users/users.module';
 
 export default AppFactory.create({
   docs: {
-    contact: {
-      email: 'support@douglasneuroinformatics.ca',
-      name: 'Douglas Neuroinformatics',
-      url: 'https://douglasneuroinformatics.ca'
-    },
+    // TODO - allow this to be configured via env variables. requires changes in libnest.
+    // contact: {
+    //   email: 'support@douglasneuroinformatics.ca',
+    //   name: 'Douglas Neuroinformatics',
+    //   url: 'https://douglasneuroinformatics.ca'
+    // },
     description: 'Documentation for the REST API for Open Data Capture',
     externalDoc: {
       description: 'Homepage',
