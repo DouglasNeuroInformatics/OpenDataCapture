@@ -4,8 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 type UseSessionOptions = {
-
-type UseSessionOptions = {
   enabled?: boolean;
   params: SessionWithUserQueryParams;
 };
