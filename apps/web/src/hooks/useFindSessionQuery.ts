@@ -3,11 +3,7 @@ import type { SessionWithUserQueryParams } from '@opendatacapture/schemas/sessio
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-//Change this query to into a hook method and name it useFindSessionQuery
-
-//Change the api call to have an include tag which includes the username from users
-
-//Change the return type to
+type UseSessionOptions = {
 
 type UseSessionOptions = {
   enabled?: boolean;
