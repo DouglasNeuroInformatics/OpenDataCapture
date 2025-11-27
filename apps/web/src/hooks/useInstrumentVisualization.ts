@@ -63,8 +63,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
- 
-
   const dl = (option: 'CSV' | 'CSV Long' | 'Excel' | 'Excel Long' | 'JSON' | 'TSV' | 'TSV Long') => {
     if (!instrument) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
@@ -239,9 +237,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             };
           });
 
-          if (!cancelled) {
-            setRecords(records);
-          }
+          setRecords(records);
         }
       } catch (error) {
         console.error('Error occurred: ', error);
@@ -255,9 +251,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       }
     };
     void fetchRecords();
-    return () => {
-      cancelled = true;
-    };
   }, [recordsQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
