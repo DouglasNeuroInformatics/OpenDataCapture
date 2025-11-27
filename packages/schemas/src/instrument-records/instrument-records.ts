@@ -64,7 +64,7 @@ export type InstrumentRecordsExport = {
   subjectId: string;
   subjectSex: null | string;
   timestamp: string;
-  userId: string;
+  username: string;
   value: InstrumentMeasureValue;
 }[];
 
