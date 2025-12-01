@@ -215,42 +215,38 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   };
 
   useEffect(() => {
-    const fetchRecords = () => {
-      try {
-        const sessions = sessionsUsernameQuery.data;
-        if (recordsQuery.data && sessions) {
-          // Fetch all sessions in parallel
+    try {
+      const sessions = sessionsUsernameQuery.data;
+      if (recordsQuery.data && sessions) {
+        // Fetch all sessions in parallel
 
-          // Build records with looked-up data
-          const records: InstrumentVisualizationRecord[] = recordsQuery.data.map((record) => {
-            const props = record.data && typeof record.data === 'object' ? record.data : {};
-            const usersSession = sessions.find((s) => s.id === record.sessionId);
+        // Build records with looked-up data
+        const records: InstrumentVisualizationRecord[] = recordsQuery.data.map((record) => {
+          const props = record.data && typeof record.data === 'object' ? record.data : {};
+          const usersSession = sessions.find((s) => s.id === record.sessionId);
 
-            const username = usersSession?.user?.username ?? 'N/A';
+          const username = usersSession?.user?.username ?? 'N/A';
 
-            return {
-              __date__: record.date,
-              __time__: record.date.getTime(),
-              username: username,
-              ...record.computedMeasures,
-              ...props
-            };
-          });
-
-          setRecords(records);
-        }
-      } catch (error) {
-        console.error('Error occurred: ', error);
-        notifications.addNotification({
-          message: t({
-            en: 'Error occurred finding records',
-            fr: "Une erreur s'est produite lors de la recherche des enregistrements."
-          }),
-          type: 'error'
+          return {
+            __date__: record.date,
+            __time__: record.date.getTime(),
+            username: username,
+            ...record.computedMeasures,
+            ...props
+          };
         });
+
+        setRecords(records);
       }
-    };
-    void fetchRecords();
+    } catch (error) {
+      notifications.addNotification({
+        message: t({
+          en: 'Error occurred finding records',
+          fr: "Une erreur s'est produite lors de la recherche des enregistrements."
+        }),
+        type: 'error'
+      });
+    }
   }, [recordsQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
