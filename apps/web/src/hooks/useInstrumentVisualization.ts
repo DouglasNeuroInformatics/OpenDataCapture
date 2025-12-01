@@ -239,6 +239,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         setRecords(records);
       }
     } catch (error) {
+      console.error(error);
       notifications.addNotification({
         message: t({
           en: 'Error occurred finding records',
