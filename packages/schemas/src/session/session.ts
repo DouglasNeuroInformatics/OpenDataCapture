@@ -10,7 +10,7 @@ export type Session = z.infer<typeof $Session>;
 export const $Session = $BaseModel.extend({
   date: z.coerce.date(),
   groupId: z.string().nullable(),
-  subject: $Subject,
+  subject: $Subject.nullable(),
   subjectId: z.string(),
   type: $SessionType,
   userId: z.string().nullish()
@@ -24,3 +24,16 @@ export const $CreateSessionData = z.object({
   type: $SessionType,
   username: z.string().nullish()
 });
+
+export type SessionWithUser = z.infer<typeof $SessionWithUser>;
+export const $SessionWithUser = $Session.extend({
+  user: z
+    .object({
+      username: z.string().nullish()
+    })
+    .nullable()
+});
+
+export type SessionWithUserQueryParams = {
+  groupId?: string;
+};

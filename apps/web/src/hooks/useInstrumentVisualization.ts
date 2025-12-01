@@ -13,6 +13,8 @@ import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
 
+import { useFindSessionQuery } from './useFindSessionQuery';
+
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
   __date__: Date;
@@ -54,6 +56,13 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     }
   });
 
+  const sessionsUsernameQuery = useFindSessionQuery({
+    enabled: instrumentId !== null,
+    params: {
+      groupId: currentGroup?.id
+    }
+  });
+
   const dl = (option: 'CSV' | 'CSV Long' | 'Excel' | 'Excel Long' | 'JSON' | 'TSV' | 'TSV Long') => {
     if (!instrument) {
       notifications.addNotification({ message: t('errors.noInstrumentSelected'), type: 'error' });
@@ -82,6 +91,10 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             obj.Date = toBasicISOString(val as Date);
             continue;
           }
+          if (key === 'username') {
+            obj.Username = val;
+            continue;
+          }
           obj[key] = typeof val === 'object' ? JSON.stringify(val) : val;
         }
         return obj;
@@ -93,10 +106,15 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
       exportRecords.forEach((item) => {
         let date: Date;
+        let username = 'N/A';
 
         Object.entries(item).forEach(([objKey, objVal]) => {
           if (objKey === '__date__') {
             date = objVal as Date;
+            return;
+          }
+          if (objKey === 'username') {
+            username = objVal as string;
             return;
           }
 
@@ -108,6 +126,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
                   // eslint-disable-next-line perfectionist/sort-objects
                   Date: toBasicISOString(date),
                   SubjectID: removeSubjectIdScope(params.subjectId),
+                  Username: username,
                   Variable: `${objKey}-${arrKey}`,
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, perfectionist/sort-objects
                   Value: arrItem
@@ -120,6 +139,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
               // eslint-disable-next-line perfectionist/sort-objects
               Date: toBasicISOString(date),
               SubjectID: removeSubjectIdScope(params.subjectId),
+              Username: username,
               Value: objVal,
               Variable: objKey
             });
@@ -195,18 +215,38 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   };
 
   useEffect(() => {
-    if (recordsQuery.data) {
-      const records: InstrumentVisualizationRecord[] = [];
-      for (const record of recordsQuery.data) {
-        const props = record.data && typeof record.data === 'object' ? record.data : {};
-        records.push({
-          __date__: record.date,
-          __time__: record.date.getTime(),
-          ...record.computedMeasures,
-          ...props
+    try {
+      const sessions = sessionsUsernameQuery.data;
+      if (recordsQuery.data && sessions) {
+        // Fetch all sessions in parallel
+
+        // Build records with looked-up data
+        const records: InstrumentVisualizationRecord[] = recordsQuery.data.map((record) => {
+          const props = record.data && typeof record.data === 'object' ? record.data : {};
+          const usersSession = sessions.find((s) => s.id === record.sessionId);
+
+          const username = usersSession?.user?.username ?? 'N/A';
+
+          return {
+            __date__: record.date,
+            __time__: record.date.getTime(),
+            username: username,
+            ...record.computedMeasures,
+            ...props
+          };
         });
+
+        setRecords(records);
       }
-      setRecords(records);
+    } catch (error) {
+      console.error(error);
+      notifications.addNotification({
+        message: t({
+          en: 'Error occurred finding records',
+          fr: "Une erreur s'est produite lors de la recherche des enregistrements."
+        }),
+        type: 'error'
+      });
     }
   }, [recordsQuery.data]);
 

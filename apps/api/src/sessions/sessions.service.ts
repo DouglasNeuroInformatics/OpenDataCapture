@@ -46,7 +46,9 @@ export class SessionsService {
     let group: Group | null = null;
     if (groupId && !subject.groupIds.includes(groupId)) {
       group = await this.groupsService.findById(groupId);
-      await this.subjectsService.addGroupForSubject(subject.id, group.id);
+      if (group) {
+        await this.subjectsService.addGroupForSubject(subject.id, group.id);
+      }
     }
 
     const { id } = await this.sessionModel.create({
@@ -92,6 +94,26 @@ export class SessionsService {
         }
       }
     });
+  }
+
+  async findAllIncludeUsernames(groupId?: string, { ability }: EntityOperationOptions = {}) {
+    const sessionsWithUsers = await this.sessionModel.findMany({
+      include: {
+        subject: true,
+        user: {
+          select: {
+            username: true
+          }
+        }
+      },
+      where: {
+        AND: [accessibleQuery(ability, 'read', 'Session'), { groupId }]
+      }
+    });
+    if (sessionsWithUsers.length < 1) {
+      throw new NotFoundException(`Failed to find users`);
+    }
+    return sessionsWithUsers;
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
