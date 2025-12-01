@@ -110,7 +110,7 @@ export class SessionsService {
         AND: [accessibleQuery(ability, 'read', 'Session'), { groupId }]
       }
     });
-    if (!sessionsWithUsers) {
+    if (sessionsWithUsers.length < 1) {
       throw new NotFoundException(`Failed to find users`);
     }
     return sessionsWithUsers;
