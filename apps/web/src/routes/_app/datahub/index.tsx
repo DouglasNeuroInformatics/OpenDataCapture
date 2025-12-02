@@ -3,10 +3,12 @@ import React, { useState } from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
   ActionDropdown,
+  Button,
   Checkbox,
   ClientTable,
   Dialog,
   Heading,
+  Label,
   SearchBar
 } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -209,9 +211,14 @@ const RouteComponent = () => {
             />
           </div>
           <div className="flex min-w-60 gap-2 lg:shrink">
-            <Checkbox id="Datahub table search mode" onCheckedChange={() => setLookUpSearch(!isLookUpSearch)}>
-              Table Search Mode
-            </Checkbox>
+            <Checkbox
+              id="Datahub table search mode"
+              onCheckedChange={() => setLookUpSearch(!isLookUpSearch)}
+            ></Checkbox>
+            <Label>Enable Datahub Table Search</Label>
+          </div>
+          <div className="flex min-w-60 gap-2 lg:shrink">
+            <Button label="Reset Datahub" onClick={() => void setTableData(data)} />
           </div>
         </div>
         <MasterDataTable
