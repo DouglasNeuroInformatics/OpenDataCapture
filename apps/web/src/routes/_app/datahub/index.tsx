@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { ActionDropdown, ClientTable, Dialog, Heading, SearchBar } from '@douglasneuroinformatics/libui/components';
+import {
+  ActionDropdown,
+  Checkbox,
+  ClientTable,
+  Dialog,
+  Heading,
+  SearchBar
+} from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
@@ -71,6 +78,8 @@ const RouteComponent = () => {
   const navigate = useNavigate();
 
   const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
+  const [tableData, setTableData] = useState<Subject[]>(data);
+  const [isLookUpSearch, setLookUpSearch] = useState(true);
 
   const getExportRecords = async () => {
     const response = await axios.get<InstrumentRecordsExport>('/v1/instrument-records/export', {
@@ -92,15 +101,21 @@ const RouteComponent = () => {
     });
     getExportRecords()
       .then((data): any => {
+        const listedSubjects = tableData.map((record) => {
+          return record.id.replace('root$', '');
+        });
+
+        const filteredData = data.filter((dataEntry) => listedSubjects.includes(dataEntry.subjectId));
+
         switch (option) {
           case 'CSV':
             void download('README.txt', t('datahub.index.table.exportHelpText'));
-            void download(`${baseFilename}.csv`, unparse(data));
+            void download(`${baseFilename}.csv`, unparse(filteredData));
             break;
           case 'Excel':
-            return downloadExcel(`${baseFilename}.xlsx`, data);
+            return downloadExcel(`${baseFilename}.xlsx`, filteredData);
           case 'JSON':
-            return download(`${baseFilename}.json`, JSON.stringify(data, null, 2));
+            return download(`${baseFilename}.json`, JSON.stringify(filteredData, null, 2));
         }
       })
       .then(() => {
@@ -119,6 +134,11 @@ const RouteComponent = () => {
   };
 
   const lookupSubject = async ({ id }: { id: string }) => {
+    if (!isLookUpSearch) {
+      setSubjectTable({ id: id });
+      return;
+    }
+
     const response = await axios.get<Subject>(`/v1/subjects/${id}`, {
       validateStatus: (status) => status === 200 || status === 404
     });
@@ -128,6 +148,24 @@ const RouteComponent = () => {
     } else {
       addNotification({ type: 'success' });
       await navigate({ to: `./${response.data.id}/assignments` });
+    }
+  };
+
+  const setSubjectTable = ({ id }: { id: string }) => {
+    const newSubjects = data.map((record) => {
+      if (record.id.includes(id)) {
+        return record;
+      }
+      return;
+    });
+
+    const filteredSubjects = newSubjects.filter((record) => record !== undefined);
+
+    if (newSubjects.length < 1) {
+      addNotification({ message: t('core.notFound'), type: 'warning' });
+    } else {
+      addNotification({ type: 'success' });
+      setTableData(filteredSubjects);
     }
   };
 
@@ -170,9 +208,14 @@ const RouteComponent = () => {
               onSelection={handleExportSelection}
             />
           </div>
+          <div className="flex min-w-60 gap-2 lg:shrink">
+            <Checkbox id="Datahub table search mode" onCheckedChange={() => setLookUpSearch(!isLookUpSearch)}>
+              Table Search Mode
+            </Checkbox>
+          </div>
         </div>
         <MasterDataTable
-          data={data}
+          data={tableData}
           onSelect={(subject) => {
             void navigate({ to: `./${subject.id}/table` });
           }}
