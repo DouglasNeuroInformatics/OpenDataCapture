@@ -215,7 +215,13 @@ const RouteComponent = () => {
               id="Datahub table search mode"
               onCheckedChange={() => setLookUpSearch(!isLookUpSearch)}
             ></Checkbox>
-            <Label>Enable Datahub Table Search</Label>
+            <Label>
+              {' '}
+              {t({
+                en: 'Enable Datahub Filter Mode',
+                fr: 'Activer le mode de filtrage'
+              })}
+            </Label>
           </div>
           <div className="flex min-w-60 gap-2 lg:shrink">
             <Button label="Reset Datahub" onClick={() => void setTableData(data)} />
