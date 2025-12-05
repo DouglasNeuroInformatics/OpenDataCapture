@@ -180,33 +180,29 @@ const RouteComponent = () => {
       </PageHeader>
       <div className="flex grow flex-col">
         <div className="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
+          <SearchBar
+            className="[&>input]:text-foreground [&>input]:placeholder-foreground grow"
+            data-testid="datahub-subject-lookup-search"
+            id="subject-lookup-search-bar"
+            placeholder={t({
+              en: 'Click to Search',
+              fr: 'Cliquer pour rechercher'
+            })}
+            readOnly={false}
+          />
           <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
-            {isLookUpSearch ? (
-              <Dialog.Trigger className="grow">
-                <Button
-                  className="[&>input]:text-foreground [&>input]:placeholder-foreground grow"
-                  data-testid="datahub-subject-lookup-search"
-                  id="subject-lookup-search-bar"
-                >
-                  {t({
-                    en: 'Click to Search',
-                    fr: 'Cliquer pour rechercher'
-                  })}
-                </Button>
-              </Dialog.Trigger>
-            ) : (
-              <SearchBar
+            <Dialog.Trigger>
+              <Button
                 className="[&>input]:text-foreground [&>input]:placeholder-foreground grow"
                 data-testid="datahub-subject-lookup-search"
                 id="subject-lookup-search-bar"
-                placeholder={t({
+              >
+                {t({
                   en: 'Click to Search',
                   fr: 'Cliquer pour rechercher'
                 })}
-                readOnly={false}
-              />
-            )}
-
+              </Button>
+            </Dialog.Trigger>
             <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
               <Dialog.Header>
                 <Dialog.Title>{t('datahub.index.lookup.title')}</Dialog.Title>
@@ -223,19 +219,6 @@ const RouteComponent = () => {
               title={t('datahub.index.table.export')}
               onSelection={handleExportSelection}
             />
-          </div>
-          <div className="flex min-w-60 gap-2 lg:shrink">
-            <Checkbox
-              id="Datahub table search mode"
-              onCheckedChange={() => setLookUpSearch(!isLookUpSearch)}
-            ></Checkbox>
-            <Label>
-              {' '}
-              {t({
-                en: 'Enable Datahub Filter Mode',
-                fr: 'Activer le mode de filtrage'
-              })}
-            </Label>
           </div>
           <div className="flex min-w-60 gap-2 lg:shrink">
             <Button label="Reset Datahub" onClick={() => void setTableData(data)} />
