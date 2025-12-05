@@ -181,18 +181,32 @@ const RouteComponent = () => {
       <div className="flex grow flex-col">
         <div className="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
           <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
-            <Dialog.Trigger className="grow">
+            {isLookUpSearch ? (
+              <Dialog.Trigger className="grow">
+                <Button
+                  className="[&>input]:text-foreground [&>input]:placeholder-foreground grow"
+                  data-testid="datahub-subject-lookup-search"
+                  id="subject-lookup-search-bar"
+                >
+                  {t({
+                    en: 'Click to Search',
+                    fr: 'Cliquer pour rechercher'
+                  })}
+                </Button>
+              </Dialog.Trigger>
+            ) : (
               <SearchBar
-                className="[&>input]:text-foreground [&>input]:placeholder-foreground"
+                className="[&>input]:text-foreground [&>input]:placeholder-foreground grow"
                 data-testid="datahub-subject-lookup-search"
                 id="subject-lookup-search-bar"
                 placeholder={t({
                   en: 'Click to Search',
                   fr: 'Cliquer pour rechercher'
                 })}
-                readOnly={true}
+                readOnly={false}
               />
-            </Dialog.Trigger>
+            )}
+
             <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
               <Dialog.Header>
                 <Dialog.Title>{t('datahub.index.lookup.title')}</Dialog.Title>
