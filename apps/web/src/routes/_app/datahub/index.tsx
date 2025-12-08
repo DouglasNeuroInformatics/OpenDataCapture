@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
-
+import React from 'react';
+import { useEffect, useState } from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
   ActionDropdown,
   Button,
-  Checkbox,
   ClientTable,
   Dialog,
   Heading,
-  Label,
   SearchBar
 } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -81,7 +79,7 @@ const RouteComponent = () => {
 
   const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
   const [tableData, setTableData] = useState<Subject[]>(data);
-  const [isLookUpSearch, setLookUpSearch] = useState(true);
+  const [searchString, setSearchString] = useState('');
 
   const getExportRecords = async () => {
     const response = await axios.get<InstrumentRecordsExport>('/v1/instrument-records/export', {
@@ -136,11 +134,6 @@ const RouteComponent = () => {
   };
 
   const lookupSubject = async ({ id }: { id: string }) => {
-    if (!isLookUpSearch) {
-      setSubjectTable({ id: id });
-      return;
-    }
-
     const response = await axios.get<Subject>(`/v1/subjects/${id}`, {
       validateStatus: (status) => status === 200 || status === 404
     });
@@ -153,23 +146,21 @@ const RouteComponent = () => {
     }
   };
 
-  const setSubjectTable = ({ id }: { id: string }) => {
-    const newSubjects = data.map((record) => {
-      if (record.id.includes(id)) {
-        return record;
-      }
+  useEffect(() => {
+    if (!searchString) {
+      setTableData(data);
       return;
-    });
-
-    const filteredSubjects = newSubjects.filter((record) => record !== undefined);
-
-    if (newSubjects.length < 1) {
-      addNotification({ message: t('core.notFound'), type: 'warning' });
-    } else {
-      addNotification({ type: 'success' });
-      setTableData(filteredSubjects);
     }
-  };
+
+    const filtered = data.filter((record) =>
+      record.id
+        .replace(/^.*?\$/, '')
+        .toLowerCase()
+        .includes(searchString.toLowerCase())
+    );
+
+    setTableData(filtered);
+  }, [searchString, data]);
 
   return (
     <React.Fragment>
@@ -189,6 +180,8 @@ const RouteComponent = () => {
               fr: 'Cliquer pour rechercher'
             })}
             readOnly={false}
+            value={searchString}
+            onValueChange={(value: string) => setSearchString(value)}
           />
           <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
             <Dialog.Trigger>
