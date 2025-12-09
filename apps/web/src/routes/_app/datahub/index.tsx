@@ -191,7 +191,7 @@ const RouteComponent = () => {
                 id="subject-lookup-search-bar"
               >
                 {t({
-                  en: 'Click to Search',
+                  en: 'Subject Lookup',
                   fr: 'Cliquer pour rechercher'
                 })}
               </Button>
