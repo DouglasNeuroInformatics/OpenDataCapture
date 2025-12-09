@@ -15,6 +15,7 @@ import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
+import { UserSearchIcon } from 'lucide-react';
 import { unparse } from 'papaparse';
 
 import { IdentificationForm } from '@/components/IdentificationForm';
@@ -22,7 +23,6 @@ import { PageHeader } from '@/components/PageHeader';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
-import { UserSearchIcon } from 'lucide-react';
 
 type MasterDataTableProps = {
   data: Subject[];
@@ -103,7 +103,7 @@ const RouteComponent = () => {
     getExportRecords()
       .then((data): any => {
         const listedSubjects = tableData.map((record) => {
-          return record.id.replace('root$', '');
+          return record.id.replace(/^.*?\$/, '');
         });
 
         const filteredData = data.filter((dataEntry) => listedSubjects.includes(dataEntry.subjectId));
