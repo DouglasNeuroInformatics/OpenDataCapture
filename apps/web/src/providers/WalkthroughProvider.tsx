@@ -140,8 +140,8 @@ const Walkthrough = () => {
         content: (
           <p>
             {t({
-              en: 'Here, you can search for subjects in the database. To begin, click on the search bar, and a popup will appear where you can enter the search query.',
-              fr: "Ici, vous pouvez rechercher des clients dans la base de données. Pour commencer, cliquez sur la barre de recherche et une fenêtre contextuelle s'affichera pour vous permettre de saisir la requête de recherche."
+              en: 'Here, you can search for subjects in the database. To begin, type in the search bar to find matching subject identification tags',
+              fr: 'Ici, vous pouvez rechercher des sujets dans la base de données. Pour commencer, saisissez votre recherche dans la barre de recherche afin de trouver les identifiants de sujets correspondants.'
             })}
           </p>
         ),
@@ -149,7 +149,26 @@ const Walkthrough = () => {
           to: '/datahub'
         },
         position: 'bottom-left',
-        target: '#subject-lookup-search-bar',
+        target: '#datahub-subject-search-bar',
+        title: t({
+          en: 'Subject Search Bar',
+          fr: 'Barre de recherche de client'
+        })
+      },
+      {
+        content: (
+          <p>
+            {t({
+              en: 'Here, you can search for subjects in the database. To begin, click on the Subject Lookup button, and a popup will appear where you can enter the search query.',
+              fr: "Ici, vous pouvez rechercher des clients dans la base de données. Pour commencer, cliquez sur la button de recherche et une fenêtre contextuelle s'affichera pour vous permettre de saisir la requête de recherche."
+            })}
+          </p>
+        ),
+        navigateOptions: {
+          to: '/datahub'
+        },
+        position: 'bottom-left',
+        target: '[data-spotlight-type="subject-lookup-search-button"]',
         title: t({
           en: 'Subject Lookup',
           fr: 'Recherche de client'
