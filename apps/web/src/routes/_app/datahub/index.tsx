@@ -78,7 +78,7 @@ const RouteComponent = () => {
   const navigate = useNavigate();
 
   const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
-  const [tableData, setTableData] = useState<Subject[]>(data);
+  const [tableData, setTableData] = useState<Subject[]>(data ?? []);
   const [searchString, setSearchString] = useState('');
 
   const getExportRecords = async () => {
@@ -161,8 +161,10 @@ const RouteComponent = () => {
   };
 
   useEffect(() => {
+    const definedTableData = data ?? [];
+
     if (!searchString) {
-      setTableData(data);
+      setTableData(definedTableData);
       return;
     }
 
