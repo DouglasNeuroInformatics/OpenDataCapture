@@ -213,9 +213,6 @@ const RouteComponent = () => {
               onSelection={handleExportSelection}
             />
           </div>
-          <div className="flex min-w-60 gap-2 lg:shrink">
-            <Button label="Reset Datahub" onClick={() => void setTableData(data)} />
-          </div>
         </div>
         <MasterDataTable
           data={tableData}
