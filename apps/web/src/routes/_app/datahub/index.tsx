@@ -185,11 +185,13 @@ const RouteComponent = () => {
             onValueChange={(value: string) => setSearchString(value)}
           />
           <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
-            <Dialog.Trigger>
+            <Dialog.Trigger asChild>
               <Button
-                className="[&>input]:text-foreground [&>input]:placeholder-foreground grow gap-1"
-                data-testid="datahub-subject-lookup-search"
-                id="subject-lookup-search-bar"
+                className="[&>input]:text-foreground [&>input]:placeholder-foreground gap-1"
+                data-spotlight-type="subject-lookup-search-button"
+                data-testid="subject-lookup-search-button"
+                id="subject-lookup-search-button"
+                variant="outline"
               >
                 <UserSearchIcon />{' '}
                 {t({
