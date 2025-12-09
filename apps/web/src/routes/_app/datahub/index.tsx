@@ -199,7 +199,7 @@ const RouteComponent = () => {
           <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
             <Dialog.Trigger asChild>
               <Button
-                className="[&>input]:text-foreground [&>input]:placeholder-foreground gap-1"
+                className="gap-1"
                 data-spotlight-type="subject-lookup-search-button"
                 data-testid="subject-lookup-search-button"
                 id="subject-lookup-search-button"
