@@ -174,8 +174,8 @@ const RouteComponent = () => {
         <div className="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
           <SearchBar
             className="[&>input]:text-foreground [&>input]:placeholder-foreground grow"
-            data-testid="datahub-subject-lookup-search"
-            id="subject-lookup-search-bar"
+            data-testid="datahub-subject-search-bar"
+            id="datahub-subject-search-bar"
             placeholder={t({
               en: 'Click to Search',
               fr: 'Cliquer pour rechercher'
