@@ -192,7 +192,7 @@ const RouteComponent = () => {
               >
                 {t({
                   en: 'Subject Lookup',
-                  fr: 'Cliquer pour rechercher'
+                  fr: 'Trouver un client'
                 })}
               </Button>
             </Dialog.Trigger>
