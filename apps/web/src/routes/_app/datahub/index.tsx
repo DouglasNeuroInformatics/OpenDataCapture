@@ -1,5 +1,5 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
   ActionDropdown,
@@ -22,6 +22,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
+import { UserSearchIcon } from 'lucide-react';
 
 type MasterDataTableProps = {
   data: Subject[];
@@ -186,10 +187,11 @@ const RouteComponent = () => {
           <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
             <Dialog.Trigger>
               <Button
-                className="[&>input]:text-foreground [&>input]:placeholder-foreground grow"
+                className="[&>input]:text-foreground [&>input]:placeholder-foreground grow gap-1"
                 data-testid="datahub-subject-lookup-search"
                 id="subject-lookup-search-bar"
               >
+                <UserSearchIcon />{' '}
                 {t({
                   en: 'Subject Lookup',
                   fr: 'Trouver un client'
