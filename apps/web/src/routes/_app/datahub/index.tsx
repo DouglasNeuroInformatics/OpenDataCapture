@@ -23,7 +23,6 @@ import { PageHeader } from '@/components/PageHeader';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
-
 type MasterDataTableProps = {
   data: Subject[];
   onSelect: (subject: Subject) => void;
@@ -93,20 +92,27 @@ const RouteComponent = () => {
 
   const handleExportSelection = (option: 'CSV' | 'Excel' | 'JSON') => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
-    addNotification({
-      message: t({
-        en: 'Exporting entries, please wait...',
-        fr: 'Téléchargement des entrées, veuillez patienter...'
-      }),
-      type: 'info'
-    });
     getExportRecords()
       .then((data): any => {
         const listedSubjects = tableData.map((record) => {
-          return record.id.replace(/^.*?\$/, '');
+          return removeSubjectIdScope(record.id);
         });
 
         const filteredData = data.filter((dataEntry) => listedSubjects.includes(dataEntry.subjectId));
+
+        if (filteredData.length < 1) {
+          throw Error(
+            t({ en: 'Export failed: No entries to export', fr: "Échec de l'exportation : aucune entrée à exporter" })
+          );
+        }
+
+        addNotification({
+          message: t({
+            en: 'Exporting entries, please wait...',
+            fr: 'Téléchargement des entrées, veuillez patienter...'
+          }),
+          type: 'info'
+        });
 
         switch (option) {
           case 'CSV':
@@ -127,10 +133,17 @@ const RouteComponent = () => {
       })
       .catch((err) => {
         console.error(err);
-        addNotification({
-          message: t({ en: 'Export failed', fr: "Échec de l'exportation" }),
-          type: 'error'
-        });
+        if (err instanceof Error && err.message) {
+          addNotification({
+            message: err.message,
+            type: 'error'
+          });
+        } else {
+          addNotification({
+            message: t({ en: 'Export failed', fr: "Échec de l'exportation" }),
+            type: 'error'
+          });
+        }
       });
   };
 
@@ -154,10 +167,7 @@ const RouteComponent = () => {
     }
 
     const filtered = data.filter((record) =>
-      record.id
-        .replace(/^.*?\$/, '')
-        .toLowerCase()
-        .includes(searchString.toLowerCase())
+      removeSubjectIdScope(record.id).toLowerCase().includes(searchString.toLowerCase())
     );
 
     setTableData(filtered);
