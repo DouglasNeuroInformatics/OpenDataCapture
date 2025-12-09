@@ -143,7 +143,7 @@ const RouteComponent = () => {
       setIsLookupOpen(false);
     } else {
       addNotification({ type: 'success' });
-      await navigate({ to: `./${response.data.id}/assignments` });
+      await navigate({ to: `./${response.data.id}/table` });
     }
   };
 
