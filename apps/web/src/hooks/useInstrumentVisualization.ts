@@ -77,7 +77,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       instrument.internal.edition
     }_${new Date().toISOString()}`;
 
-    const exportRecords = records.map((record) => omit(record, ['__time__']));
+    const exportRecords = records.map((record) => omit(record, ['__time__', '__id__']));
 
     const makeWideRows = () => {
       const columnNames = Object.keys(exportRecords[0]!);
