@@ -18,6 +18,7 @@ import { useFindSessionQuery } from './useFindSessionQuery';
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
   __date__: Date;
+  __id__: string;
   __time__: number;
 };
 
@@ -76,7 +77,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       instrument.internal.edition
     }_${new Date().toISOString()}`;
 
-    const exportRecords = records.map((record) => omit(record, ['__time__']));
+    const exportRecords = records.map((record) => omit(record, ['__time__', '__id__']));
 
     const makeWideRows = () => {
       const columnNames = Object.keys(exportRecords[0]!);
@@ -229,6 +230,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
           return {
             __date__: record.date,
+            __id__: record.id,
             __time__: record.date.getTime(),
             username: username,
             ...record.computedMeasures,

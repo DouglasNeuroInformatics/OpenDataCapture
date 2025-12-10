@@ -174,7 +174,7 @@ const RouteComponent = () => {
         <MasterDataTable
           data={data}
           onSelect={(subject) => {
-            void navigate({ to: `./${subject.id}/assignments` });
+            void navigate({ to: `./${subject.id}/table` });
           }}
         />
       </div>

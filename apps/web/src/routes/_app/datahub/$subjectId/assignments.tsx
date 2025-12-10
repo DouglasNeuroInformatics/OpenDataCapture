@@ -21,6 +21,7 @@ import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrume
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
+import { QRCode } from '@/components/QRCode';
 import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrument } from '@/hooks/useInstrument';
@@ -40,26 +41,25 @@ const AssignmentSlider: React.FC<{
   const instrument = useInstrument(assignment?.instrumentId ?? null);
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={Boolean(isOpen && assignment && instrument)} onOpenChange={setIsOpen}>
       <Sheet.Content className="flex h-full flex-col">
         <Sheet.Header>
           <Sheet.Title>{instrument?.details.title}</Sheet.Title>
           <Sheet.Description>{t('datahub.assignments.assignmentSliderDesc')}</Sheet.Description>
         </Sheet.Header>
         <Sheet.Body className="grow">
-          {instrument && (
-            <div className="flex flex-col gap-3">
-              <Label asChild>
-                <a className="hover:underline" href={assignment!.url} rel="noreferrer" target="_blank">
-                  {t('datahub.assignments.link')}
-                </a>
-              </Label>
-              <div className="flex gap-2">
-                <Input readOnly className="h-9" id="link" value={assignment!.url} />
-                <CopyButton size="sm" text={assignment!.url} variant="outline" />
-              </div>
+          <div className="flex flex-col gap-3">
+            <Label asChild>
+              <a className="hover:underline" href={assignment?.url} rel="noreferrer" target="_blank">
+                {t('datahub.assignments.link')}
+              </a>
+            </Label>
+            <div className="flex gap-2">
+              <Input readOnly className="h-9" id="link" value={assignment?.url} />
+              <CopyButton size="sm" text={assignment?.url ?? ''} variant="outline" />
             </div>
-          )}
+            <QRCode url={assignment?.url ?? 'javascript:void(0)'} />
+          </div>
         </Sheet.Body>
         <Sheet.Footer>
           <Button
