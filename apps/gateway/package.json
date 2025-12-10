@@ -25,7 +25,7 @@
     "@prisma/client": "catalog:",
     "axios": "catalog:",
     "compression": "^1.7.5",
-    "express": "^4.21.2",
+    "express": "^4.22.0",
     "lodash-es": "workspace:lodash-es__4.x@*",
     "pino-http": "^10.4.0",
     "pino-pretty": "^11.2.2",
