@@ -254,6 +254,16 @@ export class InstrumentRecordsService {
     return records;
   }
 
+  async findById(id: string, { ability }: EntityOperationOptions = {}) {
+    const record = await this.instrumentRecordModel.findFirst({
+      where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRecord')], id }
+    });
+    if (!record) {
+      throw new NotFoundException();
+    }
+    return record;
+  }
+
   async linearModel(
     { groupId, instrumentId }: { groupId?: string; instrumentId: string },
     { ability }: EntityOperationOptions = {}

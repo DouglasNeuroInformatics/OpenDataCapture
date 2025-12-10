@@ -31,6 +31,7 @@ import { Route as AppInstrumentsRenderIdRouteImport } from './routes/_app/instru
 import { Route as AppDatahubSubjectIdTableRouteImport } from './routes/_app/datahub/$subjectId/table'
 import { Route as AppDatahubSubjectIdGraphRouteImport } from './routes/_app/datahub/$subjectId/graph'
 import { Route as AppDatahubSubjectIdAssignmentsRouteImport } from './routes/_app/datahub/$subjectId/assignments'
+import { Route as AppDatahubSubjectIdRecordIdRouteImport } from './routes/_app/datahub/$subjectId/$recordId'
 import { Route as AppAdminUsersCreateRouteImport } from './routes/_app/admin/users/create'
 import { Route as AppAdminGroupsCreateRouteImport } from './routes/_app/admin/groups/create'
 
@@ -148,6 +149,12 @@ const AppDatahubSubjectIdAssignmentsRoute =
     path: '/assignments',
     getParentRoute: () => AppDatahubSubjectIdRouteRoute,
   } as any)
+const AppDatahubSubjectIdRecordIdRoute =
+  AppDatahubSubjectIdRecordIdRouteImport.update({
+    id: '/$recordId',
+    path: '/$recordId',
+    getParentRoute: () => AppDatahubSubjectIdRouteRoute,
+  } as any)
 const AppAdminUsersCreateRoute = AppAdminUsersCreateRouteImport.update({
   id: '/admin/users/create',
   path: '/admin/users/create',
@@ -177,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/upload': typeof AppUploadIndexRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
+  '/datahub/$subjectId/$recordId': typeof AppDatahubSubjectIdRecordIdRoute
   '/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
   '/datahub/$subjectId/table': typeof AppDatahubSubjectIdTableRoute
@@ -202,6 +210,7 @@ export interface FileRoutesByTo {
   '/upload': typeof AppUploadIndexRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
+  '/datahub/$subjectId/$recordId': typeof AppDatahubSubjectIdRecordIdRoute
   '/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
   '/datahub/$subjectId/table': typeof AppDatahubSubjectIdTableRoute
@@ -229,6 +238,7 @@ export interface FileRoutesById {
   '/_app/upload/': typeof AppUploadIndexRoute
   '/_app/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/_app/admin/users/create': typeof AppAdminUsersCreateRoute
+  '/_app/datahub/$subjectId/$recordId': typeof AppDatahubSubjectIdRecordIdRoute
   '/_app/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/_app/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
   '/_app/datahub/$subjectId/table': typeof AppDatahubSubjectIdTableRoute
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/upload'
     | '/admin/groups/create'
     | '/admin/users/create'
+    | '/datahub/$subjectId/$recordId'
     | '/datahub/$subjectId/assignments'
     | '/datahub/$subjectId/graph'
     | '/datahub/$subjectId/table'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/upload'
     | '/admin/groups/create'
     | '/admin/users/create'
+    | '/datahub/$subjectId/$recordId'
     | '/datahub/$subjectId/assignments'
     | '/datahub/$subjectId/graph'
     | '/datahub/$subjectId/table'
@@ -307,6 +319,7 @@ export interface FileRouteTypes {
     | '/_app/upload/'
     | '/_app/admin/groups/create'
     | '/_app/admin/users/create'
+    | '/_app/datahub/$subjectId/$recordId'
     | '/_app/datahub/$subjectId/assignments'
     | '/_app/datahub/$subjectId/graph'
     | '/_app/datahub/$subjectId/table'
@@ -477,6 +490,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDatahubSubjectIdAssignmentsRouteImport
       parentRoute: typeof AppDatahubSubjectIdRouteRoute
     }
+    '/_app/datahub/$subjectId/$recordId': {
+      id: '/_app/datahub/$subjectId/$recordId'
+      path: '/$recordId'
+      fullPath: '/datahub/$subjectId/$recordId'
+      preLoaderRoute: typeof AppDatahubSubjectIdRecordIdRouteImport
+      parentRoute: typeof AppDatahubSubjectIdRouteRoute
+    }
     '/_app/admin/users/create': {
       id: '/_app/admin/users/create'
       path: '/admin/users/create'
@@ -495,6 +515,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppDatahubSubjectIdRouteRouteChildren {
+  AppDatahubSubjectIdRecordIdRoute: typeof AppDatahubSubjectIdRecordIdRoute
   AppDatahubSubjectIdAssignmentsRoute: typeof AppDatahubSubjectIdAssignmentsRoute
   AppDatahubSubjectIdGraphRoute: typeof AppDatahubSubjectIdGraphRoute
   AppDatahubSubjectIdTableRoute: typeof AppDatahubSubjectIdTableRoute
@@ -502,6 +523,7 @@ interface AppDatahubSubjectIdRouteRouteChildren {
 
 const AppDatahubSubjectIdRouteRouteChildren: AppDatahubSubjectIdRouteRouteChildren =
   {
+    AppDatahubSubjectIdRecordIdRoute: AppDatahubSubjectIdRecordIdRoute,
     AppDatahubSubjectIdAssignmentsRoute: AppDatahubSubjectIdAssignmentsRoute,
     AppDatahubSubjectIdGraphRoute: AppDatahubSubjectIdGraphRoute,
     AppDatahubSubjectIdTableRoute: AppDatahubSubjectIdTableRoute,

@@ -92,4 +92,11 @@ export class InstrumentRecordsController {
   ) {
     return this.instrumentRecordsService.updateById(id, data, { ability });
   }
+
+  @ApiOperation({ summary: 'Get Instrument Record' })
+  @Get(':id')
+  @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
+  findById(@Param('id', ValidObjectIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+    return this.instrumentRecordsService.findById(id, { ability });
+  }
 }

@@ -14,12 +14,19 @@ import type { SubjectDisplayInfo } from '../../types';
 
 export type InstrumentSummaryProps = {
   data: any;
+  displayAllMeasures?: boolean;
   instrument: AnyUnilingualInstrument;
   subject?: SubjectDisplayInfo;
   timeCollected: number;
 };
 
-export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: InstrumentSummaryProps) => {
+export const InstrumentSummary = ({
+  data,
+  displayAllMeasures,
+  instrument,
+  subject,
+  timeCollected
+}: InstrumentSummaryProps) => {
   const download = useDownload();
   const { resolvedLanguage, t } = useTranslation();
 
@@ -28,6 +35,9 @@ export const InstrumentSummary = ({ data, instrument, subject, timeCollected }: 
   }
 
   const computedMeasures = filter(computeInstrumentMeasures(instrument, data), (_, key) => {
+    if (displayAllMeasures) {
+      return true;
+    }
     const measure = instrument.measures?.[key];
     if (measure?.visibility === 'hidden' || measure?.hidden === true) {
       return false;
