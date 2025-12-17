@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Heading, Select, StatisticCard } from '@douglasneuroinformatics/libui/components';
+import { Dialog, Heading, Select, StatisticCard } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
 import type { AppSubjectName } from '@opendatacapture/schemas/core';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
+import { AnimatePresence, motion } from 'motion/react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { PageHeader } from '@/components/PageHeader';
+import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
 import { useAppStore } from '@/store';
 
@@ -19,6 +21,9 @@ const RouteComponent = () => {
   const { t } = useTranslation();
   const [theme] = useTheme();
   const summaryQuery = useSummaryQuery({ params: { groupId: currentGroup?.id } });
+  const navigate = useNavigate();
+  const [isLookupOpen, setIsLookupOpen] = useState(false);
+  const instrumentInfoQuery = useInstrumentInfoQuery();
 
   const chartColors = {
     records: {
@@ -90,6 +95,19 @@ const RouteComponent = () => {
     });
   }
 
+  const instrumentData = currentGroup
+    ? instrumentInfoQuery.data?.filter((instrument) => {
+        return currentGroup.accessibleInstrumentIds.includes(instrument.id);
+      })
+    : instrumentInfoQuery.data;
+
+  const instrumentInfo = instrumentData?.map((record) => {
+    return {
+      kind: record.kind,
+      title: record.details.title
+    };
+  });
+
   // should never happen, as data is ensured in loader, but avoid crashing the app if someone changes this
   if (!summaryQuery.data) {
     return null;
@@ -145,9 +163,14 @@ const RouteComponent = () => {
                 value={summaryQuery.data.counts.users}
               />
             </div>
-            <div
+            <button
               className="group transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-subjects"
+              onClick={() => {
+                void navigate({
+                  to: '/datahub'
+                });
+              }}
             >
               <StatisticCard
                 icon={
@@ -159,21 +182,64 @@ const RouteComponent = () => {
                 })}
                 value={summaryQuery.data.counts.subjects}
               />
-            </div>
+            </button>
             <div
               className="group transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-instruments"
             >
-              <StatisticCard
-                icon={
-                  <ClipboardDocumentIcon className="h-12 w-12 text-amber-600 transition-transform duration-300 group-hover:scale-110 dark:text-amber-400" />
-                }
-                label={t({
-                  en: 'Total Instruments',
-                  fr: "Nombre d'instruments"
-                })}
-                value={summaryQuery.data.counts.instruments}
-              />
+              <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
+                <Dialog.Trigger className="grow">
+                  <StatisticCard
+                    icon={
+                      <ClipboardDocumentIcon className="h-12 w-12 text-amber-600 transition-transform duration-300 group-hover:scale-110 dark:text-amber-400" />
+                    }
+                    label={t({
+                      en: 'Total Instruments',
+                      fr: "Nombre d'instruments"
+                    })}
+                    value={summaryQuery.data.counts.instruments}
+                  ></StatisticCard>
+                </Dialog.Trigger>
+                <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
+                  <Dialog.Header>
+                    <Dialog.Title>
+                      {t({
+                        en: 'Available Instruments',
+                        fr: 'Les instruments'
+                      })}
+                    </Dialog.Title>
+                  </Dialog.Header>
+                  <ul className="flex flex-col gap-5">
+                    <AnimatePresence mode="popLayout">
+                      <div className="flex justify-between gap-4 font-bold">
+                        <p>
+                          {t({
+                            en: 'Title',
+                            fr: 'Titre'
+                          })}
+                        </p>{' '}
+                        <p>{t({ en: 'Kind' })}</p>
+                      </div>
+                      {instrumentInfo?.map((instrument, i) => {
+                        return (
+                          <motion.li
+                            layout
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0 }}
+                            key={instrument.title}
+                            transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
+                          >
+                            <div className="flex justify-between gap-4">
+                              <p>{instrument.title}</p> <p>{instrument.kind}</p>
+                            </div>
+                          </motion.li>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </ul>
+                </Dialog.Content>
+              </Dialog>
             </div>
             <div
               className="group transform transition-all duration-300 hover:scale-105"
