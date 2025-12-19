@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
 import { useAppStore } from '@/store';
+import { useUsersQuery } from '@/hooks/useUsersQuery';
 
 const RouteComponent = () => {
   const changeGroup = useAppStore((store) => store.changeGroup);
@@ -23,7 +24,9 @@ const RouteComponent = () => {
   const summaryQuery = useSummaryQuery({ params: { groupId: currentGroup?.id } });
   const navigate = useNavigate();
   const [isLookupOpen, setIsLookupOpen] = useState(false);
+  const [isUserLookupOpen, setIsUserLookupOpen] = useState(false);
   const instrumentInfoQuery = useInstrumentInfoQuery();
+  const userInfoQuery = useUsersQuery();
 
   const chartColors = {
     records: {
@@ -151,17 +154,54 @@ const RouteComponent = () => {
         </div>
         <div className="body-font" data-testid="dashboard-statistics">
           <div className="grid grid-cols-1 gap-6 text-center lg:grid-cols-2 xl:grid-cols-4">
-            <div className="group transform transition-all duration-300 hover:scale-105" data-testid="statistic-users">
-              <StatisticCard
-                icon={
-                  <UsersIcon className="h-12 w-12 text-blue-600 transition-transform duration-300 group-hover:scale-110 dark:text-blue-400" />
-                }
-                label={t({
-                  en: 'Total Users',
-                  fr: "Nombre d'utilisateurs"
-                })}
-                value={summaryQuery.data.counts.users}
-              />
+            <div
+              className="group flex transform transition-all duration-300 hover:scale-105"
+              data-testid="statistic-users"
+            >
+              <Dialog open={isUserLookupOpen} onOpenChange={setIsUserLookupOpen}>
+                <Dialog.Trigger className="grow">
+                  <StatisticCard
+                    icon={
+                      <UsersIcon className="h-12 w-12 text-blue-600 transition-transform duration-300 group-hover:scale-110 dark:text-blue-400" />
+                    }
+                    label={t({
+                      en: 'Total Users',
+                      fr: "Nombre d'utilisateurs"
+                    })}
+                    value={summaryQuery.data.counts.users}
+                  />
+                </Dialog.Trigger>
+                <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
+                  <Dialog.Header>
+                    <Dialog.Title>
+                      {t({
+                        en: 'Users',
+                        fr: 'Les utilisateurs'
+                      })}
+                    </Dialog.Title>
+                  </Dialog.Header>
+                  <ul className="flex flex-col gap-5">
+                    <AnimatePresence mode="popLayout">
+                      {userInfoQuery.data?.map((user, i) => {
+                        return (
+                          <motion.li
+                            layout
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0 }}
+                            key={user.username}
+                            transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
+                          >
+                            <div className="flex justify-between gap-4">
+                              <p>{user.username}</p>
+                            </div>
+                          </motion.li>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </ul>
+                </Dialog.Content>
+              </Dialog>
             </div>
             <button
               className="group transform transition-all duration-300 hover:scale-105"
@@ -184,7 +224,7 @@ const RouteComponent = () => {
               />
             </button>
             <div
-              className="group transform transition-all duration-300 hover:scale-105"
+              className="group flex transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-instruments"
             >
               <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
