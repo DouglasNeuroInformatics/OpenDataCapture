@@ -14,6 +14,9 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
 import { useAppStore } from '@/store';
 import { useUsersQuery } from '@/hooks/useUsersQuery';
+import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
+import axios from 'axios';
+import { useInstrumentRecordsExportQuery } from '@/hooks/useInstrumentRecordExportQuery';
 
 const RouteComponent = () => {
   const changeGroup = useAppStore((store) => store.changeGroup);
@@ -27,6 +30,13 @@ const RouteComponent = () => {
   const [isUserLookupOpen, setIsUserLookupOpen] = useState(false);
   const instrumentInfoQuery = useInstrumentInfoQuery();
   const userInfoQuery = useUsersQuery();
+
+  const recordsExportQuery = useInstrumentRecordsExportQuery(currentGroup?.id);
+
+  const recordsData =
+    recordsExportQuery.data?.map((record) => ({
+      title: record.instrumentName
+    })) ?? [];
 
   const chartColors = {
     records: {
