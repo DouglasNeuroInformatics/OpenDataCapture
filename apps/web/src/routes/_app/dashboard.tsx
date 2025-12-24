@@ -14,9 +14,7 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
 import { useAppStore } from '@/store';
 import { useUsersQuery } from '@/hooks/useUsersQuery';
-import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
-import axios from 'axios';
-import { useInstrumentRecordsExportQuery } from '@/hooks/useInstrumentRecordExportQuery';
+import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 
 const RouteComponent = () => {
   const changeGroup = useAppStore((store) => store.changeGroup);
@@ -31,12 +29,36 @@ const RouteComponent = () => {
   const instrumentInfoQuery = useInstrumentInfoQuery();
   const userInfoQuery = useUsersQuery();
 
-  const recordsExportQuery = useInstrumentRecordsExportQuery(currentGroup?.id);
+  const recordsQuery = useInstrumentRecords({
+    enabled: true,
+    params: {
+      groupId: currentGroup?.id
+    }
+  });
 
-  const recordsData =
-    recordsExportQuery.data?.map((record) => ({
-      title: record.instrumentName
-    })) ?? [];
+  const instrumentData = currentGroup
+    ? instrumentInfoQuery.data?.filter((instrument) => {
+        return currentGroup.accessibleInstrumentIds.includes(instrument.id);
+      })
+    : instrumentInfoQuery.data;
+
+  const instrumentInfo = instrumentData?.map((instrument) => {
+    return {
+      kind: instrument.kind,
+      title: instrument.details.title,
+      id: instrument.id
+    };
+  });
+
+  const recordIds = recordsQuery.data?.map((record) => record.instrumentId);
+
+  const recordCounter =
+    instrumentInfo?.map((title) => {
+      return {
+        instrumentTitle: title.title,
+        count: recordIds?.filter((val) => val === title.id).length ?? 0
+      };
+    }) ?? [];
 
   const chartColors = {
     records: {
@@ -107,19 +129,6 @@ const RouteComponent = () => {
       fr: 'La cliente actuelle'
     });
   }
-
-  const instrumentData = currentGroup
-    ? instrumentInfoQuery.data?.filter((instrument) => {
-        return currentGroup.accessibleInstrumentIds.includes(instrument.id);
-      })
-    : instrumentInfoQuery.data;
-
-  const instrumentInfo = instrumentData?.map((record) => {
-    return {
-      kind: record.kind,
-      title: record.details.title
-    };
-  });
 
   // should never happen, as data is ensured in loader, but avoid crashing the app if someone changes this
   if (!summaryQuery.data) {
