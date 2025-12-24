@@ -26,6 +26,7 @@ const RouteComponent = () => {
   const navigate = useNavigate();
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [isUserLookupOpen, setIsUserLookupOpen] = useState(false);
+  const [isRecordLookupOpen, setIsRecordLookupOpen] = useState(false);
   const instrumentInfoQuery = useInstrumentInfoQuery();
   const userInfoQuery = useUsersQuery();
 
@@ -223,7 +224,7 @@ const RouteComponent = () => {
               </Dialog>
             </div>
             <button
-              className="group transform transition-all duration-300 hover:scale-105"
+              className="group flex transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-subjects"
               onClick={() => {
                 void navigate({
@@ -232,6 +233,7 @@ const RouteComponent = () => {
               }}
             >
               <StatisticCard
+                className="grow"
                 icon={
                   <UserIcon className="h-12 w-12 text-emerald-600 transition-transform duration-300 group-hover:scale-110 dark:text-emerald-400" />
                 }
@@ -277,7 +279,7 @@ const RouteComponent = () => {
                             fr: 'Titre'
                           })}
                         </p>{' '}
-                        <p>{t({ en: 'Kind' })}</p>
+                        <p>{t({ en: 'Kind', fr: 'Genre' })}</p>
                       </div>
                       {instrumentInfo?.map((instrument, i) => {
                         return (
@@ -301,19 +303,62 @@ const RouteComponent = () => {
               </Dialog>
             </div>
             <div
-              className="group transform transition-all duration-300 hover:scale-105"
+              className="group flex transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-records"
             >
-              <StatisticCard
-                icon={
-                  <DocumentTextIcon className="h-12 w-12 text-purple-600 transition-transform duration-300 group-hover:scale-110 dark:text-purple-400" />
-                }
-                label={t({
-                  en: 'Total Records',
-                  fr: "Nombre d'enregistrements"
-                })}
-                value={summaryQuery.data.counts.records}
-              />
+              <Dialog open={isRecordLookupOpen} onOpenChange={setIsRecordLookupOpen}>
+                <Dialog.Trigger className="grow">
+                  <StatisticCard
+                    icon={
+                      <DocumentTextIcon className="h-12 w-12 text-purple-600 transition-transform duration-300 group-hover:scale-110 dark:text-purple-400" />
+                    }
+                    label={t({
+                      en: 'Total Records',
+                      fr: "Nombre d'enregistrements"
+                    })}
+                    value={summaryQuery.data.counts.records}
+                  />
+                </Dialog.Trigger>
+                <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
+                  <Dialog.Header>
+                    <Dialog.Title>
+                      {t({
+                        en: 'Number of Records',
+                        fr: "Nombre d'enregistrements"
+                      })}
+                    </Dialog.Title>
+                  </Dialog.Header>
+                  <ul className="flex flex-col gap-5">
+                    <AnimatePresence mode="popLayout">
+                      <div className="flex justify-between gap-4 font-bold">
+                        <p>
+                          {t({
+                            en: 'Title',
+                            fr: 'Titre'
+                          })}
+                        </p>{' '}
+                        <p>{t({ en: 'Number', fr: 'Numero' })}</p>
+                      </div>
+                      {recordCounter?.map((instrument, i) => {
+                        return (
+                          <motion.li
+                            layout
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0 }}
+                            key={instrument.instrumentTitle}
+                            transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
+                          >
+                            <div className="flex justify-between gap-4">
+                              <p>{instrument.instrumentTitle}</p> <p>{instrument.count}</p>
+                            </div>
+                          </motion.li>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </ul>
+                </Dialog.Content>
+              </Dialog>
             </div>
           </div>
         </div>
