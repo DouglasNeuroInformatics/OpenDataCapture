@@ -24,9 +24,9 @@ const RouteComponent = () => {
   const [theme] = useTheme();
   const summaryQuery = useSummaryQuery({ params: { groupId: currentGroup?.id } });
   const navigate = useNavigate();
-  const [isLookupOpen, setIsLookupOpen] = useState(false);
-  const [isUserLookupOpen, setIsUserLookupOpen] = useState(false);
-  const [isRecordLookupOpen, setIsRecordLookupOpen] = useState(false);
+  const [isInstrumentModalOpen, setIsInstrumentModalOpen] = useState(false);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const instrumentInfoQuery = useInstrumentInfoQuery();
   const userInfoQuery = useUsersQuery();
 
@@ -178,7 +178,7 @@ const RouteComponent = () => {
               className="group flex transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-users"
             >
-              <Dialog open={isUserLookupOpen} onOpenChange={setIsUserLookupOpen}>
+              <Dialog open={isUserModalOpen} onOpenChange={setIsUserModalOpen}>
                 <Dialog.Trigger className="grow">
                   <StatisticCard
                     icon={
@@ -191,7 +191,7 @@ const RouteComponent = () => {
                     value={summaryQuery.data.counts.users}
                   />
                 </Dialog.Trigger>
-                <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
+                <Dialog.Content data-spotlight-type="subject-Modal-modal" data-testid="datahub-subject-Modal-dialog">
                   <Dialog.Header>
                     <Dialog.Title>
                       {t({
@@ -248,7 +248,7 @@ const RouteComponent = () => {
               className="group flex transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-instruments"
             >
-              <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
+              <Dialog open={isInstrumentModalOpen} onOpenChange={setIsInstrumentModalOpen}>
                 <Dialog.Trigger className="grow">
                   <StatisticCard
                     icon={
@@ -261,7 +261,7 @@ const RouteComponent = () => {
                     value={summaryQuery.data.counts.instruments}
                   ></StatisticCard>
                 </Dialog.Trigger>
-                <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
+                <Dialog.Content data-spotlight-type="subject-Modal-modal" data-testid="datahub-subject-Modal-dialog">
                   <Dialog.Header>
                     <Dialog.Title>
                       {t({
@@ -306,7 +306,7 @@ const RouteComponent = () => {
               className="group flex transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-records"
             >
-              <Dialog open={isRecordLookupOpen} onOpenChange={setIsRecordLookupOpen}>
+              <Dialog open={isRecordModalOpen} onOpenChange={setIsRecordModalOpen}>
                 <Dialog.Trigger className="grow">
                   <StatisticCard
                     icon={
@@ -319,7 +319,7 @@ const RouteComponent = () => {
                     value={summaryQuery.data.counts.records}
                   />
                 </Dialog.Trigger>
-                <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
+                <Dialog.Content data-spotlight-type="subject-Modal-modal" data-testid="datahub-subject-Modal-dialog">
                   <Dialog.Header>
                     <Dialog.Title>
                       {t({
