@@ -200,6 +200,7 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
+                  <hr></hr>
                   <ul className="flex flex-col gap-5 overflow-auto">
                     <AnimatePresence mode="popLayout">
                       {userInfoQuery.data?.map((user, i) => {
@@ -284,6 +285,7 @@ const RouteComponent = () => {
                         </p>{' '}
                         <p>{t({ en: 'Kind', fr: 'Genre' })}</p>
                       </div>
+                      <hr></hr>
                       {instrumentInfo?.map((instrument, i) => {
                         return (
                           <motion.li
@@ -342,6 +344,7 @@ const RouteComponent = () => {
                         </p>{' '}
                         <p>{t({ en: 'Number', fr: 'Numero' })}</p>
                       </div>
+                      <hr></hr>
                       {recordCounter?.map((instrument, i) => {
                         return (
                           <motion.li
