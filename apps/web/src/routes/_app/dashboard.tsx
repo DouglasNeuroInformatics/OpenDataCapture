@@ -200,7 +200,7 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <ul className="flex flex-col gap-5">
+                  <ul className="flex flex-col gap-5 overflow-auto">
                     <AnimatePresence mode="popLayout">
                       {userInfoQuery.data?.map((user, i) => {
                         return (
@@ -270,7 +270,7 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <ul className="flex flex-col gap-5">
+                  <ul className="flex flex-col gap-5 overflow-auto">
                     <AnimatePresence mode="popLayout">
                       <div className="flex justify-between gap-4 font-bold">
                         <p>
@@ -328,7 +328,7 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <ul className="flex flex-col gap-5">
+                  <ul className="flex flex-col gap-5 overflow-auto">
                     <AnimatePresence mode="popLayout">
                       <div className="flex justify-between gap-4 font-bold">
                         <p>
