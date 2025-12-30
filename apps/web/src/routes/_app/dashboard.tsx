@@ -191,7 +191,7 @@ const RouteComponent = () => {
                     value={summaryQuery.data.counts.users}
                   />
                 </Dialog.Trigger>
-                <Dialog.Content data-spotlight-type="subject-Modal-modal" data-testid="datahub-subject-Modal-dialog">
+                <Dialog.Content data-spotlight-type="users-Modal-modal" data-testid="dashboard-users-Modal-dialog">
                   <Dialog.Header>
                     <Dialog.Title>
                       {t({
@@ -261,7 +261,10 @@ const RouteComponent = () => {
                     value={summaryQuery.data.counts.instruments}
                   ></StatisticCard>
                 </Dialog.Trigger>
-                <Dialog.Content data-spotlight-type="subject-Modal-modal" data-testid="datahub-subject-Modal-dialog">
+                <Dialog.Content
+                  data-spotlight-type="instruments-Modal-modal"
+                  data-testid="dashboard-instruments-Modal-dialog"
+                >
                   <Dialog.Header>
                     <Dialog.Title>
                       {t({
@@ -319,7 +322,7 @@ const RouteComponent = () => {
                     value={summaryQuery.data.counts.records}
                   />
                 </Dialog.Trigger>
-                <Dialog.Content data-spotlight-type="subject-Modal-modal" data-testid="datahub-subject-Modal-dialog">
+                <Dialog.Content data-spotlight-type="record-Modal-modal" data-testid="dashboard-record-Modal-dialog">
                   <Dialog.Header>
                     <Dialog.Title>
                       {t({
