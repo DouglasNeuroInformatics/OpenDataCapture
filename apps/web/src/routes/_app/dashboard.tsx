@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Dialog, Heading, Select, StatisticCard } from '@douglasneuroinformatics/libui/components';
+import { Dialog, Heading, Select, Spinner, StatisticCard } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
@@ -202,6 +202,15 @@ const RouteComponent = () => {
                   </Dialog.Header>
                   <hr></hr>
                   <ul className="flex flex-col gap-5 overflow-auto">
+                    {userInfoQuery.isLoading && <Spinner />}
+                    {userInfoQuery.isError && (
+                      <p>
+                        {t({
+                          en: 'Error finding users',
+                          fr: "erreur lors de la recherche d'utilisateurs"
+                        })}
+                      </p>
+                    )}
                     <AnimatePresence mode="popLayout">
                       {userInfoQuery.data?.map((user, i) => {
                         return (
