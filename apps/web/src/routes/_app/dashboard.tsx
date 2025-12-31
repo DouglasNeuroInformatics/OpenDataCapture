@@ -56,6 +56,7 @@ const RouteComponent = () => {
   const recordCounter =
     instrumentInfo?.map((title) => {
       return {
+        id: title.id,
         count: recordIds?.filter((val) => val === title.id).length ?? 0,
         instrumentTitle: title.title
       };
@@ -212,7 +213,7 @@ const RouteComponent = () => {
                       </p>
                     )}
                     <AnimatePresence mode="popLayout">
-                      {userInfoQuery.data.map((user, i) => {
+                      {userInfoQuery.data?.map((user, i) => {
                         return (
                           <motion.li
                             layout
@@ -302,7 +303,7 @@ const RouteComponent = () => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
                             initial={{ opacity: 0 }}
-                            key={instrument.title}
+                            key={instrument.id}
                             transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
                           >
                             <div className="flex justify-between gap-4">
