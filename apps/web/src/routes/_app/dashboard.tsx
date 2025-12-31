@@ -11,10 +11,10 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
-import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
-import { useAppStore } from '@/store';
-import { useUsersQuery } from '@/hooks/useUsersQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
+import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
+import { useUsersQuery } from '@/hooks/useUsersQuery';
+import { useAppStore } from '@/store';
 
 const RouteComponent = () => {
   const changeGroup = useAppStore((store) => store.changeGroup);
@@ -45,9 +45,9 @@ const RouteComponent = () => {
 
   const instrumentInfo = instrumentData?.map((instrument) => {
     return {
+      id: instrument.id,
       kind: instrument.kind,
-      title: instrument.details.title,
-      id: instrument.id
+      title: instrument.details.title
     };
   });
 
@@ -56,8 +56,8 @@ const RouteComponent = () => {
   const recordCounter =
     instrumentInfo?.map((title) => {
       return {
-        instrumentTitle: title.title,
-        count: recordIds?.filter((val) => val === title.id).length ?? 0
+        count: recordIds?.filter((val) => val === title.id).length ?? 0,
+        instrumentTitle: title.title
       };
     }) ?? [];
 
