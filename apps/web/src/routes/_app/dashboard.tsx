@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Heading, Select, StatisticCard } from '@douglasneuroinformatics/libui/components';
+import { Dialog, Heading, Select, Spinner, StatisticCard } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
 import type { AppSubjectName } from '@opendatacapture/schemas/core';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
+import { AnimatePresence, motion } from 'motion/react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { PageHeader } from '@/components/PageHeader';
+import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
+import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
+import { useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
 
 const RouteComponent = () => {
@@ -19,6 +23,44 @@ const RouteComponent = () => {
   const { t } = useTranslation();
   const [theme] = useTheme();
   const summaryQuery = useSummaryQuery({ params: { groupId: currentGroup?.id } });
+  const navigate = useNavigate();
+  const [isInstrumentModalOpen, setIsInstrumentModalOpen] = useState(false);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
+  const instrumentInfoQuery = useInstrumentInfoQuery();
+  const userInfoQuery = useUsersQuery();
+
+  const recordsQuery = useInstrumentRecords({
+    enabled: true,
+    params: {
+      groupId: currentGroup?.id
+    }
+  });
+
+  const instrumentData = currentGroup
+    ? instrumentInfoQuery.data?.filter((instrument) => {
+        return currentGroup.accessibleInstrumentIds.includes(instrument.id);
+      })
+    : instrumentInfoQuery.data;
+
+  const instrumentInfo = instrumentData?.map((instrument) => {
+    return {
+      id: instrument.id,
+      kind: instrument.kind,
+      title: instrument.details.title
+    };
+  });
+
+  const recordIds = recordsQuery.data?.map((record) => record.instrumentId);
+
+  const recordCounter =
+    instrumentInfo?.map((title) => {
+      return {
+        id: title.id,
+        count: recordIds?.filter((val) => val === title.id).length ?? 0,
+        instrumentTitle: title.title
+      };
+    }) ?? [];
 
   const chartColors = {
     records: {
@@ -133,23 +175,76 @@ const RouteComponent = () => {
         </div>
         <div className="body-font" data-testid="dashboard-statistics">
           <div className="grid grid-cols-1 gap-6 text-center lg:grid-cols-2 xl:grid-cols-4">
-            <div className="group transform transition-all duration-300 hover:scale-105" data-testid="statistic-users">
-              <StatisticCard
-                icon={
-                  <UsersIcon className="h-12 w-12 text-blue-600 transition-transform duration-300 group-hover:scale-110 dark:text-blue-400" />
-                }
-                label={t({
-                  en: 'Total Users',
-                  fr: "Nombre d'utilisateurs"
-                })}
-                value={summaryQuery.data.counts.users}
-              />
-            </div>
             <div
-              className="group transform transition-all duration-300 hover:scale-105"
+              className="group flex transform transition-all duration-300 hover:scale-105"
+              data-testid="statistic-users"
+            >
+              <Dialog open={isUserModalOpen} onOpenChange={setIsUserModalOpen}>
+                <Dialog.Trigger className="grow">
+                  <StatisticCard
+                    icon={
+                      <UsersIcon className="h-12 w-12 text-blue-600 transition-transform duration-300 group-hover:scale-110 dark:text-blue-400" />
+                    }
+                    label={t({
+                      en: 'Total Users',
+                      fr: "Nombre d'utilisateurs"
+                    })}
+                    value={summaryQuery.data.counts.users}
+                  />
+                </Dialog.Trigger>
+                <Dialog.Content data-spotlight-type="users-Modal-modal" data-testid="dashboard-users-Modal-dialog">
+                  <Dialog.Header>
+                    <Dialog.Title>
+                      {t({
+                        en: 'Users',
+                        fr: 'Les utilisateurs'
+                      })}
+                    </Dialog.Title>
+                  </Dialog.Header>
+                  <hr></hr>
+                  <ul className="flex flex-col gap-5 overflow-auto">
+                    {userInfoQuery.isLoading && <Spinner />}
+                    {userInfoQuery.isError && (
+                      <p>
+                        {t({
+                          en: 'Error finding users',
+                          fr: "erreur lors de la recherche d'utilisateurs"
+                        })}
+                      </p>
+                    )}
+                    <AnimatePresence mode="popLayout">
+                      {userInfoQuery.data?.map((user, i) => {
+                        return (
+                          <motion.li
+                            layout
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0 }}
+                            key={user.username}
+                            transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
+                          >
+                            <div className="flex justify-between gap-4">
+                              <p>{user.username}</p>
+                            </div>
+                          </motion.li>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </ul>
+                </Dialog.Content>
+              </Dialog>
+            </div>
+            <button
+              className="group flex transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-subjects"
+              onClick={() => {
+                void navigate({
+                  to: '/datahub'
+                });
+              }}
             >
               <StatisticCard
+                className="grow"
                 icon={
                   <UserIcon className="h-12 w-12 text-emerald-600 transition-transform duration-300 group-hover:scale-110 dark:text-emerald-400" />
                 }
@@ -159,36 +254,127 @@ const RouteComponent = () => {
                 })}
                 value={summaryQuery.data.counts.subjects}
               />
-            </div>
+            </button>
             <div
-              className="group transform transition-all duration-300 hover:scale-105"
+              className="group flex transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-instruments"
             >
-              <StatisticCard
-                icon={
-                  <ClipboardDocumentIcon className="h-12 w-12 text-amber-600 transition-transform duration-300 group-hover:scale-110 dark:text-amber-400" />
-                }
-                label={t({
-                  en: 'Total Instruments',
-                  fr: "Nombre d'instruments"
-                })}
-                value={summaryQuery.data.counts.instruments}
-              />
+              <Dialog open={isInstrumentModalOpen} onOpenChange={setIsInstrumentModalOpen}>
+                <Dialog.Trigger className="grow">
+                  <StatisticCard
+                    icon={
+                      <ClipboardDocumentIcon className="h-12 w-12 text-amber-600 transition-transform duration-300 group-hover:scale-110 dark:text-amber-400" />
+                    }
+                    label={t({
+                      en: 'Total Instruments',
+                      fr: "Nombre d'instruments"
+                    })}
+                    value={summaryQuery.data.counts.instruments}
+                  ></StatisticCard>
+                </Dialog.Trigger>
+                <Dialog.Content
+                  data-spotlight-type="instruments-Modal-modal"
+                  data-testid="dashboard-instruments-Modal-dialog"
+                >
+                  <Dialog.Header>
+                    <Dialog.Title>
+                      {t({
+                        en: 'Available Instruments',
+                        fr: 'Les instruments'
+                      })}
+                    </Dialog.Title>
+                  </Dialog.Header>
+                  <ul className="flex flex-col gap-5 overflow-auto">
+                    <AnimatePresence mode="popLayout">
+                      <div className="flex justify-between gap-4 font-bold">
+                        <p>
+                          {t({
+                            en: 'Title',
+                            fr: 'Titre'
+                          })}
+                        </p>{' '}
+                        <p>{t({ en: 'Kind', fr: 'Genre' })}</p>
+                      </div>
+                      <hr></hr>
+                      {instrumentInfo?.map((instrument, i) => {
+                        return (
+                          <motion.li
+                            layout
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0 }}
+                            key={instrument.id}
+                            transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
+                          >
+                            <div className="flex justify-between gap-4">
+                              <p>{instrument.title}</p> <p>{instrument.kind}</p>
+                            </div>
+                          </motion.li>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </ul>
+                </Dialog.Content>
+              </Dialog>
             </div>
             <div
-              className="group transform transition-all duration-300 hover:scale-105"
+              className="group flex transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-records"
             >
-              <StatisticCard
-                icon={
-                  <DocumentTextIcon className="h-12 w-12 text-purple-600 transition-transform duration-300 group-hover:scale-110 dark:text-purple-400" />
-                }
-                label={t({
-                  en: 'Total Records',
-                  fr: "Nombre d'enregistrements"
-                })}
-                value={summaryQuery.data.counts.records}
-              />
+              <Dialog open={isRecordModalOpen} onOpenChange={setIsRecordModalOpen}>
+                <Dialog.Trigger className="grow">
+                  <StatisticCard
+                    icon={
+                      <DocumentTextIcon className="h-12 w-12 text-purple-600 transition-transform duration-300 group-hover:scale-110 dark:text-purple-400" />
+                    }
+                    label={t({
+                      en: 'Total Records',
+                      fr: "Nombre d'enregistrements"
+                    })}
+                    value={summaryQuery.data.counts.records}
+                  />
+                </Dialog.Trigger>
+                <Dialog.Content data-spotlight-type="record-Modal-modal" data-testid="dashboard-record-Modal-dialog">
+                  <Dialog.Header>
+                    <Dialog.Title>
+                      {t({
+                        en: 'Number of Records',
+                        fr: "Nombre d'enregistrements"
+                      })}
+                    </Dialog.Title>
+                  </Dialog.Header>
+                  <ul className="flex flex-col gap-5 overflow-auto">
+                    <AnimatePresence mode="popLayout">
+                      <div className="flex justify-between gap-4 font-bold">
+                        <p>
+                          {t({
+                            en: 'Title',
+                            fr: 'Titre'
+                          })}
+                        </p>{' '}
+                        <p>{t({ en: 'Number', fr: 'Numero' })}</p>
+                      </div>
+                      <hr></hr>
+                      {recordCounter?.map((instrument, i) => {
+                        return (
+                          <motion.li
+                            layout
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0 }}
+                            key={instrument.instrumentTitle}
+                            transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
+                          >
+                            <div className="flex justify-between gap-4">
+                              <p>{instrument.instrumentTitle}</p> <p>{instrument.count}</p>
+                            </div>
+                          </motion.li>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </ul>
+                </Dialog.Content>
+              </Dialog>
             </div>
           </div>
         </div>
