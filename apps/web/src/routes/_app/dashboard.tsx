@@ -214,7 +214,7 @@ const RouteComponent = () => {
                     )}
                     {userInfoQuery.data && (
                       <AnimatePresence mode="popLayout">
-                        {userInfoQuery.data?.map((user, i) => {
+                        {userInfoQuery.data.map((user, i) => {
                           return (
                             <motion.li
                               layout
