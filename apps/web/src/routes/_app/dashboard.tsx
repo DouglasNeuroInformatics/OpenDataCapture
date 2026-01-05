@@ -56,8 +56,8 @@ const RouteComponent = () => {
   const recordCounter =
     instrumentInfo?.map((title) => {
       return {
-        id: title.id,
         count: recordIds?.filter((val) => val === title.id).length ?? 0,
+        id: title.id,
         instrumentTitle: title.title
       };
     }) ?? [];
@@ -212,24 +212,26 @@ const RouteComponent = () => {
                         })}
                       </p>
                     )}
-                    <AnimatePresence mode="popLayout">
-                      {userInfoQuery.data?.map((user, i) => {
-                        return (
-                          <motion.li
-                            layout
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0 }}
-                            initial={{ opacity: 0 }}
-                            key={user.username}
-                            transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
-                          >
-                            <div className="flex justify-between gap-4">
-                              <p>{user.username}</p>
-                            </div>
-                          </motion.li>
-                        );
-                      })}
-                    </AnimatePresence>
+                    {userInfoQuery.data && (
+                      <AnimatePresence mode="popLayout">
+                        {userInfoQuery.data.map((user, i) => {
+                          return (
+                            <motion.li
+                              layout
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0 }}
+                              initial={{ opacity: 0 }}
+                              key={user.username}
+                              transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
+                            >
+                              <div className="flex justify-between gap-4">
+                                <p>{user.username}</p>
+                              </div>
+                            </motion.li>
+                          );
+                        })}
+                      </AnimatePresence>
+                    )}
                   </ul>
                 </Dialog.Content>
               </Dialog>
@@ -285,34 +287,44 @@ const RouteComponent = () => {
                     </Dialog.Title>
                   </Dialog.Header>
                   <ul className="flex flex-col gap-5 overflow-auto">
-                    <AnimatePresence mode="popLayout">
-                      <div className="flex justify-between gap-4 font-bold">
-                        <p>
-                          {t({
-                            en: 'Title',
-                            fr: 'Titre'
-                          })}
-                        </p>{' '}
-                        <p>{t({ en: 'Kind', fr: 'Genre' })}</p>
-                      </div>
-                      <hr></hr>
-                      {instrumentInfo?.map((instrument, i) => {
-                        return (
-                          <motion.li
-                            layout
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0 }}
-                            initial={{ opacity: 0 }}
-                            key={instrument.id}
-                            transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
-                          >
-                            <div className="flex justify-between gap-4">
-                              <p>{instrument.title}</p> <p>{instrument.kind}</p>
-                            </div>
-                          </motion.li>
-                        );
-                      })}
-                    </AnimatePresence>
+                    {!instrumentInfo && (
+                      <p>
+                        {t({
+                          en: 'Error finding instruments',
+                          fr: 'Erreur lors de la recherche les instruments'
+                        })}
+                      </p>
+                    )}
+                    {instrumentInfo && (
+                      <AnimatePresence mode="popLayout">
+                        <div className="flex justify-between gap-4 font-bold">
+                          <p>
+                            {t({
+                              en: 'Title',
+                              fr: 'Titre'
+                            })}
+                          </p>{' '}
+                          <p>{t({ en: 'Kind', fr: 'Genre' })}</p>
+                        </div>
+                        <hr></hr>
+                        {instrumentInfo.map((instrument, i) => {
+                          return (
+                            <motion.li
+                              layout
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0 }}
+                              initial={{ opacity: 0 }}
+                              key={instrument.id}
+                              transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
+                            >
+                              <div className="flex justify-between gap-4">
+                                <p>{instrument.title}</p> <p>{instrument.kind}</p>
+                              </div>
+                            </motion.li>
+                          );
+                        })}
+                      </AnimatePresence>
+                    )}
                   </ul>
                 </Dialog.Content>
               </Dialog>
@@ -344,34 +356,44 @@ const RouteComponent = () => {
                     </Dialog.Title>
                   </Dialog.Header>
                   <ul className="flex flex-col gap-5 overflow-auto">
-                    <AnimatePresence mode="popLayout">
-                      <div className="flex justify-between gap-4 font-bold">
-                        <p>
-                          {t({
-                            en: 'Title',
-                            fr: 'Titre'
-                          })}
-                        </p>{' '}
-                        <p>{t({ en: 'Number', fr: 'Numero' })}</p>
-                      </div>
-                      <hr></hr>
-                      {recordCounter?.map((instrument, i) => {
-                        return (
-                          <motion.li
-                            layout
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0 }}
-                            initial={{ opacity: 0 }}
-                            key={instrument.instrumentTitle}
-                            transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
-                          >
-                            <div className="flex justify-between gap-4">
-                              <p>{instrument.instrumentTitle}</p> <p>{instrument.count}</p>
-                            </div>
-                          </motion.li>
-                        );
-                      })}
-                    </AnimatePresence>
+                    {!instrumentInfo && (
+                      <p>
+                        {t({
+                          en: 'Error finding records',
+                          fr: "Erreur lors de la recherche d'enregistrements"
+                        })}
+                      </p>
+                    )}
+                    {instrumentInfo && (
+                      <AnimatePresence mode="popLayout">
+                        <div className="flex justify-between gap-4 font-bold">
+                          <p>
+                            {t({
+                              en: 'Title',
+                              fr: 'Titre'
+                            })}
+                          </p>{' '}
+                          <p>{t({ en: 'Number', fr: 'Numero' })}</p>
+                        </div>
+                        <hr></hr>
+                        {recordCounter.map((instrument, i) => {
+                          return (
+                            <motion.li
+                              layout
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0 }}
+                              initial={{ opacity: 0 }}
+                              key={instrument.id}
+                              transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
+                            >
+                              <div className="flex justify-between gap-4">
+                                <p>{instrument.instrumentTitle}</p> <p>{instrument.count}</p>
+                              </div>
+                            </motion.li>
+                          );
+                        })}
+                      </AnimatePresence>
+                    )}
                   </ul>
                 </Dialog.Content>
               </Dialog>
