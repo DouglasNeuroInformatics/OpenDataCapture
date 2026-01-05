@@ -356,7 +356,7 @@ const RouteComponent = () => {
                     </Dialog.Title>
                   </Dialog.Header>
                   <ul className="flex flex-col gap-5 overflow-auto">
-                    {!recordCounter && (
+                    {!instrumentInfo && (
                       <p>
                         {t({
                           en: 'Error finding records',
@@ -364,7 +364,7 @@ const RouteComponent = () => {
                         })}
                       </p>
                     )}
-                    {recordCounter && (
+                    {instrumentInfo && (
                       <AnimatePresence mode="popLayout">
                         <div className="flex justify-between gap-4 font-bold">
                           <p>
@@ -383,7 +383,7 @@ const RouteComponent = () => {
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0 }}
                               initial={{ opacity: 0 }}
-                              key={instrument.instrumentTitle}
+                              key={instrument.id}
                               transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
                             >
                               <div className="flex justify-between gap-4">
