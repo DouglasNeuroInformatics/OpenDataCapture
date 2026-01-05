@@ -56,8 +56,8 @@ const RouteComponent = () => {
   const recordCounter =
     instrumentInfo?.map((title) => {
       return {
-        id: title.id,
         count: recordIds?.filter((val) => val === title.id).length ?? 0,
+        id: title.id,
         instrumentTitle: title.title
       };
     }) ?? [];
