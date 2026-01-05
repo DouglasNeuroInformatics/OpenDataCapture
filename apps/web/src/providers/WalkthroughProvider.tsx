@@ -160,7 +160,7 @@ const Walkthrough = () => {
           <p>
             {t({
               en: 'Here, you can search for subjects in the database. To begin, click on the Subject Lookup button, and a popup will appear where you can enter the search query.',
-              fr: "Ici, vous pouvez rechercher des clients dans la base de données. Pour commencer, cliquez sur la button de recherche et une fenêtre contextuelle s'affichera pour vous permettre de saisir la requête de recherche."
+              fr: "Ici, vous pouvez rechercher des clients dans la base de données. Pour commencer, cliquez sur la bouton de recherche et une fenêtre contextuelle s'affichera pour vous permettre de saisir la requête de recherche."
             })}
           </p>
         ),
