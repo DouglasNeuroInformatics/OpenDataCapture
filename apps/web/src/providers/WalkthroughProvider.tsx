@@ -140,7 +140,7 @@ const Walkthrough = () => {
         content: (
           <p>
             {t({
-              en: 'Here, you can search for subjects in the database. To begin, type in the search bar to find matching subject identification tags',
+              en: 'Here, you can search for subjects in the database. To begin, type in the search bar to find matching subject IDs',
               fr: 'Ici, vous pouvez rechercher des sujets dans la base de données. Pour commencer, saisissez votre recherche dans la barre de recherche afin de trouver les identifiants de sujets correspondants.'
             })}
           </p>
