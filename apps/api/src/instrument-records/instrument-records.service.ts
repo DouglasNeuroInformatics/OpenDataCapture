@@ -156,18 +156,21 @@ export class InstrumentRecordsService {
       }
     });
 
-    const instruments = new Map<string, ScalarInstrument>();
+    const instrumentIds = [...new Set(records.map((r) => r.instrumentId))];
+
+    const instrumentsArray = await Promise.all(
+      instrumentIds.map((id) => this.instrumentsService.findById(id) as Promise<ScalarInstrument>)
+    );
+
+    const instruments = new Map(instrumentsArray.map((instrument) => [instrument.id, instrument]));
+
     for (const record of records) {
       if (!record.computedMeasures) {
         continue;
       }
-      let instrument: ScalarInstrument;
-      if (instruments.has(record.instrumentId)) {
-        instrument = instruments.get(record.instrumentId)!;
-      } else {
-        instrument = (await this.instrumentsService.findById(record.instrumentId)) as ScalarInstrument;
-        instruments.set(record.instrumentId, instrument);
-      }
+
+      const instrument = instruments.get(record.instrumentId)!;
+
       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
         if (measureValue == null) {
           continue;
@@ -217,6 +220,7 @@ export class InstrumentRecordsService {
         }
       }
     }
+
     return data;
   }
 
