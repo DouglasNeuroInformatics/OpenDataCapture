@@ -1,10 +1,16 @@
-import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
+import { cpus } from 'os';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import { Worker } from 'worker_threads';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+import { replacer, reviver } from '@douglasneuroinformatics/libjs';
 import { InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
-import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import { $RecordArrayFieldValue } from '@opendatacapture/schemas/instrument';
 import type {
   CreateInstrumentRecordData,
@@ -14,7 +20,6 @@ import type {
   LinearRegressionResults,
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
-import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { Prisma } from '@prisma/client';
 import type { Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
@@ -39,6 +44,8 @@ type ExpandDataType =
       message: string;
       success: false;
     };
+
+type WorkerMessage = { data: InstrumentRecordsExport; success: true } | { error: string; success: false };
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -133,7 +140,6 @@ export class InstrumentRecordsService {
   }
 
   async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
-    const data: InstrumentRecordsExport = [];
     const records = await this.instrumentRecordModel.findMany({
       include: {
         session: {
@@ -164,66 +170,96 @@ export class InstrumentRecordsService {
 
     const instruments = new Map(instrumentsArray.map((instrument) => [instrument.id, instrument]));
 
-    const processRecord = (record: (typeof records)[number]) => {
-      if (!record.computedMeasures) return [];
+    // const processRecord = (record: (typeof records)[number]) => {
+    //   if (!record.computedMeasures) return [];
 
-      const instrument = instruments.get(record.instrumentId)!;
-      const rows: InstrumentRecordsExport = [];
+    //   const instrument = instruments.get(record.instrumentId)!;
+    //   const rows: InstrumentRecordsExport = [];
 
-      for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-        if (measureValue == null) continue;
+    //   for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
+    //     if (measureValue == null) continue;
 
-        if (!Array.isArray(measureValue)) {
-          rows.push({
-            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-            instrumentEdition: instrument.internal.edition,
-            instrumentName: instrument.internal.name,
-            measure: measureKey,
-            sessionDate: record.session.date.toISOString(),
-            sessionId: record.session.id,
-            sessionType: record.session.type,
-            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-            subjectId: removeSubjectIdScope(record.subject.id),
-            subjectSex: record.subject.sex,
-            timestamp: record.date.toISOString(),
-            username: record.session.user?.username ?? 'N/A',
-            value: measureValue
-          });
-          continue;
-        }
+    //     if (!Array.isArray(measureValue)) {
+    //       rows.push({
+    //         groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+    //         instrumentEdition: instrument.internal.edition,
+    //         instrumentName: instrument.internal.name,
+    //         measure: measureKey,
+    //         sessionDate: record.session.date.toISOString(),
+    //         sessionId: record.session.id,
+    //         sessionType: record.session.type,
+    //         subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+    //         subjectId: removeSubjectIdScope(record.subject.id),
+    //         subjectSex: record.subject.sex,
+    //         timestamp: record.date.toISOString(),
+    //         username: record.session.user?.username ?? 'N/A',
+    //         value: measureValue
+    //       });
+    //       continue;
+    //     }
 
-        if (measureValue.length < 1) continue;
+    //     if (measureValue.length < 1) continue;
 
-        const expanded = this.expandData(measureValue);
-        for (const entry of expanded) {
-          if (!entry.success) {
-            throw new Error(`exportRecords: ${instrument.internal.name}.${measureKey} — ${entry.message}`);
+    //     const expanded = this.expandData(measureValue);
+    //     for (const entry of expanded) {
+    //       if (!entry.success) {
+    //         throw new Error(`exportRecords: ${instrument.internal.name}.${measureKey} — ${entry.message}`);
+    //       }
+    //       rows.push({
+    //         groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+    //         instrumentEdition: instrument.internal.edition,
+    //         instrumentName: instrument.internal.name,
+    //         measure: `${measureKey} - ${entry.measure}`,
+    //         sessionDate: record.session.date.toISOString(),
+    //         sessionId: record.session.id,
+    //         sessionType: record.session.type,
+    //         subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+    //         subjectId: removeSubjectIdScope(record.subject.id),
+    //         subjectSex: record.subject.sex,
+    //         timestamp: record.date.toISOString(),
+    //         username: record.session.user?.username ?? 'N/A',
+    //         value: entry.measureValue
+    //       });
+    //     }
+    //   }
+
+    //   return rows;
+    // };
+
+    // const results = await Promise.all(records.map((record) => processRecord(record)));
+
+    // return results.flat();
+
+    const numWorkers = Math.min(cpus().length, Math.ceil(records.length / 100)); // Use up to CPU count, chunk size 100
+    const chunkSize = Math.ceil(records.length / numWorkers);
+    const chunks = [];
+    for (let i = 0; i < records.length; i += chunkSize) {
+      chunks.push(records.slice(i, i + chunkSize));
+    }
+
+    const workerPromises = chunks.map((chunk) => {
+      return new Promise<InstrumentRecordsExport>((resolve, reject) => {
+        const worker = new Worker(join(__dirname, 'export-worker.ts'));
+        worker.postMessage({ instruments: Array.from(instruments.entries()), records: chunk });
+        worker.on('message', (message: WorkerMessage) => {
+          if (message.success) {
+            resolve(message.data);
+          } else {
+            reject(new Error(message.error));
           }
-          rows.push({
-            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-            instrumentEdition: instrument.internal.edition,
-            instrumentName: instrument.internal.name,
-            measure: `${measureKey} - ${entry.measure}`,
-            sessionDate: record.session.date.toISOString(),
-            sessionId: record.session.id,
-            sessionType: record.session.type,
-            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-            subjectId: removeSubjectIdScope(record.subject.id),
-            subjectSex: record.subject.sex,
-            timestamp: record.date.toISOString(),
-            username: record.session.user?.username ?? 'N/A',
-            value: entry.measureValue
-          });
-        }
-      }
+          void worker.terminate();
+        });
+        worker.on('error', (error) => {
+          reject(error);
+          void worker.terminate();
+        });
+      });
+    });
 
-      return rows;
-    };
-
-    const results = await Promise.all(records.map((record) => processRecord(record)));
-
+    const results = await Promise.all(workerPromises);
     return results.flat();
 
+    // const data: InstrumentRecordsExport = [];
     // for (const record of records) {
     //   if (!record.computedMeasures) {
     //     continue;
@@ -281,7 +317,7 @@ export class InstrumentRecordsService {
     //   }
     // }
 
-    return data;
+    // return data;
   }
 
   async find(
