@@ -8,7 +8,7 @@
   @apply pointer-events-none my-1 ring-1 ring-slate-700;
 }
 
-#subject-lookup-search-bar[data-spotlight='true'] > input {
+#datahub-subject-search-bar[data-spotlight='true'] > input {
   @apply bg-slate-100 placeholder:text-slate-900 dark:bg-slate-900 dark:placeholder:text-slate-100;
 }
 

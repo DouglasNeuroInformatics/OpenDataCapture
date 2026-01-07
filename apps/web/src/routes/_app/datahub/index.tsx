@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { ActionDropdown, ClientTable, Dialog, Heading, SearchBar } from '@douglasneuroinformatics/libui/components';
+import {
+  ActionDropdown,
+  Button,
+  ClientTable,
+  Dialog,
+  Heading,
+  SearchBar
+} from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
+import { UserSearchIcon } from 'lucide-react';
 import { unparse } from 'papaparse';
 
 import { IdentificationForm } from '@/components/IdentificationForm';
@@ -15,7 +23,6 @@ import { PageHeader } from '@/components/PageHeader';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
-
 type MasterDataTableProps = {
   data: Subject[];
   onSelect: (subject: Subject) => void;
@@ -71,6 +78,8 @@ const RouteComponent = () => {
   const navigate = useNavigate();
 
   const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
+  const [tableData, setTableData] = useState<Subject[]>(data ?? []);
+  const [searchString, setSearchString] = useState('');
 
   const getExportRecords = async () => {
     const response = await axios.get<InstrumentRecordsExport>('/v1/instrument-records/export', {
@@ -83,24 +92,37 @@ const RouteComponent = () => {
 
   const handleExportSelection = (option: 'CSV' | 'Excel' | 'JSON') => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
-    addNotification({
-      message: t({
-        en: 'Exporting entries, please wait...',
-        fr: 'Téléchargement des entrées, veuillez patienter...'
-      }),
-      type: 'info'
-    });
     getExportRecords()
       .then((data): any => {
+        const listedSubjects = tableData.map((record) => {
+          return removeSubjectIdScope(record.id);
+        });
+
+        const filteredData = data.filter((dataEntry) => listedSubjects.includes(dataEntry.subjectId));
+
+        if (filteredData.length < 1) {
+          throw Error(
+            t({ en: 'Export failed: No entries to export', fr: "Échec de l'exportation : aucune entrée à exporter" })
+          );
+        }
+
+        addNotification({
+          message: t({
+            en: 'Exporting entries, please wait...',
+            fr: 'Téléchargement des entrées, veuillez patienter...'
+          }),
+          type: 'info'
+        });
+
         switch (option) {
           case 'CSV':
             void download('README.txt', t('datahub.index.table.exportHelpText'));
-            void download(`${baseFilename}.csv`, unparse(data));
+            void download(`${baseFilename}.csv`, unparse(filteredData));
             break;
           case 'Excel':
-            return downloadExcel(`${baseFilename}.xlsx`, data);
+            return downloadExcel(`${baseFilename}.xlsx`, filteredData);
           case 'JSON':
-            return download(`${baseFilename}.json`, JSON.stringify(data, null, 2));
+            return download(`${baseFilename}.json`, JSON.stringify(filteredData, null, 2));
         }
       })
       .then(() => {
@@ -111,10 +133,17 @@ const RouteComponent = () => {
       })
       .catch((err) => {
         console.error(err);
-        addNotification({
-          message: t({ en: 'Export failed', fr: "Échec de l'exportation" }),
-          type: 'error'
-        });
+        if (err instanceof Error && err.message) {
+          addNotification({
+            message: err.message,
+            type: 'error'
+          });
+        } else {
+          addNotification({
+            message: t({ en: 'Export failed', fr: "Échec de l'exportation" }),
+            type: 'error'
+          });
+        }
       });
   };
 
@@ -127,9 +156,24 @@ const RouteComponent = () => {
       setIsLookupOpen(false);
     } else {
       addNotification({ type: 'success' });
-      await navigate({ to: `./${response.data.id}/assignments` });
+      await navigate({ to: `./${response.data.id}/table` });
     }
   };
+
+  useEffect(() => {
+    const definedTableData = data ?? [];
+
+    if (!searchString) {
+      setTableData(definedTableData);
+      return;
+    }
+
+    const filtered = data.filter((record) =>
+      removeSubjectIdScope(record.id).toLowerCase().includes(searchString.toLowerCase())
+    );
+
+    setTableData(filtered);
+  }, [searchString, data]);
 
   return (
     <React.Fragment>
@@ -140,18 +184,33 @@ const RouteComponent = () => {
       </PageHeader>
       <div className="flex grow flex-col">
         <div className="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
+          <SearchBar
+            className="[&>input]:text-foreground [&>input]:placeholder-foreground grow"
+            data-testid="datahub-subject-search-bar"
+            id="datahub-subject-search-bar"
+            placeholder={t({
+              en: 'Click to Search',
+              fr: 'Cliquer pour rechercher'
+            })}
+            readOnly={false}
+            value={searchString}
+            onValueChange={(value: string) => setSearchString(value)}
+          />
           <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
-            <Dialog.Trigger className="grow">
-              <SearchBar
-                className="[&>input]:text-foreground [&>input]:placeholder-foreground"
-                data-testid="datahub-subject-lookup-search"
-                id="subject-lookup-search-bar"
-                placeholder={t({
-                  en: 'Click to Search',
-                  fr: 'Cliquer pour rechercher'
+            <Dialog.Trigger asChild>
+              <Button
+                className="gap-1"
+                data-spotlight-type="subject-lookup-search-button"
+                data-testid="subject-lookup-search-button"
+                id="subject-lookup-search-button"
+                variant="outline"
+              >
+                <UserSearchIcon />{' '}
+                {t({
+                  en: 'Subject Lookup',
+                  fr: 'Trouver un client'
                 })}
-                readOnly={true}
-              />
+              </Button>
             </Dialog.Trigger>
             <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
               <Dialog.Header>
@@ -172,7 +231,7 @@ const RouteComponent = () => {
           </div>
         </div>
         <MasterDataTable
-          data={data}
+          data={tableData}
           onSelect={(subject) => {
             void navigate({ to: `./${subject.id}/table` });
           }}
