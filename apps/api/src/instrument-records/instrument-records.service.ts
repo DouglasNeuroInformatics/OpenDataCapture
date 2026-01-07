@@ -11,6 +11,7 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
+// import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import { $RecordArrayFieldValue } from '@opendatacapture/schemas/instrument';
 import type {
   CreateInstrumentRecordData,
@@ -20,6 +21,7 @@ import type {
   LinearRegressionResults,
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
+// import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { Prisma } from '@prisma/client';
 import type { Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
@@ -34,6 +36,8 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
+import type { ChunkCompleteData, ChunkCompleteMessage, InitData, InitMessage, ParentMessage } from './thread-types';
+
 type ExpandDataType =
   | {
       measure: string;
@@ -46,6 +50,14 @@ type ExpandDataType =
     };
 
 type WorkerMessage = { data: InstrumentRecordsExport; success: true } | { error: string; success: false };
+
+// type MainThreadMessage = {
+//   data: {
+
+//   }
+// } | {
+//   error: string; success: false
+// }
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -230,17 +242,31 @@ export class InstrumentRecordsService {
 
     // return results.flat();
 
-    const numWorkers = Math.min(cpus().length, Math.ceil(records.length / 100)); // Use up to CPU count, chunk size 100
+    const numWorkers = 1;
+    // Math.min(cpus().length, Math.ceil(records.length / 100)); // Use up to CPU count, chunk size 100
     const chunkSize = Math.ceil(records.length / numWorkers);
     const chunks = [];
     for (let i = 0; i < records.length; i += chunkSize) {
       chunks.push(records.slice(i, i + chunkSize));
     }
+    const availableInstrumentArray: InitData = instruments
+      .values()
+      .toArray()
+      .map((item) => {
+        return {
+          edition: item.internal.edition,
+          id: item.id!,
+          name: item.internal.name
+        };
+      });
+
+    const initWorker = new Worker(join(__dirname, 'export-worker.ts'));
+    initWorker.postMessage({ data: availableInstrumentArray, type: 'INIT' });
 
     const workerPromises = chunks.map((chunk) => {
       return new Promise<InstrumentRecordsExport>((resolve, reject) => {
         const worker = new Worker(join(__dirname, 'export-worker.ts'));
-        worker.postMessage({ instruments: Array.from(instruments.entries()), records: chunk });
+        worker.postMessage({ data: chunk, type: 'CHUNK_COMPLETE' });
         worker.on('message', (message: WorkerMessage) => {
           if (message.success) {
             resolve(message.data);
