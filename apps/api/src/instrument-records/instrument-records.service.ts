@@ -5,7 +5,7 @@ import { Worker } from 'worker_threads';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-import { replacer, reviver } from '@douglasneuroinformatics/libjs';
+import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
 import { InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
@@ -37,6 +37,8 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
 import type { ChunkCompleteData, ChunkCompleteMessage, InitData, InitMessage, ParentMessage } from './thread-types';
+import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
+import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 type ExpandDataType =
   | {
@@ -50,6 +52,8 @@ type ExpandDataType =
     };
 
 type WorkerMessage = { data: InstrumentRecordsExport; success: true } | { error: string; success: false };
+
+type InitialMessage = { success: true };
 
 // type MainThreadMessage = {
 //   data: {
@@ -261,7 +265,14 @@ export class InstrumentRecordsService {
       });
 
     const initWorker = new Worker(join(__dirname, 'export-worker.ts'));
+
     initWorker.postMessage({ data: availableInstrumentArray, type: 'INIT' });
+
+    initWorker.on('message', (message: InitialMessage) => {
+      if (!message.success) {
+        throw Error('Initial thread failed');
+      }
+    });
 
     const workerPromises = chunks.map((chunk) => {
       return new Promise<InstrumentRecordsExport>((resolve, reject) => {
