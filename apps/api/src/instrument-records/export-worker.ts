@@ -1,9 +1,8 @@
 import { parentPort } from 'worker_threads';
 
 import { yearsPassed } from '@douglasneuroinformatics/libjs';
-import type { InstrumentMeasureValue } from '@opendatacapture/runtime-core';
+import type { FormTypes, InstrumentMeasureValue } from '@opendatacapture/runtime-core';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
-import { $RecordArrayFieldValue } from '@opendatacapture/schemas/instrument';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
@@ -12,7 +11,7 @@ import type { ChunkCompleteData, InitData, ParentMessage, RecordType } from './t
 type ExpandDataType =
   | {
       measure: string;
-      measureValue: InstrumentMeasureValue;
+      measureValue: FormTypes.RecordArrayFieldValue | InstrumentMeasureValue;
       success: true;
     }
   | {
@@ -26,19 +25,21 @@ function expandData(listEntry: any[]): ExpandDataType[] {
     throw new Error('Record Array is Empty');
   }
   for (const objectEntry of Object.values(listEntry)) {
-    for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
-      const parseResult = $RecordArrayFieldValue.safeParse(dataValue);
-      if (!parseResult.success) {
-        validRecordArrayList.push({
-          message: `Error interpreting value ${dataValue} and record array key ${dataKey}`,
-          success: false
-        });
-      }
+    for (const [dataKey, dataValue] of Object.entries(
+      objectEntry as { [key: string]: FormTypes.RecordArrayFieldValue }
+    )) {
       validRecordArrayList.push({
         measure: dataKey,
-        measureValue: parseResult.data,
+        measureValue: dataValue,
         success: true
       });
+
+      // if (!parseResult.success) {
+      //   validRecordArrayList.push({
+      //     message: `Error interpreting value ${dataValue} and record array key ${dataKey}`,
+      //     success: false
+      //   });
+      // }
     }
   }
   return validRecordArrayList;
@@ -141,6 +142,7 @@ let initData: Map<
 
 function handleInit(data: InitData) {
   initData = new Map(data.map((instrument) => [instrument.id, instrument]));
+  return { success: true };
 }
 
 function handleChunkComplete(_data: ChunkCompleteData) {
@@ -214,6 +216,7 @@ function handleChunkComplete(_data: ChunkCompleteData) {
 }
 
 parentPort!.on('message', (message: ParentMessage) => {
+  console.log(message);
   switch (message.type) {
     case 'CHUNK_COMPLETE':
       return handleChunkComplete(message.data);
