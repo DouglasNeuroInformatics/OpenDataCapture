@@ -142,7 +142,8 @@ let initData: Map<
 
 function handleInit(data: InitData) {
   initData = new Map(data.map((instrument) => [instrument.id, instrument]));
-  return { success: true };
+
+  parentPort?.postMessage({ success: true });
 }
 
 function handleChunkComplete(_data: ChunkCompleteData) {

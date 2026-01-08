@@ -264,15 +264,25 @@ export class InstrumentRecordsService {
         };
       });
 
-    const initWorker = new Worker(join(__dirname, 'export-worker.ts'));
+    const initWorkerPromise = new Promise<InitialMessage>((resolve, reject) => {
+      const initWorker = new Worker(join(__dirname, 'export-worker.ts'));
 
-    initWorker.postMessage({ data: availableInstrumentArray, type: 'INIT' });
+      initWorker.postMessage({ data: availableInstrumentArray, type: 'INIT' });
 
-    initWorker.on('message', (message: InitialMessage) => {
-      if (!message.success) {
-        throw Error('Initial thread failed');
-      }
+      initWorker.on('message', (message: InitialMessage) => {
+        if (!message.success) {
+          reject(new Error('Error in initial thread'));
+        }
+        resolve(message);
+        void initWorker.terminate();
+      });
     });
+
+    try {
+      await initWorkerPromise;
+    } catch (error) {
+      console.error('Worker failed:', error);
+    }
 
     const workerPromises = chunks.map((chunk) => {
       return new Promise<InstrumentRecordsExport>((resolve, reject) => {
