@@ -287,15 +287,21 @@ export class InstrumentRecordsService {
     const workerPromises = chunks.map((chunk) => {
       return new Promise<InstrumentRecordsExport>((resolve, reject) => {
         const worker = new Worker(join(__dirname, 'export-worker.ts'));
-        worker.postMessage({ data: chunk, type: 'CHUNK_COMPLETE' });
-        worker.on('message', (message: WorkerMessage) => {
+        worker.postMessage({ data: availableInstrumentArray, type: 'INIT' });
+        worker.on('message', (message: InitialMessage) => {
           if (message.success) {
-            resolve(message.data);
-          } else {
-            reject(new Error(message.error));
+            worker.postMessage({ data: chunk, type: 'CHUNK_COMPLETE' });
+            worker.on('message', (message: WorkerMessage) => {
+              if (message.success) {
+                resolve(message.data);
+              } else {
+                reject(new Error(message.error));
+              }
+              void worker.terminate();
+            });
           }
-          void worker.terminate();
         });
+
         worker.on('error', (error) => {
           reject(error);
           void worker.terminate();
