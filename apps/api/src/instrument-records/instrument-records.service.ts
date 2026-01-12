@@ -37,8 +37,6 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
 import type { ChunkCompleteData, ChunkCompleteMessage, InitData, InitMessage, ParentMessage } from './thread-types';
-import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
-import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 type ExpandDataType =
   | {
@@ -246,13 +244,39 @@ export class InstrumentRecordsService {
 
     // return results.flat();
 
+    const convertRecords = records.map((record) => {
+      return {
+        computedMeasures: record.computedMeasures,
+        date: record.date.toISOString(),
+        id: record.id,
+        instrumentId: record.instrumentId,
+        session: {
+          date: record.session.date.toISOString(),
+          id: record.session.id,
+          type: record.session.type,
+          user: {
+            username: record.session.user?.username
+          }
+        },
+        subject: {
+          age: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+          groupIds: record.subject.groupIds,
+          id: record.subject.id,
+          sex: record.subject.sex
+        }
+      };
+    });
+
     const numWorkers = 1;
     // Math.min(cpus().length, Math.ceil(records.length / 100)); // Use up to CPU count, chunk size 100
-    const chunkSize = Math.ceil(records.length / numWorkers);
+
+    const chunkSize = Math.ceil(convertRecords.length / numWorkers);
     const chunks = [];
-    for (let i = 0; i < records.length; i += chunkSize) {
-      chunks.push(records.slice(i, i + chunkSize));
+
+    for (let i = 0; i < convertRecords.length; i += chunkSize) {
+      chunks.push(convertRecords.slice(i, i + chunkSize));
     }
+
     const availableInstrumentArray: InitData = instruments
       .values()
       .toArray()
@@ -264,30 +288,11 @@ export class InstrumentRecordsService {
         };
       });
 
-    // const initWorkerPromise = new Promise<InitialMessage>((resolve, reject) => {
-    //   const initWorker = new Worker(join(__dirname, 'export-worker.ts'));
-
-    //   initWorker.postMessage({ data: availableInstrumentArray, type: 'INIT' });
-
-    //   initWorker.on('message', (message: InitialMessage) => {
-    //     if (!message.success) {
-    //       reject(new Error('Error in initial thread'));
-    //     }
-    //     resolve(message);
-    //     void initWorker.terminate();
-    //   });
-    // });
-
-    // try {
-    //   await initWorkerPromise;
-    // } catch (error) {
-    //   console.error('Worker failed:', error);
-    // }
-
     const workerPromises = chunks.map((chunk) => {
       return new Promise<InstrumentRecordsExport>((resolve, reject) => {
         const worker = new Worker(join(__dirname, 'export-worker.ts'));
         worker.postMessage({ data: availableInstrumentArray, type: 'INIT' });
+
         worker.on('message', (message: InitialMessage) => {
           if (message.success) {
             worker.postMessage({ data: chunk, type: 'CHUNK_COMPLETE' });
