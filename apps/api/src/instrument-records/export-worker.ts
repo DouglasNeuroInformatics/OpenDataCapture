@@ -32,103 +32,10 @@ function expandData(listEntry: any[]): ExpandDataType[] {
         measureValue: dataValue,
         success: true
       });
-
-      // if (!parseResult.success) {
-      //   validRecordArrayList.push({
-      //     message: `Error interpreting value ${dataValue} and record array key ${dataKey}`,
-      //     success: false
-      //   });
-      // }
     }
   }
   return validRecordArrayList;
 }
-
-// parentPort?.on(
-//   'message',
-//   ({ instruments, records }: { instruments: [string, ScalarInstrument][]; records: RecordType[] }) => {
-//     const instrumentsMap = new Map(instruments);
-
-//     const processRecord = (record: RecordType): InstrumentRecordsExport => {
-//       if (!record.computedMeasures) return [];
-
-//       const instrument = instrumentsMap.get(record.instrumentId)!;
-//       const rows: InstrumentRecordsExport = [];
-
-//       for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-//         if (measureValue == null) continue;
-
-//         if (!Array.isArray(measureValue)) {
-//           rows.push({
-//             groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-//             instrumentEdition: instrument.internal.edition,
-//             instrumentName: instrument.internal.name,
-//             measure: measureKey,
-//             sessionDate: record.session.date.toISOString(),
-//             sessionId: record.session.id,
-//             sessionType: record.session.type,
-//             subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-//             subjectId: removeSubjectIdScope(record.subject.id),
-//             subjectSex: record.subject.sex,
-//             timestamp: record.date.toISOString(),
-//             username: record.session.user?.username ?? 'N/A',
-//             value: measureValue as InstrumentMeasureValue
-//           });
-//           continue;
-//         }
-
-//         if (measureValue.length < 1) continue;
-
-//         const expanded = expandData(measureValue);
-//         for (const entry of expanded) {
-//           if (!entry.success) {
-//             throw new Error(`exportRecords: ${instrument.internal.name}.${measureKey} — ${entry.message}`);
-//           }
-//           rows.push({
-//             groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-//             instrumentEdition: instrument.internal.edition,
-//             instrumentName: instrument.internal.name,
-//             measure: `${measureKey} - ${entry.measure}`,
-//             sessionDate: record.session.date.toISOString(),
-//             sessionId: record.session.id,
-//             sessionType: record.session.type,
-//             subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-//             subjectId: removeSubjectIdScope(record.subject.id),
-//             subjectSex: record.subject.sex,
-//             timestamp: record.date.toISOString(),
-//             username: record.session.user?.username ?? 'N/A',
-//             value: entry.measureValue
-//           });
-//         }
-//       }
-
-//       return rows;
-//     };
-
-//     try {
-//       const results = records.map(processRecord);
-//       parentPort?.postMessage({ data: results.flat(), success: true });
-//     } catch (error) {
-//       parentPort?.postMessage({ error: (error as Error).message, success: false });
-//     }
-//   }
-// );
-
-// type InitData = string
-
-// type InitMessage = {
-//     data: InitData
-//     type: 'INIT'
-// }
-
-// type ChunkCompleteData = number
-
-// type ChunkCompleteMessage = {
-//     data: ChunkCompleteData
-//     type: 'CHUNK_COMPLETE'
-// }
-
-// type ParentMessage = ChunkCompleteMessage | InitMessage
 
 let initData: Map<
   string | undefined,

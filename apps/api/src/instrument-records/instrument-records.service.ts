@@ -267,9 +267,7 @@ export class InstrumentRecordsService {
       };
     });
 
-    const numWorkers = 1;
-    // Math.min(cpus().length, Math.ceil(records.length / 100)); // Use up to CPU count, chunk size 100
-
+    const numWorkers = Math.min(cpus().length, Math.ceil(records.length / 100)); // Use up to CPU count, chunk size 100
     const chunkSize = Math.ceil(convertRecords.length / numWorkers);
     const chunks = [];
 
