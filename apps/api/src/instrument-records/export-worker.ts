@@ -1,6 +1,5 @@
 import { parentPort } from 'worker_threads';
 
-import { yearsPassed } from '@douglasneuroinformatics/libjs';
 import type { FormTypes, InstrumentMeasureValue } from '@opendatacapture/runtime-core';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
@@ -167,13 +166,13 @@ function handleChunkComplete(_data: ChunkCompleteData) {
           instrumentEdition: instrument.edition,
           instrumentName: instrument.name,
           measure: measureKey,
-          sessionDate: record.session.date.toISOString(),
+          sessionDate: record.session.date,
           sessionId: record.session.id,
           sessionType: record.session.type,
-          subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+          subjectAge: record.subject.age,
           subjectId: removeSubjectIdScope(record.subject.id),
           subjectSex: record.subject.sex,
-          timestamp: record.date.toISOString(),
+          timestamp: record.date,
           username: record.session.user?.username ?? 'N/A',
           value: measureValue as InstrumentMeasureValue
         });
@@ -192,13 +191,13 @@ function handleChunkComplete(_data: ChunkCompleteData) {
           instrumentEdition: instrument.edition,
           instrumentName: instrument.name,
           measure: `${measureKey} - ${entry.measure}`,
-          sessionDate: record.session.date.toISOString(),
+          sessionDate: record.session.date,
           sessionId: record.session.id,
           sessionType: record.session.type,
-          subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+          subjectAge: record.subject.age,
           subjectId: removeSubjectIdScope(record.subject.id),
           subjectSex: record.subject.sex,
-          timestamp: record.date.toISOString(),
+          timestamp: record.date,
           username: record.session.user?.username ?? 'N/A',
           value: entry.measureValue
         });
@@ -217,7 +216,6 @@ function handleChunkComplete(_data: ChunkCompleteData) {
 }
 
 parentPort!.on('message', (message: ParentMessage) => {
-  console.log(message);
   switch (message.type) {
     case 'CHUNK_COMPLETE':
       return handleChunkComplete(message.data);
