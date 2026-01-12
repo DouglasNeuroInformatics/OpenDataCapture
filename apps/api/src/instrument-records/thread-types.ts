@@ -1,10 +1,10 @@
 export type RecordType = {
   computedMeasures: null | { [key: string]: unknown };
-  date: Date;
+  date: string;
   id: string;
   instrumentId: string;
   session: {
-    date: Date;
+    date: string;
     id: string;
     type: 'IN_PERSON' | 'REMOTE' | 'RETROSPECTIVE';
     user: null | {
@@ -12,7 +12,7 @@ export type RecordType = {
     };
   };
   subject: {
-    dateOfBirth: Date | null;
+    age: number;
     groupIds: string[];
     id: string;
     sex: string;
