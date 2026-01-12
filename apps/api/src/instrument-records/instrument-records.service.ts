@@ -36,7 +36,7 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
-import type { ChunkCompleteData, ChunkCompleteMessage, InitData, InitMessage, ParentMessage } from './thread-types';
+import type { InitData } from './thread-types';
 
 type ExpandDataType =
   | {
@@ -243,7 +243,6 @@ export class InstrumentRecordsService {
     // const results = await Promise.all(records.map((record) => processRecord(record)));
 
     // return results.flat();
-
     const convertRecords = records.map((record) => {
       return {
         computedMeasures: record.computedMeasures,
