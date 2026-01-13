@@ -30,6 +30,7 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.11",
     "@nestjs/swagger": "^11.0.6",
+    "@nestjs/throttler": "^6.5.0",
     "@opendatacapture/demo": "workspace:*",
     "@opendatacapture/instrument-library": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
