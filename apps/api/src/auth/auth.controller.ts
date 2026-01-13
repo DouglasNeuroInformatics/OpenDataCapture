@@ -1,13 +1,11 @@
-import { $NumberLike } from '@douglasneuroinformatics/libjs';
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
 import { $LoginCredentials } from '@opendatacapture/schemas/auth';
-import z from 'zod/v4';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator.js';
+import { ThrottleLoginRequest } from '@/core/decorators/throttle-login-request.decorator.js';
 
 import { AuthService } from './auth.service.js';
 
@@ -18,7 +16,7 @@ export class AuthController {
   @Get('create-instrument-token')
   @HttpCode(HttpStatus.OK)
   @RouteAccess({ action: 'create', subject: 'Instrument' })
-  @Throttle({ long: { limit: 50, ttl: 60_000 } })
+  @ThrottleLoginRequest()
   async getCreateInstrumentToken(@CurrentUser() currentUser: RequestUser): Promise<{ accessToken: string }> {
     return this.authService.getCreateInstrumentToken(currentUser);
   }
@@ -27,12 +25,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   @RouteAccess('public')
-  @Throttle({
-    long: {
-      limit: $NumberLike.pipe(z.number().int().positive()).default(50).parse(process.env.LOGIN_REQUEST_THROTTLER_LIMIT),
-      ttl: $NumberLike.pipe(z.number().int().positive()).default(60_000).parse(process.env.LOGIN_REQUEST_THROTTLER_TTL)
-    }
-  })
+  @ThrottleLoginRequest()
   async login(@Body() credentials: $LoginCredentials): Promise<{ accessToken: string }> {
     return this.authService.login(credentials);
   }
