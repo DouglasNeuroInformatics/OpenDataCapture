@@ -3,16 +3,18 @@ import { applyDecorators } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import z from 'zod/v4';
 
+import { DEFAULT_LOGIN_REQUEST_THROTTLER_LIMIT, DEFAULT_LOGIN_REQUEST_THROTTLER_TTL } from '../constants';
+
 // we cannot inject the config service here, so this needs to be parsed manually
 
 const LOGIN_REQUEST_THROTTLER_LIMIT = $NumberLike
   .pipe(z.number().int().positive())
-  .default(50)
+  .default(DEFAULT_LOGIN_REQUEST_THROTTLER_LIMIT)
   .parse(process.env.LOGIN_REQUEST_THROTTLER_LIMIT);
 
 const LOGIN_REQUEST_THROTTLER_TTL = $NumberLike
   .pipe(z.number().int().positive())
-  .default(60_000)
+  .default(DEFAULT_LOGIN_REQUEST_THROTTLER_TTL)
   .parse(process.env.LOGIN_REQUEST_THROTTLER_TTL);
 
 export function ThrottleLoginRequest() {
