@@ -12,7 +12,7 @@ export type RecordType = {
     };
   };
   subject: {
-    age: number;
+    age: null | number;
     groupIds: string[];
     id: string;
     sex: string;
