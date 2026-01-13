@@ -204,8 +204,8 @@ importers:
         specifier: 'catalog:'
         version: 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libnest':
-        specifier: ^8.1.2
-        version: 8.1.2(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3)(@nestjs/platform-fastify@11.1.8(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3))(@nestjs/testing@11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3)(@nestjs/platform-express@11.1.3))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.23)(fastify@5.6.1)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.53.3)(rxjs@7.8.2)(typescript@5.6.3)(zod@vendor+zod@3.x)
+        specifier: ^8.2.0
+        version: 8.2.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3)(@nestjs/platform-fastify@11.1.8(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3))(@nestjs/testing@11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3)(@nestjs/platform-express@11.1.3))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.23)(fastify@5.6.1)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.53.3)(rxjs@7.8.2)(typescript@5.6.3)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libpasswd':
         specifier: 'catalog:'
         version: 0.0.3(typescript@5.6.3)
@@ -1986,9 +1986,9 @@ packages:
       neverthrow: ^8.2.0
       zod: ^3.25.x
 
-  '@douglasneuroinformatics/libnest@8.1.2':
+  '@douglasneuroinformatics/libnest@8.2.0':
     resolution:
-      { integrity: sha512-EpFGaepTk0Yme90xJ5U7DgsEcdEO5HBFLXipZkht5lAWtRSyvDhWnLKasSMOAvbGQUmstO6QdXOj/V98/bL3qw== }
+      { integrity: sha512-egNVuLLukwdnKjGl/wRScMu2cEXQhbjtHTO3sePsJymohmdyBxl/7pth2Ih+aDg0ScMMwvJRzMpJQgziAR6cwA== }
     engines: { node: 22.x }
     hasBin: true
     peerDependencies:
@@ -14013,7 +14013,7 @@ snapshots:
       combined-stream: 1.0.8
       extend: 3.0.2
       forever-agent: 0.6.1
-      form-data: 4.0.3
+      form-data: 4.0.4
       http-signature: 1.4.0
       is-typedarray: 1.0.0
       isstream: 0.1.2
@@ -14091,7 +14091,7 @@ snapshots:
       type-fest: 4.41.0
       zod: link:vendor/zod@3.x
 
-  '@douglasneuroinformatics/libnest@8.1.2(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3)(@nestjs/platform-fastify@11.1.8(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3))(@nestjs/testing@11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3)(@nestjs/platform-express@11.1.3))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.23)(fastify@5.6.1)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.53.3)(rxjs@7.8.2)(typescript@5.6.3)(zod@vendor+zod@3.x)':
+  '@douglasneuroinformatics/libnest@8.2.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3)(@nestjs/platform-fastify@11.1.8(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3))(@nestjs/testing@11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.3)(@nestjs/platform-express@11.1.3))(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.23)(fastify@5.6.1)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.53.3)(rxjs@7.8.2)(typescript@5.6.3)(zod@vendor+zod@3.x)':
     dependencies:
       '@douglasneuroinformatics/libjs': 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@nestjs/common': 11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.2)
