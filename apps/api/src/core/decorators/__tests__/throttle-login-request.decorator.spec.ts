@@ -4,7 +4,7 @@ import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const MOCK_DEFAULT_LOGIN_REQUEST_THROTTLER_LIMIT = 5;
 
@@ -53,11 +53,16 @@ async function createMockApp() {
 describe('ThrottleLoginRequest', () => {
   let app: NestFastifyApplication;
 
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
   afterEach(async () => {
     if (app) {
       await app.close();
     }
     vi.resetModules();
+    vi.restoreAllMocks();
   });
 
   it('should use default values when environment variables are not set', async () => {
@@ -69,6 +74,20 @@ describe('ThrottleLoginRequest', () => {
     }
     const response = await app.inject({ method: 'GET', url: '/' });
     expect(response.statusCode).toBe(HttpStatus.TOO_MANY_REQUESTS);
+
+    vi.advanceTimersByTime(40_000);
+
+    {
+      const response = await app.inject({ method: 'GET', url: '/' });
+      expect(response.statusCode).toBe(HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    vi.advanceTimersByTime(40_000);
+
+    {
+      const response = await app.inject({ method: 'GET', url: '/' });
+      expect(response.statusCode).toBe(HttpStatus.OK);
+    }
   });
 
   it('should use custom values from environment variables', async () => {
@@ -83,8 +102,24 @@ describe('ThrottleLoginRequest', () => {
       expect(response.statusCode).toBe(HttpStatus.OK);
     }
 
-    const response = await app.inject({ method: 'GET', url: '/' });
-    expect(response.statusCode).toBe(HttpStatus.TOO_MANY_REQUESTS);
+    {
+      const response = await app.inject({ method: 'GET', url: '/' });
+      expect(response.statusCode).toBe(HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    vi.advanceTimersByTime(15_000);
+
+    {
+      const response = await app.inject({ method: 'GET', url: '/' });
+      expect(response.statusCode).toBe(HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    vi.advanceTimersByTime(20_000);
+
+    {
+      const response = await app.inject({ method: 'GET', url: '/' });
+      expect(response.statusCode).toBe(HttpStatus.OK);
+    }
 
     vi.unstubAllEnvs();
   });
