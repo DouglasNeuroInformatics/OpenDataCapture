@@ -53,14 +53,6 @@ type WorkerMessage = { data: InstrumentRecordsExport; success: true } | { error:
 
 type InitialMessage = { success: true };
 
-// type MainThreadMessage = {
-//   data: {
-
-//   }
-// } | {
-//   error: string; success: false
-// }
-
 @Injectable()
 export class InstrumentRecordsService {
   constructor(
@@ -161,10 +153,17 @@ export class InstrumentRecordsService {
             date: true,
             id: true,
             type: true,
-            user: true
+            user: { select: { username: true } }
           }
         },
-        subject: true
+        subject: {
+          select: {
+            dateOfBirth: true,
+            groupIds: true,
+            id: true,
+            sex: true
+          }
+        }
       },
       where: {
         AND: [
@@ -175,7 +174,6 @@ export class InstrumentRecordsService {
         ]
       }
     });
-
     const instrumentIds = [...new Set(records.map((r) => r.instrumentId))];
 
     const instrumentsArray = await Promise.all(
@@ -184,65 +182,6 @@ export class InstrumentRecordsService {
 
     const instruments = new Map(instrumentsArray.map((instrument) => [instrument.id, instrument]));
 
-    // const processRecord = (record: (typeof records)[number]) => {
-    //   if (!record.computedMeasures) return [];
-
-    //   const instrument = instruments.get(record.instrumentId)!;
-    //   const rows: InstrumentRecordsExport = [];
-
-    //   for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-    //     if (measureValue == null) continue;
-
-    //     if (!Array.isArray(measureValue)) {
-    //       rows.push({
-    //         groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-    //         instrumentEdition: instrument.internal.edition,
-    //         instrumentName: instrument.internal.name,
-    //         measure: measureKey,
-    //         sessionDate: record.session.date.toISOString(),
-    //         sessionId: record.session.id,
-    //         sessionType: record.session.type,
-    //         subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-    //         subjectId: removeSubjectIdScope(record.subject.id),
-    //         subjectSex: record.subject.sex,
-    //         timestamp: record.date.toISOString(),
-    //         username: record.session.user?.username ?? 'N/A',
-    //         value: measureValue
-    //       });
-    //       continue;
-    //     }
-
-    //     if (measureValue.length < 1) continue;
-
-    //     const expanded = this.expandData(measureValue);
-    //     for (const entry of expanded) {
-    //       if (!entry.success) {
-    //         throw new Error(`exportRecords: ${instrument.internal.name}.${measureKey} — ${entry.message}`);
-    //       }
-    //       rows.push({
-    //         groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-    //         instrumentEdition: instrument.internal.edition,
-    //         instrumentName: instrument.internal.name,
-    //         measure: `${measureKey} - ${entry.measure}`,
-    //         sessionDate: record.session.date.toISOString(),
-    //         sessionId: record.session.id,
-    //         sessionType: record.session.type,
-    //         subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-    //         subjectId: removeSubjectIdScope(record.subject.id),
-    //         subjectSex: record.subject.sex,
-    //         timestamp: record.date.toISOString(),
-    //         username: record.session.user?.username ?? 'N/A',
-    //         value: entry.measureValue
-    //       });
-    //     }
-    //   }
-
-    //   return rows;
-    // };
-
-    // const results = await Promise.all(records.map((record) => processRecord(record)));
-
-    // return results.flat();
     const convertRecords = records.map((record) => {
       return {
         computedMeasures: record.computedMeasures,
@@ -312,67 +251,8 @@ export class InstrumentRecordsService {
     });
 
     const results = await Promise.all(workerPromises);
+
     return results.flat();
-
-    // const data: InstrumentRecordsExport = [];
-    // for (const record of records) {
-    //   if (!record.computedMeasures) {
-    //     continue;
-    //   }
-
-    //   const instrument = instruments.get(record.instrumentId)!;
-
-    //   for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-    //     if (measureValue == null) {
-    //       continue;
-    //     }
-
-    //     if (!Array.isArray(measureValue)) {
-    //       data.push({
-    //         groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-    //         instrumentEdition: instrument.internal.edition,
-    //         instrumentName: instrument.internal.name,
-    //         measure: measureKey,
-    //         sessionDate: record.session.date.toISOString(),
-    //         sessionId: record.session.id,
-    //         sessionType: record.session.type,
-    //         subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-    //         subjectId: removeSubjectIdScope(record.subject.id),
-    //         subjectSex: record.subject.sex,
-    //         timestamp: record.date.toISOString(),
-    //         username: record.session.user?.username ?? 'N/A',
-    //         value: measureValue
-    //       });
-    //     }
-
-    //     if (Array.isArray(measureValue) && measureValue.length < 1) continue;
-
-    //     if (Array.isArray(measureValue) && measureValue.length >= 1) {
-    //       const arrayResult = this.expandData(measureValue);
-    //       arrayResult.forEach((arrayEntry: ExpandDataType) => {
-    //         if (!arrayEntry.success)
-    //           throw new Error(`exportRecords: ${instrument.internal.name}.${measureKey} — ${arrayEntry.message}`);
-    //         data.push({
-    //           groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-    //           instrumentEdition: instrument.internal.edition,
-    //           instrumentName: instrument.internal.name,
-    //           measure: `${measureKey} - ${arrayEntry.measure}`,
-    //           sessionDate: record.session.date.toISOString(),
-    //           sessionId: record.session.id,
-    //           sessionType: record.session.type,
-    //           subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-    //           subjectId: removeSubjectIdScope(record.subject.id),
-    //           subjectSex: record.subject.sex,
-    //           timestamp: record.date.toISOString(),
-    //           username: record.session.user?.username ?? 'N/A',
-    //           value: arrayEntry.measureValue
-    //         });
-    //       });
-    //     }
-    //   }
-    // }
-
-    // return data;
   }
 
   async find(
