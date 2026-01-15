@@ -146,6 +146,7 @@ export class InstrumentRecordsService {
   }
 
   async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
+    //separate this into seperate queries that are done within the thread (ie find session and subject info in thread instead with prisma model)
     const records = await this.instrumentRecordModel.findMany({
       include: {
         session: {
