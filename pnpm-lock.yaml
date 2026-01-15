@@ -25,8 +25,8 @@ catalogs:
       specifier: latest
       version: 0.2.0
     '@douglasneuroinformatics/libui':
-      specifier: ^4.8.1
-      version: 4.8.1
+      specifier: ^5.0.1
+      version: 5.0.1
     '@douglasneuroinformatics/libui-form-types':
       specifier: latest
       version: 0.11.0
@@ -332,7 +332,7 @@ importers:
         version: 0.0.4
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 4.8.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 5.0.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
@@ -429,7 +429,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 4.8.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@19.1.0))(zod@3.25.76)
+        version: 5.0.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@19.1.0))(zod@3.25.76)
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../../packages/licenses
@@ -505,7 +505,7 @@ importers:
         version: 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 4.8.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 5.0.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.52.2)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
@@ -623,7 +623,7 @@ importers:
         version: 0.0.3(typescript@5.6.3)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 4.8.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 5.0.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@vendor+react@19.x)
@@ -896,7 +896,7 @@ importers:
         version: 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 4.8.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 5.0.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/instrument-interpreter':
         specifier: workspace:*
         version: link:../instrument-interpreter
@@ -1051,7 +1051,7 @@ importers:
     devDependencies:
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 4.8.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 5.0.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/instrument-bundler':
         specifier: 'workspace:'
         version: link:../instrument-bundler
@@ -1270,7 +1270,7 @@ importers:
     devDependencies:
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 4.8.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@19.1.0))(zod@vendor+zod@3.x)
+        version: 5.0.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@19.1.0))(zod@vendor+zod@3.x)
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
         version: link:../packages/instrument-stubs
@@ -2080,9 +2080,9 @@ packages:
     resolution:
       { integrity: sha512-erds8oNXFrWSJfCglR8S7I3Yfkgx2Vz6RIQTa5OFtVAVx8DTSFf5FbnHpp49l6BcQ4FCU5w/PLO5NWdx08cNUg== }
 
-  '@douglasneuroinformatics/libui@4.8.1':
+  '@douglasneuroinformatics/libui@5.0.1':
     resolution:
-      { integrity: sha512-6yps8omcZGGgkVtgwcCD2TqUXcMPm4RV4QJDkIFJWVOS9HYqih8lUgiA2BNaHl9/07MQBXh6Cp15B7derTzoRw== }
+      { integrity: sha512-fH69WeOzibicJrHAK1O3mmqJKy2dz8ruGEbsG0u6dhL4HkkYBQjoyJU3w/o7ZHteAszje/xZo/plH1gt3oGMyw== }
     engines: { node: 22.x }
     peerDependencies:
       react: ^19.1.0
@@ -14187,7 +14187,7 @@ snapshots:
     dependencies:
       type-fest: 4.41.0
 
-  '@douglasneuroinformatics/libui@4.8.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@19.1.0))(zod@3.25.76)':
+  '@douglasneuroinformatics/libui@5.0.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@19.1.0))(zod@3.25.76)':
     dependencies:
       '@douglasneuroinformatics/libjs': 3.1.0(neverthrow@8.2.0)(zod@3.25.76)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
@@ -14214,6 +14214,7 @@ snapshots:
       '@radix-ui/react-tabs': 1.1.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@radix-ui/react-tooltip': 1.2.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tanstack/react-table': 8.21.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@tanstack/table-core': 8.21.3
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       cmdk: 1.1.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -14242,7 +14243,7 @@ snapshots:
       - neverthrow
       - use-sync-external-store
 
-  '@douglasneuroinformatics/libui@4.8.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@19.1.0))(zod@vendor+zod@3.x)':
+  '@douglasneuroinformatics/libui@5.0.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@19.1.0))(zod@vendor+zod@3.x)':
     dependencies:
       '@douglasneuroinformatics/libjs': 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
@@ -14269,6 +14270,7 @@ snapshots:
       '@radix-ui/react-tabs': 1.1.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@radix-ui/react-tooltip': 1.2.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tanstack/react-table': 8.21.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@tanstack/table-core': 8.21.3
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       cmdk: 1.1.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -14297,7 +14299,7 @@ snapshots:
       - neverthrow
       - use-sync-external-store
 
-  '@douglasneuroinformatics/libui@4.8.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)':
+  '@douglasneuroinformatics/libui@5.0.1(immer@10.1.1)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.1.11)(use-sync-external-store@1.5.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)':
     dependencies:
       '@douglasneuroinformatics/libjs': 3.1.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
@@ -14324,6 +14326,7 @@ snapshots:
       '@radix-ui/react-tabs': 1.1.12(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
       '@radix-ui/react-tooltip': 1.2.7(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
       '@tanstack/react-table': 8.21.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
+      '@tanstack/table-core': 8.21.3
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       cmdk: 1.1.1(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
