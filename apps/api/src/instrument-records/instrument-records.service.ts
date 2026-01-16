@@ -1,11 +1,17 @@
-import { replacer, reviver, yearsPassed } from '@douglasneuroinformatics/libjs';
+import { cpus } from 'os';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import { Worker } from 'worker_threads';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+import { replacer, reviver } from '@douglasneuroinformatics/libjs';
 import { InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
-import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
-import { $RecordArrayFieldValue } from '@opendatacapture/schemas/instrument';
+// import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -14,7 +20,7 @@ import type {
   LinearRegressionResults,
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
-import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
+// import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { Prisma } from '@prisma/client';
 import type { Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
@@ -29,16 +35,23 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
-type ExpandDataType =
-  | {
-      measure: string;
-      measureValue: boolean | Date | number | string | undefined;
-      success: true;
-    }
-  | {
-      message: string;
-      success: false;
-    };
+import type { InitData, RecordType } from './thread-types';
+import { P } from 'ts-pattern';
+
+// type ExpandDataType =
+//   | {
+//       measure: string;
+//       measureValue: boolean | Date | number | string | undefined;
+//       success: true;
+//     }
+//   | {
+//       message: string;
+//       success: false;
+//     };
+
+type WorkerMessage = { data: InstrumentRecordsExport; success: true } | { error: string; success: false };
+
+type InitialMessage = { success: true };
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -132,92 +145,161 @@ export class InstrumentRecordsService {
     return this.instrumentRecordModel.exists(where);
   }
 
-  async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
-    const data: InstrumentRecordsExport = [];
-    const records = await this.instrumentRecordModel.findMany({
-      include: {
-        session: {
-          select: {
-            date: true,
-            id: true,
-            type: true,
-            user: true
-          }
-        },
-        subject: true
-      },
-      where: {
-        AND: [
-          {
-            subject: groupId ? { groupIds: { has: groupId } } : {}
-          },
-          accessibleQuery(ability, 'read', 'InstrumentRecord')
-        ]
+  async exportRecords({ groupId: _ }: { groupId?: string } = {}, { ability: __ }: EntityOperationOptions = {}) {
+    //separate this into seperate queries that are done within the thread (ie find session and subject info in thread instead with prisma model)
+    // const records = await this.instrumentRecordModel.findMany({
+    //   include: {
+    //     session: {
+    //       select: {
+    //         date: true,
+    //         id: true,
+    //         type: true,
+    //         user: { select: { username: true } }
+    //       }
+    //     },
+    //     subject: {
+    //       select: {
+    //         dateOfBirth: true,
+    //         groupIds: true,
+    //         id: true,
+    //         sex: true
+    //       }
+    //     }
+    //   },
+    //   where: {
+    //     AND: [
+    //       {
+    //         subject: groupId ? { groupIds: { has: groupId } } : {}
+    //       },
+    //       accessibleQuery(ability, 'read', 'InstrumentRecord')
+    //     ]
+    //   }
+    // });
+
+    // TBD IMPORTANT - add permissions
+
+    const records = await this.queryRecordsRaw();
+
+    // console.log(records[0]
+    // records.forEach((record) => {
+    //   for (const key in record) {
+    //     try {
+    //       structuredClone(record[key])
+    //     } catch (err) {
+    //       console.log(key, record[key], record)
+    //       throw err
+    //     }
+    //   }
+    // })
+    // records.map((record) => {
+    //   try{
+    //     structuredClone(record)
+    //   }
+    //   catch {
+    //     console.log(record)
+    //     console.log(Object.getPrototypeOf(record) === Object.prototype)
+    //     console.log(record.computedMeasures)
+    //     throw new Error()
+    //   }
+
+    for (let i = 0; i < records.length; i++) {
+      const record = records[i];
+      if (Object.getPrototypeOf(record) !== Object.prototype) {
+        console.log(record);
+        throw new Error('Bad prototype');
       }
+      // for (const key in record) {
+      //   structuredClone(record[key])
+      // }
+      records[i] = {
+        ...record
+      };
+    }
+
+    console.log(records[0]);
+
+    // throw new Error("NULL")
+    structuredClone(records);
+
+    const instrumentIds = [...new Set(records.map((r) => r.instrumentId))];
+
+    const instrumentsArray = await Promise.all(
+      instrumentIds.map((id) => this.instrumentsService.findById(id) as Promise<ScalarInstrument>)
+    );
+
+    const instruments = new Map(instrumentsArray.map((instrument) => [instrument.id, instrument]));
+
+    // const convertRecords = records.map((record) => {
+    //   return {
+    //     computedMeasures: record.computedMeasures,
+    //     date: record.date.toISOString(),
+    //     id: record.id,
+    //     instrumentId: record.instrumentId,
+    //     session: {
+    //       date: record.session.date.toISOString(),
+    //       id: record.session.id,
+    //       type: record.session.type,
+    //       user: {
+    //         username: record.session.user?.username
+    //       }
+    //     },
+    //     subject: {
+    //       age: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
+    //       groupIds: record.subject.groupIds,
+    //       id: record.subject.id,
+    //       sex: record.subject.sex
+    //     }
+    //   };
+    // });
+
+    const numWorkers = Math.min(cpus().length, Math.ceil(records.length / 100)); // Use up to CPU count, chunk size 100
+    const chunkSize = Math.ceil(records.length / numWorkers);
+    const chunks = [];
+
+    for (let i = 0; i < records.length; i += chunkSize) {
+      chunks.push(records.slice(i, i + chunkSize));
+    }
+
+    const availableInstrumentArray: InitData = instruments
+      .values()
+      .toArray()
+      .map((item) => {
+        return {
+          edition: item.internal.edition,
+          id: item.id!,
+          name: item.internal.name
+        };
+      });
+
+    const workerPromises = chunks.map((chunk) => {
+      return new Promise<InstrumentRecordsExport>((resolve, reject) => {
+        const worker = new Worker(join(__dirname, 'export-worker.ts'));
+        worker.postMessage({ data: availableInstrumentArray, type: 'INIT' });
+
+        worker.on('message', (message: InitialMessage) => {
+          if (message.success) {
+            worker.postMessage({ data: chunk, type: 'CHUNK_COMPLETE' });
+            worker.on('message', (message: WorkerMessage) => {
+              if (message.success) {
+                resolve(message.data);
+              } else {
+                reject(new Error(message.error));
+              }
+              void worker.terminate();
+            });
+          }
+        });
+
+        worker.on('error', (error) => {
+          reject(error);
+          void worker.terminate();
+        });
+      });
     });
 
-    const instruments = new Map<string, ScalarInstrument>();
-    for (const record of records) {
-      if (!record.computedMeasures) {
-        continue;
-      }
-      let instrument: ScalarInstrument;
-      if (instruments.has(record.instrumentId)) {
-        instrument = instruments.get(record.instrumentId)!;
-      } else {
-        instrument = (await this.instrumentsService.findById(record.instrumentId)) as ScalarInstrument;
-        instruments.set(record.instrumentId, instrument);
-      }
-      for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-        if (measureValue == null) {
-          continue;
-        }
+    const results = await Promise.all(workerPromises);
 
-        if (!Array.isArray(measureValue)) {
-          data.push({
-            groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-            instrumentEdition: instrument.internal.edition,
-            instrumentName: instrument.internal.name,
-            measure: measureKey,
-            sessionDate: record.session.date.toISOString(),
-            sessionId: record.session.id,
-            sessionType: record.session.type,
-            subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-            subjectId: removeSubjectIdScope(record.subject.id),
-            subjectSex: record.subject.sex,
-            timestamp: record.date.toISOString(),
-            username: record.session.user?.username ?? 'N/A',
-            value: measureValue
-          });
-        }
-
-        if (Array.isArray(measureValue) && measureValue.length < 1) continue;
-
-        if (Array.isArray(measureValue) && measureValue.length >= 1) {
-          const arrayResult = this.expandData(measureValue);
-          arrayResult.forEach((arrayEntry: ExpandDataType) => {
-            if (!arrayEntry.success)
-              throw new Error(`exportRecords: ${instrument.internal.name}.${measureKey} — ${arrayEntry.message}`);
-            data.push({
-              groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
-              instrumentEdition: instrument.internal.edition,
-              instrumentName: instrument.internal.name,
-              measure: `${measureKey} - ${arrayEntry.measure}`,
-              sessionDate: record.session.date.toISOString(),
-              sessionId: record.session.id,
-              sessionType: record.session.type,
-              subjectAge: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-              subjectId: removeSubjectIdScope(record.subject.id),
-              subjectSex: record.subject.sex,
-              timestamp: record.date.toISOString(),
-              username: record.session.user?.username ?? 'N/A',
-              value: arrayEntry.measureValue
-            });
-          });
-        }
-      }
-    }
-    return data;
+    return results.flat();
   }
 
   async find(
@@ -432,30 +514,6 @@ export class InstrumentRecordsService {
     }
   }
 
-  private expandData(listEntry: any[]): ExpandDataType[] {
-    const validRecordArrayList: ExpandDataType[] = [];
-    if (listEntry.length < 1) {
-      throw new Error('Record Array is Empty');
-    }
-    for (const objectEntry of Object.values(listEntry)) {
-      for (const [dataKey, dataValue] of Object.entries(objectEntry as { [key: string]: any })) {
-        const parseResult = $RecordArrayFieldValue.safeParse(dataValue);
-        if (!parseResult.success) {
-          validRecordArrayList.push({
-            message: `Error interpreting value ${dataValue} and record array key ${dataKey}`,
-            success: false
-          });
-        }
-        validRecordArrayList.push({
-          measure: dataKey,
-          measureValue: parseResult.data,
-          success: true
-        });
-      }
-    }
-    return validRecordArrayList;
-  }
-
   private getInstrumentById(instrumentId: string) {
     return this.instrumentsService
       .findById(instrumentId)
@@ -464,6 +522,88 @@ export class InstrumentRecordsService {
 
   private parseJson(data: unknown) {
     return JSON.parse(JSON.stringify(data), reviver) as unknown;
+  }
+
+  private async queryRecordsRaw() {
+    const pipeline = [
+      // {
+      //   $match: {
+      //     $and: [
+      //       // Filter by groupId if provided
+      //       ...(groupId ? [{ groupIds: { $in: [groupId] } }] : []),
+      //       //permissionFilter
+      //     ]
+      //   }
+      // },
+      {
+        // Join with Session collection
+        $lookup: {
+          as: 'session',
+          foreignField: '_id',
+          from: 'SessionModel',
+          localField: 'sessionId' // Ensure this matches your @map or field name in Prisma
+        }
+      },
+      { $unwind: { path: '$session', preserveNullAndEmptyArrays: true } },
+      {
+        // Join with Subject collection
+        $lookup: {
+          as: 'subject',
+          foreignField: '_id',
+          from: 'SubjectModel',
+          localField: 'subjectId'
+        }
+      },
+      { $unwind: { path: '$subject', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          computedMeasures: 1,
+          date: {
+            $dateToString: {
+              date: '$createdAt',
+              format: '%Y-%m-%d'
+            }
+          },
+          id: {
+            $toString: '$_id'
+          },
+          instrumentId: 1,
+          session: {
+            date: {
+              $dateToString: {
+                date: '$session.date',
+                format: '%Y-%m-%d'
+              }
+            },
+            id: {
+              $toString: '$session._id'
+            },
+            type: '$session.type',
+            user: { username: '$session.user.username' } // TBD test this works
+          },
+          // sessionId: 1,
+          subject: {
+            age: {
+              $dateDiff: {
+                endDate: '$$NOW',
+                startDate: '$subject.dateOfBirth',
+                unit: 'year'
+              }
+            },
+            dateOfBirth: '$subject.dateOfBirth',
+            groupIds: '$subject.groupIds', // TBD make sure groupIds is string array
+            id: {
+              $toString: '$subject._id'
+            },
+            sex: '$subject.sex'
+          }
+        }
+      }
+    ];
+
+    const records = await this.instrumentRecordModel.aggregateRaw({ pipeline });
+
+    return JSON.parse(JSON.stringify(records)) as unknown as RecordType[];
   }
 
   private serializeData(data: unknown) {
