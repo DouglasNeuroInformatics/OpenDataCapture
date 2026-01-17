@@ -578,6 +578,9 @@ importers:
       react-error-boundary:
         specifier: ^5.0.0
         version: 5.0.0(react@vendor+react@19.x)
+      react-resizable-panels:
+        specifier: ^2.1.7
+        version: 2.1.9(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
       stacktrace-parser:
         specifier: ^0.1.11
         version: 0.1.11
