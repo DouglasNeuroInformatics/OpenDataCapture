@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { ContextMenu } from '@douglasneuroinformatics/libui/components';
 import { useOnClickOutside } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { PencilIcon, TrashIcon } from 'lucide-react';
 
 import { useAppStore } from '@/store';
 
+import { ContextMenu } from '../ContextMenu';
 import { EditorFileIcon } from './EditorFileIcon';
 import { EditorInput } from './EditorInput';
 
