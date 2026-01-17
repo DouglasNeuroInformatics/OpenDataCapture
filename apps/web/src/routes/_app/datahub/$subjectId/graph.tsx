@@ -1,13 +1,14 @@
 import { useRef, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { ActionDropdown, LineGraph, ListboxDropdown } from '@douglasneuroinformatics/libui/components';
+import { ActionDropdown, ListboxDropdown } from '@douglasneuroinformatics/libui/components';
 import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import { createFileRoute } from '@tanstack/react-router';
 import html2canvas from 'html2canvas';
 
+import { LineGraph } from '@/components/LineGraph';
 import { SelectInstrument } from '@/components/SelectInstrument';
 import { TimeDropdown } from '@/components/TimeDropdown';
 import { useGraphData } from '@/hooks/useGraphData';
