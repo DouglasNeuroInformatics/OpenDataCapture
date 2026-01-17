@@ -1,7 +1,8 @@
-import { Resizable, Tabs } from '@douglasneuroinformatics/libui/components';
+import { Tabs } from '@douglasneuroinformatics/libui/components';
 import { useMediaQuery } from '@douglasneuroinformatics/libui/hooks';
 
 import { Editor } from '../Editor';
+import { Resizable } from '../Resizable';
 import { Viewer } from '../Viewer';
 
 export const MainContent = () => {
