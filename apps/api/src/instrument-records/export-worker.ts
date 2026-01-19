@@ -6,6 +6,7 @@ import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrumen
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 import type { ChunkCompleteData, InitData, ParentMessage, RecordType } from './thread-types';
+import { isArray } from 'lodash-es';
 
 type ExpandDataType =
   | {
@@ -59,9 +60,11 @@ function handleChunkComplete(_data: ChunkCompleteData) {
   const instrumentsMap = initData;
 
   const processRecord = (record: RecordType): InstrumentRecordsExport => {
+    const instrument = instrumentsMap.get(record.instrumentId)!;
+
     if (!record.computedMeasures) return [];
 
-    const instrument = instrumentsMap.get(record.instrumentId)!;
+    //const instrument = instrumentsMap.get(record.instrumentId)!;
     const rows: InstrumentRecordsExport = [];
 
     for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
@@ -69,7 +72,10 @@ function handleChunkComplete(_data: ChunkCompleteData) {
 
       if (!Array.isArray(measureValue)) {
         rows.push({
-          groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+          groupId:
+            isArray(record.subject.groupIds) && record.subject.groupIds[0]
+              ? record.subject.groupIds[0]
+              : DEFAULT_GROUP_NAME,
           instrumentEdition: instrument.edition,
           instrumentName: instrument.name,
           measure: measureKey,
@@ -94,7 +100,10 @@ function handleChunkComplete(_data: ChunkCompleteData) {
           throw new Error(`exportRecords: ${instrument.name}.${measureKey} — ${entry.message}`);
         }
         rows.push({
-          groupId: record.subject.groupIds[0] ?? DEFAULT_GROUP_NAME,
+          groupId:
+            isArray(record.subject.groupIds) && record.subject.groupIds[0]
+              ? record.subject.groupIds[0]
+              : DEFAULT_GROUP_NAME,
           instrumentEdition: instrument.edition,
           instrumentName: instrument.name,
           measure: `${measureKey} - ${entry.measure}`,
@@ -110,7 +119,6 @@ function handleChunkComplete(_data: ChunkCompleteData) {
         });
       }
     }
-
     return rows;
   };
 
