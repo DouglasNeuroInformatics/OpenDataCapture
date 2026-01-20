@@ -37,6 +37,7 @@ import { InstrumentMeasuresService } from './instrument-measures.service';
 
 import type { InitData, RecordType } from './thread-types';
 import { P } from 'ts-pattern';
+import type { AppAbility } from '@/auth/auth.types';
 
 // type ExpandDataType =
 //   | {
@@ -145,7 +146,7 @@ export class InstrumentRecordsService {
     return this.instrumentRecordModel.exists(where);
   }
 
-  async exportRecords({ groupId: _ }: { groupId?: string } = {}, { ability: __ }: EntityOperationOptions = {}) {
+  async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
     //separate this into seperate queries that are done within the thread (ie find session and subject info in thread instead with prisma model)
     // const records = await this.instrumentRecordModel.findMany({
     //   include: {
@@ -178,7 +179,9 @@ export class InstrumentRecordsService {
 
     // TBD IMPORTANT - add permissions
 
-    const records = await this.queryRecordsRaw();
+    //const permissions = accessibleQuery(ability, 'read', 'InstrumentRecord')
+
+    const records = await this.queryRecordsRaw(ability, groupId);
 
     // console.log(records[0]
     // records.forEach((record) => {
@@ -524,17 +527,18 @@ export class InstrumentRecordsService {
     return JSON.parse(JSON.stringify(data), reviver) as unknown;
   }
 
-  private async queryRecordsRaw() {
+  private async queryRecordsRaw(appAbility?: AppAbility, groupId?: string) {
+    const permissions = accessibleQuery(appAbility, 'read', 'InstrumentRecord');
     const pipeline = [
-      // {
-      //   $match: {
-      //     $and: [
-      //       // Filter by groupId if provided
-      //       ...(groupId ? [{ groupIds: { $in: [groupId] } }] : []),
-      //       //permissionFilter
-      //     ]
-      //   }
-      // },
+      {
+        $match: {
+          $and: [
+            // Filter by groupId if provided
+            ...(groupId ? [{ groupIds: { $in: [groupId] } }] : []),
+            permissions
+          ]
+        }
+      },
       {
         // Join with Session collection
         $lookup: {
