@@ -24,8 +24,10 @@ import type {
 import { Prisma } from '@prisma/client';
 import type { Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
+import { ObjectId } from 'mongodb';
 
 import { accessibleQuery } from '@/auth/ability.utils';
+import type { AppAbility } from '@/auth/auth.types';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
@@ -36,8 +38,6 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
 import type { InitData, RecordType } from './thread-types';
-import { P } from 'ts-pattern';
-import type { AppAbility } from '@/auth/auth.types';
 
 // type ExpandDataType =
 //   | {
@@ -205,21 +205,21 @@ export class InstrumentRecordsService {
     //     throw new Error()
     //   }
 
-    for (let i = 0; i < records.length; i++) {
-      const record = records[i];
-      if (Object.getPrototypeOf(record) !== Object.prototype) {
-        console.log(record);
-        throw new Error('Bad prototype');
-      }
-      // for (const key in record) {
-      //   structuredClone(record[key])
-      // }
-      records[i] = {
-        ...record
-      };
-    }
+    // for (let i = 0; i < records.length; i++) {
+    //   const record = records[i];
+    //   if (Object.getPrototypeOf(record) !== Object.prototype) {
+    //     console.log(record);
+    //     throw new Error('Bad prototype');
+    //   }
+    //   // for (const key in record) {
+    //   //   structuredClone(record[key])
+    //   // }
+    //   records[i] = {
+    //     ...record
+    //   };
+    // }
 
-    console.log(records[0]);
+    // console.log(records[0]);
 
     // throw new Error("NULL")
     structuredClone(records);
@@ -529,16 +529,8 @@ export class InstrumentRecordsService {
 
   private async queryRecordsRaw(appAbility?: AppAbility, groupId?: string) {
     const permissions = accessibleQuery(appAbility, 'read', 'InstrumentRecord');
+
     const pipeline = [
-      {
-        $match: {
-          $and: [
-            // Filter by groupId if provided
-            ...(groupId ? [{ groupIds: { $in: [groupId] } }] : []),
-            permissions
-          ]
-        }
-      },
       {
         // Join with Session collection
         $lookup: {
@@ -559,6 +551,28 @@ export class InstrumentRecordsService {
         }
       },
       { $unwind: { path: '$subject', preserveNullAndEmptyArrays: true } },
+      ...(groupId
+        ? [
+            {
+              $match: {
+                'subject.groupIds': { $in: [new ObjectId(groupId)] }
+              }
+            }
+          ]
+        : []),
+      // {
+      //   $match: {
+      //     $subject: {
+      //       $in: groupId ? [groupId, "groupIds"] : [undefined]
+      //     }
+      //   }
+      // },
+      // ...(groupId ? [{
+      //   $match: {
+      //     '$subject.groupIds': { $in: [new ObjectId(groupId)] }
+      //   }
+      // }] : []),
+
       {
         $project: {
           computedMeasures: 1,
