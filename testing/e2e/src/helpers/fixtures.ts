@@ -1,19 +1,50 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
+/* eslint-disable no-empty-pattern */
 
 import { test as base, expect } from '@playwright/test';
 
+import { LoginPage } from '../pages/auth/login.page';
+import { SubjectDataTablePage } from '../pages/datahub/subject-data-table.page';
 import { SetupPage } from '../pages/setup.page';
 
+import type { NavigateVariadicArgs, ProjectMetadata, RouteTo } from './types';
+
+type PageModels = typeof pageModels;
+
 type TestArgs = {
-  setupPage: SetupPage;
+  getPageModel: <TKey extends Extract<keyof PageModels, RouteTo>>(
+    key: TKey,
+    ...args: NavigateVariadicArgs<TKey>
+  ) => Promise<InstanceType<PageModels[TKey]>>;
 };
 
-export const test = base.extend<TestArgs, {}>({
-  setupPage: async ({ page }, use) => {
-    const setupPage = new SetupPage(page);
-    await setupPage.goto();
-    return use(setupPage);
-  }
+type WorkerArgs = {
+  getProjectMetadata: <TKey extends Extract<keyof ProjectMetadata, string>>(key: TKey) => ProjectMetadata[TKey];
+};
+
+const pageModels = {
+  '/auth/login': LoginPage,
+  '/datahub/$subjectId/table': SubjectDataTablePage,
+  '/setup': SetupPage
+} satisfies { [K in RouteTo]?: any };
+
+export const test = base.extend<TestArgs, WorkerArgs>({
+  getPageModel: ({ page }, use) => {
+    return use(
+      async <TKey extends Extract<keyof PageModels, RouteTo>>(key: TKey, ...args: NavigateVariadicArgs<TKey>) => {
+        const pageModel = new pageModels[key](page) as InstanceType<PageModels[TKey]>;
+        await pageModel.goto(key, ...args);
+        return pageModel;
+      }
+    );
+  },
+  getProjectMetadata: [
+    async ({}, use, workerInfo) => {
+      return use((key) => {
+        return (workerInfo.project.metadata as ProjectMetadata)[key];
+      });
+    },
+    { scope: 'worker' }
+  ]
 });
 
 export { expect };
