@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import type { LineGraphLine, ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
+import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+
+import type { LineGraphLine } from '@/components/LineGraph';
 
 const COLOR_PALETTE: readonly string[] = [
   '#D81B60',
