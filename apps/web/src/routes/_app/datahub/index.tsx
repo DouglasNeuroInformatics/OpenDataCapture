@@ -9,6 +9,7 @@ import {
   Heading,
   SearchBar
 } from '@douglasneuroinformatics/libui/components';
+import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
@@ -29,70 +30,14 @@ type MasterDataTableProps = {
   onSelect: (subject: Subject) => void;
 };
 
-const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
+const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) => {
   const { t } = useTranslation();
-  const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
-
-  return (
-    <div>
-      <DataTable
-        columns={[
-          {
-            accessorFn: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
-            header: t('datahub.index.table.subject'),
-            id: 'subjectId'
-          },
-          {
-            accessorFn: (subject) => (subject.dateOfBirth ? toBasicISOString(new Date(subject.dateOfBirth)) : 'NULL'),
-            header: t('core.identificationData.dateOfBirth.label'),
-            id: 'date-of-birth'
-          },
-          {
-            accessorFn: (subject) => {
-              switch (subject.sex) {
-                case 'FEMALE':
-                  return t('core.identificationData.sex.female');
-                case 'MALE':
-                  return t('core.identificationData.sex.male');
-                default:
-                  return 'NULL';
-              }
-            },
-            header: t('core.identificationData.sex.label'),
-            id: 'sex'
-          }
-        ]}
-        data={data}
-        data-testid="master-data-table"
-        rowActions={[
-          {
-            label: t({ en: 'View', fr: 'Voir' }),
-            onSelect
-          }
-        ]}
-        onSearchChange={(value, table) => {
-          const subjectIdColumn = table.getColumn('subjectId')!;
-          subjectIdColumn.setFilterValue(value);
-        }}
-      />
-    </div>
-  );
-};
-
-const RouteComponent = () => {
-  const [isLookupOpen, setIsLookupOpen] = useState(false);
-
-  const currentGroup = useAppStore((store) => store.currentGroup);
-  const currentUser = useAppStore((store) => store.currentUser);
 
   const download = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
-  const { t } = useTranslation();
-  const navigate = useNavigate();
 
-  const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
-  const [tableData, setTableData] = useState<Subject[]>(data ?? []);
-  const [searchString, setSearchString] = useState('');
+  const currentGroup = useAppStore((store) => store.currentGroup);
+  const currentUser = useAppStore((store) => store.currentUser);
 
   const getExportRecords = async () => {
     const response = await axios.get<InstrumentRecordsExport>('/v1/instrument-records/export', {
@@ -107,9 +52,9 @@ const RouteComponent = () => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     getExportRecords()
       .then((data): any => {
-        const listedSubjects = tableData.map((record) => {
-          return removeSubjectIdScope(record.id);
-        });
+        const listedSubjects = table
+          .getRowModel()
+          .rows.flatMap((row) => row.getVisibleCells().map((cell) => removeSubjectIdScope(cell.row.original.id)));
 
         const filteredData = data.filter((dataEntry) => listedSubjects.includes(dataEntry.subjectId));
 
@@ -160,33 +105,173 @@ const RouteComponent = () => {
       });
   };
 
-  const lookupSubject = async ({ id }: { id: string }) => {
-    const response = await axios.get<Subject>(`/v1/subjects/${id}`, {
-      validateStatus: (status) => status === 200 || status === 404
-    });
-    if (response.status === 404) {
-      addNotification({ message: t('core.notFound'), type: 'warning' });
-      setIsLookupOpen(false);
-    } else {
-      addNotification({ type: 'success' });
-      await navigate({ to: `./${response.data.id}/table` });
-    }
-  };
+  return (
+    <>
+      <ActionDropdown
+        widthFull
+        className="min-w-48"
+        data-spotlight-type="export-data-dropdown"
+        data-testid="datahub-export-dropdown"
+        options={['CSV', 'JSON', 'Excel']}
+        title={t('datahub.index.table.export')}
+        onSelection={handleExportSelection}
+      />
+    </>
+  );
+  // const table = useDataTableHandle('table', true);
+  // const columns = table.getAllColumns();
+  // const statusColumn = columns.find((column) => column.id === 'status')!;
 
-  useEffect(() => {
-    const definedTableData = data ?? [];
+  // const filterValue = statusColumn.getFilterValue() as PaymentStatus[];
 
-    if (!searchString) {
-      setTableData(definedTableData);
-      return;
-    }
+  // return (
+  //   <>
+  //     <DropdownMenu>
+  //       <DropdownMenu.Trigger asChild>
+  //         <Button className="flex items-center gap-2" variant="outline">
+  //           Columns
+  //           <ChevronDownIcon />
+  //         </Button>
+  //       </DropdownMenu.Trigger>
+  //       <DropdownMenu.Content align="end">
+  //         {columns
+  //           .filter((column) => column.getCanHide())
+  //           .map((column) => {
+  //             return (
+  //               <DropdownMenu.CheckboxItem
+  //                 checked={column.getIsVisible()}
+  //                 className="capitalize"
+  //                 key={column.id}
+  //                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
+  //               >
+  //                 {column.id}
+  //               </DropdownMenu.CheckboxItem>
+  //             );
+  //           })}
+  //       </DropdownMenu.Content>
+  //     </DropdownMenu>
+  //     <DropdownMenu>
+  //       <DropdownMenu.Trigger asChild>
+  //         <Button className="flex items-center gap-2" variant="outline">
+  //           Filters
+  //           <ChevronDownIcon />
+  //         </Button>
+  //       </DropdownMenu.Trigger>
+  //       <DropdownMenu.Content widthFull align="start">
+  //         {statuses.map((option) => (
+  //           <DropdownMenu.CheckboxItem
+  //             checked={filterValue.includes(option)}
+  //             className="capitalize"
+  //             key={option}
+  //             onCheckedChange={(checked) => {
+  //               statusColumn.setFilterValue((prevValue: PaymentStatus[]) => {
+  //                 if (checked) {
+  //                   return [...prevValue, option];
+  //                 }
+  //                 return prevValue.filter((item) => item !== option);
+  //               });
+  //             }}
+  //           >
+  //             {option}
+  //           </DropdownMenu.CheckboxItem>
+  //         ))}
+  //       </DropdownMenu.Content>
+  //     </DropdownMenu>
+  //   </>
+  // );
+};
 
-    const filtered = data.filter((record) =>
-      removeSubjectIdScope(record.id).toLowerCase().includes(searchString.toLowerCase())
-    );
+const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
+  const { t } = useTranslation();
+  const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
 
-    setTableData(filtered);
-  }, [searchString, data]);
+  return (
+    <div>
+      <DataTable
+        columns={[
+          {
+            accessorFn: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
+            header: t('datahub.index.table.subject'),
+            id: 'subjectId'
+          },
+          {
+            accessorFn: (subject) => (subject.dateOfBirth ? toBasicISOString(new Date(subject.dateOfBirth)) : 'NULL'),
+            header: t('core.identificationData.dateOfBirth.label'),
+            id: 'date-of-birth'
+          },
+          {
+            accessorFn: (subject) => {
+              switch (subject.sex) {
+                case 'FEMALE':
+                  return t('core.identificationData.sex.female');
+                case 'MALE':
+                  return t('core.identificationData.sex.male');
+                default:
+                  return 'NULL';
+              }
+            },
+            header: t('core.identificationData.sex.label'),
+            id: 'sex'
+          }
+        ]}
+        data={data}
+        data-testid="master-data-table"
+        rowActions={[
+          {
+            label: t({ en: 'View', fr: 'Voir' }),
+            onSelect
+          }
+        ]}
+        togglesComponent={Toggles}
+        onSearchChange={(value, table) => {
+          const subjectIdColumn = table.getColumn('subjectId')!;
+          subjectIdColumn.setFilterValue(value);
+        }}
+      />
+    </div>
+  );
+};
+
+const RouteComponent = () => {
+  const [isLookupOpen, setIsLookupOpen] = useState(false);
+
+  const currentGroup = useAppStore((store) => store.currentGroup);
+  const currentUser = useAppStore((store) => store.currentUser);
+
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
+  const [tableData, setTableData] = useState<Subject[]>(data ?? []);
+  const [searchString, setSearchString] = useState('');
+
+  // const lookupSubject = async ({ id }: { id: string }) => {
+  //   const response = await axios.get<Subject>(`/v1/subjects/${id}`, {
+  //     validateStatus: (status) => status === 200 || status === 404
+  //   });
+  //   if (response.status === 404) {
+  //     addNotification({ message: t('core.notFound'), type: 'warning' });
+  //     setIsLookupOpen(false);
+  //   } else {
+  //     addNotification({ type: 'success' });
+  //     await navigate({ to: `./${response.data.id}/table` });
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   const definedTableData = data ?? [];
+
+  //   if (!searchString) {
+  //     setTableData(definedTableData);
+  //     return;
+  //   }
+
+  //   const filtered = data.filter((record) =>
+  //     removeSubjectIdScope(record.id).toLowerCase().includes(searchString.toLowerCase())
+  //   );
+
+  //   setTableData(filtered);
+  // }, [searchString, data]);
 
   return (
     <React.Fragment>
@@ -233,14 +318,14 @@ const RouteComponent = () => {
             </Dialog.Content>
           </Dialog>
           <div className="flex min-w-60 gap-2 lg:shrink">
-            <ActionDropdown
+            {/* <ActionDropdown
               widthFull
               data-spotlight-type="export-data-dropdown"
               data-testid="datahub-export-dropdown"
               options={['CSV', 'JSON', 'Excel']}
               title={t('datahub.index.table.export')}
               onSelection={handleExportSelection}
-            />
+            /> */}
           </div>
         </div>
         <MasterDataTable
