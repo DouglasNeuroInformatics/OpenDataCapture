@@ -1,14 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import {
-  ActionDropdown,
-  Button,
-  DataTable,
-  Dialog,
-  Heading,
-  SearchBar
-} from '@douglasneuroinformatics/libui/components';
+import { ActionDropdown, Button, DataTable, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
@@ -31,6 +24,8 @@ type MasterDataTableProps = {
 };
 
 const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) => {
+  const navigate = Route.useNavigate();
+
   const { t } = useTranslation();
 
   const download = useDownload();
@@ -38,6 +33,21 @@ const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
 
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentUser = useAppStore((store) => store.currentUser);
+
+  const [isLookupOpen, setIsLookupOpen] = useState(false);
+
+  const lookupSubject = async ({ id }: { id: string }) => {
+    const response = await axios.get<Subject>(`/v1/subjects/${id}`, {
+      validateStatus: (status) => status === 200 || status === 404
+    });
+    if (response.status === 404) {
+      addNotification({ message: t('core.notFound'), type: 'warning' });
+      setIsLookupOpen(false);
+    } else {
+      addNotification({ type: 'success' });
+      await navigate({ to: `./${response.data.id}/table` });
+    }
+  };
 
   const getExportRecords = async () => {
     const response = await axios.get<InstrumentRecordsExport>('/v1/instrument-records/export', {
@@ -107,6 +117,29 @@ const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
 
   return (
     <>
+      <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
+        <Dialog.Trigger asChild>
+          <Button
+            className="gap-1"
+            data-spotlight-type="subject-lookup-search-button"
+            data-testid="subject-lookup-search-button"
+            id="subject-lookup-search-button"
+            variant="outline"
+          >
+            <UserSearchIcon />{' '}
+            {t({
+              en: 'Subject Lookup',
+              fr: 'Trouver un client'
+            })}
+          </Button>
+        </Dialog.Trigger>
+        <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
+          <Dialog.Header>
+            <Dialog.Title>{t('datahub.index.lookup.title')}</Dialog.Title>
+          </Dialog.Header>
+          <IdentificationForm onSubmit={(data) => void lookupSubject(data)} />
+        </Dialog.Content>
+      </Dialog>
       <ActionDropdown
         widthFull
         className="min-w-48"
@@ -118,67 +151,6 @@ const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
       />
     </>
   );
-  // const table = useDataTableHandle('table', true);
-  // const columns = table.getAllColumns();
-  // const statusColumn = columns.find((column) => column.id === 'status')!;
-
-  // const filterValue = statusColumn.getFilterValue() as PaymentStatus[];
-
-  // return (
-  //   <>
-  //     <DropdownMenu>
-  //       <DropdownMenu.Trigger asChild>
-  //         <Button className="flex items-center gap-2" variant="outline">
-  //           Columns
-  //           <ChevronDownIcon />
-  //         </Button>
-  //       </DropdownMenu.Trigger>
-  //       <DropdownMenu.Content align="end">
-  //         {columns
-  //           .filter((column) => column.getCanHide())
-  //           .map((column) => {
-  //             return (
-  //               <DropdownMenu.CheckboxItem
-  //                 checked={column.getIsVisible()}
-  //                 className="capitalize"
-  //                 key={column.id}
-  //                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
-  //               >
-  //                 {column.id}
-  //               </DropdownMenu.CheckboxItem>
-  //             );
-  //           })}
-  //       </DropdownMenu.Content>
-  //     </DropdownMenu>
-  //     <DropdownMenu>
-  //       <DropdownMenu.Trigger asChild>
-  //         <Button className="flex items-center gap-2" variant="outline">
-  //           Filters
-  //           <ChevronDownIcon />
-  //         </Button>
-  //       </DropdownMenu.Trigger>
-  //       <DropdownMenu.Content widthFull align="start">
-  //         {statuses.map((option) => (
-  //           <DropdownMenu.CheckboxItem
-  //             checked={filterValue.includes(option)}
-  //             className="capitalize"
-  //             key={option}
-  //             onCheckedChange={(checked) => {
-  //               statusColumn.setFilterValue((prevValue: PaymentStatus[]) => {
-  //                 if (checked) {
-  //                   return [...prevValue, option];
-  //                 }
-  //                 return prevValue.filter((item) => item !== option);
-  //               });
-  //             }}
-  //           >
-  //             {option}
-  //           </DropdownMenu.CheckboxItem>
-  //         ))}
-  //       </DropdownMenu.Content>
-  //     </DropdownMenu>
-  //   </>
-  // );
 };
 
 const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
@@ -233,45 +205,12 @@ const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
 };
 
 const RouteComponent = () => {
-  const [isLookupOpen, setIsLookupOpen] = useState(false);
-
   const currentGroup = useAppStore((store) => store.currentGroup);
-  const currentUser = useAppStore((store) => store.currentUser);
 
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
-  const [tableData, setTableData] = useState<Subject[]>(data ?? []);
-  const [searchString, setSearchString] = useState('');
-
-  // const lookupSubject = async ({ id }: { id: string }) => {
-  //   const response = await axios.get<Subject>(`/v1/subjects/${id}`, {
-  //     validateStatus: (status) => status === 200 || status === 404
-  //   });
-  //   if (response.status === 404) {
-  //     addNotification({ message: t('core.notFound'), type: 'warning' });
-  //     setIsLookupOpen(false);
-  //   } else {
-  //     addNotification({ type: 'success' });
-  //     await navigate({ to: `./${response.data.id}/table` });
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const definedTableData = data ?? [];
-
-  //   if (!searchString) {
-  //     setTableData(definedTableData);
-  //     return;
-  //   }
-
-  //   const filtered = data.filter((record) =>
-  //     removeSubjectIdScope(record.id).toLowerCase().includes(searchString.toLowerCase())
-  //   );
-
-  //   setTableData(filtered);
-  // }, [searchString, data]);
 
   return (
     <React.Fragment>
@@ -281,55 +220,8 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       <div className="flex grow flex-col">
-        <div className="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
-          <SearchBar
-            className="[&>input]:text-foreground [&>input]:placeholder-foreground grow"
-            data-testid="datahub-subject-search-bar"
-            id="datahub-subject-search-bar"
-            placeholder={t({
-              en: 'Click to Search',
-              fr: 'Cliquer pour rechercher'
-            })}
-            readOnly={false}
-            value={searchString}
-            onValueChange={(value: string) => setSearchString(value)}
-          />
-          <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
-            <Dialog.Trigger asChild>
-              <Button
-                className="gap-1"
-                data-spotlight-type="subject-lookup-search-button"
-                data-testid="subject-lookup-search-button"
-                id="subject-lookup-search-button"
-                variant="outline"
-              >
-                <UserSearchIcon />{' '}
-                {t({
-                  en: 'Subject Lookup',
-                  fr: 'Trouver un client'
-                })}
-              </Button>
-            </Dialog.Trigger>
-            <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
-              <Dialog.Header>
-                <Dialog.Title>{t('datahub.index.lookup.title')}</Dialog.Title>
-              </Dialog.Header>
-              <IdentificationForm onSubmit={(data) => void lookupSubject(data)} />
-            </Dialog.Content>
-          </Dialog>
-          <div className="flex min-w-60 gap-2 lg:shrink">
-            {/* <ActionDropdown
-              widthFull
-              data-spotlight-type="export-data-dropdown"
-              data-testid="datahub-export-dropdown"
-              options={['CSV', 'JSON', 'Excel']}
-              title={t('datahub.index.table.export')}
-              onSelection={handleExportSelection}
-            /> */}
-          </div>
-        </div>
         <MasterDataTable
-          data={tableData}
+          data={data}
           onSelect={(subject) => {
             void navigate({ to: `./${subject.id}/table` });
           }}
