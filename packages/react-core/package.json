@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
-    "@douglasneuroinformatics/libui": "catalog:",
+    "@douglasneuroinformatics/libui": "file:/Users/joshua/Developer/DouglasNeuroinformatics/libui",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
     "@opendatacapture/licenses": "workspace:*",

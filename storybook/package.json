@@ -17,7 +17,7 @@
     "zod": "workspace:zod__3.x@*"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/libui": "catalog:",
+    "@douglasneuroinformatics/libui": "file:/Users/joshua/Developer/DouglasNeuroinformatics/libui",
     "@opendatacapture/instrument-stubs": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",

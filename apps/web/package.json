@@ -19,7 +19,7 @@
     "@casl/ability": "catalog:",
     "@douglasneuroinformatics/libjs": "catalog:",
     "@douglasneuroinformatics/libpasswd": "catalog:",
-    "@douglasneuroinformatics/libui": "catalog:",
+    "@douglasneuroinformatics/libui": "file:/Users/joshua/Developer/DouglasNeuroinformatics/libui",
     "@heroicons/react": "^2.2.0",
     "@import-meta-env/cli": "^0.7.3",
     "@import-meta-env/unplugin": "^0.6.2",

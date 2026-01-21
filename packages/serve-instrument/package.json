@@ -8,7 +8,7 @@
     "lint": "tsc && eslint --fix src"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/libui": "catalog:",
+    "@douglasneuroinformatics/libui": "file:/Users/joshua/Developer/DouglasNeuroinformatics/libui",
     "@opendatacapture/instrument-bundler": "workspace:",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-internal": "workspace:*",
