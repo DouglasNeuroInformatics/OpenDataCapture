@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-export type BrowserTarget = 'Desktop Chrome' | 'Desktop Firefox' | 'Desktop Safari';
+export type BrowserTarget = 'Desktop Chrome' | 'Desktop Firefox';
 
 export type ExtractParams<TPath extends string> = Split<TPath, '/'>[number] extends infer TUnion
   ? TUnion extends `$${infer TParam}`

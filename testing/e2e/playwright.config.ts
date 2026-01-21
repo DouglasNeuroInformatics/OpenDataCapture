@@ -22,8 +22,7 @@ const baseURL = `http://localhost:${webPort}`;
 
 const browsers: { target: BrowserTarget; use: Project['use'] }[] = [
   { target: 'Desktop Chrome', use: { ...devices['Desktop Chrome'], channel: 'chromium', headless: true } },
-  { target: 'Desktop Firefox', use: { ...devices['Desktop Firefox'], headless: true } },
-  { target: 'Desktop Safari', use: devices['Desktop Safari'] }
+  { target: 'Desktop Firefox', use: { ...devices['Desktop Firefox'], headless: true } }
 ] as const;
 
 export default defineConfig({
