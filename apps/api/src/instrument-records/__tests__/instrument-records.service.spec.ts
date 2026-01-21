@@ -118,7 +118,7 @@ describe('InstrumentRecordsService', () => {
         }
       ];
 
-      instrumentRecordModel.findMany.mockResolvedValueOnce(mockRecords);
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce(mockRecords);
       instrumentsService.findById.mockResolvedValueOnce(mockInstruments[0]);
 
       const ability = { can: () => true } as any;
@@ -128,7 +128,7 @@ describe('InstrumentRecordsService', () => {
       expect(Array.isArray(result)).toBe(true);
       expect(result.length).toBeGreaterThan(0);
       expect(result[0]).toMatchObject({
-        groupId: 'group-1',
+        groupId: '123',
         instrumentEdition: 1,
         instrumentName: 'Test Instrument',
         measure: 'score',
