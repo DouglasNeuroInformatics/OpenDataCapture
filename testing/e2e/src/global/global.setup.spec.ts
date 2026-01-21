@@ -1,6 +1,6 @@
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 
-import { initAppOptions } from '../helpers/data';
+import { groups, initAppOptions } from '../helpers/data';
 import { expect, test } from '../helpers/fixtures';
 
 test.describe.serial(() => {
@@ -43,6 +43,20 @@ test.describe.serial(() => {
       process.env.ADMIN_ACCESS_TOKEN = accessToken;
       process.env.ADMIN_USERNAME = username;
       process.env.ADMIN_PASSWORD = password;
+    });
+  });
+
+  test.describe.serial('creating groups', () => {
+    test('creating groups', async ({ request }) => {
+      for (const key in groups) {
+        const response = await request.post('/api/v1/groups', {
+          data: groups[key as keyof typeof groups],
+          headers: {
+            Authorization: `Bearer ${process.env.ADMIN_ACCESS_TOKEN}`
+          }
+        });
+        expect(response.status()).toBe(201);
+      }
     });
   });
 });
