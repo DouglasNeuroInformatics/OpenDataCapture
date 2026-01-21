@@ -1,3 +1,5 @@
+import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
+
 export type RecordType = {
   computedMeasures: null | { [key: string]: unknown };
   date: string;
@@ -39,3 +41,7 @@ export type ChunkCompleteMessage = {
 };
 
 export type ParentMessage = ChunkCompleteMessage | InitMessage;
+
+export type WorkerMessage = { data: InstrumentRecordsExport; success: true } | { error: string; success: false };
+
+export type InitialMessage = { success: true };

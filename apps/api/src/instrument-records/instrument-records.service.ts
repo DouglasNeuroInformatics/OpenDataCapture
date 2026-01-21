@@ -31,11 +31,7 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
-import type { InitData, RecordType } from './thread-types';
-
-type WorkerMessage = { data: InstrumentRecordsExport; success: true } | { error: string; success: false };
-
-type InitialMessage = { success: true };
+import type { InitData, InitialMessage, RecordType, WorkerMessage } from './thread-types';
 
 @Injectable()
 export class InstrumentRecordsService {
