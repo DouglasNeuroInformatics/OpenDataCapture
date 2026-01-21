@@ -1,6 +1,7 @@
 export type RecordType = {
   computedMeasures: null | { [key: string]: unknown };
   date: string;
+  groupId: string;
   id: string;
   instrumentId: string;
   session: {

@@ -72,10 +72,7 @@ function handleChunkComplete(_data: ChunkCompleteData) {
 
       if (!Array.isArray(measureValue)) {
         rows.push({
-          groupId:
-            isArray(record.subject.groupIds) && record.subject.groupIds[0]
-              ? record.subject.groupIds[0]
-              : DEFAULT_GROUP_NAME,
+          groupId: record.groupId ?? DEFAULT_GROUP_NAME,
           instrumentEdition: instrument.edition,
           instrumentName: instrument.name,
           measure: measureKey,
@@ -100,10 +97,7 @@ function handleChunkComplete(_data: ChunkCompleteData) {
           throw new Error(`exportRecords: ${instrument.name}.${measureKey} — ${entry.message}`);
         }
         rows.push({
-          groupId:
-            isArray(record.subject.groupIds) && record.subject.groupIds[0]
-              ? record.subject.groupIds[0]
-              : DEFAULT_GROUP_NAME,
+          groupId: record.groupId ?? DEFAULT_GROUP_NAME,
           instrumentEdition: instrument.edition,
           instrumentName: instrument.name,
           measure: `${measureKey} - ${entry.measure}`,
