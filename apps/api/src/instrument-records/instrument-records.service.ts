@@ -24,7 +24,6 @@ import type {
 import { Prisma } from '@prisma/client';
 import type { Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
-import { ObjectId } from 'mongodb';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { AppAbility } from '@/auth/auth.types';
@@ -146,7 +145,7 @@ export class InstrumentRecordsService {
     return this.instrumentRecordModel.exists(where);
   }
 
-  async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
+  async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: Required<EntityOperationOptions>) {
     //separate this into seperate queries that are done within the thread (ie find session and subject info in thread instead with prisma model)
     // const records = await this.instrumentRecordModel.findMany({
     //   include: {
@@ -527,9 +526,7 @@ export class InstrumentRecordsService {
     return JSON.parse(JSON.stringify(data), reviver) as unknown;
   }
 
-  private async queryRecordsRaw(appAbility?: AppAbility, groupId?: string) {
-    const permissions = accessibleQuery(appAbility, 'read', 'InstrumentRecord');
-
+  private async queryRecordsRaw(appAbility: AppAbility, groupId?: string) {
     const pipeline = [
       {
         // Join with Session collection
@@ -551,28 +548,15 @@ export class InstrumentRecordsService {
         }
       },
       { $unwind: { path: '$subject', preserveNullAndEmptyArrays: true } },
-      ...(groupId
-        ? [
-            {
-              $match: {
-                'subject.groupIds': { $in: [new ObjectId(groupId)] }
+      {
+        $match: {
+          $expr: groupId
+            ? {
+                $eq: ['$groupId', { $toObjectId: groupId }]
               }
-            }
-          ]
-        : []),
-      // {
-      //   $match: {
-      //     $subject: {
-      //       $in: groupId ? [groupId, "groupIds"] : [undefined]
-      //     }
-      //   }
-      // },
-      // ...(groupId ? [{
-      //   $match: {
-      //     '$subject.groupIds': { $in: [new ObjectId(groupId)] }
-      //   }
-      // }] : []),
-
+            : {}
+        }
+      },
       {
         $project: {
           computedMeasures: 1,
@@ -581,6 +565,9 @@ export class InstrumentRecordsService {
               date: '$createdAt',
               format: '%Y-%m-%d'
             }
+          },
+          groupId: {
+            $toString: '$groupId'
           },
           id: {
             $toString: '$_id'
@@ -619,9 +606,12 @@ export class InstrumentRecordsService {
       }
     ];
 
-    const records = await this.instrumentRecordModel.aggregateRaw({ pipeline });
+    const records = (await this.instrumentRecordModel.aggregateRaw({ pipeline })) as unknown as unknown[];
 
-    return JSON.parse(JSON.stringify(records)) as unknown as RecordType[];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const filteredRecords = records.filter((record) => appAbility?.can('read', record as any));
+
+    return JSON.parse(JSON.stringify(filteredRecords)) as unknown as RecordType[];
   }
 
   private serializeData(data: unknown) {
