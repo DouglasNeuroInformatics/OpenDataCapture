@@ -132,10 +132,10 @@ export class InstrumentRecordsService {
   async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: Required<EntityOperationOptions>) {
     const records = await this.queryRecordsRaw(ability, groupId);
 
-    const instrumentIds = [...new Set(records.map((r) => r.instrumentId))];
+    const instrumentIds = new Set(records.map((r) => r.instrumentId));
 
     const instrumentsArray = await Promise.all(
-      instrumentIds.map((id) => this.instrumentsService.findById(id) as Promise<ScalarInstrument>)
+      instrumentIds.values().map((id) => this.instrumentsService.findById(id) as Promise<ScalarInstrument>)
     );
 
     const instruments = new Map(instrumentsArray.map((instrument) => [instrument.id, instrument]));
