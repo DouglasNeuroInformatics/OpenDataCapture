@@ -121,7 +121,9 @@ describe('InstrumentRecordsService', () => {
       instrumentRecordModel.findMany.mockResolvedValueOnce(mockRecords);
       instrumentsService.findById.mockResolvedValueOnce(mockInstruments[0]);
 
-      const result = await instrumentRecordsService.exportRecords();
+      const ability = { can: () => true } as any;
+
+      const result = await instrumentRecordsService.exportRecords({}, { ability });
 
       expect(Array.isArray(result)).toBe(true);
       expect(result.length).toBeGreaterThan(0);
