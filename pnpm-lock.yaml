@@ -1347,6 +1347,9 @@ importers:
       '@playwright/test':
         specifier: ^1.51.1
         version: 1.56.0
+      type-fest:
+        specifier: workspace:type-fest__4.x@*
+        version: link:../../vendor/type-fest@4.x
 
   testing/k6:
     dependencies:

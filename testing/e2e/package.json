@@ -6,11 +6,13 @@
   "scripts": {
     "lint": "tsc && eslint --fix .",
     "test": "env-cmd -f ../../.env playwright test",
+    "test:chrome": "env-cmd -f ../../.env  playwright test --project='*Desktop Chrome'",
     "test:dev": "env-cmd -f ../../.env playwright test --ui"
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
     "@opendatacapture/schemas": "workspace:*",
-    "@playwright/test": "^1.51.1"
+    "@playwright/test": "^1.51.1",
+    "type-fest": "workspace:type-fest__4.x@*"
   }
 }
