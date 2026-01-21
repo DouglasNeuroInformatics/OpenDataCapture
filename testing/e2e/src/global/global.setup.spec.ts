@@ -10,7 +10,8 @@ test.describe.serial(() => {
       expect(response.status()).toBe(200);
       await expect(response.json()).resolves.toMatchObject({ isSetup: false });
     });
-    test('should successfully setup', async ({ setupPage }) => {
+    test('should successfully setup', async ({ getPageModel }) => {
+      const setupPage = await getPageModel('/setup');
       await setupPage.fillSetupForm(initAppOptions);
       await setupPage.expect.toHaveURL('/auth/login');
     });
