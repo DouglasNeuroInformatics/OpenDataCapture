@@ -40,7 +40,7 @@ const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
           {
             accessorFn: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
             header: t('datahub.index.table.subject'),
-            id: 'subject'
+            id: 'subjectId'
           },
           {
             accessorFn: (subject) => (subject.dateOfBirth ? toBasicISOString(new Date(subject.dateOfBirth)) : 'NULL'),
@@ -70,6 +70,10 @@ const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
             onSelect
           }
         ]}
+        onSearchChange={(value, table) => {
+          const subjectIdColumn = table.getColumn('subjectId')!;
+          subjectIdColumn.setFilterValue(value);
+        }}
       />
     </div>
   );
