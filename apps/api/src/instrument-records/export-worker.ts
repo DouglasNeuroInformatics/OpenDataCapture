@@ -5,7 +5,7 @@ import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
-import type { ChunkCompleteData, InitData, ParentMessage, RecordType } from './thread-types';
+import type { ChunkCompleteData, InitData, ParentMessage, RecordType, WorkerMessage } from './thread-types';
 
 type ExpandDataType =
   | {
@@ -117,9 +117,9 @@ function handleChunkComplete(_data: ChunkCompleteData) {
 
   try {
     const results = _data.map(processRecord);
-    parentPort?.postMessage({ data: results.flat(), success: true });
+    parentPort?.postMessage({ data: results.flat(), success: true } satisfies WorkerMessage);
   } catch (error) {
-    parentPort?.postMessage({ error: (error as Error).message, success: false });
+    parentPort?.postMessage({ error: (error as Error).message, success: false } satisfies WorkerMessage);
   }
 }
 

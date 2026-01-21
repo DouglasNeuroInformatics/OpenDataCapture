@@ -31,7 +31,14 @@ import { SubjectsService } from '@/subjects/subjects.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
-import type { InitData, InitialMessage, RecordType, WorkerMessage } from './thread-types';
+import type {
+  ChunkCompleteMessage,
+  InitData,
+  InitialMessage,
+  InitMessage,
+  RecordType,
+  WorkerMessage
+} from './thread-types';
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -158,11 +165,11 @@ export class InstrumentRecordsService {
     const workerPromises = chunks.map((chunk) => {
       return new Promise<InstrumentRecordsExport>((resolve, reject) => {
         const worker = new Worker(join(import.meta.dirname, 'export-worker.ts'));
-        worker.postMessage({ data: availableInstrumentArray, type: 'INIT' });
+        worker.postMessage({ data: availableInstrumentArray, type: 'INIT' } satisfies InitMessage);
 
         worker.on('message', (message: InitialMessage) => {
           if (message.success) {
-            worker.postMessage({ data: chunk, type: 'CHUNK_COMPLETE' });
+            worker.postMessage({ data: chunk, type: 'CHUNK_COMPLETE' } satisfies ChunkCompleteMessage);
             worker.on('message', (message: WorkerMessage) => {
               if (message.success) {
                 resolve(message.data);
