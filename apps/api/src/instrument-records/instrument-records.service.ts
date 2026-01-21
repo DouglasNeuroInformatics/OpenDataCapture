@@ -1,9 +1,6 @@
 import { cpus } from 'os';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from 'path';
 import { Worker } from 'worker_threads';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 import { replacer, reviver } from '@douglasneuroinformatics/libjs';
 import { InjectModel } from '@douglasneuroinformatics/libnest';
@@ -164,7 +161,7 @@ export class InstrumentRecordsService {
 
     const workerPromises = chunks.map((chunk) => {
       return new Promise<InstrumentRecordsExport>((resolve, reject) => {
-        const worker = new Worker(join(__dirname, 'export-worker.ts'));
+        const worker = new Worker(join(import.meta.dirname, 'export-worker.ts'));
         worker.postMessage({ data: availableInstrumentArray, type: 'INIT' });
 
         worker.on('message', (message: InitialMessage) => {
