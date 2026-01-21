@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
+/// <reference types="vite/client" />
+
 // All of these should be undefined in production
 interface ImportMetaDevEnv {
   readonly VITE_DEV_BYPASS_AUTH?: string;

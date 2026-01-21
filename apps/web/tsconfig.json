@@ -5,8 +5,7 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "types": ["vite/client"]
+    }
   },
   "include": ["src/**/*", "vite.config.ts", "vitest.config.ts"]
 }
