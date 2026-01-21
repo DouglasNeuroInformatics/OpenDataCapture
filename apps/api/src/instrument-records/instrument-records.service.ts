@@ -146,40 +146,6 @@ export class InstrumentRecordsService {
   }
 
   async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: Required<EntityOperationOptions>) {
-    //separate this into seperate queries that are done within the thread (ie find session and subject info in thread instead with prisma model)
-    // const records = await this.instrumentRecordModel.findMany({
-    //   include: {
-    //     session: {
-    //       select: {
-    //         date: true,
-    //         id: true,
-    //         type: true,
-    //         user: { select: { username: true } }
-    //       }
-    //     },
-    //     subject: {
-    //       select: {
-    //         dateOfBirth: true,
-    //         groupIds: true,
-    //         id: true,
-    //         sex: true
-    //       }
-    //     }
-    //   },
-    //   where: {
-    //     AND: [
-    //       {
-    //         subject: groupId ? { groupIds: { has: groupId } } : {}
-    //       },
-    //       accessibleQuery(ability, 'read', 'InstrumentRecord')
-    //     ]
-    //   }
-    // });
-
-    // TBD IMPORTANT - add permissions
-
-    //const permissions = accessibleQuery(ability, 'read', 'InstrumentRecord')
-
     const records = await this.queryRecordsRaw(ability, groupId);
 
     // console.log(records[0]
@@ -221,7 +187,7 @@ export class InstrumentRecordsService {
     // console.log(records[0]);
 
     // throw new Error("NULL")
-    structuredClone(records);
+    // structuredClone(records);
 
     const instrumentIds = [...new Set(records.map((r) => r.instrumentId))];
 
@@ -230,29 +196,6 @@ export class InstrumentRecordsService {
     );
 
     const instruments = new Map(instrumentsArray.map((instrument) => [instrument.id, instrument]));
-
-    // const convertRecords = records.map((record) => {
-    //   return {
-    //     computedMeasures: record.computedMeasures,
-    //     date: record.date.toISOString(),
-    //     id: record.id,
-    //     instrumentId: record.instrumentId,
-    //     session: {
-    //       date: record.session.date.toISOString(),
-    //       id: record.session.id,
-    //       type: record.session.type,
-    //       user: {
-    //         username: record.session.user?.username
-    //       }
-    //     },
-    //     subject: {
-    //       age: record.subject.dateOfBirth ? yearsPassed(record.subject.dateOfBirth) : null,
-    //       groupIds: record.subject.groupIds,
-    //       id: record.subject.id,
-    //       sex: record.subject.sex
-    //     }
-    //   };
-    // });
 
     const numWorkers = Math.min(cpus().length, Math.ceil(records.length / 100)); // Use up to CPU count, chunk size 100
     const chunkSize = Math.ceil(records.length / numWorkers);

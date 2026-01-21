@@ -6,7 +6,6 @@ import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrumen
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 import type { ChunkCompleteData, InitData, ParentMessage, RecordType } from './thread-types';
-import { isArray } from 'lodash-es';
 
 type ExpandDataType =
   | {
