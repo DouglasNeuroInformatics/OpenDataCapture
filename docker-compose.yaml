@@ -43,6 +43,8 @@ services:
       - GATEWAY_SITE_ADDRESS
       - SECRET_KEY
       - THROTTLER_ENABLED
+      - LOGIN_REQUEST_THROTTLER_LIMIT
+      - LOGIN_REQUEST_THROTTLER_TTL
       - VERBOSE
     expose:
       - 80
