@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 
-import { Button, Command, Popover } from '@douglasneuroinformatics/libui/components';
+import { Button, Popover } from '@douglasneuroinformatics/libui/components';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { InstrumentIcon } from '@opendatacapture/react-core';
 import { groupBy } from 'lodash-es';
 import { CheckIcon, ChevronsUpDown } from 'lucide-react';
 
+import { Command } from '@/components/Command';
 import type { InstrumentCategory, InstrumentRepository } from '@/models/instrument-repository.model';
 import { useAppStore } from '@/store';
 

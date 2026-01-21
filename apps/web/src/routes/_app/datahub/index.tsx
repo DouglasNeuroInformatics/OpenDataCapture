@@ -1,14 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import {
-  ActionDropdown,
-  Button,
-  ClientTable,
-  Dialog,
-  Heading,
-  SearchBar
-} from '@douglasneuroinformatics/libui/components';
+import { ActionDropdown, Button, DataTable, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
+import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
@@ -23,63 +17,37 @@ import { PageHeader } from '@/components/PageHeader';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
+
 type MasterDataTableProps = {
   data: Subject[];
   onSelect: (subject: Subject) => void;
 };
 
-const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
+const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) => {
+  const navigate = Route.useNavigate();
+
   const { t } = useTranslation();
-  const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
 
-  return (
-    <ClientTable<Subject>
-      columns={[
-        {
-          field: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
-          label: t('datahub.index.table.subject')
-        },
-        {
-          field: (subject) => (subject.dateOfBirth ? toBasicISOString(new Date(subject.dateOfBirth)) : 'NULL'),
-          label: t('core.identificationData.dateOfBirth.label')
-        },
-        {
-          field: (subject) => {
-            switch (subject.sex) {
-              case 'FEMALE':
-                return t('core.identificationData.sex.female');
-              case 'MALE':
-                return t('core.identificationData.sex.male');
-              default:
-                return 'NULL';
-            }
-          },
-          label: t('core.identificationData.sex.label')
-        }
-      ]}
-      data={data}
-      data-testid="master-data-table"
-      entriesPerPage={15}
-      minRows={15}
-      onEntryClick={onSelect}
-    />
-  );
-};
-
-const RouteComponent = () => {
-  const [isLookupOpen, setIsLookupOpen] = useState(false);
+  const download = useDownload();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
 
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentUser = useAppStore((store) => store.currentUser);
 
-  const download = useDownload();
-  const addNotification = useNotificationsStore((store) => store.addNotification);
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+  const [isLookupOpen, setIsLookupOpen] = useState(false);
 
-  const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
-  const [tableData, setTableData] = useState<Subject[]>(data ?? []);
-  const [searchString, setSearchString] = useState('');
+  const lookupSubject = async ({ id }: { id: string }) => {
+    const response = await axios.get<Subject>(`/v1/subjects/${id}`, {
+      validateStatus: (status) => status === 200 || status === 404
+    });
+    if (response.status === 404) {
+      addNotification({ message: t('core.notFound'), type: 'warning' });
+      setIsLookupOpen(false);
+    } else {
+      addNotification({ type: 'success' });
+      await navigate({ to: `./${response.data.id}/table` });
+    }
+  };
 
   const getExportRecords = async () => {
     const response = await axios.get<InstrumentRecordsExport>('/v1/instrument-records/export', {
@@ -94,9 +62,9 @@ const RouteComponent = () => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     getExportRecords()
       .then((data): any => {
-        const listedSubjects = tableData.map((record) => {
-          return removeSubjectIdScope(record.id);
-        });
+        const listedSubjects = table
+          .getRowModel()
+          .rows.flatMap((row) => row.getVisibleCells().map((cell) => removeSubjectIdScope(cell.row.original.id)));
 
         const filteredData = data.filter((dataEntry) => listedSubjects.includes(dataEntry.subjectId));
 
@@ -147,33 +115,102 @@ const RouteComponent = () => {
       });
   };
 
-  const lookupSubject = async ({ id }: { id: string }) => {
-    const response = await axios.get<Subject>(`/v1/subjects/${id}`, {
-      validateStatus: (status) => status === 200 || status === 404
-    });
-    if (response.status === 404) {
-      addNotification({ message: t('core.notFound'), type: 'warning' });
-      setIsLookupOpen(false);
-    } else {
-      addNotification({ type: 'success' });
-      await navigate({ to: `./${response.data.id}/table` });
-    }
-  };
+  return (
+    <>
+      <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
+        <Dialog.Trigger asChild>
+          <Button
+            className="gap-1"
+            data-spotlight-type="subject-lookup-search-button"
+            data-testid="subject-lookup-search-button"
+            id="subject-lookup-search-button"
+            variant="outline"
+          >
+            <UserSearchIcon />{' '}
+            {t({
+              en: 'Subject Lookup',
+              fr: 'Trouver un client'
+            })}
+          </Button>
+        </Dialog.Trigger>
+        <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
+          <Dialog.Header>
+            <Dialog.Title>{t('datahub.index.lookup.title')}</Dialog.Title>
+          </Dialog.Header>
+          <IdentificationForm onSubmit={(data) => void lookupSubject(data)} />
+        </Dialog.Content>
+      </Dialog>
+      <ActionDropdown
+        widthFull
+        className="min-w-48"
+        data-spotlight-type="export-data-dropdown"
+        data-testid="datahub-export-dropdown"
+        options={['CSV', 'JSON', 'Excel']}
+        title={t('datahub.index.table.export')}
+        onSelection={handleExportSelection}
+      />
+    </>
+  );
+};
 
-  useEffect(() => {
-    const definedTableData = data ?? [];
+const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
+  const { t } = useTranslation();
+  const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
 
-    if (!searchString) {
-      setTableData(definedTableData);
-      return;
-    }
+  return (
+    <div>
+      <DataTable
+        columns={[
+          {
+            accessorFn: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
+            header: t('datahub.index.table.subject'),
+            id: 'subjectId'
+          },
+          {
+            accessorFn: (subject) => (subject.dateOfBirth ? toBasicISOString(new Date(subject.dateOfBirth)) : 'NULL'),
+            header: t('core.identificationData.dateOfBirth.label'),
+            id: 'date-of-birth'
+          },
+          {
+            accessorFn: (subject) => {
+              switch (subject.sex) {
+                case 'FEMALE':
+                  return t('core.identificationData.sex.female');
+                case 'MALE':
+                  return t('core.identificationData.sex.male');
+                default:
+                  return 'NULL';
+              }
+            },
+            header: t('core.identificationData.sex.label'),
+            id: 'sex'
+          }
+        ]}
+        data={data}
+        data-testid="master-data-table"
+        rowActions={[
+          {
+            label: t({ en: 'View', fr: 'Voir' }),
+            onSelect
+          }
+        ]}
+        togglesComponent={Toggles}
+        onSearchChange={(value, table) => {
+          const subjectIdColumn = table.getColumn('subjectId')!;
+          subjectIdColumn.setFilterValue(value);
+        }}
+      />
+    </div>
+  );
+};
 
-    const filtered = data.filter((record) =>
-      removeSubjectIdScope(record.id).toLowerCase().includes(searchString.toLowerCase())
-    );
+const RouteComponent = () => {
+  const currentGroup = useAppStore((store) => store.currentGroup);
 
-    setTableData(filtered);
-  }, [searchString, data]);
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const { data } = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
 
   return (
     <React.Fragment>
@@ -183,55 +220,8 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       <div className="flex grow flex-col">
-        <div className="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
-          <SearchBar
-            className="[&>input]:text-foreground [&>input]:placeholder-foreground grow"
-            data-testid="datahub-subject-search-bar"
-            id="datahub-subject-search-bar"
-            placeholder={t({
-              en: 'Click to Search',
-              fr: 'Cliquer pour rechercher'
-            })}
-            readOnly={false}
-            value={searchString}
-            onValueChange={(value: string) => setSearchString(value)}
-          />
-          <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
-            <Dialog.Trigger asChild>
-              <Button
-                className="gap-1"
-                data-spotlight-type="subject-lookup-search-button"
-                data-testid="subject-lookup-search-button"
-                id="subject-lookup-search-button"
-                variant="outline"
-              >
-                <UserSearchIcon />{' '}
-                {t({
-                  en: 'Subject Lookup',
-                  fr: 'Trouver un client'
-                })}
-              </Button>
-            </Dialog.Trigger>
-            <Dialog.Content data-spotlight-type="subject-lookup-modal" data-testid="datahub-subject-lookup-dialog">
-              <Dialog.Header>
-                <Dialog.Title>{t('datahub.index.lookup.title')}</Dialog.Title>
-              </Dialog.Header>
-              <IdentificationForm onSubmit={(data) => void lookupSubject(data)} />
-            </Dialog.Content>
-          </Dialog>
-          <div className="flex min-w-60 gap-2 lg:shrink">
-            <ActionDropdown
-              widthFull
-              data-spotlight-type="export-data-dropdown"
-              data-testid="datahub-export-dropdown"
-              options={['CSV', 'JSON', 'Excel']}
-              title={t('datahub.index.table.export')}
-              onSelection={handleExportSelection}
-            />
-          </div>
-        </div>
         <MasterDataTable
-          data={tableData}
+          data={data}
           onSelect={(subject) => {
             void navigate({ to: `./${subject.id}/table` });
           }}

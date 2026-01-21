@@ -1,5 +1,5 @@
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
-import { AlertDialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding } from '@opendatacapture/react-core';
 import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
@@ -43,8 +43,8 @@ export const Sidebar = () => {
               />
             ))}
             {i === navItems.length - 1 && (
-              <AlertDialog>
-                <AlertDialog.Trigger asChild>
+              <Dialog>
+                <Dialog.Trigger asChild>
                   <NavButton
                     disabled={currentSession === null}
                     icon={StopCircle}
@@ -52,26 +52,28 @@ export const Sidebar = () => {
                     label={t('layout.navLinks.endSession')}
                     url="#"
                   />
-                </AlertDialog.Trigger>
-                <AlertDialog.Content>
-                  <AlertDialog.Header>
-                    <AlertDialog.Title>{t('layout.endSessionModal.title')}</AlertDialog.Title>
-                    <AlertDialog.Description>{t('layout.endSessionModal.message')}</AlertDialog.Description>
-                  </AlertDialog.Header>
-                  <AlertDialog.Footer>
-                    <AlertDialog.Action
-                      className="min-w-24"
+                </Dialog.Trigger>
+                <Dialog.Content>
+                  <Dialog.Header>
+                    <Dialog.Title>{t('layout.endSessionModal.title')}</Dialog.Title>
+                    <Dialog.Description>{t('layout.endSessionModal.message')}</Dialog.Description>
+                  </Dialog.Header>
+                  <Dialog.Footer>
+                    <Button
+                      className="min-w-20"
                       onClick={() => {
                         endSession();
                         void navigate({ to: '/session/start-session' });
                       }}
                     >
                       {t('core.yes')}
-                    </AlertDialog.Action>
-                    <AlertDialog.Cancel className="min-w-24">{t('core.no')}</AlertDialog.Cancel>
-                  </AlertDialog.Footer>
-                </AlertDialog.Content>
-              </AlertDialog>
+                    </Button>
+                    <Button className="min-w-20" variant="outline">
+                      {t('core.no')}
+                    </Button>
+                  </Dialog.Footer>
+                </Dialog.Content>
+              </Dialog>
             )}
           </div>
         ))}

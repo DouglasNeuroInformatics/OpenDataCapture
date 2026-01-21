@@ -1,6 +1,4 @@
-import { Fragment } from 'react';
-
-import { NotificationHub } from '@douglasneuroinformatics/libui/components';
+import { CoreProvider } from '@douglasneuroinformatics/libui/providers';
 import type { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
@@ -16,11 +14,10 @@ type RouterContext = {
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: () => (
-    <Fragment>
+    <CoreProvider>
       <Outlet />
-      <NotificationHub />
       <ReactQueryDevtools buttonPosition="bottom-right" position="left" />
       <TanStackRouterDevtools />
-    </Fragment>
+    </CoreProvider>
   )
 });

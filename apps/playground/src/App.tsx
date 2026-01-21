@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { NotificationHub } from '@douglasneuroinformatics/libui/components';
+import { CoreProvider } from '@douglasneuroinformatics/libui/providers';
 import { ErrorPage, LoadingPage } from '@opendatacapture/react-core';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -13,10 +13,11 @@ export const App = () => {
         <LoadingPage subtitle="Please Be Patient, This May Take a While" title="Loading Editor and Toolchain" />
       }
     >
-      <ErrorBoundary FallbackComponent={ErrorPage}>
-        <NotificationHub />
-        <IndexPage />
-      </ErrorBoundary>
+      <CoreProvider>
+        <ErrorBoundary FallbackComponent={ErrorPage}>
+          <IndexPage />
+        </ErrorBoundary>
+      </CoreProvider>
     </React.Suspense>
   );
 };
