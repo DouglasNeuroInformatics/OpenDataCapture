@@ -1,9 +1,10 @@
 import { expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+import type { NavigateArgs, RouteTo } from '../helpers/types';
+
 export abstract class RootPage {
   readonly $ref: Page;
-  protected abstract readonly defaultUrl: string;
 
   constructor(page: Page) {
     this.$ref = page;
@@ -13,8 +14,17 @@ export abstract class RootPage {
     return expect(this.$ref);
   }
 
-  async goto() {
-    await this.$ref.goto(this.defaultUrl);
-    await this.$ref.waitForURL(this.defaultUrl);
+  protected getUrlWithParams<TPath extends RouteTo>(...args: NavigateArgs<TPath>) {
+    let url: string = args[0];
+    if (args[1]) {
+      Object.entries(args[1]).forEach(([key, value]) => {
+        url = url.replace('$' + key, String(value));
+      });
+    }
+    return url;
+  }
+
+  async goto<TPath extends RouteTo>(...args: NavigateArgs<TPath>): Promise<void> {
+    await this.$ref.goto(this.getUrlWithParams(...args));
   }
 }
