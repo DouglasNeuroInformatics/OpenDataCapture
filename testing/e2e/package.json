@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "tsc && eslint --fix .",
     "test": "env-cmd -f ../../.env playwright test",
-    "test:chrome": "playwright test --project='*Desktop Chrome'",
+    "test:chrome": "env-cmd -f ../../.env  playwright test --project='*Desktop Chrome'",
     "test:dev": "env-cmd -f ../../.env playwright test --ui"
   },
   "dependencies": {
