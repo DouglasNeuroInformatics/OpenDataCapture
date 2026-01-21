@@ -552,9 +552,7 @@ export class InstrumentRecordsService {
     const records = (await this.instrumentRecordModel.aggregateRaw({ pipeline })) as unknown as unknown[];
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const filteredRecords = records.filter((record) => appAbility?.can('read', record as any));
-
-    return JSON.parse(JSON.stringify(filteredRecords)) as unknown as RecordType[];
+    return records.filter((record) => appAbility.can('read', record as any)) as RecordType[];
   }
 
   private serializeData(data: unknown) {
