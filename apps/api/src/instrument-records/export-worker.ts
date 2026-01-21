@@ -5,7 +5,7 @@ import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
-import type { ChunkCompleteData, InitData, ParentMessage, RecordType, WorkerMessage } from './thread-types';
+import type { BeginChunkProcessingData, InitData, ParentMessage, RecordType, WorkerMessage } from './thread-types';
 
 type ExpandDataType =
   | {
@@ -52,7 +52,7 @@ function handleInit(data: InitData) {
   parentPort?.postMessage({ success: true });
 }
 
-function handleChunkComplete(_data: ChunkCompleteData) {
+function handleChunkComplete(_data: BeginChunkProcessingData) {
   if (!initData) {
     throw new Error('Expected init data to be defined');
   }
@@ -125,7 +125,7 @@ function handleChunkComplete(_data: ChunkCompleteData) {
 
 parentPort!.on('message', (message: ParentMessage) => {
   switch (message.type) {
-    case 'CHUNK_COMPLETE':
+    case 'BEGIN_CHUNK_PROCESSING':
       return handleChunkComplete(message.data);
     case 'INIT':
       return handleInit(message.data);

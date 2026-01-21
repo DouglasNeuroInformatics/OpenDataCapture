@@ -33,14 +33,14 @@ export type InitMessage = {
   type: 'INIT';
 };
 
-export type ChunkCompleteData = RecordType[];
+export type BeginChunkProcessingData = RecordType[];
 
-export type ChunkCompleteMessage = {
-  data: ChunkCompleteData;
-  type: 'CHUNK_COMPLETE';
+export type BeginChunkProcessingMessage = {
+  data: BeginChunkProcessingData;
+  type: 'BEGIN_CHUNK_PROCESSING';
 };
 
-export type ParentMessage = ChunkCompleteMessage | InitMessage;
+export type ParentMessage = BeginChunkProcessingMessage | InitMessage;
 
 export type WorkerMessage = { data: InstrumentRecordsExport; success: true } | { error: string; success: false };
 

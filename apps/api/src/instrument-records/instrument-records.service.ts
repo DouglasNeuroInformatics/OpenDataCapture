@@ -32,7 +32,7 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
 import type {
-  ChunkCompleteMessage,
+  BeginChunkProcessingMessage,
   InitData,
   InitialMessage,
   InitMessage,
@@ -169,7 +169,7 @@ export class InstrumentRecordsService {
 
         worker.on('message', (message: InitialMessage) => {
           if (message.success) {
-            worker.postMessage({ data: chunk, type: 'CHUNK_COMPLETE' } satisfies ChunkCompleteMessage);
+            worker.postMessage({ data: chunk, type: 'BEGIN_CHUNK_PROCESSING' } satisfies BeginChunkProcessingMessage);
             worker.on('message', (message: WorkerMessage) => {
               if (message.success) {
                 resolve(message.data);
