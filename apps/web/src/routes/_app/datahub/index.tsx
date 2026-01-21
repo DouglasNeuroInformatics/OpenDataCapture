@@ -4,7 +4,7 @@ import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
   ActionDropdown,
   Button,
-  ClientTable,
+  DataTable,
   Dialog,
   Heading,
   SearchBar
@@ -23,6 +23,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
+
 type MasterDataTableProps = {
   data: Subject[];
   onSelect: (subject: Subject) => void;
@@ -33,36 +34,44 @@ const MasterDataTable = ({ data, onSelect }: MasterDataTableProps) => {
   const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
 
   return (
-    <ClientTable<Subject>
-      columns={[
-        {
-          field: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
-          label: t('datahub.index.table.subject')
-        },
-        {
-          field: (subject) => (subject.dateOfBirth ? toBasicISOString(new Date(subject.dateOfBirth)) : 'NULL'),
-          label: t('core.identificationData.dateOfBirth.label')
-        },
-        {
-          field: (subject) => {
-            switch (subject.sex) {
-              case 'FEMALE':
-                return t('core.identificationData.sex.female');
-              case 'MALE':
-                return t('core.identificationData.sex.male');
-              default:
-                return 'NULL';
-            }
+    <div>
+      <DataTable
+        columns={[
+          {
+            accessorFn: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
+            header: t('datahub.index.table.subject'),
+            id: 'subject'
           },
-          label: t('core.identificationData.sex.label')
-        }
-      ]}
-      data={data}
-      data-testid="master-data-table"
-      entriesPerPage={15}
-      minRows={15}
-      onEntryClick={onSelect}
-    />
+          {
+            accessorFn: (subject) => (subject.dateOfBirth ? toBasicISOString(new Date(subject.dateOfBirth)) : 'NULL'),
+            header: t('core.identificationData.dateOfBirth.label'),
+            id: 'date-of-birth'
+          },
+          {
+            accessorFn: (subject) => {
+              switch (subject.sex) {
+                case 'FEMALE':
+                  return t('core.identificationData.sex.female');
+                case 'MALE':
+                  return t('core.identificationData.sex.male');
+                default:
+                  return 'NULL';
+              }
+            },
+            header: t('core.identificationData.sex.label'),
+            id: 'sex'
+          }
+        ]}
+        data={data}
+        data-testid="master-data-table"
+        rowActions={[
+          {
+            label: t({ en: 'View', fr: 'Voir' }),
+            onSelect
+          }
+        ]}
+      />
+    </div>
   );
 };
 
