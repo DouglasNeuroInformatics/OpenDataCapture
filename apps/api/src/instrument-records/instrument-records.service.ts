@@ -148,47 +148,6 @@ export class InstrumentRecordsService {
   async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: Required<EntityOperationOptions>) {
     const records = await this.queryRecordsRaw(ability, groupId);
 
-    // console.log(records[0]
-    // records.forEach((record) => {
-    //   for (const key in record) {
-    //     try {
-    //       structuredClone(record[key])
-    //     } catch (err) {
-    //       console.log(key, record[key], record)
-    //       throw err
-    //     }
-    //   }
-    // })
-    // records.map((record) => {
-    //   try{
-    //     structuredClone(record)
-    //   }
-    //   catch {
-    //     console.log(record)
-    //     console.log(Object.getPrototypeOf(record) === Object.prototype)
-    //     console.log(record.computedMeasures)
-    //     throw new Error()
-    //   }
-
-    // for (let i = 0; i < records.length; i++) {
-    //   const record = records[i];
-    //   if (Object.getPrototypeOf(record) !== Object.prototype) {
-    //     console.log(record);
-    //     throw new Error('Bad prototype');
-    //   }
-    //   // for (const key in record) {
-    //   //   structuredClone(record[key])
-    //   // }
-    //   records[i] = {
-    //     ...record
-    //   };
-    // }
-
-    // console.log(records[0]);
-
-    // throw new Error("NULL")
-    // structuredClone(records);
-
     const instrumentIds = [...new Set(records.map((r) => r.instrumentId))];
 
     const instrumentsArray = await Promise.all(
@@ -551,8 +510,15 @@ export class InstrumentRecordsService {
 
     const records = (await this.instrumentRecordModel.aggregateRaw({ pipeline })) as unknown as unknown[];
 
+    /**
+     * We need to create a shallow copy of all records here, as the aggregateRaw method returns objects
+     * with the Symbol(nodejs.util.inspect.custom) property defined, which is not serializable.
+     */
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    return records.filter((record) => appAbility.can('read', record as any)) as RecordType[];
+    return (records.filter((record) => appAbility.can('read', record as any)) as RecordType[]).map((record) => ({
+      ...record
+    }));
   }
 
   private serializeData(data: unknown) {
