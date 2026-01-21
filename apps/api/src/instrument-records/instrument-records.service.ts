@@ -11,7 +11,6 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
-// import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -20,7 +19,6 @@ import type {
   LinearRegressionResults,
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
-// import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { Prisma } from '@prisma/client';
 import type { Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
@@ -37,17 +35,6 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
 import type { InitData, RecordType } from './thread-types';
-
-// type ExpandDataType =
-//   | {
-//       measure: string;
-//       measureValue: boolean | Date | number | string | undefined;
-//       success: true;
-//     }
-//   | {
-//       message: string;
-//       success: false;
-//     };
 
 type WorkerMessage = { data: InstrumentRecordsExport; success: true } | { error: string; success: false };
 
