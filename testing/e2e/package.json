@@ -11,6 +11,7 @@
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
     "@opendatacapture/schemas": "workspace:*",
-    "@playwright/test": "^1.51.1"
+    "@playwright/test": "^1.51.1",
+    "type-fest": "workspace:type-fest__4.x@*"
   }
 }
