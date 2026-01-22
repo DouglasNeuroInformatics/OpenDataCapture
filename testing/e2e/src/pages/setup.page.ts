@@ -4,6 +4,7 @@ import type { Locator, Page } from '@playwright/test';
 import { RootPage } from './__root.page';
 
 export class SetupPage extends RootPage {
+  readonly _requiresAuth = false;
   readonly setupForm: Locator;
 
   constructor(page: Page) {

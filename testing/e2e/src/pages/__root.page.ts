@@ -6,6 +6,8 @@ import type { NavigateArgs, RouteTo } from '../helpers/types';
 export abstract class RootPage {
   readonly $ref: Page;
 
+  abstract readonly _requiresAuth: boolean;
+
   constructor(page: Page) {
     this.$ref = page;
   }
@@ -25,6 +27,8 @@ export abstract class RootPage {
   }
 
   async goto<TPath extends RouteTo>(...args: NavigateArgs<TPath>): Promise<void> {
-    await this.$ref.goto(this.getUrlWithParams(...args));
+    const url = this.getUrlWithParams(...args);
+    await this.$ref.goto(url);
+    await this.expect.toHaveURL(url);
   }
 }

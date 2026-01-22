@@ -11,6 +11,9 @@ declare global {
       ADMIN_USERNAME: string;
     }
   }
+  interface Window {
+    __PLAYWRIGHT_ACCESS_TOKEN__?: string;
+  }
 }
 
 export type BrowserTarget = 'Desktop Chrome' | 'Desktop Firefox';
@@ -29,7 +32,13 @@ export type NavigateVariadicArgs<TPath extends RouteTo> = IfNever<
 
 export type NavigateArgs<TPath extends RouteTo> = [to: TPath, ...NavigateVariadicArgs<TPath>];
 
+export type ProjectAuth = {
+  accessToken: string;
+};
+
 export type ProjectMetadata = {
+  authStorageFile: string;
+  browserId: string;
   browserTarget: BrowserTarget;
 };
 
