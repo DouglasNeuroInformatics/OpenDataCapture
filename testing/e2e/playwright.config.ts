@@ -5,6 +5,8 @@ import { parseNumber, range, unwrap } from '@douglasneuroinformatics/libjs';
 import { defineConfig, devices } from '@playwright/test';
 import type { Project } from '@playwright/test';
 
+import { AUTH_STORAGE_DIR } from './src/helpers/constants';
+
 import type { BrowserName, ProjectMetadata } from './src/helpers/types';
 
 const apiPort = parseNumber(process.env.API_DEV_SERVER_PORT);
@@ -49,11 +51,13 @@ export default defineConfig({
     },
     ...unwrap(range(1, 4)).flatMap((i) => {
       return browsers.map((browser) => {
+        const browserId = crypto.createHash('sha256').update(browser.target).digest('hex');
         return {
           dependencies: i === 1 ? ['Global Setup'] : [`${i - 1}.x - ${browser.target}`],
           metadata: {
+            authStorageFile: path.resolve(AUTH_STORAGE_DIR, `${browserId}.json`),
             browser: {
-              id: crypto.createHash('sha256').update(browser.target).digest('hex'),
+              id: browserId,
               name: browser.target
             }
           } satisfies ProjectMetadata,
