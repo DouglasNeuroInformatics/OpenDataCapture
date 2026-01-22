@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-export type BrowserName = 'Desktop Chrome' | 'Desktop Firefox';
+export type BrowserTarget = 'Desktop Chrome' | 'Desktop Firefox';
 
 export type ExtractParams<TPath extends string> = Split<TPath, '/'>[number] extends infer TUnion
   ? TUnion extends `$${infer TParam}`
@@ -34,10 +34,8 @@ export type NavigateArgs<TPath extends RouteTo> = [to: TPath, ...NavigateVariadi
 
 export type ProjectMetadata = {
   authStorageFile: string;
-  browser: {
-    id: string;
-    name: BrowserName;
-  };
+  browserId: string;
+  browserTarget: BrowserTarget;
 };
 
 // export type RouteTo = import('../../../../apps/web/src/route-tree.ts').FileRouteTypes['to'];
@@ -51,5 +49,5 @@ export type RouteParams<TPath extends RouteTo> = {
   : never;
 
 export type TestDataMap<T> = {
-  [K in BrowserName]: T;
+  [K in BrowserTarget]: T;
 };
