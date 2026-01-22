@@ -1,5 +1,7 @@
 /* eslint-disable no-empty-pattern */
 
+import * as fs from 'node:fs';
+
 import { test as base, expect } from '@playwright/test';
 
 import { LoginPage } from '../pages/auth/login.page';
@@ -7,7 +9,7 @@ import { DashboardPage } from '../pages/dashboard.page';
 import { SubjectDataTablePage } from '../pages/datahub/subject-data-table.page';
 import { SetupPage } from '../pages/setup.page';
 
-import type { NavigateVariadicArgs, ProjectMetadata, RouteTo } from './types';
+import type { NavigateVariadicArgs, ProjectAuth, ProjectMetadata, RouteTo } from './types';
 
 type PageModels = typeof pageModels;
 
@@ -20,6 +22,7 @@ type TestArgs = {
 
 type WorkerArgs = {
   getProjectMetadata: <TKey extends Extract<keyof ProjectMetadata, string>>(key: TKey) => ProjectMetadata[TKey];
+  setProjectAuth: (auth: ProjectAuth) => void;
 };
 
 const pageModels = {
@@ -43,6 +46,15 @@ export const test = base.extend<TestArgs, WorkerArgs>({
     async ({}, use, workerInfo) => {
       return use((key) => {
         return (workerInfo.project.metadata as ProjectMetadata)[key];
+      });
+    },
+    { scope: 'worker' }
+  ],
+  setProjectAuth: [
+    async ({ getProjectMetadata }, use) => {
+      return use((auth) => {
+        const authStorageFile = getProjectMetadata('authStorageFile');
+        fs.writeFileSync(authStorageFile, JSON.stringify(auth, null, 2), 'utf-8');
       });
     },
     { scope: 'worker' }

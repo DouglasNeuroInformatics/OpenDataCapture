@@ -32,6 +32,10 @@ export type NavigateVariadicArgs<TPath extends RouteTo> = IfNever<
 
 export type NavigateArgs<TPath extends RouteTo> = [to: TPath, ...NavigateVariadicArgs<TPath>];
 
+export type ProjectAuth = {
+  accessToken: string;
+};
+
 export type ProjectMetadata = {
   authStorageFile: string;
   browserId: string;
