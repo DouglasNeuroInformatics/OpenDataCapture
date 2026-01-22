@@ -25,6 +25,8 @@ export abstract class RootPage {
   }
 
   async goto<TPath extends RouteTo>(...args: NavigateArgs<TPath>): Promise<void> {
-    await this.$ref.goto(this.getUrlWithParams(...args));
+    const url = this.getUrlWithParams(...args);
+    await this.$ref.goto(url);
+    await this.expect.toHaveURL(url);
   }
 }
