@@ -27,4 +27,8 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
+interface Window {
+  __PLAYWRIGHT_ACCESS_TOKEN__?: string;
+}
+
 declare const __RELEASE__: import('@opendatacapture/schemas/setup').ReleaseInfo;

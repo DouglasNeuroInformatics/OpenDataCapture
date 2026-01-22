@@ -11,6 +11,9 @@ declare global {
       ADMIN_USERNAME: string;
     }
   }
+  interface Window {
+    __PLAYWRIGHT_ACCESS_TOKEN__?: string;
+  }
 }
 
 export type BrowserTarget = 'Desktop Chrome' | 'Desktop Firefox';
