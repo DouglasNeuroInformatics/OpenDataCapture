@@ -21,8 +21,9 @@ type TestArgs = {
 };
 
 type WorkerArgs = {
+  getProjectAuth: () => Promise<ProjectAuth>;
   getProjectMetadata: <TKey extends Extract<keyof ProjectMetadata, string>>(key: TKey) => ProjectMetadata[TKey];
-  setProjectAuth: (auth: ProjectAuth) => void;
+  setProjectAuth: (auth: ProjectAuth) => Promise<void>;
 };
 
 const pageModels = {
@@ -42,6 +43,18 @@ export const test = base.extend<TestArgs, WorkerArgs>({
       }
     );
   },
+  getProjectAuth: [
+    async ({ getProjectMetadata }, use) => {
+      return use(async () => {
+        const authStorageFile = getProjectMetadata('authStorageFile');
+        if (!fs.existsSync(authStorageFile)) {
+          throw new Error(`Cannot get project auth: storage file does not exist: ${authStorageFile}`);
+        }
+        return JSON.parse(await fs.promises.readFile(authStorageFile, 'utf8')) as ProjectAuth;
+      });
+    },
+    { scope: 'worker' }
+  ],
   getProjectMetadata: [
     async ({}, use, workerInfo) => {
       return use((key) => {
@@ -52,9 +65,12 @@ export const test = base.extend<TestArgs, WorkerArgs>({
   ],
   setProjectAuth: [
     async ({ getProjectMetadata }, use) => {
-      return use((auth) => {
+      return use(async (auth) => {
         const authStorageFile = getProjectMetadata('authStorageFile');
-        fs.writeFileSync(authStorageFile, JSON.stringify(auth, null, 2), 'utf-8');
+        if (fs.existsSync(authStorageFile)) {
+          throw new Error(`Cannot set project auth: storage file already exists: ${authStorageFile}`);
+        }
+        await fs.promises.writeFile(authStorageFile, JSON.stringify(auth, null, 2), 'utf-8');
       });
     },
     { scope: 'worker' }

@@ -24,6 +24,7 @@ test.describe('login page', () => {
     const response = await loginResponsePromise;
     const body = await response.json();
     expect(typeof body.accessToken).toBe('string');
-    setProjectAuth({ accessToken: body.accessToken as string } satisfies ProjectAuth);
+
+    await setProjectAuth({ accessToken: body.accessToken as string } satisfies ProjectAuth);
   });
 });
