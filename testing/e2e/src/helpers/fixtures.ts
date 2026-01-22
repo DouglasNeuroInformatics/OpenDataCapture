@@ -34,10 +34,16 @@ const pageModels = {
 } satisfies { [K in RouteTo]?: any };
 
 export const test = base.extend<TestArgs, WorkerArgs>({
-  getPageModel: ({ page }, use) => {
+  getPageModel: ({ getProjectAuth, page }, use) => {
     return use(
       async <TKey extends Extract<keyof PageModels, RouteTo>>(key: TKey, ...args: NavigateVariadicArgs<TKey>) => {
         const pageModel = new pageModels[key](page) as InstanceType<PageModels[TKey]>;
+        if (pageModel._requiresAuth) {
+          const auth = await getProjectAuth();
+          await page.addInitScript((accessToken) => {
+            window.__PLAYWRIGHT_ACCESS_TOKEN__ = accessToken;
+          }, auth.accessToken);
+        }
         await pageModel.goto(key, ...args);
         return pageModel;
       }
