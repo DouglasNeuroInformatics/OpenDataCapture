@@ -10,12 +10,14 @@ import { DEFAULT_LOGIN_REQUEST_THROTTLER_LIMIT, DEFAULT_LOGIN_REQUEST_THROTTLER_
 const LOGIN_REQUEST_THROTTLER_LIMIT = $NumberLike
   .pipe(z.number().int().positive())
   .default(DEFAULT_LOGIN_REQUEST_THROTTLER_LIMIT)
-  .parse(process.env.LOGIN_REQUEST_THROTTLER_LIMIT);
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  .parse(process.env.LOGIN_REQUEST_THROTTLER_LIMIT || undefined);
 
 const LOGIN_REQUEST_THROTTLER_TTL = $NumberLike
   .pipe(z.number().int().positive())
   .default(DEFAULT_LOGIN_REQUEST_THROTTLER_TTL)
-  .parse(process.env.LOGIN_REQUEST_THROTTLER_TTL);
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  .parse(process.env.LOGIN_REQUEST_THROTTLER_TTL || undefined);
 
 export function ThrottleLoginRequest() {
   return applyDecorators(
