@@ -1,10 +1,11 @@
+import * as crypto from 'node:crypto';
 import * as path from 'node:path';
 
 import { parseNumber, range, unwrap } from '@douglasneuroinformatics/libjs';
 import { defineConfig, devices } from '@playwright/test';
 import type { Project } from '@playwright/test';
 
-import type { BrowserTarget, ProjectMetadata } from './src/helpers/types';
+import type { BrowserName, ProjectMetadata } from './src/helpers/types';
 
 const apiPort = parseNumber(process.env.API_DEV_SERVER_PORT);
 const gatewayPort = parseNumber(process.env.GATEWAY_DEV_SERVER_PORT);
@@ -20,7 +21,7 @@ if (Number.isNaN(apiPort)) {
 
 const baseURL = `http://localhost:${webPort}`;
 
-const browsers: { target: BrowserTarget; use: Project['use'] }[] = [
+const browsers: { target: BrowserName; use: Project['use'] }[] = [
   { target: 'Desktop Chrome', use: { ...devices['Desktop Chrome'], channel: 'chromium', headless: true } },
   { target: 'Desktop Firefox', use: { ...devices['Desktop Firefox'], headless: true } }
 ] as const;
@@ -51,7 +52,10 @@ export default defineConfig({
         return {
           dependencies: i === 1 ? ['Global Setup'] : [`${i - 1}.x - ${browser.target}`],
           metadata: {
-            browserTarget: browser.target
+            browser: {
+              id: crypto.createHash('sha256').update(browser.target).digest('hex'),
+              name: browser.target
+            }
           } satisfies ProjectMetadata,
           name: `${i}.x - ${browser.target}`,
           testMatch: `**/${i}.*.spec.ts`,
