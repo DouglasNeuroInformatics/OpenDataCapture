@@ -6,6 +6,8 @@ import type { NavigateArgs, RouteTo } from '../helpers/types';
 export abstract class RootPage {
   readonly $ref: Page;
 
+  abstract readonly _requiresAuth: boolean;
+
   constructor(page: Page) {
     this.$ref = page;
   }
