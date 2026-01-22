@@ -6,6 +6,7 @@ import { test as base, expect } from '@playwright/test';
 
 import { LoginPage } from '../pages/auth/login.page';
 import { DashboardPage } from '../pages/dashboard.page';
+import { DatahubPage } from '../pages/datahub/datahub.page';
 import { SubjectDataTablePage } from '../pages/datahub/subject-data-table.page';
 import { SetupPage } from '../pages/setup.page';
 
@@ -29,6 +30,7 @@ type WorkerArgs = {
 const pageModels = {
   '/auth/login': LoginPage,
   '/dashboard': DashboardPage,
+  '/datahub': DatahubPage,
   '/datahub/$subjectId/table': SubjectDataTablePage,
   '/setup': SetupPage
 } satisfies { [K in RouteTo]?: any };
