@@ -26,6 +26,8 @@ const browsers: { target: BrowserTarget; use: Project['use'] }[] = [
 ] as const;
 
 export default defineConfig({
+  globalSetup: path.resolve(import.meta.dirname, 'src/global/global.setup.ts'),
+  globalTeardown: path.resolve(import.meta.dirname, 'src/global/global.teardown.ts'),
   maxFailures: 1,
   outputDir: path.resolve(import.meta.dirname, '.playwright/output'),
   projects: [
