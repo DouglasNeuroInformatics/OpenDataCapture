@@ -5,5 +5,6 @@ test.describe('dashboard', () => {
     const datahubPage = await getPageModel('/datahub');
     await expect(datahubPage.pageHeader).toBeVisible();
     await expect(datahubPage.pageHeader).toContainText('Data Hub');
+    await expect(datahubPage.rowActionsTrigger).toBeVisible();
   });
 });
