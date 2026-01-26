@@ -11,6 +11,7 @@ import { SubjectDataTablePage } from '../pages/datahub/subject-data-table.page';
 import { SetupPage } from '../pages/setup.page';
 
 import type { NavigateVariadicArgs, ProjectAuth, ProjectMetadata, RouteTo } from './types';
+import { StartSessionPage } from '../pages/start-session.page';
 
 type PageModels = typeof pageModels;
 
@@ -32,6 +33,7 @@ const pageModels = {
   '/dashboard': DashboardPage,
   '/datahub': DatahubPage,
   '/datahub/$subjectId/table': SubjectDataTablePage,
+  '/session/start-session': StartSessionPage,
   '/setup': SetupPage
 } satisfies { [K in RouteTo]?: any };
 
