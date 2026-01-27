@@ -5,6 +5,24 @@ test.describe('start session', () => {
     const startSessionPage = await getPageModel('/session/start-session');
     await expect(startSessionPage.pageHeader).toBeVisible();
     await expect(startSessionPage.pageHeader).toContainText('Start Session');
-    await expect(startSessionPage.subjectIdentificationInput).toBeDefined();
+    expect(startSessionPage.sessionForm).toBeDefined();
+  });
+
+  test('should fill subject identification input', async ({ getPageModel }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    const formType = startSessionPage.sessionForm.getByTestId('subjectIdentificationMethod-select-trigger');
+    await formType.click();
+    await formType.getByRole('option', { name: 'Personal Information' }).click();
+
+    // await startSessionPage.selectIdentificationMethod('Personal Information')
+    await expect(formType).toHaveText('Personal Information');
+
+    const identifier = startSessionPage.sessionForm.locator('#subjectFirstName');
+    await expect(identifier).toHaveText('');
+    // await startSessionPage.fillSessionForm('john')
+
+    // await startSessionPage.sessionForm.fill('John');
+    // await expect(startSessionPage.sessionForm).toHaveValue('John');
   });
 });
