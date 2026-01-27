@@ -9,9 +9,9 @@ import { DashboardPage } from '../pages/dashboard.page';
 import { DatahubPage } from '../pages/datahub/datahub.page';
 import { SubjectDataTablePage } from '../pages/datahub/subject-data-table.page';
 import { SetupPage } from '../pages/setup.page';
+import { StartSessionPage } from '../pages/start-session.page';
 
 import type { NavigateVariadicArgs, ProjectAuth, ProjectMetadata, RouteTo } from './types';
-import { StartSessionPage } from '../pages/start-session.page';
 
 type PageModels = typeof pageModels;
 
