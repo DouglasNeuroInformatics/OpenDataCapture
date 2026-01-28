@@ -4,12 +4,14 @@ import { AppPage } from './_app.page';
 
 export class StartSessionPage extends AppPage {
   readonly pageHeader: Locator;
+  readonly selectField: Locator;
   readonly sessionForm: Locator;
 
   constructor(page: Page) {
     super(page);
     this.pageHeader = page.getByTestId('page-header');
     this.sessionForm = page.getByTestId('start-session-form');
+    this.selectField = page.locator('[name="subjectIdentificationMethod"]');
   }
 
   async fillSessionForm(firstName: string) {
@@ -17,9 +19,6 @@ export class StartSessionPage extends AppPage {
   }
 
   async selectIdentificationMethod(methodName: string) {
-    const methodTrigger = this.sessionForm.getByRole('combobox', { name: /identification method/i });
-    await methodTrigger.click();
-    // The options are usually rendered in a portal at the end of the body
-    await methodTrigger.getByRole('option', { name: methodName }).click();
+    await this.selectField.selectOption(methodName);
   }
 }
