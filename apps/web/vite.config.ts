@@ -10,60 +10,64 @@ import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
-const apiPort = parseNumber(process.env.API_DEV_SERVER_PORT);
-const webPort = parseNumber(process.env.WEB_DEV_SERVER_PORT);
+export default defineConfig(async ({ command }) => {
+  const apiPort = parseNumber(process.env.API_DEV_SERVER_PORT);
+  const webPort = parseNumber(process.env.WEB_DEV_SERVER_PORT);
 
-if (Number.isNaN(apiPort)) {
-  throw new Error(`Expected API_DEV_SERVER_PORT to be number, got ${process.env.API_DEV_SERVER_PORT}`);
-} else if (Number.isNaN(webPort)) {
-  throw new Error(`Expected WEB_DEV_SERVER_PORT to be number, got ${process.env.WEB_DEV_SERVER_PORT}`);
-}
+  if (command === 'serve') {
+    if (Number.isNaN(apiPort)) {
+      throw new Error(`Expected API_DEV_SERVER_PORT to be number, got ${process.env.API_DEV_SERVER_PORT}`);
+    } else if (Number.isNaN(webPort)) {
+      throw new Error(`Expected WEB_DEV_SERVER_PORT to be number, got ${process.env.WEB_DEV_SERVER_PORT}`);
+    }
+  }
 
-export default defineConfig({
-  build: {
-    chunkSizeWarningLimit: 1000,
-    emptyOutDir: false,
-    sourcemap: true,
-    target: 'es2022'
-  },
-  define: {
-    __RELEASE__: JSON.stringify(await getReleaseInfo())
-  },
-  optimizeDeps: {
-    esbuildOptions: {
+  return {
+    build: {
+      chunkSizeWarningLimit: 1000,
+      emptyOutDir: false,
+      sourcemap: true,
       target: 'es2022'
     },
-    include: ['react/*', 'react-dom/*']
-  },
-  plugins: [
-    tanstackRouter({
-      autoCodeSplitting: true,
-      generatedRouteTree: './src/route-tree.ts',
-      target: 'react'
-    }),
-    react(),
-    viteCompression(),
-    importMetaEnv.vite({
-      example: path.resolve(import.meta.dirname, '.env.public')
-    }) as any,
-    runtime(),
-    tailwindcss()
-  ],
-  resolve: {
-    alias: {
-      '@': path.resolve(import.meta.dirname, 'src')
-    }
-  },
-  server: {
-    port: webPort,
-    proxy: {
-      '/api/': {
-        rewrite: (path) => path.replace(/^\/api/, ''),
-        target: {
-          host: 'localhost',
-          port: apiPort
+    define: {
+      __RELEASE__: JSON.stringify(await getReleaseInfo())
+    },
+    optimizeDeps: {
+      esbuildOptions: {
+        target: 'es2022'
+      },
+      include: ['react/*', 'react-dom/*']
+    },
+    plugins: [
+      tanstackRouter({
+        autoCodeSplitting: true,
+        generatedRouteTree: './src/route-tree.ts',
+        target: 'react'
+      }),
+      react(),
+      viteCompression(),
+      importMetaEnv.vite({
+        example: path.resolve(import.meta.dirname, '.env.public')
+      }) as any,
+      runtime(),
+      tailwindcss()
+    ],
+    resolve: {
+      alias: {
+        '@': path.resolve(import.meta.dirname, 'src')
+      }
+    },
+    server: {
+      port: webPort,
+      proxy: {
+        '/api/': {
+          rewrite: (path: string) => path.replace(/^\/api/, ''),
+          target: {
+            host: 'localhost',
+            port: apiPort
+          }
         }
       }
     }
-  }
+  };
 });
