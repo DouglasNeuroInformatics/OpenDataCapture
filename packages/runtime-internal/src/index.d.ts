@@ -13,3 +13,6 @@ export declare function encodeUnicodeToBase64(s: string): string;
 
 /** Decodes a Base64 string back into a Unicode string. */
 export declare function decodeBase64ToUnicode(s: string): string;
+
+/** Remove the scope from a subject ID (e.g., root$123 -> 123) */
+export declare function removeSubjectIdScope(id: string): string;
