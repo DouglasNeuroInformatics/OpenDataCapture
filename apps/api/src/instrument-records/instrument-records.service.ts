@@ -164,7 +164,7 @@ export class InstrumentRecordsService {
 
     const workerPromises = chunks.map((chunk) => {
       return new Promise<InstrumentRecordsExport>((resolve, reject) => {
-        const worker = new Worker(join(import.meta.dirname, 'export-worker.ts'));
+        const worker = new Worker(join(import.meta.dirname, 'export-worker.js'));
         worker.postMessage({ data: availableInstrumentArray, type: 'INIT' } satisfies InitMessage);
 
         worker.on('message', (message: InitialMessage) => {

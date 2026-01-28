@@ -1,32 +1,39 @@
 import { parentPort } from 'worker_threads';
 
-import type { FormTypes, InstrumentMeasureValue } from '@opendatacapture/runtime-core';
-import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
-import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
-import type { BeginChunkProcessingData, InitData, ParentMessage, RecordType, WorkerMessage } from './thread-types';
+/** @type {typeof import('@opendatacapture/schemas/core').DEFAULT_GROUP_NAME} */
+const DEFAULT_GROUP_NAME = 'root';
 
-type ExpandDataType =
-  | {
-      measure: string;
-      measureValue: FormTypes.RecordArrayFieldValue | InstrumentMeasureValue;
-      success: true;
-    }
-  | {
-      message: string;
-      success: false;
-    };
+/**
+ * @typedef {Object} SuccessExpand
+ * @property {string} measure
+ * @property {any} measureValue
+ * @property {true} success
+ */
 
-function expandData(listEntry: any[]): ExpandDataType[] {
-  const validRecordArrayList: ExpandDataType[] = [];
+/**
+ * @typedef {Object} FailureExpand
+ * @property {string} message
+ * @property {false} success
+ */
+
+/** @typedef {SuccessExpand | FailureExpand} ExpandDataType */
+
+/**
+ * Flattens nested record array data into a list of expandable data objects.
+ * @param {any[]} listEntry - The array of records to expand.
+ * @returns {ExpandDataType[]} An array of expanded measure objects.
+ * @throws {Error} If the provided listEntry is empty.
+ */
+function expandData(listEntry) {
+  /** @type {SuccessExpand[]} */
+  const validRecordArrayList = [];
   if (listEntry.length < 1) {
     throw new Error('Record Array is Empty');
   }
   for (const objectEntry of Object.values(listEntry)) {
-    for (const [dataKey, dataValue] of Object.entries(
-      objectEntry as { [key: string]: FormTypes.RecordArrayFieldValue }
-    )) {
+    for (const [dataKey, dataValue] of Object.entries(objectEntry)) {
       validRecordArrayList.push({
         measure: dataKey,
         measureValue: dataValue,
@@ -37,34 +44,48 @@ function expandData(listEntry: any[]): ExpandDataType[] {
   return validRecordArrayList;
 }
 
-let initData: Map<
-  string | undefined,
-  {
-    edition: number;
-    id: string;
-    name: string;
-  }
->;
+/**
+ * Internal cache for instrument metadata.
+ * @type {Map<string | undefined, { edition: number, id: string, name: string }>}
+ */
+let initData;
 
-function handleInit(data: InitData) {
+/**
+ * Initializes the worker with instrument metadata.
+ * * @param {Array<{id: string, edition: number, name: string}>} data - The initialization payload.
+ */
+function handleInit(data) {
   initData = new Map(data.map((instrument) => [instrument.id, instrument]));
-
   parentPort?.postMessage({ success: true });
 }
 
-function handleChunkComplete(_data: BeginChunkProcessingData) {
+/**
+ * Processes a chunk of records and posts results back to the parent thread.
+ * @param {import('./thread-types').BeginChunkProcessingData} _data - The collection of records to process.
+ * @throws {Error} If initData is not defined.
+ */
+function handleChunkComplete(_data) {
   if (!initData) {
     throw new Error('Expected init data to be defined');
   }
   const instrumentsMap = initData;
 
-  const processRecord = (record: RecordType): InstrumentRecordsExport => {
-    const instrument = instrumentsMap.get(record.instrumentId)!;
+  /**
+   * Transforms a single record into an array of exportable rows.
+   * @param {import('./thread-types').RecordType} record - The raw instrument record.
+   * @returns {import('@opendatacapture/schemas/instrument-records').InstrumentRecordsExport} The processed rows.
+   */
+  const processRecord = (record) => {
+    const instrument = instrumentsMap.get(record.instrumentId);
+    if (!instrument) {
+      throw new Error(`Instrument not found for ID: ${record.instrumentId}`);
+    }
 
-    if (!record.computedMeasures) return [];
+    if (!record.computedMeasures) {
+      return [];
+    }
 
-    //const instrument = instrumentsMap.get(record.instrumentId)!;
-    const rows: InstrumentRecordsExport = [];
+    const rows = [];
 
     for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
       if (measureValue == null) continue;
@@ -83,7 +104,7 @@ function handleChunkComplete(_data: BeginChunkProcessingData) {
           subjectSex: record.subject.sex,
           timestamp: record.date,
           username: record.session.user?.username ?? 'N/A',
-          value: measureValue as InstrumentMeasureValue
+          value: measureValue
         });
         continue;
       }
@@ -117,19 +138,27 @@ function handleChunkComplete(_data: BeginChunkProcessingData) {
 
   try {
     const results = _data.map(processRecord);
-    parentPort?.postMessage({ data: results.flat(), success: true } satisfies WorkerMessage);
+    parentPort?.postMessage({ data: results.flat(), success: true });
   } catch (error) {
-    parentPort?.postMessage({ error: (error as Error).message, success: false } satisfies WorkerMessage);
+    if (error instanceof Error) {
+      parentPort?.postMessage({ error: error.message, success: false });
+    } else {
+      parentPort?.postMessage({ error: 'Unknown Error', success: false });
+    }
   }
 }
 
-parentPort!.on('message', (message: ParentMessage) => {
+/**
+ * Worker Message Router
+ * @param {import('./thread-types').ParentMessage} message
+ */
+parentPort?.on('message', (message) => {
   switch (message.type) {
     case 'BEGIN_CHUNK_PROCESSING':
       return handleChunkComplete(message.data);
     case 'INIT':
       return handleInit(message.data);
     default:
-      throw new Error(`Unexpected message type: ${(message satisfies never as { [key: string]: any }).type}`);
+      throw new Error(`Unexpected message type: ${message.type}`);
   }
 });
