@@ -1,7 +1,19 @@
 /* eslint-disable perfectionist/sort-classes */
 
 import { CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseInterceptors
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import {
@@ -13,6 +25,7 @@ import { z } from 'zod/v4';
 
 import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { MsgpackInterceptor } from '@/core/interceptors/msgpack.interceptor';
 
 import { InstrumentRecordsService } from './instrument-records.service';
 
@@ -67,6 +80,7 @@ export class InstrumentRecordsController {
   @ApiOperation({ summary: 'Export Records' })
   @Get('export')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
+  @UseInterceptors(MsgpackInterceptor)
   exportRecords(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string) {
     return this.instrumentRecordsService.exportRecords({ groupId }, { ability });
   }
