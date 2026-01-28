@@ -45,6 +45,7 @@
     "lodash-es": "workspace:lodash-es__4.x@*",
     "lucide-react": "^0.507.0",
     "motion": "catalog:",
+    "msgpackr": "catalog:",
     "papaparse": "workspace:papaparse__5.x@*",
     "qrcode": "^1.5.4",
     "react": "workspace:react__19.x@*",
