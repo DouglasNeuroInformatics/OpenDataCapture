@@ -21,3 +21,11 @@ export function decodeBase64ToUnicode(s) {
   const bytes = Uint8Array.from(binaryString, (c) => c.charCodeAt(0));
   return new TextDecoder().decode(bytes);
 }
+
+/** @type {import('./index.d.ts').removeSubjectIdScope} */
+export function removeSubjectIdScope(id) {
+  if (id.includes('$')) {
+    return /** @type {string} */ (id.split('$')[1]);
+  }
+  return id;
+}

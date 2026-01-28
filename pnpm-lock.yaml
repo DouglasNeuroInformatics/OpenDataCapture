@@ -1106,6 +1106,9 @@ importers:
       '@douglasneuroinformatics/libcrypto':
         specifier: 'catalog:'
         version: 0.0.4
+      '@opendatacapture/runtime-internal':
+        specifier: workspace:*
+        version: link:../runtime-internal
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas

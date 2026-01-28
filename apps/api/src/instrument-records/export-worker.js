@@ -1,9 +1,19 @@
 import { parentPort } from 'worker_threads';
 
-import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
-
 /** @type {typeof import('@opendatacapture/schemas/core').DEFAULT_GROUP_NAME} */
 const DEFAULT_GROUP_NAME = 'root';
+
+/** @type {typeof import( '#runtime/v1/@opendatacapture/runtime-internal/index.js').removeSubjectIdScope} */
+let removeSubjectIdScope;
+
+// we need to resolve import correctly in development
+try {
+  const runtimeInternal = await import('#runtime/v1/@opendatacapture/runtime-internal/index.js');
+  removeSubjectIdScope = runtimeInternal.removeSubjectIdScope;
+} catch {
+  const runtimeInternal = await import('@opendatacapture/runtime-v1/@opendatacapture/runtime-internal/index.js');
+  removeSubjectIdScope = runtimeInternal.removeSubjectIdScope;
+}
 
 /**
  * @typedef {Object} SuccessExpand

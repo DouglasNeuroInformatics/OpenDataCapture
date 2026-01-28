@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libcrypto": "catalog:",
+    "@opendatacapture/runtime-internal": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "transliteration": "^2.3.5"
   },
