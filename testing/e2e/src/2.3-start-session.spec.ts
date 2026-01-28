@@ -13,7 +13,8 @@ test.describe('start session', () => {
     await startSessionPage.sessionForm.waitFor({ state: 'visible' });
     const formType = startSessionPage.sessionForm.getByTestId('subjectIdentificationMethod-select-trigger');
     await formType.click();
-    await formType.getByRole('option', { name: 'Personal Information' }).click();
+
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
 
     // await startSessionPage.selectIdentificationMethod('Personal Information')
     await expect(formType).toHaveText('Personal Information');
