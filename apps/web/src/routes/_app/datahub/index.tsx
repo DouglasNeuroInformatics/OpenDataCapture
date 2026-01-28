@@ -10,6 +10,7 @@ import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 import { UserSearchIcon } from 'lucide-react';
+import { unpack } from 'msgpackr/unpack';
 import { unparse } from 'papaparse';
 
 import { IdentificationForm } from '@/components/IdentificationForm';
@@ -50,12 +51,13 @@ const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
   };
 
   const getExportRecords = async () => {
-    const response = await axios.get<InstrumentRecordsExport>('/v1/instrument-records/export', {
+    const response = await axios.get<ArrayBuffer>('/v1/instrument-records/export', {
       params: {
         groupId: currentGroup?.id
-      }
+      },
+      responseType: 'arraybuffer'
     });
-    return response.data;
+    return unpack(new Uint8Array(response.data)) as InstrumentRecordsExport;
   };
 
   const handleExportSelection = (option: 'CSV' | 'Excel' | 'JSON') => {

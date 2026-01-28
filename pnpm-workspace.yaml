@@ -20,6 +20,7 @@ catalog:
   esbuild: '0.23.x'
   esbuild-wasm: '0.23.x'
   happy-dom: '^20.0.2'
+  msgpackr: ^1.11.8
   motion: '11.15.0'
   neverthrow: ^8.2.0
   nodemon: '^3.1.9'

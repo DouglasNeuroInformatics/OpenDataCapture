@@ -10,7 +10,7 @@ axios.defaults.baseURL = config.setup.apiBaseUrl;
 axios.interceptors.request.use((config) => {
   const accessToken = useAppStore.getState().accessToken;
 
-  config.headers.setAccept('application/json');
+  config.headers.setAccept(['application/json', 'application/x-msgpack']);
 
   // Do not set timeout for setup (can be CPU intensive, especially on slow server)
   if (

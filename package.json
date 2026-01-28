@@ -87,6 +87,7 @@
       "@tailwindcss/oxide",
       "esbuild",
       "mongodb-memory-server",
+      "msgpackr-extract",
       "msw",
       "oxc-resolver",
       "prisma",
