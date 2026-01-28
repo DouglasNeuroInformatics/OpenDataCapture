@@ -17,7 +17,6 @@ import { PageHeader } from '@/components/PageHeader';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
-import { promise } from 'zod';
 
 type MasterDataTableProps = {
   data: Subject[];
