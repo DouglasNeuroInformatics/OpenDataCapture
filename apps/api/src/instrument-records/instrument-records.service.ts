@@ -132,7 +132,10 @@ export class InstrumentRecordsService {
     return this.instrumentRecordModel.exists(where);
   }
 
-  async exportRecords({ groupId }: { groupId?: string } = {}, { ability }: Required<EntityOperationOptions>) {
+  async exportRecords(
+    { groupId }: { groupId?: string } = {},
+    { ability }: Required<EntityOperationOptions>
+  ): Promise<InstrumentRecordsExport> {
     const records = await this.queryRecordsRaw(ability, groupId);
 
     const instrumentIds = new Set(records.map((r) => r.instrumentId));
