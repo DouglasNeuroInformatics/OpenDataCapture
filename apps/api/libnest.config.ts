@@ -33,6 +33,10 @@ const config = defineUserConfig({
       await fs.cp(path.join(runtimeV1Dir, 'dist'), path.join(import.meta.dirname, 'dist/runtime/v1'), {
         recursive: true
       });
+      await fs.cp(
+        path.join(import.meta.dirname, 'src/instrument-records/export-worker.js'),
+        path.join(import.meta.dirname, 'dist/export-worker.js')
+      );
     },
     outfile: path.resolve(import.meta.dirname, 'dist/app.js')
   },
