@@ -60,6 +60,17 @@ const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
 
   const handleExportSelection = (option: 'CSV' | 'Excel' | 'JSON') => {
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
+    addNotification({
+      message: t({
+        en: 'Exporting entries, please wait...',
+        fr: 'Téléchargement des entrées, veuillez patienter...'
+      }),
+      type: 'info'
+    });
+    const waitTime = new Promise((resolve) => {
+      setTimeout(resolve, 350);
+    });
+
     getExportRecords()
       .then((data): any => {
         const listedSubjects = table
@@ -74,14 +85,6 @@ const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
           );
         }
 
-        addNotification({
-          message: t({
-            en: 'Exporting entries, please wait...',
-            fr: 'Téléchargement des entrées, veuillez patienter...'
-          }),
-          type: 'info'
-        });
-
         switch (option) {
           case 'CSV':
             void download('README.txt', t('datahub.index.table.exportHelpText'));
@@ -92,6 +95,9 @@ const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
           case 'JSON':
             return download(`${baseFilename}.json`, JSON.stringify(filteredData, null, 2));
         }
+      })
+      .then(() => {
+        return waitTime;
       })
       .then(() => {
         addNotification({
