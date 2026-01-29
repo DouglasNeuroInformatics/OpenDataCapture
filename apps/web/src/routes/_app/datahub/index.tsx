@@ -76,7 +76,7 @@ const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
     getExportRecords()
       .then((data): any => {
         const listedSubjects = table
-          .getRowModel()
+          .getPrePaginationRowModel()
           .rows.flatMap((row) => row.getVisibleCells().map((cell) => removeSubjectIdScope(cell.row.original.id)));
 
         const filteredData = data.filter((dataEntry) => listedSubjects.includes(dataEntry.subjectId));
