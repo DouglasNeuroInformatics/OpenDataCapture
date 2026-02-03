@@ -41,7 +41,7 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
 
   const columns = table.getAllColumns();
 
-  const dobColumn = columns.find((column) => column.id === 'date-of-birth')!;
+  const dobColumn = columns.find((column) => column.id === 'dateOfBirth')!;
   const dobFilter = dobColumn.getFilterValue() as DateFilter;
 
   const sexColumn = columns.find((column) => column.id === 'sex')!;
@@ -311,7 +311,7 @@ const MasterDataTable: React.FC<{
             id: 'subjectId'
           },
           {
-            accessorFn: (subject) => subject.dateOfBirth,
+            accessorKey: 'dateOfBirth',
             cell: (ctx) => {
               const value = ctx.getValue() as Date | null | undefined;
               return value ? toBasicISOString(value) : 'NULL';
@@ -327,8 +327,7 @@ const MasterDataTable: React.FC<{
               }
               return true;
             },
-            header: t('core.identificationData.dateOfBirth.label'),
-            id: 'date-of-birth'
+            header: t('core.identificationData.dateOfBirth.label')
           },
           {
             accessorFn: (subject) => subject.sex ?? null,
@@ -358,7 +357,7 @@ const MasterDataTable: React.FC<{
               value: ['MALE', 'FEMALE', null] satisfies SexFilter
             },
             {
-              id: 'date-of-birth',
+              id: 'dateOfBirth',
               value: {
                 allowNull: true,
                 max: null,
