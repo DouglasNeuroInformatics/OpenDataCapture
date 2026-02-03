@@ -48,11 +48,8 @@ const RouteComponent = () => {
         data={groupsQuery.data}
         rowActions={[
           {
-            label: t({
-              en: 'Manage',
-              fr: 'Gérer'
-            }),
-            onSelect: (row) => setSelectedGroup(row)
+            label: t('common.manage'),
+            onSelect: setSelectedGroup
           }
         ]}
         togglesComponent={() => (

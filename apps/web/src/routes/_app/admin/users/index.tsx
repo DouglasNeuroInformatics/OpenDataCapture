@@ -2,15 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { isAllUndefined, snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
-import {
-  Button,
-  ClientTable,
-  Dialog,
-  Form,
-  Heading,
-  SearchBar,
-  Sheet
-} from '@douglasneuroinformatics/libui/components';
+import { Button, DataTable, Dialog, Form, Heading, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
 import { $UserPermission } from '@opendatacapture/schemas/core';
@@ -24,7 +16,6 @@ import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
 import { useDeleteUserMutation } from '@/hooks/useDeleteUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
-import { useSearch } from '@/hooks/useSearch';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
@@ -276,7 +267,6 @@ const RouteComponent = () => {
   const deleteUserMutation = useDeleteUserMutation();
   const updateUserMutation = useUpdateUserMutation();
   const [selectedUser, setSelectedUser] = useState<null | User>(null);
-  const { filteredData, searchTerm, setSearchTerm } = useSearch(usersQuery.data ?? [], 'username');
 
   const [data, setData] = useState<null | UpdateUserFormInputData>(null);
 
@@ -307,34 +297,16 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <div className="mb-3 flex gap-3">
-        <SearchBar
-          className="grow"
-          data-testid="admin-users-search"
-          placeholder={t({
-            en: 'Search by Username',
-            fr: "Recherche par nom d'utilisateur"
-          })}
-          value={searchTerm}
-          onValueChange={setSearchTerm}
-        />
-        <Button variant="outline">
-          <Link to="/admin/users/create">
-            {t({
-              en: 'Add User',
-              fr: 'Ajouter un utilisateur'
-            })}
-          </Link>
-        </Button>
-      </div>
-      <ClientTable<User>
+      <DataTable
         columns={[
           {
-            field: 'username',
-            label: t('common.username')
+            accessorKey: 'username',
+            header: t('common.username')
           },
           {
-            field: ({ basePermissionLevel }) => {
+            accessorKey: 'basePermissionLevel',
+            cell: (ctx) => {
+              const basePermissionLevel = ctx.getValue() as User['basePermissionLevel'];
               if (!basePermissionLevel) {
                 return t({
                   en: 'None',
@@ -343,14 +315,27 @@ const RouteComponent = () => {
               }
               return t(`common.${snakeToCamelCase(basePermissionLevel)}`);
             },
-            label: t('common.basePermissionLevel')
+            header: t('common.basePermissionLevel')
           }
         ]}
-        data={filteredData}
+        data={usersQuery.data}
         data-testid="admin-users-table"
-        entriesPerPage={15}
-        minRows={15}
-        onEntryClick={setSelectedUser}
+        rowActions={[
+          {
+            label: t('common.manage'),
+            onSelect: setSelectedUser
+          }
+        ]}
+        togglesComponent={() => (
+          <Button variant="outline">
+            <Link to="/admin/users/create">
+              {t({
+                en: 'Add User',
+                fr: 'Ajouter un utilisateur'
+              })}
+            </Link>
+          </Button>
+        )}
       />
       <Sheet.Content className="flex flex-col p-0" data-testid="admin-user-edit-sheet">
         <Sheet.Header className="px-6 pt-6">
