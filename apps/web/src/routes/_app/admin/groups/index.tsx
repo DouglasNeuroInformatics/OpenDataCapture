@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Button, ClientTable, Heading, SearchBar, Sheet } from '@douglasneuroinformatics/libui/components';
+import { Button, DataTable, Heading, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Group } from '@opendatacapture/schemas/group';
 import { createFileRoute, Link } from '@tanstack/react-router';
@@ -8,14 +8,12 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { PageHeader } from '@/components/PageHeader';
 import { useDeleteGroupMutation } from '@/hooks/useDeleteGroupMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
-import { useSearch } from '@/hooks/useSearch';
 
 const RouteComponent = () => {
   const { t } = useTranslation();
   const groupsQuery = useGroupsQuery();
   const deleteGroupMutation = useDeleteGroupMutation();
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-  const { filteredData, searchTerm, setSearchTerm } = useSearch(groupsQuery.data ?? [], 'name');
 
   return (
     <Sheet open={Boolean(selectedGroup)} onOpenChange={() => setSelectedGroup(null)}>
@@ -27,33 +25,16 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <div className="mb-3 flex gap-3">
-        <SearchBar
-          className="grow"
-          placeholder={t({
-            en: 'Search by Group Name',
-            fr: 'Recherche par nom de groupe'
-          })}
-          value={searchTerm}
-          onValueChange={setSearchTerm}
-        />
-        <Button asChild variant="outline">
-          <Link to="/admin/groups/create">
-            {t({
-              en: 'Add Group',
-              fr: 'Ajouter un groupe'
-            })}
-          </Link>
-        </Button>
-      </div>
-      <ClientTable<Group>
+      <DataTable
         columns={[
           {
-            field: 'name',
-            label: t('common.groupName')
+            accessorKey: 'name',
+            header: t('common.groupName')
           },
           {
-            field: ({ type }) => {
+            accessorKey: 'type',
+            cell: (ctx) => {
+              const type = ctx.getValue() as Group['type'];
               if (type === 'CLINICAL') {
                 return t('common.clinical');
               } else if (type === 'RESEARCH') {
@@ -61,13 +42,26 @@ const RouteComponent = () => {
               }
               return type satisfies never;
             },
-            label: t('common.groupType')
+            header: t('common.groupType')
           }
         ]}
-        data={filteredData}
-        entriesPerPage={15}
-        minRows={15}
-        onEntryClick={setSelectedGroup}
+        data={groupsQuery.data}
+        rowActions={[
+          {
+            label: t('common.manage'),
+            onSelect: setSelectedGroup
+          }
+        ]}
+        togglesComponent={() => (
+          <Button asChild variant="outline">
+            <Link to="/admin/groups/create">
+              {t({
+                en: 'Add Group',
+                fr: 'Ajouter un groupe'
+              })}
+            </Link>
+          </Button>
+        )}
       />
       <Sheet.Content>
         <Sheet.Header>
