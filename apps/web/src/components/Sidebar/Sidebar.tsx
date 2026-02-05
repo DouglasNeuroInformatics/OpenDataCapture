@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { Button, Dialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -14,6 +16,8 @@ import { NavButton } from '../NavButton';
 import { UserDropup } from '../UserDropup';
 
 export const Sidebar = () => {
+  const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false);
+
   const navItems = useNavItems();
   const currentSession = useAppStore((store) => store.currentSession);
   const endSession = useAppStore((store) => store.endSession);
@@ -43,7 +47,7 @@ export const Sidebar = () => {
               />
             ))}
             {i === navItems.length - 1 && (
-              <Dialog>
+              <Dialog open={isEndSessionModalOpen} onOpenChange={setIsEndSessionModalOpen}>
                 <Dialog.Trigger asChild>
                   <NavButton
                     disabled={currentSession === null}
@@ -63,12 +67,19 @@ export const Sidebar = () => {
                       className="min-w-20"
                       onClick={() => {
                         endSession();
-                        void navigate({ to: '/session/start-session' });
+                        void navigate({ to: '/session/start-session' }).then(() => {
+                          setIsEndSessionModalOpen(false);
+                        });
                       }}
                     >
                       {t('core.yes')}
                     </Button>
-                    <Button className="min-w-20" variant="outline">
+                    <Button
+                      className="min-w-20"
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsEndSessionModalOpen(false)}
+                    >
                       {t('core.no')}
                     </Button>
                   </Dialog.Footer>

@@ -60,24 +60,24 @@ const RouteComponent = () => {
           <motion.div
             animate={{ opacity: 1, scale: 1 }}
             className="flex grow"
-            exit={{ opacity: 0, scale: 0 }}
-            initial={{ opacity: 0, scale: 0 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            initial={{ opacity: 0, scale: 0.5 }}
             key="modal"
+            transition={{ duration: 0.3 }}
           >
             <div className="flex grow items-center justify-center">
-              {currentSession !== null && (
-                <Card className="mx-auto block max-w-3xl border p-12 text-green-600 opacity-70 dark:text-green-300">
-                  <div className="flex flex-col items-center justify-center gap-y-10">
-                    <CheckCircle className="!size-20" />
-                    <p className="max-w-2xl text-center text-lg font-medium">
-                      {t({
-                        en: 'The current session must be ended before starting the form again.',
-                        fr: 'La session en cours doit être terminée avant de recommencer le formulaire.'
-                      })}
-                    </p>
-                  </div>
-                </Card>
-              )}
+              <Card className="mx-auto flex max-w-2xl flex-col items-center p-12 opacity-70">
+                <CheckCircle className="mb-3 !size-10 text-green-900 dark:text-green-500" />
+                <h5 className="font-semibold text-green-900 dark:text-green-500">
+                  {t({ en: 'Session Successfully Started', fr: 'Session démarrée avec succès' })}
+                </h5>
+                <p className="text-sm text-green-700 dark:text-green-300">
+                  {t({
+                    en: 'Please note that you must end the current session before completing this form again.',
+                    fr: 'Veuillez noter que vous devez mettre fin à la session en cours avant de remplir à nouveau ce formulaire.'
+                  })}
+                </p>
+              </Card>
             </div>
           </motion.div>
         )}
