@@ -38,7 +38,7 @@ const RouteComponent = () => {
   const handleSubmit: InstrumentSubmitHandler = async ({ data, instrumentId }) => {
     await axios.post('/v1/instrument-records', {
       data,
-      date: new Date(),
+      date: currentSession!.date,
       groupId: currentGroup?.id,
       instrumentId,
       sessionId: currentSession!.id,
