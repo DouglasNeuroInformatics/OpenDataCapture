@@ -16,5 +16,18 @@ test.describe('start session', () => {
 
     // Verify the selection was made
     await expect(startSessionPage.selectField).toHaveValue('PERSONAL_INFO');
+
+    // Fill the subject first name field
+    await startSessionPage.fillSessionForm('firstNameTest', 'lastNameTest');
+
+    // Verify the field was filled
+    const firstNameField = startSessionPage.sessionForm.locator('[name="subjectFirstName"]');
+    await expect(firstNameField).toHaveValue('firstNameTest');
+
+    const lastNameField = startSessionPage.sessionForm.locator('[name="subjectLastName"]');
+    await expect(lastNameField).toHaveValue('lastNameTest');
+
+    const dobField = startSessionPage.sessionForm.locator('[name="subjectDateOfBirth"]');
+    await expect(dobField).toHaveValue('01-01-1990');
   });
 });
