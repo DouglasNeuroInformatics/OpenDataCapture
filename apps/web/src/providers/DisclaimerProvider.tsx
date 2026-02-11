@@ -14,7 +14,7 @@ export const DisclaimerProvider: React.FC<{ children: React.ReactElement }> = ({
   return (
     <React.Fragment>
       {children}
-      <Dialog data-test-id="Disclaimer-dialog" open={isDisclaimerAccepted}>
+      <Dialog data-test-id="Disclaimer-dialog" open={!isDisclaimerAccepted}>
         <Dialog.Content data-test-id="Disclaimer-dialog-content" onOpenAutoFocus={(event) => event.preventDefault()}>
           <Dialog.Header>
             <Dialog.Title>
