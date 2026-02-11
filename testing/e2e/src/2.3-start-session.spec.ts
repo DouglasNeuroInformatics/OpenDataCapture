@@ -38,5 +38,14 @@ test.describe('start session', () => {
 
     const sessionDate = startSessionPage.sessionForm.locator('[name="sessionDate"]');
     await expect(sessionDate).toHaveValue('2026-01-01');
+
+    // const submitButton = startSessionPage.sessionForm.getByLabel("Submit")
+
+    // await submitButton.waitFor({state: "visible"})
+
+    // await submitButton.click()
+
+    // const submitCard = startSessionPage.sessionForm.getByTestId('card')
+    // await expect(submitCard).toBeVisible()
   });
 });
