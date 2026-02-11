@@ -15,7 +15,7 @@
     "test": "env-cmd -f ../../.env vitest"
   },
   "dependencies": {
-    "@casl/ability": "^6.7.3",
+    "@casl/ability": "^6.7.5",
     "@casl/prisma": "^1.5.1",
     "@douglasneuroinformatics/libcrypto": "catalog:",
     "@douglasneuroinformatics/libjs": "catalog:",
