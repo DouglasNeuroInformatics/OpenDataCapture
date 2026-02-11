@@ -14,8 +14,19 @@ export class StartSessionPage extends AppPage {
     this.selectField = page.locator('[name="subjectIdentificationMethod"]');
   }
 
-  async fillSessionForm(firstName: string) {
-    await this.sessionForm.getByLabel('subjectId').fill(firstName);
+  async fillSessionForm(firstName: string, lastName: string) {
+    // Wait for the subjectFirstName field to appear after selecting PERSONAL_INFO
+    const firstNameField = this.sessionForm.locator('[name="subjectFirstName"]');
+    const lastNameField = this.sessionForm.locator('[name="subjectLastName"]');
+    const dateOfBirthField = this.sessionForm.locator('[name="subjectDateOfBirth"]');
+    await firstNameField.waitFor({ state: 'visible' });
+    await firstNameField.fill(firstName);
+
+    await lastNameField.waitFor({ state: 'visible' });
+    await lastNameField.fill(lastName);
+
+    await dateOfBirthField.waitFor({ state: 'visible' });
+    await dateOfBirthField.fill('01-01-1990');
   }
 
   async selectIdentificationMethod(methodName: string) {
