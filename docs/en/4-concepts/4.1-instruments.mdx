@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-## Overview
+### Overview
 
 In Open Data Capture (ODC), an instrument is the unit of data collection: it defines _what the user sees_, _what data is produced_, and _how that data is validated_.
 
@@ -17,19 +17,19 @@ This page is organized in two halves:
 - **Instrument Model**: What an instrument is, how it narrows by `kind`, how scalar vs series instruments differ, and how schema-driven typing works.
 - **Instrument Sources and Bundling**: How multi-file instrument sources become a single executable bundle that can be stored and executed at runtime.
 
-## Instruments Are JavaScript Objects
+### Instruments Are JavaScript Objects
 
 At runtime, an instrument is a plain [JavaScript object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object). It is _not_ a class instance, and it does not require any runtime type metadata; what makes an object a valid instrument is that it matches the expected shape used by the ODC runtime and UI.
 
-## TypeScript: Compile-Time Structure (Not Runtime)
+### TypeScript: Compile-Time Structure (Not Runtime)
 
 Although instruments are plain objects at runtime, ODC uses [TypeScript](https://www.typescriptlang.org/) to provide static type checking and compile-time data-shape enforcement.
 
 The type system is designed to enforce and enable things like:
 
-- **Discriminated narrowing**: based on `kind`, the type of `content` (and other fields) narrows to the correct variant.
-- **Schema-first data typing**: the instrument output `data` type is inferred from the Zod validation schema.
-- **Localization shaping**: based on `language`, UI-facing values become either a plain value or a per-language mapping.
+- **Discriminated Narrowing**: Based on `kind`, the type of `content` (and other fields) narrows to the correct variant.
+- **Schema-Inferred Data Typing**: The instrument output `data` type is inferred from the Zod validation schema.
+- **Localization Shaping**: Based on `language`, UI-facing values become either a single value or a per-language mapping.
 
 These rules are implemented using TypeScript features such as:
 
@@ -38,7 +38,7 @@ These rules are implemented using TypeScript features such as:
 
 It is important to understand that **TypeScript types do not exist at runtime**. Their role is to help authors and maintainers catch mistakes early.
 
-## Public Runtime API
+### Public Runtime API
 
 In the runtime environment, users typically define instruments by importing helper functions from the runtime v1 entrypoint:
 
@@ -46,18 +46,18 @@ In the runtime environment, users typically define instruments by importing help
 import { defineInstrument, defineSeriesInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 ```
 
-Instruments can also import approved third-party libraries from the runtime. For example, all instruments must define a validation schema using Zod:
+Instruments can also import approved third-party libraries from the runtime. For example, scalar instruments (`FORM` and `INTERACTIVE`) define a validation schema using Zod:
 
 ```ts
 import { z } from '/runtime/v1/zod@3.x';
 ```
 
-Although an instrument can be technically be defined without these helpers, `defineInstrument` and `defineSeriesInstrument` are intentionally designed to make the type system usable in practice:
+Although an instrument can technically be defined without these helpers, `defineInstrument` and `defineSeriesInstrument` are intentionally designed to make the type system usable in practice:
 
-- they set internal, runtime-controlled fields (like the runtime version marker)
-- they make TypeScript inference flow in the right direction to provide a better developer experience
+- They set internal, runtime-controlled fields (like the runtime version marker)
+- They make TypeScript inference flow in the right direction to provide a better developer experience
 
-## Mental Model: "Instrument" Is a Discriminated Family
+### Mental Model: "Instrument" Is a Discriminated Family
 
 At the highest level, an `Instrument` is not one shape: it is a _family_ of shapes that share a common envelope and then diverge based on a discriminator.
 
@@ -71,7 +71,7 @@ There is also a higher-level split:
 - **Scalar instruments**: "completable" instruments that produce a single output payload, validated by a schema.
 - **Series instruments**: "compositional" instruments that reference multiple scalar instruments by identity.
 
-### The Base Instrument
+#### The Base Instrument
 
 Every instrument, regardless of kind, carries:
 
@@ -111,7 +111,7 @@ type BaseInstrument = {
 
 The important point is not the exact properties; it is that the system is deliberately set up so that _once `kind` is known_, everything downstream becomes more specific.
 
-### How Narrowing Works: `kind` Drives Shape
+#### How Narrowing Works: `kind` Drives Shape
 
 The type system is built around the idea:
 
@@ -122,7 +122,7 @@ The type system is built around the idea:
 Therefore, in the codebase, consumers can narrow the type of `Instrument` based on `kind`:
 
 ```ts
-import type { AnyInstrument } from '/runtime/v1/@opendatacapture/runtime-core/index.js';
+import type { AnyInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 
 export function handleInstrument(instrument: AnyInstrument) {
   switch (instrument.kind) {
@@ -141,7 +141,7 @@ export function handleInstrument(instrument: AnyInstrument) {
 
 The benefit is that the type system becomes _predictable_ for both authors and consumers: `kind` selects the variant, and TypeScript follows.
 
-### Scalar vs Series Instruments
+#### Scalar vs Series Instruments
 
 Scalar instruments are those that can be completed. They:
 
@@ -155,7 +155,7 @@ Series instruments are orchestration containers. They:
 - `content` is an ordered list of scalar instrument identities (the same `{ edition, name }` shape used by scalar `internal`)
 - do not define `validationSchema`, `measures`, or `internal` (they are not directly completed)
 
-#### Quick Comparison
+##### Quick Comparison
 
 | Capability                     | Scalar (`FORM` / `INTERACTIVE`) | Series (`SERIES`) |
 | ------------------------------ | ------------------------------- | ----------------- |
@@ -165,7 +165,7 @@ Series instruments are orchestration containers. They:
 | Can define `measures`          | Yes                             | No                |
 | `content` describes UI         | Yes                             | No                |
 
-## Where "Data" Comes From: Schema as the Source of Truth
+### Where "Data" Comes From: Schema as the Source of Truth
 
 A central design rule is:
 
@@ -192,7 +192,7 @@ This accomplishes two things:
 1. Runtime validation and compile-time typing stay aligned by construction.
 2. Everything that depends on `TData` (measures, form field typing, etc.) becomes automatically type-safe.
 
-## Localization Model: One Rule Used Everywhere
+### Localization Model: One Rule Used Everywhere
 
 ODC supports unilingual and multilingual instruments. The instrument's `language` value selects the mode:
 
@@ -220,9 +220,9 @@ InstrumentUIOption<TLanguage, TValue> =
 
 The practical implication is that changing `language` changes the required structure of many fields.
 
-## Instruments by Kind (Narrowed View)
+### Instruments by Kind (Narrowed View)
 
-### FORM: Declarative Form Instruments
+#### FORM: Declarative Form Instruments
 
 Form instruments are scalar instruments whose `content` is a declarative description of fields. The key design is "data drives UI":
 
@@ -251,7 +251,7 @@ The type system uses the output data type to ensure:
 
 This is a compile-time guarantee that the form authoring surface stays consistent with the instrument's output.
 
-### INTERACTIVE: Imperative Interactive Instruments
+#### INTERACTIVE: Imperative Interactive Instruments
 
 Interactive instruments are scalar instruments whose `content` is code-driven rather than declarative.
 
@@ -272,7 +272,7 @@ Interactive content may also provide:
 - `staticAssets` (key/value asset map)
 - a restricted head injection surface for legacy script/style (`__injectHead`)
 
-### SERIES: Instrument Orchestration
+#### SERIES: Instrument Orchestration
 
 Series instruments are not scalar. Their job is to _refer_ to scalar instruments, not define output themselves.
 
@@ -288,7 +288,7 @@ The type system keeps the distinction sharp:
 - series `content` is references, not executable UI
 - series has no schema/measures/internal identity
 
-## Measures: Derived Values From Scalar Output
+### Measures: Derived Values From Scalar Output
 
 Scalar instruments can define `measures`, which are named derived values displayed/used by the system.
 
@@ -302,13 +302,13 @@ There are two measure modes:
 
 Measures are also localized via the same language rule (measure labels are single strings or per-language maps depending on `language`).
 
-## Authoring Instruments (Recommended)
+### Authoring Instruments (Recommended)
 
 It is possible to export a plain object as an Instrument (because Instruments are just JavaScript objects at runtime).
 However, most instruments should use the public helper functions because they set runtime-controlled fields and make
 TypeScript inference and narrowing work as intended.
 
-### `defineInstrument` (Scalar)
+#### `defineInstrument` (Scalar)
 
 Use `defineInstrument(...)` for `FORM` and `INTERACTIVE` instruments.
 
@@ -320,7 +320,7 @@ It is recommended because it:
 Minimal form example:
 
 ```ts
-import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core/index.js';
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
 import { z } from '/runtime/v1/zod@3.x';
 
 export default defineInstrument({
@@ -328,6 +328,10 @@ export default defineInstrument({
   language: 'en',
   tags: ['Example'],
   internal: { edition: 1, name: 'HAPPINESS_QUESTIONNAIRE' },
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['Please answer based on your current feelings.']
+  },
   content: {
     overallHappiness: {
       kind: 'number',
@@ -341,9 +345,7 @@ export default defineInstrument({
   details: {
     title: 'Happiness Questionnaire',
     description: 'A questionnaire about happiness.',
-    license: 'Apache-2.0',
-    estimatedDuration: 1,
-    instructions: ['Please answer based on your current feelings.']
+    license: 'Apache-2.0'
   },
   measures: null,
   validationSchema: z.object({
@@ -363,6 +365,10 @@ export default defineInstrument({
   language: 'en',
   tags: ['Example'],
   internal: { edition: 1, name: 'CLICK_THE_BUTTON_TASK' },
+  clientDetails: {
+    estimatedDuration: 1,
+    instructions: ['Please click the button when you are done.']
+  },
   content: {
     render(done) {
       const start = Date.now();
@@ -379,9 +385,7 @@ export default defineInstrument({
   details: {
     title: 'Click the Button Task',
     description: 'A very simple interactive instrument.',
-    license: 'Apache-2.0',
-    estimatedDuration: 1,
-    instructions: ['Please click the button when you are done.']
+    license: 'Apache-2.0'
   },
   measures: null,
   validationSchema: z.object({
@@ -390,7 +394,7 @@ export default defineInstrument({
 });
 ```
 
-### `defineSeriesInstrument` (Series)
+#### `defineSeriesInstrument` (Series)
 
 Use `defineSeriesInstrument(...)` for `SERIES` instruments.
 
@@ -415,7 +419,7 @@ export default defineSeriesInstrument({
 });
 ```
 
-## Repo-Only Constraint: License Narrowing
+### Repo-Only Constraint: License Narrowing
 
 When this package is compiled inside the ODC repo, a global type (`OpenDataCaptureContext`) marks `isRepo: true`, and the definition type is intersected with an extra requirement:
 
@@ -424,7 +428,7 @@ When this package is compiled inside the ODC repo, a global type (`OpenDataCaptu
 
 This is a type-level policy hook: it changes authoring constraints without changing runtime behavior. If you are authoring instruments in the instrument playground for your own instance, this will not affect you.
 
-## Instrument Sources: Why Instruments Are Bundled
+### Instrument Sources: Why Instruments Are Bundled
 
 A single-file instrument source (like the examples above) is the simplest case, but many instruments are multi-file:
 
@@ -438,7 +442,7 @@ If instruments were defined directly in the Open Data Capture codebase, adding o
 
 To avoid that, ODC treats "instrument sources" as the authoring units (a set of source files), and a bundling pipeline turns those sources into a single executable artifact.
 
-## Instrument Bundler
+### Instrument Bundler
 
 Although we often talk about files, the instrument bundler is platform-agnostic and does not require a filesystem.
 
@@ -462,7 +466,7 @@ Once found, the bundler injects a tiny entry module into esbuild. For example, i
 The effect is that the instrument's default export becomes available under a known name (`__exports`) in the bundle.
 
 Our custom plugin assumes responsibility for resolving all imports found. In this case, we resolve the static
-relative import `'./index.js` which exists in the inputs. We then return the content of the index input to
+relative import `'./index.js'` which exists in the inputs. We then return the content of the index input to
 esbuild for further processing. In this case, esbuild will look for imports in the content of the index,
 and pass any results to our resolver. The resolver marks all HTTP imports as external (e.g., `import React from '/runtime/v1/react@18.x'`).
 It looks for any static imports inside the inputs and throws an exception if it is not found. If it is found,
@@ -487,24 +491,21 @@ before the `render` method is called.
 
 This new content is then passed into the esbuild transpiler as a
 single asynchronous [Immediately Invoked Function Expression](https://developer.mozilla.org/en-US/docs/Glossary/IIFE)
-that resolves to a [Promise](https://developer.mozilla.org/en-US/docs/Web/J) of an `Instrument`. This output
+that resolves to a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) of an `Instrument`. This output
 conforms to the [ECMAScript 2022 Language Specification](https://262.ecma-international.org/13.0/) and can be executed in any modern browser.
-At this point, the code can be minified and tree shaken (i.e., dead code removed).
+At this point, the code can be minified and tree-shaken (i.e., dead code removed).
 
 For example:
 
 ```js
-`(async () => {
+(async () => {
   // code with styles injected (if applicable)
   return __exports;
-} )()`;
+})();
 ```
 
-## Storage and Execution
+### Storage and Execution
 
 The final bundle output is stored in the database.
 
 At runtime, it can be evaluated in the global scope (using indirect `eval` or the `Function` constructor) to produce a Promise of an Instrument object, which the runtime can then render/execute.
-
-This bundle is then stored in the database. It can be evaluated in the global scope
-(using indirect eval or the `Function` constructor) at runtime.
