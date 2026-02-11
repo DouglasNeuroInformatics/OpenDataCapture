@@ -57,8 +57,14 @@ export const test = base.extend<TestArgs, WorkerArgs>({
     async ({ getProjectMetadata }, use) => {
       return use(async () => {
         const authStorageFile = getProjectMetadata('authStorageFile');
+        // Wait for auth file to exist with timeout
+        let attempts = 0;
+        while (!fs.existsSync(authStorageFile) && attempts < 50) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          attempts++;
+        }
         if (!fs.existsSync(authStorageFile)) {
-          throw new Error(`Cannot get project auth: storage file does not exist: ${authStorageFile}`);
+          throw new Error(`Cannot get project auth: storage file does not exist after waiting: ${authStorageFile}`);
         }
         return JSON.parse(await fs.promises.readFile(authStorageFile, 'utf8')) as ProjectAuth;
       });
