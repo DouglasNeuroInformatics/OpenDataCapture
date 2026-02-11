@@ -20,6 +20,9 @@ export class StartSessionPage extends AppPage {
     const lastNameField = this.sessionForm.locator('[name="subjectLastName"]');
     const dateOfBirthField = this.sessionForm.locator('[name="subjectDateOfBirth"]');
     const sexSelector = this.sessionForm.locator('[name="subjectSex"]');
+    const sessionTypeSelector = this.sessionForm.locator('[name="sessionType"]');
+    const sessionDate = this.sessionForm.locator('[name="sessionDate"]');
+
     await firstNameField.waitFor({ state: 'visible' });
     await firstNameField.fill(firstName);
 
@@ -27,9 +30,14 @@ export class StartSessionPage extends AppPage {
     await lastNameField.fill(lastName);
 
     await dateOfBirthField.waitFor({ state: 'visible' });
-    await dateOfBirthField.fill('01-01-1990');
+    await dateOfBirthField.fill('1990-01-01');
 
     await sexSelector.selectOption(sex);
+
+    await sessionTypeSelector.selectOption('Retrospective');
+
+    await sessionDate.waitFor({ state: 'visible' });
+    await sessionDate.fill('2026-01-01');
   }
 
   async selectIdentificationMethod(methodName: string) {
