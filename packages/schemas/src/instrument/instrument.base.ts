@@ -1,4 +1,4 @@
-import { $AnyFunction, isUnique, isZodType } from '@douglasneuroinformatics/libjs';
+import { isUnique, isZodType } from '@douglasneuroinformatics/libjs';
 import type {
   BaseInstrument,
   ClientInstrumentDetails,
@@ -24,21 +24,43 @@ import { $Language, $LicenseIdentifier } from '../core/core.js';
 
 import type { Language } from '../core/core.js';
 
+const $AnyDynamicFunction: z.ZodType<(...args: any[]) => any> = z
+  .any()
+  .refine((arg) => typeof arg === 'function', 'must be function');
+
 const $InstrumentKind = z.enum(['FORM', 'INTERACTIVE', 'SERIES']) satisfies z.ZodType<InstrumentKind>;
 
-const $InstrumentLanguage = z.union([
-  $Language,
-  z
-    .array($Language)
-    .nonempty()
-    .refine((arr) => isUnique(arr), {
-      message: 'Array must contain unique values'
-    })
-]) satisfies z.ZodType<InstrumentLanguage>;
+const $$InstrumentLanguage = <const TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
+  let resolvedSchema: z.ZodTypeAny = z.never();
+  if (typeof language === 'string') {
+    resolvedSchema = z.literal(language as Extract<TLanguage, string>) satisfies z.ZodType<TLanguage>;
+  } else if (Array.isArray(language)) {
+    resolvedSchema = z
+      .array(z.enum(language))
+      .nonempty()
+      .refine((arr) => isUnique(arr), {
+        message: 'Array must contain unique values'
+      });
+  } else if (typeof language === 'undefined') {
+    resolvedSchema = z.union([
+      $Language,
+      z
+        .array($Language)
+        .nonempty()
+        .refine((arr) => isUnique(arr), {
+          message: 'Array must contain unique values'
+        })
+    ]) satisfies z.ZodType<InstrumentLanguage>;
+  }
+  return resolvedSchema as z.ZodType<TLanguage>;
+};
 
-const $InstrumentValidationSchema = z.custom<InstrumentValidationSchema>((arg) => {
+const $InstrumentLanguage = $$InstrumentLanguage() satisfies z.ZodType<InstrumentLanguage>;
+
+const $InstrumentValidationSchema: z.ZodType<InstrumentValidationSchema> = z.any().refine((arg) => {
+  // we cannot use z.custom here as it is cannot be converted to JSON schema
   return isZodType(arg, { version: 3 }) || isZodType(arg, { version: 4 });
-});
+}, 'Must be ZodType');
 
 const $$InstrumentUIOption = <TSchema extends z.ZodTypeAny, TLanguage extends InstrumentLanguage>(
   $Schema: TSchema,
@@ -65,24 +87,34 @@ const $$InstrumentUIOption = <TSchema extends z.ZodTypeAny, TLanguage extends In
   return resolvedSchema as z.ZodType<InstrumentUIOption<TLanguage, z.output<TSchema>>>;
 };
 
-const $ClientInstrumentDetails = z.object({
-  estimatedDuration: z.number().int().nonnegative().optional(),
-  instructions: $$InstrumentUIOption(z.array(z.string().min(1))).optional(),
-  title: $$InstrumentUIOption(z.string().min(1)).optional()
-}) satisfies z.ZodType<ClientInstrumentDetails>;
+const $$ClientInstrumentDetails = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
+  return z.object({
+    estimatedDuration: z.number().int().nonnegative().optional(),
+    instructions: $$InstrumentUIOption(z.array(z.string().min(1)), language).optional(),
+    title: $$InstrumentUIOption(z.string().min(1), language).optional()
+  }) satisfies z.ZodType<ClientInstrumentDetails<TLanguage>>;
+};
+
+const $ClientInstrumentDetails = $$ClientInstrumentDetails() satisfies z.ZodType<ClientInstrumentDetails>;
 
 const $UnilingualClientInstrumentDetails = $ClientInstrumentDetails.extend({
   instructions: z.array(z.string().min(1)).optional(),
   title: z.string().min(1).optional()
 }) satisfies z.ZodType<UnilingualClientInstrumentDetails>;
 
-const $InstrumentDetails = $ClientInstrumentDetails.required({ title: true }).extend({
-  authors: z.array(z.string()).nullish(),
-  description: $$InstrumentUIOption(z.string().min(1)),
-  license: $LicenseIdentifier,
-  referenceUrl: z.string().url().nullish(),
-  sourceUrl: z.string().url().nullish()
-}) satisfies z.ZodType<InstrumentDetails>;
+const $$InstrumentDetails = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
+  return $$ClientInstrumentDetails(language)
+    .required({ title: true })
+    .extend({
+      authors: z.array(z.string()).nullish(),
+      description: $$InstrumentUIOption(z.string().min(1), language),
+      license: $LicenseIdentifier,
+      referenceUrl: z.string().url().nullish(),
+      sourceUrl: z.string().url().nullish()
+    }) satisfies z.ZodType<InstrumentDetails<TLanguage>>;
+};
+
+const $InstrumentDetails = $$InstrumentDetails() satisfies z.ZodType<InstrumentDetails>;
 
 const $UnilingualInstrumentDetails = $InstrumentDetails.extend({
   description: z.string().min(1),
@@ -105,28 +137,32 @@ const $InstrumentMeasureValue: z.ZodType<InstrumentMeasureValue> = z.union([
   z.undefined()
 ]);
 
-const $ComputedInstrumentMeasure = z.object({
-  hidden: z.boolean().optional(),
-  kind: z.literal('computed'),
-  label: $$InstrumentUIOption(z.string()),
-  value: $AnyFunction
-}) satisfies z.ZodType<ComputedInstrumentMeasure>;
+const $$ComputedInstrumentMeasure = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
+  return z.object({
+    hidden: z.boolean().optional(),
+    kind: z.literal('computed'),
+    label: $$InstrumentUIOption(z.string(), language),
+    value: $AnyDynamicFunction
+  }) satisfies z.ZodType<ComputedInstrumentMeasure<any, TLanguage>>;
+};
 
 const $UnilingualComputedInstrumentMeasure = z.object({
   hidden: z.boolean().optional(),
   kind: z.literal('computed'),
   label: z.string(),
-  value: $AnyFunction,
+  value: $AnyDynamicFunction,
   visibility: $InstrumentMeasureVisibility.optional()
 }) satisfies z.ZodType<ComputedInstrumentMeasure<any, Language>>;
 
-const $ConstantInstrumentMeasure = z.object({
-  hidden: z.boolean().optional(),
-  kind: z.literal('const'),
-  label: $$InstrumentUIOption(z.string()).optional(),
-  ref: z.string(),
-  visibility: $InstrumentMeasureVisibility.optional()
-}) satisfies z.ZodType<ConstantInstrumentMeasure>;
+const $$ConstantInstrumentMeasure = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
+  return z.object({
+    hidden: z.boolean().optional(),
+    kind: z.literal('const'),
+    label: $$InstrumentUIOption(z.string(), language).optional(),
+    ref: z.string(),
+    visibility: $InstrumentMeasureVisibility.optional()
+  }) satisfies z.ZodType<ConstantInstrumentMeasure<any, TLanguage>>;
+};
 
 const $UnilingualConstantInstrumentMeasure = z.object({
   hidden: z.boolean().optional(),
@@ -136,38 +172,48 @@ const $UnilingualConstantInstrumentMeasure = z.object({
   visibility: $InstrumentMeasureVisibility.optional()
 }) satisfies z.ZodType<ConstantInstrumentMeasure<any, Language>>;
 
-const $InstrumentMeasures = z.record(
-  z.string(),
-  z.discriminatedUnion('kind', [$ComputedInstrumentMeasure, $ConstantInstrumentMeasure])
-) satisfies z.ZodType<InstrumentMeasures>;
+const $$InstrumentMeasures = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
+  return z.record(
+    z.string(),
+    z.discriminatedUnion('kind', [$$ComputedInstrumentMeasure(language), $$ConstantInstrumentMeasure(language)])
+  ) satisfies z.ZodType<InstrumentMeasures<any, TLanguage>>;
+};
 
 const $UnilingualInstrumentMeasures = z.record(
   z.string(),
   z.discriminatedUnion('kind', [$UnilingualComputedInstrumentMeasure, $UnilingualConstantInstrumentMeasure])
 ) satisfies z.ZodType<UnilingualInstrumentMeasures>;
 
-const $BaseInstrument = z.object({
-  __runtimeVersion: z.literal(1),
-  clientDetails: $ClientInstrumentDetails.optional(),
-  content: z.any(),
-  details: $InstrumentDetails,
-  id: z.string().optional(),
-  kind: $InstrumentKind,
-  language: $InstrumentLanguage,
-  tags: $$InstrumentUIOption(z.array(z.string().min(1)))
-}) satisfies z.ZodType<BaseInstrument>;
+const $$BaseInstrument = <const TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
+  return z.object({
+    __runtimeVersion: z.literal(1),
+    clientDetails: $$ClientInstrumentDetails(language).optional(),
+    content: z.any(),
+    details: $$InstrumentDetails(language),
+    id: z.string().optional(),
+    kind: $InstrumentKind,
+    language: $$InstrumentLanguage(language),
+    tags: $$InstrumentUIOption(z.array(z.string().min(1)), language)
+  }) satisfies z.ZodType<BaseInstrument<TLanguage>>;
+};
+
+const $BaseInstrument = $$BaseInstrument() satisfies z.ZodType<BaseInstrument>;
 
 const $ScalarInstrumentInternal = z.object({
   edition: z.number().int().positive(),
   name: z.string().min(1)
 });
 
-const $ScalarInstrument = $BaseInstrument.extend({
-  defaultMeasureVisibility: $InstrumentMeasureVisibility.optional(),
-  internal: $ScalarInstrumentInternal,
-  measures: $InstrumentMeasures.nullable(),
-  validationSchema: $InstrumentValidationSchema
-}) satisfies z.ZodType<ScalarInstrument>;
+const $$ScalarInstrument = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
+  return $$BaseInstrument(language).extend({
+    defaultMeasureVisibility: $InstrumentMeasureVisibility.optional(),
+    internal: $ScalarInstrumentInternal,
+    measures: $$InstrumentMeasures(language).nullable(),
+    validationSchema: $InstrumentValidationSchema
+  }) satisfies z.ZodType<ScalarInstrument<any, TLanguage>>;
+};
+
+const $ScalarInstrument = $$ScalarInstrument() satisfies z.ZodType<ScalarInstrument>;
 
 const $UnilingualScalarInstrument = $ScalarInstrument.extend({
   clientDetails: $UnilingualClientInstrumentDetails.optional(),
@@ -235,7 +281,11 @@ const $InstrumentBundleContainer: z.ZodType<InstrumentBundleContainer> = z.discr
 ]);
 
 export {
+  $$BaseInstrument,
+  $$InstrumentDetails,
   $$InstrumentUIOption,
+  $$ScalarInstrument,
+  $AnyDynamicFunction,
   $BaseInstrument,
   $ClientInstrumentDetails,
   $CreateInstrumentData,

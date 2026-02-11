@@ -1,0 +1,12 @@
+---
+title: Instrument Schemas (JSON)
+slug: en/docs/reference/instrument-schemas
+sidebar:
+  order: 9
+---
+
+import InstrumentSchemas from '@/components/docs/InstrumentSchemas.astro';
+
+While ODC primarily uses Zod for instrument schemas, we provide JSON Schema versions for reference and interoperability with non-TypeScript tools. While these schemas are technically accurate, certain properties that cannot be represented in JSON (such as functions) will default to accepting any value. These versions can be used for building static forms or external integrations. You can find the available schemas for all instrument types and languages below.
+
+<InstrumentSchemas />

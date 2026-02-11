@@ -1,0 +1,17 @@
+---
+import { getSchemaProps } from '@/lib/instrument-schemas';
+
+const schemaProps = getSchemaProps();
+---
+
+<ul>
+  {
+    schemaProps.map(({ meta, params }) => (
+      <li>
+        <a download href={`/resources/schemas/${params.kind}-instrument-${params.lang}.json`}>
+          {meta.displayName}
+        </a>
+      </li>
+    ))
+  }
+</ul>

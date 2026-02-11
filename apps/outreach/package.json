@@ -18,7 +18,8 @@
     "lodash-es": "workspace:lodash-es__4.x@*",
     "mdast-util-to-string": "^4.0.0",
     "reading-time": "^1.5.0",
-    "tailwind-merge": "^2.6.0"
+    "tailwind-merge": "^2.6.0",
+    "zod": "workspace:zod__3.x@*"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
