@@ -28,9 +28,15 @@ test.describe('start session', () => {
     await expect(lastNameField).toHaveValue('lastNameTest');
 
     const dobField = startSessionPage.sessionForm.locator('[name="subjectDateOfBirth"]');
-    await expect(dobField).toHaveValue('01-01-1990');
+    await expect(dobField).toHaveValue('1990-01-01');
 
     const sexField = startSessionPage.sessionForm.locator('[name="subjectSex"]');
     await expect(sexField).toHaveValue('MALE');
+
+    const sessionTypeSelector = startSessionPage.sessionForm.locator('[name="sessionType"]');
+    await expect(sessionTypeSelector).toHaveValue('RETROSPECTIVE');
+
+    const sessionDate = startSessionPage.sessionForm.locator('[name="sessionDate"]');
+    await expect(sessionDate).toHaveValue('2026-01-01');
   });
 });
