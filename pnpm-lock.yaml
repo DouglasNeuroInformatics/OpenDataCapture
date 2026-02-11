@@ -196,11 +196,11 @@ importers:
   apps/api:
     dependencies:
       '@casl/ability':
-        specifier: ^6.7.3
-        version: 6.7.3
+        specifier: ^6.7.5
+        version: 6.8.0
       '@casl/prisma':
         specifier: ^1.5.1
-        version: 1.5.1(@casl/ability@6.7.3)(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.6.3))(typescript@5.6.3))
+        version: 1.5.1(@casl/ability@6.8.0)(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.6.3))(typescript@5.6.3))
       '@douglasneuroinformatics/libcrypto':
         specifier: 'catalog:'
         version: 0.0.4
@@ -1571,8 +1571,8 @@ importers:
   vendor/lodash-es@4.x:
     dependencies:
       lodash-es:
-        specifier: 4.17.21
-        version: 4.17.21
+        specifier: 4.17.23
+        version: 4.17.23
 
   vendor/normalize.css@8.x:
     dependencies:
@@ -1912,6 +1912,9 @@ packages:
 
   '@casl/ability@6.7.3':
     resolution: {integrity: sha512-A4L28Ko+phJAsTDhRjzCOZWECQWN2jzZnJPnROWWHjJpyMq1h7h9ZqjwS2WbIUa3Z474X1ZPSgW0f1PboZGC0A==}
+
+  '@casl/ability@6.8.0':
+    resolution: {integrity: sha512-Ipt4mzI4gSgnomFdaPjaLgY2MWuXqAEZLrU6qqWBB7khGiBBuuEp6ytYDnq09bRXqcjaeeHiaCvCGFbBA2SpvA==}
 
   '@casl/prisma@1.5.1':
     resolution: {integrity: sha512-SkR0LaBSLVA0aXiYwFDTXIzfQgovpJHr7sXneuKkaw44dlFe0MwtpCMjZs7aCSIJK4SP1yGnHQcKFY7briMf9A==}
@@ -5494,8 +5497,14 @@ packages:
   '@ucast/js@3.0.4':
     resolution: {integrity: sha512-TgG1aIaCMdcaEyckOZKQozn1hazE0w90SVdlpIJ/er8xVumE11gYAtSbw/LBeUnA4fFnFWTcw3t6reqseeH/4Q==}
 
+  '@ucast/js@3.1.0':
+    resolution: {integrity: sha512-eJ7yQeYtMK85UZjxoxBEbTWx6UMxEXKbjVyp+NlzrT5oMKV5Gpo/9bjTl3r7msaXTVC8iD9NJacqJ8yp7joX+Q==}
+
   '@ucast/mongo2js@1.4.0':
     resolution: {integrity: sha512-vR9RJ3BHlkI3RfKJIZFdVktxWvBCQRiSTeJSWN9NPxP5YJkpfXvcBWAMLwvyJx4HbB+qib5/AlSDEmQiuQyx2w==}
+
+  '@ucast/mongo2js@1.4.1':
+    resolution: {integrity: sha512-9aeg5cmqwRQnKCXHN6I17wk83Rcm487bHelaG8T4vfpWneAI469wSI3Srnbu+PuZ5znWRbnwtVq9RgPL+bN6CA==}
 
   '@ucast/mongo@2.4.3':
     resolution: {integrity: sha512-XcI8LclrHWP83H+7H2anGCEeDq0n+12FU2mXCTz6/Tva9/9ddK/iacvvhCyW6cijAAOILmt0tWplRyRhVyZLsA==}
@@ -8328,8 +8337,8 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
-  lodash-es@4.17.21:
-    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+  lodash-es@4.17.23:
+    resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
 
   lodash.castarray@4.4.0:
     resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
@@ -11981,9 +11990,20 @@ snapshots:
     dependencies:
       '@ucast/mongo2js': 1.4.0
 
+  '@casl/ability@6.8.0':
+    dependencies:
+      '@ucast/mongo2js': 1.4.1
+
   '@casl/prisma@1.5.1(@casl/ability@6.7.3)(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.6.3))(typescript@5.6.3))':
     dependencies:
       '@casl/ability': 6.7.3
+      '@prisma/client': 6.11.1(prisma@6.11.1(typescript@5.6.3))(typescript@5.6.3)
+      '@ucast/core': 1.10.2
+      '@ucast/js': 3.0.4
+
+  '@casl/prisma@1.5.1(@casl/ability@6.8.0)(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.6.3))(typescript@5.6.3))':
+    dependencies:
+      '@casl/ability': 6.8.0
       '@prisma/client': 6.11.1(prisma@6.11.1(typescript@5.6.3))(typescript@5.6.3)
       '@ucast/core': 1.10.2
       '@ucast/js': 3.0.4
@@ -12198,7 +12218,7 @@ snapshots:
       '@tanstack/table-core': 8.21.3
       class-variance-authority: 0.7.1
       clsx: 2.1.1
-      lodash-es: 4.17.21
+      lodash-es: 4.17.23
       lucide-react: 0.486.0(react@19.1.0)
       motion: 11.18.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
@@ -12253,7 +12273,7 @@ snapshots:
       '@tanstack/table-core': 8.21.3
       class-variance-authority: 0.7.1
       clsx: 2.1.1
-      lodash-es: 4.17.21
+      lodash-es: 4.17.23
       lucide-react: 0.486.0(react@vendor+react@19.x)
       motion: 11.18.2(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
       react: link:vendor/react@19.x
@@ -15817,10 +15837,20 @@ snapshots:
     dependencies:
       '@ucast/core': 1.10.2
 
+  '@ucast/js@3.1.0':
+    dependencies:
+      '@ucast/core': 1.10.2
+
   '@ucast/mongo2js@1.4.0':
     dependencies:
       '@ucast/core': 1.10.2
       '@ucast/js': 3.0.4
+      '@ucast/mongo': 2.4.3
+
+  '@ucast/mongo2js@1.4.1':
+    dependencies:
+      '@ucast/core': 1.10.2
+      '@ucast/js': 3.1.0
       '@ucast/mongo': 2.4.3
 
   '@ucast/mongo@2.4.3':
@@ -19408,7 +19438,7 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  lodash-es@4.17.21: {}
+  lodash-es@4.17.23: {}
 
   lodash.castarray@4.4.0: {}
 
