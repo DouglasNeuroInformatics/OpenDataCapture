@@ -56,7 +56,7 @@ Try out Open Data Capture without installation at [demo.opendatacapture.org](htt
 
 | Username          | Group(s)                                | Role           |
 | ----------------- | --------------------------------------- | -------------- |
-| JaneDoe           | Depression Clinic<br/>Psychosis Lab     | Group Manager  |
+| JaneDoe           | Depression Clinic, Psychosis Lab        | Group Manager  |
 | JohnSmith         | Depression Clinic                       | Group Manager  |
 | FrançoisBouchard  | Psychosis Lab                           | Standard       |
 
