@@ -43,4 +43,13 @@ export class StartSessionPage extends AppPage {
   async selectIdentificationMethod(methodName: string) {
     await this.selectField.selectOption(methodName);
   }
+
+  async submitForm() {
+    const submitButton = this.sessionForm.getByLabel('Submit');
+
+    await submitButton.waitFor({ state: 'visible' });
+
+    // Use force: true to bypass overlay interception
+    await submitButton.click({ force: true });
+  }
 }
