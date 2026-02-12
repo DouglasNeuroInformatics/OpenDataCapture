@@ -14,8 +14,8 @@ export const DisclaimerProvider: React.FC<{ children: React.ReactElement }> = ({
   return (
     <React.Fragment>
       {children}
-      <Dialog open={!isDisclaimerAccepted}>
-        <Dialog.Content onOpenAutoFocus={(event) => event.preventDefault()}>
+      <Dialog data-test-id="Disclaimer-dialog" open={!isDisclaimerAccepted}>
+        <Dialog.Content data-test-id="Disclaimer-dialog-content" onOpenAutoFocus={(event) => event.preventDefault()}>
           <Dialog.Header>
             <Dialog.Title>
               {t({
@@ -31,10 +31,10 @@ export const DisclaimerProvider: React.FC<{ children: React.ReactElement }> = ({
             </Dialog.Description>
           </Dialog.Header>
           <Dialog.Footer>
-            <Button type="button" onClick={() => setIsDisclaimerAccepted(true)}>
+            <Button data-test-id="accept-disclaimer" type="button" onClick={() => setIsDisclaimerAccepted(true)}>
               {t({ en: 'Accept', fr: 'Accepter' })}
             </Button>
-            <Button type="button" variant="outline" onClick={logout}>
+            <Button data-test-id="decline-disclaimer" type="button" variant="outline" onClick={logout}>
               {t({ en: 'Decline', fr: 'Refuser' })}
             </Button>
           </Dialog.Footer>
