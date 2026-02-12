@@ -50,6 +50,18 @@ Open Data Capture is a web-based platform designed for continuous clinical data 
 - **Beautiful data visualization** 📈
 - **On-demand data export** for research integration 🔬
 
+## Demo
+
+Try out Open Data Capture without installation at [demo.opendatacapture.org](https://demo.opendatacapture.org). This demo includes a number of publicly-available instruments along with several months of simulated data. To access the platform, please select a user from the options below:
+
+| Username          | Group(s)                                | Role           |
+| ----------------- | --------------------------------------- | -------------- |
+| JaneDoe           | Depression Clinic<br/>Psychosis Lab     | Group Manager  |
+| JohnSmith         | Depression Clinic                       | Group Manager  |
+| FrançoisBouchard  | Psychosis Lab                           | Standard       |
+
+> **Note:** All data in the demo instance is fake and generated for testing purposes only.
+
 ## Quick Start
 
 Assuming that Docker and Docker Compose are already installed on your system, you can deploy an instance of Open Data Capture using the following command:
