@@ -8,7 +8,7 @@ test.describe('start session', () => {
     expect(startSessionPage.sessionForm).toBeDefined();
   });
 
-  test('should fill subject identification input', async ({ getPageModel, page }) => {
+  test('should fill subject personal information input', async ({ getPageModel, page }) => {
     await page.addInitScript(() => {
       localStorage.setItem(
         'app',
@@ -39,6 +39,42 @@ test.describe('start session', () => {
 
     const sexField = startSessionPage.sessionForm.locator('[name="subjectSex"]');
     await expect(sexField).toHaveValue('MALE');
+
+    const sessionTypeSelector = startSessionPage.sessionForm.locator('[name="sessionType"]');
+    await expect(sessionTypeSelector).toHaveValue('RETROSPECTIVE');
+
+    const sessionDate = startSessionPage.sessionForm.locator('[name="sessionDate"]');
+    await expect(sessionDate).toHaveValue('2026-01-01');
+
+    await startSessionPage.submitForm();
+
+    await expect(startSessionPage.successMessage).toBeVisible();
+  });
+});
+
+test.describe('start session', () => {
+  test('should fill custom identifier input', async ({ getPageModel, page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'app',
+        JSON.stringify({ state: { isDisclaimerAccepted: true, isWalkthroughComplete: true }, version: 1 })
+      );
+    });
+
+    const startSessionPage = await getPageModel('/session/start-session');
+
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+
+    // Verify the selection was made
+    await expect(startSessionPage.selectField).toHaveValue('CUSTOM_ID');
+
+    // Fill the subject first name field
+    await startSessionPage.fillCustomIdentifier('customIdentifierTest', 'Male');
+
+    // Verify the field was filled
+    const subjectIdField = startSessionPage.sessionForm.locator('[name="subjectId"]');
+    await expect(subjectIdField).toHaveValue('customIdentifierTest');
 
     const sessionTypeSelector = startSessionPage.sessionForm.locator('[name="sessionType"]');
     await expect(sessionTypeSelector).toHaveValue('RETROSPECTIVE');
