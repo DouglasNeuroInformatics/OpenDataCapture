@@ -81,7 +81,7 @@ export default defineConfig({
       },
       stderr: 'pipe',
       stdout: process.env.CI ? 'pipe' : 'ignore',
-      timeout: 10_000,
+      timeout: 5_000,
       url: `http://localhost:${apiPort}/v1/setup`
     },
     {
@@ -93,7 +93,7 @@ export default defineConfig({
       },
       stderr: 'pipe',
       stdout: process.env.CI ? 'pipe' : 'ignore',
-      timeout: 10_000,
+      timeout: 5_000,
       url: `http://localhost:${gatewayPort}/api/healthcheck`
     },
     {
@@ -105,7 +105,7 @@ export default defineConfig({
       },
       stderr: 'pipe',
       stdout: process.env.CI ? 'pipe' : 'ignore',
-      timeout: 10_000,
+      timeout: 5_000,
       url: `http://localhost:${webPort}`
     }
   ],
