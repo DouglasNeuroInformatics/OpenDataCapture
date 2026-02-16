@@ -3,5 +3,5 @@
   "compilerOptions": {
     "lib": ["DOM"]
   },
-  "include": ["src/**/*", "playwright.config.ts"]
+  "include": ["src/**/*", "playwright.config.ts", "playwright.docker.config.ts"]
 }

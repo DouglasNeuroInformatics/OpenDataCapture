@@ -9,8 +9,6 @@ import { AUTH_STORAGE_DIR } from './src/helpers/constants';
 
 import type { BrowserTarget, ProjectMetadata } from './src/helpers/types';
 
-console.log(process.env.APP_PORT);
-
 const appPort = parseNumber(process.env.APP_PORT);
 const gatewayPort = parseNumber(process.env.GATEWAY_PORT);
 
@@ -73,18 +71,18 @@ export default defineConfig({
   webServer: [
     {
       command: 'true', // Dummy command since services are assumed running in Docker
-      url: `http://localhost:${appPort}/api/v1/setup`,
-      timeout: 10_000
+      timeout: 10_000,
+      url: `http://localhost:${appPort}/api/v1/setup`
     },
     {
       command: 'true', // Dummy command since services are assumed running in Docker
-      url: `http://localhost:${gatewayPort}/api/healthcheck`,
-      timeout: 10_000
+      timeout: 10_000,
+      url: `http://localhost:${gatewayPort}/api/healthcheck`
     },
     {
       command: 'true', // Dummy command since services are assumed running in Docker
-      url: `http://localhost:${appPort}`,
-      timeout: 10_000
+      timeout: 10_000,
+      url: `http://localhost:${appPort}`
     }
   ],
   workers: process.env.CI ? 1 : undefined
