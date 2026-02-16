@@ -6,12 +6,14 @@ export class StartSessionPage extends AppPage {
   readonly pageHeader: Locator;
   readonly selectField: Locator;
   readonly sessionForm: Locator;
+  readonly successMessage: Locator;
 
   constructor(page: Page) {
     super(page);
     this.pageHeader = page.getByTestId('page-header');
     this.sessionForm = page.getByTestId('start-session-form');
     this.selectField = page.locator('[name="subjectIdentificationMethod"]');
+    this.successMessage = page.getByRole('heading', { name: 'Session Successfully Started' });
   }
 
   async fillSessionForm(firstName: string, lastName: string, sex: string) {

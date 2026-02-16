@@ -8,7 +8,14 @@ test.describe('start session', () => {
     expect(startSessionPage.sessionForm).toBeDefined();
   });
 
-  test('should fill subject identification input', async ({ getPageModel }) => {
+  test('should fill subject identification input', async ({ getPageModel, page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'app',
+        JSON.stringify({ state: { isDisclaimerAccepted: true, isWalkthroughComplete: true }, version: 1 })
+      );
+    });
+
     const startSessionPage = await getPageModel('/session/start-session');
 
     await startSessionPage.sessionForm.waitFor({ state: 'visible' });
@@ -41,8 +48,6 @@ test.describe('start session', () => {
 
     await startSessionPage.submitForm();
 
-    const submitCard = startSessionPage.sessionForm.getByTestId('card');
-    expect(submitCard).toBeDefined();
-    await expect(submitCard).toBeVisible();
+    await expect(startSessionPage.successMessage).toBeVisible();
   });
 });
