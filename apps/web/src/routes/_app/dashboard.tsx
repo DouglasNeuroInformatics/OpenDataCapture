@@ -202,7 +202,7 @@ const RouteComponent = () => {
                     </Dialog.Title>
                   </Dialog.Header>
                   <hr></hr>
-                  <ul className="flex flex-col gap-5 overflow-auto">
+                  <ul className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
                     {userInfoQuery.isLoading && <Spinner />}
                     {userInfoQuery.isError && (
                       <p>
@@ -286,7 +286,7 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <ul className="flex flex-col gap-5 overflow-auto">
+                  <ul className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
                     {!instrumentInfo && (
                       <p>
                         {t({
@@ -355,7 +355,7 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <ul className="flex flex-col gap-5 overflow-auto">
+                  <ul className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
                     {!instrumentInfo && (
                       <p>
                         {t({
