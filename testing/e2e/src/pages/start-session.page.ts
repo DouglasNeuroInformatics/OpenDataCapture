@@ -16,6 +16,27 @@ export class StartSessionPage extends AppPage {
     this.successMessage = page.getByRole('heading', { name: 'Session Successfully Started' });
   }
 
+  async fillCustomIdentifier(customIdentifier: string, sex: string) {
+    const subjectIdField = this.sessionForm.locator('[name="subjectId"]');
+    const dateOfBirthField = this.sessionForm.locator('[name="subjectDateOfBirth"]');
+    const sexSelector = this.sessionForm.locator('[name="subjectSex"]');
+    const sessionTypeSelector = this.sessionForm.locator('[name="sessionType"]');
+    const sessionDate = this.sessionForm.locator('[name="sessionDate"]');
+
+    await subjectIdField.waitFor({ state: 'visible' });
+    await subjectIdField.fill(customIdentifier);
+
+    await dateOfBirthField.waitFor({ state: 'visible' });
+    await dateOfBirthField.fill('1990-01-01');
+
+    await sexSelector.selectOption(sex);
+
+    await sessionTypeSelector.selectOption('Retrospective');
+
+    await sessionDate.waitFor({ state: 'visible' });
+    await sessionDate.fill('2026-01-01');
+  }
+
   async fillSessionForm(firstName: string, lastName: string, sex: string) {
     // Wait for the subjectFirstName field to appear after selecting PERSONAL_INFO
     const firstNameField = this.sessionForm.locator('[name="subjectFirstName"]');
@@ -30,27 +51,6 @@ export class StartSessionPage extends AppPage {
 
     await lastNameField.waitFor({ state: 'visible' });
     await lastNameField.fill(lastName);
-
-    await dateOfBirthField.waitFor({ state: 'visible' });
-    await dateOfBirthField.fill('1990-01-01');
-
-    await sexSelector.selectOption(sex);
-
-    await sessionTypeSelector.selectOption('Retrospective');
-
-    await sessionDate.waitFor({ state: 'visible' });
-    await sessionDate.fill('2026-01-01');
-  }
-
-  async fillCustomIdentifier(customIdentifier: string, sex: string) {
-    const subjectIdField = this.sessionForm.locator('[name="subjectId"]');
-    const dateOfBirthField = this.sessionForm.locator('[name="subjectDateOfBirth"]');
-    const sexSelector = this.sessionForm.locator('[name="subjectSex"]');
-    const sessionTypeSelector = this.sessionForm.locator('[name="sessionType"]');
-    const sessionDate = this.sessionForm.locator('[name="sessionDate"]');
-
-    await subjectIdField.waitFor({ state: 'visible' });
-    await subjectIdField.fill(customIdentifier);
 
     await dateOfBirthField.waitFor({ state: 'visible' });
     await dateOfBirthField.fill('1990-01-01');
