@@ -1,4 +1,5 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
@@ -17,8 +18,8 @@ export class AssignmentsController {
   @ApiOperation({ summary: 'Create Assignment' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Assignment' })
-  create(@Body() data: CreateAssignmentDto): Promise<Assignment> {
-    return this.assignmentsService.create(data);
+  create(@Body() data: CreateAssignmentDto, @CurrentUser() currentUser: RequestUser): Promise<Assignment> {
+    return this.assignmentsService.create(data, currentUser);
   }
 
   @ApiOperation({ summary: 'Get All Assignments' })
@@ -31,7 +32,7 @@ export class AssignmentsController {
   @ApiOperation({ summary: 'Update Assignment' })
   @Patch(':id')
   @RouteAccess({ action: 'update', subject: 'Assignment' })
-  updateById(@Param('id') id: string, @Body() data: UpdateAssignmentDto, @CurrentUser('ability') ability?: AppAbility) {
-    return this.assignmentsService.updateById(id, data, { ability });
+  updateById(@Param('id') id: string, @Body() data: UpdateAssignmentDto, @CurrentUser() currentUser: RequestUser) {
+    return this.assignmentsService.updateById(id, data, currentUser);
   }
 }

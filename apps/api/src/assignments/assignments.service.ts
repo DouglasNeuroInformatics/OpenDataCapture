@@ -2,10 +2,11 @@ import crypto from 'node:crypto';
 
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { ConfigService, InjectModel } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Assignment, UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GatewayService } from '@/gateway/gateway.service';
@@ -19,6 +20,7 @@ export class AssignmentsService {
   constructor(
     @InjectModel('Assignment') private readonly assignmentModel: Model<'Assignment'>,
     configService: ConfigService,
+    private readonly auditLogger: AuditLogger,
     private readonly gatewayService: GatewayService
   ) {
     if (configService.get('NODE_ENV') === 'production') {
@@ -30,7 +32,10 @@ export class AssignmentsService {
     }
   }
 
-  async create({ expiresAt, groupId, instrumentId, subjectId }: CreateAssignmentDto): Promise<Assignment> {
+  async create(
+    { expiresAt, groupId, instrumentId, subjectId }: CreateAssignmentDto,
+    currentUser: RequestUser
+  ): Promise<Assignment> {
     const { privateKey, publicKey } = await HybridCrypto.generateKeyPair();
     const id = crypto.randomUUID();
     const assignment = await this.assignmentModel.create({
@@ -68,6 +73,7 @@ export class AssignmentsService {
       await this.assignmentModel.delete({ where: { id } });
       throw err;
     }
+    await this.auditLogger.log('CREATE', 'ASSIGNMENT', { groupId: groupId ?? null, userId: currentUser.id });
     return assignment;
   }
 
@@ -92,13 +98,27 @@ export class AssignmentsService {
     return assignment;
   }
 
-  async updateById(id: string, data: UpdateAssignmentData, { ability }: EntityOperationOptions = {}) {
+  async updateById(id: string, data: UpdateAssignmentData, currentUser: RequestUser) {
     if (data.status === 'CANCELED') {
       await this.gatewayService.deleteRemoteAssignment(id);
     }
-    return this.assignmentModel.update({
+    const assignment = await this.assignmentModel.update({
       data,
-      where: { AND: [accessibleQuery(ability, 'update', 'Assignment')], id }
+      where: { AND: [accessibleQuery(currentUser.ability, 'update', 'Assignment')], id }
+    });
+    await this.auditLogger.log('UPDATE', 'ASSIGNMENT', { groupId: assignment.groupId, userId: currentUser.id });
+    return assignment;
+  }
+
+  /** used by the gateway internal system */
+  async updateStatusById(id: string, status: UpdateAssignmentData['status']) {
+    return this.assignmentModel.update({
+      data: {
+        status
+      },
+      where: {
+        id
+      }
     });
   }
 }

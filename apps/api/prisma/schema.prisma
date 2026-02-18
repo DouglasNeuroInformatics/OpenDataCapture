@@ -27,6 +27,36 @@ type EncryptionKeyPair {
   privateKey Bytes
 }
 
+enum AuditLogAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+}
+
+enum AuditLogEntity {
+  ASSIGNMENT
+  GROUP
+  INSTRUMENT_RECORD
+  INSTRUMENT
+  SUBJECT
+  SESSION
+  USER
+}
+
+model AuditLog {
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  action    AuditLogAction
+  entity    AuditLogEntity
+  group     Group?         @relation(fields: [groupId], references: [id])
+  groupId   String?        @db.ObjectId
+  timestamp Int
+  user      User?          @relation(fields: [userId], references: [id])
+  userId    String?        @db.ObjectId
+
+  @@map("AuditLogModel")
+}
+
 model Assignment {
   createdAt         DateTime          @default(now()) @db.Date
   updatedAt         DateTime          @updatedAt @db.Date
@@ -68,7 +98,7 @@ type GroupSettings {
   defaultIdentificationMethod   SubjectIdentificationMethod
   idValidationRegex             String?
   idValidationRegexErrorMessage ErrorMessage?
-  subjectIdDisplayLength        Int?  
+  subjectIdDisplayLength        Int?
 }
 
 model Group {
@@ -78,12 +108,13 @@ model Group {
   accessibleInstrumentIds String[]
   accessibleInstruments   Instrument[]       @relation(fields: [accessibleInstrumentIds], references: [id])
   assignments             Assignment[]
+  auditLogs               AuditLog[]
   instrumentRecords       InstrumentRecord[]
   name                    String             @unique
   settings                GroupSettings
   sessions                Session[]
   subjects                Subject[]          @relation(fields: [subjectIds], references: [id])
-  subjectIds              String[]           
+  subjectIds              String[]
   type                    GroupType
   userIds                 String[]           @db.ObjectId
   users                   User[]             @relation(fields: [userIds], references: [id])
@@ -199,6 +230,7 @@ model User {
   createdAt             DateTime             @default(now()) @db.Date
   updatedAt             DateTime             @updatedAt @db.Date
   id                    String               @id @default(auto()) @map("_id") @db.ObjectId
+  auditLogs             AuditLog[]
   basePermissionLevel   BasePermissionLevel?
   additionalPermissions AuthRule[]
   firstName             String
@@ -230,8 +262,8 @@ model Session {
   instrumentRecords InstrumentRecord[]
   subject           Subject?           @relation(fields: [subjectId], references: [id])
   subjectId         String
-  user              User?              @relation(fields: [userId], references: [id])         
-  userId            String?
+  user              User?              @relation(fields: [userId], references: [id])
+  userId            String?            @db.ObjectId
   type              SessionType
 
   @@map("SessionModel")

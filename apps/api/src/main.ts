@@ -1,6 +1,7 @@
 import { AppFactory, PrismaModule } from '@douglasneuroinformatics/libnest';
 
 import { AssignmentsModule } from './assignments/assignments.module';
+import { AuditModule } from './audit/audit.module';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModuleOptionsFactory } from './core/prisma';
 import { $Env } from './core/schemas/env.schema';
@@ -37,6 +38,7 @@ export default AppFactory.create({
   },
   envSchema: $Env,
   imports: [
+    AuditModule,
     AuthModule,
     GroupsModule,
     InstrumentRecordsModule,

@@ -8,6 +8,7 @@ import {
   ComputerIcon,
   DatabaseIcon,
   EyeIcon,
+  LogsIcon,
   UploadIcon,
   UserCogIcon,
   UsersIcon
@@ -88,6 +89,11 @@ export function useNavItems() {
           fr: "Paramètres de l'application"
         }),
         url: '/admin/settings'
+      });
+      adminItems.push({
+        icon: LogsIcon,
+        label: t('common.auditLogs'),
+        url: '/admin/audit/logs'
       });
       adminItems.push({
         icon: UsersIcon,

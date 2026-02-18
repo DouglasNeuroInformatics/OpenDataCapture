@@ -51,7 +51,7 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger asChild>
         <Button className="flex items-center justify-between gap-2" variant="outline">
-          {t({ en: 'Filters', fr: 'Filtres' })}
+          {t('common.filters')}
           <ChevronDownIcon className="opacity-50" />
         </Button>
       </DropdownMenu.Trigger>

@@ -19,6 +19,7 @@ export type TokenPayload = {
   basePermissionLevel: BasePermissionLevel | null;
   firstName: null | string;
   groups: Group[];
+  id: string;
   lastName: null | string;
   permissions: Permissions;
   username: string;

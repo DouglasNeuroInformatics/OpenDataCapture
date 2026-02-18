@@ -34,6 +34,7 @@ import { Route as AppDatahubSubjectIdAssignmentsRouteImport } from './routes/_ap
 import { Route as AppDatahubSubjectIdRecordIdRouteImport } from './routes/_app/datahub/$subjectId/$recordId'
 import { Route as AppAdminUsersCreateRouteImport } from './routes/_app/admin/users/create'
 import { Route as AppAdminGroupsCreateRouteImport } from './routes/_app/admin/groups/create'
+import { Route as AppAdminAuditLogsRouteImport } from './routes/_app/admin/audit/logs'
 
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
@@ -165,6 +166,11 @@ const AppAdminGroupsCreateRoute = AppAdminGroupsCreateRouteImport.update({
   path: '/admin/groups/create',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppAdminAuditLogsRoute = AppAdminAuditLogsRouteImport.update({
+  id: '/admin/audit/logs',
+  path: '/admin/audit/logs',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/setup': typeof SetupRoute
@@ -182,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/upload/$instrumentId': typeof AppUploadInstrumentIdRoute
   '/datahub': typeof AppDatahubIndexRoute
   '/upload': typeof AppUploadIndexRoute
+  '/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
   '/datahub/$subjectId/$recordId': typeof AppDatahubSubjectIdRecordIdRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/upload/$instrumentId': typeof AppUploadInstrumentIdRoute
   '/datahub': typeof AppDatahubIndexRoute
   '/upload': typeof AppUploadIndexRoute
+  '/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
   '/datahub/$subjectId/$recordId': typeof AppDatahubSubjectIdRecordIdRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/_app/upload/$instrumentId': typeof AppUploadInstrumentIdRoute
   '/_app/datahub/': typeof AppDatahubIndexRoute
   '/_app/upload/': typeof AppUploadIndexRoute
+  '/_app/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/_app/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/_app/admin/users/create': typeof AppAdminUsersCreateRoute
   '/_app/datahub/$subjectId/$recordId': typeof AppDatahubSubjectIdRecordIdRoute
@@ -264,6 +273,7 @@ export interface FileRouteTypes {
     | '/upload/$instrumentId'
     | '/datahub'
     | '/upload'
+    | '/admin/audit/logs'
     | '/admin/groups/create'
     | '/admin/users/create'
     | '/datahub/$subjectId/$recordId'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/upload/$instrumentId'
     | '/datahub'
     | '/upload'
+    | '/admin/audit/logs'
     | '/admin/groups/create'
     | '/admin/users/create'
     | '/datahub/$subjectId/$recordId'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/_app/upload/$instrumentId'
     | '/_app/datahub/'
     | '/_app/upload/'
+    | '/_app/admin/audit/logs'
     | '/_app/admin/groups/create'
     | '/_app/admin/users/create'
     | '/_app/datahub/$subjectId/$recordId'
@@ -511,6 +523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminGroupsCreateRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/admin/audit/logs': {
+      id: '/_app/admin/audit/logs'
+      path: '/admin/audit/logs'
+      fullPath: '/admin/audit/logs'
+      preLoaderRoute: typeof AppAdminAuditLogsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
   }
 }
 
@@ -548,6 +567,7 @@ interface AppRouteRouteChildren {
   AppUploadInstrumentIdRoute: typeof AppUploadInstrumentIdRoute
   AppDatahubIndexRoute: typeof AppDatahubIndexRoute
   AppUploadIndexRoute: typeof AppUploadIndexRoute
+  AppAdminAuditLogsRoute: typeof AppAdminAuditLogsRoute
   AppAdminGroupsCreateRoute: typeof AppAdminGroupsCreateRoute
   AppAdminUsersCreateRoute: typeof AppAdminUsersCreateRoute
   AppInstrumentsRenderIdRoute: typeof AppInstrumentsRenderIdRoute
@@ -570,6 +590,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppUploadInstrumentIdRoute: AppUploadInstrumentIdRoute,
   AppDatahubIndexRoute: AppDatahubIndexRoute,
   AppUploadIndexRoute: AppUploadIndexRoute,
+  AppAdminAuditLogsRoute: AppAdminAuditLogsRoute,
   AppAdminGroupsCreateRoute: AppAdminGroupsCreateRoute,
   AppAdminUsersCreateRoute: AppAdminUsersCreateRoute,
   AppInstrumentsRenderIdRoute: AppInstrumentsRenderIdRoute,

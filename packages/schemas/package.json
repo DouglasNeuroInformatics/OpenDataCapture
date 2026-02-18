@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "exports": {
     "./assignment": "./src/assignment/assignment.ts",
+    "./audit": "./src/audit/audit.ts",
     "./auth": "./src/auth/auth.ts",
     "./core": "./src/core/core.ts",
     "./gateway": "./src/gateway/gateway.ts",

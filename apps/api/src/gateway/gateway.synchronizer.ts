@@ -162,9 +162,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       } else {
         await this.gatewayService.deleteRemoteAssignment(assignment.id);
       }
-      await this.assignmentsService.updateById(assignment.id, {
-        status: assignment.status
-      });
+      await this.assignmentsService.updateStatusById(assignment.id, assignment.status);
     }
     this.loggingService.log('Done synchronizing with gateway');
   }
