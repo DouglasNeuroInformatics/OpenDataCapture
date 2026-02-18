@@ -1,7 +1,23 @@
 {
+  "action": {
+    "en": "Action",
+    "fr": "Action"
+  },
+  "activeGroup": {
+    "en": "Active Group",
+    "fr": "Groupe actif"
+  },
   "admin": {
     "en": "Admin",
     "fr": "Administrateur"
+  },
+  "assignment": {
+    "en": "Assignment",
+    "fr": "Devoir"
+  },
+  "auditLogs": {
+    "en": "Audit Logs",
+    "fr": "Journaux d'audit"
   },
   "basePermissionLevel": {
     "en": "Base Permission Level",
@@ -15,6 +31,10 @@
     "en": "Confirm Password",
     "fr": "Confirmer le mot de passe"
   },
+  "create": {
+    "en": "Create",
+    "fr": "Créer"
+  },
   "currentSession": {
     "en": "Current Session",
     "fr": "Session en cours"
@@ -22,6 +42,14 @@
   "customIdentifier": {
     "en": "Custom Identifier",
     "fr": "Identifiant unique"
+  },
+  "delete": {
+    "en": "Delete",
+    "fr": "Supprimer"
+  },
+  "entity": {
+    "en": "Entity",
+    "fr": "Entité"
   },
   "errors": {
     "failedToChangeLanguage": {
@@ -37,9 +65,17 @@
       "fr": "Aucun instrument sélectionné"
     }
   },
+  "filters": {
+    "en": "Filters",
+    "fr": "Filtres"
+  },
   "graph": {
     "en": "Graph",
     "fr": "Graphique"
+  },
+  "group": {
+    "en": "Group",
+    "fr": "Groupe"
   },
   "groupManager": {
     "en": "Group Manager",
@@ -73,9 +109,21 @@
     "en": "Identifier",
     "fr": "Identifiant"
   },
+  "instrument": {
+    "en": "Instrument",
+    "fr": "Instrument"
+  },
+  "instrumentRecord": {
+    "en": "Instrument Record",
+    "fr": "Enregistrement"
+  },
   "insufficientPasswordStrength": {
     "en": "Insufficient password strength",
     "fr": "Mot de passe trop faible"
+  },
+  "login": {
+    "en": "Login",
+    "fr": "Se connecter"
   },
   "manage": {
     "en": "Manage",
@@ -101,6 +149,10 @@
     "en": "Research",
     "fr": "Recherche"
   },
+  "session": {
+    "en": "Session",
+    "fr": "Session"
+  },
   "sessionInProgress": {
     "en": "Session in Progress",
     "fr": "Session en cours"
@@ -108,6 +160,10 @@
   "standard": {
     "en": "Standard",
     "fr": "Standard"
+  },
+  "subject": {
+    "en": "Subject",
+    "fr": "Client"
   },
   "subjectIdentification": {
     "description": {
@@ -143,13 +199,25 @@
     "en": "Tags",
     "fr": "Tags"
   },
+  "time": {
+    "en": "Time",
+    "fr": "Heure"
+  },
   "timeCollected": {
     "en": "Time Collected",
     "fr": "Horodatage"
   },
+  "update": {
+    "en": "Update",
+    "fr": "Mise à jour"
+  },
   "uploadSuccessful": {
     "en": "Upload Successful",
     "fr": "Téléchargement réussi"
+  },
+  "user": {
+    "en": "User",
+    "fr": "Utilisateur"
   },
   "username": {
     "en": "Username",

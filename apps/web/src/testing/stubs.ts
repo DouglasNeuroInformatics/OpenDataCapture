@@ -8,6 +8,7 @@ export const currentUser: CurrentUser = Object.freeze({
   ability: createMongoAbility<PureAbility<[AppAction, AppSubjectName], any>>([{ action: 'manage', subject: 'all' }]),
   firstName: 'Jane',
   groups: [],
+  id: '123',
   lastName: 'Doe',
   username: 'JaneDoe'
 });
