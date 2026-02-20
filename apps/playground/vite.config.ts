@@ -25,7 +25,8 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     runtime({
-      disabled: mode === 'test'
+      disabled: mode === 'test',
+      rootDir: import.meta.dirname
     }),
     tailwindcss()
   ],

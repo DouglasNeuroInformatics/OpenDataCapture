@@ -7,7 +7,7 @@ catalog:
   '@douglasneuroinformatics/libjs': ^3.1.0
   '@douglasneuroinformatics/libpasswd': 'latest'
   '@douglasneuroinformatics/libstats': 'latest'
-  '@douglasneuroinformatics/libui': ^6.1.0
+  '@douglasneuroinformatics/libui': ^6.1.1
   '@douglasneuroinformatics/libui-form-types': 'latest'
   '@microsoft/api-extractor': '^7.47.6'
   '@prisma/client': '^6.9.0'
@@ -17,6 +17,7 @@ catalog:
   '@testing-library/react': '^16.0.1'
   '@testing-library/user-event': '^14.5.2'
   axios: '^1.12.0'
+  commander: '^12.1.0'
   esbuild: '0.23.x'
   esbuild-wasm: '0.23.x'
   happy-dom: '^20.0.2'

@@ -49,7 +49,9 @@ export default defineConfig(async ({ command }) => {
       importMetaEnv.vite({
         example: path.resolve(import.meta.dirname, '.env.public')
       }) as any,
-      runtime(),
+      runtime({
+        rootDir: import.meta.dirname
+      }),
       tailwindcss()
     ],
     resolve: {

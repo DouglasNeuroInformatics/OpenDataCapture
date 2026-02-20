@@ -20,6 +20,7 @@
     "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/instrument-stubs": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
+    "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "@storybook/addon-docs": "catalog:",
     "@storybook/addon-themes": "catalog:",
