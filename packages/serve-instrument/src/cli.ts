@@ -84,7 +84,9 @@ program.action(async (target: string) => {
           return html.replace('{{BUNDLE}}', await getEncodedBundle());
         }
       },
-      runtime(),
+      runtime({
+        rootDir: import.meta.dirname
+      }),
       tailwindcss()
     ],
     root: path.join(import.meta.dirname, 'client'),
