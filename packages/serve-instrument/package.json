@@ -1,26 +1,34 @@
 {
   "name": "@opendatacapture/serve-instrument",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.4",
   "license": "Apache-2.0",
+  "bin": {
+    "serve-instrument": "./dist/cli.js"
+  },
   "scripts": {
+    "build": "node scripts/build.js",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src"
   },
-  "devDependencies": {
+  "peerDependencies": {
+    "@opendatacapture/runtime-v1": "workspace:*"
+  },
+  "dependencies": {
     "@douglasneuroinformatics/libui": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "commander": "catalog:",
+    "esbuild": "catalog:",
+    "vite": "catalog:"
+  },
+  "devDependencies": {
     "@opendatacapture/instrument-bundler": "workspace:",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-internal": "workspace:*",
-    "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
-    "@tailwindcss/vite": "catalog:",
-    "commander": "^12.1.0",
-    "esbuild": "catalog:",
     "react": "workspace:react__19.x@*",
     "react-dom": "workspace:react-dom__19.x@*",
     "tailwindcss": "catalog:",
-    "vite": "catalog:",
     "zod": "workspace:zod__3.x@*"
   }
 }
