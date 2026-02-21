@@ -1,21 +1,21 @@
 import { cn } from '@douglasneuroinformatics/libui/utils';
-import type { BuildFailure } from 'esbuild-wasm';
+import type { BundlerInput, ESBuildFailure } from '@opendatacapture/instrument-bundler';
 import { range } from 'lodash-es';
 
-import { useAppStore } from '@/store';
-
 export type CodeErrorBlockProps = {
-  error: { cause: BuildFailure };
+  context: {
+    files: BundlerInput[];
+    indexFilename: null | string;
+  };
+  error: { cause: ESBuildFailure };
 };
 
-export const CodeErrorBlock = ({ error }: CodeErrorBlockProps) => {
-  const files = useAppStore((store) => store.files);
-  const indexFilename = useAppStore((store) => store.indexFilename);
+export const CodeErrorBlock = ({ context, error }: CodeErrorBlockProps) => {
   const location = error.cause.errors[0]?.location;
 
-  const indexFile = files.find((file) => file.name === indexFilename);
+  const indexFile = context.files.find((file) => file.name === context.indexFilename);
 
-  if (!(indexFile && location)) {
+  if (!(typeof indexFile?.content === 'string' && location)) {
     return null;
   }
 

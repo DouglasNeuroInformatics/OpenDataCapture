@@ -1,11 +1,11 @@
 import { InstrumentBundlerError } from '@opendatacapture/instrument-bundler';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { ViewerErrorFallback } from './ViewerErrorFallback';
+import { InstrumentErrorFallback } from './InstrumentErrorFallback';
 
-type Story = StoryObj<typeof ViewerErrorFallback>;
+type Story = StoryObj<typeof InstrumentErrorFallback>;
 
-export default { component: ViewerErrorFallback } as Meta<typeof ViewerErrorFallback>;
+export default { component: InstrumentErrorFallback } as Meta<typeof InstrumentErrorFallback>;
 
 export const Build: Story = {
   args: {

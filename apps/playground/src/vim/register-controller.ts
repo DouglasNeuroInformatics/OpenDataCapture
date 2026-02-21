@@ -93,7 +93,7 @@ export class Register implements IRegister {
  */
 export function defineRegister(name: string, register: IRegister) {
   const registers = vimGlobalState.registerController.registers;
-  if (!name || name.length != 1) {
+  if (name?.length != 1) {
     throw Error('Register name must be 1 character');
   }
   if (registers[name]) {

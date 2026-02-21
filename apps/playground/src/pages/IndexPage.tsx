@@ -29,7 +29,7 @@ const IndexPage = () => {
     }
     for (const fileA of instrumentA.files) {
       const fileB = instrumentB.files.find((file) => file.name === fileA.name);
-      if (!fileB || fileA.content !== fileB.content) {
+      if (fileA.content !== fileB?.content) {
         return false;
       }
     }

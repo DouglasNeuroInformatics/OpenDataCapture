@@ -173,21 +173,21 @@ const AppAdminAuditLogsRoute = AppAdminAuditLogsRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AppIndexRoute
   '/setup': typeof SetupRoute
   '/about': typeof AppAboutRoute
   '/contact': typeof AppContactRoute
   '/dashboard': typeof AppDashboardRoute
   '/user': typeof AppUserRoute
   '/auth/login': typeof AuthLoginRoute
-  '/': typeof AppIndexRoute
   '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/manage': typeof AppGroupManageRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/session/start-session': typeof AppSessionStartSessionRoute
   '/upload/$instrumentId': typeof AppUploadInstrumentIdRoute
-  '/datahub': typeof AppDatahubIndexRoute
-  '/upload': typeof AppUploadIndexRoute
+  '/datahub/': typeof AppDatahubIndexRoute
+  '/upload/': typeof AppUploadIndexRoute
   '/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
@@ -196,8 +196,8 @@ export interface FileRoutesByFullPath {
   '/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
   '/datahub/$subjectId/table': typeof AppDatahubSubjectIdTableRoute
   '/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
-  '/admin/groups': typeof AppAdminGroupsIndexRoute
-  '/admin/users': typeof AppAdminUsersIndexRoute
+  '/admin/groups/': typeof AppAdminGroupsIndexRoute
+  '/admin/users/': typeof AppAdminUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/setup': typeof SetupRoute
@@ -258,21 +258,21 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/setup'
     | '/about'
     | '/contact'
     | '/dashboard'
     | '/user'
     | '/auth/login'
-    | '/'
     | '/datahub/$subjectId'
     | '/admin/settings'
     | '/group/manage'
     | '/instruments/accessible-instruments'
     | '/session/start-session'
     | '/upload/$instrumentId'
-    | '/datahub'
-    | '/upload'
+    | '/datahub/'
+    | '/upload/'
     | '/admin/audit/logs'
     | '/admin/groups/create'
     | '/admin/users/create'
@@ -281,8 +281,8 @@ export interface FileRouteTypes {
     | '/datahub/$subjectId/graph'
     | '/datahub/$subjectId/table'
     | '/instruments/render/$id'
-    | '/admin/groups'
-    | '/admin/users'
+    | '/admin/groups/'
+    | '/admin/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/setup'
@@ -358,7 +358,7 @@ declare module '@tanstack/react-router' {
     '/_app': {
       id: '/_app'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AppRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -407,14 +407,14 @@ declare module '@tanstack/react-router' {
     '/_app/upload/': {
       id: '/_app/upload/'
       path: '/upload'
-      fullPath: '/upload'
+      fullPath: '/upload/'
       preLoaderRoute: typeof AppUploadIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/datahub/': {
       id: '/_app/datahub/'
       path: '/datahub'
-      fullPath: '/datahub'
+      fullPath: '/datahub/'
       preLoaderRoute: typeof AppDatahubIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
@@ -463,14 +463,14 @@ declare module '@tanstack/react-router' {
     '/_app/admin/users/': {
       id: '/_app/admin/users/'
       path: '/admin/users'
-      fullPath: '/admin/users'
+      fullPath: '/admin/users/'
       preLoaderRoute: typeof AppAdminUsersIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/admin/groups/': {
       id: '/_app/admin/groups/'
       path: '/admin/groups'
-      fullPath: '/admin/groups'
+      fullPath: '/admin/groups/'
       preLoaderRoute: typeof AppAdminGroupsIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }

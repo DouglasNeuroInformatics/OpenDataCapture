@@ -15,6 +15,9 @@
     "@opendatacapture/runtime-v1": "workspace:*",
     "vite": "catalog:"
   },
+  "dependencies": {
+    "@opendatacapture/runtime-meta": "workspace:*"
+  },
   "devDependencies": {
     "@douglasneuroinformatics/libjs": "catalog:"
   }

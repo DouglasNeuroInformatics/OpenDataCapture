@@ -16,7 +16,12 @@ export default defineConfig({
       target: 'es2022'
     }
   },
-  plugins: [runtime(), tailwindcss()],
+  plugins: [
+    runtime({
+      rootDir: import.meta.dirname
+    }),
+    tailwindcss()
+  ],
   resolve: {
     alias: [
       {

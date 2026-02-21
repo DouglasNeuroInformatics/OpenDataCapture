@@ -9,6 +9,9 @@ export default defineConfig(({ mode }) => ({
   build: {
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false,
+    rollupOptions: {
+      external: ['esbuild']
+    },
     sourcemap: true,
     target: 'es2022'
   },
@@ -25,7 +28,8 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     runtime({
-      disabled: mode === 'test'
+      disabled: mode === 'test',
+      rootDir: import.meta.dirname
     }),
     tailwindcss()
   ],

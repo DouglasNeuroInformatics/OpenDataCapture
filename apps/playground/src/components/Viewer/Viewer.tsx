@@ -15,8 +15,10 @@ import { editorFileToInput, hashFiles } from '@/utils/file';
 
 import { CompileErrorFallback } from './CompileErrorFallback';
 import { RuntimeErrorFallback } from './RuntimeErrorFallback';
+
 export const Viewer = () => {
   const editorFilesRef = useFilesRef();
+  const indexFilename = useAppStore((store) => store.indexFilename);
   const refreshInterval = useAppStore((store) => store.settings.refreshInterval);
   const [filesHash, setFilesHash] = useState<string>('');
 
@@ -58,7 +60,11 @@ export const Viewer = () => {
     >
       {match(state)
         .with({ status: 'built' }, ({ bundle }) => (
-          <ErrorBoundary FallbackComponent={RuntimeErrorFallback}>
+          <ErrorBoundary
+            FallbackComponent={(props) => (
+              <RuntimeErrorFallback context={{ files: editorFilesRef.current, indexFilename }} {...props} />
+            )}
+          >
             <ScalarInstrumentRenderer
               options={{ validate: true }}
               target={{ bundle, id: null! }}
@@ -70,7 +76,9 @@ export const Viewer = () => {
             />
           </ErrorBoundary>
         ))
-        .with({ status: 'error' }, CompileErrorFallback)
+        .with({ status: 'error' }, (props) => (
+          <CompileErrorFallback context={{ files: editorFilesRef.current, indexFilename }} {...props} />
+        ))
         .with({ status: P.union('building', 'initial') }, () => <Spinner />)
         .exhaustive()}
     </div>
