@@ -8,6 +8,13 @@ sidebar:
 import { Steps } from '@astrojs/starlight/components';
 import Screenshot from '@/components/common/Screenshot.astro';
 
+There are two ways to create and test an instrument:
+
+- **Instrument Playground**: create, validate, and upload your instrument in the browser.
+- **Local Development (CLI)**: run an instrument folder on your machine using `@opendatacapture/serve-instrument`.
+
+## Instrument Playground (Recommended)
+
 ### Steps
 
 <Steps>
@@ -31,3 +38,21 @@ import Screenshot from '@/components/common/Screenshot.astro';
     <Screenshot alt="upload bundle form" name="upload-bundle" />
 
 </Steps>
+
+## Local Development (CLI)
+
+To use the CLI you must have **Node.js** installed on your machine.
+
+Install the CLI globally:
+
+```bash
+npm install -g @opendatacapture/serve-instrument
+```
+
+Then run it against your instrument folder containing an entrypoint (index.tsx, index.jsx, index.ts, index.js):
+
+```bash
+serve-instrument ./path/to/instrument
+```
+
+The server watches the instrument directory and rebuilds automatically when files change (refresh the browser to load the latest bundle).
