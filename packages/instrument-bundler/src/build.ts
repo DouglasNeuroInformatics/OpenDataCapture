@@ -1,3 +1,5 @@
+import type { LogLevel } from 'esbuild';
+
 import { InstrumentBundlerError } from './error.js';
 import { plugin } from './plugin.js';
 import { resolveIndexInput } from './resolve.js';
@@ -31,7 +33,13 @@ function parseBuildResult(result: BuildResult): BuildOutput {
   return { css: cssOutput?.text, js: jsOutput.text, legacyScripts: result.legacyScripts };
 }
 
-export async function build({ inputs }: { inputs: BundlerInput[] }): Promise<BuildOutput> {
+export async function build({
+  inputs,
+  logLevel
+}: {
+  inputs: BundlerInput[];
+  logLevel?: LogLevel;
+}): Promise<BuildOutput> {
   const index = resolveIndexInput(inputs);
   let result: BuildResult;
   try {
@@ -42,6 +50,7 @@ export async function build({ inputs }: { inputs: BundlerInput[] }): Promise<Bui
       jsx: 'automatic',
       jsxImportSource: '/runtime/v1/react@19.x',
       keepNames: true,
+      logLevel,
       metafile: true,
       minify: false,
       outfile: 'bundle.js',

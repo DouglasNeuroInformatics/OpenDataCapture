@@ -41,3 +41,5 @@ export const InstrumentBundlerError: InstrumentBundlerErrorClass = class extends
     return Boolean(arg instanceof this && arg.kind === kind);
   }
 };
+
+export type { BuildFailure as ESBuildFailure };

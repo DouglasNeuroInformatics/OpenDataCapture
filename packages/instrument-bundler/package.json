@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@opendatacapture/runtime-internal": "workspace:*",
-    "commander": "^12.1.0",
+    "commander": "catalog:",
     "es-module-lexer": "^1.6.0",
     "esbuild": "catalog:",
     "esbuild-wasm": "catalog:",

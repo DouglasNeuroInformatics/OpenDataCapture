@@ -33,7 +33,7 @@ export const operators: { [key: string]: OperatorFunc } = {
     if (!vim.visualMode) {
       text = adapter.getRange(anchor, head);
       const lastState = vim.lastEditInputState;
-      if (lastState && lastState.motion === 'moveByWords' && !isWhiteSpaceString(text)) {
+      if (lastState?.motion === 'moveByWords' && !isWhiteSpaceString(text)) {
         // Exclude trailing whitespace if the range is not all whitespace.
         const match = /\s+$/.exec(text);
         if (match && lastState.motionArgs?.forward) {

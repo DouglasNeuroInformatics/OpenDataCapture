@@ -1,8 +1,19 @@
 import * as path from 'path';
 
+import { MANIFEST_FILENAME } from '@opendatacapture/runtime-meta';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { generateMetadataForVersion, MANIFEST_FILENAME, plugin, RUNTIME_DIR, RUNTIME_DIST_DIRNAME } from '../plugin';
+import { plugin } from '../plugin';
+
+const MOCK_RUNTIME_BASE_DIR = '/mock/runtime-v1/dist';
+
+const moduleMock = vi.hoisted(() => ({
+  createRequire: vi.fn().mockReturnValue({
+    resolve: vi.fn().mockReturnValue('/mock/runtime-v1/package.json')
+  })
+}));
+
+vi.mock('module', () => moduleMock);
 
 const fs = vi.hoisted(() => ({
   existsSync: vi.fn().mockReturnValue(true),
@@ -12,9 +23,7 @@ const fs = vi.hoisted(() => ({
   promises: {
     cp: vi.fn(),
     readdir: vi.fn().mockImplementation((filepath: string) => {
-      if (filepath === RUNTIME_DIR) {
-        return ['v1', '.DS_Store'];
-      } else if (filepath === path.join(RUNTIME_DIR, 'v1', RUNTIME_DIST_DIRNAME)) {
+      if (filepath === MOCK_RUNTIME_BASE_DIR) {
         return ['@opendatacapture'];
       } else if (filepath.endsWith('@opendatacapture')) {
         return ['runtime-core'];
@@ -32,27 +41,15 @@ const fs = vi.hoisted(() => ({
 
 vi.mock('fs', () => fs);
 
-describe('generateMetadataForVersion', () => {
-  it('should throw if the resolved baseDir does not exist', async () => {
-    fs.existsSync.mockReturnValueOnce(false);
-    await expect(() => generateMetadataForVersion('v0')).rejects.toThrow('Not a directory');
-  });
-
-  it('should throw if the resolved baseDir is not a directory', async () => {
-    fs.lstatSync.mockReturnValueOnce({ isDirectory: () => false });
-    await expect(() => generateMetadataForVersion('v0')).rejects.toThrow('Not a directory');
-  });
-});
-
 describe('plugin', () => {
   let result: any;
 
   beforeAll(async () => {
-    result = await plugin();
+    result = await plugin({ rootDir: process.cwd() });
   });
 
   it('should return false if disabled', async () => {
-    await expect(plugin({ disabled: true })).resolves.toBe(false);
+    await expect(plugin({ disabled: true, rootDir: process.cwd() })).resolves.toBe(false);
   });
 
   describe('buildStart', () => {
@@ -60,7 +57,7 @@ describe('plugin', () => {
       await result.buildStart();
       const destination = path.join(process.cwd(), 'dist/runtime/v1');
       expect(fs.promises.cp).toHaveBeenCalledOnce();
-      expect(fs.promises.cp).toHaveBeenLastCalledWith(path.join(RUNTIME_DIR, 'v1', RUNTIME_DIST_DIRNAME), destination, {
+      expect(fs.promises.cp).toHaveBeenLastCalledWith(MOCK_RUNTIME_BASE_DIR, destination, {
         recursive: true
       });
       expect(fs.promises.writeFile).toHaveBeenCalledOnce();

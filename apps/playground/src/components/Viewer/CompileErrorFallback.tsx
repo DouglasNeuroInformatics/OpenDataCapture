@@ -1,7 +1,6 @@
-import { ViewerErrorFallback } from './ViewerErrorFallback';
+import { InstrumentErrorFallback } from '@opendatacapture/react-core';
+import type { InstrumentErrorFallbackProps } from '@opendatacapture/react-core';
 
-import type { ViewerErrorFallbackProps } from './ViewerErrorFallback';
-
-export const CompileErrorFallback = (props: Omit<ViewerErrorFallbackProps, 'title'>) => {
-  return <ViewerErrorFallback title="Failed to Compile" {...props} />;
+export const CompileErrorFallback = (props: Omit<InstrumentErrorFallbackProps, 'title'>) => {
+  return <InstrumentErrorFallback title="Failed to Compile" {...props} />;
 };

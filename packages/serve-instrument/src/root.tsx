@@ -1,27 +1,16 @@
-import { StrictMode, useEffect, useState } from 'react';
-import { createRoot } from 'react-dom/client';
+import React from 'react';
 
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { ScalarInstrumentRenderer } from '@opendatacapture/react-core';
 import { decodeBase64ToUnicode } from '@opendatacapture/runtime-internal';
 
-import '@opendatacapture/react-core/globals.css';
-
-const container = document.getElementById('root')!;
-const initialBundle = container.getAttribute('data-initial-bundle')!;
-const root = createRoot(container);
-
 i18n.init({ translations: {} });
 
-const App = () => {
-  const [encodedBundle, setEncodedBundle] = useState(initialBundle);
+export type RootProps = {
+  encodedBundle: string;
+};
 
-  useEffect(() => {
-    import.meta.hot!.on('update-bundle', (data: { encodedBundle: string }) => {
-      setEncodedBundle(data.encodedBundle);
-    });
-  }, []);
-
+export const Root: React.FC<RootProps> = ({ encodedBundle }) => {
   return (
     <div className="container h-screen py-16">
       <ScalarInstrumentRenderer
@@ -35,9 +24,3 @@ const App = () => {
     </div>
   );
 };
-
-root.render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);

@@ -24,6 +24,7 @@
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
     "@douglasneuroinformatics/libui": "catalog:",
+    "@opendatacapture/instrument-bundler": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
     "@opendatacapture/licenses": "workspace:*",
@@ -37,6 +38,7 @@
     "lucide-react": "^0.473.0",
     "motion": "catalog:",
     "serialize-error": "catalog:",
+    "stacktrace-parser": "^0.1.11",
     "ts-pattern": "workspace:ts-pattern__5.x@*"
   },
   "devDependencies": {

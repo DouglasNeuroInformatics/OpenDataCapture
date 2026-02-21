@@ -10,6 +10,7 @@ type BundlerInput = z.infer<typeof $BundlerInput>;
 
 const $BundleOptions = z.object({
   inputs: z.array($BundlerInput),
+  logLevel: z.enum(['error', 'verbose', 'debug', 'info', 'warning', 'silent']).optional(),
   minify: z.boolean().optional()
 });
 type BundleOptions = z.infer<typeof $BundleOptions>;

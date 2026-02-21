@@ -4,6 +4,7 @@ import { formatByteSize } from '@douglasneuroinformatics/libjs';
 import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 
 import { useAppStore } from '@/store';
+
 export type StorageUsageDialogProps = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
@@ -17,7 +18,7 @@ export const StorageUsageDialog = ({ isOpen, setIsOpen }: StorageUsageDialogProp
   const updateStorage = async () => {
     setMessage('Loading...');
     const [updated] = await Promise.all([
-      await navigator.storage.estimate(),
+      navigator.storage.estimate(),
       new Promise((resolve) => setTimeout(resolve, 500))
     ]);
     setStorageEstimate(updated);
