@@ -77,8 +77,8 @@ class InstrumentLoader {
       log(chalk.green('✓') + chalk.dim(' Bundle ready') + timing);
     } catch (err) {
       const formattedError = err instanceof Error ? formatError(err) : err;
-      logError(chalk.red('✘') + chalk.bold.red(' Failed to compile instrument'));
-      logError(chalk.dim(String(formattedError)));
+      logError(chalk.dim(String(formattedError)) + '\n');
+      logError(chalk.red('✘') + chalk.bold.red(' Error: Failed to compile instrument'));
     }
   }
 }
