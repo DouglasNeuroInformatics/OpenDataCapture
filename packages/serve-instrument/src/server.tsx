@@ -6,12 +6,8 @@ import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
 
-import {
-  bundle,
-  BUNDLER_FILE_EXT_REGEX,
-  inferLoader,
-  InstrumentBundlerError
-} from '@opendatacapture/instrument-bundler';
+import { formatError } from '@douglasneuroinformatics/libjs';
+import { bundle, BUNDLER_FILE_EXT_REGEX, inferLoader } from '@opendatacapture/instrument-bundler';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 import { encodeUnicodeToBase64 } from '@opendatacapture/runtime-internal';
 import { generateMetadata, resolveRuntimeAsset } from '@opendatacapture/runtime-meta';
@@ -24,13 +20,28 @@ import type { RootProps } from './root';
 
 declare const __TAILWIND_STYLES__: string;
 
+function timestamp(): string {
+  return chalk.dim(new Date().toLocaleTimeString('en', { hour12: false }));
+}
+
+function log(message: string): void {
+  console.log(`${timestamp()} ${message}`);
+}
+
+function logError(message: string): void {
+  console.error(`${timestamp()} ${message}`);
+}
+
 class InstrumentLoader {
   private encodedBundle: null | string;
 
-  constructor(private readonly target: string) {
+  constructor(
+    private readonly target: string,
+    private readonly verbose: boolean
+  ) {
     this.encodedBundle = null;
     fs.watch(target, { recursive: false }, () => {
-      console.log(chalk.yellow('↺') + chalk.dim(' File changed, rebuilding instrument...'));
+      log(chalk.yellow('↺') + chalk.dim(' File changed, rebuilding...'));
       void this.updateEncodedBundle();
     });
   }
@@ -58,14 +69,16 @@ class InstrumentLoader {
         name: path.basename(filepath)
       });
     }
+    const start = Date.now();
     try {
       this.encodedBundle = encodeUnicodeToBase64(await bundle({ inputs }));
-      console.log(chalk.green('✓') + chalk.dim(' Bundle ready'));
+      const elapsed = Date.now() - start;
+      const timing = this.verbose ? chalk.dim(` (${elapsed}ms)`) : '';
+      log(chalk.green('✓') + chalk.dim(' Bundle ready') + timing);
     } catch (err) {
-      if (!(err instanceof InstrumentBundlerError)) {
-        console.error(err);
-      }
-      console.error(chalk.red('✘ Failed to compile instrument'));
+      const formattedError = err instanceof Error ? formatError(err) : err;
+      logError(chalk.dim(String(formattedError)) + '\n');
+      logError(chalk.red('✘') + chalk.bold.red(' Error: Failed to compile instrument'));
     }
   }
 }
@@ -73,20 +86,19 @@ class InstrumentLoader {
 class RequestHandler {
   private instrumentLoader: InstrumentLoader;
   private runtimeMetadata: RuntimeMetadataMap;
+  private verbose: boolean;
 
-  constructor(params: { instrumentLoader: InstrumentLoader; runtimeMetadata: RuntimeMetadataMap }) {
+  constructor(params: { instrumentLoader: InstrumentLoader; runtimeMetadata: RuntimeMetadataMap; verbose: boolean }) {
     this.instrumentLoader = params.instrumentLoader;
     this.runtimeMetadata = params.runtimeMetadata;
+    this.verbose = params.verbose;
   }
 
   async handle(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
     if (req.method !== 'GET') {
       res.writeHead(405, { 'Content-Type': 'text/plain' });
       res.end('Method Not Allowed');
-      return;
-    }
-
-    if (req.url === '/') {
+    } else if (req.url === '/') {
       const encodedBundle = await this.instrumentLoader.getEncodedBundle();
       if (encodedBundle) {
         res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -145,11 +157,12 @@ export class Server {
     this.server = http.createServer((...args) => void this.handler.handle(...args));
   }
 
-  static async create({ port, target }: { port: number; target: string }) {
+  static async create({ port, target, verbose }: { port: number; target: string; verbose: boolean }) {
     return new this({
       handler: new RequestHandler({
-        instrumentLoader: new InstrumentLoader(target),
-        runtimeMetadata: await generateMetadata({ rootDir: import.meta.dirname })
+        instrumentLoader: new InstrumentLoader(target, verbose),
+        runtimeMetadata: await generateMetadata({ rootDir: import.meta.dirname }),
+        verbose
       }),
       port
     });
@@ -158,7 +171,14 @@ export class Server {
   async start(): Promise<void> {
     return new Promise((resolve) => {
       this.server.listen(this.port, () => {
-        console.log(chalk.green('✓') + ' Listening on ' + chalk.cyan.underline(`http://localhost:${this.port}`));
+        log(
+          chalk.green('✓') +
+            chalk.bold(' Ready') +
+            '  ' +
+            chalk.dim('➜') +
+            '  ' +
+            chalk.cyan.underline(`http://localhost:${this.port}`)
+        );
         resolve();
       });
     });
