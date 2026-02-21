@@ -20,6 +20,7 @@
     "esbuild": "catalog:"
   },
   "devDependencies": {
+    "@douglasneuroinformatics/libjs": "catalog:",
     "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/instrument-bundler": "workspace:",
     "@opendatacapture/react-core": "workspace:*",

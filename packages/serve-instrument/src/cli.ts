@@ -33,9 +33,10 @@ program
   .allowExcessArguments(false)
   .argument('<target>', 'the directory containing the instrument', parseTarget)
   .option('-p --port <number>', 'the port to run the dev server on', parsePort, 3000)
+  .option('-v, --verbose', 'enable verbose logging (includes request logs and build timing)')
   .action(async (target: string) => {
-    const { port } = program.opts<{ port: number }>();
-    const server = await Server.create({ port, target });
+    const { port, verbose } = program.opts<{ port: number; verbose: boolean }>();
+    const server = await Server.create({ port, target, verbose: verbose ?? false });
     await server.start();
   });
 
