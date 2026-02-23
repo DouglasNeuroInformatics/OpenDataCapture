@@ -34,7 +34,8 @@ export class StartSessionPage extends AppPage {
     await sessionTypeSelector.selectOption('Retrospective');
 
     await sessionDate.waitFor({ state: 'visible' });
-    await sessionDate.fill('2026-01-01');
+    const expectedSessionDate = new Date().toISOString().split('T')[0]!;
+    await sessionDate.fill(expectedSessionDate);
   }
 
   async fillSessionForm(firstName: string, lastName: string, sex: string) {
@@ -60,7 +61,8 @@ export class StartSessionPage extends AppPage {
     await sessionTypeSelector.selectOption('Retrospective');
 
     await sessionDate.waitFor({ state: 'visible' });
-    await sessionDate.fill('2026-01-01');
+    const expectedSessionDate = new Date().toISOString().split('T')[0]!;
+    await sessionDate.fill(expectedSessionDate);
   }
 
   async selectIdentificationMethod(methodName: string) {

@@ -5,7 +5,7 @@ test.describe('start session', () => {
     const startSessionPage = await getPageModel('/session/start-session');
     await expect(startSessionPage.pageHeader).toBeVisible();
     await expect(startSessionPage.pageHeader).toContainText('Start Session');
-    expect(startSessionPage.sessionForm).toBeDefined();
+    await expect(startSessionPage.sessionForm).toBeVisible();
   });
 
   test('should fill subject personal information input', async ({ getPageModel, page }) => {
@@ -43,8 +43,9 @@ test.describe('start session', () => {
     const sessionTypeSelector = startSessionPage.sessionForm.locator('[name="sessionType"]');
     await expect(sessionTypeSelector).toHaveValue('RETROSPECTIVE');
 
+    const expectedSessionDate = new Date().toISOString().split('T')[0]!;
     const sessionDate = startSessionPage.sessionForm.locator('[name="sessionDate"]');
-    await expect(sessionDate).toHaveValue('2026-01-01');
+    await expect(sessionDate).toHaveValue(expectedSessionDate);
 
     await startSessionPage.submitForm();
 
@@ -78,7 +79,8 @@ test.describe('start session', () => {
     await expect(sessionTypeSelector).toHaveValue('RETROSPECTIVE');
 
     const sessionDate = startSessionPage.sessionForm.locator('[name="sessionDate"]');
-    await expect(sessionDate).toHaveValue('2026-01-01');
+    const expectedSessionDate = new Date().toISOString().split('T')[0]!;
+    await expect(sessionDate).toHaveValue(expectedSessionDate);
 
     await startSessionPage.submitForm();
 
