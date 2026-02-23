@@ -74,7 +74,6 @@ export class StartSessionPage extends AppPage {
 
     await submitButton.waitFor({ state: 'visible' });
 
-    // Use force: true to bypass overlay interception
-    await submitButton.click({ force: true });
+    await submitButton.click();
   }
 }
