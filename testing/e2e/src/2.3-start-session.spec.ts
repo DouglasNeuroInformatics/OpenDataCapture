@@ -50,9 +50,7 @@ test.describe('start session', () => {
 
     await expect(startSessionPage.successMessage).toBeVisible();
   });
-});
 
-test.describe('start session', () => {
   test('should fill custom identifier input', async ({ getPageModel, page }) => {
     await page.addInitScript(() => {
       localStorage.setItem(
@@ -87,3 +85,7 @@ test.describe('start session', () => {
     await expect(startSessionPage.successMessage).toBeVisible();
   });
 });
+
+// test.describe('start session with custom identifier', () => {
+
+// });
