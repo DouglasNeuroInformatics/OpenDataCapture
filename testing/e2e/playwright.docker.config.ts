@@ -71,16 +71,19 @@ export default defineConfig({
   webServer: [
     {
       command: 'true', // Dummy command since services are assumed running in Docker
+      reuseExistingServer: true,
       timeout: 10_000,
       url: `http://localhost:${appPort}/api/v1/setup`
     },
     {
       command: 'true', // Dummy command since services are assumed running in Docker
+      reuseExistingServer: true,
       timeout: 10_000,
       url: `http://localhost:${gatewayPort}/api/healthcheck`
     },
     {
       command: 'true', // Dummy command since services are assumed running in Docker
+      reuseExistingServer: true,
       timeout: 10_000,
       url: `http://localhost:${appPort}`
     }
