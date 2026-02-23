@@ -58,9 +58,12 @@ export const test = base.extend<TestArgs, WorkerArgs>({
       return use(async () => {
         const authStorageFile = getProjectMetadata('authStorageFile');
         // Wait for auth file to exist with timeout
+        const MAX_WAIT_MS = 30_000;
+        const POLL_INTERVAL_MS = 200;
+        const maxAttempts = MAX_WAIT_MS / POLL_INTERVAL_MS;
         let attempts = 0;
-        while (!fs.existsSync(authStorageFile) && attempts < 50) {
-          await new Promise((resolve) => setTimeout(resolve, 100));
+        while (!fs.existsSync(authStorageFile) && attempts < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
           attempts++;
         }
         if (!fs.existsSync(authStorageFile)) {
