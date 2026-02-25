@@ -21,13 +21,10 @@ test.describe('start session', () => {
     await startSessionPage.sessionForm.waitFor({ state: 'visible' });
     await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
 
-    // Verify the selection was made
     await expect(startSessionPage.selectField).toHaveValue('PERSONAL_INFO');
 
-    // Fill the subject first name field
     await startSessionPage.fillSessionForm('firstNameTest', 'lastNameTest', 'Male');
 
-    // Verify the field was filled
     const firstNameField = startSessionPage.sessionForm.locator('[name="subjectFirstName"]');
     await expect(firstNameField).toHaveValue('firstNameTest');
 
@@ -65,13 +62,10 @@ test.describe('start session', () => {
     await startSessionPage.sessionForm.waitFor({ state: 'visible' });
     await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
 
-    // Verify the selection was made
     await expect(startSessionPage.selectField).toHaveValue('CUSTOM_ID');
 
-    // Fill the subject first name field
     await startSessionPage.fillCustomIdentifier('customIdentifierTest', 'Male');
 
-    // Verify the field was filled
     const subjectIdField = startSessionPage.sessionForm.locator('[name="subjectId"]');
     await expect(subjectIdField).toHaveValue('customIdentifierTest');
 
@@ -87,7 +81,3 @@ test.describe('start session', () => {
     await expect(startSessionPage.successMessage).toBeVisible();
   });
 });
-
-// test.describe('start session with custom identifier', () => {
-
-// });
