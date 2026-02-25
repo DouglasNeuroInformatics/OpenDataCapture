@@ -15,6 +15,9 @@ import type { NavigateVariadicArgs, ProjectAuth, ProjectMetadata, RouteTo } from
 
 type PageModels = typeof pageModels;
 
+const MAX_WAIT_MS = 30_000;
+const POLL_INTERVAL_MS = 200;
+
 type TestArgs = {
   getPageModel: <TKey extends Extract<keyof PageModels, RouteTo>>(
     key: TKey,
@@ -58,8 +61,7 @@ export const test = base.extend<TestArgs, WorkerArgs>({
       return use(async () => {
         const authStorageFile = getProjectMetadata('authStorageFile');
         // Wait for auth file to exist with timeout
-        const MAX_WAIT_MS = 30_000;
-        const POLL_INTERVAL_MS = 200;
+
         const maxAttempts = MAX_WAIT_MS / POLL_INTERVAL_MS;
         let attempts = 0;
         while (!fs.existsSync(authStorageFile) && attempts < maxAttempts) {
@@ -67,7 +69,9 @@ export const test = base.extend<TestArgs, WorkerArgs>({
           attempts++;
         }
         if (!fs.existsSync(authStorageFile)) {
-          throw new Error(`Cannot get project auth: storage file does not exist after waiting: ${authStorageFile}`);
+          throw new Error(
+            `Cannot get project auth: storage file does not exist after waiting 30000ms: ${authStorageFile}`
+          );
         }
         return JSON.parse(await fs.promises.readFile(authStorageFile, 'utf8')) as ProjectAuth;
       });
