@@ -39,7 +39,6 @@ export class StartSessionPage extends AppPage {
   }
 
   async fillSessionForm(firstName: string, lastName: string, sex: string) {
-    // Wait for the subjectFirstName field to appear after selecting PERSONAL_INFO
     const firstNameField = this.sessionForm.locator('[name="subjectFirstName"]');
     const lastNameField = this.sessionForm.locator('[name="subjectLastName"]');
     const dateOfBirthField = this.sessionForm.locator('[name="subjectDateOfBirth"]');
