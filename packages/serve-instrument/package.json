@@ -1,7 +1,7 @@
 {
   "name": "@opendatacapture/serve-instrument",
   "type": "module",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "license": "Apache-2.0",
   "bin": {
     "serve-instrument": "./dist/cli.js"

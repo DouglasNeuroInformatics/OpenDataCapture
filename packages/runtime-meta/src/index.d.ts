@@ -1,3 +1,5 @@
+export declare const RUNTIME_VERSIONS: string[];
+
 /** Contains the relative paths of assets for a given runtime version. */
 export type RuntimeManifest = {
   /** Relative paths to TypeScript declaration files (.d.ts). */
@@ -10,16 +12,22 @@ export type RuntimeManifest = {
   styles: string[];
 };
 
+export type RuntimePackageMetadata = {
+  exports: {
+    css: string[];
+    html: string[];
+    js: string[];
+  };
+  name: string;
+  version: string;
+};
+
 /**
  * Metadata for a given runtime version.
  *
  * @example
  * {
  *   baseDir: "/root/OpenDataCapture/runtime/v1/dist",
- *   importPaths: [
- *     "/runtime/v1/@opendatacapture/runtime-core/index.js",
- *     ...
- *   ],
  *   manifest: {
  *     declarations: [
  *       "@opendatacapture/runtime-core/index.d.ts",
@@ -40,10 +48,10 @@ export type RuntimeManifest = {
 export type RuntimeVersionMetadata = {
   /** Absolute path to the root directory where runtime files are located. */
   baseDir: string;
-  /** List of fully-qualified import paths available at runtime. */
-  importPaths: string[];
   /** Manifest containing relative paths to declarations, html, sources, and styles. */
   manifest: RuntimeManifest;
+  /** A list of packages available */
+  packages: RuntimePackageMetadata[];
 };
 
 export type RuntimeMetadataMap = Map<string, RuntimeVersionMetadata>;

@@ -7,7 +7,7 @@ const isDirectory = async (path) => fs.existsSync(path) && fs.lstatSync(path).is
 
 const RUNTIME_DIST_DIRNAME = 'dist';
 
-const RUNTIME_VERSIONS = [1];
+export const RUNTIME_VERSIONS = ['v1'];
 
 /** @type {import('.').MANIFEST_FILENAME} */
 export const MANIFEST_FILENAME = 'runtime.json';
@@ -37,43 +37,50 @@ export async function generateManifest(baseDir) {
   return results;
 }
 
-// /** @type {import('.').generateMetadataForVersion} */
-// export async function generateMetadataForVersion(version) {
-//   const baseDir = path.resolve(RUNTIME_DIR, version, RUNTIME_DIST_DIRNAME);
-//   if (!(await isDirectory(baseDir))) {
-//     throw new Error(`Not a directory: ${baseDir}`);
-//   }
-//   const { declarations, html, sources, styles } = await generateManifest(baseDir);
-// return {
-//   baseDir,
-//   importPaths: sources.map((filename) => `/runtime/${version}/${filename}`),
-//   manifest: {
-//     declarations,
-//     html,
-//     sources,
-//     styles
-//   }
-// };
-// }
-
 /** @type {import('.').generateMetadata} */
 export async function generateMetadata(options) {
   const require = module.createRequire(options.rootDir);
+
+  /** @type {import('.').RuntimeMetadataMap} */
   const metadata = new Map();
-  for (const version of RUNTIME_VERSIONS) {
-    const packageDir = path.dirname(require.resolve(`@opendatacapture/runtime-v${version}/package.json`));
+
+  for (const v of RUNTIME_VERSIONS) {
+    const packageDir = path.dirname(require.resolve(`@opendatacapture/runtime-${v}/package.json`));
     const baseDir = path.resolve(packageDir, RUNTIME_DIST_DIRNAME);
     const { declarations, html, sources, styles } = await generateManifest(baseDir);
 
-    metadata.set(`v${version}`, {
+    const importPathPattern = /^(@?[^@/]+(?:\/[^@/]+)?)(?:@([^/]+))?/;
+
+    /** @type {Map<string, import('.').RuntimePackageMetadata>} */
+    const packages = new Map();
+
+    /** @param {string} filename @param {'css' | 'html' | 'js'} kind */
+    const addToPackage = (filename, kind) => {
+      const match = filename.match(importPathPattern);
+      if (!match) {
+        throw new Error(`Unexpected import path pattern: ${filename}`);
+      }
+      const [name, version] = /** @type {[string, string]} */ (match.slice(1, 3));
+      const key = name + '$' + version;
+      if (!packages.has(key)) {
+        packages.set(key, { exports: { css: [], html: [], js: [] }, name, version });
+      }
+      packages.get(key)?.exports[kind].push(`/runtime/${v}/${filename}`);
+    };
+
+    sources.forEach((source) => addToPackage(source, 'js'));
+    html.forEach((file) => addToPackage(file, 'html'));
+    styles.forEach((style) => addToPackage(style, 'css'));
+
+    metadata.set(v, {
       baseDir,
-      importPaths: sources.map((filename) => `/runtime/${version}/${filename}`),
       manifest: {
         declarations,
         html,
         sources,
         styles
-      }
+      },
+      packages: [...packages.values()]
     });
   }
   return metadata;
