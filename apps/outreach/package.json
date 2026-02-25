@@ -27,6 +27,7 @@
     "@astrojs/starlight": "^0.34.3",
     "@astrojs/starlight-tailwind": "4.0.1",
     "@opendatacapture/runtime-core": "workspace:*",
+    "@opendatacapture/runtime-meta": "workspace:*",
     "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "^4.1.5",
     "astro": "^5.15.9",

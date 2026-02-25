@@ -23,7 +23,7 @@ export async function plugin(options) {
     },
     config: () => ({
       optimizeDeps: {
-        exclude: Array.from(metadata.values().flatMap((pkg) => pkg.importPaths))
+        exclude: Array.from(metadata.values().flatMap(({ packages }) => packages.flatMap((pkg) => pkg.exports.js)))
       }
     }),
     configureServer: (server) => {

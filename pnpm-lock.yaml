@@ -25,8 +25,8 @@ catalogs:
       specifier: latest
       version: 0.2.0
     '@douglasneuroinformatics/libui':
-      specifier: ^6.1.2
-      version: 6.1.2
+      specifier: ^6.1.3
+      version: 6.1.3
     '@douglasneuroinformatics/libui-form-types':
       specifier: latest
       version: 0.11.0
@@ -344,7 +344,7 @@ importers:
         version: 0.0.4
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.1.2(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 6.1.3(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
@@ -441,7 +441,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.1.2(immer@10.2.0)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@19.1.0))(zod@vendor+zod@3.x)
+        version: 6.1.3(immer@10.2.0)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@19.1.0))(zod@vendor+zod@3.x)
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../../packages/licenses
@@ -482,6 +482,9 @@ importers:
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../../packages/runtime-core
+      '@opendatacapture/runtime-meta':
+        specifier: workspace:*
+        version: link:../../packages/runtime-meta
       '@tailwindcss/typography':
         specifier: ^0.5.16
         version: 0.5.19(tailwindcss@4.2.0)
@@ -520,7 +523,7 @@ importers:
         version: 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.1.2(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 6.1.3(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.52.2)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
@@ -647,7 +650,7 @@ importers:
         version: 0.0.3(typescript@5.6.3)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.1.2(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 6.1.3(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@vendor+react@19.x)
@@ -923,7 +926,7 @@ importers:
         version: 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.1.2(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 6.1.3(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/instrument-bundler':
         specifier: workspace:*
         version: link:../instrument-bundler
@@ -1102,7 +1105,7 @@ importers:
         version: 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.1.2(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 6.1.3(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/instrument-bundler':
         specifier: 'workspace:'
         version: link:../instrument-bundler
@@ -1315,7 +1318,7 @@ importers:
     devDependencies:
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.1.2(immer@10.2.0)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@19.1.0))(zod@vendor+zod@3.x)
+        version: 6.1.3(immer@10.2.0)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@19.1.0))(zod@vendor+zod@3.x)
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
         version: link:../packages/instrument-stubs
@@ -1950,13 +1953,6 @@ packages:
     resolution:
       { integrity: sha512-tiI4ThtlBUXGEVN3hZBcX/Ul4gdHBLdfMza/KwmGdE0tjG1u556Yn4HQhwnZyDn/c1/q7j4sL+XZc+yZy8TCOQ== }
 
-  '@douglasneuroinformatics/libjs@3.1.1':
-    resolution:
-      { integrity: sha512-eLFM4p7bdGS7oObpQhirnxWxWxTAStU0D04ePyemJWt30tZy2O0mDBUJ3NcXSAUQvg+/uLNtO4aonJ4+t4k2yg== }
-    peerDependencies:
-      neverthrow: ^8.2.0
-      zod: ^3.25.67
-
   '@douglasneuroinformatics/libjs@3.2.0':
     resolution:
       { integrity: sha512-hHOqDvKWjhRovpGobEag/BT9xaQNyjDBHbxvwOadlepMbnpyk+RCbcGW9OSRidfvs96wq7KSg8tGpzXyYn2J6Q== }
@@ -2057,9 +2053,9 @@ packages:
     resolution:
       { integrity: sha512-erds8oNXFrWSJfCglR8S7I3Yfkgx2Vz6RIQTa5OFtVAVx8DTSFf5FbnHpp49l6BcQ4FCU5w/PLO5NWdx08cNUg== }
 
-  '@douglasneuroinformatics/libui@6.1.2':
+  '@douglasneuroinformatics/libui@6.1.3':
     resolution:
-      { integrity: sha512-LK/rAtt/D6F0H92yIzqVx6EzC549HZFv7SHefe7gy78gN/1KTI6zmv6xxCetRleVz2145hqPZnOPEjSXy4XfDg== }
+      { integrity: sha512-w3gxeDPBhEchQQ6dTGMRXqtRzILgpxxj7zZt2Cf60DwX8tWZNl95dSuYtcReUmid5tKv1GdJyEehLcEEzRumsw== }
     engines: { node: 22.x }
     peerDependencies:
       react: ^19.1.0
@@ -13689,16 +13685,6 @@ snapshots:
     dependencies:
       '@hpke/core': 1.7.5
 
-  '@douglasneuroinformatics/libjs@3.1.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)':
-    dependencies:
-      clean-stack: 5.2.0
-      extract-stack: 3.0.0
-      neverthrow: 8.2.0
-      serialize-error: 12.0.0
-      stringify-object: 5.0.0
-      type-fest: 4.41.0
-      zod: link:vendor/zod@3.x
-
   '@douglasneuroinformatics/libjs@3.2.0(neverthrow@8.2.0)(zod@4.3.6)':
     dependencies:
       clean-stack: 5.2.0
@@ -13811,9 +13797,9 @@ snapshots:
     dependencies:
       type-fest: 4.41.0
 
-  '@douglasneuroinformatics/libui@6.1.2(immer@10.2.0)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@19.1.0))(zod@vendor+zod@3.x)':
+  '@douglasneuroinformatics/libui@6.1.3(immer@10.2.0)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@19.1.0))(zod@vendor+zod@3.x)':
     dependencies:
-      '@douglasneuroinformatics/libjs': 3.1.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
+      '@douglasneuroinformatics/libjs': 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
       '@radix-ui/react-accordion': 1.2.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@radix-ui/react-alert-dialog': 1.1.15(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -13866,9 +13852,9 @@ snapshots:
       - neverthrow
       - use-sync-external-store
 
-  '@douglasneuroinformatics/libui@6.1.2(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)':
+  '@douglasneuroinformatics/libui@6.1.3(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)':
     dependencies:
-      '@douglasneuroinformatics/libjs': 3.1.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
+      '@douglasneuroinformatics/libjs': 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui-form-types': 0.11.0
       '@radix-ui/react-accordion': 1.2.12(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
       '@radix-ui/react-alert-dialog': 1.1.15(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
