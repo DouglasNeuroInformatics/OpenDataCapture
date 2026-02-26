@@ -6,12 +6,17 @@ import { test as base, expect } from '@playwright/test';
 
 import { LoginPage } from '../pages/auth/login.page';
 import { DashboardPage } from '../pages/dashboard.page';
+import { DatahubPage } from '../pages/datahub/datahub.page';
 import { SubjectDataTablePage } from '../pages/datahub/subject-data-table.page';
 import { SetupPage } from '../pages/setup.page';
+import { StartSessionPage } from '../pages/start-session.page';
 
 import type { NavigateVariadicArgs, ProjectAuth, ProjectMetadata, RouteTo } from './types';
 
 type PageModels = typeof pageModels;
+
+const MAX_WAIT_MS = 30_000;
+const POLL_INTERVAL_MS = 200;
 
 type TestArgs = {
   getPageModel: <TKey extends Extract<keyof PageModels, RouteTo>>(
@@ -29,7 +34,9 @@ type WorkerArgs = {
 const pageModels = {
   '/auth/login': LoginPage,
   '/dashboard': DashboardPage,
+  '/datahub': DatahubPage,
   '/datahub/$subjectId/table': SubjectDataTablePage,
+  '/session/start-session': StartSessionPage,
   '/setup': SetupPage
 } satisfies { [K in RouteTo]?: any };
 
@@ -53,8 +60,18 @@ export const test = base.extend<TestArgs, WorkerArgs>({
     async ({ getProjectMetadata }, use) => {
       return use(async () => {
         const authStorageFile = getProjectMetadata('authStorageFile');
+        // Wait for auth file to exist with timeout
+
+        const maxAttempts = MAX_WAIT_MS / POLL_INTERVAL_MS;
+        let attempts = 0;
+        while (!fs.existsSync(authStorageFile) && attempts < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+          attempts++;
+        }
         if (!fs.existsSync(authStorageFile)) {
-          throw new Error(`Cannot get project auth: storage file does not exist: ${authStorageFile}`);
+          throw new Error(
+            `Cannot get project auth: storage file does not exist after waiting 30000ms: ${authStorageFile}`
+          );
         }
         return JSON.parse(await fs.promises.readFile(authStorageFile, 'utf8')) as ProjectAuth;
       });
