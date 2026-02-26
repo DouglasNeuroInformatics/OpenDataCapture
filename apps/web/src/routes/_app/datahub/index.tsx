@@ -296,8 +296,9 @@ const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
 
 const MasterDataTable: React.FC<{
   data: Subject[];
+  onRowDoubleClick: (subject: Subject) => void;
   onSelect: (subject: Subject) => void;
-}> = ({ data, onSelect }) => {
+}> = ({ data, onRowDoubleClick, onSelect }) => {
   const { t } = useTranslation();
   const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
 
@@ -373,6 +374,7 @@ const MasterDataTable: React.FC<{
           }
         ]}
         togglesComponent={Toggles}
+        onRowDoubleClick={onRowDoubleClick}
         onSearchChange={(value, table) => {
           const subjectIdColumn = table.getColumn('subjectId')!;
           subjectIdColumn.setFilterValue(value);
@@ -400,6 +402,9 @@ const RouteComponent = () => {
       <div className="flex grow flex-col">
         <MasterDataTable
           data={data}
+          onRowDoubleClick={(subject) => {
+            void navigate({ to: `./${subject.id}/table` });
+          }}
           onSelect={(subject) => {
             void navigate({ to: `./${subject.id}/table` });
           }}
