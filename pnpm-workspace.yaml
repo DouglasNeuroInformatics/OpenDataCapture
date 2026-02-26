@@ -7,7 +7,7 @@ catalog:
   '@douglasneuroinformatics/libjs': ^3.2.0
   '@douglasneuroinformatics/libpasswd': 'latest'
   '@douglasneuroinformatics/libstats': 'latest'
-  '@douglasneuroinformatics/libui': ^6.1.3
+  '@douglasneuroinformatics/libui': ^6.2.0
   '@douglasneuroinformatics/libui-form-types': 'latest'
   '@microsoft/api-extractor': '^7.47.6'
   '@prisma/client': '^6.9.0'
