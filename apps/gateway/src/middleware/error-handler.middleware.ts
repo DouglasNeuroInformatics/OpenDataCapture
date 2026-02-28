@@ -1,9 +1,10 @@
 import type { ErrorRequestHandler } from 'express';
 
+import { logger } from '@/logger';
 import { HttpException } from '@/utils/http-exception';
 
 export const errorHandlerMiddleware: ErrorRequestHandler = (err, _, res, next) => {
-  console.error(err);
+  logger.error(err);
   if (res.headersSent) {
     return next(err);
   } else if (err instanceof HttpException) {
