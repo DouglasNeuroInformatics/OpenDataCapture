@@ -11,6 +11,7 @@ import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
 
 import { NavButton } from '../NavButton';
+import { UserDropup } from '../UserDropup';
 
 export const Navbar = () => {
   const currentSession = useAppStore((store) => store.currentSession);
@@ -95,6 +96,7 @@ export const Navbar = () => {
         </nav>
         <Sheet.Footer className="mt-auto">
           <div className="flex justify-end gap-2">
+            <UserDropup />
             <LanguageToggle
               options={{
                 en: 'English',
