@@ -1,11 +1,11 @@
 import express from 'express';
 import type { Request, Response } from 'express';
 import PinoHttp from 'pino-http';
-import PinoPretty from 'pino-pretty';
 import type { Promisable } from 'type-fest';
 
 import { config } from '@/config';
 import type { RenderFunction } from '@/entry-server';
+import { logger } from '@/logger';
 import { apiKeyMiddleware } from '@/middleware/api-key.middleware';
 import { errorHandlerMiddleware } from '@/middleware/error-handler.middleware';
 import type { RootProps } from '@/Root';
@@ -31,10 +31,8 @@ export abstract class BaseServer {
     } catch (err) {
       if (err instanceof Error) {
         this.fixStacktrace?.(err);
-        console.error(err.stack);
-      } else {
-        console.error(err);
       }
+      logger.error(err);
       res.status(500).json({ message: 'Internal Server Error', statusCode: 500 });
     }
   });
@@ -47,25 +45,21 @@ export abstract class BaseServer {
       })
     );
     this.app.use(
-      PinoHttp(
-        {
-          customLogLevel: (_, res) => {
-            return res.statusCode >= 500 ? 'error' : 'info';
-          },
-          serializers: {
-            req: (req: Request) => {
-              return `${req.method} ${req.url}`;
-            },
-            res: (res: Response) => {
-              return res.statusCode;
-            }
-          },
-          wrapSerializers: false
+      PinoHttp({
+        customLogLevel: (_, res) => {
+          return res.statusCode >= 500 ? 'error' : 'info';
         },
-        PinoPretty({
-          colorize: true
-        })
-      )
+        logger,
+        serializers: {
+          req: (req: Request) => {
+            return `${req.method} ${req.url}`;
+          },
+          res: (res: Response) => {
+            return res.statusCode;
+          }
+        },
+        wrapSerializers: false
+      })
     );
     this.app.use('/api', apiKeyMiddleware, apiRouter);
     this.app.use('/', this.rootLoader, rootRouter);
@@ -76,8 +70,7 @@ export abstract class BaseServer {
 
   listen(port = config.port) {
     return this.app.listen(port, () => {
-      // eslint-disable-next-line no-console
-      console.log(`Server started at http://localhost:${port}`);
+      logger.info(`Server started at http://localhost:${port}`);
     });
   }
 

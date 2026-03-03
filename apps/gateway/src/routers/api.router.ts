@@ -9,6 +9,7 @@ import type { GatewayHealthcheckSuccessResult } from '@opendatacapture/schemas/g
 import { Router } from 'express';
 
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/logger';
 import { ah } from '@/utils/async-handler';
 import { HttpException } from '@/utils/http-exception';
 
@@ -42,7 +43,7 @@ router.post(
   ah(async (req, res) => {
     const result = await $CreateRemoteAssignmentData.safeParseAsync(req.body);
     if (!result.success) {
-      console.error(result.error.issues);
+      logger.error(result.error.issues);
       throw new HttpException(400, 'Bad Request');
     }
     const { instrumentContainer, publicKey, ...assignment } = result.data;
@@ -61,7 +62,7 @@ router.post(
 router.patch(
   '/assignments/:id',
   ah(async (req, res) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const assignment = await prisma.remoteAssignmentModel.findFirst({
       where: { id }
     });
@@ -70,7 +71,7 @@ router.patch(
     }
     const result = await $UpdateRemoteAssignmentData.safeParseAsync(req.body);
     if (!result.success) {
-      console.error(result.error.issues);
+      logger.error(result.error.issues);
       throw new HttpException(400, 'Bad Request');
     }
     const { data, kind, status } = result.data;
@@ -114,7 +115,7 @@ router.patch(
 router.delete(
   '/assignments/:id',
   ah(async (req, res) => {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const assignment = await prisma.remoteAssignmentModel.findFirst({
       where: { id }
     });
