@@ -58,7 +58,7 @@ export const Navbar = () => {
           <Branding className="h-10" fontSize="md" />
         </Sheet.Header>
         <Separator />
-        <nav className="flex w-full grow flex-col divide-y divide-slate-200 dark:divide-slate-700">
+        <nav className="flex w-full grow flex-col divide-y divide-slate-200 overflow-auto dark:divide-slate-700">
           {navItems.map((items, i) => (
             <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
               {items.map(({ disabled, url, ...props }) => (
