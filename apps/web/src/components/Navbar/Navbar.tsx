@@ -11,6 +11,7 @@ import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
 
 import { NavButton } from '../NavButton';
+import { UserDropup } from '../UserDropup';
 
 export const Navbar = () => {
   const currentSession = useAppStore((store) => store.currentSession);
@@ -57,7 +58,7 @@ export const Navbar = () => {
           <Branding className="h-10" fontSize="md" />
         </Sheet.Header>
         <Separator />
-        <nav className="flex w-full grow flex-col divide-y divide-slate-200 dark:divide-slate-700">
+        <nav className="flex w-full grow flex-col divide-y divide-slate-200 overflow-auto dark:divide-slate-700">
           {navItems.map((items, i) => (
             <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
               {items.map(({ disabled, url, ...props }) => (
@@ -94,15 +95,18 @@ export const Navbar = () => {
           ))}
         </nav>
         <Sheet.Footer className="mt-auto">
-          <div className="flex justify-end gap-2">
-            <LanguageToggle
-              options={{
-                en: 'English',
-                fr: 'Français'
-              }}
-              variant="outline"
-            />
-            <ThemeToggle variant="outline" />
+          <div className="flex w-full justify-between gap-2 md:justify-end">
+            <UserDropup />
+            <div className="flex gap-2">
+              <LanguageToggle
+                options={{
+                  en: 'English',
+                  fr: 'Français'
+                }}
+                variant="outline"
+              />
+              <ThemeToggle variant="outline" />
+            </div>
           </div>
         </Sheet.Footer>
       </Sheet.Content>
