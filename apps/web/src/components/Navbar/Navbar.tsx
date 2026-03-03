@@ -95,16 +95,18 @@ export const Navbar = () => {
           ))}
         </nav>
         <Sheet.Footer className="mt-auto">
-          <div className="flex justify-end gap-2">
+          <div className="flex w-full justify-between gap-2 md:justify-end">
             <UserDropup />
-            <LanguageToggle
-              options={{
-                en: 'English',
-                fr: 'Français'
-              }}
-              variant="outline"
-            />
-            <ThemeToggle variant="outline" />
+            <div className="flex gap-2">
+              <LanguageToggle
+                options={{
+                  en: 'English',
+                  fr: 'Français'
+                }}
+                variant="outline"
+              />
+              <ThemeToggle variant="outline" />
+            </div>
           </div>
         </Sheet.Footer>
       </Sheet.Content>
