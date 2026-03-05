@@ -35,13 +35,13 @@ sleep 1
 
 toxiproxy-cli create --listen "0.0.0.0:$API_DEV_TOXIC_PROXY_PORT" --upstream "127.0.0.1:$API_DEV_SERVER_PORT" odc-api
 
-toxiproxy-cli toxic add -n downstream-bandwidth -t bandwidth -a rate=5000 -a type=downstream odc-api
+toxiproxy-cli toxic add -n downstream-bandwidth -t bandwidth -a rate=5000 -a --downstream odc-api
 
-toxiproxy-cli toxic add -n upstream-bandwidth -t bandwidth -a rate=2500 -a type=upstream odc-api
+toxiproxy-cli toxic add -n upstream-bandwidth -t bandwidth -a rate=2500 -a --upstream odc-api
 
-toxiproxy-cli toxic add -n latency -t latency -a latency=50 -a jitter=500 -a type=downstream -toxicity 0.2 odc-api
+toxiproxy-cli toxic add -n latency -t latency -a latency=50 -a jitter=500 -a --downstream -toxicity 0.2 odc-api
 
-toxiproxy-cli toxic add -n random-resets -t reset_peer -a type=tox_type=downstream -toxicity 0.1 odc-api
+toxiproxy-cli toxic add -n random-resets -t reset_peer -a --downstream -toxicity 0.1 odc-api
 
 wait "$TOXIPROXY_PID"
 
