@@ -126,7 +126,6 @@ export const StartSessionForm = ({
       inputRef.current.dispatchEvent(event);
 
       setIsDropdownOpen(false);
-      inputRef.current.focus();
     }
   };
 
