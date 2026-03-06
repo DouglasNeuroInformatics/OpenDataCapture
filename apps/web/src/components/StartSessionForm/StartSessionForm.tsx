@@ -9,9 +9,13 @@ import { $SessionType } from '@opendatacapture/schemas/session';
 import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { Sex, SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
-import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
+import { encodeScopedSubjectId, generateSubjectHash, removeSubjectIdScope } from '@opendatacapture/subject-utils';
+import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
+
+import { useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 
 const currentDate = new Date();
 
@@ -46,223 +50,355 @@ export const StartSessionForm = ({
   onSubmit
 }: StartSessionFormProps) => {
   const { resolvedLanguage, t } = useTranslation();
-  return (
-    <Form
-      preventResetValuesOnReset
-      suspendWhileSubmitting
-      className="mx-auto max-w-3xl"
-      content={[
-        {
-          title: t('common.identificationMethod'),
-          description: t('common.identificationMethodDesc'),
-          fields: {
-            subjectIdentificationMethod: {
-              kind: 'string',
-              label: 'Method',
-              options: {
-                CUSTOM_ID: t('common.customIdentifier'),
-                PERSONAL_INFO: t('common.personalInfo')
-              },
-              variant: 'select'
-            }
-          }
-        },
-        {
-          title: t('common.subjectIdentification.title'),
-          fields: {
-            subjectId: {
-              kind: 'dynamic',
-              deps: ['subjectIdentificationMethod'],
-              render({ subjectIdentificationMethod }) {
-                return subjectIdentificationMethod === 'CUSTOM_ID'
-                  ? {
-                      kind: 'string',
-                      label: t('common.identifier'),
-                      variant: 'input'
-                    }
-                  : null;
-              }
-            },
-            subjectFirstName: {
-              kind: 'dynamic',
-              deps: ['subjectIdentificationMethod'],
-              render({ subjectIdentificationMethod }) {
-                return subjectIdentificationMethod === 'PERSONAL_INFO'
-                  ? {
-                      description: t('common.subjectIdentification.firstName.description'),
-                      kind: 'string',
-                      label: t('common.subjectIdentification.firstName.label'),
-                      variant: 'input'
-                    }
-                  : null;
-              }
-            },
-            subjectLastName: {
-              kind: 'dynamic',
-              deps: ['subjectIdentificationMethod'],
-              render({ subjectIdentificationMethod }) {
-                return subjectIdentificationMethod === 'PERSONAL_INFO'
-                  ? {
-                      description: t('common.subjectIdentification.lastName.description'),
-                      kind: 'string',
-                      label: t('common.subjectIdentification.lastName.label'),
-                      variant: 'input'
-                    }
-                  : null;
-              }
-            },
-            subjectDateOfBirth: {
-              kind: 'date',
-              label: t('core.identificationData.dateOfBirth.label')
-            },
-            subjectSex: {
-              description: t('core.identificationData.sex.description'),
-              kind: 'string',
-              label: t('core.identificationData.sex.label'),
-              options: {
-                FEMALE: t('core.identificationData.sex.female'),
-                MALE: t('core.identificationData.sex.male')
-              },
-              variant: 'select'
-            }
-          }
-        },
-        {
-          title: t('session.additionalData.title'),
-          fields: {
-            sessionType: {
-              kind: 'string',
-              label: t('session.type.label'),
-              variant: 'select',
-              options: {
-                RETROSPECTIVE: t('session.type.retrospective'),
-                IN_PERSON: t('session.type.in-person')
-              }
-            },
-            sessionDate: {
-              kind: 'dynamic',
-              deps: ['sessionType'],
-              render({ sessionType }) {
-                return sessionType === 'RETROSPECTIVE'
-                  ? {
-                      description: t('session.dateAssessed.description'),
-                      kind: 'date',
-                      label: t('session.dateAssessed.label')
-                    }
-                  : null;
-              }
-            }
-          }
+
+  const subjectsQuery = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
+  const subjects = subjectsQuery.data ?? [];
+
+  const [dropdownPos, setDropdownPos] = useState<{ left: number; top: number; width: number } | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchString, setSearchString] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleInput = (e: Event) => {
+      setSearchString((e.target as HTMLInputElement).value);
+    };
+
+    const handleFocus = () => {
+      if (inputRef.current) {
+        const rect = inputRef.current.getBoundingClientRect();
+        setDropdownPos({
+          top: rect.bottom + window.scrollY,
+          left: rect.left + window.scrollX,
+          width: rect.width
+        });
+        setSearchString(inputRef.current.value);
+        setIsDropdownOpen(true);
+      }
+    };
+
+    const handleBlur = (e: FocusEvent) => {
+      // Prevent closing if we clicked inside the dropdown
+      if (dropdownRef.current && e.relatedTarget instanceof Node && dropdownRef.current.contains(e.relatedTarget)) {
+        return;
+      }
+      setIsDropdownOpen(false);
+    };
+
+    const observer = new MutationObserver(() => {
+      const input = document.querySelector('input[name="subjectId"]') as HTMLInputElement;
+      if (input && input !== inputRef.current) {
+        if (inputRef.current) {
+          inputRef.current.removeEventListener('input', handleInput);
+          inputRef.current.removeEventListener('focus', handleFocus);
+          inputRef.current.removeEventListener('blur', handleBlur);
         }
-      ]}
-      data-testid="start-session-form"
-      initialValues={initialValues}
-      readOnly={readOnly}
-      submitBtnLabel={t('core.submit')}
-      validationSchema={z
-        .object({
-          subjectFirstName: z.string().optional(),
-          subjectLastName: z.string().optional(),
-          subjectIdentificationMethod: $SubjectIdentificationMethod,
-          subjectId: z
-            .string()
-            .min(1)
-            .refine(
-              (arg) => !arg.includes('$'),
-              t({
-                en: 'Illegal character: $',
-                fr: 'Caractère illégal : $'
+        inputRef.current = input;
+        input.addEventListener('input', handleInput);
+        input.addEventListener('focus', handleFocus);
+        input.addEventListener('blur', handleBlur);
+
+        // Disable browser autocomplete since we're using our own
+        input.setAttribute('autocomplete', 'off');
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      if (inputRef.current) {
+        inputRef.current.removeEventListener('input', handleInput);
+        inputRef.current.removeEventListener('focus', handleFocus);
+        inputRef.current.removeEventListener('blur', handleBlur);
+      }
+    };
+  }, []);
+
+  const handleSelectOption = (value: string) => {
+    if (inputRef.current) {
+      // Set value natively to trigger React's internal state mechanism in the Form component
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeInputValueSetter?.call(inputRef.current, value);
+
+      const event = new Event('input', { bubbles: true });
+      inputRef.current.dispatchEvent(event);
+
+      setIsDropdownOpen(false);
+      inputRef.current.focus();
+    }
+  };
+
+  const filteredSubjects = subjects.filter((s) => {
+    const displayId = removeSubjectIdScope(s.id);
+    const search = searchString.toLowerCase();
+    return (
+      displayId.toLowerCase().includes(search) ||
+      (s.firstName && s.firstName.toLowerCase().includes(search)) ||
+      (s.lastName && s.lastName.toLowerCase().includes(search))
+    );
+  });
+
+  return (
+    <>
+      {isDropdownOpen &&
+        dropdownPos &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            tabIndex={-1}
+            style={{
+              position: 'absolute',
+              top: `${dropdownPos.top + 4}px`,
+              left: `${dropdownPos.left}px`,
+              width: `${dropdownPos.width}px`,
+              zIndex: 9999
+            }}
+            className="max-h-60 overflow-y-auto rounded-md border border-slate-700 bg-slate-800 p-1 shadow-md"
+          >
+            {filteredSubjects.length > 0 ? (
+              filteredSubjects.map((subject) => {
+                const displayId = removeSubjectIdScope(subject.id);
+                return (
+                  <button
+                    key={subject.id}
+                    type="button"
+                    className="flex w-full cursor-pointer select-none flex-col rounded-sm px-2 py-1.5 text-left text-sm text-slate-300 outline-none hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100"
+                    onClick={() => handleSelectOption(displayId)}
+                  >
+                    <span className="font-medium text-slate-200">{displayId}</span>
+                    <span className="text-xs text-slate-400">
+                      {subject.firstName} {subject.lastName}
+                    </span>
+                  </button>
+                );
               })
-            )
-            .optional(),
-          subjectDateOfBirth: z
-            .date()
-            .max(MIN_DATE_OF_BIRTH, { message: t('session.errors.mustBeAdult') })
-            .optional(),
-          subjectSex: z.enum(['MALE', 'FEMALE']).optional(),
-          sessionType: $SessionType.exclude(['REMOTE']),
-          sessionDate: z
-            .date()
-            .max(currentDate, { message: t('session.errors.assessmentMustBeInPast') })
-            .default(currentDate)
-        })
-        .superRefine((val, ctx) => {
-          if (val.subjectIdentificationMethod === 'CUSTOM_ID') {
-            if (!val.subjectId) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: t('core.form.requiredField'),
-                path: ['subjectId']
-              });
-            } else if (currentGroup?.settings.idValidationRegex) {
-              try {
-                const regex = new RegExp(currentGroup?.settings.idValidationRegex);
-                if (!regex.test(val.subjectId)) {
-                  ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message:
-                      currentGroup.settings.idValidationRegexErrorMessage?.[resolvedLanguage] ??
-                      t({
-                        en: `Must match regular expression: ${regex.source}`,
-                        fr: `Doit correspondre à l'expression régulière : ${regex.source}`
-                      }),
-                    path: ['subjectId']
-                  });
-                }
-              } catch (err) {
-                // this should be checked already on the backend
-                console.error(err);
+            ) : (
+              <div className="px-2 py-2 text-sm text-slate-400">
+                {t({ en: 'No subjects found.', fr: 'Aucun sujet trouvé.' })}
+              </div>
+            )}
+          </div>,
+          document.body
+        )}
+      <Form
+        preventResetValuesOnReset
+        suspendWhileSubmitting
+        className="mx-auto max-w-3xl"
+        content={[
+          {
+            title: t('common.identificationMethod'),
+            description: t('common.identificationMethodDesc'),
+            fields: {
+              subjectIdentificationMethod: {
+                kind: 'string',
+                label: 'Method',
+                options: {
+                  CUSTOM_ID: t('common.customIdentifier'),
+                  PERSONAL_INFO: t('common.personalInfo')
+                },
+                variant: 'select'
               }
             }
-          } else if (val.subjectIdentificationMethod === 'PERSONAL_INFO') {
-            const requiredKeys = ['subjectFirstName', 'subjectLastName', 'subjectSex', 'subjectDateOfBirth'] as const;
-            for (const key of requiredKeys) {
-              if (!val[key]) {
+          },
+          {
+            title: t('common.subjectIdentification.title'),
+            fields: {
+              subjectId: {
+                kind: 'dynamic',
+                deps: ['subjectIdentificationMethod'],
+                render({ subjectIdentificationMethod }) {
+                  return subjectIdentificationMethod === 'CUSTOM_ID'
+                    ? {
+                        kind: 'string',
+                        label: t('common.identifier'),
+                        variant: 'input'
+                      }
+                    : null;
+                }
+              },
+              subjectFirstName: {
+                kind: 'dynamic',
+                deps: ['subjectIdentificationMethod'],
+                render({ subjectIdentificationMethod }) {
+                  return subjectIdentificationMethod === 'PERSONAL_INFO'
+                    ? {
+                        description: t('common.subjectIdentification.firstName.description'),
+                        kind: 'string',
+                        label: t('common.subjectIdentification.firstName.label'),
+                        variant: 'input'
+                      }
+                    : null;
+                }
+              },
+              subjectLastName: {
+                kind: 'dynamic',
+                deps: ['subjectIdentificationMethod'],
+                render({ subjectIdentificationMethod }) {
+                  return subjectIdentificationMethod === 'PERSONAL_INFO'
+                    ? {
+                        description: t('common.subjectIdentification.lastName.description'),
+                        kind: 'string',
+                        label: t('common.subjectIdentification.lastName.label'),
+                        variant: 'input'
+                      }
+                    : null;
+                }
+              },
+              subjectDateOfBirth: {
+                kind: 'date',
+                label: t('core.identificationData.dateOfBirth.label')
+              },
+              subjectSex: {
+                description: t('core.identificationData.sex.description'),
+                kind: 'string',
+                label: t('core.identificationData.sex.label'),
+                options: {
+                  FEMALE: t('core.identificationData.sex.female'),
+                  MALE: t('core.identificationData.sex.male')
+                },
+                variant: 'select'
+              }
+            }
+          },
+          {
+            title: t('session.additionalData.title'),
+            fields: {
+              sessionType: {
+                kind: 'string',
+                label: t('session.type.label'),
+                variant: 'select',
+                options: {
+                  RETROSPECTIVE: t('session.type.retrospective'),
+                  IN_PERSON: t('session.type.in-person')
+                }
+              },
+              sessionDate: {
+                kind: 'dynamic',
+                deps: ['sessionType'],
+                render({ sessionType }) {
+                  return sessionType === 'RETROSPECTIVE'
+                    ? {
+                        description: t('session.dateAssessed.description'),
+                        kind: 'date',
+                        label: t('session.dateAssessed.label')
+                      }
+                    : null;
+                }
+              }
+            }
+          }
+        ]}
+        data-testid="start-session-form"
+        initialValues={initialValues}
+        readOnly={readOnly}
+        submitBtnLabel={t('core.submit')}
+        validationSchema={z
+          .object({
+            subjectFirstName: z.string().optional(),
+            subjectLastName: z.string().optional(),
+            subjectIdentificationMethod: $SubjectIdentificationMethod,
+            subjectId: z
+              .string()
+              .min(1)
+              .refine(
+                (arg) => !arg.includes('$'),
+                t({
+                  en: 'Illegal character: $',
+                  fr: 'Caractère illégal : $'
+                })
+              )
+              .optional(),
+            subjectDateOfBirth: z
+              .date()
+              .max(MIN_DATE_OF_BIRTH, { message: t('session.errors.mustBeAdult') })
+              .optional(),
+            subjectSex: z.enum(['MALE', 'FEMALE']).optional(),
+            sessionType: $SessionType.exclude(['REMOTE']),
+            sessionDate: z
+              .date()
+              .max(currentDate, { message: t('session.errors.assessmentMustBeInPast') })
+              .default(currentDate)
+          })
+          .superRefine((val, ctx) => {
+            if (val.subjectIdentificationMethod === 'CUSTOM_ID') {
+              if (!val.subjectId) {
                 ctx.addIssue({
                   code: z.ZodIssueCode.custom,
                   message: t('core.form.requiredField'),
-                  path: [key]
+                  path: ['subjectId']
                 });
+              } else if (currentGroup?.settings.idValidationRegex) {
+                try {
+                  const regex = new RegExp(currentGroup?.settings.idValidationRegex);
+                  if (!regex.test(val.subjectId)) {
+                    ctx.addIssue({
+                      code: z.ZodIssueCode.custom,
+                      message:
+                        currentGroup.settings.idValidationRegexErrorMessage?.[resolvedLanguage] ??
+                        t({
+                          en: `Must match regular expression: ${regex.source}`,
+                          fr: `Doit correspondre à l'expression régulière : ${regex.source}`
+                        }),
+                      path: ['subjectId']
+                    });
+                  }
+                } catch (err) {
+                  // this should be checked already on the backend
+                  console.error(err);
+                }
+              }
+            } else if (val.subjectIdentificationMethod === 'PERSONAL_INFO') {
+              const requiredKeys = ['subjectFirstName', 'subjectLastName', 'subjectSex', 'subjectDateOfBirth'] as const;
+              for (const key of requiredKeys) {
+                if (!val[key]) {
+                  ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: t('core.form.requiredField'),
+                    path: [key]
+                  });
+                }
               }
             }
+          })}
+        onSubmit={async ({
+          sessionType,
+          sessionDate,
+          subjectId,
+          subjectFirstName,
+          subjectLastName,
+          subjectDateOfBirth,
+          subjectSex
+        }) => {
+          if (!subjectId) {
+            subjectId = await generateSubjectHash({
+              firstName: subjectFirstName!,
+              lastName: subjectLastName!,
+              dateOfBirth: subjectDateOfBirth!,
+              sex: subjectSex!
+            });
+          } else {
+            subjectId = encodeScopedSubjectId(subjectId, {
+              groupName: currentGroup?.name ?? DEFAULT_GROUP_NAME
+            });
           }
-        })}
-      onSubmit={async ({
-        sessionType,
-        sessionDate,
-        subjectId,
-        subjectFirstName,
-        subjectLastName,
-        subjectDateOfBirth,
-        subjectSex
-      }) => {
-        if (!subjectId) {
-          subjectId = await generateSubjectHash({
-            firstName: subjectFirstName!,
-            lastName: subjectLastName!,
-            dateOfBirth: subjectDateOfBirth!,
-            sex: subjectSex!
+          await onSubmit({
+            date: sessionDate,
+            groupId: currentGroup?.id ?? null,
+            username: username ?? null,
+            type: sessionType,
+            subjectData: {
+              id: subjectId,
+              firstName: subjectFirstName,
+              lastName: subjectLastName,
+              dateOfBirth: subjectDateOfBirth,
+              sex: subjectSex
+            }
           });
-        } else {
-          subjectId = encodeScopedSubjectId(subjectId, {
-            groupName: currentGroup?.name ?? DEFAULT_GROUP_NAME
-          });
-        }
-        await onSubmit({
-          date: sessionDate,
-          groupId: currentGroup?.id ?? null,
-          username: username ?? null,
-          type: sessionType,
-          subjectData: {
-            id: subjectId,
-            firstName: subjectFirstName,
-            lastName: subjectLastName,
-            dateOfBirth: subjectDateOfBirth,
-            sex: subjectSex
-          }
-        });
-      }}
-    />
+        }}
+      />
+    </>
   );
 };
 
