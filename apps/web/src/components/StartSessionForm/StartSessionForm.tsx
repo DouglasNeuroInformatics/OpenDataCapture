@@ -10,7 +10,7 @@ import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { Sex, SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash, removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
@@ -56,67 +56,24 @@ export const StartSessionForm = ({
 
   const [dropdownPos, setDropdownPos] = useState<{ left: number; top: number; width: number } | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [searchString, setSearchString] = useState('');
+  const searchStringRef = useRef('');
+  const [dropdownKey, setDropdownKey] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleInput = (e: Event) => {
-      setSearchString((e.target as HTMLInputElement).value);
-    };
-
-    const handleFocus = () => {
-      if (inputRef.current) {
-        const rect = inputRef.current.getBoundingClientRect();
-        setDropdownPos({
-          top: rect.bottom + window.scrollY,
-          left: rect.left + window.scrollX,
-          width: rect.width
-        });
-        setSearchString(inputRef.current.value);
-        setIsDropdownOpen(true);
-      }
-    };
-
-    const handleBlur = (e: FocusEvent) => {
-      // Prevent closing if we clicked inside the dropdown
-      if (dropdownRef.current && e.relatedTarget instanceof Node && dropdownRef.current.contains(e.relatedTarget)) {
-        return;
-      }
-      setIsDropdownOpen(false);
-    };
-
-    const observer = new MutationObserver(() => {
-      const input = document.querySelector('input[name="subjectId"]') as HTMLInputElement;
-      if (input && input !== inputRef.current) {
-        if (inputRef.current) {
-          inputRef.current.removeEventListener('input', handleInput);
-          inputRef.current.removeEventListener('focus', handleFocus);
-          inputRef.current.removeEventListener('blur', handleBlur);
-        }
-        inputRef.current = input;
-        input.addEventListener('input', handleInput);
-        input.addEventListener('focus', handleFocus);
-        input.addEventListener('blur', handleBlur);
-
-        // Disable browser autocomplete since we're using our own
-        input.setAttribute('autocomplete', 'off');
-      }
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    return () => {
-      observer.disconnect();
-      if (inputRef.current) {
-        inputRef.current.removeEventListener('input', handleInput);
-        inputRef.current.removeEventListener('focus', handleFocus);
-        inputRef.current.removeEventListener('blur', handleBlur);
-      }
-    };
+  // Recalculate dropdown position from the input's current bounding rect
+  const updateDropdownPos = useCallback(() => {
+    if (inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom,
+        left: rect.left,
+        width: rect.width
+      });
+    }
   }, []);
 
-  const handleSelectOption = (value: string) => {
+  const handleSelectOption = useCallback((value: string) => {
     if (inputRef.current) {
       // Set value natively to trigger React's internal state mechanism in the Form component
       const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
@@ -127,11 +84,101 @@ export const StartSessionForm = ({
 
       setIsDropdownOpen(false);
     }
-  };
+  }, []);
 
+  useEffect(() => {
+    let rafId: number | null = null;
+    const handleInput = (e: Event) => {
+      searchStringRef.current = (e.target as HTMLInputElement).value;
+      // Defer the re-render to the next animation frame so Playwright's fill()
+      // can complete without the Form re-rendering and resetting the value
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        setDropdownKey((k) => k + 1);
+      });
+    };
+
+    const handleFocus = () => {
+      if (inputRef.current) {
+        searchStringRef.current = inputRef.current.value;
+        updateDropdownPos();
+        setIsDropdownOpen(true);
+      }
+    };
+
+    const handleBlur = (e: FocusEvent) => {
+      const related = e.relatedTarget;
+      // Use setTimeout so the relatedTarget check works after the browser has settled focus
+      setTimeout(() => {
+        if (dropdownRef.current && related instanceof Node && dropdownRef.current.contains(related)) {
+          return;
+        }
+        setIsDropdownOpen(false);
+      }, 0);
+    };
+
+    // Close dropdown on programmatic value changes (e.g., Playwright's fill())
+    const handleChange = () => {
+      setIsDropdownOpen(false);
+    };
+
+    const observer = new MutationObserver(() => {
+      const input = document.querySelector('input[name="subjectId"]') as HTMLInputElement;
+      if (input && input !== inputRef.current) {
+        // Clean up old listeners
+        if (inputRef.current) {
+          inputRef.current.removeEventListener('input', handleInput);
+          inputRef.current.removeEventListener('focus', handleFocus);
+          inputRef.current.removeEventListener('blur', handleBlur);
+          inputRef.current.removeEventListener('change', handleChange);
+        }
+        inputRef.current = input;
+        input.addEventListener('input', handleInput);
+        input.addEventListener('focus', handleFocus);
+        input.addEventListener('blur', handleBlur);
+        input.addEventListener('change', handleChange);
+
+        // Disable browser autocomplete since we're using our own
+        input.setAttribute('autocomplete', 'off');
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
+      if (inputRef.current) {
+        inputRef.current.removeEventListener('input', handleInput);
+        inputRef.current.removeEventListener('focus', handleFocus);
+        inputRef.current.removeEventListener('blur', handleBlur);
+        inputRef.current.removeEventListener('change', handleChange);
+      }
+    };
+  }, [updateDropdownPos]);
+
+  // Update dropdown position on scroll and resize so it stays attached to the input
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+
+    const handleScrollOrResize = () => {
+      updateDropdownPos();
+    };
+
+    window.addEventListener('scroll', handleScrollOrResize, true);
+    window.addEventListener('resize', handleScrollOrResize);
+
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [isDropdownOpen, updateDropdownPos]);
+
+  // Use dropdownKey as a dependency signal; actual filtering uses the ref value
+  void dropdownKey;
   const filteredSubjects = subjects.filter((s) => {
     const displayId = removeSubjectIdScope(s.id);
-    const search = searchString.toLowerCase();
+    const search = searchStringRef.current.toLowerCase();
     return (
       displayId.toLowerCase().includes(search) ||
       (s.firstName && s.firstName.toLowerCase().includes(search)) ||
@@ -148,7 +195,7 @@ export const StartSessionForm = ({
             ref={dropdownRef}
             tabIndex={-1}
             style={{
-              position: 'absolute',
+              position: 'fixed',
               top: `${dropdownPos.top + 4}px`,
               left: `${dropdownPos.left}px`,
               width: `${dropdownPos.width}px`,
