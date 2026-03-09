@@ -77,8 +77,7 @@ export const StartSessionForm = ({
   const handleSelectOption = useCallback((value: string) => {
     if (inputRef.current) {
       // Set value natively to trigger React's internal state mechanism in the Form component
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-      nativeInputValueSetter?.call(inputRef.current, value);
+      Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set?.call(inputRef.current, value);
 
       const event = new Event('input', { bubbles: true });
       inputRef.current.dispatchEvent(event);
@@ -180,11 +179,7 @@ export const StartSessionForm = ({
   const filteredSubjects = subjects.filter((s) => {
     const displayId = removeSubjectIdScope(s.id);
     const search = searchStringRef.current.toLowerCase();
-    return (
-      displayId.toLowerCase().includes(search) ||
-      s.firstName?.toLowerCase().includes(search) ||
-      s.lastName?.toLowerCase().includes(search)
-    );
+    return displayId.toLowerCase().includes(search);
   });
 
   return (
