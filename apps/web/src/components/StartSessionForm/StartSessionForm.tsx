@@ -1,5 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
@@ -10,7 +12,6 @@ import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { Sex, SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash, removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import { useEffect, useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
@@ -54,7 +55,7 @@ export const StartSessionForm = ({
   const subjectsQuery = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
   const subjects = subjectsQuery.data ?? [];
 
-  const [dropdownPos, setDropdownPos] = useState<{ left: number; top: number; width: number } | null>(null);
+  const [dropdownPos, setDropdownPos] = useState<null | { left: number; top: number; width: number }>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const searchStringRef = useRef('');
   const [dropdownKey, setDropdownKey] = useState(0);
@@ -87,7 +88,7 @@ export const StartSessionForm = ({
   }, []);
 
   useEffect(() => {
-    let rafId: number | null = null;
+    let rafId: null | number = null;
     const handleInput = (e: Event) => {
       searchStringRef.current = (e.target as HTMLInputElement).value;
       // Defer the re-render to the next animation frame so Playwright's fill()
@@ -123,7 +124,7 @@ export const StartSessionForm = ({
     };
 
     const observer = new MutationObserver(() => {
-      const input = document.querySelector('input[name="subjectId"]') as HTMLInputElement;
+      const input = document.querySelector('input[name="subjectId"]')!;
       if (input && input !== inputRef.current) {
         // Clean up old listeners
         if (inputRef.current) {
@@ -181,8 +182,8 @@ export const StartSessionForm = ({
     const search = searchStringRef.current.toLowerCase();
     return (
       displayId.toLowerCase().includes(search) ||
-      (s.firstName && s.firstName.toLowerCase().includes(search)) ||
-      (s.lastName && s.lastName.toLowerCase().includes(search))
+      s.firstName?.toLowerCase().includes(search) ||
+      s.lastName?.toLowerCase().includes(search)
     );
   });
 
@@ -192,8 +193,8 @@ export const StartSessionForm = ({
         dropdownPos &&
         createPortal(
           <div
+            className="max-h-60 overflow-y-auto rounded-md border border-slate-700 bg-slate-800 p-1 shadow-md"
             ref={dropdownRef}
-            tabIndex={-1}
             style={{
               position: 'fixed',
               top: `${dropdownPos.top + 4}px`,
@@ -201,16 +202,16 @@ export const StartSessionForm = ({
               width: `${dropdownPos.width}px`,
               zIndex: 9999
             }}
-            className="max-h-60 overflow-y-auto rounded-md border border-slate-700 bg-slate-800 p-1 shadow-md"
+            tabIndex={-1}
           >
             {filteredSubjects.length > 0 ? (
               filteredSubjects.map((subject) => {
                 const displayId = removeSubjectIdScope(subject.id);
                 return (
                   <button
+                    className="flex w-full cursor-pointer select-none flex-col rounded-sm px-2 py-1.5 text-left text-sm text-slate-300 outline-none hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100"
                     key={subject.id}
                     type="button"
-                    className="flex w-full cursor-pointer select-none flex-col rounded-sm px-2 py-1.5 text-left text-sm text-slate-300 outline-none hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100"
                     onClick={() => handleSelectOption(displayId)}
                   >
                     <span className="font-medium text-slate-200">{displayId}</span>
