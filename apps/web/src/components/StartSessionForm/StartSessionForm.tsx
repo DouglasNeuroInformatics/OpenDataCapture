@@ -210,9 +210,6 @@ export const StartSessionForm = ({
                     onClick={() => handleSelectOption(displayId)}
                   >
                     <span className="font-medium text-slate-200">{displayId}</span>
-                    <span className="text-xs text-slate-400">
-                      {subject.firstName} {subject.lastName}
-                    </span>
                   </button>
                 );
               })
