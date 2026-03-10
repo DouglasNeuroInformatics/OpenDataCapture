@@ -123,7 +123,8 @@ export const StartSessionForm = ({
     };
 
     const observer = new MutationObserver(() => {
-      const input = document.querySelector('input[name="subjectId"]') as HTMLInputElement;
+      const initialInput = document.querySelector('input[name="subjectId"]')!;
+      const input = initialInput as HTMLInputElement;
       if (input && input !== inputRef.current) {
         // Clean up old listeners
         if (inputRef.current) {
