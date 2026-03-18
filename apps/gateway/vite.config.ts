@@ -9,9 +9,6 @@ export default defineConfig(({ mode }) => ({
   build: {
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false,
-    rollupOptions: {
-      external: ['esbuild']
-    },
     sourcemap: true,
     target: 'es2022'
   },
