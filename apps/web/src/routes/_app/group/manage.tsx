@@ -247,7 +247,10 @@ const RouteComponent = () => {
       defaultIdentificationMethod,
       idValidationRegex: settings?.idValidationRegex,
       idValidationRegexErrorMessageEn: settings?.idValidationRegexErrorMessage?.en,
-      idValidationRegexErrorMessageFr: settings?.idValidationRegexErrorMessage?.fr
+      idValidationRegexErrorMessageFr: settings?.idValidationRegexErrorMessage?.fr,
+      minimumAge: settings?.minimumAge,
+      minimumAgeApplied: settings?.minimumAgeApplied,
+      subjectIdDisplayLength: settings?.subjectIdDisplayLength
     };
     for (const instrument of availableInstruments) {
       if (instrument.kind === 'FORM') {
