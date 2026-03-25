@@ -107,7 +107,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                   return {
                     kind: 'number',
                     label: t({
-                      en: 'Enter minimum age',
+                      en: 'Enter Minimum Age',
                       fr: "Entrez l'âge minimum"
                     }),
                     variant: 'input'
@@ -195,7 +195,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         idValidationRegexErrorMessageFr: z.string().optional(),
         minimumAge: z.number().int().positive().optional(),
         minimumAgeApplied: z.boolean().optional(),
-        subjectIdDisplayLength: z.number().int().min(1)
+        subjectIdDisplayLength: z.number().int().min(1).optional()
       })}
       onSubmit={(data) => {
         void onSubmit({
