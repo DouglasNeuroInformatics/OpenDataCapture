@@ -107,8 +107,8 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                   return {
                     kind: 'number',
                     label: t({
-                      en: 'Enter Minimum Age',
-                      fr: "Entrez l'âge minimum"
+                      en: 'Minimum Age',
+                      fr: "L'âge minimum"
                     }),
                     variant: 'input'
                   };
