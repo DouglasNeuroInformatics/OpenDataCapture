@@ -15,10 +15,6 @@ import { z } from 'zod/v4';
 
 const currentDate = new Date();
 
-const EIGHTEEN_YEARS = 568025136000; // milliseconds
-
-const MIN_DATE_OF_BIRTH = new Date(currentDate.getTime() - EIGHTEEN_YEARS);
-
 type StartSessionFormData = {
   sessionDate: Date;
   sessionType: 'IN_PERSON' | 'RETROSPECTIVE';
@@ -46,6 +42,10 @@ export const StartSessionForm = ({
   onSubmit
 }: StartSessionFormProps) => {
   const { resolvedLanguage, t } = useTranslation();
+  const minDateOfBirth = currentGroup?.settings.minimumAge
+    ? new Date(currentDate.getTime() - currentGroup.settings.minimumAge * 31556952000)
+    : undefined;
+
   return (
     <Form
       preventResetValuesOnReset
@@ -177,8 +177,19 @@ export const StartSessionForm = ({
             .optional(),
           subjectDateOfBirth: z
             .date()
-            .max(MIN_DATE_OF_BIRTH, { message: t('session.errors.mustBeAdult') })
-            .optional(),
+            .optional()
+            .refine(
+              (date) => {
+                if (!date || !minDateOfBirth) return true;
+                return date <= minDateOfBirth;
+              },
+              {
+                message: t({
+                  en: `Subject must be above age of ${currentGroup?.settings.minimumAge}`,
+                  fr: `Le sujet doit être âgé de plus de ${currentGroup?.settings.minimumAge}`
+                })
+              }
+            ),
           subjectSex: z.enum(['MALE', 'FEMALE']).optional(),
           sessionType: $SessionType.exclude(['REMOTE']),
           sessionDate: z

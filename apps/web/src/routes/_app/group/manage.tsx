@@ -32,7 +32,9 @@ type ManageGroupFormProps = {
       accessibleInteractiveInstrumentIds: Set<string>;
       defaultIdentificationMethod?: SubjectIdentificationMethod;
       idValidationRegex?: null | string;
-      subjectIdDisplayLength?: number;
+      minimumAge?: null | number;
+      minimumAgeApplied?: boolean | null;
+      subjectIdDisplayLength?: null | number;
     };
   };
   onSubmit: (data: Partial<UpdateGroupData>) => Promisable<any>;
@@ -84,6 +86,40 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
           title: t({
             en: 'Display Settings',
             fr: "Paramètres d'affichage"
+          })
+        },
+        {
+          fields: {
+            minimumAgeApplied: {
+              kind: 'boolean',
+              label: t({
+                en: 'Apply Minimum Age For Subjects',
+                fr: 'Appliquer un âge minimum aux sujets'
+              }),
+              variant: 'radio'
+            },
+            // eslint-disable-next-line perfectionist/sort-objects
+            minimumAge: {
+              deps: ['minimumAgeApplied'],
+              kind: 'dynamic',
+              render: (data) => {
+                if (data.minimumAgeApplied) {
+                  return {
+                    kind: 'number',
+                    label: t({
+                      en: 'Minimum Age',
+                      fr: "L'âge minimum"
+                    }),
+                    variant: 'input'
+                  };
+                }
+                return null;
+              }
+            }
+          },
+          title: t({
+            en: 'Age Limit Settings',
+            fr: "Paramètres de l'âge"
           })
         },
         {
@@ -150,15 +186,32 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
       initialValues={initialValues}
       preventResetValuesOnReset={true}
       readOnly={readOnly}
-      validationSchema={z.object({
-        accessibleFormInstrumentIds: z.set(z.string()),
-        accessibleInteractiveInstrumentIds: z.set(z.string()),
-        defaultIdentificationMethod: $SubjectIdentificationMethod.optional(),
-        idValidationRegex: $RegexString.optional(),
-        idValidationRegexErrorMessageEn: z.string().optional(),
-        idValidationRegexErrorMessageFr: z.string().optional(),
-        subjectIdDisplayLength: z.number().int().min(1)
-      })}
+      validationSchema={z
+        .object({
+          accessibleFormInstrumentIds: z.set(z.string()),
+          accessibleInteractiveInstrumentIds: z.set(z.string()),
+          defaultIdentificationMethod: $SubjectIdentificationMethod.optional(),
+          idValidationRegex: $RegexString.optional(),
+          idValidationRegexErrorMessageEn: z.string().optional(),
+          idValidationRegexErrorMessageFr: z.string().optional(),
+          minimumAge: z.number().int().positive().optional(),
+          minimumAgeApplied: z.boolean().optional(),
+          subjectIdDisplayLength: z.number().int().min(1).optional()
+        })
+        .check((ctx) => {
+          if (ctx.value.minimumAgeApplied && !ctx.value.minimumAge) {
+            ctx.issues.push({
+              code: 'custom',
+              input: ctx.value.minimumAge,
+              message: t({
+                en: 'Please enter an age',
+                fr: "Entrez un âge s'il vous plait"
+              }),
+              path: ['minimumAge']
+            });
+          }
+          return;
+        })}
       onSubmit={(data) => {
         void onSubmit({
           accessibleInstrumentIds: [...data.accessibleFormInstrumentIds, ...data.accessibleInteractiveInstrumentIds],
@@ -169,6 +222,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
               en: data.idValidationRegexErrorMessageEn,
               fr: data.idValidationRegexErrorMessageFr
             },
+            minimumAge: data.minimumAgeApplied ? data.minimumAge : null,
             subjectIdDisplayLength: data.subjectIdDisplayLength
           }
         });
@@ -207,7 +261,10 @@ const RouteComponent = () => {
       defaultIdentificationMethod,
       idValidationRegex: settings?.idValidationRegex,
       idValidationRegexErrorMessageEn: settings?.idValidationRegexErrorMessage?.en,
-      idValidationRegexErrorMessageFr: settings?.idValidationRegexErrorMessage?.fr
+      idValidationRegexErrorMessageFr: settings?.idValidationRegexErrorMessage?.fr,
+      minimumAge: settings?.minimumAge,
+      minimumAgeApplied: typeof settings?.minimumAge === 'number',
+      subjectIdDisplayLength: settings?.subjectIdDisplayLength
     };
     for (const instrument of availableInstruments) {
       if (instrument.kind === 'FORM') {
