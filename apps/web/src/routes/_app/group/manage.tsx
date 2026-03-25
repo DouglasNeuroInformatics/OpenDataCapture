@@ -141,7 +141,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
               kind: 'string',
               label: t({
                 en: 'ID Validation Pattern',
-                fr: 'TBD'
+                fr: "Modèle de validation d'identité"
               }),
               variant: 'input'
             },
