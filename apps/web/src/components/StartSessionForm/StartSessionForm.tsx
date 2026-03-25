@@ -15,10 +15,6 @@ import { z } from 'zod/v4';
 
 const currentDate = new Date();
 
-// const EIGHTEEN_YEARS = 568025136000; // milliseconds
-
-//const MIN_DATE_OF_BIRTH = new Date(currentDate.getTime() - EIGHTEEN_YEARS);
-
 type StartSessionFormData = {
   sessionDate: Date;
   sessionType: 'IN_PERSON' | 'RETROSPECTIVE';
@@ -184,17 +180,10 @@ export const StartSessionForm = ({
             .optional(),
           subjectDateOfBirth: z
             .date()
-
-            // .max(MIN_DATE_OF_BIRTH, { message: t({
-            //   en: `Subject must be above age of ${currentGroup?.settings.minimumAge}`,
-            //   fr: `Le sujet doit être âgé de plus de ${currentGroup?.settings.minimumAge}`
-            // }) })
             .optional()
             .refine(
               (date) => {
-                // If there's no date picked or no limit defined, it's valid
                 if (!date || !MIN_DATE_OF_BIRTH) return true;
-                // Otherwise, ensure the date is not after the maximum allowed date
                 return date <= MIN_DATE_OF_BIRTH;
               },
               {
