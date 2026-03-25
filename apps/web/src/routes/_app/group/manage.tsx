@@ -186,17 +186,32 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
       initialValues={initialValues}
       preventResetValuesOnReset={true}
       readOnly={readOnly}
-      validationSchema={z.object({
-        accessibleFormInstrumentIds: z.set(z.string()),
-        accessibleInteractiveInstrumentIds: z.set(z.string()),
-        defaultIdentificationMethod: $SubjectIdentificationMethod.optional(),
-        idValidationRegex: $RegexString.optional(),
-        idValidationRegexErrorMessageEn: z.string().optional(),
-        idValidationRegexErrorMessageFr: z.string().optional(),
-        minimumAge: z.number().int().positive().optional(),
-        minimumAgeApplied: z.boolean().optional(),
-        subjectIdDisplayLength: z.number().int().min(1).optional()
-      })}
+      validationSchema={z
+        .object({
+          accessibleFormInstrumentIds: z.set(z.string()),
+          accessibleInteractiveInstrumentIds: z.set(z.string()),
+          defaultIdentificationMethod: $SubjectIdentificationMethod.optional(),
+          idValidationRegex: $RegexString.optional(),
+          idValidationRegexErrorMessageEn: z.string().optional(),
+          idValidationRegexErrorMessageFr: z.string().optional(),
+          minimumAge: z.number().int().positive().optional(),
+          minimumAgeApplied: z.boolean().optional(),
+          subjectIdDisplayLength: z.number().int().min(1).optional()
+        })
+        .check((ctx) => {
+          if (ctx.value.minimumAgeApplied && !ctx.value.minimumAge) {
+            ctx.issues.push({
+              code: 'custom',
+              input: ctx.value.minimumAge,
+              message: t({
+                en: 'Please enter an age',
+                fr: "Entrez un âge s'il vous plait"
+              }),
+              path: ['minimumAge']
+            });
+          }
+          return;
+        })}
       onSubmit={(data) => {
         void onSubmit({
           accessibleInstrumentIds: [...data.accessibleFormInstrumentIds, ...data.accessibleInteractiveInstrumentIds],
@@ -207,8 +222,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
               en: data.idValidationRegexErrorMessageEn,
               fr: data.idValidationRegexErrorMessageFr
             },
-            minimumAge: data.minimumAge,
-            minimumAgeApplied: data.minimumAgeApplied,
+            minimumAge: data.minimumAgeApplied ? data.minimumAge : null,
             subjectIdDisplayLength: data.subjectIdDisplayLength
           }
         });
@@ -249,7 +263,7 @@ const RouteComponent = () => {
       idValidationRegexErrorMessageEn: settings?.idValidationRegexErrorMessage?.en,
       idValidationRegexErrorMessageFr: settings?.idValidationRegexErrorMessage?.fr,
       minimumAge: settings?.minimumAge,
-      minimumAgeApplied: settings?.minimumAgeApplied,
+      minimumAgeApplied: typeof settings?.minimumAge === 'number',
       subjectIdDisplayLength: settings?.subjectIdDisplayLength
     };
     for (const instrument of availableInstruments) {
