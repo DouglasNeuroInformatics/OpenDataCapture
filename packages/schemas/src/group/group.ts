@@ -13,6 +13,8 @@ export const $GroupSettings = z.object({
       fr: z.string().nullish()
     })
     .nullish(),
+  minimumAge: z.number().int().positive().nullish(),
+  minimumAgeApplied: z.boolean().nullish(),
   subjectIdDisplayLength: z.number().nullish()
 });
 

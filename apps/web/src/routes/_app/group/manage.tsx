@@ -32,6 +32,8 @@ type ManageGroupFormProps = {
       accessibleInteractiveInstrumentIds: Set<string>;
       defaultIdentificationMethod?: SubjectIdentificationMethod;
       idValidationRegex?: null | string;
+      minimumAge?: number;
+      minimumAgeApplied?: boolean;
       subjectIdDisplayLength?: number;
     };
   };
@@ -84,6 +86,40 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
           title: t({
             en: 'Display Settings',
             fr: "Paramètres d'affichage"
+          })
+        },
+        {
+          fields: {
+            minimumAgeApplied: {
+              kind: 'boolean',
+              label: t({
+                en: 'Apply Minimum Age For Subjects',
+                fr: 'Appliquer un âge minimum aux sujets'
+              }),
+              variant: 'radio'
+            },
+            // eslint-disable-next-line perfectionist/sort-objects
+            minimumAge: {
+              deps: ['minimumAgeApplied'],
+              kind: 'dynamic',
+              render: (data) => {
+                if (data.minimumAgeApplied) {
+                  return {
+                    kind: 'number',
+                    label: t({
+                      en: 'Enter minimum age',
+                      fr: "Entrez l'âge minimum"
+                    }),
+                    variant: 'input'
+                  };
+                }
+                return null;
+              }
+            }
+          },
+          title: t({
+            en: 'Age Limit Settings',
+            fr: "Paramètres de l'âge"
           })
         },
         {
@@ -157,6 +193,8 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         idValidationRegex: $RegexString.optional(),
         idValidationRegexErrorMessageEn: z.string().optional(),
         idValidationRegexErrorMessageFr: z.string().optional(),
+        minimumAge: z.number().int().positive().optional(),
+        minimumAgeApplied: z.boolean().optional(),
         subjectIdDisplayLength: z.number().int().min(1)
       })}
       onSubmit={(data) => {
@@ -169,6 +207,8 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
               en: data.idValidationRegexErrorMessageEn,
               fr: data.idValidationRegexErrorMessageFr
             },
+            minimumAge: data.minimumAge,
+            minimumAgeApplied: data.minimumAgeApplied,
             subjectIdDisplayLength: data.subjectIdDisplayLength
           }
         });
