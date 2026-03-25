@@ -32,9 +32,9 @@ type ManageGroupFormProps = {
       accessibleInteractiveInstrumentIds: Set<string>;
       defaultIdentificationMethod?: SubjectIdentificationMethod;
       idValidationRegex?: null | string;
-      minimumAge?: number;
-      minimumAgeApplied?: boolean;
-      subjectIdDisplayLength?: number;
+      minimumAge?: null | number;
+      minimumAgeApplied?: boolean | null;
+      subjectIdDisplayLength?: null | number;
     };
   };
   onSubmit: (data: Partial<UpdateGroupData>) => Promisable<any>;
