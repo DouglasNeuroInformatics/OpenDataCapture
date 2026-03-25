@@ -99,6 +99,8 @@ type GroupSettings {
   idValidationRegex             String?
   idValidationRegexErrorMessage ErrorMessage?
   subjectIdDisplayLength        Int?
+  minimumAge                    Int?
+  minimumAgeApplied             Boolean?
 }
 
 model Group {
