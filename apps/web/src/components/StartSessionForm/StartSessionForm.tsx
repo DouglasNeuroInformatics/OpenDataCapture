@@ -43,10 +43,7 @@ export const StartSessionForm = ({
 }: StartSessionFormProps) => {
   const { resolvedLanguage, t } = useTranslation();
   const minDateOfBirth = currentGroup?.settings.minimumAge
-    ? new Date(
-        currentDate.getTime() -
-          (currentGroup?.settings.minimumAge ? currentGroup?.settings.minimumAge * 31556952000 : 0)
-      )
+    ? new Date(currentDate.getTime() - currentGroup.settings.minimumAge * 31556952000)
     : undefined;
 
   return (
