@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button, DropdownMenu } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { EllipsisVerticalIcon } from 'lucide-react';
 
 import { useAppStore } from '@/store';
@@ -21,6 +22,7 @@ export const ActionsDropdown = () => {
   const [showStorageUsageDialog, setShowStorageUsageDialog] = useState(false);
 
   const selectedInstrument = useAppStore((store) => store.selectedInstrument);
+  const { t } = useTranslation();
 
   return (
     <React.Fragment>
@@ -43,22 +45,22 @@ export const ActionsDropdown = () => {
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild onSelect={() => setShowLoginDialog(true)}>
             <button className="w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
-              Login
+              {t({ en: 'Login', fr: 'Se connecter' })}
             </button>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild onSelect={() => setShowUploadBundleDialog(true)}>
             <button className="w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
-              Upload Bundle
+              {t({ en: 'Upload Bundle', fr: 'Téléverser le paquet' })}
             </button>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild onSelect={() => setShowUserSettingsDialog(true)}>
             <button className="w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
-              User Settings
+              {t({ en: 'User Settings', fr: 'Paramètres utilisateur' })}
             </button>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild onSelect={() => setShowStorageUsageDialog(true)}>
             <button className="w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" type="button">
-              Storage Usage
+              {t({ en: 'Storage Usage', fr: 'Utilisation du stockage' })}
             </button>
           </DropdownMenu.Item>
           <DropdownMenu.Separator />
@@ -68,7 +70,7 @@ export const ActionsDropdown = () => {
               disabled={selectedInstrument.category !== 'Saved'}
               type="button"
             >
-              Delete Instrument
+              {t({ en: 'Delete Instrument', fr: "Supprimer l'instrument" })}
             </button>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild onSelect={() => setShowRestoreDefaultsDialog(true)}>
@@ -76,7 +78,7 @@ export const ActionsDropdown = () => {
               className="w-full cursor-pointer text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400"
               type="button"
             >
-              Restore Defaults
+              {t({ en: 'Restore Defaults', fr: 'Restaurer les paramètres par défaut' })}
             </button>
           </DropdownMenu.Item>
         </DropdownMenu.Content>
