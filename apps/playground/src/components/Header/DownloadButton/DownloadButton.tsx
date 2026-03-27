@@ -1,4 +1,4 @@
-import { useDownload } from '@douglasneuroinformatics/libui/hooks';
+import { useDownload, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import JSZip from 'jszip';
 import { DownloadIcon } from 'lucide-react';
 
@@ -24,10 +24,12 @@ export const DownloadButton = () => {
     await download(`${baseName}.zip`, file, { blobType: 'application/zip' });
   };
 
+  const { t } = useTranslation();
+
   return (
     <ActionButton
       icon={<DownloadIcon />}
-      tooltip="Download Archive"
+      tooltip={t({ en: 'Download Archive', fr: "Télécharger l'archive" })}
       onClick={() => {
         void downloadFiles();
       }}
