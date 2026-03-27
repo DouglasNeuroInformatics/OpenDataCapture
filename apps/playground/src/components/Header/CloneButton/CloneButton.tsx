@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Dialog, Form, Tooltip } from '@douglasneuroinformatics/libui/components';
-import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyPlusIcon } from 'lucide-react';
 import { z } from 'zod/v4';
 
@@ -16,6 +16,7 @@ export const CloneButton = () => {
   const addInstrument = useAppStore((store) => store.addInstrument);
   const setSelectedInstrument = useAppStore((store) => store.setSelectedInstrument);
   const editorFilesRef = useFilesRef();
+  const { t } = useTranslation();
 
   const handleSubmit = ({ label }: { label: string }) => {
     const files = editorFilesRef.current;
@@ -42,9 +43,12 @@ export const CloneButton = () => {
         </Dialog.Trigger>
         <Dialog.Content className="sm:max-w-[475px]">
           <Dialog.Header>
-            <Dialog.Title>Create New Instrument</Dialog.Title>
+            <Dialog.Title>{t({ en: 'Create New Instrument', fr: 'Créer un nouvel instrument' })}</Dialog.Title>
             <Dialog.Description>
-              This will save the current playground state in local storage as a new instrument.
+              {t({
+                en: 'This will save the current playground state in local storage as a new instrument.',
+                fr: "Ceci enregistrera l'état actuel du terrain de jeu dans le stockage local en tant que nouvel instrument."
+              })}
             </Dialog.Description>
           </Dialog.Header>
           <Form
@@ -52,18 +56,18 @@ export const CloneButton = () => {
             content={{
               label: {
                 kind: 'string',
-                label: 'Label',
+                label: t({ en: 'Label', fr: 'Nom' }),
                 variant: 'input'
               }
             }}
-            submitBtnLabel="Save"
+            submitBtnLabel={t({ en: 'Save', fr: 'Enregistrer' })}
             validationSchema={z.object({
               label: z
                 .string()
                 .min(1)
                 .refine(
                   (arg) => !instruments.find((instrument) => instrument.label === arg),
-                  'An instrument with this label already exists'
+                  t({ en: 'An instrument with this label already exists', fr: 'Un instrument avec ce nom existe déjà' })
                 )
             })}
             onSubmit={(data) => void handleSubmit(data)}
@@ -71,7 +75,7 @@ export const CloneButton = () => {
         </Dialog.Content>
       </Dialog>
       <Tooltip.Content side="bottom">
-        <p>Create New Instrument</p>
+        <p>{t({ en: 'Create New Instrument', fr: 'Créer un nouvel instrument' })}</p>
       </Tooltip.Content>
     </Tooltip>
   );
