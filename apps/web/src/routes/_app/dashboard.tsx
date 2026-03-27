@@ -128,7 +128,7 @@ const RouteComponent = () => {
   } else {
     welcome = t({
       en: 'Summary of Application State',
-      fr: 'La cliente actuelle'
+      fr: "Résumé de l'état de l'application"
     });
   }
 
@@ -197,7 +197,7 @@ const RouteComponent = () => {
                     <Dialog.Title>
                       {t({
                         en: 'Users',
-                        fr: 'Les utilisateurs'
+                        fr: 'Utilisateurs'
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
@@ -208,7 +208,7 @@ const RouteComponent = () => {
                       <p>
                         {t({
                           en: 'Error finding users',
-                          fr: "erreur lors de la recherche d'utilisateurs"
+                          fr: "Erreur lors de la recherche d'utilisateurs"
                         })}
                       </p>
                     )}
@@ -252,7 +252,7 @@ const RouteComponent = () => {
                 }
                 label={t({
                   en: 'Total Subjects',
-                  fr: 'Nombre de clients'
+                  fr: 'Nombre total de sujets'
                 })}
                 value={summaryQuery.data.counts.subjects}
               />
@@ -282,7 +282,7 @@ const RouteComponent = () => {
                     <Dialog.Title>
                       {t({
                         en: 'Available Instruments',
-                        fr: 'Les instruments'
+                        fr: 'Instruments disponibles'
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
@@ -291,7 +291,7 @@ const RouteComponent = () => {
                       <p>
                         {t({
                           en: 'Error finding instruments',
-                          fr: 'Erreur lors de la recherche les instruments'
+                          fr: 'Erreur lors de la recherche des instruments'
                         })}
                       </p>
                     )}
@@ -304,7 +304,7 @@ const RouteComponent = () => {
                               fr: 'Titre'
                             })}
                           </p>{' '}
-                          <p>{t({ en: 'Kind', fr: 'Genre' })}</p>
+                          <p>{t({ en: 'Kind', fr: 'Type' })}</p>
                         </div>
                         <hr></hr>
                         {instrumentInfo.map((instrument, i) => {
@@ -373,7 +373,7 @@ const RouteComponent = () => {
                               fr: 'Titre'
                             })}
                           </p>{' '}
-                          <p>{t({ en: 'Number', fr: 'Numero' })}</p>
+                          <p>{t({ en: 'Number', fr: 'Nombre' })}</p>
                         </div>
                         <hr></hr>
                         {recordCounter.map((instrument, i) => {
@@ -414,7 +414,7 @@ const RouteComponent = () => {
                   <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
                     {t({
                       en: 'Records & Sessions Trend',
-                      fr: 'Tendance des enregistrements et sessions'
+                      fr: 'Tendance des enregistrements et des sessions'
                     })}
                   </Heading>
                   <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">

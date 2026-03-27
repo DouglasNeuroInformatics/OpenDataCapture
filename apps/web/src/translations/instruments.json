@@ -58,11 +58,11 @@
   "summary": {
     "subtitle": {
       "en": "Completed on {{ dateCompleted }}",
-      "fr": "Remplie le {{ dateCompleted }}"
+      "fr": "Complété le {{ dateCompleted }}"
     },
     "title": {
       "en": "Summary of Results for the {{title}}",
-      "fr": "{{title}} : résumé des résultats"
+      "fr": "{{title}} : Résumé des résultats"
     }
   },
   "view": {

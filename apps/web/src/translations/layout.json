@@ -8,7 +8,7 @@
   "endSessionModal": {
     "message": {
       "en": "Are you sure you want to end the current session? If you choose to proceed, you'll be taken back to the begin session page.",
-      "fr": "Êtes-vous sûr de vouloir mettre fin à la session en cours ? Si vous décidez de continuer, vous serez ramené à la page de commencement d'une session."
+      "fr": "Êtes-vous sûr de vouloir mettre fin à la session en cours ? Si vous décidez de continuer, vous serez ramené à la page de démarrage de session."
     },
     "title": {
       "en": "End Session",
@@ -56,11 +56,11 @@
     },
     "manageGroup": {
       "en": "Manage Group",
-      "fr": "Gestion du groupe"
+      "fr": "Gérer le groupe"
     },
     "startSession": {
       "en": "Start Session",
-      "fr": "Commencer une session"
+      "fr": "Démarrer une session"
     },
     "upload": {
       "en": "Upload Data",

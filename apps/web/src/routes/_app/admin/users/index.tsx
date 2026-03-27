@@ -135,7 +135,7 @@ const UpdateUserForm: React.FC<{
                       }),
                       delete: t({
                         en: 'Delete',
-                        fr: 'Effacer'
+                        fr: 'Supprimer'
                       }),
                       manage: t({
                         en: 'Manage (All)',
@@ -147,7 +147,7 @@ const UpdateUserForm: React.FC<{
                       }),
                       update: t({
                         en: 'Update',
-                        fr: 'Mettre à jour'
+                        fr: 'Modifier'
                       })
                     },
                     variant: 'select'
@@ -156,7 +156,7 @@ const UpdateUserForm: React.FC<{
                     kind: 'string',
                     label: t({
                       en: 'Resource',
-                      fr: 'Resource'
+                      fr: 'Ressource'
                     }),
                     options: {
                       all: t({
@@ -165,7 +165,7 @@ const UpdateUserForm: React.FC<{
                       }),
                       Assignment: t({
                         en: 'Assignment',
-                        fr: 'Devoir'
+                        fr: 'Assignation'
                       }),
                       Group: t({
                         en: 'Group',
@@ -198,7 +198,7 @@ const UpdateUserForm: React.FC<{
                 kind: 'record-array',
                 label: t({
                   en: 'Permission',
-                  fr: 'Autorisations supplémentaires'
+                  fr: 'Autorisation'
                 })
               }
             },
@@ -343,7 +343,7 @@ const RouteComponent = () => {
           <Sheet.Description>
             {t({
               en: 'Make changes to this user here. Click save when you are done.',
-              fr: 'Apportez des modifications à cet utilisateur ici. Cliquez sur enregistrer lorsque vous avez terminé.'
+              fr: 'Apportez des modifications à cet utilisateur ici. Cliquez sur « Enregistrer » lorsque vous avez terminé.'
             })}
           </Sheet.Description>
         </Sheet.Header>

@@ -171,7 +171,7 @@ export const StartSessionForm = ({
               (arg) => !arg.includes('$'),
               t({
                 en: 'Illegal character: $',
-                fr: 'Caractère illégal : $'
+                fr: 'Caractère non autorisé : $'
               })
             )
             .optional(),
@@ -186,7 +186,7 @@ export const StartSessionForm = ({
               {
                 message: t({
                   en: `Subject must be above age of ${currentGroup?.settings.minimumAge}`,
-                  fr: `Le sujet doit être âgé de plus de ${currentGroup?.settings.minimumAge}`
+                  fr: `Le sujet doit avoir au moins ${currentGroup?.settings.minimumAge} ans`
                 })
               }
             ),
