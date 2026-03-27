@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 
 import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
-import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import axios, { isAxiosError } from 'axios';
 import type { AxiosResponse } from 'axios';
 
@@ -23,6 +23,7 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen, onLoginRequired }: Uploa
   const revalidateToken = useAppStore((store) => store.revalidateToken);
 
   const transpilerStateRef = useRef(useAppStore.getState().transpilerState);
+  const { t } = useTranslation();
 
   useEffect(() => {
     revalidateToken();
@@ -40,13 +41,25 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen, onLoginRequired }: Uploa
   const handleSubmit = async () => {
     const state = transpilerStateRef.current;
     if (state.status === 'building' || state.status === 'initial') {
-      addNotification({ message: 'Upload Failed: Transpilation Incomplete', type: 'error' });
+      addNotification({
+        message: t({
+          en: 'Upload Failed: Transpilation Incomplete',
+          fr: 'Échec du téléversement : Transpilation incomplète'
+        }),
+        type: 'error'
+      });
       return;
     } else if (state.status === 'error') {
-      addNotification({ message: 'Upload Failed: Transpilation Error', type: 'error' });
+      addNotification({
+        message: t({
+          en: 'Upload Failed: Transpilation Error',
+          fr: 'Échec du téléversement : Erreur de transpilation'
+        }),
+        type: 'error'
+      });
       return;
     } else if (!auth) {
-      addNotification({ message: 'Login Required', type: 'error' });
+      addNotification({ message: t({ en: 'Login Required', fr: 'Connexion requise' }), type: 'error' });
       return;
     }
 
@@ -75,7 +88,11 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen, onLoginRequired }: Uploa
       } else {
         message = 'Unknown Error';
       }
-      addNotification({ message, type: 'error', title: 'HTTP Request Failed' });
+      addNotification({
+        message,
+        type: 'error',
+        title: t({ en: 'HTTP Request Failed', fr: 'Échec de la requête HTTP' })
+      });
       return;
     }
 
@@ -89,24 +106,26 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen, onLoginRequired }: Uploa
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Dialog.Content onOpenAutoFocus={(event) => event.preventDefault()}>
         <Dialog.Header>
-          <Dialog.Title>Upload Bundle</Dialog.Title>
+          <Dialog.Title>{t({ en: 'Upload Bundle', fr: 'Téléverser le paquet' })}</Dialog.Title>
           <Dialog.Description>
-            Upload an instrument to your Open Data Capture instance. This functionality requires that you have added the
-            API base URL for your instance to the user settings panel.
+            {t({
+              en: 'Upload an instrument to your Open Data Capture instance. This functionality requires that you have added the API base URL for your instance to the user settings panel.',
+              fr: "Téléversez un instrument vers votre instance Open Data Capture. Cette fonctionnalité nécessite que vous ayez ajouté l'URL de base de l'API de votre instance dans le panneau des paramètres utilisateur."
+            })}
           </Dialog.Description>
         </Dialog.Header>
         <Dialog.Body className="grid gap-4">
           {!auth && (
             <p className="mb-3 text-sm font-medium">
-              Please{' '}
+              {t({ en: 'Please ', fr: 'Veuillez ' })}
               <button className="text-sky-700 hover:underline" type="button" onClick={onLoginRequired}>
-                login to your account
+                {t({ en: 'login to your account', fr: 'vous connecter à votre compte' })}
               </button>{' '}
-              to upload a bundle.
+              {t({ en: ' to upload a bundle.', fr: ' pour téléverser un paquet.' })}
             </p>
           )}
           <Button disabled={!auth} type="button" onClick={() => void handleSubmit().then(() => setIsOpen(false))}>
-            Upload
+            {t({ en: 'Upload', fr: 'Téléverser' })}
           </Button>
         </Dialog.Body>
       </Dialog.Content>
