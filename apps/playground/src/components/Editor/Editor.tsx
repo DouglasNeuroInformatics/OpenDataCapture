@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { extractInputFileExtension } from '@opendatacapture/instrument-bundler';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Columns3Icon, FilePlusIcon, FileUpIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useShallow } from 'zustand/react/shallow';
@@ -29,6 +30,7 @@ export const Editor = () => {
 
   const [isFileUploadDialogOpen, setIsFileUploadDialogOpen] = useState(false);
   const [isDeleteFileDialogOpen, setIsDeleteFileDialogOpen] = useState(false);
+  const { t } = useTranslation();
 
   const addFile = useAppStore((store) => store.addFile);
   const addFiles = useAppStore((store) => store.addFiles);
@@ -77,10 +79,14 @@ export const Editor = () => {
   return (
     <div className="flex h-full w-full flex-col border border-r-0 bg-slate-50 dark:bg-slate-800">
       <div className="flex w-full border-b">
-        <EditorButton icon={<Columns3Icon />} tip="View Files" onClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+        <EditorButton
+          icon={<Columns3Icon />}
+          tip={t({ en: 'View Files', fr: 'Voir les fichiers' })}
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        />
         <EditorButton
           icon={<FilePlusIcon />}
-          tip="Add File"
+          tip={t({ en: 'Add File', fr: 'Ajouter un fichier' })}
           onClick={() => {
             setIsSidebarOpen(true);
             setIsAddingFile(true);
@@ -88,7 +94,7 @@ export const Editor = () => {
         />
         <EditorButton
           icon={<FileUpIcon />}
-          tip="Upload Files"
+          tip={t({ en: 'Upload Files', fr: 'Téléverser des fichiers' })}
           onClick={() => {
             setIsFileUploadDialogOpen(true);
           }}
@@ -135,7 +141,9 @@ export const Editor = () => {
         {openFilenames.length ? (
           <EditorPane ref={editorPaneRef} onEditorMount={() => setIsEditorMounted(true)} />
         ) : (
-          <EditorPanePlaceholder>No File Selected</EditorPanePlaceholder>
+          <EditorPanePlaceholder>
+            {t({ en: 'No File Selected', fr: 'Aucun fichier sélectionné' })}
+          </EditorPanePlaceholder>
         )}
       </div>
       <DeleteFileDialog
@@ -157,7 +165,7 @@ export const Editor = () => {
         }}
         isOpen={isFileUploadDialogOpen}
         setIsOpen={setIsFileUploadDialogOpen}
-        title="Upload Files"
+        title={t({ en: 'Upload Files', fr: 'Téléverser des fichiers' })}
         onSubmit={async (files) => {
           const editorFiles = await loadEditorFilesFromNative(files);
           addFiles(editorFiles);
@@ -166,7 +174,10 @@ export const Editor = () => {
         onValidate={(files: File[]) => {
           for (const file of files) {
             if (filenames.includes(file.name)) {
-              return { message: `File already exists: ${file.name}`, result: 'error' };
+              return {
+                message: t({ en: `File already exists: ${file.name}`, fr: `Le fichier existe déjà : ${file.name}` }),
+                result: 'error'
+              };
             }
           }
           return { result: 'success' };
