@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useInterval } from '@douglasneuroinformatics/libui/hooks';
+import { useInterval, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { isEqual } from 'lodash-es';
 import { SaveIcon } from 'lucide-react';
 
@@ -21,11 +21,13 @@ export const SaveButton = () => {
     }
   }, 1000);
 
+  const { t } = useTranslation();
+
   return (
     <ActionButton
       disabled={disabled}
       icon={<SaveIcon />}
-      tooltip="Save"
+      tooltip={t({ en: 'Save', fr: 'Enregistrer' })}
       onClick={() => {
         updateSelectedInstrument({ files: editorFiles.current });
       }}

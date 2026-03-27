@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { Spinner } from '@douglasneuroinformatics/libui/components';
-import { useInterval } from '@douglasneuroinformatics/libui/hooks';
+import { useInterval, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 import { bundle } from '@opendatacapture/instrument-bundler';
 import { ScalarInstrumentRenderer } from '@opendatacapture/react-core';
@@ -25,6 +25,7 @@ export const Viewer = () => {
   const key = useAppStore((store) => store.viewer.key);
   const state = useAppStore((store) => store.transpilerState);
   const setState = useAppStore((store) => store.setTranspilerState);
+  const { t } = useTranslation();
 
   const transpile = useCallback(async (files: EditorFile[]) => {
     setState({ status: 'building' });
@@ -33,7 +34,10 @@ export const Viewer = () => {
       setState({ bundle: await bundle({ inputs }), status: 'built' });
     } catch (err) {
       setState({
-        error: err instanceof Error ? err : new Error('Unexpected Error', { cause: err }),
+        error:
+          err instanceof Error
+            ? err
+            : new Error(t({ en: 'Unexpected Error', fr: 'Erreur inattendue' }), { cause: err }),
         status: 'error'
       });
     } finally {
@@ -71,7 +75,19 @@ export const Viewer = () => {
               onCompileError={(error) => setState({ error, status: 'error' })}
               onSubmit={({ data }) => {
                 // eslint-disable-next-line no-alert
-                alert(JSON.stringify({ _message: 'The following data will be submitted', data }, null, 2));
+                alert(
+                  JSON.stringify(
+                    {
+                      _message: t({
+                        en: 'The following data will be submitted',
+                        fr: 'Les données suivantes seront soumises'
+                      }),
+                      data
+                    },
+                    null,
+                    2
+                  )
+                );
               }}
             />
           </ErrorBoundary>

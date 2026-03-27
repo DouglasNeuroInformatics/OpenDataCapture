@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { useOnClickOutside } from '@douglasneuroinformatics/libui/hooks';
+import { useOnClickOutside, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { PencilIcon, TrashIcon } from 'lucide-react';
 
@@ -23,6 +23,7 @@ export const EditorFileButton = ({ filename, isActive, onDelete }: EditorFileBut
   const [displayFilename, setDisplayFilename] = useState(filename);
   const [isRenaming, setIsRenaming] = useState(false);
   const renameFile = useAppStore((store) => store.renameFile);
+  const { t } = useTranslation();
 
   const rename = () => {
     renameFile(filename, displayFilename);
@@ -79,7 +80,7 @@ export const EditorFileButton = ({ filename, isActive, onDelete }: EditorFileBut
           }}
         >
           <TrashIcon />
-          <span className="ml-2 text-sm">Delete</span>
+          <span className="ml-2 text-sm">{t({ en: 'Delete', fr: 'Supprimer' })}</span>
         </ContextMenu.Item>
         <ContextMenu.Item
           onSelect={() => {
@@ -87,7 +88,7 @@ export const EditorFileButton = ({ filename, isActive, onDelete }: EditorFileBut
           }}
         >
           <PencilIcon />
-          <span className="ml-2 text-sm">Rename</span>
+          <span className="ml-2 text-sm">{t({ en: 'Rename', fr: 'Renommer' })}</span>
         </ContextMenu.Item>
       </ContextMenu.Content>
     </ContextMenu>
