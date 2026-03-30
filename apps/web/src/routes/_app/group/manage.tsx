@@ -30,6 +30,7 @@ type ManageGroupFormProps = {
     initialValues: {
       accessibleFormInstrumentIds: Set<string>;
       accessibleInteractiveInstrumentIds: Set<string>;
+      accessibleSeriesInstrumentIds: Set<string>;
       defaultIdentificationMethod?: SubjectIdentificationMethod;
       idValidationRegex?: null | string;
       minimumAge?: null | number;
@@ -67,6 +68,12 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
               kind: 'set',
               label: t('group.manage.interactive'),
               options: availableInstrumentOptions.interactive,
+              variant: 'listbox'
+            },
+            accessibleSeriesInstrumentIds: {
+              kind: 'set',
+              label: t('group.manage.series'),
+              options: availableInstrumentOptions.series,
               variant: 'listbox'
             }
           },
@@ -190,6 +197,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         .object({
           accessibleFormInstrumentIds: z.set(z.string()),
           accessibleInteractiveInstrumentIds: z.set(z.string()),
+          accessibleSeriesInstrumentIds: z.set(z.string()),
           defaultIdentificationMethod: $SubjectIdentificationMethod.optional(),
           idValidationRegex: $RegexString.optional(),
           idValidationRegexErrorMessageEn: z.string().optional(),
@@ -214,7 +222,11 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         })}
       onSubmit={(data) => {
         void onSubmit({
-          accessibleInstrumentIds: [...data.accessibleFormInstrumentIds, ...data.accessibleInteractiveInstrumentIds],
+          accessibleInstrumentIds: [
+            ...data.accessibleFormInstrumentIds,
+            ...data.accessibleInteractiveInstrumentIds,
+            ...data.accessibleSeriesInstrumentIds
+          ],
           settings: {
             defaultIdentificationMethod: data.defaultIdentificationMethod,
             idValidationRegex: data.idValidationRegex,
@@ -258,6 +270,7 @@ const RouteComponent = () => {
     const initialValues = {
       accessibleFormInstrumentIds: new Set<string>(),
       accessibleInteractiveInstrumentIds: new Set<string>(),
+      accessibleSeriesInstrumentIds: new Set<string>(),
       defaultIdentificationMethod,
       idValidationRegex: settings?.idValidationRegex,
       idValidationRegexErrorMessageEn: settings?.idValidationRegexErrorMessage?.en,
@@ -276,6 +289,11 @@ const RouteComponent = () => {
         availableInstrumentOptions.interactive[instrument.id] = instrument.details.title;
         if (accessibleInstrumentIds?.includes(instrument.id)) {
           initialValues.accessibleInteractiveInstrumentIds.add(instrument.id);
+        }
+      } else if (instrument.kind === 'SERIES') {
+        availableInstrumentOptions.series[instrument.id] = instrument.details.title;
+        if (accessibleInstrumentIds?.includes(instrument.id)) {
+          initialValues.accessibleSeriesInstrumentIds.add(instrument.id);
         }
       }
     }

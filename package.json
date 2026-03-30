@@ -1,7 +1,7 @@
 {
   "name": "opendatacapture",
   "type": "module",
-  "version": "1.13.4",
+  "version": "1.13.5",
   "private": true,
   "packageManager": "pnpm@10.7.0",
   "license": "Apache-2.0",
@@ -85,13 +85,18 @@
       "@prisma/engines",
       "@swc/core",
       "@tailwindcss/oxide",
+      "cypress",
       "esbuild",
       "mongodb-memory-server",
       "msgpackr-extract",
       "msw",
       "oxc-resolver",
       "prisma",
-      "sharp"
+      "sharp",
+      "sqlite3"
+    ],
+    "ignoredBuiltDependencies": [
+      "@scarf/scarf"
     ]
   },
   "__isODCRepo": true
