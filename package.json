@@ -85,13 +85,18 @@
       "@prisma/engines",
       "@swc/core",
       "@tailwindcss/oxide",
+      "cypress",
       "esbuild",
       "mongodb-memory-server",
       "msgpackr-extract",
       "msw",
       "oxc-resolver",
       "prisma",
-      "sharp"
+      "sharp",
+      "sqlite3"
+    ],
+    "ignoredBuiltDependencies": [
+      "@scarf/scarf"
     ]
   },
   "__isODCRepo": true
