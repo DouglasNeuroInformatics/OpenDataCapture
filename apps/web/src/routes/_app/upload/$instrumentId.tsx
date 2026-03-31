@@ -41,7 +41,7 @@ const RouteComponent = () => {
             description: error instanceof UploadError ? error.description : undefined,
             title: {
               en: `Error Occurred Downloading Sample Template`,
-              fr: `Une erreur s'est produite lors du téléchargement du CSV`
+              fr: `Une erreur s'est produite lors du téléchargement du modèle`
             }
           }
         },
@@ -186,7 +186,7 @@ const RouteComponent = () => {
             <Heading className="text-center" variant="h3">
               {t({
                 en: 'Data currently uploading...',
-                fr: 'Données en cours de téléchargement...'
+                fr: 'Données en cours de téléversement...'
               })}
             </Heading>
           </div>

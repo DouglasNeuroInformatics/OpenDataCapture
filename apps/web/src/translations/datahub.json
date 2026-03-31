@@ -6,7 +6,7 @@
     },
     "addAssignmentDesc": {
       "en": "Please complete the following form to create an assignment. Once an assignment is created, you can send the generated link to the client.",
-      "fr": "Veuillez remplir le formulaire suivant pour créer une affectation. Une fois la mission créée, vous pouvez envoyer le lien généré au client."
+      "fr": "Veuillez remplir le formulaire suivant pour créer une assignation. Une fois l'assignation créée, vous pouvez envoyer le lien généré au client."
     },
     "assignedAt": {
       "en": "Assigned",
@@ -18,7 +18,7 @@
     },
     "assignmentSliderDesc": {
       "en": "View additional details related to this assignment here. This includes the link to the assignment, which you can send to the client.",
-      "fr": "Consultez ici les détails supplémentaires relatifs à cette mission. Il s'agit notamment du lien vers la mission, que vous pouvez envoyer au client."
+      "fr": "Consultez ici les détails supplémentaires relatifs à cette assignation. Il s'agit notamment du lien vers l'assignation, que vous pouvez envoyer au client."
     },
     "expiresAt": {
       "en": "Expires",
@@ -26,7 +26,7 @@
     },
     "link": {
       "en": "Link to Assignment",
-      "fr": "Lien vers le devoir"
+      "fr": "Lien vers l'assignation"
     },
     "resendNotification": {
       "en": "Resend Notification",
@@ -121,7 +121,7 @@
     "tabs": {
       "assignments": {
         "en": "Assignments",
-        "fr": "Devoirs"
+        "fr": "Assignations"
       },
       "graph": {
         "en": "Graph",

@@ -2,7 +2,7 @@
   "manage": {
     "accessibleInstrumentDemoNote": {
       "en": "Please note that this feature is disabled in demo mode to avoid disrupting other users.",
-      "fr": "Veuillez noter que cette fonction est désactivée en mode démo, afin d'éviter de perturber les autres utilisateurs."
+      "fr": "Veuillez noter que cette fonctionnalité est désactivée en mode démo, afin d'éviter de perturber les autres utilisateurs."
     },
     "accessibleInstruments": {
       "en": "Accessible Instruments",
@@ -34,7 +34,7 @@
     },
     "pageTitle": {
       "en": "Manage Group",
-      "fr": "Gestion du groupe"
+      "fr": "Gérer le groupe"
     }
   }
 }

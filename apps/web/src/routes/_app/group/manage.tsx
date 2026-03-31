@@ -115,7 +115,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                     kind: 'number',
                     label: t({
                       en: 'Minimum Age',
-                      fr: "L'âge minimum"
+                      fr: 'Âge minimum'
                     }),
                     variant: 'input'
                   };
@@ -126,7 +126,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
           },
           title: t({
             en: 'Age Limit Settings',
-            fr: "Paramètres de l'âge"
+            fr: "Paramètres de limite d'âge"
           })
         },
         {
@@ -148,7 +148,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
               kind: 'string',
               label: t({
                 en: 'ID Validation Pattern',
-                fr: "Modèle de validation d'identité"
+                fr: "Modèle de validation d'identifiant"
               }),
               variant: 'input'
             },
@@ -213,7 +213,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
               input: ctx.value.minimumAge,
               message: t({
                 en: 'Please enter an age',
-                fr: "Entrez un âge s'il vous plait"
+                fr: 'Veuillez entrer un âge'
               }),
               path: ['minimumAge']
             });

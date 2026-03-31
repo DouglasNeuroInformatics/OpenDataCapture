@@ -95,7 +95,7 @@ const Walkthrough = () => {
         target: '#sidebar-branding-container',
         title: t({
           en: 'Welcome to Open Data Capture 👋',
-          fr: 'Bienvenue à Open Data Capture 👋'
+          fr: 'Bienvenue sur Open Data Capture 👋'
         })
       },
       {
@@ -160,7 +160,7 @@ const Walkthrough = () => {
           <p>
             {t({
               en: 'Here, you can search for subjects in the database. To begin, click on the Subject Lookup button, and a popup will appear where you can enter the search query.',
-              fr: "Ici, vous pouvez rechercher des clients dans la base de données. Pour commencer, cliquez sur la bouton de recherche et une fenêtre contextuelle s'affichera pour vous permettre de saisir la requête de recherche."
+              fr: "Ici, vous pouvez rechercher des clients dans la base de données. Pour commencer, cliquez sur le bouton de recherche et une fenêtre contextuelle s'affichera pour vous permettre de saisir la requête de recherche."
             })}
           </p>
         ),
@@ -204,7 +204,7 @@ const Walkthrough = () => {
         target: 'button[data-nav-url="/session/start-session"]',
         title: t({
           en: 'Start Session',
-          fr: 'Commencer une session'
+          fr: 'Démarrer une session'
         })
       },
       {
@@ -351,7 +351,7 @@ const Walkthrough = () => {
       {
         content: t({
           en: 'Here, you can create and view assignments, which are instruments for a subject to complete at home.',
-          fr: 'Ici, vous pouvez créer et visualiser des devoirs, qui sont des instruments que le client doit compléter à la maison.'
+          fr: 'Ici, vous pouvez créer et visualiser des assignations, qui sont des instruments que le client doit compléter à la maison.'
         }),
         navigateOptions: {
           to: '/datahub/123/assignments'
@@ -360,7 +360,7 @@ const Walkthrough = () => {
         target: 'a[data-nav-url="/datahub/123/assignments"]',
         title: t({
           en: 'Assignments',
-          fr: 'Devoirs'
+          fr: 'Assignations'
         })
       }
     ];

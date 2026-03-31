@@ -43,7 +43,7 @@ export const InstrumentKindDropdown: React.FC<{
       setSelected={setSelected}
       title={t({
         en: 'Kind',
-        fr: 'Genre'
+        fr: 'Type'
       })}
     />
   );

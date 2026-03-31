@@ -13,7 +13,7 @@
   },
   "assignment": {
     "en": "Assignment",
-    "fr": "Devoir"
+    "fr": "Assignation"
   },
   "auditLogs": {
     "en": "Audit Logs",
@@ -213,7 +213,7 @@
   },
   "uploadSuccessful": {
     "en": "Upload Successful",
-    "fr": "Téléchargement réussi"
+    "fr": "Téléversement réussi"
   },
   "user": {
     "en": "User",
