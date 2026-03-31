@@ -307,11 +307,11 @@ const MasterDataTable: React.FC<{
       <DataTable
         columns={[
           {
-            accessorFn: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
+            accessorFn: (subject) => removeSubjectIdScope(subject.id),
             cell: (ctx) => (
               <div className="grid">
                 <div className="min-w-0 overflow-x-auto whitespace-nowrap" title={ctx.getValue() as string}>
-                  {ctx.getValue() as string}
+                  {(ctx.getValue() as string).slice(0, subjectIdDisplaySetting ?? 9)}
                 </div>
               </div>
             ),
