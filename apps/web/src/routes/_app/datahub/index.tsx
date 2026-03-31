@@ -308,6 +308,13 @@ const MasterDataTable: React.FC<{
         columns={[
           {
             accessorFn: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
+            cell: (ctx) => (
+              <div className="grid">
+                <div className="min-w-0 overflow-x-auto whitespace-nowrap" title={ctx.getValue() as string}>
+                  {ctx.getValue() as string}
+                </div>
+              </div>
+            ),
             header: t('datahub.index.table.subject'),
             id: 'subjectId'
           },
