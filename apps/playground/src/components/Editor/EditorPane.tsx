@@ -122,7 +122,10 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
   if (!fileType) {
     return (
       <EditorPanePlaceholder>
-        {t({ en: `Error: Invalid file type "${fileType}"`, fr: `Erreur : Type de fichier invalide "${fileType}"` })}
+        {t({
+          en: `Error: Invalid file type for "${defaultFile.name}"`,
+          fr: `Erreur : Type de fichier invalide pour "${defaultFile.name}"`
+        })}
       </EditorPanePlaceholder>
     );
   } else if (fileType === 'asset') {
