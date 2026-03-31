@@ -1,4 +1,4 @@
-name: open-data-capture
+name: ${PROJECT_NAME:-open-data-capture}
 volumes:
   caddy_data:
 services:
