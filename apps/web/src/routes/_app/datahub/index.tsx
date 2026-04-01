@@ -168,7 +168,7 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
           <DropdownMenu.Label>
             {t({
               en: 'Subjects with records',
-              fr: 'Sujets'
+              fr: 'Sujets avec enregistrements'
             })}
           </DropdownMenu.Label>
           <DropdownMenu.CheckboxItem
@@ -183,7 +183,10 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
             }}
             onSelect={(e) => e.preventDefault()}
           >
-            Has Records
+            {t({
+              en: 'With records only',
+              fr: 'Avec enregistrements seulement'
+            })}
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Group>
       </DropdownMenu.Content>
