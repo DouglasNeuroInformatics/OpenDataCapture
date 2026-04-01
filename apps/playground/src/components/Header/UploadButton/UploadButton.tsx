@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { isPlainObject } from '@douglasneuroinformatics/libjs';
-import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import JSZip from 'jszip';
 import { UploadIcon } from 'lucide-react';
 
@@ -18,6 +18,7 @@ export const UploadButton = () => {
   const addInstrument = useAppStore((store) => store.addInstrument);
   const setSelectedInstrument = useAppStore((store) => store.setSelectedInstrument);
   const instruments = useAppStore((store) => store.instruments);
+  const { t } = useTranslation();
 
   const handleSubmit = async (files: File[]) => {
     try {
@@ -53,8 +54,11 @@ export const UploadButton = () => {
     } catch (err) {
       console.error(err);
       addNotification({
-        message: 'Please refer to browser console for details',
-        title: 'Upload Failed',
+        message: t({
+          en: 'Please refer to browser console for details',
+          fr: 'Veuillez consulter la console du navigateur pour plus de détails'
+        }),
+        title: t({ en: 'Upload Failed', fr: 'Échec du téléversement' }),
         type: 'error'
       });
     } finally {
@@ -64,12 +68,16 @@ export const UploadButton = () => {
 
   return (
     <React.Fragment>
-      <ActionButton icon={<UploadIcon />} tooltip="Upload Archive" onClick={() => setIsDialogOpen(true)} />
+      <ActionButton
+        icon={<UploadIcon />}
+        tooltip={t({ en: 'Upload Archive', fr: 'Téléverser une archive' })}
+        onClick={() => setIsDialogOpen(true)}
+      />
       <FileUploadDialog
         accept={{ 'application/zip': ['.zip'] }}
         isOpen={isDialogOpen}
         setIsOpen={setIsDialogOpen}
-        title="Upload Archive"
+        title={t({ en: 'Upload Archive', fr: 'Téléverser une archive' })}
         onSubmit={handleSubmit}
         onValidate={() => {
           return { result: 'success' };

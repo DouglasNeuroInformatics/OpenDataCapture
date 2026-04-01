@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CloudUploadIcon } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import type { FileRejection } from 'react-dropzone';
@@ -20,11 +21,12 @@ export type FileUploadDialogProps = {
 export const FileUploadDialog = ({ accept, isOpen, onSubmit, onValidate, setIsOpen, title }: FileUploadDialogProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const [errorMessage, setErrorMessage] = useState<null | string>(null);
+  const { t } = useTranslation();
 
   const handleDrop = useCallback(
     (acceptedFiles: File[], rejections: FileRejection[]) => {
       for (const { errors, file } of rejections) {
-        setErrorMessage(`Invalid file type: ${file.name} `);
+        setErrorMessage(t({ en: `Invalid file type: ${file.name} `, fr: `Type de fichier invalide : ${file.name} ` }));
         console.error(errors);
         return;
       }
@@ -65,9 +67,15 @@ export const FileUploadDialog = ({ accept, isOpen, onSubmit, onValidate, setIsOp
   } else if (files.length === 1) {
     dropzoneText = files[0]!.name;
   } else if (isDragActive) {
-    dropzoneText = 'Release your cursor to upload file(s)';
+    dropzoneText = t({
+      en: 'Release your cursor to upload file(s)',
+      fr: 'Relâchez votre curseur pour téléverser le(s) fichier(s)'
+    });
   } else {
-    dropzoneText = 'Click here to upload, or drag and drop files into this area';
+    dropzoneText = t({
+      en: 'Click here to upload, or drag and drop files into this area',
+      fr: 'Cliquez ici pour téléverser, ou glissez et déposez des fichiers dans cette zone'
+    });
   }
 
   return (
@@ -94,7 +102,7 @@ export const FileUploadDialog = ({ accept, isOpen, onSubmit, onValidate, setIsOp
             type="button"
             onClick={() => void submitFiles(files)}
           >
-            Submit
+            {t({ en: 'Submit', fr: 'Soumettre' })}
           </Button>
         </Dialog.Footer>
       </Dialog.Content>

@@ -1,5 +1,5 @@
 import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
-import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
 import { useAppStore } from '@/store';
 
@@ -12,15 +12,25 @@ export const RestoreDefaultsDialog = ({ isOpen, setIsOpen }: RestoreDefaultsDial
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const resetInstruments = useAppStore((store) => store.resetInstruments);
   const resetSettings = useAppStore((store) => store.resetSettings);
+  const { t } = useTranslation();
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Dialog.Content>
         <Dialog.Header>
-          <Dialog.Title>Are you absolutely sure?</Dialog.Title>
+          <Dialog.Title>{t({ en: 'Are you absolutely sure?', fr: 'Êtes-vous absolument sûr ?' })}</Dialog.Title>
           <Dialog.Description>
-            This action will <span className="font-bold uppercase">delete all user-defined instruments</span> in local
-            storage and restore the default configuration.
+            {t({ en: 'This action will ', fr: 'Cette action va ' })}
+            <span className="font-bold uppercase">
+              {t({
+                en: 'delete all user-defined instruments',
+                fr: "supprimer tous les instruments définis par l'utilisateur"
+              })}
+            </span>{' '}
+            {t({
+              en: 'in local storage and restore the default configuration.',
+              fr: 'dans le stockage local et restaurer la configuration par défaut.'
+            })}
           </Dialog.Description>
         </Dialog.Header>
         <Dialog.Footer>
@@ -33,10 +43,10 @@ export const RestoreDefaultsDialog = ({ isOpen, setIsOpen }: RestoreDefaultsDial
               setIsOpen(false);
             }}
           >
-            Reset
+            {t({ en: 'Reset', fr: 'Réinitialiser' })}
           </Button>
           <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-            Cancel
+            {t({ en: 'Cancel', fr: 'Annuler' })}
           </Button>
         </Dialog.Footer>
       </Dialog.Content>

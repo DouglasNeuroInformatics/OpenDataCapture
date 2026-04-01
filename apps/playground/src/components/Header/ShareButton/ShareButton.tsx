@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { formatByteSize } from '@douglasneuroinformatics/libjs';
 import { Heading, Input, Popover, Tooltip } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
 import { Share2Icon } from 'lucide-react';
 
@@ -15,6 +16,7 @@ export const ShareButton = () => {
   const [shareURL, setShareURL] = useState(encodeShareURL({ files: editorFilesRef.current, label }));
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+  const { t } = useTranslation();
 
   // The user cannot modify the editor without closing the popover
   useEffect(() => {
@@ -40,10 +42,13 @@ export const ShareButton = () => {
         </Popover.Trigger>
         <Popover.Content align="end" className="w-[520px] p-4">
           <div className="flex flex-col space-y-2 text-center sm:text-left">
-            <Heading variant="h5">Share Instrument</Heading>
+            <Heading variant="h5">{t({ en: 'Share Instrument', fr: "Partager l'instrument" })}</Heading>
             <p className="text-muted-foreground text-sm">
-              Anyone with this link can open a snapshot of the current code in your playground. The total size of the
-              URL-encoded source files for this instrument is {formatByteSize(shareURL.size)}.
+              {t({
+                en: 'Anyone with this link can open a snapshot of the current code in your playground. The total size of the URL-encoded source files for this instrument is ',
+                fr: "Toute personne disposant de ce lien peut ouvrir un aperçu du code actuel dans votre terrain de jeu. La taille totale des fichiers sources encodés dans l'URL pour cet instrument est de "
+              })}
+              {formatByteSize(shareURL.size)}.
             </p>
           </div>
           <div className="flex gap-2 pt-4">
@@ -53,7 +58,7 @@ export const ShareButton = () => {
         </Popover.Content>
       </Popover>
       <Tooltip.Content side="bottom">
-        <p>Share</p>
+        <p>{t({ en: 'Share', fr: 'Partager' })}</p>
       </Tooltip.Content>
     </Tooltip>
   );

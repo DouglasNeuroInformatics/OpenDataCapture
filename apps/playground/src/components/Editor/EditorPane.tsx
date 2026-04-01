@@ -1,6 +1,6 @@
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
-import { useTheme } from '@douglasneuroinformatics/libui/hooks';
+import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import MonacoEditor from '@monaco-editor/react';
 
 import { useFilesRef } from '@/hooks/useFilesRef';
@@ -29,6 +29,7 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
 
   const [theme] = useTheme();
   const [isMounted, setIsMounted] = useState(false);
+  const { t } = useTranslation();
   const { libs } = useRuntime('v1');
 
   const editorRef = useRef<MonacoEditorType | null>(null);
@@ -112,12 +113,21 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
   };
 
   if (!defaultFile) {
-    return <EditorPanePlaceholder>No File Selected</EditorPanePlaceholder>;
+    return (
+      <EditorPanePlaceholder>{t({ en: 'No File Selected', fr: 'Aucun fichier sélectionné' })}</EditorPanePlaceholder>
+    );
   }
 
   const fileType = inferFileType(defaultFile.name);
   if (!fileType) {
-    return <EditorPanePlaceholder>{`Error: Invalid file type "${fileType}"`}</EditorPanePlaceholder>;
+    return (
+      <EditorPanePlaceholder>
+        {t({
+          en: `Error: Invalid file type for "${defaultFile.name}"`,
+          fr: `Erreur : Type de fichier invalide pour "${defaultFile.name}"`
+        })}
+      </EditorPanePlaceholder>
+    );
   } else if (fileType === 'asset') {
     if (isBase64EncodedFileType(defaultFile.name)) {
       return (
@@ -130,7 +140,11 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
         </div>
       );
     }
-    return <EditorPanePlaceholder>Cannot Display Binary Asset</EditorPanePlaceholder>;
+    return (
+      <EditorPanePlaceholder>
+        {t({ en: 'Cannot Display Binary Asset', fr: "Impossible d'afficher l'actif binaire" })}
+      </EditorPanePlaceholder>
+    );
   }
 
   return (
