@@ -55,12 +55,6 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
   const subjectColumn = columns.find((column) => column.id === 'subjectId')!;
   const HasRecordFilter = subjectColumn.getFilterValue() as HasRecordFilter;
 
-  // const records = useInstrumentRecords()
-  // let idsWithRecords: string[];
-  // if (records.data) {
-  //   idsWithRecords = [...new Set(records.data.map(record => record.id))]
-  // }
-
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger asChild>
@@ -361,7 +355,7 @@ const MasterDataTable: React.FC<{
               if (!value) {
                 return false;
               }
-              if (filter.hasRecords) {
+              if (filter.hasRecords && idsWithRecords.length > 0) {
                 return idsWithRecords.includes(value as string);
               } else {
                 return true;
