@@ -22,6 +22,7 @@ import { unparse } from 'papaparse';
 
 import { IdentificationForm } from '@/components/IdentificationForm';
 import { PageHeader } from '@/components/PageHeader';
+import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
@@ -33,6 +34,10 @@ type DateFilter = {
 };
 
 type SexFilter = (null | Sex)[];
+
+type HasRecordFilter = {
+  hasRecords: boolean;
+};
 
 const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) => {
   const { t } = useTranslation();
@@ -46,6 +51,15 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
 
   const sexColumn = columns.find((column) => column.id === 'sex')!;
   const sexFilter = sexColumn.getFilterValue() as SexFilter;
+
+  const subjectColumn = columns.find((column) => column.id === 'subjectId')!;
+  const HasRecordFilter = subjectColumn.getFilterValue() as HasRecordFilter;
+
+  // const records = useInstrumentRecords()
+  // let idsWithRecords: string[];
+  // if (records.data) {
+  //   idsWithRecords = [...new Set(records.data.map(record => record.id))]
+  // }
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -148,6 +162,28 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
             onSelect={(e) => e.preventDefault()}
           >
             NULL
+          </DropdownMenu.CheckboxItem>
+        </DropdownMenu.Group>
+        <DropdownMenu.Group>
+          <DropdownMenu.Label>
+            {t({
+              en: 'Subjects with records',
+              fr: 'Sujets'
+            })}
+          </DropdownMenu.Label>
+          <DropdownMenu.CheckboxItem
+            checked={HasRecordFilter.hasRecords}
+            onCheckedChange={(checked) => {
+              subjectColumn.setFilterValue((prevValue: HasRecordFilter): HasRecordFilter => {
+                return {
+                  ...prevValue,
+                  hasRecords: checked
+                };
+              });
+            }}
+            onSelect={(e) => e.preventDefault()}
+          >
+            Has Records
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Group>
       </DropdownMenu.Content>
@@ -301,20 +337,33 @@ const MasterDataTable: React.FC<{
 }> = ({ data, onRowDoubleClick, onSelect }) => {
   const { t } = useTranslation();
   const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
+  const records = useInstrumentRecords();
+  let idsWithRecords: string[];
+  if (records.data) {
+    idsWithRecords = [
+      ...new Set(
+        records.data.map((record) => removeSubjectIdScope(record.subjectId).slice(0, subjectIdDisplaySetting ?? 9))
+      )
+    ];
+  }
 
   return (
     <div>
       <DataTable
         columns={[
           {
-            accessorFn: (subject) => removeSubjectIdScope(subject.id),
-            cell: (ctx) => (
-              <div className="grid">
-                <div className="min-w-0 overflow-x-auto whitespace-nowrap" title={ctx.getValue() as string}>
-                  {(ctx.getValue() as string).slice(0, subjectIdDisplaySetting ?? 9)}
-                </div>
-              </div>
-            ),
+            accessorFn: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
+            filterFn: (row, id, filter: HasRecordFilter) => {
+              const value = row.getValue(id);
+              if (!value) {
+                return false;
+              }
+              if (filter.hasRecords) {
+                return idsWithRecords.includes(value as string);
+              } else {
+                return true;
+              }
+            },
             header: t('datahub.index.table.subject'),
             id: 'subjectId'
           },
@@ -360,6 +409,12 @@ const MasterDataTable: React.FC<{
         data-testid="master-data-table"
         initialState={{
           columnFilters: [
+            {
+              id: 'subjectId',
+              value: {
+                hasRecords: false
+              } satisfies HasRecordFilter
+            },
             {
               id: 'sex',
               value: ['MALE', 'FEMALE', null] satisfies SexFilter
