@@ -355,7 +355,7 @@ const MasterDataTable: React.FC<{
               if (!value) {
                 return false;
               }
-              if (filter.hasRecords && idsWithRecords.length > 0) {
+              if (filter.hasRecords && idsWithRecords && idsWithRecords.length > 0) {
                 return idsWithRecords.includes(value as string);
               } else {
                 return true;
