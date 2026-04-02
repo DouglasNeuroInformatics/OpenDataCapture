@@ -50,11 +50,26 @@ if (!bundle) {
     await navigator.serviceWorker.register('./worker.js', {
       scope: './'
     });
-    await navigator.serviceWorker.ready.then((registration) => {
-      registration.active?.postMessage({
-        staticAssets: instrument.content.staticAssets,
-        type: 'STATIC_ASSETS'
+    const registration = await navigator.serviceWorker.ready;
+    if (!navigator.serviceWorker.controller) {
+      await new Promise((resolve) => {
+        navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true });
       });
+    }
+    const { port1, port2 } = new MessageChannel();
+    await new Promise((resolve) => {
+      port1.onmessage = (event) => {
+        if (event.data?.type === 'STATIC_ASSETS_READY') {
+          resolve(undefined);
+        }
+      };
+      registration.active?.postMessage(
+        {
+          staticAssets: instrument.content.staticAssets,
+          type: 'STATIC_ASSETS'
+        },
+        [port2]
+      );
     });
   }
 

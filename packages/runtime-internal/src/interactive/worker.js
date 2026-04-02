@@ -1,7 +1,17 @@
 /// <reference lib="webworker" />
 
+const worker = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self));
+
 /** @type {Map<string, string>} */
 const staticAssets = new Map();
+
+worker.addEventListener('install', () => {
+  worker.skipWaiting();
+});
+
+worker.addEventListener('activate', (event) => {
+  event.waitUntil(worker.clients.claim());
+});
 
 /**
  * Converts a data URL (base64 or plain) into a Fetch API Response object.
@@ -49,9 +59,10 @@ addEventListener('message', (event) => {
   Object.entries(data.staticAssets).forEach(([key, value]) => {
     staticAssets.set(key, value);
   });
+  event.ports[0]?.postMessage({ type: 'STATIC_ASSETS_READY' });
 });
 
-self.addEventListener('fetch', (_event) => {
+worker.addEventListener('fetch', (_event) => {
   if (!staticAssets) {
     console.error('staticAssets is not defined');
     return;
