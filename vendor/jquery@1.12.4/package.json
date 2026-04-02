@@ -11,6 +11,6 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "jquery": "1.12.4"
+    "jquery": "3.5.0"
   }
 }
