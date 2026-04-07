@@ -333,8 +333,13 @@ const MasterDataTable: React.FC<{
   onSelect: (subject: Subject) => void;
 }> = ({ data, onRowDoubleClick, onSelect }) => {
   const { t } = useTranslation();
-  const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
-  const records = useInstrumentRecords();
+  const currentGroup = useAppStore((store) => store.currentGroup);
+  const subjectIdDisplaySetting = currentGroup?.settings.subjectIdDisplayLength;
+  const records = useInstrumentRecords({
+    params: {
+      groupId: currentGroup?.id
+    }
+  });
   const idsWithRecords = new Set<string>();
   if (records.data) {
     records.data.forEach((record) => {
