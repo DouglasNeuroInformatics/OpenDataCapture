@@ -335,13 +335,11 @@ const MasterDataTable: React.FC<{
   const { t } = useTranslation();
   const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
   const records = useInstrumentRecords();
-  let idsWithRecords: string[];
+  const idsWithRecords = new Set<string>();
   if (records.data) {
-    idsWithRecords = [
-      ...new Set(
-        records.data.map((record) => removeSubjectIdScope(record.subjectId).slice(0, subjectIdDisplaySetting ?? 9))
-      )
-    ];
+    records.data.forEach((record) => {
+      idsWithRecords.add(removeSubjectIdScope(record.subjectId));
+    });
   }
 
   return (
@@ -349,17 +347,20 @@ const MasterDataTable: React.FC<{
       <DataTable
         columns={[
           {
-            accessorFn: (subject) => removeSubjectIdScope(subject.id).slice(0, subjectIdDisplaySetting ?? 9),
+            accessorFn: (subject) => removeSubjectIdScope(subject.id),
+            cell: (ctx) => {
+              const value = ctx.getValue() as string;
+              return value.slice(0, subjectIdDisplaySetting ?? 9);
+            },
             filterFn: (row, id, filter: HasRecordFilter) => {
               const value = row.getValue(id);
               if (!value) {
                 return false;
               }
-              if (filter.hasRecords && idsWithRecords && idsWithRecords.length > 0) {
-                return idsWithRecords.includes(value as string);
-              } else {
-                return true;
+              if (filter.hasRecords) {
+                return idsWithRecords.has(value as string);
               }
+              return true;
             },
             header: t('datahub.index.table.subject'),
             id: 'subjectId'
