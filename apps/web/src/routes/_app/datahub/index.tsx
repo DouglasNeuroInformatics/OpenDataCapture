@@ -37,6 +37,7 @@ type SexFilter = (null | Sex)[];
 
 type HasRecordFilter = {
   hasRecords: boolean;
+  searchString: string;
 };
 
 const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) => {
@@ -168,8 +169,9 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
           <DropdownMenu.CheckboxItem
             checked={hasRecordFilter.hasRecords}
             onCheckedChange={(checked) => {
-              subjectColumn.setFilterValue((): HasRecordFilter => {
+              subjectColumn.setFilterValue((prevValue: HasRecordFilter): HasRecordFilter => {
                 return {
+                  ...prevValue,
                   hasRecords: checked
                 };
               });
@@ -361,6 +363,15 @@ const MasterDataTable: React.FC<{
               if (!value) {
                 return false;
               }
+              if (filter.searchString) {
+                if (filter.hasRecords) {
+                  return (
+                    idsWithRecords.has(value as string) &&
+                    (value as string).toLowerCase().includes(filter.searchString.toLowerCase())
+                  );
+                }
+                return (value as string).toLowerCase().includes(filter.searchString.toLowerCase());
+              }
               if (filter.hasRecords) {
                 return idsWithRecords.has(value as string);
               }
@@ -414,7 +425,8 @@ const MasterDataTable: React.FC<{
             {
               id: 'subjectId',
               value: {
-                hasRecords: false
+                hasRecords: false,
+                searchString: ''
               } satisfies HasRecordFilter
             },
             {
@@ -441,7 +453,12 @@ const MasterDataTable: React.FC<{
         onRowDoubleClick={onRowDoubleClick}
         onSearchChange={(value, table) => {
           const subjectIdColumn = table.getColumn('subjectId')!;
-          subjectIdColumn.setFilterValue(value);
+          subjectIdColumn.setFilterValue(
+            (prevValue: HasRecordFilter): HasRecordFilter => ({
+              ...prevValue,
+              searchString: value
+            })
+          );
         }}
       />
     </div>
