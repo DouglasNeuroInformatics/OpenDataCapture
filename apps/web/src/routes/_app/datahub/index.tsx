@@ -53,7 +53,7 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
   const sexFilter = sexColumn.getFilterValue() as SexFilter;
 
   const subjectColumn = columns.find((column) => column.id === 'subjectId')!;
-  const HasRecordFilter = subjectColumn.getFilterValue() as HasRecordFilter;
+  const hasRecordFilter = subjectColumn.getFilterValue() as HasRecordFilter;
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -166,11 +166,10 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
             })}
           </DropdownMenu.Label>
           <DropdownMenu.CheckboxItem
-            checked={HasRecordFilter.hasRecords}
+            checked={hasRecordFilter.hasRecords}
             onCheckedChange={(checked) => {
-              subjectColumn.setFilterValue((prevValue: HasRecordFilter): HasRecordFilter => {
+              subjectColumn.setFilterValue((): HasRecordFilter => {
                 return {
-                  ...prevValue,
                   hasRecords: checked
                 };
               });
