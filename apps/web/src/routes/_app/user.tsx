@@ -9,6 +9,7 @@ import { z } from 'zod/v4';
 
 import { PageHeader } from '@/components/PageHeader';
 import { UserIcon } from '@/components/UserIcon';
+import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
 
@@ -21,6 +22,8 @@ type UpdateUserFormData = {
 
 const RouteComponent = () => {
   const currentUser = useAppStore((store) => store.currentUser);
+
+  const updateUserMutation = useUpdateUserMutation();
   const { resolvedLanguage, t } = useTranslation();
   const userList = useUsersQuery();
   let userInfo;
@@ -149,6 +152,9 @@ const RouteComponent = () => {
           lastName: currentUser?.lastName ?? 'N/A'
         }}
         validationSchema={$UpdateUserFormData}
+        onSubmit={(data) => {
+          void updateUserMutation.mutateAsync({ data: data, id: currentUser!.id });
+        }}
       />
     </div>
   );
