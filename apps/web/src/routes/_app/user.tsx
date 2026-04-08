@@ -147,9 +147,10 @@ const RouteComponent = () => {
           }
         ]}
         initialValues={{
-          dateOfBirth: userInfo?.dateOfBirth,
+          dateOfBirth: userInfo?.dateOfBirth ?? undefined,
           firstName: currentUser?.firstName ?? 'N/A',
-          lastName: currentUser?.lastName ?? 'N/A'
+          lastName: currentUser?.lastName ?? 'N/A',
+          sex: userInfo?.sex ?? undefined
         }}
         validationSchema={$UpdateUserFormData}
         onSubmit={(data) => {
