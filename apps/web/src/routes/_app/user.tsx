@@ -20,7 +20,7 @@ const RouteComponent = () => {
     <div className="mt-4 flex flex-col items-center justify-center">
       <UserIcon className="h-16 w-16" />
       <Heading variant="h2">{fullName}</Heading>
-      <p className="text-sm">{fullName}</p>
+      <p className="text-sm">{currentUser?.username ?? fullName}</p>
     </div>
   );
 };
