@@ -44,6 +44,7 @@ export class AbilityFactory {
         ability.can('create', 'Subject');
         ability.can('read', 'Subject', { groupIds: { hasSome: groupIds } });
         ability.can('read', 'User', { id: payload.id });
+        ability.can('update', 'User', { id: payload.id });
         break;
     }
     payload.additionalPermissions?.forEach(({ action, subject }) => {
