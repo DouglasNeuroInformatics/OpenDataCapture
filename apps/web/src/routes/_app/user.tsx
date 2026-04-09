@@ -9,8 +9,8 @@ import { z } from 'zod/v4';
 
 import { PageHeader } from '@/components/PageHeader';
 import { UserIcon } from '@/components/UserIcon';
+import { useFindUserQuery } from '@/hooks/useFindUserQuery';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
-import { useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
 
 type UpdateUserFormData = {
@@ -25,12 +25,7 @@ const RouteComponent = () => {
 
   const updateUserMutation = useUpdateUserMutation();
   const { resolvedLanguage, t } = useTranslation();
-  const userList = useUsersQuery();
-  let userInfo;
-
-  if (userList.data) {
-    userInfo = userList.data.find((record) => record.id === currentUser?.id);
-  }
+  const userInfo = useFindUserQuery(currentUser!.id);
 
   let fullName: string;
   if (currentUser?.firstName && currentUser.lastName) {
@@ -157,10 +152,10 @@ const RouteComponent = () => {
           }
         ]}
         initialValues={{
-          dateOfBirth: userInfo?.dateOfBirth ?? undefined,
+          dateOfBirth: userInfo.data.dateOfBirth ?? undefined,
           firstName: currentUser?.firstName ?? 'N/A',
           lastName: currentUser?.lastName ?? 'N/A',
-          sex: userInfo?.sex ?? undefined
+          sex: userInfo.data.sex ?? undefined
         }}
         validationSchema={$UpdateUserFormData}
         onSubmit={(data) => {
