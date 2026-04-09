@@ -250,7 +250,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         type: 'error'
       });
     }
-  }, [recordsQuery.data]);
+  }, [recordsQuery.data, sessionsUsernameQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
     const options: { [key: string]: string } = {};
