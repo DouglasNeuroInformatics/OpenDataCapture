@@ -64,6 +64,16 @@ const RouteComponent = () => {
           });
           return z.NEVER;
         }
+      })
+      .check((ctx) => {
+        if (ctx.value.confirmPassword !== ctx.value.password) {
+          ctx.issues.push({
+            code: 'custom',
+            input: ctx.value.confirmPassword,
+            message: t('common.passwordsMustMatch'),
+            path: ['confirmPassword']
+          });
+        }
       }) satisfies z.ZodType<UpdateUserFormData>;
   }, [resolvedLanguage]);
 
