@@ -159,7 +159,10 @@ const RouteComponent = () => {
         }}
         validationSchema={$UpdateUserFormData}
         onSubmit={(data) => {
-          void updateUserMutation.mutateAsync({ data: data, id: currentUser!.id });
+          void updateUserMutation.mutateAsync({
+            data: { groupIds: Array.from(userInfo.data.groupIds), ...data },
+            id: currentUser!.id
+          });
         }}
       />
     </div>
