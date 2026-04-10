@@ -28,10 +28,10 @@ const RouteComponent = () => {
   const userInfo = useFindUserQuery(currentUser!.id);
 
   let fullName: string;
-  if (currentUser?.firstName && currentUser.lastName) {
-    fullName = `${currentUser.firstName} ${currentUser.lastName}`;
-  } else if (currentUser?.firstName) {
-    fullName = currentUser.firstName;
+  if (userInfo.data.firstName && userInfo.data.lastName) {
+    fullName = `${userInfo.data.firstName} ${userInfo.data.lastName}`;
+  } else if (userInfo.data.firstName) {
+    fullName = userInfo.data.firstName;
   } else {
     fullName = 'Unnamed User';
   }
@@ -88,6 +88,7 @@ const RouteComponent = () => {
         <p className="text-sm">{currentUser?.username ?? fullName}</p>
       </div>
       <Form
+        key={userInfo.dataUpdatedAt}
         className="mx-auto max-w-3xl"
         content={[
           {
@@ -153,8 +154,8 @@ const RouteComponent = () => {
         ]}
         initialValues={{
           dateOfBirth: userInfo.data.dateOfBirth ?? undefined,
-          firstName: currentUser?.firstName ?? 'N/A',
-          lastName: currentUser?.lastName ?? 'N/A',
+          firstName: userInfo.data.firstName ?? '',
+          lastName: userInfo.data.lastName ?? '',
           sex: userInfo.data.sex ?? undefined
         }}
         validationSchema={$UpdateUserFormData}
