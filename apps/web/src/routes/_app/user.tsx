@@ -20,6 +20,8 @@ type UpdateUserFormData = {
   password?: string | undefined;
 };
 
+const phoneRegex = new RegExp(/^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/);
+
 const RouteComponent = () => {
   const currentUser = useAppStore((store) => store.currentUser);
 
@@ -47,6 +49,7 @@ const RouteComponent = () => {
         // eslint-disable-next-line perfectionist/sort-objects
         confirmPassword: z.string().min(1).optional(),
         email: z.email().optional(),
+        phoneNumber: z.string().regex(phoneRegex).optional(),
         sex: $Sex
       })
       .check((ctx) => {
@@ -114,6 +117,14 @@ const RouteComponent = () => {
                 label: t({
                   en: 'Email',
                   fr: 'Courriel'
+                }),
+                variant: 'input'
+              },
+              phoneNumber: {
+                kind: 'string',
+                label: t({
+                  en: 'Phone Number',
+                  fr: 'Numéro de téléphone'
                 }),
                 variant: 'input'
               }
