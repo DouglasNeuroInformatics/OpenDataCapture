@@ -46,6 +46,7 @@ const RouteComponent = () => {
         password: z.string().min(1).optional(),
         // eslint-disable-next-line perfectionist/sort-objects
         confirmPassword: z.string().min(1).optional(),
+        email: z.email().optional(),
         sex: $Sex
       })
       .check((ctx) => {
@@ -93,12 +94,6 @@ const RouteComponent = () => {
         content={[
           {
             fields: {
-              // username: {
-              //   kind: 'string',
-              //   label: t('common.username'),
-              //   variant: 'input'
-              // },
-
               // eslint-disable-next-line perfectionist/sort-objects
               password: {
                 calculateStrength: (password) => {
@@ -113,6 +108,14 @@ const RouteComponent = () => {
                 kind: 'string',
                 label: t('common.confirmPassword'),
                 variant: 'password'
+              },
+              email: {
+                kind: 'string',
+                label: t({
+                  en: 'Email',
+                  fr: 'Courriel'
+                }),
+                variant: 'input'
               }
             },
             title: t({
