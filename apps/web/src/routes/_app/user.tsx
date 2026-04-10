@@ -41,15 +41,15 @@ const RouteComponent = () => {
   const $UpdateUserFormData = useMemo(() => {
     return z
       .object({
+        email: z.union([z.literal(''), z.email()]).optional(),
         firstName: z.string().min(1).optional(),
-        lastName: z.string().min(1).optional(),
         // eslint-disable-next-line perfectionist/sort-objects
         dateOfBirth: z.date().optional(),
-        password: z.string().min(1).optional(),
+        lastName: z.string().min(1).optional(),
         // eslint-disable-next-line perfectionist/sort-objects
         confirmPassword: z.string().min(1).optional(),
-        email: z.email().optional(),
-        phoneNumber: z.string().regex(phoneRegex).optional(),
+        password: z.string().min(1).optional(),
+        phoneNumber: z.union([z.literal(''), z.string().regex(phoneRegex)]).optional(),
         sex: $Sex
       })
       .check((ctx) => {
@@ -92,12 +92,16 @@ const RouteComponent = () => {
         <p className="text-sm">{currentUser?.username ?? fullName}</p>
       </div>
       <Form
-        key={userInfo.dataUpdatedAt}
         className="mx-auto max-w-3xl"
         content={[
           {
             fields: {
               // eslint-disable-next-line perfectionist/sort-objects
+              confirmPassword: {
+                kind: 'string',
+                label: t('common.confirmPassword'),
+                variant: 'password'
+              },
               password: {
                 calculateStrength: (password) => {
                   return estimatePasswordStrength(password).score;
@@ -106,25 +110,19 @@ const RouteComponent = () => {
                 label: t('common.password'),
                 variant: 'password'
               },
-              // eslint-disable-next-line perfectionist/sort-objects
-              confirmPassword: {
+              phoneNumber: {
                 kind: 'string',
-                label: t('common.confirmPassword'),
-                variant: 'password'
+                label: t({
+                  en: 'Phone Number',
+                  fr: 'Numéro de téléphone'
+                }),
+                variant: 'input'
               },
               email: {
                 kind: 'string',
                 label: t({
                   en: 'Email',
                   fr: 'Courriel'
-                }),
-                variant: 'input'
-              },
-              phoneNumber: {
-                kind: 'string',
-                label: t({
-                  en: 'Phone Number',
-                  fr: 'Numéro de téléphone'
                 }),
                 variant: 'input'
               }
@@ -168,10 +166,13 @@ const RouteComponent = () => {
         ]}
         initialValues={{
           dateOfBirth: userInfo.data.dateOfBirth ?? undefined,
+          email: userInfo.data.email ?? '',
           firstName: userInfo.data.firstName ?? '',
           lastName: userInfo.data.lastName ?? '',
+          phoneNumber: userInfo.data.phoneNumber ?? '',
           sex: userInfo.data.sex ?? undefined
         }}
+        key={userInfo.dataUpdatedAt}
         validationSchema={$UpdateUserFormData}
         onSubmit={(data) => {
           void updateUserMutation.mutateAsync({
