@@ -20,7 +20,7 @@ type UpdateUserFormData = {
   password?: string | undefined;
 };
 
-const phoneRegex = new RegExp(/^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/);
+const phoneRegex = new RegExp(/^\+?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/);
 
 const RouteComponent = () => {
   const currentUser = useAppStore((store) => store.currentUser);
