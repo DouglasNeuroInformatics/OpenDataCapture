@@ -243,6 +243,8 @@ model User {
   username              String
   sex                   Sex?
   dateOfBirth           DateTime?            @db.Date
+  phoneNumber           String?
+  email                 String?
 
   @@map("UserModel")
 }
