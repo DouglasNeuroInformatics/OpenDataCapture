@@ -22,7 +22,6 @@ import { unparse } from 'papaparse';
 
 import { IdentificationForm } from '@/components/IdentificationForm';
 import { PageHeader } from '@/components/PageHeader';
-import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
