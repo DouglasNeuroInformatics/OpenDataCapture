@@ -125,11 +125,16 @@ export class SubjectsService {
     return { success: true };
   }
 
-  async find({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
+  async find(
+    { groupId }: { groupId?: string } = {},
+    { hasRecord }: { hasRecord?: boolean } = {},
+    { ability }: EntityOperationOptions = {}
+  ) {
     const groupInput = groupId ? { groupIds: { has: groupId } } : {};
+    const hasRecordInput = hasRecord ? { instrumentRecords: { some: {} } } : {};
     return await this.subjectModel.findMany({
       where: {
-        AND: [accessibleQuery(ability, 'read', 'Subject'), groupInput]
+        AND: [accessibleQuery(ability, 'read', 'Subject'), groupInput, hasRecordInput]
       }
     });
   }
