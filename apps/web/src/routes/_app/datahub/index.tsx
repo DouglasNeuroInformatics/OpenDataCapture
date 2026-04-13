@@ -336,15 +336,12 @@ const MasterDataTable: React.FC<{
   const { t } = useTranslation();
   const currentGroup = useAppStore((store) => store.currentGroup);
   const subjectIdDisplaySetting = currentGroup?.settings.subjectIdDisplayLength;
-  const records = useInstrumentRecords({
-    params: {
-      groupId: currentGroup?.id
-    }
-  });
+
   const idsWithRecords = new Set<string>();
-  if (records.data) {
-    records.data.forEach((record) => {
-      idsWithRecords.add(removeSubjectIdScope(record.subjectId));
+  const subjectsData = useSubjectsQuery({ params: { groupId: currentGroup?.id, hasRecord: true } });
+  if (subjectsData.data) {
+    subjectsData.data.forEach((subject) => {
+      idsWithRecords.add(removeSubjectIdScope(subject.id));
     });
   }
 
