@@ -10,7 +10,7 @@ export const useFindUserQueryOptions = (id: string) => {
       const response = await axios.get(`/v1/users/${id}`);
       return $User.parse(response.data);
     },
-    queryKey: [USERS_QUERY_KEY]
+    queryKey: [USERS_QUERY_KEY, id]
   });
 };
 
