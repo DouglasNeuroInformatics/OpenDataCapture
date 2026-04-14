@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
@@ -336,13 +336,15 @@ const MasterDataTable: React.FC<{
   const currentGroup = useAppStore((store) => store.currentGroup);
   const subjectIdDisplaySetting = currentGroup?.settings.subjectIdDisplayLength;
 
-  const idsWithRecords = new Set<string>();
   const subjectsData = useSubjectsQuery({ params: { groupId: currentGroup?.id, hasRecord: true } });
-  if (subjectsData.data) {
-    subjectsData.data.forEach((subject) => {
-      idsWithRecords.add(removeSubjectIdScope(subject.id));
-    });
-  }
+
+  const idsWithRecords = useMemo(() => {
+    const ids = new Set<string>();
+    if (subjectsData.data) {
+      subjectsData.data.forEach((subject) => ids.add(removeSubjectIdScope(subject.id)));
+    }
+    return ids;
+  }, [subjectsData.data]);
 
   return (
     <div>
