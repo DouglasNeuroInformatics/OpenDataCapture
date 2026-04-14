@@ -78,6 +78,10 @@ describe('SubjectsService', () => {
       subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
       await expect(subjectsService.find()).resolves.toMatchObject([{ id: '123' }]);
     });
+    it('should return the array or subjects with records', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([{ instrumentRecords: { some: {} } }]);
+      await expect(subjectsService.find()).resolves.toMatchObject([{ instrumentRecords: { some: {} } }]);
+    });
   });
 
   describe('deleteById', () => {
