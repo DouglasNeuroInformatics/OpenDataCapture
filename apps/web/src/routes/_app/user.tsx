@@ -50,7 +50,7 @@ const RouteComponent = () => {
         confirmPassword: z.string().min(1).optional(),
         password: z.string().min(1).optional(),
         phoneNumber: z.union([z.literal(''), z.string().regex(phoneRegex)]).optional(),
-        sex: $Sex
+        sex: $Sex.optional()
       })
       .check((ctx) => {
         if (ctx.value.password && !estimatePasswordStrength(ctx.value.password).success) {
