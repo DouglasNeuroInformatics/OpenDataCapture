@@ -29,6 +29,23 @@ const RouteComponent = () => {
   const { resolvedLanguage, t } = useTranslation();
   const userInfo = useFindUserQuery(currentUser!.id);
 
+  const userType: { [key: string]: string } = {
+    ADMIN: t({
+      en: 'Admin',
+      fr: 'Admin'
+    }),
+    GROUP_MANAGER: t({
+      en: 'Group Manager',
+      fr: 'Responsable de groupe'
+    }),
+    STANDARD_USER: t({
+      en: 'Standard User',
+      fr: 'Utilisateur standard'
+    })
+  };
+
+  const userTypes = ['ADMIN', 'GROUP_MANAGER', 'STANDARD_USER'];
+
   let fullName: string;
   if (userInfo.data.firstName && userInfo.data.lastName) {
     fullName = `${userInfo.data.firstName} ${userInfo.data.lastName}`;
@@ -90,17 +107,29 @@ const RouteComponent = () => {
         <UserIcon className="h-16 w-16" />
         <Heading variant="h2">{fullName}</Heading>
         <p className="text-sm">{currentUser?.username ?? fullName}</p>
+        <p className="text-sm">
+          {userTypes.includes(userInfo.data.basePermissionLevel as string)
+            ? userType[userInfo.data.basePermissionLevel as string]
+            : undefined}
+        </p>
       </div>
       <Form
         className="mx-auto max-w-3xl"
         content={[
           {
             fields: {
-              // eslint-disable-next-line perfectionist/sort-objects
               confirmPassword: {
                 kind: 'string',
                 label: t('common.confirmPassword'),
                 variant: 'password'
+              },
+              email: {
+                kind: 'string',
+                label: t({
+                  en: 'Email',
+                  fr: 'Courriel'
+                }),
+                variant: 'input'
               },
               password: {
                 calculateStrength: (password) => {
@@ -115,14 +144,6 @@ const RouteComponent = () => {
                 label: t({
                   en: 'Phone Number',
                   fr: 'Numéro de téléphone'
-                }),
-                variant: 'input'
-              },
-              email: {
-                kind: 'string',
-                label: t({
-                  en: 'Email',
-                  fr: 'Courriel'
                 }),
                 variant: 'input'
               }
