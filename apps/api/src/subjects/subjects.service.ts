@@ -126,8 +126,7 @@ export class SubjectsService {
   }
 
   async find(
-    { groupId }: { groupId?: string } = {},
-    { hasRecord }: { hasRecord?: boolean } = {},
+    { groupId, hasRecord }: { groupId?: string; hasRecord?: boolean } = {},
     { ability }: EntityOperationOptions = {}
   ) {
     const groupInput = groupId ? { groupIds: { has: groupId } } : {};
