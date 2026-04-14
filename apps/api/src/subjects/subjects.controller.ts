@@ -42,7 +42,7 @@ export class SubjectsController {
     @Query('groupId') groupId?: string,
     @Query('hasRecord', new ParseSchemaPipe({ isOptional: true, schema: $BooleanLike })) hasRecord?: boolean
   ) {
-    return this.subjectsService.find({ groupId }, { hasRecord }, { ability });
+    return this.subjectsService.find({ groupId, hasRecord }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Subject' })
