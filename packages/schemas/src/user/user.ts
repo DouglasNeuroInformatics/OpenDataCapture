@@ -43,9 +43,15 @@ export const $UpdateUserData = $CreateUserData.partial().extend({
   additionalPermissions: $Permissions.optional()
 });
 
-export type SelfUpdateUserData = z.infer<typeof $SelfUpdateUserData>;
-export const $SelfUpdateUserData = $UpdateUserData.partial().omit({
-  additionalPermissions: true,
-  basePermissionLevel: true,
-  groupIds: true
-});
+export type $SelfUpdateUserData = z.infer<typeof $SelfUpdateUserData>;
+export const $SelfUpdateUserData = $UpdateUserData
+  .pick({
+    dateOfBirth: true,
+    email: true,
+    firstName: true,
+    lastName: true,
+    password: true,
+    phoneNumber: true,
+    sex: true
+  })
+  .partial();
