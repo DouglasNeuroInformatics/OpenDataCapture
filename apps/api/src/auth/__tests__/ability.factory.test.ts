@@ -32,7 +32,7 @@ describe('AbilityFactory', () => {
     expect(ability.can('manage', 'all')).toBe(true);
   });
 
-  it('should allow group manager to manage group', () => {
+  it('should allow group manager to manage their group', () => {
     const payload = {
       additionalPermissions: undefined,
       basePermissionLevel: 'GROUP_MANAGER',
@@ -47,5 +47,6 @@ describe('AbilityFactory', () => {
     const ability = abilityFactory.createForPayload(payload as any);
 
     expect(ability.can('manage', subject('Group', { id: 'group-1' }) as any)).toBe(true);
+    expect(ability.can('manage', subject('Group', { id: 'group-2' }) as any)).toBe(false);
   });
 });
