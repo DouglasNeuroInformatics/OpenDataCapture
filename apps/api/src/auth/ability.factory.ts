@@ -34,12 +34,6 @@ export class AbilityFactory {
         ability.can('create', 'Subject');
         ability.can('read', 'Subject', { groupIds: { hasSome: groupIds } });
         ability.can('read', 'User', { groupIds: { hasSome: groupIds } });
-        ability.can(
-          'update',
-          'User',
-          ['email', 'firstName', 'lastName', 'dateOfBirth', 'phoneNumber', 'sex', 'hashedPassword'],
-          { id: payload.id }
-        );
         break;
       case 'STANDARD':
         ability.can('read', 'Group', { id: { in: groupIds } });
@@ -50,12 +44,6 @@ export class AbilityFactory {
         ability.can('create', 'Subject');
         ability.can('read', 'Subject', { groupIds: { hasSome: groupIds } });
         ability.can('read', 'User', { id: payload.id });
-        ability.can(
-          'update',
-          'User',
-          ['email', 'firstName', 'lastName', 'dateOfBirth', 'phoneNumber', 'sex', 'hashedPassword'],
-          { id: payload.id }
-        );
         break;
     }
     payload.additionalPermissions?.forEach(({ action, subject }) => {
