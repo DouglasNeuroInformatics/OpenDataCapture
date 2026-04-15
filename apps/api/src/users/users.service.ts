@@ -171,6 +171,8 @@ export class UsersService {
       throw new ForbiddenException();
     }
 
+    const { dateOfBirth, email, firstName, lastName, phoneNumber, sex } = data;
+
     let hashedPassword: string | undefined;
     if (password) {
       hashedPassword = await this.cryptoService.hashPassword(password);
@@ -178,8 +180,13 @@ export class UsersService {
 
     return this.userModel.update({
       data: {
-        ...data,
-        hashedPassword
+        dateOfBirth,
+        email,
+        firstName,
+        hashedPassword,
+        lastName,
+        phoneNumber,
+        sex
       },
       omit: {
         hashedPassword: true
