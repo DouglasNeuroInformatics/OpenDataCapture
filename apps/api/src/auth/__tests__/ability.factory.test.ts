@@ -32,4 +32,21 @@ describe('AbilityFactory', () => {
     expect(ability.can('update', subject('User', { id: 'user-1' }) as any)).toBe(true);
     expect(ability.can('update', subject('User', { id: 'user-2' }) as any)).toBe(false);
   });
+
+  it('should not allow a standard user to modify its basePermissionLevel', () => {
+    const payload = {
+      additionalPermissions: undefined,
+      basePermissionLevel: 'STANDARD',
+      firstName: 'Test',
+      groups: [{ id: 'group-1' }],
+      id: 'user-1',
+      lastName: 'User',
+      permissions: [] as any,
+      username: 'standard-user'
+    };
+
+    const ability = abilityFactory.createForPayload(payload as any);
+
+    expect(ability.can('update', subject('User', { basePermissionLevel: 'ADMIN', id: 'user-1' }) as any)).toBe(false);
+  });
 });
