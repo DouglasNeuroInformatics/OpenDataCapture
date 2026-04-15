@@ -196,8 +196,14 @@ const RouteComponent = () => {
         key={userInfo.dataUpdatedAt}
         validationSchema={$UpdateUserFormData}
         onSubmit={(data) => {
+          const { confirmPassword, password, ...restData } = data;
+
           void updateUserMutation.mutateAsync({
-            data: { groupIds: Array.from(userInfo.data.groupIds), ...data },
+            data: {
+              groupIds: Array.from(userInfo.data.groupIds),
+              ...restData,
+              ...(password && password === confirmPassword ? { password } : {})
+            },
             id: currentUser!.id
           });
         }}
