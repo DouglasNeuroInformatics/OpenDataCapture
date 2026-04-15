@@ -181,7 +181,7 @@ const RouteComponent = () => {
             },
             title: t({
               en: 'Personal Information',
-              fr: 'Informations individuel'
+              fr: 'Informations personnelles'
             })
           }
         ]}
