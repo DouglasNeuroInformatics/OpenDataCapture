@@ -47,6 +47,6 @@ describe('AbilityFactory', () => {
 
     const ability = abilityFactory.createForPayload(payload as any);
 
-    expect(ability.can('update', subject('User', { basePermissionLevel: 'ADMIN', id: 'user-1' }) as any)).toBe(false);
+    expect(ability.can('update', subject('User', { id: 'user-1' }) as any, 'basePermissionLevel')).toBe(false);
   });
 });
