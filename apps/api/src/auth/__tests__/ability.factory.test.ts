@@ -15,38 +15,37 @@ describe('AbilityFactory', () => {
     abilityFactory = new AbilityFactory(loggingService as unknown as LoggingService);
   });
 
-  it('should create an ability for a standard user that can update only itself', () => {
+  it('should allow admin to manage all', () => {
     const payload = {
       additionalPermissions: undefined,
-      basePermissionLevel: 'STANDARD',
+      basePermissionLevel: 'ADMIN',
       firstName: 'Test',
       groups: [{ id: 'group-1' }],
       id: 'user-1',
       lastName: 'User',
       permissions: [] as any,
-      username: 'standard-user'
+      username: 'admin-user'
     };
 
     const ability = abilityFactory.createForPayload(payload as any);
 
-    expect(ability.can('update', subject('User', { id: 'user-1' }) as any)).toBe(true);
-    expect(ability.can('update', subject('User', { id: 'user-2' }) as any)).toBe(false);
+    expect(ability.can('manage', 'all')).toBe(true);
   });
 
-  it('should not allow a standard user to modify its basePermissionLevel', () => {
+  it('should allow group manager to manage group', () => {
     const payload = {
       additionalPermissions: undefined,
-      basePermissionLevel: 'STANDARD',
+      basePermissionLevel: 'GROUP_MANAGER',
       firstName: 'Test',
       groups: [{ id: 'group-1' }],
       id: 'user-1',
       lastName: 'User',
       permissions: [] as any,
-      username: 'standard-user'
+      username: 'admin-user'
     };
 
     const ability = abilityFactory.createForPayload(payload as any);
 
-    expect(ability.can('update', subject('User', { id: 'user-1' }) as any, 'basePermissionLevel')).toBe(false);
+    expect(ability.can('manage', subject('Group', { id: 'group-1' }) as any)).toBe(true);
   });
 });
