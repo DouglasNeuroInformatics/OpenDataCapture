@@ -200,10 +200,13 @@ const RouteComponent = () => {
         validationSchema={$UpdateUserFormData}
         onSubmit={(data) => {
           const { confirmPassword, password, ...restData } = data;
+          const filteredData = Object.fromEntries(
+            Object.entries(restData).filter(([, value]) => value != null && value !== '')
+          );
 
           void updateSelfUserMutation.mutateAsync({
             data: {
-              ...restData,
+              ...filteredData,
               ...(password && password === confirmPassword ? { password } : {})
             },
             id: currentUser!.id
