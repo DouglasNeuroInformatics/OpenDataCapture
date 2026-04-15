@@ -10,13 +10,7 @@ export function useUpdateUserMutation() {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
     mutationFn: async ({ data, id }: { data: UpdateUserData; id: string }) => {
-      const submitData = { ...data };
-      if (submitData.email === '') delete submitData.email;
-      if (submitData.phoneNumber === '') delete submitData.phoneNumber;
-      if (submitData.password === '') {
-        delete submitData.password;
-      }
-      await axios.patch(`/v1/users/${id}`, submitData);
+      await axios.patch(`/v1/users/${id}`, data);
     },
     onSuccess() {
       addNotification({ type: 'success' });
