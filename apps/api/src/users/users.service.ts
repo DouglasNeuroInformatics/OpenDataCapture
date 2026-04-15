@@ -167,7 +167,7 @@ export class UsersService {
   }
 
   async updateSelfById(id: string, { password, ...data }: $SelfUpdateUserData, currentUser: RequestUser) {
-    if (id !== currentUser.Id) {
+    if (id !== currentUser.id) {
       throw new ForbiddenException();
     }
 

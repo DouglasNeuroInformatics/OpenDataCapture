@@ -1,5 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { SelfUpdateUserData } from '@opendatacapture/schemas/user';
+import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -9,14 +9,8 @@ export function useSelfUpdateUserMutation() {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
-    mutationFn: async ({ data, id }: { data: SelfUpdateUserData; id: string }) => {
-      const submitData = { ...data };
-      if (submitData.email === '') delete submitData.email;
-      if (submitData.phoneNumber === '') delete submitData.phoneNumber;
-      if (submitData.password === '') {
-        delete submitData.password;
-      }
-      await axios.patch(`/v1/users/self-update/${id}`, submitData);
+    mutationFn: async ({ data, id }: { data: $SelfUpdateUserData; id: string }) => {
+      await axios.patch(`/v1/users/self-update/${id}`, data);
     },
     onSuccess() {
       addNotification({ type: 'success' });
