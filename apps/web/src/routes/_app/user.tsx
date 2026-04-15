@@ -10,14 +10,16 @@ import { z } from 'zod/v4';
 import { PageHeader } from '@/components/PageHeader';
 import { UserIcon } from '@/components/UserIcon';
 import { useFindUserQuery } from '@/hooks/useFindUserQuery';
-import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
+import { useSelfUpdateUserMutation } from '@/hooks/useSelfUpdateUserMutation';
 import { useAppStore } from '@/store';
 
 type UpdateUserFormData = {
   confirmPassword?: string | undefined;
+  email?: string | undefined;
   firstName?: string | undefined;
   lastName?: string | undefined;
   password?: string | undefined;
+  phoneNumber?: string | undefined;
 };
 
 const phoneRegex = new RegExp(/^\+?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/);
@@ -25,7 +27,7 @@ const phoneRegex = new RegExp(/^\+?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/);
 const RouteComponent = () => {
   const currentUser = useAppStore((store) => store.currentUser);
 
-  const updateUserMutation = useUpdateUserMutation();
+  const updateSelfUserMutation = useSelfUpdateUserMutation();
   const { resolvedLanguage, t } = useTranslation();
   const userInfo = useFindUserQuery(currentUser!.id);
 
@@ -123,14 +125,6 @@ const RouteComponent = () => {
                 label: t('common.confirmPassword'),
                 variant: 'password'
               },
-              email: {
-                kind: 'string',
-                label: t({
-                  en: 'Email',
-                  fr: 'Courriel'
-                }),
-                variant: 'input'
-              },
               password: {
                 calculateStrength: (password) => {
                   return estimatePasswordStrength(password).score;
@@ -138,6 +132,15 @@ const RouteComponent = () => {
                 kind: 'string',
                 label: t('common.password'),
                 variant: 'password'
+              },
+              // eslint-disable-next-line perfectionist/sort-objects
+              email: {
+                kind: 'string',
+                label: t({
+                  en: 'Email',
+                  fr: 'Courriel'
+                }),
+                variant: 'input'
               },
               phoneNumber: {
                 kind: 'string',
@@ -198,9 +201,8 @@ const RouteComponent = () => {
         onSubmit={(data) => {
           const { confirmPassword, password, ...restData } = data;
 
-          void updateUserMutation.mutateAsync({
+          void updateSelfUserMutation.mutateAsync({
             data: {
-              groupIds: Array.from(userInfo.data.groupIds),
               ...restData,
               ...(password && password === confirmPassword ? { password } : {})
             },
