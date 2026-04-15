@@ -42,3 +42,10 @@ export type UpdateUserData = z.infer<typeof $UpdateUserData>;
 export const $UpdateUserData = $CreateUserData.partial().extend({
   additionalPermissions: $Permissions.optional()
 });
+
+export type SelfUpdateUserData = z.infer<typeof $SelfUpdateUserData>;
+export const $SelfUpdateUserData = $UpdateUserData.partial().omit({
+  additionalPermissions: true,
+  basePermissionLevel: true,
+  groupIds: true
+});
