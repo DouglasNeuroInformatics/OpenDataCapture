@@ -1,7 +1,8 @@
 import { CryptoService, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
+import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import type { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
+import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -169,6 +170,10 @@ export class UsersService {
   async updateSelfById(id: string, { password, ...data }: $SelfUpdateUserData, currentUser: RequestUser) {
     if (id !== currentUser.id) {
       throw new ForbiddenException();
+    }
+
+    if (password && !estimatePasswordStrength(password).success) {
+      throw new Error('Insufficient password strength');
     }
 
     const { dateOfBirth, email, firstName, lastName, phoneNumber, sex } = data;
