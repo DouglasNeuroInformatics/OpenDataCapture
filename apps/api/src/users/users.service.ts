@@ -1,6 +1,7 @@
 import { CryptoService, InjectModel } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import type { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -162,6 +163,28 @@ export class UsersService {
         hashedPassword: true
       },
       where: { AND: [accessibleQuery(ability, 'update', 'User')], id }
+    });
+  }
+
+  async updateSelfById(id: string, { password, ...data }: $SelfUpdateUserData, currentUser: RequestUser) {
+    if (id !== currentUser.Id) {
+      throw new ForbiddenException();
+    }
+
+    let hashedPassword: string | undefined;
+    if (password) {
+      hashedPassword = await this.cryptoService.hashPassword(password);
+    }
+
+    return this.userModel.update({
+      data: {
+        ...data,
+        hashedPassword
+      },
+      omit: {
+        hashedPassword: true
+      },
+      where: { id }
     });
   }
 }
