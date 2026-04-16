@@ -16,8 +16,8 @@ catalogs:
       specifier: ^0.0.4
       version: 0.0.4
     '@douglasneuroinformatics/libjs':
-      specifier: ^3.2.0
-      version: 3.2.0
+      specifier: ^3.2.1
+      version: 3.2.1
     '@douglasneuroinformatics/libpasswd':
       specifier: latest
       version: 0.0.3
@@ -105,23 +105,23 @@ overrides:
   '@types/react': '-'
   '@types/react-dom': '-'
   framer-motion: 11.15.0
-  typescript: 5.6.x
+  typescript: 6.0.x
 
 importers:
   .:
     devDependencies:
       '@douglasneuroinformatics/eslint-config':
         specifier: ^6.0.0
-        version: 6.0.0(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3))(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
+        version: 6.0.0(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2))(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
       '@douglasneuroinformatics/prettier-config':
         specifier: ^0.3.0
         version: 0.3.0(husky@9.1.7)(prettier-plugin-astro@0.14.1)(prettier-plugin-tailwindcss@0.6.14(prettier-plugin-astro@0.14.1)(prettier@3.8.1))(prettier@3.8.1)
       '@douglasneuroinformatics/tsconfig':
         specifier: ^2.0.0
-        version: 2.0.0(typescript@5.6.3)
+        version: 2.0.0(typescript@6.0.2)
       '@swc-node/register':
         specifier: ^1.10.9
-        version: 1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.6.3)
+        version: 1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@6.0.2)
       '@swc/cli':
         specifier: ^0.6.0
         version: 0.6.0(@swc/core@1.15.11(@swc/helpers@0.5.18))(chokidar@4.0.3)
@@ -163,7 +163,7 @@ importers:
         version: 4.1.1
       knip:
         specifier: ^5.46.0
-        version: 5.84.1(@types/node@22.19.11)(typescript@5.6.3)
+        version: 5.84.1(@types/node@22.19.11)(typescript@6.0.2)
       prettier:
         specifier: ^3.4.2
         version: 3.8.1
@@ -186,8 +186,8 @@ importers:
         specifier: ^2.3.3
         version: 2.8.10
       typescript:
-        specifier: 5.6.x
-        version: 5.6.3
+        specifier: 6.0.x
+        version: 6.0.2
       unplugin-swc:
         specifier: ^1.5.1
         version: 1.5.9(@swc/core@1.15.11(@swc/helpers@0.5.18))(rollup@4.58.0)
@@ -202,19 +202,19 @@ importers:
         version: 6.8.0
       '@casl/prisma':
         specifier: ^1.5.1
-        version: 1.6.1(@casl/ability@6.8.0)(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3))
+        version: 1.6.1(@casl/ability@6.8.0)(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2))
       '@douglasneuroinformatics/libcrypto':
         specifier: 'catalog:'
         version: 0.0.4
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
+        version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libnest':
         specifier: ^8.2.0
-        version: 8.2.1(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)(@nestjs/platform-fastify@11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14))(@nestjs/testing@11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)(@nestjs/platform-express@11.1.14))(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.25)(fastify@5.7.4)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.58.0)(rxjs@7.8.2)(typescript@5.6.3)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))(vitest@3.2.4)(zod@vendor+zod@3.x)
+        version: 8.2.1(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)(@nestjs/platform-fastify@11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14))(@nestjs/testing@11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)(@nestjs/platform-express@11.1.14))(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2))(@swc/types@0.1.25)(fastify@5.7.4)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.58.0)(rxjs@7.8.2)(typescript@6.0.2)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))(vitest@3.2.4)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libpasswd':
         specifier: 'catalog:'
-        version: 0.0.3(typescript@5.6.3)
+        version: 0.0.3(typescript@6.0.2)
       '@douglasneuroinformatics/libstats':
         specifier: 'catalog:'
         version: 0.2.0
@@ -274,7 +274,7 @@ importers:
         version: link:../../packages/subject-utils
       '@prisma/client':
         specifier: 'catalog:'
-        version: 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3)
+        version: 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2)
       axios:
         specifier: 'catalog:'
         version: 1.13.5(debug@4.4.3)
@@ -332,10 +332,10 @@ importers:
         version: 10.4.3(socks@2.8.7)
       prisma:
         specifier: 'catalog:'
-        version: 6.19.2(magicast@0.3.5)(typescript@5.6.3)
+        version: 6.19.2(magicast@0.3.5)(typescript@6.0.2)
       prisma-json-types-generator:
         specifier: ^3.2.2
-        version: 3.6.2(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3))(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3)
+        version: 3.6.2(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2))(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2)
 
   apps/gateway:
     dependencies:
@@ -359,7 +359,7 @@ importers:
         version: link:../../packages/schemas
       '@prisma/client':
         specifier: 'catalog:'
-        version: 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3)
+        version: 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2)
       axios:
         specifier: 'catalog:'
         version: 1.13.5(debug@4.4.3)
@@ -399,7 +399,7 @@ importers:
     devDependencies:
       '@douglasneuroinformatics/esbuild-plugin-prisma':
         specifier: 'catalog:'
-        version: 1.0.1(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3))(@prisma/engines@6.19.2)(esbuild@0.23.1)(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))
+        version: 1.0.1(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2))(@prisma/engines@6.19.2)(esbuild@0.23.1)(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))
       '@opendatacapture/release-info':
         specifier: workspace:*
         version: link:../../packages/release-info
@@ -426,7 +426,7 @@ importers:
         version: 3.1.13
       prisma:
         specifier: 'catalog:'
-        version: 6.19.2(magicast@0.3.5)(typescript@5.6.3)
+        version: 6.19.2(magicast@0.3.5)(typescript@6.0.2)
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.0
@@ -472,16 +472,16 @@ importers:
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.4
-        version: 0.9.6(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@5.6.3)
+        version: 0.9.6(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@6.0.2)
       '@astrojs/sitemap':
         specifier: ^3.2.1
         version: 3.7.0
       '@astrojs/starlight':
         specifier: ^0.34.3
-        version: 0.34.8(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2))
+        version: 0.34.8(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))
       '@astrojs/starlight-tailwind':
         specifier: 4.0.1
-        version: 4.0.1(@astrojs/starlight@0.34.8(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2)))(tailwindcss@4.2.0)
+        version: 4.0.1(@astrojs/starlight@0.34.8(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)))(tailwindcss@4.2.0)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../../packages/runtime-core
@@ -496,7 +496,7 @@ importers:
         version: 4.2.0(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
       astro:
         specifier: ^5.15.9
-        version: 5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2)
+        version: 5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
@@ -511,10 +511,10 @@ importers:
         version: link:../../vendor/type-fest@4.x
       typedoc:
         specifier: 0.27.x
-        version: 0.27.9(typescript@5.6.3)
+        version: 0.27.9(typescript@6.0.2)
       typedoc-plugin-markdown:
         specifier: 4.4.x
-        version: 4.4.2(typedoc@0.27.9(typescript@5.6.3))
+        version: 4.4.2(typedoc@0.27.9(typescript@6.0.2))
 
   apps/playground:
     dependencies:
@@ -523,7 +523,7 @@ importers:
         version: 0.0.4
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
+        version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 6.2.1(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
@@ -623,7 +623,7 @@ importers:
         version: link:../../packages/vite-plugin-runtime
       '@storybook/react-vite':
         specifier: 'catalog:'
-        version: 9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@5.6.3)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@6.0.2)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
       '@tailwindcss/vite':
         specifier: 'catalog:'
         version: 4.2.0(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
@@ -647,10 +647,10 @@ importers:
         version: 6.8.0
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
+        version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libpasswd':
         specifier: 'catalog:'
-        version: 0.0.3(typescript@5.6.3)
+        version: 0.0.3(typescript@6.0.2)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 6.2.1(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
@@ -774,7 +774,7 @@ importers:
         version: link:../../packages/vite-plugin-runtime
       '@storybook/react-vite':
         specifier: 'catalog:'
-        version: 9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@5.6.3)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@6.0.2)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
       '@tailwindcss/vite':
         specifier: 'catalog:'
         version: 4.2.0(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
@@ -810,7 +810,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@4.3.6)
+        version: 3.2.1(neverthrow@8.2.0)(zod@4.3.6)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -894,7 +894,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
+        version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
@@ -906,7 +906,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@4.3.6)
+        version: 3.2.1(neverthrow@8.2.0)(zod@4.3.6)
       '@opendatacapture/runtime-core':
         specifier: workspace:*
         version: link:../runtime-core
@@ -926,7 +926,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
+        version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 6.2.1(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
@@ -999,7 +999,7 @@ importers:
         version: link:../instrument-stubs
       '@storybook/react-vite':
         specifier: 'catalog:'
-        version: 9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@5.6.3)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@6.0.2)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
       type-fest:
         specifier: workspace:type-fest__4.x@*
         version: link:../../vendor/type-fest@4.x
@@ -1023,7 +1023,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
+        version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       esbuild:
         specifier: 'catalog:'
         version: 0.23.1
@@ -1067,7 +1067,7 @@ importers:
         version: 6.8.0
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
+        version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
@@ -1080,7 +1080,7 @@ importers:
     devDependencies:
       '@casl/prisma':
         specifier: ^1.5.1
-        version: 1.6.1(@casl/ability@6.8.0)(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3))
+        version: 1.6.1(@casl/ability@6.8.0)(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2))
       '@opendatacapture/instrument-stubs':
         specifier: workspace:*
         version: link:../instrument-stubs
@@ -1105,7 +1105,7 @@ importers:
     devDependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
+        version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 6.2.1(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.2.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
@@ -1170,7 +1170,7 @@ importers:
     devDependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@4.3.6)
+        version: 3.2.1(neverthrow@8.2.0)(zod@4.3.6)
 
   runtime/v1:
     devDependencies:
@@ -1342,7 +1342,7 @@ importers:
         version: 9.0.0-beta.3(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))
       '@storybook/react-vite':
         specifier: 'catalog:'
-        version: 9.0.0-beta.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@5.6.3)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 9.0.0-beta.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@6.0.2)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
       '@tailwindcss/vite':
         specifier: 'catalog:'
         version: 4.2.0(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
@@ -1366,7 +1366,7 @@ importers:
         version: 6.8.0
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@4.3.6)
+        version: 3.2.1(neverthrow@8.2.0)(zod@4.3.6)
       '@faker-js/faker':
         specifier: ^9.4.0
         version: 9.9.0
@@ -1385,7 +1385,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
-        version: 3.2.0(neverthrow@8.2.0)(zod@4.3.6)
+        version: 3.2.1(neverthrow@8.2.0)(zod@4.3.6)
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -1717,7 +1717,7 @@ packages:
       { integrity: sha512-jlaEu5SxvSgmfGIFfNgcn5/f+29H61NJzEMfAZ82Xopr4XBchXB1GVlcJsE+elUlsYSbXlptZLX+JMG3b/wZEA== }
     hasBin: true
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@astrojs/compiler@2.13.1':
     resolution:
@@ -1947,7 +1947,7 @@ packages:
       { integrity: sha512-fq0RAZ7eleR0FoJVPwrHUBG08fH5GAAD4dtoDdnlFbiIXAcvHfazYS176gXPNjJp7ejIlbw6ICaxOE9qKMf8ww== }
     peerDependencies:
       eslint: 9.x
-      typescript: 5.6.x
+      typescript: 6.0.x
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -1962,6 +1962,13 @@ packages:
     peerDependencies:
       neverthrow: ^8.2.0
       zod: ^3.25.67
+
+  '@douglasneuroinformatics/libjs@3.2.1':
+    resolution:
+      { integrity: sha512-Q4yAufkfm67kQa+Wny9cStjLp0YJsjSp5wmdXWV8Ui18EFsJhUbe0xiwdjCjS71RJBKpnwCmwqLIP3UraGOzrg== }
+    peerDependencies:
+      neverthrow: ^8.2.0
+      zod: ^3.25.67 || 4.x
 
   '@douglasneuroinformatics/libnest@8.2.1':
     resolution:
@@ -1989,7 +1996,7 @@ packages:
     resolution:
       { integrity: sha512-F/TQ1DEkGChZxYdYDYKa5CripGxmaJ8QFbo278bppC8tLv84pnayBuafLwstW3nN/ycfTRt9u0CwPfiDKeS0AA== }
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@douglasneuroinformatics/libstats-darwin-arm64@0.2.0':
     resolution:
@@ -2090,7 +2097,7 @@ packages:
     resolution:
       { integrity: sha512-f/OdFIbtOaXX7mpfQQjlZVnf1nJFUJcletqqqPfkCdhjy1zLrDsxpMgKrN9yeAl2FWpyBCzenx7o+0fkaGgGQQ== }
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@emmetio/abbreviation@2.3.3':
     resolution:
@@ -3354,7 +3361,7 @@ packages:
     resolution:
       { integrity: sha512-qYDdL7fPwLRI+bJNurVcis+tNgJmvWjH4YTBGXTA8xMuxFrnAz6E5o35iyzyKbq5J5Lr8mJGfrR5GXl+WGwhgQ== }
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
       vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
     peerDependenciesMeta:
       typescript:
@@ -4046,7 +4053,7 @@ packages:
     engines: { node: '>=18.18' }
     peerDependencies:
       prisma: '*'
-      typescript: 5.6.x
+      typescript: 6.0.x
     peerDependenciesMeta:
       prisma:
         optional: true
@@ -5056,7 +5063,7 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
       storybook: ^9.0.0-beta.3
-      typescript: 5.6.x
+      typescript: 6.0.x
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -5074,7 +5081,7 @@ packages:
       { integrity: sha512-VQ0hJ5jX31TVv/fhZx4xJRzd8pwn6VvzYd2tGOHHr2TfXGCBixZoqdPDXTiEoJLCTS2MmvBf6zyQZZ0M8aGQCQ== }
     peerDependencies:
       '@swc/core': '>= 1.4.13'
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@swc-node/sourcemap-support@0.6.1':
     resolution:
@@ -5751,7 +5758,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': ^8.58.2
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@typescript-eslint/parser@8.58.2':
     resolution:
@@ -5759,14 +5766,14 @@ packages:
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@typescript-eslint/project-service@8.58.2':
     resolution:
       { integrity: sha512-Cq6UfpZZk15+r87BkIh5rDpi38W4b+Sjnb8wQCPPDDweS/LRCFjCyViEbzHk5Ck3f2QDfgmlxqSa7S7clDtlfg== }
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@typescript-eslint/scope-manager@8.56.0':
     resolution:
@@ -5783,7 +5790,7 @@ packages:
       { integrity: sha512-3SR+RukipDvkkKp/d0jP0dyzuls3DbGmwDpVEc5wqk5f38KFThakqAAO0XMirWAE+kT00oTauTbzMFGPoAzB0A== }
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@typescript-eslint/type-utils@8.58.2':
     resolution:
@@ -5791,7 +5798,7 @@ packages:
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@typescript-eslint/types@8.56.0':
     resolution:
@@ -5808,7 +5815,7 @@ packages:
       { integrity: sha512-ELGuoofuhhoCvNbQjFFiobFcGgcDCEm0ThWdmO4Z0UzLqPXS3KFvnEZ+SHewwOYHjM09tkzOWXNTv9u6Gqtyuw== }
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@typescript-eslint/utils@8.58.2':
     resolution:
@@ -5816,7 +5823,7 @@ packages:
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@typescript-eslint/visitor-keys@8.56.0':
     resolution:
@@ -5920,7 +5927,7 @@ packages:
     resolution:
       { integrity: sha512-cKX4vK9dtZvDRaAzeoUdaAJEew6IdxHNCRrdp5Kvcl6zZOqb6jTOfk3kXkIkG3T7oTFXguEMt5+9ptyqYR84Pg== }
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   '@volar/language-core@2.4.28':
     resolution:
@@ -9220,7 +9227,7 @@ packages:
     hasBin: true
     peerDependencies:
       '@types/node': '>=18'
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   known-css-properties@0.35.0:
     resolution:
@@ -10739,7 +10746,7 @@ packages:
     peerDependencies:
       '@prisma/client': ^6.14
       prisma: ^6.14
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   prisma@6.19.2:
     resolution:
@@ -10747,7 +10754,7 @@ packages:
     engines: { node: '>=18.18' }
     hasBin: true
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -10906,7 +10913,7 @@ packages:
     resolution:
       { integrity: sha512-ZtAp5XTO5HRzQctjPU0ybY0RRCQO19X/8fxn3w7y2VVTUbGHDKULPTL4ky3vB05euSgG5NpALhEhDPvQ56wvXg== }
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   react-docgen@7.1.1:
     resolution:
@@ -12131,7 +12138,7 @@ packages:
       { integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA== }
     engines: { node: '>=18.12' }
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   ts-dedent@2.2.0:
     resolution:
@@ -12156,7 +12163,7 @@ packages:
     engines: { node: ^18 || >=20 }
     hasBin: true
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -12316,7 +12323,7 @@ packages:
     engines: { node: '>= 18' }
     hasBin: true
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
 
   typesafe-path@0.2.2:
     resolution:
@@ -12332,11 +12339,11 @@ packages:
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
-      typescript: 5.6.x
+      typescript: 6.0.x
 
-  typescript@5.6.3:
+  typescript@6.0.2:
     resolution:
-      { integrity: sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw== }
+      { integrity: sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ== }
     engines: { node: '>=14.17' }
     hasBin: true
 
@@ -13118,7 +13125,7 @@ packages:
     resolution:
       { integrity: sha512-x30XE43V+InwGpvTySRNz9kB7qFU8DlyEy7BsSTCHPH1R0QasMmHWZDCzYm6bVXtj/9NNJAZF3jW8rzFvH5OFA== }
     peerDependencies:
-      typescript: 5.6.x
+      typescript: 6.0.x
       zod: ^3
 
   zod-validation-error@3.5.4:
@@ -13185,12 +13192,12 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
-  '@astrojs/check@0.9.6(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@5.6.3)':
+  '@astrojs/check@0.9.6(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@6.0.2)':
     dependencies:
-      '@astrojs/language-server': 2.16.3(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@5.6.3)
+      '@astrojs/language-server': 2.16.3(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@6.0.2)
       chokidar: 4.0.3
       kleur: 4.1.5
-      typescript: 5.6.3
+      typescript: 6.0.2
       yargs: 17.7.2
     transitivePeerDependencies:
       - prettier
@@ -13200,12 +13207,12 @@ snapshots:
 
   '@astrojs/internal-helpers@0.7.5': {}
 
-  '@astrojs/language-server@2.16.3(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@5.6.3)':
+  '@astrojs/language-server@2.16.3(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@6.0.2)':
     dependencies:
       '@astrojs/compiler': 2.13.1
       '@astrojs/yaml2ts': 0.2.2
       '@jridgewell/sourcemap-codec': 1.5.5
-      '@volar/kit': 2.4.28(typescript@5.6.3)
+      '@volar/kit': 2.4.28(typescript@6.0.2)
       '@volar/language-core': 2.4.28
       '@volar/language-server': 2.4.28
       '@volar/language-service': 2.4.28
@@ -13252,12 +13259,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/mdx@4.3.13(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2))':
+  '@astrojs/mdx@4.3.13(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))':
     dependencies:
       '@astrojs/markdown-remark': 6.3.10
       '@mdx-js/mdx': 3.1.1
       acorn: 8.16.0
-      astro: 5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2)
+      astro: 5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)
       es-module-lexer: 1.7.0
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.5
@@ -13281,22 +13288,22 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 3.25.76
 
-  '@astrojs/starlight-tailwind@4.0.1(@astrojs/starlight@0.34.8(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2)))(tailwindcss@4.2.0)':
+  '@astrojs/starlight-tailwind@4.0.1(@astrojs/starlight@0.34.8(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)))(tailwindcss@4.2.0)':
     dependencies:
-      '@astrojs/starlight': 0.34.8(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2))
+      '@astrojs/starlight': 0.34.8(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))
       tailwindcss: 4.2.0
 
-  '@astrojs/starlight@0.34.8(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2))':
+  '@astrojs/starlight@0.34.8(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))':
     dependencies:
       '@astrojs/markdown-remark': 6.3.10
-      '@astrojs/mdx': 4.3.13(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2))
+      '@astrojs/mdx': 4.3.13(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))
       '@astrojs/sitemap': 3.7.0
       '@pagefind/default-ui': 1.4.0
       '@types/hast': 3.0.4
       '@types/js-yaml': 4.0.9
       '@types/mdast': 4.0.4
-      astro: 5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2)
-      astro-expressive-code: 0.41.6(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2))
+      astro: 5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)
+      astro-expressive-code: 0.41.6(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))
       bcp-47: 2.1.0
       hast-util-from-html: 2.0.3
       hast-util-select: 6.0.4
@@ -13461,10 +13468,10 @@ snapshots:
     dependencies:
       '@ucast/mongo2js': 1.4.1
 
-  '@casl/prisma@1.6.1(@casl/ability@6.8.0)(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3))':
+  '@casl/prisma@1.6.1(@casl/ability@6.8.0)(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2))':
     dependencies:
       '@casl/ability': 6.8.0
-      '@prisma/client': 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3)
+      '@prisma/client': 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2)
       '@ucast/core': 1.10.2
       '@ucast/js': 3.1.0
 
@@ -13501,31 +13508,31 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@douglasneuroinformatics/esbuild-plugin-prisma@1.0.1(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3))(@prisma/engines@6.19.2)(esbuild@0.23.1)(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))':
+  '@douglasneuroinformatics/esbuild-plugin-prisma@1.0.1(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2))(@prisma/engines@6.19.2)(esbuild@0.23.1)(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))':
     dependencies:
-      '@prisma/client': 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3)
+      '@prisma/client': 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2)
       '@prisma/engines': 6.19.2
       '@prisma/get-platform': 5.22.0
       esbuild: 0.23.1
-      prisma: 6.19.2(magicast@0.3.5)(typescript@5.6.3)
+      prisma: 6.19.2(magicast@0.3.5)(typescript@6.0.2)
 
-  '@douglasneuroinformatics/eslint-config@6.0.0(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3))(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)':
+  '@douglasneuroinformatics/eslint-config@6.0.0(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2))(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)':
     dependencies:
       '@eslint/js': 9.39.3
       eslint: 9.23.0(jiti@2.6.1)
       eslint-plugin-astro: 1.7.0(eslint@9.23.0(jiti@2.6.1))
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3))(eslint@9.23.0(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2))(eslint@9.23.0(jiti@2.6.1))
       eslint-plugin-jsdoc: 50.8.0(eslint@9.23.0(jiti@2.6.1))
       eslint-plugin-jsonc: 2.21.1(eslint@9.23.0(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.23.0(jiti@2.6.1))
-      eslint-plugin-perfectionist: 5.8.0(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
+      eslint-plugin-perfectionist: 5.8.0(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
       eslint-plugin-react: 7.37.5(eslint@9.23.0(jiti@2.6.1))
       eslint-plugin-svelte: 2.46.1(eslint@9.23.0(jiti@2.6.1))
       globals: 15.15.0
       jsonc-eslint-parser: 2.4.2
-      typescript-eslint: 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
+      typescript-eslint: 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
     optionalDependencies:
-      typescript: 5.6.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - '@eslint/json'
       - '@typescript-eslint/parser'
@@ -13539,16 +13546,6 @@ snapshots:
     dependencies:
       '@hpke/core': 1.7.5
 
-  '@douglasneuroinformatics/libjs@3.2.0(neverthrow@8.2.0)(zod@4.3.6)':
-    dependencies:
-      clean-stack: 5.2.0
-      extract-stack: 3.0.0
-      neverthrow: 8.2.0
-      serialize-error: 12.0.0
-      stringify-object: 5.0.0
-      type-fest: 4.41.0
-      zod: 4.3.6
-
   '@douglasneuroinformatics/libjs@3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)':
     dependencies:
       clean-stack: 5.2.0
@@ -13559,19 +13556,39 @@ snapshots:
       type-fest: 4.41.0
       zod: link:vendor/zod@3.x
 
-  '@douglasneuroinformatics/libnest@8.2.1(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)(@nestjs/platform-fastify@11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14))(@nestjs/testing@11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)(@nestjs/platform-express@11.1.14))(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3))(@swc/types@0.1.25)(fastify@5.7.4)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.58.0)(rxjs@7.8.2)(typescript@5.6.3)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))(vitest@3.2.4)(zod@vendor+zod@3.x)':
+  '@douglasneuroinformatics/libjs@3.2.1(neverthrow@8.2.0)(zod@4.3.6)':
     dependencies:
-      '@douglasneuroinformatics/libjs': 3.2.0(neverthrow@8.2.0)(zod@vendor+zod@3.x)
+      clean-stack: 5.2.0
+      extract-stack: 3.0.0
+      neverthrow: 8.2.0
+      serialize-error: 12.0.0
+      stringify-object: 5.0.0
+      type-fest: 4.41.0
+      zod: 4.3.6
+
+  '@douglasneuroinformatics/libjs@3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)':
+    dependencies:
+      clean-stack: 5.2.0
+      extract-stack: 3.0.0
+      neverthrow: 8.2.0
+      serialize-error: 12.0.0
+      stringify-object: 5.0.0
+      type-fest: 4.41.0
+      zod: link:vendor/zod@3.x
+
+  '@douglasneuroinformatics/libnest@8.2.1(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)(@nestjs/platform-fastify@11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14))(@nestjs/testing@11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)(@nestjs/platform-express@11.1.14))(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2))(@swc/types@0.1.25)(fastify@5.7.4)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.58.0)(rxjs@7.8.2)(typescript@6.0.2)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))(vitest@3.2.4)(zod@vendor+zod@3.x)':
+    dependencies:
+      '@douglasneuroinformatics/libjs': 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@nestjs/common': 11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2)
       '@nestjs/core': 11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/platform-express@11.1.14)(reflect-metadata@0.1.14)(rxjs@7.8.2)
       '@nestjs/platform-fastify': 11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)
       '@nestjs/swagger': 11.2.6(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)(reflect-metadata@0.1.14)
       '@nestjs/testing': 11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)(@nestjs/platform-express@11.1.14)
       '@nestjs/throttler': 6.5.0(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)(reflect-metadata@0.1.14)
-      '@prisma/client': 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3)
+      '@prisma/client': 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2)
       '@prisma/engines': 6.19.2
       '@prisma/get-platform': 6.19.2
-      '@swc-node/register': 1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.6.3)
+      '@swc-node/register': 1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@6.0.2)
       '@swc/core': 1.15.11(@swc/helpers@0.5.18)
       '@swc/helpers': 0.5.18
       '@types/nodemailer': 7.0.11
@@ -13603,14 +13620,14 @@ snapshots:
       - supports-color
       - typescript
 
-  '@douglasneuroinformatics/libpasswd@0.0.3(typescript@5.6.3)':
+  '@douglasneuroinformatics/libpasswd@0.0.3(typescript@6.0.2)':
     dependencies:
       '@zxcvbn-ts/core': 3.0.4
       '@zxcvbn-ts/language-common': 3.0.4
       '@zxcvbn-ts/language-en': 3.0.2
       '@zxcvbn-ts/language-fr': 3.0.2
       type-fest: 4.41.0
-      typescript: 5.6.3
+      typescript: 6.0.2
 
   '@douglasneuroinformatics/libstats-darwin-arm64@0.2.0':
     optional: true
@@ -13769,9 +13786,9 @@ snapshots:
       prettier-plugin-astro: 0.14.1
       prettier-plugin-tailwindcss: 0.6.14(prettier-plugin-astro@0.14.1)(prettier@3.8.1)
 
-  '@douglasneuroinformatics/tsconfig@2.0.0(typescript@5.6.3)':
+  '@douglasneuroinformatics/tsconfig@2.0.0(typescript@6.0.2)':
     dependencies:
-      typescript: 5.6.3
+      typescript: 6.0.2
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:
@@ -14499,14 +14516,14 @@ snapshots:
 
   '@istanbuljs/schema@0.1.3': {}
 
-  '@joshwooding/vite-plugin-react-docgen-typescript@0.5.0(typescript@5.6.3)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@joshwooding/vite-plugin-react-docgen-typescript@0.5.0(typescript@6.0.2)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       glob: 10.5.0
       magic-string: 0.27.0
-      react-docgen-typescript: 2.4.0(typescript@5.6.3)
+      react-docgen-typescript: 2.4.0(typescript@6.0.2)
       vite: 6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)
     optionalDependencies:
-      typescript: 5.6.3
+      typescript: 6.0.2
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -14647,7 +14664,7 @@ snapshots:
       resolve: 1.22.11
       semver: 7.5.4
       source-map: 0.6.1
-      typescript: 5.6.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - '@types/node'
 
@@ -15004,10 +15021,10 @@ snapshots:
 
   '@polka/url@1.0.0-next.29': {}
 
-  '@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3)':
+  '@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2)':
     optionalDependencies:
-      prisma: 6.19.2(magicast@0.3.5)(typescript@5.6.3)
-      typescript: 5.6.3
+      prisma: 6.19.2(magicast@0.3.5)(typescript@6.0.2)
+      typescript: 6.0.2
 
   '@prisma/config@6.19.2(magicast@0.3.5)':
     dependencies:
@@ -16242,12 +16259,12 @@ snapshots:
       react-dom: link:vendor/react-dom@19.x
       storybook: 9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
 
-  '@storybook/react-vite@9.0.0-beta.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@5.6.3)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@storybook/react-vite@9.0.0-beta.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@6.0.2)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
-      '@joshwooding/vite-plugin-react-docgen-typescript': 0.5.0(typescript@5.6.3)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
+      '@joshwooding/vite-plugin-react-docgen-typescript': 0.5.0(typescript@6.0.2)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
       '@rollup/pluginutils': 5.3.0(rollup@4.58.0)
       '@storybook/builder-vite': 9.0.0-beta.3(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
-      '@storybook/react': 9.0.0-beta.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@5.6.3)
+      '@storybook/react': 9.0.0-beta.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@6.0.2)
       find-up: 5.0.0
       magic-string: 0.30.21
       react: 19.1.0
@@ -16262,12 +16279,12 @@ snapshots:
       - supports-color
       - typescript
 
-  '@storybook/react-vite@9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@5.6.3)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@storybook/react-vite@9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(rollup@4.58.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@6.0.2)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
-      '@joshwooding/vite-plugin-react-docgen-typescript': 0.5.0(typescript@5.6.3)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
+      '@joshwooding/vite-plugin-react-docgen-typescript': 0.5.0(typescript@6.0.2)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
       '@rollup/pluginutils': 5.3.0(rollup@4.58.0)
       '@storybook/builder-vite': 9.0.0-beta.3(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
-      '@storybook/react': 9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@5.6.3)
+      '@storybook/react': 9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@6.0.2)
       find-up: 5.0.0
       magic-string: 0.30.21
       react: link:vendor/react@19.x
@@ -16282,7 +16299,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@storybook/react@9.0.0-beta.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@5.6.3)':
+  '@storybook/react@9.0.0-beta.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@6.0.2)':
     dependencies:
       '@storybook/global': 5.0.0
       '@storybook/react-dom-shim': 9.0.0-beta.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))
@@ -16290,9 +16307,9 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
       storybook: 9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
     optionalDependencies:
-      typescript: 5.6.3
+      typescript: 6.0.2
 
-  '@storybook/react@9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@5.6.3)':
+  '@storybook/react@9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))(typescript@6.0.2)':
     dependencies:
       '@storybook/global': 5.0.0
       '@storybook/react-dom-shim': 9.0.0-beta.3(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(storybook@9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)))
@@ -16300,14 +16317,14 @@ snapshots:
       react-dom: link:vendor/react-dom@19.x
       storybook: 9.1.19(@testing-library/dom@10.4.1)(prettier@3.8.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
     optionalDependencies:
-      typescript: 5.6.3
+      typescript: 6.0.2
 
   '@swc-node/core@1.14.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)':
     dependencies:
       '@swc/core': 1.15.11(@swc/helpers@0.5.18)
       '@swc/types': 0.1.25
 
-  '@swc-node/register@1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.6.3)':
+  '@swc-node/register@1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@6.0.2)':
     dependencies:
       '@swc-node/core': 1.14.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)
       '@swc-node/sourcemap-support': 0.6.1
@@ -16317,7 +16334,7 @@ snapshots:
       oxc-resolver: 11.17.1
       pirates: 4.0.7
       tslib: 2.8.1
-      typescript: 5.6.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - '@swc/types'
       - supports-color
@@ -16904,40 +16921,40 @@ snapshots:
       '@types/node': 22.19.11
     optional: true
 
-  '@typescript-eslint/eslint-plugin@8.58.2(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3))(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)':
+  '@typescript-eslint/eslint-plugin@8.58.2(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2))(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
+      '@typescript-eslint/parser': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
       '@typescript-eslint/scope-manager': 8.58.2
-      '@typescript-eslint/type-utils': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
-      '@typescript-eslint/utils': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
+      '@typescript-eslint/type-utils': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
+      '@typescript-eslint/utils': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
       '@typescript-eslint/visitor-keys': 8.58.2
       eslint: 9.23.0(jiti@2.6.1)
       ignore: 7.0.5
       natural-compare: 1.4.0
-      ts-api-utils: 2.5.0(typescript@5.6.3)
-      typescript: 5.6.3
+      ts-api-utils: 2.5.0(typescript@6.0.2)
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)':
+  '@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.58.2
       '@typescript-eslint/types': 8.58.2
-      '@typescript-eslint/typescript-estree': 8.58.2(typescript@5.6.3)
+      '@typescript-eslint/typescript-estree': 8.58.2(typescript@6.0.2)
       '@typescript-eslint/visitor-keys': 8.58.2
       debug: 4.4.3(supports-color@8.1.1)
       eslint: 9.23.0(jiti@2.6.1)
-      typescript: 5.6.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.58.2(typescript@5.6.3)':
+  '@typescript-eslint/project-service@8.58.2(typescript@6.0.2)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.58.2(typescript@5.6.3)
+      '@typescript-eslint/tsconfig-utils': 8.58.2(typescript@6.0.2)
       '@typescript-eslint/types': 8.58.2
       debug: 4.4.3(supports-color@8.1.1)
-      typescript: 5.6.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
@@ -16951,19 +16968,19 @@ snapshots:
       '@typescript-eslint/types': 8.58.2
       '@typescript-eslint/visitor-keys': 8.58.2
 
-  '@typescript-eslint/tsconfig-utils@8.58.2(typescript@5.6.3)':
+  '@typescript-eslint/tsconfig-utils@8.58.2(typescript@6.0.2)':
     dependencies:
-      typescript: 5.6.3
+      typescript: 6.0.2
 
-  '@typescript-eslint/type-utils@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)':
+  '@typescript-eslint/type-utils@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)':
     dependencies:
       '@typescript-eslint/types': 8.58.2
-      '@typescript-eslint/typescript-estree': 8.58.2(typescript@5.6.3)
-      '@typescript-eslint/utils': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
+      '@typescript-eslint/typescript-estree': 8.58.2(typescript@6.0.2)
+      '@typescript-eslint/utils': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
       debug: 4.4.3(supports-color@8.1.1)
       eslint: 9.23.0(jiti@2.6.1)
-      ts-api-utils: 2.5.0(typescript@5.6.3)
-      typescript: 5.6.3
+      ts-api-utils: 2.5.0(typescript@6.0.2)
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
@@ -16971,29 +16988,29 @@ snapshots:
 
   '@typescript-eslint/types@8.58.2': {}
 
-  '@typescript-eslint/typescript-estree@8.58.2(typescript@5.6.3)':
+  '@typescript-eslint/typescript-estree@8.58.2(typescript@6.0.2)':
     dependencies:
-      '@typescript-eslint/project-service': 8.58.2(typescript@5.6.3)
-      '@typescript-eslint/tsconfig-utils': 8.58.2(typescript@5.6.3)
+      '@typescript-eslint/project-service': 8.58.2(typescript@6.0.2)
+      '@typescript-eslint/tsconfig-utils': 8.58.2(typescript@6.0.2)
       '@typescript-eslint/types': 8.58.2
       '@typescript-eslint/visitor-keys': 8.58.2
       debug: 4.4.3(supports-color@8.1.1)
       minimatch: 10.2.2
       semver: 7.7.4
       tinyglobby: 0.2.15
-      ts-api-utils: 2.5.0(typescript@5.6.3)
-      typescript: 5.6.3
+      ts-api-utils: 2.5.0(typescript@6.0.2)
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)':
+  '@typescript-eslint/utils@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.23.0(jiti@2.6.1))
       '@typescript-eslint/scope-manager': 8.58.2
       '@typescript-eslint/types': 8.58.2
-      '@typescript-eslint/typescript-estree': 8.58.2(typescript@5.6.3)
+      '@typescript-eslint/typescript-estree': 8.58.2(typescript@6.0.2)
       eslint: 9.23.0(jiti@2.6.1)
-      typescript: 5.6.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
@@ -17159,12 +17176,12 @@ snapshots:
       loupe: 3.2.1
       tinyrainbow: 2.0.0
 
-  '@volar/kit@2.4.28(typescript@5.6.3)':
+  '@volar/kit@2.4.28(typescript@6.0.2)':
     dependencies:
       '@volar/language-service': 2.4.28
       '@volar/typescript': 2.4.28
       typesafe-path: 0.2.2
-      typescript: 5.6.3
+      typescript: 6.0.2
       vscode-languageserver-textdocument: 1.0.12
       vscode-uri: 3.1.0
 
@@ -17571,12 +17588,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  astro-expressive-code@0.41.6(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2)):
+  astro-expressive-code@0.41.6(astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)):
     dependencies:
-      astro: 5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2)
+      astro: 5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)
       rehype-expressive-code: 0.41.6
 
-  astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@5.6.3)(yaml@2.8.2):
+  astro@5.17.3(@types/node@22.19.11)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.58.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2):
     dependencies:
       '@astrojs/compiler': 2.13.1
       '@astrojs/internal-helpers': 0.7.5
@@ -17627,7 +17644,7 @@ snapshots:
       svgo: 4.0.0
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
-      tsconfck: 3.1.6(typescript@5.6.3)
+      tsconfck: 3.1.6(typescript@6.0.2)
       ultrahtml: 1.6.0
       unifont: 0.7.4
       unist-util-visit: 5.1.0
@@ -17640,7 +17657,7 @@ snapshots:
       yocto-spinner: 0.2.3
       zod: 3.25.76
       zod-to-json-schema: 3.25.1(zod@3.25.76)
-      zod-to-ts: 1.2.0(typescript@5.6.3)(zod@3.25.76)
+      zod-to-ts: 1.2.0(typescript@6.0.2)(zod@3.25.76)
     optionalDependencies:
       sharp: 0.34.5
     transitivePeerDependencies:
@@ -18855,11 +18872,11 @@ snapshots:
       esquery: 1.7.0
       jsonc-eslint-parser: 2.4.2
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint@9.23.0(jiti@2.6.1)):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2))(eslint-import-resolver-node@0.3.9)(eslint@9.23.0(jiti@2.6.1)):
     dependencies:
       debug: 3.2.7(supports-color@8.1.1)
     optionalDependencies:
-      '@typescript-eslint/parser': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
+      '@typescript-eslint/parser': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
       eslint: 9.23.0(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
     transitivePeerDependencies:
@@ -18879,7 +18896,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3))(eslint@9.23.0(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2))(eslint@9.23.0(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -18890,7 +18907,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.23.0(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint@9.23.0(jiti@2.6.1))
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2))(eslint-import-resolver-node@0.3.9)(eslint@9.23.0(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -18902,7 +18919,7 @@ snapshots:
       string.prototype.trimend: 1.0.9
       tsconfig-paths: 3.15.0
     optionalDependencies:
-      '@typescript-eslint/parser': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
+      '@typescript-eslint/parser': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -18958,9 +18975,9 @@ snapshots:
       safe-regex-test: 1.1.0
       string.prototype.includes: 2.0.1
 
-  eslint-plugin-perfectionist@5.8.0(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3):
+  eslint-plugin-perfectionist@5.8.0(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2):
     dependencies:
-      '@typescript-eslint/utils': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
+      '@typescript-eslint/utils': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
       eslint: 9.23.0(jiti@2.6.1)
       natural-orderby: 5.0.0
     transitivePeerDependencies:
@@ -20463,7 +20480,7 @@ snapshots:
 
   klona@2.0.6: {}
 
-  knip@5.84.1(@types/node@22.19.11)(typescript@5.6.3):
+  knip@5.84.1(@types/node@22.19.11)(typescript@6.0.2):
     dependencies:
       '@nodelib/fs.walk': 1.2.8
       '@types/node': 22.19.11
@@ -20477,7 +20494,7 @@ snapshots:
       picomatch: 4.0.3
       smol-toml: 1.6.0
       strip-json-comments: 5.0.3
-      typescript: 5.6.3
+      typescript: 6.0.2
       zod: 4.3.6
 
   known-css-properties@0.35.0: {}
@@ -21971,21 +21988,21 @@ snapshots:
       ansi-styles: 5.2.0
       react-is: 17.0.2
 
-  prisma-json-types-generator@3.6.2(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3))(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3):
+  prisma-json-types-generator@3.6.2(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2))(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2):
     dependencies:
-      '@prisma/client': 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3))(typescript@5.6.3)
+      '@prisma/client': 6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2)
       '@prisma/generator-helper': 6.19.2
-      prisma: 6.19.2(magicast@0.3.5)(typescript@5.6.3)
+      prisma: 6.19.2(magicast@0.3.5)(typescript@6.0.2)
       semver: 7.7.4
       tslib: 2.8.1
-      typescript: 5.6.3
+      typescript: 6.0.2
 
-  prisma@6.19.2(magicast@0.3.5)(typescript@5.6.3):
+  prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2):
     dependencies:
       '@prisma/config': 6.19.2(magicast@0.3.5)
       '@prisma/engines': 6.19.2
     optionalDependencies:
-      typescript: 5.6.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - magicast
 
@@ -22098,9 +22115,9 @@ snapshots:
       minimist: 1.2.8
       strip-json-comments: 2.0.1
 
-  react-docgen-typescript@2.4.0(typescript@5.6.3):
+  react-docgen-typescript@2.4.0(typescript@6.0.2):
     dependencies:
-      typescript: 5.6.3
+      typescript: 6.0.2
 
   react-docgen@7.1.1:
     dependencies:
@@ -23433,9 +23450,9 @@ snapshots:
 
   trough@2.2.0: {}
 
-  ts-api-utils@2.5.0(typescript@5.6.3):
+  ts-api-utils@2.5.0(typescript@6.0.2):
     dependencies:
-      typescript: 5.6.3
+      typescript: 6.0.2
 
   ts-dedent@2.2.0: {}
 
@@ -23448,9 +23465,9 @@ snapshots:
 
   ts-pattern@5.9.0: {}
 
-  tsconfck@3.1.6(typescript@5.6.3):
+  tsconfck@3.1.6(typescript@6.0.2):
     optionalDependencies:
-      typescript: 5.6.3
+      typescript: 6.0.2
 
   tsconfig-paths@3.15.0:
     dependencies:
@@ -23578,17 +23595,17 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typedoc-plugin-markdown@4.4.2(typedoc@0.27.9(typescript@5.6.3)):
+  typedoc-plugin-markdown@4.4.2(typedoc@0.27.9(typescript@6.0.2)):
     dependencies:
-      typedoc: 0.27.9(typescript@5.6.3)
+      typedoc: 0.27.9(typescript@6.0.2)
 
-  typedoc@0.27.9(typescript@5.6.3):
+  typedoc@0.27.9(typescript@6.0.2):
     dependencies:
       '@gerrit0/mini-shiki': 1.27.2
       lunr: 2.3.9
       markdown-it: 14.1.1
       minimatch: 9.0.5
-      typescript: 5.6.3
+      typescript: 6.0.2
       yaml: 2.8.2
 
   typesafe-path@0.2.2: {}
@@ -23597,18 +23614,18 @@ snapshots:
     dependencies:
       semver: 7.7.4
 
-  typescript-eslint@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3):
+  typescript-eslint@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.58.2(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3))(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
-      '@typescript-eslint/parser': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
-      '@typescript-eslint/typescript-estree': 8.58.2(typescript@5.6.3)
-      '@typescript-eslint/utils': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@5.6.3)
+      '@typescript-eslint/eslint-plugin': 8.58.2(@typescript-eslint/parser@8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2))(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
+      '@typescript-eslint/parser': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
+      '@typescript-eslint/typescript-estree': 8.58.2(typescript@6.0.2)
+      '@typescript-eslint/utils': 8.58.2(eslint@9.23.0(jiti@2.6.1))(typescript@6.0.2)
       eslint: 9.23.0(jiti@2.6.1)
-      typescript: 5.6.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
-  typescript@5.6.3: {}
+  typescript@6.0.2: {}
 
   uc.micro@2.1.0: {}
 
@@ -24389,9 +24406,9 @@ snapshots:
     dependencies:
       zod: 3.25.76
 
-  zod-to-ts@1.2.0(typescript@5.6.3)(zod@3.25.76):
+  zod-to-ts@1.2.0(typescript@6.0.2)(zod@3.25.76):
     dependencies:
-      typescript: 5.6.3
+      typescript: 6.0.2
       zod: 3.25.76
 
   zod-validation-error@3.5.4(zod@vendor+zod@3.x):
