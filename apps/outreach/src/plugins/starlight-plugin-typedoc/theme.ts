@@ -16,6 +16,14 @@ class StarlightTypeDocTheme extends MarkdownTheme {
 }
 
 class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
+  #isCustomBlockCommentTagType = (tag: string): tag is CustomBlockTagType => {
+    return customBlockTagTypes.includes(tag as CustomBlockTagType);
+  };
+
+  #isCustomModifierCommentTagType = (tag: string): tag is CustomModifierTagType => {
+    return customModifiersTagTypes.includes(tag as CustomModifierTagType);
+  };
+
   #markdownThemeContext: MarkdownThemeContext;
 
   #parseCommentDisplayPart = (part: CommentDisplayPart): CommentDisplayPart => {
@@ -94,14 +102,6 @@ class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
 
       return markdown;
     }
-  };
-
-  #isCustomBlockCommentTagType = (tag: string): tag is CustomBlockTagType => {
-    return customBlockTagTypes.includes(tag as CustomBlockTagType);
-  };
-
-  #isCustomModifierCommentTagType = (tag: string): tag is CustomModifierTagType => {
-    return customModifiersTagTypes.includes(tag as CustomModifierTagType);
   };
 
   constructor(theme: MarkdownTheme, event: MarkdownPageEvent<Reflection>, options: Options) {
