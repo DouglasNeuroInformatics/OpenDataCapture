@@ -1,5 +1,7 @@
 /// <reference types="./global.d.ts" />
 
+declare module '*.css' {}
+
 declare module '*.html' {
   const src: string;
   export default src;

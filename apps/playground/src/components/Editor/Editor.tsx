@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { extractInputFileExtension } from '@opendatacapture/instrument-bundler';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { extractInputFileExtension } from '@opendatacapture/instrument-bundler';
 import { Columns3Icon, FilePlusIcon, FileUpIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useShallow } from 'zustand/react/shallow';

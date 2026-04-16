@@ -13,17 +13,17 @@ const decompress = async () => {
   const blob = new Blob([new Uint8Array(bytes)]);
   const stream = blob.stream().pipeThrough(new DecompressionStream('gzip')).getReader();
 
-  const buffers: ArrayBuffer[] = [];
+  const buffers: ArrayBufferView[] = [];
 
   while (true) {
     const { done, value } = await stream.read();
     if (done) {
       break;
     }
-    buffers.push(value as ArrayBuffer);
+    buffers.push(value);
   }
 
-  const decompressed = new Blob(buffers);
+  const decompressed = new Blob(buffers as BlobPart[]);
   const raw = await decompressed.text();
   const arr = JSON.parse(raw) as [string, number][];
 
