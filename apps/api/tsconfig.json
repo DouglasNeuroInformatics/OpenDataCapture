@@ -2,12 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "allowJs": true,
-    "baseUrl": ".",
     "checkJs": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["./src/*"],
       "#runtime/v1/*": ["../../runtime/v1/dist/*"]
     },
     "strictPropertyInitialization": false

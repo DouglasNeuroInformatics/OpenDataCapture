@@ -4,7 +4,8 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "paths": {
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]
-    }
+    },
+    "types": ["@opendatacapture/runtime-v1/env"]
   },
   "include": ["src/**/*", "vitest.config.ts"]
 }
