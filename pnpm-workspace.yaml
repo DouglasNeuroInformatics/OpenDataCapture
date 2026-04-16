@@ -3,7 +3,7 @@ catalog:
   '@casl/ability': '^6.7.1'
   '@casl/prisma': '^1.4.1'
   '@douglasneuroinformatics/esbuild-plugin-prisma': 'latest'
-  '@douglasneuroinformatics/libcrypto': '^0.0.4'
+  '@douglasneuroinformatics/libcrypto': '^0.0.5'
   '@douglasneuroinformatics/libjs': ^3.2.1
   '@douglasneuroinformatics/libpasswd': 'latest'
   '@douglasneuroinformatics/libstats': 'latest'
