@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
@@ -39,7 +39,11 @@ type HasRecordFilter = {
   searchString: string;
 };
 
-const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) => {
+const Filters: React.FC<{
+  hasRecords: boolean;
+  setHasRecords: (v: boolean) => void;
+  table: TanstackTable.Table<Subject>;
+}> = ({ hasRecords, setHasRecords, table }) => {
   const { t } = useTranslation();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -51,9 +55,6 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
 
   const sexColumn = columns.find((column) => column.id === 'sex')!;
   const sexFilter = sexColumn.getFilterValue() as SexFilter;
-
-  const subjectColumn = columns.find((column) => column.id === 'subjectId')!;
-  const hasRecordFilter = subjectColumn.getFilterValue() as HasRecordFilter;
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -166,15 +167,8 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
             })}
           </DropdownMenu.Label>
           <DropdownMenu.CheckboxItem
-            checked={hasRecordFilter.hasRecords}
-            onCheckedChange={(checked) => {
-              subjectColumn.setFilterValue((prevValue: HasRecordFilter): HasRecordFilter => {
-                return {
-                  ...prevValue,
-                  hasRecords: checked
-                };
-              });
-            }}
+            checked={hasRecords}
+            onCheckedChange={setHasRecords}
             onSelect={(e) => e.preventDefault()}
           >
             {t({
@@ -188,7 +182,11 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
   );
 };
 
-const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) => {
+const Toggles: React.FC<{
+  hasRecords: boolean;
+  setHasRecords: (v: boolean) => void;
+  table: TanstackTable.Table<Subject>;
+}> = ({ hasRecords, setHasRecords, table }) => {
   const navigate = Route.useNavigate();
 
   const { t } = useTranslation();
@@ -312,7 +310,7 @@ const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
           <IdentificationForm onSubmit={(data) => void lookupSubject(data)} />
         </Dialog.Content>
       </Dialog>
-      <Filters table={table} />
+      <Filters hasRecords={hasRecords} setHasRecords={setHasRecords} table={table} />
       <ActionDropdown
         widthFull
         align="end"
@@ -336,15 +334,25 @@ const MasterDataTable: React.FC<{
   const currentGroup = useAppStore((store) => store.currentGroup);
   const subjectIdDisplaySetting = currentGroup?.settings.subjectIdDisplayLength;
 
-  const subjectsData = useSubjectsQuery({ params: { groupId: currentGroup?.id, hasRecord: true } });
+  const [hasRecords, setHasRecords] = useState(false);
+  const [searchString, setSearchString] = useState('');
 
-  const idsWithRecords = useMemo(() => {
-    const ids = new Set<string>();
-    if (subjectsData.data) {
-      subjectsData.data.forEach((subject) => ids.add(removeSubjectIdScope(subject.id)));
-    }
-    return ids;
-  }, [subjectsData.data]);
+  const subjectsData = useSubjectsQuery({
+    params: { groupId: currentGroup?.id, hasRecord: hasRecords || undefined }
+  });
+
+  const displayData = hasRecords ? subjectsData.data : data;
+
+  const hasRecordsRef = useRef(hasRecords);
+  hasRecordsRef.current = hasRecords;
+
+  const TogglesWithFilter = useMemo(
+    () =>
+      function TogglesWithFilter(props: { table: TanstackTable.Table<Subject> }) {
+        return <Toggles {...props} hasRecords={hasRecordsRef.current} setHasRecords={setHasRecords} />;
+      },
+    []
+  );
 
   return (
     <div>
@@ -362,16 +370,7 @@ const MasterDataTable: React.FC<{
                 return false;
               }
               if (filter.searchString) {
-                if (filter.hasRecords) {
-                  return (
-                    idsWithRecords.has(value as string) &&
-                    (value as string).toLowerCase().includes(filter.searchString.toLowerCase())
-                  );
-                }
                 return (value as string).toLowerCase().includes(filter.searchString.toLowerCase());
-              }
-              if (filter.hasRecords) {
-                return idsWithRecords.has(value as string);
               }
               return true;
             },
@@ -416,7 +415,7 @@ const MasterDataTable: React.FC<{
             id: 'sex'
           }
         ]}
-        data={data}
+        data={displayData}
         data-testid="master-data-table"
         initialState={{
           columnFilters: [
@@ -424,7 +423,7 @@ const MasterDataTable: React.FC<{
               id: 'subjectId',
               value: {
                 hasRecords: false,
-                searchString: ''
+                searchString
               } satisfies HasRecordFilter
             },
             {
@@ -447,9 +446,10 @@ const MasterDataTable: React.FC<{
             onSelect
           }
         ]}
-        togglesComponent={Toggles}
+        togglesComponent={TogglesWithFilter}
         onRowDoubleClick={onRowDoubleClick}
         onSearchChange={(value, table) => {
+          setSearchString(value);
           const subjectIdColumn = table.getColumn('subjectId')!;
           subjectIdColumn.setFilterValue(
             (prevValue: HasRecordFilter): HasRecordFilter => ({
