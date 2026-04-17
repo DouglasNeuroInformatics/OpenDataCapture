@@ -60,7 +60,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Self Update User' })
   @Patch('/self-update/:id')
-  //This an exception to are regular api pattern. It is handled in the user service.
+  // This is an exception to our regular API pattern. It is handled in the user service.
   @RouteAccess({ action: 'read', subject: 'User' })
   updateSelfById(
     @Param('id') id: string,

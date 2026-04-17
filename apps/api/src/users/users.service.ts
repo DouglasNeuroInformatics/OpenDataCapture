@@ -1,7 +1,13 @@
 import { CryptoService, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
 import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
 
 import { accessibleQuery } from '@/auth/ability.utils';
@@ -173,7 +179,7 @@ export class UsersService {
     }
 
     if (password && !estimatePasswordStrength(password).success) {
-      throw new Error('Insufficient password strength');
+      throw new BadRequestException('Insufficient password strength');
     }
 
     const { dateOfBirth, email, firstName, lastName, phoneNumber, sex } = data;
