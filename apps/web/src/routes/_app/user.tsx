@@ -15,11 +15,13 @@ import { useAppStore } from '@/store';
 
 type UpdateUserFormData = {
   confirmPassword?: string | undefined;
+  dateOfBirth?: Date | undefined;
   email?: string | undefined;
   firstName?: string | undefined;
   lastName?: string | undefined;
   password?: string | undefined;
   phoneNumber?: string | undefined;
+  sex?: z.infer<typeof $Sex> | undefined;
 };
 
 const phoneRegex = new RegExp(/^\+?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/);
@@ -40,13 +42,13 @@ const RouteComponent = () => {
       en: 'Group Manager',
       fr: 'Responsable de groupe'
     }),
-    STANDARD_USER: t({
+    STANDARD: t({
       en: 'Standard User',
       fr: 'Utilisateur standard'
     })
   };
 
-  const userTypes = ['ADMIN', 'GROUP_MANAGER', 'STANDARD_USER'];
+  const userTypes = ['ADMIN', 'GROUP_MANAGER', 'STANDARD'];
 
   let fullName: string;
   if (userInfo.data.firstName && userInfo.data.lastName) {
