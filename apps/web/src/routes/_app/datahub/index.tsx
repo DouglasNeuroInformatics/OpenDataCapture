@@ -34,8 +34,7 @@ type DateFilter = {
 
 type SexFilter = (null | Sex)[];
 
-type HasRecordFilter = {
-  hasRecords: boolean;
+type HasSearchStringFilter = {
   searchString: string;
 };
 
@@ -364,7 +363,7 @@ const MasterDataTable: React.FC<{
               const value = ctx.getValue() as string;
               return value.slice(0, subjectIdDisplaySetting ?? 9);
             },
-            filterFn: (row, id, filter: HasRecordFilter) => {
+            filterFn: (row, id, filter: HasSearchStringFilter) => {
               const value = row.getValue(id);
               if (!value) {
                 return false;
@@ -422,9 +421,8 @@ const MasterDataTable: React.FC<{
             {
               id: 'subjectId',
               value: {
-                hasRecords: false,
                 searchString
-              } satisfies HasRecordFilter
+              } satisfies HasSearchStringFilter
             },
             {
               id: 'sex',
@@ -452,7 +450,7 @@ const MasterDataTable: React.FC<{
           setSearchString(value);
           const subjectIdColumn = table.getColumn('subjectId')!;
           subjectIdColumn.setFilterValue(
-            (prevValue: HasRecordFilter): HasRecordFilter => ({
+            (prevValue: HasSearchStringFilter): HasSearchStringFilter => ({
               ...prevValue,
               searchString: value
             })
