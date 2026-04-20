@@ -346,13 +346,13 @@ const MasterDataTable: React.FC<{
   const hasRecordsRef = useRef(hasRecords);
   hasRecordsRef.current = hasRecords;
 
-  const TogglesWithFilter = useMemo(
-    () =>
-      function TogglesWithFilter(props: { table: TanstackTable.Table<Subject> }) {
-        return <Toggles {...props} hasRecords={hasRecordsRef.current} setHasRecords={setHasRecords} />;
-      },
-    []
-  );
+  const TogglesWithFilter = useMemo(() => {
+    const Component = (props: { table: TanstackTable.Table<Subject> }) => (
+      <Toggles {...props} hasRecords={hasRecordsRef.current} setHasRecords={setHasRecords} />
+    );
+    Component.displayName = 'TogglesWithFilter';
+    return Component;
+  }, []);
 
   return (
     <div>
