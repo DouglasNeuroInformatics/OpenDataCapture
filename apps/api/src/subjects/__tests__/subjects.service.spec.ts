@@ -84,7 +84,7 @@ describe('SubjectsService', () => {
       expect(subjectModel.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
-            instrumentRecords: { some: {} }
+            AND: expect.arrayContaining([expect.objectContaining({ instrumentRecords: { some: {} } })])
           }
         })
       );
