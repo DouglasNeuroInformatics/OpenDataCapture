@@ -32,6 +32,9 @@ export class CreateUserDto implements CreateUserData {
   @ApiProperty({ description: 'Date of Birth' })
   dateOfBirth?: Date;
 
+  @ApiProperty({ description: 'Email' })
+  email?: string;
+
   @ApiProperty({ description: 'First Name' })
   firstName: string;
 
@@ -47,6 +50,9 @@ export class CreateUserDto implements CreateUserData {
     description: 'A password with an accessed strength of three or more, see https://github.com/zxcvbn-ts/zxcvbn'
   })
   password: string;
+
+  @ApiProperty({ description: 'Phone Number' })
+  phoneNumber?: string;
 
   @ApiProperty({ description: 'Sex at Birth' })
   @ApiProperty()
