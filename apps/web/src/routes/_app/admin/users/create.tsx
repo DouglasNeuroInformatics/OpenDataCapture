@@ -12,6 +12,7 @@ import { z } from 'zod/v4';
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
+import { PHONE_REGEX } from '@/utils/validation';
 
 const RouteComponent = () => {
   const { t } = useTranslation();
@@ -75,6 +76,24 @@ const RouteComponent = () => {
             title: t({
               en: 'Login Credentials',
               fr: 'Identifiants de connexion'
+            })
+          },
+          {
+            fields: {
+              email: {
+                kind: 'string',
+                label: t('common.email'),
+                variant: 'input'
+              },
+              phoneNumber: {
+                kind: 'string',
+                label: t('common.phoneNumber'),
+                variant: 'input'
+              }
+            },
+            title: t({
+              en: 'Contact information',
+              fr: 'Coordonnées'
             })
           },
           {
@@ -168,6 +187,17 @@ const RouteComponent = () => {
                 input: ctx.value.confirmPassword,
                 message: t('common.passwordsMustMatch'),
                 path: ['confirmPassword']
+              });
+            }
+            if (ctx.value.phoneNumber && !PHONE_REGEX.test(ctx.value.phoneNumber)) {
+              ctx.issues.push({
+                code: 'custom',
+                input: ctx.value.confirmPassword,
+                message: t({
+                  en: 'Invalid Phone number',
+                  fr: 'Numéro de téléphone invalide'
+                }),
+                path: ['phoneNumber']
               });
             }
           })}
