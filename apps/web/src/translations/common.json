@@ -47,6 +47,10 @@
     "en": "Delete",
     "fr": "Supprimer"
   },
+  "email": {
+    "en": "Email",
+    "fr": "Addresse courriel"
+  },
   "entity": {
     "en": "Entity",
     "fr": "Entité"
@@ -144,6 +148,10 @@
   "personalInfo": {
     "en": "Personal Information",
     "fr": "Renseignements personnels"
+  },
+  "phoneNumber": {
+    "en": "Phone Number",
+    "fr": "numéro de téléphone"
   },
   "research": {
     "en": "Research",
