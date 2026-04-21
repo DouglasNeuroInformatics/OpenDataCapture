@@ -192,7 +192,7 @@ const RouteComponent = () => {
             if (ctx.value.phoneNumber && !PHONE_REGEX.test(ctx.value.phoneNumber)) {
               ctx.issues.push({
                 code: 'custom',
-                input: ctx.value.confirmPassword,
+                input: ctx.value.phoneNumber,
                 message: t({
                   en: 'Invalid Phone number',
                   fr: 'Numéro de téléphone invalide'
