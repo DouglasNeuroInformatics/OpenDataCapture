@@ -1,6 +1,14 @@
 import { CryptoService, InjectModel } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
+import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
+import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -162,6 +170,39 @@ export class UsersService {
         hashedPassword: true
       },
       where: { AND: [accessibleQuery(ability, 'update', 'User')], id }
+    });
+  }
+
+  async updateSelfById(id: string, { password, ...data }: $SelfUpdateUserData, currentUser: RequestUser) {
+    if (id !== currentUser.id) {
+      throw new ForbiddenException();
+    }
+
+    if (password && !estimatePasswordStrength(password).success) {
+      throw new BadRequestException('Insufficient password strength');
+    }
+
+    const { dateOfBirth, email, firstName, lastName, phoneNumber, sex } = data;
+
+    let hashedPassword: string | undefined;
+    if (password) {
+      hashedPassword = await this.cryptoService.hashPassword(password);
+    }
+
+    return this.userModel.update({
+      data: {
+        dateOfBirth,
+        email,
+        firstName,
+        hashedPassword,
+        lastName,
+        phoneNumber,
+        sex
+      },
+      omit: {
+        hashedPassword: true
+      },
+      where: { id }
     });
   }
 }
