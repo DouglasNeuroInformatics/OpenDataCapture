@@ -19,6 +19,7 @@ import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
+import { PHONE_REGEX } from '@/utils/validation';
 
 type UpdateUserFormData = {
   additionalPermissions?: Partial<UserPermission>[];
@@ -48,8 +49,10 @@ const UpdateUserForm: React.FC<{
     return z
       .object({
         additionalPermissions: z.array($UserPermission.partial()).optional(),
+        email: z.email().optional(),
         groupIds: z.set(z.string()),
-        password: z.string().min(1).optional()
+        password: z.string().min(1).optional(),
+        phoneNumber: z.union([z.literal(''), z.string().regex(PHONE_REGEX)]).optional()
       })
       .transform((arg) => {
         const firstPermission = arg.additionalPermissions?.[0];
@@ -112,6 +115,24 @@ const UpdateUserForm: React.FC<{
             title: t({
               en: 'Login Credentials',
               fr: 'Identifiants de connexion'
+            })
+          },
+          {
+            fields: {
+              email: {
+                kind: 'string',
+                label: t('common.email'),
+                variant: 'input'
+              },
+              phoneNumber: {
+                kind: 'string',
+                label: t('common.phoneNumber'),
+                variant: 'input'
+              }
+            },
+            title: t({
+              en: 'Update Contain Information',
+              fr: 'Mettre à jour les coordonnées'
             })
           },
           {
