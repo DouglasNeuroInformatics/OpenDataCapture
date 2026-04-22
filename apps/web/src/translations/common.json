@@ -49,7 +49,7 @@
   },
   "email": {
     "en": "Email",
-    "fr": "Addresse courriel"
+    "fr": "Adresse courriel"
   },
   "entity": {
     "en": "Entity",
@@ -151,7 +151,7 @@
   },
   "phoneNumber": {
     "en": "Phone Number",
-    "fr": "numéro de téléphone"
+    "fr": "Numéro de téléphone"
   },
   "research": {
     "en": "Research",
