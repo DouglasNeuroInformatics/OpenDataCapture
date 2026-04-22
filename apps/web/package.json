@@ -68,7 +68,7 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "16.2.0",
     "@types/qrcode": "^1.5.6",
-    "@vitejs/plugin-react-swc": "^3.9.0",
+    "@vitejs/plugin-react-swc": "^4.3.0",
     "happy-dom": "catalog:",
     "tailwindcss": "catalog:",
     "vite": "catalog:",

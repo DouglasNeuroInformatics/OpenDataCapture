@@ -11,7 +11,7 @@ catalog:
   '@douglasneuroinformatics/libui-form-types': 'latest'
   '@microsoft/api-extractor': '^7.47.6'
   '@prisma/client': '^6.9.0'
-  '@tailwindcss/vite': '^4.1.4'
+  '@tailwindcss/vite': '^4.2.4'
   '@testing-library/dom': '^10.4.0'
   '@testing-library/jest-dom': '^6.5.0'
   '@testing-library/react': '^16.0.1'
@@ -30,10 +30,10 @@ catalog:
   tsx: '4.8.2'
   serialize-error: '^11.0.3'
   vite: '^6.3.3'
-  '@storybook/addon-docs': '9.0.0-beta.3'
-  '@storybook/addon-themes': '9.0.0-beta.3'
-  '@storybook/react-vite': '9.0.0-beta.3'
-  'storybook': '9.1.19'
+  '@storybook/addon-docs': '^10.3.5'
+  '@storybook/addon-themes': '^10.3.5'
+  '@storybook/react-vite': '^10.3.5'
+  'storybook': '^10.3.5'
 catalogs:
   react19:
     react: 19.1.0

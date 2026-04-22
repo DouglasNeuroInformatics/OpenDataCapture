@@ -43,7 +43,7 @@
     "@tailwindcss/vite": "catalog:",
     "@types/compression": "^1.7.5",
     "@types/express": "^5.0.6",
-    "@vitejs/plugin-react-swc": "^3.7.2",
+    "@vitejs/plugin-react-swc": "^4.3.0",
     "esbuild": "catalog:",
     "nodemon": "catalog:",
     "prisma": "catalog:",

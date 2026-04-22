@@ -50,7 +50,7 @@
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
     "@storybook/react-vite": "catalog:",
     "@tailwindcss/vite": "catalog:",
-    "@vitejs/plugin-react-swc": "^3.9.0",
+    "@vitejs/plugin-react-swc": "^4.3.0",
     "tailwindcss": "catalog:",
     "type-fest": "workspace:type-fest__4.x@*",
     "vite": "catalog:"
