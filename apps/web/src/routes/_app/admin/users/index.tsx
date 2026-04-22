@@ -51,6 +51,7 @@ const UpdateUserForm: React.FC<{
     return z
       .object({
         additionalPermissions: z.array($UserPermission.partial()).optional(),
+        confirmPassword: z.string().min(1).optional(),
         email: z.email().optional(),
         groupIds: z.set(z.string()),
         password: z.string().min(1).optional(),
@@ -87,6 +88,16 @@ const UpdateUserForm: React.FC<{
             }
           });
         });
+      })
+      .check((ctx) => {
+        if (ctx.value.confirmPassword !== ctx.value.password) {
+          ctx.issues.push({
+            code: 'custom',
+            input: ctx.value.confirmPassword,
+            message: t('common.passwordsMustMatch'),
+            path: ['confirmPassword']
+          });
+        }
       }) satisfies z.ZodType<UpdateUserFormData>;
   }, [resolvedLanguage]);
 
@@ -111,6 +122,12 @@ const UpdateUserForm: React.FC<{
                 },
                 kind: 'string',
                 label: t('common.password'),
+                variant: 'password'
+              },
+              // eslint-disable-next-line perfectionist/sort-objects
+              confirmPassword: {
+                kind: 'string',
+                label: t('common.confirmPassword'),
                 variant: 'password'
               }
             },
