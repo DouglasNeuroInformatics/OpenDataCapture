@@ -24,8 +24,10 @@ import { PHONE_REGEX } from '@/utils/validation';
 type UpdateUserFormData = {
   additionalPermissions?: Partial<UserPermission>[];
   confirmPassword?: string | undefined;
+  email?: string | undefined;
   groupIds: Set<string>;
   password?: string | undefined;
+  phoneNumber?: string | undefined;
 };
 
 type UpdateUserFormInputData = {
@@ -301,9 +303,14 @@ const RouteComponent = () => {
         groupOptions: Object.fromEntries(groups.map((group) => [group.id, group.name])),
         initialValues: selectedUser?.additionalPermissions.length
           ? {
-              additionalPermissions: selectedUser.additionalPermissions
+              additionalPermissions: selectedUser.additionalPermissions,
+              email: selectedUser.email,
+              phoneNumber: selectedUser.phoneNumber
             }
-          : undefined
+          : {
+              email: selectedUser.email,
+              phoneNumber: selectedUser.phoneNumber
+            }
       });
     }
   }, [groupsQuery.data, selectedUser]);
