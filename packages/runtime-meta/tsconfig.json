@@ -5,5 +5,5 @@
     "checkJs": true,
     "maxNodeModuleJsDepth": 0
   },
-  "include": ["src/**/*", "vitest.config.ts"]
+  "include": ["src/**/*"]
 }

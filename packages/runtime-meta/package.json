@@ -12,7 +12,6 @@
   },
   "scripts": {
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
-    "test": "vitest"
+    "lint": "tsc && eslint --fix src"
   }
 }
