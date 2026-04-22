@@ -39,9 +39,9 @@ describe('Bundler', () => {
 
   beforeAll(() => {
     resolver = { resolve: vi.fn() };
-    vi.spyOn(resolverModule, 'Resolver').mockImplementationOnce(
-      () => resolver satisfies Pick<resolverModule.Resolver, 'resolve'> as any
-    );
+    vi.spyOn(resolverModule, 'Resolver').mockImplementationOnce(function () {
+      Object.setPrototypeOf(this, resolver);
+    });
     vi.spyOn(fs, 'rmdir').mockImplementation(vi.fn());
     bundler = new Bundler(BUNDLER_OPTIONS);
   });
