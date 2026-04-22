@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
@@ -34,7 +34,15 @@ type DateFilter = {
 
 type SexFilter = (null | Sex)[];
 
-const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) => {
+type HasSearchStringFilter = {
+  searchString: string;
+};
+
+const Filters: React.FC<{
+  hasRecords: boolean;
+  setHasRecords: (v: boolean) => void;
+  table: TanstackTable.Table<Subject>;
+}> = ({ hasRecords, setHasRecords, table }) => {
   const { t } = useTranslation();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -150,12 +158,34 @@ const Filters: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
             NULL
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Group>
+        <DropdownMenu.Group>
+          <DropdownMenu.Label>
+            {t({
+              en: 'Subjects with records',
+              fr: 'Sujets avec enregistrements'
+            })}
+          </DropdownMenu.Label>
+          <DropdownMenu.CheckboxItem
+            checked={hasRecords}
+            onCheckedChange={setHasRecords}
+            onSelect={(e) => e.preventDefault()}
+          >
+            {t({
+              en: 'With records only',
+              fr: 'Avec enregistrements seulement'
+            })}
+          </DropdownMenu.CheckboxItem>
+        </DropdownMenu.Group>
       </DropdownMenu.Content>
     </DropdownMenu>
   );
 };
 
-const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) => {
+const Toggles: React.FC<{
+  hasRecords: boolean;
+  setHasRecords: (v: boolean) => void;
+  table: TanstackTable.Table<Subject>;
+}> = ({ hasRecords, setHasRecords, table }) => {
   const navigate = Route.useNavigate();
 
   const { t } = useTranslation();
@@ -279,7 +309,7 @@ const Toggles: React.FC<{ table: TanstackTable.Table<Subject> }> = ({ table }) =
           <IdentificationForm onSubmit={(data) => void lookupSubject(data)} />
         </Dialog.Content>
       </Dialog>
-      <Filters table={table} />
+      <Filters hasRecords={hasRecords} setHasRecords={setHasRecords} table={table} />
       <ActionDropdown
         widthFull
         align="end"
@@ -300,7 +330,28 @@ const MasterDataTable: React.FC<{
   onSelect: (subject: Subject) => void;
 }> = ({ data, onRowDoubleClick, onSelect }) => {
   const { t } = useTranslation();
-  const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
+  const currentGroup = useAppStore((store) => store.currentGroup);
+  const subjectIdDisplaySetting = currentGroup?.settings.subjectIdDisplayLength;
+
+  const [hasRecords, setHasRecords] = useState(false);
+  const [searchString, setSearchString] = useState('');
+
+  const subjectsData = useSubjectsQuery({
+    params: { groupId: currentGroup?.id, hasRecord: hasRecords || undefined }
+  });
+
+  const displayData = hasRecords ? subjectsData.data : data;
+
+  const hasRecordsRef = useRef(hasRecords);
+  hasRecordsRef.current = hasRecords;
+
+  const TogglesWithFilter = useMemo(() => {
+    const Component = (props: { table: TanstackTable.Table<Subject> }) => (
+      <Toggles {...props} hasRecords={hasRecordsRef.current} setHasRecords={setHasRecords} />
+    );
+    Component.displayName = 'TogglesWithFilter';
+    return Component;
+  }, []);
 
   return (
     <div>
@@ -308,13 +359,20 @@ const MasterDataTable: React.FC<{
         columns={[
           {
             accessorFn: (subject) => removeSubjectIdScope(subject.id),
-            cell: (ctx) => (
-              <div className="grid">
-                <div className="min-w-0 overflow-x-auto whitespace-nowrap" title={ctx.getValue() as string}>
-                  {(ctx.getValue() as string).slice(0, subjectIdDisplaySetting ?? 9)}
-                </div>
-              </div>
-            ),
+            cell: (ctx) => {
+              const value = ctx.getValue() as string;
+              return value.slice(0, subjectIdDisplaySetting ?? 9);
+            },
+            filterFn: (row, id, filter: HasSearchStringFilter) => {
+              const value = row.getValue(id);
+              if (!value) {
+                return false;
+              }
+              if (filter.searchString) {
+                return (value as string).toLowerCase().includes(filter.searchString.toLowerCase());
+              }
+              return true;
+            },
             header: t('datahub.index.table.subject'),
             id: 'subjectId'
           },
@@ -356,10 +414,16 @@ const MasterDataTable: React.FC<{
             id: 'sex'
           }
         ]}
-        data={data}
+        data={displayData}
         data-testid="master-data-table"
         initialState={{
           columnFilters: [
+            {
+              id: 'subjectId',
+              value: {
+                searchString
+              } satisfies HasSearchStringFilter
+            },
             {
               id: 'sex',
               value: ['MALE', 'FEMALE', null] satisfies SexFilter
@@ -380,11 +444,17 @@ const MasterDataTable: React.FC<{
             onSelect
           }
         ]}
-        togglesComponent={Toggles}
+        togglesComponent={TogglesWithFilter}
         onRowDoubleClick={onRowDoubleClick}
         onSearchChange={(value, table) => {
+          setSearchString(value);
           const subjectIdColumn = table.getColumn('subjectId')!;
-          subjectIdColumn.setFilterValue(value);
+          subjectIdColumn.setFilterValue(
+            (prevValue: HasSearchStringFilter): HasSearchStringFilter => ({
+              ...prevValue,
+              searchString: value
+            })
+          );
         }}
       />
     </div>

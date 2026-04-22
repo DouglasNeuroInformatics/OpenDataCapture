@@ -4,6 +4,7 @@ import axios from 'axios';
 
 type SubjectsQueryParams = {
   groupId?: string;
+  hasRecord?: boolean;
 };
 
 export const subjectsQueryOptions = ({ params }: { params?: SubjectsQueryParams } = {}) => {
@@ -12,7 +13,7 @@ export const subjectsQueryOptions = ({ params }: { params?: SubjectsQueryParams 
       const response = await axios.get('/v1/subjects', { params });
       return $Subject.array().parse(response.data);
     },
-    queryKey: ['subjects', params?.groupId]
+    queryKey: ['subjects', params?.groupId, params?.hasRecord]
   });
 };
 

@@ -37,8 +37,12 @@ export class SubjectsController {
   @ApiOperation({ summary: 'Get All Subjects' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Subject' })
-  find(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string) {
-    return this.subjectsService.find({ groupId }, { ability });
+  find(
+    @CurrentUser('ability') ability: AppAbility,
+    @Query('groupId') groupId?: string,
+    @Query('hasRecord', new ParseSchemaPipe({ isOptional: true, schema: $BooleanLike })) hasRecord?: boolean
+  ) {
+    return this.subjectsService.find({ groupId, hasRecord }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Subject' })

@@ -1,6 +1,8 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
 
 import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -8,6 +10,7 @@ import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+
 @ApiTags('Users')
 @Controller({ path: 'users' })
 export class UsersController {
@@ -53,5 +56,17 @@ export class UsersController {
   @RouteAccess({ action: 'update', subject: 'User' })
   updateById(@Param('id') id: string, @Body() update: UpdateUserDto, @CurrentUser('ability') ability: AppAbility) {
     return this.usersService.updateById(id, update, { ability });
+  }
+
+  @ApiOperation({ summary: 'Self Update User' })
+  @Patch('/self-update/:id')
+  // This is an exception to our regular API pattern. It is handled in the user service.
+  @RouteAccess({ action: 'read', subject: 'User' })
+  updateSelfById(
+    @Param('id') id: string,
+    @Body() update: $SelfUpdateUserData,
+    @CurrentUser() currentUser: RequestUser
+  ) {
+    return this.usersService.updateSelfById(id, update, currentUser);
   }
 }
