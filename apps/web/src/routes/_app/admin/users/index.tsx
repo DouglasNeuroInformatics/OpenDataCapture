@@ -52,7 +52,7 @@ const UpdateUserForm: React.FC<{
       .object({
         additionalPermissions: z.array($UserPermission.partial()).optional(),
         confirmPassword: z.string().min(1).optional(),
-        email: z.email().optional(),
+        email: z.union([z.literal(''), z.email()]).optional(),
         groupIds: z.set(z.string()),
         password: z.string().min(1).optional(),
         phoneNumber: z.union([z.literal(''), z.string().regex(PHONE_REGEX)]).optional()
@@ -404,7 +404,7 @@ const RouteComponent = () => {
                 deleteUserMutation.mutate({ id: selectedUser!.id });
                 setSelectedUser(null);
               },
-              onSubmit: ({ groupIds, ...data }) => {
+              onSubmit: ({ confirmPassword: _, groupIds, ...data }) => {
                 void updateUserMutation
                   .mutateAsync({ data: { groupIds: Array.from(groupIds), ...data }, id: selectedUser!.id })
                   .then(() => {
