@@ -19,7 +19,8 @@ export default mergeConfig(
     root: import.meta.dirname,
     test: {
       globals: true,
-      root: import.meta.dirname
+      include: ['src/**/*.spec.ts', 'test/**/*.test.ts'],
+      name: 'api'
     }
   })
 );
