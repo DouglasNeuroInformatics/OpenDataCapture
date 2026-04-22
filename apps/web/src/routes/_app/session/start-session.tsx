@@ -4,7 +4,6 @@ import { Card, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
 import { createFileRoute, useLocation } from '@tanstack/react-router';
-import { CheckCircle } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -67,7 +66,31 @@ const RouteComponent = () => {
           >
             <div className="flex grow items-center justify-center">
               <Card className="mx-auto flex max-w-2xl flex-col items-center p-12 opacity-70">
-                <CheckCircle className="mb-3 !size-10 text-green-900 dark:text-green-500" />
+                <svg
+                  className="mb-3 size-10 text-green-900 dark:text-green-500"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <motion.circle
+                    animate={{ pathLength: 1 }}
+                    cx="12"
+                    cy="12"
+                    initial={{ pathLength: 0 }}
+                    r="10"
+                    strokeLinecap="round"
+                    transition={{ duration: 0.5 }}
+                  />
+                  <motion.path
+                    animate={{ pathLength: 1 }}
+                    d="M 7.5 12 L 10.5 15 L 16.5 8.5"
+                    initial={{ pathLength: 0 }}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    transition={{ delay: 0.5, duration: 0.4 }}
+                  />
+                </svg>
                 <h5 className="font-semibold text-green-900 dark:text-green-500">
                   {t({ en: 'Session Successfully Started', fr: 'Session démarrée avec succès' })}
                 </h5>
