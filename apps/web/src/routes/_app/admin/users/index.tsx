@@ -305,10 +305,12 @@ const RouteComponent = () => {
           ? {
               additionalPermissions: selectedUser.additionalPermissions,
               email: selectedUser.email ?? undefined,
+              groupIds: new Set(selectedUser.groupIds),
               phoneNumber: selectedUser.phoneNumber ?? undefined
             }
           : {
               email: selectedUser.email ?? undefined,
+              groupIds: new Set(selectedUser.groupIds),
               phoneNumber: selectedUser.phoneNumber ?? undefined
             }
       });
