@@ -21,7 +21,7 @@ type UpdateUserFormData = {
   lastName?: string | undefined;
   password?: string | undefined;
   phoneNumber?: string | undefined;
-  sex?: z.infer<typeof $Sex> | undefined;
+  sex?: undefined | z.infer<typeof $Sex>;
 };
 
 const phoneRegex = new RegExp(/^\+?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/);
