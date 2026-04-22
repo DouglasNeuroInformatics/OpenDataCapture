@@ -133,7 +133,7 @@ const UpdateUserForm: React.FC<{
               }
             },
             title: t({
-              en: 'Update Contain Information',
+              en: 'Update Contact Information',
               fr: 'Mettre à jour les coordonnées'
             })
           },
@@ -304,12 +304,12 @@ const RouteComponent = () => {
         initialValues: selectedUser?.additionalPermissions.length
           ? {
               additionalPermissions: selectedUser.additionalPermissions,
-              email: selectedUser.email,
-              phoneNumber: selectedUser.phoneNumber
+              email: selectedUser.email ?? undefined,
+              phoneNumber: selectedUser.phoneNumber ?? undefined
             }
           : {
-              email: selectedUser.email,
-              phoneNumber: selectedUser.phoneNumber
+              email: selectedUser.email ?? undefined,
+              phoneNumber: selectedUser.phoneNumber ?? undefined
             }
       });
     }
