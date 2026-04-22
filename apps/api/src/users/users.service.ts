@@ -54,14 +54,14 @@ export class UsersService {
     {
       basePermissionLevel,
       dateOfBirth,
+      email,
       firstName,
       groupIds,
       lastName,
       password,
+      phoneNumber,
       sex,
-      username,
-      email,
-      phoneNumber
+      username
     }: CreateUserDto,
     options?: EntityOperationOptions
   ) {
