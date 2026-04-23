@@ -12,6 +12,7 @@ import { UserIcon } from '@/components/UserIcon';
 import { useFindUserQuery } from '@/hooks/useFindUserQuery';
 import { useSelfUpdateUserMutation } from '@/hooks/useSelfUpdateUserMutation';
 import { useAppStore } from '@/store';
+import { PHONE_REGEX } from '@/utils/validation';
 
 type UpdateUserFormData = {
   confirmPassword?: string | undefined;
@@ -23,8 +24,6 @@ type UpdateUserFormData = {
   phoneNumber?: string | undefined;
   sex?: undefined | z.infer<typeof $Sex>;
 };
-
-const phoneRegex = new RegExp(/^\+?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/);
 
 const RouteComponent = () => {
   const currentUser = useAppStore((store) => store.currentUser);
@@ -70,7 +69,7 @@ const RouteComponent = () => {
         // eslint-disable-next-line perfectionist/sort-objects
         confirmPassword: z.string().min(1).optional(),
         password: z.string().min(1).optional(),
-        phoneNumber: z.union([z.literal(''), z.string().regex(phoneRegex)]).optional(),
+        phoneNumber: z.union([z.literal(''), z.string().regex(PHONE_REGEX)]).optional(),
         sex: $Sex.optional()
       })
       .check((ctx) => {

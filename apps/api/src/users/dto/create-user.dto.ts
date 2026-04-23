@@ -6,20 +6,33 @@ import { $CreateUserData } from '@opendatacapture/schemas/user';
 import type { BasePermissionLevel, CreateUserData } from '@opendatacapture/schemas/user';
 import { z } from 'zod/v4';
 
+const regex = new RegExp(/^\+?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/);
+
 @ValidationSchema(
-  $CreateUserData.extend({
-    password: $CreateUserData.shape.password.superRefine((val, ctx) => {
-      const result = estimatePasswordStrength(val, {
-        feedbackLanguage: 'en'
-      });
-      if (!result.success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Insufficient password strength: ${result.score}`
+  $CreateUserData
+    .check((ctx) => {
+      if (ctx.value.phoneNumber && !regex.test(ctx.value.phoneNumber)) {
+        ctx.issues.push({
+          code: 'custom',
+          input: ctx.value.phoneNumber,
+          message: `Invalid phone number`,
+          path: ['phoneNumber']
         });
       }
     })
-  })
+    .extend({
+      password: $CreateUserData.shape.password.superRefine((val, ctx) => {
+        const result = estimatePasswordStrength(val, {
+          feedbackLanguage: 'en'
+        });
+        if (!result.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Insufficient password strength: ${result.score}`
+          });
+        }
+      })
+    })
 )
 export class CreateUserDto implements CreateUserData {
   @ApiProperty({
@@ -31,6 +44,9 @@ export class CreateUserDto implements CreateUserData {
 
   @ApiProperty({ description: 'Date of Birth' })
   dateOfBirth?: Date;
+
+  @ApiProperty({ description: 'Email' })
+  email?: string;
 
   @ApiProperty({ description: 'First Name' })
   firstName: string;
@@ -47,6 +63,9 @@ export class CreateUserDto implements CreateUserData {
     description: 'A password with an accessed strength of three or more, see https://github.com/zxcvbn-ts/zxcvbn'
   })
   password: string;
+
+  @ApiProperty({ description: 'Phone Number' })
+  phoneNumber?: string;
 
   @ApiProperty({ description: 'Sex at Birth' })
   @ApiProperty()
