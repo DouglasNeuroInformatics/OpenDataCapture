@@ -32,7 +32,8 @@ export const $UploadInstrumentRecordsData = z.object({
       date: z.coerce.date(),
       subjectId: z.string()
     })
-  )
+  ),
+  username: z.string().optional()
 });
 
 export type CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecordData>;
