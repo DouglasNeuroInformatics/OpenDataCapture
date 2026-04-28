@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { serializeError } from '@douglasneuroinformatics/libjs';
-import { Button, FileDropzone, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
+import { Button, Checkbox, FileDropzone, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import { createFileRoute } from '@tanstack/react-router';
@@ -17,6 +17,7 @@ import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData, 
 const RouteComponent = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploaderChecked, setIsUploaderChecked] = useState(false);
   const download = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const currentGroup = useAppStore((store) => store.currentGroup);
@@ -57,7 +58,7 @@ const RouteComponent = () => {
       const processedDataResult = await processInstrumentCSV(file!, instrument!);
       const reformattedData = reformatInstrumentData({
         currentGroup,
-        currentUsername: currentUser?.username,
+        currentUsername: isUploaderChecked ? currentUser?.username : undefined,
         data: processedDataResult,
         instrument: instrument!
       });
@@ -153,9 +154,26 @@ const RouteComponent = () => {
             setFile={setFile}
           />
           <div className="mt-4 flex justify-between space-x-2">
-            <Button disabled={!(file && instrument)} variant={'primary'} onClick={() => void handleInstrumentCSV()}>
-              {t('core.submit')}
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button disabled={!(file && instrument)} variant={'primary'} onClick={() => void handleInstrumentCSV()}>
+                {t('core.submit')}
+              </Button>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  defaultChecked={false}
+                  id="attach-uploader"
+                  onCheckedChange={() => {
+                    setIsUploaderChecked(!isUploaderChecked);
+                  }}
+                />
+                <label className="text-sm" htmlFor="attach-uploader">
+                  {t({
+                    en: 'Attach Uploader Username',
+                    fr: 'Attacher le nom utilisateur'
+                  })}
+                </label>
+              </div>
+            </div>
             <div className="flex justify-between space-x-1">
               <Button className="gap-1" disabled={!instrument} variant={'primary'} onClick={handleTemplateDownload}>
                 <DownloadIcon />
