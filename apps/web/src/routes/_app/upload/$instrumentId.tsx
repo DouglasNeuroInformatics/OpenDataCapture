@@ -20,6 +20,7 @@ const RouteComponent = () => {
   const download = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const currentGroup = useAppStore((store) => store.currentGroup);
+  const currentUser = useAppStore((store) => store.currentUser);
   const uploadInstrumentRecordsMutation = useUploadInstrumentRecordsMutation();
 
   const params = Route.useParams();
@@ -56,6 +57,7 @@ const RouteComponent = () => {
       const processedDataResult = await processInstrumentCSV(file!, instrument!);
       const reformattedData = reformatInstrumentData({
         currentGroup,
+        currentUsername: currentUser?.username,
         data: processedDataResult,
         instrument: instrument!
       });
