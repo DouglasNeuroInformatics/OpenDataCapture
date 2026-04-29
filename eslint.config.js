@@ -24,8 +24,7 @@ export default config(
       'runtime/v1/src/**/*.d.ts',
       'vendor/**/*',
       'knip.ts',
-      'vitest.config.ts',
-      'vitest.workspace.ts'
+      'vitest.config.ts'
     ]
   },
   {
