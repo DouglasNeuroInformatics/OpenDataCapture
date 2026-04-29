@@ -16,7 +16,8 @@ axios.interceptors.request.use((config) => {
   if (
     config.url !== '/v1/setup' &&
     config.url !== '/v1/instrument-records/upload' &&
-    config.url !== '/v1/instrument-records/export'
+    config.url !== '/v1/instrument-records/export' &&
+    config.url !== '/v1/subjects'
   ) {
     config.timeout = 10000; // abort request after 10 seconds
     config.timeoutErrorMessage = i18n.t({
