@@ -158,9 +158,10 @@ export class SubjectsService {
 
   private async querySubjectIdsWithRecords(groupId?: string): Promise<string[]> {
     const records = await this.prismaClient.instrumentRecord.findMany({
+      distinct: ['subjectId'],
       select: { subjectId: true },
       where: groupId ? { groupId } : {}
     });
-    return [...new Set(records.map((r) => r.subjectId))];
+    return records.map((r) => r.subjectId);
   }
 }
