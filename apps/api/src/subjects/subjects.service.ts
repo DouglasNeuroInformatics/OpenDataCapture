@@ -130,12 +130,63 @@ export class SubjectsService {
     { ability }: EntityOperationOptions = {}
   ) {
     const groupInput = groupId ? { groupIds: { has: groupId } } : {};
-    const hasRecordInput = hasRecord ? { instrumentRecords: { some: {} } } : {};
-    return await this.subjectModel.findMany({
-      where: {
-        AND: [accessibleQuery(ability, 'read', 'Subject'), groupInput, hasRecordInput]
+    if (!hasRecord) {
+      return this.subjectModel.findMany({
+        where: {
+          AND: [accessibleQuery(ability, 'read', 'Subject'), groupInput]
+        }
+      });
+    }
+
+    const pipeline: object[] = [
+      {
+        $lookup: {
+          as: '_instrumentRecords',
+          foreignField: 'subjectId',
+          from: 'InstrumentRecordModel',
+          localField: '_id',
+          pipeline: [{ $limit: 1 }]
+        }
+      },
+      {
+        $match: {
+          ...(groupId ? { groupIds: groupId } : {}),
+          _instrumentRecords: { $ne: [] }
+        }
+      },
+      {
+        $addFields: {
+          createdAt: { $toLong: '$createdAt' },
+          dateOfBirth: { $toLong: '$dateOfBirth' },
+          id: { $toString: '$_id' },
+          updatedAt: { $toLong: '$updatedAt' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          _instrumentRecords: 0
+        }
       }
-    });
+    ];
+
+    type RawSubject = { [key: string]: unknown; groupIds?: unknown[] };
+    const subjects = (await this.subjectModel.aggregateRaw({ pipeline })) as unknown as RawSubject[];
+    return subjects
+      .filter(
+        (subject) =>
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          !ability || ability.can('read', subject as any)
+      )
+      .map((subject) => ({
+        ...subject,
+        groupIds: Array.isArray(subject.groupIds)
+          ? subject.groupIds.map((gid) => {
+              const g = gid as null | { $oid?: string };
+              return g?.$oid ?? String(gid);
+            })
+          : []
+      }));
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
