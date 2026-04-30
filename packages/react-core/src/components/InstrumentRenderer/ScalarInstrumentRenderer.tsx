@@ -78,8 +78,12 @@ export const ScalarInstrumentRenderer = ({
             .with({ index: 1, instrument: { kind: 'FORM' } }, ({ instrument }) => (
               <FormContent instrument={instrument} onSubmit={handleSubmit} />
             ))
-            .with({ index: 1, instrument: { kind: 'INTERACTIVE' } }, () => (
-              <InteractiveContent bundle={target.bundle} onSubmit={handleSubmit} />
+            .with({ index: 1, instrument: { kind: 'INTERACTIVE' } }, ({ instrument }) => (
+              <InteractiveContent
+                bundle={target.bundle}
+                defaultFullscreen={instrument.content.defaultFullscreen}
+                onSubmit={handleSubmit}
+              />
             ))
             .with({ index: 2 }, () => (
               <InstrumentSummary data={data} instrument={instrument} subject={subject} timeCollected={Date.now()} />
