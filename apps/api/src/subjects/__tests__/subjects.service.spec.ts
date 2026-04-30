@@ -74,20 +74,42 @@ describe('SubjectsService', () => {
   });
 
   describe('find', () => {
-    it('should return the array returned by the subject model', async () => {
+    it('should use findMany when hasRecord is not set', async () => {
       subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
       await expect(subjectsService.find()).resolves.toMatchObject([{ id: '123' }]);
+      expect(subjectModel.findMany).toHaveBeenCalledOnce();
+      expect(subjectModel.aggregateRaw).not.toHaveBeenCalled();
     });
-    it('should return the array of subjects with records', async () => {
-      subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
-      await expect(subjectsService.find({ hasRecord: true })).resolves.toMatchObject([{ id: '123' }]);
-      expect(subjectModel.findMany).toHaveBeenCalledWith(
+    it('should use aggregateRaw when hasRecord is true', async () => {
+      subjectModel.aggregateRaw.mockResolvedValueOnce([{ groupIds: [], id: '123' }]);
+      await expect(subjectsService.find({ hasRecord: true })).resolves.toMatchObject([{ groupIds: [], id: '123' }]);
+      expect(subjectModel.aggregateRaw).toHaveBeenCalledOnce();
+      expect(subjectModel.findMany).not.toHaveBeenCalled();
+    });
+    it('should pass groupId to the $match stage when provided', async () => {
+      subjectModel.aggregateRaw.mockResolvedValueOnce([]);
+      await subjectsService.find({ groupId: 'group-1', hasRecord: true });
+      expect(subjectModel.aggregateRaw).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: {
-            AND: expect.arrayContaining([expect.objectContaining({ instrumentRecords: { some: {} } })])
-          }
+          pipeline: expect.arrayContaining([
+            expect.objectContaining({
+              $match: expect.objectContaining({ groupIds: 'group-1' })
+            })
+          ])
         })
       );
+    });
+    it('should convert groupIds ObjectId objects to strings', async () => {
+      subjectModel.aggregateRaw.mockResolvedValueOnce([
+        { groupIds: [{ $oid: 'abc123' }, { $oid: 'def456' }], id: '123' }
+      ]);
+      const result = await subjectsService.find({ hasRecord: true });
+      expect(result[0]).toMatchObject({ groupIds: ['abc123', 'def456'] });
+    });
+    it('should default groupIds to an empty array when absent', async () => {
+      subjectModel.aggregateRaw.mockResolvedValueOnce([{ id: '123' }]);
+      const result = await subjectsService.find({ hasRecord: true });
+      expect(result[0]).toMatchObject({ groupIds: [] });
     });
   });
 
