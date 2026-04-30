@@ -134,7 +134,7 @@ export class SubjectsService {
       const subjectIds = await this.querySubjectIdsWithRecords(groupId);
       return this.subjectModel.findMany({
         where: {
-          AND: [accessibleQuery(ability, 'read', 'Subject')],
+          AND: [accessibleQuery(ability, 'read', 'Subject'), groupInput],
           id: { in: subjectIds }
         }
       });
