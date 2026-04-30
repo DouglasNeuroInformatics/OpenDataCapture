@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { serializeError } from '@douglasneuroinformatics/libjs';
-import { Button, FileDropzone, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
+import { Button, Checkbox, FileDropzone, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import { createFileRoute } from '@tanstack/react-router';
@@ -17,9 +17,11 @@ import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData, 
 const RouteComponent = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploaderChecked, setIsUploaderChecked] = useState(false);
   const download = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const currentGroup = useAppStore((store) => store.currentGroup);
+  const currentUser = useAppStore((store) => store.currentUser);
   const uploadInstrumentRecordsMutation = useUploadInstrumentRecordsMutation();
 
   const params = Route.useParams();
@@ -56,6 +58,7 @@ const RouteComponent = () => {
       const processedDataResult = await processInstrumentCSV(file!, instrument!);
       const reformattedData = reformatInstrumentData({
         currentGroup,
+        currentUsername: isUploaderChecked ? currentUser?.username : undefined,
         data: processedDataResult,
         instrument: instrument!
       });
@@ -141,56 +144,71 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       {!isLoading ? (
-        <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center">
-          <FileDropzone
-            acceptedFileTypes={{
-              'text/csv': ['.csv']
-            }}
-            className="flex h-80 w-full flex-col"
-            file={file}
-            setFile={setFile}
-          />
-          <div className="mt-4 flex justify-between space-x-2">
-            <Button disabled={!(file && instrument)} variant={'primary'} onClick={() => void handleInstrumentCSV()}>
+        <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center gap-6">
+          <div className="space-y-4">
+            <FileDropzone
+              acceptedFileTypes={{ 'text/csv': ['.csv'] }}
+              className="flex h-80 w-full flex-col"
+              file={file}
+              setFile={setFile}
+            />
+            <div className="bg-muted/30 border-muted rounded-lg border p-3 transition-colors">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  checked={isUploaderChecked}
+                  id="attach-uploader"
+                  onCheckedChange={(checked) => setIsUploaderChecked(!!checked)}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label className="cursor-pointer text-sm font-semibold tracking-tight" htmlFor="attach-uploader">
+                    {t({
+                      en: 'Include uploader username',
+                      fr: "Inclure le nom d'utilisateur du téléverseur"
+                    })}
+                  </label>
+                  <p className="text-muted-foreground text-xs">
+                    {t({
+                      en: 'Your username will be associated with these records for audit and traceability.',
+                      fr: 'Votre nom d’utilisateur sera associé à ces entrées pour l’audit et la traçabilité.'
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between border-t pt-4">
+            <Button disabled={!(file && instrument)} variant="primary" onClick={() => void handleInstrumentCSV()}>
               {t('core.submit')}
             </Button>
-            <div className="flex justify-between space-x-1">
-              <Button className="gap-1" disabled={!instrument} variant={'primary'} onClick={handleTemplateDownload}>
-                <DownloadIcon />
-                {t({
-                  en: 'Download Template',
-                  fr: 'Télécharger le modèle'
-                })}
+
+            <div className="flex gap-2">
+              <Button className="gap-2" size="sm" variant="outline" onClick={handleTemplateDownload}>
+                <DownloadIcon size={16} />
+                {t({ en: 'Template', fr: 'Modèle' })}
               </Button>
               <Button
-                className="gap-1"
-                disabled={!instrument}
-                variant={'primary'}
-                onClick={() => {
-                  window.open('https://opendatacapture.org/en/docs/guides/how-to-upload-data/');
-                }}
+                className="gap-2"
+                size="sm"
+                variant="outline"
+                onClick={() => window.open('https://opendatacapture.org/en/docs/guides/how-to-upload-data/')}
               >
-                <BadgeHelpIcon />
-                {t({
-                  en: 'Help',
-                  fr: 'Aide'
-                })}
+                <BadgeHelpIcon size={16} />
+                {t({ en: 'Help', fr: 'Aide' })}
               </Button>
             </div>
           </div>
         </div>
       ) : (
-        <>
-          <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center">
-            <Spinner className="mx-auto size-1/2"></Spinner>
-            <Heading className="text-center" variant="h3">
-              {t({
-                en: 'Data currently uploading...',
-                fr: 'Données en cours de téléversement...'
-              })}
-            </Heading>
-          </div>
-        </>
+        <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center">
+          <Spinner className="mx-auto size-24" />
+          <Heading className="mt-4 text-center" variant="h3">
+            {t({
+              en: 'Data currently uploading...',
+              fr: 'Données en cours de téléversement...'
+            })}
+          </Heading>
+        </div>
       )}
     </React.Fragment>
   );

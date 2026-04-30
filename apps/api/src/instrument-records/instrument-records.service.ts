@@ -330,7 +330,7 @@ export class InstrumentRecordsService {
   }
 
   async upload(
-    { groupId, instrumentId, records }: UploadInstrumentRecordsData,
+    { groupId, instrumentId, records, username }: UploadInstrumentRecordsData,
     options?: EntityOperationOptions
   ): Promise<InstrumentRecord[]> {
     if (groupId) {
@@ -372,7 +372,8 @@ export class InstrumentRecordsService {
             date: date,
             groupId: groupId ?? null,
             subjectData: { id: subjectId },
-            type: 'RETROSPECTIVE'
+            type: 'RETROSPECTIVE',
+            username: username ?? undefined
           });
 
           createdSessionsArray.push(session);
