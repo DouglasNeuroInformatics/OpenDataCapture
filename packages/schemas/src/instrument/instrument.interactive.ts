@@ -13,6 +13,7 @@ const $$InteractiveInstrument = <TLanguage extends InstrumentLanguage>(language?
         })
         .optional()
         .readonly(),
+      defaultFullscreen: z.boolean().optional(),
       html: z.string().optional(),
       meta: z.record(z.string(), z.string()).optional(),
       render: $AnyDynamicFunction,
