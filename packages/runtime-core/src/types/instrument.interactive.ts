@@ -25,6 +25,8 @@ declare type InteractiveInstrument<
         /** base64 encoded css */
         readonly style?: string;
       };
+      /** whether to enter fullscreen mode automatically when the instrument content is shown */
+      defaultFullscreen?: boolean;
       html?: string;
       meta?: {
         [name: string]: string;
