@@ -93,7 +93,7 @@ describe('SubjectsService', () => {
       expect(subjectModel.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            id: { in: ['123'] }
+            AND: [{}, {}, { id: { in: ['123'] } }]
           })
         })
       );
@@ -115,7 +115,7 @@ describe('SubjectsService', () => {
       expect(subjectModel.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            id: { in: ['123', '456'] }
+            AND: [{}, {}, { id: { in: ['123', '456'] } }]
           })
         })
       );
