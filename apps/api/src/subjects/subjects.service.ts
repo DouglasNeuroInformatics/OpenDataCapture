@@ -133,8 +133,11 @@ export class SubjectsService {
     if (hasRecord) {
       return this.subjectModel.findMany({
         where: {
-          AND: [accessibleQuery(ability, 'read', 'Subject'), groupInput],
-          id: { in: await this.querySubjectIdsWithRecords(groupId) }
+          AND: [
+            accessibleQuery(ability, 'read', 'Subject'),
+            groupInput,
+            { id: { in: await this.querySubjectIdsWithRecords(groupId) } }
+          ]
         }
       });
     }
