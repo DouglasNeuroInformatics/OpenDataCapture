@@ -29,16 +29,19 @@ const instrument: SeriesInstrument = {
       fr: 'Questionnaire sur le bonheur (avec consentement général)'
     }
   },
-  content: [
-    {
-      name: 'DNP_GENERAL_CONSENT_FORM',
-      edition: 1
-    },
-    {
-      name: 'DNP_HAPPINESS_QUESTIONNAIRE',
-      edition: 1
-    }
-  ]
+  content: {
+    params: {},
+    items: [
+      {
+        name: 'DNP_GENERAL_CONSENT_FORM',
+        edition: 1
+      },
+      {
+        name: 'DNP_HAPPINESS_QUESTIONNAIRE',
+        edition: 1
+      }
+    ]
+  }
 };
 
 export default instrument;
