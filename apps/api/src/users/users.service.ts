@@ -54,6 +54,7 @@ export class UsersService {
     {
       basePermissionLevel,
       dateOfBirth,
+      disabled,
       email,
       firstName,
       groupIds,
@@ -84,6 +85,7 @@ export class UsersService {
         additionalPermissions: [],
         basePermissionLevel,
         dateOfBirth,
+        disabled,
         email,
         firstName,
         groups: {
