@@ -24,6 +24,7 @@ import { PHONE_REGEX } from '@/utils/validation';
 type UpdateUserFormData = {
   additionalPermissions?: Partial<UserPermission>[];
   confirmPassword?: string | undefined;
+  disabled?: boolean;
   email?: string | undefined;
   groupIds: Set<string>;
   password?: string | undefined;
@@ -52,6 +53,7 @@ const UpdateUserForm: React.FC<{
       .object({
         additionalPermissions: z.array($UserPermission.partial()).optional(),
         confirmPassword: z.string().min(1).optional(),
+        disabled: z.boolean().optional(),
         email: z.union([z.literal(''), z.email()]).optional(),
         groupIds: z.set(z.string()),
         password: z.string().min(1).optional(),
@@ -240,6 +242,18 @@ const UpdateUserForm: React.FC<{
                   en: 'Permission',
                   fr: 'Autorisation'
                 })
+              },
+              disabled: {
+                description: t({
+                  en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
+                  fr: 'Utilisez cette option si l’utilisateur n’a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l’auteur de données téléversées.'
+                }),
+                kind: 'boolean',
+                label: t({
+                  en: 'Disabled',
+                  fr: 'Désactivé'
+                }),
+                variant: 'radio'
               }
             },
             title: t({
@@ -263,7 +277,10 @@ const UpdateUserForm: React.FC<{
           }
         ]}
         data-testid="update-user-form"
-        initialValues={initialValues}
+        initialValues={{
+          ...initialValues,
+          disabled: initialValues?.disabled ?? false
+        }}
         key={JSON.stringify(initialValues)}
         submitBtnLabel={t('core.save')}
         validationSchema={$UpdateUserFormData}
