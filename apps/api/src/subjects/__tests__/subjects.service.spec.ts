@@ -29,7 +29,8 @@ describe('SubjectsService', () => {
           useValue: {
             $transaction: vi.fn(),
             instrumentRecord: {
-              deleteMany: vi.fn()
+              deleteMany: vi.fn(),
+              findMany: vi.fn()
             },
             session: {
               deleteMany: vi.fn()
@@ -79,13 +80,43 @@ describe('SubjectsService', () => {
       await expect(subjectsService.find()).resolves.toMatchObject([{ id: '123' }]);
     });
     it('should return the array of subjects with records', async () => {
+      prismaClient.instrumentRecord.findMany.mockResolvedValueOnce([{ subjectId: '123' }]);
       subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
       await expect(subjectsService.find({ hasRecord: true })).resolves.toMatchObject([{ id: '123' }]);
+      expect(prismaClient.instrumentRecord.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          distinct: ['subjectId'],
+          select: { subjectId: true },
+          where: {}
+        })
+      );
       expect(subjectModel.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: {
-            AND: expect.arrayContaining([expect.objectContaining({ instrumentRecords: { some: {} } })])
-          }
+          where: expect.objectContaining({
+            AND: [{}, {}, { id: { in: ['123'] } }]
+          })
+        })
+      );
+    });
+    it('should filter instrument records by groupId when provided', async () => {
+      prismaClient.instrumentRecord.findMany.mockResolvedValueOnce([{ subjectId: '123' }]);
+      subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
+      await subjectsService.find({ groupId: 'group-1', hasRecord: true });
+      expect(prismaClient.instrumentRecord.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { groupId: 'group-1' }
+        })
+      );
+    });
+    it('should pass all subject IDs returned by instrument records to the subject query', async () => {
+      prismaClient.instrumentRecord.findMany.mockResolvedValueOnce([{ subjectId: '123' }, { subjectId: '456' }]);
+      subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }, { id: '456' }]);
+      await subjectsService.find({ hasRecord: true });
+      expect(subjectModel.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            AND: [{}, {}, { id: { in: ['123', '456'] } }]
+          })
         })
       );
     });

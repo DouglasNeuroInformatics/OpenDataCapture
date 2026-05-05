@@ -11,11 +11,13 @@ import type { Promisable } from 'type-fest';
 
 export type InteractiveContentProps = {
   bundle: string;
+  defaultFullscreen?: boolean;
   onSubmit: (data: Json) => Promisable<void>;
 };
 
 export const InteractiveContent = React.memo<InteractiveContentProps>(function InteractiveContent({
   bundle,
+  defaultFullscreen,
   onSubmit
 }) {
   const addNotification = useNotificationsStore((store) => store.addNotification);
@@ -63,6 +65,12 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
       await document.exitFullscreen();
     }
   };
+
+  useEffect(() => {
+    if (defaultFullscreen) {
+      void iFrameRef.current?.requestFullscreen();
+    }
+  }, []);
 
   useEffect(() => {
     document.addEventListener('changeLanguage', handleChangeLanguageEvent, false);
