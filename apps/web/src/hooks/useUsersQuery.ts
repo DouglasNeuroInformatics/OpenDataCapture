@@ -14,7 +14,7 @@ export const usersQueryOptions = ({ params }: { params?: UsersQueryParams } = {}
       const response = await axios.get('/v1/users', { params });
       return $User.array().parse(response.data);
     },
-    queryKey: [USERS_QUERY_KEY]
+    queryKey: [USERS_QUERY_KEY, params?.groupId]
   });
 };
 
