@@ -112,6 +112,18 @@ const RouteComponent = () => {
                 },
                 variant: 'select'
               },
+              disabled: {
+                kind: 'boolean',
+                description: t({
+                  en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
+                  fr: 'Utilisez cette option si l’utilisateur n’a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l’auteur de données téléversées.'
+                }),
+                label: t({
+                  en: 'Disabled',
+                  fr: 'Désactivé'
+                }),
+                variant: 'radio'
+              },
               groupIds: {
                 kind: 'dynamic',
                 deps: ['basePermissionLevel'],
@@ -161,6 +173,9 @@ const RouteComponent = () => {
             })
           }
         ]}
+        initialValues={{
+          disabled: false
+        }}
         validationSchema={$CreateUserData
           .omit({
             groupIds: true

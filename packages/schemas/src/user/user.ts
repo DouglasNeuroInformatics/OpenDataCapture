@@ -12,6 +12,7 @@ export const $User = $BaseModel.extend({
   additionalPermissions: $Permissions,
   basePermissionLevel: $BasePermissionLevel.nullable(),
   dateOfBirth: z.coerce.date().nullish(),
+  disabled: z.boolean().nullish(),
   email: z.email().nullish(),
   firstName: z.string().min(1),
   groupIds: z.array(z.string()),
@@ -32,6 +33,7 @@ export const $CreateUserData = $User
   })
   .extend({
     dateOfBirth: z.coerce.date().optional(),
+    disabled: z.boolean().optional(),
     email: z.email().optional(),
     password: z.string().min(1),
     phoneNumber: z.string().optional(),

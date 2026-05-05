@@ -44,6 +44,11 @@ export class AuthService {
       }
       throw err;
     }
+
+    if (user.disabled) {
+      throw new ForbiddenException('Account Disabled');
+    }
+
     const isCorrectPassword = await this.cryptoService.comparePassword(credentials.password, user.hashedPassword);
     if (isCorrectPassword !== true) {
       throw new UnauthorizedException('Invalid Credentials');

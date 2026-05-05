@@ -45,6 +45,9 @@ export class CreateUserDto implements CreateUserData {
   @ApiProperty({ description: 'Date of Birth' })
   dateOfBirth?: Date;
 
+  @ApiProperty({ description: 'Disabled' })
+  disabled?: boolean;
+
   @ApiProperty({ description: 'Email' })
   email?: string;
 
