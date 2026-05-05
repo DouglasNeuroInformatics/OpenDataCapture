@@ -58,6 +58,7 @@ const $$FormInstrumentNumberField = <TLanguage extends InstrumentLanguage>(langu
       variant: z.literal('input')
     }),
     $$FormInstrumentBaseField(language).extend({
+      disableAutoPrefix: z.boolean().optional(),
       kind: z.literal('number'),
       options: $$InstrumentUIOption(z.record(z.string(), z.string().min(1)), language),
       variant: z.enum(['radio', 'select'])
@@ -131,6 +132,7 @@ const $$FormInstrumentFieldset = <TLanguage extends InstrumentLanguage>(language
 
 const $$FormInstrumentRecordArrayField = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return $$FormInstrumentBaseField(language).extend({
+    disableAutoSuffix: z.boolean().optional(),
     fieldset: $$FormInstrumentFieldset(language),
     kind: z.literal('record-array')
   }) satisfies z.ZodType<FormInstrument.RecordArrayField<TLanguage>>;
@@ -138,6 +140,7 @@ const $$FormInstrumentRecordArrayField = <TLanguage extends InstrumentLanguage>(
 
 const $$FormInstrumentNumberRecordField = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return $$FormInstrumentBaseField(language).extend({
+    disableAutoPrefix: z.boolean().optional(),
     items: z.record(
       z.string(),
       z.object({
