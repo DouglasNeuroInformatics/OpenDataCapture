@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { serializeError } from '@douglasneuroinformatics/libjs';
-import { Button, Checkbox, FileDropzone, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
+import { Button, FileDropzone, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import { createFileRoute } from '@tanstack/react-router';
@@ -17,7 +17,6 @@ import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData, 
 const RouteComponent = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isUploaderChecked, setIsUploaderChecked] = useState(false);
   const download = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const currentGroup = useAppStore((store) => store.currentGroup);
@@ -58,7 +57,7 @@ const RouteComponent = () => {
       const processedDataResult = await processInstrumentCSV(file!, instrument!);
       const reformattedData = reformatInstrumentData({
         currentGroup,
-        currentUsername: isUploaderChecked ? currentUser?.username : undefined,
+        currentUsername: currentUser?.username ?? undefined,
         data: processedDataResult,
         instrument: instrument!
       });
@@ -144,7 +143,7 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       {!isLoading ? (
-        <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center gap-6">
+        <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center gap-2">
           <div className="space-y-4">
             <FileDropzone
               acceptedFileTypes={{ 'text/csv': ['.csv'] }}
@@ -152,32 +151,9 @@ const RouteComponent = () => {
               file={file}
               setFile={setFile}
             />
-            <div className="bg-muted/30 border-muted rounded-lg border p-3 transition-colors">
-              <div className="flex items-start gap-3">
-                <Checkbox
-                  checked={isUploaderChecked}
-                  id="attach-uploader"
-                  onCheckedChange={(checked) => setIsUploaderChecked(!!checked)}
-                />
-                <div className="grid gap-1.5 leading-none">
-                  <label className="cursor-pointer text-sm font-semibold tracking-tight" htmlFor="attach-uploader">
-                    {t({
-                      en: 'Include uploader username',
-                      fr: "Inclure le nom d'utilisateur du téléverseur"
-                    })}
-                  </label>
-                  <p className="text-muted-foreground text-xs">
-                    {t({
-                      en: 'Your username will be associated with these records for audit and traceability.',
-                      fr: 'Votre nom d’utilisateur sera associé à ces entrées pour l’audit et la traçabilité.'
-                    })}
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
 
-          <div className="flex items-center justify-between border-t pt-4">
+          <div className="flex items-center justify-between pt-4">
             <Button disabled={!(file && instrument)} variant="primary" onClick={() => void handleInstrumentCSV()}>
               {t('core.submit')}
             </Button>
