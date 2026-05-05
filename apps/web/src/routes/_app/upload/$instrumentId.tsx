@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { serializeError } from '@douglasneuroinformatics/libjs';
-import { Button, FileDropzone, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
+import { Button, FileDropzone, Heading, Select, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import { createFileRoute } from '@tanstack/react-router';
@@ -11,17 +11,25 @@ import z from 'zod/v4';
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useUploadInstrumentRecordsMutation } from '@/hooks/useUploadInstrumentRecordsMutation';
+import { useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
 import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData, UploadError } from '@/utils/upload';
 
 const RouteComponent = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedUsername, setSelectedUsername] = useState<null | string | undefined>(undefined);
   const download = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentUser = useAppStore((store) => store.currentUser);
   const uploadInstrumentRecordsMutation = useUploadInstrumentRecordsMutation();
+
+  const groupUsers = useUsersQuery({
+    params: {
+      groupId: currentGroup?.id
+    }
+  });
 
   const params = Route.useParams();
   const { error } = Route.useSearch();
@@ -57,7 +65,7 @@ const RouteComponent = () => {
       const processedDataResult = await processInstrumentCSV(file!, instrument!);
       const reformattedData = reformatInstrumentData({
         currentGroup,
-        currentUsername: currentUser?.username ?? undefined,
+        currentUsername: selectedUsername ?? currentUser?.username,
         data: processedDataResult,
         instrument: instrument!
       });
@@ -152,8 +160,35 @@ const RouteComponent = () => {
               setFile={setFile}
             />
           </div>
+          <div className="bg-muted/30 border-muted rounded-lg border p-4 transition-colors">
+            <div className="flex flex-col gap-2">
+              <p className="text-muted-foreground text-xs">
+                {t({
+                  en: 'Select the username to associate with these records for audit and traceability.',
+                  fr: 'Sélectionnez le nom d’utilisateur à associer à ces entrées pour l’audit et la traçabilité.'
+                })}
+              </p>
+              <Select value={selectedUsername ?? currentUser?.username} onValueChange={setSelectedUsername}>
+                <Select.Trigger>
+                  <Select.Value placeholder={currentUser?.username} />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Group>
+                    {groupUsers.data.map((user) => (
+                      <Select.Item key={user.username} value={user.username}>
+                        {user.username}
+                      </Select.Item>
+                    ))}
+                    <Select.Item key={'N/A'} value={'N/A'}>
+                      {'N/A'}
+                    </Select.Item>
+                  </Select.Group>
+                </Select.Content>
+              </Select>
+            </div>
+          </div>
 
-          <div className="flex items-center justify-between pt-4">
+          <div className="flex items-center justify-between pt-2">
             <Button disabled={!(file && instrument)} variant="primary" onClick={() => void handleInstrumentCSV()}>
               {t('core.submit')}
             </Button>
