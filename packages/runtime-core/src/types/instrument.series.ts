@@ -8,10 +8,10 @@ import type { BaseInstrument, InstrumentLanguage, ScalarInstrumentInternal } fro
 /** @public */
 declare namespace SeriesInstrument {
   export type Params = {
-    [key: string]: never;
+    skipProgress?: boolean;
   };
 
-  export type Content = ScalarInstrumentInternal[] | { items: ScalarInstrumentInternal[]; params: Params };
+  export type Content = ScalarInstrumentInternal[] | { items: ScalarInstrumentInternal[]; params?: Params };
 }
 
 /** @public */

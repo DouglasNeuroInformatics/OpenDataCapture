@@ -49,3 +49,7 @@ export function isScalarInstrument(instrument: AnyInstrument): instrument is Any
 export function getSeriesInstrumentItems(content: SeriesInstrument.Content): ScalarInstrumentInternal[] {
   return Array.isArray(content) ? content : content.items;
 }
+
+export function getSeriesInstrumentParams(content: SeriesInstrument.Content): SeriesInstrument.Params {
+  return Array.isArray(content) ? {} : (content.params ?? {});
+}

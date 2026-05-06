@@ -3,13 +3,15 @@ import { z } from 'zod/v4';
 
 import { $$BaseInstrument, $ScalarInstrumentInternal } from './instrument.base.js';
 
-const $SeriesInstrumentParams = z.object({}) satisfies z.ZodType<SeriesInstrument.Params>;
+const $SeriesInstrumentParams = z.object({
+  skipProgress: z.boolean().optional()
+}) satisfies z.ZodType<SeriesInstrument.Params>;
 
 const $SeriesInstrumentContent = z.union([
   z.array($ScalarInstrumentInternal),
   z.object({
     items: z.array($ScalarInstrumentInternal),
-    params: $SeriesInstrumentParams
+    params: $SeriesInstrumentParams.optional()
   })
 ]) satisfies z.ZodType<SeriesInstrument.Content>;
 
