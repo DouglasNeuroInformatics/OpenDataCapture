@@ -6,7 +6,13 @@ import { replacer, reviver } from '@douglasneuroinformatics/libjs';
 import { InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
-import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
@@ -349,9 +355,7 @@ export class InstrumentRecordsService {
     if (username) {
       const user = await this.usersService.findByUsername(username, options);
       if (groupId && !user.groups.some((g) => g.id === groupId)) {
-        throw new ForbiddenException(
-          `User '${username}' is not a member of group '${groupId}'`
-        );
+        throw new ForbiddenException(`User '${username}' is not a member of group '${groupId}'`);
       }
     }
 
