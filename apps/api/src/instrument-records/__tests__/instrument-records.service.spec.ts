@@ -6,6 +6,8 @@ import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { UsersService } from '@/users/users.service';
+
 import { GroupsService } from '../../groups/groups.service';
 import { InstrumentsService } from '../../instruments/instruments.service';
 import { SessionsService } from '../../sessions/sessions.service';
@@ -26,6 +28,7 @@ describe('InstrumentRecordsService', () => {
         InstrumentRecordsService,
         MockFactory.createForModelToken(getModelToken('InstrumentRecord')),
         MockFactory.createForService(GroupsService),
+        MockFactory.createForService(UsersService),
         MockFactory.createForService(InstrumentMeasuresService),
         MockFactory.createForService(InstrumentsService),
         MockFactory.createForService(SessionsService),
