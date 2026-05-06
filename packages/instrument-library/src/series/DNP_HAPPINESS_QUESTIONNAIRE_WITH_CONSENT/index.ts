@@ -30,7 +30,9 @@ const instrument: SeriesInstrument = {
     }
   },
   content: {
-    params: {},
+    params: {
+      skipProgress: true
+    },
     items: [
       {
         name: 'DNP_GENERAL_CONSENT_FORM',

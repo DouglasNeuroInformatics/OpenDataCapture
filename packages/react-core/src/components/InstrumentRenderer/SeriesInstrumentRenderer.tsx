@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import { replacer } from '@douglasneuroinformatics/libjs';
 import { Button, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { Json } from '@opendatacapture/runtime-core';
+import { getSeriesInstrumentParams } from '@opendatacapture/instrument-utils';
+import type { Json, UnilingualSeriesInstrument } from '@opendatacapture/runtime-core';
 import type { SeriesInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { CircleCheckIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
@@ -47,10 +48,15 @@ export const SeriesInstrumentRenderer = ({
   const scalarBundle = target.items[currentItemIndex]?.bundle;
   const scalarId = target.items[currentItemIndex]?.id;
 
-  const rootState = useInterpretedInstrument(target.bundle);
+  const rootState = useInterpretedInstrument<UnilingualSeriesInstrument>(target.bundle);
   const scalarState = useInterpretedInstrument(scalarBundle ?? '');
 
   const [isInstrumentInProgress, setIsInstrumentInProgress] = useState(false);
+
+  const skipProgress =
+    rootState.status === 'DONE'
+      ? (getSeriesInstrumentParams(rootState.instrument.content).skipProgress ?? false)
+      : false;
 
   const handleSubmit = async (data: unknown) => {
     await onSubmit({
@@ -60,7 +66,9 @@ export const SeriesInstrumentRenderer = ({
       kind: 'SERIES'
     });
     setCurrentItemIndex(currentItemIndex + 1);
-    setIsInstrumentInProgress(false);
+    if (!skipProgress) {
+      setIsInstrumentInProgress(false);
+    }
   };
 
   useEffect(() => {
@@ -87,7 +95,17 @@ export const SeriesInstrumentRenderer = ({
         ))
         .with({ status: 'DONE' }, ({ instrument }) =>
           match({ index, instrument, isInstrumentInProgress })
-            .with({ index: 0 }, () => <InstrumentOverview instrument={instrument} onNext={() => setIndex(1)} />)
+            .with({ index: 0 }, () => (
+              <InstrumentOverview
+                instrument={instrument}
+                onNext={() => {
+                  setIndex(1);
+                  if (skipProgress) {
+                    setIsInstrumentInProgress(true);
+                  }
+                }}
+              />
+            ))
             .with({ index: 1, isInstrumentInProgress: false }, () => (
               <div className="flex grow flex-col items-center justify-center space-y-1 py-32 text-center">
                 <Heading variant="h4">
