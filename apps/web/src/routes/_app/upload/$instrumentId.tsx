@@ -18,12 +18,12 @@ import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData, 
 const RouteComponent = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedUsername, setSelectedUsername] = useState<null | string | undefined>(undefined);
   const download = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentUser = useAppStore((store) => store.currentUser);
   const uploadInstrumentRecordsMutation = useUploadInstrumentRecordsMutation();
+  const [selectedUsername, setSelectedUsername] = useState<null | string | undefined>(undefined);
 
   const groupUsers = useUsersQuery({
     params: {
@@ -65,7 +65,7 @@ const RouteComponent = () => {
       const processedDataResult = await processInstrumentCSV(file!, instrument!);
       const reformattedData = reformatInstrumentData({
         currentGroup,
-        currentUsername: selectedUsername ?? currentUser?.username,
+        currentUsername: selectedUsername === 'N/A' ? undefined : (selectedUsername ?? currentUser?.username),
         data: processedDataResult,
         instrument: instrument!
       });
