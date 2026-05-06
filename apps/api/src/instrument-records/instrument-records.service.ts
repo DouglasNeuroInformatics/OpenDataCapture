@@ -347,7 +347,12 @@ export class InstrumentRecordsService {
     }
 
     if (username) {
-      await this.usersService.findByUsername(username, options);
+      const user = await this.usersService.findByUsername(username, options);
+      if (groupId && !user.groups.some((g) => g.id === groupId)) {
+        throw new ForbiddenException(
+          `User '${username}' is not a member of group '${groupId}'`
+        );
+      }
     }
 
     const createdSessionsArray: Session[] = [];
