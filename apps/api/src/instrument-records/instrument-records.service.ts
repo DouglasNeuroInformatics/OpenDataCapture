@@ -28,6 +28,7 @@ import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
+import { UsersService } from '@/users/users.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
@@ -45,6 +46,7 @@ export class InstrumentRecordsService {
   constructor(
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
     private readonly groupsService: GroupsService,
+    private readonly usersService: UsersService,
     private readonly instrumentMeasuresService: InstrumentMeasuresService,
     private readonly instrumentsService: InstrumentsService,
     private readonly sessionsService: SessionsService,
@@ -342,6 +344,10 @@ export class InstrumentRecordsService {
       throw new UnprocessableEntityException(
         `Cannot create instrument record for series instrument '${instrument.id}'`
       );
+    }
+
+    if (username) {
+      await this.usersService.findByUsername(username, options);
     }
 
     const createdSessionsArray: Session[] = [];
