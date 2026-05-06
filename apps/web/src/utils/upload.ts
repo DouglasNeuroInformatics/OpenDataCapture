@@ -1027,7 +1027,7 @@ export function reformatInstrumentData({
     groupId: currentGroup?.id,
     instrumentId: instrument.id,
     records: recordsList,
-    username: currentUsername ?? 'N/A'
+    username: currentUsername ?? undefined
   };
   return reformatForSending;
 }
