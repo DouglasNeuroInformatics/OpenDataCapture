@@ -5,6 +5,7 @@ import type {
   AnyUnilingualInstrument,
   FormInstrument,
   InteractiveInstrument,
+  ScalarInstrumentInternal,
   SeriesInstrument
 } from '@opendatacapture/runtime-core';
 import type {
@@ -43,4 +44,12 @@ export function isSeriesInstrument(instrument: AnyInstrument): instrument is Ser
 
 export function isScalarInstrument(instrument: AnyInstrument): instrument is AnyScalarInstrument {
   return Object.hasOwn(instrument, 'internal');
+}
+
+export function getSeriesInstrumentItems(content: SeriesInstrument.Content): ScalarInstrumentInternal[] {
+  return Array.isArray(content) ? content : content.items;
+}
+
+export function getSeriesInstrumentParams(content: SeriesInstrument.Content): SeriesInstrument.Params {
+  return Array.isArray(content) ? {} : (content.params ?? {});
 }
