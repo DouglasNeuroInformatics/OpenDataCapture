@@ -7,7 +7,7 @@ import {
   NotFoundException,
   UnprocessableEntityException
 } from '@nestjs/common';
-import { isScalarInstrument, isSeriesInstrument } from '@opendatacapture/instrument-utils';
+import { getSeriesInstrumentItems, isScalarInstrument, isSeriesInstrument } from '@opendatacapture/instrument-utils';
 import type {
   AnyInstrument,
   AnyScalarInstrument,
@@ -146,7 +146,7 @@ export class InstrumentsService {
         bundle: instance.bundle,
         id: instance.id,
         items: await Promise.all(
-          instance.content.map(async (internal) => {
+          getSeriesInstrumentItems(instance.content).map(async (internal) => {
             const id = this.generateScalarInstrumentId({ internal });
             return (await this.findBundleById(id)) as ScalarInstrumentBundleContainer;
           })
@@ -212,7 +212,11 @@ export class InstrumentsService {
   }
 
   generateSeriesInstrumentId(instrument: SeriesInstrument) {
-    return this.cryptoService.hash(instrument.content.map(({ edition, name }) => `${name}-${edition}`).join('--'));
+    return this.cryptoService.hash(
+      getSeriesInstrumentItems(instrument.content)
+        .map(({ edition, name }) => `${name}-${edition}`)
+        .join('--')
+    );
   }
 
   async getInstrumentInstance(instrument: Pick<InstrumentBundleContainer, 'bundle' | 'id'>) {
@@ -249,10 +253,11 @@ export class InstrumentsService {
   }
 
   private async validateSeriesInstrument(instrument: SeriesInstrument) {
-    if (instrument.content.length < 2) {
+    const items = getSeriesInstrumentItems(instrument.content);
+    if (items.length < 2) {
       return { message: 'Series instrument must include at least two items', success: false };
     }
-    for (const internal of instrument.content) {
+    for (const internal of items) {
       const id = this.generateScalarInstrumentId({ internal });
       const exists = await this.instrumentModel.exists({ id });
       if (!exists) {

@@ -2,6 +2,8 @@ import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { ConfigService, LoggingService } from '@douglasneuroinformatics/libnest';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import type { OnApplicationBootstrap } from '@nestjs/common';
+import { getSeriesInstrumentItems } from '@opendatacapture/instrument-utils';
+import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
 import type { RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import { $Json } from '@opendatacapture/schemas/core';
 
@@ -61,6 +63,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
     const cipherTexts: string[] = [];
     const symmetricKeys: string[] = [];
+    let seriesItems: ScalarInstrumentInternal[] | undefined;
 
     if (instrument.kind === 'SERIES') {
       if (!(remoteAssignment.encryptedData.startsWith('$') && remoteAssignment.symmetricKey.startsWith('$'))) {
@@ -69,11 +72,12 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       }
       cipherTexts.push(...remoteAssignment.encryptedData.slice(1).split('$'));
       symmetricKeys.push(...remoteAssignment.symmetricKey.slice(1).split('$'));
-      if (cipherTexts.length !== instrument.content.length) {
+      seriesItems = getSeriesInstrumentItems(instrument.content);
+      if (cipherTexts.length !== seriesItems.length) {
         throw new InternalServerErrorException(
           `Expected length of cypher texts '${cipherTexts.length}' to match length of series instrument content '${symmetricKeys.length}'`
         );
-      } else if (symmetricKeys.length !== instrument.content.length) {
+      } else if (symmetricKeys.length !== seriesItems.length) {
         throw new InternalServerErrorException(
           `Expected length of symmetric keys '${cipherTexts.length}' to match length of series instrument content '${symmetricKeys.length}'`
         );
@@ -107,7 +111,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
           groupId: assignment.groupId ?? undefined,
           instrumentId:
             instrument.kind === 'SERIES'
-              ? this.instrumentsService.generateScalarInstrumentId({ internal: instrument.content[i]! })
+              ? this.instrumentsService.generateScalarInstrumentId({ internal: seriesItems![i]! })
               : instrument.id,
           sessionId: session.id,
           subjectId: assignment.subjectId

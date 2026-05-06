@@ -6,9 +6,9 @@ import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
 import { translateInstrument } from '@opendatacapture/instrument-utils';
 import type { AnyInstrument, AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
 
-export type InterpretedInstrumentState =
+export type InterpretedInstrumentState<TInstrument extends AnyUnilingualInstrument = AnyUnilingualInstrument> =
   | { error: Error; status: 'ERROR' }
-  | { instrument: AnyUnilingualInstrument; status: 'DONE' }
+  | { instrument: TInstrument; status: 'DONE' }
   | { status: 'LOADING' };
 
 /**
@@ -17,10 +17,13 @@ export type InterpretedInstrumentState =
  * @param bundle - the JavaScript code to be interpreted directly in the browser
  * @returns The instrument generated from the code, translated into the current locale, if possible, otherwise the default
  */
-export function useInterpretedInstrument(bundle: string, options?: InterpretOptions) {
+export function useInterpretedInstrument<TInstrument extends AnyUnilingualInstrument = AnyUnilingualInstrument>(
+  bundle: string,
+  options?: InterpretOptions
+): InterpretedInstrumentState<TInstrument> {
   const interpreter = useMemo(() => new InstrumentInterpreter(), []);
   const [instrument, setInstrument] = useState<AnyInstrument | null>(null);
-  const [state, setState] = useState<InterpretedInstrumentState>({ status: 'LOADING' });
+  const [state, setState] = useState<InterpretedInstrumentState<TInstrument>>({ status: 'LOADING' });
   const { resolvedLanguage } = useTranslation();
 
   useEffect(() => {
@@ -38,7 +41,7 @@ export function useInterpretedInstrument(bundle: string, options?: InterpretOpti
 
   useEffect(() => {
     if (instrument) {
-      setState({ instrument: translateInstrument(instrument, resolvedLanguage), status: 'DONE' });
+      setState({ instrument: translateInstrument(instrument, resolvedLanguage) as TInstrument, status: 'DONE' });
     }
   }, [resolvedLanguage, instrument]);
 
