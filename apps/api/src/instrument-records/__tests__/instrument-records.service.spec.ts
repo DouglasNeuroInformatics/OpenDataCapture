@@ -21,6 +21,9 @@ describe('InstrumentRecordsService', () => {
   let instrumentRecordsService: InstrumentRecordsService;
   let instrumentRecordModel: MockedInstance<Model<'InstrumentRecord'>>;
   let instrumentsService: MockedInstance<InstrumentsService>;
+  let sessionsService: MockedInstance<SessionsService>;
+  let subjectsService: MockedInstance<SubjectsService>;
+  let usersService: MockedInstance<UsersService>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -39,6 +42,9 @@ describe('InstrumentRecordsService', () => {
     instrumentRecordModel = moduleRef.get(getModelToken('InstrumentRecord'));
     instrumentRecordsService = moduleRef.get(InstrumentRecordsService);
     instrumentsService = moduleRef.get(InstrumentsService);
+    sessionsService = moduleRef.get(SessionsService);
+    subjectsService = moduleRef.get(SubjectsService);
+    usersService = moduleRef.get(UsersService);
   });
 
   describe('findById', () => {
@@ -69,6 +75,67 @@ describe('InstrumentRecordsService', () => {
         subjectId: 'test-subject-id'
       });
       expect(result.date).toBeInstanceOf(Date);
+    });
+  });
+
+  describe('upload', () => {
+    const mockInstrument = {
+      id: 'instrument-1',
+      kind: 'FORM',
+      measures: null,
+      validationSchema: {
+        safeParse: (data: unknown) => ({ data, success: true })
+      }
+    };
+
+    const mockSession = {
+      date: new Date(),
+      groupId: null,
+      id: 'session-1',
+      type: 'RETROSPECTIVE',
+      userId: null
+    };
+
+    const baseUploadData = {
+      instrumentId: 'instrument-1',
+      records: [{ data: { answer: 1 }, date: new Date(), subjectId: 'subject-1' }]
+    };
+
+    beforeEach(() => {
+      instrumentsService.findById.mockResolvedValue(mockInstrument as any);
+      subjectsService.createMany.mockResolvedValue([] as any);
+      sessionsService.create.mockResolvedValue(mockSession as any);
+      sessionsService.deleteByIds.mockResolvedValue(undefined as any);
+      instrumentRecordModel.createMany.mockResolvedValue([] as any);
+      instrumentRecordModel.findMany.mockResolvedValue([] as any);
+    });
+
+    it('should call sessionsService.create with the provided username', async () => {
+      usersService.findByUsername.mockResolvedValueOnce({ username: 'validuser' } as any);
+
+      await instrumentRecordsService.upload({ ...baseUploadData, username: 'validuser' });
+
+      expect(usersService.findByUsername).toHaveBeenCalledWith('validuser', undefined);
+      expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ username: 'validuser' }));
+    });
+
+    it('should reject and not create any sessions when an unknown username is provided', async () => {
+      usersService.findByUsername.mockRejectedValueOnce(
+        new NotFoundException('Failed to find user with username: spoofed')
+      );
+
+      await expect(instrumentRecordsService.upload({ ...baseUploadData, username: 'spoofed' })).rejects.toBeInstanceOf(
+        NotFoundException
+      );
+
+      expect(sessionsService.create).not.toHaveBeenCalled();
+    });
+
+    it('should call sessionsService.create with username undefined when no username is provided', async () => {
+      await instrumentRecordsService.upload({ ...baseUploadData });
+
+      expect(usersService.findByUsername).not.toHaveBeenCalled();
+      expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ username: undefined }));
     });
   });
 
