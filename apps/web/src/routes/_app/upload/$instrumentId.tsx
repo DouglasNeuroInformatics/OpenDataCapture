@@ -162,9 +162,9 @@ const RouteComponent = () => {
             />
           </div>
           <div className="bg-muted/30 border-muted rounded-lg border p-4 transition-colors">
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row">
               {(currentUser?.groups.length ?? 0) > 0 && (
-                <div className="flex flex-col gap-1">
+                <div className="flex w-full shrink-0 flex-col gap-1 sm:w-48">
                   <p className="text-muted-foreground text-xs">
                     {t({ en: 'Filter users by group.', fr: 'Filtrer les utilisateurs par groupe.' })}
                   </p>
