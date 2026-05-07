@@ -23,11 +23,12 @@ const RouteComponent = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const currentUser = useAppStore((store) => store.currentUser);
   const uploadInstrumentRecordsMutation = useUploadInstrumentRecordsMutation();
+  const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>(currentGroup?.id);
   const [selectedUsername, setSelectedUsername] = useState<null | string | undefined>(undefined);
 
   const groupUsers = useUsersQuery({
     params: {
-      groupId: currentGroup?.id
+      groupId: selectedGroupId
     }
   });
 
@@ -161,30 +162,57 @@ const RouteComponent = () => {
             />
           </div>
           <div className="bg-muted/30 border-muted rounded-lg border p-4 transition-colors">
-            <div className="flex flex-col gap-2">
-              <p className="text-muted-foreground text-xs">
-                {t({
-                  en: 'Select the username to associate with these records for audit and traceability.',
-                  fr: 'Sélectionnez le nom d’utilisateur à associer à ces entrées pour l’audit et la traçabilité.'
-                })}
-              </p>
-              <Select value={selectedUsername ?? currentUser?.username} onValueChange={setSelectedUsername}>
-                <Select.Trigger>
-                  <Select.Value placeholder={currentUser?.username} />
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Group>
-                    {groupUsers.data.map((user) => (
-                      <Select.Item key={user.username} value={user.username}>
-                        {user.username}
-                      </Select.Item>
-                    ))}
-                    <Select.Item key={'N/A'} value={'N/A'}>
-                      {'N/A'}
-                    </Select.Item>
-                  </Select.Group>
-                </Select.Content>
-              </Select>
+            <div className="flex flex-row gap-4">
+              {(currentUser?.groups.length ?? 0) > 0 && (
+                <div className="flex flex-col gap-1">
+                  <p className="text-muted-foreground text-xs">
+                    {t({ en: 'Filter users by group.', fr: 'Filtrer les utilisateurs par groupe.' })}
+                  </p>
+                  <Select
+                    value={selectedGroupId}
+                    onValueChange={(id) => {
+                      setSelectedGroupId(id);
+                      setSelectedUsername(undefined);
+                    }}
+                  >
+                    <Select.Trigger>
+                      <Select.Value placeholder={t({ en: 'Select group', fr: 'Sélectionner un groupe' })} />
+                    </Select.Trigger>
+                    <Select.Content>
+                      <Select.Group>
+                        {currentUser?.groups.map((group) => (
+                          <Select.Item key={group.id} value={group.id}>
+                            {group.name}
+                          </Select.Item>
+                        ))}
+                      </Select.Group>
+                    </Select.Content>
+                  </Select>
+                </div>
+              )}
+              <div className="flex flex-1 flex-col gap-1">
+                <p className="text-muted-foreground text-xs">
+                  {t({
+                    en: 'Select the username to associate with these records for audit and traceability.',
+                    fr: "Sélectionnez le nom d'utilisateur à associer à ces entrées pour l'audit et la traçabilité."
+                  })}
+                </p>
+                <Select value={selectedUsername ?? currentUser?.username} onValueChange={setSelectedUsername}>
+                  <Select.Trigger>
+                    <Select.Value placeholder={currentUser?.username} />
+                  </Select.Trigger>
+                  <Select.Content>
+                    <Select.Group>
+                      {groupUsers.data.map((user) => (
+                        <Select.Item key={user.username} value={user.username}>
+                          {user.username}
+                        </Select.Item>
+                      ))}
+                      <Select.Item value="N/A">N/A</Select.Item>
+                    </Select.Group>
+                  </Select.Content>
+                </Select>
+              </div>
             </div>
           </div>
 
