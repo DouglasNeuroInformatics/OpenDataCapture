@@ -177,7 +177,7 @@ export class UsersService {
       data: {
         ...data,
         groups: {
-          connect: groupIds?.map((id) => ({ id }))
+          set: groupIds?.map((id) => ({ id }))
         },
         hashedPassword
       },
