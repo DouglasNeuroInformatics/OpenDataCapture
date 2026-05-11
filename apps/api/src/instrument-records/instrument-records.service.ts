@@ -357,6 +357,9 @@ export class InstrumentRecordsService {
       if (groupId && !user.groups.some((g) => g.id === groupId)) {
         throw new ForbiddenException(`User '${username}' is not a member of group '${groupId}'`);
       }
+      if (!groupId && user.basePermissionLevel !== 'ADMIN') {
+        throw new ForbiddenException(`The Non-Admin User '${username}' must be part of a group`);
+      }
     }
 
     const createdSessionsArray: Session[] = [];
