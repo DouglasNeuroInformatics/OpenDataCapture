@@ -2,7 +2,7 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { getModelToken } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -117,6 +117,32 @@ describe('InstrumentRecordsService', () => {
 
       expect(usersService.findByUsername).toHaveBeenCalledWith('validuser', undefined);
       expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ username: 'validuser' }));
+    });
+
+    it('should throw a ForbiddenException when a non-admin user uploads without a group', async () => {
+      usersService.findByUsername.mockResolvedValueOnce({
+        basePermissionLevel: 'STANDARD',
+        username: 'validuser'
+      } as any);
+
+      await expect(
+        instrumentRecordsService.upload({ ...baseUploadData, username: 'validuser' })
+      ).rejects.toBeInstanceOf(ForbiddenException);
+
+      expect(sessionsService.create).not.toHaveBeenCalled();
+    });
+
+    it('should throw a ForbiddenException when a user uploads to a group they are not a member of', async () => {
+      usersService.findByUsername.mockResolvedValueOnce({
+        groups: [{ id: 'other-group' }],
+        username: 'validuser'
+      } as any);
+
+      await expect(
+        instrumentRecordsService.upload({ ...baseUploadData, groupId: 'group-1', username: 'validuser' })
+      ).rejects.toBeInstanceOf(ForbiddenException);
+
+      expect(sessionsService.create).not.toHaveBeenCalled();
     });
 
     it('should reject and not create any sessions when an unknown username is provided', async () => {
