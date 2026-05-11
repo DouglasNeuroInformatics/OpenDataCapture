@@ -6,7 +6,13 @@ import { replacer, reviver } from '@douglasneuroinformatics/libjs';
 import { InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
-import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
@@ -28,6 +34,7 @@ import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
+import { UsersService } from '@/users/users.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
@@ -45,6 +52,7 @@ export class InstrumentRecordsService {
   constructor(
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
     private readonly groupsService: GroupsService,
+    private readonly usersService: UsersService,
     private readonly instrumentMeasuresService: InstrumentMeasuresService,
     private readonly instrumentsService: InstrumentsService,
     private readonly sessionsService: SessionsService,
@@ -330,7 +338,7 @@ export class InstrumentRecordsService {
   }
 
   async upload(
-    { groupId, instrumentId, records }: UploadInstrumentRecordsData,
+    { groupId, instrumentId, records, username }: UploadInstrumentRecordsData,
     options?: EntityOperationOptions
   ): Promise<InstrumentRecord[]> {
     if (groupId) {
@@ -342,6 +350,16 @@ export class InstrumentRecordsService {
       throw new UnprocessableEntityException(
         `Cannot create instrument record for series instrument '${instrument.id}'`
       );
+    }
+
+    if (username) {
+      const user = await this.usersService.findByUsername(username, options);
+      if (groupId && !user.groups.some((g) => g.id === groupId)) {
+        throw new ForbiddenException(`User '${username}' is not a member of group '${groupId}'`);
+      }
+      if (!groupId && user.basePermissionLevel !== 'ADMIN') {
+        throw new ForbiddenException(`The Non-Admin User '${username}' must be part of a group`);
+      }
     }
 
     const createdSessionsArray: Session[] = [];
@@ -372,7 +390,8 @@ export class InstrumentRecordsService {
             date: date,
             groupId: groupId ?? null,
             subjectData: { id: subjectId },
-            type: 'RETROSPECTIVE'
+            type: 'RETROSPECTIVE',
+            username: username ?? undefined
           });
 
           createdSessionsArray.push(session);

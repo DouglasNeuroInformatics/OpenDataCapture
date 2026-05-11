@@ -2,9 +2,11 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { getModelToken } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
+
+import { UsersService } from '@/users/users.service';
 
 import { GroupsService } from '../../groups/groups.service';
 import { InstrumentsService } from '../../instruments/instruments.service';
@@ -19,6 +21,9 @@ describe('InstrumentRecordsService', () => {
   let instrumentRecordsService: InstrumentRecordsService;
   let instrumentRecordModel: MockedInstance<Model<'InstrumentRecord'>>;
   let instrumentsService: MockedInstance<InstrumentsService>;
+  let sessionsService: MockedInstance<SessionsService>;
+  let subjectsService: MockedInstance<SubjectsService>;
+  let usersService: MockedInstance<UsersService>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -26,6 +31,7 @@ describe('InstrumentRecordsService', () => {
         InstrumentRecordsService,
         MockFactory.createForModelToken(getModelToken('InstrumentRecord')),
         MockFactory.createForService(GroupsService),
+        MockFactory.createForService(UsersService),
         MockFactory.createForService(InstrumentMeasuresService),
         MockFactory.createForService(InstrumentsService),
         MockFactory.createForService(SessionsService),
@@ -36,6 +42,9 @@ describe('InstrumentRecordsService', () => {
     instrumentRecordModel = moduleRef.get(getModelToken('InstrumentRecord'));
     instrumentRecordsService = moduleRef.get(InstrumentRecordsService);
     instrumentsService = moduleRef.get(InstrumentsService);
+    sessionsService = moduleRef.get(SessionsService);
+    subjectsService = moduleRef.get(SubjectsService);
+    usersService = moduleRef.get(UsersService);
   });
 
   describe('findById', () => {
@@ -66,6 +75,93 @@ describe('InstrumentRecordsService', () => {
         subjectId: 'test-subject-id'
       });
       expect(result.date).toBeInstanceOf(Date);
+    });
+  });
+
+  describe('upload', () => {
+    const mockInstrument = {
+      id: 'instrument-1',
+      kind: 'FORM',
+      measures: null,
+      validationSchema: {
+        safeParse: (data: unknown) => ({ data, success: true })
+      }
+    };
+
+    const mockSession = {
+      date: new Date(),
+      groupId: null,
+      id: 'session-1',
+      type: 'RETROSPECTIVE',
+      userId: null
+    };
+
+    const baseUploadData = {
+      instrumentId: 'instrument-1',
+      records: [{ data: { answer: 1 }, date: new Date(), subjectId: 'subject-1' }]
+    };
+
+    beforeEach(() => {
+      instrumentsService.findById.mockResolvedValue(mockInstrument as any);
+      subjectsService.createMany.mockResolvedValue([] as any);
+      sessionsService.create.mockResolvedValue(mockSession as any);
+      sessionsService.deleteByIds.mockResolvedValue(undefined as any);
+      instrumentRecordModel.createMany.mockResolvedValue([] as any);
+      instrumentRecordModel.findMany.mockResolvedValue([] as any);
+    });
+
+    it('should call sessionsService.create with the provided username', async () => {
+      usersService.findByUsername.mockResolvedValueOnce({ groups: [{ id: 'group-1' }], username: 'validuser' } as any);
+
+      await instrumentRecordsService.upload({ ...baseUploadData, groupId: 'group-1', username: 'validuser' });
+
+      expect(usersService.findByUsername).toHaveBeenCalledWith('validuser', undefined);
+      expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ username: 'validuser' }));
+    });
+
+    it('should throw a ForbiddenException when a non-admin user uploads without a group', async () => {
+      usersService.findByUsername.mockResolvedValueOnce({
+        basePermissionLevel: 'STANDARD',
+        username: 'validuser'
+      } as any);
+
+      await expect(
+        instrumentRecordsService.upload({ ...baseUploadData, username: 'validuser' })
+      ).rejects.toBeInstanceOf(ForbiddenException);
+
+      expect(sessionsService.create).not.toHaveBeenCalled();
+    });
+
+    it('should throw a ForbiddenException when a user uploads to a group they are not a member of', async () => {
+      usersService.findByUsername.mockResolvedValueOnce({
+        groups: [{ id: 'other-group' }],
+        username: 'validuser'
+      } as any);
+
+      await expect(
+        instrumentRecordsService.upload({ ...baseUploadData, groupId: 'group-1', username: 'validuser' })
+      ).rejects.toBeInstanceOf(ForbiddenException);
+
+      expect(sessionsService.create).not.toHaveBeenCalled();
+    });
+
+    it('should reject and not create any sessions when an unknown username is provided', async () => {
+      usersService.findByUsername.mockRejectedValueOnce(
+        new NotFoundException('Failed to find user with username: spoofed')
+      );
+
+      await expect(instrumentRecordsService.upload({ ...baseUploadData, username: 'spoofed' })).rejects.toBeInstanceOf(
+        NotFoundException
+      );
+
+      expect(sessionsService.create).not.toHaveBeenCalled();
+    });
+
+    it('should call sessionsService.create with username undefined when no username is provided', async () => {
+      await instrumentRecordsService.upload({ ...baseUploadData });
+
+      expect(usersService.findByUsername).not.toHaveBeenCalled();
+      expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ username: undefined }));
     });
   });
 

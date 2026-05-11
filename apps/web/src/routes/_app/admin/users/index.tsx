@@ -37,6 +37,7 @@ type UpdateUserFormInputData = {
     [id: string]: string;
   };
   initialValues?: FormTypes.PartialNullableData<UpdateUserFormData>;
+  selectedUserBasePermission?: User['basePermissionLevel'];
 };
 
 const UpdateUserForm: React.FC<{
@@ -90,6 +91,19 @@ const UpdateUserForm: React.FC<{
             }
           });
         });
+      })
+      .check((ctx) => {
+        if (ctx.value.groupIds.size <= 0 && data.selectedUserBasePermission !== 'ADMIN') {
+          ctx.issues.push({
+            code: 'custom',
+            input: ctx.value.confirmPassword,
+            message: t({
+              en: 'Standard user must be part of a group',
+              fr: "Un utilisateur standard doit faire partie d'un groupe"
+            }),
+            path: ['groupIds']
+          });
+        }
       })
       .check((ctx) => {
         if (ctx.value.confirmPassword !== ctx.value.password) {
@@ -335,6 +349,7 @@ const RouteComponent = () => {
       setData({
         disableDelete: selectedUser?.username === currentUser?.username,
         groupOptions: Object.fromEntries(groups.map((group) => [group.id, group.name])),
+        selectedUserBasePermission: selectedUser.basePermissionLevel,
         initialValues: selectedUser?.additionalPermissions.length
           ? {
               additionalPermissions: selectedUser.additionalPermissions,
