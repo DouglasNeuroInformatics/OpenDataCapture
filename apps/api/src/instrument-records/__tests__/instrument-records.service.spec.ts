@@ -111,9 +111,9 @@ describe('InstrumentRecordsService', () => {
     });
 
     it('should call sessionsService.create with the provided username', async () => {
-      usersService.findByUsername.mockResolvedValueOnce({ username: 'validuser' } as any);
+      usersService.findByUsername.mockResolvedValueOnce({ groups: [{ id: 'group-1' }], username: 'validuser' } as any);
 
-      await instrumentRecordsService.upload({ ...baseUploadData, username: 'validuser' });
+      await instrumentRecordsService.upload({ ...baseUploadData, groupId: 'group-1', username: 'validuser' });
 
       expect(usersService.findByUsername).toHaveBeenCalledWith('validuser', undefined);
       expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ username: 'validuser' }));
