@@ -3,6 +3,7 @@ import { z } from 'zod/v4';
 
 import { $BaseModel, $Json } from '../core/core.js';
 import { $InstrumentMeasureValue } from '../instrument/instrument.js';
+import { $FileMetadata } from '../storage/storage.js';
 
 import type { SessionType } from '../session/session.js';
 
@@ -46,6 +47,7 @@ export const $InstrumentRecord = $BaseModel.extend({
   date: z.coerce.date(),
   groupId: z.string().nullish(),
   instrumentId: z.string(),
+  pending: z.boolean().nullish(),
   sessionId: z.string(),
   subjectId: z.string()
 });
@@ -86,3 +88,19 @@ export type InstrumentRecordQueryParams = {
   minDate?: Date;
   subjectId?: string;
 };
+
+export type $FileSearchParams = z.infer<typeof $FileSearchParams>;
+export const $FileSearchParams = z.object({
+  fileId: z.string(),
+  groupId: z.string().nullable(),
+  recordId: z.string()
+});
+
+export type $InstrumentRecordFile = z.infer<typeof $InstrumentRecordFile>;
+export const $InstrumentRecordFile = $FileMetadata.extend({
+  exp: z.int(),
+  url: z.url()
+});
+
+export type $InstrumentRecordFiles = z.infer<typeof $InstrumentRecordFiles>;
+export const $InstrumentRecordFiles = z.record(z.string(), z.array($InstrumentRecordFile));

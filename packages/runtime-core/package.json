@@ -9,6 +9,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./constants": {
+      "types": "./lib/constants.d.ts",
+      "import": "./lib/constants.js"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {

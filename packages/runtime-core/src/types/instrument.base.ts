@@ -10,7 +10,7 @@ import type { Language } from './core.js';
  * The kind of an instrument. This serves as the discriminator key.
  * @public
  */
-type InstrumentKind = 'FORM' | 'INTERACTIVE' | 'SERIES';
+type InstrumentKind = 'FILE' | 'FORM' | 'INTERACTIVE' | 'SERIES';
 
 /**
  * The language(s) of the instrument. For a unilingual instrument,
