@@ -17,7 +17,7 @@ export function detectAppSubject(obj: { [key: string]: any }) {
   return detectSubjectType(obj) as AppSubject;
 }
 
-export function forceAppSubject<TSubjectName extends Exclude<AppSubjectName, 'all'>>(
+export function forcedAppSubject<TSubjectName extends Exclude<AppSubjectName, 'all'>>(
   name: TSubjectName,
   obj: Partial<AppSubjectModels[TSubjectName]>
 ) {

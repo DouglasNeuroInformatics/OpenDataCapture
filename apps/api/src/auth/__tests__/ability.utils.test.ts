@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { accessibleQuery, createAppAbility, forceAppSubject } from '../ability.utils';
+import { accessibleQuery, createAppAbility, forcedAppSubject } from '../ability.utils';
 
 const accessibleBy = vi.hoisted(() => vi.fn());
 
@@ -23,14 +23,14 @@ describe('accessibleQuery', () => {
   });
 });
 
-describe('forceAppSubject', () => {
+describe('forcedAppSubject', () => {
   it('should limit access by groupId when ability is scoped to a group', () => {
     const ability = createAppAbility([
       { action: 'create', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecordFile' }
     ]);
 
-    expect(ability.can('create', forceAppSubject('InstrumentRecordFile', { groupId: 'group-1' }))).toBe(true);
-    expect(ability.can('create', forceAppSubject('InstrumentRecordFile', { groupId: 'group-2' }))).toBe(false);
+    expect(ability.can('create', forcedAppSubject('InstrumentRecordFile', { groupId: 'group-1' }))).toBe(true);
+    expect(ability.can('create', forcedAppSubject('InstrumentRecordFile', { groupId: 'group-2' }))).toBe(false);
   });
 
   it('should deny access when no groupId is provided and ability requires one', () => {
@@ -38,6 +38,6 @@ describe('forceAppSubject', () => {
       { action: 'create', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecordFile' }
     ]);
 
-    expect(ability.can('create', forceAppSubject('InstrumentRecordFile', {}))).toBe(false);
+    expect(ability.can('create', forcedAppSubject('InstrumentRecordFile', {}))).toBe(false);
   });
 });
