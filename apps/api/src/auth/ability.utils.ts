@@ -19,12 +19,12 @@ export function detectAppSubject(obj: { [key: string]: any }) {
 
 export function forceAppSubject<TSubjectName extends Exclude<AppSubjectName, 'all'>>(
   name: TSubjectName,
-  obj: AppSubjectModels[TSubjectName]
+  obj: Partial<AppSubjectModels[TSubjectName]>
 ) {
   return subject(name, {
     __modelName: name,
     ...obj
-  });
+  } as unknown as AppSubjectModels[TSubjectName]);
 }
 
 export function createAppAbility(permissions: Permission[]): AppAbility {
