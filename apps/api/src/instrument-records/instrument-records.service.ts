@@ -104,6 +104,7 @@ export class InstrumentRecordsService {
             id: instrumentId
           }
         },
+        pending: instrument.kind === 'FILE',
         session: {
           connect: {
             id: sessionId
