@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useRef } from 'react';
 
-import { Button, Heading } from '@douglasneuroinformatics/libui/components';
+import { Button } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { RefreshCwIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
@@ -22,7 +22,6 @@ const _FileInstrumentContent: React.FC<FileInstrumentContentProps> = () => {
   const fileGroups = useFileInstrumentContentStore((store) => store.props.instrument.content.fileGroups);
   const onSuccess = useFileInstrumentContentStore((store) => store.props.onSuccess);
   const status = useFileInstrumentContentStore((store) => store.status);
-  const title = useFileInstrumentContentStore((store) => store.props.instrument.details.title);
 
   const { t } = useTranslation();
 
@@ -35,16 +34,15 @@ const _FileInstrumentContent: React.FC<FileInstrumentContentProps> = () => {
   return (
     <Fragment>
       <div
-        className="mx-auto mt-16 flex w-full max-w-xl flex-col"
+        className="mx-auto mt-6 flex w-full flex-col gap-12"
         style={{ pointerEvents: status === 'SUBMITTED' || status === 'PENDING' ? 'none' : undefined }}
       >
-        <Heading className="text-center" variant="h4">
-          {title}
-        </Heading>
-        {fileGroups.map((_, index) => (
-          <Dropzone index={index} key={index} />
-        ))}
-        <div className="mt-8 flex flex-col gap-3">
+        <div className="flex flex-col gap-12">
+          {fileGroups.map((_, index) => (
+            <Dropzone index={index} key={index} />
+          ))}
+        </div>
+        <div className="flex flex-col gap-6">
           {match(status)
             .with('PENDING', () => <UploadProgressBar />)
             .with('FAILED', () => (

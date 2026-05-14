@@ -16,7 +16,10 @@ export default defineInstrument({
     fileGroups: [
       {
         basename: 'file',
-        count: 1,
+        count: {
+          max: 1,
+          min: 1
+        },
         type: null,
         label: {
           en: 'File',
@@ -37,6 +40,5 @@ export default defineInstrument({
       fr: 'Téléchargement de fichier arbitraire'
     }
   },
-
   validationSchema: z.any()
 });

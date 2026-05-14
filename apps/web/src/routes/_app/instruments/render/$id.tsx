@@ -60,9 +60,9 @@ const RouteComponent = () => {
 
     for (const basename in presignedUrls) {
       const filesToUpload = uploadMap[basename];
-      if (filesToUpload?.length !== presignedUrls[basename]?.length) {
+      if ((filesToUpload?.length ?? 0) > (presignedUrls[basename]?.length ?? 0)) {
         throw new Error(
-          `Files to upload (${filesToUpload?.length}) for file group with basename '${basename}' does not match presigned URLs (${presignedUrls[basename]?.length})`
+          `Files to upload (${filesToUpload?.length}) for file group with basename '${basename}' exceeds available presigned URLs (${presignedUrls[basename]?.length})`
         );
       }
     }
@@ -70,8 +70,9 @@ const RouteComponent = () => {
     const uploads: { [id: string]: $FileMetadata[] } = {};
     for (const basename in presignedUrls) {
       uploads[basename] = [];
-      for (let i = 0; i < presignedUrls[basename]!.length; i++) {
-        const file = uploadMap[basename]![i]!;
+      const filesToUpload = uploadMap[basename]!;
+      for (let i = 0; i < filesToUpload.length; i++) {
+        const file = filesToUpload[i]!;
         const { location, url } = presignedUrls[basename]![i]!;
         await axios.put(url, file, {
           headers: {

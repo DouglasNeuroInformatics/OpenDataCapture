@@ -9,7 +9,10 @@ export const bilingualFileInstrument = await createInstrumentStub(async () => {
       fileGroups: [
         {
           basename: 'file',
-          count: 1,
+          count: {
+            max: 1,
+            min: 1
+          },
           id: 'file',
           label: {
             en: 'File',

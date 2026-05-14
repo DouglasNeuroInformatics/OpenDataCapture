@@ -23,11 +23,14 @@ export function createFileInstrumentContentStore(props: FileInstrumentContentPro
           const errors: FileInstrumentContentStore.Errors = {};
           props.instrument.content.fileGroups.forEach(({ basename, count }) => {
             const actual = uploadMap[basename]!.length;
-            if (actual !== count) {
+            if (actual < count.min || actual > count.max) {
+              const required = count.min === count.max ? `${count.min}` : `between ${count.min} and ${count.max}`;
+              const requiredFr = count.min === count.max ? `${count.min}` : `entre ${count.min} et ${count.max}`;
+              const isPluralRequired = count.min !== count.max || count.min !== 1;
               errors[basename] ??= [];
               errors[basename].push({
-                en: `You uploaded ${actual} file${actual === 1 ? '' : 's'}, but ${count} ${count === 1 ? 'is' : 'are'} required`,
-                fr: `Vous avez téléchargé ${actual} fichier${actual === 1 ? '' : 's'}, mais ${count} ${count === 1 ? 'est' : 'sont'} requis`
+                en: `You uploaded ${actual} file${actual === 1 ? '' : 's'}, but ${required} ${isPluralRequired ? 'are' : 'is'} required`,
+                fr: `Vous avez téléchargé ${actual} fichier${actual === 1 ? '' : 's'}, mais ${requiredFr} ${isPluralRequired ? 'sont' : 'est'} requis`
               });
             }
           });

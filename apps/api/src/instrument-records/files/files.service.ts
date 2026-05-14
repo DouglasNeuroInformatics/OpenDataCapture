@@ -85,7 +85,7 @@ export class FilesService {
     const presignedUrls: $PresignedUrls = {};
     for (const fileGroup of instrument.content.fileGroups) {
       presignedUrls[fileGroup.basename] = await Promise.all(
-        range(fileGroup.count).map((index) => {
+        range(fileGroup.count.max + 1).map((index) => {
           return this.storageService.getPresignedUploadUrl({
             groupId,
             location: {
@@ -172,12 +172,15 @@ export class FilesService {
     const validatedFiles: $FileMetadata[] = [];
     for (const fileGroup of fileGroups) {
       const uploadedFiles = uploads[fileGroup.basename];
-      if (uploadedFiles?.length !== fileGroup.count) {
+      const actual = uploadedFiles?.length ?? 0;
+      const { max, min } = fileGroup.count;
+      if (actual < min || actual > max) {
+        const expected = min === max ? `${min}` : `between ${min} and ${max}`;
         throw new BadRequestException(
-          `Missing files for file group '${fileGroup.basename}': expected '${fileGroup.count}' file(s), but got '${uploadedFiles?.length ?? 0}'`
+          `Invalid file count for file group '${fileGroup.basename}': expected ${expected} file(s), but got '${actual}'`
         );
       }
-      for (const file of uploadedFiles) {
+      for (const file of uploadedFiles!) {
         validatedFiles.push(file);
       }
     }

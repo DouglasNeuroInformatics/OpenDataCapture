@@ -12,7 +12,10 @@ const $FileType = z.enum(
 const $$FileGroup = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return z.object({
     basename: z.string(),
-    count: z.int().min(1),
+    count: z.object({
+      max: z.int().positive(),
+      min: z.int().positive()
+    }),
     label: $$InstrumentUIOption(z.string(), language),
     type: $FileType.nullable()
   }) satisfies z.ZodType<FileInstrument.FileGroup>;

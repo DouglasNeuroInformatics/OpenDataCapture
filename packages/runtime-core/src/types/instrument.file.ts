@@ -16,7 +16,10 @@ declare namespace FileInstrument {
 
   export type FileGroup<TLanguage extends InstrumentLanguage = InstrumentLanguage> = {
     basename: string;
-    count: number;
+    count: {
+      max: number;
+      min: number;
+    };
     label: InstrumentUIOption<TLanguage, string>;
     type: FileType | null;
   };
