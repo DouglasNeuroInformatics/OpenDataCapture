@@ -6,13 +6,15 @@ import type { DefaultSelection } from '@prisma/client/runtime/library';
 
 type AppAction = 'create' | 'delete' | 'manage' | 'read' | 'update';
 
-type AppSubjects =
-  | 'all'
-  | Subjects<{
-      [K in keyof Prisma.TypeMap['model']]: DefaultSelection<Prisma.TypeMap['model'][K]['payload']>;
-    }>;
+type AppSubjectModels = {
+  [K in keyof Prisma.TypeMap['model']]: DefaultSelection<Prisma.TypeMap['model'][K]['payload']>;
+};
+
+type AppSubjects = 'all' | Subjects<AppSubjectModels>;
 
 type AppSubjectName = Extract<AppSubjects, string>;
+
+type AppSubjectModel = Extract<AppSubjects, object>;
 
 type AppAbilities = [AppAction, AppSubjects];
 
@@ -20,4 +22,4 @@ type AppAbility = PureAbility<AppAbilities, PrismaQuery>;
 
 type Permission = RawRuleOf<PureAbility<[AppAction, AppSubjectName], PrismaQuery>>;
 
-export type { AppAbilities, AppAbility, AppAction, AppSubjectName, Permission };
+export type { AppAbilities, AppAbility, AppAction, AppSubjectModel, AppSubjectModels, AppSubjectName, Permission };
