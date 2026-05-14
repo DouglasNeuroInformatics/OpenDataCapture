@@ -15,7 +15,7 @@ const FILE_TYPE_DESCRIPTORS: {
 } = {
   'application/json': { extensions: ['.json'], icon: BracesIcon, label: 'JSON' },
   'application/msword': { extensions: ['.doc'], icon: FileTextIcon, label: 'Word' },
-  'application/octet-stream': { extensions: ['.bin'], icon: FileIcon, label: 'Binary' },
+  'application/octet-stream': { extensions: [], icon: FileIcon, label: 'Binary' },
   'application/pdf': { extensions: ['.pdf'], icon: FileTextIcon, label: 'PDF' },
   'application/rtf': { extensions: ['.rtf'], icon: FileTextIcon, label: 'RTF' },
   'application/vnd.ms-excel': { extensions: ['.xls'], icon: SheetIcon, label: 'Excel' },
@@ -64,7 +64,7 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
   );
 
   const acceptConfig = useMemo(() => {
-    if (type === null) {
+    if (type === null || !FILE_TYPE_DESCRIPTORS[type].extensions.length) {
       return undefined;
     }
     return { [type]: FILE_TYPE_DESCRIPTORS[type].extensions };
