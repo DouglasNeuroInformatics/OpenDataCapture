@@ -1,8 +1,14 @@
 import { z } from 'zod/v4';
 
+export type $FileLocation = z.infer<typeof $FileLocation>;
+export const $FileLocation = z.object({
+  basename: z.string(),
+  index: z.int()
+});
+
 export type $FileMetadata = z.infer<typeof $FileMetadata>;
 export const $FileMetadata = z.object({
-  key: z.string().min(1),
+  location: $FileLocation,
   name: z.string().min(1),
   size: z.int().nonnegative()
 });
@@ -10,7 +16,7 @@ export const $FileMetadata = z.object({
 export type $PresignedUrlInfo = z.infer<typeof $PresignedUrlInfo>;
 export const $PresignedUrlInfo = z.object({
   exp: z.int(),
-  key: z.string(),
+  location: $FileLocation,
   url: z.url()
 });
 

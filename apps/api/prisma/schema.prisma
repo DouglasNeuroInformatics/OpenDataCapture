@@ -151,14 +151,16 @@ model InstrumentRecord {
 }
 
 model InstrumentRecordFile {
-  createdAt   DateTime         @default(now()) @db.Date
-  group       Group?           @relation(fields: [groupId], references: [id])
-  groupId     String?          @db.ObjectId
-  id          String           @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  record      InstrumentRecord @relation(fields: [recordId], references: [id])
-  recordId    String           @db.ObjectId
-  size        Int
+  basename  String
+  createdAt DateTime         @default(now()) @db.Date
+  group     Group?           @relation(fields: [groupId], references: [id])
+  groupId   String?          @db.ObjectId
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  index     Int
+  name      String
+  record    InstrumentRecord @relation(fields: [recordId], references: [id])
+  recordId  String           @db.ObjectId
+  size      Int
 
   @@map("InstrumentRecordFileModel")
 }

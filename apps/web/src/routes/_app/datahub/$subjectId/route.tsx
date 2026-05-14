@@ -13,7 +13,7 @@ import { useAppStore } from '@/store';
 
 const TabLink = ({ label, pathname, testId }: { label: string; pathname: string; testId?: string }) => {
   const location = useLocation();
-  const isActive = location.pathname === pathname;
+  const isActive = location.pathname.startsWith(pathname);
   return (
     <Link
       className={cn(

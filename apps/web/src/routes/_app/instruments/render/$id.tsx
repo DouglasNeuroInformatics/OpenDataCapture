@@ -5,7 +5,8 @@ import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/
 import { InstrumentRenderer } from '@opendatacapture/react-core';
 import type { InstrumentSubmitHandler } from '@opendatacapture/react-core';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
-import type { CreateInstrumentRecordData } from '@opendatacapture/schemas/instrument-records';
+import type { CreateInstrumentRecordData, InstrumentRecord } from '@opendatacapture/schemas/instrument-records';
+import { $FileMetadata, $PresignedUrls, $UploadCompleteData } from '@opendatacapture/schemas/storage';
 import { createFileRoute, useLocation, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 
@@ -35,16 +36,63 @@ const RouteComponent = () => {
     }
   }, [currentSession?.id]);
 
-  const handleSubmit: InstrumentSubmitHandler = async ({ data, instrumentId }) => {
-    await axios.post('/v1/instrument-records', {
-      data,
+  const handleSubmit: InstrumentSubmitHandler = async (result) => {
+    const createRecordResponse = await axios.post<InstrumentRecord>('/v1/instrument-records', {
+      data: result.data,
       date: currentSession!.date,
       groupId: currentGroup?.id,
-      instrumentId,
+      instrumentId: result.instrumentId,
       sessionId: currentSession!.id,
       subjectId: currentSession!.subject!.id
     } satisfies CreateInstrumentRecordData);
-    notifications.addNotification({ type: 'success' });
+    if (result.kind !== 'FILE') {
+      notifications.addNotification({ type: 'success' });
+      return;
+    }
+    const record = createRecordResponse.data;
+    const { onNext, onProgress, uploadMap } = result;
+
+    const presignedUrlsResponse = await axios.get<$PresignedUrls>(
+      `/v1/instrument-records/${record.id}/files/upload-urls`
+    );
+
+    const presignedUrls = presignedUrlsResponse.data;
+
+    for (const basename in presignedUrls) {
+      const filesToUpload = uploadMap[basename];
+      if (filesToUpload?.length !== presignedUrls[basename]?.length) {
+        throw new Error(
+          `Files to upload (${filesToUpload?.length}) for file group with basename '${basename}' does not match presigned URLs (${presignedUrls[basename]?.length})`
+        );
+      }
+    }
+
+    const uploads: { [id: string]: $FileMetadata[] } = {};
+    for (const basename in presignedUrls) {
+      uploads[basename] = [];
+      for (let i = 0; i < presignedUrls[basename]!.length; i++) {
+        const file = uploadMap[basename]![i]!;
+        const { location, url } = presignedUrls[basename]![i]!;
+        await axios.put(url, file, {
+          headers: {
+            'Content-Type': file.type
+          },
+          meta: {
+            disableDefaultAuth: true,
+            disableDefaultTimeout: true
+          },
+          onUploadProgress: (event) => {
+            onProgress(file, event);
+          }
+        });
+        uploads[basename].push({ location, name: file.name, size: file.size });
+        onNext();
+      }
+    }
+
+    await axios.post(`/v1/instrument-records/${record.id}/files/upload-complete`, {
+      uploads
+    } satisfies $UploadCompleteData);
   };
 
   if (!instrumentBundleQuery.data) {

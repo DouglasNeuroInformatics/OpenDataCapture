@@ -223,7 +223,8 @@ export class InstrumentRecordsService {
           { instrumentId },
           { instrumentId: { in: instrumentKindIds } },
           accessibleQuery(ability, 'read', 'InstrumentRecord'),
-          { subjectId }
+          { subjectId },
+          { pending: false }
         ]
       }
     });

@@ -89,15 +89,8 @@ export type InstrumentRecordQueryParams = {
   subjectId?: string;
 };
 
-export type $FileSearchParams = z.infer<typeof $FileSearchParams>;
-export const $FileSearchParams = z.object({
-  fileId: z.string(),
-  groupId: z.string().nullable(),
-  recordId: z.string()
-});
-
 export type $InstrumentRecordFile = z.infer<typeof $InstrumentRecordFile>;
-export const $InstrumentRecordFile = $FileMetadata.extend({
+export const $InstrumentRecordFile = $FileMetadata.omit({ location: true }).extend({
   exp: z.int(),
   url: z.url()
 });

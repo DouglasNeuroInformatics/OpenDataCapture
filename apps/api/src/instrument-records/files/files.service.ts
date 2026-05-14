@@ -9,10 +9,11 @@ import {
   UnprocessableEntityException
 } from '@nestjs/common';
 import type { FileInstrument } from '@opendatacapture/runtime-core';
+import type { $InstrumentRecordFile, $InstrumentRecordFiles } from '@opendatacapture/schemas/instrument-records';
 import type { $FileMetadata, $PresignedUrls, $UploadCompleteData } from '@opendatacapture/schemas/storage';
 import { range } from 'lodash-es';
 
-import { forcedAppSubject } from '@/auth/ability.utils';
+import { accessibleQuery, forcedAppSubject } from '@/auth/ability.utils';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { StorageService } from '@/storage/storage.service';
 
@@ -26,53 +27,57 @@ export class FilesService {
     private readonly storageService: StorageService
   ) {}
 
-  // async find(recordId: string, currentUser: RequestUser): Promise<$InstrumentRecordFiles> {
-  //   const record = await this.instrumentRecordModel.findUnique({
-  //     include: {
-  //       files: true
-  //     },
-  //     where: {
-  //       AND: [
-  //         accessibleQuery(currentUser.ability, 'read', 'InstrumentRecord'),
-  //         {
-  //           files: {
-  //             every: accessibleQuery(currentUser.ability, 'read', 'InstrumentRecordFile')
-  //           }
-  //         }
-  //       ],
-  //       id: recordId
-  //     }
-  //   });
+  async find(recordId: string, currentUser: RequestUser): Promise<$InstrumentRecordFiles> {
+    const record = await this.instrumentRecordModel.findUnique({
+      include: {
+        files: true
+      },
+      where: {
+        AND: [
+          accessibleQuery(currentUser.ability, 'read', 'InstrumentRecord'),
+          {
+            files: {
+              every: accessibleQuery(currentUser.ability, 'read', 'InstrumentRecordFile')
+            }
+          }
+        ],
+        id: recordId
+      }
+    });
 
-  //   if (!record) {
-  //     throw new NotFoundException(`Could not find record with ID '${recordId}'`);
-  //   }
+    if (!record) {
+      throw new NotFoundException(`Could not find record with ID '${recordId}'`);
+    }
 
-  //   const instrument = await this.findFileInstrumentById(record.instrumentId);
+    const instrument = await this.findFileInstrumentById(record.instrumentId);
 
-  //   const files: { [basename: string]: $InstrumentRecordFile[] } = {};
-  //   for (const fileGroup of instrument.content.fileGroups) {
-  //     const groupFiles = record.files.filter((file) => file.fileGroupId === fileGroup.id);
-  //     files[fileGroup.id] = await Promise.all(
-  //       groupFiles.map(async (file) => {
-  //         const presigned = await this.storageService.getPresignedDownloadUrl({
-  //           fileId: file.id,
-  //           groupId: file.groupId,
-  //           recordId: file.recordId
-  //         });
-  //         return {
-  //           exp: presigned.exp,
-  //           key: presigned.key,
-  //           name: file.name,
-  //           size: file.size,
-  //           url: presigned.url
-  //         };
-  //       })
-  //     );
-  //   }
+    const files: { [basename: string]: $InstrumentRecordFile[] } = {};
+    for (const fileGroup of instrument.content.fileGroups) {
+      const groupFiles = record.files
+        .filter((file) => file.basename === fileGroup.basename)
+        .toSorted((a, b) => a.index - b.index);
+      files[fileGroup.basename] = await Promise.all(
+        groupFiles.map(async (file) => {
+          const presigned = await this.storageService.getPresignedDownloadUrl({
+            groupId: file.groupId,
+            location: {
+              basename: file.basename,
+              index: file.index
+            },
+            recordId: file.recordId
+          });
+          return {
+            exp: presigned.exp,
+            name: file.name,
+            size: file.size,
+            url: presigned.url
+          };
+        })
+      );
+    }
 
-  //   return files;
-  // }
+    return files;
+  }
 
   async getPresignedUploadUrls(recordId: string, currentUser: RequestUser): Promise<$PresignedUrls> {
     const { groupId, instrument } = await this.getAssociations(recordId, currentUser);
@@ -80,10 +85,13 @@ export class FilesService {
     const presignedUrls: $PresignedUrls = {};
     for (const fileGroup of instrument.content.fileGroups) {
       presignedUrls[fileGroup.basename] = await Promise.all(
-        range(fileGroup.count).map((i) => {
+        range(fileGroup.count).map((index) => {
           return this.storageService.getPresignedUploadUrl({
-            fileId: `${fileGroup.basename}_${i + 1}`,
             groupId,
+            location: {
+              basename: fileGroup.basename,
+              index
+            },
             recordId
           });
         })
@@ -99,12 +107,9 @@ export class FilesService {
       data: {
         files: {
           create: this.validateFiles(data.uploads, instrument.content.fileGroups).map((file) => ({
-            group: {
-              connect: {
-                id: groupId
-              }
-            },
-            key: file.key,
+            basename: file.location.basename,
+            group: groupId ? { connect: groupId } : undefined,
+            index: file.location.index,
             name: file.name,
             size: file.size
           }))
