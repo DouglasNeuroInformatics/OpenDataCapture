@@ -3,6 +3,7 @@ import type {
   AnyMultilingualInstrument,
   AnyScalarInstrument,
   AnyUnilingualInstrument,
+  FileInstrument,
   FormInstrument,
   InteractiveInstrument,
   ScalarInstrumentInternal,
@@ -28,6 +29,10 @@ export function isMultilingualInstrument(instrument: AnyInstrument): instrument 
 
 export function isMultilingualInstrumentInfo(info: InstrumentInfo): info is MultilingualInstrumentInfo {
   return Array.isArray(info.language);
+}
+
+export function isFileInstrument(instrument: AnyInstrument): instrument is FileInstrument {
+  return instrument.kind === 'FILE';
 }
 
 export function isFormInstrument(instrument: AnyInstrument): instrument is FormInstrument {
