@@ -52,7 +52,7 @@ const FileInstrumentRecordView = ({ instrument, record }: FileInstrumentRecordVi
     }
   };
 
-  const dateCompleted = new Date().toLocaleString(resolvedLanguage, {
+  const dateCompleted = record.date.toLocaleString(resolvedLanguage, {
     dateStyle: 'long',
     timeStyle: 'long'
   });

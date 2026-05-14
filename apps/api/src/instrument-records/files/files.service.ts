@@ -85,7 +85,7 @@ export class FilesService {
     const presignedUrls: $PresignedUrls = {};
     for (const fileGroup of instrument.content.fileGroups) {
       presignedUrls[fileGroup.basename] = await Promise.all(
-        range(fileGroup.count.max + 1).map((index) => {
+        range(fileGroup.count.max).map((index) => {
           return this.storageService.getPresignedUploadUrl({
             groupId,
             location: {
@@ -108,7 +108,7 @@ export class FilesService {
         files: {
           create: this.validateFiles(data.uploads, instrument.content.fileGroups).map((file) => ({
             basename: file.location.basename,
-            group: groupId ? { connect: groupId } : undefined,
+            group: groupId ? { connect: { id: groupId } } : undefined,
             index: file.location.index,
             name: file.name,
             size: file.size
