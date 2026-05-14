@@ -14,7 +14,8 @@ const distDir = path.resolve(import.meta.dirname, '../dist');
 const results: { [K in InstrumentKind as Lowercase<K>]: { title: string }[] } = {
   form: [],
   interactive: [],
-  series: []
+  series: [],
+  file: []
 };
 for (const kindDir of await fs.readdir(distDir, 'utf-8')) {
   const targetDir = path.join(distDir, kindDir);
