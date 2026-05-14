@@ -3,16 +3,21 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Separator } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
-import type { Language, RuntimeNotification } from '@opendatacapture/runtime-core';
+import type { InstrumentKind, Language, RuntimeNotification } from '@opendatacapture/runtime-core';
 import { $Json } from '@opendatacapture/schemas/core';
 import type { Json } from '@opendatacapture/schemas/core';
 import { FullscreenIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 import type { Promisable } from 'type-fest';
 
+export type InteractiveContentSubmitResult = {
+  data: Json;
+  kind: Extract<InstrumentKind, 'INTERACTIVE'>;
+};
+
 export type InteractiveContentProps = {
   bundle: string;
   defaultFullscreen?: boolean;
-  onSubmit: (data: Json) => Promisable<void>;
+  onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
 };
 
 export const InteractiveContent = React.memo<InteractiveContentProps>(function InteractiveContent({
@@ -52,7 +57,7 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
     (event: CustomEvent<Json>) => {
       void (async function () {
         const data = await $Json.parseAsync(event.detail);
-        await onSubmit(data);
+        await onSubmit({ data, kind: 'INTERACTIVE' });
       })();
     },
     [onSubmit]

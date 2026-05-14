@@ -16,12 +16,15 @@ import { InteractiveContent } from '../InteractiveContent';
 import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
 
-import type { InstrumentSubmitHandler, SubjectDisplayInfo } from '../../types';
+import type { SubjectDisplayInfo } from '../../types';
+import type { FormContentSubmitResult } from '../FormContent';
+import type { InteractiveContentSubmitResult } from '../InteractiveContent';
+import type { InstrumentSubmitHandler } from './types';
 
 export type SeriesInstrumentRendererProps = {
   className?: string;
   initialSeriesIndex?: number;
-  onSubmit: InstrumentSubmitHandler;
+  onSubmit: InstrumentSubmitHandler<'SERIES'>;
   subject?: SubjectDisplayInfo;
   target: SeriesInstrumentBundleContainer;
 };
@@ -58,8 +61,8 @@ export const SeriesInstrumentRenderer = ({
       ? (getSeriesInstrumentParams(rootState.instrument.content).skipProgress ?? false)
       : false;
 
-  const handleSubmit = async (data: unknown) => {
-    await onSubmit({
+  const handleSubmit = async ({ data }: FormContentSubmitResult | InteractiveContentSubmitResult) => {
+    await onSubmit?.({
       data: JSON.parse(JSON.stringify(data, replacer)) as Json,
       index,
       instrumentId: scalarId!,

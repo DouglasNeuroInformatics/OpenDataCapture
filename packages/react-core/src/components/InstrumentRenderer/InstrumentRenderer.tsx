@@ -3,7 +3,8 @@ import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrum
 import { ScalarInstrumentRenderer } from './ScalarInstrumentRenderer';
 import { SeriesInstrumentRenderer } from './SeriesInstrumentRenderer';
 
-import type { InstrumentSubmitHandler, SubjectDisplayInfo } from '../../types';
+import type { SubjectDisplayInfo } from '../../types';
+import type { InstrumentSubmitHandler } from './types';
 
 export type InstrumentRendererProps = {
   className?: string;
