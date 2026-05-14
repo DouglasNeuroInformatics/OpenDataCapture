@@ -5,6 +5,8 @@ import type { OnApplicationShutdown } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import type { MongoMemoryReplSet } from 'mongodb-memory-server';
 
+import type { StorageKey } from '@/storage/storage.service';
+
 @Injectable()
 export class PrismaModuleOptionsFactory implements OnApplicationShutdown {
   private memoryReplSet: MongoMemoryReplSet | null;
@@ -27,7 +29,25 @@ export class PrismaModuleOptionsFactory implements OnApplicationShutdown {
           hashedPassword: true
         }
       }
-    }).$extends(LibnestPrismaExtension);
+    })
+      .$extends(LibnestPrismaExtension)
+      .$extends({
+        name: 'file-key-extension',
+        result: {
+          instrumentRecordFile: {
+            key: {
+              compute: ({ groupId, id, recordId }) => {
+                return `groups/${groupId}/records/${recordId}/files/${id}` satisfies StorageKey;
+              },
+              needs: {
+                groupId: true,
+                id: true,
+                recordId: true
+              }
+            }
+          }
+        }
+      });
     await client.$connect();
     return { client } satisfies PrismaModuleOptions;
   }
