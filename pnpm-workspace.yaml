@@ -1,4 +1,18 @@
 ---
+allowBuilds:
+  '@import-meta-env/unplugin': true
+  '@nestjs/core': true
+  '@prisma/client': true
+  '@prisma/engines': true
+  '@scarf/scarf': false
+  '@swc/core': true
+  cypress: true
+  esbuild: true
+  mongodb-memory-server: true
+  msgpackr-extract: false
+  prisma: true
+  sharp: true
+  sqlite3: true
 catalog:
   '@casl/ability': '^6.7.1'
   '@casl/prisma': '^1.4.1'
@@ -7,7 +21,7 @@ catalog:
   '@douglasneuroinformatics/libjs': ^3.2.1
   '@douglasneuroinformatics/libpasswd': 'latest'
   '@douglasneuroinformatics/libstats': 'latest'
-  '@douglasneuroinformatics/libui': ^6.5.0
+  '@douglasneuroinformatics/libui': ^6.7.1
   '@douglasneuroinformatics/libui-form-types': ^0.13.0
   '@microsoft/api-extractor': '^7.47.6'
   '@prisma/client': '^6.9.0'
@@ -26,10 +40,12 @@ catalog:
   neverthrow: ^8.2.0
   nodemon: '^3.1.9'
   prisma: '^6.9.0'
+  react-dropzone: ^14.3.8
   tailwindcss: '^4.1.4'
   tsx: '4.8.2'
   serialize-error: '^11.0.3'
   vite: '^6.3.3'
+  zustand: ^5.0.13
   '@storybook/addon-docs': '^10.3.5'
   '@storybook/addon-themes': '^10.3.5'
   '@storybook/react-vite': '^10.3.5'
