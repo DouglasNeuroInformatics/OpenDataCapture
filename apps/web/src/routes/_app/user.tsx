@@ -121,17 +121,18 @@ const RouteComponent = () => {
         content={[
           {
             fields: {
-              confirmPassword: {
-                kind: 'string',
-                label: t('common.confirmPassword'),
-                variant: 'password'
-              },
               password: {
                 calculateStrength: (password) => {
                   return estimatePasswordStrength(password).score;
                 },
                 kind: 'string',
                 label: t('common.password'),
+                variant: 'password'
+              },
+              // eslint-disable-next-line perfectionist/sort-objects
+              confirmPassword: {
+                kind: 'string',
+                label: t('common.confirmPassword'),
                 variant: 'password'
               },
               // eslint-disable-next-line perfectionist/sort-objects
