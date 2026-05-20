@@ -9,4 +9,5 @@ export * from './components/InstrumentRenderer';
 export * from './components/InstrumentSummary';
 export * from './components/LoadingPage';
 export * from './components/Logo';
+export * from './components/NavigationBlockerDialog';
 export * from './types';

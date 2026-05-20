@@ -5,7 +5,6 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { RefreshCwIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 
-import { NavigationBlocker } from '../NavigationBlocker';
 import { Dropzone } from './Dropzone';
 import { ErrorBox } from './ErrorBox';
 import {
@@ -17,7 +16,7 @@ import { UploadProgressBar } from './UploadProgressBar';
 
 import type { FileInstrumentContentProps } from './types';
 
-const _FileInstrumentContent: React.FC<FileInstrumentContentProps> = () => {
+const _FileInstrumentContent: React.FC<FileInstrumentContentProps> = ({ NavigationBlocker }) => {
   const actions = useFileInstrumentContentStore((store) => store.actions);
   const fileGroups = useFileInstrumentContentStore((store) => store.props.instrument.content.fileGroups);
   const onSuccess = useFileInstrumentContentStore((store) => store.props.onSuccess);
@@ -66,13 +65,15 @@ const _FileInstrumentContent: React.FC<FileInstrumentContentProps> = () => {
           </Button>
         </div>
       </div>
-      <NavigationBlocker
-        active={status === 'PENDING'}
-        message={t({
-          en: 'Are you sure you want to leave this page? Data is currently uploading and will be lost if you leave this page now.',
-          fr: 'Êtes-vous sûr de vouloir quitter cette page ? Des données sont en cours de téléversement et seront perdues si vous quittez la page maintenant.'
-        })}
-      />
+      {NavigationBlocker && (
+        <NavigationBlocker
+          active={status === 'PENDING'}
+          message={t({
+            en: 'Are you sure you want to leave this page? Data is currently uploading and will be lost if you leave this page now.',
+            fr: 'Êtes-vous sûr de vouloir quitter cette page ? Des données sont en cours de téléversement et seront perdues si vous quittez la page maintenant.'
+          })}
+        />
+      )}
     </Fragment>
   );
 };

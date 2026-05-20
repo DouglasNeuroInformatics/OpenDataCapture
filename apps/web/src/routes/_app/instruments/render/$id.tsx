@@ -10,6 +10,7 @@ import { $FileMetadata, $PresignedUrls, $UploadCompleteData } from '@opendatacap
 import { createFileRoute, useLocation, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 
+import { NavigationBlocker } from '@/components/NavigationBlocker';
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentBundle } from '@/hooks/useInstrumentBundle';
 import { useAppStore } from '@/store';
@@ -110,6 +111,7 @@ const RouteComponent = () => {
       <div className="grow">
         <InstrumentRenderer
           className="mx-auto max-w-3xl"
+          NavigationBlocker={NavigationBlocker}
           subject={currentSession?.subject ?? undefined}
           target={instrumentBundleQuery.data}
           onSubmit={handleSubmit}

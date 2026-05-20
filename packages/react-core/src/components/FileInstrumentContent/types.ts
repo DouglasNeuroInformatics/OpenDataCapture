@@ -9,6 +9,8 @@ import type {
 import type { AxiosProgressEvent } from 'axios';
 import type { Promisable } from 'type-fest';
 
+import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
+
 export type UploadMap = {
   [basename: string]: File[];
 };
@@ -57,6 +59,7 @@ export type FileInstrumentContentSubmitResult = {
 
 export type FileInstrumentContentProps = {
   instrument: AnyUnilingualFileInstrument & { id: string };
+  NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: (result: FileInstrumentContentSubmitResult) => Promisable<void>;
   onSuccess?: () => Promisable<void>;
 };

@@ -18,10 +18,12 @@ import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
 
 import type { SubjectDisplayInfo } from '../../types';
+import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
 import type { AnyContentResult, InstrumentSubmitHandler } from './types';
 
 export type ScalarInstrumentRendererProps = {
   className?: string;
+  NavigationBlocker?: NavigationBlockerComponent;
   /** @deprecated */
   onCompileError?: (error: Error) => void;
   onSubmit: InstrumentSubmitHandler<AnyScalarInstrument['kind']>;
@@ -33,6 +35,7 @@ export type ScalarInstrumentRendererProps = {
 
 export const ScalarInstrumentRenderer = ({
   className,
+  NavigationBlocker,
   onCompileError,
   onSubmit,
   options,
@@ -90,7 +93,13 @@ export const ScalarInstrumentRenderer = ({
               />
             ))
             .with({ index: 1, instrument: { kind: 'FILE' } }, ({ instrument }) => {
-              return <FileInstrumentContent instrument={{ ...instrument, id: target.id }} onSubmit={handleSubmit} />;
+              return (
+                <FileInstrumentContent
+                  instrument={{ ...instrument, id: target.id }}
+                  NavigationBlocker={NavigationBlocker}
+                  onSubmit={handleSubmit}
+                />
+              );
             })
             .with({ index: 2 }, () => (
               <InstrumentSummary data={data} instrument={instrument} subject={subject} timeCollected={Date.now()} />

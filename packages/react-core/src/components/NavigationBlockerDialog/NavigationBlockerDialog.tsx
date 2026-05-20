@@ -3,43 +3,32 @@ import React, { memo } from 'react';
 import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
-let useBlocker: null | typeof import('@tanstack/react-router').useBlocker;
-
-try {
-  useBlocker = (await import('@tanstack/react-router')).useBlocker ?? null;
-} catch {
-  useBlocker = null;
-}
-
-type NavigationBlockerProps = {
-  active: boolean;
+export type NavigationBlockerDialogProps = {
   message: string;
+  onCancel?: () => void;
+  onConfirm?: () => void;
+  open: boolean;
 };
 
-export const NavigationBlocker = memo<NavigationBlockerProps>(function NavigationBlocker({ active, message }) {
-  const blocker = useBlocker?.({
-    enableBeforeUnload: true,
-    shouldBlockFn: () => active,
-    withResolver: true
-  });
+export const NavigationBlockerDialog = memo<NavigationBlockerDialogProps>(function NavigationBlockerDialog({
+  message,
+  onCancel,
+  onConfirm,
+  open
+}) {
   const { t } = useTranslation();
-
-  if (!blocker) {
-    return null;
-  }
-
   return (
-    <Dialog open={blocker.status === 'blocked'}>
+    <Dialog open={open}>
       <Dialog.Content data-testid="blocker-dialog" onOpenAutoFocus={(event) => event.preventDefault()}>
         <Dialog.Header>
           <Dialog.Title className="flex items-center gap-2">{t({ en: 'Warning', fr: 'Avertissement' })}</Dialog.Title>
           <Dialog.Description>{message}</Dialog.Description>
         </Dialog.Header>
         <Dialog.Footer>
-          <Button className="min-w-16" type="button" variant="outline" onClick={blocker.proceed}>
+          <Button className="min-w-16" type="button" variant="outline" onClick={onConfirm}>
             {t('libui.yes')}
           </Button>
-          <Button className="min-w-16" type="button" variant="primary" onClick={blocker.reset}>
+          <Button className="min-w-16" type="button" variant="primary" onClick={onCancel}>
             {t('libui.no')}
           </Button>
         </Dialog.Footer>
@@ -47,3 +36,10 @@ export const NavigationBlocker = memo<NavigationBlockerProps>(function Navigatio
     </Dialog>
   );
 });
+
+export type NavigationBlockerProps = {
+  active: boolean;
+  message: string;
+};
+
+export type NavigationBlockerComponent = React.ComponentType<NavigationBlockerProps>;
