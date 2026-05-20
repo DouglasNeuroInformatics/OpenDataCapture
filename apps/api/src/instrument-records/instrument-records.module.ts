@@ -5,6 +5,7 @@ import { InstrumentsModule } from '@/instruments/instruments.module';
 import { SessionsModule } from '@/sessions/sessions.module';
 import { StorageModule } from '@/storage/storage.module';
 import { SubjectsModule } from '@/subjects/subjects.module';
+import { UsersModule } from '@/users/users.module';
 
 import { FilesController } from './files/files.controller';
 import { FilesService } from './files/files.service';
@@ -15,7 +16,7 @@ import { InstrumentRecordsService } from './instrument-records.service';
 @Module({
   controllers: [FilesController, InstrumentRecordsController],
   exports: [InstrumentRecordsService],
-  imports: [GroupsModule, InstrumentsModule, SessionsModule, SubjectsModule, StorageModule],
+  imports: [GroupsModule, InstrumentsModule, SessionsModule, SubjectsModule, StorageModule, UsersModule],
   providers: [FilesService, InstrumentMeasuresService, InstrumentRecordsService]
 })
 export class InstrumentRecordsModule {}

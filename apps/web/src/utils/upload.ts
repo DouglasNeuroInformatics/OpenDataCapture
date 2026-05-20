@@ -1002,10 +1002,12 @@ export function processInstrumentCSV(input: File, instrument: AnyUnilingualFormI
 
 export function reformatInstrumentData({
   currentGroup,
+  currentUsername,
   data,
   instrument
 }: {
   currentGroup: Group | null;
+  currentUsername?: null | string;
   data: FormTypes.Data[];
   instrument: UnilingualInstrumentInfo;
 }): UploadInstrumentRecordsData {
@@ -1024,7 +1026,8 @@ export function reformatInstrumentData({
   const reformatForSending: UploadInstrumentRecordsData = {
     groupId: currentGroup?.id,
     instrumentId: instrument.id,
-    records: recordsList
+    records: recordsList,
+    username: currentUsername ?? undefined
   };
   return reformatForSending;
 }

@@ -28,7 +28,11 @@ const RouteComponent = () => {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const instrumentInfoQuery = useInstrumentInfoQuery();
-  const userInfoQuery = useUsersQuery();
+  const userInfoQuery = useUsersQuery({
+    params: {
+      groupId: currentGroup?.id
+    }
+  });
 
   const recordsQuery = useInstrumentRecords({
     enabled: true,

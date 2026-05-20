@@ -3,7 +3,7 @@ WORKDIR /app
 ARG RELEASE_VERSION
 ENV GATEWAY_DATABASE_URL=file:/app/sqlite/gateway.db
 ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+ENV PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 RUN corepack enable
 RUN pnpm install -g turbo@latest
