@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.7.0",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=v22.11.0"
+    "node": ">=v24.15.0"
   },
   "scripts": {
     "build": "env-cmd turbo run build",
