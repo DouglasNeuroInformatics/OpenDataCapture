@@ -1,13 +1,24 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Button, Separator } from '@douglasneuroinformatics/libui/components';
+import { Button, DropdownMenu, Separator } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentKind, Language, RuntimeNotification } from '@opendatacapture/runtime-core';
 import { $Json } from '@opendatacapture/schemas/core';
 import type { Json } from '@opendatacapture/schemas/core';
-import { FullscreenIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
+import { FullscreenIcon, LanguagesIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 import type { Promisable } from 'type-fest';
+
+const ALL_LANGUAGES: { [K in Language]: { [P in Language]: string } } = {
+  en: {
+    en: 'English',
+    fr: 'Anglais'
+  },
+  fr: {
+    en: 'French',
+    fr: 'Français'
+  }
+};
 
 export type InteractiveContentSubmitResult = {
   data: Json;
@@ -18,12 +29,14 @@ export type InteractiveContentProps = {
   bundle: string;
   defaultFullscreen?: boolean;
   onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
+  supportedLanguages?: Language[];
 };
 
 export const InteractiveContent = React.memo<InteractiveContentProps>(function InteractiveContent({
   bundle,
   defaultFullscreen,
-  onSubmit
+  onSubmit,
+  supportedLanguages = []
 }) {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const { changeLanguage, resolvedLanguage } = useTranslation();
@@ -123,6 +136,27 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
         <Button size="icon" type="button" variant="outline" onClick={() => void handleToggleFullScreen()}>
           <FullscreenIcon />
         </Button>
+        {supportedLanguages?.length > 1 && (
+          <DropdownMenu>
+            <DropdownMenu.Trigger asChild>
+              <Button size="icon" type="button" variant="outline">
+                <LanguagesIcon />
+              </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content align="end">
+              {supportedLanguages.map((language) => (
+                <DropdownMenu.Item
+                  key={language}
+                  onSelect={() => {
+                    changeLanguage(language);
+                  }}
+                >
+                  {ALL_LANGUAGES[language][resolvedLanguage]}
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Content>
+          </DropdownMenu>
+        )}
       </div>
       <div className="h-full w-full overflow-hidden rounded-md border border-slate-300 dark:border-slate-700">
         <iframe
