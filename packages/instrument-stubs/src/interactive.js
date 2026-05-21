@@ -53,6 +53,25 @@ export const bilingualInteractiveInstrument = await createInstrumentStub(async (
   const { z } = await import('zod/v4');
   const { Translator } = await import('@opendatacapture/runtime-core');
 
+  const translator = new Translator({
+    translations: {
+      changeLanguage: {
+        en: 'Change Language',
+        fr: 'Changer de langue'
+      },
+      greetings: {
+        hello: {
+          en: 'Hello',
+          fr: 'Bonjour'
+        }
+      },
+      submit: {
+        en: 'Submit',
+        fr: 'Soumettre'
+      }
+    }
+  });
+
   return {
     __runtimeVersion: 1,
     kind: 'INTERACTIVE',
@@ -63,26 +82,9 @@ export const bilingualInteractiveInstrument = await createInstrumentStub(async (
       name: 'BILINGUAL_INTERACTIVE_INSTRUMENT'
     },
     content: {
+      enableLanguageSelect: true,
+      enableLanguageToggle: true,
       render(done) {
-        const translator = new Translator({
-          translations: {
-            changeLanguage: {
-              en: 'Change Language',
-              fr: 'Changer de langue'
-            },
-            greetings: {
-              hello: {
-                en: 'Hello',
-                fr: 'Bonjour'
-              }
-            },
-            submit: {
-              en: 'Submit',
-              fr: 'Soumettre'
-            }
-          }
-        });
-
         translator.init();
 
         const changeLanguageButton = document.createElement('button');
@@ -98,7 +100,6 @@ export const bilingualInteractiveInstrument = await createInstrumentStub(async (
         document.body.appendChild(submitButton);
 
         translator.onLanguageChange = () => {
-          console.log('change');
           changeLanguageButton.textContent = translator.t('changeLanguage');
           submitButton.textContent = translator.t('submit');
         };
