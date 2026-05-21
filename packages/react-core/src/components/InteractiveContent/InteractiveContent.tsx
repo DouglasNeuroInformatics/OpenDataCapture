@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Button, DropdownMenu, Separator } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog, DropdownMenu, Separator } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import type {
@@ -11,7 +11,7 @@ import type {
 } from '@opendatacapture/runtime-core';
 import { $Json } from '@opendatacapture/schemas/core';
 import type { Json } from '@opendatacapture/schemas/core';
-import { FullscreenIcon, LanguagesIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
+import { ChevronRightIcon, FullscreenIcon, LanguagesIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 import type { Promisable, Simplify } from 'type-fest';
 
 const ALL_LANGUAGES: { [K in Language]: { [P in Language]: string } } = {
@@ -44,25 +44,37 @@ export type InteractiveContentProps = Simplify<
 export const _InteractiveContent = React.memo<InteractiveContentProps>(function _InteractiveContent({
   bundle,
   defaultFullscreen,
+  enableLanguageLock,
+  enableLanguageSelect,
   enableLanguageToggle,
   onSubmit,
   supportedLanguages = []
 }) {
   const addNotification = useNotificationsStore((store) => store.addNotification);
-  const { changeLanguage, resolvedLanguage } = useTranslation();
+  const { changeLanguage, resolvedLanguage, t } = useTranslation();
   const [_, updateTheme] = useTheme();
   const [scale, setScale] = useState(100);
+  const [hasSelectedLanguage, setHasSelectedLanguage] = useState(
+    !enableLanguageSelect || supportedLanguages.length <= 1
+  );
+  const [lockDialogOpen, setLockDialogOpen] = useState(false);
   const iFrameRef = useRef<HTMLIFrameElement>(null);
+
+  const isLocked = Boolean(enableLanguageLock) && hasSelectedLanguage;
 
   const handleChangeLanguageEvent = useCallback(
     (event: CustomEvent<Language>) => {
-      if (event.detail === 'en' || event.detail === 'fr') {
-        void changeLanguage(event.detail);
-      } else {
+      if (event.detail !== 'en' && event.detail !== 'fr') {
         console.error(`Cannot change language: invalid language '${event.detail}', expected 'en' or 'fr'`);
+        return;
       }
+      if (isLocked) {
+        setLockDialogOpen(true);
+        return;
+      }
+      void changeLanguage(event.detail);
     },
-    [updateTheme]
+    [changeLanguage, isLocked]
   );
 
   const handleChangeThemeEvent = useCallback(
@@ -95,10 +107,10 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
   };
 
   useEffect(() => {
-    if (defaultFullscreen) {
+    if (defaultFullscreen && hasSelectedLanguage) {
       void iFrameRef.current?.requestFullscreen();
     }
-  }, []);
+  }, [hasSelectedLanguage]);
 
   useEffect(() => {
     document.addEventListener('changeLanguage', handleChangeLanguageEvent, false);
@@ -125,62 +137,120 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="text-muted-foreground mb-2 flex items-center justify-end gap-2">
-        <span className="text-foreground-muted text-sm">{scale}%</span>
-        <Button
-          size="icon"
-          type="button"
-          variant="outline"
-          onClick={() => {
-            if (scale > 25) {
-              setScale(scale - 25);
-            }
-          }}
-        >
-          <ZoomOutIcon />
-        </Button>
-        <Button size="icon" type="button" variant="outline" onClick={() => setScale(scale + 25)}>
-          <ZoomInIcon />
-        </Button>
-        <Separator className="mx-1 h-6" orientation="vertical" />
-        <Button size="icon" type="button" variant="outline" onClick={() => void handleToggleFullScreen()}>
-          <FullscreenIcon />
-        </Button>
-        {enableLanguageToggle && supportedLanguages?.length > 1 && (
-          <DropdownMenu>
-            <DropdownMenu.Trigger asChild>
-              <Button size="icon" type="button" variant="outline">
-                <LanguagesIcon />
-              </Button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content align="end">
-              {supportedLanguages.map((language) => (
-                <DropdownMenu.Item
-                  key={language}
-                  onSelect={() => {
-                    changeLanguage(language);
-                  }}
-                >
-                  {ALL_LANGUAGES[language][resolvedLanguage]}
-                </DropdownMenu.Item>
-              ))}
-            </DropdownMenu.Content>
-          </DropdownMenu>
-        )}
-      </div>
-      <div className="h-full w-full overflow-hidden rounded-md border border-slate-300 dark:border-slate-700">
-        <iframe
-          allow="fullscreen"
-          className="origin-top-left"
-          data-bundle={bundle}
-          lang={resolvedLanguage}
-          name="interactive-instrument"
-          ref={iFrameRef}
-          src="/runtime/v1/@opendatacapture/runtime-internal/interactive/iframe.html"
-          style={{ backgroundColor: 'white', height: dimensions, scale: `${scale}%`, width: dimensions }}
-          title="Open Data Capture - Interactive Instrument"
-        />
-      </div>
+      {hasSelectedLanguage ? (
+        <>
+          <div className="text-muted-foreground mb-2 flex items-center justify-end gap-2">
+            <span className="text-foreground-muted text-sm">{scale}%</span>
+            <Button
+              size="icon"
+              type="button"
+              variant="outline"
+              onClick={() => {
+                if (scale > 25) {
+                  setScale(scale - 25);
+                }
+              }}
+            >
+              <ZoomOutIcon />
+            </Button>
+            <Button size="icon" type="button" variant="outline" onClick={() => setScale(scale + 25)}>
+              <ZoomInIcon />
+            </Button>
+            <Separator className="mx-1 h-6" orientation="vertical" />
+            <Button size="icon" type="button" variant="outline" onClick={() => void handleToggleFullScreen()}>
+              <FullscreenIcon />
+            </Button>
+            {enableLanguageToggle && supportedLanguages?.length > 1 && (
+              <DropdownMenu>
+                <DropdownMenu.Trigger asChild>
+                  <Button size="icon" type="button" variant="outline">
+                    <LanguagesIcon />
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content align="end">
+                  {supportedLanguages.map((language) => (
+                    <DropdownMenu.Item
+                      key={language}
+                      onSelect={() => {
+                        if (isLocked) {
+                          setLockDialogOpen(true);
+                          return;
+                        }
+                        changeLanguage(language);
+                      }}
+                    >
+                      {ALL_LANGUAGES[language][resolvedLanguage]}
+                    </DropdownMenu.Item>
+                  ))}
+                </DropdownMenu.Content>
+              </DropdownMenu>
+            )}
+          </div>
+          <div className="h-full w-full overflow-hidden rounded-md border border-slate-300 dark:border-slate-700">
+            <iframe
+              allow="fullscreen"
+              className="origin-top-left"
+              data-bundle={bundle}
+              lang={resolvedLanguage}
+              name="interactive-instrument"
+              ref={iFrameRef}
+              src="/runtime/v1/@opendatacapture/runtime-internal/interactive/iframe.html"
+              style={{ backgroundColor: 'white', height: dimensions, scale: `${scale}%`, width: dimensions }}
+              title="Open Data Capture - Interactive Instrument"
+            />
+          </div>
+        </>
+      ) : (
+        <div className="flex h-full w-full items-center justify-center p-6">
+          <div className="flex w-full max-w-lg flex-col gap-8">
+            <h2 className="text-center text-2xl font-semibold tracking-tight">
+              {t({ en: 'Select Language', fr: 'Sélectionnez une langue' })}
+            </h2>
+            <div className="flex flex-col gap-2.5">
+              {supportedLanguages.map((language) => {
+                const otherLanguage = (Object.keys(ALL_LANGUAGES) as Language[]).find((l) => l !== language);
+                return (
+                  <button
+                    className="group flex items-center justify-between rounded-lg border border-slate-200 px-5 py-4 text-left transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none dark:border-slate-700 dark:hover:bg-slate-900/50"
+                    key={language}
+                    type="button"
+                    onClick={() => {
+                      void changeLanguage(language);
+                      setHasSelectedLanguage(true);
+                    }}
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-base font-medium">{ALL_LANGUAGES[language][language]}</span>
+                      {otherLanguage && (
+                        <span className="text-muted-foreground text-xs">{ALL_LANGUAGES[language][otherLanguage]}</span>
+                      )}
+                    </div>
+                    <ChevronRightIcon className="text-muted-foreground group-hover:text-foreground h-5 w-5 transition-transform group-hover:translate-x-0.5" />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+      <Dialog open={lockDialogOpen} onOpenChange={setLockDialogOpen}>
+        <Dialog.Content onOpenAutoFocus={(event) => event.preventDefault()}>
+          <Dialog.Header>
+            <Dialog.Title>{t({ en: 'Cannot Change Language', fr: 'Impossible de changer la langue' })}</Dialog.Title>
+            <Dialog.Description>
+              {t({
+                en: 'The language cannot be changed during this instrument.',
+                fr: 'La langue ne peut pas être modifiée pendant cet instrument.'
+              })}
+            </Dialog.Description>
+          </Dialog.Header>
+          <Dialog.Footer>
+            <Button type="button" variant="primary" onClick={() => setLockDialogOpen(false)}>
+              {t({ en: 'OK', fr: 'OK' })}
+            </Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
     </div>
   );
 });

@@ -84,6 +84,7 @@ export const bilingualInteractiveInstrument = await createInstrumentStub(async (
     content: {
       enableLanguageSelect: true,
       enableLanguageToggle: true,
+      enableLanguageLock: true,
       render(done) {
         translator.init();
 
