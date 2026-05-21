@@ -3,11 +3,16 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, DropdownMenu, Separator } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
-import type { InstrumentKind, Language, RuntimeNotification } from '@opendatacapture/runtime-core';
+import type {
+  InstrumentKind,
+  InteractiveInstrument,
+  Language,
+  RuntimeNotification
+} from '@opendatacapture/runtime-core';
 import { $Json } from '@opendatacapture/schemas/core';
 import type { Json } from '@opendatacapture/schemas/core';
 import { FullscreenIcon, LanguagesIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
-import type { Promisable } from 'type-fest';
+import type { Promisable, Simplify } from 'type-fest';
 
 const ALL_LANGUAGES: { [K in Language]: { [P in Language]: string } } = {
   en: {
@@ -25,15 +30,18 @@ export type InteractiveContentSubmitResult = {
   kind: Extract<InstrumentKind, 'INTERACTIVE'>;
 };
 
-export type InteractiveContentProps = {
-  bundle: string;
-  defaultFullscreen?: boolean;
-  enableLanguageToggle?: boolean;
-  onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
-  supportedLanguages?: Language[];
-};
+export type InteractiveContentProps = Simplify<
+  Pick<
+    InteractiveInstrument['content'],
+    'defaultFullscreen' | 'enableLanguageLock' | 'enableLanguageSelect' | 'enableLanguageToggle'
+  > & {
+    bundle: string;
+    onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
+    supportedLanguages?: Language[];
+  }
+>;
 
-export const InteractiveContent = React.memo<InteractiveContentProps>(function InteractiveContent({
+export const _InteractiveContent = React.memo<InteractiveContentProps>(function _InteractiveContent({
   bundle,
   defaultFullscreen,
   enableLanguageToggle,
@@ -175,4 +183,8 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
       </div>
     </div>
   );
+});
+
+export const InteractiveContent = React.memo<InteractiveContentProps>(function InteractiveContent() {
+  return null;
 });
