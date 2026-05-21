@@ -1,7 +1,7 @@
 import { Card } from '@douglasneuroinformatics/libui/components';
 import { bilingualFileInstrument } from '@opendatacapture/instrument-stubs/file';
 import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
-import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
+import { bilingualInteractiveInstrument, interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
 import { seriesInstrument } from '@opendatacapture/instrument-stubs/series';
 import type { ScalarInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -19,6 +19,12 @@ const unilingualFormTarget: ScalarInstrumentBundleContainer = {
 
 const unilingualInteractiveTarget: ScalarInstrumentBundleContainer = {
   bundle: interactiveInstrument.bundle,
+  id: crypto.randomUUID(),
+  kind: 'INTERACTIVE'
+};
+
+const bilingualInteractiveTarget: ScalarInstrumentBundleContainer = {
+  bundle: bilingualInteractiveInstrument.bundle,
   id: crypto.randomUUID(),
   kind: 'INTERACTIVE'
 };
@@ -110,6 +116,12 @@ export const BilingualFile: Story = {
 export const UnilingualInteractive: Story = {
   args: {
     target: unilingualInteractiveTarget
+  }
+};
+
+export const BilingualInteractive: Story = {
+  args: {
+    target: bilingualInteractiveTarget
   }
 };
 

@@ -185,6 +185,6 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
   );
 });
 
-export const InteractiveContent = React.memo<InteractiveContentProps>(function InteractiveContent() {
-  return null;
+export const InteractiveContent = React.memo<InteractiveContentProps>(function InteractiveContent(props) {
+  return <_InteractiveContent {...props} />;
 });
