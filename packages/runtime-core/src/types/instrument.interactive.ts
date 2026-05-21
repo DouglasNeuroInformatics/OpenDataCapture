@@ -27,6 +27,10 @@ declare type InteractiveInstrument<
       };
       /** whether to enter fullscreen mode automatically when the instrument content is shown */
       defaultFullscreen?: boolean;
+      /** whether to block users from changing languages during an instrument */
+      enableLanguageLock?: boolean;
+      /** whether to provide an initial screen to select language before the instrument */
+      enableLanguageSelect?: boolean;
       /** whether to enable a button above the instrument to change languages */
       enableLanguageToggle?: boolean;
       html?: string;
