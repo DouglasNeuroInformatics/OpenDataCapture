@@ -1,7 +1,7 @@
 {
   "name": "@opendatacapture/serve-instrument",
   "type": "module",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "license": "Apache-2.0",
   "bin": {
     "serve-instrument": "./dist/cli.js"
@@ -26,8 +26,8 @@
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-internal": "workspace:*",
     "@opendatacapture/runtime-meta": "workspace:",
-    "@tailwindcss/postcss": "^4.2.0",
-    "postcss": "^8.5.6",
+    "@tailwindcss/postcss": "catalog:",
+    "postcss": "^8.5.15",
     "react": "workspace:react__19.x@*",
     "react-dom": "workspace:react-dom__19.x@*",
     "zod": "workspace:zod__3.x@*"
