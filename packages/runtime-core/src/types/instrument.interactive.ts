@@ -27,6 +27,8 @@ declare type InteractiveInstrument<
       };
       /** whether to enter fullscreen mode automatically when the instrument content is shown */
       defaultFullscreen?: boolean;
+      /** whether to enable a button above the instrument to change languages */
+      enableLanguageToggle?: boolean;
       html?: string;
       meta?: {
         [name: string]: string;

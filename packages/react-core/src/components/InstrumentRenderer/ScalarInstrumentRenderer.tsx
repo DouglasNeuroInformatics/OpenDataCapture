@@ -89,6 +89,7 @@ export const ScalarInstrumentRenderer = ({
               <InteractiveContent
                 bundle={target.bundle}
                 defaultFullscreen={instrument.content.defaultFullscreen}
+                enableLanguageToggle={instrument.content.enableLanguageToggle}
                 supportedLanguages={instrument.supportedLanguages}
                 onSubmit={handleSubmit}
               />

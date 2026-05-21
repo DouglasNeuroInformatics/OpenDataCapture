@@ -28,6 +28,7 @@ export type InteractiveContentSubmitResult = {
 export type InteractiveContentProps = {
   bundle: string;
   defaultFullscreen?: boolean;
+  enableLanguageToggle?: boolean;
   onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
   supportedLanguages?: Language[];
 };
@@ -35,6 +36,7 @@ export type InteractiveContentProps = {
 export const InteractiveContent = React.memo<InteractiveContentProps>(function InteractiveContent({
   bundle,
   defaultFullscreen,
+  enableLanguageToggle,
   onSubmit,
   supportedLanguages = []
 }) {
@@ -136,7 +138,7 @@ export const InteractiveContent = React.memo<InteractiveContentProps>(function I
         <Button size="icon" type="button" variant="outline" onClick={() => void handleToggleFullScreen()}>
           <FullscreenIcon />
         </Button>
-        {supportedLanguages?.length > 1 && (
+        {enableLanguageToggle && supportedLanguages?.length > 1 && (
           <DropdownMenu>
             <DropdownMenu.Trigger asChild>
               <Button size="icon" type="button" variant="outline">
