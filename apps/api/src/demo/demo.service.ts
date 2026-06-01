@@ -3,6 +3,8 @@ import { InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/lib
 import { faker } from '@faker-js/faker';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
+import arbitrarySingleFileInstrument from '@opendatacapture/instrument-library/file/ARBITRARY_SINGLE_FILE.js';
+import mriScanSessionInstrument from '@opendatacapture/instrument-library/file/MRI_SCAN_SESSION.js';
 import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-library/forms/DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE.js';
 import generalConsentForm from '@opendatacapture/instrument-library/forms/DNP_GENERAL_CONSENT_FORM.js';
 import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/DNP_HAPPINESS_QUESTIONNAIRE.js';
@@ -71,6 +73,12 @@ export class DemoService {
 
       await this.instrumentsService.create({ bundle: happinessQuestionnaireWithConsent });
       this.loggingService.debug('Done creating series instruments');
+
+      await Promise.all([
+        this.instrumentsService.create({ bundle: arbitrarySingleFileInstrument }),
+        this.instrumentsService.create({ bundle: mriScanSessionInstrument })
+      ]);
+      this.loggingService.debug('Done creating file instruments');
 
       const groups: (Group & { dummyIdPrefix?: string })[] = [];
       for (const group of DEMO_GROUPS) {

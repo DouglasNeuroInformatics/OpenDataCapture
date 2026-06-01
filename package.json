@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.7.0",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=v22.11.0"
+    "node": ">=v24.15.0"
   },
   "scripts": {
     "build": "env-cmd turbo run build",
@@ -26,6 +26,7 @@
     "postinstall": "turbo telemetry disable",
     "prepare": "husky",
     "preview:core": "env-cmd turbo run preview --filter=@opendatacapture/api --filter=@opendatacapture/gateway --filter=@opendatacapture/web",
+    "start": "turbo run start",
     "test": "env-cmd vitest",
     "test:coverage": "vitest --coverage",
     "test:e2e": "env-cmd turbo run test:e2e",

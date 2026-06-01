@@ -28,7 +28,9 @@ export class AbilityFactory {
         ability.can('manage', 'Group', { id: { in: groupIds } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');
+        ability.can('create', 'InstrumentRecordFile', { groupId: { in: groupIds } });
         ability.can('read', 'InstrumentRecord', { groupId: { in: groupIds } });
+        ability.can('read', 'InstrumentRecordFile', { groupId: { in: groupIds } });
         ability.can('create', 'Session');
         ability.can('read', 'Session', { groupId: { in: groupIds } });
         ability.can('create', 'Subject');
@@ -39,6 +41,7 @@ export class AbilityFactory {
         ability.can('read', 'Group', { id: { in: groupIds } });
         ability.can('read', 'Instrument');
         ability.can('create', 'InstrumentRecord');
+        ability.can('create', 'InstrumentRecordFile', { groupId: { in: groupIds } });
         ability.can('read', 'Session', { groupId: { in: groupIds } });
         ability.can('create', 'Session');
         ability.can('create', 'Subject');

@@ -1,4 +1,4 @@
-import { detectSubjectType } from '@casl/ability';
+import { detectSubjectType, subject } from '@casl/ability';
 import { createPrismaAbility } from '@casl/prisma';
 import type { PrismaQuery } from '@casl/prisma';
 import { createAccessibleByFactory } from '@casl/prisma/runtime';
@@ -6,7 +6,7 @@ import type { AppSubject, Prisma } from '@prisma/client';
 
 import type { PrismaModelWhereInputMap } from '@/core/prisma';
 
-import type { AppAbilities, AppAbility, AppAction, Permission } from './auth.types';
+import type { AppAbilities, AppAbility, AppAction, AppSubjectModels, AppSubjectName, Permission } from './auth.types';
 
 const accessibleBy = createAccessibleByFactory<PrismaModelWhereInputMap, PrismaQuery>();
 
@@ -15,6 +15,16 @@ export function detectAppSubject(obj: { [key: string]: any }) {
     return obj.__modelName as AppSubject;
   }
   return detectSubjectType(obj) as AppSubject;
+}
+
+export function forcedAppSubject<TSubjectName extends Exclude<AppSubjectName, 'all'>>(
+  name: TSubjectName,
+  obj: Partial<AppSubjectModels[TSubjectName]>
+) {
+  return subject(name, {
+    __modelName: name,
+    ...obj
+  } as unknown as AppSubjectModels[TSubjectName]);
 }
 
 export function createAppAbility(permissions: Permission[]): AppAbility {

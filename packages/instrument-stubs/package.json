@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "license": "Apache-2.0",
   "exports": {
+    "./file": "./src/file.js",
     "./forms": "./src/forms.js",
     "./interactive": "./src/interactive.js",
     "./series": "./src/series.js"

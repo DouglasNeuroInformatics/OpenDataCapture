@@ -1,12 +1,14 @@
 import { Button, Dialog, Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { AnyUnilingualFormInstrument, FormInstrument } from '@opendatacapture/runtime-core';
+import type { AnyUnilingualFormInstrument, FormInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
 import { InfoIcon } from 'lucide-react';
 import type { Promisable } from 'type-fest';
 
+export type FormContentSubmitResult = { data: FormInstrument.Data; kind: Extract<InstrumentKind, 'FORM'> };
+
 export type FormContentProps = {
   instrument: AnyUnilingualFormInstrument;
-  onSubmit: (data: FormInstrument.Data) => Promisable<void>;
+  onSubmit: (result: FormContentSubmitResult) => Promisable<void>;
 };
 
 export const FormContent = ({ instrument, onSubmit }: FormContentProps) => {
@@ -22,7 +24,7 @@ export const FormContent = ({ instrument, onSubmit }: FormContentProps) => {
               <InfoIcon />
             </Button>
           </Dialog.Trigger>
-          <Dialog.Content className="sm:max-w-[425px]">
+          <Dialog.Content className="sm:max-w-106.25">
             <Dialog.Header>
               <Dialog.Title>
                 {t({
@@ -43,7 +45,7 @@ export const FormContent = ({ instrument, onSubmit }: FormContentProps) => {
         data-testid="form-content"
         initialValues={instrument.initialValues}
         validationSchema={instrument.validationSchema}
-        onSubmit={(data) => void onSubmit(data)}
+        onSubmit={(data) => void onSubmit({ data, kind: 'FORM' })}
       />
     </div>
   );

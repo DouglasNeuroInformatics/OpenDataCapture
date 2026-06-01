@@ -1,9 +1,21 @@
+/* eslint-disable @typescript-eslint/consistent-type-definitions */
+
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import axios, { isAxiosError } from 'axios';
 
 import { config } from '@/config';
 import { useAppStore } from '@/store';
+
+declare module 'axios' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  export interface AxiosRequestConfig<D = any> {
+    meta?: {
+      disableDefaultAuth?: boolean;
+      disableDefaultTimeout?: boolean;
+    };
+  }
+}
 
 axios.defaults.baseURL = config.setup.apiBaseUrl;
 
@@ -13,11 +25,7 @@ axios.interceptors.request.use((config) => {
   config.headers.setAccept(['application/json', 'application/x-msgpack']);
 
   // Do not set timeout for setup (can be CPU intensive, especially on slow server)
-  if (
-    config.url !== '/v1/setup' &&
-    config.url !== '/v1/instrument-records/upload' &&
-    config.url !== '/v1/instrument-records/export'
-  ) {
+  if (!config.meta?.disableDefaultTimeout) {
     config.timeout = 10000; // abort request after 10 seconds
     config.timeoutErrorMessage = i18n.t({
       en: 'Network Error',
@@ -25,7 +33,7 @@ axios.interceptors.request.use((config) => {
     });
   }
 
-  if (accessToken) {
+  if (accessToken && !config.meta?.disableDefaultAuth) {
     config.headers.set('Authorization', `Bearer ${accessToken}`);
   }
 

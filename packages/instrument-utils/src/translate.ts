@@ -1,7 +1,9 @@
 import type {
   AnyInstrument,
+  AnyMultilingualFileInstrument,
   AnyMultilingualFormInstrument,
   AnyMultilingualInteractiveInstrument,
+  AnyUnilingualFileInstrument,
   AnyUnilingualFormInstrument,
   AnyUnilingualInstrument,
   AnyUnilingualInteractiveInstrument,
@@ -20,6 +22,7 @@ import { mapValues, wrap } from 'lodash-es';
 import { match, P } from 'ts-pattern';
 
 import {
+  isFileInstrument,
   isFormInstrument,
   isInteractiveInstrument,
   isMultilingualInstrument,
@@ -288,6 +291,23 @@ function translateInteractive(
   };
 }
 
+function translateFile(instrument: AnyMultilingualFileInstrument, language: Language): AnyUnilingualFileInstrument {
+  return {
+    ...instrument,
+    clientDetails: translateClientDetails(instrument.clientDetails, language),
+    content: {
+      fileGroups: instrument.content.fileGroups.map((group) => ({
+        ...group,
+        label: group.label[language]
+      }))
+    },
+    details: translateDetails(instrument.details, language),
+    language,
+    measures: translateMeasures(instrument.measures as MultilingualInstrumentMeasures, language),
+    tags: instrument.tags[language]
+  };
+}
+
 function translateSeries(series: SeriesInstrument<Language[]>, language: Language): SeriesInstrument<Language> {
   return {
     ...series,
@@ -350,6 +370,8 @@ export function translateInstrument(instrument: AnyInstrument, preferredLanguage
     return translateSeries(instrument, targetLanguage);
   } else if (isInteractiveInstrument(instrument)) {
     return translateInteractive(instrument, targetLanguage);
+  } else if (isFileInstrument(instrument)) {
+    return translateFile(instrument, targetLanguage);
   }
   throw new Error(`Unexpected instrument kind: ${(instrument as AnyInstrument).kind}`);
 }

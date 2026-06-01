@@ -121,21 +121,6 @@ const RouteComponent = () => {
         content={[
           {
             fields: {
-              password: {
-                calculateStrength: (password) => {
-                  return estimatePasswordStrength(password).score;
-                },
-                kind: 'string',
-                label: t('common.password'),
-                variant: 'password'
-              },
-              // eslint-disable-next-line perfectionist/sort-objects
-              confirmPassword: {
-                kind: 'string',
-                label: t('common.confirmPassword'),
-                variant: 'password'
-              },
-              // eslint-disable-next-line perfectionist/sort-objects
               email: {
                 kind: 'string',
                 label: t({
@@ -143,6 +128,21 @@ const RouteComponent = () => {
                   fr: 'Courriel'
                 }),
                 variant: 'input'
+              },
+              // eslint-disable-next-line perfectionist/sort-objects
+              confirmPassword: {
+                kind: 'string',
+                label: t('common.confirmPassword'),
+                variant: 'password'
+              },
+
+              password: {
+                calculateStrength: (password) => {
+                  return estimatePasswordStrength(password).score;
+                },
+                kind: 'string',
+                label: t('common.password'),
+                variant: 'password'
               },
               phoneNumber: {
                 kind: 'string',

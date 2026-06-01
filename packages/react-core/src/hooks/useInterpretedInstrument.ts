@@ -4,7 +4,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
 import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
 import { translateInstrument } from '@opendatacapture/instrument-utils';
-import type { AnyInstrument, AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
+import type { AnyInstrument, AnyUnilingualInstrument, Language } from '@opendatacapture/runtime-core';
 
 export type InterpretedInstrumentState<TInstrument extends AnyUnilingualInstrument = AnyUnilingualInstrument> =
   | { error: Error; status: 'ERROR' }
@@ -20,10 +20,12 @@ export type InterpretedInstrumentState<TInstrument extends AnyUnilingualInstrume
 export function useInterpretedInstrument<TInstrument extends AnyUnilingualInstrument = AnyUnilingualInstrument>(
   bundle: string,
   options?: InterpretOptions
-): InterpretedInstrumentState<TInstrument> {
+): InterpretedInstrumentState<TInstrument & { supportedLanguages: Language[] }> {
   const interpreter = useMemo(() => new InstrumentInterpreter(), []);
   const [instrument, setInstrument] = useState<AnyInstrument | null>(null);
-  const [state, setState] = useState<InterpretedInstrumentState<TInstrument>>({ status: 'LOADING' });
+  const [state, setState] = useState<InterpretedInstrumentState<TInstrument & { supportedLanguages: Language[] }>>({
+    status: 'LOADING'
+  });
   const { resolvedLanguage } = useTranslation();
 
   useEffect(() => {
@@ -41,7 +43,13 @@ export function useInterpretedInstrument<TInstrument extends AnyUnilingualInstru
 
   useEffect(() => {
     if (instrument) {
-      setState({ instrument: translateInstrument(instrument, resolvedLanguage) as TInstrument, status: 'DONE' });
+      setState({
+        instrument: {
+          ...(translateInstrument(instrument, resolvedLanguage) as TInstrument),
+          supportedLanguages: Array.isArray(instrument.language) ? instrument.language : [instrument.language]
+        },
+        status: 'DONE'
+      });
     }
   }, [resolvedLanguage, instrument]);
 

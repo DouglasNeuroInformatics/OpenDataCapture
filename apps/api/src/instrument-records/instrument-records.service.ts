@@ -112,6 +112,7 @@ export class InstrumentRecordsService {
             id: instrumentId
           }
         },
+        pending: instrument.kind === 'FILE',
         session: {
           connect: {
             id: sessionId
@@ -230,7 +231,8 @@ export class InstrumentRecordsService {
           { instrumentId },
           { instrumentId: { in: instrumentKindIds } },
           accessibleQuery(ability, 'read', 'InstrumentRecord'),
-          { subjectId }
+          { subjectId },
+          { NOT: { pending: true } }
         ]
       }
     });

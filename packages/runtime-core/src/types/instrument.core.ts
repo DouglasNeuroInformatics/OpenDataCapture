@@ -1,5 +1,6 @@
 import type { Language } from './core.js';
 import type { InstrumentKind } from './instrument.base.js';
+import type { AnyMultilingualFileInstrument, AnyUnilingualFileInstrument, FileInstrument } from './instrument.file.js';
 import type { AnyMultilingualFormInstrument, AnyUnilingualFormInstrument, FormInstrument } from './instrument.form.js';
 import type {
   AnyMultilingualInteractiveInstrument,
@@ -9,7 +10,7 @@ import type {
 import type { SeriesInstrument } from './instrument.series.js';
 
 /** @internal */
-type AnyScalarInstrument = FormInstrument | InteractiveInstrument;
+type AnyScalarInstrument = FileInstrument | FormInstrument | InteractiveInstrument;
 
 /** @internal */
 type AnyInstrument = AnyScalarInstrument | SeriesInstrument;
@@ -19,6 +20,7 @@ type SomeInstrument<TKind extends InstrumentKind> = Extract<AnyInstrument, { kin
 
 /** @internal */
 type AnyUnilingualInstrument =
+  | AnyUnilingualFileInstrument
   | AnyUnilingualFormInstrument
   | AnyUnilingualInteractiveInstrument
   | SeriesInstrument<Language>;
@@ -27,7 +29,10 @@ type AnyUnilingualInstrument =
 type SomeUnilingualInstrument<TKind extends InstrumentKind> = Extract<AnyUnilingualInstrument, { kind: TKind }>;
 
 /** @internal */
-type AnyUnilingualScalarInstrument = AnyUnilingualFormInstrument | AnyUnilingualInteractiveInstrument;
+type AnyUnilingualScalarInstrument =
+  | AnyUnilingualFileInstrument
+  | AnyUnilingualFormInstrument
+  | AnyUnilingualInteractiveInstrument;
 
 /** @internal */
 type SomeUnilingualScalarInstrument<TKind extends InstrumentKind> = Extract<
@@ -37,6 +42,7 @@ type SomeUnilingualScalarInstrument<TKind extends InstrumentKind> = Extract<
 
 /** @internal */
 type AnyMultilingualInstrument =
+  | AnyMultilingualFileInstrument
   | AnyMultilingualFormInstrument
   | AnyMultilingualInteractiveInstrument
   | SeriesInstrument<Language[]>;

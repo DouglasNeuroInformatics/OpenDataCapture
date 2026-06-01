@@ -349,7 +349,6 @@ const RouteComponent = () => {
       setData({
         disableDelete: selectedUser?.username === currentUser?.username,
         groupOptions: Object.fromEntries(groups.map((group) => [group.id, group.name])),
-        selectedUserBasePermission: selectedUser.basePermissionLevel,
         initialValues: selectedUser?.additionalPermissions.length
           ? {
               additionalPermissions: selectedUser.additionalPermissions,
@@ -361,7 +360,8 @@ const RouteComponent = () => {
               email: selectedUser.email ?? undefined,
               groupIds: new Set(selectedUser.groupIds),
               phoneNumber: selectedUser.phoneNumber ?? undefined
-            }
+            },
+        selectedUserBasePermission: selectedUser.basePermissionLevel
       });
     }
   }, [groupsQuery.data, selectedUser]);

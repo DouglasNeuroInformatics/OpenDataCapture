@@ -9,7 +9,12 @@ export function useCreateSetupStateMutation() {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
-    mutationFn: (data: InitAppOptions) => axios.post('/v1/setup', data),
+    mutationFn: (data: InitAppOptions) =>
+      axios.post('/v1/setup', data, {
+        meta: {
+          disableDefaultTimeout: true
+        }
+      }),
     onSuccess: async () => {
       addNotification({ type: 'success' });
       await queryClient.invalidateQueries({ queryKey: [SETUP_STATE_QUERY_KEY] });

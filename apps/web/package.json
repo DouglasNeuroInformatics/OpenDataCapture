@@ -12,6 +12,7 @@
     "format:translations": "find src/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
     "inject": "pnpm exec import-meta-env -x .env.public -p dist/index.html",
     "lint": "tsc && eslint --fix src",
+    "start": "NODE_ENV=production env-cmd -f ../../.env pnpm exec import-meta-env -x .env.public -p dist/index.html && python -m http.server -d dist 3000",
     "storybook": "NODE_OPTIONS='--import=tsx' env-cmd -f ../../.env storybook dev -p 6006",
     "test": "env-cmd -f ../../.env vitest"
   },
@@ -56,7 +57,7 @@
     "type-fest": "workspace:type-fest__4.x@*",
     "xlsx": "^0.18.5",
     "zod": "workspace:zod__3.x@*",
-    "zustand": "^4.5.6"
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@opendatacapture/release-info": "workspace:*",
