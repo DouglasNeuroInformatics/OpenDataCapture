@@ -1,0 +1,29 @@
+{
+  "name": "@opendatacapture/instrument-guidelines",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Guidelines for authoring Open Data Capture instruments, intended to be read by an AI agent (e.g. Claude Code).",
+  "license": "Apache-2.0",
+  "keywords": [
+    "opendatacapture",
+    "instrument",
+    "agent",
+    "guidelines",
+    "claude"
+  ],
+  "exports": {
+    "./AGENTS.md": "./AGENTS.md",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "instrument-guidelines": "./bin/cli.mjs"
+  },
+  "files": [
+    "bin",
+    "AGENTS.md"
+  ],
+  "scripts": {
+    "format": "prettier --write bin",
+    "lint": "eslint --fix bin"
+  }
+}
