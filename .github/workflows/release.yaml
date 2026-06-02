@@ -3,13 +3,101 @@ on:
   push:
     branches: ['main']
   workflow_dispatch:
+permissions:
+  contents: write
+  packages: write
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash
 jobs:
+  configure:
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.version.outputs.should_release }}
+      version: ${{ steps.version.outputs.version }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Derive Build Matrix
+        id: matrix
+        run: |
+          matrix=$(docker compose config --no-interpolate --format json \
+            | jq -c '{include:[.services|to_entries[]|select(.value.build and .value.image)|{image:(.value.image|split(":")[0]),dockerfile:.value.build.dockerfile}]}')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+      - name: Determine Release Version
+        id: version
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await require('./.github/scripts/release.cjs')({ context, core, github, exec, glob, io })
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v3
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          cache: pnpm
+          node-version-file: '.nvmrc'
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Validate
+        run: GATEWAY_DATABASE_URL=file:${TMPDIR}tmp.db pnpm lint
+  build:
+    runs-on: ubuntu-latest
+    needs: [configure, validate]
+    if: ${{ needs.configure.outputs.should_release == 'true' }}
+    strategy:
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.configure.outputs.matrix) }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set Up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract Metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ matrix.image }}
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ needs.configure.outputs.version }}
+      - name: Build and Push Docker Images
+        uses: docker/build-push-action@v6
+        with:
+          build-args: |
+            RELEASE_VERSION=${{ needs.configure.outputs.version }}
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
   release:
-    permissions:
-      contents: write
-      packages: write
-    uses: DouglasNeuroinformatics/.github/.github/workflows/app-release.yaml@main
-    with:
-      org: DouglasNeuroinformatics
-      packages: open-data-capture-api, open-data-capture-gateway, open-data-capture-web
-      validate_command: GATEWAY_DATABASE_URL=file:${TMPDIR}tmp.db pnpm lint
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - configure
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.configure.outputs.version }}
