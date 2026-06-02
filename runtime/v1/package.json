@@ -1,12 +1,15 @@
 {
   "name": "@opendatacapture/runtime-v1",
   "type": "module",
-  "version": "1.8.10",
+  "version": "1.16.4",
   "author": {
     "name": "Douglas Neuroinformatics",
     "email": "support@douglasneuroinformatics.ca"
   },
   "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://github.com/DouglasNeuroInformatics/OpenDataCapture/#readme",
   "repository": {
     "type": "git",

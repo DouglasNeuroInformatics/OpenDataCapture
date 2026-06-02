@@ -7,14 +7,13 @@ IFS=$'\n\t'
 
 projectRoot="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
 
-# package.json files (relative to projectRoot) kept in sync with the root version
-packages=(
-  "package.json"
-  "runtime/v1/package.json"
-  "packages/instrument-bundler/package.json"
-  "packages/serve-instrument/package.json"
-  "packages/instrument-guidelines/package.json"
-)
+# package.json files kept in sync with the root version: the (private) root package,
+# plus every publishable package discovered via its `publishConfig` marker. See
+# scripts/list-publishable.sh — adding a new publishable package needs no edit here.
+packages=("$projectRoot/package.json")
+while IFS=$'\t' read -r _name _version pkgPath; do
+  packages+=("$pkgPath")
+done < <("$projectRoot/scripts/list-publishable.sh")
 
 currentVersion=$(node -e 'process.stdout.write(require(process.argv[1]).version)' "$projectRoot/package.json")
 IFS='.' read -r major minor patch <<< "$currentVersion"
@@ -38,8 +37,7 @@ case "$confirm" in
   *) echo "Aborted."; exit 0 ;;
 esac
 
-for pkg in "${packages[@]}"; do
-  file="$projectRoot/$pkg"
+for file in "${packages[@]}"; do
   node -e '
     const fs = require("fs");
     const [file, version] = process.argv.slice(1);
@@ -51,7 +49,7 @@ for pkg in "${packages[@]}"; do
     }
     fs.writeFileSync(file, updated);
   ' "$file" "$newVersion"
-  echo "Updated $pkg -> $newVersion"
+  echo "Updated ${file#"$projectRoot"/} -> $newVersion"
 done
 
 echo "Done! All packages set to $newVersion"
