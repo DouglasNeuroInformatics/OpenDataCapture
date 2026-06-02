@@ -4,6 +4,9 @@
   "version": "0.0.1",
   "description": "Guidelines for authoring Open Data Capture instruments, intended to be read by an AI agent (e.g. Claude Code).",
   "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "opendatacapture",
     "instrument",

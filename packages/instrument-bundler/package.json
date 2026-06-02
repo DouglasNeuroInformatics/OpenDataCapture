@@ -3,6 +3,9 @@
   "type": "module",
   "version": "0.0.0",
   "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.ts"
   },

@@ -3,6 +3,9 @@
   "type": "module",
   "version": "0.0.9",
   "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "serve-instrument": "./dist/cli.js"
   },
