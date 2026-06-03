@@ -24,6 +24,7 @@ import { Route as AppSessionStartSessionRouteImport } from './routes/_app/sessio
 import { Route as AppInstrumentsAccessibleInstrumentsRouteImport } from './routes/_app/instruments/accessible-instruments'
 import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
+import { Route as AppAdminBrandingRouteImport } from './routes/_app/admin/branding'
 import { Route as AppDatahubSubjectIdRouteRouteImport } from './routes/_app/datahub/$subjectId/route'
 import { Route as AppAdminUsersIndexRouteImport } from './routes/_app/admin/users/index'
 import { Route as AppAdminGroupsIndexRouteImport } from './routes/_app/admin/groups/index'
@@ -111,6 +112,11 @@ const AppAdminSettingsRoute = AppAdminSettingsRouteImport.update({
   path: '/admin/settings',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppAdminBrandingRoute = AppAdminBrandingRouteImport.update({
+  id: '/admin/branding',
+  path: '/admin/branding',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppDatahubSubjectIdRouteRoute =
   AppDatahubSubjectIdRouteRouteImport.update({
     id: '/datahub/$subjectId',
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/user': typeof AppUserRoute
   '/auth/login': typeof AuthLoginRoute
   '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
+  '/admin/branding': typeof AppAdminBrandingRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/manage': typeof AppGroupManageRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
   '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
+  '/admin/branding': typeof AppAdminBrandingRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/manage': typeof AppGroupManageRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
@@ -237,6 +245,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/_app/': typeof AppIndexRoute
   '/_app/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
+  '/_app/admin/branding': typeof AppAdminBrandingRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/group/manage': typeof AppGroupManageRoute
   '/_app/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/user'
     | '/auth/login'
     | '/datahub/$subjectId'
+    | '/admin/branding'
     | '/admin/settings'
     | '/group/manage'
     | '/instruments/accessible-instruments'
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/'
     | '/datahub/$subjectId'
+    | '/admin/branding'
     | '/admin/settings'
     | '/group/manage'
     | '/instruments/accessible-instruments'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/_app/'
     | '/_app/datahub/$subjectId'
+    | '/_app/admin/branding'
     | '/_app/admin/settings'
     | '/_app/group/manage'
     | '/_app/instruments/accessible-instruments'
@@ -453,6 +465,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminSettingsRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/admin/branding': {
+      id: '/_app/admin/branding'
+      path: '/admin/branding'
+      fullPath: '/admin/branding'
+      preLoaderRoute: typeof AppAdminBrandingRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/datahub/$subjectId': {
       id: '/_app/datahub/$subjectId'
       path: '/datahub/$subjectId'
@@ -560,6 +579,7 @@ interface AppRouteRouteChildren {
   AppUserRoute: typeof AppUserRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDatahubSubjectIdRouteRoute: typeof AppDatahubSubjectIdRouteRouteWithChildren
+  AppAdminBrandingRoute: typeof AppAdminBrandingRoute
   AppAdminSettingsRoute: typeof AppAdminSettingsRoute
   AppGroupManageRoute: typeof AppGroupManageRoute
   AppInstrumentsAccessibleInstrumentsRoute: typeof AppInstrumentsAccessibleInstrumentsRoute
@@ -582,6 +602,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppUserRoute: AppUserRoute,
   AppIndexRoute: AppIndexRoute,
   AppDatahubSubjectIdRouteRoute: AppDatahubSubjectIdRouteRouteWithChildren,
+  AppAdminBrandingRoute: AppAdminBrandingRoute,
   AppAdminSettingsRoute: AppAdminSettingsRoute,
   AppGroupManageRoute: AppGroupManageRoute,
   AppInstrumentsAccessibleInstrumentsRoute:

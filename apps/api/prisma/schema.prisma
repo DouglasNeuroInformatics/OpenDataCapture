@@ -275,10 +275,57 @@ model Session {
 
 // Setup
 
+type BrandingText {
+  en String?
+  fr String?
+}
+
+type ResourceLink {
+  href  String
+  label String
+}
+
+type BrandingConfig {
+  boldDetails              Boolean?
+  boldName                 Boolean?
+  boldResourceLinks        Boolean?
+  boldTagline              Boolean?
+  customLogoHeight         Int?
+  customLogoSrc            String?
+  customLogoUrl            String?
+  customLogoWidth          Int?
+  customPrimaryColor       String?
+  customSecondaryColor     String?
+  detailsFontSize          Int?
+  instanceDetails          BrandingText?
+  instanceName             BrandingText?
+  instanceTagline          BrandingText?
+  loginTheme               String?
+  logoAlignment            String?
+  logoSize                 String?
+  logoSource               String?
+  nameAlignment            String?
+  nameFontSize             Int?
+  panelTextColor           String?
+  resourceLinks            ResourceLink[]
+  resourceLinksFontSize    Int?
+  rightPanelPrimaryColor   String?
+  rightPanelSecondaryColor String?
+  rightPanelTheme          String?
+  sectionsOrder            String[]
+  showDetails              Boolean?
+  showFooterLinks          Boolean?
+  showLogo                 Boolean?
+  showResourceLinks        Boolean?
+  showTagline              Boolean?
+  taglineFontSize          Int?
+}
+
 model SetupState {
-  createdAt                     DateTime @default(now()) @db.Date
-  updatedAt                     DateTime @updatedAt @db.Date
-  id                            String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt                     DateTime        @default(now()) @db.Date
+  updatedAt                     DateTime        @updatedAt @db.Date
+  id                            String          @id @default(auto()) @map("_id") @db.ObjectId
+  branding                      BrandingConfig?
   isDemo                        Boolean
   isExperimentalFeaturesEnabled Boolean?
   isSetup                       Boolean

@@ -2,11 +2,11 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Link } from '@tanstack/react-router';
 
 import { config } from '@/config';
-
-const CURRENT_YEAR = new Date().getFullYear();
+import { useCurrentYear } from '@/hooks/useCurrentYear';
 
 export const Footer = () => {
   const { t } = useTranslation('layout');
+  const currentYear = useCurrentYear();
 
   return (
     <footer className="text-muted-foreground container py-3 text-sm" data-testid="footer">
@@ -51,7 +51,7 @@ export const Footer = () => {
         </div>
       </div>
       <p className="text-center">
-        &copy; {CURRENT_YEAR} {t('organization.name')}
+        &copy; {currentYear} {t('organization.name')}
       </p>
     </footer>
   );

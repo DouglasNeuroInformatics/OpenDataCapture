@@ -51,9 +51,8 @@ const RouteComponent = () => {
         preventResetValuesOnReset={true}
         validationSchema={
           z.object({
-            customLogoSvg: z.string().optional(),
             isExperimentalFeaturesEnabled: z.boolean()
-          }) satisfies z.ZodType<SetNonNullable<UpdateSetupStateData>>
+          }) satisfies z.ZodType<Pick<SetNonNullable<UpdateSetupStateData>, 'isExperimentalFeaturesEnabled'>>
         }
         onSubmit={handleSubmit}
       />
