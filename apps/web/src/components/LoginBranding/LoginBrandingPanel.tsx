@@ -253,7 +253,7 @@ export const LoginBrandingPanel = ({
             )}
             href={link.href}
             key={`${link.href}-${index}`}
-            rel="noreferrer"
+            rel="noopener noreferrer"
             target="_blank"
           >
             <LinkIcon className={preview ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5'} />
