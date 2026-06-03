@@ -210,7 +210,9 @@ const RouteComponent = () => {
       panelTextColor: saved?.panelTextColor ?? DEFAULT_PANEL_TEXT_COLOR,
       resourceLinks: saved?.resourceLinks?.length ? saved.resourceLinks.map((l) => ({ ...l })) : [],
       resourceLinksFontSize: saved?.resourceLinksFontSize ?? null,
-      rightPanelOption: (saved?.rightPanelTheme ?? 'none') as RightPanelOption,
+      rightPanelOption: RIGHT_PANEL_OPTIONS.includes((saved?.rightPanelTheme ?? 'none') as RightPanelOption)
+        ? ((saved?.rightPanelTheme ?? 'none') as RightPanelOption)
+        : 'none',
       rightPanelPrimaryColor: saved?.rightPanelPrimaryColor ?? LOGIN_THEME_COLORS.slate.primary,
       rightPanelSecondaryColor: saved?.rightPanelSecondaryColor ?? LOGIN_THEME_COLORS.slate.secondary,
       sectionsOrder:
