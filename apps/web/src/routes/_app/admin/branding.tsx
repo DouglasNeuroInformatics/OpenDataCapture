@@ -601,7 +601,7 @@ const RouteComponent = () => {
                   </div>
                   <Card.Description className="mt-1">
                     {t({
-                      en: 'Upload an 1 MB image (SVG,PNG,JPEG) or link to one.',
+                      en: 'Upload a 1 MB image (SVG, PNG, JPEG) or link to one.',
                       fr: 'Téléversez une image de 1 Mo (SVG,PNG,JPEG) ou indiquez un lien.'
                     })}
                   </Card.Description>
