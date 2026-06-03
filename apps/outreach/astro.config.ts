@@ -147,7 +147,7 @@ export default defineConfig({
           'docs/fr/docs': '../../docs/fr'
         }
       }),
-      tailwind()
+      tailwind() as any
     ],
     // this is necessary because the MDX imports will attempt to resolve from their actual location
     resolve: {
