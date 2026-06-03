@@ -52,10 +52,18 @@ export const $BrandingText = z.object({
   fr: z.string().max(300).nullish()
 });
 
+/**
+ * Resource-link hrefs render into `<a href>` on the login page, so they must be
+ * restricted to http(s) here (the server-side gate) — otherwise a crafted value
+ * like `javascript:` or `data:` would be a script-injection vector. The pattern
+ * also requires a dotted host (e.g. example.com) and mirrors the client form's.
+ */
+const RESOURCE_LINK_URL_PATTERN = /^https?:\/\/\S+\.\S+$/;
+
 /** A single resource link displayed in the branding panel. */
 export type ResourceLink = z.infer<typeof $ResourceLink>;
 export const $ResourceLink = z.object({
-  href: z.string().min(1).max(2000),
+  href: z.string().max(2000).regex(RESOURCE_LINK_URL_PATTERN, 'Must be an http(s) URL'),
   label: z.string().min(1).max(120)
 });
 

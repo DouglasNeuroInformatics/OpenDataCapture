@@ -13,7 +13,7 @@
  *  - An unsaved-changes guard (useBlocker) compares a JSON snapshot of `form`.
  *  - Empty strings are normalized to `null` on save so the panel uses defaults.
  */
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import {
   Button,
@@ -160,6 +160,14 @@ type FormState = {
   taglineFontSize: null | number;
 };
 
+/**
+ * Serialize form state for the unsaved-changes check. The uploaded-logo data URI
+ * (`customLogoSrc`) can be megabytes, so it is collapsed to its length here —
+ * it only changes on an explicit upload/remove, and this keeps the dirty check
+ * cheap on every keystroke instead of re-stringifying the whole image.
+ */
+const snapshotForm = (form: FormState): string => JSON.stringify({ ...form, customLogoSrc: form.customLogoSrc.length });
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const RouteComponent = () => {
@@ -231,8 +239,10 @@ const RouteComponent = () => {
   // ── Unsaved-changes guard ───────────────────────────────────────────────
   // Snapshot of the form state as it appeared when last saved (or on mount).
   // Used to detect unsaved edits and warn the user before they navigate away.
-  const savedSnapshotRef = useRef<string>(JSON.stringify(form));
-  const isDirty = JSON.stringify(form) !== savedSnapshotRef.current;
+  // Memoized so the (potentially large) form is serialized only when it changes.
+  const formSnapshot = useMemo(() => snapshotForm(form), [form]);
+  const savedSnapshotRef = useRef<string>(formSnapshot);
+  const isDirty = formSnapshot !== savedSnapshotRef.current;
 
   // Block in-app navigation (TanStack Router back button, link clicks, etc.)
   // and the native `beforeunload` (tab close / refresh / external nav) when dirty.
@@ -409,7 +419,7 @@ const RouteComponent = () => {
       .filter((l) => l.href && l.label);
     // Capture the snapshot at submit time so a concurrent edit during the
     // request doesn't get marked clean if the user typed while saving.
-    const submittedSnapshot = JSON.stringify(form);
+    const submittedSnapshot = snapshotForm(form);
     updateSetupStateMutation.mutate(
       {
         branding: {
