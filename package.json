@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.34.1",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=v22.11.0"
+    "node": ">=v24.15.0"
   },
   "scripts": {
     "build": "env-cmd turbo run build",
@@ -40,7 +40,7 @@
     "@swc/core": "^1.10.9",
     "@swc/helpers": "^0.5.15",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "22.x",
+    "@types/node": "24.x",
     "@vitest/browser": "^4.1.4",
     "@vitest/coverage-v8": "^4.1.4",
     "dotenv": "^16.4.7",

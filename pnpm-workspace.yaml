@@ -1,17 +1,18 @@
 ---
+blockExoticSubdeps: true
 catalog:
   '@casl/ability': '^6.7.1'
   '@casl/prisma': '^1.4.1'
   '@douglasneuroinformatics/esbuild-plugin-prisma': 'latest'
-  '@douglasneuroinformatics/libcrypto': '^0.0.5'
+  '@douglasneuroinformatics/libcrypto': '^0.0.6'
   '@douglasneuroinformatics/libjs': ^3.2.1
   '@douglasneuroinformatics/libpasswd': 'latest'
   '@douglasneuroinformatics/libstats': 'latest'
-  '@douglasneuroinformatics/libui': ^6.5.0
+  '@douglasneuroinformatics/libui': ^6.7.1
   '@douglasneuroinformatics/libui-form-types': ^0.13.0
   '@microsoft/api-extractor': '^7.47.6'
   '@prisma/client': '^6.9.0'
-  '@tailwindcss/vite': '^4.2.4'
+  '@tailwindcss/vite': '4.3.0'
   '@testing-library/dom': '^10.4.0'
   '@testing-library/jest-dom': '^6.5.0'
   '@testing-library/react': '^16.0.1'
@@ -26,10 +27,13 @@ catalog:
   neverthrow: ^8.2.0
   nodemon: '^3.1.9'
   prisma: '^6.9.0'
-  tailwindcss: '^4.1.4'
+  react-dropzone: ^14.3.8
+  '@tailwindcss/postcss': '4.3.0'
+  tailwindcss: '4.3.0'
   tsx: '4.8.2'
   serialize-error: '^11.0.3'
   vite: '^6.3.3'
+  zustand: ^5.0.13
   '@storybook/addon-docs': '^10.3.5'
   '@storybook/addon-themes': '^10.3.5'
   '@storybook/react-vite': '^10.3.5'
@@ -38,6 +42,9 @@ catalogs:
   react19:
     react: 19.1.0
     react-dom: 19.1.0
+minimumReleaseAge: 10080 # 7 days
+minimumReleaseAgeExclude:
+  - '@douglasneuroinformatics/*'
 packages:
   - 'apps/*'
   - 'packages/*'
