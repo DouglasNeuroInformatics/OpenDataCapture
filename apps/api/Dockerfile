@@ -1,4 +1,4 @@
-FROM node:lts-jod AS base
+FROM node:lts-krypton AS base
 WORKDIR /app
 ARG RELEASE_VERSION
 ENV GATEWAY_DATABASE_URL="file:/dev/null"

@@ -1,4 +1,4 @@
-FROM node:lts-jod AS base
+FROM node:lts-krypton AS base
 ARG RELEASE_VERSION
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
