@@ -21,7 +21,7 @@ jobs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Derive Build Matrix
         id: matrix
         run: |
@@ -38,11 +38,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup PNPM
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v6
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           cache: pnpm
           node-version-file: '.nvmrc'
@@ -59,7 +59,7 @@ jobs:
       matrix: ${{ fromJSON(needs.configure.outputs.matrix) }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set Up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set Up Docker Buildx
@@ -100,17 +100,22 @@ jobs:
     if: ${{ needs.configure.outputs.should_release == 'true' }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup PNPM
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v6
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           cache: pnpm
           node-version-file: '.nvmrc'
           registry-url: 'https://registry.npmjs.org'
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+      - name: Print Tool Versions
+        run: |
+          echo "pnpm: $(pnpm --version)"
+          echo "npm:  $(npm --version)"
+          echo "node: $(node --version)"
       - name: Build Publishable Packages
         run: |
           # Build each publishable package and its dependency closure (turbo skips
@@ -140,7 +145,7 @@ jobs:
       - publish-npm
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
