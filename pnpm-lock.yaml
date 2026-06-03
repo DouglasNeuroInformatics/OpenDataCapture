@@ -13,8 +13,8 @@ catalogs:
       specifier: latest
       version: 1.0.1
     '@douglasneuroinformatics/libcrypto':
-      specifier: ^0.0.5
-      version: 0.0.5
+      specifier: ^0.0.6
+      version: 0.0.6
     '@douglasneuroinformatics/libjs':
       specifier: ^3.2.1
       version: 3.2.1
@@ -211,7 +211,7 @@ importers:
         version: 1.6.1(@casl/ability@6.8.0)(@prisma/client@6.19.2(prisma@6.19.2(magicast@0.3.5)(typescript@6.0.2))(typescript@6.0.2))
       '@douglasneuroinformatics/libcrypto':
         specifier: 'catalog:'
-        version: 0.0.5
+        version: 0.0.6
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
         version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
@@ -347,7 +347,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libcrypto':
         specifier: 'catalog:'
-        version: 0.0.5
+        version: 0.0.6
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
         version: 6.7.1(immer@10.2.0)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.0)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
@@ -526,7 +526,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libcrypto':
         specifier: 'catalog:'
-        version: 0.0.5
+        version: 0.0.6
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
         version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
@@ -1155,7 +1155,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libcrypto':
         specifier: 'catalog:'
-        version: 0.0.5
+        version: 0.0.6
       '@opendatacapture/runtime-internal':
         specifier: workspace:*
         version: link:../runtime-internal
@@ -1999,9 +1999,9 @@ packages:
       typescript:
         optional: true
 
-  '@douglasneuroinformatics/libcrypto@0.0.5':
+  '@douglasneuroinformatics/libcrypto@0.0.6':
     resolution:
-      { integrity: sha512-k1i+j81Oe3V2C9qOfllYWuhFVKyOFxg5Z5wbRn9pEqkBUSesnV20Ufb94Nag7a/WT/LSFDU7LsL1Rzva1pRxtA== }
+      { integrity: sha512-vEUVnZwJj27FIi0s1q8y6zr/vQYBBOLHuwr4qHkih8HsZnw38ZPhsb1KOkEhA4mRKgRxNRvbLCIZ8c0ynm705w== }
 
   '@douglasneuroinformatics/libjs@3.2.1':
     resolution:
@@ -13621,7 +13621,7 @@ snapshots:
       - svelte
       - ts-node
 
-  '@douglasneuroinformatics/libcrypto@0.0.5':
+  '@douglasneuroinformatics/libcrypto@0.0.6':
     dependencies:
       '@hpke/core': 1.9.0
 
@@ -17196,24 +17196,6 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@vitest/browser@4.1.4(vite@7.3.1(@types/node@24.12.4)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(vitest@4.1.4)':
-    dependencies:
-      '@blazediff/core': 1.9.1
-      '@vitest/mocker': 4.1.4(vite@7.3.1(@types/node@24.12.4)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
-      '@vitest/utils': 4.1.4
-      magic-string: 0.30.21
-      pngjs: 7.0.0
-      sirv: 3.0.2
-      tinyrainbow: 3.1.0
-      vitest: 4.1.4(@types/node@24.12.4)(@vitest/coverage-v8@4.1.4)(happy-dom@20.6.3)(vite@7.3.1(@types/node@24.12.4)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
-      ws: 8.19.0
-    transitivePeerDependencies:
-      - bufferutil
-      - msw
-      - utf-8-validate
-      - vite
-    optional: true
-
   '@vitest/browser@4.1.4(vite@7.3.1(@types/node@24.12.4)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.8.2)(yaml@2.8.2))(vitest@4.1.4)':
     dependencies:
       '@blazediff/core': 1.9.1
@@ -17243,9 +17225,9 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.4(@types/node@24.12.4)(@vitest/coverage-v8@4.1.4)(happy-dom@20.6.3)(vite@7.3.1(@types/node@24.12.4)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
+      vitest: 4.1.4(@types/node@24.12.4)(@vitest/coverage-v8@4.1.4)(happy-dom@20.6.3)(vite@7.3.1(@types/node@24.12.4)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.8.2)(yaml@2.8.2))
     optionalDependencies:
-      '@vitest/browser': 4.1.4(vite@7.3.1(@types/node@24.12.4)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(vitest@4.1.4)
+      '@vitest/browser': 4.1.4(vite@7.3.1(@types/node@24.12.4)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.8.2)(yaml@2.8.2))(vitest@4.1.4)
 
   '@vitest/expect@3.2.4':
     dependencies:
