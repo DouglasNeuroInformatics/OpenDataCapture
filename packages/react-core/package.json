@@ -37,9 +37,11 @@
     "lodash-es": "workspace:lodash-es__4.x@*",
     "lucide-react": "^0.473.0",
     "motion": "catalog:",
+    "react-dropzone": "catalog:",
     "serialize-error": "catalog:",
     "stacktrace-parser": "^0.1.11",
-    "ts-pattern": "workspace:ts-pattern__5.x@*"
+    "ts-pattern": "workspace:ts-pattern__5.x@*",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@opendatacapture/instrument-stubs": "workspace:*",
