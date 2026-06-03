@@ -942,7 +942,7 @@ const RouteComponent = () => {
                   </div>
                   <Card.Description className="mt-1">
                     {t({
-                      en: 'A short description shown on the shown on the branding panel',
+                      en: 'A short description shown on the branding panel',
                       fr: 'Une courte description figurant sur le panneau de marque.'
                     })}
                   </Card.Description>
