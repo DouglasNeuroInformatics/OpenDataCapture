@@ -328,8 +328,7 @@ export const LoginBrandingPanel = ({
                 tc('text-slate-200/90 hover:text-white')
               )}
               href={config.meta.docsUrl}
-              rel="noreferrer"
-              target="_blank"
+              rel="noopener noreferrer"
             >
               <BookOpenIcon className={preview ? 'h-3 w-3' : 'h-4 w-4'} />
               {tl({ en: 'Documentation', fr: 'Documentation' })}
