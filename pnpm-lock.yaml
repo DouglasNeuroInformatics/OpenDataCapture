@@ -216,8 +216,8 @@ importers:
         specifier: 'catalog:'
         version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libnest':
-        specifier: ^8.2.0
-        version: 8.3.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.10.0)(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@nestjs/platform-fastify@11.1.24(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24))(@nestjs/testing@11.1.24(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@nestjs/platform-express@11.1.24))(@prisma/client@6.19.3(prisma@6.19.3(typescript@6.0.3))(typescript@6.0.3))(@swc/types@0.1.26)(fastify@5.8.5)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.60.4)(rxjs@7.8.2)(typescript@6.0.3)(vite@6.4.2(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.8.2)(yaml@2.9.0))(vitest@4.1.7)(zod@vendor+zod@3.x)
+        specifier: ^8.3.1
+        version: 8.3.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.10.0)(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@nestjs/platform-fastify@11.1.24(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24))(@nestjs/testing@11.1.24(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@nestjs/platform-express@11.1.24))(@prisma/client@6.19.3(prisma@6.19.3(typescript@6.0.3))(typescript@6.0.3))(@swc/types@0.1.26)(fastify@5.8.5)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.60.4)(rxjs@7.8.2)(typescript@6.0.3)(vite@6.4.2(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.8.2)(yaml@2.9.0))(vitest@4.1.7)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libpasswd':
         specifier: 'catalog:'
         version: 0.0.3(typescript@6.0.3)
@@ -2009,10 +2009,10 @@ packages:
       neverthrow: ^8.2.0
       zod: ^3.25.67 || 4.x
 
-  '@douglasneuroinformatics/libnest@8.3.0':
+  '@douglasneuroinformatics/libnest@8.3.1':
     resolution:
-      { integrity: sha512-/VYLG6Wc+D1vdi684U0XmnCpeSqWadjrB5J9akLCWbRRA+QupzqniXX4SJJFKLPBIF79y0yU1EBV1SWKHsEgYg== }
-    engines: { node: 22.x }
+      { integrity: sha512-YRO+0YNvru2dZzehGWYHbq/lZB/y39uwuSuW9GNmy9rW4d0lS+PiXSyM3EHYUU5uRIN3I+cB5zxUJTA9t+ZjQg== }
+    engines: { node: 22.x || 24.x }
     hasBin: true
     peerDependencies:
       '@nestjs/common': ^11.0.11
@@ -13782,7 +13782,7 @@ snapshots:
       type-fest: 4.41.0
       zod: link:vendor/zod@3.x
 
-  '@douglasneuroinformatics/libnest@8.3.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.10.0)(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@nestjs/platform-fastify@11.1.24(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24))(@nestjs/testing@11.1.24(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@nestjs/platform-express@11.1.24))(@prisma/client@6.19.3(prisma@6.19.3(typescript@6.0.3))(typescript@6.0.3))(@swc/types@0.1.26)(fastify@5.8.5)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.60.4)(rxjs@7.8.2)(typescript@6.0.3)(vite@6.4.2(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.8.2)(yaml@2.9.0))(vitest@4.1.7)(zod@vendor+zod@3.x)':
+  '@douglasneuroinformatics/libnest@8.3.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.10.0)(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@nestjs/platform-fastify@11.1.24(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24))(@nestjs/testing@11.1.24(@nestjs/common@11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@nestjs/platform-express@11.1.24))(@prisma/client@6.19.3(prisma@6.19.3(typescript@6.0.3))(typescript@6.0.3))(@swc/types@0.1.26)(fastify@5.8.5)(neverthrow@8.2.0)(reflect-metadata@0.1.14)(rollup@4.60.4)(rxjs@7.8.2)(typescript@6.0.3)(vite@6.4.2(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.8.2)(yaml@2.9.0))(vitest@4.1.7)(zod@vendor+zod@3.x)':
     dependencies:
       '@douglasneuroinformatics/libjs': 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@nestjs/common': 11.1.24(reflect-metadata@0.1.14)(rxjs@7.8.2)
