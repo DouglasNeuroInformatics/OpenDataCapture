@@ -497,7 +497,7 @@ export namespace Zod3 {
         date: z3.coerce.date(),
         subjectID: z3.string().regex(SUBJECT_ID_REGEX)
       });
-      shape = (instrumentSchemaWithInternal._def as z3.ZodObjectDef).shape() as { [key: string]: z3.ZodTypeAny };
+      shape = (instrumentSchemaWithInternal._def as z3.ZodObjectDef).shape();
     } else {
       instrumentSchemaWithInternal = instrumentSchema.extend({
         date: z3.coerce.date(),
@@ -621,7 +621,7 @@ export namespace Zod3 {
               })
             );
           }
-          result.push(zodCheck.data as FormTypes.Data);
+          result.push(zodCheck.data);
           rowNumber++;
         }
         return resolve(result);
