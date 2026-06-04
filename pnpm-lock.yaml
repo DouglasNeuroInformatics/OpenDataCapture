@@ -19,11 +19,11 @@ catalogs:
       specifier: ^3.2.1
       version: 3.2.1
     '@douglasneuroinformatics/libpasswd':
-      specifier: latest
+      specifier: ^0.0.3
       version: 0.0.3
     '@douglasneuroinformatics/libstats':
-      specifier: latest
-      version: 0.2.0
+      specifier: ^0.2.1
+      version: 0.2.1
     '@douglasneuroinformatics/libui':
       specifier: ^6.7.1
       version: 6.7.1
@@ -223,7 +223,7 @@ importers:
         version: 0.0.3(typescript@6.0.3)
       '@douglasneuroinformatics/libstats':
         specifier: 'catalog:'
-        version: 0.2.0
+        version: 0.2.1
       '@faker-js/faker':
         specifier: ^9.4.0
         version: 9.9.0
@@ -2037,70 +2037,70 @@ packages:
     peerDependencies:
       typescript: 6.0.x
 
-  '@douglasneuroinformatics/libstats-darwin-arm64@0.2.0':
+  '@douglasneuroinformatics/libstats-darwin-arm64@0.2.1':
     resolution:
-      { integrity: sha512-BbqzpIeVoQw+tMkh/PLFroUUHis8sUSP1i+IRi9vvRVoP1AgiYwIpsUrIWkPha/nHhyT1oJaN8xUrLHEFQrm2Q== }
-    engines: { node: 20.x || 22.x }
+      { integrity: sha512-bz1v2gk5yQFkZup5rrgxn/SW7b5zDSJhwzMWKcj5lameQbeElCsVYlQjFIqhIIxsEfukMkpOpCcRC91utSjFXQ== }
+    engines: { node: '>=20' }
     cpu: [arm64]
     os: [darwin]
 
-  '@douglasneuroinformatics/libstats-darwin-x64@0.2.0':
+  '@douglasneuroinformatics/libstats-darwin-x64@0.2.1':
     resolution:
-      { integrity: sha512-8nGvq3OjczTrXD6qXyde2wgwRN1tyeV08TQ/dtLiABvxWIkSE5A4QH3jjfmNwXwzQCxRDewl/AinmLCZXX4xWA== }
-    engines: { node: 20.x || 22.x }
+      { integrity: sha512-6MyxsGUXmFIL9jBoBa8OxCnFVZ8pim1PyMVtb4o4giHd801qtniHBJOv0rnEYS+kruFsl9xLdci7YHE9TpDRiA== }
+    engines: { node: '>=20' }
     cpu: [x64]
     os: [darwin]
 
-  '@douglasneuroinformatics/libstats-linux-arm64-gnu@0.2.0':
+  '@douglasneuroinformatics/libstats-linux-arm64-gnu@0.2.1':
     resolution:
-      { integrity: sha512-Dr65T9+qXR6zGzQoStcQeWlI7xJLMw/vTbtaY7jPhmNdUgVjILw1y4xXRhB+KSzFTd2wSq6FwWW8QVfQyrH7QA== }
-    engines: { node: 20.x || 22.x }
+      { integrity: sha512-SWFVoWOoBHScQkCuC0PyhUd7AFSV0+ADrLhsuid01cOeiQChRMPFTYDP72IboP4yV/K6+mYExcg6xKpBXoiuiQ== }
+    engines: { node: '>=20' }
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@douglasneuroinformatics/libstats-linux-arm64-musl@0.2.0':
+  '@douglasneuroinformatics/libstats-linux-arm64-musl@0.2.1':
     resolution:
-      { integrity: sha512-n3xQl6j9lkp39gvUMpsR0IPKotqU/Xobu7bYXOZo2UGeqOSg1YdCPZl1k5UiVj0xd9JVFVXifU7ksk96+h/Ydw== }
-    engines: { node: 20.x || 22.x }
+      { integrity: sha512-NrCijX6UjOnQ4sreuWMPznKFOxAB+l4cV39OOGkkerwKm99s3UjQsZ2ZCoeUbB66CE0nUqN6V2Lw1e/kaLLq0A== }
+    engines: { node: '>=20' }
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@douglasneuroinformatics/libstats-linux-x64-gnu@0.2.0':
+  '@douglasneuroinformatics/libstats-linux-x64-gnu@0.2.1':
     resolution:
-      { integrity: sha512-1Ge65QZLng+I5SWlFzGmytOeSCGjl2JKANgTAcZ7F0s8u87zciddtxe4Md98AzkrVZQaup9aeYF45Kj+aYCdeQ== }
-    engines: { node: 20.x || 22.x }
+      { integrity: sha512-S16k/wfL9t3Wrs7CKqnpwHf6W3pIprG4jTsegMTesw+H3NAiiHkhOAVbCgZYfwjFjmhal2QuUYFCMolzWRh2dQ== }
+    engines: { node: '>=20' }
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@douglasneuroinformatics/libstats-linux-x64-musl@0.2.0':
+  '@douglasneuroinformatics/libstats-linux-x64-musl@0.2.1':
     resolution:
-      { integrity: sha512-XS0tkUgXedSpMRXwaUizXn17AN1vTROKuI4mdFPUGTFjIrwQ1ZY7TAs3gGl2WOEZIjNq6ZHy1A2XvmAc6zn1kg== }
-    engines: { node: 20.x || 22.x }
+      { integrity: sha512-YD4pYtV5ZhFHrtVTaLf/Tb+kJIfpnGgAx6JJP4ClzWWAEKBa1oARnNPmJEpK2U+1ASYtGKtjeOZjq58ieeongg== }
+    engines: { node: '>=20' }
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@douglasneuroinformatics/libstats-win32-arm64-msvc@0.2.0':
+  '@douglasneuroinformatics/libstats-win32-arm64-msvc@0.2.1':
     resolution:
-      { integrity: sha512-jKomfgFrHvhIWCEWUfsyeI3iERHVdHTacYMxXH8ECl1JJJ0cH2DZcVwM8Dhm+BKozrdRy+m7CMM94m0wPYGtFw== }
-    engines: { node: 20.x || 22.x }
+      { integrity: sha512-5iz+KMMSnV3A802ELiOpAGsSNFjAOuRjbh1T2MDqH2AOT5GDu/uIbppCdOk88hb94wRncsViLAEsqwglxqY+sA== }
+    engines: { node: '>=20' }
     cpu: [arm64]
     os: [win32]
 
-  '@douglasneuroinformatics/libstats-win32-x64-msvc@0.2.0':
+  '@douglasneuroinformatics/libstats-win32-x64-msvc@0.2.1':
     resolution:
-      { integrity: sha512-CgmdfRieCbmD8iVsi8ENDp6/LXjZuubiKRY6yQW45u06DkGNKThtA7SMVolj8QjqgoR31EDtfhyj/pbjKL3Dig== }
-    engines: { node: 20.x || 22.x }
+      { integrity: sha512-DprYd9CueDxF5ieMPjhxmou9GYiY/ElSHpLRHZitAF3xkAicQ5P0/WJAu/puVVsHp8xbjw+moSS1HA9BtjDoDA== }
+    engines: { node: '>=20' }
     cpu: [x64]
     os: [win32]
 
-  '@douglasneuroinformatics/libstats@0.2.0':
+  '@douglasneuroinformatics/libstats@0.2.1':
     resolution:
-      { integrity: sha512-hfyCRnrMDdiKpxcsB6hc5GzfZ85YApT94ESP3XNpDyHYDKydcavrkFuDsP86RlkspyF6Vlt6F5tj7xQVt3LQDA== }
-    engines: { node: 20.x || 22.x }
+      { integrity: sha512-weXJgsNBdz26ldMMEh20Cn9EtR+ynn3O9v81ZEWnfBmzZmFxSlUxnevLlncJxbVM6s6SgH97C4B/L8AdGvlCxA== }
+    engines: { node: '>=20' }
 
   '@douglasneuroinformatics/libui-form-types@0.13.0':
     resolution:
@@ -13837,40 +13837,40 @@ snapshots:
       type-fest: 4.41.0
       typescript: 6.0.3
 
-  '@douglasneuroinformatics/libstats-darwin-arm64@0.2.0':
+  '@douglasneuroinformatics/libstats-darwin-arm64@0.2.1':
     optional: true
 
-  '@douglasneuroinformatics/libstats-darwin-x64@0.2.0':
+  '@douglasneuroinformatics/libstats-darwin-x64@0.2.1':
     optional: true
 
-  '@douglasneuroinformatics/libstats-linux-arm64-gnu@0.2.0':
+  '@douglasneuroinformatics/libstats-linux-arm64-gnu@0.2.1':
     optional: true
 
-  '@douglasneuroinformatics/libstats-linux-arm64-musl@0.2.0':
+  '@douglasneuroinformatics/libstats-linux-arm64-musl@0.2.1':
     optional: true
 
-  '@douglasneuroinformatics/libstats-linux-x64-gnu@0.2.0':
+  '@douglasneuroinformatics/libstats-linux-x64-gnu@0.2.1':
     optional: true
 
-  '@douglasneuroinformatics/libstats-linux-x64-musl@0.2.0':
+  '@douglasneuroinformatics/libstats-linux-x64-musl@0.2.1':
     optional: true
 
-  '@douglasneuroinformatics/libstats-win32-arm64-msvc@0.2.0':
+  '@douglasneuroinformatics/libstats-win32-arm64-msvc@0.2.1':
     optional: true
 
-  '@douglasneuroinformatics/libstats-win32-x64-msvc@0.2.0':
+  '@douglasneuroinformatics/libstats-win32-x64-msvc@0.2.1':
     optional: true
 
-  '@douglasneuroinformatics/libstats@0.2.0':
+  '@douglasneuroinformatics/libstats@0.2.1':
     optionalDependencies:
-      '@douglasneuroinformatics/libstats-darwin-arm64': 0.2.0
-      '@douglasneuroinformatics/libstats-darwin-x64': 0.2.0
-      '@douglasneuroinformatics/libstats-linux-arm64-gnu': 0.2.0
-      '@douglasneuroinformatics/libstats-linux-arm64-musl': 0.2.0
-      '@douglasneuroinformatics/libstats-linux-x64-gnu': 0.2.0
-      '@douglasneuroinformatics/libstats-linux-x64-musl': 0.2.0
-      '@douglasneuroinformatics/libstats-win32-arm64-msvc': 0.2.0
-      '@douglasneuroinformatics/libstats-win32-x64-msvc': 0.2.0
+      '@douglasneuroinformatics/libstats-darwin-arm64': 0.2.1
+      '@douglasneuroinformatics/libstats-darwin-x64': 0.2.1
+      '@douglasneuroinformatics/libstats-linux-arm64-gnu': 0.2.1
+      '@douglasneuroinformatics/libstats-linux-arm64-musl': 0.2.1
+      '@douglasneuroinformatics/libstats-linux-x64-gnu': 0.2.1
+      '@douglasneuroinformatics/libstats-linux-x64-musl': 0.2.1
+      '@douglasneuroinformatics/libstats-win32-arm64-msvc': 0.2.1
+      '@douglasneuroinformatics/libstats-win32-x64-msvc': 0.2.1
 
   '@douglasneuroinformatics/libui-form-types@0.13.0':
     dependencies:
