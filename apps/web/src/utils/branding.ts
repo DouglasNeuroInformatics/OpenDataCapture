@@ -6,7 +6,7 @@ export type LoginThemeColors = {
 };
 
 /** The curated gradient palettes, keyed by theme name. */
-export const LOGIN_THEME_COLORS: Record<Exclude<LoginTheme, 'custom'>, LoginThemeColors> = {
+export const LOGIN_THEME_COLORS: { [K in Exclude<LoginTheme, 'custom'>]: LoginThemeColors } = {
   forest: { primary: '#10b981', secondary: '#064e3b' },
   midnight: { primary: '#1f2937', secondary: '#020617' },
   ocean: { primary: '#0ea5e9', secondary: '#0c4a6e' },

@@ -5,8 +5,6 @@ import { LoginBrandingPanel } from './LoginBrandingPanel';
 
 type Story = StoryObj<typeof LoginBrandingPanel>;
 
-export default { component: LoginBrandingPanel } as Meta<typeof LoginBrandingPanel>;
-
 const baseBranding: BrandingConfig = {
   instanceName: { en: 'Open Data Capture', fr: 'Open Data Capture' },
   instanceTagline: {
@@ -57,3 +55,5 @@ export const CustomGradient: Story = {
     className: 'h-screen w-screen'
   }
 };
+
+export default { component: LoginBrandingPanel } as Meta<typeof LoginBrandingPanel>;

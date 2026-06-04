@@ -224,9 +224,7 @@ const RouteComponent = () => {
       rightPanelPrimaryColor: saved?.rightPanelPrimaryColor ?? LOGIN_THEME_COLORS.slate.primary,
       rightPanelSecondaryColor: saved?.rightPanelSecondaryColor ?? LOGIN_THEME_COLORS.slate.secondary,
       sectionsOrder:
-        saved?.sectionsOrder?.length === PANEL_SECTIONS.length
-          ? (saved.sectionsOrder as PanelSection[])
-          : DEFAULT_SECTIONS_ORDER,
+        saved?.sectionsOrder?.length === PANEL_SECTIONS.length ? saved.sectionsOrder : DEFAULT_SECTIONS_ORDER,
       showDetails: saved?.showDetails !== false,
       showFooterLinks: saved?.showFooterLinks ?? true,
       showLogo: saved?.showLogo !== false,

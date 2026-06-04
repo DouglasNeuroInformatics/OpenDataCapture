@@ -2,6 +2,21 @@ import { z } from 'zod/v4';
 
 import { $CreateUserData } from '../user/user.js';
 
+const $HexColor = z.string().regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, 'Must be a valid hex color (e.g. #0ea5e9)');
+
+/**
+ * Resource-link hrefs render into `<a href>` on the login page, so they must be
+ * restricted to http(s) here (the server-side gate) — otherwise a crafted value
+ * like `javascript:` or `data:` would be a script-injection vector. The pattern
+ * also requires a dotted host (e.g. example.com) and mirrors the client form's.
+ */
+const RESOURCE_LINK_URL_PATTERN = /^https?:\/\/\S+\.\S+$/;
+
+const $FontSize = z
+  .number()
+  .int()
+  .refine((n): n is FontSize => (FONT_SIZES as readonly number[]).includes(n), 'Must be a supported font size');
+
 export const $ReleaseVersion = z.string().regex(/[0-9]+.[0-9]+.[0-9]+/);
 
 export type DevelopmentReleaseInfo = z.infer<typeof $DevelopmentReleaseInfo>;
@@ -43,22 +58,12 @@ export type LogoSource = (typeof LOGO_SOURCES)[number];
 export const PANEL_SECTIONS = ['logo', 'name', 'tagline', 'details', 'resources'] as const;
 export type PanelSection = (typeof PANEL_SECTIONS)[number];
 
-const $HexColor = z.string().regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, 'Must be a valid hex color (e.g. #0ea5e9)');
-
 /** A piece of branding text with an English and French variant. */
 export type BrandingText = z.infer<typeof $BrandingText>;
 export const $BrandingText = z.object({
   en: z.string().max(300).nullish(),
   fr: z.string().max(300).nullish()
 });
-
-/**
- * Resource-link hrefs render into `<a href>` on the login page, so they must be
- * restricted to http(s) here (the server-side gate) — otherwise a crafted value
- * like `javascript:` or `data:` would be a script-injection vector. The pattern
- * also requires a dotted host (e.g. example.com) and mirrors the client form's.
- */
-const RESOURCE_LINK_URL_PATTERN = /^https?:\/\/\S+\.\S+$/;
 
 /** A single resource link displayed in the branding panel. */
 export type ResourceLink = z.infer<typeof $ResourceLink>;
@@ -70,11 +75,6 @@ export const $ResourceLink = z.object({
 /** Allowed login-panel font sizes, in pixels. Used by the per-section size pickers. */
 export const FONT_SIZES = [10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72] as const;
 export type FontSize = (typeof FONT_SIZES)[number];
-
-const $FontSize = z
-  .number()
-  .int()
-  .refine((n): n is FontSize => (FONT_SIZES as readonly number[]).includes(n), 'Must be a supported font size');
 
 export type BrandingConfig = z.infer<typeof $BrandingConfig>;
 export const $BrandingConfig = z.object({

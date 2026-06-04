@@ -125,9 +125,7 @@ export const LoginBrandingPanel = ({
   const showResourceLinks = (branding?.showResourceLinks ?? false) && (branding?.resourceLinks?.length ?? 0) > 0;
 
   const sectionsOrder: PanelSection[] =
-    branding?.sectionsOrder?.length === DEFAULT_SECTIONS_ORDER.length
-      ? (branding.sectionsOrder as PanelSection[])
-      : DEFAULT_SECTIONS_ORDER;
+    branding?.sectionsOrder?.length === DEFAULT_SECTIONS_ORDER.length ? branding.sectionsOrder : DEFAULT_SECTIONS_ORDER;
 
   // ── Logo sizing ──────────────────────────────────────────────────────────
   const baseW = branding?.customLogoWidth ?? null;
