@@ -102,14 +102,14 @@ export class SubjectsService {
       return { success: true };
     }
     await this.prismaClient.$transaction([
-      this.prismaClient.session.deleteMany({
+      this.prismaClient.instrumentRecord.deleteMany({
         where: {
           subject: {
             id: subject.id
           }
         }
       }),
-      this.prismaClient.instrumentRecord.deleteMany({
+      this.prismaClient.session.deleteMany({
         where: {
           subject: {
             id: subject.id
