@@ -407,13 +407,15 @@ class SubjectCommands:
     @require_token
     @staticmethod
     def find(min_date: datetime | None, subject_id: str | None) -> None:
-        url = build_url_with_params(
-            f'{config.base_url}/v1/subjects',
-            {
-                'minDate': min_date,
-                'subjectId': subject_id,
-            },
-        )
+        if subject_id is not None:
+            url = f'{config.base_url}/v1/subjects/{quote(subject_id, safe="")}'
+        else:
+            url = build_url_with_params(
+                f'{config.base_url}/v1/subjects',
+                {
+                    'minDate': min_date,
+                },
+            )
         response = HttpClient.get(url)
         print(response)
 
