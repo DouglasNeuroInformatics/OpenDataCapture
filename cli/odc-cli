@@ -242,15 +242,15 @@ class HttpClient:
 
     @classmethod
     def _request(cls, method: str, url: str, data: Any = None) -> HttpResponse:
-        headers = cls._get_default_headers()
         body = json.dumps(data).encode('utf-8') if data is not None else None
+        headers = cls._get_default_headers(has_body=body is not None)
         request = Request(url, data=body, headers=headers, method=method)
         return cls._send(request)
 
     @classmethod
     def _send(cls, req: Request) -> HttpResponse:
         try:
-            with urlopen(req, timeout=2) as response:
+            with urlopen(req, timeout=30) as response:
                 return cls._build_response(response)
         except HTTPError as err:
             return cls._build_response(err)
@@ -283,8 +283,10 @@ class HttpClient:
         return HttpResponse(data=data, status=response.getcode())
 
     @staticmethod
-    def _get_default_headers() -> dict[str, str]:
-        headers = {'Content-Type': 'application/json'}
+    def _get_default_headers(has_body: bool = False) -> dict[str, str]:
+        headers: dict[str, str] = {}
+        if has_body:
+            headers['Content-Type'] = 'application/json'
         if config.access_token:
             headers['Authorization'] = f'Bearer {config.access_token}'
         return headers
