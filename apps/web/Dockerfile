@@ -22,7 +22,9 @@ RUN pnpm install --frozen-lockfile
 RUN turbo build --filter=@opendatacapture/web
 
 # RUN SERVER
-FROM base AS runner
-RUN pnpm install -g @import-meta-env/cli@0.6.8 http-server@14.1.1
-COPY --from=installer /app/apps/web/.env.public /app/apps/web/dist/ ./
-CMD [ "sh", "-c", "import-meta-env -x .env.public -p index.html && http-server -s -p 80 -P http://localhost:80? --gzip ." ]
+FROM caddy:2.7-alpine AS runner
+RUN apk add --no-cache nodejs npm
+RUN npm install -g @import-meta-env/cli@0.6.8
+COPY apps/web/Caddyfile /etc/caddy/Caddyfile
+COPY --from=installer /app/apps/web/.env.public /app/apps/web/dist/ /srv/
+CMD [ "sh", "-c", "import-meta-env -x .env.public -p index.html && caddy run --config /etc/caddy/Caddyfile --adapter caddyfile" ]
