@@ -368,7 +368,7 @@ class InstrumentRecordsCommands:
         url = build_url_with_params(
             f'{config.base_url}/v1/instrument-records',
             {
-                'minDate': min_date,
+                'minDate': min_date.isoformat() if min_date is not None else None,
                 'instrumentId': instrument_id,
                 'subjectId': subject_id,
             },
@@ -572,9 +572,9 @@ class CLI:
         find_parser.add_argument(
             '--min-date',
             type=ArgumentTypes.valid_datetime,
-            help='filter records created after this date (format: yyyy-mm-dd or yyyy-mm-dd hh:mm:ss)',
+            help='filter subjects created after this date (format: yyyy-mm-dd or yyyy-mm-dd hh:mm:ss). Cannot be used with --subject-id',
         )
-        find_parser.add_argument('--subject-id', help='filter by subject id')
+        find_parser.add_argument('--subject-id', help='find a single subject by exact id. Cannot be used with --min-date')
         find_parser.set_defaults(fn=SubjectCommands.find)
 
     def _create_instruments_parser(self):
@@ -615,7 +615,7 @@ class CLI:
         app_group.add_argument(
             '--dummy-subject-count',
             type=int,
-            help='.umber of dummy subjects to create for the demo',
+            help='number of dummy subjects to create for the demo',
         )
         app_group.add_argument(
             '--records-per-subject',
