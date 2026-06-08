@@ -13,7 +13,7 @@
  *  - An unsaved-changes guard (useBlocker) compares a JSON snapshot of `form`.
  *  - Empty strings are normalized to `null` on save so the panel uses defaults.
  */
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   Button,
@@ -108,7 +108,7 @@ const SECTION_TITLES: { [K in PanelSection]: { en: string; fr: string } } = {
 const DEFAULT_SECTIONS_ORDER: PanelSection[] = ['logo', 'name', 'tagline', 'details', 'resources'];
 const HEX_PATTERN = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 /** Accept http(s) URLs with a hostname containing at least one dot (e.g. example.com). */
-const URL_PATTERN = /^https?:\/\/\S+\.\S+$/;
+const URL_PATTERN = /^https?:\/\/[^\s/]+\.[^\s/]+(\/\S*)?$/;
 const MAX_LOGO_BYTES = 1024 * 1024;
 const FORM_ID = 'branding-form';
 /** Sentinel Select value representing "no override — use the default font size". */
@@ -160,6 +160,52 @@ type FormState = {
   taglineFontSize: null | number;
 };
 
+const buildFormState = (saved: BrandingConfig | null | undefined): FormState => {
+  const savedLogoSrc = saved?.customLogoSrc ?? '';
+  const savedLogoUrl = saved?.customLogoUrl ?? '';
+  const legacyUrlInSrc = !savedLogoUrl && savedLogoSrc !== '' && !savedLogoSrc.startsWith('data:');
+  return {
+    boldDetails: saved?.boldDetails === true,
+    boldName: saved?.boldName !== false,
+    boldResourceLinks: saved?.boldResourceLinks === true,
+    boldTagline: saved?.boldTagline === true,
+    customLogoHeight: saved?.customLogoHeight ? String(saved.customLogoHeight) : '',
+    customLogoSrc: legacyUrlInSrc ? '' : savedLogoSrc,
+    customLogoUrl: legacyUrlInSrc ? savedLogoSrc : savedLogoUrl,
+    customLogoWidth: saved?.customLogoWidth ? String(saved.customLogoWidth) : '',
+    customPrimaryColor: saved?.customPrimaryColor ?? LOGIN_THEME_COLORS.ocean.primary,
+    customSecondaryColor: saved?.customSecondaryColor ?? LOGIN_THEME_COLORS.ocean.secondary,
+    detailsFontSize: saved?.detailsFontSize ?? null,
+    instanceDetails: { en: saved?.instanceDetails?.en ?? '', fr: saved?.instanceDetails?.fr ?? '' },
+    instanceName: { en: saved?.instanceName?.en ?? '', fr: saved?.instanceName?.fr ?? '' },
+    instanceTagline: { en: saved?.instanceTagline?.en ?? '', fr: saved?.instanceTagline?.fr ?? '' },
+    loginTheme: saved?.loginTheme ?? 'slate',
+    logoAlignment: saved?.logoAlignment ?? 'left',
+    logoSize: saved?.logoSize ?? 'small',
+    logoSource: saved?.logoSource ?? (legacyUrlInSrc ? 'url' : 'upload'),
+    nameAlignment: saved?.nameAlignment ?? 'left',
+    nameFontSize: saved?.nameFontSize ?? null,
+    panelTextColor: saved?.panelTextColor ?? DEFAULT_PANEL_TEXT_COLOR,
+    resourceLinks: saved?.resourceLinks?.length ? saved.resourceLinks.map((l) => ({ ...l })) : [],
+    resourceLinksFontSize: saved?.resourceLinksFontSize ?? null,
+    rightPanelOption: RIGHT_PANEL_OPTIONS.includes((saved?.rightPanelTheme ?? 'none') as RightPanelOption)
+      ? ((saved?.rightPanelTheme ?? 'none') as RightPanelOption)
+      : 'none',
+    rightPanelPrimaryColor: saved?.rightPanelPrimaryColor ?? LOGIN_THEME_COLORS.slate.primary,
+    rightPanelSecondaryColor: saved?.rightPanelSecondaryColor ?? LOGIN_THEME_COLORS.slate.secondary,
+    sectionsOrder:
+      saved?.sectionsOrder?.length === PANEL_SECTIONS.length
+        ? (saved.sectionsOrder as PanelSection[])
+        : DEFAULT_SECTIONS_ORDER,
+    showDetails: saved?.showDetails !== false,
+    showFooterLinks: saved?.showFooterLinks ?? true,
+    showLogo: saved?.showLogo !== false,
+    showResourceLinks: saved?.showResourceLinks ?? false,
+    showTagline: saved?.showTagline !== false,
+    taglineFontSize: saved?.taglineFontSize ?? null
+  };
+};
+
 /**
  * Serialize form state for the unsaved-changes check. The uploaded-logo data URI
  * (`customLogoSrc`) can be megabytes, so it is collapsed to its length here —
@@ -187,52 +233,7 @@ const RouteComponent = () => {
 
   const saved = setupStateQuery.data.branding;
 
-  const [form, setForm] = useState<FormState>(() => {
-    // Migrate legacy data: before the upload/URL split, a single `customLogoSrc`
-    // held *either* an uploaded data URI or a URL. Route a legacy URL into the
-    // new URL slot so both slots stay correct going forward.
-    const savedLogoSrc = saved?.customLogoSrc ?? '';
-    const savedLogoUrl = saved?.customLogoUrl ?? '';
-    const legacyUrlInSrc = !savedLogoUrl && savedLogoSrc !== '' && !savedLogoSrc.startsWith('data:');
-    return {
-      boldDetails: saved?.boldDetails === true,
-      boldName: saved?.boldName !== false,
-      boldResourceLinks: saved?.boldResourceLinks === true,
-      boldTagline: saved?.boldTagline === true,
-      customLogoHeight: saved?.customLogoHeight ? String(saved.customLogoHeight) : '',
-      customLogoSrc: legacyUrlInSrc ? '' : savedLogoSrc,
-      customLogoUrl: legacyUrlInSrc ? savedLogoSrc : savedLogoUrl,
-      customLogoWidth: saved?.customLogoWidth ? String(saved.customLogoWidth) : '',
-      customPrimaryColor: saved?.customPrimaryColor ?? LOGIN_THEME_COLORS.ocean.primary,
-      customSecondaryColor: saved?.customSecondaryColor ?? LOGIN_THEME_COLORS.ocean.secondary,
-      detailsFontSize: saved?.detailsFontSize ?? null,
-      instanceDetails: { en: saved?.instanceDetails?.en ?? '', fr: saved?.instanceDetails?.fr ?? '' },
-      instanceName: { en: saved?.instanceName?.en ?? '', fr: saved?.instanceName?.fr ?? '' },
-      instanceTagline: { en: saved?.instanceTagline?.en ?? '', fr: saved?.instanceTagline?.fr ?? '' },
-      loginTheme: saved?.loginTheme ?? 'slate',
-      logoAlignment: saved?.logoAlignment ?? 'left',
-      logoSize: saved?.logoSize ?? 'small',
-      logoSource: saved?.logoSource ?? (legacyUrlInSrc ? 'url' : 'upload'),
-      nameAlignment: saved?.nameAlignment ?? 'left',
-      nameFontSize: saved?.nameFontSize ?? null,
-      panelTextColor: saved?.panelTextColor ?? DEFAULT_PANEL_TEXT_COLOR,
-      resourceLinks: saved?.resourceLinks?.length ? saved.resourceLinks.map((l) => ({ ...l })) : [],
-      resourceLinksFontSize: saved?.resourceLinksFontSize ?? null,
-      rightPanelOption: RIGHT_PANEL_OPTIONS.includes((saved?.rightPanelTheme ?? 'none') as RightPanelOption)
-        ? ((saved?.rightPanelTheme ?? 'none') as RightPanelOption)
-        : 'none',
-      rightPanelPrimaryColor: saved?.rightPanelPrimaryColor ?? LOGIN_THEME_COLORS.slate.primary,
-      rightPanelSecondaryColor: saved?.rightPanelSecondaryColor ?? LOGIN_THEME_COLORS.slate.secondary,
-      sectionsOrder:
-        saved?.sectionsOrder?.length === PANEL_SECTIONS.length ? saved.sectionsOrder : DEFAULT_SECTIONS_ORDER,
-      showDetails: saved?.showDetails !== false,
-      showFooterLinks: saved?.showFooterLinks ?? true,
-      showLogo: saved?.showLogo !== false,
-      showResourceLinks: saved?.showResourceLinks ?? false,
-      showTagline: saved?.showTagline !== false,
-      taglineFontSize: saved?.taglineFontSize ?? null
-    };
-  });
+  const [form, setForm] = useState<FormState>(() => buildFormState(saved));
 
   // ── Unsaved-changes guard ───────────────────────────────────────────────
   // Snapshot of the form state as it appeared when last saved (or on mount).
@@ -242,22 +243,24 @@ const RouteComponent = () => {
   const savedSnapshotRef = useRef<string>(formSnapshot);
   const isDirty = formSnapshot !== savedSnapshotRef.current;
 
+  // Rehydrate the form when the server data changes (e.g. after a save triggers
+  // a refetch) — but only when there are no unsaved local edits.
+  useEffect(() => {
+    if (!isDirty) {
+      const fresh = buildFormState(saved);
+      setForm(fresh);
+      savedSnapshotRef.current = snapshotForm(fresh);
+    }
+  }, [saved]);
+
   // Block in-app navigation (TanStack Router back button, link clicks, etc.)
   // and the native `beforeunload` (tab close / refresh / external nav) when dirty.
-  useBlocker({
+  // `withResolver` gives us proceed/reset controls to drive a custom dialog
+  // instead of the native confirm() — lets us show Yes/No with No as default.
+  const blocker = useBlocker({
     enableBeforeUnload: () => isDirty,
-    shouldBlockFn: () => {
-      if (!isDirty) return false;
-      // A native confirm() is intentional here: useBlocker needs a synchronous
-      // boolean decision, which a custom async dialog can't provide.
-      // eslint-disable-next-line no-alert
-      return !window.confirm(
-        t({
-          en: 'You have unsaved changes to the login page. Are you sure you want to leave? Your changes will be lost.',
-          fr: 'Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ? Vos modifications seront perdues.'
-        })
-      );
-    }
+    shouldBlockFn: () => isDirty,
+    withResolver: true
   });
 
   // ── State helpers ────────────────────────────────────────────────────────
@@ -1384,6 +1387,29 @@ const RouteComponent = () => {
                 </Button>
               </Card.Content>
             </Card>
+          </div>
+        </Dialog.Content>
+      </Dialog>
+
+      {/* Unsaved-changes confirmation — shown when the user tries to navigate
+          away while dirty. "No" is auto-focused so Enter keeps them on the page. */}
+      <Dialog open={blocker.status === 'blocked'} onOpenChange={() => blocker.reset?.()}>
+        <Dialog.Content>
+          <Dialog.Title>{t({ en: 'Unsaved Changes', fr: 'Modifications non enregistrées' })}</Dialog.Title>
+          <Dialog.Description>
+            {t({
+              en: 'You have unsaved changes. Are you sure you want to leave? Your changes will be lost. Select "No" and click the X in the top-right corner to keep your changes.',
+              fr: 'Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ? Vos modifications seront perdues. Sélectionnez « Non » et cliquez sur le X en haut à droite pour conserver vos modifications.'
+            })}
+          </Dialog.Description>
+          <div className="mt-4 flex justify-end gap-3">
+            <Button type="button" variant="outline" onClick={() => blocker.proceed?.()}>
+              {t({ en: 'Yes', fr: 'Oui' })}
+            </Button>
+            {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
+            <Button autoFocus type="button" onClick={() => blocker.reset?.()}>
+              {t({ en: 'No', fr: 'Non' })}
+            </Button>
           </div>
         </Dialog.Content>
       </Dialog>
