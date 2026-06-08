@@ -133,10 +133,18 @@ describe('SubjectsService', () => {
       subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
       await subjectsService.deleteById('123', { force: true });
       expect(subjectModel.delete).not.toHaveBeenCalled();
-      expect(prismaClient.session.deleteMany).toHaveBeenCalled();
-      expect(prismaClient.instrumentRecord.deleteMany).toHaveBeenCalled();
-      expect(prismaClient.subject.deleteMany).toHaveBeenCalled();
       expect(prismaClient.$transaction).toHaveBeenCalledOnce();
+    });
+    it('should pass operations to $transaction in order: instrumentRecord, session, subject', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      const instrumentRecordOp = 'instrumentRecord-op';
+      const sessionOp = 'session-op';
+      const subjectOp = 'subject-op';
+      prismaClient.instrumentRecord.deleteMany.mockReturnValueOnce(instrumentRecordOp);
+      prismaClient.session.deleteMany.mockReturnValueOnce(sessionOp);
+      prismaClient.subject.deleteMany.mockReturnValueOnce(subjectOp);
+      await subjectsService.deleteById('123', { force: true });
+      expect(prismaClient.$transaction).toHaveBeenCalledWith([instrumentRecordOp, sessionOp, subjectOp]);
     });
     it('should throw NotFoundException when subject does not exist', async () => {
       subjectModel.findFirst.mockResolvedValueOnce(null);

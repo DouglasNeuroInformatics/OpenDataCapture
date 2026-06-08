@@ -19,7 +19,7 @@ from argparse import (
     ArgumentTypeError,
     RawTextHelpFormatter,
 )
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Callable, TypedDict
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse, quote
@@ -242,15 +242,15 @@ class HttpClient:
 
     @classmethod
     def _request(cls, method: str, url: str, data: Any = None) -> HttpResponse:
-        headers = cls._get_default_headers()
         body = json.dumps(data).encode('utf-8') if data is not None else None
+        headers = cls._get_default_headers(has_body=body is not None)
         request = Request(url, data=body, headers=headers, method=method)
         return cls._send(request)
 
     @classmethod
     def _send(cls, req: Request) -> HttpResponse:
         try:
-            with urlopen(req, timeout=2) as response:
+            with urlopen(req, timeout=30) as response:
                 return cls._build_response(response)
         except HTTPError as err:
             return cls._build_response(err)
@@ -283,8 +283,10 @@ class HttpClient:
         return HttpResponse(data=data, status=response.getcode())
 
     @staticmethod
-    def _get_default_headers() -> dict[str, str]:
-        headers = {'Content-Type': 'application/json'}
+    def _get_default_headers(has_body: bool = False) -> dict[str, str]:
+        headers: dict[str, str] = {}
+        if has_body:
+            headers['Content-Type'] = 'application/json'
         if config.access_token:
             headers['Authorization'] = f'Bearer {config.access_token}'
         return headers
@@ -366,7 +368,7 @@ class InstrumentRecordsCommands:
         url = build_url_with_params(
             f'{config.base_url}/v1/instrument-records',
             {
-                'minDate': min_date,
+                'minDate': min_date.isoformat() if min_date is not None else None,
                 'instrumentId': instrument_id,
                 'subjectId': subject_id,
             },
@@ -405,14 +407,21 @@ class SubjectCommands:
     @require_token
     @staticmethod
     def find(min_date: datetime | None, subject_id: str | None) -> None:
-        url = build_url_with_params(
-            f'{config.base_url}/v1/subjects',
-            {
-                'minDate': min_date,
-                'subjectId': subject_id,
-            },
-        )
-        response = HttpClient.get(url)
+        if subject_id is not None:
+            url = f'{config.base_url}/v1/subjects/{quote(subject_id, safe="")}'
+            response = HttpClient.get(url)
+        else:
+            url = build_url_with_params(
+                f'{config.base_url}/v1/subjects',
+                {}
+            )
+            response = HttpClient.get(url)
+            if min_date is not None and isinstance(response.data, list):
+                min_date_utc = min_date.replace(tzinfo=timezone.utc) if min_date.tzinfo is None else min_date
+                response.data = [
+                    s for s in response.data
+                    if datetime.fromisoformat(s['createdAt'].replace('Z', '+00:00')) >= min_date_utc
+                ]
         print(response)
 
 
@@ -563,9 +572,9 @@ class CLI:
         find_parser.add_argument(
             '--min-date',
             type=ArgumentTypes.valid_datetime,
-            help='filter records created after this date (format: yyyy-mm-dd or yyyy-mm-dd hh:mm:ss)',
+            help='filter subjects created after this date (format: yyyy-mm-dd or yyyy-mm-dd hh:mm:ss). Cannot be used with --subject-id',
         )
-        find_parser.add_argument('--subject-id', help='filter by subject id')
+        find_parser.add_argument('--subject-id', help='find a single subject by exact id. Cannot be used with --min-date')
         find_parser.set_defaults(fn=SubjectCommands.find)
 
     def _create_instruments_parser(self):
@@ -606,7 +615,7 @@ class CLI:
         app_group.add_argument(
             '--dummy-subject-count',
             type=int,
-            help='.umber of dummy subjects to create for the demo',
+            help='number of dummy subjects to create for the demo',
         )
         app_group.add_argument(
             '--records-per-subject',
