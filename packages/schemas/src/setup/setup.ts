@@ -4,7 +4,7 @@ import { $CreateUserData } from '../user/user.js';
 
 // ── Internal helpers (must precede all exports for import/exports-last) ───────
 
-const $ReleaseVersion = z.string().regex(/[0-9]+.[0-9]+.[0-9]+/);
+const $ReleaseVersion = z.string().regex(/^[0-9]+\.[0-9]+\.[0-9]+$/);
 
 const $DevelopmentReleaseInfo = z.object({
   branch: z.string().min(1),

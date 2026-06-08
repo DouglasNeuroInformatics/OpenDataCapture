@@ -208,11 +208,13 @@ const buildFormState = (saved: BrandingConfig | null | undefined): FormState => 
 
 /**
  * Serialize form state for the unsaved-changes check. The uploaded-logo data URI
- * (`customLogoSrc`) can be megabytes, so it is collapsed to its length here —
- * it only changes on an explicit upload/remove, and this keeps the dirty check
- * cheap on every keystroke instead of re-stringifying the whole image.
+ * (`customLogoSrc`) can be megabytes, so it is collapsed to a short fingerprint
+ * (length + head + tail) — collision-resistant but cheap on every keystroke.
  */
-const snapshotForm = (form: FormState): string => JSON.stringify({ ...form, customLogoSrc: form.customLogoSrc.length });
+const snapshotForm = (form: FormState): string => {
+  const s = form.customLogoSrc;
+  return JSON.stringify({ ...form, customLogoSrc: `${s.length}:${s.slice(0, 32)}:${s.slice(-32)}` });
+};
 
 // ── Component ─────────────────────────────────────────────────────────────────
 

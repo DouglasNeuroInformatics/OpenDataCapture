@@ -21,11 +21,13 @@ export function useUpdateSetupStateMutation({ successNotification }: UpdateSetup
       await axios.patch('/v1/setup', data);
     },
     onSuccess() {
-      addNotification({
-        message: successNotification?.message,
-        title: successNotification?.title,
-        type: 'success'
-      });
+      if (successNotification) {
+        addNotification({
+          message: successNotification.message,
+          title: successNotification.title,
+          type: 'success'
+        });
+      }
       void queryClient.invalidateQueries({ queryKey: [SETUP_STATE_QUERY_KEY] });
     }
   });

@@ -79,11 +79,11 @@ export class SetupService {
     if (!setupState?.isSetup) {
       throw new ServiceUnavailableException('Cannot update state before setup');
     }
+    const normalizedBranding = branding ? { resourceLinks: [], sectionsOrder: [], ...branding } : branding;
     await this.setupStateModel.update({
       data: {
         ...rest,
-        // Composite types must be replaced wholesale via `set`
-        ...(branding !== undefined ? { branding: { set: branding ?? null } } : {})
+        ...(branding !== undefined ? { branding: { set: normalizedBranding ?? null } } : {})
       },
       where: {
         id: setupState.id
