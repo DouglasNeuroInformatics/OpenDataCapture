@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-
 // Assignment creation has been moved to the dedicated remote assignment page (/session/remote-assignment).
 // This page now only displays existing assignments and allows viewing/canceling them.
 

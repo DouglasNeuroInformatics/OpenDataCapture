@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import React, { useEffect, useState } from 'react';
 
 import { Button, Dialog, Form, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
@@ -85,7 +83,7 @@ const RouteComponent = () => {
   const instrumentInfoQuery = useInstrumentInfoQuery();
   const createAssignmentMutation = useCreateAssignment();
 
-  const [selectedInstrument, setSelectedInstrument] = useState<TranslatedInstrumentInfo | null>(null);
+  const [selectedInstrument, setSelectedInstrument] = useState<null | TranslatedInstrumentInfo>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isResultSliderOpen, setIsResultSliderOpen] = useState(false);
   const [assignmentUrl, setAssignmentUrl] = useState<string | undefined>(undefined);
@@ -168,7 +166,7 @@ const RouteComponent = () => {
               }) satisfies z.ZodType<Pick<CreateAssignmentData, 'expiresAt'>>
             }
             onSubmit={async ({ expiresAt }) => {
-              const response = await createAssignmentMutation.mutateAsync({
+              const assignment = await createAssignmentMutation.mutateAsync({
                 data: {
                   expiresAt,
                   groupId: currentGroup?.id,
@@ -176,7 +174,7 @@ const RouteComponent = () => {
                   subjectId: currentSession.subject!.id
                 }
               });
-              setAssignmentUrl((response.data as { url?: string }).url);
+              setAssignmentUrl(assignment.url);
               setIsCreateModalOpen(false);
               setIsResultSliderOpen(true);
             }}
