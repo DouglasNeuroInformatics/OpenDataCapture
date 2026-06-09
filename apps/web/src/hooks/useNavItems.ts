@@ -9,6 +9,7 @@ import {
   DatabaseIcon,
   EyeIcon,
   LogsIcon,
+  SendIcon,
   UploadIcon,
   UserCogIcon,
   UsersIcon
@@ -130,6 +131,15 @@ export function useNavItems() {
         url: '/instruments/accessible-instruments'
       });
     }
+    // Remote assignment requires the gateway to be enabled, since assignments are served through it
+    if (ability?.can('create', 'Assignment') && setupStateQuery.data.isGatewayEnabled) {
+      sessionItems.push({
+        disabled: currentSession === null,
+        icon: SendIcon,
+        label: t('layout.navLinks.remoteAssignment'),
+        url: '/session/remote-assignment'
+      });
+    }
     if (ability?.can('read', 'Subject') && ability.can('read', 'InstrumentRecord')) {
       sessionItems.push({
         disabled: currentSession === null,
@@ -139,7 +149,13 @@ export function useNavItems() {
       });
     }
     setNavItems([globalItems, adminItems, sessionItems].filter((arr) => arr.length));
-  }, [currentSession, currentUser, resolvedLanguage, setupStateQuery.data.isExperimentalFeaturesEnabled]);
+  }, [
+    currentSession,
+    currentUser,
+    resolvedLanguage,
+    setupStateQuery.data.isExperimentalFeaturesEnabled,
+    setupStateQuery.data.isGatewayEnabled
+  ]);
 
   return navItems;
 }
