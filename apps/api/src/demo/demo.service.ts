@@ -11,7 +11,7 @@ import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/DN
 import breakoutTask from '@opendatacapture/instrument-library/interactive/DNP_BREAKOUT_TASK.js';
 import happinessQuestionnaireWithConsent from '@opendatacapture/instrument-library/series/DNP_HAPPINESS_QUESTIONNAIRE_WITH_CONSENT.js';
 import type { FormInstrument } from '@opendatacapture/runtime-core';
-import type { Json, Language, WithID } from '@opendatacapture/schemas/core';
+import type { Language, WithID } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 
@@ -142,7 +142,7 @@ export class DemoService {
             data.reasonNotSatisfied = faker.lorem.sentence();
           }
           await this.instrumentRecordsService.create({
-            data: data as Json,
+            data: data,
             date,
             groupId: group.id,
             instrumentId: hq.id,

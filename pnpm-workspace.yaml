@@ -13,14 +13,15 @@ allowBuilds:
   prisma: true
   sharp: true
   sqlite3: true
+blockExoticSubdeps: true
 catalog:
   '@casl/ability': '^6.7.1'
   '@casl/prisma': '^1.4.1'
   '@douglasneuroinformatics/esbuild-plugin-prisma': 'latest'
-  '@douglasneuroinformatics/libcrypto': '^0.0.5'
+  '@douglasneuroinformatics/libcrypto': '^0.0.6'
   '@douglasneuroinformatics/libjs': ^3.2.1
-  '@douglasneuroinformatics/libpasswd': 'latest'
-  '@douglasneuroinformatics/libstats': 'latest'
+  '@douglasneuroinformatics/libpasswd': '^0.0.3'
+  '@douglasneuroinformatics/libstats': '^0.2.1'
   '@douglasneuroinformatics/libui': ^6.7.1
   '@douglasneuroinformatics/libui-form-types': ^0.13.0
   '@microsoft/api-extractor': '^7.47.6'
@@ -55,6 +56,9 @@ catalogs:
   react19:
     react: 19.1.0
     react-dom: 19.1.0
+minimumReleaseAge: 10080 # 7 days
+minimumReleaseAgeExclude:
+  - '@douglasneuroinformatics/*'
 packages:
   - 'apps/*'
   - 'packages/*'

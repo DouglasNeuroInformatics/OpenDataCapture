@@ -1,8 +1,16 @@
 {
   "name": "@opendatacapture/instrument-bundler",
   "type": "module",
-  "version": "0.0.0",
+  "version": "1.16.6",
   "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture.git",
+    "directory": "packages/instrument-bundler"
+  },
   "exports": {
     ".": "./src/index.ts"
   },

@@ -3,13 +3,150 @@ on:
   push:
     branches: ['main']
   workflow_dispatch:
+permissions:
+  contents: write
+  packages: write
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash
 jobs:
-  release:
+  configure:
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.version.outputs.should_release }}
+      version: ${{ steps.version.outputs.version }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+      - name: Derive Build Matrix
+        id: matrix
+        run: |
+          matrix=$(docker compose config --no-interpolate --format json \
+            | jq -c '{include:[.services|to_entries[]|select(.value.build and .value.image)|{image:(.value.image|split(":")[0]),dockerfile:.value.build.dockerfile}]}')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+      - name: Determine Release Version
+        id: version
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await require('./.github/scripts/release.cjs')({ context, core, github, exec, glob, io })
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v6
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          cache: pnpm
+          node-version-file: '.nvmrc'
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Validate
+        run: GATEWAY_DATABASE_URL=file:${TMPDIR}tmp.db pnpm lint
+  build:
+    runs-on: ubuntu-latest
+    needs: [configure, validate]
+    if: ${{ needs.configure.outputs.should_release == 'true' }}
+    strategy:
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.configure.outputs.matrix) }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+      - name: Set Up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract Metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ matrix.image }}
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ needs.configure.outputs.version }}
+      - name: Build and Push Docker Images
+        uses: docker/build-push-action@v6
+        with:
+          build-args: |
+            RELEASE_VERSION=${{ needs.configure.outputs.version }}
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+  publish-npm:
+    runs-on: ubuntu-latest
     permissions:
-      contents: write
-      packages: write
-    uses: DouglasNeuroinformatics/.github/.github/workflows/app-release.yaml@main
-    with:
-      org: DouglasNeuroinformatics
-      packages: open-data-capture-api, open-data-capture-gateway, open-data-capture-web
-      validate_command: GATEWAY_DATABASE_URL=file:${TMPDIR}tmp.db pnpm lint
+      contents: read
+      id-token: write # mint an OIDC token for npm trusted publishing (no NPM_TOKEN needed)
+    needs:
+      - build
+      - configure
+    if: ${{ needs.configure.outputs.should_release == 'true' }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v6
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          cache: pnpm
+          node-version-file: '.nvmrc'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Print Tool Versions
+        run: |
+          echo "pnpm: $(pnpm --version)"
+          echo "npm:  $(npm --version)"
+          echo "node: $(node --version)"
+      - name: Build Publishable Packages
+        run: |
+          # Build each publishable package and its dependency closure (turbo skips
+          # packages that have no build script, e.g. those that publish source directly).
+          filters=()
+          while IFS=$'\t' read -r name version pkgPath; do
+            filters+=("--filter=${name}...")
+          done < <(scripts/list-publishable.sh)
+          pnpm exec turbo run build "${filters[@]}"
+      - name: Publish Packages
+        run: |
+          # Publish each marked package whose version is not already on npm. The version
+          # check keeps this idempotent across workflow re-runs.
+          while IFS=$'\t' read -r name version pkgPath; do
+            if [ -n "$(npm view "${name}@${version}" version 2>/dev/null)" ]; then
+              echo "Skipping ${name}@${version} (already published)"
+              continue
+            fi
+            echo "Publishing ${name}@${version}"
+            pnpm --filter "${name}" publish --no-git-checks
+          done < <(scripts/list-publishable.sh)
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - configure
+      - publish-npm
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.configure.outputs.version }}

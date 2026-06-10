@@ -17,12 +17,23 @@ function encodeFiles(files: EditorFile[]): string {
   return compressToEncodedURIComponent(JSON.stringify($EditorFiles.parse(files)));
 }
 
-export function encodeShareURL({ files, label }: Pick<InstrumentRepository, 'files' | 'label'>): ShareURL {
+export function encodeShareURL({
+  files,
+  fullscreen,
+  label
+}: Pick<InstrumentRepository, 'files' | 'label'> & { fullscreen?: boolean }): ShareURL {
   const url = new URL(location.origin) as ShareURL;
   url.searchParams.append('files', encodeFiles(files));
   url.searchParams.append('label', compressToEncodedURIComponent(label));
+  if (fullscreen) {
+    url.searchParams.append('fullscreen', '1');
+  }
   url.size = new TextEncoder().encode(url.href).length;
   return url;
+}
+
+export function isFullscreenShareURL(url: URL): boolean {
+  return url.searchParams.get('fullscreen') === '1';
 }
 
 export function decodeShareURL(url: URL): null | Pick<InstrumentRepository, 'files' | 'label'> {

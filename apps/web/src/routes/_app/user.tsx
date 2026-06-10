@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-objects */
 import { useMemo } from 'react';
 
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
@@ -63,10 +64,10 @@ const RouteComponent = () => {
       .object({
         email: z.union([z.literal(''), z.email()]).optional(),
         firstName: z.string().min(1).optional(),
-        // eslint-disable-next-line perfectionist/sort-objects
+
         dateOfBirth: z.date().optional(),
         lastName: z.string().min(1).optional(),
-        // eslint-disable-next-line perfectionist/sort-objects
+
         confirmPassword: z.string().min(1).optional(),
         password: z.string().min(1).optional(),
         phoneNumber: z.union([z.literal(''), z.string().regex(PHONE_REGEX)]).optional(),
@@ -129,19 +130,17 @@ const RouteComponent = () => {
                 }),
                 variant: 'input'
               },
-              // eslint-disable-next-line perfectionist/sort-objects
-              confirmPassword: {
-                kind: 'string',
-                label: t('common.confirmPassword'),
-                variant: 'password'
-              },
-
               password: {
                 calculateStrength: (password) => {
                   return estimatePasswordStrength(password).score;
                 },
                 kind: 'string',
                 label: t('common.password'),
+                variant: 'password'
+              },
+              confirmPassword: {
+                kind: 'string',
+                label: t('common.confirmPassword'),
                 variant: 'password'
               },
               phoneNumber: {

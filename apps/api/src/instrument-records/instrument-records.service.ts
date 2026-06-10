@@ -194,7 +194,7 @@ export class InstrumentRecordsService {
         });
 
         worker.on('error', (error) => {
-          reject(error);
+          reject(error as Error);
           void worker.terminate();
         });
       });
