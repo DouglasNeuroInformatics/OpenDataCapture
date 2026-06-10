@@ -285,11 +285,11 @@ class AllModeHandler {
 }
 
 export class Server {
-  private handler: SingleModeHandler | AllModeHandler;
+  private handler: AllModeHandler | SingleModeHandler;
   private port: number;
   private server: http.Server;
 
-  private constructor(params: { handler: SingleModeHandler | AllModeHandler; port: number }) {
+  private constructor(params: { handler: AllModeHandler | SingleModeHandler; port: number }) {
     this.handler = params.handler;
     this.port = params.port;
     this.server = http.createServer((...args) => void this.handler.handle(...args));

@@ -7,7 +7,7 @@ import { decodeBase64ToUnicode } from '@opendatacapture/runtime-internal';
 i18n.init({ translations: {} });
 
 const LanguageSwitcher: React.FC = () => {
-  const [lang, setLang] = useState<'en' | 'fr'>(i18n.resolvedLanguage as 'en' | 'fr');
+  const [lang, setLang] = useState<'en' | 'fr'>(i18n.resolvedLanguage);
   useEffect(() => {
     const handler = (l: 'en' | 'fr') => setLang(l);
     i18n.addEventListener('languageChange', handler);
@@ -35,9 +35,9 @@ type InstrumentEntry = {
   type: 'forms' | 'interactive';
 };
 
-export type RootProps =
-  | { encodedBundle: string; page: 'single' }
+type RootProps =
   | { encodedBundle: string; instrumentName: string; instrumentType: string; page: 'instrument' }
+  | { encodedBundle: string; page: 'single' }
   | { instruments: InstrumentEntry[]; page: 'index' };
 
 const IndexPage: React.FC<{ instruments: InstrumentEntry[] }> = ({ instruments }) => {
@@ -133,4 +133,4 @@ export const Root: React.FC<RootProps> = (props) => {
   );
 };
 
-export type { InstrumentEntry };
+export type { InstrumentEntry, RootProps };
