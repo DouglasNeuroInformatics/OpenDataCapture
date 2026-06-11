@@ -14,6 +14,7 @@
     "./instrument-records": "./src/instrument-records/instrument-records.ts",
     "./session": "./src/session/session.ts",
     "./setup": "./src/setup/setup.ts",
+    "./storage": "./src/storage/storage.ts",
     "./subject": "./src/subject/subject.ts",
     "./summary": "./src/summary/summary.ts",
     "./user": "./src/user/user.ts"

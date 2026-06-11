@@ -4,11 +4,12 @@ import { replacer } from '@douglasneuroinformatics/libjs';
 import { Spinner } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
-import type { Json } from '@opendatacapture/schemas/core';
+import type { AnyScalarInstrument } from '@opendatacapture/runtime-core';
 import type { ScalarInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { match } from 'ts-pattern';
 
 import { useInterpretedInstrument } from '../../hooks/useInterpretedInstrument';
+import { FileInstrumentContent } from '../FileInstrumentContent';
 import { FormContent } from '../FormContent';
 import { InstrumentOverview } from '../InstrumentOverview';
 import { InstrumentSummary } from '../InstrumentSummary';
@@ -16,13 +17,16 @@ import { InteractiveContent } from '../InteractiveContent';
 import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
 
-import type { InstrumentSubmitHandler, SubjectDisplayInfo } from '../../types';
+import type { SubjectDisplayInfo } from '../../types';
+import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
+import type { AnyContentResult, InstrumentSubmitHandler } from './types';
 
 export type ScalarInstrumentRendererProps = {
   className?: string;
+  NavigationBlocker?: NavigationBlockerComponent;
   /** @deprecated */
   onCompileError?: (error: Error) => void;
-  onSubmit: InstrumentSubmitHandler;
+  onSubmit: InstrumentSubmitHandler<AnyScalarInstrument['kind']>;
   /** @deprecated */
   options?: InterpretOptions;
   subject?: SubjectDisplayInfo;
@@ -31,6 +35,7 @@ export type ScalarInstrumentRendererProps = {
 
 export const ScalarInstrumentRenderer = ({
   className,
+  NavigationBlocker,
   onCompileError,
   onSubmit,
   options,
@@ -42,9 +47,11 @@ export const ScalarInstrumentRenderer = ({
   const [index, setIndex] = useState<0 | 1 | 2>(0);
   const { t } = useTranslation();
 
-  const handleSubmit = async (data: unknown) => {
-    await onSubmit({
-      data: JSON.parse(JSON.stringify(data, replacer)) as Json,
+  const handleSubmit = async ({ data, ...result }: AnyContentResult) => {
+    await onSubmit?.({
+      ...result,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      data: JSON.parse(JSON.stringify(data, replacer)),
       instrumentId: target.id
     });
     setIndex(2);
@@ -82,9 +89,22 @@ export const ScalarInstrumentRenderer = ({
               <InteractiveContent
                 bundle={target.bundle}
                 defaultFullscreen={instrument.content.defaultFullscreen}
+                enableLanguageLock={instrument.content.enableLanguageLock}
+                enableLanguageSelect={instrument.content.enableLanguageSelect}
+                enableLanguageToggle={instrument.content.enableLanguageToggle}
+                supportedLanguages={instrument.supportedLanguages}
                 onSubmit={handleSubmit}
               />
             ))
+            .with({ index: 1, instrument: { kind: 'FILE' } }, ({ instrument }) => {
+              return (
+                <FileInstrumentContent
+                  instrument={{ ...instrument, id: target.id }}
+                  NavigationBlocker={NavigationBlocker}
+                  onSubmit={handleSubmit}
+                />
+              );
+            })
             .with({ index: 2 }, () => (
               <InstrumentSummary data={data} instrument={instrument} subject={subject} timeCollected={Date.now()} />
             ))

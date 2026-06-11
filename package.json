@@ -1,9 +1,9 @@
 {
   "name": "opendatacapture",
   "type": "module",
-  "version": "1.16.6",
+  "version": "2.0.0",
   "private": true,
-  "packageManager": "pnpm@10.34.1",
+  "packageManager": "pnpm@10.34.3",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=v24.15.0"
@@ -26,6 +26,7 @@
     "postinstall": "turbo telemetry disable",
     "prepare": "husky",
     "preview:core": "env-cmd turbo run preview --filter=@opendatacapture/api --filter=@opendatacapture/gateway --filter=@opendatacapture/web",
+    "start": "turbo run start",
     "test": "env-cmd vitest",
     "test:coverage": "vitest --coverage",
     "test:e2e": "env-cmd turbo run test:e2e",

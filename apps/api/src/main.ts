@@ -11,6 +11,7 @@ import { InstrumentRecordsModule } from './instrument-records/instrument-records
 import { InstrumentsModule } from './instruments/instruments.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { SetupModule } from './setup/setup.module';
+import { StorageModule } from './storage/storage.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { SummaryModule } from './summary/summary.module';
 import { UsersModule } from './users/users.module';
@@ -48,6 +49,7 @@ export default AppFactory.create({
     }),
     SessionsModule,
     SetupModule,
+    StorageModule,
     SubjectsModule,
     SummaryModule,
     UsersModule,
