@@ -5,6 +5,12 @@
 		reverse_proxy api
 	}
 
+	handle_path /storage/* {
+		reverse_proxy rustfs:9000 {
+			header_up Host rustfs:9000
+		}
+	}
+
 	handle {
 		reverse_proxy web
 	}

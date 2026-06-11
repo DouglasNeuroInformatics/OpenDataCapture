@@ -303,7 +303,7 @@ function translateFile(instrument: AnyMultilingualFileInstrument, language: Lang
     },
     details: translateDetails(instrument.details, language),
     language,
-    measures: translateMeasures(instrument.measures as MultilingualInstrumentMeasures, language),
+    measures: translateMeasures(instrument.measures, language),
     tags: instrument.tags[language]
   };
 }
