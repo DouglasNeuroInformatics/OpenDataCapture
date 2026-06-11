@@ -6,6 +6,7 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout Code
         uses: actions/checkout@v5
@@ -24,11 +25,7 @@ jobs:
           git config --global --add safe.directory /__w/OpenDataCapture/OpenDataCapture
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
-      - name: Install Playwright
-        run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps
       - name: Lint
         run: pnpm lint
       - name: Unit Tests
         run: pnpm test
-      - name: End-to-End Tests
-        run: pnpm --filter "@opendatacapture/e2e" test

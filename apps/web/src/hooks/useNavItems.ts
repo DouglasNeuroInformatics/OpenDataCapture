@@ -9,6 +9,7 @@ import {
   DatabaseIcon,
   EyeIcon,
   LogsIcon,
+  PaletteIcon,
   UploadIcon,
   UserCogIcon,
   UsersIcon
@@ -89,6 +90,14 @@ export function useNavItems() {
           fr: "Paramètres de l'application"
         }),
         url: '/admin/settings'
+      });
+      adminItems.push({
+        icon: PaletteIcon,
+        label: t({
+          en: 'Customize Login Page',
+          fr: 'Personnaliser la page de connexion'
+        }),
+        url: '/admin/branding'
       });
       adminItems.push({
         icon: LogsIcon,
