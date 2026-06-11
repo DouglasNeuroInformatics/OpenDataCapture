@@ -3,6 +3,7 @@
 import type { ApprovedLicense } from '@opendatacapture/licenses';
 
 import type { InstrumentKind, InstrumentLanguage, InstrumentValidationSchema } from './types/instrument.base.js';
+import type { FileInstrument } from './types/instrument.file.js';
 import type { FormInstrument } from './types/instrument.form.js';
 import type { InteractiveInstrument } from './types/instrument.interactive.js';
 import type { SeriesInstrument } from './types/instrument.series.js';
@@ -23,8 +24,8 @@ type InternalLicensingRequirements = OpenDataCaptureContext extends { isRepo: tr
 /** @public */
 // prettier-ignore
 export type DiscriminatedInstrument<
-  TKind extends InstrumentKind,
-  TLanguage extends InstrumentLanguage,
+  TKind extends InstrumentKind, 
+  TLanguage extends InstrumentLanguage, 
   TData
 > = [TKind] extends ['FORM']
   ? TData extends FormInstrument.Data
@@ -34,7 +35,9 @@ export type DiscriminatedInstrument<
     ? TData extends InteractiveInstrument.Data
       ? InteractiveInstrument<TData, TLanguage>
       : never
-    : never;
+    : [TKind] extends ['FILE']
+      ? FileInstrument<TLanguage>
+      : never;
 
 /** @public */
 export type InstrumentDef<
