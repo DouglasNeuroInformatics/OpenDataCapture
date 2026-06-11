@@ -25,19 +25,14 @@ jobs:
           git config --global --add safe.directory /__w/OpenDataCapture/OpenDataCapture
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
-      - name: Install Playwright System Dependencies
-        run: pnpm --filter "@opendatacapture/e2e" exec playwright install-deps chromium firefox
-        timeout-minutes: 5
-        env:
-          DEBIAN_FRONTEND: noninteractive
-      - name: Install Playwright Browsers
-        run: pnpm --filter "@opendatacapture/e2e" exec playwright install chromium firefox
-        timeout-minutes: 5
-        env:
-          PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: '120000'
       - name: Lint
         run: pnpm lint
       - name: Unit Tests
         run: pnpm test
+      - name: Install Playwright
+        run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps
+        timeout-minutes: 5
+        env:
+          DEBIAN_FRONTEND: noninteractive
       - name: End-to-End Tests
         run: pnpm --filter "@opendatacapture/e2e" test
