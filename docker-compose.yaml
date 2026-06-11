@@ -35,6 +35,7 @@ services:
       - MONGO_WRITE_CONCERN=majority
       - MONGO_DIRECT_CONNECTION=true
       - MONGO_URI=mongodb://mongo:27017
+      - STORAGE_ENABLED
       - STORAGE_ENDPOINT=http://rustfs:9000
       - STORAGE_PUBLIC_ENDPOINT=${STORAGE_PUBLIC_ENDPOINT:-http://localhost:${APP_PORT}/storage}
       - STORAGE_ACCESS_KEY
@@ -129,8 +130,10 @@ services:
     environment:
       - RUSTFS_VOLUMES=/data
       - RUSTFS_ADDRESS=0.0.0.0:9000
-      - RUSTFS_ACCESS_KEY=${STORAGE_ACCESS_KEY}
-      - RUSTFS_SECRET_KEY=${STORAGE_SECRET_KEY}
+      # Fall back to placeholder credentials so the container still boots cleanly when
+      # storage is disabled (STORAGE_ENABLED=false) and no keys have been generated.
+      - RUSTFS_ACCESS_KEY=${STORAGE_ACCESS_KEY:-odc-storage}
+      - RUSTFS_SECRET_KEY=${STORAGE_SECRET_KEY:-odc-storage-secret}
       - RUSTFS_CONSOLE_ENABLE=false
     expose:
       - 9000

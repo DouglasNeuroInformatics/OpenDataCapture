@@ -10,11 +10,14 @@ import { StorageService } from './storage.service';
     {
       inject: [ConfigService],
       provide: S3Client,
-      useFactory: (configService: ConfigService): S3Client => {
+      useFactory: (configService: ConfigService): null | S3Client => {
+        if (!configService.get('STORAGE_ENABLED')) {
+          return null;
+        }
         return new S3Client({
           credentials: {
-            accessKeyId: configService.get('STORAGE_ACCESS_KEY'),
-            secretAccessKey: configService.get('STORAGE_SECRET_KEY')
+            accessKeyId: configService.get('STORAGE_ACCESS_KEY')!,
+            secretAccessKey: configService.get('STORAGE_SECRET_KEY')!
           },
           endpoint: configService.get('STORAGE_ENDPOINT'),
           forcePathStyle: true,

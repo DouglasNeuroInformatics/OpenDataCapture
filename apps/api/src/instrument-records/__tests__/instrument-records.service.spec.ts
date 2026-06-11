@@ -6,6 +6,7 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { StorageService } from '@/storage/storage.service';
 import { UsersService } from '@/users/users.service';
 
 import { GroupsService } from '../../groups/groups.service';
@@ -35,6 +36,7 @@ describe('InstrumentRecordsService', () => {
         MockFactory.createForService(InstrumentMeasuresService),
         MockFactory.createForService(InstrumentsService),
         MockFactory.createForService(SessionsService),
+        MockFactory.createForService(StorageService),
         MockFactory.createForService(SubjectsService)
       ]
     }).compile();
