@@ -122,6 +122,14 @@ const RouteComponent = () => {
         content={[
           {
             fields: {
+              email: {
+                kind: 'string',
+                label: t({
+                  en: 'Email',
+                  fr: 'Courriel'
+                }),
+                variant: 'input'
+              },
               password: {
                 calculateStrength: (password) => {
                   return estimatePasswordStrength(password).score;
@@ -134,14 +142,6 @@ const RouteComponent = () => {
                 kind: 'string',
                 label: t('common.confirmPassword'),
                 variant: 'password'
-              },
-              email: {
-                kind: 'string',
-                label: t({
-                  en: 'Email',
-                  fr: 'Courriel'
-                }),
-                variant: 'input'
               },
               phoneNumber: {
                 kind: 'string',
