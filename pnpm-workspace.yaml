@@ -1,4 +1,18 @@
 ---
+allowBuilds:
+  '@import-meta-env/unplugin': true
+  '@nestjs/core': true
+  '@prisma/client': true
+  '@prisma/engines': true
+  '@scarf/scarf': false
+  '@swc/core': true
+  cypress: true
+  esbuild: true
+  mongodb-memory-server: true
+  msgpackr-extract: false
+  prisma: true
+  sharp: true
+  sqlite3: true
 blockExoticSubdeps: true
 catalog:
   '@casl/ability': '^6.7.1'
