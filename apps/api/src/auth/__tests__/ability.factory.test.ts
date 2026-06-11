@@ -66,4 +66,41 @@ describe('AbilityFactory', () => {
     expect(ability.can('read', subject('User', { id: 'user-1' }) as any)).toBe(true);
     expect(ability.can('read', subject('User', { id: 'user-2' }) as any)).toBe(false);
   });
+
+  it('should scope standard user instrument record file uploads to their groups', () => {
+    const payload = {
+      additionalPermissions: undefined,
+      basePermissionLevel: 'STANDARD',
+      firstName: 'Test',
+      groups: [{ id: 'group-1' }],
+      id: 'user-1',
+      lastName: 'User',
+      permissions: [] as any,
+      username: 'standard-user'
+    };
+
+    const ability = abilityFactory.createForPayload(payload as any);
+
+    expect(ability.can('create', subject('InstrumentRecordFile', { groupId: 'group-1' }) as any)).toBe(true);
+    expect(ability.can('create', subject('InstrumentRecordFile', { groupId: 'group-2' }) as any)).toBe(false);
+    expect(ability.can('read', subject('InstrumentRecordFile', { groupId: 'group-1' }) as any)).toBe(false);
+  });
+
+  it('should scope group manager instrument record file uploads to their groups', () => {
+    const payload = {
+      additionalPermissions: undefined,
+      basePermissionLevel: 'GROUP_MANAGER',
+      firstName: 'Test',
+      groups: [{ id: 'group-1' }],
+      id: 'user-1',
+      lastName: 'User',
+      permissions: [] as any,
+      username: 'manager-user'
+    };
+
+    const ability = abilityFactory.createForPayload(payload as any);
+
+    expect(ability.can('create', subject('InstrumentRecordFile', { groupId: 'group-1' }) as any)).toBe(true);
+    expect(ability.can('create', subject('InstrumentRecordFile', { groupId: 'group-2' }) as any)).toBe(false);
+  });
 });
