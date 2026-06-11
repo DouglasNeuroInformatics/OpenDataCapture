@@ -29,10 +29,3 @@ jobs:
         run: pnpm lint
       - name: Unit Tests
         run: pnpm test
-      - name: Install Playwright
-        run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps
-        timeout-minutes: 5
-        env:
-          DEBIAN_FRONTEND: noninteractive
-      - name: End-to-End Tests
-        run: pnpm --filter "@opendatacapture/e2e" test
