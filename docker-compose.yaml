@@ -26,6 +26,7 @@ services:
         - RELEASE_VERSION
     depends_on:
       - mongo
+      - rustfs
     restart: unless-stopped
     environment:
       - GATEWAY_INTERNAL_NETWORK_URL=http://gateway:80
@@ -34,6 +35,12 @@ services:
       - MONGO_WRITE_CONCERN=majority
       - MONGO_DIRECT_CONNECTION=true
       - MONGO_URI=mongodb://mongo:27017
+      - STORAGE_ENDPOINT=http://rustfs:9000
+      - STORAGE_PUBLIC_ENDPOINT=${STORAGE_PUBLIC_ENDPOINT:-http://localhost:${APP_PORT}/storage}
+      - STORAGE_ACCESS_KEY
+      - STORAGE_SECRET_KEY
+      - STORAGE_BUCKET
+      - STORAGE_REGION
       - NODE_ENV=production
       - DANGEROUSLY_DISABLE_PBKDF2_ITERATION
       - DEBUG
@@ -112,6 +119,29 @@ services:
     volumes:
       - ./mongo/config:/data/configdb
       - ./mongo/data:/data/db
+    profiles:
+      - '' #load by default without having to specify docker compose --profile
+      - fullstack
+      - nogateway
+  rustfs:
+    image: rustfs/rustfs:${RUSTFS_VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      - RUSTFS_VOLUMES=/data
+      - RUSTFS_ADDRESS=0.0.0.0:9000
+      - RUSTFS_ACCESS_KEY=${STORAGE_ACCESS_KEY}
+      - RUSTFS_SECRET_KEY=${STORAGE_SECRET_KEY}
+      - RUSTFS_CONSOLE_ENABLE=false
+    expose:
+      - 9000
+    volumes:
+      - ./rustfs/data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     profiles:
       - '' #load by default without having to specify docker compose --profile
       - fullstack

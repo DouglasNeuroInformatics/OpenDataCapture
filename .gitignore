@@ -61,6 +61,7 @@ apps/outreach/src/content/docs/en/runtime-core-docs/
 
 # docker dbs
 mongo/
+rustfs/
 sqlite/
 
 # runtime core intermediate build
