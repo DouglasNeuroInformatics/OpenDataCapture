@@ -33,6 +33,8 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm --filter "@opendatacapture/e2e" exec playwright install chromium firefox
         timeout-minutes: 5
+        env:
+          PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: '120000'
       - name: Lint
         run: pnpm lint
       - name: Unit Tests
