@@ -5,7 +5,7 @@ description: 'Open Data Capture v2.0 introduces file instruments, letting resear
 author: joshua-unrau
 language: en
 datePublished: 2026-06-11
-isDraft: true
+isDraft: false
 ---
 
 Since its first release, Open Data Capture has been built around two kinds of instruments: **forms**, for structured questionnaire-style data, and **interactive instruments**, for richer, code-driven tasks. Both produce structured records that live in the database. But not all research data fits neatly into a JSON document. Sometimes the data _is_ a file — a signed consent form, a spreadsheet of behavioural results, or the raw output of an imaging session.
