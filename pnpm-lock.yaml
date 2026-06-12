@@ -460,6 +460,9 @@ importers:
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../../packages/licenses
+      '@opendatacapture/runtime-v1':
+        specifier: workspace:*
+        version: link:../../runtime/v1
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -545,6 +548,9 @@ importers:
       '@opendatacapture/instrument-bundler':
         specifier: workspace:*
         version: link:../../packages/instrument-bundler
+      '@opendatacapture/playground-url':
+        specifier: workspace:*
+        version: link:../../packages/playground-url
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
@@ -587,9 +593,6 @@ importers:
       lucide-react:
         specifier: ^0.503.0
         version: 0.503.0(react@vendor+react@19.x)
-      lz-string:
-        specifier: ^1.5.0
-        version: 1.5.0
       monaco-editor:
         specifier: ^0.52.2
         version: 0.52.2
@@ -935,6 +938,25 @@ importers:
         version: link:../../vendor/ts-pattern@5.x
 
   packages/licenses: {}
+
+  packages/playground-url:
+    dependencies:
+      chalk:
+        specifier: ^5.6.2
+        version: 5.6.2
+      commander:
+        specifier: 'catalog:'
+        version: 12.1.0
+      lz-string:
+        specifier: ^1.5.0
+        version: 1.5.0
+      zod:
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
+    devDependencies:
+      esbuild:
+        specifier: 'catalog:'
+        version: 0.23.1
 
   packages/react-core:
     dependencies:

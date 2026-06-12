@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ESNext"]
+  },
+  "include": ["scripts/*", "src/**/*", "vitest.config.ts"]
+}

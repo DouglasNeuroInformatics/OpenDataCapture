@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { LanguageToggle, Separator, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { decodeShareURL, isFullscreenShareURL } from '@opendatacapture/playground-url';
 import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 
 import { Header } from '@/components/Header';
@@ -8,7 +9,6 @@ import { MainContent } from '@/components/MainContent';
 import { Viewer } from '@/components/Viewer';
 import type { InstrumentRepository } from '@/models/instrument-repository.model';
 import { useAppStore } from '@/store';
-import { decodeShareURL, isFullscreenShareURL } from '@/utils/encode';
 
 const { initialize } = await import('esbuild-wasm');
 await initialize({
