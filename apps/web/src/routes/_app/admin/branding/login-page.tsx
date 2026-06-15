@@ -1484,6 +1484,6 @@ const RouteComponent = () => {
   );
 };
 
-export const Route = createFileRoute('/_app/admin/branding')({
+export const Route = createFileRoute('/_app/admin/branding/login-page')({
   component: RouteComponent
 });

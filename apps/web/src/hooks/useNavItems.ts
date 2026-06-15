@@ -94,8 +94,8 @@ export function useNavItems() {
       adminItems.push({
         icon: PaletteIcon,
         label: t({
-          en: 'Customize Login Page',
-          fr: 'Personnaliser la page de connexion'
+          en: 'Branding',
+          fr: 'Image de marque'
         }),
         url: '/admin/branding'
       });
