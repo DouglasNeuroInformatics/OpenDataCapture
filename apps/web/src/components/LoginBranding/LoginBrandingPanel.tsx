@@ -144,6 +144,7 @@ const ResourcesSection = ({ boldResourceLinks, fontSize, lang, links, preview, t
       style={fontStyle(fontSize, preview)}
     >
       {links.map((link, index) => {
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         const linkLabel = link.label?.[lang]?.trim() || link.label?.en?.trim() || link.label?.fr?.trim() || '';
         if (!linkLabel) return null;
         return (
@@ -228,7 +229,9 @@ export const LoginBrandingPanel = ({
   const derived = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const instanceName = branding?.instanceName?.[lang]?.trim() || DEFAULT_INSTANCE_NAME;
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const instanceTagline = branding?.instanceTagline?.[lang]?.trim() || null;
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const instanceDetails = branding?.instanceDetails?.[lang]?.trim() || null;
     const panelTextColor = branding?.panelTextColor ?? null;
     return {
