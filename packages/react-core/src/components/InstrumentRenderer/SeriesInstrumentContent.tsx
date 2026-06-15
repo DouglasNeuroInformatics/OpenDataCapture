@@ -3,15 +3,18 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createPortal } from 'react-dom';
+import type { Simplify } from 'type-fest';
 
 import type { ScalarInstrumentRendererProps } from './ScalarInstrumentRenderer';
 
-export type SeriesInstrumentContentProps = ScalarInstrumentRendererProps & {
-  status: {
-    completedInstruments: number;
-    totalInstruments: number;
-  };
-};
+export type SeriesInstrumentContentProps = Simplify<
+  ScalarInstrumentRendererProps & {
+    status: {
+      completedInstruments: number;
+      totalInstruments: number;
+    };
+  }
+>;
 
 export const SeriesInstrumentContent = ({ status }: SeriesInstrumentContentProps) => {
   const { t } = useTranslation();

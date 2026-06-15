@@ -11,6 +11,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
   UnprocessableEntityException
 } from '@nestjs/common';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
@@ -32,6 +33,7 @@ import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
+import { StorageService } from '@/storage/storage.service';
 import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
@@ -56,6 +58,7 @@ export class InstrumentRecordsService {
     private readonly instrumentMeasuresService: InstrumentMeasuresService,
     private readonly instrumentsService: InstrumentsService,
     private readonly sessionsService: SessionsService,
+    private readonly storageService: StorageService,
     private readonly subjectsService: SubjectsService
   ) {}
 
@@ -79,6 +82,11 @@ export class InstrumentRecordsService {
     if (instrument.kind === 'SERIES') {
       throw new UnprocessableEntityException(
         `Cannot create instrument record for series instrument '${instrument.id}'`
+      );
+    }
+    if (instrument.kind === 'FILE' && !this.storageService.isEnabled) {
+      throw new ServiceUnavailableException(
+        `Cannot create instrument record for file instrument '${instrument.id}': file storage is not configured`
       );
     }
 
@@ -112,6 +120,7 @@ export class InstrumentRecordsService {
             id: instrumentId
           }
         },
+        pending: instrument.kind === 'FILE',
         session: {
           connect: {
             id: sessionId
@@ -230,7 +239,8 @@ export class InstrumentRecordsService {
           { instrumentId },
           { instrumentId: { in: instrumentKindIds } },
           accessibleQuery(ability, 'read', 'InstrumentRecord'),
-          { subjectId }
+          { subjectId },
+          { NOT: { pending: true } }
         ]
       }
     });

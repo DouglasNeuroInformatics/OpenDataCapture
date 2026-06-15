@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "license": "Apache-2.0",
   "exports": {
+    "./file/*": "./dist/file/*",
     "./forms/*": "./dist/forms/*",
     "./interactive/*": "./dist/interactive/*",
     "./series/*": "./dist/series/*"

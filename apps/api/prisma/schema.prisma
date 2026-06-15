@@ -103,22 +103,23 @@ type GroupSettings {
 }
 
 model Group {
-  createdAt               DateTime           @default(now()) @db.Date
-  updatedAt               DateTime           @updatedAt @db.Date
-  id                      String             @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt               DateTime               @default(now()) @db.Date
+  updatedAt               DateTime               @updatedAt @db.Date
+  id                      String                 @id @default(auto()) @map("_id") @db.ObjectId
   accessibleInstrumentIds String[]
-  accessibleInstruments   Instrument[]       @relation(fields: [accessibleInstrumentIds], references: [id])
+  accessibleInstruments   Instrument[]           @relation(fields: [accessibleInstrumentIds], references: [id])
   assignments             Assignment[]
   auditLogs               AuditLog[]
   instrumentRecords       InstrumentRecord[]
-  name                    String             @unique
+  instrumentRecordFiles   InstrumentRecordFile[]
+  name                    String                 @unique
   settings                GroupSettings
   sessions                Session[]
-  subjects                Subject[]          @relation(fields: [subjectIds], references: [id])
+  subjects                Subject[]              @relation(fields: [subjectIds], references: [id])
   subjectIds              String[]
   type                    GroupType
-  userIds                 String[]           @db.ObjectId
-  users                   User[]             @relation(fields: [userIds], references: [id])
+  userIds                 String[]               @db.ObjectId
+  users                   User[]                 @relation(fields: [userIds], references: [id])
 
   @@map("GroupModel")
 }
@@ -126,30 +127,48 @@ model Group {
 /// Instrument Records
 
 model InstrumentRecord {
-  createdAt        DateTime    @default(now()) @db.Date
-  updatedAt        DateTime    @updatedAt @db.Date
-  id               String      @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt        DateTime               @default(now()) @db.Date
+  updatedAt        DateTime               @updatedAt @db.Date
+  id               String                 @id @default(auto()) @map("_id") @db.ObjectId
   /// [ComputedMeasures]
   computedMeasures Json?
   data             Json?
-  date             DateTime    @db.Date
-  group            Group?      @relation(fields: [groupId], references: [id])
-  groupId          String?     @db.ObjectId
-  subject          Subject     @relation(fields: [subjectId], references: [id])
+  date             DateTime               @db.Date
+  files            InstrumentRecordFile[]
+  group            Group?                 @relation(fields: [groupId], references: [id])
+  groupId          String?                @db.ObjectId
+  subject          Subject                @relation(fields: [subjectId], references: [id])
   subjectId        String
-  instrument       Instrument  @relation(fields: [instrumentId], references: [id])
+  instrument       Instrument             @relation(fields: [instrumentId], references: [id])
   instrumentId     String
-  assignment       Assignment? @relation(fields: [assignmentId], references: [id])
-  assignmentId     String?     @unique
-  session          Session     @relation(fields: [sessionId], references: [id])
-  sessionId        String      @db.ObjectId
+  assignment       Assignment?            @relation(fields: [assignmentId], references: [id])
+  assignmentId     String?                @unique
+  session          Session                @relation(fields: [sessionId], references: [id])
+  sessionId        String                 @db.ObjectId
+  pending          Boolean?
 
   @@map("InstrumentRecordModel")
 }
 
-// Instruments 
+model InstrumentRecordFile {
+  basename  String
+  createdAt DateTime         @default(now()) @db.Date
+  group     Group?           @relation(fields: [groupId], references: [id])
+  groupId   String?          @db.ObjectId
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  index     Int
+  name      String
+  record    InstrumentRecord @relation(fields: [recordId], references: [id])
+  recordId  String           @db.ObjectId
+  size      Int
+
+  @@map("InstrumentRecordFileModel")
+}
+
+// Instruments
 
 enum InstrumentKind {
+  FILE
   FORM
   INTERACTIVE
   SERIES

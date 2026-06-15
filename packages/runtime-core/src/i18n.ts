@@ -141,7 +141,7 @@ class SynchronizedTranslator<T extends { [key: string]: unknown }>
 
   @InitializedOnly
   changeLanguage(language: Language) {
-    window.top!.document.dispatchEvent(new CustomEvent('changeLanguage', { detail: language }));
+    window.parent.document.dispatchEvent(new CustomEvent('changeLanguage', { detail: language }));
   }
 
   override init(options: TranslatorInitOptions = {}) {

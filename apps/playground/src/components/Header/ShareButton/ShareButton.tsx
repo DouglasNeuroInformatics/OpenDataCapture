@@ -3,18 +3,20 @@ import { useEffect, useState } from 'react';
 import { formatByteSize } from '@douglasneuroinformatics/libjs';
 import { Heading, Input, Label, Popover, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { encodeShareURL } from '@opendatacapture/playground-url';
 import { CopyButton } from '@opendatacapture/react-core';
 import { CircleHelpIcon, Share2Icon } from 'lucide-react';
 
 import { useFilesRef } from '@/hooks/useFilesRef';
 import { useAppStore } from '@/store';
-import { encodeShareURL } from '@/utils/encode';
 
 export const ShareButton = () => {
   const label = useAppStore((store) => store.selectedInstrument.label);
   const editorFilesRef = useFilesRef();
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [shareURL, setShareURL] = useState(encodeShareURL({ files: editorFilesRef.current, label }));
+  const [shareURL, setShareURL] = useState(
+    encodeShareURL({ baseURL: window.location.origin, files: editorFilesRef.current, label })
+  );
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const { t } = useTranslation();
@@ -22,7 +24,14 @@ export const ShareButton = () => {
   // The user cannot modify the editor without closing the popover
   useEffect(() => {
     if (isPopoverOpen) {
-      setShareURL(encodeShareURL({ files: editorFilesRef.current, fullscreen: isFullscreen, label }));
+      setShareURL(
+        encodeShareURL({
+          baseURL: window.location.origin,
+          files: editorFilesRef.current,
+          fullscreen: isFullscreen,
+          label
+        })
+      );
     }
   }, [isFullscreen, isPopoverOpen, label]);
 

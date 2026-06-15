@@ -1,7 +1,7 @@
 {
   "name": "@opendatacapture/runtime-v1",
   "type": "module",
-  "version": "1.16.6",
+  "version": "2.0.0",
   "author": {
     "name": "Douglas Neuroinformatics",
     "email": "support@douglasneuroinformatics.ca"
