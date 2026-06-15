@@ -225,29 +225,54 @@ export const LoginBrandingPanel = ({
 
   const tl = (obj: { en: string; fr: string }): string => obj[lang];
 
-  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-  const instanceName = branding?.instanceName?.[lang]?.trim() || DEFAULT_INSTANCE_NAME;
-  const instanceTagline = branding?.instanceTagline?.[lang]?.trim() ?? null;
-  const instanceDetails = branding?.instanceDetails?.[lang]?.trim() ?? null;
-  const showFooterLinks = branding?.showFooterLinks ?? true;
-  const showLogo = branding?.showLogo !== false;
-  const showTagline = branding?.showTagline !== false;
-  const showDetails = branding?.showDetails !== false;
-  const boldName = branding?.boldName !== false;
-  const nameAlignment: LogoAlignment = branding?.nameAlignment ?? 'left';
-  const boldTagline = branding?.boldTagline === true;
-  const boldDetails = branding?.boldDetails === true;
-  const boldResourceLinks = branding?.boldResourceLinks === true;
-  const panelTextColor = branding?.panelTextColor ?? null;
-  const logoAlignment: LogoAlignment = branding?.logoAlignment ?? 'left';
-  const showResourceLinks = (branding?.showResourceLinks ?? false) && (branding?.resourceLinks?.length ?? 0) > 0;
-
-  const tc = (slateClass: string): null | string => (panelTextColor ? null : slateClass);
-
-  const sectionsOrder: PanelSection[] =
-    branding?.sectionsOrder?.length === DEFAULT_SECTIONS_ORDER.length ? branding.sectionsOrder : DEFAULT_SECTIONS_ORDER;
+  const derived = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    const instanceName = branding?.instanceName?.[lang]?.trim() || DEFAULT_INSTANCE_NAME;
+    const instanceTagline = branding?.instanceTagline?.[lang]?.trim() || null;
+    const instanceDetails = branding?.instanceDetails?.[lang]?.trim() || null;
+    const panelTextColor = branding?.panelTextColor ?? null;
+    return {
+      boldDetails: branding?.boldDetails === true,
+      boldName: branding?.boldName !== false,
+      boldResourceLinks: branding?.boldResourceLinks === true,
+      boldTagline: branding?.boldTagline === true,
+      instanceDetails,
+      instanceName,
+      instanceTagline,
+      logoAlignment: (branding?.logoAlignment ?? 'left') as LogoAlignment,
+      nameAlignment: (branding?.nameAlignment ?? 'left') as LogoAlignment,
+      panelTextColor,
+      sectionsOrder:
+        branding?.sectionsOrder?.length === DEFAULT_SECTIONS_ORDER.length
+          ? branding.sectionsOrder
+          : DEFAULT_SECTIONS_ORDER,
+      showDetails: branding?.showDetails !== false,
+      showFooterLinks: branding?.showFooterLinks ?? true,
+      showLogo: branding?.showLogo !== false,
+      showResourceLinks: (branding?.showResourceLinks ?? false) && (branding?.resourceLinks?.length ?? 0) > 0,
+      showTagline: branding?.showTagline !== false,
+      tc: (slateClass: string): null | string => (panelTextColor ? null : slateClass)
+    };
+  }, [branding, lang]);
 
   const sectionNodes = useMemo(() => {
+    const {
+      boldDetails,
+      boldName,
+      boldResourceLinks,
+      boldTagline,
+      instanceDetails,
+      instanceName,
+      instanceTagline,
+      logoAlignment,
+      nameAlignment,
+      showDetails,
+      showLogo,
+      showResourceLinks,
+      showTagline,
+      tc
+    } = derived;
+
     const logoNode: React.ReactNode = showLogo ? (
       <LogoSection alignment={logoAlignment} branding={branding} instanceName={instanceName} preview={preview} />
     ) : null;
@@ -315,20 +340,23 @@ export const LoginBrandingPanel = ({
       resources: resourcesNode,
       tagline: taglineNode
     } satisfies { [K in PanelSection]: React.ReactNode };
-  }, [branding, preview, lang]);
+  }, [derived, branding, preview, lang]);
 
-  const visibleSections = sectionsOrder.filter((s) => sectionNodes[s] !== null);
+  const visibleSections = derived.sectionsOrder.filter((s) => sectionNodes[s] !== null);
 
   return (
     <div
       className={cn(
         'relative flex flex-col overflow-hidden',
-        tc('text-slate-100'),
+        derived.tc('text-slate-100'),
         preview ? 'p-5' : 'p-10 lg:p-14',
         className
       )}
       data-testid="login-branding-panel"
-      style={{ backgroundImage: getLoginGradient(branding), ...(panelTextColor ? { color: panelTextColor } : {}) }}
+      style={{
+        backgroundImage: getLoginGradient(branding),
+        ...(derived.panelTextColor ? { color: derived.panelTextColor } : {})
+      }}
     >
       <div
         aria-hidden
@@ -341,7 +369,7 @@ export const LoginBrandingPanel = ({
         ))}
       </div>
 
-      <PanelFooter preview={preview} showFooterLinks={showFooterLinks} tc={tc} tl={tl} />
+      <PanelFooter preview={preview} showFooterLinks={derived.showFooterLinks} tc={derived.tc} tl={tl} />
     </div>
   );
 };
