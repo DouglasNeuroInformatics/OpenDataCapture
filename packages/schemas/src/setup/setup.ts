@@ -93,6 +93,8 @@ const $BrandingConfig = z.object({
   customSecondaryColor: $HexColor.nullish(),
   /** Font size (px) for the details section; null/undefined uses the default size */
   detailsFontSize: $FontSize.nullish(),
+  /** Whether the custom branded login page is enabled (defaults to false) */
+  enableBranding: z.boolean().nullish(),
   /** Extended description / notes shown below the tagline */
   instanceDetails: $BrandingText.nullish(),
   /** The display name of the instance, shown on the login branding panel */

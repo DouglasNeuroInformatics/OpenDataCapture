@@ -316,6 +316,7 @@ type BrandingConfig {
   customPrimaryColor       String?
   customSecondaryColor     String?
   detailsFontSize          Int?
+  enableBranding           Boolean?
   instanceDetails          BrandingText?
   instanceName             BrandingText?
   instanceTagline          BrandingText?

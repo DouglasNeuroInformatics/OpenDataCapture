@@ -34,9 +34,8 @@ const RouteComponent = () => {
   const navigate = useNavigate();
 
   const branding = setupStateQuery.data.branding;
+  const enableBranding = branding?.enableBranding === true;
   const lang = resolvedLanguage === 'fr' ? 'fr' : 'en';
-  // Shown atop the form only when the branding panel is hidden (below `lg`),
-  // so the instance name doesn't disappear entirely at high zoom / narrow widths.
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const instanceName = branding?.instanceName?.[lang]?.trim() || 'Open Data Capture';
 
@@ -54,18 +53,49 @@ const RouteComponent = () => {
     await navigate({ to: '/dashboard' });
   };
 
+  if (!enableBranding) {
+    return (
+      <div className="flex min-h-screen w-full flex-col" data-testid="login-page">
+        {setupStateQuery.data.isDemo && <DemoBanner onLogin={(credentials) => void handleLogin(credentials)} />}
+        <div className="flex w-full grow flex-col items-center justify-center">
+          <Card
+            className="sm:bg-card w-full max-w-sm border-none bg-inherit px-2.5 py-1.5 sm:border-solid"
+            data-testid="login-card"
+          >
+            <Card.Header className="flex items-center justify-center">
+              <Logo className="m-1.5 h-auto w-16" variant="auto" />
+              <Heading variant="h2">{t('login')}</Heading>
+            </Card.Header>
+            <Card.Content>
+              <LoginForm onSubmit={(credentials) => void handleLogin(credentials)} />
+            </Card.Content>
+            <Card.Footer className="text-muted-foreground flex justify-between" data-testid="login-footer-toggles">
+              <LanguageToggle
+                align="start"
+                options={{
+                  en: 'English',
+                  fr: 'Français'
+                }}
+                triggerClassName="border p-2"
+                variant="ghost"
+              />
+              <ThemeToggle className="border p-2" variant="ghost" />
+            </Card.Footer>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen w-full flex-col" data-testid="login-page">
       {setupStateQuery.data.isDemo && <DemoBanner onLogin={(credentials) => void handleLogin(credentials)} />}
       <div className="flex grow flex-col lg:flex-row">
-        {/* Customizable branding panel — visible on large screens */}
         <LoginBrandingPanel branding={branding} className="hidden lg:flex lg:w-1/2 xl:w-3/5" />
-        {/* Login form */}
         <div
           className="bg-background flex w-full grow flex-col px-4 py-10 lg:w-1/2 xl:w-2/5"
           style={getRightPanelGradient(branding) ? { backgroundImage: getRightPanelGradient(branding)! } : undefined}
         >
-          {/* Branding panel is hidden below `lg`; surface the instance name pinned to the top here instead. */}
           <Heading className="mb-8 text-center lg:hidden" variant="h3">
             {instanceName}
           </Heading>

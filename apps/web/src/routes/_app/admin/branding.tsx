@@ -133,6 +133,7 @@ type FormState = {
   customSecondaryColor: string;
   /** Per-section font size (px), or null to use the default size */
   detailsFontSize: null | number;
+  enableBranding: boolean;
   instanceDetails: { en: string; fr: string };
   instanceName: { en: string; fr: string };
   instanceTagline: { en: string; fr: string };
@@ -176,6 +177,7 @@ const buildFormState = (saved: BrandingConfig | null | undefined): FormState => 
     customPrimaryColor: saved?.customPrimaryColor ?? LOGIN_THEME_COLORS.ocean.primary,
     customSecondaryColor: saved?.customSecondaryColor ?? LOGIN_THEME_COLORS.ocean.secondary,
     detailsFontSize: saved?.detailsFontSize ?? null,
+    enableBranding: saved?.enableBranding === true,
     instanceDetails: { en: saved?.instanceDetails?.en ?? '', fr: saved?.instanceDetails?.fr ?? '' },
     instanceName: { en: saved?.instanceName?.en ?? '', fr: saved?.instanceName?.fr ?? '' },
     instanceTagline: { en: saved?.instanceTagline?.en ?? '', fr: saved?.instanceTagline?.fr ?? '' },
@@ -369,6 +371,7 @@ const RouteComponent = () => {
     customPrimaryColor: form.customPrimaryColor,
     customSecondaryColor: form.customSecondaryColor,
     detailsFontSize: form.detailsFontSize,
+    enableBranding: form.enableBranding,
     instanceDetails: form.instanceDetails,
     instanceName: form.instanceName,
     instanceTagline: form.instanceTagline,
@@ -429,13 +432,13 @@ const RouteComponent = () => {
           boldResourceLinks: form.boldResourceLinks,
           boldTagline: form.boldTagline,
           customLogoHeight: form.logoSize === 'custom' ? customHeight : null,
-          // Both logo slots are persisted so each is remembered; `logoSource` picks the active one.
           customLogoSrc: form.customLogoSrc.trim() || null,
           customLogoUrl: form.customLogoUrl.trim() || null,
           customLogoWidth: form.logoSize === 'custom' ? customWidth : null,
           customPrimaryColor: form.loginTheme === 'custom' ? form.customPrimaryColor : null,
           customSecondaryColor: form.loginTheme === 'custom' ? form.customSecondaryColor : null,
           detailsFontSize: form.detailsFontSize,
+          enableBranding: form.enableBranding,
           instanceDetails: toText(form.instanceDetails),
           instanceName: toText(form.instanceName),
           instanceTagline: toText(form.instanceTagline),
@@ -1028,6 +1031,33 @@ const RouteComponent = () => {
             }}
             onSubmit={handleSubmit}
           >
+            {/* Enable / disable branding toggle */}
+            <Card>
+              <Card.Header>
+                <Card.Title>
+                  {t({ en: 'Enable Custom Login Page', fr: 'Activer la page de connexion personnalisée' })}
+                </Card.Title>
+                <Card.Description>
+                  {t({
+                    en: 'When disabled, the classic Open Data Capture login page is shown instead.',
+                    fr: "Lorsque désactivé, la page de connexion classique d'Open Data Capture est affichée."
+                  })}
+                </Card.Description>
+              </Card.Header>
+              <Card.Content>
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    checked={form.enableBranding}
+                    id="enableBranding"
+                    onCheckedChange={(checked) => update('enableBranding', checked === true)}
+                  />
+                  <Label className="cursor-pointer" htmlFor="enableBranding">
+                    {t({ en: 'Enable', fr: 'Activer' })}
+                  </Label>
+                </div>
+              </Card.Content>
+            </Card>
+
             {/* Orderable section cards */}
             {form.sectionsOrder.map(renderSectionCard)}
 
@@ -1297,27 +1327,33 @@ const RouteComponent = () => {
               </div>
             </div>
 
-            {/* Preview card */}
+            {/* Preview card — mirrors the actual login page layout: two-panel when
+                branding is enabled, centered single-panel when disabled. */}
             <div className="bg-background flex aspect-[4/3] w-full overflow-hidden rounded-xl border shadow-sm">
-              <LoginBrandingPanel
-                preview
-                branding={previewBranding}
-                className="hidden w-3/5 overflow-hidden sm:flex"
-                lang={previewLang}
-              />
+              {form.enableBranding && (
+                <LoginBrandingPanel
+                  preview
+                  branding={previewBranding}
+                  className="hidden w-3/5 overflow-hidden sm:flex"
+                  lang={previewLang}
+                />
+              )}
               <div
-                className="bg-background flex w-full flex-col items-center justify-center gap-3 p-6 sm:w-2/5"
+                className={cn(
+                  'bg-background flex flex-col items-center justify-center gap-3 p-6',
+                  form.enableBranding ? 'w-full sm:w-2/5' : 'w-full'
+                )}
                 style={
-                  getRightPanelGradient(previewBranding)
+                  form.enableBranding && getRightPanelGradient(previewBranding)
                     ? { backgroundImage: getRightPanelGradient(previewBranding)! }
                     : undefined
                 }
               >
                 <div className="bg-muted h-8 w-8 rounded-full" />
                 <div className="bg-foreground/80 h-2.5 w-20 rounded" />
-                <div className="bg-muted h-7 w-full rounded-md" />
-                <div className="bg-muted h-7 w-full rounded-md" />
-                <div className="bg-primary h-7 w-full rounded-md" />
+                <div className={cn('bg-muted h-7 rounded-md', form.enableBranding ? 'w-full' : 'w-2/5')} />
+                <div className={cn('bg-muted h-7 rounded-md', form.enableBranding ? 'w-full' : 'w-2/5')} />
+                <div className={cn('bg-primary h-7 rounded-md', form.enableBranding ? 'w-full' : 'w-2/5')} />
               </div>
             </div>
 
@@ -1354,16 +1390,21 @@ const RouteComponent = () => {
             })}
           </Dialog.Description>
           {/* Left — branding panel */}
-          <LoginBrandingPanel
-            branding={previewBranding}
-            className="flex w-1/2 overflow-y-auto xl:w-3/5"
-            lang={previewLang}
-          />
+          {form.enableBranding && (
+            <LoginBrandingPanel
+              branding={previewBranding}
+              className="flex w-1/2 overflow-y-auto xl:w-3/5"
+              lang={previewLang}
+            />
+          )}
           {/* Right — actual login form mockup */}
           <div
-            className="bg-background relative flex w-1/2 flex-col items-center justify-center overflow-y-auto p-8 xl:w-2/5"
+            className={cn(
+              'bg-background relative flex flex-col items-center justify-center overflow-y-auto p-8',
+              form.enableBranding ? 'w-1/2 xl:w-2/5' : 'w-full'
+            )}
             style={
-              getRightPanelGradient(previewBranding)
+              form.enableBranding && getRightPanelGradient(previewBranding)
                 ? { backgroundImage: getRightPanelGradient(previewBranding)! }
                 : undefined
             }
