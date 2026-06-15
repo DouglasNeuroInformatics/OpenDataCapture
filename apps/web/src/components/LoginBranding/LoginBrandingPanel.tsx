@@ -4,7 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { Logo } from '@opendatacapture/react-core';
-import type { BrandingConfig, LogoAlignment, LogoSize, PanelSection } from '@opendatacapture/schemas/setup';
+import type {
+  BrandingConfig,
+  LogoAlignment,
+  LogoSize,
+  PanelSection,
+  ResourceLink
+} from '@opendatacapture/schemas/setup';
 import { BookOpenIcon, GithubIcon, LinkIcon } from 'lucide-react';
 
 import { config } from '@/config';
@@ -118,13 +124,14 @@ const LogoSection = ({ alignment, branding, instanceName, preview }: LogoSection
 type ResourcesSectionProps = {
   boldResourceLinks: boolean;
   fontSize: null | number | undefined;
-  links: { href: string; label: string }[];
+  lang: 'en' | 'fr';
+  links: ResourceLink[];
   preview: boolean;
   tc: (slateClass: string) => null | string;
   tl: (obj: { en: string; fr: string }) => string;
 };
 
-const ResourcesSection = ({ boldResourceLinks, fontSize, links, preview, tc, tl }: ResourcesSectionProps) => (
+const ResourcesSection = ({ boldResourceLinks, fontSize, lang, links, preview, tc, tl }: ResourcesSectionProps) => (
   <div className="relative z-10 flex flex-col gap-2">
     <p
       className={cn('font-semibold uppercase tracking-wider', tc('text-slate-100'), preview ? 'text-[9px]' : 'text-xs')}
@@ -136,22 +143,26 @@ const ResourcesSection = ({ boldResourceLinks, fontSize, links, preview, tc, tl 
       className={cn('flex flex-wrap items-center gap-x-5 gap-y-2', preview ? 'text-[11px]' : 'text-sm')}
       style={fontStyle(fontSize, preview)}
     >
-      {links.map((link, index) => (
-        <a
-          className={cn(
-            'inline-flex items-center gap-1.5 underline-offset-4 transition-colors hover:underline',
-            tc('text-slate-200/90 hover:text-white'),
-            boldResourceLinks ? 'font-bold' : 'font-medium'
-          )}
-          href={link.href}
-          key={`${link.href}-${index}`}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <LinkIcon className={preview ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5'} />
-          {link.label}
-        </a>
-      ))}
+      {links.map((link, index) => {
+        const linkLabel = link.label?.[lang]?.trim() || link.label?.en?.trim() || link.label?.fr?.trim() || '';
+        if (!linkLabel) return null;
+        return (
+          <a
+            className={cn(
+              'inline-flex items-center gap-1.5 underline-offset-4 transition-colors hover:underline',
+              tc('text-slate-200/90 hover:text-white'),
+              boldResourceLinks ? 'font-bold' : 'font-medium'
+            )}
+            href={link.href}
+            key={`${link.href}-${index}`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <LinkIcon className={preview ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5'} />
+            {linkLabel}
+          </a>
+        );
+      })}
     </div>
   </div>
 );
@@ -210,7 +221,7 @@ export const LoginBrandingPanel = ({
   preview = false
 }: LoginBrandingPanelProps) => {
   const { resolvedLanguage } = useTranslation();
-  const lang = langOverride ?? (resolvedLanguage === 'fr' ? 'fr' : 'en');
+  const lang = langOverride ?? resolvedLanguage;
 
   const tl = (obj: { en: string; fr: string }): string => obj[lang];
 
@@ -289,6 +300,7 @@ export const LoginBrandingPanel = ({
       <ResourcesSection
         boldResourceLinks={boldResourceLinks}
         fontSize={branding?.resourceLinksFontSize}
+        lang={lang}
         links={branding!.resourceLinks!}
         preview={preview}
         tc={tc}

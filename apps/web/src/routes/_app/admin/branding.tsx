@@ -39,8 +39,7 @@ import type {
   LogoAlignment,
   LogoSize,
   LogoSource,
-  PanelSection,
-  ResourceLink
+  PanelSection
 } from '@opendatacapture/schemas/setup';
 import { createFileRoute, useBlocker } from '@tanstack/react-router';
 import { ChevronDownIcon, ChevronUpIcon, MaximizeIcon, PlusIcon, TrashIcon, UploadIcon, XIcon } from 'lucide-react';
@@ -146,7 +145,7 @@ type FormState = {
   nameFontSize: null | number;
   /** Hex color applied to all left-panel text (always set; seeded with the default). */
   panelTextColor: string;
-  resourceLinks: ResourceLink[];
+  resourceLinks: { href: string; label: { en: string; fr: string } }[];
   resourceLinksFontSize: null | number;
   /** 'none' means no right-panel override; otherwise one of LoginTheme */
   rightPanelOption: RightPanelOption;
@@ -188,7 +187,9 @@ const buildFormState = (saved: BrandingConfig | null | undefined): FormState => 
     nameAlignment: saved?.nameAlignment ?? 'left',
     nameFontSize: saved?.nameFontSize ?? null,
     panelTextColor: saved?.panelTextColor ?? DEFAULT_PANEL_TEXT_COLOR,
-    resourceLinks: saved?.resourceLinks?.length ? saved.resourceLinks.map((l) => ({ ...l })) : [],
+    resourceLinks: saved?.resourceLinks?.length
+      ? saved.resourceLinks.map((l) => ({ href: l.href, label: { en: l.label?.en ?? '', fr: l.label?.fr ?? '' } }))
+      : [],
     resourceLinksFontSize: saved?.resourceLinksFontSize ?? null,
     rightPanelOption: RIGHT_PANEL_OPTIONS.includes((saved?.rightPanelTheme ?? 'none') as RightPanelOption)
       ? ((saved?.rightPanelTheme ?? 'none') as RightPanelOption)
@@ -276,14 +277,25 @@ const RouteComponent = () => {
     value: string
   ) => setForm((prev) => ({ ...prev, [field]: { ...prev[field], [lang]: value } }));
 
-  const updateResourceLink = (index: number, key: keyof ResourceLink, value: string) =>
+  const updateResourceLinkHref = (index: number, value: string) =>
     setForm((prev) => ({
       ...prev,
-      resourceLinks: prev.resourceLinks.map((l, i) => (i === index ? { ...l, [key]: value } : l))
+      resourceLinks: prev.resourceLinks.map((l, i) => (i === index ? { ...l, href: value } : l))
+    }));
+
+  const updateResourceLinkLabel = (index: number, lang: 'en' | 'fr', value: string) =>
+    setForm((prev) => ({
+      ...prev,
+      resourceLinks: prev.resourceLinks.map((l, i) =>
+        i === index ? { ...l, label: { ...l.label, [lang]: value } } : l
+      )
     }));
 
   const addResourceLink = () =>
-    setForm((prev) => ({ ...prev, resourceLinks: [...prev.resourceLinks, { href: '', label: '' }] }));
+    setForm((prev) => ({
+      ...prev,
+      resourceLinks: [...prev.resourceLinks, { href: '', label: { en: '', fr: '' } }]
+    }));
 
   const removeResourceLink = (index: number) =>
     setForm((prev) => ({ ...prev, resourceLinks: prev.resourceLinks.filter((_, i) => i !== index) }));
@@ -344,7 +356,8 @@ const RouteComponent = () => {
     return !trimmed || !URL_PATTERN.test(trimmed);
   };
   const hasInvalidResourceLinks =
-    form.showResourceLinks && form.resourceLinks.some((l) => !l.label.trim() || isResourceLinkHrefInvalid(l.href));
+    form.showResourceLinks &&
+    form.resourceLinks.some((l) => (!l.label.en.trim() && !l.label.fr.trim()) || isResourceLinkHrefInvalid(l.href));
 
   const isSubmitDisabled =
     isCustomColorInvalid ||
@@ -419,8 +432,11 @@ const RouteComponent = () => {
     };
     // Drop blank/partial resource links so we never persist half-filled rows.
     const cleanedLinks = form.resourceLinks
-      .map((l) => ({ href: l.href.trim(), label: l.label.trim() }))
-      .filter((l) => l.href && l.label);
+      .map((l) => ({
+        href: l.href.trim(),
+        label: { en: trim(l.label.en), fr: trim(l.label.fr) }
+      }))
+      .filter((l) => l.href && (l.label.en ?? l.label.fr));
     // Capture the snapshot at submit time so a concurrent edit during the
     // request doesn't get marked clean if the user typed while saving.
     const submittedSnapshot = snapshotForm(form);
@@ -884,25 +900,11 @@ const RouteComponent = () => {
                 {form.resourceLinks.map((link, index) => {
                   const hrefInvalid = link.href.trim() !== '' && !URL_PATTERN.test(link.href.trim());
                   return (
-                    <div className="flex flex-col gap-1" key={index}>
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
-                        <Input
-                          aria-label={t({ en: 'Anchor text', fr: "Texte d'ancrage" })}
-                          className="min-w-0 sm:flex-1"
-                          maxLength={120}
-                          placeholder={t({ en: 'Anchor text', fr: "Texte d'ancrage" })}
-                          value={link.label}
-                          onChange={(e) => updateResourceLink(index, 'label', e.target.value)}
-                        />
-                        <Input
-                          aria-invalid={hrefInvalid}
-                          aria-label="URL"
-                          className="min-w-0 sm:flex-[2]"
-                          maxLength={2000}
-                          placeholder="https://example.org"
-                          value={link.href}
-                          onChange={(e) => updateResourceLink(index, 'href', e.target.value)}
-                        />
+                    <div className="flex flex-col gap-2 rounded-md border p-3" key={index}>
+                      <div className="flex items-start justify-between gap-2">
+                        <Label className="text-sm font-medium">
+                          {t({ en: `Link ${index + 1}`, fr: `Lien ${index + 1}` })}
+                        </Label>
                         <Button
                           aria-label={t({ en: 'Remove', fr: 'Retirer' })}
                           size="sm"
@@ -913,8 +915,32 @@ const RouteComponent = () => {
                           <TrashIcon className="h-4 w-4" />
                         </Button>
                       </div>
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        <Input
+                          aria-label={t({ en: 'Label (English)', fr: 'Libellé (anglais)' })}
+                          maxLength={120}
+                          placeholder={t({ en: 'Label (English)', fr: 'Libellé (anglais)' })}
+                          value={link.label.en}
+                          onChange={(e) => updateResourceLinkLabel(index, 'en', e.target.value)}
+                        />
+                        <Input
+                          aria-label={t({ en: 'Label (French)', fr: 'Libellé (français)' })}
+                          maxLength={120}
+                          placeholder={t({ en: 'Label (French)', fr: 'Libellé (français)' })}
+                          value={link.label.fr}
+                          onChange={(e) => updateResourceLinkLabel(index, 'fr', e.target.value)}
+                        />
+                      </div>
+                      <Input
+                        aria-invalid={hrefInvalid}
+                        aria-label="URL"
+                        maxLength={2000}
+                        placeholder="https://example.org"
+                        value={link.href}
+                        onChange={(e) => updateResourceLinkHref(index, e.target.value)}
+                      />
                       {hrefInvalid && (
-                        <p className="text-destructive text-xs sm:ml-[33%]">
+                        <p className="text-destructive text-xs">
                           {t({
                             en: 'URL must start with http:// or https:// and include a domain (e.g. example.com).',
                             fr: "L'URL doit commencer par http:// ou https:// et inclure un domaine (ex. example.com)."

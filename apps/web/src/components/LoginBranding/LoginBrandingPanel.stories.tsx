@@ -35,8 +35,8 @@ export const WithResources: Story = {
       ...baseBranding,
       loginTheme: 'midnight',
       resourceLinks: [
-        { href: 'https://example.org/handbook', label: 'Handbook' },
-        { href: 'https://example.org/contact', label: 'Contact' }
+        { href: 'https://example.org/handbook', label: { en: 'Handbook', fr: 'Manuel' } },
+        { href: 'https://example.org/contact', label: { en: 'Contact', fr: 'Contact' } }
       ],
       showResourceLinks: true
     },

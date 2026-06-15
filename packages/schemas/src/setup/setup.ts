@@ -56,7 +56,7 @@ const RESOURCE_LINK_URL_PATTERN = /^https?:\/\/[^\s/]+\.[^\s/]+(\/\S*)?$/;
 /** A single resource link displayed in the branding panel. */
 const $ResourceLink = z.object({
   href: z.string().max(2000).regex(RESOURCE_LINK_URL_PATTERN, 'Must be an http(s) URL'),
-  label: z.string().min(1).max(120)
+  label: $BrandingText
 });
 
 /** Allowed login-panel font sizes, in pixels. Used by the per-section size pickers. */
