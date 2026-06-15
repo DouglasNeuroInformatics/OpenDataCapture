@@ -24,16 +24,16 @@ import { Route as AppSessionStartSessionRouteImport } from './routes/_app/sessio
 import { Route as AppInstrumentsAccessibleInstrumentsRouteImport } from './routes/_app/instruments/accessible-instruments'
 import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
-import { Route as AppAdminBrandingLoginPageRouteImport } from './routes/_app/admin/branding/login-page'
-import { Route as AppAdminBrandingIndexRouteImport } from './routes/_app/admin/branding/index'
 import { Route as AppDatahubSubjectIdRouteRouteImport } from './routes/_app/datahub/$subjectId/route'
 import { Route as AppAdminUsersIndexRouteImport } from './routes/_app/admin/users/index'
 import { Route as AppAdminGroupsIndexRouteImport } from './routes/_app/admin/groups/index'
+import { Route as AppAdminBrandingIndexRouteImport } from './routes/_app/admin/branding/index'
 import { Route as AppInstrumentsRenderIdRouteImport } from './routes/_app/instruments/render/$id'
 import { Route as AppDatahubSubjectIdGraphRouteImport } from './routes/_app/datahub/$subjectId/graph'
 import { Route as AppDatahubSubjectIdAssignmentsRouteImport } from './routes/_app/datahub/$subjectId/assignments'
 import { Route as AppAdminUsersCreateRouteImport } from './routes/_app/admin/users/create'
 import { Route as AppAdminGroupsCreateRouteImport } from './routes/_app/admin/groups/create'
+import { Route as AppAdminBrandingLoginPageRouteImport } from './routes/_app/admin/branding/login-page'
 import { Route as AppAdminAuditLogsRouteImport } from './routes/_app/admin/audit/logs'
 import { Route as AppDatahubSubjectIdTableIndexRouteImport } from './routes/_app/datahub/$subjectId/table/index'
 import { Route as AppDatahubSubjectIdTableRecordIdRouteImport } from './routes/_app/datahub/$subjectId/table/$recordId'
@@ -113,16 +113,6 @@ const AppAdminSettingsRoute = AppAdminSettingsRouteImport.update({
   path: '/admin/settings',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppAdminBrandingLoginPageRoute = AppAdminBrandingLoginPageRouteImport.update({
-  id: '/admin/branding/login-page',
-  path: '/admin/branding/login-page',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppAdminBrandingIndexRoute = AppAdminBrandingIndexRouteImport.update({
-  id: '/admin/branding/',
-  path: '/admin/branding/',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AppDatahubSubjectIdRouteRoute =
   AppDatahubSubjectIdRouteRouteImport.update({
     id: '/datahub/$subjectId',
@@ -137,6 +127,11 @@ const AppAdminUsersIndexRoute = AppAdminUsersIndexRouteImport.update({
 const AppAdminGroupsIndexRoute = AppAdminGroupsIndexRouteImport.update({
   id: '/admin/groups/',
   path: '/admin/groups/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppAdminBrandingIndexRoute = AppAdminBrandingIndexRouteImport.update({
+  id: '/admin/branding/',
+  path: '/admin/branding/',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppInstrumentsRenderIdRoute = AppInstrumentsRenderIdRouteImport.update({
@@ -166,6 +161,12 @@ const AppAdminGroupsCreateRoute = AppAdminGroupsCreateRouteImport.update({
   path: '/admin/groups/create',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppAdminBrandingLoginPageRoute =
+  AppAdminBrandingLoginPageRouteImport.update({
+    id: '/admin/branding/login-page',
+    path: '/admin/branding/login-page',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
 const AppAdminAuditLogsRoute = AppAdminAuditLogsRouteImport.update({
   id: '/admin/audit/logs',
   path: '/admin/audit/logs',
@@ -193,8 +194,6 @@ export interface FileRoutesByFullPath {
   '/user': typeof AppUserRoute
   '/auth/login': typeof AuthLoginRoute
   '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
-  '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
-  '/admin/branding/': typeof AppAdminBrandingIndexRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/manage': typeof AppGroupManageRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
@@ -203,11 +202,13 @@ export interface FileRoutesByFullPath {
   '/datahub/': typeof AppDatahubIndexRoute
   '/upload/': typeof AppUploadIndexRoute
   '/admin/audit/logs': typeof AppAdminAuditLogsRoute
+  '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
   '/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
   '/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
+  '/admin/branding/': typeof AppAdminBrandingIndexRoute
   '/admin/groups/': typeof AppAdminGroupsIndexRoute
   '/admin/users/': typeof AppAdminUsersIndexRoute
   '/datahub/$subjectId/table/$recordId': typeof AppDatahubSubjectIdTableRecordIdRoute
@@ -222,7 +223,6 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
   '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
-  '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/manage': typeof AppGroupManageRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
@@ -231,12 +231,13 @@ export interface FileRoutesByTo {
   '/datahub': typeof AppDatahubIndexRoute
   '/upload': typeof AppUploadIndexRoute
   '/admin/audit/logs': typeof AppAdminAuditLogsRoute
-  '/admin/branding': typeof AppAdminBrandingIndexRoute
+  '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
   '/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
   '/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
+  '/admin/branding': typeof AppAdminBrandingIndexRoute
   '/admin/groups': typeof AppAdminGroupsIndexRoute
   '/admin/users': typeof AppAdminUsersIndexRoute
   '/datahub/$subjectId/table/$recordId': typeof AppDatahubSubjectIdTableRecordIdRoute
@@ -253,8 +254,6 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/_app/': typeof AppIndexRoute
   '/_app/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
-  '/_app/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
-  '/_app/admin/branding/': typeof AppAdminBrandingIndexRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/group/manage': typeof AppGroupManageRoute
   '/_app/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
@@ -263,11 +262,13 @@ export interface FileRoutesById {
   '/_app/datahub/': typeof AppDatahubIndexRoute
   '/_app/upload/': typeof AppUploadIndexRoute
   '/_app/admin/audit/logs': typeof AppAdminAuditLogsRoute
+  '/_app/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/_app/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/_app/admin/users/create': typeof AppAdminUsersCreateRoute
   '/_app/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/_app/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
   '/_app/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
+  '/_app/admin/branding/': typeof AppAdminBrandingIndexRoute
   '/_app/admin/groups/': typeof AppAdminGroupsIndexRoute
   '/_app/admin/users/': typeof AppAdminUsersIndexRoute
   '/_app/datahub/$subjectId/table/$recordId': typeof AppDatahubSubjectIdTableRecordIdRoute
@@ -284,8 +285,6 @@ export interface FileRouteTypes {
     | '/user'
     | '/auth/login'
     | '/datahub/$subjectId'
-    | '/admin/branding/login-page'
-    | '/admin/branding/'
     | '/admin/settings'
     | '/group/manage'
     | '/instruments/accessible-instruments'
@@ -294,11 +293,13 @@ export interface FileRouteTypes {
     | '/datahub/'
     | '/upload/'
     | '/admin/audit/logs'
+    | '/admin/branding/login-page'
     | '/admin/groups/create'
     | '/admin/users/create'
     | '/datahub/$subjectId/assignments'
     | '/datahub/$subjectId/graph'
     | '/instruments/render/$id'
+    | '/admin/branding/'
     | '/admin/groups/'
     | '/admin/users/'
     | '/datahub/$subjectId/table/$recordId'
@@ -313,8 +314,6 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/'
     | '/datahub/$subjectId'
-    | '/admin/branding/login-page'
-    | '/admin/branding'
     | '/admin/settings'
     | '/group/manage'
     | '/instruments/accessible-instruments'
@@ -323,11 +322,13 @@ export interface FileRouteTypes {
     | '/datahub'
     | '/upload'
     | '/admin/audit/logs'
+    | '/admin/branding/login-page'
     | '/admin/groups/create'
     | '/admin/users/create'
     | '/datahub/$subjectId/assignments'
     | '/datahub/$subjectId/graph'
     | '/instruments/render/$id'
+    | '/admin/branding'
     | '/admin/groups'
     | '/admin/users'
     | '/datahub/$subjectId/table/$recordId'
@@ -343,8 +344,6 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/_app/'
     | '/_app/datahub/$subjectId'
-    | '/_app/admin/branding/login-page'
-    | '/_app/admin/branding/'
     | '/_app/admin/settings'
     | '/_app/group/manage'
     | '/_app/instruments/accessible-instruments'
@@ -353,11 +352,13 @@ export interface FileRouteTypes {
     | '/_app/datahub/'
     | '/_app/upload/'
     | '/_app/admin/audit/logs'
+    | '/_app/admin/branding/login-page'
     | '/_app/admin/groups/create'
     | '/_app/admin/users/create'
     | '/_app/datahub/$subjectId/assignments'
     | '/_app/datahub/$subjectId/graph'
     | '/_app/instruments/render/$id'
+    | '/_app/admin/branding/'
     | '/_app/admin/groups/'
     | '/_app/admin/users/'
     | '/_app/datahub/$subjectId/table/$recordId'
@@ -477,20 +478,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminSettingsRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/admin/branding/login-page': {
-      id: '/_app/admin/branding/login-page'
-      path: '/admin/branding/login-page'
-      fullPath: '/admin/branding/login-page'
-      preLoaderRoute: typeof AppAdminBrandingLoginPageRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/admin/branding/': {
-      id: '/_app/admin/branding/'
-      path: '/admin/branding'
-      fullPath: '/admin/branding/'
-      preLoaderRoute: typeof AppAdminBrandingIndexRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/_app/datahub/$subjectId': {
       id: '/_app/datahub/$subjectId'
       path: '/datahub/$subjectId'
@@ -510,6 +497,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/groups'
       fullPath: '/admin/groups/'
       preLoaderRoute: typeof AppAdminGroupsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/admin/branding/': {
+      id: '/_app/admin/branding/'
+      path: '/admin/branding'
+      fullPath: '/admin/branding/'
+      preLoaderRoute: typeof AppAdminBrandingIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/instruments/render/$id': {
@@ -545,6 +539,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/groups/create'
       fullPath: '/admin/groups/create'
       preLoaderRoute: typeof AppAdminGroupsCreateRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/admin/branding/login-page': {
+      id: '/_app/admin/branding/login-page'
+      path: '/admin/branding/login-page'
+      fullPath: '/admin/branding/login-page'
+      preLoaderRoute: typeof AppAdminBrandingLoginPageRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/admin/audit/logs': {
@@ -599,8 +600,6 @@ interface AppRouteRouteChildren {
   AppUserRoute: typeof AppUserRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDatahubSubjectIdRouteRoute: typeof AppDatahubSubjectIdRouteRouteWithChildren
-  AppAdminBrandingLoginPageRoute: typeof AppAdminBrandingLoginPageRoute
-  AppAdminBrandingIndexRoute: typeof AppAdminBrandingIndexRoute
   AppAdminSettingsRoute: typeof AppAdminSettingsRoute
   AppGroupManageRoute: typeof AppGroupManageRoute
   AppInstrumentsAccessibleInstrumentsRoute: typeof AppInstrumentsAccessibleInstrumentsRoute
@@ -609,9 +608,11 @@ interface AppRouteRouteChildren {
   AppDatahubIndexRoute: typeof AppDatahubIndexRoute
   AppUploadIndexRoute: typeof AppUploadIndexRoute
   AppAdminAuditLogsRoute: typeof AppAdminAuditLogsRoute
+  AppAdminBrandingLoginPageRoute: typeof AppAdminBrandingLoginPageRoute
   AppAdminGroupsCreateRoute: typeof AppAdminGroupsCreateRoute
   AppAdminUsersCreateRoute: typeof AppAdminUsersCreateRoute
   AppInstrumentsRenderIdRoute: typeof AppInstrumentsRenderIdRoute
+  AppAdminBrandingIndexRoute: typeof AppAdminBrandingIndexRoute
   AppAdminGroupsIndexRoute: typeof AppAdminGroupsIndexRoute
   AppAdminUsersIndexRoute: typeof AppAdminUsersIndexRoute
 }
@@ -623,8 +624,6 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppUserRoute: AppUserRoute,
   AppIndexRoute: AppIndexRoute,
   AppDatahubSubjectIdRouteRoute: AppDatahubSubjectIdRouteRouteWithChildren,
-  AppAdminBrandingLoginPageRoute: AppAdminBrandingLoginPageRoute,
-  AppAdminBrandingIndexRoute: AppAdminBrandingIndexRoute,
   AppAdminSettingsRoute: AppAdminSettingsRoute,
   AppGroupManageRoute: AppGroupManageRoute,
   AppInstrumentsAccessibleInstrumentsRoute:
@@ -634,9 +633,11 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDatahubIndexRoute: AppDatahubIndexRoute,
   AppUploadIndexRoute: AppUploadIndexRoute,
   AppAdminAuditLogsRoute: AppAdminAuditLogsRoute,
+  AppAdminBrandingLoginPageRoute: AppAdminBrandingLoginPageRoute,
   AppAdminGroupsCreateRoute: AppAdminGroupsCreateRoute,
   AppAdminUsersCreateRoute: AppAdminUsersCreateRoute,
   AppInstrumentsRenderIdRoute: AppInstrumentsRenderIdRoute,
+  AppAdminBrandingIndexRoute: AppAdminBrandingIndexRoute,
   AppAdminGroupsIndexRoute: AppAdminGroupsIndexRoute,
   AppAdminUsersIndexRoute: AppAdminUsersIndexRoute,
 }

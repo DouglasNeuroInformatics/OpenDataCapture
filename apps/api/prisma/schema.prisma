@@ -301,7 +301,7 @@ type BrandingText {
 
 type ResourceLink {
   href  String
-  label BrandingText
+  label BrandingText?
 }
 
 type BrandingConfig {

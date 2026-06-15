@@ -153,6 +153,12 @@ export class SetupService implements OnModuleInit {
   }
 
   private async getSavedOptions() {
-    return await this.setupStateModel.findFirst();
+    try {
+      return await this.setupStateModel.findFirst();
+    } catch {
+      this.logger.warn('SetupState deserialization failed; retrying after migration');
+      await this.migrateResourceLinkLabels();
+      return await this.setupStateModel.findFirst();
+    }
   }
 }
