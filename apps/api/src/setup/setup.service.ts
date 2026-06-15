@@ -6,9 +6,9 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-  type OnModuleInit,
   ServiceUnavailableException
 } from '@nestjs/common';
+import type { OnModuleInit } from '@nestjs/common';
 import { $BrandingConfig } from '@opendatacapture/schemas/setup';
 import type { CreateAdminData, InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
@@ -26,10 +26,6 @@ export class SetupService implements OnModuleInit {
     private readonly demoService: DemoService,
     private readonly usersService: UsersService
   ) {}
-
-  async onModuleInit() {
-    await this.migrateResourceLinkLabels();
-  }
 
   async createAdmin(admin: CreateAdminData) {
     return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN', groupIds: [] });
@@ -81,6 +77,10 @@ export class SetupService implements OnModuleInit {
     return { success: true };
   }
 
+  async onModuleInit() {
+    await this.migrateResourceLinkLabels();
+  }
+
   async updateState({ branding, ...rest }: UpdateSetupStateData): Promise<Partial<SetupState>> {
     const setupState = await this.getSavedOptions();
     if (!setupState?.isSetup) {
@@ -97,6 +97,25 @@ export class SetupService implements OnModuleInit {
       }
     });
     return this.getState();
+  }
+
+  private async dropDatabase(): Promise<void> {
+    const result = await this.prismaClient.$runCommandRaw({ dropDatabase: 1 });
+    if (!isPlainObject(result) || result.ok !== 1) {
+      throw new InternalServerErrorException('Failed to drop database: raw mongodb command returned unexpected value', {
+        cause: result
+      });
+    }
+  }
+
+  private async getSavedOptions() {
+    try {
+      return await this.setupStateModel.findFirst();
+    } catch {
+      this.logger.warn('SetupState deserialization failed; retrying after migration');
+      await this.migrateResourceLinkLabels();
+      return await this.setupStateModel.findFirst();
+    }
   }
 
   /** Convert old string/null resourceLink labels to BrandingText objects. */
@@ -140,25 +159,6 @@ export class SetupService implements OnModuleInit {
       }
     } catch {
       this.logger.warn('ResourceLink label migration skipped (no matching documents or collection not found)');
-    }
-  }
-
-  private async dropDatabase(): Promise<void> {
-    const result = await this.prismaClient.$runCommandRaw({ dropDatabase: 1 });
-    if (!isPlainObject(result) || result.ok !== 1) {
-      throw new InternalServerErrorException('Failed to drop database: raw mongodb command returned unexpected value', {
-        cause: result
-      });
-    }
-  }
-
-  private async getSavedOptions() {
-    try {
-      return await this.setupStateModel.findFirst();
-    } catch {
-      this.logger.warn('SetupState deserialization failed; retrying after migration');
-      await this.migrateResourceLinkLabels();
-      return await this.setupStateModel.findFirst();
     }
   }
 }

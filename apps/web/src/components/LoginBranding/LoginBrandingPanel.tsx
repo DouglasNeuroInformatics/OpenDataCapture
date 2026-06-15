@@ -101,7 +101,7 @@ const LogoSection = ({ alignment, branding, instanceName, preview }: LogoSection
     }
     const presetKey = logoSize === 'custom' ? 'small' : logoSize;
     const heightClass = PRESET_LOGO_HEIGHT_CLASS[presetKey][preview ? 'preview' : 'main'];
-    return { logoImgClass: cn('w-auto', heightClass), logoImgStyle: {} as React.CSSProperties };
+    return { logoImgClass: cn('w-auto', heightClass), logoImgStyle: {} };
   }, [useCustomSize, baseW, baseH, preview, logoSize]);
 
   return (
@@ -242,8 +242,8 @@ export const LoginBrandingPanel = ({
       instanceDetails,
       instanceName,
       instanceTagline,
-      logoAlignment: (branding?.logoAlignment ?? 'left') as LogoAlignment,
-      nameAlignment: (branding?.nameAlignment ?? 'left') as LogoAlignment,
+      logoAlignment: branding?.logoAlignment ?? 'left',
+      nameAlignment: branding?.nameAlignment ?? 'left',
       panelTextColor,
       sectionsOrder:
         branding?.sectionsOrder?.length === DEFAULT_SECTIONS_ORDER.length
