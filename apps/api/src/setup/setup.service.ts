@@ -5,6 +5,8 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  Logger,
+  type OnModuleInit,
   ServiceUnavailableException
 } from '@nestjs/common';
 import { $BrandingConfig } from '@opendatacapture/schemas/setup';
@@ -15,7 +17,8 @@ import { DemoService } from '@/demo/demo.service';
 import { UsersService } from '@/users/users.service';
 
 @Injectable()
-export class SetupService {
+export class SetupService implements OnModuleInit {
+  private readonly logger = new Logger(SetupService.name);
   constructor(
     @InjectPrismaClient() private readonly prismaClient: RuntimePrismaClient,
     @InjectModel('SetupState') private readonly setupStateModel: Model<'SetupState'>,
@@ -23,6 +26,10 @@ export class SetupService {
     private readonly demoService: DemoService,
     private readonly usersService: UsersService
   ) {}
+
+  async onModuleInit() {
+    await this.migrateResourceLinkLabels();
+  }
 
   async createAdmin(admin: CreateAdminData) {
     return this.usersService.create({ ...admin, basePermissionLevel: 'ADMIN', groupIds: [] });
@@ -90,6 +97,50 @@ export class SetupService {
       }
     });
     return this.getState();
+  }
+
+  /** Convert old string/null resourceLink labels to BrandingText objects. */
+  private async migrateResourceLinkLabels(): Promise<void> {
+    try {
+      const result = await this.prismaClient.$runCommandRaw({
+        update: 'SetupState',
+        updates: [
+          {
+            multi: true,
+            q: { 'branding.resourceLinks': { $exists: true } },
+            u: [
+              {
+                $set: {
+                  'branding.resourceLinks': {
+                    $map: {
+                      as: 'link',
+                      in: {
+                        href: '$$link.href',
+                        label: {
+                          $cond: {
+                            else: '$$link.label',
+                            if: {
+                              $or: [{ $eq: [{ $type: '$$link.label' }, 'string'] }, { $eq: ['$$link.label', null] }]
+                            },
+                            then: { en: { $ifNull: ['$$link.label', null] }, fr: null }
+                          }
+                        }
+                      },
+                      input: '$branding.resourceLinks'
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      });
+      if (isPlainObject(result) && typeof result.nModified === 'number' && result.nModified > 0) {
+        this.logger.log(`Migrated ${result.nModified} document(s): resourceLink labels → BrandingText`);
+      }
+    } catch {
+      this.logger.warn('ResourceLink label migration skipped (no matching documents or collection not found)');
+    }
   }
 
   private async dropDatabase(): Promise<void> {
