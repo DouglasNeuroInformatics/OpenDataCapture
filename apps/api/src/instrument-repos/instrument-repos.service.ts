@@ -323,7 +323,15 @@ export class InstrumentReposService implements OnModuleInit {
   }
 
   private normalizeUrl(url: string): string {
-    return url.replace(/\/+$/, '').replace(/\.git$/, '');
+    // Strip trailing slashes then a single `.git` suffix so `.../repo`, `.../repo/`, and
+    // `.../repo.git` all normalize to the same canonical URL. Done with a manual scan rather than a
+    // `/\/+$/` regex, which CodeQL flags as polynomial (ReDoS-prone) on attacker-controlled input.
+    let end = url.length;
+    while (end > 0 && url.charCodeAt(end - 1) === 47 /* '/' */) {
+      end -= 1;
+    }
+    const trimmed = url.slice(0, end);
+    return trimmed.endsWith('.git') ? trimmed.slice(0, -4) : trimmed;
   }
 
   private parseGitHubUrl(url: string): { owner: string; repoName: string } {

@@ -10,8 +10,9 @@ import { InstrumentsService } from '../../instruments/instruments.service';
 import { InstrumentReposService } from '../instrument-repos.service';
 
 // Typed view onto the service's private members, so tests can exercise them (and stub the network-
-// bound import step) without resorting to `any`.
-type InternalService = InstrumentReposService & {
+// bound import step) without resorting to `any`. Kept as a standalone interface rather than an
+// intersection with the class, whose private members would collapse the type to `never`.
+type InternalService = {
   decrypt(value: string): string | undefined;
   encrypt(plaintext: string): string;
   importInstruments(
@@ -19,6 +20,7 @@ type InternalService = InstrumentReposService & {
     repoName: string,
     accessToken?: string
   ): Promise<{ createdIds: string[]; instrumentIds: string[] }>;
+  normalizeUrl(url: string): string;
   reconcileOrphanedInstruments(): Promise<void>;
 };
 
@@ -74,6 +76,23 @@ describe('InstrumentReposService', () => {
 
     it('returns undefined when decrypting a malformed value', () => {
       expect(internal.decrypt('not-a-valid-token')).toBeUndefined();
+    });
+  });
+
+  describe('normalizeUrl', () => {
+    it.each([
+      ['https://github.com/owner/repo', 'https://github.com/owner/repo'],
+      ['https://github.com/owner/repo/', 'https://github.com/owner/repo'],
+      ['https://github.com/owner/repo.git', 'https://github.com/owner/repo'],
+      ['https://github.com/owner/repo.git/', 'https://github.com/owner/repo'],
+      ['https://github.com/owner/repo///', 'https://github.com/owner/repo']
+    ])('normalizes %s to %s', (input, expected) => {
+      expect(internal.normalizeUrl(input)).toBe(expected);
+    });
+
+    it('does not hang on input with many trailing slashes', () => {
+      const input = `https://github.com/owner/repo${'/'.repeat(100_000)}`;
+      expect(internal.normalizeUrl(input)).toBe('https://github.com/owner/repo');
     });
   });
 
