@@ -176,6 +176,9 @@ export class InstrumentsService {
     options: EntityOperationOptions = {}
   ): Promise<InstrumentInfo[]> {
     const instances = await this.find(query, options);
+
+    const sourceMap = await this.buildInstrumentSourceMap();
+
     const results = new Map<string, InstrumentInfo>();
     for (const instance of instances) {
       const info = pick(instance, [
@@ -188,6 +191,16 @@ export class InstrumentsService {
         'language',
         'tags'
       ]);
+      // Expose the source repo id whenever the instrument came from a repo (so it can be filtered per
+      // group). The name may be null for legacy instruments imported before names were stored; the
+      // client renders those as "uploaded manually" while still treating them as repo-sourced.
+      const source = sourceMap.get(info.id);
+      if (source?.sourceRepoId) {
+        (info as InstrumentInfo).sourceRepo = {
+          id: source.sourceRepoId,
+          name: source.sourceRepoName ?? null
+        };
+      }
       if (!info.internal) {
         results.set(info.id, info);
         continue;
@@ -242,6 +255,22 @@ export class InstrumentsService {
         title: instrument.details.title
       }));
     });
+  }
+
+  /** Map of instrument id -> denormalized repository provenance, for instruments imported from a repo. */
+  private async buildInstrumentSourceMap(): Promise<
+    Map<string, { sourceRepoId: string; sourceRepoName: null | string }>
+  > {
+    const instruments = await this.instrumentModel.findMany({
+      where: { sourceRepoId: { not: null } }
+    });
+    const map = new Map<string, { sourceRepoId: string; sourceRepoName: null | string }>();
+    for (const inst of instruments) {
+      if (inst.sourceRepoId) {
+        map.set(inst.id, { sourceRepoId: inst.sourceRepoId, sourceRepoName: inst.sourceRepoName });
+      }
+    }
+    return map;
   }
 
   private async instantiate(instruments: Pick<InstrumentBundleContainer, 'bundle' | 'id'>[]) {

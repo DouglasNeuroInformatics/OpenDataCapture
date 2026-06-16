@@ -6,26 +6,25 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { InstrumentsService } from '../../instruments/instruments.service';
 import { GroupsService } from '../groups.service';
 
 describe('GroupsService', () => {
   let groupsService: GroupsService;
   let groupModel: MockedInstance<Model<'Group'>>;
-  let instrumentsService: MockedInstance<InstrumentsService>;
+  let instrumentModel: MockedInstance<Model<'Instrument'>>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         GroupsService,
         MockFactory.createForModelToken(getModelToken('Group')),
-        MockFactory.createForService(InstrumentsService)
+        MockFactory.createForModelToken(getModelToken('Instrument'))
       ]
     }).compile();
     groupModel = moduleRef.get(getModelToken('Group'));
+    instrumentModel = moduleRef.get(getModelToken('Instrument'));
     groupsService = moduleRef.get(GroupsService);
-    instrumentsService = moduleRef.get(InstrumentsService);
-    instrumentsService.find.mockResolvedValue([]);
+    instrumentModel.findMany.mockResolvedValue([]);
   });
 
   describe('create', () => {

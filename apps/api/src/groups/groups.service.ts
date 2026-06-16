@@ -5,7 +5,6 @@ import type { Prisma } from '@prisma/client';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
-import { InstrumentsService } from '@/instruments/instruments.service';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -14,7 +13,7 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 export class GroupsService {
   constructor(
     @InjectModel('Group') private readonly groupModel: Model<'Group'>,
-    private readonly instrumentsService: InstrumentsService
+    @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>
   ) {}
 
   async create({ name, settings, type, ...data }: CreateGroupDto) {
@@ -22,10 +21,15 @@ export class GroupsService {
     if (exists) {
       throw new ConflictException(`Group with name '${name}' already exists!`);
     }
+    // Connect only instruments that did not come from an instrument repository. Repo-sourced
+    // instruments are opt-in: a group manager must select them manually after a repo is assigned.
+    const nonRepoInstruments = await this.instrumentModel.findMany({
+      where: { sourceRepoId: null }
+    });
     return this.groupModel.create({
       data: {
         accessibleInstruments: {
-          connect: (await this.instrumentsService.find()).map(({ id }) => ({ id }))
+          connect: nonRepoInstruments.map(({ id }) => ({ id }))
         },
         name,
         settings: {
@@ -62,7 +66,7 @@ export class GroupsService {
 
   async updateById(
     id: string,
-    { accessibleInstrumentIds, settings, ...data }: UpdateGroupDto,
+    { accessibleInstrumentIds, instrumentRepoIds, settings, ...data }: UpdateGroupDto,
     { ability }: EntityOperationOptions = {}
   ) {
     const where: Prisma.GroupWhereInput = { AND: [accessibleQuery(ability, 'update', 'Group')], id };
@@ -74,11 +78,17 @@ export class GroupsService {
     if (exists) {
       throw new ConflictException(`Group with name '${group.name}' already exists!`);
     }
+
     return this.groupModel.update({
       data: {
         accessibleInstruments: accessibleInstrumentIds
           ? {
               set: accessibleInstrumentIds.map((id) => ({ id }))
+            }
+          : undefined,
+        instrumentRepos: instrumentRepoIds
+          ? {
+              set: instrumentRepoIds.map((id) => ({ id }))
             }
           : undefined,
         settings: {

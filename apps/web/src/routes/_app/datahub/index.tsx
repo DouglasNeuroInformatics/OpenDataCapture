@@ -338,6 +338,7 @@ const MasterDataTable: React.FC<{
 
   const [hasRecords, setHasRecords] = useState(false);
   const [searchString, setSearchString] = useState('');
+  const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
 
   const subjectsData = useSubjectsQuery({
     params: { groupId: currentGroup?.id, hasRecord: hasRecords || undefined }
@@ -363,8 +364,14 @@ const MasterDataTable: React.FC<{
           {
             accessorFn: (subject) => removeSubjectIdScope(subject.id),
             cell: (ctx) => {
-              const value = ctx.getValue() as string;
-              return value.slice(0, subjectIdDisplaySetting ?? 9);
+              const subject = ctx.row.original;
+              const value = (ctx.getValue() as string).slice(0, subjectIdDisplaySetting ?? 9);
+              return (
+                <span className="flex items-center">
+                  {value}
+                  <span className="hidden" data-row-selected={highlightedRowId === subject.id ? 'true' : 'false'} />
+                </span>
+              );
             },
             filterFn: (row, id, filter: HasSearchStringFilter) => {
               const value = row.getValue(id);
@@ -448,6 +455,7 @@ const MasterDataTable: React.FC<{
           }
         ]}
         togglesComponent={TogglesWithFilter}
+        onRowClick={(subject) => setHighlightedRowId(subject.id)}
         onRowDoubleClick={onRowDoubleClick}
         onSearchChange={(value, table) => {
           setSearchString(value);

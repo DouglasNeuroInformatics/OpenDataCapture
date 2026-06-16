@@ -5,6 +5,7 @@ import type { GroupSettings, GroupType, UpdateGroupData } from '@opendatacapture
 @ValidationSchema($UpdateGroupData)
 export class UpdateGroupDto implements UpdateGroupData {
   accessibleInstrumentIds?: string[];
+  instrumentRepoIds?: string[];
   name?: string;
   settings?: Partial<GroupSettings>;
   type?: GroupType;

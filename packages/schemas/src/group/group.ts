@@ -23,6 +23,7 @@ export const $GroupType = z.enum(['CLINICAL', 'RESEARCH']);
 export type Group = z.infer<typeof $Group>;
 export const $Group = $BaseModel.extend({
   accessibleInstrumentIds: z.array(z.string()),
+  instrumentRepoIds: z.array(z.string()),
   name: z.string().min(1),
   settings: $GroupSettings,
   subjectIds: z.array(z.string()),
