@@ -663,40 +663,49 @@ const RouteComponent = () => {
                       </Label>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className="bg-muted flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border">
+                      <input
+                        accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                        className="hidden"
+                        ref={fileInputRef}
+                        type="file"
+                        onChange={(e) => {
+                          handleLogoFile(e.target.files?.[0]);
+                          e.target.value = '';
+                        }}
+                      />
+                      {/* The box itself is the upload target: click anywhere to pick a file. */}
+                      <button
+                        className="bg-muted hover:border-primary/50 flex h-24 w-full max-w-xs flex-col items-center justify-center gap-2 overflow-hidden rounded-md border border-dashed p-2 text-center transition-colors"
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
                         {form.customLogoSrc ? (
-                          <img
-                            alt="Logo preview"
-                            className="h-full w-full object-contain p-1"
-                            src={form.customLogoSrc}
-                          />
+                          <React.Fragment>
+                            <img
+                              alt="Logo preview"
+                              className="max-h-12 w-auto object-contain"
+                              src={form.customLogoSrc}
+                            />
+                            <span className="text-muted-foreground text-xs">
+                              {t({ en: 'Click to replace', fr: 'Cliquez pour remplacer' })}
+                            </span>
+                          </React.Fragment>
                         ) : (
-                          <span className="text-muted-foreground text-xs">{t({ en: 'None', fr: 'Aucune' })}</span>
+                          <React.Fragment>
+                            <UploadIcon className="text-muted-foreground h-5 w-5" />
+                            <span className="text-muted-foreground text-xs">
+                              {t({ en: 'Click to upload', fr: 'Cliquez pour téléverser' })}
+                            </span>
+                          </React.Fragment>
                         )}
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <input
-                          accept="image/png,image/jpeg,image/svg+xml,image/webp"
-                          className="hidden"
-                          ref={fileInputRef}
-                          type="file"
-                          onChange={(e) => {
-                            handleLogoFile(e.target.files?.[0]);
-                            e.target.value = '';
-                          }}
-                        />
-                        <Button size="sm" type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                          <UploadIcon className="mr-1.5 h-4 w-4" />
-                          {t({ en: 'Upload image', fr: 'Téléverser' })}
+                      </button>
+                      {/* Clears only the uploaded image; the saved URL is left intact. */}
+                      {form.customLogoSrc && (
+                        <Button size="sm" type="button" variant="ghost" onClick={() => update('customLogoSrc', '')}>
+                          <XIcon className="mr-1.5 h-4 w-4" />
+                          {t({ en: 'Remove', fr: 'Retirer' })}
                         </Button>
-                        {/* Clears only the uploaded image; the saved URL is left intact. */}
-                        {form.customLogoSrc && (
-                          <Button size="sm" type="button" variant="ghost" onClick={() => update('customLogoSrc', '')}>
-                            <XIcon className="mr-1.5 h-4 w-4" />
-                            {t({ en: 'Remove', fr: 'Retirer' })}
-                          </Button>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
 
