@@ -24,11 +24,18 @@ jobs:
           git config --global --add safe.directory /__w/OpenDataCapture/OpenDataCapture
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
-      - name: Install Playwright
-        run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps
+      # Run lint and unit tests before the (occasionally flaky) Playwright install so those results
+      # aren't blocked by a hung browser download.
       - name: Lint
         run: pnpm lint
       - name: Unit Tests
         run: pnpm test
+      - name: Install Playwright
+        # Cap the step so a hung download fails fast instead of running into the 6h job limit, skip the
+        # interactive apt prompt, and install only the browsers the e2e suite actually uses.
+        timeout-minutes: 10
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps chromium firefox
       - name: End-to-End Tests
         run: pnpm --filter "@opendatacapture/e2e" test
