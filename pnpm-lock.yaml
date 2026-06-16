@@ -950,13 +950,13 @@ importers:
       lz-string:
         specifier: ^1.5.0
         version: 1.5.0
-      zod:
-        specifier: workspace:zod__3.x@*
-        version: link:../../vendor/zod@3.x
     devDependencies:
       esbuild:
         specifier: 'catalog:'
         version: 0.23.1
+      zod:
+        specifier: workspace:zod__3.x@*
+        version: link:../../vendor/zod@3.x
 
   packages/react-core:
     dependencies:
