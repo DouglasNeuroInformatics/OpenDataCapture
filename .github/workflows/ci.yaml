@@ -30,26 +30,12 @@ jobs:
         run: pnpm lint
       - name: Unit Tests
         run: pnpm test
-      # Install OS deps and browser binaries separately. The apt step is reliable; the browser
-      # download is what hangs (a stalled CDN socket with no internal timeout), so it's wrapped in a
-      # per-attempt `timeout` + retry. Playwright skips already-downloaded browsers, so each retry
-      # resumes where the last left off. Only chromium + firefox are used by the e2e suite.
-      - name: Install Playwright system dependencies
-        timeout-minutes: 5
+      - name: Install Playwright
+        # Cap the step so a hang fails fast instead of hitting the 6h job limit, skip the interactive
+        # apt prompt, and install only the browsers the e2e suite uses.
+        timeout-minutes: 10
         env:
           DEBIAN_FRONTEND: noninteractive
-        run: pnpm --filter "@opendatacapture/e2e" exec playwright install-deps chromium firefox
-      - name: Install Playwright browsers
-        timeout-minutes: 10
-        run: |
-          for attempt in 1 2 3; do
-            echo "Downloading Playwright browsers (attempt ${attempt})..."
-            if timeout 180 pnpm --filter "@opendatacapture/e2e" exec playwright install chromium firefox; then
-              exit 0
-            fi
-            echo "Attempt ${attempt} stalled or failed; retrying..."
-          done
-          echo "Playwright browser download failed after 3 attempts."
-          exit 1
+        run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps chromium firefox
       - name: End-to-End Tests
         run: pnpm --filter "@opendatacapture/e2e" test
