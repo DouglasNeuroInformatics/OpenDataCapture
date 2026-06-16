@@ -6,10 +6,12 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 
 import { DemoBanner } from '@/components/DemoBanner';
+import { LoginBrandingPanel } from '@/components/LoginBranding';
 import { LoginForm } from '@/components/LoginForm';
 import { config } from '@/config';
 import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
+import { getRightPanelGradient } from '@/utils/branding';
 
 const loginRequest = async (
   credentials: $LoginCredentials
@@ -28,8 +30,13 @@ const RouteComponent = () => {
   const login = useAppStore((store) => store.login);
   const setupStateQuery = useSetupStateQuery();
   const notifications = useNotificationsStore();
-  const { t } = useTranslation('auth');
+  const { resolvedLanguage, t } = useTranslation('auth');
   const navigate = useNavigate();
+
+  const branding = setupStateQuery.data.branding;
+  const enableBranding = branding?.enableBranding === true;
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  const instanceName = branding?.instanceName?.[resolvedLanguage]?.trim() || 'Open Data Capture';
 
   const handleLogin = async (credentials: $LoginCredentials) => {
     const result = await loginRequest(credentials);
@@ -45,34 +52,77 @@ const RouteComponent = () => {
     await navigate({ to: '/dashboard' });
   };
 
+  if (!enableBranding) {
+    return (
+      <div className="flex min-h-screen w-full flex-col" data-testid="login-page">
+        {setupStateQuery.data.isDemo && <DemoBanner onLogin={(credentials) => void handleLogin(credentials)} />}
+        <div className="flex w-full grow flex-col items-center justify-center">
+          <Card
+            className="sm:bg-card w-full max-w-sm border-none bg-inherit px-2.5 py-1.5 sm:border-solid"
+            data-testid="login-card"
+          >
+            <Card.Header className="flex items-center justify-center">
+              <Logo className="m-1.5 h-auto w-16" variant="auto" />
+              <Heading variant="h2">{t('login')}</Heading>
+            </Card.Header>
+            <Card.Content>
+              <LoginForm onSubmit={(credentials) => void handleLogin(credentials)} />
+            </Card.Content>
+            <Card.Footer className="text-muted-foreground flex justify-between" data-testid="login-footer-toggles">
+              <LanguageToggle
+                align="start"
+                options={{
+                  en: 'English',
+                  fr: 'Français'
+                }}
+                triggerClassName="border p-2"
+                variant="ghost"
+              />
+              <ThemeToggle className="border p-2" variant="ghost" />
+            </Card.Footer>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen w-full flex-col" data-testid="login-page">
       {setupStateQuery.data.isDemo && <DemoBanner onLogin={(credentials) => void handleLogin(credentials)} />}
-      <div className="flex w-full grow flex-col items-center justify-center">
-        <Card
-          className="sm:bg-card w-full max-w-sm border-none bg-inherit px-2.5 py-1.5 sm:border-solid"
-          data-testid="login-card"
+      <div className="flex grow flex-col lg:flex-row">
+        <LoginBrandingPanel branding={branding} className="hidden lg:flex lg:w-1/2 xl:w-3/5" />
+        <div
+          className="bg-background flex w-full grow flex-col px-4 py-10 lg:w-1/2 xl:w-2/5"
+          style={getRightPanelGradient(branding) ? { backgroundImage: getRightPanelGradient(branding)! } : undefined}
         >
-          <Card.Header className="flex items-center justify-center">
-            <Logo className="m-1.5 h-auto w-16" variant="auto" />
-            <Heading variant="h2">{t('login')}</Heading>
-          </Card.Header>
-          <Card.Content>
-            <LoginForm onSubmit={(credentials) => void handleLogin(credentials)} />
-          </Card.Content>
-          <Card.Footer className="text-muted-foreground flex justify-between" data-testid="login-footer-toggles">
-            <LanguageToggle
-              align="start"
-              options={{
-                en: 'English',
-                fr: 'Français'
-              }}
-              triggerClassName="border p-2"
-              variant="ghost"
-            />
-            <ThemeToggle className="border p-2" variant="ghost" />
-          </Card.Footer>
-        </Card>
+          <Heading className="mb-8 text-center lg:hidden" variant="h3">
+            {instanceName}
+          </Heading>
+          <Card
+            className="my-auto w-full max-w-sm self-center border-none bg-inherit px-2.5 py-1.5 shadow-none sm:border-none"
+            data-testid="login-card"
+          >
+            <Card.Header className="flex items-center justify-center">
+              <Logo className="m-1.5 h-auto w-16" variant="auto" />
+              <Heading variant="h2">{t('login')}</Heading>
+            </Card.Header>
+            <Card.Content>
+              <LoginForm onSubmit={(credentials) => void handleLogin(credentials)} />
+            </Card.Content>
+            <Card.Footer className="text-muted-foreground flex justify-between" data-testid="login-footer-toggles">
+              <LanguageToggle
+                align="start"
+                options={{
+                  en: 'English',
+                  fr: 'Français'
+                }}
+                triggerClassName="border p-2"
+                variant="ghost"
+              />
+              <ThemeToggle className="border p-2" variant="ghost" />
+            </Card.Footer>
+          </Card>
+        </div>
       </div>
     </div>
   );
