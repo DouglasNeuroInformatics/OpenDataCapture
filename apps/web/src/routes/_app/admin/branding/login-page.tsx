@@ -648,21 +648,20 @@ const RouteComponent = () => {
                   selects which one the login page actually renders. The inactive
                   option is dimmed (but still editable) to signal it isn't in use.
                 */}
-                <RadioGroup value={form.logoSource} onValueChange={(v) => update('logoSource', v as LogoSource)}>
+                <RadioGroup
+                  className="gap-5"
+                  value={form.logoSource}
+                  onValueChange={(v) => update('logoSource', v as LogoSource)}
+                >
                   {/* Uploaded image slot */}
-                  <div
-                    className={cn(
-                      'flex flex-col gap-3 rounded-md border p-3',
-                      form.logoSource !== 'upload' && 'opacity-60'
-                    )}
-                  >
+                  <div className={cn('flex flex-col gap-3', form.logoSource !== 'upload' && 'opacity-60')}>
                     <div className="flex items-center gap-2">
                       <RadioGroup.Item id="logoSource-upload" value="upload" />
                       <Label className="cursor-pointer font-medium" htmlFor="logoSource-upload">
                         {t({ en: 'Uploaded image', fr: 'Image téléversée' })}
                       </Label>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="pl-6">
                       <input
                         accept="image/png,image/jpeg,image/svg+xml,image/webp"
                         className="hidden"
@@ -673,62 +672,67 @@ const RouteComponent = () => {
                           e.target.value = '';
                         }}
                       />
-                      {/* The box itself is the upload target: click anywhere to pick a file. */}
-                      <button
-                        className="bg-muted hover:border-primary/50 flex h-24 w-full max-w-xs flex-col items-center justify-center gap-2 overflow-hidden rounded-md border border-dashed p-2 text-center transition-colors"
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        {form.customLogoSrc ? (
-                          <React.Fragment>
-                            <img
-                              alt="Logo preview"
-                              className="max-h-12 w-auto object-contain"
-                              src={form.customLogoSrc}
-                            />
-                            <span className="text-muted-foreground text-xs">
-                              {t({ en: 'Click to replace', fr: 'Cliquez pour remplacer' })}
-                            </span>
-                          </React.Fragment>
-                        ) : (
-                          <React.Fragment>
-                            <UploadIcon className="text-muted-foreground h-5 w-5" />
-                            <span className="text-muted-foreground text-xs">
-                              {t({ en: 'Click to upload', fr: 'Cliquez pour téléverser' })}
-                            </span>
-                          </React.Fragment>
+                      <div className="relative w-full max-w-xs">
+                        {/* The box itself is the upload target: click anywhere to pick a file. */}
+                        <button
+                          className="bg-muted hover:border-primary/50 flex h-24 w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-md border border-dashed p-2 text-center transition-colors"
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          {form.customLogoSrc ? (
+                            <React.Fragment>
+                              <img
+                                alt="Logo preview"
+                                className="max-h-12 w-auto object-contain"
+                                src={form.customLogoSrc}
+                              />
+                              <span className="text-muted-foreground text-xs">
+                                {t({ en: 'Click to replace', fr: 'Cliquez pour remplacer' })}
+                              </span>
+                            </React.Fragment>
+                          ) : (
+                            <React.Fragment>
+                              <UploadIcon className="text-muted-foreground h-5 w-5" />
+                              <span className="text-muted-foreground text-xs">
+                                {t({ en: 'Click to upload', fr: 'Cliquez pour téléverser' })}
+                              </span>
+                            </React.Fragment>
+                          )}
+                        </button>
+                        {/* Clears only the uploaded image; the saved URL is left intact. */}
+                        {form.customLogoSrc && (
+                          <Button
+                            aria-label={t({ en: 'Remove', fr: 'Retirer' })}
+                            className="bg-background/80 hover:bg-background absolute right-1.5 top-1.5 h-7 w-7 rounded-full border p-0 shadow-sm backdrop-blur-sm"
+                            size="sm"
+                            type="button"
+                            variant="ghost"
+                            onClick={() => update('customLogoSrc', '')}
+                          >
+                            <XIcon className="h-4 w-4" />
+                          </Button>
                         )}
-                      </button>
-                      {/* Clears only the uploaded image; the saved URL is left intact. */}
-                      {form.customLogoSrc && (
-                        <Button size="sm" type="button" variant="ghost" onClick={() => update('customLogoSrc', '')}>
-                          <XIcon className="mr-1.5 h-4 w-4" />
-                          {t({ en: 'Remove', fr: 'Retirer' })}
-                        </Button>
-                      )}
+                      </div>
                     </div>
                   </div>
 
                   {/* Image URL slot */}
-                  <div
-                    className={cn(
-                      'flex flex-col gap-3 rounded-md border p-3',
-                      form.logoSource !== 'url' && 'opacity-60'
-                    )}
-                  >
+                  <div className={cn('flex flex-col gap-3', form.logoSource !== 'url' && 'opacity-60')}>
                     <div className="flex items-center gap-2">
                       <RadioGroup.Item id="logoSource-url" value="url" />
                       <Label className="cursor-pointer font-medium" htmlFor="logoSource-url">
                         {t({ en: 'Image URL', fr: "URL de l'image" })}
                       </Label>
                     </div>
-                    <Input
-                      aria-label={t({ en: 'Image URL', fr: "URL de l'image" })}
-                      maxLength={2000}
-                      placeholder="https://example.org/logo.png"
-                      value={form.customLogoUrl}
-                      onChange={(e) => update('customLogoUrl', e.target.value)}
-                    />
+                    <div className="pl-6">
+                      <Input
+                        aria-label={t({ en: 'Image URL', fr: "URL de l'image" })}
+                        maxLength={2000}
+                        placeholder="https://example.org/logo.png"
+                        value={form.customLogoUrl}
+                        onChange={(e) => update('customLogoUrl', e.target.value)}
+                      />
+                    </div>
                   </div>
                 </RadioGroup>
                 <div className="grid gap-4 sm:grid-cols-2">
