@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import {
   Badge,
@@ -120,6 +120,7 @@ const InstrumentSection = ({
                   : t({ en: 'Uploaded manually', fr: 'Téléversé manuellement' })}
               </Badge>
               <button
+                aria-label={t({ en: 'Preview instrument', fr: "Aperçu de l'instrument" })}
                 className="text-muted-foreground hover:text-foreground shrink-0 p-1 transition-colors"
                 type="button"
                 onClick={(e) => {
@@ -223,6 +224,13 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
   const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set(initialSelectedIds));
   const [previewItem, setPreviewItem] = useState<InstrumentItem | null>(null);
+
+  // Resync the selection when the upstream group data changes (e.g. after a save refetches the group).
+  // `initialSelectedIds` is a stable reference from a useMemo, so this only fires on real changes —
+  // not on every render — and won't clobber in-progress edits.
+  useEffect(() => {
+    setSelectedIds(new Set(initialSelectedIds));
+  }, [initialSelectedIds]);
 
   const toggle = (id: string) => {
     setSelectedIds((prev) => {

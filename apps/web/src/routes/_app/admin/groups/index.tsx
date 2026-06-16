@@ -11,7 +11,11 @@ import axios from 'axios';
 import { PageHeader } from '@/components/PageHeader';
 import { useDeleteGroupMutation } from '@/hooks/useDeleteGroupMutation';
 import { GROUPS_QUERY_KEY, groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
-import { instrumentReposQueryOptions, useInstrumentReposQuery } from '@/hooks/useInstrumentReposQuery';
+import {
+  INSTRUMENT_REPOS_QUERY_KEY,
+  instrumentReposQueryOptions,
+  useInstrumentReposQuery
+} from '@/hooks/useInstrumentReposQuery';
 import { getApiErrorMessage } from '@/utils/error';
 
 const RouteComponent = () => {
@@ -41,6 +45,10 @@ const RouteComponent = () => {
     onSuccess() {
       addNotification({ type: 'success' });
       void queryClient.invalidateQueries({ queryKey: [GROUPS_QUERY_KEY] });
+      // Group<->repo assignments changed, so the repos page's "in use" state must refetch too.
+      void queryClient.invalidateQueries({ queryKey: [INSTRUMENT_REPOS_QUERY_KEY] });
+      // Close the sheet only after a successful save so the user keeps their selection on failure.
+      setSelectedGroup(null);
     }
   });
 
@@ -64,11 +72,11 @@ const RouteComponent = () => {
 
   const handleSave = () => {
     if (!selectedGroup) return;
+    // The sheet is closed in the mutation's onSuccess so a failed save keeps the user's selection.
     updateGroupReposMutation.mutate({
       groupId: selectedGroup.id,
       instrumentRepoIds: [...selectedRepoIds]
     });
-    setSelectedGroup(null);
   };
 
   return (

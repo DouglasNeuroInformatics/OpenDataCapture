@@ -125,7 +125,10 @@ const RouteComponent = () => {
   const handleDeleteClick = (repo: InstrumentRepo) => {
     if (inUseRepoIds.has(repo.id)) {
       addNotification({
-        message: `"${repo.name}" is assigned to one or more groups. Remove it from those groups before deleting.`,
+        message: t({
+          en: `"${repo.name}" is assigned to one or more groups. Remove it from those groups before deleting.`,
+          fr: `« ${repo.name} » est assigné à un ou plusieurs groupes. Retirez-le de ces groupes avant de le supprimer.`
+        }),
         type: 'warning'
       });
       return;
@@ -291,34 +294,36 @@ const RouteComponent = () => {
               );
             }
             return (
-              <ul className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
-                <AnimatePresence mode="popLayout">
-                  <div className="grid grid-cols-[1fr_8rem_5rem] gap-x-6 font-bold">
-                    <p>{t({ en: 'Title', fr: 'Titre' })}</p>
-                    <p>{t({ en: 'Kind', fr: 'Type' })}</p>
-                    <p>{t({ en: 'Edition', fr: 'Édition' })}</p>
-                  </div>
-                  <hr />
-                  {repoInstruments.map((instrument, i) => (
-                    <motion.li
-                      layout
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      initial={{ opacity: 0 }}
-                      key={instrument.id}
-                      transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
-                    >
-                      <div className="grid grid-cols-[1fr_8rem_5rem] gap-x-6">
-                        <p className="truncate" title={instrument.details.title}>
-                          {instrument.details.title}
-                        </p>
-                        <p className="text-muted-foreground">{instrument.kind}</p>
-                        <p className="text-muted-foreground">{instrument.internal?.edition ?? '-'}</p>
-                      </div>
-                    </motion.li>
-                  ))}
-                </AnimatePresence>
-              </ul>
+              <div className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
+                <div className="grid grid-cols-[1fr_8rem_5rem] gap-x-6 font-bold">
+                  <p>{t({ en: 'Title', fr: 'Titre' })}</p>
+                  <p>{t({ en: 'Kind', fr: 'Type' })}</p>
+                  <p>{t({ en: 'Edition', fr: 'Édition' })}</p>
+                </div>
+                <hr />
+                <ul className="flex flex-col gap-5">
+                  <AnimatePresence mode="popLayout">
+                    {repoInstruments.map((instrument, i) => (
+                      <motion.li
+                        layout
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        initial={{ opacity: 0 }}
+                        key={instrument.id}
+                        transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
+                      >
+                        <div className="grid grid-cols-[1fr_8rem_5rem] gap-x-6">
+                          <p className="truncate" title={instrument.details.title}>
+                            {instrument.details.title}
+                          </p>
+                          <p className="text-muted-foreground">{instrument.kind}</p>
+                          <p className="text-muted-foreground">{instrument.internal?.edition ?? '-'}</p>
+                        </div>
+                      </motion.li>
+                    ))}
+                  </AnimatePresence>
+                </ul>
+              </div>
             );
           })()}
         </Dialog.Content>

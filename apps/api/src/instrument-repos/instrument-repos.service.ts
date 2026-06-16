@@ -1,8 +1,9 @@
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { promisify } from 'node:util';
 
 import { ConfigService, InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
@@ -16,6 +17,9 @@ import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
 
 import type { CreateInstrumentRepoDto } from './dto/create-instrument-repo.dto';
+
+// Promisified so the (potentially slow) curl/tar calls don't block the Node.js event loop.
+const execFileAsync = promisify(execFile);
 
 @Injectable()
 export class InstrumentReposService implements OnModuleInit {
@@ -186,7 +190,15 @@ export class InstrumentReposService implements OnModuleInit {
     return dirs;
   }
 
-  private downloadAndExtractRepo(owner: string, repoName: string, accessToken?: string): string {
+  // Returns both the extracted instrument root (`repoDir`) and the temp directory that owns it
+  // (`tmpDir`); the caller is responsible for removing `tmpDir` once done. They differ because tar
+  // extracts into a `repoName-branch` subdirectory, and the caller must delete the exact directory we
+  // created — never its parent (the OS temp root).
+  private async downloadAndExtractRepo(
+    owner: string,
+    repoName: string,
+    accessToken?: string
+  ): Promise<{ repoDir: string; tmpDir: string }> {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'odc-repo-'));
     const tarballPath = path.join(tmpDir, 'archive.tar.gz');
     // Prefer a repo-specific token, falling back to a server-wide GITHUB_TOKEN if configured.
@@ -199,7 +211,7 @@ export class InstrumentReposService implements OnModuleInit {
       // (which redirects to codeload while still requiring auth) fails for private repos.
       const tarballUrl = `https://api.github.com/repos/${owner}/${repoName}/tarball/${branch}`;
       try {
-        // execFileSync (no shell) so owner/repoName/token cannot inject shell commands.
+        // execFile (no shell) so owner/repoName/token cannot inject shell commands.
         const curlArgs = [
           '-fsSL',
           '-H',
@@ -211,18 +223,15 @@ export class InstrumentReposService implements OnModuleInit {
           curlArgs.push('-H', `Authorization: Bearer ${token}`);
         }
         curlArgs.push(tarballUrl, '-o', tarballPath);
-        execFileSync('curl', curlArgs, { stdio: 'pipe', timeout: 60_000 });
-        execFileSync('tar', ['-xz', '-f', tarballPath, '-C', tmpDir], { stdio: 'pipe', timeout: 60_000 });
+        await execFileAsync('curl', curlArgs, { timeout: 60_000 });
+        await execFileAsync('tar', ['-xz', '-f', tarballPath, '-C', tmpDir], { timeout: 60_000 });
         fs.rmSync(tarballPath, { force: true });
         // tar extracts into a single subdirectory like "repoName-main"
         const dirs = fs
           .readdirSync(tmpDir, { withFileTypes: true })
           .filter((entry) => entry.isDirectory())
           .map((entry) => entry.name);
-        if (dirs.length === 1) {
-          return path.join(tmpDir, dirs[0]!);
-        }
-        return tmpDir;
+        return { repoDir: dirs.length === 1 ? path.join(tmpDir, dirs[0]!) : tmpDir, tmpDir };
       } catch {
         // remove any partial download and try the next branch
         fs.rmSync(tarballPath, { force: true });
@@ -288,7 +297,7 @@ export class InstrumentReposService implements OnModuleInit {
     accessToken?: string
   ): Promise<{ createdIds: string[]; instrumentIds: string[] }> {
     this.loggingService.log(`Downloading ${owner}/${repoName}...`);
-    const repoDir = this.downloadAndExtractRepo(owner, repoName, accessToken);
+    const { repoDir, tmpDir } = await this.downloadAndExtractRepo(owner, repoName, accessToken);
 
     try {
       const instrumentDirs = this.discoverInstrumentDirs(repoDir);
@@ -317,8 +326,8 @@ export class InstrumentReposService implements OnModuleInit {
       this.loggingService.log(`Imported ${instrumentIds.length} instruments from ${owner}/${repoName}`);
       return { createdIds, instrumentIds };
     } finally {
-      const tmpRoot = path.dirname(repoDir);
-      fs.rmSync(tmpRoot, { force: true, recursive: true });
+      // Remove the exact temp directory we created (never its parent, the OS temp root).
+      fs.rmSync(tmpDir, { force: true, recursive: true });
     }
   }
 

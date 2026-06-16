@@ -177,7 +177,7 @@ export class InstrumentsService {
   ): Promise<InstrumentInfo[]> {
     const instances = await this.find(query, options);
 
-    const sourceMap = await this.buildInstrumentSourceMap();
+    const sourceMap = await this.buildInstrumentSourceMap(instances.map((instance) => instance.id));
 
     const results = new Map<string, InstrumentInfo>();
     for (const instance of instances) {
@@ -257,14 +257,22 @@ export class InstrumentsService {
     });
   }
 
-  /** Map of instrument id -> denormalized repository provenance, for instruments imported from a repo. */
-  private async buildInstrumentSourceMap(): Promise<
-    Map<string, { sourceRepoId: string; sourceRepoName: null | string }>
-  > {
-    const instruments = await this.instrumentModel.findMany({
-      where: { sourceRepoId: { not: null } }
-    });
+  /**
+   * Map of instrument id -> denormalized repository provenance, for the given instruments that came
+   * from a repo. Scoped to the requested ids and selecting only the provenance fields so it never
+   * loads full instrument records (notably the large `bundle`).
+   */
+  private async buildInstrumentSourceMap(
+    ids: string[]
+  ): Promise<Map<string, { sourceRepoId: string; sourceRepoName: null | string }>> {
     const map = new Map<string, { sourceRepoId: string; sourceRepoName: null | string }>();
+    if (ids.length === 0) {
+      return map;
+    }
+    const instruments = await this.instrumentModel.findMany({
+      select: { id: true, sourceRepoId: true, sourceRepoName: true },
+      where: { id: { in: ids }, sourceRepoId: { not: null } }
+    });
     for (const inst of instruments) {
       if (inst.sourceRepoId) {
         map.set(inst.id, { sourceRepoId: inst.sourceRepoId, sourceRepoName: inst.sourceRepoName });

@@ -74,9 +74,12 @@ export class GroupsService {
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);
     }
-    const exists = typeof data.name === 'string' && (await this.groupModel.exists({ name: group.name }));
+    // Only guard against a genuine rename collision: check the requested name (not the current one,
+    // which would always match this same group) and skip the check when the name is unchanged.
+    const exists =
+      typeof data.name === 'string' && data.name !== group.name && (await this.groupModel.exists({ name: data.name }));
     if (exists) {
-      throw new ConflictException(`Group with name '${group.name}' already exists!`);
+      throw new ConflictException(`Group with name '${data.name}' already exists!`);
     }
 
     return this.groupModel.update({
