@@ -5,7 +5,15 @@ import axios from 'axios';
 
 import { SETUP_STATE_QUERY_KEY } from './useSetupStateQuery';
 
-export function useUpdateSetupStateMutation() {
+type UpdateSetupStateMutationOptions = {
+  /** The notification shown when the update succeeds */
+  successNotification?: {
+    message: string;
+    title: string;
+  };
+};
+
+export function useUpdateSetupStateMutation({ successNotification }: UpdateSetupStateMutationOptions = {}) {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
@@ -13,7 +21,13 @@ export function useUpdateSetupStateMutation() {
       await axios.patch('/v1/setup', data);
     },
     onSuccess() {
-      addNotification({ type: 'success' });
+      if (successNotification) {
+        addNotification({
+          message: successNotification.message,
+          title: successNotification.title,
+          type: 'success'
+        });
+      }
       void queryClient.invalidateQueries({ queryKey: [SETUP_STATE_QUERY_KEY] });
     }
   });

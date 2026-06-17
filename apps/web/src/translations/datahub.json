@@ -103,11 +103,33 @@
       "fr": "Centre de données"
     }
   },
+  "files": {
+    "dateCollected": {
+      "en": "Date Collected",
+      "fr": "Date de collecte"
+    },
+    "download": {
+      "en": "Download",
+      "fr": "Télécharger"
+    },
+    "empty": {
+      "en": "No files have been uploaded for this subject.",
+      "fr": "Aucun fichier n'a été téléversé pour ce client."
+    },
+    "instrument": {
+      "en": "Instrument",
+      "fr": "Instrument"
+    }
+  },
   "layout": {
     "tabs": {
       "assignments": {
         "en": "Assignments",
         "fr": "Assignations"
+      },
+      "files": {
+        "en": "Files",
+        "fr": "Fichiers"
       },
       "graph": {
         "en": "Graph",

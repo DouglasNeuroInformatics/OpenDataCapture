@@ -1,0 +1,40 @@
+{
+  "name": "@opendatacapture/playground-url",
+  "type": "module",
+  "version": "2.0.0",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture.git",
+    "directory": "packages/playground-url"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "bin": {
+    "playground-url": "./dist/cli.js"
+  },
+  "files": [
+    "!/src/**/*.test.ts",
+    "/dist",
+    "/src"
+  ],
+  "scripts": {
+    "build": "node scripts/build.js",
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "catalog:",
+    "lz-string": "^1.5.0",
+    "zod": "workspace:zod__3.x@*"
+  },
+  "devDependencies": {
+    "esbuild": "catalog:"
+  }
+}

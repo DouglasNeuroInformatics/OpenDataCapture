@@ -1,11 +1,14 @@
+import { useMemo } from 'react';
+
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { ActionDropdown, ClientTable } from '@douglasneuroinformatics/libui/components';
+import { ActionDropdown, DataTable, TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute } from '@tanstack/react-router';
 
 import { SelectInstrument } from '@/components/SelectInstrument';
 import { TimeDropdown } from '@/components/TimeDropdown';
 import { useInstrumentVisualization } from '@/hooks/useInstrumentVisualization';
+import type { InstrumentVisualizationRecord } from '@/hooks/useInstrumentVisualization';
 
 const RouteComponent = () => {
   const navigate = Route.useNavigate();
@@ -16,19 +19,27 @@ const RouteComponent = () => {
 
   const { t } = useTranslation();
 
-  const fields: { field: string; label: string }[] = [];
-  for (const subItem in records[0]) {
-    if (!subItem.startsWith('__')) {
-      fields.push({
-        field: subItem,
-        label: camelToSnakeCase(subItem).toUpperCase()
-      });
+  const columns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(() => {
+    const columns: TanstackTable.ColumnDef<InstrumentVisualizationRecord>[] = [];
+    for (const subItem in records[0]) {
+      if (!subItem.startsWith('__')) {
+        columns.push({
+          accessorKey: subItem,
+          cell: (ctx) => {
+            const value = ctx.getValue();
+            return <p className="overflow-hidden text-ellipsis whitespace-nowrap">{String(value)}</p>;
+          },
+          header: camelToSnakeCase(subItem).toUpperCase(),
+          id: subItem
+        });
+      }
     }
-  }
+    return columns;
+  }, [records[0]]);
 
   return (
     <div>
-      <div className="mb-2">
+      <div className="mb-3">
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
           <div className="flex">
             <SelectInstrument options={instrumentOptions} onSelect={setInstrumentId} />
@@ -47,28 +58,40 @@ const RouteComponent = () => {
           </div>
         </div>
       </div>
-      <ClientTable
-        noWrap
+      <DataTable
+        disableSearch
         columns={[
           {
-            field: '__date__',
-            formatter: (value: Date) => toBasicISOString(value),
-            label: 'DATE_COLLECTED'
+            accessorKey: '__date__',
+            cell: (ctx) => {
+              const value = ctx.getValue();
+              if (value instanceof Date) {
+                return toBasicISOString(value);
+              }
+              return value;
+            },
+            header: 'DATE_COLLECTED'
           },
-          ...fields
+          ...columns
         ]}
         data={records}
         data-testid="subject-table"
-        entriesPerPage={15}
-        minRows={15}
-        onEntryClick={(row) => {
-          void navigate({ params: { recordId: row.__id__ }, to: '/datahub/$subjectId/$recordId' });
+        rowActions={[
+          {
+            label: t('common.view'),
+            onSelect: (row) => {
+              void navigate({ params: { recordId: row.__id__ }, to: './$recordId' });
+            }
+          }
+        ]}
+        onRowDoubleClick={(row) => {
+          void navigate({ params: { recordId: row.__id__ }, to: './$recordId' });
         }}
       />
     </div>
   );
 };
 
-export const Route = createFileRoute('/_app/datahub/$subjectId/table')({
+export const Route = createFileRoute('/_app/datahub/$subjectId/table/')({
   component: RouteComponent
 });

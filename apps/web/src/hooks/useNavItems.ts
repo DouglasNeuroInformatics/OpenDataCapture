@@ -9,6 +9,7 @@ import {
   DatabaseIcon,
   EyeIcon,
   LogsIcon,
+  PaletteIcon,
   SendIcon,
   UploadIcon,
   UserCogIcon,
@@ -90,6 +91,14 @@ export function useNavItems() {
           fr: "Paramètres de l'application"
         }),
         url: '/admin/settings'
+      });
+      adminItems.push({
+        icon: PaletteIcon,
+        label: t({
+          en: 'Branding',
+          fr: 'Image de marque'
+        }),
+        url: '/admin/branding'
       });
       adminItems.push({
         icon: LogsIcon,

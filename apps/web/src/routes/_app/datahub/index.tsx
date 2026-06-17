@@ -213,6 +213,9 @@ const Toggles: React.FC<{
 
   const getExportRecords = async () => {
     const response = await axios.get<ArrayBuffer>('/v1/instrument-records/export', {
+      meta: {
+        disableDefaultTimeout: true
+      },
       params: {
         groupId: currentGroup?.id
       },

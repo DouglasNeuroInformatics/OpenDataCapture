@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   ServiceUnavailableException
 } from '@nestjs/common';
+import { $BrandingConfig } from '@opendatacapture/schemas/setup';
 import type { CreateAdminData, InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
 import type { RuntimePrismaClient } from '@/core/prisma';
@@ -37,7 +38,13 @@ export class SetupService {
 
   async getState() {
     const savedOptions = await this.getSavedOptions();
+    // The stored value is validated against the schema so that scalar columns
+    // (e.g. `loginTheme`) are narrowed to their expected literal union types.
+    // Note: unknown keys are stripped here, so a stale dev server running an
+    // older $BrandingConfig will silently drop newer branding fields on read.
+    const branding = $BrandingConfig.nullable().safeParse(savedOptions?.branding ?? null);
     return {
+      branding: branding.success ? branding.data : null,
       isDemo: Boolean(savedOptions?.isDemo),
       isExperimentalFeaturesEnabled: Boolean(savedOptions?.isExperimentalFeaturesEnabled),
       isGatewayEnabled: this.configService.get('GATEWAY_ENABLED'),
@@ -67,17 +74,22 @@ export class SetupService {
     return { success: true };
   }
 
-  async updateState(data: UpdateSetupStateData): Promise<Partial<SetupState>> {
+  async updateState({ branding, ...rest }: UpdateSetupStateData): Promise<Partial<SetupState>> {
     const setupState = await this.getSavedOptions();
     if (!setupState?.isSetup) {
       throw new ServiceUnavailableException('Cannot update state before setup');
     }
-    return this.setupStateModel.update({
-      data,
+    const normalizedBranding = branding ? { resourceLinks: [], sectionsOrder: [], ...branding } : branding;
+    await this.setupStateModel.update({
+      data: {
+        ...rest,
+        ...(branding !== undefined ? { branding: { set: normalizedBranding ?? null } } : {})
+      },
       where: {
         id: setupState.id
       }
     });
+    return this.getState();
   }
 
   private async dropDatabase(): Promise<void> {

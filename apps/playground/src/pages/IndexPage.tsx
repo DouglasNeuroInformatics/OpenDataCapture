@@ -1,13 +1,14 @@
 import { useEffect } from 'react';
 
-import { Separator } from '@douglasneuroinformatics/libui/components';
+import { LanguageToggle, Separator, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { decodeShareURL, isFullscreenShareURL } from '@opendatacapture/playground-url';
 import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 
 import { Header } from '@/components/Header';
 import { MainContent } from '@/components/MainContent';
+import { Viewer } from '@/components/Viewer';
 import type { InstrumentRepository } from '@/models/instrument-repository.model';
 import { useAppStore } from '@/store';
-import { decodeShareURL } from '@/utils/encode';
 
 const { initialize } = await import('esbuild-wasm');
 await initialize({
@@ -76,6 +77,30 @@ const IndexPage = () => {
       }
     };
   }, [location.href]);
+
+  const isFullscreen = isFullscreenShareURL(new URL(location.href));
+
+  if (isFullscreen) {
+    return (
+      <div className="flex h-screen w-screen flex-col overflow-hidden">
+        <div className="flex items-center justify-end gap-2 px-4 py-2">
+          <ThemeToggle className="h-9 w-9" />
+          <LanguageToggle
+            align="end"
+            options={{
+              en: 'English',
+              fr: 'Français'
+            }}
+            triggerClassName="h-9 w-9"
+          />
+        </div>
+        <Separator />
+        <main className="mx-auto w-full max-w-3xl grow overflow-hidden px-4 py-4">
+          <Viewer />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden px-4">

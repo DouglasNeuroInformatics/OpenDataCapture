@@ -13,7 +13,14 @@ export const $Env = $BaseEnv
     GATEWAY_ENABLED: $BooleanLike,
     GATEWAY_INTERNAL_NETWORK_URL: $UrlLike.optional(),
     GATEWAY_REFRESH_INTERVAL: $NumberLike.pipe(z.number().positive().int()),
-    GATEWAY_SITE_ADDRESS: $UrlLike.optional()
+    GATEWAY_SITE_ADDRESS: $UrlLike.optional(),
+    STORAGE_ACCESS_KEY: z.string().min(1).optional(),
+    STORAGE_BUCKET: z.string().min(1).optional(),
+    STORAGE_ENABLED: $BooleanLike.optional(),
+    STORAGE_ENDPOINT: z.url().optional(),
+    STORAGE_PUBLIC_ENDPOINT: z.url().optional(),
+    STORAGE_REGION: z.string().optional(),
+    STORAGE_SECRET_KEY: z.string().min(1).optional()
   })
   .transform((env, ctx) => {
     if (env.NODE_ENV === 'production') {
@@ -29,6 +36,17 @@ export const $Env = $BaseEnv
           code: z.ZodIssueCode.custom,
           message: 'API_DEV_SERVER_PORT must be defined in development'
         });
+      }
+    }
+    if (env.STORAGE_ENABLED) {
+      for (const key of ['STORAGE_ACCESS_KEY', 'STORAGE_BUCKET', 'STORAGE_ENDPOINT', 'STORAGE_SECRET_KEY'] as const) {
+        if (!env[key]) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `${key} must be defined when STORAGE_ENABLED is true`,
+            path: [key]
+          });
+        }
       }
     }
     return { ...env, API_PORT: env.API_DEV_SERVER_PORT ?? 80 };
