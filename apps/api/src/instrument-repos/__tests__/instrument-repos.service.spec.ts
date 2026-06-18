@@ -2,7 +2,7 @@ import { ConfigService, getModelToken, LoggingService } from '@douglasneuroinfor
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -21,6 +21,7 @@ type InternalService = {
     accessToken?: string
   ): Promise<{ createdIds: string[]; instrumentIds: string[] }>;
   normalizeUrl(url: string): string;
+  parseGitHubUrl(url: string): { owner: string; repoName: string };
   reconcileOrphanedInstruments(): Promise<void>;
 };
 
@@ -93,6 +94,26 @@ describe('InstrumentReposService', () => {
     it('does not hang on input with many trailing slashes', () => {
       const input = `https://github.com/owner/repo${'/'.repeat(100_000)}`;
       expect(internal.normalizeUrl(input)).toBe('https://github.com/owner/repo');
+    });
+  });
+
+  describe('parseGitHubUrl', () => {
+    it('extracts the owner and repo from a valid github URL', () => {
+      expect(internal.parseGitHubUrl('https://github.com/owner/repo.git')).toEqual({
+        owner: 'owner',
+        repoName: 'repo'
+      });
+    });
+
+    it.each([
+      'https://gitlab.com/owner/repo',
+      'https://github.com.evil.com/owner/repo',
+      'https://github.com/owner@evil.com/repo',
+      'https://github.com/owner/repo?x=y',
+      'https://github.com/owner'
+    ])('rejects a crafted URL that could forge a request: %s', (url) => {
+      // Guards against SSRF: only github.com with a strict owner/repo may reach the GitHub API call.
+      expect(() => internal.parseGitHubUrl(url)).toThrow(BadRequestException);
     });
   });
 

@@ -5,7 +5,13 @@ import * as path from 'node:path';
 
 import { ConfigService, InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
-import { BadGatewayException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadGatewayException,
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
 import type { OnModuleInit } from '@nestjs/common';
 import { bundle, BUNDLER_FILE_EXT_REGEX, inferLoader } from '@opendatacapture/instrument-bundler';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
@@ -205,7 +211,9 @@ export class InstrumentReposService implements OnModuleInit {
       // https://github.com/.../archive/...: the API authenticates the request and then 302-redirects
       // to a *signed* codeload.github.com URL. fetch drops the Authorization header on that
       // cross-origin redirect, but the signed URL no longer needs it — so private repos still work.
-      const zipballUrl = `https://api.github.com/repos/${owner}/${repoName}/zipball/${branch}`;
+      // owner/repoName are already restricted to a strict allowlist in parseGitHubUrl; encode them
+      // anyway so nothing can break out of the intended api.github.com path component.
+      const zipballUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/zipball/${branch}`;
       try {
         const headers: { [key: string]: string } = {
           Accept: 'application/vnd.github+json',
@@ -363,8 +371,16 @@ export class InstrumentReposService implements OnModuleInit {
   private parseGitHubUrl(url: string): { owner: string; repoName: string } {
     const cleaned = this.normalizeUrl(url);
     const parts = cleaned.split('/');
-    const repoName = parts.pop()!;
-    const owner = parts.pop()!;
+    const repoName = parts.pop();
+    const owner = parts.pop();
+    // parts now holds ['https:', '', '<host>']; require the GitHub host and a strict owner/repo so a
+    // crafted URL cannot redirect the later GitHub API request elsewhere (server-side request forgery).
+    // GitHub owners/repos only ever contain these characters, so this rejects `@`, `:`, `?`, `#`, etc.
+    const host = parts[2];
+    const validName = /^[A-Za-z0-9._-]+$/;
+    if (host !== 'github.com' || !owner || !repoName || !validName.test(owner) || !validName.test(repoName)) {
+      throw new BadRequestException('Must be a valid GitHub repository URL (https://github.com/<owner>/<repo>).');
+    }
     return { owner, repoName };
   }
 
