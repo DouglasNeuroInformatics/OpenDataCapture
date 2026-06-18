@@ -299,6 +299,9 @@ importers:
       fastify:
         specifier: ^5.7.1
         version: 5.7.4
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
       lodash-es:
         specifier: workspace:lodash-es__4.x@*
         version: link:../../vendor/lodash-es@4.x

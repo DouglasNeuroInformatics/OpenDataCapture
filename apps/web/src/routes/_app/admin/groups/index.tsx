@@ -40,7 +40,13 @@ const RouteComponent = () => {
       return $Group.parseAsync(response.data);
     },
     onError(err) {
-      addNotification({ message: getApiErrorMessage(err, 'Failed to update group repositories'), type: 'error' });
+      addNotification({
+        message: getApiErrorMessage(
+          err,
+          t({ en: 'Failed to update group repositories', fr: 'Échec de la mise à jour des dépôts du groupe' })
+        ),
+        type: 'error'
+      });
     },
     onSuccess() {
       addNotification({ type: 'success' });

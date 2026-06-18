@@ -47,6 +47,7 @@
     "axios": "catalog:",
     "express": "^5.0.1",
     "fastify": "^5.7.1",
+    "jszip": "^3.10.1",
     "lodash-es": "workspace:lodash-es__4.x@*",
     "mongodb": "^6.15.0",
     "msgpackr": "catalog:",

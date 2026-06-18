@@ -1,9 +1,7 @@
-import { execFile } from 'node:child_process';
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { promisify } from 'node:util';
 
 import { ConfigService, InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
@@ -11,15 +9,13 @@ import { BadGatewayException, ConflictException, Injectable, NotFoundException }
 import type { OnModuleInit } from '@nestjs/common';
 import { bundle, BUNDLER_FILE_EXT_REGEX, inferLoader } from '@opendatacapture/instrument-bundler';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
+import JSZip from 'jszip';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
 
 import type { CreateInstrumentRepoDto } from './dto/create-instrument-repo.dto';
-
-// Promisified so the (potentially slow) curl/tar calls don't block the Node.js event loop.
-const execFileAsync = promisify(execFile);
 
 @Injectable()
 export class InstrumentReposService implements OnModuleInit {
@@ -191,50 +187,43 @@ export class InstrumentReposService implements OnModuleInit {
   }
 
   // Returns both the extracted instrument root (`repoDir`) and the temp directory that owns it
-  // (`tmpDir`); the caller is responsible for removing `tmpDir` once done. They differ because tar
-  // extracts into a `repoName-branch` subdirectory, and the caller must delete the exact directory we
-  // created — never its parent (the OS temp root).
+  // (`tmpDir`); the caller is responsible for removing `tmpDir` once done. They differ because the
+  // GitHub archive wraps everything in a single `owner-repo-sha` subdirectory, and the caller must
+  // delete the exact directory we created — never its parent (the OS temp root).
   private async downloadAndExtractRepo(
     owner: string,
     repoName: string,
     accessToken?: string
   ): Promise<{ repoDir: string; tmpDir: string }> {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'odc-repo-'));
-    const tarballPath = path.join(tmpDir, 'archive.tar.gz');
     // Prefer a repo-specific token, falling back to a server-wide GITHUB_TOKEN if configured.
     const token = accessToken ?? process.env.GITHUB_TOKEN;
 
     for (const branch of ['main', 'master']) {
-      // Use the API tarball endpoint rather than https://github.com/.../archive/...: the API
-      // authenticates the request and then 302-redirects to a *signed* codeload.github.com URL.
-      // curl strips the Authorization header on cross-host redirects, so the archive endpoint
-      // (which redirects to codeload while still requiring auth) fails for private repos.
-      const tarballUrl = `https://api.github.com/repos/${owner}/${repoName}/tarball/${branch}`;
+      // Download + unpack entirely in-process (Node's fetch + JSZip) so we don't depend on `curl` or
+      // `tar` being installed in the runtime container. We hit the API zipball endpoint rather than
+      // https://github.com/.../archive/...: the API authenticates the request and then 302-redirects
+      // to a *signed* codeload.github.com URL. fetch drops the Authorization header on that
+      // cross-origin redirect, but the signed URL no longer needs it — so private repos still work.
+      const zipballUrl = `https://api.github.com/repos/${owner}/${repoName}/zipball/${branch}`;
       try {
-        // execFile (no shell) so owner/repoName/token cannot inject shell commands.
-        const curlArgs = [
-          '-fsSL',
-          '-H',
-          'Accept: application/vnd.github+json',
-          '-H',
-          'X-GitHub-Api-Version: 2022-11-28'
-        ];
+        const headers: { [key: string]: string } = {
+          Accept: 'application/vnd.github+json',
+          'User-Agent': 'OpenDataCapture',
+          'X-GitHub-Api-Version': '2022-11-28'
+        };
         if (token) {
-          curlArgs.push('-H', `Authorization: Bearer ${token}`);
+          headers.Authorization = `Bearer ${token}`;
         }
-        curlArgs.push(tarballUrl, '-o', tarballPath);
-        await execFileAsync('curl', curlArgs, { timeout: 60_000 });
-        await execFileAsync('tar', ['-xz', '-f', tarballPath, '-C', tmpDir], { timeout: 60_000 });
-        fs.rmSync(tarballPath, { force: true });
-        // tar extracts into a single subdirectory like "repoName-main"
-        const dirs = fs
-          .readdirSync(tmpDir, { withFileTypes: true })
-          .filter((entry) => entry.isDirectory())
-          .map((entry) => entry.name);
-        return { repoDir: dirs.length === 1 ? path.join(tmpDir, dirs[0]!) : tmpDir, tmpDir };
+        const response = await fetch(zipballUrl, { headers, signal: AbortSignal.timeout(60_000) });
+        if (!response.ok) {
+          throw new Error(`GitHub responded with status ${response.status}`);
+        }
+        const archive = Buffer.from(await response.arrayBuffer());
+        const repoDir = await this.extractZipArchive(archive, tmpDir);
+        return { repoDir, tmpDir };
       } catch {
-        // remove any partial download and try the next branch
-        fs.rmSync(tarballPath, { force: true });
+        // try the next branch
       }
     }
 
@@ -258,6 +247,34 @@ export class InstrumentReposService implements OnModuleInit {
   private encryptionKey(): Buffer {
     const secret = this.configService.getOrThrow('SECRET_KEY');
     return createHash('sha256').update(secret).digest();
+  }
+
+  // Unpack a GitHub zipball into `destDir`, returning the single top-level directory the archive wraps
+  // its contents in (e.g. `owner-repo-sha`), or `destDir` itself when there is no single wrapper.
+  private async extractZipArchive(archive: Buffer, destDir: string): Promise<string> {
+    const zip = await JSZip.loadAsync(archive);
+    const resolvedDest = path.resolve(destDir);
+    const topLevelEntries = new Set<string>();
+
+    for (const entry of Object.values(zip.files)) {
+      const target = path.resolve(destDir, entry.name);
+      // Guard against zip-slip: never write outside the temp directory we created.
+      if (target !== resolvedDest && !target.startsWith(resolvedDest + path.sep)) {
+        continue;
+      }
+      const topLevel = entry.name.split('/')[0];
+      if (topLevel) {
+        topLevelEntries.add(topLevel);
+      }
+      if (entry.dir) {
+        fs.mkdirSync(target, { recursive: true });
+        continue;
+      }
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      await fs.promises.writeFile(target, await entry.async('nodebuffer'));
+    }
+
+    return topLevelEntries.size === 1 ? path.join(destDir, [...topLevelEntries][0]!) : destDir;
   }
 
   /**
