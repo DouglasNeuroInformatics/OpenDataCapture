@@ -1,5 +1,10 @@
 @import '@opendatacapture/react-core/globals.css';
 
+/* Highlight a data-table row that contains a selected marker (see admin tables with row actions). */
+[data-testid='data-table-row']:has([data-row-selected='true']) {
+  @apply bg-slate-100 dark:bg-slate-800;
+}
+
 [data-spotlight='true'] {
   @apply pointer-events-none z-40 rounded-md shadow-2xl;
 }

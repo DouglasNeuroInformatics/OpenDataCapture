@@ -17,6 +17,7 @@ export const $AppSubjectName = z.enum([
   'Group',
   'Instrument',
   'InstrumentRecord',
+  'InstrumentRepo',
   'Session',
   'Subject',
   'User'

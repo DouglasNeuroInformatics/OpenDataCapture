@@ -235,6 +235,10 @@ const UpdateUserForm: React.FC<{
                         en: 'Instrument Record',
                         fr: "Enregistrement de l'instrument"
                       }),
+                      InstrumentRepo: t({
+                        en: 'Instrument Repository',
+                        fr: "Dépôt d'instruments"
+                      }),
                       Session: t({
                         en: 'Session',
                         fr: 'Session'
@@ -338,6 +342,7 @@ const RouteComponent = () => {
   const deleteUserMutation = useDeleteUserMutation();
   const updateUserMutation = useUpdateUserMutation();
   const [selectedUser, setSelectedUser] = useState<null | User>(null);
+  const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
 
   const [data, setData] = useState<null | UpdateUserFormInputData>(null);
 
@@ -380,6 +385,15 @@ const RouteComponent = () => {
         columns={[
           {
             accessorKey: 'username',
+            cell: (ctx) => {
+              const user = ctx.row.original;
+              return (
+                <span className="flex items-center">
+                  {user.username}
+                  <span className="hidden" data-row-selected={highlightedRowId === user.id ? 'true' : 'false'} />
+                </span>
+              );
+            },
             header: t('common.username')
           },
           {
@@ -415,6 +429,11 @@ const RouteComponent = () => {
             </Link>
           </Button>
         )}
+        onRowClick={(user) => setHighlightedRowId(user.id)}
+        onRowDoubleClick={(user) => {
+          setHighlightedRowId(user.id);
+          setSelectedUser(user);
+        }}
       />
       <Sheet.Content className="flex flex-col p-0" data-testid="admin-user-edit-sheet">
         <Sheet.Header className="px-6 pt-6">

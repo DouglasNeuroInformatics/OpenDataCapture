@@ -26,6 +26,7 @@ import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
 import { Route as AppDatahubSubjectIdRouteRouteImport } from './routes/_app/datahub/$subjectId/route'
 import { Route as AppAdminUsersIndexRouteImport } from './routes/_app/admin/users/index'
+import { Route as AppAdminInstrumentReposIndexRouteImport } from './routes/_app/admin/instrument-repos/index'
 import { Route as AppAdminGroupsIndexRouteImport } from './routes/_app/admin/groups/index'
 import { Route as AppAdminBrandingIndexRouteImport } from './routes/_app/admin/branding/index'
 import { Route as AppInstrumentsRenderIdRouteImport } from './routes/_app/instruments/render/$id'
@@ -124,6 +125,12 @@ const AppAdminUsersIndexRoute = AppAdminUsersIndexRouteImport.update({
   path: '/admin/users/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppAdminInstrumentReposIndexRoute =
+  AppAdminInstrumentReposIndexRouteImport.update({
+    id: '/admin/instrument-repos/',
+    path: '/admin/instrument-repos/',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
 const AppAdminGroupsIndexRoute = AppAdminGroupsIndexRouteImport.update({
   id: '/admin/groups/',
   path: '/admin/groups/',
@@ -210,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
   '/admin/branding/': typeof AppAdminBrandingIndexRoute
   '/admin/groups/': typeof AppAdminGroupsIndexRoute
+  '/admin/instrument-repos/': typeof AppAdminInstrumentReposIndexRoute
   '/admin/users/': typeof AppAdminUsersIndexRoute
   '/datahub/$subjectId/table/$recordId': typeof AppDatahubSubjectIdTableRecordIdRoute
   '/datahub/$subjectId/table/': typeof AppDatahubSubjectIdTableIndexRoute
@@ -239,6 +247,7 @@ export interface FileRoutesByTo {
   '/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
   '/admin/branding': typeof AppAdminBrandingIndexRoute
   '/admin/groups': typeof AppAdminGroupsIndexRoute
+  '/admin/instrument-repos': typeof AppAdminInstrumentReposIndexRoute
   '/admin/users': typeof AppAdminUsersIndexRoute
   '/datahub/$subjectId/table/$recordId': typeof AppDatahubSubjectIdTableRecordIdRoute
   '/datahub/$subjectId/table': typeof AppDatahubSubjectIdTableIndexRoute
@@ -270,6 +279,7 @@ export interface FileRoutesById {
   '/_app/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
   '/_app/admin/branding/': typeof AppAdminBrandingIndexRoute
   '/_app/admin/groups/': typeof AppAdminGroupsIndexRoute
+  '/_app/admin/instrument-repos/': typeof AppAdminInstrumentReposIndexRoute
   '/_app/admin/users/': typeof AppAdminUsersIndexRoute
   '/_app/datahub/$subjectId/table/$recordId': typeof AppDatahubSubjectIdTableRecordIdRoute
   '/_app/datahub/$subjectId/table/': typeof AppDatahubSubjectIdTableIndexRoute
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
     | '/instruments/render/$id'
     | '/admin/branding/'
     | '/admin/groups/'
+    | '/admin/instrument-repos/'
     | '/admin/users/'
     | '/datahub/$subjectId/table/$recordId'
     | '/datahub/$subjectId/table/'
@@ -330,6 +341,7 @@ export interface FileRouteTypes {
     | '/instruments/render/$id'
     | '/admin/branding'
     | '/admin/groups'
+    | '/admin/instrument-repos'
     | '/admin/users'
     | '/datahub/$subjectId/table/$recordId'
     | '/datahub/$subjectId/table'
@@ -360,6 +372,7 @@ export interface FileRouteTypes {
     | '/_app/instruments/render/$id'
     | '/_app/admin/branding/'
     | '/_app/admin/groups/'
+    | '/_app/admin/instrument-repos/'
     | '/_app/admin/users/'
     | '/_app/datahub/$subjectId/table/$recordId'
     | '/_app/datahub/$subjectId/table/'
@@ -492,6 +505,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminUsersIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/admin/instrument-repos/': {
+      id: '/_app/admin/instrument-repos/'
+      path: '/admin/instrument-repos'
+      fullPath: '/admin/instrument-repos/'
+      preLoaderRoute: typeof AppAdminInstrumentReposIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/admin/groups/': {
       id: '/_app/admin/groups/'
       path: '/admin/groups'
@@ -614,6 +634,7 @@ interface AppRouteRouteChildren {
   AppInstrumentsRenderIdRoute: typeof AppInstrumentsRenderIdRoute
   AppAdminBrandingIndexRoute: typeof AppAdminBrandingIndexRoute
   AppAdminGroupsIndexRoute: typeof AppAdminGroupsIndexRoute
+  AppAdminInstrumentReposIndexRoute: typeof AppAdminInstrumentReposIndexRoute
   AppAdminUsersIndexRoute: typeof AppAdminUsersIndexRoute
 }
 
@@ -639,6 +660,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppInstrumentsRenderIdRoute: AppInstrumentsRenderIdRoute,
   AppAdminBrandingIndexRoute: AppAdminBrandingIndexRoute,
   AppAdminGroupsIndexRoute: AppAdminGroupsIndexRoute,
+  AppAdminInstrumentReposIndexRoute: AppAdminInstrumentReposIndexRoute,
   AppAdminUsersIndexRoute: AppAdminUsersIndexRoute,
 }
 
