@@ -13,7 +13,15 @@ export const Layout = () => {
       <div className="hidden md:flex md:shrink-0">
         <Sidebar />
       </div>
-      <div className="scrollbar-none flex grow flex-col overflow-y-scroll pt-14 md:pt-0" data-testid="layout-main">
+      {/* `relative` establishes a containing block so absolutely-positioned
+          descendants (e.g. the visually-hidden native inputs inside libui
+          Checkbox/RadioGroup/Switch) are anchored to — and clipped by — this
+          scroll container rather than escaping to the viewport and inflating
+          the document height. */}
+      <div
+        className="scrollbar-none relative flex grow flex-col overflow-y-scroll pt-14 md:pt-0"
+        data-testid="layout-main"
+      >
         <main className="container flex grow flex-col">
           <Outlet />
         </main>
