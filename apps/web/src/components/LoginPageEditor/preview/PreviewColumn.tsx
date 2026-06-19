@@ -8,7 +8,7 @@ import { getRightPanelGradient } from '@/utils/branding';
 
 import { FORM_ID } from '../constants';
 
-import type { BrandingEditor } from '../useBrandingForm';
+import type { BrandingEditor } from '../hooks';
 
 type PreviewColumnProps = {
   editor: BrandingEditor;

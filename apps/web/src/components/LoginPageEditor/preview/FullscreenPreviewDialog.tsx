@@ -6,7 +6,7 @@ import { Logo } from '@opendatacapture/react-core';
 import { LoginBrandingPanel } from '@/components/LoginBranding';
 import { getRightPanelGradient } from '@/utils/branding';
 
-import type { BrandingEditor } from '../useBrandingForm';
+import type { BrandingEditor } from '../hooks';
 
 type FullscreenPreviewDialogProps = {
   editor: BrandingEditor;

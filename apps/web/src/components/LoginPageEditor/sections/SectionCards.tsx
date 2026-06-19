@@ -11,7 +11,7 @@ import { LOGO_ALIGNMENT_LABELS, LOGO_SIZE_LABELS, SECTION_TITLES, URL_PATTERN } 
 import { FontSizeField } from '../fields/FontSizeField';
 import { SectionHeader } from '../fields/SectionHeader';
 
-import type { BrandingEditor } from '../useBrandingForm';
+import type { BrandingEditor } from '../hooks';
 
 type CardProps = { editor: BrandingEditor };
 

@@ -6,6 +6,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { PageHeader } from '@/components/PageHeader';
 
 import { FORM_ID } from './constants';
+import { useBrandingForm } from './hooks';
 import { FullscreenPreviewDialog } from './preview/FullscreenPreviewDialog';
 import { PreviewColumn } from './preview/PreviewColumn';
 import { EnableBrandingCard } from './sections/EnableBrandingCard';
@@ -15,7 +16,6 @@ import { RightPanelThemeCard } from './sections/RightPanelThemeCard';
 import { SectionCard } from './sections/SectionCards';
 import { TextColorCard } from './sections/TextColorCard';
 import { UnsavedChangesDialog } from './UnsavedChangesDialog';
-import { useBrandingForm } from './useBrandingForm';
 
 /**
  * Admin "Customize Login Page" editor. Owns the branding form via `useBrandingForm`

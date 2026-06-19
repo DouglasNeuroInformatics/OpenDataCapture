@@ -9,7 +9,7 @@ import { THEME_LABELS } from '../constants';
 import { ColorField } from '../fields/ColorField';
 import { SwatchButton } from '../fields/SwatchButton';
 
-import type { BrandingEditor } from '../useBrandingForm';
+import type { BrandingEditor } from '../hooks';
 
 /** Left-panel background gradient: a theme swatch grid plus custom hex inputs. */
 export const LeftPanelThemeCard = ({ editor }: { editor: BrandingEditor }) => {

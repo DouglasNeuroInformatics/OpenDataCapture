@@ -1,7 +1,7 @@
 import { Card, Checkbox, Label } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
-import type { BrandingEditor } from '../useBrandingForm';
+import type { BrandingEditor } from '../hooks';
 
 /** Toggles the GitHub / documentation links shown in the login page footer. */
 export const FooterCard = ({ editor }: { editor: BrandingEditor }) => {

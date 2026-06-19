@@ -4,7 +4,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { DEFAULT_PANEL_TEXT_COLOR } from '../constants';
 import { ColorField } from '../fields/ColorField';
 
-import type { BrandingEditor } from '../useBrandingForm';
+import type { BrandingEditor } from '../hooks';
 
 /**
  * A single color applied to every text element on the branding panel. Shown

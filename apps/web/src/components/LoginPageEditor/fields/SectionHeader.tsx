@@ -7,7 +7,7 @@ import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
 import { BoldToggle } from './BoldToggle';
 
-import type { BrandingEditor } from '../useBrandingForm';
+import type { BrandingEditor } from '../hooks';
 
 type ToggleConfig = { checked: boolean; id: string; onChange: (checked: boolean) => void };
 

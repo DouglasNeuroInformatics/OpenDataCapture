@@ -1,7 +1,7 @@
 import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
-import type { BrandingEditor } from './useBrandingForm';
+import type { BrandingEditor } from './hooks';
 
 /**
  * Unsaved-changes confirmation — shown when the user tries to navigate away while

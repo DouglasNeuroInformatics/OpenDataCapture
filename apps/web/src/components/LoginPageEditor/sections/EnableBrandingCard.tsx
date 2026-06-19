@@ -1,7 +1,7 @@
 import { Card, Checkbox, Label } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
-import type { BrandingEditor } from '../useBrandingForm';
+import type { BrandingEditor } from '../hooks';
 
 /** Top-level toggle: when off, the classic (unbranded) login page is shown. */
 export const EnableBrandingCard = ({ editor }: { editor: BrandingEditor }) => {

@@ -7,7 +7,7 @@ import { RIGHT_PANEL_LABELS, RIGHT_PANEL_OPTIONS } from '../constants';
 import { ColorField } from '../fields/ColorField';
 import { SwatchButton } from '../fields/SwatchButton';
 
-import type { BrandingEditor } from '../useBrandingForm';
+import type { BrandingEditor } from '../hooks';
 
 /** Right-panel background gradient: a theme swatch grid plus custom hex inputs. */
 export const RightPanelThemeCard = ({ editor }: { editor: BrandingEditor }) => {
