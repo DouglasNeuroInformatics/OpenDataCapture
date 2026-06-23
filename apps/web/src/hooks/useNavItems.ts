@@ -9,6 +9,7 @@ import {
   DatabaseIcon,
   EyeIcon,
   LogsIcon,
+  PackageIcon,
   PaletteIcon,
   SendIcon,
   UploadIcon,
@@ -120,6 +121,14 @@ export function useNavItems() {
           fr: 'Gérer les utilisateurs'
         }),
         url: '/admin/users'
+      });
+      adminItems.push({
+        icon: PackageIcon,
+        label: t({
+          en: 'Instrument Repos',
+          fr: "Dépôts d'instruments"
+        }),
+        url: '/admin/instrument-repos'
       });
     }
 

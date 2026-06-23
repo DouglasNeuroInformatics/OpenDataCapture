@@ -233,13 +233,28 @@ type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = Omit<T, 'conten
   internal?: {
     edition: number;
   };
+  // Provenance: null when uploaded manually; otherwise the source repository id (always present) and
+  // its name (may be null for legacy instruments imported before names were stored).
+  sourceRepo?: null | {
+    id: string;
+    name: null | string;
+  };
 };
 
 const $InstrumentInfo = $BaseInstrument
   .omit({
     content: true
   })
-  .extend({ id: z.string(), internal: $ScalarInstrumentInternal.optional() }) satisfies z.ZodType<InstrumentInfo>;
+  .extend({
+    id: z.string(),
+    internal: $ScalarInstrumentInternal.optional(),
+    sourceRepo: z
+      .object({
+        id: z.string(),
+        name: z.string().nullable()
+      })
+      .nullish()
+  }) satisfies z.ZodType<InstrumentInfo>;
 
 /** @internal */
 type UnilingualInstrumentInfo = Simplify<InstrumentInfo<BaseInstrument<Language>>>;

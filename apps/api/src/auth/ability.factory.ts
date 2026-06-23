@@ -27,6 +27,7 @@ export class AbilityFactory {
         ability.can('manage', 'Assignment', { groupId: { in: groupIds } });
         ability.can('manage', 'Group', { id: { in: groupIds } });
         ability.can('read', 'Instrument');
+        ability.can('read', 'InstrumentRepo', { groupIds: { hasSome: groupIds } });
         ability.can('create', 'InstrumentRecord');
         ability.can('create', 'InstrumentRecordFile', { groupId: { in: groupIds } });
         ability.can('read', 'InstrumentRecord', { groupId: { in: groupIds } });
