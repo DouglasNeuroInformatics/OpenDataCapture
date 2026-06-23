@@ -20,8 +20,8 @@ import { Route as AppAboutRouteImport } from './routes/_app/about'
 import { Route as AppUploadIndexRouteImport } from './routes/_app/upload/index'
 import { Route as AppDatahubIndexRouteImport } from './routes/_app/datahub/index'
 import { Route as AppUploadInstrumentIdRouteImport } from './routes/_app/upload/$instrumentId'
-import { Route as AppSessionRemoteAssignmentRouteImport } from './routes/_app/session/remote-assignment'
 import { Route as AppSessionStartSessionRouteImport } from './routes/_app/session/start-session'
+import { Route as AppSessionRemoteAssignmentRouteImport } from './routes/_app/session/remote-assignment'
 import { Route as AppInstrumentsAccessibleInstrumentsRouteImport } from './routes/_app/instruments/accessible-instruments'
 import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
@@ -94,16 +94,17 @@ const AppUploadInstrumentIdRoute = AppUploadInstrumentIdRouteImport.update({
   path: '/upload/$instrumentId',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppSessionRemoteAssignmentRoute = AppSessionRemoteAssignmentRouteImport.update({
-  id: '/session/remote-assignment',
-  path: '/session/remote-assignment',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AppSessionStartSessionRoute = AppSessionStartSessionRouteImport.update({
   id: '/session/start-session',
   path: '/session/start-session',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppSessionRemoteAssignmentRoute =
+  AppSessionRemoteAssignmentRouteImport.update({
+    id: '/session/remote-assignment',
+    path: '/session/remote-assignment',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
 const AppInstrumentsAccessibleInstrumentsRoute =
   AppInstrumentsAccessibleInstrumentsRouteImport.update({
     id: '/instruments/accessible-instruments',
@@ -475,18 +476,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppUploadInstrumentIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/session/remote-assignment': {
-      id: '/_app/session/remote-assignment'
-      path: '/session/remote-assignment'
-      fullPath: '/session/remote-assignment'
-      preLoaderRoute: typeof AppSessionRemoteAssignmentRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/_app/session/start-session': {
       id: '/_app/session/start-session'
       path: '/session/start-session'
       fullPath: '/session/start-session'
       preLoaderRoute: typeof AppSessionStartSessionRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/session/remote-assignment': {
+      id: '/_app/session/remote-assignment'
+      path: '/session/remote-assignment'
+      fullPath: '/session/remote-assignment'
+      preLoaderRoute: typeof AppSessionRemoteAssignmentRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/instruments/accessible-instruments': {

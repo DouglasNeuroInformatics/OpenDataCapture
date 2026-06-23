@@ -33,8 +33,8 @@ const AssignmentResultSlider: React.FC<{
           <Sheet.Title>{title}</Sheet.Title>
           <Sheet.Description>
             {t({
-              en: 'Share this link with the subject to complete the assignment remotely.',
-              fr: 'Partagez ce lien avec le client pour compléter la tâche à distance.'
+              en: 'Share this link with the subject to complete the assignment remotely. If the link is lost, it can be found by navigating to View Current Subject, selecting the Assignments tab, and clicking on the assignment.',
+              fr: "Partagez ce lien avec le client pour compléter la tâche à distance. Si le lien est perdu, il peut être retrouvé en naviguant vers Voir le client actuel, en sélectionnant l'onglet Tâches, puis en cliquant sur la tâche."
             })}
           </Sheet.Description>
         </Sheet.Header>

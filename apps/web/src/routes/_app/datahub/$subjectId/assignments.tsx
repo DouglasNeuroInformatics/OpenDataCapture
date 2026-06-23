@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, ClientTable, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
+import { Button, Heading, Input, Label, Sheet, Table } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { Assignment, AssignmentStatus } from '@opendatacapture/schemas/assignment';
@@ -70,7 +70,8 @@ const AssignmentSlider: React.FC<{
 const AssignmentsTable: React.FC<{
   assignments: Assignment[];
   onSelection: (assignment: Assignment) => void;
-}> = ({ assignments, onSelection }) => {
+  selectedId: null | string;
+}> = ({ assignments, onSelection, selectedId }) => {
   const { t } = useTranslation('datahub');
   const [instruments, setInstruments] = useState<{ [key: string]: UnilingualInstrumentInfo }>({});
 
@@ -82,47 +83,47 @@ const AssignmentsTable: React.FC<{
     );
   }, [instrumentInfoQuery.data]);
 
+  const formatStatus = (status: AssignmentStatus) => {
+    switch (status) {
+      case 'CANCELED':
+        return t('assignments.statusOptions.canceled');
+      case 'COMPLETE':
+        return t('assignments.statusOptions.complete');
+      case 'EXPIRED':
+        return t('assignments.statusOptions.expired');
+      case 'OUTSTANDING':
+        return t('assignments.statusOptions.outstanding');
+    }
+  };
+
   return (
-    <ClientTable<Assignment>
-      columns={[
-        {
-          field: (entry) => {
-            return instruments[entry.instrumentId]?.details.title ?? entry.instrumentId;
-          },
-          label: t('assignments.title')
-        },
-        {
-          field: 'createdAt',
-          formatter: (value: Date) => toBasicISOString(value),
-          label: t('assignments.assignedAt')
-        },
-        {
-          field: 'expiresAt',
-          formatter: (value: Date) => toBasicISOString(value),
-          label: t('assignments.expiresAt')
-        },
-        {
-          field: 'status',
-          formatter: (value: AssignmentStatus) => {
-            switch (value) {
-              case 'CANCELED':
-                return t('assignments.statusOptions.canceled');
-              case 'COMPLETE':
-                return t('assignments.statusOptions.complete');
-              case 'EXPIRED':
-                return t('assignments.statusOptions.expired');
-              case 'OUTSTANDING':
-                return t('assignments.statusOptions.outstanding');
-            }
-          },
-          label: t('assignments.status')
-        }
-      ]}
-      data={assignments}
-      entriesPerPage={15}
-      minRows={15}
-      onEntryClick={onSelection}
-    />
+    <div className="bg-card text-muted-foreground shadow-xs rounded-md border tracking-tight">
+      <Table>
+        <Table.Header>
+          <Table.Row>
+            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.title')}</Table.Head>
+            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.assignedAt')}</Table.Head>
+            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.expiresAt')}</Table.Head>
+            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.status')}</Table.Head>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {assignments.map((assignment) => (
+            <Table.Row
+              className="cursor-pointer"
+              data-state={selectedId === assignment.id ? 'selected' : undefined}
+              key={assignment.id}
+              onClick={() => onSelection(assignment)}
+            >
+              <Table.Cell>{instruments[assignment.instrumentId]?.details.title ?? assignment.instrumentId}</Table.Cell>
+              <Table.Cell>{toBasicISOString(assignment.createdAt)}</Table.Cell>
+              <Table.Cell>{toBasicISOString(assignment.expiresAt)}</Table.Cell>
+              <Table.Cell>{formatStatus(assignment.status)}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    </div>
   );
 };
 
@@ -143,6 +144,7 @@ const RouteComponent = () => {
       </div>
       <AssignmentsTable
         assignments={assignmentsQuery.data ?? []}
+        selectedId={selectedAssignment?.id ?? null}
         onSelection={(assignment) => {
           setSelectedAssignment(assignment);
           setIsEditSliderOpen(true);
