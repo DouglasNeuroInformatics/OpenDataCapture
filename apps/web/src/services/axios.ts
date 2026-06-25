@@ -12,6 +12,9 @@ declare module 'axios' {
   export interface AxiosRequestConfig<D = any> {
     meta?: {
       disableDefaultAuth?: boolean;
+      // Opt out of the global error notification so the caller can handle the error itself
+      // (e.g. translate a structured error code returned by the API).
+      disableDefaultErrorNotification?: boolean;
       disableDefaultTimeout?: boolean;
     };
   }
@@ -52,6 +55,9 @@ axios.interceptors.response.use(
     );
   },
   (error) => {
+    if (isAxiosError(error) && error.config?.meta?.disableDefaultErrorNotification) {
+      return Promise.reject(error);
+    }
     const notifications = useNotificationsStore.getState();
     if (!isAxiosError(error)) {
       notifications.addNotification({

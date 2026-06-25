@@ -4,7 +4,7 @@ import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $BasePermissionLevel, $CreateUserData } from '@opendatacapture/schemas/user';
-import type { CreateUserData } from '@opendatacapture/schemas/user';
+import type { CreateUserData, PasswordErrorCode } from '@opendatacapture/schemas/user';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 import { z } from 'zod/v4';
@@ -13,6 +13,12 @@ import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { PHONE_REGEX } from '@/utils/validation';
+
+const PASSWORD_ERROR_TRANSLATION_KEYS = {
+  INSUFFICIENT_PASSWORD_STRENGTH: 'common.insufficientPasswordStrength',
+  PASSWORD_IN_DATA_BREACH: 'common.passwordInDataBreach',
+  PASSWORD_MATCHES_USERNAME: 'common.passwordMatchesUsername'
+} as const satisfies { [code in PasswordErrorCode]: string };
 
 const RouteComponent = () => {
   const { t } = useTranslation();
@@ -32,11 +38,21 @@ const RouteComponent = () => {
         type: 'error',
         message: t('common.usernameExists')
       });
-    } else {
-      void createUserMutation.mutateAsync({ data });
-
-      void navigate({ to: '..' });
+      return;
     }
+
+    const result = await createUserMutation.mutateAsync({ data });
+    if (result.success) {
+      void navigate({ to: '..' });
+      return;
+    }
+    // Stay on the form so the admin can correct the password (e.g. one found in a data breach).
+    notification.addNotification({
+      type: 'error',
+      message: result.code
+        ? t(PASSWORD_ERROR_TRANSLATION_KEYS[result.code])
+        : t({ en: 'Failed to create user', fr: "Échec de la création de l'utilisateur" })
+    });
   };
 
   return (
@@ -192,6 +208,16 @@ const RouteComponent = () => {
                 fatal: true,
                 input: ctx.value.password,
                 message: t('common.insufficientPasswordStrength'),
+                path: ['password']
+              });
+              return z.NEVER;
+            }
+            if (ctx.value.password.toLowerCase() === ctx.value.username.toLowerCase()) {
+              ctx.issues.push({
+                code: 'custom',
+                fatal: true,
+                input: ctx.value.password,
+                message: t('common.passwordMatchesUsername'),
                 path: ['password']
               });
               return z.NEVER;

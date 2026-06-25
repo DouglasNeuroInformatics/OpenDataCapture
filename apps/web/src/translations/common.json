@@ -141,6 +141,14 @@
     "en": "Password",
     "fr": "Mot de passe"
   },
+  "passwordInDataBreach": {
+    "en": "This password has appeared in a known data breach and cannot be used",
+    "fr": "Ce mot de passe est apparu dans une fuite de données connue et ne peut pas être utilisé"
+  },
+  "passwordMatchesUsername": {
+    "en": "Password must not be the same as the username",
+    "fr": "Le mot de passe ne doit pas être identique au nom d'utilisateur"
+  },
   "passwordsMustMatch": {
     "en": "Passwords Must Match",
     "fr": "Les mots de passe doivent correspondre"

@@ -296,6 +296,9 @@ importers:
       fastify:
         specifier: ^5.7.1
         version: 5.8.5
+      hibp:
+        specifier: ^15.2.1
+        version: 15.2.1
       lodash-es:
         specifier: workspace:lodash-es__4.x@*
         version: link:../../vendor/lodash-es@4.x
@@ -9118,6 +9121,11 @@ packages:
   help-me@5.0.0:
     resolution:
       { integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg== }
+
+  hibp@15.2.1:
+    resolution:
+      { integrity: sha512-f7FxrlBz5FGd/J7tx9DR1cCQNIzKTl4BLZzgRXeQblzcO/xiWGrvXBMwztRzjJVeFACpED6P+iVmU7of9eFqyA== }
+    engines: { node: '>= 20.19.0' }
 
   html-escaper@2.0.2:
     resolution:
@@ -20878,6 +20886,8 @@ snapshots:
       space-separated-tokens: 2.0.2
 
   help-me@5.0.0: {}
+
+  hibp@15.2.1: {}
 
   html-escaper@2.0.2: {}
 
