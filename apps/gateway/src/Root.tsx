@@ -25,14 +25,25 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const notifications = useNotificationsStore();
 
-  const [capToken, setCapToken] = useState<null | string>(null);
+  const [verified, setVerified] = useState(false);
 
   useEffect(() => {
     ref.current!.style.display = 'flex';
   }, []);
 
+  // Solving the Cap challenge redeems a short-lived token; exchange it immediately for a
+  // server-side verification flag so the form is not bound by the token's 20-minute lifetime.
+  const handleSolve = async (token: string) => {
+    try {
+      await axios.post('/api/auth/verify', { id, token });
+      setVerified(true);
+    } catch {
+      notifications.addNotification({ message: 'Verification failed, please try again', type: 'error' });
+    }
+  };
+
   const handleSubmit: InstrumentSubmitHandler = async (result) => {
-    if (!capToken) {
+    if (!verified) {
       notifications.addNotification({ message: 'Please complete the verification challenge', type: 'error' });
       return;
     }
@@ -54,8 +65,7 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
     }
     await axios.patch(`/api/assignments/${id}`, updateData, {
       headers: {
-        Authorization: `Bearer ${token}`,
-        'X-Captcha-Token': capToken
+        Authorization: `Bearer ${token}`
       }
     });
     notifications.addNotification({ type: 'success' });
@@ -81,9 +91,9 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
         </header>
         <main className="container flex min-h-0 max-w-3xl grow flex-col pb-16 pt-32 xl:max-w-5xl">
           <InstrumentRenderer
-            beforeBegin={<CapWidget onSolve={setCapToken} />}
+            beforeBegin={<CapWidget onSolve={(token) => void handleSolve(token)} />}
             className="min-h-full w-full"
-            disableBegin={!capToken}
+            disableBegin={!verified}
             initialSeriesIndex={initialSeriesIndex}
             target={target}
             onSubmit={handleSubmit}
