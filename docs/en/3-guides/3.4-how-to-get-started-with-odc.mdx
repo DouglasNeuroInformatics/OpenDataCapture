@@ -1,0 +1,123 @@
+---
+title: How to Get Started with ODC
+slug: en/docs/guides/how-to-get-started-with-odc
+sidebar:
+  order: 4
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import Screenshot from '@/components/common/Screenshot.astro';
+
+This guide is for people logging into an existing Open Data Capture (ODC) instance for the first time.
+An **instance** is the ODC site deployed for your organization, lab, or clinic.
+
+ODC users are one of two types:
+
+- **Admins** responsible for configuring and managing the instance.
+- **Group managers** configure a group and work with the data collected by that group.
+- **Standard users** primarily start sessions and administer instruments.
+
+For more detail about how roles and permissions work, see the [Security reference](/en/docs/reference/security/).
+
+## Before You Start
+
+You need:
+
+- The URL for your ODC instance
+- Your account credentials
+- Access to the group where you will collect or review data
+
+Most users belong to one group. If you belong to more than one group, the selected group controls which instruments and data you see.
+
+<Screenshot alt="login page" name="login" />
+
+## Shared Navigation
+
+The navigation you see depends on your role, group, permissions, and instance settings.
+
+- **Dashboard** shows an overview of data for the selected group. Standard users do not see this unless custom permissions have been granted.
+- **Data Hub** is used to find subjects, review records, export data, graph measures, and, when enabled, manage assignments. Standard users do not see this unless custom permissions have been granted.
+- **Start Session** begins a session for a subject.
+- **Accessible Instruments** shows the instruments available for the selected group that are available for the current session.
+- **Upload** imports form instrument data from CSV.
+- **Manage Group** appears for group managers and is used to configure group-level settings.
+
+<Screenshot alt="dashboard page" name="dashboard" />
+
+## Group Managers
+
+Group managers are responsible for configuring a group before data collection begins, then reviewing and exporting the data collected for that group.
+
+### First-Time Setup
+
+<Steps>
+
+1.  **Log in to your ODC instance**
+
+    Use the URL and credentials provided by your administrator.
+
+2.  **Confirm the selected group**
+
+    If you have access to more than one group, use the group selector on the Dashboard to choose the group you want to configure.
+
+3.  **Open Manage Group**
+
+    Use **Manage Group** to control what is available to your group. The instruments selected here are the instruments shown to group members in **Accessible Instruments**.
+
+4.  **Review accessible instruments**
+
+    Select the instruments that should be available to group members.
+
+5.  **Review subject settings**
+
+    Confirm the group's subject ID settings, including preferred display length, minimum age, default identification method, ID validation pattern, and custom validation messages when applicable.
+
+</Steps>
+
+### When to Ask an Admin
+
+Ask an administrator for help with:
+
+- Creating users
+- Creating groups
+- Reviewing logs
+- Adding or modifying instruments
+- Changing permissions for users in your group
+
+## Standard Users
+
+Standard users are usually responsible for collecting data by starting sessions and administering instruments. By default, standard users do not manage group settings or access collected group data.
+
+### First-Time Workflow
+
+<Steps>
+
+1.  **Log in to your ODC instance**
+
+    Use the URL and credentials provided by your administrator or group manager.
+
+2.  **Confirm your group**
+
+    Most standard users have one group. If you have more than one, make sure the correct group is selected before starting a session.
+
+3.  **Start a session**
+
+    Open **Start Session** and identify the subject. Depending on the group settings, you may use a custom ID or enter personal information so ODC can generate an ID in the browser.
+
+    <Screenshot alt="start session page" name="start-session-hash" />
+
+4.  **Choose the session type**
+
+    Use an in-person session for new data collection. Use a retrospective session when entering data that was collected earlier using another system. You will see that a session is active in the sidebar.
+
+5.  **Administer an instrument**
+
+    Open **Accessible Instruments**, choose an instrument, complete it, and submit the record.
+
+6.  **Finish the current session**
+
+    ODC only allows one active session at a time in the browser. End the current session before starting another one.
+
+</Steps>
+
+If you need access to Dashboard, Data Hub, export tools, group settings, or broader subject data, ask a group manager or administrator. Those areas are permission-controlled and are not normally available to standard users.
