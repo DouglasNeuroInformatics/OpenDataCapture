@@ -8,6 +8,7 @@ import type {
 import type { GatewayHealthcheckSuccessResult } from '@opendatacapture/schemas/gateway';
 import { Router } from 'express';
 
+import { cap } from '@/lib/cap';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/logger';
 import { ah } from '@/utils/async-handler';
@@ -63,6 +64,12 @@ router.patch(
   '/assignments/:id',
   ah(async (req, res) => {
     const id = req.params.id as string;
+
+    const captchaToken = req.headers['x-captcha-token'];
+    if (typeof captchaToken !== 'string' || !(await cap.validateToken(captchaToken, { keepToken: true })).success) {
+      throw new HttpException(403, 'Invalid or missing proof-of-work token');
+    }
+
     const assignment = await prisma.remoteAssignmentModel.findFirst({
       where: { id }
     });
