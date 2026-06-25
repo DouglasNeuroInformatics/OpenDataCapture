@@ -6,7 +6,7 @@ import { useDownload, useTranslation } from '@douglasneuroinformatics/libui/hook
 import { $AuditLogsQuerySearchParams } from '@opendatacapture/schemas/audit';
 import type { $AuditLog, $AuditLogAction, $AuditLogEntity } from '@opendatacapture/schemas/audit';
 import { createFileRoute } from '@tanstack/react-router';
-import { ChevronDownIcon, DownloadIcon } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, ChevronDownIcon, ChevronsUpDownIcon, DownloadIcon } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
 import { auditLogsQueryOptions, useAuditLogsQuery } from '@/hooks/useAuditLogsQuery';
@@ -63,6 +63,26 @@ const SelectSingleFilterGroup = ({
         })}
       </DropdownMenu.Group>
     </Fragment>
+  );
+};
+
+const SortableHeader = ({ column, label }: { column: TanstackTable.Column<$AuditLog>; label: string }) => {
+  const sorted = column.getIsSorted();
+  return (
+    <button
+      className="hover:text-foreground flex items-center gap-2"
+      type="button"
+      onClick={column.getToggleSortingHandler()}
+    >
+      {label}
+      {sorted === 'asc' ? (
+        <ArrowUpIcon className="opacity-50" style={{ height: '14px', width: 'auto' }} />
+      ) : sorted === 'desc' ? (
+        <ArrowDownIcon className="opacity-50" style={{ height: '14px', width: 'auto' }} />
+      ) : (
+        <ChevronsUpDownIcon className="opacity-50" style={{ height: '14px', width: 'auto' }} />
+      )}
+    </button>
   );
 };
 
@@ -164,7 +184,8 @@ const RouteComponent = () => {
               return datetimeFormat.format(value);
             },
             enableResizing: false,
-            header: t('common.time'),
+            enableSorting: true,
+            header: ({ column }) => <SortableHeader column={column} label={t('common.time')} />,
             size: 250
           },
           {
@@ -214,7 +235,8 @@ const RouteComponent = () => {
         initialState={{
           columnPinning: {
             left: ['timestamp']
-          }
+          },
+          sorting: [{ desc: true, id: 'timestamp' }]
         }}
         togglesComponent={Toggles}
       />
