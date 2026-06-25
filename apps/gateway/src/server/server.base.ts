@@ -10,6 +10,7 @@ import { apiKeyMiddleware } from '@/middleware/api-key.middleware';
 import { errorHandlerMiddleware } from '@/middleware/error-handler.middleware';
 import type { RootProps } from '@/Root';
 import { apiRouter } from '@/routers/api.router';
+import { capRouter } from '@/routers/cap.router';
 import { rootRouter } from '@/routers/root.router';
 import { ah } from '@/utils/async-handler';
 
@@ -61,6 +62,7 @@ export abstract class BaseServer {
         wrapSerializers: false
       })
     );
+    this.app.use('/api/auth', capRouter);
     this.app.use('/api', apiKeyMiddleware, apiRouter);
     this.app.use('/', this.rootLoader, rootRouter);
     this.app.use(errorHandlerMiddleware);

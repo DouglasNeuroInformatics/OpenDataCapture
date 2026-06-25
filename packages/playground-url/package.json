@@ -31,10 +31,10 @@
   "dependencies": {
     "chalk": "^5.6.2",
     "commander": "catalog:",
-    "lz-string": "^1.5.0",
-    "zod": "workspace:zod__3.x@*"
+    "lz-string": "^1.5.0"
   },
   "devDependencies": {
-    "esbuild": "catalog:"
+    "esbuild": "catalog:",
+    "zod": "workspace:zod__3.x@*"
   }
 }

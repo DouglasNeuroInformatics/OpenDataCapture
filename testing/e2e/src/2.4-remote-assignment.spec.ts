@@ -1,4 +1,5 @@
 import { expect, test } from './helpers/fixtures';
+import { RemoteAssignmentPage } from './pages/remote-assignment.page';
 
 test.describe('remote assignment', () => {
   test.beforeEach(async ({ page }) => {
@@ -10,7 +11,7 @@ test.describe('remote assignment', () => {
     });
   });
 
-  test('should display the remote assignment page after starting a session', async ({ getPageModel }) => {
+  test('should display the remote assignment page after starting a session', async ({ getPageModel, page }) => {
     const startSessionPage = await getPageModel('/session/start-session');
     await startSessionPage.sessionForm.waitFor({ state: 'visible' });
     await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
@@ -18,7 +19,9 @@ test.describe('remote assignment', () => {
     await startSessionPage.submitForm();
     await expect(startSessionPage.successMessage).toBeVisible();
 
-    const remoteAssignmentPage = await getPageModel('/session/remote-assignment');
+    await page.getByTestId('nav-button-/session/remote-assignment').click();
+    await page.waitForURL('**/session/remote-assignment');
+    const remoteAssignmentPage = new RemoteAssignmentPage(page);
     await expect(remoteAssignmentPage.pageHeader).toBeVisible();
     await expect(remoteAssignmentPage.pageHeader).toContainText('Remote Assignment');
     await expect(remoteAssignmentPage.instrumentShowcase).toBeVisible();
@@ -32,7 +35,9 @@ test.describe('remote assignment', () => {
     await startSessionPage.submitForm();
     await expect(startSessionPage.successMessage).toBeVisible();
 
-    const remoteAssignmentPage = await getPageModel('/session/remote-assignment');
+    await page.getByTestId('nav-button-/session/remote-assignment').click();
+    await page.waitForURL('**/session/remote-assignment');
+    const remoteAssignmentPage = new RemoteAssignmentPage(page);
     await expect(remoteAssignmentPage.instrumentShowcase).toBeVisible();
 
     await remoteAssignmentPage.clickFirstInstrumentCard();

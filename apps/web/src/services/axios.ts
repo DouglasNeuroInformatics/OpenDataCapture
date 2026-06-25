@@ -55,6 +55,9 @@ axios.interceptors.response.use(
     );
   },
   (error) => {
+    if (isAxiosError(error) && error.config?.meta?.disableDefaultErrorNotification) {
+      return Promise.reject(error);
+    }
     const notifications = useNotificationsStore.getState();
     if (!isAxiosError(error)) {
       notifications.addNotification({

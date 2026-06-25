@@ -1,4 +1,4 @@
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+import lz from 'lz-string';
 
 import { $EditorFiles } from './models.js';
 
@@ -18,11 +18,11 @@ type EncodeShareURLOptions = PlaygroundInstrument & {
 };
 
 function decodeFiles(encodedFiles: string): EditorFile[] {
-  return $EditorFiles.parse(JSON.parse(decompressFromEncodedURIComponent(encodedFiles)));
+  return $EditorFiles.parse(JSON.parse(lz.decompressFromEncodedURIComponent(encodedFiles)));
 }
 
 function encodeFiles(files: EditorFile[]): string {
-  return compressToEncodedURIComponent(JSON.stringify($EditorFiles.parse(files)));
+  return lz.compressToEncodedURIComponent(JSON.stringify($EditorFiles.parse(files)));
 }
 
 /**
@@ -38,7 +38,7 @@ function encodeShareURL({
 }: EncodeShareURLOptions): ShareURL {
   const url = new URL(baseURL) as ShareURL;
   url.searchParams.append('files', encodeFiles(files));
-  url.searchParams.append('label', compressToEncodedURIComponent(label));
+  url.searchParams.append('label', lz.compressToEncodedURIComponent(label));
   if (fullscreen) {
     url.searchParams.append('fullscreen', '1');
   }
@@ -58,7 +58,7 @@ function decodeShareURL(url: URL): null | PlaygroundInstrument {
   if (!(encodedFiles && encodedLabel)) {
     return null;
   }
-  return { files: decodeFiles(encodedFiles), label: decompressFromEncodedURIComponent(encodedLabel) };
+  return { files: decodeFiles(encodedFiles), label: lz.decompressFromEncodedURIComponent(encodedLabel) };
 }
 
 /**

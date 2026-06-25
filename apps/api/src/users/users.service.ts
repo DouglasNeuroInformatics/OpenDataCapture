@@ -6,9 +6,12 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException
 } from '@nestjs/common';
 import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
+import type { PasswordErrorCode } from '@opendatacapture/schemas/user';
+import { pwnedPassword } from 'hibp';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -20,6 +23,8 @@ import type { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     @InjectModel('User') private readonly userModel: Model<'User'>,
     private readonly cryptoService: CryptoService,
@@ -69,6 +74,8 @@ export class UsersService {
     if (await this.userModel.exists({ username })) {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
+
+    await this.validatePassword(password, username);
 
     // Check that all group exist and are accessible to the user
     for (const id of groupIds) {
@@ -171,6 +178,8 @@ export class UsersService {
   ) {
     let hashedPassword: string | undefined;
     if (password) {
+      const username = data.username ?? (await this.findById(id, { ability })).username;
+      await this.validatePassword(password, username);
       hashedPassword = await this.cryptoService.hashPassword(password);
     }
     return this.userModel.update({
@@ -193,8 +202,8 @@ export class UsersService {
       throw new ForbiddenException();
     }
 
-    if (password && !estimatePasswordStrength(password).success) {
-      throw new BadRequestException('Insufficient password strength');
+    if (password) {
+      await this.validatePassword(password, currentUser.username);
     }
 
     const { dateOfBirth, email, firstName, lastName, phoneNumber, sex } = data;
@@ -219,5 +228,41 @@ export class UsersService {
       },
       where: { id }
     });
+  }
+
+  /**
+   * Build a `BadRequestException` whose response body carries a machine-readable `code`
+   * (in addition to a fallback English `message`) so the web client can localize it.
+   */
+  private passwordError(code: PasswordErrorCode, message: string): BadRequestException {
+    return new BadRequestException({ code, error: 'Bad Request', message, statusCode: 400 });
+  }
+
+  /**
+   * Enforce the password policy whenever a password is set or changed. Throws a
+   * `BadRequestException` if the password is too weak, matches the username, or has
+   * appeared in a known data breach. The breach check fails open: if the Have I Been
+   * Pwned API is unreachable (e.g. an air-gapped deployment), the password is allowed.
+   */
+  private async validatePassword(password: string, username: string): Promise<void> {
+    if (!estimatePasswordStrength(password).success) {
+      throw this.passwordError('INSUFFICIENT_PASSWORD_STRENGTH', 'Insufficient password strength');
+    }
+    if (password.toLowerCase() === username.toLowerCase()) {
+      throw this.passwordError('PASSWORD_MATCHES_USERNAME', 'Password must not be the same as the username');
+    }
+    let breachCount: number;
+    try {
+      breachCount = await pwnedPassword(password);
+    } catch (err) {
+      this.logger.warn('Failed to check password against the Have I Been Pwned API, allowing password', err);
+      return;
+    }
+    if (breachCount > 0) {
+      throw this.passwordError(
+        'PASSWORD_IN_DATA_BREACH',
+        'Password has appeared in a known data breach and cannot be used'
+      );
+    }
   }
 }
