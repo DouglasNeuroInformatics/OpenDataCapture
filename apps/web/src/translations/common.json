@@ -43,6 +43,10 @@
     "en": "Custom Identifier",
     "fr": "Identifiant unique"
   },
+  "dateFormat": {
+    "en": "Date Format",
+    "fr": "Format de date"
+  },
   "delete": {
     "en": "Delete",
     "fr": "Supprimer"
@@ -125,6 +129,10 @@
     "en": "Insufficient password strength",
     "fr": "Mot de passe trop faible"
   },
+  "localFormat": {
+    "en": "Local",
+    "fr": "Local"
+  },
   "login": {
     "en": "Login",
     "fr": "Se connecter"
@@ -140,6 +148,14 @@
   "password": {
     "en": "Password",
     "fr": "Mot de passe"
+  },
+  "passwordInDataBreach": {
+    "en": "This password has appeared in a known data breach and cannot be used",
+    "fr": "Ce mot de passe est apparu dans une fuite de données connue et ne peut pas être utilisé"
+  },
+  "passwordMatchesUsername": {
+    "en": "Password must not be the same as the username",
+    "fr": "Le mot de passe ne doit pas être identique au nom d'utilisateur"
   },
   "passwordsMustMatch": {
     "en": "Passwords Must Match",

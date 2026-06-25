@@ -7,6 +7,19 @@ export const $BasePermissionLevel = z.enum(['ADMIN', 'GROUP_MANAGER', 'STANDARD'
 
 export type BasePermissionLevel = z.infer<typeof $BasePermissionLevel>;
 
+/**
+ * Stable, machine-readable codes for the reasons the API can reject a password. These are
+ * returned as the `code` property of the error response body so the web client can show a
+ * localized message; the API itself does not need to localize.
+ */
+export const PASSWORD_ERROR_CODES = [
+  'INSUFFICIENT_PASSWORD_STRENGTH',
+  'PASSWORD_MATCHES_USERNAME',
+  'PASSWORD_IN_DATA_BREACH'
+] as const;
+
+export type PasswordErrorCode = (typeof PASSWORD_ERROR_CODES)[number];
+
 export type User = z.infer<typeof $User>;
 export const $User = $BaseModel.extend({
   additionalPermissions: $Permissions,

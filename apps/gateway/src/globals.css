@@ -1,0 +1,22 @@
+cap-widget {
+  --cap-background: var(--color-background);
+  --cap-border-color: var(--color-input);
+  --cap-border-radius: var(--radius-md);
+  --cap-widget-height: 60px;
+  --cap-widget-width: 100%;
+  --cap-widget-padding: 14px;
+  --cap-gap: 15px;
+  --cap-color: var(--color-card-foreground);
+  --cap-checkbox-size: 25px;
+  --cap-checkbox-border: 1px solid var(--color-border);
+  --cap-checkbox-border-radius: var(--radius-md);
+  --cap-checkbox-background: var(--color-accent);
+  --cap-checkbox-margin: 2px;
+  --cap-font: ui-sans-serif, system-ui, sans-serif;
+  --cap-spinner-color: var(--color-primary);
+  --cap-spinner-background-color: #eee;
+  --cap-spinner-thickness: 5px;
+  --cap-credits-font-size: 12px;
+  --cap-opacity-hover: 0.8;
+  width: 100%;
+}

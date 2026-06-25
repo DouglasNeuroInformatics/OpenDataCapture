@@ -7,7 +7,10 @@ export const auditLogsQueryOptions = ({ search = {} }: { search?: $AuditLogsQuer
   return queryOptions({
     queryFn: async () => {
       const response = await axios.get(`/v1/audit/logs?${new URLSearchParams(search).toString()}`);
-      return z.array($AuditLog).parse(response.data);
+      return z
+        .array($AuditLog)
+        .parse(response.data)
+        .sort((a, b) => b.timestamp - a.timestamp);
     },
     queryKey: ['audit-logs', JSON.stringify(search)]
   });

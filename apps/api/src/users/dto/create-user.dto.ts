@@ -1,38 +1,25 @@
 import { ValidationSchema } from '@douglasneuroinformatics/libnest';
-import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { ApiProperty } from '@nestjs/swagger';
 import type { Sex } from '@opendatacapture/schemas/subject';
 import { $CreateUserData } from '@opendatacapture/schemas/user';
 import type { BasePermissionLevel, CreateUserData } from '@opendatacapture/schemas/user';
-import { z } from 'zod/v4';
 
 const regex = new RegExp(/^\+?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/);
 
+// Note: password strength, username-match, and breached-password checks are enforced
+// centrally in `UsersService.validatePassword` so they apply to every flow that sets a
+// password (user creation, admin edits, self-service updates, and initial setup).
 @ValidationSchema(
-  $CreateUserData
-    .check((ctx) => {
-      if (ctx.value.phoneNumber && !regex.test(ctx.value.phoneNumber)) {
-        ctx.issues.push({
-          code: 'custom',
-          input: ctx.value.phoneNumber,
-          message: `Invalid phone number`,
-          path: ['phoneNumber']
-        });
-      }
-    })
-    .extend({
-      password: $CreateUserData.shape.password.superRefine((val, ctx) => {
-        const result = estimatePasswordStrength(val, {
-          feedbackLanguage: 'en'
-        });
-        if (!result.success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Insufficient password strength: ${result.score}`
-          });
-        }
-      })
-    })
+  $CreateUserData.check((ctx) => {
+    if (ctx.value.phoneNumber && !regex.test(ctx.value.phoneNumber)) {
+      ctx.issues.push({
+        code: 'custom',
+        input: ctx.value.phoneNumber,
+        message: `Invalid phone number`,
+        path: ['phoneNumber']
+      });
+    }
+  })
 )
 export class CreateUserDto implements CreateUserData {
   @ApiProperty({
