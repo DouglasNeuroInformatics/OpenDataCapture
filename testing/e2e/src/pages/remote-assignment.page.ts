@@ -6,14 +6,12 @@ export class RemoteAssignmentPage extends AppPage {
   readonly createDialog: Locator;
   readonly instrumentShowcase: Locator;
   readonly pageHeader: Locator;
-  readonly resultSlider: Locator;
 
   constructor(page: Page) {
     super(page);
     this.pageHeader = page.getByTestId('page-header');
     this.instrumentShowcase = page.getByTestId('instrument-showcase');
     this.createDialog = page.getByRole('dialog');
-    this.resultSlider = page.locator('[data-testid="remote-assignment-page"] ~ div [role="dialog"]');
   }
 
   async clickFirstInstrumentCard() {
