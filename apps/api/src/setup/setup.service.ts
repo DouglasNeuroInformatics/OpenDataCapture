@@ -1,5 +1,5 @@
 import { isPlainObject } from '@douglasneuroinformatics/libjs';
-import { ConfigService, InjectModel, InjectPrismaClient } from '@douglasneuroinformatics/libnest';
+import { ConfigService, InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import {
   ForbiddenException,
@@ -12,7 +12,12 @@ import type { CreateAdminData, InitAppOptions, SetupState, UpdateSetupStateData 
 
 import type { RuntimePrismaClient } from '@/core/prisma';
 import { DemoService } from '@/demo/demo.service';
+import { InstrumentReposService } from '@/instrument-repos/instrument-repos.service';
 import { UsersService } from '@/users/users.service';
+
+// The shared collection of instruments maintained by the Douglas Neuroinformatics team. It is used by
+// virtually every deployment, so every fresh installation is seeded with it automatically.
+const DEFAULT_INSTRUMENT_REPO_URL = 'https://github.com/DouglasNeuroInformatics/ODC_Instruments';
 
 @Injectable()
 export class SetupService {
@@ -21,6 +26,8 @@ export class SetupService {
     @InjectModel('SetupState') private readonly setupStateModel: Model<'SetupState'>,
     private readonly configService: ConfigService,
     private readonly demoService: DemoService,
+    private readonly instrumentReposService: InstrumentReposService,
+    private readonly loggingService: LoggingService,
     private readonly usersService: UsersService
   ) {}
 
@@ -71,6 +78,7 @@ export class SetupService {
     await this.setupStateModel.create({
       data: { isDemo: initDemo, isExperimentalFeaturesEnabled: enableExperimentalFeatures, isSetup: true }
     });
+    await this.seedDefaultInstrumentRepo();
     return { success: true };
   }
 
@@ -103,5 +111,22 @@ export class SetupService {
 
   private async getSavedOptions() {
     return await this.setupStateModel.findFirst();
+  }
+
+  /**
+   * Import the default DNI instrument collection so every fresh installation ships with it. Skipped in
+   * tests (which must not reach out to GitHub) and never allowed to fail setup: a network error here
+   * just logs and is recoverable — an admin can add the repo manually afterward.
+   */
+  private async seedDefaultInstrumentRepo(): Promise<void> {
+    if (this.configService.get('NODE_ENV') === 'test') {
+      return;
+    }
+    try {
+      await this.instrumentReposService.create({ url: DEFAULT_INSTRUMENT_REPO_URL });
+      this.loggingService.log(`Imported default instrument repository: ${DEFAULT_INSTRUMENT_REPO_URL}`);
+    } catch (err) {
+      this.loggingService.error(`Failed to import default instrument repository: ${String(err)}`);
+    }
   }
 }

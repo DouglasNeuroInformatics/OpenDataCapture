@@ -76,3 +76,6 @@ storybook-static
 
 # playwright
 testing/e2e/.playwright
+
+# tanstack router generated temp files
+.tanstack

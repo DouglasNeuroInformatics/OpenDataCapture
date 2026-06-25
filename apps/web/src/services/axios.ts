@@ -12,8 +12,8 @@ declare module 'axios' {
   export interface AxiosRequestConfig<D = any> {
     meta?: {
       disableDefaultAuth?: boolean;
-      // Opt out of the global error notification so the caller can handle the error itself
-      // (e.g. translate a structured error code returned by the API).
+      // Suppress the generic "HTTP Request Failed" toast so a caller can show its own specific error
+      // message (e.g. a mutation onError) without the user seeing two notifications.
       disableDefaultErrorNotification?: boolean;
       disableDefaultTimeout?: boolean;
     };
@@ -70,14 +70,17 @@ axios.interceptors.response.use(
       console.error(error);
       return Promise.reject(error as Error);
     }
-    notifications.addNotification({
-      message: i18n.t({
-        en: 'HTTP Request Failed',
-        fr: 'Échec de la requête HTTP'
-      }),
-      title: error.response?.status.toString(),
-      type: 'error'
-    });
+    // Let callers that surface their own specific error message opt out of the generic toast.
+    if (!error.config?.meta?.disableDefaultErrorNotification) {
+      notifications.addNotification({
+        message: i18n.t({
+          en: 'HTTP Request Failed',
+          fr: 'Échec de la requête HTTP'
+        }),
+        title: error.response?.status.toString(),
+        type: 'error'
+      });
+    }
     return Promise.reject(error);
   }
 );

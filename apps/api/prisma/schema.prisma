@@ -112,6 +112,8 @@ model Group {
   auditLogs               AuditLog[]
   instrumentRecords       InstrumentRecord[]
   instrumentRecordFiles   InstrumentRecordFile[]
+  instrumentRepoIds       String[]               @db.ObjectId
+  instrumentRepos         InstrumentRepo[]       @relation(fields: [instrumentRepoIds], references: [id])
   name                    String                 @unique
   settings                GroupSettings
   sessions                Session[]
@@ -180,16 +182,43 @@ type InstrumentInternal {
 }
 
 model Instrument {
-  createdAt   DateTime           @default(now()) @db.Date
-  updatedAt   DateTime           @updatedAt @db.Date
-  id          String             @id @map("_id")
-  assignments Assignment[]
-  bundle      String
-  groups      Group[]            @relation(fields: [groupIds], references: [id])
-  groupIds    String[]           @db.ObjectId
-  records     InstrumentRecord[]
+  createdAt      DateTime           @default(now()) @db.Date
+  updatedAt      DateTime           @updatedAt @db.Date
+  id             String             @id @map("_id")
+  assignments    Assignment[]
+  bundle         String
+  groups         Group[]            @relation(fields: [groupIds], references: [id])
+  groupIds       String[]           @db.ObjectId
+  records        InstrumentRecord[]
+  // Set only when the instrument was first created by importing an instrument repository. Left null
+  // for manually-uploaded instruments, which keep "manual" provenance even if a repo also provides them.
+  sourceRepoId   String?            @db.ObjectId
+  // Denormalized repository name, kept so the source tag survives deletion of the repository.
+  sourceRepoName String?
 
   @@map("InstrumentModel")
+}
+
+// Instrument Repos
+
+model InstrumentRepo {
+  createdAt     DateTime   @default(now()) @db.Date
+  updatedAt     DateTime   @updatedAt @db.Date
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  // Display label only (derived from the repo name); not unique because two owners may have repos with
+  // the same name (e.g. alice/forms and bob/forms). `url` is the true identity and is unique.
+  name          String
+  owner         String
+  repoName      String
+  url           String     @unique
+  instrumentIds String[]
+  groupIds      String[]   @db.ObjectId
+  groups        Group[]    @relation(fields: [groupIds], references: [id])
+  lastSyncedAt  DateTime?  @db.Date
+  // AES-256-GCM encrypted GitHub personal access token, used to access private repositories.
+  accessToken   String?
+
+  @@map("InstrumentRepoModel")
 }
 
 // Subjects
@@ -228,6 +257,7 @@ enum AppSubject {
   Group
   Instrument
   InstrumentRecord
+  InstrumentRepo
   Session
   Subject
   User

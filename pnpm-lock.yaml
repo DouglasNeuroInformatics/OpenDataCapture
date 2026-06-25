@@ -263,6 +263,9 @@ importers:
       '@opendatacapture/demo':
         specifier: workspace:*
         version: link:../../packages/demo
+      '@opendatacapture/instrument-bundler':
+        specifier: workspace:*
+        version: link:../../packages/instrument-bundler
       '@opendatacapture/instrument-library':
         specifier: workspace:*
         version: link:../../packages/instrument-library
@@ -299,6 +302,9 @@ importers:
       hibp:
         specifier: ^15.2.1
         version: 15.2.1
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
       lodash-es:
         specifier: workspace:lodash-es__4.x@*
         version: link:../../vendor/lodash-es@4.x
@@ -1444,7 +1450,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/schemas
       '@playwright/test':
-        specifier: ^1.51.1
+        specifier: ^1.60.0
         version: 1.60.0
       type-fest:
         specifier: workspace:type-fest__4.x@*

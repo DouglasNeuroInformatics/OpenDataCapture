@@ -8,6 +8,7 @@ import { $Env } from './core/schemas/env.schema';
 import { GatewayModule } from './gateway/gateway.module';
 import { GroupsModule } from './groups/groups.module';
 import { InstrumentRecordsModule } from './instrument-records/instrument-records.module';
+import { InstrumentReposModule } from './instrument-repos/instrument-repos.module';
 import { InstrumentsModule } from './instruments/instruments.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { SetupModule } from './setup/setup.module';
@@ -43,6 +44,7 @@ export default AppFactory.create({
     AuthModule,
     GroupsModule,
     InstrumentRecordsModule,
+    InstrumentReposModule,
     InstrumentsModule,
     PrismaModule.forRootAsync({
       useClass: PrismaModuleOptionsFactory
