@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
@@ -8,6 +8,8 @@ import type { InstrumentSubmitHandler } from '@opendatacapture/react-core';
 import type { UpdateRemoteAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import axios from 'axios';
+
+import CapWidget from './components/Cap';
 
 import './services/axios';
 import './services/i18n';
@@ -23,11 +25,17 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const notifications = useNotificationsStore();
 
+  const [capToken, setCapToken] = useState<null | string>(null);
+
   useEffect(() => {
     ref.current!.style.display = 'flex';
   }, []);
 
   const handleSubmit: InstrumentSubmitHandler = async (result) => {
+    if (!capToken) {
+      notifications.addNotification({ message: 'Please complete the verification challenge', type: 'error' });
+      return;
+    }
     let updateData: UpdateRemoteAssignmentData;
     if (target.kind === 'SERIES' && result.kind === 'SERIES') {
       updateData = {
@@ -46,7 +54,8 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
     }
     await axios.patch(`/api/assignments/${id}`, updateData, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        'X-Captcha-Token': capToken
       }
     });
     notifications.addNotification({ type: 'success' });
@@ -72,7 +81,9 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
         </header>
         <main className="container flex min-h-0 max-w-3xl grow flex-col pb-16 pt-32 xl:max-w-5xl">
           <InstrumentRenderer
+            beforeBegin={<CapWidget onSolve={setCapToken} />}
             className="min-h-full w-full"
+            disableBegin={!capToken}
             initialSeriesIndex={initialSeriesIndex}
             target={target}
             onSubmit={handleSubmit}

@@ -1,13 +1,19 @@
+import type { ReactNode } from 'react';
+
 import { Button, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
 
 export type InstrumentOverviewProps = {
+  /** Content rendered directly above the "Begin" button (e.g., a verification gate). */
+  beforeBegin?: ReactNode;
+  /** When true, the "Begin" button is disabled. */
+  disableBegin?: boolean;
   instrument: AnyUnilingualInstrument;
   onNext: () => void;
 };
 
-export const InstrumentOverview = ({ instrument, onNext }: InstrumentOverviewProps) => {
+export const InstrumentOverview = ({ beforeBegin, disableBegin, instrument, onNext }: InstrumentOverviewProps) => {
   const { t } = useTranslation();
 
   const estimatedDuration = instrument.clientDetails?.estimatedDuration ?? instrument.details.estimatedDuration;
@@ -42,8 +48,10 @@ export const InstrumentOverview = ({ instrument, onNext }: InstrumentOverviewPro
           </div>
         )}
       </div>
+      {beforeBegin}
       <Button
         className="w-full"
+        disabled={disableBegin}
         label={t({
           en: 'Begin',
           fr: 'Commencer'

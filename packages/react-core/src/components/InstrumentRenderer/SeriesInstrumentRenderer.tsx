@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 
 import { replacer } from '@douglasneuroinformatics/libjs';
 import { Button, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
@@ -22,7 +23,11 @@ import type { InteractiveContentSubmitResult } from '../InteractiveContent';
 import type { InstrumentSubmitHandler } from './types';
 
 export type SeriesInstrumentRendererProps = {
+  /** Content rendered directly above the "Begin" button on the overview screen. */
+  beforeBegin?: ReactNode;
   className?: string;
+  /** When true, the "Begin" button on the overview screen is disabled. */
+  disableBegin?: boolean;
   initialSeriesIndex?: number;
   onSubmit: InstrumentSubmitHandler<'SERIES'>;
   subject?: SubjectDisplayInfo;
@@ -30,7 +35,9 @@ export type SeriesInstrumentRendererProps = {
 };
 
 export const SeriesInstrumentRenderer = ({
+  beforeBegin,
   className,
+  disableBegin,
   initialSeriesIndex,
   onSubmit,
   target
@@ -100,6 +107,8 @@ export const SeriesInstrumentRenderer = ({
           match({ index, instrument, isInstrumentInProgress })
             .with({ index: 0 }, () => (
               <InstrumentOverview
+                beforeBegin={beforeBegin}
+                disableBegin={disableBegin}
                 instrument={instrument}
                 onNext={() => {
                   setIndex(1);

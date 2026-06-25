@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 
 import { ScalarInstrumentRenderer } from './ScalarInstrumentRenderer';
@@ -8,7 +10,11 @@ import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
 import type { InstrumentSubmitHandler } from './types';
 
 export type InstrumentRendererProps = {
+  /** Content rendered directly above the "Begin" button on the overview screen. */
+  beforeBegin?: ReactNode;
   className?: string;
+  /** When true, the "Begin" button on the overview screen is disabled. */
+  disableBegin?: boolean;
   initialSeriesIndex?: number;
   NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: InstrumentSubmitHandler;

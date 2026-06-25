@@ -18,4 +18,5 @@ cap-widget {
   --cap-spinner-thickness: 5px;
   --cap-credits-font-size: 12px;
   --cap-opacity-hover: 0.8;
+  width: 100%;
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 
 import { replacer } from '@douglasneuroinformatics/libjs';
 import { Spinner } from '@douglasneuroinformatics/libui/components';
@@ -22,7 +23,11 @@ import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
 import type { AnyContentResult, InstrumentSubmitHandler } from './types';
 
 export type ScalarInstrumentRendererProps = {
+  /** Content rendered directly above the "Begin" button on the overview screen. */
+  beforeBegin?: ReactNode;
   className?: string;
+  /** When true, the "Begin" button on the overview screen is disabled. */
+  disableBegin?: boolean;
   NavigationBlocker?: NavigationBlockerComponent;
   /** @deprecated */
   onCompileError?: (error: Error) => void;
@@ -34,7 +39,9 @@ export type ScalarInstrumentRendererProps = {
 };
 
 export const ScalarInstrumentRenderer = ({
+  beforeBegin,
   className,
+  disableBegin,
   NavigationBlocker,
   onCompileError,
   onSubmit,
@@ -81,7 +88,14 @@ export const ScalarInstrumentRenderer = ({
         })
         .with({ status: 'DONE' }, ({ instrument }) =>
           match({ index, instrument })
-            .with({ index: 0 }, () => <InstrumentOverview instrument={instrument} onNext={() => setIndex(1)} />)
+            .with({ index: 0 }, () => (
+              <InstrumentOverview
+                beforeBegin={beforeBegin}
+                disableBegin={disableBegin}
+                instrument={instrument}
+                onNext={() => setIndex(1)}
+              />
+            ))
             .with({ index: 1, instrument: { kind: 'FORM' } }, ({ instrument }) => (
               <FormContent instrument={instrument} onSubmit={handleSubmit} />
             ))
