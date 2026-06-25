@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { Root } from './Root';
 
 import '@opendatacapture/react-core/globals.css';
+import './globals.css';
 
 const ROOT_PROPS = window.__ROOT_PROPS__;
 
