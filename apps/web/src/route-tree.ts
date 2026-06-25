@@ -21,7 +21,6 @@ import { Route as AppUploadIndexRouteImport } from './routes/_app/upload/index'
 import { Route as AppDatahubIndexRouteImport } from './routes/_app/datahub/index'
 import { Route as AppUploadInstrumentIdRouteImport } from './routes/_app/upload/$instrumentId'
 import { Route as AppSessionStartSessionRouteImport } from './routes/_app/session/start-session'
-import { Route as AppSessionRemoteAssignmentRouteImport } from './routes/_app/session/remote-assignment'
 import { Route as AppInstrumentsAccessibleInstrumentsRouteImport } from './routes/_app/instruments/accessible-instruments'
 import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
@@ -99,12 +98,6 @@ const AppSessionStartSessionRoute = AppSessionStartSessionRouteImport.update({
   path: '/session/start-session',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppSessionRemoteAssignmentRoute =
-  AppSessionRemoteAssignmentRouteImport.update({
-    id: '/session/remote-assignment',
-    path: '/session/remote-assignment',
-    getParentRoute: () => AppRouteRoute,
-  } as any)
 const AppInstrumentsAccessibleInstrumentsRoute =
   AppInstrumentsAccessibleInstrumentsRouteImport.update({
     id: '/instruments/accessible-instruments',
@@ -211,7 +204,6 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/manage': typeof AppGroupManageRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
-  '/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/session/start-session': typeof AppSessionStartSessionRoute
   '/upload/$instrumentId': typeof AppUploadInstrumentIdRoute
   '/datahub/': typeof AppDatahubIndexRoute
@@ -242,7 +234,6 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/manage': typeof AppGroupManageRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
-  '/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/session/start-session': typeof AppSessionStartSessionRoute
   '/upload/$instrumentId': typeof AppUploadInstrumentIdRoute
   '/datahub': typeof AppDatahubIndexRoute
@@ -275,7 +266,6 @@ export interface FileRoutesById {
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/group/manage': typeof AppGroupManageRoute
   '/_app/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
-  '/_app/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/_app/session/start-session': typeof AppSessionStartSessionRoute
   '/_app/upload/$instrumentId': typeof AppUploadInstrumentIdRoute
   '/_app/datahub/': typeof AppDatahubIndexRoute
@@ -308,7 +298,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/group/manage'
     | '/instruments/accessible-instruments'
-    | '/session/remote-assignment'
     | '/session/start-session'
     | '/upload/$instrumentId'
     | '/datahub/'
@@ -339,7 +328,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/group/manage'
     | '/instruments/accessible-instruments'
-    | '/session/remote-assignment'
     | '/session/start-session'
     | '/upload/$instrumentId'
     | '/datahub'
@@ -371,7 +359,6 @@ export interface FileRouteTypes {
     | '/_app/admin/settings'
     | '/_app/group/manage'
     | '/_app/instruments/accessible-instruments'
-    | '/_app/session/remote-assignment'
     | '/_app/session/start-session'
     | '/_app/upload/$instrumentId'
     | '/_app/datahub/'
@@ -481,13 +468,6 @@ declare module '@tanstack/react-router' {
       path: '/session/start-session'
       fullPath: '/session/start-session'
       preLoaderRoute: typeof AppSessionStartSessionRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/session/remote-assignment': {
-      id: '/_app/session/remote-assignment'
-      path: '/session/remote-assignment'
-      fullPath: '/session/remote-assignment'
-      preLoaderRoute: typeof AppSessionRemoteAssignmentRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/instruments/accessible-instruments': {
@@ -643,7 +623,6 @@ interface AppRouteRouteChildren {
   AppAdminSettingsRoute: typeof AppAdminSettingsRoute
   AppGroupManageRoute: typeof AppGroupManageRoute
   AppInstrumentsAccessibleInstrumentsRoute: typeof AppInstrumentsAccessibleInstrumentsRoute
-  AppSessionRemoteAssignmentRoute: typeof AppSessionRemoteAssignmentRoute
   AppSessionStartSessionRoute: typeof AppSessionStartSessionRoute
   AppUploadInstrumentIdRoute: typeof AppUploadInstrumentIdRoute
   AppDatahubIndexRoute: typeof AppDatahubIndexRoute
@@ -670,7 +649,6 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppGroupManageRoute: AppGroupManageRoute,
   AppInstrumentsAccessibleInstrumentsRoute:
     AppInstrumentsAccessibleInstrumentsRoute,
-  AppSessionRemoteAssignmentRoute: AppSessionRemoteAssignmentRoute,
   AppSessionStartSessionRoute: AppSessionStartSessionRoute,
   AppUploadInstrumentIdRoute: AppUploadInstrumentIdRoute,
   AppDatahubIndexRoute: AppDatahubIndexRoute,
