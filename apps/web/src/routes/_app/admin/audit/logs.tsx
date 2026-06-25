@@ -6,12 +6,21 @@ import { useDownload, useTranslation } from '@douglasneuroinformatics/libui/hook
 import { $AuditLogsQuerySearchParams } from '@opendatacapture/schemas/audit';
 import type { $AuditLog, $AuditLogAction, $AuditLogEntity } from '@opendatacapture/schemas/audit';
 import { createFileRoute } from '@tanstack/react-router';
-import { ArrowDownIcon, ArrowUpIcon, ChevronDownIcon, ChevronsUpDownIcon, DownloadIcon } from 'lucide-react';
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  CalendarIcon,
+  ChevronDownIcon,
+  ChevronsUpDownIcon,
+  DownloadIcon
+} from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
 import { auditLogsQueryOptions, useAuditLogsQuery } from '@/hooks/useAuditLogsQuery';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
+
+type DateFormat = 'iso' | 'local';
 
 const ACTIONS: $AuditLogAction[] = ['CREATE', 'DELETE', 'UPDATE', 'LOGIN'];
 
@@ -83,6 +92,36 @@ const SortableHeader = ({ column, label }: { column: TanstackTable.Column<$Audit
         <ChevronsUpDownIcon className="opacity-50" style={{ height: '14px', width: 'auto' }} />
       )}
     </button>
+  );
+};
+
+const DateFormatMenu = ({ onChange, value }: { onChange: (value: DateFormat) => void; value: DateFormat }) => {
+  const { t } = useTranslation();
+  const options: { label: string; value: DateFormat }[] = [
+    { label: t('common.localFormat'), value: 'local' },
+    { label: 'ISO 8601', value: 'iso' }
+  ];
+  return (
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild>
+        <button aria-label={t('common.dateFormat')} className="opacity-50 hover:opacity-100" type="button">
+          <CalendarIcon style={{ height: '14px', width: 'auto' }} />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content align="start">
+        <DropdownMenu.Label>{t('common.dateFormat')}</DropdownMenu.Label>
+        {options.map((option) => (
+          <DropdownMenu.CheckboxItem
+            checked={value === option.value}
+            key={option.value}
+            onCheckedChange={() => onChange(option.value)}
+            onSelect={(e) => e.preventDefault()}
+          >
+            {option.label}
+          </DropdownMenu.CheckboxItem>
+        ))}
+      </DropdownMenu.Content>
+    </DropdownMenu>
   );
 };
 
@@ -161,12 +200,21 @@ const RouteComponent = () => {
 
   const { resolvedLanguage, t } = useTranslation();
 
+  const [dateFormat, setDateFormat] = useState<DateFormat>('local');
+
   const datetimeFormat = useMemo(() => {
     return new Intl.DateTimeFormat(resolvedLanguage, {
       dateStyle: 'medium',
       timeStyle: 'medium'
     });
   }, [resolvedLanguage]);
+
+  const formatTimestamp = useCallback(
+    (value: number) => {
+      return dateFormat === 'iso' ? new Date(value).toISOString() : datetimeFormat.format(value);
+    },
+    [dateFormat, datetimeFormat]
+  );
 
   return (
     <Fragment>
@@ -181,11 +229,16 @@ const RouteComponent = () => {
             accessorKey: 'timestamp',
             cell: (ctx) => {
               const value = ctx.getValue() as number;
-              return datetimeFormat.format(value);
+              return formatTimestamp(value);
             },
             enableResizing: false,
             enableSorting: true,
-            header: ({ column }) => <SortableHeader column={column} label={t('common.time')} />,
+            header: ({ column }) => (
+              <div className="flex items-center gap-2">
+                <SortableHeader column={column} label={t('common.time')} />
+                <DateFormatMenu value={dateFormat} onChange={setDateFormat} />
+              </div>
+            ),
             size: 250
           },
           {
