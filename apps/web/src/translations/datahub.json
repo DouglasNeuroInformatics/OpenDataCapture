@@ -1,5 +1,13 @@
 {
   "assignments": {
+    "addAssignment": {
+      "en": "Add Assignment",
+      "fr": "Assigner un instrument"
+    },
+    "addAssignmentDesc": {
+      "en": "Please complete the following form to create an assignment. Once an assignment is created, you can send the generated link to the client.",
+      "fr": "Veuillez remplir le formulaire suivant pour créer une assignation. Une fois l'assignation créée, vous pouvez envoyer le lien généré au client."
+    },
     "assignedAt": {
       "en": "Assigned",
       "fr": "Attribué"
@@ -71,6 +79,12 @@
     "time": {
       "en": "Timeframe: ",
       "fr": "Période : "
+    }
+  },
+  "errors": {
+    "expiryMustBeInFuture": {
+      "en": "The expiry date must be in the future",
+      "fr": "La date d'expiration doit être dans le futur"
     }
   },
   "index": {

@@ -8,7 +8,6 @@ import { LoginPage } from '../pages/auth/login.page';
 import { DashboardPage } from '../pages/dashboard.page';
 import { DatahubPage } from '../pages/datahub/datahub.page';
 import { SubjectDataTablePage } from '../pages/datahub/subject-data-table.page';
-import { RemoteAssignmentPage } from '../pages/remote-assignment.page';
 import { SetupPage } from '../pages/setup.page';
 import { StartSessionPage } from '../pages/start-session.page';
 
@@ -37,7 +36,6 @@ const pageModels = {
   '/dashboard': DashboardPage,
   '/datahub': DatahubPage,
   '/datahub/$subjectId/table': SubjectDataTablePage,
-  '/session/remote-assignment': RemoteAssignmentPage,
   '/session/start-session': StartSessionPage,
   '/setup': SetupPage
 } satisfies { [K in RouteTo]?: any };
