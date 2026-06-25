@@ -11,13 +11,13 @@ import Screenshot from '@/components/common/Screenshot.astro';
 This guide is for people logging into an existing Open Data Capture (ODC) instance for the first time.
 An **instance** is the ODC site deployed for your organization, lab, or clinic.
 
-ODC users are one of two types:
+ODC has three roles:
 
-- **Admins** responsible for configuring and managing the instance.
-- **Group managers** configure a group and work with the data collected by that group.
-- **Standard users** primarily start sessions and administer instruments.
+- **Admin**: manages the instance.
+- **Group Manager**: manages one or more groups and the data collected by those groups.
+- **Standard User**: starts sessions and administers instruments.
 
-For more detail about how roles and permissions work, see the [Security reference](/en/docs/reference/security/).
+For the complete permission model, see the [Security reference](/en/docs/reference/security/).
 
 ## Before You Start
 
@@ -27,97 +27,134 @@ You need:
 - Your account credentials
 - Access to the group where you will collect or review data
 
-Most users belong to one group. If you belong to more than one group, the selected group controls which instruments and data you see.
+Most users belong to one group. At login, ODC selects the first group assigned to your account.
 
 <Screenshot alt="login page" name="login" />
 
-## Shared Navigation
+## Navigation
 
-The navigation you see depends on your role, group, permissions, and instance settings.
+ODC only shows navigation items that your account can access.
 
-- **Dashboard** shows an overview of data for the selected group. Standard users do not see this unless custom permissions have been granted.
-- **Data Hub** is used to find subjects, review records, export data, graph measures, and, when enabled, manage assignments. Standard users do not see this unless custom permissions have been granted.
+- **Dashboard** shows an overview of data for the selected group. The default Standard User role does not see Dashboard.
+- **Data Hub** finds subjects, reviews records, exports data, graphs measures, and manages assignments. The default Standard User role does not see Data Hub.
 - **Start Session** begins a session for a subject.
-- **Accessible Instruments** shows the instruments available for the selected group that are available for the current session.
+- **Accessible Instruments** shows the instruments available for the selected group and current session.
 - **Upload** imports form instrument data from CSV.
-- **Manage Group** appears for group managers and is used to configure group-level settings.
+- **Manage Group** configures group-level settings. The default Standard User role does not see Manage Group.
 
 <Screenshot alt="dashboard page" name="dashboard" />
 
-## Group Managers
+## Select a Group
 
-Group managers are responsible for configuring a group before data collection begins, then reviewing and exporting the data collected for that group.
+The selected group controls which instruments and data you see.
 
-### First-Time Setup
+Group managers use the group selector on Dashboard to change the selected group.
+
+## Configure a Group
+
+Group configuration is done in **Manage Group**.
+
+The default Standard User role does not see Manage Group.
 
 <Steps>
 
-1.  **Log in to your ODC instance**
+1.  **Open Manage Group**
 
-    Use the URL and credentials provided by your administrator.
+    Use **Manage Group** to control the instruments and subject settings for the selected group.
 
-2.  **Confirm the selected group**
+2.  **Select accessible instruments**
 
-    If you have access to more than one group, use the group selector on the Dashboard to choose the group you want to configure.
+    Accessible instruments are the instruments shown to group members in **Accessible Instruments**.
 
-3.  **Open Manage Group**
+3.  **Review subject display settings**
 
-    Use **Manage Group** to control what is available to your group. The instruments selected here are the instruments shown to group members in **Accessible Instruments**.
+    Set the preferred subject ID display length.
 
-4.  **Review accessible instruments**
+4.  **Review age settings**
 
-    Select the instruments that should be available to group members.
+    Turn minimum age validation on or off. When it is on, set the minimum age.
 
-5.  **Review subject settings**
+5.  **Review subject identification settings**
 
-    Confirm the group's subject ID settings, including preferred display length, minimum age, default identification method, ID validation pattern, and custom validation messages when applicable.
+    Choose the default identification method and configure the ID validation pattern and validation messages.
 
 </Steps>
 
-### When to Ask an Admin
+## Start a Session
 
-Ask an administrator for help with:
-
-- Creating users
-- Creating groups
-- Reviewing logs
-- Adding or modifying instruments
-- Changing permissions for users in your group
-
-## Standard Users
-
-Standard users are usually responsible for collecting data by starting sessions and administering instruments. By default, standard users do not manage group settings or access collected group data.
-
-### First-Time Workflow
+Use **Start Session** to begin work with a subject.
 
 <Steps>
 
-1.  **Log in to your ODC instance**
+1.  **Open Start Session**
 
-    Use the URL and credentials provided by your administrator or group manager.
+    Start Session is available to group managers and standard users.
 
-2.  **Confirm your group**
+2.  **Identify the subject**
 
-    Most standard users have one group. If you have more than one, make sure the correct group is selected before starting a session.
-
-3.  **Start a session**
-
-    Open **Start Session** and identify the subject. Depending on the group settings, you may use a custom ID or enter personal information so ODC can generate an ID in the browser.
+    ODC supports custom IDs and auto-generated IDs based on personal information. The selected group's settings determine the default method.
 
     <Screenshot alt="start session page" name="start-session-hash" />
 
-4.  **Choose the session type**
+3.  **Choose the session type**
 
-    Use an in-person session for new data collection. Use a retrospective session when entering data that was collected earlier using another system. You will see that a session is active in the sidebar.
+    Use an in-person session for new data collection. Use a retrospective session when entering data that was collected earlier using another system.
 
-5.  **Administer an instrument**
+4.  **Confirm the session is active**
 
-    Open **Accessible Instruments**, choose an instrument, complete it, and submit the record.
-
-6.  **Finish the current session**
-
-    ODC only allows one active session at a time in the browser. End the current session before starting another one.
+    After the session starts, ODC shows the active session in the sidebar.
 
 </Steps>
 
-If you need access to Dashboard, Data Hub, export tools, group settings, or broader subject data, ask a group manager or administrator. Those areas are permission-controlled and are not normally available to standard users.
+ODC allows one active session at a time. Starting a new session will automatically end an existing session.
+
+## Administer Instruments
+
+Use **Accessible Instruments** after starting a session.
+
+Accessible Instruments shows the instruments selected for the current group. Select an instrument and complete it.
+
+## Review and Export Data
+
+Use **Data Hub** to find subjects, review records, export data, and graph measures.
+
+The default Standard User role does not see Data Hub.
+
+<Screenshot alt="data hub page" name="data-hub" />
+
+For more detail, see:
+
+- [How to Export Data](/en/docs/guides/how-to-export-data/)
+- [How to Visualize Data](/en/docs/guides/how-to-visualize-data/)
+
+## Upload Data
+
+Use **Upload** to import CSV data for form instruments.
+
+Upload appears the feature is enabled by the instance admin and your account can read subjects and create instrument records. The default Group Manager and Standard User roles satisfy those permissions.
+
+For more detail, see [How to Upload Data](/en/docs/guides/how-to-upload-data/).
+
+## Assignments
+
+Assignments are instruments that a subject completes outside the main ODC web app.
+
+The **Assignments** tab appears on Data Hub subject pages when gateway support is enabled. Group managers can create and manage assignments for their groups. The default Standard User role does not see Data Hub and does not have assignment permissions.
+
+## When to Ask an Admin
+
+Ask an admin for:
+
+- Creating users
+- Creating groups
+- Adding or modifying instruments
+- Changing permissions
+
+## Troubleshooting
+
+- **I cannot find an instrument:** Ask a group manager to check the group's accessible instruments.
+- **I see the wrong instruments or data:** A group manager should confirm the selected group on Dashboard.
+- **I do not see Dashboard:** The default Standard User role does not see Dashboard.
+- **I do not see Data Hub:** The default Standard User role does not see Data Hub.
+- **I do not see Upload:** This feature is disabled on your instance or your account does not have the required upload permissions.
+- **I do not see Assignments:** Gateway support is disabled or your account does not have assignment permissions.
