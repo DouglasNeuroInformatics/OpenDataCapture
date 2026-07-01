@@ -28,6 +28,8 @@ export type ScalarInstrumentRendererProps = {
   className?: string;
   /** When true, the "Begin" button on the overview screen is disabled. */
   disableBegin?: boolean;
+  /** Whether to disable copy, download, print in the final summary */
+  disableSummaryActions?: boolean;
   NavigationBlocker?: NavigationBlockerComponent;
   /** @deprecated */
   onCompileError?: (error: Error) => void;
@@ -42,6 +44,7 @@ export const ScalarInstrumentRenderer = ({
   beforeBegin,
   className,
   disableBegin,
+  disableSummaryActions,
   NavigationBlocker,
   onCompileError,
   onSubmit,
@@ -120,7 +123,13 @@ export const ScalarInstrumentRenderer = ({
               );
             })
             .with({ index: 2 }, () => (
-              <InstrumentSummary data={data} instrument={instrument} subject={subject} timeCollected={Date.now()} />
+              <InstrumentSummary
+                data={data}
+                disableActions={disableSummaryActions}
+                instrument={instrument}
+                subject={subject}
+                timeCollected={Date.now()}
+              />
             ))
             .otherwise(() => null)
         )
