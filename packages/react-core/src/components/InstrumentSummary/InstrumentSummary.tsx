@@ -14,6 +14,7 @@ import type { SubjectDisplayInfo } from '../../types';
 
 export type InstrumentSummaryProps = {
   data: any;
+  disableActions?: boolean;
   displayAllMeasures?: boolean;
   instrument: AnyUnilingualInstrument;
   subject?: SubjectDisplayInfo;
@@ -22,6 +23,7 @@ export type InstrumentSummaryProps = {
 
 export const InstrumentSummary = ({
   data,
+  disableActions,
   displayAllMeasures,
   instrument,
   subject,
@@ -102,15 +104,17 @@ export const InstrumentSummary = ({
             })}
           </p>
         </div>
-        <div className="hidden sm:flex sm:items-center sm:gap-1 print:hidden">
-          <CopyButton text={copyText} variant="ghost" />
-          <Button size="icon" type="button" variant="ghost" onClick={handleDownload}>
-            <DownloadIcon />
-          </Button>
-          <Button size="icon" type="button" variant="ghost" onClick={print}>
-            <PrinterIcon />
-          </Button>
-        </div>
+        {!disableActions && (
+          <div className="hidden sm:flex sm:items-center sm:gap-1 print:hidden">
+            <CopyButton text={copyText} variant="ghost" />
+            <Button size="icon" type="button" variant="ghost" onClick={handleDownload}>
+              <DownloadIcon />
+            </Button>
+            <Button size="icon" type="button" variant="ghost" onClick={print}>
+              <PrinterIcon />
+            </Button>
+          </div>
+        )}
       </div>
       <Separator />
       {subject && (

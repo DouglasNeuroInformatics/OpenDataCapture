@@ -76,6 +76,16 @@ export default defineInstrument({
     {
       title: 'String',
       fields: {
+        stringCombobox: {
+          kind: 'string',
+          label: 'String (Combobox)',
+          options: {
+            a: 'A',
+            b: 'B',
+            c: 'C'
+          },
+          variant: 'combobox'
+        },
         stringInput: {
           kind: 'string',
           label: 'String (Input)',
@@ -230,6 +240,7 @@ export default defineInstrument({
         });
       }
     }),
+    stringCombobox: z.enum(['a', 'b', 'c']),
     stringRadio: z.enum(['a', 'b', 'c']),
     stringSelect: z.enum(['a', 'b', 'c']),
     stringTextArea: z.string(),

@@ -91,6 +91,7 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
         </header>
         <main className="container flex min-h-0 max-w-3xl grow flex-col pb-16 pt-32 xl:max-w-5xl">
           <InstrumentRenderer
+            disableSummaryActions
             beforeBegin={<CapWidget onSolve={(token) => void handleSolve(token)} />}
             className="min-h-full w-full"
             disableBegin={!verified}
