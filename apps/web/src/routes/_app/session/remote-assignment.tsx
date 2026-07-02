@@ -171,7 +171,7 @@ const RouteComponent = () => {
                   expiresAt,
                   groupId: currentGroup?.id,
                   instrumentId: selectedInstrument!.id,
-                  subjectId: currentSession.subject!.id
+                  subjectId: currentSession.subjectId
                 }
               });
               setAssignmentUrl(assignment.url);
