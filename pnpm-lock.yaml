@@ -28,8 +28,8 @@ catalogs:
       specifier: ^6.8.0
       version: 6.8.0
     '@douglasneuroinformatics/libui-form-types':
-      specifier: ^0.13.0
-      version: 0.13.0
+      specifier: ^0.15.0
+      version: 0.15.0
     '@microsoft/api-extractor':
       specifier: ^7.47.6
       version: 7.58.7
@@ -1095,7 +1095,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libui-form-types':
         specifier: 'catalog:'
-        version: 0.13.0
+        version: 0.15.0
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
@@ -2310,10 +2310,6 @@ packages:
     resolution:
       { integrity: sha512-weXJgsNBdz26ldMMEh20Cn9EtR+ynn3O9v81ZEWnfBmzZmFxSlUxnevLlncJxbVM6s6SgH97C4B/L8AdGvlCxA== }
     engines: { node: '>=20' }
-
-  '@douglasneuroinformatics/libui-form-types@0.13.0':
-    resolution:
-      { integrity: sha512-56DsMv5yb5aG/NRVGp7BpuW7toUAgp4gfGDhbFTGPHVuGiL/U7+CnvW/BI1Me9NFIBM5bpuU30w4Kgr6xPMwHQ== }
 
   '@douglasneuroinformatics/libui-form-types@0.15.0':
     resolution:
@@ -14463,10 +14459,6 @@ snapshots:
       '@douglasneuroinformatics/libstats-linux-x64-musl': 0.2.1
       '@douglasneuroinformatics/libstats-win32-arm64-msvc': 0.2.1
       '@douglasneuroinformatics/libstats-win32-x64-msvc': 0.2.1
-
-  '@douglasneuroinformatics/libui-form-types@0.13.0':
-    dependencies:
-      type-fest: 4.41.0
 
   '@douglasneuroinformatics/libui-form-types@0.15.0':
     dependencies:
