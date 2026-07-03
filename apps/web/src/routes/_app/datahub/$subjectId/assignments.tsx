@@ -1,35 +1,21 @@
-/* eslint-disable perfectionist/sort-objects */
+// Assignment creation has been moved to the dedicated remote assignment page (/session/remote-assignment).
+// This page now only displays existing assignments and allows viewing/canceling them.
 
 import React, { useEffect, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import {
-  Button,
-  ClientTable,
-  Dialog,
-  Form,
-  Heading,
-  Input,
-  Label,
-  Sheet
-} from '@douglasneuroinformatics/libui/components';
+import { Button, Heading, Input, Label, Sheet, Table } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { PlusIcon } from '@heroicons/react/24/solid';
 import { CopyButton } from '@opendatacapture/react-core';
-import type { Assignment, AssignmentStatus, CreateAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { Assignment, AssignmentStatus } from '@opendatacapture/schemas/assignment';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute } from '@tanstack/react-router';
-import { z } from 'zod/v4';
 
 import { QRCode } from '@/components/QRCode';
 import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
-import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useUpdateAssignment } from '@/hooks/useUpdateAssignment';
-import { useAppStore } from '@/store';
-
-const ONE_YEAR = 31556952000;
 
 const AssignmentSlider: React.FC<{
   assignment: Assignment | null;
@@ -84,7 +70,8 @@ const AssignmentSlider: React.FC<{
 const AssignmentsTable: React.FC<{
   assignments: Assignment[];
   onSelection: (assignment: Assignment) => void;
-}> = ({ assignments, onSelection }) => {
+  selectedId: null | string;
+}> = ({ assignments, onSelection, selectedId }) => {
   const { t } = useTranslation('datahub');
   const [instruments, setInstruments] = useState<{ [key: string]: UnilingualInstrumentInfo }>({});
 
@@ -96,140 +83,83 @@ const AssignmentsTable: React.FC<{
     );
   }, [instrumentInfoQuery.data]);
 
+  const formatStatus = (status: AssignmentStatus) => {
+    switch (status) {
+      case 'CANCELED':
+        return t('assignments.statusOptions.canceled');
+      case 'COMPLETE':
+        return t('assignments.statusOptions.complete');
+      case 'EXPIRED':
+        return t('assignments.statusOptions.expired');
+      case 'OUTSTANDING':
+        return t('assignments.statusOptions.outstanding');
+    }
+  };
+
   return (
-    <ClientTable<Assignment>
-      columns={[
-        {
-          field: (entry) => {
-            return instruments[entry.instrumentId]?.details.title ?? entry.instrumentId;
-          },
-          label: t('assignments.title')
-        },
-        {
-          field: 'createdAt',
-          formatter: (value: Date) => toBasicISOString(value),
-          label: t('assignments.assignedAt')
-        },
-        {
-          field: 'expiresAt',
-          formatter: (value: Date) => toBasicISOString(value),
-          label: t('assignments.expiresAt')
-        },
-        {
-          field: 'status',
-          formatter: (value: AssignmentStatus) => {
-            switch (value) {
-              case 'CANCELED':
-                return t('assignments.statusOptions.canceled');
-              case 'COMPLETE':
-                return t('assignments.statusOptions.complete');
-              case 'EXPIRED':
-                return t('assignments.statusOptions.expired');
-              case 'OUTSTANDING':
-                return t('assignments.statusOptions.outstanding');
-            }
-          },
-          label: t('assignments.status')
-        }
-      ]}
-      data={assignments}
-      entriesPerPage={15}
-      minRows={15}
-      onEntryClick={onSelection}
-    />
+    <div className="bg-card text-muted-foreground shadow-xs rounded-md border tracking-tight">
+      <Table>
+        <Table.Header>
+          <Table.Row>
+            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.title')}</Table.Head>
+            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.assignedAt')}</Table.Head>
+            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.expiresAt')}</Table.Head>
+            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.status')}</Table.Head>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {assignments.map((assignment) => (
+            <Table.Row
+              className="cursor-pointer"
+              data-state={selectedId === assignment.id ? 'selected' : undefined}
+              key={assignment.id}
+              onClick={() => onSelection(assignment)}
+            >
+              <Table.Cell>{instruments[assignment.instrumentId]?.details.title ?? assignment.instrumentId}</Table.Cell>
+              <Table.Cell>{toBasicISOString(assignment.createdAt)}</Table.Cell>
+              <Table.Cell>{toBasicISOString(assignment.expiresAt)}</Table.Cell>
+              <Table.Cell>{formatStatus(assignment.status)}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    </div>
   );
 };
 
 const RouteComponent = () => {
   const params = Route.useParams();
   const { t } = useTranslation();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditSliderOpen, setIsEditSliderOpen] = useState(false);
-  const currentGroup = useAppStore((store) => store.currentGroup);
 
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
   const assignmentsQuery = useAssignmentsQuery({ params: { subjectId: params.subjectId } });
-  const createAssignmentMutation = useCreateAssignment();
   const updateAssignmentMutation = useUpdateAssignment();
 
-  const instrumentInfoQuery = useInstrumentInfoQuery();
-
-  const instrumentOptions = Object.fromEntries(
-    (instrumentInfoQuery.data ?? [])
-      .sort((a, b) => a.details.title.localeCompare(b.details.title))
-      .filter((instrument) => {
-        return currentGroup?.accessibleInstrumentIds.includes(instrument.id) ?? true;
-      })
-      .map((instrument) => [instrument.id, instrument.details.title])
-  );
-
   return (
-    <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-      <div>
-        <div className="mb-5 flex flex-col items-center justify-start gap-2 md:justify-between lg:flex-row">
-          <Heading variant="h4">{t('datahub.assignments.assignedInstruments')}</Heading>
-          <Dialog.Trigger asChild>
-            <Button variant="outline">
-              {t('datahub.assignments.addAssignment')}
-              <PlusIcon />
-            </Button>
-          </Dialog.Trigger>
-        </div>
-        <AssignmentsTable
-          assignments={assignmentsQuery.data ?? []}
-          onSelection={(assignment) => {
-            setSelectedAssignment(assignment);
-            setIsEditSliderOpen(true);
-          }}
-        />
-        <AssignmentSlider
-          assignment={selectedAssignment}
-          isOpen={isEditSliderOpen}
-          setIsOpen={setIsEditSliderOpen}
-          onCancel={({ id }) => {
-            updateAssignmentMutation.mutate({ data: { status: 'CANCELED' }, params: { id } });
-            setIsEditSliderOpen(false);
-          }}
-        />
-        <Dialog.Content>
-          <Dialog.Header>
-            <Dialog.Title>{t('datahub.assignments.addAssignment')}</Dialog.Title>
-            <Dialog.Description>{t('datahub.assignments.addAssignmentDesc')}</Dialog.Description>
-          </Dialog.Header>
-          <Form
-            suspendWhileSubmitting
-            content={{
-              instrumentId: {
-                kind: 'string',
-                label: t('core.instrument'),
-                options: instrumentOptions,
-                variant: 'select'
-              },
-              expiresAt: {
-                kind: 'date',
-                label: t('datahub.assignments.expiresAt')
-              }
-            }}
-            initialValues={{
-              expiresAt: new Date(Date.now() + ONE_YEAR)
-            }}
-            validationSchema={
-              z.object({
-                expiresAt: z.coerce.date().min(new Date(), { message: t('datahub.errors.expiryMustBeInFuture') }),
-                instrumentId: z.string()
-              }) satisfies z.ZodType<Omit<CreateAssignmentData, 'subjectId'>>
-            }
-            onSubmit={async (data) => {
-              await createAssignmentMutation.mutateAsync({
-                data: { ...data, groupId: currentGroup?.id, subjectId: params.subjectId }
-              });
-              setIsCreateModalOpen(false);
-            }}
-          />
-        </Dialog.Content>
+    <div>
+      <div className="mb-5 flex flex-col items-center justify-start gap-2 md:justify-between lg:flex-row">
+        <Heading variant="h4">{t('datahub.assignments.assignedInstruments')}</Heading>
       </div>
-    </Dialog>
+      <AssignmentsTable
+        assignments={assignmentsQuery.data ?? []}
+        selectedId={selectedAssignment?.id ?? null}
+        onSelection={(assignment) => {
+          setSelectedAssignment(assignment);
+          setIsEditSliderOpen(true);
+        }}
+      />
+      <AssignmentSlider
+        assignment={selectedAssignment}
+        isOpen={isEditSliderOpen}
+        setIsOpen={setIsEditSliderOpen}
+        onCancel={({ id }) => {
+          updateAssignmentMutation.mutate({ data: { status: 'CANCELED' }, params: { id } });
+          setIsEditSliderOpen(false);
+        }}
+      />
+    </div>
   );
 };
 
