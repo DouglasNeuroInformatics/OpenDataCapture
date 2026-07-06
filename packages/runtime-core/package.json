@@ -10,7 +10,7 @@
       "import": "./dist/index.js"
     },
     "./constants": {
-      "types": "./src/constants.ts",
+      "types": "./lib/constants.d.ts",
       "import": "./lib/constants.js"
     },
     "./package.json": "./package.json"
