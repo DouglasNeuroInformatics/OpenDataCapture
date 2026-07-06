@@ -22,7 +22,7 @@ const router = Router();
 router.post('/challenge', (_, res) => {
   res.status(200).json(
     cap.createChallenge({
-      challengeDifficulty: 5,
+      challengeDifficulty: 4,
       expiresMs: 60_000 * 5
     })
   );

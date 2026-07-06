@@ -22,8 +22,8 @@ catalog:
   '@douglasneuroinformatics/libjs': ^3.2.1
   '@douglasneuroinformatics/libpasswd': '^0.0.3'
   '@douglasneuroinformatics/libstats': '^0.2.1'
-  '@douglasneuroinformatics/libui': ^6.7.1
-  '@douglasneuroinformatics/libui-form-types': ^0.13.0
+  '@douglasneuroinformatics/libui': ^6.8.1
+  '@douglasneuroinformatics/libui-form-types': ^0.15.0
   '@microsoft/api-extractor': '^7.47.6'
   '@prisma/client': '^6.9.0'
   '@tailwindcss/vite': '4.3.0'

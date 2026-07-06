@@ -27,6 +27,10 @@ export class AbilityFactory {
         ability.can('manage', 'Assignment', { groupId: { in: groupIds } });
         ability.can('manage', 'Group', { id: { in: groupIds } });
         ability.can('read', 'Instrument');
+        // Group managers may assemble series instruments on the fly and remove ones they created
+        // (the service enforces that an instrument with collected records cannot be deleted).
+        ability.can('create', 'Instrument');
+        ability.can('delete', 'Instrument');
         ability.can('read', 'InstrumentRepo', { groupIds: { hasSome: groupIds } });
         ability.can('create', 'InstrumentRecord');
         ability.can('create', 'InstrumentRecordFile', { groupId: { in: groupIds } });

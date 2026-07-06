@@ -9,9 +9,10 @@ export type FormContentSubmitResult = { data: FormInstrument.Data; kind: Extract
 export type FormContentProps = {
   instrument: AnyUnilingualFormInstrument;
   onSubmit: (result: FormContentSubmitResult) => Promisable<void>;
+  submitButtonLabel?: string;
 };
 
-export const FormContent = ({ instrument, onSubmit }: FormContentProps) => {
+export const FormContent = ({ instrument, onSubmit, submitButtonLabel }: FormContentProps) => {
   const { t } = useTranslation();
   const instructions = instrument.clientDetails?.instructions ?? instrument.details.instructions;
   return (
@@ -44,6 +45,7 @@ export const FormContent = ({ instrument, onSubmit }: FormContentProps) => {
         content={instrument.content}
         data-testid="form-content"
         initialValues={instrument.initialValues}
+        submitBtnLabel={submitButtonLabel}
         validationSchema={instrument.validationSchema}
         onSubmit={(data) => void onSubmit({ data, kind: 'FORM' })}
       />

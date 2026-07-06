@@ -31,6 +31,7 @@ export type SeriesInstrumentRendererProps = {
   initialSeriesIndex?: number;
   onSubmit: InstrumentSubmitHandler<'SERIES'>;
   subject?: SubjectDisplayInfo;
+  submitButtonLabel?: string;
   target: SeriesInstrumentBundleContainer;
 };
 
@@ -40,6 +41,7 @@ export const SeriesInstrumentRenderer = ({
   disableBegin,
   initialSeriesIndex,
   onSubmit,
+  submitButtonLabel,
   target
 }: SeriesInstrumentRendererProps) => {
   const [index, setIndex] = useState<0 | 1 | 2>(0);
@@ -161,7 +163,11 @@ export const SeriesInstrumentRenderer = ({
                 .with({ status: 'DONE' }, () =>
                   match(scalarState)
                     .with({ instrument: { kind: 'FORM' } }, ({ instrument }) => (
-                      <FormContent instrument={instrument} onSubmit={handleSubmit} />
+                      <FormContent
+                        instrument={instrument}
+                        submitButtonLabel={submitButtonLabel}
+                        onSubmit={handleSubmit}
+                      />
                     ))
                     .with({ instrument: { kind: 'INTERACTIVE' } }, () => (
                       <InteractiveContent bundle={scalarBundle!} onSubmit={handleSubmit} />

@@ -32,7 +32,7 @@ const $$FormInstrumentStringField = <TLanguage extends InstrumentLanguage>(langu
     $$FormInstrumentBaseField(language).extend({
       kind: z.literal('string'),
       options: $$InstrumentUIOption(z.record(z.string(), z.string().min(1)), language),
-      variant: z.enum(['radio', 'select'])
+      variant: z.enum(['combobox', 'radio', 'select'])
     }),
     $$FormInstrumentBaseField(language).extend({
       kind: z.literal('string'),

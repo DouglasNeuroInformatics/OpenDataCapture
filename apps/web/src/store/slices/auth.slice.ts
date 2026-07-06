@@ -39,6 +39,19 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set) => {
     },
     logout: () => {
       window.location.reload();
+    },
+    pruneDeletedInstrument: (instrumentId) => {
+      // Keep the cached group(s) in sync after an instrument is deleted: the deleted id would otherwise
+      // linger in accessibleInstrumentIds and be re-sent on the next group save, failing the relation set.
+      set((state) => {
+        const remove = (ids: string[]) => ids.filter((id) => id !== instrumentId);
+        if (state.currentGroup) {
+          state.currentGroup.accessibleInstrumentIds = remove(state.currentGroup.accessibleInstrumentIds);
+        }
+        state.currentUser?.groups.forEach((group) => {
+          group.accessibleInstrumentIds = remove(group.accessibleInstrumentIds);
+        });
+      });
     }
   };
 };

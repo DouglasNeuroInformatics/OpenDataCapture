@@ -232,8 +232,10 @@ type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = Omit<T, 'conten
   id: string;
   internal?: {
     edition: number;
+    name: string;
   };
   // Provenance: null when uploaded manually; otherwise the source repository id (always present) and
+  seriesItems?: { id: string }[];
   // its name (may be null for legacy instruments imported before names were stored).
   sourceRepo?: null | {
     id: string;
@@ -248,6 +250,12 @@ const $InstrumentInfo = $BaseInstrument
   .extend({
     id: z.string(),
     internal: $ScalarInstrumentInternal.optional(),
+    seriesItems: z
+      .object({
+        id: z.string()
+      })
+      .array()
+      .optional(),
     sourceRepo: z
       .object({
         id: z.string(),
@@ -270,6 +278,20 @@ type MultilingualInstrumentInfo = Simplify<InstrumentInfo<BaseInstrument<Languag
 type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 const $CreateInstrumentData = z.object({
   bundle: z.string().min(1)
+});
+
+type CreateSeriesInstrumentData = z.infer<typeof $CreateSeriesInstrumentData>;
+const $CreateSeriesInstrumentData = z.object({
+  // When true, proceed even though another series already contains the same set of forms.
+  confirmDuplicate: z.boolean().optional(),
+  // Optional human-readable description; falls back to the title when omitted.
+  description: z.string().min(1).optional(),
+  // Optional instructions shown to participants before the series begins.
+  instructions: z.string().min(1).optional(),
+  // The ordered list of scalar instruments (by name + edition) that make up the series.
+  items: z.array($ScalarInstrumentInternal).min(2),
+  // The unique display name entered by the group manager.
+  title: z.string().min(1)
 });
 
 const $BaseInstrumentBundleContainer = z.object({
@@ -304,6 +326,7 @@ export {
   $BaseInstrument,
   $ClientInstrumentDetails,
   $CreateInstrumentData,
+  $CreateSeriesInstrumentData,
   $InstrumentBundleContainer,
   $InstrumentDetails,
   $InstrumentInfo,
@@ -321,6 +344,7 @@ export {
 
 export type {
   CreateInstrumentData,
+  CreateSeriesInstrumentData,
   InstrumentBundleContainer,
   InstrumentInfo,
   MultilingualInstrumentInfo,

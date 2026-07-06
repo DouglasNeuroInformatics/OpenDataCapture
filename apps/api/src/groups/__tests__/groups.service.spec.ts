@@ -59,6 +59,20 @@ describe('GroupsService', () => {
       });
     });
 
+    it('should drop accessibleInstrumentIds that no longer exist before setting the relation', async () => {
+      groupModel.findFirst.mockResolvedValueOnce({ name: 'Test Group', settings: {} });
+      // 'deleted' was removed since the client loaded the group and must not reach the relation set.
+      instrumentModel.findMany.mockResolvedValueOnce([{ id: 'live-1' }, { id: 'live-2' }]);
+      await groupsService.updateById('123', { accessibleInstrumentIds: ['live-1', 'deleted', 'live-2'] });
+      expect(instrumentModel.findMany).toHaveBeenCalledWith({
+        select: { id: true },
+        where: { id: { in: ['live-1', 'deleted', 'live-2'] } }
+      });
+      expect(groupModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { accessibleInstruments: { set: [{ id: 'live-1' }, { id: 'live-2' }] } }
+      });
+    });
+
     it('should not throw when the name is unchanged', async () => {
       groupModel.findFirst.mockResolvedValueOnce({ name: 'Test Group', settings: {} });
       await groupsService.updateById('123', { name: 'Test Group' });

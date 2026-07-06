@@ -2,16 +2,19 @@ import { CryptoService, InjectModel, LoggingService, VirtualizationService } fro
 import type { Model } from '@douglasneuroinformatics/libnest';
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
   UnprocessableEntityException
 } from '@nestjs/common';
+import { bundle } from '@opendatacapture/instrument-bundler';
 import { getSeriesInstrumentItems, isScalarInstrument, isSeriesInstrument } from '@opendatacapture/instrument-utils';
 import type {
   AnyInstrument,
   AnyScalarInstrument,
   InstrumentKind,
+  ScalarInstrumentInternal,
   SeriesInstrument,
   SomeInstrument
 } from '@opendatacapture/runtime-core';
@@ -29,10 +32,20 @@ import type { AppAbility } from '@/auth/auth.types';
 import type { EntityOperationOptions } from '@/core/types';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
+import { CreateSeriesInstrumentDto } from './dto/create-series-instrument.dto';
 
 type InstrumentVirtualizationContext = {
   __resolveImport: (specifier: string) => string;
   instruments: Map<string, WithID<AnyInstrument>>;
+};
+
+/**
+ * Returned by `createSeries` instead of creating an instrument when a series with the same set of forms
+ * already exists and the caller has not confirmed they want a duplicate.
+ */
+type SeriesDuplicateConfirmation = {
+  existingTitle: string;
+  requiresConfirmation: true;
 };
 
 type InstrumentQuery<TKind extends InstrumentKind> = {
@@ -45,6 +58,7 @@ export class InstrumentsService {
   constructor(
     @InjectModel('Group') private readonly groupModel: Model<'Group'>,
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
+    @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
     private readonly cryptoService: CryptoService,
     private readonly loggingService: LoggingService,
     private readonly virtualizationService: VirtualizationService<InstrumentVirtualizationContext>
@@ -104,6 +118,74 @@ export class InstrumentsService {
 
     await this.instrumentModel.create({ data: { bundle, id } });
     return { ...instance, id };
+  }
+
+  /**
+   * Assemble a new series instrument from existing scalar instruments. The title must be unique among
+   * instruments the caller can see; the series bundle is generated server-side and run through the same
+   * validation/creation path as any other instrument.
+   *
+   * If another series already contains the exact same set of forms (regardless of order or name) and the
+   * caller has not opted to proceed, no instrument is created — instead a confirmation prompt is returned
+   * naming the existing series, so the client can ask the user whether they really want a duplicate.
+   */
+  async createSeries(
+    { confirmDuplicate, description, instructions, items, title }: CreateSeriesInstrumentDto,
+    options: EntityOperationOptions = {}
+  ): Promise<SeriesDuplicateConfirmation | WithID<AnyInstrument>> {
+    const trimmedTitle = title.trim();
+    if (await this.isInstrumentTitleTaken(trimmedTitle, options)) {
+      throw new ConflictException(`An instrument named '${trimmedTitle}' already exists`);
+    }
+    if (!confirmDuplicate) {
+      const existingTitle = await this.findSeriesTitleWithSameForms(items, options);
+      if (existingTitle !== null) {
+        return { existingTitle, requiresConfirmation: true };
+      }
+    }
+    const source = this.generateSeriesInstrumentSource({
+      description: description?.trim(),
+      instructions: instructions?.trim(),
+      items,
+      title: trimmedTitle
+    });
+    const generatedBundle = await bundle({ inputs: [{ content: source, name: 'index.ts' }], minify: true });
+    return this.create({ bundle: generatedBundle });
+  }
+
+  /**
+   * Delete an instrument the caller is permitted to remove, but only when no records have been collected
+   * with it (so historical data is never orphaned). Also detaches it from any group that exposes it.
+   */
+  async deleteById(id: string, { ability }: EntityOperationOptions = {}): Promise<{ id: string }> {
+    const instrument = await this.instrumentModel.findFirst({
+      where: { AND: [accessibleQuery(ability, 'delete', 'Instrument')], id }
+    });
+    if (!instrument) {
+      throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
+    }
+    const recordCount = await this.instrumentRecordModel.count({ where: { instrumentId: id } });
+    if (recordCount > 0) {
+      throw new ForbiddenException(
+        `Cannot delete instrument: ${recordCount} record(s) have already been collected with it`
+      );
+    }
+    // Mongo does not cascade scalar-list relations, so pull the id from every group that exposes it
+    // before removing the instrument itself.
+    const groups = await this.groupModel.findMany({
+      select: { accessibleInstrumentIds: true, id: true },
+      where: { accessibleInstrumentIds: { has: id } }
+    });
+    await Promise.all(
+      groups.map((group) =>
+        this.groupModel.update({
+          data: { accessibleInstrumentIds: { set: group.accessibleInstrumentIds.filter((value) => value !== id) } },
+          where: { id: group.id }
+        })
+      )
+    );
+    await this.instrumentModel.delete({ where: { id } });
+    return { id };
   }
 
   async find<TKind extends InstrumentKind>(
@@ -178,10 +260,18 @@ export class InstrumentsService {
     const instances = await this.find(query, options);
 
     const sourceMap = await this.buildInstrumentSourceMap(instances.map((instance) => instance.id));
+    const scalarInstrumentIds = new Map(
+      instances.flatMap((instance) => {
+        if (!isScalarInstrument(instance) || !instance.internal) {
+          return [];
+        }
+        return [[`${instance.internal.name}:${instance.internal.edition}`, instance.id] as const];
+      })
+    );
 
     const results = new Map<string, InstrumentInfo>();
     for (const instance of instances) {
-      const info = pick(instance, [
+      const info: InstrumentInfo = pick(instance, [
         '__runtimeVersion',
         'clientDetails',
         'details',
@@ -191,12 +281,18 @@ export class InstrumentsService {
         'language',
         'tags'
       ]);
+      if (isSeriesInstrument(instance)) {
+        info.seriesItems = getSeriesInstrumentItems(instance.content)
+          .map(({ edition, name }) => scalarInstrumentIds.get(`${name}:${edition}`))
+          .filter((id): id is string => typeof id === 'string')
+          .map((id) => ({ id }));
+      }
       // Expose the source repo id whenever the instrument came from a repo (so it can be filtered per
       // group). The name may be null for legacy instruments imported before names were stored; the
       // client renders those as "uploaded manually" while still treating them as repo-sourced.
       const source = sourceMap.get(info.id);
       if (source?.sourceRepoId) {
-        (info as InstrumentInfo).sourceRepo = {
+        (info).sourceRepo = {
           id: source.sourceRepoId,
           name: source.sourceRepoName ?? null
         };
@@ -226,9 +322,10 @@ export class InstrumentsService {
 
   generateSeriesInstrumentId(instrument: SeriesInstrument) {
     return this.cryptoService.hash(
-      getSeriesInstrumentItems(instrument.content)
-        .map(({ edition, name }) => `${name}-${edition}`)
-        .join('--')
+      JSON.stringify({
+        content: instrument.content,
+        title: instrument.details.title
+      })
     );
   }
 
@@ -281,12 +378,95 @@ export class InstrumentsService {
     return map;
   }
 
+  /**
+   * The title of an existing series instrument that contains the exact same set of forms as `items`
+   * (regardless of order), or `null` when none exists. Used to warn before creating a redundant series.
+   */
+  private async findSeriesTitleWithSameForms(
+    items: ScalarInstrumentInternal[],
+    { ability }: EntityOperationOptions = {}
+  ): Promise<null | string> {
+    const targetKey = this.getFormSetKey(items);
+    const seriesInstances = await this.find({ kind: 'SERIES' }, { ability });
+    for (const series of seriesInstances) {
+      if (!isSeriesInstrument(series)) {
+        continue;
+      }
+      if (this.getFormSetKey(getSeriesInstrumentItems(series.content)) === targetKey) {
+        const value = series.details.title;
+        return typeof value === 'string' ? value : (Object.values(value)[0] ?? null);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Generate the TypeScript source for an on-the-fly series instrument. The definition is plain
+   * JSON-serializable data, so it is emitted as a single default export with no runtime imports.
+   */
+  private generateSeriesInstrumentSource({
+    description,
+    instructions,
+    items,
+    title
+  }: {
+    description?: string;
+    instructions?: string;
+    items: ScalarInstrumentInternal[];
+    title: string;
+  }): string {
+    const text = description && description.length > 0 ? description : title;
+    const definition = {
+      __runtimeVersion: 1,
+      ...(instructions && instructions.length > 0
+        ? { clientDetails: { instructions: { en: [instructions], fr: [instructions] } } }
+        : {}),
+      content: {
+        items: items.map(({ edition, name }) => ({ edition, name }))
+      },
+      details: {
+        description: { en: text, fr: text },
+        license: 'UNLICENSED',
+        title: { en: title, fr: title }
+      },
+      kind: 'SERIES',
+      language: ['en', 'fr'],
+      tags: { en: ['Series'], fr: ['Série'] }
+    };
+    return `export default ${JSON.stringify(definition)};`;
+  }
+
+  /**
+   * A stable, order-independent key identifying the set of forms in a series. Two series with the same
+   * forms produce the same key even if the forms were added in a different order.
+   */
+  private getFormSetKey(items: ScalarInstrumentInternal[]): string {
+    return items
+      .map(({ edition, name }) => `${name}-${edition}`)
+      .sort()
+      .join('--');
+  }
+
   private async instantiate(instruments: Pick<InstrumentBundleContainer, 'bundle' | 'id'>[]) {
     return Promise.all(
       instruments.map((instrument) => {
         return this.getInstrumentInstance(instrument);
       })
     );
+  }
+
+  /**
+   * Whether an instrument visible to the caller already uses the given title (case-insensitive). Used to
+   * enforce that newly-created series instruments have a unique, recognizable name.
+   */
+  private async isInstrumentTitleTaken(title: string, { ability }: EntityOperationOptions = {}): Promise<boolean> {
+    const normalized = title.trim().toLowerCase();
+    const instances = await this.find({}, { ability });
+    return instances.some((instance) => {
+      const value = instance.details.title;
+      const titles = typeof value === 'string' ? [value] : Object.values(value);
+      return titles.some((candidate) => typeof candidate === 'string' && candidate.trim().toLowerCase() === normalized);
+    });
   }
 
   private async validateSeriesInstrument(instrument: SeriesInstrument) {
@@ -308,4 +488,4 @@ export class InstrumentsService {
   }
 }
 
-export type { InstrumentVirtualizationContext };
+export type { InstrumentVirtualizationContext, SeriesDuplicateConfirmation };

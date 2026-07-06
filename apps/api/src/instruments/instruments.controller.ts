@@ -1,5 +1,5 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import type { InstrumentBundleContainer, InstrumentInfo } from '@opendatacapture/schemas/instrument';
@@ -8,6 +8,7 @@ import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
+import { CreateSeriesInstrumentDto } from './dto/create-series-instrument.dto';
 import { InstrumentsService } from './instruments.service';
 
 @ApiTags('Instruments')
@@ -20,6 +21,20 @@ export class InstrumentsController {
   @RouteAccess({ action: 'create', subject: 'Instrument' })
   create(@Body() data: CreateInstrumentDto): Promise<unknown> {
     return this.instrumentsService.create(data);
+  }
+
+  @ApiOperation({ summary: 'Create Series Instrument' })
+  @Post('series')
+  @RouteAccess({ action: 'create', subject: 'Instrument' })
+  createSeries(@Body() data: CreateSeriesInstrumentDto, @CurrentUser('ability') ability: AppAbility): Promise<unknown> {
+    return this.instrumentsService.createSeries(data, { ability });
+  }
+
+  @ApiOperation({ summary: 'Delete Instrument' })
+  @Delete(':id')
+  @RouteAccess({ action: 'delete', subject: 'Instrument' })
+  delete(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility): Promise<unknown> {
+    return this.instrumentsService.deleteById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Get Instrument Bundle' })

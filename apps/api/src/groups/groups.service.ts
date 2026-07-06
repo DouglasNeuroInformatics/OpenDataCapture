@@ -82,11 +82,23 @@ export class GroupsService {
       throw new ConflictException(`Group with name '${data.name}' already exists!`);
     }
 
+    // Guard against stale client state: an instrument may have been deleted since the client loaded the
+    // group (the deleted id can linger in the client's accessible list). Connecting a non-existent
+    // instrument makes Prisma fail the relation update, so restrict the set to ids that still exist.
+    let validInstrumentIds: string[] | undefined;
+    if (accessibleInstrumentIds) {
+      const existingInstruments = await this.instrumentModel.findMany({
+        select: { id: true },
+        where: { id: { in: accessibleInstrumentIds } }
+      });
+      validInstrumentIds = existingInstruments.map(({ id }) => id);
+    }
+
     return this.groupModel.update({
       data: {
-        accessibleInstruments: accessibleInstrumentIds
+        accessibleInstruments: validInstrumentIds
           ? {
-              set: accessibleInstrumentIds.map((id) => ({ id }))
+              set: validInstrumentIds.map((id) => ({ id }))
             }
           : undefined,
         instrumentRepos: instrumentRepoIds

@@ -15,10 +15,13 @@ export type InstrumentRendererProps = {
   className?: string;
   /** When true, the "Begin" button on the overview screen is disabled. */
   disableBegin?: boolean;
+  /** Whether to disable copy, download, print in the final summary */
+  disableSummaryActions?: boolean;
   initialSeriesIndex?: number;
   NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: InstrumentSubmitHandler;
   subject?: SubjectDisplayInfo;
+  submitButtonLabel?: string;
   target: InstrumentBundleContainer;
 };
 
