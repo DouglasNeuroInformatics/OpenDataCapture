@@ -6,6 +6,7 @@ import { getSeriesInstrumentItems } from '@opendatacapture/instrument-utils';
 import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
 import type { RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import { $Json } from '@opendatacapture/schemas/core';
+import type { Json } from '@opendatacapture/schemas/core';
 
 import { AssignmentsService } from '@/assignments/assignments.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
@@ -97,45 +98,53 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       for (let i = 0; i < cipherTexts.length; i++) {
         const cipherText = cipherTexts[i]!;
         const symmetricKey = symmetricKeys[i]!;
-        const data = await $Json.parseAsync(
-          JSON.parse(
-            await HybridCrypto.decrypt({
-              cipherText: Buffer.from(cipherText, 'base64'),
-              privateKey: await HybridCrypto.deserializePrivateKey(assignment.encryptionKeyPair.privateKey),
-              symmetricKey: Buffer.from(symmetricKey, 'base64')
-            })
-          )
-        );
-        const record = await this.instrumentRecordsService.create({
-          assignmentId: assignment.id,
-          data,
-          date: remoteAssignment.completedAt,
-          groupId: assignment.groupId ?? undefined,
-          instrumentId:
-            instrument.kind === 'SERIES'
-              ? this.instrumentsService.generateScalarInstrumentId({ internal: seriesItems![i]! })
-              : instrument.id,
-          sessionId: session.id,
-          subjectId: assignment.subjectId
-        });
-        this.loggingService.log(`Created record with ID: ${record.id}`);
-        createdRecordIds.push(record.id);
+        const instrumentId =
+          instrument.kind === 'SERIES'
+            ? this.instrumentsService.generateScalarInstrumentId({ internal: seriesItems![i]! })
+            : instrument.id;
+        let decryptedData: string;
+        try {
+          decryptedData = await HybridCrypto.decrypt({
+            cipherText: Buffer.from(cipherText, 'base64'),
+            privateKey: await HybridCrypto.deserializePrivateKey(assignment.encryptionKeyPair.privateKey),
+            symmetricKey: Buffer.from(symmetricKey, 'base64')
+          });
+        } catch (err) {
+          this.loggingService.error({ instrumentId, message: 'Failed to decrypt data' });
+          throw err;
+        }
+
+        let data: Json;
+        try {
+          data = await $Json.parseAsync(JSON.parse(decryptedData));
+        } catch (err) {
+          this.loggingService.error({ decryptedData, instrumentId, message: 'Failed to parse decrypted data' });
+          throw err;
+        }
+
+        try {
+          const record = await this.instrumentRecordsService.create({
+            assignmentId: assignment.id,
+            data,
+            date: remoteAssignment.completedAt,
+            groupId: assignment.groupId ?? undefined,
+            instrumentId,
+            sessionId: session.id,
+            subjectId: assignment.subjectId
+          });
+          this.loggingService.log(`Created record with ID: ${record.id}`);
+          createdRecordIds.push(record.id);
+        } catch (err) {
+          this.loggingService.error({ data, instrumentId, message: 'Failed to create instrument record' });
+          throw err;
+        }
       }
       await this.gatewayService.deleteRemoteAssignment(assignment.id);
     } catch (err) {
-      this.loggingService.error({
-        data: {
-          assignment,
-          cipherTexts,
-          remoteAssignment,
-          symmetricKeys
-        },
-        message: 'Failed to Process Data'
-      });
       this.loggingService.error(err);
       for (const id of createdRecordIds) {
         await this.instrumentRecordsService.deleteById(id);
-        this.loggingService.log(`Deleted Record with ID: ${id}`);
+        this.loggingService.log(`Deleted record with ID: ${id}`);
       }
       throw err;
     }
