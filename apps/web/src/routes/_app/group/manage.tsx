@@ -17,7 +17,7 @@ import { InstrumentRenderer } from '@opendatacapture/react-core';
 import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
 import { $RegexString } from '@opendatacapture/schemas/core';
 import type { UpdateGroupData } from '@opendatacapture/schemas/group';
-import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
+import type { $CreateSeriesInstrumentData, InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { createFileRoute } from '@tanstack/react-router';
@@ -27,10 +27,7 @@ import { z } from 'zod/v4';
 
 import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
-import {
-  isSeriesDuplicateConfirmation,
-  useCreateSeriesInstrumentMutation
-} from '@/hooks/useCreateSeriesInstrumentMutation';
+import { useCreateSeriesInstrumentMutation } from '@/hooks/useCreateSeriesInstrumentMutation';
 import { useDeleteInstrumentMutation } from '@/hooks/useDeleteInstrumentMutation';
 import { useInstrumentBundle } from '@/hooks/useInstrumentBundle';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
@@ -216,7 +213,8 @@ const InstrumentPreviewDialog = ({
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   const bundleQuery = useInstrumentBundle(showForm || item.kind === 'SERIES' ? item.id : null);
-  const previewSubmitLabel = t({ en: 'Preview Submit', fr: 'Soumettre l’aperçu' });
+  // Passed to the renderer as a localizable value; the shared component resolves it to the active language.
+  const previewSubmitLabel = { en: 'Preview Submit', fr: 'Soumettre l’aperçu' };
   const seriesItemTitles = useMemo(() => {
     return getSeriesPreviewItemTitles({
       bundle: bundleQuery.data,
@@ -329,7 +327,7 @@ const CreateSeriesInstrumentDialog = ({
   forms: InstrumentItem[];
   onClose: () => void;
 }) => {
-  const { t } = useTranslation();
+  const { resolvedLanguage, t } = useTranslation();
   const createMutation = useCreateSeriesInstrumentMutation();
   const [title, setTitle] = useState('');
   const [instructions, setInstructions] = useState('');
@@ -366,18 +364,24 @@ const CreateSeriesInstrumentDialog = ({
       .map((id) => selectableForms.find((form) => form.id === id)?.internal)
       .filter((internal): internal is ScalarInstrumentInternal => internal !== null && internal !== undefined);
 
+  // The series is authored in the creator's current language, so the details/instructions are stored as
+  // plain (unilingual) strings tagged with that language — the same shape any instrument would use.
+  const buildPayload = (items: ScalarInstrumentInternal[]): $CreateSeriesInstrumentData => ({
+    clientDetails: instructions.trim() ? { instructions: [instructions.trim()] } : undefined,
+    details: { title: title.trim() },
+    items,
+    language: resolvedLanguage
+  });
+
   const handleCreate = async () => {
     const items = buildItems();
     if (items.length < 2) {
       return;
     }
-    const result = await createMutation.mutateAsync({
-      instructions: instructions.trim() || undefined,
-      items,
-      title: title.trim()
-    });
-    if (isSeriesDuplicateConfirmation(result)) {
-      setDuplicateOf(result.existingTitle);
+    const result = await createMutation.mutateAsync(buildPayload(items));
+    if (result.outcome === 'duplicate') {
+      // The existing title comes back in its stored form (a plain string, or multilingual object).
+      setDuplicateOf(typeof result.existingTitle === 'string' ? result.existingTitle : t(result.existingTitle));
       return;
     }
     onClose();
@@ -388,12 +392,7 @@ const CreateSeriesInstrumentDialog = ({
     if (items.length < 2) {
       return;
     }
-    await createMutation.mutateAsync({
-      confirmDuplicate: true,
-      instructions: instructions.trim() || undefined,
-      items,
-      title: title.trim()
-    });
+    await createMutation.mutateAsync({ ...buildPayload(items), confirmDuplicate: true });
     onClose();
   };
 
@@ -531,12 +530,21 @@ const CreateSeriesInstrumentDialog = ({
   );
 };
 
-const DeleteInstrumentDialog = ({ item, onClose }: { item: InstrumentItem; onClose: () => void }) => {
+const DeleteInstrumentDialog = ({
+  item,
+  onClose,
+  onDeleted
+}: {
+  item: InstrumentItem;
+  onClose: () => void;
+  onDeleted: (id: string) => void;
+}) => {
   const { t } = useTranslation();
   const deleteMutation = useDeleteInstrumentMutation();
 
   const handleDelete = async () => {
     await deleteMutation.mutateAsync({ id: item.id });
+    onDeleted(item.id);
     onClose();
   };
 
@@ -583,6 +591,10 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
   const [previewItem, setPreviewItem] = useState<InstrumentItem | null>(null);
   const [showCreateSeries, setShowCreateSeries] = useState(false);
   const [deletingItem, setDeletingItem] = useState<InstrumentItem | null>(null);
+  // Ids deleted during this session. The server has already detached them from the group, but our copy of
+  // the group's accessible ids (seeded from the auth store) may still list them; we drop them at save time
+  // so a just-deleted instrument is never re-sent as a dangling relation.
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(() => new Set());
 
   // Resync the selection when the upstream group data changes (e.g. after a save refetches the group).
   // `initialSelectedIds` is a stable reference from a useMemo, so this only fires on real changes —
@@ -624,7 +636,13 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
           onClose={() => setShowCreateSeries(false)}
         />
       )}
-      {deletingItem && <DeleteInstrumentDialog item={deletingItem} onClose={() => setDeletingItem(null)} />}
+      {deletingItem && (
+        <DeleteInstrumentDialog
+          item={deletingItem}
+          onClose={() => setDeletingItem(null)}
+          onDeleted={(id) => setDeletedIds((prev) => new Set(prev).add(id))}
+        />
+      )}
       <Heading variant="h4">{t('group.manage.accessibleInstruments')}</Heading>
       <p className="text-muted-foreground mb-3 mt-1 text-sm">{description}</p>
       <div className="mb-4">
@@ -818,7 +836,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                 selectedIds,
                 series: instruments.series
               })
-            ],
+            ].filter((id) => !deletedIds.has(id)),
             settings: {
               defaultIdentificationMethod: formData.defaultIdentificationMethod,
               idValidationRegex: formData.idValidationRegex,
@@ -870,17 +888,19 @@ const RouteComponent = () => {
         continue;
       }
       visibleIds.add(instrument.id);
-      // Show the repo name when we have one; legacy repo instruments without a stored name render as
-      // "uploaded manually" (but are still filtered above as repo-sourced via their id).
-      const repoName = instrument.sourceRepo?.name ?? null;
-      const source: InstrumentSource = repoName ? { kind: 'repo', name: repoName } : { kind: 'manual' };
+      // Provenance is determined by the repo id, not the name: a legacy repo instrument may have a null
+      // name but is still repo-sourced (and so must not get the "manual" delete affordance). We fall back
+      // to a placeholder label only for display.
+      const source: InstrumentSource = repoId
+        ? { kind: 'repo', name: instrument.sourceRepo?.name ?? t({ en: 'Unknown repository', fr: 'Dépôt inconnu' }) }
+        : { kind: 'manual' };
       const item: InstrumentItem = {
         authors: instrument.details.authors,
         description: instrument.details.description,
         id: instrument.id,
-        internal: instrument.internal ?? null,
+        internal: instrument.kind === 'SERIES' ? null : instrument.internal,
         kind: instrument.kind,
-        seriesItems: instrument.seriesItems,
+        seriesItems: instrument.kind === 'SERIES' ? instrument.seriesItems : undefined,
         source,
         title: instrument.details.title
       };
@@ -919,6 +939,7 @@ const RouteComponent = () => {
     defaultIdentificationMethod,
     instrumentRepoIds,
     resolvedLanguage,
+    t,
     currentGroup?.settings
   ]);
 

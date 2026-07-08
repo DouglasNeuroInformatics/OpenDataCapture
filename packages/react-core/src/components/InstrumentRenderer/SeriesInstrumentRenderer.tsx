@@ -17,7 +17,7 @@ import { InteractiveContent } from '../InteractiveContent';
 import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
 
-import type { SubjectDisplayInfo } from '../../types';
+import type { LocalizedText, SubjectDisplayInfo } from '../../types';
 import type { FormContentSubmitResult } from '../FormContent';
 import type { InteractiveContentSubmitResult } from '../InteractiveContent';
 import type { InstrumentSubmitHandler } from './types';
@@ -31,7 +31,8 @@ export type SeriesInstrumentRendererProps = {
   initialSeriesIndex?: number;
   onSubmit: InstrumentSubmitHandler<'SERIES'>;
   subject?: SubjectDisplayInfo;
-  submitButtonLabel?: string;
+  /** A localizable label for each constituent form's submit button. */
+  submitButtonLabel?: LocalizedText;
   target: SeriesInstrumentBundleContainer;
 };
 

@@ -16,7 +16,6 @@ export type AuthSlice = {
   currentUser: CurrentUser | null;
   login: (accessToken: string) => void;
   logout: () => void;
-  pruneDeletedInstrument: (instrumentId: string) => void;
 };
 
 export type DisclaimerSlice = {

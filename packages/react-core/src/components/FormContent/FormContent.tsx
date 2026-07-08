@@ -4,12 +4,15 @@ import type { AnyUnilingualFormInstrument, FormInstrument, InstrumentKind } from
 import { InfoIcon } from 'lucide-react';
 import type { Promisable } from 'type-fest';
 
+import type { LocalizedText } from '../../types';
+
 export type FormContentSubmitResult = { data: FormInstrument.Data; kind: Extract<InstrumentKind, 'FORM'> };
 
 export type FormContentProps = {
   instrument: AnyUnilingualFormInstrument;
   onSubmit: (result: FormContentSubmitResult) => Promisable<void>;
-  submitButtonLabel?: string;
+  /** A localizable submit-button label; resolved to the active language here. */
+  submitButtonLabel?: LocalizedText;
 };
 
 export const FormContent = ({ instrument, onSubmit, submitButtonLabel }: FormContentProps) => {
@@ -45,7 +48,7 @@ export const FormContent = ({ instrument, onSubmit, submitButtonLabel }: FormCon
         content={instrument.content}
         data-testid="form-content"
         initialValues={instrument.initialValues}
-        submitBtnLabel={submitButtonLabel}
+        submitBtnLabel={submitButtonLabel ? t(submitButtonLabel) : undefined}
         validationSchema={instrument.validationSchema}
         onSubmit={(data) => void onSubmit({ data, kind: 'FORM' })}
       />

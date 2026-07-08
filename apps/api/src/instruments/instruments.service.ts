@@ -13,7 +13,11 @@ import { getSeriesInstrumentItems, isScalarInstrument, isSeriesInstrument } from
 import type {
   AnyInstrument,
   AnyScalarInstrument,
+  ClientInstrumentDetails,
   InstrumentKind,
+  InstrumentLanguage,
+  InstrumentUIOption,
+  Language,
   ScalarInstrumentInternal,
   SeriesInstrument,
   SomeInstrument
@@ -21,9 +25,13 @@ import type {
 import type { WithID } from '@opendatacapture/schemas/core';
 import { $AnyInstrument } from '@opendatacapture/schemas/instrument';
 import type {
+  $CreateSeriesInstrumentData,
+  CreateSeriesInstrumentResult,
   InstrumentBundleContainer,
   InstrumentInfo,
-  ScalarInstrumentBundleContainer
+  ScalarInstrumentBundleContainer,
+  ScalarInstrumentInfo,
+  SeriesInstrumentInfo
 } from '@opendatacapture/schemas/instrument';
 import { pick } from 'lodash-es';
 
@@ -32,20 +40,13 @@ import type { AppAbility } from '@/auth/auth.types';
 import type { EntityOperationOptions } from '@/core/types';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
-import { CreateSeriesInstrumentDto } from './dto/create-series-instrument.dto';
+
+/** The localized "series" tag applied to every generated series instrument. */
+const seriesTag = (language: Language): string => (language === 'fr' ? 'Série' : 'Series');
 
 type InstrumentVirtualizationContext = {
   __resolveImport: (specifier: string) => string;
   instruments: Map<string, WithID<AnyInstrument>>;
-};
-
-/**
- * Returned by `createSeries` instead of creating an instrument when a series with the same set of forms
- * already exists and the caller has not confirmed they want a duplicate.
- */
-type SeriesDuplicateConfirmation = {
-  existingTitle: string;
-  requiresConfirmation: true;
 };
 
 type InstrumentQuery<TKind extends InstrumentKind> = {
@@ -122,40 +123,37 @@ export class InstrumentsService {
 
   /**
    * Assemble a new series instrument from existing scalar instruments. The title must be unique among
-   * instruments the caller can see; the series bundle is generated server-side and run through the same
-   * validation/creation path as any other instrument.
+   * every instrument on the platform; the series bundle is generated server-side and run through the
+   * same validation/creation path as any other instrument.
    *
-   * If another series already contains the exact same set of forms (regardless of order or name) and the
-   * caller has not opted to proceed, no instrument is created — instead a confirmation prompt is returned
-   * naming the existing series, so the client can ask the user whether they really want a duplicate.
+   * If another series already contains the exact same set of items (regardless of order or name) and the
+   * caller has not opted to proceed, no instrument is created — instead a `duplicate` result is returned
+   * with the existing series' title, so the client can ask the user whether they really want a duplicate.
    */
   async createSeries(
-    { confirmDuplicate, description, instructions, items, title }: CreateSeriesInstrumentDto,
+    { clientDetails, confirmDuplicate, details, items, language }: $CreateSeriesInstrumentData,
     options: EntityOperationOptions = {}
-  ): Promise<SeriesDuplicateConfirmation | WithID<AnyInstrument>> {
-    const trimmedTitle = title.trim();
-    if (await this.isInstrumentTitleTaken(trimmedTitle, options)) {
-      throw new ConflictException(`An instrument named '${trimmedTitle}' already exists`);
+  ): Promise<CreateSeriesInstrumentResult> {
+    if (await this.isInstrumentTitleTaken(details.title)) {
+      throw new ConflictException('An instrument with the same title already exists');
     }
     if (!confirmDuplicate) {
-      const existingTitle = await this.findSeriesTitleWithSameForms(items, options);
+      const existingTitle = await this.findSeriesTitleWithSameItems(items, options);
       if (existingTitle !== null) {
-        return { existingTitle, requiresConfirmation: true };
+        return { existingTitle, outcome: 'duplicate' };
       }
     }
-    const source = this.generateSeriesInstrumentSource({
-      description: description?.trim(),
-      instructions: instructions?.trim(),
-      items,
-      title: trimmedTitle
-    });
+    const source = this.generateSeriesInstrumentSource({ clientDetails, details, items, language });
     const generatedBundle = await bundle({ inputs: [{ content: source, name: 'index.ts' }], minify: true });
-    return this.create({ bundle: generatedBundle });
+    const created = await this.create({ bundle: generatedBundle });
+    return { instrumentId: created.id, outcome: 'created' };
   }
 
   /**
-   * Delete an instrument the caller is permitted to remove, but only when no records have been collected
-   * with it (so historical data is never orphaned). Also detaches it from any group that exposes it.
+   * Delete a series instrument the caller is permitted to remove, detaching it from any group that
+   * exposes it. Only series instruments may be deleted: they are on-the-fly bundles of other
+   * instruments and never have records of their own (records belong to their constituent members).
+   * Scalar instruments are shared platform assets and are never removed through this path.
    */
   async deleteById(id: string, { ability }: EntityOperationOptions = {}): Promise<{ id: string }> {
     const instrument = await this.instrumentModel.findFirst({
@@ -164,11 +162,9 @@ export class InstrumentsService {
     if (!instrument) {
       throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
     }
-    const recordCount = await this.instrumentRecordModel.count({ where: { instrumentId: id } });
-    if (recordCount > 0) {
-      throw new ForbiddenException(
-        `Cannot delete instrument: ${recordCount} record(s) have already been collected with it`
-      );
+    const instance = await this.getInstrumentInstance(instrument);
+    if (!isSeriesInstrument(instance)) {
+      throw new ForbiddenException('Only series instruments can be deleted');
     }
     // Mongo does not cascade scalar-list relations, so pull the id from every group that exposes it
     // before removing the instrument itself.
@@ -260,49 +256,50 @@ export class InstrumentsService {
     const instances = await this.find(query, options);
 
     const sourceMap = await this.buildInstrumentSourceMap(instances.map((instance) => instance.id));
+    // Series resolve their `seriesItems` against the scalar instruments they reference. A `kind` filter can
+    // exclude those scalars from `instances`, so when the result set contains series we build the lookup
+    // from the full instrument set instead — otherwise a series' items would resolve to nothing.
+    const scalarSource = query.kind && instances.some(isSeriesInstrument) ? await this.find({}, options) : instances;
     const scalarInstrumentIds = new Map(
-      instances.flatMap((instance) => {
-        if (!isScalarInstrument(instance) || !instance.internal) {
-          return [];
-        }
-        return [[`${instance.internal.name}:${instance.internal.edition}`, instance.id] as const];
-      })
+      scalarSource.flatMap((instance) =>
+        isScalarInstrument(instance) && instance.internal
+          ? [[`${instance.internal.name}:${instance.internal.edition}`, instance.id] as const]
+          : []
+      )
     );
 
     const results = new Map<string, InstrumentInfo>();
     for (const instance of instances) {
-      const info: InstrumentInfo = pick(instance, [
-        '__runtimeVersion',
-        'clientDetails',
-        'details',
-        'id',
-        'internal',
-        'kind',
-        'language',
-        'tags'
-      ]);
-      if (isSeriesInstrument(instance)) {
-        info.seriesItems = getSeriesInstrumentItems(instance.content)
-          .map(({ edition, name }) => scalarInstrumentIds.get(`${name}:${edition}`))
-          .filter((id): id is string => typeof id === 'string')
-          .map((id) => ({ id }));
-      }
+      const base = pick(instance, ['__runtimeVersion', 'clientDetails', 'details', 'id', 'language', 'tags']);
       // Expose the source repo id whenever the instrument came from a repo (so it can be filtered per
       // group). The name may be null for legacy instruments imported before names were stored; the
-      // client renders those as "uploaded manually" while still treating them as repo-sourced.
-      const source = sourceMap.get(info.id);
-      if (source?.sourceRepoId) {
-        (info).sourceRepo = {
-          id: source.sourceRepoId,
-          name: source.sourceRepoName ?? null
+      // client still treats those as repo-sourced via their id.
+      const source = sourceMap.get(instance.id);
+      const sourceRepo = source?.sourceRepoId ? { id: source.sourceRepoId, name: source.sourceRepoName ?? null } : null;
+
+      if (isSeriesInstrument(instance)) {
+        const info: SeriesInstrumentInfo = {
+          ...base,
+          kind: 'SERIES',
+          seriesItems: getSeriesInstrumentItems(instance.content)
+            .map(({ edition, name }) => scalarInstrumentIds.get(`${name}:${edition}`))
+            .filter((id): id is string => typeof id === 'string')
+            .map((id) => ({ id })),
+          sourceRepo
         };
-      }
-      if (!info.internal) {
         results.set(info.id, info);
         continue;
       }
+
+      const info: ScalarInstrumentInfo = {
+        ...base,
+        internal: instance.internal,
+        kind: instance.kind,
+        sourceRepo
+      };
+      // Collapse editions of the same instrument to the newest one, keyed by its stable internal name.
       const currentEntry = results.get(info.internal.name);
-      if (!currentEntry || info.internal.edition > currentEntry.internal!.edition) {
+      if (!currentEntry || !('internal' in currentEntry) || info.internal.edition > currentEntry.internal.edition) {
         results.set(info.internal.name, info);
       }
     }
@@ -378,23 +375,34 @@ export class InstrumentsService {
     return map;
   }
 
+  /** The localized `tags` for a series, matching the shape (unilingual vs multilingual) of `language`. */
+  private buildSeriesTags(language: InstrumentLanguage): InstrumentUIOption<InstrumentLanguage, string[]> {
+    if (typeof language === 'string') {
+      return [seriesTag(language)];
+    }
+    return Object.fromEntries(language.map((lang) => [lang, [seriesTag(lang)]])) as InstrumentUIOption<
+      InstrumentLanguage,
+      string[]
+    >;
+  }
+
   /**
-   * The title of an existing series instrument that contains the exact same set of forms as `items`
+   * The title of an existing series instrument that contains the exact same set of items as `items`
    * (regardless of order), or `null` when none exists. Used to warn before creating a redundant series.
+   * The title is returned in its stored (possibly multilingual) form so the client can localize it.
    */
-  private async findSeriesTitleWithSameForms(
+  private async findSeriesTitleWithSameItems(
     items: ScalarInstrumentInternal[],
     { ability }: EntityOperationOptions = {}
-  ): Promise<null | string> {
-    const targetKey = this.getFormSetKey(items);
+  ): Promise<NonNullable<ClientInstrumentDetails['title']> | null> {
+    const targetKey = this.getSeriesItemSetKey(items);
     const seriesInstances = await this.find({ kind: 'SERIES' }, { ability });
     for (const series of seriesInstances) {
       if (!isSeriesInstrument(series)) {
         continue;
       }
-      if (this.getFormSetKey(getSeriesInstrumentItems(series.content)) === targetKey) {
-        const value = series.details.title;
-        return typeof value === 'string' ? value : (Object.values(value)[0] ?? null);
+      if (this.getSeriesItemSetKey(getSeriesInstrumentItems(series.content)) === targetKey) {
+        return series.details.title;
       }
     }
     return null;
@@ -402,45 +410,41 @@ export class InstrumentsService {
 
   /**
    * Generate the TypeScript source for an on-the-fly series instrument. The definition is plain
-   * JSON-serializable data, so it is emitted as a single default export with no runtime imports.
+   * JSON-serializable data, so it is emitted as a single default export with no runtime imports. The
+   * multilingual details/instructions and the language(s) are taken verbatim from the caller — nothing
+   * is hardcoded — so the series is stored exactly as it was authored.
    */
   private generateSeriesInstrumentSource({
-    description,
-    instructions,
+    clientDetails,
+    details,
     items,
-    title
-  }: {
-    description?: string;
-    instructions?: string;
-    items: ScalarInstrumentInternal[];
-    title: string;
-  }): string {
-    const text = description && description.length > 0 ? description : title;
-    const definition = {
+    language
+  }: Pick<$CreateSeriesInstrumentData, 'clientDetails' | 'details' | 'items' | 'language'>): string {
+    // A series is a `SeriesInstrument` minus the server-computed `id`; typing it explicitly keeps this
+    // in sync with the schema so a change to the instrument shape fails to compile here.
+    const definition: Omit<SeriesInstrument, 'id'> = {
       __runtimeVersion: 1,
-      ...(instructions && instructions.length > 0
-        ? { clientDetails: { instructions: { en: [instructions], fr: [instructions] } } }
-        : {}),
+      ...(clientDetails?.instructions ? { clientDetails: { instructions: clientDetails.instructions } } : {}),
       content: {
         items: items.map(({ edition, name }) => ({ edition, name }))
       },
       details: {
-        description: { en: text, fr: text },
+        description: details.description ?? details.title,
         license: 'UNLICENSED',
-        title: { en: title, fr: title }
+        title: details.title
       },
       kind: 'SERIES',
-      language: ['en', 'fr'],
-      tags: { en: ['Series'], fr: ['Série'] }
+      language,
+      tags: this.buildSeriesTags(language)
     };
     return `export default ${JSON.stringify(definition)};`;
   }
 
   /**
-   * A stable, order-independent key identifying the set of forms in a series. Two series with the same
-   * forms produce the same key even if the forms were added in a different order.
+   * A stable, order-independent key identifying the set of scalar instruments in a series. Two series
+   * with the same items produce the same key even if the items were added in a different order.
    */
-  private getFormSetKey(items: ScalarInstrumentInternal[]): string {
+  private getSeriesItemSetKey(items: ScalarInstrumentInternal[]): string {
     return items
       .map(({ edition, name }) => `${name}-${edition}`)
       .sort()
@@ -456,17 +460,23 @@ export class InstrumentsService {
   }
 
   /**
-   * Whether an instrument visible to the caller already uses the given title (case-insensitive). Used to
-   * enforce that newly-created series instruments have a unique, recognizable name.
+   * Whether any instrument on the platform already uses the given title (case-insensitive, across every
+   * language it is defined in). Used to enforce that newly-created series have a unique, recognizable
+   * name. Deliberately unscoped by ability: uniqueness must hold globally, not just for instruments the
+   * caller happens to see.
    */
-  private async isInstrumentTitleTaken(title: string, { ability }: EntityOperationOptions = {}): Promise<boolean> {
-    const normalized = title.trim().toLowerCase();
-    const instances = await this.find({}, { ability });
-    return instances.some((instance) => {
-      const value = instance.details.title;
-      const titles = typeof value === 'string' ? [value] : Object.values(value);
-      return titles.some((candidate) => typeof candidate === 'string' && candidate.trim().toLowerCase() === normalized);
-    });
+  private async isInstrumentTitleTaken(title: NonNullable<ClientInstrumentDetails['title']>): Promise<boolean> {
+    const normalize = (value: string) => value.trim().toLowerCase();
+    const candidates = new Set(this.titleValues(title).map(normalize));
+    const instances = await this.find({});
+    return instances.some((instance) =>
+      this.titleValues(instance.details.title).some((value) => candidates.has(normalize(value)))
+    );
+  }
+
+  /** The individual language values of a (possibly multilingual) title. */
+  private titleValues(title: InstrumentUIOption<InstrumentLanguage, string>): string[] {
+    return typeof title === 'string' ? [title] : Object.values(title);
   }
 
   private async validateSeriesInstrument(instrument: SeriesInstrument) {
@@ -488,4 +498,4 @@ export class InstrumentsService {
   }
 }
 
-export type { InstrumentVirtualizationContext, SeriesDuplicateConfirmation };
+export type { InstrumentVirtualizationContext };

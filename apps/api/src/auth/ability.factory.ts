@@ -27,10 +27,12 @@ export class AbilityFactory {
         ability.can('manage', 'Assignment', { groupId: { in: groupIds } });
         ability.can('manage', 'Group', { id: { in: groupIds } });
         ability.can('read', 'Instrument');
-        // Group managers may assemble series instruments on the fly and remove ones they created
-        // (the service enforces that an instrument with collected records cannot be deleted).
+        // Group managers may assemble series instruments on the fly and delete ones they created. A
+        // series is a bundle of other instruments, not a shared platform asset. The delete ability is
+        // scoped to manually-created (non-repo) instruments so repo instruments shared across groups can
+        // never be removed; the service further restricts deletion to series instruments specifically.
         ability.can('create', 'Instrument');
-        ability.can('delete', 'Instrument');
+        ability.can('delete', 'Instrument', { sourceRepoId: null });
         ability.can('read', 'InstrumentRepo', { groupIds: { hasSome: groupIds } });
         ability.can('create', 'InstrumentRecord');
         ability.can('create', 'InstrumentRecordFile', { groupId: { in: groupIds } });

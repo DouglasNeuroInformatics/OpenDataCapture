@@ -18,7 +18,7 @@ import { InteractiveContent } from '../InteractiveContent';
 import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
 
-import type { SubjectDisplayInfo } from '../../types';
+import type { LocalizedText, SubjectDisplayInfo } from '../../types';
 import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
 import type { AnyContentResult, InstrumentSubmitHandler } from './types';
 
@@ -37,7 +37,8 @@ export type ScalarInstrumentRendererProps = {
   /** @deprecated */
   options?: InterpretOptions;
   subject?: SubjectDisplayInfo;
-  submitButtonLabel?: string;
+  /** A localizable label for the form's submit button. */
+  submitButtonLabel?: LocalizedText;
   target: Pick<ScalarInstrumentBundleContainer, 'bundle' | 'id'>;
 };
 

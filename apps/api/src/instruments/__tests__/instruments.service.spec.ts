@@ -5,6 +5,8 @@ import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { bundle } from '@opendatacapture/instrument-bundler';
+import type { SeriesInstrument } from '@opendatacapture/runtime-core';
+import type { WithID } from '@opendatacapture/schemas/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { InstrumentsService } from '../instruments.service';
@@ -16,7 +18,7 @@ vi.mock('@opendatacapture/instrument-bundler', () => ({
 }));
 
 // A multilingual series instance as returned by `find`, containing two forms.
-const existingSeries = {
+const existingSeries: WithID<SeriesInstrument> = {
   __runtimeVersion: 1,
   content: {
     items: [
@@ -24,11 +26,16 @@ const existingSeries = {
       { edition: 1, name: 'FORM_B' }
     ]
   },
-  details: { title: { en: 'Existing Series', fr: 'Série existante' } },
+  details: {
+    description: { en: 'An existing series', fr: 'Une série existante' },
+    license: 'UNLICENSED',
+    title: { en: 'Existing Series', fr: 'Série existante' }
+  },
   id: 'existing-series-id',
   kind: 'SERIES',
-  language: ['en', 'fr']
-} as any;
+  language: ['en', 'fr'],
+  tags: { en: ['Series'], fr: ['Série'] }
+};
 
 describe('InstrumentsService', () => {
   let instrumentsService: InstrumentsService;
@@ -58,6 +65,8 @@ describe('InstrumentsService', () => {
     instrumentRecordModel = moduleRef.get(getModelToken('InstrumentRecord'));
     groupModel = moduleRef.get(getModelToken('Group'));
     virtualizationService = moduleRef.get(VirtualizationService);
+    // `getInstrumentInstance` reads/writes an instance cache on the virtualization context.
+    (virtualizationService as { context: unknown }).context = { __resolveImport: vi.fn(), instruments: new Map() };
   });
 
   it('should be defined', () => {
@@ -72,14 +81,18 @@ describe('InstrumentsService', () => {
 
       // Same two forms as `existingSeries` but in a different order and under a different name.
       const result = await instrumentsService.createSeries({
+        details: { title: 'My New Series' },
         items: [
           { edition: 1, name: 'FORM_B' },
           { edition: 1, name: 'FORM_A' }
         ],
-        title: 'My New Series'
+        language: 'en'
       });
 
-      expect(result).toEqual({ existingTitle: 'Existing Series', requiresConfirmation: true });
+      expect(result).toEqual({
+        existingTitle: { en: 'Existing Series', fr: 'Série existante' },
+        outcome: 'duplicate'
+      });
       expect(createSpy).not.toHaveBeenCalled();
     });
 
@@ -89,15 +102,16 @@ describe('InstrumentsService', () => {
 
       const result = await instrumentsService.createSeries({
         confirmDuplicate: true,
+        details: { title: 'My New Series' },
         items: [
           { edition: 1, name: 'FORM_A' },
           { edition: 1, name: 'FORM_B' }
         ],
-        title: 'My New Series'
+        language: 'en'
       });
 
       expect(createSpy).toHaveBeenCalledWith({ bundle: '__BUNDLE__' });
-      expect(result).toEqual({ id: 'new-id' });
+      expect(result).toEqual({ instrumentId: 'new-id', outcome: 'created' });
     });
 
     it('creates the series directly when no existing series shares its forms', async () => {
@@ -105,29 +119,30 @@ describe('InstrumentsService', () => {
       const createSpy = vi.spyOn(instrumentsService, 'create').mockResolvedValue({ id: 'fresh-id' } as any);
 
       const result = await instrumentsService.createSeries({
+        details: { title: 'Totally New' },
         items: [
           { edition: 1, name: 'FORM_C' },
           { edition: 1, name: 'FORM_D' }
         ],
-        title: 'Totally New'
+        language: 'en'
       });
 
       expect(createSpy).toHaveBeenCalledWith({ bundle: '__BUNDLE__' });
-      expect(result).toEqual({ id: 'fresh-id' });
+      expect(result).toEqual({ instrumentId: 'fresh-id', outcome: 'created' });
     });
 
-    it('generates a valid series source payload with selected items in order', async () => {
+    it('generates a valid, unilingual series source payload with selected items in order', async () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
       vi.spyOn(instrumentsService, 'create').mockResolvedValue({ id: 'generated-id' } as any);
 
       await instrumentsService.createSeries({
-        description: 'Optional description',
-        instructions: 'Complete the instruments in order.',
+        clientDetails: { instructions: ['Complete the instruments in order.'] },
+        details: { description: 'Optional description', title: 'Generated Series' },
         items: [
           { edition: 2, name: 'FORM_B' },
           { edition: 1, name: 'FORM_A' }
         ],
-        title: 'Generated Series'
+        language: 'en'
       });
 
       expect(bundle).toHaveBeenCalledTimes(1);
@@ -143,13 +158,15 @@ describe('InstrumentsService', () => {
 
       const definition = JSON.parse(match![1]!);
       expect(definition.kind).toBe('SERIES');
-      expect(definition.clientDetails).toEqual({
-        instructions: { en: ['Complete the instruments in order.'], fr: ['Complete the instruments in order.'] }
-      });
+      // The details/instructions/language are stored verbatim in the caller's language — nothing is
+      // duplicated across languages or hardcoded.
+      expect(definition.language).toBe('en');
+      expect(definition.clientDetails).toEqual({ instructions: ['Complete the instruments in order.'] });
       expect(definition.details).toMatchObject({
-        description: { en: 'Optional description', fr: 'Optional description' },
-        title: { en: 'Generated Series', fr: 'Generated Series' }
+        description: 'Optional description',
+        title: 'Generated Series'
       });
+      expect(definition.tags).toEqual(['Series']);
       expect(definition.content.items).toEqual([
         { edition: 2, name: 'FORM_B' },
         { edition: 1, name: 'FORM_A' }
@@ -165,13 +182,13 @@ describe('InstrumentsService', () => {
         __runtimeVersion: 1,
         content: { items },
         details: {
-          description: { en: 'Stored Series', fr: 'Stored Series' },
+          description: 'Stored Series',
           license: 'UNLICENSED',
-          title: { en: 'Stored Series', fr: 'Stored Series' }
+          title: 'Stored Series'
         },
         kind: 'SERIES',
-        language: ['en', 'fr'],
-        tags: { en: ['Series'], fr: ['Série'] }
+        language: 'en',
+        tags: ['Series']
       } as const;
       const id = `hash:${JSON.stringify({ content: instance.content, title: instance.details.title })}`;
 
@@ -182,8 +199,9 @@ describe('InstrumentsService', () => {
 
       const result = await instrumentsService.createSeries({
         confirmDuplicate: true,
+        details: { title: 'Stored Series' },
         items,
-        title: 'Stored Series'
+        language: 'en'
       });
 
       expect(virtualizationService.eval).toHaveBeenCalledWith('__BUNDLE__');
@@ -191,7 +209,7 @@ describe('InstrumentsService', () => {
       expect(instrumentModel.exists).toHaveBeenNthCalledWith(2, { id: 'hash:FORM_A-1' });
       expect(instrumentModel.exists).toHaveBeenNthCalledWith(3, { id: 'hash:FORM_B-1' });
       expect(instrumentModel.create).toHaveBeenCalledWith({ data: { bundle: '__BUNDLE__', id } });
-      expect(result).toEqual({ ...instance, id });
+      expect(result).toEqual({ instrumentId: id, outcome: 'created' });
     });
 
     it('rejects a title that is already used (case-insensitively) by another instrument', async () => {
@@ -200,11 +218,12 @@ describe('InstrumentsService', () => {
 
       await expect(
         instrumentsService.createSeries({
+          details: { title: 'existing series' },
           items: [
             { edition: 1, name: 'FORM_X' },
             { edition: 1, name: 'FORM_Y' }
           ],
-          title: 'existing series'
+          language: 'en'
         })
       ).rejects.toThrow(ConflictException);
       expect(createSpy).not.toHaveBeenCalled();
@@ -217,11 +236,11 @@ describe('InstrumentsService', () => {
 
       const first = {
         ...existingSeries,
-        details: { title: 'First Series' }
+        details: { ...existingSeries.details, title: 'First Series' }
       };
       const second = {
         ...existingSeries,
-        details: { title: 'Second Series' }
+        details: { ...existingSeries.details, title: 'Second Series' }
       };
 
       expect(instrumentsService.generateSeriesInstrumentId(first)).not.toBe(
@@ -239,17 +258,23 @@ describe('InstrumentsService', () => {
       await expect(instrumentsService.deleteById('missing')).rejects.toThrow(NotFoundException);
     });
 
-    it('refuses to delete an instrument that has collected records', async () => {
-      instrumentModel.findFirst.mockResolvedValue({ id: 'has-records' });
-      instrumentRecordModel.count.mockResolvedValue(3);
+    it('refuses to delete a non-series (scalar) instrument', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'scalar' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { internal: { edition: 1, name: 'FORM_A' }, kind: 'FORM' }
+      } as any);
 
-      await expect(instrumentsService.deleteById('has-records')).rejects.toThrow(ForbiddenException);
+      await expect(instrumentsService.deleteById('scalar')).rejects.toThrow(ForbiddenException);
       expect(instrumentModel.delete).not.toHaveBeenCalled();
     });
 
-    it('deletes the instrument and detaches it from every group when it has no records', async () => {
-      instrumentModel.findFirst.mockResolvedValue({ id: 'target' });
-      instrumentRecordModel.count.mockResolvedValue(0);
+    it('deletes a series instrument and detaches it from every group', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'target' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { content: { items: [] }, kind: 'SERIES' }
+      } as any);
       groupModel.findMany.mockResolvedValue([{ accessibleInstrumentIds: ['other', 'target'], id: 'g1' }]);
 
       const result = await instrumentsService.deleteById('target');
@@ -260,6 +285,8 @@ describe('InstrumentsService', () => {
       });
       expect(instrumentModel.delete).toHaveBeenCalledWith({ where: { id: 'target' } });
       expect(result).toEqual({ id: 'target' });
+      // Series instruments never have records of their own, so record counts are irrelevant here.
+      expect(instrumentRecordModel.count).not.toHaveBeenCalled();
     });
   });
 });

@@ -2,13 +2,11 @@ import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
-import { useAppStore } from '@/store';
 import { getApiErrorMessage } from '@/utils/error';
 
 export function useDeleteInstrumentMutation() {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
-  const pruneDeletedInstrument = useAppStore((store) => store.pruneDeletedInstrument);
   const { t } = useTranslation();
   return useMutation({
     mutationFn: ({ id }: { id: string }) =>
@@ -22,10 +20,10 @@ export function useDeleteInstrumentMutation() {
         type: 'error'
       });
     },
-    onSuccess(_, { id }) {
+    onSuccess() {
       addNotification({ type: 'success' });
-      // Drop the deleted id from the cached group so the manage page does not re-send it on save.
-      pruneDeletedInstrument(id);
+      // The server has already detached the instrument from every group; callers that hold a stale copy
+      // of the group's accessible ids (e.g. the manage page) reconcile it locally via the mutation result.
       void queryClient.invalidateQueries({ queryKey: ['instrument-info'] });
     }
   });
