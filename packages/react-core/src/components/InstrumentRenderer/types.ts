@@ -27,6 +27,7 @@ export namespace InstrumentSubmitHandler {
   type InteractiveContext = ContextMixin<InteractiveContentSubmitResult>;
 
   type SeriesContext = ContextMixin<{
+    complete: boolean;
     index: number;
     kind: Extract<InstrumentKind, 'SERIES'>;
   }>;

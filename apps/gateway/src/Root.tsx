@@ -51,7 +51,7 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
     if (target.kind === 'SERIES' && result.kind === 'SERIES') {
       updateData = {
         ...result,
-        status: result.instrumentId === target.items.at(-1)?.id ? 'COMPLETE' : undefined
+        status: result.complete ? 'COMPLETE' : undefined
       };
     } else if (target.kind !== 'SERIES') {
       updateData = {
