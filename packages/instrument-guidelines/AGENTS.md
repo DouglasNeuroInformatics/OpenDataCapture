@@ -179,14 +179,36 @@ The `content` may be either a bare ordered array of identities, or an object tha
 with optional series-level `params`:
 
 ```ts
-type SeriesContent =
+// TData defaults to `any`; annotate the `data` parameter (or pass TData) to type it.
+type SeriesParams<TItemName extends string = string, TData = any> = {
+  skipProgress?: boolean;
+  // Called after each item is submitted with that item's data and its
+  // `{ itemIndex, itemName }`. Return `true` to end the series early: the
+  // remaining items are not administered and the series is marked complete.
+  // The terminating item's own record is still saved.
+  terminate?: (this: void, data: TData, context: { itemIndex: number; itemName: TItemName }) => boolean;
+};
+
+type SeriesContent<TItemName extends string = string, TData = any> =
   | ScalarInstrumentInternal[]
-  | { items: ScalarInstrumentInternal[]; params?: { skipProgress?: boolean } };
+  | { items: ScalarInstrumentInternal[]; params?: SeriesParams<TItemName, TData> };
 
 interface SeriesInstrument<TLanguage extends InstrumentLanguage> extends BaseInstrument<TLanguage> {
   content: SeriesContent;
   internal?: never;
   kind: 'SERIES';
+}
+```
+
+Use `terminate` for conditional early exit — e.g. a consent form as the first item that,
+when declined, prevents the remaining items from being shown. When the series is authored with
+`defineSeriesInstrument`, `itemName` is narrowed to the literal union of the series' item names.
+`data` defaults to `any`, so annotate it inline with the terminating item's data shape:
+
+```ts
+params: {
+  // itemName: 'CONSENT_FORM' | 'QUESTIONNAIRE'
+  terminate: (data: { consent?: boolean }, { itemName }) => itemName === 'CONSENT_FORM' && data.consent === false;
 }
 ```
 

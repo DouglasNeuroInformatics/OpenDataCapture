@@ -1,10 +1,11 @@
 import type { InstrumentLanguage, SeriesInstrument } from '@opendatacapture/runtime-core';
 import { z } from 'zod/v4';
 
-import { $$BaseInstrument, $ScalarInstrumentInternal } from './instrument.base.js';
+import { $$BaseInstrument, $AnyDynamicFunction, $ScalarInstrumentInternal } from './instrument.base.js';
 
 const $SeriesInstrumentParams = z.object({
-  skipProgress: z.boolean().optional()
+  skipProgress: z.boolean().optional(),
+  terminate: $AnyDynamicFunction.optional()
 }) satisfies z.ZodType<SeriesInstrument.Params>;
 
 const $SeriesInstrumentContent = z.union([

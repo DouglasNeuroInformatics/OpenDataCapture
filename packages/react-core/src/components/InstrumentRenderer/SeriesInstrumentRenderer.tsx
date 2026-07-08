@@ -63,18 +63,29 @@ export const SeriesInstrumentRenderer = ({
 
   const [isInstrumentInProgress, setIsInstrumentInProgress] = useState(false);
 
-  const skipProgress =
-    rootState.status === 'DONE'
-      ? (getSeriesInstrumentParams(rootState.instrument.content).skipProgress ?? false)
-      : false;
+  const params = rootState.status === 'DONE' ? getSeriesInstrumentParams(rootState.instrument.content) : {};
+  const skipProgress = params.skipProgress ?? false;
 
   const handleSubmit = async ({ data }: FormContentSubmitResult | InteractiveContentSubmitResult) => {
+    const parsedData = JSON.parse(JSON.stringify(data, replacer)) as Json;
+    const isLastItem = currentItemIndex === target.items.length - 1;
+    // `scalarState` is DONE here (its content is what was just submitted); its
+    // `internal.name` gives the item name for the predicate context.
+    const itemName = scalarState.status === 'DONE' ? (scalarState.instrument.internal?.name ?? '') : '';
+    const shouldTerminate = params.terminate?.(parsedData, { itemIndex: currentItemIndex, itemName }) ?? false;
+
     await onSubmit?.({
-      data: JSON.parse(JSON.stringify(data, replacer)) as Json,
+      complete: isLastItem || shouldTerminate,
+      data: parsedData,
       index,
       instrumentId: scalarId!,
       kind: 'SERIES'
     });
+
+    if (shouldTerminate) {
+      setIndex(2);
+      return;
+    }
     setCurrentItemIndex(currentItemIndex + 1);
     if (!skipProgress) {
       setIsInstrumentInProgress(false);

@@ -2,7 +2,12 @@
 
 import type { ApprovedLicense } from '@opendatacapture/licenses';
 
-import type { InstrumentKind, InstrumentLanguage, InstrumentValidationSchema } from './types/instrument.base.js';
+import type {
+  InstrumentKind,
+  InstrumentLanguage,
+  InstrumentValidationSchema,
+  ScalarInstrumentInternal
+} from './types/instrument.base.js';
 import type { FileInstrument } from './types/instrument.file.js';
 import type { FormInstrument } from './types/instrument.form.js';
 import type { InteractiveInstrument } from './types/instrument.interactive.js';
@@ -66,10 +71,15 @@ export function defineInstrument<
 }
 
 /** @public */
-export function defineSeriesInstrument<TLanguage extends InstrumentLanguage>(
-  def: Omit<SeriesInstrument<TLanguage>, '__runtimeVersion'>
-): SeriesInstrument<TLanguage> {
+export function defineSeriesInstrument<
+  const TItems extends readonly ScalarInstrumentInternal[],
+  TLanguage extends InstrumentLanguage
+>(
+  def: Omit<SeriesInstrument<TLanguage, TItems[number]['name']>, '__runtimeVersion' | 'content'> & {
+    content: TItems | { items: TItems; params?: SeriesInstrument.Params<TItems[number]['name']> };
+  }
+): SeriesInstrument<TLanguage, TItems[number]['name']> {
   return Object.assign(def, {
     __runtimeVersion: 1 as const
-  });
+  }) as unknown as SeriesInstrument<TLanguage, TItems[number]['name']>;
 }

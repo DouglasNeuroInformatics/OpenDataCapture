@@ -50,6 +50,6 @@ export default defineInstrument({
   },
   measures: null,
   validationSchema: z.object({
-    consent: z.literal(true, { message: 'You must agree to the terms to continue' })
+    consent: z.boolean()
   })
 });
