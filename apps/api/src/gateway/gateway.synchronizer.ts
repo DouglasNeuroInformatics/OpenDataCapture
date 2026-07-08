@@ -73,13 +73,15 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       cipherTexts.push(...remoteAssignment.encryptedData.slice(1).split('$'));
       symmetricKeys.push(...remoteAssignment.symmetricKey.slice(1).split('$'));
       seriesItems = getSeriesInstrumentItems(instrument.content);
-      if (cipherTexts.length !== seriesItems.length) {
+      // A series may end early (e.g. via `terminate`), so the submitted items are a non-empty
+      // prefix of the series content: fewer records than items is valid, more is malformed.
+      if (cipherTexts.length !== symmetricKeys.length) {
         throw new InternalServerErrorException(
-          `Expected length of cypher texts '${cipherTexts.length}' to match length of series instrument content '${symmetricKeys.length}'`
+          `Expected length of cypher texts '${cipherTexts.length}' to match length of symmetric keys '${symmetricKeys.length}'`
         );
-      } else if (symmetricKeys.length !== seriesItems.length) {
+      } else if (cipherTexts.length < 1 || cipherTexts.length > seriesItems.length) {
         throw new InternalServerErrorException(
-          `Expected length of symmetric keys '${cipherTexts.length}' to match length of series instrument content '${symmetricKeys.length}'`
+          `Expected number of submitted series items '${cipherTexts.length}' to be between 1 and the series instrument content length '${seriesItems.length}'`
         );
       }
     } else if (remoteAssignment.encryptedData.includes('$') || remoteAssignment.symmetricKey.includes('$')) {
