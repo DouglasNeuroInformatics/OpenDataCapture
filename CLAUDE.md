@@ -67,3 +67,4 @@ Per-package scripts (run from repo root via turbo filters, or `cd` into the pack
 - Prefer descriptive variable names over terse or cryptic ones.
 - Avoid excessive comments; don't comment obvious behavior. Use comments only to explain non-obvious behavior or pitfalls.
 - Once all changes are complete, run `pnpm lint` and `pnpm test` from the repo root to verify them.
+- All frontend user-facing strings need to be translated using the `useTranslation` hook (prefer inline translations with `t({ en: '...', fr: '...' })` unless translation is used multiple times).
