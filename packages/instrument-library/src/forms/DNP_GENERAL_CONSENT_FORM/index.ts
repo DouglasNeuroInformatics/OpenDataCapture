@@ -26,10 +26,20 @@ export default defineInstrument({
         consent: {
           kind: 'boolean',
           label: {
-            en: 'I have read, understand, and agree to the above terms',
-            fr: "J'ai lu, compris et accepté les conditions ci-dessus."
+            en: 'Do you accept the above terms?',
+            fr: 'Acceptez-vous les conditions ci-dessus ?'
           },
-          variant: 'checkbox'
+          options: {
+            en: {
+              false: 'I decline the terms',
+              true: 'I have read, understand, and accept the above terms'
+            },
+            fr: {
+              false: 'Je refuse les conditions',
+              true: "J'ai lu, compris et accepté les conditions ci-dessus"
+            }
+          },
+          variant: 'radio'
         }
       }
     }

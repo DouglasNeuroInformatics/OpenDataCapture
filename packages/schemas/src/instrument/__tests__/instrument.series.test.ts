@@ -19,6 +19,28 @@ describe('$SeriesInstrument', () => {
     expect($SeriesInstrument.safeParse(instance).success).toBe(true);
   });
 
+  it('should accept a function as the completionMessage param', () => {
+    const instance = {
+      ...seriesInstrument.instance,
+      content: {
+        items: [{ edition: 1, name: 'HAPPINESS_QUESTIONNAIRE' }],
+        params: { completionMessage: () => ({ en: 'Done' }) }
+      }
+    };
+    expect($SeriesInstrument.safeParse(instance).success).toBe(true);
+  });
+
+  it('should reject a non-function completionMessage param', () => {
+    const instance = {
+      ...seriesInstrument.instance,
+      content: {
+        items: [{ edition: 1, name: 'HAPPINESS_QUESTIONNAIRE' }],
+        params: { completionMessage: { en: 'Done' } }
+      }
+    };
+    expect($SeriesInstrument.safeParse(instance).success).toBe(false);
+  });
+
   it('should reject a non-function terminate param', () => {
     const instance = {
       ...seriesInstrument.instance,

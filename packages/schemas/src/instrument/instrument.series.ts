@@ -4,6 +4,7 @@ import { z } from 'zod/v4';
 import { $$BaseInstrument, $AnyDynamicFunction, $ScalarInstrumentInternal } from './instrument.base.js';
 
 const $SeriesInstrumentParams = z.object({
+  completionMessage: $AnyDynamicFunction.optional(),
   skipProgress: z.boolean().optional(),
   terminate: $AnyDynamicFunction.optional()
 }) satisfies z.ZodType<SeriesInstrument.Params>;

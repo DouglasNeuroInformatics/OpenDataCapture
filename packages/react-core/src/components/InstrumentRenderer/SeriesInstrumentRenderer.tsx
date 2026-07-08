@@ -62,6 +62,7 @@ export const SeriesInstrumentRenderer = ({
   const scalarState = useInterpretedInstrument(scalarBundle ?? '');
 
   const [isInstrumentInProgress, setIsInstrumentInProgress] = useState(false);
+  const [completion, setCompletion] = useState<null | { itemName?: string; terminated: boolean }>(null);
 
   const params = rootState.status === 'DONE' ? getSeriesInstrumentParams(rootState.instrument.content) : {};
   const skipProgress = params.skipProgress ?? false;
@@ -82,6 +83,9 @@ export const SeriesInstrumentRenderer = ({
       kind: 'SERIES'
     });
 
+    if (isLastItem || shouldTerminate) {
+      setCompletion({ itemName, terminated: shouldTerminate });
+    }
     if (shouldTerminate) {
       setIndex(2);
       return;
@@ -91,6 +95,9 @@ export const SeriesInstrumentRenderer = ({
       setIsInstrumentInProgress(false);
     }
   };
+
+  const completionMessage =
+    params.completionMessage?.({ itemName: completion?.itemName, terminated: completion?.terminated ?? false }) ?? null;
 
   useEffect(() => {
     if (currentItemIndex === target.items.length) {
@@ -194,10 +201,12 @@ export const SeriesInstrumentRenderer = ({
                   })}
                 </Heading>
                 <p className="text-muted-foreground text-sm">
-                  {t({
-                    en: 'You have successfully completed all steps of this instrument.',
-                    fr: 'Vous avez terminé avec succès toutes les étapes de cet instrument.'
-                  })}
+                  {t(
+                    completionMessage ?? {
+                      en: 'You have successfully completed all steps of this instrument.',
+                      fr: 'Vous avez terminé avec succès toutes les étapes de cet instrument.'
+                    }
+                  )}
                 </p>
               </div>
             ))

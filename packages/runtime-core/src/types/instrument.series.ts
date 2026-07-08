@@ -12,7 +12,25 @@ declare namespace SeriesInstrument {
     itemName: TItemName;
   };
 
+  export type CompletionContext<TItemName extends string = string> = {
+    /** The item after which the series ended (the terminating item, or the final item). */
+    itemName?: TItemName;
+    /** Whether the series ended early because `terminate` returned `true`. */
+    terminated: boolean;
+  };
+
+  /** A localized message; keyed by language (e.g. `{ en, fr }`). */
+  export type CompletionMessage = {
+    [L in Language]?: string;
+  };
+
   export type Params<TItemName extends string = string, TData = any> = {
+    /**
+     * Returns a custom localized `CompletionMessage` to show on the series completion screen, or
+     * `null`/`undefined` to use the default. `context.terminated` indicates whether the series
+     * ended early via `terminate`, allowing a distinct message per outcome.
+     */
+    completionMessage?: (this: void, context: CompletionContext<TItemName>) => CompletionMessage | null | undefined;
     skipProgress?: boolean;
     /**
      * Called after each item is submitted with that item's data and its `{ itemIndex, itemName }`.

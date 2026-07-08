@@ -47,6 +47,16 @@ export default defineSeriesInstrument({
       // happiness questionnaire is never administered.
       terminate: (data: { consent?: boolean }, { itemName }) => {
         return itemName === 'DNP_GENERAL_CONSENT_FORM' && data.consent === false;
+      },
+      // Explain on the completion screen why the series ended when consent was declined.
+      completionMessage: ({ terminated }) => {
+        if (terminated) {
+          return {
+            en: 'Because you did not consent, the happiness questionnaire was not administered. Thank you for your time.',
+            fr: "Comme vous n'avez pas donné votre consentement, le questionnaire sur le bonheur n'a pas été administré. Merci de votre temps."
+          };
+        }
+        return null;
       }
     }
   }
