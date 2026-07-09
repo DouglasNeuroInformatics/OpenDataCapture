@@ -50,18 +50,29 @@ test.describe.serial(() => {
 
   test.describe.serial('creating groups', () => {
     test('creating groups', async ({ request }) => {
+      const authHeaders = { Authorization: `Bearer ${process.env.ADMIN_ACCESS_TOKEN}` };
+
+      const instrumentsResponse = await request.get('/api/v1/instruments/info', { headers: authHeaders });
+      expect(instrumentsResponse.status()).toBe(200);
+      const instruments: { id: string }[] = await instrumentsResponse.json();
+      const accessibleInstrumentIds = instruments.map((i) => i.id);
+
       const createdGroupIds = {} as TestDataMap<string>;
       for (const browser in groups) {
         const response = await request.post('/api/v1/groups', {
           data: groups[browser as keyof typeof groups],
-          headers: {
-            Authorization: `Bearer ${process.env.ADMIN_ACCESS_TOKEN}`
-          }
+          headers: authHeaders
         });
         expect(response.status()).toBe(201);
         const data = await response.json();
         expect(data).toMatchObject({ id: expect.any(String) });
         createdGroupIds[browser as keyof typeof groups] = data.id;
+
+        const patchResponse = await request.patch(`/api/v1/groups/${data.id}`, {
+          data: { accessibleInstrumentIds },
+          headers: authHeaders
+        });
+        expect(patchResponse.status()).toBe(200);
       }
 
       for (const key in users) {
@@ -70,9 +81,7 @@ test.describe.serial(() => {
             ...users[key as keyof typeof groups],
             groupIds: [createdGroupIds[key as keyof typeof users]]
           },
-          headers: {
-            Authorization: `Bearer ${process.env.ADMIN_ACCESS_TOKEN}`
-          }
+          headers: authHeaders
         });
         expect(response.status()).toBe(201);
       }
