@@ -4,6 +4,7 @@ import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 import { createAuthSlice } from './slices/auth.slice';
+import { createConnectivitySlice } from './slices/connectivity.slice';
 import { createDisclaimerSlice } from './slices/disclaimer.slice';
 import { createSessionSlice } from './slices/session.slice';
 import { createWalkthroughSlice } from './slices/walkthrough.slice';
@@ -15,6 +16,7 @@ export const useAppStore = create(
     persist(
       immer<AppStore>((...a) => ({
         ...createAuthSlice(...a),
+        ...createConnectivitySlice(...a),
         ...createDisclaimerSlice(...a),
         ...createSessionSlice(...a),
         ...createWalkthroughSlice(...a)
