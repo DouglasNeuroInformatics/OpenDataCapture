@@ -6,6 +6,7 @@ import { getSeriesInstrumentItems } from '@opendatacapture/instrument-utils';
 import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
 import type { RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import { $Json } from '@opendatacapture/schemas/core';
+import type { Json } from '@opendatacapture/schemas/core';
 
 import { AssignmentsService } from '@/assignments/assignments.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
@@ -73,13 +74,15 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       cipherTexts.push(...remoteAssignment.encryptedData.slice(1).split('$'));
       symmetricKeys.push(...remoteAssignment.symmetricKey.slice(1).split('$'));
       seriesItems = getSeriesInstrumentItems(instrument.content);
-      if (cipherTexts.length !== seriesItems.length) {
+      // A series may end early (e.g. via `terminate`), so the submitted items are a non-empty
+      // prefix of the series content: fewer records than items is valid, more is malformed.
+      if (cipherTexts.length !== symmetricKeys.length) {
         throw new InternalServerErrorException(
-          `Expected length of cypher texts '${cipherTexts.length}' to match length of series instrument content '${symmetricKeys.length}'`
+          `Expected length of cypher texts '${cipherTexts.length}' to match length of symmetric keys '${symmetricKeys.length}'`
         );
-      } else if (symmetricKeys.length !== seriesItems.length) {
+      } else if (cipherTexts.length < 1 || cipherTexts.length > seriesItems.length) {
         throw new InternalServerErrorException(
-          `Expected length of symmetric keys '${cipherTexts.length}' to match length of series instrument content '${symmetricKeys.length}'`
+          `Expected number of submitted series items '${cipherTexts.length}' to be between 1 and the series instrument content length '${seriesItems.length}'`
         );
       }
     } else if (remoteAssignment.encryptedData.includes('$') || remoteAssignment.symmetricKey.includes('$')) {
@@ -95,47 +98,55 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       for (let i = 0; i < cipherTexts.length; i++) {
         const cipherText = cipherTexts[i]!;
         const symmetricKey = symmetricKeys[i]!;
-        const data = await $Json.parseAsync(
-          JSON.parse(
-            await HybridCrypto.decrypt({
-              cipherText: Buffer.from(cipherText, 'base64'),
-              privateKey: await HybridCrypto.deserializePrivateKey(assignment.encryptionKeyPair.privateKey),
-              symmetricKey: Buffer.from(symmetricKey, 'base64')
-            })
-          )
-        );
-        const record = await this.instrumentRecordsService.create({
-          assignmentId: assignment.id,
-          data,
-          date: remoteAssignment.completedAt,
-          groupId: assignment.groupId ?? undefined,
-          instrumentId:
-            instrument.kind === 'SERIES'
-              ? this.instrumentsService.generateScalarInstrumentId({ internal: seriesItems![i]! })
-              : instrument.id,
-          // Preserve which series orchestrated this remote collection in the record's metadata
-          seriesInstrumentId: instrument.kind === 'SERIES' ? instrument.id : undefined,
-          sessionId: session.id,
-          subjectId: assignment.subjectId
-        });
-        this.loggingService.log(`Created record with ID: ${record.id}`);
-        createdRecordIds.push(record.id);
+        const instrumentId =
+          instrument.kind === 'SERIES'
+            ? this.instrumentsService.generateScalarInstrumentId({ internal: seriesItems![i]! })
+            : instrument.id;
+        let decryptedData: string;
+        try {
+          decryptedData = await HybridCrypto.decrypt({
+            cipherText: Buffer.from(cipherText, 'base64'),
+            privateKey: await HybridCrypto.deserializePrivateKey(assignment.encryptionKeyPair.privateKey),
+            symmetricKey: Buffer.from(symmetricKey, 'base64')
+          });
+        } catch (err) {
+          this.loggingService.error({ instrumentId, message: 'Failed to decrypt data' });
+          throw err;
+        }
+
+        let data: Json;
+        try {
+          data = await $Json.parseAsync(JSON.parse(decryptedData));
+        } catch (err) {
+          this.loggingService.error({ decryptedData, instrumentId, message: 'Failed to parse decrypted data' });
+          throw err;
+        }
+
+        try {
+          const record = await this.instrumentRecordsService.create({
+            assignmentId: assignment.id,
+            data,
+            date: remoteAssignment.completedAt,
+            groupId: assignment.groupId ?? undefined,
+            instrumentId,
+            // Preserve which series orchestrated this remote collection in the record's metadata
+            seriesInstrumentId: instrument.kind === 'SERIES' ? instrument.id : undefined,
+            sessionId: session.id,
+            subjectId: assignment.subjectId
+          });
+          this.loggingService.log(`Created record with ID: ${record.id}`);
+          createdRecordIds.push(record.id);
+        } catch (err) {
+          this.loggingService.error({ data, instrumentId, message: 'Failed to create instrument record' });
+          throw err;
+        }
       }
       await this.gatewayService.deleteRemoteAssignment(assignment.id);
     } catch (err) {
-      this.loggingService.error({
-        data: {
-          assignment,
-          cipherTexts,
-          remoteAssignment,
-          symmetricKeys
-        },
-        message: 'Failed to Process Data'
-      });
       this.loggingService.error(err);
       for (const id of createdRecordIds) {
         await this.instrumentRecordsService.deleteById(id);
-        this.loggingService.log(`Deleted Record with ID: ${id}`);
+        this.loggingService.log(`Deleted record with ID: ${id}`);
       }
       throw err;
     }

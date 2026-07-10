@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
-import { ErrorPage } from '@opendatacapture/react-core';
 import { createRouter } from '@tanstack/react-router';
 
+import { AppErrorComponent } from './components/AppErrorComponent';
 import { LoadingFallback } from './components/LoadingFallback';
 import { routeTree } from './route-tree';
 import { queryClient } from './services/react-query';
@@ -20,7 +20,7 @@ export const router = createRouter({
   context: {
     queryClient
   },
-  defaultErrorComponent: ErrorPage,
+  defaultErrorComponent: AppErrorComponent,
   defaultPendingComponent: LoadingFallback,
   defaultPendingMinMs: 500,
   routeTree
