@@ -2,7 +2,7 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { getModelToken } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -77,6 +77,61 @@ describe('InstrumentRecordsService', () => {
         subjectId: 'test-subject-id'
       });
       expect(result.date).toBeInstanceOf(Date);
+    });
+  });
+
+  describe('create', () => {
+    const mockFormInstrument = {
+      id: 'form-1',
+      kind: 'FORM',
+      measures: null,
+      validationSchema: {
+        safeParse: (data: unknown) => ({ data, success: true })
+      }
+    };
+
+    const baseCreateData = {
+      data: { answer: 1 },
+      date: new Date(),
+      instrumentId: 'form-1',
+      sessionId: 'session-1',
+      subjectId: 'subject-1'
+    };
+
+    beforeEach(() => {
+      subjectsService.findById.mockResolvedValue({ id: 'subject-1' } as any);
+      sessionsService.findById.mockResolvedValue({ id: 'session-1' } as any);
+      instrumentRecordModel.create.mockResolvedValue({ id: 'record-1' } as any);
+    });
+
+    it('should persist the series instrument reference when provided', async () => {
+      instrumentsService.findById.mockImplementation((id: string) => {
+        if (id === 'series-1') {
+          return Promise.resolve({ id: 'series-1', kind: 'SERIES' } as any);
+        }
+        return Promise.resolve(mockFormInstrument as any);
+      });
+      await instrumentRecordsService.create({ ...baseCreateData, seriesInstrumentId: 'series-1' });
+      expect(instrumentRecordModel.create.mock.lastCall?.[0]).toMatchObject({
+        data: {
+          instrument: { connect: { id: 'form-1' } },
+          seriesInstrument: { connect: { id: 'series-1' } }
+        }
+      });
+    });
+
+    it('should not connect a series instrument when none is provided', async () => {
+      instrumentsService.findById.mockResolvedValue(mockFormInstrument as any);
+      await instrumentRecordsService.create(baseCreateData);
+      expect(instrumentRecordModel.create.mock.lastCall?.[0].data.seriesInstrument).toBeUndefined();
+    });
+
+    it('should reject a seriesInstrumentId that references a non-series instrument', async () => {
+      instrumentsService.findById.mockResolvedValue(mockFormInstrument as any);
+      await expect(
+        instrumentRecordsService.create({ ...baseCreateData, seriesInstrumentId: 'form-1' })
+      ).rejects.toBeInstanceOf(UnprocessableEntityException);
+      expect(instrumentRecordModel.create).not.toHaveBeenCalled();
     });
   });
 

@@ -113,6 +113,8 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
             instrument.kind === 'SERIES'
               ? this.instrumentsService.generateScalarInstrumentId({ internal: seriesItems![i]! })
               : instrument.id,
+          // Preserve which series orchestrated this remote collection in the record's metadata
+          seriesInstrumentId: instrument.kind === 'SERIES' ? instrument.id : undefined,
           sessionId: session.id,
           subjectId: assignment.subjectId
         });

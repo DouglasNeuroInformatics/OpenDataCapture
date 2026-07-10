@@ -76,7 +76,8 @@ export const SeriesInstrumentRenderer = ({
       data: JSON.parse(JSON.stringify(data, replacer)) as Json,
       index,
       instrumentId: scalarId!,
-      kind: 'SERIES'
+      kind: 'SERIES',
+      seriesInstrumentId: target.id
     });
     setCurrentItemIndex(currentItemIndex + 1);
     if (!skipProgress) {

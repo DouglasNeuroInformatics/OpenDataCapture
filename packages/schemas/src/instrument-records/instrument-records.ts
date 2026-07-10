@@ -14,6 +14,7 @@ export const $CreateInstrumentRecordData = z.object({
   date: z.coerce.date(),
   groupId: z.string().optional(),
   instrumentId: z.string(),
+  seriesInstrumentId: z.string().optional(),
   sessionId: z.string(),
   subjectId: z.string()
 });
@@ -49,6 +50,7 @@ export const $InstrumentRecord = $BaseModel.extend({
   groupId: z.string().nullish(),
   instrumentId: z.string(),
   pending: z.boolean().nullish(),
+  seriesInstrumentId: z.string().nullish(),
   sessionId: z.string(),
   subjectId: z.string()
 });

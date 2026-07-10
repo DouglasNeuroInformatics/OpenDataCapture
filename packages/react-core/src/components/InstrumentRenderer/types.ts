@@ -29,6 +29,8 @@ export namespace InstrumentSubmitHandler {
   type SeriesContext = ContextMixin<{
     index: number;
     kind: Extract<InstrumentKind, 'SERIES'>;
+    /** The id of the series instrument orchestrating this submission (instrumentId is the scalar item). */
+    seriesInstrumentId: string;
   }>;
 
   export type ScalarContext = FileContext | FormContext | InteractiveContext;

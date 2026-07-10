@@ -72,7 +72,7 @@ export class InstrumentRecordsService {
   }
 
   async create(
-    { data: rawData, date, groupId, instrumentId, sessionId, subjectId }: CreateInstrumentRecordData,
+    { data: rawData, date, groupId, instrumentId, seriesInstrumentId, sessionId, subjectId }: CreateInstrumentRecordData,
     options?: EntityOperationOptions
   ): Promise<InstrumentRecord> {
     if (groupId) {
@@ -88,6 +88,17 @@ export class InstrumentRecordsService {
       throw new ServiceUnavailableException(
         `Cannot create instrument record for file instrument '${instrument.id}': file storage is not configured`
       );
+    }
+
+    // When the record was collected through a series instrument, verify the reference points at an
+    // actual series before persisting it in the record's metadata.
+    if (seriesInstrumentId) {
+      const seriesInstrument = await this.instrumentsService.findById(seriesInstrumentId);
+      if (seriesInstrument.kind !== 'SERIES') {
+        throw new UnprocessableEntityException(
+          `Instrument '${seriesInstrumentId}' referenced as seriesInstrumentId is not a series instrument`
+        );
+      }
     }
 
     await this.subjectsService.findById(subjectId);
@@ -121,6 +132,13 @@ export class InstrumentRecordsService {
           }
         },
         pending: instrument.kind === 'FILE',
+        seriesInstrument: seriesInstrumentId
+          ? {
+              connect: {
+                id: seriesInstrumentId
+              }
+            }
+          : undefined,
         session: {
           connect: {
             id: sessionId

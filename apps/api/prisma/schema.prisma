@@ -141,8 +141,12 @@ model InstrumentRecord {
   groupId          String?                @db.ObjectId
   subject          Subject                @relation(fields: [subjectId], references: [id])
   subjectId        String
-  instrument       Instrument             @relation(fields: [instrumentId], references: [id])
+  instrument       Instrument             @relation("InstrumentRecords", fields: [instrumentId], references: [id])
   instrumentId     String
+  // The series instrument, if any, that orchestrated this record's collection. Null for records
+  // collected outside a series. The series id encodes the exact ordered composition of its forms.
+  seriesInstrument   Instrument?          @relation("SeriesInstrumentRecords", fields: [seriesInstrumentId], references: [id])
+  seriesInstrumentId String?
   assignment       Assignment?            @relation(fields: [assignmentId], references: [id])
   assignmentId     String?                @unique
   session          Session                @relation(fields: [sessionId], references: [id])
@@ -189,7 +193,8 @@ model Instrument {
   bundle         String
   groups         Group[]            @relation(fields: [groupIds], references: [id])
   groupIds       String[]           @db.ObjectId
-  records        InstrumentRecord[]
+  records        InstrumentRecord[] @relation("InstrumentRecords")
+  seriesRecords  InstrumentRecord[] @relation("SeriesInstrumentRecords")
   // Set only when the instrument was first created by importing an instrument repository. Left null
   // for manually-uploaded instruments, which keep "manual" provenance even if a repo also provides them.
   sourceRepoId   String?            @db.ObjectId
