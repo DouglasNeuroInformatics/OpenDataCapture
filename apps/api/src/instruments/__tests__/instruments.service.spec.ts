@@ -64,6 +64,7 @@ describe('InstrumentsService', () => {
     instrumentModel = moduleRef.get(getModelToken('Instrument'));
     instrumentRecordModel = moduleRef.get(getModelToken('InstrumentRecord'));
     groupModel = moduleRef.get(getModelToken('Group'));
+    groupModel.findFirst.mockResolvedValue({ id: 'group-1' } as any);
     virtualizationService = moduleRef.get(VirtualizationService);
     // `getInstrumentInstance` reads/writes an instance cache on the virtualization context.
     (virtualizationService as { context: unknown }).context = { __resolveImport: vi.fn(), instruments: new Map() };
@@ -75,16 +76,16 @@ describe('InstrumentsService', () => {
   });
 
   describe('createSeries', () => {
-    it('asks for confirmation (without creating) when another series already has the same forms', async () => {
-      vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries]);
+    it('asks for confirmation (without creating) when another series has the same forms in the same order', async () => {
+      const findSpy = vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries]);
       const createSpy = vi.spyOn(instrumentsService, 'create');
 
-      // Same two forms as `existingSeries` but in a different order and under a different name.
       const result = await instrumentsService.createSeries({
         details: { title: 'My New Series' },
+        groupId: 'group-1',
         items: [
-          { edition: 1, name: 'FORM_B' },
-          { edition: 1, name: 'FORM_A' }
+          { edition: 1, name: 'FORM_A' },
+          { edition: 1, name: 'FORM_B' }
         ],
         language: 'en'
       });
@@ -93,7 +94,27 @@ describe('InstrumentsService', () => {
         existingTitle: { en: 'Existing Series', fr: 'Série existante' },
         outcome: 'duplicate'
       });
+      expect(findSpy).toHaveBeenNthCalledWith(1, { seriesGroupId: 'group-1' }, {});
+      expect(findSpy).toHaveBeenNthCalledWith(2, { kind: 'SERIES', seriesGroupId: 'group-1' }, { ability: undefined });
       expect(createSpy).not.toHaveBeenCalled();
+    });
+
+    it('creates a distinct series when the same forms are in a different order', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries]);
+      const createSpy = vi.spyOn(instrumentsService, 'create').mockResolvedValue({ id: 'reordered-id' } as any);
+
+      const result = await instrumentsService.createSeries({
+        details: { title: 'Reordered Series' },
+        groupId: 'group-1',
+        items: [
+          { edition: 1, name: 'FORM_B' },
+          { edition: 1, name: 'FORM_A' }
+        ],
+        language: 'en'
+      });
+
+      expect(createSpy).toHaveBeenCalledWith({ bundle: '__BUNDLE__' }, { seriesGroupId: 'group-1' });
+      expect(result).toEqual({ instrumentId: 'reordered-id', outcome: 'created' });
     });
 
     it('creates the series when the duplicate is explicitly confirmed', async () => {
@@ -103,6 +124,7 @@ describe('InstrumentsService', () => {
       const result = await instrumentsService.createSeries({
         confirmDuplicate: true,
         details: { title: 'My New Series' },
+        groupId: 'group-1',
         items: [
           { edition: 1, name: 'FORM_A' },
           { edition: 1, name: 'FORM_B' }
@@ -110,7 +132,7 @@ describe('InstrumentsService', () => {
         language: 'en'
       });
 
-      expect(createSpy).toHaveBeenCalledWith({ bundle: '__BUNDLE__' });
+      expect(createSpy).toHaveBeenCalledWith({ bundle: '__BUNDLE__' }, { seriesGroupId: 'group-1' });
       expect(result).toEqual({ instrumentId: 'new-id', outcome: 'created' });
     });
 
@@ -120,6 +142,7 @@ describe('InstrumentsService', () => {
 
       const result = await instrumentsService.createSeries({
         details: { title: 'Totally New' },
+        groupId: 'group-1',
         items: [
           { edition: 1, name: 'FORM_C' },
           { edition: 1, name: 'FORM_D' }
@@ -127,7 +150,7 @@ describe('InstrumentsService', () => {
         language: 'en'
       });
 
-      expect(createSpy).toHaveBeenCalledWith({ bundle: '__BUNDLE__' });
+      expect(createSpy).toHaveBeenCalledWith({ bundle: '__BUNDLE__' }, { seriesGroupId: 'group-1' });
       expect(result).toEqual({ instrumentId: 'fresh-id', outcome: 'created' });
     });
 
@@ -138,6 +161,7 @@ describe('InstrumentsService', () => {
       await instrumentsService.createSeries({
         clientDetails: { instructions: ['Complete the instruments in order.'] },
         details: { description: 'Optional description', title: 'Generated Series' },
+        groupId: 'group-1',
         items: [
           { edition: 2, name: 'FORM_B' },
           { edition: 1, name: 'FORM_A' }
@@ -190,7 +214,11 @@ describe('InstrumentsService', () => {
         language: 'en',
         tags: ['Series']
       } as const;
-      const id = `hash:${JSON.stringify({ content: instance.content, title: instance.details.title })}`;
+      const id = `hash:${JSON.stringify({
+        content: instance.content,
+        seriesGroupId: 'group-1',
+        title: instance.details.title
+      })}`;
 
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
       vi.spyOn(cryptoService, 'hash').mockImplementation((value) => `hash:${value}`);
@@ -200,6 +228,7 @@ describe('InstrumentsService', () => {
       const result = await instrumentsService.createSeries({
         confirmDuplicate: true,
         details: { title: 'Stored Series' },
+        groupId: 'group-1',
         items,
         language: 'en'
       });
@@ -208,7 +237,14 @@ describe('InstrumentsService', () => {
       expect(instrumentModel.exists).toHaveBeenNthCalledWith(1, { id });
       expect(instrumentModel.exists).toHaveBeenNthCalledWith(2, { id: 'hash:FORM_A-1' });
       expect(instrumentModel.exists).toHaveBeenNthCalledWith(3, { id: 'hash:FORM_B-1' });
-      expect(instrumentModel.create).toHaveBeenCalledWith({ data: { bundle: '__BUNDLE__', id } });
+      expect(instrumentModel.create).toHaveBeenCalledWith({
+        data: {
+          bundle: '__BUNDLE__',
+          groups: { connect: { id: 'group-1' } },
+          id,
+          seriesGroup: { connect: { id: 'group-1' } }
+        }
+      });
       expect(result).toEqual({ instrumentId: id, outcome: 'created' });
     });
 
@@ -219,6 +255,7 @@ describe('InstrumentsService', () => {
       await expect(
         instrumentsService.createSeries({
           details: { title: 'existing series' },
+          groupId: 'group-1',
           items: [
             { edition: 1, name: 'FORM_X' },
             { edition: 1, name: 'FORM_Y' }
@@ -227,6 +264,23 @@ describe('InstrumentsService', () => {
         })
       ).rejects.toThrow(ConflictException);
       expect(createSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects creation for a group the caller cannot manage', async () => {
+      groupModel.findFirst.mockResolvedValue(null);
+
+      await expect(
+        instrumentsService.createSeries({
+          details: { title: 'Inaccessible Group Series' },
+          groupId: 'group-2',
+          items: [
+            { edition: 1, name: 'FORM_A' },
+            { edition: 1, name: 'FORM_B' }
+          ],
+          language: 'en'
+        })
+      ).rejects.toThrow(NotFoundException);
+      expect(instrumentModel.create).not.toHaveBeenCalled();
     });
   });
 
@@ -250,12 +304,54 @@ describe('InstrumentsService', () => {
         JSON.stringify({ content: first.content, title: first.details.title })
       );
     });
+
+    it('includes the owning group so groups can create independent copies of the same series', () => {
+      vi.spyOn(cryptoService, 'hash').mockImplementation((value) => value);
+
+      expect(instrumentsService.generateSeriesInstrumentId(existingSeries, 'group-1')).not.toBe(
+        instrumentsService.generateSeriesInstrumentId(existingSeries, 'group-2')
+      );
+    });
+  });
+
+  describe('find', () => {
+    it('keeps shared forms visible while restricting owned series to the user groups', async () => {
+      instrumentModel.findMany.mockResolvedValue([]);
+
+      await instrumentsService.find({}, { groupIds: ['group-1'] });
+
+      expect(instrumentModel.findMany).toHaveBeenCalledWith({
+        where: {
+          AND: [
+            { records: undefined },
+            {
+              OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }, { seriesGroupId: { in: ['group-1'] } }]
+            },
+            {}
+          ]
+        }
+      });
+    });
   });
 
   describe('deleteById', () => {
     it('throws when the instrument does not exist', async () => {
       instrumentModel.findFirst.mockResolvedValue(null);
       await expect(instrumentsService.deleteById('missing')).rejects.toThrow(NotFoundException);
+      expect(instrumentModel.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: 'missing',
+          OR: [
+            {},
+            {
+              AND: [
+                { OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }] },
+                { OR: [{ sourceRepoId: null }, { sourceRepoId: { isSet: false } }] }
+              ]
+            }
+          ]
+        }
+      });
     });
 
     it('refuses to delete a non-series (scalar) instrument', async () => {
@@ -269,12 +365,29 @@ describe('InstrumentsService', () => {
       expect(instrumentModel.delete).not.toHaveBeenCalled();
     });
 
-    it('deletes a series instrument and detaches it from every group', async () => {
+    it('refuses to delete a series instrument that has already been administered', async () => {
       instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'target' });
       virtualizationService.eval.mockResolvedValue({
         isErr: () => false,
         value: { content: { items: [] }, kind: 'SERIES' }
       } as any);
+      // Records collected through a series carry it in seriesInstrumentId (never as their instrumentId).
+      instrumentRecordModel.count.mockResolvedValue(3);
+
+      await expect(instrumentsService.deleteById('target')).rejects.toThrow(ForbiddenException);
+      expect(instrumentRecordModel.count).toHaveBeenCalledWith({
+        where: { OR: [{ instrumentId: 'target' }, { seriesInstrumentId: 'target' }] }
+      });
+      expect(instrumentModel.delete).not.toHaveBeenCalled();
+    });
+
+    it('deletes a never-administered series instrument and detaches it from every group', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'target' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { content: { items: [] }, kind: 'SERIES' }
+      } as any);
+      instrumentRecordModel.count.mockResolvedValue(0);
       groupModel.findMany.mockResolvedValue([{ accessibleInstrumentIds: ['other', 'target'], id: 'g1' }]);
 
       const result = await instrumentsService.deleteById('target');
@@ -285,8 +398,6 @@ describe('InstrumentsService', () => {
       });
       expect(instrumentModel.delete).toHaveBeenCalledWith({ where: { id: 'target' } });
       expect(result).toEqual({ id: 'target' });
-      // Series instruments never have records of their own, so record counts are irrelevant here.
-      expect(instrumentRecordModel.count).not.toHaveBeenCalled();
     });
   });
 });

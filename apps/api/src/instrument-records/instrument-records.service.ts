@@ -72,7 +72,15 @@ export class InstrumentRecordsService {
   }
 
   async create(
-    { data: rawData, date, groupId, instrumentId, seriesInstrumentId, sessionId, subjectId }: CreateInstrumentRecordData,
+    {
+      data: rawData,
+      date,
+      groupId,
+      instrumentId,
+      seriesInstrumentId,
+      sessionId,
+      subjectId
+    }: CreateInstrumentRecordData,
     options?: EntityOperationOptions
   ): Promise<InstrumentRecord> {
     if (groupId) {
@@ -169,7 +177,7 @@ export class InstrumentRecordsService {
 
   async exportRecords(
     { groupId }: { groupId?: string } = {},
-    { ability }: Required<EntityOperationOptions>
+    { ability }: Required<Pick<EntityOperationOptions, 'ability'>>
   ): Promise<InstrumentRecordsExport> {
     const records = await this.queryRecordsRaw(ability, groupId);
 

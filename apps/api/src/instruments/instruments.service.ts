@@ -51,6 +51,7 @@ type InstrumentVirtualizationContext = {
 
 type InstrumentQuery<TKind extends InstrumentKind> = {
   kind?: TKind;
+  seriesGroupId?: string;
   subjectId?: string;
 };
 
@@ -72,7 +73,10 @@ export class InstrumentsService {
     return (await this.find(query, options)).length;
   }
 
-  async create({ bundle }: CreateInstrumentDto): Promise<WithID<AnyInstrument>> {
+  async create(
+    { bundle }: CreateInstrumentDto,
+    { seriesGroupId }: { seriesGroupId?: string } = {}
+  ): Promise<WithID<AnyInstrument>> {
     const result = await this.virtualizationService.eval(bundle);
     if (result.isErr()) {
       this.loggingService.error(result.error);
@@ -90,7 +94,7 @@ export class InstrumentsService {
     }
     const instance = parseResult.data;
 
-    const id = this.generateInstrumentId(instance);
+    const id = this.generateInstrumentId(instance, seriesGroupId);
     if (await this.instrumentModel.exists({ id })) {
       throw new ConflictException(`Instrument with ID '${id}' already exists!`);
     }
@@ -117,35 +121,49 @@ export class InstrumentsService {
       });
     }
 
-    await this.instrumentModel.create({ data: { bundle, id } });
+    await this.instrumentModel.create({
+      data: {
+        bundle,
+        groups: seriesGroupId ? { connect: { id: seriesGroupId } } : undefined,
+        id,
+        seriesGroup: seriesGroupId ? { connect: { id: seriesGroupId } } : undefined
+      }
+    });
     return { ...instance, id };
   }
 
   /**
    * Assemble a new series instrument from existing scalar instruments. The title must be unique among
-   * every instrument on the platform; the series bundle is generated server-side and run through the
-   * same validation/creation path as any other instrument.
+   * every instrument visible to the target group; the series bundle is generated server-side and run
+   * through the same validation/creation path as any other instrument.
    *
-   * If another series already contains the exact same set of items (regardless of order or name) and the
+   * If another series already contains the exact same ordered sequence of items (regardless of name) and the
    * caller has not opted to proceed, no instrument is created — instead a `duplicate` result is returned
    * with the existing series' title, so the client can ask the user whether they really want a duplicate.
    */
   async createSeries(
-    { clientDetails, confirmDuplicate, details, items, language }: $CreateSeriesInstrumentData,
+    { clientDetails, confirmDuplicate, details, groupId, items, language }: $CreateSeriesInstrumentData,
     options: EntityOperationOptions = {}
   ): Promise<CreateSeriesInstrumentResult> {
-    if (await this.isInstrumentTitleTaken(details.title)) {
+    const group = await this.groupModel.findFirst({
+      select: { id: true },
+      where: { AND: [accessibleQuery(options.ability, 'update', 'Group')], id: groupId }
+    });
+    if (!group) {
+      throw new NotFoundException(`Failed to find group with ID: ${groupId}`);
+    }
+    if (await this.isInstrumentTitleTaken(details.title, groupId, options)) {
       throw new ConflictException('An instrument with the same title already exists');
     }
     if (!confirmDuplicate) {
-      const existingTitle = await this.findSeriesTitleWithSameItems(items, options);
+      const existingTitle = await this.findSeriesTitleWithSameItems(items, groupId, options);
       if (existingTitle !== null) {
         return { existingTitle, outcome: 'duplicate' };
       }
     }
     const source = this.generateSeriesInstrumentSource({ clientDetails, details, items, language });
     const generatedBundle = await bundle({ inputs: [{ content: source, name: 'index.ts' }], minify: true });
-    const created = await this.create({ bundle: generatedBundle });
+    const created = await this.create({ bundle: generatedBundle }, { seriesGroupId: groupId });
     return { instrumentId: created.id, outcome: 'created' };
   }
 
@@ -156,8 +174,20 @@ export class InstrumentsService {
    * Scalar instruments are shared platform assets and are never removed through this path.
    */
   async deleteById(id: string, { ability }: EntityOperationOptions = {}): Promise<{ id: string }> {
+    const deleteAccess = accessibleQuery(ability, 'delete', 'Instrument');
     const instrument = await this.instrumentModel.findFirst({
-      where: { AND: [accessibleQuery(ability, 'delete', 'Instrument')], id }
+      where: {
+        id,
+        OR: [
+          deleteAccess,
+          {
+            AND: [
+              { OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }] },
+              { OR: [{ sourceRepoId: null }, { sourceRepoId: { isSet: false } }] }
+            ]
+          }
+        ]
+      }
     });
     if (!instrument) {
       throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
@@ -165,6 +195,17 @@ export class InstrumentsService {
     const instance = await this.getInstrumentInstance(instrument);
     if (!isSeriesInstrument(instance)) {
       throw new ForbiddenException('Only series instruments can be deleted');
+    }
+    // A series that has been administered must never be deleted, so its collected data stays
+    // interpretable. Records collected through a series are stored under the scalar items'
+    // instrumentId with the orchestrating series preserved in seriesInstrumentId, so count on both.
+    const recordCount = await this.instrumentRecordModel.count({
+      where: { OR: [{ instrumentId: id }, { seriesInstrumentId: id }] }
+    });
+    if (recordCount > 0) {
+      throw new ForbiddenException(
+        `Cannot delete series instrument: ${recordCount} record(s) have already been collected with it`
+      );
     }
     // Mongo does not cascade scalar-list relations, so pull the id from every group that exposes it
     // before removing the instrument itself.
@@ -186,7 +227,7 @@ export class InstrumentsService {
 
   async find<TKind extends InstrumentKind>(
     query: InstrumentQuery<TKind> = {},
-    { ability }: EntityOperationOptions = {}
+    { ability, groupIds }: EntityOperationOptions = {}
   ): Promise<WithID<SomeInstrument<TKind>>[]> {
     const instruments = await this.instrumentModel.findMany({
       where: {
@@ -200,6 +241,23 @@ export class InstrumentsService {
                 }
               : undefined
           },
+          query.seriesGroupId
+            ? {
+                OR: [
+                  { seriesGroupId: null },
+                  { seriesGroupId: { isSet: false } },
+                  { seriesGroupId: query.seriesGroupId }
+                ]
+              }
+            : groupIds
+              ? {
+                  OR: [
+                    { seriesGroupId: null },
+                    { seriesGroupId: { isSet: false } },
+                    { seriesGroupId: { in: groupIds } }
+                  ]
+                }
+              : {},
           accessibleQuery(ability, 'read', 'Instrument')
         ]
       }
@@ -237,10 +295,20 @@ export class InstrumentsService {
 
   async findById(
     id: string,
-    { ability }: EntityOperationOptions = {}
+    { ability, groupIds }: EntityOperationOptions = {}
   ): Promise<AnyInstrument & { bundle: string; id: string }> {
     const instrument = await this.instrumentModel.findFirst({
-      where: { AND: [accessibleQuery(ability, 'read', 'Instrument')], id }
+      where: {
+        AND: [
+          accessibleQuery(ability, 'read', 'Instrument'),
+          groupIds
+            ? {
+                OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }, { seriesGroupId: { in: groupIds } }]
+              }
+            : {}
+        ],
+        id
+      }
     });
     if (!instrument) {
       throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
@@ -306,21 +374,22 @@ export class InstrumentsService {
     return Array.from(results.values());
   }
 
-  generateInstrumentId(instrument: AnyInstrument) {
+  generateInstrumentId(instrument: AnyInstrument, seriesGroupId?: string) {
     if (isScalarInstrument(instrument)) {
       return this.generateScalarInstrumentId(instrument);
     }
-    return this.generateSeriesInstrumentId(instrument);
+    return this.generateSeriesInstrumentId(instrument, seriesGroupId);
   }
 
   generateScalarInstrumentId({ internal: { edition, name } }: Pick<AnyScalarInstrument, 'internal'>) {
     return this.cryptoService.hash(`${name}-${edition}`);
   }
 
-  generateSeriesInstrumentId(instrument: SeriesInstrument) {
+  generateSeriesInstrumentId(instrument: SeriesInstrument, seriesGroupId?: string) {
     return this.cryptoService.hash(
       JSON.stringify({
         content: instrument.content,
+        seriesGroupId,
         title: instrument.details.title
       })
     );
@@ -341,8 +410,12 @@ export class InstrumentsService {
     return instance;
   }
 
-  async list<TKind extends InstrumentKind>(query: InstrumentQuery<TKind> = {}, ability: AppAbility) {
-    return this.find(query, { ability }).then((arr) => {
+  async list<TKind extends InstrumentKind>(
+    query: InstrumentQuery<TKind> = {},
+    ability: AppAbility,
+    groupIds?: string[]
+  ) {
+    return this.find(query, { ability, groupIds }).then((arr) => {
       return arr.map((instrument) => ({
         id: instrument.id,
         internal: instrument.internal,
@@ -387,21 +460,22 @@ export class InstrumentsService {
   }
 
   /**
-   * The title of an existing series instrument that contains the exact same set of items as `items`
-   * (regardless of order), or `null` when none exists. Used to warn before creating a redundant series.
+   * The title of an existing series instrument that contains the exact same ordered sequence of items as
+   * `items`, or `null` when none exists. Used to warn before creating a redundant series.
    * The title is returned in its stored (possibly multilingual) form so the client can localize it.
    */
   private async findSeriesTitleWithSameItems(
     items: ScalarInstrumentInternal[],
+    seriesGroupId: string,
     { ability }: EntityOperationOptions = {}
   ): Promise<NonNullable<ClientInstrumentDetails['title']> | null> {
-    const targetKey = this.getSeriesItemSetKey(items);
-    const seriesInstances = await this.find({ kind: 'SERIES' }, { ability });
+    const targetKey = this.getSeriesItemSequenceKey(items);
+    const seriesInstances = await this.find({ kind: 'SERIES', seriesGroupId }, { ability });
     for (const series of seriesInstances) {
       if (!isSeriesInstrument(series)) {
         continue;
       }
-      if (this.getSeriesItemSetKey(getSeriesInstrumentItems(series.content)) === targetKey) {
+      if (this.getSeriesItemSequenceKey(getSeriesInstrumentItems(series.content)) === targetKey) {
         return series.details.title;
       }
     }
@@ -441,14 +515,10 @@ export class InstrumentsService {
   }
 
   /**
-   * A stable, order-independent key identifying the set of scalar instruments in a series. Two series
-   * with the same items produce the same key even if the items were added in a different order.
+   * A stable key identifying the ordered sequence of scalar instruments in a series.
    */
-  private getSeriesItemSetKey(items: ScalarInstrumentInternal[]): string {
-    return items
-      .map(({ edition, name }) => `${name}-${edition}`)
-      .sort()
-      .join('--');
+  private getSeriesItemSequenceKey(items: ScalarInstrumentInternal[]): string {
+    return JSON.stringify(items.map(({ edition, name }) => ({ edition, name })));
   }
 
   private async instantiate(instruments: Pick<InstrumentBundleContainer, 'bundle' | 'id'>[]) {
@@ -460,15 +530,18 @@ export class InstrumentsService {
   }
 
   /**
-   * Whether any instrument on the platform already uses the given title (case-insensitive, across every
-   * language it is defined in). Used to enforce that newly-created series have a unique, recognizable
-   * name. Deliberately unscoped by ability: uniqueness must hold globally, not just for instruments the
-   * caller happens to see.
+   * Whether an instrument visible to the target group already uses the given title (case-insensitive,
+   * across every language it is defined in). Used to enforce that newly-created series have a unique,
+   * recognizable name within their group.
    */
-  private async isInstrumentTitleTaken(title: NonNullable<ClientInstrumentDetails['title']>): Promise<boolean> {
+  private async isInstrumentTitleTaken(
+    title: NonNullable<ClientInstrumentDetails['title']>,
+    seriesGroupId: string,
+    options: EntityOperationOptions
+  ): Promise<boolean> {
     const normalize = (value: string) => value.trim().toLowerCase();
     const candidates = new Set(this.titleValues(title).map(normalize));
-    const instances = await this.find({});
+    const instances = await this.find({ seriesGroupId }, options);
     return instances.some((instance) =>
       this.titleValues(instance.details.title).some((value) => candidates.has(normalize(value)))
     );

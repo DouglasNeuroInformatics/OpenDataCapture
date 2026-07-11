@@ -33,10 +33,15 @@ describe('GroupsService', () => {
       expect(groupModel.create.mock.lastCall?.[0]).toMatchObject({ data: { name: 'Test Group' } });
     });
 
-    it('should connect only non-repo instruments (sourceRepoId: null)', async () => {
+    it('should connect only shared non-repo instruments', async () => {
       instrumentModel.findMany.mockResolvedValueOnce([{ id: 'manual-1' }, { id: 'manual-2' }]);
       await groupsService.create({ name: 'Test Group', type: 'CLINICAL' });
-      expect(instrumentModel.findMany).toHaveBeenCalledWith({ where: { sourceRepoId: null } });
+      expect(instrumentModel.findMany).toHaveBeenCalledWith({
+        where: {
+          OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }],
+          sourceRepoId: null
+        }
+      });
       expect(groupModel.create.mock.lastCall?.[0]).toMatchObject({
         data: { accessibleInstruments: { connect: [{ id: 'manual-1' }, { id: 'manual-2' }] } }
       });
@@ -66,7 +71,10 @@ describe('GroupsService', () => {
       await groupsService.updateById('123', { accessibleInstrumentIds: ['live-1', 'deleted', 'live-2'] });
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
         select: { id: true },
-        where: { id: { in: ['live-1', 'deleted', 'live-2'] } }
+        where: {
+          id: { in: ['live-1', 'deleted', 'live-2'] },
+          OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }, { seriesGroupId: '123' }]
+        }
       });
       expect(groupModel.update.mock.lastCall?.[0]).toMatchObject({
         data: { accessibleInstruments: { set: [{ id: 'live-1' }, { id: 'live-2' }] } }

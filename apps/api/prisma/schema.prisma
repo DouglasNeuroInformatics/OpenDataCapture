@@ -111,6 +111,7 @@ model Group {
   assignments             Assignment[]
   auditLogs               AuditLog[]
   instrumentRecords       InstrumentRecord[]
+  ownedSeriesInstruments  Instrument[]           @relation("OwnedSeriesInstruments")
   instrumentRecordFiles   InstrumentRecordFile[]
   instrumentRepoIds       String[]               @db.ObjectId
   instrumentRepos         InstrumentRepo[]       @relation(fields: [instrumentRepoIds], references: [id])
@@ -195,6 +196,8 @@ model Instrument {
   groupIds       String[]           @db.ObjectId
   records        InstrumentRecord[] @relation("InstrumentRecords")
   seriesRecords  InstrumentRecord[] @relation("SeriesInstrumentRecords")
+  seriesGroup    Group?             @relation("OwnedSeriesInstruments", fields: [seriesGroupId], references: [id])
+  seriesGroupId  String?            @db.ObjectId
   // Set only when the instrument was first created by importing an instrument repository. Left null
   // for manually-uploaded instruments, which keep "manual" provenance even if a repo also provides them.
   sourceRepoId   String?            @db.ObjectId

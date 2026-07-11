@@ -35,6 +35,8 @@ import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
 
+import { deleteSeriesInstrument } from './delete-series-instrument';
+
 type InstrumentSource = { kind: 'manual' } | { kind: 'repo'; name: string };
 
 type InstrumentItem = {
@@ -99,6 +101,7 @@ type ManageGroupFormProps = {
   data: {
     // The titles of every visible instrument, used to enforce unique new series instrument names.
     existingTitles: string[];
+    groupId: string;
     // Accessible instrument ids that are not in the visible list; preserved as-is on save.
     hiddenAccessibleIds: string[];
     initialSelectedIds: string[];
@@ -321,11 +324,15 @@ const InstrumentPreviewDialog = ({
 const CreateSeriesInstrumentDialog = ({
   existingTitles,
   forms,
-  onClose
+  groupId,
+  onClose,
+  onCreated
 }: {
   existingTitles: string[];
   forms: InstrumentItem[];
+  groupId: string;
   onClose: () => void;
+  onCreated: (id: string) => void;
 }) => {
   const { resolvedLanguage, t } = useTranslation();
   const createMutation = useCreateSeriesInstrumentMutation();
@@ -369,6 +376,7 @@ const CreateSeriesInstrumentDialog = ({
   const buildPayload = (items: ScalarInstrumentInternal[]): $CreateSeriesInstrumentData => ({
     clientDetails: instructions.trim() ? { instructions: [instructions.trim()] } : undefined,
     details: { title: title.trim() },
+    groupId,
     items,
     language: resolvedLanguage
   });
@@ -378,13 +386,20 @@ const CreateSeriesInstrumentDialog = ({
     if (items.length < 2) {
       return;
     }
-    const result = await createMutation.mutateAsync(buildPayload(items));
-    if (result.outcome === 'duplicate') {
-      // The existing title comes back in its stored form (a plain string, or multilingual object).
-      setDuplicateOf(typeof result.existingTitle === 'string' ? result.existingTitle : t(result.existingTitle));
-      return;
+    // Failures are surfaced by the mutation's onError notification; catch here so the rejection does
+    // not escape the void call site, and leave the dialog open for retry.
+    try {
+      const result = await createMutation.mutateAsync(buildPayload(items));
+      if (result.outcome === 'duplicate') {
+        // The existing title comes back in its stored form (a plain string, or multilingual object).
+        setDuplicateOf(typeof result.existingTitle === 'string' ? result.existingTitle : t(result.existingTitle));
+        return;
+      }
+      onCreated(result.instrumentId);
+      onClose();
+    } catch {
+      // no-op: notification already shown by the mutation's onError
     }
-    onClose();
   };
 
   const handleConfirmDuplicate = async () => {
@@ -392,8 +407,15 @@ const CreateSeriesInstrumentDialog = ({
     if (items.length < 2) {
       return;
     }
-    await createMutation.mutateAsync({ ...buildPayload(items), confirmDuplicate: true });
-    onClose();
+    try {
+      const result = await createMutation.mutateAsync({ ...buildPayload(items), confirmDuplicate: true });
+      if (result.outcome === 'created') {
+        onCreated(result.instrumentId);
+      }
+      onClose();
+    } catch {
+      // no-op: notification already shown by the mutation's onError; dialog stays open for retry
+    }
   };
 
   return (
@@ -542,11 +564,13 @@ const DeleteInstrumentDialog = ({
   const { t } = useTranslation();
   const deleteMutation = useDeleteInstrumentMutation();
 
-  const handleDelete = async () => {
-    await deleteMutation.mutateAsync({ id: item.id });
-    onDeleted(item.id);
-    onClose();
-  };
+  const handleDelete = () =>
+    deleteSeriesInstrument({
+      deleteInstrument: deleteMutation.mutateAsync,
+      id: item.id,
+      onClose,
+      onDeleted
+    });
 
   return (
     <Dialog
@@ -584,7 +608,7 @@ const DeleteInstrumentDialog = ({
 };
 
 const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => {
-  const { existingTitles, hiddenAccessibleIds, initialSelectedIds, instruments, settingsInitialValues } = data;
+  const { existingTitles, groupId, hiddenAccessibleIds, initialSelectedIds, instruments, settingsInitialValues } = data;
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set(initialSelectedIds));
@@ -633,7 +657,9 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         <CreateSeriesInstrumentDialog
           existingTitles={existingTitles}
           forms={[...instruments.form, ...instruments.interactive]}
+          groupId={groupId}
           onClose={() => setShowCreateSeries(false)}
+          onCreated={(id) => setSelectedIds((previous) => new Set(previous).add(id))}
         />
       )}
       {deletingItem && (
@@ -932,7 +958,16 @@ const RouteComponent = () => {
       (item) => item.title
     );
 
-    return { existingTitles, hiddenAccessibleIds, initialSelectedIds, instruments, settingsInitialValues };
+    return currentGroup
+      ? {
+          existingTitles,
+          groupId: currentGroup.id,
+          hiddenAccessibleIds,
+          initialSelectedIds,
+          instruments,
+          settingsInitialValues
+        }
+      : null;
   }, [
     accessibleInstrumentIds,
     availableInstruments,

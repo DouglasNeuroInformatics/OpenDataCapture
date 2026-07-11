@@ -24,7 +24,10 @@ export class GroupsService {
     // Connect only instruments that did not come from an instrument repository. Repo-sourced
     // instruments are opt-in: a group manager must select them manually after a repo is assigned.
     const nonRepoInstruments = await this.instrumentModel.findMany({
-      where: { sourceRepoId: null }
+      where: {
+        OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }],
+        sourceRepoId: null
+      }
     });
     return this.groupModel.create({
       data: {
@@ -89,7 +92,10 @@ export class GroupsService {
     if (accessibleInstrumentIds) {
       const existingInstruments = await this.instrumentModel.findMany({
         select: { id: true },
-        where: { id: { in: accessibleInstrumentIds } }
+        where: {
+          id: { in: accessibleInstrumentIds },
+          OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }, { seriesGroupId: id }]
+        }
       });
       validInstrumentIds = existingInstruments.map(({ id }) => id);
     }

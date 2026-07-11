@@ -308,12 +308,14 @@ type $CreateSeriesInstrumentData = z.infer<typeof $CreateSeriesInstrumentData>;
 const $CreateSeriesInstrumentData = z.object({
   // Optional instructions shown before the series begins (same shape as any instrument's clientDetails).
   clientDetails: $ClientInstrumentDetails.pick({ instructions: true }).optional(),
-  // When true, proceed even though another series already contains the same set of items.
+  // When true, proceed even though another series already contains the same ordered items.
   confirmDuplicate: z.boolean().optional(),
   // The display title (required) and optional description, in the same multilingual shape as an instrument.
   details: $InstrumentDetails.pick({ title: true }).extend({
     description: $InstrumentDetails.shape.description.optional()
   }),
+  // The group that owns and can access the generated series instrument.
+  groupId: z.string(),
   // The ordered list of scalar instruments (by name + edition) that make up the series.
   items: z.array($ScalarInstrumentInternal).min(2),
   // The language(s) the details above are written in — mirrors an instrument's own `language` field.
@@ -322,7 +324,7 @@ const $CreateSeriesInstrumentData = z.object({
 
 /**
  * The result of a create-series request. A discriminated union over `outcome`: either the series was
- * created, or another series already contains the same set of items and the caller must confirm the
+ * created, or another series already contains the same ordered items and the caller must confirm the
  * duplicate before it is created.
  */
 type CreateSeriesInstrumentResult =

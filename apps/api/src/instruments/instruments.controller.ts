@@ -1,5 +1,6 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
+import { Body, Controller, Delete, ForbiddenException, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 // Imported as a value (not a type-only import) so it doubles as the validation schema for the request
@@ -51,26 +52,48 @@ export class InstrumentsController {
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   async findBundleById(
     @Param('id') id: string,
-    @CurrentUser('ability') ability: AppAbility
+    @CurrentUser() currentUser: RequestUser,
+    @Query('groupId') groupId?: string
   ): Promise<InstrumentBundleContainer> {
-    return this.instrumentsService.findBundleById(id, { ability });
+    return this.instrumentsService.findBundleById(id, {
+      ability: currentUser.ability,
+      groupIds: this.resolveGroupIds(currentUser, groupId)
+    });
   }
 
   @ApiOperation({ summary: 'Summarize Instruments' })
   @Get('info')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   async findInfo(
-    @CurrentUser('ability') ability: AppAbility,
+    @CurrentUser() currentUser: RequestUser,
+    @Query('groupId') groupId?: string,
     @Query('kind') kind?: InstrumentKind,
     @Query('subjectId') subjectId?: string
   ): Promise<InstrumentInfo[]> {
-    return this.instrumentsService.findInfo({ kind, subjectId }, { ability });
+    return this.instrumentsService.findInfo(
+      { kind, subjectId },
+      { ability: currentUser.ability, groupIds: this.resolveGroupIds(currentUser, groupId) }
+    );
   }
 
   @ApiOperation({ summary: 'List Instruments' })
   @Get('list')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async list(@CurrentUser('ability') ability: AppAbility, @Query('kind') kind?: InstrumentKind) {
-    return this.instrumentsService.list({ kind }, ability);
+  async list(
+    @CurrentUser() currentUser: RequestUser,
+    @Query('groupId') groupId?: string,
+    @Query('kind') kind?: InstrumentKind
+  ) {
+    return this.instrumentsService.list({ kind }, currentUser.ability, this.resolveGroupIds(currentUser, groupId));
+  }
+
+  private resolveGroupIds(currentUser: RequestUser, requestedGroupId?: string): string[] {
+    if (!requestedGroupId) {
+      return currentUser.groups.map(({ id }) => id);
+    }
+    if (!currentUser.ability.can('manage', 'all') && !currentUser.groups.some(({ id }) => id === requestedGroupId)) {
+      throw new ForbiddenException(`Cannot access instruments for group with ID: ${requestedGroupId}`);
+    }
+    return [requestedGroupId];
   }
 }
