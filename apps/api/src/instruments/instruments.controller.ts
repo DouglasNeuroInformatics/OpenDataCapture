@@ -1,6 +1,6 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Delete, ForbiddenException, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 // Imported as a value (not a type-only import) so it doubles as the validation schema for the request
@@ -12,7 +12,6 @@ import type {
   InstrumentInfo
 } from '@opendatacapture/schemas/instrument';
 
-import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
@@ -35,16 +34,16 @@ export class InstrumentsController {
   @RouteAccess({ action: 'create', subject: 'Instrument' })
   createSeries(
     @Body() data: $CreateSeriesInstrumentData,
-    @CurrentUser('ability') ability: AppAbility
+    @CurrentUser() currentUser: RequestUser
   ): Promise<CreateSeriesInstrumentResult> {
-    return this.instrumentsService.createSeries(data, { ability });
+    return this.instrumentsService.createSeries(data, currentUser);
   }
 
   @ApiOperation({ summary: 'Delete Series Instrument' })
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Instrument' })
-  delete(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility): Promise<unknown> {
-    return this.instrumentsService.deleteById(id, { ability });
+  delete(@Param('id') id: string, @CurrentUser() currentUser: RequestUser): Promise<unknown> {
+    return this.instrumentsService.deleteById(id, currentUser);
   }
 
   @ApiOperation({ summary: 'Get Instrument Bundle' })
@@ -55,10 +54,7 @@ export class InstrumentsController {
     @CurrentUser() currentUser: RequestUser,
     @Query('groupId') groupId?: string
   ): Promise<InstrumentBundleContainer> {
-    return this.instrumentsService.findBundleById(id, {
-      ability: currentUser.ability,
-      groupIds: this.resolveGroupIds(currentUser, groupId)
-    });
+    return this.instrumentsService.findBundleById(id, currentUser, groupId);
   }
 
   @ApiOperation({ summary: 'Summarize Instruments' })
@@ -70,10 +66,7 @@ export class InstrumentsController {
     @Query('kind') kind?: InstrumentKind,
     @Query('subjectId') subjectId?: string
   ): Promise<InstrumentInfo[]> {
-    return this.instrumentsService.findInfo(
-      { kind, subjectId },
-      { ability: currentUser.ability, groupIds: this.resolveGroupIds(currentUser, groupId) }
-    );
+    return this.instrumentsService.findInfo({ kind, subjectId }, currentUser, groupId);
   }
 
   @ApiOperation({ summary: 'List Instruments' })
@@ -84,16 +77,6 @@ export class InstrumentsController {
     @Query('groupId') groupId?: string,
     @Query('kind') kind?: InstrumentKind
   ) {
-    return this.instrumentsService.list({ kind }, currentUser.ability, this.resolveGroupIds(currentUser, groupId));
-  }
-
-  private resolveGroupIds(currentUser: RequestUser, requestedGroupId?: string): string[] {
-    if (!requestedGroupId) {
-      return currentUser.groups.map(({ id }) => id);
-    }
-    if (!currentUser.ability.can('manage', 'all') && !currentUser.groups.some(({ id }) => id === requestedGroupId)) {
-      throw new ForbiddenException(`Cannot access instruments for group with ID: ${requestedGroupId}`);
-    }
-    return [requestedGroupId];
+    return this.instrumentsService.list({ kind }, currentUser, groupId);
   }
 }

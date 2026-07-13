@@ -76,7 +76,7 @@ describe('InstrumentsService', () => {
   });
 
   describe('createSeries', () => {
-    it('asks for confirmation (without creating) when another series has the same forms in the same order', async () => {
+    it('asks for confirmation when a legacy series has the same forms in the same order', async () => {
       const findSpy = vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries]);
       const createSpy = vi.spyOn(instrumentsService, 'create');
 
@@ -214,7 +214,7 @@ describe('InstrumentsService', () => {
         language: 'en',
         tags: ['Series']
       } as const;
-      const id = `hash:${JSON.stringify({
+      const id = `__V2__hash:${JSON.stringify({
         content: instance.content,
         seriesGroupId: 'group-1',
         title: instance.details.title
@@ -285,7 +285,7 @@ describe('InstrumentsService', () => {
   });
 
   describe('generateSeriesInstrumentId', () => {
-    it('includes the series title so confirmed duplicate form sets can be distinct', () => {
+    it('uses a versioned prefix and includes the title so confirmed duplicate form sets can be distinct', () => {
       vi.spyOn(cryptoService, 'hash').mockImplementation((value) => value);
 
       const first = {
@@ -297,9 +297,9 @@ describe('InstrumentsService', () => {
         details: { ...existingSeries.details, title: 'Second Series' }
       };
 
-      expect(instrumentsService.generateSeriesInstrumentId(first)).not.toBe(
-        instrumentsService.generateSeriesInstrumentId(second)
-      );
+      const firstId = instrumentsService.generateSeriesInstrumentId(first);
+      expect(firstId).toMatch(/^__V2__/);
+      expect(firstId).not.toBe(instrumentsService.generateSeriesInstrumentId(second));
       expect(cryptoService.hash).toHaveBeenCalledWith(
         JSON.stringify({ content: first.content, title: first.details.title })
       );
@@ -318,7 +318,7 @@ describe('InstrumentsService', () => {
     it('keeps shared forms visible while restricting owned series to the user groups', async () => {
       instrumentModel.findMany.mockResolvedValue([]);
 
-      await instrumentsService.find({}, { groupIds: ['group-1'] });
+      await instrumentsService.find({}, {}, ['group-1']);
 
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
         where: {
@@ -332,6 +332,16 @@ describe('InstrumentsService', () => {
         }
       });
     });
+
+    it('rejects a requested group outside the current user groups', async () => {
+      const currentUser = {
+        ability: { can: vi.fn(() => false) },
+        groups: [{ id: 'group-1' }]
+      } as any;
+
+      await expect(instrumentsService.findInfo({}, currentUser, 'group-2')).rejects.toThrow(ForbiddenException);
+      expect(instrumentModel.findMany).not.toHaveBeenCalled();
+    });
   });
 
   describe('deleteById', () => {
@@ -340,16 +350,8 @@ describe('InstrumentsService', () => {
       await expect(instrumentsService.deleteById('missing')).rejects.toThrow(NotFoundException);
       expect(instrumentModel.findFirst).toHaveBeenCalledWith({
         where: {
-          id: 'missing',
-          OR: [
-            {},
-            {
-              AND: [
-                { OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }] },
-                { OR: [{ sourceRepoId: null }, { sourceRepoId: { isSet: false } }] }
-              ]
-            }
-          ]
+          AND: [{}],
+          id: 'missing'
         }
       });
     });

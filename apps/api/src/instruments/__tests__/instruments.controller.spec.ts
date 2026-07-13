@@ -1,6 +1,5 @@
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ForbiddenException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -34,17 +33,8 @@ describe('InstrumentsController', () => {
 
     expect(instrumentsService.findInfo).toHaveBeenCalledWith(
       { kind: undefined, subjectId: undefined },
-      { ability, groupIds: ['group-1'] }
+      currentUser,
+      'group-1'
     );
-  });
-
-  it('rejects an instrument group scope outside the current user groups', async () => {
-    const currentUser = {
-      ability: { can: vi.fn(() => false) },
-      groups: [{ id: 'group-1' }]
-    } as any;
-
-    await expect(instrumentsController.findInfo(currentUser, 'group-2')).rejects.toThrow(ForbiddenException);
-    expect(instrumentsService.findInfo).not.toHaveBeenCalled();
   });
 });

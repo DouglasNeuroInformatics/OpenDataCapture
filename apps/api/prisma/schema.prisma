@@ -194,8 +194,10 @@ model Instrument {
   bundle         String
   groups         Group[]            @relation(fields: [groupIds], references: [id])
   groupIds       String[]           @db.ObjectId
+  // Explicit names disambiguate the record's administered instrument from its optional parent series.
   records        InstrumentRecord[] @relation("InstrumentRecords")
   seriesRecords  InstrumentRecord[] @relation("SeriesInstrumentRecords")
+  // This name disambiguates series ownership from the existing Group-Instrument access relation.
   seriesGroup    Group?             @relation("OwnedSeriesInstruments", fields: [seriesGroupId], references: [id])
   seriesGroupId  String?            @db.ObjectId
   // Set only when the instrument was first created by importing an instrument repository. Left null

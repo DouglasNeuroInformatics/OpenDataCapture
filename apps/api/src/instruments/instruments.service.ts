@@ -1,5 +1,5 @@
 import { CryptoService, InjectModel, LoggingService, VirtualizationService } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import {
   ConflictException,
   ForbiddenException,
@@ -36,13 +36,13 @@ import type {
 import { pick } from 'lodash-es';
 
 import { accessibleQuery } from '@/auth/ability.utils';
-import type { AppAbility } from '@/auth/auth.types';
 import type { EntityOperationOptions } from '@/core/types';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
 
 /** The localized "series" tag applied to every generated series instrument. */
 const seriesTag = (language: Language): string => (language === 'fr' ? 'Série' : 'Series');
+const SERIES_INSTRUMENT_ID_PREFIX = '__V2__';
 
 type InstrumentVirtualizationContext = {
   __resolveImport: (specifier: string) => string;
@@ -143,8 +143,9 @@ export class InstrumentsService {
    */
   async createSeries(
     { clientDetails, confirmDuplicate, details, groupId, items, language }: $CreateSeriesInstrumentData,
-    options: EntityOperationOptions = {}
+    currentUser?: RequestUser
   ): Promise<CreateSeriesInstrumentResult> {
+    const options = { ability: currentUser?.ability };
     const group = await this.groupModel.findFirst({
       select: { id: true },
       where: { AND: [accessibleQuery(options.ability, 'update', 'Group')], id: groupId }
@@ -173,20 +174,11 @@ export class InstrumentsService {
    * instruments and never have records of their own (records belong to their constituent members).
    * Scalar instruments are shared platform assets and are never removed through this path.
    */
-  async deleteById(id: string, { ability }: EntityOperationOptions = {}): Promise<{ id: string }> {
-    const deleteAccess = accessibleQuery(ability, 'delete', 'Instrument');
+  async deleteById(id: string, currentUser?: RequestUser): Promise<{ id: string }> {
     const instrument = await this.instrumentModel.findFirst({
       where: {
-        id,
-        OR: [
-          deleteAccess,
-          {
-            AND: [
-              { OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }] },
-              { OR: [{ sourceRepoId: null }, { sourceRepoId: { isSet: false } }] }
-            ]
-          }
-        ]
+        AND: [accessibleQuery(currentUser?.ability, 'delete', 'Instrument')],
+        id
       }
     });
     if (!instrument) {
@@ -227,7 +219,8 @@ export class InstrumentsService {
 
   async find<TKind extends InstrumentKind>(
     query: InstrumentQuery<TKind> = {},
-    { ability, groupIds }: EntityOperationOptions = {}
+    { ability }: EntityOperationOptions = {},
+    groupIds?: string[]
   ): Promise<WithID<SomeInstrument<TKind>>[]> {
     const instruments = await this.instrumentModel.findMany({
       where: {
@@ -269,8 +262,13 @@ export class InstrumentsService {
     return instances.filter((instance) => instance.kind === query.kind) as WithID<SomeInstrument<TKind>>[];
   }
 
-  async findBundleById(id: string, options: EntityOperationOptions = {}): Promise<InstrumentBundleContainer> {
-    const instance = await this.findById(id, options);
+  async findBundleById(
+    id: string,
+    currentUser?: RequestUser,
+    requestedGroupId?: string
+  ): Promise<InstrumentBundleContainer> {
+    const groupIds = currentUser ? this.resolveGroupIds(currentUser, requestedGroupId) : undefined;
+    const instance = await this.findById(id, { ability: currentUser?.ability }, groupIds);
     if (isScalarInstrument(instance)) {
       return {
         bundle: instance.bundle,
@@ -284,7 +282,7 @@ export class InstrumentsService {
         items: await Promise.all(
           getSeriesInstrumentItems(instance.content).map(async (internal) => {
             const id = this.generateScalarInstrumentId({ internal });
-            return (await this.findBundleById(id)) as ScalarInstrumentBundleContainer;
+            return (await this.findBundleById(id, currentUser, requestedGroupId)) as ScalarInstrumentBundleContainer;
           })
         ),
         kind: 'SERIES'
@@ -295,7 +293,8 @@ export class InstrumentsService {
 
   async findById(
     id: string,
-    { ability, groupIds }: EntityOperationOptions = {}
+    { ability }: EntityOperationOptions = {},
+    groupIds?: string[]
   ): Promise<AnyInstrument & { bundle: string; id: string }> {
     const instrument = await this.instrumentModel.findFirst({
       where: {
@@ -319,15 +318,19 @@ export class InstrumentsService {
 
   async findInfo<TKind extends InstrumentKind>(
     query: InstrumentQuery<TKind> = {},
-    options: EntityOperationOptions = {}
+    currentUser?: RequestUser,
+    requestedGroupId?: string
   ): Promise<InstrumentInfo[]> {
-    const instances = await this.find(query, options);
+    const options = { ability: currentUser?.ability };
+    const groupIds = currentUser ? this.resolveGroupIds(currentUser, requestedGroupId) : undefined;
+    const instances = await this.find(query, options, groupIds);
 
     const sourceMap = await this.buildInstrumentSourceMap(instances.map((instance) => instance.id));
     // Series resolve their `seriesItems` against the scalar instruments they reference. A `kind` filter can
     // exclude those scalars from `instances`, so when the result set contains series we build the lookup
     // from the full instrument set instead — otherwise a series' items would resolve to nothing.
-    const scalarSource = query.kind && instances.some(isSeriesInstrument) ? await this.find({}, options) : instances;
+    const scalarSource =
+      query.kind && instances.some(isSeriesInstrument) ? await this.find({}, options, groupIds) : instances;
     const scalarInstrumentIds = new Map(
       scalarSource.flatMap((instance) =>
         isScalarInstrument(instance) && instance.internal
@@ -386,13 +389,13 @@ export class InstrumentsService {
   }
 
   generateSeriesInstrumentId(instrument: SeriesInstrument, seriesGroupId?: string) {
-    return this.cryptoService.hash(
+    return `${SERIES_INSTRUMENT_ID_PREFIX}${this.cryptoService.hash(
       JSON.stringify({
         content: instrument.content,
         seriesGroupId,
         title: instrument.details.title
       })
-    );
+    )}`;
   }
 
   async getInstrumentInstance(instrument: Pick<InstrumentBundleContainer, 'bundle' | 'id'>) {
@@ -412,10 +415,11 @@ export class InstrumentsService {
 
   async list<TKind extends InstrumentKind>(
     query: InstrumentQuery<TKind> = {},
-    ability: AppAbility,
-    groupIds?: string[]
+    currentUser?: RequestUser,
+    requestedGroupId?: string
   ) {
-    return this.find(query, { ability, groupIds }).then((arr) => {
+    const groupIds = currentUser ? this.resolveGroupIds(currentUser, requestedGroupId) : undefined;
+    return this.find(query, { ability: currentUser?.ability }, groupIds).then((arr) => {
       return arr.map((instrument) => ({
         id: instrument.id,
         internal: instrument.internal,
@@ -545,6 +549,16 @@ export class InstrumentsService {
     return instances.some((instance) =>
       this.titleValues(instance.details.title).some((value) => candidates.has(normalize(value)))
     );
+  }
+
+  private resolveGroupIds(currentUser: RequestUser, requestedGroupId?: string): string[] {
+    if (!requestedGroupId) {
+      return currentUser.groups.map(({ id }) => id);
+    }
+    if (!currentUser.ability.can('manage', 'all') && !currentUser.groups.some(({ id }) => id === requestedGroupId)) {
+      throw new ForbiddenException(`Cannot access instruments for group with ID: ${requestedGroupId}`);
+    }
+    return [requestedGroupId];
   }
 
   /** The individual language values of a (possibly multilingual) title. */

@@ -134,9 +134,9 @@ describe('InstrumentRecordsService', () => {
         { ability }
       );
 
-      const expectedOptions = { ability, groupIds: ['group-1'] };
-      expect(instrumentsService.findById).toHaveBeenNthCalledWith(1, 'form-1', expectedOptions);
-      expect(instrumentsService.findById).toHaveBeenNthCalledWith(2, 'series-1', expectedOptions);
+      const expectedOptions = { ability };
+      expect(instrumentsService.findById).toHaveBeenNthCalledWith(1, 'form-1', expectedOptions, ['group-1']);
+      expect(instrumentsService.findById).toHaveBeenNthCalledWith(2, 'series-1', expectedOptions, ['group-1']);
     });
 
     it('should not connect a series instrument when none is provided', async () => {
