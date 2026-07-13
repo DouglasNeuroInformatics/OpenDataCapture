@@ -86,7 +86,8 @@ export class InstrumentRecordsService {
     if (groupId) {
       await this.groupsService.findById(groupId, options);
     }
-    const instrument = await this.instrumentsService.findById(instrumentId);
+    const instrumentLookupOptions = groupId ? { ...options, groupIds: [groupId] } : options;
+    const instrument = await this.instrumentsService.findById(instrumentId, instrumentLookupOptions);
     if (instrument.kind === 'SERIES') {
       throw new UnprocessableEntityException(
         `Cannot create instrument record for series instrument '${instrument.id}'`
@@ -101,7 +102,7 @@ export class InstrumentRecordsService {
     // When the record was collected through a series instrument, verify the reference points at an
     // actual series before persisting it in the record's metadata.
     if (seriesInstrumentId) {
-      const seriesInstrument = await this.instrumentsService.findById(seriesInstrumentId);
+      const seriesInstrument = await this.instrumentsService.findById(seriesInstrumentId, instrumentLookupOptions);
       if (seriesInstrument.kind !== 'SERIES') {
         throw new UnprocessableEntityException(
           `Instrument '${seriesInstrumentId}' referenced as seriesInstrumentId is not a series instrument`

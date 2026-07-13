@@ -120,6 +120,25 @@ describe('InstrumentRecordsService', () => {
       });
     });
 
+    it('should authorize and scope instrument lookups to the record group', async () => {
+      const ability = { can: () => true } as any;
+      instrumentsService.findById.mockImplementation((id: string) => {
+        if (id === 'series-1') {
+          return Promise.resolve({ id: 'series-1', kind: 'SERIES' } as any);
+        }
+        return Promise.resolve(mockFormInstrument as any);
+      });
+
+      await instrumentRecordsService.create(
+        { ...baseCreateData, groupId: 'group-1', seriesInstrumentId: 'series-1' },
+        { ability }
+      );
+
+      const expectedOptions = { ability, groupIds: ['group-1'] };
+      expect(instrumentsService.findById).toHaveBeenNthCalledWith(1, 'form-1', expectedOptions);
+      expect(instrumentsService.findById).toHaveBeenNthCalledWith(2, 'series-1', expectedOptions);
+    });
+
     it('should not connect a series instrument when none is provided', async () => {
       instrumentsService.findById.mockResolvedValue(mockFormInstrument as any);
       await instrumentRecordsService.create(baseCreateData);

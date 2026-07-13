@@ -40,7 +40,7 @@ export class InstrumentsController {
     return this.instrumentsService.createSeries(data, { ability });
   }
 
-  @ApiOperation({ summary: 'Delete Instrument' })
+  @ApiOperation({ summary: 'Delete Series Instrument' })
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Instrument' })
   delete(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility): Promise<unknown> {
