@@ -26,8 +26,8 @@ export function useDeleteInstrumentMutation() {
       // of the group's accessible ids (e.g. the manage page) reconcile it locally via the mutation result.
       void queryClient.invalidateQueries({ queryKey: ['instrument-info'] });
     },
-    // Callers catch mutateAsync failures and this hook presents the API message as a notification.
-    // Do not also rethrow the same handled error into the route error boundary.
+    // The app default is throwOnError: true. mutateAsync still rejects for the caller's try/catch, while
+    // this override prevents the mutation's error state from also being thrown during hook rendering.
     throwOnError: false
   });
 }

@@ -64,6 +64,8 @@ describe('AbilityFactory', () => {
     expect(ability.can('delete', subject('Instrument', { seriesGroupId: 'group-1' }) as any)).toBe(true);
     expect(ability.can('delete', subject('Instrument', { seriesGroupId: 'group-2' }) as any)).toBe(false);
     expect(ability.can('delete', subject('Instrument', { seriesGroupId: null }) as any)).toBe(false);
+    expect(ability.can('create', 'Instrument')).toBe(true);
+    expect(ability.can('manage', 'Instrument')).toBe(false);
   });
   it('should allow standard user to read their own user info', () => {
     const payload = {

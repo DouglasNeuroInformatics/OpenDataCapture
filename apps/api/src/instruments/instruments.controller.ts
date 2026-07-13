@@ -24,7 +24,7 @@ export class InstrumentsController {
 
   @ApiOperation({ summary: 'Create Instrument' })
   @Post()
-  @RouteAccess({ action: 'create', subject: 'Instrument' })
+  @RouteAccess({ action: 'manage', subject: 'Instrument' })
   create(@Body() data: CreateInstrumentDto): Promise<unknown> {
     return this.instrumentsService.create(data);
   }
