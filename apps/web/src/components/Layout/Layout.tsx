@@ -1,6 +1,7 @@
 import { Outlet } from '@tanstack/react-router';
 
 import { Footer } from '../Footer';
+import { GroupSwitcher } from '../GroupSwitcher';
 import { Navbar } from '../Navbar';
 import { Sidebar } from '../Sidebar';
 
@@ -22,6 +23,7 @@ export const Layout = () => {
         className="scrollbar-none relative flex grow flex-col overflow-y-scroll pt-14 md:pt-0"
         data-testid="layout-main"
       >
+        <GroupSwitcher />
         <main className="container flex grow flex-col">
           <Outlet />
         </main>

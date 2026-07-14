@@ -65,7 +65,7 @@ export const DEFAULT_SECTIONS_ORDER: PanelSection[] = ['logo', 'name', 'tagline'
 export const HEX_PATTERN = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 /** Accept http(s) URLs with a hostname containing at least one dot (e.g. example.com). */
 export const URL_PATTERN = /^https?:\/\/[^\s/]+\.[^\s/]+(\/\S*)?$/;
-export const MAX_LOGO_BYTES = 1024 * 1024;
+export const MAX_LOGO_BYTES = 5 * 1024 * 1024;
 export const FORM_ID = 'branding-form';
 /** Sentinel Select value representing "no override — use the default font size". */
 export const FONT_SIZE_DEFAULT = 'default';

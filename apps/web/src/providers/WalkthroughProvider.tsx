@@ -436,6 +436,20 @@ const Walkthrough = () => {
           </Card.Header>
           <Card.Content className="text-muted-foreground text-sm">{currentStep.content}</Card.Content>
           <Card.Footer className="flex justify-end gap-3">
+            <Button
+              className="mr-auto"
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setIsWalkthroughComplete(true);
+                close();
+              }}
+            >
+              {t({
+                en: "Don't show again",
+                fr: 'Ne plus afficher'
+              })}
+            </Button>
             {index > 0 && (
               <Button type="button" variant="outline" onClick={() => setIndex(index - 1)}>
                 {t({

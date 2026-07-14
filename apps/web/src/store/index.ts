@@ -22,6 +22,11 @@ export const useAppStore = create(
         ...createWalkthroughSlice(...a)
       })),
       {
+        // Carry the persisted flags forward across any future store-version bump so a
+        // user's "don't show the tutorial again" choice survives ODC upgrades. Without a
+        // migrate function, zustand discards persisted state on a version mismatch, which
+        // would make the walkthrough reappear after an update.
+        migrate: (persistedState) => persistedState as AppStore,
         name: 'app',
         partialize: (state) => pick(state, ['isDisclaimerAccepted', 'isWalkthroughComplete']),
         storage: createJSONStorage(() => localStorage),

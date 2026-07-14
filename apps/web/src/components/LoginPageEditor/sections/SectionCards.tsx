@@ -15,6 +15,19 @@ import type { BrandingEditor } from '../hooks';
 
 type CardProps = { editor: BrandingEditor };
 
+/**
+ * Checkerboard backdrop used behind the uploaded-logo preview so genuine
+ * transparency is visible (rather than appearing as a solid square). If a logo
+ * still looks like an opaque rectangle over this pattern, the image file itself
+ * has a baked-in background and needs to be re-exported with an alpha channel.
+ */
+const CHECKERBOARD_STYLE: React.CSSProperties = {
+  backgroundImage:
+    'linear-gradient(45deg, #c7c7c7 25%, transparent 25%), linear-gradient(-45deg, #c7c7c7 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #c7c7c7 75%), linear-gradient(-45deg, transparent 75%, #c7c7c7 75%)',
+  backgroundPosition: '0 0, 0 6px, 6px -6px, -6px 0',
+  backgroundSize: '12px 12px'
+};
+
 const DetailsCard = ({ editor }: CardProps) => {
   const { t } = useTranslation();
   const { form, update, updateText } = editor;
@@ -73,8 +86,8 @@ const LogoCard = ({ editor }: CardProps) => {
     <Card key="logo">
       <SectionHeader
         description={t({
-          en: 'Upload a 1 MB image (SVG, PNG, JPEG) or link to one.',
-          fr: 'Téléversez une image de 1 Mo (SVG, PNG, JPEG) ou indiquez un lien.'
+          en: 'Upload an image up to 5 MB (SVG, PNG, JPEG) or link to one.',
+          fr: "Téléversez une image jusqu'à 5 Mo (SVG, PNG, JPEG) ou indiquez un lien."
         })}
         editor={editor}
         section="logo"
@@ -121,7 +134,12 @@ const LogoCard = ({ editor }: CardProps) => {
                   >
                     {form.customLogoSrc ? (
                       <React.Fragment>
-                        <img alt="Logo preview" className="max-h-12 w-auto object-contain" src={form.customLogoSrc} />
+                        <img
+                          alt="Logo preview"
+                          className="max-h-12 w-auto rounded object-contain"
+                          src={form.customLogoSrc}
+                          style={CHECKERBOARD_STYLE}
+                        />
                         <span className="text-muted-foreground text-xs">
                           {t({ en: 'Click to replace', fr: 'Cliquez pour remplacer' })}
                         </span>

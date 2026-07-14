@@ -81,8 +81,11 @@ const $BrandingConfig = z.object({
   boldTagline: z.boolean().nullish(),
   /** Custom logo height in pixels, used when logoSize is 'custom' */
   customLogoHeight: z.number().int().positive().max(5000).nullish(),
-  /** The uploaded logo image as a data URI (SVG, PNG, JPEG, …); used when logoSource is 'upload' */
-  customLogoSrc: z.string().max(3_000_000).nullish(),
+  /**
+   * The uploaded logo image as a data URI (SVG, PNG, JPEG, …); used when logoSource is 'upload'.
+   * The limit accommodates a 5 MB source image, which is ~6.99M characters once base64-encoded.
+   */
+  customLogoSrc: z.string().max(7_500_000).nullish(),
   /** An external logo image URL; used when logoSource is 'url' */
   customLogoUrl: z.string().url().max(2000).nullish(),
   /** Custom logo width in pixels, used when logoSize is 'custom' */
