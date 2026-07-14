@@ -1,6 +1,6 @@
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { ConfigService, LoggingService } from '@douglasneuroinformatics/libnest';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnprocessableEntityException } from '@nestjs/common';
 import type { OnApplicationBootstrap } from '@nestjs/common';
 import { getSeriesInstrumentItems } from '@opendatacapture/instrument-utils';
 import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
@@ -35,6 +35,47 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
   onApplicationBootstrap() {
     setInterval(() => void this.sync(), this.refreshInterval);
+  }
+
+  async sync() {
+    const setupState = await this.setupService.getState();
+    if (!setupState.isSetup) {
+      this.loggingService.log('Will not attempt synchronizing with gateway: app is not setup');
+      return;
+    }
+
+    this.loggingService.log('Synchronizing with gateway...');
+    let remoteAssignments: RemoteAssignment[];
+    try {
+      remoteAssignments = await this.gatewayService.fetchRemoteAssignments();
+    } catch (err) {
+      this.loggingService.error({
+        cause: err,
+        error: 'Failed to Fetch Remote Assignments'
+      });
+      return;
+    }
+
+    for (const assignment of remoteAssignments) {
+      // A failure for one assignment must not prevent the others from being synchronized. The status
+      // is left untouched so the assignment is retried on the next interval.
+      try {
+        if (assignment.status === 'OUTSTANDING') {
+          continue;
+        } else if (assignment.status === 'COMPLETE') {
+          await this.handleAssignmentComplete(assignment);
+        } else {
+          await this.gatewayService.deleteRemoteAssignment(assignment.id);
+        }
+        await this.assignmentsService.updateStatusById(assignment.id, assignment.status);
+      } catch (err) {
+        this.loggingService.error({
+          cause: err,
+          error: `Failed to synchronize remote assignment with ID: ${assignment.id}`
+        });
+      }
+    }
+    this.loggingService.log('Done synchronizing with gateway');
   }
 
   private async handleAssignmentComplete(remoteAssignment: RemoteAssignment) {
@@ -98,9 +139,10 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       for (let i = 0; i < cipherTexts.length; i++) {
         const cipherText = cipherTexts[i]!;
         const symmetricKey = symmetricKeys[i]!;
+        const internal = instrument.kind === 'SERIES' ? seriesItems![i]! : instrument.internal;
         const instrumentId =
           instrument.kind === 'SERIES'
-            ? this.instrumentsService.generateScalarInstrumentId({ internal: seriesItems![i]! })
+            ? this.instrumentsService.generateScalarInstrumentId({ internal })
             : instrument.id;
         let decryptedData: string;
         try {
@@ -122,16 +164,38 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
           throw err;
         }
 
-        try {
-          const record = await this.instrumentRecordsService.create({
+        const createRecord = (instrumentId: string) => {
+          return this.instrumentRecordsService.create({
             assignmentId: assignment.id,
             data,
-            date: remoteAssignment.completedAt,
+            date: remoteAssignment.completedAt!,
             groupId: assignment.groupId ?? undefined,
             instrumentId,
             sessionId: session.id,
             subjectId: assignment.subjectId
           });
+        };
+
+        try {
+          let record: Awaited<ReturnType<typeof createRecord>>;
+          try {
+            record = await createRecord(instrumentId);
+          } catch (err) {
+            // The data may have been submitted against an instrument whose validation schema was
+            // since corrected in a subsequent edition, in which case it can only be ingested by
+            // validating it against that edition instead.
+            if (!(err instanceof UnprocessableEntityException)) {
+              throw err;
+            }
+            const latestId = await this.instrumentsService.findLatestScalarEditionId({ internal });
+            if (latestId === instrumentId) {
+              throw err;
+            }
+            this.loggingService.warn(
+              `Data for instrument '${internal.name}' (edition ${internal.edition}) failed validation against its own schema; retrying against the latest edition with id '${latestId}'`
+            );
+            record = await createRecord(latestId);
+          }
           this.loggingService.log(`Created record with ID: ${record.id}`);
           createdRecordIds.push(record.id);
         } catch (err) {
@@ -146,39 +210,9 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         await this.instrumentRecordsService.deleteById(id);
         this.loggingService.log(`Deleted record with ID: ${id}`);
       }
+      await this.sessionsService.deleteById(session.id);
+      this.loggingService.log(`Deleted session with ID: ${session.id}`);
       throw err;
     }
-  }
-
-  private async sync() {
-    const setupState = await this.setupService.getState();
-    if (!setupState.isSetup) {
-      this.loggingService.log('Will not attempt synchronizing with gateway: app is not setup');
-      return;
-    }
-
-    this.loggingService.log('Synchronizing with gateway...');
-    let remoteAssignments: RemoteAssignment[];
-    try {
-      remoteAssignments = await this.gatewayService.fetchRemoteAssignments();
-    } catch (err) {
-      this.loggingService.error({
-        cause: err,
-        error: 'Failed to Fetch Remote Assignments'
-      });
-      return;
-    }
-
-    for (const assignment of remoteAssignments) {
-      if (assignment.status === 'OUTSTANDING') {
-        continue;
-      } else if (assignment.status === 'COMPLETE') {
-        await this.handleAssignmentComplete(assignment);
-      } else {
-        await this.gatewayService.deleteRemoteAssignment(assignment.id);
-      }
-      await this.assignmentsService.updateStatusById(assignment.id, assignment.status);
-    }
-    this.loggingService.log('Done synchronizing with gateway');
   }
 }
