@@ -24,7 +24,6 @@ vi.mock('@douglasneuroinformatics/libcrypto', () => ({
 }));
 
 const CURRENT_EDITION_ID = 'instrument-edition-1';
-const LATEST_EDITION_ID = 'instrument-edition-2';
 
 describe('GatewaySynchronizer', () => {
   let gatewaySynchronizer: GatewaySynchronizer;
@@ -82,7 +81,6 @@ describe('GatewaySynchronizer', () => {
       internal: { edition: 1, name: 'HAPPINESS_QUESTIONNAIRE' },
       kind: 'FORM'
     });
-    instrumentsService.findLatestScalarEditionId.mockResolvedValue(CURRENT_EDITION_ID);
     sessionsService.create.mockResolvedValue({ id: 'session-1' });
     vi.mocked(HybridCrypto).decrypt.mockResolvedValue(JSON.stringify({ score: 1 }));
   });
@@ -98,28 +96,10 @@ describe('GatewaySynchronizer', () => {
       expect(instrumentRecordsService.create).toHaveBeenCalledWith(
         expect.objectContaining({ instrumentId: CURRENT_EDITION_ID })
       );
-      expect(instrumentsService.findLatestScalarEditionId).not.toHaveBeenCalled();
       expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledWith('assignment-1');
     });
 
-    it('should retry against the latest edition when the data fails validation', async () => {
-      gatewayService.fetchRemoteAssignments.mockResolvedValue([createRemoteAssignment('assignment-1')]);
-      instrumentsService.findLatestScalarEditionId.mockResolvedValue(LATEST_EDITION_ID);
-      instrumentRecordsService.create
-        .mockRejectedValueOnce(new UnprocessableEntityException('Data received for record does not pass validation'))
-        .mockResolvedValueOnce({ id: 'record-1' });
-
-      await gatewaySynchronizer.sync();
-
-      expect(instrumentRecordsService.create).toHaveBeenCalledTimes(2);
-      expect(instrumentRecordsService.create).toHaveBeenLastCalledWith(
-        expect.objectContaining({ instrumentId: LATEST_EDITION_ID })
-      );
-      expect(instrumentRecordsService.deleteById).not.toHaveBeenCalled();
-      expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledWith('assignment-1');
-    });
-
-    it('should not retry when the data fails validation and there is no newer edition', async () => {
+    it('should not delete the remote assignment when the data fails validation', async () => {
       gatewayService.fetchRemoteAssignments.mockResolvedValue([createRemoteAssignment('assignment-1')]);
       instrumentRecordsService.create.mockRejectedValue(new UnprocessableEntityException('Failed validation'));
 
