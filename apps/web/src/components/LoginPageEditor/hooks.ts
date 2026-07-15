@@ -187,7 +187,7 @@ export const useBrandingForm = () => {
       return;
     } else if (file.size > MAX_LOGO_BYTES) {
       addNotification({
-        message: t({ en: 'The selected image is larger than 5 MB.', fr: "L'image sélectionnée dépasse 5 Mo." }),
+        message: t({ en: 'The selected image is larger than 2 MB.', fr: "L'image sélectionnée dépasse 2 Mo." }),
         title: t({ en: 'File too large', fr: 'Fichier trop volumineux' }),
         type: 'error'
       });

@@ -47,7 +47,7 @@ export const Sidebar = () => {
       {showSidebarGroupSwitcher && (
         <div className="mb-2">
           {isSingleGroup ? (
-            <div className="bg-primary text-primary-foreground flex h-9 w-full items-center justify-center rounded-md text-sm font-semibold">
+            <div className="flex h-9 w-full items-center justify-center rounded-md bg-sky-700 text-sm font-semibold text-slate-100">
               {currentGroup.name}
             </div>
           ) : (
@@ -55,7 +55,7 @@ export const Sidebar = () => {
               value={currentGroup.id}
               onValueChange={(id) => changeGroup(currentUser.groups.find((g) => g.id === id)!)}
             >
-              <Select.Trigger className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary [&>svg]:text-primary-foreground/80 w-full border-transparent font-semibold [&>svg]:opacity-100">
+              <Select.Trigger className="w-full border-transparent bg-sky-700 font-semibold text-slate-100 hover:bg-sky-600 focus:ring-sky-600 [&>svg]:text-slate-300 [&>svg]:opacity-100">
                 <Select.Value />
               </Select.Trigger>
               <Select.Content>
