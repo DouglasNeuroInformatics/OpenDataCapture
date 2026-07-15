@@ -3,9 +3,9 @@ import type { ReactNode } from 'react';
 
 import { replacer } from '@douglasneuroinformatics/libjs';
 import { Spinner } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
-import type { AnyScalarInstrument } from '@opendatacapture/runtime-core';
+import type { AnyScalarInstrument, AnyUnilingualScalarInstrument, Json } from '@opendatacapture/runtime-core';
 import type { ScalarInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { match } from 'ts-pattern';
 
@@ -17,6 +17,7 @@ import { InstrumentSummary } from '../InstrumentSummary';
 import { InteractiveContent } from '../InteractiveContent';
 import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
+import { validateSubmission } from './validateSubmission';
 
 import type { LocalizedText, SubjectDisplayInfo } from '../../types';
 import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
@@ -56,11 +57,27 @@ export const ScalarInstrumentRenderer = ({
   target
 }: ScalarInstrumentRendererProps) => {
   const [data, setData] = useState<unknown>();
-  const interpreted = useInterpretedInstrument(target.bundle, options);
+  const interpreted = useInterpretedInstrument<AnyUnilingualScalarInstrument>(target.bundle, options);
   const [index, setIndex] = useState<0 | 1 | 2>(0);
   const { t } = useTranslation();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
 
   const handleSubmit = async ({ data, ...result }: AnyContentResult) => {
+    if (interpreted.status === 'DONE') {
+      const serializedData = JSON.parse(JSON.stringify(data, replacer)) as Json;
+      const validationResult = validateSubmission(interpreted.instrument, serializedData);
+      if (!validationResult.success) {
+        console.error(validationResult.issues);
+        addNotification({
+          message: t({
+            en: 'The information submitted is invalid and cannot be saved. Please contact the platform administrator.',
+            fr: "Les informations soumises sont invalides et ne peuvent pas être enregistrées. Veuillez contacter l'administrateur de la plateforme."
+          }),
+          type: 'error'
+        });
+        return;
+      }
+    }
     await onSubmit?.({
       ...result,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

@@ -37,6 +37,47 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     setInterval(() => void this.sync(), this.refreshInterval);
   }
 
+  async sync() {
+    const setupState = await this.setupService.getState();
+    if (!setupState.isSetup) {
+      this.loggingService.log('Will not attempt synchronizing with gateway: app is not setup');
+      return;
+    }
+
+    this.loggingService.log('Synchronizing with gateway...');
+    let remoteAssignments: RemoteAssignment[];
+    try {
+      remoteAssignments = await this.gatewayService.fetchRemoteAssignments();
+    } catch (err) {
+      this.loggingService.error({
+        cause: err,
+        error: 'Failed to Fetch Remote Assignments'
+      });
+      return;
+    }
+
+    for (const assignment of remoteAssignments) {
+      // A failure for one assignment must not prevent the others from being synchronized. The status
+      // is left untouched so the assignment is retried on the next interval.
+      try {
+        if (assignment.status === 'OUTSTANDING') {
+          continue;
+        } else if (assignment.status === 'COMPLETE') {
+          await this.handleAssignmentComplete(assignment);
+        } else {
+          await this.gatewayService.deleteRemoteAssignment(assignment.id);
+        }
+        await this.assignmentsService.updateStatusById(assignment.id, assignment.status);
+      } catch (err) {
+        this.loggingService.error({
+          cause: err,
+          error: `Failed to synchronize remote assignment with ID: ${assignment.id}`
+        });
+      }
+    }
+    this.loggingService.log('Done synchronizing with gateway');
+  }
+
   private async handleAssignmentComplete(remoteAssignment: RemoteAssignment) {
     if (!remoteAssignment.encryptedData) {
       throw new Error(`Data is undefined for completed remote assignment with id '${remoteAssignment.id}'`);
@@ -148,39 +189,9 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         await this.instrumentRecordsService.deleteById(id);
         this.loggingService.log(`Deleted record with ID: ${id}`);
       }
+      await this.sessionsService.deleteById(session.id);
+      this.loggingService.log(`Deleted session with ID: ${session.id}`);
       throw err;
     }
-  }
-
-  private async sync() {
-    const setupState = await this.setupService.getState();
-    if (!setupState.isSetup) {
-      this.loggingService.log('Will not attempt synchronizing with gateway: app is not setup');
-      return;
-    }
-
-    this.loggingService.log('Synchronizing with gateway...');
-    let remoteAssignments: RemoteAssignment[];
-    try {
-      remoteAssignments = await this.gatewayService.fetchRemoteAssignments();
-    } catch (err) {
-      this.loggingService.error({
-        cause: err,
-        error: 'Failed to Fetch Remote Assignments'
-      });
-      return;
-    }
-
-    for (const assignment of remoteAssignments) {
-      if (assignment.status === 'OUTSTANDING') {
-        continue;
-      } else if (assignment.status === 'COMPLETE') {
-        await this.handleAssignmentComplete(assignment);
-      } else {
-        await this.gatewayService.deleteRemoteAssignment(assignment.id);
-      }
-      await this.assignmentsService.updateStatusById(assignment.id, assignment.status);
-    }
-    this.loggingService.log('Done synchronizing with gateway');
   }
 }
