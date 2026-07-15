@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 
-import { Button, LanguageToggle, Separator, Sheet, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import {
+  Button,
+  LanguageToggle,
+  Select,
+  Separator,
+  Sheet,
+  ThemeToggle
+} from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding } from '@opendatacapture/react-core';
 import { useNavigate } from '@tanstack/react-router';
@@ -11,10 +18,14 @@ import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
 
 import { NavButton } from '../NavButton';
+import { NavGroup } from '../NavGroup';
 import { UserDropup } from '../UserDropup';
 
 export const Navbar = () => {
+  const changeGroup = useAppStore((store) => store.changeGroup);
+  const currentGroup = useAppStore((store) => store.currentGroup);
   const currentSession = useAppStore((store) => store.currentSession);
+  const currentUser = useAppStore((store) => store.currentUser);
   const [isOpen, setIsOpen] = useState(false);
   const navItems = useNavItems();
   const { t } = useTranslation('layout');
@@ -58,24 +69,68 @@ export const Navbar = () => {
           <Branding className="h-10" fontSize="md" />
         </Sheet.Header>
         <Separator />
+        {currentGroup && currentUser && currentUser.groups.length > 0 && (
+          <div className="px-3 py-2">
+            {currentUser.groups.length === 1 ? (
+              <div className="bg-primary text-primary-foreground flex h-9 w-full items-center justify-center rounded-md text-sm font-semibold">
+                {currentGroup.name}
+              </div>
+            ) : (
+              <Select
+                value={currentGroup.id}
+                onValueChange={(id) => changeGroup(currentUser.groups.find((g) => g.id === id)!)}
+              >
+                <Select.Trigger className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary [&>svg]:text-primary-foreground/80 w-full border-transparent font-semibold [&>svg]:opacity-100">
+                  <Select.Value />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Group>
+                    {currentUser.groups.map((group) => (
+                      <Select.Item key={group.id} value={group.id}>
+                        {group.name}
+                      </Select.Item>
+                    ))}
+                  </Select.Group>
+                </Select.Content>
+              </Select>
+            )}
+          </div>
+        )}
+        <Separator />
         <nav className="flex w-full grow flex-col divide-y divide-slate-200 overflow-auto dark:divide-slate-700">
           {navItems.map((items, i) => (
             <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
-              {items.map(({ disabled, url, ...props }) => (
-                <NavButton
-                  activeClassName="bg-slate-200 text-slate-900 dark:text-slate-100 dark:bg-slate-800"
-                  className="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
-                  disabled={disabled && location.pathname !== url}
-                  isActive={location.pathname === url}
-                  key={url}
-                  url={url}
-                  onClick={() => {
-                    setIsOpen(false);
-                    void navigate({ to: url });
-                  }}
-                  {...props}
-                />
-              ))}
+              {items.map(({ disabled, url, ...props }) =>
+                props.children ? (
+                  <NavGroup
+                    activeClassName="bg-slate-200 text-slate-900 dark:text-slate-100 dark:bg-slate-800"
+                    childClassName="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
+                    className="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
+                    icon={props.icon}
+                    items={props.children}
+                    key={props.label}
+                    label={props.label}
+                    onNavigate={(to) => {
+                      setIsOpen(false);
+                      void navigate({ to });
+                    }}
+                  />
+                ) : (
+                  <NavButton
+                    activeClassName="bg-slate-200 text-slate-900 dark:text-slate-100 dark:bg-slate-800"
+                    className="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
+                    disabled={disabled && location.pathname !== url}
+                    isActive={location.pathname === url}
+                    key={url}
+                    url={url!}
+                    onClick={() => {
+                      setIsOpen(false);
+                      void navigate({ to: url! });
+                    }}
+                    {...props}
+                  />
+                )
+              )}
               {i === navItems.length - 1 && (
                 <NavButton
                   activeClassName="bg-slate-200 text-slate-900"

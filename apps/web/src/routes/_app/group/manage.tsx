@@ -537,6 +537,7 @@ const RouteComponent = () => {
       </PageHeader>
       <WithFallback
         Component={ManageGroupForm}
+        key={currentGroup?.id}
         props={{
           data,
           onSubmit: async (data) => {

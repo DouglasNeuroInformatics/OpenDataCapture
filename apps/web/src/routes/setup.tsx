@@ -68,11 +68,6 @@ const RouteComponent = () => {
               {
                 description: t('setup.demo.description'),
                 fields: {
-                  enableExperimentalFeatures: {
-                    kind: 'boolean',
-                    label: t('setup.enableExperimentalFeatures'),
-                    variant: 'radio'
-                  },
                   initDemo: {
                     kind: 'boolean',
                     label: t('setup.demo.init'),
@@ -115,9 +110,7 @@ const RouteComponent = () => {
               }
             ]}
             data-testid="setup-form"
-            initialValues={{
-              enableExperimentalFeatures: false
-            }}
+            initialValues={{}}
             submitBtnLabel={t('core.submit')}
             validationSchema={z
               .object({
@@ -130,7 +123,6 @@ const RouteComponent = () => {
                   .refine((val) => estimatePasswordStrength(val).success, t('common.insufficientPasswordStrength')),
                 confirmPassword: z.string().min(1),
                 initDemo: z.boolean(),
-                enableExperimentalFeatures: z.boolean(),
                 recordsPerSubject: z.number().int().nonnegative().optional(),
                 dummySubjectCount: z.number().int().nonnegative().optional()
               })
@@ -146,7 +138,6 @@ const RouteComponent = () => {
               })}
             onSubmit={async ({
               dummySubjectCount,
-              enableExperimentalFeatures,
               firstName,
               initDemo,
               lastName,
@@ -162,7 +153,7 @@ const RouteComponent = () => {
                   username
                 },
                 dummySubjectCount,
-                enableExperimentalFeatures,
+                enableExperimentalFeatures: false,
                 initDemo,
                 recordsPerSubject
               });

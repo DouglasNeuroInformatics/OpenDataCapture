@@ -6,6 +6,7 @@ import { immer } from 'zustand/middleware/immer';
 import { createAuthSlice } from './slices/auth.slice';
 import { createConnectivitySlice } from './slices/connectivity.slice';
 import { createDisclaimerSlice } from './slices/disclaimer.slice';
+import { createPreferencesSlice } from './slices/preferences.slice';
 import { createSessionSlice } from './slices/session.slice';
 import { createWalkthroughSlice } from './slices/walkthrough.slice';
 
@@ -18,6 +19,7 @@ export const useAppStore = create(
         ...createAuthSlice(...a),
         ...createConnectivitySlice(...a),
         ...createDisclaimerSlice(...a),
+        ...createPreferencesSlice(...a),
         ...createSessionSlice(...a),
         ...createWalkthroughSlice(...a)
       })),
@@ -28,7 +30,7 @@ export const useAppStore = create(
         // would make the walkthrough reappear after an update.
         migrate: (persistedState) => persistedState as AppStore,
         name: 'app',
-        partialize: (state) => pick(state, ['isDisclaimerAccepted', 'isWalkthroughComplete']),
+        partialize: (state) => pick(state, ['groupSwitcherPosition', 'isDisclaimerAccepted', 'isWalkthroughComplete']),
         storage: createJSONStorage(() => localStorage),
         version: 1
       }

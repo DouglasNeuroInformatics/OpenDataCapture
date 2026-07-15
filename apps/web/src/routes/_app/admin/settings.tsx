@@ -1,23 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Form, Heading } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { UpdateSetupStateData } from '@opendatacapture/schemas/setup';
+import { Button, Card, Heading, HoverCard, Select } from '@douglasneuroinformatics/libui/components';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute } from '@tanstack/react-router';
-import type { SetNonNullable } from 'type-fest';
-import { z } from 'zod/v4';
+import { CircleHelpIcon } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateSetupStateMutation } from '@/hooks/useUpdateSetupStateMutation';
+import { useAppStore } from '@/store';
+import type { GroupSwitcherPosition } from '@/store/types';
+
+const Toggle = ({ checked, onCheckedChange }: { checked: boolean; onCheckedChange: (val: boolean) => void }) => (
+  <button
+    aria-checked={checked}
+    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${checked ? 'bg-primary' : 'bg-muted'}`}
+    role="switch"
+    type="button"
+    onClick={() => onCheckedChange(!checked)}
+  >
+    <span
+      className={`bg-background pointer-events-none block h-5 w-5 rounded-full shadow-lg ring-0 transition-transform ${checked ? 'translate-x-5' : 'translate-x-0'}`}
+    />
+  </button>
+);
 
 const RouteComponent = () => {
   const { t } = useTranslation();
   const setupStateQuery = useSetupStateQuery();
   const updateSetupStateMutation = useUpdateSetupStateMutation();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
+  const groupSwitcherPosition = useAppStore((store) => store.groupSwitcherPosition);
+  const setGroupSwitcherPosition = useAppStore((store) => store.setGroupSwitcherPosition);
 
-  const handleSubmit = (data: UpdateSetupStateData) => {
-    updateSetupStateMutation.mutate(data);
+  const [uploaderEnabled, setUploaderEnabled] = useState(
+    () => setupStateQuery.data?.isExperimentalFeaturesEnabled ?? false
+  );
+
+  const handleSave = () => {
+    updateSetupStateMutation.mutate(
+      { isExperimentalFeaturesEnabled: uploaderEnabled },
+      {
+        onSuccess: () => {
+          addNotification({ type: 'success' });
+        }
+      }
+    );
   };
 
   return (
@@ -25,37 +53,71 @@ const RouteComponent = () => {
       <PageHeader>
         <Heading className="text-center" variant="h2">
           {t({
-            en: 'Modify Application Settings',
-            fr: "Modifier les paramètres de l'application"
+            en: 'Application Settings',
+            fr: "Paramètres de l'application"
           })}
         </Heading>
       </PageHeader>
-      <Form
-        className="mx-auto max-w-3xl"
-        content={[
-          {
-            fields: {
-              isExperimentalFeaturesEnabled: {
-                kind: 'boolean',
-                label: t('setup.enableExperimentalFeatures'),
-                variant: 'radio'
-              }
-            },
-            title: t({
-              en: 'Features',
-              fr: 'Fonctionnalités'
-            })
-          }
-        ]}
-        initialValues={setupStateQuery.data}
-        preventResetValuesOnReset={true}
-        validationSchema={
-          z.object({
-            isExperimentalFeaturesEnabled: z.boolean()
-          }) satisfies z.ZodType<Pick<SetNonNullable<UpdateSetupStateData>, 'isExperimentalFeaturesEnabled'>>
-        }
-        onSubmit={handleSubmit}
-      />
+      <div className="mx-auto max-w-4xl">
+        <Card>
+          <Card.Header>
+            <Card.Title className="text-lg font-bold">{t({ en: 'Features', fr: 'Fonctionnalités' })}</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium">{t({ en: 'Enable Uploader', fr: 'Activer le téléversement' })}</p>
+                <HoverCard>
+                  <HoverCard.Trigger asChild>
+                    <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
+                      <CircleHelpIcon className="h-4 w-4" />
+                    </button>
+                  </HoverCard.Trigger>
+                  <HoverCard.Content className="w-72 text-sm">
+                    {t({
+                      en: 'When enabled, an Upload menu item appears in the sidebar that allows users to upload instrument records directly from data files, bypassing the normal session workflow.',
+                      fr: "Lorsqu'elle est activée, un élément de menu Téléversement apparaît dans le menu latéral et permet aux utilisateurs de téléverser des enregistrements d'instruments directement à partir de fichiers de données."
+                    })}
+                  </HoverCard.Content>
+                </HoverCard>
+              </div>
+              <Toggle checked={uploaderEnabled} onCheckedChange={setUploaderEnabled} />
+            </div>
+          </Card.Content>
+          <hr className="border-border" />
+          <Card.Header>
+            <Card.Title className="text-lg font-bold">{t({ en: 'Preferences', fr: 'Préférences' })}</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm font-medium">
+                {t({ en: 'Group Switcher Position', fr: 'Position du sélecteur de groupe' })}
+              </p>
+              <Select
+                value={groupSwitcherPosition}
+                onValueChange={(value) => setGroupSwitcherPosition(value as GroupSwitcherPosition)}
+              >
+                <Select.Trigger className="w-[180px] shrink-0">
+                  <Select.Value />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Group>
+                    <Select.Item value="sidebar">{t({ en: 'Sidebar Menu', fr: 'Menu latéral' })}</Select.Item>
+                    <Select.Item value="topbar">
+                      {t({ en: 'Top Right Corner', fr: 'Coin supérieur droit' })}
+                    </Select.Item>
+                  </Select.Group>
+                </Select.Content>
+              </Select>
+            </div>
+          </Card.Content>
+        </Card>
+        <div className="mt-6 flex justify-center">
+          <Button className="w-36" onClick={handleSave}>
+            {t({ en: 'Save', fr: 'Enregistrer' })}
+          </Button>
+        </div>
+      </div>
     </React.Fragment>
   );
 };

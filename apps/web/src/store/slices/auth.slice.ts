@@ -18,6 +18,8 @@ const parseAccessToken = (accessToken: string) => {
   };
 };
 
+const PREFERRED_GROUP_KEY = 'odc-preferred-group-id';
+
 export const createAuthSlice: SliceCreator<AuthSlice> = (set) => {
   const accessToken = window.__PLAYWRIGHT_ACCESS_TOKEN__ ?? null;
   const initialState = accessToken ? parseAccessToken(accessToken) : null;
@@ -25,15 +27,18 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set) => {
   return {
     accessToken,
     changeGroup: (group) => {
+      localStorage.setItem(PREFERRED_GROUP_KEY, group.id);
       set({ currentGroup: group, currentSession: null });
     },
     currentGroup: initialState?.currentGroup ?? null,
     currentUser: initialState?.currentUser ?? null,
     login: (accessToken) => {
       const { currentGroup, currentUser } = parseAccessToken(accessToken);
+      const preferredId = localStorage.getItem(PREFERRED_GROUP_KEY);
+      const preferred = preferredId ? currentUser.groups.find((g) => g.id === preferredId) : null;
       set({
         accessToken,
-        currentGroup,
+        currentGroup: preferred ?? currentGroup,
         currentUser
       });
     },

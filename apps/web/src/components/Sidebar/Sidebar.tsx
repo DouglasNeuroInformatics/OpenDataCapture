@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
-import { Button, Dialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog, LanguageToggle, Select, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding } from '@opendatacapture/react-core';
 import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
@@ -13,11 +13,16 @@ import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
 
 import { NavButton } from '../NavButton';
+import { NavGroup } from '../NavGroup';
 import { UserDropup } from '../UserDropup';
 
 export const Sidebar = () => {
   const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false);
 
+  const changeGroup = useAppStore((store) => store.changeGroup);
+  const currentGroup = useAppStore((store) => store.currentGroup);
+  const currentUser = useAppStore((store) => store.currentUser);
+  const groupSwitcherPosition = useAppStore((store) => store.groupSwitcherPosition);
   const navItems = useNavItems();
   const currentSession = useAppStore((store) => store.currentSession);
   const endSession = useAppStore((store) => store.endSession);
@@ -25,6 +30,11 @@ export const Sidebar = () => {
   const navigate = useNavigate();
 
   const { t } = useTranslation();
+
+  const showSidebarGroupSwitcher =
+    groupSwitcherPosition === 'sidebar' && currentGroup && currentUser && currentUser.groups.length > 0;
+  const isSingleGroup = currentUser?.groups.length === 1;
+
   return (
     <div
       className="flex h-screen w-[19rem] flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700"
@@ -34,18 +44,50 @@ export const Sidebar = () => {
         <Branding className="h-12" fontSize="md" logoVariant="light" />
       </div>
       <hr className="my-2 h-[1px] border-none bg-slate-700" />
+      {showSidebarGroupSwitcher && (
+        <div className="mb-2">
+          {isSingleGroup ? (
+            <div className="bg-primary text-primary-foreground flex h-9 w-full items-center justify-center rounded-md text-sm font-semibold">
+              {currentGroup.name}
+            </div>
+          ) : (
+            <Select
+              value={currentGroup.id}
+              onValueChange={(id) => changeGroup(currentUser.groups.find((g) => g.id === id)!)}
+            >
+              <Select.Trigger className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary [&>svg]:text-primary-foreground/80 w-full border-transparent font-semibold [&>svg]:opacity-100">
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Group>
+                  {currentUser.groups.map((group) => (
+                    <Select.Item key={group.id} value={group.id}>
+                      {group.name}
+                    </Select.Item>
+                  ))}
+                </Select.Group>
+              </Select.Content>
+            </Select>
+          )}
+          <hr className="mt-2 h-[1px] border-none bg-slate-700" />
+        </div>
+      )}
       <nav className="flex w-full flex-col divide-y divide-slate-700">
         {navItems.map((items, i) => (
           <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
-            {items.map(({ disabled, url, ...props }) => (
-              <NavButton
-                disabled={disabled && location.pathname !== url}
-                isActive={location.pathname === url}
-                key={url}
-                url={url}
-                {...props}
-              />
-            ))}
+            {items.map(({ disabled, url, ...props }) =>
+              props.children ? (
+                <NavGroup icon={props.icon} items={props.children} key={props.label} label={props.label} />
+              ) : (
+                <NavButton
+                  disabled={disabled && location.pathname !== url}
+                  isActive={location.pathname === url}
+                  key={url}
+                  url={url!}
+                  {...props}
+                />
+              )
+            )}
             {i === navItems.length - 1 && (
               <Dialog open={isEndSessionModalOpen} onOpenChange={setIsEndSessionModalOpen}>
                 <Dialog.Trigger asChild>
