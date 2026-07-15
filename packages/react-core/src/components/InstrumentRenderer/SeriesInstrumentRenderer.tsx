@@ -3,9 +3,9 @@ import type { ReactNode } from 'react';
 
 import { replacer } from '@douglasneuroinformatics/libjs';
 import { Button, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { getSeriesInstrumentParams } from '@opendatacapture/instrument-utils';
-import type { Json, UnilingualSeriesInstrument } from '@opendatacapture/runtime-core';
+import type { AnyUnilingualScalarInstrument, Json, UnilingualSeriesInstrument } from '@opendatacapture/runtime-core';
 import type { SeriesInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { CircleCheckIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
@@ -16,6 +16,7 @@ import { InstrumentOverview } from '../InstrumentOverview';
 import { InteractiveContent } from '../InteractiveContent';
 import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
+import { validateSubmission } from './validateSubmission';
 
 import type { SubjectDisplayInfo } from '../../types';
 import type { FormContentSubmitResult } from '../FormContent';
@@ -54,12 +55,13 @@ export const SeriesInstrumentRenderer = ({
     return initialSeriesIndex;
   });
   const { t } = useTranslation();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
 
   const scalarBundle = target.items[currentItemIndex]?.bundle;
   const scalarId = target.items[currentItemIndex]?.id;
 
   const rootState = useInterpretedInstrument<UnilingualSeriesInstrument>(target.bundle);
-  const scalarState = useInterpretedInstrument(scalarBundle ?? '');
+  const scalarState = useInterpretedInstrument<AnyUnilingualScalarInstrument>(scalarBundle ?? '');
 
   const [isInstrumentInProgress, setIsInstrumentInProgress] = useState(false);
   const [completion, setCompletion] = useState<null | { itemName?: string; terminated: boolean }>(null);
@@ -69,6 +71,20 @@ export const SeriesInstrumentRenderer = ({
 
   const handleSubmit = async ({ data }: FormContentSubmitResult | InteractiveContentSubmitResult) => {
     const parsedData = JSON.parse(JSON.stringify(data, replacer)) as Json;
+    if (scalarState.status === 'DONE') {
+      const validationResult = validateSubmission(scalarState.instrument, parsedData);
+      if (!validationResult.success) {
+        console.error(validationResult.issues);
+        addNotification({
+          message: t({
+            en: 'The information submitted is invalid and cannot be saved. Please contact the platform administrator.',
+            fr: "Les informations soumises sont invalides et ne peuvent pas être enregistrées. Veuillez contacter l'administrateur de la plateforme."
+          }),
+          type: 'error'
+        });
+        return;
+      }
+    }
     const isLastItem = currentItemIndex === target.items.length - 1;
     // `scalarState` is DONE here (its content is what was just submitted); its
     // `internal.name` gives the item name for the predicate context.
