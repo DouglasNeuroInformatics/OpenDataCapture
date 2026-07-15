@@ -213,23 +213,6 @@ export class InstrumentsService {
     return Array.from(results.values());
   }
 
-  /**
-   * Resolve the id of the most recent edition of a scalar instrument. Since the id is derived from
-   * the name and edition, successive editions can be probed without instantiating any bundle.
-   */
-  async findLatestScalarEditionId({ internal: { edition, name } }: Pick<AnyScalarInstrument, 'internal'>) {
-    let latestId = this.generateScalarInstrumentId({ internal: { edition, name } });
-    let nextEdition = edition + 1;
-    while (true) {
-      const nextId = this.generateScalarInstrumentId({ internal: { edition: nextEdition, name } });
-      if (!(await this.instrumentModel.exists({ id: nextId }))) {
-        return latestId;
-      }
-      latestId = nextId;
-      nextEdition++;
-    }
-  }
-
   generateInstrumentId(instrument: AnyInstrument) {
     if (isScalarInstrument(instrument)) {
       return this.generateScalarInstrumentId(instrument);
