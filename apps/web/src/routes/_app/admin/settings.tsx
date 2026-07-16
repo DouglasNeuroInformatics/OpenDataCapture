@@ -75,7 +75,7 @@ const RouteComponent = () => {
                   </HoverCard.Trigger>
                   <HoverCard.Content className="w-72 text-sm">
                     {t({
-                      en: 'When enabled, an Upload menu item appears in the sidebar that allows users to upload instrument records directly from data files, bypassing the normal session workflow.',
+                      en: 'When enabled, an upload menu item appears in the sidebar that allows users to upload instrument records directly from data files, bypassing the normal session workflow.',
                       fr: "Lorsqu'elle est activée, un élément de menu Téléversement apparaît dans le menu latéral et permet aux utilisateurs de téléverser des enregistrements d'instruments directement à partir de fichiers de données."
                     })}
                   </HoverCard.Content>
