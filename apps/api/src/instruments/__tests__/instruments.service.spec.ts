@@ -3,7 +3,7 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { Test } from '@nestjs/testing';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { InstrumentsService } from '../instruments.service';
 
@@ -29,5 +29,26 @@ describe('InstrumentsService', () => {
   it('should be defined', () => {
     expect(instrumentsService).toBeDefined();
     expect(instrumentModel).toBeDefined();
+  });
+
+  describe('findInfo', () => {
+    beforeEach(() => {
+      const instances = [
+        { details: { title: 'Happiness Questionnaire' }, id: 'id-1', internal: { edition: 1, name: 'HQ' } },
+        { details: { title: 'Happiness Questionnaire' }, id: 'id-2', internal: { edition: 2, name: 'HQ' } }
+      ] as Awaited<ReturnType<InstrumentsService['find']>>;
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue(instances);
+      instrumentModel.findMany.mockResolvedValue([]);
+    });
+
+    it('should return only the latest edition of each instrument by default', async () => {
+      const result = await instrumentsService.findInfo();
+      expect(result.map((info) => info.id)).toEqual(['id-2']);
+    });
+
+    it('should return every edition when allEditions is set', async () => {
+      const result = await instrumentsService.findInfo({ allEditions: true });
+      expect(result.map((info) => info.id)).toEqual(['id-1', 'id-2']);
+    });
   });
 });

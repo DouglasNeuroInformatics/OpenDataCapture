@@ -22,7 +22,13 @@ const mockDownloadFn = vi.fn();
 
 const mockExcelDownloadFn = vi.hoisted(() => vi.fn());
 
-const mockInfoQuery = {
+const mockInfoQuery: {
+  data: {
+    details: { title: string };
+    id: string;
+    internal?: { edition: number; name: string };
+  }[];
+} = {
   data: []
 };
 
@@ -82,6 +88,7 @@ vi.mock('@/hooks/useFindSessionQuery', () => ({
 describe('useInstrumentVisualization', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockInfoQuery.data = [];
   });
 
   describe('CSV', () => {
@@ -209,6 +216,21 @@ describe('useInstrumentVisualization', () => {
           Variable: 'someValue'
         }
       ]);
+    });
+  });
+  describe('editions', () => {
+    it('should list only the latest edition of an instrument, with every edition available as an option', async () => {
+      mockInfoQuery.data = [
+        { details: { title: 'Happiness Questionnaire' }, id: 'hq-1', internal: { edition: 1, name: 'HQ' } },
+        { details: { title: 'Happiness Questionnaire' }, id: 'hq-2', internal: { edition: 2, name: 'HQ' } }
+      ];
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
+      expect(result.current.instrumentOptions).toEqual({ 'hq-2': 'Happiness Questionnaire' });
+      expect(result.current.editionOptions).toEqual({});
+      act(() => result.current.setInstrumentId('hq-1'));
+      await waitFor(() => {
+        expect(Object.keys(result.current.editionOptions)).toEqual(['hq-1', 'hq-2']);
+      });
     });
   });
   describe('JSON', () => {

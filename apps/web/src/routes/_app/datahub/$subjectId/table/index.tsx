@@ -5,6 +5,7 @@ import { ActionDropdown, DataTable, TanstackTable } from '@douglasneuroinformati
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute } from '@tanstack/react-router';
 
+import { SelectEdition } from '@/components/SelectEdition';
 import { SelectInstrument } from '@/components/SelectInstrument';
 import { TimeDropdown } from '@/components/TimeDropdown';
 import { useInstrumentVisualization } from '@/hooks/useInstrumentVisualization';
@@ -13,9 +14,10 @@ import type { InstrumentVisualizationRecord } from '@/hooks/useInstrumentVisuali
 const RouteComponent = () => {
   const navigate = Route.useNavigate();
   const params = Route.useParams();
-  const { dl, instrumentId, instrumentOptions, records, setInstrumentId, setMinDate } = useInstrumentVisualization({
-    params: { subjectId: params.subjectId }
-  });
+  const { dl, editionOptions, instrumentId, instrumentOptions, records, setInstrumentId, setMinDate } =
+    useInstrumentVisualization({
+      params: { subjectId: params.subjectId }
+    });
 
   const { t } = useTranslation();
 
@@ -41,8 +43,9 @@ const RouteComponent = () => {
     <div>
       <div className="mb-3">
         <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
-          <div className="flex">
+          <div className="flex flex-col gap-2 lg:flex-row">
             <SelectInstrument options={instrumentOptions} onSelect={setInstrumentId} />
+            <SelectEdition options={editionOptions} value={instrumentId} onSelect={setInstrumentId} />
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
             <TimeDropdown disabled={!instrumentId} setMinTime={setMinDate} />
