@@ -18,6 +18,7 @@ import {
   RIGHT_PANEL_OPTIONS,
   URL_PATTERN
 } from './constants';
+import { readLogoAsWebpDataUrl } from './image';
 
 import type { RightPanelOption } from './constants';
 import type { FormState } from './types';
@@ -197,6 +198,8 @@ export const useBrandingForm = () => {
       });
       return;
     } else if (file.size > MAX_LOGO_BYTES) {
+      // Checked against the file as picked; the stored copy is usually far
+      // smaller, since a raster upload is re-encoded to WebP below.
       addNotification({
         message: t({ en: 'The selected image is larger than 2 MB.', fr: "L'image sélectionnée dépasse 2 Mo." }),
         title: t({ en: 'File too large', fr: 'Fichier trop volumineux' }),
@@ -204,9 +207,19 @@ export const useBrandingForm = () => {
       });
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => update('customLogoSrc', reader.result as string);
-    reader.readAsDataURL(file);
+    readLogoAsWebpDataUrl(file)
+      .then((dataUrl) => update('customLogoSrc', dataUrl))
+      .catch((error: unknown) => {
+        console.error(error);
+        addNotification({
+          message: t({
+            en: 'The selected file could not be read as an image.',
+            fr: "Le fichier sélectionné n'a pas pu être lu comme une image."
+          }),
+          title: t({ en: 'Invalid image', fr: 'Image invalide' }),
+          type: 'error'
+        });
+      });
   };
 
   // ── Derived ──────────────────────────────────────────────────────────────

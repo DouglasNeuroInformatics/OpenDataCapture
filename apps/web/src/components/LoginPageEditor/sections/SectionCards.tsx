@@ -92,8 +92,8 @@ const LogoCard = ({ editor }: CardProps) => {
     <Card key="logo">
       <SectionHeader
         description={t({
-          en: 'Upload an image up to 2 MB (SVG, PNG, JPEG, WebP) or link to one.',
-          fr: "Téléversez une image jusqu'à 2 Mo (SVG, PNG, JPEG, WebP) ou indiquez un lien."
+          en: 'Upload an image up to 2 MB (SVG, PNG, JPEG, WebP) or link to one. PNG and JPEG uploads are converted to WebP to save space.',
+          fr: "Téléversez une image jusqu'à 2 Mo (SVG, PNG, JPEG, WebP) ou indiquez un lien. Les téléversements PNG et JPEG sont convertis en WebP pour économiser de l'espace."
         })}
         editor={editor}
         section="logo"
