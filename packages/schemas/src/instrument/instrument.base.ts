@@ -232,6 +232,7 @@ type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = Omit<T, 'conten
   id: string;
   internal?: {
     edition: number;
+    name: string;
   };
   // Provenance: null when uploaded manually; otherwise the source repository id (always present) and
   // its name (may be null for legacy instruments imported before names were stored).

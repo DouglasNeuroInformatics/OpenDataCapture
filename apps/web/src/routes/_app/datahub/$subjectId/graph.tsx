@@ -9,6 +9,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import html2canvas from 'html2canvas';
 
 import { LineGraph } from '@/components/LineGraph';
+import { SelectEdition } from '@/components/SelectEdition';
 import { SelectInstrument } from '@/components/SelectInstrument';
 import { TimeDropdown } from '@/components/TimeDropdown';
 import { useGraphData } from '@/hooks/useGraphData';
@@ -22,7 +23,7 @@ const RouteComponent = () => {
   const downloadCanvas = useDownload();
   const currentGroup = useAppStore((store) => store.currentGroup);
   const params = Route.useParams();
-  const { instrument, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate } =
+  const { editionOptions, instrument, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate } =
     useInstrumentVisualization({
       params: {
         kind: 'FORM',
@@ -109,6 +110,16 @@ const RouteComponent = () => {
             <div data-testid="instrument-select-dropdown-container">
               <SelectInstrument
                 options={instrumentOptions}
+                onSelect={(id) => {
+                  setInstrumentId(id);
+                  setSelectedMeasures([]);
+                }}
+              />
+            </div>
+            <div data-testid="edition-select-dropdown-container">
+              <SelectEdition
+                options={editionOptions}
+                value={instrumentId}
                 onSelect={(id) => {
                   setInstrumentId(id);
                   setSelectedMeasures([]);

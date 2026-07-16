@@ -40,6 +40,11 @@ type InstrumentQuery<TKind extends InstrumentKind> = {
   subjectId?: string;
 };
 
+type InstrumentInfoQuery<TKind extends InstrumentKind> = InstrumentQuery<TKind> & {
+  /** whether to include every edition of instruments sharing the same internal name, rather than only the latest (default false) */
+  allEditions?: boolean;
+};
+
 @Injectable()
 export class InstrumentsService {
   constructor(
@@ -172,7 +177,7 @@ export class InstrumentsService {
   }
 
   async findInfo<TKind extends InstrumentKind>(
-    query: InstrumentQuery<TKind> = {},
+    { allEditions = false, ...query }: InstrumentInfoQuery<TKind> = {},
     options: EntityOperationOptions = {}
   ): Promise<InstrumentInfo[]> {
     const instances = await this.find(query, options);
@@ -201,7 +206,7 @@ export class InstrumentsService {
           name: source.sourceRepoName ?? null
         };
       }
-      if (!info.internal) {
+      if (!info.internal || allEditions) {
         results.set(info.id, info);
         continue;
       }

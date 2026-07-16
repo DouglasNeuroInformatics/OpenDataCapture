@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualScalarInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
+import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { omit } from 'lodash-es';
 import { unparse } from 'papaparse';
@@ -44,7 +45,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   const instrument = useInstrument(instrumentId) as AnyUnilingualScalarInstrument;
 
   const instrumentInfoQuery = useInstrumentInfoQuery({
-    params: { kind: params.kind, subjectId: params.subjectId }
+    params: { allEditions: true, kind: params.kind, subjectId: params.subjectId }
   });
   const recordsQuery = useInstrumentRecords({
     enabled: instrumentId !== null,
@@ -253,14 +254,49 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   }, [recordsQuery.data, sessionsUsernameQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
+    // only show the latest edition of each instrument; older editions are selectable via editionOptions
+    const latestInstruments = new Map<string, TranslatedInstrumentInfo>();
+    for (const info of instrumentInfoQuery.data ?? []) {
+      const key = info.internal?.name ?? info.id;
+      const currentEntry = latestInstruments.get(key);
+      if (!currentEntry || (info.internal?.edition ?? 0) > (currentEntry.internal?.edition ?? 0)) {
+        latestInstruments.set(key, info);
+      }
+    }
     const options: { [key: string]: string } = {};
-    for (const instrument of instrumentInfoQuery.data ?? []) {
-      options[instrument.id] = instrument.details.title;
+    for (const info of latestInstruments.values()) {
+      options[info.id] = info.details.title;
     }
     return options;
   }, [instrumentInfoQuery.data]);
 
-  return { dl, instrument, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate };
+  const editionOptions: { [key: string]: string } = useMemo(() => {
+    const infos = instrumentInfoQuery.data ?? [];
+    const selectedName = infos.find((info) => info.id === instrumentId)?.internal?.name;
+    if (!selectedName) {
+      return {};
+    }
+    const options: { [key: string]: string } = {};
+    infos
+      .filter((info) => info.internal?.name === selectedName)
+      .sort((a, b) => a.internal!.edition - b.internal!.edition)
+      .forEach((info) => {
+        options[info.id] = `${t({ en: 'Edition', fr: 'Édition' })} ${info.internal!.edition}`;
+      });
+    return options;
+  }, [instrumentInfoQuery.data, instrumentId]);
+
+  return {
+    dl,
+    editionOptions,
+    instrument,
+    instrumentId,
+    instrumentOptions,
+    minDate,
+    records,
+    setInstrumentId,
+    setMinDate
+  };
 }
 
 export type { InstrumentVisualizationRecord };
