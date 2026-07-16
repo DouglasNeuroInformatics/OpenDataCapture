@@ -7,7 +7,13 @@ import { LOGO_ALIGNMENTS, LOGO_SIZES } from '@opendatacapture/schemas/setup';
 import type { LogoAlignment, LogoSize, LogoSource, PanelSection } from '@opendatacapture/schemas/setup';
 import { PlusIcon, TrashIcon, UploadIcon, XIcon } from 'lucide-react';
 
-import { LOGO_ALIGNMENT_LABELS, LOGO_SIZE_LABELS, SECTION_TITLES, URL_PATTERN } from '../constants';
+import {
+  ACCEPTED_LOGO_MIME_TYPES,
+  LOGO_ALIGNMENT_LABELS,
+  LOGO_SIZE_LABELS,
+  SECTION_TITLES,
+  URL_PATTERN
+} from '../constants';
 import { FontSizeField } from '../fields/FontSizeField';
 import { SectionHeader } from '../fields/SectionHeader';
 
@@ -86,8 +92,8 @@ const LogoCard = ({ editor }: CardProps) => {
     <Card key="logo">
       <SectionHeader
         description={t({
-          en: 'Upload an image up to 2 MB (SVG, PNG, JPEG) or link to one.',
-          fr: "Téléversez une image jusqu'à 2 Mo (SVG, PNG, JPEG) ou indiquez un lien."
+          en: 'Upload an image up to 2 MB (SVG, PNG, JPEG, WebP) or link to one.',
+          fr: "Téléversez une image jusqu'à 2 Mo (SVG, PNG, JPEG, WebP) ou indiquez un lien."
         })}
         editor={editor}
         section="logo"
@@ -116,7 +122,7 @@ const LogoCard = ({ editor }: CardProps) => {
               </div>
               <div className="pl-6">
                 <input
-                  accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                  accept={ACCEPTED_LOGO_MIME_TYPES.join(',')}
                   className="hidden"
                   ref={fileInputRef}
                   type="file"

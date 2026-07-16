@@ -10,6 +10,7 @@ import { useUpdateSetupStateMutation } from '@/hooks/useUpdateSetupStateMutation
 import { LOGIN_THEME_COLORS } from '@/utils/branding';
 
 import {
+  ACCEPTED_LOGO_MIME_TYPES,
   DEFAULT_PANEL_TEXT_COLOR,
   DEFAULT_SECTIONS_ORDER,
   HEX_PATTERN,
@@ -184,6 +185,16 @@ export const useBrandingForm = () => {
 
   const handleLogoFile = (file: File | undefined) => {
     if (!file) {
+      return;
+    } else if (!(ACCEPTED_LOGO_MIME_TYPES as readonly string[]).includes(file.type)) {
+      addNotification({
+        message: t({
+          en: 'The selected file must be an SVG, PNG, JPEG, or WebP image.',
+          fr: 'Le fichier sélectionné doit être une image SVG, PNG, JPEG ou WebP.'
+        }),
+        title: t({ en: 'Unsupported file type', fr: 'Type de fichier non pris en charge' }),
+        type: 'error'
+      });
       return;
     } else if (file.size > MAX_LOGO_BYTES) {
       addNotification({

@@ -66,6 +66,12 @@ export const HEX_PATTERN = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 /** Accept http(s) URLs with a hostname containing at least one dot (e.g. example.com). */
 export const URL_PATTERN = /^https?:\/\/[^\s/]+\.[^\s/]+(\/\S*)?$/;
 export const MAX_LOGO_BYTES = 2 * 1024 * 1024;
+/**
+ * Image types accepted for the uploaded login image. Drives both the file input's
+ * `accept` hint and the post-selection check in `handleLogoFile` — the hint alone
+ * is advisory, since the OS picker lets the user override it with "All Files".
+ */
+export const ACCEPTED_LOGO_MIME_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'] as const;
 export const FORM_ID = 'branding-form';
 /** Sentinel Select value representing "no override — use the default font size". */
 export const FONT_SIZE_DEFAULT = 'default';
