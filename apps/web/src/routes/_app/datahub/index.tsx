@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
@@ -338,7 +338,16 @@ const MasterDataTable: React.FC<{
 
   const [hasRecords, setHasRecords] = useState(false);
   const [searchString, setSearchString] = useState('');
-  const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
+  const handleRowHighlight = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const row = (e.target as HTMLElement).closest<HTMLElement>('[data-testid="data-table-row"]');
+    if (!row) return;
+    const body = row.closest('[data-testid="data-table-body"]');
+    if (!body) return;
+    for (const r of body.querySelectorAll<HTMLElement>('[data-testid="data-table-row"]')) {
+      r.style.backgroundColor = '';
+    }
+    row.style.backgroundColor = 'var(--color-accent)';
+  }, []);
 
   const subjectsData = useSubjectsQuery({
     params: { groupId: currentGroup?.id, hasRecord: hasRecords || undefined }
@@ -358,20 +367,13 @@ const MasterDataTable: React.FC<{
   }, []);
 
   return (
-    <div>
+    <div onClick={handleRowHighlight}>
       <DataTable
         columns={[
           {
             accessorFn: (subject) => removeSubjectIdScope(subject.id),
             cell: (ctx) => {
-              const subject = ctx.row.original;
-              const value = (ctx.getValue() as string).slice(0, subjectIdDisplaySetting ?? 9);
-              return (
-                <span className="flex items-center">
-                  {value}
-                  <span className="hidden" data-row-selected={highlightedRowId === subject.id ? 'true' : 'false'} />
-                </span>
-              );
+              return (ctx.getValue() as string).slice(0, subjectIdDisplaySetting ?? 9);
             },
             filterFn: (row, id, filter: HasSearchStringFilter) => {
               const value = row.getValue(id);
@@ -455,7 +457,7 @@ const MasterDataTable: React.FC<{
           }
         ]}
         togglesComponent={TogglesWithFilter}
-        onRowClick={(subject) => setHighlightedRowId(subject.id)}
+        onRowClick={() => {}}
         onRowDoubleClick={onRowDoubleClick}
         onSearchChange={(value, table) => {
           setSearchString(value);

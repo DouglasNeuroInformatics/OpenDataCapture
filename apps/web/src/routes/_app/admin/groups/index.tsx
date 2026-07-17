@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { Button, Checkbox, DataTable, Dialog, Heading, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -28,7 +28,16 @@ const RouteComponent = () => {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [selectedRepoIds, setSelectedRepoIds] = useState<Set<string>>(new Set());
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
-  const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
+  const handleRowHighlight = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const row = (e.target as HTMLElement).closest<HTMLElement>('[data-testid="data-table-row"]');
+    if (!row) return;
+    const body = row.closest('[data-testid="data-table-body"]');
+    if (!body) return;
+    for (const r of body.querySelectorAll<HTMLElement>('[data-testid="data-table-row"]')) {
+      r.style.backgroundColor = '';
+    }
+    row.style.backgroundColor = 'var(--color-accent)';
+  }, []);
 
   const updateGroupReposMutation = useMutation({
     mutationFn: async ({ groupId, instrumentRepoIds }: { groupId: string; instrumentRepoIds: string[] }) => {
@@ -95,58 +104,50 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <DataTable
-        columns={[
-          {
-            accessorKey: 'name',
-            cell: (ctx) => {
-              const group = ctx.row.original;
-              return (
-                <span className="flex items-center">
-                  {group.name}
-                  <span className="hidden" data-row-selected={highlightedRowId === group.id ? 'true' : 'false'} />
-                </span>
-              );
+      <div onClick={handleRowHighlight}>
+        <DataTable
+          columns={[
+            {
+              accessorKey: 'name',
+              header: t('common.groupName')
             },
-            header: t('common.groupName')
-          },
-          {
-            accessorKey: 'type',
-            cell: (ctx) => {
-              const type = ctx.getValue() as Group['type'];
-              if (type === 'CLINICAL') {
-                return t('common.clinical');
-              } else if (type === 'RESEARCH') {
-                return t('common.research');
-              }
-              return type satisfies never;
-            },
-            header: t('common.groupType')
-          }
-        ]}
-        data={groupsQuery.data}
-        rowActions={[
-          {
-            label: t('common.manage'),
-            onSelect: setSelectedGroup
-          }
-        ]}
-        togglesComponent={() => (
-          <Button asChild variant="outline">
-            <Link to="/admin/groups/create">
-              {t({
-                en: 'Add Group',
-                fr: 'Ajouter un groupe'
-              })}
-            </Link>
-          </Button>
-        )}
-        onRowClick={(group) => setHighlightedRowId(group.id)}
-        onRowDoubleClick={(group) => {
-          setHighlightedRowId(group.id);
-          setSelectedGroup(group);
-        }}
-      />
+            {
+              accessorKey: 'type',
+              cell: (ctx) => {
+                const type = ctx.getValue() as Group['type'];
+                if (type === 'CLINICAL') {
+                  return t('common.clinical');
+                } else if (type === 'RESEARCH') {
+                  return t('common.research');
+                }
+                return type satisfies never;
+              },
+              header: t('common.groupType')
+            }
+          ]}
+          data={groupsQuery.data}
+          rowActions={[
+            {
+              label: t('common.manage'),
+              onSelect: setSelectedGroup
+            }
+          ]}
+          togglesComponent={() => (
+            <Button asChild variant="outline">
+              <Link to="/admin/groups/create">
+                {t({
+                  en: 'Add Group',
+                  fr: 'Ajouter un groupe'
+                })}
+              </Link>
+            </Button>
+          )}
+          onRowClick={() => {}}
+          onRowDoubleClick={(group) => {
+            setSelectedGroup(group);
+          }}
+        />
+      </div>
       <Sheet.Content className="flex flex-col p-0">
         <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
           <Sheet.Header className="px-6 pt-6">

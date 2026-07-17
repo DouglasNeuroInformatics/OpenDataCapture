@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { isAllUndefined, snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
@@ -342,7 +342,16 @@ const RouteComponent = () => {
   const deleteUserMutation = useDeleteUserMutation();
   const updateUserMutation = useUpdateUserMutation();
   const [selectedUser, setSelectedUser] = useState<null | User>(null);
-  const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
+  const handleRowHighlight = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const row = (e.target as HTMLElement).closest<HTMLElement>('[data-testid="data-table-row"]');
+    if (!row) return;
+    const body = row.closest('[data-testid="data-table-body"]');
+    if (!body) return;
+    for (const r of body.querySelectorAll<HTMLElement>('[data-testid="data-table-row"]')) {
+      r.style.backgroundColor = '';
+    }
+    row.style.backgroundColor = 'var(--color-accent)';
+  }, []);
 
   const [data, setData] = useState<null | UpdateUserFormInputData>(null);
 
@@ -381,60 +390,52 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <DataTable
-        columns={[
-          {
-            accessorKey: 'username',
-            cell: (ctx) => {
-              const user = ctx.row.original;
-              return (
-                <span className="flex items-center">
-                  {user.username}
-                  <span className="hidden" data-row-selected={highlightedRowId === user.id ? 'true' : 'false'} />
-                </span>
-              );
+      <div onClick={handleRowHighlight}>
+        <DataTable
+          columns={[
+            {
+              accessorKey: 'username',
+              header: t('common.username')
             },
-            header: t('common.username')
-          },
-          {
-            accessorKey: 'basePermissionLevel',
-            cell: (ctx) => {
-              const basePermissionLevel = ctx.getValue() as User['basePermissionLevel'];
-              if (!basePermissionLevel) {
-                return t({
-                  en: 'None',
-                  fr: 'Aucune'
-                });
-              }
-              return t(`common.${snakeToCamelCase(basePermissionLevel)}`);
-            },
-            header: t('common.basePermissionLevel')
-          }
-        ]}
-        data={usersQuery.data}
-        data-testid="admin-users-table"
-        rowActions={[
-          {
-            label: t('common.manage'),
-            onSelect: setSelectedUser
-          }
-        ]}
-        togglesComponent={() => (
-          <Button variant="outline">
-            <Link to="/admin/users/create">
-              {t({
-                en: 'Add User',
-                fr: 'Ajouter un utilisateur'
-              })}
-            </Link>
-          </Button>
-        )}
-        onRowClick={(user) => setHighlightedRowId(user.id)}
-        onRowDoubleClick={(user) => {
-          setHighlightedRowId(user.id);
-          setSelectedUser(user);
-        }}
-      />
+            {
+              accessorKey: 'basePermissionLevel',
+              cell: (ctx) => {
+                const basePermissionLevel = ctx.getValue() as User['basePermissionLevel'];
+                if (!basePermissionLevel) {
+                  return t({
+                    en: 'None',
+                    fr: 'Aucune'
+                  });
+                }
+                return t(`common.${snakeToCamelCase(basePermissionLevel)}`);
+              },
+              header: t('common.basePermissionLevel')
+            }
+          ]}
+          data={usersQuery.data}
+          data-testid="admin-users-table"
+          rowActions={[
+            {
+              label: t('common.manage'),
+              onSelect: setSelectedUser
+            }
+          ]}
+          togglesComponent={() => (
+            <Button variant="outline">
+              <Link to="/admin/users/create">
+                {t({
+                  en: 'Add User',
+                  fr: 'Ajouter un utilisateur'
+                })}
+              </Link>
+            </Button>
+          )}
+          onRowClick={() => {}}
+          onRowDoubleClick={(user) => {
+            setSelectedUser(user);
+          }}
+        />
+      </div>
       <Sheet.Content className="flex flex-col p-0" data-testid="admin-user-edit-sheet">
         <Sheet.Header className="px-6 pt-6">
           <Sheet.Title>{selectedUser?.username}</Sheet.Title>

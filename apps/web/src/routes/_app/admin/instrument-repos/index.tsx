@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { FormEvent } from 'react';
 
 import { Button, DataTable, Dialog, Heading, Input, Label, Spinner } from '@douglasneuroinformatics/libui/components';
@@ -117,7 +117,16 @@ const RouteComponent = () => {
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [repoToView, setRepoToView] = useState<InstrumentRepo | null>(null);
   const [repoToDelete, setRepoToDelete] = useState<InstrumentRepo | null>(null);
-  const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
+  const handleRowHighlight = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const row = (e.target as HTMLElement).closest<HTMLElement>('[data-testid="data-table-row"]');
+    if (!row) return;
+    const body = row.closest('[data-testid="data-table-body"]');
+    if (!body) return;
+    for (const r of body.querySelectorAll<HTMLElement>('[data-testid="data-table-row"]')) {
+      r.style.backgroundColor = '';
+    }
+    row.style.backgroundColor = 'var(--color-accent)';
+  }, []);
 
   // Compute which repos are currently assigned to at least one (live) group.
   const inUseRepoIds = new Set(groupsQuery.data.flatMap((group) => group.instrumentRepoIds));
@@ -158,86 +167,78 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <DataTable
-        columns={[
-          {
-            accessorKey: 'name',
-            cell: (ctx) => {
-              const repo = ctx.row.original;
-              return (
-                <span className="flex items-center">
-                  {repo.name}
-                  <span className="hidden" data-row-selected={highlightedRowId === repo.id ? 'true' : 'false'} />
-                </span>
-              );
+      <div onClick={handleRowHighlight}>
+        <DataTable
+          columns={[
+            {
+              accessorKey: 'name',
+              header: t({
+                en: 'Repository Name',
+                fr: 'Nom du dépôt'
+              })
             },
-            header: t({
-              en: 'Repository Name',
-              fr: 'Nom du dépôt'
-            })
-          },
-          {
-            accessorKey: 'url',
-            header: 'URL'
-          },
-          {
-            accessorFn: (row: InstrumentRepo) => row.instrumentIds.length,
-            header: t({
-              en: 'Instruments',
-              fr: 'Instruments'
-            }),
-            id: 'instrumentCount'
-          },
-          {
-            accessorFn: (row: InstrumentRepo) =>
-              row.lastSyncedAt ? new Date(row.lastSyncedAt).toLocaleDateString() : '-',
-            header: t({
-              en: 'Last Synced',
-              fr: 'Dernière synchronisation'
-            }),
-            id: 'lastSynced'
-          }
-        ]}
-        data={reposQuery.data}
-        rowActions={[
-          {
-            label: t({
-              en: 'Sync',
-              fr: 'Synchroniser'
-            }),
-            onSelect: (repo: InstrumentRepo) => {
-              syncRepoMutation.mutate({ id: repo.id });
+            {
+              accessorKey: 'url',
+              header: 'URL'
+            },
+            {
+              accessorFn: (row: InstrumentRepo) => row.instrumentIds.length,
+              header: t({
+                en: 'Instruments',
+                fr: 'Instruments'
+              }),
+              id: 'instrumentCount'
+            },
+            {
+              accessorFn: (row: InstrumentRepo) =>
+                row.lastSyncedAt ? new Date(row.lastSyncedAt).toLocaleDateString() : '-',
+              header: t({
+                en: 'Last Synced',
+                fr: 'Dernière synchronisation'
+              }),
+              id: 'lastSynced'
             }
-          },
-          {
-            label: t({
-              en: 'View',
-              fr: 'Voir'
-            }),
-            onSelect: (repo: InstrumentRepo) => {
-              setRepoToView(repo);
-              setIsViewOpen(true);
+          ]}
+          data={reposQuery.data}
+          rowActions={[
+            {
+              label: t({
+                en: 'Sync',
+                fr: 'Synchroniser'
+              }),
+              onSelect: (repo: InstrumentRepo) => {
+                syncRepoMutation.mutate({ id: repo.id });
+              }
+            },
+            {
+              label: t({
+                en: 'View',
+                fr: 'Voir'
+              }),
+              onSelect: (repo: InstrumentRepo) => {
+                setRepoToView(repo);
+                setIsViewOpen(true);
+              }
+            },
+            {
+              label: t('core.delete'),
+              onSelect: handleDeleteClick
             }
-          },
-          {
-            label: t('core.delete'),
-            onSelect: handleDeleteClick
-          }
-        ]}
-        togglesComponent={() => (
-          <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
-            {t({
-              en: 'Add Repository',
-              fr: 'Ajouter un dépôt'
-            })}
-          </Button>
-        )}
-        onRowClick={(repo) => setHighlightedRowId(repo.id)}
-        onRowDoubleClick={(repo) => {
-          setHighlightedRowId(repo.id);
-          syncRepoMutation.mutate({ id: repo.id });
-        }}
-      />
+          ]}
+          togglesComponent={() => (
+            <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
+              {t({
+                en: 'Add Repository',
+                fr: 'Ajouter un dépôt'
+              })}
+            </Button>
+          )}
+          onRowClick={() => {}}
+          onRowDoubleClick={(repo) => {
+            syncRepoMutation.mutate({ id: repo.id });
+          }}
+        />
+      </div>
       {isDialogOpen && (
         <Dialog.Content className="sm:max-w-[475px]">
           <Dialog.Header>
