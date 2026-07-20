@@ -253,6 +253,38 @@ describe('InstrumentRecordsService', () => {
         data: [expect.objectContaining({ instrumentId: 'instrument-1', subjectId: 'subject-1' })]
       });
     });
+
+    it('should return only the records this upload created, not every record in the group', async () => {
+      await instrumentRecordsService.upload({ ...baseUploadData, groupId: 'group-1' });
+
+      expect(instrumentRecordModel.findMany).toHaveBeenCalledWith({
+        where: { sessionId: { in: ['session-1'] } }
+      });
+      const [call] = instrumentRecordModel.findMany.mock.lastCall as [{ where: { [key: string]: unknown } }];
+      expect(call.where).not.toHaveProperty('groupId');
+      expect(call.where).not.toHaveProperty('instrumentId');
+    });
+
+    it('should reject an invalid record before creating any sessions', async () => {
+      instrumentsService.findById.mockResolvedValue({
+        ...mockInstrument,
+        validationSchema: { safeParse: () => ({ error: { issues: [] }, success: false }) }
+      } as any);
+
+      await expect(
+        instrumentRecordsService.upload({
+          ...baseUploadData,
+          records: [
+            { data: { answer: 1 }, date: new Date(), subjectId: 'subject-1' },
+            { data: { answer: 2 }, date: new Date(), subjectId: 'subject-2' }
+          ]
+        })
+      ).rejects.toBeInstanceOf(UnprocessableEntityException);
+
+      expect(sessionsService.create).not.toHaveBeenCalled();
+      expect(subjectsService.createMany).not.toHaveBeenCalled();
+      expect(instrumentRecordModel.createMany).not.toHaveBeenCalled();
+    });
   });
 
   describe('find', () => {
