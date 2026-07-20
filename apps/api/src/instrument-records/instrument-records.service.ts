@@ -24,7 +24,7 @@ import type {
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
 import { Prisma } from '@prisma/client';
-import type { InstrumentRecord as PrismaInstrumentRecord, Session } from '@prisma/client';
+import type { InstrumentRecord as PrismaInstrumentRecord } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
 
 import { accessibleQuery } from '@/auth/ability.utils';
@@ -34,7 +34,6 @@ import { GroupsService } from '@/groups/groups.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { StorageService } from '@/storage/storage.service';
-import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 
@@ -398,6 +397,14 @@ export class InstrumentRecordsService {
         `Cannot create instrument record for series instrument '${instrument.id}'`
       );
     }
+    // A bulk-uploaded file record could never be completed: the payload schema has nowhere to carry a
+    // file, this path never attaches one, and the response ids the client would need to attach one
+    // afterwards are discarded. Refuse it rather than write a record that can only ever be pending.
+    if (instrument.kind === 'FILE') {
+      throw new UnprocessableEntityException(
+        `Cannot create instrument record for file instrument '${instrument.id}': files cannot be attached to a bulk upload`
+      );
+    }
 
     if (username) {
       const user = await this.usersService.findByUsername(username, options);
@@ -409,70 +416,60 @@ export class InstrumentRecordsService {
       }
     }
 
-    const createdSessionsArray: Session[] = [];
+    // Every record is validated before anything is written, so a malformed record in the middle of a
+    // batch rejects the request without first creating sessions that then have to be rolled back.
+    const validatedRecords = records.map((record, index) => {
+      const parseResult = instrument.validationSchema.safeParse(this.parseJson(record.data));
+      if (!parseResult.success) {
+        throw new UnprocessableEntityException({
+          error: 'Unprocessable Entity',
+          issues: parseResult.error.issues,
+          message: `Data received for record at index ${index} does not pass validation schema of instrument '${instrument.id}'`,
+          statusCode: 422
+        });
+      }
+      return { data: parseResult.data, date: record.date, subjectId: record.subjectId };
+    });
 
+    // One batched call rather than one session creation per record, which cost several queries each.
+    // Returned in input order, so each record can be paired with its session by index.
+    const sessions = await this.sessionsService.createMany({
+      entries: validatedRecords.map((record) => ({
+        date: record.date,
+        subjectData: { id: record.subjectId }
+      })),
+      groupId: groupId ?? null,
+      type: 'RETROSPECTIVE',
+      username: username ?? undefined
+    });
+
+    // Only the insert is rolled back on failure. Deleting the sessions after it has succeeded would
+    // strand the records that now reference them, so the read-back below sits outside the catch.
     try {
-      const subjectIdList = records.map(({ subjectId }) => {
-        const subjectToAdd: CreateSubjectDto = { id: subjectId };
-
-        return subjectToAdd;
-      });
-
-      await this.subjectsService.createMany(subjectIdList);
-
-      const preProcessedRecords = await Promise.all(
-        records.map(async (record) => {
-          const { data: rawData, date, subjectId } = record;
-
-          // Validate data
-          const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
-          if (!parseResult.success) {
-            console.error(parseResult.error.issues);
-            throw new UnprocessableEntityException(
-              `Data received for record does not pass validation schema of instrument '${instrument.id}'`
-            );
-          }
-
-          const session = await this.sessionsService.create({
-            date: date,
-            groupId: groupId ?? null,
-            subjectData: { id: subjectId },
-            type: 'RETROSPECTIVE',
-            username: username ?? undefined
-          });
-
-          createdSessionsArray.push(session);
-
-          const computedMeasures = instrument.measures
-            ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
-            : null;
-
-          return {
-            computedMeasures,
-            data: this.serializeData(parseResult.data),
-            date,
-            groupId,
-            instrumentId,
-            pending: false,
-            sessionId: session.id,
-            subjectId
-          };
-        })
-      );
       await this.instrumentRecordModel.createMany({
-        data: preProcessedRecords
-      });
-
-      return this.instrumentRecordModel.findMany({
-        where: {
+        data: validatedRecords.map((record, index) => ({
+          computedMeasures: instrument.measures
+            ? this.instrumentMeasuresService.computeMeasures(instrument.measures, record.data)
+            : null,
+          data: this.serializeData(record.data),
+          date: record.date,
           groupId,
-          instrumentId
-        }
+          instrumentId,
+          pending: false,
+          sessionId: sessions[index]!.id,
+          subjectId: record.subjectId
+        }))
       });
     } catch (err) {
-      await this.sessionsService.deleteByIds(createdSessionsArray.map((session) => session.id));
+      await this.sessionsService.deleteByIds(sessions.map((session) => session.id));
       throw err;
     }
+
+    return this.instrumentRecordModel.findMany({
+      where: {
+        sessionId: { in: sessions.map((session) => session.id) }
+      }
+    });
   }
 
   private getInstrumentById(instrumentId: string) {
