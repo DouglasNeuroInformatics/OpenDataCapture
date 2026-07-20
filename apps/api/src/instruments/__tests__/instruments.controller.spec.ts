@@ -29,7 +29,7 @@ describe('InstrumentsController', () => {
     const currentUser = { ability, groups: [{ id: 'group-1' }, { id: 'group-2' }] } as any;
     instrumentsService.findInfo.mockResolvedValue([]);
 
-    await instrumentsController.findInfo(currentUser, 'group-1');
+    await instrumentsController.findInfo(currentUser, undefined, 'group-1');
 
     expect(instrumentsService.findInfo).toHaveBeenCalledWith(
       { kind: undefined, subjectId: undefined },

@@ -445,6 +445,7 @@ export class InstrumentRecordsService {
             date,
             groupId,
             instrumentId,
+            pending: false,
             sessionId: session.id,
             subjectId
           };
