@@ -2,7 +2,7 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { getModelToken } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -172,6 +172,38 @@ describe('InstrumentRecordsService', () => {
       expect(instrumentRecordModel.createMany).toHaveBeenCalledWith({
         data: [expect.objectContaining({ pending: false })]
       });
+    });
+
+    it('should return only the records this upload created, not every record in the group', async () => {
+      await instrumentRecordsService.upload({ ...baseUploadData, groupId: 'group-1' });
+
+      expect(instrumentRecordModel.findMany).toHaveBeenCalledWith({
+        where: { sessionId: { in: ['session-1'] } }
+      });
+      const [call] = instrumentRecordModel.findMany.mock.lastCall as [{ where: { [key: string]: unknown } }];
+      expect(call.where).not.toHaveProperty('groupId');
+      expect(call.where).not.toHaveProperty('instrumentId');
+    });
+
+    it('should reject an invalid record before creating any sessions', async () => {
+      instrumentsService.findById.mockResolvedValue({
+        ...mockInstrument,
+        validationSchema: { safeParse: () => ({ error: { issues: [] }, success: false }) }
+      } as any);
+
+      await expect(
+        instrumentRecordsService.upload({
+          ...baseUploadData,
+          records: [
+            { data: { answer: 1 }, date: new Date(), subjectId: 'subject-1' },
+            { data: { answer: 2 }, date: new Date(), subjectId: 'subject-2' }
+          ]
+        })
+      ).rejects.toBeInstanceOf(UnprocessableEntityException);
+
+      expect(sessionsService.create).not.toHaveBeenCalled();
+      expect(subjectsService.createMany).not.toHaveBeenCalled();
+      expect(instrumentRecordModel.createMany).not.toHaveBeenCalled();
     });
   });
 
