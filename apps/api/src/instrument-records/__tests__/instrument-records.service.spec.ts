@@ -240,13 +240,29 @@ describe('InstrumentRecordsService', () => {
       expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ username: undefined }));
     });
 
-    // `pending` is intentionally not written on create; the find-side OR filter treats missing and
-    // false `pending` alike (see the 'find' describe block), so records stay query-visible without it.
     it('should create records via createMany with the processed record data', async () => {
       await instrumentRecordsService.upload({ ...baseUploadData });
 
       expect(instrumentRecordModel.createMany).toHaveBeenCalledWith({
         data: [expect.objectContaining({ instrumentId: 'instrument-1', subjectId: 'subject-1' })]
+      });
+    });
+
+    it('should settle a form instrument record, since an upload carries its data in full', async () => {
+      await instrumentRecordsService.upload({ ...baseUploadData });
+
+      expect(instrumentRecordModel.createMany).toHaveBeenCalledWith({
+        data: [expect.objectContaining({ pending: false })]
+      });
+    });
+
+    it('should leave a file instrument record pending, so its files can still be attached', async () => {
+      instrumentsService.findById.mockResolvedValue({ ...mockInstrument, kind: 'FILE' } as any);
+
+      await instrumentRecordsService.upload({ ...baseUploadData });
+
+      expect(instrumentRecordModel.createMany).toHaveBeenCalledWith({
+        data: [expect.objectContaining({ pending: true })]
       });
     });
   });

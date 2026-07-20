@@ -445,7 +445,7 @@ export class InstrumentRecordsService {
             date,
             groupId,
             instrumentId,
-            pending: false,
+            pending: instrument.kind === 'FILE',
             sessionId: session.id,
             subjectId
           };
