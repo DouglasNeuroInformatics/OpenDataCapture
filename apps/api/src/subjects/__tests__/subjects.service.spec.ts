@@ -7,6 +7,7 @@ import { Test } from '@nestjs/testing';
 import { pick } from 'lodash-es';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { createAppAbility } from '@/auth/ability.utils';
 import type { RuntimePrismaClient } from '@/core/prisma';
 
 import { SubjectsService } from '../subjects.service';
@@ -30,7 +31,8 @@ describe('SubjectsService', () => {
             $transaction: vi.fn(),
             instrumentRecord: {
               deleteMany: vi.fn(),
-              findMany: vi.fn()
+              findMany: vi.fn(),
+              groupBy: vi.fn()
             },
             session: {
               deleteMany: vi.fn()
@@ -80,16 +82,9 @@ describe('SubjectsService', () => {
       await expect(subjectsService.find()).resolves.toMatchObject([{ id: '123' }]);
     });
     it('should return the array of subjects with records', async () => {
-      prismaClient.instrumentRecord.findMany.mockResolvedValueOnce([{ subjectId: '123' }]);
+      prismaClient.instrumentRecord.groupBy.mockResolvedValueOnce([{ subjectId: '123' }]);
       subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
       await expect(subjectsService.find({ hasRecord: true })).resolves.toMatchObject([{ id: '123' }]);
-      expect(prismaClient.instrumentRecord.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          distinct: ['subjectId'],
-          select: { subjectId: true },
-          where: {}
-        })
-      );
       expect(subjectModel.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
@@ -98,18 +93,41 @@ describe('SubjectsService', () => {
         })
       );
     });
+    // `distinct` is applied by the prisma query engine, so it returns one row per record over the
+    // wire; grouping asks mongodb for one row per subject instead.
+    it('should group the ids in the database rather than deduplicating them after the fact', async () => {
+      prismaClient.instrumentRecord.groupBy.mockResolvedValueOnce([{ subjectId: '123' }]);
+      subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
+      await subjectsService.find({ hasRecord: true });
+      expect(prismaClient.instrumentRecord.groupBy).toHaveBeenCalledWith(
+        expect.objectContaining({ by: ['subjectId'] })
+      );
+      expect(prismaClient.instrumentRecord.findMany).not.toHaveBeenCalled();
+    });
     it('should filter instrument records by groupId when provided', async () => {
-      prismaClient.instrumentRecord.findMany.mockResolvedValueOnce([{ subjectId: '123' }]);
+      prismaClient.instrumentRecord.groupBy.mockResolvedValueOnce([{ subjectId: '123' }]);
       subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
       await subjectsService.find({ groupId: 'group-1', hasRecord: true });
-      expect(prismaClient.instrumentRecord.findMany).toHaveBeenCalledWith(
+      expect(prismaClient.instrumentRecord.groupBy).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { groupId: 'group-1' }
+          where: { AND: [{}, { groupId: 'group-1' }] }
         })
       );
     });
+    it('should constrain the record query to what the caller may read', async () => {
+      prismaClient.instrumentRecord.groupBy.mockResolvedValueOnce([]);
+      subjectModel.findMany.mockResolvedValueOnce([]);
+      const ability = createAppAbility([
+        { action: 'read', subject: 'InstrumentRecord' },
+        { action: 'read', subject: 'Subject' }
+      ]);
+      await subjectsService.find({ hasRecord: true }, { ability });
+      const [call] = prismaClient.instrumentRecord.groupBy.mock.lastCall as [{ where: { AND: unknown[] } }];
+      // the ability contributes the first clause; without it the query would be unconstrained
+      expect(call.where.AND[0]).not.toStrictEqual({});
+    });
     it('should pass all subject IDs returned by instrument records to the subject query', async () => {
-      prismaClient.instrumentRecord.findMany.mockResolvedValueOnce([{ subjectId: '123' }, { subjectId: '456' }]);
+      prismaClient.instrumentRecord.groupBy.mockResolvedValueOnce([{ subjectId: '123' }, { subjectId: '456' }]);
       subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }, { id: '456' }]);
       await subjectsService.find({ hasRecord: true });
       expect(subjectModel.findMany).toHaveBeenCalledWith(
