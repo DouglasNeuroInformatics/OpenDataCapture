@@ -20,6 +20,11 @@ import { ChevronDownIcon, UserSearchIcon } from 'lucide-react';
 import { unpack } from 'msgpackr/unpack';
 import { unparse } from 'papaparse';
 
+import {
+  DataTableRowHighlight,
+  DataTableRowHighlightProvider,
+  dataTableRowHighlightRootStyle
+} from '@/components/DataTableRowHighlight';
 import { IdentificationForm } from '@/components/IdentificationForm';
 import { PageHeader } from '@/components/PageHeader';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
@@ -357,8 +362,6 @@ const MasterDataTable: React.FC<{
     return Component;
   }, []);
 
-  const highlightedRowIndex = highlightedRowId !== null ? displayData.findIndex((s) => s.id === highlightedRowId) : -1;
-
   const dataTable = useMemo(
     () => (
       <DataTable
@@ -366,7 +369,14 @@ const MasterDataTable: React.FC<{
           {
             accessorFn: (subject) => removeSubjectIdScope(subject.id),
             cell: (ctx) => {
-              return (ctx.getValue() as string).slice(0, subjectIdDisplaySetting ?? 9);
+              const subject = ctx.row.original;
+              const value = (ctx.getValue() as string).slice(0, subjectIdDisplaySetting ?? 9);
+              return (
+                <span className="flex items-center">
+                  {value}
+                  <DataTableRowHighlight rowId={subject.id} />
+                </span>
+              );
             },
             filterFn: (row, id, filter: HasSearchStringFilter) => {
               const value = row.getValue(id);
@@ -443,6 +453,7 @@ const MasterDataTable: React.FC<{
             }
           ]
         }}
+        rootStyle={dataTableRowHighlightRootStyle}
         rowActions={[
           {
             label: t({ en: 'View', fr: 'Voir' }),
@@ -464,15 +475,12 @@ const MasterDataTable: React.FC<{
         }}
       />
     ),
-    [displayData, t, subjectIdDisplaySetting, searchString, onSelect, onRowDoubleClick]
+    [displayData, onRowDoubleClick, onSelect, searchString, subjectIdDisplaySetting, t]
   );
 
   return (
     <div>
-      {highlightedRowIndex >= 0 && (
-        <style>{`[data-testid="data-table-body"] > [id="${highlightedRowIndex}"] { background-color: var(--color-accent) }`}</style>
-      )}
-      {dataTable}
+      <DataTableRowHighlightProvider rowId={highlightedRowId}>{dataTable}</DataTableRowHighlightProvider>
     </div>
   );
 };

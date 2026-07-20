@@ -1,13 +1,18 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 
 import { Button, DataTable, Dialog, Heading, Input, Label, Spinner } from '@douglasneuroinformatics/libui/components';
-import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useEventCallback, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
 import type { CreateInstrumentRepoData, InstrumentRepo } from '@opendatacapture/schemas/instrument-repo';
 import { createFileRoute } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 
+import {
+  DataTableRowHighlight,
+  DataTableRowHighlightProvider,
+  dataTableRowHighlightRootStyle
+} from '@/components/DataTableRowHighlight';
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateInstrumentRepoMutation } from '@/hooks/useCreateInstrumentRepoMutation';
 import { useDeleteInstrumentRepoMutation } from '@/hooks/useDeleteInstrumentRepoMutation';
@@ -122,7 +127,7 @@ const RouteComponent = () => {
   // Compute which repos are currently assigned to at least one (live) group.
   const inUseRepoIds = new Set(groupsQuery.data.flatMap((group) => group.instrumentRepoIds));
 
-  const handleDeleteClick = (repo: InstrumentRepo) => {
+  const handleDeleteClick = useEventCallback((repo: InstrumentRepo) => {
     if (inUseRepoIds.has(repo.id)) {
       addNotification({
         message: t({
@@ -135,12 +140,11 @@ const RouteComponent = () => {
     }
     setRepoToDelete(repo);
     setIsConfirmDeleteOpen(true);
-  };
+  });
 
-  const handleDeleteClickRef = useRef(handleDeleteClick);
-  handleDeleteClickRef.current = handleDeleteClick;
-
-  const highlightedRowIndex = reposQuery.data.findIndex((r) => r.id === highlightedRowId);
+  const handleSync = useEventCallback((repo: InstrumentRepo) => {
+    syncRepoMutation.mutate({ id: repo.id });
+  });
 
   const dataTable = useMemo(
     () => (
@@ -148,6 +152,15 @@ const RouteComponent = () => {
         columns={[
           {
             accessorKey: 'name',
+            cell: (ctx) => {
+              const repo = ctx.row.original;
+              return (
+                <span className="flex items-center">
+                  {repo.name}
+                  <DataTableRowHighlight rowId={repo.id} />
+                </span>
+              );
+            },
             header: t({
               en: 'Repository Name',
               fr: 'Nom du dépôt'
@@ -176,15 +189,14 @@ const RouteComponent = () => {
           }
         ]}
         data={reposQuery.data}
+        rootStyle={dataTableRowHighlightRootStyle}
         rowActions={[
           {
             label: t({
               en: 'Sync',
               fr: 'Synchroniser'
             }),
-            onSelect: (repo: InstrumentRepo) => {
-              syncRepoMutation.mutate({ id: repo.id });
-            }
+            onSelect: handleSync
           },
           {
             label: t({
@@ -198,7 +210,7 @@ const RouteComponent = () => {
           },
           {
             label: t('core.delete'),
-            onSelect: (repo: InstrumentRepo) => handleDeleteClickRef.current(repo)
+            onSelect: handleDeleteClick
           }
         ]}
         togglesComponent={() => (
@@ -210,12 +222,10 @@ const RouteComponent = () => {
           </Button>
         )}
         onRowClick={(repo) => setHighlightedRowId(repo.id)}
-        onRowDoubleClick={(repo) => {
-          syncRepoMutation.mutate({ id: repo.id });
-        }}
+        onRowDoubleClick={handleSync}
       />
     ),
-    [reposQuery.data, t]
+    [handleDeleteClick, handleSync, reposQuery.data, t]
   );
 
   return (
@@ -239,10 +249,7 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      {highlightedRowIndex >= 0 && (
-        <style>{`[data-testid="data-table-body"] > [id="${highlightedRowIndex}"] { background-color: var(--color-accent) }`}</style>
-      )}
-      {dataTable}
+      <DataTableRowHighlightProvider rowId={highlightedRowId}>{dataTable}</DataTableRowHighlightProvider>
       {isDialogOpen && (
         <Dialog.Content className="sm:max-w-[475px]">
           <Dialog.Header>

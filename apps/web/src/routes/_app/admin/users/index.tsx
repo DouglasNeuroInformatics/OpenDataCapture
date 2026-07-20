@@ -12,6 +12,11 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
 
+import {
+  DataTableRowHighlight,
+  DataTableRowHighlightProvider,
+  dataTableRowHighlightRootStyle
+} from '@/components/DataTableRowHighlight';
 import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
 import { useDeleteUserMutation } from '@/hooks/useDeleteUserMutation';
@@ -371,14 +376,21 @@ const RouteComponent = () => {
     }
   }, [groupsQuery.data, selectedUser]);
 
-  const highlightedRowIndex = usersQuery.data.findIndex((u) => u.id === highlightedRowId);
-
   const dataTable = useMemo(
     () => (
       <DataTable
         columns={[
           {
             accessorKey: 'username',
+            cell: (ctx) => {
+              const user = ctx.row.original;
+              return (
+                <span className="flex items-center">
+                  {user.username}
+                  <DataTableRowHighlight rowId={user.id} />
+                </span>
+              );
+            },
             header: t('common.username')
           },
           {
@@ -398,6 +410,7 @@ const RouteComponent = () => {
         ]}
         data={usersQuery.data}
         data-testid="admin-users-table"
+        rootStyle={dataTableRowHighlightRootStyle}
         rowActions={[
           {
             label: t('common.manage'),
@@ -434,10 +447,7 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      {highlightedRowIndex >= 0 && (
-        <style>{`[data-testid="data-table-body"] > [id="${highlightedRowIndex}"] { background-color: var(--color-accent) }`}</style>
-      )}
-      {dataTable}
+      <DataTableRowHighlightProvider rowId={highlightedRowId}>{dataTable}</DataTableRowHighlightProvider>
       <Sheet.Content className="flex flex-col p-0" data-testid="admin-user-edit-sheet">
         <Sheet.Header className="px-6 pt-6">
           <Sheet.Title>{selectedUser?.username}</Sheet.Title>

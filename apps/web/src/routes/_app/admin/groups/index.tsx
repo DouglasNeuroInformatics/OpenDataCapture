@@ -8,6 +8,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import axios from 'axios';
 
+import {
+  DataTableRowHighlight,
+  DataTableRowHighlightProvider,
+  dataTableRowHighlightRootStyle
+} from '@/components/DataTableRowHighlight';
 import { PageHeader } from '@/components/PageHeader';
 import { useDeleteGroupMutation } from '@/hooks/useDeleteGroupMutation';
 import { GROUPS_QUERY_KEY, groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
@@ -85,14 +90,21 @@ const RouteComponent = () => {
     });
   };
 
-  const highlightedRowIndex = groupsQuery.data.findIndex((g) => g.id === highlightedRowId);
-
   const dataTable = useMemo(
     () => (
       <DataTable
         columns={[
           {
             accessorKey: 'name',
+            cell: (ctx) => {
+              const group = ctx.row.original;
+              return (
+                <span className="flex items-center">
+                  {group.name}
+                  <DataTableRowHighlight rowId={group.id} />
+                </span>
+              );
+            },
             header: t('common.groupName')
           },
           {
@@ -110,6 +122,7 @@ const RouteComponent = () => {
           }
         ]}
         data={groupsQuery.data}
+        rootStyle={dataTableRowHighlightRootStyle}
         rowActions={[
           {
             label: t('common.manage'),
@@ -146,10 +159,7 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      {highlightedRowIndex >= 0 && (
-        <style>{`[data-testid="data-table-body"] > [id="${highlightedRowIndex}"] { background-color: var(--color-accent) }`}</style>
-      )}
-      {dataTable}
+      <DataTableRowHighlightProvider rowId={highlightedRowId}>{dataTable}</DataTableRowHighlightProvider>
       <Sheet.Content className="flex flex-col p-0">
         <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
           <Sheet.Header className="px-6 pt-6">
