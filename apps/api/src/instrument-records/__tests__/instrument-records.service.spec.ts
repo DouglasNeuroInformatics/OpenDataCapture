@@ -173,6 +173,16 @@ describe('InstrumentRecordsService', () => {
         data: [expect.objectContaining({ pending: false })]
       });
     });
+
+    it('should leave a file instrument record pending, so its files can still be attached', async () => {
+      instrumentsService.findById.mockResolvedValue({ ...mockInstrument, kind: 'FILE' } as any);
+
+      await instrumentRecordsService.upload({ ...baseUploadData });
+
+      expect(instrumentRecordModel.createMany).toHaveBeenCalledWith({
+        data: [expect.objectContaining({ pending: true })]
+      });
+    });
   });
 
   describe('find', () => {
