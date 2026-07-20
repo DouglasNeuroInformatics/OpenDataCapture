@@ -24,7 +24,7 @@ import type {
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
 import { Prisma } from '@prisma/client';
-import type { Session } from '@prisma/client';
+import type { InstrumentRecord as PrismaInstrumentRecord, Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
 
 import { accessibleQuery } from '@/auth/ability.utils';
@@ -53,6 +53,7 @@ import type {
 export class InstrumentRecordsService {
   constructor(
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
+    @InjectModel('Session') private readonly sessionModel: Model<'Session'>,
     private readonly groupsService: GroupsService,
     private readonly usersService: UsersService,
     private readonly instrumentMeasuresService: InstrumentMeasuresService,
@@ -274,7 +275,7 @@ export class InstrumentRecordsService {
       }
     });
 
-    return records;
+    return this.withSessionUsernames(records);
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
@@ -572,5 +573,29 @@ export class InstrumentRecordsService {
 
   private serializeData(data: unknown) {
     return JSON.parse(JSON.stringify(data, replacer)) as unknown;
+  }
+
+  /**
+   * Label each record with the user who conducted its session, so clients can show that column
+   * without fetching every session in the group.
+   *
+   * Deliberately a second scoped query rather than an `include` on the relation: `session` is
+   * declared required, so Prisma aborts the whole query with "Inconsistent query result" if any one
+   * record's session has since been deleted. Looking the sessions up by id degrades to a missing
+   * username for that record instead of a failed request.
+   */
+  private async withSessionUsernames(records: PrismaInstrumentRecord[]): Promise<InstrumentRecord[]> {
+    if (records.length === 0) {
+      return [];
+    }
+    const sessions = await this.sessionModel.findMany({
+      select: { id: true, user: { select: { username: true } } },
+      where: { id: { in: Array.from(new Set(records.map((record) => record.sessionId))) } }
+    });
+    const usernameBySessionId = new Map(sessions.map((session) => [session.id, session.user?.username ?? null]));
+    return records.map((record) => ({
+      ...record,
+      session: { user: { username: usernameBySessionId.get(record.sessionId) ?? null } }
+    }));
   }
 }
