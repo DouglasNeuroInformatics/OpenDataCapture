@@ -38,6 +38,18 @@ type HasSearchStringFilter = {
   searchString: string;
 };
 
+/**
+ * The subject ids currently listed by the table, for filtering an export down to them.
+ *
+ * Read one per row: iterating `getVisibleCells()` yields the row's id once per rendered column
+ * (including the row-actions column), so the ids arrive duplicated as many times as there are
+ * columns. A set also keeps the membership test that consumes this constant time rather than a
+ * linear scan per exported row.
+ */
+const getListedSubjectIds = (table: TanstackTable.Table<Subject>): Set<string> => {
+  return new Set(table.getPrePaginationRowModel().rows.map((row) => removeSubjectIdScope(row.original.id)));
+};
+
 const Filters: React.FC<{
   hasRecords: boolean;
   setHasRecords: (v: boolean) => void;
@@ -239,11 +251,9 @@ const Toggles: React.FC<{
 
     getExportRecords()
       .then((data): any => {
-        const listedSubjects = table
-          .getPrePaginationRowModel()
-          .rows.flatMap((row) => row.getVisibleCells().map((cell) => removeSubjectIdScope(cell.row.original.id)));
+        const listedSubjects = getListedSubjectIds(table);
 
-        const filteredData = data.filter((dataEntry) => listedSubjects.includes(dataEntry.subjectId));
+        const filteredData = data.filter((dataEntry) => listedSubjects.has(dataEntry.subjectId));
 
         if (filteredData.length < 1) {
           throw Error(
