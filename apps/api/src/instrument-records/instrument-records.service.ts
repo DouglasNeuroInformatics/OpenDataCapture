@@ -418,6 +418,11 @@ export class InstrumentRecordsService {
             date,
             groupId,
             instrumentId,
+            // Set explicitly rather than left absent: `find` only matches records missing the field
+            // through a compatibility clause kept for data predating file instruments, and a query
+            // filtering on `pending` directly would not see these records at all. Mirrors `create`,
+            // so a file instrument's record stays pending until its files have been attached.
+            pending: instrument.kind === 'FILE',
             sessionId: session.id,
             subjectId
           };
