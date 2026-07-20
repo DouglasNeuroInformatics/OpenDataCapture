@@ -21,6 +21,7 @@ import type { RecordType } from '../thread-types';
 describe('InstrumentRecordsService', () => {
   let instrumentRecordsService: InstrumentRecordsService;
   let instrumentRecordModel: MockedInstance<Model<'InstrumentRecord'>>;
+  let sessionModel: MockedInstance<Model<'Session'>>;
   let instrumentsService: MockedInstance<InstrumentsService>;
   let sessionsService: MockedInstance<SessionsService>;
   let subjectsService: MockedInstance<SubjectsService>;
@@ -31,6 +32,7 @@ describe('InstrumentRecordsService', () => {
       providers: [
         InstrumentRecordsService,
         MockFactory.createForModelToken(getModelToken('InstrumentRecord')),
+        MockFactory.createForModelToken(getModelToken('Session')),
         MockFactory.createForService(GroupsService),
         MockFactory.createForService(UsersService),
         MockFactory.createForService(InstrumentMeasuresService),
@@ -42,6 +44,7 @@ describe('InstrumentRecordsService', () => {
     }).compile();
 
     instrumentRecordModel = moduleRef.get(getModelToken('InstrumentRecord'));
+    sessionModel = moduleRef.get(getModelToken('Session'));
     instrumentRecordsService = moduleRef.get(InstrumentRecordsService);
     instrumentsService = moduleRef.get(InstrumentsService);
     sessionsService = moduleRef.get(SessionsService);
@@ -255,6 +258,7 @@ describe('InstrumentRecordsService', () => {
     beforeEach(() => {
       instrumentsService.find.mockResolvedValue([]);
       instrumentRecordModel.findMany.mockResolvedValue([]);
+      sessionModel.findMany.mockResolvedValue([]);
     });
 
     it('should match records where the pending field is missing entirely, since prisma NOT filters on mongodb exclude documents without the field', async () => {
@@ -269,6 +273,68 @@ describe('InstrumentRecordsService', () => {
           }
         })
       );
+    });
+
+    it('should not join the instrument, whose bundle is large and unused here', async () => {
+      await instrumentRecordsService.find({});
+
+      expect(instrumentRecordModel.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          include: expect.objectContaining({ instrument: false })
+        })
+      );
+    });
+
+    it("should label each record with its session user's username", async () => {
+      instrumentRecordModel.findMany.mockResolvedValueOnce([
+        { id: 'record-1', sessionId: 'session-1' },
+        { id: 'record-2', sessionId: 'session-2' }
+      ]);
+      sessionModel.findMany.mockResolvedValueOnce([
+        { id: 'session-1', user: { username: 'alice' } },
+        { id: 'session-2', user: null }
+      ]);
+
+      const records = await instrumentRecordsService.find({});
+
+      expect(records[0]).toMatchObject({ session: { user: { username: 'alice' } } });
+      expect(records[1]).toMatchObject({ session: { user: { username: null } } });
+    });
+
+    it('should look up only the sessions the returned records reference, deduplicated', async () => {
+      instrumentRecordModel.findMany.mockResolvedValueOnce([
+        { id: 'record-1', sessionId: 'session-1' },
+        { id: 'record-2', sessionId: 'session-1' },
+        { id: 'record-3', sessionId: 'session-2' }
+      ]);
+      sessionModel.findMany.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.find({});
+
+      expect(sessionModel.findMany).toHaveBeenCalledWith({
+        select: { id: true, user: { select: { username: true } } },
+        where: { id: { in: ['session-1', 'session-2'] } }
+      });
+    });
+
+    it('should not query sessions at all when there are no records', async () => {
+      instrumentRecordModel.findMany.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.find({});
+
+      expect(sessionModel.findMany).not.toHaveBeenCalled();
+    });
+
+    // A record whose session has been deleted must not take down the whole request. An `include` on
+    // the relation would, since `session` is declared required in the prisma schema.
+    it('should return a record whose session no longer exists, with no username', async () => {
+      instrumentRecordModel.findMany.mockResolvedValueOnce([{ id: 'record-1', sessionId: 'deleted-session' }]);
+      sessionModel.findMany.mockResolvedValueOnce([]);
+
+      const records = await instrumentRecordsService.find({});
+
+      expect(records).toHaveLength(1);
+      expect(records[0]).toMatchObject({ id: 'record-1', session: { user: { username: null } } });
     });
   });
 
