@@ -4,6 +4,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import type { Prisma } from '@prisma/client';
 
 import { accessibleQuery } from '@/auth/ability.utils';
+import type { AppAbility } from '@/auth/auth.types';
 import type { RuntimePrismaClient } from '@/core/prisma';
 import type { EntityOperationOptions } from '@/core/types';
 
@@ -136,7 +137,7 @@ export class SubjectsService {
           AND: [
             accessibleQuery(ability, 'read', 'Subject'),
             groupInput,
-            { id: { in: await this.querySubjectIdsWithRecords(groupId) } }
+            { id: { in: await this.querySubjectIdsWithRecords(groupId, ability) } }
           ]
         }
       });
@@ -158,12 +159,25 @@ export class SubjectsService {
     return subject;
   }
 
-  private async querySubjectIdsWithRecords(groupId?: string): Promise<string[]> {
-    const records = await this.prismaClient.instrumentRecord.findMany({
-      distinct: ['subjectId'],
-      select: { subjectId: true },
-      where: groupId ? { groupId } : {}
+  /**
+   * The ids of subjects having at least one record, for the "with records only" filter.
+   *
+   * Grouped by the database rather than deduplicated after the fact: `distinct` is applied by the
+   * prisma query engine, so it returns one row per *record* over the wire and collapses them only
+   * once they have arrived.
+   *
+   * Deliberately not expressed as a `instrumentRecords: { some: ... }` relation filter on Subject.
+   * On mongodb prisma compiles that into a $lookup over the whole record collection, which measured
+   * far slower than either form here and carries the 100 MiB per-document ceiling that made the same
+   * construct fail outright elsewhere.
+   */
+  private async querySubjectIdsWithRecords(groupId?: string, ability?: AppAbility): Promise<string[]> {
+    const groups = await this.prismaClient.instrumentRecord.groupBy({
+      by: ['subjectId'],
+      where: {
+        AND: [accessibleQuery(ability, 'read', 'InstrumentRecord'), groupId ? { groupId } : {}]
+      }
     });
-    return records.map((r) => r.subjectId);
+    return groups.map((group) => group.subjectId);
   }
 }
