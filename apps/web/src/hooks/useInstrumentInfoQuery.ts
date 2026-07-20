@@ -9,6 +9,7 @@ import { useAppStore } from '@/store';
 
 type UseInstrumentInfoQueryOptions<TKind extends InstrumentKind> = {
   params?: {
+    allEditions?: boolean;
     kind?: TKind;
     subjectId?: string;
   };
@@ -27,6 +28,13 @@ export function useInstrumentInfoQuery<TKind extends InstrumentKind>({
       const infos = await $InstrumentInfo.array().parseAsync(response.data);
       return infos.map((instrument) => translateInstrumentInfo(instrument, resolvedLanguage ?? 'en'));
     },
-    queryKey: ['instrument-info', currentGroupId, params?.kind, params?.subjectId, resolvedLanguage]
+    queryKey: [
+      'instrument-info',
+      currentGroupId,
+      params?.kind,
+      params?.subjectId,
+      params?.allEditions,
+      resolvedLanguage
+    ]
   });
 }

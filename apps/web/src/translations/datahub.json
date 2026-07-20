@@ -154,6 +154,10 @@
       "en": "Measures",
       "fr": "Mesures"
     },
+    "selectEdition": {
+      "en": "Select an edition",
+      "fr": "Sélectionnez une édition"
+    },
     "selectInstrument": {
       "en": "Select an instrument",
       "fr": "Sélectionnez un instrument"

@@ -239,6 +239,35 @@ describe('InstrumentRecordsService', () => {
       expect(usersService.findByUsername).not.toHaveBeenCalled();
       expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ username: undefined }));
     });
+
+    it('should create records with pending set, so they are not excluded from queries filtering on the field', async () => {
+      await instrumentRecordsService.upload({ ...baseUploadData });
+
+      expect(instrumentRecordModel.createMany).toHaveBeenCalledWith({
+        data: [expect.objectContaining({ pending: false })]
+      });
+    });
+  });
+
+  describe('find', () => {
+    beforeEach(() => {
+      instrumentsService.find.mockResolvedValue([]);
+      instrumentRecordModel.findMany.mockResolvedValue([]);
+    });
+
+    it('should match records where the pending field is missing entirely, since prisma NOT filters on mongodb exclude documents without the field', async () => {
+      await instrumentRecordsService.find({});
+
+      expect(instrumentRecordModel.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            AND: expect.arrayContaining([
+              { OR: [{ pending: { isSet: false } }, { pending: null }, { pending: false }] }
+            ])
+          }
+        })
+      );
+    });
   });
 
   describe('exportRecords', () => {

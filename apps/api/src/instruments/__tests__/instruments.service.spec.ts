@@ -402,4 +402,25 @@ describe('InstrumentsService', () => {
       expect(result).toEqual({ id: 'target' });
     });
   });
+
+  describe('findInfo', () => {
+    beforeEach(() => {
+      const instances = [
+        { details: { title: 'Happiness Questionnaire' }, id: 'id-1', internal: { edition: 1, name: 'HQ' } },
+        { details: { title: 'Happiness Questionnaire' }, id: 'id-2', internal: { edition: 2, name: 'HQ' } }
+      ] as Awaited<ReturnType<InstrumentsService['find']>>;
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue(instances);
+      instrumentModel.findMany.mockResolvedValue([]);
+    });
+
+    it('should return only the latest edition of each instrument by default', async () => {
+      const result = await instrumentsService.findInfo();
+      expect(result.map((info) => info.id)).toEqual(['id-2']);
+    });
+
+    it('should return every edition when allEditions is set', async () => {
+      const result = await instrumentsService.findInfo({ allEditions: true });
+      expect(result.map((info) => info.id)).toEqual(['id-1', 'id-2']);
+    });
+  });
 });

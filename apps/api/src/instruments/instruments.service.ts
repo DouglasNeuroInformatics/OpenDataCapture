@@ -55,6 +55,11 @@ type InstrumentQuery<TKind extends InstrumentKind> = {
   subjectId?: string;
 };
 
+type InstrumentInfoQuery<TKind extends InstrumentKind> = InstrumentQuery<TKind> & {
+  /** whether to include every edition of instruments sharing the same internal name, rather than only the latest (default false) */
+  allEditions?: boolean;
+};
+
 @Injectable()
 export class InstrumentsService {
   constructor(
@@ -317,7 +322,7 @@ export class InstrumentsService {
   }
 
   async findInfo<TKind extends InstrumentKind>(
-    query: InstrumentQuery<TKind> = {},
+    { allEditions = false, ...query }: InstrumentInfoQuery<TKind> = {},
     currentUser?: RequestUser,
     requestedGroupId?: string
   ): Promise<InstrumentInfo[]> {
@@ -368,10 +373,13 @@ export class InstrumentsService {
         kind: instance.kind,
         sourceRepo
       };
-      // Collapse editions of the same instrument to the newest one, keyed by its stable internal name.
-      const currentEntry = results.get(info.internal.name);
-      if (!currentEntry || !('internal' in currentEntry) || info.internal.edition > currentEntry.internal.edition) {
-        results.set(info.internal.name, info);
+      if (allEditions) {
+        results.set(info.id, info);
+      } else {
+        const currentEntry = results.get(info.internal.name);
+        if (!currentEntry || !('internal' in currentEntry) || info.internal.edition > currentEntry.internal.edition) {
+          results.set(info.internal.name, info);
+        }
       }
     }
     return Array.from(results.values());

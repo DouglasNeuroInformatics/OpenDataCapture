@@ -1,6 +1,6 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseBoolPipe, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 // Imported as a value (not a type-only import) so it doubles as the validation schema for the request
@@ -62,11 +62,12 @@ export class InstrumentsController {
   @RouteAccess({ action: 'read', subject: 'Instrument' })
   async findInfo(
     @CurrentUser() currentUser: RequestUser,
+    @Query('allEditions', new ParseBoolPipe({ optional: true })) allEditions?: boolean,
     @Query('groupId') groupId?: string,
     @Query('kind') kind?: InstrumentKind,
     @Query('subjectId') subjectId?: string
   ): Promise<InstrumentInfo[]> {
-    return this.instrumentsService.findInfo({ kind, subjectId }, currentUser, groupId);
+    return this.instrumentsService.findInfo({ allEditions, kind, subjectId }, currentUser, groupId);
   }
 
   @ApiOperation({ summary: 'List Instruments' })

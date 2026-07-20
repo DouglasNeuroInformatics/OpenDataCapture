@@ -267,7 +267,9 @@ export class InstrumentRecordsService {
           { instrumentId: { in: instrumentKindIds } },
           accessibleQuery(ability, 'read', 'InstrumentRecord'),
           { subjectId },
-          { NOT: { pending: true } }
+          // records created before the file instrument feature do not have the pending field at all,
+          // and prisma NOT filters on mongodb exclude documents where the field is missing entirely
+          { OR: [{ pending: { isSet: false } }, { pending: null }, { pending: false }] }
         ]
       }
     });
