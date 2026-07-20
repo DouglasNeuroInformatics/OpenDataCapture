@@ -16,14 +16,21 @@ export class SubjectsService {
     @InjectModel('Subject') private readonly subjectModel: Model<'Subject'>
   ) {}
 
-  async addGroupForSubject(subjectId: string, groupId: string, { ability }: EntityOperationOptions = {}) {
-    return this.subjectModel.update({
-      data: {
-        groupIds: {
-          push: groupId
-        }
-      },
-      where: { ...accessibleQuery(ability, 'update', 'Subject'), id: subjectId }
+  /**
+   * Associate each of the given subjects with a group, in one write rather than one per subject.
+   *
+   * The membership check is part of the query rather than done by the caller: mongodb arrays admit
+   * duplicates, so a caller filtering against a list it read earlier would push the same group id
+   * twice if a concurrent request associated the subject in between.
+   */
+  async addGroupForSubjects(subjectIds: string[], groupId: string, { ability }: EntityOperationOptions = {}) {
+    return this.subjectModel.updateMany({
+      data: { groupIds: { push: groupId } },
+      where: {
+        AND: [accessibleQuery(ability, 'update', 'Subject')],
+        id: { in: subjectIds },
+        NOT: { groupIds: { has: groupId } }
+      }
     });
   }
 
@@ -53,42 +60,45 @@ export class SubjectsService {
   }
 
   async createMany(data: CreateSubjectDto[], { ability }: EntityOperationOptions = {}) {
-    //filter out all duplicate ids that are planned to be created via a set
-    const noDuplicatesSet = new Set(
-      data.map((record) => {
-        return record.id;
-      })
-    );
-
-    const subjectIds = Array.from(noDuplicatesSet);
+    // keyed by id so duplicates within the request collapse, keeping the first entry for each
+    const requested = new Map<string, CreateSubjectDto>();
+    for (const subject of data) {
+      if (!requested.has(subject.id)) {
+        requested.set(subject.id, subject);
+      }
+    }
 
     //find the list of subject ids that already exist
     const existingSubjects = await this.subjectModel.findMany({
       select: { id: true },
       where: {
         AND: [accessibleQuery(ability, 'read', 'Subject')],
-        id: { in: subjectIds }
+        id: { in: Array.from(requested.keys()) }
       }
     });
 
     //create a set of existing ids in the database to filter our to-be-created ids with
     const existingIds = new Set(existingSubjects.map((subj) => subj.id));
 
-    //Filter out records whose IDs already exist
-    const subjectsToCreateIds = subjectIds.filter((record) => !existingIds.has(record));
-
-    const subjectsToCreate: CreateSubjectDto[] = subjectsToCreateIds.map((record) => {
-      return {
-        id: record
-      };
-    });
+    // The whole entry is kept, not just the id: a subject identified by personal info carries
+    // demographics that would otherwise be dropped on creation.
+    const subjectsToCreate = Array.from(requested.values()).filter((subject) => !existingIds.has(subject.id));
 
     //if there are none left to create do not follow through with the command
     if (subjectsToCreate.length < 1) {
       return subjectsToCreate;
     }
     return this.subjectModel.createMany({
-      data: subjectsToCreate,
+      // Named explicitly rather than spread: callers hand this whole Prisma rows, and a spread would
+      // carry fields that are not the caller's to set.
+      data: subjectsToCreate.map(({ dateOfBirth, firstName, id, lastName, sex }) => ({
+        dateOfBirth,
+        firstName,
+        groupIds: [],
+        id,
+        lastName,
+        sex
+      })),
       ...accessibleQuery(ability, 'create', 'Subject')
     });
   }
