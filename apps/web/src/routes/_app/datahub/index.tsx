@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
@@ -338,16 +338,7 @@ const MasterDataTable: React.FC<{
 
   const [hasRecords, setHasRecords] = useState(false);
   const [searchString, setSearchString] = useState('');
-  const handleRowHighlight = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const row = (e.target as HTMLElement).closest<HTMLElement>('[data-testid="data-table-row"]');
-    if (!row) return;
-    const body = row.closest('[data-testid="data-table-body"]');
-    if (!body) return;
-    for (const r of body.querySelectorAll<HTMLElement>('[data-testid="data-table-row"]')) {
-      r.style.backgroundColor = '';
-    }
-    row.style.backgroundColor = 'var(--color-accent)';
-  }, []);
+  const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
 
   const subjectsData = useSubjectsQuery({
     params: { groupId: currentGroup?.id, hasRecord: hasRecords || undefined }
@@ -366,8 +357,10 @@ const MasterDataTable: React.FC<{
     return Component;
   }, []);
 
-  return (
-    <div onClick={handleRowHighlight}>
+  const highlightedRowIndex = highlightedRowId !== null ? displayData.findIndex((s) => s.id === highlightedRowId) : -1;
+
+  const dataTable = useMemo(
+    () => (
       <DataTable
         columns={[
           {
@@ -457,7 +450,7 @@ const MasterDataTable: React.FC<{
           }
         ]}
         togglesComponent={TogglesWithFilter}
-        onRowClick={() => {}}
+        onRowClick={(subject) => setHighlightedRowId(subject.id)}
         onRowDoubleClick={onRowDoubleClick}
         onSearchChange={(value, table) => {
           setSearchString(value);
@@ -470,6 +463,16 @@ const MasterDataTable: React.FC<{
           );
         }}
       />
+    ),
+    [displayData, t, subjectIdDisplaySetting, searchString, onSelect, onRowDoubleClick]
+  );
+
+  return (
+    <div>
+      {highlightedRowIndex >= 0 && (
+        <style>{`[data-testid="data-table-body"] > [id="${highlightedRowIndex}"] { background-color: var(--color-accent) }`}</style>
+      )}
+      {dataTable}
     </div>
   );
 };
