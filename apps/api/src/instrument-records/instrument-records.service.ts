@@ -24,7 +24,6 @@ import type {
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
 import { Prisma } from '@prisma/client';
-import type { Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
 
 import { accessibleQuery } from '@/auth/ability.utils';
@@ -34,7 +33,6 @@ import { GroupsService } from '@/groups/groups.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { StorageService } from '@/storage/storage.service';
-import { CreateSubjectDto } from '@/subjects/dto/create-subject.dto';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 
@@ -374,67 +372,55 @@ export class InstrumentRecordsService {
       }
     }
 
-    const createdSessionsArray: Session[] = [];
+    // Every record is validated before anything is written, so a malformed record in the middle of a
+    // batch rejects the request without first creating sessions that then have to be rolled back.
+    const validatedRecords = records.map((record) => {
+      const parseResult = instrument.validationSchema.safeParse(this.parseJson(record.data));
+      if (!parseResult.success) {
+        console.error(parseResult.error.issues);
+        throw new UnprocessableEntityException(
+          `Data received for record does not pass validation schema of instrument '${instrument.id}'`
+        );
+      }
+      return { data: parseResult.data, date: record.date, subjectId: record.subjectId };
+    });
+
+    // One batched call rather than one session creation per record, which cost several queries each.
+    // Returned in input order, so each record can be paired with its session by index.
+    const sessions = await this.sessionsService.createMany({
+      entries: validatedRecords.map((record) => ({
+        date: record.date,
+        subjectData: { id: record.subjectId }
+      })),
+      groupId: groupId ?? null,
+      type: 'RETROSPECTIVE',
+      username: username ?? undefined
+    });
 
     try {
-      const subjectIdList = records.map(({ subjectId }) => {
-        const subjectToAdd: CreateSubjectDto = { id: subjectId };
-
-        return subjectToAdd;
-      });
-
-      await this.subjectsService.createMany(subjectIdList);
-
-      const preProcessedRecords = await Promise.all(
-        records.map(async (record) => {
-          const { data: rawData, date, subjectId } = record;
-
-          // Validate data
-          const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
-          if (!parseResult.success) {
-            console.error(parseResult.error.issues);
-            throw new UnprocessableEntityException(
-              `Data received for record does not pass validation schema of instrument '${instrument.id}'`
-            );
-          }
-
-          const session = await this.sessionsService.create({
-            date: date,
-            groupId: groupId ?? null,
-            subjectData: { id: subjectId },
-            type: 'RETROSPECTIVE',
-            username: username ?? undefined
-          });
-
-          createdSessionsArray.push(session);
-
-          const computedMeasures = instrument.measures
-            ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
-            : null;
-
-          return {
-            computedMeasures,
-            data: this.serializeData(parseResult.data),
-            date,
-            groupId,
-            instrumentId,
-            sessionId: session.id,
-            subjectId
-          };
-        })
-      );
       await this.instrumentRecordModel.createMany({
-        data: preProcessedRecords
+        data: validatedRecords.map((record, index) => ({
+          computedMeasures: instrument.measures
+            ? this.instrumentMeasuresService.computeMeasures(instrument.measures, record.data)
+            : null,
+          data: this.serializeData(record.data),
+          date: record.date,
+          groupId,
+          instrumentId,
+          sessionId: sessions[index]!.id,
+          subjectId: record.subjectId
+        }))
       });
 
+      // Scoped to the sessions this upload created, rather than every record in the group for this
+      // instrument: the response should describe the request, not the size of the database.
       return this.instrumentRecordModel.findMany({
         where: {
-          groupId,
-          instrumentId
+          sessionId: { in: sessions.map((session) => session.id) }
         }
       });
     } catch (err) {
-      await this.sessionsService.deleteByIds(createdSessionsArray.map((session) => session.id));
+      await this.sessionsService.deleteByIds(sessions.map((session) => session.id));
       throw err;
     }
   }

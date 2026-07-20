@@ -53,42 +53,36 @@ export class SubjectsService {
   }
 
   async createMany(data: CreateSubjectDto[], { ability }: EntityOperationOptions = {}) {
-    //filter out all duplicate ids that are planned to be created via a set
-    const noDuplicatesSet = new Set(
-      data.map((record) => {
-        return record.id;
-      })
-    );
-
-    const subjectIds = Array.from(noDuplicatesSet);
+    // keyed by id so duplicates within the request collapse, keeping the first entry for each
+    const requested = new Map<string, CreateSubjectDto>();
+    for (const subject of data) {
+      if (!requested.has(subject.id)) {
+        requested.set(subject.id, subject);
+      }
+    }
 
     //find the list of subject ids that already exist
     const existingSubjects = await this.subjectModel.findMany({
       select: { id: true },
       where: {
         AND: [accessibleQuery(ability, 'read', 'Subject')],
-        id: { in: subjectIds }
+        id: { in: Array.from(requested.keys()) }
       }
     });
 
     //create a set of existing ids in the database to filter our to-be-created ids with
     const existingIds = new Set(existingSubjects.map((subj) => subj.id));
 
-    //Filter out records whose IDs already exist
-    const subjectsToCreateIds = subjectIds.filter((record) => !existingIds.has(record));
-
-    const subjectsToCreate: CreateSubjectDto[] = subjectsToCreateIds.map((record) => {
-      return {
-        id: record
-      };
-    });
+    // The whole entry is kept, not just the id: a subject identified by personal info carries
+    // demographics that would otherwise be dropped on creation.
+    const subjectsToCreate = Array.from(requested.values()).filter((subject) => !existingIds.has(subject.id));
 
     //if there are none left to create do not follow through with the command
     if (subjectsToCreate.length < 1) {
       return subjectsToCreate;
     }
     return this.subjectModel.createMany({
-      data: subjectsToCreate,
+      data: subjectsToCreate.map((subject) => ({ ...subject, groupIds: [] })),
       ...accessibleQuery(ability, 'create', 'Subject')
     });
   }
