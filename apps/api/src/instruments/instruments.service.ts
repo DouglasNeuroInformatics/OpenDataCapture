@@ -50,6 +50,7 @@ export class InstrumentsService {
   constructor(
     @InjectModel('Group') private readonly groupModel: Model<'Group'>,
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
+    @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
     private readonly cryptoService: CryptoService,
     private readonly loggingService: LoggingService,
     private readonly virtualizationService: VirtualizationService<InstrumentVirtualizationContext>
@@ -115,18 +116,18 @@ export class InstrumentsService {
     query: InstrumentQuery<TKind> = {},
     { ability }: EntityOperationOptions = {}
   ): Promise<WithID<SomeInstrument<TKind>>[]> {
+    // Resolved against InstrumentRecord rather than expressed as a `records: { some: ... }` relation
+    // filter. On mongodb prisma compiles that filter into a $lookup which materialises *every* record
+    // belonging to an instrument into one array before applying the predicate, and mongodb caps a
+    // single document's $lookup output at 100 MiB. A busy instrument therefore fails the whole query
+    // outright once it passes that threshold. Querying the child collection is bounded by the
+    // subject's own records instead of the instrument's.
+    const subjectInstrumentIds = query.subjectId ? await this.findInstrumentIdsBySubject(query.subjectId) : null;
+
     const instruments = await this.instrumentModel.findMany({
       where: {
         AND: [
-          {
-            records: query.subjectId
-              ? {
-                  some: {
-                    subjectId: query.subjectId
-                  }
-                }
-              : undefined
-          },
+          subjectInstrumentIds ? { id: { in: subjectInstrumentIds } } : {},
           accessibleQuery(ability, 'read', 'Instrument')
         ]
       }
@@ -284,6 +285,16 @@ export class InstrumentsService {
       }
     }
     return map;
+  }
+
+  /** The ids of the instruments a subject has at least one record for. */
+  private async findInstrumentIdsBySubject(subjectId: string): Promise<string[]> {
+    const records = await this.instrumentRecordModel.findMany({
+      distinct: ['instrumentId'],
+      select: { instrumentId: true },
+      where: { subjectId }
+    });
+    return records.map((record) => record.instrumentId);
   }
 
   private async instantiate(instruments: Pick<InstrumentBundleContainer, 'bundle' | 'id'>[]) {
