@@ -1,13 +1,13 @@
 {
-  "name": "@opendatacapture/e2e",
+  "name": "@opendatacapture/testing",
   "type": "module",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "lint": "tsc && eslint --fix .",
-    "test": "env-cmd -f ../../.env playwright test",
-    "test:chrome": "env-cmd -f ../../.env  playwright test --project='*Desktop Chrome'",
-    "test:dev": "env-cmd -f ../../.env playwright test --ui"
+    "test:chrome": "env-cmd -f ../.env  playwright test --project='*Desktop Chrome'",
+    "test:dev": "env-cmd -f ../.env playwright test --ui",
+    "test:e2e": "env-cmd -f ../.env playwright test"
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
