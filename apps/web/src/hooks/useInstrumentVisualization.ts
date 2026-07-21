@@ -254,6 +254,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   }, [recordsQuery.data, sessionsUsernameQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
+    // only show the latest edition of each instrument; older editions are selectable via editionOptions
     const latestInstruments = new Map<string, TranslatedInstrumentInfo>();
     for (const info of instrumentInfoQuery.data ?? []) {
       const key = info.kind !== 'SERIES' ? info.internal.name : info.id;

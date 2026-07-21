@@ -11,6 +11,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { InstrumentsService } from '../instruments.service';
 
+import type { InstrumentVirtualizationContext } from '../instruments.service';
+
 // Avoid bundling a real instrument (esbuild) during unit tests; `createSeries` only needs `create` to be
 // called with whatever the bundler produces.
 vi.mock('@opendatacapture/instrument-bundler', () => ({
@@ -37,6 +39,17 @@ const existingSeries: WithID<SeriesInstrument> = {
   tags: { en: ['Series'], fr: ['Série'] }
 };
 
+/**
+ * The `where` fragment `validateSeriesInstrument` builds to restrict a series' items to the instruments
+ * the owning group may administer.
+ */
+const groupItemFilter = ({
+  accessibleInstrumentIds = [],
+  instrumentRepoIds = []
+}: { accessibleInstrumentIds?: string[]; instrumentRepoIds?: string[] } = {}) => ({
+  OR: [{ sourceRepoId: null }, { sourceRepoId: { in: instrumentRepoIds } }, { id: { in: accessibleInstrumentIds } }]
+});
+
 describe('InstrumentsService', () => {
   let instrumentsService: InstrumentsService;
   let cryptoService: MockedInstance<CryptoService>;
@@ -45,6 +58,8 @@ describe('InstrumentsService', () => {
   let instrumentRecordModel: MockedInstance<Model<'InstrumentRecord'>>;
   let groupModel: MockedInstance<Model<'Group'>>;
   let virtualizationService: MockedInstance<VirtualizationService<any>>;
+  /** The same Map the service memoizes evaluated instances into — see the context assignment below. */
+  let instanceCache: InstrumentVirtualizationContext['instruments'];
 
   beforeEach(async () => {
     vi.mocked(bundle).mockClear();
@@ -68,10 +83,21 @@ describe('InstrumentsService', () => {
     instrumentModel = moduleRef.get(getModelToken('Instrument'));
     instrumentRecordModel = moduleRef.get(getModelToken('InstrumentRecord'));
     groupModel = moduleRef.get(getModelToken('Group'));
-    groupModel.findFirst.mockResolvedValue({ id: 'group-1' } as any);
+    // Two lookups hit this: the caller's permission check on the target group, and the item-access
+    // check in `validateSeriesInstrument`. The empty arrays mean "no repos assigned, nothing accessible
+    // yet", so by default only non-repo instruments may be assembled into a series.
+    groupModel.findFirst.mockResolvedValue({
+      accessibleInstrumentIds: [],
+      id: 'group-1',
+      instrumentRepoIds: []
+    } as any);
     virtualizationService = moduleRef.get(VirtualizationService);
     // `getInstrumentInstance` reads/writes an instance cache on the virtualization context.
-    (virtualizationService as { context: unknown }).context = { __resolveImport: vi.fn(), instruments: new Map() };
+    instanceCache = new Map();
+    (virtualizationService as { context: unknown }).context = {
+      __resolveImport: vi.fn(),
+      instruments: instanceCache
+    };
   });
 
   it('should be defined', () => {
@@ -243,7 +269,7 @@ describe('InstrumentsService', () => {
       expect(instrumentModel.exists).toHaveBeenCalledWith({ id });
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
         select: { id: true },
-        where: { id: { in: ['hash:FORM_A-1', 'hash:FORM_B-1'] } }
+        where: { AND: [groupItemFilter()], id: { in: ['hash:FORM_A-1', 'hash:FORM_B-1'] } }
       });
       expect(instrumentModel.create).toHaveBeenCalledWith({
         data: {
@@ -309,6 +335,87 @@ describe('InstrumentsService', () => {
       expect(JSON.parse(source.replace(/^export default /, '').replace(/;$/, ''))).toMatchObject({
         details: { title: 'Padded Series' }
       });
+    });
+
+    // Items are named by internal name + edition, which the caller controls entirely, so a manager could
+    // otherwise name an instrument from a repository their group was never assigned and have the
+    // resulting `seriesItems` carry it into the group's accessible list.
+    it('refuses an item the group is not entitled to administer', async () => {
+      const items = [
+        { edition: 1, name: 'FORM_A' },
+        { edition: 1, name: 'OFF_LIMITS' }
+      ];
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
+      vi.spyOn(cryptoService, 'hash').mockImplementation((value) => `hash:${value}`);
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: {
+          __runtimeVersion: 1,
+          content: { items },
+          details: { description: 'S', license: 'UNLICENSED', title: 'S' },
+          kind: 'SERIES',
+          language: 'en',
+          tags: ['Series']
+        }
+      } as any);
+      instrumentModel.exists.mockResolvedValue(false);
+      // The restricted lookup resolves only the permitted item; the other exists but is out of reach.
+      instrumentModel.findMany.mockResolvedValue([{ id: 'hash:FORM_A-1' }] as any);
+
+      await expect(
+        instrumentsService.createSeries({
+          confirmDuplicate: true,
+          details: { title: 'S' },
+          groupId: 'group-1',
+          items,
+          language: 'en'
+        })
+      ).rejects.toThrow(UnprocessableEntityException);
+      expect(instrumentModel.create).not.toHaveBeenCalled();
+    });
+
+    it('admits items from a repo assigned to the group, and ones already accessible to it', async () => {
+      groupModel.findFirst.mockResolvedValue({
+        accessibleInstrumentIds: ['hash:FORM_A-1'],
+        id: 'group-1',
+        instrumentRepoIds: ['repo-1']
+      } as any);
+      const items = [
+        { edition: 1, name: 'FORM_A' },
+        { edition: 1, name: 'FORM_B' }
+      ];
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
+      vi.spyOn(cryptoService, 'hash').mockImplementation((value) => `hash:${value}`);
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: {
+          __runtimeVersion: 1,
+          content: { items },
+          details: { description: 'S', license: 'UNLICENSED', title: 'S' },
+          kind: 'SERIES',
+          language: 'en',
+          tags: ['Series']
+        }
+      } as any);
+      instrumentModel.exists.mockResolvedValue(false);
+      instrumentModel.findMany.mockResolvedValue([{ id: 'hash:FORM_A-1' }, { id: 'hash:FORM_B-1' }] as any);
+
+      await instrumentsService.createSeries({
+        confirmDuplicate: true,
+        details: { title: 'S' },
+        groupId: 'group-1',
+        items,
+        language: 'en'
+      });
+
+      expect(instrumentModel.findMany).toHaveBeenCalledWith({
+        select: { id: true },
+        where: {
+          AND: [groupItemFilter({ accessibleInstrumentIds: ['hash:FORM_A-1'], instrumentRepoIds: ['repo-1'] })],
+          id: { in: ['hash:FORM_A-1', 'hash:FORM_B-1'] }
+        }
+      });
+      expect(instrumentModel.create).toHaveBeenCalled();
     });
 
     it('rejects creation for a group the caller cannot manage', async () => {
@@ -462,6 +569,33 @@ describe('InstrumentsService', () => {
       expect(instrumentModel.delete).toHaveBeenCalledWith({ where: { id: 'target' } });
       expect(result).toEqual({ id: 'target' });
     });
+
+    it('evicts the deleted instrument from the instance cache', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'target' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { content: { items: [] }, kind: 'SERIES' }
+      } as any);
+      instrumentRecordModel.count.mockResolvedValue(0);
+      groupModel.findMany.mockResolvedValue([]);
+
+      await instrumentsService.deleteById('target');
+
+      // Checking the kind populates the cache, so a delete always leaves an entry behind to clean up.
+      expect(instanceCache.has('target')).toBe(false);
+    });
+
+    it('does not evict the cached instance when the delete is refused', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'scalar' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { internal: { edition: 1, name: 'FORM_A' }, kind: 'FORM' }
+      } as any);
+
+      await expect(instrumentsService.deleteById('scalar')).rejects.toThrow(ForbiddenException);
+
+      expect(instanceCache.has('scalar')).toBe(true);
+    });
   });
 
   describe('findInfo', () => {
@@ -482,6 +616,32 @@ describe('InstrumentsService', () => {
     it('should return every edition when allEditions is set', async () => {
       const result = await instrumentsService.findInfo({ allEditions: true });
       expect(result.map((info) => info.id)).toEqual(['id-1', 'id-2']);
+    });
+
+    // The client shows a delete affordance only for a series its own group owns, so a series with no
+    // owning group (uploaded directly, or created before series became group-owned) must report null
+    // rather than being conflated with an owned one.
+    it('should report the owning group of each series', async () => {
+      const instances: WithID<SeriesInstrument>[] = [
+        { ...existingSeries, content: { items: [] }, id: 'owned' },
+        { ...existingSeries, content: { items: [] }, id: 'shared' }
+      ];
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue(instances);
+      instrumentModel.findMany.mockResolvedValue([
+        { id: 'owned', seriesGroupId: 'group-1', sourceRepoId: null, sourceRepoName: null },
+        { id: 'shared', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
+      ]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(instrumentModel.findMany).toHaveBeenCalledWith({
+        select: { id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
+        where: { id: { in: ['owned', 'shared'] } }
+      });
+      expect(result).toMatchObject([
+        { id: 'owned', seriesGroupId: 'group-1' },
+        { id: 'shared', seriesGroupId: null }
+      ]);
     });
   });
 });
