@@ -31,6 +31,15 @@ export const NavGroup = ({
   const containsActive = items.some((item) => item.url === location.pathname);
   const [isOpen, setIsOpen] = React.useState(containsActive);
 
+  // Navigating into the group from anywhere else (a link, a redirect, a restored URL) must reveal the
+  // active child rather than leaving it hidden inside a collapsed group. Only expanding here — never
+  // collapsing — keeps a group the user opened deliberately open as they navigate away from it.
+  React.useEffect(() => {
+    if (containsActive) {
+      setIsOpen(true);
+    }
+  }, [containsActive]);
+
   return (
     <div className="flex flex-col">
       <button
@@ -49,10 +58,15 @@ export const NavGroup = ({
       </button>
       {isOpen && (
         <div className="ml-4 flex flex-col border-l border-slate-500/30 pl-1">
-          {items.map(({ url, ...props }) => (
+          {/* `children` is destructured out rather than spread: NavButton renders a <button>, and a
+              nested group's items would otherwise land in it as React children. */}
+          {items.map(({ children: _, disabled, url, ...props }) => (
             <NavButton
               activeClassName={activeClassName}
               className={childClassName}
+              // Matches the flat items in Sidebar/Navbar: a disabled item stays reachable while it is
+              // the current route, so the user is never stranded on a page they cannot navigate from.
+              disabled={disabled && location.pathname !== url}
               isActive={location.pathname === url}
               key={url}
               url={url!}
