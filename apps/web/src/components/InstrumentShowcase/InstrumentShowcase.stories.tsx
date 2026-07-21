@@ -13,7 +13,9 @@ export default { component: InstrumentShowcase } as Meta<typeof InstrumentShowca
 export const Default: Story = {
   args: {
     data: [...Object.values(forms), ...Object.values(interactive), ...Object.values(series)].map(({ instance }) =>
-      translateInstrumentInfo(instance, 'en')
+      // The stubs are full instruments; `translateInstrumentInfo` only reads the fields common to every
+      // `InstrumentInfo`, so a cast to its parameter type is sufficient for the story.
+      translateInstrumentInfo(instance as unknown as Parameters<typeof translateInstrumentInfo>[0], 'en')
     )
   }
 };

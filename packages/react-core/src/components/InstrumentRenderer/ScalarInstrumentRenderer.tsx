@@ -19,7 +19,7 @@ import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
 import { validateSubmission } from './validateSubmission';
 
-import type { SubjectDisplayInfo } from '../../types';
+import type { LocalizedText, SubjectDisplayInfo } from '../../types';
 import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
 import type { AnyContentResult, InstrumentSubmitHandler } from './types';
 
@@ -38,6 +38,8 @@ export type ScalarInstrumentRendererProps = {
   /** @deprecated */
   options?: InterpretOptions;
   subject?: SubjectDisplayInfo;
+  /** A localizable label for the form's submit button. */
+  submitButtonLabel?: LocalizedText;
   target: Pick<ScalarInstrumentBundleContainer, 'bundle' | 'id'>;
 };
 
@@ -51,6 +53,7 @@ export const ScalarInstrumentRenderer = ({
   onSubmit,
   options,
   subject,
+  submitButtonLabel,
   target
 }: ScalarInstrumentRendererProps) => {
   const [data, setData] = useState<unknown>();
@@ -117,7 +120,7 @@ export const ScalarInstrumentRenderer = ({
               />
             ))
             .with({ index: 1, instrument: { kind: 'FORM' } }, ({ instrument }) => (
-              <FormContent instrument={instrument} onSubmit={handleSubmit} />
+              <FormContent instrument={instrument} submitButtonLabel={submitButtonLabel} onSubmit={handleSubmit} />
             ))
             .with({ index: 1, instrument: { kind: 'INTERACTIVE' } }, ({ instrument }) => (
               <InteractiveContent

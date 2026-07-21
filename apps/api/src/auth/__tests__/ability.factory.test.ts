@@ -49,6 +49,24 @@ describe('AbilityFactory', () => {
     expect(ability.can('manage', subject('Group', { id: 'group-1' }) as any)).toBe(true);
     expect(ability.can('manage', subject('Group', { id: 'group-2' }) as any)).toBe(false);
   });
+
+  it('should restrict series deletion to the manager group', () => {
+    const ability = abilityFactory.createForPayload({
+      additionalPermissions: undefined,
+      basePermissionLevel: 'GROUP_MANAGER',
+      firstName: 'Test',
+      groups: [{ id: 'group-1' }],
+      id: 'user-1',
+      lastName: 'User',
+      username: 'manager-user'
+    } as any);
+
+    expect(ability.can('delete', subject('Instrument', { seriesGroupId: 'group-1' }) as any)).toBe(true);
+    expect(ability.can('delete', subject('Instrument', { seriesGroupId: 'group-2' }) as any)).toBe(false);
+    expect(ability.can('delete', subject('Instrument', { seriesGroupId: null }) as any)).toBe(false);
+    expect(ability.can('create', 'Instrument')).toBe(true);
+    expect(ability.can('manage', 'Instrument')).toBe(false);
+  });
   it('should allow standard user to read their own user info', () => {
     const payload = {
       additionalPermissions: undefined,
