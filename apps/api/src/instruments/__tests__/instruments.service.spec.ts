@@ -2,7 +2,7 @@ import { CryptoService, getModelToken, LoggingService, VirtualizationService } f
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { bundle } from '@opendatacapture/instrument-bundler';
 import type { SeriesInstrument } from '@opendatacapture/runtime-core';
@@ -40,6 +40,7 @@ const existingSeries: WithID<SeriesInstrument> = {
 describe('InstrumentsService', () => {
   let instrumentsService: InstrumentsService;
   let cryptoService: MockedInstance<CryptoService>;
+  let assignmentModel: MockedInstance<Model<'Assignment'>>;
   let instrumentModel: MockedInstance<Model<'Instrument'>>;
   let instrumentRecordModel: MockedInstance<Model<'InstrumentRecord'>>;
   let groupModel: MockedInstance<Model<'Group'>>;
@@ -51,6 +52,7 @@ describe('InstrumentsService', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         InstrumentsService,
+        MockFactory.createForModelToken(getModelToken('Assignment')),
         MockFactory.createForModelToken(getModelToken('Group')),
         MockFactory.createForModelToken(getModelToken('Instrument')),
         MockFactory.createForModelToken(getModelToken('InstrumentRecord')),
@@ -61,6 +63,8 @@ describe('InstrumentsService', () => {
     }).compile();
     instrumentsService = moduleRef.get(InstrumentsService);
     cryptoService = moduleRef.get(CryptoService);
+    assignmentModel = moduleRef.get(getModelToken('Assignment'));
+    assignmentModel.count.mockResolvedValue(0);
     instrumentModel = moduleRef.get(getModelToken('Instrument'));
     instrumentRecordModel = moduleRef.get(getModelToken('InstrumentRecord'));
     groupModel = moduleRef.get(getModelToken('Group'));
@@ -223,7 +227,9 @@ describe('InstrumentsService', () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
       vi.spyOn(cryptoService, 'hash').mockImplementation((value) => `hash:${value}`);
       virtualizationService.eval.mockResolvedValue({ isErr: () => false, value: instance } as any);
-      instrumentModel.exists.mockResolvedValueOnce(false).mockResolvedValue(true);
+      // `exists` guards the generated series id; the items are resolved in a single batched lookup.
+      instrumentModel.exists.mockResolvedValue(false);
+      instrumentModel.findMany.mockResolvedValue([{ id: 'hash:FORM_A-1' }, { id: 'hash:FORM_B-1' }] as any);
 
       const result = await instrumentsService.createSeries({
         confirmDuplicate: true,
@@ -234,9 +240,11 @@ describe('InstrumentsService', () => {
       });
 
       expect(virtualizationService.eval).toHaveBeenCalledWith('__BUNDLE__');
-      expect(instrumentModel.exists).toHaveBeenNthCalledWith(1, { id });
-      expect(instrumentModel.exists).toHaveBeenNthCalledWith(2, { id: 'hash:FORM_A-1' });
-      expect(instrumentModel.exists).toHaveBeenNthCalledWith(3, { id: 'hash:FORM_B-1' });
+      expect(instrumentModel.exists).toHaveBeenCalledWith({ id });
+      expect(instrumentModel.findMany).toHaveBeenCalledWith({
+        select: { id: true },
+        where: { id: { in: ['hash:FORM_A-1', 'hash:FORM_B-1'] } }
+      });
       expect(instrumentModel.create).toHaveBeenCalledWith({
         data: {
           bundle: '__BUNDLE__',
@@ -264,6 +272,43 @@ describe('InstrumentsService', () => {
         })
       ).rejects.toThrow(ConflictException);
       expect(createSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects a title that is blank once trimmed', async () => {
+      const createSpy = vi.spyOn(instrumentsService, 'create');
+
+      await expect(
+        instrumentsService.createSeries({
+          details: { title: '   ' },
+          groupId: 'group-1',
+          items: [
+            { edition: 1, name: 'FORM_X' },
+            { edition: 1, name: 'FORM_Y' }
+          ],
+          language: 'en'
+        })
+      ).rejects.toThrow(UnprocessableEntityException);
+      expect(createSpy).not.toHaveBeenCalled();
+    });
+
+    it('stores the trimmed title so it matches what was validated', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
+      vi.spyOn(instrumentsService, 'create').mockResolvedValue({ id: 'created-id' } as any);
+
+      await instrumentsService.createSeries({
+        details: { title: '  Padded Series  ' },
+        groupId: 'group-1',
+        items: [
+          { edition: 1, name: 'FORM_X' },
+          { edition: 1, name: 'FORM_Y' }
+        ],
+        language: 'en'
+      });
+
+      const source = vi.mocked(bundle).mock.lastCall?.[0].inputs[0]!.content as string;
+      expect(JSON.parse(source.replace(/^export default /, '').replace(/;$/, ''))).toMatchObject({
+        details: { title: 'Padded Series' }
+      });
     });
 
     it('rejects creation for a group the caller cannot manage', async () => {
@@ -380,6 +425,22 @@ describe('InstrumentsService', () => {
       expect(instrumentRecordModel.count).toHaveBeenCalledWith({
         where: { OR: [{ instrumentId: 'target' }, { seriesInstrumentId: 'target' }] }
       });
+      expect(instrumentModel.delete).not.toHaveBeenCalled();
+    });
+
+    it('refuses to delete a series instrument that is still assigned', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'target' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { content: { items: [] }, kind: 'SERIES' }
+      } as any);
+      // A remote assignment only becomes a record once the gateway synchronizer resolves its
+      // instrument, so an assignment with no records yet must still block deletion.
+      instrumentRecordModel.count.mockResolvedValue(0);
+      assignmentModel.count.mockResolvedValue(1);
+
+      await expect(instrumentsService.deleteById('target')).rejects.toThrow(ForbiddenException);
+      expect(assignmentModel.count).toHaveBeenCalledWith({ where: { instrumentId: 'target' } });
       expect(instrumentModel.delete).not.toHaveBeenCalled();
     });
 

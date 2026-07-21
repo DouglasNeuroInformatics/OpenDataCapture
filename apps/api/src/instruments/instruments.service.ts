@@ -63,6 +63,7 @@ type InstrumentInfoQuery<TKind extends InstrumentKind> = InstrumentQuery<TKind> 
 @Injectable()
 export class InstrumentsService {
   constructor(
+    @InjectModel('Assignment') private readonly assignmentModel: Model<'Assignment'>,
     @InjectModel('Group') private readonly groupModel: Model<'Group'>,
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
@@ -158,7 +159,10 @@ export class InstrumentsService {
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${groupId}`);
     }
-    if (await this.isInstrumentTitleTaken(details.title, groupId, options)) {
+    // `min(1)` on the schema still admits whitespace-only titles, which would render as a blank entry
+    // in every instrument list. Trim before storing so what is validated is what is persisted.
+    const title = this.normalizeTitle(details.title);
+    if (await this.isInstrumentTitleTaken(title, groupId, options)) {
       throw new ConflictException('An instrument with the same title already exists');
     }
     if (!confirmDuplicate) {
@@ -167,7 +171,12 @@ export class InstrumentsService {
         return { existingTitle, outcome: 'duplicate' };
       }
     }
-    const source = this.generateSeriesInstrumentSource({ clientDetails, details, items, language });
+    const source = this.generateSeriesInstrumentSource({
+      clientDetails,
+      details: { ...details, title },
+      items,
+      language
+    });
     const generatedBundle = await bundle({ inputs: [{ content: source, name: 'index.ts' }], minify: true });
     const created = await this.create({ bundle: generatedBundle }, { seriesGroupId: groupId });
     return { instrumentId: created.id, outcome: 'created' };
@@ -196,12 +205,25 @@ export class InstrumentsService {
     // A series that has been administered must never be deleted, so its collected data stays
     // interpretable. Records collected through a series are stored under the scalar items'
     // instrumentId with the orchestrating series preserved in seriesInstrumentId, so count on both.
-    const recordCount = await this.instrumentRecordModel.count({
-      where: { OR: [{ instrumentId: id }, { seriesInstrumentId: id }] }
-    });
+    //
+    // Assignments must block deletion too, and regardless of status: `Assignment.instrument` is a
+    // required relation, and a remote assignment produces records only once the gateway synchronizer
+    // resolves its instrument. Deleting the series first would leave that lookup permanently failing,
+    // stranding data the subject has already submitted.
+    const [recordCount, assignmentCount] = await Promise.all([
+      this.instrumentRecordModel.count({
+        where: { OR: [{ instrumentId: id }, { seriesInstrumentId: id }] }
+      }),
+      this.assignmentModel.count({ where: { instrumentId: id } })
+    ]);
     if (recordCount > 0) {
       throw new ForbiddenException(
         `Cannot delete series instrument: ${recordCount} record(s) have already been collected with it`
+      );
+    }
+    if (assignmentCount > 0) {
+      throw new ForbiddenException(
+        `Cannot delete series instrument: ${assignmentCount} assignment(s) still reference it`
       );
     }
     // Mongo does not cascade scalar-list relations, so pull the id from every group that exposes it
@@ -354,13 +376,24 @@ export class InstrumentsService {
       const sourceRepo = source?.sourceRepoId ? { id: source.sourceRepoId, name: source.sourceRepoName ?? null } : null;
 
       if (isSeriesInstrument(instance)) {
+        const seriesItems: { id: string }[] = [];
+        for (const { edition, name } of getSeriesInstrumentItems(instance.content)) {
+          const itemId = scalarInstrumentIds.get(`${name}:${edition}`);
+          if (!itemId) {
+            // Callers use `seriesItems` to grant a group access to a series' constituent instruments,
+            // so a silently dropped item becomes a failure part-way through administering the series.
+            this.loggingService.error({
+              message: `Cannot resolve item '${name}' (edition ${edition}) of series instrument '${instance.id}'`,
+              seriesInstrumentId: instance.id
+            });
+            continue;
+          }
+          seriesItems.push({ id: itemId });
+        }
         const info: SeriesInstrumentInfo = {
           ...base,
           kind: 'SERIES',
-          seriesItems: getSeriesInstrumentItems(instance.content)
-            .map(({ edition, name }) => scalarInstrumentIds.get(`${name}:${edition}`))
-            .filter((id): id is string => typeof id === 'string')
-            .map((id) => ({ id })),
+          seriesItems,
           sourceRepo
         };
         results.set(info.id, info);
@@ -559,6 +592,31 @@ export class InstrumentsService {
     );
   }
 
+  /**
+   * Trim every language value of a (possibly multilingual) title, rejecting one that is blank in any
+   * language it claims to define.
+   */
+  private normalizeTitle(
+    title: NonNullable<ClientInstrumentDetails['title']>
+  ): NonNullable<ClientInstrumentDetails['title']> {
+    if (typeof title === 'string') {
+      const trimmed = title.trim();
+      if (!trimmed) {
+        throw new UnprocessableEntityException('Instrument title cannot be blank');
+      }
+      return trimmed;
+    }
+    return Object.fromEntries(
+      Object.entries(title).map(([language, value]) => {
+        const trimmed = value.trim();
+        if (!trimmed) {
+          throw new UnprocessableEntityException(`Instrument title cannot be blank for language '${language}'`);
+        }
+        return [language, trimmed];
+      })
+    ) as NonNullable<ClientInstrumentDetails['title']>;
+  }
+
   private resolveGroupIds(currentUser: RequestUser, requestedGroupId?: string): string[] {
     if (!requestedGroupId) {
       return currentUser.groups.map(({ id }) => id);
@@ -579,15 +637,19 @@ export class InstrumentsService {
     if (items.length < 2) {
       return { message: 'Series instrument must include at least two items', success: false };
     }
-    for (const internal of items) {
-      const id = this.generateScalarInstrumentId({ internal });
-      const exists = await this.instrumentModel.exists({ id });
-      if (!exists) {
-        return {
-          message: `Cannot find instrument '${internal.name}' with edition '${internal.edition}'`,
-          success: false
-        };
-      }
+    const itemIds = items.map((internal) => this.generateScalarInstrumentId({ internal }));
+    const found = await this.instrumentModel.findMany({
+      select: { id: true },
+      where: { id: { in: itemIds } }
+    });
+    const foundIds = new Set(found.map(({ id }) => id));
+    const missingIndex = itemIds.findIndex((id) => !foundIds.has(id));
+    if (missingIndex !== -1) {
+      const { edition, name } = items[missingIndex]!;
+      return {
+        message: `Cannot find instrument '${name}' with edition '${edition}'`,
+        success: false
+      };
     }
     return { success: true };
   }
