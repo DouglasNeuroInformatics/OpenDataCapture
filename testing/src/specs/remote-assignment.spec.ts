@@ -1,4 +1,4 @@
-import { RemoteAssignmentPage } from '../pages/remote-assignment.page';
+import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { expect, test } from '../support/fixtures';
 
 import type { GetPageModel } from '../support/fixtures';
