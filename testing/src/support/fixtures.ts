@@ -3,12 +3,13 @@
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 
+import { DashboardPage } from '../pages/_app/dashboard.page';
+import { SubjectDataTablePage } from '../pages/_app/datahub/$subjectId/table/index.page';
+import { DatahubPage } from '../pages/_app/datahub/index.page';
+import { AccessibleInstrumentsPage } from '../pages/_app/instruments/accessible-instruments.page';
+import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
+import { StartSessionPage } from '../pages/_app/session/start-session.page';
 import { LoginPage } from '../pages/auth/login.page';
-import { DashboardPage } from '../pages/dashboard.page';
-import { DatahubPage } from '../pages/datahub/datahub.page';
-import { SubjectDataTablePage } from '../pages/datahub/subject-data-table.page';
-import { RemoteAssignmentPage } from '../pages/remote-assignment.page';
-import { StartSessionPage } from '../pages/start-session.page';
 import { ApiClient } from './api-client';
 import { ADMIN } from './constants';
 import { baseURL } from './env';
@@ -21,6 +22,7 @@ const pageModels = {
   '/dashboard': DashboardPage,
   '/datahub': DatahubPage,
   '/datahub/$subjectId/table': SubjectDataTablePage,
+  '/instruments/accessible-instruments': AccessibleInstrumentsPage,
   '/session/remote-assignment': RemoteAssignmentPage,
   '/session/start-session': StartSessionPage
 } satisfies { [K in RouteTo]?: any };
@@ -48,6 +50,12 @@ type TestFixtures = {
   actingRole: Role;
   /** First-run gating written to localStorage; override per file with `test.use({ appState })`. */
   appState: AppState;
+  /**
+   * Injects a role's token without navigating, so the test can drive navigation itself. Use this
+   * (rather than `getPageModel`) when the expected outcome is a redirect, since `getPageModel`
+   * asserts it landed on the requested route.
+   */
+  authenticateAs: (role: Role) => Promise<void>;
   /** Navigates to a route as `actingRole` and returns its page object. */
   getPageModel: GetPageModel;
   /** Short run-unique suffix for naming seeded data in this test. */
@@ -77,19 +85,24 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     { scope: 'worker' }
   ],
   appState: [{ isDisclaimerAccepted: true, isWalkthroughComplete: true }, { option: true }],
-  getPageModel: async ({ actingRole, appState, page, roleToken }, use) => {
+  authenticateAs: async ({ appState, page, roleToken }, use) => {
+    await use(async (role) => {
+      const accessToken = await roleToken(role);
+      await page.addInitScript(
+        (injected) => {
+          window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;
+          localStorage.setItem('app', JSON.stringify({ state: injected.state, version: 1 }));
+        },
+        { accessToken, state: appState }
+      );
+    });
+  },
+  getPageModel: async ({ actingRole, authenticateAs, page }, use) => {
     await use(
       async <TKey extends Extract<keyof PageModels, RouteTo>>(key: TKey, ...args: NavigateVariadicArgs<TKey>) => {
         const pageModel = new pageModels[key](page) as InstanceType<PageModels[TKey]>;
         if (pageModel._requiresAuth) {
-          const accessToken = await roleToken(actingRole);
-          await page.addInitScript(
-            (injected) => {
-              window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;
-              localStorage.setItem('app', JSON.stringify({ state: injected.state, version: 1 }));
-            },
-            { accessToken, state: appState }
-          );
+          await authenticateAs(actingRole);
         }
         await pageModel.goto(key, ...args);
         return pageModel;
