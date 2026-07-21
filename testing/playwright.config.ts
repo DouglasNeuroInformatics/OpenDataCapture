@@ -29,6 +29,11 @@ const browsers: { target: BrowserTarget; use: Project['use'] }[] = [
 ] as const;
 
 export default defineConfig({
+  // The default 5s assertion timeout is too tight for a 2-core CI runner doing real DB work
+  // (session creation, seeding). Heavier one-off operations set their own longer timeout inline.
+  expect: {
+    timeout: 15_000
+  },
   globalSetup: path.resolve(import.meta.dirname, 'src/global/global.setup.ts'),
   globalTeardown: path.resolve(import.meta.dirname, 'src/global/global.teardown.ts'),
   maxFailures: 1,
