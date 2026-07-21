@@ -28,16 +28,17 @@ import { z } from 'zod/v4';
 import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
 import { useCreateSeriesInstrumentMutation } from '@/hooks/useCreateSeriesInstrumentMutation';
-import { useDeleteInstrumentMutation } from '@/hooks/useDeleteInstrumentMutation';
+import { useDeleteSeriesInstrumentMutation } from '@/hooks/useDeleteSeriesInstrumentMutation';
 import { useInstrumentBundle } from '@/hooks/useInstrumentBundle';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
 
-import { deleteSeriesInstrument } from './delete-series-instrument';
-
 type InstrumentSource = { kind: 'manual' } | { kind: 'repo'; name: string };
+
+/** Passed to the renderer as a localizable value; the shared component resolves it to the active language. */
+const PREVIEW_SUBMIT_LABEL = { en: 'Preview Submit', fr: 'Soumettre l’aperçu' };
 
 type InstrumentItem = {
   authors?: null | string[];
@@ -45,6 +46,10 @@ type InstrumentItem = {
   id: string;
   // The scalar instrument identity (name + edition); null for series instruments, which have no edition.
   internal: null | ScalarInstrumentInternal;
+  // Whether this group owns the instrument and may therefore delete it. Only a series created by this
+  // group qualifies: scalar instruments are never deletable, and a series with no owning group is
+  // shared across the whole instance.
+  isDeletable: boolean;
   kind: string;
   seriesItems?: { id: string }[];
   source: InstrumentSource;
@@ -179,7 +184,7 @@ const InstrumentSection = ({
                 >
                   <EyeIcon className="h-4 w-4" />
                 </button>
-                {onDelete && !readOnly && item.source.kind === 'manual' && (
+                {onDelete && !readOnly && item.isDeletable && (
                   <button
                     aria-label={t({ en: 'Delete instrument', fr: "Supprimer l'instrument" })}
                     className="text-muted-foreground hover:text-destructive p-1 transition-colors"
@@ -216,8 +221,6 @@ const InstrumentPreviewDialog = ({
   // the info query already provides — fetching the bundle for it would pull down the compiled source of
   // every constituent instrument just to list their names.
   const bundleQuery = useInstrumentBundle(showForm ? item.id : null);
-  // Passed to the renderer as a localizable value; the shared component resolves it to the active language.
-  const previewSubmitLabel = { en: 'Preview Submit', fr: 'Soumettre l’aperçu' };
   const seriesItemTitles = useMemo(() => {
     return getSeriesPreviewItemTitles({
       fallbackTitle: (index) => t({ en: `Item ${index + 1}`, fr: `Élément ${index + 1}` }),
@@ -254,7 +257,7 @@ const InstrumentPreviewDialog = ({
             )}
             {bundleQuery.data && (
               <InstrumentRenderer
-                submitButtonLabel={previewSubmitLabel}
+                submitButtonLabel={PREVIEW_SUBMIT_LABEL}
                 target={bundleQuery.data}
                 onSubmit={() => {
                   // Intentionally does nothing: previews can advance without creating records.
@@ -560,15 +563,12 @@ const DeleteInstrumentDialog = ({
   onDeleted: (id: string) => void;
 }) => {
   const { t } = useTranslation();
-  const deleteMutation = useDeleteInstrumentMutation();
+  const deleteMutation = useDeleteSeriesInstrumentMutation();
 
+  // Close on either outcome: a series that is already in use is refused by the API, and leaving the
+  // confirmation open after the user has been notified only invites them to press the button again.
   const handleDelete = () =>
-    deleteSeriesInstrument({
-      deleteInstrument: deleteMutation.mutateAsync,
-      id: item.id,
-      onClose,
-      onDeleted
-    });
+    deleteMutation.mutate({ id: item.id }, { onSettled: onClose, onSuccess: () => onDeleted(item.id) });
 
   return (
     <Dialog
@@ -591,12 +591,7 @@ const DeleteInstrumentDialog = ({
           <Button type="button" variant="outline" onClick={onClose}>
             {t({ en: 'No', fr: 'Non' })}
           </Button>
-          <Button
-            disabled={deleteMutation.isPending}
-            type="button"
-            variant="danger"
-            onClick={() => void handleDelete()}
-          >
+          <Button disabled={deleteMutation.isPending} type="button" variant="danger" onClick={handleDelete}>
             {t({ en: 'Yes, delete', fr: 'Oui, supprimer' })}
           </Button>
         </Dialog.Footer>
@@ -644,14 +639,17 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
     description += ` ${t('group.manage.accessibleInstrumentDemoNote')}`;
   }
 
+  // The preview dialog resolves a series' item titles against the full list; a fresh array each render
+  // would invalidate the memo it does that lookup in.
+  const allItems = useMemo(
+    () => [...instruments.form, ...instruments.interactive, ...instruments.series],
+    [instruments]
+  );
+
   return (
     <div className="mx-auto max-w-4xl">
       {previewItem && (
-        <InstrumentPreviewDialog
-          item={previewItem}
-          items={[...instruments.form, ...instruments.interactive, ...instruments.series]}
-          onClose={() => setPreviewItem(null)}
-        />
+        <InstrumentPreviewDialog item={previewItem} items={allItems} onClose={() => setPreviewItem(null)} />
       )}
       {showCreateSeries && (
         <CreateSeriesInstrumentDialog
@@ -925,6 +923,7 @@ const RouteComponent = () => {
         description: instrument.details.description,
         id: instrument.id,
         internal: instrument.kind === 'SERIES' ? null : instrument.internal,
+        isDeletable: instrument.kind === 'SERIES' && instrument.seriesGroupId === currentGroup?.id,
         kind: instrument.kind,
         seriesItems: instrument.kind === 'SERIES' ? instrument.seriesItems : undefined,
         source,
@@ -988,6 +987,7 @@ const RouteComponent = () => {
       </PageHeader>
       <WithFallback
         Component={ManageGroupForm}
+        key={currentGroup?.id}
         props={{
           data,
           onSubmit: async (data) => {

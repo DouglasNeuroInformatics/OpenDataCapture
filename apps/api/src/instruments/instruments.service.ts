@@ -49,6 +49,12 @@ type InstrumentVirtualizationContext = {
   instruments: Map<string, WithID<AnyInstrument>>;
 };
 
+type InstrumentMetadata = {
+  seriesGroupId: null | string;
+  sourceRepoId: null | string;
+  sourceRepoName: null | string;
+};
+
 type InstrumentQuery<TKind extends InstrumentKind> = {
   kind?: TKind;
   seriesGroupId?: string;
@@ -106,7 +112,7 @@ export class InstrumentsService {
     }
 
     if (instance.kind === 'SERIES') {
-      const result = await this.validateSeriesInstrument(instance);
+      const result = await this.validateSeriesInstrument(instance, seriesGroupId);
       if (!result.success) {
         throw new UnprocessableEntityException(result.message);
       }
@@ -222,8 +228,10 @@ export class InstrumentsService {
       );
     }
     if (assignmentCount > 0) {
+      // Assignments are kept after completion, so this is permanent rather than something the user can
+      // wait out — say so, instead of implying the series frees up once the assignments finish.
       throw new ForbiddenException(
-        `Cannot delete series instrument: ${assignmentCount} assignment(s) still reference it`
+        `Cannot delete series instrument: it has been assigned ${assignmentCount} time(s), and assignments are retained permanently`
       );
     }
     // Mongo does not cascade scalar-list relations, so pull the id from every group that exposes it
@@ -241,6 +249,10 @@ export class InstrumentsService {
       )
     );
     await this.instrumentModel.delete({ where: { id } });
+    // `getInstrumentInstance` memoizes every instance it evaluates, including the one this method just
+    // evaluated to check the kind. Leaving it behind would keep a deleted instrument resident for the
+    // lifetime of the process, and would shadow the bundle of any future instrument issued the same id.
+    this.virtualizationService.context.instruments.delete(id);
     return { id };
   }
 
@@ -352,7 +364,7 @@ export class InstrumentsService {
     const groupIds = currentUser ? this.resolveGroupIds(currentUser, requestedGroupId) : undefined;
     const instances = await this.find(query, options, groupIds);
 
-    const sourceMap = await this.buildInstrumentSourceMap(instances.map((instance) => instance.id));
+    const metadataMap = await this.buildInstrumentMetadataMap(instances.map((instance) => instance.id));
     // Series resolve their `seriesItems` against the scalar instruments they reference. A `kind` filter can
     // exclude those scalars from `instances`, so when the result set contains series we build the lookup
     // from the full instrument set instead — otherwise a series' items would resolve to nothing.
@@ -372,8 +384,10 @@ export class InstrumentsService {
       // Expose the source repo id whenever the instrument came from a repo (so it can be filtered per
       // group). The name may be null for legacy instruments imported before names were stored; the
       // client still treats those as repo-sourced via their id.
-      const source = sourceMap.get(instance.id);
-      const sourceRepo = source?.sourceRepoId ? { id: source.sourceRepoId, name: source.sourceRepoName ?? null } : null;
+      const metadata = metadataMap.get(instance.id);
+      const sourceRepo = metadata?.sourceRepoId
+        ? { id: metadata.sourceRepoId, name: metadata.sourceRepoName ?? null }
+        : null;
 
       if (isSeriesInstrument(instance)) {
         const seriesItems: { id: string }[] = [];
@@ -393,6 +407,7 @@ export class InstrumentsService {
         const info: SeriesInstrumentInfo = {
           ...base,
           kind: 'SERIES',
+          seriesGroupId: metadata?.seriesGroupId ?? null,
           seriesItems,
           sourceRepo
         };
@@ -470,25 +485,26 @@ export class InstrumentsService {
   }
 
   /**
-   * Map of instrument id -> denormalized repository provenance, for the given instruments that came
-   * from a repo. Scoped to the requested ids and selecting only the provenance fields so it never
-   * loads full instrument records (notably the large `bundle`).
+   * Map of instrument id -> the stored columns `findInfo` reports but cannot read off an evaluated
+   * instance: repository provenance, and the owning group of a generated series. Scoped to the
+   * requested ids and selecting only those fields, so it never loads full instrument records (notably
+   * the large `bundle`).
    */
-  private async buildInstrumentSourceMap(
-    ids: string[]
-  ): Promise<Map<string, { sourceRepoId: string; sourceRepoName: null | string }>> {
-    const map = new Map<string, { sourceRepoId: string; sourceRepoName: null | string }>();
+  private async buildInstrumentMetadataMap(ids: string[]): Promise<Map<string, InstrumentMetadata>> {
+    const map = new Map<string, InstrumentMetadata>();
     if (ids.length === 0) {
       return map;
     }
     const instruments = await this.instrumentModel.findMany({
-      select: { id: true, sourceRepoId: true, sourceRepoName: true },
-      where: { id: { in: ids }, sourceRepoId: { not: null } }
+      select: { id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
+      where: { id: { in: ids } }
     });
     for (const inst of instruments) {
-      if (inst.sourceRepoId) {
-        map.set(inst.id, { sourceRepoId: inst.sourceRepoId, sourceRepoName: inst.sourceRepoName });
-      }
+      map.set(inst.id, {
+        seriesGroupId: inst.seriesGroupId,
+        sourceRepoId: inst.sourceRepoId,
+        sourceRepoName: inst.sourceRepoName
+      });
     }
     return map;
   }
@@ -632,15 +648,48 @@ export class InstrumentsService {
     return typeof title === 'string' ? [title] : Object.values(title);
   }
 
-  private async validateSeriesInstrument(instrument: SeriesInstrument) {
+  /**
+   * Resolve a series' items to stored instruments, rejecting the series if any is missing.
+   *
+   * When the series belongs to a group, its items are additionally restricted to the instruments that
+   * group may administer. Items are named by internal name + edition, which the caller controls
+   * entirely, and `findInfo` reports the resolved ids back as `seriesItems` — which the manage page
+   * then writes into the group's accessible list. Without this check a manager could name an
+   * instrument from a repository their group was never assigned and have the series carry it in,
+   * defeating the opt-in that `GroupsService` enforces when a group is created.
+   *
+   * The rule mirrors the visibility test the manage page applies client-side: not sourced from a repo,
+   * sourced from a repo currently assigned to the group, or already accessible to it — the last so a
+   * selection survives its repository later being unassigned.
+   */
+  private async validateSeriesInstrument(instrument: SeriesInstrument, seriesGroupId?: string) {
     const items = getSeriesInstrumentItems(instrument.content);
     if (items.length < 2) {
       return { message: 'Series instrument must include at least two items', success: false };
     }
     const itemIds = items.map((internal) => this.generateScalarInstrumentId({ internal }));
+    const group = seriesGroupId
+      ? await this.groupModel.findFirst({
+          select: { accessibleInstrumentIds: true, instrumentRepoIds: true },
+          where: { id: seriesGroupId }
+        })
+      : null;
     const found = await this.instrumentModel.findMany({
       select: { id: true },
-      where: { id: { in: itemIds } }
+      where: {
+        AND: [
+          group
+            ? {
+                OR: [
+                  { sourceRepoId: null },
+                  { sourceRepoId: { in: group.instrumentRepoIds ?? [] } },
+                  { id: { in: group.accessibleInstrumentIds ?? [] } }
+                ]
+              }
+            : {}
+        ],
+        id: { in: itemIds }
+      }
     });
     const foundIds = new Set(found.map(({ id }) => id));
     const missingIndex = itemIds.findIndex((id) => !foundIds.has(id));

@@ -43,8 +43,8 @@ const RouteComponent = () => {
               <h3 className="text-foreground font-medium">{t({ en: 'Login Page', fr: 'Page de connexion' })}</h3>
               <p className="text-muted-foreground mt-1 text-sm">
                 {t({
-                  en: 'Customize the branding panel, colors, logo, and text shown on the login page.',
-                  fr: 'Personnalisez le panneau de marque, les couleurs, le logo et le texte affichés sur la page de connexion.'
+                  en: 'Customize the branding panel, colors, image, and text shown on the login page.',
+                  fr: "Personnalisez le panneau de marque, les couleurs, l'image et le texte affichés sur la page de connexion."
                 })}
               </p>
             </div>

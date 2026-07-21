@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Dialog, Heading, Select, Spinner, StatisticCard } from '@douglasneuroinformatics/libui/components';
+import { Dialog, Heading, Spinner, StatisticCard } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
@@ -17,9 +17,7 @@ import { useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
 
 const RouteComponent = () => {
-  const changeGroup = useAppStore((store) => store.changeGroup);
   const currentGroup = useAppStore((store) => store.currentGroup);
-  const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation();
   const [theme] = useTheme();
   const summaryQuery = useSummaryQuery({ params: { groupId: currentGroup?.id } });
@@ -152,31 +150,9 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       <section className="flex grow flex-col gap-8 p-6">
-        <div className="flex w-full flex-col flex-wrap justify-between gap-3 md:flex-row md:items-center">
-          <Heading className="whitespace-nowrap" variant="h3">
-            {welcome}
-          </Heading>
-          {/* unless the user is an admin, this is set at login */}
-          {currentGroup && (
-            <Select
-              value={currentGroup.id}
-              onValueChange={(id) => changeGroup(currentUser!.groups.find((group) => group.id === id)!)!}
-            >
-              <Select.Trigger className="w-full md:w-[180px]" data-testid="dashboard-group-select">
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Content>
-                <Select.Group>
-                  {currentUser?.groups.map((group) => (
-                    <Select.Item key={group.id} value={group.id}>
-                      {group.name}
-                    </Select.Item>
-                  ))}
-                </Select.Group>
-              </Select.Content>
-            </Select>
-          )}
-        </div>
+        <Heading className="whitespace-nowrap" variant="h3">
+          {welcome}
+        </Heading>
         <div className="body-font" data-testid="dashboard-statistics">
           <div className="grid grid-cols-1 gap-6 text-center lg:grid-cols-2 xl:grid-cols-4">
             <div

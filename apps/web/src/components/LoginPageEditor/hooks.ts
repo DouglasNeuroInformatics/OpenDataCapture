@@ -10,6 +10,7 @@ import { useUpdateSetupStateMutation } from '@/hooks/useUpdateSetupStateMutation
 import { LOGIN_THEME_COLORS } from '@/utils/branding';
 
 import {
+  ACCEPTED_LOGO_MIME_TYPES,
   DEFAULT_PANEL_TEXT_COLOR,
   DEFAULT_SECTIONS_ORDER,
   HEX_PATTERN,
@@ -17,6 +18,7 @@ import {
   RIGHT_PANEL_OPTIONS,
   URL_PATTERN
 } from './constants';
+import { readLogoAsWebpDataUrl } from './image';
 
 import type { RightPanelOption } from './constants';
 import type { FormState } from './types';
@@ -185,17 +187,39 @@ export const useBrandingForm = () => {
   const handleLogoFile = (file: File | undefined) => {
     if (!file) {
       return;
-    } else if (file.size > MAX_LOGO_BYTES) {
+    } else if (!(ACCEPTED_LOGO_MIME_TYPES as readonly string[]).includes(file.type)) {
       addNotification({
-        message: t({ en: 'The selected image is larger than 1 MB.', fr: "L'image sélectionnée dépasse 1 Mo." }),
+        message: t({
+          en: 'The selected file must be an SVG, PNG, JPEG, or WebP image.',
+          fr: 'Le fichier sélectionné doit être une image SVG, PNG, JPEG ou WebP.'
+        }),
+        title: t({ en: 'Unsupported file type', fr: 'Type de fichier non pris en charge' }),
+        type: 'error'
+      });
+      return;
+    } else if (file.size > MAX_LOGO_BYTES) {
+      // Checked against the file as picked; the stored copy is usually far
+      // smaller, since a raster upload is re-encoded to WebP below.
+      addNotification({
+        message: t({ en: 'The selected image is larger than 2 MB.', fr: "L'image sélectionnée dépasse 2 Mo." }),
         title: t({ en: 'File too large', fr: 'Fichier trop volumineux' }),
         type: 'error'
       });
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => update('customLogoSrc', reader.result as string);
-    reader.readAsDataURL(file);
+    readLogoAsWebpDataUrl(file)
+      .then((dataUrl) => update('customLogoSrc', dataUrl))
+      .catch((error: unknown) => {
+        console.error(error);
+        addNotification({
+          message: t({
+            en: 'The selected file could not be read as an image.',
+            fr: "Le fichier sélectionné n'a pas pu être lu comme une image."
+          }),
+          title: t({ en: 'Invalid image', fr: 'Image invalide' }),
+          type: 'error'
+        });
+      });
   };
 
   // ── Derived ──────────────────────────────────────────────────────────────
