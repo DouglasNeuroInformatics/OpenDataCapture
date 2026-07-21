@@ -228,8 +228,10 @@ export class InstrumentsService {
       );
     }
     if (assignmentCount > 0) {
+      // Assignments are kept after completion, so this is permanent rather than something the user can
+      // wait out — say so, instead of implying the series frees up once the assignments finish.
       throw new ForbiddenException(
-        `Cannot delete series instrument: ${assignmentCount} assignment(s) still reference it`
+        `Cannot delete series instrument: it has been assigned ${assignmentCount} time(s), and assignments are retained permanently`
       );
     }
     // Mongo does not cascade scalar-list relations, so pull the id from every group that exposes it
