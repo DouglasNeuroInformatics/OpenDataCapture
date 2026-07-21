@@ -329,7 +329,9 @@ const RouteComponent = () => {
                             {instrument.details.title}
                           </p>
                           <p className="text-muted-foreground">{instrument.kind}</p>
-                          <p className="text-muted-foreground">{instrument.internal?.edition ?? '-'}</p>
+                          <p className="text-muted-foreground">
+                            {instrument.kind === 'SERIES' ? '-' : instrument.internal.edition}
+                          </p>
                         </div>
                       </motion.li>
                     ))}

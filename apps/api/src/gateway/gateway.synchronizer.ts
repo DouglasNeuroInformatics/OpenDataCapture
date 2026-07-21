@@ -170,6 +170,8 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
             date: remoteAssignment.completedAt,
             groupId: assignment.groupId ?? undefined,
             instrumentId,
+            // Preserve which series orchestrated this remote collection in the record's metadata
+            seriesInstrumentId: instrument.kind === 'SERIES' ? instrument.id : undefined,
             sessionId: session.id,
             subjectId: assignment.subjectId
           });

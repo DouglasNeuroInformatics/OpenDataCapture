@@ -254,12 +254,13 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   }, [recordsQuery.data, sessionsUsernameQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
-    // only show the latest edition of each instrument; older editions are selectable via editionOptions
     const latestInstruments = new Map<string, TranslatedInstrumentInfo>();
     for (const info of instrumentInfoQuery.data ?? []) {
-      const key = info.internal?.name ?? info.id;
+      const key = info.kind !== 'SERIES' ? info.internal.name : info.id;
       const currentEntry = latestInstruments.get(key);
-      if (!currentEntry || (info.internal?.edition ?? 0) > (currentEntry.internal?.edition ?? 0)) {
+      const currentEdition = currentEntry && currentEntry.kind !== 'SERIES' ? currentEntry.internal.edition : 0;
+      const infoEdition = info.kind !== 'SERIES' ? info.internal.edition : 0;
+      if (!currentEntry || infoEdition > currentEdition) {
         latestInstruments.set(key, info);
       }
     }
@@ -272,16 +273,17 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   const editionOptions: { [key: string]: string } = useMemo(() => {
     const infos = instrumentInfoQuery.data ?? [];
-    const selectedName = infos.find((info) => info.id === instrumentId)?.internal?.name;
-    if (!selectedName) {
+    const selected = infos.find((info) => info.id === instrumentId);
+    if (!selected || selected.kind === 'SERIES') {
       return {};
     }
+    const selectedName = selected.internal.name;
     const options: { [key: string]: string } = {};
     infos
-      .filter((info) => info.internal?.name === selectedName)
-      .sort((a, b) => a.internal!.edition - b.internal!.edition)
+      .filter((info): info is typeof selected => info.kind !== 'SERIES' && info.internal.name === selectedName)
+      .sort((a, b) => a.internal.edition - b.internal.edition)
       .forEach((info) => {
-        options[info.id] = `${t({ en: 'Edition', fr: 'Édition' })} ${info.internal!.edition}`;
+        options[info.id] = `${t({ en: 'Edition', fr: 'Édition' })} ${info.internal.edition}`;
       });
     return options;
   }, [instrumentInfoQuery.data, instrumentId]);
