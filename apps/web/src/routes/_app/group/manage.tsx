@@ -28,14 +28,12 @@ import { z } from 'zod/v4';
 import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
 import { useCreateSeriesInstrumentMutation } from '@/hooks/useCreateSeriesInstrumentMutation';
-import { useDeleteInstrumentMutation } from '@/hooks/useDeleteInstrumentMutation';
+import { useDeleteSeriesInstrumentMutation } from '@/hooks/useDeleteSeriesInstrumentMutation';
 import { useInstrumentBundle } from '@/hooks/useInstrumentBundle';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
-
-import { deleteSeriesInstrument } from './delete-series-instrument';
 
 type InstrumentSource = { kind: 'manual' } | { kind: 'repo'; name: string };
 
@@ -560,15 +558,12 @@ const DeleteInstrumentDialog = ({
   onDeleted: (id: string) => void;
 }) => {
   const { t } = useTranslation();
-  const deleteMutation = useDeleteInstrumentMutation();
+  const deleteMutation = useDeleteSeriesInstrumentMutation();
 
+  // Close on either outcome: a series that is already in use is refused by the API, and leaving the
+  // confirmation open after the user has been notified only invites them to press the button again.
   const handleDelete = () =>
-    deleteSeriesInstrument({
-      deleteInstrument: deleteMutation.mutateAsync,
-      id: item.id,
-      onClose,
-      onDeleted
-    });
+    deleteMutation.mutate({ id: item.id }, { onSettled: onClose, onSuccess: () => onDeleted(item.id) });
 
   return (
     <Dialog
@@ -591,12 +586,7 @@ const DeleteInstrumentDialog = ({
           <Button type="button" variant="outline" onClick={onClose}>
             {t({ en: 'No', fr: 'Non' })}
           </Button>
-          <Button
-            disabled={deleteMutation.isPending}
-            type="button"
-            variant="danger"
-            onClick={() => void handleDelete()}
-          >
+          <Button disabled={deleteMutation.isPending} type="button" variant="danger" onClick={handleDelete}>
             {t({ en: 'Yes, delete', fr: 'Oui, supprimer' })}
           </Button>
         </Dialog.Footer>
