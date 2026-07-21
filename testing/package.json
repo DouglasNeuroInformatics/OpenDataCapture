@@ -1,0 +1,20 @@
+{
+  "name": "@opendatacapture/testing",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "gen:routes": "tsx scripts/gen-routes.ts",
+    "lint": "pnpm gen:routes && tsc && eslint --fix .",
+    "postinstall": "pnpm gen:routes",
+    "test:chrome": "pnpm gen:routes && env-cmd -f ../.env  playwright test --project='*Desktop Chrome'",
+    "test:dev": "pnpm gen:routes && env-cmd -f ../.env playwright test --ui",
+    "test:e2e": "pnpm gen:routes && env-cmd -f ../.env playwright test"
+  },
+  "dependencies": {
+    "@douglasneuroinformatics/libjs": "catalog:",
+    "@opendatacapture/schemas": "workspace:*",
+    "@playwright/test": "^1.60.0",
+    "type-fest": "workspace:type-fest__4.x@*"
+  }
+}
