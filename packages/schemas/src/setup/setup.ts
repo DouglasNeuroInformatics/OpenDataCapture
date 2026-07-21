@@ -65,6 +65,11 @@ const RESOURCE_LINK_URL_PATTERN = /^https?:\/\/[^\s/]+\.[^\s/]+(\/\S*)?$/;
  * this schema also gates reads, where a rejected value drops the whole branding
  * config, so it must stay permissive enough for images saved by earlier versions.
  * The narrower list the editor accepts is enforced client-side.
+ *
+ * Note this admits `image/svg+xml`, which can carry script. That is only safe
+ * because every consumer renders the logo through `<img src>`, where SVG script
+ * does not execute. Inlining it instead — `dangerouslySetInnerHTML`, `<object>`,
+ * a CSS `mask` — would reintroduce the injection this pattern exists to prevent.
  */
 const LOGO_DATA_URI_PATTERN = /^data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/]+={0,2}$/;
 const HTTP_URL_SCHEME_PATTERN = /^https?:\/\//;

@@ -160,6 +160,7 @@ export function useNavItems() {
         url: '/instruments/accessible-instruments'
       });
     }
+    // Remote assignment requires the gateway to be enabled, since assignments are served through it
     if (ability?.can('create', 'Assignment') && setupStateQuery.data.isGatewayEnabled) {
       sessionItems.push({
         disabled: currentSession === null,

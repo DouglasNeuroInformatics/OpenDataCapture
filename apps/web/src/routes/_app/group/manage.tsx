@@ -37,6 +37,9 @@ import { useAppStore } from '@/store';
 
 type InstrumentSource = { kind: 'manual' } | { kind: 'repo'; name: string };
 
+/** Passed to the renderer as a localizable value; the shared component resolves it to the active language. */
+const PREVIEW_SUBMIT_LABEL = { en: 'Preview Submit', fr: 'Soumettre l’aperçu' };
+
 type InstrumentItem = {
   authors?: null | string[];
   description?: string;
@@ -218,8 +221,6 @@ const InstrumentPreviewDialog = ({
   // the info query already provides — fetching the bundle for it would pull down the compiled source of
   // every constituent instrument just to list their names.
   const bundleQuery = useInstrumentBundle(showForm ? item.id : null);
-  // Passed to the renderer as a localizable value; the shared component resolves it to the active language.
-  const previewSubmitLabel = { en: 'Preview Submit', fr: 'Soumettre l’aperçu' };
   const seriesItemTitles = useMemo(() => {
     return getSeriesPreviewItemTitles({
       fallbackTitle: (index) => t({ en: `Item ${index + 1}`, fr: `Élément ${index + 1}` }),
@@ -256,7 +257,7 @@ const InstrumentPreviewDialog = ({
             )}
             {bundleQuery.data && (
               <InstrumentRenderer
-                submitButtonLabel={previewSubmitLabel}
+                submitButtonLabel={PREVIEW_SUBMIT_LABEL}
                 target={bundleQuery.data}
                 onSubmit={() => {
                   // Intentionally does nothing: previews can advance without creating records.
@@ -638,14 +639,17 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
     description += ` ${t('group.manage.accessibleInstrumentDemoNote')}`;
   }
 
+  // The preview dialog resolves a series' item titles against the full list; a fresh array each render
+  // would invalidate the memo it does that lookup in.
+  const allItems = useMemo(
+    () => [...instruments.form, ...instruments.interactive, ...instruments.series],
+    [instruments]
+  );
+
   return (
     <div className="mx-auto max-w-4xl">
       {previewItem && (
-        <InstrumentPreviewDialog
-          item={previewItem}
-          items={[...instruments.form, ...instruments.interactive, ...instruments.series]}
-          onClose={() => setPreviewItem(null)}
-        />
+        <InstrumentPreviewDialog item={previewItem} items={allItems} onClose={() => setPreviewItem(null)} />
       )}
       {showCreateSeries && (
         <CreateSeriesInstrumentDialog
