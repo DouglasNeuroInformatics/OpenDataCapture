@@ -518,5 +518,31 @@ describe('InstrumentsService', () => {
       const result = await instrumentsService.findInfo({ allEditions: true });
       expect(result.map((info) => info.id)).toEqual(['id-1', 'id-2']);
     });
+
+    // The client shows a delete affordance only for a series its own group owns, so a series with no
+    // owning group (uploaded directly, or created before series became group-owned) must report null
+    // rather than being conflated with an owned one.
+    it('should report the owning group of each series', async () => {
+      const instances: WithID<SeriesInstrument>[] = [
+        { ...existingSeries, content: { items: [] }, id: 'owned' },
+        { ...existingSeries, content: { items: [] }, id: 'shared' }
+      ];
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue(instances);
+      instrumentModel.findMany.mockResolvedValue([
+        { id: 'owned', seriesGroupId: 'group-1', sourceRepoId: null, sourceRepoName: null },
+        { id: 'shared', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
+      ]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(instrumentModel.findMany).toHaveBeenCalledWith({
+        select: { id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
+        where: { id: { in: ['owned', 'shared'] } }
+      });
+      expect(result).toMatchObject([
+        { id: 'owned', seriesGroupId: 'group-1' },
+        { id: 'shared', seriesGroupId: null }
+      ]);
+    });
   });
 });

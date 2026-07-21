@@ -49,6 +49,12 @@ type InstrumentVirtualizationContext = {
   instruments: Map<string, WithID<AnyInstrument>>;
 };
 
+type InstrumentMetadata = {
+  seriesGroupId: null | string;
+  sourceRepoId: null | string;
+  sourceRepoName: null | string;
+};
+
 type InstrumentQuery<TKind extends InstrumentKind> = {
   kind?: TKind;
   seriesGroupId?: string;
@@ -356,7 +362,7 @@ export class InstrumentsService {
     const groupIds = currentUser ? this.resolveGroupIds(currentUser, requestedGroupId) : undefined;
     const instances = await this.find(query, options, groupIds);
 
-    const sourceMap = await this.buildInstrumentSourceMap(instances.map((instance) => instance.id));
+    const metadataMap = await this.buildInstrumentMetadataMap(instances.map((instance) => instance.id));
     // Series resolve their `seriesItems` against the scalar instruments they reference. A `kind` filter can
     // exclude those scalars from `instances`, so when the result set contains series we build the lookup
     // from the full instrument set instead — otherwise a series' items would resolve to nothing.
@@ -376,8 +382,10 @@ export class InstrumentsService {
       // Expose the source repo id whenever the instrument came from a repo (so it can be filtered per
       // group). The name may be null for legacy instruments imported before names were stored; the
       // client still treats those as repo-sourced via their id.
-      const source = sourceMap.get(instance.id);
-      const sourceRepo = source?.sourceRepoId ? { id: source.sourceRepoId, name: source.sourceRepoName ?? null } : null;
+      const metadata = metadataMap.get(instance.id);
+      const sourceRepo = metadata?.sourceRepoId
+        ? { id: metadata.sourceRepoId, name: metadata.sourceRepoName ?? null }
+        : null;
 
       if (isSeriesInstrument(instance)) {
         const seriesItems: { id: string }[] = [];
@@ -397,6 +405,7 @@ export class InstrumentsService {
         const info: SeriesInstrumentInfo = {
           ...base,
           kind: 'SERIES',
+          seriesGroupId: metadata?.seriesGroupId ?? null,
           seriesItems,
           sourceRepo
         };
@@ -474,25 +483,26 @@ export class InstrumentsService {
   }
 
   /**
-   * Map of instrument id -> denormalized repository provenance, for the given instruments that came
-   * from a repo. Scoped to the requested ids and selecting only the provenance fields so it never
-   * loads full instrument records (notably the large `bundle`).
+   * Map of instrument id -> the stored columns `findInfo` reports but cannot read off an evaluated
+   * instance: repository provenance, and the owning group of a generated series. Scoped to the
+   * requested ids and selecting only those fields, so it never loads full instrument records (notably
+   * the large `bundle`).
    */
-  private async buildInstrumentSourceMap(
-    ids: string[]
-  ): Promise<Map<string, { sourceRepoId: string; sourceRepoName: null | string }>> {
-    const map = new Map<string, { sourceRepoId: string; sourceRepoName: null | string }>();
+  private async buildInstrumentMetadataMap(ids: string[]): Promise<Map<string, InstrumentMetadata>> {
+    const map = new Map<string, InstrumentMetadata>();
     if (ids.length === 0) {
       return map;
     }
     const instruments = await this.instrumentModel.findMany({
-      select: { id: true, sourceRepoId: true, sourceRepoName: true },
-      where: { id: { in: ids }, sourceRepoId: { not: null } }
+      select: { id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
+      where: { id: { in: ids } }
     });
     for (const inst of instruments) {
-      if (inst.sourceRepoId) {
-        map.set(inst.id, { sourceRepoId: inst.sourceRepoId, sourceRepoName: inst.sourceRepoName });
-      }
+      map.set(inst.id, {
+        seriesGroupId: inst.seriesGroupId,
+        sourceRepoId: inst.sourceRepoId,
+        sourceRepoName: inst.sourceRepoName
+      });
     }
     return map;
   }

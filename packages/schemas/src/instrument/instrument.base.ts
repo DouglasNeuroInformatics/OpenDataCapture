@@ -250,6 +250,10 @@ type ScalarInstrumentInfo<T extends BaseInstrument = BaseInstrument> = BaseInstr
 /** Info for a series instrument, which bundles the scalar instruments referenced by `seriesItems`. */
 type SeriesInstrumentInfo<T extends BaseInstrument = BaseInstrument> = BaseInstrumentInfo<T> & {
   kind: 'SERIES';
+  // The group that created and owns this series, or null for a series shared across every group (one
+  // uploaded directly, or created before series became group-owned). Only the owning group may delete
+  // it, so clients need this to decide whether to offer a delete affordance.
+  seriesGroupId?: null | string;
   seriesItems: { id: string }[];
 };
 
@@ -273,6 +277,7 @@ const $ScalarInstrumentInfo = $BaseInstrumentInfo.extend({
 
 const $SeriesInstrumentInfo = $BaseInstrumentInfo.extend({
   kind: z.literal('SERIES'),
+  seriesGroupId: z.string().nullish(),
   seriesItems: z.object({ id: z.string() }).array()
 }) satisfies z.ZodType<SeriesInstrumentInfo>;
 

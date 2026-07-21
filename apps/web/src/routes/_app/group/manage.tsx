@@ -43,6 +43,10 @@ type InstrumentItem = {
   id: string;
   // The scalar instrument identity (name + edition); null for series instruments, which have no edition.
   internal: null | ScalarInstrumentInternal;
+  // Whether this group owns the instrument and may therefore delete it. Only a series created by this
+  // group qualifies: scalar instruments are never deletable, and a series with no owning group is
+  // shared across the whole instance.
+  isDeletable: boolean;
   kind: string;
   seriesItems?: { id: string }[];
   source: InstrumentSource;
@@ -177,7 +181,7 @@ const InstrumentSection = ({
                 >
                   <EyeIcon className="h-4 w-4" />
                 </button>
-                {onDelete && !readOnly && item.source.kind === 'manual' && (
+                {onDelete && !readOnly && item.isDeletable && (
                   <button
                     aria-label={t({ en: 'Delete instrument', fr: "Supprimer l'instrument" })}
                     className="text-muted-foreground hover:text-destructive p-1 transition-colors"
@@ -915,6 +919,7 @@ const RouteComponent = () => {
         description: instrument.details.description,
         id: instrument.id,
         internal: instrument.kind === 'SERIES' ? null : instrument.internal,
+        isDeletable: instrument.kind === 'SERIES' && instrument.seriesGroupId === currentGroup?.id,
         kind: instrument.kind,
         seriesItems: instrument.kind === 'SERIES' ? instrument.seriesItems : undefined,
         source,
