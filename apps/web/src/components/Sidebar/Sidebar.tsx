@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
-import { Button, Dialog, LanguageToggle, Select, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding } from '@opendatacapture/react-core';
 import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
 
+import { GroupSwitcher, useIsGroupSwitcherVisible } from '../GroupSwitcher';
 import { NavButton } from '../NavButton';
 import { NavGroup } from '../NavGroup';
 import { UserDropup } from '../UserDropup';
@@ -19,10 +20,8 @@ import { UserDropup } from '../UserDropup';
 export const Sidebar = () => {
   const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false);
 
-  const changeGroup = useAppStore((store) => store.changeGroup);
-  const currentGroup = useAppStore((store) => store.currentGroup);
-  const currentUser = useAppStore((store) => store.currentUser);
   const groupSwitcherPosition = useAppStore((store) => store.groupSwitcherPosition);
+  const isGroupSwitcherVisible = useIsGroupSwitcherVisible();
   const navItems = useNavItems();
   const currentSession = useAppStore((store) => store.currentSession);
   const endSession = useAppStore((store) => store.endSession);
@@ -30,10 +29,6 @@ export const Sidebar = () => {
   const navigate = useNavigate();
 
   const { t } = useTranslation();
-
-  const showSidebarGroupSwitcher =
-    groupSwitcherPosition === 'sidebar' && currentGroup && currentUser && currentUser.groups.length > 0;
-  const isSingleGroup = currentUser?.groups.length === 1;
 
   return (
     <div
@@ -44,39 +39,9 @@ export const Sidebar = () => {
         <Branding className="h-12" fontSize="md" logoVariant="light" />
       </div>
       <hr className="my-2 h-[1px] border-none bg-slate-700" />
-      {showSidebarGroupSwitcher && (
+      {groupSwitcherPosition === 'sidebar' && isGroupSwitcherVisible && (
         <div className="mb-2">
-          {isSingleGroup ? (
-            <div className="relative flex h-auto w-full flex-col items-start overflow-hidden rounded-md border border-sky-700 bg-slate-800 px-3 py-1.5 font-semibold text-white before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-sky-400 before:content-['']">
-              <span className="text-[10px] font-medium tracking-tight text-sky-400">
-                {t({ en: 'Group', fr: 'Groupe' })}
-              </span>
-              <span className="text-[14px]">{currentGroup.name}</span>
-            </div>
-          ) : (
-            <Select
-              value={currentGroup.id}
-              onValueChange={(id) => changeGroup(currentUser.groups.find((g) => g.id === id)!)}
-            >
-              <Select.Trigger className="relative h-auto w-full overflow-hidden border border-sky-700 bg-slate-800 py-1.5 text-[14px] font-semibold text-white before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-sky-400 before:content-[''] hover:bg-slate-700 [&>svg]:text-white [&>svg]:opacity-100">
-                <div className="flex flex-col items-start leading-tight">
-                  <span className="text-[10px] font-medium tracking-tight text-sky-400">
-                    {t({ en: 'Group', fr: 'Groupe' })}
-                  </span>
-                  <Select.Value />
-                </div>
-              </Select.Trigger>
-              <Select.Content>
-                <Select.Group>
-                  {currentUser.groups.map((group) => (
-                    <Select.Item key={group.id} value={group.id}>
-                      {group.name}
-                    </Select.Item>
-                  ))}
-                </Select.Group>
-              </Select.Content>
-            </Select>
-          )}
+          <GroupSwitcher />
           <hr className="mt-2 h-[1px] border-none bg-slate-700" />
         </div>
       )}

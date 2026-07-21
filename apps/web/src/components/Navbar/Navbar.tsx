@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import {
-  Button,
-  LanguageToggle,
-  Select,
-  Separator,
-  Sheet,
-  ThemeToggle
-} from '@douglasneuroinformatics/libui/components';
+import { Button, LanguageToggle, Separator, Sheet, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding } from '@opendatacapture/react-core';
 import { useNavigate } from '@tanstack/react-router';
@@ -17,15 +10,14 @@ import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
 
+import { GroupSwitcher, useIsGroupSwitcherVisible } from '../GroupSwitcher';
 import { NavButton } from '../NavButton';
 import { NavGroup } from '../NavGroup';
 import { UserDropup } from '../UserDropup';
 
 export const Navbar = () => {
-  const changeGroup = useAppStore((store) => store.changeGroup);
-  const currentGroup = useAppStore((store) => store.currentGroup);
   const currentSession = useAppStore((store) => store.currentSession);
-  const currentUser = useAppStore((store) => store.currentUser);
+  const isGroupSwitcherVisible = useIsGroupSwitcherVisible();
   const [isOpen, setIsOpen] = useState(false);
   const navItems = useNavItems();
   const { t } = useTranslation('layout');
@@ -68,40 +60,11 @@ export const Navbar = () => {
         <Sheet.Header>
           <Branding className="h-10" fontSize="md" />
         </Sheet.Header>
-        {/* Mirrors the desktop sidebar's group switcher so the control reads the same on both layouts. */}
-        {currentGroup && currentUser && currentUser.groups.length > 0 && (
+        {/* Shown regardless of the group-switcher position preference: the mobile layout has no sidebar
+            and no top bar, so the nav sheet is the only place the control can live. */}
+        {isGroupSwitcherVisible && (
           <div className="py-2">
-            {currentUser.groups.length === 1 ? (
-              <div className="relative flex h-auto w-full flex-col items-start overflow-hidden rounded-md border border-sky-700 bg-slate-800 px-3 py-1.5 font-semibold text-white before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-sky-400 before:content-['']">
-                <span className="text-[10px] font-medium tracking-tight text-sky-400">
-                  {t({ en: 'Group', fr: 'Groupe' })}
-                </span>
-                <span className="text-[14px]">{currentGroup.name}</span>
-              </div>
-            ) : (
-              <Select
-                value={currentGroup.id}
-                onValueChange={(id) => changeGroup(currentUser.groups.find((group) => group.id === id)!)}
-              >
-                <Select.Trigger className="relative h-auto w-full overflow-hidden border border-sky-700 bg-slate-800 py-1.5 text-[14px] font-semibold text-white before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-sky-400 before:content-[''] hover:bg-slate-700 [&>svg]:text-white [&>svg]:opacity-100">
-                  <div className="flex flex-col items-start leading-tight">
-                    <span className="text-[10px] font-medium tracking-tight text-sky-400">
-                      {t({ en: 'Group', fr: 'Groupe' })}
-                    </span>
-                    <Select.Value />
-                  </div>
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Group>
-                    {currentUser.groups.map((group) => (
-                      <Select.Item key={group.id} value={group.id}>
-                        {group.name}
-                      </Select.Item>
-                    ))}
-                  </Select.Group>
-                </Select.Content>
-              </Select>
-            )}
+            <GroupSwitcher />
           </div>
         )}
         <Separator />
