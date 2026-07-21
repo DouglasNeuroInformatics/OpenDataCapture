@@ -11,9 +11,19 @@ import { useUpdateSetupStateMutation } from '@/hooks/useUpdateSetupStateMutation
 import { useAppStore } from '@/store';
 import type { GroupSwitcherPosition } from '@/store/types';
 
-const Toggle = ({ checked, onCheckedChange }: { checked: boolean; onCheckedChange: (val: boolean) => void }) => (
+/** libui ships no Switch, so this is hand-rolled — `label` names it for assistive technology. */
+const Toggle = ({
+  checked,
+  label,
+  onCheckedChange
+}: {
+  checked: boolean;
+  label: string;
+  onCheckedChange: (val: boolean) => void;
+}) => (
   <button
     aria-checked={checked}
+    aria-label={label}
     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${checked ? 'bg-primary' : 'bg-slate-400 dark:bg-slate-600'}`}
     role="switch"
     type="button"
@@ -33,9 +43,18 @@ const RouteComponent = () => {
   const groupSwitcherPosition = useAppStore((store) => store.groupSwitcherPosition);
   const setGroupSwitcherPosition = useAppStore((store) => store.setGroupSwitcherPosition);
 
-  const [uploaderEnabled, setUploaderEnabled] = useState(
-    () => setupStateQuery.data?.isExperimentalFeaturesEnabled ?? false
-  );
+  const uploaderLabel = t({ en: 'Enable Uploader', fr: 'Activer le téléversement' });
+
+  // The toggle is staged locally until Save, so it holds its own state. Resync it whenever the server
+  // value changes underneath — saving invalidates the query, and the response is the authority on what
+  // was actually stored.
+  const savedUploaderEnabled = setupStateQuery.data.isExperimentalFeaturesEnabled ?? false;
+  const [uploaderEnabled, setUploaderEnabled] = useState(savedUploaderEnabled);
+  const [syncedUploaderEnabled, setSyncedUploaderEnabled] = useState(savedUploaderEnabled);
+  if (syncedUploaderEnabled !== savedUploaderEnabled) {
+    setSyncedUploaderEnabled(savedUploaderEnabled);
+    setUploaderEnabled(savedUploaderEnabled);
+  }
 
   const handleSave = () => {
     updateSetupStateMutation.mutate(
@@ -66,7 +85,7 @@ const RouteComponent = () => {
           <Card.Content>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-medium">{t({ en: 'Enable Uploader', fr: 'Activer le téléversement' })}</p>
+                <p className="text-sm font-medium">{uploaderLabel}</p>
                 <HoverCard>
                   <HoverCard.Trigger asChild>
                     <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
@@ -81,12 +100,26 @@ const RouteComponent = () => {
                   </HoverCard.Content>
                 </HoverCard>
               </div>
-              <Toggle checked={uploaderEnabled} onCheckedChange={setUploaderEnabled} />
+              <Toggle checked={uploaderEnabled} label={uploaderLabel} onCheckedChange={setUploaderEnabled} />
             </div>
           </Card.Content>
-          <hr className="border-border" />
+          <Card.Footer className="justify-end">
+            <Button disabled={updateSetupStateMutation.isPending} onClick={handleSave}>
+              {t({ en: 'Save', fr: 'Enregistrer' })}
+            </Button>
+          </Card.Footer>
+        </Card>
+        {/* A separate card because these settings are not the instance's: they live in this browser and
+            apply instantly, so they are deliberately outside the Save button's scope above. */}
+        <Card className="mt-6">
           <Card.Header>
             <Card.Title className="text-lg font-bold">{t({ en: 'Preferences', fr: 'Préférences' })}</Card.Title>
+            <Card.Description>
+              {t({
+                en: 'Saved in this browser and applied immediately. They affect only you, not other users of this instance.',
+                fr: 'Enregistrées dans ce navigateur et appliquées immédiatement. Elles ne concernent que vous, et non les autres utilisateurs de cette instance.'
+              })}
+            </Card.Description>
           </Card.Header>
           <Card.Content>
             <div className="flex items-center justify-between gap-4">
@@ -112,11 +145,6 @@ const RouteComponent = () => {
             </div>
           </Card.Content>
         </Card>
-        <div className="mt-6">
-          <Button className="w-full" onClick={handleSave}>
-            {t({ en: 'Save', fr: 'Enregistrer' })}
-          </Button>
-        </div>
       </div>
     </React.Fragment>
   );
