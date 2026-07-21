@@ -65,10 +65,13 @@ test.describe('gateway remote assignment', () => {
     await page.getByRole('link', { name: 'Assignments' }).click();
     await page.waitForURL('**/datahub/**/assignments');
 
-    // The completion posts back from the gateway asynchronously, and assertion retries re-query the
-    // locator rather than refetching, so reload to pick up the settled state. Safe here: the page is
-    // addressed by subject id, so it does not depend on the (now irrelevant) in-memory session.
-    await page.reload();
-    await expect(page.getByRole('table')).toContainText('Complete');
+    // The completion posts back from the gateway asynchronously (it can still read "Outstanding"
+    // for a while on a slow runner), and assertion retries re-query the locator rather than
+    // refetching -- so retry the reload itself until the status settles. Reloading is safe here:
+    // the page is addressed by subject id, not the (now irrelevant) in-memory session.
+    await expect(async () => {
+      await page.reload();
+      await expect(page.getByRole('table')).toContainText('Complete', { timeout: 5_000 });
+    }).toPass({ timeout: 90_000 });
   });
 });
