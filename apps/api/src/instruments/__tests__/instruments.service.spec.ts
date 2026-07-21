@@ -11,6 +11,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { InstrumentsService } from '../instruments.service';
 
+import type { InstrumentVirtualizationContext } from '../instruments.service';
+
 // Avoid bundling a real instrument (esbuild) during unit tests; `createSeries` only needs `create` to be
 // called with whatever the bundler produces.
 vi.mock('@opendatacapture/instrument-bundler', () => ({
@@ -45,6 +47,8 @@ describe('InstrumentsService', () => {
   let instrumentRecordModel: MockedInstance<Model<'InstrumentRecord'>>;
   let groupModel: MockedInstance<Model<'Group'>>;
   let virtualizationService: MockedInstance<VirtualizationService<any>>;
+  /** The same Map the service memoizes evaluated instances into — see the context assignment below. */
+  let instanceCache: InstrumentVirtualizationContext['instruments'];
 
   beforeEach(async () => {
     vi.mocked(bundle).mockClear();
@@ -71,7 +75,11 @@ describe('InstrumentsService', () => {
     groupModel.findFirst.mockResolvedValue({ id: 'group-1' } as any);
     virtualizationService = moduleRef.get(VirtualizationService);
     // `getInstrumentInstance` reads/writes an instance cache on the virtualization context.
-    (virtualizationService as { context: unknown }).context = { __resolveImport: vi.fn(), instruments: new Map() };
+    instanceCache = new Map();
+    (virtualizationService as { context: unknown }).context = {
+      __resolveImport: vi.fn(),
+      instruments: instanceCache
+    };
   });
 
   it('should be defined', () => {
@@ -461,6 +469,33 @@ describe('InstrumentsService', () => {
       });
       expect(instrumentModel.delete).toHaveBeenCalledWith({ where: { id: 'target' } });
       expect(result).toEqual({ id: 'target' });
+    });
+
+    it('evicts the deleted instrument from the instance cache', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'target' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { content: { items: [] }, kind: 'SERIES' }
+      } as any);
+      instrumentRecordModel.count.mockResolvedValue(0);
+      groupModel.findMany.mockResolvedValue([]);
+
+      await instrumentsService.deleteById('target');
+
+      // Checking the kind populates the cache, so a delete always leaves an entry behind to clean up.
+      expect(instanceCache.has('target')).toBe(false);
+    });
+
+    it('does not evict the cached instance when the delete is refused', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'scalar' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { internal: { edition: 1, name: 'FORM_A' }, kind: 'FORM' }
+      } as any);
+
+      await expect(instrumentsService.deleteById('scalar')).rejects.toThrow(ForbiddenException);
+
+      expect(instanceCache.has('scalar')).toBe(true);
     });
   });
 

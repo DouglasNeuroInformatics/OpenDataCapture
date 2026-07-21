@@ -241,6 +241,10 @@ export class InstrumentsService {
       )
     );
     await this.instrumentModel.delete({ where: { id } });
+    // `getInstrumentInstance` memoizes every instance it evaluates, including the one this method just
+    // evaluated to check the kind. Leaving it behind would keep a deleted instrument resident for the
+    // lifetime of the process, and would shadow the bundle of any future instrument issued the same id.
+    this.virtualizationService.context.instruments.delete(id);
     return { id };
   }
 
