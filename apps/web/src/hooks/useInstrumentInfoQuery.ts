@@ -5,6 +5,8 @@ import { $InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
+import { useAppStore } from '@/store';
+
 type UseInstrumentInfoQueryOptions<TKind extends InstrumentKind> = {
   params?: {
     allEditions?: boolean;
@@ -17,14 +19,22 @@ export function useInstrumentInfoQuery<TKind extends InstrumentKind>({
   params
 }: UseInstrumentInfoQueryOptions<TKind> = {}) {
   const { resolvedLanguage } = useTranslation();
+  const currentGroupId = useAppStore((store) => store.currentGroup?.id);
   return useQuery({
     queryFn: async () => {
       const response = await axios.get('/v1/instruments/info', {
-        params
+        params: { ...params, groupId: currentGroupId }
       });
       const infos = await $InstrumentInfo.array().parseAsync(response.data);
       return infos.map((instrument) => translateInstrumentInfo(instrument, resolvedLanguage ?? 'en'));
     },
-    queryKey: ['instrument-info', params?.kind, params?.subjectId, params?.allEditions, resolvedLanguage]
+    queryKey: [
+      'instrument-info',
+      currentGroupId,
+      params?.kind,
+      params?.subjectId,
+      params?.allEditions,
+      resolvedLanguage
+    ]
   });
 }
