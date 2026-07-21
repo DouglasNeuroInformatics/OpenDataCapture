@@ -2,7 +2,7 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { getModelToken } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -106,19 +106,60 @@ describe('InstrumentRecordsService', () => {
     beforeEach(() => {
       instrumentsService.findById.mockResolvedValue(mockInstrument as any);
       subjectsService.createMany.mockResolvedValue([] as any);
-      sessionsService.create.mockResolvedValue(mockSession as any);
+      sessionsService.createMany.mockResolvedValue([mockSession] as any);
       sessionsService.deleteByIds.mockResolvedValue(undefined as any);
       instrumentRecordModel.createMany.mockResolvedValue([] as any);
       instrumentRecordModel.findMany.mockResolvedValue([] as any);
     });
 
-    it('should call sessionsService.create with the provided username', async () => {
+    it('should create the sessions in one batched call carrying the provided username', async () => {
       usersService.findByUsername.mockResolvedValueOnce({ groups: [{ id: 'group-1' }], username: 'validuser' } as any);
 
       await instrumentRecordsService.upload({ ...baseUploadData, groupId: 'group-1', username: 'validuser' });
 
       expect(usersService.findByUsername).toHaveBeenCalledWith('validuser', undefined);
-      expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ username: 'validuser' }));
+      expect(sessionsService.create).not.toHaveBeenCalled();
+      expect(sessionsService.createMany).toHaveBeenCalledTimes(1);
+      expect(sessionsService.createMany).toHaveBeenCalledWith(
+        expect.objectContaining({ groupId: 'group-1', type: 'RETROSPECTIVE', username: 'validuser' })
+      );
+    });
+
+    it('should batch every record into a single session creation call', async () => {
+      const records = Array.from({ length: 25 }, (_, i) => ({
+        data: { answer: i },
+        date: new Date(),
+        subjectId: `subject-${i}`
+      }));
+      sessionsService.createMany.mockResolvedValueOnce(
+        records.map((_, i) => ({ ...mockSession, id: `session-${i}` })) as any
+      );
+
+      await instrumentRecordsService.upload({ ...baseUploadData, records });
+
+      expect(sessionsService.createMany).toHaveBeenCalledTimes(1);
+      const [call] = sessionsService.createMany.mock.lastCall as [{ entries: unknown[] }];
+      expect(call.entries).toHaveLength(25);
+    });
+
+    it('should pair each record with the session created for it, by position', async () => {
+      const records = [
+        { data: { answer: 1 }, date: new Date(), subjectId: 'subject-a' },
+        { data: { answer: 2 }, date: new Date(), subjectId: 'subject-b' }
+      ];
+      sessionsService.createMany.mockResolvedValueOnce([
+        { ...mockSession, id: 'session-a' },
+        { ...mockSession, id: 'session-b' }
+      ] as any);
+
+      await instrumentRecordsService.upload({ ...baseUploadData, records });
+
+      expect(instrumentRecordModel.createMany.mock.lastCall?.[0]).toMatchObject({
+        data: [
+          { sessionId: 'session-a', subjectId: 'subject-a' },
+          { sessionId: 'session-b', subjectId: 'subject-b' }
+        ]
+      });
     });
 
     it('should throw a ForbiddenException when a non-admin user uploads without a group', async () => {
@@ -131,7 +172,7 @@ describe('InstrumentRecordsService', () => {
         instrumentRecordsService.upload({ ...baseUploadData, username: 'validuser' })
       ).rejects.toBeInstanceOf(ForbiddenException);
 
-      expect(sessionsService.create).not.toHaveBeenCalled();
+      expect(sessionsService.createMany).not.toHaveBeenCalled();
     });
 
     it('should throw a ForbiddenException when a user uploads to a group they are not a member of', async () => {
@@ -144,7 +185,7 @@ describe('InstrumentRecordsService', () => {
         instrumentRecordsService.upload({ ...baseUploadData, groupId: 'group-1', username: 'validuser' })
       ).rejects.toBeInstanceOf(ForbiddenException);
 
-      expect(sessionsService.create).not.toHaveBeenCalled();
+      expect(sessionsService.createMany).not.toHaveBeenCalled();
     });
 
     it('should reject and not create any sessions when an unknown username is provided', async () => {
@@ -156,14 +197,36 @@ describe('InstrumentRecordsService', () => {
         NotFoundException
       );
 
-      expect(sessionsService.create).not.toHaveBeenCalled();
+      expect(sessionsService.createMany).not.toHaveBeenCalled();
     });
 
-    it('should call sessionsService.create with username undefined when no username is provided', async () => {
+    it('should create the sessions with username undefined when no username is provided', async () => {
       await instrumentRecordsService.upload({ ...baseUploadData });
 
       expect(usersService.findByUsername).not.toHaveBeenCalled();
-      expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ username: undefined }));
+      expect(sessionsService.createMany).toHaveBeenCalledWith(expect.objectContaining({ username: undefined }));
+    });
+
+    it('should return only the records this upload created, not every record in the group', async () => {
+      await instrumentRecordsService.upload({ ...baseUploadData, groupId: 'group-1' });
+
+      expect(instrumentRecordModel.findMany).toHaveBeenCalledWith({
+        where: { sessionId: { in: ['session-1'] } }
+      });
+    });
+
+    it('should reject an invalid record before creating any sessions', async () => {
+      instrumentsService.findById.mockResolvedValue({
+        ...mockInstrument,
+        validationSchema: { safeParse: () => ({ error: { issues: [] }, success: false }) }
+      } as any);
+
+      await expect(instrumentRecordsService.upload({ ...baseUploadData })).rejects.toBeInstanceOf(
+        UnprocessableEntityException
+      );
+
+      expect(sessionsService.createMany).not.toHaveBeenCalled();
+      expect(instrumentRecordModel.createMany).not.toHaveBeenCalled();
     });
 
     // `pending` is intentionally not written on create; the find-side OR filter treats missing and
