@@ -10,7 +10,12 @@ import {
   Heading
 } from '@douglasneuroinformatics/libui/components';
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
-import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import {
+  useDownload,
+  useEventCallback,
+  useNotificationsStore,
+  useTranslation
+} from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import type { Sex, Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
@@ -354,6 +359,14 @@ const MasterDataTable: React.FC<{
   const hasRecordsRef = useRef(hasRecords);
   hasRecordsRef.current = hasRecords;
 
+  // Read on re-creation of the memoized table below, so typing does not itself re-create it
+  const searchStringRef = useRef(searchString);
+  searchStringRef.current = searchString;
+
+  // The parent passes these as inline arrows, so they must be stabilized before they can be memo dependencies
+  const handleSelect = useEventCallback(onSelect);
+  const handleRowDoubleClick = useEventCallback(onRowDoubleClick);
+
   const TogglesWithFilter = useMemo(() => {
     const Component = (props: { table: TanstackTable.Table<Subject> }) => (
       <Toggles {...props} hasRecords={hasRecordsRef.current} setHasRecords={setHasRecords} />
@@ -436,7 +449,7 @@ const MasterDataTable: React.FC<{
             {
               id: 'subjectId',
               value: {
-                searchString
+                searchString: searchStringRef.current
               } satisfies HasSearchStringFilter
             },
             {
@@ -457,12 +470,12 @@ const MasterDataTable: React.FC<{
         rowActions={[
           {
             label: t({ en: 'View', fr: 'Voir' }),
-            onSelect
+            onSelect: handleSelect
           }
         ]}
         togglesComponent={TogglesWithFilter}
         onRowClick={(subject) => setHighlightedRowId(subject.id)}
-        onRowDoubleClick={onRowDoubleClick}
+        onRowDoubleClick={handleRowDoubleClick}
         onSearchChange={(value, table) => {
           setSearchString(value);
           const subjectIdColumn = table.getColumn('subjectId')!;
@@ -475,7 +488,7 @@ const MasterDataTable: React.FC<{
         }}
       />
     ),
-    [displayData, onRowDoubleClick, onSelect, searchString, subjectIdDisplaySetting, t]
+    [displayData, handleRowDoubleClick, handleSelect, subjectIdDisplaySetting, t]
   );
 
   return (

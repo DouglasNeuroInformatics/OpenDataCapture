@@ -1,5 +1,7 @@
 @import '@opendatacapture/react-core/globals.css';
 
+/* Highlight the data-table row containing a marker (see @/components/DataTableRowHighlight, which sets
+   both the marker and the custom property via the table's rootStyle). */
 [data-testid='data-table-row']:has([data-row-highlighted='true']) {
   background-color: var(--data-table-row-highlight-background);
 }

@@ -222,7 +222,10 @@ const RouteComponent = () => {
           </Button>
         )}
         onRowClick={(repo) => setHighlightedRowId(repo.id)}
-        onRowDoubleClick={handleSync}
+        onRowDoubleClick={(repo) => {
+          setHighlightedRowId(repo.id);
+          handleSync(repo);
+        }}
       />
     ),
     [handleDeleteClick, handleSync, reposQuery.data, t]
