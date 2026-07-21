@@ -18,24 +18,25 @@ const parseAccessToken = (accessToken: string) => {
   };
 };
 
-const PREFERRED_GROUP_KEY = 'odc-preferred-group-id';
-
-export const createAuthSlice: SliceCreator<AuthSlice> = (set) => {
+export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => {
   const accessToken = window.__PLAYWRIGHT_ACCESS_TOKEN__ ?? null;
   const initialState = accessToken ? parseAccessToken(accessToken) : null;
 
   return {
     accessToken,
     changeGroup: (group) => {
-      localStorage.setItem(PREFERRED_GROUP_KEY, group.id);
-      set({ currentGroup: group, currentSession: null });
+      set({ currentGroup: group, currentSession: null, preferredGroupId: group.id });
     },
     currentGroup: initialState?.currentGroup ?? null,
     currentUser: initialState?.currentUser ?? null,
     login: (accessToken) => {
       const { currentGroup, currentUser } = parseAccessToken(accessToken);
-      const preferredId = localStorage.getItem(PREFERRED_GROUP_KEY);
-      const preferred = preferredId ? currentUser.groups.find((g) => g.id === preferredId) : null;
+      // Restore the group last used on this device. A different user signing in on the same browser
+      // will not belong to it, in which case we fall back to the first group on their token.
+      const { preferredGroupId } = get();
+      const preferred = preferredGroupId
+        ? currentUser.groups.find((group) => group.id === preferredGroupId)
+        : undefined;
       set({
         accessToken,
         currentGroup: preferred ?? currentGroup,

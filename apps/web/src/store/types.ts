@@ -45,6 +45,8 @@ export type GroupSwitcherPosition = 'sidebar' | 'topbar';
 
 export type PreferencesSlice = {
   groupSwitcherPosition: GroupSwitcherPosition;
+  /** The group last selected on this device, reselected at login when the user still belongs to it. */
+  preferredGroupId: null | string;
   setGroupSwitcherPosition: (position: GroupSwitcherPosition) => void;
 };
 

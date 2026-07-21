@@ -12,6 +12,17 @@ import { createWalkthroughSlice } from './slices/walkthrough.slice';
 
 import type { AppStore } from './types';
 
+/**
+ * The slice of the store written to localStorage. Everything else (auth, session, connectivity) is
+ * derived from the access token or the network at runtime and must not outlive the tab.
+ */
+const PERSISTED_KEYS = [
+  'groupSwitcherPosition',
+  'isDisclaimerAccepted',
+  'isWalkthroughComplete',
+  'preferredGroupId'
+] as const satisfies (keyof AppStore)[];
+
 export const useAppStore = create(
   devtools(
     persist(
@@ -24,13 +35,14 @@ export const useAppStore = create(
         ...createWalkthroughSlice(...a)
       })),
       {
-        // Carry the persisted flags forward across any future store-version bump so a
-        // user's "don't show the tutorial again" choice survives ODC upgrades. Without a
-        // migrate function, zustand discards persisted state on a version mismatch, which
-        // would make the walkthrough reappear after an update.
-        migrate: (persistedState) => persistedState as AppStore,
+        // Carry the persisted keys forward across any future store-version bump, so a user's "don't
+        // show the tutorial again" choice survives an ODC upgrade — without a migrate function
+        // zustand discards persisted state whenever the version changes. Picking the known keys
+        // rather than passing the blob through means a v2 that drops or renames one only has to
+        // amend PERSISTED_KEYS, and stale keys never leak back into the store.
+        migrate: (persistedState) => pick(persistedState as Partial<AppStore>, PERSISTED_KEYS) as AppStore,
         name: 'app',
-        partialize: (state) => pick(state, ['groupSwitcherPosition', 'isDisclaimerAccepted', 'isWalkthroughComplete']),
+        partialize: (state) => pick(state, PERSISTED_KEYS),
         storage: createJSONStorage(() => localStorage),
         version: 1
       }
