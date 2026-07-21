@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import {
   Badge,
@@ -17,7 +17,7 @@ import { InstrumentRenderer } from '@opendatacapture/react-core';
 import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
 import { $RegexString } from '@opendatacapture/schemas/core';
 import type { UpdateGroupData } from '@opendatacapture/schemas/group';
-import type { $CreateSeriesInstrumentData, InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
+import type { $CreateSeriesInstrumentData } from '@opendatacapture/schemas/instrument';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { createFileRoute } from '@tanstack/react-router';
@@ -58,18 +58,15 @@ type CategorizedInstruments = {
 };
 
 const getSeriesPreviewItemTitles = ({
-  bundle,
   fallbackTitle,
-  items
+  items,
+  seriesItems
 }: {
-  bundle?: InstrumentBundleContainer;
   fallbackTitle: (index: number) => string;
   items: InstrumentItem[];
+  seriesItems: { id: string }[];
 }) => {
-  if (bundle?.kind !== 'SERIES') {
-    return [];
-  }
-  return bundle.items.map((seriesItem, index) => {
+  return seriesItems.map((seriesItem, index) => {
     return items.find((item) => item.id === seriesItem.id)?.title ?? fallbackTitle(index);
   });
 };
@@ -150,7 +147,7 @@ const InstrumentSection = ({
         <div className="space-y-1">
           {filtered.map((item) => (
             <div
-              className="grid cursor-pointer grid-cols-[auto_1fr_auto_auto] items-center gap-3 rounded-md px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800"
+              className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 rounded-md px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800"
               key={item.id}
             >
               <Checkbox
@@ -159,7 +156,7 @@ const InstrumentSection = ({
                 onCheckedChange={() => onToggle(item.id)}
               />
               <button
-                className="truncate bg-transparent p-0 text-left text-sm disabled:cursor-default"
+                className="cursor-pointer truncate bg-transparent p-0 text-left text-sm disabled:cursor-default"
                 disabled={readOnly}
                 title={item.title}
                 type="button"
@@ -215,16 +212,19 @@ const InstrumentPreviewDialog = ({
 }) => {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
-  const bundleQuery = useInstrumentBundle(showForm || item.kind === 'SERIES' ? item.id : null);
+  // Only the rendered preview needs the bundle. Series composition comes from `item.seriesItems`, which
+  // the info query already provides — fetching the bundle for it would pull down the compiled source of
+  // every constituent instrument just to list their names.
+  const bundleQuery = useInstrumentBundle(showForm ? item.id : null);
   // Passed to the renderer as a localizable value; the shared component resolves it to the active language.
   const previewSubmitLabel = { en: 'Preview Submit', fr: 'Soumettre l’aperçu' };
   const seriesItemTitles = useMemo(() => {
     return getSeriesPreviewItemTitles({
-      bundle: bundleQuery.data,
       fallbackTitle: (index) => t({ en: `Item ${index + 1}`, fr: `Élément ${index + 1}` }),
-      items
+      items,
+      seriesItems: item.seriesItems ?? []
     });
-  }, [bundleQuery.data, items, t]);
+  }, [item.seriesItems, items, t]);
 
   return (
     <Dialog
@@ -275,11 +275,9 @@ const InstrumentPreviewDialog = ({
                     {t({ en: 'Series order', fr: 'Ordre de la série' })}
                     {seriesItemTitles.length > 0 && ` (${seriesItemTitles.length})`}:{' '}
                   </span>
-                  {bundleQuery.isLoading ? (
-                    <span className="text-muted-foreground">{t({ en: 'Loading...', fr: 'Chargement...' })}</span>
-                  ) : bundleQuery.isError ? (
-                    <span className="text-destructive">
-                      {t({ en: 'Unable to load series items.', fr: 'Impossible de charger les éléments de la série.' })}
+                  {seriesItemTitles.length === 0 ? (
+                    <span className="text-muted-foreground">
+                      {t({ en: 'No items in this series.', fr: 'Aucun élément dans cette série.' })}
                     </span>
                   ) : (
                     <ol className="text-muted-foreground mt-1 max-h-48 list-decimal space-y-1 overflow-auto rounded-md border border-slate-200 py-2 pl-8 pr-3 dark:border-slate-800">
@@ -620,12 +618,14 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
   // so a just-deleted instrument is never re-sent as a dangling relation.
   const [deletedIds, setDeletedIds] = useState<Set<string>>(() => new Set());
 
-  // Resync the selection when the upstream group data changes (e.g. after a save refetches the group).
-  // `initialSelectedIds` is a stable reference from a useMemo, so this only fires on real changes —
-  // not on every render — and won't clobber in-progress edits.
-  useEffect(() => {
+  // Reseed the selection only when the user switches groups. `initialSelectedIds` gets a new identity
+  // on every instrument-info refetch — including the one triggered by creating a series — and resyncing
+  // on that would discard unsaved edits, among them the newly created series we just selected.
+  const [syncedGroupId, setSyncedGroupId] = useState(groupId);
+  if (syncedGroupId !== groupId) {
+    setSyncedGroupId(groupId);
     setSelectedIds(new Set(initialSelectedIds));
-  }, [initialSelectedIds]);
+  }
 
   const toggle = (id: string) => {
     setSelectedIds((prev) => {
@@ -971,6 +971,7 @@ const RouteComponent = () => {
   }, [
     accessibleInstrumentIds,
     availableInstruments,
+    currentGroup?.id,
     defaultIdentificationMethod,
     instrumentRepoIds,
     resolvedLanguage,
