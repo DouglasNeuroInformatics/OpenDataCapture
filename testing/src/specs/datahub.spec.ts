@@ -1,7 +1,7 @@
-import { expect, test } from './helpers/fixtures';
+import { expect, test } from '../support/fixtures';
 
-test.describe('dashhub', () => {
-  test('should display the dashhub header', async ({ getPageModel }) => {
+test.describe('data hub', () => {
+  test('should display the data hub header', async ({ getPageModel }) => {
     const datahubPage = await getPageModel('/datahub');
     await expect(datahubPage.pageHeader).toBeVisible();
     await expect(datahubPage.pageHeader).toContainText('Data Hub');

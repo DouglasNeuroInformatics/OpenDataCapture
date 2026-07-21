@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-import type { NavigateArgs, RouteTo } from '../helpers/types';
+import type { NavigateArgs, RouteTo } from '../support/types';
 
 export abstract class RootPage {
   readonly $ref: Page;
