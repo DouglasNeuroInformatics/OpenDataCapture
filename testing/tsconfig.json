@@ -1,0 +1,7 @@
+{
+  "extends": ["../tsconfig.base.json"],
+  "compilerOptions": {
+    "lib": ["DOM"]
+  },
+  "include": ["src/**/*", "scripts/**/*", "playwright.config.ts", "playwright.docker.config.ts"]
+}

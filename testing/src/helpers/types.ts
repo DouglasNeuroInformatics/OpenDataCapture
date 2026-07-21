@@ -42,9 +42,8 @@ export type ProjectMetadata = {
   browserTarget: BrowserTarget;
 };
 
-// export type RouteTo = import('../../../../apps/web/src/route-tree.ts').FileRouteTypes['to'];
-
-export type RouteTo = string;
+// Generated from apps/web's route tree by scripts/gen-routes.ts (see src/generated/route.d.ts).
+export type RouteTo = import('../generated/route.d.ts').RouteTo;
 
 export type RouteParams<TPath extends RouteTo> = {
   [K in ExtractParams<TPath>]: number | string;
