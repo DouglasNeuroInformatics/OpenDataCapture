@@ -112,7 +112,7 @@ export class InstrumentsService {
     }
 
     if (instance.kind === 'SERIES') {
-      const result = await this.validateSeriesInstrument(instance);
+      const result = await this.validateSeriesInstrument(instance, seriesGroupId);
       if (!result.success) {
         throw new UnprocessableEntityException(result.message);
       }
@@ -646,15 +646,48 @@ export class InstrumentsService {
     return typeof title === 'string' ? [title] : Object.values(title);
   }
 
-  private async validateSeriesInstrument(instrument: SeriesInstrument) {
+  /**
+   * Resolve a series' items to stored instruments, rejecting the series if any is missing.
+   *
+   * When the series belongs to a group, its items are additionally restricted to the instruments that
+   * group may administer. Items are named by internal name + edition, which the caller controls
+   * entirely, and `findInfo` reports the resolved ids back as `seriesItems` — which the manage page
+   * then writes into the group's accessible list. Without this check a manager could name an
+   * instrument from a repository their group was never assigned and have the series carry it in,
+   * defeating the opt-in that `GroupsService` enforces when a group is created.
+   *
+   * The rule mirrors the visibility test the manage page applies client-side: not sourced from a repo,
+   * sourced from a repo currently assigned to the group, or already accessible to it — the last so a
+   * selection survives its repository later being unassigned.
+   */
+  private async validateSeriesInstrument(instrument: SeriesInstrument, seriesGroupId?: string) {
     const items = getSeriesInstrumentItems(instrument.content);
     if (items.length < 2) {
       return { message: 'Series instrument must include at least two items', success: false };
     }
     const itemIds = items.map((internal) => this.generateScalarInstrumentId({ internal }));
+    const group = seriesGroupId
+      ? await this.groupModel.findFirst({
+          select: { accessibleInstrumentIds: true, instrumentRepoIds: true },
+          where: { id: seriesGroupId }
+        })
+      : null;
     const found = await this.instrumentModel.findMany({
       select: { id: true },
-      where: { id: { in: itemIds } }
+      where: {
+        AND: [
+          group
+            ? {
+                OR: [
+                  { sourceRepoId: null },
+                  { sourceRepoId: { in: group.instrumentRepoIds ?? [] } },
+                  { id: { in: group.accessibleInstrumentIds ?? [] } }
+                ]
+              }
+            : {}
+        ],
+        id: { in: itemIds }
+      }
     });
     const foundIds = new Set(found.map(({ id }) => id));
     const missingIndex = itemIds.findIndex((id) => !foundIds.has(id));
