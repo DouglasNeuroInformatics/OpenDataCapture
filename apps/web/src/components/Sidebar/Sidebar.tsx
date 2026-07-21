@@ -47,16 +47,24 @@ export const Sidebar = () => {
       {showSidebarGroupSwitcher && (
         <div className="mb-2">
           {isSingleGroup ? (
-            <div className="flex h-9 w-full items-center justify-center rounded-md bg-sky-700 text-sm font-semibold text-slate-100">
-              {currentGroup.name}
+            <div className="relative flex h-auto w-full flex-col items-start overflow-hidden rounded-md border border-sky-700 bg-slate-800 px-3 py-1.5 font-semibold text-white before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-sky-400 before:content-['']">
+              <span className="text-[10px] font-medium tracking-tight text-sky-400">
+                {t({ en: 'Group', fr: 'Groupe' })}
+              </span>
+              <span className="text-[14px]">{currentGroup.name}</span>
             </div>
           ) : (
             <Select
               value={currentGroup.id}
               onValueChange={(id) => changeGroup(currentUser.groups.find((g) => g.id === id)!)}
             >
-              <Select.Trigger className="w-full border-transparent bg-sky-700 font-semibold text-slate-100 hover:bg-sky-600 focus:ring-sky-600 [&>svg]:text-slate-300 [&>svg]:opacity-100">
-                <Select.Value />
+              <Select.Trigger className="relative h-auto w-full overflow-hidden border border-sky-700 bg-slate-800 py-1.5 text-[14px] font-semibold text-white before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-sky-400 before:content-[''] hover:bg-slate-700 [&>svg]:text-white [&>svg]:opacity-100">
+                <div className="flex flex-col items-start leading-tight">
+                  <span className="text-[10px] font-medium tracking-tight text-sky-400">
+                    {t({ en: 'Group', fr: 'Groupe' })}
+                  </span>
+                  <Select.Value />
+                </div>
               </Select.Trigger>
               <Select.Content>
                 <Select.Group>

@@ -14,13 +14,13 @@ import type { GroupSwitcherPosition } from '@/store/types';
 const Toggle = ({ checked, onCheckedChange }: { checked: boolean; onCheckedChange: (val: boolean) => void }) => (
   <button
     aria-checked={checked}
-    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${checked ? 'bg-primary' : 'bg-muted'}`}
+    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${checked ? 'bg-primary' : 'bg-slate-400 dark:bg-slate-600'}`}
     role="switch"
     type="button"
     onClick={() => onCheckedChange(!checked)}
   >
     <span
-      className={`bg-background pointer-events-none block h-5 w-5 rounded-full shadow-lg ring-0 transition-transform ${checked ? 'translate-x-5' : 'translate-x-0'}`}
+      className={`pointer-events-none block h-5 w-5 rounded-full bg-slate-200 shadow-lg ring-0 transition-transform ${checked ? 'translate-x-5' : 'translate-x-0'}`}
     />
   </button>
 );
@@ -112,8 +112,8 @@ const RouteComponent = () => {
             </div>
           </Card.Content>
         </Card>
-        <div className="mt-6 flex justify-center">
-          <Button className="w-36" onClick={handleSave}>
+        <div className="mt-6">
+          <Button className="w-full" onClick={handleSave}>
             {t({ en: 'Save', fr: 'Enregistrer' })}
           </Button>
         </div>
