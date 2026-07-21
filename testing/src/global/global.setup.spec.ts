@@ -15,7 +15,9 @@ test.describe.serial(() => {
     test('should successfully setup', async ({ getPageModel }) => {
       const setupPage = await getPageModel('/setup');
       await setupPage.fillSetupForm(initAppOptions);
-      await setupPage.expect.toHaveURL('/auth/login');
+      // Setup seeds demo data plus dummySubjectCount * recordsPerSubject dummy records before
+      // redirecting; on a cold CI runner this legitimately takes far longer than the default timeout.
+      await setupPage.expect.toHaveURL('/auth/login', { timeout: 90_000 });
     });
     test('should be setup after initialization', async ({ request }) => {
       const response = await request.get('/api/v1/setup');

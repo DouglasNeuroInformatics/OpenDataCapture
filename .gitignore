@@ -5,8 +5,6 @@ node_modules
 
 # testing
 coverage
-testing/cypress/screenshots
-testing/cypress/downloads
 
 # build
 build
@@ -43,10 +41,6 @@ yarn-error.log*
 /data/
 /apps/gateway/data/
 
-# k6
-testing/k6/results
-testing/k6/notebooks/
-
 # bruno
 .bruno/
 
@@ -75,7 +69,7 @@ storybook-static
 .claude/settings.local.json
 
 # playwright
-testing/e2e/.playwright
+testing/.playwright
 
 # tanstack router generated temp files
 .tanstack

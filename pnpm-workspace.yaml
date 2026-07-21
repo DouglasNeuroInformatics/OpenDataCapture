@@ -64,5 +64,5 @@ packages:
   - 'packages/*'
   - 'runtime/*'
   - 'storybook'
-  - 'testing/*'
+  - 'testing'
   - 'vendor/**/*'

@@ -29,6 +29,11 @@ const browsers: { target: BrowserTarget; use: Project['use'] }[] = [
 ] as const;
 
 export default defineConfig({
+  // The default 5s assertion timeout is too tight for a 2-core CI runner doing real DB work
+  // (session creation, seeding). Heavier one-off operations set their own longer timeout inline.
+  expect: {
+    timeout: 15_000
+  },
   globalSetup: path.resolve(import.meta.dirname, 'src/global/global.setup.ts'),
   globalTeardown: path.resolve(import.meta.dirname, 'src/global/global.teardown.ts'),
   maxFailures: 1,
@@ -74,7 +79,7 @@ export default defineConfig({
   webServer: [
     {
       command: 'pnpm dev:test',
-      cwd: path.resolve(import.meta.dirname, '../../apps/api'),
+      cwd: path.resolve(import.meta.dirname, '../apps/api'),
       gracefulShutdown: {
         signal: 'SIGINT',
         timeout: 1000
@@ -86,7 +91,7 @@ export default defineConfig({
     },
     {
       command: 'pnpm dev:test',
-      cwd: path.resolve(import.meta.dirname, '../../apps/gateway'),
+      cwd: path.resolve(import.meta.dirname, '../apps/gateway'),
       gracefulShutdown: {
         signal: 'SIGINT',
         timeout: 1000
@@ -98,7 +103,7 @@ export default defineConfig({
     },
     {
       command: 'pnpm dev:test',
-      cwd: path.resolve(import.meta.dirname, '../../apps/web'),
+      cwd: path.resolve(import.meta.dirname, '../apps/web'),
       gracefulShutdown: {
         signal: 'SIGINT',
         timeout: 1000
