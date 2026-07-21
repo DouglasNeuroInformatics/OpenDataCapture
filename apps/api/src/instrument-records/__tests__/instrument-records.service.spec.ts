@@ -165,6 +165,37 @@ describe('InstrumentRecordsService', () => {
       expect(usersService.findByUsername).not.toHaveBeenCalled();
       expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ username: undefined }));
     });
+
+    // `pending` is intentionally not written on create; the find-side OR filter treats missing and
+    // false `pending` alike (see the 'find' describe block), so records stay query-visible without it.
+    it('should create records via createMany with the processed record data', async () => {
+      await instrumentRecordsService.upload({ ...baseUploadData });
+
+      expect(instrumentRecordModel.createMany).toHaveBeenCalledWith({
+        data: [expect.objectContaining({ instrumentId: 'instrument-1', subjectId: 'subject-1' })]
+      });
+    });
+  });
+
+  describe('find', () => {
+    beforeEach(() => {
+      instrumentsService.find.mockResolvedValue([]);
+      instrumentRecordModel.findMany.mockResolvedValue([]);
+    });
+
+    it('should match records where the pending field is missing entirely, since prisma NOT filters on mongodb exclude documents without the field', async () => {
+      await instrumentRecordsService.find({});
+
+      expect(instrumentRecordModel.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            AND: expect.arrayContaining([
+              { OR: [{ pending: { isSet: false } }, { pending: null }, { pending: false }] }
+            ])
+          }
+        })
+      );
+    });
   });
 
   describe('exportRecords', () => {

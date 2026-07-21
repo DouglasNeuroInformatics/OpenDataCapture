@@ -36,6 +36,6 @@ jobs:
         timeout-minutes: 10
         env:
           DEBIAN_FRONTEND: noninteractive
-        run: pnpm --filter "@opendatacapture/e2e" exec playwright install --with-deps chromium firefox
+        run: pnpm --filter "@opendatacapture/testing" exec playwright install --with-deps chromium firefox
       - name: End-to-End Tests
-        run: pnpm --filter "@opendatacapture/e2e" test
+        run: pnpm test:e2e
