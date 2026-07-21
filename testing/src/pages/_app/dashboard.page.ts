@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
-import { AppPage } from './_app.page';
+import { AppPage } from './route.page';
 
 export class DashboardPage extends AppPage {
   readonly pageHeader: Locator;

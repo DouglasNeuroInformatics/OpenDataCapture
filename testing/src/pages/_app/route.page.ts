@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
-import { RootPage } from './__root.page';
+import { RootPage } from '../__root.page';
 
 export abstract class AppPage extends RootPage {
   readonly _requiresAuth = true;
