@@ -51,7 +51,7 @@ export class SessionsService {
       }
     }
 
-    const { id } = await this.sessionModel.create({
+    return this.sessionModel.create({
       data: {
         date,
         group: group
@@ -68,15 +68,13 @@ export class SessionsService {
               connect: { id: user.id }
             }
           : undefined
-      }
-    });
-
-    return (await this.sessionModel.findUnique({
+      },
+      // returned by the create itself rather than re-read afterwards, which cost a second round trip
+      // for every session created
       include: {
         subject: true
-      },
-      where: { id }
-    }))!;
+      }
+    });
   }
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {

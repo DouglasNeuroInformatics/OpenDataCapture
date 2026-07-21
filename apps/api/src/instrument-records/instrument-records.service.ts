@@ -374,6 +374,19 @@ export class InstrumentRecordsService {
       }
     }
 
+    // Every record is validated before anything is written, so a malformed record in the middle of a
+    // batch rejects the request without first creating sessions that then have to be rolled back.
+    const validatedRecords = records.map((record) => {
+      const parseResult = instrument.validationSchema.safeParse(this.parseJson(record.data));
+      if (!parseResult.success) {
+        console.error(parseResult.error.issues);
+        throw new UnprocessableEntityException(
+          `Data received for record does not pass validation schema of instrument '${instrument.id}'`
+        );
+      }
+      return { data: parseResult.data, date: record.date, subjectId: record.subjectId };
+    });
+
     const createdSessionsArray: Session[] = [];
 
     try {
@@ -386,17 +399,8 @@ export class InstrumentRecordsService {
       await this.subjectsService.createMany(subjectIdList);
 
       const preProcessedRecords = await Promise.all(
-        records.map(async (record) => {
-          const { data: rawData, date, subjectId } = record;
-
-          // Validate data
-          const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
-          if (!parseResult.success) {
-            console.error(parseResult.error.issues);
-            throw new UnprocessableEntityException(
-              `Data received for record does not pass validation schema of instrument '${instrument.id}'`
-            );
-          }
+        validatedRecords.map(async (record) => {
+          const { data, date, subjectId } = record;
 
           const session = await this.sessionsService.create({
             date: date,
@@ -409,12 +413,12 @@ export class InstrumentRecordsService {
           createdSessionsArray.push(session);
 
           const computedMeasures = instrument.measures
-            ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
+            ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
             : null;
 
           return {
             computedMeasures,
-            data: this.serializeData(parseResult.data),
+            data: this.serializeData(data),
             date,
             groupId,
             instrumentId,
@@ -427,10 +431,11 @@ export class InstrumentRecordsService {
         data: preProcessedRecords
       });
 
+      // Scoped to the sessions this upload created, rather than every record in the group for this
+      // instrument: the response should describe the request, not the size of the database.
       return this.instrumentRecordModel.findMany({
         where: {
-          groupId,
-          instrumentId
+          sessionId: { in: createdSessionsArray.map((session) => session.id) }
         }
       });
     } catch (err) {
