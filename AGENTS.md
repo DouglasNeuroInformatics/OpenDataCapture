@@ -21,6 +21,46 @@ Per-package scripts (run from repo root via turbo filters, or `cd` into the pack
 
 `apps/web` uses TanStack Router with a generated `src/route-tree.ts`. **Do not run the route-tree generator yourself** — the user runs it manually after route changes.
 
+## Hard Rules
+
+- Ask before writing code if the task is ambiguous or its stated scope cannot accomplish the goal.
+- No new dependencies without asking in-conversation.
+- Whenever making any code changes, run `pnpm lint` and `pnpm test` from the repo root and fix failures before declaring the task done.
+- If code needs a comment to be understood, the code is wrong — rewrite it. Comments should be used to sparingly to understand the non-obvious (e.g., a vendor bug, a protocol quirk), not to restate the code.
+- All frontend user-facing strings need to be translated using the `useTranslation` hook (prefer inline translations with `t({ en: '...', fr: '...' })` unless translation is used multiple times).
+
+## What Good Code Looks Like Here
+
+Each principle applies where its problem exists; machinery without its justifying problem is ceremony, and ceremony is worse than plain code.
+
+- Correctness is structural, not vigilant. A correct system is one where the invalid state cannot be written, not one where a careful person catches it. Anything a human must remember, the compiler should remember instead.
+- One source of truth; everything derived. A contract exists once; types, variants, and fixtures flow from it. Two artifacts that must agree is a bug waiting for its trigger.
+- Strict data validation at the boundary, trusting inside. Data is distrusted exactly once — at the perimeter — then the interior runs clean, with no defensive re-checking cluttering the logic.
+- Shape is never repeated. Shared structure gets abstracted — with types before runtime indirection — so change propagates instead of being replicated.
+- Names and types carry all meaning. Guards first, success path flat, reading top to bottom.
+- Fail loudly on an undeclared policy.
+- Prefer descriptive variable names over terse or cryptic ones.
+
+## Conventions
+
+Define Zod schemas for data validation; derive types via `z.infer`. Convention: `$`-prefixed schema, same-named inferred type, type declared first:
+
+```ts
+export type $Entity = z.infer<typeof $Entity>;
+export const $Entity = z.object({ ... });
+```
+
+Variants by composition from a base shape, never from scratch. Schemas only
+for data actually parsed at a perimeter; everything else is a plain type.
+
+## Types
+
+Strict mode; no casting at call sites. No loose records where a closed key set is known. If only a subset of keys is known, type those keys and add an index signature. Type safety takes precedence over convenience.
+
+Use advanced type-level constructs — conditional types, template literal types, inference extraction, mapped types — as a routine tool rather than a special occasion. Use them to keep call sites short and fully inferred. Concentrate the cost: complex type machinery belongs in a small number of utilities, never spread across ordinary code.
+
+Name generics with a `T` prefix and a PascalCase noun describing the parameter's role — `TValue`, `TError`. The prefix distinguishes a type parameter from a concrete type at a glance; the noun explains it.
+
 ## Architecture
 
 ### Workspace layout
@@ -55,12 +95,13 @@ Per-package scripts (run from repo root via turbo filters, or `cd` into the pack
 - `testing/` — end-to-end tests.
 - `storybook/` — shared Storybook config.
 
-## Conventions
+## Tests
+
+Keep test bodies short; each verifies one behavior. Test descriptions are concise and grammatical.
+
+All new changes require new unit tests, as well as new end-to-end tests in `testing`.
+
+## Workflow
 
 - Make small, incremental, easily reviewable changes — avoid sweeping refactors unless explicitly requested.
-- Favor type safety over convenience; avoid type casting unless necessary. Never silently swallow errors.
-- No new dependencies without approval.
-- Prefer descriptive variable names over terse or cryptic ones.
-- Avoid excessive comments; don't comment obvious behavior. Use comments only to explain non-obvious behavior or pitfalls.
-- Once all changes are complete, run `pnpm lint` and `pnpm test` from the repo root to verify them.
 - All frontend user-facing strings need to be translated using the `useTranslation` hook (prefer inline translations with `t({ en: '...', fr: '...' })` unless translation is used multiple times).
