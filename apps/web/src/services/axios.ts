@@ -116,6 +116,7 @@ axios.interceptors.request.use((config) => {
     config.timeout = 10000; // abort request after 10 seconds
     config.timeoutErrorMessage = i18n.t({
       en: 'Network Error',
+      es: 'Error de red',
       fr: 'Erreur de réseau'
     });
   }
@@ -174,6 +175,7 @@ axios.interceptors.response.use(
       notifications.addNotification({
         message: i18n.t({
           en: 'Unknown Error',
+          es: 'Error desconocido',
           fr: 'Erreur inconnue'
         }),
         type: 'error'
@@ -187,10 +189,12 @@ axios.interceptors.response.use(
       notifications.addNotification({
         message: i18n.t({
           en: 'Unable to reach the server. Please check your connection and try again.',
+          es: 'No se pudo conectar con el servidor. Por favor, verifique su conexión e intente de nuevo.',
           fr: 'Impossible de joindre le serveur. Veuillez vérifier votre connexion et réessayer.'
         }),
         title: i18n.t({
           en: 'Connection Problem',
+          es: 'Problema de conexión',
           fr: 'Problème de connexion'
         }),
         type: 'warning'
@@ -200,6 +204,7 @@ axios.interceptors.response.use(
     notifications.addNotification({
       message: i18n.t({
         en: 'HTTP Request Failed',
+        es: 'Error en la solicitud HTTP',
         fr: 'Échec de la requête HTTP'
       }),
       title: error.response?.status.toString(),

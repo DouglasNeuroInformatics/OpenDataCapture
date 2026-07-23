@@ -21,6 +21,7 @@ const UploadSelectTable: React.FC<{
           field: (instrument) => instrument.details.title,
           label: t({
             en: 'Title',
+            es: 'Título',
             fr: 'Titre'
           })
         },
@@ -28,6 +29,7 @@ const UploadSelectTable: React.FC<{
           field: (instrument) => instrument.kind,
           label: t({
             en: 'Kind',
+            es: 'Tipo',
             fr: 'Type'
           })
         }
@@ -58,6 +60,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'Select Instrument (Experimental Feature)',
+            es: 'Seleccionar instrumento (Función experimental)',
             fr: 'Sélectionnez un instrument (Fonctionnalité expérimentale)'
           })}
         </Heading>
@@ -66,6 +69,7 @@ const RouteComponent = () => {
         className="mb-3"
         placeholder={t({
           en: 'Search by Instrument Title',
+          es: 'Buscar por título del instrumento',
           fr: "Rechercher par titre de l'instrument"
         })}
         value={searchTerm}

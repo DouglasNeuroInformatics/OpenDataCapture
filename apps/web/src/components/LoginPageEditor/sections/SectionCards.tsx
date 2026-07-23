@@ -43,6 +43,7 @@ const DetailsCard = ({ editor }: CardProps) => {
         bold={{ checked: form.boldDetails, id: 'boldDetails', onChange: (b) => update('boldDetails', b) }}
         description={t({
           en: 'Additional notes shown on the branding panel',
+          es: 'Notas adicionales que se muestran en el panel de marca',
           fr: 'Remarques supplémentaires figurant sur le panneau de marque.'
         })}
         editor={editor}
@@ -54,7 +55,7 @@ const DetailsCard = ({ editor }: CardProps) => {
         <Card.Content className="flex flex-col gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="instanceDetails-en">{t({ en: 'English', fr: 'Anglais' })}</Label>
+              <Label htmlFor="instanceDetails-en">{t({ en: 'English', es: 'Inglés', fr: 'Anglais' })}</Label>
               <TextArea
                 id="instanceDetails-en"
                 maxLength={300}
@@ -64,7 +65,7 @@ const DetailsCard = ({ editor }: CardProps) => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="instanceDetails-fr">{t({ en: 'French', fr: 'Français' })}</Label>
+              <Label htmlFor="instanceDetails-fr">{t({ en: 'French', es: 'Francés', fr: 'Français' })}</Label>
               <TextArea
                 id="instanceDetails-fr"
                 maxLength={300}
@@ -93,6 +94,7 @@ const LogoCard = ({ editor }: CardProps) => {
       <SectionHeader
         description={t({
           en: 'Upload an image up to 2 MB (SVG, PNG, JPEG, WebP) or link to one. PNG and JPEG uploads are converted to WebP to save space.',
+          es: 'Cargue una imagen de hasta 2 MB (SVG, PNG, JPEG, WebP) o enlace a una. Las cargas PNG y JPEG se convierten a WebP para ahorrar espacio.',
           fr: "Téléversez une image jusqu'à 2 Mo (SVG, PNG, JPEG, WebP) ou indiquez un lien. Les téléversements PNG et JPEG sont convertis en WebP pour économiser de l'espace."
         })}
         editor={editor}
@@ -117,7 +119,7 @@ const LogoCard = ({ editor }: CardProps) => {
               <div className="flex items-center gap-2">
                 <RadioGroup.Item id="logoSource-upload" value="upload" />
                 <Label className="cursor-pointer font-medium" htmlFor="logoSource-upload">
-                  {t({ en: 'Uploaded image', fr: 'Image téléversée' })}
+                  {t({ en: 'Uploaded image', es: 'Imagen cargada', fr: 'Image téléversée' })}
                 </Label>
               </div>
               <div className="pl-6">
@@ -147,14 +149,14 @@ const LogoCard = ({ editor }: CardProps) => {
                           style={CHECKERBOARD_STYLE}
                         />
                         <span className="text-muted-foreground text-xs">
-                          {t({ en: 'Click to replace', fr: 'Cliquez pour remplacer' })}
+                          {t({ en: 'Click to replace', es: 'Haga clic para reemplazar', fr: 'Cliquez pour remplacer' })}
                         </span>
                       </React.Fragment>
                     ) : (
                       <React.Fragment>
                         <UploadIcon className="text-muted-foreground h-5 w-5" />
                         <span className="text-muted-foreground text-xs">
-                          {t({ en: 'Click to upload', fr: 'Cliquez pour téléverser' })}
+                          {t({ en: 'Click to upload', es: 'Haga clic para cargar', fr: 'Cliquez pour téléverser' })}
                         </span>
                       </React.Fragment>
                     )}
@@ -162,7 +164,7 @@ const LogoCard = ({ editor }: CardProps) => {
                   {/* Clears only the uploaded image; the saved URL is left intact. */}
                   {form.customLogoSrc && (
                     <Button
-                      aria-label={t({ en: 'Remove', fr: 'Retirer' })}
+                      aria-label={t({ en: 'Remove', es: 'Eliminar', fr: 'Retirer' })}
                       className="bg-background/80 hover:bg-background absolute right-1.5 top-1.5 h-7 w-7 rounded-full border p-0 shadow-sm backdrop-blur-sm"
                       size="sm"
                       type="button"
@@ -181,12 +183,12 @@ const LogoCard = ({ editor }: CardProps) => {
               <div className="flex items-center gap-2">
                 <RadioGroup.Item id="logoSource-url" value="url" />
                 <Label className="cursor-pointer font-medium" htmlFor="logoSource-url">
-                  {t({ en: 'Image URL', fr: "URL de l'image" })}
+                  {t({ en: 'Image URL', es: 'URL de la imagen', fr: "URL de l'image" })}
                 </Label>
               </div>
               <div className="pl-6">
                 <Input
-                  aria-label={t({ en: 'Image URL', fr: "URL de l'image" })}
+                  aria-label={t({ en: 'Image URL', es: 'URL de la imagen', fr: "URL de l'image" })}
                   maxLength={2000}
                   placeholder="https://example.org/logo.png"
                   value={form.customLogoUrl}
@@ -197,7 +199,7 @@ const LogoCard = ({ editor }: CardProps) => {
           </RadioGroup>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="logoSize">{t({ en: 'Size', fr: 'Taille' })}</Label>
+              <Label htmlFor="logoSize">{t({ en: 'Size', es: 'Tamaño', fr: 'Taille' })}</Label>
               <Select value={form.logoSize} onValueChange={(v) => update('logoSize', v as LogoSize)}>
                 <Select.Trigger id="logoSize">
                   <Select.Value />
@@ -214,7 +216,7 @@ const LogoCard = ({ editor }: CardProps) => {
               </Select>
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="logoAlignment">{t({ en: 'Alignment', fr: 'Alignement' })}</Label>
+              <Label htmlFor="logoAlignment">{t({ en: 'Alignment', es: 'Alineación', fr: 'Alignement' })}</Label>
               <Select value={form.logoAlignment} onValueChange={(v) => update('logoAlignment', v as LogoAlignment)}>
                 <Select.Trigger id="logoAlignment">
                   <Select.Value />
@@ -233,20 +235,26 @@ const LogoCard = ({ editor }: CardProps) => {
           </div>
           {form.logoSize === 'custom' && (
             <div className="flex flex-col gap-2">
-              <Label>{t({ en: 'Custom dimensions (pixels)', fr: 'Dimensions personnalisées (pixels)' })}</Label>
+              <Label>
+                {t({
+                  en: 'Custom dimensions (pixels)',
+                  es: 'Dimensiones personalizadas (píxeles)',
+                  fr: 'Dimensions personnalisées (pixels)'
+                })}
+              </Label>
               <div className="flex items-center gap-2">
                 <Input
-                  aria-label={t({ en: 'Width', fr: 'Largeur' })}
+                  aria-label={t({ en: 'Width', es: 'Ancho', fr: 'Largeur' })}
                   inputMode="numeric"
-                  placeholder={t({ en: 'Width', fr: 'Largeur' })}
+                  placeholder={t({ en: 'Width', es: 'Ancho', fr: 'Largeur' })}
                   value={form.customLogoWidth}
                   onChange={(e) => update('customLogoWidth', e.target.value.replace(/[^0-9]/g, ''))}
                 />
                 <span className="text-muted-foreground text-sm">×</span>
                 <Input
-                  aria-label={t({ en: 'Height', fr: 'Hauteur' })}
+                  aria-label={t({ en: 'Height', es: 'Alto', fr: 'Hauteur' })}
                   inputMode="numeric"
-                  placeholder={t({ en: 'Height', fr: 'Hauteur' })}
+                  placeholder={t({ en: 'Height', es: 'Alto', fr: 'Hauteur' })}
                   value={form.customLogoHeight}
                   onChange={(e) => update('customLogoHeight', e.target.value.replace(/[^0-9]/g, ''))}
                 />
@@ -255,6 +263,7 @@ const LogoCard = ({ editor }: CardProps) => {
                 <p className="text-destructive text-xs">
                   {t({
                     en: 'Enter at least one positive value (1–5000).',
+                    es: 'Ingrese al menos un valor positivo (1–5000).',
                     fr: 'Entrez au moins une valeur positive (1–5000).'
                   })}
                 </p>
@@ -276,6 +285,7 @@ const NameCard = ({ editor }: CardProps) => {
         bold={{ checked: form.boldName, id: 'boldName', onChange: (b) => update('boldName', b) }}
         description={t({
           en: 'The primary name shown on the login page.',
+          es: 'El nombre principal que se muestra en la página de inicio de sesión.',
           fr: 'Le nom principal affiché sur la page de connexion.'
         })}
         editor={editor}
@@ -285,7 +295,7 @@ const NameCard = ({ editor }: CardProps) => {
       <Card.Content className="flex flex-col gap-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="instanceName-en">{t({ en: 'English', fr: 'Anglais' })}</Label>
+            <Label htmlFor="instanceName-en">{t({ en: 'English', es: 'Inglés', fr: 'Anglais' })}</Label>
             <Input
               id="instanceName-en"
               maxLength={60}
@@ -295,7 +305,7 @@ const NameCard = ({ editor }: CardProps) => {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="instanceName-fr">{t({ en: 'French', fr: 'Français' })}</Label>
+            <Label htmlFor="instanceName-fr">{t({ en: 'French', es: 'Francés', fr: 'Français' })}</Label>
             <Input
               id="instanceName-fr"
               maxLength={60}
@@ -307,7 +317,7 @@ const NameCard = ({ editor }: CardProps) => {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="nameAlignment">{t({ en: 'Alignment', fr: 'Alignement' })}</Label>
+            <Label htmlFor="nameAlignment">{t({ en: 'Alignment', es: 'Alineación', fr: 'Alignement' })}</Label>
             <Select value={form.nameAlignment} onValueChange={(v) => update('nameAlignment', v as LogoAlignment)}>
               <Select.Trigger id="nameAlignment">
                 <Select.Value />
@@ -341,7 +351,11 @@ const ResourcesCard = ({ editor }: CardProps) => {
           id: 'boldResourceLinks',
           onChange: (b) => update('boldResourceLinks', b)
         }}
-        description={t({ en: 'Optional links shown on the branding panel.', fr: 'Liens optionnels sur le panneau.' })}
+        description={t({
+          en: 'Optional links shown on the branding panel.',
+          es: 'Enlaces opcionales que se muestran en el panel de marca.',
+          fr: 'Liens optionnels sur le panneau.'
+        })}
         editor={editor}
         section="resources"
         show={{
@@ -355,7 +369,11 @@ const ResourcesCard = ({ editor }: CardProps) => {
         <Card.Content className="flex flex-col gap-3">
           {form.resourceLinks.length === 0 && (
             <p className="text-muted-foreground text-sm">
-              {t({ en: 'No links yet. Add one to get started.', fr: "Aucun lien pour l'instant." })}
+              {t({
+                en: 'No links yet. Add one to get started.',
+                es: 'Aún no hay enlaces. Agregue uno para comenzar.',
+                fr: "Aucun lien pour l'instant."
+              })}
             </p>
           )}
           {form.resourceLinks.map((link, index) => {
@@ -364,10 +382,10 @@ const ResourcesCard = ({ editor }: CardProps) => {
               <div className="flex flex-col gap-2 rounded-md border p-3" key={index}>
                 <div className="flex items-start justify-between gap-2">
                   <Label className="text-sm font-medium">
-                    {t({ en: `Link ${index + 1}`, fr: `Lien ${index + 1}` })}
+                    {t({ en: `Link ${index + 1}`, es: `Enlace ${index + 1}`, fr: `Lien ${index + 1}` })}
                   </Label>
                   <Button
-                    aria-label={t({ en: 'Remove', fr: 'Retirer' })}
+                    aria-label={t({ en: 'Remove', es: 'Eliminar', fr: 'Retirer' })}
                     size="sm"
                     type="button"
                     variant="ghost"
@@ -378,16 +396,16 @@ const ResourcesCard = ({ editor }: CardProps) => {
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2">
                   <Input
-                    aria-label={t({ en: 'Label (English)', fr: 'Libellé (anglais)' })}
+                    aria-label={t({ en: 'Label (English)', es: 'Etiqueta (inglés)', fr: 'Libellé (anglais)' })}
                     maxLength={120}
-                    placeholder={t({ en: 'Label (English)', fr: 'Libellé (anglais)' })}
+                    placeholder={t({ en: 'Label (English)', es: 'Etiqueta (inglés)', fr: 'Libellé (anglais)' })}
                     value={link.label.en}
                     onChange={(e) => updateResourceLinkLabel(index, 'en', e.target.value)}
                   />
                   <Input
-                    aria-label={t({ en: 'Label (French)', fr: 'Libellé (français)' })}
+                    aria-label={t({ en: 'Label (French)', es: 'Etiqueta (francés)', fr: 'Libellé (français)' })}
                     maxLength={120}
-                    placeholder={t({ en: 'Label (French)', fr: 'Libellé (français)' })}
+                    placeholder={t({ en: 'Label (French)', es: 'Etiqueta (francés)', fr: 'Libellé (français)' })}
                     value={link.label.fr}
                     onChange={(e) => updateResourceLinkLabel(index, 'fr', e.target.value)}
                   />
@@ -404,6 +422,7 @@ const ResourcesCard = ({ editor }: CardProps) => {
                   <p className="text-destructive text-xs">
                     {t({
                       en: 'URL must start with http:// or https:// and include a domain (e.g. example.com).',
+                      es: 'La URL debe comenzar con http:// o https:// e incluir un dominio (ej. example.com).',
                       fr: "L'URL doit commencer par http:// ou https:// et inclure un domaine (ex. example.com)."
                     })}
                   </p>
@@ -413,7 +432,7 @@ const ResourcesCard = ({ editor }: CardProps) => {
           })}
           <Button className="self-start" size="sm" type="button" variant="outline" onClick={addResourceLink}>
             <PlusIcon className="mr-1.5 h-4 w-4" />
-            {t({ en: 'Add link', fr: 'Ajouter un lien' })}
+            {t({ en: 'Add link', es: 'Agregar enlace', fr: 'Ajouter un lien' })}
           </Button>
           <FontSizeField
             id="resourceLinksFontSize"
@@ -435,6 +454,7 @@ const TaglineCard = ({ editor }: CardProps) => {
         bold={{ checked: form.boldTagline, id: 'boldTagline', onChange: (b) => update('boldTagline', b) }}
         description={t({
           en: 'A short description shown on the branding panel',
+          es: 'Una breve descripción que se muestra en el panel de marca',
           fr: 'Une courte description figurant sur le panneau de marque.'
         })}
         editor={editor}
@@ -446,7 +466,7 @@ const TaglineCard = ({ editor }: CardProps) => {
         <Card.Content className="flex flex-col gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="instanceTagline-en">{t({ en: 'English', fr: 'Anglais' })}</Label>
+              <Label htmlFor="instanceTagline-en">{t({ en: 'English', es: 'Inglés', fr: 'Anglais' })}</Label>
               <TextArea
                 id="instanceTagline-en"
                 maxLength={300}
@@ -456,7 +476,7 @@ const TaglineCard = ({ editor }: CardProps) => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="instanceTagline-fr">{t({ en: 'French', fr: 'Français' })}</Label>
+              <Label htmlFor="instanceTagline-fr">{t({ en: 'French', es: 'Francés', fr: 'Français' })}</Label>
               <TextArea
                 id="instanceTagline-fr"
                 maxLength={300}

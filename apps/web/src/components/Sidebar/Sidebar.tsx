@@ -10,7 +10,9 @@ import { StopCircle } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { useNavItems } from '@/hooks/useNavItems';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
+import { ALL_LANGUAGES } from '@/utils/languages';
 
 import { GroupSwitcher, useIsGroupSwitcherVisible } from '../GroupSwitcher';
 import { NavButton } from '../NavButton';
@@ -27,8 +29,14 @@ export const Sidebar = () => {
   const endSession = useAppStore((store) => store.endSession);
   const location = useLocation();
   const navigate = useNavigate();
+  const setupStateQuery = useSetupStateQuery();
 
   const { t } = useTranslation();
+
+  const activeLanguages = setupStateQuery.data.activeLanguages ?? ['en', 'fr'];
+  const languageOptions = Object.fromEntries(
+    Object.entries(ALL_LANGUAGES).filter(([key]) => activeLanguages.includes(key))
+  ) as { [key: string]: string };
 
   return (
     <div
@@ -45,7 +53,7 @@ export const Sidebar = () => {
           <hr className="mt-2 h-[1px] border-none bg-slate-700" />
         </div>
       )}
-      <nav className="flex w-full flex-col divide-y divide-slate-700">
+      <nav className="scrollbar-none flex min-h-0 flex-1 flex-col divide-y divide-slate-700 overflow-y-auto">
         {navItems.map((items, i) => (
           <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
             {items.map(({ disabled, url, ...props }) =>
@@ -104,7 +112,6 @@ export const Sidebar = () => {
           </div>
         ))}
       </nav>
-      <hr className="invisible mt-auto" />
       <AnimatePresence>
         {currentSession && (
           <motion.div
@@ -138,16 +145,15 @@ export const Sidebar = () => {
       <div className="flex items-center justify-between py-2">
         <UserDropup />
         <div className="flex h-full items-center gap-2">
-          <LanguageToggle
-            contentClassName="bg-slate-800 border-slate-700 text-slate-300"
-            itemClassName="bg-slate-800 hover:bg-slate-700 focus:bg-slate-700 focus:text-slate-100"
-            options={{
-              en: 'English',
-              fr: 'Français'
-            }}
-            triggerClassName="hover:bg-slate-800 hover:text-slate-300 focus-visible:ring-0"
-            variant="ghost"
-          />
+          {Object.keys(languageOptions).length > 1 && (
+            <LanguageToggle
+              contentClassName="bg-slate-800 border-slate-700 text-slate-300"
+              itemClassName="bg-slate-800 hover:bg-slate-700 focus:bg-slate-700 focus:text-slate-100"
+              options={languageOptions}
+              triggerClassName="hover:bg-slate-800 hover:text-slate-300 focus-visible:ring-0"
+              variant="ghost"
+            />
+          )}
           <ThemeToggle className="hover:bg-slate-800 hover:text-slate-300" variant="ghost" />
         </div>
       </div>

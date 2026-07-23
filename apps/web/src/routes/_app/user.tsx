@@ -36,14 +36,17 @@ const RouteComponent = () => {
   const userType: { [key: string]: string } = {
     ADMIN: t({
       en: 'Admin',
+      es: 'Administrador',
       fr: 'Admin'
     }),
     GROUP_MANAGER: t({
       en: 'Group Manager',
+      es: 'Administrador de grupo',
       fr: 'Responsable de groupe'
     }),
     STANDARD: t({
       en: 'Standard User',
+      es: 'Usuario estándar',
       fr: 'Utilisateur standard'
     })
   };
@@ -103,6 +106,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'User Info',
+            es: 'Información del usuario',
             fr: 'Informations utilisateur'
           })}
         </Heading>
@@ -126,6 +130,7 @@ const RouteComponent = () => {
                 kind: 'string',
                 label: t({
                   en: 'Email',
+                  es: 'Correo electrónico',
                   fr: 'Courriel'
                 }),
                 variant: 'input'
@@ -147,6 +152,7 @@ const RouteComponent = () => {
                 kind: 'string',
                 label: t({
                   en: 'Phone Number',
+                  es: 'Número de teléfono',
                   fr: 'Numéro de téléphone'
                 }),
                 variant: 'input'
@@ -154,6 +160,7 @@ const RouteComponent = () => {
             },
             title: t({
               en: 'Login Credentials',
+              es: 'Credenciales de inicio de sesión',
               fr: 'Identifiants de connexion'
             })
           },
@@ -185,6 +192,7 @@ const RouteComponent = () => {
             },
             title: t({
               en: 'Personal Information',
+              es: 'Información personal',
               fr: 'Informations personnelles'
             })
           }

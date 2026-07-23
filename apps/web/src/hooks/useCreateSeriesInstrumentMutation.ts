@@ -24,7 +24,11 @@ export function useCreateSeriesInstrumentMutation() {
       addNotification({
         message: getApiErrorMessage(
           err,
-          t({ en: 'Failed to create series instrument', fr: "Échec de la création de l'instrument en série" })
+          t({
+            en: 'Failed to create series instrument',
+            es: 'Error al crear el instrumento en serie',
+            fr: "Échec de la création de l'instrument en série"
+          })
         ),
         type: 'error'
       });

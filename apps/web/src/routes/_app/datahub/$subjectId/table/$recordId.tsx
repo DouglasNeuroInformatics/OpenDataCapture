@@ -44,6 +44,7 @@ const FileInstrumentRecordView = ({ instrument, record }: FileInstrumentRecordVi
       notifications.addNotification({
         message: t({
           en: 'An unexpected error occurred',
+          es: 'Ocurrió un error inesperado',
           fr: "Une erreur inattendue s'est produite"
         }),
         title: 'Error',
@@ -64,13 +65,16 @@ const FileInstrumentRecordView = ({ instrument, record }: FileInstrumentRecordVi
         <p className="text-muted-foreground text-sm">
           {t({
             en: `Completed on ${dateCompleted}`,
+            es: `Completado el ${dateCompleted}`,
             fr: `Remplie le ${dateCompleted}`
           })}
         </p>
       </header>
       {record.pending ? (
         <div className="rounded-md border border-dashed p-6 text-center">
-          <p className="text-muted-foreground text-sm">{t({ en: 'Upload pending', fr: 'Téléversement en attente' })}</p>
+          <p className="text-muted-foreground text-sm">
+            {t({ en: 'Upload pending', es: 'Carga pendiente', fr: 'Téléversement en attente' })}
+          </p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -80,7 +84,9 @@ const FileInstrumentRecordView = ({ instrument, record }: FileInstrumentRecordVi
               <section className="space-y-2" key={fileGroup.basename}>
                 <Heading variant="h5">{fileGroup.label}</Heading>
                 {groupFiles.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">{t({ en: 'No files', fr: 'Aucun fichier' })}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {t({ en: 'No files', es: 'Sin archivos', fr: 'Aucun fichier' })}
+                  </p>
                 ) : (
                   <ul className="divide-y rounded-md border">
                     {groupFiles.map((file) => (
@@ -98,7 +104,7 @@ const FileInstrumentRecordView = ({ instrument, record }: FileInstrumentRecordVi
                           }}
                         >
                           <DownloadIcon className="mr-2 h-4 w-4" />
-                          {t({ en: 'Download', fr: 'Télécharger' })}
+                          {t({ en: 'Download', es: 'Descargar', fr: 'Télécharger' })}
                         </Button>
                       </li>
                     ))}

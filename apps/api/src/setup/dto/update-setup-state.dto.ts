@@ -6,6 +6,9 @@ import type { BrandingConfig, UpdateSetupStateData } from '@opendatacapture/sche
 @ValidationSchema($UpdateSetupStateData)
 export class UpdateSetupStateDto implements UpdateSetupStateData {
   @ApiProperty({ required: false })
+  activeLanguages?: string[];
+
+  @ApiProperty({ required: false })
   branding?: BrandingConfig | null;
 
   @ApiProperty({ required: false })

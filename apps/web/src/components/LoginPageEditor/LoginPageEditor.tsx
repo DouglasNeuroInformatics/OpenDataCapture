@@ -40,7 +40,11 @@ export const LoginPageEditor = () => {
       <div className="w-full overflow-x-clip">
         <PageHeader>
           <Heading className="text-center" variant="h2">
-            {t({ en: 'Customize Login Page', fr: 'Personnaliser la page de connexion' })}
+            {t({
+              en: 'Customize Login Page',
+              es: 'Personalizar página de inicio de sesión',
+              fr: 'Personnaliser la page de connexion'
+            })}
           </Heading>
         </PageHeader>
 

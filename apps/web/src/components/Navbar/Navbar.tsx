@@ -8,7 +8,9 @@ import { MenuIcon, StopCircle } from 'lucide-react';
 
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useNavItems } from '@/hooks/useNavItems';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
+import { ALL_LANGUAGES } from '@/utils/languages';
 
 import { GroupSwitcher, useIsGroupSwitcherVisible } from '../GroupSwitcher';
 import { NavButton } from '../NavButton';
@@ -23,6 +25,12 @@ export const Navbar = () => {
   const { t } = useTranslation('layout');
   const navigate = useNavigate();
   const endSession = useAppStore((store) => store.endSession);
+  const setupStateQuery = useSetupStateQuery();
+
+  const activeLanguages = setupStateQuery.data.activeLanguages ?? ['en', 'fr'];
+  const languageOptions = Object.fromEntries(
+    Object.entries(ALL_LANGUAGES).filter(([key]) => activeLanguages.includes(key))
+  ) as { [key: string]: string };
 
   // This is to prevent ugly styling when resizing the viewport
   const isDesktop = useIsDesktop();
@@ -124,13 +132,9 @@ export const Navbar = () => {
           <div className="flex w-full justify-between gap-2 md:justify-end">
             <UserDropup />
             <div className="flex gap-2">
-              <LanguageToggle
-                options={{
-                  en: 'English',
-                  fr: 'Français'
-                }}
-                variant="outline"
-              />
+              {Object.keys(languageOptions).length > 1 && (
+                <LanguageToggle options={languageOptions} variant="outline" />
+              )}
               <ThemeToggle variant="outline" />
             </div>
           </div>

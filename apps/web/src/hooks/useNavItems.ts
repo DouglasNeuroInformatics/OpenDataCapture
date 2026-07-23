@@ -9,6 +9,7 @@ import {
   DatabaseIcon,
   EyeIcon,
   LogsIcon,
+  MailIcon,
   PackageIcon,
   PaletteIcon,
   SendIcon,
@@ -23,10 +24,12 @@ import { useAppStore } from '@/store';
 import { useSetupStateQuery } from './useSetupStateQuery';
 
 export type NavItem = {
+  /** When present, this item renders as a collapsible group rather than a link. */
   children?: NavItem[];
   disabled?: boolean;
   icon: React.ComponentType<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
   label: string;
+  /** The route to navigate to. Omitted for collapsible group headers. */
   url?: string;
 };
 
@@ -83,6 +86,13 @@ export function useNavItems() {
         label: t('layout.navLinks.manageGroup'),
         url: '/group/manage'
       });
+      if (setupStateQuery.data.isMailEnabled) {
+        globalItems.push({
+          icon: MailIcon,
+          label: t({ en: 'Email Templates', es: 'Plantillas de correo', fr: 'Modèles de courriel' }),
+          url: '/group/email-templates'
+        });
+      }
     }
 
     if (ability?.can('manage', 'all')) {
@@ -90,6 +100,7 @@ export function useNavItems() {
         icon: UsersIcon,
         label: t({
           en: 'Manage Groups',
+          es: 'Administrar grupos',
           fr: 'Gérer les groupes'
         }),
         url: '/admin/groups'
@@ -98,6 +109,7 @@ export function useNavItems() {
         icon: UserCogIcon,
         label: t({
           en: 'Manage Users',
+          es: 'Administrar usuarios',
           fr: 'Gérer les utilisateurs'
         }),
         url: '/admin/users'
@@ -112,17 +124,10 @@ export function useNavItems() {
             icon: CogIcon,
             label: t({
               en: 'App Settings',
+              es: 'Configuración de la aplicación',
               fr: "Paramètres de l'application"
             }),
             url: '/admin/settings'
-          },
-          {
-            icon: PaletteIcon,
-            label: t({
-              en: 'Branding',
-              fr: 'Image de marque'
-            }),
-            url: '/admin/branding'
           },
           {
             icon: LogsIcon,
@@ -130,16 +135,31 @@ export function useNavItems() {
             url: '/admin/audit/logs'
           },
           {
+            icon: PaletteIcon,
+            label: t({
+              en: 'Branding',
+              es: 'Imagen de marca',
+              fr: 'Image de marque'
+            }),
+            url: '/admin/branding'
+          },
+          {
             icon: PackageIcon,
             label: t({
               en: 'Instrument Repos',
+              es: 'Repositorios de instrumentos',
               fr: "Dépôts d'instruments"
             }),
             url: '/admin/instrument-repos'
+          },
+          {
+            icon: MailIcon,
+            label: t({ en: 'Mail', es: 'Correo', fr: 'Courriel' }),
+            url: '/admin/mail'
           }
         ],
         icon: ShieldIcon,
-        label: t({ en: 'Admin Panel', fr: "Panneau d'administration" })
+        label: t({ en: 'Admin Panel', es: 'Panel de administración', fr: "Panneau d'administration" })
       });
     }
 
@@ -183,7 +203,8 @@ export function useNavItems() {
     currentUser,
     resolvedLanguage,
     setupStateQuery.data.isExperimentalFeaturesEnabled,
-    setupStateQuery.data.isGatewayEnabled
+    setupStateQuery.data.isGatewayEnabled,
+    setupStateQuery.data.isMailEnabled
   ]);
 
   return navItems;

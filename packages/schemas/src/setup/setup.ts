@@ -177,16 +177,24 @@ const $BrandingConfig = z.object({
 });
 
 const $SetupState = z.object({
+  activeLanguages: z.array(z.string()).optional(),
   branding: $BrandingConfig.nullish(),
   isDemo: z.boolean(),
   isExperimentalFeaturesEnabled: z.boolean().nullish(),
   isGatewayEnabled: z.boolean(),
+  /**
+   * Whether outgoing email is globally enabled and configured. A derived, non-secret
+   * flag (the SMTP configuration itself is admin-only, via the dedicated mail
+   * endpoints) that lets the client hide all email-related UI when mail is off.
+   */
+  isMailEnabled: z.boolean().nullish(),
   isSetup: z.boolean().nullable(),
   release: $ReleaseInfo,
   uptime: z.number()
 });
 
 const $UpdateSetupStateData = z.object({
+  activeLanguages: z.array(z.string()).optional(),
   branding: $BrandingConfig.nullish(),
   isExperimentalFeaturesEnabled: z.boolean().nullish()
 });

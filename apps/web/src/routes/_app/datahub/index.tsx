@@ -162,6 +162,7 @@ const Filters: React.FC<{
           <DropdownMenu.Label>
             {t({
               en: 'Subjects with records',
+              es: 'Sujetos con registros',
               fr: 'Sujets avec enregistrements'
             })}
           </DropdownMenu.Label>
@@ -172,6 +173,7 @@ const Filters: React.FC<{
           >
             {t({
               en: 'With records only',
+              es: 'Solo con registros',
               fr: 'Avec enregistrements seulement'
             })}
           </DropdownMenu.CheckboxItem>
@@ -229,6 +231,7 @@ const Toggles: React.FC<{
     addNotification({
       message: t({
         en: 'Exporting entries, please wait...',
+        es: 'Exportando entradas, por favor espere...',
         fr: 'Téléchargement des entrées, veuillez patienter...'
       }),
       type: 'info'
@@ -247,7 +250,11 @@ const Toggles: React.FC<{
 
         if (filteredData.length < 1) {
           throw Error(
-            t({ en: 'Export failed: No entries to export', fr: "Échec de l'exportation : aucune entrée à exporter" })
+            t({
+              en: 'Export failed: No entries to export',
+              es: 'Error de exportación: no hay entradas para exportar',
+              fr: "Échec de l'exportation : aucune entrée à exporter"
+            })
           );
         }
 
@@ -267,7 +274,7 @@ const Toggles: React.FC<{
       })
       .then(() => {
         addNotification({
-          message: t({ en: 'Export successful', fr: 'Exportation réussie' }),
+          message: t({ en: 'Export successful', es: 'Exportación exitosa', fr: 'Exportation réussie' }),
           type: 'success'
         });
       })
@@ -280,7 +287,7 @@ const Toggles: React.FC<{
           });
         } else {
           addNotification({
-            message: t({ en: 'Export failed', fr: "Échec de l'exportation" }),
+            message: t({ en: 'Export failed', es: 'Error de exportación', fr: "Échec de l'exportation" }),
             type: 'error'
           });
         }
@@ -300,6 +307,7 @@ const Toggles: React.FC<{
           >
             {t({
               en: 'Subject Lookup',
+              es: 'Buscar sujeto',
               fr: 'Trouver un client'
             })}
             <UserSearchIcon style={{ strokeWidth: '2px' }} />
@@ -450,7 +458,7 @@ const MasterDataTable: React.FC<{
         }}
         rowActions={[
           {
-            label: t({ en: 'View', fr: 'Voir' }),
+            label: t({ en: 'View', es: 'Ver', fr: 'Voir' }),
             onSelect
           }
         ]}

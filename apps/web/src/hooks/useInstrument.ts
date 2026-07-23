@@ -18,7 +18,14 @@ export function useInstrument(id: null | string) {
       const { bundle, id } = instrumentBundleQuery.data;
       interpreter
         .interpret(bundle, { id, validate: import.meta.env.DEV })
-        .then((instrument) => setInstrument(translateInstrument(instrument, resolvedLanguage)))
+        .then((instrument) =>
+          setInstrument(
+            translateInstrument(
+              instrument,
+              resolvedLanguage === 'en' || resolvedLanguage === 'fr' ? resolvedLanguage : 'en'
+            )
+          )
+        )
         .catch((err) => {
           console.error(err);
           setInstrument(null);

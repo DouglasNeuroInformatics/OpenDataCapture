@@ -17,18 +17,33 @@ export function useSyncInstrumentRepoMutation() {
       addNotification({
         message: getApiErrorMessage(
           err,
-          t({ en: 'Failed to sync repository', fr: 'Échec de la synchronisation du dépôt' })
+          t({
+            en: 'Failed to sync repository',
+            es: 'Error al sincronizar el repositorio',
+            fr: 'Échec de la synchronisation du dépôt'
+          })
         ),
         type: 'error'
       });
     },
     onMutate() {
       // Immediate feedback that the (potentially slow) sync has started.
-      addNotification({ message: t({ en: 'Syncing repository...', fr: 'Synchronisation du dépôt...' }), type: 'info' });
+      addNotification({
+        message: t({
+          en: 'Syncing repository...',
+          es: 'Sincronizando repositorio...',
+          fr: 'Synchronisation du dépôt...'
+        }),
+        type: 'info'
+      });
     },
     onSuccess() {
       addNotification({
-        message: t({ en: 'Repository synced successfully', fr: 'Dépôt synchronisé avec succès' }),
+        message: t({
+          en: 'Repository synced successfully',
+          es: 'Repositorio sincronizado exitosamente',
+          fr: 'Dépôt synchronisé avec succès'
+        }),
         type: 'success'
       });
       void queryClient.invalidateQueries({ queryKey: [INSTRUMENT_REPOS_QUERY_KEY] });

@@ -30,7 +30,7 @@ const OrderButtons = ({ editor, section }: { editor: BrandingEditor; section: Pa
   return (
     <div className="flex shrink-0 gap-0.5">
       <Button
-        aria-label={t({ en: 'Move up', fr: 'Haut' })}
+        aria-label={t({ en: 'Move up', es: 'Subir', fr: 'Haut' })}
         disabled={idx <= 0}
         size="sm"
         type="button"
@@ -40,7 +40,7 @@ const OrderButtons = ({ editor, section }: { editor: BrandingEditor; section: Pa
         <ChevronUpIcon className="h-4 w-4" />
       </Button>
       <Button
-        aria-label={t({ en: 'Move down', fr: 'Bas' })}
+        aria-label={t({ en: 'Move down', es: 'Bajar', fr: 'Bas' })}
         disabled={idx >= form.sectionsOrder.length - 1}
         size="sm"
         type="button"
@@ -69,7 +69,7 @@ export const SectionHeader = ({ bold, description, editor, section, show, title 
               <div className="flex items-center gap-2">
                 <Checkbox checked={show.checked} id={show.id} onCheckedChange={(c) => show.onChange(c === true)} />
                 <Label className="cursor-pointer text-sm font-normal" htmlFor={show.id}>
-                  {t({ en: 'Show', fr: 'Afficher' })}
+                  {t({ en: 'Show', es: 'Mostrar', fr: 'Afficher' })}
                 </Label>
               </div>
             )}

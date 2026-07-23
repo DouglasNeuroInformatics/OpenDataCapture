@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
-import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import { CoreProvider } from '@douglasneuroinformatics/libui/providers';
 import { Branding, InstrumentRenderer } from '@opendatacapture/react-core';
 import type { InstrumentSubmitHandler } from '@opendatacapture/react-core';
@@ -14,21 +15,30 @@ import CapWidget from './components/Cap';
 import './services/axios';
 import './services/i18n';
 
+const GATEWAY_LANGUAGES: { [key: string]: string } = { en: 'English', fr: 'Français' };
+const VALID_LANGUAGES = ['en', 'es', 'fr'];
+
 export type RootProps = {
   id: string;
   initialSeriesIndex?: number;
+  lang?: string;
   target: InstrumentBundleContainer;
   token: string;
 };
 
-export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
+export const Root = ({ id, initialSeriesIndex, lang, target, token }: RootProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const notifications = useNotificationsStore();
+  const { changeLanguage } = useTranslation();
 
   const [verified, setVerified] = useState(false);
 
   useEffect(() => {
     ref.current!.style.display = 'flex';
+    const targetLang = lang ?? new URLSearchParams(window.location.search).get('lang') ?? undefined;
+    if (targetLang && VALID_LANGUAGES.includes(targetLang)) {
+      changeLanguage(targetLang as Language);
+    }
   }, []);
 
   // Solving the Cap challenge redeems a short-lived token; exchange it immediately for a
@@ -79,13 +89,7 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
             <Branding className="[&>span]:hidden sm:[&>span]:block" fontSize="md" />
             <div className="flex gap-3">
               <ThemeToggle className="h-9 w-9" />
-              <LanguageToggle
-                options={{
-                  en: 'English',
-                  fr: 'Français'
-                }}
-                triggerClassName="h-9 w-9"
-              />
+              <LanguageToggle options={GATEWAY_LANGUAGES} triggerClassName="h-9 w-9" />
             </div>
           </div>
         </header>

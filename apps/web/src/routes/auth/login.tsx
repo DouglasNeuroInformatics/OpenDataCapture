@@ -1,5 +1,9 @@
+import { useEffect } from 'react';
+
 import { Card, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import { Logo } from '@opendatacapture/react-core';
 import type { $LoginCredentials, AuthPayload } from '@opendatacapture/schemas/auth';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
@@ -12,6 +16,7 @@ import { config } from '@/config';
 import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 import { getRightPanelGradient } from '@/utils/branding';
+import { ALL_LANGUAGES } from '@/utils/languages';
 
 const loginRequest = async (
   credentials: $LoginCredentials
@@ -33,10 +38,21 @@ const RouteComponent = () => {
   const { resolvedLanguage, t } = useTranslation('auth');
   const navigate = useNavigate();
 
+  const activeLanguages = setupStateQuery.data.activeLanguages ?? ['en', 'fr'];
+  const languageOptions = Object.fromEntries(
+    Object.entries(ALL_LANGUAGES).filter(([key]) => activeLanguages.includes(key))
+  );
+
+  useEffect(() => {
+    if (!activeLanguages.includes(resolvedLanguage)) {
+      i18n.changeLanguage(activeLanguages[0]! as Language);
+    }
+  }, [activeLanguages, resolvedLanguage]);
+
   const branding = setupStateQuery.data.branding;
   const enableBranding = branding?.enableBranding === true;
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-  const instanceName = branding?.instanceName?.[resolvedLanguage]?.trim() || 'Open Data Capture';
+  const instanceName = branding?.instanceName?.[resolvedLanguage as 'en' | 'fr']?.trim() || 'Open Data Capture';
 
   const handleLogin = async (credentials: $LoginCredentials) => {
     const result = await loginRequest(credentials);
@@ -69,15 +85,7 @@ const RouteComponent = () => {
               <LoginForm onSubmit={(credentials) => void handleLogin(credentials)} />
             </Card.Content>
             <Card.Footer className="text-muted-foreground flex justify-between" data-testid="login-footer-toggles">
-              <LanguageToggle
-                align="start"
-                options={{
-                  en: 'English',
-                  fr: 'Français'
-                }}
-                triggerClassName="border p-2"
-                variant="ghost"
-              />
+              <LanguageToggle align="start" options={languageOptions} triggerClassName="border p-2" variant="ghost" />
               <ThemeToggle className="border p-2" variant="ghost" />
             </Card.Footer>
           </Card>
@@ -110,15 +118,7 @@ const RouteComponent = () => {
               <LoginForm onSubmit={(credentials) => void handleLogin(credentials)} />
             </Card.Content>
             <Card.Footer className="text-muted-foreground flex justify-between" data-testid="login-footer-toggles">
-              <LanguageToggle
-                align="start"
-                options={{
-                  en: 'English',
-                  fr: 'Français'
-                }}
-                triggerClassName="border p-2"
-                variant="ghost"
-              />
+              <LanguageToggle align="start" options={languageOptions} triggerClassName="border p-2" variant="ghost" />
               <ThemeToggle className="border p-2" variant="ghost" />
             </Card.Footer>
           </Card>

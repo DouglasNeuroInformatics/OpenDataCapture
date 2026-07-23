@@ -17,10 +17,17 @@ export const TextColorCard = ({ editor }: { editor: BrandingEditor }) => {
   return (
     <Card>
       <Card.Header>
-        <Card.Title>{t({ en: 'Text Color - Left Panel', fr: 'Couleur du texte - Panneau gauche' })}</Card.Title>
+        <Card.Title>
+          {t({
+            en: 'Text Color - Left Panel',
+            es: 'Color del texto - Panel izquierdo',
+            fr: 'Couleur du texte - Panneau gauche'
+          })}
+        </Card.Title>
         <Card.Description>
           {t({
             en: 'The color applied to all text on the branding panel.',
+            es: 'El color aplicado a todo el texto del panel de marca.',
             fr: 'La couleur appliquée à tout le texte du panneau.'
           })}
         </Card.Description>
@@ -29,7 +36,7 @@ export const TextColorCard = ({ editor }: { editor: BrandingEditor }) => {
         <div className="sm:max-w-xs">
           <ColorField
             id="panelTextColor"
-            label={t({ en: 'Text color', fr: 'Couleur du texte' })}
+            label={t({ en: 'Text color', es: 'Color del texto', fr: 'Couleur du texte' })}
             placeholder={DEFAULT_PANEL_TEXT_COLOR}
             swatchFallback={DEFAULT_PANEL_TEXT_COLOR}
             value={form.panelTextColor}

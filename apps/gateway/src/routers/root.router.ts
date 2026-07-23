@@ -41,9 +41,11 @@ router.get(
     }
 
     const token = generateToken(assignment.id);
+    const lang = typeof req.query.lang === 'string' ? req.query.lang : undefined;
     const html = res.locals.loadRoot({
       id,
       initialSeriesIndex,
+      lang,
       target: targetParseResult.data,
       token
     } satisfies RootProps);

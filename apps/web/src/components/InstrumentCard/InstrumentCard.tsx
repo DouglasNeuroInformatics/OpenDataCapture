@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Card, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { licenses } from '@opendatacapture/licenses';
 import { InstrumentIcon } from '@opendatacapture/react-core';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
@@ -16,11 +17,12 @@ type TextCardItem = BaseCardItem & { kind: 'text'; text?: string };
 type CardItem = LinkCardItem | TextCardItem;
 
 type InstrumentCardProps = {
+  highlighted?: boolean;
   instrument: TranslatedInstrumentInfo;
   onClick: () => void;
 };
 
-export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => {
+export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentCardProps) => {
   const { t } = useTranslation();
 
   const license = licenses.get(instrument.details.license);
@@ -30,6 +32,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
       kind: 'text',
       label: t({
         en: 'Authors',
+        es: 'Autores',
         fr: 'Auteurs'
       }),
       text: instrument.details.authors?.join(', ')
@@ -38,6 +41,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
       kind: 'text',
       label: t({
         en: 'Description',
+        es: 'Descripción',
         fr: 'Description'
       }),
       text: instrument.details.description
@@ -46,6 +50,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
       kind: 'text',
       label: t({
         en: 'Edition',
+        es: 'Edición',
         fr: 'Édition'
       }),
       text: instrument.kind === 'SERIES' ? undefined : instrument.internal.edition.toString()
@@ -54,6 +59,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
       kind: 'text',
       label: t({
         en: 'Languages',
+        es: 'Idiomas',
         fr: 'Langues'
       }),
       text: instrument.supportedLanguages
@@ -71,6 +77,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
       kind: 'text',
       label: t({
         en: 'License',
+        es: 'Licencia',
         fr: 'Licence'
       }),
       text: license?.name ?? 'NA',
@@ -88,10 +95,12 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
               {license?.isOpenSource
                 ? t({
                     en: 'This is a free and open-source license',
+                    es: 'Esta es una licencia libre y de código abierto',
                     fr: "Il s'agit d'une licence libre"
                   })
                 : t({
                     en: 'This is not a free and open source license',
+                    es: 'Esta no es una licencia libre y de código abierto',
                     fr: "Il ne s'agit pas d'une licence libre"
                   })}
             </p>
@@ -104,6 +113,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
       kind: 'link',
       label: t({
         en: 'Reference Link',
+        es: 'Enlace de referencia',
         fr: 'Lien vers la référence'
       })
     },
@@ -112,6 +122,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
       kind: 'link',
       label: t({
         en: 'Source Link',
+        es: 'Enlace al código fuente',
         fr: 'Lien vers le code source'
       })
     },
@@ -124,12 +135,14 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
 
   return (
     <Card
-      className="group flex gap-8 p-6 transition-transform duration-300 ease-in-out hover:scale-[1.03] hover:cursor-pointer sm:p-8"
+      className={cn(
+        'group flex gap-8 p-6 transition-transform duration-300 ease-in-out hover:scale-[1.03] hover:cursor-pointer sm:p-8',
+        highlighted && 'bg-sky-100/60 ring-2 ring-sky-500/60 dark:bg-sky-900/30'
+      )}
       data-testid={`instrument-card-${instrument.id}`}
       role="button"
-      tabIndex={0}
+      tabIndex={-1}
       onClick={onClick}
-      onKeyDown={onClick}
     >
       <div className="hidden shrink-0 items-center justify-center sm:flex md:min-w-24 lg:min-w-32">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-indigo-500">
@@ -148,7 +161,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
             return (
               <div className="flex items-center gap-1" key={item.label}>
                 <p className="line-clamp-3 leading-tight">
-                  <span className="font-medium">{item.label + t({ en: ': ', fr: ' : ' })}</span>
+                  <span className="font-medium">{item.label + t({ en: ': ', es: ': ', fr: ' : ' })}</span>
                   {item.kind === 'text' && <span className="text-muted-foreground">{item.text}</span>}
                   {item.kind === 'link' && (
                     <a
