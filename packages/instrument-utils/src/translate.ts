@@ -209,11 +209,16 @@ function translateFormContent(
   if (!Array.isArray(content)) {
     return translateFormFields(content, language);
   }
-  return content.map((group) => ({
-    description: group.description?.[language],
-    fields: translateFormFields(group.fields, language),
-    title: group.title?.[language]
-  }));
+  return content.map((item) => {
+    if (item.kind === 'block') {
+      return item;
+    }
+    return {
+      description: item.description?.[language],
+      fields: translateFormFields(item.fields, language),
+      title: item.title?.[language]
+    };
+  });
 }
 
 function translateMeasures(
