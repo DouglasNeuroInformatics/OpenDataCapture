@@ -1,258 +1,320 @@
 {
   "action": {
     "en": "Action",
+    "es": "Acción",
     "fr": "Action"
   },
   "activeGroup": {
     "en": "Active Group",
+    "es": "Grupo activo",
     "fr": "Groupe actif"
   },
   "admin": {
     "en": "Admin",
+    "es": "Administrador",
     "fr": "Administrateur"
   },
   "assignment": {
     "en": "Assignment",
+    "es": "Asignación",
     "fr": "Assignation"
   },
   "auditLogs": {
     "en": "Audit Logs",
+    "es": "Registros de auditoría",
     "fr": "Journaux d'audit"
   },
   "basePermissionLevel": {
     "en": "Base Permission Level",
+    "es": "Nivel de permiso base",
     "fr": "Niveau de permission de base"
   },
   "clinical": {
     "en": "Clinical",
+    "es": "Clínico",
     "fr": "Clinique"
   },
   "confirmPassword": {
     "en": "Confirm Password",
+    "es": "Confirmar contraseña",
     "fr": "Confirmer le mot de passe"
   },
   "create": {
     "en": "Create",
+    "es": "Crear",
     "fr": "Créer"
   },
   "currentSession": {
     "en": "Current Session",
+    "es": "Sesión actual",
     "fr": "Session en cours"
   },
   "customIdentifier": {
     "en": "Custom Identifier",
+    "es": "Identificador personalizado",
     "fr": "Identifiant unique"
   },
   "dateFormat": {
     "en": "Date Format",
+    "es": "Formato de fecha",
     "fr": "Format de date"
   },
   "delete": {
     "en": "Delete",
+    "es": "Eliminar",
     "fr": "Supprimer"
   },
   "email": {
     "en": "Email",
+    "es": "Correo electrónico",
     "fr": "Adresse courriel"
   },
   "entity": {
     "en": "Entity",
+    "es": "Entidad",
     "fr": "Entité"
   },
   "errors": {
     "failedToChangeLanguage": {
       "en": "Failed to change languages",
+      "es": "No se pudo cambiar el idioma",
       "fr": "Le changement de langue n'a pas été effectué"
     },
     "noDataToExport": {
       "en": "No Data to Export",
+      "es": "No hay datos para exportar",
       "fr": "Pas de données à exporter"
     },
     "noInstrumentSelected": {
       "en": "No Instrument Selected",
+      "es": "Ningún instrumento seleccionado",
       "fr": "Aucun instrument sélectionné"
     }
   },
   "filters": {
     "en": "Filters",
+    "es": "Filtros",
     "fr": "Filtres"
   },
   "graph": {
     "en": "Graph",
+    "es": "Gráfico",
     "fr": "Graphique"
   },
   "group": {
     "en": "Group",
+    "es": "Grupo",
     "fr": "Groupe"
   },
   "groupManager": {
     "en": "Group Manager",
+    "es": "Responsable de grupo",
     "fr": "Responsable de groupe"
   },
   "groupName": {
     "en": "Group Name",
+    "es": "Nombre del grupo",
     "fr": "Nom du groupe"
   },
   "groupTrend": {
     "en": "Group Trend",
+    "es": "Tendencia del grupo",
     "fr": "Tendance du groupe"
   },
   "groupType": {
     "en": "Group Type",
+    "es": "Tipo de grupo",
     "fr": "Type de groupe"
   },
   "groups": {
     "en": "Groups",
+    "es": "Grupos",
     "fr": "Groupes"
   },
   "identificationMethod": {
     "en": "Identification Method",
+    "es": "Método de identificación",
     "fr": "Méthode d'identification"
   },
   "identificationMethodDesc": {
     "en": "Please select the method by which a subject will be identified for this session.",
+    "es": "Seleccione el método por el cual se identificará al sujeto para esta sesión.",
     "fr": "Veuillez sélectionner la méthode par laquelle un sujet sera identifié pour cette session."
   },
   "identifier": {
     "en": "Identifier",
+    "es": "Identificador",
     "fr": "Identifiant"
   },
   "instrument": {
     "en": "Instrument",
+    "es": "Instrumento",
     "fr": "Instrument"
   },
   "instrumentRecord": {
     "en": "Instrument Record",
+    "es": "Registro del instrumento",
     "fr": "Enregistrement"
   },
   "insufficientPasswordStrength": {
     "en": "Insufficient password strength",
+    "es": "Contraseña demasiado débil",
     "fr": "Mot de passe trop faible"
   },
   "localFormat": {
     "en": "Local",
+    "es": "Local",
     "fr": "Local"
   },
   "login": {
     "en": "Login",
+    "es": "Iniciar sesión",
     "fr": "Se connecter"
   },
   "manage": {
     "en": "Manage",
+    "es": "Gestionar",
     "fr": "Gérer"
   },
   "method": {
     "en": "Method",
+    "es": "Método",
     "fr": "Méthode"
   },
   "password": {
     "en": "Password",
+    "es": "Contraseña",
     "fr": "Mot de passe"
   },
   "passwordInDataBreach": {
     "en": "This password has appeared in a known data breach and cannot be used",
+    "es": "Esta contraseña ha aparecido en una filtración de datos conocida y no se puede utilizar",
     "fr": "Ce mot de passe est apparu dans une fuite de données connue et ne peut pas être utilisé"
   },
   "passwordMatchesUsername": {
     "en": "Password must not be the same as the username",
+    "es": "La contraseña no debe ser igual al nombre de usuario",
     "fr": "Le mot de passe ne doit pas être identique au nom d'utilisateur"
   },
   "passwordsMustMatch": {
     "en": "Passwords Must Match",
+    "es": "Las contraseñas deben coincidir",
     "fr": "Les mots de passe doivent correspondre"
   },
   "personalInfo": {
     "en": "Personal Information",
+    "es": "Información personal",
     "fr": "Renseignements personnels"
   },
   "phoneNumber": {
     "en": "Phone Number",
+    "es": "Número de teléfono",
     "fr": "Numéro de téléphone"
   },
   "research": {
     "en": "Research",
+    "es": "Investigación",
     "fr": "Recherche"
   },
   "session": {
     "en": "Session",
+    "es": "Sesión",
     "fr": "Session"
   },
   "sessionInProgress": {
     "en": "Session in Progress",
+    "es": "Sesión en curso",
     "fr": "Session en cours"
   },
   "standard": {
     "en": "Standard",
+    "es": "Estándar",
     "fr": "Standard"
   },
   "subject": {
     "en": "Subject",
+    "es": "Sujeto",
     "fr": "Client"
   },
   "subjectIdentification": {
     "description": {
       "en": "The following items are used to compute a unique identifier that enables consistent cross-session identification.",
+      "es": "Los siguientes elementos se utilizan para calcular un identificador único que permite una identificación coherente entre sesiones.",
       "fr": "Les éléments suivants sont utilisés pour calculer un identifiant unique qui permet une identification cohérente entre les sessions."
     },
     "firstName": {
       "description": {
         "en": "The subject's first name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as a fixed ASCII transliteration.",
+        "es": "El nombre del sujeto, según su certificado de nacimiento. A efectos de identificación, se eliminan los espacios en blanco, los caracteres especiales y los acentos, y los caracteres acentuados se tratan como una transliteración ASCII fija.",
         "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance. Pour les besoins de l'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme une translittération ASCII fixe."
       },
       "label": {
         "en": "First Name",
+        "es": "Nombre",
         "fr": "Prénom"
       }
     },
     "lastName": {
       "description": {
         "en": "The subject's last name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as their ASCII equivalents.",
+        "es": "El apellido del sujeto, según su certificado de nacimiento. A efectos de identificación, se eliminan los espacios en blanco, los caracteres especiales y los acentos, y los caracteres acentuados se tratan como sus equivalentes ASCII.",
         "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance. Aux fins d'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme leurs équivalents ASCII."
       },
       "label": {
         "en": "Last Name",
+        "es": "Apellido",
         "fr": "Nom de famille"
       }
     },
     "title": {
       "en": "Subject Identification",
+      "es": "Identificación del sujeto",
       "fr": "Identification du client"
     }
   },
   "tags": {
     "en": "Tags",
+    "es": "Etiquetas",
     "fr": "Tags"
   },
   "time": {
     "en": "Time",
+    "es": "Hora",
     "fr": "Heure"
   },
   "timeCollected": {
     "en": "Time Collected",
+    "es": "Hora de recopilación",
     "fr": "Horodatage"
   },
   "update": {
     "en": "Update",
+    "es": "Actualizar",
     "fr": "Mise à jour"
   },
   "uploadSuccessful": {
     "en": "Upload Successful",
+    "es": "Carga exitosa",
     "fr": "Téléversement réussi"
   },
   "user": {
     "en": "User",
+    "es": "Usuario",
     "fr": "Utilisateur"
   },
   "username": {
     "en": "Username",
+    "es": "Nombre de usuario",
     "fr": "Nom d'utilisateur"
   },
   "usernameExists": {
     "en": "Username already exists",
+    "es": "El nombre de usuario ya existe",
     "fr": "Le nom d'utilisateur existe déjà"
   },
   "view": {
     "en": "View",
+    "es": "Ver",
     "fr": "Voir"
   }
 }
