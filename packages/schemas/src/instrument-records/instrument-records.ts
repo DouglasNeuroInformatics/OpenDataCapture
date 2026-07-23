@@ -51,6 +51,16 @@ export const $InstrumentRecord = $BaseModel.extend({
   instrumentId: z.string(),
   pending: z.boolean().nullish(),
   seriesInstrumentId: z.string().nullish(),
+  /** The user who conducted the session, resolved server-side so clients need not join sessions themselves */
+  session: z
+    .object({
+      user: z
+        .object({
+          username: z.string().nullish()
+        })
+        .nullish()
+    })
+    .nullish(),
   sessionId: z.string(),
   subjectId: z.string()
 });

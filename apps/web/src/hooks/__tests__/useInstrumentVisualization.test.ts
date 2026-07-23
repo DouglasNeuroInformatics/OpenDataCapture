@@ -48,18 +48,8 @@ const mockInstrumentRecords = {
       computedMeasures: {},
       data: { someValue: 'abc' },
       date: FIXED_TEST_DATE,
+      session: { user: { username: 'testusername' } },
       sessionId: '123'
-    }
-  ]
-};
-
-const mockSessionWithUsername = {
-  data: [
-    {
-      id: '123',
-      user: {
-        username: 'testusername'
-      }
     }
   ]
 };
@@ -88,10 +78,6 @@ vi.mock('@/utils/excel', () => ({
 
 vi.mock('@/hooks/useInstrumentRecords', () => ({
   useInstrumentRecords: () => mockInstrumentRecords
-}));
-
-vi.mock('@/hooks/useFindSessionQuery', () => ({
-  useFindSessionQuery: () => mockSessionWithUsername
 }));
 
 describe('useInstrumentVisualization', () => {
