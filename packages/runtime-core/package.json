@@ -23,6 +23,14 @@
     "format": "prettier --write src",
     "lint": "tsc --noEmit && eslint --fix src"
   },
+  "peerDependencies": {
+    "react": "workspace:react__19.x@*"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "@douglasneuroinformatics/libui-form-types": "catalog:",
     "@opendatacapture/licenses": "workspace:*",
