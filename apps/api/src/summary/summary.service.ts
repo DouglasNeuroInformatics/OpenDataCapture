@@ -9,6 +9,7 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+const TREND_POINT_COUNT = 5;
 
 @Injectable()
 export class SummaryService {
@@ -25,42 +26,29 @@ export class SummaryService {
     const sessionFilter = groupId ? { groupId } : {};
     const recordFilter = groupId ? { groupId } : {};
 
-    const counts = {
-      instruments: await this.instrumentsService.count(),
-      records: await this.instrumentRecordsService.count(recordFilter, { ability }),
-      sessions: await this.sessionsService.count(sessionFilter, { ability }),
-      subjects: await this.subjectsService.count(filter, { ability }),
-      users: await this.usersService.count(filter, { ability })
-    };
-
     const now = Date.now();
+    const timestamps = Array.from({ length: TREND_POINT_COUNT }, (_, i) => now - THIRTY_DAYS_MS * i);
 
-    const trends: Summary['trends'] = {
-      records: [],
-      sessions: [],
-      subjects: []
-    };
+    const countTrend = (countAsOf: (lte: Date) => Promise<number>): Promise<Summary['trends']['records']> =>
+      Promise.all(timestamps.map(async (timestamp) => ({ timestamp, value: await countAsOf(new Date(timestamp)) })));
 
-    for (let i = 0; i < 5; i++) {
-      const timestamp = now - THIRTY_DAYS_MS * i;
-      const lte = new Date(timestamp);
-      trends.records.push({
-        timestamp,
-        value: await this.instrumentRecordsService.count({ date: { lte }, ...recordFilter }, { ability })
-      });
-      trends.sessions.push({
-        timestamp,
-        value: await this.sessionsService.count({ date: { lte }, ...sessionFilter }, { ability })
-      });
-      trends.subjects.push({
-        timestamp,
-        value: await this.subjectsService.count({ createdAt: { lte }, ...filter }, { ability })
-      });
-    }
+    // None of these counts depend on one another, so they are issued concurrently: the endpoint costs
+    // the slowest query rather than the sum of all of them.
+    const [instruments, records, sessions, subjects, users, recordTrend, sessionTrend, subjectTrend] =
+      await Promise.all([
+        this.instrumentsService.count(),
+        this.instrumentRecordsService.count(recordFilter, { ability }),
+        this.sessionsService.count(sessionFilter, { ability }),
+        this.subjectsService.count(filter, { ability }),
+        this.usersService.count(filter, { ability }),
+        countTrend((lte) => this.instrumentRecordsService.count({ date: { lte }, ...recordFilter }, { ability })),
+        countTrend((lte) => this.sessionsService.count({ date: { lte }, ...sessionFilter }, { ability })),
+        countTrend((lte) => this.subjectsService.count({ createdAt: { lte }, ...filter }, { ability }))
+      ]);
 
     return {
-      counts,
-      trends
+      counts: { instruments, records, sessions, subjects, users },
+      trends: { records: recordTrend, sessions: sessionTrend, subjects: subjectTrend }
     };
   }
 }

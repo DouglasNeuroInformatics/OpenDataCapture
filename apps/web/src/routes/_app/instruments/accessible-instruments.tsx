@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -15,6 +15,11 @@ const RouteComponent = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const instrumentInfoQuery = useInstrumentInfoQuery();
+
+  useEffect(() => {
+    const input = document.querySelector<HTMLInputElement>('[data-testid="instrument-search-bar"] input');
+    input?.focus();
+  }, []);
 
   return (
     <div data-testid="accessible-instruments-page">

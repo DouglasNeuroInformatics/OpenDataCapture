@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ListboxDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
 import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
@@ -26,6 +26,8 @@ export const InstrumentShowcase: React.FC<{
   const [selectedLanguages, setSelectedLanguages] = useState<InstrumentShowcaseLanguageOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<ListboxDropdownOption[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const listRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     const updatedFilteredInstruments = availableInstruments.filter(({ details, kind, supportedLanguages, tags }) => {
@@ -45,6 +47,7 @@ export const InstrumentShowcase: React.FC<{
       return a.details.title.localeCompare(b.details.title);
     });
     setFilteredInstruments(updatedFilteredInstruments);
+    setHighlightedIndex(0);
   }, [availableInstruments, selectedKinds, selectedLanguages, selectedTags, searchTerm]);
 
   useEffect(() => {
@@ -58,8 +61,40 @@ export const InstrumentShowcase: React.FC<{
     );
   }, [availableInstruments]);
 
+  useEffect(() => {
+    if (highlightedIndex < 0 || !listRef.current) return;
+    const items = listRef.current.querySelectorAll<HTMLElement>('[data-instrument-index]');
+    items[highlightedIndex]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [highlightedIndex]);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (filteredInstruments.length === 0) return;
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        setHighlightedIndex((prev) => Math.min(prev + 1, filteredInstruments.length - 1));
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        const instrument = filteredInstruments[highlightedIndex];
+        if (instrument) {
+          onSelect(instrument);
+        }
+      }
+    },
+    [filteredInstruments, highlightedIndex, onSelect]
+  );
+
   return (
-    <div className="flex flex-col gap-5" data-testid="instrument-showcase">
+    <div
+      className="flex flex-col gap-5"
+      data-testid="instrument-showcase"
+      role="toolbar"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    >
       <div className="flex items-center gap-2.5">
         <SearchBar
           className="grow"
@@ -85,19 +120,24 @@ export const InstrumentShowcase: React.FC<{
           </div>
         </div>
       </div>
-      <ul className="flex flex-col gap-5">
+      <ul className="flex flex-col gap-5" ref={listRef}>
         <AnimatePresence mode="popLayout">
           {filteredInstruments.map((instrument, i) => {
             return (
               <motion.li
                 layout
                 animate={{ opacity: 1, y: 0 }}
+                data-instrument-index={i}
                 exit={{ opacity: 0, y: 80 }}
                 initial={{ opacity: 0, y: 80 }}
                 key={instrument.id}
                 transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
               >
-                <InstrumentCard instrument={instrument} onClick={() => onSelect(instrument)} />
+                <InstrumentCard
+                  highlighted={i === highlightedIndex}
+                  instrument={instrument}
+                  onClick={() => onSelect(instrument)}
+                />
               </motion.li>
             );
           })}

@@ -18,7 +18,7 @@ export const QRCode = ({ url }: { url: string }) => {
           light: '#0000'
         },
         margin: 2,
-        scale: 6
+        scale: 4
       },
       (error) => {
         if (error) {

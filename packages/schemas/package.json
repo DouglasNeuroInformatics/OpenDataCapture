@@ -2,6 +2,7 @@
   "name": "@opendatacapture/schemas",
   "type": "module",
   "version": "0.0.0",
+  "sideEffects": false,
   "license": "Apache-2.0",
   "exports": {
     "./assignment": "./src/assignment/assignment.ts",

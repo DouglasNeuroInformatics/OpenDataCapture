@@ -24,10 +24,12 @@ import { useAppStore } from '@/store';
 import { useSetupStateQuery } from './useSetupStateQuery';
 
 export type NavItem = {
+  /** When present, this item renders as a collapsible group rather than a link. */
   children?: NavItem[];
   disabled?: boolean;
   icon: React.ComponentType<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
   label: string;
+  /** The route to navigate to. Omitted for collapsible group headers. */
   url?: string;
 };
 
@@ -125,17 +127,17 @@ export function useNavItems() {
             url: '/admin/settings'
           },
           {
+            icon: LogsIcon,
+            label: t('common.auditLogs'),
+            url: '/admin/audit/logs'
+          },
+          {
             icon: PaletteIcon,
             label: t({
               en: 'Branding',
               fr: 'Image de marque'
             }),
             url: '/admin/branding'
-          },
-          {
-            icon: LogsIcon,
-            label: t('common.auditLogs'),
-            url: '/admin/audit/logs'
           },
           {
             icon: PackageIcon,
