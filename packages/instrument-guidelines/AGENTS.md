@@ -441,11 +441,20 @@ type Fields<TData, TLanguage> = {
 type FieldsGroup<TData, TLanguage> = {
   description?: InstrumentUIOption<TLanguage, string>;
   fields: { [K in keyof TData]?: UnknownField<TData, K, TLanguage> };
+  kind?: 'fields-group';
   title?: InstrumentUIOption<TLanguage, string>;
 };
 
-type Content<TData, TLanguage> = Fields<TData, TLanguage> | FieldsGroup<TData, TLanguage>[];
+// An item of arbitrary JSX inlined amongst the groups of a form
+type Block<TData> = {
+  kind: 'block';
+  render: (this: void, data: PartialData<TData>) => ReactNode;
+};
+
+type Content<TData, TLanguage> = Fields<TData, TLanguage> | (Block<TData> | FieldsGroup<TData, TLanguage>)[];
 ```
+
+Content is either an object mapping every key to a field (`Fields`), or an array of `FieldsGroup` items — optionally interleaved with `Block` items that render arbitrary JSX (e.g. explanatory text) between groups. A `Block` holds no field data; its `render` receives the current partial form data and returns a `ReactNode`.
 
 ##### Full Type
 
