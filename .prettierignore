@@ -4,3 +4,4 @@
 /coverage
 .claude/skills
 apps/web/src/route-tree.ts
+pnpm-lock.yaml
