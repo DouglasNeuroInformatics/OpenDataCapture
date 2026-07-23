@@ -31,14 +31,13 @@ export const NavGroup = ({
   const containsActive = items.some((item) => item.url === location.pathname);
   const [isOpen, setIsOpen] = React.useState(containsActive);
 
-  // Navigating into the group from anywhere else (a link, a redirect, a restored URL) must reveal the
-  // active child rather than leaving it hidden inside a collapsed group. Only expanding here — never
-  // collapsing — keeps a group the user opened deliberately open as they navigate away from it.
   React.useEffect(() => {
     if (containsActive) {
       setIsOpen(true);
+    } else {
+      setIsOpen(false);
     }
-  }, [containsActive]);
+  }, [location.pathname]);
 
   return (
     <div className="flex flex-col">
