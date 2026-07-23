@@ -43,6 +43,9 @@ const RouteComponent = () => {
       date: currentSession!.date,
       groupId: currentGroup?.id,
       instrumentId: result.instrumentId,
+      // Record which series instrument (if any) orchestrated this collection: the series' identity
+      // encodes the exact ordered composition of its items, so it must be preserved in the metadata.
+      seriesInstrumentId: result.kind === 'SERIES' ? result.seriesInstrumentId : undefined,
       sessionId: currentSession!.id,
       subjectId: currentSession!.subject!.id
     } satisfies CreateInstrumentRecordData);

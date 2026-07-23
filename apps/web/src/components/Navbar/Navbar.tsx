@@ -10,11 +10,14 @@ import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
 
+import { GroupSwitcher, useIsGroupSwitcherVisible } from '../GroupSwitcher';
 import { NavButton } from '../NavButton';
+import { NavGroup } from '../NavGroup';
 import { UserDropup } from '../UserDropup';
 
 export const Navbar = () => {
   const currentSession = useAppStore((store) => store.currentSession);
+  const isGroupSwitcherVisible = useIsGroupSwitcherVisible();
   const [isOpen, setIsOpen] = useState(false);
   const navItems = useNavItems();
   const { t } = useTranslation('layout');
@@ -57,25 +60,48 @@ export const Navbar = () => {
         <Sheet.Header>
           <Branding className="h-10" fontSize="md" />
         </Sheet.Header>
+        {/* Shown regardless of the group-switcher position preference: the mobile layout has no sidebar
+            and no top bar, so the nav sheet is the only place the control can live. */}
+        {isGroupSwitcherVisible && (
+          <div className="py-2">
+            <GroupSwitcher />
+          </div>
+        )}
         <Separator />
         <nav className="flex w-full grow flex-col divide-y divide-slate-200 overflow-auto dark:divide-slate-700">
           {navItems.map((items, i) => (
             <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
-              {items.map(({ disabled, url, ...props }) => (
-                <NavButton
-                  activeClassName="bg-slate-200 text-slate-900 dark:text-slate-100 dark:bg-slate-800"
-                  className="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
-                  disabled={disabled && location.pathname !== url}
-                  isActive={location.pathname === url}
-                  key={url}
-                  url={url}
-                  onClick={() => {
-                    setIsOpen(false);
-                    void navigate({ to: url });
-                  }}
-                  {...props}
-                />
-              ))}
+              {items.map(({ disabled, url, ...props }) =>
+                props.children ? (
+                  <NavGroup
+                    activeClassName="bg-slate-200 text-slate-900 dark:text-slate-100 dark:bg-slate-800"
+                    childClassName="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
+                    className="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
+                    icon={props.icon}
+                    items={props.children}
+                    key={props.label}
+                    label={props.label}
+                    onNavigate={(to) => {
+                      setIsOpen(false);
+                      void navigate({ to });
+                    }}
+                  />
+                ) : (
+                  <NavButton
+                    activeClassName="bg-slate-200 text-slate-900 dark:text-slate-100 dark:bg-slate-800"
+                    className="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
+                    disabled={disabled && location.pathname !== url}
+                    isActive={location.pathname === url}
+                    key={url}
+                    url={url!}
+                    onClick={() => {
+                      setIsOpen(false);
+                      void navigate({ to: url! });
+                    }}
+                    {...props}
+                  />
+                )
+              )}
               {i === navItems.length - 1 && (
                 <NavButton
                   activeClassName="bg-slate-200 text-slate-900"

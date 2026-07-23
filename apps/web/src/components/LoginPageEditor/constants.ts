@@ -55,7 +55,7 @@ export const LOGO_ALIGNMENT_LABELS: { [K in LogoAlignment]: { en: string; fr: st
 
 export const SECTION_TITLES: { [K in PanelSection]: { en: string; fr: string } } = {
   details: { en: 'Details', fr: 'Détails' },
-  logo: { en: 'Logo', fr: 'Logo' },
+  logo: { en: 'Login Image', fr: 'Image de connexion' },
   name: { en: 'Instance Name', fr: "Nom de l'instance" },
   resources: { en: 'Resources', fr: 'Ressources' },
   tagline: { en: 'Main Description', fr: 'Description principale' }
@@ -65,7 +65,13 @@ export const DEFAULT_SECTIONS_ORDER: PanelSection[] = ['logo', 'name', 'tagline'
 export const HEX_PATTERN = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 /** Accept http(s) URLs with a hostname containing at least one dot (e.g. example.com). */
 export const URL_PATTERN = /^https?:\/\/[^\s/]+\.[^\s/]+(\/\S*)?$/;
-export const MAX_LOGO_BYTES = 1024 * 1024;
+export const MAX_LOGO_BYTES = 2 * 1024 * 1024;
+/**
+ * Image types accepted for the uploaded login image. Drives both the file input's
+ * `accept` hint and the post-selection check in `handleLogoFile` — the hint alone
+ * is advisory, since the OS picker lets the user override it with "All Files".
+ */
+export const ACCEPTED_LOGO_MIME_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'] as const;
 export const FORM_ID = 'branding-form';
 /** Sentinel Select value representing "no override — use the default font size". */
 export const FONT_SIZE_DEFAULT = 'default';

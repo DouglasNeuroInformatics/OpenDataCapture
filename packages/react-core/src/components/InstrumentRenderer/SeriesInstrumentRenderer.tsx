@@ -18,7 +18,7 @@ import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
 import { validateSubmission } from './validateSubmission';
 
-import type { SubjectDisplayInfo } from '../../types';
+import type { LocalizedText, SubjectDisplayInfo } from '../../types';
 import type { FormContentSubmitResult } from '../FormContent';
 import type { InteractiveContentSubmitResult } from '../InteractiveContent';
 import type { InstrumentSubmitHandler } from './types';
@@ -32,6 +32,8 @@ export type SeriesInstrumentRendererProps = {
   initialSeriesIndex?: number;
   onSubmit: InstrumentSubmitHandler<'SERIES'>;
   subject?: SubjectDisplayInfo;
+  /** A localizable label for each constituent form's submit button. */
+  submitButtonLabel?: LocalizedText;
   target: SeriesInstrumentBundleContainer;
 };
 
@@ -41,6 +43,7 @@ export const SeriesInstrumentRenderer = ({
   disableBegin,
   initialSeriesIndex,
   onSubmit,
+  submitButtonLabel,
   target
 }: SeriesInstrumentRendererProps) => {
   const [index, setIndex] = useState<0 | 1 | 2>(0);
@@ -96,7 +99,8 @@ export const SeriesInstrumentRenderer = ({
       data: parsedData,
       index,
       instrumentId: scalarId!,
-      kind: 'SERIES'
+      kind: 'SERIES',
+      seriesInstrumentId: target.id
     });
 
     if (isLastItem || shouldTerminate) {
@@ -195,7 +199,11 @@ export const SeriesInstrumentRenderer = ({
                 .with({ status: 'DONE' }, () =>
                   match(scalarState)
                     .with({ instrument: { kind: 'FORM' } }, ({ instrument }) => (
-                      <FormContent instrument={instrument} onSubmit={handleSubmit} />
+                      <FormContent
+                        instrument={instrument}
+                        submitButtonLabel={submitButtonLabel}
+                        onSubmit={handleSubmit}
+                      />
                     ))
                     .with({ instrument: { kind: 'INTERACTIVE' } }, () => (
                       <InteractiveContent bundle={scalarBundle!} onSubmit={handleSubmit} />
