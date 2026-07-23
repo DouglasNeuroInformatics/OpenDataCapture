@@ -69,7 +69,7 @@ export class GroupsService {
 
   async updateById(
     id: string,
-    { accessibleInstrumentIds, instrumentRepoIds, settings, ...data }: UpdateGroupDto,
+    { accessibleInstrumentIds, emailTemplates, instrumentRepoIds, settings, ...data }: UpdateGroupDto,
     { ability }: EntityOperationOptions = {}
   ) {
     const where: Prisma.GroupWhereInput = { AND: [accessibleQuery(ability, 'update', 'Group')], id };
@@ -107,6 +107,8 @@ export class GroupsService {
               set: validInstrumentIds.map((id) => ({ id }))
             }
           : undefined,
+        // Composite list fields must be replaced via `set` in the MongoDB connector.
+        emailTemplates: emailTemplates ? { set: emailTemplates } : undefined,
         instrumentRepos: instrumentRepoIds
           ? {
               set: instrumentRepoIds.map((id) => ({ id }))

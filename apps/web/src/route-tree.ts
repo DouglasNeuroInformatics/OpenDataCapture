@@ -24,7 +24,9 @@ import { Route as AppSessionStartSessionRouteImport } from './routes/_app/sessio
 import { Route as AppSessionRemoteAssignmentRouteImport } from './routes/_app/session/remote-assignment'
 import { Route as AppInstrumentsAccessibleInstrumentsRouteImport } from './routes/_app/instruments/accessible-instruments'
 import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
+import { Route as AppGroupEmailTemplatesRouteImport } from './routes/_app/group/email-templates'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
+import { Route as AppAdminMailRouteImport } from './routes/_app/admin/mail'
 import { Route as AppDatahubSubjectIdRouteRouteImport } from './routes/_app/datahub/$subjectId/route'
 import { Route as AppAdminUsersIndexRouteImport } from './routes/_app/admin/users/index'
 import { Route as AppAdminInstrumentReposIndexRouteImport } from './routes/_app/admin/instrument-repos/index'
@@ -116,9 +118,19 @@ const AppGroupManageRoute = AppGroupManageRouteImport.update({
   path: '/group/manage',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppGroupEmailTemplatesRoute = AppGroupEmailTemplatesRouteImport.update({
+  id: '/group/email-templates',
+  path: '/group/email-templates',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppAdminSettingsRoute = AppAdminSettingsRouteImport.update({
   id: '/admin/settings',
   path: '/admin/settings',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppAdminMailRoute = AppAdminMailRouteImport.update({
+  id: '/admin/mail',
+  path: '/admin/mail',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppDatahubSubjectIdRouteRoute =
@@ -208,7 +220,9 @@ export interface FileRoutesByFullPath {
   '/user': typeof AppUserRoute
   '/auth/login': typeof AuthLoginRoute
   '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
+  '/admin/mail': typeof AppAdminMailRoute
   '/admin/settings': typeof AppAdminSettingsRoute
+  '/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/group/manage': typeof AppGroupManageRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
@@ -239,7 +253,9 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
   '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
+  '/admin/mail': typeof AppAdminMailRoute
   '/admin/settings': typeof AppAdminSettingsRoute
+  '/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/group/manage': typeof AppGroupManageRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
@@ -272,7 +288,9 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/_app/': typeof AppIndexRoute
   '/_app/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
+  '/_app/admin/mail': typeof AppAdminMailRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
+  '/_app/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/_app/group/manage': typeof AppGroupManageRoute
   '/_app/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/_app/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
@@ -305,7 +323,9 @@ export interface FileRouteTypes {
     | '/user'
     | '/auth/login'
     | '/datahub/$subjectId'
+    | '/admin/mail'
     | '/admin/settings'
+    | '/group/email-templates'
     | '/group/manage'
     | '/instruments/accessible-instruments'
     | '/session/remote-assignment'
@@ -336,7 +356,9 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/'
     | '/datahub/$subjectId'
+    | '/admin/mail'
     | '/admin/settings'
+    | '/group/email-templates'
     | '/group/manage'
     | '/instruments/accessible-instruments'
     | '/session/remote-assignment'
@@ -368,7 +390,9 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/_app/'
     | '/_app/datahub/$subjectId'
+    | '/_app/admin/mail'
     | '/_app/admin/settings'
+    | '/_app/group/email-templates'
     | '/_app/group/manage'
     | '/_app/instruments/accessible-instruments'
     | '/_app/session/remote-assignment'
@@ -504,11 +528,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppGroupManageRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/group/email-templates': {
+      id: '/_app/group/email-templates'
+      path: '/group/email-templates'
+      fullPath: '/group/email-templates'
+      preLoaderRoute: typeof AppGroupEmailTemplatesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/admin/settings': {
       id: '/_app/admin/settings'
       path: '/admin/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AppAdminSettingsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/admin/mail': {
+      id: '/_app/admin/mail'
+      path: '/admin/mail'
+      fullPath: '/admin/mail'
+      preLoaderRoute: typeof AppAdminMailRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/datahub/$subjectId': {
@@ -640,7 +678,9 @@ interface AppRouteRouteChildren {
   AppUserRoute: typeof AppUserRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDatahubSubjectIdRouteRoute: typeof AppDatahubSubjectIdRouteRouteWithChildren
+  AppAdminMailRoute: typeof AppAdminMailRoute
   AppAdminSettingsRoute: typeof AppAdminSettingsRoute
+  AppGroupEmailTemplatesRoute: typeof AppGroupEmailTemplatesRoute
   AppGroupManageRoute: typeof AppGroupManageRoute
   AppInstrumentsAccessibleInstrumentsRoute: typeof AppInstrumentsAccessibleInstrumentsRoute
   AppSessionRemoteAssignmentRoute: typeof AppSessionRemoteAssignmentRoute
@@ -666,7 +706,9 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppUserRoute: AppUserRoute,
   AppIndexRoute: AppIndexRoute,
   AppDatahubSubjectIdRouteRoute: AppDatahubSubjectIdRouteRouteWithChildren,
+  AppAdminMailRoute: AppAdminMailRoute,
   AppAdminSettingsRoute: AppAdminSettingsRoute,
+  AppGroupEmailTemplatesRoute: AppGroupEmailTemplatesRoute,
   AppGroupManageRoute: AppGroupManageRoute,
   AppInstrumentsAccessibleInstrumentsRoute:
     AppInstrumentsAccessibleInstrumentsRoute,
