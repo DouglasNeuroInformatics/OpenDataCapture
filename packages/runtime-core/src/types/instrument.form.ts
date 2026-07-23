@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
+import type { ReactNode } from 'react';
+
 import type FormTypes from '@douglasneuroinformatics/libui-form-types';
 import type { PartialDeep, Simplify } from 'type-fest';
 
@@ -126,8 +128,8 @@ declare namespace FormInstrument {
    */
   type ScalarField<
     TLanguage extends InstrumentLanguage = InstrumentLanguage,
-    TValue extends
-      FormTypes.RequiredFieldValue<FormTypes.ScalarFieldValue> = FormTypes.RequiredFieldValue<FormTypes.ScalarFieldValue>
+    TValue extends FormTypes.RequiredFieldValue<FormTypes.ScalarFieldValue> =
+      FormTypes.RequiredFieldValue<FormTypes.ScalarFieldValue>
   > = [TValue] extends [object]
     ? [TValue] extends [Date]
       ? DateField<TLanguage>
@@ -145,8 +147,8 @@ declare namespace FormInstrument {
   type DynamicFieldsetField<
     TLanguage extends InstrumentLanguage = InstrumentLanguage,
     TFieldsetValue extends FormTypes.FieldsetValue = FormTypes.FieldsetValue,
-    TValue extends
-      FormTypes.RequiredFieldValue<FormTypes.ScalarFieldValue> = FormTypes.RequiredFieldValue<FormTypes.ScalarFieldValue>
+    TValue extends FormTypes.RequiredFieldValue<FormTypes.ScalarFieldValue> =
+      FormTypes.RequiredFieldValue<FormTypes.ScalarFieldValue>
   > = {
     kind: 'dynamic';
     render: (this: void, fieldset: Partial<TFieldsetValue>) => null | ScalarField<TLanguage, TValue>;
@@ -165,8 +167,8 @@ declare namespace FormInstrument {
 
   type RecordArrayField<
     TLanguage extends InstrumentLanguage = InstrumentLanguage,
-    TValue extends
-      FormTypes.RequiredFieldValue<FormTypes.RecordArrayFieldValue> = FormTypes.RequiredFieldValue<FormTypes.RecordArrayFieldValue>
+    TValue extends FormTypes.RequiredFieldValue<FormTypes.RecordArrayFieldValue> =
+      FormTypes.RequiredFieldValue<FormTypes.RecordArrayFieldValue>
   > = FieldMixin<
     TLanguage,
     FormTypes.RecordArrayField<TValue>,
@@ -177,8 +179,8 @@ declare namespace FormInstrument {
 
   type NumberRecordField<
     TLanguage extends InstrumentLanguage = InstrumentLanguage,
-    TValue extends
-      FormTypes.RequiredFieldValue<FormTypes.NumberRecordFieldValue> = FormTypes.RequiredFieldValue<FormTypes.NumberRecordFieldValue>
+    TValue extends FormTypes.RequiredFieldValue<FormTypes.NumberRecordFieldValue> =
+      FormTypes.RequiredFieldValue<FormTypes.NumberRecordFieldValue>
   > = FieldMixin<
     TLanguage,
     FormTypes.NumberRecordField,
@@ -202,8 +204,8 @@ declare namespace FormInstrument {
 
   type CompositeField<
     TLanguage extends InstrumentLanguage = InstrumentLanguage,
-    TValue extends
-      FormTypes.RequiredFieldValue<FormTypes.CompositeFieldValue> = FormTypes.RequiredFieldValue<FormTypes.CompositeFieldValue>
+    TValue extends FormTypes.RequiredFieldValue<FormTypes.CompositeFieldValue> =
+      FormTypes.RequiredFieldValue<FormTypes.CompositeFieldValue>
   > =
     TValue extends FormTypes.RequiredFieldValue<FormTypes.RecordArrayFieldValue>
       ? RecordArrayField<TLanguage, TValue>
@@ -271,12 +273,19 @@ declare namespace FormInstrument {
     fields: {
       [K in keyof TData]?: UnknownField<TData, K, TLanguage>;
     };
+    kind?: 'fields-group';
     title?: InstrumentUIOption<TLanguage, string>;
   };
 
+  /** An item of arbitrary JSX that may be inlined amongst the groups of a form */
+  export type Block<TData extends Data = Data> = {
+    kind: 'block';
+    render: (this: void, data: PartialData<TData>) => ReactNode;
+  };
+
   type Content<TData extends Data = Data, TLanguage extends InstrumentLanguage = InstrumentLanguage> =
-    | Fields<TData, TLanguage>
-    | FieldsGroup<TData, TLanguage>[];
+    | (Block<TData> | FieldsGroup<TData, TLanguage>)[]
+    | Fields<TData, TLanguage>;
 }
 
 /** @public */

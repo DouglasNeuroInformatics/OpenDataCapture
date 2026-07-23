@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import type FormTypes from '@douglasneuroinformatics/libui-form-types';
 import { expectTypeOf } from 'expect-type';
 
@@ -316,4 +318,19 @@ import type { FormInstrument } from '../instrument.form.js';
   /** Composite Value Types */
 
   /** Dynamic */
+}
+
+/** FormInstrument.Block */
+{
+  type TData = { _: string };
+
+  expectTypeOf<FormInstrument.Block<TData>['kind']>().toEqualTypeOf<'block'>();
+  expectTypeOf<FormInstrument.Block<TData>['render']>().toEqualTypeOf<
+    (this: void, data: FormInstrument.PartialData<TData>) => ReactNode
+  >();
+
+  /** A block may be inlined amongst groups in the array form of content */
+  expectTypeOf<FormInstrument.Block<TData>>().toMatchTypeOf<
+    Extract<FormInstrument<TData>['content'], unknown[]>[number]
+  >();
 }
