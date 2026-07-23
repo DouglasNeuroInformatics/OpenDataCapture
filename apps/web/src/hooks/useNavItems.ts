@@ -12,6 +12,7 @@ import {
   PackageIcon,
   PaletteIcon,
   SendIcon,
+  ShieldIcon,
   UploadIcon,
   UserCogIcon,
   UsersIcon
@@ -22,10 +23,11 @@ import { useAppStore } from '@/store';
 import { useSetupStateQuery } from './useSetupStateQuery';
 
 export type NavItem = {
+  children?: NavItem[];
   disabled?: boolean;
   icon: React.ComponentType<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
   label: string;
-  url: string;
+  url?: string;
 };
 
 /**
@@ -83,30 +85,8 @@ export function useNavItems() {
       });
     }
 
-    const adminItems: NavItem[] = [];
     if (ability?.can('manage', 'all')) {
-      adminItems.push({
-        icon: CogIcon,
-        label: t({
-          en: 'App Settings',
-          fr: "Paramètres de l'application"
-        }),
-        url: '/admin/settings'
-      });
-      adminItems.push({
-        icon: PaletteIcon,
-        label: t({
-          en: 'Branding',
-          fr: 'Image de marque'
-        }),
-        url: '/admin/branding'
-      });
-      adminItems.push({
-        icon: LogsIcon,
-        label: t('common.auditLogs'),
-        url: '/admin/audit/logs'
-      });
-      adminItems.push({
+      globalItems.push({
         icon: UsersIcon,
         label: t({
           en: 'Manage Groups',
@@ -114,7 +94,7 @@ export function useNavItems() {
         }),
         url: '/admin/groups'
       });
-      adminItems.push({
+      globalItems.push({
         icon: UserCogIcon,
         label: t({
           en: 'Manage Users',
@@ -122,13 +102,44 @@ export function useNavItems() {
         }),
         url: '/admin/users'
       });
+    }
+
+    const adminItems: NavItem[] = [];
+    if (ability?.can('manage', 'all')) {
       adminItems.push({
-        icon: PackageIcon,
-        label: t({
-          en: 'Instrument Repos',
-          fr: "Dépôts d'instruments"
-        }),
-        url: '/admin/instrument-repos'
+        children: [
+          {
+            icon: CogIcon,
+            label: t({
+              en: 'App Settings',
+              fr: "Paramètres de l'application"
+            }),
+            url: '/admin/settings'
+          },
+          {
+            icon: PaletteIcon,
+            label: t({
+              en: 'Branding',
+              fr: 'Image de marque'
+            }),
+            url: '/admin/branding'
+          },
+          {
+            icon: LogsIcon,
+            label: t('common.auditLogs'),
+            url: '/admin/audit/logs'
+          },
+          {
+            icon: PackageIcon,
+            label: t({
+              en: 'Instrument Repos',
+              fr: "Dépôts d'instruments"
+            }),
+            url: '/admin/instrument-repos'
+          }
+        ],
+        icon: ShieldIcon,
+        label: t({ en: 'Admin Panel', fr: "Panneau d'administration" })
       });
     }
 

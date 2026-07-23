@@ -224,16 +224,12 @@ const $UnilingualScalarInstrument = $ScalarInstrument.extend({
 }) satisfies z.ZodType<ScalarInstrument<any, Language>>;
 
 /**
- * An object containing the essential data describing an instrument, but omitting the content
- * and validation schema required to actually complete the instrument. This may be used for,
- * among other things, displaying available instruments to the user.
+ * The fields common to every instrument's "info" (essential describing data, omitting the content and
+ * validation schema needed to actually complete the instrument). Used, among other things, for
+ * displaying available instruments to the user.
  */
-type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = Omit<T, 'content'> & {
+type BaseInstrumentInfo<T extends BaseInstrument = BaseInstrument> = Omit<T, 'content' | 'kind'> & {
   id: string;
-  internal?: {
-    edition: number;
-    name: string;
-  };
   // Provenance: null when uploaded manually; otherwise the source repository id (always present) and
   // its name (may be null for legacy instruments imported before names were stored).
   sourceRepo?: null | {
@@ -242,20 +238,53 @@ type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = Omit<T, 'conten
   };
 };
 
-const $InstrumentInfo = $BaseInstrument
-  .omit({
-    content: true
-  })
-  .extend({
-    id: z.string(),
-    internal: $ScalarInstrumentInternal.optional(),
-    sourceRepo: z
-      .object({
-        id: z.string(),
-        name: z.string().nullable()
-      })
-      .nullish()
-  }) satisfies z.ZodType<InstrumentInfo>;
+/** Info for a scalar (standalone) instrument, uniquely identified by its internal name + edition. */
+type ScalarInstrumentInfo<T extends BaseInstrument = BaseInstrument> = BaseInstrumentInfo<T> & {
+  internal: {
+    edition: number;
+    name: string;
+  };
+  kind: Exclude<InstrumentKind, 'SERIES'>;
+};
+
+/** Info for a series instrument, which bundles the scalar instruments referenced by `seriesItems`. */
+type SeriesInstrumentInfo<T extends BaseInstrument = BaseInstrument> = BaseInstrumentInfo<T> & {
+  kind: 'SERIES';
+  // The group that created and owns this series, or null for a series shared across every group (one
+  // uploaded directly, or created before series became group-owned). Only the owning group may delete
+  // it, so clients need this to decide whether to offer a delete affordance.
+  seriesGroupId?: null | string;
+  seriesItems: { id: string }[];
+};
+
+/** A discriminated union over `kind`: scalar instruments carry `internal`, series carry `seriesItems`. */
+type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = ScalarInstrumentInfo<T> | SeriesInstrumentInfo<T>;
+
+const $BaseInstrumentInfo = $BaseInstrument.omit({ content: true, kind: true }).extend({
+  id: z.string(),
+  sourceRepo: z
+    .object({
+      id: z.string(),
+      name: z.string().nullable()
+    })
+    .nullish()
+});
+
+const $ScalarInstrumentInfo = $BaseInstrumentInfo.extend({
+  internal: $ScalarInstrumentInternal,
+  kind: z.enum(['FILE', 'FORM', 'INTERACTIVE'])
+}) satisfies z.ZodType<ScalarInstrumentInfo>;
+
+const $SeriesInstrumentInfo = $BaseInstrumentInfo.extend({
+  kind: z.literal('SERIES'),
+  seriesGroupId: z.string().nullish(),
+  seriesItems: z.object({ id: z.string() }).array()
+}) satisfies z.ZodType<SeriesInstrumentInfo>;
+
+const $InstrumentInfo = z.discriminatedUnion('kind', [
+  $ScalarInstrumentInfo,
+  $SeriesInstrumentInfo
+]) satisfies z.ZodType<InstrumentInfo>;
 
 /** @internal */
 type UnilingualInstrumentInfo = Simplify<InstrumentInfo<BaseInstrument<Language>>>;
@@ -272,6 +301,40 @@ type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 const $CreateInstrumentData = z.object({
   bundle: z.string().min(1)
 });
+
+/**
+ * The data a client submits to assemble a new series instrument from existing scalar instruments. The
+ * multilingual `details`/`clientDetails` are picked directly from the master instrument schemas (single
+ * source of truth); everything else about the stored instrument (id, content, kind, ...) is computed
+ * server-side. Exported as both a value (the schema) and a type so it can annotate a controller body
+ * without a dedicated DTO class.
+ */
+type $CreateSeriesInstrumentData = z.infer<typeof $CreateSeriesInstrumentData>;
+const $CreateSeriesInstrumentData = z.object({
+  // Optional instructions shown before the series begins (same shape as any instrument's clientDetails).
+  clientDetails: $ClientInstrumentDetails.pick({ instructions: true }).optional(),
+  // When true, proceed even though another series already contains the same ordered items.
+  confirmDuplicate: z.boolean().optional(),
+  // The display title (required) and optional description, in the same multilingual shape as an instrument.
+  details: $InstrumentDetails.pick({ title: true }).extend({
+    description: $InstrumentDetails.shape.description.optional()
+  }),
+  // The group that owns and can access the generated series instrument.
+  groupId: z.string(),
+  // The ordered list of scalar instruments (by name + edition) that make up the series.
+  items: z.array($ScalarInstrumentInternal).min(2),
+  // The language(s) the details above are written in — mirrors an instrument's own `language` field.
+  language: $InstrumentLanguage
+});
+
+/**
+ * The result of a create-series request. A discriminated union over `outcome`: either the series was
+ * created, or another series already contains the same ordered items and the caller must confirm the
+ * duplicate before it is created.
+ */
+type CreateSeriesInstrumentResult =
+  | { existingTitle: NonNullable<ClientInstrumentDetails['title']>; outcome: 'duplicate' }
+  | { instrumentId: string; outcome: 'created' };
 
 const $BaseInstrumentBundleContainer = z.object({
   id: z.string()
@@ -305,6 +368,7 @@ export {
   $BaseInstrument,
   $ClientInstrumentDetails,
   $CreateInstrumentData,
+  $CreateSeriesInstrumentData,
   $InstrumentBundleContainer,
   $InstrumentDetails,
   $InstrumentInfo,
@@ -322,11 +386,14 @@ export {
 
 export type {
   CreateInstrumentData,
+  CreateSeriesInstrumentResult,
   InstrumentBundleContainer,
   InstrumentInfo,
   MultilingualInstrumentInfo,
   ScalarInstrumentBundleContainer,
+  ScalarInstrumentInfo,
   SeriesInstrumentBundleContainer,
+  SeriesInstrumentInfo,
   TranslatedInstrumentInfo,
   UnilingualInstrumentInfo
 };

@@ -4,23 +4,23 @@ import { snakeToCamelCase, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, DropdownMenu, Heading, TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $AuditLogsQuerySearchParams } from '@opendatacapture/schemas/audit';
-import type { $AuditLog, $AuditLogAction, $AuditLogEntity } from '@opendatacapture/schemas/audit';
+import type {
+  $AuditLog,
+  $AuditLogAction,
+  $AuditLogEntity,
+  $AuditLogsQuerySearchParams as AuditLogsSearchParams
+} from '@opendatacapture/schemas/audit';
 import { createFileRoute } from '@tanstack/react-router';
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  CalendarIcon,
-  ChevronDownIcon,
-  ChevronsUpDownIcon,
-  DownloadIcon
-} from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, CalendarIcon, ChevronDownIcon, DownloadIcon } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
-import { auditLogsQueryOptions, useAuditLogsQuery } from '@/hooks/useAuditLogsQuery';
+import { auditLogsQueryOptions, fetchAllAuditLogs, useAuditLogsQuery } from '@/hooks/useAuditLogsQuery';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 
 type DateFormat = 'iso' | 'local';
+
+type SortOrder = 'asc' | 'desc';
 
 const ACTIONS: $AuditLogAction[] = ['CREATE', 'DELETE', 'UPDATE', 'LOGIN'];
 
@@ -75,8 +75,18 @@ const SelectSingleFilterGroup = ({
   );
 };
 
-const SortableHeader = ({ column, label }: { column: TanstackTable.Column<$AuditLog>; label: string }) => {
-  const sorted = column.getIsSorted();
+// The sort direction is rendered from the value the rows were actually fetched with, rather than from
+// `column.getIsSorted()`: in server mode the table mounts with no sorting state of its own, so the
+// column would read as unsorted even though the server has already ordered by timestamp descending.
+const SortableHeader = ({
+  column,
+  label,
+  sortOrder
+}: {
+  column: TanstackTable.Column<$AuditLog>;
+  label: string;
+  sortOrder: SortOrder;
+}) => {
   return (
     <button
       className="hover:text-foreground flex items-center gap-2"
@@ -84,12 +94,10 @@ const SortableHeader = ({ column, label }: { column: TanstackTable.Column<$Audit
       onClick={column.getToggleSortingHandler()}
     >
       {label}
-      {sorted === 'asc' ? (
+      {sortOrder === 'asc' ? (
         <ArrowUpIcon className="opacity-50" style={{ height: '14px', width: 'auto' }} />
-      ) : sorted === 'desc' ? (
-        <ArrowDownIcon className="opacity-50" style={{ height: '14px', width: 'auto' }} />
       ) : (
-        <ChevronsUpDownIcon className="opacity-50" style={{ height: '14px', width: 'auto' }} />
+        <ArrowDownIcon className="opacity-50" style={{ height: '14px', width: 'auto' }} />
       )}
     </button>
   );
@@ -125,7 +133,7 @@ const DateFormatMenu = ({ onChange, value }: { onChange: (value: DateFormat) => 
   );
 };
 
-const Toggles: React.FC<{ table: TanstackTable.Table<$AuditLog> }> = ({ table }) => {
+const Toggles: React.FC<{ table: TanstackTable.Table<$AuditLog> }> = () => {
   const search = Route.useSearch();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -137,12 +145,14 @@ const Toggles: React.FC<{ table: TanstackTable.Table<$AuditLog> }> = ({ table })
 
   const download = useDownload();
 
+  // The table only holds the page currently displayed, so the download refetches every log matching
+  // the active filters rather than exporting what happens to be on screen.
   const handleDownload = useCallback(() => {
-    const data = table
-      .getPrePaginationRowModel()
-      .rows.map((row) => Object.fromEntries(row.getVisibleCells().map((cell) => [cell.column.id, cell.getValue()])));
-    void download(`ODC_Audit_Logs_${Date.now()}.json`, JSON.stringify(data, null, 2));
-  }, []);
+    void download(`ODC_Audit_Logs_${Date.now()}.json`, async () => {
+      const logs = await fetchAllAuditLogs(search);
+      return JSON.stringify(logs, null, 2);
+    });
+  }, [search]);
 
   const availableUsers = search.groupId ? users.filter((user) => user.groupIds.includes(search.groupId!)) : users;
 
@@ -193,10 +203,11 @@ const Toggles: React.FC<{ table: TanstackTable.Table<$AuditLog> }> = ({ table })
   );
 };
 
-const RouteComponent = () => {
-  const search = Route.useSearch();
+const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search }) => {
+  const [page, setPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
-  const auditLogsQuery = useAuditLogsQuery({ search });
+  const auditLogsQuery = useAuditLogsQuery({ params: { ...search, page, sortOrder } });
 
   const { resolvedLanguage, t } = useTranslation();
 
@@ -217,82 +228,97 @@ const RouteComponent = () => {
   );
 
   return (
+    <DataTable
+      columns={[
+        {
+          accessorKey: 'timestamp',
+          cell: (ctx) => {
+            const value = ctx.getValue() as number;
+            return formatTimestamp(value);
+          },
+          enableResizing: false,
+          enableSorting: true,
+          header: ({ column }) => (
+            <div className="flex items-center gap-2">
+              <SortableHeader column={column} label={t('common.time')} sortOrder={sortOrder} />
+              <DateFormatMenu value={dateFormat} onChange={setDateFormat} />
+            </div>
+          ),
+          size: 250
+        },
+        {
+          accessorFn: (row) => row.user?.username ?? 'N/A',
+          cell: (ctx) => {
+            const value = ctx.getValue() as string;
+            return <span className="overflow-hidden text-ellipsis whitespace-nowrap">{value}</span>;
+          },
+          header: t('common.user'),
+          id: 'user'
+        },
+        {
+          accessorFn: (row) => row.group?.name ?? 'N/A',
+          cell: (ctx) => {
+            const value = ctx.getValue() as string;
+            return <span className="overflow-hidden text-ellipsis whitespace-nowrap">{value}</span>;
+          },
+          header: t('common.activeGroup'),
+          id: 'group'
+        },
+        {
+          accessorKey: 'action',
+          cell: (ctx) => {
+            const value = ctx.getValue() as $AuditLogAction;
+            return (
+              <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+                {t(`common.${toLowerCase(value)}`)}
+              </span>
+            );
+          },
+          header: t('common.action')
+        },
+        {
+          accessorKey: 'entity',
+          cell: (ctx) => {
+            const value = ctx.getValue() as $AuditLogEntity;
+            return (
+              <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+                {t(`common.${snakeToCamelCase(toLowerCase(value))}`)}
+              </span>
+            );
+          },
+          header: t('common.entity')
+        }
+      ]}
+      data={auditLogsQuery.data?.data ?? []}
+      mode="server"
+      pageCount={auditLogsQuery.data?.pageCount ?? 0}
+      togglesComponent={Toggles}
+      onPaginationChange={({ pageIndex }) => setPage(pageIndex + 1)}
+      onSortingChange={(state) => {
+        const timestamp = state.find(({ id }) => id === 'timestamp');
+        if (timestamp) {
+          setSortOrder(timestamp.desc ? 'desc' : 'asc');
+          setPage(1);
+        }
+      }}
+    />
+  );
+};
+
+const RouteComponent = () => {
+  const search = Route.useSearch();
+  const { t } = useTranslation();
+
+  return (
     <Fragment>
       <PageHeader>
         <Heading className="text-center" variant="h2">
           {t('common.auditLogs')}
         </Heading>
       </PageHeader>
-      <DataTable
-        columns={[
-          {
-            accessorKey: 'timestamp',
-            cell: (ctx) => {
-              const value = ctx.getValue() as number;
-              return formatTimestamp(value);
-            },
-            enableResizing: false,
-            enableSorting: true,
-            header: ({ column }) => (
-              <div className="flex items-center gap-2">
-                <SortableHeader column={column} label={t('common.time')} />
-                <DateFormatMenu value={dateFormat} onChange={setDateFormat} />
-              </div>
-            ),
-            size: 250
-          },
-          {
-            accessorFn: (row) => row.user?.username ?? 'N/A',
-            cell: (ctx) => {
-              const value = ctx.getValue() as string;
-              return <span className="overflow-hidden text-ellipsis whitespace-nowrap">{value}</span>;
-            },
-            header: t('common.user'),
-            id: 'user'
-          },
-          {
-            accessorFn: (row) => row.group?.name ?? 'N/A',
-            cell: (ctx) => {
-              const value = ctx.getValue() as string;
-              return <span className="overflow-hidden text-ellipsis whitespace-nowrap">{value}</span>;
-            },
-            header: t('common.activeGroup'),
-            id: 'group'
-          },
-          {
-            accessorKey: 'action',
-            cell: (ctx) => {
-              const value = ctx.getValue() as $AuditLogAction;
-              return (
-                <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-                  {t(`common.${toLowerCase(value)}`)}
-                </span>
-              );
-            },
-            header: t('common.action')
-          },
-          {
-            accessorKey: 'entity',
-            cell: (ctx) => {
-              const value = ctx.getValue() as $AuditLogEntity;
-              return (
-                <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-                  {t(`common.${snakeToCamelCase(toLowerCase(value))}`)}
-                </span>
-              );
-            },
-            header: t('common.entity')
-          }
-        ]}
-        data={auditLogsQuery.data}
-        initialState={{
-          columnPinning: {
-            left: ['timestamp']
-          },
-          sorting: [{ desc: true, id: 'timestamp' }]
-        }}
-        togglesComponent={Toggles}
-      />
+      {/* Remounted when the filters change: in server mode the table owns its page index and offers no
+          way to set it, so a fresh store is the only way to return it to the first page. */}
+      <AuditLogsTable key={JSON.stringify(search)} search={search} />
     </Fragment>
   );
 };
@@ -303,7 +329,7 @@ export const Route = createFileRoute('/_app/admin/audit/logs')({
   // eslint-disable-next-line perfectionist/sort-objects
   loader: async ({ context, deps }) => {
     await Promise.all([
-      context.queryClient.ensureQueryData(auditLogsQueryOptions({ search: deps.search })),
+      context.queryClient.ensureQueryData(auditLogsQueryOptions({ params: deps.search })),
       context.queryClient.ensureQueryData(groupsQueryOptions()),
       context.queryClient.ensureQueryData(usersQueryOptions())
     ]);

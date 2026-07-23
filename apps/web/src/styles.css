@@ -1,8 +1,12 @@
 @import '@opendatacapture/react-core/globals.css';
 
-/* Highlight a data-table row that contains a selected marker (see admin tables with row actions). */
+/* Highlight a data-table row that contains a selected marker (see admin tables with row actions).
+   The highlight must not reuse the accent colour, which libui already applies to the row hover
+   state -- in dark mode both resolved to slate-800, so a selected row vanished under the cursor.
+   A translucent tint (rather than a colour-mix against the background) keeps the row readable in
+   both themes and degrades to a plain alpha blend everywhere. */
 [data-testid='data-table-row']:has([data-row-selected='true']) {
-  @apply bg-slate-100 dark:bg-slate-800;
+  @apply bg-sky-500/15;
 }
 
 [data-spotlight='true'] {

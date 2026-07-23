@@ -5,11 +5,12 @@ import { useNavigate } from '@tanstack/react-router';
 
 import type { NavItem } from '@/hooks/useNavItems';
 
-type NavButtonProps = NavItem & {
+type NavButtonProps = Omit<NavItem, 'children' | 'url'> & {
   activeClassName?: string;
   className?: string;
   isActive: boolean;
   onClick?: (path: string) => void;
+  url: string;
 };
 
 export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(function NavButton(

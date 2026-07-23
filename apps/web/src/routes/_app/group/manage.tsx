@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import {
   Badge,
@@ -7,22 +7,28 @@ import {
   Dialog,
   Form,
   Heading,
+  Input,
   SearchBar,
-  Spinner
+  Spinner,
+  TextArea
 } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/react-core';
+import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
 import { $RegexString } from '@opendatacapture/schemas/core';
 import type { UpdateGroupData } from '@opendatacapture/schemas/group';
+import type { $CreateSeriesInstrumentData } from '@opendatacapture/schemas/instrument';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { createFileRoute } from '@tanstack/react-router';
-import { EyeIcon } from 'lucide-react';
+import { EyeIcon, TrashIcon } from 'lucide-react';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
 
 import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
+import { useCreateSeriesInstrumentMutation } from '@/hooks/useCreateSeriesInstrumentMutation';
+import { useDeleteSeriesInstrumentMutation } from '@/hooks/useDeleteSeriesInstrumentMutation';
 import { useInstrumentBundle } from '@/hooks/useInstrumentBundle';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
@@ -31,11 +37,21 @@ import { useAppStore } from '@/store';
 
 type InstrumentSource = { kind: 'manual' } | { kind: 'repo'; name: string };
 
+/** Passed to the renderer as a localizable value; the shared component resolves it to the active language. */
+const PREVIEW_SUBMIT_LABEL = { en: 'Preview Submit', fr: 'Soumettre l’aperçu' };
+
 type InstrumentItem = {
   authors?: null | string[];
   description?: string;
   id: string;
+  // The scalar instrument identity (name + edition); null for series instruments, which have no edition.
+  internal: null | ScalarInstrumentInternal;
+  // Whether this group owns the instrument and may therefore delete it. Only a series created by this
+  // group qualifies: scalar instruments are never deletable, and a series with no owning group is
+  // shared across the whole instance.
+  isDeletable: boolean;
   kind: string;
+  seriesItems?: { id: string }[];
   source: InstrumentSource;
   title: string;
 };
@@ -44,6 +60,33 @@ type CategorizedInstruments = {
   form: InstrumentItem[];
   interactive: InstrumentItem[];
   series: InstrumentItem[];
+};
+
+const getSeriesPreviewItemTitles = ({
+  fallbackTitle,
+  items,
+  seriesItems
+}: {
+  fallbackTitle: (index: number) => string;
+  items: InstrumentItem[];
+  seriesItems: { id: string }[];
+}) => {
+  return seriesItems.map((seriesItem, index) => {
+    return items.find((item) => item.id === seriesItem.id)?.title ?? fallbackTitle(index);
+  });
+};
+
+const expandSelectedSeriesIds = ({ selectedIds, series }: { selectedIds: Set<string>; series: InstrumentItem[] }) => {
+  const expandedIds = new Set(selectedIds);
+  for (const item of series) {
+    if (!selectedIds.has(item.id)) {
+      continue;
+    }
+    for (const seriesItem of item.seriesItems ?? []) {
+      expandedIds.add(seriesItem.id);
+    }
+  }
+  return expandedIds;
 };
 
 type SettingsValues = {
@@ -58,6 +101,9 @@ type SettingsValues = {
 
 type ManageGroupFormProps = {
   data: {
+    // The titles of every visible instrument, used to enforce unique new series instrument names.
+    existingTitles: string[];
+    groupId: string;
     // Accessible instrument ids that are not in the visible list; preserved as-is on save.
     hiddenAccessibleIds: string[];
     initialSelectedIds: string[];
@@ -70,6 +116,7 @@ type ManageGroupFormProps = {
 
 const InstrumentSection = ({
   items,
+  onDelete,
   onPreview,
   onToggle,
   readOnly,
@@ -78,6 +125,8 @@ const InstrumentSection = ({
   title
 }: {
   items: InstrumentItem[];
+  // When provided, a delete affordance is shown for items where it returns true.
+  onDelete?: (item: InstrumentItem) => void;
   onPreview: (item: InstrumentItem) => void;
   onToggle: (id: string) => void;
   readOnly: boolean;
@@ -94,7 +143,7 @@ const InstrumentSection = ({
 
   return (
     <div className="mb-6">
-      <h3 className="mb-2 text-sm font-semibold">{title}</h3>
+      {title && <h3 className="mb-2 text-sm font-semibold">{title}</h3>}
       {filtered.length === 0 ? (
         <p className="text-muted-foreground text-sm italic">
           {t({ en: 'No instruments available.', fr: 'Aucun instrument disponible.' })}
@@ -103,7 +152,7 @@ const InstrumentSection = ({
         <div className="space-y-1">
           {filtered.map((item) => (
             <div
-              className="grid cursor-pointer grid-cols-[auto_1fr_auto_auto] items-center gap-3 rounded-md px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800"
+              className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 rounded-md px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800"
               key={item.id}
             >
               <Checkbox
@@ -111,25 +160,44 @@ const InstrumentSection = ({
                 disabled={readOnly}
                 onCheckedChange={() => onToggle(item.id)}
               />
-              <span className="truncate text-sm" title={item.title}>
-                {item.title}
-              </span>
-              <Badge className="shrink-0" variant={item.source.kind === 'repo' ? 'secondary' : 'outline'}>
-                {item.source.kind === 'repo'
-                  ? item.source.name
-                  : t({ en: 'Uploaded manually', fr: 'Téléversé manuellement' })}
-              </Badge>
               <button
-                aria-label={t({ en: 'Preview instrument', fr: "Aperçu de l'instrument" })}
-                className="text-muted-foreground hover:text-foreground shrink-0 p-1 transition-colors"
+                className="cursor-pointer truncate bg-transparent p-0 text-left text-sm disabled:cursor-default"
+                disabled={readOnly}
+                title={item.title}
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPreview(item);
-                }}
+                onClick={() => onToggle(item.id)}
               >
-                <EyeIcon className="h-4 w-4" />
+                {item.title}
               </button>
+              <Badge className="shrink-0" variant={item.source.kind === 'repo' ? 'secondary' : 'outline'}>
+                {item.source.kind === 'repo' ? item.source.name : t({ en: 'No repo', fr: 'Aucun dépôt' })}
+              </Badge>
+              <div className="flex shrink-0 items-center gap-1">
+                <button
+                  aria-label={t({ en: 'Preview instrument', fr: "Aperçu de l'instrument" })}
+                  className="text-muted-foreground hover:text-foreground p-1 transition-colors"
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPreview(item);
+                  }}
+                >
+                  <EyeIcon className="h-4 w-4" />
+                </button>
+                {onDelete && !readOnly && item.isDeletable && (
+                  <button
+                    aria-label={t({ en: 'Delete instrument', fr: "Supprimer l'instrument" })}
+                    className="text-muted-foreground hover:text-destructive p-1 transition-colors"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(item);
+                    }}
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -138,10 +206,28 @@ const InstrumentSection = ({
   );
 };
 
-const InstrumentPreviewDialog = ({ item, onClose }: { item: InstrumentItem; onClose: () => void }) => {
+const InstrumentPreviewDialog = ({
+  item,
+  items,
+  onClose
+}: {
+  item: InstrumentItem;
+  items: InstrumentItem[];
+  onClose: () => void;
+}) => {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
+  // Only the rendered preview needs the bundle. Series composition comes from `item.seriesItems`, which
+  // the info query already provides — fetching the bundle for it would pull down the compiled source of
+  // every constituent instrument just to list their names.
   const bundleQuery = useInstrumentBundle(showForm ? item.id : null);
+  const seriesItemTitles = useMemo(() => {
+    return getSeriesPreviewItemTitles({
+      fallbackTitle: (index) => t({ en: `Item ${index + 1}`, fr: `Élément ${index + 1}` }),
+      items,
+      seriesItems: item.seriesItems ?? []
+    });
+  }, [item.seriesItems, items, t]);
 
   return (
     <Dialog
@@ -150,7 +236,7 @@ const InstrumentPreviewDialog = ({ item, onClose }: { item: InstrumentItem; onCl
         if (!open) onClose();
       }}
     >
-      <Dialog.Content className={showForm ? 'sm:max-w-[800px]' : 'sm:max-w-[500px]'}>
+      <Dialog.Content className={showForm ? 'sm:max-w-[800px]' : 'max-h-[85vh] sm:max-w-[560px]'}>
         <Dialog.Header>
           <Dialog.Title>{item.title}</Dialog.Title>
         </Dialog.Header>
@@ -170,45 +256,63 @@ const InstrumentPreviewDialog = ({ item, onClose }: { item: InstrumentItem; onCl
               </p>
             )}
             {bundleQuery.data && (
-              // Preview only: visually disable the submit button (pointer-events-none + dimmed) so no
-              // record can be created, and make submit a no-op as a defensive backstop.
-              <div className="[&_button[type='submit']]:pointer-events-none [&_button[type='submit']]:opacity-50">
-                <InstrumentRenderer
-                  target={bundleQuery.data}
-                  onSubmit={() => {
-                    // Intentionally does nothing: forms cannot be submitted in preview mode.
-                  }}
-                />
-              </div>
+              <InstrumentRenderer
+                submitButtonLabel={PREVIEW_SUBMIT_LABEL}
+                target={bundleQuery.data}
+                onSubmit={() => {
+                  // Intentionally does nothing: previews can advance without creating records.
+                }}
+              />
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-3 text-sm">
-            <div>
-              <span className="font-medium">{t({ en: 'Kind', fr: 'Type' })}: </span>
-              <span className="text-muted-foreground">{item.kind}</span>
-            </div>
-            {item.authors && item.authors.length > 0 && (
+          <div className="flex max-h-[70vh] flex-col text-sm">
+            <div className="min-h-0 space-y-3 overflow-y-auto pr-1">
               <div>
-                <span className="font-medium">{t({ en: 'Authors', fr: 'Auteurs' })}: </span>
-                <span className="text-muted-foreground">{item.authors.join(', ')}</span>
+                <span className="font-medium">{t({ en: 'Kind', fr: 'Type' })}: </span>
+                <span className="text-muted-foreground">{item.kind}</span>
               </div>
-            )}
-            {item.description && (
+              {item.kind === 'SERIES' && (
+                <div>
+                  <span className="font-medium">
+                    {t({ en: 'Series order', fr: 'Ordre de la série' })}
+                    {seriesItemTitles.length > 0 && ` (${seriesItemTitles.length})`}:{' '}
+                  </span>
+                  {seriesItemTitles.length === 0 ? (
+                    <span className="text-muted-foreground">
+                      {t({ en: 'No items in this series.', fr: 'Aucun élément dans cette série.' })}
+                    </span>
+                  ) : (
+                    <ol className="text-muted-foreground mt-1 max-h-48 list-decimal space-y-1 overflow-auto rounded-md border border-slate-200 py-2 pl-8 pr-3 dark:border-slate-800">
+                      {seriesItemTitles.map((title, index) => (
+                        <li className="break-words" key={`${title}-${index}`}>
+                          {title}
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </div>
+              )}
+              {item.authors && item.authors.length > 0 && (
+                <div>
+                  <span className="font-medium">{t({ en: 'Authors', fr: 'Auteurs' })}: </span>
+                  <span className="text-muted-foreground">{item.authors.join(', ')}</span>
+                </div>
+              )}
+              {item.description && (
+                <div>
+                  <span className="font-medium">{t({ en: 'Description', fr: 'Description' })}: </span>
+                  <span className="text-muted-foreground">{item.description}</span>
+                </div>
+              )}
               <div>
-                <span className="font-medium">{t({ en: 'Description', fr: 'Description' })}: </span>
-                <span className="text-muted-foreground">{item.description}</span>
+                <span className="font-medium">{t({ en: 'Source', fr: 'Source' })}: </span>
+                <span className="text-muted-foreground">
+                  {item.source.kind === 'repo' ? item.source.name : t({ en: 'No repo', fr: 'Aucun dépôt' })}
+                </span>
               </div>
-            )}
-            <div>
-              <span className="font-medium">{t({ en: 'Source', fr: 'Source' })}: </span>
-              <span className="text-muted-foreground">
-                {item.source.kind === 'repo'
-                  ? item.source.name
-                  : t({ en: 'Uploaded manually', fr: 'Téléversé manuellement' })}
-              </span>
             </div>
-            <div className="mt-2 flex justify-center">
+            <div className="mt-3 flex shrink-0 justify-center border-t border-slate-200 pt-3 dark:border-slate-800">
               <Button onClick={() => setShowForm(true)}>{t({ en: 'Preview Form', fr: 'Aperçu du formulaire' })}</Button>
             </div>
           </div>
@@ -218,19 +322,305 @@ const InstrumentPreviewDialog = ({ item, onClose }: { item: InstrumentItem; onCl
   );
 };
 
+const CreateSeriesInstrumentDialog = ({
+  existingTitles,
+  forms,
+  groupId,
+  onClose,
+  onCreated
+}: {
+  existingTitles: string[];
+  forms: InstrumentItem[];
+  groupId: string;
+  onClose: () => void;
+  onCreated: (id: string) => void;
+}) => {
+  const { resolvedLanguage, t } = useTranslation();
+  const createMutation = useCreateSeriesInstrumentMutation();
+  const [title, setTitle] = useState('');
+  const [instructions, setInstructions] = useState('');
+  const [search, setSearch] = useState('');
+  // Ordered list of selected instrument ids — order determines the sequence of the series.
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  // Set when the server reports another series already uses the same forms; holds that series' name so
+  // we can ask the user whether they really want to create a duplicate.
+  const [duplicateOf, setDuplicateOf] = useState<null | string>(null);
+
+  // Only scalar instruments (which carry a name + edition) can be assembled into a series.
+  const selectableForms = useMemo(() => forms.filter((form) => form.internal !== null), [forms]);
+
+  const filteredForms = useMemo(() => {
+    if (!search) return selectableForms;
+    const lower = search.toLowerCase();
+    return selectableForms.filter((form) => form.title.toLowerCase().includes(lower));
+  }, [selectableForms, search]);
+
+  const normalizedTitle = title.trim().toLowerCase();
+  const titleTaken = useMemo(
+    () => existingTitles.some((existing) => existing.trim().toLowerCase() === normalizedTitle),
+    [existingTitles, normalizedTitle]
+  );
+
+  const toggle = (id: string) => {
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((value) => value !== id) : [...prev, id]));
+  };
+
+  const canCreate = title.trim().length > 0 && !titleTaken && selectedIds.length >= 2 && !createMutation.isPending;
+
+  const buildItems = () =>
+    selectedIds
+      .map((id) => selectableForms.find((form) => form.id === id)?.internal)
+      .filter((internal): internal is ScalarInstrumentInternal => internal !== null && internal !== undefined);
+
+  // The series is authored in the creator's current language, so the details/instructions are stored as
+  // plain (unilingual) strings tagged with that language — the same shape any instrument would use.
+  const buildPayload = (items: ScalarInstrumentInternal[]): $CreateSeriesInstrumentData => ({
+    clientDetails: instructions.trim() ? { instructions: [instructions.trim()] } : undefined,
+    details: { title: title.trim() },
+    groupId,
+    items,
+    language: resolvedLanguage
+  });
+
+  const handleCreate = async () => {
+    const items = buildItems();
+    if (items.length < 2) {
+      return;
+    }
+    // Failures are surfaced by the mutation's onError notification; catch here so the rejection does
+    // not escape the void call site, and leave the dialog open for retry.
+    try {
+      const result = await createMutation.mutateAsync(buildPayload(items));
+      if (result.outcome === 'duplicate') {
+        // The existing title comes back in its stored form (a plain string, or multilingual object).
+        setDuplicateOf(typeof result.existingTitle === 'string' ? result.existingTitle : t(result.existingTitle));
+        return;
+      }
+      onCreated(result.instrumentId);
+      onClose();
+    } catch {
+      // no-op: notification already shown by the mutation's onError
+    }
+  };
+
+  const handleConfirmDuplicate = async () => {
+    const items = buildItems();
+    if (items.length < 2) {
+      return;
+    }
+    try {
+      const result = await createMutation.mutateAsync({ ...buildPayload(items), confirmDuplicate: true });
+      if (result.outcome === 'created') {
+        onCreated(result.instrumentId);
+      }
+      onClose();
+    } catch {
+      // no-op: notification already shown by the mutation's onError; dialog stays open for retry
+    }
+  };
+
+  return (
+    <React.Fragment>
+      <Dialog
+        open
+        onOpenChange={(open) => {
+          if (!open) onClose();
+        }}
+      >
+        <Dialog.Content className="sm:max-w-[600px]">
+          <Dialog.Header>
+            <Dialog.Title>{t({ en: 'Create Series Instrument', fr: 'Créer un instrument en série' })}</Dialog.Title>
+            <Dialog.Description>
+              {t({
+                en: 'Give the series a unique name, then select at least two instruments to include in order.',
+                fr: 'Donnez un nom unique à la série, puis sélectionnez au moins deux instruments à inclure dans l’ordre.'
+              })}
+            </Dialog.Description>
+          </Dialog.Header>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium" htmlFor="series-name">
+                {t({ en: 'Name', fr: 'Nom' })}
+              </label>
+              <Input
+                id="series-name"
+                placeholder={t({ en: 'e.g. Baseline Battery', fr: 'p. ex. Batterie de base' })}
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+              />
+              {titleTaken && (
+                <p className="text-destructive text-xs">
+                  {t({
+                    en: 'An instrument with this name already exists.',
+                    fr: 'Un instrument portant ce nom existe déjà.'
+                  })}
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium" htmlFor="series-instructions">
+                {t({ en: 'Instructions', fr: 'Instructions' })}
+              </label>
+              <TextArea
+                id="series-instructions"
+                placeholder={t({
+                  en: 'Optional instructions shown before the series begins.',
+                  fr: 'Instructions facultatives affichées avant le début de la série.'
+                })}
+                rows={3}
+                value={instructions}
+                onChange={(event) => setInstructions(event.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium">
+                {t({ en: 'Available instruments', fr: 'Instruments disponibles' })}
+                {selectedIds.length > 0 && ` (${selectedIds.length})`}
+              </span>
+              <SearchBar
+                placeholder={t({ en: 'Search instruments...', fr: 'Rechercher des instruments...' })}
+                value={search}
+                onValueChange={setSearch}
+              />
+              <div className="text-muted-foreground flex items-center justify-between px-2 text-xs font-medium uppercase">
+                <span>{t({ en: 'Instrument', fr: 'Instrument' })}</span>
+                <span>{t({ en: 'Series order', fr: 'Ordre de la série' })}</span>
+              </div>
+              <div className="max-h-[40vh] space-y-1 overflow-auto">
+                {filteredForms.length === 0 ? (
+                  <p className="text-muted-foreground text-sm italic">
+                    {t({ en: 'No instruments available.', fr: 'Aucun instrument disponible.' })}
+                  </p>
+                ) : (
+                  filteredForms.map((form) => {
+                    const order = selectedIds.indexOf(form.id);
+                    return (
+                      <label
+                        className="grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-3 rounded-md px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800"
+                        key={form.id}
+                      >
+                        <Checkbox checked={order !== -1} onCheckedChange={() => toggle(form.id)} />
+                        <span className="truncate text-sm" title={form.title}>
+                          {form.title}
+                        </span>
+                        {order !== -1 && <Badge variant="secondary">{order + 1}</Badge>}
+                      </label>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+          <Dialog.Footer>
+            <Button type="button" variant="outline" onClick={onClose}>
+              {t({ en: 'Cancel', fr: 'Annuler' })}
+            </Button>
+            <Button disabled={!canCreate} type="button" onClick={() => void handleCreate()}>
+              {t({ en: 'Create', fr: 'Créer' })}
+            </Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
+      {duplicateOf !== null && (
+        <Dialog
+          open
+          onOpenChange={(open) => {
+            if (!open) setDuplicateOf(null);
+          }}
+        >
+          <Dialog.Content className="sm:max-w-[450px]">
+            <Dialog.Header>
+              <Dialog.Title>{t({ en: 'Series Already Exists', fr: 'La série existe déjà' })}</Dialog.Title>
+              <Dialog.Description>
+                {t({
+                  en: `A series named "${duplicateOf}" already contains the same forms — you can use it instead. Do you still want to create "${title.trim()}"?`,
+                  fr: `Une série nommée « ${duplicateOf} » contient déjà les mêmes formulaires — vous pouvez l’utiliser à la place. Voulez-vous quand même créer « ${title.trim()} » ?`
+                })}
+              </Dialog.Description>
+            </Dialog.Header>
+            <Dialog.Footer>
+              <Button type="button" variant="outline" onClick={() => setDuplicateOf(null)}>
+                {t({ en: 'No', fr: 'Non' })}
+              </Button>
+              <Button disabled={createMutation.isPending} type="button" onClick={() => void handleConfirmDuplicate()}>
+                {t({ en: 'Yes, create anyway', fr: 'Oui, créer quand même' })}
+              </Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog>
+      )}
+    </React.Fragment>
+  );
+};
+
+const DeleteInstrumentDialog = ({
+  item,
+  onClose,
+  onDeleted
+}: {
+  item: InstrumentItem;
+  onClose: () => void;
+  onDeleted: (id: string) => void;
+}) => {
+  const { t } = useTranslation();
+  const deleteMutation = useDeleteSeriesInstrumentMutation();
+
+  // Close on either outcome: a series that is already in use is refused by the API, and leaving the
+  // confirmation open after the user has been notified only invites them to press the button again.
+  const handleDelete = () =>
+    deleteMutation.mutate({ id: item.id }, { onSettled: onClose, onSuccess: () => onDeleted(item.id) });
+
+  return (
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <Dialog.Content className="sm:max-w-[450px]">
+        <Dialog.Header>
+          <Dialog.Title>{t({ en: 'Delete Series Instrument', fr: 'Supprimer l’instrument en série' })}</Dialog.Title>
+          <Dialog.Description>
+            {t({
+              en: `Are you sure you want to delete "${item.title}"? This cannot be undone.`,
+              fr: `Êtes-vous sûr de vouloir supprimer « ${item.title} » ? Cette action est irréversible.`
+            })}
+          </Dialog.Description>
+        </Dialog.Header>
+        <Dialog.Footer>
+          <Button type="button" variant="outline" onClick={onClose}>
+            {t({ en: 'No', fr: 'Non' })}
+          </Button>
+          <Button disabled={deleteMutation.isPending} type="button" variant="danger" onClick={handleDelete}>
+            {t({ en: 'Yes, delete', fr: 'Oui, supprimer' })}
+          </Button>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog>
+  );
+};
+
 const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => {
-  const { hiddenAccessibleIds, initialSelectedIds, instruments, settingsInitialValues } = data;
+  const { existingTitles, groupId, hiddenAccessibleIds, initialSelectedIds, instruments, settingsInitialValues } = data;
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set(initialSelectedIds));
   const [previewItem, setPreviewItem] = useState<InstrumentItem | null>(null);
+  const [showCreateSeries, setShowCreateSeries] = useState(false);
+  const [deletingItem, setDeletingItem] = useState<InstrumentItem | null>(null);
+  // Ids deleted during this session. The server has already detached them from the group, but our copy of
+  // the group's accessible ids (seeded from the auth store) may still list them; we drop them at save time
+  // so a just-deleted instrument is never re-sent as a dangling relation.
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(() => new Set());
 
-  // Resync the selection when the upstream group data changes (e.g. after a save refetches the group).
-  // `initialSelectedIds` is a stable reference from a useMemo, so this only fires on real changes —
-  // not on every render — and won't clobber in-progress edits.
-  useEffect(() => {
+  // Reseed the selection only when the user switches groups. `initialSelectedIds` gets a new identity
+  // on every instrument-info refetch — including the one triggered by creating a series — and resyncing
+  // on that would discard unsaved edits, among them the newly created series we just selected.
+  const [syncedGroupId, setSyncedGroupId] = useState(groupId);
+  if (syncedGroupId !== groupId) {
+    setSyncedGroupId(groupId);
     setSelectedIds(new Set(initialSelectedIds));
-  }, [initialSelectedIds]);
+  }
 
   const toggle = (id: string) => {
     setSelectedIds((prev) => {
@@ -249,9 +639,34 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
     description += ` ${t('group.manage.accessibleInstrumentDemoNote')}`;
   }
 
+  // The preview dialog resolves a series' item titles against the full list; a fresh array each render
+  // would invalidate the memo it does that lookup in.
+  const allItems = useMemo(
+    () => [...instruments.form, ...instruments.interactive, ...instruments.series],
+    [instruments]
+  );
+
   return (
     <div className="mx-auto max-w-4xl">
-      {previewItem && <InstrumentPreviewDialog item={previewItem} onClose={() => setPreviewItem(null)} />}
+      {previewItem && (
+        <InstrumentPreviewDialog item={previewItem} items={allItems} onClose={() => setPreviewItem(null)} />
+      )}
+      {showCreateSeries && (
+        <CreateSeriesInstrumentDialog
+          existingTitles={existingTitles}
+          forms={[...instruments.form, ...instruments.interactive]}
+          groupId={groupId}
+          onClose={() => setShowCreateSeries(false)}
+          onCreated={(id) => setSelectedIds((previous) => new Set(previous).add(id))}
+        />
+      )}
+      {deletingItem && (
+        <DeleteInstrumentDialog
+          item={deletingItem}
+          onClose={() => setDeletingItem(null)}
+          onDeleted={(id) => setDeletedIds((prev) => new Set(prev).add(id))}
+        />
+      )}
       <Heading variant="h4">{t('group.manage.accessibleInstruments')}</Heading>
       <p className="text-muted-foreground mb-3 mt-1 text-sm">{description}</p>
       <div className="mb-4">
@@ -279,12 +694,21 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         onPreview={setPreviewItem}
         onToggle={toggle}
       />
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="text-sm font-semibold">{t('group.manage.series')}</h3>
+        {!readOnly && (
+          <Button size="sm" type="button" variant="primary" onClick={() => setShowCreateSeries(true)}>
+            {t({ en: 'Create series', fr: 'Créer une série' })}
+          </Button>
+        )}
+      </div>
       <InstrumentSection
         items={instruments.series}
         readOnly={readOnly}
         search={search}
         selectedIds={selectedIds}
-        title={t('group.manage.series')}
+        title=""
+        onDelete={setDeletingItem}
         onPreview={setPreviewItem}
         onToggle={toggle}
       />
@@ -430,7 +854,13 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
           })}
         onSubmit={(formData) => {
           void onSubmit({
-            accessibleInstrumentIds: [...hiddenAccessibleIds, ...selectedIds],
+            accessibleInstrumentIds: [
+              ...hiddenAccessibleIds,
+              ...expandSelectedSeriesIds({
+                selectedIds,
+                series: instruments.series
+              })
+            ].filter((id) => !deletedIds.has(id)),
             settings: {
               defaultIdentificationMethod: formData.defaultIdentificationMethod,
               idValidationRegex: formData.idValidationRegex,
@@ -482,15 +912,20 @@ const RouteComponent = () => {
         continue;
       }
       visibleIds.add(instrument.id);
-      // Show the repo name when we have one; legacy repo instruments without a stored name render as
-      // "uploaded manually" (but are still filtered above as repo-sourced via their id).
-      const repoName = instrument.sourceRepo?.name ?? null;
-      const source: InstrumentSource = repoName ? { kind: 'repo', name: repoName } : { kind: 'manual' };
+      // Provenance is determined by the repo id, not the name: a legacy repo instrument may have a null
+      // name but is still repo-sourced (and so must not get the "manual" delete affordance). We fall back
+      // to a placeholder label only for display.
+      const source: InstrumentSource = repoId
+        ? { kind: 'repo', name: instrument.sourceRepo?.name ?? t({ en: 'Unknown repository', fr: 'Dépôt inconnu' }) }
+        : { kind: 'manual' };
       const item: InstrumentItem = {
         authors: instrument.details.authors,
         description: instrument.details.description,
         id: instrument.id,
+        internal: instrument.kind === 'SERIES' ? null : instrument.internal,
+        isDeletable: instrument.kind === 'SERIES' && instrument.seriesGroupId === currentGroup?.id,
         kind: instrument.kind,
+        seriesItems: instrument.kind === 'SERIES' ? instrument.seriesItems : undefined,
         source,
         title: instrument.details.title
       };
@@ -518,13 +953,28 @@ const RouteComponent = () => {
       subjectIdDisplayLength: settings?.subjectIdDisplayLength
     };
 
-    return { hiddenAccessibleIds, initialSelectedIds, instruments, settingsInitialValues };
+    const existingTitles = [...instruments.form, ...instruments.interactive, ...instruments.series].map(
+      (item) => item.title
+    );
+
+    return currentGroup
+      ? {
+          existingTitles,
+          groupId: currentGroup.id,
+          hiddenAccessibleIds,
+          initialSelectedIds,
+          instruments,
+          settingsInitialValues
+        }
+      : null;
   }, [
     accessibleInstrumentIds,
     availableInstruments,
+    currentGroup?.id,
     defaultIdentificationMethod,
     instrumentRepoIds,
     resolvedLanguage,
+    t,
     currentGroup?.settings
   ]);
 
@@ -537,6 +987,7 @@ const RouteComponent = () => {
       </PageHeader>
       <WithFallback
         Component={ManageGroupForm}
+        key={currentGroup?.id}
         props={{
           data,
           onSubmit: async (data) => {
