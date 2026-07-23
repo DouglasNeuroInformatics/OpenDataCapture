@@ -23,7 +23,7 @@ catalog:
   '@douglasneuroinformatics/libpasswd': '^0.0.3'
   '@douglasneuroinformatics/libstats': '^0.2.1'
   '@douglasneuroinformatics/libui': ^6.9.3
-  '@douglasneuroinformatics/libui-form-types': ^0.15.0
+  '@douglasneuroinformatics/libui-form-types': ^1.0.0
   '@microsoft/api-extractor': '^7.47.6'
   '@prisma/client': '^6.9.0'
   '@tailwindcss/vite': '4.3.0'

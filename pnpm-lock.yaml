@@ -28,8 +28,8 @@ catalogs:
       specifier: ^6.9.3
       version: 6.9.3
     '@douglasneuroinformatics/libui-form-types':
-      specifier: ^0.15.0
-      version: 0.15.0
+      specifier: ^1.0.0
+      version: 1.0.0
     '@microsoft/api-extractor':
       specifier: ^7.47.6
       version: 7.58.7
@@ -1095,13 +1095,16 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libui-form-types':
         specifier: 'catalog:'
-        version: 0.15.0
+        version: 1.0.0
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../licenses
       lodash-es:
         specifier: workspace:lodash-es__4.x@*
         version: link:../../vendor/lodash-es@4.x
+      react:
+        specifier: workspace:react__19.x@*
+        version: link:../../vendor/react@19.x
       type-fest:
         specifier: workspace:type-fest__4.x@*
         version: link:../../vendor/type-fest@4.x
@@ -2306,10 +2309,6 @@ packages:
     resolution:
       { integrity: sha512-weXJgsNBdz26ldMMEh20Cn9EtR+ynn3O9v81ZEWnfBmzZmFxSlUxnevLlncJxbVM6s6SgH97C4B/L8AdGvlCxA== }
     engines: { node: '>=20' }
-
-  '@douglasneuroinformatics/libui-form-types@0.15.0':
-    resolution:
-      { integrity: sha512-ag36tPgh9KxrcZzzc793M5GYyJcTSXXeDR0dZxa4+1Bk3RuDBsePNACKftypZKZFHZxvT8NIokLeRqRoNOquFA== }
 
   '@douglasneuroinformatics/libui-form-types@1.0.0':
     resolution:
@@ -14034,10 +14033,6 @@ snapshots:
       '@douglasneuroinformatics/libstats-linux-x64-musl': 0.2.1
       '@douglasneuroinformatics/libstats-win32-arm64-msvc': 0.2.1
       '@douglasneuroinformatics/libstats-win32-x64-msvc': 0.2.1
-
-  '@douglasneuroinformatics/libui-form-types@0.15.0':
-    dependencies:
-      type-fest: 4.41.0
 
   '@douglasneuroinformatics/libui-form-types@1.0.0':
     dependencies:
