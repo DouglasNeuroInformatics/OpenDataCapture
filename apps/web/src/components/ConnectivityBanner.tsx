@@ -29,10 +29,12 @@ export const ConnectivityBanner = () => {
           {isOnline
             ? t({
                 en: 'Reconnecting…',
+                es: 'Reconectando…',
                 fr: 'Reconnexion…'
               })
             : t({
                 en: 'Offline — waiting for connection…',
+                es: 'Sin conexión — esperando conexión…',
                 fr: 'Hors ligne — en attente de connexion…'
               })}
         </span>

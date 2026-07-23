@@ -120,16 +120,19 @@ const RouteComponent = () => {
   if (currentGroup?.type === 'CLINICAL') {
     welcome = t({
       en: 'Overview of Your Clinic',
+      es: 'Resumen de su clínica',
       fr: "Vue d'ensemble de votre clinique"
     });
   } else if (currentGroup?.type === 'RESEARCH') {
     welcome = t({
       en: 'Overview of Your Research Group',
+      es: 'Resumen de su grupo de investigación',
       fr: "Vue d'ensemble de votre groupe de recherche"
     });
   } else {
     welcome = t({
       en: 'Summary of Application State',
+      es: 'Resumen del estado de la aplicación',
       fr: "Résumé de l'état de l'application"
     });
   }
@@ -145,6 +148,7 @@ const RouteComponent = () => {
         <Heading variant="h2">
           {t({
             en: 'Dashboard',
+            es: 'Panel de control',
             fr: 'Tableau de bord'
           })}
         </Heading>
@@ -167,6 +171,7 @@ const RouteComponent = () => {
                     }
                     label={t({
                       en: 'Total Users',
+                      es: 'Total de usuarios',
                       fr: "Nombre d'utilisateurs"
                     })}
                     value={summaryQuery.data.counts.users}
@@ -177,6 +182,7 @@ const RouteComponent = () => {
                     <Dialog.Title>
                       {t({
                         en: 'Users',
+                        es: 'Usuarios',
                         fr: 'Utilisateurs'
                       })}
                     </Dialog.Title>
@@ -188,6 +194,7 @@ const RouteComponent = () => {
                       <p>
                         {t({
                           en: 'Error finding users',
+                          es: 'Error al buscar usuarios',
                           fr: "Erreur lors de la recherche d'utilisateurs"
                         })}
                       </p>
@@ -232,6 +239,7 @@ const RouteComponent = () => {
                 }
                 label={t({
                   en: 'Total Subjects',
+                  es: 'Total de sujetos',
                   fr: 'Nombre total de sujets'
                 })}
                 value={summaryQuery.data.counts.subjects}
@@ -249,6 +257,7 @@ const RouteComponent = () => {
                     }
                     label={t({
                       en: 'Total Instruments',
+                      es: 'Total de instrumentos',
                       fr: "Nombre d'instruments"
                     })}
                     value={summaryQuery.data.counts.instruments}
@@ -262,6 +271,7 @@ const RouteComponent = () => {
                     <Dialog.Title>
                       {t({
                         en: 'Available Instruments',
+                        es: 'Instrumentos disponibles',
                         fr: 'Instruments disponibles'
                       })}
                     </Dialog.Title>
@@ -271,6 +281,7 @@ const RouteComponent = () => {
                       <p>
                         {t({
                           en: 'Error finding instruments',
+                          es: 'Error al buscar instrumentos',
                           fr: 'Erreur lors de la recherche des instruments'
                         })}
                       </p>
@@ -281,10 +292,11 @@ const RouteComponent = () => {
                           <p>
                             {t({
                               en: 'Title',
+                              es: 'Título',
                               fr: 'Titre'
                             })}
                           </p>{' '}
-                          <p>{t({ en: 'Kind', fr: 'Type' })}</p>
+                          <p>{t({ en: 'Kind', es: 'Tipo', fr: 'Type' })}</p>
                         </div>
                         <hr></hr>
                         {instrumentInfo.map((instrument, i) => {
@@ -321,6 +333,7 @@ const RouteComponent = () => {
                     }
                     label={t({
                       en: 'Total Records',
+                      es: 'Total de registros',
                       fr: "Nombre d'enregistrements"
                     })}
                     value={summaryQuery.data.counts.records}
@@ -331,6 +344,7 @@ const RouteComponent = () => {
                     <Dialog.Title>
                       {t({
                         en: 'Number of Records',
+                        es: 'Número de registros',
                         fr: "Nombre d'enregistrements"
                       })}
                     </Dialog.Title>
@@ -340,6 +354,7 @@ const RouteComponent = () => {
                       <p>
                         {t({
                           en: 'Error finding records',
+                          es: 'Error al buscar registros',
                           fr: "Erreur lors de la recherche d'enregistrements"
                         })}
                       </p>
@@ -350,10 +365,11 @@ const RouteComponent = () => {
                           <p>
                             {t({
                               en: 'Title',
+                              es: 'Título',
                               fr: 'Titre'
                             })}
                           </p>{' '}
-                          <p>{t({ en: 'Number', fr: 'Nombre' })}</p>
+                          <p>{t({ en: 'Number', es: 'Número', fr: 'Nombre' })}</p>
                         </div>
                         <hr></hr>
                         {recordCounter.map((instrument, i) => {
@@ -394,12 +410,14 @@ const RouteComponent = () => {
                   <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
                     {t({
                       en: 'Records & Sessions Trend',
+                      es: 'Tendencia de registros y sesiones',
                       fr: 'Tendance des enregistrements et des sessions'
                     })}
                   </Heading>
                   <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                     {t({
                       en: 'Activity over time',
+                      es: 'Actividad a lo largo del tiempo',
                       fr: 'Activité au fil du temps'
                     })}
                   </p>
@@ -461,6 +479,7 @@ const RouteComponent = () => {
                               <p className="font-semibold text-blue-600 dark:text-blue-400">
                                 {t({
                                   en: 'Records',
+                                  es: 'Registros',
                                   fr: 'Enregistrements'
                                 })}
                                 : {payload.find((p) => p.dataKey === 'records')?.value ?? 0}
@@ -468,6 +487,7 @@ const RouteComponent = () => {
                               <p className="font-semibold text-emerald-600 dark:text-emerald-400">
                                 {t({
                                   en: 'Sessions',
+                                  es: 'Sesiones',
                                   fr: 'Sessions'
                                 })}
                                 : {payload.find((p) => p.dataKey === 'sessions')?.value ?? 0}
@@ -514,12 +534,14 @@ const RouteComponent = () => {
                   <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
                     {t({
                       en: 'Subjects Growth',
+                      es: 'Crecimiento de sujetos',
                       fr: 'Croissance des sujets'
                     })}
                   </Heading>
                   <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                     {t({
                       en: 'Growth trajectory',
+                      es: 'Trayectoria de crecimiento',
                       fr: 'Trajectoire de croissance'
                     })}
                   </p>
@@ -579,6 +601,7 @@ const RouteComponent = () => {
                             <p className="font-semibold text-amber-600 dark:text-amber-400">
                               {t({
                                 en: 'Subjects',
+                                es: 'Sujetos',
                                 fr: 'Sujets'
                               })}
                               : {payload[0]?.value}

@@ -10,7 +10,7 @@ export const FooterCard = ({ editor }: { editor: BrandingEditor }) => {
   return (
     <Card>
       <Card.Header>
-        <Card.Title>{t({ en: 'Footer', fr: 'Pied de page' })}</Card.Title>
+        <Card.Title>{t({ en: 'Footer', es: 'Pie de página', fr: 'Pied de page' })}</Card.Title>
       </Card.Header>
       <Card.Content>
         <div className="flex items-center gap-3">
@@ -20,7 +20,11 @@ export const FooterCard = ({ editor }: { editor: BrandingEditor }) => {
             onCheckedChange={(checked) => update('showFooterLinks', checked === true)}
           />
           <Label className="cursor-pointer" htmlFor="showFooterLinks">
-            {t({ en: 'Show GitHub and documentation links', fr: 'Afficher les liens GitHub et documentation' })}
+            {t({
+              en: 'Show GitHub and documentation links',
+              es: 'Mostrar enlaces de GitHub y documentación',
+              fr: 'Afficher les liens GitHub et documentation'
+            })}
           </Label>
         </div>
       </Card.Content>

@@ -194,6 +194,7 @@ const $SetupState = z.object({
 });
 
 const $UpdateSetupStateData = z.object({
+  activeLanguages: z.array(z.string()).optional(),
   branding: $BrandingConfig.nullish(),
   isExperimentalFeaturesEnabled: z.boolean().nullish()
 });

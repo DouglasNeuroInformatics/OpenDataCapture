@@ -43,7 +43,11 @@ const RouteComponent = () => {
       addNotification({
         message: getApiErrorMessage(
           err,
-          t({ en: 'Failed to update group repositories', fr: 'Échec de la mise à jour des dépôts du groupe' })
+          t({
+            en: 'Failed to update group repositories',
+            es: 'Error al actualizar los repositorios del grupo',
+            fr: 'Échec de la mise à jour des dépôts du groupe'
+          })
         ),
         type: 'error'
       });
@@ -91,6 +95,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'Manage Groups',
+            es: 'Administrar grupos',
             fr: 'Gérer les groupes'
           })}
         </Heading>
@@ -136,6 +141,7 @@ const RouteComponent = () => {
             <Link to="/admin/groups/create">
               {t({
                 en: 'Add Group',
+                es: 'Agregar grupo',
                 fr: 'Ajouter un groupe'
               })}
             </Link>
@@ -154,6 +160,7 @@ const RouteComponent = () => {
             <Sheet.Description>
               {t({
                 en: 'Make changes to this group here. Click save when you are done.',
+                es: 'Realice cambios a este grupo aquí. Haga clic en guardar cuando haya terminado.',
                 fr: 'Apportez des modifications à ce groupe ici. Cliquez sur enregistrer lorsque vous avez terminé.'
               })}
             </Sheet.Description>
@@ -163,12 +170,14 @@ const RouteComponent = () => {
               <h3 className="mb-2 text-sm font-medium">
                 {t({
                   en: 'Instrument Repositories',
+                  es: 'Repositorios de instrumentos',
                   fr: "Dépôts d'instruments"
                 })}
               </h3>
               <p className="text-muted-foreground mb-3 text-xs">
                 {t({
                   en: 'Select which instrument repositories this group has access to.',
+                  es: 'Seleccione a qué repositorios de instrumentos tiene acceso este grupo.',
                   fr: "Sélectionnez les dépôts d'instruments auxquels ce groupe a accès."
                 })}
               </p>
@@ -176,6 +185,7 @@ const RouteComponent = () => {
                 <p className="text-muted-foreground text-sm italic">
                   {t({
                     en: 'No instrument repositories available. Add one from the admin menu.',
+                    es: 'No hay repositorios de instrumentos disponibles. Agregue uno desde el menú de administración.',
                     fr: "Aucun dépôt d'instruments disponible. Ajoutez-en un depuis le menu admin."
                   })}
                 </p>
@@ -193,7 +203,8 @@ const RouteComponent = () => {
                       <div>
                         <span className="text-sm font-medium">{repo.name}</span>
                         <span className="text-muted-foreground ml-2 text-xs">
-                          ({repo.instrumentIds.length} {t({ en: 'instruments', fr: 'instruments' })})
+                          ({repo.instrumentIds.length} {t({ en: 'instruments', es: 'instrumentos', fr: 'instruments' })}
+                          )
                         </span>
                       </div>
                     </div>
@@ -219,12 +230,14 @@ const RouteComponent = () => {
               <Dialog.Title>
                 {t({
                   en: 'Are you absolutely sure?',
+                  es: '¿Está completamente seguro?',
                   fr: 'Êtes-vous absolument sûr ?'
                 })}
               </Dialog.Title>
               <Dialog.Description>
                 {t({
                   en: 'This action will permanently delete this group and cannot be undone.',
+                  es: 'Esta acción eliminará permanentemente este grupo y no se puede deshacer.',
                   fr: 'Cette action supprimera définitivement ce groupe et ne pourra pas être annulée.'
                 })}
               </Dialog.Description>

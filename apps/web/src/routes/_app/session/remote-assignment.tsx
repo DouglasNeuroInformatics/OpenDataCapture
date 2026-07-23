@@ -33,6 +33,7 @@ const CreateAssignmentForm: React.FC<{
       setError(
         t({
           en: 'Expiry date must be a valid date in the future',
+          es: 'La fecha de expiración debe ser una fecha válida en el futuro',
           fr: "La date d'expiration doit être une date valide dans le futur"
         })
       );
@@ -45,7 +46,9 @@ const CreateAssignmentForm: React.FC<{
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="expires-at">{t({ en: 'Expires At', fr: "Date d'expiration" })}</Label>
+        <Label htmlFor="expires-at">
+          {t({ en: 'Expires At', es: 'Fecha de expiración', fr: "Date d'expiration" })}
+        </Label>
         <Input
           id="expires-at"
           placeholder="YYYY-MM-DD"
@@ -59,7 +62,9 @@ const CreateAssignmentForm: React.FC<{
         {error && <p className="text-destructive text-xs font-medium">{error}</p>}
       </div>
       <Button className="w-full" disabled={isPending} type="submit" variant="primary">
-        {isPending ? t({ en: 'Creating…', fr: 'Création…' }) : t({ en: 'Submit', fr: 'Soumettre' })}
+        {isPending
+          ? t({ en: 'Creating…', es: 'Creando…', fr: 'Création…' })
+          : t({ en: 'Submit', es: 'Enviar', fr: 'Soumettre' })}
       </Button>
     </form>
   );
@@ -84,6 +89,7 @@ const AssignmentResultSlider: React.FC<{
           <Sheet.Description>
             {t({
               en: 'Share this link with the subject to complete the assignment remotely. If the link is lost, it can be found by navigating to View Current Subject, selecting the Assignments tab, and clicking on the assignment.',
+              es: 'Comparta este enlace con el sujeto para completar la tarea de forma remota. Si el enlace se pierde, puede encontrarlo navegando a Ver sujeto actual, seleccionando la pestaña Tareas y haciendo clic en la tarea.',
               fr: "Partagez ce lien avec le client pour compléter la tâche à distance. Si le lien est perdu, il peut être retrouvé en naviguant vers Voir le client actuel, en sélectionnant l'onglet Tâches, puis en cliquant sur la tâche."
             })}
           </Sheet.Description>
@@ -94,6 +100,7 @@ const AssignmentResultSlider: React.FC<{
               <a className="hover:underline" href={url} rel="noreferrer" target="_blank">
                 {t({
                   en: 'Assignment Link',
+                  es: 'Enlace de la tarea',
                   fr: 'Lien de la tâche'
                 })}
               </a>
@@ -161,6 +168,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'Remote Assignment',
+            es: 'Tarea remota',
             fr: 'Tâche à distance'
           })}
         </Heading>
@@ -185,6 +193,7 @@ const RouteComponent = () => {
             <Dialog.Title>
               {t({
                 en: 'Create Remote Assignment',
+                es: 'Crear tarea remota',
                 fr: 'Créer une tâche à distance'
               })}
             </Dialog.Title>
@@ -192,6 +201,7 @@ const RouteComponent = () => {
               {t(
                 {
                   en: 'Assign "{}" to the current subject for remote completion.',
+                  es: 'Asignar "{}" al sujeto actual para completar de forma remota.',
                   fr: 'Assigner « {} » au client actuel pour complétion à distance.'
                 },
                 { args: [selectedInstrument?.details.title ?? ''] }

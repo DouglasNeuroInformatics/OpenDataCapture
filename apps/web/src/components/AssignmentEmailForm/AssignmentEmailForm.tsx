@@ -51,7 +51,7 @@ export const AssignmentEmailForm: React.FC<{
   const selectedTemplate = templateChoice ?? activeValue;
   const templateOptions = [
     {
-      label: t({ en: 'Built-in default', fr: 'Modèle par défaut' }),
+      label: t({ en: 'Built-in default', es: 'Predeterminado integrado', fr: 'Modèle par défaut' }),
       value: DEFAULT_TEMPLATE_OPTION
     },
     ...remoteTemplates.map((tpl) => ({ label: tpl.name, value: tpl.id }))
@@ -80,12 +80,13 @@ export const AssignmentEmailForm: React.FC<{
         onError: () => {
           const message = t({
             en: 'The email could not be sent',
+            es: 'No se pudo enviar el correo electrónico',
             fr: "Le courriel n'a pas pu être envoyé"
           });
           setFeedback({ message, tone: 'error' });
           addNotification({
             message,
-            title: t({ en: 'Email failed', fr: 'Échec du courriel' }),
+            title: t({ en: 'Email failed', es: 'Error de correo electrónico', fr: 'Échec du courriel' }),
             type: 'error'
           });
         },
@@ -93,12 +94,13 @@ export const AssignmentEmailForm: React.FC<{
           if (result.status === 'SENT') {
             const message = t({
               en: `Assignment link sent to ${recipient}`,
+              es: `Enlace de evaluación enviado a ${recipient}`,
               fr: `Lien d'évaluation envoyé à ${recipient}`
             });
             setFeedback({ message, tone: 'success' });
             addNotification({
               message,
-              title: t({ en: 'Email sent', fr: 'Courriel envoyé' }),
+              title: t({ en: 'Email sent', es: 'Correo electrónico enviado', fr: 'Courriel envoyé' }),
               type: 'success'
             });
             setRecipient('');
@@ -107,12 +109,13 @@ export const AssignmentEmailForm: React.FC<{
               result.error ??
               t({
                 en: 'The email could not be sent',
+                es: 'No se pudo enviar el correo electrónico',
                 fr: "Le courriel n'a pas pu être envoyé"
               });
             setFeedback({ message, tone: 'error' });
             addNotification({
               message,
-              title: t({ en: 'Email failed', fr: 'Échec du courriel' }),
+              title: t({ en: 'Email failed', es: 'Error de correo electrónico', fr: 'Échec du courriel' }),
               type: 'error'
             });
           }
@@ -134,7 +137,9 @@ export const AssignmentEmailForm: React.FC<{
     <div className="flex flex-col gap-2">
       {remoteTemplates.length > 0 && (
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="assignment-template">{t({ en: 'Email template', fr: 'Modèle de courriel' })}</Label>
+          <Label htmlFor="assignment-template">
+            {t({ en: 'Email template', es: 'Plantilla de correo electrónico', fr: 'Modèle de courriel' })}
+          </Label>
           <Select value={selectedTemplate} onValueChange={setTemplateChoice}>
             <Select.Trigger className="w-full" id="assignment-template">
               <Select.Value />
@@ -151,7 +156,7 @@ export const AssignmentEmailForm: React.FC<{
       )}
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-1.5">
-          <Label>{t({ en: 'Email language', fr: 'Langue du courriel' })}</Label>
+          <Label>{t({ en: 'Email language', es: 'Idioma del correo', fr: 'Langue du courriel' })}</Label>
           <Tooltip>
             <Tooltip.Trigger className="p-0 hover:bg-transparent" size="icon" variant="ghost">
               <CircleHelpIcon className="text-muted-foreground h-4 w-4" />
@@ -160,6 +165,7 @@ export const AssignmentEmailForm: React.FC<{
               <p>
                 {t({
                   en: 'Emails and assignments are sent in the selected language when available. However, subjects may still choose a different preferred language on the gateway.',
+                  es: 'Los correos y las evaluaciones se envían en el idioma seleccionado cuando está disponible. Sin embargo, los sujetos aún pueden elegir un idioma preferido diferente en el portal.',
                   fr: "Les courriels et les évaluations sont envoyés dans la langue sélectionnée lorsqu'elle est disponible. Cependant, les sujets peuvent toujours choisir une langue préférée différente sur le portail."
                 })}
               </p>
@@ -184,6 +190,7 @@ export const AssignmentEmailForm: React.FC<{
       <Label htmlFor="assignment-email">
         {t({
           en: 'Email link to participant',
+          es: 'Enviar enlace al participante por correo electrónico',
           fr: 'Envoyer le lien au participant par courriel'
         })}
       </Label>
@@ -193,6 +200,7 @@ export const AssignmentEmailForm: React.FC<{
           id="assignment-email"
           placeholder={t({
             en: 'recipient@example.org',
+            es: 'destinatario@ejemplo.org',
             fr: 'destinataire@exemple.org'
           })}
           type="email"
@@ -207,8 +215,8 @@ export const AssignmentEmailForm: React.FC<{
           onClick={sendEmail}
         >
           {sendEmailMutation.isPending
-            ? t({ en: 'Sending…', fr: 'Envoi en cours…' })
-            : t({ en: 'Email assignment', fr: 'Envoyer par courriel' })}
+            ? t({ en: 'Sending…', es: 'Enviando…', fr: 'Envoi en cours…' })
+            : t({ en: 'Email assignment', es: 'Enviar por correo electrónico', fr: 'Envoyer par courriel' })}
         </Button>
       </div>
       {feedback && (

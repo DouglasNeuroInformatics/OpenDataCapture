@@ -19,11 +19,16 @@ export const LeftPanelThemeCard = ({ editor }: { editor: BrandingEditor }) => {
     <Card>
       <Card.Header>
         <Card.Title>
-          {t({ en: 'Background Theme - Left Panel', fr: "Thème d'arrière-plan - Panneau gauche" })}
+          {t({
+            en: 'Background Theme - Left Panel',
+            es: 'Tema de fondo - Panel izquierdo',
+            fr: "Thème d'arrière-plan - Panneau gauche"
+          })}
         </Card.Title>
         <Card.Description>
           {t({
             en: 'The gradient shown behind the branding panel.',
+            es: 'El degradado que se muestra detrás del panel de marca.',
             fr: 'Le dégradé affiché derrière le panneau.'
           })}
         </Card.Description>
@@ -54,14 +59,14 @@ export const LeftPanelThemeCard = ({ editor }: { editor: BrandingEditor }) => {
           <div className="grid gap-4 sm:grid-cols-2">
             <ColorField
               id="customPrimaryColor"
-              label={t({ en: 'Gradient Start', fr: 'Début du dégradé' })}
+              label={t({ en: 'Gradient Start', es: 'Inicio del degradado', fr: 'Début du dégradé' })}
               swatchFallback="#000000"
               value={form.customPrimaryColor}
               onChange={(v) => update('customPrimaryColor', v)}
             />
             <ColorField
               id="customSecondaryColor"
-              label={t({ en: 'Gradient End', fr: 'Fin du dégradé' })}
+              label={t({ en: 'Gradient End', es: 'Fin del degradado', fr: 'Fin du dégradé' })}
               swatchFallback="#000000"
               value={form.customSecondaryColor}
               onChange={(v) => update('customSecondaryColor', v)}

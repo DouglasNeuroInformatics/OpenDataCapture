@@ -20,22 +20,24 @@ export const DisclaimerProvider: React.FC<{ children: React.ReactElement }> = ({
             <Dialog.Title>
               {t({
                 en: 'Disclaimer',
+                es: 'Aviso legal',
                 fr: 'Avis'
               })}
             </Dialog.Title>
             <Dialog.Description>
               {t({
                 en: 'This platform is not an Electronic Health Record. Our terms of service prohibit using this platform as the primary mechanism to store clinical data.',
+                es: 'Esta plataforma no es un expediente clínico electrónico. Nuestros términos de servicio prohíben utilizar esta plataforma como mecanismo principal para almacenar datos clínicos.',
                 fr: "Cette plateforme n'est pas un dossier médical électronique. Nos conditions de service interdisent l'utilisation de cette plateforme comme principal mécanisme de stockage des données cliniques."
               })}
             </Dialog.Description>
           </Dialog.Header>
           <Dialog.Footer>
             <Button data-test-id="accept-disclaimer" type="button" onClick={() => setIsDisclaimerAccepted(true)}>
-              {t({ en: 'Accept', fr: 'Accepter' })}
+              {t({ en: 'Accept', es: 'Aceptar', fr: 'Accepter' })}
             </Button>
             <Button data-test-id="decline-disclaimer" type="button" variant="outline" onClick={logout}>
-              {t({ en: 'Decline', fr: 'Refuser' })}
+              {t({ en: 'Decline', es: 'Rechazar', fr: 'Refuser' })}
             </Button>
           </Dialog.Footer>
         </Dialog.Content>

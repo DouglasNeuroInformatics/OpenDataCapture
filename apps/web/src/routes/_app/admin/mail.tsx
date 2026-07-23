@@ -199,7 +199,7 @@ const MailManager = ({
       if (!silent) {
         addNotification({
           message,
-          title: t({ en: 'Invalid configuration', fr: 'Configuration invalide' }),
+          title: t({ en: 'Invalid configuration', es: 'Configuración inválida', fr: 'Configuration invalide' }),
           type: 'error'
         });
       }
@@ -221,6 +221,7 @@ const MailManager = ({
         return fail(
           t({
             en: 'Enter your Mailgun sending domain (e.g. mg.example.org)',
+            es: 'Ingrese su dominio de envío de Mailgun (p. ej. mg.example.org)',
             fr: "Entrez votre domaine d'envoi Mailgun (p. ex. mg.example.org)"
           })
         );
@@ -230,6 +231,7 @@ const MailManager = ({
         return fail(
           t({
             en: 'Enter your AWS region (e.g. us-east-1)',
+            es: 'Ingrese su región de AWS (p. ej. us-east-1)',
             fr: 'Entrez votre région AWS (p. ex. us-east-1)'
           })
         );
@@ -238,6 +240,7 @@ const MailManager = ({
         return fail(
           t({
             en: 'Enter your AWS access key ID',
+            es: 'Ingrese su ID de clave de acceso de AWS',
             fr: "Entrez votre identifiant de clé d'accès AWS"
           })
         );
@@ -247,6 +250,7 @@ const MailManager = ({
         return fail(
           t({
             en: 'Enter a valid host (e.g. smtp.example.org)',
+            es: 'Ingrese un host válido (p. ej. smtp.example.org)',
             fr: 'Entrez un hôte valide (p. ex. smtp.example.org)'
           })
         );
@@ -255,6 +259,7 @@ const MailManager = ({
         return fail(
           t({
             en: 'Port must be a whole number between 1 and 65535',
+            es: 'El puerto debe ser un número entero entre 1 y 65535',
             fr: 'Le port doit être un nombre entier entre 1 et 65535'
           })
         );
@@ -263,6 +268,7 @@ const MailManager = ({
         return fail(
           t({
             en: 'Username is required',
+            es: 'El nombre de usuario es obligatorio',
             fr: "Le nom d'utilisateur est requis"
           })
         );
@@ -275,14 +281,15 @@ const MailManager = ({
     if (!secretStored && (!secretValue || secretValue === MASKED_SECRET)) {
       return fail(
         isHttp
-          ? t({ en: 'An API key is required', fr: 'Une clé API est requise' })
-          : t({ en: 'A password is required', fr: 'Un mot de passe est requis' })
+          ? t({ en: 'An API key is required', es: 'Se requiere una clave API', fr: 'Une clé API est requise' })
+          : t({ en: 'A password is required', es: 'Se requiere una contraseña', fr: 'Un mot de passe est requis' })
       );
     }
     if (!senderAddress || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(senderAddress)) {
       return fail(
         t({
           en: 'Enter a valid sender address (e.g. noreply@example.org)',
+          es: 'Ingrese una dirección de remitente válida (p. ej. noreply@example.org)',
           fr: "Entrez une adresse d'expéditeur valide (p. ex. noreply@example.org)"
         })
       );
@@ -309,7 +316,8 @@ const MailManager = ({
     const parsed = $UpdateMailConfigData.safeParse(candidate);
     if (!parsed.success) {
       return fail(
-        parsed.error.issues[0]?.message ?? t({ en: 'Please check the fields', fr: 'Veuillez vérifier les champs' })
+        parsed.error.issues[0]?.message ??
+          t({ en: 'Please check the fields', es: 'Por favor verifique los campos', fr: 'Veuillez vérifier les champs' })
       );
     }
     return parsed.data;
@@ -377,9 +385,10 @@ const MailManager = ({
       addNotification({
         message: t({
           en: 'Enter a valid recipient email address',
+          es: 'Ingrese una dirección de correo electrónico de destinatario válida',
           fr: 'Entrez une adresse courriel de destinataire valide'
         }),
-        title: t({ en: 'Invalid email', fr: 'Courriel invalide' }),
+        title: t({ en: 'Invalid email', es: 'Correo electrónico inválido', fr: 'Courriel invalide' }),
         type: 'error'
       });
       return;
@@ -389,13 +398,15 @@ const MailManager = ({
       message: withRecipient
         ? t({
             en: 'Sending a test email… this can take a few seconds.',
+            es: 'Enviando un correo de prueba… esto puede tardar unos segundos.',
             fr: "Envoi d'un courriel de test… cela peut prendre quelques secondes."
           })
         : t({
             en: 'Testing the connection… this can take a few seconds.',
+            es: 'Probando la conexión… esto puede tardar unos segundos.',
             fr: 'Test de la connexion… cela peut prendre quelques secondes.'
           }),
-      title: t({ en: 'Please wait', fr: 'Veuillez patienter' }),
+      title: t({ en: 'Please wait', es: 'Por favor espere', fr: 'Veuillez patienter' }),
       type: 'info'
     });
     testMutation.mutate(
@@ -405,9 +416,10 @@ const MailManager = ({
           addNotification({
             message: t({
               en: 'The test could not be completed (the server may be unreachable or the request timed out). Check the host, port, and credentials.',
+              es: 'No se pudo completar la prueba (el servidor puede ser inaccesible o la solicitud expiró). Verifique el host, el puerto y las credenciales.',
               fr: "Le test n'a pas pu être effectué (serveur injoignable ou délai dépassé). Vérifiez l'hôte, le port et les identifiants."
             }),
-            title: t({ en: 'Mail test failed', fr: 'Échec du test de courriel' }),
+            title: t({ en: 'Mail test failed', es: 'Prueba de correo fallida', fr: 'Échec du test de courriel' }),
             type: 'error'
           });
         },
@@ -418,19 +430,21 @@ const MailManager = ({
               message: withRecipient
                 ? t({
                     en: `Test email sent to ${recipient}`,
+                    es: `Correo de prueba enviado a ${recipient}`,
                     fr: `Courriel de test envoyé à ${recipient}`
                   })
                 : t({
                     en: 'Connected to the mail server successfully',
+                    es: 'Conexión al servidor de correo exitosa',
                     fr: 'Connexion au serveur de courriel réussie'
                   }),
-              title: t({ en: 'Mail test succeeded', fr: 'Test de courriel réussi' }),
+              title: t({ en: 'Mail test succeeded', es: 'Prueba de correo exitosa', fr: 'Test de courriel réussi' }),
               type: 'success'
             });
           } else {
             addNotification({
-              message: result.error ?? t({ en: 'Unknown error', fr: 'Erreur inconnue' }),
-              title: t({ en: 'Mail test failed', fr: 'Échec du test de courriel' }),
+              message: result.error ?? t({ en: 'Unknown error', es: 'Error desconocido', fr: 'Erreur inconnue' }),
+              title: t({ en: 'Mail test failed', es: 'Prueba de correo fallida', fr: 'Échec du test de courriel' }),
               type: 'error'
             });
           }
@@ -443,10 +457,10 @@ const MailManager = ({
   // Providers name their secret differently, so label the HTTP secret field accordingly.
   const secretLabel =
     values.provider === 'ses'
-      ? t({ en: 'AWS secret access key', fr: "Clé d'accès secrète AWS" })
+      ? t({ en: 'AWS secret access key', es: 'Clave de acceso secreta de AWS', fr: "Clé d'accès secrète AWS" })
       : values.provider === 'postmark'
-        ? t({ en: 'Server API token', fr: 'Jeton API du serveur' })
-        : t({ en: 'API key', fr: 'Clé API' });
+        ? t({ en: 'Server API token', es: 'Token API del servidor', fr: 'Jeton API du serveur' })
+        : t({ en: 'API key', es: 'Clave API', fr: 'Clé API' });
 
   // We never persist `enabled: true` without a working configuration, so when email is enabled
   // but the form isn't valid yet nothing is saved. Surface that so the toggle doesn't look broken.
@@ -459,12 +473,14 @@ const MailManager = ({
     if (issue === 'incomplete') {
       return t({
         en: 'Fill in the subject and body for each added language.',
+        es: 'Complete el asunto y el cuerpo para cada idioma agregado.',
         fr: "Remplissez l'objet et le corps pour chaque langue ajoutée."
       });
     }
     if (issue === 'missing-vars') {
       return t({
         en: 'The body must include {{username}} and {{password}}.',
+        es: 'El cuerpo debe incluir {{username}} y {{password}}.',
         fr: 'Le corps doit inclure {{username}} et {{password}}.'
       });
     }
@@ -476,11 +492,12 @@ const MailManager = ({
       <SaveStatus state={saveState} />
       <SectionCard>
         <Heading className="mb-1" variant="h4">
-          {t({ en: 'Email', fr: 'Courriel' })}
+          {t({ en: 'Email', es: 'Correo electrónico', fr: 'Courriel' })}
         </Heading>
         <p className="text-muted-foreground mb-4 text-sm">
           {t({
             en: 'Turn outgoing email on to configure your mail server and templates. When off, the application behaves as if email is not available. Changes on this page are saved automatically.',
+            es: 'Active el envío de correos electrónicos para configurar su servidor de correo y plantillas. Cuando está desactivado, la aplicación se comporta como si el correo no estuviera disponible. Los cambios en esta página se guardan automáticamente.',
             fr: "Activez l'envoi de courriels pour configurer votre serveur de messagerie et vos modèles. Lorsque c'est désactivé, l'application se comporte comme si le courriel n'était pas disponible. Les modifications de cette page sont enregistrées automatiquement."
           })}
         </p>
@@ -493,6 +510,7 @@ const MailManager = ({
           <span className="text-sm font-medium">
             {t({
               en: 'Enable email sending',
+              es: 'Activar el envío de correos electrónicos',
               fr: "Activer l'envoi de courriels"
             })}
           </span>
@@ -501,6 +519,7 @@ const MailManager = ({
           <p className="mt-2 text-xs font-medium text-amber-600 dark:text-amber-500">
             {t({
               en: 'Complete the configuration below to turn email on — your settings save automatically as you go, so there is no separate save button.',
+              es: 'Complete la configuración a continuación para activar el correo electrónico — sus ajustes se guardan automáticamente a medida que avanza, por lo que no hay un botón de guardar separado.',
               fr: "Complétez la configuration ci-dessous pour activer les courriels — vos paramètres sont enregistrés automatiquement au fur et à mesure, il n'y a donc pas de bouton d'enregistrement distinct."
             })}
           </p>
@@ -513,25 +532,27 @@ const MailManager = ({
             <Heading className="mb-1" variant="h4">
               {t({
                 en: 'Mail Server Configuration',
+                es: 'Configuración del servidor de correo',
                 fr: 'Configuration du serveur de courriel'
               })}
             </Heading>
             <p className="text-muted-foreground mb-4 text-sm">
               {t({
                 en: "Send email over a classic SMTP connection, or through a provider's HTTP sending API (useful when outbound SMTP ports are blocked).",
+                es: 'Envíe correos electrónicos a través de una conexión SMTP clásica o a través de la API de envío HTTP de un proveedor (útil cuando los puertos SMTP salientes están bloqueados).',
                 fr: "Envoyez des courriels via une connexion SMTP classique ou via l'API d'envoi HTTP d'un fournisseur (utile lorsque les ports SMTP sortants sont bloqués)."
               })}
             </p>
             {/* Changes autosave; new-password secrets keep the browser from autofilling the admin's login */}
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <Label>{t({ en: 'Delivery method', fr: "Méthode d'envoi" })}</Label>
+                <Label>{t({ en: 'Delivery method', es: 'Método de envío', fr: "Méthode d'envoi" })}</Label>
                 <SegmentedControl<MailTransport>
-                  ariaLabel={t({ en: 'Delivery method', fr: "Méthode d'envoi" })}
+                  ariaLabel={t({ en: 'Delivery method', es: 'Método de envío', fr: "Méthode d'envoi" })}
                   className="w-full max-w-md"
                   options={[
                     { label: 'SMTP', value: 'smtp' },
-                    { label: t({ en: 'HTTP API', fr: 'API HTTP' }), value: 'http' }
+                    { label: t({ en: 'HTTP API', es: 'API HTTP', fr: 'API HTTP' }), value: 'http' }
                   ]}
                   value={values.transport}
                   onChange={(value) => set('transport', value)}
@@ -541,7 +562,7 @@ const MailManager = ({
               {isHttp ? (
                 <React.Fragment>
                   <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="mail-provider">{t({ en: 'Provider', fr: 'Fournisseur' })}</Label>
+                    <Label htmlFor="mail-provider">{t({ en: 'Provider', es: 'Proveedor', fr: 'Fournisseur' })}</Label>
                     <Select
                       value={values.provider}
                       onValueChange={(value) => set('provider', $MailProvider.parse(value))}
@@ -563,10 +584,11 @@ const MailManager = ({
                       <Field
                         description={t({
                           en: 'The domain you send from in Mailgun (e.g. mg.example.org) — not the API base URL.',
+                          es: 'El dominio desde el que envía en Mailgun (p. ej. mg.example.org) — no la URL base de la API.',
                           fr: "Le domaine d'envoi configuré dans Mailgun (p. ex. mg.example.org) — pas l'URL de base de l'API."
                         })}
                         htmlFor="mail-domain"
-                        label={t({ en: 'Sending domain', fr: "Domaine d'envoi" })}
+                        label={t({ en: 'Sending domain', es: 'Dominio de envío', fr: "Domaine d'envoi" })}
                       >
                         <Input
                           autoComplete="off"
@@ -579,7 +601,7 @@ const MailManager = ({
                       </Field>
 
                       <div className="flex flex-col gap-1.5">
-                        <Label htmlFor="mail-region">{t({ en: 'Region', fr: 'Région' })}</Label>
+                        <Label htmlFor="mail-region">{t({ en: 'Region', es: 'Región', fr: 'Région' })}</Label>
                         <Select
                           value={values.region}
                           onValueChange={(value) => set('region', $MailRegion.parse(value))}
@@ -588,8 +610,8 @@ const MailManager = ({
                             <Select.Value />
                           </Select.Trigger>
                           <Select.Content>
-                            <Select.Item value="us">{t({ en: 'US', fr: 'États-Unis' })}</Select.Item>
-                            <Select.Item value="eu">{t({ en: 'EU', fr: 'Europe' })}</Select.Item>
+                            <Select.Item value="us">{t({ en: 'US', es: 'EE. UU.', fr: 'États-Unis' })}</Select.Item>
+                            <Select.Item value="eu">{t({ en: 'EU', es: 'UE', fr: 'Europe' })}</Select.Item>
                           </Select.Content>
                         </Select>
                       </div>
@@ -601,10 +623,11 @@ const MailManager = ({
                       <Field
                         description={t({
                           en: 'The AWS region your SES account sends from (e.g. us-east-1).',
+                          es: 'La región de AWS desde la que envía su cuenta SES (p. ej. us-east-1).',
                           fr: 'La région AWS depuis laquelle votre compte SES envoie (p. ex. us-east-1).'
                         })}
                         htmlFor="mail-aws-region"
-                        label={t({ en: 'AWS region', fr: 'Région AWS' })}
+                        label={t({ en: 'AWS region', es: 'Región de AWS', fr: 'Région AWS' })}
                       >
                         <Input
                           autoComplete="off"
@@ -620,6 +643,7 @@ const MailManager = ({
                         htmlFor="mail-aws-access-key-id"
                         label={t({
                           en: 'AWS access key ID',
+                          es: 'ID de clave de acceso de AWS',
                           fr: "Identifiant de clé d'accès AWS"
                         })}
                       >
@@ -637,7 +661,7 @@ const MailManager = ({
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  <Field htmlFor="mail-host" label={t({ en: 'Host', fr: 'Hôte' })}>
+                  <Field htmlFor="mail-host" label={t({ en: 'Host', es: 'Host', fr: 'Hôte' })}>
                     <Input
                       autoComplete="off"
                       id="mail-host"
@@ -650,11 +674,14 @@ const MailManager = ({
 
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-1.5">
-                      <Label htmlFor="mail-encryption">{t({ en: 'Encryption', fr: 'Chiffrement' })}</Label>
+                      <Label htmlFor="mail-encryption">
+                        {t({ en: 'Encryption', es: 'Cifrado', fr: 'Chiffrement' })}
+                      </Label>
                       <Tooltip>
                         <Tooltip.Trigger
                           aria-label={t({
                             en: 'About encryption options',
+                            es: 'Acerca de las opciones de cifrado',
                             fr: 'À propos des options de chiffrement'
                           })}
                           className="text-muted-foreground h-5 w-5 rounded-full p-0"
@@ -668,12 +695,14 @@ const MailManager = ({
                           <span>
                             {t({
                               en: 'STARTTLS (default port 587) is the modern default and recommended for most setups — it upgrades a plain connection to an encrypted one and has the best compatibility.',
+                              es: 'STARTTLS (puerto predeterminado 587) es el estándar moderno y recomendado para la mayoría de las configuraciones — actualiza una conexión simple a una cifrada y tiene la mejor compatibilidad.',
                               fr: 'STARTTLS (port par défaut 587) est la valeur par défaut moderne et recommandée — elle convertit une connexion en clair en connexion chiffrée et offre la meilleure compatibilité.'
                             })}
                           </span>
                           <span>
                             {t({
                               en: 'SSL/TLS (default port 465) is encrypted from the start, used by some providers and legacy systems. If unsure, choose STARTTLS.',
+                              es: 'SSL/TLS (puerto predeterminado 465) está cifrado desde el inicio, utilizado por algunos proveedores y sistemas heredados. En caso de duda, elija STARTTLS.',
                               fr: 'SSL/TLS (port par défaut 465) est chiffré dès le départ, utilisé par certains fournisseurs et systèmes hérités. En cas de doute, choisissez STARTTLS.'
                             })}
                           </span>
@@ -690,7 +719,7 @@ const MailManager = ({
                       <Select.Content>
                         <Select.Item value="starttls">STARTTLS</Select.Item>
                         <Select.Item value="ssl">SSL/TLS</Select.Item>
-                        <Select.Item value="none">{t({ en: 'None', fr: 'Aucun' })}</Select.Item>
+                        <Select.Item value="none">{t({ en: 'None', es: 'Ninguno', fr: 'Aucun' })}</Select.Item>
                       </Select.Content>
                     </Select>
                   </div>
@@ -698,10 +727,11 @@ const MailManager = ({
                   <Field
                     description={t({
                       en: `Suggested port for ${values.encryption.toUpperCase()}: ${PORT_DEFAULTS[values.encryption]}`,
+                      es: `Puerto sugerido para ${values.encryption.toUpperCase()}: ${PORT_DEFAULTS[values.encryption]}`,
                       fr: `Port suggéré pour ${values.encryption.toUpperCase()} : ${PORT_DEFAULTS[values.encryption]}`
                     })}
                     htmlFor="mail-port"
-                    label={t({ en: 'Port', fr: 'Port' })}
+                    label={t({ en: 'Port', es: 'Puerto', fr: 'Port' })}
                   >
                     <Input
                       autoComplete="off"
@@ -714,7 +744,10 @@ const MailManager = ({
                     />
                   </Field>
 
-                  <Field htmlFor="mail-username" label={t({ en: 'Username', fr: "Nom d'utilisateur" })}>
+                  <Field
+                    htmlFor="mail-username"
+                    label={t({ en: 'Username', es: 'Nombre de usuario', fr: "Nom d'utilisateur" })}
+                  >
                     <Input
                       autoComplete="off"
                       id="mail-username"
@@ -732,6 +765,7 @@ const MailManager = ({
                     config?.hasApiKey
                       ? t({
                           en: 'A secret is set (shown masked). Edit the field to replace it.',
+                          es: 'Se ha establecido un secreto (se muestra enmascarado). Edite el campo para reemplazarlo.',
                           fr: 'Un secret est défini (affiché masqué). Modifiez le champ pour le remplacer.'
                         })
                       : undefined
@@ -756,12 +790,13 @@ const MailManager = ({
                     config?.hasPassword
                       ? t({
                           en: 'A password is set (shown masked). Edit the field to replace it.',
+                          es: 'Se ha establecido una contraseña (se muestra enmascarada). Edite el campo para reemplazarla.',
                           fr: 'Un mot de passe est défini (affiché masqué). Modifiez le champ pour le remplacer.'
                         })
                       : undefined
                   }
                   htmlFor="mail-secret"
-                  label={t({ en: 'Password', fr: 'Mot de passe' })}
+                  label={t({ en: 'Password', es: 'Contraseña', fr: 'Mot de passe' })}
                 >
                   <Input
                     data-1p-ignore
@@ -776,7 +811,10 @@ const MailManager = ({
                 </Field>
               )}
 
-              <Field htmlFor="mail-sender-name" label={t({ en: 'Sender name', fr: "Nom de l'expéditeur" })}>
+              <Field
+                htmlFor="mail-sender-name"
+                label={t({ en: 'Sender name', es: 'Nombre del remitente', fr: "Nom de l'expéditeur" })}
+              >
                 <Input
                   autoComplete="off"
                   id="mail-sender-name"
@@ -786,7 +824,10 @@ const MailManager = ({
                 />
               </Field>
 
-              <Field htmlFor="mail-sender-address" label={t({ en: 'Sender address', fr: "Adresse de l'expéditeur" })}>
+              <Field
+                htmlFor="mail-sender-address"
+                label={t({ en: 'Sender address', es: 'Dirección del remitente', fr: "Adresse de l'expéditeur" })}
+              >
                 <Input
                   autoComplete="off"
                   id="mail-sender-address"
@@ -803,6 +844,7 @@ const MailManager = ({
             <Heading className="mb-5" variant="h4">
               {t({
                 en: 'Verify Your Configuration',
+                es: 'Verifique su configuración',
                 fr: 'Vérifiez votre configuration'
               })}
             </Heading>
@@ -810,10 +852,11 @@ const MailManager = ({
             <div className="flex flex-col gap-5">
               <div className="flex flex-col items-start gap-2">
                 <div>
-                  <p className="text-sm font-medium">{t({ en: 'Connection', fr: 'Connexion' })}</p>
+                  <p className="text-sm font-medium">{t({ en: 'Connection', es: 'Conexión', fr: 'Connexion' })}</p>
                   <p className="text-muted-foreground text-xs">
                     {t({
                       en: 'Check that the server accepts the connection and your credentials.',
+                      es: 'Verifique que el servidor acepta la conexión y sus credenciales.',
                       fr: 'Vérifiez que le serveur accepte la connexion et vos identifiants.'
                     })}
                   </p>
@@ -826,8 +869,8 @@ const MailManager = ({
                 >
                   {testingMode === 'connection' && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
                   {testingMode === 'connection'
-                    ? t({ en: 'Testing…', fr: 'Test en cours…' })
-                    : t({ en: 'Test connection', fr: 'Tester la connexion' })}
+                    ? t({ en: 'Testing…', es: 'Probando…', fr: 'Test en cours…' })
+                    : t({ en: 'Test connection', es: 'Probar conexión', fr: 'Tester la connexion' })}
                 </Button>
               </div>
 
@@ -836,11 +879,12 @@ const MailManager = ({
               <div className="flex flex-col items-start gap-2">
                 <div>
                   <p className="text-sm font-medium">
-                    {t({ en: 'Send test email', fr: 'Envoyer un courriel de test' })}
+                    {t({ en: 'Send test email', es: 'Enviar correo de prueba', fr: 'Envoyer un courriel de test' })}
                   </p>
                   <p className="text-muted-foreground text-xs">
                     {t({
                       en: 'Deliver a real message to confirm everything works end to end.',
+                      es: 'Envíe un mensaje real para confirmar que todo funciona de extremo a extremo.',
                       fr: 'Envoyez un message réel pour confirmer que tout fonctionne de bout en bout.'
                     })}
                   </p>
@@ -852,6 +896,7 @@ const MailManager = ({
                   name="odc-smtp-test-recipient"
                   placeholder={t({
                     en: 'recipient@example.org',
+                    es: 'destinatario@ejemplo.org',
                     fr: 'destinataire@exemple.org'
                   })}
                   type="email"
@@ -866,8 +911,8 @@ const MailManager = ({
                 >
                   {testingMode === 'email' && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
                   {testingMode === 'email'
-                    ? t({ en: 'Sending…', fr: 'Envoi en cours…' })
-                    : t({ en: 'Send test email', fr: 'Envoyer un courriel de test' })}
+                    ? t({ en: 'Sending…', es: 'Enviando…', fr: 'Envoi en cours…' })
+                    : t({ en: 'Send test email', es: 'Enviar correo de prueba', fr: 'Envoyer un courriel de test' })}
                 </Button>
               </div>
             </div>
@@ -878,6 +923,7 @@ const MailManager = ({
               <Heading variant="h4">
                 {t({
                   en: 'New User Email Template',
+                  es: 'Plantilla de correo para nuevos usuarios',
                   fr: 'Modèle de courriel pour les nouveaux utilisateurs'
                 })}
               </Heading>
@@ -893,12 +939,13 @@ const MailManager = ({
                   })
                 }
               >
-                {t({ en: 'Reset', fr: 'Réinitialiser' })}
+                {t({ en: 'Reset', es: 'Restablecer', fr: 'Réinitialiser' })}
               </Button>
             </div>
             <p className="text-muted-foreground mb-4 text-sm">
               {t({
                 en: 'Sent automatically when a new user with an email address is created. The sender chooses the language.',
+                es: 'Se envía automáticamente cuando se crea un nuevo usuario con dirección de correo electrónico. El remitente elige el idioma.',
                 fr: "Envoyé automatiquement lors de la création d'un nouvel utilisateur disposant d'une adresse courriel. L'expéditeur choisit la langue."
               })}
             </p>
@@ -906,13 +953,14 @@ const MailManager = ({
               <p className="mb-6 text-sm font-medium text-amber-600 dark:text-amber-400">
                 {t({
                   en: 'Remember to update the template in all active languages, not only the one currently selected.',
+                  es: 'Recuerde actualizar la plantilla en todos los idiomas activos, no solo en el seleccionado actualmente.',
                   fr: 'N’oubliez pas de mettre à jour le modèle dans toutes les langues actives, pas seulement celle actuellement sélectionnée.'
                 })}
               </p>
             )}
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <Label>{t({ en: 'Language', fr: 'Langue' })}</Label>
+                <Label>{t({ en: 'Language', es: 'Idioma', fr: 'Langue' })}</Label>
                 <Select value={templateLang} onValueChange={(v) => setTemplateLang($MailLanguage.parse(v))}>
                   <Select.Trigger className="w-[180px] border-sky-700 bg-sky-700 text-white hover:bg-sky-800 dark:border-sky-700 dark:bg-sky-700 dark:text-white dark:hover:bg-sky-800">
                     <Select.Value />
@@ -928,7 +976,7 @@ const MailManager = ({
                   </Select.Content>
                 </Select>
               </div>
-              <Field htmlFor="template-subject" label={t({ en: 'Subject', fr: 'Objet' })}>
+              <Field htmlFor="template-subject" label={t({ en: 'Subject', es: 'Asunto', fr: 'Objet' })}>
                 <Input
                   id="template-subject"
                   value={template.subject[templateLang] ?? ''}
@@ -942,9 +990,11 @@ const MailManager = ({
               </Field>
               <div className="flex flex-col gap-1.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <Label htmlFor="template-body">{t({ en: 'Body', fr: 'Corps' })}</Label>
+                  <Label htmlFor="template-body">{t({ en: 'Body', es: 'Cuerpo', fr: 'Corps' })}</Label>
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-muted-foreground text-xs">{t({ en: 'Insert:', fr: 'Insérer :' })}</span>
+                    <span className="text-muted-foreground text-xs">
+                      {t({ en: 'Insert:', es: 'Insertar:', fr: 'Insérer :' })}
+                    </span>
                     {NEW_USER_VARS.map((variable) => (
                       <Button
                         className="h-6 px-2 font-mono text-xs"
@@ -1011,7 +1061,7 @@ const RouteComponent = () => {
     <div className="w-full">
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t({ en: 'Mail Server', fr: 'Serveur de courriel' })}
+          {t({ en: 'Mail Server', es: 'Servidor de correo', fr: 'Serveur de courriel' })}
         </Heading>
       </PageHeader>
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">

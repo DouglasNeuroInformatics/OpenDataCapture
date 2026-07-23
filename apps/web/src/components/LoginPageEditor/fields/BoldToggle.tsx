@@ -14,7 +14,7 @@ export const BoldToggle = ({ checked, id, onChange }: BoldToggleProps) => {
     <div className="flex items-center gap-2">
       <Checkbox checked={checked} id={id} onCheckedChange={(c) => onChange(c === true)} />
       <Label className="cursor-pointer text-sm font-normal" htmlFor={id}>
-        {t({ en: 'Bold', fr: 'Gras' })}
+        {t({ en: 'Bold', es: 'Negrita', fr: 'Gras' })}
       </Label>
     </div>
   );

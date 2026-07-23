@@ -23,6 +23,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'Add Group',
+            es: 'Agregar grupo',
             fr: 'Ajouter un groupe'
           })}
         </Heading>

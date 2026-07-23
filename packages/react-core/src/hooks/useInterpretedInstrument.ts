@@ -45,7 +45,10 @@ export function useInterpretedInstrument<TInstrument extends AnyUnilingualInstru
     if (instrument) {
       setState({
         instrument: {
-          ...(translateInstrument(instrument, resolvedLanguage) as TInstrument),
+          ...(translateInstrument(
+            instrument,
+            resolvedLanguage === 'en' || resolvedLanguage === 'fr' ? resolvedLanguage : 'en'
+          ) as TInstrument),
           supportedLanguages: Array.isArray(instrument.language) ? instrument.language : [instrument.language]
         },
         status: 'DONE'

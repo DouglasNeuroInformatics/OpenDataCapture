@@ -2,66 +2,80 @@
   "accessible": {
     "title": {
       "en": "Administer Instrument",
+      "es": "Administrar instrumento",
       "fr": "Administrer un instrument"
     }
   },
   "manage": {
     "title": {
       "en": "Manage Instruments",
+      "es": "Gestionar instrumentos",
       "fr": "Gérer les instruments"
     }
   },
   "overview": {
     "estimatedDuration": {
       "en": "{{minutes}} minutes",
+      "es": "{{minutes}} minutos",
       "fr": "{{minutes}} minutes"
     }
   },
   "props": {
     "description": {
       "en": "Description",
+      "es": "Descripción",
       "fr": "Description"
     },
     "details": {
       "en": "Details",
+      "es": "Detalles",
       "fr": "Détails"
     },
     "estimatedDuration": {
       "en": "Estimated Duration",
+      "es": "Duración estimada",
       "fr": "Durée estimée"
     },
     "instructions": {
       "en": "Instructions",
+      "es": "Instrucciones",
       "fr": "Instructions"
     },
     "name": {
       "en": "Instrument Name",
+      "es": "Nombre del instrumento",
       "fr": "Nom de l'instrument"
     },
     "tag": {
       "en": "Tag",
+      "es": "Etiqueta",
       "fr": "Tag"
     },
     "tags": {
       "en": "Tags",
+      "es": "Etiquetas",
       "fr": "Tags"
     },
     "title": {
       "en": "Title",
+      "es": "Título",
       "fr": "Titre"
     },
     "version": {
       "en": "Version",
+      "es": "Versión",
       "fr": "Version"
     }
   },
   "summary": {
     "subtitle": {
       "en": "Completed on {{ dateCompleted }}",
+      "es": "Completado el {{ dateCompleted }}",
       "fr": "Complété le {{ dateCompleted }}"
     },
     "title": {
       "en": "Summary of Results for the {{title}}",
+      "es": "Resumen de resultados del {{title}}",
       "fr": "{{title}} : Résumé des résultats"
     }
   },
@@ -69,15 +83,18 @@
     "filters": {
       "language": {
         "en": "Language",
+        "es": "Idioma",
         "fr": "Langue"
       },
       "tags": {
         "en": "Tags",
+        "es": "Etiquetas",
         "fr": "Tags"
       }
     },
     "title": {
       "en": "Instruments",
+      "es": "Instrumentos",
       "fr": "Instruments"
     }
   }

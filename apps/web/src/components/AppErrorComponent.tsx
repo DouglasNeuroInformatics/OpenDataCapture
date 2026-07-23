@@ -45,22 +45,24 @@ export const AppErrorComponent = ({ error, reset }: ErrorComponentProps) => {
         <WifiOff aria-hidden className="text-muted-foreground h-8! w-8!" />
       )}
       <h1 className="mt-4 text-2xl font-extrabold tracking-tight sm:text-3xl">
-        {t({ en: 'Connection Problem', fr: 'Problème de connexion' })}
+        {t({ en: 'Connection Problem', es: 'Problema de conexión', fr: 'Problème de connexion' })}
       </h1>
       <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">
         {isOnline
           ? t({
               en: "We couldn't reach the server. This is usually temporary — please try again.",
+              es: 'No se pudo conectar con el servidor. Esto suele ser temporal — por favor, inténtelo de nuevo.',
               fr: 'Impossible de joindre le serveur. Le problème est généralement temporaire — veuillez réessayer.'
             })
           : t({
               en: "You appear to be offline. We'll reconnect automatically as soon as your connection returns.",
+              es: 'Parece que está desconectado. La reconexión se realizará automáticamente en cuanto vuelva la conexión.',
               fr: 'Vous semblez être hors ligne. La reconnexion se fera automatiquement dès le retour de votre connexion.'
             })}
       </p>
       <div className="mt-6">
         <Button type="button" variant="primary" onClick={handleRetry}>
-          {t({ en: 'Try again', fr: 'Réessayer' })}
+          {t({ en: 'Try again', es: 'Intentar de nuevo', fr: 'Réessayer' })}
         </Button>
       </div>
     </div>

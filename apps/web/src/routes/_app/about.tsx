@@ -15,44 +15,54 @@ import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStat
 const translations = {
   branch: {
     en: 'Branch',
+    es: 'Rama',
     fr: 'Branche'
   },
   buildDate: {
     en: 'Build Date',
+    es: 'Fecha de compilación',
     fr: 'Date de construction'
   },
   buildType: {
     en: 'Build Type',
+    es: 'Tipo de compilación',
     fr: 'Type de construction'
   },
   buildTypes: {
     development: {
       en: 'Development',
+      es: 'Desarrollo',
       fr: 'Développement'
     },
     production: {
       en: 'Production',
+      es: 'Producción',
       fr: 'Production'
     },
     test: {
       en: 'Test',
+      es: 'Prueba',
       fr: 'Test'
     }
   },
   enabled: {
     en: 'Enabled',
+    es: 'Habilitado',
     fr: 'Activé'
   },
   status: {
     en: 'Status',
+    es: 'Estado',
     fr: 'Statut'
   },
   uptime: {
     en: 'Uptime',
+    es: 'Tiempo de actividad',
     fr: 'Temps de fonctionnement'
   },
   version: {
     en: 'Version',
+    es: 'Versión',
     fr: 'Version'
   }
 };
@@ -155,6 +165,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'Platform Information',
+            es: 'Información de la plataforma',
             fr: 'Informations concernant la plateforme'
           })}
         </Heading>
@@ -165,12 +176,16 @@ const RouteComponent = () => {
           <Card.Description>
             {t({
               en: "This page provides technical information that you can share with your platform administrator if you encounter any issues. Don't worry if you don't understand the content; it's intended for technical support.",
+              es: 'Esta página proporciona información técnica que puede compartir con el administrador de su plataforma si encuentra algún problema. No se preocupe si no entiende el contenido; está destinado al soporte técnico.',
               fr: "Cette page fournit des informations techniques que vous pouvez partager avec l'administrateur de votre plateforme si vous rencontrez des problèmes. Ne vous inquiétez pas si vous ne comprenez pas le contenu ; il est destiné à l'assistance technique."
             })}
           </Card.Description>
         </Card.Header>
         <Card.Content className="flex flex-col gap-6 p-6 text-sm">
-          <InfoBlock items={translateReleaseInfo(__RELEASE__)} label={t({ en: 'Web Client', fr: 'Client Web' })} />
+          <InfoBlock
+            items={translateReleaseInfo(__RELEASE__)}
+            label={t({ en: 'Web Client', es: 'Cliente web', fr: 'Client Web' })}
+          />
           <InfoBlock
             items={{
               ...translateReleaseInfo(setupStateQuery.data.release),
@@ -178,6 +193,7 @@ const RouteComponent = () => {
             }}
             label={t({
               en: 'Core API',
+              es: 'API principal',
               fr: 'API de base'
             })}
           />
@@ -185,13 +201,18 @@ const RouteComponent = () => {
             items={getTranslatedGatewayInfo()}
             label={t({
               en: 'Gateway Service',
+              es: 'Servicio de pasarela',
               fr: 'Service de passerelle'
             })}
           />
         </Card.Content>
         <Card.Footer className="border-t px-6 py-3">
           <p className="text-muted-foreground text-xs">
-            {t({ en: `Generated on ${currentDateString}`, fr: `Généré le ${currentDateString}` })}
+            {t({
+              en: `Generated on ${currentDateString}`,
+              es: `Generado el ${currentDateString}`,
+              fr: `Généré le ${currentDateString}`
+            })}
           </p>
         </Card.Footer>
       </Card>

@@ -99,6 +99,7 @@ const UpdateUserForm: React.FC<{
             input: ctx.value.confirmPassword,
             message: t({
               en: 'Standard user must be part of a group',
+              es: 'Un usuario estándar debe ser parte de un grupo',
               fr: "Un utilisateur standard doit faire partie d'un groupe"
             }),
             path: ['groupIds']
@@ -149,6 +150,7 @@ const UpdateUserForm: React.FC<{
             },
             title: t({
               en: 'Login Credentials',
+              es: 'Credenciales de inicio de sesión',
               fr: 'Identifiants de connexion'
             })
           },
@@ -167,12 +169,14 @@ const UpdateUserForm: React.FC<{
             },
             title: t({
               en: 'Update Contact Information',
+              es: 'Actualizar información de contacto',
               fr: 'Mettre à jour les coordonnées'
             })
           },
           {
             description: t({
               en: 'IMPORTANT: These permissions are not specific to any group. To manage granular permissions, please use the API.',
+              es: 'IMPORTANTE: Estos permisos no son específicos de ningún grupo. Para gestionar permisos granulares, utilice la API.',
               fr: "IMPORTANT : Ces autorisations ne sont pas spécifiques à un groupe. Pour gérer des autorisations granulaires, veuillez utiliser l'API."
             }),
             fields: {
@@ -182,27 +186,33 @@ const UpdateUserForm: React.FC<{
                     kind: 'string',
                     label: t({
                       en: 'Action',
+                      es: 'Acción',
                       fr: 'Action'
                     }),
                     options: {
                       create: t({
                         en: 'Create',
+                        es: 'Crear',
                         fr: 'Créer'
                       }),
                       delete: t({
                         en: 'Delete',
+                        es: 'Eliminar',
                         fr: 'Supprimer'
                       }),
                       manage: t({
                         en: 'Manage (All)',
+                        es: 'Gestionar (Todo)',
                         fr: 'Gérer (Tout)'
                       }),
                       read: t({
                         en: 'Read',
+                        es: 'Leer',
                         fr: 'Lire'
                       }),
                       update: t({
                         en: 'Update',
+                        es: 'Actualizar',
                         fr: 'Modifier'
                       })
                     },
@@ -212,43 +222,53 @@ const UpdateUserForm: React.FC<{
                     kind: 'string',
                     label: t({
                       en: 'Resource',
+                      es: 'Recurso',
                       fr: 'Ressource'
                     }),
                     options: {
                       all: t({
                         en: 'All',
+                        es: 'Todos',
                         fr: 'Tous'
                       }),
                       Assignment: t({
                         en: 'Assignment',
+                        es: 'Asignación',
                         fr: 'Assignation'
                       }),
                       Group: t({
                         en: 'Group',
+                        es: 'Grupo',
                         fr: 'Groupe'
                       }),
                       Instrument: t({
                         en: 'Instrument',
+                        es: 'Instrumento',
                         fr: 'Instrument'
                       }),
                       InstrumentRecord: t({
                         en: 'Instrument Record',
+                        es: 'Registro de instrumento',
                         fr: "Enregistrement de l'instrument"
                       }),
                       InstrumentRepo: t({
                         en: 'Instrument Repository',
+                        es: 'Repositorio de instrumentos',
                         fr: "Dépôt d'instruments"
                       }),
                       Session: t({
                         en: 'Session',
+                        es: 'Sesión',
                         fr: 'Session'
                       }),
                       Subject: t({
                         en: 'Subject',
+                        es: 'Sujeto',
                         fr: 'Client'
                       }),
                       User: t({
                         en: 'User',
+                        es: 'Usuario',
                         fr: 'Utilisateur'
                       })
                     },
@@ -258,17 +278,20 @@ const UpdateUserForm: React.FC<{
                 kind: 'record-array',
                 label: t({
                   en: 'Permission',
+                  es: 'Permiso',
                   fr: 'Autorisation'
                 })
               },
               disabled: {
                 description: t({
                   en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
-                  fr: 'Utilisez cette option si l’utilisateur n’a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l’auteur de données téléversées.'
+                  es: 'Use esta opción si el usuario no está destinado a iniciar sesión, por ejemplo, cuando la cuenta se usa únicamente para identificar al autor de los datos cargados.',
+                  fr: "Utilisez cette option si l'utilisateur n'a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l'auteur de données téléversées."
                 }),
                 kind: 'boolean',
                 label: t({
                   en: 'Disabled',
+                  es: 'Desactivado',
                   fr: 'Désactivé'
                 }),
                 variant: 'radio'
@@ -276,6 +299,7 @@ const UpdateUserForm: React.FC<{
             },
             title: t({
               en: 'Authorization',
+              es: 'Autorización',
               fr: 'Autorisation'
             })
           },
@@ -290,6 +314,7 @@ const UpdateUserForm: React.FC<{
             },
             title: t({
               en: 'Groups',
+              es: 'Grupos',
               fr: 'Groupes'
             })
           }
@@ -311,12 +336,14 @@ const UpdateUserForm: React.FC<{
           <Dialog.Title>
             {t({
               en: 'Are you absolutely sure?',
+              es: '¿Está completamente seguro?',
               fr: 'Êtes-vous absolument sûr ?'
             })}
           </Dialog.Title>
           <Dialog.Description>
             {t({
               en: 'This action will permanently delete the account and cannot be undone.',
+              es: 'Esta acción eliminará permanentemente la cuenta y no se puede deshacer.',
               fr: 'Cette action supprimera définitivement le compte et ne pourra pas être annulée.'
             })}
           </Dialog.Description>
@@ -377,6 +404,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'Manage Users',
+            es: 'Administrar usuarios',
             fr: 'Gérer les utilisateurs'
           })}
         </Heading>
@@ -403,6 +431,7 @@ const RouteComponent = () => {
               if (!basePermissionLevel) {
                 return t({
                   en: 'None',
+                  es: 'Ninguno',
                   fr: 'Aucune'
                 });
               }
@@ -424,6 +453,7 @@ const RouteComponent = () => {
             <Link to="/admin/users/create">
               {t({
                 en: 'Add User',
+                es: 'Agregar usuario',
                 fr: 'Ajouter un utilisateur'
               })}
             </Link>
@@ -441,6 +471,7 @@ const RouteComponent = () => {
           <Sheet.Description>
             {t({
               en: 'Make changes to this user here. Click save when you are done.',
+              es: 'Realice cambios a este usuario aquí. Haga clic en guardar cuando haya terminado.',
               fr: 'Apportez des modifications à cet utilisateur ici. Cliquez sur « Enregistrer » lorsque vous avez terminé.'
             })}
           </Sheet.Description>

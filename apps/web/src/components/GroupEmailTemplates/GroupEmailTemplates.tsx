@@ -38,12 +38,14 @@ const templateErrorMessage = (
   if (issue === 'incomplete') {
     return t({
       en: 'Fill in the subject and body in each language.',
+      es: 'Complete el asunto y el cuerpo en cada idioma.',
       fr: "Remplissez l'objet et le corps dans chaque langue."
     });
   }
   if (issue === 'missing-vars') {
     return t({
       en: 'Remote assignment templates must include {{url}} and {{expiresAt}}.',
+      es: 'Las plantillas de evaluación remota deben incluir {{url}} y {{expiresAt}}.',
       fr: "Les modèles d'évaluation à distance doivent inclure {{url}} et {{expiresAt}}."
     });
   }
@@ -102,7 +104,7 @@ const TemplateFields = ({
   return (
     <React.Fragment>
       <div className="flex flex-col gap-1.5">
-        <Label>{t({ en: 'Category', fr: 'Catégorie' })}</Label>
+        <Label>{t({ en: 'Category', es: 'Categoría', fr: 'Catégorie' })}</Label>
         <SegmentedControl<GroupEmailTemplateCategory>
           className="w-full max-w-md"
           options={[
@@ -114,11 +116,11 @@ const TemplateFields = ({
         />
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="tpl-name">{t({ en: 'Name', fr: 'Nom' })}</Label>
+        <Label htmlFor="tpl-name">{t({ en: 'Name', es: 'Nombre', fr: 'Nom' })}</Label>
         <Input id="tpl-name" value={name} onChange={(event) => setName(event.target.value)} />
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label>{t({ en: 'Language', fr: 'Langue' })}</Label>
+        <Label>{t({ en: 'Language', es: 'Idioma', fr: 'Langue' })}</Label>
         <Select value={lang} onValueChange={setLang}>
           <Select.Trigger className="w-[180px] border-sky-700 bg-sky-700 text-white hover:bg-sky-800 dark:border-sky-700 dark:bg-sky-700 dark:text-white dark:hover:bg-sky-800">
             <Select.Value />
@@ -135,7 +137,7 @@ const TemplateFields = ({
         </Select>
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="tpl-subject">{t({ en: 'Subject', fr: 'Objet' })}</Label>
+        <Label htmlFor="tpl-subject">{t({ en: 'Subject', es: 'Asunto', fr: 'Objet' })}</Label>
         <Input
           id="tpl-subject"
           value={currentSubject}
@@ -144,10 +146,12 @@ const TemplateFields = ({
       </div>
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <Label htmlFor="tpl-body">{t({ en: 'Body', fr: 'Corps' })}</Label>
+          <Label htmlFor="tpl-body">{t({ en: 'Body', es: 'Cuerpo', fr: 'Corps' })}</Label>
           {AVAILABLE_VARS[category].length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-muted-foreground text-xs">{t({ en: 'Insert:', fr: 'Insérer :' })}</span>
+              <span className="text-muted-foreground text-xs">
+                {t({ en: 'Insert:', es: 'Insertar:', fr: 'Insérer :' })}
+              </span>
               {AVAILABLE_VARS[category].map((variable) => (
                 <Button
                   className="h-6 px-2 font-mono text-xs"
@@ -218,6 +222,7 @@ const EditTemplateForm = ({
 
   const duplicateNameMessage = t({
     en: 'A template with this name already exists',
+    es: 'Ya existe una plantilla con este nombre',
     fr: 'Un modèle avec ce nom existe déjà'
   });
 
@@ -225,7 +230,7 @@ const EditTemplateForm = ({
     event.preventDefault();
     if (!name.trim()) {
       addNotification({
-        message: t({ en: 'A name is required', fr: 'Un nom est requis' }),
+        message: t({ en: 'A name is required', es: 'Se requiere un nombre', fr: 'Un nom est requis' }),
         type: 'error'
       });
       return;
@@ -316,8 +321,8 @@ export const GroupEmailTemplates = () => {
 
   const categoryLabel = (value: GroupEmailTemplateCategory) =>
     value === 'REMOTE_ASSIGNMENT'
-      ? t({ en: 'Remote assignment', fr: 'Évaluation à distance' })
-      : t({ en: 'Information', fr: 'Information' });
+      ? t({ en: 'Remote assignment', es: 'Evaluación remota', fr: 'Évaluation à distance' })
+      : t({ en: 'Information', es: 'Información', fr: 'Information' });
 
   const activeIdFor = (value: GroupEmailTemplateCategory) =>
     value === 'REMOTE_ASSIGNMENT' ? activeIds.assignment : activeIds.information;
@@ -359,7 +364,7 @@ export const GroupEmailTemplates = () => {
     event.preventDefault();
     if (!name.trim()) {
       addNotification({
-        message: t({ en: 'A name is required', fr: 'Un nom est requis' }),
+        message: t({ en: 'A name is required', es: 'Se requiere un nombre', fr: 'Un nom est requis' }),
         type: 'error'
       });
       return;
@@ -369,6 +374,7 @@ export const GroupEmailTemplates = () => {
       addNotification({
         message: t({
           en: 'A template with this name already exists',
+          es: 'Ya existe una plantilla con este nombre',
           fr: 'Un modèle avec ce nom existe déjà'
         }),
         type: 'error'
@@ -422,7 +428,7 @@ export const GroupEmailTemplates = () => {
       >
         <span className="flex-1 text-sm font-medium">{tpl.name}</span>
         <Button
-          aria-label={t({ en: 'Edit', fr: 'Modifier' })}
+          aria-label={t({ en: 'Edit', es: 'Editar', fr: 'Modifier' })}
           size="icon"
           type="button"
           variant="outline"
@@ -447,7 +453,7 @@ export const GroupEmailTemplates = () => {
             type="button"
             variant="primary"
           >
-            {t({ en: 'Default', fr: 'Par défaut' })}
+            {t({ en: 'Default', es: 'Predeterminado', fr: 'Par défaut' })}
           </Button>
         ) : (
           <Button
@@ -457,7 +463,7 @@ export const GroupEmailTemplates = () => {
             variant="outline"
             onClick={() => void handleSetActive(tpl)}
           >
-            {t({ en: 'Set default', fr: 'Définir par défaut' })}
+            {t({ en: 'Set default', es: 'Predeterminar', fr: 'Définir par défaut' })}
           </Button>
         )}
       </div>
@@ -471,11 +477,12 @@ export const GroupEmailTemplates = () => {
         <span className="flex-1 text-sm font-medium">
           {t({
             en: 'Your Open Data Capture Assignment (built-in)',
+            es: 'Su evaluación de Open Data Capture (integrado)',
             fr: 'Votre évaluation Open Data Capture (intégré)'
           })}
         </span>
         <Button
-          aria-label={t({ en: 'View', fr: 'Voir' })}
+          aria-label={t({ en: 'View', es: 'Ver', fr: 'Voir' })}
           size="icon"
           type="button"
           variant="outline"
@@ -491,7 +498,7 @@ export const GroupEmailTemplates = () => {
             type="button"
             variant="primary"
           >
-            {t({ en: 'Default', fr: 'Par défaut' })}
+            {t({ en: 'Default', es: 'Predeterminado', fr: 'Par défaut' })}
           </Button>
         ) : (
           <Button
@@ -501,7 +508,7 @@ export const GroupEmailTemplates = () => {
             variant="outline"
             onClick={() => void persist(templates, { assignment: null, information: activeIds.information })}
           >
-            {t({ en: 'Set default', fr: 'Définir par défaut' })}
+            {t({ en: 'Set default', es: 'Predeterminar', fr: 'Définir par défaut' })}
           </Button>
         )}
       </div>
@@ -524,12 +531,14 @@ export const GroupEmailTemplates = () => {
         <Heading className="mb-2" variant="h4">
           {t({
             en: 'Remote Assignment Templates',
+            es: 'Plantillas de evaluación remota',
             fr: "Modèles d'évaluation à distance"
           })}
         </Heading>
         <p className="text-muted-foreground mb-3 text-sm">
           {t({
             en: 'Used when emailing a remote assignment link.',
+            es: 'Se usa al enviar un enlace de evaluación remota por correo electrónico.',
             fr: "Utilisés lors de l'envoi d'un lien d'évaluation à distance."
           })}
         </p>
@@ -541,11 +550,12 @@ export const GroupEmailTemplates = () => {
 
       <div>
         <Heading className="mb-2" variant="h4">
-          {t({ en: 'Information Templates', fr: "Modèles d'information" })}
+          {t({ en: 'Information Templates', es: 'Plantillas de información', fr: "Modèles d'information" })}
         </Heading>
         <p className="text-muted-foreground mb-3 text-sm">
           {t({
             en: 'General study-related messages for your participants.',
+            es: 'Mensajes generales relacionados con el estudio para sus participantes.',
             fr: "Messages généraux liés à l'étude pour vos participants."
           })}
         </p>
@@ -555,6 +565,7 @@ export const GroupEmailTemplates = () => {
           <EmptyState>
             {t({
               en: 'No information templates yet — create one to get started.',
+              es: 'Aún no hay plantillas de información — cree una para comenzar.',
               fr: "Aucun modèle d'information — créez-en un pour commencer."
             })}
           </EmptyState>
@@ -565,7 +576,7 @@ export const GroupEmailTemplates = () => {
         className="flex flex-col gap-3 rounded-2xl border border-slate-200/60 p-5 dark:border-slate-700/60"
         onSubmit={(event) => void handleCreate(event)}
       >
-        <Heading variant="h5">{t({ en: 'New template', fr: 'Nouveau modèle' })}</Heading>
+        <Heading variant="h5">{t({ en: 'New template', es: 'Nueva plantilla', fr: 'Nouveau modèle' })}</Heading>
         <TemplateFields
           activeLanguages={activeLanguages}
           body={body}
@@ -581,7 +592,7 @@ export const GroupEmailTemplates = () => {
         />
         <div>
           <Button disabled={updateGroupMutation.isPending || Boolean(createBodyError)} type="submit">
-            {t({ en: 'Add template', fr: 'Ajouter le modèle' })}
+            {t({ en: 'Add template', es: 'Agregar plantilla', fr: 'Ajouter le modèle' })}
           </Button>
         </div>
       </form>
@@ -592,19 +603,21 @@ export const GroupEmailTemplates = () => {
             <Dialog.Title>
               {t({
                 en: 'Built-in default template',
+                es: 'Plantilla predeterminada integrada',
                 fr: 'Modèle par défaut intégré'
               })}
             </Dialog.Title>
             <Dialog.Description>
               {t({
                 en: 'This is the message sent for remote assignments when no custom template is active.',
+                es: 'Este es el mensaje enviado para las evaluaciones remotas cuando no hay una plantilla personalizada activa.',
                 fr: "Il s'agit du message envoyé pour les évaluations à distance lorsqu'aucun modèle personnalisé n'est actif."
               })}
             </Dialog.Description>
           </Dialog.Header>
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label>{t({ en: 'Language', fr: 'Langue' })}</Label>
+              <Label>{t({ en: 'Language', es: 'Idioma', fr: 'Langue' })}</Label>
               <Select value={defaultViewLang} onValueChange={setDefaultViewLang}>
                 <Select.Trigger className="w-[180px] border-sky-700 bg-sky-700 text-white hover:bg-sky-800 dark:border-sky-700 dark:bg-sky-700 dark:text-white dark:hover:bg-sky-800">
                   <Select.Value />
@@ -621,17 +634,17 @@ export const GroupEmailTemplates = () => {
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="default-tpl-subject">{t({ en: 'Subject', fr: 'Objet' })}</Label>
+              <Label htmlFor="default-tpl-subject">{t({ en: 'Subject', es: 'Asunto', fr: 'Objet' })}</Label>
               <Input readOnly id="default-tpl-subject" value={defaultTemplateSubject[defaultViewLang] ?? ''} />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="default-tpl-body">{t({ en: 'Body', fr: 'Corps' })}</Label>
+              <Label htmlFor="default-tpl-body">{t({ en: 'Body', es: 'Cuerpo', fr: 'Corps' })}</Label>
               <TextArea readOnly id="default-tpl-body" rows={8} value={defaultTemplateBody[defaultViewLang] ?? ''} />
             </div>
           </div>
           <Dialog.Footer>
             <Button type="button" variant="outline" onClick={() => setViewingDefault(false)}>
-              {t({ en: 'Close', fr: 'Fermer' })}
+              {t({ en: 'Close', es: 'Cerrar', fr: 'Fermer' })}
             </Button>
           </Dialog.Footer>
         </Dialog.Content>
@@ -640,7 +653,7 @@ export const GroupEmailTemplates = () => {
       <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
         <Dialog.Content className="max-w-lg">
           <Dialog.Header>
-            <Dialog.Title>{t({ en: 'Edit template', fr: 'Modifier le modèle' })}</Dialog.Title>
+            <Dialog.Title>{t({ en: 'Edit template', es: 'Editar plantilla', fr: 'Modifier le modèle' })}</Dialog.Title>
           </Dialog.Header>
           {editing && (
             <EditTemplateForm
@@ -660,12 +673,15 @@ export const GroupEmailTemplates = () => {
       <Dialog open={confirmCreate} onOpenChange={setConfirmCreate}>
         <Dialog.Content className="max-w-md">
           <Dialog.Header>
-            <Dialog.Title>{t({ en: 'Missing translations', fr: 'Traductions manquantes' })}</Dialog.Title>
+            <Dialog.Title>
+              {t({ en: 'Missing translations', es: 'Traducciones faltantes', fr: 'Traductions manquantes' })}
+            </Dialog.Title>
           </Dialog.Header>
           <Dialog.Description>
             {t(
               {
                 en: 'Warning: This template is missing translations for: {}.',
+                es: 'Advertencia: Esta plantilla no tiene traducciones para: {}.',
                 fr: 'Attention : Ce modèle est sans traduction pour : {}.'
               },
               { args: [missingLanguages.map((code) => ALL_LANGUAGES[code] ?? code).join(', ')] }
@@ -683,7 +699,7 @@ export const GroupEmailTemplates = () => {
                 void doCreate();
               }}
             >
-              {t({ en: 'Add anyway', fr: 'Ajouter quand même' })}
+              {t({ en: 'Add anyway', es: 'Agregar de todos modos', fr: 'Ajouter quand même' })}
             </Button>
           </Dialog.Footer>
         </Dialog.Content>

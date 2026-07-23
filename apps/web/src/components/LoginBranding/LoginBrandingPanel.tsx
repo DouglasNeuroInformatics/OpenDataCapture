@@ -222,7 +222,8 @@ export const LoginBrandingPanel = ({
   preview = false
 }: LoginBrandingPanelProps) => {
   const { resolvedLanguage } = useTranslation();
-  const lang = langOverride ?? resolvedLanguage;
+  const lang: 'en' | 'fr' =
+    langOverride ?? (resolvedLanguage === 'en' || resolvedLanguage === 'fr' ? resolvedLanguage : 'en');
 
   const tl = (obj: { en: string; fr: string }): string => obj[lang];
 

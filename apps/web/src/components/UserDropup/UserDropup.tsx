@@ -59,6 +59,7 @@ export const UserDropup = () => {
             <Info />
             {t({
               en: 'About',
+              es: 'Acerca de',
               fr: 'Information'
             })}
           </DropdownMenu.Item>
@@ -72,6 +73,7 @@ export const UserDropup = () => {
             <SettingsIcon />
             {t({
               en: 'Preferences',
+              es: 'Preferencias',
               fr: 'Préférences'
             })}
           </DropdownMenu.Item>
@@ -86,6 +88,7 @@ export const UserDropup = () => {
             <SchoolIcon />
             {t({
               en: 'Tutorial',
+              es: 'Tutorial',
               fr: 'Tutoriel'
             })}
           </DropdownMenu.Item>
@@ -97,6 +100,7 @@ export const UserDropup = () => {
             <LogOutIcon />
             {t({
               en: 'Logout',
+              es: 'Cerrar sesión',
               fr: 'Se déconnecter'
             })}
           </DropdownMenu.Item>

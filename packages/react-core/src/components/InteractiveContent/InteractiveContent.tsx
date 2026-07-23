@@ -63,7 +63,7 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
   const isLocked = Boolean(enableLanguageLock) && hasSelectedLanguage;
 
   const handleChangeLanguageEvent = useCallback(
-    (event: CustomEvent<Language>) => {
+    (event: CustomEvent<string>) => {
       if (event.detail !== 'en' && event.detail !== 'fr') {
         console.error(`Cannot change language: invalid language '${event.detail}', expected 'en' or 'fr'`);
         return;
@@ -179,7 +179,11 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
                         changeLanguage(language);
                       }}
                     >
-                      {ALL_LANGUAGES[language][resolvedLanguage]}
+                      {
+                        ALL_LANGUAGES[language][
+                          resolvedLanguage === 'en' || resolvedLanguage === 'fr' ? resolvedLanguage : 'en'
+                        ]
+                      }
                     </DropdownMenu.Item>
                   ))}
                 </DropdownMenu.Content>

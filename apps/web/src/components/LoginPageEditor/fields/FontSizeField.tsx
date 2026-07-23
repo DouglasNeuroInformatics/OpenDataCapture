@@ -15,7 +15,7 @@ export const FontSizeField = ({ id, onChange, value }: FontSizeFieldProps) => {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor={id}>{t({ en: 'Font size', fr: 'Taille de police' })}</Label>
+      <Label htmlFor={id}>{t({ en: 'Font size', es: 'Tamaño de fuente', fr: 'Taille de police' })}</Label>
       <Select
         value={value === null ? FONT_SIZE_DEFAULT : String(value)}
         onValueChange={(v) => onChange(v === FONT_SIZE_DEFAULT ? null : Number(v))}
@@ -25,7 +25,9 @@ export const FontSizeField = ({ id, onChange, value }: FontSizeFieldProps) => {
         </Select.Trigger>
         <Select.Content>
           <Select.Group>
-            <Select.Item value={FONT_SIZE_DEFAULT}>{t({ en: 'Default', fr: 'Par défaut' })}</Select.Item>
+            <Select.Item value={FONT_SIZE_DEFAULT}>
+              {t({ en: 'Default', es: 'Predeterminado', fr: 'Par défaut' })}
+            </Select.Item>
             {FONT_SIZES.map((s) => (
               <Select.Item key={s} value={String(s)}>{`${s} px`}</Select.Item>
             ))}

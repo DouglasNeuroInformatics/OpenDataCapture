@@ -44,7 +44,11 @@ export const ColorField = ({
       </div>
       {isInvalid && (
         <p className="text-destructive text-xs">
-          {t({ en: 'Enter a valid hex color.', fr: 'Entrez une couleur hexadécimale valide.' })}
+          {t({
+            en: 'Enter a valid hex color.',
+            es: 'Ingrese un color hexadecimal válido.',
+            fr: 'Entrez une couleur hexadécimale valide.'
+          })}
         </p>
       )}
     </div>

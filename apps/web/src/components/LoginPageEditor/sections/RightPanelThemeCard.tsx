@@ -17,11 +17,16 @@ export const RightPanelThemeCard = ({ editor }: { editor: BrandingEditor }) => {
     <Card>
       <Card.Header>
         <Card.Title>
-          {t({ en: 'Background Theme - Right Panel', fr: "Thème d'arrière-plan - Panneau droit" })}
+          {t({
+            en: 'Background Theme - Right Panel',
+            es: 'Tema de fondo - Panel derecho',
+            fr: "Thème d'arrière-plan - Panneau droit"
+          })}
         </Card.Title>
         <Card.Description>
           {t({
             en: 'The gradient applied behind the login form.',
+            es: 'El degradado aplicado detrás del formulario de inicio de sesión.',
             fr: 'Le dégradé appliqué derrière le formulaire de connexion.'
           })}
         </Card.Description>
@@ -58,14 +63,14 @@ export const RightPanelThemeCard = ({ editor }: { editor: BrandingEditor }) => {
           <div className="grid gap-4 sm:grid-cols-2">
             <ColorField
               id="rightPanelPrimaryColor"
-              label={t({ en: 'Gradient Start', fr: 'Début du dégradé' })}
+              label={t({ en: 'Gradient Start', es: 'Inicio del degradado', fr: 'Début du dégradé' })}
               swatchFallback="#ffffff"
               value={form.rightPanelPrimaryColor}
               onChange={(v) => update('rightPanelPrimaryColor', v)}
             />
             <ColorField
               id="rightPanelSecondaryColor"
-              label={t({ en: 'Gradient End', fr: 'Fin du dégradé' })}
+              label={t({ en: 'Gradient End', es: 'Fin del degradado', fr: 'Fin du dégradé' })}
               swatchFallback="#ffffff"
               value={form.rightPanelSecondaryColor}
               onChange={(v) => update('rightPanelSecondaryColor', v)}

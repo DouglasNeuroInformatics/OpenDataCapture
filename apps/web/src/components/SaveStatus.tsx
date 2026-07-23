@@ -13,12 +13,14 @@ export const SaveStatus = ({ state }: { state: 'idle' | 'saved' | 'saving' }) =>
       {state === 'saving' ? (
         <React.Fragment>
           <Loader2Icon className="text-muted-foreground h-3.5 w-3.5 animate-spin" />
-          <span className="text-muted-foreground">{t({ en: 'Saving…', fr: 'Enregistrement…' })}</span>
+          <span className="text-muted-foreground">{t({ en: 'Saving…', es: 'Guardando…', fr: 'Enregistrement…' })}</span>
         </React.Fragment>
       ) : (
         <React.Fragment>
           <CheckIcon className="h-3.5 w-3.5 text-green-600" />
-          <span>{t({ en: 'All changes saved', fr: 'Modifications enregistrées' })}</span>
+          <span>
+            {t({ en: 'All changes saved', es: 'Todos los cambios guardados', fr: 'Modifications enregistrées' })}
+          </span>
         </React.Fragment>
       )}
     </div>

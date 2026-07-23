@@ -18,14 +18,22 @@ export function useCreateInstrumentRepoMutation() {
       addNotification({
         message: getApiErrorMessage(
           err,
-          t({ en: 'Failed to import repository', fr: "Échec de l'importation du dépôt" })
+          t({
+            en: 'Failed to import repository',
+            es: 'Error al importar el repositorio',
+            fr: "Échec de l'importation du dépôt"
+          })
         ),
         type: 'error'
       });
     },
     onSuccess() {
       addNotification({
-        message: t({ en: 'Repository imported successfully', fr: 'Dépôt importé avec succès' }),
+        message: t({
+          en: 'Repository imported successfully',
+          es: 'Repositorio importado exitosamente',
+          fr: 'Dépôt importé avec succès'
+        }),
         type: 'success'
       });
       void queryClient.invalidateQueries({ queryKey: [INSTRUMENT_REPOS_QUERY_KEY] });

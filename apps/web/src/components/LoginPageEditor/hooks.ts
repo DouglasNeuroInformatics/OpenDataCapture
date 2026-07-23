@@ -99,8 +99,12 @@ export const useBrandingForm = () => {
 
   const updateSetupStateMutation = useUpdateSetupStateMutation({
     successNotification: {
-      message: t({ en: 'The login page has been updated.', fr: 'La page de connexion a été mise à jour.' }),
-      title: t({ en: 'Success', fr: 'Succès' })
+      message: t({
+        en: 'The login page has been updated.',
+        es: 'La página de inicio de sesión ha sido actualizada.',
+        fr: 'La page de connexion a été mise à jour.'
+      }),
+      title: t({ en: 'Success', es: 'Éxito', fr: 'Succès' })
     }
   });
 
@@ -191,9 +195,14 @@ export const useBrandingForm = () => {
       addNotification({
         message: t({
           en: 'The selected file must be an SVG, PNG, JPEG, or WebP image.',
+          es: 'El archivo seleccionado debe ser una imagen SVG, PNG, JPEG o WebP.',
           fr: 'Le fichier sélectionné doit être une image SVG, PNG, JPEG ou WebP.'
         }),
-        title: t({ en: 'Unsupported file type', fr: 'Type de fichier non pris en charge' }),
+        title: t({
+          en: 'Unsupported file type',
+          es: 'Tipo de archivo no compatible',
+          fr: 'Type de fichier non pris en charge'
+        }),
         type: 'error'
       });
       return;
@@ -201,8 +210,12 @@ export const useBrandingForm = () => {
       // Checked against the file as picked; the stored copy is usually far
       // smaller, since a raster upload is re-encoded to WebP below.
       addNotification({
-        message: t({ en: 'The selected image is larger than 2 MB.', fr: "L'image sélectionnée dépasse 2 Mo." }),
-        title: t({ en: 'File too large', fr: 'Fichier trop volumineux' }),
+        message: t({
+          en: 'The selected image is larger than 2 MB.',
+          es: 'La imagen seleccionada supera los 2 MB.',
+          fr: "L'image sélectionnée dépasse 2 Mo."
+        }),
+        title: t({ en: 'File too large', es: 'Archivo demasiado grande', fr: 'Fichier trop volumineux' }),
         type: 'error'
       });
       return;
@@ -214,9 +227,10 @@ export const useBrandingForm = () => {
         addNotification({
           message: t({
             en: 'The selected file could not be read as an image.',
+            es: 'El archivo seleccionado no se pudo leer como una imagen.',
             fr: "Le fichier sélectionné n'a pas pu être lu comme une image."
           }),
-          title: t({ en: 'Invalid image', fr: 'Image invalide' }),
+          title: t({ en: 'Invalid image', es: 'Imagen no válida', fr: 'Image invalide' }),
           type: 'error'
         });
       });
