@@ -19,4 +19,9 @@ export type InterpretedInstrumentState<T extends AnyUnilingualInstrument = AnyUn
   | { instrument: T; status: 'DONE' }
   | { status: 'LOADING' };
 
+/** A localizable string: per-language text that a component resolves with `t()` to the active language. */
+export type LocalizedText = {
+  [L in Language]?: string;
+};
+
 export type SubjectDisplayInfo = Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;

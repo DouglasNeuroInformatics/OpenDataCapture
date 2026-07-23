@@ -53,6 +53,27 @@ const $BrandingText = z.object({
  */
 const RESOURCE_LINK_URL_PATTERN = /^https?:\/\/[^\s/]+\.[^\s/]+(\/\S*)?$/;
 
+/**
+ * Both logo fields render into `<img src>`, so — like resource-link hrefs — they
+ * must be restricted here to values that can only ever load an image; otherwise a
+ * crafted `javascript:` or `data:text/html` value would be a script-injection
+ * vector. An uploaded logo is a base64 data URI of some image type, while
+ * `customLogoSrc` may also hold an http(s) URL for logos saved before
+ * `customLogoUrl` existed (see `logoSource`).
+ *
+ * Any `image/*` subtype is allowed rather than just the four the editor offers:
+ * this schema also gates reads, where a rejected value drops the whole branding
+ * config, so it must stay permissive enough for images saved by earlier versions.
+ * The narrower list the editor accepts is enforced client-side.
+ *
+ * Note this admits `image/svg+xml`, which can carry script. That is only safe
+ * because every consumer renders the logo through `<img src>`, where SVG script
+ * does not execute. Inlining it instead — `dangerouslySetInnerHTML`, `<object>`,
+ * a CSS `mask` — would reintroduce the injection this pattern exists to prevent.
+ */
+const LOGO_DATA_URI_PATTERN = /^data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/]+={0,2}$/;
+const HTTP_URL_SCHEME_PATTERN = /^https?:\/\//;
+
 /** A single resource link displayed in the branding panel. */
 const $ResourceLink = z.object({
   href: z.string().max(2000).regex(RESOURCE_LINK_URL_PATTERN, 'Must be an http(s) URL'),
@@ -81,10 +102,20 @@ const $BrandingConfig = z.object({
   boldTagline: z.boolean().nullish(),
   /** Custom logo height in pixels, used when logoSize is 'custom' */
   customLogoHeight: z.number().int().positive().max(5000).nullish(),
-  /** The uploaded logo image as a data URI (SVG, PNG, JPEG, …); used when logoSource is 'upload' */
-  customLogoSrc: z.string().max(3_000_000).nullish(),
+  /**
+   * The uploaded logo image as a data URI (SVG, PNG, JPEG, WebP); used when logoSource is 'upload'.
+   * The limit accommodates a 2 MB source image, which is ~2.74M characters once base64-encoded.
+   */
+  customLogoSrc: z
+    .string()
+    .max(3_000_000)
+    .refine(
+      (value) => LOGO_DATA_URI_PATTERN.test(value) || HTTP_URL_SCHEME_PATTERN.test(value),
+      'Must be a base64 image data URI, or an http(s) URL'
+    )
+    .nullish(),
   /** An external logo image URL; used when logoSource is 'url' */
-  customLogoUrl: z.string().url().max(2000).nullish(),
+  customLogoUrl: z.string().url().max(2000).regex(HTTP_URL_SCHEME_PATTERN, 'Must be an http(s) URL').nullish(),
   /** Custom logo width in pixels, used when logoSize is 'custom' */
   customLogoWidth: z.number().int().positive().max(5000).nullish(),
   /** The starting gradient color, used when loginTheme is 'custom' */

@@ -18,22 +18,28 @@ const parseAccessToken = (accessToken: string) => {
   };
 };
 
-export const createAuthSlice: SliceCreator<AuthSlice> = (set) => {
+export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => {
   const accessToken = window.__PLAYWRIGHT_ACCESS_TOKEN__ ?? null;
   const initialState = accessToken ? parseAccessToken(accessToken) : null;
 
   return {
     accessToken,
     changeGroup: (group) => {
-      set({ currentGroup: group, currentSession: null });
+      set({ currentGroup: group, currentSession: null, preferredGroupId: group.id });
     },
     currentGroup: initialState?.currentGroup ?? null,
     currentUser: initialState?.currentUser ?? null,
     login: (accessToken) => {
       const { currentGroup, currentUser } = parseAccessToken(accessToken);
+      // Restore the group last used on this device. A different user signing in on the same browser
+      // will not belong to it, in which case we fall back to the first group on their token.
+      const { preferredGroupId } = get();
+      const preferred = preferredGroupId
+        ? currentUser.groups.find((group) => group.id === preferredGroupId)
+        : undefined;
       set({
         accessToken,
-        currentGroup,
+        currentGroup: preferred ?? currentGroup,
         currentUser
       });
     },

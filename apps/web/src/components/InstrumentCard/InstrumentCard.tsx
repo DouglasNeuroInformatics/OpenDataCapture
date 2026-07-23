@@ -48,7 +48,7 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
         en: 'Edition',
         fr: 'Édition'
       }),
-      text: instrument.internal?.edition.toString()
+      text: instrument.kind === 'SERIES' ? undefined : instrument.internal.edition.toString()
     },
     {
       kind: 'text',

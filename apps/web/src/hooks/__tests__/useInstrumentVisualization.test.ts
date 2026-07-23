@@ -23,11 +23,20 @@ const mockDownloadFn = vi.fn();
 const mockExcelDownloadFn = vi.hoisted(() => vi.fn());
 
 const mockInfoQuery: {
-  data: {
-    details: { title: string };
-    id: string;
-    internal?: { edition: number; name: string };
-  }[];
+  data: (
+    | {
+        details: { title: string };
+        id: string;
+        internal: { edition: number; name: string };
+        kind: 'FORM';
+      }
+    | {
+        details: { title: string };
+        id: string;
+        kind: 'SERIES';
+        seriesItems: { id: string }[];
+      }
+  )[];
 } = {
   data: []
 };
@@ -221,8 +230,18 @@ describe('useInstrumentVisualization', () => {
   describe('editions', () => {
     it('should list only the latest edition of an instrument, with every edition available as an option', async () => {
       mockInfoQuery.data = [
-        { details: { title: 'Happiness Questionnaire' }, id: 'hq-1', internal: { edition: 1, name: 'HQ' } },
-        { details: { title: 'Happiness Questionnaire' }, id: 'hq-2', internal: { edition: 2, name: 'HQ' } }
+        {
+          details: { title: 'Happiness Questionnaire' },
+          id: 'hq-1',
+          internal: { edition: 1, name: 'HQ' },
+          kind: 'FORM'
+        },
+        {
+          details: { title: 'Happiness Questionnaire' },
+          id: 'hq-2',
+          internal: { edition: 2, name: 'HQ' },
+          kind: 'FORM'
+        }
       ];
       const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
       expect(result.current.instrumentOptions).toEqual({ 'hq-2': 'Happiness Questionnaire' });
@@ -231,6 +250,32 @@ describe('useInstrumentVisualization', () => {
       await waitFor(() => {
         expect(Object.keys(result.current.editionOptions)).toEqual(['hq-1', 'hq-2']);
       });
+    });
+
+    it('should list each series separately without edition options', () => {
+      mockInfoQuery.data = [
+        {
+          details: { title: 'Intake Series' },
+          id: 'series-1',
+          kind: 'SERIES',
+          seriesItems: [{ id: 'hq-1' }]
+        },
+        {
+          details: { title: 'Follow-up Series' },
+          id: 'series-2',
+          kind: 'SERIES',
+          seriesItems: [{ id: 'hq-2' }]
+        }
+      ];
+
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
+
+      expect(result.current.instrumentOptions).toEqual({
+        'series-1': 'Intake Series',
+        'series-2': 'Follow-up Series'
+      });
+      act(() => result.current.setInstrumentId('series-1'));
+      expect(result.current.editionOptions).toEqual({});
     });
   });
   describe('JSON', () => {

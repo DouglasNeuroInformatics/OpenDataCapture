@@ -12,12 +12,16 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useNavItems } from '@/hooks/useNavItems';
 import { useAppStore } from '@/store';
 
+import { GroupSwitcher, useIsGroupSwitcherVisible } from '../GroupSwitcher';
 import { NavButton } from '../NavButton';
+import { NavGroup } from '../NavGroup';
 import { UserDropup } from '../UserDropup';
 
 export const Sidebar = () => {
   const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false);
 
+  const groupSwitcherPosition = useAppStore((store) => store.groupSwitcherPosition);
+  const isGroupSwitcherVisible = useIsGroupSwitcherVisible();
   const navItems = useNavItems();
   const currentSession = useAppStore((store) => store.currentSession);
   const endSession = useAppStore((store) => store.endSession);
@@ -25,6 +29,7 @@ export const Sidebar = () => {
   const navigate = useNavigate();
 
   const { t } = useTranslation();
+
   return (
     <div
       className="flex h-screen w-[19rem] flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700"
@@ -34,18 +39,28 @@ export const Sidebar = () => {
         <Branding className="h-12" fontSize="md" logoVariant="light" />
       </div>
       <hr className="my-2 h-[1px] border-none bg-slate-700" />
+      {groupSwitcherPosition === 'sidebar' && isGroupSwitcherVisible && (
+        <div className="mb-2">
+          <GroupSwitcher />
+          <hr className="mt-2 h-[1px] border-none bg-slate-700" />
+        </div>
+      )}
       <nav className="flex w-full flex-col divide-y divide-slate-700">
         {navItems.map((items, i) => (
           <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
-            {items.map(({ disabled, url, ...props }) => (
-              <NavButton
-                disabled={disabled && location.pathname !== url}
-                isActive={location.pathname === url}
-                key={url}
-                url={url}
-                {...props}
-              />
-            ))}
+            {items.map(({ disabled, url, ...props }) =>
+              props.children ? (
+                <NavGroup icon={props.icon} items={props.children} key={props.label} label={props.label} />
+              ) : (
+                <NavButton
+                  disabled={disabled && location.pathname !== url}
+                  isActive={location.pathname === url}
+                  key={url}
+                  url={url!}
+                  {...props}
+                />
+              )
+            )}
             {i === navItems.length - 1 && (
               <Dialog open={isEndSessionModalOpen} onOpenChange={setIsEndSessionModalOpen}>
                 <Dialog.Trigger asChild>

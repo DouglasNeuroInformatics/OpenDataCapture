@@ -7,7 +7,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ConfigService } from '@douglasneuroinformatics/libnest';
-import { Injectable, Optional, ServiceUnavailableException } from '@nestjs/common';
+import { Inject, Injectable, Optional, ServiceUnavailableException } from '@nestjs/common';
 import type { OnModuleInit } from '@nestjs/common';
 import type { $FileLocation, $PresignedUrlInfo } from '@opendatacapture/schemas/storage';
 
@@ -28,7 +28,7 @@ export class StorageService implements OnModuleInit {
 
   constructor(
     private readonly configService: ConfigService,
-    @Optional() private readonly s3: null | S3Client
+    @Optional() @Inject(S3Client) private readonly s3: null | S3Client
   ) {
     this.enabled = !!this.configService.get('STORAGE_ENABLED');
     this.bucket = this.configService.get('STORAGE_BUCKET');
