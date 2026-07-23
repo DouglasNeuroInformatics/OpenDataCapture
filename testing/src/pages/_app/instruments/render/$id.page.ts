@@ -8,14 +8,22 @@ import { AppPage } from '../../route.page';
  */
 export class RenderInstrumentPage extends AppPage {
   readonly beginButton: Locator;
+  /** An inline JSX `block` rendered amongst the groups of the General Consent Form. */
+  readonly consentPreamble: Locator;
   readonly submitButton: Locator;
   readonly summaryHeading: Locator;
 
   constructor(page: Page) {
     super(page);
     this.beginButton = page.getByRole('button', { name: 'Begin' });
+    this.consentPreamble = page.getByTestId('consent-preamble');
     this.submitButton = page.getByRole('button', { name: 'Submit' });
     this.summaryHeading = page.getByRole('heading', { name: /Summary of Results/i });
+  }
+
+  /** Accepts the General Consent Form by selecting the affirmative radio option. */
+  async acceptConsent(): Promise<void> {
+    await this.$ref.getByRole('radio', { name: /I have read/ }).click();
   }
 
   async begin(): Promise<void> {
