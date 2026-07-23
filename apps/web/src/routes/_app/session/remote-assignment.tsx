@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Dialog, Form, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
+import { DEFAULT_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/assignment';
 import type { CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
@@ -14,9 +15,10 @@ import { QRCode } from '@/components/QRCode';
 import { WithFallback } from '@/components/WithFallback';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 
-const ONE_YEAR = 31556952000;
+const MS_PER_DAY = 86_400_000;
 
 /** Slide-over panel shown after an assignment is created, displaying the URL, copy button, and QR code */
 const AssignmentResultSlider: React.FC<{
@@ -81,7 +83,10 @@ const RouteComponent = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const instrumentInfoQuery = useInstrumentInfoQuery();
+  const setupStateQuery = useSetupStateQuery();
   const createAssignmentMutation = useCreateAssignment();
+
+  const durationDays = setupStateQuery.data.defaultAssignmentDurationDays ?? DEFAULT_ASSIGNMENT_DURATION_DAYS;
 
   const [selectedInstrument, setSelectedInstrument] = useState<null | TranslatedInstrumentInfo>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -153,7 +158,7 @@ const RouteComponent = () => {
               }
             }}
             initialValues={{
-              expiresAt: new Date(Date.now() + ONE_YEAR)
+              expiresAt: new Date(Date.now() + durationDays * MS_PER_DAY)
             }}
             validationSchema={
               z.object({

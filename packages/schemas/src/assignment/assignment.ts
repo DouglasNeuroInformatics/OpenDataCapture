@@ -7,6 +7,9 @@ export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUT
 
 export type AssignmentStatus = z.infer<typeof $AssignmentStatus>;
 
+/** Fallback validity period (in days) for a new remote assignment when the instance has not configured one. */
+export const DEFAULT_ASSIGNMENT_DURATION_DAYS = 365;
+
 /**
  * An self-contained object representing an assignment.
  */

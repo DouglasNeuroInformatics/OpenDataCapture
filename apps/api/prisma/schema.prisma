@@ -386,6 +386,7 @@ model SetupState {
   updatedAt                     DateTime        @updatedAt @db.Date
   id                            String          @id @default(auto()) @map("_id") @db.ObjectId
   branding                      BrandingConfig?
+  defaultAssignmentDurationDays Int?
   isDemo                        Boolean
   isExperimentalFeaturesEnabled Boolean?
   isSetup                       Boolean
