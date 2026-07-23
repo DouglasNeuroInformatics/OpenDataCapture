@@ -6,6 +6,7 @@ import { ForbiddenException, NotFoundException, UnprocessableEntityException } f
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 import { StorageService } from '@/storage/storage.service';
 import { UsersService } from '@/users/users.service';
 
@@ -313,7 +314,23 @@ describe('InstrumentRecordsService', () => {
 
       expect(sessionModel.findMany).toHaveBeenCalledWith({
         select: { id: true, user: { select: { username: true } } },
-        where: { id: { in: ['session-1', 'session-2'] } }
+        where: { AND: [{}, { id: { in: ['session-1', 'session-2'] } }] }
+      });
+    });
+
+    it('should scope the session lookup to the sessions the caller may read, so a readable record referencing an unreadable session leaks no username', async () => {
+      const ability = createAppAbility([
+        { action: 'read', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' },
+        { action: 'read', conditions: { groupId: 'group-1' }, subject: 'Session' }
+      ]);
+      instrumentRecordModel.findMany.mockResolvedValueOnce([{ id: 'record-1', sessionId: 'session-1' }]);
+      sessionModel.findMany.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.find({}, { ability });
+
+      expect(sessionModel.findMany).toHaveBeenCalledWith({
+        select: { id: true, user: { select: { username: true } } },
+        where: { AND: [accessibleQuery(ability, 'read', 'Session'), { id: { in: ['session-1'] } }] }
       });
     });
 

@@ -275,7 +275,7 @@ export class InstrumentRecordsService {
       }
     });
 
-    return this.withSessionUsernames(records);
+    return this.withSessionUsernames(records, ability);
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
@@ -584,13 +584,21 @@ export class InstrumentRecordsService {
    * record's session has since been deleted. Looking the sessions up by id degrades to a missing
    * username for that record instead of a failed request.
    */
-  private async withSessionUsernames(records: PrismaInstrumentRecord[]): Promise<InstrumentRecord[]> {
+  private async withSessionUsernames(
+    records: PrismaInstrumentRecord[],
+    ability?: AppAbility
+  ): Promise<InstrumentRecord[]> {
     if (records.length === 0) {
       return [];
     }
     const sessions = await this.sessionModel.findMany({
       select: { id: true, user: { select: { username: true } } },
-      where: { id: { in: Array.from(new Set(records.map((record) => record.sessionId))) } }
+      where: {
+        AND: [
+          accessibleQuery(ability, 'read', 'Session'),
+          { id: { in: Array.from(new Set(records.map((record) => record.sessionId))) } }
+        ]
+      }
     });
     const usernameBySessionId = new Map(sessions.map((session) => [session.id, session.user?.username ?? null]));
     return records.map((record) => ({
