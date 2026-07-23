@@ -230,6 +230,12 @@ describe('buildSendRequest', () => {
     const b = buildSendRequest(sesConfig, message, fixedNow);
     expect(a.headers.authorization).toBe(b.headers.authorization);
   });
+
+  it('rejects an AWS region that would inject a different request host', () => {
+    expect(() => buildSendRequest({ ...sesConfig, awsRegion: 'evil.example/' }, message, fixedNow)).toThrow(
+      'Invalid AWS region'
+    );
+  });
 });
 
 describe('buildVerifyRequest', () => {
@@ -250,6 +256,12 @@ describe('buildVerifyRequest', () => {
     const request = buildVerifyRequest(postmarkConfig);
     expect(request.url).toBe('https://api.postmarkapp.com/server');
     expect(request.headers['X-Postmark-Server-Token']).toBe('postmark-token');
+  });
+
+  it('rejects an AWS region that would inject a different request host', () => {
+    expect(() => buildVerifyRequest({ ...sesConfig, awsRegion: 'evil.example/' }, fixedNow)).toThrow(
+      'Invalid AWS region'
+    );
   });
 
   it('builds a SigV4-signed SES account lookup without a content-type header', () => {

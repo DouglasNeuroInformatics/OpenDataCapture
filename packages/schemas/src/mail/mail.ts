@@ -147,6 +147,15 @@ const checkTransportFields = (ctx: z.core.ParsePayload<TransportCheckValue>) => 
         message: 'An AWS region is required for Amazon SES',
         path: ['awsRegion']
       });
+    } else if (!/^[a-z0-9-]+$/.test(value.awsRegion)) {
+      // The region is interpolated into the SES request host, so it is constrained to the AWS
+      // region character set here at the boundary to prevent a crafted value redirecting the request.
+      ctx.issues.push({
+        code: 'custom',
+        input: value.awsRegion,
+        message: 'AWS region may contain only lowercase letters, digits, and hyphens',
+        path: ['awsRegion']
+      });
     }
     if (!value.awsAccessKeyId) {
       ctx.issues.push({

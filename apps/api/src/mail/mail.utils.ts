@@ -9,6 +9,21 @@ function mailgunBaseUrl(region: MailConfig['region']): string {
   return region === 'eu' ? 'https://api.eu.mailgun.net' : 'https://api.mailgun.net';
 }
 
+/** AWS region names are lowercase alphanumerics and hyphens (e.g. `us-east-1`, `eu-west-2`). */
+const AWS_REGION_PATTERN = /^[a-z0-9-]+$/;
+
+/**
+ * Build the SES endpoint host from the configured region. The region is interpolated into the
+ * request host, so it is validated against {@link AWS_REGION_PATTERN} first: without this a crafted
+ * value (e.g. `evil.example/`) could redirect the request to an attacker-controlled host (SSRF).
+ */
+function sesHost(awsRegion: string): string {
+  if (!AWS_REGION_PATTERN.test(awsRegion)) {
+    throw new Error(`Invalid AWS region: ${awsRegion}`);
+  }
+  return `email.${awsRegion}.amazonaws.com`;
+}
+
 /** HTTP Basic `Authorization` header value for the given credentials. */
 function basicAuth(user: string, pass: string): string {
   return `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}`;
@@ -213,7 +228,7 @@ export function buildSendRequest(config: MailConfig, message: MailMessage, now: 
       };
     }
     case 'ses': {
-      const host = `email.${config.awsRegion}.amazonaws.com`;
+      const host = sesHost(config.awsRegion);
       const path = '/v2/email/outbound-emails';
       const body = JSON.stringify({
         Content: {
@@ -293,7 +308,7 @@ export function buildVerifyRequest(config: MailConfig, now: Date = new Date()): 
       };
     }
     case 'ses': {
-      const host = `email.${config.awsRegion}.amazonaws.com`;
+      const host = sesHost(config.awsRegion);
       const path = '/v2/account';
       const signed = signAwsV4({
         accessKeyId: config.awsAccessKeyId,
