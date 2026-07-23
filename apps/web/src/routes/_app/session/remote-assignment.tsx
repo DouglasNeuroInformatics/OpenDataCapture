@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button, Dialog, Form, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
+import { Button, Dialog, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
-import type { CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { z } from 'zod/v4';
 
+import { AssignmentEmailForm } from '@/components/AssignmentEmailForm';
 import { InstrumentShowcase } from '@/components/InstrumentShowcase';
 import { PageHeader } from '@/components/PageHeader';
 import { QRCode } from '@/components/QRCode';
@@ -18,14 +18,64 @@ import { useAppStore } from '@/store';
 
 const ONE_YEAR = 31556952000;
 
+const CreateAssignmentForm: React.FC<{
+  isPending: boolean;
+  onSubmit: (expiresAt: Date) => Promise<void>;
+}> = ({ isPending, onSubmit }) => {
+  const { t } = useTranslation();
+  const [expiresAt, setExpiresAt] = useState(toBasicISOString(new Date(Date.now() + ONE_YEAR)));
+  const [error, setError] = useState<null | string>(null);
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const date = new Date(expiresAt);
+    if (isNaN(date.getTime()) || date <= new Date()) {
+      setError(
+        t({
+          en: 'Expiry date must be a valid date in the future',
+          fr: "La date d'expiration doit être une date valide dans le futur"
+        })
+      );
+      return;
+    }
+    setError(null);
+    void onSubmit(date);
+  };
+
+  return (
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="expires-at">{t({ en: 'Expires At', fr: "Date d'expiration" })}</Label>
+        <Input
+          id="expires-at"
+          placeholder="YYYY-MM-DD"
+          type="text"
+          value={expiresAt}
+          onChange={(event) => {
+            setExpiresAt(event.target.value);
+            setError(null);
+          }}
+        />
+        {error && <p className="text-destructive text-xs font-medium">{error}</p>}
+      </div>
+      <Button className="w-full" disabled={isPending} type="submit" variant="primary">
+        {isPending ? t({ en: 'Creating…', fr: 'Création…' }) : t({ en: 'Submit', fr: 'Soumettre' })}
+      </Button>
+    </form>
+  );
+};
+
 /** Slide-over panel shown after an assignment is created, displaying the URL, copy button, and QR code */
 const AssignmentResultSlider: React.FC<{
+  assignmentId: string | undefined;
+  instrumentLanguages?: string[];
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   title: string | undefined;
   url: string | undefined;
-}> = ({ isOpen, setIsOpen, title, url }) => {
+}> = ({ assignmentId, instrumentLanguages, isOpen, setIsOpen, title, url }) => {
   const { t } = useTranslation();
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <Sheet.Content className="flex h-full flex-col">
@@ -38,7 +88,7 @@ const AssignmentResultSlider: React.FC<{
             })}
           </Sheet.Description>
         </Sheet.Header>
-        <Sheet.Body className="grow">
+        <Sheet.Body className="min-h-0 flex-1 overflow-y-auto">
           <div className="flex flex-col gap-3">
             <Label asChild>
               <a className="hover:underline" href={url} rel="noreferrer" target="_blank">
@@ -53,6 +103,7 @@ const AssignmentResultSlider: React.FC<{
               <CopyButton size="sm" text={url ?? ''} variant="outline" />
             </div>
             <QRCode url={url ?? 'javascript:void(0)'} />
+            <AssignmentEmailForm assignmentId={assignmentId} instrumentLanguages={instrumentLanguages} />
           </div>
         </Sheet.Body>
         <Sheet.Footer>
@@ -87,12 +138,18 @@ const RouteComponent = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isResultSliderOpen, setIsResultSliderOpen] = useState(false);
   const [assignmentUrl, setAssignmentUrl] = useState<string | undefined>(undefined);
+  const [assignmentId, setAssignmentId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (!currentSession) {
       void navigate({ to: '/session/start-session' });
     }
   }, [currentSession]);
+
+  useEffect(() => {
+    const input = document.querySelector<HTMLInputElement>('[data-testid="instrument-search-bar"] input');
+    input?.focus();
+  }, []);
 
   if (!currentSession) {
     return null;
@@ -141,31 +198,9 @@ const RouteComponent = () => {
               )}
             </Dialog.Description>
           </Dialog.Header>
-          <Form
-            suspendWhileSubmitting
-            content={{
-              expiresAt: {
-                kind: 'date',
-                label: t({
-                  en: 'Expires At',
-                  fr: "Date d'expiration"
-                })
-              }
-            }}
-            initialValues={{
-              expiresAt: new Date(Date.now() + ONE_YEAR)
-            }}
-            validationSchema={
-              z.object({
-                expiresAt: z.coerce.date().min(new Date(), {
-                  message: t({
-                    en: 'Expiry date must be in the future',
-                    fr: "La date d'expiration doit être dans le futur"
-                  })
-                })
-              }) satisfies z.ZodType<Pick<CreateAssignmentData, 'expiresAt'>>
-            }
-            onSubmit={async ({ expiresAt }) => {
+          <CreateAssignmentForm
+            isPending={createAssignmentMutation.isPending}
+            onSubmit={async (expiresAt) => {
               const assignment = await createAssignmentMutation.mutateAsync({
                 data: {
                   expiresAt,
@@ -175,6 +210,7 @@ const RouteComponent = () => {
                 }
               });
               setAssignmentUrl(assignment.url);
+              setAssignmentId(assignment.id);
               setIsCreateModalOpen(false);
               setIsResultSliderOpen(true);
             }}
@@ -182,6 +218,8 @@ const RouteComponent = () => {
         </Dialog.Content>
       </Dialog>
       <AssignmentResultSlider
+        assignmentId={assignmentId}
+        instrumentLanguages={selectedInstrument?.supportedLanguages}
         isOpen={isResultSliderOpen}
         setIsOpen={setIsResultSliderOpen}
         title={selectedInstrument?.details.title}

@@ -317,6 +317,9 @@ importers:
       neverthrow:
         specifier: 'catalog:'
         version: 8.2.0
+      nodemailer:
+        specifier: ^7.0.12
+        version: 7.0.13
       passport:
         specifier: ^0.7.0
         version: 0.7.0
@@ -342,6 +345,9 @@ importers:
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.6
+      '@types/nodemailer':
+        specifier: ^7.0.5
+        version: 7.0.11
       '@types/passport':
         specifier: ^1.0.17
         version: 1.0.17

@@ -9,6 +9,7 @@ import {
   DatabaseIcon,
   EyeIcon,
   LogsIcon,
+  MailIcon,
   PackageIcon,
   PaletteIcon,
   SendIcon,
@@ -85,6 +86,13 @@ export function useNavItems() {
         label: t('layout.navLinks.manageGroup'),
         url: '/group/manage'
       });
+      if (setupStateQuery.data.isMailEnabled) {
+        globalItems.push({
+          icon: MailIcon,
+          label: t({ en: 'Email Templates', fr: 'Modèles de courriel' }),
+          url: '/group/email-templates'
+        });
+      }
     }
 
     if (ability?.can('manage', 'all')) {
@@ -138,6 +146,11 @@ export function useNavItems() {
               fr: "Dépôts d'instruments"
             }),
             url: '/admin/instrument-repos'
+          },
+          {
+            icon: MailIcon,
+            label: t({ en: 'Mail', fr: 'Courriel' }),
+            url: '/admin/mail'
           }
         ],
         icon: ShieldIcon,
@@ -185,7 +198,8 @@ export function useNavItems() {
     currentUser,
     resolvedLanguage,
     setupStateQuery.data.isExperimentalFeaturesEnabled,
-    setupStateQuery.data.isGatewayEnabled
+    setupStateQuery.data.isGatewayEnabled,
+    setupStateQuery.data.isMailEnabled
   ]);
 
   return navItems;
