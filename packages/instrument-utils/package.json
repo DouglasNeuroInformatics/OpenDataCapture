@@ -2,6 +2,7 @@
   "name": "@opendatacapture/instrument-utils",
   "type": "module",
   "version": "0.0.0",
+  "sideEffects": false,
   "license": "Apache-2.0",
   "exports": {
     ".": "./src/index.ts"

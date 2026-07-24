@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Card, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { licenses } from '@opendatacapture/licenses';
 import { InstrumentIcon } from '@opendatacapture/react-core';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
@@ -16,11 +17,12 @@ type TextCardItem = BaseCardItem & { kind: 'text'; text?: string };
 type CardItem = LinkCardItem | TextCardItem;
 
 type InstrumentCardProps = {
+  highlighted?: boolean;
   instrument: TranslatedInstrumentInfo;
   onClick: () => void;
 };
 
-export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => {
+export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentCardProps) => {
   const { t } = useTranslation();
 
   const license = licenses.get(instrument.details.license);
@@ -124,12 +126,14 @@ export const InstrumentCard = ({ instrument, onClick }: InstrumentCardProps) => 
 
   return (
     <Card
-      className="group flex gap-8 p-6 transition-transform duration-300 ease-in-out hover:scale-[1.03] hover:cursor-pointer sm:p-8"
+      className={cn(
+        'group flex gap-8 p-6 transition-transform duration-300 ease-in-out hover:scale-[1.03] hover:cursor-pointer sm:p-8',
+        highlighted && 'bg-sky-100/60 ring-2 ring-sky-500/60 dark:bg-sky-900/30'
+      )}
       data-testid={`instrument-card-${instrument.id}`}
       role="button"
-      tabIndex={0}
+      tabIndex={-1}
       onClick={onClick}
-      onKeyDown={onClick}
     >
       <div className="hidden shrink-0 items-center justify-center sm:flex md:min-w-24 lg:min-w-32">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-indigo-500">
