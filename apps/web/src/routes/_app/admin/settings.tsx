@@ -109,9 +109,13 @@ const RouteComponent = () => {
     return parsed;
   }, [autosave]);
 
-  const flushDurationOnBlur = () => {
+  const flushDurationOnBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     clearTimeout(durationDebounceRef.current);
-    if (saveDurationIfChanged() === null) {
+    const parsed = parseDurationDays(event.target.value);
+    if (parsed !== null && parsed !== savedDurationRef.current) {
+      setDurationDays(String(parsed));
+      autosave({ defaultAssignmentDurationDays: parsed });
+    } else if (parsed === null) {
       setDurationDays(String(savedDurationRef.current));
     }
   };
