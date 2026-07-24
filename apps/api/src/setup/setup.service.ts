@@ -52,6 +52,7 @@ export class SetupService {
     const branding = $BrandingConfig.nullable().safeParse(savedOptions?.branding ?? null);
     return {
       branding: branding.success ? branding.data : null,
+      defaultAssignmentDurationDays: savedOptions?.defaultAssignmentDurationDays ?? null,
       isDemo: Boolean(savedOptions?.isDemo),
       isExperimentalFeaturesEnabled: Boolean(savedOptions?.isExperimentalFeaturesEnabled),
       isGatewayEnabled: this.configService.get('GATEWAY_ENABLED'),
