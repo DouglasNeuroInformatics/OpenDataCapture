@@ -385,6 +385,7 @@ model SetupState {
   createdAt                     DateTime        @default(now()) @db.Date
   updatedAt                     DateTime        @updatedAt @db.Date
   id                            String          @id @default(auto()) @map("_id") @db.ObjectId
+  activeLanguages               String[]
   branding                      BrandingConfig?
   isDemo                        Boolean
   isExperimentalFeaturesEnabled Boolean?

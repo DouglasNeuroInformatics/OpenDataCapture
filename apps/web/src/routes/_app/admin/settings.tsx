@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { Button, Card, Heading, HoverCard, Select } from '@douglasneuroinformatics/libui/components';
-import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { Card, Checkbox, Heading, HoverCard, Select } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import { createFileRoute } from '@tanstack/react-router';
 import { CircleHelpIcon } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
+import { SaveStatus } from '@/components/SaveStatus';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateSetupStateMutation } from '@/hooks/useUpdateSetupStateMutation';
 import { useAppStore } from '@/store';
 import type { GroupSwitcherPosition } from '@/store/types';
+import { ALL_LANGUAGES } from '@/utils/languages';
 
-/** libui ships no Switch, so this is hand-rolled — `label` names it for assistive technology. */
 const Toggle = ({
   checked,
   label,
@@ -39,33 +42,29 @@ const RouteComponent = () => {
   const { t } = useTranslation();
   const setupStateQuery = useSetupStateQuery();
   const updateSetupStateMutation = useUpdateSetupStateMutation();
-  const addNotification = useNotificationsStore((store) => store.addNotification);
   const groupSwitcherPosition = useAppStore((store) => store.groupSwitcherPosition);
   const setGroupSwitcherPosition = useAppStore((store) => store.setGroupSwitcherPosition);
 
-  const uploaderLabel = t({ en: 'Enable Uploader', fr: 'Activer le téléversement' });
+  const [saveState, setSaveState] = React.useState<'idle' | 'saved' | 'saving'>('idle');
+  const savedTimerRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  // The toggle is staged locally until Save, so it holds its own state. Resync it whenever the server
-  // value changes underneath — saving invalidates the query, and the response is the authority on what
-  // was actually stored.
-  const savedUploaderEnabled = setupStateQuery.data.isExperimentalFeaturesEnabled ?? false;
-  const [uploaderEnabled, setUploaderEnabled] = useState(savedUploaderEnabled);
-  const [syncedUploaderEnabled, setSyncedUploaderEnabled] = useState(savedUploaderEnabled);
-  if (syncedUploaderEnabled !== savedUploaderEnabled) {
-    setSyncedUploaderEnabled(savedUploaderEnabled);
-    setUploaderEnabled(savedUploaderEnabled);
-  }
-
-  const handleSave = () => {
-    updateSetupStateMutation.mutate(
-      { isExperimentalFeaturesEnabled: uploaderEnabled },
-      {
-        onSuccess: () => {
-          addNotification({ type: 'success' });
+  const autosave = React.useCallback(
+    (data: Parameters<typeof updateSetupStateMutation.mutate>[0]) => {
+      setSaveState('saving');
+      updateSetupStateMutation.mutate(data, {
+        onSettled: () => {
+          setSaveState('saved');
+          clearTimeout(savedTimerRef.current);
+          savedTimerRef.current = setTimeout(() => setSaveState('idle'), 2000);
         }
-      }
-    );
-  };
+      });
+    },
+    [updateSetupStateMutation]
+  );
+
+  const uploaderLabel = t({ en: 'Enable Uploader', fr: 'Activer le téléversement' });
+  const uploaderEnabled = setupStateQuery.data.isExperimentalFeaturesEnabled ?? false;
+  const activeLanguages = setupStateQuery.data.activeLanguages ?? ['en', 'fr'];
 
   return (
     <React.Fragment>
@@ -100,17 +99,14 @@ const RouteComponent = () => {
                   </HoverCard.Content>
                 </HoverCard>
               </div>
-              <Toggle checked={uploaderEnabled} label={uploaderLabel} onCheckedChange={setUploaderEnabled} />
+              <Toggle
+                checked={uploaderEnabled}
+                label={uploaderLabel}
+                onCheckedChange={(checked) => autosave({ isExperimentalFeaturesEnabled: checked })}
+              />
             </div>
           </Card.Content>
-          <Card.Footer className="justify-end">
-            <Button disabled={updateSetupStateMutation.isPending} onClick={handleSave}>
-              {t({ en: 'Save', fr: 'Enregistrer' })}
-            </Button>
-          </Card.Footer>
         </Card>
-        {/* A separate card because these settings are not the instance's: they live in this browser and
-            apply instantly, so they are deliberately outside the Save button's scope above. */}
         <Card className="mt-6">
           <Card.Header>
             <Card.Title className="text-lg font-bold">{t({ en: 'Preferences', fr: 'Préférences' })}</Card.Title>
@@ -124,7 +120,10 @@ const RouteComponent = () => {
           <Card.Content>
             <div className="flex items-center justify-between gap-4">
               <p className="text-sm font-medium">
-                {t({ en: 'Group Switcher Position', fr: 'Position du sélecteur de groupe' })}
+                {t({
+                  en: 'Group Switcher Position',
+                  fr: 'Position du sélecteur de groupe'
+                })}
               </p>
               <Select
                 value={groupSwitcherPosition}
@@ -145,7 +144,47 @@ const RouteComponent = () => {
             </div>
           </Card.Content>
         </Card>
+        <Card className="mt-6">
+          <Card.Header>
+            <Card.Title className="text-lg font-bold">{t({ en: 'Languages', fr: 'Langues' })}</Card.Title>
+            <Card.Description>
+              {t({
+                en: 'Select which languages are available across the application. At least one language must remain active.',
+                fr: "Sélectionnez les langues disponibles dans l'application. Au moins une langue doit rester active."
+              })}
+            </Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <div className="flex flex-col gap-3">
+              {Object.entries(ALL_LANGUAGES).map(([code, name]) => {
+                const isActive = activeLanguages.includes(code);
+                const isLastActive = isActive && activeLanguages.length === 1;
+                return (
+                  <label className="flex items-center gap-3" key={code}>
+                    <Checkbox
+                      checked={isActive}
+                      disabled={isLastActive}
+                      onCheckedChange={(checked) => {
+                        const updated = checked
+                          ? [...activeLanguages, code]
+                          : activeLanguages.filter((l) => l !== code);
+                        if (updated.length > 0) {
+                          autosave({ activeLanguages: updated });
+                          if (!updated.includes(i18n.resolvedLanguage)) {
+                            i18n.changeLanguage(updated[0]! as Language);
+                          }
+                        }
+                      }}
+                    />
+                    <span className="text-sm font-medium">{name}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </Card.Content>
+        </Card>
       </div>
+      <SaveStatus state={saveState} />
     </React.Fragment>
   );
 };

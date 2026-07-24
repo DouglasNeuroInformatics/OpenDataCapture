@@ -26,7 +26,8 @@ export function useInstrumentInfoQuery<TKind extends InstrumentKind>({
         params: { ...params, groupId: currentGroupId }
       });
       const infos = await $InstrumentInfo.array().parseAsync(response.data);
-      return infos.map((instrument) => translateInstrumentInfo(instrument, resolvedLanguage ?? 'en'));
+      const instrumentLang = resolvedLanguage === 'en' || resolvedLanguage === 'fr' ? resolvedLanguage : 'en';
+      return infos.map((instrument) => translateInstrumentInfo(instrument, instrumentLang));
     },
     queryKey: [
       'instrument-info',
