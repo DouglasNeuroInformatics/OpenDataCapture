@@ -2,44 +2,53 @@
   "additionalData": {
     "title": {
       "en": "Additional Data",
+      "es": "Datos adicionales",
       "fr": "Données supplémentaires"
     }
   },
   "dateAssessed": {
     "description": {
       "en": "If the session took place on a date other than today, you can change it here.",
+      "es": "Si la sesión tuvo lugar en una fecha distinta a hoy, puede modificarla aquí.",
       "fr": "Si la session a eu lieu à une autre date qu'aujourd'hui, vous pouvez la modifier ici."
     },
     "label": {
       "en": "Date Assessed",
+      "es": "Fecha de evaluación",
       "fr": "Date d'évaluation"
     }
   },
   "errors": {
     "assessmentMustBeInPast": {
       "en": "The assessment must be in the past",
+      "es": "La evaluación debe estar en el pasado",
       "fr": "L'évaluation doit être dans le passé"
     },
     "mustBeAdult": {
       "en": "The subject must be at least 18 years old",
+      "es": "El sujeto debe tener al menos 18 años de edad",
       "fr": "Le client doit avoir au moins 18 ans"
     }
   },
   "startSession": {
     "en": "Start Session",
+    "es": "Iniciar sesión",
     "fr": "Démarrer une session"
   },
   "type": {
     "in-person": {
       "en": "In-Person",
+      "es": "En persona",
       "fr": "En personne"
     },
     "label": {
       "en": "Type of Assessment",
+      "es": "Tipo de evaluación",
       "fr": "Type d'évaluation"
     },
     "retrospective": {
       "en": "Retrospective",
+      "es": "Retrospectiva",
       "fr": "Rétrospective"
     }
   }

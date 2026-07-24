@@ -2,82 +2,100 @@
   "branding": {
     "title": {
       "en": "Open Data Capture",
+      "es": "Open Data Capture",
       "fr": "Open Data Capture"
     }
   },
   "endSessionModal": {
     "message": {
       "en": "Are you sure you want to end the current session? If you choose to proceed, you'll be taken back to the begin session page.",
+      "es": "Está seguro de que desea finalizar la sesión actual? Si decide continuar, será redirigido a la página para comenzar una nueva sesión.",
       "fr": "Êtes-vous sûr de vouloir mettre fin à la session en cours ? Si vous décidez de continuer, vous serez ramené à la page de démarrage de session."
     },
     "title": {
       "en": "End Session",
+      "es": "Finalizar sesión",
       "fr": "Terminer la session en cours"
     }
   },
   "footer": {
     "contact": {
       "en": "Contact Us",
+      "es": "Contáctenos",
       "fr": "Contactez-nous"
     },
     "documentation": {
       "en": "Documentation",
+      "es": "Documentación",
       "fr": "Documentation"
     },
     "license": {
       "en": "License",
+      "es": "Licencia",
       "fr": "Licence"
     },
     "sourceCode": {
       "en": "Source Code",
+      "es": "Código fuente",
       "fr": "Code source"
     }
   },
   "navLinks": {
     "accessibleInstruments": {
       "en": "Administer Instrument",
+      "es": "Administrar instrumento",
       "fr": "Administrer un instrument"
     },
     "createInstrument": {
       "en": "Add Instrument",
+      "es": "Agregar instrumento",
       "fr": "Ajouter un instrument"
     },
     "dashboard": {
       "en": "Dashboard",
+      "es": "Panel de control",
       "fr": "Tableau de bord"
     },
     "datahub": {
       "en": "Data Hub",
+      "es": "Centro de datos",
       "fr": "Centre de données"
     },
     "endSession": {
       "en": "End Current Session",
+      "es": "Finalizar la sesión actual",
       "fr": "Terminer la session en cours"
     },
     "manageGroup": {
       "en": "Manage Group",
+      "es": "Gestionar grupo",
       "fr": "Gérer le groupe"
     },
     "remoteAssignment": {
       "en": "Remote Assignment",
+      "es": "Tarea remota",
       "fr": "Tâche à distance"
     },
     "startSession": {
       "en": "Start Session",
+      "es": "Iniciar una sesión",
       "fr": "Démarrer une session"
     },
     "upload": {
       "en": "Upload Data",
+      "es": "Cargar datos",
       "fr": "Téléverser les données"
     },
     "viewCurrentSubject": {
       "en": "View Current Subject",
+      "es": "Ver el sujeto actual",
       "fr": "Voir le client actuel"
     }
   },
   "organization": {
     "name": {
       "en": "Douglas Neuroinformatics Platform",
+      "es": "Douglas Neuroinformatics Platform",
       "fr": "Douglas Neuroinformatics Platform"
     }
   }
