@@ -212,7 +212,9 @@ export const StartSessionForm = ({
                   ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message:
-                      currentGroup.settings.idValidationRegexErrorMessage?.[resolvedLanguage] ??
+                      (currentGroup.settings.idValidationRegexErrorMessage as undefined | { [key: string]: string })?.[
+                        resolvedLanguage
+                      ] ??
                       t({
                         en: `Must match regular expression: ${regex.source}`,
                         fr: `Doit correspondre à l'expression régulière : ${regex.source}`

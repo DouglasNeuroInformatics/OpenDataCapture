@@ -51,6 +51,7 @@ export class SetupService {
     // older $BrandingConfig will silently drop newer branding fields on read.
     const branding = $BrandingConfig.nullable().safeParse(savedOptions?.branding ?? null);
     return {
+      activeLanguages: savedOptions?.activeLanguages?.length ? savedOptions.activeLanguages : ['en', 'fr'],
       branding: branding.success ? branding.data : null,
       isDemo: Boolean(savedOptions?.isDemo),
       isExperimentalFeaturesEnabled: Boolean(savedOptions?.isExperimentalFeaturesEnabled),

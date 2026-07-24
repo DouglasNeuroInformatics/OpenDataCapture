@@ -19,6 +19,7 @@ declare module '@douglasneuroinformatics/libui/i18n' {
   export namespace UserConfig {
     export interface LanguageOptions {
       en: true;
+      es: true;
       fr: true;
     }
     export interface Translations {

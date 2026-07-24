@@ -35,8 +35,10 @@ const RouteComponent = () => {
 
   const branding = setupStateQuery.data.branding;
   const enableBranding = branding?.enableBranding === true;
-  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-  const instanceName = branding?.instanceName?.[resolvedLanguage]?.trim() || 'Open Data Capture';
+  const instanceName =
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    (branding?.instanceName as undefined | { [key: string]: string })?.[resolvedLanguage]?.trim() ||
+    'Open Data Capture';
 
   const handleLogin = async (credentials: $LoginCredentials) => {
     const result = await loginRequest(credentials);

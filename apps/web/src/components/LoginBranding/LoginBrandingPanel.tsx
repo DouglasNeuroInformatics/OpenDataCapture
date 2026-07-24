@@ -124,11 +124,11 @@ const LogoSection = ({ alignment, branding, instanceName, preview }: LogoSection
 type ResourcesSectionProps = {
   boldResourceLinks: boolean;
   fontSize: null | number | undefined;
-  lang: 'en' | 'fr';
+  lang: string;
   links: ResourceLink[];
   preview: boolean;
   tc: (slateClass: string) => null | string;
-  tl: (obj: { en: string; fr: string }) => string;
+  tl: (obj: { [key: string]: string }) => string;
 };
 
 const ResourcesSection = ({ boldResourceLinks, fontSize, lang, links, preview, tc, tl }: ResourcesSectionProps) => (
@@ -144,8 +144,13 @@ const ResourcesSection = ({ boldResourceLinks, fontSize, lang, links, preview, t
       style={fontStyle(fontSize, preview)}
     >
       {links.map((link, index) => {
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        const linkLabel = link.label?.[lang]?.trim() || link.label?.en?.trim() || link.label?.fr?.trim() || '';
+        /* eslint-disable @typescript-eslint/prefer-nullish-coalescing -- blank strings must fall back, so `||` not `??` */
+        const linkLabel =
+          (link.label as undefined | { [key: string]: string })?.[lang]?.trim() ||
+          link.label?.en?.trim() ||
+          link.label?.fr?.trim() ||
+          '';
+        /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
         if (!linkLabel) return null;
         return (
           <a
@@ -224,15 +229,17 @@ export const LoginBrandingPanel = ({
   const { resolvedLanguage } = useTranslation();
   const lang = langOverride ?? resolvedLanguage;
 
-  const tl = (obj: { en: string; fr: string }): string => obj[lang];
+  const tl = (obj: { [key: string]: string }): string => obj[lang] ?? obj.en ?? '';
 
   const derived = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const instanceName = branding?.instanceName?.[lang]?.trim() || DEFAULT_INSTANCE_NAME;
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const instanceTagline = branding?.instanceTagline?.[lang]?.trim() || null;
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const instanceDetails = branding?.instanceDetails?.[lang]?.trim() || null;
+    /* eslint-disable @typescript-eslint/prefer-nullish-coalescing -- blank strings must fall back, so `||` not `??` */
+    const instanceName =
+      (branding?.instanceName as undefined | { [key: string]: string })?.[lang]?.trim() || DEFAULT_INSTANCE_NAME;
+    const instanceTagline =
+      (branding?.instanceTagline as undefined | { [key: string]: string })?.[lang]?.trim() || null;
+    const instanceDetails =
+      (branding?.instanceDetails as undefined | { [key: string]: string })?.[lang]?.trim() || null;
+    /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
     const panelTextColor = branding?.panelTextColor ?? null;
     return {
       boldDetails: branding?.boldDetails === true,

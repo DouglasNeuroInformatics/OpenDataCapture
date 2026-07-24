@@ -379,7 +379,7 @@ const CreateSeriesInstrumentDialog = ({
     details: { title: title.trim() },
     groupId,
     items,
-    language: resolvedLanguage
+    language: resolvedLanguage === 'en' || resolvedLanguage === 'fr' ? resolvedLanguage : 'en'
   });
 
   const handleCreate = async () => {
