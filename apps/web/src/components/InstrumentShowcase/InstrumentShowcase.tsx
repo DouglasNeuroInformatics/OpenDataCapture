@@ -69,6 +69,16 @@ export const InstrumentShowcase: React.FC<{
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        // The SearchBar is a bare <input> inside a <form>; without preventDefault the Enter keypress
+        // submits that form, reloading the app and dropping the user back at the login page.
+        event.preventDefault();
+        const instrument = filteredInstruments[highlightedIndex];
+        if (instrument) {
+          onSelect(instrument);
+        }
+        return;
+      }
       if (filteredInstruments.length === 0) return;
       if (event.key === 'ArrowDown') {
         event.preventDefault();
@@ -76,12 +86,6 @@ export const InstrumentShowcase: React.FC<{
       } else if (event.key === 'ArrowUp') {
         event.preventDefault();
         setHighlightedIndex((prev) => Math.max(prev - 1, 0));
-      } else if (event.key === 'Enter') {
-        event.preventDefault();
-        const instrument = filteredInstruments[highlightedIndex];
-        if (instrument) {
-          onSelect(instrument);
-        }
       }
     },
     [filteredInstruments, highlightedIndex, onSelect]

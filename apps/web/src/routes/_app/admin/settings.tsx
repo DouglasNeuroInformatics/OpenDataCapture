@@ -239,3 +239,5 @@ const RouteComponent = () => {
 export const Route = createFileRoute('/_app/admin/settings')({
   component: RouteComponent
 });
+
+export { parseDurationDays };
