@@ -12183,9 +12183,9 @@ packages:
       svelte:
         optional: true
 
-  svgo@4.0.1:
+  svgo@4.0.2:
     resolution:
-      { integrity: sha512-XDpWUOPC6FEibaLzjfe0ucaV0YrOjYotGJO1WpF0Zd+n6ZGEQUsSugaoLq9QkEZtAfQIxT42UChcssDVPP3+/w== }
+      { integrity: sha512-ekx94z1rRc5LDi6oSUaeRnYhd0UOJxdtQCL2rF8xpWxD3TPAsISWOrxezqGovqS38GRZOdpDfvQe3ts6F7nsng== }
     engines: { node: '>=16' }
     hasBin: true
 
@@ -18131,7 +18131,7 @@ snapshots:
       semver: 7.8.1
       shiki: 3.23.0
       smol-toml: 1.6.1
-      svgo: 4.0.1
+      svgo: 4.0.2
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
       tsconfck: 3.1.6(typescript@6.0.3)
@@ -23485,7 +23485,7 @@ snapshots:
       postcss: 8.5.15
       postcss-scss: 4.0.9(postcss@8.5.15)
 
-  svgo@4.0.1:
+  svgo@4.0.2:
     dependencies:
       commander: 11.1.0
       css-select: 5.2.2
