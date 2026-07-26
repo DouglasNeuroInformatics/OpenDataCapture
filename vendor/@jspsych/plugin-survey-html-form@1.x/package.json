@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@jspsych/plugin-survey-html-form": "1.0.3",
+    "jspsych": "7.3.4",
     "jspsych__7.x": "workspace:*"
   }
 }
