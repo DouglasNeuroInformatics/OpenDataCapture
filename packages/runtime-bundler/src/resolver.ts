@@ -4,7 +4,7 @@ import path from 'path';
 
 import { isPlainObject } from '@douglasneuroinformatics/libjs';
 
-import type { ExportCondition, PackageExport, ResolvedPackage } from './types.js';
+import type { ExportCondition, ModuleExport, PackageExport, ResolvedPackage } from './types.js';
 
 class ResolverError extends Error {
   constructor(message: string, options?: ErrorOptions) {
@@ -104,9 +104,9 @@ export class Resolver {
 
   private parseExport(exp: unknown, packageRoot: string): PackageExport {
     if (typeof exp === 'string') {
-      return { import: this.resolveSourceExport(exp, packageRoot) };
+      return { copy: this.resolveSourceExport(exp, packageRoot) };
     } else if (isPlainObject(exp)) {
-      const exports: PackageExport = {};
+      const exports: ModuleExport = {};
       const conditions: ExportCondition[] = ['default', 'import', 'types'];
       for (const condition of conditions) {
         const val = exp[condition];

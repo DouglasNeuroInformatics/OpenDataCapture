@@ -1,0 +1,12 @@
+{
+  "name": "classic-script",
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    ".": {
+      "default": "./index.js"
+    },
+    "./bootstrap.js": "./bootstrap.js",
+    "./package.json": "./package.json"
+  }
+}

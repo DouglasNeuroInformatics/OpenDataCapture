@@ -37,6 +37,39 @@ export async function generateManifest(baseDir) {
   return results;
 }
 
+/** @type {import('.').parsePackages} */
+export function parsePackages(runtimeVersion, manifest) {
+  const importPathPattern = /^(@?[^@/]+(?:\/[^@/]+)?)(?:@([^/]+))?/;
+
+  /** @type {Map<string, import('.').RuntimePackageMetadata>} */
+  const packages = new Map();
+
+  /** @param {string} filename @param {'css' | 'html' | 'js'} kind */
+  const addToPackage = (filename, kind) => {
+    // npm forbids a leading underscore in package names, so it marks bundler-internal
+    // output (e.g. _chunks/) that is served from the manifest but belongs to no package
+    if (filename.startsWith('_')) {
+      return;
+    }
+    const match = filename.match(importPathPattern);
+    if (!match) {
+      throw new Error(`Unexpected import path pattern: ${filename}`);
+    }
+    const [name, version] = /** @type {[string, string]} */ (match.slice(1, 3));
+    const key = name + '$' + version;
+    if (!packages.has(key)) {
+      packages.set(key, { exports: { css: [], html: [], js: [] }, name, version });
+    }
+    packages.get(key)?.exports[kind].push(`/runtime/${runtimeVersion}/${filename}`);
+  };
+
+  manifest.sources.forEach((source) => addToPackage(source, 'js'));
+  manifest.html.forEach((file) => addToPackage(file, 'html'));
+  manifest.styles.forEach((style) => addToPackage(style, 'css'));
+
+  return [...packages.values()];
+}
+
 /** @type {import('.').generateMetadata} */
 export async function generateMetadata(options) {
   const require = module.createRequire(options.rootDir);
@@ -47,40 +80,12 @@ export async function generateMetadata(options) {
   for (const v of RUNTIME_VERSIONS) {
     const packageDir = path.dirname(require.resolve(`@opendatacapture/runtime-${v}/package.json`));
     const baseDir = path.resolve(packageDir, RUNTIME_DIST_DIRNAME);
-    const { declarations, html, sources, styles } = await generateManifest(baseDir);
-
-    const importPathPattern = /^(@?[^@/]+(?:\/[^@/]+)?)(?:@([^/]+))?/;
-
-    /** @type {Map<string, import('.').RuntimePackageMetadata>} */
-    const packages = new Map();
-
-    /** @param {string} filename @param {'css' | 'html' | 'js'} kind */
-    const addToPackage = (filename, kind) => {
-      const match = filename.match(importPathPattern);
-      if (!match) {
-        throw new Error(`Unexpected import path pattern: ${filename}`);
-      }
-      const [name, version] = /** @type {[string, string]} */ (match.slice(1, 3));
-      const key = name + '$' + version;
-      if (!packages.has(key)) {
-        packages.set(key, { exports: { css: [], html: [], js: [] }, name, version });
-      }
-      packages.get(key)?.exports[kind].push(`/runtime/${v}/${filename}`);
-    };
-
-    sources.forEach((source) => addToPackage(source, 'js'));
-    html.forEach((file) => addToPackage(file, 'html'));
-    styles.forEach((style) => addToPackage(style, 'css'));
+    const manifest = await generateManifest(baseDir);
 
     metadata.set(v, {
       baseDir,
-      manifest: {
-        declarations,
-        html,
-        sources,
-        styles
-      },
-      packages: [...packages.values()]
+      manifest,
+      packages: parsePackages(v, manifest)
     });
   }
   return metadata;

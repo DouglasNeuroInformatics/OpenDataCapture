@@ -208,7 +208,7 @@ describe('Resolver', () => {
       vi.resetAllMocks();
     });
 
-    it('should return the exports for a valid, single source string export', async () => {
+    it('should return an asset export for a valid, single source string export', async () => {
       const relpath = './src/main.js';
       const abspath = path.join(packageRoot, relpath);
       vi.spyOn(fs, 'existsSync').mockReturnValue(true);
@@ -219,7 +219,7 @@ describe('Resolver', () => {
       await expect(resolver.resolve(PACKAGE_STUB.name)).resolves.toMatchObject({
         exports: {
           '.': {
-            import: abspath
+            copy: abspath
           }
         }
       });
