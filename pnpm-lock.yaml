@@ -115,6 +115,7 @@ overrides:
   '@types/react-dom': '-'
   framer-motion: 11.15.0
   typescript: 6.0.x
+  yaml@2: ^2.9.0
 
 importers:
   .:
@@ -12809,7 +12810,7 @@ packages:
       sugarss: '*'
       terser: ^5.16.0
       tsx: ^4.8.1
-      yaml: ^2.4.2
+      yaml: ^2.9.0
     peerDependenciesMeta:
       '@types/node':
         optional: true
@@ -13178,12 +13179,6 @@ packages:
     resolution:
       { integrity: sha512-vIYeF1u3CjlhAFekPPAk2h/Kv4T3mAkMox5OymRiJQB0spDP10LHvt+K7G9Ny6NuuMAb25/6n1qyUjAcGNf/AA== }
     engines: { node: '>= 6' }
-
-  yaml@2.7.1:
-    resolution:
-      { integrity: sha512-10ULxpnOCQXxJvBgxsn9ptjq6uviG/htZKk9veJGhlqn3w/DxQ631zFF+nlQXLwmImeS5amR2dl2U8sg6U9jsQ== }
-    engines: { node: '>= 14' }
-    hasBin: true
 
   yaml@2.9.0:
     resolution:
@@ -24322,11 +24317,9 @@ snapshots:
       vscode-languageserver-textdocument: 1.0.12
       vscode-languageserver-types: 3.18.0
       vscode-uri: 3.1.0
-      yaml: 2.7.1
+      yaml: 2.9.0
 
   yaml@1.10.3: {}
-
-  yaml@2.7.1: {}
 
   yaml@2.9.0: {}
 
