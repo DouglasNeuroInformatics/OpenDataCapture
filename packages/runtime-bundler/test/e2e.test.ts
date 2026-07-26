@@ -25,7 +25,7 @@ describe('bundle (e2e)', () => {
     await fs.writeFile(path.join(workdir, 'package.json'), '{}');
     await new Bundler({
       configFilepath: path.join(workdir, 'package.json'),
-      include: ['shared-state', 'state-writer'],
+      include: ['classic-script', 'shared-state', 'state-writer'],
       mode: 'production',
       outdir: distdir
     }).bundle();
@@ -44,5 +44,29 @@ describe('bundle (e2e)', () => {
     };
     setValue('shared');
     expect(getValue()).toBe('shared');
+  });
+
+  it('emits bare-path exports byte-for-byte, with no module syntax a classic script would reject', async () => {
+    const emitted = await fs.readFile(path.join(distdir, 'classic-script/bootstrap.js'), 'utf-8');
+    const source = await fs.readFile(path.join(fixtures, 'classic-script/bootstrap.js'), 'utf-8');
+    expect(emitted).toBe(source);
+  });
+
+  it('emits every shared chunk under _chunks, never at a path that parses as a package', async () => {
+    const jsFiles: string[] = [];
+    await (async function walk(dir: string) {
+      for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
+        const abspath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          await walk(abspath);
+        } else if (entry.name.endsWith('.js')) {
+          jsFiles.push(path.relative(distdir, abspath));
+        }
+      }
+    })(distdir);
+    const packageDirs = ['classic-script/', 'shared-state/', 'state-writer/', '_chunks/'];
+    for (const file of jsFiles) {
+      expect(packageDirs.some((dir) => file.startsWith(dir))).toBe(true);
+    }
   });
 });

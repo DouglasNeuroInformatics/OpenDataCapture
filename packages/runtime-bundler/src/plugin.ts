@@ -50,6 +50,9 @@ export function dtsPlugin(options: DtsPluginOptions): Plugin {
       }
       const packageExport = pkg.exports[exportKey];
       if (packageExport) {
+        if ('copy' in packageExport) {
+          throw new Error(`Found dependency '${importPath}' but export '${exportKey}' is a static asset`);
+        }
         const types = packageExport.types;
         if (types) {
           const outfile = options.entryPoints.find((item) => item.in === types)?.out;
@@ -127,12 +130,15 @@ export function dtsPlugin(options: DtsPluginOptions): Plugin {
   };
 }
 
-export function htmlPlugin(): Plugin {
+export function assetPlugin(assetFilepaths: Set<string>): Plugin {
   return {
-    name: 'html-plugin',
+    name: 'asset-plugin',
     setup(build) {
-      const namespace = 'html';
-      build.onResolve({ filter: /.+\.html$/ }, (args) => {
+      const namespace = 'asset';
+      build.onResolve({ filter: /.*/ }, (args) => {
+        if (!assetFilepaths.has(args.path)) {
+          return undefined;
+        }
         return {
           namespace,
           path: args.path
@@ -140,7 +146,7 @@ export function htmlPlugin(): Plugin {
       });
       build.onLoad({ filter: /.*/, namespace }, async (args) => {
         return {
-          contents: await fs.readFile(args.path, 'utf-8'),
+          contents: await fs.readFile(args.path),
           loader: 'copy'
         };
       });
