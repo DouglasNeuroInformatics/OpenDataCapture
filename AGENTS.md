@@ -21,6 +21,26 @@ Per-package scripts (run from repo root via turbo filters, or `cd` into the pack
 
 `apps/web` uses TanStack Router with a generated `src/route-tree.ts`. **Do not run the route-tree generator yourself** — the user runs it manually after route changes.
 
+## Internal Packages
+
+This repo depends on 11 `@douglasneuroinformatics/*` packages, maintained in separate repos and consumed from npm. Check `.agents/docs/packages/index.md` before writing code that duplicates one of these.
+
+| Package               | Purpose                                                                                 | Used here?                                            |
+| --------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| eslint-config         | ESLint flat-config factory for DNP TS/JS projects                                       | yes — root config                                     |
+| prettier-config       | Prettier config factory                                                                 | yes — root config                                     |
+| tsconfig              | Shared `tsconfig.json` base                                                             | yes — root config                                     |
+| esbuild-plugin-prisma | Copies the Prisma query engine into an esbuild outdir                                   | yes — `gateway` build script only                     |
+| libjs                 | Utility functions/types (arrays, dates, zod schemas, etc.)                              | yes — widely, across most apps and packages           |
+| libcrypto             | Web Crypto API wrappers (hashing, hybrid encryption)                                    | yes — `api`, `gateway`, `playground`, `subject-utils` |
+| libnest               | NestJS decorators/pipes/modules (config, prisma, mail, logging, crypto, virtualization) | yes — heavy, `api` only                               |
+| libpasswd             | Password strength estimation (zxcvbn wrapper)                                           | yes — password forms in `api` and `web`               |
+| libstats              | Basic stats in Rust/NAPI (sum, mean, std, linear regression)                            | yes — one call site in `api`; Node-only               |
+| libui-form-types      | Type-only declarative form schema (`FormTypes`)                                         | yes — direct dependency of `runtime-core`             |
+| libui                 | React/Tailwind UI components, hooks, providers                                          | yes — heavy, every frontend surface                   |
+
+The source of most of these is inspectable in `node_modules` — `libnest`, `libui`, `libcrypto`, and `libpasswd` publish their original TypeScript under `src/`. Read it instead of guessing at a signature. See `.agents/docs/packages/index.md` for the per-package paths and the exceptions.
+
 ## Hard Rules
 
 - Ask before writing code if the task is ambiguous or its stated scope cannot accomplish the goal.
