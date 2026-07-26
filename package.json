@@ -74,7 +74,8 @@
       "@types/react": "-",
       "@types/react-dom": "-",
       "framer-motion": "11.15.0",
-      "typescript": "6.0.x"
+      "typescript": "6.0.x",
+      "yaml@2": "^2.9.0"
     },
     "onlyBuiltDependencies": [
       "@import-meta-env/unplugin",
