@@ -73,9 +73,9 @@
     "overrides": {
       "@types/react": "-",
       "@types/react-dom": "-",
+      "find-my-way@9": "^9.7.0",
       "framer-motion": "11.15.0",
       "typescript": "6.0.x",
-      "find-my-way@9": "^9.7.0",
       "yaml@2": "^2.9.0"
     },
     "onlyBuiltDependencies": [
