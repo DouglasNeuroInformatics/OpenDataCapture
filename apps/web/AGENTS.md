@@ -110,6 +110,12 @@ per-leaf as `{ "en": ..., "fr": ... }` and kept sorted by
 **Adding a namespace means three edits in `src/services/i18n.ts`** — the import, the `declare module`
 interface member, and the `init` object. Without the interface member the keys do not type-check.
 
+Instrument validation errors are localized by `src/services/zod.ts`, which registers the
+required-field error map on **four** zod instances: this bundle's v3 and v4, plus the v3 and v4 of
+the runtime-served `/runtime/v1/zod@3.x` that instrument bundles import at runtime — a separate
+browser module instance with its own error registry. Change that file rather than calling
+`setErrorMap`/`z.config` anywhere else, or one of the four silently keeps the default messages.
+
 `react/jsx-no-literals` makes bare JSX text an **error**. Punctuation and proper nouns are
 allowlisted in `eslint.config.js` and `*.stories.tsx` is exempt; anything else it flags is a string
 that needs translating. Strings that are genuinely not copy — stack-frame syntax, for example —

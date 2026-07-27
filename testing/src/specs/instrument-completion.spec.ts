@@ -44,4 +44,39 @@ test.describe('instrument completion', () => {
 
     await expect(page.getByTestId('data-table-body').getByTestId('data-table-row').first()).toBeVisible();
   });
+
+  test('should localize required-field errors from a zod v4 validation schema', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Validation${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+
+    // The happiness questionnaire is authored against /runtime/v1/zod@3.x/v4, so submitting with
+    // nothing filled in exercises the v4 error map that apps/web/src/services/zod.ts registers on
+    // the runtime-served zod instance. Without that registration, zod's own default message
+    // ("Invalid input: ...") renders instead of the localized one.
+    await instrumentPage.submit();
+
+    const errorMessages = page.getByTestId('error-message-text');
+    await expect(errorMessages.first()).toBeVisible();
+    for (const message of await errorMessages.allTextContents()) {
+      expect(message).toBe('This field is required');
+    }
+  });
 });
