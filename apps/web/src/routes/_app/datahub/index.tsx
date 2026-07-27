@@ -25,6 +25,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
+import { getListedSubjectIds } from '@/utils/table';
 
 type DateFilter = {
   allowNull: boolean;
@@ -36,18 +37,6 @@ type SexFilter = (null | Sex)[];
 
 type HasSearchStringFilter = {
   searchString: string;
-};
-
-/**
- * The subject ids currently listed by the table, for filtering an export down to them.
- *
- * Read one per row: iterating `getVisibleCells()` yields the row's id once per rendered column
- * (including the row-actions column), so the ids arrive duplicated as many times as there are
- * columns. A set also keeps the membership test that consumes this constant time rather than a
- * linear scan per exported row.
- */
-const getListedSubjectIds = (table: TanstackTable.Table<Subject>): Set<string> => {
-  return new Set(table.getPrePaginationRowModel().rows.map((row) => removeSubjectIdScope(row.original.id)));
 };
 
 const Filters: React.FC<{
