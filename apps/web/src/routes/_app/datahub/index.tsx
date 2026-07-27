@@ -106,13 +106,13 @@ const Filters: React.FC<{
             }}
             onSelect={(e) => e.preventDefault()}
           >
-            NULL
+            {t({ en: 'NULL', fr: 'NUL' })}
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Group>
         <DropdownMenu.Label>{t('core.identificationData.dateOfBirth.label')}</DropdownMenu.Label>
         <DropdownMenu.Group>
           <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
-            <span className="pb-1">Min:</span>
+            <span className="pb-1">{t({ en: 'Min:', fr: 'Min :' })}</span>
             <input
               className="text-muted-foreground pointer-events-auto rounded-sm border-b pb-0.5"
               type="date"
@@ -128,7 +128,7 @@ const Filters: React.FC<{
             />
           </div>
           <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
-            <span className="pb-1">Max:</span>
+            <span className="pb-1">{t({ en: 'Max:', fr: 'Max :' })}</span>
             <input
               className="text-muted-foreground pointer-events-auto rounded-sm border-b pb-0.5"
               type="date"
@@ -155,7 +155,7 @@ const Filters: React.FC<{
             }}
             onSelect={(e) => e.preventDefault()}
           >
-            NULL
+            {t({ en: 'NULL', fr: 'NUL' })}
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Group>
         <DropdownMenu.Group>
@@ -390,7 +390,7 @@ const MasterDataTable: React.FC<{
             accessorKey: 'dateOfBirth',
             cell: (ctx) => {
               const value = ctx.getValue() as Date | null | undefined;
-              return value ? toBasicISOString(value) : 'NULL';
+              return value ? toBasicISOString(value) : t({ en: 'NULL', fr: 'NUL' });
             },
             filterFn: (row, id, filter: DateFilter) => {
               const value = row.getValue(id);
@@ -414,7 +414,7 @@ const MasterDataTable: React.FC<{
                 case 'MALE':
                   return t('core.identificationData.sex.male');
                 default:
-                  return 'NULL';
+                  return t({ en: 'NULL', fr: 'NUL' });
               }
             },
             filterFn: (row, id, filter: SexFilter) => {

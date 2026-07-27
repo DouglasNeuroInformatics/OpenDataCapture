@@ -32,7 +32,9 @@ export const InstrumentOverview = ({ beforeBegin, disableBegin, instrument, onNe
                   fr: 'Durée estimée'
                 })}
               </Heading>
-              <p className="text-muted-foreground text-sm">{`${estimatedDuration} minute(s)`}</p>
+              <p className="text-muted-foreground text-sm">
+                {t({ en: '{} minute(s)', fr: '{} minute(s)' }, { args: [estimatedDuration] })}
+              </p>
             </>
           )}
         </div>

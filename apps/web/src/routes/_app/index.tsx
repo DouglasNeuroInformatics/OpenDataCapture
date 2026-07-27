@@ -1,7 +1,9 @@
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute } from '@tanstack/react-router';
 
 const RouteComponent = () => {
-  return <div>Index</div>;
+  const { t } = useTranslation();
+  return <div>{t({ en: 'Index', fr: 'Index' })}</div>;
 };
 
 export const Route = createFileRoute('/_app/')({

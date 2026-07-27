@@ -208,7 +208,7 @@ const RouteComponent = () => {
                           {user.username}
                         </Select.Item>
                       ))}
-                      <Select.Item value="N/A">N/A</Select.Item>
+                      <Select.Item value="N/A">{t({ en: 'N/A', fr: 'S.O.' })}</Select.Item>
                     </Select.Group>
                   </Select.Content>
                 </Select>
