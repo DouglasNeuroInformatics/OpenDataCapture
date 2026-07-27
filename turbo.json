@@ -22,6 +22,9 @@
     "db:generate": {
       "outputs": ["node_modules/@prisma/generated-client/**"]
     },
+    "@opendatacapture/api#db:generate": {
+      "cache": false
+    },
     "db:push": {
       "cache": false,
       "env": ["GATEWAY_DATABASE_URL"],
