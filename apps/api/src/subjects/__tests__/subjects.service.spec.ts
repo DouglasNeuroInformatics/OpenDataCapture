@@ -168,17 +168,18 @@ describe('SubjectsService', () => {
         })
       );
     });
-    it('should constrain the record query to what the caller may read', async () => {
+    it('should constrain the record query to what the caller may read, so the filter cannot be resolved from other groups records', async () => {
       prismaClient.instrumentRecord.groupBy.mockResolvedValueOnce([]);
       subjectModel.findMany.mockResolvedValueOnce([]);
+      // Conditions are what make this meaningful: an unconditional read rule yields `{}`, which is
+      // indistinguishable from the ability never having been applied.
       const ability = createAppAbility([
-        { action: 'read', subject: 'InstrumentRecord' },
-        { action: 'read', subject: 'Subject' }
+        { action: 'read', conditions: { groupId: { in: ['group-1'] } }, subject: 'InstrumentRecord' },
+        { action: 'read', conditions: { groupIds: { hasSome: ['group-1'] } }, subject: 'Subject' }
       ]);
       await subjectsService.find({ hasRecord: true }, { ability });
       const [call] = prismaClient.instrumentRecord.groupBy.mock.lastCall as [{ where: { AND: unknown[] } }];
-      // the ability contributes the first clause; without it the query would be unconstrained
-      expect(call.where.AND[0]).not.toStrictEqual({});
+      expect(call.where.AND[0]).toStrictEqual(accessibleQuery(ability, 'read', 'InstrumentRecord'));
     });
     it('should pass all subject IDs returned by instrument records to the subject query', async () => {
       prismaClient.instrumentRecord.groupBy.mockResolvedValueOnce([{ subjectId: '123' }, { subjectId: '456' }]);
