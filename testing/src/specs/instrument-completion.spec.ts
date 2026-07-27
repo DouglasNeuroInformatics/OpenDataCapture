@@ -5,6 +5,10 @@ import { expect, test } from '../support/fixtures';
 // title shown while running it (`clientDetails.title`, "Questionnaire on Happiness").
 const INSTRUMENT_TITLE = 'Happiness Questionnaire';
 
+// Every field on this instrument is optional, and its content is grouped across several titled
+// sections (select, radio and number inputs), unlike the flat Happiness Questionnaire.
+const DEMOGRAPHICS_INSTRUMENT_TITLE = 'Enhanced Demographics Questionnaire';
+
 test.describe('instrument completion', () => {
   test('should administer an instrument and surface the record for the subject @smoke', async ({
     getPageModel,
@@ -78,5 +82,75 @@ test.describe('instrument completion', () => {
     for (const message of await errorMessages.allTextContents()) {
       expect(message).toBe('This field is required');
     }
+  });
+
+  test('should administer a second instrument with a different mix of question types and surface its record', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Demographics${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page
+      .locator('[data-testid^="instrument-card-"]')
+      .filter({ hasText: DEMOGRAPHICS_INSTRUMENT_TITLE })
+      .first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+    await instrumentPage.completeEnhancedDemographicsQuestionnaire();
+    await instrumentPage.submit();
+
+    await expect(instrumentPage.summaryHeading).toBeVisible();
+
+    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
+    await page.waitForURL('**/datahub/**/table');
+
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: DEMOGRAPHICS_INSTRUMENT_TITLE }).click();
+
+    await expect(page.getByTestId('data-table-body').getByTestId('data-table-row').first()).toBeVisible();
+  });
+
+  test('should show a validation error for a postal code that does not match the expected format', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Postal${uniqueId}`, `Subject${uniqueId}`, 'Male');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page
+      .locator('[data-testid^="instrument-card-"]')
+      .filter({ hasText: DEMOGRAPHICS_INSTRUMENT_TITLE })
+      .first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+    // Every field on this instrument is optional, so an out-of-format postal code is the only value
+    // filled in, isolating the format error from any required-field error.
+    await instrumentPage.$ref.locator('[name="postalCode"]').fill('invalid');
+    await instrumentPage.submit();
+
+    await expect(instrumentPage.errorMessages).toBeVisible();
   });
 });

@@ -32,9 +32,6 @@ export const UserDropup = () => {
           position="right"
           rotation={-90}
           size="md"
-          onClick={() => {
-            setIsOpen(!isOpen);
-          }}
         >
           <p className="ml-0.5">{currentUser?.username}</p>
           <UserIcon />

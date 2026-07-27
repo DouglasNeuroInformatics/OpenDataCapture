@@ -1,4 +1,5 @@
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
+import { baseURL } from '../support/env';
 import { expect, test } from '../support/fixtures';
 
 import type { GetPageModel } from '../support/fixtures';
@@ -47,5 +48,84 @@ test.describe('remote assignment', () => {
     const urlInput = page.locator('input[readonly]');
     await expect(urlInput).toBeVisible();
     expect(await urlInput.inputValue()).toMatch(/^https?:\/\/.+/);
+  });
+
+  test('should offer a copy-to-clipboard control and a QR code alongside the assignment link', async ({
+    context,
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: baseURL });
+    await startSession(getPageModel, `Copy${uniqueId}`, `User${uniqueId}`, 'Male');
+
+    await page.getByTestId('nav-button-/session/remote-assignment').click();
+    await page.waitForURL('**/session/remote-assignment');
+
+    const remoteAssignmentPage = new RemoteAssignmentPage(page);
+    await expect(remoteAssignmentPage.instrumentShowcase).toBeVisible();
+    await remoteAssignmentPage.clickFirstInstrumentCard();
+    await remoteAssignmentPage.submitAssignmentForm();
+
+    await expect(remoteAssignmentPage.urlInput).toBeVisible();
+    await expect(remoteAssignmentPage.qrCode).toBeVisible();
+
+    const assignmentUrl = await remoteAssignmentPage.urlInput.inputValue();
+    await remoteAssignmentPage.copyLinkButton.click();
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clipboardText).toBe(assignmentUrl);
+  });
+
+  test('should allow creating more than one remote assignment in the same session', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    await startSession(getPageModel, `Multi${uniqueId}`, `User${uniqueId}`, 'Female');
+
+    await page.getByTestId('nav-button-/session/remote-assignment').click();
+    await page.waitForURL('**/session/remote-assignment');
+
+    const remoteAssignmentPage = new RemoteAssignmentPage(page);
+    await expect(remoteAssignmentPage.instrumentShowcase).toBeVisible();
+    await remoteAssignmentPage.selectInstrument('Happiness Questionnaire');
+    await remoteAssignmentPage.submitAssignmentForm();
+    const firstUrl = await remoteAssignmentPage.urlInput.inputValue();
+    await remoteAssignmentPage.closeResultButton.click();
+
+    await expect(remoteAssignmentPage.instrumentShowcase).toBeVisible();
+    await remoteAssignmentPage.selectInstrument('General Consent Form');
+    await remoteAssignmentPage.submitAssignmentForm();
+    const secondUrl = await remoteAssignmentPage.urlInput.inputValue();
+
+    expect(secondUrl).not.toBe(firstUrl);
+  });
+
+  test("should let a group manager cancel an outstanding assignment from the subject's assignments tab", async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    await startSession(getPageModel, `Cancel${uniqueId}`, `User${uniqueId}`, 'Male');
+
+    await page.getByTestId('nav-button-/session/remote-assignment').click();
+    await page.waitForURL('**/session/remote-assignment');
+
+    const remoteAssignmentPage = new RemoteAssignmentPage(page);
+    await expect(remoteAssignmentPage.instrumentShowcase).toBeVisible();
+    await remoteAssignmentPage.selectInstrument('Happiness Questionnaire');
+    await remoteAssignmentPage.submitAssignmentForm();
+    await expect(remoteAssignmentPage.urlInput).toBeVisible();
+    await remoteAssignmentPage.closeResultButton.click();
+
+    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
+    await page.waitForURL('**/datahub/**/table');
+    await page.getByRole('link', { name: 'Assignments' }).click();
+    await page.waitForURL('**/datahub/**/assignments');
+
+    await page.getByRole('row').filter({ hasText: 'Happiness Questionnaire' }).click();
+    await page.getByRole('button', { name: 'Cancel' }).click();
+
+    await expect(page.getByRole('row').filter({ hasText: 'Happiness Questionnaire' })).toContainText('Canceled');
   });
 });

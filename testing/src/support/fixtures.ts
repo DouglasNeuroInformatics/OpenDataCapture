@@ -3,12 +3,26 @@
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 
+import { AboutPage } from '../pages/_app/about.page';
+import { AuditLogsPage } from '../pages/_app/admin/audit/logs.page';
+import { BrandingPage } from '../pages/_app/admin/branding/index.page';
+import { BrandingLoginPagePage } from '../pages/_app/admin/branding/login-page.page';
+import { InstrumentReposPage } from '../pages/_app/admin/instrument-repos/index.page';
+import { AdminSettingsPage } from '../pages/_app/admin/settings.page';
+import { ContactPage } from '../pages/_app/contact.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
+import { SubjectAssignmentsPage } from '../pages/_app/datahub/$subjectId/assignments.page';
+import { SubjectGraphPage } from '../pages/_app/datahub/$subjectId/graph.page';
+import { SubjectRecordDetailPage } from '../pages/_app/datahub/$subjectId/table/$recordId.page';
 import { SubjectDataTablePage } from '../pages/_app/datahub/$subjectId/table/index.page';
 import { DatahubPage } from '../pages/_app/datahub/index.page';
+import { GroupManagePage } from '../pages/_app/group/manage.page';
 import { AccessibleInstrumentsPage } from '../pages/_app/instruments/accessible-instruments.page';
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { StartSessionPage } from '../pages/_app/session/start-session.page';
+import { UploadInstrumentPage } from '../pages/_app/upload/$instrumentId.page';
+import { UploadPage } from '../pages/_app/upload/index.page';
+import { UserPage } from '../pages/_app/user.page';
 import { LoginPage } from '../pages/auth/login.page';
 import { ApiClient } from './api-client';
 import { ADMIN } from './constants';
@@ -18,13 +32,27 @@ import { randomId } from './unique';
 import type { AppState, NavigateVariadicArgs, Role, RouteTo } from './types';
 
 const pageModels = {
+  '/about': AboutPage,
+  '/admin/audit/logs': AuditLogsPage,
+  '/admin/branding': BrandingPage,
+  '/admin/branding/login-page': BrandingLoginPagePage,
+  '/admin/instrument-repos': InstrumentReposPage,
+  '/admin/settings': AdminSettingsPage,
   '/auth/login': LoginPage,
+  '/contact': ContactPage,
   '/dashboard': DashboardPage,
   '/datahub': DatahubPage,
+  '/datahub/$subjectId/assignments': SubjectAssignmentsPage,
+  '/datahub/$subjectId/graph': SubjectGraphPage,
   '/datahub/$subjectId/table': SubjectDataTablePage,
+  '/datahub/$subjectId/table/$recordId': SubjectRecordDetailPage,
+  '/group/manage': GroupManagePage,
   '/instruments/accessible-instruments': AccessibleInstrumentsPage,
   '/session/remote-assignment': RemoteAssignmentPage,
-  '/session/start-session': StartSessionPage
+  '/session/start-session': StartSessionPage,
+  '/upload': UploadPage,
+  '/upload/$instrumentId': UploadInstrumentPage,
+  '/user': UserPage
 } satisfies { [K in RouteTo]?: any };
 
 type PageModels = typeof pageModels;
@@ -56,6 +84,8 @@ type TestFixtures = {
    * asserts it landed on the requested route.
    */
   authenticateAs: (role: Role) => Promise<void>;
+  /** As `authenticateAs`, for a specific seeded user's token rather than a cached role's. */
+  authenticateWithToken: (accessToken: string) => Promise<void>;
   /** Navigates to a route as `actingRole` and returns its page object. */
   getPageModel: GetPageModel;
   /** Short run-unique suffix for naming seeded data in this test. */
@@ -85,9 +115,13 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     { scope: 'worker' }
   ],
   appState: [{ isDisclaimerAccepted: true, isWalkthroughComplete: true }, { option: true }],
-  authenticateAs: async ({ appState, page, roleToken }, use) => {
+  authenticateAs: async ({ authenticateWithToken, roleToken }, use) => {
     await use(async (role) => {
-      const accessToken = await roleToken(role);
+      await authenticateWithToken(await roleToken(role));
+    });
+  },
+  authenticateWithToken: async ({ appState, page }, use) => {
+    await use(async (accessToken) => {
       await page.addInitScript(
         (injected) => {
           window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;

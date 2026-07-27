@@ -109,9 +109,13 @@ const RouteComponent = () => {
       </PageHeader>
       <div className="mt-4 flex flex-col items-center justify-center">
         <UserIcon className="h-16 w-16" />
-        <Heading variant="h2">{fullName}</Heading>
-        <p className="text-sm">{currentUser?.username ?? fullName}</p>
-        <p className="text-sm">
+        <div data-testid="user-info-full-name">
+          <Heading variant="h2">{fullName}</Heading>
+        </div>
+        <p className="text-sm" data-testid="user-info-username">
+          {currentUser?.username ?? fullName}
+        </p>
+        <p className="text-sm" data-testid="user-info-role">
           {userTypes.includes(userInfo.data.basePermissionLevel as string)
             ? userType[userInfo.data.basePermissionLevel as string]
             : undefined}
@@ -189,6 +193,7 @@ const RouteComponent = () => {
             })
           }
         ]}
+        data-testid="user-info-form"
         initialValues={{
           dateOfBirth: userInfo.data.dateOfBirth ?? undefined,
           email: userInfo.data.email ?? '',
