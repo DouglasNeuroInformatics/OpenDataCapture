@@ -3,8 +3,8 @@
   "globalDependencies": [".env", "eslint.config.js", "tsconfig.base.json", "prettier.config.js"],
   "globalEnv": ["NODE_ENV", "NODE_OPTIONS"],
   "tasks": {
-    "gateway#build": {
-      "dependsOn": ["db:push"]
+    "@opendatacapture/gateway#build": {
+      "dependsOn": ["^build", "db:push"]
     },
     "build": {
       "dependsOn": ["^build", "db:generate"],

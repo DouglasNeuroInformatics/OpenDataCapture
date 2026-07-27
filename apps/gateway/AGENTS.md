@@ -62,9 +62,8 @@ Its own SQLite database, entirely separate from the API's MongoDB: `prisma/schem
 `src/lib/prisma.ts` with a computed `getPublicKey()`.
 
 `GATEWAY_DATABASE_URL` is an absolute `file:` URL written by `pnpm generate:env`. Turbo runs
-`db:push` before `dev`, `lint` and `test:e2e`, but `build` only depends on `db:generate` — the
-`gateway#build` key in `turbo.json` does not match the package name `@opendatacapture/gateway` and
-has no effect. After a schema change run `pnpm --filter @opendatacapture/gateway db:push` yourself.
+`db:push` before `dev`, `lint`, `test:e2e` and — via the `@opendatacapture/gateway#build` key in
+`turbo.json` — before `build`, so a gateway build needs `GATEWAY_DATABASE_URL` set.
 
 ## Build and dev
 

@@ -31,7 +31,7 @@ Nothing depends on an app. All five are leaves.
 | `apps/web`        | Clinician-facing React SPA                                                                       | `tsc && vite build`                                    | `web`          |
 
 `apps/gateway` is the only workspace with a `db:push` task, which is why `turbo.json` special-cases
-`gateway#build`.
+`@opendatacapture/gateway#build`.
 
 ## Packages — `packages/*`
 
