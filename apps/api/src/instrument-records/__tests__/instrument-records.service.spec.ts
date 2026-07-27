@@ -296,10 +296,21 @@ describe('InstrumentRecordsService', () => {
         { id: 'session-2', user: null }
       ]);
 
-      const records = await instrumentRecordsService.find({});
+      const records = await instrumentRecordsService.find({ subjectId: 'subject-1' });
 
       expect(records[0]).toMatchObject({ session: { user: { username: 'alice' } } });
       expect(records[1]).toMatchObject({ session: { user: { username: null } } });
+    });
+
+    // Only the per-subject datahub view renders the username column; /dashboard fetches every record
+    // in the group and reads instrumentId alone, so labelling there is a second query for nothing.
+    it('should not look up sessions when no subject is given, so the dashboard does not pay for it', async () => {
+      instrumentRecordModel.findMany.mockResolvedValueOnce([{ id: 'record-1', sessionId: 'session-1' }]);
+
+      const records = await instrumentRecordsService.find({ groupId: 'group-1' });
+
+      expect(sessionModel.findMany).not.toHaveBeenCalled();
+      expect(records[0]).not.toHaveProperty('session');
     });
 
     it('should look up only the sessions the returned records reference, deduplicated', async () => {
@@ -310,7 +321,7 @@ describe('InstrumentRecordsService', () => {
       ]);
       sessionModel.findMany.mockResolvedValueOnce([]);
 
-      await instrumentRecordsService.find({});
+      await instrumentRecordsService.find({ subjectId: 'subject-1' });
 
       expect(sessionModel.findMany).toHaveBeenCalledWith({
         select: { id: true, user: { select: { username: true } } },
@@ -326,7 +337,7 @@ describe('InstrumentRecordsService', () => {
       instrumentRecordModel.findMany.mockResolvedValueOnce([{ id: 'record-1', sessionId: 'session-1' }]);
       sessionModel.findMany.mockResolvedValueOnce([]);
 
-      await instrumentRecordsService.find({}, { ability });
+      await instrumentRecordsService.find({ subjectId: 'subject-1' }, { ability });
 
       expect(sessionModel.findMany).toHaveBeenCalledWith({
         select: { id: true, user: { select: { username: true } } },
@@ -337,7 +348,7 @@ describe('InstrumentRecordsService', () => {
     it('should not query sessions at all when there are no records', async () => {
       instrumentRecordModel.findMany.mockResolvedValueOnce([]);
 
-      await instrumentRecordsService.find({});
+      await instrumentRecordsService.find({ subjectId: 'subject-1' });
 
       expect(sessionModel.findMany).not.toHaveBeenCalled();
     });
@@ -348,7 +359,7 @@ describe('InstrumentRecordsService', () => {
       instrumentRecordModel.findMany.mockResolvedValueOnce([{ id: 'record-1', sessionId: 'deleted-session' }]);
       sessionModel.findMany.mockResolvedValueOnce([]);
 
-      const records = await instrumentRecordsService.find({});
+      const records = await instrumentRecordsService.find({ subjectId: 'subject-1' });
 
       expect(records).toHaveLength(1);
       expect(records[0]).toMatchObject({ id: 'record-1', session: { user: { username: null } } });

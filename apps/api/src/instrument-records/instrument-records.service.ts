@@ -275,6 +275,13 @@ export class InstrumentRecordsService {
       }
     });
 
+    // Only the per-subject view renders the username column. /dashboard fetches every record in the
+    // group and reads `instrumentId` alone, so labelling there would buy a second query with an `$in`
+    // as long as the group's record list for a field that is thrown away.
+    if (!subjectId) {
+      return records;
+    }
+
     return this.withSessionUsernames(records, ability);
   }
 
@@ -595,6 +602,9 @@ export class InstrumentRecordsService {
       select: { id: true, user: { select: { username: true } } },
       where: {
         AND: [
+          // Depends on the caller holding some `read Session` rule: given none at all, this throws a
+          // CASL ForbiddenError instead of returning a restrictive filter, and the request 500s. Every
+          // base permission level grants one, pinned by a test in auth/__tests__/ability.factory.test.ts.
           accessibleQuery(ability, 'read', 'Session'),
           { id: { in: Array.from(new Set(records.map((record) => record.sessionId))) } }
         ]

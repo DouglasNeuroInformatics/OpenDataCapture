@@ -9,6 +9,7 @@ test.describe('instrument completion', () => {
   test('should administer an instrument and surface the record for the subject @smoke', async ({
     getPageModel,
     page,
+    roleAccount,
     uniqueId
   }) => {
     const startSessionPage = await getPageModel('/session/start-session');
@@ -43,6 +44,13 @@ test.describe('instrument completion', () => {
     await page.getByRole('option', { name: INSTRUMENT_TITLE }).click();
 
     await expect(page.getByTestId('data-table-body').getByTestId('data-table-row').first()).toBeVisible();
+
+    // The one place the api -> web username contract is exercised end to end. Both unit tiers mock
+    // the other side of it: the api spec mocks prisma, and the useInstrumentVisualization test mocks
+    // useInstrumentRecords. A record carries its session's user from `GET /v1/instrument-records`,
+    // and 'N/A' is what the hook falls back to when that field does not arrive.
+    const { username } = await roleAccount('GROUP_MANAGER');
+    await expect(page.getByTestId('subject-table-cell-username').first()).toHaveText(username);
   });
 
   test('should localize required-field errors from a zod v4 validation schema', async ({
