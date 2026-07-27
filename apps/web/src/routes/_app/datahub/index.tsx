@@ -106,7 +106,7 @@ const Filters: React.FC<{
             }}
             onSelect={(e) => e.preventDefault()}
           >
-            {t({ en: 'NULL', fr: 'NUL' })}
+            {t({ en: 'NULL', fr: 'NULL' })}
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Group>
         <DropdownMenu.Label>{t('core.identificationData.dateOfBirth.label')}</DropdownMenu.Label>
@@ -155,7 +155,7 @@ const Filters: React.FC<{
             }}
             onSelect={(e) => e.preventDefault()}
           >
-            {t({ en: 'NULL', fr: 'NUL' })}
+            {t({ en: 'NULL', fr: 'NULL' })}
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Group>
         <DropdownMenu.Group>
@@ -390,7 +390,7 @@ const MasterDataTable: React.FC<{
             accessorKey: 'dateOfBirth',
             cell: (ctx) => {
               const value = ctx.getValue() as Date | null | undefined;
-              return value ? toBasicISOString(value) : t({ en: 'NULL', fr: 'NUL' });
+              return value ? toBasicISOString(value) : t({ en: 'NULL', fr: 'NULL' });
             },
             filterFn: (row, id, filter: DateFilter) => {
               const value = row.getValue(id);
@@ -414,7 +414,7 @@ const MasterDataTable: React.FC<{
                 case 'MALE':
                   return t('core.identificationData.sex.male');
                 default:
-                  return t({ en: 'NULL', fr: 'NUL' });
+                  return t({ en: 'NULL', fr: 'NULL' });
               }
             },
             filterFn: (row, id, filter: SexFilter) => {
