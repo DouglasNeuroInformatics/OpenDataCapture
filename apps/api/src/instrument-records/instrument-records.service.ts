@@ -403,13 +403,15 @@ export class InstrumentRecordsService {
 
     // Every record is validated before anything is written, so a malformed record in the middle of a
     // batch rejects the request without first creating sessions that then have to be rolled back.
-    const validatedRecords = records.map((record) => {
+    const validatedRecords = records.map((record, index) => {
       const parseResult = instrument.validationSchema.safeParse(this.parseJson(record.data));
       if (!parseResult.success) {
-        console.error(parseResult.error.issues);
-        throw new UnprocessableEntityException(
-          `Data received for record does not pass validation schema of instrument '${instrument.id}'`
-        );
+        throw new UnprocessableEntityException({
+          error: 'Unprocessable Entity',
+          issues: parseResult.error.issues,
+          message: `Data received for record at index ${index} does not pass validation schema of instrument '${instrument.id}'`,
+          statusCode: 422
+        });
       }
       return { data: parseResult.data, date: record.date, subjectId: record.subjectId };
     });
@@ -425,7 +427,11 @@ export class InstrumentRecordsService {
 
       await this.subjectsService.createMany(subjectIdList);
 
-      const preProcessedRecords = await Promise.all(
+      // `allSettled` rather than `all`: `all` rejects on the first failure while its siblings are
+      // still in flight, so a session created after the catch had begun would be missing from
+      // `createdSessionsArray` and survive the rollback. Settling first means every session that
+      // exists is recorded before anything is undone.
+      const settled = await Promise.allSettled(
         validatedRecords.map(async (record) => {
           const { data, date, subjectId } = record;
 
@@ -455,6 +461,14 @@ export class InstrumentRecordsService {
           };
         })
       );
+
+      const preProcessedRecords = settled.map((result) => {
+        if (result.status === 'rejected') {
+          throw result.reason;
+        }
+        return result.value;
+      });
+
       await this.instrumentRecordModel.createMany({
         data: preProcessedRecords
       });
