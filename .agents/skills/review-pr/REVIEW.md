@@ -61,7 +61,17 @@ Two more reach REQUIRES_HUMAN_REVIEW rather than CLOSE, because the user may alr
 - **medium** — the read was sampled rather than complete, or the subsystem is one you had to learn from scratch, or the intent had to be inferred.
 - **low** — something load-bearing could not be verified. Say what, in the ledger.
 
-## 4. Write the document
+## 4. Size the work
+
+Any verdict carrying action items also names the Claude model that should do them, sized to the scope of the whole action-item set rather than the largest single item. **Overestimate**: torn between two tiers, name the stronger one — a model too large costs tokens, a model too small costs a wrong change to clinical software.
+
+- **Sonnet 5** — mechanical and local: work confined to one or two files, fully specified by the action items, mirroring a pattern already in the repo. Adding missing translation keys, a test modelled on an existing one, a rename.
+- **Opus 5** — the default: multi-file or cross-workspace work, anything needing repo judgment, and any set where an item is phrased as a question rather than an instruction.
+- **Fable 5** — the strongest model, for work that spans several aspects of the system at once and has to hold all of them in mind. **Anything on an escalation path takes Fable 5**, so every automatic REQUIRES_HUMAN_REVIEW carries it: the instrument pipeline, auth and data integrity and schema, build and release tooling.
+
+Name the family, not a dated release — whoever runs the work uses the latest model in that family at the time, and reads `Opus 5` as its successor once one exists.
+
+## 5. Write the document
 
 To `misc/pr-reviews/<N>.md`. One page. The user is busy: no preamble, no restating the diff.
 
@@ -89,6 +99,8 @@ the exact question to answer, and why it cannot be settled without the user.>
 1. [author] <what to change — file:line>
 2. [you] <what only the user can decide>
 
+**Suggested model:** <Fable 5 | Sonnet 5 | Opus 5> — <one clause on why this scope needs it>
+
 ## Evidence
 
 ok: <what was checked — lint, files read, rules applied>
@@ -102,7 +114,7 @@ plain language, no internal reasoning, no verdict jargon.>
 
 Omit a section that does not apply rather than writing "n/a". An action item without a file path is not an action item — make it locatable.
 
-## 5. Clean up
+## 6. Clean up
 
 ```sh
 git worktree remove --force <worktree-path>

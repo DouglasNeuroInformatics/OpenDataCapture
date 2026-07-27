@@ -51,7 +51,7 @@ Done when every drafted comment is either posted or recorded in the index as `bl
 
 Spawn one `general-purpose` sub-agent per surviving PR, at most three in flight. Each prompt carries: the PR number, URL, title, author, `headRefOid`, size, the worktree path to use under the scratchpad directory, and this instruction —
 
-> Read `.agents/skills/review-pr/REVIEW.md` and follow it exactly for this PR. Return only the verdict, confidence, and the path of the document you wrote.
+> Read `.agents/skills/review-pr/REVIEW.md` and follow it exactly for this PR. Return only the verdict, confidence, the suggested model where there are action items, and the path of the document you wrote.
 
 Setup failing inside a worktree splits two ways, and the split matters:
 
@@ -60,7 +60,7 @@ Setup failing inside a worktree splits two ways, and the split matters:
 
 ## 5. Aggregate
 
-Write `misc/pr-reviews/INDEX.md` — every PR in the set, one line each, ordered by what it costs the user: `CLOSE`, `REQUIRES_HUMAN_REVIEW`, `REWORK`, `MERGE`, `BLOCKED`, `PENDING`. Each line: number, title, verdict, confidence, one-clause reason, link to its document.
+Write `misc/pr-reviews/INDEX.md` — every PR in the set, one line each, ordered by what it costs the user: `CLOSE`, `REQUIRES_HUMAN_REVIEW`, `REWORK`, `MERGE`, `BLOCKED`, `PENDING`. Each line: number, title, verdict, confidence, one-clause reason, suggested model where there are action items, link to its document.
 
 Then ask for approval on any late blocked-PR comments from step 4.
 
