@@ -2,8 +2,7 @@
 
 Fixture instruments for tests and Storybook, one export per kind (`./file`, `./forms`,
 `./interactive`, `./series`). Consumed by `packages/schemas` tests, `packages/react-core` and
-`apps/web` stories, and `storybook`. (`packages/instrument-bundler` declares it as a devDependency
-but never imports it — its tests use their own fixtures.)
+`apps/web` stories, and `storybook`.
 
 Written in vanilla JavaScript deliberately: the same stubs are bundled by esbuild in the browser and
 in Node, and transpilation differences between the two would break that. Do not add a `.ts` file

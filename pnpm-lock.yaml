@@ -884,9 +884,6 @@ importers:
         specifier: workspace:zod__3.x@*
         version: link:../../vendor/zod@3.x
     devDependencies:
-      '@opendatacapture/instrument-stubs':
-        specifier: workspace:*
-        version: link:../instrument-stubs
       '@opendatacapture/runtime-v1':
         specifier: workspace:*
         version: link:../../runtime/v1
