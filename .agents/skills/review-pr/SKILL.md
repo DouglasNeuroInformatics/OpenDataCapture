@@ -56,19 +56,38 @@ Setup failing inside a worktree splits two ways, and the split matters:
 - **`pnpm install` or `pnpm generate:env` fails** → BLOCKED (machine). No comment; the machine is broken, not the PR. Report it to the user directly.
 - **`pnpm lint` fails** → BLOCKED (PR). The merge result does not typecheck against current `main`. Draft a comment asking the author to update the branch, and add it to a second approval prompt at the end of the run.
 
-As each **REWORK** document lands, post its `## Reply to author` section straight to the PR with `gh pr comment <N> --body-file <path>` — no approval, no relaying. REWORK is the verdict that costs the user nothing, so the author hears it immediately and the user never sees it again.
+As each **REWORK** document lands, request changes on the PR with its `## Reply to author` section — no approval, no relaying:
+
+```sh
+gh pr review <N> --request-changes --body-file <path>
+```
+
+GitHub refuses a review on the user's own PR; fall back to `gh pr comment <N> --body-file <path>` there. REWORK is the verdict that costs the user nothing, so the author hears it immediately and the user never sees it again.
 
 A **CLOSE** reply is never posted. Closing is the user's call, and the drafted reply waits in the document for them to send when they make it.
 
-## 5. Aggregate
+## 5. Put the toss-ups to the user
+
+Every finding is one of two kinds, and only one of them is the user's:
+
+- **Obvious** — a rule broken, a bug, a missing test, a reimplementation of something that already exists. The fix is not in doubt. Request changes and move on; never ask.
+- **Toss-up** — two defensible options where the choice belongs to the user, not the reviewer. These stay in the document under `## What needs you`.
+
+Once every sub-agent has returned, work through the toss-ups. **Ask one question at a time and wait for the answer — asking multiple questions at once is bewildering.** Give a recommended answer with each.
+
+Then fold each answer back where it belongs: record it in that PR's document, revise the verdict if the answer changed it, and if a PR became REWORK, request changes on it as in step 4.
+
+Done when no document has an unanswered `## What needs you` entry that the user could have settled in a sentence. What remains there is what genuinely needs them in the code.
+
+## 6. Aggregate
 
 Write `misc/pr-reviews/INDEX.md` — every PR in the set, one line each, ordered by what it costs the user: `CLOSE`, `REQUIRES_HUMAN_REVIEW`, `REWORK`, `MERGE`, `BLOCKED`, `PENDING`. Each line: number, title, verdict, confidence, one-clause reason, suggested model where there are action items, link to its document.
 
 Then ask for approval on any late blocked-PR comments from step 4.
 
-## 6. Respond, once every sub-agent is done
+## 7. Respond
 
-Say nothing about action items while reviews are still running — a partial list reads as the whole list. Wait for every sub-agent to return, then reply with two things and nothing else.
+Say nothing about action items while reviews are still running — a partial list reads as the whole list. Every sub-agent has returned and every toss-up is settled by now; reply with two things and nothing else.
 
 **One or two sentences of tally.** "Reviewed all 10. Three need you, one should be closed, four went back to their authors, two are blocked on red CI."
 

@@ -114,6 +114,8 @@ plain language, no internal reasoning, no verdict jargon.>
 
 Omit a section that does not apply rather than writing "n/a". An action item without a file path is not an action item — make it locatable.
 
+Sort every finding into one of two homes. A finding whose fix is not in doubt — a rule broken, a bug, a missing test, a reimplementation of something that exists — is an **action item**, whatever the verdict. A genuine toss-up between two defensible options belongs under **What needs you**, phrased as one answerable question, because your caller will put it to the user directly.
+
 ## 6. Clean up
 
 ```sh
