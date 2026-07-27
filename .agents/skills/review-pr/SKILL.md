@@ -43,13 +43,11 @@ Draft one comment per BLOCKED PR: name the failing check or the conflict, say wh
 
 Print every draft in full, then ask the user once — post all, post none, or post a named subset — and wait. Post with `gh pr comment <N> --body-file <path>`.
 
-This is the only write to GitHub this skill makes. Verdicts are never posted; the user relays those.
-
 Done when every drafted comment is either posted or recorded in the index as `blocked, not notified`.
 
-## 4. Review, three at a time
+## 4. Review, two at a time
 
-Spawn one `general-purpose` sub-agent per surviving PR, at most three in flight. Each prompt carries: the PR number, URL, title, author, `headRefOid`, size, the worktree path to use under the scratchpad directory, and this instruction —
+Spawn one `general-purpose` sub-agent per surviving PR, at most two in flight. Each prompt carries: the PR number, URL, title, author, `headRefOid`, size, the worktree path to use under the scratchpad directory, and this instruction —
 
 > Read `.agents/skills/review-pr/REVIEW.md` and follow it exactly for this PR. Return only the verdict, confidence, the suggested model where there are action items, and the path of the document you wrote.
 
@@ -58,10 +56,30 @@ Setup failing inside a worktree splits two ways, and the split matters:
 - **`pnpm install` or `pnpm generate:env` fails** → BLOCKED (machine). No comment; the machine is broken, not the PR. Report it to the user directly.
 - **`pnpm lint` fails** → BLOCKED (PR). The merge result does not typecheck against current `main`. Draft a comment asking the author to update the branch, and add it to a second approval prompt at the end of the run.
 
+As each **REWORK** document lands, post its `## Reply to author` section straight to the PR with `gh pr comment <N> --body-file <path>` — no approval, no relaying. REWORK is the verdict that costs the user nothing, so the author hears it immediately and the user never sees it again.
+
+A **CLOSE** reply is never posted. Closing is the user's call, and the drafted reply waits in the document for them to send when they make it.
+
 ## 5. Aggregate
 
 Write `misc/pr-reviews/INDEX.md` — every PR in the set, one line each, ordered by what it costs the user: `CLOSE`, `REQUIRES_HUMAN_REVIEW`, `REWORK`, `MERGE`, `BLOCKED`, `PENDING`. Each line: number, title, verdict, confidence, one-clause reason, suggested model where there are action items, link to its document.
 
 Then ask for approval on any late blocked-PR comments from step 4.
 
-Print to the terminal only the verdict lines and the index path. The documents are the deliverable; do not repeat their contents.
+## 6. Respond, once every sub-agent is done
+
+Say nothing about action items while reviews are still running — a partial list reads as the whole list. Wait for every sub-agent to return, then reply with two things and nothing else.
+
+**One or two sentences of tally.** "Reviewed all 10. Three need you, one should be closed, four went back to their authors, two are blocked on red CI."
+
+**Then the action items**, one line each, only for PRs that need the user:
+
+- `CLOSE` → close #N — one clause on why; the reply to send is in its document.
+- `REQUIRES_HUMAN_REVIEW` → review #N — name the part that needs them, and the document path.
+- `MERGE` → merge #N.
+
+`REWORK` PRs produce no action item; their replies are already posted.
+
+`BLOCKED` and `PENDING` produce none either. They are gate outcomes from step 2 — those PRs never reached a sub-agent — plus any late block from step 4, so the tally accounts for them: it explains why a set of ten yielded eight reviews.
+
+End with the index path. The documents hold the reasoning; do not repeat it in the terminal.
