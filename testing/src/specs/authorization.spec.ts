@@ -179,8 +179,10 @@ async function readUsernames(request: APIRequestContext, token: string): Promise
 
 // The sidebar hiding an admin link is cosmetic: a non-admin who navigates to `/admin/users`,
 // `/admin/settings`, `/admin/branding`, `/admin/groups` or `/group/manage` directly gets the real
-// screen. What makes that harmless is the API, so these tests drive it directly rather than through
-// the UI -- they are the reason those screens are not treated as an access-control defect.
+// screen (#1470). What makes that harmless is the API, so these tests drive it directly rather than
+// through the UI -- they are the reason those screens are not treated as an access-control defect.
+// `POST /v1/groups` is the one privileged request a group manager is wrongly allowed (#1468); it is
+// left out of the table below rather than asserted, so the suite does not lock that in.
 test.describe('server-side authorization', () => {
   for (const role of NON_ADMIN_ROLES) {
     test(`should refuse every privileged request a ${role} user could fire from an admin screen`, async ({

@@ -134,7 +134,7 @@ test.describe('admin management', () => {
   });
 
   test('should edit and delete a user through the manage sheet', async ({ api, authenticateAs, page, uniqueId }) => {
-    // The update form requires a non-empty `groupIds` for any non-ADMIN role (see BUGS.md) --
+    // The update form requires a non-empty `groupIds` for any non-ADMIN role (see #1472) --
     // asymmetric with the create form, which allows an empty group set -- so a groupless user can
     // never actually be saved from this sheet. Seed one with a group to isolate the behavior under test.
     const group = await api.createGroup({ name: `E2E Group ${uniqueId}` });
@@ -150,7 +150,7 @@ test.describe('admin management', () => {
 
     await page.getByLabel('Email').fill(`${user.username}@example.com`);
     // The shared `Form` component's own submit button always has `aria-label="Submit"`, even though
-    // this form's visible label is "Save" -- see BUGS.md.
+    // this form's visible label is "Save" -- see DouglasNeuroInformatics/libui#108.
     await page.getByRole('button', { name: 'Submit' }).click();
     // The edit and delete toasts below can stack within the notification hub's shared 5s lifetime,
     // so `.last()` targets the most recently raised one rather than an ambiguous match on both.

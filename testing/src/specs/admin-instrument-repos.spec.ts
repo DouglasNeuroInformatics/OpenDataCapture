@@ -3,7 +3,7 @@ import { expect, test } from '../support/fixtures';
 // Importing a repository clones real instruments from GitHub server-side (see
 // `InstrumentReposService.create` in `apps/api`), and `SetupService` explicitly skips seeding the
 // default repository when `NODE_ENV=test` "which must not reach out to GitHub". So this suite cannot
-// safely exercise a successful import, sync, or delete -- see BUGS.md.
+// safely exercise a successful import, sync, or delete.
 
 test.describe('admin instrument repos', () => {
   test.use({ actingRole: 'ADMIN' });

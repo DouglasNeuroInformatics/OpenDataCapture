@@ -14,7 +14,7 @@ test.describe('admin audit logs', () => {
 
   // Only `Login` (via `auth.service.ts`) and assignment actions (via `assignments.service.ts`)
   // actually call `AuditLogger.log`; creating a group, user, instrument, subject etc. is not audited
-  // despite the Entity filter offering those options -- see BUGS.md. Login is therefore the
+  // despite the Entity filter offering those options -- see #1473. Login is therefore the
   // only auditable action this spec can reliably trigger and verify.
   test('should record a login and find it through the action filter', async ({ apiRequestContext, getPageModel }) => {
     // `getPageModel('ADMIN')` reuses a token cached once per worker (see `roleToken` in fixtures.ts),
