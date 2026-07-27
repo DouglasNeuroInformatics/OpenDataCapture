@@ -69,8 +69,8 @@ export class SessionsService {
             }
           : undefined
       },
-      // returned by the create itself rather than re-read afterwards, which cost a second round trip
-      // for every session created
+      // Returned by the create itself; re-reading it afterwards cost a second round trip for every
+      // session created.
       include: {
         subject: true
       }

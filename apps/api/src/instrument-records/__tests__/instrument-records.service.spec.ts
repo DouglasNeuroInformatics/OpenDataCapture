@@ -285,6 +285,50 @@ describe('InstrumentRecordsService', () => {
       expect(subjectsService.createMany).not.toHaveBeenCalled();
       expect(instrumentRecordModel.createMany).not.toHaveBeenCalled();
     });
+
+    it('should report which record failed and why, so a rejected batch can be corrected', async () => {
+      const issues = [{ message: 'Required', path: ['answer'] }];
+      instrumentsService.findById.mockResolvedValue({
+        ...mockInstrument,
+        validationSchema: {
+          safeParse: (data: any) =>
+            data.answer === 2 ? { error: { issues }, success: false } : { data, success: true }
+        }
+      } as any);
+
+      await expect(
+        instrumentRecordsService.upload({
+          ...baseUploadData,
+          records: [
+            { data: { answer: 1 }, date: new Date(), subjectId: 'subject-1' },
+            { data: { answer: 2 }, date: new Date(), subjectId: 'subject-2' }
+          ]
+        })
+      ).rejects.toMatchObject({
+        response: { issues, message: expect.stringContaining('at index 1') }
+      });
+    });
+
+    it('should roll back a session that was created after an earlier record had already failed', async () => {
+      sessionsService.create
+        .mockRejectedValueOnce(new Error('could not create session'))
+        .mockImplementationOnce(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+          return { ...mockSession, id: 'session-2' };
+        });
+
+      await expect(
+        instrumentRecordsService.upload({
+          ...baseUploadData,
+          records: [
+            { data: { answer: 1 }, date: new Date(), subjectId: 'subject-1' },
+            { data: { answer: 2 }, date: new Date(), subjectId: 'subject-2' }
+          ]
+        })
+      ).rejects.toThrow('could not create session');
+
+      expect(sessionsService.deleteByIds).toHaveBeenCalledWith(['session-2']);
+    });
   });
 
   describe('find', () => {
