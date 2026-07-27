@@ -10,6 +10,8 @@ API-side access control that #3 depends on.
 
 ### 1. A `GROUP_MANAGER` can create groups, because a conditional `manage` rule passes the route guard
 
+Tracked upstream as [#1468](https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues/1468).
+
 `apps/api/src/auth/ability.factory.ts` gives a group manager
 `can('manage', 'Group', { id: { in: groupIds } })`. `JwtAuthGuard` evaluates `@RouteAccess` against
 the subject **type** only, and CASL ignores a rule's conditions for a type-level check, so
@@ -46,6 +48,8 @@ deliberately omits `POST /v1/groups` from `PRIVILEGED_REQUESTS` so the suite doe
 
 ### 2. Subject Lookup's "Personal Information" method silently fails to submit
 
+Tracked upstream as [#1469](https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues/1469).
+
 `apps/web/src/components/IdentificationForm/IdentificationForm.tsx` — the `dateOfBirth` field
 (`kind: 'date'`, nested inside a `kind: 'dynamic'` wrapper) loses its committed value whenever a
 _later_ field in the form re-renders it (e.g. selecting "Sex" after typing the date). Submitting
@@ -66,6 +70,8 @@ exercises the bug. It's equally fragile to a future reorder.
 ## Medium priority
 
 ### 3. Admin routes have no route-level authorization — only the API stops a non-admin
+
+Tracked upstream as [#1470](https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues/1470).
 
 `_app/route.tsx`'s `beforeLoad` checks that a token exists, not what role holds it, and no route
 under `/admin` adds a check of its own. So for a non-admin who navigates directly (pasted URL,
@@ -106,6 +112,8 @@ should not be there.
 
 ### 4. Start Session's custom-identifier path shows a duplicate, contradictory validation error
 
+Tracked upstream as [#1471](https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues/1471).
+
 `apps/web/src/components/StartSessionForm/StartSessionForm.tsx` — the Custom Identifier
 `superRefine` checks `!val.subjectId` to add a "This field is required" error. When the
 identifier's own `.refine()` (format check) fails, Zod hands `superRefine` an `undefined`
@@ -116,6 +124,8 @@ spurious second "This field is required" error alongside the real "Illegal chara
 Submit → two errors under Identifier: "Illegal character: $" **and** "This field is required".
 
 ### 5. Admin "manage user" edit sheet silently requires a group, asymmetric with the create form
+
+Tracked upstream as [#1472](https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues/1472).
 
 `apps/web/src/routes/_app/admin/users/index.tsx` — the update-user schema requires `groupIds` to be
 non-empty for any role other than `ADMIN` (a `.check()` pushes an inline "Standard user must be part
@@ -131,6 +141,8 @@ scroll to the Groups field.
 
 ### 6. Audit log UI offers filters that can never return a result
 
+Tracked upstream as [#1473](https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues/1473).
+
 `/admin/audit/logs`'s Entity filter offers `GROUP`, `USER`, `INSTRUMENT`, `INSTRUMENT_RECORD`,
 `SESSION`, `SUBJECT` — but grepping `apps/api`, only `assignments.service.ts` (Assignment CRUD) and
 `auth.service.ts` (Login) ever call `AuditLogger.log()`. Creating, updating, or deleting a Group,
@@ -140,6 +152,8 @@ ends.
 ## Rare / unconfirmed
 
 ### 7. An instrument occasionally doesn't appear in the subject graph tab's selector moments after its record is created
+
+Tracked upstream as [#1474](https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues/1474).
 
 `apps/web/src/routes/_app/datahub/$subjectId/graph.tsx`, via `useInstrumentVisualization` →
 `useInstrumentInfoQuery` (`GET /v1/instruments/info`). In roughly 1 of every 8 full suite runs while
@@ -159,6 +173,8 @@ rather than asserting the race away; worth a look with real network tracing if i
 
 ### 8. Duplicate `data-testid="subject-table"` on two elements
 
+Tracked upstream as [#1475](https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues/1475).
+
 `apps/web/src/routes/_app/datahub/$subjectId/route.tsx` (the "Table" tab `<Link>`) and
 `apps/web/src/routes/_app/datahub/$subjectId/table/index.tsx` (the `<DataTable>` itself) both carry
 `data-testid="subject-table"`, and both are present in the DOM simultaneously whenever that tab is
@@ -167,11 +183,15 @@ active. `page.getByTestId('subject-table')` is ambiguous. (Worked around in the 
 
 ### 9. `/contact` form shows an untranslated raw Zod message for one field
 
+Tracked upstream as [#1476](https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues/1476).
+
 Submitting `/contact` empty shows the properly localized "This field is required" under Message, but
 the "Reason" select shows the raw Zod message instead: `Invalid option: expected one of
 "bug"|"feedback"|"other"|"request"`. Inconsistent i18n polish, not broken functionality.
 
 ### 10. Vendored `libui` `Form` component's submit button ignores a custom label for its accessible name
+
+Tracked upstream as [DouglasNeuroInformatics/libui#108](https://github.com/DouglasNeuroInformatics/libui/issues/108).
 
 Not a bug in this repo — `@douglasneuroinformatics/libui`'s `Form` component
 (`dist/components/Form/Form.tsx`) hardcodes `aria-label="Submit"` on its submit button regardless of
