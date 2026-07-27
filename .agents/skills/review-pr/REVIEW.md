@@ -23,7 +23,7 @@ pnpm lint
 
 Run `generate:env` in the worktree and never copy the repo's `.env`: `turbo lint` depends on `db:push`, and a worktree-local `.env` keeps the gateway's sqlite file local instead of writing to the user's dev database.
 
-`install` or `generate:env` failing is a broken machine — stop, report it as BLOCKED (machine), write no document. `lint` failing is the PR's problem — stop, report BLOCKED (PR) with the errors, and draft a comment asking the author to update their branch against `main`.
+`install` or `generate:env` failing is a broken machine — stop, report it as BLOCKED (machine), write no document. `lint` failing is the PR's problem — stop, report BLOCKED (PR) with the errors, and write a reply body to the scratchpad asking the author to update their branch against `main`, ending it with `Reviewed at commit <headRefOid>.` so your caller can post it.
 
 ## 2. Read
 
@@ -73,7 +73,16 @@ Name the family, not a dated release — whoever runs the work uses the latest m
 
 ## 5. Write the document
 
-To `misc/pr-reviews/<N>.md`. One page. The user is busy: no preamble, no restating the diff.
+To `misc/pr-reviews/<bucket>/<N>.md`, where the bucket follows the verdict:
+
+| Bucket             | Verdicts                                  |
+| ------------------ | ----------------------------------------- |
+| `action-required/` | `CLOSE`, `REQUIRES_HUMAN_REVIEW`, `MERGE` |
+| `no-action/`       | `REWORK`                                  |
+
+Delete any existing `misc/pr-reviews/*/<N>.md` first — one document per PR, in exactly one bucket, or the buckets stop meaning anything.
+
+One page. The user is busy: no preamble, no restating the diff.
 
 ```markdown
 # PR #<N> — <title>
@@ -96,8 +105,8 @@ the exact question to answer, and why it cannot be settled without the user.>
 
 ## Action items
 
-1. [author] <what to change — file:line>
-2. [you] <what only the user can decide>
+1. <what to change — file:line>
+2. <...>
 
 **Suggested model:** <Fable 5 | Sonnet 5 | Opus 5> — <one clause on why this scope needs it>
 
@@ -108,13 +117,28 @@ not checked: <what was not, and why>
 
 ## Reply to author
 
-<CLOSE and REWORK only. Paste-ready, addressed to the author, action items in
-plain language, no internal reasoning, no verdict jargon.>
+<Whenever there are action items, whatever the verdict. Paste-ready, addressed
+to the author, every action item in plain language, no internal reasoning, no
+verdict jargon.>
+
+If you hand this to Claude Code, **<Fable 5 | Opus 5 | Sonnet 5>** is the right
+size — <one clause on why this scope needs it>.
+
+Reviewed at commit <headRefOid>.
 ```
 
 Omit a section that does not apply rather than writing "n/a". An action item without a file path is not an action item — make it locatable.
 
-Sort every finding into one of two homes. A finding whose fix is not in doubt — a rule broken, a bug, a missing test, a reimplementation of something that exists — is an **action item**, whatever the verdict. A genuine toss-up between two defensible options belongs under **What needs you**, phrased as one answerable question, because your caller will put it to the user directly.
+**Two sections, two audiences, and nothing crosses over.** Sort every finding into exactly one of them:
+
+- **`## Action items` is the author's, and all of it gets posted.** A finding whose fix is not in doubt — a rule broken, a bug, a missing test, a reimplementation of something that exists — goes here, whatever the verdict. The user never relays an action item to anyone, so never address one to them.
+- **`## What needs you` is the user's, and none of it gets posted.** A genuine toss-up between two defensible options, phrased as one answerable question, because your caller will put it to the user directly.
+
+A REQUIRES_HUMAN_REVIEW document has both: the questions wait for the user, the action items go to the author regardless.
+
+The `**Suggested model:**` line under `## Action items` and the model line in the reply are the same judgment for two audiences: the first explains the sizing, the second just tells the author what to reach for. The `Reviewed at commit` line is what stops the next run repeating this review, so it is not optional.
+
+Then write the reply text **on its own** to a file in the scratchpad directory — everything under `## Reply to author` and nothing else — so your caller can post it without parsing the document. The reply body does not belong in `misc/pr-reviews/`; the document already keeps the text for the record.
 
 ## 6. Clean up
 
@@ -123,4 +147,4 @@ git worktree remove --force <worktree-path>
 git worktree prune
 ```
 
-Return only the verdict, the confidence, and the document path.
+Return only the verdict, the confidence, the document path, and the reply-body path where you wrote one.
