@@ -59,6 +59,7 @@ catalogs:
 minimumReleaseAge: 10080 # 7 days
 minimumReleaseAgeExclude:
   - '@douglasneuroinformatics/*'
+  - find-my-way
 packages:
   - 'apps/*'
   - 'packages/*'

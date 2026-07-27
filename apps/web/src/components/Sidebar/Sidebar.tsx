@@ -117,17 +117,42 @@ export const Sidebar = () => {
             <hr className="my-1.5 h-[1px] border-none bg-slate-700" />
             {isSubjectWithPersonalInfo(currentSession.subject!) ? (
               <div data-testid="current-session-info">
-                <p>{`${t('core.fullName')}: ${currentSession.subject.firstName} ${currentSession.subject.lastName}`}</p>
                 <p>
-                  {`${t('core.identificationData.dateOfBirth.label')}: ${toBasicISOString(currentSession.subject.dateOfBirth)}`}{' '}
+                  {t(
+                    { en: '{}: {} {}', fr: '{} : {} {}' },
+                    {
+                      args: [t('core.fullName'), currentSession.subject.firstName, currentSession.subject.lastName]
+                    }
+                  )}
                 </p>
                 <p>
-                  {`${t('core.identificationData.sex.label')}: ${t(`core.identificationData.sex.${toLowerCase(currentSession.subject.sex)}`)}`}
+                  {t(
+                    { en: '{}: {}', fr: '{} : {}' },
+                    {
+                      args: [
+                        t('core.identificationData.dateOfBirth.label'),
+                        toBasicISOString(currentSession.subject.dateOfBirth)
+                      ]
+                    }
+                  )}{' '}
+                </p>
+                <p>
+                  {t(
+                    { en: '{}: {}', fr: '{} : {}' },
+                    {
+                      args: [
+                        t('core.identificationData.sex.label'),
+                        t(`core.identificationData.sex.${toLowerCase(currentSession.subject.sex)}`)
+                      ]
+                    }
+                  )}
                 </p>
               </div>
             ) : (
               <div data-testid="current-session-info">
-                <p>ID: {removeSubjectIdScope(currentSession.subject!.id)}</p>
+                <p>
+                  {t({ en: 'ID: {}', fr: 'ID : {}' }, { args: [removeSubjectIdScope(currentSession.subject!.id)] })}
+                </p>
               </div>
             )}
           </motion.div>
