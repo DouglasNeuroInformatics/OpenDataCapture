@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
 
-import { $ReleaseInfo } from '../setup/setup';
+import { $ReleaseInfo } from '../setup/setup.js';
 
 export type GatewayHealthcheckSuccessResult = z.infer<typeof $GatewayHealthcheckSuccessResult>;
 export const $GatewayHealthcheckSuccessResult = z.object({
