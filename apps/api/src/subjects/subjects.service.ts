@@ -168,13 +168,6 @@ export class SubjectsService {
     return subject;
   }
 
-  /** The subjects among `ids` that exist, in one query; a missing id is omitted rather than an error. */
-  async findByIds(ids: string[], { ability }: EntityOperationOptions = {}) {
-    return this.subjectModel.findMany({
-      where: { AND: [accessibleQuery(ability, 'read', 'Subject')], id: { in: ids } }
-    });
-  }
-
   private async querySubjectIdsWithRecords(groupId?: string): Promise<string[]> {
     const records = await this.prismaClient.instrumentRecord.findMany({
       distinct: ['subjectId'],

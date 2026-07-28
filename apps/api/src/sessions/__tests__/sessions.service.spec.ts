@@ -2,6 +2,7 @@ import { getModelToken, LoggingService, PRISMA_CLIENT_TOKEN } from '@douglasneur
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
+import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -45,7 +46,6 @@ describe('SessionsService', () => {
 
     subjectsService.createMany.mockResolvedValue([] as any);
     subjectsService.addGroupForSubjects.mockResolvedValue({ count: 0 } as any);
-    subjectsService.findByIds.mockResolvedValue([{ groupIds: [], id: 'subject-1' }] as any);
     prismaClient.user.findFirst.mockResolvedValue(null);
     sessionModel.createMany.mockResolvedValue({ count: 1 } as any);
     sessionModel.findMany.mockImplementation(({ where }: any) =>
@@ -64,7 +64,6 @@ describe('SessionsService', () => {
     // A session whose groupId is unset is invisible to a group manager, whose Session rule is
     // { groupId: { in: [...] } }, and uncounted by every group-scoped query.
     it('should set the groupId on a session for a subject that is already a member of the group', async () => {
-      subjectsService.findByIds.mockResolvedValueOnce([{ groupIds: ['group-1'], id: 'subject-1' }] as any);
       groupsService.findById.mockResolvedValueOnce({ id: 'group-1' } as any);
 
       await sessionsService.createMany({
@@ -77,10 +76,6 @@ describe('SessionsService', () => {
     });
 
     it('should associate the batch with the group in a single write', async () => {
-      subjectsService.findByIds.mockResolvedValueOnce([
-        { groupIds: ['group-1'], id: 'subject-1' },
-        { groupIds: [], id: 'subject-2' }
-      ] as any);
       groupsService.findById.mockResolvedValueOnce({ id: 'group-1' } as any);
 
       await sessionsService.createMany({
@@ -105,10 +100,6 @@ describe('SessionsService', () => {
     });
 
     it('should return the sessions in the order the entries were given, so callers can pair by index', async () => {
-      subjectsService.findByIds.mockResolvedValueOnce([
-        { groupIds: [], id: 'subject-a' },
-        { groupIds: [], id: 'subject-b' }
-      ] as any);
       // The read-back is a findMany, which is free to return documents in any order.
       sessionModel.findMany.mockImplementationOnce(({ where }: any) =>
         Promise.resolve([...where.id.in].reverse().map((id: string) => ({ id })))
@@ -127,9 +118,6 @@ describe('SessionsService', () => {
 
     it('should create every session in one call rather than one call per entry', async () => {
       const entries = Array.from({ length: 20 }, (_, i) => entry(`subject-${i}`));
-      subjectsService.findByIds.mockResolvedValueOnce(
-        entries.map((_, i) => ({ groupIds: [], id: `subject-${i}` })) as any
-      );
 
       await sessionsService.createMany({ entries, groupId: null, type: 'RETROSPECTIVE' });
 
@@ -139,10 +127,6 @@ describe('SessionsService', () => {
 
     it('should resolve the user once for the whole batch and stamp it on every session', async () => {
       const entries = [entry('subject-a'), entry('subject-b')];
-      subjectsService.findByIds.mockResolvedValueOnce([
-        { groupIds: [], id: 'subject-a' },
-        { groupIds: [], id: 'subject-b' }
-      ] as any);
       prismaClient.user.findFirst.mockResolvedValueOnce({ id: 'user-1', username: 'someone' });
 
       await sessionsService.createMany({ entries, groupId: null, type: 'RETROSPECTIVE', username: 'someone' });
@@ -151,6 +135,22 @@ describe('SessionsService', () => {
       expect(sessionModel.createMany.mock.lastCall?.[0]).toMatchObject({
         data: [{ userId: 'user-1' }, { userId: 'user-1' }]
       });
+    });
+
+    // Without this, a session missing from the read-back would be handed to the caller as
+    // `undefined` typed `Session`, and `POST /sessions` would answer 201 with an empty body.
+    it('should throw rather than return a gap when the read-back misses a created session', async () => {
+      sessionModel.findMany.mockImplementationOnce(({ where }: any) =>
+        Promise.resolve(where.id.in.slice(1).map((id: string) => ({ id })))
+      );
+
+      await expect(
+        sessionsService.createMany({
+          entries: [entry('subject-a'), entry('subject-b')],
+          groupId: null,
+          type: 'RETROSPECTIVE'
+        })
+      ).rejects.toBeInstanceOf(InternalServerErrorException);
     });
   });
 
