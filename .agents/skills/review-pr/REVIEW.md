@@ -43,7 +43,9 @@ One verdict, with confidence.
 - **CLOSE** — the premise is wrong; no amount of fixing the code rescues it. The diff would have to be thrown away. Grounds: fundamentally flawed; a step backwards from the current architecture; reimplements a DNP package; endangers clinical data by design (silently swallowed errors, weakened auth or group scoping, data-loss paths, plaintext subject identifiers); or the whole PR is a hack that belongs elsewhere — direct DOM manipulation in React for something `libui` should own, and that hack _is_ the PR.
 - **REWORK** — the premise is sound, the execution is not. Action items go to the author; the user need not open it.
 - **REQUIRES_HUMAN_REVIEW** — blocked on a judgment only the user can make.
-- **MERGE** — conforms, is tested, and nothing needs the user.
+- **MERGE** — conforms, is tested, and has **no action items at all**. Not "none that matter" — none.
+  A single item the author owes makes it REWORK, because that item is a round trip either way, and a
+  PR the user is told to merge is a PR nobody reopens to fix it.
 
 Judgment, not a checklist. Contradicting a documented `AGENTS.md` is **not** automatically wrong — if the change is an improvement, say so and let the verdict follow the merit. Conversely a clean-looking diff on an escalation path is still REQUIRES_HUMAN_REVIEW.
 
@@ -131,7 +133,7 @@ Omit a section that does not apply rather than writing "n/a". An action item wit
 
 **Two sections, two audiences, and nothing crosses over.** Sort every finding into exactly one of them:
 
-- **`## Action items` is the author's, and all of it gets posted.** A finding whose fix is not in doubt — a rule broken, a bug, a missing test, a reimplementation of something that exists — goes here, whatever the verdict. The user never relays an action item to anyone, so never address one to them.
+- **`## Action items` is the author's, and all of it gets posted.** A finding whose fix is not in doubt — a rule broken, a bug, a missing test, a reimplementation of something that exists — goes here, whatever the verdict, and its presence rules out MERGE. Every entry names the defect or the documented standard it rests on; if you cannot name one, drop the entry rather than padding the list. The user never relays an action item to anyone, so never address one to them.
 - **`## What needs you` is the user's, and none of it gets posted.** A genuine toss-up between two defensible options, phrased as one answerable question, because your caller will put it to the user directly.
 
 A REQUIRES_HUMAN_REVIEW document has both: the questions wait for the user, the action items go to the author regardless.
