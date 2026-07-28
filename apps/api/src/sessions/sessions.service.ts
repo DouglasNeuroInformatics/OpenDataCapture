@@ -3,14 +3,19 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData } from '@opendatacapture/schemas/session';
-import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { Prisma, Session, Subject, User } from '@prisma/client';
+import type { Prisma, Session, User } from '@prisma/client';
+import { ObjectId } from 'mongodb';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { RuntimePrismaClient } from '@/core/prisma';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { SubjectsService } from '@/subjects/subjects.service';
+
+/** The batched form of `CreateSessionData`: what varies per session, and what the batch shares. */
+type CreateManySessionsData = Pick<CreateSessionData, 'groupId' | 'type' | 'username'> & {
+  entries: Pick<CreateSessionData, 'date' | 'subjectData'>[];
+};
 
 @Injectable()
 export class SessionsService {
@@ -29,54 +34,68 @@ export class SessionsService {
   }
 
   async create({ date, groupId, subjectData, type, username }: CreateSessionData): Promise<Session> {
-    this.loggingService.debug({ message: 'Attempting to create session' });
-    const subject = await this.resolveSubject(subjectData);
+    const [session] = await this.createMany({
+      entries: [{ date, subjectData }],
+      groupId,
+      type,
+      username
+    });
+    return session!;
+  }
 
-    let user: null | Omit<User, 'hashedPassword'> = null;
+  /**
+   * Create one session per entry, in a fixed number of queries rather than a fixed number per entry.
+   *
+   * Returned in the same order as `entries`, so a caller can pair each session with the input that
+   * produced it without a second lookup.
+   */
+  async createMany({ entries, groupId, type, username }: CreateManySessionsData): Promise<Session[]> {
+    if (entries.length === 0) {
+      return [];
+    }
+    this.loggingService.debug({ message: `Attempting to create ${entries.length} session(s)` });
 
-    if (username) {
-      user = await this.prismaClient.user.findFirst({
-        where: {
-          username: username
-        }
-      });
+    await this.subjectsService.createMany(entries.map((entry) => entry.subjectData));
+
+    const user: null | Omit<User, 'hashedPassword'> = username
+      ? await this.prismaClient.user.findFirst({ where: { username } })
+      : null;
+
+    const group: Group | null = groupId ? await this.groupsService.findById(groupId) : null;
+    if (group) {
+      await this.subjectsService.addGroupForSubjects(
+        Array.from(new Set(entries.map((entry) => entry.subjectData.id))),
+        group.id
+      );
     }
 
-    // If the subject is not yet associated with the group, check it exists then append it
-    let group: Group | null = null;
-    if (groupId && !subject.groupIds.includes(groupId)) {
-      group = await this.groupsService.findById(groupId);
-      if (group) {
-        await this.subjectsService.addGroupForSubject(subject.id, group.id);
-      }
-    }
+    // Generated up front so the sessions can be read back in the order they were requested;
+    // createMany does not return the documents it inserted.
+    const ids = entries.map(() => new ObjectId().toHexString());
 
-    const { id } = await this.sessionModel.create({
-      data: {
-        date,
-        group: group
-          ? {
-              connect: { id: group.id }
-            }
-          : undefined,
-        subject: {
-          connect: { id: subject.id }
-        },
+    await this.sessionModel.createMany({
+      data: entries.map((entry, index) => ({
+        date: entry.date,
+        groupId: group?.id ?? null,
+        id: ids[index]!,
+        subjectId: entry.subjectData.id,
         type,
-        user: user
-          ? {
-              connect: { id: user.id }
-            }
-          : undefined
-      }
+        userId: user?.id ?? null
+      }))
     });
 
-    return (await this.sessionModel.findUnique({
-      include: {
-        subject: true
-      },
-      where: { id }
-    }))!;
+    const created = await this.sessionModel.findMany({
+      include: { subject: true },
+      where: { id: { in: ids } }
+    });
+    const byId = new Map(created.map((session) => [session.id, session]));
+    return ids.map((id) => {
+      const session = byId.get(id);
+      if (!session) {
+        throw new InternalServerErrorException(`Failed to read back created session with id: ${id}`);
+      }
+      return session;
+    });
   }
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
@@ -124,20 +143,5 @@ export class SessionsService {
       throw new NotFoundException(`Failed to find session with ID: ${id}`);
     }
     return session;
-  }
-
-  /** Get the subject if they exist, otherwise create them */
-  private async resolveSubject(subjectData: CreateSubjectData) {
-    this.loggingService.debug({ message: 'Attempting to resolve subject', subjectData });
-    let subject: Subject;
-    try {
-      subject = await this.subjectsService.findById(subjectData.id);
-    } catch (err) {
-      if (!(err instanceof NotFoundException)) {
-        throw new InternalServerErrorException('Unexpected Error', { cause: err });
-      }
-      subject = await this.subjectsService.create(subjectData);
-    }
-    return subject;
   }
 }
