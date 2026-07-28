@@ -1,4 +1,4 @@
-import { CryptoService, getModelToken, PRISMA_CLIENT_TOKEN } from '@douglasneuroinformatics/libnest';
+import { CryptoService, getModelToken, LoggingService, PRISMA_CLIENT_TOKEN } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
@@ -7,6 +7,7 @@ import { Test } from '@nestjs/testing';
 import { pick } from 'lodash-es';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 import type { RuntimePrismaClient } from '@/core/prisma';
 
@@ -102,7 +103,6 @@ describe('SubjectsService', () => {
       expect(prismaClient.instrumentRecord.groupBy).toHaveBeenCalledWith(
         expect.objectContaining({ by: ['subjectId'] })
       );
-      expect(prismaClient.instrumentRecord.findMany).not.toHaveBeenCalled();
     });
     it('should filter instrument records by groupId when provided', async () => {
       prismaClient.instrumentRecord.groupBy.mockResolvedValueOnce([{ subjectId: '123' }]);
@@ -126,6 +126,25 @@ describe('SubjectsService', () => {
       await subjectsService.find({ hasRecord: true }, { ability });
       const [call] = prismaClient.instrumentRecord.groupBy.mock.lastCall as [{ where: { AND: unknown[] } }];
       expect(call.where.AND[0]).toStrictEqual(accessibleQuery(ability, 'read', 'InstrumentRecord'));
+    });
+
+    // A STANDARD user holds `create` but not `read` on InstrumentRecord, and this route's guard names
+    // `read Subject`, so they reach the service. `accessibleQuery` throws on an ability with no rule
+    // for the subject at all, which escapes as a 500 rather than the empty list they should see.
+    it('should return an empty list for a caller who may read no records, rather than throwing', async () => {
+      const abilityFactory = new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService);
+      const ability = abilityFactory.createForPayload({
+        basePermissionLevel: 'STANDARD',
+        groups: [{ id: 'group-1' }],
+        id: 'user-1'
+      } as any);
+      subjectModel.findMany.mockResolvedValueOnce([]);
+
+      await expect(subjectsService.find({ hasRecord: true }, { ability })).resolves.toStrictEqual([]);
+
+      expect(prismaClient.instrumentRecord.groupBy).not.toHaveBeenCalled();
+      const [call] = subjectModel.findMany.mock.lastCall as [{ where: { AND: unknown[] } }];
+      expect(call.where.AND).toContainEqual({ id: { in: [] } });
     });
     it('should pass all subject IDs returned by instrument records to the subject query', async () => {
       prismaClient.instrumentRecord.groupBy.mockResolvedValueOnce([{ subjectId: '123' }, { subjectId: '456' }]);

@@ -172,6 +172,13 @@ export class SubjectsService {
    * construct fail outright elsewhere.
    */
   private async querySubjectIdsWithRecords(groupId?: string, ability?: AppAbility): Promise<string[]> {
+    // `accessibleQuery` throws rather than returning a restrictive filter when the ability holds no
+    // rule for the subject at all, and a STANDARD user holds `create` but not `read` on
+    // InstrumentRecord. This route's guard names `read Subject`, so such a caller reaches here; no
+    // readable records means no subjects qualify.
+    if (ability && !ability.can('read', 'InstrumentRecord')) {
+      return [];
+    }
     const groups = await this.prismaClient.instrumentRecord.groupBy({
       by: ['subjectId'],
       where: {
