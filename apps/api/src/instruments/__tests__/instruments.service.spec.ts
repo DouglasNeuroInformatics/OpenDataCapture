@@ -9,6 +9,7 @@ import type { SeriesInstrument } from '@opendatacapture/runtime-core';
 import type { WithID } from '@opendatacapture/schemas/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 
 import { InstrumentsService } from '../instruments.service';
@@ -690,6 +691,25 @@ describe('InstrumentsService', () => {
 
       const [call] = instrumentRecordModel.findMany.mock.lastCall as [{ where: { AND: unknown[] } }];
       expect(call.where.AND[0]).toStrictEqual(accessibleQuery(ability, 'read', 'InstrumentRecord'));
+    });
+
+    // Built through the factory rather than by hand: a hand-built ability tends to include a
+    // `read InstrumentRecord` rule, and it is the absence of one that breaks. A STANDARD user holds
+    // `create` but not `read`, and this route is gated on `read Instrument`, which they do hold.
+    it('should resolve for a caller who may read no records, rather than failing the request', async () => {
+      const abilityFactory = new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService);
+      const ability = abilityFactory.createForPayload({
+        basePermissionLevel: 'STANDARD',
+        groups: [{ id: 'group-1' }],
+        id: 'user-1'
+      } as any);
+
+      await expect(instrumentsService.find({ subjectId: 'subject-1' }, { ability })).resolves.toStrictEqual([]);
+
+      expect(instrumentRecordModel.findMany).not.toHaveBeenCalled();
+      expect(instrumentModel.findMany.mock.lastCall?.[0]).toMatchObject({
+        where: { AND: expect.arrayContaining([{ id: { in: [] } }]) }
+      });
     });
 
     it('should return nothing when the subject has no records', async () => {
