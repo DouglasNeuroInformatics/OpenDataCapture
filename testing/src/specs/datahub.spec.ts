@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+
 import { DatahubPage } from '../pages/_app/datahub/index.page';
 import { expect, test } from '../support/fixtures';
 
@@ -42,18 +44,9 @@ test.describe('data hub', () => {
     await expect(datahubPage.rows).toHaveCount(1);
 
     const download = await datahubPage.exportAs('JSON');
-    const payload = JSON.parse(await readAll(download)) as { subjectId: string }[];
+    const payload = JSON.parse(await readFile(await download.path(), 'utf8')) as { subjectId: string }[];
 
     expect(payload.length).toBeGreaterThan(0);
     expect([...new Set(payload.map((row) => row.subjectId))]).toStrictEqual([listed]);
   });
 });
-
-async function readAll(download: Awaited<ReturnType<DatahubPage['exportAs']>>): Promise<string> {
-  const stream = await download.createReadStream();
-  const chunks: Buffer[] = [];
-  for await (const chunk of stream) {
-    chunks.push(chunk as Buffer);
-  }
-  return Buffer.concat(chunks).toString('utf8');
-}
