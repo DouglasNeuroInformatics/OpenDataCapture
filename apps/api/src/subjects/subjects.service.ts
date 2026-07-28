@@ -179,6 +179,10 @@ export class SubjectsService {
     if (ability && !ability.can('read', 'InstrumentRecord')) {
       return [];
     }
+    // The accessibleQuery clause also drops records whose groupId is null: a group manager's rule is
+    // `groupId: { in: [...] }`, and prisma's `in` never matches null. That is intended — an
+    // admin-created, ungrouped record should not make a subject count as "with records" for a
+    // manager — but it is invisible at this call site, so it is recorded here.
     const groups = await this.prismaClient.instrumentRecord.groupBy({
       by: ['subjectId'],
       where: {
