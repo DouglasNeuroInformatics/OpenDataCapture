@@ -14,9 +14,9 @@ import { QRCode } from '@/components/QRCode';
 import { WithFallback } from '@/components/WithFallback';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
-
-const ONE_YEAR = 31556952000;
+import { getDefaultAssignmentExpiry } from '@/utils/assignment-duration';
 
 /** Slide-over panel shown after an assignment is created, displaying the URL, copy button, and QR code */
 const AssignmentResultSlider: React.FC<{
@@ -81,6 +81,7 @@ const RouteComponent = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const instrumentInfoQuery = useInstrumentInfoQuery();
+  const setupStateQuery = useSetupStateQuery();
   const createAssignmentMutation = useCreateAssignment();
 
   const [selectedInstrument, setSelectedInstrument] = useState<null | TranslatedInstrumentInfo>(null);
@@ -93,6 +94,11 @@ const RouteComponent = () => {
       void navigate({ to: '/session/start-session' });
     }
   }, [currentSession]);
+
+  useEffect(() => {
+    const input = document.querySelector<HTMLInputElement>('[data-testid="instrument-search-bar"] input');
+    input?.focus();
+  }, []);
 
   if (!currentSession) {
     return null;
@@ -123,7 +129,14 @@ const RouteComponent = () => {
         }}
       />
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <Dialog.Content>
+        <Dialog.Content
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            if (event.currentTarget instanceof HTMLElement) {
+              event.currentTarget.querySelector<HTMLButtonElement>('button[type="submit"]')?.focus();
+            }
+          }}
+        >
           <Dialog.Header>
             <Dialog.Title>
               {t({
@@ -153,7 +166,7 @@ const RouteComponent = () => {
               }
             }}
             initialValues={{
-              expiresAt: new Date(Date.now() + ONE_YEAR)
+              expiresAt: getDefaultAssignmentExpiry(setupStateQuery.data.defaultAssignmentDurationDays)
             }}
             validationSchema={
               z.object({

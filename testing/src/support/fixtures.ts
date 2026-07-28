@@ -3,6 +3,7 @@
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 
+import { SettingsPage } from '../pages/_app/admin/settings.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
 import { SubjectDataTablePage } from '../pages/_app/datahub/$subjectId/table/index.page';
 import { DatahubPage } from '../pages/_app/datahub/index.page';
@@ -18,6 +19,7 @@ import { randomId } from './unique';
 import type { AppState, NavigateVariadicArgs, Role, RouteTo } from './types';
 
 const pageModels = {
+  '/admin/settings': SettingsPage,
   '/auth/login': LoginPage,
   '/dashboard': DashboardPage,
   '/datahub': DatahubPage,
