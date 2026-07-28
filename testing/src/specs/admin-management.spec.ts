@@ -30,9 +30,10 @@ test.describe('admin management', () => {
     await expect(page.getByTestId('data-table-body')).toContainText('admin');
   });
 
-  test("should clear a user's email from the edit sheet", async ({ api, authenticateAs, page }) => {
+  test("should clear a user's email from the edit sheet", async ({ api, authenticateAs, page, uniqueId }) => {
+    const email = `contact-${uniqueId}@example.org`;
     const group = await api.createGroup();
-    const { user } = await api.createUser({ email: 'contact@example.org', groupIds: [group.id] });
+    const { user } = await api.createUser({ email, groupIds: [group.id] });
 
     await authenticateAs('ADMIN');
     await page.goto('/admin/users');
@@ -43,7 +44,7 @@ test.describe('admin management', () => {
     const emailInput = editSheet.getByLabel('Email');
 
     await page.getByTestId('data-table-row').dblclick();
-    await expect(emailInput).toHaveValue('contact@example.org');
+    await expect(emailInput).toHaveValue(email);
     await emailInput.clear();
     await editSheet.getByRole('button', { name: 'Submit' }).click();
     await expect(editSheet).toBeHidden();

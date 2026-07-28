@@ -41,10 +41,11 @@ test.describe('user account', () => {
     await expect(userAccountPage.passwordDialog).toBeHidden();
   });
 
-  test('should clear contact details that are saved blank', async ({ api, authenticateAs, page }) => {
+  test('should clear contact details that are saved blank', async ({ api, authenticateAs, page, uniqueId }) => {
+    const email = `contact-${uniqueId}@example.org`;
     const group = await api.createGroup();
     const { credentials } = await api.createUser({
-      email: 'contact@example.org',
+      email,
       groupIds: [group.id],
       phoneNumber: '5145551234'
     });
@@ -52,7 +53,7 @@ test.describe('user account', () => {
 
     const userAccountPage = new UserAccountPage(page);
     await userAccountPage.goto('/user');
-    await expect(userAccountPage.emailInput).toHaveValue('contact@example.org');
+    await expect(userAccountPage.emailInput).toHaveValue(email);
     await expect(userAccountPage.phoneNumberInput).toHaveValue('5145551234');
 
     await userAccountPage.emailInput.clear();
