@@ -15,21 +15,30 @@ export class SubjectGraphPage extends AppPage {
   }
 
   /**
+   * The dots plotted for one measure. Each selected measure also gets a dashed group-trend line
+   * whose points carry the same `.recharts-line-dot` class and appear only once the linear-model
+   * query resolves, so an unscoped locator matches one or two elements depending on timing.
+   */
+  measureDots(label: string): Locator {
+    return this.chart.locator(`.recharts-line-dot[name="${label}"]`);
+  }
+
+  /**
    * The instrument list is a fresh fetch on every mount, but has rarely (not reliably reproducible)
    * still been missing an instrument completed moments earlier -- an apparent eventual-consistency
-   * gap somewhere between the write and this read, not a caching issue in the client. Retry with a
-   * reload rather than a single long wait, since a reload is what's actually been observed to help.
+   * gap somewhere between the write and this read, not a caching issue in the client. The option
+   * has also been seen detaching mid-click as the list re-renders under it. Both failures look the
+   * same from here, and a reload is what's actually been observed to help, so retry through one.
    */
   async selectInstrument(title: string, attempts = 3) {
     for (let attempt = 1; attempt <= attempts; attempt++) {
       await this.instrumentSelectTrigger.click();
       const option = this.$ref.getByRole('option', { name: title });
-      const found = await option
-        .waitFor({ state: 'visible', timeout: attempt === attempts ? 15000 : 5000 })
+      const selected = await option
+        .click({ timeout: attempt === attempts ? 15000 : 5000 })
         .then(() => true)
         .catch(() => false);
-      if (found) {
-        await option.click();
+      if (selected) {
         return;
       }
       if (attempt < attempts) {
@@ -37,7 +46,7 @@ export class SubjectGraphPage extends AppPage {
         await this.$ref.reload();
       }
     }
-    throw new Error(`Instrument "${title}" never appeared in the graph tab's selector after ${attempts} attempts.`);
+    throw new Error(`Instrument "${title}" was never selectable in the graph tab after ${attempts} attempts.`);
   }
 
   async selectMeasure(label: string) {

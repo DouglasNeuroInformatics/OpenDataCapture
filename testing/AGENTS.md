@@ -63,7 +63,7 @@ A page object is only reachable from a spec once it is registered in the `pageMo
 | `authenticateAs(role)`         | test        | Injects a token without navigating                                         |
 | `authenticateWithToken(token)` | test        | Same, for a specific seeded user rather than a cached role                 |
 | `actingRole`                   | test option | Default `GROUP_MANAGER`; override with `test.use({ actingRole: 'ADMIN' })` |
-| `appState`                     | test option | localStorage first-run gating; both flags default to accepted/complete     |
+| `appState`                     | test option | localStorage first-run gating, seeded for every test; defaults to accepted |
 | `uniqueId`                     | test        | Short random suffix for seeded data                                        |
 | `api`                          | worker      | `ApiClient` as admin — `createGroup()` / `createUser()` for preconditions  |
 | `roleAccount(role)`            | worker      | Seeds a group + user per role once, then caches its token and username     |
@@ -74,6 +74,16 @@ only drive the UI for the behaviour actually under test.
 
 Auth is injected as `window.__PLAYWRIGHT_ACCESS_TOKEN__`, which `apps/web`'s
 `src/store/slices/auth.slice.ts` reads on boot. It is memory-only and never persisted.
+
+`appState` is written to localStorage by an autouse fixture, so it applies to a spec that logs in
+through the real form just as much as to one using `authenticateAs`. Left to the app's own defaults,
+the disclaimer dialog and then the walkthrough overlay cover the page and swallow clicks — the
+walkthrough only stays away locally because a developer `.env` tends to set
+`VITE_DEV_DISABLE_TUTORIAL=true`, which `.env.template` (and therefore CI) does not.
+
+**Never assert against a value only your `.env` holds.** CI generates `.env` from `.env.template`,
+so anything configurable — `CONTACT_EMAIL`, ports — is read through `src/support/env.ts` rather than
+written as a literal in a spec.
 
 ## Running
 

@@ -23,8 +23,8 @@ test.describe('disclaimer', () => {
     // Logging in through the real UI form (rather than `getPageModel`, which injects the token via
     // `page.addInitScript`) matters here: an init script re-runs on every navigation, including the
     // hard reload declining triggers, so it would silently re-authenticate the page and mask the
-    // very thing this test checks. A brand-new browser context also defaults to
-    // `isDisclaimerAccepted: false` in-code, so the dialog appears without needing `appState`.
+    // very thing this test checks. The `appState` override above still applies, since it is seeded
+    // independently of authentication, so the dialog appears on both logins below.
     const group = await api.createGroup();
     const { credentials } = await api.createUser({ groupIds: [group.id] });
 

@@ -13,6 +13,8 @@ import type { GetPageModel } from '../support/fixtures';
 // title shown while running it (`clientDetails.title`, "Questionnaire on Happiness").
 const INSTRUMENT_TITLE = 'Happiness Questionnaire';
 
+const MEASURE = 'Overall Satisfaction Score';
+
 /**
  * Starts a session, completes the Happiness Questionnaire for it, and lands on the resulting
  * subject's record table — the precondition every test in this file needs. Mirrors the flow in
@@ -51,6 +53,10 @@ test.describe('subject detail', () => {
     page,
     uniqueId
   }) => {
+    // Seeding through the UI, then driving three dropdowns, does not fit the default 30s on a
+    // two-core CI runner -- especially once `selectInstrument` spends any of it retrying.
+    test.slow();
+
     await seedSubjectWithRecord(getPageModel, page, `Graph${uniqueId}`);
 
     await page.getByRole('link', { name: 'Graph' }).click();
@@ -58,11 +64,11 @@ test.describe('subject detail', () => {
 
     const graphPage = new SubjectGraphPage(page);
     await graphPage.selectInstrument(INSTRUMENT_TITLE);
-    await graphPage.selectMeasure('Overall Satisfaction Score');
+    await graphPage.selectMeasure(MEASURE);
 
     // `.recharts-line-curve` is the path connecting two or more points, which this single-record
-    // subject never has; `.recharts-line-dot` renders per point regardless of count.
-    await expect(graphPage.chart.locator('.recharts-line-dot')).toBeVisible();
+    // subject never has; a dot renders per point regardless of count.
+    await expect(graphPage.measureDots(MEASURE)).toBeVisible();
   });
 
   test('should list a remote assignment created for the subject and allow canceling it', async ({

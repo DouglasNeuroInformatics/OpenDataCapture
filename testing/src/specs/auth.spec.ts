@@ -1,4 +1,3 @@
-import { acceptDisclaimerIfPresent } from '../support/disclaimer';
 import { expect, test } from '../support/fixtures';
 
 test.describe('authentication', () => {
@@ -56,7 +55,6 @@ test.describe('authentication', () => {
     const loginPage = await getPageModel('/auth/login');
     await loginPage.fillLoginForm(credentials);
     await loginPage.expect.toHaveURL('/dashboard');
-    await acceptDisclaimerIfPresent(page);
 
     await page.getByTestId('user-dropup-trigger').click();
     await page.getByTestId('user-dropup-logout').click();

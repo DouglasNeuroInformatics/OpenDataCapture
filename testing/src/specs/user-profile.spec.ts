@@ -1,7 +1,6 @@
 import type { Page } from '@playwright/test';
 
 import { UserPage } from '../pages/_app/user.page';
-import { acceptDisclaimerIfPresent } from '../support/disclaimer';
 import { expect, test } from '../support/fixtures';
 
 const STRONG_PASSWORD = 'Zq7#nGxLp3RtHm9Q';
@@ -11,7 +10,6 @@ const STRONG_PASSWORD = 'Zq7#nGxLp3RtHm9Q';
  * in-app path to the profile page.
  */
 async function goToUserProfile(page: Page): Promise<void> {
-  await acceptDisclaimerIfPresent(page);
   await page.getByTestId('user-dropup-trigger').click();
   await page.getByTestId('user-dropup-preferences').click();
   await expect(page).toHaveURL('/user');

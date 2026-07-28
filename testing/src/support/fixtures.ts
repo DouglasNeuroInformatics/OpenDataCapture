@@ -88,6 +88,13 @@ type TestFixtures = {
   authenticateWithToken: (accessToken: string) => Promise<void>;
   /** Navigates to a route as `actingRole` and returns its page object. */
   getPageModel: GetPageModel;
+  /**
+   * Writes `appState` to localStorage on every navigation, for every test, whether or not it
+   * authenticates through `authenticateAs`. Without it a spec that logs in through the real form
+   * meets the app's in-code defaults, where the disclaimer dialog and then the walkthrough overlay
+   * cover the page and swallow clicks.
+   */
+  seedAppState: void;
   /** Short run-unique suffix for naming seeded data in this test. */
   uniqueId: string;
 };
@@ -121,15 +128,11 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       await authenticateWithToken(accessToken);
     });
   },
-  authenticateWithToken: async ({ appState, page }, use) => {
+  authenticateWithToken: async ({ page }, use) => {
     await use(async (accessToken) => {
-      await page.addInitScript(
-        (injected) => {
-          window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;
-          localStorage.setItem('app', JSON.stringify({ state: injected.state, version: 1 }));
-        },
-        { accessToken, state: appState }
-      );
+      await page.addInitScript((injected) => {
+        window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected;
+      }, accessToken);
     });
   },
   getPageModel: async ({ actingRole, authenticateAs, page }, use) => {
@@ -165,6 +168,15 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       });
     },
     { scope: 'worker' }
+  ],
+  seedAppState: [
+    async ({ appState, page }, use) => {
+      await page.addInitScript((state) => {
+        localStorage.setItem('app', JSON.stringify({ state, version: 1 }));
+      }, appState);
+      await use();
+    },
+    { auto: true }
   ],
   uniqueId: async ({}, use) => {
     await use(randomId());

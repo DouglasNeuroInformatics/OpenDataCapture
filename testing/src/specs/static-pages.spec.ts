@@ -1,7 +1,5 @@
+import { contactEmail } from '../support/env';
 import { expect, test } from '../support/fixtures';
-
-// CONTACT_EMAIL in the repo root .env, which apps/web reads into config.meta.contactEmail.
-const CONTACT_EMAIL = 'support@douglasneuroinformatics.ca';
 
 test.describe('about', () => {
   test('should display web client, API and gateway release information', async ({ getPageModel }) => {
@@ -42,8 +40,8 @@ test.describe('contact', () => {
     await expect(page.getByText('This field is required')).toBeVisible();
   });
 
-  // The page never renders CONTACT_EMAIL as visible text; it only surfaces in the mailto link a
-  // submission opens, so that link is the one place worth asserting the configured address reaches.
+  // The page never renders the contact address as visible text; it only surfaces in the mailto link
+  // a submission opens, so that link is the one place worth asserting the configured address reaches.
   test('should open a mailto link to the configured contact address on submit', async ({ getPageModel, uniqueId }) => {
     const message = `Test message ${uniqueId}`;
     const contactPage = await getPageModel('/contact');
@@ -54,7 +52,7 @@ test.describe('contact', () => {
 
     await expect(async () => {
       const mailtoLink = await contactPage.getCapturedMailtoLink();
-      expect(mailtoLink).toContain(`mailto:${CONTACT_EMAIL}`);
+      expect(mailtoLink).toContain(`mailto:${contactEmail}`);
       expect(mailtoLink).toContain(encodeURIComponent(message));
     }).toPass();
   });
