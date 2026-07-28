@@ -19,7 +19,7 @@ import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
-import { $Email, $PhoneNumber, clearedIfBlank } from '@/utils/validation';
+import { $Email, $PhoneNumber, clearedIfBlank, omittedIfUnchanged } from '@/utils/validation';
 
 type UpdateUserFormData = {
   additionalPermissions?: Partial<UserPermission>[];
@@ -58,7 +58,7 @@ const UpdateUserForm: React.FC<{
         email: $Email(t).optional(),
         groupIds: z.set(z.string()),
         password: z.string().min(1).optional(),
-        phoneNumber: $PhoneNumber(t).optional()
+        phoneNumber: $PhoneNumber(t, initialValues?.phoneNumber).optional()
       })
       .transform((arg) => {
         const firstPermission = arg.additionalPermissions?.[0];
@@ -115,7 +115,7 @@ const UpdateUserForm: React.FC<{
           });
         }
       }) satisfies z.ZodType<UpdateUserFormData>;
-  }, [resolvedLanguage]);
+  }, [resolvedLanguage, initialValues?.phoneNumber]);
 
   return (
     <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
@@ -462,7 +462,7 @@ const RouteComponent = () => {
                       ...data,
                       email: clearedIfBlank(email),
                       groupIds: Array.from(groupIds),
-                      phoneNumber: clearedIfBlank(phoneNumber)
+                      phoneNumber: omittedIfUnchanged(phoneNumber, selectedUser!.phoneNumber)
                     },
                     id: selectedUser!.id
                   },

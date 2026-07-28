@@ -3,7 +3,7 @@ import { MIN_PHONE_DIGITS } from '@opendatacapture/schemas/user';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod/v4';
 
-import { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank } from '../validation';
+import { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank, omittedIfUnchanged } from '../validation';
 
 const t: TranslateFunction<TranslationKey> = (arg) => (typeof arg === 'string' ? arg : (arg.en ?? ''));
 
@@ -35,6 +35,24 @@ describe('omittedIfBlank', () => {
   });
 });
 
+describe('omittedIfUnchanged', () => {
+  it('should omit a value the user never touched, so the write schema never sees it', () => {
+    expect(omittedIfUnchanged('123', '123')).toBeUndefined();
+  });
+
+  it('should treat a blank field over an absent value as unchanged', () => {
+    expect(omittedIfUnchanged('', null)).toBeUndefined();
+  });
+
+  it('should clear a value the user blanked out', () => {
+    expect(omittedIfUnchanged('', '5145551234')).toBeNull();
+  });
+
+  it('should send an edited value', () => {
+    expect(omittedIfUnchanged('5145551234', '123')).toBe('5145551234');
+  });
+});
+
 describe('$PhoneNumber', () => {
   it('should accept a blank value', () => {
     expect(parsePhoneNumber('').success).toBe(true);
@@ -62,6 +80,14 @@ describe('$PhoneNumber', () => {
     const { issues } = parsePhoneNumber('abcdefgh');
     expect(issues).toHaveLength(1);
     expect(issues[0]!.message).toBe('Invalid phone number');
+  });
+
+  it('should accept the number already on the record, even one predating the digit minimum', () => {
+    expect(parseWith($PhoneNumber(t, '123'))('123').success).toBe(true);
+  });
+
+  it('should still reject a short number that is not the one on record', () => {
+    expect(parseWith($PhoneNumber(t, '123'))('456').success).toBe(false);
   });
 });
 

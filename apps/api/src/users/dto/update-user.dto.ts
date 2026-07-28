@@ -1,6 +1,7 @@
 import { ValidationSchema } from '@douglasneuroinformatics/libnest';
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { $UpdateUserData } from '@opendatacapture/schemas/user';
+import type { UpdateUserData } from '@opendatacapture/schemas/user';
 
 import { CreateUserDto } from './create-user.dto';
 
@@ -8,8 +9,8 @@ import { CreateUserDto } from './create-user.dto';
 @ValidationSchema($UpdateUserData)
 export class UpdateUserDto extends PartialType(OmitType(CreateUserDto, ['email', 'phoneNumber'] as const)) {
   @ApiProperty({ description: 'Email, or null to clear the one on record' })
-  email?: null | string;
+  email?: UpdateUserData['email'];
 
   @ApiProperty({ description: 'Phone Number, or null to clear the one on record' })
-  phoneNumber?: null | string;
+  phoneNumber?: UpdateUserData['phoneNumber'];
 }

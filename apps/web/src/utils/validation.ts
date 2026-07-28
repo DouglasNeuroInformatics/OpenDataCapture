@@ -27,13 +27,28 @@ function omittedIfBlank(value: string | undefined) {
   return value === '' ? undefined : value;
 }
 
+/**
+ * A PATCH carries only what changed, so a value the user never touched is never re-validated by the
+ * write schema. That matters for a number stored before the digit minimum existed: `$User` still
+ * parses it so the form can show it, but `$UpdateUserData` would reject it on the way back out and
+ * block every other field on the form with it.
+ */
+function omittedIfUnchanged(value: string | undefined, storedValue: null | string | undefined) {
+  return (value ?? '') === (storedValue ?? '') ? undefined : clearedIfBlank(value);
+}
+
 function $Email(t: TranslateFunction<TranslationKey>) {
   return blankOr((value) =>
     z.email().safeParse(value).success ? null : t({ en: 'Invalid email address', fr: 'Adresse courriel invalide' })
   );
 }
 
-function $PhoneNumber(t: TranslateFunction<TranslationKey>) {
+/**
+ * `storedValue` is the number already on the record, which is accepted as-is: one stored before the
+ * digit minimum existed would otherwise fail here and leave the rest of the form unsubmittable.
+ * Pair it with `omittedIfUnchanged` so the value the schema waved through is not then sent.
+ */
+function $PhoneNumber(t: TranslateFunction<TranslationKey>, storedValue?: null | string) {
   const messages: { [K in PhoneNumberErrorCode]: string } = {
     INVALID_FORMAT: t({ en: 'Invalid phone number', fr: 'Numéro de téléphone invalide' }),
     TOO_FEW_DIGITS: t({
@@ -42,9 +57,12 @@ function $PhoneNumber(t: TranslateFunction<TranslationKey>) {
     })
   };
   return blankOr((value) => {
+    if (value === storedValue) {
+      return null;
+    }
     const code = findPhoneNumberError(value);
     return code ? messages[code] : null;
   });
 }
 
-export { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank };
+export { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank, omittedIfUnchanged };

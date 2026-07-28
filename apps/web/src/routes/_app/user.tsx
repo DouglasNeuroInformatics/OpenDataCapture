@@ -15,7 +15,7 @@ import { UserIcon } from '@/components/UserIcon';
 import { useFindUserQuery } from '@/hooks/useFindUserQuery';
 import { useSelfUpdateUserMutation } from '@/hooks/useSelfUpdateUserMutation';
 import { useAppStore } from '@/store';
-import { $Email, $PhoneNumber, clearedIfBlank } from '@/utils/validation';
+import { $Email, $PhoneNumber, clearedIfBlank, omittedIfUnchanged } from '@/utils/validation';
 
 type ProfileFormData = {
   dateOfBirth?: Date | undefined;
@@ -55,9 +55,9 @@ const RouteComponent = () => {
       dateOfBirth: z.date().optional(),
       sex: $Sex.optional(),
       email: $Email(t).optional(),
-      phoneNumber: $PhoneNumber(t).optional()
+      phoneNumber: $PhoneNumber(t, userInfo.data.phoneNumber).optional()
     }) satisfies z.ZodType<ProfileFormData>;
-  }, [resolvedLanguage]);
+  }, [resolvedLanguage, userInfo.data.phoneNumber]);
 
   const $PasswordFormData = useMemo(() => {
     return z
@@ -172,11 +172,15 @@ const RouteComponent = () => {
           phoneNumber: userInfo.data.phoneNumber ?? ''
         }}
         key={userInfo.dataUpdatedAt}
-        submitBtnLabel={t('common.save')}
+        submitBtnLabel={t('core.save')}
         validationSchema={$ProfileFormData}
         onSubmit={({ email, phoneNumber, ...rest }) => {
           updateSelfUserMutation.mutate({
-            data: { ...rest, email: clearedIfBlank(email), phoneNumber: clearedIfBlank(phoneNumber) },
+            data: {
+              ...rest,
+              email: clearedIfBlank(email),
+              phoneNumber: omittedIfUnchanged(phoneNumber, userInfo.data.phoneNumber)
+            },
             id: currentUser!.id
           });
         }}
@@ -209,7 +213,7 @@ const RouteComponent = () => {
               }}
               data-form-type="other"
               data-lpignore="true"
-              submitBtnLabel={t('common.save')}
+              submitBtnLabel={t('core.save')}
               validationSchema={$PasswordFormData}
               onSubmit={(data) => {
                 updateSelfUserMutation.mutate(
