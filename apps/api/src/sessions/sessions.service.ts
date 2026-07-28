@@ -1,10 +1,9 @@
 import { InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData } from '@opendatacapture/schemas/session';
-import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { Prisma, Session, Subject, User } from '@prisma/client';
+import type { Prisma, Session, User } from '@prisma/client';
 import { ObjectId } from 'mongodb';
 
 import { accessibleQuery } from '@/auth/ability.utils';
@@ -56,7 +55,7 @@ export class SessionsService {
     }
     this.loggingService.debug({ message: `Attempting to create ${entries.length} session(s)` });
 
-    const subjects = await this.resolveSubjects(entries.map((entry) => entry.subjectData));
+    await this.subjectsService.createMany(entries.map((entry) => entry.subjectData));
 
     const user: null | Omit<User, 'hashedPassword'> = username
       ? await this.prismaClient.user.findFirst({ where: { username } })
@@ -65,7 +64,7 @@ export class SessionsService {
     const group: Group | null = groupId ? await this.groupsService.findById(groupId) : null;
     if (group) {
       await this.subjectsService.addGroupForSubjects(
-        subjects.map((subject) => subject.id),
+        Array.from(new Set(entries.map((entry) => entry.subjectData.id))),
         group.id
       );
     }
@@ -90,7 +89,13 @@ export class SessionsService {
       where: { id: { in: ids } }
     });
     const byId = new Map(created.map((session) => [session.id, session]));
-    return ids.map((id) => byId.get(id)!);
+    return ids.map((id) => {
+      const session = byId.get(id);
+      if (!session) {
+        throw new InternalServerErrorException(`Failed to read back created session with id: ${id}`);
+      }
+      return session;
+    });
   }
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
@@ -138,12 +143,5 @@ export class SessionsService {
       throw new NotFoundException(`Failed to find session with ID: ${id}`);
     }
     return session;
-  }
-
-  /** Get each subject if they exist, otherwise create them, in two queries regardless of count. */
-  private async resolveSubjects(subjectData: CreateSubjectData[]): Promise<Subject[]> {
-    const ids = Array.from(new Set(subjectData.map((subject) => subject.id)));
-    await this.subjectsService.createMany(subjectData);
-    return this.subjectsService.findByIds(ids);
   }
 }

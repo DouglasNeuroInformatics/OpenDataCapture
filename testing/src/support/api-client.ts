@@ -1,5 +1,6 @@
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { CreateGroupData, Group } from '@opendatacapture/schemas/group';
+import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import type { CreateSessionData, Session } from '@opendatacapture/schemas/session';
 import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
 import type { CreateUserData, User } from '@opendatacapture/schemas/user';
@@ -9,6 +10,8 @@ import { SEEDED_USER_PASSWORD } from './constants';
 import { randomId } from './unique';
 
 const API = '/api/v1';
+
+type UploadRecord = UploadInstrumentRecordsData['records'][number];
 
 /** Typed helper for seeding preconditions (groups, users) and authenticating over the API. */
 export class ApiClient {
@@ -78,6 +81,37 @@ export class ApiClient {
       'create user'
     );
     return { credentials: { password, username }, user };
+  }
+
+  /** The id of a seeded instrument, looked up by the internal name its source file declares. */
+  async findInstrumentIdByName(name: string): Promise<string> {
+    const instruments = await this.expectJson<{ id: string; internal?: { name: string } }[]>(
+      this.request.get(`${API}/instruments/info`, { headers: this.authHeaders }),
+      200,
+      'list instruments'
+    );
+    const instrument = instruments.find((candidate) => candidate.internal?.name === name);
+    if (!instrument) {
+      throw new Error(`No instrument named '${name}' among ${instruments.length} returned`);
+    }
+    return instrument.id;
+  }
+
+  /**
+   * Bulk-creates one record per entry, and with them the subjects and sessions they name. Returns
+   * the records the api reports created, which the upload contract scopes to this request alone.
+   */
+  async uploadRecords(
+    groupId: string,
+    instrumentId: string,
+    records: UploadRecord[]
+  ): Promise<{ subjectId: string }[]> {
+    const data: UploadInstrumentRecordsData = { groupId, instrumentId, records };
+    return this.expectJson<{ subjectId: string }[]>(
+      this.request.post(`${API}/instrument-records/upload`, { data, headers: this.authHeaders }),
+      201,
+      'upload instrument records'
+    );
   }
 
   private async expectJson<T>(
