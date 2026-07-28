@@ -144,6 +144,6 @@ export class SessionsService {
   private async resolveSubjects(subjectData: CreateSubjectData[]): Promise<Subject[]> {
     const ids = Array.from(new Set(subjectData.map((subject) => subject.id)));
     await this.subjectsService.createMany(subjectData);
-    return this.prismaClient.subject.findMany({ where: { id: { in: ids } } });
+    return this.subjectsService.findByIds(ids);
   }
 }
