@@ -1,5 +1,6 @@
 /* eslint-disable no-empty-pattern */
 
+import type { Group } from '@opendatacapture/schemas/group';
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 
@@ -60,6 +61,14 @@ type TestFixtures = {
   authenticateAs: (role: Role) => Promise<void>;
   /** Navigates to a route as `actingRole` and returns its page object. */
   getPageModel: GetPageModel;
+  /**
+   * Authenticates as a group manager of a group created for this test alone, and returns that group.
+   *
+   * The `roleAccount` group is cached per worker and shared by every spec running in it, so a test
+   * that counts what the group contains cannot use it. A group manager's `read Subject` rule is
+   * scoped to their own groups, so a fresh group means the data this test seeds is all it can see.
+   */
+  isolatedGroupManager: () => Promise<Group>;
   /** Short run-unique suffix for naming seeded data in this test. */
   uniqueId: string;
 };
@@ -110,6 +119,21 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
         return pageModel;
       }
     );
+  },
+  isolatedGroupManager: async ({ api, apiRequestContext, appState, page }, use) => {
+    await use(async () => {
+      const group = await api.createGroup();
+      const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });
+      const accessToken = await ApiClient.login(apiRequestContext, credentials);
+      await page.addInitScript(
+        (injected) => {
+          window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;
+          localStorage.setItem('app', JSON.stringify({ state: injected.state, version: 1 }));
+        },
+        { accessToken, state: appState }
+      );
+      return group;
+    });
   },
   roleAccount: [
     async ({ adminToken, api, apiRequestContext }, use) => {

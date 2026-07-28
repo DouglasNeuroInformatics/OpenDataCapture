@@ -1,5 +1,7 @@
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { CreateGroupData, Group } from '@opendatacapture/schemas/group';
+import type { CreateSessionData, Session } from '@opendatacapture/schemas/session';
+import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
 import type { CreateUserData, User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
@@ -45,6 +47,19 @@ export class ApiClient {
       'grant instrument access'
     );
     return group;
+  }
+
+  /**
+   * Creates a session, and with it the subject it names. A subject seeded this way holds no
+   * instrument records, which is what distinguishes it under the "with records only" filter.
+   */
+  async createSession(groupId: null | string, subjectData: CreateSubjectData): Promise<Session> {
+    const data: CreateSessionData = { date: new Date(), groupId, subjectData, type: 'IN_PERSON' };
+    return this.expectJson<Session>(
+      this.request.post(`${API}/sessions`, { data, headers: this.authHeaders }),
+      201,
+      'create session'
+    );
   }
 
   /** Creates a user (GROUP_MANAGER by default) and returns the login credentials for it. */

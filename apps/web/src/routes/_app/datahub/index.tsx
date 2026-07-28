@@ -58,7 +58,11 @@ const Filters: React.FC<{
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger asChild>
-        <Button className="flex items-center justify-between gap-2" variant="outline">
+        <Button
+          className="flex items-center justify-between gap-2"
+          data-testid="datahub-filters-trigger"
+          variant="outline"
+        >
           {t('common.filters')}
           <ChevronDownIcon className="opacity-50" />
         </Button>
@@ -167,6 +171,7 @@ const Filters: React.FC<{
           </DropdownMenu.Label>
           <DropdownMenu.CheckboxItem
             checked={hasRecords}
+            data-testid="datahub-filter-has-records"
             onCheckedChange={setHasRecords}
             onSelect={(e) => e.preventDefault()}
           >
