@@ -18,10 +18,12 @@ Then, from inside the worktree:
 ```sh
 pnpm install --frozen-lockfile
 pnpm generate:env    # inside the worktree — it derives paths from its own location
-pnpm lint
+TURBO_CONCURRENCY=2 pnpm lint
 ```
 
 Run `generate:env` in the worktree and never copy the repo's `.env`: `turbo lint` depends on `db:push`, and a worktree-local `.env` keeps the gateway's sqlite file local instead of writing to the user's dev database.
+
+`TURBO_CONCURRENCY=2` is not optional. `lint` depends on `^build`, so a cold worktree runs the whole 27-workspace build graph, and turbo's default of 10 across three concurrent reviews would leave the user's machine unusable. Never drop the cap for speed.
 
 `install` or `generate:env` failing is a broken machine — stop, report it as BLOCKED (machine), write no document. `lint` failing is the PR's problem — stop, report BLOCKED (PR) with the errors, and write a reply body to the scratchpad asking the author to update their branch against `main`, ending it with `Reviewed at commit <headRefOid>.` so your caller can post it.
 
