@@ -54,7 +54,7 @@ export const Navbar = () => {
         </div>
       </div>
       <Sheet.Trigger asChild>
-        <Button variant="outline">Open</Button>
+        <Button variant="outline">{t({ en: 'Open', fr: 'Ouvrir' })}</Button>
       </Sheet.Trigger>
       <Sheet.Content className="flex h-full flex-col">
         <Sheet.Header>

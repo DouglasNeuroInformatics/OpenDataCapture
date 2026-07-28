@@ -27,7 +27,9 @@ export const FontSizeField = ({ id, onChange, value }: FontSizeFieldProps) => {
           <Select.Group>
             <Select.Item value={FONT_SIZE_DEFAULT}>{t({ en: 'Default', fr: 'Par défaut' })}</Select.Item>
             {FONT_SIZES.map((s) => (
-              <Select.Item key={s} value={String(s)}>{`${s} px`}</Select.Item>
+              <Select.Item key={s} value={String(s)}>
+                {t({ en: '{} px', fr: '{} px' }, { args: [s] })}
+              </Select.Item>
             ))}
           </Select.Group>
         </Select.Content>

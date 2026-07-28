@@ -71,6 +71,16 @@ export declare const MANIFEST_FILENAME: string;
 export declare function generateManifest(baseDir: string): Promise<RuntimeManifest>;
 
 /**
+ * Group the files in a runtime manifest into the packages they belong to. Files whose first
+ * path segment begins with an underscore (bundler-internal output such as shared chunks)
+ * belong to no package and are omitted.
+ */
+export declare function parsePackages(
+  runtimeVersion: string,
+  manifest: Pick<RuntimeManifest, 'html' | 'sources' | 'styles'>
+): RuntimePackageMetadata[];
+
+/**
  * Generate metadata for all available runtime versions.
  * @returns A Map keyed by version name, with corresponding metadata.
  */
