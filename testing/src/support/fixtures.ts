@@ -2,7 +2,7 @@
 
 import type { Group } from '@opendatacapture/schemas/group';
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';
-import type { APIRequestContext } from '@playwright/test';
+import type { APIRequestContext, Page } from '@playwright/test';
 
 import { SettingsPage } from '../pages/_app/admin/settings.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
@@ -31,6 +31,16 @@ const pageModels = {
 } satisfies { [K in RouteTo]?: any };
 
 type PageModels = typeof pageModels;
+
+/** Injects the token and first-run state the web app reads on boot; must run before navigation. */
+const injectAuth = (page: Page, accessToken: string, state: AppState) =>
+  page.addInitScript(
+    (injected) => {
+      window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;
+      localStorage.setItem('app', JSON.stringify({ state: injected.state, version: 1 }));
+    },
+    { accessToken, state }
+  );
 
 type GetPageModel = <TKey extends Extract<keyof PageModels, RouteTo>>(
   key: TKey,
@@ -65,8 +75,9 @@ type TestFixtures = {
    * Authenticates as a group manager of a group created for this test alone, and returns that group.
    *
    * The `roleAccount` group is cached per worker and shared by every spec running in it, so a test
-   * that counts what the group contains cannot use it. A group manager's `read Subject` rule is
-   * scoped to their own groups, so a fresh group means the data this test seeds is all it can see.
+   * that asserts on exactly what a group contains cannot use it. A group manager's `read Subject`
+   * rule is scoped to their own groups, so a fresh group bounds what this test can see to what it
+   * seeded.
    */
   isolatedGroupManager: () => Promise<Group>;
   /** Short run-unique suffix for naming seeded data in this test. */
@@ -99,13 +110,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
   authenticateAs: async ({ appState, page, roleAccount }, use) => {
     await use(async (role) => {
       const { accessToken } = await roleAccount(role);
-      await page.addInitScript(
-        (injected) => {
-          window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;
-          localStorage.setItem('app', JSON.stringify({ state: injected.state, version: 1 }));
-        },
-        { accessToken, state: appState }
-      );
+      await injectAuth(page, accessToken, appState);
     });
   },
   getPageModel: async ({ actingRole, authenticateAs, page }, use) => {
@@ -125,13 +130,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       const group = await api.createGroup();
       const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });
       const accessToken = await ApiClient.login(apiRequestContext, credentials);
-      await page.addInitScript(
-        (injected) => {
-          window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;
-          localStorage.setItem('app', JSON.stringify({ state: injected.state, version: 1 }));
-        },
-        { accessToken, state: appState }
-      );
+      await injectAuth(page, accessToken, appState);
       return group;
     });
   },
