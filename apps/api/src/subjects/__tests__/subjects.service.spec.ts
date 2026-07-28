@@ -185,4 +185,14 @@ describe('SubjectsService', () => {
       await expect(subjectsService.findById('123')).resolves.toMatchObject({ id: '123' });
     });
   });
+
+  describe('findByIds', () => {
+    it('should query the whole id set in one call, omitting missing ids rather than throwing', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
+      await expect(subjectsService.findByIds(['123', 'does-not-exist'])).resolves.toMatchObject([{ id: '123' }]);
+      expect(subjectModel.findMany).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ where: expect.objectContaining({ id: { in: ['123', 'does-not-exist'] } }) })
+      );
+    });
+  });
 });

@@ -31,7 +31,6 @@ describe('SessionsService', () => {
         {
           provide: PRISMA_CLIENT_TOKEN,
           useValue: {
-            subject: { findMany: vi.fn(), updateMany: vi.fn() },
             user: { findFirst: vi.fn() }
           }
         }
@@ -46,7 +45,7 @@ describe('SessionsService', () => {
 
     subjectsService.createMany.mockResolvedValue([] as any);
     subjectsService.addGroupForSubjects.mockResolvedValue({ count: 0 } as any);
-    prismaClient.subject.findMany.mockResolvedValue([{ groupIds: [], id: 'subject-1' }]);
+    subjectsService.findByIds.mockResolvedValue([{ groupIds: [], id: 'subject-1' }] as any);
     prismaClient.user.findFirst.mockResolvedValue(null);
     sessionModel.createMany.mockResolvedValue({ count: 1 } as any);
     sessionModel.findMany.mockImplementation(({ where }: any) =>
@@ -65,7 +64,7 @@ describe('SessionsService', () => {
     // A session whose groupId is unset is invisible to a group manager, whose Session rule is
     // { groupId: { in: [...] } }, and uncounted by every group-scoped query.
     it('should set the groupId on a session for a subject that is already a member of the group', async () => {
-      prismaClient.subject.findMany.mockResolvedValueOnce([{ groupIds: ['group-1'], id: 'subject-1' }]);
+      subjectsService.findByIds.mockResolvedValueOnce([{ groupIds: ['group-1'], id: 'subject-1' }] as any);
       groupsService.findById.mockResolvedValueOnce({ id: 'group-1' } as any);
 
       await sessionsService.createMany({
@@ -78,10 +77,10 @@ describe('SessionsService', () => {
     });
 
     it('should associate the batch with the group in a single write', async () => {
-      prismaClient.subject.findMany.mockResolvedValueOnce([
+      subjectsService.findByIds.mockResolvedValueOnce([
         { groupIds: ['group-1'], id: 'subject-1' },
         { groupIds: [], id: 'subject-2' }
-      ]);
+      ] as any);
       groupsService.findById.mockResolvedValueOnce({ id: 'group-1' } as any);
 
       await sessionsService.createMany({
@@ -106,10 +105,10 @@ describe('SessionsService', () => {
     });
 
     it('should return the sessions in the order the entries were given, so callers can pair by index', async () => {
-      prismaClient.subject.findMany.mockResolvedValueOnce([
+      subjectsService.findByIds.mockResolvedValueOnce([
         { groupIds: [], id: 'subject-a' },
         { groupIds: [], id: 'subject-b' }
-      ]);
+      ] as any);
       // The read-back is a findMany, which is free to return documents in any order.
       sessionModel.findMany.mockImplementationOnce(({ where }: any) =>
         Promise.resolve([...where.id.in].reverse().map((id: string) => ({ id })))
@@ -128,7 +127,9 @@ describe('SessionsService', () => {
 
     it('should create every session in one call rather than one call per entry', async () => {
       const entries = Array.from({ length: 20 }, (_, i) => entry(`subject-${i}`));
-      prismaClient.subject.findMany.mockResolvedValueOnce(entries.map((_, i) => ({ groupIds: [], id: `subject-${i}` })));
+      subjectsService.findByIds.mockResolvedValueOnce(
+        entries.map((_, i) => ({ groupIds: [], id: `subject-${i}` })) as any
+      );
 
       await sessionsService.createMany({ entries, groupId: null, type: 'RETROSPECTIVE' });
 
@@ -138,10 +139,10 @@ describe('SessionsService', () => {
 
     it('should resolve the user once for the whole batch and stamp it on every session', async () => {
       const entries = [entry('subject-a'), entry('subject-b')];
-      prismaClient.subject.findMany.mockResolvedValueOnce([
+      subjectsService.findByIds.mockResolvedValueOnce([
         { groupIds: [], id: 'subject-a' },
         { groupIds: [], id: 'subject-b' }
-      ]);
+      ] as any);
       prismaClient.user.findFirst.mockResolvedValueOnce({ id: 'user-1', username: 'someone' });
 
       await sessionsService.createMany({ entries, groupId: null, type: 'RETROSPECTIVE', username: 'someone' });
