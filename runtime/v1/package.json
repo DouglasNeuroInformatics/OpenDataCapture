@@ -30,7 +30,8 @@
     "global.d.ts"
   ],
   "scripts": {
-    "build": "pnpm exec runtime-bundler"
+    "build": "pnpm exec runtime-bundler",
+    "test": "vitest"
   },
   "devDependencies": {
     "@jspsych/plugin-html-button-response__1.x": "workspace:*",

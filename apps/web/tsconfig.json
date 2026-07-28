@@ -3,7 +3,8 @@
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "/runtime/v1/*": ["../../runtime/v1/dist/*"]
     }
   },
   "include": ["src/**/*", "vite.config.ts", "vitest.config.ts"]

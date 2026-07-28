@@ -31,7 +31,8 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "react-dom": "catalog:react19",
-    "react__19.x": "workspace:"
+    "react": "catalog:react19",
+    "react__19.x": "workspace:",
+    "react-dom": "catalog:react19"
   }
 }

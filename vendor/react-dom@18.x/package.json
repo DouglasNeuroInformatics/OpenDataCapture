@@ -19,7 +19,8 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "react-dom": "18.3.1",
-    "react__18.x": "workspace:"
+    "react": "18.3.1",
+    "react__18.x": "workspace:",
+    "react-dom": "18.3.1"
   }
 }

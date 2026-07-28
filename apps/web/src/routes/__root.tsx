@@ -5,10 +5,12 @@ import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
 import { ConnectivityBanner } from '../components/ConnectivityBanner';
+import { localizeInstrumentValidationErrors } from '../services/zod';
 
 import '../services/axios';
 import '../services/i18n';
-import '../services/zod';
+
+localizeInstrumentValidationErrors().catch(console.error);
 
 type RouterContext = {
   queryClient: QueryClient;

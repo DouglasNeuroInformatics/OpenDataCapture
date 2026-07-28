@@ -203,7 +203,7 @@ export class InstrumentReposService implements OnModuleInit {
   ): Promise<{ repoDir: string; tmpDir: string }> {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'odc-repo-'));
     // Prefer a repo-specific token, falling back to a server-wide GITHUB_TOKEN if configured.
-    const token = accessToken ?? process.env.GITHUB_TOKEN;
+    const token = accessToken ?? this.configService.get('GITHUB_TOKEN');
 
     for (const branch of ['main', 'master']) {
       // Download + unpack entirely in-process (Node's fetch + JSZip) so we don't depend on `curl` or
