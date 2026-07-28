@@ -14,8 +14,6 @@ import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
 
-import { useFindSessionQuery } from './useFindSessionQuery';
-
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
   __date__: Date;
@@ -55,13 +53,6 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       kind: params.kind,
       minDate: minDate ?? undefined,
       subjectId: params.subjectId
-    }
-  });
-
-  const sessionsUsernameQuery = useFindSessionQuery({
-    enabled: instrumentId !== null,
-    params: {
-      groupId: currentGroup?.id
     }
   });
 
@@ -218,22 +209,15 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   useEffect(() => {
     try {
-      const sessions = sessionsUsernameQuery.data;
-      if (recordsQuery.data && sessions) {
-        // Fetch all sessions in parallel
-
-        // Build records with looked-up data
+      if (recordsQuery.data) {
         const records: InstrumentVisualizationRecord[] = recordsQuery.data.map((record) => {
           const props = record.data && typeof record.data === 'object' ? record.data : {};
-          const usersSession = sessions.find((s) => s.id === record.sessionId);
-
-          const username = usersSession?.user?.username ?? 'N/A';
 
           return {
             __date__: record.date,
             __id__: record.id,
             __time__: record.date.getTime(),
-            username: username,
+            username: record.session?.user?.username ?? 'N/A',
             ...record.computedMeasures,
             ...props
           };
@@ -251,7 +235,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         type: 'error'
       });
     }
-  }, [recordsQuery.data, sessionsUsernameQuery.data]);
+  }, [recordsQuery.data]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
     // only show the latest edition of each instrument; older editions are selectable via editionOptions

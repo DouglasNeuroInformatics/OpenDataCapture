@@ -17,7 +17,7 @@ test.describe('admin audit logs', () => {
   // despite the Entity filter offering those options -- see #1473. Login is therefore the
   // only auditable action this spec can reliably trigger and verify.
   test('should record a login and find it through the action filter', async ({ apiRequestContext, getPageModel }) => {
-    // `getPageModel('ADMIN')` reuses a token cached once per worker (see `roleToken` in fixtures.ts),
+    // `getPageModel('ADMIN')` reuses a token cached once per worker (see `roleAccount` in fixtures.ts),
     // so it would not itself produce a fresh entry here. Logging in directly does.
     await ApiClient.login(apiRequestContext, { password: ADMIN.password, username: ADMIN.username });
 

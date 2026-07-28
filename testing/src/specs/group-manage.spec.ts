@@ -23,7 +23,7 @@ test.describe('group manage', () => {
     uniqueId
   }) => {
     // A dedicated group + user, rather than the default `actingRole: 'GROUP_MANAGER'` fixture: that
-    // role's group is created once and cached per worker (see `roleToken` in fixtures.ts) and shared
+    // role's group is created once and cached per worker (see `roleAccount` in fixtures.ts) and shared
     // by every other spec using the default role, so mutating it here would leak into their state.
     const group = await api.createGroup({ name: `Group${uniqueId}` });
     const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });

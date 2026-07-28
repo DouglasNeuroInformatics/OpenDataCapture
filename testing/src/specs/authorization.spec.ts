@@ -188,11 +188,12 @@ test.describe('server-side authorization', () => {
     test(`should refuse every privileged request a ${role} user could fire from an admin screen`, async ({
       api,
       apiRequestContext,
-      roleToken
+      roleAccount
     }) => {
       const group = await api.createGroup();
       const { user } = await api.createUser({ groupIds: [group.id] });
-      const headers = { Authorization: `Bearer ${await roleToken(role)}` };
+      const { accessToken } = await roleAccount(role);
+      const headers = { Authorization: `Bearer ${accessToken}` };
 
       for (const { screen, send, what } of PRIVILEGED_REQUESTS) {
         const response = await send(apiRequestContext, { headers, userId: user.id });
@@ -207,14 +208,15 @@ test.describe('server-side authorization', () => {
   test('should not let a group manager rename a group they do not belong to', async ({
     api,
     apiRequestContext,
-    roleToken,
+    roleAccount,
     uniqueId
   }) => {
     const group = await api.createGroup({ name: `Foreign Group ${uniqueId}` });
+    const { accessToken } = await roleAccount('GROUP_MANAGER');
 
     const response = await apiRequestContext.patch(`${API}/groups/${group.id}`, {
       data: { name: `Hijacked Group ${uniqueId}` },
-      headers: { Authorization: `Bearer ${await roleToken('GROUP_MANAGER')}` }
+      headers: { Authorization: `Bearer ${accessToken}` }
     });
 
     expect(response.ok()).toBe(false);
@@ -224,13 +226,14 @@ test.describe('server-side authorization', () => {
   test('should not let a group manager delete a group they do not belong to', async ({
     api,
     apiRequestContext,
-    roleToken,
+    roleAccount,
     uniqueId
   }) => {
     const group = await api.createGroup({ name: `Foreign Group ${uniqueId}` });
+    const { accessToken } = await roleAccount('GROUP_MANAGER');
 
     const response = await apiRequestContext.delete(`${API}/groups/${group.id}`, {
-      headers: { Authorization: `Bearer ${await roleToken('GROUP_MANAGER')}` }
+      headers: { Authorization: `Bearer ${accessToken}` }
     });
 
     expect(response.ok()).toBe(false);
