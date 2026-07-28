@@ -4,6 +4,8 @@ import { AppPage } from '../route.page';
 
 export class DatahubPage extends AppPage {
   readonly exportDropdown: Locator;
+  readonly filtersTrigger: Locator;
+  readonly hasRecordsFilter: Locator;
   readonly pageHeader: Locator;
   readonly rowActionsTrigger: Locator;
   readonly rows: Locator;
@@ -11,6 +13,8 @@ export class DatahubPage extends AppPage {
   constructor(page: Page) {
     super(page);
     this.exportDropdown = page.getByTestId('datahub-export-dropdown');
+    this.filtersTrigger = page.getByTestId('datahub-filters-trigger');
+    this.hasRecordsFilter = page.getByTestId('datahub-filter-has-records');
     this.pageHeader = page.getByTestId('page-header');
     this.rowActionsTrigger = page.getByTestId('row-actions-trigger').first();
     this.rows = page.getByTestId('data-table-body').getByTestId('data-table-row');
@@ -27,5 +31,11 @@ export class DatahubPage extends AppPage {
     await this.exportDropdown.click();
     await this.$ref.getByRole('menuitem', { exact: true, name: format }).click();
     return started;
+  }
+
+  /** Opens the filter menu and toggles "With records only", which refetches with `hasRecord=true`. */
+  async toggleWithRecordsOnly() {
+    await this.filtersTrigger.click();
+    await this.hasRecordsFilter.click();
   }
 }
