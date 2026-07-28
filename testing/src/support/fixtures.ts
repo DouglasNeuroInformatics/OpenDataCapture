@@ -1,5 +1,6 @@
 /* eslint-disable no-empty-pattern */
 
+import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 
@@ -10,6 +11,7 @@ import { DatahubPage } from '../pages/_app/datahub/index.page';
 import { AccessibleInstrumentsPage } from '../pages/_app/instruments/accessible-instruments.page';
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { StartSessionPage } from '../pages/_app/session/start-session.page';
+import { UserAccountPage } from '../pages/_app/user.page';
 import { LoginPage } from '../pages/auth/login.page';
 import { ApiClient } from './api-client';
 import { ADMIN } from './constants';
@@ -26,7 +28,8 @@ const pageModels = {
   '/datahub/$subjectId/table': SubjectDataTablePage,
   '/instruments/accessible-instruments': AccessibleInstrumentsPage,
   '/session/remote-assignment': RemoteAssignmentPage,
-  '/session/start-session': StartSessionPage
+  '/session/start-session': StartSessionPage,
+  '/user': UserAccountPage
 } satisfies { [K in RouteTo]?: any };
 
 type PageModels = typeof pageModels;
@@ -53,11 +56,12 @@ type TestFixtures = {
   /** First-run gating written to localStorage; override per file with `test.use({ appState })`. */
   appState: AppState;
   /**
-   * Injects a role's token without navigating, so the test can drive navigation itself. Use this
-   * (rather than `getPageModel`) when the expected outcome is a redirect, since `getPageModel`
-   * asserts it landed on the requested route.
+   * Injects a token without navigating, so the test can drive navigation itself. Use this (rather
+   * than `getPageModel`) when the expected outcome is a redirect, since `getPageModel` asserts it
+   * landed on the requested route. Pass a role to reuse the worker's cached user, or credentials
+   * to act as a user the test seeded itself — necessary when the test mutates that user's login.
    */
-  authenticateAs: (role: Role) => Promise<void>;
+  authenticateAs: (roleOrCredentials: $LoginCredentials | Role) => Promise<void>;
   /** Navigates to a route as `actingRole` and returns its page object. */
   getPageModel: GetPageModel;
   /** Short run-unique suffix for naming seeded data in this test. */
@@ -87,9 +91,12 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     { scope: 'worker' }
   ],
   appState: [{ isDisclaimerAccepted: true, isWalkthroughComplete: true }, { option: true }],
-  authenticateAs: async ({ appState, page, roleAccount }, use) => {
-    await use(async (role) => {
-      const { accessToken } = await roleAccount(role);
+  authenticateAs: async ({ apiRequestContext, appState, page, roleAccount }, use) => {
+    await use(async (roleOrCredentials) => {
+      const accessToken =
+        typeof roleOrCredentials === 'string'
+          ? (await roleAccount(roleOrCredentials)).accessToken
+          : await ApiClient.login(apiRequestContext, roleOrCredentials);
       await page.addInitScript(
         (injected) => {
           window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;

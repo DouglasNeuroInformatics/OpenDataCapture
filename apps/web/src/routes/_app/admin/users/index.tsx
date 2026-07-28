@@ -19,7 +19,7 @@ import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
-import { PHONE_REGEX } from '@/utils/validation';
+import { $Email, $PhoneNumber, clearedIfBlank, omittedIfUnchanged } from '@/utils/validation';
 
 type UpdateUserFormData = {
   additionalPermissions?: Partial<UserPermission>[];
@@ -55,10 +55,10 @@ const UpdateUserForm: React.FC<{
         additionalPermissions: z.array($UserPermission.partial()).optional(),
         confirmPassword: z.string().min(1).optional(),
         disabled: z.boolean().optional(),
-        email: z.union([z.literal(''), z.email()]).optional(),
+        email: $Email(t).optional(),
         groupIds: z.set(z.string()),
         password: z.string().min(1).optional(),
-        phoneNumber: z.union([z.literal(''), z.string().regex(PHONE_REGEX)]).optional()
+        phoneNumber: $PhoneNumber(t, initialValues?.phoneNumber).optional()
       })
       .transform((arg) => {
         const firstPermission = arg.additionalPermissions?.[0];
@@ -115,7 +115,7 @@ const UpdateUserForm: React.FC<{
           });
         }
       }) satisfies z.ZodType<UpdateUserFormData>;
-  }, [resolvedLanguage]);
+  }, [resolvedLanguage, initialValues?.phoneNumber]);
 
   return (
     <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
@@ -455,12 +455,19 @@ const RouteComponent = () => {
                 deleteUserMutation.mutate({ id: selectedUser!.id });
                 setSelectedUser(null);
               },
-              onSubmit: ({ confirmPassword: _, groupIds, ...data }) => {
-                void updateUserMutation
-                  .mutateAsync({ data: { groupIds: Array.from(groupIds), ...data }, id: selectedUser!.id })
-                  .then(() => {
-                    setSelectedUser(null);
-                  });
+              onSubmit: ({ confirmPassword: _, email, groupIds, phoneNumber, ...data }) => {
+                updateUserMutation.mutate(
+                  {
+                    data: {
+                      ...data,
+                      email: clearedIfBlank(email),
+                      groupIds: Array.from(groupIds),
+                      phoneNumber: omittedIfUnchanged(phoneNumber, selectedUser!.phoneNumber)
+                    },
+                    id: selectedUser!.id
+                  },
+                  { onSuccess: () => setSelectedUser(null) }
+                );
               }
             }}
           />
