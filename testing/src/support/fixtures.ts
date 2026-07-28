@@ -2,7 +2,7 @@
 
 import type { Group } from '@opendatacapture/schemas/group';
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';
-import type { APIRequestContext } from '@playwright/test';
+import type { APIRequestContext, Page } from '@playwright/test';
 
 import { SettingsPage } from '../pages/_app/admin/settings.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
@@ -31,6 +31,16 @@ const pageModels = {
 } satisfies { [K in RouteTo]?: any };
 
 type PageModels = typeof pageModels;
+
+/** Injects the token and first-run state the web app reads on boot; must run before navigation. */
+const injectAuth = (page: Page, accessToken: string, state: AppState) =>
+  page.addInitScript(
+    (injected) => {
+      window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;
+      localStorage.setItem('app', JSON.stringify({ state: injected.state, version: 1 }));
+    },
+    { accessToken, state }
+  );
 
 type GetPageModel = <TKey extends Extract<keyof PageModels, RouteTo>>(
   key: TKey,
@@ -100,13 +110,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
   authenticateAs: async ({ appState, page, roleAccount }, use) => {
     await use(async (role) => {
       const { accessToken } = await roleAccount(role);
-      await page.addInitScript(
-        (injected) => {
-          window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;
-          localStorage.setItem('app', JSON.stringify({ state: injected.state, version: 1 }));
-        },
-        { accessToken, state: appState }
-      );
+      await injectAuth(page, accessToken, appState);
     });
   },
   getPageModel: async ({ actingRole, authenticateAs, page }, use) => {
@@ -126,13 +130,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       const group = await api.createGroup();
       const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });
       const accessToken = await ApiClient.login(apiRequestContext, credentials);
-      await page.addInitScript(
-        (injected) => {
-          window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;
-          localStorage.setItem('app', JSON.stringify({ state: injected.state, version: 1 }));
-        },
-        { accessToken, state: appState }
-      );
+      await injectAuth(page, accessToken, appState);
       return group;
     });
   },

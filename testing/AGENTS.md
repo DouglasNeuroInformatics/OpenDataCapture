@@ -65,10 +65,15 @@ A page object is only reachable from a spec once it is registered in the `pageMo
 | `appState`             | test option | localStorage first-run gating; both flags default to accepted/complete     |
 | `uniqueId`             | test        | Short random suffix for seeded data                                        |
 | `api`                  | worker      | `ApiClient` as admin — `createGroup()` / `createUser()` for preconditions  |
+| `isolatedGroupManager` | test        | Authenticates into a group created for this test alone; returns the group  |
 | `roleAccount(role)`    | worker      | Seeds a group + user per role once, then caches its token and username     |
 
 Set up preconditions over the API with the `api` fixture rather than by clicking through the UI;
 only drive the UI for the behaviour actually under test.
+
+`roleAccount`'s group is cached per worker and shared by every spec running in it, so a test that
+asserts on **how much** a group contains must use `isolatedGroupManager` instead. A group manager
+reads only their own groups, so a fresh group bounds what the test can see to what it seeded.
 
 Auth is injected as `window.__PLAYWRIGHT_ACCESS_TOKEN__`, which `apps/web`'s
 `src/store/slices/auth.slice.ts` reads on boot. It is memory-only and never persisted.

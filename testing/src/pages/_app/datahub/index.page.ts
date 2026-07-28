@@ -7,7 +7,6 @@ export class DatahubPage extends AppPage {
   readonly pageHeader: Locator;
   readonly rowActionsTrigger: Locator;
   readonly rows: Locator;
-  /** libui's `SearchBar` carries no testid; it renders an `input[type=search]`. */
   readonly searchInput: Locator;
   constructor(page: Page) {
     super(page);
@@ -15,7 +14,7 @@ export class DatahubPage extends AppPage {
     this.pageHeader = page.getByTestId('page-header');
     this.rowActionsTrigger = page.getByTestId('row-actions-trigger').first();
     this.rows = page.getByTestId('data-table-body').getByTestId('data-table-row');
-    this.searchInput = page.getByRole('searchbox').first();
+    this.searchInput = page.getByTestId('data-table-search-bar').getByRole('searchbox');
   }
 
   /** Picks a format from the export menu and returns the file it produced. */
