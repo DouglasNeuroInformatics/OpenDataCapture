@@ -13,6 +13,19 @@ import '@/services/i18n';
 
 const noop = () => undefined;
 
+/** A complete `Subject`, so the fixture satisfies the type rather than being cast into it. */
+const subject = (id: string): Subject => ({
+  createdAt: new Date(0),
+  dateOfBirth: null,
+  firstName: null,
+  groupIds: [],
+  id,
+  lastName: null,
+  sessionIds: [],
+  sex: null,
+  updatedAt: new Date(0)
+});
+
 /**
  * Renders a table shaped like the datahub master table (several columns plus row actions) and hands
  * back its tanstack instance, so the id extraction is exercised against a real row model rather than
@@ -31,7 +44,7 @@ const renderMasterTableLike = (ids: string[]) => {
         { accessorFn: () => null, header: 'DOB', id: 'dateOfBirth' },
         { accessorFn: () => null, header: 'Sex', id: 'sex' }
       ]}
-      data={ids.map((id) => ({ id }) as Subject)}
+      data={ids.map(subject)}
       rowActions={[{ label: 'View', onSelect: noop }]}
       togglesComponent={Capture}
     />
