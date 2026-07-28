@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import esbuild from 'esbuild';
 
-import { dtsPlugin, htmlPlugin } from './plugin.js';
+import { assetPlugin, dtsPlugin } from './plugin.js';
 import { Resolver } from './resolver.js';
 
 import type { BundlerOptions, EntryPoint, ExportCondition, ResolvedPackage } from './types.js';
@@ -26,13 +26,15 @@ export class Bundler {
   async bundle(): Promise<void> {
     const packages = await this.findPackages();
     this.logger.verbose(`Found packages: ${JSON.stringify(packages, null, 2)}`);
-    const entryPoints = this.getEntryPoints(packages);
-    this.logger.verbose(`Found entry points: ${JSON.stringify(entryPoints, null, 2)}`);
+    const { assetEntryPoints, moduleEntryPoints } = this.getEntryPoints(packages);
+    this.logger.verbose(`Found entry points: ${JSON.stringify({ assetEntryPoints, moduleEntryPoints }, null, 2)}`);
 
     await fs.rm(this.options.outdir, { force: true, recursive: true });
     await esbuild.build({
       bundle: true,
-      entryPoints: entryPoints,
+      // an underscore prefix cannot collide with a served package: npm forbids it in package names
+      chunkNames: '_chunks/[hash]',
+      entryPoints: [...moduleEntryPoints, ...assetEntryPoints],
       format: 'esm',
       keepNames: true,
       minify: this.options.mode === 'production',
@@ -41,15 +43,15 @@ export class Bundler {
       plugins: [
         dtsPlugin({
           configFilepath: this.options.configFilepath,
-          entryPoints,
+          entryPoints: moduleEntryPoints,
           outdir: this.options.outdir,
           packages
         }),
-        htmlPlugin()
+        assetPlugin(new Set(assetEntryPoints.map((entryPoint) => entryPoint.in)))
       ],
       sourcemap: 'linked',
       sourcesContent: true,
-      splitting: false,
+      splitting: true,
       target: 'es2022'
     });
   }
@@ -63,34 +65,45 @@ export class Bundler {
     return packages;
   }
 
-  private getEntryPoints(packages: ResolvedPackage[]): EntryPoint[] {
-    const entryPoints: EntryPoint[] = [];
+  private getEntryPoints(packages: ResolvedPackage[]): {
+    assetEntryPoints: EntryPoint[];
+    moduleEntryPoints: EntryPoint[];
+  } {
+    const assetEntryPoints: EntryPoint[] = [];
+    const moduleEntryPoints: EntryPoint[] = [];
     for (const pkg of packages) {
       for (const key in pkg.exports) {
         if (key === './package.json') {
           continue;
         }
-        const conditions = pkg.exports[key]!;
+        const packageExport = pkg.exports[key]!;
         const runtimePackageName = pkg.name.split('__').join('@');
         const parsedOutPath = path.parse(key === '.' ? 'index' : key);
         const out = path.join(runtimePackageName, parsedOutPath.dir, parsedOutPath.name);
+        if ('copy' in packageExport) {
+          assetEntryPoints.push({
+            in: packageExport.copy,
+            out
+          });
+          continue;
+        }
         for (const condition of ['import', 'default'] satisfies ExportCondition[]) {
-          if (conditions[condition]) {
-            entryPoints.push({
-              in: conditions[condition],
+          if (packageExport[condition]) {
+            moduleEntryPoints.push({
+              in: packageExport[condition],
               out
             });
             break;
           }
         }
-        if (conditions.types) {
-          entryPoints.push({
-            in: conditions.types,
+        if (packageExport.types) {
+          moduleEntryPoints.push({
+            in: packageExport.types,
             out: out + '.d'
           });
         }
       }
     }
-    return entryPoints;
+    return { assetEntryPoints, moduleEntryPoints };
   }
 }

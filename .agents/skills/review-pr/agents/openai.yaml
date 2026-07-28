@@ -1,0 +1,3 @@
+interface:
+  display_name: 'Review PR'
+  short_description: 'Triage open pull requests and say which need you'

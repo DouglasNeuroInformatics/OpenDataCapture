@@ -24,7 +24,7 @@ import type {
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
 import { Prisma } from '@prisma/client';
-import type { Session } from '@prisma/client';
+import type { InstrumentRecord as PrismaInstrumentRecord, Session } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
 
 import { accessibleQuery } from '@/auth/ability.utils';
@@ -53,6 +53,7 @@ import type {
 export class InstrumentRecordsService {
   constructor(
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
+    @InjectModel('Session') private readonly sessionModel: Model<'Session'>,
     private readonly groupsService: GroupsService,
     private readonly usersService: UsersService,
     private readonly instrumentMeasuresService: InstrumentMeasuresService,
@@ -274,7 +275,14 @@ export class InstrumentRecordsService {
       }
     });
 
-    return records;
+    // Only the per-subject view renders the username column. /dashboard fetches every record in the
+    // group and reads `instrumentId` alone, so labelling there would buy a second query with an `$in`
+    // as long as the group's record list for a field that is thrown away.
+    if (!subjectId) {
+      return records;
+    }
+
+    return this.withSessionUsernames(records, ability);
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
@@ -572,5 +580,40 @@ export class InstrumentRecordsService {
 
   private serializeData(data: unknown) {
     return JSON.parse(JSON.stringify(data, replacer)) as unknown;
+  }
+
+  /**
+   * Label each record with the user who conducted its session, so clients can show that column
+   * without fetching every session in the group.
+   *
+   * Deliberately a second scoped query rather than an `include` on the relation: `session` is
+   * declared required, so Prisma aborts the whole query with "Inconsistent query result" if any one
+   * record's session has since been deleted. Looking the sessions up by id degrades to a missing
+   * username for that record instead of a failed request.
+   */
+  private async withSessionUsernames(
+    records: PrismaInstrumentRecord[],
+    ability?: AppAbility
+  ): Promise<InstrumentRecord[]> {
+    if (records.length === 0) {
+      return [];
+    }
+    const sessions = await this.sessionModel.findMany({
+      select: { id: true, user: { select: { username: true } } },
+      where: {
+        AND: [
+          // Depends on the caller holding some `read Session` rule: given none at all, this throws a
+          // CASL ForbiddenError instead of returning a restrictive filter, and the request 500s. Every
+          // base permission level grants one, pinned by a test in auth/__tests__/ability.factory.test.ts.
+          accessibleQuery(ability, 'read', 'Session'),
+          { id: { in: Array.from(new Set(records.map((record) => record.sessionId))) } }
+        ]
+      }
+    });
+    const usernameBySessionId = new Map(sessions.map((session) => [session.id, session.user?.username ?? null]));
+    return records.map((record) => ({
+      ...record,
+      session: { user: { username: usernameBySessionId.get(record.sessionId) ?? null } }
+    }));
   }
 }

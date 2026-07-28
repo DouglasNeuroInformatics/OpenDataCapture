@@ -18,7 +18,7 @@ const RouteComponent = () => {
   if (createSetupStateMutation.isPending) {
     return <LoadingPage subtitle={t('setup.loadingSubtitle')} title={t('setup.loadingTitle')} />;
   } else if (createSetupStateMutation.isSuccess) {
-    return <Navigate to="/" />;
+    return <Navigate to="/dashboard" />;
   }
 
   return (
@@ -186,7 +186,7 @@ export const Route = createFileRoute('/setup')({
   loader: async ({ context }) => {
     const setupState = await context.queryClient.fetchQuery(setupStateQueryOptions());
     if (setupState.isSetup) {
-      throw redirect({ to: '/' });
+      throw redirect({ to: '/dashboard' });
     }
   }
 });

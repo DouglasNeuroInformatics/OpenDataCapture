@@ -1,0 +1,11 @@
+{
+  "name": "shared-state",
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    ".": {
+      "default": "./index.js"
+    },
+    "./package.json": "./package.json"
+  }
+}

@@ -29,7 +29,14 @@ const RouteComponent = () => {
           accessorKey: subItem,
           cell: (ctx) => {
             const value = ctx.getValue();
-            return <p className="overflow-hidden text-ellipsis whitespace-nowrap">{String(value)}</p>;
+            return (
+              <p
+                className="overflow-hidden text-ellipsis whitespace-nowrap"
+                data-testid={`subject-table-cell-${subItem}`}
+              >
+                {String(value)}
+              </p>
+            );
           },
           header: camelToSnakeCase(subItem).toUpperCase(),
           id: subItem
