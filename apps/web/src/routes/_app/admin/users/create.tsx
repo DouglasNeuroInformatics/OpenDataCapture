@@ -12,7 +12,7 @@ import { z } from 'zod/v4';
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
-import { $PhoneNumber } from '@/utils/validation';
+import { $Email, $PhoneNumber, omittedIfBlank } from '@/utils/validation';
 
 const PASSWORD_ERROR_TRANSLATION_KEYS = {
   INSUFFICIENT_PASSWORD_STRENGTH: 'common.insufficientPasswordStrength',
@@ -189,6 +189,7 @@ const RouteComponent = () => {
             })
           }
         ]}
+        data-testid="create-user-form"
         initialValues={{
           disabled: false
         }}
@@ -200,6 +201,7 @@ const RouteComponent = () => {
             basePermissionLevel: $BasePermissionLevel,
             groupIds: z.set(z.string()).optional(),
             confirmPassword: z.string().min(1),
+            email: $Email(t).optional(),
             phoneNumber: $PhoneNumber(t).optional()
           })
           .check((ctx) => {
@@ -232,7 +234,14 @@ const RouteComponent = () => {
               });
             }
           })}
-        onSubmit={(data) => handleSubmit({ ...data, groupIds: Array.from(data.groupIds ?? []) })}
+        onSubmit={({ email, groupIds, phoneNumber, ...data }) =>
+          handleSubmit({
+            ...data,
+            email: omittedIfBlank(email),
+            groupIds: Array.from(groupIds ?? []),
+            phoneNumber: omittedIfBlank(phoneNumber)
+          })
+        }
       />
     </div>
   );

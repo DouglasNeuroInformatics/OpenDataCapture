@@ -17,7 +17,7 @@ export const UserDropup = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const { t } = useTranslation('layout');
+  const { t } = useTranslation();
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -70,10 +70,7 @@ export const UserDropup = () => {
             }}
           >
             <UserCogIcon />
-            {t({
-              en: 'Account',
-              fr: 'Compte'
-            })}
+            {t('user.account')}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             className="gap-2 hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100"

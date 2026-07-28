@@ -3,6 +3,40 @@ import { z } from 'zod/v4';
 import { $BaseModel, $Permissions } from '../core/core.js';
 import { $Sex } from '../subject/subject.js';
 
+const MIN_PHONE_DIGITS = 7;
+
+const PHONE_NUMBER_FORMAT = /^\+?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/;
+
+const PHONE_NUMBER_ERROR_MESSAGES = {
+  INVALID_FORMAT: 'Invalid phone number',
+  TOO_FEW_DIGITS: `Phone number must contain at least ${MIN_PHONE_DIGITS} digits`
+};
+
+type PhoneNumberErrorCode = keyof typeof PHONE_NUMBER_ERROR_MESSAGES;
+
+function countPhoneDigits(value: string): number {
+  return value.replace(/\D/g, '').length;
+}
+
+/**
+ * The reason a phone number is rejected, in the same spirit as {@link PASSWORD_ERROR_CODES}: the
+ * rule lives here so every tier enforces the same one, and `apps/web` maps the code to a translated
+ * message instead of restating the rule.
+ */
+function findPhoneNumberError(value: string): null | PhoneNumberErrorCode {
+  if (!PHONE_NUMBER_FORMAT.test(value)) {
+    return 'INVALID_FORMAT';
+  }
+  return countPhoneDigits(value) < MIN_PHONE_DIGITS ? 'TOO_FEW_DIGITS' : null;
+}
+
+export const $PhoneNumber = z.string().check((ctx) => {
+  const code = findPhoneNumberError(ctx.value);
+  if (code) {
+    ctx.issues.push({ code: 'custom', input: ctx.value, message: PHONE_NUMBER_ERROR_MESSAGES[code] });
+  }
+});
+
 export const $BasePermissionLevel = z.enum(['ADMIN', 'GROUP_MANAGER', 'STANDARD']);
 
 export type BasePermissionLevel = z.infer<typeof $BasePermissionLevel>;
@@ -30,6 +64,8 @@ export const $User = $BaseModel.extend({
   firstName: z.string().min(1),
   groupIds: z.array(z.string()),
   lastName: z.string().min(1),
+  // Not `$PhoneNumber`: this is the read model, which must still parse numbers stored before the
+  // digit minimum existed. The rule is enforced on the write schemas below.
   phoneNumber: z.string().nullish(),
   sex: $Sex.nullish(),
   username: z.string().min(1)
@@ -49,7 +85,7 @@ export const $CreateUserData = $User
     disabled: z.boolean().optional(),
     email: z.email().optional(),
     password: z.string().min(1),
-    phoneNumber: z.string().optional(),
+    phoneNumber: $PhoneNumber.optional(),
     sex: $Sex.optional()
   });
 
@@ -58,7 +94,7 @@ export type UpdateUserData = z.infer<typeof $UpdateUserData>;
 export const $UpdateUserData = $CreateUserData.partial().extend({
   additionalPermissions: $Permissions.optional(),
   email: z.email().nullish(),
-  phoneNumber: z.string().nullish()
+  phoneNumber: $PhoneNumber.nullish()
 });
 
 export type $SelfUpdateUserData = z.infer<typeof $SelfUpdateUserData>;
@@ -73,3 +109,6 @@ export const $SelfUpdateUserData = $UpdateUserData
     sex: true
   })
   .partial();
+
+export { findPhoneNumberError, MIN_PHONE_DIGITS };
+export type { PhoneNumberErrorCode };

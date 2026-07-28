@@ -1,8 +1,9 @@
 import type { TranslateFunction, TranslationKey } from '@douglasneuroinformatics/libui/i18n';
+import { MIN_PHONE_DIGITS } from '@opendatacapture/schemas/user';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod/v4';
 
-import { $Email, $PhoneNumber, countPhoneDigits, MIN_PHONE_DIGITS } from '../validation';
+import { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank } from '../validation';
 
 const t: TranslateFunction<TranslationKey> = (arg) => (typeof arg === 'string' ? arg : (arg.en ?? ''));
 
@@ -14,17 +15,23 @@ const parseWith = (schema: z.ZodType<string>) => (value: string) => {
 const parseEmail = parseWith($Email(t));
 const parsePhoneNumber = parseWith($PhoneNumber(t));
 
-describe('countPhoneDigits', () => {
-  it('should count only numeric characters', () => {
-    expect(countPhoneDigits('+1 (514) 555-1234')).toBe(11);
+describe('clearedIfBlank', () => {
+  it('should map a blank value to null, so an update clears the field', () => {
+    expect(clearedIfBlank('')).toBeNull();
   });
 
-  it('should return 0 for an empty string', () => {
-    expect(countPhoneDigits('')).toBe(0);
+  it('should leave a filled value untouched', () => {
+    expect(clearedIfBlank('jane.doe@example.org')).toBe('jane.doe@example.org');
+  });
+});
+
+describe('omittedIfBlank', () => {
+  it('should map a blank value to undefined, since a create has nothing to clear', () => {
+    expect(omittedIfBlank('')).toBeUndefined();
   });
 
-  it('should ignore dashes, spaces, and parentheses', () => {
-    expect(countPhoneDigits('(555) 123-4567')).toBe(10);
+  it('should leave a filled value untouched', () => {
+    expect(omittedIfBlank('jane.doe@example.org')).toBe('jane.doe@example.org');
   });
 });
 

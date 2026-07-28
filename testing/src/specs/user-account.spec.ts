@@ -16,6 +16,14 @@ test.describe('user account', () => {
     await expect(userAccountPage.pageHeader).toContainText('Account');
   });
 
+  test('should describe the password dialog, so it is announced with more than its title', async ({ getPageModel }) => {
+    const userAccountPage = await getPageModel('/user');
+
+    await userAccountPage.openPasswordDialog();
+
+    await expect(userAccountPage.passwordDialog).toHaveAccessibleDescription(/confirm it to save the change/);
+  });
+
   test('should keep the dialog open when the new password is too weak', async ({ getPageModel }) => {
     const userAccountPage = await getPageModel('/user');
 

@@ -93,7 +93,7 @@ const RouteComponent = () => {
     <div>
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t({ en: 'Account', fr: 'Compte' })}
+          {t('user.account')}
         </Heading>
       </PageHeader>
       <Card className="mx-auto mt-4 max-w-3xl">
@@ -185,6 +185,12 @@ const RouteComponent = () => {
         <Dialog.Content>
           <Dialog.Header>
             <Dialog.Title>{t('user.changePassword')}</Dialog.Title>
+            <Dialog.Description>
+              {t({
+                en: 'Enter a new password for your account, then confirm it to save the change.',
+                fr: 'Saisissez un nouveau mot de passe pour votre compte, puis confirmez-le pour enregistrer la modification.'
+              })}
+            </Dialog.Description>
           </Dialog.Header>
           <Dialog.Body>
             <Form

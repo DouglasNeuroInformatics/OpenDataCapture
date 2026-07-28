@@ -1,9 +1,7 @@
 import type { TranslateFunction, TranslationKey } from '@douglasneuroinformatics/libui/i18n';
+import { findPhoneNumberError, MIN_PHONE_DIGITS } from '@opendatacapture/schemas/user';
+import type { PhoneNumberErrorCode } from '@opendatacapture/schemas/user';
 import { z } from 'zod/v4';
-
-const PHONE_REGEX = new RegExp(/^\+?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/);
-
-const MIN_PHONE_DIGITS = 7;
 
 /**
  * A field that may be left blank, and is otherwise rejected with the message `findError` returns.
@@ -19,13 +17,14 @@ function blankOr(findError: (value: string) => null | string) {
   });
 }
 
-function countPhoneDigits(phone: string): number {
-  return phone.replace(/\D/g, '').length;
-}
-
-/** The submit-side counterpart of `blankOr`: a field left blank is cleared, which the API spells null. */
+/** The update-side counterpart of `blankOr`: a field left blank is cleared, which the API spells null. */
 function clearedIfBlank(value: string | undefined) {
   return value === '' ? null : value;
+}
+
+/** The create-side counterpart of `blankOr`: a create has nothing to clear, so a blank field is simply absent. */
+function omittedIfBlank(value: string | undefined) {
+  return value === '' ? undefined : value;
 }
 
 function $Email(t: TranslateFunction<TranslationKey>) {
@@ -35,18 +34,17 @@ function $Email(t: TranslateFunction<TranslationKey>) {
 }
 
 function $PhoneNumber(t: TranslateFunction<TranslationKey>) {
+  const messages: { [K in PhoneNumberErrorCode]: string } = {
+    INVALID_FORMAT: t({ en: 'Invalid phone number', fr: 'Numéro de téléphone invalide' }),
+    TOO_FEW_DIGITS: t({
+      en: `Phone number must contain at least ${MIN_PHONE_DIGITS} digits`,
+      fr: `Le numéro de téléphone doit contenir au moins ${MIN_PHONE_DIGITS} chiffres`
+    })
+  };
   return blankOr((value) => {
-    if (!PHONE_REGEX.test(value)) {
-      return t({ en: 'Invalid phone number', fr: 'Numéro de téléphone invalide' });
-    }
-    if (countPhoneDigits(value) < MIN_PHONE_DIGITS) {
-      return t({
-        en: `Phone number must contain at least ${MIN_PHONE_DIGITS} digits`,
-        fr: `Le numéro de téléphone doit contenir au moins ${MIN_PHONE_DIGITS} chiffres`
-      });
-    }
-    return null;
+    const code = findPhoneNumberError(value);
+    return code ? messages[code] : null;
   });
 }
 
-export { $Email, $PhoneNumber, clearedIfBlank, countPhoneDigits, MIN_PHONE_DIGITS };
+export { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank };
