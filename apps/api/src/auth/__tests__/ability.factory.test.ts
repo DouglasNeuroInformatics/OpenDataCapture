@@ -5,6 +5,7 @@ import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AbilityFactory } from '../ability.factory.js';
+import { accessibleQuery } from '../ability.utils.js';
 
 describe('AbilityFactory', () => {
   let abilityFactory: AbilityFactory;
@@ -121,4 +122,28 @@ describe('AbilityFactory', () => {
     expect(ability.can('create', subject('InstrumentRecordFile', { groupId: 'group-1' }) as any)).toBe(true);
     expect(ability.can('create', subject('InstrumentRecordFile', { groupId: 'group-2' }) as any)).toBe(false);
   });
+
+  // `accessibleQuery` throws a CASL ForbiddenError, rather than returning a restrictive filter, when
+  // an ability carries no rule for the subject at all -- which surfaces as a 500 rather than a 403.
+  // `InstrumentRecordsService.find` calls it for 'Session' whenever a subjectId is given, so this
+  // pins the grant it depends on: removing `read Session` from a level fails here, not in production.
+  it.each(['ADMIN', 'GROUP_MANAGER', 'STANDARD'])(
+    'should grant %s a read rule for Session, which the record username lookup requires',
+    (basePermissionLevel) => {
+      const payload = {
+        additionalPermissions: undefined,
+        basePermissionLevel,
+        firstName: 'Test',
+        groups: [{ id: 'group-1' }],
+        id: 'user-1',
+        lastName: 'User',
+        permissions: [] as any,
+        username: 'some-user'
+      };
+
+      const ability = abilityFactory.createForPayload(payload as any);
+
+      expect(accessibleQuery(ability, 'read', 'Session')).toBeDefined();
+    }
+  );
 });

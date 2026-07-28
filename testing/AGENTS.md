@@ -65,7 +65,7 @@ A page object is only reachable from a spec once it is registered in the `pageMo
 | `appState`             | test option | localStorage first-run gating; both flags default to accepted/complete     |
 | `uniqueId`             | test        | Short random suffix for seeded data                                        |
 | `api`                  | worker      | `ApiClient` as admin — `createGroup()` / `createUser()` for preconditions  |
-| `roleToken(role)`      | worker      | Seeds a group + user per role once, then caches the token                  |
+| `roleAccount(role)`    | worker      | Seeds a group + user per role once, then caches its token and username     |
 
 Set up preconditions over the API with the `api` fixture rather than by clicking through the UI;
 only drive the UI for the behaviour actually under test.
