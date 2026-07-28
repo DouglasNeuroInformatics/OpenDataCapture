@@ -64,8 +64,9 @@ test.describe('authorization', () => {
 
   // The populated case -- a group manager reaching /datahub/$subjectId/table and picking an
   // instrument from the list -- is covered end to end by `instrument-completion.spec.ts`, which
-  // administers one first so the list has something in it.
-  test('should serve the subject-filtered instrument list to a group manager', async ({
+  // administers one first so the list has something in it. This case only pins the contract for a
+  // subject with no visible records: an empty list, not an error.
+  test('should answer the subject-filtered instrument list for a group manager rather than erroring', async ({
     apiRequestContext,
     roleAccount
   }) => {
