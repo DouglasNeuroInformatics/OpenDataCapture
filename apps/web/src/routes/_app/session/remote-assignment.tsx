@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Button, Dialog, Form, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
-import { DEFAULT_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/assignment';
 import type { CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
@@ -17,16 +16,7 @@ import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
-
-const MS_PER_DAY = 86_400_000;
-
-const getDefaultAssignmentExpiry = (
-  defaultAssignmentDurationDays: null | number | undefined,
-  now = Date.now()
-): Date => {
-  const durationDays = defaultAssignmentDurationDays ?? DEFAULT_ASSIGNMENT_DURATION_DAYS;
-  return new Date(now + durationDays * MS_PER_DAY);
-};
+import { getDefaultAssignmentExpiry } from '@/utils/assignment-duration';
 
 /** Slide-over panel shown after an assignment is created, displaying the URL, copy button, and QR code */
 const AssignmentResultSlider: React.FC<{
@@ -217,5 +207,3 @@ const RouteComponent = () => {
 export const Route = createFileRoute('/_app/session/remote-assignment')({
   component: RouteComponent
 });
-
-export { getDefaultAssignmentExpiry };

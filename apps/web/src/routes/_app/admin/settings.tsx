@@ -13,6 +13,7 @@ import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateSetupStateMutation } from '@/hooks/useUpdateSetupStateMutation';
 import { useAppStore } from '@/store';
 import type { GroupSwitcherPosition } from '@/store/types';
+import { parseDurationDays } from '@/utils/assignment-duration';
 
 /** libui ships no Switch, so this is hand-rolled — `label` names it for assistive technology. */
 const Toggle = ({
@@ -44,14 +45,6 @@ const SettingSection = ({ children, title }: { children: React.ReactNode; title:
     {children}
   </section>
 );
-
-/** Returns the whole-day count if `raw` is a valid duration, otherwise null. */
-const parseDurationDays = (raw: string): null | number => {
-  const parsed = Number(raw);
-  const isValid =
-    raw.trim() !== '' && Number.isInteger(parsed) && parsed >= 1 && parsed <= MAX_ASSIGNMENT_DURATION_DAYS;
-  return isValid ? parsed : null;
-};
 
 const DURATION_AUTOSAVE_DELAY = 700;
 
@@ -243,5 +236,3 @@ const RouteComponent = () => {
 export const Route = createFileRoute('/_app/admin/settings')({
   component: RouteComponent
 });
-
-export { parseDurationDays };
