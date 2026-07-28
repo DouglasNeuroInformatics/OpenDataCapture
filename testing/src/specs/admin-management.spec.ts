@@ -29,4 +29,26 @@ test.describe('admin management', () => {
     // The admin created during setup is always present.
     await expect(page.getByTestId('data-table-body')).toContainText('admin');
   });
+
+  test("should clear a user's email from the edit sheet", async ({ api, authenticateAs, page }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ email: 'contact@example.org', groupIds: [group.id] });
+
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users');
+    // Search so the seeded user is the only row, whichever page it would otherwise land on.
+    await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(user.username);
+
+    const editSheet = page.getByTestId('admin-user-edit-sheet');
+    const emailInput = editSheet.getByLabel('Email');
+
+    await page.getByTestId('data-table-row').dblclick();
+    await expect(emailInput).toHaveValue('contact@example.org');
+    await emailInput.clear();
+    await editSheet.getByRole('button', { name: 'Submit' }).click();
+    await expect(editSheet).toBeHidden();
+
+    await page.getByTestId('data-table-row').dblclick();
+    await expect(emailInput).toHaveValue('');
+  });
 });

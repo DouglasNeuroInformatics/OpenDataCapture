@@ -12,7 +12,7 @@ import { z } from 'zod/v4';
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
-import { PHONE_REGEX } from '@/utils/validation';
+import { $PhoneNumber } from '@/utils/validation';
 
 const PASSWORD_ERROR_TRANSLATION_KEYS = {
   INSUFFICIENT_PASSWORD_STRENGTH: 'common.insufficientPasswordStrength',
@@ -199,7 +199,8 @@ const RouteComponent = () => {
           .extend({
             basePermissionLevel: $BasePermissionLevel,
             groupIds: z.set(z.string()).optional(),
-            confirmPassword: z.string().min(1)
+            confirmPassword: z.string().min(1),
+            phoneNumber: $PhoneNumber(t).optional()
           })
           .check((ctx) => {
             if (!estimatePasswordStrength(ctx.value.password).success) {
@@ -228,17 +229,6 @@ const RouteComponent = () => {
                 input: ctx.value.confirmPassword,
                 message: t('common.passwordsMustMatch'),
                 path: ['confirmPassword']
-              });
-            }
-            if (ctx.value.phoneNumber && !PHONE_REGEX.test(ctx.value.phoneNumber)) {
-              ctx.issues.push({
-                code: 'custom',
-                input: ctx.value.phoneNumber,
-                message: t({
-                  en: 'Invalid Phone number',
-                  fr: 'Numéro de téléphone invalide'
-                }),
-                path: ['phoneNumber']
               });
             }
           })}

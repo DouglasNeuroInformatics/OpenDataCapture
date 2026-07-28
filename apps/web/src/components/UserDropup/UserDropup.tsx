@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ArrowToggle, DropdownMenu } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { useNavigate } from '@tanstack/react-router';
-import { Info, LogOutIcon, SchoolIcon, SettingsIcon } from 'lucide-react';
+import { Info, LogOutIcon, SchoolIcon, UserCogIcon } from 'lucide-react';
 
 import { useAppStore } from '@/store';
 
@@ -64,12 +64,12 @@ export const UserDropup = () => {
           </DropdownMenu.Item>
           <DropdownMenu.Item
             className="gap-2 hover:bg-slate-700 hover:text-slate-100 focus:bg-slate-700 focus:text-slate-100"
-            data-testid="user-dropup-preferences"
+            data-testid="user-dropup-account"
             onClick={() => {
               void navigate({ to: '/user' });
             }}
           >
-            <SettingsIcon />
+            <UserCogIcon />
             {t({
               en: 'Account',
               fr: 'Compte'

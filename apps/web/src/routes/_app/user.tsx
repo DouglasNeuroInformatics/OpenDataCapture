@@ -5,6 +5,7 @@ import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Button, Card, Dialog, Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $Sex } from '@opendatacapture/schemas/subject';
+import type { BasePermissionLevel } from '@opendatacapture/schemas/user';
 import { createFileRoute } from '@tanstack/react-router';
 import { KeyRoundIcon } from 'lucide-react';
 import { z } from 'zod/v4';
@@ -14,7 +15,7 @@ import { UserIcon } from '@/components/UserIcon';
 import { useFindUserQuery } from '@/hooks/useFindUserQuery';
 import { useSelfUpdateUserMutation } from '@/hooks/useSelfUpdateUserMutation';
 import { useAppStore } from '@/store';
-import { countPhoneDigits, MIN_PHONE_DIGITS, PHONE_REGEX } from '@/utils/validation';
+import { $Email, $PhoneNumber, clearedIfBlank } from '@/utils/validation';
 
 type ProfileFormData = {
   dateOfBirth?: Date | undefined;
@@ -37,16 +38,15 @@ const RouteComponent = () => {
   const userInfo = useFindUserQuery(currentUser!.id);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
-  const permissionLabels: { [key: string]: string } = {
+  const permissionLabels: { [K in BasePermissionLevel]: string } = {
     ADMIN: t({ en: 'Admin', fr: 'Admin' }),
     GROUP_MANAGER: t({ en: 'Group Manager', fr: 'Responsable de groupe' }),
     STANDARD: t({ en: 'Standard User', fr: 'Utilisateur standard' })
   };
 
-  const permissionLevel =
-    typeof userInfo.data.basePermissionLevel === 'string'
-      ? permissionLabels[userInfo.data.basePermissionLevel]
-      : undefined;
+  const permissionLevel = userInfo.data.basePermissionLevel
+    ? permissionLabels[userInfo.data.basePermissionLevel]
+    : undefined;
 
   const $ProfileFormData = useMemo(() => {
     return z.object({
@@ -54,27 +54,8 @@ const RouteComponent = () => {
       lastName: z.string().min(1).optional(),
       dateOfBirth: z.date().optional(),
       sex: $Sex.optional(),
-      email: z.union([z.literal(''), z.email()]).optional(),
-      phoneNumber: z
-        .union([
-          z.literal(''),
-          z
-            .string()
-            .regex(PHONE_REGEX)
-            .check((ctx) => {
-              if (countPhoneDigits(ctx.value) < MIN_PHONE_DIGITS) {
-                ctx.issues.push({
-                  code: 'custom',
-                  input: ctx.value,
-                  message: t({
-                    en: `Phone number must contain at least ${MIN_PHONE_DIGITS} digits`,
-                    fr: `Le numéro de téléphone doit contenir au moins ${MIN_PHONE_DIGITS} chiffres`
-                  })
-                });
-              }
-            })
-        ])
-        .optional()
+      email: $Email(t).optional(),
+      phoneNumber: $PhoneNumber(t).optional()
     }) satisfies z.ZodType<ProfileFormData>;
   }, [resolvedLanguage]);
 
@@ -116,7 +97,7 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       <Card className="mx-auto mt-4 max-w-3xl">
-        <Card.Header className="flex-row items-center justify-between py-[0.633rem]">
+        <Card.Header className="flex-row items-center justify-between py-2.5">
           <div className="flex items-center gap-3">
             <UserIcon className="h-18 w-18" />
             <div>
@@ -128,17 +109,10 @@ const RouteComponent = () => {
               )}
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Button
-              className="flex w-60 items-center justify-center gap-2 bg-sky-700 text-white hover:bg-sky-800"
-              type="button"
-              variant="primary"
-              onClick={() => setIsPasswordDialogOpen(true)}
-            >
-              <KeyRoundIcon className="h-4 w-4" />
-              {t({ en: 'Change Password', fr: 'Changer le mot de passe' })}
-            </Button>
-          </div>
+          <Button className="gap-2" type="button" variant="primary" onClick={() => setIsPasswordDialogOpen(true)}>
+            <KeyRoundIcon className="h-4 w-4" />
+            {t('user.changePassword')}
+          </Button>
         </Card.Header>
       </Card>
       <Form
@@ -171,12 +145,12 @@ const RouteComponent = () => {
               },
               email: {
                 kind: 'string',
-                label: t({ en: 'Email', fr: 'Courriel' }),
+                label: t('common.email'),
                 variant: 'input'
               },
               phoneNumber: {
                 kind: 'string',
-                label: t({ en: 'Phone Number', fr: 'Numéro de téléphone' }),
+                label: t('common.phoneNumber'),
                 variant: 'input'
               }
             },
@@ -188,6 +162,7 @@ const RouteComponent = () => {
         ]}
         data-form-type="other"
         data-lpignore="true"
+        data-testid="profile-form"
         initialValues={{
           firstName: userInfo.data.firstName ?? '',
           lastName: userInfo.data.lastName ?? '',
@@ -197,14 +172,11 @@ const RouteComponent = () => {
           phoneNumber: userInfo.data.phoneNumber ?? ''
         }}
         key={userInfo.dataUpdatedAt}
-        submitBtnLabel={t({ en: 'Save', fr: 'Enregistrer' })}
+        submitBtnLabel={t('common.save')}
         validationSchema={$ProfileFormData}
-        onSubmit={(data) => {
-          const filteredData = Object.fromEntries(
-            Object.entries(data).filter(([, value]) => value != null && value !== '')
-          );
-          void updateSelfUserMutation.mutateAsync({
-            data: filteredData,
+        onSubmit={({ email, phoneNumber, ...rest }) => {
+          updateSelfUserMutation.mutate({
+            data: { ...rest, email: clearedIfBlank(email), phoneNumber: clearedIfBlank(phoneNumber) },
             id: currentUser!.id
           });
         }}
@@ -212,7 +184,7 @@ const RouteComponent = () => {
       <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
         <Dialog.Content>
           <Dialog.Header>
-            <Dialog.Title>{t({ en: 'Change Password', fr: 'Changer le mot de passe' })}</Dialog.Title>
+            <Dialog.Title>{t('user.changePassword')}</Dialog.Title>
           </Dialog.Header>
           <Dialog.Body>
             <Form
@@ -231,15 +203,13 @@ const RouteComponent = () => {
               }}
               data-form-type="other"
               data-lpignore="true"
-              submitBtnLabel={t({ en: 'Save', fr: 'Enregistrer' })}
+              submitBtnLabel={t('common.save')}
               validationSchema={$PasswordFormData}
               onSubmit={(data) => {
-                void updateSelfUserMutation
-                  .mutateAsync({
-                    data: { password: data.password },
-                    id: currentUser!.id
-                  })
-                  .then(() => setIsPasswordDialogOpen(false));
+                updateSelfUserMutation.mutate(
+                  { data: { password: data.password }, id: currentUser!.id },
+                  { onSuccess: () => setIsPasswordDialogOpen(false) }
+                );
               }}
             />
           </Dialog.Body>

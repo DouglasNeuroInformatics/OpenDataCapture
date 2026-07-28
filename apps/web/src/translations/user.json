@@ -1,1 +1,6 @@
-{}
+{
+  "changePassword": {
+    "en": "Change Password",
+    "fr": "Changer le mot de passe"
+  }
+}

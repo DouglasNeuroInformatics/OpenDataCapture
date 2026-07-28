@@ -53,9 +53,12 @@ export const $CreateUserData = $User
     sex: $Sex.optional()
   });
 
+/** Optional contact details are nullable here, and only here, so an update can clear one. */
 export type UpdateUserData = z.infer<typeof $UpdateUserData>;
 export const $UpdateUserData = $CreateUserData.partial().extend({
-  additionalPermissions: $Permissions.optional()
+  additionalPermissions: $Permissions.optional(),
+  email: z.email().nullish(),
+  phoneNumber: z.string().nullish()
 });
 
 export type $SelfUpdateUserData = z.infer<typeof $SelfUpdateUserData>;
