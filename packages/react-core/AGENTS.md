@@ -89,9 +89,8 @@ it entirely** — the root config globs `packages/*/vitest.config.ts`. There are
 today.
 
 Behaviour changed here is currently only covered from a consumer's suite
-(`pnpm exec vitest --project web`) and by `testing/`. If a change warrants a unit test, add
-`packages/react-core/vitest.config.ts` modelled on `apps/web/vitest.config.ts` (happy-dom,
-`name: 'react-core'`); the environment caveats in `apps/web/AGENTS.md` apply, notably that
-`@testing-library/jest-dom` is not installed anywhere in this repo.
+(`pnpm exec vitest --project web`) and by `testing/`. If a change warrants a unit test, add a
+config first — `.agents/docs/playbooks/add-vitest-project.md` is the order of operations; the
+environment caveats in `apps/web/AGENTS.md` apply.
 
 `pnpm --filter @opendatacapture/react-core lint` runs `tsc` then eslint.

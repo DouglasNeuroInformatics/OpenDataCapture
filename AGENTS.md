@@ -30,7 +30,8 @@ from the `name` field in each package's `vitest.config.ts`, e.g. `api`, `web`, `
 single file with `pnpm exec vitest path/to/file.test.ts`.
 
 `pnpm lint` and `pnpm test` both need `.env` to exist. `pnpm lint` also needs a generated Prisma
-client, so a cold run is not fast.
+client, so a cold run is not fast. A fresh clone needs more than `pnpm install` before `pnpm dev`
+serves anything — `.agents/docs/playbooks/run-locally.md` is the order of operations.
 
 ## Hard rules
 
@@ -60,9 +61,13 @@ not every tool loads nested files.
    contradict it.** If it does, either revise the change or update that `AGENTS.md` in the same
    commit — never leave the two disagreeing.
 
+`.agents/skills/odc-done/SKILL.md` runs these two plus the checks a green `pnpm lint` does not
+cover.
+
 ## Where to look
 
-Read the `AGENTS.md` in the directory you are editing. Each one covers only that workspace.
+Read the `AGENTS.md` in the directory you are editing. Each one covers only that workspace. New
+here? `.agents/skills/odc-orientation/SKILL.md` is the reading order.
 
 | Working on                                      | Read first                                |
 | ----------------------------------------------- | ----------------------------------------- |
@@ -107,16 +112,20 @@ isn't one.
 Follow these in full. Each covers a task where **skipping a step compiles cleanly and fails at
 runtime**.
 
-| Task                                   | Playbook                                       |
-| -------------------------------------- | ---------------------------------------------- |
-| Add an API endpoint                    | `.agents/docs/playbooks/add-api-endpoint.md`   |
-| Add a route to `apps/web`              | `.agents/docs/playbooks/add-web-route.md`      |
-| Add a data-fetching hook to `apps/web` | `.agents/docs/playbooks/add-web-data-hook.md`  |
-| Add an end-to-end test                 | `.agents/docs/playbooks/add-e2e-test.md`       |
-| Add a built-in instrument              | `.agents/docs/playbooks/add-instrument.md`     |
-| Add a vendored library for instruments | `.agents/docs/playbooks/add-vendor-package.md` |
-| Add an environment variable            | `.agents/docs/playbooks/add-env-var.md`        |
-| Add a blog post                        | `.agents/docs/playbooks/add-blog-post.md`      |
+| Task                                   | Playbook                                          |
+| -------------------------------------- | ------------------------------------------------- |
+| Add an API endpoint                    | `.agents/docs/playbooks/add-api-endpoint.md`      |
+| Add a route to `apps/web`              | `.agents/docs/playbooks/add-web-route.md`         |
+| Add a data-fetching hook to `apps/web` | `.agents/docs/playbooks/add-web-data-hook.md`     |
+| Add an end-to-end test                 | `.agents/docs/playbooks/add-e2e-test.md`          |
+| Add a built-in instrument              | `.agents/docs/playbooks/add-instrument.md`        |
+| Add a vendored library for instruments | `.agents/docs/playbooks/add-vendor-package.md`    |
+| Add an environment variable            | `.agents/docs/playbooks/add-env-var.md`           |
+| Add a blog post                        | `.agents/docs/playbooks/add-blog-post.md`         |
+| Run the stack on a fresh clone         | `.agents/docs/playbooks/run-locally.md`           |
+| Cut a release                          | `.agents/docs/playbooks/cut-a-release.md`         |
+| Add a vitest project to a package      | `.agents/docs/playbooks/add-vitest-project.md`    |
+| Promote a component to react-core      | `.agents/docs/playbooks/promote-to-react-core.md` |
 
 ## Internal DNP packages
 

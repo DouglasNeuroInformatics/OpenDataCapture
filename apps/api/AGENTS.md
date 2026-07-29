@@ -122,8 +122,8 @@ connection string is built at runtime in `src/core/prisma.ts`. Do not "fix" it.
 
 When `NODE_ENV=test`, `src/core/prisma.ts` starts an in-memory replica set
 (`mongodb-memory-server`), which is how `pnpm dev:test` and the Playwright suite get a database
-without external Mongo. Local development does need a real replica set — see the header comment in
-`docker-compose.dev.yaml`.
+without external Mongo. Local development does need a real replica set —
+`.agents/docs/playbooks/run-locally.md` starts and initiates one.
 
 Every model has `@@map("<Name>Model")`. libnest's Prisma extension adds `model.exists(where)` and a
 computed `__modelName` field, which is what CASL subject detection reads.

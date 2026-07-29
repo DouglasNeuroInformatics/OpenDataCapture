@@ -70,8 +70,8 @@ grouped by kind; `--title` prints a flat list. **It reads `dist`, not `src`, so 
 
 ## Tests
 
-**This package has no `vitest.config.ts` and therefore no unit tests** — the root vitest config only
-picks up `packages/*/vitest.config.ts`. Correctness is covered by the bundler's own suite and by
+**This package has no `vitest.config.ts` and therefore no unit tests** (adding one:
+`.agents/docs/playbooks/add-vitest-project.md`). Correctness is covered by the bundler's own suite and by
 Playwright: `testing/src/specs/instrument-completion.spec.ts` and `gateway-assignment.spec.ts` drive
 `Happiness Questionnaire` end to end. See `.agents/docs/architecture/testing-strategy.md` and
 `.agents/docs/architecture/instrument-pipeline.md`.
