@@ -15,9 +15,8 @@ test.describe('admin management', () => {
     await page.getByRole('option', { name: 'Clinical' }).click();
     await page.getByRole('button', { name: 'Submit' }).click();
 
-    // Success toast + redirect are the app's own success signals. Deliberately not asserting the
-    // group then shows up in /admin/groups: that list appears to be scoped to groups the actor
-    // belongs to, and creating one does not add the creator as a member.
+    // Success toast + redirect are the app's own success signals; the "group is now listed" case is
+    // covered by the search test below.
     await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
     await expect(page).toHaveURL('/admin/groups');
   });
@@ -29,6 +28,141 @@ test.describe('admin management', () => {
     await expect(page.getByTestId('data-table')).toBeVisible();
     // The admin created during setup is always present.
     await expect(page.getByTestId('data-table-body')).toContainText('admin');
+  });
+
+  test('should show a validation error when the group name is missing', async ({ authenticateAs, page }) => {
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/groups/create');
+
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(page.getByTestId('error-message-text').filter({ hasText: 'This field is required' })).toBeVisible();
+    await expect(page).toHaveURL('/admin/groups/create');
+  });
+
+  test('should find a created group by search and delete it from the manage sheet', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const group = await api.createGroup({ name: `E2E Group ${uniqueId}` });
+
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/groups');
+
+    await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(group.name);
+    const row = page.getByTestId('data-table-row');
+    await expect(row).toHaveCount(1);
+    await expect(row).toContainText(group.name);
+
+    await row.getByTestId('row-actions-trigger').click();
+    await page.getByTestId('row-actions-dropdown').getByRole('menuitem', { name: 'Manage' }).click();
+    await page.getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole('button', { name: 'Yes' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
+    await expect(page.getByTestId('data-table-row').filter({ hasText: group.name })).toHaveCount(0);
+  });
+
+  test('should show validation errors when submitting the user creation form empty', async ({
+    authenticateAs,
+    page
+  }) => {
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users/create');
+
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    // Username, password, confirm password, first name and last name are all required.
+    await expect(
+      page.getByTestId('error-message-text').filter({ hasText: 'This field is required' }).first()
+    ).toBeVisible();
+    await expect(page).toHaveURL('/admin/users/create');
+  });
+
+  test('should reject a password that does not meet the strength requirement', async ({
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users/create');
+
+    await page.getByLabel('Username').fill(`user${uniqueId}`);
+    await page.getByLabel('Password', { exact: true }).fill('weak');
+    await page.getByLabel('Confirm Password').fill('weak');
+    await page.getByLabel('First Name').fill('Test');
+    await page.getByLabel('Last Name').fill('User');
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: 'Admin' }).click();
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(
+      page.getByTestId('error-message-text').filter({ hasText: 'Insufficient password strength' })
+    ).toBeVisible();
+    await expect(page).toHaveURL('/admin/users/create');
+  });
+
+  test('should create a user through the UI and show it in the users list @smoke', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const group = await api.createGroup();
+    const username = `user${uniqueId}`;
+
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users/create');
+
+    await page.getByLabel('Username').fill(username);
+    await page.getByLabel('Password', { exact: true }).fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('Confirm Password').fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('First Name').fill('Test');
+    await page.getByLabel('Last Name').fill('User');
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: 'Group Manager' }).click();
+    await page.getByRole('checkbox', { name: group.name }).check();
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
+    await expect(page).toHaveURL('/admin/users');
+
+    await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(username);
+    await expect(page.getByTestId('data-table-row')).toContainText(username);
+  });
+
+  test('should edit and delete a user through the manage sheet', async ({ api, authenticateAs, page, uniqueId }) => {
+    // The update form requires a non-empty `groupIds` for any non-ADMIN role (see #1472) --
+    // asymmetric with the create form, which allows an empty group set -- so a groupless user can
+    // never actually be saved from this sheet. Seed one with a group to isolate the behavior under test.
+    const group = await api.createGroup({ name: `E2E Group ${uniqueId}` });
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users');
+    await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(user.username);
+
+    const row = page.getByTestId('data-table-row');
+    await row.getByTestId('row-actions-trigger').click();
+    await page.getByTestId('row-actions-dropdown').getByRole('menuitem', { name: 'Manage' }).click();
+
+    await page.getByLabel('Email').fill(`${user.username}@example.com`);
+    // The shared `Form` component's own submit button always has `aria-label="Submit"`, even though
+    // this form's visible label is "Save" -- see DouglasNeuroInformatics/libui#108.
+    await page.getByRole('button', { name: 'Submit' }).click();
+    // The edit and delete toasts below can stack within the notification hub's shared 5s lifetime,
+    // so `.last()` targets the most recently raised one rather than an ambiguous match on both.
+    await expect(page.getByRole('heading', { name: 'Success' }).last()).toBeVisible();
+
+    await row.getByTestId('row-actions-trigger').click();
+    await page.getByTestId('row-actions-dropdown').getByRole('menuitem', { name: 'Manage' }).click();
+    await page.getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole('button', { name: 'Yes' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Success' }).last()).toBeVisible();
+    await expect(page.getByTestId('data-table-row').filter({ hasText: user.username })).toHaveCount(0);
   });
 
   test('should create a user whose email was typed and then cleared', async ({ authenticateAs, page, uniqueId }) => {

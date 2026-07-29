@@ -157,6 +157,7 @@ const InstrumentSection = ({
             >
               <Checkbox
                 checked={selectedIds.has(item.id)}
+                data-testid={`instrument-checkbox-${item.title}`}
                 disabled={readOnly}
                 onCheckedChange={() => onToggle(item.id)}
               />

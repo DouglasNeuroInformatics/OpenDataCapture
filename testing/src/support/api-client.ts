@@ -68,6 +68,15 @@ export class ApiClient {
     return { credentials: { password, username }, user };
   }
 
+  /** Reads a group back as admin, to check whether a write by another role actually took effect. */
+  async findGroupById(id: string): Promise<Group> {
+    return this.expectJson<Group>(
+      this.request.get(`${API}/groups/${id}`, { headers: this.authHeaders }),
+      200,
+      `find group '${id}'`
+    );
+  }
+
   private async expectJson<T>(
     pending: ReturnType<APIRequestContext['post']>,
     status: number,

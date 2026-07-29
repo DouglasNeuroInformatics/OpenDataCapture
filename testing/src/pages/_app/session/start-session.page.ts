@@ -3,9 +3,11 @@ import type { Locator, Page } from '@playwright/test';
 import { AppPage } from '../route.page';
 
 export class StartSessionPage extends AppPage {
+  readonly errorMessages: Locator;
   readonly pageHeader: Locator;
   readonly selectField: Locator;
   readonly sessionForm: Locator;
+  readonly subjectIdField: Locator;
   readonly successMessage: Locator;
 
   constructor(page: Page) {
@@ -14,6 +16,8 @@ export class StartSessionPage extends AppPage {
     this.sessionForm = page.getByTestId('start-session-form');
     this.selectField = page.locator('[name="subjectIdentificationMethod"]');
     this.successMessage = page.getByRole('heading', { name: 'Session Successfully Started' });
+    this.errorMessages = page.getByTestId('error-message-text');
+    this.subjectIdField = this.sessionForm.locator('[name="subjectId"]');
   }
 
   async fillCustomIdentifier(customIdentifier: string, sex: string) {

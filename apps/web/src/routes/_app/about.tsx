@@ -92,9 +92,10 @@ const InfoBlock: React.FC<{
     [key: string]: string;
   };
   label: string;
-}> = ({ items, label }) => {
+  testId: string;
+}> = ({ items, label, testId }) => {
   return (
-    <div>
+    <div data-testid={testId}>
       <h5 className="mb-1 font-semibold">{label}</h5>
       <ul className="text-muted-foreground grid gap-0.5">
         {Object.entries(items).map(([key, value]) => (
@@ -170,7 +171,11 @@ const RouteComponent = () => {
           </Card.Description>
         </Card.Header>
         <Card.Content className="flex flex-col gap-6 p-6 text-sm">
-          <InfoBlock items={translateReleaseInfo(__RELEASE__)} label={t({ en: 'Web Client', fr: 'Client Web' })} />
+          <InfoBlock
+            items={translateReleaseInfo(__RELEASE__)}
+            label={t({ en: 'Web Client', fr: 'Client Web' })}
+            testId="about-web-client-info"
+          />
           <InfoBlock
             items={{
               ...translateReleaseInfo(setupStateQuery.data.release),
@@ -180,6 +185,7 @@ const RouteComponent = () => {
               en: 'Core API',
               fr: 'API de base'
             })}
+            testId="about-core-api-info"
           />
           <InfoBlock
             items={getTranslatedGatewayInfo()}
@@ -187,6 +193,7 @@ const RouteComponent = () => {
               en: 'Gateway Service',
               fr: 'Service de passerelle'
             })}
+            testId="about-gateway-info"
           />
         </Card.Content>
         <Card.Footer className="border-t px-6 py-3">
