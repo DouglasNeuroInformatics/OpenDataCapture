@@ -101,9 +101,11 @@ const RouteComponent = () => {
           <div className="flex items-center gap-3">
             <UserIcon className="h-18 w-18" />
             <div>
-              <Card.Title className="text-lg">{currentUser?.username}</Card.Title>
+              <Card.Title className="text-lg" data-testid="user-info-username">
+                {currentUser?.username}
+              </Card.Title>
               {permissionLevel && (
-                <p className="text-muted-foreground text-base">
+                <p className="text-muted-foreground text-base" data-testid="user-info-role">
                   {t({ en: 'Role', fr: 'Rôle' })}: {permissionLevel}
                 </p>
               )}

@@ -4,14 +4,26 @@ import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 
-import { SettingsPage } from '../pages/_app/admin/settings.page';
+import { AboutPage } from '../pages/_app/about.page';
+import { AuditLogsPage } from '../pages/_app/admin/audit/logs.page';
+import { BrandingPage } from '../pages/_app/admin/branding/index.page';
+import { BrandingLoginPagePage } from '../pages/_app/admin/branding/login-page.page';
+import { InstrumentReposPage } from '../pages/_app/admin/instrument-repos/index.page';
+import { AdminSettingsPage } from '../pages/_app/admin/settings.page';
+import { ContactPage } from '../pages/_app/contact.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
+import { SubjectAssignmentsPage } from '../pages/_app/datahub/$subjectId/assignments.page';
+import { SubjectGraphPage } from '../pages/_app/datahub/$subjectId/graph.page';
+import { SubjectRecordDetailPage } from '../pages/_app/datahub/$subjectId/table/$recordId.page';
 import { SubjectDataTablePage } from '../pages/_app/datahub/$subjectId/table/index.page';
 import { DatahubPage } from '../pages/_app/datahub/index.page';
+import { GroupManagePage } from '../pages/_app/group/manage.page';
 import { AccessibleInstrumentsPage } from '../pages/_app/instruments/accessible-instruments.page';
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { StartSessionPage } from '../pages/_app/session/start-session.page';
-import { UserAccountPage } from '../pages/_app/user.page';
+import { UploadInstrumentPage } from '../pages/_app/upload/$instrumentId.page';
+import { UploadPage } from '../pages/_app/upload/index.page';
+import { UserPage } from '../pages/_app/user.page';
 import { LoginPage } from '../pages/auth/login.page';
 import { ApiClient } from './api-client';
 import { ADMIN } from './constants';
@@ -21,15 +33,27 @@ import { randomId } from './unique';
 import type { AppState, NavigateVariadicArgs, Role, RouteTo } from './types';
 
 const pageModels = {
-  '/admin/settings': SettingsPage,
+  '/about': AboutPage,
+  '/admin/audit/logs': AuditLogsPage,
+  '/admin/branding': BrandingPage,
+  '/admin/branding/login-page': BrandingLoginPagePage,
+  '/admin/instrument-repos': InstrumentReposPage,
+  '/admin/settings': AdminSettingsPage,
   '/auth/login': LoginPage,
+  '/contact': ContactPage,
   '/dashboard': DashboardPage,
   '/datahub': DatahubPage,
+  '/datahub/$subjectId/assignments': SubjectAssignmentsPage,
+  '/datahub/$subjectId/graph': SubjectGraphPage,
   '/datahub/$subjectId/table': SubjectDataTablePage,
+  '/datahub/$subjectId/table/$recordId': SubjectRecordDetailPage,
+  '/group/manage': GroupManagePage,
   '/instruments/accessible-instruments': AccessibleInstrumentsPage,
   '/session/remote-assignment': RemoteAssignmentPage,
   '/session/start-session': StartSessionPage,
-  '/user': UserAccountPage
+  '/upload': UploadPage,
+  '/upload/$instrumentId': UploadInstrumentPage,
+  '/user': UserPage
 } satisfies { [K in RouteTo]?: any };
 
 type PageModels = typeof pageModels;
@@ -64,6 +88,13 @@ type TestFixtures = {
   authenticateAs: (roleOrCredentials: $LoginCredentials | Role) => Promise<void>;
   /** Navigates to a route as `actingRole` and returns its page object. */
   getPageModel: GetPageModel;
+  /**
+   * Writes `appState` to localStorage on every navigation, for every test, whether or not it
+   * authenticates through `authenticateAs`. Without it a spec that logs in through the real form
+   * meets the app's in-code defaults, where the disclaimer dialog and then the walkthrough overlay
+   * cover the page and swallow clicks.
+   */
+  seedAppState: void;
   /** Short run-unique suffix for naming seeded data in this test. */
   uniqueId: string;
 };
@@ -91,19 +122,15 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     { scope: 'worker' }
   ],
   appState: [{ isDisclaimerAccepted: true, isWalkthroughComplete: true }, { option: true }],
-  authenticateAs: async ({ apiRequestContext, appState, page, roleAccount }, use) => {
+  authenticateAs: async ({ apiRequestContext, page, roleAccount }, use) => {
     await use(async (roleOrCredentials) => {
       const accessToken =
         typeof roleOrCredentials === 'string'
           ? (await roleAccount(roleOrCredentials)).accessToken
           : await ApiClient.login(apiRequestContext, roleOrCredentials);
-      await page.addInitScript(
-        (injected) => {
-          window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected.accessToken;
-          localStorage.setItem('app', JSON.stringify({ state: injected.state, version: 1 }));
-        },
-        { accessToken, state: appState }
-      );
+      await page.addInitScript((injected) => {
+        window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected;
+      }, accessToken);
     });
   },
   getPageModel: async ({ actingRole, authenticateAs, page }, use) => {
@@ -139,6 +166,15 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       });
     },
     { scope: 'worker' }
+  ],
+  seedAppState: [
+    async ({ appState, page }, use) => {
+      await page.addInitScript((state) => {
+        localStorage.setItem('app', JSON.stringify({ state, version: 1 }));
+      }, appState);
+      await use();
+    },
+    { auto: true }
   ],
   uniqueId: async ({}, use) => {
     await use(randomId());

@@ -55,7 +55,7 @@ not every tool loads nested files.
 
 ### Before you are done
 
-1. Run `pnpm lint` and `pnpm test` from the repo root and fix every failure.
+1. Run `pnpm lint`, `pnpm test`, and `pnpm test:e2e` from the repo root and fix every failure.
 2. **Re-read the `AGENTS.md` of every package or app you modified and confirm your change does not
    contradict it.** If it does, either revise the change or update that `AGENTS.md` in the same
    commit — never leave the two disagreeing.
