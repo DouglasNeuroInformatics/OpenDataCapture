@@ -1,4 +1,3 @@
-import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { EmailDeliveryResult, MailLanguage } from '@opendatacapture/schemas/mail';
 import type { CreateUserData, User } from '@opendatacapture/schemas/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -11,7 +10,6 @@ export type CreateUserResponse = User & { welcomeEmail?: EmailDeliveryResult };
 
 export function useCreateUserMutation() {
   const queryClient = useQueryClient();
-  const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
     mutationFn: async ({ data, language }: { data: CreateUserData; language?: MailLanguage }) => {
       // The welcome-email language is a query param so it stays out of the user record itself.
@@ -22,7 +20,6 @@ export function useCreateUserMutation() {
       return response.data;
     },
     onSuccess() {
-      addNotification({ type: 'success' });
       void queryClient.invalidateQueries({ queryKey: [USERS_QUERY_KEY] });
     }
   });

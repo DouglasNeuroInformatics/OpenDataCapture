@@ -59,7 +59,10 @@ export class SetupService {
       isGatewayEnabled: this.configService.get('GATEWAY_ENABLED'),
       // Non-secret flag so the client can hide email UI when mail is off. The SMTP
       // configuration itself is never exposed here (this is a public route).
-      isMailEnabled: Boolean(savedOptions?.mailConfig?.enabled && savedOptions.mailConfig.host),
+      isMailEnabled: Boolean(
+        savedOptions?.mailConfig?.enabled &&
+        (savedOptions.mailConfig.transport === 'http' ? savedOptions.mailConfig.apiKey : savedOptions.mailConfig.host)
+      ),
       isSetup: Boolean(savedOptions?.isSetup),
       release: __RELEASE__,
       uptime: Math.round(process.uptime())

@@ -63,6 +63,11 @@ const RouteComponent = () => {
       return;
     }
 
+    const createUserFailedMessage = t({
+      en: 'Failed to create user',
+      fr: "Échec de la création de l'utilisateur"
+    });
+
     let created;
     try {
       created = await createUserMutation.mutateAsync({ data, language: emailLanguage });
@@ -70,20 +75,12 @@ const RouteComponent = () => {
       if (isAxiosError(err) && err.response?.status === 400) {
         const code = parsePasswordErrorCode(err.response.data);
         notification.addNotification({
-          message: code
-            ? t(PASSWORD_ERROR_TRANSLATION_KEYS[code])
-            : t({
-                en: 'Failed to create user',
-                fr: "Échec de la création de l'utilisateur"
-              }),
+          message: code ? t(PASSWORD_ERROR_TRANSLATION_KEYS[code]) : createUserFailedMessage,
           type: 'error'
         });
       } else {
         notification.addNotification({
-          message: t({
-            en: 'Failed to create user',
-            fr: "Échec de la création de l'utilisateur"
-          }),
+          message: createUserFailedMessage,
           type: 'error'
         });
       }
@@ -128,6 +125,7 @@ const RouteComponent = () => {
         return;
       }
     }
+    notification.addNotification({ type: 'success' });
     void navigate({ to: '..' });
   };
 

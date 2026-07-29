@@ -47,7 +47,7 @@ export class UsersController {
       email: user.email,
       firstName: user.firstName,
       group: await this.resolveGroupNames(user.groupIds, ability),
-      language: language === 'fr' ? 'fr' : 'en',
+      language,
       lastName: user.lastName,
       password: user.password,
       url: origin ? `${origin}/auth/login` : '',
