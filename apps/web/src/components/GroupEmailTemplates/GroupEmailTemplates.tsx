@@ -148,28 +148,30 @@ const TemplateFields = ({
           {AVAILABLE_VARS[category].length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-muted-foreground text-xs">{t({ en: 'Insert:', fr: 'Insérer :' })}</span>
-              {AVAILABLE_VARS[category].map((variable) => (
-                <Button
-                  className="h-6 px-2 font-mono text-xs"
-                  key={variable}
-                  size="sm"
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    const tag = `{{${variable}}}`;
-                    const cursor = bodyCursorRef.current;
-                    if (cursor === null) {
-                      setBody({ ...body, [lang]: currentBody.length > 0 ? `${currentBody} ${tag}` : tag });
-                    } else {
-                      const next = currentBody.slice(0, cursor.start) + tag + currentBody.slice(cursor.end);
-                      bodyCursorRef.current = { end: cursor.start + tag.length, start: cursor.start + tag.length };
-                      setBody({ ...body, [lang]: next });
-                    }
-                  }}
-                >
-                  {`{{${variable}}}`}
-                </Button>
-              ))}
+              {AVAILABLE_VARS[category].map((variable) => {
+                const tag = `{{${variable}}}`;
+                return (
+                  <Button
+                    className="h-6 px-2 font-mono text-xs"
+                    key={variable}
+                    size="sm"
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      const cursor = bodyCursorRef.current;
+                      if (cursor === null) {
+                        setBody({ ...body, [lang]: currentBody.length > 0 ? `${currentBody} ${tag}` : tag });
+                      } else {
+                        const next = currentBody.slice(0, cursor.start) + tag + currentBody.slice(cursor.end);
+                        bodyCursorRef.current = { end: cursor.start + tag.length, start: cursor.start + tag.length };
+                        setBody({ ...body, [lang]: next });
+                      }
+                    }}
+                  >
+                    {tag}
+                  </Button>
+                );
+              })}
             </div>
           )}
         </div>
