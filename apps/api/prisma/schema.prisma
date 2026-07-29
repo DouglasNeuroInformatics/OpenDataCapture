@@ -442,6 +442,7 @@ model SetupState {
   id                            String          @id @default(auto()) @map("_id") @db.ObjectId
   activeLanguages               String[]
   branding                      BrandingConfig?
+  defaultAssignmentDurationDays Int?
   isDemo                        Boolean
   isExperimentalFeaturesEnabled Boolean?
   isSetup                       Boolean

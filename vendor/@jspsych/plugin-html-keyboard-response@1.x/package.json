@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@jspsych/plugin-html-keyboard-response": "1.1.3",
+    "jspsych": "7.3.4",
     "jspsych__7.x": "workspace:*"
   }
 }

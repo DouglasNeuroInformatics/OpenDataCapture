@@ -18,7 +18,7 @@ import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { ALL_LANGUAGES } from '@/utils/languages';
-import { PHONE_REGEX } from '@/utils/validation';
+import { $Email, $PhoneNumber, omittedIfBlank } from '@/utils/validation';
 
 const PASSWORD_ERROR_TRANSLATION_KEYS = {
   INSUFFICIENT_PASSWORD_STRENGTH: 'common.insufficientPasswordStrength',
@@ -289,6 +289,7 @@ const RouteComponent = () => {
             })
           }
         ]}
+        data-testid="create-user-form"
         initialValues={{
           disabled: false
         }}
@@ -299,7 +300,9 @@ const RouteComponent = () => {
           .extend({
             basePermissionLevel: $BasePermissionLevel,
             groupIds: z.set(z.string()).optional(),
-            confirmPassword: z.string().min(1)
+            confirmPassword: z.string().min(1),
+            email: $Email(t).optional(),
+            phoneNumber: $PhoneNumber(t).optional()
           })
           .check((ctx) => {
             if (!estimatePasswordStrength(ctx.value.password).success) {
@@ -330,19 +333,15 @@ const RouteComponent = () => {
                 path: ['confirmPassword']
               });
             }
-            if (ctx.value.phoneNumber && !PHONE_REGEX.test(ctx.value.phoneNumber)) {
-              ctx.issues.push({
-                code: 'custom',
-                input: ctx.value.phoneNumber,
-                message: t({
-                  en: 'Invalid Phone number',
-                  fr: 'Numéro de téléphone invalide'
-                }),
-                path: ['phoneNumber']
-              });
-            }
           })}
-        onSubmit={(data) => handleSubmit({ ...data, groupIds: Array.from(data.groupIds ?? []) })}
+        onSubmit={({ email, groupIds, phoneNumber, ...data }) =>
+          handleSubmit({
+            ...data,
+            email: omittedIfBlank(email),
+            groupIds: Array.from(groupIds ?? []),
+            phoneNumber: omittedIfBlank(phoneNumber)
+          })
+        }
       />
       <Dialog
         open={fallbackMessage !== null}

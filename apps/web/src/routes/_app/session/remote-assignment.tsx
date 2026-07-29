@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
-import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, Dialog, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog, Form, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
+import type { CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { z } from 'zod/v4';
 
 import { AssignmentEmailForm } from '@/components/AssignmentEmailForm';
 import { InstrumentShowcase } from '@/components/InstrumentShowcase';
@@ -14,56 +15,9 @@ import { QRCode } from '@/components/QRCode';
 import { WithFallback } from '@/components/WithFallback';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
-
-const ONE_YEAR = 31556952000;
-
-const CreateAssignmentForm: React.FC<{
-  isPending: boolean;
-  onSubmit: (expiresAt: Date) => Promise<void>;
-}> = ({ isPending, onSubmit }) => {
-  const { t } = useTranslation();
-  const [expiresAt, setExpiresAt] = useState(toBasicISOString(new Date(Date.now() + ONE_YEAR)));
-  const [error, setError] = useState<null | string>(null);
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    const date = new Date(expiresAt);
-    if (isNaN(date.getTime()) || date <= new Date()) {
-      setError(
-        t({
-          en: 'Expiry date must be a valid date in the future',
-          fr: "La date d'expiration doit être une date valide dans le futur"
-        })
-      );
-      return;
-    }
-    setError(null);
-    void onSubmit(date);
-  };
-
-  return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="expires-at">{t({ en: 'Expires At', fr: "Date d'expiration" })}</Label>
-        <Input
-          id="expires-at"
-          placeholder="YYYY-MM-DD"
-          type="text"
-          value={expiresAt}
-          onChange={(event) => {
-            setExpiresAt(event.target.value);
-            setError(null);
-          }}
-        />
-        {error && <p className="text-destructive text-xs font-medium">{error}</p>}
-      </div>
-      <Button className="w-full" disabled={isPending} type="submit" variant="primary">
-        {isPending ? t({ en: 'Creating…', fr: 'Création…' }) : t({ en: 'Submit', fr: 'Soumettre' })}
-      </Button>
-    </form>
-  );
-};
+import { getDefaultAssignmentExpiry } from '@/utils/assignment-duration';
 
 /** Slide-over panel shown after an assignment is created, displaying the URL, copy button, and QR code */
 const AssignmentResultSlider: React.FC<{
@@ -132,6 +86,7 @@ const RouteComponent = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const instrumentInfoQuery = useInstrumentInfoQuery();
+  const setupStateQuery = useSetupStateQuery();
   const createAssignmentMutation = useCreateAssignment();
 
   const [selectedInstrument, setSelectedInstrument] = useState<null | TranslatedInstrumentInfo>(null);
@@ -180,7 +135,14 @@ const RouteComponent = () => {
         }}
       />
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <Dialog.Content>
+        <Dialog.Content
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            if (event.currentTarget instanceof HTMLElement) {
+              event.currentTarget.querySelector<HTMLButtonElement>('button[type="submit"]')?.focus();
+            }
+          }}
+        >
           <Dialog.Header>
             <Dialog.Title>
               {t({
@@ -198,9 +160,31 @@ const RouteComponent = () => {
               )}
             </Dialog.Description>
           </Dialog.Header>
-          <CreateAssignmentForm
-            isPending={createAssignmentMutation.isPending}
-            onSubmit={async (expiresAt) => {
+          <Form
+            suspendWhileSubmitting
+            content={{
+              expiresAt: {
+                kind: 'date',
+                label: t({
+                  en: 'Expires At',
+                  fr: "Date d'expiration"
+                })
+              }
+            }}
+            initialValues={{
+              expiresAt: getDefaultAssignmentExpiry(setupStateQuery.data.defaultAssignmentDurationDays)
+            }}
+            validationSchema={
+              z.object({
+                expiresAt: z.coerce.date().min(new Date(), {
+                  message: t({
+                    en: 'Expiry date must be in the future',
+                    fr: "La date d'expiration doit être dans le futur"
+                  })
+                })
+              }) satisfies z.ZodType<Pick<CreateAssignmentData, 'expiresAt'>>
+            }
+            onSubmit={async ({ expiresAt }) => {
               const assignment = await createAssignmentMutation.mutateAsync({
                 data: {
                   expiresAt,

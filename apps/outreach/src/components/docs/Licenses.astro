@@ -2,32 +2,40 @@
 import { licenses } from '@opendatacapture/licenses';
 import type { ApprovedLicense } from '@opendatacapture/licenses';
 
-const approvedLicenseIds: ApprovedLicense[] = [
-  '0BSD',
-  'Apache-2.0',
-  'BSD-1-Clause',
-  'BSD-2-Clause',
-  'BSD-3-Clause',
-  'CC0-1.0',
-  'ISC',
-  'MIT',
-  'MIT-0',
-  'Unlicense',
-  'WTFPL'
-];
+// Keyed by the ApprovedLicense union rather than written as an array: adding a license to the union
+// without listing it here is then a type error, instead of a row that silently goes missing from
+// this page. That is how CC-BY-4.0, FREE-NOS and PUBLIC-DOMAIN previously fell out of the list.
+const approved: Record<ApprovedLicense, true> = {
+  '0BSD': true,
+  'Apache-2.0': true,
+  'BSD-1-Clause': true,
+  'BSD-2-Clause': true,
+  'BSD-3-Clause': true,
+  'CC-BY-4.0': true,
+  'CC0-1.0': true,
+  'FREE-NOS': true,
+  ISC: true,
+  MIT: true,
+  'MIT-0': true,
+  'PUBLIC-DOMAIN': true,
+  Unlicense: true,
+  WTFPL: true
+};
+
+const approvedLicenseIds = new Set<string>(Object.keys(approved));
 
 const openApprovedLicenses = Array.from(licenses.entries())
-  .filter(([id]) => approvedLicenseIds.includes(id as any))
+  .filter(([id]) => approvedLicenseIds.has(id))
   .map(([id, license]) => ({ id, ...license }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
 const openNonApprovedLicenses = Array.from(licenses.entries())
-  .filter(([id, license]) => !approvedLicenseIds.includes(id as any) && license.isOpenSource && license.isCopyleft)
+  .filter(([id, license]) => !approvedLicenseIds.has(id) && license.isOpenSource && license.isCopyleft)
   .map(([id, license]) => ({ id, ...license }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
 const openUnreviewedLicenses = Array.from(licenses.entries())
-  .filter(([id, license]) => !approvedLicenseIds.includes(id as any) && license.isOpenSource && !license.isCopyleft)
+  .filter(([id, license]) => !approvedLicenseIds.has(id) && license.isOpenSource && !license.isCopyleft)
   .map(([id, license]) => ({ id, ...license }))
   .sort((a, b) => a.name.localeCompare(b.name));
 

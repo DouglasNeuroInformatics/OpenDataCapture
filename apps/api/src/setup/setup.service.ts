@@ -53,6 +53,7 @@ export class SetupService {
     return {
       activeLanguages: savedOptions?.activeLanguages?.length ? savedOptions.activeLanguages : ['en', 'fr'],
       branding: branding.success ? branding.data : null,
+      defaultAssignmentDurationDays: savedOptions?.defaultAssignmentDurationDays ?? null,
       isDemo: Boolean(savedOptions?.isDemo),
       isExperimentalFeaturesEnabled: Boolean(savedOptions?.isExperimentalFeaturesEnabled),
       isGatewayEnabled: this.configService.get('GATEWAY_ENABLED'),

@@ -176,9 +176,16 @@ const $BrandingConfig = z.object({
   taglineFontSize: $FontSize.nullish()
 });
 
+/** Upper bound (in days) for a configured assignment validity period; roughly ten years. */
+const MAX_ASSIGNMENT_DURATION_DAYS = 3650;
+
+/** The instance-wide default validity period (in days) applied to new remote assignments. */
+const $DefaultAssignmentDurationDays = z.number().int().positive().max(MAX_ASSIGNMENT_DURATION_DAYS);
+
 const $SetupState = z.object({
   activeLanguages: z.array(z.string()).optional(),
   branding: $BrandingConfig.nullish(),
+  defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
   isDemo: z.boolean(),
   isExperimentalFeaturesEnabled: z.boolean().nullish(),
   isGatewayEnabled: z.boolean(),
@@ -195,6 +202,7 @@ const $SetupState = z.object({
 
 const $UpdateSetupStateData = z.object({
   branding: $BrandingConfig.nullish(),
+  defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
   isExperimentalFeaturesEnabled: z.boolean().nullish()
 });
 
@@ -247,5 +255,6 @@ export {
   LOGO_ALIGNMENTS,
   LOGO_SIZES,
   LOGO_SOURCES,
+  MAX_ASSIGNMENT_DURATION_DAYS,
   PANEL_SECTIONS
 };
