@@ -89,6 +89,33 @@ describe('GroupsService', () => {
       expect(groupModel.update).toHaveBeenCalled();
     });
 
+    // `emailTemplates` is replaced wholesale from the client's cached copy, so a concurrent edit
+    // has to be rejected rather than silently overwritten.
+    it('should reject an update composed against a stale revision', async () => {
+      groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: new Date('2026-07-02T00:00:00Z') });
+      await expect(
+        groupsService.updateById('123', {
+          emailTemplates: [],
+          expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
+        })
+      ).rejects.toBeInstanceOf(ConflictException);
+      expect(groupModel.update).not.toHaveBeenCalled();
+    });
+
+    // The pre-check is a separate read, so the revision has to constrain the write itself too.
+    it('should carry the expected revision into the update where clause', async () => {
+      const expectedUpdatedAt = new Date('2026-07-01T00:00:00Z');
+      groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: expectedUpdatedAt });
+      await groupsService.updateById('123', { emailTemplates: [], expectedUpdatedAt });
+      expect(groupModel.update.mock.lastCall?.[0]).toMatchObject({ where: { updatedAt: expectedUpdatedAt } });
+    });
+
+    it('should leave the where clause unconstrained when no revision is supplied', async () => {
+      groupModel.findFirst.mockResolvedValueOnce({ settings: {} });
+      await groupsService.updateById('123', { name: 'Test Group' });
+      expect(groupModel.update.mock.lastCall?.[0].where).not.toHaveProperty('updatedAt');
+    });
+
     it('should throw a ConflictException when renaming to an existing name', async () => {
       groupModel.findFirst.mockResolvedValueOnce({ name: 'Old Name', settings: {} });
       groupModel.exists.mockResolvedValueOnce(true);

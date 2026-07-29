@@ -1,5 +1,6 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { EmailDeliveryResult, MailLanguage } from '@opendatacapture/schemas/mail';
+import type { Language } from '@opendatacapture/schemas/core';
+import type { EmailDeliveryResult } from '@opendatacapture/schemas/mail';
 import type { CreateUserData, User } from '@opendatacapture/schemas/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
@@ -13,7 +14,7 @@ export function useCreateUserMutation() {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
-    mutationFn: async ({ data, language }: { data: CreateUserData; language?: MailLanguage }) => {
+    mutationFn: async ({ data, language }: { data: CreateUserData; language?: Language }) => {
       // The welcome-email language is a query param so it stays out of the user record itself.
       const response = await axios.post<CreateUserResponse>('/v1/users', data, {
         meta: { disableDefaultErrorNotification: true },

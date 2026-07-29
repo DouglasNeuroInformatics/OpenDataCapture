@@ -153,6 +153,8 @@ export default config(
             'EN',
             'FR',
             'Open Data Capture',
+            'SSL/TLS',
+            'STARTTLS',
             '×',
             '·',
             '—',

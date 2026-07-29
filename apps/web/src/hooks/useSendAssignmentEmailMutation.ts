@@ -1,4 +1,5 @@
-import type { EmailDeliveryResult, MailLanguage } from '@opendatacapture/schemas/mail';
+import type { Language } from '@opendatacapture/schemas/core';
+import type { EmailDeliveryResult } from '@opendatacapture/schemas/mail';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -11,7 +12,7 @@ export function useSendAssignmentEmailMutation() {
       templateId
     }: {
       assignmentId: string;
-      language: MailLanguage;
+      language: Language;
       recipient: string;
       templateId?: null | string;
     }) => {

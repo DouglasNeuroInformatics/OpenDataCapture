@@ -2,11 +2,11 @@ import { getModelToken, LoggingService } from '@douglasneuroinformatics/libnest'
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ServiceUnavailableException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { UpdateMailConfigData } from '@opendatacapture/schemas/mail';
 import { createTransport } from 'nodemailer';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
 import { MailService } from '../mail.service';
@@ -14,55 +14,14 @@ import { MailService } from '../mail.service';
 vi.mock('nodemailer', () => ({ createTransport: vi.fn() }));
 
 const validConfig: UpdateMailConfigData = {
-  apiKey: '',
-  awsAccessKeyId: '',
-  awsRegion: '',
-  domain: '',
   enabled: true,
   encryption: 'starttls',
   host: 'smtp.example.org',
   password: 'secret',
   port: 587,
-  provider: 'mailgun',
-  region: 'us',
   senderAddress: 'noreply@example.org',
   senderName: 'ODC',
-  transport: 'smtp',
   username: 'user'
-};
-
-const mailgunConfig: UpdateMailConfigData = {
-  apiKey: 'key-123',
-  awsAccessKeyId: '',
-  awsRegion: '',
-  domain: 'mg.example.org',
-  enabled: true,
-  encryption: 'starttls',
-  host: '',
-  password: '',
-  port: 587,
-  provider: 'mailgun',
-  region: 'us',
-  senderAddress: 'noreply@example.org',
-  senderName: 'ODC',
-  transport: 'http',
-  username: ''
-};
-
-const sesConfig: UpdateMailConfigData = {
-  ...mailgunConfig,
-  apiKey: 'aws-secret',
-  awsAccessKeyId: 'AKIAEXAMPLE',
-  awsRegion: 'us-east-1',
-  domain: '',
-  provider: 'ses'
-};
-
-const postmarkConfig: UpdateMailConfigData = {
-  ...mailgunConfig,
-  apiKey: 'postmark-token',
-  domain: '',
-  provider: 'postmark'
 };
 
 const newUserArgs = {
@@ -70,21 +29,18 @@ const newUserArgs = {
   firstName: 'Jane',
   group: 'G',
   lastName: 'Doe',
-  password: 'pw',
   url: 'https://x',
   username: 'jdoe'
 };
-
-/** A minimal `fetch` Response stand-in exposing only what the service reads. */
-const httpResponse = (status: number) => ({ ok: status >= 200 && status < 300, status });
 
 describe('MailService', () => {
   let mailService: MailService;
   let setupStateModel: MockedInstance<Model<'SetupState'>>;
   let transporter: { sendMail: Mock; verify: Mock };
-  let fetchMock: Mock;
 
   beforeEach(async () => {
+    // `createTransport` is a module-level mock, so its call history outlives the testing module.
+    vi.clearAllMocks();
     const moduleRef = await Test.createTestingModule({
       providers: [
         MailService,
@@ -96,32 +52,14 @@ describe('MailService', () => {
     mailService = moduleRef.get(MailService);
     transporter = { sendMail: vi.fn().mockResolvedValue({}), verify: vi.fn().mockResolvedValue(true) };
     (createTransport as Mock).mockReturnValue(transporter);
-    fetchMock = vi.fn().mockResolvedValue(httpResponse(200));
-    vi.stubGlobal('fetch', fetchMock);
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
   });
 
   describe('getSettings', () => {
-    it('strips secrets and exposes has-flags', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: { ...validConfig, apiKey: 'k' } });
+    it('strips the password and exposes a has-flag', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: validConfig });
       const settings = await mailService.getSettings();
-      expect(settings.config).toMatchObject({ hasApiKey: true, hasPassword: true, host: 'smtp.example.org' });
+      expect(settings.config).toMatchObject({ hasPassword: true, host: 'smtp.example.org' });
       expect(settings.config).not.toHaveProperty('password');
-      expect(settings.config).not.toHaveProperty('apiKey');
-    });
-
-    it('exposes the transport and provider fields', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: mailgunConfig });
-      const settings = await mailService.getSettings();
-      expect(settings.config).toMatchObject({
-        domain: 'mg.example.org',
-        provider: 'mailgun',
-        region: 'us',
-        transport: 'http'
-      });
     });
 
     it('returns null config and a default template when nothing is stored', async () => {
@@ -133,7 +71,7 @@ describe('MailService', () => {
   });
 
   describe('isEnabled', () => {
-    it('is true when enabled and a host is set (smtp)', async () => {
+    it('is true when a stored configuration is switched on', async () => {
       setupStateModel.findFirst.mockResolvedValue({ mailConfig: validConfig });
       expect(await mailService.isEnabled()).toBe(true);
     });
@@ -143,29 +81,9 @@ describe('MailService', () => {
       expect(await mailService.isEnabled()).toBe(false);
     });
 
-    it('is true for http when the api key and mailgun domain are set', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: mailgunConfig });
-      expect(await mailService.isEnabled()).toBe(true);
-    });
-
-    it('is false for a mailgun config missing its sending domain', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: { ...mailgunConfig, domain: '' } });
+    it('is false when nothing is stored', async () => {
+      setupStateModel.findFirst.mockResolvedValue(null);
       expect(await mailService.isEnabled()).toBe(false);
-    });
-
-    it('is true for an SES config with a key, access key ID, and region', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: sesConfig });
-      expect(await mailService.isEnabled()).toBe(true);
-    });
-
-    it('is false for an SES config missing its region', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: { ...sesConfig, awsRegion: '' } });
-      expect(await mailService.isEnabled()).toBe(false);
-    });
-
-    it('is true for a Postmark config with only a token', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: postmarkConfig });
-      expect(await mailService.isEnabled()).toBe(true);
     });
   });
 
@@ -177,23 +95,45 @@ describe('MailService', () => {
       );
     });
 
-    it('keeps the stored password when the update omits it', async () => {
+    it('keeps the stored password when the update omits it for the same server', async () => {
       setupStateModel.findFirst.mockResolvedValue({ id: '1', isSetup: true, mailConfig: validConfig });
       await mailService.updateSettings({ config: { ...validConfig, password: undefined } });
       expect(setupStateModel.update.mock.lastCall?.[0]).toMatchObject({
         data: { mailConfig: { set: { password: 'secret' } } }
       });
     });
+
+    // Inheriting across servers would let the stored secret be aimed at a host the admin chose;
+    // blanking it instead would silently break a working configuration on an unrelated edit.
+    it('refuses to save a different host without a password rather than inheriting or blanking it', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ id: '1', isSetup: true, mailConfig: validConfig });
+      await expect(
+        mailService.updateSettings({
+          config: { ...validConfig, host: 'smtp.attacker.example', password: undefined }
+        })
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(setupStateModel.update).not.toHaveBeenCalled();
+    });
+
+    it('keeps the stored password when only a non-server field changes', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ id: '1', isSetup: true, mailConfig: validConfig });
+      await mailService.updateSettings({
+        config: { ...validConfig, password: undefined, senderName: 'New Name' }
+      });
+      expect(setupStateModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { mailConfig: { set: { password: 'secret', senderName: 'New Name' } } }
+      });
+    });
   });
 
   describe('test', () => {
-    it('returns success when the smtp connection verifies', async () => {
+    it('returns success when the connection verifies', async () => {
       setupStateModel.findFirst.mockResolvedValue({ mailConfig: validConfig });
       expect(await mailService.test({})).toEqual({ success: true });
       expect(transporter.verify).toHaveBeenCalled();
     });
 
-    it('returns a friendly error when smtp verification fails', async () => {
+    it('returns a friendly error when verification fails', async () => {
       setupStateModel.findFirst.mockResolvedValue({ mailConfig: validConfig });
       transporter.verify.mockRejectedValueOnce({ code: 'EAUTH' });
       const result = await mailService.test({});
@@ -201,23 +141,21 @@ describe('MailService', () => {
       expect(result.error).toMatch(/authentication failed/i);
     });
 
-    it('verifies an http config against the provider and can send a test message', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: mailgunConfig });
+    it('delivers a message when a recipient is supplied', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: validConfig });
       const result = await mailService.test({ recipient: 'p@x.org' });
       expect(result).toEqual({ success: true });
-      // First call verifies the domain, second delivers the message.
-      expect(fetchMock).toHaveBeenCalledTimes(2);
-      expect(fetchMock.mock.calls[0]?.[0]).toContain('api.mailgun.net/v3/domains/mg.example.org');
-      expect(fetchMock.mock.calls[1]?.[0]).toContain('/v3/mg.example.org/messages');
-      expect(transporter.verify).not.toHaveBeenCalled();
+      expect(transporter.sendMail).toHaveBeenCalled();
     });
 
-    it('maps an http auth failure to a friendly error', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: mailgunConfig });
-      fetchMock.mockResolvedValueOnce(httpResponse(401));
-      const result = await mailService.test({});
+    // Otherwise the stored credential could be read back off an SMTP AUTH to a chosen host.
+    it('refuses to connect to a different host without being given that host’s password', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: validConfig });
+      const result = await mailService.test({
+        config: { ...validConfig, host: 'smtp.attacker.example', password: undefined }
+      });
       expect(result.success).toBe(false);
-      expect(result.error).toMatch(/authentication failed/i);
+      expect(createTransport).not.toHaveBeenCalled();
     });
 
     it('reports when mail has not been configured', async () => {
@@ -240,11 +178,18 @@ describe('MailService', () => {
       expect(result.status).toBe('NO_RECIPIENT');
     });
 
-    it('is SENT over smtp when delivery succeeds', async () => {
+    it('is SENT when delivery succeeds', async () => {
       setupStateModel.findFirst.mockResolvedValue({ mailConfig: validConfig });
       const result = await mailService.sendNewUserEmail(newUserArgs);
       expect(result.status).toBe('SENT');
       expect(transporter.sendMail).toHaveBeenCalled();
+    });
+
+    it('never includes a password in the rendered message', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: validConfig });
+      const result = await mailService.sendNewUserEmail(newUserArgs);
+      expect(result.message).not.toMatch(/password:/i);
+      expect(result.message).not.toMatch(/\{\{password\}\}/);
     });
 
     it('renders the French content when language is fr', async () => {
@@ -254,29 +199,12 @@ describe('MailService', () => {
       expect(result.message).toContain('Bonjour');
     });
 
-    it('is SENT over the http provider when delivery succeeds', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: mailgunConfig });
-      const result = await mailService.sendNewUserEmail(newUserArgs);
-      expect(result.status).toBe('SENT');
-      expect(fetchMock).toHaveBeenCalledTimes(1);
-      expect(fetchMock.mock.calls[0]?.[0]).toContain('/v3/mg.example.org/messages');
-      expect(transporter.sendMail).not.toHaveBeenCalled();
-    });
-
-    it('is FAILED with a friendly error when smtp delivery throws', async () => {
+    it('is FAILED with a friendly error when delivery throws', async () => {
       setupStateModel.findFirst.mockResolvedValue({ mailConfig: validConfig });
       transporter.sendMail.mockRejectedValueOnce({ code: 'ECONNREFUSED' });
       const result = await mailService.sendNewUserEmail(newUserArgs);
       expect(result.status).toBe('FAILED');
       expect(result.error).toMatch(/refused/i);
-    });
-
-    it('is FAILED with a friendly error when the http provider rejects the request', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: mailgunConfig });
-      fetchMock.mockResolvedValueOnce(httpResponse(401));
-      const result = await mailService.sendNewUserEmail(newUserArgs);
-      expect(result.status).toBe('FAILED');
-      expect(result.error).toMatch(/authentication failed/i);
     });
   });
 

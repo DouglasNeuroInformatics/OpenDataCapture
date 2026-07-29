@@ -6,8 +6,8 @@ import type { GroupEmailTemplate, GroupSettings, GroupType, UpdateGroupData } fr
 export class UpdateGroupDto implements UpdateGroupData {
   accessibleInstrumentIds?: string[];
   activeAssignmentEmailTemplateId?: null | string;
-  activeInformationTemplateId?: null | string;
   emailTemplates?: GroupEmailTemplate[];
+  expectedUpdatedAt?: Date;
   instrumentRepoIds?: string[];
   name?: string;
   settings?: Partial<GroupSettings>;

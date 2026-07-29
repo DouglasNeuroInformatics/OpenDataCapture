@@ -52,7 +52,7 @@ const AssignmentSlider: React.FC<{
             <QRCode url={assignment?.url ?? 'javascript:void(0)'} />
             {/* Only an outstanding assignment can still be completed, so only it is worth emailing. */}
             {assignment?.status === 'OUTSTANDING' && (
-              <AssignmentEmailForm assignmentId={assignment.id} instrumentLanguages={instrumentLanguages} />
+              <AssignmentEmailForm assignment={assignment} instrumentLanguages={instrumentLanguages} />
             )}
           </div>
         </Sheet.Body>

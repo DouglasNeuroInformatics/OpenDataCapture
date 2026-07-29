@@ -1,42 +1,13 @@
 import { z } from 'zod/v4';
 
+import { $Language, $LocalizedString } from '../core/core.js';
+
+import type { LocalizedString } from '../core/core.js';
+
 // ── Internal helpers (must precede all exports for import/exports-last) ───────
 
 /**
- * How outgoing mail is delivered:
- * - `smtp` — a classic SMTP connection via nodemailer (host/port/encryption/username/password)
- * - `http` — the provider's HTTP sending API (an API key + provider-specific fields), which
- *            some networks require because outbound SMTP ports are blocked, and which gives
- *            clearer delivery feedback than SMTP
- */
-const MAIL_TRANSPORT = ['smtp', 'http'] as const;
-
-const $MailTransport = z.enum(MAIL_TRANSPORT);
-
-/**
- * The provider whose HTTP API is used when `transport` is `http`. Each provider has a
- * distinct endpoint and authentication scheme (see the mail service), so this cannot be a
- * free-form value.
- * - `mailgun`  — `POST https://api.(eu.)mailgun.net/v3/{domain}/messages`, basic auth `api:{apiKey}`
- * - `sendgrid` — `POST https://api.sendgrid.com/v3/mail/send`, bearer `{apiKey}`
- * - `ses`      — `POST https://email.{awsRegion}.amazonaws.com/v2/email/outbound-emails`, AWS
- *                SigV4 signed with `awsAccessKeyId` + `apiKey` (the secret access key)
- * - `postmark` — `POST https://api.postmarkapp.com/email`, header `X-Postmark-Server-Token: {apiKey}`
- */
-const MAIL_PROVIDER = ['mailgun', 'sendgrid', 'ses', 'postmark'] as const;
-
-const $MailProvider = z.enum(MAIL_PROVIDER);
-
-/**
- * The Mailgun API region. Mailgun serves EU-hosted domains from a separate endpoint, so the
- * wrong region yields a "domain not found" error even with a valid key.
- */
-const MAIL_REGION = ['us', 'eu'] as const;
-
-const $MailRegion = z.enum(MAIL_REGION);
-
-/**
- * How the connection to the SMTP server is secured (SMTP transport only).
+ * How the connection to the SMTP server is secured.
  * - `none`     — plain, unencrypted connection (typically port 25; not recommended)
  * - `starttls` — upgrade a plain connection to TLS via STARTTLS (typically port 587)
  * - `ssl`      — implicit TLS for the whole connection (typically port 465)
@@ -48,166 +19,51 @@ const $MailEncryption = z.enum(MAIL_ENCRYPTION);
 const $Port = z.number().int().positive().max(65535);
 
 /**
- * The full mail configuration as persisted server-side, spanning both transports. This
- * includes the SMTP `password` and the HTTP `apiKey` and therefore must NEVER be returned to
- * a client — use {@link $MailConfigDto} for anything sent to the browser.
- *
- * Fields not relevant to the active `transport` (e.g. `host` while on `http`, or `domain`
- * while on `smtp`) are permitted to be empty; {@link checkTransportFields} enforces only the
- * fields the active transport actually needs. New fields are defaulted so a configuration
- * stored before HTTP-transport support still parses (and is treated as SMTP).
+ * The mail configuration as persisted server-side. This includes the SMTP `password` and
+ * therefore must NEVER be returned to a client — use {@link $MailConfigDto} for anything sent
+ * to the browser.
  */
 const $MailConfigBase = z.object({
-  /**
-   * The provider secret used to authenticate against the HTTP API when `transport` is `http`:
-   * an API key (Mailgun/SendGrid), a server token (Postmark), or the AWS secret access key
-   * (SES). Secret; never sent to clients. Defaulted so pre-HTTP configurations still parse.
-   */
-  apiKey: z.string().default(''),
-  /** AWS access key ID, paired with `apiKey` (the secret access key) when `provider` is `ses`. Not secret. */
-  awsAccessKeyId: z.string().default(''),
-  /** AWS region for SES (e.g. us-east-1), used when `provider` is `ses`. */
-  awsRegion: z.string().default(''),
-  /** Mailgun sending domain (e.g. mg.example.org), used when `provider` is `mailgun`. */
-  domain: z.string().default(''),
   /** Master on/off switch. When false, the application behaves as if email did not exist. */
   enabled: z.boolean(),
-  /** SMTP connection security (SMTP transport only). Defaulted so HTTP payloads may omit it. */
-  encryption: $MailEncryption.default('starttls'),
-  /** Hostname or IP of the SMTP server (e.g. smtp.gmail.com); SMTP transport only. */
-  host: z.string().default(''),
-  /** SMTP account password / app password. Secret; never sent to clients. SMTP transport only. */
-  password: z.string().default(''),
-  /** TCP port of the SMTP server; SMTP transport only. Defaulted so HTTP payloads may omit it. */
-  port: $Port.default(587),
-  /** The provider whose HTTP API is used; HTTP transport only. */
-  provider: $MailProvider.default('mailgun'),
-  /** Mailgun API region; used when `provider` is `mailgun`. */
-  region: $MailRegion.default('us'),
-  /** The "from" address that recipients will see */
+  /** SMTP connection security. */
+  encryption: $MailEncryption,
+  /** Hostname or IP of the SMTP server (e.g. smtp.gmail.com). */
+  host: z.string().min(1),
+  /** SMTP account password / app password. Secret; never sent to clients. */
+  password: z.string(),
+  /** TCP port of the SMTP server. */
+  port: $Port,
+  /** The "from" address that recipients will see. */
   senderAddress: z.email(),
-  /** Optional human-readable name shown alongside the sender address */
+  /** Optional human-readable name shown alongside the sender address. */
   senderName: z.string().nullish(),
-  /** Which delivery mechanism is active. Defaulted to `smtp` for backward compatibility. */
-  transport: $MailTransport.default('smtp'),
-  /** SMTP account username (often identical to the sender address); SMTP transport only. */
-  username: z.string().default('')
+  /** SMTP account username (often identical to the sender address). */
+  username: z.string().min(1)
 });
 
-/**
- * The subset of config fields the transport check reads. Typing the check against only these
- * (rather than the full inferred config) lets the same function validate both the persisted
- * schema and the update schema, whose secret fields differ in optionality.
- */
-type TransportCheckValue = {
-  awsAccessKeyId: string;
-  awsRegion: string;
-  domain: string;
-  host: string;
-  provider: MailProvider;
-  transport: MailTransport;
-  username: string;
-};
+const $MailConfig = $MailConfigBase;
 
 /**
- * Enforce only the fields the active transport (and provider) requires, so switching transports
- * or providers doesn't demand fields the others use. Secrets (`apiKey`/`password`) are validated
- * separately (they may be omitted on an update to keep the stored value), so they are
- * intentionally not checked here.
+ * The mail configuration as exposed to an authenticated admin client. The secret `password` is
+ * replaced by a `hasPassword` boolean so the UI can show that one is set without transmitting it.
  */
-const checkTransportFields = (ctx: z.core.ParsePayload<TransportCheckValue>) => {
-  const value = ctx.value;
-  if (value.transport === 'smtp') {
-    if (!value.host) {
-      ctx.issues.push({ code: 'custom', input: value.host, message: 'A host is required for SMTP', path: ['host'] });
-    }
-    if (!value.username) {
-      ctx.issues.push({
-        code: 'custom',
-        input: value.username,
-        message: 'A username is required for SMTP',
-        path: ['username']
-      });
-    }
-    return;
-  }
-  if (value.provider === 'mailgun' && !value.domain) {
-    ctx.issues.push({
-      code: 'custom',
-      input: value.domain,
-      message: 'A sending domain is required for Mailgun',
-      path: ['domain']
-    });
-  }
-  if (value.provider === 'ses') {
-    if (!value.awsRegion) {
-      ctx.issues.push({
-        code: 'custom',
-        input: value.awsRegion,
-        message: 'An AWS region is required for Amazon SES',
-        path: ['awsRegion']
-      });
-    } else if (!/^[a-z0-9-]+$/.test(value.awsRegion)) {
-      // The region is interpolated into the SES request host, so it is constrained to the AWS
-      // region character set here at the boundary to prevent a crafted value redirecting the request.
-      ctx.issues.push({
-        code: 'custom',
-        input: value.awsRegion,
-        message: 'AWS region may contain only lowercase letters, digits, and hyphens',
-        path: ['awsRegion']
-      });
-    }
-    if (!value.awsAccessKeyId) {
-      ctx.issues.push({
-        code: 'custom',
-        input: value.awsAccessKeyId,
-        message: 'An AWS access key ID is required for Amazon SES',
-        path: ['awsAccessKeyId']
-      });
-    }
-  }
-};
-
-const $MailConfig = $MailConfigBase.check(checkTransportFields);
-
-/**
- * The mail configuration as exposed to an authenticated admin client. The secret
- * `password`/`apiKey` are replaced by `hasPassword`/`hasApiKey` booleans so the UI
- * can indicate that a secret is set without ever transmitting it.
- */
-const $MailConfigDto = $MailConfigBase.omit({ apiKey: true, password: true }).extend({
-  hasApiKey: z.boolean(),
+const $MailConfigDto = $MailConfigBase.omit({ password: true }).extend({
   hasPassword: z.boolean()
 });
 
 /**
- * The payload an admin submits to update the mail configuration. The secrets
- * (`password`/`apiKey`) are optional: when omitted or left blank the previously
- * stored value is kept, which lets the form round-trip without exposing them.
+ * The payload an admin submits to update the mail configuration. `password` is optional: when
+ * omitted or left blank the stored value is kept, which lets the form round-trip without ever
+ * holding the secret.
  */
-const $UpdateMailConfigData = $MailConfigBase
-  .omit({ apiKey: true, password: true })
-  .extend({
-    apiKey: z.string().optional(),
-    password: z.string().optional()
-  })
-  .check(checkTransportFields);
-
-/** The languages email content can be authored in; the sender chooses one when sending. */
-const MAIL_LANGUAGE = ['en', 'es', 'fr'] as const;
-
-const $MailLanguage = z.enum(MAIL_LANGUAGE);
-
-/** A string authored in the instance's active languages. Each field is nullish so a template can target a single language; nullish (rather than just optional) matches Prisma's null-for-absent convention. */
-const $LocalizedString = z.object({
-  en: z.string().nullish(),
-  es: z.string().nullish(),
-  fr: z.string().nullish()
+const $UpdateMailConfigData = $MailConfigBase.omit({ password: true }).extend({
+  password: z.string().optional()
 });
 
 /**
  * An editable email template with per-language subject/body. Bodies may contain `{{variable}}`
- * placeholders. Content is authored in both languages; the sender selects one at send time.
+ * placeholders. The sender selects a language at send time.
  */
 const $MailTemplate = z.object({
   body: $LocalizedString,
@@ -226,10 +82,10 @@ const $UpdateMailSettingsData = z.object({
 });
 
 /**
- * Request body for the "test connection / send test email" endpoint. When
- * `config` is provided the supplied (possibly unsaved) settings are tested,
- * otherwise the saved configuration is used. When `recipient` is provided a real
- * test message is delivered to it; otherwise only the connection is verified.
+ * Request body for the "test connection / send test email" endpoint. When `config` is provided
+ * the supplied (possibly unsaved) settings are tested, otherwise the saved configuration is
+ * used. When `recipient` is provided a real test message is delivered to it; otherwise only the
+ * connection is verified.
  */
 const $TestMailData = z.object({
   config: $UpdateMailConfigData.optional(),
@@ -246,7 +102,6 @@ const $NewUserEmailVariables = z.object({
   firstName: z.string(),
   group: z.string(),
   lastName: z.string(),
-  password: z.string(),
   url: z.string(),
   username: z.string()
 });
@@ -277,11 +132,11 @@ const $EmailDeliveryResult = z.object({
 
 const $SendAssignmentEmailData = z.object({
   /** The language to send the email in. Defaults to English when omitted. */
-  language: $MailLanguage.default('en'),
+  language: $Language.default('en'),
   recipient: z.email(),
   /**
-   * Which remote-assignment template to send: a template id, `null` for the built-in default, or
-   * omitted to fall back to the group's active template (then the built-in default).
+   * Which template to send: a template id, `null` for the built-in default, or omitted to fall
+   * back to the group's active template (then the built-in default).
    */
   templateId: z.string().nullish()
 });
@@ -295,30 +150,13 @@ const DEFAULT_NEW_USER_EMAIL_TEMPLATE = {
       'An account has been created for you on Open Data Capture.',
       '',
       'Username: {{username}}',
-      'Temporary password: {{password}}',
       'Group(s): {{group}}',
       '',
       'You can log in here: {{url}}',
       '',
-      'For security, please change your password after signing in for the first time.',
+      'Your administrator will provide your password separately. For security, please change it after signing in for the first time.',
       '',
       'New to Open Data Capture? This guide will help you get started:',
-      'https://opendatacapture.org/en/docs/guides/how-to-get-started-with-odc/'
-    ].join('\n'),
-    es: [
-      'Hola {{firstName}},',
-      '',
-      'Se ha creado una cuenta para usted en Open Data Capture.',
-      '',
-      'Nombre de usuario: {{username}}',
-      'Contraseña temporal: {{password}}',
-      'Grupo(s): {{group}}',
-      '',
-      'Puede iniciar sesión aquí: {{url}}',
-      '',
-      'Por seguridad, cambie su contraseña después de iniciar sesión por primera vez.',
-      '',
-      '¿Nuevo en Open Data Capture? Esta guía le ayudará a comenzar:',
       'https://opendatacapture.org/en/docs/guides/how-to-get-started-with-odc/'
     ].join('\n'),
     fr: [
@@ -327,12 +165,11 @@ const DEFAULT_NEW_USER_EMAIL_TEMPLATE = {
       'Un compte a été créé pour vous sur Open Data Capture.',
       '',
       "Nom d'utilisateur : {{username}}",
-      'Mot de passe temporaire : {{password}}',
       'Groupe(s) : {{group}}',
       '',
       'Vous pouvez vous connecter ici : {{url}}',
       '',
-      'Pour des raisons de sécurité, veuillez changer votre mot de passe après votre première connexion.',
+      'Votre administrateur vous transmettra votre mot de passe séparément. Pour des raisons de sécurité, veuillez le changer après votre première connexion.',
       '',
       'Nouveau sur Open Data Capture ? Ce guide vous aidera à démarrer :',
       'https://opendatacapture.org/fr/docs/guides/how-to-get-started-with-odc/'
@@ -340,7 +177,6 @@ const DEFAULT_NEW_USER_EMAIL_TEMPLATE = {
   },
   subject: {
     en: 'Your Open Data Capture account',
-    es: 'Su cuenta de Open Data Capture',
     fr: 'Votre compte Open Data Capture'
   }
 } as const satisfies z.infer<typeof $MailTemplate>;
@@ -360,18 +196,6 @@ const DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE = {
       '',
       'Thank you.'
     ].join('\n'),
-    es: [
-      'Hola,',
-      '',
-      'Se le ha asignado un cuestionario para completar en Open Data Capture.',
-      '',
-      'Por favor, complételo utilizando el enlace seguro a continuación:',
-      '{{url}}',
-      '',
-      'Este enlace expira el {{expiresAt}}.',
-      '',
-      'Gracias.'
-    ].join('\n'),
     fr: [
       'Bonjour,',
       '',
@@ -387,10 +211,23 @@ const DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE = {
   },
   subject: {
     en: 'Your Open Data Capture assignment',
-    es: 'Su evaluación de Open Data Capture',
     fr: 'Votre évaluation Open Data Capture'
   }
 } as const satisfies z.infer<typeof $MailTemplate>;
+
+/**
+ * The single definition of "outgoing mail is on". `SetupService` reports this to clients as the
+ * public `isMailEnabled` flag and `MailService` gates sending on it.
+ *
+ * It takes the **raw stored value** and validates it here, rather than a already-parsed config,
+ * because that is the only way the two sides cannot disagree: a stored configuration that no
+ * longer satisfies `$MailConfig` has to count as off for the client flag exactly as it does for
+ * the server, which refuses to send with it.
+ */
+function isMailEnabled(storedConfig: unknown): boolean {
+  const result = $MailConfig.safeParse(storedConfig);
+  return result.success && result.data.enabled;
+}
 
 // ── Template validation helpers ──────────────────────────────────────────────
 
@@ -438,14 +275,9 @@ export type EmailDeliveryResult = z.infer<typeof $EmailDeliveryResult>;
 export type EmailDeliveryStatus = z.infer<typeof $EmailDeliveryStatus>;
 export type MailConfig = z.infer<typeof $MailConfig>;
 export type MailConfigDto = z.infer<typeof $MailConfigDto>;
-export type LocalizedString = z.infer<typeof $LocalizedString>;
 export type MailEncryption = (typeof MAIL_ENCRYPTION)[number];
-export type MailLanguage = (typeof MAIL_LANGUAGE)[number];
-export type MailProvider = (typeof MAIL_PROVIDER)[number];
-export type MailRegion = (typeof MAIL_REGION)[number];
 export type MailSettings = z.infer<typeof $MailSettings>;
 export type MailTemplate = z.infer<typeof $MailTemplate>;
-export type MailTransport = (typeof MAIL_TRANSPORT)[number];
 export type NewUserEmailVariables = z.infer<typeof $NewUserEmailVariables>;
 export type SendAssignmentEmailData = z.infer<typeof $SendAssignmentEmailData>;
 export type TestMailData = z.infer<typeof $TestMailData>;
@@ -457,16 +289,11 @@ export {
   $AssignmentEmailVariables,
   $EmailDeliveryResult,
   $EmailDeliveryStatus,
-  $LocalizedString,
   $MailConfig,
   $MailConfigDto,
   $MailEncryption,
-  $MailLanguage,
-  $MailProvider,
-  $MailRegion,
   $MailSettings,
   $MailTemplate,
-  $MailTransport,
   $NewUserEmailVariables,
   $SendAssignmentEmailData,
   $TestMailData,
@@ -476,9 +303,6 @@ export {
   checkTemplateIssue,
   DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE,
   DEFAULT_NEW_USER_EMAIL_TEMPLATE,
-  MAIL_ENCRYPTION,
-  MAIL_LANGUAGE,
-  MAIL_PROVIDER,
-  MAIL_REGION,
-  MAIL_TRANSPORT
+  isMailEnabled,
+  MAIL_ENCRYPTION
 };

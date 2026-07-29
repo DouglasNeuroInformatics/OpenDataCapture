@@ -1,10 +1,12 @@
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { Test } from '@nestjs/testing';
-import type { MailLanguage } from '@opendatacapture/schemas/mail';
+import type { Language } from '@opendatacapture/schemas/core';
 import { DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import type { AppAbility } from '@/auth/auth.types';
 import { GroupsService } from '@/groups/groups.service';
 import { MailService } from '@/mail/mail.service';
@@ -12,7 +14,7 @@ import { MailService } from '@/mail/mail.service';
 import { AssignmentsController } from '../assignments.controller';
 import { AssignmentsService } from '../assignments.service';
 
-const ability = {} as AppAbility;
+const currentUser = { ability: {} as AppAbility, id: 'user-1' } as RequestUser;
 
 const assignment = {
   expiresAt: new Date('2026-08-01T12:00:00.000Z'),
@@ -23,7 +25,6 @@ const assignment = {
 
 const customTemplate = {
   body: { en: 'Custom body {{url}}', fr: 'Corps personnalisé {{url}}' },
-  category: 'REMOTE_ASSIGNMENT',
   id: 'tpl-1',
   name: 'Custom',
   subject: { en: 'Custom subject', fr: 'Objet personnalisé' }
@@ -32,6 +33,7 @@ const customTemplate = {
 describe('AssignmentsController', () => {
   let assignmentsController: AssignmentsController;
   let assignmentsService: MockedInstance<AssignmentsService>;
+  let auditLogger: MockedInstance<AuditLogger>;
   let groupsService: MockedInstance<GroupsService>;
   let mailService: MockedInstance<MailService>;
 
@@ -40,12 +42,14 @@ describe('AssignmentsController', () => {
       controllers: [AssignmentsController],
       providers: [
         MockFactory.createForService(AssignmentsService),
+        MockFactory.createForService(AuditLogger),
         MockFactory.createForService(GroupsService),
         MockFactory.createForService(MailService)
       ]
     }).compile();
     assignmentsController = moduleRef.get(AssignmentsController);
     assignmentsService = moduleRef.get(AssignmentsService);
+    auditLogger = moduleRef.get(AuditLogger);
     groupsService = moduleRef.get(GroupsService);
     mailService = moduleRef.get(MailService);
   });
@@ -55,8 +59,8 @@ describe('AssignmentsController', () => {
   });
 
   describe('sendEmail', () => {
-    const sendEmail = (body: { language: MailLanguage; recipient: string; templateId?: null | string }) =>
-      assignmentsController.sendEmail('assignment-1', body, ability);
+    const sendEmail = (body: { language: Language; recipient: string; templateId?: null | string }) =>
+      assignmentsController.sendEmail('assignment-1', body, currentUser);
 
     it('uses the built-in default template when the assignment has no group', async () => {
       assignmentsService.findById.mockResolvedValueOnce({ ...assignment, groupId: null });
@@ -64,11 +68,18 @@ describe('AssignmentsController', () => {
       expect(groupsService.findById).not.toHaveBeenCalled();
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
         body: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body.en,
-        expiresAt: '2026-08-01',
         recipient: 'p@x.org',
         subject: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.subject.en,
         url: `${assignment.url}?lang=en`
       });
+    });
+
+    it('formats the expiry with a time rather than a bare UTC date', async () => {
+      assignmentsService.findById.mockResolvedValueOnce({ ...assignment, groupId: null });
+      await sendEmail({ language: 'en', recipient: 'p@x.org' });
+      const { expiresAt } = mailService.sendAssignmentEmail.mock.lastCall?.[0] as { expiresAt: string };
+      expect(expiresAt).not.toBe('2026-08-01');
+      expect(expiresAt).toMatch(/\d{1,2}:\d{2}/);
     });
 
     it("uses the group's active template when no template id is given", async () => {
@@ -110,19 +121,6 @@ describe('AssignmentsController', () => {
       });
     });
 
-    it('ignores a matching template of the wrong category', async () => {
-      assignmentsService.findById.mockResolvedValueOnce(assignment);
-      groupsService.findById.mockResolvedValueOnce({
-        activeAssignmentEmailTemplateId: 'tpl-1',
-        emailTemplates: [{ ...customTemplate, category: 'INFORMATION' }]
-      });
-      await sendEmail({ language: 'en', recipient: 'p@x.org' });
-      expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
-        body: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body.en,
-        subject: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.subject.en
-      });
-    });
-
     it('sends the French content when language is fr', async () => {
       assignmentsService.findById.mockResolvedValueOnce(assignment);
       groupsService.findById.mockResolvedValueOnce({
@@ -133,6 +131,16 @@ describe('AssignmentsController', () => {
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
         body: customTemplate.body.fr,
         subject: customTemplate.subject.fr
+      });
+    });
+
+    it('records an audit log entry against the assignment group', async () => {
+      assignmentsService.findById.mockResolvedValueOnce(assignment);
+      groupsService.findById.mockResolvedValueOnce({ emailTemplates: [] });
+      await sendEmail({ language: 'en', recipient: 'p@x.org' });
+      expect(auditLogger.log).toHaveBeenCalledWith('SEND_EMAIL', 'ASSIGNMENT', {
+        groupId: 'group-1',
+        userId: 'user-1'
       });
     });
 

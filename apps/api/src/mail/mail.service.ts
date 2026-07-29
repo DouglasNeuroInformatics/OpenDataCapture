@@ -1,11 +1,11 @@
 import { InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
-import { $MailConfig, DEFAULT_NEW_USER_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
+import { BadRequestException, Injectable, ServiceUnavailableException } from '@nestjs/common';
+import type { Language } from '@opendatacapture/schemas/core';
+import { $MailConfig, DEFAULT_NEW_USER_EMAIL_TEMPLATE, isMailEnabled } from '@opendatacapture/schemas/mail';
 import type {
   EmailDeliveryResult,
   MailConfig,
-  MailLanguage,
   MailSettings,
   MailTemplate,
   TestMailData,
@@ -16,16 +16,7 @@ import type {
 import { createTransport } from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 
-import {
-  buildSendRequest,
-  buildVerifyRequest,
-  describeMailError,
-  encryptionToTransportFlags,
-  formatSender,
-  HttpMailError,
-  pickLocale,
-  renderTemplate
-} from './mail.utils';
+import { describeMailError, encryptionToTransportFlags, formatSender, pickLocale, renderTemplate } from './mail.utils';
 
 type SendOptions = {
   body: {
@@ -36,15 +27,22 @@ type SendOptions = {
   to: string;
 };
 
+/** Everything the service reads off `SetupState`, fetched in a single query. */
+type MailState = {
+  config: MailConfig | null;
+  isEnabled: boolean;
+  newUserEmailTemplate: MailTemplate;
+};
+
 /**
  * Handles all outgoing email for the application.
  *
- * Unlike libnest's `MailModule`, which binds a single transporter from static
- * options at boot, the SMTP configuration here is owned by the admin and stored in
- * the database (on `SetupState`). We therefore build a fresh nodemailer transporter
- * from the current configuration whenever we send, so changes take effect without a
- * restart and a "test connection" button can validate unsaved settings. We still
- * reuse the same underlying library (nodemailer) that libnest depends on.
+ * Unlike libnest's `MailModule`, which binds a single transporter from static options at boot,
+ * the SMTP configuration here is owned by the admin and stored in the database (on
+ * `SetupState`). We therefore build a fresh nodemailer transporter from the current
+ * configuration whenever we send, so changes take effect without a restart and a "test
+ * connection" button can validate unsaved settings. We still reuse the same underlying library
+ * (nodemailer) that libnest depends on.
  */
 @Injectable()
 export class MailService {
@@ -55,78 +53,24 @@ export class MailService {
 
   /** The full SMTP configuration including the secret password, or null if never configured. */
   async getConfig(): Promise<MailConfig | null> {
-    const setupState = await this.setupStateModel.findFirst();
-    if (!setupState?.mailConfig) {
-      return null;
-    }
-    // Validate the stored value so scalar columns (e.g. `encryption`) are narrowed
-    // from `string` to their expected literal union types.
-    const result = $MailConfig.safeParse(setupState.mailConfig);
-    return result.success ? result.data : null;
+    return (await this.readState()).config;
   }
 
-  /** The new-user welcome template, falling back to the seeded default. */
-  async getNewUserEmailTemplate(): Promise<MailTemplate> {
-    const setupState = await this.setupStateModel.findFirst();
-    const body = setupState?.newUserEmailTemplate?.body;
-    const subject = setupState?.newUserEmailTemplate?.subject;
-    if (!body || !subject) {
-      return { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE };
-    }
-    return { body, subject };
-  }
-
-  /** Admin-facing settings: secrets are replaced by `hasPassword`/`hasApiKey` flags. */
+  /** Admin-facing settings: the password is replaced by a `hasPassword` flag. */
   async getSettings(): Promise<MailSettings> {
-    const config = await this.getConfig();
-    return {
-      config: config
-        ? {
-            awsAccessKeyId: config.awsAccessKeyId,
-            awsRegion: config.awsRegion,
-            domain: config.domain,
-            enabled: config.enabled,
-            encryption: config.encryption,
-            hasApiKey: Boolean(config.apiKey),
-            hasPassword: Boolean(config.password),
-            host: config.host,
-            port: config.port,
-            provider: config.provider,
-            region: config.region,
-            senderAddress: config.senderAddress,
-            senderName: config.senderName,
-            transport: config.transport,
-            username: config.username
-          }
-        : null,
-      newUserEmailTemplate: await this.getNewUserEmailTemplate()
-    };
+    const { config, newUserEmailTemplate } = await this.readState();
+    return { config: config ? this.toDto(config) : null, newUserEmailTemplate };
   }
 
   /** Whether outgoing email is both configured and switched on. */
   async isEnabled(): Promise<boolean> {
-    const config = await this.getConfig();
-    if (!config?.enabled) {
-      return false;
-    }
-    if (config.transport === 'http') {
-      // Each provider needs its secret plus any provider-specific fields: Mailgun a sending
-      // domain, SES an access key ID and region; SendGrid and Postmark need only the key/token.
-      if (config.provider === 'mailgun') {
-        return Boolean(config.apiKey && config.domain);
-      }
-      if (config.provider === 'ses') {
-        return Boolean(config.apiKey && config.awsAccessKeyId && config.awsRegion);
-      }
-      return Boolean(config.apiKey);
-    }
-    return Boolean(config.host);
+    return (await this.readState()).isEnabled;
   }
 
   /**
-   * Email a remote-assignment link to a participant. The subject/body come from the
-   * caller (the participant's group active template, or a default), and `{{url}}` /
-   * `{{expiresAt}}` placeholders are substituted here.
+   * Email a remote-assignment link to a participant. The subject/body come from the caller (the
+   * participant's group active template, or a default), and `{{url}}` / `{{expiresAt}}`
+   * placeholders are substituted here.
    */
   async sendAssignmentEmail({
     body,
@@ -148,11 +92,12 @@ export class MailService {
     const message = rendered.includes(url) ? rendered : `${rendered}\n\n${url}`;
     const subject = renderTemplate(subjectTemplate, variables);
 
-    if (!(await this.isEnabled())) {
+    const { config, isEnabled } = await this.readState();
+    if (!isEnabled || !config) {
       return { message, recipient, status: 'DISABLED' };
     }
     try {
-      await this.sendMail({ body: { text: message }, subject, to: recipient });
+      await this.sendMail(config, { body: { text: message }, subject, to: recipient });
       return { message, recipient, status: 'SENT' };
     } catch (err) {
       this.loggingService.error(`Failed to send assignment email to ${recipient}: ${String(err)}`);
@@ -167,32 +112,30 @@ export class MailService {
     group,
     language = 'en',
     lastName,
-    password,
     url,
     username
   }: {
     email?: null | string;
     firstName: string;
     group: string;
-    language?: MailLanguage;
+    language?: Language;
     lastName: string;
-    password: string;
     url: string;
     username: string;
   }): Promise<EmailDeliveryResult> {
-    const template = await this.getNewUserEmailTemplate();
-    const variables = { firstName, group, lastName, password, url, username };
+    const { config, isEnabled, newUserEmailTemplate: template } = await this.readState();
+    const variables = { firstName, group, lastName, url, username };
     const message = renderTemplate(pickLocale(template.body, language), variables);
     const subject = renderTemplate(pickLocale(template.subject, language), variables);
 
-    if (!(await this.isEnabled())) {
+    if (!isEnabled || !config) {
       return { message, recipient: email, status: 'DISABLED' };
     }
     if (!email) {
       return { message, recipient: null, status: 'NO_RECIPIENT' };
     }
     try {
-      await this.sendMail({ body: { text: message }, subject, to: email });
+      await this.sendMail(config, { body: { text: message }, subject, to: email });
       return { message, recipient: email, status: 'SENT' };
     } catch (err) {
       this.loggingService.error(`Failed to send welcome email to ${email}: ${String(err)}`);
@@ -201,12 +144,15 @@ export class MailService {
   }
 
   /**
-   * Test the SMTP connection, optionally sending a real message to `recipient`.
-   * When `config` is supplied the (possibly unsaved) values are tested; otherwise
-   * the saved configuration is used.
+   * Test the SMTP connection, optionally sending a real message to `recipient`. When `config` is
+   * supplied the (possibly unsaved) values are tested; otherwise the saved configuration is used.
    */
   async test({ config, recipient }: TestMailData): Promise<TestMailResult> {
-    const resolved = await this.resolveConfig(config);
+    const saved = await this.getConfig();
+    if (this.requiresNewPassword(config, saved)) {
+      return { error: 'Enter the password for this mail server before testing it.', success: false };
+    }
+    const resolved = this.resolveConfig(config, saved);
     if (!resolved) {
       return { error: 'Mail has not been configured', success: false };
     }
@@ -218,17 +164,10 @@ export class MailService {
       to: recipient ?? ''
     };
     try {
-      if (resolved.transport === 'http') {
-        await this.verifyHttp(resolved);
-        if (recipient) {
-          await this.sendViaHttp(resolved, testMessage);
-        }
-      } else {
-        const transporter = this.createTransporter(resolved);
-        await transporter.verify();
-        if (recipient) {
-          await this.send(transporter, resolved, testMessage);
-        }
+      const transporter = this.createTransporter(resolved);
+      await transporter.verify();
+      if (recipient) {
+        await this.send(transporter, resolved, testMessage);
       }
       return { success: true };
     } catch (err) {
@@ -237,16 +176,20 @@ export class MailService {
   }
 
   /**
-   * Persist the mail configuration and/or new-user template. A blank/omitted
-   * `password` preserves the previously stored one so the secret never has to leave
-   * the server. Returns the admin-facing settings (password stripped).
+   * Persist the mail configuration and/or new-user template. A blank/omitted `password`
+   * preserves the stored one so the secret never has to leave the server. Returns the
+   * admin-facing settings (password stripped).
    */
   async updateSettings(data: UpdateMailSettingsData): Promise<MailSettings> {
     const setupState = await this.setupStateModel.findFirst();
     if (!setupState?.isSetup) {
       throw new ServiceUnavailableException('Cannot update mail settings before setup');
     }
-    const nextConfig = data.config ? await this.resolveConfig(data.config) : undefined;
+    const saved = await this.getConfig();
+    if (this.requiresNewPassword(data.config, saved)) {
+      throw new BadRequestException('A password is required when changing the mail server');
+    }
+    const nextConfig = data.config ? this.resolveConfig(data.config, saved) : undefined;
     await this.setupStateModel.update({
       data: {
         ...(nextConfig ? { mailConfig: { set: nextConfig } } : {}),
@@ -271,40 +214,53 @@ export class MailService {
     });
   }
 
+  /** Read `SetupState` once and narrow both mail fields off it. */
+  private async readState(): Promise<MailState> {
+    const setupState = await this.setupStateModel.findFirst();
+    // Validate the stored value so scalar columns (e.g. `encryption`) are narrowed
+    // from `string` to their expected literal union types.
+    const config = $MailConfig.safeParse(setupState?.mailConfig);
+    const { body, subject } = setupState?.newUserEmailTemplate ?? {};
+    return {
+      config: config.success ? config.data : null,
+      isEnabled: isMailEnabled(setupState?.mailConfig),
+      newUserEmailTemplate: body && subject ? { body, subject } : { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE }
+    };
+  }
+
   /**
-   * Resolve a (possibly partial) update payload into a complete config. A blank or
-   * omitted secret (`password`/`apiKey`) keeps the previously saved one, so secrets
-   * never have to round-trip to the client.
+   * Whether the caller has to supply a password rather than inheriting the stored one.
+   *
+   * A blank password normally means "keep the stored one", so the secret never has to round-trip
+   * to the client. That inheritance is confined to the server the password belongs to: otherwise
+   * `POST /v1/mail/test` could aim an arbitrary host at the stored credential and read it back off
+   * the resulting SMTP AUTH. Pointing at a different server is refused outright rather than
+   * quietly blanking the password, which would break a working configuration on an unrelated edit.
    */
-  private async resolveConfig(partial?: UpdateMailConfigData): Promise<MailConfig | null> {
-    const saved = await this.getConfig();
+  private requiresNewPassword(partial: undefined | UpdateMailConfigData, saved: MailConfig | null): boolean {
+    if (!partial || partial.password) {
+      return false;
+    }
+    return saved?.host !== partial.host || saved.username !== partial.username || saved.port !== partial.port;
+  }
+
+  /**
+   * Resolve a (possibly partial) update payload into a complete config. Callers reject the
+   * payload with {@link requiresNewPassword} first, which is what makes inheriting a blank
+   * password below safe.
+   */
+  private resolveConfig(partial: undefined | UpdateMailConfigData, saved: MailConfig | null): MailConfig | null {
     if (!partial) {
       return saved;
     }
-    // A blank/omitted secret means "keep the saved one"; only a non-empty value replaces it.
-    let apiKey = saved?.apiKey ?? '';
-    if (partial.apiKey) {
-      apiKey = partial.apiKey;
-    }
-    let password = saved?.password ?? '';
-    if (partial.password) {
-      password = partial.password;
-    }
     return {
-      apiKey,
-      awsAccessKeyId: partial.awsAccessKeyId,
-      awsRegion: partial.awsRegion,
-      domain: partial.domain,
       enabled: partial.enabled,
       encryption: partial.encryption,
       host: partial.host,
-      password,
+      password: partial.password ?? saved?.password ?? '',
       port: partial.port,
-      provider: partial.provider,
-      region: partial.region,
       senderAddress: partial.senderAddress,
       senderName: partial.senderName ?? null,
-      transport: partial.transport,
       username: partial.username
     };
   }
@@ -319,43 +275,13 @@ export class MailService {
     });
   }
 
-  /** Send a message using the currently saved configuration and its active transport. */
-  private async sendMail(options: SendOptions): Promise<void> {
-    const config = await this.getConfig();
-    if (!config) {
-      throw new Error('Mail has not been configured');
-    }
-    if (config.transport === 'http') {
-      await this.sendViaHttp(config, options);
-    } else {
-      await this.send(this.createTransporter(config), config, options);
-    }
+  /** Send a message using an already-resolved configuration. */
+  private async sendMail(config: MailConfig, options: SendOptions): Promise<void> {
+    await this.send(this.createTransporter(config), config, options);
   }
 
-  /** Deliver a message through the provider's HTTP API. Throws {@link HttpMailError} on a non-2xx. */
-  private async sendViaHttp(config: MailConfig, options: SendOptions): Promise<void> {
-    const request = buildSendRequest(config, {
-      html: options.body.html,
-      subject: options.subject,
-      text: options.body.text,
-      to: options.to
-    });
-    const response = await fetch(request.url, {
-      body: request.body,
-      headers: request.headers,
-      method: request.method
-    });
-    if (!response.ok) {
-      throw new HttpMailError(response.status);
-    }
-  }
-
-  /** Validate HTTP-transport credentials (and Mailgun domain/region) without sending a message. */
-  private async verifyHttp(config: MailConfig): Promise<void> {
-    const request = buildVerifyRequest(config);
-    const response = await fetch(request.url, { headers: request.headers, method: request.method });
-    if (!response.ok) {
-      throw new HttpMailError(response.status);
-    }
+  private toDto(config: MailConfig): MailSettings['config'] {
+    const { password, ...rest } = config;
+    return { ...rest, hasPassword: Boolean(password) };
   }
 }

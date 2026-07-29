@@ -12,7 +12,7 @@ import {
   Spinner,
   TextArea
 } from '@douglasneuroinformatics/libui/components';
-import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/react-core';
 import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
 import { $RegexString } from '@opendatacapture/schemas/core';
@@ -880,7 +880,6 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
 
 const RouteComponent = () => {
   const { resolvedLanguage, t } = useTranslation('group');
-  const addNotification = useNotificationsStore((store) => store.addNotification);
   const instrumentInfoQuery = useInstrumentInfoQuery();
   const updateGroupMutation = useUpdateGroupMutation();
   const currentGroup = useAppStore((store) => store.currentGroup);
@@ -994,7 +993,6 @@ const RouteComponent = () => {
           onSubmit: async (data) => {
             const updatedGroup = await updateGroupMutation.mutateAsync(data);
             changeGroup(updatedGroup);
-            addNotification({ type: 'success' });
           },
           readOnly: Boolean(setupState.data?.isDemo && import.meta.env.PROD)
         }}

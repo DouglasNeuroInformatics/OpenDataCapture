@@ -3,9 +3,11 @@
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 
+import { MailSettingsPage } from '../pages/_app/admin/mail.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
 import { SubjectDataTablePage } from '../pages/_app/datahub/$subjectId/table/index.page';
 import { DatahubPage } from '../pages/_app/datahub/index.page';
+import { GroupEmailTemplatesPage } from '../pages/_app/group/email-templates.page';
 import { AccessibleInstrumentsPage } from '../pages/_app/instruments/accessible-instruments.page';
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { StartSessionPage } from '../pages/_app/session/start-session.page';
@@ -18,10 +20,12 @@ import { randomId } from './unique';
 import type { AppState, NavigateVariadicArgs, Role, RouteTo } from './types';
 
 const pageModels = {
+  '/admin/mail': MailSettingsPage,
   '/auth/login': LoginPage,
   '/dashboard': DashboardPage,
   '/datahub': DatahubPage,
   '/datahub/$subjectId/table': SubjectDataTablePage,
+  '/group/email-templates': GroupEmailTemplatesPage,
   '/instruments/accessible-instruments': AccessibleInstrumentsPage,
   '/session/remote-assignment': RemoteAssignmentPage,
   '/session/start-session': StartSessionPage

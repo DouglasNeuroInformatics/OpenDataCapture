@@ -177,7 +177,6 @@ const $BrandingConfig = z.object({
 });
 
 const $SetupState = z.object({
-  activeLanguages: z.array(z.string()).optional(),
   branding: $BrandingConfig.nullish(),
   isDemo: z.boolean(),
   isExperimentalFeaturesEnabled: z.boolean().nullish(),

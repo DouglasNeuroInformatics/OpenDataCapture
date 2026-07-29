@@ -2,6 +2,7 @@ import { InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
@@ -69,7 +70,14 @@ export class GroupsService {
 
   async updateById(
     id: string,
-    { accessibleInstrumentIds, emailTemplates, instrumentRepoIds, settings, ...data }: UpdateGroupDto,
+    {
+      accessibleInstrumentIds,
+      emailTemplates,
+      expectedUpdatedAt,
+      instrumentRepoIds,
+      settings,
+      ...data
+    }: UpdateGroupDto,
     { ability }: EntityOperationOptions = {}
   ) {
     const where: Prisma.GroupWhereInput = { AND: [accessibleQuery(ability, 'update', 'Group')], id };
@@ -77,6 +85,13 @@ export class GroupsService {
     if (!group) {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);
     }
+    if (expectedUpdatedAt && group.updatedAt.getTime() !== expectedUpdatedAt.getTime()) {
+      throw new ConflictException(`Group with ID '${id}' has been modified since it was loaded`);
+    }
+    // The check above is only a fast, friendly rejection — it is a separate read, so two writers
+    // can both pass it. `expectedUpdatedAt` therefore also goes in the update's own `where`, which
+    // is what actually makes the write conditional.
+    const revisionGuard: { updatedAt?: Date } = expectedUpdatedAt ? { updatedAt: expectedUpdatedAt } : {};
     // Only guard against a genuine rename collision: check the requested name (not the current one,
     // which would always match this same group) and skip the check when the name is unchanged.
     const exists =
@@ -100,27 +115,37 @@ export class GroupsService {
       validInstrumentIds = existingInstruments.map(({ id }) => id);
     }
 
-    return this.groupModel.update({
-      data: {
-        accessibleInstruments: validInstrumentIds
-          ? {
-              set: validInstrumentIds.map((id) => ({ id }))
-            }
-          : undefined,
-        // Composite list fields must be replaced via `set` in the MongoDB connector.
-        emailTemplates: emailTemplates ? { set: emailTemplates } : undefined,
-        instrumentRepos: instrumentRepoIds
-          ? {
-              set: instrumentRepoIds.map((id) => ({ id }))
-            }
-          : undefined,
-        settings: {
-          ...group.settings,
-          ...settings
+    try {
+      return await this.groupModel.update({
+        data: {
+          accessibleInstruments: validInstrumentIds
+            ? {
+                set: validInstrumentIds.map((id) => ({ id }))
+              }
+            : undefined,
+          // Composite list fields must be replaced via `set` in the MongoDB connector.
+          emailTemplates: emailTemplates ? { set: emailTemplates } : undefined,
+          instrumentRepos: instrumentRepoIds
+            ? {
+                set: instrumentRepoIds.map((id) => ({ id }))
+              }
+            : undefined,
+          settings: {
+            ...group.settings,
+            ...settings
+          },
+          ...data
         },
-        ...data
-      },
-      where: { AND: [accessibleQuery(ability, 'update', 'Group')], id }
-    });
+        where: { AND: [accessibleQuery(ability, 'update', 'Group')], id, ...revisionGuard }
+      });
+    } catch (err) {
+      // P2025 is "no record matched the where clause". The findFirst above already matched on id
+      // and ability, so the revision guard is the only filter that can have started failing —
+      // i.e. a concurrent edit. Anything else is a real fault and has to surface.
+      if (revisionGuard.updatedAt && err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
+        throw new ConflictException(`Group with ID '${id}' has been modified since it was loaded`);
+      }
+      throw err;
+    }
   }
 }

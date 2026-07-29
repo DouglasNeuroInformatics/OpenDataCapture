@@ -1,405 +1,450 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import React from 'react';
 
-import {
-  Button,
-  Checkbox,
-  Heading,
-  Input,
-  Label,
-  Select,
-  TextArea,
-  Tooltip
-} from '@douglasneuroinformatics/libui/components';
+import { Button, Checkbox, Heading, Input, Select, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { $LocalizedString } from '@opendatacapture/schemas/core';
+import type { LocalizedString } from '@opendatacapture/schemas/core';
 import {
-  $LocalizedString,
   $MailEncryption,
-  $MailLanguage,
-  $MailProvider,
-  $MailRegion,
+  $TestMailData,
   $UpdateMailConfigData,
   checkTemplateIssue,
-  DEFAULT_NEW_USER_EMAIL_TEMPLATE,
-  MAIL_LANGUAGE
+  DEFAULT_NEW_USER_EMAIL_TEMPLATE
 } from '@opendatacapture/schemas/mail';
-import type {
-  LocalizedString,
-  MailConfigDto,
-  MailLanguage,
-  MailProvider,
-  MailTemplate,
-  MailTransport,
-  UpdateMailConfigData
-} from '@opendatacapture/schemas/mail';
+import type { MailConfigDto, MailEncryption, MailTemplate, UpdateMailConfigData } from '@opendatacapture/schemas/mail';
 import { createFileRoute } from '@tanstack/react-router';
 import { CircleHelpIcon, Loader2Icon } from 'lucide-react';
 
+import { EmailTemplateEditor } from '@/components/EmailTemplateEditor';
+import { FormField } from '@/components/FormField';
 import { PageHeader } from '@/components/PageHeader';
-import { SaveStatus } from '@/components/SaveStatus';
-import { SegmentedControl } from '@/components/SegmentedControl';
+import { SectionCard } from '@/components/SectionCard';
 import { mailSettingsQueryOptions, useMailSettingsQuery } from '@/hooks/useMailSettingsQuery';
-import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useTestMailMutation } from '@/hooks/useTestMailMutation';
 import { useUpdateMailSettingsMutation } from '@/hooks/useUpdateMailSettingsMutation';
-import { ALL_LANGUAGES } from '@/utils/languages';
 
-const SectionCard = ({ children }: { children: React.ReactNode }) => (
-  <div className="rounded-2xl border border-slate-200/60 bg-white/90 p-6 shadow-sm backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90">
-    {children}
-  </div>
-);
-
-const Field = ({
-  children,
-  description,
-  htmlFor,
-  label
-}: {
-  children: React.ReactNode;
-  description?: string;
-  htmlFor: string;
-  label: string;
-}) => (
-  <div className="flex flex-col gap-1.5">
-    <Label htmlFor={htmlFor}>{label}</Label>
-    {description && <p className="text-muted-foreground text-xs">{description}</p>}
-    {children}
-  </div>
-);
-
-type ConfigFormValues = {
-  apiKey: string;
-  awsAccessKeyId: string;
-  awsRegion: string;
-  domain: string;
-  enabled: boolean;
-  encryption: 'none' | 'ssl' | 'starttls';
-  host: string;
-  password: string;
-  port: string;
-  provider: MailProvider;
-  region: 'eu' | 'us';
-  senderAddress: string;
-  senderName: string;
-  transport: MailTransport;
-  username: string;
-};
-
-// Shown in a secret field when one is already stored. The real value is never sent to
-// the client; leaving this mask unchanged keeps the stored secret, editing it sets a new one.
+// Shown in the password field when one is already stored. The real value is never sent to the
+// client; leaving this mask unchanged keeps the stored secret, editing it sets a new one.
 const MASKED_SECRET = '••••••••';
 
-// Variables a new-user welcome email can contain; username/password are required so the
-// recipient always receives their credentials.
-const NEW_USER_VARS = ['firstName', 'lastName', 'username', 'password', 'group', 'url'];
-const REQUIRED_NEW_USER_VARS = ['username', 'password'] as const;
+const NEW_USER_VARS = ['firstName', 'lastName', 'username', 'group', 'url'];
+const REQUIRED_NEW_USER_VARS = ['username'] as const;
 
-const newUserTemplateIssue = (subject: LocalizedString, body: LocalizedString, languages?: string[]) =>
-  checkTemplateIssue(subject, body, REQUIRED_NEW_USER_VARS, languages);
-
-// Standard SMTP submission ports per encryption mode, applied as the default when the
-// encryption is changed (unless the user has typed a non-standard port).
-const PORT_DEFAULTS: { [K in ConfigFormValues['encryption']]: string } = {
+// Standard SMTP submission ports per encryption mode, offered as the placeholder.
+const PORT_DEFAULTS = {
   none: '25',
   ssl: '465',
   starttls: '587'
+} as const satisfies { [K in ConfigFormValues['encryption']]: string };
+
+type ConfigFormValues = {
+  enabled: boolean;
+  encryption: MailEncryption;
+  host: string;
+  password: string;
+  port: string;
+  senderAddress: string;
+  senderName: string;
+  username: string;
 };
+
+type FieldErrors = { [K in keyof ConfigFormValues]?: string };
 
 const initialValues = (config: MailConfigDto | null): ConfigFormValues => ({
   enabled: config?.enabled ?? false,
-  transport: config?.transport ?? 'smtp',
-  provider: config?.provider ?? 'mailgun',
-  domain: config?.domain ?? '',
-  region: config?.region ?? 'us',
-  awsRegion: config?.awsRegion ?? '',
-  awsAccessKeyId: config?.awsAccessKeyId ?? '',
+  encryption: config?.encryption ?? 'starttls',
   host: config?.host ?? '',
+  password: config?.hasPassword ? MASKED_SECRET : '',
   // Empty for a new config so the encryption-specific suggestion shows and must be typed.
   port: config?.port ? String(config.port) : '',
-  encryption: config?.encryption ?? 'starttls',
-  username: config?.username ?? '',
-  password: config?.hasPassword ? MASKED_SECRET : '',
-  apiKey: config?.hasApiKey ? MASKED_SECRET : '',
+  senderAddress: config?.senderAddress ?? '',
   senderName: config?.senderName ?? '',
-  senderAddress: config?.senderAddress ?? ''
+  username: config?.username ?? ''
 });
 
-// Build a (secret-free) update payload from the saved config so the enabled flag can be
-// persisted on its own; omitted secrets are kept server-side.
-const toEnabledPayload = (config: MailConfigDto, enabled: boolean): UpdateMailConfigData => ({
-  awsAccessKeyId: config.awsAccessKeyId,
-  awsRegion: config.awsRegion,
-  domain: config.domain,
-  enabled,
-  encryption: config.encryption,
-  host: config.host,
-  port: config.port,
-  provider: config.provider,
-  region: config.region,
-  senderAddress: config.senderAddress,
-  senderName: config.senderName ?? undefined,
-  transport: config.transport,
-  username: config.username
-});
+const cleanLocalized = (value: LocalizedString): LocalizedString =>
+  $LocalizedString.parse(Object.fromEntries(Object.entries(value).filter(([, text]) => text)));
 
-// Debounced autosave: when `snapshot` changes, run `onSave` after a quiet period.
-function useAutosave(snapshot: string, onSave: () => void, delay = 1200) {
-  const lastSaved = React.useRef(snapshot);
-  const onSaveRef = React.useRef(onSave);
-  onSaveRef.current = onSave;
-  React.useEffect(() => {
-    if (snapshot === lastSaved.current) {
-      return;
-    }
-    const timer = setTimeout(() => {
-      lastSaved.current = snapshot;
-      onSaveRef.current();
-    }, delay);
-    return () => clearTimeout(timer);
-  }, [snapshot, delay]);
-}
+const RouteComponent = () => {
+  const { t } = useTranslation();
+  const { data: settings } = useMailSettingsQuery();
+
+  return (
+    <div className="w-full">
+      <PageHeader>
+        <Heading className="text-center" variant="h2">
+          {t({ en: 'Mail Server', fr: 'Serveur de courriel' })}
+        </Heading>
+      </PageHeader>
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6" data-testid="mail-settings-page">
+        <MailManager config={settings.config} newUserEmailTemplate={settings.newUserEmailTemplate} />
+      </div>
+    </div>
+  );
+};
 
 const MailManager = ({
-  activeLanguages,
   config,
   newUserEmailTemplate
 }: {
-  activeLanguages: string[];
   config: MailConfigDto | null;
   newUserEmailTemplate: MailTemplate;
 }) => {
-  const { resolvedLanguage, t } = useTranslation();
+  const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const updateMutation = useUpdateMailSettingsMutation();
-  const testMutation = useTestMailMutation();
 
   const [values, setValues] = React.useState<ConfigFormValues>(() => initialValues(config));
-  const [template, setTemplate] = React.useState({
-    body: { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE.body, ...newUserEmailTemplate.body },
-    subject: { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE.subject, ...newUserEmailTemplate.subject }
-  });
-  const [templateLang, setTemplateLang] = React.useState<MailLanguage>(() =>
-    $MailLanguage.parse(activeLanguages.includes(resolvedLanguage) ? resolvedLanguage : (activeLanguages[0] ?? 'en'))
-  );
-  const bodyCursorRef = React.useRef<null | { end: number; start: number }>(null);
-  const [recipient, setRecipient] = React.useState('');
-  const [testingMode, setTestingMode] = React.useState<'connection' | 'email' | null>(null);
+  const [errors, setErrors] = React.useState<FieldErrors>({});
 
-  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+  // Per-field copy for the rules `$UpdateMailConfigData` enforces. The schema decides what is
+  // invalid; this only decides how to say it, so the two cannot disagree about the rules.
+  const errorMessages: { [K in keyof ConfigFormValues]?: string } = {
+    host: t({
+      en: 'Enter a valid host (e.g. smtp.example.org)',
+      fr: 'Entrez un hôte valide (p. ex. smtp.example.org)'
+    }),
+    password: t({ en: 'A password is required', fr: 'Un mot de passe est requis' }),
+    port: t({
+      en: 'Port must be a whole number between 1 and 65535',
+      fr: 'Le port doit être un nombre entier entre 1 et 65535'
+    }),
+    senderAddress: t({
+      en: 'Enter a valid sender address (e.g. noreply@example.org)',
+      fr: "Entrez une adresse d'expéditeur valide (p. ex. noreply@example.org)"
+    }),
+    username: t({ en: 'A username is required', fr: "Le nom d'utilisateur est requis" })
+  };
 
-  const set = <K extends keyof ConfigFormValues>(key: K, value: ConfigFormValues[K]) =>
-    setValues((prev) => ({ ...prev, [key]: value }));
-
-  // Validate the live form into an API payload, or return null. When `silent` (autosave),
-  // invalid input simply yields null without a notification.
-  const buildConfig = (silent = false): null | UpdateMailConfigData => {
-    const fail = (message: string) => {
-      if (!silent) {
-        addNotification({
-          message,
-          title: t({ en: 'Invalid configuration', fr: 'Configuration invalide' }),
-          type: 'error'
-        });
-      }
-      return null;
-    };
-
-    const isHttp = values.transport === 'http';
+  /** Validate the live form into an API payload, collecting a message per offending field. */
+  const buildConfig = (): { errors: FieldErrors } | { payload: UpdateMailConfigData } => {
+    const isSecretChanged = values.password !== '' && values.password !== MASKED_SECRET;
     const host = values.host.trim();
-    const username = values.username.trim();
-    const domain = values.domain.trim();
-    const awsRegion = values.awsRegion.trim();
-    const awsAccessKeyId = values.awsAccessKeyId.trim();
-    const senderAddress = values.senderAddress.trim();
     const port = Number(values.port);
-
-    if (isHttp) {
-      // Mailgun sends through a per-domain endpoint, so a sending domain is required for it.
-      if (values.provider === 'mailgun' && !domain) {
-        return fail(
-          t({
-            en: 'Enter your Mailgun sending domain (e.g. mg.example.org)',
-            fr: "Entrez votre domaine d'envoi Mailgun (p. ex. mg.example.org)"
-          })
-        );
-      }
-      // SES signs each request with the access key ID and region, so both are required.
-      if (values.provider === 'ses' && !awsRegion) {
-        return fail(
-          t({
-            en: 'Enter your AWS region (e.g. us-east-1)',
-            fr: 'Entrez votre région AWS (p. ex. us-east-1)'
-          })
-        );
-      }
-      if (values.provider === 'ses' && !awsAccessKeyId) {
-        return fail(
-          t({
-            en: 'Enter your AWS access key ID',
-            fr: "Entrez votre identifiant de clé d'accès AWS"
-          })
-        );
-      }
-    } else {
-      if (!host || !/^[a-zA-Z0-9.-]+$/.test(host) || (!host.includes('.') && host !== 'localhost')) {
-        return fail(
-          t({
-            en: 'Enter a valid host (e.g. smtp.example.org)',
-            fr: 'Entrez un hôte valide (p. ex. smtp.example.org)'
-          })
-        );
-      }
-      if (!values.port.trim() || !Number.isInteger(port) || port < 1 || port > 65535) {
-        return fail(
-          t({
-            en: 'Port must be a whole number between 1 and 65535',
-            fr: 'Le port doit être un nombre entier entre 1 et 65535'
-          })
-        );
-      }
-      if (!username) {
-        return fail(
-          t({
-            en: 'Username is required',
-            fr: "Le nom d'utilisateur est requis"
-          })
-        );
-      }
-    }
-    // A secret is required the first time (when none is stored yet); afterwards the masked
-    // value may be left as-is to keep the stored one.
-    const secretValue = isHttp ? values.apiKey : values.password;
-    const secretStored = isHttp ? config?.hasApiKey : config?.hasPassword;
-    if (!secretStored && (!secretValue || secretValue === MASKED_SECRET)) {
-      return fail(
-        isHttp
-          ? t({ en: 'An API key is required', fr: 'Une clé API est requise' })
-          : t({ en: 'A password is required', fr: 'Un mot de passe est requis' })
-      );
-    }
-    if (!senderAddress || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(senderAddress)) {
-      return fail(
-        t({
-          en: 'Enter a valid sender address (e.g. noreply@example.org)',
-          fr: "Entrez une adresse d'expéditeur valide (p. ex. noreply@example.org)"
-        })
-      );
-    }
-
-    const candidate = {
-      awsAccessKeyId,
-      awsRegion,
-      domain,
+    const username = values.username.trim();
+    const parsed = $UpdateMailConfigData.safeParse({
       enabled: values.enabled,
       encryption: values.encryption,
       host,
-      port: Number.isInteger(port) && port > 0 ? port : 587,
-      provider: values.provider,
-      region: values.region,
-      senderAddress,
+      port,
+      senderAddress: values.senderAddress.trim(),
       senderName: values.senderName.trim() || undefined,
-      transport: values.transport,
       username,
-      // Only send a secret when it has actually been changed from the stored (masked) one.
-      ...(values.password && values.password !== MASKED_SECRET ? { password: values.password } : {}),
-      ...(values.apiKey && values.apiKey !== MASKED_SECRET ? { apiKey: values.apiKey } : {})
-    };
-    const parsed = $UpdateMailConfigData.safeParse(candidate);
+      // Only send the password when it has actually been changed from the stored (masked) one.
+      ...(isSecretChanged ? { password: values.password } : {})
+    });
+    const nextErrors: FieldErrors = {};
+    // The server only lets a blank password inherit the stored one for the same server, so the
+    // password has to be re-entered when there is none yet or when the server identity changes.
+    const isServerChanged =
+      config !== null && (config.host !== host || config.username !== username || config.port !== port);
+    if ((!config?.hasPassword || isServerChanged) && !isSecretChanged) {
+      nextErrors.password = isServerChanged
+        ? t({
+            en: 'Re-enter the password for this mail server',
+            fr: 'Saisissez à nouveau le mot de passe pour ce serveur'
+          })
+        : errorMessages.password;
+    }
     if (!parsed.success) {
-      return fail(
-        parsed.error.issues[0]?.message ?? t({ en: 'Please check the fields', fr: 'Veuillez vérifier les champs' })
-      );
+      for (const issue of parsed.error.issues) {
+        const field = issue.path[0] as keyof ConfigFormValues;
+        nextErrors[field] = errorMessages[field] ?? issue.message;
+      }
+      return { errors: nextErrors };
     }
-    return parsed.data;
+    if (Object.keys(nextErrors).length > 0) {
+      return { errors: nextErrors };
+    }
+    return { payload: parsed.data };
   };
 
-  const handleToggleEnabled = (checked: boolean) => {
-    set('enabled', checked);
-    // Persist a disable immediately so the rest of the app reflects it. Enabling for the
-    // first time only reveals the form — saving a valid configuration is what turns it on.
-    if (!checked && config) {
-      updateMutation.mutate({ config: toEnabledPayload(config, false) });
-    }
+  const set = <K extends keyof ConfigFormValues>(key: K, value: ConfigFormValues[K]) => {
+    setValues((prev) => ({ ...prev, [key]: value }));
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
 
-  // Autosave the SMTP configuration whenever the form settles on a valid state.
-  useAutosave(JSON.stringify(values), () => {
-    const cfg = buildConfig(true);
-    if (cfg) {
-      updateMutation.mutate({ config: cfg });
-    }
-  });
-
-  const cleanLocalized = (obj: LocalizedString): LocalizedString => {
-    const filtered = Object.fromEntries(Object.entries(obj).filter(([, v]) => v));
-    return $LocalizedString.parse(filtered);
-  };
-
-  // Autosave the new-user template only when both languages are complete and include the
-  // required variables, so we never store a template that can't deliver credentials.
-  useAutosave(JSON.stringify(template), () => {
-    if (newUserTemplateIssue(template.subject, template.body) === null) {
-      updateMutation.mutate({
-        newUserEmailTemplate: {
-          body: cleanLocalized(template.body),
-          subject: cleanLocalized(template.subject)
-        }
-      });
-    }
-  });
-
-  // Drive the floating status: "saving" while a save runs, then "saved" for a moment.
-  const [saveState, setSaveState] = React.useState<'idle' | 'saved' | 'saving'>('idle');
-  const wasPendingRef = React.useRef(false);
-  React.useEffect(() => {
-    if (updateMutation.isPending) {
-      wasPendingRef.current = true;
-      setSaveState('saving');
-      return undefined;
-    }
-    if (!wasPendingRef.current) {
-      return undefined;
-    }
-    wasPendingRef.current = false;
-    setSaveState('saved');
-    const timer = setTimeout(() => setSaveState('idle'), 2500);
-    return () => clearTimeout(timer);
-  }, [updateMutation.isPending]);
-
-  const runTest = (withRecipient: boolean) => {
-    const cfg = buildConfig();
-    if (!cfg) {
-      return;
-    }
-    if (withRecipient && !isValidEmail(recipient)) {
+  const save = async (data: Parameters<typeof updateMutation.mutateAsync>[0]) => {
+    try {
+      const next = await updateMutation.mutateAsync(data);
+      // Re-seed from what the server actually stored, so any normalisation is visible and the
+      // masked password reflects the saved state rather than whatever was typed.
+      setValues(initialValues(next.config));
+      addNotification({ type: 'success' });
+      return true;
+    } catch {
       addNotification({
         message: t({
-          en: 'Enter a valid recipient email address',
-          fr: 'Entrez une adresse courriel de destinataire valide'
+          en: 'Your changes were not saved. Check your connection and try again.',
+          fr: "Vos modifications n'ont pas été enregistrées. Vérifiez votre connexion et réessayez."
         }),
-        title: t({ en: 'Invalid email', fr: 'Courriel invalide' }),
+        title: t({ en: 'Save failed', fr: "Échec de l'enregistrement" }),
         type: 'error'
       });
+      return false;
+    }
+  };
+
+  const handleSaveConfig = async () => {
+    const result = buildConfig();
+    if ('errors' in result) {
+      setErrors(result.errors);
+      return;
+    }
+    setErrors({});
+    await save({ config: result.payload });
+  };
+
+  const handleToggleEnabled = async (checked: boolean) => {
+    set('enabled', checked);
+    // Persist a disable immediately so the rest of the app reflects it. Enabling for the first
+    // time only reveals the form — saving a valid configuration is what turns it on.
+    if (!checked && config) {
+      await save({ config: { ...config, enabled: false, senderName: config.senderName ?? undefined } });
+    }
+  };
+
+  return (
+    <React.Fragment>
+      <SectionCard data-testid="mail-enabled-card">
+        <Heading className="mb-1" variant="h4">
+          {t({ en: 'Email', fr: 'Courriel' })}
+        </Heading>
+        <p className="text-muted-foreground mb-4 text-sm">
+          {t({
+            en: 'Turn outgoing email on to configure your mail server and templates. When off, the application behaves as if email is not available.',
+            fr: "Activez l'envoi de courriels pour configurer votre serveur de messagerie et vos modèles. Lorsque c'est désactivé, l'application se comporte comme si le courriel n'était pas disponible."
+          })}
+        </p>
+        <label className="flex items-center gap-2" htmlFor="mail-enabled">
+          <Checkbox
+            checked={values.enabled}
+            data-testid="mail-enabled-toggle"
+            id="mail-enabled"
+            onCheckedChange={(checked) => void handleToggleEnabled(checked === true)}
+          />
+          <span className="text-sm font-medium">
+            {t({ en: 'Enable email sending', fr: "Activer l'envoi de courriels" })}
+          </span>
+        </label>
+      </SectionCard>
+
+      {values.enabled && (
+        <React.Fragment>
+          <SectionCard data-testid="mail-server-card">
+            <Heading className="mb-1" variant="h4">
+              {t({ en: 'Mail Server Configuration', fr: 'Configuration du serveur de courriel' })}
+            </Heading>
+            <p className="text-muted-foreground mb-4 text-sm">
+              {t({
+                en: 'Outgoing email is sent over an SMTP connection.',
+                fr: "L'envoi de courriels se fait via une connexion SMTP."
+              })}
+            </p>
+            {/* new-password on the secret keeps the browser from autofilling the admin's own login */}
+            <div className="flex flex-col gap-4">
+              <FormField error={errors.host} htmlFor="mail-host" label={t({ en: 'Host', fr: 'Hôte' })}>
+                <Input
+                  autoComplete="off"
+                  data-testid="mail-host"
+                  id="mail-host"
+                  name="odc-smtp-host"
+                  placeholder="smtp.example.org"
+                  value={values.host}
+                  onChange={(event) => set('host', event.target.value)}
+                />
+              </FormField>
+
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-1.5">
+                  <label className="text-sm font-medium" htmlFor="mail-encryption">
+                    {t({ en: 'Encryption', fr: 'Chiffrement' })}
+                  </label>
+                  <Tooltip>
+                    <Tooltip.Trigger
+                      aria-label={t({ en: 'About encryption options', fr: 'À propos des options de chiffrement' })}
+                      className="text-muted-foreground h-5 w-5 rounded-full p-0"
+                      size="icon"
+                      type="button"
+                      variant="ghost"
+                    >
+                      <CircleHelpIcon className="h-4 w-4" />
+                    </Tooltip.Trigger>
+                    <Tooltip.Content className="flex max-w-xs flex-col gap-2 text-xs leading-relaxed">
+                      <span>
+                        {t({
+                          en: 'STARTTLS (default port 587) is the modern default and recommended for most setups — it upgrades a plain connection to an encrypted one and has the best compatibility.',
+                          fr: 'STARTTLS (port par défaut 587) est la valeur par défaut moderne et recommandée — elle convertit une connexion en clair en connexion chiffrée et offre la meilleure compatibilité.'
+                        })}
+                      </span>
+                      <span>
+                        {t({
+                          en: 'SSL/TLS (default port 465) is encrypted from the start, used by some providers and legacy systems. If unsure, choose STARTTLS.',
+                          fr: 'SSL/TLS (port par défaut 465) est chiffré dès le départ, utilisé par certains fournisseurs et systèmes hérités. En cas de doute, choisissez STARTTLS.'
+                        })}
+                      </span>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </div>
+                <Select
+                  value={values.encryption}
+                  onValueChange={(value) => set('encryption', $MailEncryption.parse(value))}
+                >
+                  <Select.Trigger className="w-full" data-testid="mail-encryption" id="mail-encryption">
+                    <Select.Value />
+                  </Select.Trigger>
+                  <Select.Content>
+                    <Select.Item value="starttls">STARTTLS</Select.Item>
+                    <Select.Item value="ssl">SSL/TLS</Select.Item>
+                    <Select.Item value="none">{t({ en: 'None', fr: 'Aucun' })}</Select.Item>
+                  </Select.Content>
+                </Select>
+              </div>
+
+              <FormField
+                description={t(
+                  {
+                    en: 'Suggested port for {}: {}',
+                    fr: 'Port suggéré pour {} : {}'
+                  },
+                  { args: [values.encryption.toUpperCase(), PORT_DEFAULTS[values.encryption]] }
+                )}
+                error={errors.port}
+                htmlFor="mail-port"
+                label={t({ en: 'Port', fr: 'Port' })}
+              >
+                <Input
+                  autoComplete="off"
+                  data-testid="mail-port"
+                  id="mail-port"
+                  name="odc-smtp-port"
+                  placeholder={PORT_DEFAULTS[values.encryption]}
+                  type="number"
+                  value={values.port}
+                  onChange={(event) => set('port', event.target.value)}
+                />
+              </FormField>
+
+              <FormField
+                error={errors.username}
+                htmlFor="mail-username"
+                label={t({ en: 'Username', fr: "Nom d'utilisateur" })}
+              >
+                <Input
+                  autoComplete="off"
+                  data-testid="mail-username"
+                  id="mail-username"
+                  name="odc-smtp-username"
+                  value={values.username}
+                  onChange={(event) => set('username', event.target.value)}
+                />
+              </FormField>
+
+              <FormField
+                description={
+                  config?.hasPassword
+                    ? t({
+                        en: 'A password is set (shown masked). Edit the field to replace it.',
+                        fr: 'Un mot de passe est défini (affiché masqué). Modifiez le champ pour le remplacer.'
+                      })
+                    : undefined
+                }
+                error={errors.password}
+                htmlFor="mail-password"
+                label={t({ en: 'Password', fr: 'Mot de passe' })}
+              >
+                <Input
+                  data-1p-ignore
+                  autoComplete="new-password"
+                  data-lpignore="true"
+                  data-testid="mail-password"
+                  id="mail-password"
+                  name="odc-smtp-secret"
+                  type="password"
+                  value={values.password}
+                  onChange={(event) => set('password', event.target.value)}
+                />
+              </FormField>
+
+              <FormField htmlFor="mail-sender-name" label={t({ en: 'Sender name', fr: "Nom de l'expéditeur" })}>
+                <Input
+                  autoComplete="off"
+                  data-testid="mail-sender-name"
+                  id="mail-sender-name"
+                  name="odc-smtp-sender-name"
+                  value={values.senderName}
+                  onChange={(event) => set('senderName', event.target.value)}
+                />
+              </FormField>
+
+              <FormField
+                error={errors.senderAddress}
+                htmlFor="mail-sender-address"
+                label={t({ en: 'Sender address', fr: "Adresse de l'expéditeur" })}
+              >
+                <Input
+                  autoComplete="off"
+                  data-testid="mail-sender-address"
+                  id="mail-sender-address"
+                  name="odc-smtp-sender-address"
+                  placeholder="noreply@example.org"
+                  value={values.senderAddress}
+                  onChange={(event) => set('senderAddress', event.target.value)}
+                />
+              </FormField>
+
+              <div>
+                <Button
+                  data-testid="mail-save-config"
+                  disabled={updateMutation.isPending}
+                  type="button"
+                  variant="primary"
+                  onClick={() => void handleSaveConfig()}
+                >
+                  {updateMutation.isPending && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+                  {t('core.save')}
+                </Button>
+              </div>
+            </div>
+          </SectionCard>
+
+          <TestMailSection buildConfig={buildConfig} onInvalid={setErrors} />
+
+          <NewUserTemplateSection
+            isSaving={updateMutation.isPending}
+            template={newUserEmailTemplate}
+            onSave={(next) => save({ newUserEmailTemplate: next })}
+          />
+        </React.Fragment>
+      )}
+    </React.Fragment>
+  );
+};
+
+const TestMailSection = ({
+  buildConfig,
+  onInvalid
+}: {
+  buildConfig: () => { errors: FieldErrors } | { payload: UpdateMailConfigData };
+  onInvalid: (errors: FieldErrors) => void;
+}) => {
+  const { t } = useTranslation();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
+  const testMutation = useTestMailMutation();
+  const [recipient, setRecipient] = React.useState('');
+  const [testingMode, setTestingMode] = React.useState<'connection' | 'email' | null>(null);
+
+  const isValidRecipient = $TestMailData.shape.recipient.safeParse(recipient).success && recipient.length > 0;
+
+  const runTest = (withRecipient: boolean) => {
+    const result = buildConfig();
+    if ('errors' in result) {
+      onInvalid(result.errors);
       return;
     }
     setTestingMode(withRecipient ? 'email' : 'connection');
-    addNotification({
-      message: withRecipient
-        ? t({
-            en: 'Sending a test email… this can take a few seconds.',
-            fr: "Envoi d'un courriel de test… cela peut prendre quelques secondes."
-          })
-        : t({
-            en: 'Testing the connection… this can take a few seconds.',
-            fr: 'Test de la connexion… cela peut prendre quelques secondes.'
-          }),
-      title: t({ en: 'Please wait', fr: 'Veuillez patienter' }),
-      type: 'info'
-    });
     testMutation.mutate(
-      { config: cfg, recipient: withRecipient && recipient ? recipient : undefined },
+      { config: result.payload, recipient: withRecipient ? recipient : undefined },
       {
         onError: () => {
           addNotification({
@@ -412,616 +457,177 @@ const MailManager = ({
           });
         },
         onSettled: () => setTestingMode(null),
-        onSuccess: (result) => {
-          if (result.success) {
+        onSuccess: (outcome) => {
+          if (!outcome.success) {
             addNotification({
-              message: withRecipient
-                ? t({
-                    en: `Test email sent to ${recipient}`,
-                    fr: `Courriel de test envoyé à ${recipient}`
-                  })
-                : t({
-                    en: 'Connected to the mail server successfully',
-                    fr: 'Connexion au serveur de courriel réussie'
-                  }),
-              title: t({ en: 'Mail test succeeded', fr: 'Test de courriel réussi' }),
-              type: 'success'
-            });
-          } else {
-            addNotification({
-              message: result.error ?? t({ en: 'Unknown error', fr: 'Erreur inconnue' }),
+              message: outcome.error ?? t({ en: 'Unknown error', fr: 'Erreur inconnue' }),
               title: t({ en: 'Mail test failed', fr: 'Échec du test de courriel' }),
               type: 'error'
             });
+            return;
           }
+          addNotification({
+            message: withRecipient
+              ? t({ en: 'Test email sent to {}', fr: 'Courriel de test envoyé à {}' }, { args: [recipient] })
+              : t({
+                  en: 'Connected to the mail server successfully',
+                  fr: 'Connexion au serveur de courriel réussie'
+                }),
+            title: t({ en: 'Mail test succeeded', fr: 'Test de courriel réussi' }),
+            type: 'success'
+          });
         }
       }
     );
   };
 
-  const isHttp = values.transport === 'http';
-  // Providers name their secret differently, so label the HTTP secret field accordingly.
-  const secretLabel =
-    values.provider === 'ses'
-      ? t({ en: 'AWS secret access key', fr: "Clé d'accès secrète AWS" })
-      : values.provider === 'postmark'
-        ? t({ en: 'Server API token', fr: 'Jeton API du serveur' })
-        : t({ en: 'API key', fr: 'Clé API' });
-
-  // We never persist `enabled: true` without a working configuration, so when email is enabled
-  // but the form isn't valid yet nothing is saved. Surface that so the toggle doesn't look broken.
-  const isConfigComplete = buildConfig(true) !== null;
-
-  const templateLangs = MAIL_LANGUAGE.filter((k) => template.body[k] != null);
-
-  const newUserTemplateError = (() => {
-    const issue = newUserTemplateIssue(template.subject, template.body, templateLangs);
-    if (issue === 'incomplete') {
-      return t({
-        en: 'Fill in the subject and body for each added language.',
-        fr: "Remplissez l'objet et le corps pour chaque langue ajoutée."
-      });
-    }
-    if (issue === 'missing-vars') {
-      return t({
-        en: 'The body must include {{username}} and {{password}}.',
-        fr: 'Le corps doit inclure {{username}} et {{password}}.'
-      });
-    }
-    return undefined;
-  })();
-
   return (
-    <React.Fragment>
-      <SaveStatus state={saveState} />
-      <SectionCard>
-        <Heading className="mb-1" variant="h4">
-          {t({ en: 'Email', fr: 'Courriel' })}
-        </Heading>
-        <p className="text-muted-foreground mb-4 text-sm">
-          {t({
-            en: 'Turn outgoing email on to configure your mail server and templates. When off, the application behaves as if email is not available. Changes on this page are saved automatically.',
-            fr: "Activez l'envoi de courriels pour configurer votre serveur de messagerie et vos modèles. Lorsque c'est désactivé, l'application se comporte comme si le courriel n'était pas disponible. Les modifications de cette page sont enregistrées automatiquement."
-          })}
-        </p>
-        <label className="flex items-center gap-2" htmlFor="mail-enabled">
-          <Checkbox
-            checked={values.enabled}
-            id="mail-enabled"
-            onCheckedChange={(checked) => handleToggleEnabled(checked === true)}
+    <SectionCard data-testid="mail-test-card">
+      <Heading className="mb-5" variant="h4">
+        {t({ en: 'Verify Your Configuration', fr: 'Vérifiez votre configuration' })}
+      </Heading>
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col items-start gap-2">
+          <div>
+            <p className="text-sm font-medium">{t({ en: 'Connection', fr: 'Connexion' })}</p>
+            <p className="text-muted-foreground text-xs">
+              {t({
+                en: 'Check that the server accepts the connection and your credentials.',
+                fr: 'Vérifiez que le serveur accepte la connexion et vos identifiants.'
+              })}
+            </p>
+          </div>
+          <Button
+            data-testid="mail-test-connection"
+            disabled={testMutation.isPending}
+            type="button"
+            variant="primary"
+            onClick={() => runTest(false)}
+          >
+            {testingMode === 'connection' && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+            {testingMode === 'connection'
+              ? t({ en: 'Testing…', fr: 'Test en cours…' })
+              : t({ en: 'Test connection', fr: 'Tester la connexion' })}
+          </Button>
+        </div>
+
+        <div className="border-border border-t" />
+
+        <div className="flex flex-col items-start gap-2">
+          <div>
+            <p className="text-sm font-medium">{t({ en: 'Send test email', fr: 'Envoyer un courriel de test' })}</p>
+            <p className="text-muted-foreground text-xs">
+              {t({
+                en: 'Deliver a real message to confirm everything works end to end.',
+                fr: 'Envoyez un message réel pour confirmer que tout fonctionne de bout en bout.'
+              })}
+            </p>
+          </div>
+          <Input
+            autoComplete="off"
+            className="sm:max-w-sm"
+            data-testid="mail-test-recipient"
+            id="mail-test-recipient"
+            name="odc-smtp-test-recipient"
+            placeholder={t({ en: 'recipient@example.org', fr: 'destinataire@exemple.org' })}
+            type="email"
+            value={recipient}
+            onChange={(event) => setRecipient(event.target.value)}
           />
-          <span className="text-sm font-medium">
-            {t({
-              en: 'Enable email sending',
-              fr: "Activer l'envoi de courriels"
-            })}
-          </span>
-        </label>
-        {values.enabled && !isConfigComplete && (
-          <p className="mt-2 text-xs font-medium text-amber-600 dark:text-amber-500">
-            {t({
-              en: 'Complete the configuration below to turn email on — your settings save automatically as you go, so there is no separate save button.',
-              fr: "Complétez la configuration ci-dessous pour activer les courriels — vos paramètres sont enregistrés automatiquement au fur et à mesure, il n'y a donc pas de bouton d'enregistrement distinct."
-            })}
-          </p>
-        )}
-      </SectionCard>
-
-      {values.enabled && (
-        <React.Fragment>
-          <SectionCard>
-            <Heading className="mb-1" variant="h4">
-              {t({
-                en: 'Mail Server Configuration',
-                fr: 'Configuration du serveur de courriel'
-              })}
-            </Heading>
-            <p className="text-muted-foreground mb-4 text-sm">
-              {t({
-                en: "Send email over a classic SMTP connection, or through a provider's HTTP sending API (useful when outbound SMTP ports are blocked).",
-                fr: "Envoyez des courriels via une connexion SMTP classique ou via l'API d'envoi HTTP d'un fournisseur (utile lorsque les ports SMTP sortants sont bloqués)."
-              })}
-            </p>
-            {/* Changes autosave; new-password secrets keep the browser from autofilling the admin's login */}
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <Label>{t({ en: 'Delivery method', fr: "Méthode d'envoi" })}</Label>
-                <SegmentedControl<MailTransport>
-                  ariaLabel={t({ en: 'Delivery method', fr: "Méthode d'envoi" })}
-                  className="w-full max-w-md"
-                  options={[
-                    { label: 'SMTP', value: 'smtp' },
-                    { label: t({ en: 'HTTP API', fr: 'API HTTP' }), value: 'http' }
-                  ]}
-                  value={values.transport}
-                  onChange={(value) => set('transport', value)}
-                />
-              </div>
-
-              {isHttp ? (
-                <React.Fragment>
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="mail-provider">{t({ en: 'Provider', fr: 'Fournisseur' })}</Label>
-                    <Select
-                      value={values.provider}
-                      onValueChange={(value) => set('provider', $MailProvider.parse(value))}
-                    >
-                      <Select.Trigger className="w-full" id="mail-provider">
-                        <Select.Value />
-                      </Select.Trigger>
-                      <Select.Content>
-                        <Select.Item value="mailgun">Mailgun</Select.Item>
-                        <Select.Item value="sendgrid">SendGrid</Select.Item>
-                        <Select.Item value="ses">Amazon SES</Select.Item>
-                        <Select.Item value="postmark">Postmark</Select.Item>
-                      </Select.Content>
-                    </Select>
-                  </div>
-
-                  {values.provider === 'mailgun' && (
-                    <React.Fragment>
-                      <Field
-                        description={t({
-                          en: 'The domain you send from in Mailgun (e.g. mg.example.org) — not the API base URL.',
-                          fr: "Le domaine d'envoi configuré dans Mailgun (p. ex. mg.example.org) — pas l'URL de base de l'API."
-                        })}
-                        htmlFor="mail-domain"
-                        label={t({ en: 'Sending domain', fr: "Domaine d'envoi" })}
-                      >
-                        <Input
-                          autoComplete="off"
-                          id="mail-domain"
-                          name="odc-mail-domain"
-                          placeholder="mg.example.org"
-                          value={values.domain}
-                          onChange={(event) => set('domain', event.target.value)}
-                        />
-                      </Field>
-
-                      <div className="flex flex-col gap-1.5">
-                        <Label htmlFor="mail-region">{t({ en: 'Region', fr: 'Région' })}</Label>
-                        <Select
-                          value={values.region}
-                          onValueChange={(value) => set('region', $MailRegion.parse(value))}
-                        >
-                          <Select.Trigger className="w-full" id="mail-region">
-                            <Select.Value />
-                          </Select.Trigger>
-                          <Select.Content>
-                            <Select.Item value="us">{t({ en: 'US', fr: 'États-Unis' })}</Select.Item>
-                            <Select.Item value="eu">{t({ en: 'EU', fr: 'Europe' })}</Select.Item>
-                          </Select.Content>
-                        </Select>
-                      </div>
-                    </React.Fragment>
-                  )}
-
-                  {values.provider === 'ses' && (
-                    <React.Fragment>
-                      <Field
-                        description={t({
-                          en: 'The AWS region your SES account sends from (e.g. us-east-1).',
-                          fr: 'La région AWS depuis laquelle votre compte SES envoie (p. ex. us-east-1).'
-                        })}
-                        htmlFor="mail-aws-region"
-                        label={t({ en: 'AWS region', fr: 'Région AWS' })}
-                      >
-                        <Input
-                          autoComplete="off"
-                          id="mail-aws-region"
-                          name="odc-mail-aws-region"
-                          placeholder="us-east-1"
-                          value={values.awsRegion}
-                          onChange={(event) => set('awsRegion', event.target.value)}
-                        />
-                      </Field>
-
-                      <Field
-                        htmlFor="mail-aws-access-key-id"
-                        label={t({
-                          en: 'AWS access key ID',
-                          fr: "Identifiant de clé d'accès AWS"
-                        })}
-                      >
-                        <Input
-                          autoComplete="off"
-                          id="mail-aws-access-key-id"
-                          name="odc-mail-aws-access-key-id"
-                          placeholder="AKIA…"
-                          value={values.awsAccessKeyId}
-                          onChange={(event) => set('awsAccessKeyId', event.target.value)}
-                        />
-                      </Field>
-                    </React.Fragment>
-                  )}
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  <Field htmlFor="mail-host" label={t({ en: 'Host', fr: 'Hôte' })}>
-                    <Input
-                      autoComplete="off"
-                      id="mail-host"
-                      name="odc-smtp-host"
-                      placeholder="smtp.example.org"
-                      value={values.host}
-                      onChange={(event) => set('host', event.target.value)}
-                    />
-                  </Field>
-
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center gap-1.5">
-                      <Label htmlFor="mail-encryption">{t({ en: 'Encryption', fr: 'Chiffrement' })}</Label>
-                      <Tooltip>
-                        <Tooltip.Trigger
-                          aria-label={t({
-                            en: 'About encryption options',
-                            fr: 'À propos des options de chiffrement'
-                          })}
-                          className="text-muted-foreground h-5 w-5 rounded-full p-0"
-                          size="icon"
-                          type="button"
-                          variant="ghost"
-                        >
-                          <CircleHelpIcon className="h-4 w-4" />
-                        </Tooltip.Trigger>
-                        <Tooltip.Content className="flex max-w-xs flex-col gap-2 text-xs leading-relaxed">
-                          <span>
-                            {t({
-                              en: 'STARTTLS (default port 587) is the modern default and recommended for most setups — it upgrades a plain connection to an encrypted one and has the best compatibility.',
-                              fr: 'STARTTLS (port par défaut 587) est la valeur par défaut moderne et recommandée — elle convertit une connexion en clair en connexion chiffrée et offre la meilleure compatibilité.'
-                            })}
-                          </span>
-                          <span>
-                            {t({
-                              en: 'SSL/TLS (default port 465) is encrypted from the start, used by some providers and legacy systems. If unsure, choose STARTTLS.',
-                              fr: 'SSL/TLS (port par défaut 465) est chiffré dès le départ, utilisé par certains fournisseurs et systèmes hérités. En cas de doute, choisissez STARTTLS.'
-                            })}
-                          </span>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </div>
-                    <Select
-                      value={values.encryption}
-                      onValueChange={(value) => set('encryption', $MailEncryption.parse(value))}
-                    >
-                      <Select.Trigger className="w-full" id="mail-encryption">
-                        <Select.Value />
-                      </Select.Trigger>
-                      <Select.Content>
-                        <Select.Item value="starttls">STARTTLS</Select.Item>
-                        <Select.Item value="ssl">SSL/TLS</Select.Item>
-                        <Select.Item value="none">{t({ en: 'None', fr: 'Aucun' })}</Select.Item>
-                      </Select.Content>
-                    </Select>
-                  </div>
-
-                  <Field
-                    description={t({
-                      en: `Suggested port for ${values.encryption.toUpperCase()}: ${PORT_DEFAULTS[values.encryption]}`,
-                      fr: `Port suggéré pour ${values.encryption.toUpperCase()} : ${PORT_DEFAULTS[values.encryption]}`
-                    })}
-                    htmlFor="mail-port"
-                    label={t({ en: 'Port', fr: 'Port' })}
-                  >
-                    <Input
-                      autoComplete="off"
-                      id="mail-port"
-                      name="odc-smtp-port"
-                      placeholder={PORT_DEFAULTS[values.encryption]}
-                      type="number"
-                      value={values.port}
-                      onChange={(event) => set('port', event.target.value)}
-                    />
-                  </Field>
-
-                  <Field htmlFor="mail-username" label={t({ en: 'Username', fr: "Nom d'utilisateur" })}>
-                    <Input
-                      autoComplete="off"
-                      id="mail-username"
-                      name="odc-smtp-username"
-                      value={values.username}
-                      onChange={(event) => set('username', event.target.value)}
-                    />
-                  </Field>
-                </React.Fragment>
-              )}
-
-              {isHttp ? (
-                <Field
-                  description={
-                    config?.hasApiKey
-                      ? t({
-                          en: 'A secret is set (shown masked). Edit the field to replace it.',
-                          fr: 'Un secret est défini (affiché masqué). Modifiez le champ pour le remplacer.'
-                        })
-                      : undefined
-                  }
-                  htmlFor="mail-secret"
-                  label={secretLabel}
-                >
-                  <Input
-                    data-1p-ignore
-                    autoComplete="new-password"
-                    data-lpignore="true"
-                    id="mail-secret"
-                    name="odc-smtp-secret"
-                    type="password"
-                    value={values.apiKey}
-                    onChange={(event) => set('apiKey', event.target.value)}
-                  />
-                </Field>
-              ) : (
-                <Field
-                  description={
-                    config?.hasPassword
-                      ? t({
-                          en: 'A password is set (shown masked). Edit the field to replace it.',
-                          fr: 'Un mot de passe est défini (affiché masqué). Modifiez le champ pour le remplacer.'
-                        })
-                      : undefined
-                  }
-                  htmlFor="mail-secret"
-                  label={t({ en: 'Password', fr: 'Mot de passe' })}
-                >
-                  <Input
-                    data-1p-ignore
-                    autoComplete="new-password"
-                    data-lpignore="true"
-                    id="mail-secret"
-                    name="odc-smtp-secret"
-                    type="password"
-                    value={values.password}
-                    onChange={(event) => set('password', event.target.value)}
-                  />
-                </Field>
-              )}
-
-              <Field htmlFor="mail-sender-name" label={t({ en: 'Sender name', fr: "Nom de l'expéditeur" })}>
-                <Input
-                  autoComplete="off"
-                  id="mail-sender-name"
-                  name="odc-smtp-sender-name"
-                  value={values.senderName}
-                  onChange={(event) => set('senderName', event.target.value)}
-                />
-              </Field>
-
-              <Field htmlFor="mail-sender-address" label={t({ en: 'Sender address', fr: "Adresse de l'expéditeur" })}>
-                <Input
-                  autoComplete="off"
-                  id="mail-sender-address"
-                  name="odc-smtp-sender-address"
-                  placeholder="noreply@example.org"
-                  value={values.senderAddress}
-                  onChange={(event) => set('senderAddress', event.target.value)}
-                />
-              </Field>
-            </div>
-          </SectionCard>
-
-          <SectionCard>
-            <Heading className="mb-5" variant="h4">
-              {t({
-                en: 'Verify Your Configuration',
-                fr: 'Vérifiez votre configuration'
-              })}
-            </Heading>
-
-            <div className="flex flex-col gap-5">
-              <div className="flex flex-col items-start gap-2">
-                <div>
-                  <p className="text-sm font-medium">{t({ en: 'Connection', fr: 'Connexion' })}</p>
-                  <p className="text-muted-foreground text-xs">
-                    {t({
-                      en: 'Check that the server accepts the connection and your credentials.',
-                      fr: 'Vérifiez que le serveur accepte la connexion et vos identifiants.'
-                    })}
-                  </p>
-                </div>
-                <Button
-                  disabled={testMutation.isPending}
-                  type="button"
-                  variant="primary"
-                  onClick={() => runTest(false)}
-                >
-                  {testingMode === 'connection' && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-                  {testingMode === 'connection'
-                    ? t({ en: 'Testing…', fr: 'Test en cours…' })
-                    : t({ en: 'Test connection', fr: 'Tester la connexion' })}
-                </Button>
-              </div>
-
-              <div className="border-t border-slate-200/60 dark:border-slate-700/60" />
-
-              <div className="flex flex-col items-start gap-2">
-                <div>
-                  <p className="text-sm font-medium">
-                    {t({ en: 'Send test email', fr: 'Envoyer un courriel de test' })}
-                  </p>
-                  <p className="text-muted-foreground text-xs">
-                    {t({
-                      en: 'Deliver a real message to confirm everything works end to end.',
-                      fr: 'Envoyez un message réel pour confirmer que tout fonctionne de bout en bout.'
-                    })}
-                  </p>
-                </div>
-                <Input
-                  autoComplete="off"
-                  className="sm:max-w-sm"
-                  id="mail-test-recipient"
-                  name="odc-smtp-test-recipient"
-                  placeholder={t({
-                    en: 'recipient@example.org',
-                    fr: 'destinataire@exemple.org'
-                  })}
-                  type="email"
-                  value={recipient}
-                  onChange={(event) => setRecipient(event.target.value)}
-                />
-                <Button
-                  disabled={testMutation.isPending || !isValidEmail(recipient)}
-                  type="button"
-                  variant="primary"
-                  onClick={() => runTest(true)}
-                >
-                  {testingMode === 'email' && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-                  {testingMode === 'email'
-                    ? t({ en: 'Sending…', fr: 'Envoi en cours…' })
-                    : t({ en: 'Send test email', fr: 'Envoyer un courriel de test' })}
-                </Button>
-              </div>
-            </div>
-          </SectionCard>
-
-          <SectionCard>
-            <div className="mb-1 flex items-start justify-between gap-4">
-              <Heading variant="h4">
-                {t({
-                  en: 'New User Email Template',
-                  fr: 'Modèle de courriel pour les nouveaux utilisateurs'
-                })}
-              </Heading>
-              <Button
-                className="shrink-0"
-                size="sm"
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  setTemplate({
-                    body: DEFAULT_NEW_USER_EMAIL_TEMPLATE.body,
-                    subject: DEFAULT_NEW_USER_EMAIL_TEMPLATE.subject
-                  })
-                }
-              >
-                {t({ en: 'Reset', fr: 'Réinitialiser' })}
-              </Button>
-            </div>
-            <p className="text-muted-foreground mb-4 text-sm">
-              {t({
-                en: 'Sent automatically when a new user with an email address is created. The sender chooses the language.',
-                fr: "Envoyé automatiquement lors de la création d'un nouvel utilisateur disposant d'une adresse courriel. L'expéditeur choisit la langue."
-              })}
-            </p>
-            {activeLanguages.length > 1 && (
-              <p className="mb-6 text-sm font-medium text-amber-600 dark:text-amber-400">
-                {t({
-                  en: 'Remember to update the template in all active languages, not only the one currently selected.',
-                  fr: 'N’oubliez pas de mettre à jour le modèle dans toutes les langues actives, pas seulement celle actuellement sélectionnée.'
-                })}
-              </p>
-            )}
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <Label>{t({ en: 'Language', fr: 'Langue' })}</Label>
-                <Select value={templateLang} onValueChange={(v) => setTemplateLang($MailLanguage.parse(v))}>
-                  <Select.Trigger className="w-[180px] border-sky-700 bg-sky-700 text-white hover:bg-sky-800 dark:border-sky-700 dark:bg-sky-700 dark:text-white dark:hover:bg-sky-800">
-                    <Select.Value />
-                  </Select.Trigger>
-                  <Select.Content>
-                    <Select.Group>
-                      {activeLanguages.map((code) => (
-                        <Select.Item key={code} value={code}>
-                          {ALL_LANGUAGES[code] ?? code}
-                        </Select.Item>
-                      ))}
-                    </Select.Group>
-                  </Select.Content>
-                </Select>
-              </div>
-              <Field htmlFor="template-subject" label={t({ en: 'Subject', fr: 'Objet' })}>
-                <Input
-                  id="template-subject"
-                  value={template.subject[templateLang] ?? ''}
-                  onChange={(event) =>
-                    setTemplate((prev) => ({
-                      ...prev,
-                      subject: { ...prev.subject, [templateLang]: event.target.value }
-                    }))
-                  }
-                />
-              </Field>
-              <div className="flex flex-col gap-1.5">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <Label htmlFor="template-body">{t({ en: 'Body', fr: 'Corps' })}</Label>
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-muted-foreground text-xs">{t({ en: 'Insert:', fr: 'Insérer :' })}</span>
-                    {NEW_USER_VARS.map((variable) => (
-                      <Button
-                        className="h-6 px-2 font-mono text-xs"
-                        key={variable}
-                        size="sm"
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          const tag = `{{${variable}}}`;
-                          setTemplate((prev) => {
-                            const current = prev.body[templateLang] ?? '';
-                            const cursor = bodyCursorRef.current;
-                            if (cursor === null) {
-                              return {
-                                ...prev,
-                                body: { ...prev.body, [templateLang]: current.length > 0 ? `${current} ${tag}` : tag }
-                              };
-                            }
-                            const next = current.slice(0, cursor.start) + tag + current.slice(cursor.end);
-                            bodyCursorRef.current = {
-                              end: cursor.start + tag.length,
-                              start: cursor.start + tag.length
-                            };
-                            return { ...prev, body: { ...prev.body, [templateLang]: next } };
-                          });
-                        }}
-                      >
-                        {`{{${variable}}}`}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                <TextArea
-                  className="min-h-[15rem]"
-                  id="template-body"
-                  value={template.body[templateLang] ?? ''}
-                  onBlur={(event: React.FocusEvent<HTMLTextAreaElement>) => {
-                    bodyCursorRef.current = {
-                      end: event.currentTarget.selectionEnd,
-                      start: event.currentTarget.selectionStart
-                    };
-                  }}
-                  onChange={(event) =>
-                    setTemplate((prev) => ({ ...prev, body: { ...prev.body, [templateLang]: event.target.value } }))
-                  }
-                />
-                {newUserTemplateError && <p className="text-destructive text-xs font-medium">{newUserTemplateError}</p>}
-              </div>
-            </div>
-          </SectionCard>
-        </React.Fragment>
-      )}
-    </React.Fragment>
+          <Button
+            data-testid="mail-send-test"
+            disabled={testMutation.isPending || !isValidRecipient}
+            type="button"
+            variant="primary"
+            onClick={() => runTest(true)}
+          >
+            {testingMode === 'email' && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+            {testingMode === 'email'
+              ? t({ en: 'Sending…', fr: 'Envoi en cours…' })
+              : t({ en: 'Send test email', fr: 'Envoyer un courriel de test' })}
+          </Button>
+        </div>
+      </div>
+    </SectionCard>
   );
 };
 
-const RouteComponent = () => {
+const NewUserTemplateSection = ({
+  isSaving,
+  onSave,
+  template: saved
+}: {
+  isSaving: boolean;
+  onSave: (template: MailTemplate) => Promise<boolean>;
+  template: MailTemplate;
+}) => {
   const { t } = useTranslation();
-  const { data: settings } = useMailSettingsQuery();
-  const setupStateQuery = useSetupStateQuery();
-  const activeLanguages = setupStateQuery.data.activeLanguages ?? ['en', 'fr'];
+  const [template, setTemplate] = React.useState<MailTemplate>(() => ({
+    body: { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE.body, ...saved.body },
+    subject: { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE.subject, ...saved.subject }
+  }));
+
+  const issue = checkTemplateIssue(template.subject, template.body, REQUIRED_NEW_USER_VARS);
+  const error =
+    issue === 'incomplete'
+      ? t({
+          en: 'Fill in the subject and body for each language.',
+          fr: "Remplissez l'objet et le corps pour chaque langue."
+        })
+      : issue === 'missing-vars'
+        ? t({ en: 'The body must include {{username}}.', fr: 'Le corps doit inclure {{username}}.' })
+        : undefined;
 
   return (
-    <div className="w-full">
-      <PageHeader>
-        <Heading className="text-center" variant="h2">
-          {t({ en: 'Mail Server', fr: 'Serveur de courriel' })}
+    <SectionCard data-testid="mail-template-card">
+      <div className="mb-1 flex items-start justify-between gap-4">
+        <Heading variant="h4">
+          {t({ en: 'New User Email Template', fr: 'Modèle de courriel pour les nouveaux utilisateurs' })}
         </Heading>
-      </PageHeader>
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-        <MailManager
-          activeLanguages={activeLanguages}
-          config={settings.config}
-          newUserEmailTemplate={settings.newUserEmailTemplate}
-        />
+        <Button
+          className="shrink-0"
+          data-testid="mail-template-reset"
+          size="sm"
+          type="button"
+          variant="outline"
+          onClick={() =>
+            setTemplate({
+              body: { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE.body },
+              subject: { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE.subject }
+            })
+          }
+        >
+          {t({ en: 'Reset', fr: 'Réinitialiser' })}
+        </Button>
       </div>
-    </div>
+      <p className="text-muted-foreground mb-4 text-sm">
+        {t({
+          en: 'Sent automatically when a new user with an email address is created. The sender chooses the language.',
+          fr: "Envoyé automatiquement lors de la création d'un nouvel utilisateur disposant d'une adresse courriel. L'expéditeur choisit la langue."
+        })}
+      </p>
+      <EmailTemplateEditor
+        error={error}
+        idPrefix="new-user-template"
+        template={template}
+        variables={NEW_USER_VARS}
+        onChange={setTemplate}
+      />
+      <div className="mt-4">
+        <Button
+          data-testid="mail-template-save"
+          disabled={isSaving || Boolean(error)}
+          type="button"
+          variant="primary"
+          onClick={() =>
+            void onSave({ body: cleanLocalized(template.body), subject: cleanLocalized(template.subject) })
+          }
+        >
+          {isSaving && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+          {t('core.save')}
+        </Button>
+      </div>
+    </SectionCard>
   );
 };
 
