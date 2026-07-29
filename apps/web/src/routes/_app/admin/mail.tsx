@@ -945,36 +945,38 @@ const MailManager = ({
                   <Label htmlFor="template-body">{t({ en: 'Body', fr: 'Corps' })}</Label>
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className="text-muted-foreground text-xs">{t({ en: 'Insert:', fr: 'Insérer :' })}</span>
-                    {NEW_USER_VARS.map((variable) => (
-                      <Button
-                        className="h-6 px-2 font-mono text-xs"
-                        key={variable}
-                        size="sm"
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          const tag = `{{${variable}}}`;
-                          setTemplate((prev) => {
-                            const current = prev.body[templateLang] ?? '';
-                            const cursor = bodyCursorRef.current;
-                            if (cursor === null) {
-                              return {
-                                ...prev,
-                                body: { ...prev.body, [templateLang]: current.length > 0 ? `${current} ${tag}` : tag }
+                    {NEW_USER_VARS.map((variable) => {
+                      const tag = `{{${variable}}}`;
+                      return (
+                        <Button
+                          className="h-6 px-2 font-mono text-xs"
+                          key={variable}
+                          size="sm"
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            setTemplate((prev) => {
+                              const current = prev.body[templateLang] ?? '';
+                              const cursor = bodyCursorRef.current;
+                              if (cursor === null) {
+                                return {
+                                  ...prev,
+                                  body: { ...prev.body, [templateLang]: current.length > 0 ? `${current} ${tag}` : tag }
+                                };
+                              }
+                              const next = current.slice(0, cursor.start) + tag + current.slice(cursor.end);
+                              bodyCursorRef.current = {
+                                end: cursor.start + tag.length,
+                                start: cursor.start + tag.length
                               };
-                            }
-                            const next = current.slice(0, cursor.start) + tag + current.slice(cursor.end);
-                            bodyCursorRef.current = {
-                              end: cursor.start + tag.length,
-                              start: cursor.start + tag.length
-                            };
-                            return { ...prev, body: { ...prev.body, [templateLang]: next } };
-                          });
-                        }}
-                      >
-                        {`{{${variable}}}`}
-                      </Button>
-                    ))}
+                              return { ...prev, body: { ...prev.body, [templateLang]: next } };
+                            });
+                          }}
+                        >
+                          {tag}
+                        </Button>
+                      );
+                    })}
                   </div>
                 </div>
                 <TextArea

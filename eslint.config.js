@@ -142,21 +142,27 @@ export default config(
           // Punctuation and separators carry no meaning to translate, and proper nouns must survive
           // translation unchanged.
           allowedStrings: [
+            '%',
             '&copy;',
             '(',
             ')',
             '-',
             '/',
             ':',
+            'Amazon SES',
             'Douglas Neuroinformatics',
             'Douglas Neuroinformatics Platform',
             'EN',
             'FR',
+            'Mailgun',
             'Open Data Capture',
+            'Postmark',
+            'SSL/TLS',
+            'STARTTLS',
+            'SendGrid',
             '×',
             '·',
-            '—',
-            '%'
+            '—'
           ],
           ignoreProps: true,
           noStrings: true
