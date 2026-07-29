@@ -1,5 +1,6 @@
 /* eslint-disable no-empty-pattern */
 
+import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 
@@ -79,13 +80,12 @@ type TestFixtures = {
   /** First-run gating written to localStorage; override per file with `test.use({ appState })`. */
   appState: AppState;
   /**
-   * Injects a role's token without navigating, so the test can drive navigation itself. Use this
-   * (rather than `getPageModel`) when the expected outcome is a redirect, since `getPageModel`
-   * asserts it landed on the requested route.
+   * Injects a token without navigating, so the test can drive navigation itself. Use this (rather
+   * than `getPageModel`) when the expected outcome is a redirect, since `getPageModel` asserts it
+   * landed on the requested route. Pass a role to reuse the worker's cached user, or credentials
+   * to act as a user the test seeded itself — necessary when the test mutates that user's login.
    */
-  authenticateAs: (role: Role) => Promise<void>;
-  /** As `authenticateAs`, for a specific seeded user's token rather than a cached role's. */
-  authenticateWithToken: (accessToken: string) => Promise<void>;
+  authenticateAs: (roleOrCredentials: $LoginCredentials | Role) => Promise<void>;
   /** Navigates to a route as `actingRole` and returns its page object. */
   getPageModel: GetPageModel;
   /**
@@ -122,14 +122,12 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     { scope: 'worker' }
   ],
   appState: [{ isDisclaimerAccepted: true, isWalkthroughComplete: true }, { option: true }],
-  authenticateAs: async ({ authenticateWithToken, roleAccount }, use) => {
-    await use(async (role) => {
-      const { accessToken } = await roleAccount(role);
-      await authenticateWithToken(accessToken);
-    });
-  },
-  authenticateWithToken: async ({ page }, use) => {
-    await use(async (accessToken) => {
+  authenticateAs: async ({ apiRequestContext, page, roleAccount }, use) => {
+    await use(async (roleOrCredentials) => {
+      const accessToken =
+        typeof roleOrCredentials === 'string'
+          ? (await roleAccount(roleOrCredentials)).accessToken
+          : await ApiClient.login(apiRequestContext, roleOrCredentials);
       await page.addInitScript((injected) => {
         window.__PLAYWRIGHT_ACCESS_TOKEN__ = injected;
       }, accessToken);

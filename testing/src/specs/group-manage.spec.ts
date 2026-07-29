@@ -1,5 +1,4 @@
 import { GroupManagePage } from '../pages/_app/group/manage.page';
-import { ApiClient } from '../support/api-client';
 import { expect, test } from '../support/fixtures';
 
 test.describe('group manage', () => {
@@ -17,8 +16,7 @@ test.describe('group manage', () => {
 
   test('should update accessible instruments and group settings, and keep them after navigating away and back', async ({
     api,
-    apiRequestContext,
-    authenticateWithToken,
+    authenticateAs,
     page,
     uniqueId
   }) => {
@@ -28,7 +26,7 @@ test.describe('group manage', () => {
     const group = await api.createGroup({ name: `Group${uniqueId}` });
     const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });
 
-    await authenticateWithToken(await ApiClient.login(apiRequestContext, credentials));
+    await authenticateAs(credentials);
     await page.goto('/group/manage');
     await expect(page).toHaveURL('/group/manage');
 

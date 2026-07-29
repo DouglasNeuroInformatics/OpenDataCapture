@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { $BrandingConfig } from './setup.js';
+import { $BrandingConfig, $UpdateSetupStateData } from './setup.js';
 
 describe('$BrandingConfig', () => {
   describe('customLogoSrc', () => {
@@ -41,5 +41,21 @@ describe('$BrandingConfig', () => {
         expect($BrandingConfig.safeParse({ customLogoUrl }).success).toBe(false);
       }
     );
+  });
+});
+
+describe('$UpdateSetupStateData', () => {
+  describe('defaultAssignmentDurationDays', () => {
+    it.each([1, 30, 365, 3650])('should accept the positive whole day count %d', (value) => {
+      expect($UpdateSetupStateData.safeParse({ defaultAssignmentDurationDays: value }).success).toBe(true);
+    });
+
+    it.each([0, -1, 1.5, 3651])('should reject the out-of-range or non-integer value %d', (value) => {
+      expect($UpdateSetupStateData.safeParse({ defaultAssignmentDurationDays: value }).success).toBe(false);
+    });
+
+    it('should allow the field to be omitted', () => {
+      expect($UpdateSetupStateData.safeParse({}).success).toBe(true);
+    });
   });
 });

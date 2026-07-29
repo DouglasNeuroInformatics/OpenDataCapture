@@ -9,5 +9,8 @@ export class UpdateSetupStateDto implements UpdateSetupStateData {
   branding?: BrandingConfig | null;
 
   @ApiProperty({ required: false })
+  defaultAssignmentDurationDays?: null | number;
+
+  @ApiProperty({ required: false })
   isExperimentalFeaturesEnabled?: boolean;
 }

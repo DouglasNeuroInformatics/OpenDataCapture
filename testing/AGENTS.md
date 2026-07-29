@@ -28,7 +28,9 @@ is `.agents/docs/playbooks/add-e2e-test.md`; the tier-by-tier picture is
   `expect(page).toHaveURL(url)`). When the expected outcome _is_ a redirect, use `authenticateAs`
   plus a raw `page.goto` instead — see the standard-user cases in `src/specs/authorization.spec.ts`.
 - **`authenticateAs` works through `page.addInitScript`**, so it must run before the navigation it
-  is meant to affect.
+  is meant to affect. Passing a role reuses the worker's cached user; pass `$LoginCredentials` from
+  `api.createUser()` instead when the test mutates that user's own login, so it cannot invalidate
+  the cached token every other spec in the worker shares.
 - **`.env` at the repo root must exist.** `src/support/env.ts` reads `API_DEV_SERVER_PORT`,
   `GATEWAY_DEV_SERVER_PORT` and `WEB_DEV_SERVER_PORT` and throws while `playwright.config.ts` is
   loading if any is missing. `./scripts/generate-env.sh` produces it.
@@ -57,17 +59,16 @@ A page object is only reachable from a spec once it is registered in the `pageMo
 
 ## Fixtures
 
-| Fixture                        | Scope       | Notes                                                                      |
-| ------------------------------ | ----------- | -------------------------------------------------------------------------- |
-| `getPageModel`                 | test        | Authenticates as `actingRole`, navigates, returns the page object          |
-| `authenticateAs(role)`         | test        | Injects a token without navigating                                         |
-| `authenticateWithToken(token)` | test        | Same, for a specific seeded user rather than a cached role                 |
-| `actingRole`                   | test option | Default `GROUP_MANAGER`; override with `test.use({ actingRole: 'ADMIN' })` |
-| `appState`                     | test option | localStorage first-run gating, seeded for every test; defaults to accepted |
-| `uniqueId`                     | test        | Short random suffix for seeded data                                        |
-| `api`                          | worker      | `ApiClient` as admin — `createGroup()` / `createUser()` for preconditions  |
-| `roleAccount(role)`            | worker      | Seeds a group + user per role once, then caches its token and username     |
-| `apiRequestContext`            | worker      | Raw `APIRequestContext` on the web origin, for driving the API directly    |
+| Fixture               | Scope       | Notes                                                                      |
+| --------------------- | ----------- | -------------------------------------------------------------------------- |
+| `getPageModel`        | test        | Authenticates as `actingRole`, navigates, returns the page object          |
+| `authenticateAs(who)` | test        | Injects a token without navigating; takes a role or `$LoginCredentials`    |
+| `actingRole`          | test option | Default `GROUP_MANAGER`; override with `test.use({ actingRole: 'ADMIN' })` |
+| `appState`            | test option | localStorage first-run gating, seeded for every test; defaults to accepted |
+| `uniqueId`            | test        | Short random suffix for seeded data                                        |
+| `api`                 | worker      | `ApiClient` as admin — `createGroup()` / `createUser()` for preconditions  |
+| `roleAccount(role)`   | worker      | Seeds a group + user per role once, then caches its token and username     |
+| `apiRequestContext`   | worker      | Raw `APIRequestContext` on the web origin, for driving the API directly    |
 
 Set up preconditions over the API with the `api` fixture rather than by clicking through the UI;
 only drive the UI for the behaviour actually under test.
