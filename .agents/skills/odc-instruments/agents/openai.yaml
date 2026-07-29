@@ -1,0 +1,3 @@
+interface:
+  display_name: 'ODC Instruments'
+  short_description: 'Change an instrument or the runtime it imports without breaking published ones'

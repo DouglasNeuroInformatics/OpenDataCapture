@@ -1,0 +1,3 @@
+interface:
+  display_name: 'ODC API'
+  short_description: 'Change apps/api — route guards, row scoping, env vars'
