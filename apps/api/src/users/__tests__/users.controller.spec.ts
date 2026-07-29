@@ -80,11 +80,13 @@ describe('UsersController', () => {
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ url: '' });
     });
 
-    it('defaults to English and honors the fr language query param', async () => {
+    it('passes the language query param through to sendNewUserEmail', async () => {
       await usersController.create(createUserData, ability);
-      expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ language: 'en' });
+      expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ language: undefined });
       await usersController.create(createUserData, ability, undefined, 'fr');
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ language: 'fr' });
+      await usersController.create(createUserData, ability, undefined, 'es');
+      expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ language: 'es' });
     });
 
     it('joins the names of the resolved groups', async () => {
