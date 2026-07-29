@@ -6,7 +6,8 @@ description: What actually breaks in Open Data Capture — a failing build, lint
 Failures in this repo sort into two piles that want opposite reactions.
 
 **Loud and correct** — a command failed, and the failure is the repo working as designed. Name it as designed
-behaviour, leave it standing, and carry on with the change it interrupted.
+behaviour, leave it standing, and carry on with the change it interrupted. The whole answer here is the
+explanation plus, at most, a change to your own uncommitted work — the configs, CI and docs stay as they are.
 
 **Quiet and wrong** — nothing failed, and that is the symptom: the test never ran, the query returned every group's
 rows, the story is not in Storybook, the instrument was never loaded. These are the expensive ones, because the signal

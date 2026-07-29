@@ -20,6 +20,10 @@ your literal is still not a member of `RouteTo`, and the `pageModels` map in
 `testing/src/support/fixtures.ts` still rejects it as a key. Ask the user for the regeneration, then
 run `gen:routes` again — repeating it costs nothing.
 
+The root `AGENTS.md` prohibition covers the first row only. `gen:routes` is not the route-tree
+generator — it reads `route-tree.ts` and never writes it — and running it is your job, not the
+user's.
+
 **TS2345 on your own route literal is then the expected state of a correct new route**, not a defect
 to chase; `.agents/docs/playbooks/add-web-route.md` shows the exact message. Confirm first that the
 `createFileRoute` literal is character-for-character the file path, leading `/_app` included — a
