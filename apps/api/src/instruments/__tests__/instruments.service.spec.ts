@@ -9,6 +9,9 @@ import type { SeriesInstrument } from '@opendatacapture/runtime-core';
 import type { WithID } from '@opendatacapture/schemas/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { AbilityFactory } from '@/auth/ability.factory';
+import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
+
 import { InstrumentsService } from '../instruments.service';
 
 import type { InstrumentVirtualizationContext } from '../instruments.service';
@@ -642,6 +645,81 @@ describe('InstrumentsService', () => {
         { id: 'owned', seriesGroupId: 'group-1' },
         { id: 'shared', seriesGroupId: null }
       ]);
+    });
+  });
+
+  describe('find', () => {
+    beforeEach(() => {
+      instrumentModel.findMany.mockResolvedValue([]);
+      instrumentRecordModel.findMany.mockResolvedValue([]);
+      vi.spyOn(instrumentsService as any, 'instantiate').mockResolvedValue([]);
+    });
+
+    it('should not query records when no subject is given, so the unfiltered listing costs one query', async () => {
+      await instrumentsService.find();
+      expect(instrumentRecordModel.findMany).not.toHaveBeenCalled();
+    });
+
+    // A `records: { some: ... }` relation filter compiles to a $lookup that materialises every
+    // record belonging to an instrument, which mongodb aborts past 100 MiB. The subject's own
+    // records are queried instead, so the work is bounded by the subject rather than the instrument.
+    it('should resolve the subject filter against records rather than joining from instruments', async () => {
+      instrumentRecordModel.findMany.mockResolvedValueOnce([{ instrumentId: 'id-1' }, { instrumentId: 'id-2' }] as any);
+
+      await instrumentsService.find({ subjectId: 'subject-1' });
+
+      expect(instrumentRecordModel.findMany).toHaveBeenCalledWith({
+        distinct: ['instrumentId'],
+        select: { instrumentId: true },
+        where: { AND: [{}, { subjectId: 'subject-1' }] }
+      });
+      expect(instrumentModel.findMany.mock.lastCall?.[0]).toMatchObject({
+        where: { AND: expect.arrayContaining([{ id: { in: ['id-1', 'id-2'] } }]) }
+      });
+      expect(JSON.stringify(instrumentModel.findMany.mock.lastCall?.[0])).not.toContain('records');
+    });
+
+    it('should constrain the record lookup to what the caller may read, so the filter cannot be resolved from other groups records', async () => {
+      // Conditions are what make this meaningful: an unconditional read rule yields `{}`, which is
+      // indistinguishable from the ability never having been applied.
+      const ability = createAppAbility([
+        { action: 'read', conditions: { groupId: { in: ['group-1'] } }, subject: 'InstrumentRecord' },
+        { action: 'read', subject: 'Instrument' }
+      ]);
+
+      await instrumentsService.find({ subjectId: 'subject-1' }, { ability });
+
+      const [call] = instrumentRecordModel.findMany.mock.lastCall as [{ where: { AND: unknown[] } }];
+      expect(call.where.AND[0]).toStrictEqual(accessibleQuery(ability, 'read', 'InstrumentRecord'));
+    });
+
+    // Built through the factory rather than by hand: a hand-built ability tends to include a
+    // `read InstrumentRecord` rule, and it is the absence of one that breaks. A STANDARD user holds
+    // `create` but not `read`, and this route is gated on `read Instrument`, which they do hold.
+    it('should resolve for a caller who may read no records, rather than failing the request', async () => {
+      const abilityFactory = new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService);
+      const ability = abilityFactory.createForPayload({
+        basePermissionLevel: 'STANDARD',
+        groups: [{ id: 'group-1' }],
+        id: 'user-1'
+      } as any);
+
+      await expect(instrumentsService.find({ subjectId: 'subject-1' }, { ability })).resolves.toStrictEqual([]);
+
+      expect(instrumentRecordModel.findMany).not.toHaveBeenCalled();
+      expect(instrumentModel.findMany.mock.lastCall?.[0]).toMatchObject({
+        where: { AND: expect.arrayContaining([{ id: { in: [] } }]) }
+      });
+    });
+
+    it('should return nothing when the subject has no records', async () => {
+      instrumentRecordModel.findMany.mockResolvedValueOnce([]);
+
+      await instrumentsService.find({ subjectId: 'subject-with-no-records' });
+
+      expect(instrumentModel.findMany.mock.lastCall?.[0]).toMatchObject({
+        where: { AND: expect.arrayContaining([{ id: { in: [] } }]) }
+      });
     });
   });
 });

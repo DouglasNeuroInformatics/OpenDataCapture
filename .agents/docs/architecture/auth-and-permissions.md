@@ -70,6 +70,16 @@ available in this codebase. Check the `where` clause of every query you add or t
 that the controller actually forwards `@CurrentUser('ability')` — `EntityOperationOptions.ability`
 is optional, so a controller that simply never passes it compiles and runs.
 
+**A defined ability holding no rule for the queried subject does not produce a deny-all filter —
+CASL's `accessibleBy` throws `ForbiddenError`.** That error is not an `HttpException`, so the
+global exception filter renders it as a 500. It is reachable whenever the route guard names a
+different subject than the service queries: a STANDARD user passes a `read Instrument` guard but
+holds no rule on `InstrumentRecord`, so a record query made on their behalf throws. The throw is
+deliberate — `accessibleQuery` is kept as-is rather than returning a deny-all filter — so where
+such a caller is legitimate, guard the query with `ability.can(action, subject)` and return the
+empty result instead; `findInstrumentIdsBySubject` in `src/instruments/instruments.service.ts` is
+the reference example.
+
 One call site uses `{ ...accessibleQuery(...), id: subjectId }` instead of `AND: [...]`
 (`src/subjects/subjects.service.ts`). Spreading merges keys and will silently lose a condition if
 the generated query and the literal share one. Prefer `AND`.

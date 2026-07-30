@@ -83,6 +83,14 @@ restriction**, which reads clinical data across every group. Nothing catches thi
 eslint, not a passing test suite. It is the single highest-severity mistake available in this
 codebase, so verify the `where` clause of any query you add or edit.
 
+The defined case has the opposite failure mode: **an ability holding no rule at all for the queried
+subject makes `accessibleQuery` throw CASL's `ForbiddenError`**, which is not an `HttpException`
+and so surfaces as a 500. This is reachable whenever a route's guard names one subject but the
+service queries another — a STANDARD user passes `read Instrument` yet holds no `read` rule on
+`InstrumentRecord`. That behaviour is deliberate and stays; where such a caller is legitimate,
+short-circuit before the query with `ability.can(action, subject)` and return the empty result —
+see `findInstrumentIdsBySubject` in `src/instruments/instruments.service.ts`.
+
 Granting a new `action`/`subject` pair means editing `src/auth/ability.factory.ts` and adding tests
 for **both** the allow and the deny case — see `src/auth/__tests__/ability.factory.test.ts`.
 
