@@ -162,6 +162,7 @@ const RouteComponent = () => {
       </div>
       <div
         className="bg-card text-muted-foreground shadow-xs rounded-md border p-6 tracking-tight"
+        data-testid="subject-graph-chart"
         ref={graphContainerRef}
       >
         <LineGraph

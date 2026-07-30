@@ -36,6 +36,7 @@ import type {
 import { pick } from 'lodash-es';
 
 import { accessibleQuery } from '@/auth/ability.utils';
+import type { AppAbility } from '@/auth/auth.types';
 import type { EntityOperationOptions } from '@/core/types';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
@@ -261,18 +262,20 @@ export class InstrumentsService {
     { ability }: EntityOperationOptions = {},
     groupIds?: string[]
   ): Promise<WithID<SomeInstrument<TKind>>[]> {
+    // Resolved against InstrumentRecord rather than expressed as a `records: { some: ... }` relation
+    // filter. On mongodb prisma compiles that filter into a $lookup which materialises *every* record
+    // belonging to an instrument into one array before applying the predicate, and mongodb caps a
+    // single document's $lookup output at 100 MiB. A busy instrument therefore fails the whole query
+    // outright once it passes that threshold. Querying the child collection is bounded by the
+    // subject's own records instead of the instrument's.
+    const subjectInstrumentIds = query.subjectId
+      ? await this.findInstrumentIdsBySubject(query.subjectId, ability)
+      : null;
+
     const instruments = await this.instrumentModel.findMany({
       where: {
         AND: [
-          {
-            records: query.subjectId
-              ? {
-                  some: {
-                    subjectId: query.subjectId
-                  }
-                }
-              : undefined
-          },
+          subjectInstrumentIds ? { id: { in: subjectInstrumentIds } } : {},
           query.seriesGroupId
             ? {
                 OR: [
@@ -518,6 +521,29 @@ export class InstrumentsService {
       InstrumentLanguage,
       string[]
     >;
+  }
+
+  /**
+   * The ids of the instruments the subject has at least one record for.
+   *
+   * Scoped to the records the caller may read, so the filter cannot be resolved from records outside
+   * their groups — the ids feed straight into the instrument query, so an unscoped lookup would
+   * disclose which instruments a subject has been administered elsewhere.
+   */
+  private async findInstrumentIdsBySubject(subjectId: string, ability?: AppAbility): Promise<string[]> {
+    // `accessibleQuery` throws rather than returning a restrictive filter when the ability holds no
+    // rule for the subject at all, and a STANDARD user holds `create` but not `read` on
+    // InstrumentRecord. This route is gated on `read Instrument`, which they do hold, so they reach
+    // here; no readable records means no instruments qualify.
+    if (ability && !ability.can('read', 'InstrumentRecord')) {
+      return [];
+    }
+    const records = await this.instrumentRecordModel.findMany({
+      distinct: ['instrumentId'],
+      select: { instrumentId: true },
+      where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRecord'), { subjectId }] }
+    });
+    return records.map((record) => record.instrumentId);
   }
 
   /**

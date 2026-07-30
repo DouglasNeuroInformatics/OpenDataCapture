@@ -14,6 +14,7 @@ export const $Env = $BaseEnv
     GATEWAY_INTERNAL_NETWORK_URL: $UrlLike.optional(),
     GATEWAY_REFRESH_INTERVAL: $NumberLike.pipe(z.number().positive().int()),
     GATEWAY_SITE_ADDRESS: $UrlLike.optional(),
+    GITHUB_TOKEN: z.string().min(1).optional(),
     STORAGE_ACCESS_KEY: z.string().min(1).optional(),
     STORAGE_BUCKET: z.string().min(1).optional(),
     STORAGE_ENABLED: $BooleanLike.optional(),

@@ -5,11 +5,13 @@ import { AppPage } from '../route.page';
 export class AccessibleInstrumentsPage extends AppPage {
   readonly instrumentShowcase: Locator;
   readonly pageHeader: Locator;
+  readonly searchBox: Locator;
 
   constructor(page: Page) {
     super(page);
     this.pageHeader = page.getByTestId('page-header');
     this.instrumentShowcase = page.getByTestId('instrument-showcase');
+    this.searchBox = page.getByTestId('instrument-search-bar').locator('input');
   }
 
   /** Cards carry a content-hash testid, so match on the visible title instead. */
@@ -21,5 +23,9 @@ export class AccessibleInstrumentsPage extends AppPage {
     const card = this.instrumentCard(title);
     await card.waitFor({ state: 'visible' });
     await card.click();
+  }
+
+  async search(query: string): Promise<void> {
+    await this.searchBox.fill(query);
   }
 }

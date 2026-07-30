@@ -8,8 +8,8 @@ import { AppPage } from '../../route.page';
  */
 export class RenderInstrumentPage extends AppPage {
   readonly beginButton: Locator;
-  /** An inline JSX `block` rendered amongst the groups of the General Consent Form. */
   readonly consentPreamble: Locator;
+  readonly errorMessages: Locator;
   readonly submitButton: Locator;
   readonly summaryHeading: Locator;
 
@@ -19,6 +19,7 @@ export class RenderInstrumentPage extends AppPage {
     this.consentPreamble = page.getByTestId('consent-preamble');
     this.submitButton = page.getByRole('button', { name: 'Submit' });
     this.summaryHeading = page.getByRole('heading', { name: /Summary of Results/i });
+    this.errorMessages = page.getByTestId('error-message-text');
   }
 
   /** Accepts the General Consent Form by selecting the affirmative radio option. */
@@ -29,6 +30,31 @@ export class RenderInstrumentPage extends AppPage {
   async begin(): Promise<void> {
     await this.beginButton.waitFor({ state: 'visible' });
     await this.beginButton.click();
+  }
+
+  /**
+   * Answers a representative subset of the Enhanced Demographics Questionnaire: every field is
+   * optional, so this exercises select, radio and number inputs without needing every field filled.
+   */
+  async completeEnhancedDemographicsQuestionnaire(): Promise<void> {
+    await this.$ref.locator('[name="ethnicOrigin"]').selectOption('canadian');
+    await this.$ref.locator('[name="gender"]').selectOption('female');
+    await this.$ref.locator('[name="religion"]').selectOption('none');
+    await this.$ref.locator('[name="firstLanguage"]').selectOption('english');
+    // `.check()` is a real, coordinate-based click, which the app-wide toast notification (fixed to
+    // the bottom of the viewport, per `NotificationHub`) can sit on top of for this instrument's
+    // still-visible "session started" success toast. A direct native click skips hit-testing.
+    await this.checkRadio(this.$ref.locator('[name="speaksEnglish"][value="true"]'));
+    await this.checkRadio(this.$ref.locator('[name="speaksFrench"][value="false"]'));
+    await this.$ref.locator('[name="householdSize"]').fill('3');
+    await this.$ref.locator('[name="maritalStatus"]').selectOption('married');
+    await this.$ref.locator('[name="numberChildren"]').fill('1');
+    await this.$ref.locator('[name="postalCode"]').fill('A1A 1A1');
+    await this.$ref.locator('[name="annualIncome"]').fill('50000');
+    await this.$ref.locator('[name="employmentStatus"]').selectOption('fullTime');
+    await this.$ref.locator('[name="yearsOfEducation"]').fill('16');
+    await this.$ref.locator('[name="ageAtImmigration"]').fill('10');
+    await this.checkRadio(this.$ref.locator('[name="isCanadianCitizen"][value="true"]'));
   }
 
   /**
@@ -51,5 +77,12 @@ export class RenderInstrumentPage extends AppPage {
 
   async submit(): Promise<void> {
     await this.submitButton.click();
+  }
+
+  private async checkRadio(radio: Locator): Promise<void> {
+    await radio.waitFor({ state: 'visible' });
+    await radio.evaluate((element: HTMLInputElement) => {
+      element.click();
+    });
   }
 }
