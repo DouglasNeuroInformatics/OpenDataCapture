@@ -32,11 +32,17 @@ export class GroupEmailTemplatesPage extends AppPage {
   }
 
   /**
-   * The delete control on the first template row. Matched on the testid prefix because the id
-   * suffix is a UUID minted at creation time, so the spec never knows it.
+   * The delete control on the row for `name`. Scoped to that row because earlier specs leave
+   * their own templates in the list, so the first delete button is not this test's, and because
+   * the button's own testid carries a UUID the spec never sees.
    */
-  get rowDeleteButton(): Locator {
-    return this.$ref.getByTestId(/^template-delete-/).first();
+  deleteButtonFor(name: string): Locator {
+    return this.rowFor(name).getByTestId(/^template-delete-/);
+  }
+
+  /** The list row whose label is `name`. */
+  rowFor(name: string): Locator {
+    return this.root.getByTestId('template-row').filter({ hasText: name });
   }
 
   /** Create a template authored in one language, accepting the missing-translations warning. */

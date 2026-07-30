@@ -39,7 +39,7 @@ test.describe('group email templates', () => {
     await templatesPage.fillCreateForm({ body: BODY, name, subject: `Subject${uniqueId}` });
 
     await expect(templatesPage.createAnyway).toBeVisible();
-    await expect(templatesPage.root.getByText(name)).toBeHidden();
+    await expect(templatesPage.rowFor(name)).toBeHidden();
   });
 
   test('should create a template and make it the default', async ({ getPageModel, uniqueId }) => {
@@ -48,8 +48,8 @@ test.describe('group email templates', () => {
 
     await templatesPage.createTemplate({ body: BODY, name, subject: `Subject${uniqueId}` });
 
-    await expect(templatesPage.root.getByText(name)).toBeVisible();
-    // The first custom template becomes the default, displacing the built-in one.
+    await expect(templatesPage.rowFor(name)).toBeVisible();
+    // A custom template takes over as the default, displacing the built-in one.
     await expect(templatesPage.builtInDefaultBadge).toBeHidden();
   });
 
@@ -57,15 +57,15 @@ test.describe('group email templates', () => {
     const templatesPage = await getPageModel('/group/email-templates');
     const name = `Template${uniqueId}`;
     await templatesPage.createTemplate({ body: BODY, name, subject: `Subject${uniqueId}` });
-    await expect(templatesPage.root.getByText(name)).toBeVisible();
+    await expect(templatesPage.rowFor(name)).toBeVisible();
 
-    await templatesPage.rowDeleteButton.click();
+    await templatesPage.deleteButtonFor(name).click();
 
     // Nothing is destroyed until the dialog is confirmed.
     await expect(templatesPage.deleteConfirm).toBeVisible();
-    await expect(templatesPage.root.getByText(name)).toBeVisible();
+    await expect(templatesPage.rowFor(name)).toBeVisible();
 
     await templatesPage.deleteConfirm.click();
-    await expect(templatesPage.root.getByText(name)).toBeHidden();
+    await expect(templatesPage.rowFor(name)).toBeHidden();
   });
 });

@@ -299,7 +299,11 @@ export const GroupEmailTemplates = () => {
     actions: React.ReactNode,
     onSetActive: () => void
   ) => (
-    <div className="border-border flex flex-wrap items-center gap-2 rounded-md border p-2" key={key}>
+    <div
+      className="border-border flex flex-wrap items-center gap-2 rounded-md border p-2"
+      data-testid="template-row"
+      key={key}
+    >
       <span className="flex-1 text-sm font-medium">{label}</span>
       {actions}
       {isActive ? (
