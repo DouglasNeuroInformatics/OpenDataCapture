@@ -11,7 +11,7 @@ import { isAxiosError } from 'axios';
 import { EyeIcon, PencilIcon, Trash2Icon } from 'lucide-react';
 
 import { EmailTemplateEditor, LANGUAGE_LABELS, LANGUAGES } from '@/components/EmailTemplateEditor';
-import { GROUP_QUERY_KEY, useGroupQuery } from '@/hooks/useGroupQuery';
+import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
 
@@ -197,7 +197,7 @@ export const GroupEmailTemplates = () => {
       return false;
     }
     try {
-      await updateGroupMutation.mutateAsync({
+      const updated = await updateGroupMutation.mutateAsync({
         activeAssignmentEmailTemplateId: nextActiveId,
         emailTemplates: next.map((template) => ({
           ...template,
@@ -206,7 +206,10 @@ export const GroupEmailTemplates = () => {
         })),
         expectedUpdatedAt: group.updatedAt
       });
-      await queryClient.invalidateQueries({ queryKey: [GROUP_QUERY_KEY, groupId] });
+      // Seed the cache from the response rather than invalidating. Every write moves `updatedAt`,
+      // so waiting on a refetch would leave the next edit composed against the previous revision —
+      // which the server then rejects as a conflict with this client's own change.
+      queryClient.setQueryData(groupQueryOptions(groupId).queryKey, updated);
       addNotification({ type: 'success' });
       return true;
     } catch (err) {
@@ -225,7 +228,7 @@ export const GroupEmailTemplates = () => {
         type: 'error'
       });
       if (isConflict) {
-        await queryClient.invalidateQueries({ queryKey: [GROUP_QUERY_KEY, groupId] });
+        await queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
       }
       return false;
     }
