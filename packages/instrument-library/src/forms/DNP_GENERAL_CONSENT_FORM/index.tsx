@@ -14,6 +14,27 @@ export default defineInstrument({
   },
   content: [
     {
+      kind: 'block',
+      render: () => (
+        <div className="text-muted-foreground space-y-2 text-sm" data-testid="consent-preamble">
+          <p>
+            WHEREAS the party of the first part, hereinafter and forever referred to as &ldquo;the Participant&rdquo;,
+            enters into the within arrangement of their own volition and without duress; and WHEREAS the recitals set
+            forth above are hereby incorporated by reference as though fully restated at length herein; NOW THEREFORE,
+            in consideration of the mutual covenants contained herein, the receipt and sufficiency of which are hereby
+            acknowledged, the parties do covenant and agree as hereinafter provided.
+          </p>
+          <p>
+            Nothing contained in this preamble shall be construed to create, imply, or give rise to any obligation,
+            right, or remedy not otherwise existing at law or in equity, nor to modify, waive, supersede, or otherwise
+            affect any provision hereof. The headings appearing herein are inserted for convenience of reference only
+            and shall in no way define, limit, or describe the scope or intent of any clause. Any term left undefined
+            shall bear the meaning ordinarily ascribed to it, save where the context manifestly requires otherwise.
+          </p>
+        </div>
+      )
+    },
+    {
       title: {
         en: 'Terms and Conditions',
         fr: 'Conditions générales'
