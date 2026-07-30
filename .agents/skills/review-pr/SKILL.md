@@ -139,16 +139,20 @@ Setup failing inside a worktree splits two ways, and the split matters:
 relay — that is the user doing the reviewer's errand. As each document lands, post its reply body
 immediately: no approval, no waiting for the other reviews.
 
-| Verdict             | Posted                                                     |
-| ------------------- | ---------------------------------------------------------- |
-| `REWORK`            | request changes                                            |
-| `CLOSE`             | request changes — but never `gh pr close`                  |
-| `BLOCKED (PR)`      | request changes — lint fails against current `main`        |
-| `MERGE`             | plain comment if there are action items, otherwise nothing |
-| `BLOCKED (machine)` | nothing — reported to the user directly                    |
+| Verdict             | Posted                                              |
+| ------------------- | --------------------------------------------------- |
+| `REWORK`            | request changes                                     |
+| `CLOSE`             | request changes — but never `gh pr close`           |
+| `BLOCKED (PR)`      | request changes — lint fails against current `main` |
+| `MERGE`             | nothing — a MERGE has nothing left to say           |
+| `BLOCKED (machine)` | nothing — reported to the user directly             |
 
-A MERGE gets a comment rather than a review because the user is about to merge it — a
-changes-requested review would stand in their way over nits.
+**A PR with an outstanding action item is never MERGE.** One action item is one round trip, so the
+verdict is REWORK and the review requests changes. There is no "merge it, and by the way fix these
+five things" — that hands the user a decision the author has not finished earning, and it buries the
+items in a comment on a PR nobody will reopen. The corollary binds the other way too: if the only
+thing standing between a PR and MERGE is a list of remarks that name no real defect and no documented
+standard, the remarks were never action items and should not have been written.
 
 `REQUIRES_HUMAN_REVIEW` is the one verdict that waits, and only until step 6: its questions may
 change its action items, so posting now risks a second review that contradicts the first. It is
@@ -174,10 +178,14 @@ if the answer changed them, revise the verdict if the answer changed that, and `
 the bucket changed.
 
 **Then post every `REQUIRES_HUMAN_REVIEW` PR that has action items** — per its settled verdict in the
-step 5 table, and per the `MERGE` row if it is still REQUIRES_HUMAN_REVIEW, since the user has not
-agreed to block it. Write that reply body yourself, carrying the same model line and `Reviewed at
-commit` line every other posted body carries. An answer the user declined to give does not hold the
-author's items back.
+step 5 table, and as a request for changes if it is still REQUIRES_HUMAN_REVIEW, since outstanding
+action items are what a changes-requested review is for. Write that reply body yourself, carrying the
+same model line and `Reviewed at commit` line every other posted body carries. An answer the user
+declined to give does not hold the author's items back.
+
+An answer that clears every question on a REQUIRES_HUMAN_REVIEW PR does not make it MERGE — its
+action items still do. Settling the questions moves it to REWORK, and the document to `no-action/`,
+unless the answer left it with nothing outstanding at all.
 
 Done when no document has an unanswered `## What needs you` entry that the user could have settled in
 a sentence, and no document has an `## Action items` entry that has not reached GitHub. What remains
@@ -196,7 +204,7 @@ back to their authors, two are blocked on red CI."
 
 - `CLOSE` → close #N — one clause on why; the reply is already posted.
 - `REQUIRES_HUMAN_REVIEW` → review #N — name the part that needs them, and the document path.
-- `MERGE` → merge #N.
+- `MERGE` → merge #N — nothing is outstanding, which is what the verdict means.
 
 Never list what the author has to fix. Those items are on GitHub; repeating them here turns the reply
 into a second inbox for work that is not the user's.

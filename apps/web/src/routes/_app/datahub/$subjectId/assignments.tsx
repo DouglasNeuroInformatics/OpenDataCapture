@@ -121,6 +121,7 @@ const AssignmentsTable: React.FC<{
             <Table.Row
               className="cursor-pointer"
               data-state={selectedId === assignment.id ? 'selected' : undefined}
+              data-testid="assignment-row"
               key={assignment.id}
               onClick={() => onSelection(assignment)}
             >

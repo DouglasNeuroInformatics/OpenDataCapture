@@ -1,5 +1,13 @@
 import { parseNumber } from '@douglasneuroinformatics/libjs';
 
+function required(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Expected ${name} to be set, got ${value}`);
+  }
+  return value;
+}
+
 function requiredPort(name: string): number {
   const value = parseNumber(process.env[name]);
   if (Number.isNaN(value)) {
@@ -7,6 +15,10 @@ function requiredPort(name: string): number {
   }
   return value;
 }
+
+// Read straight from the same `.env` apps/web builds `config.meta.contactEmail` from: a developer's
+// value differs from the `.env.template` one CI generates, so a literal here only passes locally.
+export const contactEmail = required('CONTACT_EMAIL');
 
 export const apiPort = requiredPort('API_DEV_SERVER_PORT');
 export const gatewayPort = requiredPort('GATEWAY_DEV_SERVER_PORT');

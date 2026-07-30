@@ -142,6 +142,7 @@ export default config(
           // Punctuation and separators carry no meaning to translate, and proper nouns must survive
           // translation unchanged.
           allowedStrings: [
+            '%',
             '&copy;',
             '(',
             ')',
@@ -157,8 +158,7 @@ export default config(
             'STARTTLS',
             '×',
             '·',
-            '—',
-            '%'
+            '—'
           ],
           ignoreProps: true,
           noStrings: true

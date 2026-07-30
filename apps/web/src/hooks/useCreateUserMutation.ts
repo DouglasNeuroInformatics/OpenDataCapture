@@ -1,4 +1,3 @@
-import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@opendatacapture/schemas/core';
 import type { EmailDeliveryResult } from '@opendatacapture/schemas/mail';
 import type { CreateUserData, User } from '@opendatacapture/schemas/user';
@@ -12,7 +11,6 @@ export type CreateUserResponse = User & { welcomeEmail?: EmailDeliveryResult };
 
 export function useCreateUserMutation() {
   const queryClient = useQueryClient();
-  const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
     mutationFn: async ({ data, language }: { data: CreateUserData; language?: Language }) => {
       // The welcome-email language is a query param so it stays out of the user record itself.
@@ -23,8 +21,10 @@ export function useCreateUserMutation() {
       return response.data;
     },
     onSuccess() {
-      addNotification({ type: 'success' });
       void queryClient.invalidateQueries({ queryKey: [USERS_QUERY_KEY] });
-    }
+    },
+    // `create.tsx` catches the rejection to map password error codes onto field messages, so it
+    // must not also escape to the router error boundary.
+    throwOnError: false
   });
 }

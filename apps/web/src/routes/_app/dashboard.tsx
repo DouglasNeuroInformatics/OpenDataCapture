@@ -150,9 +150,11 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       <section className="flex grow flex-col gap-8 p-6">
-        <Heading className="whitespace-nowrap" variant="h3">
-          {welcome}
-        </Heading>
+        <div data-testid="dashboard-welcome-heading">
+          <Heading className="whitespace-nowrap" variant="h3">
+            {welcome}
+          </Heading>
+        </div>
         <div className="body-font" data-testid="dashboard-statistics">
           <div className="grid grid-cols-1 gap-6 text-center lg:grid-cols-2 xl:grid-cols-4">
             <div
