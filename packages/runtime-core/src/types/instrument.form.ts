@@ -280,7 +280,11 @@ declare namespace FormInstrument {
   /** An item of arbitrary JSX that may be inlined amongst the groups of a form */
   export type Block<TData extends Data = Data> = {
     kind: 'block';
-    render: (this: void, data: PartialData<TData>) => ReactNode;
+    render: (
+      this: void,
+      data: PartialData<TData>,
+      context: { t: (translations: { [L in Language]?: string }) => string }
+    ) => ReactNode;
   };
 
   type Content<TData extends Data = Data, TLanguage extends InstrumentLanguage = InstrumentLanguage> =

@@ -326,7 +326,11 @@ import type { FormInstrument } from '../instrument.form.js';
 
   expectTypeOf<FormInstrument.Block<TData>['kind']>().toEqualTypeOf<'block'>();
   expectTypeOf<FormInstrument.Block<TData>['render']>().toEqualTypeOf<
-    (this: void, data: FormInstrument.PartialData<TData>) => ReactNode
+    (
+      this: void,
+      data: FormInstrument.PartialData<TData>,
+      context: { t: (translations: { [L in Language]?: string }) => string }
+    ) => ReactNode
   >();
 
   /** A block may be inlined amongst groups in the array form of content */
