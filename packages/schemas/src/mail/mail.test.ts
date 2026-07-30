@@ -4,7 +4,6 @@ import {
   $MailConfig,
   $MailConfigDto,
   $UpdateMailConfigData,
-  checkTemplateIssue,
   DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE,
   DEFAULT_NEW_USER_EMAIL_TEMPLATE,
   isMailEnabled
@@ -88,48 +87,16 @@ describe('isMailEnabled', () => {
   });
 });
 
-describe('checkTemplateIssue', () => {
-  const subject = { en: 'Subject', fr: 'Objet' };
-  const body = { en: 'Link {{url}}', fr: 'Lien {{url}}' };
-
-  it('should report no issue when every authored language is complete', () => {
-    expect(checkTemplateIssue(subject, body, ['url'])).toBeNull();
-  });
-
-  it('should report incomplete when a language has a body but no subject', () => {
-    expect(checkTemplateIssue({ en: 'Subject' }, body, ['url'], ['en', 'fr'])).toBe('incomplete');
-  });
-
-  it('should report incomplete when a subject is only whitespace', () => {
-    expect(checkTemplateIssue({ en: '   ' }, { en: 'Link {{url}}' }, ['url'], ['en'])).toBe('incomplete');
-  });
-
-  it('should report missing-vars when a required placeholder is absent', () => {
-    expect(checkTemplateIssue(subject, { en: 'No link here', fr: 'Lien {{url}}' }, ['url'], ['en'])).toBe(
-      'missing-vars'
-    );
-  });
-
-  it('should tolerate whitespace inside a placeholder', () => {
-    expect(checkTemplateIssue({ en: 'Subject' }, { en: 'Link {{ url }}' }, ['url'], ['en'])).toBeNull();
-  });
-
-  it('should report incomplete when nothing has been authored at all', () => {
-    expect(checkTemplateIssue({}, {}, ['url'])).toBe('incomplete');
-  });
-});
-
 describe('default templates', () => {
-  it('should satisfy their own required variables', () => {
-    expect(
-      checkTemplateIssue(DEFAULT_NEW_USER_EMAIL_TEMPLATE.subject, DEFAULT_NEW_USER_EMAIL_TEMPLATE.body, ['username'])
-    ).toBeNull();
-    expect(
-      checkTemplateIssue(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.subject, DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body, [
-        'url',
-        'expiresAt'
-      ])
-    ).toBeNull();
+  it.each(['en', 'fr'] as const)('should carry the required placeholders in %s', (language) => {
+    expect(DEFAULT_NEW_USER_EMAIL_TEMPLATE.body[language]).toContain('{{username}}');
+    expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body[language]).toContain('{{url}}');
+    expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body[language]).toContain('{{expiresAt}}');
+  });
+
+  it.each(['en', 'fr'] as const)('should have a non-empty subject and body in %s', (language) => {
+    expect(DEFAULT_NEW_USER_EMAIL_TEMPLATE.subject[language].trim()).toBeTruthy();
+    expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.subject[language].trim()).toBeTruthy();
   });
 
   // Emailing a cleartext password is the thing this flow was changed to stop doing.

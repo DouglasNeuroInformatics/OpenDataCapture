@@ -8,7 +8,6 @@ import {
   $MailEncryption,
   $TestMailData,
   $UpdateMailConfigData,
-  checkTemplateIssue,
   DEFAULT_NEW_USER_EMAIL_TEMPLATE
 } from '@opendatacapture/schemas/mail';
 import type { MailConfigDto, MailEncryption, MailTemplate, UpdateMailConfigData } from '@opendatacapture/schemas/mail';
@@ -19,9 +18,11 @@ import { EmailTemplateEditor } from '@/components/EmailTemplateEditor';
 import { FormField } from '@/components/FormField';
 import { PageHeader } from '@/components/PageHeader';
 import { SectionCard } from '@/components/SectionCard';
+import { useMailErrorMessage } from '@/hooks/useMailErrorMessage';
 import { mailSettingsQueryOptions, useMailSettingsQuery } from '@/hooks/useMailSettingsQuery';
 import { useTestMailMutation } from '@/hooks/useTestMailMutation';
 import { useUpdateMailSettingsMutation } from '@/hooks/useUpdateMailSettingsMutation';
+import { checkTemplateIssue } from '@/utils/email-template';
 
 // Shown in the password field when one is already stored. The real value is never sent to the
 // client; leaving this mask unchanged keeps the stored secret, editing it sets a new one.
@@ -136,8 +137,14 @@ const MailManager = ({
     const nextErrors: FieldErrors = {};
     // The server only lets a blank password inherit the stored one for the same server, so the
     // password has to be re-entered when there is none yet or when the server identity changes.
+    // Must match `MailService.requiresNewPassword`, encryption included: downgrading it on the
+    // same host would otherwise reuse the stored password over an unencrypted connection.
     const isServerChanged =
-      config !== null && (config.host !== host || config.username !== username || config.port !== port);
+      config !== null &&
+      (config.host !== host ||
+        config.username !== username ||
+        config.port !== port ||
+        config.encryption !== values.encryption);
     if ((!config?.hasPassword || isServerChanged) && !isSecretChanged) {
       nextErrors.password = isServerChanged
         ? t({
@@ -431,6 +438,7 @@ const TestMailSection = ({
   const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const testMutation = useTestMailMutation();
+  const mailErrorMessage = useMailErrorMessage();
   const [recipient, setRecipient] = React.useState('');
   const [testingMode, setTestingMode] = React.useState<'connection' | 'email' | null>(null);
 
@@ -460,7 +468,7 @@ const TestMailSection = ({
         onSuccess: (outcome) => {
           if (!outcome.success) {
             addNotification({
-              message: outcome.error ?? t({ en: 'Unknown error', fr: 'Erreur inconnue' }),
+              message: mailErrorMessage(outcome.error),
               title: t({ en: 'Mail test failed', fr: 'Échec du test de courriel' }),
               type: 'error'
             });

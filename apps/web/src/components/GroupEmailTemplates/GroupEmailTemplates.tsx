@@ -4,8 +4,8 @@ import { Button, Dialog, Heading, Input, Label } from '@douglasneuroinformatics/
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { LocalizedString } from '@opendatacapture/schemas/core';
 import type { GroupEmailTemplate } from '@opendatacapture/schemas/group';
-import { checkTemplateIssue, DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
-import type { MailTemplate, TemplateIssue } from '@opendatacapture/schemas/mail';
+import { DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
+import type { MailTemplate } from '@opendatacapture/schemas/mail';
 import { useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { EyeIcon, PencilIcon, Trash2Icon } from 'lucide-react';
@@ -14,6 +14,8 @@ import { EmailTemplateEditor, LANGUAGE_LABELS, LANGUAGES } from '@/components/Em
 import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
+import { checkTemplateIssue } from '@/utils/email-template';
+import type { TemplateIssue } from '@/utils/email-template';
 
 const ASSIGNMENT_VARS = ['url', 'expiresAt'] as const;
 
@@ -242,7 +244,9 @@ export const GroupEmailTemplates = () => {
   const doCreate = async () => {
     const id = crypto.randomUUID();
     const created: GroupEmailTemplate = { ...draft, id, name: name.trim() };
-    const saved = await persist([...templates, created], activeId ?? id);
+    // Adding a template must not change what participants receive. The built-in default stays
+    // active until someone chooses otherwise with "Set default".
+    const saved = await persist([...templates, created], activeId);
     if (!saved) {
       return;
     }
@@ -279,9 +283,20 @@ export const GroupEmailTemplates = () => {
 
   const handleDelete = async (template: GroupEmailTemplate) => {
     const next = templates.filter((other) => other.id !== template.id);
-    const nextActiveId = activeId === template.id ? (next[0]?.id ?? null) : activeId;
-    if (await persist(next, nextActiveId)) {
+    // Deleting the default falls back to the built-in message rather than promoting whichever
+    // template happens to sort first — nobody chose that one, and the change is invisible.
+    const wasActive = activeId === template.id;
+    if (await persist(next, wasActive ? null : activeId)) {
       setDeleting(null);
+      if (wasActive) {
+        addNotification({
+          message: t({
+            en: 'That was the default template, so the built-in message is now used.',
+            fr: 'Ce modèle était le modèle par défaut ; le message intégré est désormais utilisé.'
+          }),
+          type: 'info'
+        });
+      }
     }
   };
 

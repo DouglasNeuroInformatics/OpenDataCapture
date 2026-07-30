@@ -1,5 +1,5 @@
 import type { Language, LocalizedString } from '@opendatacapture/schemas/core';
-import type { MailConfig, MailEncryption } from '@opendatacapture/schemas/mail';
+import type { MailConfig, MailEncryption, MailErrorCode } from '@opendatacapture/schemas/mail';
 
 /**
  * Substitute `{{key}}` placeholders in a template with the provided values.
@@ -45,34 +45,35 @@ export function pickLocale(localized: LocalizedString, language: Language): stri
 }
 
 /**
- * Translate a nodemailer/SMTP error into a clear, actionable message — matching on the
- * error code and, as a fallback, the message text (SMTP libraries are inconsistent about
- * codes). The raw technical error is never surfaced; anything unrecognized (including
- * timeouts) returns a friendly generic message.
+ * Classify a nodemailer/SMTP error — matching on the error code and, as a fallback, the message
+ * text (SMTP libraries are inconsistent about codes).
+ *
+ * Returns a {@link MailErrorCode} rather than prose: the server does not know what language the
+ * admin reads, so the client renders the message. The raw technical error is never surfaced, and
+ * anything unrecognized (including timeouts) collapses to `UNKNOWN`.
  */
-export function describeMailError(err: unknown): string {
+export function describeMailError(err: unknown): MailErrorCode {
   const e = (err ?? {}) as { code?: unknown; message?: unknown };
   const code = typeof e.code === 'string' ? e.code : '';
   const message = typeof e.message === 'string' ? e.message.toLowerCase() : '';
   const matches = (codes: string[], pattern: RegExp) => codes.includes(code) || pattern.test(message);
 
   if (matches(['EAUTH'], /invalid login|authentication failed|535|credentials|username and password/)) {
-    return 'Authentication failed — check the username and password.';
+    return 'AUTHENTICATION_FAILED';
   }
   if (matches(['EDNS', 'ENOTFOUND'], /getaddrinfo|enotfound|not be found|unknown host/)) {
-    return 'The mail server could not be found — check the host name.';
+    return 'HOST_NOT_FOUND';
   }
   if (matches(['ECONNREFUSED'], /econnrefused|refused/)) {
-    return 'The mail server refused the connection — check the host and port.';
+    return 'CONNECTION_REFUSED';
   }
   if (matches(['ESOCKET'], /wrong version number|ssl routines|tls|certificate|self[- ]signed|esocket/)) {
-    return 'Could not establish a secure connection — check the port and encryption method.';
+    return 'INSECURE_CONNECTION';
   }
   if (matches(['EENVELOPE'], /envelope|sender address|from address|mail from/)) {
-    return 'The sender address was rejected — check the sender address.';
+    return 'SENDER_REJECTED';
   }
-  // Timeouts and anything else: keep it simple and non-technical.
-  return 'Please check and reconfigure your mail settings and try again.';
+  return 'UNKNOWN';
 }
 
 /**

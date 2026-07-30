@@ -51,7 +51,9 @@ describe('UsersController', () => {
   describe('create', () => {
     beforeEach(() => {
       usersService.create.mockResolvedValue({ id: 'user-1', username: createUserData.username });
-      groupsService.findById.mockImplementation((id: string) => Promise.resolve({ id, name: `Name of ${id}` }));
+      groupsService.findById.mockImplementation((id: string, _options?: unknown) =>
+        Promise.resolve({ id, name: `Name of ${id}` })
+      );
       mailService.sendNewUserEmail.mockResolvedValue({
         message: 'rendered',
         recipient: createUserData.email,
@@ -98,6 +100,15 @@ describe('UsersController', () => {
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({
         group: 'Name of group-1, Name of group-2'
       });
+    });
+
+    // Without this, dropping `{ ability }` from the service calls would leave every other test
+    // green while the lookups silently read across every group.
+    it('scopes both the create and the group lookups to the caller ability', async () => {
+      await usersController.create(createUserData, ability);
+      expect(usersService.create).toHaveBeenCalledWith(createUserData, { ability });
+      expect(groupsService.findById).toHaveBeenCalledWith('group-1', { ability });
+      expect(groupsService.findById).toHaveBeenCalledWith('group-2', { ability });
     });
 
     it('omits groups the creator cannot read', async () => {

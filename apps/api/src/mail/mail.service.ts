@@ -1,6 +1,11 @@
-import { InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
+import { ConfigService, InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
-import { BadRequestException, Injectable, ServiceUnavailableException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  ServiceUnavailableException
+} from '@nestjs/common';
 import type { Language } from '@opendatacapture/schemas/core';
 import { $MailConfig, DEFAULT_NEW_USER_EMAIL_TEMPLATE, isMailEnabled } from '@opendatacapture/schemas/mail';
 import type {
@@ -15,6 +20,8 @@ import type {
 } from '@opendatacapture/schemas/mail';
 import { createTransport } from 'nodemailer';
 import type { Transporter } from 'nodemailer';
+
+import { decryptSecret, encryptSecret } from '@/core/secret-cipher';
 
 import { describeMailError, encryptionToTransportFlags, formatSender, pickLocale, renderTemplate } from './mail.utils';
 
@@ -48,6 +55,7 @@ type MailState = {
 export class MailService {
   constructor(
     @InjectModel('SetupState') private readonly setupStateModel: Model<'SetupState'>,
+    private readonly configService: ConfigService,
     private readonly loggingService: LoggingService
   ) {}
 
@@ -150,11 +158,12 @@ export class MailService {
   async test({ config, recipient }: TestMailData): Promise<TestMailResult> {
     const saved = await this.getConfig();
     if (this.requiresNewPassword(config, saved)) {
-      return { error: 'Enter the password for this mail server before testing it.', success: false };
+      // The client already blocks this, so a code the UI maps to "check your credentials" is enough.
+      return { error: 'AUTHENTICATION_FAILED', success: false };
     }
     const resolved = this.resolveConfig(config, saved);
     if (!resolved) {
-      return { error: 'Mail has not been configured', success: false };
+      return { error: 'UNKNOWN', success: false };
     }
     const testMessage: SendOptions = {
       body: {
@@ -189,7 +198,8 @@ export class MailService {
     if (this.requiresNewPassword(data.config, saved)) {
       throw new BadRequestException('A password is required when changing the mail server');
     }
-    const nextConfig = data.config ? this.resolveConfig(data.config, saved) : undefined;
+    const resolved = data.config ? this.resolveConfig(data.config, saved) : undefined;
+    const nextConfig = resolved ? { ...resolved, password: this.encryptPassword(resolved.password) } : undefined;
     await this.setupStateModel.update({
       data: {
         ...(nextConfig ? { mailConfig: { set: nextConfig } } : {}),
@@ -214,17 +224,40 @@ export class MailService {
     });
   }
 
-  /** Read `SetupState` once and narrow both mail fields off it. */
+  /** Reverse {@link encryptPassword}. Propagates, so a key rotation surfaces instead of muting mail. */
+  private decryptPassword(stored: string): string {
+    return stored ? decryptSecret(stored, this.configService.getOrThrow('SECRET_KEY')) : '';
+  }
+
+  /** Encrypt the SMTP password so a database dump yields no working mail credential. */
+  private encryptPassword(plaintext: string): string {
+    return plaintext ? encryptSecret(plaintext, this.configService.getOrThrow('SECRET_KEY')) : '';
+  }
+
+  /**
+   * Read `SetupState` once and narrow both mail fields off it.
+   *
+   * A stored configuration that no longer validates, or whose password no longer decrypts, is a
+   * hard failure rather than "not configured": treating it as the latter makes every send return
+   * `DISABLED` while the admin looks at a configured mail page, with nothing to explain it.
+   */
   private async readState(): Promise<MailState> {
     const setupState = await this.setupStateModel.findFirst();
-    // Validate the stored value so scalar columns (e.g. `encryption`) are narrowed
-    // from `string` to their expected literal union types.
-    const config = $MailConfig.safeParse(setupState?.mailConfig);
+    const stored = setupState?.mailConfig;
+    // Validate so scalar columns (e.g. `encryption`) narrow from `string` to their literal unions.
+    const parsed = stored ? $MailConfig.safeParse(stored) : null;
+    if (parsed && !parsed.success) {
+      this.loggingService.error(`Stored mail configuration is invalid: ${parsed.error.message}`);
+      throw new InternalServerErrorException('The stored mail configuration is invalid');
+    }
     const { body, subject } = setupState?.newUserEmailTemplate ?? {};
+    // Two empty objects are truthy, so check for actual content before preferring the stored one.
+    const hasStoredTemplate = Boolean(body && subject && pickLocale(body, 'en') && pickLocale(subject, 'en'));
     return {
-      config: config.success ? config.data : null,
-      isEnabled: isMailEnabled(setupState?.mailConfig),
-      newUserEmailTemplate: body && subject ? { body, subject } : { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE }
+      config: parsed?.success ? { ...parsed.data, password: this.decryptPassword(parsed.data.password) } : null,
+      isEnabled: isMailEnabled(stored),
+      newUserEmailTemplate:
+        hasStoredTemplate && body && subject ? { body, subject } : { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE }
     };
   }
 
@@ -241,7 +274,14 @@ export class MailService {
     if (!partial || partial.password) {
       return false;
     }
-    return saved?.host !== partial.host || saved.username !== partial.username || saved.port !== partial.port;
+    // `encryption` counts as part of the server's identity: without it an admin could flip a
+    // configured host to `none` and have the test endpoint offer the stored password in the clear.
+    return (
+      saved?.host !== partial.host ||
+      saved.username !== partial.username ||
+      saved.port !== partial.port ||
+      saved.encryption !== partial.encryption
+    );
   }
 
   /**

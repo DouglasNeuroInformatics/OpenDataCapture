@@ -14,6 +14,7 @@ export class MailSettingsPage extends AppPage {
   readonly templateBody: Locator;
   readonly templateCard: Locator;
   readonly templateSave: Locator;
+  readonly testConnection: Locator;
   readonly testRecipient: Locator;
   readonly username: Locator;
 
@@ -27,6 +28,7 @@ export class MailSettingsPage extends AppPage {
     this.password = page.getByTestId('mail-password');
     this.senderAddress = page.getByTestId('mail-sender-address');
     this.saveConfig = page.getByTestId('mail-save-config');
+    this.testConnection = page.getByTestId('mail-test-connection');
     this.testRecipient = page.getByTestId('mail-test-recipient');
     this.sendTest = page.getByTestId('mail-send-test');
     this.templateCard = page.getByTestId('mail-template-card');
@@ -34,8 +36,11 @@ export class MailSettingsPage extends AppPage {
     this.templateSave = page.getByTestId('mail-template-save');
   }
 
+  /** Idempotent: a configuration left enabled by an earlier spec already shows the form. */
   async enableMail() {
-    await this.enableToggle.click();
+    if (!(await this.serverCard.isVisible())) {
+      await this.enableToggle.click();
+    }
     await this.serverCard.waitFor({ state: 'visible' });
   }
 

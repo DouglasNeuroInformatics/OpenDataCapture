@@ -9,6 +9,7 @@ import { CircleHelpIcon } from 'lucide-react';
 
 import { LANGUAGE_LABELS, LANGUAGES } from '@/components/EmailTemplateEditor';
 import { useGroupQuery } from '@/hooks/useGroupQuery';
+import { useMailErrorMessage } from '@/hooks/useMailErrorMessage';
 import { useSendAssignmentEmailMutation } from '@/hooks/useSendAssignmentEmailMutation';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 
@@ -25,6 +26,7 @@ export const AssignmentEmailForm: React.FC<{
   const setupStateQuery = useSetupStateQuery();
   const sendEmailMutation = useSendAssignmentEmailMutation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
+  const mailErrorMessage = useMailErrorMessage();
   const [recipient, setRecipient] = useState('');
   const [languageChoice, setLanguageChoice] = useState<Language>(resolvedLanguage);
   const [templateChoice, setTemplateChoice] = useState<null | string>(null);
@@ -77,7 +79,7 @@ export const AssignmentEmailForm: React.FC<{
         onError: () => fail(t({ en: 'The email could not be sent', fr: "Le courriel n'a pas pu être envoyé" })),
         onSuccess: (result) => {
           if (result.status !== 'SENT') {
-            fail(result.error ?? t({ en: 'The email could not be sent', fr: "Le courriel n'a pas pu être envoyé" }));
+            fail(mailErrorMessage(result.error));
             return;
           }
           const message = t(
@@ -124,9 +126,10 @@ export const AssignmentEmailForm: React.FC<{
             </Tooltip.Trigger>
             <Tooltip.Content className="max-w-xs">
               <p>
+                {/* Only the email is localized: the gateway does not read the link's `lang` param. */}
                 {t({
-                  en: 'Emails and assignments are sent in the selected language when available. However, subjects may still choose a different preferred language on the gateway.',
-                  fr: "Les courriels et les évaluations sont envoyés dans la langue sélectionnée lorsqu'elle est disponible. Cependant, les sujets peuvent toujours choisir une langue préférée différente sur le portail."
+                  en: 'The email is sent in the selected language when the template has been written in it. Participants choose their own language when they open the assignment.',
+                  fr: "Le courriel est envoyé dans la langue sélectionnée lorsque le modèle a été rédigé dans celle-ci. Les participants choisissent leur propre langue à l'ouverture de l'évaluation."
                 })}
               </p>
             </Tooltip.Content>
@@ -163,7 +166,11 @@ export const AssignmentEmailForm: React.FC<{
         <Button
           className="whitespace-nowrap"
           data-testid="assignment-email-submit"
-          disabled={!recipient || sendEmailMutation.isPending}
+          // While the group query is in flight `selectedTemplate` reads as the built-in default,
+          // and posting that is indistinguishable from deliberately choosing it. `isLoading`
+          // rather than `isPending`: a disabled query (an assignment with no group) stays pending
+          // forever and would leave the button permanently dead.
+          disabled={!recipient || sendEmailMutation.isPending || groupQuery.isLoading}
           type="button"
           variant="primary"
           onClick={sendEmail}

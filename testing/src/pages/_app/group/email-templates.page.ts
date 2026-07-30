@@ -31,6 +31,13 @@ export class GroupEmailTemplatesPage extends AppPage {
     return this.$ref.getByTestId('template-create-error');
   }
 
+  /** Create a template authored in one language, accepting the missing-translations warning. */
+  async createTemplate(fields: { body: string; name: string; subject: string }) {
+    await this.fillCreateForm(fields);
+    await this.createAnyway.waitFor({ state: 'visible' });
+    await this.createAnyway.click();
+  }
+
   /**
    * The delete control on the row for `name`. Scoped to that row because earlier specs leave
    * their own templates in the list, so the first delete button is not this test's, and because
@@ -38,18 +45,6 @@ export class GroupEmailTemplatesPage extends AppPage {
    */
   deleteButtonFor(name: string): Locator {
     return this.rowFor(name).getByTestId(/^template-delete-/);
-  }
-
-  /** The list row whose label is `name`. */
-  rowFor(name: string): Locator {
-    return this.root.getByTestId('template-row').filter({ hasText: name });
-  }
-
-  /** Create a template authored in one language, accepting the missing-translations warning. */
-  async createTemplate(fields: { body: string; name: string; subject: string }) {
-    await this.fillCreateForm(fields);
-    await this.createAnyway.waitFor({ state: 'visible' });
-    await this.createAnyway.click();
   }
 
   /**
@@ -62,5 +57,15 @@ export class GroupEmailTemplatesPage extends AppPage {
     await this.createSubject.fill(subject);
     await this.createBody.fill(body);
     await this.createSubmit.click();
+  }
+
+  /** The list row whose label is `name`. */
+  rowFor(name: string): Locator {
+    return this.root.getByTestId('template-row').filter({ hasText: name });
+  }
+
+  /** The "set default" control on the row for `name`. */
+  setActiveButtonFor(name: string): Locator {
+    return this.rowFor(name).getByTestId(/^template-set-active-/);
   }
 }

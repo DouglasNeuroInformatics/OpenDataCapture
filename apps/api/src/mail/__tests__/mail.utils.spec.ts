@@ -81,35 +81,38 @@ describe('encryptionToTransportFlags', () => {
   });
 });
 
+// A code, not prose: the server cannot know what language the admin reads.
 describe('describeMailError', () => {
   it('maps auth failures', () => {
-    expect(describeMailError({ code: 'EAUTH' })).toMatch(/authentication failed/i);
+    expect(describeMailError({ code: 'EAUTH' })).toBe('AUTHENTICATION_FAILED');
   });
 
   it('maps unknown host (by code or message)', () => {
-    expect(describeMailError({ code: 'ENOTFOUND' })).toMatch(/could not be found/i);
-    expect(describeMailError({ message: 'getaddrinfo ENOTFOUND smtp.bad' })).toMatch(/could not be found/i);
+    expect(describeMailError({ code: 'ENOTFOUND' })).toBe('HOST_NOT_FOUND');
+    expect(describeMailError({ message: 'getaddrinfo ENOTFOUND smtp.bad' })).toBe('HOST_NOT_FOUND');
   });
 
   it('maps a refused connection', () => {
-    expect(describeMailError({ code: 'ECONNREFUSED' })).toMatch(/refused/i);
+    expect(describeMailError({ code: 'ECONNREFUSED' })).toBe('CONNECTION_REFUSED');
   });
 
   it('maps TLS/version mismatch to an encryption hint', () => {
-    expect(describeMailError({ code: 'ESOCKET' })).toMatch(/secure connection/i);
-    expect(describeMailError({ message: 'SSL routines:tls_validate_record_header:wrong version number' })).toMatch(
-      /secure connection/i
+    expect(describeMailError({ code: 'ESOCKET' })).toBe('INSECURE_CONNECTION');
+    expect(describeMailError({ message: 'SSL routines:tls_validate_record_header:wrong version number' })).toBe(
+      'INSECURE_CONNECTION'
     );
   });
 
-  it('returns the generic message for timeouts (no technical wording)', () => {
-    const result = describeMailError({ code: 'ETIMEDOUT', message: 'Connection timeout' });
-    expect(result).toBe('Please check and reconfigure your mail settings and try again.');
-    expect(result).not.toMatch(/timeout|timed out/i);
+  it('maps a rejected sender address', () => {
+    expect(describeMailError({ code: 'EENVELOPE' })).toBe('SENDER_REJECTED');
   });
 
-  it('never leaks a raw/unknown error', () => {
-    expect(describeMailError(new Error('0FC2C9C667C0000:error:0A00010B:SSL routines'))).not.toMatch(/0FC2C9/);
-    expect(describeMailError('something weird')).toBe('Please check and reconfigure your mail settings and try again.');
+  it('collapses timeouts to UNKNOWN', () => {
+    expect(describeMailError({ code: 'ETIMEDOUT', message: 'Connection timeout' })).toBe('UNKNOWN');
+  });
+
+  it('never leaks a raw error, returning only a known code', () => {
+    expect(describeMailError(new Error('0FC2C9C667C0000:error:0A00010B:SSL routines'))).not.toContain('0FC2C9');
+    expect(describeMailError('something weird')).toBe('UNKNOWN');
   });
 });

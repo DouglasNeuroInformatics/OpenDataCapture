@@ -42,15 +42,33 @@ test.describe('group email templates', () => {
     await expect(templatesPage.rowFor(name)).toBeHidden();
   });
 
-  test('should create a template and make it the default', async ({ getPageModel, uniqueId }) => {
+  // Adding a template must not silently change what participants receive.
+  test('should create a template without making it the default', async ({ getPageModel, uniqueId }) => {
     const templatesPage = await getPageModel('/group/email-templates');
     const name = `Template${uniqueId}`;
 
     await templatesPage.createTemplate({ body: BODY, name, subject: `Subject${uniqueId}` });
 
     await expect(templatesPage.rowFor(name)).toBeVisible();
-    // A custom template takes over as the default, displacing the built-in one.
+    await expect(templatesPage.builtInDefaultBadge).toBeVisible();
+  });
+
+  test('should make a template the default only when asked, and fall back on delete', async ({
+    getPageModel,
+    uniqueId
+  }) => {
+    const templatesPage = await getPageModel('/group/email-templates');
+    const name = `Template${uniqueId}`;
+    await templatesPage.createTemplate({ body: BODY, name, subject: `Subject${uniqueId}` });
+
+    await templatesPage.setActiveButtonFor(name).click();
     await expect(templatesPage.builtInDefaultBadge).toBeHidden();
+
+    // Deleting the default returns to the built-in message rather than promoting an arbitrary row.
+    await templatesPage.deleteButtonFor(name).click();
+    await templatesPage.deleteConfirm.click();
+    await expect(templatesPage.rowFor(name)).toBeHidden();
+    await expect(templatesPage.builtInDefaultBadge).toBeVisible();
   });
 
   test('should require confirmation before deleting a template', async ({ getPageModel, uniqueId }) => {

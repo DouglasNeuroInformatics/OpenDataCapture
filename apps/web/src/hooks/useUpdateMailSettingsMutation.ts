@@ -1,4 +1,5 @@
-import type { MailSettings, UpdateMailSettingsData } from '@opendatacapture/schemas/mail';
+import { $MailSettings } from '@opendatacapture/schemas/mail';
+import type { UpdateMailSettingsData } from '@opendatacapture/schemas/mail';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -13,10 +14,10 @@ export function useUpdateMailSettingsMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: UpdateMailSettingsData) => {
-      const response = await axios.patch<MailSettings>('/v1/mail/settings', data, {
+      const response = await axios.patch('/v1/mail/settings', data, {
         meta: { disableDefaultErrorNotification: true }
       });
-      return response.data;
+      return $MailSettings.parseAsync(response.data);
     },
     onSuccess() {
       void queryClient.invalidateQueries({ queryKey: [MAIL_SETTINGS_QUERY_KEY] });

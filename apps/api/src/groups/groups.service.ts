@@ -1,6 +1,7 @@
 import { InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import type { GroupEmailTemplate } from '@opendatacapture/schemas/group';
 import type { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
@@ -99,6 +100,7 @@ export class GroupsService {
     if (exists) {
       throw new ConflictException(`Group with name '${data.name}' already exists!`);
     }
+    this.validateEmailTemplates(emailTemplates, data.activeAssignmentEmailTemplateId, group);
 
     // Guard against stale client state: an instrument may have been deleted since the client loaded the
     // group (the deleted id can linger in the client's accessible list). Connecting a non-existent
@@ -146,6 +148,31 @@ export class GroupsService {
         throw new ConflictException(`Group with ID '${id}' has been modified since it was loaded`);
       }
       throw err;
+    }
+  }
+
+  /**
+   * Reject a template list that cannot be resolved later. A duplicate id makes `find()` shadow
+   * every match after the first, and an active id pointing at nothing makes the assignment
+   * controller fall back to the built-in wording — so participants silently receive the wrong
+   * message with nothing logged.
+   */
+  private validateEmailTemplates(
+    emailTemplates: GroupEmailTemplate[] | undefined,
+    activeId: null | string | undefined,
+    group: { activeAssignmentEmailTemplateId?: null | string; emailTemplates?: GroupEmailTemplate[] }
+  ): void {
+    const templates = emailTemplates ?? group.emailTemplates ?? [];
+    if (emailTemplates) {
+      const ids = emailTemplates.map((template) => template.id);
+      if (new Set(ids).size !== ids.length) {
+        throw new BadRequestException('Each email template must have a unique id');
+      }
+    }
+    // `undefined` leaves the stored value alone; `null` deliberately selects the built-in default.
+    const nextActiveId = activeId === undefined ? group.activeAssignmentEmailTemplateId : activeId;
+    if (nextActiveId && !templates.some((template) => template.id === nextActiveId)) {
+      throw new BadRequestException(`No email template with id '${nextActiveId}' exists in this group`);
     }
   }
 }

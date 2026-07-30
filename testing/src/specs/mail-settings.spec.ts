@@ -13,14 +13,34 @@ test.describe('mail settings', () => {
     await expect(mailPage.host).toBeVisible();
   });
 
+  // Cleared explicitly rather than assuming an unconfigured instance: other specs in this suite
+  // leave a stored configuration behind, and the assertion is about the required fields.
   test('should reject an incomplete configuration without saving it', async ({ getPageModel }) => {
     const mailPage = await getPageModel('/admin/mail');
     await mailPage.enableMail();
+    await mailPage.host.fill('');
+    await mailPage.username.fill('');
 
     await mailPage.saveConfig.click();
 
     await expect(mailPage.fieldError('host')).toBeVisible();
     await expect(mailPage.fieldError('username')).toBeVisible();
+  });
+
+  // Pointing at a different server must not silently reuse the credential stored for the old one.
+  test('should require the password again when the server changes', async ({ getPageModel }) => {
+    const mailPage = await getPageModel('/admin/mail');
+    await mailPage.enableMail();
+    await mailPage.fillServerConfig({
+      host: `smtp.somewhere-else.test`,
+      password: '',
+      port: '587',
+      senderAddress: 'noreply@example.org',
+      username: 'mailer'
+    });
+
+    await mailPage.saveConfig.click();
+
     await expect(mailPage.fieldError('password')).toBeVisible();
   });
 

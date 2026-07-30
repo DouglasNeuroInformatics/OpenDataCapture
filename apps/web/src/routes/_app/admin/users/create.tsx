@@ -16,6 +16,7 @@ import { LANGUAGE_LABELS, LANGUAGES } from '@/components/EmailTemplateEditor';
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
+import { useMailErrorMessage } from '@/hooks/useMailErrorMessage';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { $Email, $PhoneNumber, omittedIfBlank } from '@/utils/validation';
 
@@ -39,6 +40,7 @@ const RouteComponent = () => {
   const createUserMutation = useCreateUserMutation();
   const notification = useNotificationsStore();
   const setupStateQuery = useSetupStateQuery();
+  const mailErrorMessage = useMailErrorMessage();
 
   // When the welcome email cannot be delivered, we surface its rendered text here so
   // the admin can copy it and send it manually. Navigation is deferred until dismissed.
@@ -104,12 +106,7 @@ const RouteComponent = () => {
       if (welcomeEmail.status === 'FAILED' || welcomeEmail.status === 'NO_RECIPIENT') {
         if (welcomeEmail.status === 'FAILED') {
           notification.addNotification({
-            message:
-              welcomeEmail.error ??
-              t({
-                en: 'The welcome email could not be sent',
-                fr: "Le courriel de bienvenue n'a pas pu être envoyé"
-              }),
+            message: mailErrorMessage(welcomeEmail.error),
             title: t({
               en: 'Welcome email failed',
               fr: 'Échec du courriel de bienvenue'

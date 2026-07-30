@@ -23,7 +23,7 @@ const $Port = z.number().int().positive().max(65535);
  * therefore must NEVER be returned to a client — use {@link $MailConfigDto} for anything sent
  * to the browser.
  */
-const $MailConfigBase = z.object({
+const $MailConfig = z.object({
   /** Master on/off switch. When false, the application behaves as if email did not exist. */
   enabled: z.boolean(),
   /** SMTP connection security. */
@@ -42,13 +42,11 @@ const $MailConfigBase = z.object({
   username: z.string().min(1)
 });
 
-const $MailConfig = $MailConfigBase;
-
 /**
  * The mail configuration as exposed to an authenticated admin client. The secret `password` is
  * replaced by a `hasPassword` boolean so the UI can show that one is set without transmitting it.
  */
-const $MailConfigDto = $MailConfigBase.omit({ password: true }).extend({
+const $MailConfigDto = $MailConfig.omit({ password: true }).extend({
   hasPassword: z.boolean()
 });
 
@@ -57,7 +55,7 @@ const $MailConfigDto = $MailConfigBase.omit({ password: true }).extend({
  * omitted or left blank the stored value is kept, which lets the form round-trip without ever
  * holding the secret.
  */
-const $UpdateMailConfigData = $MailConfigBase.omit({ password: true }).extend({
+const $UpdateMailConfigData = $MailConfig.omit({ password: true }).extend({
   password: z.string().optional()
 });
 
@@ -92,25 +90,46 @@ const $TestMailData = z.object({
   recipient: z.email().optional()
 });
 
+/**
+ * Why an outgoing message could not be delivered. A code rather than prose, so the client can
+ * render it in the reader's language — the server has no idea who is looking at the result.
+ * - `AUTHENTICATION_FAILED` — the server rejected the username/password
+ * - `HOST_NOT_FOUND`        — the host name does not resolve
+ * - `CONNECTION_REFUSED`    — the host resolved but refused the connection
+ * - `INSECURE_CONNECTION`   — TLS could not be established for the chosen port/encryption
+ * - `SENDER_REJECTED`       — the server refused the configured sender address
+ * - `UNKNOWN`               — anything else, including timeouts
+ */
+const MAIL_ERROR_CODE = [
+  'AUTHENTICATION_FAILED',
+  'HOST_NOT_FOUND',
+  'CONNECTION_REFUSED',
+  'INSECURE_CONNECTION',
+  'SENDER_REJECTED',
+  'UNKNOWN'
+] as const;
+
+const $MailErrorCode = z.enum(MAIL_ERROR_CODE);
+
 const $TestMailResult = z.object({
-  error: z.string().nullish(),
+  error: $MailErrorCode.nullish(),
   success: z.boolean()
 });
 
 /** Variables substituted into the new-user welcome template. */
-const $NewUserEmailVariables = z.object({
-  firstName: z.string(),
-  group: z.string(),
-  lastName: z.string(),
-  url: z.string(),
-  username: z.string()
-});
+type NewUserEmailVariables = {
+  firstName: string;
+  group: string;
+  lastName: string;
+  url: string;
+  username: string;
+};
 
 /** Variables substituted into the remote-assignment email template. */
-const $AssignmentEmailVariables = z.object({
-  expiresAt: z.string(),
-  url: z.string()
-});
+type AssignmentEmailVariables = {
+  expiresAt: string;
+  url: string;
+};
 
 /**
  * The outcome of an attempt to deliver a feature email (e.g. the new-user welcome
@@ -124,7 +143,7 @@ const $AssignmentEmailVariables = z.object({
 const $EmailDeliveryStatus = z.enum(['SENT', 'FAILED', 'NO_RECIPIENT', 'DISABLED']);
 
 const $EmailDeliveryResult = z.object({
-  error: z.string().nullish(),
+  error: $MailErrorCode.nullish(),
   message: z.string(),
   recipient: z.string().nullish(),
   status: $EmailDeliveryStatus
@@ -229,56 +248,17 @@ function isMailEnabled(storedConfig: unknown): boolean {
   return result.success && result.data.enabled;
 }
 
-// ── Template validation helpers ──────────────────────────────────────────────
-
-/** Whether a body string contains a given `{{variable}}` placeholder. */
-function hasVar(body: string, name: string): boolean {
-  return new RegExp(`\\{\\{\\s*${name}\\s*\\}\\}`).test(body);
-}
-
-type TemplateIssue = 'incomplete' | 'missing-vars' | null;
-
-/**
- * What (if anything) is wrong with a template for the given languages:
- * `incomplete` when a required language's subject/body is blank,
- * `missing-vars` when the body omits a required variable, otherwise `null`.
- * When no `languages` are supplied, checks all languages present in the template.
- */
-function checkTemplateIssue(
-  subject: LocalizedString,
-  body: LocalizedString,
-  requiredVars: readonly string[],
-  languages?: readonly string[]
-): TemplateIssue {
-  const langs = languages ?? Object.keys(body).filter((k) => body[k as keyof LocalizedString]);
-  if (langs.length === 0) {
-    return 'incomplete';
-  }
-  for (const lang of langs) {
-    const s = subject[lang as keyof LocalizedString];
-    const b = body[lang as keyof LocalizedString];
-    if (!s?.trim() || !b?.trim()) {
-      return 'incomplete';
-    }
-    if (requiredVars.length > 0 && requiredVars.some((name) => !hasVar(b, name))) {
-      return 'missing-vars';
-    }
-  }
-  return null;
-}
-
 // ── Exports ──────────────────────────────────────────────────────────────────
 
-export type { TemplateIssue };
-export type AssignmentEmailVariables = z.infer<typeof $AssignmentEmailVariables>;
+export type { AssignmentEmailVariables, NewUserEmailVariables };
 export type EmailDeliveryResult = z.infer<typeof $EmailDeliveryResult>;
 export type EmailDeliveryStatus = z.infer<typeof $EmailDeliveryStatus>;
 export type MailConfig = z.infer<typeof $MailConfig>;
 export type MailConfigDto = z.infer<typeof $MailConfigDto>;
 export type MailEncryption = (typeof MAIL_ENCRYPTION)[number];
+export type MailErrorCode = (typeof MAIL_ERROR_CODE)[number];
 export type MailSettings = z.infer<typeof $MailSettings>;
 export type MailTemplate = z.infer<typeof $MailTemplate>;
-export type NewUserEmailVariables = z.infer<typeof $NewUserEmailVariables>;
 export type SendAssignmentEmailData = z.infer<typeof $SendAssignmentEmailData>;
 export type TestMailData = z.infer<typeof $TestMailData>;
 export type TestMailResult = z.infer<typeof $TestMailResult>;
@@ -286,23 +266,22 @@ export type UpdateMailConfigData = z.infer<typeof $UpdateMailConfigData>;
 export type UpdateMailSettingsData = z.infer<typeof $UpdateMailSettingsData>;
 
 export {
-  $AssignmentEmailVariables,
   $EmailDeliveryResult,
   $EmailDeliveryStatus,
   $MailConfig,
   $MailConfigDto,
   $MailEncryption,
+  $MailErrorCode,
   $MailSettings,
   $MailTemplate,
-  $NewUserEmailVariables,
   $SendAssignmentEmailData,
   $TestMailData,
   $TestMailResult,
   $UpdateMailConfigData,
   $UpdateMailSettingsData,
-  checkTemplateIssue,
   DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE,
   DEFAULT_NEW_USER_EMAIL_TEMPLATE,
   isMailEnabled,
-  MAIL_ENCRYPTION
+  MAIL_ENCRYPTION,
+  MAIL_ERROR_CODE
 };

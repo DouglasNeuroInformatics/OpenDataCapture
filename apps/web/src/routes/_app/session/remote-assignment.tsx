@@ -100,6 +100,11 @@ const RouteComponent = () => {
     }
   }, [currentSession]);
 
+  useEffect(() => {
+    const input = document.querySelector<HTMLInputElement>('[data-testid="instrument-search-bar"] input');
+    input?.focus();
+  }, []);
+
   if (!currentSession) {
     return null;
   }
