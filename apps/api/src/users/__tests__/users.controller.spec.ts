@@ -85,7 +85,10 @@ describe('UsersController', () => {
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ url: '' });
     });
 
-    it('passes the requested language through', async () => {
+    // The controller forwards whatever was asked for and leaves the default to the mail service.
+    it('passes the language query param through to sendNewUserEmail', async () => {
+      await usersController.create(createUserData, ability);
+      expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ language: undefined });
       await usersController.create(createUserData, ability, undefined, 'fr');
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ language: 'fr' });
     });
