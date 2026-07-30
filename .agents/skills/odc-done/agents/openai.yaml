@@ -1,0 +1,3 @@
+interface:
+  display_name: 'ODC Done'
+  short_description: 'Close out a change before committing or opening a PR'

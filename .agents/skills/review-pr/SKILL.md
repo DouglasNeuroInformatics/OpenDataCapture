@@ -118,9 +118,9 @@ there — the same fallback applies everywhere this skill posts.
 Then write the stub to `no-action/<N>.md` and move on. Blocked PRs never reach the user's attention
 beyond a count in the final tally.
 
-## 5. Review, two at a time
+## 5. Review, three at a time
 
-Spawn one `general-purpose` sub-agent per surviving PR, at most two in flight. Each prompt carries:
+Spawn one `general-purpose` sub-agent per surviving PR, at most three in flight. Each prompt carries:
 the PR number, URL, title, author, `headRefOid`, size, the worktree path to use under the scratchpad
 directory, and this instruction —
 
