@@ -456,6 +456,8 @@ type Content<TData, TLanguage> = Fields<TData, TLanguage> | (Block<TData> | Fiel
 
 Content is either an object mapping every key to a field (`Fields`), or an array of `FieldsGroup` items — optionally interleaved with `Block` items that render arbitrary JSX (e.g. explanatory text) between groups. A `Block` holds no field data; its `render` receives the current partial form data and returns a `ReactNode`.
 
+`render` is rendered as a component, so it may hold state with hooks imported from `/runtime/v1/react@19.x`. It may not mount a root of its own: `createRoot` from `/runtime/v1/react-dom@19.x/client.js` belongs to an interactive instrument, which owns its document, and throws if called from a form.
+
 ##### Full Type
 
 ```ts

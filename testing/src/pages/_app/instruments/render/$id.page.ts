@@ -9,6 +9,8 @@ import { AppPage } from '../../route.page';
 export class RenderInstrumentPage extends AppPage {
   readonly beginButton: Locator;
   readonly consentPreamble: Locator;
+  readonly consentPreambleRemainder: Locator;
+  readonly consentPreambleToggle: Locator;
   readonly errorMessages: Locator;
   readonly submitButton: Locator;
   readonly summaryHeading: Locator;
@@ -17,6 +19,8 @@ export class RenderInstrumentPage extends AppPage {
     super(page);
     this.beginButton = page.getByRole('button', { name: 'Begin' });
     this.consentPreamble = page.getByTestId('consent-preamble');
+    this.consentPreambleRemainder = page.getByTestId('consent-preamble-remainder');
+    this.consentPreambleToggle = page.getByTestId('consent-preamble-toggle');
     this.submitButton = page.getByRole('button', { name: 'Submit' });
     this.summaryHeading = page.getByRole('heading', { name: /Summary of Results/i });
     this.errorMessages = page.getByTestId('error-message-text');
