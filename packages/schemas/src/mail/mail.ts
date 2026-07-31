@@ -2,8 +2,6 @@ import { z } from 'zod/v4';
 
 import { $Language, $LocalizedString } from '../core/core.js';
 
-import type { LocalizedString } from '../core/core.js';
-
 // ── Internal helpers (must precede all exports for import/exports-last) ───────
 
 /**
