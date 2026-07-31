@@ -38,7 +38,12 @@ export class MailSettingsPage extends AppPage {
 
   /** Idempotent: a configuration left enabled by an earlier spec already shows the form. */
   async enableMail() {
-    if (!(await this.serverCard.isVisible())) {
+    // Branch on the toggle's own state, not the card's visibility. `isVisible` is a point-in-time
+    // check with no auto-waiting, so on a slow first paint it reports false for an instance where
+    // mail is already on — and the click that follows then turns mail OFF for the whole instance,
+    // which breaks this spec and any other running against a mail-enabled instance.
+    await this.enableToggle.waitFor({ state: 'visible' });
+    if (!(await this.enableToggle.isChecked())) {
       await this.enableToggle.click();
     }
     await this.serverCard.waitFor({ state: 'visible' });

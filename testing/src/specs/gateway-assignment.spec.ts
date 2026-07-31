@@ -76,12 +76,23 @@ test.describe('gateway remote assignment', () => {
     await gatewayInstrument.submit();
     await expect(gatewayInstrument.summaryHeading).toBeVisible();
 
-    // Revisiting the same link after completion should surface the conflict instead of silently
-    // reprocessing it. Reuses this now-completed assignment rather than soloing a second, expensive
-    // Cap proof-of-work just to exercise this branch.
+    // Revisiting the same link after completion must not serve the instrument again. Reuses this
+    // now-completed assignment rather than soloing a second, expensive Cap proof-of-work just to
+    // exercise this branch.
+    //
+    // Which refusal arrives is a race with the API's gateway synchronizer, which runs every
+    // GATEWAY_REFRESH_INTERVAL (10s): until it sweeps the completed assignment across into a real
+    // record the gateway still holds it and answers 409, and once it has, the record is deleted
+    // from the gateway by design and the link is a 404. Asserting 409 alone made this test fail
+    // whenever a sync tick landed in the window, so both terminal answers are accepted and the
+    // invariant that actually matters — the instrument is not re-served — is asserted directly.
     const revisitResponse = await gatewayPage.goto(assignmentUrl);
-    expect(revisitResponse?.status()).toBe(409);
-    await expect(gatewayPage.getByText('Assignment already completed')).toBeVisible();
+    const revisitStatus = revisitResponse?.status();
+    expect([404, 409]).toContain(revisitStatus);
+    await expect(gatewayPage.getByRole('button', { name: 'Begin' })).toBeHidden();
+    if (revisitStatus === 409) {
+      await expect(gatewayPage.getByText('Assignment already completed')).toBeVisible();
+    }
 
     await gatewayPage.close();
 

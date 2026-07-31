@@ -91,7 +91,7 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
 
 /** Sidebar destinations a GROUP_MANAGER gets but a STANDARD user must not. */
 // `/group/email-templates` is deliberately absent: its nav item only renders when mail is
-// enabled instance-wide, which it is not for this suite. `mail-delivery.spec.ts` covers it there.
+// enabled instance-wide, which it is not for this suite. `mail.spec.ts` covers it there.
 const GROUP_MANAGER_ONLY_ROUTES = ['/dashboard', '/datahub', '/group/manage', '/session/remote-assignment'] as const;
 
 /** Sidebar destinations behind `can('manage', 'all')`, gated to ADMIN alone. */
