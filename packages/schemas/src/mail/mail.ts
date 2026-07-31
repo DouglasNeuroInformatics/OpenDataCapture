@@ -10,9 +10,7 @@ import { $Language, $LocalizedString } from '../core/core.js';
  * - `starttls` — upgrade a plain connection to TLS via STARTTLS (typically port 587)
  * - `ssl`      — implicit TLS for the whole connection (typically port 465)
  */
-const MAIL_ENCRYPTION = ['none', 'starttls', 'ssl'] as const;
-
-const $MailEncryption = z.enum(MAIL_ENCRYPTION);
+const $MailEncryption = z.enum(['none', 'starttls', 'ssl']);
 
 const $Port = z.number().int().positive().max(65535);
 
@@ -22,21 +20,13 @@ const $Port = z.number().int().positive().max(65535);
  * to the browser.
  */
 const $MailConfig = z.object({
-  /** Master on/off switch. When false, the application behaves as if email did not exist. */
   enabled: z.boolean(),
-  /** SMTP connection security. */
   encryption: $MailEncryption,
-  /** Hostname or IP of the SMTP server (e.g. smtp.gmail.com). */
   host: z.string().min(1),
-  /** SMTP account password / app password. Secret; never sent to clients. */
   password: z.string(),
-  /** TCP port of the SMTP server. */
   port: $Port,
-  /** The "from" address that recipients will see. */
   senderAddress: z.email(),
-  /** Optional human-readable name shown alongside the sender address. */
   senderName: z.string().nullish(),
-  /** SMTP account username (often identical to the sender address). */
   username: z.string().min(1)
 });
 
@@ -56,6 +46,9 @@ const $MailConfigDto = $MailConfig.omit({ password: true }).extend({
 const $UpdateMailConfigData = $MailConfig.omit({ password: true }).extend({
   password: z.string().optional()
 });
+
+/** The fields that together identify which SMTP server a configuration points at. */
+type MailServerIdentity = Pick<z.infer<typeof $MailConfig>, 'encryption' | 'host' | 'port' | 'username'>;
 
 /**
  * An editable email template with per-language subject/body. Bodies may contain `{{variable}}`
@@ -98,36 +91,19 @@ const $TestMailData = z.object({
  * - `SENDER_REJECTED`       — the server refused the configured sender address
  * - `UNKNOWN`               — anything else, including timeouts
  */
-const MAIL_ERROR_CODE = [
+const $MailErrorCode = z.enum([
   'AUTHENTICATION_FAILED',
   'HOST_NOT_FOUND',
   'CONNECTION_REFUSED',
   'INSECURE_CONNECTION',
   'SENDER_REJECTED',
   'UNKNOWN'
-] as const;
-
-const $MailErrorCode = z.enum(MAIL_ERROR_CODE);
+]);
 
 const $TestMailResult = z.object({
   error: $MailErrorCode.nullish(),
   success: z.boolean()
 });
-
-/** Variables substituted into the new-user welcome template. */
-type NewUserEmailVariables = {
-  firstName: string;
-  group: string;
-  lastName: string;
-  url: string;
-  username: string;
-};
-
-/** Variables substituted into the remote-assignment email template. */
-type AssignmentEmailVariables = {
-  expiresAt: string;
-  url: string;
-};
 
 /**
  * The outcome of an attempt to deliver a feature email (e.g. the new-user welcome
@@ -138,17 +114,14 @@ type AssignmentEmailVariables = {
  * - `NO_RECIPIENT`  — mail is enabled but the record has no email address
  * - `DISABLED`      — mail is globally disabled (UI should ignore this silently)
  */
-const $EmailDeliveryStatus = z.enum(['SENT', 'FAILED', 'NO_RECIPIENT', 'DISABLED']);
-
 const $EmailDeliveryResult = z.object({
   error: $MailErrorCode.nullish(),
   message: z.string(),
   recipient: z.string().nullish(),
-  status: $EmailDeliveryStatus
+  status: z.enum(['SENT', 'FAILED', 'NO_RECIPIENT', 'DISABLED'])
 });
 
 const $SendAssignmentEmailData = z.object({
-  /** The language to send the email in. Defaults to English when omitted. */
   language: $Language.default('en'),
   recipient: z.email(),
   /**
@@ -246,15 +219,30 @@ function isMailEnabled(storedConfig: unknown): boolean {
   return result.success && result.data.enabled;
 }
 
+/**
+ * Whether two configurations address the same SMTP server.
+ *
+ * A blank password means "keep the stored one", so the secret never has to round-trip to the
+ * client. That inheritance is confined to the server the password belongs to: otherwise
+ * `POST /v1/mail/test` could aim an arbitrary host at the stored credential and read it back off
+ * the resulting SMTP AUTH. `encryption` counts as part of the server's identity — without it an
+ * admin could flip a configured host to `none` and have the test endpoint offer the stored
+ * password in the clear.
+ *
+ * `MailService` refuses such an update and the mail settings form asks for the password back;
+ * they share this predicate so the two cannot disagree about what "the same server" means.
+ */
+function isSameMailServer(a: MailServerIdentity, b: MailServerIdentity): boolean {
+  return a.host === b.host && a.username === b.username && a.port === b.port && a.encryption === b.encryption;
+}
+
 // ── Exports ──────────────────────────────────────────────────────────────────
 
-export type { AssignmentEmailVariables, NewUserEmailVariables };
 export type EmailDeliveryResult = z.infer<typeof $EmailDeliveryResult>;
-export type EmailDeliveryStatus = z.infer<typeof $EmailDeliveryStatus>;
 export type MailConfig = z.infer<typeof $MailConfig>;
 export type MailConfigDto = z.infer<typeof $MailConfigDto>;
-export type MailEncryption = (typeof MAIL_ENCRYPTION)[number];
-export type MailErrorCode = (typeof MAIL_ERROR_CODE)[number];
+export type MailEncryption = z.infer<typeof $MailEncryption>;
+export type MailErrorCode = z.infer<typeof $MailErrorCode>;
 export type MailSettings = z.infer<typeof $MailSettings>;
 export type MailTemplate = z.infer<typeof $MailTemplate>;
 export type SendAssignmentEmailData = z.infer<typeof $SendAssignmentEmailData>;
@@ -265,13 +253,10 @@ export type UpdateMailSettingsData = z.infer<typeof $UpdateMailSettingsData>;
 
 export {
   $EmailDeliveryResult,
-  $EmailDeliveryStatus,
   $MailConfig,
   $MailConfigDto,
   $MailEncryption,
-  $MailErrorCode,
   $MailSettings,
-  $MailTemplate,
   $SendAssignmentEmailData,
   $TestMailData,
   $TestMailResult,
@@ -280,6 +265,5 @@ export {
   DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE,
   DEFAULT_NEW_USER_EMAIL_TEMPLATE,
   isMailEnabled,
-  MAIL_ENCRYPTION,
-  MAIL_ERROR_CODE
+  isSameMailServer
 };

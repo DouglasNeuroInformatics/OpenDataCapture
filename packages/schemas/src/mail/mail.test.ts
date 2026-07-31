@@ -6,10 +6,13 @@ import {
   $UpdateMailConfigData,
   DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE,
   DEFAULT_NEW_USER_EMAIL_TEMPLATE,
-  isMailEnabled
+  isMailEnabled,
+  isSameMailServer
 } from './mail.js';
 
-const config = {
+import type { MailConfig } from './mail.js';
+
+const config: MailConfig = {
   enabled: true,
   encryption: 'starttls',
   host: 'smtp.example.org',
@@ -84,6 +87,24 @@ describe('isMailEnabled', () => {
   ])('should be false for a stored configuration with %s, even when enabled', (_label, value) => {
     expect(value.enabled).toBe(true);
     expect(isMailEnabled(value)).toBe(false);
+  });
+});
+
+// Both the API (which refuses the update) and the mail settings form (which asks for the password
+// back) branch on this, so a disagreement would let the stored secret reach an unintended server.
+describe('isSameMailServer', () => {
+  it('should be true when only non-identifying fields differ', () => {
+    const rebranded: MailConfig = { ...config, senderAddress: 'other@example.org', senderName: 'Other' };
+    expect(isSameMailServer(config, rebranded)).toBe(true);
+  });
+
+  it.each<[string, MailConfig]>([
+    ['host', { ...config, host: 'smtp.other.org' }],
+    ['username', { ...config, username: 'other' }],
+    ['port', { ...config, port: 2525 }],
+    ['encryption', { ...config, encryption: 'none' }]
+  ])('should be false when the %s differs, since it identifies the server holding the password', (_field, other) => {
+    expect(isSameMailServer(config, other)).toBe(false);
   });
 });
 
