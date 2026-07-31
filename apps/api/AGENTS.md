@@ -83,6 +83,14 @@ restriction**, which reads clinical data across every group. Nothing catches thi
 eslint, not a passing test suite. It is the single highest-severity mistake available in this
 codebase, so verify the `where` clause of any query you add or edit.
 
+The defined case has the opposite failure mode: **an ability holding no rule at all for the queried
+subject makes `accessibleQuery` throw CASL's `ForbiddenError`**, which is not an `HttpException`
+and so surfaces as a 500. This is reachable whenever a route's guard names one subject but the
+service queries another — a STANDARD user passes `read Instrument` yet holds no `read` rule on
+`InstrumentRecord`. That behaviour is deliberate and stays; where such a caller is legitimate,
+short-circuit before the query with `ability.can(action, subject)` and return the empty result —
+see `findInstrumentIdsBySubject` in `src/instruments/instruments.service.ts`.
+
 Granting a new `action`/`subject` pair means editing `src/auth/ability.factory.ts` and adding tests
 for **both** the allow and the deny case — see `src/auth/__tests__/ability.factory.test.ts`.
 
@@ -122,8 +130,8 @@ connection string is built at runtime in `src/core/prisma.ts`. Do not "fix" it.
 
 When `NODE_ENV=test`, `src/core/prisma.ts` starts an in-memory replica set
 (`mongodb-memory-server`), which is how `pnpm dev:test` and the Playwright suite get a database
-without external Mongo. Local development does need a real replica set — see the header comment in
-`docker-compose.dev.yaml`.
+without external Mongo. Local development does need a real replica set —
+`.agents/docs/playbooks/run-locally.md` starts and initiates one.
 
 Every model has `@@map("<Name>Model")`. libnest's Prisma extension adds `model.exists(where)` and a
 computed `__modelName` field, which is what CASL subject detection reads.

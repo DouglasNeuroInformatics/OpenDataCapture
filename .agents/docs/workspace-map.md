@@ -113,6 +113,7 @@ checkout is not — build its dependencies first.
 
 Five workspaces, determined at release time by `scripts/list-publishable.sh`: a package is
 publishable when it is **not private and declares `publishConfig`**. There is no hard-coded list.
+Cutting one: `.agents/docs/playbooks/cut-a-release.md`.
 
 `instrument-bundler`, `instrument-guidelines`, `playground-url`, `runtime-v1`, `serve-instrument` —
 all versioned together (`2.1.4` at time of writing, bumped by `scripts/increment-version.sh`; the

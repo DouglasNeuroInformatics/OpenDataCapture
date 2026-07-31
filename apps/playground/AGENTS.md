@@ -103,8 +103,8 @@ junk.
 ## Tests
 
 **There is no `apps/playground/vitest.config.ts`, so this app has no unit tests and no `test` script**
-— `pnpm exec vitest --project playground` will not match anything. Adding one means creating that
-config so the root `vitest.config.ts` project glob picks it up, and mocking anything that touches
+— `pnpm exec vitest --project playground` will not match anything. Adding one is
+`.agents/docs/playbooks/add-vitest-project.md`, plus mocking anything that touches
 esbuild-wasm, Monaco workers or `/runtime/v1`, none of which exist in a test environment.
 
 What coverage there is comes from Storybook: `*.stories.tsx` under `src/components/` are collected

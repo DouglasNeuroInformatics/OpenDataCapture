@@ -1,0 +1,3 @@
+interface:
+  display_name: 'ODC Debugging'
+  short_description: 'What actually breaks in Open Data Capture, keyed by symptom'

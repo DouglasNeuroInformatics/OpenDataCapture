@@ -1,0 +1,5 @@
+interface:
+  display_name: 'ODC Orientation'
+  short_description: 'The reading order for this repo, and every skill in one place'
+policy:
+  allow_implicit_invocation: false
