@@ -51,6 +51,9 @@ catalogs:
     '@tailwindcss/vite':
       specifier: 4.3.0
       version: 4.3.0
+    '@types/nodemailer':
+      specifier: ^7.0.5
+      version: 7.0.11
     axios:
       specifier: ^1.18.0
       version: 1.18.1
@@ -75,6 +78,9 @@ catalogs:
     neverthrow:
       specifier: ^8.2.0
       version: 8.2.0
+    nodemailer:
+      specifier: ^7.0.12
+      version: 7.0.13
     nodemon:
       specifier: ^3.1.9
       version: 3.1.14
@@ -321,7 +327,7 @@ importers:
         specifier: 'catalog:'
         version: 8.2.0
       nodemailer:
-        specifier: ^7.0.12
+        specifier: 'catalog:'
         version: 7.0.13
       passport:
         specifier: ^0.7.0
@@ -349,7 +355,7 @@ importers:
         specifier: ^5.0.0
         version: 5.0.6
       '@types/nodemailer':
-        specifier: ^7.0.5
+        specifier: 'catalog:'
         version: 7.0.11
       '@types/passport':
         specifier: ^1.0.17

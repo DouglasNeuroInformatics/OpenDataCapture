@@ -1,4 +1,3 @@
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -18,6 +17,7 @@ import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 import JSZip from 'jszip';
 
 import { accessibleQuery } from '@/auth/ability.utils';
+import { decryptSecret, encryptSecret } from '@/core/secret-cipher';
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
 
@@ -152,17 +152,13 @@ export class InstrumentReposService implements OnModuleInit {
     return this.stripSecrets(updated);
   }
 
-  /** Reverse {@link encrypt}. Returns undefined if the value cannot be decrypted. */
+  /**
+   * Reverse {@link encrypt}. Returns undefined if the value cannot be decrypted: a repository whose
+   * token is unreadable is still usable if it is public, so this stays recoverable rather than fatal.
+   */
   private decrypt(value: string): string | undefined {
     try {
-      const [ivB64, authTagB64, ciphertextB64] = value.split('.');
-      if (!ivB64 || !authTagB64 || !ciphertextB64) {
-        return undefined;
-      }
-      const decipher = createDecipheriv('aes-256-gcm', this.encryptionKey(), Buffer.from(ivB64, 'base64'));
-      decipher.setAuthTag(Buffer.from(authTagB64, 'base64'));
-      const plaintext = Buffer.concat([decipher.update(Buffer.from(ciphertextB64, 'base64')), decipher.final()]);
-      return plaintext.toString('utf8');
+      return decryptSecret(value, this.configService.getOrThrow('SECRET_KEY'));
     } catch (err) {
       this.loggingService.error(`Failed to decrypt stored access token: ${String(err)}`);
       return undefined;
@@ -242,19 +238,8 @@ export class InstrumentReposService implements OnModuleInit {
     throw new BadGatewayException(`Failed to download repository ${owner}/${repoName}. ${hint}`);
   }
 
-  /** Encrypt a secret with AES-256-GCM, returning `iv.authTag.ciphertext` (all base64). */
   private encrypt(plaintext: string): string {
-    const iv = randomBytes(12);
-    const cipher = createCipheriv('aes-256-gcm', this.encryptionKey(), iv);
-    const ciphertext = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
-    const authTag = cipher.getAuthTag();
-    return [iv.toString('base64'), authTag.toString('base64'), ciphertext.toString('base64')].join('.');
-  }
-
-  /** Derive a 32-byte AES key from the server SECRET_KEY. */
-  private encryptionKey(): Buffer {
-    const secret = this.configService.getOrThrow('SECRET_KEY');
-    return createHash('sha256').update(secret).digest();
+    return encryptSecret(plaintext, this.configService.getOrThrow('SECRET_KEY'));
   }
 
   // Unpack a GitHub zipball into `destDir`, returning the single top-level directory the archive wraps

@@ -4,7 +4,7 @@ import { $Group } from '../group/group.js';
 import { $User } from '../user/user.js';
 
 export type $AuditLogAction = z.infer<typeof $AuditLogAction>;
-export const $AuditLogAction = z.enum(['CREATE', 'UPDATE', 'DELETE', 'LOGIN']);
+export const $AuditLogAction = z.enum(['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'SEND_EMAIL']);
 
 export type $AuditLogEntity = z.infer<typeof $AuditLogEntity>;
 export const $AuditLogEntity = z.enum([

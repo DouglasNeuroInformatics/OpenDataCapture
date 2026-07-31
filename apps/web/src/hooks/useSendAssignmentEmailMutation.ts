@@ -1,4 +1,5 @@
-import type { EmailDeliveryResult, MailLanguage } from '@opendatacapture/schemas/mail';
+import type { Language } from '@opendatacapture/schemas/core';
+import { $EmailDeliveryResult } from '@opendatacapture/schemas/mail';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -11,15 +12,21 @@ export function useSendAssignmentEmailMutation() {
       templateId
     }: {
       assignmentId: string;
-      language: MailLanguage;
+      language: Language;
       recipient: string;
       templateId?: null | string;
     }) => {
-      const response = await axios.post<EmailDeliveryResult>(
+      // A slow SMTP host can take ~20s to fail server-side. Without opting out of the global 10s
+      // timeout the request aborts after the mail has already gone out, and a resend leaves the
+      // participant holding two assignment links.
+      const response = await axios.post(
         `/v1/assignments/${encodeURIComponent(assignmentId)}/email`,
-        { language, recipient, templateId }
+        { language, recipient, templateId },
+        { meta: { disableDefaultErrorNotification: true, disableDefaultTimeout: true }, timeout: 30_000 }
       );
-      return response.data;
-    }
+      return $EmailDeliveryResult.parseAsync(response.data);
+    },
+    // The caller renders its own failure message inline; escalating would replace the whole page.
+    throwOnError: false
   });
 }

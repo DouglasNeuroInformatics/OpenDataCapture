@@ -1,5 +1,6 @@
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
+import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -50,7 +51,9 @@ describe('UsersController', () => {
   describe('create', () => {
     beforeEach(() => {
       usersService.create.mockResolvedValue({ id: 'user-1', username: createUserData.username });
-      groupsService.findById.mockImplementation((id: string) => Promise.resolve({ id, name: `Name of ${id}` }));
+      groupsService.findById.mockImplementation((id: string, _options?: unknown) =>
+        Promise.resolve({ id, name: `Name of ${id}` })
+      );
       mailService.sendNewUserEmail.mockResolvedValue({
         message: 'rendered',
         recipient: createUserData.email,
@@ -69,10 +72,14 @@ describe('UsersController', () => {
       await usersController.create(createUserData, ability, 'https://odc.example.org');
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({
         email: createUserData.email,
-        password: createUserData.password,
         url: 'https://odc.example.org/auth/login',
         username: createUserData.username
       });
+    });
+
+    it('never hands the password to the welcome email', async () => {
+      await usersController.create(createUserData, ability, 'https://odc.example.org');
+      expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).not.toHaveProperty('password');
     });
 
     it('sends an empty url when the origin header is absent', async () => {
@@ -80,13 +87,12 @@ describe('UsersController', () => {
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ url: '' });
     });
 
+    // The controller forwards whatever was asked for and leaves the default to the mail service.
     it('passes the language query param through to sendNewUserEmail', async () => {
       await usersController.create(createUserData, ability);
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ language: undefined });
       await usersController.create(createUserData, ability, undefined, 'fr');
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ language: 'fr' });
-      await usersController.create(createUserData, ability, undefined, 'es');
-      expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ language: 'es' });
     });
 
     it('joins the names of the resolved groups', async () => {
@@ -96,12 +102,27 @@ describe('UsersController', () => {
       });
     });
 
-    it('omits groups that cannot be resolved', async () => {
+    // Without this, dropping `{ ability }` from the service calls would leave every other test
+    // green while the lookups silently read across every group.
+    it('scopes both the create and the group lookups to the caller ability', async () => {
+      await usersController.create(createUserData, ability);
+      expect(usersService.create).toHaveBeenCalledWith(createUserData, { ability });
+      expect(groupsService.findById).toHaveBeenCalledWith('group-1', { ability });
+      expect(groupsService.findById).toHaveBeenCalledWith('group-2', { ability });
+    });
+
+    it('omits groups the creator cannot read', async () => {
       groupsService.findById.mockImplementation((id: string) =>
-        id === 'group-1' ? Promise.reject(new Error('Forbidden')) : Promise.resolve({ id, name: `Name of ${id}` })
+        id === 'group-1' ? Promise.reject(new NotFoundException()) : Promise.resolve({ id, name: `Name of ${id}` })
       );
       await usersController.create(createUserData, ability);
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ group: 'Name of group-2' });
+    });
+
+    it('propagates a group lookup failure that is not a permission denial', async () => {
+      groupsService.findById.mockRejectedValue(new Error('connection lost'));
+      await expect(usersController.create(createUserData, ability)).rejects.toThrow('connection lost');
+      expect(mailService.sendNewUserEmail).not.toHaveBeenCalled();
     });
 
     it('passes an empty group name when the user has no groups', async () => {

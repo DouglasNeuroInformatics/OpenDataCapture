@@ -2,15 +2,18 @@ import { CurrentUser } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
 import { DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
 import type { EmailDeliveryResult, MailTemplate } from '@opendatacapture/schemas/mail';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import type { AppAbility } from '@/auth/auth.types';
+import { ASSIGNMENT_EMAIL_THROTTLER_LIMIT, ASSIGNMENT_EMAIL_THROTTLER_TTL } from '@/core/constants';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import { GroupsService } from '@/groups/groups.service';
 import { MailService } from '@/mail/mail.service';
-import { pickLocale } from '@/mail/mail.utils';
+import { formatExpiryDate, pickLocale } from '@/mail/mail.utils';
 
 import { AssignmentsService } from './assignments.service';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
@@ -21,6 +24,7 @@ import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 export class AssignmentsController {
   constructor(
     private readonly assignmentsService: AssignmentsService,
+    private readonly auditLogger: AuditLogger,
     private readonly groupsService: GroupsService,
     private readonly mailService: MailService
   ) {}
@@ -42,11 +46,15 @@ export class AssignmentsController {
   @ApiOperation({ summary: 'Email Assignment Link' })
   @Post(':id/email')
   @RouteAccess({ action: 'update', subject: 'Assignment' })
+  // This route makes the instance's mail identity deliver a live assignment credential to a
+  // caller-supplied address, so it is bounded independently of the global default.
+  @Throttle({ long: { limit: ASSIGNMENT_EMAIL_THROTTLER_LIMIT, ttl: ASSIGNMENT_EMAIL_THROTTLER_TTL } })
   async sendEmail(
     @Param('id') id: string,
     @Body() { language, recipient, templateId }: SendAssignmentEmailDto,
-    @CurrentUser('ability') ability: AppAbility
+    @CurrentUser() currentUser: RequestUser
   ): Promise<EmailDeliveryResult> {
+    const { ability } = currentUser;
     const assignment = await this.assignmentsService.findById(id, { ability });
     // Choose the requested template if given, else the group's active one; either way falling back
     // to the built-in default when the id resolves to nothing (e.g. null selects the default).
@@ -54,20 +62,23 @@ export class AssignmentsController {
     if (assignment.groupId) {
       const group = await this.groupsService.findById(assignment.groupId, { ability });
       const targetId = templateId === undefined ? group.activeAssignmentEmailTemplateId : templateId;
-      const chosen = group.emailTemplates?.find(
-        ({ category, id }) => category === 'REMOTE_ASSIGNMENT' && id === targetId
-      );
-      if (chosen?.body && chosen?.subject) {
+      const chosen = group.emailTemplates?.find(({ id }) => id === targetId);
+      if (chosen?.body && chosen.subject) {
         template = { body: chosen.body, subject: chosen.subject };
       }
     }
-    return this.mailService.sendAssignmentEmail({
+    const result = await this.mailService.sendAssignmentEmail({
       body: pickLocale(template.body, language),
-      expiresAt: new Date(assignment.expiresAt).toISOString().slice(0, 10),
+      expiresAt: formatExpiryDate(assignment.expiresAt, language),
       recipient,
       subject: pickLocale(template.subject, language),
       url: `${assignment.url}?lang=${language}`
     });
+    await this.auditLogger.log('SEND_EMAIL', 'ASSIGNMENT', {
+      groupId: assignment.groupId ?? null,
+      userId: currentUser.id
+    });
+    return result;
   }
 
   @ApiOperation({ summary: 'Update Assignment' })

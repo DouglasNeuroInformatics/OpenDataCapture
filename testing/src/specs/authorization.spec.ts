@@ -73,10 +73,25 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
     screen: '/admin/audit/logs',
     send: (request, { headers }) => request.get(`${API}/audit/logs`, { headers }),
     what: 'read the audit log'
+  },
+  {
+    // The response omits the password, but the host, username and sender address are still the
+    // institution's outbound mail identity.
+    screen: '/admin/mail',
+    send: (request, { headers }) => request.get(`${API}/mail/settings`, { headers }),
+    what: 'read the mail configuration'
+  },
+  {
+    screen: '/admin/mail',
+    send: (request, { headers }) =>
+      request.patch(`${API}/mail/settings`, { data: { newUserEmailTemplate: { body: {}, subject: {} } }, headers }),
+    what: 'rewrite the mail configuration or templates'
   }
 ];
 
 /** Sidebar destinations a GROUP_MANAGER gets but a STANDARD user must not. */
+// `/group/email-templates` is deliberately absent: its nav item only renders when mail is
+// enabled instance-wide, which it is not for this suite. `mail-delivery.spec.ts` covers it there.
 const GROUP_MANAGER_ONLY_ROUTES = ['/dashboard', '/datahub', '/group/manage', '/session/remote-assignment'] as const;
 
 /** Sidebar destinations behind `can('manage', 'all')`, gated to ADMIN alone. */
@@ -86,7 +101,9 @@ const ADMIN_ONLY_ROUTES = [
   '/admin/settings',
   '/admin/branding',
   '/admin/instrument-repos',
-  '/admin/audit/logs'
+  '/admin/audit/logs',
+  // Only asserted negatively (hidden from non-admins), which holds whether or not mail is on.
+  '/admin/mail'
 ] as const;
 
 /** Routes with no role gating at all -- reachable by every authenticated role. */

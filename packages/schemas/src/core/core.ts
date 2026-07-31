@@ -36,6 +36,20 @@ export const $Permissions = z.array($UserPermission);
 
 export const $Language: z.ZodType<Language> = z.enum(['en', 'fr']);
 
+/**
+ * A string authored in each of the application's languages. Every field is nullish so content
+ * may target a single language, and nullish rather than optional to match Prisma's
+ * null-for-absent convention.
+ *
+ * The `satisfies` is what keeps this in step with {@link Language}: the shape must name every
+ * language, so adding one to `Language` fails to compile until it is added here too.
+ */
+export type LocalizedString = z.infer<typeof $LocalizedString>;
+export const $LocalizedString = z.object({
+  en: z.string().nullish(),
+  fr: z.string().nullish()
+} satisfies { [L in Language]: z.ZodType<null | string | undefined> });
+
 export type BaseModel = z.infer<typeof $BaseModel>;
 export const $BaseModel = z.object({
   createdAt: z.coerce.date(),

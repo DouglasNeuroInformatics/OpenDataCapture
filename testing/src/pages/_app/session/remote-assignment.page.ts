@@ -43,7 +43,7 @@ export class RemoteAssignmentPage extends AppPage {
   }
 
   async submitAssignmentForm() {
-    const submitButton = this.createDialog.getByRole('button', { name: 'Submit' });
+    const submitButton = this.createDialog.getByLabel('Submit');
     await submitButton.waitFor({ state: 'visible' });
     await submitButton.click();
   }

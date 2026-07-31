@@ -1,8 +1,9 @@
-import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { MailLanguage } from '@opendatacapture/schemas/mail';
+import { $Language } from '@opendatacapture/schemas/core';
+import type { Language } from '@opendatacapture/schemas/core';
 import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
 
 import type { AppAbility } from '@/auth/auth.types';
@@ -37,7 +38,7 @@ export class UsersController {
     @Body() user: CreateUserDto,
     @CurrentUser('ability') ability: AppAbility,
     @Headers('origin') origin?: string,
-    @Query('language') language?: MailLanguage
+    @Query('language', new ParseSchemaPipe({ schema: $Language.optional() })) language?: Language
   ) {
     const created = await this.usersService.create(user, { ability });
     // Attempt to send the welcome email. The result is always returned (even when
@@ -49,7 +50,6 @@ export class UsersController {
       group: await this.resolveGroupNames(user.groupIds, ability),
       language,
       lastName: user.lastName,
-      password: user.password,
       url: origin ? `${origin}/auth/login` : '',
       username: user.username
     });
@@ -96,13 +96,24 @@ export class UsersController {
     return this.usersService.updateSelfById(id, update, currentUser);
   }
 
-  /** Resolve accessible group names for the welcome-email `{{group}}` variable. */
+  /**
+   * Resolve accessible group names for the welcome-email `{{group}}` variable. A group the
+   * creator cannot read is omitted from the list; every other failure propagates, so a database
+   * fault surfaces instead of silently rendering an email with no groups in it.
+   */
   private async resolveGroupNames(groupIds: string[], ability: AppAbility): Promise<string> {
     if (!groupIds.length) {
       return '';
     }
     const groups = await Promise.all(
-      groupIds.map((id) => this.groupsService.findById(id, { ability }).catch(() => null))
+      groupIds.map((id) =>
+        this.groupsService.findById(id, { ability }).catch((err) => {
+          if (err instanceof NotFoundException) {
+            return null;
+          }
+          throw err;
+        })
+      )
     );
     return groups
       .filter((group): group is NonNullable<typeof group> => group !== null)

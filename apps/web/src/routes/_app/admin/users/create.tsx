@@ -5,19 +5,19 @@ import React from 'react';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Button, CopyButton, Dialog, Form, Heading, Label, Select } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { $MailLanguage } from '@opendatacapture/schemas/mail';
-import type { MailLanguage } from '@opendatacapture/schemas/mail';
+import type { Language } from '@opendatacapture/schemas/core';
 import { $BasePermissionLevel, $CreateUserData, PASSWORD_ERROR_CODES } from '@opendatacapture/schemas/user';
 import type { CreateUserData, PasswordErrorCode } from '@opendatacapture/schemas/user';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios, { isAxiosError } from 'axios';
 import { z } from 'zod/v4';
 
+import { LANGUAGE_LABELS, LANGUAGES } from '@/components/EmailTemplateEditor';
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
+import { useMailErrorMessage } from '@/hooks/useMailErrorMessage';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
-import { ALL_LANGUAGES } from '@/utils/languages';
 import { $Email, $PhoneNumber, omittedIfBlank } from '@/utils/validation';
 
 const PASSWORD_ERROR_TRANSLATION_KEYS = {
@@ -40,14 +40,12 @@ const RouteComponent = () => {
   const createUserMutation = useCreateUserMutation();
   const notification = useNotificationsStore();
   const setupStateQuery = useSetupStateQuery();
+  const mailErrorMessage = useMailErrorMessage();
 
   // When the welcome email cannot be delivered, we surface its rendered text here so
   // the admin can copy it and send it manually. Navigation is deferred until dismissed.
   const [fallbackMessage, setFallbackMessage] = React.useState<null | string>(null);
-  const activeLanguages = setupStateQuery.data.activeLanguages ?? ['en', 'fr'];
-  const [emailLanguage, setEmailLanguage] = React.useState<MailLanguage>(() =>
-    $MailLanguage.parse(activeLanguages.includes(resolvedLanguage) ? resolvedLanguage : (activeLanguages[0] ?? 'en'))
-  );
+  const [emailLanguage, setEmailLanguage] = React.useState<Language>(resolvedLanguage);
 
   const handleSubmit = async (data: CreateUserData) => {
     // check if username exists
@@ -108,12 +106,7 @@ const RouteComponent = () => {
       if (welcomeEmail.status === 'FAILED' || welcomeEmail.status === 'NO_RECIPIENT') {
         if (welcomeEmail.status === 'FAILED') {
           notification.addNotification({
-            message:
-              welcomeEmail.error ??
-              t({
-                en: 'The welcome email could not be sent',
-                fr: "Le courriel de bienvenue n'a pas pu être envoyé"
-              }),
+            message: mailErrorMessage(welcomeEmail.error),
             title: t({
               en: 'Welcome email failed',
               fr: 'Échec du courriel de bienvenue'
@@ -147,15 +140,15 @@ const RouteComponent = () => {
               fr: 'Langue du courriel de bienvenue'
             })}
           </Label>
-          <Select value={emailLanguage} onValueChange={(v) => setEmailLanguage($MailLanguage.parse(v))}>
-            <Select.Trigger className="w-[180px]">
+          <Select value={emailLanguage} onValueChange={(value) => setEmailLanguage(value as Language)}>
+            <Select.Trigger className="w-[180px]" data-testid="welcome-email-language">
               <Select.Value />
             </Select.Trigger>
             <Select.Content>
               <Select.Group>
-                {activeLanguages.map((code) => (
+                {LANGUAGES.map((code) => (
                   <Select.Item key={code} value={code}>
-                    {ALL_LANGUAGES[code] ?? code}
+                    {t(LANGUAGE_LABELS[code])}
                   </Select.Item>
                 ))}
               </Select.Group>

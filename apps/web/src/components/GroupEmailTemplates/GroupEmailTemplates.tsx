@@ -1,270 +1,145 @@
 import React from 'react';
 
-import { Button, Dialog, Heading, Input, Label, Select, TextArea } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog, Heading, Input, Label } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { $Group } from '@opendatacapture/schemas/group';
-import type { GroupEmailTemplate, GroupEmailTemplateCategory } from '@opendatacapture/schemas/group';
-import { checkTemplateIssue, DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
-import type { LocalizedString, TemplateIssue } from '@opendatacapture/schemas/mail';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import type { LocalizedString } from '@opendatacapture/schemas/core';
+import type { GroupEmailTemplate } from '@opendatacapture/schemas/group';
+import { DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
+import type { MailTemplate } from '@opendatacapture/schemas/mail';
+import { useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { EyeIcon, PencilIcon, Trash2Icon } from 'lucide-react';
 
-import { SaveStatus } from '@/components/SaveStatus';
-import { SegmentedControl } from '@/components/SegmentedControl';
-import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
+import { EmailTemplateEditor, LANGUAGE_LABELS, LANGUAGES } from '@/components/EmailTemplateEditor';
+import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
-import { ALL_LANGUAGES } from '@/utils/languages';
+import { checkTemplateIssue } from '@/utils/email-template';
+import type { TemplateIssue } from '@/utils/email-template';
 
-type ActiveIds = { assignment: null | string; information: null | string };
+const ASSIGNMENT_VARS = ['url', 'expiresAt'] as const;
 
-const AVAILABLE_VARS: { [K in GroupEmailTemplateCategory]: string[] } = {
-  INFORMATION: [],
-  REMOTE_ASSIGNMENT: ['url', 'expiresAt']
-};
+const emptyTemplate = (): MailTemplate => ({ body: {}, subject: {} });
 
-const templateIssue = (
-  category: GroupEmailTemplateCategory,
-  subject: LocalizedString,
-  body: LocalizedString,
-  languages?: string[]
-): TemplateIssue => checkTemplateIssue(subject, body, AVAILABLE_VARS[category], languages);
+const cleanLocalized = (value: LocalizedString | null | undefined): LocalizedString =>
+  Object.fromEntries(Object.entries(value ?? {}).filter(([, text]) => text));
 
-const templateErrorMessage = (
-  t: (value: { en: string; es?: string; fr: string }) => string,
-  issue: TemplateIssue
-): string | undefined => {
-  if (issue === 'incomplete') {
-    return t({
-      en: 'Fill in the subject and body in each language.',
-      fr: "Remplissez l'objet et le corps dans chaque langue."
-    });
-  }
-  if (issue === 'missing-vars') {
-    return t({
-      en: 'Remote assignment templates must include {{url}} and {{expiresAt}}.',
-      fr: "Les modèles d'évaluation à distance doivent inclure {{url}} et {{expiresAt}}."
-    });
-  }
-  return undefined;
-};
+/** The languages a template has any body text in; used to scope validation to what was authored. */
+const authoredLanguages = (body: LocalizedString): string[] =>
+  LANGUAGES.filter((code) => body[code]?.trim()).map(String);
 
 const EmptyState = ({ children }: { children: React.ReactNode }) => (
-  <div className="text-muted-foreground rounded-md border border-dashed border-slate-200/80 p-3 text-sm dark:border-slate-700/80">
-    {children}
-  </div>
+  <div className="text-muted-foreground border-border rounded-md border border-dashed p-3 text-sm">{children}</div>
 );
 
-function getTemplateLangs(body: LocalizedString | null | undefined, fallback: string): string[] {
-  if (!body) return [fallback];
-  const langs = (Object.keys(body) as (keyof LocalizedString)[]).filter((k) => body[k] != null);
-  return langs.length > 0 ? langs : [fallback];
-}
-
-const cleanLocalized = (obj: LocalizedString | null | undefined): LocalizedString =>
-  Object.fromEntries(Object.entries(obj ?? {}).filter(([, v]) => v));
-
-const TemplateFields = ({
-  activeLanguages,
-  body,
-  category,
-  categoryLabel,
-  error,
-  name,
-  setBody,
-  setCategory,
-  setName,
-  setSubject,
-  subject
+const ViewDefaultTemplateDialog = ({
+  onOpenChange,
+  open
 }: {
-  activeLanguages: string[];
-  body: LocalizedString;
-  category: GroupEmailTemplateCategory;
-  categoryLabel: (value: GroupEmailTemplateCategory) => string;
-  error?: string;
-  name: string;
-  setBody: (value: LocalizedString) => void;
-  setCategory: (value: GroupEmailTemplateCategory) => void;
-  setName: (value: string) => void;
-  setSubject: (value: LocalizedString) => void;
-  subject: LocalizedString;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
 }) => {
-  const { resolvedLanguage, t } = useTranslation();
-  const [lang, setLang] = React.useState<string>(
-    activeLanguages.includes(resolvedLanguage) ? resolvedLanguage : activeLanguages[0]!
-  );
-  const bodyCursorRef = React.useRef<null | { end: number; start: number }>(null);
-
-  const currentBody = body[lang as keyof LocalizedString] ?? '';
-  const currentSubject = subject[lang as keyof LocalizedString] ?? '';
-
+  const { t } = useTranslation();
   return (
-    <React.Fragment>
-      <div className="flex flex-col gap-1.5">
-        <Label>{t({ en: 'Category', fr: 'Catégorie' })}</Label>
-        <SegmentedControl<GroupEmailTemplateCategory>
-          className="w-full max-w-md"
-          options={[
-            { label: categoryLabel('REMOTE_ASSIGNMENT'), value: 'REMOTE_ASSIGNMENT' },
-            { label: categoryLabel('INFORMATION'), value: 'INFORMATION' }
-          ]}
-          value={category}
-          onChange={setCategory}
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog.Content className="max-w-lg">
+        <Dialog.Header>
+          <Dialog.Title>{t({ en: 'Built-in default template', fr: 'Modèle par défaut intégré' })}</Dialog.Title>
+          <Dialog.Description>
+            {t({
+              en: 'This is the message sent for remote assignments when no custom template is active.',
+              fr: "Il s'agit du message envoyé pour les évaluations à distance lorsqu'aucun modèle personnalisé n'est actif."
+            })}
+          </Dialog.Description>
+        </Dialog.Header>
+        <EmailTemplateEditor
+          readOnly
+          idPrefix="template-builtin"
+          template={DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE}
+          onChange={() => undefined}
         />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="tpl-name">{t({ en: 'Name', fr: 'Nom' })}</Label>
-        <Input id="tpl-name" value={name} onChange={(event) => setName(event.target.value)} />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label>{t({ en: 'Language', fr: 'Langue' })}</Label>
-        <Select value={lang} onValueChange={setLang}>
-          <Select.Trigger className="w-[180px] border-sky-700 bg-sky-700 text-white hover:bg-sky-800 dark:border-sky-700 dark:bg-sky-700 dark:text-white dark:hover:bg-sky-800">
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content>
-            <Select.Group>
-              {activeLanguages.map((code) => (
-                <Select.Item key={code} value={code}>
-                  {ALL_LANGUAGES[code] ?? code}
-                </Select.Item>
-              ))}
-            </Select.Group>
-          </Select.Content>
-        </Select>
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="tpl-subject">{t({ en: 'Subject', fr: 'Objet' })}</Label>
-        <Input
-          id="tpl-subject"
-          value={currentSubject}
-          onChange={(event) => setSubject({ ...subject, [lang]: event.target.value })}
-        />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <Label htmlFor="tpl-body">{t({ en: 'Body', fr: 'Corps' })}</Label>
-          {AVAILABLE_VARS[category].length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-muted-foreground text-xs">{t({ en: 'Insert:', fr: 'Insérer :' })}</span>
-              {AVAILABLE_VARS[category].map((variable) => {
-                const tag = `{{${variable}}}`;
-                return (
-                  <Button
-                    className="h-6 px-2 font-mono text-xs"
-                    key={variable}
-                    size="sm"
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      const cursor = bodyCursorRef.current;
-                      if (cursor === null) {
-                        setBody({ ...body, [lang]: currentBody.length > 0 ? `${currentBody} ${tag}` : tag });
-                      } else {
-                        const next = currentBody.slice(0, cursor.start) + tag + currentBody.slice(cursor.end);
-                        bodyCursorRef.current = { end: cursor.start + tag.length, start: cursor.start + tag.length };
-                        setBody({ ...body, [lang]: next });
-                      }
-                    }}
-                  >
-                    {tag}
-                  </Button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-        <TextArea
-          id="tpl-body"
-          rows={8}
-          value={currentBody}
-          onBlur={(event) => {
-            const el = event.currentTarget;
-            bodyCursorRef.current = { end: el.selectionEnd, start: el.selectionStart };
-          }}
-          onChange={(event) => setBody({ ...body, [lang]: event.target.value })}
-        />
-        {error && <p className="text-destructive text-xs font-medium">{error}</p>}
-      </div>
-    </React.Fragment>
+        <Dialog.Footer>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            {t('core.close')}
+          </Button>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog>
   );
 };
 
 const EditTemplateForm = ({
-  activeLanguages,
-  categoryLabel,
-  existingTemplates,
+  isDuplicateName,
   isPending,
   onCancel,
   onSave,
-  template
+  template,
+  validate
 }: {
-  activeLanguages: string[];
-  categoryLabel: (value: GroupEmailTemplateCategory) => string;
-  existingTemplates: GroupEmailTemplate[];
+  isDuplicateName: (name: string) => boolean;
   isPending: boolean;
   onCancel: () => void;
-  onSave: (template: GroupEmailTemplate) => Promise<void> | void;
+  onSave: (template: GroupEmailTemplate) => Promise<void>;
   template: GroupEmailTemplate;
+  validate: (template: MailTemplate) => string | undefined;
 }) => {
   const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
-  const [category, setCategory] = React.useState(template.category);
   const [name, setName] = React.useState(template.name);
-  const [subject, setSubject] = React.useState<LocalizedString>(template.subject ?? {});
-  const [body, setBody] = React.useState<LocalizedString>(template.body ?? {});
-
-  const templateLangs = getTemplateLangs(body, activeLanguages[0]!);
-  const bodyError = templateErrorMessage(t, templateIssue(category, subject, body, templateLangs));
-
-  const duplicateNameMessage = t({
-    en: 'A template with this name already exists',
-    fr: 'Un modèle avec ce nom existe déjà'
+  const [draft, setDraft] = React.useState<MailTemplate>({
+    body: template.body ?? {},
+    subject: template.subject ?? {}
   });
+
+  const error = validate(draft);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!name.trim()) {
+      addNotification({ message: t({ en: 'A name is required', fr: 'Un nom est requis' }), type: 'error' });
+      return;
+    }
+    if (isDuplicateName(name)) {
       addNotification({
-        message: t({ en: 'A name is required', fr: 'Un nom est requis' }),
+        message: t({ en: 'A template with this name already exists', fr: 'Un modèle avec ce nom existe déjà' }),
         type: 'error'
       });
       return;
     }
-    const isDuplicate = existingTemplates.some(
-      (tpl) => tpl.id !== template.id && tpl.name.toLowerCase() === name.trim().toLowerCase()
-    );
-    if (isDuplicate) {
-      addNotification({ message: duplicateNameMessage, type: 'error' });
+    if (error) {
       return;
     }
-    if (bodyError) {
-      return;
-    }
-    void onSave({ ...template, body, category, name: name.trim(), subject });
+    void onSave({ ...template, ...draft, name: name.trim() });
   };
 
   return (
     <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-      <TemplateFields
-        activeLanguages={activeLanguages}
-        body={body}
-        category={category}
-        categoryLabel={categoryLabel}
-        error={bodyError}
-        name={name}
-        setBody={setBody}
-        setCategory={setCategory}
-        setName={setName}
-        setSubject={setSubject}
-        subject={subject}
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="template-edit-name">{t({ en: 'Name', fr: 'Nom' })}</Label>
+        <Input
+          data-testid="template-edit-name"
+          id="template-edit-name"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
+      </div>
+      <EmailTemplateEditor
+        error={error}
+        idPrefix="template-edit"
+        template={draft}
+        variables={ASSIGNMENT_VARS}
+        onChange={setDraft}
       />
       <Dialog.Footer>
         <Button className="flex-1" type="button" variant="outline" onClick={onCancel}>
           {t('core.cancel')}
         </Button>
-        <Button className="flex-1" disabled={isPending || Boolean(bodyError)} type="submit">
+        <Button
+          className="flex-1"
+          data-testid="template-edit-save"
+          disabled={isPending || Boolean(error)}
+          type="submit"
+        >
           {t('core.save')}
         </Button>
       </Dialog.Footer>
@@ -273,111 +148,130 @@ const EditTemplateForm = ({
 };
 
 export const GroupEmailTemplates = () => {
-  const { resolvedLanguage, t } = useTranslation();
+  const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const currentGroup = useAppStore((store) => store.currentGroup);
   const groupId = currentGroup?.id;
   const queryClient = useQueryClient();
-  const updateGroupMutation = useUpdateGroupMutation();
-  const setupStateQuery = useSetupStateQuery();
-  const activeLanguages = setupStateQuery.data.activeLanguages ?? ['en', 'fr'];
+  // A conflict has to be recoverable in place, so it must not reach the router error boundary.
+  const updateGroupMutation = useUpdateGroupMutation({ successNotification: false, throwOnError: false });
+  const groupQuery = useGroupQuery(groupId);
 
-  const [saveState, setSaveState] = React.useState<'idle' | 'saved' | 'saving'>('idle');
-  const saveTimerRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
-  React.useEffect(() => {
-    if (updateGroupMutation.isPending) {
-      setSaveState('saving');
-    } else if (updateGroupMutation.isSuccess) {
-      setSaveState('saved');
-      clearTimeout(saveTimerRef.current);
-      saveTimerRef.current = setTimeout(() => setSaveState('idle'), 2000);
-    }
-  }, [updateGroupMutation.isPending, updateGroupMutation.isSuccess]);
+  const group = groupQuery.data;
+  const templates = group?.emailTemplates ?? [];
+  const activeId = group?.activeAssignmentEmailTemplateId ?? null;
 
-  const groupQuery = useQuery({
-    enabled: Boolean(groupId),
-    queryFn: async () => $Group.parseAsync((await axios.get(`/v1/groups/${groupId}`)).data),
-    queryKey: ['group', groupId]
-  });
-
-  const templates = groupQuery.data?.emailTemplates ?? [];
-  const activeIds: ActiveIds = {
-    assignment: groupQuery.data?.activeAssignmentEmailTemplateId ?? null,
-    information: groupQuery.data?.activeInformationTemplateId ?? null
-  };
-
-  const firstLang = activeLanguages.includes(resolvedLanguage) ? resolvedLanguage : activeLanguages[0]!;
-  const [category, setCategory] = React.useState<GroupEmailTemplateCategory>('REMOTE_ASSIGNMENT');
   const [name, setName] = React.useState('');
-  const [subject, setSubject] = React.useState<LocalizedString>({ [firstLang]: '' } as LocalizedString);
-  const [body, setBody] = React.useState<LocalizedString>({ [firstLang]: '' } as LocalizedString);
-
+  const [draft, setDraft] = React.useState<MailTemplate>(emptyTemplate);
   const [editing, setEditing] = React.useState<GroupEmailTemplate | null>(null);
+  const [deleting, setDeleting] = React.useState<GroupEmailTemplate | null>(null);
   const [viewingDefault, setViewingDefault] = React.useState(false);
   const [confirmCreate, setConfirmCreate] = React.useState(false);
+  const createFormRef = React.useRef<HTMLFormElement>(null);
 
-  const categoryLabel = (value: GroupEmailTemplateCategory) =>
-    value === 'REMOTE_ASSIGNMENT'
-      ? t({ en: 'Remote assignment', fr: 'Évaluation à distance' })
-      : t({ en: 'Information', fr: 'Information' });
-
-  const activeIdFor = (value: GroupEmailTemplateCategory) =>
-    value === 'REMOTE_ASSIGNMENT' ? activeIds.assignment : activeIds.information;
-
-  const persist = async (next: GroupEmailTemplate[], actives: ActiveIds) => {
-    const cleaned = next.map((tpl) => ({
-      ...tpl,
-      body: cleanLocalized(tpl.body),
-      subject: cleanLocalized(tpl.subject)
-    }));
-    await updateGroupMutation.mutateAsync({
-      activeAssignmentEmailTemplateId: actives.assignment,
-      activeInformationTemplateId: actives.information,
-      emailTemplates: cleaned
-    });
-    await queryClient.invalidateQueries({ queryKey: ['group', groupId] });
+  const templateError = (issue: TemplateIssue): string | undefined => {
+    if (issue === 'incomplete') {
+      return t({
+        en: 'Fill in the subject and body in each language you have started.',
+        fr: "Remplissez l'objet et le corps dans chaque langue commencée."
+      });
+    }
+    if (issue === 'missing-vars') {
+      return t({
+        en: 'The body must include {{url}} and {{expiresAt}}.',
+        fr: 'Le corps doit inclure {{url}} et {{expiresAt}}.'
+      });
+    }
+    return undefined;
   };
 
-  const createTemplateLangs = getTemplateLangs(body, firstLang);
+  const validate = (template: MailTemplate): string | undefined =>
+    templateError(
+      checkTemplateIssue(template.subject, template.body, ASSIGNMENT_VARS, authoredLanguages(template.body))
+    );
+
+  /**
+   * Replace the group's whole template list. `expectedUpdatedAt` pins the revision this edit was
+   * composed against, so a concurrent edit by another manager is rejected rather than overwritten.
+   */
+  const persist = async (next: GroupEmailTemplate[], nextActiveId: null | string): Promise<boolean> => {
+    if (!group) {
+      return false;
+    }
+    try {
+      const updated = await updateGroupMutation.mutateAsync({
+        activeAssignmentEmailTemplateId: nextActiveId,
+        emailTemplates: next.map((template) => ({
+          ...template,
+          body: cleanLocalized(template.body),
+          subject: cleanLocalized(template.subject)
+        })),
+        expectedUpdatedAt: group.updatedAt
+      });
+      // Seed the cache from the response rather than invalidating. Every write moves `updatedAt`,
+      // so waiting on a refetch would leave the next edit composed against the previous revision —
+      // which the server then rejects as a conflict with this client's own change.
+      queryClient.setQueryData(groupQueryOptions(groupId).queryKey, updated);
+      addNotification({ type: 'success' });
+      return true;
+    } catch (err) {
+      const isConflict = isAxiosError(err) && err.response?.status === 409;
+      addNotification({
+        message: isConflict
+          ? t({
+              en: 'Someone else changed these templates while you were editing. Your changes were not saved — reload the page and try again.',
+              fr: "Quelqu'un d'autre a modifié ces modèles pendant votre édition. Vos modifications n'ont pas été enregistrées — rechargez la page et réessayez."
+            })
+          : t({
+              en: 'Your changes were not saved. Check your connection and try again.',
+              fr: "Vos modifications n'ont pas été enregistrées. Vérifiez votre connexion et réessayez."
+            }),
+        title: t({ en: 'Save failed', fr: "Échec de l'enregistrement" }),
+        type: 'error'
+      });
+      if (isConflict) {
+        await queryClient.invalidateQueries({ queryKey: groupQueryOptions(groupId).queryKey });
+      }
+      return false;
+    }
+  };
+
+  const isDuplicateName = (candidate: string, exceptId?: string) =>
+    templates.some(
+      (template) => template.id !== exceptId && template.name.toLowerCase() === candidate.trim().toLowerCase()
+    );
 
   const doCreate = async () => {
     const id = crypto.randomUUID();
-    const next = [...templates, { body, category, id, name: name.trim(), subject }];
-    const actives: ActiveIds = {
-      assignment: category === 'REMOTE_ASSIGNMENT' ? (activeIds.assignment ?? id) : activeIds.assignment,
-      information: category === 'INFORMATION' ? (activeIds.information ?? id) : activeIds.information
-    };
-    await persist(next, actives);
-    setCategory('REMOTE_ASSIGNMENT');
+    const created: GroupEmailTemplate = { ...draft, id, name: name.trim() };
+    // Adding a template must not change what participants receive. The built-in default stays
+    // active until someone chooses otherwise with "Set default".
+    const saved = await persist([...templates, created], activeId);
+    if (!saved) {
+      return;
+    }
     setName('');
-    setSubject({ [firstLang]: '' });
-    setBody({ [firstLang]: '' });
-    document.querySelector('.overflow-y-scroll')?.scrollTo({ behavior: 'smooth', top: 0 });
+    setDraft(emptyTemplate());
+    createFormRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const missingLanguages = activeLanguages.filter((lang) => !body[lang as keyof LocalizedString]?.trim());
+  const missingLanguages = LANGUAGES.filter((code) => !draft.body[code]?.trim());
+  const createError = validate(draft);
 
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!name.trim()) {
+      addNotification({ message: t({ en: 'A name is required', fr: 'Un nom est requis' }), type: 'error' });
+      return;
+    }
+    if (isDuplicateName(name)) {
       addNotification({
-        message: t({ en: 'A name is required', fr: 'Un nom est requis' }),
+        message: t({ en: 'A template with this name already exists', fr: 'Un modèle avec ce nom existe déjà' }),
         type: 'error'
       });
       return;
     }
-    const isDuplicate = templates.some((tpl) => tpl.name.toLowerCase() === name.trim().toLowerCase());
-    if (isDuplicate) {
-      addNotification({
-        message: t({
-          en: 'A template with this name already exists',
-          fr: 'Un modèle avec ce nom existe déjà'
-        }),
-        type: 'error'
-      });
-      return;
-    }
-    if (templateIssue(category, subject, body, createTemplateLangs) !== null) {
+    if (createError) {
       return;
     }
     if (missingLanguages.length > 0) {
@@ -387,147 +281,74 @@ export const GroupEmailTemplates = () => {
     await doCreate();
   };
 
-  const handleSetActive = async (tpl: GroupEmailTemplate) => {
-    await persist(templates, {
-      assignment: tpl.category === 'REMOTE_ASSIGNMENT' ? tpl.id : activeIds.assignment,
-      information: tpl.category === 'INFORMATION' ? tpl.id : activeIds.information
-    });
-  };
-
-  const handleDelete = async (tpl: GroupEmailTemplate) => {
-    const next = templates.filter((other) => other.id !== tpl.id);
-    const actives: ActiveIds = {
-      assignment:
-        activeIds.assignment === tpl.id
-          ? (next.find((other) => other.category === 'REMOTE_ASSIGNMENT')?.id ?? null)
-          : activeIds.assignment,
-      information:
-        activeIds.information === tpl.id
-          ? (next.find((other) => other.category === 'INFORMATION')?.id ?? null)
-          : activeIds.information
-    };
-    await persist(next, actives);
+  const handleDelete = async (template: GroupEmailTemplate) => {
+    const next = templates.filter((other) => other.id !== template.id);
+    // Deleting the default falls back to the built-in message rather than promoting whichever
+    // template happens to sort first — nobody chose that one, and the change is invisible.
+    const wasActive = activeId === template.id;
+    if (await persist(next, wasActive ? null : activeId)) {
+      setDeleting(null);
+      if (wasActive) {
+        addNotification({
+          message: t({
+            en: 'That was the default template, so the built-in message is now used.',
+            fr: 'Ce modèle était le modèle par défaut ; le message intégré est désormais utilisé.'
+          }),
+          type: 'info'
+        });
+      }
+    }
   };
 
   const handleEditSave = async (updated: GroupEmailTemplate) => {
-    const next = templates.map((tpl) => (tpl.id === updated.id ? updated : tpl));
-    await persist(next, activeIds);
-    setEditing(null);
+    const next = templates.map((template) => (template.id === updated.id ? updated : template));
+    if (await persist(next, activeId)) {
+      setEditing(null);
+    }
   };
 
-  const renderTemplate = (tpl: GroupEmailTemplate) => {
-    const isActive = activeIdFor(tpl.category) === tpl.id;
-    return (
-      <div
-        className="flex flex-wrap items-center gap-2 rounded-md border border-slate-200/60 p-2 dark:border-slate-700/60"
-        key={tpl.id}
-      >
-        <span className="flex-1 text-sm font-medium">{tpl.name}</span>
-        <Button
-          aria-label={t({ en: 'Edit', fr: 'Modifier' })}
-          size="icon"
-          type="button"
-          variant="outline"
-          onClick={() => setEditing(tpl)}
+  const renderRow = (
+    key: string,
+    label: string,
+    isActive: boolean,
+    actions: React.ReactNode,
+    onSetActive: () => void
+  ) => (
+    <div
+      className="border-border flex flex-wrap items-center gap-2 rounded-md border p-2"
+      data-testid="template-row"
+      key={key}
+    >
+      <span className="flex-1 text-sm font-medium">{label}</span>
+      {actions}
+      {isActive ? (
+        <span
+          className="bg-primary text-primary-foreground w-28 rounded-md py-1.5 text-center text-sm font-medium"
+          data-testid={`template-active-${key}`}
         >
-          <PencilIcon className="h-4 w-4" />
-        </Button>
-        <Button
-          aria-label={t('core.delete')}
-          size="icon"
-          type="button"
-          variant="danger"
-          onClick={() => void handleDelete(tpl)}
-        >
-          <Trash2Icon className="h-4 w-4" />
-        </Button>
-        {isActive ? (
-          <Button
-            className="pointer-events-none w-28 justify-center border-transparent bg-green-700 text-white hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-800"
-            size="sm"
-            tabIndex={-1}
-            type="button"
-            variant="primary"
-          >
-            {t({ en: 'Default', fr: 'Par défaut' })}
-          </Button>
-        ) : (
-          <Button
-            className="w-28 justify-center"
-            size="sm"
-            type="button"
-            variant="outline"
-            onClick={() => void handleSetActive(tpl)}
-          >
-            {t({ en: 'Set default', fr: 'Définir par défaut' })}
-          </Button>
-        )}
-      </div>
-    );
-  };
-
-  const renderDefaultAssignmentTemplate = () => {
-    const isActive = activeIds.assignment === null;
-    return (
-      <div className="flex flex-wrap items-center gap-2 rounded-md border border-slate-200/60 p-2 dark:border-slate-700/60">
-        <span className="flex-1 text-sm font-medium">
-          {t({
-            en: 'Your Open Data Capture Assignment (built-in)',
-            fr: 'Votre évaluation Open Data Capture (intégré)'
-          })}
+          {t({ en: 'Default', fr: 'Par défaut' })}
         </span>
+      ) : (
         <Button
-          aria-label={t({ en: 'View', fr: 'Voir' })}
-          size="icon"
+          className="w-28 justify-center"
+          data-testid={`template-set-active-${key}`}
+          disabled={updateGroupMutation.isPending}
+          size="sm"
           type="button"
           variant="outline"
-          onClick={() => setViewingDefault(true)}
+          onClick={onSetActive}
         >
-          <EyeIcon className="h-4 w-4" />
+          {t({ en: 'Set default', fr: 'Définir par défaut' })}
         </Button>
-        {isActive ? (
-          <Button
-            className="pointer-events-none w-28 justify-center border-transparent bg-green-700 text-white hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-800"
-            size="sm"
-            tabIndex={-1}
-            type="button"
-            variant="primary"
-          >
-            {t({ en: 'Default', fr: 'Par défaut' })}
-          </Button>
-        ) : (
-          <Button
-            className="w-28 justify-center"
-            size="sm"
-            type="button"
-            variant="outline"
-            onClick={() => void persist(templates, { assignment: null, information: activeIds.information })}
-          >
-            {t({ en: 'Set default', fr: 'Définir par défaut' })}
-          </Button>
-        )}
-      </div>
-    );
-  };
-
-  const remoteAssignmentTemplates = templates.filter((tpl) => tpl.category === 'REMOTE_ASSIGNMENT');
-  const informationTemplates = templates.filter((tpl) => tpl.category === 'INFORMATION');
-
-  const createBodyError = templateErrorMessage(t, templateIssue(category, subject, body, createTemplateLangs));
-
-  const defaultTemplateBody = DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body as { [key: string]: string | undefined };
-  const defaultTemplateSubject = DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.subject as { [key: string]: string | undefined };
-  const defaultTemplateLangs = activeLanguages.filter((k) => defaultTemplateBody[k]);
-  const [defaultViewLang, setDefaultViewLang] = React.useState(firstLang);
+      )}
+    </div>
+  );
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6" data-testid="group-email-templates">
       <div>
         <Heading className="mb-2" variant="h4">
-          {t({
-            en: 'Remote Assignment Templates',
-            fr: "Modèles d'évaluation à distance"
-          })}
+          {t({ en: 'Remote Assignment Templates', fr: "Modèles d'évaluation à distance" })}
         </Heading>
         <p className="text-muted-foreground mb-3 text-sm">
           {t({
@@ -536,108 +357,101 @@ export const GroupEmailTemplates = () => {
           })}
         </p>
         <div className="flex flex-col gap-2">
-          {renderDefaultAssignmentTemplate()}
-          {remoteAssignmentTemplates.map(renderTemplate)}
+          {renderRow(
+            'builtin',
+            t({
+              en: 'Your Open Data Capture Assignment (built-in)',
+              fr: 'Votre évaluation Open Data Capture (intégré)'
+            }),
+            activeId === null,
+            <Button
+              aria-label={t({ en: 'View', fr: 'Voir' })}
+              data-testid="template-view-builtin"
+              size="icon"
+              type="button"
+              variant="outline"
+              onClick={() => setViewingDefault(true)}
+            >
+              <EyeIcon className="h-4 w-4" />
+            </Button>,
+            () => void persist(templates, null)
+          )}
+          {templates.map((template) =>
+            renderRow(
+              template.id,
+              template.name,
+              activeId === template.id,
+              <React.Fragment>
+                <Button
+                  aria-label={t({ en: 'Edit', fr: 'Modifier' })}
+                  data-testid={`template-edit-${template.id}`}
+                  size="icon"
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditing(template)}
+                >
+                  <PencilIcon className="h-4 w-4" />
+                </Button>
+                <Button
+                  aria-label={t('core.delete')}
+                  data-testid={`template-delete-${template.id}`}
+                  size="icon"
+                  type="button"
+                  variant="danger"
+                  onClick={() => setDeleting(template)}
+                >
+                  <Trash2Icon className="h-4 w-4" />
+                </Button>
+              </React.Fragment>,
+              () => void persist(templates, template.id)
+            )
+          )}
+          {templates.length === 0 && (
+            <EmptyState>
+              {t({
+                en: 'No custom templates yet — create one below to override the built-in message.',
+                fr: 'Aucun modèle personnalisé — créez-en un ci-dessous pour remplacer le message intégré.'
+              })}
+            </EmptyState>
+          )}
         </div>
       </div>
 
-      <div>
-        <Heading className="mb-2" variant="h4">
-          {t({ en: 'Information Templates', fr: "Modèles d'information" })}
-        </Heading>
-        <p className="text-muted-foreground mb-3 text-sm">
-          {t({
-            en: 'General study-related messages for your participants.',
-            fr: "Messages généraux liés à l'étude pour vos participants."
-          })}
-        </p>
-        {informationTemplates.length > 0 ? (
-          <div className="flex flex-col gap-2">{informationTemplates.map(renderTemplate)}</div>
-        ) : (
-          <EmptyState>
-            {t({
-              en: 'No information templates yet — create one to get started.',
-              fr: "Aucun modèle d'information — créez-en un pour commencer."
-            })}
-          </EmptyState>
-        )}
-      </div>
-
       <form
-        className="flex flex-col gap-3 rounded-2xl border border-slate-200/60 p-5 dark:border-slate-700/60"
+        className="border-border flex flex-col gap-3 rounded-2xl border p-5"
+        data-testid="template-create-form"
+        ref={createFormRef}
         onSubmit={(event) => void handleCreate(event)}
       >
         <Heading variant="h5">{t({ en: 'New template', fr: 'Nouveau modèle' })}</Heading>
-        <TemplateFields
-          activeLanguages={activeLanguages}
-          body={body}
-          category={category}
-          categoryLabel={categoryLabel}
-          error={createBodyError}
-          name={name}
-          setBody={setBody}
-          setCategory={setCategory}
-          setName={setName}
-          setSubject={setSubject}
-          subject={subject}
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="template-name">{t({ en: 'Name', fr: 'Nom' })}</Label>
+          <Input
+            data-testid="template-name"
+            id="template-name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+        </div>
+        <EmailTemplateEditor
+          error={createError}
+          idPrefix="template-create"
+          template={draft}
+          variables={ASSIGNMENT_VARS}
+          onChange={setDraft}
         />
         <div>
-          <Button disabled={updateGroupMutation.isPending || Boolean(createBodyError)} type="submit">
+          <Button
+            data-testid="template-create-submit"
+            disabled={updateGroupMutation.isPending || Boolean(createError)}
+            type="submit"
+          >
             {t({ en: 'Add template', fr: 'Ajouter le modèle' })}
           </Button>
         </div>
       </form>
 
-      <Dialog open={viewingDefault} onOpenChange={setViewingDefault}>
-        <Dialog.Content className="max-w-lg">
-          <Dialog.Header>
-            <Dialog.Title>
-              {t({
-                en: 'Built-in default template',
-                fr: 'Modèle par défaut intégré'
-              })}
-            </Dialog.Title>
-            <Dialog.Description>
-              {t({
-                en: 'This is the message sent for remote assignments when no custom template is active.',
-                fr: "Il s'agit du message envoyé pour les évaluations à distance lorsqu'aucun modèle personnalisé n'est actif."
-              })}
-            </Dialog.Description>
-          </Dialog.Header>
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1.5">
-              <Label>{t({ en: 'Language', fr: 'Langue' })}</Label>
-              <Select value={defaultViewLang} onValueChange={setDefaultViewLang}>
-                <Select.Trigger className="w-[180px] border-sky-700 bg-sky-700 text-white hover:bg-sky-800 dark:border-sky-700 dark:bg-sky-700 dark:text-white dark:hover:bg-sky-800">
-                  <Select.Value />
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Group>
-                    {defaultTemplateLangs.map((code) => (
-                      <Select.Item key={code} value={code}>
-                        {ALL_LANGUAGES[code] ?? code}
-                      </Select.Item>
-                    ))}
-                  </Select.Group>
-                </Select.Content>
-              </Select>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="default-tpl-subject">{t({ en: 'Subject', fr: 'Objet' })}</Label>
-              <Input readOnly id="default-tpl-subject" value={defaultTemplateSubject[defaultViewLang] ?? ''} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="default-tpl-body">{t({ en: 'Body', fr: 'Corps' })}</Label>
-              <TextArea readOnly id="default-tpl-body" rows={8} value={defaultTemplateBody[defaultViewLang] ?? ''} />
-            </div>
-          </div>
-          <Dialog.Footer>
-            <Button type="button" variant="outline" onClick={() => setViewingDefault(false)}>
-              {t({ en: 'Close', fr: 'Fermer' })}
-            </Button>
-          </Dialog.Footer>
-        </Dialog.Content>
-      </Dialog>
+      <ViewDefaultTemplateDialog open={viewingDefault} onOpenChange={setViewingDefault} />
 
       <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
         <Dialog.Content className="max-w-lg">
@@ -646,18 +460,47 @@ export const GroupEmailTemplates = () => {
           </Dialog.Header>
           {editing && (
             <EditTemplateForm
-              activeLanguages={activeLanguages}
-              categoryLabel={categoryLabel}
-              existingTemplates={templates}
+              isDuplicateName={(candidate) => isDuplicateName(candidate, editing.id)}
               isPending={updateGroupMutation.isPending}
               template={editing}
+              validate={validate}
               onCancel={() => setEditing(null)}
               onSave={handleEditSave}
             />
           )}
         </Dialog.Content>
       </Dialog>
-      <SaveStatus state={saveState} />
+
+      <Dialog open={deleting !== null} onOpenChange={(open) => !open && setDeleting(null)}>
+        <Dialog.Content className="max-w-md">
+          <Dialog.Header>
+            <Dialog.Title>{t({ en: 'Delete template', fr: 'Supprimer le modèle' })}</Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Description>
+            {t(
+              {
+                en: 'Permanently delete "{}"? This cannot be undone.',
+                fr: 'Supprimer définitivement « {} » ? Cette action est irréversible.'
+              },
+              { args: [deleting?.name ?? ''] }
+            )}
+          </Dialog.Description>
+          <Dialog.Footer>
+            <Button type="button" variant="outline" onClick={() => setDeleting(null)}>
+              {t('core.cancel')}
+            </Button>
+            <Button
+              data-testid="template-delete-confirm"
+              disabled={updateGroupMutation.isPending}
+              type="button"
+              variant="danger"
+              onClick={() => deleting && void handleDelete(deleting)}
+            >
+              {t('core.delete')}
+            </Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
 
       <Dialog open={confirmCreate} onOpenChange={setConfirmCreate}>
         <Dialog.Content className="max-w-md">
@@ -670,7 +513,7 @@ export const GroupEmailTemplates = () => {
                 en: 'Warning: This template is missing translations for: {}.',
                 fr: 'Attention : Ce modèle est sans traduction pour : {}.'
               },
-              { args: [missingLanguages.map((code) => ALL_LANGUAGES[code] ?? code).join(', ')] }
+              { args: [missingLanguages.map((code) => t(LANGUAGE_LABELS[code])).join(', ')] }
             )}
           </Dialog.Description>
           <Dialog.Footer>
@@ -678,6 +521,7 @@ export const GroupEmailTemplates = () => {
               {t('core.cancel')}
             </Button>
             <Button
+              data-testid="template-create-anyway"
               type="button"
               variant="primary"
               onClick={() => {

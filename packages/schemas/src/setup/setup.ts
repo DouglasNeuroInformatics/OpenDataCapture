@@ -183,7 +183,6 @@ const MAX_ASSIGNMENT_DURATION_DAYS = 3650;
 const $DefaultAssignmentDurationDays = z.number().int().positive().max(MAX_ASSIGNMENT_DURATION_DAYS);
 
 const $SetupState = z.object({
-  activeLanguages: z.array(z.string()).optional(),
   branding: $BrandingConfig.nullish(),
   defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
   isDemo: z.boolean(),

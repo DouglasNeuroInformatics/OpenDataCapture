@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   ServiceUnavailableException
 } from '@nestjs/common';
+import { isMailEnabled } from '@opendatacapture/schemas/mail';
 import { $BrandingConfig } from '@opendatacapture/schemas/setup';
 import type { CreateAdminData, InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
@@ -51,7 +52,6 @@ export class SetupService {
     // older $BrandingConfig will silently drop newer branding fields on read.
     const branding = $BrandingConfig.nullable().safeParse(savedOptions?.branding ?? null);
     return {
-      activeLanguages: savedOptions?.activeLanguages?.length ? savedOptions.activeLanguages : ['en', 'fr'],
       branding: branding.success ? branding.data : null,
       defaultAssignmentDurationDays: savedOptions?.defaultAssignmentDurationDays ?? null,
       isDemo: Boolean(savedOptions?.isDemo),
@@ -59,10 +59,7 @@ export class SetupService {
       isGatewayEnabled: this.configService.get('GATEWAY_ENABLED'),
       // Non-secret flag so the client can hide email UI when mail is off. The SMTP
       // configuration itself is never exposed here (this is a public route).
-      isMailEnabled: Boolean(
-        savedOptions?.mailConfig?.enabled &&
-        (savedOptions.mailConfig.transport === 'http' ? savedOptions.mailConfig.apiKey : savedOptions.mailConfig.host)
-      ),
+      isMailEnabled: isMailEnabled(savedOptions?.mailConfig),
       isSetup: Boolean(savedOptions?.isSetup),
       release: __RELEASE__,
       uptime: Math.round(process.uptime())

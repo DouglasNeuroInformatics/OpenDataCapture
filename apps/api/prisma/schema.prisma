@@ -32,6 +32,7 @@ enum AuditLogAction {
   UPDATE
   DELETE
   LOGIN
+  SEND_EMAIL
 }
 
 enum AuditLogEntity {
@@ -102,28 +103,19 @@ type GroupSettings {
   minimumAge                    Int?
 }
 
-// Mirrors $GroupEmailTemplateCategory in @opendatacapture/schemas so Prisma returns the
-// narrowed enum rather than a bare string (which the Zod-typed Group records reject).
-enum GroupEmailTemplateCategory {
-  REMOTE_ASSIGNMENT
-  INFORMATION
-}
-
-// A string authored in the instance's active languages; each field is optional so a
-// template can be authored in a single language without requiring all of them.
+// Mirrors $LocalizedString in @opendatacapture/schemas/core; each field is optional so
+// content can be authored in a single language without requiring all of them.
 type LocalizedString {
   en String?
-  es String?
   fr String?
 }
 
-// A group-manager-authored, categorized email template for a group's participants.
+// A group-manager-authored remote-assignment email template for a group's participants.
 type GroupEmailTemplate {
-  id       String
-  name     String
-  category GroupEmailTemplateCategory
-  subject  LocalizedString?
-  body     LocalizedString?
+  id      String
+  name    String
+  subject LocalizedString?
+  body    LocalizedString?
 }
 
 model Group {
@@ -150,7 +142,6 @@ model Group {
 
   emailTemplates                  GroupEmailTemplate[]
   activeAssignmentEmailTemplateId String?
-  activeInformationTemplateId     String?
 
   @@map("GroupModel")
 }
@@ -413,21 +404,14 @@ type BrandingConfig {
 // is stored here so the server can authenticate to the SMTP server; it is never
 // returned to clients (see the mail endpoints, which strip it).
 type MailConfig {
-  apiKey         String
-  awsAccessKeyId String?
-  awsRegion      String?
-  domain         String?
-  enabled        Boolean
-  encryption     String
-  host           String
-  password       String
-  port           Int
-  provider       String?
-  region         String?
-  senderAddress  String
-  senderName     String?
-  transport      String?
-  username       String
+  enabled       Boolean
+  encryption    String
+  host          String
+  password      String
+  port          Int
+  senderAddress String
+  senderName    String?
+  username      String
 }
 
 // An editable email template whose body may contain {{variable}} placeholders.
@@ -440,7 +424,6 @@ model SetupState {
   createdAt                     DateTime        @default(now()) @db.Date
   updatedAt                     DateTime        @updatedAt @db.Date
   id                            String          @id @default(auto()) @map("_id") @db.ObjectId
-  activeLanguages               String[]
   branding                      BrandingConfig?
   defaultAssignmentDurationDays Int?
   isDemo                        Boolean
