@@ -67,19 +67,20 @@ describe('AssignmentsController', () => {
       await sendEmail({ language: 'en', recipient: 'p@x.org' });
       expect(groupsService.findById).not.toHaveBeenCalled();
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
-        body: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body.en,
         recipient: 'p@x.org',
-        subject: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.subject.en,
+        template: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE,
         url: `${assignment.url}?lang=en`
       });
     });
 
-    it('formats the expiry with a time rather than a bare UTC date', async () => {
+    // Rendering is the mail service's job, so the raw date has to survive the hand-off — a
+    // pre-formatted string here would be formatted twice.
+    it('forwards the raw expiry rather than a formatted date', async () => {
       assignmentsService.findById.mockResolvedValueOnce({ ...assignment, groupId: null });
       await sendEmail({ language: 'en', recipient: 'p@x.org' });
-      const { expiresAt } = mailService.sendAssignmentEmail.mock.lastCall?.[0] as { expiresAt: string };
-      expect(expiresAt).not.toBe('2026-08-01');
-      expect(expiresAt).toMatch(/\d{1,2}:\d{2}/);
+      expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
+        expiresAt: assignment.expiresAt
+      });
     });
 
     it("uses the group's active template when no template id is given", async () => {
@@ -90,8 +91,7 @@ describe('AssignmentsController', () => {
       });
       await sendEmail({ language: 'en', recipient: 'p@x.org' });
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
-        body: customTemplate.body.en,
-        subject: customTemplate.subject.en
+        template: { body: customTemplate.body, subject: customTemplate.subject }
       });
     });
 
@@ -103,8 +103,7 @@ describe('AssignmentsController', () => {
       });
       await sendEmail({ language: 'en', recipient: 'p@x.org', templateId: 'tpl-1' });
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
-        body: customTemplate.body.en,
-        subject: customTemplate.subject.en
+        template: { body: customTemplate.body, subject: customTemplate.subject }
       });
     });
 
@@ -116,12 +115,11 @@ describe('AssignmentsController', () => {
       });
       await sendEmail({ language: 'en', recipient: 'p@x.org', templateId: null });
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
-        body: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body.en,
-        subject: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.subject.en
+        template: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE
       });
     });
 
-    it('sends the French content when language is fr', async () => {
+    it('passes the requested language through for the mail service to render', async () => {
       assignmentsService.findById.mockResolvedValueOnce(assignment);
       groupsService.findById.mockResolvedValueOnce({
         activeAssignmentEmailTemplateId: 'tpl-1',
@@ -129,8 +127,8 @@ describe('AssignmentsController', () => {
       });
       await sendEmail({ language: 'fr', recipient: 'p@x.org' });
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
-        body: customTemplate.body.fr,
-        subject: customTemplate.subject.fr
+        language: 'fr',
+        url: `${assignment.url}?lang=fr`
       });
     });
 

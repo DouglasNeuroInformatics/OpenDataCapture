@@ -13,7 +13,6 @@ import { ASSIGNMENT_EMAIL_THROTTLER_LIMIT, ASSIGNMENT_EMAIL_THROTTLER_TTL } from
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import { GroupsService } from '@/groups/groups.service';
 import { MailService } from '@/mail/mail.service';
-import { formatExpiryDate, pickLocale } from '@/mail/mail.utils';
 
 import { AssignmentsService } from './assignments.service';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
@@ -68,10 +67,10 @@ export class AssignmentsController {
       }
     }
     const result = await this.mailService.sendAssignmentEmail({
-      body: pickLocale(template.body, language),
-      expiresAt: formatExpiryDate(assignment.expiresAt, language),
+      expiresAt: assignment.expiresAt,
+      language,
       recipient,
-      subject: pickLocale(template.subject, language),
+      template,
       url: `${assignment.url}?lang=${language}`
     });
     await this.auditLogger.log('SEND_EMAIL', 'ASSIGNMENT', {

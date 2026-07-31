@@ -110,23 +110,6 @@ describe('MailService', () => {
     });
   });
 
-  describe('isEnabled', () => {
-    it('is true when a stored configuration is switched on', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
-      expect(await mailService.isEnabled()).toBe(true);
-    });
-
-    it('is false when disabled', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ mailConfig: { ...stored(validConfig), enabled: false } });
-      expect(await mailService.isEnabled()).toBe(false);
-    });
-
-    it('is false when nothing is stored', async () => {
-      setupStateModel.findFirst.mockResolvedValue(null);
-      expect(await mailService.isEnabled()).toBe(false);
-    });
-  });
-
   describe('updateSettings', () => {
     it('throws before setup is complete', async () => {
       setupStateModel.findFirst.mockResolvedValue({ isSetup: false });
@@ -266,11 +249,13 @@ describe('MailService', () => {
   });
 
   describe('sendAssignmentEmail', () => {
+    const template = (body: string) => ({ body: { en: body }, subject: { en: 'Assignment' } });
+
     const assignmentArgs = {
-      body: 'Link: {{url}}',
-      expiresAt: '2026-01-01',
+      expiresAt: new Date('2026-01-01T12:00:00.000Z'),
+      language: 'en' as const,
       recipient: 'p@x.org',
-      subject: 'Assignment',
+      template: template('Link: {{url}}'),
       url: 'https://assign'
     };
 
@@ -294,23 +279,41 @@ describe('MailService', () => {
     it('substitutes url/expiresAt and sends when enabled', async () => {
       setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
       const result = await mailService.sendAssignmentEmail({
-        body: 'Link: {{url}} (expires {{expiresAt}})',
-        expiresAt: '2026-01-01',
-        recipient: 'p@x.org',
-        subject: 'Assignment',
-        url: 'https://assign'
+        ...assignmentArgs,
+        template: template('Link: {{url}} (expires {{expiresAt}})')
       });
       expect(result.status).toBe('SENT');
-      expect(result.message).toBe('Link: https://assign (expires 2026-01-01)');
+      expect(result.message).toContain('Link: https://assign (expires ');
+    });
+
+    // Truncating to a bare UTC date shifts the day for anyone west of UTC.
+    it('renders the expiry with a time rather than a bare date', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
+      const result = await mailService.sendAssignmentEmail({
+        ...assignmentArgs,
+        template: template('{{url}} expires {{expiresAt}}')
+      });
+      expect(result.message).not.toContain('2026-01-01');
+      expect(result.message).toMatch(/\d{1,2}:\d{2}/);
+    });
+
+    it('renders the French body when language is fr', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
+      const result = await mailService.sendAssignmentEmail({
+        ...assignmentArgs,
+        language: 'fr',
+        template: { body: { en: 'Link {{url}}', fr: 'Lien {{url}}' }, subject: { en: 'Assignment', fr: 'Évaluation' } }
+      });
+      expect(result.status).toBe('SENT');
+      expect(result.message).toContain('Lien');
+      expect(transporter.sendMail.mock.lastCall?.[0]).toMatchObject({ subject: 'Évaluation' });
     });
 
     it('appends the link when the template body omits {{url}}', async () => {
       setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
       const result = await mailService.sendAssignmentEmail({
-        body: 'Please complete your assignment.',
-        expiresAt: '2026-01-01',
-        recipient: 'p@x.org',
-        subject: 'Assignment',
+        ...assignmentArgs,
+        template: template('Please complete your assignment.'),
         url: 'https://assign/xyz'
       });
       expect(result.status).toBe('SENT');
