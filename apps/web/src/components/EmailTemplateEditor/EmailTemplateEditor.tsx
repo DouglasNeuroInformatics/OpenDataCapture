@@ -1,20 +1,11 @@
 import React from 'react';
 
-import { Button, Input, Label, Select, TextArea } from '@douglasneuroinformatics/libui/components';
+import { Button, Input, Label, TextArea } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@opendatacapture/schemas/core';
 import type { MailTemplate } from '@opendatacapture/schemas/mail';
 
-/**
- * The `satisfies` keeps this in step with {@link Language}: adding a language fails to compile
- * until it is named here, which is also what supplies the ordered list of authorable languages.
- */
-export const LANGUAGE_LABELS = {
-  en: { en: 'English', fr: 'Anglais' },
-  fr: { en: 'French', fr: 'Français' }
-} as const satisfies { [L in Language]: { en: string; fr: string } };
-
-export const LANGUAGES = Object.keys(LANGUAGE_LABELS) as Language[];
+import { LanguageSelect } from '@/components/LanguageSelect';
 
 export type EmailTemplateEditorProps = {
   error?: string;
@@ -63,20 +54,12 @@ export const EmailTemplateEditor = ({
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
         <Label htmlFor={`${idPrefix}-language`}>{t({ en: 'Language', fr: 'Langue' })}</Label>
-        <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
-          <Select.Trigger className="w-[180px]" data-testid={`${idPrefix}-language`} id={`${idPrefix}-language`}>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content>
-            <Select.Group>
-              {LANGUAGES.map((code) => (
-                <Select.Item key={code} value={code}>
-                  {t(LANGUAGE_LABELS[code])}
-                </Select.Item>
-              ))}
-            </Select.Group>
-          </Select.Content>
-        </Select>
+        <LanguageSelect
+          data-testid={`${idPrefix}-language`}
+          id={`${idPrefix}-language`}
+          value={language}
+          onChange={setLanguage}
+        />
       </div>
 
       <div className="flex flex-col gap-1.5">

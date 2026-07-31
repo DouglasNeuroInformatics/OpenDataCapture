@@ -3,25 +3,25 @@ import React, { useState } from 'react';
 import { Button, Input, Label, Select, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
-import type { Language, LocalizedString } from '@opendatacapture/schemas/core';
+import type { Language } from '@opendatacapture/schemas/core';
 import { DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
 import { CircleHelpIcon } from 'lucide-react';
 
-import { LANGUAGE_LABELS, LANGUAGES } from '@/components/EmailTemplateEditor';
+import { LanguageSelect } from '@/components/LanguageSelect';
 import { useGroupQuery } from '@/hooks/useGroupQuery';
 import { useMailErrorMessage } from '@/hooks/useMailErrorMessage';
 import { useSendAssignmentEmailMutation } from '@/hooks/useSendAssignmentEmailMutation';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
+import { authoredLanguages, LANGUAGES } from '@/utils/language';
 
 const DEFAULT_TEMPLATE_OPTION = '__default__';
 
-const bodyLanguages = (body: LocalizedString | null | undefined): Language[] =>
-  body ? LANGUAGES.filter((code) => body[code]) : [];
-
-export const AssignmentEmailForm: React.FC<{
+export type AssignmentEmailFormProps = {
   assignment: Assignment | null;
   instrumentLanguages?: string[];
-}> = ({ assignment, instrumentLanguages }) => {
+};
+
+export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: AssignmentEmailFormProps) => {
   const { resolvedLanguage, t } = useTranslation();
   const setupStateQuery = useSetupStateQuery();
   const sendEmailMutation = useSendAssignmentEmailMutation();
@@ -50,7 +50,7 @@ export const AssignmentEmailForm: React.FC<{
       ? DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body
       : templates.find((template) => template.id === selectedTemplate)?.body;
 
-  const authored = bodyLanguages(selectedBody);
+  const authored = authoredLanguages(selectedBody);
   const templateLanguages = authored.length > 0 ? authored : LANGUAGES;
   const languageOptions = instrumentLanguages
     ? templateLanguages.filter((code) => instrumentLanguages.includes(code))
@@ -135,20 +135,13 @@ export const AssignmentEmailForm: React.FC<{
             </Tooltip.Content>
           </Tooltip>
         </div>
-        <Select value={language} onValueChange={(value) => setLanguageChoice(value as Language)}>
-          <Select.Trigger className="w-[180px]" data-testid="assignment-language" id="assignment-language">
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content>
-            <Select.Group>
-              {languageOptions.map((code) => (
-                <Select.Item key={code} value={code}>
-                  {t(LANGUAGE_LABELS[code])}
-                </Select.Item>
-              ))}
-            </Select.Group>
-          </Select.Content>
-        </Select>
+        <LanguageSelect
+          data-testid="assignment-language"
+          id="assignment-language"
+          options={languageOptions}
+          value={language}
+          onChange={setLanguageChoice}
+        />
       </div>
       <Label htmlFor="assignment-email">
         {t({ en: 'Email link to participant', fr: 'Envoyer le lien au participant par courriel' })}

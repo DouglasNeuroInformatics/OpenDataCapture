@@ -10,11 +10,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { EyeIcon, PencilIcon, Trash2Icon } from 'lucide-react';
 
-import { EmailTemplateEditor, LANGUAGE_LABELS, LANGUAGES } from '@/components/EmailTemplateEditor';
+import { EmailTemplateEditor } from '@/components/EmailTemplateEditor';
 import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
 import { checkTemplateIssue } from '@/utils/email-template';
+import { authoredLanguages, LANGUAGE_LABELS, LANGUAGES } from '@/utils/language';
+
 import type { TemplateIssue } from '@/utils/email-template';
 
 const ASSIGNMENT_VARS = ['url', 'expiresAt'] as const;
@@ -23,10 +25,6 @@ const emptyTemplate = (): MailTemplate => ({ body: {}, subject: {} });
 
 const cleanLocalized = (value: LocalizedString | null | undefined): LocalizedString =>
   Object.fromEntries(Object.entries(value ?? {}).filter(([, text]) => text));
-
-/** The languages a template has any body text in; used to scope validation to what was authored. */
-const authoredLanguages = (body: LocalizedString): string[] =>
-  LANGUAGES.filter((code) => body[code]?.trim()).map(String);
 
 const EmptyState = ({ children }: { children: React.ReactNode }) => (
   <div className="text-muted-foreground border-border rounded-md border border-dashed p-3 text-sm">{children}</div>

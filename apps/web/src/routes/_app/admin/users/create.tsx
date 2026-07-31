@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
-import { Button, CopyButton, Dialog, Form, Heading, Label, Select } from '@douglasneuroinformatics/libui/components';
+import { Button, CopyButton, Dialog, Form, Heading, Label } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@opendatacapture/schemas/core';
 import { $BasePermissionLevel, $CreateUserData, PASSWORD_ERROR_CODES } from '@opendatacapture/schemas/user';
@@ -12,7 +12,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios, { isAxiosError } from 'axios';
 import { z } from 'zod/v4';
 
-import { LANGUAGE_LABELS, LANGUAGES } from '@/components/EmailTemplateEditor';
+import { LanguageSelect } from '@/components/LanguageSelect';
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
@@ -140,20 +140,7 @@ const RouteComponent = () => {
               fr: 'Langue du courriel de bienvenue'
             })}
           </Label>
-          <Select value={emailLanguage} onValueChange={(value) => setEmailLanguage(value as Language)}>
-            <Select.Trigger className="w-[180px]" data-testid="welcome-email-language">
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Group>
-                {LANGUAGES.map((code) => (
-                  <Select.Item key={code} value={code}>
-                    {t(LANGUAGE_LABELS[code])}
-                  </Select.Item>
-                ))}
-              </Select.Group>
-            </Select.Content>
-          </Select>
+          <LanguageSelect data-testid="welcome-email-language" value={emailLanguage} onChange={setEmailLanguage} />
         </div>
       )}
       <Form
