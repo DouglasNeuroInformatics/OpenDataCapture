@@ -163,7 +163,8 @@ Two environment gaps to work around explicitly:
 
 - **`@testing-library/jest-dom` is not installed.** `toBeInTheDocument()` does not exist — assert
   with `expect(screen.getByText(x)).toBeTruthy()`.
-- **happy-dom has no layout engine.** Rendering a libui `DataTable` needs a `ResizeObserver` stub;
-  see `src/__tests__/data-table-server-mode.test.tsx`.
+- **happy-dom has no layout engine.** Layout-dependent assertions (sizes, positions, virtualized
+  rows) cannot work; happy-dom ≥ 20 ships its own no-op `ResizeObserver`, so a manual stub is no
+  longer needed.
 
 Import `@/services/i18n` for its side effect before rendering any libui component with controls.

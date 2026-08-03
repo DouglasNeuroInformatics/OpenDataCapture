@@ -12,8 +12,8 @@ to `apps/gateway` or `packages/react-core` today is collected by nothing, report
 passes CI green.
 
 Check the table below before writing a unit test. If the package is not in it, add a
-`vitest.config.ts` in the same change — `packages/schemas/vitest.config.ts` is the whole pattern
-(`mergeConfig(baseConfig, defineProject({ test: { name, root: import.meta.dirname } }))`).
+`vitest.config.ts` in the same change — `.agents/docs/playbooks/add-vitest-project.md` is the order
+of operations.
 
 ## Tiers
 

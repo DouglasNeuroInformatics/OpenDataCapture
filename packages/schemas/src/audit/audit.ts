@@ -4,7 +4,7 @@ import { $Group } from '../group/group.js';
 import { $User } from '../user/user.js';
 
 export type $AuditLogAction = z.infer<typeof $AuditLogAction>;
-export const $AuditLogAction = z.enum(['CREATE', 'UPDATE', 'DELETE', 'LOGIN']);
+export const $AuditLogAction = z.enum(['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'SEND_EMAIL']);
 
 export type $AuditLogEntity = z.infer<typeof $AuditLogEntity>;
 export const $AuditLogEntity = z.enum([
@@ -46,6 +46,8 @@ export const $AuditLog = z.object({
   entity: $AuditLogEntity,
   group: $Group.pick({ name: true }).nullish(),
   id: z.string(),
+  /** Action-specific facts (e.g. the recipient and assignment of a SEND_EMAIL) the fixed columns cannot carry */
+  metadata: z.record(z.string(), z.unknown()).nullish(),
   timestamp: z.int(),
   user: $User.pick({ username: true }).nullish()
 });

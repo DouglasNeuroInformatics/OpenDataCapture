@@ -11,6 +11,7 @@ import type { Assignment, AssignmentStatus } from '@opendatacapture/schemas/assi
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute } from '@tanstack/react-router';
 
+import { AssignmentEmailForm } from '@/components/AssignmentEmailForm';
 import { QRCode } from '@/components/QRCode';
 import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useInstrument } from '@/hooks/useInstrument';
@@ -25,6 +26,10 @@ const AssignmentSlider: React.FC<{
 }> = ({ assignment, isOpen, onCancel, setIsOpen }) => {
   const { t } = useTranslation();
   const instrument = useInstrument(assignment?.instrumentId ?? null);
+  const instrumentInfoQuery = useInstrumentInfoQuery();
+  const instrumentLanguages = instrumentInfoQuery.data?.find(
+    (i) => i.id === assignment?.instrumentId
+  )?.supportedLanguages;
 
   return (
     <Sheet open={Boolean(isOpen && assignment && instrument)} onOpenChange={setIsOpen}>
@@ -45,6 +50,16 @@ const AssignmentSlider: React.FC<{
               <CopyButton size="sm" text={assignment?.url ?? ''} variant="outline" />
             </div>
             <QRCode url={assignment?.url ?? 'javascript:void(0)'} />
+            {/* Only an outstanding assignment can still be completed, so only it is worth emailing.
+                Keyed per assignment: the sheet is reused across selections, and a template chosen
+                for one assignment must not silently carry over to the next one opened. */}
+            {assignment?.status === 'OUTSTANDING' && (
+              <AssignmentEmailForm
+                assignment={assignment}
+                instrumentLanguages={instrumentLanguages}
+                key={assignment.id}
+              />
+            )}
           </div>
         </Sheet.Body>
         <Sheet.Footer>

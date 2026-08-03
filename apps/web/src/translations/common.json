@@ -173,6 +173,10 @@
     "en": "Research",
     "fr": "Recherche"
   },
+  "sendEmail": {
+    "en": "Send email",
+    "fr": "Envoyer un courriel"
+  },
   "session": {
     "en": "Session",
     "fr": "Session"

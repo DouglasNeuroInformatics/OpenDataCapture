@@ -1,0 +1,3 @@
+interface:
+  display_name: 'ODC Frontend'
+  short_description: 'Write React UI across web, gateway and react-core'

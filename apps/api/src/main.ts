@@ -10,6 +10,7 @@ import { GroupsModule } from './groups/groups.module';
 import { InstrumentRecordsModule } from './instrument-records/instrument-records.module';
 import { InstrumentReposModule } from './instrument-repos/instrument-repos.module';
 import { InstrumentsModule } from './instruments/instruments.module';
+import { MailModule } from './mail/mail.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { SetupModule } from './setup/setup.module';
 import { StorageModule } from './storage/storage.module';
@@ -35,7 +36,7 @@ export default AppFactory.create({
       url: 'https://www.apache.org/licenses/LICENSE-2.0'
     },
     path: '/',
-    tags: ['Authentication', 'Groups', 'Instruments', 'Instrument Records', 'Subjects', 'Users'],
+    tags: ['Authentication', 'Groups', 'Instruments', 'Instrument Records', 'Mail', 'Subjects', 'Users'],
     title: 'Open Data Capture'
   },
   envSchema: $Env,
@@ -46,6 +47,7 @@ export default AppFactory.create({
     InstrumentRecordsModule,
     InstrumentReposModule,
     InstrumentsModule,
+    MailModule,
     PrismaModule.forRootAsync({
       useClass: PrismaModuleOptionsFactory
     }),

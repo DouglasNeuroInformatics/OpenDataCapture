@@ -3,7 +3,7 @@ import type { CreateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { CreateUserData, User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
-import { SEEDED_USER_PASSWORD } from './constants';
+import { E2E_MAIL_CONFIG, SEEDED_USER_PASSWORD } from './constants';
 import { randomId } from './unique';
 
 const API = '/api/v1';
@@ -74,6 +74,21 @@ export class ApiClient {
       this.request.get(`${API}/groups/${id}`, { headers: this.authHeaders }),
       200,
       `find group '${id}'`
+    );
+  }
+
+  /**
+   * Switch outgoing mail on or off instance-wide, (re)seeding {@link E2E_MAIL_CONFIG}. Every
+   * caller must switch it back off — `isMailEnabled` is global, and leaving it on changes the UI
+   * for every other spec.
+   */
+  async setMailEnabled(enabled: boolean): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/mail/settings`, {
+        data: { config: { enabled, ...E2E_MAIL_CONFIG } },
+        headers: this.authHeaders
+      }),
+      `set mail enabled to ${enabled}`
     );
   }
 

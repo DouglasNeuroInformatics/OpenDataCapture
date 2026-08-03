@@ -1,0 +1,3 @@
+interface:
+  display_name: 'ODC Run Locally'
+  short_description: 'Bring the local stack up — dev servers, Mongo, first-run setup'
