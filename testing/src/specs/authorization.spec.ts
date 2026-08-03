@@ -86,6 +86,13 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
     send: (request, { headers }) =>
       request.patch(`${API}/mail/settings`, { data: { newUserEmailTemplate: { body: {}, subject: {} } }, headers }),
     what: 'rewrite the mail configuration or templates'
+  },
+  {
+    // The one request that opens an outbound SMTP connection to a caller-supplied host using the
+    // stored credential.
+    screen: '/admin/mail',
+    send: (request, { headers }) => request.post(`${API}/mail/test`, { data: {}, headers }),
+    what: 'probe a mail server with the stored credential'
   }
 ];
 

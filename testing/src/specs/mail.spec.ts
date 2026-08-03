@@ -1,4 +1,5 @@
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
+import { E2E_MAIL_CONFIG, SEEDED_USER_PASSWORD } from '../support/constants';
 import { expect, test } from '../support/fixtures';
 
 // Whether mail is on is a property of the instance, not of a test: it lives on `SetupState` and
@@ -13,6 +14,12 @@ test.describe('mail settings', () => {
   test.use({ actingRole: 'ADMIN' });
 
   test.beforeAll(async ({ api }) => {
+    await api.setMailEnabled(false);
+  });
+
+  // The save test below persists a different server, so the stored configuration is restored for
+  // the delivery block and everything after it.
+  test.afterAll(async ({ api }) => {
     await api.setMailEnabled(false);
   });
 
@@ -38,6 +45,11 @@ test.describe('mail settings', () => {
 
     await expect(mailPage.fieldError('host')).toBeVisible();
     await expect(mailPage.fieldError('username')).toBeVisible();
+
+    // "Without saving it" is only proven by the round trip: the stored host must survive.
+    await mailPage.$ref.reload();
+    await mailPage.enableMail();
+    await expect(mailPage.host).toHaveValue(E2E_MAIL_CONFIG.host);
   });
 
   // Pointing at a different server must not silently reuse the credential stored for the old one.
@@ -73,20 +85,30 @@ test.describe('mail settings', () => {
     await expect(mailPage.fieldError('sender-address')).toBeVisible();
   });
 
-  // The secret must never round-trip to the browser, even after a save.
-  test('should never render the stored password', async ({ getPageModel }) => {
+  // The whole save path — validate, persist, re-seed from the response — while the secret
+  // itself never round-trips back to the browser.
+  test('should save a valid configuration without ever rendering the stored password', async ({ getPageModel }) => {
     const mailPage = await getPageModel('/admin/mail');
     await mailPage.enableMail();
     await mailPage.fillServerConfig({
-      host: 'smtp.example.org',
+      host: 'smtp.saved.test',
       password: 'hunter2',
-      port: '587',
-      senderAddress: 'noreply@example.org',
-      username: 'mailer'
+      port: '2525',
+      senderAddress: 'sender@example.org',
+      username: 'saver'
     });
 
-    await expect(mailPage.password).toHaveAttribute('type', 'password');
+    await mailPage.saveConfig.click();
+    await expect(mailPage.$ref.getByRole('heading', { name: 'Success' }).last()).toBeVisible();
+
+    // The reload proves the save reached the database, not merely component state.
     await mailPage.$ref.reload();
+    await mailPage.enableMail();
+    await expect(mailPage.host).toHaveValue('smtp.saved.test');
+    await expect(mailPage.username).toHaveValue('saver');
+    await expect(mailPage.port).toHaveValue('2525');
+    await expect(mailPage.password).toHaveAttribute('type', 'password');
+    await expect(mailPage.password).not.toHaveValue('hunter2');
     await expect(mailPage.$ref.locator('body')).not.toContainText('hunter2');
   });
 
@@ -127,11 +149,11 @@ test.describe('mail delivery', () => {
     test('should show the saved configuration without ever returning the password', async ({ getPageModel }) => {
       const mailPage = await getPageModel('/admin/mail');
 
-      await expect(mailPage.host).toHaveValue('smtp.invalid.test');
-      await expect(mailPage.username).toHaveValue('e2e');
+      await expect(mailPage.host).toHaveValue(E2E_MAIL_CONFIG.host);
+      await expect(mailPage.username).toHaveValue(E2E_MAIL_CONFIG.username);
       // The stored password is real, so this is the assertion that it never reaches the browser.
-      await expect(mailPage.password).not.toHaveValue('e2e-password');
-      await expect(mailPage.$ref.locator('body')).not.toContainText('e2e-password');
+      await expect(mailPage.password).not.toHaveValue(E2E_MAIL_CONFIG.password);
+      await expect(mailPage.$ref.locator('body')).not.toContainText(E2E_MAIL_CONFIG.password);
     });
 
     test('should report a failed connection test in the reader’s language, not raw SMTP prose', async ({
@@ -146,6 +168,52 @@ test.describe('mail delivery', () => {
       const notification = mailPage.$ref.getByText(/could not be found|check and reconfigure/i);
       await expect(notification.first()).toBeVisible({ timeout: 40_000 });
       await expect(mailPage.$ref.locator('body')).not.toContainText('ENOTFOUND');
+    });
+
+    // Distinct from the connection test: this is the one path that calls `sendMail`, so the send
+    // button has to be driven all the way to an outcome, not merely checked enabled.
+    test('should report a failed test email in the reader’s language, not raw SMTP prose', async ({ getPageModel }) => {
+      const mailPage = await getPageModel('/admin/mail');
+
+      await mailPage.testRecipient.fill('recipient@example.org');
+      await mailPage.sendTest.click();
+
+      const notification = mailPage.$ref.getByText(/could not be found|check and reconfigure/i);
+      await expect(notification.first()).toBeVisible({ timeout: 40_000 });
+      await expect(mailPage.$ref.locator('body')).not.toContainText('ENOTFOUND');
+    });
+  });
+
+  test.describe('welcome email', () => {
+    // Delivery fails against the unroutable host, so the app must surface the rendered message
+    // for manual sending rather than silently losing the one copy of it.
+    test('should offer the rendered welcome message for manual delivery when sending fails', async ({
+      authenticateAs,
+      page,
+      uniqueId
+    }) => {
+      const username = `welcome_${uniqueId}`;
+      await authenticateAs('ADMIN');
+      await page.goto('/admin/users/create');
+
+      const createUserForm = page.getByTestId('create-user-form');
+      await createUserForm.getByLabel('Username').fill(username);
+      await createUserForm.getByLabel('Password', { exact: true }).fill(SEEDED_USER_PASSWORD);
+      await createUserForm.getByLabel('Confirm Password').fill(SEEDED_USER_PASSWORD);
+      await createUserForm.getByLabel('First Name').fill('Welcome');
+      await createUserForm.getByLabel('Last Name').fill('Probe');
+      await createUserForm.getByLabel('Email').fill(`${username}@example.org`);
+      // ADMIN so the form does not also demand a group.
+      await createUserForm.getByTestId('basePermissionLevel-select-trigger').click();
+      await page.getByTestId('basePermissionLevel-select-item-ADMIN').click();
+      await createUserForm.getByRole('button', { name: 'Submit' }).click();
+
+      const fallback = page.getByTestId('welcome-email-fallback');
+      await expect(fallback).toBeVisible({ timeout: 40_000 });
+      // The message is the rendered template, so the admin can hand it over as-is.
+      await expect(fallback).toContainText(username);
+      await fallback.getByRole('button', { name: 'Done' }).click();
+      await page.waitForURL('**/admin/users');
     });
   });
 

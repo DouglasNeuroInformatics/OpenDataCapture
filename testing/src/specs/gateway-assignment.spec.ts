@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test';
 
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
+import { ApiClient } from '../support/api-client';
 import { expect, test } from '../support/fixtures';
 
 import type { GetPageModel } from '../support/fixtures';
@@ -128,5 +129,29 @@ test.describe('gateway assignment errors', () => {
     expect(response?.status()).toBe(404);
 
     await gatewayPage.close();
+  });
+
+  // `POST /v1/assignments/:id/email` mails a live assignment credential to a caller-supplied
+  // address, and its guard (`update Assignment`) is group-scoped rather than admin-only — so the
+  // control that matters is row scoping, which no blanket-403 table can assert.
+  test('should not let a manager outside the group email an assignment link', async ({
+    api,
+    apiRequestContext,
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const assignmentUrl = await createRemoteAssignmentLink(getPageModel, page, uniqueId);
+    const assignmentId = assignmentUrl.split('/').pop()!;
+
+    const outsiderGroup = await api.createGroup();
+    const { credentials } = await api.createUser({ groupIds: [outsiderGroup.id] });
+    const token = await ApiClient.login(apiRequestContext, credentials);
+
+    const response = await apiRequestContext.post(`/api/v1/assignments/${assignmentId}/email`, {
+      data: { language: 'en', recipient: 'outsider-target@example.org' },
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    expect([403, 404]).toContain(response.status());
   });
 });
