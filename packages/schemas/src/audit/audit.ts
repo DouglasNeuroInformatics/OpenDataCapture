@@ -46,6 +46,8 @@ export const $AuditLog = z.object({
   entity: $AuditLogEntity,
   group: $Group.pick({ name: true }).nullish(),
   id: z.string(),
+  /** Action-specific facts (e.g. the recipient and assignment of a SEND_EMAIL) the fixed columns cannot carry */
+  metadata: z.record(z.string(), z.unknown()).nullish(),
   timestamp: z.int(),
   user: $User.pick({ username: true }).nullish()
 });

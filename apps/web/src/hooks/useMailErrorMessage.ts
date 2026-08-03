@@ -24,6 +24,10 @@ export function useMailErrorMessage(): (code: MailErrorCode | null | undefined) 
       en: 'Could not establish a secure connection — check the port and encryption method.',
       fr: 'Impossible d’établir une connexion sécurisée — vérifiez le port et le chiffrement.'
     }),
+    PASSWORD_REQUIRED: t({
+      en: 'The mail server has changed — enter the password again to confirm it.',
+      fr: 'Le serveur de courriel a changé — saisissez de nouveau le mot de passe pour le confirmer.'
+    }),
     SENDER_REJECTED: t({
       en: 'The sender address was rejected — check the sender address.',
       fr: "L'adresse d'expéditeur a été refusée — vérifiez l'adresse d'expéditeur."

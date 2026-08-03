@@ -63,6 +63,10 @@ describe('$UpdateMailConfigData', () => {
   it('should accept an update that sets a new password', () => {
     expect($UpdateMailConfigData.parse(config).password).toBe('secret');
   });
+
+  it('should normalize a blank password to undefined, so no consumer can mistake it for a new secret', () => {
+    expect($UpdateMailConfigData.parse({ ...config, password: '' }).password).toBeUndefined();
+  });
 });
 
 describe('isMailEnabled', () => {

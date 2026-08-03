@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
 
-import { $BaseModel, $LocalizedString, $RegexString } from '../core/core.js';
+import { $AuthoredLocalizedString, $BaseModel, $RegexString } from '../core/core.js';
 import { $SubjectIdentificationMethod } from '../subject/subject.js';
 
 export type GroupSettings = z.infer<typeof $GroupSettings>;
@@ -22,14 +22,16 @@ export const $GroupType = z.enum(['CLINICAL', 'RESEARCH']);
 
 /**
  * A named remote-assignment email template authored by a group manager. Bodies support the
- * `{{url}}` and `{{expiresAt}}` placeholders.
+ * `{{url}}` and `{{expiresAt}}` placeholders. Subject and body must each carry content in at
+ * least one language: a stored template with neither would otherwise reach a participant as an
+ * empty subject over a bare link, reported as sent.
  */
 export type GroupEmailTemplate = z.infer<typeof $GroupEmailTemplate>;
 export const $GroupEmailTemplate = z.object({
-  body: $LocalizedString.nullish(),
+  body: $AuthoredLocalizedString,
   id: z.string().min(1),
   name: z.string().min(1),
-  subject: $LocalizedString.nullish()
+  subject: $AuthoredLocalizedString
 });
 
 export type Group = z.infer<typeof $Group>;

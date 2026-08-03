@@ -1,6 +1,6 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
@@ -55,13 +55,18 @@ export class AssignmentsController {
   ): Promise<EmailDeliveryResult> {
     const { ability } = currentUser;
     const assignment = await this.assignmentsService.findById(id, { ability });
-    // Choose the requested template if given, else the group's active one; either way falling back
-    // to the built-in default when the id resolves to nothing (e.g. null selects the default).
+    // Choose the requested template if given (null selects the built-in default), else the
+    // group's active one, falling back to the default when the active id resolves to nothing.
     let template: MailTemplate = { ...DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE };
     if (assignment.groupId) {
       const group = await this.groupsService.findById(assignment.groupId, { ability });
       const targetId = templateId === undefined ? group.activeAssignmentEmailTemplateId : templateId;
       const chosen = group.emailTemplates?.find(({ id }) => id === targetId);
+      // An explicitly requested template that no longer exists must not become a silent
+      // substitution of wording the caller never chose — it was deleted under their open form.
+      if (templateId && !chosen) {
+        throw new BadRequestException(`No email template with id '${templateId}' exists in this group`);
+      }
       if (chosen?.body && chosen.subject) {
         template = { body: chosen.body, subject: chosen.subject };
       }
@@ -73,10 +78,15 @@ export class AssignmentsController {
       template,
       url: `${assignment.url}?lang=${language}`
     });
-    await this.auditLogger.log('SEND_EMAIL', 'ASSIGNMENT', {
-      groupId: assignment.groupId ?? null,
-      userId: currentUser.id
-    });
+    // The entry must mean the instance's mail identity actually carried this credential toward
+    // this address: nothing goes outbound for DISABLED or NO_RECIPIENT, so nothing is recorded.
+    if (result.status === 'SENT' || result.status === 'FAILED') {
+      await this.auditLogger.log('SEND_EMAIL', 'ASSIGNMENT', {
+        groupId: assignment.groupId ?? null,
+        metadata: { assignmentId: id, recipient, status: result.status },
+        userId: currentUser.id
+      });
+    }
     return result;
   }
 

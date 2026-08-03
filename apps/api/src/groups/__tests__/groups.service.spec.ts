@@ -9,6 +9,14 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { GroupsService } from '../groups.service';
 
+/** A minimal template satisfying `$GroupEmailTemplate`, which requires renderable content. */
+const template = (id: string, name: string) => ({
+  body: { en: 'Link {{url}}' },
+  id,
+  name,
+  subject: { en: 'Subject' }
+});
+
 describe('GroupsService', () => {
   let groupsService: GroupsService;
   let groupModel: MockedInstance<Model<'Group'>>;
@@ -106,10 +114,7 @@ describe('GroupsService', () => {
       groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: new Date('2026-07-01T00:00:00Z') });
       await expect(
         groupsService.updateById('123', {
-          emailTemplates: [
-            { id: 'tpl-1', name: 'One' },
-            { id: 'tpl-1', name: 'Two' }
-          ],
+          emailTemplates: [template('tpl-1', 'One'), template('tpl-1', 'Two')],
           expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
         })
       ).rejects.toBeInstanceOf(BadRequestException);
@@ -121,7 +126,7 @@ describe('GroupsService', () => {
       await expect(
         groupsService.updateById('123', {
           activeAssignmentEmailTemplateId: 'tpl-gone',
-          emailTemplates: [{ id: 'tpl-1', name: 'One' }],
+          emailTemplates: [template('tpl-1', 'One')],
           expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
         })
       ).rejects.toBeInstanceOf(BadRequestException);
@@ -131,7 +136,7 @@ describe('GroupsService', () => {
       groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: new Date('2026-07-01T00:00:00Z') });
       await groupsService.updateById('123', {
         activeAssignmentEmailTemplateId: null,
-        emailTemplates: [{ id: 'tpl-1', name: 'One' }],
+        emailTemplates: [template('tpl-1', 'One')],
         expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
       });
       expect(groupModel.update).toHaveBeenCalled();
@@ -146,7 +151,7 @@ describe('GroupsService', () => {
       });
       await expect(
         groupsService.updateById('123', {
-          emailTemplates: [{ id: 'tpl-2', name: 'Two' }],
+          emailTemplates: [template('tpl-2', 'Two')],
           expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
         })
       ).rejects.toBeInstanceOf(BadRequestException);

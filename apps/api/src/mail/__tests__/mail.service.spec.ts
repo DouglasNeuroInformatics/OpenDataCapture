@@ -108,6 +108,15 @@ describe('MailService', () => {
       expect(settings.config).toBeNull();
       expect(settings.newUserEmailTemplate.subject).toBeTruthy();
     });
+
+    // Otherwise a rotated SECRET_KEY locks the admin out of the one page that could fix it.
+    it('still returns the settings when the stored password no longer decrypts', async () => {
+      setupStateModel.findFirst.mockResolvedValue({
+        mailConfig: { ...validConfig, password: encryptSecret('secret', 'rotated-key') }
+      });
+      const settings = await mailService.getSettings();
+      expect(settings.config).toMatchObject({ hasPassword: true, host: 'smtp.example.org' });
+    });
   });
 
   describe('updateSettings', () => {
@@ -122,6 +131,26 @@ describe('MailService', () => {
       setupStateModel.findFirst.mockResolvedValue({ id: '1', isSetup: true, mailConfig: stored(validConfig) });
       await mailService.updateSettings({ config: { ...validConfig, password: undefined } });
       expect(persistedPassword()).toBe('secret');
+    });
+
+    // `''` must behave exactly like an omitted password, so a client sending the blank form
+    // field back cannot silently erase the credential.
+    it('keeps the stored password when the update sends an empty string for the same server', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ id: '1', isSetup: true, mailConfig: stored(validConfig) });
+      await mailService.updateSettings({ config: { ...validConfig, password: '' } });
+      expect(persistedPassword()).toBe('secret');
+    });
+
+    // The write path must never depend on decrypting the old secret, or a rotated SECRET_KEY
+    // would make it impossible to ever set a working password again.
+    it('accepts a new password even when the stored one no longer decrypts', async () => {
+      setupStateModel.findFirst.mockResolvedValue({
+        id: '1',
+        isSetup: true,
+        mailConfig: { ...validConfig, password: encryptSecret('secret', 'rotated-key') }
+      });
+      await mailService.updateSettings({ config: { ...validConfig, password: 'new-secret' } });
+      expect(persistedPassword()).toBe('new-secret');
     });
 
     // A Mongo dump must not yield a working mail credential.
@@ -195,7 +224,18 @@ describe('MailService', () => {
         config: { ...validConfig, host: 'smtp.attacker.example', password: undefined }
       });
       expect(result.success).toBe(false);
+      // The credentials are fine — the admin has to re-enter the password, and the code says so.
+      expect(result.error).toBe('PASSWORD_REQUIRED');
       expect(createTransport).not.toHaveBeenCalled();
+    });
+
+    it('reports an error rather than throwing when the stored password no longer decrypts', async () => {
+      setupStateModel.findFirst.mockResolvedValue({
+        mailConfig: { ...validConfig, password: encryptSecret('secret', 'rotated-key') }
+      });
+      const result = await mailService.test({});
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('UNKNOWN');
     });
 
     it('reports when mail has not been configured', async () => {
@@ -245,6 +285,24 @@ describe('MailService', () => {
       const result = await mailService.sendNewUserEmail(newUserArgs);
       expect(result.status).toBe('FAILED');
       expect(result.error).toBe('CONNECTION_REFUSED');
+    });
+
+    it('is FAILED rather than throwing when the stored password no longer decrypts', async () => {
+      setupStateModel.findFirst.mockResolvedValue({
+        mailConfig: { ...validConfig, password: encryptSecret('secret', 'rotated-key') }
+      });
+      const result = await mailService.sendNewUserEmail(newUserArgs);
+      expect(result.status).toBe('FAILED');
+      expect(result.message).toContain('Jane');
+    });
+
+    // The caller has already created the user, so even a mail state that cannot be read must
+    // come back as a result with a copy-pasteable message, never as a thrown error.
+    it('is FAILED with the default message rather than throwing when the stored configuration is invalid', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: { ...stored(validConfig), port: 'not-a-port' } });
+      const result = await mailService.sendNewUserEmail(newUserArgs);
+      expect(result.status).toBe('FAILED');
+      expect(result.message).toContain('jdoe');
     });
   });
 

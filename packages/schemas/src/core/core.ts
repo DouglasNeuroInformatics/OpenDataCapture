@@ -50,6 +50,17 @@ export const $LocalizedString = z.object({
   fr: z.string().nullish()
 } satisfies { [L in Language]: z.ZodType<null | string | undefined> });
 
+/**
+ * A {@link $LocalizedString} with at least one non-blank entry, for content a reader must
+ * actually see — an email subject or body that renders as nothing is a broken message, not a
+ * translation choice.
+ */
+export type AuthoredLocalizedString = z.infer<typeof $AuthoredLocalizedString>;
+export const $AuthoredLocalizedString = $LocalizedString.refine(
+  (localized) => Object.values(localized).some((entry) => typeof entry === 'string' && entry.trim().length > 0),
+  'At least one language must have content'
+);
+
 export type BaseModel = z.infer<typeof $BaseModel>;
 export const $BaseModel = z.object({
   createdAt: z.coerce.date(),

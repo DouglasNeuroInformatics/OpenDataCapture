@@ -11,7 +11,8 @@ import {
   $MailConfig,
   DEFAULT_NEW_USER_EMAIL_TEMPLATE,
   isMailEnabled,
-  isSameMailServer
+  isSameMailServer,
+  MAIL_TRANSPORT_TIMEOUTS
 } from '@opendatacapture/schemas/mail';
 import type {
   EmailDeliveryResult,
@@ -45,7 +46,7 @@ type MailMessage = {
   to: string;
 };
 
-/** Everything the service reads off `SetupState`, validated and decrypted. */
+/** Everything the service reads off `SetupState`, validated. The config's password remains the stored ciphertext. */
 type MailState = {
   config: MailConfig | null;
   isEnabled: boolean;
@@ -103,7 +104,13 @@ export class MailService {
     });
   }
 
-  /** Build and send the welcome email for a newly created user, in the requested language. */
+  /**
+   * Build and send the welcome email for a newly created user, in the requested language.
+   *
+   * Never throws: the caller has already created the user, so a failure to even read the mail
+   * state has to reach the admin as a FAILED result with a copy-pasteable message, not as an
+   * error response on a creation that succeeded.
+   */
   async sendNewUserEmail({
     email,
     firstName,
@@ -121,9 +128,20 @@ export class MailService {
     url: string;
     username: string;
   }): Promise<EmailDeliveryResult> {
-    const state = await this.readState();
-    const { body, subject } = state.newUserEmailTemplate;
     const variables = { firstName, group, lastName, url, username };
+    let state: MailState;
+    try {
+      state = await this.readState();
+    } catch (err) {
+      this.loggingService.error(`Failed to read mail state for new user email: ${String(err)}`);
+      return {
+        error: 'UNKNOWN',
+        message: renderTemplate(pickLocale(DEFAULT_NEW_USER_EMAIL_TEMPLATE.body, language), variables),
+        recipient: email,
+        status: 'FAILED'
+      };
+    }
+    const { body, subject } = state.newUserEmailTemplate;
     return this.deliver(state, {
       message: renderTemplate(pickLocale(body, language), variables),
       recipient: email,
@@ -138,14 +156,15 @@ export class MailService {
   async test({ config, recipient }: TestMailData): Promise<TestMailResult> {
     const { config: saved } = await this.readState();
     if (this.requiresNewPassword(config, saved)) {
-      // The client already blocks this, so a code the UI maps to "check your credentials" is enough.
-      return { error: 'AUTHENTICATION_FAILED', success: false };
-    }
-    const resolved = this.resolveConfig(config, saved);
-    if (!resolved) {
-      return { error: 'UNKNOWN', success: false };
+      return { error: 'PASSWORD_REQUIRED', success: false };
     }
     try {
+      // Resolution decrypts an inherited stored password, so it belongs inside the collapse: an
+      // undecryptable secret must report a code here exactly as it does on a real send.
+      const resolved = this.resolveConfig(config, saved);
+      if (!resolved) {
+        return { error: 'UNKNOWN', success: false };
+      }
       const transporter = this.createTransporter(resolved);
       await transporter.verify();
       if (recipient) {
@@ -175,8 +194,14 @@ export class MailService {
     if (this.requiresNewPassword(data.config, saved)) {
       throw new BadRequestException('A password is required when changing the mail server');
     }
-    const resolved = data.config ? this.resolveConfig(data.config, saved) : undefined;
-    const nextConfig = resolved ? { ...resolved, password: this.encryptPassword(resolved.password) } : undefined;
+    // A kept password is inherited as its stored ciphertext, so updating settings never has to
+    // decrypt the old secret — after a SECRET_KEY rotation the admin recovers by re-entering it.
+    const nextConfig = data.config
+      ? this.mergeConfig(
+          data.config,
+          data.config.password ? this.encryptPassword(data.config.password) : (saved?.password ?? '')
+        )
+      : undefined;
     const updated = await this.setupStateModel.update({
       data: {
         ...(nextConfig ? { mailConfig: { set: nextConfig } } : {}),
@@ -190,18 +215,26 @@ export class MailService {
   private createTransporter(config: MailConfig): Transporter {
     return createTransport({
       auth: { pass: config.password, user: config.username },
-      // Fail fast (e.g. on a wrong port) so the API returns a clear error rather than
-      // hanging until the client request times out.
-      connectionTimeout: 15_000,
-      greetingTimeout: 15_000,
+      // The shared budget: clients derive their request timeouts from these same values, so the
+      // server always fails (and reports) before a client gives up and aborts.
+      connectionTimeout: MAIL_TRANSPORT_TIMEOUTS.connection,
+      greetingTimeout: MAIL_TRANSPORT_TIMEOUTS.greeting,
       host: config.host,
       port: config.port,
-      socketTimeout: 20_000,
+      socketTimeout: MAIL_TRANSPORT_TIMEOUTS.socket,
       ...encryptionToTransportFlags(config.encryption)
     });
   }
 
-  /** Reverse {@link encryptPassword}. Propagates, so a key rotation surfaces instead of muting mail. */
+  /** Swap the stored ciphertext for the plaintext password, immediately before it is used. */
+  private decryptConfig(config: MailConfig): MailConfig {
+    return { ...config, password: this.decryptPassword(config.password) };
+  }
+
+  /**
+   * Reverse {@link encryptPassword}. Throws on a rotated key; callers sit inside a failure
+   * collapse, so that surfaces as a FAILED result or test error rather than muting mail.
+   */
   private decryptPassword(stored: string): string {
     return stored ? decryptSecret(stored, this.configService.getOrThrow('SECRET_KEY')) : '';
   }
@@ -221,7 +254,11 @@ export class MailService {
       return { message, recipient: null, status: 'NO_RECIPIENT' };
     }
     try {
-      await this.send(this.createTransporter(config), config, { body: message, subject, to: recipient });
+      await this.send(this.createTransporter(this.decryptConfig(config)), config, {
+        body: message,
+        subject,
+        to: recipient
+      });
       return { message, recipient, status: 'SENT' };
     } catch (err) {
       this.loggingService.error(`Failed to send "${subject}" to ${recipient}: ${String(err)}`);
@@ -234,12 +271,29 @@ export class MailService {
     return plaintext ? encryptSecret(plaintext, this.configService.getOrThrow('SECRET_KEY')) : '';
   }
 
+  /** Combine an update payload with an already-resolved password into a complete config. */
+  private mergeConfig(partial: UpdateMailConfigData, password: string): MailConfig {
+    return {
+      enabled: partial.enabled,
+      encryption: partial.encryption,
+      host: partial.host,
+      password,
+      port: partial.port,
+      senderAddress: partial.senderAddress,
+      senderName: partial.senderName ?? null,
+      username: partial.username
+    };
+  }
+
   /**
-   * Validate and decrypt the two mail fields off a `SetupState` row.
+   * Validate the two mail fields off a `SetupState` row. The password stays as its stored
+   * ciphertext — it is decrypted immediately before use, so a rotated SECRET_KEY breaks sending
+   * (loudly, as a FAILED delivery) without also locking the admin out of the settings page that
+   * would fix it.
    *
-   * A stored configuration that no longer validates, or whose password no longer decrypts, is a
-   * hard failure rather than "not configured": treating it as the latter makes every send return
-   * `DISABLED` while the admin looks at a configured mail page, with nothing to explain it.
+   * A stored configuration that no longer validates is a hard failure rather than "not
+   * configured": treating it as the latter makes every send return `DISABLED` while the admin
+   * looks at a configured mail page, with nothing to explain it.
    */
   private parseState(setupState: null | Pick<SetupState, 'mailConfig' | 'newUserEmailTemplate'>): MailState {
     const stored = setupState?.mailConfig;
@@ -253,7 +307,7 @@ export class MailService {
     // Two empty objects are truthy, so check for actual content before preferring the stored one.
     const hasStoredTemplate = Boolean(body && subject && pickLocale(body, 'en') && pickLocale(subject, 'en'));
     return {
-      config: parsed?.success ? { ...parsed.data, password: this.decryptPassword(parsed.data.password) } : null,
+      config: parsed?.success ? parsed.data : null,
       isEnabled: isMailEnabled(stored),
       newUserEmailTemplate:
         hasStoredTemplate && body && subject ? { body, subject } : { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE }
@@ -276,24 +330,17 @@ export class MailService {
   }
 
   /**
-   * Resolve a (possibly partial) update payload into a complete config. Callers reject the
-   * payload with {@link requiresNewPassword} first, which is what makes inheriting a blank
-   * password below safe.
+   * Resolve a (possibly partial) update payload into a complete config ready to authenticate
+   * with — an inherited stored password is decrypted here. Callers reject the payload with
+   * {@link requiresNewPassword} first, which is what confines inheritance to the server the
+   * stored password belongs to.
    */
   private resolveConfig(partial: undefined | UpdateMailConfigData, saved: MailConfig | null): MailConfig | null {
     if (!partial) {
-      return saved;
+      return saved && this.decryptConfig(saved);
     }
-    return {
-      enabled: partial.enabled,
-      encryption: partial.encryption,
-      host: partial.host,
-      password: partial.password ?? saved?.password ?? '',
-      port: partial.port,
-      senderAddress: partial.senderAddress,
-      senderName: partial.senderName ?? null,
-      username: partial.username
-    };
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- a blank password means "keep the stored one"; fall through intentionally
+    return this.mergeConfig(partial, partial.password || this.decryptPassword(saved?.password ?? ''));
   }
 
   private async send(transporter: Transporter, config: MailConfig, { body, subject, to }: MailMessage): Promise<void> {

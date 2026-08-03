@@ -51,6 +51,9 @@ model AuditLog {
   entity    AuditLogEntity
   group     Group?         @relation(fields: [groupId], references: [id])
   groupId   String?        @db.ObjectId
+  /// Action-specific facts (e.g. the recipient and assignment of a SEND_EMAIL) the fixed columns cannot carry
+  /// [AuditLogMetadata]
+  metadata  Json?
   timestamp Int
   user      User?          @relation(fields: [userId], references: [id])
   userId    String?        @db.ObjectId
@@ -111,11 +114,13 @@ type LocalizedString {
 }
 
 // A group-manager-authored remote-assignment email template for a group's participants.
+// Subject and body are required to match `$GroupEmailTemplate`, which rejects a template
+// without renderable content at the write perimeter.
 type GroupEmailTemplate {
   id      String
   name    String
-  subject LocalizedString?
-  body    LocalizedString?
+  subject LocalizedString
+  body    LocalizedString
 }
 
 model Group {

@@ -41,10 +41,14 @@ const $MailConfigDto = $MailConfig.omit({ password: true }).extend({
 /**
  * The payload an admin submits to update the mail configuration. `password` is optional: when
  * omitted or left blank the stored value is kept, which lets the form round-trip without ever
- * holding the secret.
+ * holding the secret. A blank string is normalized to `undefined` here so no consumer can
+ * mistake it for "set the password to nothing" and wipe the stored credential.
  */
 const $UpdateMailConfigData = $MailConfig.omit({ password: true }).extend({
-  password: z.string().optional()
+  password: z
+    .string()
+    .transform((value) => value || undefined)
+    .optional()
 });
 
 /** The fields that together identify which SMTP server a configuration points at. */
@@ -89,6 +93,8 @@ const $TestMailData = z.object({
  * - `CONNECTION_REFUSED`    — the host resolved but refused the connection
  * - `INSECURE_CONNECTION`   — TLS could not be established for the chosen port/encryption
  * - `SENDER_REJECTED`       — the server refused the configured sender address
+ * - `PASSWORD_REQUIRED`     — the target server is not the one the stored password belongs to, so
+ *                             the password must be entered again
  * - `UNKNOWN`               — anything else, including timeouts
  */
 const $MailErrorCode = z.enum([
@@ -97,6 +103,7 @@ const $MailErrorCode = z.enum([
   'CONNECTION_REFUSED',
   'INSECURE_CONNECTION',
   'SENDER_REJECTED',
+  'PASSWORD_REQUIRED',
   'UNKNOWN'
 ]);
 
@@ -130,6 +137,24 @@ const $SendAssignmentEmailData = z.object({
    */
   templateId: z.string().nullish()
 });
+
+/**
+ * The SMTP transporter's failure budget, in milliseconds. The server fails fast on each phase so
+ * a bad host or port yields a clear error rather than an open-ended hang.
+ */
+const MAIL_TRANSPORT_TIMEOUTS = {
+  connection: 15_000,
+  greeting: 15_000,
+  socket: 20_000
+} as const;
+
+/**
+ * How long a client triggering a send must wait, in milliseconds: the transporter's whole failure
+ * budget plus round-trip slack. Derived rather than restated so the client can never again abort
+ * *after* the server has handed the message off — the abort-after-side-effect bug this replaces.
+ */
+const MAIL_CLIENT_TIMEOUT =
+  MAIL_TRANSPORT_TIMEOUTS.connection + MAIL_TRANSPORT_TIMEOUTS.greeting + MAIL_TRANSPORT_TIMEOUTS.socket + 10_000;
 
 /** Default subject/body (per language) seeded into the new-user template the first time it is read. */
 const DEFAULT_NEW_USER_EMAIL_TEMPLATE = {
@@ -265,5 +290,7 @@ export {
   DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE,
   DEFAULT_NEW_USER_EMAIL_TEMPLATE,
   isMailEnabled,
-  isSameMailServer
+  isSameMailServer,
+  MAIL_CLIENT_TIMEOUT,
+  MAIL_TRANSPORT_TIMEOUTS
 };

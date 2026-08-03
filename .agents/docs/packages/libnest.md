@@ -11,7 +11,7 @@ Generic NestJS decorators, pipes, modules, and utilities used across DNP project
 - Talking to Prisma — use `InjectModel` / `Model<'X'>` / `InjectPrismaClient` instead of instantiating `PrismaClient`.
 - Validating a request DTO against a Zod schema — use the `@ValidationSchema()` decorator, or `ParseSchemaPipe` / `ValidObjectIdPipe`, instead of a custom pipe.
 - Mocking a Prisma model or libnest service in a unit test — use `MockFactory` from `./testing` instead of hand-rolling a stub.
-- Logging, hashing/encrypting, sending mail, or running virtualized code inside Nest — use `LoggingModule`/`CryptoModule`/`MailModule`/`VirtualizationModule` instead of a third-party Nest integration.
+- Logging, hashing/encrypting, or running virtualized code inside Nest — use `LoggingModule`/`CryptoModule`/`VirtualizationModule` instead of a third-party Nest integration. (`MailModule` is the one deliberate exception in this repo — see below.)
 
 ## Subpath exports
 

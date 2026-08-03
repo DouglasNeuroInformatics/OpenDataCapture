@@ -5,6 +5,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { $Language } from '@opendatacapture/schemas/core';
 import type { Language } from '@opendatacapture/schemas/core';
 import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
+import type { CreateUserResponse } from '@opendatacapture/schemas/user';
 
 import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -39,7 +40,7 @@ export class UsersController {
     @CurrentUser('ability') ability: AppAbility,
     @Headers('origin') origin?: string,
     @Query('language', new ParseSchemaPipe({ schema: $Language.optional() })) language?: Language
-  ) {
+  ): Promise<CreateUserResponse> {
     const created = await this.usersService.create(user, { ability });
     // Attempt to send the welcome email. The result is always returned (even when
     // mail is disabled or the user has no email) so the client can fall back to a
