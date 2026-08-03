@@ -439,6 +439,39 @@ describe('InstrumentsService', () => {
     });
   });
 
+  describe('create', () => {
+    // The id `create` derives for `existingSeries` when no owning group is supplied, as a repo import
+    // does. `seriesGroupId` is undefined, so `JSON.stringify` drops the key entirely.
+    const seriesId = `__V2__hash:${JSON.stringify({
+      content: existingSeries.content,
+      title: existingSeries.details.title
+    })}`;
+
+    beforeEach(() => {
+      vi.spyOn(cryptoService, 'hash').mockImplementation((value) => `hash:${value}`);
+      virtualizationService.eval.mockResolvedValue({ isErr: () => false, value: existingSeries } as any);
+      instrumentModel.findMany.mockResolvedValue([{ id: 'hash:FORM_A-1' }, { id: 'hash:FORM_B-1' }] as any);
+    });
+
+    it('should report a lost insert race as a conflict, so a concurrent import can still recover the id', async () => {
+      // The guard passes, then a competing import wins the insert: the driver rejects the duplicate id
+      // and the row is present on re-check.
+      instrumentModel.exists.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+      instrumentModel.create.mockRejectedValueOnce(new Error('Unique constraint failed on the constraint: `_id_`'));
+
+      await expect(instrumentsService.create({ bundle: '__BUNDLE__' })).rejects.toThrowError(
+        new ConflictException(`Instrument with ID '${seriesId}' already exists!`)
+      );
+    });
+
+    it('should rethrow an insert failure that is not a duplicate, so real errors are not masked', async () => {
+      instrumentModel.exists.mockResolvedValue(false);
+      instrumentModel.create.mockRejectedValueOnce(new Error('connection reset'));
+
+      await expect(instrumentsService.create({ bundle: '__BUNDLE__' })).rejects.toThrowError('connection reset');
+    });
+  });
+
   describe('generateSeriesInstrumentId', () => {
     it('uses a versioned prefix and includes the title so confirmed duplicate form sets can be distinct', () => {
       vi.spyOn(cryptoService, 'hash').mockImplementation((value) => value);
