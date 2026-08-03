@@ -67,9 +67,9 @@ export async function build({
   } catch (err) {
     const parseResult = await $BuildFailure.safeParseAsync(err);
     if (parseResult.success) {
-      throw new InstrumentBundlerError('Unknown Error', { cause: err });
+      throw new InstrumentBundlerError('Failed to Compile', { cause: parseResult.data, kind: 'ESBUILD_FAILURE' });
     }
-    throw new InstrumentBundlerError('Failed to Compile', { cause: parseResult.error, kind: 'ESBUILD_FAILURE' });
+    throw new InstrumentBundlerError('Unknown Error', { cause: err });
   }
   return parseBuildResult(result);
 }

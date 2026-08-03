@@ -344,7 +344,11 @@ export class InstrumentReposService implements OnModuleInit {
           }
         } catch (err) {
           // One bad instrument should not abort importing the rest of the repository.
-          this.loggingService.error(`Failed to import instrument from ${path.basename(dir)}: ${String(err)}`);
+          this.loggingService.error({
+            cause: err,
+            error: 'Failed to Import Instrument',
+            instrumentDir: path.basename(dir)
+          });
         }
       }
 

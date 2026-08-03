@@ -45,14 +45,17 @@ degrades every such error, and **esbuild error locations are one line ahead of t
 matching `location.lineText` rather
 than trusting `location.line`.
 
-**Known defect, verified, unfixed:** the two branches of the `catch` in `build.ts` are inverted. A real
-`BuildFailure` parses successfully and is thrown as `'Unknown Error'` with no `kind`, so
-`InstrumentBundlerError.isInstance(err, 'ESBUILD_FAILURE')` is never true and `CodeErrorBlock` never
-renders. Anything you write that depends on `kind` will not fire until this is corrected.
-
 **Never `import 'esbuild'` directly.** `src/vendor/esbuild.ts` switches between `esbuild` and
 `esbuild-wasm` on `typeof window === 'undefined'` — that is what lets the playground bundle in the
 browser. Tests also spy on this module (`vi.spyOn(esbuild, 'build')`).
+
+**That switch must initialize its exports in the declaration itself.** `package.json` declares
+`sideEffects: ['**/cli.ts']`, so every other file here is advertised as side-effect free and a
+bundler may delete any standalone top-level statement. Writing the switch as an `if`/`else` that
+assigns to a hoisted `var` puts the initialization in such a statement: `apps/api`'s production
+bundle dropped the entire module and every instrument import failed with
+`ReferenceError: build is not defined` — a failure that only appears in a bundled build, never under
+`pnpm dev`. `src/__tests__/vendor.test.ts` bundles the module with tree shaking to guard this.
 
 **`src/parse.ts` is vendored** from `parse-imports` (Apache-2.0, adapted to TypeScript and to run in a
 browser). Treat it as third-party: fix it upstream-style or not at all.
