@@ -93,9 +93,12 @@ export const MailSettings = ({ config, newUserEmailTemplate }: MailSettingsProps
         : errorMessages.password;
     }
     if (!parsed.success) {
+      const isFormField = (key: unknown): key is keyof MailConfigFormValues => typeof key === 'string' && key in values;
       for (const issue of parsed.error.issues) {
-        const field = issue.path[0] as keyof MailConfigFormValues;
-        nextErrors[field] = errorMessages[field] ?? issue.message;
+        const [field] = issue.path;
+        if (isFormField(field)) {
+          nextErrors[field] = errorMessages[field] ?? issue.message;
+        }
       }
       return { errors: nextErrors };
     }

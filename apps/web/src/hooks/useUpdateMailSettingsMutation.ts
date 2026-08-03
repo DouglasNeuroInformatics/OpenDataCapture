@@ -3,7 +3,7 @@ import type { UpdateMailSettingsData } from '@opendatacapture/schemas/mail';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
-import { MAIL_SETTINGS_QUERY_KEY } from './useMailSettingsQuery';
+import { mailSettingsQueryOptions } from './useMailSettingsQuery';
 import { SETUP_STATE_QUERY_KEY } from './useSetupStateQuery';
 
 // The mail page renders its own inline save feedback, so this mutation raises neither a success
@@ -19,8 +19,11 @@ export function useUpdateMailSettingsMutation() {
       });
       return $MailSettings.parseAsync(response.data);
     },
-    onSuccess() {
-      void queryClient.invalidateQueries({ queryKey: [MAIL_SETTINGS_QUERY_KEY] });
+    onSuccess(data) {
+      // Seed from the response rather than invalidating: the settings page reads its `config`
+      // from this query, and an action taken right after a save (e.g. toggling mail off) must
+      // see the saved server, not the pre-refetch copy.
+      queryClient.setQueryData(mailSettingsQueryOptions().queryKey, data);
       // Toggling `enabled` changes the public `isMailEnabled` flag, which gates email UI elsewhere.
       void queryClient.invalidateQueries({ queryKey: [SETUP_STATE_QUERY_KEY] });
     },

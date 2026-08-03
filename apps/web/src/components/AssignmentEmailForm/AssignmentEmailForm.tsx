@@ -40,10 +40,12 @@ export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: Assignm
   const templates = groupQuery.data?.emailTemplates ?? [];
   const activeValue = groupQuery.data?.activeAssignmentEmailTemplateId ?? DEFAULT_TEMPLATE_OPTION;
   const selectedTemplate = templateChoice ?? activeValue;
+  // The group's active template sorts first; boolean subtraction is a total order, unlike the
+  // ternary chain it replaces, so the result does not depend on the sort's visiting order.
   const templateOptions = [
     { label: t({ en: 'Built-in default', fr: 'Modèle par défaut' }), value: DEFAULT_TEMPLATE_OPTION },
     ...templates.map((template) => ({ label: template.name, value: template.id }))
-  ].sort((a, b) => (a.value === activeValue ? -1 : b.value === activeValue ? 1 : 0));
+  ].sort((a, b) => Number(b.value === activeValue) - Number(a.value === activeValue));
 
   const selectedBody =
     selectedTemplate === DEFAULT_TEMPLATE_OPTION

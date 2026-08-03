@@ -330,7 +330,7 @@ const RouteComponent = () => {
           }
         }}
       >
-        <Dialog.Content className="max-w-lg">
+        <Dialog.Content className="max-w-lg" data-testid="welcome-email-fallback">
           <Dialog.Header>
             <Dialog.Title>{t({ en: 'Welcome message', fr: 'Message de bienvenue' })}</Dialog.Title>
             <Dialog.Description>

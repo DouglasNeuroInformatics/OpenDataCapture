@@ -12,7 +12,7 @@ import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
 import { ASSIGNMENT_TEMPLATE_VARS, checkTemplateIssue } from '@/utils/email-template';
-import { authoredLanguages, omitBlankLanguages } from '@/utils/language';
+import { omitBlankLanguages } from '@/utils/language';
 
 import { CreateTemplateForm } from './CreateTemplateForm';
 import { DeleteTemplateDialog } from './DeleteTemplateDialog';
@@ -20,7 +20,11 @@ import { EditTemplateDialog } from './EditTemplateDialog';
 import { TemplateRow } from './TemplateRow';
 import { ViewDefaultTemplateDialog } from './ViewDefaultTemplateDialog';
 
-const EmptyState = ({ children }: { children: React.ReactNode }) => (
+type EmptyStateProps = {
+  children: React.ReactNode;
+};
+
+const EmptyState = ({ children }: EmptyStateProps) => (
   <div className="text-muted-foreground border-border rounded-md border border-dashed p-3 text-sm">{children}</div>
 );
 
@@ -42,14 +46,26 @@ export const GroupEmailTemplates = () => {
   const [deleting, setDeleting] = React.useState<GroupEmailTemplate | null>(null);
   const [isViewingDefault, setIsViewingDefault] = React.useState(false);
 
-  const validateContent = (template: MailTemplate): string | undefined => {
-    // Scope validation to the languages actually started, so a pristine form is not an error.
-    const issue = checkTemplateIssue(
-      template.subject,
-      template.body,
-      ASSIGNMENT_TEMPLATE_VARS,
-      authoredLanguages(template.body)
+  // Without a group there is nothing to save to, so no editor is rendered: showing one whose
+  // every save quietly did nothing (a typed URL can get here with no group selected) would be a
+  // silent failure.
+  if (!groupId) {
+    return (
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6" data-testid="group-email-templates">
+        <EmptyState>
+          {t({
+            en: 'Select a group to manage its email templates.',
+            fr: 'Sélectionnez un groupe pour gérer ses modèles de courriel.'
+          })}
+        </EmptyState>
+      </div>
     );
+  }
+
+  const validateContent = (template: MailTemplate): string | undefined => {
+    // The default scope is every language touched in either field, so starting a subject without
+    // its body (or vice versa) is an error, while untouched languages are not.
+    const issue = checkTemplateIssue(template.subject, template.body, ASSIGNMENT_TEMPLATE_VARS);
     if (issue === 'incomplete') {
       return t({
         en: 'Fill in the subject and body in each language you have started.',
@@ -84,6 +100,15 @@ export const GroupEmailTemplates = () => {
    */
   const persist = async (next: GroupEmailTemplate[], nextActiveId: null | string): Promise<boolean> => {
     if (!group) {
+      // Reachable only in the window before the group query resolves — but a swallowed save
+      // would read as success, so it has to say something.
+      addNotification({
+        message: t({
+          en: 'The group is still loading — try again in a moment.',
+          fr: 'Le groupe est encore en cours de chargement — réessayez dans un instant.'
+        }),
+        type: 'error'
+      });
       return false;
     }
     try {

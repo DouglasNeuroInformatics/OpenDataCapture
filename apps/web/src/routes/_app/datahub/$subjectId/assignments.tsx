@@ -50,9 +50,15 @@ const AssignmentSlider: React.FC<{
               <CopyButton size="sm" text={assignment?.url ?? ''} variant="outline" />
             </div>
             <QRCode url={assignment?.url ?? 'javascript:void(0)'} />
-            {/* Only an outstanding assignment can still be completed, so only it is worth emailing. */}
+            {/* Only an outstanding assignment can still be completed, so only it is worth emailing.
+                Keyed per assignment: the sheet is reused across selections, and a template chosen
+                for one assignment must not silently carry over to the next one opened. */}
             {assignment?.status === 'OUTSTANDING' && (
-              <AssignmentEmailForm assignment={assignment} instrumentLanguages={instrumentLanguages} />
+              <AssignmentEmailForm
+                assignment={assignment}
+                instrumentLanguages={instrumentLanguages}
+                key={assignment.id}
+              />
             )}
           </div>
         </Sheet.Body>

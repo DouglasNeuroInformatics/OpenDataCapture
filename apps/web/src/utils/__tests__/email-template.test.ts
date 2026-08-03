@@ -36,4 +36,18 @@ describe('checkTemplateIssue', () => {
   it('should ignore a language the author has not started', () => {
     expect(checkTemplateIssue({ en: 'Subject' }, { en: 'Link {{url}}' }, ['url'], ['en'])).toBeNull();
   });
+
+  it('should ignore a language untouched in both fields by default', () => {
+    expect(checkTemplateIssue({ en: 'Subject' }, { en: 'Link {{url}}' }, ['url'])).toBeNull();
+  });
+
+  // A whitespace-only body must be blocked, not silently dropped at save time — dropping it sends
+  // a subject in one language over a body in another.
+  it('should report incomplete when a body is only whitespace in a touched language', () => {
+    expect(checkTemplateIssue(subject, { en: 'Link {{url}}', fr: '   ' }, ['url'])).toBe('incomplete');
+  });
+
+  it('should report incomplete when a subject is authored without its body', () => {
+    expect(checkTemplateIssue(subject, { en: 'Link {{url}}' }, ['url'])).toBe('incomplete');
+  });
 });

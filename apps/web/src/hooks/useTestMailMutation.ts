@@ -1,4 +1,4 @@
-import { $TestMailResult } from '@opendatacapture/schemas/mail';
+import { $TestMailResult, MAIL_CLIENT_TIMEOUT } from '@opendatacapture/schemas/mail';
 import type { TestMailData } from '@opendatacapture/schemas/mail';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
@@ -6,12 +6,12 @@ import axios from 'axios';
 export function useTestMailMutation() {
   return useMutation({
     mutationFn: async (data: TestMailData) => {
-      // A bad host/port can take ~15s to fail server-side, so opt out of the global 10s
-      // timeout (which the axios interceptor would otherwise force) and suppress the generic
-      // error toast — this mutation surfaces its own success/failure notifications.
+      // The timeout must outlast the server's whole SMTP failure budget (which the global 10s
+      // default would cut short), and the generic error toast is suppressed because this
+      // mutation surfaces its own success/failure notifications.
       const response = await axios.post('/v1/mail/test', data, {
         meta: { disableDefaultErrorNotification: true, disableDefaultTimeout: true },
-        timeout: 30_000
+        timeout: MAIL_CLIENT_TIMEOUT
       });
       return $TestMailResult.parseAsync(response.data);
     },

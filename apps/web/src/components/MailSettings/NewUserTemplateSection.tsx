@@ -9,7 +9,7 @@ import { Loader2Icon } from 'lucide-react';
 import { EmailTemplateEditor } from '@/components/EmailTemplateEditor';
 import { SectionCard } from '@/components/SectionCard';
 import { checkTemplateIssue, NEW_USER_TEMPLATE_VARS, REQUIRED_NEW_USER_TEMPLATE_VARS } from '@/utils/email-template';
-import { omitBlankLanguages } from '@/utils/language';
+import { LANGUAGES, omitBlankLanguages } from '@/utils/language';
 
 const defaultTemplate = (): MailTemplate => ({
   body: { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE.body },
@@ -32,7 +32,7 @@ export const NewUserTemplateSection = ({ isSaving, onSave, template: saved }: Ne
 
   // Unlike a group template, this one is sent in whichever language the admin picks at creation
   // time, so every language has to be filled in rather than only the ones started.
-  const issue = checkTemplateIssue(template.subject, template.body, REQUIRED_NEW_USER_TEMPLATE_VARS);
+  const issue = checkTemplateIssue(template.subject, template.body, REQUIRED_NEW_USER_TEMPLATE_VARS, LANGUAGES);
   const error =
     issue === 'incomplete'
       ? t({

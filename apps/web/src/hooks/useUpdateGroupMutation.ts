@@ -24,7 +24,11 @@ export function useUpdateGroupMutation({
   const currentGroup = useAppStore((store) => store.currentGroup);
   return useMutation({
     mutationFn: async (data: UpdateGroupData) => {
-      const response = await axios.patch(`/v1/groups/${currentGroup?.id}`, data);
+      // A caller that opts out of throwing is declaring it renders its own failure feedback, so
+      // the interceptor's generic error toast would double it; the default path keeps the toast.
+      const response = await axios.patch(`/v1/groups/${currentGroup?.id}`, data, {
+        meta: { disableDefaultErrorNotification: !throwOnError }
+      });
       return $Group.parseAsync(response.data);
     },
     onSuccess() {
