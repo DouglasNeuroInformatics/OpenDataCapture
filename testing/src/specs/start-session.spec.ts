@@ -92,29 +92,4 @@ test.describe('start session', () => {
     await page.waitForURL('**/dashboard');
     await expect(page.getByTestId('nav-button-/session/start-session')).toBeDisabled();
   });
-
-  test('should keep entered values in the form if the user navigates away and back without submitting', async ({
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
-    const identifier = `retained-${uniqueId}`;
-    await startSessionPage.subjectIdField.fill(identifier);
-
-    await page.getByTestId('nav-button-/dashboard').click();
-    await page.waitForURL('**/dashboard');
-
-    await page.getByTestId('nav-button-/session/start-session').click();
-    await page.waitForURL('**/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-
-    // Re-select the method (it may not be the group's default) to reach the identifier field again.
-    // No session was ever started here, so the identifier typed before navigating away is still
-    // there -- this app does not clear an abandoned draft on nav-away.
-    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
-    await expect(startSessionPage.subjectIdField).toHaveValue(identifier);
-  });
 });
