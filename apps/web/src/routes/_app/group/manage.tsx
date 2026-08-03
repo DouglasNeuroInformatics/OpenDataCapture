@@ -306,7 +306,7 @@ const InstrumentPreviewDialog = ({
                   <span className="text-muted-foreground">{item.description}</span>
                 </div>
               )}
-              {item.internal?.edition && (
+              {item.internal && (
                 <div>
                   <span className="font-medium">{t({ en: 'Edition', fr: 'Édition' })}: </span>
                   <span className="text-muted-foreground">{item.internal.edition}</span>
