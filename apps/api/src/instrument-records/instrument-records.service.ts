@@ -498,6 +498,26 @@ export class InstrumentRecordsService {
       },
       { $unwind: { path: '$session', preserveNullAndEmptyArrays: true } },
       {
+        // session.userId is an ObjectId reference to UserModel, but a small number of legacy
+        // sessions have it stored as a plain string; $convert normalizes both to a real ObjectId
+        // (or null, if the session has no user) so the following $lookup can match on it.
+        $addFields: {
+          'session.userObjectId': {
+            $convert: { input: '$session.userId', onError: null, onNull: null, to: 'objectId' }
+          }
+        }
+      },
+      {
+        // Join with User collection, to resolve the username of whoever ran the session
+        $lookup: {
+          as: 'sessionUser',
+          foreignField: '_id',
+          from: 'UserModel',
+          localField: 'session.userObjectId'
+        }
+      },
+      { $unwind: { path: '$sessionUser', preserveNullAndEmptyArrays: true } },
+      {
         // Join with Subject collection
         $lookup: {
           as: 'subject',
@@ -543,7 +563,7 @@ export class InstrumentRecordsService {
               $toString: '$session._id'
             },
             type: '$session.type',
-            user: { username: '$session.user.username' } // TBD test this works
+            user: { username: '$sessionUser.username' }
           },
           // sessionId: 1,
           subject: {
