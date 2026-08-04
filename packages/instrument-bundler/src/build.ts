@@ -11,6 +11,32 @@ import type { BundlerInput } from './schemas.js';
 import type { BuildOutput } from './types.js';
 import type { BuildResult } from './vendor/esbuild.js';
 
+const DEFAULT_REACT_PACKAGE = 'react@19.x';
+
+const REACT_PACKAGE_PATTERN = /['"]\/runtime\/v1\/(react@[^'"/]+)/g;
+
+/**
+ * JSX compiles to the JSX runtime of one react, and elements of one major are not renderable by
+ * another, so the runtime has to be the react the source itself imports rather than a fixed version.
+ */
+function resolveJsxImportSource(inputs: BundlerInput[]): string {
+  const packages = new Set<string>();
+  for (const { content } of inputs) {
+    if (typeof content !== 'string') {
+      continue;
+    }
+    for (const [, name] of content.matchAll(REACT_PACKAGE_PATTERN)) {
+      packages.add(name!);
+    }
+  }
+  if (packages.size > 1) {
+    throw new InstrumentBundlerError(
+      `Cannot resolve the JSX runtime: expected at most one version of react, found ${[...packages].join(', ')}`
+    );
+  }
+  return `/runtime/v1/${packages.values().next().value ?? DEFAULT_REACT_PACKAGE}`;
+}
+
 function parseBuildResult(result: BuildResult): BuildOutput {
   const cssOutput = result.outputFiles?.find((output) => output.path.endsWith('bundle.css'));
   const jsOutput = result.outputFiles?.find((output) => output.path.endsWith('bundle.js'));
@@ -41,6 +67,8 @@ export async function build({
   logLevel?: LogLevel;
 }): Promise<BuildOutput> {
   const index = resolveIndexInput(inputs);
+  // outside the try, whose catch rewrites anything it sees into an esbuild failure
+  const jsxImportSource = resolveJsxImportSource(inputs);
   let result: BuildResult;
   try {
     result = await esbuild.build({
@@ -48,7 +76,7 @@ export async function build({
       charset: 'ascii',
       format: 'esm',
       jsx: 'automatic',
-      jsxImportSource: '/runtime/v1/react@19.x',
+      jsxImportSource,
       keepNames: true,
       logLevel,
       metafile: true,

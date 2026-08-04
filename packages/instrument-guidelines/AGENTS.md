@@ -460,7 +460,7 @@ type Content<TData, TLanguage> = Fields<TData, TLanguage> | (Block<TData> | Fiel
 
 Content is either an object mapping every key to a field (`Fields`), or an array of `FieldsGroup` items — optionally interleaved with `Block` items that render arbitrary JSX (e.g. explanatory text) between groups. A `Block` holds no field data; its `render` receives the current partial form data, plus a context whose `t` resolves a translation map to the language the form is displayed in, and returns a `ReactNode`.
 
-**A form may not import React.** `/runtime/v1/react@19.x` and `/runtime/v1/react-dom@19.x` belong to an interactive instrument, which renders in a document of its own; importing either outside one is rejected when the instrument is loaded. Write JSX freely — it compiles to the JSX runtime, not to an import of your own — but a block is a plain function with no state and no hooks.
+**A form may not import React.** `/runtime/v1/react@19.x` and `/runtime/v1/react-dom@19.x` — and their `@18.x` counterparts — belong to an interactive instrument, which renders in a document of its own; importing any of them outside one is rejected when the instrument is loaded. Write JSX freely — it compiles to the JSX runtime, not to an import of your own — but a block is a plain function with no state and no hooks.
 
 ##### Full Type
 
