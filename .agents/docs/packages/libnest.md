@@ -11,7 +11,7 @@ Generic NestJS decorators, pipes, modules, and utilities used across DNP project
 - Talking to Prisma — use `InjectModel` / `Model<'X'>` / `InjectPrismaClient` instead of instantiating `PrismaClient`.
 - Validating a request DTO against a Zod schema — use the `@ValidationSchema()` decorator, or `ParseSchemaPipe` / `ValidObjectIdPipe`, instead of a custom pipe.
 - Mocking a Prisma model or libnest service in a unit test — use `MockFactory` from `./testing` instead of hand-rolling a stub.
-- Logging, hashing/encrypting, sending mail, or running virtualized code inside Nest — use `LoggingModule`/`CryptoModule`/`MailModule`/`VirtualizationModule` instead of a third-party Nest integration.
+- Logging, hashing/encrypting, or running virtualized code inside Nest — use `LoggingModule`/`CryptoModule`/`VirtualizationModule` instead of a third-party Nest integration. (`MailModule` is the one deliberate exception in this repo — see below.)
 
 ## Subpath exports
 
@@ -22,7 +22,15 @@ Generic NestJS decorators, pipes, modules, and utilities used across DNP project
 | `./testing/plugin` | Vitest plugin (path aliases, env)         | `apps/api/vitest.config.ts`                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `./user-config`    | User-supplied app config typing           | `defineUserConfig` in `apps/api/libnest.config.ts`                                                                                                                                                                                                                                                                                                                                                                               |
 
-`MailModule`/`MailService` are available but not currently used here.
+**`MailModule`/`MailService` are deliberately not used.** `apps/api/src/mail/` builds its own
+nodemailer transporter instead, because libnest's `MailService` constructs `this.transporter` in
+its constructor from `MAIL_MODULE_OPTIONS_TOKEN` — so the SMTP options resolve once at boot. The
+configuration here is admin-editable and stored on `SetupState`, and `POST /v1/mail/test` has to
+send with settings that have not been saved yet; neither works with a transporter fixed at
+startup, and `forRootAsync` does not help because the limitation is the transporter's lifetime
+rather than where the options come from. libnest is expected to gain a lazily-derived transporter
+and a per-call transport override, at which point this app should consume it and drop the local
+copy.
 
 The root subpath is the only fully re-exporting barrel; its `index.ts` is ~38 lines and lists the entire public surface.
 

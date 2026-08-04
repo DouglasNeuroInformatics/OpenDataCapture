@@ -25,6 +25,7 @@ export class AuditService {
           entity: true,
           group: { select: { name: true } },
           id: true,
+          metadata: true,
           timestamp: true,
           user: { select: { username: true } }
         },

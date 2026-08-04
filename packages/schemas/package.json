@@ -14,6 +14,7 @@
     "./instrument": "./src/instrument/instrument.ts",
     "./instrument-records": "./src/instrument-records/instrument-records.ts",
     "./instrument-repo": "./src/instrument-repo/instrument-repo.ts",
+    "./mail": "./src/mail/mail.ts",
     "./session": "./src/session/session.ts",
     "./setup": "./src/setup/setup.ts",
     "./storage": "./src/storage/storage.ts",

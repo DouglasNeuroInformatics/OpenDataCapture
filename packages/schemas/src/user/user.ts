@@ -1,6 +1,7 @@
 import { z } from 'zod/v4';
 
 import { $BaseModel, $Permissions } from '../core/core.js';
+import { $EmailDeliveryResult } from '../mail/mail.js';
 import { $Sex } from '../subject/subject.js';
 
 const MIN_PHONE_DIGITS = 7;
@@ -70,6 +71,10 @@ export const $User = $BaseModel.extend({
   sex: $Sex.nullish(),
   username: z.string().min(1)
 });
+
+/** What `POST /v1/users` returns: the created user, augmented with the outcome of the welcome-email attempt. */
+export type CreateUserResponse = z.infer<typeof $CreateUserResponse>;
+export const $CreateUserResponse = $User.extend({ welcomeEmail: $EmailDeliveryResult });
 
 export type CreateUserData = z.infer<typeof $CreateUserData>;
 export const $CreateUserData = $User
