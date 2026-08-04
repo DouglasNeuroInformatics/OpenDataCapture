@@ -1,9 +1,20 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
+/* eslint-disable @typescript-eslint/no-namespace */
 
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import type { AnyUnilingualInstrument, Json, RuntimeNotification } from '@opendatacapture/runtime-core';
 import type { Subject } from '@opendatacapture/schemas/subject';
+
+declare module '@douglasneuroinformatics/libui/i18n' {
+  export namespace UserConfig {
+    export interface LanguageOptions {
+      en: true;
+      es: false;
+      fr: true;
+    }
+  }
+}
 
 declare global {
   interface GlobalEventHandlersEventMap {

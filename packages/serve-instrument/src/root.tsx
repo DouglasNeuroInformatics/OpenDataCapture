@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import { ScalarInstrumentRenderer } from '@opendatacapture/react-core';
 import { decodeBase64ToUnicode } from '@opendatacapture/runtime-internal';
 
 i18n.init({ translations: {} });
 
 const LanguageSwitcher: React.FC = () => {
-  const [lang, setLang] = useState<'en' | 'fr'>(i18n.resolvedLanguage);
+  const [lang, setLang] = useState(i18n.resolvedLanguage);
   useEffect(() => {
-    const handler = (l: 'en' | 'fr') => setLang(l);
+    const handler = (l: Language) => setLang(l);
     i18n.addEventListener('languageChange', handler);
     return () => {
       i18n.removeEventListener('languageChange', handler);
@@ -17,7 +18,7 @@ const LanguageSwitcher: React.FC = () => {
   }, []);
   return (
     <div className="flex gap-2">
-      {(['en', 'fr'] as const).map((l) => (
+      {(['en', 'fr'] satisfies Language[]).map((l) => (
         <button
           className={`text-sm uppercase ${lang === l ? 'font-bold underline' : 'text-gray-500 hover:text-gray-900'}`}
           key={l}

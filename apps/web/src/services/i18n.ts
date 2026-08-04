@@ -17,10 +17,6 @@ import user from '../translations/user.json';
 
 declare module '@douglasneuroinformatics/libui/i18n' {
   export namespace UserConfig {
-    export interface LanguageOptions {
-      en: true;
-      fr: true;
-    }
     export interface Translations {
       auth: typeof auth;
       common: typeof common;
