@@ -199,16 +199,22 @@ const $$FormInstrumentFieldsGroup = <TLanguage extends InstrumentLanguage>(langu
   return z.object({
     description: $$InstrumentUIOption(z.string().min(1), language).optional(),
     fields: $$FormInstrumentFields(language),
+    kind: z.literal('fields-group').optional(),
     title: $$InstrumentUIOption(z.string().min(1), language).optional()
   }) satisfies z.ZodType<FormInstrument.FieldsGroup<FormInstrument.Data, TLanguage>>;
 };
 
 const $FormInstrumentFieldsGroup = $$FormInstrumentFieldsGroup() satisfies z.ZodType<FormInstrument.FieldsGroup>;
 
+const $FormInstrumentBlock = z.object({
+  kind: z.literal('block'),
+  render: $AnyDynamicFunction
+}) satisfies z.ZodType<FormInstrument.Block>;
+
 const $$FormInstrumentContent = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return z.union([
     $$FormInstrumentFields(language),
-    $$FormInstrumentFieldsGroup(language).array()
+    z.union([$FormInstrumentBlock, $$FormInstrumentFieldsGroup(language)]).array()
   ]) satisfies z.ZodType<FormInstrument.Content>;
 };
 
@@ -228,6 +234,7 @@ const $FormInstrument = $$FormInstrument() satisfies z.ZodType<FormInstrument>;
 export {
   $$FormInstrument,
   $FormInstrument,
+  $FormInstrumentBlock,
   $FormInstrumentBooleanField,
   $FormInstrumentCompositeField,
   $FormInstrumentContent,

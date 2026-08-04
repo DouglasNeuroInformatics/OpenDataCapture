@@ -143,7 +143,9 @@ return await new Function(`return ${bundle}`)();
 
 It performs no validation, and its docstring is explicit that only trusted input may reach it.
 `InstrumentInterpreter.interpret` (`packages/instrument-interpreter/src/index.ts`) wraps it and
-re-validates against the Zod schemas only when `validate: true` is passed. It defaults to off; the
+re-validates against the Zod schemas only when `validate: true` is passed. It also rejects a
+non-interactive instrument whose bundle imports React, which is the one library a form may not use —
+`packages/instrument-interpreter/AGENTS.md` has the reasoning. It defaults to off; the
 playground is the one caller that opts in (`apps/playground/src/components/Viewer/Viewer.tsx`), since
 its bundles have never been through the API's `$AnyInstrument` check.
 

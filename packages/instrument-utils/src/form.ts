@@ -7,10 +7,12 @@ export function getFormFields<TData extends FormInstrument.Data>(
   if (!Array.isArray(content)) {
     return content;
   }
-  return content.reduce(
-    (prev, current) => ({ ...prev, ...current.fields }),
-    content[0]!.fields
-  ) as FormInstrument.Fields<TData, Language>;
+  return content.reduce((previous, current) => {
+    if (current.kind === 'block') {
+      return previous;
+    }
+    return { ...previous, ...current.fields };
+  }, {}) as FormInstrument.Fields<TData, Language>;
 }
 
 export function extractFieldLabel<TData extends FormInstrument.Data>(

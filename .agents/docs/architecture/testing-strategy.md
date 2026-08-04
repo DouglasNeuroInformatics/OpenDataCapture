@@ -28,27 +28,28 @@ path exercised against a real database is Playwright.
 
 ## Vitest projects
 
-Eleven. Scope a run with `pnpm exec vitest --project <name>`; the name is the `name` field in that
+Thirteen. Scope a run with `pnpm exec vitest --project <name>`; the name is the `name` field in that
 package's config, which is **not** always the directory name.
 
-| Project               | Package                        | Notable config                                                              |
-| --------------------- | ------------------------------ | --------------------------------------------------------------------------- |
-| `api`                 | `apps/api`                     | libnest SWC plugin; `globals: true`; extra `include` for `src/**/*.spec.ts` |
-| `web`                 | `apps/web`                     | `environment: 'happy-dom'`; redeclares the `@` alias                        |
-| `instrument-bundler`  | `packages/instrument-bundler`  |                                                                             |
-| `playground-url`      | `packages/playground-url`      |                                                                             |
-| `release-info`        | `packages/release-info`        |                                                                             |
-| `runtime-bundler`     | `packages/runtime-bundler`     |                                                                             |
-| `runtime-meta`        | `packages/runtime-meta`        |                                                                             |
-| `schemas`             | `packages/schemas`             |                                                                             |
-| `subject-utils`       | `packages/subject-utils`       |                                                                             |
-| `vite-plugin-runtime` | `packages/vite-plugin-runtime` |                                                                             |
-| `runtime-v1`          | `runtime/v1`                   | directory is `v1`, project is `runtime-v1`                                  |
+| Project                  | Package                           | Notable config                                                              |
+| ------------------------ | --------------------------------- | --------------------------------------------------------------------------- |
+| `api`                    | `apps/api`                        | libnest SWC plugin; `globals: true`; extra `include` for `src/**/*.spec.ts` |
+| `web`                    | `apps/web`                        | `environment: 'happy-dom'`; redeclares the `@` alias                        |
+| `instrument-bundler`     | `packages/instrument-bundler`     |                                                                             |
+| `instrument-interpreter` | `packages/instrument-interpreter` |                                                                             |
+| `instrument-utils`       | `packages/instrument-utils`       |                                                                             |
+| `playground-url`         | `packages/playground-url`         |                                                                             |
+| `release-info`           | `packages/release-info`           |                                                                             |
+| `runtime-bundler`        | `packages/runtime-bundler`        |                                                                             |
+| `runtime-meta`           | `packages/runtime-meta`           |                                                                             |
+| `schemas`                | `packages/schemas`                |                                                                             |
+| `subject-utils`          | `packages/subject-utils`          |                                                                             |
+| `vite-plugin-runtime`    | `packages/vite-plugin-runtime`    |                                                                             |
+| `runtime-v1`             | `runtime/v1`                      | directory is `v1`, project is `runtime-v1`                                  |
 
 Everything else has no unit tests and no way to run them: `apps/gateway`, `apps/outreach`,
-`apps/playground`, and `packages/{demo, instrument-guidelines, instrument-interpreter,
-instrument-library, instrument-stubs, instrument-utils, licenses, react-core, runtime-core,
-runtime-internal, serve-instrument}`. `testing/`, `storybook/` and `vendor/**` fall outside the
+`apps/playground`, and `packages/{demo, instrument-guidelines, instrument-library, instrument-stubs,
+licenses, react-core, runtime-core, runtime-internal, serve-instrument}`. `testing/`, `storybook/` and `vendor/**` fall outside the
 project globs by design — `testing/` is Playwright, not vitest.
 
 ## Test environment

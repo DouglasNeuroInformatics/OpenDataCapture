@@ -24,11 +24,24 @@ interpreted instrument has been validated.
 **`instrument.id = options?.id` runs unconditionally**, so omitting `id` sets it to `undefined`
 rather than leaving whatever the bundle produced.
 
+**Only an interactive instrument may import React.** `interpret()` rejects a bundle of any other
+kind that imports `/runtime/v1/react@*` or `/runtime/v1/react-dom@*`. A form renders inside the host
+application's own React tree, where a hook called through the served copy reaches the wrong
+dispatcher; making the served copy defer to the application's copy instead would tie an already
+stored instrument to whichever React that application ships. `src/imports.ts` matches the served
+specifier in the bundle text and exempts the JSX runtime, which is what a block's JSX compiles to —
+so a block still renders JSX, it just cannot hold state. What a block needs is passed to its
+`render` function as `context` (`packages/instrument-guidelines/AGENTS.md`).
+
 `InstrumentInterpreterOptions` (and its `transformBundle` member) is exported but referenced
 nowhere — not by the class, not by any consumer. It is dead; do not build on it.
 
 ## Tests
 
-None, and there is no `vitest.config.ts` here. Neither is there one in `packages/react-core`, so
-`interpret()` has no unit coverage anywhere in the repo — behaviour changes must be checked through
-the Playwright suite in `testing/`.
+`pnpm exec vitest --project instrument-interpreter`.
+
+`src/__tests__/index.test.ts` drives `interpret()` over hand-written bundles — a bundle is an async
+IIFE that resolves to the instrument, so a fixture is one that returns a plain object — and
+`src/__tests__/imports.test.ts` covers `findReactImport` against the specifiers a built bundle
+actually carries. There is still no project in `packages/react-core`, so `useInterpretedInstrument`
+is covered only by the Playwright suite in `testing/`.
