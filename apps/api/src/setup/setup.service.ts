@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   ServiceUnavailableException
 } from '@nestjs/common';
+import { isMailEnabled } from '@opendatacapture/schemas/mail';
 import { $BrandingConfig } from '@opendatacapture/schemas/setup';
 import type { CreateAdminData, InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
@@ -56,6 +57,9 @@ export class SetupService {
       isDemo: Boolean(savedOptions?.isDemo),
       isExperimentalFeaturesEnabled: Boolean(savedOptions?.isExperimentalFeaturesEnabled),
       isGatewayEnabled: this.configService.get('GATEWAY_ENABLED'),
+      // Non-secret flag so the client can hide email UI when mail is off. The SMTP
+      // configuration itself is never exposed here (this is a public route).
+      isMailEnabled: isMailEnabled(savedOptions?.mailConfig),
       isSetup: Boolean(savedOptions?.isSetup),
       release: __RELEASE__,
       uptime: Math.round(process.uptime())

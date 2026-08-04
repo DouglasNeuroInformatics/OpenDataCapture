@@ -121,12 +121,23 @@ test.describe('admin management', () => {
     await page.getByLabel('Confirm Password').fill(SEEDED_USER_PASSWORD);
     await page.getByLabel('First Name').fill('Test');
     await page.getByLabel('Last Name').fill('User');
-    await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: 'Group Manager' }).click();
+    // By testid, not `getByRole('combobox').first()`: when mail is enabled the page grows a
+    // welcome-email language select above the form, and `.first()` then opens the wrong one.
+    await page.getByTestId('basePermissionLevel-select-trigger').click();
+    await page.getByTestId('basePermissionLevel-select-item-GROUP_MANAGER').click();
     await page.getByRole('checkbox', { name: group.name }).check();
     await page.getByRole('button', { name: 'Submit' }).click();
 
-    await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
+    // `mail.spec.ts` may hold mail enabled in a parallel local worker; a user created without an
+    // email then gets the copy-it-manually dialog before navigating. Dismiss it — the user was
+    // created either way, and the users list below is the assertion that matters.
+    const fallback = page.getByTestId('welcome-email-fallback');
+    await expect(fallback.or(page.getByTestId('data-table-search-bar'))).toBeVisible();
+    if (await fallback.isVisible()) {
+      await fallback.getByRole('button', { name: 'Done' }).click();
+    } else {
+      await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
+    }
     await expect(page).toHaveURL('/admin/users');
 
     await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(username);
@@ -187,6 +198,14 @@ test.describe('admin management', () => {
     await page.getByTestId('basePermissionLevel-select-item-ADMIN').click();
     await createUserForm.getByRole('button', { name: 'Submit' }).click();
 
+    // `mail.spec.ts` may hold mail enabled in a parallel local worker, in which case a user with
+    // no email gets the copy-it-manually dialog before navigating. Dismiss it — the user was
+    // created either way, and the navigation is the assertion.
+    const fallback = page.getByTestId('welcome-email-fallback');
+    await expect(fallback.or(page.getByTestId('data-table-search-bar'))).toBeVisible();
+    if (await fallback.isVisible()) {
+      await fallback.getByRole('button', { name: 'Done' }).click();
+    }
     await expect(page).toHaveURL('/admin/users');
   });
 

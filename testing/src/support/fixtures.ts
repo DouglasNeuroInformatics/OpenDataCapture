@@ -9,6 +9,7 @@ import { AuditLogsPage } from '../pages/_app/admin/audit/logs.page';
 import { BrandingPage } from '../pages/_app/admin/branding/index.page';
 import { BrandingLoginPagePage } from '../pages/_app/admin/branding/login-page.page';
 import { InstrumentReposPage } from '../pages/_app/admin/instrument-repos/index.page';
+import { MailSettingsPage } from '../pages/_app/admin/mail.page';
 import { AdminSettingsPage } from '../pages/_app/admin/settings.page';
 import { ContactPage } from '../pages/_app/contact.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
@@ -17,6 +18,7 @@ import { SubjectGraphPage } from '../pages/_app/datahub/$subjectId/graph.page';
 import { SubjectRecordDetailPage } from '../pages/_app/datahub/$subjectId/table/$recordId.page';
 import { SubjectDataTablePage } from '../pages/_app/datahub/$subjectId/table/index.page';
 import { DatahubPage } from '../pages/_app/datahub/index.page';
+import { GroupEmailTemplatesPage } from '../pages/_app/group/email-templates.page';
 import { GroupManagePage } from '../pages/_app/group/manage.page';
 import { AccessibleInstrumentsPage } from '../pages/_app/instruments/accessible-instruments.page';
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
@@ -38,6 +40,7 @@ const pageModels = {
   '/admin/branding': BrandingPage,
   '/admin/branding/login-page': BrandingLoginPagePage,
   '/admin/instrument-repos': InstrumentReposPage,
+  '/admin/mail': MailSettingsPage,
   '/admin/settings': AdminSettingsPage,
   '/auth/login': LoginPage,
   '/contact': ContactPage,
@@ -47,6 +50,7 @@ const pageModels = {
   '/datahub/$subjectId/graph': SubjectGraphPage,
   '/datahub/$subjectId/table': SubjectDataTablePage,
   '/datahub/$subjectId/table/$recordId': SubjectRecordDetailPage,
+  '/group/email-templates': GroupEmailTemplatesPage,
   '/group/manage': GroupManagePage,
   '/instruments/accessible-instruments': AccessibleInstrumentsPage,
   '/session/remote-assignment': RemoteAssignmentPage,

@@ -10,13 +10,14 @@ export class AuditLogger {
   async log(
     action: $AuditLogAction,
     entity: $AuditLogEntity,
-    params: { groupId: null | string; userId: string }
+    params: { groupId: null | string; metadata?: { [key: string]: string }; userId: string }
   ): Promise<void> {
     await this.auditLogModel.create({
       data: {
         action,
         entity,
         group: params.groupId ? { connect: { id: params.groupId } } : undefined,
+        metadata: params.metadata,
         timestamp: Date.now(),
         user: {
           connect: {

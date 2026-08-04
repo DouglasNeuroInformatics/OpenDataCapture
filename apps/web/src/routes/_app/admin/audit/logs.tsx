@@ -22,7 +22,7 @@ type DateFormat = 'iso' | 'local';
 
 type SortOrder = 'asc' | 'desc';
 
-const ACTIONS: $AuditLogAction[] = ['CREATE', 'DELETE', 'UPDATE', 'LOGIN'];
+const ACTIONS: $AuditLogAction[] = ['CREATE', 'DELETE', 'UPDATE', 'LOGIN', 'SEND_EMAIL'];
 
 const ENTITIES: $AuditLogEntity[] = [
   'ASSIGNMENT',
@@ -178,7 +178,9 @@ const Toggles: React.FC<{ table: TanstackTable.Table<$AuditLog> }> = () => {
           />
           <SelectSingleFilterGroup
             label={t('common.action')}
-            options={Object.fromEntries(ACTIONS.map((action) => [action, t(`common.${toLowerCase(action)}`)]))}
+            options={Object.fromEntries(
+              ACTIONS.map((action) => [action, t(`common.${snakeToCamelCase(toLowerCase(action))}`)])
+            )}
             searchKey="action"
           />
           <SelectSingleFilterGroup
@@ -270,7 +272,7 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
             const value = ctx.getValue() as $AuditLogAction;
             return (
               <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-                {t(`common.${toLowerCase(value)}`)}
+                {t(`common.${snakeToCamelCase(toLowerCase(value))}`)}
               </span>
             );
           },
