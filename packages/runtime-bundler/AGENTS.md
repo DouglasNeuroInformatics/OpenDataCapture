@@ -33,12 +33,6 @@ it in a package name, so `_chunks` cannot collide with a served package, and
 `parsePackages` in `packages/runtime-meta/src/index.js` skips any path starting with `_`. Change
 `chunkNames` here and that filter must change with it.
 
-`src/bundler.ts` also defines `__ODC_RUNTIME_BUILD__`. Several vendor wrappers are bundled twice —
-once here to be served, once by an app that aliases the same wrapper as an ordinary dependency — and
-that define is how a wrapper knows which copy it is. `vendor/react@19.x` and `vendor/react-dom@19.x`
-depend on it; `vendor/AGENTS.md` explains what they do with it. Only the runtime build sets it, so a
-wrapper must read it as `typeof __ODC_RUNTIME_BUILD__`, never as a bare reference.
-
 ## Path conventions
 
 `pkg.name.split('__').join('@')` is how a vendor package reaches its served URL: `vendor/react@19.x`

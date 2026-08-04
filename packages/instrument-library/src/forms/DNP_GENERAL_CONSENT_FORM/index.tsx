@@ -1,5 +1,4 @@
 import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { useState } from '/runtime/v1/react@19.x';
 import { z } from '/runtime/v1/zod@3.x';
 
 export default defineInstrument({
@@ -17,7 +16,6 @@ export default defineInstrument({
     {
       kind: 'block',
       render: (_, { t }) => {
-        const [isExpanded, setIsExpanded] = useState(false);
         return (
           <div className="text-muted-foreground space-y-2 text-sm" data-testid="consent-preamble">
             <p>
@@ -26,22 +24,12 @@ export default defineInstrument({
                 fr: 'ATTENDU QUE la partie de première part, ci-après et en tout temps désignée comme le « Participant », conclut la présente entente de son plein gré et sans contrainte; et ATTENDU QUE les considérants énoncés ci-dessus sont intégrés aux présentes par renvoi comme s’ils y étaient reproduits intégralement; EN CONSÉQUENCE, en contrepartie des engagements réciproques contenus aux présentes, dont la réception et le caractère suffisant sont par les présentes reconnus, les parties conviennent de ce qui suit.'
               })}
             </p>
-            {isExpanded && (
-              <p data-testid="consent-preamble-remainder">
-                {t({
-                  en: ' Nothing contained in this preamble shall be construed to create, imply, or give rise to any obligation, right, or remedy not otherwise existing at law or in equity, nor to modify, waive, supersede, or otherwise affect any provision hereof. The headings appearing herein are inserted for convenience of reference only and shall in no way define, limit, or describe the scope or intent of any clause. Any term left undefined shall bear the meaning ordinarily ascribed to it, save where the context manifestly requires otherwise.',
-                  fr: 'Aucune disposition du présent préambule ne saurait être interprétée comme créant, impliquant ou faisant naître une obligation, un droit ou un recours qui n’existerait pas autrement en droit ou en equity, ni comme modifiant, écartant, remplaçant ou touchant de quelque autre manière une disposition des présentes. Les titres figurant aux présentes sont insérés uniquement pour en faciliter la consultation et ne sauraient en aucun cas définir, limiter ou décrire la portée ou l’intention d’une clause. Tout terme qui n’est pas défini aux présentes conserve le sens qui lui est normalement attribué, sauf lorsque le contexte exige manifestement une autre interprétation.'
-                })}
-              </p>
-            )}
-            <button
-              className="underline-offset-3 hover:underline"
-              data-testid="consent-preamble-toggle"
-              type="button"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? t({ en: 'Show less', fr: 'Afficher moins' }) : t({ en: 'Show more', fr: 'Afficher plus' })}
-            </button>
+            <p>
+              {t({
+                en: 'Nothing contained in this preamble shall be construed to create, imply, or give rise to any obligation, right, or remedy not otherwise existing at law or in equity, nor to modify, waive, supersede, or otherwise affect any provision hereof. The headings appearing herein are inserted for convenience of reference only and shall in no way define, limit, or describe the scope or intent of any clause. Any term left undefined shall bear the meaning ordinarily ascribed to it, save where the context manifestly requires otherwise.',
+                fr: 'Aucune disposition du présent préambule ne saurait être interprétée comme créant, impliquant ou faisant naître une obligation, un droit ou un recours qui n’existerait pas autrement en droit ou en equity, ni comme modifiant, écartant, remplaçant ou touchant de quelque autre manière une disposition des présentes. Les titres figurant aux présentes sont insérés uniquement pour en faciliter la consultation et ne sauraient en aucun cas définir, limiter ou décrire la portée ou l’intention d’une clause. Tout terme qui n’est pas défini aux présentes conserve le sens qui lui est normalement attribué, sauf lorsque le contexte exige manifestement une autre interprétation.'
+              })}
+            </p>
           </div>
         );
       }

@@ -13,10 +13,9 @@ file is the rules for editing what is already here.
 
 `vendor/**/*` is in the `ignores` block of the root `eslint.config.js`. No package here has a
 `tsconfig.json`, a `vitest.config.ts` or any `scripts`, so `pnpm lint` never visits them and `tsc`
-never reads a wrapper's declarations except through a consumer that imports them. The only automated
-guards are `runtime/v1/test/vendor-pairing.test.ts` and `react-host-delegation.test.ts` beside it.
-Every other rule below is one you have to hold yourself to, and getting it wrong produces a broken
-runtime bundle rather than an error.
+never reads a wrapper's declarations except through a consumer that imports them. The one automated
+guard is `runtime/v1/test/vendor-pairing.test.ts`. Every other rule below is one you have to hold
+yourself to, and getting it wrong produces a broken runtime bundle rather than an error.
 
 ## Peer pairing
 
@@ -63,33 +62,6 @@ enumerate a CJS module's exports statically and the named imports silently come 
 When you bump a wrapped version, diff its exports against that list; nothing else will tell you an
 export was added or removed.
 
-## Two wrappers are more than a re-export, and both hinge on one define
-
-A page rendering a form instrument runs **two instances of the react wrapper**: the one the host
-application bundles (apps alias `react` to it) and the one served from `/runtime/v1` that the
-instrument imports. Elements pass between them, because React tags them with a registered symbol,
-but a hook only works through the instance whose dispatcher owns the render.
-
-So `vendor/react@19.x/src/index.js` does not re-export `react` directly. The bundled copy publishes
-the wrapped package on `globalThis.__ODC_HOST_REACT`; the served copy re-exports whatever it finds
-there, falling back to its own when nothing is registered — the interactive case, where the
-instrument owns an iframe of its own. A host React of a different major throws instead of silently
-mixing the two. `vendor/react-dom@19.x/src/client.js` refuses the opposite direction: the served copy
-throws from `createRoot`/`hydrateRoot` when a host React is present, since mounting a root inside
-someone else's tree is never what an author meant.
-
-The two copies tell themselves apart by `__ODC_RUNTIME_BUILD__`, which `packages/runtime-bundler`
-defines and no app build does — hence `typeof __ODC_RUNTIME_BUILD__`, never a bare reference. **The
-guard is on the call, not the import**, because every instrument bundle is evaluated once in the host
-page to read its definition, interactive ones included; only the mount is exclusive to the iframe.
-`runtime/v1/test/react-host-delegation.test.ts` covers all of it, against the built output.
-
-Editing any wrapper an app also bundles needs **two** caches cleared before the change is visible:
-`pnpm --filter @opendatacapture/runtime-v1 build` for the served copy, and `node_modules/.vite` in
-the app for the bundled one. Vite keys its prebundle on the lockfile, not on a linked package's
-contents, so a running dev server serves the old wrapper indefinitely — which looks exactly like the
-change not working.
-
 ## `vendor/react@19.x` _is_ this repo's React type definition
 
 Root `package.json` `pnpm.overrides` sets `"@types/react": "-"` and `"@types/react-dom": "-"`, which
@@ -127,10 +99,7 @@ because they map `/runtime/v1/*` with a wildcard.
 
 There is no `vitest.config.ts` here, and the root `vitest.config.ts` `projects` globs cover only
 `apps/*`, `packages/*` and `runtime/*` — a test file placed in this directory would never run. The
-coverage that applies is the two files in `runtime/v1/test/`, run with
-`pnpm exec vitest --project runtime-v1`. `vendor-pairing.test.ts`
+coverage that applies is `runtime/v1/test/vendor-pairing.test.ts`, run with
+`pnpm exec vitest --project runtime-v1`. It
 walks every wrapper, and for each `__`-named dependency checks that the physical directory the
 wrapped package's peer resolves to is the same one the paired wrapper serves.
-`react-host-delegation.test.ts` covers the react and react-dom wrappers described above. Both read
-what is on disk — the first real `node_modules`, the second `runtime/v1/dist` — so build before
-trusting a pass.

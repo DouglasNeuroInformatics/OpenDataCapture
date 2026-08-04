@@ -34,9 +34,6 @@ export class Bundler {
       bundle: true,
       // an underscore prefix cannot collide with a served package: npm forbids it in package names
       chunkNames: '_chunks/[hash]',
-      // apps bundle several vendor wrappers themselves, so a wrapper reads this to tell whether it
-      // is the copy served to an instrument or the copy the host application runs on
-      define: { __ODC_RUNTIME_BUILD__: 'true' },
       entryPoints: [...moduleEntryPoints, ...assetEntryPoints],
       format: 'esm',
       keepNames: true,

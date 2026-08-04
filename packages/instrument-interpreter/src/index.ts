@@ -8,6 +8,8 @@ import {
 } from '@opendatacapture/schemas/instrument';
 import type { Promisable } from 'type-fest';
 
+import { findReactImport } from './imports.js';
+
 export type InstrumentInterpreterOptions = {
   /** An optional function to preprocess a bundle */
   transformBundle?: ((bundle: string) => Promisable<string>) | null;
@@ -52,6 +54,14 @@ export class InstrumentInterpreter {
         });
       }
       throw new Error(`Failed to evaluate instrument bundle`, { cause: error });
+    }
+    if (instrument.kind !== 'INTERACTIVE') {
+      const reactImport = findReactImport(bundle);
+      if (reactImport) {
+        throw new Error(
+          `Cannot import '${reactImport}' in an instrument of kind '${instrument.kind}': React is available only to interactive instruments, which render in a document of their own. A form block receives everything it needs as the second argument to its render function.`
+        );
+      }
     }
     instrument.id = options?.id;
     return instrument as SomeInstrument<TKind>;

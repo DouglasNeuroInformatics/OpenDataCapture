@@ -448,15 +448,19 @@ type FieldsGroup<TData, TLanguage> = {
 // An item of arbitrary JSX inlined amongst the groups of a form
 type Block<TData> = {
   kind: 'block';
-  render: (this: void, data: PartialData<TData>) => ReactNode;
+  render: (
+    this: void,
+    data: PartialData<TData>,
+    context: { t: (translations: { [L in Language]?: string }) => string }
+  ) => ReactNode;
 };
 
 type Content<TData, TLanguage> = Fields<TData, TLanguage> | (Block<TData> | FieldsGroup<TData, TLanguage>)[];
 ```
 
-Content is either an object mapping every key to a field (`Fields`), or an array of `FieldsGroup` items — optionally interleaved with `Block` items that render arbitrary JSX (e.g. explanatory text) between groups. A `Block` holds no field data; its `render` receives the current partial form data and returns a `ReactNode`.
+Content is either an object mapping every key to a field (`Fields`), or an array of `FieldsGroup` items — optionally interleaved with `Block` items that render arbitrary JSX (e.g. explanatory text) between groups. A `Block` holds no field data; its `render` receives the current partial form data, plus a context whose `t` resolves a translation map to the language the form is displayed in, and returns a `ReactNode`.
 
-`render` is rendered as a component, so it may hold state with hooks imported from `/runtime/v1/react@19.x`. It may not mount a root of its own: `createRoot` from `/runtime/v1/react-dom@19.x/client.js` belongs to an interactive instrument, which owns its document, and throws if called from a form.
+**A form may not import React.** `/runtime/v1/react@19.x` and `/runtime/v1/react-dom@19.x` belong to an interactive instrument, which renders in a document of its own; importing either outside one is rejected when the instrument is loaded. Write JSX freely — it compiles to the JSX runtime, not to an import of your own — but a block is a plain function with no state and no hooks.
 
 ##### Full Type
 
