@@ -1,4 +1,4 @@
-import { $ActiveLanguages, $Language, DEFAULT_ACTIVE_LANGUAGES } from '@opendatacapture/schemas/core';
+import { $Language } from '@opendatacapture/schemas/core';
 import { $InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { Router } from 'express';
 
@@ -43,17 +43,16 @@ router.get(
 
     // Read server-side rather than from `window.location` so the SSR pass and the hydration pass
     // resolve the same language; anything else renders the page in English and then swaps it.
-    const activeLanguages = $ActiveLanguages.safeParse(JSON.parse(assignment.activeLanguagesStringified));
-    const resolvedActiveLanguages = activeLanguages.success ? activeLanguages.data : DEFAULT_ACTIVE_LANGUAGES;
+    const { activeLanguages } = assignment;
     const requestedLanguage = $Language.safeParse(req.query.lang);
     const language =
-      requestedLanguage.success && resolvedActiveLanguages.includes(requestedLanguage.data)
+      requestedLanguage.success && activeLanguages.includes(requestedLanguage.data)
         ? requestedLanguage.data
-        : resolvedActiveLanguages[0];
+        : activeLanguages[0];
 
     const token = generateToken(assignment.id);
     const html = res.locals.loadRoot({
-      activeLanguages: resolvedActiveLanguages,
+      activeLanguages,
       id,
       initialSeriesIndex,
       language,

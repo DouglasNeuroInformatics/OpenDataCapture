@@ -77,8 +77,8 @@ describe('SetupService', () => {
       await expect(setupService.getState()).resolves.toMatchObject({ activeLanguages: ['en', 'fr'] });
     });
 
-    it('should fall back to the default rather than serve a language code it cannot offer', async () => {
-      setupStateModel.findFirst.mockResolvedValue({ activeLanguages: ['klingon'], isDemo: false, isSetup: true });
+    it('should fall back to the default for an instance with no setup document at all', async () => {
+      setupStateModel.findFirst.mockResolvedValue(null);
       await expect(setupService.getState()).resolves.toMatchObject({ activeLanguages: ['en', 'fr'] });
     });
   });

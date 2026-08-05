@@ -52,7 +52,7 @@ router.post(
     await prisma.remoteAssignmentModel.create({
       data: {
         ...assignment,
-        activeLanguagesStringified: JSON.stringify(activeLanguages),
+        activeLanguages,
         rawPublicKey: Buffer.from(publicKey),
         targetStringified: JSON.stringify(instrumentContainer)
       }

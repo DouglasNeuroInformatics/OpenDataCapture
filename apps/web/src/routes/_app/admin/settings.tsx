@@ -61,22 +61,25 @@ const DURATION_AUTOSAVE_DELAY = 700;
 const RouteComponent = () => {
   const { t } = useTranslation();
   const setupStateQuery = useSetupStateQuery();
-  const updateSetupStateMutation = useUpdateSetupStateMutation();
+  const updateSetupStateMutation = useUpdateSetupStateMutation({ throwOnError: false });
   const groupSwitcherPosition = useAppStore((store) => store.groupSwitcherPosition);
   const setGroupSwitcherPosition = useAppStore((store) => store.setGroupSwitcherPosition);
 
   // `mutate` is referentially stable across renders, so callbacks that depend on `autosave` stay stable too.
   const { mutate } = updateSetupStateMutation;
-  const [saveState, setSaveState] = useState<'idle' | 'saved' | 'saving'>('idle');
+  const [saveState, setSaveState] = useState<'error' | 'idle' | 'saved' | 'saving'>('idle');
   const savedTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
+  // A failed save leaves its status showing rather than clearing on a timer: the controls all render
+  // from server state, so once the pill is gone nothing else tells the admin their change never landed.
   const autosave = useCallback(
     (data: Parameters<typeof mutate>[0]) => {
+      clearTimeout(savedTimerRef.current);
       setSaveState('saving');
       mutate(data, {
-        onSettled: () => {
+        onError: () => setSaveState('error'),
+        onSuccess: () => {
           setSaveState('saved');
-          clearTimeout(savedTimerRef.current);
           savedTimerRef.current = setTimeout(() => setSaveState('idle'), 2000);
         }
       });

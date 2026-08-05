@@ -131,6 +131,31 @@ test.describe('gateway assignment errors', () => {
     await gatewayPage.close();
   });
 
+  // The languages an assignment offers are stored on the gateway's own database and read back
+  // server-side, so `?lang=` must be honoured in the SSR'd HTML rather than swapped in after
+  // hydration. Asserting against the raw response body is what distinguishes the two.
+  test('should render the assignment server-side in a requested active language', async ({
+    context,
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const assignmentUrl = await createRemoteAssignmentLink(getPageModel, page, uniqueId);
+
+    // The stepper is the only translated copy in the first paint — everything below it waits on the
+    // instrument bundle, which loads client-side.
+    const gatewayPage = await context.newPage();
+    const french = await gatewayPage.goto(`${assignmentUrl}?lang=fr`);
+    expect(await french!.text()).toContain('Aperçu');
+
+    // A language the instance does not offer falls back to the first active one rather than
+    // rendering the blank strings an unresolvable language would produce.
+    const unknown = await gatewayPage.goto(`${assignmentUrl}?lang=klingon`);
+    expect(await unknown!.text()).toContain('Overview');
+
+    await gatewayPage.close();
+  });
+
   // `POST /v1/assignments/:id/email` mails a live assignment credential to a caller-supplied
   // address, and its guard (`update Assignment`) is group-scoped rather than admin-only — so the
   // control that matters is row scoping, which no blanket-403 table can assert.
