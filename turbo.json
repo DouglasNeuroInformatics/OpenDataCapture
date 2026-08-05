@@ -1,22 +1,17 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [".env", "eslint.config.js", "tsconfig.base.json", "prettier.config.js"],
-  "globalEnv": ["NODE_ENV", "NODE_OPTIONS"],
+  "globalEnv": ["NODE_ENV", "NODE_OPTIONS", "RELEASE_VERSION"],
   "tasks": {
+    // A package-scoped task replaces the generic one rather than merging with it,
+    // so anything the generic build declares must be repeated here.
     "@opendatacapture/gateway#build": {
-      "dependsOn": ["^build", "db:push"]
+      "dependsOn": ["^build", "db:push"],
+      "outputs": ["dist/**"]
     },
     "build": {
       "dependsOn": ["^build", "db:generate"],
-      "env": [
-        "API_BASE_URL",
-        "CONTACT_EMAIL",
-        "DOCS_URL",
-        "GITHUB_REPO_URL",
-        "LICENSE_URL",
-        "GATEWAY_ENABLED",
-        "RELEASE_VERSION"
-      ],
+      "env": ["API_BASE_URL", "CONTACT_EMAIL", "DOCS_URL", "GITHUB_REPO_URL", "LICENSE_URL", "GATEWAY_ENABLED"],
       "outputs": ["dist/**"]
     },
     "db:generate": {
