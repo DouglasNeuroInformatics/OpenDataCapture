@@ -35,6 +35,7 @@ const AddRepoForm = ({
         <p className="text-muted-foreground text-sm">
           {t({
             en: 'Importing instruments from GitHub...',
+            es: 'Importando instrumentos desde GitHub...',
             fr: 'Importation des instruments depuis GitHub...'
           })}
         </p>
@@ -53,6 +54,7 @@ const AddRepoForm = ({
       setError(
         t({
           en: 'Please enter a valid GitHub repository URL.',
+          es: 'Introduzca una URL de repositorio de GitHub válida.',
           fr: 'Veuillez entrer une URL de dépôt GitHub valide.'
         })
       );
@@ -66,7 +68,7 @@ const AddRepoForm = ({
     // autofilling the URL and token fields.
     <form autoComplete="off" className="flex flex-col gap-4" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="instrument-repo-url">{t({ en: 'GitHub URL', fr: 'URL GitHub' })}</Label>
+        <Label htmlFor="instrument-repo-url">{t({ en: 'GitHub URL', es: 'URL de GitHub', fr: 'URL GitHub' })}</Label>
         <Input
           autoComplete="off"
           id="instrument-repo-url"
@@ -78,7 +80,11 @@ const AddRepoForm = ({
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="instrument-repo-token">
-          {t({ en: 'Personal Access Token (optional*)', fr: "Jeton d'accès personnel (facultatif*)" })}
+          {t({
+            en: 'Personal Access Token (optional*)',
+            es: 'Token de acceso personal (opcional*)',
+            fr: "Jeton d'accès personnel (facultatif*)"
+          })}
         </Label>
         <Input
           autoComplete="new-password"
@@ -91,13 +97,14 @@ const AddRepoForm = ({
         <p className="text-muted-foreground text-xs">
           {t({
             en: '*Required only for private repositories. Stored encrypted and reused when syncing.',
+            es: '*Solo es necesario para repositorios privados. Se almacena cifrado y se reutiliza al sincronizar.',
             fr: '*Requis uniquement pour les dépôts privés. Stocké de manière chiffrée et réutilisé lors de la synchronisation.'
           })}
         </p>
       </div>
       {error && <p className="text-destructive text-sm">{error}</p>}
       <Button className="w-full" type="submit">
-        {t({ en: 'Import', fr: 'Importer' })}
+        {t({ en: 'Import', es: 'Importar', fr: 'Importer' })}
       </Button>
     </form>
   );
@@ -129,6 +136,7 @@ const RouteComponent = () => {
       addNotification({
         message: t({
           en: `"${repo.name}" is assigned to one or more groups. Remove it from those groups before deleting.`,
+          es: `"${repo.name}" está asignado a uno o más grupos. Quítelo de esos grupos antes de eliminarlo.`,
           fr: `« ${repo.name} » est assigné à un ou plusieurs groupes. Retirez-le de ces groupes avant de le supprimer.`
         }),
         type: 'warning'
@@ -156,6 +164,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'Instrument Repositories',
+            es: 'Repositorios de instrumentos',
             fr: "Dépôts d'instruments"
           })}
         </Heading>
@@ -175,6 +184,7 @@ const RouteComponent = () => {
             },
             header: t({
               en: 'Repository Name',
+              es: 'Nombre del repositorio',
               fr: 'Nom du dépôt'
             })
           },
@@ -186,6 +196,7 @@ const RouteComponent = () => {
             accessorFn: (row: InstrumentRepo) => row.instrumentIds.length,
             header: t({
               en: 'Instruments',
+              es: 'Instrumentos',
               fr: 'Instruments'
             }),
             id: 'instrumentCount'
@@ -195,6 +206,7 @@ const RouteComponent = () => {
               row.lastSyncedAt ? new Date(row.lastSyncedAt).toLocaleDateString() : '-',
             header: t({
               en: 'Last Synced',
+              es: 'Última sincronización',
               fr: 'Dernière synchronisation'
             }),
             id: 'lastSynced'
@@ -205,6 +217,7 @@ const RouteComponent = () => {
           {
             label: t({
               en: 'Sync',
+              es: 'Sincronizar',
               fr: 'Synchroniser'
             }),
             onSelect: (repo: InstrumentRepo) => {
@@ -214,6 +227,7 @@ const RouteComponent = () => {
           {
             label: t({
               en: 'View',
+              es: 'Ver',
               fr: 'Voir'
             }),
             onSelect: (repo: InstrumentRepo) => {
@@ -230,6 +244,7 @@ const RouteComponent = () => {
           <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
             {t({
               en: 'Add Repository',
+              es: 'Agregar repositorio',
               fr: 'Ajouter un dépôt'
             })}
           </Button>
@@ -246,12 +261,14 @@ const RouteComponent = () => {
             <Dialog.Title>
               {t({
                 en: 'Add Instrument Repository',
+                es: 'Agregar repositorio de instrumentos',
                 fr: "Ajouter un dépôt d'instruments"
               })}
             </Dialog.Title>
             <Dialog.Description>
               {t({
                 en: 'Enter the GitHub URL of the instrument repository. Importing may take a minute.',
+                es: 'Introduzca la URL de GitHub del repositorio de instrumentos. La importación puede tardar un minuto.',
                 fr: "Entrez l'URL GitHub du dépôt d'instruments. L'importation peut prendre une minute."
               })}
             </Dialog.Description>
@@ -270,6 +287,7 @@ const RouteComponent = () => {
             <Dialog.Title>
               {t({
                 en: `Instruments in "${repoToView.name}"`,
+                es: `Instrumentos de "${repoToView.name}"`,
                 fr: `Instruments dans « ${repoToView.name} »`
               })}
             </Dialog.Title>
@@ -290,6 +308,7 @@ const RouteComponent = () => {
                 <p className="text-muted-foreground py-4 text-center text-sm">
                   {t({
                     en: 'No instruments found in this repository.',
+                    es: 'No se encontraron instrumentos en este repositorio.',
                     fr: 'Aucun instrument trouvé dans ce dépôt.'
                   })}
                 </p>
@@ -298,9 +317,9 @@ const RouteComponent = () => {
             return (
               <div className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
                 <div className="grid grid-cols-[1fr_8rem_5rem] gap-x-6 font-bold">
-                  <p>{t({ en: 'Title', fr: 'Titre' })}</p>
-                  <p>{t({ en: 'Kind', fr: 'Type' })}</p>
-                  <p>{t({ en: 'Edition', fr: 'Édition' })}</p>
+                  <p>{t({ en: 'Title', es: 'Título', fr: 'Titre' })}</p>
+                  <p>{t({ en: 'Kind', es: 'Tipo', fr: 'Type' })}</p>
+                  <p>{t({ en: 'Edition', es: 'Edición', fr: 'Édition' })}</p>
                 </div>
                 <hr />
                 <ul className="flex flex-col gap-5">
@@ -338,12 +357,14 @@ const RouteComponent = () => {
             <Dialog.Title>
               {t({
                 en: 'Are you absolutely sure?',
+                es: '¿Está completamente seguro?',
                 fr: 'Êtes-vous absolument sûr ?'
               })}
             </Dialog.Title>
             <Dialog.Description>
               {t({
                 en: `This will remove the repository "${repoToDelete.name}" from the system. Deletion is only possible if no groups currently have this repository assigned.`,
+                es: `Esto eliminará el repositorio "${repoToDelete.name}" del sistema. Solo se puede eliminar si ningún grupo lo tiene asignado actualmente.`,
                 fr: `Cela supprimera le dépôt « ${repoToDelete.name} » du système. La suppression n'est possible que si aucun groupe n'utilise actuellement ce dépôt.`
               })}
             </Dialog.Description>

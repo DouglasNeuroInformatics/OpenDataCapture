@@ -27,7 +27,11 @@ export function useDeleteSeriesInstrumentMutation() {
       addNotification({
         message: getApiErrorMessage(
           err,
-          t({ en: 'Failed to delete instrument', fr: "Échec de la suppression de l'instrument" })
+          t({
+            en: 'Failed to delete instrument',
+            es: 'Error al eliminar el instrumento',
+            fr: "Échec de la suppression de l'instrument"
+          })
         ),
         type: 'error'
       });

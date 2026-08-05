@@ -51,7 +51,7 @@ const EditTemplateForm = ({
   return (
     <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="template-edit-name">{t({ en: 'Name', fr: 'Nom' })}</Label>
+        <Label htmlFor="template-edit-name">{t({ en: 'Name', es: 'Nombre', fr: 'Nom' })}</Label>
         <Input
           data-testid="template-edit-name"
           id="template-edit-name"
@@ -99,7 +99,7 @@ export const EditTemplateDialog = ({ template, ...props }: EditTemplateDialogPro
     <Dialog open={template !== null} onOpenChange={props.onOpenChange}>
       <Dialog.Content className="max-w-lg">
         <Dialog.Header>
-          <Dialog.Title>{t({ en: 'Edit template', fr: 'Modifier le modèle' })}</Dialog.Title>
+          <Dialog.Title>{t({ en: 'Edit template', es: 'Editar plantilla', fr: 'Modifier le modèle' })}</Dialog.Title>
         </Dialog.Header>
         {/* Mounted only while open, so the draft resets between templates. */}
         {template && (

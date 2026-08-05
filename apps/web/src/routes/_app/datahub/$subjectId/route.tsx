@@ -44,6 +44,7 @@ const RouteComponent = () => {
           {t(
             {
               en: 'Instrument Records for Subject {}',
+              es: 'Registros de instrumentos del sujeto {}',
               fr: "Dossiers d'instruments pour le client {}"
             },
             {

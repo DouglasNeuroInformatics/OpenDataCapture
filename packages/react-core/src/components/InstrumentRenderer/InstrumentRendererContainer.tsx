@@ -22,6 +22,7 @@ export const InstrumentRendererContainer = ({ children, className, index }: Inst
         icon: FileCheckIcon,
         label: t({
           en: 'Overview',
+          es: 'Descripción general',
           fr: 'Aperçu'
         })
       },
@@ -29,6 +30,7 @@ export const InstrumentRendererContainer = ({ children, className, index }: Inst
         icon: MonitorIcon,
         label: t({
           en: 'Content',
+          es: 'Contenido',
           fr: 'Contenu'
         })
       },
@@ -36,6 +38,7 @@ export const InstrumentRendererContainer = ({ children, className, index }: Inst
         icon: PrinterIcon,
         label: t({
           en: 'Summary',
+          es: 'Resumen',
           fr: 'Résumé'
         })
       }
