@@ -18,7 +18,7 @@ import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useMailErrorMessage } from '@/hooks/useMailErrorMessage';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
-import { $Email, $PhoneNumber, omittedIfBlank } from '@/utils/validation';
+import { $Email, $PhoneNumber, omittedIfBlank, requiresGroup } from '@/utils/validation';
 
 const PASSWORD_ERROR_TRANSLATION_KEYS = {
   INSUFFICIENT_PASSWORD_STRENGTH: 'common.insufficientPasswordStrength',
@@ -309,6 +309,16 @@ const RouteComponent = () => {
                 input: ctx.value.confirmPassword,
                 message: t('common.passwordsMustMatch'),
                 path: ['confirmPassword']
+              });
+            }
+          })
+          .check((ctx) => {
+            if (requiresGroup(ctx.value) && !ctx.value.groupIds?.size) {
+              ctx.issues.push({
+                code: 'custom',
+                input: ctx.value.groupIds,
+                message: t('common.groupRequired'),
+                path: ['groupIds']
               });
             }
           })}
