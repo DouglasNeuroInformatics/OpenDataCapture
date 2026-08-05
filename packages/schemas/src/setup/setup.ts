@@ -1,6 +1,9 @@
 import { z } from 'zod/v4';
 
+import { $Language } from '../core/core.js';
 import { $CreateUserData } from '../user/user.js';
+
+import type { Language } from '../core/core.js';
 
 // ── Internal helpers (must precede all exports for import/exports-last) ───────
 
@@ -39,11 +42,16 @@ const PANEL_SECTIONS = ['logo', 'name', 'tagline', 'details', 'resources'] as co
 
 const $HexColor = z.string().regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, 'Must be a valid hex color (e.g. #0ea5e9)');
 
-/** A piece of branding text with an English and French variant. */
+/**
+ * A piece of branding text, in each language the interface may be displayed in. The `satisfies`
+ * keeps it in step with {@link Language}: a language added there fails to compile until it is
+ * offered here too, so branding can never silently render blank in a language the instance offers.
+ */
 const $BrandingText = z.object({
   en: z.string().max(300).nullish(),
+  es: z.string().max(300).nullish(),
   fr: z.string().max(300).nullish()
-});
+} satisfies { [L in Language]: z.ZodType<null | string | undefined> });
 
 /**
  * Resource-link hrefs render into `<a href>` on the login page, so they must be
@@ -176,6 +184,19 @@ const $BrandingConfig = z.object({
   taglineFontSize: $FontSize.nullish()
 });
 
+/**
+ * The languages an instance offers its users, as a non-empty subset of the interface languages.
+ * Empty is rejected rather than treated as "all": an instance with no language is one whose every
+ * user loses the ability to read it, and no admin can undo that through the UI.
+ *
+ * A tuple rather than `z.array().nonempty()` because only the tuple carries the guarantee into the
+ * type — consumers read `activeLanguages[0]` as the fallback language with no assertion.
+ */
+const $ActiveLanguages = z.tuple([$Language], $Language);
+
+/** The languages an instance offers before an admin has chosen, and the fallback for one saved before this setting existed. */
+const DEFAULT_ACTIVE_LANGUAGES: ActiveLanguages = ['en', 'fr'];
+
 /** Upper bound (in days) for a configured assignment validity period; roughly ten years. */
 const MAX_ASSIGNMENT_DURATION_DAYS = 3650;
 
@@ -183,6 +204,7 @@ const MAX_ASSIGNMENT_DURATION_DAYS = 3650;
 const $DefaultAssignmentDurationDays = z.number().int().positive().max(MAX_ASSIGNMENT_DURATION_DAYS);
 
 const $SetupState = z.object({
+  activeLanguages: $ActiveLanguages,
   branding: $BrandingConfig.nullish(),
   defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
   isDemo: z.boolean(),
@@ -200,6 +222,7 @@ const $SetupState = z.object({
 });
 
 const $UpdateSetupStateData = z.object({
+  activeLanguages: $ActiveLanguages.optional(),
   branding: $BrandingConfig.nullish(),
   defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
   isExperimentalFeaturesEnabled: z.boolean().nullish()
@@ -220,6 +243,7 @@ const $InitAppOptions = z.object({
 
 // ── Exports ──────────────────────────────────────────────────────────────────
 
+export type ActiveLanguages = z.infer<typeof $ActiveLanguages>;
 export type BrandingConfig = z.infer<typeof $BrandingConfig>;
 export type BrandingText = z.infer<typeof $BrandingText>;
 export type CreateAdminData = z.infer<typeof $CreateAdminData>;
@@ -238,6 +262,7 @@ export type SetupState = z.infer<typeof $SetupState>;
 export type UpdateSetupStateData = z.infer<typeof $UpdateSetupStateData>;
 
 export {
+  $ActiveLanguages,
   $BrandingConfig,
   $BrandingText,
   $CreateAdminData,
@@ -249,6 +274,7 @@ export {
   $ResourceLink,
   $SetupState,
   $UpdateSetupStateData,
+  DEFAULT_ACTIVE_LANGUAGES,
   FONT_SIZES,
   LOGIN_THEMES,
   LOGO_ALIGNMENTS,

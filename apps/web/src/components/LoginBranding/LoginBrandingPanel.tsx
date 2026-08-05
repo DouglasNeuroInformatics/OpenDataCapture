@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { Logo } from '@opendatacapture/react-core';
+import type { Language } from '@opendatacapture/schemas/core';
 import type {
   BrandingConfig,
   LogoAlignment,
@@ -15,6 +16,8 @@ import { BookOpenIcon, GithubIcon, LinkIcon } from 'lucide-react';
 
 import { config } from '@/config';
 import { getLoginGradient } from '@/utils/branding';
+import { getValueForLanguage } from '@/utils/language';
+import type { LocalizedValues } from '@/utils/language';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -47,7 +50,7 @@ const DEFAULT_INSTANCE_NAME = 'Open Data Capture';
 type LoginBrandingPanelProps = {
   branding?: BrandingConfig | null;
   className?: string;
-  lang?: 'en' | 'fr';
+  lang?: Language;
   preview?: boolean;
 };
 
@@ -124,11 +127,11 @@ const LogoSection = ({ alignment, branding, instanceName, preview }: LogoSection
 type ResourcesSectionProps = {
   boldResourceLinks: boolean;
   fontSize: null | number | undefined;
-  lang: 'en' | 'fr';
+  lang: Language;
   links: ResourceLink[];
   preview: boolean;
   tc: (slateClass: string) => null | string;
-  tl: (obj: { en: string; fr: string }) => string;
+  tl: (obj: LocalizedValues<string>) => string;
 };
 
 const ResourcesSection = ({ boldResourceLinks, fontSize, lang, links, preview, tc, tl }: ResourcesSectionProps) => (
@@ -137,15 +140,14 @@ const ResourcesSection = ({ boldResourceLinks, fontSize, lang, links, preview, t
       className={cn('font-semibold uppercase tracking-wider', tc('text-slate-100'), preview ? 'text-[9px]' : 'text-xs')}
       style={fontStyle(fontSize, preview)}
     >
-      {tl({ en: 'Resources', fr: 'Ressources' })}
+      {tl({ en: 'Resources', es: 'Recursos', fr: 'Ressources' })}
     </p>
     <div
       className={cn('flex flex-wrap items-center gap-x-5 gap-y-2', preview ? 'text-[11px]' : 'text-sm')}
       style={fontStyle(fontSize, preview)}
     >
       {links.map((link, index) => {
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        const linkLabel = link.label?.[lang]?.trim() || link.label?.en?.trim() || link.label?.fr?.trim() || '';
+        const linkLabel = getValueForLanguage(link.label ?? {}, lang)?.trim();
         if (!linkLabel) return null;
         return (
           <a
@@ -172,7 +174,7 @@ type PanelFooterProps = {
   preview: boolean;
   showFooterLinks: boolean;
   tc: (slateClass: string) => null | string;
-  tl: (obj: { en: string; fr: string }) => string;
+  tl: (obj: LocalizedValues<string>) => string;
 };
 
 const PanelFooter = ({ preview, showFooterLinks, tc, tl }: PanelFooterProps) => (
@@ -191,7 +193,7 @@ const PanelFooter = ({ preview, showFooterLinks, tc, tl }: PanelFooterProps) => 
           target="_blank"
         >
           <GithubIcon className={preview ? 'h-3 w-3' : 'h-4 w-4'} />
-          {tl({ en: 'Source Code', fr: 'Code source' })}
+          {tl({ en: 'Source Code', es: 'Código fuente', fr: 'Code source' })}
         </a>
         <a
           className={cn(
@@ -203,7 +205,7 @@ const PanelFooter = ({ preview, showFooterLinks, tc, tl }: PanelFooterProps) => 
           target="_blank"
         >
           <BookOpenIcon className={preview ? 'h-3 w-3' : 'h-4 w-4'} />
-          {tl({ en: 'Documentation', fr: 'Documentation' })}
+          {tl({ en: 'Documentation', es: 'Documentación', fr: 'Documentation' })}
         </a>
       </div>
     )}
@@ -224,15 +226,12 @@ export const LoginBrandingPanel = ({
   const { resolvedLanguage } = useTranslation();
   const lang = langOverride ?? resolvedLanguage;
 
-  const tl = (obj: { en: string; fr: string }): string => obj[lang];
+  const tl = (obj: LocalizedValues<string>): string => getValueForLanguage(obj, lang) ?? '';
 
   const derived = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const instanceName = branding?.instanceName?.[lang]?.trim() || DEFAULT_INSTANCE_NAME;
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const instanceTagline = branding?.instanceTagline?.[lang]?.trim() || null;
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const instanceDetails = branding?.instanceDetails?.[lang]?.trim() || null;
+    const instanceName = getValueForLanguage(branding?.instanceName ?? {}, lang)?.trim() ?? DEFAULT_INSTANCE_NAME;
+    const instanceTagline = getValueForLanguage(branding?.instanceTagline ?? {}, lang)?.trim() ?? null;
+    const instanceDetails = getValueForLanguage(branding?.instanceDetails ?? {}, lang)?.trim() ?? null;
     const panelTextColor = branding?.panelTextColor ?? null;
     return {
       boldDetails: branding?.boldDetails === true,

@@ -8,7 +8,7 @@ import {
   ServiceUnavailableException
 } from '@nestjs/common';
 import { isMailEnabled } from '@opendatacapture/schemas/mail';
-import { $BrandingConfig } from '@opendatacapture/schemas/setup';
+import { $ActiveLanguages, $BrandingConfig, DEFAULT_ACTIVE_LANGUAGES } from '@opendatacapture/schemas/setup';
 import type { CreateAdminData, InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
 import type { RuntimePrismaClient } from '@/core/prisma';
@@ -51,7 +51,12 @@ export class SetupService {
     // Note: unknown keys are stripped here, so a stale dev server running an
     // older $BrandingConfig will silently drop newer branding fields on read.
     const branding = $BrandingConfig.nullable().safeParse(savedOptions?.branding ?? null);
+    // Parsed rather than read through: the column is a bare `String[]` and predates this setting,
+    // so a document written by an older release holds `[]` and every client would be left with no
+    // language to offer.
+    const activeLanguages = $ActiveLanguages.safeParse(savedOptions?.activeLanguages);
     return {
+      activeLanguages: activeLanguages.success ? activeLanguages.data : DEFAULT_ACTIVE_LANGUAGES,
       branding: branding.success ? branding.data : null,
       defaultAssignmentDurationDays: savedOptions?.defaultAssignmentDurationDays ?? null,
       isDemo: Boolean(savedOptions?.isDemo),

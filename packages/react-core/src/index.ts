@@ -10,4 +10,6 @@ export * from './components/InstrumentSummary';
 export * from './components/LoadingPage';
 export * from './components/Logo';
 export * from './components/NavigationBlockerDialog';
+export * from './hooks/useLanguageOptions';
 export * from './types';
+export * from './utils/language';
