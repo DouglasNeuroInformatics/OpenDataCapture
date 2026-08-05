@@ -72,6 +72,36 @@ describe('build', () => {
       await expect(build({ inputs })).rejects.toThrowError('expected at most one version of react');
     });
 
+    it('should wrap a BuildFailure-shaped error as ESBUILD_FAILURE', async () => {
+      vi.spyOn(esbuild, 'build').mockRejectedValueOnce({
+        cause: undefined,
+        errors: [
+          {
+            detail: undefined,
+            id: '',
+            location: null,
+            notes: [],
+            pluginName: '',
+            text: 'Could not resolve "missing"'
+          }
+        ],
+        message: 'Build failed with 1 error',
+        name: 'BuildFailure',
+        warnings: []
+      });
+      await expect(build(options)).rejects.toSatisfy((err: any) => {
+        return err.name === 'InstrumentBundlerError' && err.kind === 'ESBUILD_FAILURE';
+      });
+    });
+
+    it('should wrap a plain error as an unknown error with no kind', async () => {
+      const error = new TypeError('something broke');
+      vi.spyOn(esbuild, 'build').mockRejectedValueOnce(error);
+      await expect(build(options)).rejects.toSatisfy((err: any) => {
+        return err.name === 'InstrumentBundlerError' && err.kind === undefined && err.cause === error;
+      });
+    });
+
     // it('should return javascript that can be executed with no further transformation', () => {
     //   const result = bundle(options);
     //   expect((0, eval)(result.js)).toMatchObject({ kind: 'INTERACTIVE' });
