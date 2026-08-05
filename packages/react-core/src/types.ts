@@ -17,6 +17,9 @@ declare module '@douglasneuroinformatics/libui/i18n' {
   export namespace UserConfig {
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- the members come from the extends clause, which is the point
     export interface LanguageOptions extends Record<InterfaceLanguage, true> {}
+    export interface Options {
+      requireCompleteTranslations: true;
+    }
   }
 }
 

@@ -47,8 +47,8 @@ not every tool loads nested files.
   `.agents/docs/playbooks/add-e2e-test.md`.
 - **All frontend user-facing strings go through `useTranslation`.** Prefer inline
   `t({ en: '...', es: '...', fr: '...' })` unless the string is used more than once. **Every
-  interface language gets an entry** — a missing one falls back to English silently, so
-  `apps/web/src/__tests__/spanish-coverage.test.ts` fails the build rather than let it ship.
+  interface language gets an entry** — `requireCompleteTranslations` is set in
+  `packages/react-core/src/types.ts`, so omitting a language is a type error caught by `pnpm lint`.
 - **Never run the `apps/web` route-tree generator.** `src/route-tree.ts` is generated and
   git-tracked, but the user regenerates it manually after route changes. Never hand-edit it either.
 - **If code needs a comment to be understood, the code is wrong** — rewrite it. Comments are for
