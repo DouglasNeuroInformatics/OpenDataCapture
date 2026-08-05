@@ -1,15 +1,16 @@
 import { useState } from 'react';
 
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
-import { Button, Dialog, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { Branding } from '@opendatacapture/react-core';
+import { Branding, LanguageToggle } from '@opendatacapture/react-core';
 import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import { StopCircle } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { useNavItems } from '@/hooks/useNavItems';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 
 import { GroupSwitcher, useIsGroupSwitcherVisible } from '../GroupSwitcher';
@@ -27,6 +28,7 @@ export const Sidebar = () => {
   const endSession = useAppStore((store) => store.endSession);
   const location = useLocation();
   const navigate = useNavigate();
+  const { activeLanguages } = useSetupStateQuery().data;
 
   const { t } = useTranslation();
 
@@ -163,12 +165,9 @@ export const Sidebar = () => {
         <UserDropup />
         <div className="flex h-full items-center gap-2">
           <LanguageToggle
+            activeLanguages={activeLanguages}
             contentClassName="bg-slate-800 border-slate-700 text-slate-300"
             itemClassName="bg-slate-800 hover:bg-slate-700 focus:bg-slate-700 focus:text-slate-100"
-            options={{
-              en: 'English',
-              fr: 'Français'
-            }}
             triggerClassName="hover:bg-slate-800 hover:text-slate-300 focus-visible:ring-0"
             variant="ghost"
           />

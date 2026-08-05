@@ -1,6 +1,9 @@
 import { z } from 'zod/v4';
 
+import { $ActiveLanguages } from '../core/core.js';
 import { $CreateUserData } from '../user/user.js';
+
+import type { Language } from '../core/core.js';
 
 // ── Internal helpers (must precede all exports for import/exports-last) ───────
 
@@ -39,11 +42,16 @@ const PANEL_SECTIONS = ['logo', 'name', 'tagline', 'details', 'resources'] as co
 
 const $HexColor = z.string().regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, 'Must be a valid hex color (e.g. #0ea5e9)');
 
-/** A piece of branding text with an English and French variant. */
+/**
+ * A piece of branding text, in each language the interface may be displayed in. The `satisfies`
+ * keeps it in step with {@link Language}: a language added there fails to compile until it is
+ * offered here too, so branding can never silently render blank in a language the instance offers.
+ */
 const $BrandingText = z.object({
   en: z.string().max(300).nullish(),
+  es: z.string().max(300).nullish(),
   fr: z.string().max(300).nullish()
-});
+} satisfies { [L in Language]: z.ZodType<null | string | undefined> });
 
 /**
  * Resource-link hrefs render into `<a href>` on the login page, so they must be
@@ -183,6 +191,7 @@ const MAX_ASSIGNMENT_DURATION_DAYS = 3650;
 const $DefaultAssignmentDurationDays = z.number().int().positive().max(MAX_ASSIGNMENT_DURATION_DAYS);
 
 const $SetupState = z.object({
+  activeLanguages: $ActiveLanguages,
   branding: $BrandingConfig.nullish(),
   defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
   isDemo: z.boolean(),
@@ -200,6 +209,7 @@ const $SetupState = z.object({
 });
 
 const $UpdateSetupStateData = z.object({
+  activeLanguages: $ActiveLanguages.optional(),
   branding: $BrandingConfig.nullish(),
   defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
   isExperimentalFeaturesEnabled: z.boolean().nullish()

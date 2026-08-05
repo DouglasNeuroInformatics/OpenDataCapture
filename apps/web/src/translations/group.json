@@ -2,38 +2,47 @@
   "manage": {
     "accessibleInstrumentDemoNote": {
       "en": "Please note that this feature is disabled in demo mode to avoid disrupting other users.",
+      "es": "Tenga en cuenta que esta funcionalidad está desactivada en modo de demostración para evitar interrumpir a otros usuarios.",
       "fr": "Veuillez noter que cette fonctionnalité est désactivée en mode démo, afin d'éviter de perturber les autres utilisateurs."
     },
     "accessibleInstruments": {
       "en": "Accessible Instruments",
+      "es": "Instrumentos accesibles",
       "fr": "Instruments accessibles"
     },
     "accessibleInstrumentsDesc": {
       "en": "Select the instruments that are shown to you and other members of your group. This can be changed by a group manager at any time.",
+      "es": "Seleccione los instrumentos que se muestran a usted y a los demás miembros de su grupo. Esto puede ser modificado por un administrador de grupo en cualquier momento.",
       "fr": "Sélectionnez les instruments qui vous sont présentés ainsi qu'aux autres membres de votre groupe. Cette sélection peut être modifiée à tout moment par un responsable de groupe."
     },
     "defaultSubjectIdMethod": {
       "en": "Subject Identification Method (Default)",
+      "es": "Método de identificación del sujeto (predeterminado)",
       "fr": "Méthode d'identification du sujet par défaut"
     },
     "forms": {
       "en": "Forms",
+      "es": "Formularios",
       "fr": "Formulaires"
     },
     "groupSettings": {
       "en": "Group Settings",
+      "es": "Configuración del grupo",
       "fr": "Paramètres du groupe"
     },
     "interactive": {
       "en": "Interactive Tasks",
+      "es": "Tareas interactivas",
       "fr": "Tâches interactives"
     },
     "series": {
       "en": "Series",
+      "es": "Series",
       "fr": "Séries"
     },
     "pageTitle": {
       "en": "Manage Group",
+      "es": "Gestionar grupo",
       "fr": "Gérer le groupe"
     }
   }

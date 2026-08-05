@@ -13,6 +13,8 @@ import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/sub
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
 
+import { getValueForLanguage } from '@/utils/language';
+
 const currentDate = new Date();
 
 type StartSessionFormData = {
@@ -212,9 +214,13 @@ export const StartSessionForm = ({
                   ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message:
-                      currentGroup.settings.idValidationRegexErrorMessage?.[resolvedLanguage] ??
+                      getValueForLanguage(
+                        currentGroup.settings.idValidationRegexErrorMessage ?? {},
+                        resolvedLanguage
+                      ) ??
                       t({
                         en: `Must match regular expression: ${regex.source}`,
+                        es: `Debe coincidir con la expresión regular: ${regex.source}`,
                         fr: `Doit correspondre à l'expression régulière : ${regex.source}`
                       }),
                     path: ['subjectId']

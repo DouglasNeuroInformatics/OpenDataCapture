@@ -2,74 +2,91 @@
   "assignments": {
     "assignedAt": {
       "en": "Assigned",
+      "es": "Asignado",
       "fr": "Attribué"
     },
     "assignedInstruments": {
       "en": "Assigned Instruments",
+      "es": "Instrumentos asignados",
       "fr": "Instruments assignés"
     },
     "assignmentSliderDesc": {
       "en": "View additional details related to this assignment here. This includes the link to the assignment, which you can send to the client.",
+      "es": "Consulte aquí los detalles adicionales relacionados con esta asignación. Esto incluye el enlace a la asignación, que puede enviar al cliente.",
       "fr": "Consultez ici les détails supplémentaires relatifs à cette assignation. Il s'agit notamment du lien vers l'assignation, que vous pouvez envoyer au client."
     },
     "expiresAt": {
       "en": "Expires",
+      "es": "Vencimiento",
       "fr": "Expiration"
     },
     "link": {
       "en": "Link to Assignment",
+      "es": "Enlace a la asignación",
       "fr": "Lien vers l'assignation"
     },
     "resendNotification": {
       "en": "Resend Notification",
+      "es": "Reenviar notificación",
       "fr": "Renvoyer la notification"
     },
     "status": {
       "en": "Status",
+      "es": "Estado",
       "fr": "État"
     },
     "statusOptions": {
       "canceled": {
         "en": "Canceled",
+        "es": "Cancelado",
         "fr": "Annulé"
       },
       "complete": {
         "en": "Complete",
+        "es": "Completado",
         "fr": "Terminé"
       },
       "expired": {
         "en": "Expired",
+        "es": "Expirado",
         "fr": "Expiré"
       },
       "outstanding": {
         "en": "Outstanding",
+        "es": "Pendiente",
         "fr": "À compléter"
       }
     },
     "title": {
       "en": "Title",
+      "es": "Título",
       "fr": "Titre"
     }
   },
   "downloadInfo": {
     "allTime": {
       "en": "Timeframe: All time",
+      "es": "Periodo: Todo el tiempo",
       "fr": "Période : Toujours"
     },
     "download": {
       "en": "Download",
+      "es": "Descargar",
       "fr": "Télécharger"
     },
     "measurement": {
       "en": "Measures: ",
+      "es": "Medidas: ",
       "fr": "Mesures : "
     },
     "subjectText": {
       "en": "{} of Subject: {}",
+      "es": "{} del sujeto: {}",
       "fr": "{} du client : {}"
     },
     "time": {
       "en": "Timeframe: ",
+      "es": "Periodo: ",
       "fr": "Période : "
     }
   },
@@ -77,47 +94,57 @@
     "lookup": {
       "title": {
         "en": "Subject Lookup",
+        "es": "Buscar sujeto",
         "fr": "Trouver un client"
       }
     },
     "table": {
       "export": {
         "en": "Export",
+        "es": "Exportar",
         "fr": "Exporter"
       },
       "exportHelpText": {
         "en": "This data is provided in an ultra-long format. Each row corresponds to the value for a single measure. Rows corresponding to the same record will have matching subject identifiers and timestamps.",
+        "es": "Estos datos se proporcionan en un formato ultralargo. Cada fila corresponde al valor de una sola medida. Las filas correspondientes al mismo registro tendrán identificadores de sujeto y marcas de tiempo coincidentes.",
         "fr": "Ces données sont fournies dans un format ultra-long. Chaque ligne correspond à la valeur d'une seule mesure. Les lignes correspondant à un même enregistrement auront des identifiants de sujet et des horodatages correspondants."
       },
       "filters": {
         "en": "Filters",
+        "es": "Filtros",
         "fr": "Filtres"
       },
       "subject": {
         "en": "Subject",
+        "es": "Sujeto",
         "fr": "Client"
       }
     },
     "title": {
       "en": "Data Hub",
+      "es": "Centro de datos",
       "fr": "Centre de données"
     }
   },
   "files": {
     "dateCollected": {
       "en": "Date Collected",
+      "es": "Fecha de recopilación",
       "fr": "Date de collecte"
     },
     "download": {
       "en": "Download",
+      "es": "Descargar",
       "fr": "Télécharger"
     },
     "empty": {
       "en": "No files have been uploaded for this subject.",
+      "es": "No se han cargado archivos para este sujeto.",
       "fr": "Aucun fichier n'a été téléversé pour ce client."
     },
     "instrument": {
       "en": "Instrument",
+      "es": "Instrumento",
       "fr": "Instrument"
     }
   },
@@ -125,71 +152,87 @@
     "tabs": {
       "assignments": {
         "en": "Assignments",
+        "es": "Asignaciones",
         "fr": "Assignations"
       },
       "files": {
         "en": "Files",
+        "es": "Archivos",
         "fr": "Fichiers"
       },
       "graph": {
         "en": "Graph",
+        "es": "Gráfico",
         "fr": "Graphique"
       },
       "table": {
         "en": "Table",
+        "es": "Tabla",
         "fr": "Tableau"
       }
     },
     "title": {
       "en": "Instrument Records for Subject {{id}}",
+      "es": "Registros de instrumentos del sujeto {{id}}",
       "fr": "Dossiers d'instruments pour le client {{id}}"
     }
   },
   "visualization": {
     "instrument": {
       "en": "Instrument",
+      "es": "Instrumento",
       "fr": "Instrument"
     },
     "measures": {
       "en": "Measures",
+      "es": "Medidas",
       "fr": "Mesures"
     },
     "selectEdition": {
       "en": "Select an edition",
+      "es": "Seleccione una edición",
       "fr": "Sélectionnez une édition"
     },
     "selectInstrument": {
       "en": "Select an instrument",
+      "es": "Seleccione un instrumento",
       "fr": "Sélectionnez un instrument"
     },
     "selectMeasures": {
       "en": "Please select one or more measures",
+      "es": "Por favor, seleccione una o más medidas",
       "fr": "Veuillez sélectionner au moins une mesure"
     },
     "timeframe": {
       "en": "Timeframe",
+      "es": "Periodo",
       "fr": "Période"
     },
     "timeframeOptions": {
       "all": {
         "en": "All-Time",
+        "es": "Todo el tiempo",
         "fr": "Toujours"
       },
       "month": {
         "en": "Past Month",
+        "es": "Último mes",
         "fr": "Mois écoulé"
       },
       "year": {
         "en": "Past Year",
+        "es": "Último año",
         "fr": "Année écoulée"
       }
     },
     "xLabel": {
       "en": "Date Collected",
+      "es": "Fecha de recopilación",
       "fr": "Date d'enregistrement"
     },
     "yLabel": {
       "en": "Value",
+      "es": "Valor",
       "fr": "Valeur"
     }
   }

@@ -58,4 +58,22 @@ describe('$UpdateSetupStateData', () => {
       expect($UpdateSetupStateData.safeParse({}).success).toBe(true);
     });
   });
+
+  describe('activeLanguages', () => {
+    it('should accept a subset of the interface languages', () => {
+      expect($UpdateSetupStateData.safeParse({ activeLanguages: ['en', 'es'] }).success).toBe(true);
+    });
+
+    it('should reject an unknown language code, which would empty the language toggle for everyone', () => {
+      expect($UpdateSetupStateData.safeParse({ activeLanguages: ['klingon'] }).success).toBe(false);
+    });
+
+    it('should reject an empty set, leaving no way to restore a language through the UI', () => {
+      expect($UpdateSetupStateData.safeParse({ activeLanguages: [] }).success).toBe(false);
+    });
+
+    it('should allow the field to be omitted', () => {
+      expect($UpdateSetupStateData.safeParse({}).success).toBe(true);
+    });
+  });
 });

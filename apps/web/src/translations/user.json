@@ -1,10 +1,12 @@
 {
   "account": {
     "en": "Account",
+    "es": "Cuenta",
     "fr": "Compte"
   },
   "changePassword": {
     "en": "Change Password",
+    "es": "Cambiar contraseña",
     "fr": "Changer le mot de passe"
   }
 }

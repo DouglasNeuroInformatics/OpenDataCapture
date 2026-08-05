@@ -2,53 +2,65 @@
   "admin": {
     "description": {
       "en": "To use the application, there must be at least one platform administrator. Ensure you remember these credentials, as failure to do so may result in data loss.",
+      "es": "Para utilizar la aplicación, debe haber al menos un administrador de la plataforma. Asegúrese de recordar estas credenciales, ya que no hacerlo puede resultar en la pérdida de datos.",
       "fr": "Pour utiliser l'application, il faut qu'il y ait au moins un administrateur. Assurez-vous de vous souvenir de ces informations d'identification, faute de quoi vous risquez de perdre des données."
     },
     "password": {
       "en": "Password",
+      "es": "Contraseña",
       "fr": "Mot de passe"
     },
     "title": {
       "en": "Admin",
+      "es": "Administrador",
       "fr": "Administrateur"
     },
     "username": {
       "en": "Username",
+      "es": "Nombre de usuario",
       "fr": "Nom d'utilisateur"
     }
   },
   "demo": {
     "description": {
       "en": "If you're testing the platform, you have the option to populate the database with sample data.",
+      "es": "Si está probando la plataforma, tiene la opción de poblar la base de datos con datos de muestra.",
       "fr": "Si vous testez la plateforme, vous avez la possibilité d'alimenter la base de données avec des échantillons de données."
     },
     "dummySubjectCount": {
       "en": "Number of Dummy Subjects",
+      "es": "Número de sujetos ficticios",
       "fr": "Nombre de clients fictifs"
     },
     "init": {
       "en": "Initialize Demo",
+      "es": "Inicializar demostración",
       "fr": "Initialiser la démonstration"
     },
     "recordsPerSubject": {
       "en": "Records Per Subject",
+      "es": "Registros por sujeto",
       "fr": "Enregistrements par sujet"
     },
     "title": {
       "en": "Demo",
+      "es": "Demostración",
       "fr": "Démonstration"
     }
   },
   "loadingSubtitle": {
     "en": "Please be patient, this may take a while...",
+    "es": "Por favor, tenga paciencia, esto puede tardar un momento...",
     "fr": "Veuillez patienter, cela peut prendre un certain temps..."
   },
   "loadingTitle": {
     "en": "Initializing Application",
+    "es": "Inicializando la aplicación",
     "fr": "Initialisation de l'application"
   },
   "pageTitle": {
     "en": "Setup",
+    "es": "Configuración",
     "fr": "Mise en service"
   }
 }
