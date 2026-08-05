@@ -65,6 +65,29 @@ test.describe('admin settings', () => {
     await settingsPage.activeLanguageCheckbox('fr').click();
     expect((await restored).ok()).toBe(true);
     await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toBeVisible();
+
+    // Deactivating the language the reader is currently in. The sidebar is the casualty when this
+    // goes wrong: it renders the toggle, so it is the ancestor a correction made from the toggle
+    // cannot reach. `Iniciar una sesión` is a namespace string, translated on any branch.
+    const sidebar = page.getByTestId('sidebar');
+    const activated = waitForSetupPatch(page);
+    await settingsPage.activeLanguageCheckbox('es').click();
+    expect((await activated).ok()).toBe(true);
+
+    await sidebar.getByTestId('language-toggle').getByRole('button').click();
+    await page.getByRole('menuitem', { name: 'Español' }).click();
+    await expect(sidebar).toContainText('Iniciar una sesión');
+
+    const deactivatedSpanish = waitForSetupPatch(page);
+    await settingsPage.activeLanguageCheckbox('es').click();
+    expect((await deactivatedSpanish).ok()).toBe(true);
+
+    await expect(sidebar).toContainText('Start Session');
+    await expect(sidebar).not.toContainText('Iniciar una sesión');
+
+    // And on a fresh mount, where the correction has to already have happened before render.
+    await page.reload();
+    await expect(sidebar).toContainText('Start Session');
   });
 
   test('should apply the group switcher position preference immediately', async ({ getPageModel }) => {

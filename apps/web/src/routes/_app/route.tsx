@@ -6,6 +6,7 @@ import { DisclaimerProvider } from '@/providers/DisclaimerProvider';
 import { ForceClearQueryCacheProvider } from '@/providers/ForceClearQueryCacheProvider';
 import { WalkthroughProvider } from '@/providers/WalkthroughProvider';
 import { useAppStore } from '@/store';
+import { reconcileInterfaceLanguage } from '@/utils/language';
 
 export const Route = createFileRoute('/_app')({
   beforeLoad: async ({ context }) => {
@@ -17,6 +18,8 @@ export const Route = createFileRoute('/_app')({
     if (!accessToken) {
       throw redirect({ to: '/auth/login' });
     }
+    // Before the tree renders, so no component has to be told after the fact.
+    reconcileInterfaceLanguage(setupState.activeLanguages);
   },
   component: () => {
     return (
