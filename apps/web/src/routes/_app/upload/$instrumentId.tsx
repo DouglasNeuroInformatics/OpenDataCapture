@@ -74,6 +74,7 @@ const RouteComponent = () => {
         addNotification({
           message: t({
             en: 'Lots of entries loading, please wait...',
+            es: 'Se están cargando muchas entradas, espere...',
             fr: 'Beaucoup de données, veuillez patienter...'
           }),
           type: 'info'
@@ -117,6 +118,7 @@ const RouteComponent = () => {
           >
             {t({
               en: 'Error Report',
+              es: 'Informe de error',
               fr: "Rapport d'erreur"
             })}
           </Button>
@@ -129,6 +131,7 @@ const RouteComponent = () => {
           >
             {t({
               en: 'Try Again',
+              es: 'Vuelva a intentarlo',
               fr: 'Réessayer'
             })}
           </Button>
@@ -147,6 +150,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: `Upload Data For ${instrument.details.title}`,
+            es: `Cargar datos de ${instrument.details.title}`,
             fr: `Téléverser les données pour l'instrument : ${instrument.details.title}`
           })}
         </Heading>
@@ -166,7 +170,11 @@ const RouteComponent = () => {
               {(currentUser?.groups.length ?? 0) > 0 && (
                 <div className="flex w-full shrink-0 flex-col gap-1 sm:w-48">
                   <p className="text-muted-foreground text-xs">
-                    {t({ en: 'Filter users by group.', fr: 'Filtrer les utilisateurs par groupe.' })}
+                    {t({
+                      en: 'Filter users by group.',
+                      es: 'Filtrar los usuarios por grupo.',
+                      fr: 'Filtrer les utilisateurs par groupe.'
+                    })}
                   </p>
                   <Select
                     value={selectedGroupId}
@@ -176,7 +184,9 @@ const RouteComponent = () => {
                     }}
                   >
                     <Select.Trigger>
-                      <Select.Value placeholder={t({ en: 'Select group', fr: 'Sélectionner un groupe' })} />
+                      <Select.Value
+                        placeholder={t({ en: 'Select group', es: 'Seleccione un grupo', fr: 'Sélectionner un groupe' })}
+                      />
                     </Select.Trigger>
                     <Select.Content>
                       <Select.Group>
@@ -194,6 +204,7 @@ const RouteComponent = () => {
                 <p className="text-muted-foreground text-xs">
                   {t({
                     en: 'Select the username to associate with these records for audit and traceability.',
+                    es: 'Seleccione el nombre de usuario que se asociará a estos registros para fines de auditoría y trazabilidad.',
                     fr: "Sélectionnez le nom d'utilisateur à associer à ces entrées pour l'audit et la traçabilité."
                   })}
                 </p>
@@ -208,7 +219,7 @@ const RouteComponent = () => {
                           {user.username}
                         </Select.Item>
                       ))}
-                      <Select.Item value="N/A">{t({ en: 'N/A', fr: 'S.O.' })}</Select.Item>
+                      <Select.Item value="N/A">{t({ en: 'N/A', es: 'N/D', fr: 'S.O.' })}</Select.Item>
                     </Select.Group>
                   </Select.Content>
                 </Select>
@@ -224,7 +235,7 @@ const RouteComponent = () => {
             <div className="flex gap-2">
               <Button className="gap-2" size="sm" variant="outline" onClick={handleTemplateDownload}>
                 <DownloadIcon size={16} />
-                {t({ en: 'Template', fr: 'Modèle' })}
+                {t({ en: 'Template', es: 'Plantilla', fr: 'Modèle' })}
               </Button>
               <Button
                 className="gap-2"
@@ -233,7 +244,7 @@ const RouteComponent = () => {
                 onClick={() => window.open('https://opendatacapture.org/en/docs/guides/how-to-upload-data/')}
               >
                 <BadgeHelpIcon size={16} />
-                {t({ en: 'Help', fr: 'Aide' })}
+                {t({ en: 'Help', es: 'Ayuda', fr: 'Aide' })}
               </Button>
             </div>
           </div>
@@ -244,6 +255,7 @@ const RouteComponent = () => {
           <Heading className="mt-4 text-center" variant="h3">
             {t({
               en: 'Data currently uploading...',
+              es: 'Cargando datos...',
               fr: 'Données en cours de téléversement...'
             })}
           </Heading>

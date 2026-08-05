@@ -26,7 +26,7 @@ export const TemplateRow = ({ actions, isActive, isPending, label, onSetActive, 
           className="bg-primary text-primary-foreground w-28 rounded-md py-1.5 text-center text-sm font-medium"
           data-testid={`template-active-${rowId}`}
         >
-          {t({ en: 'Default', fr: 'Par défaut' })}
+          {t({ en: 'Default', es: 'Predeterminada', fr: 'Par défaut' })}
         </span>
       ) : (
         <Button
@@ -38,7 +38,7 @@ export const TemplateRow = ({ actions, isActive, isPending, label, onSetActive, 
           variant="outline"
           onClick={onSetActive}
         >
-          {t({ en: 'Set default', fr: 'Définir par défaut' })}
+          {t({ en: 'Set default', es: 'Establecer como predeterminada', fr: 'Définir par défaut' })}
         </Button>
       )}
     </div>

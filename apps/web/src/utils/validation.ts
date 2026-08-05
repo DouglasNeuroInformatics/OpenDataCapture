@@ -39,7 +39,9 @@ function omittedIfUnchanged(value: string | undefined, storedValue: null | strin
 
 function $Email(t: TranslateFunction<TranslationKey>) {
   return blankOr((value) =>
-    z.email().safeParse(value).success ? null : t({ en: 'Invalid email address', fr: 'Adresse courriel invalide' })
+    z.email().safeParse(value).success
+      ? null
+      : t({ en: 'Invalid email address', es: 'Dirección de correo no válida', fr: 'Adresse courriel invalide' })
   );
 }
 
@@ -50,9 +52,14 @@ function $Email(t: TranslateFunction<TranslationKey>) {
  */
 function $PhoneNumber(t: TranslateFunction<TranslationKey>, storedValue?: null | string) {
   const messages: { [K in PhoneNumberErrorCode]: string } = {
-    INVALID_FORMAT: t({ en: 'Invalid phone number', fr: 'Numéro de téléphone invalide' }),
+    INVALID_FORMAT: t({
+      en: 'Invalid phone number',
+      es: 'Número de teléfono no válido',
+      fr: 'Numéro de téléphone invalide'
+    }),
     TOO_FEW_DIGITS: t({
       en: `Phone number must contain at least ${MIN_PHONE_DIGITS} digits`,
+      es: `El número de teléfono debe contener al menos ${MIN_PHONE_DIGITS} dígitos`,
       fr: `Le numéro de téléphone doit contenir au moins ${MIN_PHONE_DIGITS} chiffres`
     })
   };

@@ -14,7 +14,7 @@ const RouteComponent = () => {
     <div className="w-full">
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t({ en: 'Mail Server', fr: 'Serveur de courriel' })}
+          {t({ en: 'Mail Server', es: 'Servidor de correo', fr: 'Serveur de courriel' })}
         </Heading>
       </PageHeader>
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6" data-testid="mail-settings-page">

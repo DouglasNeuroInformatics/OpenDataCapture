@@ -230,6 +230,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       notifications.addNotification({
         message: t({
           en: 'Error occurred finding records',
+          es: 'Se produjo un error al buscar los registros',
           fr: "Une erreur s'est produite lors de la recherche des enregistrements."
         }),
         type: 'error'
@@ -268,7 +269,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       .filter((info): info is typeof selected => info.kind !== 'SERIES' && info.internal.name === selectedName)
       .sort((a, b) => a.internal.edition - b.internal.edition)
       .forEach((info) => {
-        options[info.id] = `${t({ en: 'Edition', fr: 'Édition' })} ${info.internal.edition}`;
+        options[info.id] = `${t({ en: 'Edition', es: 'Edición', fr: 'Édition' })} ${info.internal.edition}`;
       });
     return options;
   }, [instrumentInfoQuery.data, instrumentId]);

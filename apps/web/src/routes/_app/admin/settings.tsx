@@ -87,7 +87,7 @@ const RouteComponent = () => {
     [mutate]
   );
 
-  const uploaderLabel = t({ en: 'Enable Uploader', fr: 'Activer le téléversement' });
+  const uploaderLabel = t({ en: 'Enable Uploader', es: 'Activar la carga de datos', fr: 'Activer le téléversement' });
   const uploaderEnabled = setupStateQuery.data.isExperimentalFeaturesEnabled ?? false;
 
   const activeLanguages = setupStateQuery.data.activeLanguages;
@@ -155,6 +155,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'Application Settings',
+            es: 'Configuración de la aplicación',
             fr: "Paramètres de l'application"
           })}
         </Heading>
@@ -162,7 +163,7 @@ const RouteComponent = () => {
       <div className="mx-auto max-w-5xl">
         <Card>
           <Card.Content className="p-0">
-            <SettingSection title={t({ en: 'Features', fr: 'Fonctionnalités' })}>
+            <SettingSection title={t({ en: 'Features', es: 'Funcionalidades', fr: 'Fonctionnalités' })}>
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-medium">{uploaderLabel}</p>
@@ -175,6 +176,7 @@ const RouteComponent = () => {
                     <HoverCard.Content className="w-72 text-sm">
                       {t({
                         en: 'When enabled, an upload menu item appears in the sidebar that allows users to upload instrument records directly from data files, bypassing the normal session workflow.',
+                        es: 'Cuando está activada, aparece un elemento de menú de carga en la barra lateral que permite a los usuarios cargar registros de instrumentos directamente desde archivos de datos, sin pasar por el flujo de trabajo habitual de las sesiones.',
                         fr: "Lorsqu'elle est activée, un élément de menu Téléversement apparaît dans le menu latéral et permet aux utilisateurs de téléverser des enregistrements d'instruments directement à partir de fichiers de données."
                       })}
                     </HoverCard.Content>
@@ -188,11 +190,15 @@ const RouteComponent = () => {
               </div>
             </SettingSection>
             <Separator />
-            <SettingSection title={t({ en: 'Settings', fr: 'Paramètres' })}>
+            <SettingSection title={t({ en: 'Settings', es: 'Configuración', fr: 'Paramètres' })}>
               <div className="flex items-center gap-10">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-medium">
-                    {t({ en: 'Default Assignment Validity (Days)', fr: 'Validité par défaut des tâches (jours)' })}
+                    {t({
+                      en: 'Default Assignment Validity (Days)',
+                      es: 'Validez predeterminada de las tareas (días)',
+                      fr: 'Validité par défaut des tâches (jours)'
+                    })}
                   </p>
                   <HoverCard>
                     <HoverCard.Trigger asChild>
@@ -203,6 +209,7 @@ const RouteComponent = () => {
                     <HoverCard.Content className="w-72 text-sm">
                       {t({
                         en: 'The number of days a new remote assignment stays valid by default. This only sets the initial expiry date when creating an assignment, which can still be changed for each one.',
+                        es: 'El número de días que una nueva tarea remota permanece válida de forma predeterminada. Esto solo define la fecha de vencimiento inicial al crear una tarea, que se puede cambiar en cada caso.',
                         fr: "Le nombre de jours pendant lesquels une nouvelle tâche à distance reste valide par défaut. Ceci ne définit que la date d'expiration initiale lors de la création d'une tâche, qui peut toujours être modifiée pour chacune."
                       })}
                     </HoverCard.Content>
@@ -262,10 +269,14 @@ const RouteComponent = () => {
               </div>
             </SettingSection>
             <Separator />
-            <SettingSection title={t({ en: 'Preferences', fr: 'Préférences' })}>
+            <SettingSection title={t({ en: 'Preferences', es: 'Preferencias', fr: 'Préférences' })}>
               <div className="flex items-center gap-10">
                 <p className="text-sm font-medium">
-                  {t({ en: 'Group Switcher Position', fr: 'Position du sélecteur de groupe' })}
+                  {t({
+                    en: 'Group Switcher Position',
+                    es: 'Posición del selector de grupo',
+                    fr: 'Position du sélecteur de groupe'
+                  })}
                 </p>
                 <Select
                   value={groupSwitcherPosition}
@@ -276,9 +287,11 @@ const RouteComponent = () => {
                   </Select.Trigger>
                   <Select.Content>
                     <Select.Group>
-                      <Select.Item value="sidebar">{t({ en: 'Sidebar Menu', fr: 'Menu latéral' })}</Select.Item>
+                      <Select.Item value="sidebar">
+                        {t({ en: 'Sidebar Menu', es: 'Menú lateral', fr: 'Menu latéral' })}
+                      </Select.Item>
                       <Select.Item value="topbar">
-                        {t({ en: 'Top Right Corner', fr: 'Coin supérieur droit' })}
+                        {t({ en: 'Top Right Corner', es: 'Esquina superior derecha', fr: 'Coin supérieur droit' })}
                       </Select.Item>
                     </Select.Group>
                   </Select.Content>

@@ -21,7 +21,9 @@ export const NavigationBlockerDialog = memo<NavigationBlockerDialogProps>(functi
     <Dialog open={open}>
       <Dialog.Content data-testid="blocker-dialog" onOpenAutoFocus={(event) => event.preventDefault()}>
         <Dialog.Header>
-          <Dialog.Title className="flex items-center gap-2">{t({ en: 'Warning', fr: 'Avertissement' })}</Dialog.Title>
+          <Dialog.Title className="flex items-center gap-2">
+            {t({ en: 'Warning', es: 'Advertencia', fr: 'Avertissement' })}
+          </Dialog.Title>
           <Dialog.Description>{message}</Dialog.Description>
         </Dialog.Header>
         <Dialog.Footer>

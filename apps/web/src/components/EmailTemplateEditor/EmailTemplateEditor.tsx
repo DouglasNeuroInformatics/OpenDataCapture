@@ -53,7 +53,7 @@ export const EmailTemplateEditor = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor={`${idPrefix}-language`}>{t({ en: 'Language', fr: 'Langue' })}</Label>
+        <Label htmlFor={`${idPrefix}-language`}>{t({ en: 'Language', es: 'Idioma', fr: 'Langue' })}</Label>
         <LanguageSelect
           data-testid={`${idPrefix}-language`}
           id={`${idPrefix}-language`}
@@ -63,7 +63,7 @@ export const EmailTemplateEditor = ({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor={`${idPrefix}-subject`}>{t({ en: 'Subject', fr: 'Objet' })}</Label>
+        <Label htmlFor={`${idPrefix}-subject`}>{t({ en: 'Subject', es: 'Asunto', fr: 'Objet' })}</Label>
         <Input
           data-testid={`${idPrefix}-subject`}
           id={`${idPrefix}-subject`}
@@ -77,10 +77,12 @@ export const EmailTemplateEditor = ({
 
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <Label htmlFor={`${idPrefix}-body`}>{t({ en: 'Body', fr: 'Corps' })}</Label>
+          <Label htmlFor={`${idPrefix}-body`}>{t({ en: 'Body', es: 'Cuerpo', fr: 'Corps' })}</Label>
           {!readOnly && variables.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-muted-foreground text-xs">{t({ en: 'Insert:', fr: 'Insérer :' })}</span>
+              <span className="text-muted-foreground text-xs">
+                {t({ en: 'Insert:', es: 'Insertar:', fr: 'Insérer :' })}
+              </span>
               {variables.map((variable) => {
                 // Placeholder syntax, not copy — it must render verbatim in every language.
                 const tag = `{{${variable}}}`;

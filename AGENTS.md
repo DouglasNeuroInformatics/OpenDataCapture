@@ -46,7 +46,9 @@ not every tool loads nested files.
 - **Every change needs a unit test _and_ an end-to-end test in `testing/`.** See
   `.agents/docs/playbooks/add-e2e-test.md`.
 - **All frontend user-facing strings go through `useTranslation`.** Prefer inline
-  `t({ en: '...', fr: '...' })` unless the string is used more than once.
+  `t({ en: '...', es: '...', fr: '...' })` unless the string is used more than once. **Every
+  interface language gets an entry** — a missing one falls back to English silently, so
+  `apps/web/src/__tests__/spanish-coverage.test.ts` fails the build rather than let it ship.
 - **Never run the `apps/web` route-tree generator.** `src/route-tree.ts` is generated and
   git-tracked, but the user regenerates it manually after route changes. Never hand-edit it either.
 - **If code needs a comment to be understood, the code is wrong** — rewrite it. Comments are for

@@ -21,6 +21,12 @@ export class AdminSettingsPage extends AppPage {
     return this.$ref.getByTestId(`active-language-${language}`);
   }
 
+  /** `name` is the language's autonym, which is how the toggle labels its options. */
+  async selectLanguage(name: string) {
+    await this.sidebar.getByTestId('language-toggle').getByRole('button').click();
+    await this.$ref.getByRole('menuitem', { name }).click();
+  }
+
   async setDefaultAssignmentDuration(days: number) {
     await this.defaultAssignmentDurationInput.fill(String(days));
     await this.defaultAssignmentDurationInput.press('Enter');
