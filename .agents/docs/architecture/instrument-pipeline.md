@@ -44,11 +44,16 @@ Three places produce instrument source:
 | ---------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------- |
 | Built-in catalog                   | `packages/instrument-library/src/{file,forms,interactive,series}/<NAME>/` | `instrument-bundler` CLI at package build time          |
 | Playground examples and user edits | `apps/playground/src/instruments/{examples,templates}/`                   | `bundle()` in the browser, via `esbuild-wasm`           |
-| External GitHub repos              | `lib/forms/*` and `lib/interactive/*` in the remote repo                  | `InstrumentReposService` on the API at import/sync time |
+| External GitHub repos              | `lib/{file,forms,interactive,series}/*` in the remote repo                | `InstrumentReposService` on the API at import/sync time |
 
-**Repo discovery only scans `lib/forms` and `lib/interactive`** (`discoverInstrumentDirs` in
-`apps/api/src/instrument-repos/instrument-repos.service.ts`). A `lib/file` or `lib/series` directory
-in an external repo is silently ignored.
+**Repo discovery returns `series` last, and callers must import in that order** (`discoverInstrumentDirs`
+in `apps/api/src/instrument-repos/instrument-repos.service.ts`). `InstrumentsService.create` rejects a
+series unless every instrument it references is already stored, so the scalars a repo provides have to
+be created before its series.
+
+**A series that references another repository still fails to import.** Nothing resolves dependencies
+across repositories or retries afterwards, so whether it works depends on the order the repos were
+added. Making this reliable needs a second resolution pass once every repo has been imported.
 
 ## 2. Bundling
 
@@ -217,6 +222,5 @@ instrument repository so an agent working _there_ can read it.
 
 Editing it changes a published package that third parties consume. It describes how to author an
 instrument in a standalone repo; it says nothing about working in this monorepo, and none of its
-rules apply to code outside an instrument directory. Its instruction to place instruments in
-`lib/forms` and `lib/interactive` is coupled to `discoverInstrumentDirs` on the API — change one and
-you must change the other.
+rules apply to code outside an instrument directory. Its instruction on where to place instruments is
+coupled to `discoverInstrumentDirs` on the API — change one and you must change the other.

@@ -111,7 +111,9 @@ const RouteComponent = () => {
   const createRepoMutation = useCreateInstrumentRepoMutation();
   const deleteRepoMutation = useDeleteInstrumentRepoMutation();
   const syncRepoMutation = useSyncInstrumentRepoMutation();
-  const instrumentInfoQuery = useInstrumentInfoQuery();
+  // Every edition, because this page audits what a repository contributed. The default collapses an
+  // instrument's editions to the latest one, which would disagree with the count in the table.
+  const instrumentInfoQuery = useInstrumentInfoQuery({ params: { allEditions: true } });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);

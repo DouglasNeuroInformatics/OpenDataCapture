@@ -54,9 +54,10 @@ emitted directory exists under `runtime/v1/dist` before believing the build.
 **A built instrument is not a loaded one.** The built-in catalog takes one hand-written default import and one
 `create` call per instrument in `apps/api/src/demo/demo.service.ts` (`.agents/docs/playbooks/add-instrument.md`
 is where that step lives); `src/interactive/DNP_STROOP_TASK` is the standing proof — it builds, `pnpm run available`
-lists it, and it is in no demo instance. For an external repository, discovery scans only `lib/forms` and
-`lib/interactive` (`.agents/docs/architecture/instrument-pipeline.md`), so a `lib/file` or `lib/series`
-directory is skipped silently.
+lists it, and it is in no demo instance. For an external repository, discovery scans
+`lib/{file,forms,interactive,series}` and returns `series` last, because a series is rejected unless the
+instruments it references are already stored — so a series whose items live in a _different_ repository still
+fails to import (`.agents/docs/architecture/instrument-pipeline.md`).
 
 **`/runtime/v1/zod@3.x` is the Zod v3 API.** `vendor/zod@3.x`'s `.` export re-exports `zod/v3`; the v4 API is a
 separate subpath, `/runtime/v1/zod@3.x/v4`. The repo-wide `no-restricted-imports` ban on bare `zod`

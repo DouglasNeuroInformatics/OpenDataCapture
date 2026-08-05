@@ -1,10 +1,14 @@
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+
 import { ConfigService, getModelToken, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { InstrumentsService } from '../../instruments/instruments.service';
 import { InstrumentReposService } from '../instrument-repos.service';
@@ -14,6 +18,7 @@ import { InstrumentReposService } from '../instrument-repos.service';
 // intersection with the class, whose private members would collapse the type to `never`.
 type InternalService = {
   decrypt(value: string): string | undefined;
+  discoverInstrumentDirs(repoDir: string): string[];
   encrypt(plaintext: string): string;
   importInstruments(
     owner: string,
@@ -311,6 +316,54 @@ describe('InstrumentReposService', () => {
       await internal.reconcileOrphanedInstruments();
 
       expect(instrumentModel.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('discoverInstrumentDirs', () => {
+    let repoDir: string;
+
+    const writeInstrument = (category: string, name: string) => {
+      const dir = path.join(repoDir, 'lib', category, name);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, 'index.ts'), 'export default {};');
+    };
+
+    beforeEach(() => {
+      repoDir = fs.mkdtempSync(path.join(os.tmpdir(), 'odc-repo-'));
+    });
+
+    afterEach(() => {
+      fs.rmSync(repoDir, { force: true, recursive: true });
+    });
+
+    it('should discover every instrument category, so a repo does not silently lose its series', () => {
+      writeInstrument('file', 'SCAN');
+      writeInstrument('forms', 'HAPPINESS');
+      writeInstrument('interactive', 'CLICK');
+      writeInstrument('series', 'HAPPINESS_WITH_CONSENT');
+
+      const found = internal.discoverInstrumentDirs(repoDir).map((dir) => path.basename(dir));
+
+      expect(found.sort()).toStrictEqual(['CLICK', 'HAPPINESS', 'HAPPINESS_WITH_CONSENT', 'SCAN']);
+    });
+
+    it('should return series after every scalar, because a series cannot be stored before its items', () => {
+      writeInstrument('series', 'HAPPINESS_WITH_CONSENT');
+      writeInstrument('forms', 'HAPPINESS');
+      writeInstrument('interactive', 'CLICK');
+
+      const found = internal.discoverInstrumentDirs(repoDir).map((dir) => path.basename(dir));
+
+      expect(found.at(-1)).toBe('HAPPINESS_WITH_CONSENT');
+    });
+
+    it('should ignore a directory without an index file', () => {
+      writeInstrument('forms', 'HAPPINESS');
+      fs.mkdirSync(path.join(repoDir, 'lib', 'forms', 'README_ONLY'), { recursive: true });
+
+      const found = internal.discoverInstrumentDirs(repoDir).map((dir) => path.basename(dir));
+
+      expect(found).toStrictEqual(['HAPPINESS']);
     });
   });
 });

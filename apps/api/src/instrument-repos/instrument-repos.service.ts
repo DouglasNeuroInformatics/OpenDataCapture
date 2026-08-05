@@ -167,7 +167,11 @@ export class InstrumentReposService implements OnModuleInit {
 
   private discoverInstrumentDirs(repoDir: string): string[] {
     const dirs: string[] = [];
-    for (const category of ['forms', 'interactive']) {
+    // `series` is scanned last, and callers must import in the returned order: a series is rejected
+    // unless every instrument it references is already stored, so the scalars a repo provides have to
+    // be created first. A series referencing a *different* repo still fails; see
+    // `.agents/docs/architecture/instrument-pipeline.md`.
+    for (const category of ['file', 'forms', 'interactive', 'series']) {
       const libDir = path.join(repoDir, 'lib', category);
       if (!fs.existsSync(libDir)) {
         continue;
@@ -294,8 +298,18 @@ export class InstrumentReposService implements OnModuleInit {
       // from the conflict message so we still associate the existing instrument with this repo.
       if (err instanceof ConflictException) {
         const idMatch = /ID '([^']+)'/.exec(err.message);
+        if (!idMatch?.[1]) {
+          // The message is the only channel carrying the existing id. Losing it drops the instrument
+          // from this repo's list, so fail loudly rather than returning an empty result.
+          this.loggingService.error({
+            conflictMessage: err.message,
+            error: 'Cannot recover instrument id from conflict',
+            instrumentDir: dirName
+          });
+          return null;
+        }
         this.loggingService.debug(`Instrument from ${dirName} already exists, skipping creation`);
-        return idMatch?.[1] ? { created: false, id: idMatch[1] } : null;
+        return { created: false, id: idMatch[1] };
       }
       throw err;
     }

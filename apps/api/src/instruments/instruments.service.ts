@@ -109,7 +109,7 @@ export class InstrumentsService {
 
     const id = this.generateInstrumentId(instance, seriesGroupId);
     if (await this.instrumentModel.exists({ id })) {
-      throw new ConflictException(`Instrument with ID '${id}' already exists!`);
+      throw this.instrumentExistsConflict(id);
     }
 
     if (instance.kind === 'SERIES') {
@@ -134,14 +134,24 @@ export class InstrumentsService {
       });
     }
 
-    await this.instrumentModel.create({
-      data: {
-        bundle,
-        groups: seriesGroupId ? { connect: { id: seriesGroupId } } : undefined,
-        id,
-        seriesGroup: seriesGroupId ? { connect: { id: seriesGroupId } } : undefined
+    try {
+      await this.instrumentModel.create({
+        data: {
+          bundle,
+          groups: seriesGroupId ? { connect: { id: seriesGroupId } } : undefined,
+          id,
+          seriesGroup: seriesGroupId ? { connect: { id: seriesGroupId } } : undefined
+        }
+      });
+    } catch (err) {
+      // Two concurrent imports both clear the check above and then one loses the insert on the unique
+      // id. Surface that as the same conflict as losing the check, so a caller has one case to handle
+      // rather than a driver-specific error that reads as an unrelated failure.
+      if (await this.instrumentModel.exists({ id })) {
+        throw this.instrumentExistsConflict(id);
       }
-    });
+      throw err;
+    }
     return { ...instance, id };
   }
 
@@ -614,6 +624,15 @@ export class InstrumentsService {
         return this.getInstrumentInstance(instrument);
       })
     );
+  }
+
+  /**
+   * The single source of this message. `InstrumentReposService.importInstrumentFromDir` reads the id
+   * back out of it to associate an already-stored instrument with the repository that provides it, so
+   * the id must stay quoted and the two throw sites must stay identical.
+   */
+  private instrumentExistsConflict(id: string): ConflictException {
+    return new ConflictException(`Instrument with ID '${id}' already exists!`);
   }
 
   /**
