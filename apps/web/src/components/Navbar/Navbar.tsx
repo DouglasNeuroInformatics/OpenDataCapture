@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 
-import { Button, LanguageToggle, Separator, Sheet, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { Button, Separator, Sheet, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { Branding } from '@opendatacapture/react-core';
+import { Branding, LanguageToggle } from '@opendatacapture/react-core';
 import { useNavigate } from '@tanstack/react-router';
 import { MenuIcon, StopCircle } from 'lucide-react';
 
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useNavItems } from '@/hooks/useNavItems';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 
 import { GroupSwitcher, useIsGroupSwitcherVisible } from '../GroupSwitcher';
@@ -20,6 +21,7 @@ export const Navbar = () => {
   const isGroupSwitcherVisible = useIsGroupSwitcherVisible();
   const [isOpen, setIsOpen] = useState(false);
   const navItems = useNavItems();
+  const { activeLanguages } = useSetupStateQuery().data;
   const { t } = useTranslation('layout');
   const navigate = useNavigate();
   const endSession = useAppStore((store) => store.endSession);
@@ -124,13 +126,7 @@ export const Navbar = () => {
           <div className="flex w-full justify-between gap-2 md:justify-end">
             <UserDropup />
             <div className="flex gap-2">
-              <LanguageToggle
-                options={{
-                  en: 'English',
-                  fr: 'Français'
-                }}
-                variant="outline"
-              />
+              <LanguageToggle activeLanguages={activeLanguages} variant="outline" />
               <ThemeToggle variant="outline" />
             </div>
           </div>

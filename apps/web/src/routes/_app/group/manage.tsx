@@ -15,7 +15,7 @@ import {
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/react-core';
 import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
-import { $RegexString } from '@opendatacapture/schemas/core';
+import { $RegexString, toInstrumentAuthoringLanguage } from '@opendatacapture/schemas/core';
 import type { UpdateGroupData } from '@opendatacapture/schemas/group';
 import type { $CreateSeriesInstrumentData } from '@opendatacapture/schemas/instrument';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
@@ -386,7 +386,7 @@ const CreateSeriesInstrumentDialog = ({
     details: { title: title.trim() },
     groupId,
     items,
-    language: resolvedLanguage
+    language: toInstrumentAuthoringLanguage(resolvedLanguage)
   });
 
   const handleCreate = async () => {

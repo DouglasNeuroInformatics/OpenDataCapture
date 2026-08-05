@@ -20,9 +20,9 @@ import type {
 import type { Simplify } from 'type-fest';
 import { z } from 'zod/v4';
 
-import { $Language, $LicenseIdentifier } from '../core/core.js';
+import { $InstrumentAuthoringLanguage, $LicenseIdentifier } from '../core/core.js';
 
-import type { Language } from '../core/core.js';
+import type { InstrumentAuthoringLanguage as Language } from '../core/core.js';
 
 const $AnyDynamicFunction: z.ZodType<(...args: any[]) => any> = z
   .any()
@@ -43,9 +43,9 @@ const $$InstrumentLanguage = <const TLanguage extends InstrumentLanguage>(langua
       });
   } else if (typeof language === 'undefined') {
     resolvedSchema = z.union([
-      $Language,
+      $InstrumentAuthoringLanguage,
       z
-        .array($Language)
+        .array($InstrumentAuthoringLanguage)
         .nonempty()
         .refine((arr) => isUnique(arr), {
           message: 'Array must contain unique values'
@@ -218,7 +218,7 @@ const $ScalarInstrument = $$ScalarInstrument() satisfies z.ZodType<ScalarInstrum
 const $UnilingualScalarInstrument = $ScalarInstrument.extend({
   clientDetails: $UnilingualClientInstrumentDetails.optional(),
   details: $UnilingualInstrumentDetails,
-  language: $Language,
+  language: $InstrumentAuthoringLanguage,
   measures: $UnilingualInstrumentMeasures.nullable(),
   tags: z.array(z.string().min(1))
 }) satisfies z.ZodType<ScalarInstrument<any, Language>>;

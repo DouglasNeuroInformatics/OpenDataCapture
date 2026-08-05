@@ -136,6 +136,11 @@ without external Mongo. Local development does need a real replica set —
 Every model has `@@map("<Name>Model")`. libnest's Prisma extension adds `model.exists(where)` and a
 computed `__modelName` field, which is what CASL subject detection reads.
 
+`enum Language` is a third hand-maintained list that must agree with `packages/schemas`, alongside
+`AppSubject` above: its values are the language codes themselves, so `LANGUAGES` in
+`packages/schemas/src/core/core.ts` and this enum have to stay in step. Nothing checks it — a code
+in one and not the other type-checks on both sides and fails when a document is written.
+
 ## Configuration
 
 All environment variables are declared in `$Env` (`src/core/schemas/env.schema.ts`) and read through

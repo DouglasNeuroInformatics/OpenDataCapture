@@ -10,8 +10,8 @@ import generalConsentForm from '@opendatacapture/instrument-library/forms/DNP_GE
 import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/DNP_HAPPINESS_QUESTIONNAIRE.js';
 import breakoutTask from '@opendatacapture/instrument-library/interactive/DNP_BREAKOUT_TASK.js';
 import happinessQuestionnaireWithConsent from '@opendatacapture/instrument-library/series/DNP_HAPPINESS_QUESTIONNAIRE_WITH_CONSENT.js';
-import type { FormInstrument } from '@opendatacapture/runtime-core';
-import type { Language, WithID } from '@opendatacapture/schemas/core';
+import type { FormInstrument, Language } from '@opendatacapture/runtime-core';
+import type { WithID } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 

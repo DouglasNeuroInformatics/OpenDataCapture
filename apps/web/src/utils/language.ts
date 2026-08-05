@@ -1,15 +1,24 @@
+import { LANGUAGE_LABELS, LANGUAGES } from '@opendatacapture/react-core';
 import type { Language, LocalizedString } from '@opendatacapture/schemas/core';
 
-/**
- * The `satisfies` keeps this in step with {@link Language}: adding a language fails to compile
- * until it is named here, which is also what supplies the ordered list of authorable languages.
- */
-export const LANGUAGE_LABELS = {
-  en: { en: 'English', fr: 'Anglais' },
-  fr: { en: 'French', fr: 'Français' }
-} as const satisfies { [L in Language]: { en: string; fr: string } };
+/** Blank text is absent text: content authored as `''` is a language the author left empty. */
+const isPresent = <TValue>(value: null | TValue | undefined): value is TValue =>
+  value !== null && value !== undefined && (typeof value !== 'string' || value.trim().length > 0);
 
-export const LANGUAGES = Object.keys(LANGUAGE_LABELS) as Language[];
+/** Content in some or all of the interface languages — a branding string, or a piece of UI copy. */
+export type LocalizedValues<TValue> = { [L in Language]?: null | TValue };
+
+/**
+ * Resolve per-language content for a reader, preferring their language and otherwise falling back
+ * through the remaining languages in {@link LANGUAGES} order.
+ *
+ * Falling back rather than returning nothing is the point: an instance that named itself only in
+ * English should still show that name to a reader of Spanish, not an empty heading.
+ */
+export const getValueForLanguage = <TValue>(
+  values: LocalizedValues<TValue>,
+  preferredLanguage: Language
+): TValue | undefined => [preferredLanguage, ...LANGUAGES].map((code) => values[code]).find(isPresent);
 
 /** The languages a localized string has non-blank content in, in {@link LANGUAGES} order. */
 export const authoredLanguages = (value: LocalizedString | null | undefined): Language[] =>
@@ -21,3 +30,5 @@ export const authoredLanguages = (value: LocalizedString | null | undefined): La
  */
 export const omitBlankLanguages = (value: LocalizedString | null | undefined): LocalizedString =>
   Object.fromEntries(authoredLanguages(value).map((code) => [code, value?.[code]]));
+
+export { LANGUAGE_LABELS, LANGUAGES };

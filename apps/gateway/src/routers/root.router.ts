@@ -1,3 +1,4 @@
+import { $Language } from '@opendatacapture/schemas/core';
 import { $InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { Router } from 'express';
 
@@ -40,10 +41,21 @@ router.get(
       initialSeriesIndex = assignment.encryptedData.slice(1).split('$').length;
     }
 
+    // Read server-side rather than from `window.location` so the SSR pass and the hydration pass
+    // resolve the same language; anything else renders the page in English and then swaps it.
+    const { activeLanguages } = assignment;
+    const requestedLanguage = $Language.safeParse(req.query.lang);
+    const language =
+      requestedLanguage.success && activeLanguages.includes(requestedLanguage.data)
+        ? requestedLanguage.data
+        : activeLanguages[0];
+
     const token = generateToken(assignment.id);
     const html = res.locals.loadRoot({
+      activeLanguages,
       id,
       initialSeriesIndex,
+      language,
       target: targetParseResult.data,
       token
     } satisfies RootProps);

@@ -93,15 +93,11 @@ enum SubjectIdentificationMethod {
   PERSONAL_INFO
 }
 
-type ErrorMessage {
-  en String?
-  fr String?
-}
 
 type GroupSettings {
   defaultIdentificationMethod   SubjectIdentificationMethod
   idValidationRegex             String?
-  idValidationRegexErrorMessage ErrorMessage?
+  idValidationRegexErrorMessage LocalizedString?
   subjectIdDisplayLength        Int?
   minimumAge                    Int?
 }
@@ -110,6 +106,7 @@ type GroupSettings {
 // content can be authored in a single language without requiring all of them.
 type LocalizedString {
   en String?
+  es String?
   fr String?
 }
 
@@ -358,6 +355,14 @@ model Session {
 
 // Setup
 
+// Mirrors LANGUAGES in @opendatacapture/schemas/core. Values are the language codes themselves,
+// so a document read back through Prisma is already a `Language` with nothing to narrow.
+enum Language {
+  en
+  es
+  fr
+}
+
 type BrandingText {
   en String?
   fr String?
@@ -429,6 +434,7 @@ model SetupState {
   createdAt                     DateTime        @default(now()) @db.Date
   updatedAt                     DateTime        @updatedAt @db.Date
   id                            String          @id @default(auto()) @map("_id") @db.ObjectId
+  activeLanguages               Language[]      @default([en, fr])
   branding                      BrandingConfig?
   defaultAssignmentDurationDays Int?
   isDemo                        Boolean
