@@ -419,5 +419,22 @@ describe('InstrumentRecordsService', () => {
         value: 85
       });
     });
+
+    it('should join and project the session user by a cast-hardened lookup, so the export includes the username of whoever ran the session', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
+      const ability = { can: () => true } as any;
+
+      await instrumentRecordsService.exportRecords({}, { ability });
+
+      const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
+
+      // Session documents only ever store a userId reference, never an embedded user object, so
+      // resolving a username requires an explicit join against UserModel.
+      const userLookupStage = pipeline.find((stage) => stage.$lookup?.from === 'UserModel');
+      expect(userLookupStage).toBeDefined();
+
+      const projectStage = pipeline.find((stage) => stage.$project);
+      expect(projectStage.$project.session.user.username).toBe('$sessionUser.username');
+    });
   });
 });
