@@ -18,5 +18,11 @@ export const LanguageToggle = ({ activeLanguages, ...props }: LanguageToggleProp
   if (activeLanguages.length < 2) {
     return null;
   }
-  return <BaseLanguageToggle options={options} {...props} />;
+  // `contents` keeps the wrapper out of layout, so the trigger stays a direct child of the
+  // flex row it is placed in; it exists only to give the toggle a stable e2e selector.
+  return (
+    <div className="contents" data-testid="language-toggle">
+      <BaseLanguageToggle options={options} {...props} />
+    </div>
+  );
 };

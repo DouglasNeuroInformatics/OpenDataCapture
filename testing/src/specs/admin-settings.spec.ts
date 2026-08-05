@@ -45,6 +45,28 @@ test.describe('admin settings', () => {
     await expect(settingsPage.defaultAssignmentDurationInput).toHaveValue(String(durationDays));
   });
 
+  test('should hide the language toggle once only one language is offered', async ({ getPageModel, page }) => {
+    const settingsPage = await getPageModel('/admin/settings');
+
+    // `activeLanguages` is one instance-wide document seeded with English and French, so the
+    // deactivated language is restored at the end rather than left off for the next spec.
+    await expect(settingsPage.activeLanguageCheckbox('en')).toBeVisible();
+    await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toBeVisible();
+
+    const deactivated = waitForSetupPatch(page);
+    await settingsPage.activeLanguageCheckbox('fr').click();
+    expect((await deactivated).ok()).toBe(true);
+
+    await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toHaveCount(0);
+    // The last remaining language cannot be turned off, so an instance always offers one.
+    await expect(settingsPage.activeLanguageCheckbox('en')).toBeDisabled();
+
+    const restored = waitForSetupPatch(page);
+    await settingsPage.activeLanguageCheckbox('fr').click();
+    expect((await restored).ok()).toBe(true);
+    await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toBeVisible();
+  });
+
   test('should apply the group switcher position preference immediately', async ({ getPageModel }) => {
     const settingsPage = await getPageModel('/admin/settings');
 
