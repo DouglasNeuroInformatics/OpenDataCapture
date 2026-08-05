@@ -1,7 +1,7 @@
 import { $Uint8ArrayLike } from '@douglasneuroinformatics/libjs';
 import { z } from 'zod/v4';
 
-import { $BaseModel, $Json } from '../core/core.js';
+import { $ActiveLanguages, $BaseModel, $Json } from '../core/core.js';
 import { $InstrumentBundleContainer } from '../instrument/instrument.base.js';
 export const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
@@ -39,9 +39,16 @@ export const $CreateAssignmentData = z.object({
   subjectId: z.string()
 });
 
-/** The DTO transferred from the core API to the external gateway when creating an assignment */
+/**
+ * The DTO transferred from the core API to the external gateway when creating an assignment.
+ *
+ * The gateway has its own database and cannot read the instance's setup state, so the languages it
+ * may offer this patient travel with the assignment. They are a snapshot taken at creation: an
+ * assignment already sent keeps the languages it was created with.
+ */
 export type CreateRemoteAssignmentInputData = z.input<typeof $CreateRemoteAssignmentData>;
 export const $CreateRemoteAssignmentData = $RemoteAssignment.omit({ encryptedData: true, symmetricKey: true }).extend({
+  activeLanguages: $ActiveLanguages,
   instrumentContainer: $InstrumentBundleContainer,
   publicKey: $Uint8ArrayLike
 });

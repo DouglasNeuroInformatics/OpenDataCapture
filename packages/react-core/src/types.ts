@@ -4,15 +4,19 @@
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@douglasneuroinformatics/libui/i18n';
 import type { AnyUnilingualInstrument, Json, RuntimeNotification } from '@opendatacapture/runtime-core';
+import type { Language as InterfaceLanguage } from '@opendatacapture/schemas/core';
 import type { Subject } from '@opendatacapture/schemas/subject';
 
+/**
+ * Turns on exactly the languages `@opendatacapture/schemas` declares. Every frontend imports this
+ * package, and a module augmentation applies program-wide, so this one declaration is what makes
+ * libui's `Language` — and therefore `useTranslation` — agree with the rest of the application.
+ * Extending rather than listing the languages is what stops the two sets drifting apart.
+ */
 declare module '@douglasneuroinformatics/libui/i18n' {
   export namespace UserConfig {
-    export interface LanguageOptions {
-      en: true;
-      es: false;
-      fr: true;
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- the members come from the extends clause, which is the point
+    export interface LanguageOptions extends Record<InterfaceLanguage, true> {}
   }
 }
 

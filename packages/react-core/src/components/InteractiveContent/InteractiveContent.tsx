@@ -9,21 +9,12 @@ import type {
   Language,
   RuntimeNotification
 } from '@opendatacapture/runtime-core';
-import { $Json } from '@opendatacapture/schemas/core';
-import type { Json } from '@opendatacapture/schemas/core';
+import { $InstrumentAuthoringLanguage, $Json } from '@opendatacapture/schemas/core';
+import type { Language as InterfaceLanguage, Json } from '@opendatacapture/schemas/core';
 import { ChevronRightIcon, FullscreenIcon, LanguagesIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 import type { Promisable, Simplify } from 'type-fest';
 
-const ALL_LANGUAGES: { [K in Language]: { [P in Language]: string } } = {
-  en: {
-    en: 'English',
-    fr: 'Anglais'
-  },
-  fr: {
-    en: 'French',
-    fr: 'Français'
-  }
-};
+import { LANGUAGE_LABELS } from '../../utils/language';
 
 export type InteractiveContentSubmitResult = {
   data: Json;
@@ -62,19 +53,29 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
 
   const isLocked = Boolean(enableLanguageLock) && hasSelectedLanguage;
 
+  // The payload crosses from an instrument bundle running in the iframe, so it is parsed rather
+  // than trusted — an instrument may only ask for a language instruments can be authored in.
   const handleChangeLanguageEvent = useCallback(
-    (event: CustomEvent<Language>) => {
-      if (event.detail !== 'en' && event.detail !== 'fr') {
-        console.error(`Cannot change language: invalid language '${event.detail}', expected 'en' or 'fr'`);
+    (event: CustomEvent<InterfaceLanguage>) => {
+      const requested = $InstrumentAuthoringLanguage.safeParse(event.detail);
+      if (!requested.success) {
+        addNotification({
+          message: t({
+            en: `This instrument requested an unsupported language: ${event.detail}`,
+            es: `Este instrumento solicitó un idioma no admitido: ${event.detail}`,
+            fr: `Cet instrument a demandé une langue non prise en charge : ${event.detail}`
+          }),
+          type: 'error'
+        });
         return;
       }
       if (isLocked) {
         setLockDialogOpen(true);
         return;
       }
-      void changeLanguage(event.detail);
+      void changeLanguage(requested.data);
     },
-    [changeLanguage, isLocked]
+    [addNotification, changeLanguage, isLocked, t]
   );
 
   const handleChangeThemeEvent = useCallback(
@@ -179,7 +180,7 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
                         changeLanguage(language);
                       }}
                     >
-                      {ALL_LANGUAGES[language][resolvedLanguage]}
+                      {LANGUAGE_LABELS[language][resolvedLanguage]}
                     </DropdownMenu.Item>
                   ))}
                 </DropdownMenu.Content>
@@ -208,7 +209,7 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
             </h2>
             <div className="flex flex-col gap-2.5">
               {supportedLanguages.map((language) => {
-                const otherLanguage = (Object.keys(ALL_LANGUAGES) as Language[]).find((l) => l !== language);
+                const otherLanguage = supportedLanguages.find((supported) => supported !== language);
                 return (
                   <button
                     className="group flex items-center justify-between rounded-lg border border-slate-200 px-5 py-4 text-left transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none dark:border-slate-700 dark:hover:bg-slate-900/50"
@@ -220,9 +221,11 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
                     }}
                   >
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-base font-medium">{ALL_LANGUAGES[language][language]}</span>
+                      <span className="text-base font-medium">{LANGUAGE_LABELS[language][language]}</span>
                       {otherLanguage && (
-                        <span className="text-muted-foreground text-xs">{ALL_LANGUAGES[language][otherLanguage]}</span>
+                        <span className="text-muted-foreground text-xs">
+                          {LANGUAGE_LABELS[language][otherLanguage]}
+                        </span>
                       )}
                     </div>
                     <ChevronRightIcon className="text-muted-foreground group-hover:text-foreground h-5 w-5 transition-transform group-hover:translate-x-0.5" />

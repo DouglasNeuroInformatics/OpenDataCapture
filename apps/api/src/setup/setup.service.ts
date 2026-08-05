@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   ServiceUnavailableException
 } from '@nestjs/common';
+import { DEFAULT_ACTIVE_LANGUAGES } from '@opendatacapture/schemas/core';
 import { isMailEnabled } from '@opendatacapture/schemas/mail';
 import { $BrandingConfig } from '@opendatacapture/schemas/setup';
 import type { CreateAdminData, InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
@@ -51,7 +52,13 @@ export class SetupService {
     // Note: unknown keys are stripped here, so a stale dev server running an
     // older $BrandingConfig will silently drop newer branding fields on read.
     const branding = $BrandingConfig.nullable().safeParse(savedOptions?.branding ?? null);
+    // The column is `Language[]`, so an unknown code cannot be stored and nothing needs parsing.
+    // The destructure is only what carries the non-empty guarantee into the type: the default
+    // covers a document written before this setting existed, and this covers an instance with no
+    // setup document at all.
+    const [fallbackLanguage, ...otherLanguages] = savedOptions?.activeLanguages ?? [];
     return {
+      activeLanguages: fallbackLanguage ? [fallbackLanguage, ...otherLanguages] : DEFAULT_ACTIVE_LANGUAGES,
       branding: branding.success ? branding.data : null,
       defaultAssignmentDurationDays: savedOptions?.defaultAssignmentDurationDays ?? null,
       isDemo: Boolean(savedOptions?.isDemo),

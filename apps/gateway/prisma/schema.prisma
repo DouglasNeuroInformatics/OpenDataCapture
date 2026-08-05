@@ -7,6 +7,10 @@ generator client {
   binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
+generator json {
+  provider = "prisma-json-types-generator"
+}
+
 datasource db {
   provider = "sqlite"
   url      = env("GATEWAY_DATABASE_URL")
@@ -14,6 +18,9 @@ datasource db {
 
 model RemoteAssignmentModel {
   id                String    @id
+  /// [ActiveLanguages]
+  // The default covers assignments created before an instance could choose which languages to offer.
+  activeLanguages   Json      @default("[\"en\",\"fr\"]")
   createdAt         DateTime  @default(now())
   completedAt       DateTime?
   expiresAt         DateTime

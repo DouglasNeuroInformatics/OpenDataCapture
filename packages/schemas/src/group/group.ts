@@ -1,18 +1,13 @@
 import { z } from 'zod/v4';
 
-import { $AuthoredLocalizedString, $BaseModel, $RegexString } from '../core/core.js';
+import { $AuthoredLocalizedString, $BaseModel, $LocalizedString, $RegexString } from '../core/core.js';
 import { $SubjectIdentificationMethod } from '../subject/subject.js';
 
 export type GroupSettings = z.infer<typeof $GroupSettings>;
 export const $GroupSettings = z.object({
   defaultIdentificationMethod: $SubjectIdentificationMethod,
   idValidationRegex: $RegexString.nullish(),
-  idValidationRegexErrorMessage: z
-    .object({
-      en: z.string().nullish(),
-      fr: z.string().nullish()
-    })
-    .nullish(),
+  idValidationRegexErrorMessage: $LocalizedString.nullish(),
   minimumAge: z.number().int().positive().nullish(),
   subjectIdDisplayLength: z.number().nullish()
 });

@@ -61,6 +61,13 @@ Its own SQLite database, entirely separate from the API's MongoDB: `prisma/schem
 (`RemoteAssignmentModel`), generated to `node_modules/@prisma/generated-client` and wrapped in
 `src/lib/prisma.ts` with a computed `getPublicKey()`.
 
+A `Json` column is typed by `prisma-json-types-generator`, the same generator `apps/api` uses: a
+`/// [TypeName]` docstring above the field names a type from the `PrismaJson` namespace declared in
+`src/typings/prisma-json-types-generator.d.ts`, and the generated client uses it on both the read
+and the write side. **The name must exist in that namespace** — the generator emits the reference
+either way, so a typo surfaces as an unresolved type in the generated client rather than an error
+from `prisma generate`.
+
 `GATEWAY_DATABASE_URL` is an absolute `file:` URL written by `pnpm generate:env`. Turbo runs
 `db:push` before `dev`, `lint`, `test:e2e` and — via the `@opendatacapture/gateway#build` key in
 `turbo.json` — before `build`, so a gateway build needs `GATEWAY_DATABASE_URL` set.
@@ -83,8 +90,8 @@ hydrated tree can disagree with the SSR'd HTML until you do.
 ## Conventions specific to here
 
 - `@/` aliases `src/`, declared in both `vite.config.ts` and `tsconfig.json`.
-- Ambient declarations live in `src/typings/` and `src/vite-env.d.ts`: `res.locals.loadRoot`,
-  `window.__ROOT_PROPS__`, the `cap-widget` JSX element, `__RELEASE__`.
+- Ambient declarations live in `src/typings/` and `src/vite-env.d.ts`: the `PrismaJson` namespace,
+  `res.locals.loadRoot`, `window.__ROOT_PROPS__`, the `cap-widget` JSX element, `__RELEASE__`.
 - The eslint blocks for `apps/web` and `packages/react-core` (no default exports, no bare `clsx`,
   `jsx-no-literals`) **do not cover this app**, and default exports are in use. Translation is still
   required, and there are no translation resource files — `src/services/i18n.ts` initializes with
