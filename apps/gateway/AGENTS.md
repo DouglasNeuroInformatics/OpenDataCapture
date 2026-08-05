@@ -96,7 +96,8 @@ hydrated tree can disagree with the SSR'd HTML until you do.
   `jsx-no-literals`) **do not cover this app**, and default exports are in use. Translation is still
   required, and there are no translation resource files — `src/services/i18n.ts` initializes with
   `{}`, so every string is inline `t({ en, es, fr })`. Every interface language needs an entry;
-  `apps/web/src/__tests__/spanish-coverage.test.ts` scans this app and fails on a call missing `es`.
+  `requireCompleteTranslations` in `packages/react-core/src/types.ts` makes a missing one a type
+  error caught by `pnpm lint`.
 - Shared UI comes from `packages/react-core` (`InstrumentRenderer`, `Branding`). Put anything both
   apps need there, not here.
 - Validation messages are localized by `src/services/zod.ts`, a thin call to react-core's
