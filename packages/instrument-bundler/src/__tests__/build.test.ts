@@ -72,8 +72,11 @@ describe('build', () => {
       await expect(build({ inputs })).rejects.toThrowError('expected at most one version of react');
     });
 
-    it('should wrap a BuildFailure-shaped error as ESBUILD_FAILURE', async () => {
-      vi.spyOn(esbuild, 'build').mockRejectedValueOnce({
+    // These two branches shipped inverted, which relabelled every real compile failure and meant
+    // `CodeErrorBlock` never rendered. Both the message and the kind are asserted because each is
+    // load-bearing: the kind gates the error UI, and the message is what reaches the API log.
+    it('should report a BuildFailure as a compile failure, so the error UI can render it', async () => {
+      const buildFailure = {
         cause: undefined,
         errors: [
           {
@@ -88,17 +91,28 @@ describe('build', () => {
         message: 'Build failed with 1 error',
         name: 'BuildFailure',
         warnings: []
-      });
+      };
+      vi.spyOn(esbuild, 'build').mockRejectedValueOnce(buildFailure);
       await expect(build(options)).rejects.toSatisfy((err: any) => {
-        return err.name === 'InstrumentBundlerError' && err.kind === 'ESBUILD_FAILURE';
+        return (
+          err.name === 'InstrumentBundlerError' &&
+          err.message === 'Failed to Compile' &&
+          err.kind === 'ESBUILD_FAILURE' &&
+          err.cause.errors[0].text === 'Could not resolve "missing"'
+        );
       });
     });
 
-    it('should wrap a plain error as an unknown error with no kind', async () => {
+    it('should report anything that is not a BuildFailure as an unknown error, preserving the cause', async () => {
       const error = new TypeError('something broke');
       vi.spyOn(esbuild, 'build').mockRejectedValueOnce(error);
       await expect(build(options)).rejects.toSatisfy((err: any) => {
-        return err.name === 'InstrumentBundlerError' && err.kind === undefined && err.cause === error;
+        return (
+          err.name === 'InstrumentBundlerError' &&
+          err.message === 'Unknown Error' &&
+          err.kind === undefined &&
+          err.cause === error
+        );
       });
     });
 
