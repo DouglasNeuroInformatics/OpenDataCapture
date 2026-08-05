@@ -19,7 +19,7 @@ RUN turbo prune @opendatacapture/api
 FROM base AS installer
 COPY tsconfig.base.json vitest.config.ts ./
 COPY --from=pruner /app/out/ .
-RUN pnpm install --frozen-lockfile 
+RUN pnpm install --frozen-lockfile
 RUN turbo build --filter=@opendatacapture/api
 
 # RUN SERVER
@@ -30,5 +30,6 @@ COPY --from=installer /app/apps/api/dist/runtime/ /runtime/
 
 RUN echo '{ "type": "module", "imports": { "#runtime/v1/*": "./dist/runtime/v1/*" } }' > package.json
 RUN echo '{ "type": "module" }' > /runtime/package.json
+
 USER node
 CMD [ "node", "--enable-source-maps", "./dist/app.js" ]
