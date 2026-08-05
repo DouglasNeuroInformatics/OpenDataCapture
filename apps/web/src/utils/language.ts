@@ -1,5 +1,7 @@
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { LANGUAGE_LABELS, LANGUAGES } from '@opendatacapture/react-core';
-import type { Language, LocalizedString } from '@opendatacapture/schemas/core';
+import { resolveActiveLanguage } from '@opendatacapture/schemas/core';
+import type { ActiveLanguages, Language, LocalizedString } from '@opendatacapture/schemas/core';
 
 /** Blank text is absent text: content authored as `''` is a language the author left empty. */
 const isPresent = <TValue>(value: null | TValue | undefined): value is TValue =>
@@ -30,5 +32,22 @@ export const authoredLanguages = (value: LocalizedString | null | undefined): La
  */
 export const omitBlankLanguages = (value: LocalizedString | null | undefined): LocalizedString =>
   Object.fromEntries(authoredLanguages(value).map((code) => [code, value?.[code]]));
+
+/**
+ * Move a reader off a language their instance no longer offers, and report whether it moved them.
+ *
+ * Called before the app renders rather than from a component: `changeLanguage` notifies only the
+ * components already subscribed, libui's `useTranslation` subscribes in an effect, and effects run
+ * child-first — so a correction made after mount never reaches the ancestors of whatever made it.
+ * The sidebar renders the language toggle, so the sidebar is what a late correction leaves behind.
+ */
+export const reconcileInterfaceLanguage = (activeLanguages: ActiveLanguages): boolean => {
+  const language = resolveActiveLanguage(i18n.resolvedLanguage, activeLanguages);
+  if (language === i18n.resolvedLanguage) {
+    return false;
+  }
+  i18n.changeLanguage(language);
+  return true;
+};
 
 export { LANGUAGE_LABELS, LANGUAGES };

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { $ActiveLanguages, $LocalizedString, LANGUAGES, toInstrumentAuthoringLanguage } from './core.js';
+import {
+  $ActiveLanguages,
+  $LocalizedString,
+  LANGUAGES,
+  resolveActiveLanguage,
+  toInstrumentAuthoringLanguage
+} from './core.js';
 
 describe('$ActiveLanguages', () => {
   it.each([[['en']], [['es']], [['en', 'fr']], [['en', 'es', 'fr']]])(
@@ -24,6 +30,20 @@ describe('$ActiveLanguages', () => {
   it('should type the first entry as present, so consumers need no assertion to read a fallback', () => {
     const parsed = $ActiveLanguages.parse(['es', 'fr']);
     expect(parsed[0]).toBe('es');
+  });
+});
+
+describe('resolveActiveLanguage', () => {
+  it('should keep a reader on their language while the instance still offers it', () => {
+    expect(resolveActiveLanguage('fr', ['en', 'fr'])).toBe('fr');
+  });
+
+  it('should move a reader off a deactivated language, which the toggle no longer offers a way out of', () => {
+    expect(resolveActiveLanguage('es', ['en', 'fr'])).toBe('en');
+  });
+
+  it('should fall back to the first offered language, so the result does not depend on click order', () => {
+    expect(resolveActiveLanguage('en', ['fr', 'es'])).toBe('fr');
   });
 });
 
