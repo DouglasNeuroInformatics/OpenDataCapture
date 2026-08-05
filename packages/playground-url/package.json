@@ -1,7 +1,7 @@
 {
   "name": "@opendatacapture/playground-url",
   "type": "module",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "sideEffects": [
     "**/cli.ts"
   ],
