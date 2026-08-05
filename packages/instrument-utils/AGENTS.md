@@ -29,5 +29,6 @@ appearing in two groups silently keeps the last one.
 
 ## Tests
 
-None, and there is no `vitest.config.ts` here. These helpers are covered only through their
-consumers' suites (`apps/api`, `apps/web`) and the Playwright suite in `testing/`.
+`pnpm exec vitest --project instrument-utils`. `src/__tests__/` covers `getFormFields`; everything
+else here is still covered only through its consumers' suites (`apps/api`, `apps/web`) and the
+Playwright suite in `testing/`.
