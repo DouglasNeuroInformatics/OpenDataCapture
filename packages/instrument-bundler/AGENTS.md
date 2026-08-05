@@ -31,9 +31,19 @@ splices `output.js` into an async IIFE, where a surviving `export` statement is 
 reason `transformImports` must run first: it rewrites the remaining static imports (the external
 `/runtime/v1/*` ones) into `await __import(...)`.
 
-**`jsxImportSource: '/runtime/v1/react@19.x'` lives in three files that must agree** —
-`src/build.ts`, `packages/instrument-library/tsconfig.json`, and
-`apps/playground/src/components/Editor/setup.ts` (the Monaco config). Nothing enforces this.
+**`jsxImportSource` is derived, not fixed.** `resolveJsxImportSource` in `src/build.ts` scans the
+inputs for a `/runtime/v1/react@<major>` import and compiles JSX against that react, defaulting to
+`react@19.x` when the source imports none — the form case, where a block may hold JSX but may not
+import react at all. This matters because elements built by one major are not renderable by another:
+React 19's JSX runtime stamps `Symbol.for('react.transitional.element')` and React 18's reconciler
+only accepts `Symbol.for('react.element')`, so a react-18 instrument whose JSX came from react 19
+fails at render with nothing pointing at the cause. Importing two majors in one instrument is a build
+error rather than a guess.
+
+**The type-check and editor copies are still pinned to 19** — `packages/instrument-library/tsconfig.json`
+and `apps/playground/src/components/Editor/setup.ts` (the Monaco config). A react-18 instrument
+therefore bundles against react 18 and type-checks against react 19's JSX types. Nothing enforces
+agreement between the three.
 
 **Every js/jsx/ts/tsx input is prefixed with a line** (`plugin.ts`):
 `globalThis.__ODC_BUNDLER_ERROR_CONTEXT = "<input.name>";`. The `document` / `self` / `window` Proxies in

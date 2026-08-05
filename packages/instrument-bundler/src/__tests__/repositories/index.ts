@@ -25,5 +25,6 @@ async function loadDirectory(dirname: string) {
 
 export const repositories = new Map([
   ['form', await loadDirectory(path.resolve(import.meta.dirname, 'form'))],
-  ['interactive', await loadDirectory(path.resolve(import.meta.dirname, 'interactive'))]
+  ['interactive', await loadDirectory(path.resolve(import.meta.dirname, 'interactive'))],
+  ['interactive-react18', await loadDirectory(path.resolve(import.meta.dirname, 'interactive-react18'))]
 ] as const);

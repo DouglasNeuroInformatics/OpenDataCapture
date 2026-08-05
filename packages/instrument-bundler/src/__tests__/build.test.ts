@@ -53,6 +53,25 @@ describe('build', () => {
       await expect(build(options)).resolves.toMatchObject({ css: expect.any(String), js: expect.any(String) });
     });
 
+    it('should compile its JSX against the react it imports, whose elements another major cannot render', async () => {
+      const { js } = await build({ inputs: repositories.get('interactive-react18')! });
+      expect(js).toContain('/runtime/v1/react@18.x/jsx-runtime');
+      expect(js).not.toContain('/runtime/v1/react@19.x');
+    });
+
+    it('should default to react 19 when the source imports no react, as a form with a JSX block does', async () => {
+      const inputs = [{ content: `export default { content: <div>Block</div> };`, name: 'index.tsx' }];
+      const { js } = await build({ inputs });
+      expect(js).toContain('/runtime/v1/react@19.x/jsx-runtime');
+    });
+
+    it('should refuse to guess when the source imports two versions of react', async () => {
+      const inputs = [
+        { content: `import '/runtime/v1/react@18.x';\nimport '/runtime/v1/react@19.x';`, name: 'index.tsx' }
+      ];
+      await expect(build({ inputs })).rejects.toThrowError('expected at most one version of react');
+    });
+
     // it('should return javascript that can be executed with no further transformation', () => {
     //   const result = bundle(options);
     //   expect((0, eval)(result.js)).toMatchObject({ kind: 'INTERACTIVE' });

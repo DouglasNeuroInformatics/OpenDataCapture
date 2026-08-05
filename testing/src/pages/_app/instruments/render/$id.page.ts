@@ -8,6 +8,7 @@ import { AppPage } from '../../route.page';
  */
 export class RenderInstrumentPage extends AppPage {
   readonly beginButton: Locator;
+  readonly consentPreamble: Locator;
   readonly errorMessages: Locator;
   readonly submitButton: Locator;
   readonly summaryHeading: Locator;
@@ -15,9 +16,15 @@ export class RenderInstrumentPage extends AppPage {
   constructor(page: Page) {
     super(page);
     this.beginButton = page.getByRole('button', { name: 'Begin' });
+    this.consentPreamble = page.getByTestId('consent-preamble');
     this.submitButton = page.getByRole('button', { name: 'Submit' });
     this.summaryHeading = page.getByRole('heading', { name: /Summary of Results/i });
     this.errorMessages = page.getByTestId('error-message-text');
+  }
+
+  /** Accepts the General Consent Form by selecting the affirmative radio option. */
+  async acceptConsent(): Promise<void> {
+    await this.$ref.getByRole('radio', { name: /I have read/ }).click();
   }
 
   async begin(): Promise<void> {

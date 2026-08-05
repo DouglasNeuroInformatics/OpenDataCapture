@@ -16,6 +16,22 @@ export default defineInstrument({
   },
   content: [
     {
+      kind: 'block',
+      render: (_, { t }) => {
+        return (
+          <div>
+            <h3>{t({ en: 'Welcome', fr: 'Bienvenue' })}</h3>
+            <p>
+              {t({
+                en: 'A block lets you render arbitrary content between form groups — headings, instructions, images, or any React element. Unlike fields, a block collects no data; it is purely presentational. Please read the sections below and answer each question as accurately as you can.',
+                fr: "Un bloc vous permet d'afficher du contenu de votre choix entre les groupes de formulaires : titres, instructions, images ou tout autre élément React. Contrairement aux champs, un bloc ne collecte aucune donnée ; il sert uniquement à la mise en page. Veuillez lire les sections ci-dessous et répondre à chaque question aussi précisément que possible."
+              })}
+            </p>
+          </div>
+        );
+      }
+    },
+    {
       title: {
         en: 'Personal Information',
         fr: 'Renseignements personnels'
