@@ -116,6 +116,11 @@
     "es": "Nombre del grupo",
     "fr": "Nom du groupe"
   },
+  "groupRequired": {
+    "en": "A user who is not an administrator must belong to at least one group",
+    "es": "Un usuario que no es administrador debe pertenecer al menos a un grupo",
+    "fr": "Un utilisateur qui n'est pas administrateur doit appartenir à au moins un groupe"
+  },
   "groupTrend": {
     "en": "Group Trend",
     "es": "Tendencia del grupo",
