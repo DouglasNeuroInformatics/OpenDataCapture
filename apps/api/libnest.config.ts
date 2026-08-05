@@ -26,6 +26,7 @@ declare module '@douglasneuroinformatics/libnest/user-config' {
 
 const config = defineUserConfig({
   build: {
+    nativeDependencies: ['esbuild'],
     onComplete: async () => {
       const runtimeV1Dir = path.dirname(
         url.fileURLToPath(import.meta.resolve('@opendatacapture/runtime-v1/package.json'))

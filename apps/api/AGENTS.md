@@ -178,6 +178,11 @@ exist.
 `libnest.config.ts` copies `@opendatacapture/runtime-v1/dist` and the export worker into `dist/`.
 **Any other non-bundled runtime asset must be copied there too, or it will not exist in production.**
 
+`nativeDependencies: ['esbuild']` in `libnest.config.ts` makes the build emit the esbuild native
+binary to `dist/` and set `ESBUILD_BINARY_PATH` via the JS banner, so the Dockerfile needs no manual
+binary staging. The binary is resolved from the application's dependency graph, not libnest's, so the
+JS/binary pair always matches even when the two resolve different esbuild versions.
+
 `#runtime/v1/*` is a Node subpath import declared in `apps/api/package.json` and mirrored in
 `apps/api/tsconfig.json` — two files that must agree. See
 `.agents/docs/architecture/runtime-and-vendor.md`.
