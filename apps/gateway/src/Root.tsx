@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { CoreProvider } from '@douglasneuroinformatics/libui/providers';
-import { Branding, InstrumentRenderer } from '@opendatacapture/react-core';
+import { Branding, InstrumentRenderer, LanguageToggle } from '@opendatacapture/react-core';
 import type { InstrumentSubmitHandler } from '@opendatacapture/react-core';
 import type { UpdateRemoteAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { ActiveLanguages, Language } from '@opendatacapture/schemas/core';
 import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import axios from 'axios';
 
@@ -15,13 +16,17 @@ import './services/axios';
 import './services/i18n';
 
 export type RootProps = {
+  activeLanguages: ActiveLanguages;
   id: string;
   initialSeriesIndex?: number;
+  language: Language;
   target: InstrumentBundleContainer;
   token: string;
 };
 
-export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
+// `language` is not read here: the entry points apply it to the translator before render, so that
+// the server and the client start from the same resolved language.
+export const Root = ({ activeLanguages, id, initialSeriesIndex, target, token }: RootProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const notifications = useNotificationsStore();
 
@@ -79,13 +84,7 @@ export const Root = ({ id, initialSeriesIndex, target, token }: RootProps) => {
             <Branding className="[&>span]:hidden sm:[&>span]:block" fontSize="md" />
             <div className="flex gap-3">
               <ThemeToggle className="h-9 w-9" />
-              <LanguageToggle
-                options={{
-                  en: 'English',
-                  fr: 'Français'
-                }}
-                triggerClassName="h-9 w-9"
-              />
+              <LanguageToggle activeLanguages={activeLanguages} triggerClassName="h-9 w-9" />
             </div>
           </div>
         </header>

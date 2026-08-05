@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
 
-import { $Language } from '../core/core.js';
+import { $ActiveLanguages } from '../core/core.js';
 import { $CreateUserData } from '../user/user.js';
 
 import type { Language } from '../core/core.js';
@@ -184,19 +184,6 @@ const $BrandingConfig = z.object({
   taglineFontSize: $FontSize.nullish()
 });
 
-/**
- * The languages an instance offers its users, as a non-empty subset of the interface languages.
- * Empty is rejected rather than treated as "all": an instance with no language is one whose every
- * user loses the ability to read it, and no admin can undo that through the UI.
- *
- * A tuple rather than `z.array().nonempty()` because only the tuple carries the guarantee into the
- * type — consumers read `activeLanguages[0]` as the fallback language with no assertion.
- */
-const $ActiveLanguages = z.tuple([$Language], $Language);
-
-/** The languages an instance offers before an admin has chosen, and the fallback for one saved before this setting existed. */
-const DEFAULT_ACTIVE_LANGUAGES: ActiveLanguages = ['en', 'fr'];
-
 /** Upper bound (in days) for a configured assignment validity period; roughly ten years. */
 const MAX_ASSIGNMENT_DURATION_DAYS = 3650;
 
@@ -243,7 +230,6 @@ const $InitAppOptions = z.object({
 
 // ── Exports ──────────────────────────────────────────────────────────────────
 
-export type ActiveLanguages = z.infer<typeof $ActiveLanguages>;
 export type BrandingConfig = z.infer<typeof $BrandingConfig>;
 export type BrandingText = z.infer<typeof $BrandingText>;
 export type CreateAdminData = z.infer<typeof $CreateAdminData>;
@@ -262,7 +248,6 @@ export type SetupState = z.infer<typeof $SetupState>;
 export type UpdateSetupStateData = z.infer<typeof $UpdateSetupStateData>;
 
 export {
-  $ActiveLanguages,
   $BrandingConfig,
   $BrandingText,
   $CreateAdminData,
@@ -274,7 +259,6 @@ export {
   $ResourceLink,
   $SetupState,
   $UpdateSetupStateData,
-  DEFAULT_ACTIVE_LANGUAGES,
   FONT_SIZES,
   LOGIN_THEMES,
   LOGO_ALIGNMENTS,

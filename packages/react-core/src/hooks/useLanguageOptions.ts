@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { ActiveLanguages } from '@opendatacapture/schemas/setup';
+import type { ActiveLanguages } from '@opendatacapture/schemas/core';
 
 import { toLanguageToggleOptions } from '../utils/language';
 

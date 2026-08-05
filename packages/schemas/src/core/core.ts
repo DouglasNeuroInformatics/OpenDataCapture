@@ -69,6 +69,20 @@ export const toInstrumentAuthoringLanguage = (language: Language): InstrumentAut
 };
 
 /**
+ * The languages an instance offers its users, as a non-empty subset of {@link LANGUAGES}. Empty is
+ * rejected rather than treated as "all": an instance with no language is one whose every user
+ * loses the ability to read it, and no admin can undo that through the UI.
+ *
+ * A tuple rather than `z.array().nonempty()` because only the tuple carries the guarantee into the
+ * type — consumers read `activeLanguages[0]` as the fallback language with no assertion.
+ */
+export type ActiveLanguages = z.infer<typeof $ActiveLanguages>;
+export const $ActiveLanguages = z.tuple([$Language], $Language);
+
+/** The languages an instance offers before an admin has chosen, and the fallback for one saved before this setting existed. */
+export const DEFAULT_ACTIVE_LANGUAGES: ActiveLanguages = ['en', 'fr'];
+
+/**
  * A string authored in each of the application's languages. Every field is nullish so content
  * may target a single language, and nullish rather than optional to match Prisma's
  * null-for-absent convention.

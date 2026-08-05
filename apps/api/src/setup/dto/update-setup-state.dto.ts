@@ -1,7 +1,8 @@
 import { ValidationSchema } from '@douglasneuroinformatics/libnest';
 import { ApiProperty } from '@nestjs/swagger';
+import type { ActiveLanguages } from '@opendatacapture/schemas/core';
 import { $UpdateSetupStateData } from '@opendatacapture/schemas/setup';
-import type { ActiveLanguages, BrandingConfig, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
+import type { BrandingConfig, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
 @ValidationSchema($UpdateSetupStateData)
 export class UpdateSetupStateDto implements UpdateSetupStateData {

@@ -14,6 +14,9 @@ datasource db {
 
 model RemoteAssignmentModel {
   id                String    @id
+  // SQLite has no scalar list, so this is JSON, read back through $ActiveLanguages. The default
+  // covers assignments created before an instance could choose which languages to offer.
+  activeLanguagesStringified String @default("[\"en\",\"fr\"]")
   createdAt         DateTime  @default(now())
   completedAt       DateTime?
   expiresAt         DateTime

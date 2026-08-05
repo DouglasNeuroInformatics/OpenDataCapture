@@ -47,11 +47,12 @@ router.post(
       logger.error(result.error.issues);
       throw new HttpException(400, 'Bad Request');
     }
-    const { instrumentContainer, publicKey, ...assignment } = result.data;
+    const { activeLanguages, instrumentContainer, publicKey, ...assignment } = result.data;
 
     await prisma.remoteAssignmentModel.create({
       data: {
         ...assignment,
+        activeLanguagesStringified: JSON.stringify(activeLanguages),
         rawPublicKey: Buffer.from(publicKey),
         targetStringified: JSON.stringify(instrumentContainer)
       }

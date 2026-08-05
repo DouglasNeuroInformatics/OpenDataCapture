@@ -7,8 +7,9 @@ import {
   InternalServerErrorException,
   ServiceUnavailableException
 } from '@nestjs/common';
+import { $ActiveLanguages, DEFAULT_ACTIVE_LANGUAGES } from '@opendatacapture/schemas/core';
 import { isMailEnabled } from '@opendatacapture/schemas/mail';
-import { $ActiveLanguages, $BrandingConfig, DEFAULT_ACTIVE_LANGUAGES } from '@opendatacapture/schemas/setup';
+import { $BrandingConfig } from '@opendatacapture/schemas/setup';
 import type { CreateAdminData, InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 
 import type { RuntimePrismaClient } from '@/core/prisma';

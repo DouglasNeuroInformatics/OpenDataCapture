@@ -1,8 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Card, Heading, HoverCard, Input, Select, Separator } from '@douglasneuroinformatics/libui/components';
+import {
+  Card,
+  Checkbox,
+  Heading,
+  HoverCard,
+  Input,
+  Select,
+  Separator
+} from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { DEFAULT_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/assignment';
+import type { Language } from '@opendatacapture/schemas/core';
 import { MAX_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/setup';
 import { createFileRoute } from '@tanstack/react-router';
 import { CircleHelpIcon } from 'lucide-react';
@@ -14,6 +23,7 @@ import { useUpdateSetupStateMutation } from '@/hooks/useUpdateSetupStateMutation
 import { useAppStore } from '@/store';
 import type { GroupSwitcherPosition } from '@/store/types';
 import { parseDurationDays } from '@/utils/assignment-duration';
+import { LANGUAGE_LABELS, LANGUAGES } from '@/utils/language';
 
 /** libui ships no Switch, so this is hand-rolled — `label` names it for assistive technology. */
 const Toggle = ({
@@ -76,6 +86,22 @@ const RouteComponent = () => {
 
   const uploaderLabel = t({ en: 'Enable Uploader', fr: 'Activer le téléversement' });
   const uploaderEnabled = setupStateQuery.data.isExperimentalFeaturesEnabled ?? false;
+
+  const activeLanguages = setupStateQuery.data.activeLanguages;
+
+  // Rebuilt by filtering LANGUAGES rather than appending, so the stored order is always the
+  // canonical one — the first entry is what a user stranded by a deactivation falls back to,
+  // and it must not depend on the order an admin happened to click.
+  const toggleLanguage = (language: Language) => {
+    const updated = LANGUAGES.filter((code) =>
+      code === language ? !activeLanguages.includes(code) : activeLanguages.includes(code)
+    );
+    const [first, ...rest] = updated;
+    if (!first) {
+      return;
+    }
+    autosave({ activeLanguages: [first, ...rest] });
+  };
 
   // The input holds its own draft while the admin types. The saved draft is committed after a brief pause,
   // on blur, and on unmount — so navigating away (e.g. clicking a sidebar link) still persists the value.
@@ -199,6 +225,37 @@ const RouteComponent = () => {
                     }
                   }}
                 />
+              </div>
+            </SettingSection>
+            <Separator />
+            <SettingSection title={t({ en: 'Languages', es: 'Idiomas', fr: 'Langues' })}>
+              <div className="flex items-center gap-2">
+                <p className="text-muted-foreground text-sm">
+                  {t({
+                    en: 'The languages users of this instance can read the interface in.',
+                    es: 'Los idiomas en los que los usuarios de esta instancia pueden leer la interfaz.',
+                    fr: "Les langues dans lesquelles les utilisateurs de cette instance peuvent lire l'interface."
+                  })}
+                </p>
+              </div>
+              <div className="flex flex-col gap-3">
+                {LANGUAGES.map((language) => {
+                  const isActive = activeLanguages.includes(language);
+                  return (
+                    <div className="flex items-center gap-2.5" key={language}>
+                      <Checkbox
+                        checked={isActive}
+                        data-testid={`active-language-${language}`}
+                        disabled={isActive && activeLanguages.length === 1}
+                        id={`active-language-${language}`}
+                        onCheckedChange={() => toggleLanguage(language)}
+                      />
+                      <label className="text-sm font-medium" htmlFor={`active-language-${language}`}>
+                        {t(LANGUAGE_LABELS[language])}
+                      </label>
+                    </div>
+                  );
+                })}
               </div>
             </SettingSection>
             <Separator />
