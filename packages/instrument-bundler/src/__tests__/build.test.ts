@@ -76,7 +76,10 @@ describe('build', () => {
     // `CodeErrorBlock` never rendered. Both the message and the kind are asserted because each is
     // load-bearing: the kind gates the error UI, and the message is what reaches the API log.
     it('should report a BuildFailure as a compile failure, so the error UI can render it', async () => {
-      const buildFailure = {
+      // esbuild throws a real Error with the diagnostics attached, and the cause must stay that
+      // error rather than the parsed copy: `InstrumentErrorFallback` gates its `Cause` section on
+      // `cause instanceof Error`, and libjs `formatError` walks the chain with the same check.
+      const buildFailure = Object.assign(new Error('Build failed with 1 error'), {
         cause: undefined,
         errors: [
           {
@@ -91,25 +94,27 @@ describe('build', () => {
         message: 'Build failed with 1 error',
         name: 'BuildFailure',
         warnings: []
-      };
+      });
       vi.spyOn(esbuild, 'build').mockRejectedValueOnce(buildFailure);
       await expect(build(options)).rejects.toSatisfy((err: any) => {
         return (
           err.name === 'InstrumentBundlerError' &&
           err.message === 'Failed to Compile' &&
           err.kind === 'ESBUILD_FAILURE' &&
+          err.cause === buildFailure &&
+          err.cause instanceof Error &&
           err.cause.errors[0].text === 'Could not resolve "missing"'
         );
       });
     });
 
-    it('should report anything that is not a BuildFailure as an unknown error, preserving the cause', async () => {
+    it('should name anything that is not a BuildFailure in the message, preserving the cause', async () => {
       const error = new TypeError('something broke');
       vi.spyOn(esbuild, 'build').mockRejectedValueOnce(error);
       await expect(build(options)).rejects.toSatisfy((err: any) => {
         return (
           err.name === 'InstrumentBundlerError' &&
-          err.message === 'Unknown Error' &&
+          err.message === 'Unexpected error while invoking esbuild: TypeError: something broke' &&
           err.kind === undefined &&
           err.cause === error
         );
