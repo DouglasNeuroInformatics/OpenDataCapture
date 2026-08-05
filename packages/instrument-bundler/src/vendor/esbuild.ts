@@ -14,6 +14,11 @@ declare module 'esbuild-wasm' {
   }
 }
 
+/**
+ * The exports below are assigned by a side effect, so this file must stay listed in the `sideEffects`
+ * field of package.json: a bundler permitted to treat it as pure drops the assignments while inlining
+ * the imports of it, leaving consumers with a bare `ReferenceError: build is not defined` at runtime.
+ */
 if (typeof window === 'undefined') {
   var { build, transform } = await import('esbuild');
 } else {

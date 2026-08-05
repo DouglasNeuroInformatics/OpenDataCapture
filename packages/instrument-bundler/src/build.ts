@@ -9,7 +9,7 @@ import * as esbuild from './vendor/esbuild.js';
 
 import type { BundlerInput } from './schemas.js';
 import type { BuildOutput } from './types.js';
-import type { BuildResult } from './vendor/esbuild.js';
+import type { BuildFailure, BuildResult } from './vendor/esbuild.js';
 
 const DEFAULT_REACT_PACKAGE = 'react@19.x';
 
@@ -35,6 +35,10 @@ function resolveJsxImportSource(inputs: BundlerInput[]): string {
     );
   }
   return `/runtime/v1/${packages.values().next().value ?? DEFAULT_REACT_PACKAGE}`;
+}
+
+function describeError(err: unknown): string {
+  return err instanceof Error ? `${err.name}: ${err.message}` : `${typeof err}: ${String(err)}`;
 }
 
 function parseBuildResult(result: BuildResult): BuildOutput {
@@ -95,9 +99,12 @@ export async function build({
   } catch (err) {
     const parseResult = await $BuildFailure.safeParseAsync(err);
     if (parseResult.success) {
-      throw new InstrumentBundlerError('Unknown Error', { cause: err });
+      // the original error, rather than the parsed copy, so that `cause instanceof Error` holds downstream
+      throw new InstrumentBundlerError('Failed to Compile', { cause: err as BuildFailure, kind: 'ESBUILD_FAILURE' });
     }
-    throw new InstrumentBundlerError('Failed to Compile', { cause: parseResult.error, kind: 'ESBUILD_FAILURE' });
+    // anything esbuild did not report as a compilation failure is a fault in the bundler itself, not in the
+    // instrument, so name it here instead of discarding it in favor of the schema mismatch that detected it
+    throw new InstrumentBundlerError(`Unexpected error while invoking esbuild: ${describeError(err)}`, { cause: err });
   }
   return parseBuildResult(result);
 }
