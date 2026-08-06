@@ -45,6 +45,18 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
     }
 
     this.loggingService.log('Synchronizing with gateway...');
+
+    // A failure here must not stop assignments from synchronizing: the two are independent, and
+    // the next pass sends the state again.
+    try {
+      await this.gatewayService.updateRemoteSetupState({ activeLanguages: setupState.activeLanguages });
+    } catch (err) {
+      this.loggingService.error({
+        cause: err,
+        error: 'Failed to Update Remote Setup State'
+      });
+    }
+
     let remoteAssignments: RemoteAssignment[];
     try {
       remoteAssignments = await this.gatewayService.fetchRemoteAssignments();

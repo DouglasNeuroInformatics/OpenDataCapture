@@ -5,6 +5,14 @@ rendered. `apps/api` is its only programmatic client — `apps/api/src/gateway/g
 creates, fetches and deletes assignments here over HTTP, and the patient is given a link to
 `/assignments/:id`.
 
+**Traffic only ever flows API → gateway.** This app holds no address or credential for the API, so
+it cannot ask for anything: whatever it needs to know about the instance it serves has to be pushed.
+`PUT /api/setup-state` is that push, and `GatewaySynchronizer` in `apps/api` sends it on every pass
+(every `GATEWAY_REFRESH_INTERVAL`, unconditionally) rather than only when the state changes. That is
+what makes this app's copy safe to keep in memory: whatever it missed — the change itself, or its
+whole copy across a restart — it is told again within one interval, so the window on
+`DEFAULT_ACTIVE_LANGUAGES` is bounded without either side tracking what the other holds.
+
 Read the root `AGENTS.md` first for the rules that apply everywhere.
 
 **There is no client-side router, no TanStack Query and no Zustand.** Express routing
@@ -61,12 +69,14 @@ Its own SQLite database, entirely separate from the API's MongoDB: `prisma/schem
 (`RemoteAssignmentModel`), generated to `node_modules/@prisma/generated-client` and wrapped in
 `src/lib/prisma.ts` with a computed `getPublicKey()`.
 
-A `Json` column is typed by `prisma-json-types-generator`, the same generator `apps/api` uses: a
-`/// [TypeName]` docstring above the field names a type from the `PrismaJson` namespace declared in
-`src/typings/prisma-json-types-generator.d.ts`, and the generated client uses it on both the read
-and the write side. **The name must exist in that namespace** — the generator emits the reference
-either way, so a typo surfaces as an unresolved type in the generated client rather than an error
-from `prisma generate`.
+**SQLite has no array or JSON column type**, so a non-scalar is serialized into a `String` and parsed
+back on read — `targetStringified`, validated with `$InstrumentBundleContainer` in
+`src/routers/root.router.ts`.
+
+Everything else this app knows is in memory, and deliberately: the assignment verification set
+(`src/lib/assignment-verification.ts`) and the instance's setup state (`src/lib/setup-state.ts`).
+Neither is a record of something that happened here — one is a short-lived gate, the other a copy of
+state `apps/api` owns — so persisting either would only add a second copy that can disagree.
 
 `GATEWAY_DATABASE_URL` is an absolute `file:` URL written by `pnpm generate:env`. Turbo runs
 `db:push` before `dev`, `lint`, `test:e2e` and — via the `@opendatacapture/gateway#build` key in
@@ -90,8 +100,8 @@ hydrated tree can disagree with the SSR'd HTML until you do.
 ## Conventions specific to here
 
 - `@/` aliases `src/`, declared in both `vite.config.ts` and `tsconfig.json`.
-- Ambient declarations live in `src/typings/` and `src/vite-env.d.ts`: the `PrismaJson` namespace,
-  `res.locals.loadRoot`, `window.__ROOT_PROPS__`, the `cap-widget` JSX element, `__RELEASE__`.
+- Ambient declarations live in `src/typings/` and `src/vite-env.d.ts`: `res.locals.loadRoot`,
+  `window.__ROOT_PROPS__`, the `cap-widget` JSX element, `__RELEASE__`.
 - The eslint blocks for `apps/web` and `packages/react-core` (no default exports, no bare `clsx`,
   `jsx-no-literals`) **do not cover this app**, and default exports are in use. Translation is still
   required, and there are no translation resource files — `src/services/i18n.ts` initializes with

@@ -5,11 +5,13 @@ import type {
   MutateAssignmentResponseBody,
   RemoteAssignment
 } from '@opendatacapture/schemas/assignment';
+import { $RemoteSetupState } from '@opendatacapture/schemas/gateway';
 import type { GatewayHealthcheckSuccessResult } from '@opendatacapture/schemas/gateway';
 import { Router } from 'express';
 
 import { clearAssignmentVerification, isAssignmentVerified } from '@/lib/assignment-verification';
 import { prisma } from '@/lib/prisma';
+import { updateSetupState } from '@/lib/setup-state';
 import { logger } from '@/logger';
 import { ah } from '@/utils/async-handler';
 import { HttpException } from '@/utils/http-exception';
@@ -47,12 +49,11 @@ router.post(
       logger.error(result.error.issues);
       throw new HttpException(400, 'Bad Request');
     }
-    const { activeLanguages, instrumentContainer, publicKey, ...assignment } = result.data;
+    const { instrumentContainer, publicKey, ...assignment } = result.data;
 
     await prisma.remoteAssignmentModel.create({
       data: {
         ...assignment,
-        activeLanguages,
         rawPublicKey: Buffer.from(publicKey),
         targetStringified: JSON.stringify(instrumentContainer)
       }
@@ -136,6 +137,21 @@ router.delete(
       where: { id }
     });
     res.status(200).json({ success: true } satisfies MutateAssignmentResponseBody);
+  })
+);
+
+// A full replacement rather than a patch, so a retry, a duplicate and the periodic reconcile in
+// `apps/api` are all the same request.
+router.put(
+  '/setup-state',
+  ah(async (req, res) => {
+    const result = await $RemoteSetupState.safeParseAsync(req.body);
+    if (!result.success) {
+      logger.error(result.error.issues);
+      throw new HttpException(400, 'Bad Request');
+    }
+    updateSetupState(result.data);
+    res.status(204).end();
   })
 );
 

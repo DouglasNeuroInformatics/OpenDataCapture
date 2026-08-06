@@ -3,7 +3,7 @@ import type { webcrypto } from 'node:crypto';
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { LoggingService } from '@douglasneuroinformatics/libnest';
 import { HttpService } from '@nestjs/axios';
-import { BadGatewayException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadGatewayException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import type {
   Assignment,
@@ -12,7 +12,11 @@ import type {
   RemoteAssignment
 } from '@opendatacapture/schemas/assignment';
 import { $GatewayHealthcheckSuccessResult } from '@opendatacapture/schemas/gateway';
-import type { GatewayHealthcheckFailureResult, GatewayHealthcheckResult } from '@opendatacapture/schemas/gateway';
+import type {
+  GatewayHealthcheckFailureResult,
+  GatewayHealthcheckResult,
+  RemoteSetupState
+} from '@opendatacapture/schemas/gateway';
 
 import { InstrumentsService } from '@/instruments/instruments.service';
 
@@ -99,5 +103,20 @@ export class GatewayService {
       };
     }
     return result.data;
+  }
+
+  /**
+   * Replace the setup state held by the gateway. The gateway cannot reach this instance, so it
+   * learns of a change only by being told; it is told on every synchronization pass rather than
+   * only when the state changes, which is what lets a gateway that missed the change — restarting,
+   * unreachable, redeployed with an empty in-memory copy — catch up on its own.
+   */
+  async updateRemoteSetupState(setupState: RemoteSetupState): Promise<void> {
+    const response = await this.httpService.axiosRef.put(`/api/setup-state`, setupState);
+    if (response.status !== HttpStatus.NO_CONTENT) {
+      throw new InternalServerErrorException(`Unexpected Status Code From Gateway: ${response.status}`, {
+        cause: response.statusText
+      });
+    }
   }
 }
