@@ -20,6 +20,11 @@ function requiredPort(name: string): number {
 // value differs from the `.env.template` one CI generates, so a literal here only passes locally.
 export const contactEmail = required('CONTACT_EMAIL');
 
+// The credential the API itself presents to the gateway. A test needs it to put the gateway into a
+// state the API cannot reach on its own — namely, having forgotten an assignment this instance
+// still holds.
+export const gatewayApiKey = required('GATEWAY_API_KEY');
+
 export const apiPort = requiredPort('API_DEV_SERVER_PORT');
 export const gatewayPort = requiredPort('GATEWAY_DEV_SERVER_PORT');
 export const webPort = requiredPort('WEB_DEV_SERVER_PORT');

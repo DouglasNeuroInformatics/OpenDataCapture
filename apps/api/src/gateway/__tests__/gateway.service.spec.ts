@@ -20,13 +20,58 @@ vi.mock('@douglasneuroinformatics/libcrypto', () => ({
 }));
 
 describe('createGatewayHttpOptions', () => {
+  const createConfigService = (values: { [key: string]: unknown }) =>
+    ({ get: (key: string) => values[key], getOrThrow: (key: string) => values[key] }) as never;
+
   // Every assertion GatewayService makes about a status depends on the response reaching it at all,
   // which only happens because axios is told to resolve rather than reject on a non-2xx.
   it('should resolve every status, so the gateway’s own answer reaches the service', () => {
-    const configService = { get: vi.fn().mockReturnValue('development'), getOrThrow: vi.fn() };
-    const { validateStatus } = createGatewayHttpOptions(configService as never);
+    const { validateStatus } = createGatewayHttpOptions(createConfigService({ NODE_ENV: 'development' }));
     expect(validateStatus?.(401)).toBe(true);
     expect(validateStatus?.(500)).toBe(true);
+  });
+
+  it('should address the dev server and carry the api key outside production', () => {
+    const options = createGatewayHttpOptions(
+      createConfigService({ GATEWAY_API_KEY: 'secret', GATEWAY_DEV_SERVER_PORT: 3500, NODE_ENV: 'development' })
+    );
+    expect(options.baseURL).toBe('http://localhost:3500');
+    expect(options.headers).toMatchObject({ Authorization: 'Bearer secret' });
+  });
+
+  // The production branch is the one the e2e suite can never reach — it runs the api with
+  // NODE_ENV=test — and it is the one a deployment gets wrong, leaving every request to the gateway
+  // addressed somewhere nothing answers.
+  describe('in production', () => {
+    it('should address the internal network url when the site address is localhost, which a container cannot reach', () => {
+      const options = createGatewayHttpOptions(
+        createConfigService({
+          GATEWAY_INTERNAL_NETWORK_URL: new URL('http://gateway:80'),
+          GATEWAY_SITE_ADDRESS: new URL('http://localhost:3500'),
+          NODE_ENV: 'production'
+        })
+      );
+      // docker-compose.yaml sets this to `http://gateway:80`, whose origin drops the default port.
+      expect(options.baseURL).toBe('http://gateway');
+    });
+
+    it('should address the site address when it is a real host', () => {
+      const options = createGatewayHttpOptions(
+        createConfigService({
+          GATEWAY_INTERNAL_NETWORK_URL: new URL('http://gateway:80'),
+          GATEWAY_SITE_ADDRESS: new URL('https://gateway.example.org'),
+          NODE_ENV: 'production'
+        })
+      );
+      expect(options.baseURL).toBe('https://gateway.example.org');
+    });
+
+    it('should address the site address when no internal network url is configured', () => {
+      const options = createGatewayHttpOptions(
+        createConfigService({ GATEWAY_SITE_ADDRESS: new URL('http://localhost:3500'), NODE_ENV: 'production' })
+      );
+      expect(options.baseURL).toBe('http://localhost:3500');
+    });
   });
 });
 

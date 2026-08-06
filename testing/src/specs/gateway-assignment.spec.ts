@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
 import { ApiClient } from '../support/api-client';
+import { gatewayApiKey } from '../support/env';
 import { expect, test } from '../support/fixtures';
 
 import type { GetPageModel } from '../support/fixtures';
@@ -193,6 +194,68 @@ test.describe('gateway assignment errors', () => {
     expect(await unknown!.text()).toContain('Overview');
 
     await gatewayPage.close();
+  });
+
+  // Every other test here drives a gateway that accepts, so the branch taken when it refuses had no
+  // cover at all — and that branch is the whole feature: without it the clinician gets a 500 naming
+  // neither the gateway nor what it said. Cancelling deletes the remote assignment, so cancelling
+  // the same one twice is the one way to make the real gateway refuse a real request without
+  // sabotaging the server every other worker shares.
+  test('should report what the gateway answered when it no longer holds the assignment', async ({
+    apiRequestContext,
+    getPageModel,
+    page,
+    roleAccount,
+    uniqueId
+  }) => {
+    const assignmentUrl = await createRemoteAssignmentLink(getPageModel, page, uniqueId);
+    const assignmentId = assignmentUrl.split('/').pop()!;
+    const { accessToken } = await roleAccount('GROUP_MANAGER');
+    const cancel = () =>
+      apiRequestContext.patch(`/api/v1/assignments/${assignmentId}`, {
+        data: { status: 'CANCELED' },
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+
+    expect((await cancel()).status()).toBe(200);
+
+    const response = await cancel();
+    expect(response.status()).toBe(502);
+    const body = (await response.json()) as { message: string };
+    expect(body.message).toMatch(/gateway/i);
+    expect(body.message).toContain('404');
+  });
+
+  // The clinician-facing half of the same fix, and the only case where a real gateway refusal
+  // reaches a real user. It must read as the error it is: 502 is a status the axios layer otherwise
+  // treats as a network blip, and the "Connection Problem" screen it would show offers a retry that
+  // can never succeed.
+  test('should show the clinician the gateway’s refusal rather than a connection problem', async ({
+    apiRequestContext,
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const assignmentUrl = await createRemoteAssignmentLink(getPageModel, page, uniqueId);
+    const assignmentId = assignmentUrl.split('/').pop()!;
+
+    // Drop the record on the gateway directly, which leaves this instance's assignment OUTSTANDING —
+    // the only status whose Cancel button is enabled, and so the only way a click reaches this path.
+    const forgotten = await apiRequestContext.delete(
+      `${new URL(assignmentUrl).origin}/api/assignments/${assignmentId}`,
+      { headers: { Authorization: `Bearer ${gatewayApiKey}` } }
+    );
+    expect(forgotten.status()).toBe(200);
+
+    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
+    await page.waitForURL('**/datahub/**/table');
+    await page.getByRole('link', { name: 'Assignments' }).click();
+    await page.waitForURL('**/datahub/**/assignments');
+    await page.getByTestId('assignment-row').first().click();
+    await page.getByRole('button', { name: 'Cancel' }).click();
+
+    await expect(page.getByRole('heading', { name: '502 - Bad Gateway' })).toBeVisible();
+    await expect(page.getByText('Connection Problem')).toBeHidden();
   });
 
   // `POST /v1/assignments/:id/email` mails a live assignment credential to a caller-supplied
