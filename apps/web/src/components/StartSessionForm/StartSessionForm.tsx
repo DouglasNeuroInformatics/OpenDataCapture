@@ -30,6 +30,7 @@ type StartSessionFormData = {
 
 type StartSessionFormProps = {
   currentGroup: Group | null;
+  customSubjectIds: string[];
   initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
   onSubmit: (data: CreateSessionData) => Promisable<void>;
   readOnly: boolean;
@@ -38,6 +39,7 @@ type StartSessionFormProps = {
 
 export const StartSessionForm = ({
   currentGroup,
+  customSubjectIds,
   username,
   initialValues,
   readOnly,
@@ -80,7 +82,8 @@ export const StartSessionForm = ({
                   ? {
                       kind: 'string',
                       label: t('common.identifier'),
-                      variant: 'input'
+                      variant: 'combobox',
+                      options: Object.fromEntries(customSubjectIds.map((id) => [id, id]))
                     }
                   : null;
               }
