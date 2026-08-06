@@ -159,6 +159,10 @@ test.describe('instrument completion', () => {
     await instrumentPage.$ref.locator('[name="postalCode"]').fill('invalid');
     await instrumentPage.submit();
 
+    // This instrument is authored against zod v3, whose own message for a failed regex is the bare
+    // word "Invalid". Asserting the text is what proves the runtime-served v3 instance carries the
+    // shared error map, and that the map does not echo the pattern back at the clinician.
     await expect(instrumentPage.errorMessages).toBeVisible();
+    await expect(instrumentPage.errorMessages).toHaveText('Does not match the expected format');
   });
 });

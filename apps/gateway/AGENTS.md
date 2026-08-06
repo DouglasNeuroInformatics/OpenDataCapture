@@ -98,6 +98,11 @@ hydrated tree can disagree with the SSR'd HTML until you do.
   `{}`, so every string is inline `t({ en, fr })`.
 - Shared UI comes from `packages/react-core` (`InstrumentRenderer`, `Branding`). Put anything both
   apps need there, not here.
+- Validation messages are localized by `src/services/zod.ts`, a thin call to react-core's
+  `localizeZodErrors`. **`entry-client.tsx` is the only place it may be called** — its `'runtime'`
+  target dynamically imports `/runtime/v1/zod@3.x/…`, a browser URL that does not resolve in node,
+  and nothing is validated during SSR anyway. The copy lives in
+  `packages/react-core/src/utils/zodErrorMap.ts`; do not add a message table here.
 - Instrument bundles arrive already built and are validated with `$InstrumentBundleContainer` in
   `src/routers/root.router.ts`. Background: `.agents/docs/architecture/instrument-pipeline.md`.
 
