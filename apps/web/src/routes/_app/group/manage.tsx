@@ -425,7 +425,11 @@ const CreateSeriesInstrumentDialog = ({
       const result = await createMutation.mutateAsync(buildPayload(items));
       if (result.outcome === 'duplicate') {
         // The existing title comes back in its stored form (a plain string, or multilingual object).
-        setDuplicateOf(typeof result.existingTitle === 'string' ? result.existingTitle : t(result.existingTitle));
+        setDuplicateOf(
+          typeof result.existingTitle === 'string'
+            ? result.existingTitle
+            : result.existingTitle[toInstrumentAuthoringLanguage(resolvedLanguage)]
+        );
         return;
       }
       onCreated(result.instrumentId);

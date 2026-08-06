@@ -1,14 +1,10 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
-import type {
-  AnyUnilingualFileInstrument,
-  FileInstrument,
-  InstrumentKind,
-  Language
-} from '@opendatacapture/runtime-core';
+import type { AnyUnilingualFileInstrument, FileInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
 import type { AxiosProgressEvent } from 'axios';
 import type { Promisable } from 'type-fest';
 
+import type { LocalizedText } from '../../types';
 import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
 
 export type UploadMap = {
@@ -19,9 +15,7 @@ export type UploadProgressEvent = Pick<AxiosProgressEvent, 'loaded' | 'progress'
 
 export namespace FileInstrumentContentStore {
   export type Errors = {
-    [basename: string]: {
-      [L in Language]: string;
-    }[];
+    [basename: string]: LocalizedText[];
   };
 
   type UploadState = {

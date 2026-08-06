@@ -105,8 +105,8 @@ t('layout.tabs.table'); // keyed, from a namespace JSON
 
 **Every interface language needs an entry.** libui resolves `obj[resolvedLanguage] ?? obj.en`, so a
 missing language renders in English and nothing complains — which is why
-`requireCompleteTranslations` is set in `packages/react-core/src/types.ts`: omitting a language from
-an inline `t()` call is a type error caught by `pnpm lint`.
+`requireCompleteTranslations` is set in `src/services/i18n.ts`: omitting a language from an inline
+`t()` call is a type error caught by `pnpm lint`.
 
 Use the keyed form only when a string is reused. Resource files are `src/translations/*.json`, keyed
 per-leaf as `{ "en": ..., "es": ..., "fr": ... }` and kept sorted by
