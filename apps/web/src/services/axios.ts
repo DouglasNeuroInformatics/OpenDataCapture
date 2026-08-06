@@ -41,6 +41,20 @@ const IDEMPOTENT_METHODS = new Set(['get', 'head', 'options']);
 axios.defaults.baseURL = config.setup.apiBaseUrl;
 
 /**
+ * Every failure our API answers deliberately carries libnest's error envelope. The network equipment
+ * this retry logic exists for — proxies, load balancers — answers with HTML, or with nothing. That is
+ * what separates a blip in front of the API from the API telling us something is wrong behind it,
+ * which no amount of retrying resolves.
+ */
+function isApiErrorBody(data: unknown): boolean {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+  const body = data as { message?: unknown; statusCode?: unknown };
+  return typeof body.message === 'string' && typeof body.statusCode === 'number';
+}
+
+/**
  * A transient error is one that is likely to succeed on a later attempt: a dropped/refused/reset
  * connection, a timeout (no response received), or an upstream gateway error. A "real" application error
  * (4xx, or a 5xx the server deliberately returned with a body) is not transient.
@@ -53,7 +67,7 @@ function isTransientError(error: unknown): boolean {
     // No response at all: network failure (ERR_NETWORK), connection reset, or timeout (ECONNABORTED).
     return true;
   }
-  return RETRYABLE_STATUS_CODES.has(error.response.status);
+  return RETRYABLE_STATUS_CODES.has(error.response.status) && !isApiErrorBody(error.response.data);
 }
 
 /** Only idempotent methods are safe to retry automatically — retrying a write risks duplicate submissions. */

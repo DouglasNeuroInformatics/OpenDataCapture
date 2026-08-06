@@ -114,6 +114,45 @@ test.describe('gateway remote assignment', () => {
   });
 });
 
+// An admin holds no groups, so the create dialog sends no `groupId` and the assignment is created
+// unscoped. Every other test here acts as a GROUP_MANAGER, whose assignment always carries one, so
+// this is the only cover for the unscoped path reaching the gateway and back.
+test.describe('gateway remote assignment without a group', () => {
+  test.use({ actingRole: 'ADMIN' });
+  test.describe.configure({ timeout: 180_000 });
+
+  test('should let an admin with no groups create a remote assignment', async ({ getPageModel, page, uniqueId }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Ungrouped${uniqueId}`, `Patient${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/session/remote-assignment').click();
+    await page.waitForURL('**/session/remote-assignment');
+
+    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toContainText('Create Remote Assignment');
+
+    // Asserting the status directly is what distinguishes "the gateway accepted this" from a 500 the
+    // UI would surface identically to any other failure.
+    const created = page.waitForResponse(
+      (response) => response.url().includes('/v1/assignments') && response.request().method() === 'POST'
+    );
+    await dialog.getByRole('button', { name: 'Submit' }).click();
+    expect((await created).status()).toBe(201);
+
+    const linkInput = page.locator('input[readonly]');
+    await expect(linkInput).toBeVisible();
+    expect(await linkInput.inputValue()).toMatch(/^https?:\/\/.+\/assignments\/.+/);
+  });
+});
+
 test.describe('gateway assignment errors', () => {
   test('should respond with 404 when the assignment id in the link does not exist', async ({
     context,
