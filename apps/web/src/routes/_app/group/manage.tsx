@@ -38,7 +38,7 @@ import { useAppStore } from '@/store';
 type InstrumentSource = { kind: 'manual' } | { kind: 'repo'; name: string };
 
 /** Passed to the renderer as a localizable value; the shared component resolves it to the active language. */
-const PREVIEW_SUBMIT_LABEL = { en: 'Preview Submit', fr: 'Soumettre l’aperçu' };
+const PREVIEW_SUBMIT_LABEL = { en: 'Preview Submit', es: 'Vista previa del envío', fr: 'Soumettre l’aperçu' };
 
 type InstrumentItem = {
   authors?: null | string[];
