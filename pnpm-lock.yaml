@@ -469,9 +469,6 @@ importers:
       prisma:
         specifier: 'catalog:'
         version: 6.19.3(typescript@6.0.3)
-      prisma-json-types-generator:
-        specifier: ^3.2.2
-        version: 3.6.2(@prisma/client@6.19.3(prisma@6.19.3(typescript@6.0.3))(typescript@6.0.3))(prisma@6.19.3(typescript@6.0.3))(typescript@6.0.3)
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.0

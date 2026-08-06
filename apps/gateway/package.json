@@ -50,7 +50,6 @@
     "esbuild": "catalog:",
     "nodemon": "catalog:",
     "prisma": "catalog:",
-    "prisma-json-types-generator": "^3.2.2",
     "tailwindcss": "catalog:",
     "tsx": "catalog:",
     "type-fest": "workspace:type-fest__4.x@*",
