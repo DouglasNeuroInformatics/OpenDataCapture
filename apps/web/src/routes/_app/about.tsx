@@ -15,44 +15,54 @@ import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStat
 const translations = {
   branch: {
     en: 'Branch',
+    es: 'Rama',
     fr: 'Branche'
   },
   buildDate: {
     en: 'Build Date',
+    es: 'Fecha de compilación',
     fr: 'Date de construction'
   },
   buildType: {
     en: 'Build Type',
+    es: 'Tipo de compilación',
     fr: 'Type de construction'
   },
   buildTypes: {
     development: {
       en: 'Development',
+      es: 'Desarrollo',
       fr: 'Développement'
     },
     production: {
       en: 'Production',
+      es: 'Producción',
       fr: 'Production'
     },
     test: {
       en: 'Test',
+      es: 'Prueba',
       fr: 'Test'
     }
   },
   enabled: {
     en: 'Enabled',
+    es: 'Habilitado',
     fr: 'Activé'
   },
   status: {
     en: 'Status',
+    es: 'Estado',
     fr: 'Statut'
   },
   uptime: {
     en: 'Uptime',
+    es: 'Tiempo de actividad',
     fr: 'Temps de fonctionnement'
   },
   version: {
     en: 'Version',
+    es: 'Versión',
     fr: 'Version'
   }
 };

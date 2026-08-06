@@ -51,6 +51,7 @@ const RouteComponent = () => {
             description: error instanceof UploadError ? error.description : undefined,
             title: {
               en: `Error Occurred Downloading Sample Template`,
+              es: `Error al descargar la plantilla de ejemplo`,
               fr: `Une erreur s'est produite lors du téléchargement du modèle`
             }
           }
@@ -90,6 +91,7 @@ const RouteComponent = () => {
             description: error instanceof UploadError ? error.description : undefined,
             title: {
               en: `An error has happened within the request`,
+              es: `Se ha producido un error en la solicitud`,
               fr: `Une erreur s'est produite lors du téléversement`
             }
           }
@@ -106,7 +108,13 @@ const RouteComponent = () => {
       <div className="flex min-h-screen flex-col items-center justify-center gap-1 p-3 text-center">
         <h3 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t(error.title)}</h3>
         {error.description && (
-          <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">{t(error.description)}</p>
+          <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">
+            {t({
+              en: error.description.en ?? '',
+              es: error.description.es ?? '',
+              fr: error.description.fr ?? ''
+            })}
+          </p>
         )}
         <div className="mt-6 flex gap-2">
           <Button
@@ -273,12 +281,14 @@ export const Route = createFileRoute('/_app/upload/$instrumentId')({
         description: z
           .object({
             en: z.string(),
+            es: z.string(),
             fr: z.string()
           })
           .partial()
           .optional(),
         title: z.object({
           en: z.string(),
+          es: z.string(),
           fr: z.string()
         })
       })

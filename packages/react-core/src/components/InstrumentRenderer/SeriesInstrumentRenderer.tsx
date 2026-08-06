@@ -233,12 +233,11 @@ export const SeriesInstrumentRenderer = ({
                   })}
                 </Heading>
                 <p className="text-muted-foreground text-sm">
-                  {t(
-                    completionMessage ?? {
-                      en: 'You have successfully completed all steps of this instrument.',
-                      fr: 'Vous avez terminé avec succès toutes les étapes de cet instrument.'
-                    }
-                  )}
+                  {t({
+                    en: completionMessage?.en ?? 'You have successfully completed all steps of this instrument.',
+                    es: completionMessage?.es ?? 'Ha completado con éxito todos los pasos de este instrumento.',
+                    fr: completionMessage?.fr ?? 'Vous avez terminé avec succès toutes les étapes de cet instrument.'
+                  })}
                 </p>
               </div>
             ))
