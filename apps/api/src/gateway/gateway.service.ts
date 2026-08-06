@@ -15,15 +15,13 @@ import { $GatewayHealthcheckSuccessResult } from '@opendatacapture/schemas/gatew
 import type { GatewayHealthcheckFailureResult, GatewayHealthcheckResult } from '@opendatacapture/schemas/gateway';
 
 import { InstrumentsService } from '@/instruments/instruments.service';
-import { SetupService } from '@/setup/setup.service';
 
 @Injectable()
 export class GatewayService {
   constructor(
     private readonly httpService: HttpService,
     private readonly instrumentsService: InstrumentsService,
-    private readonly loggingService: LoggingService,
-    private readonly setupService: SetupService
+    private readonly loggingService: LoggingService
   ) {}
 
   async createRemoteAssignment(
@@ -31,12 +29,8 @@ export class GatewayService {
     publicKey: webcrypto.CryptoKey
   ): Promise<MutateAssignmentResponseBody> {
     const instrument = await this.instrumentsService.findBundleById(assignment.instrumentId);
-    // The gateway cannot read this instance's setup state, so the languages it may offer this
-    // patient are sent with the assignment.
-    const { activeLanguages } = await this.setupService.getState();
     const response = await this.httpService.axiosRef.post(`/api/assignments`, {
       ...assignment,
-      activeLanguages,
       instrumentContainer: instrument,
       publicKey: Array.from(await HybridCrypto.serializePublicKey(publicKey))
     } satisfies CreateRemoteAssignmentInputData);
