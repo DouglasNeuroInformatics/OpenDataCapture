@@ -13,3 +13,4 @@ export * from './components/Logo';
 export * from './components/NavigationBlockerDialog';
 export * from './types';
 export * from './utils/language';
+export * from './utils/zodErrorMap';

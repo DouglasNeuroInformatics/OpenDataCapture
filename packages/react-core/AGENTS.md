@@ -29,7 +29,9 @@ belongs in `apps/web/src/components`.
 ## No translation resource files
 
 There are no JSON translations here and there should never be: `apps/gateway` initialises i18n with
-`i18n.init({ translations: {} })`, so a namespaced key would render as the raw key string there.
+`i18n.init({ translations: {} })`, so a namespaced key resolves to nothing there — `t()` logs
+`Failed to extract translation from object '{}'` and returns the **empty string**, which renders as
+missing copy rather than as a visible key.
 
 Use inline `t({ en: '...', fr: '...' })`. The only keyed calls that are safe are libui's own
 namespace — `t('libui.yes')`, `t('libui.no')`, `t('libui.form.submit')` — which libui registers.
@@ -37,6 +39,31 @@ namespace — `t('libui.yes')`, `t('libui.no')`, `t('libui.form.submit')` — wh
 Copy supplied by the host app arrives as a prop typed `LocalizedText` (`src/types.ts`), a partial
 `{ en?, fr? }` record the component resolves with `t()`. `submitButtonLabel` is the only prop using
 it today; follow that shape rather than inventing a namespace.
+
+## Validation messages
+
+`src/utils/zodErrorMap.ts` owns the localized copy for **every** zod validation error either
+frontend shows — instruments and the apps' own forms alike. `apps/web/src/services/zod.ts` and
+`apps/gateway/src/services/zod.ts` are thin adapters over its `localizeZodErrors`.
+
+- **`MESSAGES` / `COUNTED_MESSAGES` are the only place message copy belongs.** Both carry
+  `as const satisfies { ... { [L in Language]: string } }`, so a new interface language fails to
+  compile until every message has one. `COUNTED_MESSAGES` exists because French puts zero in the
+  singular where English and Spanish do not; the form is picked by `Intl.PluralRules`.
+- **zod v3 and v4 name almost every issue field differently.** `normalizeV3Issue` and
+  `normalizeV4Issue` reduce both to one `FormIssue`, and `describeIssue` writes the message once.
+  Add an issue code to the normalizers, not a second message table.
+- **`V4Issue` is a deliberate widening.** `vendor/zod@3.x` pins declarations older than the zod it
+  resolves at runtime, so `exact` and a string-format issue's `prefix`/`suffix`/`includes` are
+  emitted but not declared.
+- Anything unmapped renders the generic `invalid` message rather than `undefined`. Returning
+  `undefined` from the v4 map would defer to `config.localeError`, which the runtime bundle sets to
+  zod's **English** locale at module init.
+- A message written by the schema author always wins — both majors skip the error map entirely when
+  an issue already carries one.
+
+Tests live in `apps/web/src/__tests__/zod-error-maps.test.ts` (this package has no vitest project).
+They drive `createZodErrorMaps` through per-parse maps rather than registering globally.
 
 ## `@tanstack/react-router` is an optional peer — never import it
 

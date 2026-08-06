@@ -73,6 +73,16 @@ test.describe('gateway remote assignment', () => {
     const gatewayInstrument = new RenderInstrumentPage(gatewayPage);
     await expect(gatewayInstrument.beginButton).toBeEnabled({ timeout: 120_000 });
     await gatewayInstrument.begin();
+
+    // Submitting empty first, before answering, so the one expensive Cap proof-of-work above covers
+    // this too. The gateway registers the shared zod error maps in `entry-client.tsx`; without that
+    // a patient sees zod's untranslated default here regardless of the language they chose.
+    await gatewayInstrument.submit();
+    await expect(gatewayInstrument.errorMessages.first()).toBeVisible();
+    for (const message of await gatewayInstrument.errorMessages.allTextContents()) {
+      expect(message).toBe('This field is required');
+    }
+
     await gatewayInstrument.completeHappinessQuestionnaire();
     await gatewayInstrument.submit();
     await expect(gatewayInstrument.summaryHeading).toBeVisible();

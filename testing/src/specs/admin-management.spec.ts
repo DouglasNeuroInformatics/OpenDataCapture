@@ -36,7 +36,13 @@ test.describe('admin management', () => {
 
     await page.getByRole('button', { name: 'Submit' }).click();
 
-    await expect(page.getByTestId('error-message-text').filter({ hasText: 'This field is required' })).toBeVisible();
+    // Every missing field reports the same thing, including the ones backed by a select — those
+    // raise an issue code that used to fall through to zod's untranslated default.
+    const errorMessages = page.getByTestId('error-message-text');
+    await expect(errorMessages.first()).toBeVisible();
+    for (const message of await errorMessages.allTextContents()) {
+      expect(message).toBe('This field is required');
+    }
     await expect(page).toHaveURL('/admin/groups/create');
   });
 

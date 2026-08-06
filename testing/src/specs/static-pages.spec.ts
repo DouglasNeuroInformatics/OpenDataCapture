@@ -37,7 +37,14 @@ test.describe('contact', () => {
   test('should require a reason and a message before submitting', async ({ getPageModel, page }) => {
     const contactPage = await getPageModel('/contact');
     await contactPage.submitButton.click();
-    await expect(page.getByText('This field is required')).toBeVisible();
+
+    // Both fields report it: the message textarea, and the reason select — whose unselected value
+    // raises an issue code that used to fall through to zod's untranslated default.
+    const errorMessages = page.getByTestId('error-message-text');
+    await expect(errorMessages.first()).toBeVisible();
+    for (const message of await errorMessages.allTextContents()) {
+      expect(message).toBe('This field is required');
+    }
   });
 
   // The page never renders the contact address as visible text; it only surfaces in the mailto link
