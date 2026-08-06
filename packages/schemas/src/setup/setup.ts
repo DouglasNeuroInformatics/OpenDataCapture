@@ -203,6 +203,11 @@ const $SetupState = z.object({
    * endpoints) that lets the client hide all email-related UI when mail is off.
    */
   isMailEnabled: z.boolean().nullish(),
+  /**
+   * Whether remote assignments are offered at all. Unlike the stored column this is never null —
+   * the API resolves an unset value to `true`, so a client never has to know the default.
+   */
+  isRemoteAssignmentsEnabled: z.boolean(),
   isSetup: z.boolean().nullable(),
   release: $ReleaseInfo,
   uptime: z.number()
@@ -212,7 +217,8 @@ const $UpdateSetupStateData = z.object({
   activeLanguages: $ActiveLanguages.optional(),
   branding: $BrandingConfig.nullish(),
   defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
-  isExperimentalFeaturesEnabled: z.boolean().nullish()
+  isExperimentalFeaturesEnabled: z.boolean().nullish(),
+  isRemoteAssignmentsEnabled: z.boolean().optional()
 });
 
 const $CreateAdminData = $CreateUserData.omit({

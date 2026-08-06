@@ -43,6 +43,15 @@ describe('SetupService', () => {
         where: { id: 'setup-1' }
       });
     });
+
+    it('should persist isRemoteAssignmentsEnabled', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ id: 'setup-1', isSetup: true });
+      await setupService.updateState({ isRemoteAssignmentsEnabled: false });
+      expect(setupStateModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { isRemoteAssignmentsEnabled: false },
+        where: { id: 'setup-1' }
+      });
+    });
   });
 
   describe('getState', () => {
@@ -54,6 +63,16 @@ describe('SetupService', () => {
     it('should return null when unset', async () => {
       setupStateModel.findFirst.mockResolvedValue({ isDemo: false, isSetup: true });
       await expect(setupService.getState()).resolves.toMatchObject({ defaultAssignmentDurationDays: null });
+    });
+
+    it('should report remote assignments as enabled when the setting was never saved', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ isDemo: false, isSetup: true });
+      await expect(setupService.getState()).resolves.toMatchObject({ isRemoteAssignmentsEnabled: true });
+    });
+
+    it('should report remote assignments as disabled once an admin turns them off', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ isDemo: false, isRemoteAssignmentsEnabled: false, isSetup: true });
+      await expect(setupService.getState()).resolves.toMatchObject({ isRemoteAssignmentsEnabled: false });
     });
   });
 

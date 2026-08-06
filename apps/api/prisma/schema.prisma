@@ -439,6 +439,7 @@ model SetupState {
   defaultAssignmentDurationDays Int?
   isDemo                        Boolean
   isExperimentalFeaturesEnabled Boolean?
+  isRemoteAssignmentsEnabled    Boolean?
   isSetup                       Boolean
   mailConfig                    MailConfig?
   newUserEmailTemplate          MailTemplate?

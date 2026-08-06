@@ -49,6 +49,37 @@ const Toggle = ({
   </button>
 );
 
+const HelpHoverCard = ({ children }: { children: React.ReactNode }) => (
+  <HoverCard>
+    <HoverCard.Trigger asChild>
+      <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
+        <CircleHelpIcon className="h-4 w-4" />
+      </button>
+    </HoverCard.Trigger>
+    <HoverCard.Content className="w-72 text-sm">{children}</HoverCard.Content>
+  </HoverCard>
+);
+
+const FeatureToggle = ({
+  checked,
+  description,
+  label,
+  onCheckedChange
+}: {
+  checked: boolean;
+  description: string;
+  label: string;
+  onCheckedChange: (val: boolean) => void;
+}) => (
+  <div className="flex items-center justify-between gap-4">
+    <div className="flex items-center gap-2">
+      <p className="text-sm font-medium">{label}</p>
+      <HelpHoverCard>{description}</HelpHoverCard>
+    </div>
+    <Toggle checked={checked} label={label} onCheckedChange={onCheckedChange} />
+  </div>
+);
+
 const SettingSection = ({ children, title }: { children: React.ReactNode; title: string }) => (
   <section className="flex flex-col gap-4 p-6">
     <h3 className="text-base font-semibold">{title}</h3>
@@ -87,8 +118,8 @@ const RouteComponent = () => {
     [mutate]
   );
 
-  const uploaderLabel = t({ en: 'Enable Uploader', fr: 'Activer le téléversement' });
   const uploaderEnabled = setupStateQuery.data.isExperimentalFeaturesEnabled ?? false;
+  const remoteAssignmentsEnabled = setupStateQuery.data.isRemoteAssignmentsEnabled;
 
   const activeLanguages = setupStateQuery.data.activeLanguages;
 
@@ -163,29 +194,24 @@ const RouteComponent = () => {
         <Card>
           <Card.Content className="p-0">
             <SettingSection title={t({ en: 'Features', fr: 'Fonctionnalités' })}>
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium">{uploaderLabel}</p>
-                  <HoverCard>
-                    <HoverCard.Trigger asChild>
-                      <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
-                        <CircleHelpIcon className="h-4 w-4" />
-                      </button>
-                    </HoverCard.Trigger>
-                    <HoverCard.Content className="w-72 text-sm">
-                      {t({
-                        en: 'When enabled, an upload menu item appears in the sidebar that allows users to upload instrument records directly from data files, bypassing the normal session workflow.',
-                        fr: "Lorsqu'elle est activée, un élément de menu Téléversement apparaît dans le menu latéral et permet aux utilisateurs de téléverser des enregistrements d'instruments directement à partir de fichiers de données."
-                      })}
-                    </HoverCard.Content>
-                  </HoverCard>
-                </div>
-                <Toggle
-                  checked={uploaderEnabled}
-                  label={uploaderLabel}
-                  onCheckedChange={(checked) => autosave({ isExperimentalFeaturesEnabled: checked })}
-                />
-              </div>
+              <FeatureToggle
+                checked={uploaderEnabled}
+                description={t({
+                  en: 'When enabled, an upload menu item appears in the sidebar that allows users to upload instrument records directly from data files, bypassing the normal session workflow.',
+                  fr: "Lorsqu'elle est activée, un élément de menu Téléversement apparaît dans le menu latéral et permet aux utilisateurs de téléverser des enregistrements d'instruments directement à partir de fichiers de données."
+                })}
+                label={t({ en: 'Enable Uploader', fr: 'Activer le téléversement' })}
+                onCheckedChange={(checked) => autosave({ isExperimentalFeaturesEnabled: checked })}
+              />
+              <FeatureToggle
+                checked={remoteAssignmentsEnabled}
+                description={t({
+                  en: 'When enabled, subjects can be assigned instruments to complete at home through the gateway: the remote assignment menu item appears during a session, and each subject has an assignments tab. Turn this off on an instance that only collects data in person.',
+                  fr: "Lorsqu'elle est activée, des instruments peuvent être assignés aux clients pour être complétés à la maison par le biais de la passerelle : l'élément de menu Tâche à distance apparaît pendant une session, et chaque client possède un onglet Tâches. Désactivez cette option sur une instance qui ne recueille des données qu'en personne."
+                })}
+                label={t({ en: 'Enable Remote Assignments', fr: 'Activer les tâches à distance' })}
+                onCheckedChange={(checked) => autosave({ isRemoteAssignmentsEnabled: checked })}
+              />
             </SettingSection>
             <Separator />
             <SettingSection title={t({ en: 'Settings', fr: 'Paramètres' })}>
@@ -194,19 +220,12 @@ const RouteComponent = () => {
                   <p className="text-sm font-medium">
                     {t({ en: 'Default Assignment Validity (Days)', fr: 'Validité par défaut des tâches (jours)' })}
                   </p>
-                  <HoverCard>
-                    <HoverCard.Trigger asChild>
-                      <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
-                        <CircleHelpIcon className="h-4 w-4" />
-                      </button>
-                    </HoverCard.Trigger>
-                    <HoverCard.Content className="w-72 text-sm">
-                      {t({
-                        en: 'The number of days a new remote assignment stays valid by default. This only sets the initial expiry date when creating an assignment, which can still be changed for each one.',
-                        fr: "Le nombre de jours pendant lesquels une nouvelle tâche à distance reste valide par défaut. Ceci ne définit que la date d'expiration initiale lors de la création d'une tâche, qui peut toujours être modifiée pour chacune."
-                      })}
-                    </HoverCard.Content>
-                  </HoverCard>
+                  <HelpHoverCard>
+                    {t({
+                      en: 'The number of days a new remote assignment stays valid by default. This only sets the initial expiry date when creating an assignment, which can still be changed for each one.',
+                      fr: "Le nombre de jours pendant lesquels une nouvelle tâche à distance reste valide par défaut. Ceci ne définit que la date d'expiration initiale lors de la création d'une tâche, qui peut toujours être modifiée pour chacune."
+                    })}
+                  </HelpHoverCard>
                 </div>
                 <Input
                   className="w-[90px] shrink-0"

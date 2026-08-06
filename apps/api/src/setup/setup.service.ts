@@ -67,6 +67,9 @@ export class SetupService {
       // Non-secret flag so the client can hide email UI when mail is off. The SMTP
       // configuration itself is never exposed here (this is a public route).
       isMailEnabled: isMailEnabled(savedOptions?.mailConfig),
+      // Opt-out, not opt-in: an instance that never touched this setting — including every instance
+      // set up before it existed — keeps offering remote assignments.
+      isRemoteAssignmentsEnabled: savedOptions?.isRemoteAssignmentsEnabled ?? true,
       isSetup: Boolean(savedOptions?.isSetup),
       release: __RELEASE__,
       uptime: Math.round(process.uptime())

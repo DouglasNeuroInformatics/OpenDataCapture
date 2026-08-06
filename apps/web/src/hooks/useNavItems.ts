@@ -21,6 +21,7 @@ import {
 
 import { useAppStore } from '@/store';
 
+import { useIsRemoteAssignmentsEnabled } from './useIsRemoteAssignmentsEnabled';
 import { useSetupStateQuery } from './useSetupStateQuery';
 
 export type NavItem = {
@@ -46,6 +47,7 @@ export function useNavItems() {
   const [navItems, setNavItems] = useState<NavItem[][]>([[], []]);
   const { resolvedLanguage, t } = useTranslation();
   const setupStateQuery = useSetupStateQuery();
+  const isRemoteAssignmentsEnabled = useIsRemoteAssignmentsEnabled();
 
   useEffect(() => {
     const ability = currentUser?.ability;
@@ -175,8 +177,7 @@ export function useNavItems() {
         url: '/instruments/accessible-instruments'
       });
     }
-    // Remote assignment requires the gateway to be enabled, since assignments are served through it
-    if (ability?.can('create', 'Assignment') && setupStateQuery.data.isGatewayEnabled) {
+    if (ability?.can('create', 'Assignment') && isRemoteAssignmentsEnabled) {
       sessionItems.push({
         disabled: currentSession === null,
         icon: SendIcon,
@@ -196,9 +197,9 @@ export function useNavItems() {
   }, [
     currentSession,
     currentUser,
+    isRemoteAssignmentsEnabled,
     resolvedLanguage,
     setupStateQuery.data.isExperimentalFeaturesEnabled,
-    setupStateQuery.data.isGatewayEnabled,
     setupStateQuery.data.isMailEnabled
   ]);
 

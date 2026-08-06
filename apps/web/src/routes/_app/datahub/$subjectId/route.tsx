@@ -8,7 +8,7 @@ import { createFileRoute, Link, Outlet, useLocation } from '@tanstack/react-rout
 
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { PageHeader } from '@/components/PageHeader';
-import { config } from '@/config';
+import { useIsRemoteAssignmentsEnabled } from '@/hooks/useIsRemoteAssignmentsEnabled';
 import { useAppStore } from '@/store';
 
 const TabLink = ({ label, pathname, testId }: { label: string; pathname: string; testId?: string }) => {
@@ -36,6 +36,7 @@ const RouteComponent = () => {
   const subjectId = params.subjectId;
   const basePathname = `/datahub/${subjectId}`;
   const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
+  const isRemoteAssignmentsEnabled = useIsRemoteAssignmentsEnabled();
 
   return (
     <React.Fragment>
@@ -55,7 +56,7 @@ const RouteComponent = () => {
       <div className="mb-5 flex">
         <TabLink label={t('layout.tabs.table')} pathname={`${basePathname}/table`} testId="subject-table" />
         <TabLink label={t('layout.tabs.graph')} pathname={`${basePathname}/graph`} testId="subject-graph" />
-        {config.setup.isGatewayEnabled && (
+        {isRemoteAssignmentsEnabled && (
           <TabLink
             label={t('layout.tabs.assignments')}
             pathname={`${basePathname}/assignments`}

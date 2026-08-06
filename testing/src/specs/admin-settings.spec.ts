@@ -29,6 +29,26 @@ test.describe('admin settings', () => {
     await expect(page.getByTestId('nav-button-/upload')).toHaveCount(0);
   });
 
+  // Remote assignments are on unless an admin opts out, and the rest of the suite drives them, so
+  // this is the one test that touches the flag and it turns it back on before finishing.
+  test('should toggle remote assignments and reflect it in the sidebar nav', async ({ getPageModel, page }) => {
+    const settingsPage = await getPageModel('/admin/settings');
+    const remoteAssignmentNav = page.getByTestId('nav-button-/session/remote-assignment');
+
+    await expect(settingsPage.remoteAssignmentsToggle).toHaveAttribute('aria-checked', 'true');
+    await expect(remoteAssignmentNav).toBeVisible();
+
+    const disabled = waitForSetupPatch(page);
+    await settingsPage.remoteAssignmentsToggle.click();
+    expect((await disabled).ok()).toBe(true);
+    await expect(remoteAssignmentNav).toHaveCount(0);
+
+    const restored = waitForSetupPatch(page);
+    await settingsPage.remoteAssignmentsToggle.click();
+    expect((await restored).ok()).toBe(true);
+    await expect(remoteAssignmentNav).toBeVisible();
+  });
+
   test('should persist the default assignment duration @smoke', async ({ getPageModel, page, uniqueId }) => {
     // The setting is instance-wide and every project shares one database, so a fixed value would already
     // be stored by the time the second browser runs, and the settings page would skip the save entirely.

@@ -76,4 +76,18 @@ describe('$UpdateSetupStateData', () => {
       expect($UpdateSetupStateData.safeParse({}).success).toBe(true);
     });
   });
+
+  describe('isRemoteAssignmentsEnabled', () => {
+    it.each([true, false])('should accept the boolean %s', (value) => {
+      expect($UpdateSetupStateData.safeParse({ isRemoteAssignmentsEnabled: value }).success).toBe(true);
+    });
+
+    it('should allow the field to be omitted, so a save of another setting leaves it alone', () => {
+      expect($UpdateSetupStateData.safeParse({}).success).toBe(true);
+    });
+
+    it('should reject null, which would silently mean the default rather than off', () => {
+      expect($UpdateSetupStateData.safeParse({ isRemoteAssignmentsEnabled: null }).success).toBe(false);
+    });
+  });
 });
