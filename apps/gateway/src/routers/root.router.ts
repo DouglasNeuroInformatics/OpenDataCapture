@@ -3,6 +3,7 @@ import { $InstrumentBundleContainer } from '@opendatacapture/schemas/instrument'
 import { Router } from 'express';
 
 import { prisma } from '@/lib/prisma';
+import { getActiveLanguages } from '@/lib/setup-state';
 import { logger } from '@/logger';
 import type { RootProps } from '@/Root';
 import { ah } from '@/utils/async-handler';
@@ -43,7 +44,7 @@ router.get(
 
     // Read server-side rather than from `window.location` so the SSR pass and the hydration pass
     // resolve the same language; anything else renders the page in English and then swaps it.
-    const { activeLanguages } = assignment;
+    const activeLanguages = getActiveLanguages();
     const requestedLanguage = $Language.safeParse(req.query.lang);
     const language =
       requestedLanguage.success && activeLanguages.includes(requestedLanguage.data)
