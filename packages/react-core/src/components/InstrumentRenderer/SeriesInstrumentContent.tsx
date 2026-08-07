@@ -37,19 +37,22 @@ export const SeriesInstrumentContent = ({ status }: SeriesInstrumentContentProps
       <Heading variant="h4">
         {t({
           en: 'Series Instrument in Progress',
+          es: 'Serie de instrumentos en proceso',
           fr: "Série d'instruments en cours"
         })}
       </Heading>
       <p className="text-muted-foreground text-sm">
         {t({
-          en: `Instruments Completed: ${status.completedInstruments}/{${status.totalInstruments}}`,
-          fr: `Nombre d'instruments complétés : ${status.completedInstruments}/{${status.totalInstruments}}`
+          en: `Instruments Completed: ${status.completedInstruments}/${status.totalInstruments}`,
+          es: `Instrumentos completados: ${status.completedInstruments}/${status.totalInstruments}`,
+          fr: `Nombre d'instruments complétés : ${status.completedInstruments}/${status.totalInstruments}`
         })}
       </p>
       <div className="pt-2">
         <Button disabled={isOpen} type="button" onClick={() => setIsOpen(true)}>
           {t({
             en: 'Begin',
+            es: 'Comenzar',
             fr: 'Commencer'
           })}
         </Button>

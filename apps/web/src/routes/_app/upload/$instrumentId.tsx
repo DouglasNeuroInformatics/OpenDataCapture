@@ -13,6 +13,7 @@ import { useInstrument } from '@/hooks/useInstrument';
 import { useUploadInstrumentRecordsMutation } from '@/hooks/useUploadInstrumentRecordsMutation';
 import { useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
+import { getValueForLanguage } from '@/utils/language';
 import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData, UploadError } from '@/utils/upload';
 
 const RouteComponent = () => {
@@ -37,7 +38,7 @@ const RouteComponent = () => {
   const navigate = Route.useNavigate();
 
   const instrument = useInstrument(params.instrumentId) as (AnyUnilingualFormInstrument & { id: string }) | null;
-  const { t } = useTranslation();
+  const { resolvedLanguage, t } = useTranslation();
 
   const handleTemplateDownload = () => {
     try {
@@ -51,6 +52,7 @@ const RouteComponent = () => {
             description: error instanceof UploadError ? error.description : undefined,
             title: {
               en: `Error Occurred Downloading Sample Template`,
+              es: `Error al descargar la plantilla de ejemplo`,
               fr: `Une erreur s'est produite lors du téléchargement du modèle`
             }
           }
@@ -74,6 +76,7 @@ const RouteComponent = () => {
         addNotification({
           message: t({
             en: 'Lots of entries loading, please wait...',
+            es: 'Se están cargando muchas entradas, espere...',
             fr: 'Beaucoup de données, veuillez patienter...'
           }),
           type: 'info'
@@ -89,6 +92,7 @@ const RouteComponent = () => {
             description: error instanceof UploadError ? error.description : undefined,
             title: {
               en: `An error has happened within the request`,
+              es: `Se ha producido un error en la solicitud`,
               fr: `Une erreur s'est produite lors du téléversement`
             }
           }
@@ -105,7 +109,9 @@ const RouteComponent = () => {
       <div className="flex min-h-screen flex-col items-center justify-center gap-1 p-3 text-center">
         <h3 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t(error.title)}</h3>
         {error.description && (
-          <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">{t(error.description)}</p>
+          <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">
+            {getValueForLanguage(error.description, resolvedLanguage)}
+          </p>
         )}
         <div className="mt-6 flex gap-2">
           <Button
@@ -117,6 +123,7 @@ const RouteComponent = () => {
           >
             {t({
               en: 'Error Report',
+              es: 'Informe de error',
               fr: "Rapport d'erreur"
             })}
           </Button>
@@ -129,6 +136,7 @@ const RouteComponent = () => {
           >
             {t({
               en: 'Try Again',
+              es: 'Vuelva a intentarlo',
               fr: 'Réessayer'
             })}
           </Button>
@@ -147,6 +155,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: `Upload Data For ${instrument.details.title}`,
+            es: `Cargar datos de ${instrument.details.title}`,
             fr: `Téléverser les données pour l'instrument : ${instrument.details.title}`
           })}
         </Heading>
@@ -166,7 +175,11 @@ const RouteComponent = () => {
               {(currentUser?.groups.length ?? 0) > 0 && (
                 <div className="flex w-full shrink-0 flex-col gap-1 sm:w-48">
                   <p className="text-muted-foreground text-xs">
-                    {t({ en: 'Filter users by group.', fr: 'Filtrer les utilisateurs par groupe.' })}
+                    {t({
+                      en: 'Filter users by group.',
+                      es: 'Filtrar los usuarios por grupo.',
+                      fr: 'Filtrer les utilisateurs par groupe.'
+                    })}
                   </p>
                   <Select
                     value={selectedGroupId}
@@ -176,7 +189,9 @@ const RouteComponent = () => {
                     }}
                   >
                     <Select.Trigger>
-                      <Select.Value placeholder={t({ en: 'Select group', fr: 'Sélectionner un groupe' })} />
+                      <Select.Value
+                        placeholder={t({ en: 'Select group', es: 'Seleccione un grupo', fr: 'Sélectionner un groupe' })}
+                      />
                     </Select.Trigger>
                     <Select.Content>
                       <Select.Group>
@@ -194,6 +209,7 @@ const RouteComponent = () => {
                 <p className="text-muted-foreground text-xs">
                   {t({
                     en: 'Select the username to associate with these records for audit and traceability.',
+                    es: 'Seleccione el nombre de usuario que se asociará a estos registros para fines de auditoría y trazabilidad.',
                     fr: "Sélectionnez le nom d'utilisateur à associer à ces entrées pour l'audit et la traçabilité."
                   })}
                 </p>
@@ -208,7 +224,7 @@ const RouteComponent = () => {
                           {user.username}
                         </Select.Item>
                       ))}
-                      <Select.Item value="N/A">{t({ en: 'N/A', fr: 'S.O.' })}</Select.Item>
+                      <Select.Item value="N/A">{t({ en: 'N/A', es: 'N/D', fr: 'S.O.' })}</Select.Item>
                     </Select.Group>
                   </Select.Content>
                 </Select>
@@ -224,7 +240,7 @@ const RouteComponent = () => {
             <div className="flex gap-2">
               <Button className="gap-2" size="sm" variant="outline" onClick={handleTemplateDownload}>
                 <DownloadIcon size={16} />
-                {t({ en: 'Template', fr: 'Modèle' })}
+                {t({ en: 'Template', es: 'Plantilla', fr: 'Modèle' })}
               </Button>
               <Button
                 className="gap-2"
@@ -233,7 +249,7 @@ const RouteComponent = () => {
                 onClick={() => window.open('https://opendatacapture.org/en/docs/guides/how-to-upload-data/')}
               >
                 <BadgeHelpIcon size={16} />
-                {t({ en: 'Help', fr: 'Aide' })}
+                {t({ en: 'Help', es: 'Ayuda', fr: 'Aide' })}
               </Button>
             </div>
           </div>
@@ -244,6 +260,7 @@ const RouteComponent = () => {
           <Heading className="mt-4 text-center" variant="h3">
             {t({
               en: 'Data currently uploading...',
+              es: 'Cargando datos...',
               fr: 'Données en cours de téléversement...'
             })}
           </Heading>
@@ -261,12 +278,14 @@ export const Route = createFileRoute('/_app/upload/$instrumentId')({
         description: z
           .object({
             en: z.string(),
+            es: z.string(),
             fr: z.string()
           })
           .partial()
           .optional(),
         title: z.object({
           en: z.string(),
+          es: z.string(),
           fr: z.string()
         })
       })

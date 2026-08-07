@@ -63,6 +63,7 @@ const RouteComponent = () => {
 
     const createUserFailedMessage = t({
       en: 'Failed to create user',
+      es: 'Error al crear el usuario',
       fr: "Échec de la création de l'utilisateur"
     });
 
@@ -92,10 +93,12 @@ const RouteComponent = () => {
         notification.addNotification({
           message: t({
             en: `A welcome email was sent to ${welcomeEmail.recipient ?? ''}`,
+            es: `Se envió un correo de bienvenida a ${welcomeEmail.recipient ?? ''}`,
             fr: `Un courriel de bienvenue a été envoyé à ${welcomeEmail.recipient ?? ''}`
           }),
           title: t({
             en: 'Welcome email sent',
+            es: 'Correo de bienvenida enviado',
             fr: 'Courriel de bienvenue envoyé'
           }),
           type: 'success'
@@ -109,6 +112,7 @@ const RouteComponent = () => {
             message: mailErrorMessage(welcomeEmail.error),
             title: t({
               en: 'Welcome email failed',
+              es: 'Error al enviar el correo de bienvenida',
               fr: 'Échec du courriel de bienvenue'
             }),
             type: 'error'
@@ -128,6 +132,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'Add User',
+            es: 'Agregar usuario',
             fr: 'Ajouter un utilisateur'
           })}
         </Heading>
@@ -137,6 +142,7 @@ const RouteComponent = () => {
           <Label>
             {t({
               en: 'Welcome email language',
+              es: 'Idioma del correo de bienvenida',
               fr: 'Langue du courriel de bienvenue'
             })}
           </Label>
@@ -169,6 +175,7 @@ const RouteComponent = () => {
             },
             title: t({
               en: 'Login Credentials',
+              es: 'Credenciales de acceso',
               fr: 'Identifiants de connexion'
             })
           },
@@ -187,12 +194,14 @@ const RouteComponent = () => {
             },
             title: t({
               en: 'Contact information',
+              es: 'Información de contacto',
               fr: 'Coordonnées'
             })
           },
           {
             title: t({
               en: 'Permissions',
+              es: 'Permisos',
               fr: 'Autorisations'
             }),
             fields: {
@@ -210,10 +219,12 @@ const RouteComponent = () => {
                 kind: 'boolean',
                 description: t({
                   en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
+                  es: 'Use esta opción si el usuario no debe iniciar sesión, por ejemplo, cuando la cuenta solo sirve para identificar al autor de los datos cargados.',
                   fr: "Utilisez cette option si l'utilisateur n'a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l'auteur de données téléversées."
                 }),
                 label: t({
                   en: 'Disabled',
+                  es: 'Desactivado',
                   fr: 'Désactivé'
                 }),
                 variant: 'radio'
@@ -263,6 +274,7 @@ const RouteComponent = () => {
             },
             title: t({
               en: 'Additional Information',
+              es: 'Información adicional',
               fr: 'Informations supplémentaires'
             })
           }
@@ -332,10 +344,13 @@ const RouteComponent = () => {
       >
         <Dialog.Content className="max-w-lg" data-testid="welcome-email-fallback">
           <Dialog.Header>
-            <Dialog.Title>{t({ en: 'Welcome message', fr: 'Message de bienvenue' })}</Dialog.Title>
+            <Dialog.Title>
+              {t({ en: 'Welcome message', es: 'Mensaje de bienvenida', fr: 'Message de bienvenue' })}
+            </Dialog.Title>
             <Dialog.Description>
               {t({
                 en: 'The welcome email could not be delivered automatically. Copy the message below and send it to the user manually.',
+                es: 'El correo de bienvenida no se pudo entregar automáticamente. Copie el mensaje siguiente y envíeselo al usuario manualmente.',
                 fr: "Le courriel de bienvenue n'a pas pu être livré automatiquement. Copiez le message ci-dessous et envoyez-le manuellement à l'utilisateur."
               })}
             </Dialog.Description>
@@ -352,7 +367,7 @@ const RouteComponent = () => {
                 void navigate({ to: '..' });
               }}
             >
-              {t({ en: 'Done', fr: 'Terminé' })}
+              {t({ en: 'Done', es: 'Listo', fr: 'Terminé' })}
             </Button>
           </Dialog.Footer>
         </Dialog.Content>

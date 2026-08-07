@@ -26,7 +26,11 @@ export const UploadProgressBar = memo(function UploadProgressBar() {
     <div className="flex w-full flex-col gap-3">
       <div className="flex items-center justify-between text-sm">
         <span className="text-muted-foreground animate-pulse">
-          {t({ en: `Uploading files... (${loadedFiles}/${totalFiles} complete)` })}
+          {t({
+            en: `Uploading files... (${loadedFiles}/${totalFiles} complete)`,
+            es: `Cargando archivos... (${loadedFiles}/${totalFiles} completados)`,
+            fr: `Téléversement des fichiers... (${loadedFiles}/${totalFiles} terminés)`
+          })}
         </span>
         <motion.p className="font-medium">{percentage}</motion.p>
       </div>

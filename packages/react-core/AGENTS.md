@@ -33,12 +33,18 @@ There are no JSON translations here and there should never be: `apps/gateway` in
 `Failed to extract translation from object '{}'` and returns the **empty string**, which renders as
 missing copy rather than as a visible key.
 
-Use inline `t({ en: '...', fr: '...' })`. The only keyed calls that are safe are libui's own
-namespace — `t('libui.yes')`, `t('libui.no')`, `t('libui.form.submit')` — which libui registers.
+Use inline `t({ en: '...', es: '...', fr: '...' })`, naming every interface language — a missing one
+falls back to English silently, so `requireCompleteTranslations` is set in
+`src/complete-translations.d.ts` and omitting a language is a type error caught by `pnpm lint`. That
+augmentation stays outside the exported `src/types.ts`; exporting it would also force Spanish on
+`apps/playground`, whose language selector intentionally exposes only English and French. The only
+keyed calls that are safe are libui's own namespace —
+`t('libui.yes')`, `t('libui.no')`, `t('libui.form.submit')` — which libui registers.
 
-Copy supplied by the host app arrives as a prop typed `LocalizedText` (`src/types.ts`), a partial
-`{ en?, fr? }` record the component resolves with `t()`. `submitButtonLabel` is the only prop using
-it today; follow that shape rather than inventing a namespace.
+Copy supplied by the host app arrives as a prop typed `LocalizedText` (`src/types.ts`), a total
+record keyed by `Language` — every interface language is required — that the component resolves with
+`t()`. `submitButtonLabel` is the only prop using it today; follow that shape rather than inventing a
+namespace.
 
 ## Validation messages
 

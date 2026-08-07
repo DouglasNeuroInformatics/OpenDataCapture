@@ -99,12 +99,17 @@ In components use a selector: `useAppStore((store) => store.currentGroup)`. Outs
 `useTranslation` comes from `@douglasneuroinformatics/libui/hooks`. Two forms:
 
 ```tsx
-t({ en: 'Connection Problem', fr: 'Problème de connexion' }); // inline — prefer this
+t({ en: 'Connection Problem', es: 'Problema de conexión', fr: 'Problème de connexion' }); // inline — prefer this
 t('layout.tabs.table'); // keyed, from a namespace JSON
 ```
 
+**Every interface language needs an entry.** libui resolves `obj[resolvedLanguage] ?? obj.en`, so a
+missing language renders in English and nothing complains — which is why
+`requireCompleteTranslations` is set in `src/services/i18n.ts`: omitting a language from an inline
+`t()` call is a type error caught by `pnpm lint`.
+
 Use the keyed form only when a string is reused. Resource files are `src/translations/*.json`, keyed
-per-leaf as `{ "en": ..., "fr": ... }` and kept sorted by
+per-leaf as `{ "en": ..., "es": ..., "fr": ... }` and kept sorted by
 `pnpm --filter @opendatacapture/web format:translations`.
 
 **Adding a namespace means three edits in `src/services/i18n.ts`** — the import, the `declare module`

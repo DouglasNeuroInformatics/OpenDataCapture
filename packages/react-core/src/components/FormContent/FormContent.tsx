@@ -33,6 +33,7 @@ export const FormContent = ({ instrument, onSubmit, submitButtonLabel }: FormCon
               <Dialog.Title>
                 {t({
                   en: 'Instructions',
+                  es: 'Instrucciones',
                   fr: 'Instructions'
                 })}
               </Dialog.Title>

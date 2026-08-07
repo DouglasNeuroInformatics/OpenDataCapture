@@ -54,7 +54,7 @@ step type-checks and compiles, and fails at runtime or serves the wrong cached d
     (`throwOnError: true` for both queries and mutations, in `apps/web/src/services/react-query.ts`,
     which routes errors to the route error boundary). Set `throwOnError: false` on the mutation _and_
     `meta: { disableDefaultErrorNotification: true }` on the request, then notify in `onError` with
-    `getApiErrorMessage(err, t({ en: …, fr: … }))` from `@/utils/error`. Omitting the meta flag shows
+    `getApiErrorMessage(err, t({ en: …, es: …, fr: … }))` from `@/utils/error`. Omitting the meta flag shows
     two toasts. Canonical: `apps/web/src/hooks/useDeleteSeriesInstrumentMutation.ts`.
 
 11. **Write the unit test in `apps/web/src/hooks/__tests__/<hookName>.test.ts` — never under

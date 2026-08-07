@@ -71,6 +71,7 @@ export const ScalarInstrumentRenderer = ({
         addNotification({
           message: t({
             en: 'The information submitted is invalid and cannot be saved. Please contact the platform administrator.',
+            es: 'La información enviada no es válida y no se puede guardar. Comuníquese con el administrador de la plataforma.',
             fr: "Les informations soumises sont invalides et ne peuvent pas être enregistrées. Veuillez contacter l'administrateur de la plateforme."
           }),
           type: 'error'
@@ -100,10 +101,12 @@ export const ScalarInstrumentRenderer = ({
             <ContentPlaceholder
               message={t({
                 en: 'An unexpected error occurred while loading this instrument. Please contact the platform administrator for further assistance.',
+                es: 'Se produjo un error inesperado al cargar este instrumento. Comuníquese con el administrador de la plataforma para obtener ayuda.',
                 fr: "Une erreur inattendue s'est produite lors du chargement de cet instrument. Veuillez contacter l'administrateur de la plateforme pour obtenir de l'aide."
               })}
               title={t({
                 en: 'Failed to Load Instrument',
+                es: 'Error al cargar el instrumento',
                 fr: "Échec du chargement de l'instrument"
               })}
             />

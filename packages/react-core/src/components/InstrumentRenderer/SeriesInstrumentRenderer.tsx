@@ -81,6 +81,7 @@ export const SeriesInstrumentRenderer = ({
         addNotification({
           message: t({
             en: 'The information submitted is invalid and cannot be saved. Please contact the platform administrator.',
+            es: 'La información enviada no es válida y no se puede guardar. Comuníquese con el administrador de la plataforma.',
             fr: "Les informations soumises sont invalides et ne peuvent pas être enregistrées. Veuillez contacter l'administrateur de la plateforme."
           }),
           type: 'error'
@@ -133,10 +134,12 @@ export const SeriesInstrumentRenderer = ({
           <ContentPlaceholder
             message={t({
               en: 'An unexpected error occurred while loading this instrument. Please contact the platform administrator for further assistance.',
+              es: 'Se produjo un error inesperado al cargar este instrumento. Comuníquese con el administrador de la plataforma para obtener ayuda.',
               fr: "Une erreur inattendue s'est produite lors du chargement de cet instrument. Veuillez contacter l'administrateur de la plateforme pour obtenir de l'aide."
             })}
             title={t({
               en: 'Failed to Load Instrument',
+              es: 'Error al cargar el instrumento',
               fr: "Échec du chargement de l'instrument"
             })}
           />
@@ -161,12 +164,14 @@ export const SeriesInstrumentRenderer = ({
                 <Heading variant="h4">
                   {t({
                     en: 'Series Instrument in Progress',
+                    es: 'Serie de instrumentos en proceso',
                     fr: "Série d'instruments en cours"
                   })}
                 </Heading>
                 <p className="text-muted-foreground text-sm">
                   {t({
                     en: `Instruments Completed: ${currentItemIndex}/${target.items.length}`,
+                    es: `Instrumentos completados: ${currentItemIndex}/${target.items.length}`,
                     fr: `Nombre d'instruments complétés : ${currentItemIndex}/${target.items.length}`
                   })}
                 </p>
@@ -176,7 +181,7 @@ export const SeriesInstrumentRenderer = ({
                     type="button"
                     onClick={() => setIsInstrumentInProgress(true)}
                   >
-                    {t({ en: 'Begin', fr: 'Commencer' })}
+                    {t({ en: 'Begin', es: 'Comenzar', fr: 'Commencer' })}
                   </Button>
                 </div>
               </div>
@@ -187,10 +192,12 @@ export const SeriesInstrumentRenderer = ({
                   <ContentPlaceholder
                     message={t({
                       en: 'An unexpected error occurred while loading this instrument. Please contact the platform administrator for further assistance.',
+                      es: 'Se produjo un error inesperado al cargar este instrumento. Comuníquese con el administrador de la plataforma para obtener ayuda.',
                       fr: "Une erreur inattendue s'est produite lors du chargement de cet instrument. Veuillez contacter l'administrateur de la plateforme pour obtenir de l'aide."
                     })}
                     title={t({
                       en: 'Failed to Load Instrument',
+                      es: 'Error al cargar el instrumento',
                       fr: "Échec du chargement de l'instrument"
                     })}
                   />
@@ -221,16 +228,23 @@ export const SeriesInstrumentRenderer = ({
                 <Heading variant="h3">
                   {t({
                     en: 'Thank You!',
+                    es: '¡Gracias!',
                     fr: 'Merci'
                   })}
                 </Heading>
                 <p className="text-muted-foreground text-sm">
-                  {t(
-                    completionMessage ?? {
-                      en: 'You have successfully completed all steps of this instrument.',
-                      fr: 'Vous avez terminé avec succès toutes les étapes de cet instrument.'
-                    }
-                  )}
+                  {/*
+                   * `completionMessage?.en` is deliberate on the Spanish line, not a typo.
+                   * `CompletionMessage` is keyed by runtime-core's `Language`, which is `'en' | 'fr'`
+                   * — instruments are authored in those two only, while Spanish is an interface
+                   * language. So a Spanish reader gets the author's English message when there is
+                   * one, and the Spanish default when there is not.
+                   */}
+                  {t({
+                    en: completionMessage?.en ?? 'You have successfully completed all steps of this instrument.',
+                    es: completionMessage?.en ?? 'Ha completado con éxito todos los pasos de este instrumento.',
+                    fr: completionMessage?.fr ?? 'Vous avez terminé avec succès toutes les étapes de cet instrument.'
+                  })}
                 </p>
               </div>
             ))

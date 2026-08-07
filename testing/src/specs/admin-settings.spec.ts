@@ -45,7 +45,13 @@ test.describe('admin settings', () => {
     await expect(settingsPage.defaultAssignmentDurationInput).toHaveValue(String(durationDays));
   });
 
-  test('should hide the language toggle once only one language is offered', async ({ getPageModel, page }) => {
+  // Every step that changes `activeLanguages` lives in this one test. The setting is a single
+  // instance-wide document and `fullyParallel` is on, so a second test mutating it would race this
+  // one — a worker that added Spanish here would break the "only one language left" assertion there.
+  test('should hide the toggle when one language is left and render the nav in a newly activated language', async ({
+    getPageModel,
+    page
+  }) => {
     const settingsPage = await getPageModel('/admin/settings');
 
     // `activeLanguages` is one instance-wide document seeded with English and French, so the
@@ -65,6 +71,25 @@ test.describe('admin settings', () => {
     await settingsPage.activeLanguageCheckbox('fr').click();
     expect((await restored).ok()).toBe(true);
     await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toBeVisible();
+
+    // Spanish is off by default, so reaching it at all takes activating it first. The admin nav
+    // group and its submenu are inline `t()` strings rather than namespace keys, which is exactly
+    // where a missing Spanish entry hides: the page renders, in English.
+    const activated = waitForSetupPatch(page);
+    await settingsPage.activeLanguageCheckbox('es').click();
+    expect((await activated).ok()).toBe(true);
+
+    await settingsPage.selectLanguage('Español');
+    const sidebar = page.getByTestId('sidebar');
+    // The group header is a `NavGroup`, not a `NavButton`, so it carries no testid and is matched
+    // by role; its submenu items are `NavButton`s and are matched by theirs.
+    await expect(sidebar.getByRole('button', { name: 'Panel de administración' })).toBeVisible();
+    await expect(sidebar.getByTestId('nav-button-/admin/settings')).toContainText('Configuración de la aplicación');
+
+    await settingsPage.selectLanguage('English');
+    const removed = waitForSetupPatch(page);
+    await settingsPage.activeLanguageCheckbox('es').click();
+    expect((await removed).ok()).toBe(true);
   });
 
   test('should apply the group switcher position preference immediately', async ({ getPageModel }) => {

@@ -48,6 +48,7 @@ const _FileInstrumentContent: React.FC<FileInstrumentContentProps> = ({ Navigati
               <ErrorBox
                 title={t({
                   en: 'Something went wrong',
+                  es: 'Algo salió mal',
                   fr: "Une erreur s'est produite"
                 })}
               />
@@ -70,6 +71,7 @@ const _FileInstrumentContent: React.FC<FileInstrumentContentProps> = ({ Navigati
           active={status === 'PENDING'}
           message={t({
             en: 'Are you sure you want to leave this page? Data is currently uploading and will be lost if you leave this page now.',
+            es: '¿Seguro que desea salir de esta página? Se están cargando datos que se perderán si sale ahora.',
             fr: 'Êtes-vous sûr de vouloir quitter cette page ? Des données sont en cours de téléversement et seront perdues si vous quittez la page maintenant.'
           })}
         />

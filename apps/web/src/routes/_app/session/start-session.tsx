@@ -92,11 +92,16 @@ const RouteComponent = () => {
                   />
                 </svg>
                 <h5 className="font-semibold text-green-900 dark:text-green-500">
-                  {t({ en: 'Session Successfully Started', fr: 'Session démarrée avec succès' })}
+                  {t({
+                    en: 'Session Successfully Started',
+                    es: 'La sesión se inició correctamente',
+                    fr: 'Session démarrée avec succès'
+                  })}
                 </h5>
                 <p className="text-sm text-green-700 dark:text-green-300">
                   {t({
                     en: 'Please note that you must end the current session before completing this form again.',
+                    es: 'Tenga en cuenta que debe finalizar la sesión actual antes de volver a completar este formulario.',
                     fr: 'Veuillez noter que vous devez mettre fin à la session en cours avant de remplir à nouveau ce formulaire.'
                   })}
                 </p>

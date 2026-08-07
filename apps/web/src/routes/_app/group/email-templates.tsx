@@ -14,7 +14,7 @@ const RouteComponent = () => {
     <React.Fragment>
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t({ en: 'Email Templates', fr: 'Modèles de courriel' })}
+          {t({ en: 'Email Templates', es: 'Plantillas de correo', fr: 'Modèles de courriel' })}
         </Heading>
       </PageHeader>
       <GroupEmailTemplates />

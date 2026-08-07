@@ -89,7 +89,7 @@ export function useNavItems() {
       if (setupStateQuery.data.isMailEnabled) {
         globalItems.push({
           icon: MailIcon,
-          label: t({ en: 'Email Templates', fr: 'Modèles de courriel' }),
+          label: t({ en: 'Email Templates', es: 'Plantillas de correo', fr: 'Modèles de courriel' }),
           url: '/group/email-templates'
         });
       }
@@ -100,6 +100,7 @@ export function useNavItems() {
         icon: UsersIcon,
         label: t({
           en: 'Manage Groups',
+          es: 'Gestionar grupos',
           fr: 'Gérer les groupes'
         }),
         url: '/admin/groups'
@@ -108,6 +109,7 @@ export function useNavItems() {
         icon: UserCogIcon,
         label: t({
           en: 'Manage Users',
+          es: 'Gestionar usuarios',
           fr: 'Gérer les utilisateurs'
         }),
         url: '/admin/users'
@@ -122,6 +124,7 @@ export function useNavItems() {
             icon: CogIcon,
             label: t({
               en: 'App Settings',
+              es: 'Configuración de la aplicación',
               fr: "Paramètres de l'application"
             }),
             url: '/admin/settings'
@@ -135,6 +138,7 @@ export function useNavItems() {
             icon: PaletteIcon,
             label: t({
               en: 'Branding',
+              es: 'Imagen de marca',
               fr: 'Image de marque'
             }),
             url: '/admin/branding'
@@ -143,18 +147,19 @@ export function useNavItems() {
             icon: PackageIcon,
             label: t({
               en: 'Instrument Repos',
+              es: 'Repositorios de instrumentos',
               fr: "Dépôts d'instruments"
             }),
             url: '/admin/instrument-repos'
           },
           {
             icon: MailIcon,
-            label: t({ en: 'Mail', fr: 'Courriel' }),
+            label: t({ en: 'Mail', es: 'Correo', fr: 'Courriel' }),
             url: '/admin/mail'
           }
         ],
         icon: ShieldIcon,
-        label: t({ en: 'Admin Panel', fr: "Panneau d'administration" })
+        label: t({ en: 'Admin Panel', es: 'Panel de administración', fr: "Panneau d'administration" })
       });
     }
 
