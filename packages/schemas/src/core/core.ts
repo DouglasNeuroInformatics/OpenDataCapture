@@ -83,6 +83,17 @@ export const $ActiveLanguages = z.tuple([$Language], $Language);
 export const DEFAULT_ACTIVE_LANGUAGES: ActiveLanguages = ['en', 'fr'];
 
 /**
+ * The language a reader should end up in, given the set their instance offers. A reader on a
+ * language that has since been deactivated falls back to the first active one — the toggle no
+ * longer lists theirs, so leaving them on it strands them with no way out.
+ *
+ * This is the one place that policy is decided; both the moment it is applied — before the app
+ * renders, and again whenever an admin changes the set mid-session — resolve through here.
+ */
+export const resolveActiveLanguage = (language: Language, activeLanguages: ActiveLanguages): Language =>
+  activeLanguages.includes(language) ? language : activeLanguages[0];
+
+/**
  * A string authored in each of the application's languages. Every field is nullish so content
  * may target a single language, and nullish rather than optional to match Prisma's
  * null-for-absent convention.
