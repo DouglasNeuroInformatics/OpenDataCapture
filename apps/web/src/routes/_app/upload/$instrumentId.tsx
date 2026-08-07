@@ -13,6 +13,7 @@ import { useInstrument } from '@/hooks/useInstrument';
 import { useUploadInstrumentRecordsMutation } from '@/hooks/useUploadInstrumentRecordsMutation';
 import { useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
+import { getValueForLanguage } from '@/utils/language';
 import { createUploadTemplateCSV, processInstrumentCSV, reformatInstrumentData, UploadError } from '@/utils/upload';
 
 const RouteComponent = () => {
@@ -37,7 +38,7 @@ const RouteComponent = () => {
   const navigate = Route.useNavigate();
 
   const instrument = useInstrument(params.instrumentId) as (AnyUnilingualFormInstrument & { id: string }) | null;
-  const { t } = useTranslation();
+  const { resolvedLanguage, t } = useTranslation();
 
   const handleTemplateDownload = () => {
     try {
@@ -109,11 +110,7 @@ const RouteComponent = () => {
         <h3 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t(error.title)}</h3>
         {error.description && (
           <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">
-            {t({
-              en: error.description.en ?? '',
-              es: error.description.es ?? '',
-              fr: error.description.fr ?? ''
-            })}
+            {getValueForLanguage(error.description, resolvedLanguage)}
           </p>
         )}
         <div className="mt-6 flex gap-2">

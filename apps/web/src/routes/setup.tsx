@@ -1,18 +1,19 @@
 /* eslint-disable perfectionist/sort-objects */
 
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
-import { Card, Form, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { Card, Form, Heading, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { LoadingPage, Logo } from '@opendatacapture/react-core';
+import { LanguageToggle, LoadingPage, Logo } from '@opendatacapture/react-core';
 import { createFileRoute, Navigate, redirect, useRouter } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
 import { useCreateSetupStateMutation } from '@/hooks/useCreateSetupStateMutation';
-import { setupStateQueryOptions } from '@/hooks/useSetupStateQuery';
+import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 
 const RouteComponent = () => {
   const router = useRouter();
   const createSetupStateMutation = useCreateSetupStateMutation();
+  const setupStateQuery = useSetupStateQuery();
   const { t } = useTranslation();
 
   if (createSetupStateMutation.isPending) {
@@ -165,11 +166,8 @@ const RouteComponent = () => {
           <p className="text-sm">&copy; {new Date().getFullYear()} Douglas Neuroinformatics Platform</p>
           <div className="flex gap-2">
             <LanguageToggle
+              activeLanguages={setupStateQuery.data.activeLanguages}
               align="start"
-              options={{
-                en: 'English',
-                fr: 'Français'
-              }}
               triggerClassName="border p-2"
               variant="ghost"
             />

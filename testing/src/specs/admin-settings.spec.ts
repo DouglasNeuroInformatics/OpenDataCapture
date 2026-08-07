@@ -48,7 +48,10 @@ test.describe('admin settings', () => {
   // Every step that changes `activeLanguages` lives in this one test. The setting is a single
   // instance-wide document and `fullyParallel` is on, so a second test mutating it would race this
   // one — a worker that added Spanish here would break the "only one language left" assertion there.
-  test('should hide the language toggle once only one language is offered', async ({ getPageModel, page }) => {
+  test('should hide the toggle when one language is left and render the nav in a newly activated language', async ({
+    getPageModel,
+    page
+  }) => {
     const settingsPage = await getPageModel('/admin/settings');
 
     // `activeLanguages` is one instance-wide document seeded with English and French, so the
@@ -78,8 +81,10 @@ test.describe('admin settings', () => {
 
     await settingsPage.selectLanguage('Español');
     const sidebar = page.getByTestId('sidebar');
+    // The group header is a `NavGroup`, not a `NavButton`, so it carries no testid and is matched
+    // by role; its submenu items are `NavButton`s and are matched by theirs.
     await expect(sidebar.getByRole('button', { name: 'Panel de administración' })).toBeVisible();
-    await expect(sidebar.getByRole('button', { name: 'Configuración de la aplicación' })).toBeVisible();
+    await expect(sidebar.getByTestId('nav-button-/admin/settings')).toContainText('Configuración de la aplicación');
 
     await settingsPage.selectLanguage('English');
     const removed = waitForSetupPatch(page);

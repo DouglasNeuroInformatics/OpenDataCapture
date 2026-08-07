@@ -43,9 +43,9 @@ export const SeriesInstrumentContent = ({ status }: SeriesInstrumentContentProps
       </Heading>
       <p className="text-muted-foreground text-sm">
         {t({
-          en: `Instruments Completed: ${status.completedInstruments}/{${status.totalInstruments}}`,
-          es: `Instrumentos completados: ${status.completedInstruments}/{${status.totalInstruments}}`,
-          fr: `Nombre d'instruments complétés : ${status.completedInstruments}/{${status.totalInstruments}}`
+          en: `Instruments Completed: ${status.completedInstruments}/${status.totalInstruments}`,
+          es: `Instrumentos completados: ${status.completedInstruments}/${status.totalInstruments}`,
+          fr: `Nombre d'instruments complétés : ${status.completedInstruments}/${status.totalInstruments}`
         })}
       </p>
       <div className="pt-2">

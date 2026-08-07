@@ -92,7 +92,8 @@ export const InstrumentSummary = ({
             {title
               ? t({
                   en: `Summary of Results for the ${title}`,
-                  es: `Resumen de resultados del ${title}`,
+                  // Leading with the title avoids `del`, which would force a gender onto every title.
+                  es: `${title}: resumen de resultados`,
                   fr: `${title} : résumé des résultats`
                 })
               : t({

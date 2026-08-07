@@ -233,6 +233,13 @@ export const SeriesInstrumentRenderer = ({
                   })}
                 </Heading>
                 <p className="text-muted-foreground text-sm">
+                  {/*
+                   * `completionMessage?.en` is deliberate on the Spanish line, not a typo.
+                   * `CompletionMessage` is keyed by runtime-core's `Language`, which is `'en' | 'fr'`
+                   * — instruments are authored in those two only, while Spanish is an interface
+                   * language. So a Spanish reader gets the author's English message when there is
+                   * one, and the Spanish default when there is not.
+                   */}
                   {t({
                     en: completionMessage?.en ?? 'You have successfully completed all steps of this instrument.',
                     es: completionMessage?.en ?? 'Ha completado con éxito todos los pasos de este instrumento.',

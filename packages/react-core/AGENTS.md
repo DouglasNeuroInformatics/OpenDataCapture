@@ -41,9 +41,10 @@ augmentation stays outside the exported `src/types.ts`; exporting it would also 
 keyed calls that are safe are libui's own namespace —
 `t('libui.yes')`, `t('libui.no')`, `t('libui.form.submit')` — which libui registers.
 
-Copy supplied by the host app arrives as a prop typed `LocalizedText` (`src/types.ts`), a partial
-record keyed by `Language` that the component resolves with `t()`. `submitButtonLabel` is the only
-prop using it today; follow that shape rather than inventing a namespace.
+Copy supplied by the host app arrives as a prop typed `LocalizedText` (`src/types.ts`), a total
+record keyed by `Language` — every interface language is required — that the component resolves with
+`t()`. `submitButtonLabel` is the only prop using it today; follow that shape rather than inventing a
+namespace.
 
 ## Validation messages
 
