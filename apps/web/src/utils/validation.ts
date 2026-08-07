@@ -1,6 +1,6 @@
 import type { TranslateFunction, TranslationKey } from '@douglasneuroinformatics/libui/i18n';
 import { findPhoneNumberError, MIN_PHONE_DIGITS } from '@opendatacapture/schemas/user';
-import type { PhoneNumberErrorCode } from '@opendatacapture/schemas/user';
+import type { BasePermissionLevel, PhoneNumberErrorCode } from '@opendatacapture/schemas/user';
 import { z } from 'zod/v4';
 
 /**
@@ -65,4 +65,23 @@ function $PhoneNumber(t: TranslateFunction<TranslationKey>, storedValue?: null |
   });
 }
 
-export { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank, omittedIfUnchanged };
+/**
+ * Whether this user must belong to at least one group, shared by the create and update forms so the
+ * two cannot drift apart again.
+ *
+ * A disabled account exists only to attribute uploaded data, so it never needs one. Every other
+ * non-admin does: each read rule granted to a non-admin is scoped to the groups they belong to, so a
+ * groupless user can still create records that no group manager can ever read back. A null
+ * permission level is not an admin, and so counts.
+ */
+function requiresGroup({
+  basePermissionLevel,
+  disabled
+}: {
+  basePermissionLevel?: BasePermissionLevel | null;
+  disabled?: boolean | null;
+}) {
+  return basePermissionLevel !== 'ADMIN' && !disabled;
+}
+
+export { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank, omittedIfUnchanged, requiresGroup };

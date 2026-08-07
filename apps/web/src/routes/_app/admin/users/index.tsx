@@ -19,7 +19,7 @@ import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
-import { $Email, $PhoneNumber, clearedIfBlank, omittedIfUnchanged } from '@/utils/validation';
+import { $Email, $PhoneNumber, clearedIfBlank, omittedIfUnchanged, requiresGroup } from '@/utils/validation';
 
 type UpdateUserFormData = {
   additionalPermissions?: Partial<UserPermission>[];
@@ -93,14 +93,12 @@ const UpdateUserForm: React.FC<{
         });
       })
       .check((ctx) => {
-        if (ctx.value.groupIds.size <= 0 && data.selectedUserBasePermission !== 'ADMIN') {
+        const permissions = { basePermissionLevel: data.selectedUserBasePermission, disabled: ctx.value.disabled };
+        if (requiresGroup(permissions) && ctx.value.groupIds.size <= 0) {
           ctx.issues.push({
             code: 'custom',
-            input: ctx.value.confirmPassword,
-            message: t({
-              en: 'Standard user must be part of a group',
-              fr: "Un utilisateur standard doit faire partie d'un groupe"
-            }),
+            input: ctx.value.groupIds,
+            message: t('common.groupRequired'),
             path: ['groupIds']
           });
         }
@@ -115,7 +113,10 @@ const UpdateUserForm: React.FC<{
           });
         }
       }) satisfies z.ZodType<UpdateUserFormData>;
-  }, [resolvedLanguage, initialValues?.phoneNumber]);
+    // `selectedUserBasePermission` decides whether a group is required, so a schema built for the
+    // previously selected user must not be reused: two users differing only in permission level
+    // would otherwise share one schema and be validated against the wrong rule.
+  }, [data.selectedUserBasePermission, resolvedLanguage, initialValues?.phoneNumber]);
 
   return (
     <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>

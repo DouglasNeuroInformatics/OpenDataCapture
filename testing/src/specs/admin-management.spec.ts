@@ -110,6 +110,56 @@ test.describe('admin management', () => {
     await expect(page).toHaveURL('/admin/users/create');
   });
 
+  test('should reject a non-admin user created without a group', async ({ authenticateAs, page, uniqueId }) => {
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users/create');
+
+    await page.getByLabel('Username').fill(`user${uniqueId}`);
+    await page.getByLabel('Password', { exact: true }).fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('Confirm Password').fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('First Name').fill('Test');
+    await page.getByLabel('Last Name').fill('User');
+    // By testid rather than `getByRole('combobox').first()`: when mail is enabled a welcome-email
+    // language select renders above the form, and `.first()` then opens the wrong one.
+    await page.getByTestId('basePermissionLevel-select-trigger').click();
+    await page.getByTestId('basePermissionLevel-select-item-GROUP_MANAGER').click();
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(
+      page.getByTestId('error-message-text').filter({ hasText: 'must belong to at least one group' })
+    ).toBeVisible();
+    await expect(page).toHaveURL('/admin/users/create');
+  });
+
+  test('should allow a disabled non-admin user with no group, since such an account only attributes uploaded data', async ({
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users/create');
+
+    await page.getByLabel('Username').fill(`user${uniqueId}`);
+    await page.getByLabel('Password', { exact: true }).fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('Confirm Password').fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('First Name').fill('Test');
+    await page.getByLabel('Last Name').fill('User');
+    await page.getByTestId('basePermissionLevel-select-trigger').click();
+    await page.getByTestId('basePermissionLevel-select-item-GROUP_MANAGER').click();
+    // The radio items carry stable ids (`<name>-true`), unlike their labels, which libui translates.
+    await page.locator('#disabled-true').click();
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    // Same dual outcome as the creation test below: a user created without an email gets the
+    // copy-it-manually dialog when a parallel worker holds mail enabled.
+    const fallback = page.getByTestId('welcome-email-fallback');
+    await expect(fallback.or(page.getByTestId('data-table-search-bar'))).toBeVisible();
+    if (await fallback.isVisible()) {
+      await fallback.getByRole('button', { name: 'Done' }).click();
+    }
+    await expect(page).toHaveURL('/admin/users');
+  });
+
   test('should create a user through the UI and show it in the users list @smoke', async ({
     api,
     authenticateAs,
@@ -151,9 +201,9 @@ test.describe('admin management', () => {
   });
 
   test('should edit and delete a user through the manage sheet', async ({ api, authenticateAs, page, uniqueId }) => {
-    // The update form requires a non-empty `groupIds` for any non-ADMIN role (see #1472) --
-    // asymmetric with the create form, which allows an empty group set -- so a groupless user can
-    // never actually be saved from this sheet. Seed one with a group to isolate the behavior under test.
+    // Both forms require a non-empty `groupIds` for any non-ADMIN role that is not disabled, so a
+    // groupless user can never be saved from this sheet. Seed one with a group to isolate the
+    // behavior under test.
     const group = await api.createGroup({ name: `E2E Group ${uniqueId}` });
     const { user } = await api.createUser({ groupIds: [group.id] });
 
