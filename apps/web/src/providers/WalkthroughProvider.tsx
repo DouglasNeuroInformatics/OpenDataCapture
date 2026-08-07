@@ -348,21 +348,25 @@ const Walkthrough = () => {
           fr: 'Graphique'
         })
       },
-      {
-        content: t({
-          en: 'Here, you can create and view assignments, which are instruments for a subject to complete at home.',
-          fr: 'Ici, vous pouvez créer et visualiser des assignations, qui sont des instruments que le client doit compléter à la maison.'
-        }),
-        navigateOptions: {
-          to: '/datahub/123/assignments'
-        },
-        position: 'bottom-left',
-        target: 'a[data-nav-url="/datahub/123/assignments"]',
-        title: t({
-          en: 'Assignments',
-          fr: 'Assignations'
-        })
-      }
+      ...(config.setup.isGatewayEnabled
+        ? [
+            {
+              content: t({
+                en: 'Here, you can create and view assignments, which are instruments for a subject to complete at home.',
+                fr: 'Ici, vous pouvez créer et visualiser des assignations, qui sont des instruments que le client doit compléter à la maison.'
+              }),
+              navigateOptions: {
+                to: '/datahub/123/assignments'
+              },
+              position: 'bottom-left',
+              target: 'a[data-nav-url="/datahub/123/assignments"]',
+              title: t({
+                en: 'Assignments',
+                fr: 'Assignations'
+              })
+            } satisfies WalkthroughStep
+          ]
+        : [])
     ];
   }, [resolvedLanguage]);
 
