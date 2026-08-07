@@ -6,7 +6,7 @@ import { DisclaimerProvider } from '@/providers/DisclaimerProvider';
 import { ForceClearQueryCacheProvider } from '@/providers/ForceClearQueryCacheProvider';
 import { WalkthroughProvider } from '@/providers/WalkthroughProvider';
 import { useAppStore } from '@/store';
-import { reconcileInterfaceLanguage } from '@/utils/language';
+import { reconcileInterfaceLanguage } from '@/services/i18n';
 
 export const Route = createFileRoute('/_app')({
   beforeLoad: async ({ context }) => {
