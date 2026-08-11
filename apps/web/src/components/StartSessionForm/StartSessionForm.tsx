@@ -83,6 +83,7 @@ export const StartSessionForm = ({
                       kind: 'string',
                       label: t('common.identifier'),
                       variant: 'combobox',
+                      allowCustomValue: true,
                       options: Object.fromEntries(customSubjectIds.map((id) => [id, id]))
                     }
                   : null;
