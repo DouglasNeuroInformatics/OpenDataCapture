@@ -18,6 +18,7 @@ import { CircleHelpIcon } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
 import { SaveStatus } from '@/components/SaveStatus';
+import { config } from '@/config';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateSetupStateMutation } from '@/hooks/useUpdateSetupStateMutation';
 import { useAppStore } from '@/store';
@@ -187,49 +188,58 @@ const RouteComponent = () => {
                 />
               </div>
             </SettingSection>
-            <Separator />
-            <SettingSection title={t({ en: 'Settings', fr: 'Paramètres' })}>
-              <div className="flex items-center gap-10">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium">
-                    {t({ en: 'Default Assignment Validity (Days)', fr: 'Validité par défaut des tâches (jours)' })}
-                  </p>
-                  <HoverCard>
-                    <HoverCard.Trigger asChild>
-                      <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
-                        <CircleHelpIcon className="h-4 w-4" />
-                      </button>
-                    </HoverCard.Trigger>
-                    <HoverCard.Content className="w-72 text-sm">
-                      {t({
-                        en: 'The number of days a new remote assignment stays valid by default. This only sets the initial expiry date when creating an assignment, which can still be changed for each one.',
-                        fr: "Le nombre de jours pendant lesquels une nouvelle tâche à distance reste valide par défaut. Ceci ne définit que la date d'expiration initiale lors de la création d'une tâche, qui peut toujours être modifiée pour chacune."
-                      })}
-                    </HoverCard.Content>
-                  </HoverCard>
-                </div>
-                <Input
-                  className="w-[90px] shrink-0"
-                  data-testid="default-assignment-duration-input"
-                  inputMode="numeric"
-                  max={MAX_ASSIGNMENT_DURATION_DAYS}
-                  min={1}
-                  type="number"
-                  value={durationDays}
-                  onBlur={flushDurationOnBlur}
-                  onChange={(event) => {
-                    setDurationDays(event.target.value);
-                    clearTimeout(durationDebounceRef.current);
-                    durationDebounceRef.current = setTimeout(saveDurationIfChanged, DURATION_AUTOSAVE_DELAY);
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      event.currentTarget.blur();
-                    }
-                  }}
-                />
-              </div>
-            </SettingSection>
+            {/* The only thing this section configures is the expiry of a remote assignment, which
+                an instance deployed without the gateway can never create */}
+            {config.setup.isGatewayEnabled && (
+              <React.Fragment>
+                <Separator />
+                <SettingSection title={t({ en: 'Settings', fr: 'Paramètres' })}>
+                  <div className="flex items-center gap-10">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium">
+                        {t({ en: 'Default Assignment Validity (Days)', fr: 'Validité par défaut des tâches (jours)' })}
+                      </p>
+                      <HoverCard>
+                        <HoverCard.Trigger asChild>
+                          <button
+                            className="text-muted-foreground hover:text-foreground transition-colors"
+                            type="button"
+                          >
+                            <CircleHelpIcon className="h-4 w-4" />
+                          </button>
+                        </HoverCard.Trigger>
+                        <HoverCard.Content className="w-72 text-sm">
+                          {t({
+                            en: 'The number of days a new remote assignment stays valid by default. This only sets the initial expiry date when creating an assignment, which can still be changed for each one.',
+                            fr: "Le nombre de jours pendant lesquels une nouvelle tâche à distance reste valide par défaut. Ceci ne définit que la date d'expiration initiale lors de la création d'une tâche, qui peut toujours être modifiée pour chacune."
+                          })}
+                        </HoverCard.Content>
+                      </HoverCard>
+                    </div>
+                    <Input
+                      className="w-[90px] shrink-0"
+                      data-testid="default-assignment-duration-input"
+                      inputMode="numeric"
+                      max={MAX_ASSIGNMENT_DURATION_DAYS}
+                      min={1}
+                      type="number"
+                      value={durationDays}
+                      onBlur={flushDurationOnBlur}
+                      onChange={(event) => {
+                        setDurationDays(event.target.value);
+                        clearTimeout(durationDebounceRef.current);
+                        durationDebounceRef.current = setTimeout(saveDurationIfChanged, DURATION_AUTOSAVE_DELAY);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.currentTarget.blur();
+                        }
+                      }}
+                    />
+                  </div>
+                </SettingSection>
+              </React.Fragment>
+            )}
             <Separator />
             <SettingSection title={t({ en: 'Languages', es: 'Idiomas', fr: 'Langues' })}>
               <div className="flex items-center gap-2">

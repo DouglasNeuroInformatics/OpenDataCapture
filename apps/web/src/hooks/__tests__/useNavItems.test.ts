@@ -10,7 +10,8 @@ const mocks = vi.hoisted(() => {
   return {
     can,
     config: { setup: { isGatewayEnabled: true } },
-    store: { currentGroup: null, currentSession: null, currentUser: { ability: { can } } }
+    setupState: { isExperimentalFeaturesEnabled: false, isMailEnabled: false },
+    store: { currentGroup: { id: 'group-1' }, currentSession: null, currentUser: { ability: { can } } }
   };
 });
 
@@ -21,7 +22,7 @@ vi.mock('@/store', () => ({
 }));
 
 vi.mock('@/hooks/useSetupStateQuery', () => ({
-  useSetupStateQuery: () => ({ data: { isExperimentalFeaturesEnabled: false, isMailEnabled: false } })
+  useSetupStateQuery: () => ({ data: mocks.setupState })
 }));
 
 const navUrls = () =>
@@ -35,6 +36,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.can.mockReturnValue(true);
   mocks.config.setup.isGatewayEnabled = true;
+  mocks.setupState.isMailEnabled = false;
 });
 
 describe('useNavItems', () => {
@@ -52,5 +54,18 @@ describe('useNavItems', () => {
   it('should omit remote assignment when the user cannot create one', () => {
     mocks.can.mockImplementation((action, subject) => !(action === 'create' && subject === 'Assignment'));
     expect(navUrls()).not.toContain('/session/remote-assignment');
+  });
+
+  it('should offer email templates when mail is configured and the gateway is deployed', () => {
+    mocks.setupState.isMailEnabled = true;
+    expect(navUrls()).toContain('/group/email-templates');
+  });
+
+  // The templates are only ever used to email a remote assignment link, and the endpoint that sends
+  // that mail lives in the gateway-gated AssignmentsModule.
+  it('should omit email templates when the gateway is not deployed, even with mail configured', () => {
+    mocks.setupState.isMailEnabled = true;
+    mocks.config.setup.isGatewayEnabled = false;
+    expect(navUrls()).not.toContain('/group/email-templates');
   });
 });

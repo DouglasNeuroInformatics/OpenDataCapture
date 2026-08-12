@@ -87,7 +87,8 @@ export function useNavItems() {
         label: t('layout.navLinks.manageGroup'),
         url: '/group/manage'
       });
-      if (setupStateQuery.data.isMailEnabled) {
+      // These templates exist only to email a remote assignment link, which the gateway serves
+      if (setupStateQuery.data.isMailEnabled && config.setup.isGatewayEnabled) {
         globalItems.push({
           icon: MailIcon,
           label: t({ en: 'Email Templates', fr: 'Modèles de courriel' }),
