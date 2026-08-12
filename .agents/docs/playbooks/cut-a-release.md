@@ -67,13 +67,13 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
 
 7. **Watch the run:** `gh run watch`, or `gh run list --workflow=Release --limit 1` for its id.
 
-   | Job           | What it does                                                                                                                                       | Skips when                           |
-   | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-   | `configure`   | derives the build matrix from `docker compose config` through the jq filter described below; runs `release.cjs` for `version` and `should_release` | never                                |
-   | `validate`    | `pnpm lint`                                                                                                                                        | never                                |
-   | `build`       | buildx `linux/amd64,linux/arm64` per matrix leg, pushing `latest` and the bare version, with `RELEASE_VERSION` as a build arg                      | `should_release != 'true'`           |
-   | `publish-npm` | turbo-builds each publishable package and its closure, then publishes each version not already on npm, over OIDC (no `NPM_TOKEN`)                  | `should_release != 'true'`           |
-   | `release`     | creates the GitHub release tagged `v${version}`                                                                                                    | any of its `needs` skipped or failed |
+   | Job           | What it does                                                                                                                                       | Skips when                                                   |
+   | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+   | `configure`   | derives the build matrix from `docker compose config` through the jq filter described below; runs `release.cjs` for `version` and `should_release` | never                                                        |
+   | `validate`    | `pnpm lint`                                                                                                                                        | never                                                        |
+   | `build`       | buildx `linux/amd64,linux/arm64` per matrix leg, pushing `latest` and the bare version, with `RELEASE_VERSION` as a build arg                      | never — guards on `should_release`, which is always `'true'` |
+   | `publish-npm` | turbo-builds each publishable package and its closure, then publishes each version not already on npm, over OIDC (no `NPM_TOKEN`)                  | never — same guard                                           |
+   | `release`     | creates the GitHub release tagged `v${version}`                                                                                                    | any of its `needs` skipped or failed                         |
 
    **No playground image ships.** The filter keeps only compose services declaring **both** `build` and
    `image`, and `playground` declares no `image:` key. `scripts/publish.sh` is not the way to add it back:
@@ -85,12 +85,19 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    leading `v` appears on the GitHub tag alone, and `RELEASE_VERSION` cannot carry one
    (`packages/release-info/AGENTS.md`).
 
-8. **Expect a full build even when nothing changed.** `release.cjs` matches GHCR tags against
-   `/^v(\d+\.\d+\.\d+(-(alpha|beta)\.\d+)?)$/` while `build` pushes unprefixed tags, so
-   `extractPackageVersionTag` returns `null` and `should_release` is `'true'` on every push to `main`.
-   Pushing without a bump re-pushes the same image tags and updates the existing GitHub release in place
-   rather than skipping. Report that as a finding; a release is not the moment to change the release
-   script.
+8. **Expect a full build even when nothing changed.** `release.cjs` reads the root `package.json`
+   version and sets `should_release` to `'true'` unconditionally — by design, and it reads nothing
+   outside the repository to decide. Pushing without a bump re-pushes the same image tags and updates
+   the existing GitHub release in place rather than skipping. That is the intended behaviour, not a
+   finding.
+
+   It used to ask GHCR which version carried the `latest` tag and skip when that matched. The
+   comparison never fired — the regex required a leading `v` and `build` pushes bare tags — while the
+   lookup threw `Failed to find package '<name>' with tag 'latest'` and failed `configure` outright
+   whenever no image carried `latest`. Deleting a bad release does exactly that: `build` pushes
+   `latest` and the version onto one manifest, so removing that version removes both tags. Do not
+   reintroduce a gate that depends on registry state — a deleted release must never be able to wedge
+   the next one.
 
 9. **Confirm all three artifacts carry the new version** — the images, the npm packages, the GitHub
    release. Done when the `## Verify` block below is clean for each.

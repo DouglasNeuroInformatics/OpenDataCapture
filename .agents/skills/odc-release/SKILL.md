@@ -52,9 +52,21 @@ from the run.
 Machinery oddities, verified and already understood — say so in your reply and carry on. A red `build` is not one
 of them; that is a failure to fix.
 
-- Every push to `main` performs a full release — `should_release` is always `'true'`.
+- Every push to `main` performs a full release — `release.cjs` sets `should_release` to `'true'` unconditionally, on
+  purpose. It consults nothing outside the repository, so no registry state can wedge it; do not add a gate that
+  reads GHCR or npm back. The gate that used to live there is in `.agents/docs/playbooks/cut-a-release.md`.
 - No playground image ships — the matrix filter drops it.
 - Nothing enforces the version lockstep; you do, above.
+
+## Pulling a bad release takes `latest` with it
+
+`build` pushes `latest` and the bare version onto **one** manifest, so deleting that GHCR package version deletes
+both tags. Delete the two most recent releases and the images have no `latest` at all — every
+`docker pull ghcr.io/douglasneuroinformatics/open-data-capture-api:latest` fails until the next release restores it,
+and nothing in this repo reports that. Cut the replacement release promptly, or retag a known-good version by hand.
+Deleting the GitHub release and its `v<version>` tag is independent of the images and of npm, where a version older
+than 72h cannot be unpublished at all — pulling a release means pulling it in three places, and only the images
+carry `latest`.
 
 Done when every release-machinery oddity you hit is either in that list or in your reply — the reason for any one
 of them is in `.agents/docs/playbooks/cut-a-release.md`.
