@@ -8,6 +8,7 @@ export default { component: StartSessionForm } as Meta<typeof StartSessionForm>;
 
 export const Default: Story = {
   args: {
+    customSubjectIds: ['SUBJECT_001', 'SUBJECT_002', 'SUBJECT_003'],
     onSubmit(data) {
       alert(JSON.stringify(data, null, 2));
     }
