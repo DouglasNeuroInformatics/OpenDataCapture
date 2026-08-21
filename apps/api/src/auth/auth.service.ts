@@ -64,6 +64,7 @@ export class AuthService {
       groups: user.groups,
       id: user.id,
       lastName: user.lastName,
+      mustResetPassword: user.mustResetPassword ?? false,
       username: user.username
     };
 

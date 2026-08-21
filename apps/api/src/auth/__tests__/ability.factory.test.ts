@@ -33,6 +33,29 @@ describe('AbilityFactory', () => {
     expect(ability.can('manage', 'all')).toBe(true);
   });
 
+  it('should reduce a user owing a password reset to reading themselves, whatever their permission level', () => {
+    const ability = abilityFactory.createForPayload({
+      additionalPermissions: [{ action: 'read', subject: 'Subject' }],
+      basePermissionLevel: 'ADMIN',
+      firstName: 'Test',
+      groups: [{ id: 'group-1' }],
+      id: 'user-1',
+      lastName: 'User',
+      mustResetPassword: true,
+      username: 'admin-user'
+    } as any);
+
+    // Allowed, because `updateSelfById` is gated on it and is the only way out of the reset.
+    expect(ability.can('read', subject('User', { id: 'user-1' }) as any)).toBe(true);
+
+    // Everything else is refused, including the level's own grants and any additional permissions.
+    expect(ability.can('manage', 'all')).toBe(false);
+    expect(ability.can('read', subject('User', { id: 'user-2' }) as any)).toBe(false);
+    expect(ability.can('update', subject('User', { id: 'user-1' }) as any)).toBe(false);
+    expect(ability.can('read', 'Subject')).toBe(false);
+    expect(ability.can('read', 'InstrumentRecord')).toBe(false);
+  });
+
   it('should allow group manager to manage their group', () => {
     const payload = {
       additionalPermissions: undefined,
