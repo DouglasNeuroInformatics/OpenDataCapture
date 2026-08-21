@@ -45,6 +45,14 @@ src/<feature>/
 
 There is no repository layer and no `entity/` folder — `Model<'X'>` _is_ the repository.
 
+**A single-segment route can be shadowed by a `:param` route on the same verb.** `perfectionist/sort-classes`
+is an eslint error, so `eslint --fix` orders controller handlers alphabetically — a handler you wrote
+above `@Get(':id')` does not stay there. Anything that sorts below it, such as a hypothetical
+`@Get('summary')` in `users.controller.ts`, is matched by `:id` instead, and the failure is a
+confusing 404 or cast error rather than a lint or type failure. Give such a route two segments so
+matching cannot depend on declaration order at all — `@Get('/check-username/:username')` is safe for
+exactly that reason.
+
 **A new module must be added to the `imports` array in `src/main.ts`** or its routes will not exist.
 Modules can be imported conditionally with `{ module: XModule, when: 'SOME_BOOLEAN_ENV_KEY' }`.
 
@@ -93,6 +101,15 @@ see `findInstrumentIdsBySubject` in `src/instruments/instruments.service.ts`.
 
 Granting a new `action`/`subject` pair means editing `src/auth/ability.factory.ts` and adding tests
 for **both** the allow and the deny case — see `src/auth/__tests__/ability.factory.test.ts`.
+
+`createForPayload` returns early, before the `basePermissionLevel` switch and before
+`additionalPermissions`, for a user whose token carries `mustResetPassword` — their only rule is
+`read User` conditioned on their own id, which is what `updateSelfById` is gated on. That is how
+"must reset before using the app" is enforced: as a permission set rather than as a guard holding an
+allowlist of exempt routes, so a route added later is refused without anyone remembering to refuse
+it. Note the two halves above apply in full: routes naming another subject 403 at the guard, while
+the four routes gated on `read User` still **pass** the guard — a conditional rule satisfies a
+subject-type check — and are confined instead by `accessibleQuery` applying the condition.
 
 CASL subjects are derived automatically from the Prisma `TypeMap`, so every model is a subject
 without you doing anything. But the subjects a user can be _granted_ through `additionalPermissions`
