@@ -27,6 +27,7 @@ import { UploadInstrumentPage } from '../pages/_app/upload/$instrumentId.page';
 import { UploadPage } from '../pages/_app/upload/index.page';
 import { UserPage } from '../pages/_app/user.page';
 import { LoginPage } from '../pages/auth/login.page';
+import { ResetPasswordPage } from '../pages/auth/reset-password.page';
 import { ApiClient } from './api-client';
 import { ADMIN } from './constants';
 import { baseURL } from './env';
@@ -43,6 +44,7 @@ const pageModels = {
   '/admin/mail': MailSettingsPage,
   '/admin/settings': AdminSettingsPage,
   '/auth/login': LoginPage,
+  '/auth/reset-password': ResetPasswordPage,
   '/contact': ContactPage,
   '/dashboard': DashboardPage,
   '/datahub': DatahubPage,
