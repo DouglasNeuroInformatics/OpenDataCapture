@@ -17,6 +17,8 @@ import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
 import { useDeleteUserMutation } from '@/hooks/useDeleteUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
+import { usePasswordGenerator } from '@/hooks/usePasswordGenerator';
+import type { PasswordFormValues } from '@/hooks/usePasswordGenerator';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
@@ -39,6 +41,15 @@ type UpdateUserFormData = {
   phoneNumber?: string | undefined;
 };
 
+/**
+ * `mustResetPassword` is not a form field — it is derived at submission from whether the password
+ * being saved is the generated one, so it is carried alongside the form data rather than in it.
+ */
+type UpdateUserSubmitData = UpdateUserFormData & {
+  additionalPermissions?: UserPermission[];
+  mustResetPassword?: boolean;
+};
+
 type UpdateUserFormInputData = {
   disableDelete: boolean;
   groupOptions: {
@@ -52,11 +63,12 @@ const UpdateUserForm: React.FC<{
   data: UpdateUserFormInputData;
   onDelete: () => void;
   onError: (error: ZodErrorLike) => void;
-  onSubmit: (data: UpdateUserFormData & { additionalPermissions?: UserPermission[] }) => Promisable<void>;
-}> = ({ data, onDelete, onError, onSubmit }) => {
+  onSubmit: (data: UpdateUserSubmitData) => Promisable<void>;
+}> = ({ data, onDelete, onSubmit }) => {
   const { disableDelete, groupOptions, initialValues } = data;
   const { resolvedLanguage, t } = useTranslation();
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const { applyGeneratedPassword, generatedPassword, generatePassword, isGeneratedPassword } = usePasswordGenerator();
 
   const $UpdateUserFormData = useMemo(() => {
     return z
@@ -146,6 +158,7 @@ const UpdateUserForm: React.FC<{
                 calculateStrength: (password) => {
                   return estimatePasswordStrength(password).score;
                 },
+                generatePassword,
                 kind: 'string',
                 label: t('common.password'),
                 variant: 'password'
@@ -311,10 +324,23 @@ const UpdateUserForm: React.FC<{
         }}
         key={JSON.stringify(initialValues)}
         submitBtnLabel={t('core.save')}
+        subscribe={{
+          // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
+          // position, so `setValues` is inferred as an error type rather than a setter.
+          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) =>
+            applyGeneratedPassword(setValues),
+          selector: () => generatedPassword
+        }}
         validationSchema={$UpdateUserFormData}
         onError={onError}
         onSubmit={({ additionalPermissions, ...data }) =>
-          onSubmit({ additionalPermissions: additionalPermissions as undefined | UserPermission[], ...data })
+          onSubmit({
+            additionalPermissions: additionalPermissions as undefined | UserPermission[],
+            ...data,
+            // Left undefined when the password field is blank, so saving other changes to a user who
+            // still owes a reset does not quietly lift it.
+            mustResetPassword: data.password ? isGeneratedPassword(data.password) : undefined
+          })
         }
       />
       <Dialog.Content>

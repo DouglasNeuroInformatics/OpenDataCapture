@@ -6,10 +6,10 @@ import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Button, CopyButton, Dialog, Form, Heading, Label } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@opendatacapture/schemas/core';
-import { $BasePermissionLevel, $CreateUserData, PASSWORD_ERROR_CODES } from '@opendatacapture/schemas/user';
-import type { CreateUserData, PasswordErrorCode } from '@opendatacapture/schemas/user';
+import { $BasePermissionLevel, $CreateUserData } from '@opendatacapture/schemas/user';
+import type { CreateUserData } from '@opendatacapture/schemas/user';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import axios, { isAxiosError } from 'axios';
+import axios from 'axios';
 import { z } from 'zod/v4';
 
 import { LanguageSelect } from '@/components/LanguageSelect';
@@ -17,21 +17,11 @@ import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useMailErrorMessage } from '@/hooks/useMailErrorMessage';
+import { usePasswordErrorMessage } from '@/hooks/usePasswordErrorMessage';
+import { usePasswordGenerator } from '@/hooks/usePasswordGenerator';
+import type { PasswordFormValues } from '@/hooks/usePasswordGenerator';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { $Email, $PhoneNumber, omittedIfBlank, requiresGroup } from '@/utils/validation';
-
-const PASSWORD_ERROR_TRANSLATION_KEYS = {
-  INSUFFICIENT_PASSWORD_STRENGTH: 'common.insufficientPasswordStrength',
-  PASSWORD_IN_DATA_BREACH: 'common.passwordInDataBreach',
-  PASSWORD_MATCHES_USERNAME: 'common.passwordMatchesUsername'
-} as const satisfies { [code in PasswordErrorCode]: string };
-
-function parsePasswordErrorCode(data: unknown): null | PasswordErrorCode {
-  if (typeof data === 'object' && data !== null && 'code' in data && typeof data.code === 'string') {
-    return (PASSWORD_ERROR_CODES as readonly string[]).includes(data.code) ? (data.code as PasswordErrorCode) : null;
-  }
-  return null;
-}
 
 const RouteComponent = () => {
   const { resolvedLanguage, t } = useTranslation();
@@ -41,6 +31,8 @@ const RouteComponent = () => {
   const notification = useNotificationsStore();
   const setupStateQuery = useSetupStateQuery();
   const mailErrorMessage = useMailErrorMessage();
+  const passwordErrorMessage = usePasswordErrorMessage();
+  const { applyGeneratedPassword, generatePassword, generatedPassword, isGeneratedPassword } = usePasswordGenerator();
 
   // When the welcome email cannot be delivered, we surface its rendered text here so
   // the admin can copy it and send it manually. Navigation is deferred until dismissed.
@@ -70,18 +62,10 @@ const RouteComponent = () => {
     try {
       created = await createUserMutation.mutateAsync({ data, language: emailLanguage });
     } catch (err) {
-      if (isAxiosError(err) && err.response?.status === 400) {
-        const code = parsePasswordErrorCode(err.response.data);
-        notification.addNotification({
-          message: code ? t(PASSWORD_ERROR_TRANSLATION_KEYS[code]) : createUserFailedMessage,
-          type: 'error'
-        });
-      } else {
-        notification.addNotification({
-          message: createUserFailedMessage,
-          type: 'error'
-        });
-      }
+      notification.addNotification({
+        message: passwordErrorMessage(err, createUserFailedMessage),
+        type: 'error'
+      });
       return;
     }
     const welcomeEmail = created.welcomeEmail;
@@ -157,6 +141,7 @@ const RouteComponent = () => {
                 calculateStrength: (password) => {
                   return estimatePasswordStrength(password).score;
                 },
+                generatePassword,
                 kind: 'string',
                 label: t('common.password'),
                 variant: 'password'
@@ -271,6 +256,13 @@ const RouteComponent = () => {
         initialValues={{
           disabled: false
         }}
+        subscribe={{
+          // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
+          // position, so `setValues` is inferred as an error type rather than a setter.
+          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) =>
+            applyGeneratedPassword(setValues),
+          selector: () => generatedPassword
+        }}
         validationSchema={$CreateUserData
           .omit({
             groupIds: true
@@ -327,6 +319,7 @@ const RouteComponent = () => {
             ...data,
             email: omittedIfBlank(email),
             groupIds: Array.from(groupIds ?? []),
+            mustResetPassword: isGeneratedPassword(data.password),
             phoneNumber: omittedIfBlank(phoneNumber)
           })
         }
