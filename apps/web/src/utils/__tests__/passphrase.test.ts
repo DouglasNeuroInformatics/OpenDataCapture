@@ -30,6 +30,12 @@ describe('generatePassphrase', () => {
 });
 
 describe('WORD_LIST', () => {
+  // The file is marked `linguist-generated`, so it is collapsed in review and nobody reads it. This
+  // is what would notice a word being added or dropped.
+  it('should hold the number of words the documented entropy is derived from', () => {
+    expect(WORD_LIST).toHaveLength(1295);
+  });
+
   it('should contain no word holding the separator, so the word boundaries of a passphrase are unambiguous', () => {
     expect(WORD_LIST.filter((word) => word.includes(PASSPHRASE_SEPARATOR))).toStrictEqual([]);
   });
