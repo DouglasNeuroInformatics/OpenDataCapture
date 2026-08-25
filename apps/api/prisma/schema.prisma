@@ -58,6 +58,9 @@ model AuditLog {
   user      User?          @relation(fields: [userId], references: [id])
   userId    String?        @db.ObjectId
 
+  @@index([timestamp])
+  @@index([groupId, timestamp])
+  @@index([userId, timestamp])
   @@map("AuditLogModel")
 }
 
@@ -78,6 +81,8 @@ model Assignment {
   url               String
   encryptionKeyPair EncryptionKeyPair
 
+  @@index([groupId])
+  @@index([subjectId])
   @@map("AssignmentModel")
 }
 
@@ -92,7 +97,6 @@ enum SubjectIdentificationMethod {
   CUSTOM_ID
   PERSONAL_INFO
 }
-
 
 type GroupSettings {
   defaultIdentificationMethod   SubjectIdentificationMethod
@@ -151,30 +155,37 @@ model Group {
 /// Instrument Records
 
 model InstrumentRecord {
-  createdAt        DateTime               @default(now()) @db.Date
-  updatedAt        DateTime               @updatedAt @db.Date
-  id               String                 @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt          DateTime               @default(now()) @db.Date
+  updatedAt          DateTime               @updatedAt @db.Date
+  id                 String                 @id @default(auto()) @map("_id") @db.ObjectId
   /// [ComputedMeasures]
-  computedMeasures Json?
-  data             Json?
-  date             DateTime               @db.Date
-  files            InstrumentRecordFile[]
-  group            Group?                 @relation(fields: [groupId], references: [id])
-  groupId          String?                @db.ObjectId
-  subject          Subject                @relation(fields: [subjectId], references: [id])
-  subjectId        String
-  instrument       Instrument             @relation("InstrumentRecords", fields: [instrumentId], references: [id])
-  instrumentId     String
+  computedMeasures   Json?
+  data               Json?
+  date               DateTime               @db.Date
+  files              InstrumentRecordFile[]
+  group              Group?                 @relation(fields: [groupId], references: [id])
+  groupId            String?                @db.ObjectId
+  subject            Subject                @relation(fields: [subjectId], references: [id])
+  subjectId          String
+  instrument         Instrument             @relation("InstrumentRecords", fields: [instrumentId], references: [id])
+  instrumentId       String
   // The series instrument, if any, that orchestrated this record's collection. Null for records
   // collected outside a series. The series id encodes the exact ordered composition of its forms.
-  seriesInstrument   Instrument?          @relation("SeriesInstrumentRecords", fields: [seriesInstrumentId], references: [id])
+  seriesInstrument   Instrument?            @relation("SeriesInstrumentRecords", fields: [seriesInstrumentId], references: [id])
   seriesInstrumentId String?
-  assignment       Assignment?            @relation(fields: [assignmentId], references: [id])
-  assignmentId     String?                @unique
-  session          Session                @relation(fields: [sessionId], references: [id])
-  sessionId        String                 @db.ObjectId
-  pending          Boolean?
+  assignment         Assignment?            @relation(fields: [assignmentId], references: [id])
+  // Prisma requires @unique here for the 1:1 relation, but builds the index non-sparse, and MongoDB
+  // indexes a missing field as null — so a second record without an assignment would collide.
+  // ensureDatabaseIndexes in src/core/prisma.ts creates this one sparse instead.
+  assignmentId       String?                @unique
+  session            Session                @relation(fields: [sessionId], references: [id])
+  sessionId          String                 @db.ObjectId
+  pending            Boolean?
 
+  @@index([subjectId, instrumentId, date])
+  @@index([groupId, date])
+  @@index([instrumentId])
+  @@index([sessionId])
   @@map("InstrumentRecordModel")
 }
 
@@ -190,6 +201,7 @@ model InstrumentRecordFile {
   recordId  String           @db.ObjectId
   size      Int
 
+  @@index([recordId])
   @@map("InstrumentRecordFileModel")
 }
 
@@ -233,19 +245,19 @@ model Instrument {
 // Instrument Repos
 
 model InstrumentRepo {
-  createdAt     DateTime   @default(now()) @db.Date
-  updatedAt     DateTime   @updatedAt @db.Date
-  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt     DateTime  @default(now()) @db.Date
+  updatedAt     DateTime  @updatedAt @db.Date
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
   // Display label only (derived from the repo name); not unique because two owners may have repos with
   // the same name (e.g. alice/forms and bob/forms). `url` is the true identity and is unique.
   name          String
   owner         String
   repoName      String
-  url           String     @unique
+  url           String    @unique
   instrumentIds String[]
-  groupIds      String[]   @db.ObjectId
-  groups        Group[]    @relation(fields: [groupIds], references: [id])
-  lastSyncedAt  DateTime?  @db.Date
+  groupIds      String[]  @db.ObjectId
+  groups        Group[]   @relation(fields: [groupIds], references: [id])
+  lastSyncedAt  DateTime? @db.Date
   // AES-256-GCM encrypted GitHub personal access token, used to access private repositories.
   accessToken   String?
 
@@ -273,6 +285,7 @@ model Subject {
   instrumentRecords InstrumentRecord[]
   assignments       Assignment[]
 
+  @@index([groupIds])
   @@map("SubjectModel")
 }
 
@@ -327,6 +340,7 @@ model User {
   email                 String?
   disabled              Boolean?
 
+  @@unique([username])
   @@map("UserModel")
 }
 
@@ -350,6 +364,8 @@ model Session {
   userId            String?            @db.ObjectId
   type              SessionType
 
+  @@index([groupId, date])
+  @@index([subjectId])
   @@map("SessionModel")
 }
 

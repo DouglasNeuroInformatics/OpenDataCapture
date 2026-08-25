@@ -130,6 +130,45 @@ test.describe('instrument completion', () => {
     await expect(page.getByTestId('data-table-body').getByTestId('data-table-row').first()).toBeVisible();
   });
 
+  // Records collected in person carry no assignmentId, and MongoDB indexes a missing field as null.
+  // The unique index the schema declares on that field therefore has to be sparse, or the second
+  // record here is rejected with a duplicate key error. See ensureDatabaseIndexes in the api's src/core/prisma.ts.
+  test('should administer the same instrument twice for one subject, neither record having an assignment', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Repeat${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    for (const _ of [1, 2]) {
+      await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+      await page.waitForURL('**/instruments/accessible-instruments');
+
+      const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
+      await expect(card).toBeVisible();
+      await card.click();
+
+      const instrumentPage = new RenderInstrumentPage(page);
+      await instrumentPage.begin();
+      await instrumentPage.completeHappinessQuestionnaire();
+      await instrumentPage.submit();
+      await expect(instrumentPage.summaryHeading).toBeVisible();
+    }
+
+    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
+    await page.waitForURL('**/datahub/**/table');
+
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: INSTRUMENT_TITLE }).click();
+
+    await expect(page.getByTestId('data-table-body').getByTestId('data-table-row')).toHaveCount(2);
+  });
+
   test('should show a validation error for a postal code that does not match the expected format', async ({
     getPageModel,
     page,
