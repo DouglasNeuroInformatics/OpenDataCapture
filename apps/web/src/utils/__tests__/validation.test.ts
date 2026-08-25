@@ -3,7 +3,15 @@ import { MIN_PHONE_DIGITS } from '@opendatacapture/schemas/user';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod/v4';
 
-import { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank, omittedIfUnchanged, requiresGroup } from '../validation';
+import {
+  $Email,
+  $PhoneNumber,
+  clearedIfBlank,
+  omittedIfBlank,
+  omittedIfUnchanged,
+  requiresGroup,
+  validationSummary
+} from '../validation';
 
 const t: TranslateFunction<TranslationKey> = (arg) => (typeof arg === 'string' ? arg : (arg.en ?? ''));
 
@@ -126,5 +134,24 @@ describe('requiresGroup', () => {
 
   it('should still require a group for a non-admin explicitly marked as enabled', () => {
     expect(requiresGroup({ basePermissionLevel: 'STANDARD', disabled: false })).toBe(true);
+  });
+});
+
+describe('validationSummary', () => {
+  const errorWith = (...messages: string[]) => ({
+    issues: messages.map((message) => ({ code: 'custom', message, path: [] })),
+    name: 'ZodError'
+  });
+
+  it('should state every distinct reason the submit was rejected', () => {
+    expect(validationSummary(errorWith('Invalid email address', 'Passwords must match'))).toBe(
+      'Invalid email address Passwords must match'
+    );
+  });
+
+  it('should say a repeated reason once, since several blank fields raise one shared message', () => {
+    expect(validationSummary(errorWith('This field is required', 'This field is required'))).toBe(
+      'This field is required'
+    );
   });
 });

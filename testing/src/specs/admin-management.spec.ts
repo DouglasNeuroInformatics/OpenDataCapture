@@ -232,6 +232,31 @@ test.describe('admin management', () => {
     await expect(page.getByTestId('data-table-row').filter({ hasText: user.username })).toHaveCount(0);
   });
 
+  test('should say why a save failed when the rejected field is scrolled out of view', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    // The API accepts a non-admin user with no group; the manage sheet, like the create form, does
+    // not. Groups is its last section, so the inline rejection sits below the fold of a sheet the
+    // admin submits from the top of -- the submit otherwise reads as a no-op (#1472).
+    const { user } = await api.createUser({ groupIds: [] });
+
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users');
+    await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(user.username);
+    await page.getByTestId('data-table-row').dblclick();
+
+    const editSheet = page.getByTestId('admin-user-edit-sheet');
+    await editSheet.getByLabel('Email').fill(`${user.username}@example.com`);
+    await editSheet.getByRole('button', { name: 'Submit' }).click();
+
+    const submitError = page.getByTestId('admin-user-edit-error');
+    await expect(submitError).toBeVisible();
+    await expect(submitError).toContainText('must belong to at least one group');
+    await expect(editSheet).toBeVisible();
+  });
+
   test('should create a user whose email was typed and then cleared', async ({ authenticateAs, page, uniqueId }) => {
     const username = `user_${uniqueId}`;
 

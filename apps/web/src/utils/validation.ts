@@ -1,3 +1,4 @@
+import type { ZodErrorLike } from '@douglasneuroinformatics/libjs';
 import type { TranslateFunction, TranslationKey } from '@douglasneuroinformatics/libui/i18n';
 import { findPhoneNumberError, MIN_PHONE_DIGITS } from '@opendatacapture/schemas/user';
 import type { BasePermissionLevel, PhoneNumberErrorCode } from '@opendatacapture/schemas/user';
@@ -84,4 +85,13 @@ function requiresGroup({
   return basePermissionLevel !== 'ADMIN' && !disabled;
 }
 
-export { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank, omittedIfUnchanged, requiresGroup };
+/**
+ * What to tell the user about a submit their form data never passed. Messages are deduplicated
+ * because the common failure — several blank required fields — otherwise repeats one sentence once
+ * per field.
+ */
+function validationSummary({ issues }: ZodErrorLike) {
+  return Array.from(new Set(issues.map((issue) => issue.message))).join(' ');
+}
+
+export { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank, omittedIfUnchanged, requiresGroup, validationSummary };
