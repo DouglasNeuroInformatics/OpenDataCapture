@@ -233,6 +233,15 @@ test.describe('authorization', () => {
   });
 });
 
+/** A real, already-interpretable bundle: the first seeded instrument's own compiled source. */
+async function readSeededBundle(request: APIRequestContext, token: string): Promise<string> {
+  const headers = { Authorization: `Bearer ${token}` };
+  const [instrument] = (await (await request.get(`${API}/instruments/info`, { headers })).json()) as { id: string }[];
+  const container = await request.get(`${API}/instruments/bundle/${instrument!.id}`, { headers });
+  expect(container.ok()).toBe(true);
+  return ((await container.json()) as { bundle: string }).bundle;
+}
+
 /** The user list `/admin/users` renders, read with the given user's own token. */
 async function readUsernames(request: APIRequestContext, token: string): Promise<string[]> {
   const response = await request.get(`${API}/users`, { headers: { Authorization: `Bearer ${token}` } });
@@ -264,6 +273,46 @@ test.describe('server-side authorization', () => {
       }
     });
   }
+
+  // The playground uploads a bundle with a token minted by `GET /auth/create-instrument-token`, and
+  // that token is the only non-interactive caller of `POST /instruments`. Nothing else in the suite
+  // exercises it, which is how #1392 severed the two: the route moved to `manage Instrument` while
+  // the token still carried `create`, and every upload answered 403.
+  test.describe('granular instrument token', () => {
+    test('should let an administrator mint a token their own bundle upload is accepted with', async ({
+      adminToken,
+      apiRequestContext
+    }) => {
+      const minted = await apiRequestContext.get(`${API}/auth/create-instrument-token`, {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+      expect(minted.status()).toBe(200);
+      const { accessToken } = (await minted.json()) as { accessToken: string };
+
+      // Re-posting a seeded instrument's own bundle. The conflict is the point: reaching the
+      // duplicate check means the guard admitted the token and the bundle was really interpreted
+      // and validated server-side, which a 403 would have cut short.
+      const response = await apiRequestContext.post(`${API}/instruments`, {
+        data: { bundle: await readSeededBundle(apiRequestContext, adminToken) },
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+
+      expect(response.status(), 'a minted token must be accepted by the instrument create route').toBe(409);
+    });
+
+    test('should not mint a token for a group manager, whose create grant is for series instruments', async ({
+      apiRequestContext,
+      roleAccount
+    }) => {
+      const { accessToken } = await roleAccount('GROUP_MANAGER');
+
+      const response = await apiRequestContext.get(`${API}/auth/create-instrument-token`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+
+      expect(response.status()).toBe(403);
+    });
+  });
 
   // A group manager holds `manage Group` for their own groups, and `@RouteAccess` sees only the
   // subject type, so the guard lets these through and the row scoping in `GroupsService` is the

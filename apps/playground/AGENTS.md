@@ -87,6 +87,12 @@ The playground has no backend and no baked-in API URL, but it is not offline-onl
 `/v1/auth/create-instrument-token`, `/v1/instruments`) with a raw `axios` call and a bearer token held
 in the store. There is no shared axios instance and no React Query here.
 
+The token `/v1/auth/create-instrument-token` mints is scoped to `manage Instrument`, which is what
+`POST /v1/instruments` requires — the two actions must stay in step, and this dialog is that route's
+only caller, so tightening it silently breaks upload here and nowhere else (#1392). It is scoped no
+narrower because a bundle is evaluated server-side: whoever may create an instrument can already run
+code on the API. `testing/src/specs/authorization.spec.ts` pins the contract.
+
 Share links come from `@opendatacapture/playground-url`, which lz-string-compresses file contents into
 a query parameter. Its `$EditorFile` requires `content` to be a UTF-8 string, so binary assets do not
 survive a share URL.
