@@ -122,8 +122,26 @@ or `ValidObjectIdPipe` explicitly — see `src/audit/audit.controller.ts` and
 
 ## Prisma / database
 
-Provider is **MongoDB, so there are no migrations** — `prisma db push` only, and nothing to check in
-after a schema change beyond `schema.prisma` itself.
+Provider is **MongoDB, so there are no migrations**. Nothing is checked in after a schema change
+beyond `schema.prisma` itself, and **nothing in this app runs `prisma db push`**. This workspace
+defines no `db:push` script, so the `db:push` that `dev`, `dev:test`, `lint` and `test:e2e` depend on
+resolves to nothing here; the only workspace that owns one is `apps/gateway`, whose datasource is
+SQLite. The Dockerfile only builds.
+
+**Indexes are created at startup instead**, by `ensureDatabaseIndexes` in `src/core/prisma.ts`,
+which the client factory awaits after `$connect()`. MongoDB creates a collection on first insert
+with only its `_id_` index, so without that step a deployed instance scans whole collections and
+enforces none of the schema's unique constraints. Adding an index means editing **both**
+`schema.prisma` and `DATABASE_INDEXES`, which
+`src/core/__tests__/prisma.spec.ts` asserts agree — `db push` drops any index the schema
+does not declare, and a runtime-only index would not survive one.
+
+**Do not point `prisma db push` at a database this application uses.** `InstrumentRecord.assignmentId`
+is optional but must carry `@unique`, because Prisma requires it on the defining side of the 1:1
+relation to `Assignment`. `db push` builds that index non-sparse, MongoDB indexes a missing field as
+null, and the second record collected outside a remote assignment is then rejected with a duplicate
+key error. `ensureDatabaseIndexes` creates it sparse and replaces a non-sparse one it finds, so an
+instance recovers on its next boot — but the push is still what broke it.
 
 `datasource db { url = env("_") }` in `apps/api/prisma/schema.prisma` is **deliberate**; the real
 connection string is built at runtime in `src/core/prisma.ts`. Do not "fix" it.

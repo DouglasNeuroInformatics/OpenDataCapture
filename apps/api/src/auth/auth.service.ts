@@ -20,12 +20,15 @@ export class AuthService {
     private readonly usersService: UsersService
   ) {}
 
+  // Scoped to `manage` rather than `create` because that is what `POST /instruments` requires. A
+  // narrower token would buy nothing: an uploaded bundle is evaluated server-side, so whoever may
+  // create an instrument can already run code here.
   async getCreateInstrumentToken(currentUser: RequestUser) {
-    if (!currentUser.ability.can('create', 'Instrument')) {
+    if (!currentUser.ability.can('manage', 'Instrument')) {
       throw new ForbiddenException();
     }
 
-    const limitedAbility = this.abilityFactory.createForPermissions([{ action: 'create', subject: 'Instrument' }]);
+    const limitedAbility = this.abilityFactory.createForPermissions([{ action: 'manage', subject: 'Instrument' }]);
 
     return {
       accessToken: await this.jwtService.signAsync({ permissions: limitedAbility.rules }, { expiresIn: '1h' })
