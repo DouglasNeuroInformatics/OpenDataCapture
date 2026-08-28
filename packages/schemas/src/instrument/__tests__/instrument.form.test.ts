@@ -32,6 +32,25 @@ describe('$FormInstrument', () => {
     });
     expect(result.success).toBe(true);
   });
+
+  // Zod strips what it does not declare, and `apps/web` only validates in development while the
+  // playground always does — so omitting `resetButton` here would drop the flag in exactly the places
+  // an author tests their instrument, while leaving it intact in production.
+  it('should preserve resetButton rather than stripping it', () => {
+    const result = $FormInstrument.safeParse({ ...unilingualFormInstrument.instance, resetButton: true });
+    expect(result.success).toBe(true);
+    expect(result.data).toHaveProperty('resetButton', true);
+  });
+
+  it('should parse a form that omits resetButton, since it is optional', () => {
+    const result = $FormInstrument.safeParse(unilingualFormInstrument.instance);
+    expect(result.success).toBe(true);
+    expect(result.data).not.toHaveProperty('resetButton');
+  });
+
+  it('should reject a non-boolean resetButton', () => {
+    expect($FormInstrument.safeParse({ ...unilingualFormInstrument.instance, resetButton: 'yes' }).success).toBe(false);
+  });
 });
 
 describe('$FormInstrumentBlock', () => {
