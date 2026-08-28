@@ -225,6 +225,7 @@ const $$FormInstrument = <TLanguage extends InstrumentLanguage>(language?: TLang
     content: $$FormInstrumentContent(language),
     initialValues: z.record(z.string(), z.any()).optional(),
     kind: z.literal('FORM'),
+    resetButton: z.boolean().optional(),
     validationSchema: $InstrumentValidationSchema
   }) satisfies z.ZodType<FormInstrument<FormInstrument.Data, TLanguage>>;
 };
