@@ -32,7 +32,10 @@ test.describe('group manage', () => {
 
     const groupManagePage = new GroupManagePage(page);
     // A freshly created group has every non-repo instrument accessible already, so uncheck one to
-    // produce an observable, reversible change.
+    // produce an observable, reversible change. Assert it starts checked first: `uncheck()` is a
+    // no-op on an already-unchecked box, so without this the whole test passes even when the group
+    // was created with nothing accessible at all.
+    await expect(groupManagePage.instrumentCheckbox('Happiness Questionnaire')).toBeChecked();
     await groupManagePage.instrumentCheckbox('Happiness Questionnaire').uncheck();
     await groupManagePage.subjectIdDisplayLengthInput.fill('6');
     await groupManagePage.submitButton.click();

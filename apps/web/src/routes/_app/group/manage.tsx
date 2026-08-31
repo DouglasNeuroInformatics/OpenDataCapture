@@ -899,10 +899,6 @@ const RouteComponent = () => {
   const instrumentRepoIds = currentGroup?.instrumentRepoIds;
   const defaultIdentificationMethod = currentGroup?.settings.defaultIdentificationMethod;
 
-  // Gates both the read-only lock and the pre-selection below: they must move together, or an
-  // editable page would show boxes ticked that the group's stored selection does not contain.
-  const isDemo = Boolean(setupState.data?.isDemo && import.meta.env.PROD);
-
   const data = useMemo(() => {
     if (!availableInstruments) {
       return null;
@@ -949,7 +945,7 @@ const RouteComponent = () => {
       }
     }
 
-    const initialSelectedIds = isDemo ? [...visibleIds] : [...accessibleSet].filter((id) => visibleIds.has(id));
+    const initialSelectedIds = [...accessibleSet].filter((id) => visibleIds.has(id));
     // Preserve any accessible ids we are not displaying (defensive: e.g. instruments that failed to load).
     const hiddenAccessibleIds = [...accessibleSet].filter((id) => !visibleIds.has(id));
 
@@ -983,7 +979,6 @@ const RouteComponent = () => {
     availableInstruments,
     currentGroup?.id,
     defaultIdentificationMethod,
-    isDemo,
     instrumentRepoIds,
     resolvedLanguage,
     t,
@@ -1006,7 +1001,7 @@ const RouteComponent = () => {
             const updatedGroup = await updateGroupMutation.mutateAsync(data);
             changeGroup(updatedGroup);
           },
-          readOnly: isDemo
+          readOnly: Boolean(setupState.data?.isDemo && import.meta.env.PROD)
         }}
       />
     </React.Fragment>
