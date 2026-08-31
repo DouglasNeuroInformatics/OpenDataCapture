@@ -8,6 +8,7 @@ import { InstrumentShowcase } from '@/components/InstrumentShowcase';
 import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 
 const RouteComponent = () => {
@@ -15,6 +16,8 @@ const RouteComponent = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const instrumentInfoQuery = useInstrumentInfoQuery();
+  const setupState = useSetupStateQuery();
+  const isDemo = Boolean(setupState.data?.isDemo);
 
   useEffect(() => {
     const input = document.querySelector<HTMLInputElement>('[data-testid="instrument-search-bar"] input');
@@ -33,6 +36,9 @@ const RouteComponent = () => {
         props={{
           data: currentGroup
             ? instrumentInfoQuery.data?.filter((instrument) => {
+                if (isDemo) {
+                  return !instrument.sourceRepo;
+                }
                 return currentGroup.accessibleInstrumentIds.includes(instrument.id);
               })
             : instrumentInfoQuery.data,

@@ -12,6 +12,7 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
 import { useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
@@ -26,6 +27,8 @@ const RouteComponent = () => {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const instrumentInfoQuery = useInstrumentInfoQuery();
+  const setupState = useSetupStateQuery();
+  const isDemo = Boolean(setupState.data?.isDemo);
   const userInfoQuery = useUsersQuery({
     params: {
       groupId: currentGroup?.id
@@ -41,6 +44,9 @@ const RouteComponent = () => {
 
   const instrumentData = currentGroup
     ? instrumentInfoQuery.data?.filter((instrument) => {
+        if (isDemo) {
+          return !instrument.sourceRepo;
+        }
         return currentGroup.accessibleInstrumentIds.includes(instrument.id);
       })
     : instrumentInfoQuery.data;

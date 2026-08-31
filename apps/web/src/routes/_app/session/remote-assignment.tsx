@@ -89,6 +89,7 @@ const RouteComponent = () => {
   const instrumentInfoQuery = useInstrumentInfoQuery();
   const setupStateQuery = useSetupStateQuery();
   const createAssignmentMutation = useCreateAssignment();
+  const isDemo = Boolean(setupStateQuery.data?.isDemo);
 
   const [selectedInstrument, setSelectedInstrument] = useState<null | TranslatedInstrumentInfo>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -125,6 +126,9 @@ const RouteComponent = () => {
         props={{
           data: currentGroup
             ? instrumentInfoQuery.data?.filter((instrument) => {
+                if (isDemo) {
+                  return !instrument.sourceRepo;
+                }
                 return currentGroup.accessibleInstrumentIds.includes(instrument.id);
               })
             : instrumentInfoQuery.data,

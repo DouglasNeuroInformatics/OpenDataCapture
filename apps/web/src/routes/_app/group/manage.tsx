@@ -899,6 +899,8 @@ const RouteComponent = () => {
   const instrumentRepoIds = currentGroup?.instrumentRepoIds;
   const defaultIdentificationMethod = currentGroup?.settings.defaultIdentificationMethod;
 
+  const isDemo = Boolean(setupState.data?.isDemo);
+
   const data = useMemo(() => {
     if (!availableInstruments) {
       return null;
@@ -945,7 +947,7 @@ const RouteComponent = () => {
       }
     }
 
-    const initialSelectedIds = [...accessibleSet].filter((id) => visibleIds.has(id));
+    const initialSelectedIds = isDemo ? [...visibleIds] : [...accessibleSet].filter((id) => visibleIds.has(id));
     // Preserve any accessible ids we are not displaying (defensive: e.g. instruments that failed to load).
     const hiddenAccessibleIds = [...accessibleSet].filter((id) => !visibleIds.has(id));
 
@@ -979,6 +981,7 @@ const RouteComponent = () => {
     availableInstruments,
     currentGroup?.id,
     defaultIdentificationMethod,
+    isDemo,
     instrumentRepoIds,
     resolvedLanguage,
     t,
@@ -1001,7 +1004,7 @@ const RouteComponent = () => {
             const updatedGroup = await updateGroupMutation.mutateAsync(data);
             changeGroup(updatedGroup);
           },
-          readOnly: Boolean(setupState.data?.isDemo && import.meta.env.PROD)
+          readOnly: isDemo
         }}
       />
     </React.Fragment>
