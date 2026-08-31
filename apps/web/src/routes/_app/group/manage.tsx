@@ -899,7 +899,9 @@ const RouteComponent = () => {
   const instrumentRepoIds = currentGroup?.instrumentRepoIds;
   const defaultIdentificationMethod = currentGroup?.settings.defaultIdentificationMethod;
 
-  const isDemo = Boolean(setupState.data?.isDemo);
+  // Gates both the read-only lock and the pre-selection below: they must move together, or an
+  // editable page would show boxes ticked that the group's stored selection does not contain.
+  const isDemo = Boolean(setupState.data?.isDemo && import.meta.env.PROD);
 
   const data = useMemo(() => {
     if (!availableInstruments) {
