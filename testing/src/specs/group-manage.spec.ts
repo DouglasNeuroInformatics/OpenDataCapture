@@ -2,6 +2,25 @@ import { GroupManagePage } from '../pages/_app/group/manage.page';
 import { expect, test } from '../support/fixtures';
 
 test.describe('group manage', () => {
+  test('should give a newly created group access to every uploaded instrument, so a manager has something to administer', async ({
+    adminToken,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    // Deliberately not the `api.createGroup` fixture: that helper PATCHes the accessible instruments
+    // in after creating the group, so it passes whether or not creation connected anything itself.
+    // An uploaded instrument has no `sourceRepoId` key at all, and the selection query has to match
+    // that as well as an explicit null.
+    const response = await apiRequestContext.post('/api/v1/groups', {
+      data: { name: `RawGroup${uniqueId}`, type: 'CLINICAL' },
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    expect(response.status()).toBe(201);
+
+    const group = (await response.json()) as { accessibleInstrumentIds: string[] };
+    expect(group.accessibleInstrumentIds.length).toBeGreaterThan(0);
+  });
+
   test('should let a group manager preview an accessible instrument', async ({ getPageModel }) => {
     const groupManagePage = await getPageModel('/group/manage');
 
@@ -31,10 +50,10 @@ test.describe('group manage', () => {
     await expect(page).toHaveURL('/group/manage');
 
     const groupManagePage = new GroupManagePage(page);
-    // A freshly created group has every non-repo instrument accessible already, so uncheck one to
-    // produce an observable, reversible change. Assert it starts checked first: `uncheck()` is a
-    // no-op on an already-unchecked box, so without this the whole test passes even when the group
-    // was created with nothing accessible at all.
+    // `api.createGroup` grants access to every instrument, so uncheck one to produce an observable,
+    // reversible change. Assert it starts checked first: `uncheck()` is a no-op on an already-
+    // unchecked box, so without this the rest of the test would still pass if the precondition
+    // silently stopped holding.
     await expect(groupManagePage.instrumentCheckbox('Happiness Questionnaire')).toBeChecked();
     await groupManagePage.instrumentCheckbox('Happiness Questionnaire').uncheck();
     await groupManagePage.subjectIdDisplayLengthInput.fill('6');
