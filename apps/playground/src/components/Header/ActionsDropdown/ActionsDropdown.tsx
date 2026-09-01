@@ -81,6 +81,10 @@ export const ActionsDropdown = () => {
               {t({ en: 'Restore Defaults', fr: 'Restaurer les paramètres par défaut' })}
             </button>
           </DropdownMenu.Item>
+          <DropdownMenu.Separator />
+          <DropdownMenu.Label className="text-muted-foreground text-xs font-normal">
+            {t({ en: 'ODC Version', fr: 'Version ODC' })} {__APP_VERSION__}
+          </DropdownMenu.Label>
         </DropdownMenu.Content>
       </DropdownMenu>
       <UserSettingsDialog isOpen={showUserSettingsDialog} setIsOpen={setShowUserSettingsDialog} />
