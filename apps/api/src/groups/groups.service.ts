@@ -25,10 +25,16 @@ export class GroupsService {
     }
     // Connect only instruments that did not come from an instrument repository. Repo-sourced
     // instruments are opt-in: a group manager must select them manually after a repo is assigned.
+    //
+    // Both fields need the `isSet` fallback: `InstrumentsService.create` writes neither, so on an
+    // instrument that was never imported from a repository the key is absent rather than null, and
+    // Prisma's `null` filter does not match an absent key.
     const nonRepoInstruments = await this.instrumentModel.findMany({
       where: {
-        OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }],
-        sourceRepoId: null
+        AND: [
+          { OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }] },
+          { OR: [{ sourceRepoId: null }, { sourceRepoId: { isSet: false } }] }
+        ]
       }
     });
     return this.groupModel.create({
