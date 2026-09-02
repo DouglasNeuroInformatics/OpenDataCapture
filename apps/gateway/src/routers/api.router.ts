@@ -1,5 +1,9 @@
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
-import { $CreateRemoteAssignmentData, $UpdateRemoteAssignmentData } from '@opendatacapture/schemas/assignment';
+import {
+  $CreateRemoteAssignmentData,
+  $CreateRemoteAssignmentsData,
+  $UpdateRemoteAssignmentData
+} from '@opendatacapture/schemas/assignment';
 import type {
   AssignmentStatus,
   MutateAssignmentResponseBody,
@@ -58,6 +62,42 @@ router.post(
         targetStringified: JSON.stringify(instrumentContainer)
       }
     });
+    res.status(201).send({ success: true } satisfies MutateAssignmentResponseBody);
+  })
+);
+
+// Declared before `/assignments/:id` so `bulk` is not captured as an id by the routes below.
+router.post(
+  '/assignments/bulk',
+  ah(async (req, res) => {
+    const result = await $CreateRemoteAssignmentsData.safeParseAsync(req.body);
+    if (!result.success) {
+      logger.error(result.error.issues);
+      throw new HttpException(400, 'Bad Request');
+    }
+    const { assignments, instruments } = result.data;
+
+    const containerByInstrumentId = new Map(
+      instruments.map(({ instrumentContainer, instrumentId }) => [instrumentId, instrumentContainer])
+    );
+    // Resolve every bundle before writing anything: a batch referencing an instrument the caller
+    // did not send is a malformed request, not a partially valid one.
+    const records = assignments.map(({ instrumentId, publicKey, ...assignment }) => {
+      const instrumentContainer = containerByInstrumentId.get(instrumentId);
+      if (!instrumentContainer) {
+        throw new HttpException(400, `Missing instrument container for assignment: ${assignment.id}`);
+      }
+      return {
+        ...assignment,
+        rawPublicKey: Buffer.from(publicKey),
+        targetStringified: JSON.stringify(instrumentContainer)
+      };
+    });
+
+    // All-or-nothing: the core API deletes its own staged rows when this call fails, so a batch
+    // that half-succeeded here would leave assignment links live with no record on the other side.
+    await prisma.$transaction(records.map((data) => prisma.remoteAssignmentModel.create({ data })));
+
     res.status(201).send({ success: true } satisfies MutateAssignmentResponseBody);
   })
 );
