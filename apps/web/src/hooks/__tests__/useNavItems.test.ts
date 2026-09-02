@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useNavItems } from '../useNavItems';
 
+import type { NavItem } from '../useNavItems';
+
 import '@/services/i18n';
 
 const mocks = vi.hoisted(() => {
@@ -25,10 +27,17 @@ vi.mock('@/hooks/useSetupStateQuery', () => ({
   useSetupStateQuery: () => ({ data: mocks.setupState })
 }));
 
-const navUrls = () =>
+/** Every reachable url, including those nested inside a collapsible group. */
+const navUrls = () => {
+  const collect = (items: NavItem[]): (string | undefined)[] =>
+    items.flatMap((item) => [item.url, ...collect(item.children ?? [])]);
+  return collect(renderHook(() => useNavItems()).result.current.flat());
+};
+
+const navLabels = () =>
   renderHook(() => useNavItems())
     .result.current.flat()
-    .map((item) => item.url);
+    .map((item) => item.label);
 
 beforeEach(() => {
   // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
@@ -67,5 +76,38 @@ describe('useNavItems', () => {
     mocks.setupState.isMailEnabled = true;
     mocks.config.setup.isGatewayEnabled = false;
     expect(navUrls()).not.toContain('/group/email-templates');
+  });
+
+  it('should group the group-scoped pages under a single parent', () => {
+    expect(navLabels()).toContain('Group Actions');
+  });
+
+  it('should offer bulk remote assignments to a user holding the abilities that page needs', () => {
+    expect(navUrls()).toContain('/group/bulk-remote-assignments');
+  });
+
+  it('should omit bulk remote assignments when the gateway is not deployed', () => {
+    mocks.config.setup.isGatewayEnabled = false;
+    expect(navUrls()).not.toContain('/group/bulk-remote-assignments');
+  });
+
+  it('should omit bulk remote assignments when the user cannot create an assignment', () => {
+    mocks.can.mockImplementation((action, subject) => !(action === 'create' && subject === 'Assignment'));
+    expect(navUrls()).not.toContain('/group/bulk-remote-assignments');
+  });
+
+  // Each child is gated on its own requirements: losing assignment-create must not take the
+  // existing manage-group link down with it.
+  it('should keep manage group available to a user who cannot create assignments', () => {
+    mocks.can.mockImplementation((action, subject) => !(action === 'create' && subject === 'Assignment'));
+    expect(navUrls()).toContain('/group/manage');
+    expect(navUrls()).not.toContain('/group/bulk-remote-assignments');
+  });
+
+  it('should still render the group when only bulk assignments is available', () => {
+    mocks.can.mockImplementation((action, subject) => !(action === 'manage' && subject === 'Group'));
+    expect(navUrls()).toContain('/group/bulk-remote-assignments');
+    expect(navUrls()).not.toContain('/group/manage');
+    expect(navLabels()).toContain('Group Actions');
   });
 });

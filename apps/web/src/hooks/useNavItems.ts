@@ -81,20 +81,44 @@ export function useNavItems() {
         url: '/upload'
       });
     }
+    // Each child is gated on what that page actually needs, not on the parent: bulk assignment
+    // requires abilities managing a group does not, and a user holding only one of them must still
+    // see the one they can use. The group renders whenever at least one child survives.
+    const groupItems: NavItem[] = [];
     if (currentGroup && ability?.can('manage', 'Group')) {
-      globalItems.push({
+      groupItems.push({
         icon: UsersIcon,
         label: t('layout.navLinks.manageGroup'),
         url: '/group/manage'
       });
       // These templates exist only to email a remote assignment link, which the gateway serves
       if (setupStateQuery.data.isMailEnabled && config.setup.isGatewayEnabled) {
-        globalItems.push({
+        groupItems.push({
           icon: MailIcon,
           label: t({ en: 'Email Templates', fr: 'Modèles de courriel' }),
           url: '/group/email-templates'
         });
       }
+    }
+    if (
+      currentGroup &&
+      config.setup.isGatewayEnabled &&
+      ability?.can('create', 'Assignment') &&
+      ability.can('read', 'Assignment') &&
+      ability.can('read', 'Subject')
+    ) {
+      groupItems.push({
+        icon: SendIcon,
+        label: t({ en: 'Bulk Remote Assignments', fr: 'Tâches à distance en lot' }),
+        url: '/group/bulk-remote-assignments'
+      });
+    }
+    if (groupItems.length > 0) {
+      globalItems.push({
+        children: groupItems,
+        icon: UsersIcon,
+        label: t({ en: 'Group Actions', fr: 'Actions de groupe' })
+      });
     }
 
     if (ability?.can('manage', 'all')) {
