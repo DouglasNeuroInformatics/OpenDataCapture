@@ -327,6 +327,12 @@ export class AssignmentsService {
         url: `${this.assignmentBaseUrl}/assignments/${id}`
       }
     });
-    return { assignment, publicKey };
+    // Drop the keypair before this row travels anywhere. `Assignment` does not declare it, but the
+    // model carries it, and structural typing does not remove a field at runtime: left in, the
+    // private key that decrypts this assignment would be serialized into the HTTP response and
+    // posted to the gateway. The gateway's own schema discards it, but only after it crossed the
+    // wire.
+    const { encryptionKeyPair: _encryptionKeyPair, ...withoutKeyPair } = assignment;
+    return { assignment: withoutKeyPair, publicKey };
   }
 }

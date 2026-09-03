@@ -184,6 +184,18 @@ describe('AssignmentsService', () => {
       expect(assignmentModel.create).toHaveBeenCalledTimes(4);
     });
 
+    it('should never return or transmit the encryption keypair, which would hand out the private key', async () => {
+      assignmentModel.create.mockImplementation(({ data }: any) =>
+        Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } })
+      );
+      const assignments = await assignmentsService.createBulk(request(), permissiveUser());
+
+      expect(assignments.every((assignment) => !('encryptionKeyPair' in assignment))).toBe(true);
+      const sent = gatewayService.createRemoteAssignments.mock.lastCall?.[0] as { assignment: object }[];
+      expect(sent.every(({ assignment }) => !('encryptionKeyPair' in assignment))).toBe(true);
+      expect(JSON.stringify(sent)).not.toContain('SECRET');
+    });
+
     it('should send the whole batch to the gateway in a single call, so one bundle is fetched per instrument', async () => {
       await assignmentsService.createBulk(request(), permissiveUser());
       expect(gatewayService.createRemoteAssignments).toHaveBeenCalledTimes(1);

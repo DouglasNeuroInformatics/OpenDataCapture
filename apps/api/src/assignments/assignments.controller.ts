@@ -1,6 +1,17 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
-import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query
+} from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Assignment, BulkAssignmentPreflightResult } from '@opendatacapture/schemas/assignment';
@@ -38,6 +49,8 @@ export class AssignmentsController {
   // `RouteAccess` cannot express is enforced in the service, which also checks `read Subject` through
   // `accessibleQuery` before any subject is used.
   @ApiOperation({ summary: 'Validate a Bulk Assignment Request' })
+  // Creates nothing, so it answers 200 rather than the 201 a POST defaults to in Nest.
+  @HttpCode(HttpStatus.OK)
   @Post('bulk/preflight')
   @RouteAccess({ action: 'create', subject: 'Assignment' })
   bulkPreflight(
