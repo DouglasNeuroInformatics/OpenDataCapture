@@ -57,6 +57,9 @@ describe('GroupsController', () => {
         groups: [{ id: 'group-1' }] as Group[],
         id: 'user-1',
         lastName: 'User',
+        // This suite is testing basePermissionLevel-driven access, not the forced-reset ability,
+        // which would short-circuit every case below to `read User self` regardless of the role.
+        mustResetPassword: false,
         username: 'test-user'
       });
 

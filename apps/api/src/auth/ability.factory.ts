@@ -19,6 +19,18 @@ export class AbilityFactory {
     });
     const ability = new AbilityBuilder<AppAbility>(createPrismaAbility);
     const groupIds = payload.groups.map((group) => group.id);
+
+    // A user owing a password reset holds one rule: read themselves, which is what `updateSelfById`
+    // is gated on. Every route naming another subject is then refused by the ordinary `@RouteAccess`
+    // check, with no allowlist to keep up to date, whether the request comes from the web client or
+    // from curl. Routes gated on `read User` still pass that check, because it tests the subject
+    // type and a conditional rule satisfies it -- those stay confined by `accessibleQuery`, which
+    // applies the condition and so reduces every such query to the user themselves.
+    if (payload.mustResetPassword) {
+      ability.can('read', 'User', { id: payload.id });
+      return ability.build({ detectSubjectType: detectAppSubject });
+    }
+
     switch (payload.basePermissionLevel) {
       case 'ADMIN':
         ability.can('manage', 'all');

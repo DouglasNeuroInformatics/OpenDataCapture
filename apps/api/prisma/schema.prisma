@@ -333,6 +333,10 @@ model User {
   groups                Group[]              @relation(fields: [groupIds], references: [id])
   lastName              String
   hashedPassword        String               @map("password")
+  /// Whether the user must choose a new password before they may use the app. Optional rather than
+  /// defaulted: on MongoDB a default is applied on write, so a required column would fail to read
+  /// back every user created before this field existed.
+  mustResetPassword     Boolean?
   username              String
   sex                   Sex?
   dateOfBirth           DateTime?            @db.Date

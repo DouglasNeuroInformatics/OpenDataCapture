@@ -87,5 +87,38 @@ describe('UsersService', () => {
       await usersService.create({ ...baseUser });
       expect(userModel.create).toHaveBeenCalledOnce();
     });
+
+    it('should persist mustResetPassword, so a generated password forces a reset at first sign-in', async () => {
+      await usersService.create({ ...baseUser, mustResetPassword: true });
+      expect(userModel.create.mock.lastCall?.[0]).toMatchObject({ data: { mustResetPassword: true } });
+    });
+  });
+
+  describe('updateSelfById', () => {
+    const currentUser = { id: 'user-1', username: 'jane.doe' } as any;
+
+    beforeEach(() => {
+      userModel.findFirst.mockResolvedValue({ hashedPassword: 'hashed-current', id: 'user-1' });
+      userModel.update.mockResolvedValue({});
+      cryptoService.comparePassword.mockResolvedValue(false);
+    });
+
+    it('should clear mustResetPassword when the user sets a password, which is what lifts the lock', async () => {
+      await usersService.updateSelfById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, currentUser);
+      expect(userModel.update.mock.lastCall?.[0]).toMatchObject({ data: { mustResetPassword: false } });
+    });
+
+    it('should leave mustResetPassword untouched when no password is set, so editing a profile cannot lift it', async () => {
+      await usersService.updateSelfById('user-1', { firstName: 'Janet' }, currentUser);
+      expect(userModel.update.mock.lastCall?.[0].data.mustResetPassword).toBeUndefined();
+    });
+
+    it('should reject the password already on the account, so a forced reset cannot be satisfied by it', async () => {
+      cryptoService.comparePassword.mockResolvedValue(true);
+      await expect(
+        usersService.updateSelfById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, currentUser)
+      ).rejects.toMatchObject({ response: { code: 'PASSWORD_MATCHES_CURRENT' } });
+      expect(userModel.update).not.toHaveBeenCalled();
+    });
   });
 });

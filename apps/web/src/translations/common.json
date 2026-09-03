@@ -196,6 +196,11 @@
     "es": "Esta contraseña ha aparecido en una filtración de datos conocida y no se puede utilizar",
     "fr": "Ce mot de passe est apparu dans une fuite de données connue et ne peut pas être utilisé"
   },
+  "passwordMatchesCurrent": {
+    "en": "Password must not be the same as your current password",
+    "es": "La contraseña no debe ser igual a su contraseña actual",
+    "fr": "Le mot de passe ne doit pas être identique à votre mot de passe actuel"
+  },
   "passwordMatchesUsername": {
     "en": "Password must not be the same as the username",
     "es": "La contraseña no debe ser igual al nombre de usuario",
