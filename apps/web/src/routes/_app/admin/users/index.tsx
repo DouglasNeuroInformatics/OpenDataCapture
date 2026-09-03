@@ -64,7 +64,7 @@ const UpdateUserForm: React.FC<{
   onDelete: () => void;
   onError: (error: ZodErrorLike) => void;
   onSubmit: (data: UpdateUserSubmitData) => Promisable<void>;
-}> = ({ data, onDelete, onSubmit }) => {
+}> = ({ data, onDelete, onError, onSubmit }) => {
   const { disableDelete, groupOptions, initialValues } = data;
   const { resolvedLanguage, t } = useTranslation();
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
