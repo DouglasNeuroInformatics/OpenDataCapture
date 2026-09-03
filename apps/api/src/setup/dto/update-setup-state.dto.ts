@@ -18,6 +18,6 @@ export class UpdateSetupStateDto implements UpdateSetupStateData {
   @ApiProperty({ required: false })
   isBulkRemoteAssignmentsEnabled?: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   isExperimentalFeaturesEnabled?: boolean;
 }
