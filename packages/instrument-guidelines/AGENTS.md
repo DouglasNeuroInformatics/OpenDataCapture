@@ -473,10 +473,16 @@ type FormInstrument<TData extends FormInstrument.Data, TLanguage extends Instrum
   initialValues?: PartialDeep<TData>;
   kind: 'FORM';
   measures: InstrumentMeasures<TData, TLanguage> | null;
+  resetButton?: boolean;
 };
 ```
 
 - `initialValues` — optional pre-populated values, applied when the form is first rendered. This is a _deep_ partial (`PartialDeep<TData>`), so nested composite values (e.g. individual fields within `record-array` rows) may be partially specified.
+- `resetButton` — whether to show a button that clears every answer. Defaults to `false`.
+
+  **The button takes effect on the first click.** There is no confirmation step and no undo, and the subject loses everything they have entered. Set it on a long form the subject may reasonably want to start over, and leave it off a short one, where a stray click costs more than the button saves.
+
+  It also governs what happens to the answers after a successful submit: a form with `resetButton: true` is emptied, and a form without it retains its values. Neither is visible in the standard flow, which replaces the form once it is submitted.
 
 #### 1.3.2 Interactive Instruments
 

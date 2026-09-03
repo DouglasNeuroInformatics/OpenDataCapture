@@ -10,6 +10,8 @@ export class RenderInstrumentPage extends AppPage {
   readonly beginButton: Locator;
   readonly consentPreamble: Locator;
   readonly errorMessages: Locator;
+  /** Rendered only for an instrument declaring `resetButton: true`; libui gives it this aria-label. */
+  readonly resetButton: Locator;
   readonly submitButton: Locator;
   readonly summaryHeading: Locator;
 
@@ -17,6 +19,7 @@ export class RenderInstrumentPage extends AppPage {
     super(page);
     this.beginButton = page.getByRole('button', { name: 'Begin' });
     this.consentPreamble = page.getByTestId('consent-preamble');
+    this.resetButton = page.getByRole('button', { name: 'Reset' });
     this.submitButton = page.getByRole('button', { name: 'Submit' });
     this.summaryHeading = page.getByRole('heading', { name: /Summary of Results/i });
     this.errorMessages = page.getByTestId('error-message-text');

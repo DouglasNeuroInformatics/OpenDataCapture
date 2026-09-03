@@ -338,3 +338,17 @@ import type { FormInstrument } from '../instrument.form.js';
     Extract<FormInstrument<TData>['content'], unknown[]>[number]
   >();
 }
+
+/** FormInstrument.resetButton */
+{
+  type TData = { _: string };
+
+  expectTypeOf<FormInstrument<TData>['resetButton']>().toEqualTypeOf<boolean | undefined>();
+
+  /** Optional, so every instrument authored before it existed still satisfies the type */
+  expectTypeOf<{
+    content: FormInstrument<TData>['content'];
+    kind: 'FORM';
+    measures: FormInstrument<TData>['measures'];
+  }>().toMatchTypeOf<Partial<FormInstrument<TData>>>();
+}
