@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 
-import { Button, Card, ClientTable, FileDropzone, TextArea } from '@douglasneuroinformatics/libui/components';
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
+import { Button, ClientTable, FileDropzone, TextArea } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Subject } from '@opendatacapture/schemas/subject';
+import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 import {
   ACCEPTED_FILE_EXTENSIONS,
@@ -16,28 +18,24 @@ import type { BulkParseError, BulkParseResult } from '@/utils/bulk-assignments';
 
 import { ErrorList } from './ErrorList';
 
+type SourceMode = 'FILE' | 'PASTE' | 'SELECT';
+
 type SourceStepProps = {
   onParsed: (parsed: BulkParseResult) => void;
   onSubjectsSelected: (subjectIds: string[]) => void;
+  /** Group setting controlling how much of an identifier is shown, as elsewhere in the app. */
+  subjectIdDisplayLength: number;
   subjects: Subject[];
 };
 
-/**
- * A subject id that was generated from personal information is a 64-character hex digest; anything
- * else was chosen by a person. Only the latter is meaningful to pick from a list, so the picker
- * offers those and leaves hash-identified subjects to the file/paste path.
- */
-const GENERATED_ID = /^[0-9a-f]{64}$/i;
-
-export const isCustomIdentifier = (id: string) => !GENERATED_ID.test(id);
-
-export const SourceStep = ({ onParsed, onSubjectsSelected, subjects }: SourceStepProps) => {
+export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLength, subjects }: SourceStepProps) => {
   const { t } = useTranslation();
+  // One source at a time: offering all three at once left it unclear which the wizard would act on,
+  // and a file dropped while text was pasted had no defined precedence.
+  const [mode, setMode] = useState<SourceMode>('SELECT');
   const [errors, setErrors] = useState<BulkParseError[]>([]);
   const [pasted, setPasted] = useState('');
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
-
-  const selectable = subjects.filter(({ id }) => isCustomIdentifier(id));
 
   const run = async (parse: () => BulkParseResult | Promise<BulkParseResult>) => {
     setErrors([]);
@@ -70,72 +68,97 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjects }: SourceSte
       return next;
     });
 
+  const modes: { label: string; value: SourceMode }[] = [
+    { label: t({ en: 'Select subjects', fr: 'Sélectionner des sujets' }), value: 'SELECT' },
+    { label: t({ en: 'Upload a file', fr: 'Téléverser un fichier' }), value: 'FILE' },
+    { label: t({ en: 'Paste data', fr: 'Coller des données' }), value: 'PASTE' }
+  ];
+
+  // Every subject in the group is listed, not only those with a chosen identifier: a hash-identified
+  // subject is just as assignable, and excluding them left most of a group invisible. Identifiers are
+  // rendered the way the rest of the app renders them — group scope removed, truncated to the group's
+  // display length — with date of birth and sex alongside, since a digest identifies nobody on sight.
+  const rows = subjects.map((subject) => ({
+    dateOfBirth: subject.dateOfBirth ? toBasicISOString(subject.dateOfBirth) : t({ en: 'NULL', fr: 'NUL' }),
+    id: subject.id,
+    selected: selected.has(subject.id) ? '✓' : '',
+    sex:
+      subject.sex === 'FEMALE'
+        ? t('core.identificationData.sex.female')
+        : subject.sex === 'MALE'
+          ? t('core.identificationData.sex.male')
+          : t({ en: 'NULL', fr: 'NUL' }),
+    subject: removeSubjectIdScope(subject.id).slice(0, subjectIdDisplayLength)
+  }));
+
   return (
     <div className="flex flex-col gap-6" data-testid="bulk-source-step">
       <ErrorList errors={errors} />
-      <Card>
-        <Card.Header>
-          <Card.Title>{t({ en: 'Select subjects', fr: 'Sélectionner des sujets' })}</Card.Title>
-          <Card.Description>
+
+      <div className="flex flex-wrap gap-2" data-testid="bulk-source-mode">
+        {modes.map((option) => (
+          <Button
+            data-testid={`bulk-source-mode-${option.value}`}
+            key={option.value}
+            type="button"
+            variant={mode === option.value ? 'primary' : 'outline'}
+            onClick={() => {
+              setErrors([]);
+              setMode(option.value);
+            }}
+          >
+            {option.label}
+          </Button>
+        ))}
+      </div>
+
+      {mode === 'SELECT' && (
+        <div className="flex flex-col gap-3">
+          <p className="text-muted-foreground text-sm">
             {t({
-              en: 'Choose existing subjects in this group that use a custom identifier.',
-              fr: 'Choisissez des sujets existants de ce groupe qui utilisent un identifiant personnalisé.'
+              en: 'Choose existing subjects in this group.',
+              fr: 'Choisissez des sujets existants de ce groupe.'
             })}
-          </Card.Description>
-        </Card.Header>
-        <Card.Content>
-          {selectable.length === 0 ? (
+          </p>
+          {rows.length === 0 ? (
             <p className="text-muted-foreground text-sm italic">
-              {t({
-                en: 'No subjects with a custom identifier are available in this group.',
-                fr: 'Aucun sujet avec un identifiant personnalisé n’est disponible dans ce groupe.'
-              })}
+              {t({ en: 'This group has no subjects.', fr: 'Ce groupe n’a aucun sujet.' })}
             </p>
           ) : (
             <ClientTable
               columns={[
-                {
-                  field: 'id',
-                  label: t({ en: 'Subject', fr: 'Sujet' })
-                },
-                {
-                  field: 'selected',
-                  label: t({ en: 'Selected', fr: 'Sélectionné' })
-                }
+                { field: 'subject', label: t('datahub.index.table.subject') },
+                { field: 'dateOfBirth', label: t('core.identificationData.dateOfBirth.label') },
+                { field: 'sex', label: t('core.identificationData.sex.label') },
+                { field: 'selected', label: t({ en: 'Selected', fr: 'Sélectionné' }) }
               ]}
-              data={selectable.map(({ id }) => ({
-                id,
-                selected: selected.has(id) ? '✓' : ''
-              }))}
+              data={rows}
               data-testid="bulk-subject-picker"
               onEntryClick={({ id }) => toggle(id)}
             />
           )}
-        </Card.Content>
-        <Card.Footer>
-          <Button
-            data-testid="bulk-use-selected-subjects"
-            disabled={selected.size === 0}
-            type="button"
-            onClick={() => onSubjectsSelected([...selected])}
-          >
-            {t({ en: 'Continue with selected', fr: 'Continuer avec la sélection' })}
-            {selected.size > 0 && ` (${selected.size})`}
-          </Button>
-        </Card.Footer>
-      </Card>
+          <div>
+            <Button
+              data-testid="bulk-use-selected-subjects"
+              disabled={selected.size === 0}
+              type="button"
+              onClick={() => onSubjectsSelected([...selected])}
+            >
+              {t({ en: 'Continue with selected', fr: 'Continuer avec la sélection' })}
+              {selected.size > 0 && ` (${selected.size})`}
+            </Button>
+          </div>
+        </div>
+      )}
 
-      <Card>
-        <Card.Header>
-          <Card.Title>{t({ en: 'Upload a file', fr: 'Téléverser un fichier' })}</Card.Title>
-          <Card.Description>
+      {mode === 'FILE' && (
+        <div className="flex flex-col gap-3">
+          <p className="text-muted-foreground text-sm">
             {t({
               en: 'CSV, TSV or Excel. Include a subject ID column, or first name, last name, date of birth and sex.',
               fr: 'CSV, TSV ou Excel. Incluez une colonne d’identifiant, ou prénom, nom, date de naissance et sexe.'
             })}
-          </Card.Description>
-        </Card.Header>
-        <Card.Content>
+          </p>
           <FileDropzone
             acceptedFileTypes={{
               'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
@@ -147,38 +170,35 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjects }: SourceSte
             file={null}
             setFile={handleFile}
           />
-        </Card.Content>
-      </Card>
+        </div>
+      )}
 
-      <Card>
-        <Card.Header>
-          <Card.Title>{t({ en: 'Or paste data', fr: 'Ou coller des données' })}</Card.Title>
-          <Card.Description>
+      {mode === 'PASTE' && (
+        <div className="flex flex-col gap-3">
+          <p className="text-muted-foreground text-sm">
             {t({
               en: 'Comma, tab or semicolon separated, with a header row.',
               fr: 'Séparé par des virgules, tabulations ou points-virgules, avec une ligne d’en-tête.'
             })}
-          </Card.Description>
-        </Card.Header>
-        <Card.Content>
+          </p>
           <TextArea
             data-testid="bulk-paste-input"
-            rows={6}
+            rows={8}
             value={pasted}
             onChange={(event) => setPasted(event.target.value)}
           />
-        </Card.Content>
-        <Card.Footer>
-          <Button
-            data-testid="bulk-parse-pasted"
-            disabled={pasted.trim().length === 0}
-            type="button"
-            onClick={() => void run(() => parseDelimitedText(pasted))}
-          >
-            {t({ en: 'Use pasted data', fr: 'Utiliser les données collées' })}
-          </Button>
-        </Card.Footer>
-      </Card>
+          <div>
+            <Button
+              data-testid="bulk-parse-pasted"
+              disabled={pasted.trim().length === 0}
+              type="button"
+              onClick={() => void run(() => parseDelimitedText(pasted))}
+            >
+              {t({ en: 'Use pasted data', fr: 'Utiliser les données collées' })}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

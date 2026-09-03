@@ -42,6 +42,7 @@ const RouteComponent = () => {
         }
         groupId={currentGroup.id}
         instruments={instruments}
+        subjectIdDisplayLength={currentGroup.settings.subjectIdDisplayLength ?? 9}
         subjects={subjectsQuery.data}
       />
     </React.Fragment>

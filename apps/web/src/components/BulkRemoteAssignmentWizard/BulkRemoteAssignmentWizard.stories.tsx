@@ -27,6 +27,7 @@ export default {
       { id: 'instrument-1', title: 'Happiness Questionnaire' },
       { id: 'instrument-2', title: 'General Consent Form' }
     ],
+    subjectIdDisplayLength: 9,
     subjects: [subject('Depression_Clinic$001'), subject('Depression_Clinic$002')]
   },
   component: BulkRemoteAssignmentWizard,
@@ -43,8 +44,8 @@ export default {
 /** The entry state: pick existing subjects, upload a file, or paste delimited data. */
 export const Source: Story = {};
 
-/** Every subject uses a generated identifier, so only the file and paste paths are offered. */
-export const NoSelectableSubjects: Story = {
+/** Subjects identified by a hash, which the picker still lists and truncates for display. */
+export const HashIdentifiedSubjects: Story = {
   args: {
     subjects: [subject('a'.repeat(64)), subject('b'.repeat(64))]
   }

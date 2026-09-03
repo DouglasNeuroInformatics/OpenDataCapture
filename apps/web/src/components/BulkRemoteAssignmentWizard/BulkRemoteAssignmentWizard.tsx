@@ -31,6 +31,8 @@ export type BulkRemoteAssignmentWizardProps = {
   defaultExpiresAt: string;
   groupId: string;
   instruments: InstrumentOption[];
+  /** Group setting controlling how much of an identifier the subject picker shows. */
+  subjectIdDisplayLength: number;
   subjects: Subject[];
 };
 
@@ -48,6 +50,7 @@ export const BulkRemoteAssignmentWizard = ({
   defaultExpiresAt,
   groupId,
   instruments,
+  subjectIdDisplayLength,
   subjects
 }: BulkRemoteAssignmentWizardProps) => {
   const { t } = useTranslation();
@@ -98,6 +101,7 @@ export const BulkRemoteAssignmentWizard = ({
     <div className="mx-auto flex max-w-4xl flex-col gap-6" data-testid="bulk-remote-assignment-wizard">
       {state.step === 'SOURCE' && (
         <SourceStep
+          subjectIdDisplayLength={subjectIdDisplayLength}
           subjects={subjects}
           onParsed={(parsed) => setState({ parsed, step: 'MAP' })}
           onSubjectsSelected={(subjectIds) => setState({ step: 'TIMEPOINTS', subjectIds })}

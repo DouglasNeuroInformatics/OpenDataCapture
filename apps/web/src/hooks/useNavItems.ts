@@ -81,9 +81,11 @@ export function useNavItems() {
         url: '/upload'
       });
     }
-    // Each child is gated on what that page actually needs, not on the parent: bulk assignment
-    // requires abilities managing a group does not, and a user holding only one of them must still
-    // see the one they can use. The group renders whenever at least one child survives.
+    // The bulk page is behind an instance toggle. With it off, the group links stay exactly where
+    // they were — two flat entries — so an instance that never turns this on sees no change at all.
+    // With it on they collapse into one group, whose children are gated independently: bulk assignment
+    // needs abilities managing a group does not, and holding only one of them must still surface it.
+    const isBulkEnabled = Boolean(setupStateQuery.data.isBulkRemoteAssignmentsEnabled);
     const groupItems: NavItem[] = [];
     if (currentGroup && ability?.can('manage', 'Group')) {
       groupItems.push({
@@ -101,6 +103,7 @@ export function useNavItems() {
       }
     }
     if (
+      isBulkEnabled &&
       currentGroup &&
       config.setup.isGatewayEnabled &&
       ability?.can('create', 'Assignment') &&
@@ -114,11 +117,15 @@ export function useNavItems() {
       });
     }
     if (groupItems.length > 0) {
-      globalItems.push({
-        children: groupItems,
-        icon: UsersIcon,
-        label: t({ en: 'Group Actions', fr: 'Actions de groupe' })
-      });
+      if (isBulkEnabled) {
+        globalItems.push({
+          children: groupItems,
+          icon: UsersIcon,
+          label: t({ en: 'Group Actions', fr: 'Actions de groupe' })
+        });
+      } else {
+        globalItems.push(...groupItems);
+      }
     }
 
     if (ability?.can('manage', 'all')) {
@@ -223,6 +230,7 @@ export function useNavItems() {
     currentSession,
     currentUser,
     resolvedLanguage,
+    setupStateQuery.data.isBulkRemoteAssignmentsEnabled,
     setupStateQuery.data.isExperimentalFeaturesEnabled,
     setupStateQuery.data.isMailEnabled
   ]);

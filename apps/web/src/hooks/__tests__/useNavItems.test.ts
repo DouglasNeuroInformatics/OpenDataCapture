@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => {
   return {
     can,
     config: { setup: { isGatewayEnabled: true } },
-    setupState: { isExperimentalFeaturesEnabled: false, isMailEnabled: false },
+    setupState: { isBulkRemoteAssignmentsEnabled: true, isExperimentalFeaturesEnabled: false, isMailEnabled: false },
     store: { currentGroup: { id: 'group-1' }, currentSession: null, currentUser: { ability: { can } } }
   };
 });
@@ -46,6 +46,7 @@ beforeEach(() => {
   mocks.can.mockReturnValue(true);
   mocks.config.setup.isGatewayEnabled = true;
   mocks.setupState.isMailEnabled = false;
+  mocks.setupState.isBulkRemoteAssignmentsEnabled = true;
 });
 
 describe('useNavItems', () => {
@@ -102,6 +103,22 @@ describe('useNavItems', () => {
     mocks.can.mockImplementation((action, subject) => !(action === 'create' && subject === 'Assignment'));
     expect(navUrls()).toContain('/group/manage');
     expect(navUrls()).not.toContain('/group/bulk-remote-assignments');
+  });
+
+  // With the instance toggle off, the group links must stay exactly where they were, so an
+  // instance that never enables this sees no change to its menu at all.
+  it('should leave the group links flat and hide the bulk page when the toggle is off', () => {
+    mocks.setupState.isBulkRemoteAssignmentsEnabled = false;
+    expect(navUrls()).toContain('/group/manage');
+    expect(navUrls()).not.toContain('/group/bulk-remote-assignments');
+    expect(navLabels()).not.toContain('Group Actions');
+  });
+
+  it('should keep email templates flat and reachable when the toggle is off', () => {
+    mocks.setupState.isBulkRemoteAssignmentsEnabled = false;
+    mocks.setupState.isMailEnabled = true;
+    expect(navUrls()).toContain('/group/email-templates');
+    expect(navLabels()).not.toContain('Group Actions');
   });
 
   it('should still render the group when only bulk assignments is available', () => {
