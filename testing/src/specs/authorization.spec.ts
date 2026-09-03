@@ -64,6 +64,14 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
     what: 'change instance-wide settings'
   },
   {
+    // `POST /v1/groups` used to be declared `create Group`, which every group manager passes: the
+    // guard sees the subject type, and their `manage Group` rule's condition is invisible to it.
+    screen: '/admin/groups',
+    send: (request, { headers, userId }) =>
+      request.post(`${API}/groups`, { data: { name: `Escalation Probe ${userId}`, type: 'CLINICAL' }, headers }),
+    what: 'create a group'
+  },
+  {
     screen: '/admin/instrument-repos',
     send: (request, { headers }) =>
       request.post(`${API}/instrument-repos`, { data: { url: 'https://github.com/example/example' }, headers }),
@@ -253,8 +261,6 @@ async function readUsernames(request: APIRequestContext, token: string): Promise
 // `/admin/settings`, `/admin/branding`, `/admin/groups` or `/group/manage` directly gets the real
 // screen (#1470). What makes that harmless is the API, so these tests drive it directly rather than
 // through the UI -- they are the reason those screens are not treated as an access-control defect.
-// `POST /v1/groups` is the one privileged request a group manager is wrongly allowed (#1468); it is
-// left out of the table below rather than asserted, so the suite does not lock that in.
 test.describe('server-side authorization', () => {
   for (const role of NON_ADMIN_ROLES) {
     test(`should refuse every privileged request a ${role} user could fire from an admin screen`, async ({

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { isAllUndefined, snakeToCamelCase } from '@douglasneuroinformatics/libjs';
+import type { ZodErrorLike } from '@douglasneuroinformatics/libjs';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Button, DataTable, Dialog, Form, Heading, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -19,7 +20,14 @@ import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
-import { $Email, $PhoneNumber, clearedIfBlank, omittedIfUnchanged, requiresGroup } from '@/utils/validation';
+import {
+  $Email,
+  $PhoneNumber,
+  clearedIfBlank,
+  omittedIfUnchanged,
+  requiresGroup,
+  validationSummary
+} from '@/utils/validation';
 
 type UpdateUserFormData = {
   additionalPermissions?: Partial<UserPermission>[];
@@ -43,8 +51,9 @@ type UpdateUserFormInputData = {
 const UpdateUserForm: React.FC<{
   data: UpdateUserFormInputData;
   onDelete: () => void;
+  onError: (error: ZodErrorLike) => void;
   onSubmit: (data: UpdateUserFormData & { additionalPermissions?: UserPermission[] }) => Promisable<void>;
-}> = ({ data, onDelete, onSubmit }) => {
+}> = ({ data, onDelete, onError, onSubmit }) => {
   const { disableDelete, groupOptions, initialValues } = data;
   const { resolvedLanguage, t } = useTranslation();
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
@@ -303,6 +312,7 @@ const UpdateUserForm: React.FC<{
         key={JSON.stringify(initialValues)}
         submitBtnLabel={t('core.save')}
         validationSchema={$UpdateUserFormData}
+        onError={onError}
         onSubmit={({ additionalPermissions, ...data }) =>
           onSubmit({ additionalPermissions: additionalPermissions as undefined | UserPermission[], ...data })
         }
@@ -344,6 +354,12 @@ const RouteComponent = () => {
   const updateUserMutation = useUpdateUserMutation();
   const [selectedUser, setSelectedUser] = useState<null | User>(null);
   const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
+  const [submitErrorMessage, setSubmitErrorMessage] = useState<null | string>(null);
+
+  const openManageSheet = (user: User) => {
+    setSubmitErrorMessage(null);
+    setSelectedUser(user);
+  };
 
   const [data, setData] = useState<null | UpdateUserFormInputData>(null);
 
@@ -373,7 +389,13 @@ const RouteComponent = () => {
   }, [groupsQuery.data, selectedUser]);
 
   return (
-    <Sheet open={Boolean(selectedUser)} onOpenChange={() => setSelectedUser(null)}>
+    <Sheet
+      open={Boolean(selectedUser)}
+      onOpenChange={() => {
+        setSubmitErrorMessage(null);
+        setSelectedUser(null);
+      }}
+    >
       <PageHeader>
         <Heading className="text-center" variant="h2">
           {t({
@@ -417,7 +439,7 @@ const RouteComponent = () => {
         rowActions={[
           {
             label: t('common.manage'),
-            onSelect: setSelectedUser
+            onSelect: openManageSheet
           }
         ]}
         togglesComponent={() => (
@@ -433,7 +455,7 @@ const RouteComponent = () => {
         onRowClick={(user) => setHighlightedRowId(user.id)}
         onRowDoubleClick={(user) => {
           setHighlightedRowId(user.id);
-          setSelectedUser(user);
+          openManageSheet(user);
         }}
       />
       <Sheet.Content className="flex flex-col p-0" data-testid="admin-user-edit-sheet">
@@ -445,6 +467,19 @@ const RouteComponent = () => {
               fr: 'Apportez des modifications à cet utilisateur ici. Cliquez sur « Enregistrer » lorsque vous avez terminé.'
             })}
           </Sheet.Description>
+          {/* In the header, which does not scroll: a rejected field can be several sections away
+              from the submit button, and inline is then off-screen at the moment of the failure. */}
+          {submitErrorMessage && (
+            <div className="text-destructive text-sm font-medium" data-testid="admin-user-edit-error" role="alert">
+              <p>
+                {t({
+                  en: 'Your changes were not saved',
+                  fr: "Vos modifications n'ont pas été enregistrées"
+                })}
+              </p>
+              <p>{submitErrorMessage}</p>
+            </div>
+          )}
         </Sheet.Header>
         <Sheet.Body className="grow overflow-y-scroll px-6 pb-6">
           <WithFallback
@@ -456,7 +491,9 @@ const RouteComponent = () => {
                 deleteUserMutation.mutate({ id: selectedUser!.id });
                 setSelectedUser(null);
               },
+              onError: (error) => setSubmitErrorMessage(validationSummary(error)),
               onSubmit: ({ confirmPassword: _, email, groupIds, phoneNumber, ...data }) => {
+                setSubmitErrorMessage(null);
                 updateUserMutation.mutate(
                   {
                     data: {
