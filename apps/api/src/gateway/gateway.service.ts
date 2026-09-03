@@ -8,6 +8,7 @@ import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@opendatacaptu
 import type {
   Assignment,
   CreateRemoteAssignmentInputData,
+  CreateRemoteAssignmentsInputData,
   MutateAssignmentResponseBody,
   RemoteAssignment
 } from '@opendatacapture/schemas/assignment';
@@ -38,6 +39,43 @@ export class GatewayService {
       instrumentContainer: instrument,
       publicKey: Array.from(await HybridCrypto.serializePublicKey(publicKey))
     } satisfies CreateRemoteAssignmentInputData);
+    if (response.status !== HttpStatus.CREATED) {
+      throw new BadGatewayException(`Unexpected Status Code From Gateway: ${response.status}`, {
+        cause: response.statusText
+      });
+    }
+    return $MutateAssignmentResponseBody.parseAsync(response.data);
+  }
+
+  /**
+   * Send a whole batch to the gateway in one request.
+   *
+   * Each distinct instrument's bundle is fetched once and sent once, no matter how many assignments
+   * reference it — a batch is a handful of instruments across hundreds of subjects, so fetching per
+   * assignment would re-read and re-transmit the same compiled bundle hundreds of times.
+   *
+   * The gateway writes the batch in a transaction, so this either persists in full or not at all.
+   */
+  async createRemoteAssignments(
+    entries: { assignment: Assignment; publicKey: webcrypto.CryptoKey }[]
+  ): Promise<MutateAssignmentResponseBody> {
+    const instrumentIds = [...new Set(entries.map(({ assignment }) => assignment.instrumentId))];
+    const instruments = await Promise.all(
+      instrumentIds.map(async (instrumentId) => ({
+        instrumentContainer: await this.instrumentsService.findBundleById(instrumentId),
+        instrumentId
+      }))
+    );
+    const assignments = await Promise.all(
+      entries.map(async ({ assignment, publicKey }) => ({
+        ...assignment,
+        publicKey: Array.from(await HybridCrypto.serializePublicKey(publicKey))
+      }))
+    );
+    const response = await this.httpService.axiosRef.post(`/api/assignments/bulk`, {
+      assignments,
+      instruments
+    } satisfies CreateRemoteAssignmentsInputData);
     if (response.status !== HttpStatus.CREATED) {
       throw new BadGatewayException(`Unexpected Status Code From Gateway: ${response.status}`, {
         cause: response.statusText

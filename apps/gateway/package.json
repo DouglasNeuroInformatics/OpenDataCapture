@@ -14,6 +14,7 @@
     "dev:test": "NODE_ENV=test env-cmd -f ../../.env tsx scripts/dev.ts && env-cmd -f ../../.env node dist/main.js",
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
+    "test": "env-cmd -f ../../.env vitest",
     "start": "NODE_ENV=production env-cmd -f ../../.env node dist/main.js"
   },
   "dependencies": {
