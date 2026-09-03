@@ -96,10 +96,10 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
       <ErrorList errors={errors} />
 
       <div className="flex flex-col gap-3">
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground mb-2 text-sm">
           {t({
-            en: 'Assign one or more instruments to many subjects at once. Choose the subjects, pick the instruments and when each expires, then review before anything is created — every assignment is created together, or none of them are.',
-            fr: 'Attribuez un ou plusieurs instruments à plusieurs sujets à la fois. Choisissez les sujets, sélectionnez les instruments et leur date d’expiration, puis révisez avant toute création — toutes les tâches sont créées ensemble, ou aucune ne l’est.'
+            en: 'Assign one or more instruments to many subjects at once. Choose the subjects, pick the instruments and when each expires, then review before anything is created - every assignment is created together, or none of them are.',
+            fr: 'Attribuez un ou plusieurs instruments à plusieurs sujets à la fois. Choisissez les sujets, sélectionnez les instruments et leur date d’expiration, puis révisez avant toute création - toutes les tâches sont créées ensemble, ou aucune ne l’est.'
           })}
         </p>
         <Tabs
