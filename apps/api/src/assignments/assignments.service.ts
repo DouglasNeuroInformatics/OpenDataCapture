@@ -229,7 +229,7 @@ export class AssignmentsService {
    */
   private async resolveBulkRequest(
     { allowDuplicates, groupId, subjectIds, timepoints }: BulkAssignmentPreflightData,
-    { ability, id: userId }: RequestUser
+    { ability }: RequestUser
   ) {
     // A group the caller cannot read is indistinguishable from one that does not exist.
     const group = await this.groupModel.findFirst({
@@ -295,7 +295,7 @@ export class AssignmentsService {
         issues
       } satisfies BulkAssignmentFailure);
     }
-    return { groupId, subjectIds, timepoints, userId };
+    return { groupId, subjectIds, timepoints };
   }
 
   /** Create the Mongo row and keypair for a single assignment within a batch. */
