@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, ClientTable, FileDropzone, Tabs, TextArea } from '@douglasneuroinformatics/libui/components';
+import { Button, FileDropzone, SearchBar, Table, Tabs, TextArea } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
@@ -35,6 +35,7 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
   const [mode, setMode] = useState<SourceMode>('SELECT');
   const [errors, setErrors] = useState<BulkParseError[]>([]);
   const [pasted, setPasted] = useState('');
+  const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
 
   const run = async (parse: () => BulkParseResult | Promise<BulkParseResult>) => {
@@ -91,6 +92,11 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
     subject: removeSubjectIdScope(subject.id).slice(0, subjectIdDisplayLength)
   }));
 
+  const query = search.trim().toLowerCase();
+  const filtered = query
+    ? rows.filter((row) => [row.subject, row.dateOfBirth, row.sex].some((value) => value.toLowerCase().includes(query)))
+    : rows;
+
   return (
     <div className="flex flex-col gap-6" data-testid="bulk-source-step">
       <ErrorList errors={errors} />
@@ -126,28 +132,75 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
 
       {mode === 'SELECT' && (
         <div className="flex flex-col gap-3">
-          <p className="text-muted-foreground text-sm">
-            {t({
-              en: 'Choose existing subjects in this group.',
-              fr: 'Choisissez des sujets existants de ce groupe.'
-            })}
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-muted-foreground text-sm">
+              {t({
+                en: 'Choose existing subjects in this group.',
+                fr: 'Choisissez des sujets existants de ce groupe.'
+              })}
+            </p>
+            <SearchBar
+              className="w-full sm:w-72"
+              data-testid="bulk-subject-search"
+              placeholder={t({ en: 'Search subjects...', fr: 'Rechercher des sujets...' })}
+              value={search}
+              onValueChange={setSearch}
+            />
+          </div>
           {rows.length === 0 ? (
             <p className="text-muted-foreground text-sm italic">
               {t({ en: 'This group has no subjects.', fr: 'Ce groupe n’a aucun sujet.' })}
             </p>
+          ) : filtered.length === 0 ? (
+            <p className="text-muted-foreground text-sm italic">
+              {t({ en: 'No subjects match your search.', fr: 'Aucun sujet ne correspond à votre recherche.' })}
+            </p>
           ) : (
-            <ClientTable
-              columns={[
-                { field: 'subject', label: t('datahub.index.table.subject') },
-                { field: 'dateOfBirth', label: t('core.identificationData.dateOfBirth.label') },
-                { field: 'sex', label: t('core.identificationData.sex.label') },
-                { field: 'selected', label: t({ en: 'Selected', fr: 'Sélectionné' }) }
-              ]}
-              data={rows}
-              data-testid="bulk-subject-picker"
-              onEntryClick={({ id }) => toggle(id)}
-            />
+            <div className="max-h-96 overflow-auto rounded-md border" data-testid="bulk-subject-picker">
+              <Table>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.Head>{t('datahub.index.table.subject')}</Table.Head>
+                    <Table.Head>{t('core.identificationData.dateOfBirth.label')}</Table.Head>
+                    <Table.Head>{t('core.identificationData.sex.label')}</Table.Head>
+                    <Table.Head className="text-right">{t({ en: 'Select', fr: 'Choisir' })}</Table.Head>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                  {filtered.map((row) => {
+                    const isSelected = selected.has(row.id);
+                    return (
+                      // `data-state` drives the row highlight libui already defines for a selected row,
+                      // rather than a colour invented here.
+                      <Table.Row
+                        className="cursor-pointer"
+                        data-state={isSelected ? 'selected' : undefined}
+                        key={row.id}
+                        onClick={() => toggle(row.id)}
+                      >
+                        <Table.Cell className="font-medium">{row.subject}</Table.Cell>
+                        <Table.Cell>{row.dateOfBirth}</Table.Cell>
+                        <Table.Cell>{row.sex}</Table.Cell>
+                        <Table.Cell className="text-right">
+                          <Button
+                            data-testid={`bulk-select-subject-${row.subject}`}
+                            size="sm"
+                            type="button"
+                            variant={isSelected ? 'primary' : 'outline'}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              toggle(row.id);
+                            }}
+                          >
+                            {isSelected ? t({ en: 'Selected', fr: 'Choisi' }) : t({ en: 'Select', fr: 'Choisir' })}
+                          </Button>
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  })}
+                </Table.Body>
+              </Table>
+            </div>
           )}
           <div className="flex justify-center">
             <Button
@@ -199,7 +252,7 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
             value={pasted}
             onChange={(event) => setPasted(event.target.value)}
           />
-          <div>
+          <div className="flex justify-center">
             <Button
               data-testid="bulk-parse-pasted"
               disabled={pasted.trim().length === 0}
