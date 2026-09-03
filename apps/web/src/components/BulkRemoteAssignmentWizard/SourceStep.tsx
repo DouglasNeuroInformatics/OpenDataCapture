@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, FileDropzone, SearchBar, Table, Tabs, TextArea } from '@douglasneuroinformatics/libui/components';
+import {
+  Button,
+  Checkbox,
+  FileDropzone,
+  SearchBar,
+  Table,
+  Tabs,
+  TextArea
+} from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
@@ -82,7 +90,6 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
   const rows = subjects.map((subject) => ({
     dateOfBirth: subject.dateOfBirth ? toBasicISOString(subject.dateOfBirth) : t({ en: 'NULL', fr: 'NUL' }),
     id: subject.id,
-    selected: selected.has(subject.id) ? '✓' : '',
     sex:
       subject.sex === 'FEMALE'
         ? t('core.identificationData.sex.female')
@@ -96,6 +103,21 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
   const filtered = query
     ? rows.filter((row) => [row.subject, row.dateOfBirth, row.sex].some((value) => value.toLowerCase().includes(query)))
     : rows;
+
+  const allShownSelected = filtered.length > 0 && filtered.every((row) => selected.has(row.id));
+
+  const toggleAllShown = () =>
+    setSelected((previous) => {
+      const next = new Set(previous);
+      for (const row of filtered) {
+        if (allShownSelected) {
+          next.delete(row.id);
+        } else {
+          next.add(row.id);
+        }
+      }
+      return next;
+    });
 
   return (
     <div className="flex flex-col gap-6" data-testid="bulk-source-step">
@@ -160,10 +182,17 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
               <Table>
                 <Table.Header>
                   <Table.Row>
+                    <Table.Head className="w-10">
+                      <Checkbox
+                        aria-label={t({ en: 'Select all shown', fr: 'Tout sélectionner' })}
+                        checked={allShownSelected}
+                        data-testid="bulk-select-all-subjects"
+                        onCheckedChange={toggleAllShown}
+                      />
+                    </Table.Head>
                     <Table.Head>{t('datahub.index.table.subject')}</Table.Head>
                     <Table.Head>{t('core.identificationData.dateOfBirth.label')}</Table.Head>
                     <Table.Head>{t('core.identificationData.sex.label')}</Table.Head>
-                    <Table.Head className="text-right">{t({ en: 'Select', fr: 'Choisir' })}</Table.Head>
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -178,23 +207,17 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
                         key={row.id}
                         onClick={() => toggle(row.id)}
                       >
+                        <Table.Cell className="w-10">
+                          <Checkbox
+                            aria-label={row.subject}
+                            checked={isSelected}
+                            data-testid={`bulk-select-subject-${row.subject}`}
+                            onCheckedChange={() => toggle(row.id)}
+                          />
+                        </Table.Cell>
                         <Table.Cell className="font-medium">{row.subject}</Table.Cell>
                         <Table.Cell>{row.dateOfBirth}</Table.Cell>
                         <Table.Cell>{row.sex}</Table.Cell>
-                        <Table.Cell className="text-right">
-                          <Button
-                            data-testid={`bulk-select-subject-${row.subject}`}
-                            size="sm"
-                            type="button"
-                            variant={isSelected ? 'primary' : 'outline'}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              toggle(row.id);
-                            }}
-                          >
-                            {isSelected ? t({ en: 'Selected', fr: 'Choisi' }) : t({ en: 'Select', fr: 'Choisir' })}
-                          </Button>
-                        </Table.Cell>
                       </Table.Row>
                     );
                   })}
