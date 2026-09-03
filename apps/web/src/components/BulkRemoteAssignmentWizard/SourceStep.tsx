@@ -111,7 +111,12 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
         >
           <Tabs.List className="w-fit" data-testid="bulk-source-mode">
             {modes.map((option) => (
-              <Tabs.Trigger data-testid={`bulk-source-mode-${option.value}`} key={option.value} value={option.value}>
+              <Tabs.Trigger
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                data-testid={`bulk-source-mode-${option.value}`}
+                key={option.value}
+                value={option.value}
+              >
                 {option.label}
               </Tabs.Trigger>
             ))}
@@ -144,7 +149,7 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
               onEntryClick={({ id }) => toggle(id)}
             />
           )}
-          <div>
+          <div className="flex justify-center">
             <Button
               data-testid="bulk-use-selected-subjects"
               disabled={selected.size === 0}
@@ -184,8 +189,8 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
         <div className="flex flex-col gap-3">
           <p className="text-muted-foreground text-sm">
             {t({
-              en: 'Comma, tab or semicolon separated, with a header row.',
-              fr: 'Séparé par des virgules, tabulations ou points-virgules, avec une ligne d’en-tête.'
+              en: 'Comma, tab or semicolon separated, with a header row. Include a subject ID column, or first name, last name, date of birth and sex.',
+              fr: 'Séparé par des virgules, tabulations ou points-virgules, avec une ligne d’en-tête. Incluez une colonne d’identifiant, ou prénom, nom, date de naissance et sexe.'
             })}
           </p>
           <TextArea
