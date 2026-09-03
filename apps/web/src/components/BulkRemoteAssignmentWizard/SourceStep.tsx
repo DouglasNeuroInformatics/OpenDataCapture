@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, ClientTable, FileDropzone, TextArea } from '@douglasneuroinformatics/libui/components';
+import { Button, ClientTable, FileDropzone, Tabs, TextArea } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
@@ -95,21 +95,28 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
     <div className="flex flex-col gap-6" data-testid="bulk-source-step">
       <ErrorList errors={errors} />
 
-      <div className="flex flex-wrap gap-2" data-testid="bulk-source-mode">
-        {modes.map((option) => (
-          <Button
-            data-testid={`bulk-source-mode-${option.value}`}
-            key={option.value}
-            type="button"
-            variant={mode === option.value ? 'primary' : 'outline'}
-            onClick={() => {
-              setErrors([]);
-              setMode(option.value);
-            }}
-          >
-            {option.label}
-          </Button>
-        ))}
+      <div className="flex flex-col gap-3">
+        <p className="text-muted-foreground text-sm">
+          {t({
+            en: 'Assign one or more instruments to many subjects at once. Choose the subjects, pick the instruments and when each expires, then review before anything is created — every assignment is created together, or none of them are.',
+            fr: 'Attribuez un ou plusieurs instruments à plusieurs sujets à la fois. Choisissez les sujets, sélectionnez les instruments et leur date d’expiration, puis révisez avant toute création — toutes les tâches sont créées ensemble, ou aucune ne l’est.'
+          })}
+        </p>
+        <Tabs
+          value={mode}
+          onValueChange={(value) => {
+            setErrors([]);
+            setMode(value as SourceMode);
+          }}
+        >
+          <Tabs.List className="w-fit" data-testid="bulk-source-mode">
+            {modes.map((option) => (
+              <Tabs.Trigger data-testid={`bulk-source-mode-${option.value}`} key={option.value} value={option.value}>
+                {option.label}
+              </Tabs.Trigger>
+            ))}
+          </Tabs.List>
+        </Tabs>
       </div>
 
       {mode === 'SELECT' && (
