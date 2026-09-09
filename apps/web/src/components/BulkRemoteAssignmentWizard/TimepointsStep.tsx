@@ -61,14 +61,19 @@ export const TimepointsStep = ({
         })}
       </p>
 
-      <div className="flex flex-wrap items-end gap-2">
-        <div className="flex min-w-64 flex-col gap-1">
+      {/* Fixed column widths, and `minmax(0, …)` on the select so a long instrument title clips
+          instead of widening its column. Laid out with flex and a min-width, the row re-flowed every
+          time a different instrument was chosen. */}
+      <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,20rem)_10rem_auto]">
+        <div className="flex min-w-0 flex-col gap-1">
           <label className="text-sm font-medium" htmlFor="bulk-instrument">
             {t({ en: 'Instrument', fr: 'Instrument' })}
           </label>
           <Select value={instrumentId} onValueChange={setInstrumentId}>
-            <Select.Trigger data-testid="bulk-instrument-select" id="bulk-instrument">
-              <Select.Value placeholder={t({ en: 'Choose an instrument', fr: 'Choisir un instrument' })} />
+            <Select.Trigger className="w-full" data-testid="bulk-instrument-select" id="bulk-instrument">
+              <span className="truncate">
+                <Select.Value placeholder={t({ en: 'Choose an instrument', fr: 'Choisir un instrument' })} />
+              </span>
             </Select.Trigger>
             <Select.Content>
               {available.map((instrument) => (
@@ -84,6 +89,7 @@ export const TimepointsStep = ({
             {t({ en: 'Expires on', fr: 'Expire le' })}
           </label>
           <Input
+            className="w-full"
             data-testid="bulk-expiry-input"
             id="bulk-expiry"
             type="date"
@@ -103,9 +109,14 @@ export const TimepointsStep = ({
           </p>
         ) : (
           timepoints.map((timepoint) => (
-            <div className="flex items-center justify-between rounded-md border px-3 py-2" key={timepoint.instrumentId}>
-              <span className="text-sm">{timepoint.instrumentTitle}</span>
-              <div className="flex items-center gap-2">
+            <div
+              className="flex items-center justify-between gap-3 rounded-md border px-3 py-2"
+              key={timepoint.instrumentId}
+            >
+              <span className="truncate text-sm" title={timepoint.instrumentTitle}>
+                {timepoint.instrumentTitle}
+              </span>
+              <div className="flex shrink-0 items-center gap-2">
                 <Badge variant="secondary">{timepoint.expiresAt}</Badge>
                 <button
                   aria-label={t({ en: 'Remove instrument', fr: "Retirer l'instrument" })}
