@@ -51,6 +51,12 @@ catalogs:
     '@tailwindcss/vite':
       specifier: 4.3.0
       version: 4.3.0
+    '@testing-library/dom':
+      specifier: ^10.4.0
+      version: 10.4.1
+    '@testing-library/react':
+      specifier: ^16.0.1
+      version: 16.2.0
     '@types/nodemailer':
       specifier: ^7.0.5
       version: 7.0.11
@@ -827,10 +833,10 @@ importers:
         specifier: ^1.127.3
         version: 1.168.14(@tanstack/react-router@1.170.11(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x))(vite@6.4.3(@types/node@24.13.0)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.8.2)(yaml@2.9.0))
       '@testing-library/dom':
-        specifier: ^10.4.0
+        specifier: 'catalog:'
         version: 10.4.1
       '@testing-library/react':
-        specifier: 16.2.0
+        specifier: 'catalog:'
         version: 16.2.0(@testing-library/dom@10.4.1)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
       '@types/qrcode':
         specifier: ^1.5.6
@@ -1072,6 +1078,15 @@ importers:
       '@storybook/react-vite':
         specifier: 'catalog:'
         version: 10.4.2(esbuild@0.27.7)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(rollup@4.61.1)(storybook@10.4.2(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x))(typescript@6.0.3)(vite@6.4.3(@types/node@24.13.0)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.8.2)(yaml@2.9.0))
+      '@testing-library/dom':
+        specifier: 'catalog:'
+        version: 10.4.1
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.2.0(@testing-library/dom@10.4.1)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.10.1
       type-fest:
         specifier: workspace:type-fest__4.x@*
         version: link:../../vendor/type-fest@4.x

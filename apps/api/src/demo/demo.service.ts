@@ -9,6 +9,7 @@ import enhancedDemographicsQuestionnaire from '@opendatacapture/instrument-libra
 import generalConsentForm from '@opendatacapture/instrument-library/forms/DNP_GENERAL_CONSENT_FORM.js';
 import happinessQuestionnaire from '@opendatacapture/instrument-library/forms/DNP_HAPPINESS_QUESTIONNAIRE.js';
 import breakoutTask from '@opendatacapture/instrument-library/interactive/DNP_BREAKOUT_TASK.js';
+import happinessQuestionnaireRepeated from '@opendatacapture/instrument-library/series/DNP_HAPPINESS_QUESTIONNAIRE_REPEATED.js';
 import happinessQuestionnaireWithConsent from '@opendatacapture/instrument-library/series/DNP_HAPPINESS_QUESTIONNAIRE_WITH_CONSENT.js';
 import type { FormInstrument, Language } from '@opendatacapture/runtime-core';
 import type { WithID } from '@opendatacapture/schemas/core';
@@ -72,6 +73,7 @@ export class DemoService {
       this.loggingService.debug('Done creating interactive instruments');
 
       await this.instrumentsService.create({ bundle: happinessQuestionnaireWithConsent });
+      await this.instrumentsService.create({ bundle: happinessQuestionnaireRepeated });
       this.loggingService.debug('Done creating series instruments');
 
       await Promise.all([

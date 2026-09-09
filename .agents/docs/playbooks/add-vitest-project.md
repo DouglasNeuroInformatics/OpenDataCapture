@@ -7,14 +7,14 @@ matters.
 **Plan around this:** the failure this playbook prevents is silent. Root `vitest.config.ts` declares
 `projects: ['apps/*/vitest.config.ts', 'packages/*/vitest.config.ts', 'runtime/*/vitest.config.ts']`,
 so a workspace with no `vitest.config.ts` of its own contributes no project. A test file added to
-`packages/react-core` today is collected by nothing, reported by nothing, and passes CI green — the
+`apps/gateway` today is collected by nothing, reported by nothing, and passes CI green — the
 run never mentions it, and there is no error to search for.
 
 The opposite mistake is loud. Once a project exists, a `--project` filter that matches no `name` stops
 the run dead:
 
 ```
-Error: No projects matched the filter "react-core".
+Error: No projects matched the filter "gateway".
 ```
 
 That error means the config is absent or its `name` differs from what you typed. Green with no mention
@@ -113,7 +113,7 @@ of your file means the config is absent.
 
 9. **Record the new tier in every doc that tracks it.** The set that moves together is one row in
    `.agents/skills/odc-agent-docs/SKILL.md`. Other files also assert your package has no project —
-   `packages/instrument-interpreter/AGENTS.md` says it of `react-core` — and none of them contains the
+   `.agents/skills/odc-frontend/SKILL.md` says it of `apps/gateway` — and none of them contains the
    new project name, so search by the package name instead:
    `grep -rn '<pkg>' --include=AGENTS.md . ; grep -rn '<pkg>' .agents`.
 
