@@ -28,7 +28,28 @@ the first is an esbuild `define` holding base64 Tailwind CSS built from
 Runtime assets are not bundled: `Server.create` calls `generateMetadata({ rootDir: import.meta.dirname })`,
 which resolves the `@opendatacapture/runtime-v1` **peer** dependency from the installed `dist/`.
 
+**`Server.stop()` closes the http server, not the file watcher.** `InstrumentLoader`'s constructor
+calls `fs.watch(target, ...)` and nothing ever calls `.close()` on the returned watcher — every
+`Server` instance leaks one. `src/__tests__/server.test.ts` works around this by mocking `fs.watch`
+outright rather than by fixing it; do not copy that pattern as evidence the leak is fine.
+
+**`cli.ts`'s target/`--all` validation does not exit cleanly.** `parseTarget` is called by hand
+inside the async `.action()` body rather than passed to `.argument()` as commander's own parser, so
+throwing `InvalidArgumentError` from it does not go through commander's usual
+print-message-and-`process.exit(1)` handling — it does not even reject the promise `program.parse()`
+returns. It surfaces as a bare unhandled rejection on the process, which crashes with an ugly stack
+trace instead of the clean CLI error the code reads as though it produces. The `--port` validator
+(`parsePort`, passed directly to `.option()`) does not have this problem.
+
 ## Tests and running it
 
-No `vitest.config.ts` and no `test` script — this package has no unit tests. There is no `dev` script
-either: `pnpm --filter @opendatacapture/serve-instrument build`, then `node dist/cli.js <dir>`.
+`pnpm exec vitest --project serve-instrument`. `src/__tests__/cli.test.ts` drives the CLI with a
+stubbed `process.argv` and a fresh module per test, `Server` itself mocked out.
+`src/__tests__/root.test.tsx` renders `Root` with `renderToStaticMarkup` — no DOM, so
+`LanguageSwitcher`'s interactive half goes unexercised. `src/__tests__/server.test.ts` starts a real
+`Server` against real temp-directory fixtures and drives it with real `fetch` calls; it mocks
+`fs.watch` (see the trap above) and stubs the `client.js` / `__TAILWIND_STYLES__` globals that only
+exist post-build.
+
+There is no `dev` script either: `pnpm --filter @opendatacapture/serve-instrument build`, then
+`node dist/cli.js <dir>`.

@@ -3,5 +3,5 @@
   "compilerOptions": {
     "lib": ["DOM", "ESNext"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "vitest.config.ts"]
 }

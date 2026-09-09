@@ -19,7 +19,8 @@ export default defineConfig({
         '**/*.config.?(c|m)[jt]s?(x)',
         '**/*.stories.?(c|m)[jt]s?(x)'
       ],
-      include: ['apps/{api,gateway,web}/src/**/*.?(c|m)[jt]s?(x)', 'packages/*/src/**/*.?(c|m)[jt]s?(x)'],
+      include: ['packages/*/src/**/*.?(c|m)[jt]s?(x)'],
+      // include: ['apps/{api,gateway,web}/src/**/*.?(c|m)[jt]s?(x)', 'packages/*/src/**/*.?(c|m)[jt]s?(x)'],
       provider: 'v8',
       reportsDirectory: path.resolve(import.meta.dirname, 'coverage'),
       skipFull: true

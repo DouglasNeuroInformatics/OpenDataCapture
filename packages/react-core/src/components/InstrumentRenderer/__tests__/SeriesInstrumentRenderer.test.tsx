@@ -1,6 +1,6 @@
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import type { SeriesInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod/v4';
 
@@ -13,9 +13,12 @@ import { SeriesInstrumentRenderer } from '../SeriesInstrumentRenderer';
 declare global {
   // eslint-disable-next-line no-var
   var __testValidationSchema: z.ZodTypeAny;
+  // eslint-disable-next-line no-var
+  var __testInteractiveValidationSchema: z.ZodTypeAny;
 }
 
 globalThis.__testValidationSchema = z.object({ answer: z.string().min(1) });
+globalThis.__testInteractiveValidationSchema = z.object({ message: z.string() });
 
 const ITEM_BUNDLE = `(async () => ({
   __runtimeVersion: 1,
@@ -140,6 +143,83 @@ describe('SeriesInstrumentRenderer', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
     await waitFor(() => {
       expect(getAnswerInput().value).toBe('');
+    });
+  });
+
+  it('should show the completion screen once every item has been submitted', async () => {
+    const { onSubmit } = await beginSeries({ skipProgress: true });
+    await answerAndSubmit('first administration', onSubmit);
+    await waitFor(() => {
+      expect(getAnswerInput().value).toBe('');
+    });
+    await answerAndSubmit('second administration', onSubmit);
+
+    await waitFor(() => {
+      expect(screen.getByText('Thank You!')).toBeTruthy();
+    });
+  });
+
+  it('should show a placeholder when an item bundle fails to interpret', async () => {
+    const target: SeriesInstrumentBundleContainer = {
+      bundle: `(async () => ({
+        __runtimeVersion: 1,
+        kind: 'SERIES',
+        language: 'en',
+        tags: ['Test'],
+        content: { items: [{ name: 'BROKEN', edition: 1 }], params: { skipProgress: true } },
+        details: { description: 'A series with a broken item', license: 'Apache-2.0', title: 'Broken Series' }
+      }))()`,
+      id: 'series-id',
+      items: [{ bundle: "(() => { throw new Error('boom'); })()", id: 'item-id', kind: 'FORM' }],
+      kind: 'SERIES'
+    };
+    render(<SeriesInstrumentRenderer target={target} onSubmit={vi.fn()} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    await waitFor(() => {
+      expect(screen.getByText('Failed to Load Instrument')).toBeTruthy();
+    });
+  });
+
+  it('should render an INTERACTIVE item, and complete the series when it submits', async () => {
+    const interactiveItemBundle = `(async () => ({
+      __runtimeVersion: 1,
+      kind: 'INTERACTIVE',
+      language: 'en',
+      tags: ['Test'],
+      internal: { edition: 1, name: 'INTERACTIVE_ITEM' },
+      content: {},
+      details: { description: 'An interactive series item', license: 'Apache-2.0', title: 'Interactive Item' },
+      measures: null,
+      validationSchema: globalThis.__testInteractiveValidationSchema
+    }))()`;
+    const target: SeriesInstrumentBundleContainer = {
+      bundle: `(async () => ({
+        __runtimeVersion: 1,
+        kind: 'SERIES',
+        language: 'en',
+        tags: ['Test'],
+        content: { items: [{ name: 'INTERACTIVE_ITEM', edition: 1 }], params: { skipProgress: true } },
+        details: { description: 'A series with one interactive item', license: 'Apache-2.0', title: 'Interactive Series' }
+      }))()`,
+      id: 'series-id',
+      items: [{ bundle: interactiveItemBundle, id: 'item-id', kind: 'INTERACTIVE' }],
+      kind: 'SERIES'
+    };
+    const onSubmit = vi.fn();
+    render(<SeriesInstrumentRenderer target={target} onSubmit={onSubmit} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    await waitFor(() => {
+      expect(document.querySelector('iframe')).toBeTruthy();
+    });
+    await act(async () => {
+      document.dispatchEvent(new CustomEvent('done', { detail: { message: 'ok' } }));
+      await Promise.resolve();
+    });
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledOnce();
+    });
+    await waitFor(() => {
+      expect(screen.getByText('Thank You!')).toBeTruthy();
     });
   });
 });
