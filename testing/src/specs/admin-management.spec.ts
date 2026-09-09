@@ -294,6 +294,33 @@ test.describe('admin management', () => {
     await expect(api.createUser({ phoneNumber: '123' })).rejects.toThrow(/Phone number must contain at least 7 digits/);
   });
 
+  test('should show the permissions a user already holds when the edit sheet is first opened', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+    await api.updateUser(user.id, { additionalPermissions: [{ action: 'read', subject: 'Subject' }] });
+
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users');
+    await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(user.username);
+    await page.getByTestId('data-table-row').dblclick();
+
+    const editSheet = page.getByTestId('admin-user-edit-sheet');
+    await expect(editSheet.getByTestId('action-select-trigger')).toContainText('Read');
+    await expect(editSheet.getByTestId('subject-select-trigger')).toContainText('Subject');
+
+    // Any re-render of the sheet -- a background refetch landing, or opening this dialog and
+    // thinking better of it -- used to reset the permission field to a blank row, so saving
+    // afterwards silently cleared the permissions the admin never saw.
+    await editSheet.getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole('button', { name: 'No' }).click();
+    await expect(editSheet.getByTestId('action-select-trigger')).toContainText('Read');
+    await expect(editSheet.getByTestId('subject-select-trigger')).toContainText('Subject');
+  });
+
   test("should clear a user's email from the edit sheet", async ({ api, authenticateAs, page, uniqueId }) => {
     const email = `contact-${uniqueId}@example.org`;
     const group = await api.createGroup();
