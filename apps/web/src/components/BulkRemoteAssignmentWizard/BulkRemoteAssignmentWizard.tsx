@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 
-import { Button, Heading } from '@douglasneuroinformatics/libui/components';
+import { Button, CopyButton, Table } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { BulkAssignmentFailure } from '@opendatacapture/schemas/assignment';
 import type { Subject } from '@opendatacapture/schemas/subject';
+import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 import { toBulkAssignmentFailure, useCreateBulkAssignmentsMutation } from '@/hooks/useBulkAssignments';
 import { toResultCsv } from '@/utils/bulk-assignments';
@@ -11,11 +12,24 @@ import { toResultCsv } from '@/utils/bulk-assignments';
 import { MapStep } from './MapStep';
 import { ReviewStep } from './ReviewStep';
 import { SourceStep } from './SourceStep';
+import { StepLayout } from './StepLayout';
 import { TimepointsStep } from './TimepointsStep';
 
-import type { WizardState } from './types';
+import type { CreatedAssignment, WizardState } from './types';
 
 type InstrumentOption = { id: string; title: string };
+
+/** The link is the point of the export, so it is a column rather than something to look up later. */
+const toCsvRows = (assignments: CreatedAssignment[]) =>
+  assignments.map((assignment) => ({
+    expiresAt: new Date(assignment.expiresAt).toISOString(),
+    instrumentId: assignment.instrumentId,
+    subjectId: assignment.subjectId,
+    url: assignment.url
+  }));
+
+const copyLinks = (assignments: CreatedAssignment[]) =>
+  navigator.clipboard.writeText(assignments.map(({ url }) => url).join('\n'));
 
 const downloadCsv = (csv: string) => {
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
@@ -91,7 +105,7 @@ export const BulkRemoteAssignmentWizard = ({
           setTransportError(true);
         },
         onSuccess: (assignments) => {
-          setState({ createdCount: assignments.length, step: 'DONE', subjectIds: state.subjectIds });
+          setState({ assignments, step: 'DONE' });
         }
       }
     );
@@ -139,30 +153,63 @@ export const BulkRemoteAssignmentWizard = ({
       )}
 
       {state.step === 'DONE' && (
-        <div className="flex flex-col gap-4" data-testid="bulk-done-step">
-          <Heading variant="h4">{t({ en: 'Assignments created', fr: 'Tâches créées' })}</Heading>
-          <p className="text-sm" data-testid="bulk-created-count">
-            {t({
-              en: `${state.createdCount} assignments were created.`,
-              fr: `${state.createdCount} tâches ont été créées.`
-            })}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              data-testid="bulk-download-csv"
-              type="button"
-              variant="outline"
-              onClick={() =>
-                downloadCsv(toResultCsv(state.subjectIds.map((subjectId) => ({ status: 'CREATED', subjectId }))))
-              }
-            >
-              {t({ en: 'Download CSV', fr: 'Télécharger le CSV' })}
-            </Button>
-            <Button data-testid="bulk-start-over" type="button" onClick={reset}>
-              {t({ en: 'Start over', fr: 'Recommencer' })}
-            </Button>
+        <StepLayout
+          description={t({
+            en: 'Each subject has a link below. Copy them, or download a CSV to share with whoever is sending them out.',
+            fr: 'Chaque sujet a un lien ci-dessous. Copiez-les ou téléchargez un CSV à transmettre à la personne qui les enverra.'
+          })}
+          footer={
+            <React.Fragment>
+              <Button
+                data-testid="bulk-copy-links"
+                type="button"
+                variant="outline"
+                onClick={() => void copyLinks(state.assignments)}
+              >
+                {t({ en: 'Copy all links', fr: 'Copier tous les liens' })}
+              </Button>
+              <Button
+                data-testid="bulk-download-csv"
+                type="button"
+                onClick={() => downloadCsv(toResultCsv(toCsvRows(state.assignments)))}
+              >
+                {t({ en: 'Download CSV', fr: 'Télécharger le CSV' })}
+              </Button>
+            </React.Fragment>
+          }
+          step={null}
+          title={t({
+            en: `${state.assignments.length} assignments created`,
+            fr: `${state.assignments.length} tâches créées`
+          })}
+        >
+          <div className="max-h-96 overflow-auto rounded-md border" data-testid="bulk-done-step">
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>{t('datahub.index.table.subject')}</Table.Head>
+                  <Table.Head>{t({ en: 'Link', fr: 'Lien' })}</Table.Head>
+                  <Table.Head className="w-12" />
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {state.assignments.map((assignment) => (
+                  <Table.Row key={assignment.url}>
+                    <Table.Cell className="font-medium">
+                      {removeSubjectIdScope(assignment.subjectId).slice(0, subjectIdDisplayLength)}
+                    </Table.Cell>
+                    <Table.Cell className="text-muted-foreground max-w-0 truncate text-xs" title={assignment.url}>
+                      {assignment.url}
+                    </Table.Cell>
+                    <Table.Cell>
+                      <CopyButton size="icon" text={assignment.url} variant="outline" />
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
           </div>
-        </div>
+        </StepLayout>
       )}
     </div>
   );

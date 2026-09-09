@@ -25,6 +25,7 @@ import {
 import type { BulkParseError, BulkParseResult } from '@/utils/bulk-assignments';
 
 import { ErrorList } from './ErrorList';
+import { StepLayout } from './StepLayout';
 
 type SourceMode = 'FILE' | 'PASTE' | 'SELECT';
 
@@ -120,16 +121,17 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
     });
 
   return (
-    <div className="flex flex-col gap-6" data-testid="bulk-source-step">
-      <ErrorList errors={errors} />
+    <StepLayout
+      description={t({
+        en: 'Assign one or more instruments to many subjects at once. Every assignment is created together, or none of them are.',
+        fr: 'Attribuez un ou plusieurs instruments à plusieurs sujets à la fois. Toutes les tâches sont créées ensemble, ou aucune ne l’est.'
+      })}
+      step="SUBJECTS"
+      title={t({ en: 'Choose subjects', fr: 'Choisir les sujets' })}
+    >
+      <div className="flex flex-col gap-4" data-testid="bulk-source-step">
+        <ErrorList errors={errors} />
 
-      <div className="flex flex-col gap-3">
-        <p className="text-muted-foreground mb-2 text-sm">
-          {t({
-            en: 'Assign one or more instruments to many subjects at once. Choose the subjects, pick the instruments and when each expires, then review before anything is created - every assignment is created together, or none of them are.',
-            fr: 'Attribuez un ou plusieurs instruments à plusieurs sujets à la fois. Choisissez les sujets, sélectionnez les instruments et leur date d’expiration, puis révisez avant toute création - toutes les tâches sont créées ensemble, ou aucune ne l’est.'
-          })}
-        </p>
         <Tabs
           value={mode}
           onValueChange={(value) => {
@@ -150,143 +152,143 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
             ))}
           </Tabs.List>
         </Tabs>
-      </div>
 
-      {mode === 'SELECT' && (
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        {mode === 'SELECT' && (
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-muted-foreground text-sm">
+                {t({
+                  en: 'Choose existing subjects in this group.',
+                  fr: 'Choisissez des sujets existants de ce groupe.'
+                })}
+              </p>
+              <SearchBar
+                className="w-full sm:w-72"
+                data-testid="bulk-subject-search"
+                placeholder={t({ en: 'Search subjects...', fr: 'Rechercher des sujets...' })}
+                value={search}
+                onValueChange={setSearch}
+              />
+            </div>
+            {rows.length === 0 ? (
+              <p className="text-muted-foreground text-sm italic">
+                {t({ en: 'This group has no subjects.', fr: 'Ce groupe n’a aucun sujet.' })}
+              </p>
+            ) : filtered.length === 0 ? (
+              <p className="text-muted-foreground text-sm italic">
+                {t({ en: 'No subjects match your search.', fr: 'Aucun sujet ne correspond à votre recherche.' })}
+              </p>
+            ) : (
+              <div className="max-h-96 overflow-auto rounded-md border" data-testid="bulk-subject-picker">
+                <Table>
+                  <Table.Header>
+                    <Table.Row>
+                      <Table.Head className="w-10">
+                        <Checkbox
+                          aria-label={t({ en: 'Select all shown', fr: 'Tout sélectionner' })}
+                          checked={allShownSelected}
+                          data-testid="bulk-select-all-subjects"
+                          onCheckedChange={toggleAllShown}
+                        />
+                      </Table.Head>
+                      <Table.Head>{t('datahub.index.table.subject')}</Table.Head>
+                      <Table.Head>{t('core.identificationData.dateOfBirth.label')}</Table.Head>
+                      <Table.Head>{t('core.identificationData.sex.label')}</Table.Head>
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
+                    {filtered.map((row) => {
+                      const isSelected = selected.has(row.id);
+                      return (
+                        // `data-state` drives the row highlight libui already defines for a selected row,
+                        // rather than a colour invented here.
+                        <Table.Row
+                          className="cursor-pointer"
+                          data-state={isSelected ? 'selected' : undefined}
+                          key={row.id}
+                          onClick={() => toggle(row.id)}
+                        >
+                          <Table.Cell className="w-10">
+                            <Checkbox
+                              aria-label={row.subject}
+                              checked={isSelected}
+                              data-testid={`bulk-select-subject-${row.subject}`}
+                              onCheckedChange={() => toggle(row.id)}
+                            />
+                          </Table.Cell>
+                          <Table.Cell className="font-medium">{row.subject}</Table.Cell>
+                          <Table.Cell>{row.dateOfBirth}</Table.Cell>
+                          <Table.Cell>{row.sex}</Table.Cell>
+                        </Table.Row>
+                      );
+                    })}
+                  </Table.Body>
+                </Table>
+              </div>
+            )}
+            <div className="flex justify-center">
+              <Button
+                data-testid="bulk-use-selected-subjects"
+                disabled={selected.size === 0}
+                type="button"
+                onClick={() => onSubjectsSelected([...selected])}
+              >
+                {t({ en: 'Continue with selected', fr: 'Continuer avec la sélection' })}
+                {selected.size > 0 && ` (${selected.size})`}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {mode === 'FILE' && (
+          <div className="flex flex-col gap-3">
             <p className="text-muted-foreground text-sm">
               {t({
-                en: 'Choose existing subjects in this group.',
-                fr: 'Choisissez des sujets existants de ce groupe.'
+                en: 'CSV, TSV or Excel. Include a subject ID column, or first name, last name, date of birth and sex.',
+                fr: 'CSV, TSV ou Excel. Incluez une colonne d’identifiant, ou prénom, nom, date de naissance et sexe.'
               })}
             </p>
-            <SearchBar
-              className="w-full sm:w-72"
-              data-testid="bulk-subject-search"
-              placeholder={t({ en: 'Search subjects...', fr: 'Rechercher des sujets...' })}
-              value={search}
-              onValueChange={setSearch}
+            <FileDropzone
+              acceptedFileTypes={{
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+                'text/csv': ['.csv'],
+                'text/tab-separated-values': ['.tsv']
+              }}
+              data-testid="bulk-file-dropzone"
+              description={ACCEPTED_FILE_EXTENSIONS.join(', ')}
+              file={null}
+              setFile={handleFile}
             />
           </div>
-          {rows.length === 0 ? (
-            <p className="text-muted-foreground text-sm italic">
-              {t({ en: 'This group has no subjects.', fr: 'Ce groupe n’a aucun sujet.' })}
+        )}
+
+        {mode === 'PASTE' && (
+          <div className="flex flex-col gap-3">
+            <p className="text-muted-foreground text-sm">
+              {t({
+                en: 'Comma, tab or semicolon separated, with a header row. Include a subject ID column, or first name, last name, date of birth and sex.',
+                fr: 'Séparé par des virgules, tabulations ou points-virgules, avec une ligne d’en-tête. Incluez une colonne d’identifiant, ou prénom, nom, date de naissance et sexe.'
+              })}
             </p>
-          ) : filtered.length === 0 ? (
-            <p className="text-muted-foreground text-sm italic">
-              {t({ en: 'No subjects match your search.', fr: 'Aucun sujet ne correspond à votre recherche.' })}
-            </p>
-          ) : (
-            <div className="max-h-96 overflow-auto rounded-md border" data-testid="bulk-subject-picker">
-              <Table>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.Head className="w-10">
-                      <Checkbox
-                        aria-label={t({ en: 'Select all shown', fr: 'Tout sélectionner' })}
-                        checked={allShownSelected}
-                        data-testid="bulk-select-all-subjects"
-                        onCheckedChange={toggleAllShown}
-                      />
-                    </Table.Head>
-                    <Table.Head>{t('datahub.index.table.subject')}</Table.Head>
-                    <Table.Head>{t('core.identificationData.dateOfBirth.label')}</Table.Head>
-                    <Table.Head>{t('core.identificationData.sex.label')}</Table.Head>
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {filtered.map((row) => {
-                    const isSelected = selected.has(row.id);
-                    return (
-                      // `data-state` drives the row highlight libui already defines for a selected row,
-                      // rather than a colour invented here.
-                      <Table.Row
-                        className="cursor-pointer"
-                        data-state={isSelected ? 'selected' : undefined}
-                        key={row.id}
-                        onClick={() => toggle(row.id)}
-                      >
-                        <Table.Cell className="w-10">
-                          <Checkbox
-                            aria-label={row.subject}
-                            checked={isSelected}
-                            data-testid={`bulk-select-subject-${row.subject}`}
-                            onCheckedChange={() => toggle(row.id)}
-                          />
-                        </Table.Cell>
-                        <Table.Cell className="font-medium">{row.subject}</Table.Cell>
-                        <Table.Cell>{row.dateOfBirth}</Table.Cell>
-                        <Table.Cell>{row.sex}</Table.Cell>
-                      </Table.Row>
-                    );
-                  })}
-                </Table.Body>
-              </Table>
+            <TextArea
+              data-testid="bulk-paste-input"
+              rows={8}
+              value={pasted}
+              onChange={(event) => setPasted(event.target.value)}
+            />
+            <div className="flex justify-center">
+              <Button
+                data-testid="bulk-parse-pasted"
+                disabled={pasted.trim().length === 0}
+                type="button"
+                onClick={() => void run(() => parseDelimitedText(pasted))}
+              >
+                {t({ en: 'Use pasted data', fr: 'Utiliser les données collées' })}
+              </Button>
             </div>
-          )}
-          <div className="flex justify-center">
-            <Button
-              data-testid="bulk-use-selected-subjects"
-              disabled={selected.size === 0}
-              type="button"
-              onClick={() => onSubjectsSelected([...selected])}
-            >
-              {t({ en: 'Continue with selected', fr: 'Continuer avec la sélection' })}
-              {selected.size > 0 && ` (${selected.size})`}
-            </Button>
           </div>
-        </div>
-      )}
-
-      {mode === 'FILE' && (
-        <div className="flex flex-col gap-3">
-          <p className="text-muted-foreground text-sm">
-            {t({
-              en: 'CSV, TSV or Excel. Include a subject ID column, or first name, last name, date of birth and sex.',
-              fr: 'CSV, TSV ou Excel. Incluez une colonne d’identifiant, ou prénom, nom, date de naissance et sexe.'
-            })}
-          </p>
-          <FileDropzone
-            acceptedFileTypes={{
-              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-              'text/csv': ['.csv'],
-              'text/tab-separated-values': ['.tsv']
-            }}
-            data-testid="bulk-file-dropzone"
-            description={ACCEPTED_FILE_EXTENSIONS.join(', ')}
-            file={null}
-            setFile={handleFile}
-          />
-        </div>
-      )}
-
-      {mode === 'PASTE' && (
-        <div className="flex flex-col gap-3">
-          <p className="text-muted-foreground text-sm">
-            {t({
-              en: 'Comma, tab or semicolon separated, with a header row. Include a subject ID column, or first name, last name, date of birth and sex.',
-              fr: 'Séparé par des virgules, tabulations ou points-virgules, avec une ligne d’en-tête. Incluez une colonne d’identifiant, ou prénom, nom, date de naissance et sexe.'
-            })}
-          </p>
-          <TextArea
-            data-testid="bulk-paste-input"
-            rows={8}
-            value={pasted}
-            onChange={(event) => setPasted(event.target.value)}
-          />
-          <div className="flex justify-center">
-            <Button
-              data-testid="bulk-parse-pasted"
-              disabled={pasted.trim().length === 0}
-              type="button"
-              onClick={() => void run(() => parseDelimitedText(pasted))}
-            >
-              {t({ en: 'Use pasted data', fr: 'Utiliser les données collées' })}
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </StepLayout>
   );
 };

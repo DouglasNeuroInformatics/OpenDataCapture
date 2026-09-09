@@ -4,6 +4,8 @@ import { Badge, Button, Input, Select } from '@douglasneuroinformatics/libui/com
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { TrashIcon } from 'lucide-react';
 
+import { StepLayout } from './StepLayout';
+
 import type { DraftTimepoint } from './types';
 
 type InstrumentOption = { id: string; title: string };
@@ -53,107 +55,113 @@ export const TimepointsStep = ({
   };
 
   return (
-    <div className="flex flex-col gap-4" data-testid="bulk-timepoints-step">
-      <p className="text-muted-foreground text-sm">
-        {t({
-          en: `Each instrument you add is assigned to all ${subjectCount} selected subjects.`,
-          fr: `Chaque instrument ajouté est attribué aux ${subjectCount} sujets sélectionnés.`
-        })}
-      </p>
-
-      {/* Fixed column widths, and `minmax(0, …)` on the select so a long instrument title clips
+    <StepLayout
+      aside={
+        <span className="text-sm font-medium" data-testid="bulk-assignment-total">
+          {t({
+            en: `${subjectCount * timepoints.length} assignments`,
+            fr: `${subjectCount * timepoints.length} tâches`
+          })}
+        </span>
+      }
+      description={t({
+        en: `Each instrument is assigned to all ${subjectCount} selected subjects, with its own expiry.`,
+        fr: `Chaque instrument est attribué aux ${subjectCount} sujets sélectionnés, avec sa propre date d’expiration.`
+      })}
+      footer={
+        <React.Fragment>
+          <Button type="button" variant="outline" onClick={onBack}>
+            {t({ en: 'Back', fr: 'Retour' })}
+          </Button>
+          <Button
+            data-testid="bulk-confirm-timepoints"
+            disabled={timepoints.length === 0}
+            type="button"
+            onClick={() => onConfirm(timepoints)}
+          >
+            {t({ en: 'Review', fr: 'Réviser' })}
+          </Button>
+        </React.Fragment>
+      }
+      step="INSTRUMENTS"
+      title={t({ en: 'Choose instruments', fr: 'Choisir les instruments' })}
+    >
+      <div className="flex flex-col gap-4" data-testid="bulk-timepoints-step">
+        {/* Fixed column widths, and `minmax(0, …)` on the select so a long instrument title clips
           instead of widening its column. Laid out with flex and a min-width, the row re-flowed every
           time a different instrument was chosen. */}
-      <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,20rem)_10rem_auto]">
-        <div className="flex min-w-0 flex-col gap-1">
-          <label className="text-sm font-medium" htmlFor="bulk-instrument">
-            {t({ en: 'Instrument', fr: 'Instrument' })}
-          </label>
-          <Select value={instrumentId} onValueChange={setInstrumentId}>
-            <Select.Trigger className="w-full" data-testid="bulk-instrument-select" id="bulk-instrument">
-              <span className="truncate">
-                <Select.Value placeholder={t({ en: 'Choose an instrument', fr: 'Choisir un instrument' })} />
-              </span>
-            </Select.Trigger>
-            <Select.Content>
-              {available.map((instrument) => (
-                <Select.Item key={instrument.id} value={instrument.id}>
-                  {instrument.title}
-                </Select.Item>
-              ))}
-            </Select.Content>
-          </Select>
+        <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,20rem)_10rem_auto]">
+          <div className="flex min-w-0 flex-col gap-1">
+            <label className="text-sm font-medium" htmlFor="bulk-instrument">
+              {t({ en: 'Instrument', fr: 'Instrument' })}
+            </label>
+            <Select value={instrumentId} onValueChange={setInstrumentId}>
+              <Select.Trigger className="w-full" data-testid="bulk-instrument-select" id="bulk-instrument">
+                <span className="truncate">
+                  <Select.Value placeholder={t({ en: 'Choose an instrument', fr: 'Choisir un instrument' })} />
+                </span>
+              </Select.Trigger>
+              <Select.Content>
+                {available.map((instrument) => (
+                  <Select.Item key={instrument.id} value={instrument.id}>
+                    {instrument.title}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium" htmlFor="bulk-expiry">
+              {t({ en: 'Expires on', fr: 'Expire le' })}
+            </label>
+            <Input
+              className="w-full"
+              data-testid="bulk-expiry-input"
+              id="bulk-expiry"
+              type="date"
+              value={expiresAt}
+              onChange={(event) => setExpiresAt(event.target.value)}
+            />
+          </div>
+          <Button data-testid="bulk-add-timepoint" disabled={!instrumentId || !expiresAt} type="button" onClick={add}>
+            {t({ en: 'Add', fr: 'Ajouter' })}
+          </Button>
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium" htmlFor="bulk-expiry">
-            {t({ en: 'Expires on', fr: 'Expire le' })}
-          </label>
-          <Input
-            className="w-full"
-            data-testid="bulk-expiry-input"
-            id="bulk-expiry"
-            type="date"
-            value={expiresAt}
-            onChange={(event) => setExpiresAt(event.target.value)}
-          />
-        </div>
-        <Button data-testid="bulk-add-timepoint" disabled={!instrumentId || !expiresAt} type="button" onClick={add}>
-          {t({ en: 'Add', fr: 'Ajouter' })}
-        </Button>
-      </div>
 
-      <div className="flex flex-col gap-2" data-testid="bulk-timepoint-list">
-        {timepoints.length === 0 ? (
-          <p className="text-muted-foreground text-sm italic">
-            {t({ en: 'No instruments added yet.', fr: 'Aucun instrument ajouté.' })}
-          </p>
-        ) : (
-          timepoints.map((timepoint) => (
-            <div
-              className="flex items-center justify-between gap-3 rounded-md border px-3 py-2"
-              key={timepoint.instrumentId}
-            >
-              <span className="truncate text-sm" title={timepoint.instrumentTitle}>
-                {timepoint.instrumentTitle}
-              </span>
-              <div className="flex shrink-0 items-center gap-2">
-                <Badge variant="secondary">{timepoint.expiresAt}</Badge>
-                <button
-                  aria-label={t({ en: 'Remove instrument', fr: "Retirer l'instrument" })}
-                  className="text-muted-foreground hover:text-destructive p-1"
-                  type="button"
-                  onClick={() =>
-                    setTimepoints((previous) => previous.filter((item) => item.instrumentId !== timepoint.instrumentId))
-                  }
-                >
-                  <TrashIcon className="h-4 w-4" />
-                </button>
+        <div className="flex flex-col gap-2" data-testid="bulk-timepoint-list">
+          {timepoints.length === 0 ? (
+            <p className="text-muted-foreground text-sm italic">
+              {t({ en: 'No instruments added yet.', fr: 'Aucun instrument ajouté.' })}
+            </p>
+          ) : (
+            timepoints.map((timepoint) => (
+              <div
+                className="flex items-center justify-between gap-3 rounded-md border px-3 py-2"
+                key={timepoint.instrumentId}
+              >
+                <span className="truncate text-sm" title={timepoint.instrumentTitle}>
+                  {timepoint.instrumentTitle}
+                </span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Badge variant="secondary">{timepoint.expiresAt}</Badge>
+                  <button
+                    aria-label={t({ en: 'Remove instrument', fr: "Retirer l'instrument" })}
+                    className="text-muted-foreground hover:text-destructive p-1"
+                    type="button"
+                    onClick={() =>
+                      setTimepoints((previous) =>
+                        previous.filter((item) => item.instrumentId !== timepoint.instrumentId)
+                      )
+                    }
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
-
-      <p className="text-sm font-medium" data-testid="bulk-assignment-total">
-        {t({
-          en: `${subjectCount * timepoints.length} assignments will be created.`,
-          fr: `${subjectCount * timepoints.length} tâches seront créées.`
-        })}
-      </p>
-
-      <div className="flex gap-2">
-        <Button type="button" variant="outline" onClick={onBack}>
-          {t({ en: 'Back', fr: 'Retour' })}
-        </Button>
-        <Button
-          data-testid="bulk-confirm-timepoints"
-          disabled={timepoints.length === 0}
-          type="button"
-          onClick={() => onConfirm(timepoints)}
-        >
-          {t({ en: 'Review', fr: 'Réviser' })}
-        </Button>
-      </div>
-    </div>
+    </StepLayout>
   );
 };

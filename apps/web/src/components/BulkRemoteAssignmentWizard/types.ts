@@ -1,4 +1,9 @@
+import type { Assignment } from '@opendatacapture/schemas/assignment';
+
 import type { BulkParseResult } from '@/utils/bulk-assignments';
+
+/** What the results step needs from a created assignment: who it is for, and the link to hand out. */
+export type CreatedAssignment = Pick<Assignment, 'expiresAt' | 'instrumentId' | 'subjectId' | 'url'>;
 
 /**
  * The wizard is a linear machine, and each state carries exactly what that step needs. Modelling it
@@ -6,7 +11,7 @@ import type { BulkParseResult } from '@/utils/bulk-assignments';
  * step without resolved subject ids, or the timepoint step without a source.
  */
 export type WizardState =
-  | { createdCount: number; step: 'DONE'; subjectIds: string[] }
+  | { assignments: CreatedAssignment[]; step: 'DONE' }
   | { parsed: BulkParseResult; step: 'MAP' }
   | { step: 'REVIEW'; subjectIds: string[]; timepoints: DraftTimepoint[] }
   | { step: 'SOURCE' }

@@ -7,6 +7,7 @@ import type { BulkAssignmentFailure, BulkAssignmentIssue } from '@opendatacaptur
 import type { BulkParseError } from '@/utils/bulk-assignments';
 
 import { ErrorList } from './ErrorList';
+import { StepLayout } from './StepLayout';
 
 import type { DraftTimepoint } from './types';
 
@@ -80,59 +81,69 @@ export const ReviewStep = ({
   }
 
   return (
-    <div className="flex flex-col gap-4" data-testid="bulk-review-step">
-      <ErrorList errors={messages} />
-
-      <div className="rounded-md border p-4">
-        <p className="text-sm font-medium" data-testid="bulk-review-summary">
+    <StepLayout
+      aside={
+        <span className="text-sm font-medium" data-testid="bulk-review-summary">
           {t({
-            en: `${subjectCount} subjects × ${timepoints.length} instruments = ${subjectCount * timepoints.length} assignments`,
-            fr: `${subjectCount} sujets × ${timepoints.length} instruments = ${subjectCount * timepoints.length} tâches`
+            en: `${subjectCount * timepoints.length} assignments`,
+            fr: `${subjectCount * timepoints.length} tâches`
           })}
-        </p>
-        <ul className="text-muted-foreground mt-2 list-disc space-y-1 pl-5 text-sm">
-          {timepoints.map((timepoint) => (
-            <li key={timepoint.instrumentId}>
-              {timepoint.instrumentTitle} — {timepoint.expiresAt}
-            </li>
-          ))}
-        </ul>
+        </span>
+      }
+      description={t({
+        en: 'All assignments are created together. If any of them cannot be created, none are.',
+        fr: 'Toutes les tâches sont créées ensemble. Si l’une d’elles échoue, aucune n’est créée.'
+      })}
+      footer={
+        <React.Fragment>
+          <Button disabled={isSubmitting} type="button" variant="outline" onClick={onBack}>
+            {t({ en: 'Back', fr: 'Retour' })}
+          </Button>
+          <Button
+            data-testid="bulk-submit"
+            disabled={isSubmitting || (hasConflict && !allowDuplicates)}
+            type="button"
+            onClick={() => onSubmit({ allowDuplicates })}
+          >
+            {t({ en: 'Create assignments', fr: 'Créer les tâches' })}
+          </Button>
+        </React.Fragment>
+      }
+      step="REVIEW"
+      title={t({ en: 'Review and create', fr: 'Réviser et créer' })}
+    >
+      <div className="flex flex-col gap-4" data-testid="bulk-review-step">
+        <ErrorList errors={messages} />
+
+        <div className="rounded-md border p-4">
+          <p className="mb-2 text-sm font-medium">
+            {t({
+              en: `${subjectCount} subjects × ${timepoints.length} instruments`,
+              fr: `${subjectCount} sujets × ${timepoints.length} instruments`
+            })}
+          </p>
+          <ul className="text-muted-foreground list-disc space-y-1 pl-5 text-sm">
+            {timepoints.map((timepoint) => {
+              const summary = `${timepoint.instrumentTitle} — ${timepoint.expiresAt}`;
+              return <li key={timepoint.instrumentId}>{summary}</li>;
+            })}
+          </ul>
+        </div>
+
+        {hasConflict && (
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox
+              checked={allowDuplicates}
+              data-testid="bulk-allow-duplicates"
+              onCheckedChange={(checked) => setAllowDuplicates(checked === true)}
+            />
+            {t({
+              en: 'Assign anyway, creating a second assignment for those subjects',
+              fr: 'Attribuer quand même, en créant une seconde tâche pour ces sujets'
+            })}
+          </label>
+        )}
       </div>
-
-      <p className="text-muted-foreground text-sm">
-        {t({
-          en: 'All assignments are created together. If any of them cannot be created, none are.',
-          fr: 'Toutes les tâches sont créées ensemble. Si l’une d’elles échoue, aucune n’est créée.'
-        })}
-      </p>
-
-      {hasConflict && (
-        <label className="flex items-center gap-2 text-sm">
-          <Checkbox
-            checked={allowDuplicates}
-            data-testid="bulk-allow-duplicates"
-            onCheckedChange={(checked) => setAllowDuplicates(checked === true)}
-          />
-          {t({
-            en: 'Assign anyway, creating a second assignment for those subjects',
-            fr: 'Attribuer quand même, en créant une seconde tâche pour ces sujets'
-          })}
-        </label>
-      )}
-
-      <div className="flex gap-2">
-        <Button disabled={isSubmitting} type="button" variant="outline" onClick={onBack}>
-          {t({ en: 'Back', fr: 'Retour' })}
-        </Button>
-        <Button
-          data-testid="bulk-submit"
-          disabled={isSubmitting || (hasConflict && !allowDuplicates)}
-          type="button"
-          onClick={() => onSubmit({ allowDuplicates })}
-        >
-          {t({ en: 'Create assignments', fr: 'Créer les tâches' })}
-        </Button>
-      </div>
-    </div>
+    </StepLayout>
   );
 };
