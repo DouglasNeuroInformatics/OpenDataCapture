@@ -11,6 +11,7 @@ export default defineConfig({
         '**/coverage/**',
         '**/cypress/**',
         '**/dist/**',
+        '**/node_modules/**',
         '**/public/**',
         '**/scripts/**',
         '**/*.d.?(c|m)ts',
@@ -18,7 +19,7 @@ export default defineConfig({
         '**/*.config.?(c|m)[jt]s?(x)',
         '**/*.stories.?(c|m)[jt]s?(x)'
       ],
-      include: ['apps/api', 'apps/gateway', 'apps/web', 'packages/**/*'],
+      include: ['apps/{api,gateway,web}/src/**/*.?(c|m)[jt]s?(x)', 'packages/*/src/**/*.?(c|m)[jt]s?(x)'],
       provider: 'v8',
       reportsDirectory: path.resolve(import.meta.dirname, 'coverage'),
       skipFull: true
