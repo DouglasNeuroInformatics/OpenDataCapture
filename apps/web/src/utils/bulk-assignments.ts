@@ -1,3 +1,4 @@
+import { toLocalISOString } from '@douglasneuroinformatics/libjs';
 import { $Sex } from '@opendatacapture/schemas/subject';
 import { generateSubjectHash } from '@opendatacapture/subject-utils';
 import Papa from 'papaparse';
@@ -152,6 +153,14 @@ function buildResult(headers: string[], rows: { [key: string]: string }[]): Bulk
     preview: populated.slice(0, MAX_PREVIEW_ROWS),
     rows: populated
   };
+}
+
+/**
+ * Name the export by local time rather than UTC, so it matches the clock of whoever downloaded it,
+ * and without colons, which a filename cannot carry on Windows.
+ */
+function resultCsvFilename(now: Date): string {
+  return `bulk-remote-assignments-${toLocalISOString(now).slice(0, 19).replaceAll(':', '-')}.csv`;
 }
 
 /** Thrown by every parse and resolve entry point, carrying user-displayable, row-numbered errors. */
@@ -317,5 +326,7 @@ export async function resolveSubjectIds(
 export function toResultCsv(rows: { [key: string]: string }[]): string {
   return Papa.unparse(rows, { escapeFormulae: true });
 }
+
+export { resultCsvFilename };
 
 export type { BulkParseError, BulkParseResult, BulkSourceMode };

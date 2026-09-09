@@ -6,6 +6,7 @@ import {
   isWorkbookFile,
   parseDelimitedText,
   resolveSubjectIds,
+  resultCsvFilename,
   toResultCsv
 } from '../bulk-assignments';
 
@@ -203,5 +204,23 @@ describe('toResultCsv', () => {
 
   it('should round-trip ordinary values', () => {
     expect(toResultCsv([{ status: 'CREATED', subjectId: 'subject-1' }])).toContain('subject-1');
+  });
+});
+
+describe('resultCsvFilename', () => {
+  it('should stamp the file with the date and time it was downloaded', () => {
+    const name = resultCsvFilename(new Date(2026, 8, 9, 15, 44, 12));
+    expect(name).toBe('bulk-remote-assignments-2026-09-09T15-44-12.csv');
+  });
+
+  it('should carry no colon, which a filename cannot contain on Windows', () => {
+    expect(resultCsvFilename(new Date(2026, 0, 2, 3, 4, 5))).not.toContain(':');
+  });
+
+  it('should read the local clock rather than UTC, so the name matches when the user downloaded it', () => {
+    // Constructed in local time; the stamp must echo those same wall-clock digits back regardless
+    // of the machine's offset from UTC.
+    const name = resultCsvFilename(new Date(2026, 0, 2, 23, 30, 0));
+    expect(name).toContain('2026-01-02T23-30-00');
   });
 });

@@ -7,7 +7,7 @@ import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 import { toBulkAssignmentFailure, useCreateBulkAssignmentsMutation } from '@/hooks/useBulkAssignments';
-import { toResultCsv } from '@/utils/bulk-assignments';
+import { resultCsvFilename, toResultCsv } from '@/utils/bulk-assignments';
 
 import { MapStep } from './MapStep';
 import { ReviewStep } from './ReviewStep';
@@ -34,7 +34,7 @@ const copyLinks = (assignments: CreatedAssignment[]) =>
 const downloadCsv = (csv: string) => {
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
   const anchor = document.createElement('a');
-  anchor.download = 'bulk-remote-assignments.csv';
+  anchor.download = resultCsvFilename(new Date());
   anchor.href = url;
   anchor.click();
   URL.revokeObjectURL(url);
