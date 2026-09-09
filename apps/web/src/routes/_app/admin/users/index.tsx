@@ -70,6 +70,91 @@ const UpdateUserForm: React.FC<{
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const { applyGeneratedPassword, generatedPassword, generatePassword, isGeneratedPassword } = usePasswordGenerator();
 
+  // libui's `record-array` field resets itself to a single blank record whenever its `fieldset`
+  // changes identity, so an inline literal would discard the permissions it was seeded with on the
+  // next render of this component -- which a background refetch of either query triggers.
+  const additionalPermissionsFieldset = useMemo(
+    () => ({
+      action: {
+        kind: 'string' as const,
+        label: t({
+          en: 'Action',
+          fr: 'Action'
+        }),
+        options: {
+          create: t({
+            en: 'Create',
+            fr: 'Créer'
+          }),
+          delete: t({
+            en: 'Delete',
+            fr: 'Supprimer'
+          }),
+          manage: t({
+            en: 'Manage (All)',
+            fr: 'Gérer (Tout)'
+          }),
+          read: t({
+            en: 'Read',
+            fr: 'Lire'
+          }),
+          update: t({
+            en: 'Update',
+            fr: 'Modifier'
+          })
+        },
+        variant: 'select' as const
+      },
+      subject: {
+        kind: 'string' as const,
+        label: t({
+          en: 'Resource',
+          fr: 'Ressource'
+        }),
+        options: {
+          all: t({
+            en: 'All',
+            fr: 'Tous'
+          }),
+          Assignment: t({
+            en: 'Assignment',
+            fr: 'Assignation'
+          }),
+          Group: t({
+            en: 'Group',
+            fr: 'Groupe'
+          }),
+          Instrument: t({
+            en: 'Instrument',
+            fr: 'Instrument'
+          }),
+          InstrumentRecord: t({
+            en: 'Instrument Record',
+            fr: "Enregistrement de l'instrument"
+          }),
+          InstrumentRepo: t({
+            en: 'Instrument Repository',
+            fr: "Dépôt d'instruments"
+          }),
+          Session: t({
+            en: 'Session',
+            fr: 'Session'
+          }),
+          Subject: t({
+            en: 'Subject',
+            fr: 'Client'
+          }),
+          User: t({
+            en: 'User',
+            fr: 'Utilisateur'
+          })
+        },
+        variant: 'select' as const
+      }
+    }),
+    [resolvedLanguage]
+  );
+
   const $UpdateUserFormData = useMemo(() => {
     return z
       .object({
@@ -200,84 +285,7 @@ const UpdateUserForm: React.FC<{
             }),
             fields: {
               additionalPermissions: {
-                fieldset: {
-                  action: {
-                    kind: 'string',
-                    label: t({
-                      en: 'Action',
-                      fr: 'Action'
-                    }),
-                    options: {
-                      create: t({
-                        en: 'Create',
-                        fr: 'Créer'
-                      }),
-                      delete: t({
-                        en: 'Delete',
-                        fr: 'Supprimer'
-                      }),
-                      manage: t({
-                        en: 'Manage (All)',
-                        fr: 'Gérer (Tout)'
-                      }),
-                      read: t({
-                        en: 'Read',
-                        fr: 'Lire'
-                      }),
-                      update: t({
-                        en: 'Update',
-                        fr: 'Modifier'
-                      })
-                    },
-                    variant: 'select'
-                  },
-                  subject: {
-                    kind: 'string',
-                    label: t({
-                      en: 'Resource',
-                      fr: 'Ressource'
-                    }),
-                    options: {
-                      all: t({
-                        en: 'All',
-                        fr: 'Tous'
-                      }),
-                      Assignment: t({
-                        en: 'Assignment',
-                        fr: 'Assignation'
-                      }),
-                      Group: t({
-                        en: 'Group',
-                        fr: 'Groupe'
-                      }),
-                      Instrument: t({
-                        en: 'Instrument',
-                        fr: 'Instrument'
-                      }),
-                      InstrumentRecord: t({
-                        en: 'Instrument Record',
-                        fr: "Enregistrement de l'instrument"
-                      }),
-                      InstrumentRepo: t({
-                        en: 'Instrument Repository',
-                        fr: "Dépôt d'instruments"
-                      }),
-                      Session: t({
-                        en: 'Session',
-                        fr: 'Session'
-                      }),
-                      Subject: t({
-                        en: 'Subject',
-                        fr: 'Client'
-                      }),
-                      User: t({
-                        en: 'User',
-                        fr: 'Utilisateur'
-                      })
-                    },
-                    variant: 'select'
-                  }
-                },
+                fieldset: additionalPermissionsFieldset,
                 kind: 'record-array',
                 label: t({
                   en: 'Permission',
