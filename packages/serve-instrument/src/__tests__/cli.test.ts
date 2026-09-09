@@ -80,45 +80,38 @@ describe('cli', () => {
     });
   });
 
-  /**
-   * `parseTarget` is called by hand inside the async `.action()` body rather than passed to
-   * `.argument()` as commander's own parser, so throwing `InvalidArgumentError` here does not go
-   * through commander's usual exit-with-message handling. The rejection does not even propagate to
-   * the dynamic `import()` promise — it becomes a bare unhandled rejection on the process, which in
-   * a real run prints an ugly stack trace and crashes rather than the clean CLI error the author
-   * intended. Filed as a bug in the final report rather than fixed here (no product-code changes).
-   */
-  function waitForUnhandledRejection(): Promise<unknown> {
-    return new Promise((resolve) => {
-      process.once('unhandledRejection', resolve);
-    });
+  // `parseTarget` is commander's own parser for `<target>`, so an `InvalidArgumentError` it throws
+  // takes the same print-message-and-exit path as the `--port` validator above, rather than escaping
+  // the async `.action()` body as an unhandled rejection. Each case asserts the process exits and
+  // never reaches `Server.create`.
+  async function expectCleanExit(argv: string[], message: string) {
+    // commander prints through `process.stderr.write`, not `console.error`. Restore the spy before
+    // asserting: vitest reports a failure on stderr, so a throw while it is still stubbed would
+    // swallow the very message explaining what broke.
+    const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    process.argv = ['node', 'cli.js', ...argv];
+    await expect(import('../cli.js')).rejects.toThrow(/EXIT/);
+    const written = stderrSpy.mock.calls.flat().join(' ');
+    stderrSpy.mockRestore();
+    expect(written).toContain(message);
+    expect(serverCreate).not.toHaveBeenCalled();
   }
 
-  it('should surface an unhandled rejection (rather than exit cleanly) in --all mode when neither subdirectory exists', async () => {
-    const rejection = waitForUnhandledRejection();
-    process.argv = ['node', 'cli.js', tmpDir, '--all'];
-    await import('../cli.js');
-    await expect(rejection).resolves.toMatchObject({
-      message: expect.stringContaining(
-        'In --all mode, directory must contain a forms/ and/or interactive/ subdirectory'
-      )
-    });
+  it('should exit cleanly in --all mode when neither subdirectory exists', async () => {
+    await expectCleanExit(
+      [tmpDir, '--all'],
+      'In --all mode, directory must contain a forms/ and/or interactive/ subdirectory'
+    );
   });
 
-  it('should surface an unhandled rejection (rather than exit cleanly) when the target directory does not exist', async () => {
-    const rejection = waitForUnhandledRejection();
-    process.argv = ['node', 'cli.js', path.join(tmpDir, 'missing')];
-    await import('../cli.js');
-    await expect(rejection).resolves.toMatchObject({ message: expect.stringContaining('Directory does not exist') });
+  it('should exit cleanly when the target directory does not exist', async () => {
+    await expectCleanExit([path.join(tmpDir, 'missing')], 'Directory does not exist');
   });
 
-  it('should surface an unhandled rejection (rather than exit cleanly) when the target is not a directory', async () => {
+  it('should exit cleanly when the target is not a directory', async () => {
     const filePath = path.join(tmpDir, 'not-a-directory.txt');
     fs.writeFileSync(filePath, '');
-    const rejection = waitForUnhandledRejection();
-    process.argv = ['node', 'cli.js', filePath];
-    await import('../cli.js');
-    await expect(rejection).resolves.toMatchObject({ message: expect.stringContaining('Not a directory') });
+    await expectCleanExit([filePath], 'Not a directory');
   });
 
   it('should pass verbose through when --verbose is given', async () => {

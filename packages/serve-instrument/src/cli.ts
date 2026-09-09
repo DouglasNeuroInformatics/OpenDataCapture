@@ -38,17 +38,18 @@ program
   .name(name)
   .version(version)
   .allowExcessArguments(false)
-  .argument('<target>', 'the directory containing the instrument')
+  .argument('<target>', 'the directory containing the instrument', (target: string) =>
+    parseTarget(target, program.opts<{ all: boolean }>().all)
+  )
   .option('-a, --all', 'serve all instruments from forms/ and interactive/ subdirectories')
   .option('-p --port <number>', 'the port to run the dev server on', parsePort, 3000)
   .option('-v, --verbose', 'enable verbose logging (includes request logs and build timing)')
   .action(async (target: string) => {
     const { all, port, verbose } = program.opts<{ all: boolean; port: number; verbose: boolean }>();
-    const resolved = parseTarget(target, all);
     const server = await Server.create({
       mode: all ? 'all' : 'single',
       port,
-      target: resolved,
+      target,
       verbose: verbose ?? false
     });
     await server.start();

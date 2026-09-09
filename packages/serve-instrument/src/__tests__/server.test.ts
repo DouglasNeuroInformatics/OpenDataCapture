@@ -4,13 +4,15 @@ import * as path from 'node:path';
 
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// `InstrumentLoader` never closes the `fs.watch` handle it opens on construction — a real resource
-// leak, reported in the final summary rather than fixed here — so a real watcher would keep firing
-// (eventually against a deleted directory) long after each test's server has stopped. `fs.watch` is
-// a named ESM export, which vitest cannot `spyOn` directly ("Module namespace is not configurable"),
-// so it is replaced at the module level instead; `watchCallbacks` captures what each call registered
-// so a test can still trigger the watcher's callback deliberately.
-const { watchCallbacks } = vi.hoisted(() => ({ watchCallbacks: [] as (() => void)[] }));
+// A real watcher would keep firing against a deleted temp directory after each test, so `fs.watch`
+// is stubbed. It is a named ESM export, which vitest cannot `spyOn` directly ("Module namespace is
+// not configurable"), so it is replaced at the module level instead. `watchCallbacks` captures what
+// each call registered so a test can trigger the rebuild deliberately, and `watchCloses` records
+// every `close()` so a test can assert `Server.stop()` disposes the handles rather than leaking them.
+const { watchCallbacks, watchCloses } = vi.hoisted(() => ({
+  watchCallbacks: [] as (() => void)[],
+  watchCloses: [] as ReturnType<typeof vi.fn>[]
+}));
 
 vi.mock('node:fs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('node:fs')>();
@@ -18,7 +20,9 @@ vi.mock('node:fs', async (importOriginal) => {
     ...actual,
     watch: (_target: unknown, _options: unknown, callback: () => void) => {
       watchCallbacks.push(callback);
-      return { close: () => undefined };
+      const close = vi.fn();
+      watchCloses.push(close);
+      return { close };
     }
   };
 });
@@ -62,6 +66,7 @@ beforeEach(() => {
   port = 34000 + Math.floor(Math.random() * 1000);
   stubClientBundle();
   watchCallbacks.length = 0;
+  watchCloses.length = 0;
 });
 
 afterEach(() => {
@@ -111,6 +116,15 @@ describe('Server — single mode', () => {
       logSpy.mockRestore();
       await server.stop();
     }
+  });
+
+  it('should close the file watcher on stop, so a stopped server leaks no watch handle', async () => {
+    fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
+    const server = await Server.create({ mode: 'single', port, target: tmpDir, verbose: false });
+    await server.start();
+    expect(watchCloses).toHaveLength(1);
+    await server.stop();
+    expect(watchCloses[0]).toHaveBeenCalledOnce();
   });
 
   it('should reject a non-GET request with 405', async () => {
@@ -183,6 +197,20 @@ describe('Server — all mode', () => {
       expect(instrumentHtml).toContain('>happiness<');
     } finally {
       await server.stop();
+    }
+  });
+
+  it("should close every discovered instrument's file watcher on stop", async () => {
+    for (const name of ['happiness', 'sadness']) {
+      fs.mkdirSync(path.join(tmpDir, 'forms', name), { recursive: true });
+      fs.writeFileSync(path.join(tmpDir, 'forms', name, 'index.ts'), FORM_SOURCE);
+    }
+    const server = await Server.create({ mode: 'all', port, target: tmpDir, verbose: false });
+    await server.start();
+    expect(watchCloses).toHaveLength(2);
+    await server.stop();
+    for (const close of watchCloses) {
+      expect(close).toHaveBeenCalledOnce();
     }
   });
 

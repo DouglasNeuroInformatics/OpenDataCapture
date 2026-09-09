@@ -51,16 +51,17 @@ describe('getReleaseInfo', () => {
   describe('production', () => {
     beforeEach(() => {
       vi.stubEnv('NODE_ENV', 'production');
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
     });
-    it("should throw if the environment variable 'RELEASE_VERSION' is undefined", async () => {
-      await expect(getReleaseInfo()).rejects.toThrow();
+    // A schema failure must surface as the caller-facing "Failed to parse release info" error, not
+    // as a raw ZodError: `getReleaseInfo` only converts it if the rejection is awaited inside its
+    // own try block, so asserting on the message is what pins the conversion in place.
+    it("should throw a parse error naming the environment if 'RELEASE_VERSION' is undefined", async () => {
+      await expect(getReleaseInfo()).rejects.toThrow("Failed to parse release info for environment 'production'");
     });
-    // `$ProductionReleaseInfo.parseAsync` rejects with a real ZodError here, but `err instanceof
-    // z.ZodError` in `getReleaseInfo`'s catch block evaluates false, so the ZodError propagates
-    // unconverted rather than becoming the friendlier "Failed to parse release info" error.
-    it("should throw if the environment variable 'RELEASE_VERSION' is invalid", async () => {
+    it("should throw a parse error naming the environment if 'RELEASE_VERSION' is invalid", async () => {
       vi.stubEnv('RELEASE_VERSION', 'foo');
-      await expect(getReleaseInfo()).rejects.toThrow();
+      await expect(getReleaseInfo()).rejects.toThrow("Failed to parse release info for environment 'production'");
     });
     it('should return the production release info', async () => {
       vi.stubEnv('RELEASE_VERSION', '0.0.0');
@@ -71,6 +72,7 @@ describe('getReleaseInfo', () => {
     });
     afterEach(() => {
       vi.unstubAllEnvs();
+      vi.restoreAllMocks();
     });
   });
   describe('unexpected environment', () => {
