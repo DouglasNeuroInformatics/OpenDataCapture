@@ -220,7 +220,8 @@ export const BulkRemoteAssignmentWizard = ({
                       buildResultRows({
                         assignments,
                         instrumentTitleById: Object.fromEntries(instruments.map(({ id, title }) => [id, title])),
-                        sourceRowBySubjectId: sourceRows
+                        sourceRowBySubjectId: sourceRows,
+                        subjectIdDisplayLength
                       })
                     )
                   )

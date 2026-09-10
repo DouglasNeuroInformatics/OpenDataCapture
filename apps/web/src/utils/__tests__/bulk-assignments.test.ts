@@ -236,20 +236,21 @@ describe('buildResultRows', () => {
   };
 
   it('should render the expiry as a plain date rather than a timestamp', () => {
-    const [row] = buildResultRows({ assignments: [assignment], instrumentTitleById: {} });
+    const [row] = buildResultRows({ assignments: [assignment], instrumentTitleById: {}, subjectIdDisplayLength: 9 });
     expect(row?.expiresAt).toBe('2027-09-10');
   });
 
   it('should name the instrument rather than exporting its id, which reads as noise', () => {
     const [row] = buildResultRows({
       assignments: [assignment],
-      instrumentTitleById: { __V2__0c5b9177a7df14b3: 'Happiness Questionnaire' }
+      instrumentTitleById: { __V2__0c5b9177a7df14b3: 'Happiness Questionnaire' },
+      subjectIdDisplayLength: 9
     });
     expect(row?.instrument).toBe('Happiness Questionnaire');
   });
 
   it('should fall back to the id when the instrument is not among those offered', () => {
-    const [row] = buildResultRows({ assignments: [assignment], instrumentTitleById: {} });
+    const [row] = buildResultRows({ assignments: [assignment], instrumentTitleById: {}, subjectIdDisplayLength: 9 });
     expect(row?.instrument).toBe('__V2__0c5b9177a7df14b3');
   });
 
@@ -257,7 +258,8 @@ describe('buildResultRows', () => {
     const [row] = buildResultRows({
       assignments: [assignment],
       instrumentTitleById: {},
-      sourceRowBySubjectId: { 'subject-1': { dateOfBirth: '1982-03-14', firstName: 'Marie', lastName: 'Belanger' } }
+      sourceRowBySubjectId: { 'subject-1': { dateOfBirth: '1982-03-14', firstName: 'Marie', lastName: 'Belanger' } },
+      subjectIdDisplayLength: 9
     });
     expect(row).toMatchObject({
       dateOfBirth: '1982-03-14',
@@ -271,9 +273,40 @@ describe('buildResultRows', () => {
   it('should emit one row per assignment, so a subject appears once per instrument', () => {
     const rows = buildResultRows({
       assignments: [assignment, { ...assignment, instrumentId: 'other', url: 'http://x/a2' }],
-      instrumentTitleById: {}
+      instrumentTitleById: {},
+      subjectIdDisplayLength: 9
     });
     expect(rows).toHaveLength(2);
+  });
+});
+
+describe('buildResultRows subject columns', () => {
+  it('should carry the truncated identifier the app displays beside the full key', () => {
+    const [row] = buildResultRows({
+      assignments: [
+        {
+          expiresAt: '2027-09-10T23:59:59.999Z',
+          instrumentId: 'i1',
+          subjectId: 'a'.repeat(64),
+          url: 'http://x/a1'
+        }
+      ],
+      instrumentTitleById: {},
+      subjectIdDisplayLength: 9
+    });
+    expect(row?.subject).toBe('aaaaaaaaa');
+    expect(row?.subjectId).toBe('a'.repeat(64));
+  });
+
+  it('should strip the group scope from a custom identifier, as the app does', () => {
+    const [row] = buildResultRows({
+      assignments: [
+        { expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'Depression_Clinic$ex_111', url: 'http://x/a1' }
+      ],
+      instrumentTitleById: {},
+      subjectIdDisplayLength: 9
+    });
+    expect(row?.subject).toBe('ex_111');
   });
 });
 

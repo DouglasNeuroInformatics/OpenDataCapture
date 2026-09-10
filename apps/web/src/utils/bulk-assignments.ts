@@ -1,6 +1,6 @@
 import { toBasicISOString, toLocalISOString } from '@douglasneuroinformatics/libjs';
 import { $Sex } from '@opendatacapture/schemas/subject';
-import { generateSubjectHash } from '@opendatacapture/subject-utils';
+import { generateSubjectHash, removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import Papa from 'papaparse';
 
 /**
@@ -185,16 +185,22 @@ type ResultAssignment = {
 function buildResultRows({
   assignments,
   instrumentTitleById,
-  sourceRowBySubjectId
+  sourceRowBySubjectId,
+  subjectIdDisplayLength
 }: {
   assignments: ResultAssignment[];
   instrumentTitleById: { [instrumentId: string]: string };
   sourceRowBySubjectId?: { [subjectId: string]: { [column: string]: string } };
+  subjectIdDisplayLength: number;
 }): { [key: string]: string }[] {
   return assignments.map((assignment) => ({
     ...sourceRowBySubjectId?.[assignment.subjectId],
     expiresAt: toBasicISOString(new Date(assignment.expiresAt)),
     instrument: instrumentTitleById[assignment.instrumentId] ?? assignment.instrumentId,
+    // Both forms: `subject` is what the app shows on screen, `subjectId` is the full key the record
+    // is stored under. Exporting only the full hash left the file impossible to reconcile with the
+    // truncated id shown everywhere else.
+    subject: removeSubjectIdScope(assignment.subjectId).slice(0, subjectIdDisplayLength),
     subjectId: assignment.subjectId,
     url: assignment.url
   }));
