@@ -2,17 +2,9 @@ import React from 'react';
 
 import { Button, Card } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { cn } from '@douglasneuroinformatics/libui/utils';
 import { ChevronRightIcon } from 'lucide-react';
 
 import type { WizardStep } from './types';
-
-/**
- * Every step reserves the same body height. Without it the card resized on each step and on each
- * source tab — the subject table is far taller than a dropzone — so the footer and its primary
- * button jumped around the screen as the user moved through the flow.
- */
-const STEP_BODY_MIN_HEIGHT = 'min-h-[34rem]';
 
 const WIZARD_STEPS = ['SUBJECTS', 'INSTRUMENTS', 'REVIEW'] as const;
 
@@ -94,7 +86,7 @@ const StepLayout = ({ aside, children, description, footer, onStepChange, step, 
           {aside}
         </div>
       </Card.Header>
-      <Card.Content className={cn('flex flex-col gap-4', STEP_BODY_MIN_HEIGHT)}>{children}</Card.Content>
+      <Card.Content className="flex flex-col gap-4">{children}</Card.Content>
       {footer && <Card.Footer className="flex justify-end gap-2">{footer}</Card.Footer>}
     </Card>
   );
