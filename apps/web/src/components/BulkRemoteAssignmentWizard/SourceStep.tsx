@@ -135,8 +135,8 @@ export const SourceStep = ({
   return (
     <StepLayout
       description={t({
-        en: 'Assign one or more instruments to many subjects at once. Every assignment is created together, or none of them are.',
-        fr: 'Attribuez un ou plusieurs instruments à plusieurs sujets à la fois. Toutes les tâches sont créées ensemble, ou aucune ne l’est.'
+        en: 'Assign one or more instruments to many subjects at once. Every assignment is created together.',
+        fr: 'Attribuez un ou plusieurs instruments à plusieurs sujets à la fois. Toutes les tâches sont créées ensemble.'
       })}
       step="SUBJECTS"
       title={t({ en: 'Choose subjects', fr: 'Choisir les sujets' })}
