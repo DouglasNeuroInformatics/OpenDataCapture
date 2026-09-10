@@ -73,10 +73,10 @@ const UpdateUserForm: React.FC<{
   // libui's `record-array` field resets itself to a single blank record whenever its `fieldset`
   // changes identity, so an inline literal would discard the permissions it was seeded with on the
   // next render of this component -- which a background refetch of either query triggers.
-  const additionalPermissionsFieldset = useMemo(
+  const additionalPermissionsFieldset = useMemo<FormTypes.Fieldset<UserPermission>>(
     () => ({
       action: {
-        kind: 'string' as const,
+        kind: 'string',
         label: t({
           en: 'Action',
           fr: 'Action'
@@ -103,10 +103,10 @@ const UpdateUserForm: React.FC<{
             fr: 'Modifier'
           })
         },
-        variant: 'select' as const
+        variant: 'select'
       },
       subject: {
-        kind: 'string' as const,
+        kind: 'string',
         label: t({
           en: 'Resource',
           fr: 'Ressource'
@@ -149,7 +149,7 @@ const UpdateUserForm: React.FC<{
             fr: 'Utilisateur'
           })
         },
-        variant: 'select' as const
+        variant: 'select'
       }
     }),
     [resolvedLanguage]
