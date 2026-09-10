@@ -87,7 +87,7 @@ export const MapStep = ({ onBack, onResolved, onStepChange, parsed }: MapStepPro
           <h3 className="text-sm font-medium">{t({ en: 'Column mapping', fr: 'Correspondance des colonnes' })}</h3>
           <div className="overflow-hidden rounded-md border">
             <Table>
-              <Table.Header className="bg-muted">
+              <Table.Header className="bg-secondary [&_th]:text-secondary-foreground [&_th]:font-semibold">
                 <Table.Row>
                   <Table.Head>{t({ en: 'Column in your file', fr: 'Colonne de votre fichier' })}</Table.Head>
                   <Table.Head>{t({ en: 'Read as', fr: 'Interprétée comme' })}</Table.Head>
@@ -121,7 +121,7 @@ export const MapStep = ({ onBack, onResolved, onStepChange, parsed }: MapStepPro
               and ClientTable renders a pagination footer whose controls are permanently disabled. */}
           <div className="overflow-x-auto rounded-md border" data-testid="bulk-preview-table">
             <Table>
-              <Table.Header className="bg-muted">
+              <Table.Header className="bg-secondary [&_th]:text-secondary-foreground [&_th]:font-semibold">
                 <Table.Row>
                   {parsed.headers.map((header) => (
                     <Table.Head key={header}>{header}</Table.Head>
