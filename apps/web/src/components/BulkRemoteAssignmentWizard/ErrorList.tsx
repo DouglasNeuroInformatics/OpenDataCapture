@@ -15,17 +15,20 @@ export const ErrorList = ({ errors }: { errors: BulkParseError[] }) => {
   }
   return (
     <div
+      // An explicit scale rather than `text-destructive`, which resolves to red-600 and is too
+      // light to read comfortably against this tinted panel. The border and ground stay on the
+      // token, so the panel still follows the theme.
       className="border-destructive/40 bg-destructive/5 rounded-md border p-4"
       data-testid="bulk-error-list"
       role="alert"
     >
-      <p className="text-destructive mb-2 text-sm font-medium">
+      <p className="mb-2 text-sm font-semibold text-red-800 dark:text-red-300">
         {t({
           en: 'Nothing has been created. Fix the following and try again:',
           fr: 'Rien n’a été créé. Corrigez ce qui suit et réessayez :'
         })}
       </p>
-      <ul className="text-destructive list-disc space-y-1 pl-5 text-sm">
+      <ul className="list-disc space-y-1 pl-5 text-sm text-red-800 dark:text-red-300">
         {errors.map((error, index) => (
           <li key={index}>
             {error.row !== undefined && (
