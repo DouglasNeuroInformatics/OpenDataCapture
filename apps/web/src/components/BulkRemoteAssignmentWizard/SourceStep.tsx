@@ -194,7 +194,7 @@ export const SourceStep = ({
             ) : (
               <div className="max-h-96 overflow-auto rounded-md border" data-testid="bulk-subject-picker">
                 <Table>
-                  <Table.Header>
+                  <Table.Header className="bg-muted">
                     <Table.Row>
                       <Table.Head className="w-10">
                         <Checkbox

@@ -238,7 +238,7 @@ export const BulkRemoteAssignmentWizard = ({
         >
           <div className="max-h-96 overflow-auto rounded-md border" data-testid="bulk-done-step">
             <Table>
-              <Table.Header>
+              <Table.Header className="bg-muted">
                 <Table.Row>
                   <Table.Head>{t('datahub.index.table.subject')}</Table.Head>
                   <Table.Head>{t({ en: 'Link', fr: 'Lien' })}</Table.Head>

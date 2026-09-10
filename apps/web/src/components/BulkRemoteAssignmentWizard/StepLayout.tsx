@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Button, Card } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { ChevronRightIcon } from 'lucide-react';
 
 import type { WizardStep } from './types';
@@ -63,11 +64,14 @@ const StepLayout = ({ aside, children, description, footer, onStepChange, step, 
                     )}
                     <Button
                       aria-current={isCurrent ? 'step' : undefined}
+                      // Disabled because you are already here, but not dimmed like a step you
+                      // cannot reach yet: it carries the accent so the position is obvious.
+                      className={cn(isCurrent && 'border-primary text-primary font-semibold disabled:opacity-100')}
                       data-testid={`bulk-breadcrumb-${name}`}
                       disabled={!isNavigable}
                       size="sm"
                       type="button"
-                      variant={isCurrent ? 'secondary' : 'outline'}
+                      variant="outline"
                       onClick={() => onStepChange?.(STEP_ENTRY[name])}
                     >
                       {label}
