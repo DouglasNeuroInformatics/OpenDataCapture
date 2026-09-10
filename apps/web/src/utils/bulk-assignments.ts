@@ -197,21 +197,18 @@ function buildResultRows({
     ...sourceRowBySubjectId?.[assignment.subjectId],
     expiresAt: toBasicISOString(new Date(assignment.expiresAt)),
     instrument: instrumentTitleById[assignment.instrumentId] ?? assignment.instrumentId,
-    // Both forms: `subject` is what the app shows on screen, `subjectId` is the full key the record
-    // is stored under. Exporting only the full hash left the file impossible to reconcile with the
-    // truncated id shown everywhere else.
+    // The identifier as the app displays it, so a row can be matched against what is on screen.
     subject: removeSubjectIdScope(assignment.subjectId).slice(0, subjectIdDisplayLength),
-    subjectId: assignment.subjectId,
     url: assignment.url
   }));
 }
 
 /**
- * A two-column table for the clipboard. Tab separated so it pastes into a spreadsheet as columns
- * rather than as one run of text.
+ * The same rows as the download, tab separated so they paste into a spreadsheet as columns. Built
+ * from `buildResultRows` like the file is, so the two cannot drift apart.
  */
-function toLinkTable(assignments: ResultAssignment[]): string {
-  return ['subjectId\turl', ...assignments.map(({ subjectId, url }) => `${subjectId}\t${url}`)].join('\n');
+function toResultTsv(rows: { [key: string]: string }[]): string {
+  return Papa.unparse(rows, { delimiter: '\t', escapeFormulae: true });
 }
 
 /** Thrown by every parse and resolve entry point, carrying user-displayable, row-numbered errors. */
@@ -378,6 +375,6 @@ export function toResultCsv(rows: { [key: string]: string }[]): string {
   return Papa.unparse(rows, { escapeFormulae: true });
 }
 
-export { buildResultRows, resultCsvFilename, toLinkTable };
+export { buildResultRows, resultCsvFilename, toResultTsv };
 
 export type { BulkParseError, BulkParseResult, BulkSourceMode, ResultAssignment };

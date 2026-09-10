@@ -8,8 +8,8 @@ import {
   parseDelimitedText,
   resolveSubjectIds,
   resultCsvFilename,
-  toLinkTable,
-  toResultCsv
+  toResultCsv,
+  toResultTsv
 } from '../bulk-assignments';
 
 const resolve = (input: string, maxSubjects = 500) => resolveSubjectIds(parseDelimitedText(input), { maxSubjects });
@@ -265,7 +265,6 @@ describe('buildResultRows', () => {
       dateOfBirth: '1982-03-14',
       firstName: 'Marie',
       lastName: 'Belanger',
-      subjectId: 'subject-1',
       url: 'http://localhost:3500/assignments/a1'
     });
   });
@@ -295,7 +294,6 @@ describe('buildResultRows subject columns', () => {
       subjectIdDisplayLength: 9
     });
     expect(row?.subject).toBe('aaaaaaaaa');
-    expect(row?.subjectId).toBe('a'.repeat(64));
   });
 
   it('should strip the group scope from a custom identifier, as the app does', () => {
@@ -310,12 +308,39 @@ describe('buildResultRows subject columns', () => {
   });
 });
 
-describe('toLinkTable', () => {
-  it('should copy a two-column table that pastes into a spreadsheet as columns', () => {
-    const table = toLinkTable([
-      { expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' },
-      { expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-2', url: 'http://x/a2' }
-    ]);
-    expect(table.split('\n')).toEqual(['subjectId\turl', 'subject-1\thttp://x/a1', 'subject-2\thttp://x/a2']);
+describe('toResultTsv', () => {
+  it('should carry the same columns as the download, tab separated so it pastes as columns', () => {
+    const rows = buildResultRows({
+      assignments: [
+        {
+          expiresAt: '2027-01-01',
+          instrumentId: 'i1',
+          subjectId: 'Depression_Clinic$ex_111',
+          url: 'http://x/a1'
+        }
+      ],
+      instrumentTitleById: { i1: 'Happiness Questionnaire' },
+      sourceRowBySubjectId: { Depression_Clinic$ex_111: { firstName: 'Marie', lastName: 'Belanger' } },
+      subjectIdDisplayLength: 9
+    });
+    const [header, row] = toResultTsv(rows).split('\n');
+
+    // The personal information the user supplied has to come back with the link, or the clipboard
+    // cannot be matched against their own file.
+    expect(header).toContain('firstName');
+    expect(header).toContain('url');
+    expect(header?.split('\t').length).toBe(row?.split('\t').length);
+    expect(row).toContain('Marie');
+    expect(row).toContain('http://x/a1');
+  });
+
+  it('should no longer carry the full identifier, only the displayed one', () => {
+    const rows = buildResultRows({
+      assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'a'.repeat(64), url: 'http://x/a1' }],
+      instrumentTitleById: {},
+      subjectIdDisplayLength: 9
+    });
+    expect(Object.keys(rows[0]!)).not.toContain('subjectId');
+    expect(rows[0]?.subject).toBe('aaaaaaaaa');
   });
 });

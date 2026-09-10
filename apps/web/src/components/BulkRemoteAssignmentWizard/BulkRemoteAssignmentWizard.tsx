@@ -8,7 +8,7 @@ import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 import { toBulkAssignmentFailure, useCreateBulkAssignmentsMutation } from '@/hooks/useBulkAssignments';
 import type { BulkParseResult } from '@/utils/bulk-assignments';
-import { buildResultRows, resultCsvFilename, toLinkTable, toResultCsv } from '@/utils/bulk-assignments';
+import { buildResultRows, resultCsvFilename, toResultCsv, toResultTsv } from '@/utils/bulk-assignments';
 
 import { MapStep } from './MapStep';
 import { ReviewStep } from './ReviewStep';
@@ -76,12 +76,20 @@ export const BulkRemoteAssignmentWizard = ({
    * has no clipboard at all. Say so rather than failing silently - these links are the only record
    * of what was just created, and the CSV is the way out.
    */
+  const resultRows = () =>
+    buildResultRows({
+      assignments,
+      instrumentTitleById: Object.fromEntries(instruments.map(({ id, title }) => [id, title])),
+      sourceRowBySubjectId: sourceRows,
+      subjectIdDisplayLength
+    });
+
   const copyLinks = async () => {
     try {
       if (!navigator.clipboard) {
         throw new Error('Clipboard unavailable');
       }
-      await navigator.clipboard.writeText(toLinkTable(assignments));
+      await navigator.clipboard.writeText(toResultTsv(resultRows()));
       setDidCopy(true);
     } catch {
       addNotification({
@@ -214,18 +222,7 @@ export const BulkRemoteAssignmentWizard = ({
               <Button
                 data-testid="bulk-download-csv"
                 type="button"
-                onClick={() =>
-                  downloadCsv(
-                    toResultCsv(
-                      buildResultRows({
-                        assignments,
-                        instrumentTitleById: Object.fromEntries(instruments.map(({ id, title }) => [id, title])),
-                        sourceRowBySubjectId: sourceRows,
-                        subjectIdDisplayLength
-                      })
-                    )
-                  )
-                }
+                onClick={() => downloadCsv(toResultCsv(resultRows()))}
               >
                 {t({ en: 'Download CSV', fr: 'Télécharger le CSV' })}
               </Button>
