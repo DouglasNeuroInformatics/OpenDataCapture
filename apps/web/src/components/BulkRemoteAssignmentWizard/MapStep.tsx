@@ -21,20 +21,21 @@ const FIELD_LABELS = {
 import type { WizardStep } from './types';
 
 type MapStepProps = {
+  groupName: string;
   onBack: () => void;
   onResolved: (subjectIds: string[]) => void;
   onStepChange: (step: WizardStep) => void;
   parsed: BulkParseResult;
 };
 
-export const MapStep = ({ onBack, onResolved, onStepChange, parsed }: MapStepProps) => {
+export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }: MapStepProps) => {
   const { t } = useTranslation();
   const [errors, setErrors] = useState<BulkParseError[]>([]);
 
   const resolve = async () => {
     setErrors([]);
     try {
-      onResolved(await resolveSubjectIds(parsed, { maxSubjects: BULK_ASSIGNMENT_MAX_SUBJECTS }));
+      onResolved(await resolveSubjectIds(parsed, { groupName, maxSubjects: BULK_ASSIGNMENT_MAX_SUBJECTS }));
     } catch (err) {
       if (err instanceof BulkParseFailure) {
         setErrors(err.errors);

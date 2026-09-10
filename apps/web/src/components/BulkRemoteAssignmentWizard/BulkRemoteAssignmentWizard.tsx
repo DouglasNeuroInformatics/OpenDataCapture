@@ -33,6 +33,8 @@ export type BulkRemoteAssignmentWizardProps = {
   /** Prefilled expiry for a new timepoint, as `YYYY-MM-DD`. */
   defaultExpiresAt: string;
   groupId: string;
+  /** Needed to turn a pasted custom identifier back into the scoped form it is stored under. */
+  groupName: string;
   instruments: InstrumentOption[];
   /** Group setting controlling how much of an identifier the subject picker shows. */
   subjectIdDisplayLength: number;
@@ -52,6 +54,7 @@ export type BulkRemoteAssignmentWizardProps = {
 export const BulkRemoteAssignmentWizard = ({
   defaultExpiresAt,
   groupId,
+  groupName,
   instruments,
   subjectIdDisplayLength,
   subjects
@@ -80,8 +83,7 @@ export const BulkRemoteAssignmentWizard = ({
     buildResultRows({
       assignments,
       instrumentTitleById: Object.fromEntries(instruments.map(({ id, title }) => [id, title])),
-      sourceRowBySubjectId: sourceRows,
-      subjectIdDisplayLength
+      sourceRowBySubjectId: sourceRows
     });
 
   const copyLinks = async () => {
@@ -164,6 +166,7 @@ export const BulkRemoteAssignmentWizard = ({
 
       {step === 'MAP' && parsed && (
         <MapStep
+          groupName={groupName}
           parsed={parsed}
           onBack={() => goTo('SOURCE')}
           onResolved={(ids) => {

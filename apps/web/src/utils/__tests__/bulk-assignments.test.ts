@@ -236,21 +236,20 @@ describe('buildResultRows', () => {
   };
 
   it('should render the expiry as a plain date rather than a timestamp', () => {
-    const [row] = buildResultRows({ assignments: [assignment], instrumentTitleById: {}, subjectIdDisplayLength: 9 });
+    const [row] = buildResultRows({ assignments: [assignment], instrumentTitleById: {} });
     expect(row?.expiresAt).toBe('2027-09-10');
   });
 
   it('should name the instrument rather than exporting its id, which reads as noise', () => {
     const [row] = buildResultRows({
       assignments: [assignment],
-      instrumentTitleById: { __V2__0c5b9177a7df14b3: 'Happiness Questionnaire' },
-      subjectIdDisplayLength: 9
+      instrumentTitleById: { __V2__0c5b9177a7df14b3: 'Happiness Questionnaire' }
     });
     expect(row?.instrument).toBe('Happiness Questionnaire');
   });
 
   it('should fall back to the id when the instrument is not among those offered', () => {
-    const [row] = buildResultRows({ assignments: [assignment], instrumentTitleById: {}, subjectIdDisplayLength: 9 });
+    const [row] = buildResultRows({ assignments: [assignment], instrumentTitleById: {} });
     expect(row?.instrument).toBe('__V2__0c5b9177a7df14b3');
   });
 
@@ -258,8 +257,7 @@ describe('buildResultRows', () => {
     const [row] = buildResultRows({
       assignments: [assignment],
       instrumentTitleById: {},
-      sourceRowBySubjectId: { 'subject-1': { dateOfBirth: '1982-03-14', firstName: 'Marie', lastName: 'Belanger' } },
-      subjectIdDisplayLength: 9
+      sourceRowBySubjectId: { 'subject-1': { dateOfBirth: '1982-03-14', firstName: 'Marie', lastName: 'Belanger' } }
     });
     expect(row).toMatchObject({
       dateOfBirth: '1982-03-14',
@@ -272,15 +270,14 @@ describe('buildResultRows', () => {
   it('should emit one row per assignment, so a subject appears once per instrument', () => {
     const rows = buildResultRows({
       assignments: [assignment, { ...assignment, instrumentId: 'other', url: 'http://x/a2' }],
-      instrumentTitleById: {},
-      subjectIdDisplayLength: 9
+      instrumentTitleById: {}
     });
     expect(rows).toHaveLength(2);
   });
 });
 
 describe('buildResultRows subject columns', () => {
-  it('should carry the truncated identifier the app displays beside the full key', () => {
+  it('should carry the identifier untruncated, since a prefix cannot be pasted back in', () => {
     const [row] = buildResultRows({
       assignments: [
         {
@@ -290,10 +287,9 @@ describe('buildResultRows subject columns', () => {
           url: 'http://x/a1'
         }
       ],
-      instrumentTitleById: {},
-      subjectIdDisplayLength: 9
+      instrumentTitleById: {}
     });
-    expect(row?.subject).toBe('aaaaaaaaa');
+    expect(row?.subject).toBe('a'.repeat(64));
   });
 
   it('should strip the group scope from a custom identifier, as the app does', () => {
@@ -301,8 +297,7 @@ describe('buildResultRows subject columns', () => {
       assignments: [
         { expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'Depression_Clinic$ex_111', url: 'http://x/a1' }
       ],
-      instrumentTitleById: {},
-      subjectIdDisplayLength: 9
+      instrumentTitleById: {}
     });
     expect(row?.subject).toBe('ex_111');
   });
@@ -320,8 +315,7 @@ describe('toResultTsv', () => {
         }
       ],
       instrumentTitleById: { i1: 'Happiness Questionnaire' },
-      sourceRowBySubjectId: { Depression_Clinic$ex_111: { firstName: 'Marie', lastName: 'Belanger' } },
-      subjectIdDisplayLength: 9
+      sourceRowBySubjectId: { Depression_Clinic$ex_111: { firstName: 'Marie', lastName: 'Belanger' } }
     });
     const [header, row] = toResultTsv(rows).split('\n');
 
@@ -337,10 +331,36 @@ describe('toResultTsv', () => {
   it('should no longer carry the full identifier, only the displayed one', () => {
     const rows = buildResultRows({
       assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'a'.repeat(64), url: 'http://x/a1' }],
-      instrumentTitleById: {},
-      subjectIdDisplayLength: 9
+      instrumentTitleById: {}
     });
     expect(Object.keys(rows[0]!)).not.toContain('subjectId');
-    expect(rows[0]?.subject).toBe('aaaaaaaaa');
+    expect(rows[0]?.subject).toBe('a'.repeat(64));
+  });
+});
+
+describe('resolveSubjectIds identifier forms', () => {
+  const idCsv = (value: string) => parseDelimitedText(`subjectId\n${value}`);
+
+  it('should scope a custom identifier written the way the app displays it', async () => {
+    await expect(
+      resolveSubjectIds(idCsv('ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })
+    ).resolves.toEqual(['Depression_Clinic$ex_111']);
+  });
+
+  it('should leave an already scoped identifier alone', async () => {
+    await expect(
+      resolveSubjectIds(idCsv('Depression_Clinic$ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })
+    ).resolves.toEqual(['Depression_Clinic$ex_111']);
+  });
+
+  it('should leave a generated digest alone, since those are never scoped', async () => {
+    const digest = 'a'.repeat(64);
+    await expect(
+      resolveSubjectIds(idCsv(digest), { groupName: 'Depression Clinic', maxSubjects: 10 })
+    ).resolves.toEqual([digest]);
+  });
+
+  it('should pass values through unchanged when no group is known', async () => {
+    await expect(resolveSubjectIds(idCsv('ex_111'), { maxSubjects: 10 })).resolves.toEqual(['ex_111']);
   });
 });

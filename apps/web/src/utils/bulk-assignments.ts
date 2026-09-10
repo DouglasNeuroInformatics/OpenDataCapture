@@ -1,6 +1,6 @@
 import { toBasicISOString, toLocalISOString } from '@douglasneuroinformatics/libjs';
 import { $Sex } from '@opendatacapture/schemas/subject';
-import { generateSubjectHash, removeSubjectIdScope } from '@opendatacapture/subject-utils';
+import { encodeScopedSubjectId, generateSubjectHash, removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import Papa from 'papaparse';
 
 /**
@@ -44,6 +44,22 @@ const SEX_ALIASES: { [key: string]: 'FEMALE' | 'MALE' } = {
 };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+const GENERATED_ID = /^[0-9a-f]{64}$/i;
+
+/**
+ * Turn an identifier as a person would write it into the one the record is stored under.
+ *
+ * A custom identifier is stored scoped to its group (`Group$id`) but is shown, exported and spoken
+ * about without that prefix, so a user pasting what they see would otherwise never match. A digest
+ * is never scoped, and an already-scoped value is left alone.
+ */
+function toStoredSubjectId(value: string, groupName: string | undefined): string {
+  if (!groupName || value.includes('$') || GENERATED_ID.test(value)) {
+    return value;
+  }
+  return encodeScopedSubjectId(value, { groupName });
+}
 
 type BulkParseError = {
   message: string;
@@ -185,20 +201,19 @@ type ResultAssignment = {
 function buildResultRows({
   assignments,
   instrumentTitleById,
-  sourceRowBySubjectId,
-  subjectIdDisplayLength
+  sourceRowBySubjectId
 }: {
   assignments: ResultAssignment[];
   instrumentTitleById: { [instrumentId: string]: string };
   sourceRowBySubjectId?: { [subjectId: string]: { [column: string]: string } };
-  subjectIdDisplayLength: number;
 }): { [key: string]: string }[] {
   return assignments.map((assignment) => ({
     ...sourceRowBySubjectId?.[assignment.subjectId],
     expiresAt: toBasicISOString(new Date(assignment.expiresAt)),
     instrument: instrumentTitleById[assignment.instrumentId] ?? assignment.instrumentId,
-    // The identifier as the app displays it, so a row can be matched against what is on screen.
-    subject: removeSubjectIdScope(assignment.subjectId).slice(0, subjectIdDisplayLength),
+    // Scope removed so it reads the way the app talks about a subject, but not truncated: this is
+    // the value a user pastes back in to assign again, and a prefix cannot be resolved to a record.
+    subject: removeSubjectIdScope(assignment.subjectId),
     url: assignment.url
   }));
 }
@@ -295,7 +310,7 @@ export function isWorkbookFile(file: File): boolean {
  */
 export async function resolveSubjectIds(
   result: BulkParseResult,
-  { maxSubjects }: { maxSubjects: number }
+  { groupName, maxSubjects }: { groupName?: string; maxSubjects: number }
 ): Promise<string[]> {
   const errors: BulkParseError[] = [];
   const ids: string[] = [];
@@ -309,7 +324,7 @@ export async function resolveSubjectIds(
         errors.push({ message: 'Missing subject ID', row: rowNumber });
         continue;
       }
-      ids.push(value);
+      ids.push(toStoredSubjectId(value, groupName));
       continue;
     }
 

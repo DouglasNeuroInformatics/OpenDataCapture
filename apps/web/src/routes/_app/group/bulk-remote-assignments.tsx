@@ -42,6 +42,7 @@ const RouteComponent = () => {
           getDefaultAssignmentExpiry(setupStateQuery.data.defaultAssignmentDurationDays).toISOString().split('T')[0]!
         }
         groupId={currentGroup.id}
+        groupName={currentGroup.name}
         instruments={instruments}
         subjectIdDisplayLength={currentGroup.settings.subjectIdDisplayLength ?? 9}
         subjects={subjectsQuery.data}
