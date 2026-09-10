@@ -10,13 +10,16 @@ import type { BulkParseError, BulkParseResult } from '@/utils/bulk-assignments';
 import { ErrorList } from './ErrorList';
 import { StepLayout } from './StepLayout';
 
+import type { WizardStep } from './types';
+
 type MapStepProps = {
   onBack: () => void;
   onResolved: (subjectIds: string[]) => void;
+  onStepChange: (step: WizardStep) => void;
   parsed: BulkParseResult;
 };
 
-export const MapStep = ({ onBack, onResolved, parsed }: MapStepProps) => {
+export const MapStep = ({ onBack, onResolved, onStepChange, parsed }: MapStepProps) => {
   const { t } = useTranslation();
   const [errors, setErrors] = useState<BulkParseError[]>([]);
 
@@ -58,6 +61,7 @@ export const MapStep = ({ onBack, onResolved, parsed }: MapStepProps) => {
       }
       step="SUBJECTS"
       title={t({ en: 'Confirm the columns', fr: 'Confirmer les colonnes' })}
+      onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-map-step">
         <ErrorList errors={errors} />

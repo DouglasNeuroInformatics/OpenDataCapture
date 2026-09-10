@@ -3,11 +3,24 @@ import React from 'react';
 import { Card } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
+import { ChevronRightIcon } from 'lucide-react';
 
-/** Not copy: the divider between step names in the progress line. */
-const SEPARATOR = '/';
+import type { WizardStep } from './types';
 
 const WIZARD_STEPS = ['SUBJECTS', 'INSTRUMENTS', 'REVIEW'] as const;
+
+const STEP_LABELS = {
+  INSTRUMENTS: { en: 'Instruments', fr: 'Instruments' },
+  REVIEW: { en: 'Review', fr: 'Révision' },
+  SUBJECTS: { en: 'Subjects', fr: 'Sujets' }
+} as const;
+
+/** The screen a breadcrumb returns to. Subjects re-enters at the source step, not the mapping one. */
+const STEP_ENTRY = {
+  INSTRUMENTS: 'TIMEPOINTS',
+  REVIEW: 'REVIEW',
+  SUBJECTS: 'SOURCE'
+} as const satisfies { [K in WizardStepName]: WizardStep };
 
 type WizardStepName = (typeof WIZARD_STEPS)[number];
 
@@ -18,6 +31,7 @@ type StepLayoutProps = {
   description: string;
   /** Actions for this step. Laid out identically on every step so the primary action never moves. */
   footer?: React.ReactNode;
+  onStepChange?: (step: WizardStep) => void;
   step: null | WizardStepName;
   title: string;
 };
@@ -27,7 +41,7 @@ type StepLayoutProps = {
  * screens: the same card, the same heading level, the same spacing, and a primary action that stays
  * in one place from step to step.
  */
-const StepLayout = ({ aside, children, description, footer, step, title }: StepLayoutProps) => {
+const StepLayout = ({ aside, children, description, footer, onStepChange, step, title }: StepLayoutProps) => {
   const { t } = useTranslation();
   const currentIndex = step ? WIZARD_STEPS.indexOf(step) : -1;
 
@@ -35,30 +49,39 @@ const StepLayout = ({ aside, children, description, footer, step, title }: StepL
     <Card>
       <Card.Header className="gap-3">
         {currentIndex !== -1 && (
-          <ol className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-wide">
-            {WIZARD_STEPS.map((name, index) => {
-              const label = `${index + 1}. ${
-                name === 'SUBJECTS'
-                  ? t({ en: 'Subjects', fr: 'Sujets' })
-                  : name === 'INSTRUMENTS'
-                    ? t({ en: 'Instruments', fr: 'Instruments' })
-                    : t({ en: 'Review', fr: 'Révision' })
-              }`;
-              return (
-                <li className="flex items-center gap-2" key={name}>
-                  {index > 0 && <span aria-hidden="true">{SEPARATOR}</span>}
-                  <span
-                    className={cn(
-                      index === currentIndex && 'text-foreground',
-                      index < currentIndex && 'text-muted-foreground/70'
+          <nav aria-label={t({ en: 'Progress', fr: 'Progression' })} data-testid="bulk-breadcrumbs">
+            <ol className="flex flex-wrap items-center gap-1">
+              {WIZARD_STEPS.map((name, index) => {
+                const isCurrent = index === currentIndex;
+                // Only a step already completed can be revisited; jumping ahead would skip the work
+                // the later step depends on.
+                const isNavigable = index < currentIndex && Boolean(onStepChange);
+                const label = `${index + 1}. ${t(STEP_LABELS[name])}`;
+                return (
+                  <li className="flex items-center gap-1" key={name}>
+                    {index > 0 && (
+                      <ChevronRightIcon aria-hidden="true" className="text-muted-foreground/50 h-3.5 w-3.5" />
                     )}
-                  >
-                    {label}
-                  </span>
-                </li>
-              );
-            })}
-          </ol>
+                    <button
+                      aria-current={isCurrent ? 'step' : undefined}
+                      className={cn(
+                        'rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
+                        isCurrent && 'bg-primary text-primary-foreground',
+                        isNavigable && 'text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer',
+                        !isCurrent && !isNavigable && 'text-muted-foreground/50 cursor-default'
+                      )}
+                      data-testid={`bulk-breadcrumb-${name}`}
+                      disabled={!isNavigable}
+                      type="button"
+                      onClick={() => onStepChange?.(STEP_ENTRY[name])}
+                    >
+                      {label}
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
         )}
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex flex-col gap-1">

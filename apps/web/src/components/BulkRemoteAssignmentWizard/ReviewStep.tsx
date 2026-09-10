@@ -9,12 +9,13 @@ import type { BulkParseError } from '@/utils/bulk-assignments';
 import { ErrorList } from './ErrorList';
 import { StepLayout } from './StepLayout';
 
-import type { DraftTimepoint } from './types';
+import type { DraftTimepoint, WizardStep } from './types';
 
 type ReviewStepProps = {
   failure: BulkAssignmentFailure | null;
   isSubmitting: boolean;
   onBack: () => void;
+  onStepChange: (step: WizardStep) => void;
   onSubmit: (options: { allowDuplicates: boolean }) => void;
   subjectCount: number;
   timepoints: DraftTimepoint[];
@@ -60,6 +61,7 @@ export const ReviewStep = ({
   failure,
   isSubmitting,
   onBack,
+  onStepChange,
   onSubmit,
   subjectCount,
   timepoints,
@@ -111,6 +113,7 @@ export const ReviewStep = ({
       }
       step="REVIEW"
       title={t({ en: 'Review and create', fr: 'Réviser et créer' })}
+      onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-review-step">
         <ErrorList errors={messages} />

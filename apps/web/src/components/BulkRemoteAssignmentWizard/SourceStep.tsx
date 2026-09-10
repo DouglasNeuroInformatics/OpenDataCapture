@@ -27,17 +27,31 @@ import type { BulkParseError, BulkParseResult } from '@/utils/bulk-assignments';
 import { ErrorList } from './ErrorList';
 import { StepLayout } from './StepLayout';
 
+import type { WizardStep } from './types';
+
 type SourceMode = 'FILE' | 'PASTE' | 'SELECT';
 
 type SourceStepProps = {
   onParsed: (parsed: BulkParseResult) => void;
+  /** Selection is held by the wizard, so stepping away and back does not discard it. */
+  onSelectedChange: (subjectIds: string[]) => void;
+  onStepChange: (step: WizardStep) => void;
   onSubjectsSelected: (subjectIds: string[]) => void;
+  selectedIds: string[];
   /** Group setting controlling how much of an identifier is shown, as elsewhere in the app. */
   subjectIdDisplayLength: number;
   subjects: Subject[];
 };
 
-export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLength, subjects }: SourceStepProps) => {
+export const SourceStep = ({
+  onParsed,
+  onSelectedChange,
+  onStepChange,
+  onSubjectsSelected,
+  selectedIds,
+  subjectIdDisplayLength,
+  subjects
+}: SourceStepProps) => {
   const { t } = useTranslation();
   // One source at a time: offering all three at once left it unclear which the wizard would act on,
   // and a file dropped while text was pasted had no defined precedence.
@@ -45,7 +59,7 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
   const [errors, setErrors] = useState<BulkParseError[]>([]);
   const [pasted, setPasted] = useState('');
   const [search, setSearch] = useState('');
-  const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  const selected = new Set(selectedIds);
 
   const run = async (parse: () => BulkParseResult | Promise<BulkParseResult>) => {
     setErrors([]);
@@ -67,16 +81,15 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
       return isWorkbookFile(file) ? parseWorkbook(file) : parseDelimitedText(await file.text());
     });
 
-  const toggle = (id: string) =>
-    setSelected((previous) => {
-      const next = new Set(previous);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+  const toggle = (id: string) => {
+    const next = new Set(selected);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    onSelectedChange([...next]);
+  };
 
   const modes: { label: string; value: SourceMode }[] = [
     { label: t({ en: 'Select subjects', fr: 'Sélectionner des sujets' }), value: 'SELECT' },
@@ -107,18 +120,17 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
 
   const allShownSelected = filtered.length > 0 && filtered.every((row) => selected.has(row.id));
 
-  const toggleAllShown = () =>
-    setSelected((previous) => {
-      const next = new Set(previous);
-      for (const row of filtered) {
-        if (allShownSelected) {
-          next.delete(row.id);
-        } else {
-          next.add(row.id);
-        }
+  const toggleAllShown = () => {
+    const next = new Set(selected);
+    for (const row of filtered) {
+      if (allShownSelected) {
+        next.delete(row.id);
+      } else {
+        next.add(row.id);
       }
-      return next;
-    });
+    }
+    onSelectedChange([...next]);
+  };
 
   return (
     <StepLayout
@@ -128,6 +140,7 @@ export const SourceStep = ({ onParsed, onSubjectsSelected, subjectIdDisplayLengt
       })}
       step="SUBJECTS"
       title={t({ en: 'Choose subjects', fr: 'Choisir les sujets' })}
+      onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-source-step">
         <ErrorList errors={errors} />

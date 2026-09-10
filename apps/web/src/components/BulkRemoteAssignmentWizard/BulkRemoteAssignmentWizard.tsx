@@ -7,6 +7,7 @@ import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 import { toBulkAssignmentFailure, useCreateBulkAssignmentsMutation } from '@/hooks/useBulkAssignments';
+import type { BulkParseResult } from '@/utils/bulk-assignments';
 import { resultCsvFilename, toResultCsv } from '@/utils/bulk-assignments';
 
 import { MapStep } from './MapStep';
@@ -15,7 +16,7 @@ import { SourceStep } from './SourceStep';
 import { StepLayout } from './StepLayout';
 import { TimepointsStep } from './TimepointsStep';
 
-import type { CreatedAssignment, WizardState } from './types';
+import type { CreatedAssignment, DraftTimepoint, WizardStep } from './types';
 
 type InstrumentOption = { id: string; title: string };
 
@@ -68,29 +69,32 @@ export const BulkRemoteAssignmentWizard = ({
   subjects
 }: BulkRemoteAssignmentWizardProps) => {
   const { t } = useTranslation();
-  const [state, setState] = useState<WizardState>({ step: 'SOURCE' });
+  // Each piece of the batch is held here rather than in the step that edits it, so moving between
+  // steps — by Back or by breadcrumb — never discards work the user has already done.
+  const [step, setStep] = useState<WizardStep>('SOURCE');
+  const [parsed, setParsed] = useState<BulkParseResult | null>(null);
+  const [subjectIds, setSubjectIds] = useState<string[]>([]);
+  const [timepoints, setTimepoints] = useState<DraftTimepoint[]>([]);
+  const [assignments, setAssignments] = useState<CreatedAssignment[]>([]);
   const [failure, setFailure] = useState<BulkAssignmentFailure | null>(null);
   const [transportError, setTransportError] = useState(false);
   const createMutation = useCreateBulkAssignmentsMutation();
 
-  const reset = () => {
+  const goTo = (next: WizardStep) => {
     setFailure(null);
     setTransportError(false);
-    setState({ step: 'SOURCE' });
+    setStep(next);
   };
 
   const submit = ({ allowDuplicates }: { allowDuplicates: boolean }) => {
-    if (state.step !== 'REVIEW') {
-      return;
-    }
     setFailure(null);
     setTransportError(false);
     createMutation.mutate(
       {
         allowDuplicates,
         groupId,
-        subjectIds: state.subjectIds,
-        timepoints: state.timepoints.map(({ expiresAt, instrumentId }) => ({
+        subjectIds,
+        timepoints: timepoints.map(({ expiresAt, instrumentId }) => ({
           expiresAt: new Date(`${expiresAt}T23:59:59.999Z`),
           instrumentId
         }))
@@ -104,8 +108,9 @@ export const BulkRemoteAssignmentWizard = ({
           }
           setTransportError(true);
         },
-        onSuccess: (assignments) => {
-          setState({ assignments, step: 'DONE' });
+        onSuccess: (created) => {
+          setAssignments(created);
+          setStep('DONE');
         }
       }
     );
@@ -113,46 +118,63 @@ export const BulkRemoteAssignmentWizard = ({
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-6" data-testid="bulk-remote-assignment-wizard">
-      {state.step === 'SOURCE' && (
+      {step === 'SOURCE' && (
         <SourceStep
+          selectedIds={subjectIds}
           subjectIdDisplayLength={subjectIdDisplayLength}
           subjects={subjects}
-          onParsed={(parsed) => setState({ parsed, step: 'MAP' })}
-          onSubjectsSelected={(subjectIds) => setState({ step: 'TIMEPOINTS', subjectIds })}
+          onParsed={(result) => {
+            setParsed(result);
+            goTo('MAP');
+          }}
+          onSelectedChange={setSubjectIds}
+          onStepChange={goTo}
+          onSubjectsSelected={(ids) => {
+            setSubjectIds(ids);
+            goTo('TIMEPOINTS');
+          }}
         />
       )}
 
-      {state.step === 'MAP' && (
+      {step === 'MAP' && parsed && (
         <MapStep
-          parsed={state.parsed}
-          onBack={reset}
-          onResolved={(subjectIds) => setState({ step: 'TIMEPOINTS', subjectIds })}
+          parsed={parsed}
+          onBack={() => goTo('SOURCE')}
+          onResolved={(ids) => {
+            setSubjectIds(ids);
+            goTo('TIMEPOINTS');
+          }}
+          onStepChange={goTo}
         />
       )}
 
-      {state.step === 'TIMEPOINTS' && (
+      {step === 'TIMEPOINTS' && (
         <TimepointsStep
           defaultExpiresAt={defaultExpiresAt}
           instruments={instruments}
-          subjectCount={state.subjectIds.length}
-          onBack={reset}
-          onConfirm={(timepoints) => setState({ step: 'REVIEW', subjectIds: state.subjectIds, timepoints })}
+          subjectCount={subjectIds.length}
+          timepoints={timepoints}
+          onBack={() => goTo('SOURCE')}
+          onChange={setTimepoints}
+          onConfirm={() => goTo('REVIEW')}
+          onStepChange={goTo}
         />
       )}
 
-      {state.step === 'REVIEW' && (
+      {step === 'REVIEW' && (
         <ReviewStep
           failure={failure}
           isSubmitting={createMutation.isPending}
-          subjectCount={state.subjectIds.length}
-          timepoints={state.timepoints}
+          subjectCount={subjectIds.length}
+          timepoints={timepoints}
           transportError={transportError}
-          onBack={() => setState({ step: 'TIMEPOINTS', subjectIds: state.subjectIds })}
+          onBack={() => goTo('TIMEPOINTS')}
+          onStepChange={goTo}
           onSubmit={submit}
         />
       )}
 
-      {state.step === 'DONE' && (
+      {step === 'DONE' && (
         <StepLayout
           description={t({
             en: 'Each subject has a link below. Copy them, or download a CSV to share with whoever is sending them out.',
@@ -164,14 +186,14 @@ export const BulkRemoteAssignmentWizard = ({
                 data-testid="bulk-copy-links"
                 type="button"
                 variant="outline"
-                onClick={() => void copyLinks(state.assignments)}
+                onClick={() => void copyLinks(assignments)}
               >
                 {t({ en: 'Copy all links', fr: 'Copier tous les liens' })}
               </Button>
               <Button
                 data-testid="bulk-download-csv"
                 type="button"
-                onClick={() => downloadCsv(toResultCsv(toCsvRows(state.assignments)))}
+                onClick={() => downloadCsv(toResultCsv(toCsvRows(assignments)))}
               >
                 {t({ en: 'Download CSV', fr: 'Télécharger le CSV' })}
               </Button>
@@ -179,8 +201,8 @@ export const BulkRemoteAssignmentWizard = ({
           }
           step={null}
           title={t({
-            en: `${state.assignments.length} assignments created`,
-            fr: `${state.assignments.length} tâches créées`
+            en: `${assignments.length} assignments created`,
+            fr: `${assignments.length} tâches créées`
           })}
         >
           <div className="max-h-96 overflow-auto rounded-md border" data-testid="bulk-done-step">
@@ -193,7 +215,7 @@ export const BulkRemoteAssignmentWizard = ({
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {state.assignments.map((assignment) => (
+                {assignments.map((assignment) => (
                   <Table.Row key={assignment.url}>
                     <Table.Cell className="font-medium">
                       {removeSubjectIdScope(assignment.subjectId).slice(0, subjectIdDisplayLength)}

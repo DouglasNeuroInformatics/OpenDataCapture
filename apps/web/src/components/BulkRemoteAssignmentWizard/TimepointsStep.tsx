@@ -6,7 +6,7 @@ import { TrashIcon } from 'lucide-react';
 
 import { StepLayout } from './StepLayout';
 
-import type { DraftTimepoint } from './types';
+import type { DraftTimepoint, WizardStep } from './types';
 
 type InstrumentOption = { id: string; title: string };
 
@@ -15,8 +15,12 @@ type TimepointsStepProps = {
   defaultExpiresAt: string;
   instruments: InstrumentOption[];
   onBack: () => void;
-  onConfirm: (timepoints: DraftTimepoint[]) => void;
+  onChange: (timepoints: DraftTimepoint[]) => void;
+  onConfirm: () => void;
+  onStepChange: (step: WizardStep) => void;
   subjectCount: number;
+  /** Held by the wizard, so returning from review does not discard the list. */
+  timepoints: DraftTimepoint[];
 };
 
 /**
@@ -27,11 +31,13 @@ export const TimepointsStep = ({
   defaultExpiresAt,
   instruments,
   onBack,
+  onChange,
   onConfirm,
-  subjectCount
+  onStepChange,
+  subjectCount,
+  timepoints
 }: TimepointsStepProps) => {
   const { t } = useTranslation();
-  const [timepoints, setTimepoints] = useState<DraftTimepoint[]>([]);
   const [instrumentId, setInstrumentId] = useState('');
   const [expiresAt, setExpiresAt] = useState(defaultExpiresAt);
 
@@ -46,10 +52,7 @@ export const TimepointsStep = ({
     if (!instrument || !expiresAt) {
       return;
     }
-    setTimepoints((previous) => [
-      ...previous,
-      { expiresAt, instrumentId: instrument.id, instrumentTitle: instrument.title }
-    ]);
+    onChange([...timepoints, { expiresAt, instrumentId: instrument.id, instrumentTitle: instrument.title }]);
     setInstrumentId('');
     setExpiresAt(defaultExpiresAt);
   };
@@ -77,7 +80,7 @@ export const TimepointsStep = ({
             data-testid="bulk-confirm-timepoints"
             disabled={timepoints.length === 0}
             type="button"
-            onClick={() => onConfirm(timepoints)}
+            onClick={onConfirm}
           >
             {t({ en: 'Review', fr: 'Réviser' })}
           </Button>
@@ -85,6 +88,7 @@ export const TimepointsStep = ({
       }
       step="INSTRUMENTS"
       title={t({ en: 'Choose instruments', fr: 'Choisir les instruments' })}
+      onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-timepoints-step">
         {/* Fixed column widths, and `minmax(0, …)` on the select so a long instrument title clips
@@ -148,11 +152,7 @@ export const TimepointsStep = ({
                     aria-label={t({ en: 'Remove instrument', fr: "Retirer l'instrument" })}
                     className="text-muted-foreground hover:text-destructive p-1"
                     type="button"
-                    onClick={() =>
-                      setTimepoints((previous) =>
-                        previous.filter((item) => item.instrumentId !== timepoint.instrumentId)
-                      )
-                    }
+                    onClick={() => onChange(timepoints.filter((item) => item.instrumentId !== timepoint.instrumentId))}
                   >
                     <TrashIcon className="h-4 w-4" />
                   </button>
