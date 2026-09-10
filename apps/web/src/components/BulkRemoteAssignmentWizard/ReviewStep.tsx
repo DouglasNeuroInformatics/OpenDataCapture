@@ -84,14 +84,6 @@ export const ReviewStep = ({
 
   return (
     <StepLayout
-      aside={
-        <span className="text-sm font-medium" data-testid="bulk-review-summary">
-          {t({
-            en: `${subjectCount * timepoints.length} assignments`,
-            fr: `${subjectCount * timepoints.length} tâches`
-          })}
-        </span>
-      }
       description={t({
         en: 'All assignments are created together. If any of them cannot be created, none are.',
         fr: 'Toutes les tâches sont créées ensemble. Si l’une d’elles échoue, aucune n’est créée.'
@@ -119,10 +111,10 @@ export const ReviewStep = ({
         <ErrorList errors={messages} />
 
         <div className="rounded-md border p-4">
-          <p className="mb-2 text-sm font-medium">
+          <p className="mb-2 text-sm font-bold" data-testid="bulk-review-summary">
             {t({
-              en: `${subjectCount} subjects × ${timepoints.length} instruments`,
-              fr: `${subjectCount} sujets × ${timepoints.length} instruments`
+              en: `${subjectCount} subjects × ${timepoints.length} instruments = ${subjectCount * timepoints.length} assignments`,
+              fr: `${subjectCount} sujets × ${timepoints.length} instruments = ${subjectCount * timepoints.length} tâches`
             })}
           </p>
           <ul className="text-muted-foreground list-disc space-y-1 pl-5 text-sm">

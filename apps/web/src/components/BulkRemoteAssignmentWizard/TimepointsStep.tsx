@@ -59,14 +59,6 @@ export const TimepointsStep = ({
 
   return (
     <StepLayout
-      aside={
-        <span className="text-sm font-medium" data-testid="bulk-assignment-total">
-          {t({
-            en: `${subjectCount * timepoints.length} assignments`,
-            fr: `${subjectCount * timepoints.length} tâches`
-          })}
-        </span>
-      }
       description={t({
         en: `Each instrument is assigned to all ${subjectCount} selected subjects, with its own expiry.`,
         fr: `Chaque instrument est attribué aux ${subjectCount} sujets sélectionnés, avec sa propre date d’expiration.`
