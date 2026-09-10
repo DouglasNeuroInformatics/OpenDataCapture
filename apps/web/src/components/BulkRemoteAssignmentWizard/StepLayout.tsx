@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { Card } from '@douglasneuroinformatics/libui/components';
+import { Button, Card } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { cn } from '@douglasneuroinformatics/libui/utils';
 import { ChevronRightIcon } from 'lucide-react';
 
 import type { WizardStep } from './types';
@@ -62,21 +61,17 @@ const StepLayout = ({ aside, children, description, footer, onStepChange, step, 
                     {index > 0 && (
                       <ChevronRightIcon aria-hidden="true" className="text-muted-foreground/50 h-3.5 w-3.5" />
                     )}
-                    <button
+                    <Button
                       aria-current={isCurrent ? 'step' : undefined}
-                      className={cn(
-                        'rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
-                        isCurrent && 'bg-primary text-primary-foreground',
-                        isNavigable && 'text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer',
-                        !isCurrent && !isNavigable && 'text-muted-foreground/50 cursor-default'
-                      )}
                       data-testid={`bulk-breadcrumb-${name}`}
                       disabled={!isNavigable}
+                      size="sm"
                       type="button"
+                      variant={isCurrent ? 'secondary' : 'outline'}
                       onClick={() => onStepChange?.(STEP_ENTRY[name])}
                     >
                       {label}
-                    </button>
+                    </Button>
                   </li>
                 );
               })}

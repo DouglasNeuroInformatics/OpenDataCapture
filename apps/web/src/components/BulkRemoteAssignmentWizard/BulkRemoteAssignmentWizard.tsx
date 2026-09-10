@@ -117,7 +117,7 @@ export const BulkRemoteAssignmentWizard = ({
   };
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-6" data-testid="bulk-remote-assignment-wizard">
+    <div className="mx-auto flex max-w-[70rem] flex-col gap-6" data-testid="bulk-remote-assignment-wizard">
       {step === 'SOURCE' && (
         <SourceStep
           selectedIds={subjectIds}
