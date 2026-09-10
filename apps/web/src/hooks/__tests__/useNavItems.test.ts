@@ -9,11 +9,16 @@ import '@/services/i18n';
 
 const mocks = vi.hoisted(() => {
   const can = vi.fn((_action: string, _subject: string) => true);
+  const store: { currentGroup: null | { id: string }; currentSession: null; currentUser: unknown } = {
+    currentGroup: { id: 'group-1' },
+    currentSession: null,
+    currentUser: { ability: { can } }
+  };
   return {
     can,
     config: { setup: { isGatewayEnabled: true } },
     setupState: { isBulkRemoteAssignmentsEnabled: true, isExperimentalFeaturesEnabled: false, isMailEnabled: false },
-    store: { currentGroup: { id: 'group-1' }, currentSession: null, currentUser: { ability: { can } } }
+    store
   };
 });
 
@@ -119,6 +124,22 @@ describe('useNavItems', () => {
     mocks.setupState.isMailEnabled = true;
     expect(navUrls()).toContain('/group/email-templates');
     expect(navLabels()).not.toContain('Group Actions');
+  });
+
+  // An admin holds `manage all`, so the group links are gated on having a group rather than on the
+  // permission level. An admin assigned to one sees exactly what a group manager sees.
+  it('should offer the group actions to an admin who is assigned to a group', () => {
+    mocks.can.mockReturnValue(true);
+    expect(navLabels()).toContain('Group Actions');
+    expect(navUrls()).toContain('/group/manage');
+    expect(navUrls()).toContain('/group/bulk-remote-assignments');
+  });
+
+  it('should offer no group actions to a user with no current group, whatever their permissions', () => {
+    mocks.store.currentGroup = null;
+    expect(navLabels()).not.toContain('Group Actions');
+    expect(navUrls()).not.toContain('/group/bulk-remote-assignments');
+    mocks.store.currentGroup = { id: 'group-1' };
   });
 
   it('should still render the group when only bulk assignments is available', () => {

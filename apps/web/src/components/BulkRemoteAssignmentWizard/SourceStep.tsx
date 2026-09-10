@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import {
-  Button,
-  Checkbox,
-  DataTable,
-  FileDropzone,
-  Select,
-  Tabs,
-  TextArea
-} from '@douglasneuroinformatics/libui/components';
+import { Button, Checkbox, DataTable, FileDropzone, Tabs, TextArea } from '@douglasneuroinformatics/libui/components';
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
+import { ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from 'lucide-react';
 
 import {
   ACCEPTED_FILE_EXTENSIONS,
@@ -39,24 +33,22 @@ type PickerRow = {
   subject: string;
 };
 
-const SEX_FILTER_ALL = 'ALL';
-
-/** Sits beside the table's own search box, the way the datahub places its filters. */
-const SexFilter: React.FC<{ table: TanstackTable.Table<PickerRow> }> = ({ table }) => {
-  const { t } = useTranslation();
-  const column = table.getColumn('sex');
-  const value = (column?.getFilterValue() as string | undefined) ?? SEX_FILTER_ALL;
+/**
+ * A clickable column label. `DataTableHead` renders whatever the column supplies, so the sort
+ * affordance lives here rather than coming from the table.
+ */
+const SortableHeader = ({ column, label }: { column: TanstackTable.Column<PickerRow>; label: string }) => {
+  const sorted = column.getIsSorted();
+  const Icon = sorted === 'asc' ? ChevronUpIcon : sorted === 'desc' ? ChevronDownIcon : ChevronsUpDownIcon;
   return (
-    <Select value={value} onValueChange={(next) => column?.setFilterValue(next === SEX_FILTER_ALL ? undefined : next)}>
-      <Select.Trigger className="w-44" data-testid="bulk-sex-filter">
-        <Select.Value />
-      </Select.Trigger>
-      <Select.Content>
-        <Select.Item value={SEX_FILTER_ALL}>{t({ en: 'All sexes', fr: 'Tous les sexes' })}</Select.Item>
-        <Select.Item value="MALE">{t('core.identificationData.sex.male')}</Select.Item>
-        <Select.Item value="FEMALE">{t('core.identificationData.sex.female')}</Select.Item>
-      </Select.Content>
-    </Select>
+    <button
+      className="hover:text-foreground flex items-center gap-1 transition-colors"
+      type="button"
+      onClick={() => column.toggleSorting()}
+    >
+      {label}
+      <Icon className={cn('h-3.5 w-3.5', !sorted && 'opacity-40')} />
+    </button>
   );
 };
 
@@ -220,10 +212,18 @@ export const SourceStep = ({
                       ),
                       id: 'select'
                     },
-                    { accessorKey: 'subject', header: t('datahub.index.table.subject'), id: 'subject' },
+                    {
+                      accessorKey: 'subject',
+                      header: ({ column }) => (
+                        <SortableHeader column={column} label={t('datahub.index.table.subject')} />
+                      ),
+                      id: 'subject'
+                    },
                     {
                       accessorKey: 'dateOfBirth',
-                      header: t('core.identificationData.dateOfBirth.label'),
+                      header: ({ column }) => (
+                        <SortableHeader column={column} label={t('core.identificationData.dateOfBirth.label')} />
+                      ),
                       id: 'dateOfBirth'
                     },
                     {
@@ -238,12 +238,13 @@ export const SourceStep = ({
                         }
                         return t({ en: 'NULL', fr: 'NUL' });
                       },
-                      header: t('core.identificationData.sex.label'),
+                      header: ({ column }) => (
+                        <SortableHeader column={column} label={t('core.identificationData.sex.label')} />
+                      ),
                       id: 'sex'
                     }
                   ]}
                   data={rows}
-                  togglesComponent={SexFilter}
                   onRowClick={(row) => toggle(row.id)}
                 />
               </div>
