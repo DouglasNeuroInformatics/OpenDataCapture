@@ -16,7 +16,7 @@ Skipping @opendatacapture/runtime-v1@<version> (already published)
 ```
 
 So a bump that touches only the root leaves the packages behind and `publish-npm` reports **success while
-publishing nothing**. `scripts/increment-version.sh` rewrites the root plus every path
+publishing nothing**. `scripts/increment-version.ts` rewrites the root plus every path
 `scripts/list-publishable.sh` returns in one run, and it is the only thing holding those files in
 agreement — nothing in CI compares them, and hand edits have moved the root alone before.
 
@@ -32,24 +32,27 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    before the bump.
 
 2. **Bump from a branch that already contains `main`.** `git fetch origin && git merge origin/main`.
-   `increment-version.sh` derives the next version from the root `package.json` in your working tree
+   `increment-version.ts` derives the next version from the root `package.json` in your working tree
    alone, so a branch trailing `main` computes a version that is already released — the run then re-pushes
    the same image tags, updates the same GitHub release, and prints `Skipping` for every package. Done
    when `git merge-base --is-ancestor origin/main HEAD` exits 0.
 
-3. **Run `./scripts/increment-version.sh` from the repo root.** There is no `pnpm` script for it — invoke
-   the path; prerequisites for anything under `scripts/` are in `.agents/docs/playbooks/run-locally.md`.
-   It first prints `Recommended bump: major|minor|patch`, derived by `scripts/changelog.ts` from the
-   commits since the last `v*` tag (a breaking change → major, a `feat` → minor, anything else → patch —
-   strict SemVer, so expect `minor` more often than recent releases suggest). The choice stays yours: its
-   `select` prompt offers `major`/`minor`/`patch`/`quit`, then a `y/N` confirmation, then it rewrites the
-   root `package.json` plus every path `scripts/list-publishable.sh` returns, then runs
+3. **Run `./scripts/increment-version.ts` from the repo root.** There is no `pnpm` script for it — invoke
+   the path, which Node executes directly; prerequisites for anything under `scripts/` are in
+   `.agents/docs/playbooks/run-locally.md`. It first prints `Recommended bump: major|minor|patch`, derived
+   by `scripts/changelog.ts` from the commits since the last `v*` tag (a breaking change → major, a `feat` →
+   minor, anything else → patch — strict SemVer, so expect `minor` more often than recent releases suggest).
+   The choice stays yours: it offers `major`/`minor`/`patch`/`quit` with the recommendation preselected and
+   the resulting version beside each, then a `y/N` confirmation. `--bump <major|minor|patch>` and `--yes`
+   answer those two prompts on the command line and are **required** when stdin is not a terminal — without
+   them it exits 1 having written nothing rather than picking for you. It then rewrites the root
+   `package.json` plus every path `scripts/list-publishable.sh` returns, runs
    `scripts/changelog.ts write <version>`, which inserts a `## <version>` section into `CHANGELOG.md` and
-   regenerates `docs/en/6-changelog/changelog.md` from it. A commit whose message does not follow the
-   convention is skipped with `Warning: skipping commit <sha> …` on stderr — read those lines, because
-   the entry is simply absent (#1529 tracks making that a failure). Done when its output carries one
-   `Updated …` line per file, a `Wrote the <version> section` line, and ends
-   `Done! All packages set to <version>`.
+   regenerates `docs/en/6-changelog/changelog.md` from it, and re-reads every version field to assert the
+   lockstep of step 4. A commit whose message does not follow the convention is skipped with
+   `Warning: skipping commit <sha> …` — read those lines, because the entry is simply absent (#1529 tracks
+   making that a failure). Done when its output carries one `✓ <file> → <version>` line per package, a
+   `Wrote the <version> section` line, and ends `✓ All 6 packages report <version>`.
 
 4. **Confirm the lockstep before you commit.**
 
@@ -59,19 +62,25 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
 
    `list-publishable.sh` never prints the root, so a uniform version column proves nothing on its own —
    that is exactly what a root-only bump looks like. Done when the root version on the first line equals
-   the second tab-separated field of every row below it. No check enforces that equality.
+   the second tab-separated field of every row below it. Nothing in CI enforces that equality;
+   `increment-version.ts` asserts it for its own run, which is exactly why this check matters when
+   anything bypassed the script.
 
    Then read the new `## <version>` section of `CHANGELOG.md`. It becomes the GitHub release body
    verbatim, and this PR is the only review it gets. It lists `feat`, `fix`, `perf` and breaking commits
    only; a `chore`-only range renders as `This release contains no user-facing changes.`
 
-5. **Commit the version files and both changelog files in one commit, `chore: release v<version>`, and
-   open the PR with `main` as its base.** `ci.yaml` fires on `pull_request` to `main` and on
+5. **Commit the version files and both changelog files in one commit, `chore: release v<version>`, and open
+   the PR with `main` as its base.** `increment-version.ts --commit` makes exactly that commit — the six
+   `package.json` files and both changelogs, by explicit pathspec, so anything else already staged stays out
+   of it. It commits only; the tag is the release workflow's (`v${version}`, on the GitHub release). Using
+   it skips the step-4 read of `CHANGELOG.md`, which is the only review that section gets before it becomes
+   the release body, so read the commit afterwards. `ci.yaml` fires on `pull_request` to `main` and on
    `workflow_dispatch`, never on a push, so a PR based on `dev` or any other branch runs no lint, no unit
    tests and no e2e — silently (`commitlint.yaml` runs on a PR to any branch). In-repo work branches on
    origin and merges into `main`; `CONTRIBUTING.md` describes a fork path, which addresses outside
-   contributors. There is no changeset: `CHANGELOG.md` is the record, and the GitHub release body is a
-   copy of its new section.
+   contributors. There is no changeset: `CHANGELOG.md` is the record, and the GitHub release body is a copy
+   of its new section.
 
 6. **Land one release at a time.** The workflow's concurrency group is per-workflow-per-ref with
    `cancel-in-progress: true` (`release.yaml:9-11`), so a second merge cancels the release in flight. A
@@ -90,7 +99,7 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    | `release`     | extracts the `## ${version}` section of `CHANGELOG.md` (`scripts/changelog.ts section`) and creates the GitHub release tagged `v${version}` with it as the body | any of its `needs` skipped or failed                         |
 
    `release` **fails** — not skips — with `CHANGELOG.md has no section for <version>` when the bump
-   bypassed `increment-version.sh`. That is deliberate: an empty body would look like every release
+   bypassed `increment-version.ts`. That is deliberate: an empty body would look like every release
    before the changelog existed and would hide the bypass.
 
    **No playground image ships.** The filter keeps only compose services declaring **both** `build` and
@@ -121,7 +130,7 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    release. Done when the `## Verify` block below is clean for each.
 
 10. **If npm did not move, cut another patch.** A `Skipping` line for every package means the bump
-    bypassed `scripts/increment-version.sh`; so does a red `release` job reporting no changelog section.
+    bypassed `scripts/increment-version.ts`; so does a red `release` job reporting no changelog section.
     Run the script properly, commit, merge again — re-running a version the registry already has
     publishes nothing, so the fix is always forward.
 
