@@ -2,12 +2,13 @@ import React from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 import { BulkRemoteAssignmentWizard } from '@/components/BulkRemoteAssignmentWizard';
 import { PageHeader } from '@/components/PageHeader';
+import { config } from '@/config';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
-import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
+import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { getDefaultAssignmentExpiry } from '@/utils/assignment-duration';
@@ -50,5 +51,17 @@ const RouteComponent = () => {
 };
 
 export const Route = createFileRoute('/_app/group/bulk-remote-assignments')({
+  // Guarded rather than merely hidden from the nav: assignments are served by the gateway, and the
+  // API only mounts AssignmentsModule when it is enabled, so a bookmarked link would otherwise reach
+  // a page whose endpoints do not exist. The instance toggle gates it the same way.
+  beforeLoad: async ({ context }) => {
+    if (!config.setup.isGatewayEnabled) {
+      throw redirect({ to: '/dashboard' });
+    }
+    const setupState = await context.queryClient.ensureQueryData(setupStateQueryOptions());
+    if (!setupState.isBulkRemoteAssignmentsEnabled) {
+      throw redirect({ to: '/dashboard' });
+    }
+  },
   component: RouteComponent
 });

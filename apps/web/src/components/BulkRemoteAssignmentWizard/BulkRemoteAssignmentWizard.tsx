@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button, CopyButton, Table } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { BulkAssignmentFailure } from '@opendatacapture/schemas/assignment';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
@@ -28,9 +28,6 @@ const toCsvRows = (assignments: CreatedAssignment[]) =>
     subjectId: assignment.subjectId,
     url: assignment.url
   }));
-
-const copyLinks = (assignments: CreatedAssignment[]) =>
-  navigator.clipboard.writeText(assignments.map(({ url }) => url).join('\n'));
 
 const downloadCsv = (csv: string) => {
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
@@ -79,6 +76,31 @@ export const BulkRemoteAssignmentWizard = ({
   const [failure, setFailure] = useState<BulkAssignmentFailure | null>(null);
   const [transportError, setTransportError] = useState(false);
   const createMutation = useCreateBulkAssignmentsMutation();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
+  const [didCopy, setDidCopy] = useState(false);
+
+  /**
+   * `navigator.clipboard` is absent outside a secure context, so an instance served over plain http
+   * has no clipboard at all. Say so rather than failing silently — these links are the only record
+   * of what was just created, and the CSV is the way out.
+   */
+  const copyLinks = async () => {
+    try {
+      if (!navigator.clipboard) {
+        throw new Error('Clipboard unavailable');
+      }
+      await navigator.clipboard.writeText(assignments.map(({ url }) => url).join('\n'));
+      setDidCopy(true);
+    } catch {
+      addNotification({
+        message: t({
+          en: 'Could not copy to the clipboard. Download the CSV instead.',
+          fr: 'Impossible de copier dans le presse-papiers. Téléchargez plutôt le CSV.'
+        }),
+        type: 'error'
+      });
+    }
+  };
 
   const goTo = (next: WizardStep) => {
     setFailure(null);
@@ -186,9 +208,10 @@ export const BulkRemoteAssignmentWizard = ({
                 data-testid="bulk-copy-links"
                 type="button"
                 variant="outline"
-                onClick={() => void copyLinks(assignments)}
+                onClick={() => void copyLinks()}
+                onMouseLeave={() => setDidCopy(false)}
               >
-                {t({ en: 'Copy all links', fr: 'Copier tous les liens' })}
+                {didCopy ? t({ en: 'Copied', fr: 'Copié' }) : t({ en: 'Copy all links', fr: 'Copier tous les liens' })}
               </Button>
               <Button
                 data-testid="bulk-download-csv"
