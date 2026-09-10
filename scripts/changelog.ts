@@ -174,9 +174,14 @@ async function write(version: string): Promise<void> {
   const changelog = insertRelease(fs.readFileSync(changelogPath, 'utf8'), version, renderRelease(version, commits));
   await writeFormatted(changelogPath, changelog);
   await writeFormatted(docsCopyPath, toDocsCopy(changelog));
-  console.log(`Wrote the ${version} section (${commits.length} commits since ${tag}) to:`);
-  console.log(`  ${path.relative(projectRoot, changelogPath)}`);
-  console.log(`  ${path.relative(projectRoot, docsCopyPath)}`);
+  process.stdout.write(
+    [
+      `Wrote the ${version} section (${commits.length} commits since ${tag}) to:`,
+      `  ${path.relative(projectRoot, changelogPath)}`,
+      `  ${path.relative(projectRoot, docsCopyPath)}`,
+      ''
+    ].join('\n')
+  );
 }
 
 function recommend(): void {
@@ -184,7 +189,7 @@ function recommend(): void {
   const commits = readCommitsSince(tag);
   const bump = recommendBump(commits);
   console.error(`Recommended bump: ${bump} (${commits.length} commits since ${tag})`);
-  console.log(bump);
+  process.stdout.write(`${bump}\n`);
 }
 
 function section(version: string): void {

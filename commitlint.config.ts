@@ -29,8 +29,9 @@ function readWorkspaceScopes(): string[] {
     globs.map((glob) => path.posix.join(glob, 'package.json')),
     { cwd: projectRoot }
   );
-  const names = manifests.map((manifest) => {
-    const { name }: { name?: unknown } = JSON.parse(fs.readFileSync(path.join(projectRoot, manifest), 'utf8'));
+  const names = manifests.map((manifestPath) => {
+    const manifest: unknown = JSON.parse(fs.readFileSync(path.join(projectRoot, manifestPath), 'utf8'));
+    const name = typeof manifest === 'object' && manifest !== null && 'name' in manifest ? manifest.name : null;
     return typeof name === 'string' ? name : '';
   });
   return names

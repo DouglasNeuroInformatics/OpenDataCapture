@@ -16,7 +16,7 @@ it. Read the `AGENTS.md` in a directory before editing it; this file only says w
 - **Versions are pinned in the `catalog:` block of `pnpm-workspace.yaml`.** A dependency entry says
   `"catalog:"`, never a literal version.
 - `tsc` in every `lint` script is a **typecheck only** — `noEmit: true` comes from
-  `@douglasneuroinformatics/tsconfig` via `tsconfig.base.json`. Nothing is emitted by `pnpm lint`.
+  `@douglasneuroinformatics/tsconfig` via `tsconfig.json`. Nothing is emitted by `pnpm lint`.
 
 ## Apps — `apps/*`
 
@@ -131,7 +131,7 @@ library that instruments may import — `react@18.x`, `react@19.x`, `jspsych@7.x
 - Each wrapper's `exports` point at hand-written files under its own `src/` — usually `index.js` +
   `index.d.ts` re-exporting the real dependency by name, sometimes only a stylesheet
   (`normalize.css@8.x`).
-- **`vendor/**/\*`is excluded from`tsconfig.base.json`,\*\* so these are not typechecked with the rest
+- **`vendor/**/\*`is excluded from`tsconfig.json`,\*\* so these are not typechecked with the rest
   of the repo.
 - `runtime/v1` depends on all of them as `devDependencies` and is what turns them into the
   published runtime; many other workspaces alias individual wrappers under the real name

@@ -18,7 +18,7 @@ pnpm install                # install deps
 pnpm generate:env           # create .env from .env.template — required before anything else runs
 pnpm dev                    # run core apps (api, gateway, web) via turbo
 pnpm build                  # turbo build (all packages/apps)
-pnpm lint                   # turbo lint — this is `tsc && eslint --fix src` per package
+pnpm lint                   # turbo lint — `tsc && eslint --fix src` per package, plus lint:root for root-level scripts and configs
 pnpm format                 # turbo format (prettier per package)
 pnpm test                   # vitest across the workspace
 pnpm test:e2e               # playwright, in testing/

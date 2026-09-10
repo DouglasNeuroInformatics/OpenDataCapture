@@ -108,7 +108,7 @@ dependency, generates both Prisma clients, and pushes the gateway SQLite schema 
 **`test` is not a turbo task at all.** Root `pnpm test` is `env-cmd vitest`: plain vitest, no build,
 no database. Only `testing` owns a `test:e2e` script; only `apps/gateway` owns a `db:push`.
 
-`globalDependencies` are `.env`, `eslint.config.js`, `tsconfig.base.json` and `prettier.config.js`.
+`globalDependencies` are `.env`, `eslint.config.js`, `tsconfig.json` and `prettier.config.js`.
 Touching any of them invalidates the cache for every task in the repo.
 
 ## What CI gates
