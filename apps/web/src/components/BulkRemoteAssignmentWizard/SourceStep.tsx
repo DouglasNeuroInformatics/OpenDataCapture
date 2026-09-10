@@ -4,12 +4,13 @@ import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
   Button,
   Checkbox,
+  DataTable,
   FileDropzone,
-  SearchBar,
-  Table,
+  Select,
   Tabs,
   TextArea
 } from '@douglasneuroinformatics/libui/components';
+import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
@@ -30,6 +31,34 @@ import { StepLayout } from './StepLayout';
 import type { WizardStep } from './types';
 
 type SourceMode = 'FILE' | 'PASTE' | 'SELECT';
+
+type PickerRow = {
+  dateOfBirth: string;
+  id: string;
+  sex: string;
+  subject: string;
+};
+
+const SEX_FILTER_ALL = 'ALL';
+
+/** Sits beside the table's own search box, the way the datahub places its filters. */
+const SexFilter: React.FC<{ table: TanstackTable.Table<PickerRow> }> = ({ table }) => {
+  const { t } = useTranslation();
+  const column = table.getColumn('sex');
+  const value = (column?.getFilterValue() as string | undefined) ?? SEX_FILTER_ALL;
+  return (
+    <Select value={value} onValueChange={(next) => column?.setFilterValue(next === SEX_FILTER_ALL ? undefined : next)}>
+      <Select.Trigger className="w-44" data-testid="bulk-sex-filter">
+        <Select.Value />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value={SEX_FILTER_ALL}>{t({ en: 'All sexes', fr: 'Tous les sexes' })}</Select.Item>
+        <Select.Item value="MALE">{t('core.identificationData.sex.male')}</Select.Item>
+        <Select.Item value="FEMALE">{t('core.identificationData.sex.female')}</Select.Item>
+      </Select.Content>
+    </Select>
+  );
+};
 
 type SourceStepProps = {
   onParsed: (parsed: BulkParseResult) => void;
@@ -58,7 +87,6 @@ export const SourceStep = ({
   const [mode, setMode] = useState<SourceMode>('SELECT');
   const [errors, setErrors] = useState<BulkParseError[]>([]);
   const [pasted, setPasted] = useState('');
-  const [search, setSearch] = useState('');
   const selected = new Set(selectedIds);
 
   const run = async (parse: () => BulkParseResult | Promise<BulkParseResult>) => {
@@ -101,28 +129,18 @@ export const SourceStep = ({
   // subject is just as assignable, and excluding them left most of a group invisible. Identifiers are
   // rendered the way the rest of the app renders them - group scope removed, truncated to the group's
   // display length - with date of birth and sex alongside, since a digest identifies nobody on sight.
-  const rows = subjects.map((subject) => ({
+  const rows: PickerRow[] = subjects.map((subject) => ({
     dateOfBirth: subject.dateOfBirth ? toBasicISOString(subject.dateOfBirth) : t({ en: 'NULL', fr: 'NUL' }),
     id: subject.id,
-    sex:
-      subject.sex === 'FEMALE'
-        ? t('core.identificationData.sex.female')
-        : subject.sex === 'MALE'
-          ? t('core.identificationData.sex.male')
-          : t({ en: 'NULL', fr: 'NUL' }),
+    sex: subject.sex ?? '',
     subject: removeSubjectIdScope(subject.id).slice(0, subjectIdDisplayLength)
   }));
 
-  const query = search.trim().toLowerCase();
-  const filtered = query
-    ? rows.filter((row) => [row.subject, row.dateOfBirth, row.sex].some((value) => value.toLowerCase().includes(query)))
-    : rows;
-
-  const allShownSelected = filtered.length > 0 && filtered.every((row) => selected.has(row.id));
+  const allShownSelected = rows.length > 0 && rows.every((row) => selected.has(row.id));
 
   const toggleAllShown = () => {
     const next = new Set(selected);
-    for (const row of filtered) {
+    for (const row of rows) {
       if (allShownSelected) {
         next.delete(row.id);
       } else {
@@ -168,78 +186,69 @@ export const SourceStep = ({
 
         {mode === 'SELECT' && (
           <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-muted-foreground text-sm">
-                {t({
-                  en: 'Choose existing subjects in this group.',
-                  fr: 'Choisissez des sujets existants de ce groupe.'
-                })}
-              </p>
-              <SearchBar
-                className="w-full sm:w-72"
-                data-testid="bulk-subject-search"
-                placeholder={t({ en: 'Search subjects...', fr: 'Rechercher des sujets...' })}
-                value={search}
-                onValueChange={setSearch}
-              />
-            </div>
+            <p className="text-muted-foreground text-sm">
+              {t({
+                en: 'Choose existing subjects in this group. Search, sort or filter to narrow the list.',
+                fr: 'Choisissez des sujets existants de ce groupe. Cherchez, triez ou filtrez pour réduire la liste.'
+              })}
+            </p>
             {rows.length === 0 ? (
               <p className="text-muted-foreground text-sm italic">
                 {t({ en: 'This group has no subjects.', fr: 'Ce groupe n’a aucun sujet.' })}
               </p>
-            ) : filtered.length === 0 ? (
-              <p className="text-muted-foreground text-sm italic">
-                {t({ en: 'No subjects match your search.', fr: 'Aucun sujet ne correspond à votre recherche.' })}
-              </p>
             ) : (
-              <div className="max-h-96 overflow-auto rounded-md border" data-testid="bulk-subject-picker">
-                <Table>
-                  <Table.Header className="bg-muted">
-                    <Table.Row>
-                      <Table.Head className="w-10">
+              <div data-testid="bulk-subject-picker">
+                <DataTable
+                  columns={[
+                    {
+                      cell: ({ row }) => (
+                        <Checkbox
+                          aria-label={row.original.subject}
+                          checked={selected.has(row.original.id)}
+                          data-testid={`bulk-select-subject-${row.original.id}`}
+                          onCheckedChange={() => toggle(row.original.id)}
+                        />
+                      ),
+                      enableSorting: false,
+                      header: () => (
                         <Checkbox
                           aria-label={t({ en: 'Select all shown', fr: 'Tout sélectionner' })}
                           checked={allShownSelected}
                           data-testid="bulk-select-all-subjects"
                           onCheckedChange={toggleAllShown}
                         />
-                      </Table.Head>
-                      <Table.Head>{t('datahub.index.table.subject')}</Table.Head>
-                      <Table.Head>{t('core.identificationData.dateOfBirth.label')}</Table.Head>
-                      <Table.Head>{t('core.identificationData.sex.label')}</Table.Head>
-                    </Table.Row>
-                  </Table.Header>
-                  <Table.Body>
-                    {filtered.map((row) => {
-                      const isSelected = selected.has(row.id);
-                      return (
-                        // `data-state` drives the row highlight libui already defines for a selected row,
-                        // rather than a colour invented here.
-                        <Table.Row
-                          className="cursor-pointer"
-                          data-state={isSelected ? 'selected' : undefined}
-                          key={row.id}
-                          onClick={() => toggle(row.id)}
-                        >
-                          <Table.Cell className="w-10">
-                            <Checkbox
-                              aria-label={row.subject}
-                              checked={isSelected}
-                              data-testid={`bulk-select-subject-${row.subject}`}
-                              onCheckedChange={() => toggle(row.id)}
-                            />
-                          </Table.Cell>
-                          <Table.Cell className="font-medium">{row.subject}</Table.Cell>
-                          <Table.Cell>{row.dateOfBirth}</Table.Cell>
-                          <Table.Cell>{row.sex}</Table.Cell>
-                        </Table.Row>
-                      );
-                    })}
-                  </Table.Body>
-                </Table>
+                      ),
+                      id: 'select'
+                    },
+                    { accessorKey: 'subject', header: t('datahub.index.table.subject'), id: 'subject' },
+                    {
+                      accessorKey: 'dateOfBirth',
+                      header: t('core.identificationData.dateOfBirth.label'),
+                      id: 'dateOfBirth'
+                    },
+                    {
+                      accessorKey: 'sex',
+                      cell: ({ getValue }) => {
+                        const value = getValue<string>();
+                        if (value === 'FEMALE') {
+                          return t('core.identificationData.sex.female');
+                        }
+                        if (value === 'MALE') {
+                          return t('core.identificationData.sex.male');
+                        }
+                        return t({ en: 'NULL', fr: 'NUL' });
+                      },
+                      header: t('core.identificationData.sex.label'),
+                      id: 'sex'
+                    }
+                  ]}
+                  data={rows}
+                  togglesComponent={SexFilter}
+                  onRowClick={(row) => toggle(row.id)}
+                />
               </div>
             )}
-            <div className="flex justify-center">
+            <div className="mt-3 flex justify-center">
               <Button
                 data-testid="bulk-use-selected-subjects"
                 disabled={selected.size === 0}
