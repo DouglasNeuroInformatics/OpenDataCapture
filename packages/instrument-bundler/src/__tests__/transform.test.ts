@@ -16,6 +16,11 @@ describe('transformImports', () => {
       "const { useState, default: React } = await __import('react');"
     );
   });
+  it('should alias a named import whose local binding differs from the exported name', () => {
+    expect(transformImports("import { useState as useStateAlias } from 'react';")).toBe(
+      "const { useState: useStateAlias } = await __import('react');"
+    );
+  });
   it('should transform a namespace import', () => {
     expect(transformImports("import * as React from 'react';")).toBe("const React = await __import('react');");
   });

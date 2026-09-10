@@ -28,7 +28,34 @@ the first is an esbuild `define` holding base64 Tailwind CSS built from
 Runtime assets are not bundled: `Server.create` calls `generateMetadata({ rootDir: import.meta.dirname })`,
 which resolves the `@opendatacapture/runtime-v1` **peer** dependency from the installed `dist/`.
 
+**Every `fs.watch` handle must be reachable from `Server.stop()`.** `InstrumentLoader` opens one per
+instrument directory and exposes `close()`; `InstrumentLoaderMap` and both handlers forward it, and
+`Server.stop()` calls `handler.close()` before closing the http server. A new watcher (or a new
+handler) that is not wired into that chain leaks a live watcher per `Server` instance, which keeps
+the process alive and, in tests, keeps firing against deleted temp directories.
+
+**`cli.ts` validation belongs in commander's parsers, not the `.action()` body.** `parseTarget` is
+passed to `.argument()` and `parsePort` to `.option()`, so an `InvalidArgumentError` thrown by
+either takes commander's print-message-and-`process.exit(1)` path. `parseTarget` needs the `--all` flag,
+which is safe because commander runs argument parsers after option parsing — `program.opts()` is
+already populated inside it, whatever order the flags appear in. Validating inside `.action()`
+instead would escape that handling: the body is `async`, and `program.parse()` does not await it, so
+the throw would surface as a bare unhandled rejection with a stack trace rather than a clean error.
+
+**`program.parse()` does not await the async `.action()` body.** Anything that throws _after_
+validation — `Server.create` failing to resolve runtime metadata, `listen` hitting `EADDRINUSE` —
+is still an unhandled rejection. Only the argument/option parsers exit cleanly today.
+
 ## Tests and running it
 
-No `vitest.config.ts` and no `test` script — this package has no unit tests. There is no `dev` script
-either: `pnpm --filter @opendatacapture/serve-instrument build`, then `node dist/cli.js <dir>`.
+`pnpm exec vitest --project serve-instrument`. `src/__tests__/cli.test.ts` drives the CLI with a
+stubbed `process.argv` and a fresh module per test, `Server` itself mocked out.
+`src/__tests__/root.test.tsx` renders `Root` with `renderToStaticMarkup` — no DOM, so
+`LanguageSwitcher`'s interactive half goes unexercised. `src/__tests__/server.test.ts` starts a real
+`Server` against real temp-directory fixtures and drives it with real `fetch` calls; it stubs the
+`client.js` / `__TAILWIND_STYLES__` globals that only exist post-build, and replaces `fs.watch` at
+the module level (it is a named ESM export, which `vi.spyOn` cannot touch) so a test can fire the
+rebuild callback on demand and assert every watcher's `close()` ran after `stop()`.
+
+There is no `dev` script either: `pnpm --filter @opendatacapture/serve-instrument build`, then
+`node dist/cli.js <dir>`.

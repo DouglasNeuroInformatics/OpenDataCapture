@@ -192,14 +192,45 @@ Adding a variable touches several files that must agree — follow
 
 ## Tests
 
-`pnpm exec vitest --project api`. These are **unit tests with a mocked Prisma layer**; there are no
-integration tests in the suite.
+`pnpm exec vitest --project api` runs two kinds of test, both in the `api` project.
 
+**Unit tests** — `src/**/*.spec.ts`, the bulk of the suite — mock the Prisma layer.
 `src/groups/__tests__/groups.service.spec.ts` is the canonical example. Build a testing module with
 `MockFactory.createForModelToken(getModelToken('Group'))` from
 `@douglasneuroinformatics/libnest/testing`, type mocks as `MockedInstance<Model<'Group'>>`, and
 assert Prisma arguments with `model.create.mock.lastCall?.[0]` and `toMatchObject`. A fresh module is
 compiled per test, so there is no shared mock state to reset.
+
+**Integration tests** — `test/**/*.test.ts` — boot the real application against a real database.
+`test/app.test.ts` is the only entry point: it imports every file in `test/suites/` in filename
+order and runs it, so a numeric prefix is how a suite declares it must run after another. A suite is
+a `defineSuite(name, function () { ... })` default export (`test/helpers.ts`) whose body reaches the
+booted app as `this.app` and drives it with fastify's `app.inject`.
+
+`test/helpers.ts` boots `appContainer.createApplicationInstance()` — the instance `src/main.ts`
+exports, so the suite exercises the real wiring, URI versioning (routes live under `/v1`) and docs
+rather than a module list assembled for tests. The fixture is file-scoped: one boot and one database
+per file. Three consequences worth knowing:
+
+- **`NODE_ENV` is `test` under vitest**, which is the whole database story — `PrismaModuleOptionsFactory`
+  starts a `mongodb-memory-server` replica set instead of dialing `MONGO_URI`, and `app.close()`
+  stops it via `onApplicationShutdown`. Nothing in the test sets a connection string.
+- **`__RELEASE__` must be stubbed.** `libnest build` replaces it with a literal, so under vitest the
+  identifier is undefined and any route reading it (`GET /v1/setup`) throws a `ReferenceError`.
+  `test/helpers.ts` stubs it once for every suite; a unit spec touching that path stubs its own.
+- **The OpenAPI document is built before `enableVersioning`**, so paths in `/spec.json` carry no
+  `/v1` prefix even though the live routes do.
+- **`GatewaySynchronizer` leaks a timer into the suite.** Its `onApplicationBootstrap` calls
+  `setInterval` without storing the handle, and `app.close()` cannot clear it. Nothing breaks while a
+  file finishes inside `GATEWAY_REFRESH_INTERVAL`; a longer one fires `sync()` mid-run, whose
+  database call may land after the replica set is stopped. Fix it at the source — store the handle
+  and clear it in `onApplicationShutdown` — rather than disabling `GATEWAY_ENABLED` for tests, which
+  would drop `GatewayModule`'s `forwardRef` circular dependency out of exactly the wiring these tests
+  exist to check.
+
+Provider overrides are deliberately not offered — nothing needs one yet. Adding them means
+`Test.createTestingModule({ imports: [appContainer.module] })`, which also means reproducing
+`configureApp`; export it from libnest rather than copying it here.
 
 The `apps/api/vitest.config.ts` `libnest` plugin is required — it applies the SWC decorator
 transforms, without which `@Injectable`/`@Body` metadata does not exist at runtime.

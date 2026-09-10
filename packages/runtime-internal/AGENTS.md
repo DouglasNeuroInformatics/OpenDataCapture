@@ -29,6 +29,8 @@ the prefix `worker.js` strips off incoming request pathnames. Moving the package
 
 ## Tests
 
-None here — no `vitest.config.ts` and no `test` script. The copy-verbatim guarantee this package
-depends on is covered upstream by the `classic-script` fixture in
-`packages/runtime-bundler/test/e2e.test.ts`.
+`pnpm exec vitest --project runtime-internal`, in `src/__tests__/index.test.ts` — covers
+`evaluateInstrument`, `encodeUnicodeToBase64`, `decodeBase64ToUnicode` and `removeSubjectIdScope`.
+The `interactive/*.js` trio (`iframe.html`, `bootstrap.js`, `worker.js`) has no test of its own here
+— they only run inside a real browser iframe/worker — so their copy-verbatim guarantee is still
+covered upstream, by the `classic-script` fixture in `packages/runtime-bundler/test/e2e.test.ts`.

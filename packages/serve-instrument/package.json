@@ -17,7 +17,8 @@
   "scripts": {
     "build": "node scripts/build.js",
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "lint": "tsc && eslint --fix src",
+    "test": "vitest"
   },
   "peerDependencies": {
     "@opendatacapture/runtime-v1": "workspace:*"

@@ -6,5 +6,5 @@
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]
     }
   },
-  "include": ["scripts/*", "src/**/*"]
+  "include": ["scripts/*", "src/**/*", "vitest.config.ts"]
 }

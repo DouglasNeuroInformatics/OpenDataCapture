@@ -77,3 +77,23 @@ describe('$UpdateSetupStateData', () => {
     });
   });
 });
+
+describe('$BrandingConfig', () => {
+  describe('resourceLinksFontSize', () => {
+    it('should accept a supported font size', () => {
+      expect($BrandingConfig.safeParse({ resourceLinksFontSize: 16 }).success).toBe(true);
+    });
+    it('should reject a font size not in the supported list', () => {
+      expect($BrandingConfig.safeParse({ resourceLinksFontSize: 13 }).success).toBe(false);
+    });
+  });
+
+  describe('sectionsOrder', () => {
+    it('should accept a permutation of the panel sections with no duplicates', () => {
+      expect($BrandingConfig.safeParse({ sectionsOrder: ['logo', 'name', 'tagline'] }).success).toBe(true);
+    });
+    it('should reject a sectionsOrder containing a duplicate section', () => {
+      expect($BrandingConfig.safeParse({ sectionsOrder: ['logo', 'logo'] }).success).toBe(false);
+    });
+  });
+});
