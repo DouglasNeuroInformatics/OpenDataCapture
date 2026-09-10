@@ -1,4 +1,4 @@
-import { toLocalISOString } from '@douglasneuroinformatics/libjs';
+import { toBasicISOString, toLocalISOString } from '@douglasneuroinformatics/libjs';
 import { $Sex } from '@opendatacapture/schemas/subject';
 import { generateSubjectHash } from '@opendatacapture/subject-utils';
 import Papa from 'papaparse';
@@ -161,6 +161,51 @@ function buildResult(headers: string[], rows: { [key: string]: string }[]): Bulk
  */
 function resultCsvFilename(now: Date): string {
   return `bulk-remote-assignments-${toLocalISOString(now).slice(0, 19).replaceAll(':', '-')}.csv`;
+}
+
+/** The fields of a created assignment that the results export and clipboard table are built from. */
+type ResultAssignment = {
+  expiresAt: Date | string;
+  instrumentId: string;
+  subjectId: string;
+  url: string;
+};
+
+/**
+ * Build the rows the user takes away.
+ *
+ * When the batch came from a file or a paste, each original row is echoed back with the link added,
+ * because a resolved identifier is a hash: without their own columns beside it the user cannot tell
+ * which link belongs to which person. One row is emitted per subject per instrument.
+ *
+ * Note this means the exported file contains whatever personal information the user supplied, next
+ * to live assignment links. It is generated in the browser and never uploaded, but it is a sensitive
+ * artifact once saved.
+ */
+function buildResultRows({
+  assignments,
+  instrumentTitleById,
+  sourceRowBySubjectId
+}: {
+  assignments: ResultAssignment[];
+  instrumentTitleById: { [instrumentId: string]: string };
+  sourceRowBySubjectId?: { [subjectId: string]: { [column: string]: string } };
+}): { [key: string]: string }[] {
+  return assignments.map((assignment) => ({
+    ...sourceRowBySubjectId?.[assignment.subjectId],
+    expiresAt: toBasicISOString(new Date(assignment.expiresAt)),
+    instrument: instrumentTitleById[assignment.instrumentId] ?? assignment.instrumentId,
+    subjectId: assignment.subjectId,
+    url: assignment.url
+  }));
+}
+
+/**
+ * A two-column table for the clipboard. Tab separated so it pastes into a spreadsheet as columns
+ * rather than as one run of text.
+ */
+function toLinkTable(assignments: ResultAssignment[]): string {
+  return ['subjectId\turl', ...assignments.map(({ subjectId, url }) => `${subjectId}\t${url}`)].join('\n');
 }
 
 /** Thrown by every parse and resolve entry point, carrying user-displayable, row-numbered errors. */
@@ -327,6 +372,6 @@ export function toResultCsv(rows: { [key: string]: string }[]): string {
   return Papa.unparse(rows, { escapeFormulae: true });
 }
 
-export { resultCsvFilename };
+export { buildResultRows, resultCsvFilename, toLinkTable };
 
-export type { BulkParseError, BulkParseResult, BulkSourceMode };
+export type { BulkParseError, BulkParseResult, BulkSourceMode, ResultAssignment };

@@ -8,7 +8,7 @@ import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 import { toBulkAssignmentFailure, useCreateBulkAssignmentsMutation } from '@/hooks/useBulkAssignments';
 import type { BulkParseResult } from '@/utils/bulk-assignments';
-import { resultCsvFilename, toResultCsv } from '@/utils/bulk-assignments';
+import { buildResultRows, resultCsvFilename, toLinkTable, toResultCsv } from '@/utils/bulk-assignments';
 
 import { MapStep } from './MapStep';
 import { ReviewStep } from './ReviewStep';
@@ -19,15 +19,6 @@ import { TimepointsStep } from './TimepointsStep';
 import type { CreatedAssignment, DraftTimepoint, WizardStep } from './types';
 
 type InstrumentOption = { id: string; title: string };
-
-/** The link is the point of the export, so it is a column rather than something to look up later. */
-const toCsvRows = (assignments: CreatedAssignment[]) =>
-  assignments.map((assignment) => ({
-    expiresAt: new Date(assignment.expiresAt).toISOString(),
-    instrumentId: assignment.instrumentId,
-    subjectId: assignment.subjectId,
-    url: assignment.url
-  }));
 
 const downloadCsv = (csv: string) => {
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
@@ -73,6 +64,7 @@ export const BulkRemoteAssignmentWizard = ({
   const [subjectIds, setSubjectIds] = useState<string[]>([]);
   const [timepoints, setTimepoints] = useState<DraftTimepoint[]>([]);
   const [assignments, setAssignments] = useState<CreatedAssignment[]>([]);
+  const [sourceRows, setSourceRows] = useState<undefined | { [subjectId: string]: { [column: string]: string } }>();
   const [failure, setFailure] = useState<BulkAssignmentFailure | null>(null);
   const [transportError, setTransportError] = useState(false);
   const createMutation = useCreateBulkAssignmentsMutation();
@@ -89,7 +81,7 @@ export const BulkRemoteAssignmentWizard = ({
       if (!navigator.clipboard) {
         throw new Error('Clipboard unavailable');
       }
-      await navigator.clipboard.writeText(assignments.map(({ url }) => url).join('\n'));
+      await navigator.clipboard.writeText(toLinkTable(assignments));
       setDidCopy(true);
     } catch {
       addNotification({
@@ -152,6 +144,10 @@ export const BulkRemoteAssignmentWizard = ({
           onSelectedChange={setSubjectIds}
           onStepChange={goTo}
           onSubjectsSelected={(ids) => {
+            // Picked by hand, so there are no uploaded rows to echo back; clear any left from a
+            // file the user parsed and then abandoned, which would no longer line up.
+            setParsed(null);
+            setSourceRows(undefined);
             setSubjectIds(ids);
             goTo('TIMEPOINTS');
           }}
@@ -164,6 +160,8 @@ export const BulkRemoteAssignmentWizard = ({
           onBack={() => goTo('SOURCE')}
           onResolved={(ids) => {
             setSubjectIds(ids);
+            // `resolveSubjectIds` preserves row order, so each id belongs to the row at its index.
+            setSourceRows(Object.fromEntries(ids.map((id, index) => [id, parsed.rows[index] ?? {}])));
             goTo('TIMEPOINTS');
           }}
           onStepChange={goTo}
@@ -216,7 +214,17 @@ export const BulkRemoteAssignmentWizard = ({
               <Button
                 data-testid="bulk-download-csv"
                 type="button"
-                onClick={() => downloadCsv(toResultCsv(toCsvRows(assignments)))}
+                onClick={() =>
+                  downloadCsv(
+                    toResultCsv(
+                      buildResultRows({
+                        assignments,
+                        instrumentTitleById: Object.fromEntries(instruments.map(({ id, title }) => [id, title])),
+                        sourceRowBySubjectId: sourceRows
+                      })
+                    )
+                  )
+                }
               >
                 {t({ en: 'Download CSV', fr: 'Télécharger le CSV' })}
               </Button>

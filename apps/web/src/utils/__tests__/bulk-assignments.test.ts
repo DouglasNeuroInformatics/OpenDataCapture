@@ -2,11 +2,13 @@ import { generateSubjectHash } from '@opendatacapture/subject-utils';
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildResultRows,
   BulkParseFailure,
   isWorkbookFile,
   parseDelimitedText,
   resolveSubjectIds,
   resultCsvFilename,
+  toLinkTable,
   toResultCsv
 } from '../bulk-assignments';
 
@@ -222,5 +224,65 @@ describe('resultCsvFilename', () => {
     // of the machine's offset from UTC.
     const name = resultCsvFilename(new Date(2026, 0, 2, 23, 30, 0));
     expect(name).toContain('2026-01-02T23-30-00');
+  });
+});
+
+describe('buildResultRows', () => {
+  const assignment = {
+    expiresAt: '2027-09-10T23:59:59.999Z',
+    instrumentId: '__V2__0c5b9177a7df14b3',
+    subjectId: 'subject-1',
+    url: 'http://localhost:3500/assignments/a1'
+  };
+
+  it('should render the expiry as a plain date rather than a timestamp', () => {
+    const [row] = buildResultRows({ assignments: [assignment], instrumentTitleById: {} });
+    expect(row?.expiresAt).toBe('2027-09-10');
+  });
+
+  it('should name the instrument rather than exporting its id, which reads as noise', () => {
+    const [row] = buildResultRows({
+      assignments: [assignment],
+      instrumentTitleById: { __V2__0c5b9177a7df14b3: 'Happiness Questionnaire' }
+    });
+    expect(row?.instrument).toBe('Happiness Questionnaire');
+  });
+
+  it('should fall back to the id when the instrument is not among those offered', () => {
+    const [row] = buildResultRows({ assignments: [assignment], instrumentTitleById: {} });
+    expect(row?.instrument).toBe('__V2__0c5b9177a7df14b3');
+  });
+
+  it('should echo back the uploaded row, so a hashed identifier can be traced to a person', () => {
+    const [row] = buildResultRows({
+      assignments: [assignment],
+      instrumentTitleById: {},
+      sourceRowBySubjectId: { 'subject-1': { dateOfBirth: '1982-03-14', firstName: 'Marie', lastName: 'Belanger' } }
+    });
+    expect(row).toMatchObject({
+      dateOfBirth: '1982-03-14',
+      firstName: 'Marie',
+      lastName: 'Belanger',
+      subjectId: 'subject-1',
+      url: 'http://localhost:3500/assignments/a1'
+    });
+  });
+
+  it('should emit one row per assignment, so a subject appears once per instrument', () => {
+    const rows = buildResultRows({
+      assignments: [assignment, { ...assignment, instrumentId: 'other', url: 'http://x/a2' }],
+      instrumentTitleById: {}
+    });
+    expect(rows).toHaveLength(2);
+  });
+});
+
+describe('toLinkTable', () => {
+  it('should copy a two-column table that pastes into a spreadsheet as columns', () => {
+    const table = toLinkTable([
+      { expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' },
+      { expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-2', url: 'http://x/a2' }
+    ]);
+    expect(table.split('\n')).toEqual(['subjectId\turl', 'subject-1\thttp://x/a1', 'subject-2\thttp://x/a2']);
   });
 });
