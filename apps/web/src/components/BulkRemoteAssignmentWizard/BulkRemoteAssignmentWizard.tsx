@@ -79,6 +79,18 @@ export const BulkRemoteAssignmentWizard = ({
    * has no clipboard at all. Say so rather than failing silently - these links are the only record
    * of what was just created, and the CSV is the way out.
    */
+  /**
+   * Name a subject the way the user will recognise it. When the batch came from a file, that is the
+   * row they supplied; a derived identifier is a hash and would tell them nothing about who it is.
+   */
+  const describeSubject = (subjectId: string) => {
+    const row = sourceRows?.[subjectId];
+    // Explicit emptiness check rather than `??`: a row of blank cells joins to '', which still has
+    // to fall through to the identifier.
+    const supplied = row ? Object.values(row).filter(Boolean).join(' · ') : '';
+    return supplied.length > 0 ? supplied : removeSubjectIdScope(subjectId).slice(0, subjectIdDisplayLength);
+  };
+
   const resultRows = () =>
     buildResultRows({
       assignments,
@@ -194,6 +206,7 @@ export const BulkRemoteAssignmentWizard = ({
 
       {step === 'REVIEW' && (
         <ReviewStep
+          describeSubject={describeSubject}
           failure={failure}
           isSubmitting={createMutation.isPending}
           subjectCount={subjectIds.length}

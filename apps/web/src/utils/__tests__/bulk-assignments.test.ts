@@ -338,6 +338,27 @@ describe('toResultTsv', () => {
   });
 });
 
+describe('result column order', () => {
+  it('should lead every row with the subject, ahead of the uploaded columns', () => {
+    const [row] = buildResultRows({
+      assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' }],
+      instrumentTitleById: {},
+      sourceRowBySubjectId: { 'subject-1': { firstName: 'Marie', lastName: 'Belanger' } }
+    });
+    // Pinned because `perfectionist` sorts object literals; the spread is what keeps this first.
+    expect(Object.keys(row!)[0]).toBe('subject');
+  });
+
+  it('should put the subject first in the clipboard table too', () => {
+    const rows = buildResultRows({
+      assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' }],
+      instrumentTitleById: {},
+      sourceRowBySubjectId: { 'subject-1': { firstName: 'Marie' } }
+    });
+    expect(toResultTsv(rows).split('\n')[0]?.split('\t')[0]).toBe('subject');
+  });
+});
+
 describe('resolveSubjectIds identifier forms', () => {
   const idCsv = (value: string) => parseDelimitedText(`subjectId\n${value}`);
 

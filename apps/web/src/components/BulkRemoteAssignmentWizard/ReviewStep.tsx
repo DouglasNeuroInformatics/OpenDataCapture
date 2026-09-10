@@ -12,6 +12,8 @@ import { StepLayout } from './StepLayout';
 import type { DraftTimepoint, WizardStep } from './types';
 
 type ReviewStepProps = {
+  /** Renders a subject id as something the user recognises, ideally their own uploaded row. */
+  describeSubject: (subjectId: string) => string;
   failure: BulkAssignmentFailure | null;
   isSubmitting: boolean;
   onBack: () => void;
@@ -27,30 +29,33 @@ type ReviewStepProps = {
  * has never been told the names - so a count plus the ids is all there is to show, and all that
  * should be shown.
  */
-const useIssueMessages = () => {
+const useIssueMessages = (describeSubject: (subjectId: string) => string) => {
   const { t } = useTranslation();
   return (issues: BulkAssignmentIssue[]): BulkParseError[] =>
     issues.map((issue) => {
       switch (issue.kind) {
         case 'CONFLICT':
           return {
+            items: issue.conflicts.map(({ subjectId }) => describeSubject(subjectId)),
             message: t({
-              en: `${issue.conflicts.length} subject(s) already have an outstanding assignment for one of these instruments.`,
-              fr: `${issue.conflicts.length} sujet(s) ont déjà une tâche en cours pour l’un de ces instruments.`
+              en: `${issue.conflicts.length} subject(s) already have an outstanding assignment for one of these instruments:`,
+              fr: `${issue.conflicts.length} sujet(s) ont déjà une tâche en cours pour l’un de ces instruments :`
             })
           };
         case 'INSTRUMENT_UNAVAILABLE':
           return {
+            items: issue.instrumentIds,
             message: t({
-              en: `This group cannot assign ${issue.instrumentIds.length} of the selected instrument(s).`,
-              fr: `Ce groupe ne peut pas attribuer ${issue.instrumentIds.length} des instruments sélectionnés.`
+              en: `This group cannot assign ${issue.instrumentIds.length} of the selected instrument(s):`,
+              fr: `Ce groupe ne peut pas attribuer ${issue.instrumentIds.length} des instruments sélectionnés :`
             })
           };
         case 'SUBJECT_UNAVAILABLE':
           return {
+            items: issue.subjectIds.map((subjectId) => describeSubject(subjectId)),
             message: t({
-              en: `${issue.subjectIds.length} subject(s) are not available in this group.`,
-              fr: `${issue.subjectIds.length} sujet(s) ne sont pas disponibles dans ce groupe.`
+              en: `${issue.subjectIds.length} subject(s) are not available in this group:`,
+              fr: `${issue.subjectIds.length} sujet(s) ne sont pas disponibles dans ce groupe :`
             })
           };
       }
@@ -58,6 +63,7 @@ const useIssueMessages = () => {
 };
 
 export const ReviewStep = ({
+  describeSubject,
   failure,
   isSubmitting,
   onBack,
@@ -69,7 +75,7 @@ export const ReviewStep = ({
 }: ReviewStepProps) => {
   const { t } = useTranslation();
   const [allowDuplicates, setAllowDuplicates] = useState(false);
-  const toMessages = useIssueMessages();
+  const toMessages = useIssueMessages(describeSubject);
 
   const hasConflict = failure?.issues.some(({ kind }) => kind === 'CONFLICT') ?? false;
   const messages = failure ? toMessages(failure.issues) : [];

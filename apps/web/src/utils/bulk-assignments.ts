@@ -62,6 +62,8 @@ function toStoredSubjectId(value: string, groupName: string | undefined): string
 }
 
 type BulkParseError = {
+  /** Optional detail lines rendered beneath the message, such as the rows a refusal names. */
+  items?: string[];
   message: string;
   /** 1-based index of the offending row as the user sees it in their file, when it is row-specific. */
   row?: number;
@@ -208,12 +210,14 @@ function buildResultRows({
   sourceRowBySubjectId?: { [subjectId: string]: { [column: string]: string } };
 }): { [key: string]: string }[] {
   return assignments.map((assignment) => ({
+    // Subject leads the row: it is what a reader scans down, and it sat buried between the
+    // uploaded columns. Scope removed so it reads the way the app talks about a subject, but not
+    // truncated, since this is the value pasted back in to assign again. A spread separates the
+    // sorted groups, so this stays first.
+    subject: removeSubjectIdScope(assignment.subjectId),
     ...sourceRowBySubjectId?.[assignment.subjectId],
     expiresAt: toBasicISOString(new Date(assignment.expiresAt)),
     instrument: instrumentTitleById[assignment.instrumentId] ?? assignment.instrumentId,
-    // Scope removed so it reads the way the app talks about a subject, but not truncated: this is
-    // the value a user pastes back in to assign again, and a prefix cannot be resolved to a record.
-    subject: removeSubjectIdScope(assignment.subjectId),
     url: assignment.url
   }));
 }

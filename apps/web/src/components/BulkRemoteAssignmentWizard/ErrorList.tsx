@@ -34,6 +34,15 @@ export const ErrorList = ({ errors }: { errors: BulkParseError[] }) => {
               <span className="font-medium">{t({ en: `Row ${error.row}: `, fr: `Ligne ${error.row} : ` })}</span>
             )}
             {error.message}
+            {error.items && error.items.length > 0 && (
+              // Capped and scrollable: a refusal can name hundreds of subjects, and the actions
+              // below it must stay reachable without hunting for them.
+              <ul className="border-destructive-foreground/30 mt-1 max-h-40 list-none space-y-0.5 overflow-y-auto border-l pl-3 text-xs">
+                {error.items.map((item, itemIndex) => (
+                  <li key={itemIndex}>{item}</li>
+                ))}
+              </ul>
+            )}
           </li>
         ))}
       </ul>
