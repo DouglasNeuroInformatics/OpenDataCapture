@@ -108,7 +108,7 @@ dependency, generates both Prisma clients, and pushes the gateway SQLite schema 
 **`test` is not a turbo task at all.** Root `pnpm test` is `env-cmd vitest`: plain vitest, no build,
 no database. Only `testing` owns a `test:e2e` script; only `apps/gateway` owns a `db:push`.
 
-`globalDependencies` are `.env`, `eslint.config.js`, `tsconfig.base.json` and `prettier.config.js`.
+`globalDependencies` are `.env`, `eslint.config.js`, `tsconfig.json` and `prettier.config.js`.
 Touching any of them invalidates the cache for every task in the repo.
 
 ## What CI gates
@@ -139,6 +139,10 @@ Not gated, despite existing in the repo:
 
 `.github/workflows/release.yaml` (push to `main`) has a `Validate` job that runs `pnpm lint` only —
 **no unit tests and no e2e before a release build.**
+
+`.github/workflows/commitlint.yaml` (`pull_request` to any branch, so forks included) runs
+`commitlint` over the commits the pull request adds — `base.sha..head.sha`, never the history — against
+`commitlint.config.ts`. An unknown type fails; an unknown scope only warns (#1529).
 
 ## Playwright specifics
 

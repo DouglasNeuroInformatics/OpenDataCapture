@@ -146,7 +146,21 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v6
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          cache: pnpm
+          node-version-file: '.nvmrc'
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Extract Release Notes
+        # Fails when CHANGELOG.md has no section for this version: a bump that bypassed the generator
+        # must not publish a release with an empty body.
+        run: pnpm exec tsx scripts/changelog.ts section "${{ needs.configure.outputs.version }}" > "$RUNNER_TEMP/release-notes.md"
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          body_path: ${{ runner.temp }}/release-notes.md
           tag_name: v${{ needs.configure.outputs.version }}

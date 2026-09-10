@@ -1,9 +1,13 @@
 ---
-title: v2.0.0
-slug: en/docs/updating/v2.0.0
-sidebar:
-  order: 1
+title: Changelog
+slug: en/docs/changelog
 ---
+
+Every release of Open Data Capture from 2.0.0 onward is recorded here. Each section is generated from the
+commit history when the version changes, and becomes the body of the GitHub release. Releases before
+2.0.0 are listed in the [release history](https://github.com/DouglasNeuroinformatics/OpenDataCapture/releases).
+
+## 2.0.0
 
 ### Overview
 

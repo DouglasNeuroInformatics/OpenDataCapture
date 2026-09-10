@@ -5,9 +5,9 @@ description: Ship a release of Open Data Capture — bump the version, publish t
 
 A release is **one version bump merged to `main`** — after that `.github/workflows/release.yaml` builds the
 images, publishes the npm packages and creates the GitHub release with no further input. It also fires on
-`workflow_dispatch`, which releases again with no bump and no merge. That GitHub release is a tag with an empty
-body, and there is no changelog and no changeset, so nothing records what shipped — put that in the PR carrying
-the bump. Which workspaces publish: `.agents/docs/workspace-map.md`; how each artifact is selected: the job
+`workflow_dispatch`, which releases again with no bump and no merge. The release body is the new version's
+section of `CHANGELOG.md`, which `scripts/increment-version.sh` generates from the commits since the last tag;
+the `release` job fails, rather than publishing an empty body, when that section is missing. Which workspaces publish: `.agents/docs/workspace-map.md`; how each artifact is selected: the job
 table in `.agents/docs/playbooks/cut-a-release.md`.
 
 The failures here are silent — nothing goes red.

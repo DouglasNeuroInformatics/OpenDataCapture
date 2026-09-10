@@ -19,7 +19,10 @@ currentVersion=$(node -e 'process.stdout.write(require(process.argv[1]).version)
 IFS='.' read -r major minor patch <<< "$currentVersion"
 IFS=$'\n\t'
 
+recommendedBump=$(pnpm -C "$projectRoot" exec tsx scripts/changelog.ts recommend </dev/null)
+
 echo "Current version: $currentVersion"
+echo "Recommended bump: $recommendedBump"
 PS3="Select a version bump: "
 select bump in major minor patch quit; do
   case "${bump:-}" in
@@ -52,4 +55,7 @@ for file in "${packages[@]}"; do
   echo "Updated ${file#"$projectRoot"/} -> $newVersion"
 done
 
+pnpm -C "$projectRoot" exec tsx scripts/changelog.ts write "$newVersion"
+
 echo "Done! All packages set to $newVersion"
+echo "Review CHANGELOG.md, then commit as: chore: release v$newVersion"

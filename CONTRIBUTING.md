@@ -21,7 +21,7 @@ Begin by forking the repository to your personal GitHub account. This will give 
 
 ### 3. Create a New Branch
 
-Never work directly on the `main` branch. Instead, create a new branch for your feature or fix. This keeps the project organized and makes the integration of changes smoother. 
+Never work directly on the `main` branch. Instead, create a new branch for your feature or fix. This keeps the project organized and makes the integration of changes smoother.
 
 ```shell
 git checkout -b your-feature-name
@@ -29,13 +29,15 @@ git checkout -b your-feature-name
 
 ### 4. Committing Changes
 
-Ensure your commits are clear and understandable. If possible, follow a convention like:
+Commit messages follow the [Conventional Commits](https://www.conventionalcommits.org) convention, and the changelog is generated from them:
 
 ```shell
-git commit -m "type: brief description of change"
+git commit -m "type(scope): brief description of change"
 ```
 
-Where `type` can be `feature`, `fix`, `doc`, etc.
+`type` is one of `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style` or `test`. The optional `scope` is the name of the workspace you changed (`web`, `api`, `gateway`, `schemas` and so on: any `@opendatacapture/*` package without its prefix). Mark a breaking change with `!` after the type, or with a `BREAKING CHANGE:` footer.
+
+A `commit-msg` hook checks each message as you write it, and a CI check blocks a pull request that contains a commit that does not follow the convention. Each `feat`, `fix` and `perf` commit becomes one entry in the changelog, so make each commit one change with a subject a user can read.
 
 ### 5. Syncing your Fork
 

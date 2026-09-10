@@ -6,10 +6,10 @@ Shared `tsconfig.json` base for DNP TypeScript projects.
 
 ## Where it's used
 
-`tsconfig.base.json` (repo root) extends it and layers on the repo-wide compiler options. Every workspace package's `tsconfig.json` then extends `tsconfig.base.json` rather than this package directly:
+The root `tsconfig.json` extends it and layers on the repo-wide compiler options; its own `include` covers only the root-level scripts and configs. Every workspace package's `tsconfig.json` then extends the root one rather than this package directly:
 
 ```json
-// tsconfig.base.json
+// tsconfig.json
 {
   "extends": ["@douglasneuroinformatics/tsconfig"],
   "compilerOptions": {
@@ -24,11 +24,11 @@ Shared `tsconfig.json` base for DNP TypeScript projects.
 ```json
 // packages/schemas/tsconfig.json
 {
-  "extends": "../../tsconfig.base.json"
+  "extends": "../../tsconfig.json"
 }
 ```
 
-Put anything that should apply repo-wide in `tsconfig.base.json`; only per-package concerns (`lib`, `paths`, `include`) belong in a package's own `tsconfig.json`.
+Put anything that should apply repo-wide in the root `tsconfig.json`; only per-package concerns (`lib`, `paths`, `include`) belong in a package's own `tsconfig.json`.
 
 ## Reading the source
 
