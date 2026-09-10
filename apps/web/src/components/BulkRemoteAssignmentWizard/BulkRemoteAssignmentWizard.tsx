@@ -58,7 +58,7 @@ export const BulkRemoteAssignmentWizard = ({
 }: BulkRemoteAssignmentWizardProps) => {
   const { t } = useTranslation();
   // Each piece of the batch is held here rather than in the step that edits it, so moving between
-  // steps — by Back or by breadcrumb — never discards work the user has already done.
+  // steps - by Back or by breadcrumb - never discards work the user has already done.
   const [step, setStep] = useState<WizardStep>('SOURCE');
   const [parsed, setParsed] = useState<BulkParseResult | null>(null);
   const [subjectIds, setSubjectIds] = useState<string[]>([]);
@@ -73,7 +73,7 @@ export const BulkRemoteAssignmentWizard = ({
 
   /**
    * `navigator.clipboard` is absent outside a secure context, so an instance served over plain http
-   * has no clipboard at all. Say so rather than failing silently — these links are the only record
+   * has no clipboard at all. Say so rather than failing silently - these links are the only record
    * of what was just created, and the CSV is the way out.
    */
   const copyLinks = async () => {

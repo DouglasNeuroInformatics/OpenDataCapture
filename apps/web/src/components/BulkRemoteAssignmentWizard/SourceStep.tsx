@@ -99,8 +99,8 @@ export const SourceStep = ({
 
   // Every subject in the group is listed, not only those with a chosen identifier: a hash-identified
   // subject is just as assignable, and excluding them left most of a group invisible. Identifiers are
-  // rendered the way the rest of the app renders them — group scope removed, truncated to the group's
-  // display length — with date of birth and sex alongside, since a digest identifies nobody on sight.
+  // rendered the way the rest of the app renders them - group scope removed, truncated to the group's
+  // display length - with date of birth and sex alongside, since a digest identifies nobody on sight.
   const rows = subjects.map((subject) => ({
     dateOfBirth: subject.dateOfBirth ? toBasicISOString(subject.dateOfBirth) : t({ en: 'NULL', fr: 'NUL' }),
     id: subject.id,

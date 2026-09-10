@@ -19,8 +19,8 @@ import axios, { isAxiosError } from 'axios';
 export const ASSIGNMENTS_QUERY_KEY = ['assignments'] as const;
 
 /**
- * Recover the structured refusal the API attaches to a rejected bulk request. Any other failure —
- * a network error, a 500 — is not a refusal and carries nothing displayable, so it is left to the
+ * Recover the structured refusal the API attaches to a rejected bulk request. Any other failure -
+ * a network error, a 500 - is not a refusal and carries nothing displayable, so it is left to the
  * caller's generic error handling rather than being dressed up as one.
  */
 export function toBulkAssignmentFailure(error: unknown): BulkAssignmentFailure | null {
@@ -38,7 +38,7 @@ export function toBulkAssignmentFailure(error: unknown): BulkAssignmentFailure |
  */
 export function useBulkAssignmentPreflightMutation() {
   return useMutation({
-    // A refusal is a considered answer from the server, not a transient fault — retrying would
+    // A refusal is a considered answer from the server, not a transient fault - retrying would
     // re-run the same validation and produce the same refusal.
     meta: { disableDefaultErrorNotification: true },
     mutationFn: async (data: BulkAssignmentPreflightData) => {

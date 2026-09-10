@@ -23,8 +23,8 @@ type ReviewStepProps = {
 };
 
 /**
- * Render a refusal as sentences a clinician can act on. The API reports ids rather than names — it
- * has never been told the names — so a count plus the ids is all there is to show, and all that
+ * Render a refusal as sentences a clinician can act on. The API reports ids rather than names - it
+ * has never been told the names - so a count plus the ids is all there is to show, and all that
  * should be shown.
  */
 const useIssueMessages = () => {
@@ -127,7 +127,7 @@ export const ReviewStep = ({
           </p>
           <ul className="text-muted-foreground list-disc space-y-1 pl-5 text-sm">
             {timepoints.map((timepoint) => {
-              const summary = `${timepoint.instrumentTitle} — ${timepoint.expiresAt}`;
+              const summary = `${timepoint.instrumentTitle} - ${timepoint.expiresAt}`;
               return <li key={timepoint.instrumentId}>{summary}</li>;
             })}
           </ul>

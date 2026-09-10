@@ -21,7 +21,7 @@ type CanonicalField = 'dateOfBirth' | 'firstName' | 'lastName' | 'sex' | 'subjec
 
 /**
  * Header aliases, English and French. Compared after normalization, so only meaningful spelling
- * differences need to appear here — case, accents, punctuation and spacing are handled by
+ * differences need to appear here - case, accents, punctuation and spacing are handled by
  * `normalizeHeader`.
  */
 const FIELD_ALIASES: { [K in CanonicalField]: string[] } = {
@@ -58,7 +58,7 @@ type BulkParseResult = {
   /** Canonical field for each column, by header. Absent means the column is ignored. */
   mapping: Partial<{ [key: string]: CanonicalField }>;
   mode: BulkSourceMode;
-  /** The first few rows, for the mapping preview. Raw values — never send these anywhere. */
+  /** The first few rows, for the mapping preview. Raw values - never send these anywhere. */
   preview: { [key: string]: string }[];
   rows: { [key: string]: string }[];
 };
@@ -80,7 +80,7 @@ function isEmptyRow(row: { [key: string]: string }): boolean {
 }
 
 /**
- * Map each header onto a canonical field. A canonical field may be claimed only once — two columns
+ * Map each header onto a canonical field. A canonical field may be claimed only once - two columns
  * both looking like a last name is ambiguous, and guessing which one is meant would silently assign
  * the wrong people.
  */
@@ -230,8 +230,8 @@ export function parseDelimitedText(input: string): BulkParseResult {
     transform: (value) => value.trim(),
     transformHeader: (header) => header.trim()
   });
-  // `UndetectableDelimiter` is a warning, not a failure: single-column input — a lone subject ID
-  // column, the most common case here — gives Papa Parse nothing to detect, and it correctly
+  // `UndetectableDelimiter` is a warning, not a failure: single-column input - a lone subject ID
+  // column, the most common case here - gives Papa Parse nothing to detect, and it correctly
   // defaults to a comma. `FieldMismatch` is likewise tolerated; a ragged row is caught later by the
   // per-field validation, with a row number attached.
   const fatal = parsed.errors.filter(({ code, type }) => type !== 'FieldMismatch' && code !== 'UndetectableDelimiter');
@@ -287,7 +287,7 @@ export function isWorkbookFile(file: File): boolean {
  * Reduce parsed rows to the subject ids the API will be given.
  *
  * In PII mode the id is derived here with `generateSubjectHash`, the same function the rest of the
- * platform uses — the algorithm is never reimplemented, because its output is the subject's primary
+ * platform uses - the algorithm is never reimplemented, because its output is the subject's primary
  * key. The personal information itself stops at this function.
  */
 export async function resolveSubjectIds(

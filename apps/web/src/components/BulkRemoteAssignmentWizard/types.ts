@@ -5,7 +5,7 @@ export type CreatedAssignment = Pick<Assignment, 'expiresAt' | 'instrumentId' | 
 
 /**
  * Which screen the wizard is on. The data behind each screen lives in the wizard rather than in the
- * step components, so stepping backwards — including by breadcrumb — never discards it.
+ * step components, so stepping backwards - including by breadcrumb - never discards it.
  */
 export type WizardStep = 'DONE' | 'MAP' | 'REVIEW' | 'SOURCE' | 'TIMEPOINTS';
 
