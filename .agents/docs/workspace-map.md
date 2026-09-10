@@ -116,7 +116,7 @@ publishable when it is **not private and declares `publishConfig`**. There is no
 Cutting one: `.agents/docs/playbooks/cut-a-release.md`.
 
 `instrument-bundler`, `instrument-guidelines`, `playground-url`, `runtime-v1`, `serve-instrument` —
-all versioned together (`2.1.4` at time of writing, bumped by `scripts/increment-version.sh`; the
+all versioned together (`2.1.4` at time of writing, bumped by `scripts/increment-version.ts`; the
 root `package.json` version can run ahead of them). Everything else is `0.0.0` and internal.
 
 ## `vendor/`
@@ -147,4 +147,4 @@ Adding one: `.agents/docs/playbooks/add-vendor-package.md`.
 | `docs/`    | User documentation, `docs/en` and `docs/fr`. **Symlinked into `apps/outreach/src/content/docs/{en,fr}/docs`** and rendered by Astro Starlight — edit here, not in `apps/outreach`.                                                                                 |
 | `blog/`    | Blog posts, flat `.md`. **Symlinked to `apps/outreach/src/content/blog`.** Frontmatter is validated by the `blog` collection schema in `apps/outreach/src/content/config.ts`, whose `author` field is a `reference('team')` into `apps/outreach/src/content/team`. |
 | `.agents/` | Agent-facing documentation (`.agents/docs`) and skills (`.agents/skills`). Not shipped, not linted.                                                                                                                                                                |
-| `scripts/` | Repo scripts invoked by root `package.json` or by path — `generate-env.sh`, `list-publishable.sh`, `increment-version.sh`, `changelog.ts` (the generator it runs), `publish.sh`, `workspace.sh` and others. No tests, by decision.                                 |
+| `scripts/` | Repo scripts invoked by root `package.json` or by path — `generate-env.sh`, `list-publishable.sh`, `increment-version.ts`, `changelog.ts` (the generator it runs), `publish.sh`, `workspace.sh` and others. No tests, by decision.                                 |

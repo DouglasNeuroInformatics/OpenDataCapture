@@ -13,7 +13,7 @@ as real installs. React, `react-core`, `instrument-bundler`, `runtime-internal`,
 libui are in `devDependencies` deliberately — that is what gets them inlined into `dist/cli.js`. Moving
 a package between the two fields silently changes what ships.
 
-**The version field is managed by `scripts/increment-version.sh`.** This is one of five publishable
+**The version field is managed by `scripts/increment-version.ts`.** This is one of five publishable
 workspaces (non-private + a `publishConfig` field, enumerated by `scripts/list-publishable.sh`); its
 version tracks the monorepo release. Do not hand-bump it.
 

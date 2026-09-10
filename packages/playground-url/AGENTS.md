@@ -10,7 +10,7 @@ Read the root `AGENTS.md` first for the rules that apply everywhere.
 
 **This is one of five packages published to npm.** `scripts/list-publishable.sh` picks it up from
 its `publishConfig`, so a change here is a change to a public API, and `version` is bumped for it by
-`scripts/increment-version.sh` — never hand-edit it.
+`scripts/increment-version.ts` — never hand-edit it.
 
 **The `.` export is raw TypeScript** (`./src/index.ts`), in the published tarball as well as in the
 workspace. `pnpm build` runs `scripts/build.js`, which esbuilds `src/cli.ts` into `dist/cli.js` and

@@ -7,6 +7,19 @@ Every release of Open Data Capture from 2.0.0 onward is recorded here. Each sect
 commit history when the version changes, and becomes the body of the GitHub release. Releases before
 2.0.0 are listed in the [release history](https://github.com/DouglasNeuroinformatics/OpenDataCapture/releases).
 
+## 2.3.0
+
+### Features
+
+- adjust loaded permissions with a a useMemo hook to fix initial loading ([eabbde8](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/eabbde85879ec894067be32f94ea43836f211291))
+- enforce conventional commits and generate the changelog from them ([b7073d2](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/b7073d2dc60f4cd79cccde4dab72bf02a5932e57))
+- **web:** redesign the audit log filters as a per-facet filter bar ([63054fe](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/63054fe4d7611a78f53c924a5a495e9327959c7d))
+
+### Bug Fixes
+
+- close the three bugs documented by the packages/\* coverage pass ([1ffd7da](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/1ffd7da87f948d3a91c64642842b29bead1707f4))
+- administer each item of a skipProgress series as a fresh form ([f06b4ff](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/f06b4ff880e654bd49b2441f2eba82f8035236c4))
+
 ## 2.0.0
 
 ### Overview
