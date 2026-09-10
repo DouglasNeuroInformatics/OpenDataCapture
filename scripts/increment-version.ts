@@ -12,9 +12,21 @@ const BUMPS = ['major', 'minor', 'patch'] as const;
 
 type Bump = (typeof BUMPS)[number];
 
+type Options = {
+  bump: Bump | null;
+  commit: boolean;
+  help: boolean;
+  yes: boolean;
+};
+
 type PackageFile = {
   absolutePath: string;
   relativePath: string;
+};
+
+type Plan = {
+  commit: boolean;
+  newVersion: string;
 };
 
 type Prompt = {
@@ -37,8 +49,8 @@ version's section of CHANGELOG.md, and optionally commits the result.
 
 Options:
   -b, --bump <major|minor|patch>  Take the bump from the command line instead of prompting
-  -y, --yes                       Skip the confirmation prompt
-  -c, --commit                    Commit the changed files as "chore: release v<version>"
+  -y, --yes                       Answer every prompt with its default and skip the confirmation
+  -c, --commit                    Answer the commit prompt yes, without asking
   -h, --help                      Show this message
 `;
 
@@ -252,7 +264,7 @@ function parseBumpOption(value: string | undefined): Bump | null {
   return value;
 }
 
-function parseOptions(argv: string[]): { bump: Bump | null; commit: boolean; help: boolean; yes: boolean } {
+function parseOptions(argv: string[]): Options {
   const { values } = parseArgs({
     args: argv,
     options: {
@@ -273,6 +285,31 @@ function parseOptions(argv: string[]): { bump: Bump | null; commit: boolean; hel
 function requireTty(flag: string): void {
   if (!process.stdin.isTTY) {
     throw new Error(`Cannot prompt when stdin is not a terminal — pass ${flag} to run without the prompt`);
+  }
+}
+
+// Both answers can arrive as flags, which is what makes a run without a terminal possible: --commit
+// answers the commit prompt, --yes answers the rest with their defaults, and the commit default is no.
+async function planRelease(options: Options, currentVersion: string): Promise<null | Plan> {
+  const prompt = createPrompt();
+  try {
+    const bump = options.bump ?? (await askBump(prompt, currentVersion, recommendBump()));
+    if (!bump) {
+      return null;
+    }
+    const newVersion = bumpVersion(currentVersion, bump);
+    const message = `"chore: release v${newVersion}"`;
+    const commit =
+      options.commit || (!options.yes && (await askConfirmation(prompt, `Commit the result as ${message}?`)));
+    const action = commit
+      ? `Bump ${currentVersion} → ${newVersion} and commit as ${message}?`
+      : `Bump ${currentVersion} → ${newVersion}?`;
+    if (!options.yes && !(await askConfirmation(prompt, action))) {
+      return null;
+    }
+    return { commit, newVersion };
+  } finally {
+    prompt.close();
   }
 }
 
@@ -300,25 +337,12 @@ async function main(argv: string[]): Promise<void> {
     requireTty('--yes');
   }
 
-  const prompt = createPrompt();
-  let newVersion: string;
-  try {
-    const bump = options.bump ?? (await askBump(prompt, currentVersion, recommendBump()));
-    if (!bump) {
-      print(styleText('dim', 'Aborted.'));
-      return;
-    }
-    newVersion = bumpVersion(currentVersion, bump);
-    const action = options.commit
-      ? `Bump ${currentVersion} → ${newVersion} and commit as "chore: release v${newVersion}"?`
-      : `Bump ${currentVersion} → ${newVersion}?`;
-    if (!options.yes && !(await askConfirmation(prompt, action))) {
-      print(styleText('dim', 'Aborted.'));
-      return;
-    }
-  } finally {
-    prompt.close();
+  const plan = await planRelease(options, currentVersion);
+  if (!plan) {
+    print(styleText('dim', 'Aborted.'));
+    return;
   }
+  const { commit, newVersion } = plan;
 
   print();
   for (const file of packageFiles) {
@@ -341,7 +365,7 @@ async function main(argv: string[]): Promise<void> {
   print();
   print(`${styleText('green', '✓')} All ${packageFiles.length} packages report ${styleText('cyan', newVersion)}`);
 
-  if (options.commit) {
+  if (commit) {
     commitRelease([...packageFiles.map((file) => file.relativePath), ...CHANGELOG_FILES], newVersion);
     print(`${styleText('green', '✓')} Committed as ${styleText('bold', `chore: release v${newVersion}`)}`);
     print();

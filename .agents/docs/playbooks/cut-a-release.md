@@ -43,9 +43,11 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    by `scripts/changelog.ts` from the commits since the last `v*` tag (a breaking change → major, a `feat` →
    minor, anything else → patch — strict SemVer, so expect `minor` more often than recent releases suggest).
    The choice stays yours: it offers `major`/`minor`/`patch`/`quit` with the recommendation preselected and
-   the resulting version beside each, then a `y/N` confirmation. `--bump <major|minor|patch>` and `--yes`
-   answer those two prompts on the command line and are **required** when stdin is not a terminal — without
-   them it exits 1 having written nothing rather than picking for you. It then rewrites the root
+   the resulting version beside each, then asks whether to commit the result, then confirms both together.
+   `--bump <major|minor|patch>`, `--commit` and `--yes` answer those prompts on the command line; `--bump`
+   and `--yes` are **required** when stdin is not a terminal — without them it exits 1 having written
+   nothing rather than picking for you. `--yes` leaves the commit prompt at its default of no, so a
+   non-interactive run that should also commit needs `--commit`. It then rewrites the root
    `package.json` plus every path `scripts/list-publishable.sh` returns, runs
    `scripts/changelog.ts write <version>`, which inserts a `## <version>` section into `CHANGELOG.md` and
    regenerates `docs/en/6-changelog/changelog.md` from it, and re-reads every version field to assert the
@@ -71,11 +73,12 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    only; a `chore`-only range renders as `This release contains no user-facing changes.`
 
 5. **Commit the version files and both changelog files in one commit, `chore: release v<version>`, and open
-   the PR with `main` as its base.** `increment-version.ts --commit` makes exactly that commit — the six
+   the PR with `main` as its base.** The script offers to make exactly that commit — the six
    `package.json` files and both changelogs, by explicit pathspec, so anything else already staged stays out
-   of it. It commits only; the tag is the release workflow's (`v${version}`, on the GitHub release). Using
-   it skips the step-4 read of `CHANGELOG.md`, which is the only review that section gets before it becomes
-   the release body, so read the commit afterwards. `ci.yaml` fires on `pull_request` to `main` and on
+   of it, and `--commit` answers that prompt up front. It commits only; the tag is the release workflow's
+   (`v${version}`, on the GitHub release). Saying yes skips the step-4 read of `CHANGELOG.md`, which is the
+   only review that section gets before it becomes the release body, so read the commit afterwards.
+   `ci.yaml` fires on `pull_request` to `main` and on
    `workflow_dispatch`, never on a push, so a PR based on `dev` or any other branch runs no lint, no unit
    tests and no e2e — silently (`commitlint.yaml` runs on a PR to any branch). In-repo work branches on
    origin and merges into `main`; `CONTRIBUTING.md` describes a fork path, which addresses outside
