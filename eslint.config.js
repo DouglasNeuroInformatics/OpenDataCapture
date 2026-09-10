@@ -69,6 +69,7 @@ export default config(
       'runtime/v1/src/**/*.d.ts',
       'vendor/**/*',
       'knip.ts',
+      'commitlint.config.ts',
       'vitest.config.ts'
     ]
   },
