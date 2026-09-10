@@ -83,4 +83,34 @@ describe('useInterpretedInstrument', () => {
       expect(result.current).toMatchObject({ instrument: { details: { title: 'Recovered' } }, status: 'DONE' });
     });
   });
+
+  it('should wrap a non-Error thrown while interpreting, rather than fail to report an error at all', async () => {
+    const { result } = renderHook(() => useInterpretedInstrument('(async () => { throw "not an Error instance"; })()'));
+    await waitFor(() => {
+      expect(result.current.status).toBe('ERROR');
+    });
+    expect((result.current as { error: Error }).error).toBeInstanceOf(Error);
+  });
+
+  it('should report every language of a multilingual instrument as supported', async () => {
+    const bundle = `(async () => ({
+      __runtimeVersion: 1,
+      kind: 'FORM',
+      language: ['en', 'fr'],
+      content: {},
+      details: {
+        description: { en: 'English description', fr: 'Description française' },
+        title: { en: 'English Title', fr: 'Titre français' }
+      },
+      tags: { en: [], fr: [] }
+    }))()`;
+    const { result } = renderHook(() => useInterpretedInstrument(bundle));
+    await waitFor(() => {
+      expect(result.current.status).toBe('DONE');
+    });
+    expect((result.current as { instrument: { supportedLanguages: string[] } }).instrument.supportedLanguages).toEqual([
+      'en',
+      'fr'
+    ]);
+  });
 });

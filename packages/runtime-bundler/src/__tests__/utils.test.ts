@@ -74,4 +74,11 @@ describe('validatePackageName', () => {
   it('should pass for valid scoped package names', () => {
     expect(validatePackageName('@scope/valid')).toEqual({ success: true });
   });
+
+  it('should fail for a non-URL-friendly name with more path segments than a scoped package allows', () => {
+    expect(validatePackageName('foo/bar/baz@1')).toEqual({
+      issue: 'must contain only URL-friendly characters',
+      success: false
+    });
+  });
 });
