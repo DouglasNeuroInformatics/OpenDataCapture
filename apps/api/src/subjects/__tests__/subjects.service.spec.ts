@@ -4,6 +4,7 @@ import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import type { Subject } from '@prisma/client';
 import { pick } from 'lodash-es';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -94,6 +95,36 @@ describe('SubjectsService', () => {
           sex: 'MALE'
         })
       ).rejects.toBeInstanceOf(ConflictException);
+    });
+  });
+
+  describe('createMany', () => {
+    // `demo.service.ts` hands `sessionsService.create` a whole row, which reaches this method.
+    it('should keep the demographics of a new subject and drop the fields the caller may not set', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([]);
+      const row: Subject = {
+        createdAt: new Date(0),
+        dateOfBirth: new Date(2000, 0, 1),
+        firstName: 'Ada',
+        groupIds: ['group-9'],
+        id: 'subject-1',
+        lastName: 'Lovelace',
+        sex: 'FEMALE',
+        updatedAt: new Date(0)
+      };
+
+      await subjectsService.createMany([row]);
+
+      expect(subjectModel.createMany.mock.lastCall?.[0].data).toStrictEqual([
+        {
+          dateOfBirth: row.dateOfBirth,
+          firstName: 'Ada',
+          groupIds: [],
+          id: 'subject-1',
+          lastName: 'Lovelace',
+          sex: 'FEMALE'
+        }
+      ]);
     });
   });
 
