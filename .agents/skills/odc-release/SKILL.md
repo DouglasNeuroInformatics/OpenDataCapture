@@ -5,9 +5,9 @@ description: Ship a release of Open Data Capture — bump the version, publish t
 
 A release is **one version bump merged to `main`** — after that `.github/workflows/release.yaml` builds the
 images, publishes the npm packages and creates the GitHub release with no further input. It also fires on
-`workflow_dispatch`, which releases again with no bump and no merge. That GitHub release is a tag with an empty
-body, and there is no changelog and no changeset, so nothing records what shipped — put that in the PR carrying
-the bump. Which workspaces publish: `.agents/docs/workspace-map.md`; how each artifact is selected: the job
+`workflow_dispatch`, which releases again with no bump and no merge. The release body is the new version's
+section of `CHANGELOG.md`, which `scripts/increment-version.ts` generates from the commits since the last tag;
+the `release` job fails, rather than publishing an empty body, when that section is missing. Which workspaces publish: `.agents/docs/workspace-map.md`; how each artifact is selected: the job
 table in `.agents/docs/playbooks/cut-a-release.md`.
 
 The failures here are silent — nothing goes red.
@@ -74,11 +74,12 @@ of them is in `.agents/docs/playbooks/cut-a-release.md`.
 ## The procedure
 
 `.agents/docs/playbooks/cut-a-release.md` — open it before the first command and follow it end to end. It owns
-the order of operations, `scripts/increment-version.sh` (no `pnpm` script — run the path), the merge, watching
-the run, and the `## Verify` block. That script reads a `select` menu and a `y/N` from stdin; with none it prints
-the menu and dies with `newVersion: unbound variable`, exit 1, nothing written, so pipe the answers:
-`printf '3\ny\n' | ./scripts/increment-version.sh` (`3` is `patch`). Hand-editing a version field is how the
-drift this skill exists to prevent gets made.
+the order of operations, `scripts/increment-version.ts` (no `pnpm` script — run the path), the merge, watching
+the run, and the `## Verify` block. That script prompts for the bump and for a `y/N`; with no terminal on stdin
+it exits 1 having written nothing, so pass the answers as flags:
+`./scripts/increment-version.ts --bump patch --yes`, plus `--commit` to have it make the
+`chore: release v<version>` commit too. Hand-editing a version field is how the drift this skill exists to
+prevent gets made.
 
 Done when the playbook's `## Verify` block has been run and all three artifacts report the new version. A green
 run is not the criterion.

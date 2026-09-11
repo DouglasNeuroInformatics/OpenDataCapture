@@ -4,7 +4,7 @@
 #
 # A package is "publishable" when it is not private and declares a `publishConfig`
 # field in its package.json. This is the single source of truth consumed by both
-# scripts/increment-version.sh (to keep versions in sync) and the release workflow
+# scripts/increment-version.ts (to keep versions in sync) and the release workflow
 # (to decide what to publish). Adding a future package only requires the
 # `publishConfig` field — no list needs editing here.
 #

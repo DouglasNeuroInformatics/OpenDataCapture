@@ -11,6 +11,6 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["knip.ts", "vitest.config.ts"],
+  "include": ["commitlint.config.ts", "knip.ts", "scripts/*.ts", "vitest.config.ts"],
   "exclude": ["docs/*", "**/dist", "**/node_modules", "vendor/**/*"]
 }

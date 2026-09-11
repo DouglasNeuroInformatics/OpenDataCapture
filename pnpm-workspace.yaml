@@ -16,6 +16,8 @@ allowBuilds:
 blockExoticSubdeps: true
 catalog:
   '@casl/ability': '^6.7.1'
+  '@commitlint/cli': '^21.2.2'
+  '@commitlint/config-conventional': '^21.2.2'
   '@casl/prisma': '^1.4.1'
   '@douglasneuroinformatics/esbuild-plugin-prisma': 'latest'
   '@douglasneuroinformatics/libcrypto': '^0.0.6'
@@ -41,6 +43,7 @@ catalog:
   neverthrow: ^8.2.0
   nodemailer: ^7.0.12
   '@types/nodemailer': ^7.0.5
+  conventional-commits-parser: '^7.1.2'
   nodemon: '^3.1.9'
   prisma: '^6.9.0'
   react-dropzone: ^14.3.8

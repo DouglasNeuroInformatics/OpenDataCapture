@@ -97,8 +97,8 @@ export default defineConfig({
           label: 'Reference'
         },
         {
-          autogenerate: { directory: 'docs/6-updating' },
-          label: 'Updating'
+          label: 'Changelog',
+          slug: 'docs/changelog'
         },
         starlightTypeDocSidebarGroup
       ],

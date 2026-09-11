@@ -2,7 +2,7 @@
 
 A release is one version bump merged to `main`. Everything after the merge is automatic:
 `.github/workflows/release.yaml` builds and pushes the container images, publishes the npm packages, and
-creates the GitHub release. Which packages are publishable is in `.agents/docs/workspace-map.md`; what CI
+creates the GitHub release, whose body is the new version's section of `CHANGELOG.md`. Which packages are publishable is in `.agents/docs/workspace-map.md`; what CI
 gates is in `.agents/docs/architecture/testing-strategy.md`; the `RELEASE_VERSION` build-arg contract is in
 `packages/release-info/AGENTS.md`. This file is only the order of operations.
 
@@ -16,7 +16,7 @@ Skipping @opendatacapture/runtime-v1@<version> (already published)
 ```
 
 So a bump that touches only the root leaves the packages behind and `publish-npm` reports **success while
-publishing nothing**. `scripts/increment-version.sh` rewrites the root plus every path
+publishing nothing**. `scripts/increment-version.ts` rewrites the root plus every path
 `scripts/list-publishable.sh` returns in one run, and it is the only thing holding those files in
 agreement — nothing in CI compares them, and hand edits have moved the root alone before.
 
@@ -32,16 +32,29 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    before the bump.
 
 2. **Bump from a branch that already contains `main`.** `git fetch origin && git merge origin/main`.
-   `increment-version.sh` derives the next version from the root `package.json` in your working tree
+   `increment-version.ts` derives the next version from the root `package.json` in your working tree
    alone, so a branch trailing `main` computes a version that is already released — the run then re-pushes
    the same image tags, updates the same GitHub release, and prints `Skipping` for every package. Done
    when `git merge-base --is-ancestor origin/main HEAD` exits 0.
 
-3. **Run `./scripts/increment-version.sh` from the repo root.** There is no `pnpm` script for it — invoke
-   the path; prerequisites for anything under `scripts/` are in `.agents/docs/playbooks/run-locally.md`.
-   Its `select` prompt offers `major`/`minor`/`patch`/`quit`, then a `y/N` confirmation, then it rewrites
-   the root `package.json` plus every path `scripts/list-publishable.sh` returns. Done when its output
-   carries one `Updated …` line per file and ends `Done! All packages set to <version>`.
+3. **Run `./scripts/increment-version.ts` from the repo root.** There is no `pnpm` script for it — invoke
+   the path, which Node executes directly; prerequisites for anything under `scripts/` are in
+   `.agents/docs/playbooks/run-locally.md`. It first prints `Recommended bump: major|minor|patch`, derived
+   by `scripts/changelog.ts` from the commits since the last `v*` tag (a breaking change → major, a `feat` →
+   minor, anything else → patch — strict SemVer, so expect `minor` more often than recent releases suggest).
+   The choice stays yours: it offers `major`/`minor`/`patch`/`quit` with the recommendation preselected and
+   the resulting version beside each, then asks whether to commit the result, then confirms both together.
+   `--bump <major|minor|patch>`, `--commit` and `--yes` answer those prompts on the command line; `--bump`
+   and `--yes` are **required** when stdin is not a terminal — without them it exits 1 having written
+   nothing rather than picking for you. `--yes` leaves the commit prompt at its default of no, so a
+   non-interactive run that should also commit needs `--commit`. It then rewrites the root
+   `package.json` plus every path `scripts/list-publishable.sh` returns, runs
+   `scripts/changelog.ts write <version>`, which inserts a `## <version>` section into `CHANGELOG.md` and
+   regenerates `docs/en/6-changelog/changelog.md` from it, and re-reads every version field to assert the
+   lockstep of step 4. A commit whose message does not follow the convention is skipped with
+   `Warning: skipping commit <sha> …` — read those lines, because the entry is simply absent (#1529 tracks
+   making that a failure). Done when its output carries one `✓ <file> → <version>` line per package, a
+   `Wrote the <version> section` line, and ends `✓ All 6 packages report <version>`.
 
 4. **Confirm the lockstep before you commit.**
 
@@ -51,13 +64,26 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
 
    `list-publishable.sh` never prints the root, so a uniform version column proves nothing on its own —
    that is exactly what a root-only bump looks like. Done when the root version on the first line equals
-   the second tab-separated field of every row below it. No check enforces that equality.
+   the second tab-separated field of every row below it. Nothing in CI enforces that equality;
+   `increment-version.ts` asserts it for its own run, which is exactly why this check matters when
+   anything bypassed the script.
 
-5. **Commit the version files in one commit and open the PR with `main` as its base.** `ci.yaml` fires on
-   `pull_request` to `main` and on `workflow_dispatch`, never on a push, so a PR based on `dev` or any
-   other branch runs no lint, no unit tests and no e2e — silently. In-repo work branches on origin and
-   merges into `main`; `CONTRIBUTING.md` describes a fork path, which addresses outside contributors.
-   There is no changeset and no changelog file: the generated GitHub release is the whole record.
+   Then read the new `## <version>` section of `CHANGELOG.md`. It becomes the GitHub release body
+   verbatim, and this PR is the only review it gets. It lists `feat`, `fix`, `perf` and breaking commits
+   only; a `chore`-only range renders as `This release contains no user-facing changes.`
+
+5. **Commit the version files and both changelog files in one commit, `chore: release v<version>`, and open
+   the PR with `main` as its base.** The script offers to make exactly that commit — the six
+   `package.json` files and both changelogs, by explicit pathspec, so anything else already staged stays out
+   of it, and `--commit` answers that prompt up front. It commits only; the tag is the release workflow's
+   (`v${version}`, on the GitHub release). Saying yes skips the step-4 read of `CHANGELOG.md`, which is the
+   only review that section gets before it becomes the release body, so read the commit afterwards.
+   `ci.yaml` fires on `pull_request` to `main` and on
+   `workflow_dispatch`, never on a push, so a PR based on `dev` or any other branch runs no lint, no unit
+   tests and no e2e — silently (`commitlint.yaml` runs on a PR to any branch). In-repo work branches on
+   origin and merges into `main`; `CONTRIBUTING.md` describes a fork path, which addresses outside
+   contributors. There is no changeset: `CHANGELOG.md` is the record, and the GitHub release body is a copy
+   of its new section.
 
 6. **Land one release at a time.** The workflow's concurrency group is per-workflow-per-ref with
    `cancel-in-progress: true` (`release.yaml:9-11`), so a second merge cancels the release in flight. A
@@ -67,13 +93,17 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
 
 7. **Watch the run:** `gh run watch`, or `gh run list --workflow=Release --limit 1` for its id.
 
-   | Job           | What it does                                                                                                                                       | Skips when                                                   |
-   | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-   | `configure`   | derives the build matrix from `docker compose config` through the jq filter described below; runs `release.cjs` for `version` and `should_release` | never                                                        |
-   | `validate`    | `pnpm lint`                                                                                                                                        | never                                                        |
-   | `build`       | buildx `linux/amd64,linux/arm64` per matrix leg, pushing `latest` and the bare version, with `RELEASE_VERSION` as a build arg                      | never — guards on `should_release`, which is always `'true'` |
-   | `publish-npm` | turbo-builds each publishable package and its closure, then publishes each version not already on npm, over OIDC (no `NPM_TOKEN`)                  | never — same guard                                           |
-   | `release`     | creates the GitHub release tagged `v${version}`                                                                                                    | any of its `needs` skipped or failed                         |
+   | Job           | What it does                                                                                                                                                    | Skips when                                                   |
+   | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+   | `configure`   | derives the build matrix from `docker compose config` through the jq filter described below; runs `release.cjs` for `version` and `should_release`              | never                                                        |
+   | `validate`    | `pnpm lint`                                                                                                                                                     | never                                                        |
+   | `build`       | buildx `linux/amd64,linux/arm64` per matrix leg, pushing `latest` and the bare version, with `RELEASE_VERSION` as a build arg                                   | never — guards on `should_release`, which is always `'true'` |
+   | `publish-npm` | turbo-builds each publishable package and its closure, then publishes each version not already on npm, over OIDC (no `NPM_TOKEN`)                               | never — same guard                                           |
+   | `release`     | extracts the `## ${version}` section of `CHANGELOG.md` (`scripts/changelog.ts section`) and creates the GitHub release tagged `v${version}` with it as the body | any of its `needs` skipped or failed                         |
+
+   `release` **fails** — not skips — with `CHANGELOG.md has no section for <version>` when the bump
+   bypassed `increment-version.ts`. That is deliberate: an empty body would look like every release
+   before the changelog existed and would hide the bypass.
 
    **No playground image ships.** The filter keeps only compose services declaring **both** `build` and
    `image`, and `playground` declares no `image:` key. `scripts/publish.sh` is not the way to add it back:
@@ -103,8 +133,9 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    release. Done when the `## Verify` block below is clean for each.
 
 10. **If npm did not move, cut another patch.** A `Skipping` line for every package means the bump
-    bypassed `scripts/increment-version.sh`. Run the script properly, commit, merge again — re-running a
-    version the registry already has publishes nothing, so the fix is always forward.
+    bypassed `scripts/increment-version.ts`; so does a red `release` job reporting no changelog section.
+    Run the script properly, commit, merge again — re-running a version the registry already has
+    publishes nothing, so the fix is always forward.
 
 ## Verify
 
@@ -114,7 +145,8 @@ gh run list --workflow=Release --limit 1                                    # th
 gh run view <run-id> --json jobs -q '.jobs[]|"\(.name)\t\(.conclusion)"'    # every build leg, publish-npm and release: success
 gh run view <run-id> --log | grep -E 'Publishing|Skipping'
 npm view @opendatacapture/runtime-v1 version                                # the version you just cut
-gh release view v<version>                                                  # exists, tagged with the leading v
+pnpm exec tsx scripts/changelog.ts section <version>                        # the section the release body was cut from; exit 1 if absent
+gh release view v<version>                                                  # exists, tagged with the leading v, body is that section
 ```
 
 `Publishing <name>@<version>` for every package is the first run after a bump. `Skipping <name>@<version>
