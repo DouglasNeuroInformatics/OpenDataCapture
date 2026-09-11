@@ -166,7 +166,7 @@ export class SubjectsService {
    * prisma query engine, so it returns one row per *record* over the wire and collapses them only
    * once they have arrived.
    *
-   * Deliberately not expressed as a `instrumentRecords: { some: ... }` relation filter on Subject.
+   * Deliberately not expressed as an `instrumentRecords: { some: ... }` relation filter on Subject.
    * On mongodb prisma compiles that into a $lookup over the whole record collection, which measured
    * far slower than either form here and carries the 100 MiB per-document ceiling that made the same
    * construct fail outright elsewhere.
