@@ -61,6 +61,7 @@ export class SetupService {
       activeLanguages: fallbackLanguage ? [fallbackLanguage, ...otherLanguages] : DEFAULT_ACTIVE_LANGUAGES,
       branding: branding.success ? branding.data : null,
       defaultAssignmentDurationDays: savedOptions?.defaultAssignmentDurationDays ?? null,
+      isBulkRemoteAssignmentsEnabled: Boolean(savedOptions?.isBulkRemoteAssignmentsEnabled),
       isDemo: Boolean(savedOptions?.isDemo),
       isExperimentalFeaturesEnabled: Boolean(savedOptions?.isExperimentalFeaturesEnabled),
       isGatewayEnabled: this.configService.get('GATEWAY_ENABLED'),

@@ -194,6 +194,8 @@ const $SetupState = z.object({
   activeLanguages: $ActiveLanguages,
   branding: $BrandingConfig.nullish(),
   defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
+  /** Whether the group-scoped bulk remote assignment page is offered. */
+  isBulkRemoteAssignmentsEnabled: z.boolean().nullish(),
   isDemo: z.boolean(),
   isExperimentalFeaturesEnabled: z.boolean().nullish(),
   isGatewayEnabled: z.boolean(),
@@ -212,6 +214,7 @@ const $UpdateSetupStateData = z.object({
   activeLanguages: $ActiveLanguages.optional(),
   branding: $BrandingConfig.nullish(),
   defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
+  isBulkRemoteAssignmentsEnabled: z.boolean().nullish(),
   isExperimentalFeaturesEnabled: z.boolean().nullish()
 });
 
