@@ -1,6 +1,7 @@
 /* eslint-disable no-empty-pattern */
 
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
+import type { Group } from '@opendatacapture/schemas/group';
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 
@@ -95,6 +96,15 @@ type TestFixtures = {
   /** Navigates to a route as `actingRole` and returns its page object. */
   getPageModel: GetPageModel;
   /**
+   * Authenticates as a group manager of a group created for this test alone, and returns that group.
+   *
+   * The `roleAccount` group is cached per worker and shared by every spec running in it, so a test
+   * that asserts on exactly what a group contains cannot use it. A group manager's `read Subject`
+   * rule is scoped to their own groups, so a fresh group bounds what this test can see to what it
+   * seeded.
+   */
+  isolatedGroupManager: () => Promise<Group>;
+  /**
    * Writes `appState` to localStorage on every navigation, for every test, whether or not it
    * authenticates through `authenticateAs`. Without it a spec that logs in through the real form
    * meets the app's in-code defaults, where the disclaimer dialog and then the walkthrough overlay
@@ -150,6 +160,14 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
         return pageModel;
       }
     );
+  },
+  isolatedGroupManager: async ({ api, authenticateAs }, use) => {
+    await use(async () => {
+      const group = await api.createGroup();
+      const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });
+      await authenticateAs(credentials);
+      return group;
+    });
   },
   roleAccount: [
     async ({ adminToken, api, apiRequestContext }, use) => {
