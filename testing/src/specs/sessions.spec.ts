@@ -1,3 +1,5 @@
+import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
+
 import { ApiClient } from '../support/api-client';
 import { expect, test } from '../support/fixtures';
 
@@ -8,7 +10,7 @@ test.describe('sessions', () => {
   // uncounted by every group-scoped query, the dashboard trends included.
   //
   // Seeded into a group of its own, so the count is exactly what this test created.
-  test('should keep a returning subject later sessions visible to their group manager', async ({
+  test("should keep a returning subject's later sessions visible to their group manager", async ({
     api,
     apiRequestContext,
     uniqueId
@@ -28,5 +30,36 @@ test.describe('sessions', () => {
     expect(response.status()).toBe(200);
     const sessions = (await response.json()) as { subjectId: string }[];
     expect(sessions.filter((session) => session.subjectId === subjectId)).toHaveLength(2);
+  });
+
+  // Session creation resolves its subjects in a batch, and the batched path once kept only their ids.
+  test('should create a new subject with the demographics its first session names', async ({
+    adminToken,
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup();
+    const subjectData: CreateSubjectData = {
+      dateOfBirth: new Date('1990-05-17T00:00:00.000Z'),
+      firstName: 'Ada',
+      id: `clinical-${uniqueId}`,
+      lastName: 'Lovelace',
+      sex: 'FEMALE'
+    };
+
+    await api.createSession(group.id, subjectData);
+
+    const response = await apiRequestContext.get(`/api/v1/subjects/${subjectData.id}`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toMatchObject({
+      dateOfBirth: '1990-05-17T00:00:00.000Z',
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      sex: 'FEMALE'
+    });
   });
 });
