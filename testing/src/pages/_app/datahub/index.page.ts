@@ -17,9 +17,13 @@ export class DatahubPage extends AppPage {
     this.searchInput = page.getByTestId('data-table-search-bar').getByRole('searchbox');
   }
 
-  /** Picks a format from the export menu and returns the file it produced. */
+  /**
+   * Picks a format from the export menu and returns the file it produced. Matched by extension,
+   * because a CSV export downloads a `README.txt` before the `.csv` itself.
+   */
   async exportAs(format: 'CSV' | 'Excel' | 'JSON'): Promise<Download> {
-    const started = this.$ref.waitForEvent('download');
+    const extension = { CSV: '.csv', Excel: '.xlsx', JSON: '.json' }[format];
+    const started = this.$ref.waitForEvent('download', (download) => download.suggestedFilename().endsWith(extension));
     await this.exportDropdown.click();
     await this.$ref.getByRole('menuitem', { exact: true, name: format }).click();
     return started;
