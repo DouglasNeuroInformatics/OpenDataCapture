@@ -4,7 +4,7 @@ import { DataTable } from '@douglasneuroinformatics/libui/components';
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { render } from '@testing-library/react';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { getListedSubjectIds } from '@/utils/table';
 
@@ -56,15 +56,6 @@ const renderMasterTableLike = (ids: string[]) => {
 };
 
 describe('getListedSubjectIds', () => {
-  beforeAll(() => {
-    // libui measures the table container; happy-dom has no layout engine.
-    globalThis.ResizeObserver ??= class {
-      disconnect = noop;
-      observe = noop;
-      unobserve = noop;
-    } as never;
-  });
-
   it('should yield one id per row, not the one-per-rendered-cell duplication the row model offers', () => {
     const table = renderMasterTableLike(['subject-a', 'subject-b', 'subject-c']);
     const rows = table.getPrePaginationRowModel().rows;
