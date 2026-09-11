@@ -1,3 +1,5 @@
+import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
+
 import { UploadInstrumentPage } from '../pages/_app/upload/$instrumentId.page';
 import { expect, test } from '../support/fixtures';
 
@@ -86,5 +88,32 @@ test.describe('upload', () => {
 
     expect(records).toHaveLength(3);
     expect(new Set(records.map((record) => record.subjectId))).toStrictEqual(new Set(batch));
+  });
+
+  // The bulk payload has nowhere to carry a file, so a record for a file instrument could only ever
+  // be incomplete. The upload is refused before anything is written.
+  test('should refuse a batch upload for a file instrument without writing a session or record', async ({
+    adminToken,
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup();
+    const headers = { Authorization: `Bearer ${adminToken}` };
+    const subjectId = `file-${uniqueId}`;
+    const data: UploadInstrumentRecordsData = {
+      groupId: group.id,
+      instrumentId: await api.findInstrumentIdByName('ARBITRARY_SINGLE_FILE'),
+      records: [{ data: {}, date: new Date(), subjectId }]
+    };
+
+    const response = await apiRequestContext.post('/api/v1/instrument-records/upload', { data, headers });
+
+    expect(response.status()).toBe(422);
+    // Sessions are created only after the subjects they name, so a missing subject means no session.
+    const subject = await apiRequestContext.get(`/api/v1/subjects/${subjectId}`, { headers });
+    expect(subject.status()).toBe(404);
+    const records = await apiRequestContext.get(`/api/v1/instrument-records?groupId=${group.id}`, { headers });
+    expect(await records.json()).toStrictEqual([]);
   });
 });
