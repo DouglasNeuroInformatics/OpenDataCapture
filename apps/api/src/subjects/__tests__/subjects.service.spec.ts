@@ -189,9 +189,14 @@ describe('SubjectsService', () => {
       const abilityFactory = new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService);
       const ability = abilityFactory.createForPayload({
         basePermissionLevel: 'STANDARD',
-        groups: [{ id: 'group-1' }],
-        id: 'user-1'
-      } as any);
+        firstName: null,
+        groups: [],
+        id: 'user-1',
+        kind: 'login',
+        lastName: null,
+        mustResetPassword: false,
+        username: 'standard-user'
+      });
       subjectModel.findMany.mockResolvedValueOnce([]);
 
       await expect(subjectsService.find({ hasRecord: true }, { ability })).resolves.toStrictEqual([]);
