@@ -76,8 +76,17 @@ describe('SetupService', () => {
       await expect(setupService.getState()).resolves.toMatchObject({ isBulkRemoteAssignmentsEnabled: true });
     });
 
-    it('should default to false when the field is absent', async () => {
+    it('should default to true when the field is absent, so a new instance has it enabled', async () => {
       setupStateModel.findFirst.mockResolvedValue({ isDemo: false, isSetup: true });
+      await expect(setupService.getState()).resolves.toMatchObject({ isBulkRemoteAssignmentsEnabled: true });
+    });
+
+    it('should return false when explicitly disabled', async () => {
+      setupStateModel.findFirst.mockResolvedValue({
+        isBulkRemoteAssignmentsEnabled: false,
+        isDemo: false,
+        isSetup: true
+      });
       await expect(setupService.getState()).resolves.toMatchObject({ isBulkRemoteAssignmentsEnabled: false });
     });
   });
