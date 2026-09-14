@@ -105,11 +105,11 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    bypassed `increment-version.ts`. That is deliberate: an empty body would look like every release
    before the changelog existed and would hide the bypass.
 
-   **No playground image ships.** The filter keeps only compose services declaring **both** `build` and
-   `image`, and `playground` declares no `image:` key. `scripts/publish.sh` is not the way to add it back:
-   it `docker push`es the local `:latest` tag of all four images, builds nothing and pushes no version
-   tag, so it replaces the three CI-published `latest` tags with whatever is in your daemon. It is wired
-   to no workflow.
+   **Four images ship: api, gateway, web and playground.** The filter keeps only compose services
+   declaring **both** `build` and `image`, so a new image is a compose service with both keys and
+   nothing in the workflow. `scripts/publish.sh` is not a substitute: it `docker push`es the local
+   `:latest` tag of all four images, builds nothing and pushes no version tag, so it replaces the
+   CI-published `latest` tags with whatever is in your daemon. It is wired to no workflow.
 
    **The `v` belongs to GitHub only.** Image tags are pushed bare (`type=raw,value=${version}`); the
    leading `v` appears on the GitHub tag alone, and `RELEASE_VERSION` cannot carry one
