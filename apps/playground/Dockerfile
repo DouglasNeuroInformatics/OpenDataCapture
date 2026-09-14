@@ -1,9 +1,8 @@
-FROM node:iron AS base
+FROM node:lts-krypton AS base
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
 ENV NODE_OPTIONS="--max-old-space-size=8192"
-RUN npm i -g corepack@latest
 RUN corepack enable
 RUN pnpm install -g turbo@2.9.16
 
@@ -18,11 +17,10 @@ RUN turbo prune @opendatacapture/playground
 FROM base AS builder
 COPY tsconfig.json vitest.config.ts ./
 COPY --from=pruner /app/out/ .
-RUN pnpm install --frozen-lockfile 
+RUN pnpm install --frozen-lockfile
 RUN turbo build --filter=@opendatacapture/playground
 
 # SERVE PLAYGROUND
-FROM base AS runner
-RUN pnpm install -g http-server@14.1.1
-COPY --from=builder /app/apps/playground/dist ./
-CMD [ "http-server", "-s", "-p", "80", "-P", "http://localhost:80?", "--gzip", "." ]
+FROM caddy:2.7-alpine AS runner
+COPY apps/playground/Caddyfile /etc/caddy/Caddyfile
+COPY --from=builder /app/apps/playground/dist/ /srv/

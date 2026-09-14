@@ -7,6 +7,12 @@ Every release of Open Data Capture from 2.0.0 onward is recorded here. Each sect
 commit history when the version changes, and becomes the body of the GitHub release. Releases before
 2.0.0 are listed in the [release history](https://github.com/DouglasNeuroinformatics/OpenDataCapture/releases).
 
+## 2.3.1
+
+### Bug Fixes
+
+- **playground-url:** carry the share link payload in the URL fragment ([a78fdbd](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/a78fdbd04c0073d660ba31f082c23e6cd747414f))
+
 ## 2.3.0
 
 ### Features

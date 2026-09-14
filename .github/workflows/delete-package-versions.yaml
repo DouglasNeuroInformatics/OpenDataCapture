@@ -24,6 +24,14 @@ jobs:
           package-type: container
           min-versions-to-keep: 0
           delete-only-untagged-versions: true
+      - name: Delete Playground
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: DouglasNeuroInformatics
+          package-name: open-data-capture-playground
+          package-type: container
+          min-versions-to-keep: 0
+          delete-only-untagged-versions: true
       - name: Delete Web
         uses: actions/delete-package-versions@v5
         with:
