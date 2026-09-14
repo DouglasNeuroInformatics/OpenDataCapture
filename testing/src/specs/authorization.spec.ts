@@ -128,6 +128,12 @@ test.describe('authorization', () => {
   test('should give a group manager the management navigation @smoke', async ({ getPageModel, page }) => {
     await getPageModel('/dashboard');
     await expect(page.getByTestId('sidebar')).toBeVisible();
+    // Bulk remote assignments is enabled by default, which nests group links under a collapsible
+    // "Group Actions" menu — expand it so the child nav buttons become visible.
+    const groupActions = page.getByTestId('sidebar').getByRole('button', { name: 'Group Actions' });
+    if (await groupActions.isVisible()) {
+      await groupActions.click();
+    }
     for (const route of GROUP_MANAGER_ONLY_ROUTES) {
       await expect(page.getByTestId(`nav-button-${route}`)).toBeVisible();
     }

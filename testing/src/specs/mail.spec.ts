@@ -221,6 +221,11 @@ test.describe('mail delivery', () => {
     // The nav item is gated on `isMailEnabled`, so this is the only place it can be asserted.
     test('should offer the email templates page once mail is on', async ({ getPageModel, page }) => {
       await getPageModel('/dashboard');
+      // Bulk remote assignments is enabled by default, nesting group links under "Group Actions"
+      const groupActions = page.getByTestId('sidebar').getByRole('button', { name: 'Group Actions' });
+      if (await groupActions.isVisible()) {
+        await groupActions.click();
+      }
       await expect(page.getByTestId('nav-button-/group/email-templates')).toBeVisible();
     });
   });

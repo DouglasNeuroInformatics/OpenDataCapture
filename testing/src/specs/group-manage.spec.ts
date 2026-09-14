@@ -65,6 +65,11 @@ test.describe('group manage', () => {
     // update just made. Navigating away and back in the same session instead reflects the store, which
     // the mutation's own response already updated.
     await page.getByTestId('nav-button-/dashboard').click();
+    // Bulk remote assignments is enabled by default, nesting group links under "Group Actions"
+    const groupActions = page.getByTestId('sidebar').getByRole('button', { name: 'Group Actions' });
+    if (await groupActions.isVisible()) {
+      await groupActions.click();
+    }
     await page.getByTestId('nav-button-/group/manage').click();
     await expect(page).toHaveURL('/group/manage');
 
