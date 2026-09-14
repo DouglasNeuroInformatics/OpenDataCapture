@@ -122,7 +122,7 @@ describe('cli', () => {
     fs.writeFileSync(path.join(tmpDir, 'index.ts'), 'export default {};');
     process.argv = ['node', 'cli.js', tmpDir, '--base-url', 'https://example.org/some/path'];
     await import('./cli.js');
-    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining('https://example.org/?'));
+    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining('https://example.org/#'));
   });
 
   it('should exit with an error when --base-url is not a valid URL', async () => {

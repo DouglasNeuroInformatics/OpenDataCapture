@@ -7,6 +7,7 @@ import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 import { Header } from '@/components/Header';
 import { MainContent } from '@/components/MainContent';
 import { Viewer } from '@/components/Viewer';
+import { useLocationHref } from '@/hooks/useLocationHref';
 import type { InstrumentRepository } from '@/models/instrument-repository.model';
 import { useAppStore } from '@/store';
 
@@ -20,6 +21,7 @@ const IndexPage = () => {
   const setSelectedInstrument = useAppStore((store) => store.setSelectedInstrument);
   const removeInstrument = useAppStore((store) => store.removeInstrument);
   const instruments = useAppStore((store) => store.instruments);
+  const href = useLocationHref();
 
   const isSameInstrument = (
     instrumentA: Pick<InstrumentRepository, 'files'>,
@@ -40,7 +42,7 @@ const IndexPage = () => {
   useEffect(() => {
     let id: null | string = null;
     try {
-      const decodedInstrument = decodeShareURL(new URL(location.href));
+      const decodedInstrument = decodeShareURL(new URL(href));
       if (!decodedInstrument) {
         return;
       }
@@ -76,9 +78,9 @@ const IndexPage = () => {
         removeInstrument(id);
       }
     };
-  }, [location.href]);
+  }, [href]);
 
-  const isFullscreen = isFullscreenShareURL(new URL(location.href));
+  const isFullscreen = isFullscreenShareURL(new URL(href));
 
   if (isFullscreen) {
     return (
