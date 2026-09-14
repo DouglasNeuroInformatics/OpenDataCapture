@@ -5,6 +5,7 @@ import { Button, Checkbox, DataTable, FileDropzone, Tabs, TextArea } from '@doug
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
+import { BULK_ASSIGNMENT_MAX_SUBJECTS } from '@opendatacapture/schemas/assignment';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from 'lucide-react';
@@ -128,12 +129,11 @@ export const SourceStep = ({
     subject: removeSubjectIdScope(subject.id).slice(0, subjectIdDisplayLength)
   }));
 
-  const allShownSelected = rows.length > 0 && rows.every((row) => selected.has(row.id));
-
-  const toggleAllShown = () => {
+  const toggleFiltered = (filteredRows: PickerRow[]) => {
+    const allSelected = filteredRows.length > 0 && filteredRows.every((row) => selected.has(row.id));
     const next = new Set(selected);
-    for (const row of rows) {
-      if (allShownSelected) {
+    for (const row of filteredRows) {
+      if (allSelected) {
         next.delete(row.id);
       } else {
         next.add(row.id);
@@ -202,14 +202,19 @@ export const SourceStep = ({
                         />
                       ),
                       enableSorting: false,
-                      header: () => (
-                        <Checkbox
-                          aria-label={t({ en: 'Select all shown', fr: 'Tout sélectionner' })}
-                          checked={allShownSelected}
-                          data-testid="bulk-select-all-subjects"
-                          onCheckedChange={toggleAllShown}
-                        />
-                      ),
+                      header: ({ table }) => {
+                        const filteredRows = table.getFilteredRowModel().rows.map((row) => row.original);
+                        const allFilteredSelected =
+                          filteredRows.length > 0 && filteredRows.every((row) => selected.has(row.id));
+                        return (
+                          <Checkbox
+                            aria-label={t({ en: 'Select all shown', fr: 'Tout sélectionner' })}
+                            checked={allFilteredSelected}
+                            data-testid="bulk-select-all-subjects"
+                            onCheckedChange={() => toggleFiltered(filteredRows)}
+                          />
+                        );
+                      },
                       id: 'select'
                     },
                     {
@@ -250,9 +255,17 @@ export const SourceStep = ({
               </div>
             )}
             <div className="mt-3 flex justify-center">
+              {selected.size > BULK_ASSIGNMENT_MAX_SUBJECTS && (
+                <p className="text-destructive text-sm">
+                  {t({
+                    en: `Selection is limited to ${BULK_ASSIGNMENT_MAX_SUBJECTS} subjects`,
+                    fr: `La sélection est limitée à ${BULK_ASSIGNMENT_MAX_SUBJECTS} sujets`
+                  })}
+                </p>
+              )}
               <Button
                 data-testid="bulk-use-selected-subjects"
-                disabled={selected.size === 0}
+                disabled={selected.size === 0 || selected.size > BULK_ASSIGNMENT_MAX_SUBJECTS}
                 type="button"
                 onClick={() => onSubjectsSelected([...selected])}
               >

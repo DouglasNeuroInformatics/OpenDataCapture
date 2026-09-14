@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 
-import { Badge, Button, Table } from '@douglasneuroinformatics/libui/components';
+import { Badge, Button, Select, Table } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { BULK_ASSIGNMENT_MAX_SUBJECTS } from '@opendatacapture/schemas/assignment';
 
-import { BulkParseFailure, resolveSubjectIds } from '@/utils/bulk-assignments';
-import type { BulkParseError, BulkParseResult } from '@/utils/bulk-assignments';
+import { BulkParseFailure, detectMode, resolveSubjectIds } from '@/utils/bulk-assignments';
+import type { BulkParseError, BulkParseResult, BulkSourceMode, CanonicalField } from '@/utils/bulk-assignments';
 
 import { ErrorList } from './ErrorList';
 import { StepLayout } from './StepLayout';
 
-const FIELD_LABELS = {
+import type { WizardStep } from './types';
+
+const CANONICAL_FIELDS: CanonicalField[] = ['subjectId', 'firstName', 'lastName', 'dateOfBirth', 'sex'];
+
+const FIELD_LABELS: { [K in CanonicalField]: { en: string; fr: string } } = {
   dateOfBirth: { en: 'Date of birth', fr: 'Date de naissance' },
   firstName: { en: 'First name', fr: 'Prénom' },
   lastName: { en: 'Last name', fr: 'Nom' },
@@ -18,7 +22,7 @@ const FIELD_LABELS = {
   subjectId: { en: 'Subject ID', fr: 'Identifiant du sujet' }
 } as const;
 
-import type { WizardStep } from './types';
+const NOT_USED = '__not_used__';
 
 type MapStepProps = {
   groupName: string;
@@ -31,11 +35,40 @@ type MapStepProps = {
 export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }: MapStepProps) => {
   const { t } = useTranslation();
   const [errors, setErrors] = useState<BulkParseError[]>([]);
+  const [mapping, setMapping] = useState<Partial<{ [key: string]: CanonicalField }>>(parsed.mapping);
+
+  const mode: BulkSourceMode | null = detectMode(mapping);
+
+  const claimed = new Set(Object.values(mapping).filter(Boolean));
+
+  const setHeaderField = (header: string, value: string) => {
+    setMapping((prev) => {
+      const next = { ...prev };
+      if (value === NOT_USED) {
+        delete next[header];
+      } else {
+        next[header] = value as CanonicalField;
+      }
+      return next;
+    });
+  };
 
   const resolve = async () => {
     setErrors([]);
+    if (!mode) {
+      setErrors([
+        {
+          message: t({
+            en: 'Map a subject ID column, or a complete set of first name, last name, date of birth and sex.',
+            fr: "Associez une colonne d'identifiant, ou un ensemble complet de prénom, nom, date de naissance et sexe."
+          })
+        }
+      ]);
+      return;
+    }
+    const resolvedParsed: BulkParseResult = { ...parsed, mapping, mode };
     try {
-      onResolved(await resolveSubjectIds(parsed, { groupName, maxSubjects: BULK_ASSIGNMENT_MAX_SUBJECTS }));
+      onResolved(await resolveSubjectIds(resolvedParsed, { groupName, maxSubjects: BULK_ASSIGNMENT_MAX_SUBJECTS }));
     } catch (err) {
       if (err instanceof BulkParseFailure) {
         setErrors(err.errors);
@@ -48,11 +81,13 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
   return (
     <StepLayout
       aside={
-        <Badge data-testid="bulk-detected-mode" variant="secondary">
-          {parsed.mode === 'ID'
-            ? t({ en: 'Subject ID', fr: 'Identifiant du sujet' })
-            : t({ en: 'Personal information', fr: 'Renseignements personnels' })}
-        </Badge>
+        mode ? (
+          <Badge data-testid="bulk-detected-mode" variant="secondary">
+            {mode === 'ID'
+              ? t({ en: 'Subject ID', fr: 'Identifiant du sujet' })
+              : t({ en: 'Personal information', fr: 'Renseignements personnels' })}
+          </Badge>
+        ) : null
       }
       description={t({
         en: `Check that the columns were read correctly. ${parsed.rows.length} rows found.`,
@@ -63,7 +98,7 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
           <Button type="button" variant="outline" onClick={onBack}>
             {t({ en: 'Back', fr: 'Retour' })}
           </Button>
-          <Button data-testid="bulk-confirm-mapping" type="button" onClick={() => void resolve()}>
+          <Button data-testid="bulk-confirm-mapping" disabled={!mode} type="button" onClick={() => void resolve()}>
             {t({ en: 'Continue', fr: 'Continuer' })}
           </Button>
         </React.Fragment>
@@ -75,7 +110,7 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
       <div className="flex flex-col gap-4" data-testid="bulk-map-step">
         <ErrorList errors={errors} />
 
-        {parsed.mode === 'PII' && (
+        {mode === 'PII' && (
           <p className="text-muted-foreground text-sm">
             {t({
               en: 'Subject identifiers are derived in your browser. The personal information in this file is never sent.',
@@ -96,12 +131,27 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
               </Table.Header>
               <Table.Body>
                 {parsed.headers.map((header) => {
-                  const field = parsed.mapping[header];
+                  const field = mapping[header];
                   return (
                     <Table.Row key={header}>
                       <Table.Cell className="font-medium">{header}</Table.Cell>
-                      <Table.Cell className={field ? undefined : 'text-muted-foreground italic'}>
-                        {field ? t(FIELD_LABELS[field]) : t({ en: 'Not used', fr: 'Non utilisée' })}
+                      <Table.Cell>
+                        <Select value={field ?? NOT_USED} onValueChange={(value) => setHeaderField(header, value)}>
+                          <Select.Trigger
+                            className={field ? 'w-48' : 'text-muted-foreground w-48 italic'}
+                            data-testid={`bulk-map-select-${header}`}
+                          >
+                            <Select.Value />
+                          </Select.Trigger>
+                          <Select.Content>
+                            <Select.Item value={NOT_USED}>{t({ en: 'Not used', fr: 'Non utilisée' })}</Select.Item>
+                            {CANONICAL_FIELDS.filter((f) => !claimed.has(f) || f === field).map((f) => (
+                              <Select.Item key={f} value={f}>
+                                {t(FIELD_LABELS[f])}
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select>
                       </Table.Cell>
                     </Table.Row>
                   );
@@ -118,8 +168,6 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
               fr: `Aperçu des ${parsed.preview.length} premières lignes`
             })}
           </h3>
-          {/* Table primitives rather than ClientTable: the preview is capped at a handful of rows,
-              and ClientTable renders a pagination footer whose controls are permanently disabled. */}
           <div className="overflow-x-auto rounded-md border" data-testid="bulk-preview-table">
             <Table>
               <Table.Header className="bg-secondary [&_th]:text-secondary-foreground [&_th]:font-semibold">

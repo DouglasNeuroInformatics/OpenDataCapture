@@ -270,22 +270,38 @@ export function parseDelimitedText(input: string): BulkParseResult {
 export async function parseWorkbook(file: File): Promise<BulkParseResult> {
   assertFileSize(file);
   const { read, utils } = await import('xlsx');
-  const workbook = read(await file.arrayBuffer(), { cellDates: true, type: 'array' });
+  let workbook: ReturnType<typeof read>;
+  try {
+    workbook = read(await file.arrayBuffer(), { cellDates: true, type: 'array' });
+  } catch {
+    throw new BulkParseFailure([
+      { message: 'The file could not be read as a workbook. It may be corrupt or unsupported.' }
+    ]);
+  }
   const sheetName = workbook.SheetNames[0];
   if (!sheetName) {
     throw new BulkParseFailure([{ message: 'The workbook contains no sheets.' }]);
   }
-  // `raw: false` renders every cell as its displayed text, which keeps dates in the sheet's own
-  // formatting rather than as Excel serial numbers.
-  const rows = utils.sheet_to_json<{ [key: string]: string }>(workbook.Sheets[sheetName]!, {
+  // `raw: true` preserves typed values so Date cells arrive as JS Dates rather than locale-
+  // formatted strings like "3/14/1982", which would fail ISO validation in `resolveSubjectIds`.
+  const rows = utils.sheet_to_json<{ [key: string]: unknown }>(workbook.Sheets[sheetName]!, {
     defval: '',
-    raw: false
+    raw: true
   });
   const headers = Object.keys(rows[0] ?? {}).map((header) => header.trim());
   return buildResult(
     headers,
     rows.map((row) =>
-      Object.fromEntries(Object.entries(row).map(([key, value]) => [key.trim(), String(value ?? '').trim()]))
+      Object.fromEntries(
+        Object.entries(row).map(([key, value]) => [
+          key.trim(),
+          value instanceof Date
+            ? toBasicISOString(value)
+            : typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+              ? String(value).trim()
+              : ''
+        ])
+      )
     )
   );
 }
@@ -349,7 +365,7 @@ export async function resolveSubjectIds(
       continue;
     }
     const dateOfBirth = new Date(`${rawDateOfBirth}T00:00:00.000Z`);
-    if (Number.isNaN(dateOfBirth.getTime())) {
+    if (Number.isNaN(dateOfBirth.getTime()) || dateOfBirth.toISOString().slice(0, 10) !== rawDateOfBirth) {
       errors.push({ message: 'Date of birth is not a real date', row: rowNumber });
       continue;
     }
@@ -394,6 +410,6 @@ export function toResultCsv(rows: { [key: string]: string }[]): string {
   return Papa.unparse(rows, { escapeFormulae: true });
 }
 
-export { buildResultRows, resultCsvFilename, toResultTsv };
+export { buildResultRows, detectMode, resultCsvFilename, toResultTsv };
 
-export type { BulkParseError, BulkParseResult, BulkSourceMode, ResultAssignment };
+export type { BulkParseError, BulkParseResult, BulkSourceMode, CanonicalField, ResultAssignment };

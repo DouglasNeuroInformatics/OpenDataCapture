@@ -78,6 +78,8 @@ export const ReviewStep = ({
   const toMessages = useIssueMessages(describeSubject);
 
   const hasConflict = failure?.issues.some(({ kind }) => kind === 'CONFLICT') ?? false;
+  const hasBlockingIssue =
+    failure?.issues.some(({ kind }) => kind === 'SUBJECT_UNAVAILABLE' || kind === 'INSTRUMENT_UNAVAILABLE') ?? false;
   const messages = failure ? toMessages(failure.issues) : [];
   if (transportError) {
     messages.push({
@@ -101,7 +103,7 @@ export const ReviewStep = ({
           </Button>
           <Button
             data-testid="bulk-submit"
-            disabled={isSubmitting || (hasConflict && !allowDuplicates)}
+            disabled={isSubmitting || hasBlockingIssue || (hasConflict && !allowDuplicates)}
             type="button"
             onClick={() => onSubmit({ allowDuplicates })}
           >

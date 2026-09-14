@@ -57,6 +57,31 @@ describe('SetupService', () => {
     });
   });
 
+  describe('isBulkRemoteAssignmentsEnabled', () => {
+    it('should persist isBulkRemoteAssignmentsEnabled', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ id: 'setup-1', isSetup: true });
+      await setupService.updateState({ isBulkRemoteAssignmentsEnabled: true });
+      expect(setupStateModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { isBulkRemoteAssignmentsEnabled: true },
+        where: { id: 'setup-1' }
+      });
+    });
+
+    it('should return true when saved as true', async () => {
+      setupStateModel.findFirst.mockResolvedValue({
+        isBulkRemoteAssignmentsEnabled: true,
+        isDemo: false,
+        isSetup: true
+      });
+      await expect(setupService.getState()).resolves.toMatchObject({ isBulkRemoteAssignmentsEnabled: true });
+    });
+
+    it('should default to false when the field is absent', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ isDemo: false, isSetup: true });
+      await expect(setupService.getState()).resolves.toMatchObject({ isBulkRemoteAssignmentsEnabled: false });
+    });
+  });
+
   describe('activeLanguages', () => {
     it('should persist the languages an admin selected', async () => {
       setupStateModel.findFirst.mockResolvedValue({ id: 'setup-1', isSetup: true });

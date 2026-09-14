@@ -6,7 +6,11 @@ import type { BulkAssignmentFailure } from '@opendatacapture/schemas/assignment'
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
-import { toBulkAssignmentFailure, useCreateBulkAssignmentsMutation } from '@/hooks/useBulkAssignments';
+import {
+  toBulkAssignmentFailure,
+  useBulkAssignmentPreflightMutation,
+  useCreateBulkAssignmentsMutation
+} from '@/hooks/useBulkAssignments';
 import type { BulkParseResult } from '@/utils/bulk-assignments';
 import { buildResultRows, resultCsvFilename, toResultCsv, toResultTsv } from '@/utils/bulk-assignments';
 
@@ -70,6 +74,7 @@ export const BulkRemoteAssignmentWizard = ({
   const [sourceRows, setSourceRows] = useState<undefined | { [subjectId: string]: { [column: string]: string } }>();
   const [failure, setFailure] = useState<BulkAssignmentFailure | null>(null);
   const [transportError, setTransportError] = useState(false);
+  const preflightMutation = useBulkAssignmentPreflightMutation();
   const createMutation = useCreateBulkAssignmentsMutation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const [didCopy, setDidCopy] = useState(false);
@@ -120,6 +125,18 @@ export const BulkRemoteAssignmentWizard = ({
     setFailure(null);
     setTransportError(false);
     setStep(next);
+  };
+
+  const reset = () => {
+    setParsed(null);
+    setSubjectIds([]);
+    setTimepoints([]);
+    setAssignments([]);
+    setSourceRows(undefined);
+    setFailure(null);
+    setTransportError(false);
+    setDidCopy(false);
+    setStep('SOURCE');
   };
 
   const submit = ({ allowDuplicates }: { allowDuplicates: boolean }) => {
@@ -195,11 +212,35 @@ export const BulkRemoteAssignmentWizard = ({
         <TimepointsStep
           defaultExpiresAt={defaultExpiresAt}
           instruments={instruments}
+          isLoading={preflightMutation.isPending}
           subjectCount={subjectIds.length}
           timepoints={timepoints}
           onBack={() => goTo('SOURCE')}
           onChange={setTimepoints}
-          onConfirm={() => goTo('REVIEW')}
+          onConfirm={() => {
+            const payload = {
+              allowDuplicates: false,
+              groupId,
+              subjectIds,
+              timepoints: timepoints.map(({ expiresAt, instrumentId }) => ({
+                expiresAt: new Date(`${expiresAt}T23:59:59.999Z`),
+                instrumentId
+              }))
+            };
+            preflightMutation.mutate(payload, {
+              onError: (error) => {
+                const refusal = toBulkAssignmentFailure(error);
+                if (refusal) {
+                  setFailure(refusal);
+                }
+                goTo('REVIEW');
+              },
+              onSuccess: () => {
+                setFailure(null);
+                goTo('REVIEW');
+              }
+            });
+          }}
           onStepChange={goTo}
         />
       )}
@@ -226,6 +267,9 @@ export const BulkRemoteAssignmentWizard = ({
           })}
           footer={
             <React.Fragment>
+              <Button data-testid="bulk-start-over" type="button" variant="outline" onClick={reset}>
+                {t({ en: 'Start over', fr: 'Recommencer' })}
+              </Button>
               <Button
                 data-testid="bulk-copy-links"
                 type="button"

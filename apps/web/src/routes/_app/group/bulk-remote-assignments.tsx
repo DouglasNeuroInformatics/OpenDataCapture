@@ -9,7 +9,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { config } from '@/config';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStateQuery';
-import { useSubjectsQuery } from '@/hooks/useSubjectsQuery';
+import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { getDefaultAssignmentExpiry } from '@/utils/assignment-duration';
 
@@ -64,5 +64,10 @@ export const Route = createFileRoute('/_app/group/bulk-remote-assignments')({
       throw redirect({ to: '/dashboard' });
     }
   },
-  component: RouteComponent
+  component: RouteComponent,
+  loader: ({ context }) => {
+    const groupId = useAppStore.getState().currentGroup?.id;
+    void context.queryClient.ensureQueryData(setupStateQueryOptions());
+    void context.queryClient.ensureQueryData(subjectsQueryOptions({ params: { groupId } }));
+  }
 });

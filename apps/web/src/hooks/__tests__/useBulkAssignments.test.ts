@@ -19,12 +19,9 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
   useNotificationsStore: (selector: any) => selector({ addNotification: mocks.addNotification })
 }));
 
-const {
-  ASSIGNMENTS_QUERY_KEY,
-  toBulkAssignmentFailure,
-  useBulkAssignmentPreflightMutation,
-  useCreateBulkAssignmentsMutation
-} = await import('../useBulkAssignments');
+const { toBulkAssignmentFailure, useBulkAssignmentPreflightMutation, useCreateBulkAssignmentsMutation } =
+  await import('../useBulkAssignments');
+const { ASSIGNMENTS_QUERY_KEY_PREFIX } = await import('../useAssignmentsQuery');
 
 const futureDate = () => new Date(Date.now() + 86_400_000);
 
@@ -96,7 +93,7 @@ describe('useCreateBulkAssignmentsMutation', () => {
     result.current.mutate(request);
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toHaveLength(1);
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ASSIGNMENTS_QUERY_KEY });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: [ASSIGNMENTS_QUERY_KEY_PREFIX] });
   });
 
   it('should not invalidate or notify when the batch was refused, since nothing was created', async () => {

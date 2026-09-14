@@ -144,6 +144,11 @@ describe('resolveSubjectIds', () => {
     expect(errors[0]).toMatchObject({ row: 2 });
   });
 
+  it('should reject a date that Date normalizes silently, like Feb 29 in a non-leap year', async () => {
+    const errors = await failureOf(() => resolve('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2001-02-29,M'));
+    expect(errors[0]).toMatchObject({ message: 'Date of birth is not a real date', row: 2 });
+  });
+
   it('should number errors by the row of the user file, counting the header as row 1', async () => {
     const errors = await failureOf(() =>
       resolve('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M\nAnne,Roy,2000-01-02,X')

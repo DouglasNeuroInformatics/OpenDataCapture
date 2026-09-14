@@ -14,6 +14,7 @@ type TimepointsStepProps = {
   /** Prefilled expiry for a newly added timepoint, from the instance default. */
   defaultExpiresAt: string;
   instruments: InstrumentOption[];
+  isLoading?: boolean;
   onBack: () => void;
   onChange: (timepoints: DraftTimepoint[]) => void;
   onConfirm: () => void;
@@ -30,6 +31,7 @@ type TimepointsStepProps = {
 export const TimepointsStep = ({
   defaultExpiresAt,
   instruments,
+  isLoading,
   onBack,
   onChange,
   onConfirm,
@@ -47,9 +49,11 @@ export const TimepointsStep = ({
     (instrument) => !timepoints.some((timepoint) => timepoint.instrumentId === instrument.id)
   );
 
+  const todayISO = new Date().toISOString().split('T')[0]!;
+
   const add = () => {
     const instrument = instruments.find(({ id }) => id === instrumentId);
-    if (!instrument || !expiresAt) {
+    if (!instrument || !expiresAt || expiresAt <= todayISO) {
       return;
     }
     onChange([...timepoints, { expiresAt, instrumentId: instrument.id, instrumentTitle: instrument.title }]);
@@ -70,7 +74,7 @@ export const TimepointsStep = ({
           </Button>
           <Button
             data-testid="bulk-confirm-timepoints"
-            disabled={timepoints.length === 0}
+            disabled={timepoints.length === 0 || isLoading}
             type="button"
             onClick={onConfirm}
           >
@@ -114,12 +118,18 @@ export const TimepointsStep = ({
               className="w-full"
               data-testid="bulk-expiry-input"
               id="bulk-expiry"
+              min={todayISO}
               type="date"
               value={expiresAt}
               onChange={(event) => setExpiresAt(event.target.value)}
             />
           </div>
-          <Button data-testid="bulk-add-timepoint" disabled={!instrumentId || !expiresAt} type="button" onClick={add}>
+          <Button
+            data-testid="bulk-add-timepoint"
+            disabled={!instrumentId || !expiresAt || expiresAt <= todayISO}
+            type="button"
+            onClick={add}
+          >
             {t({ en: 'Add', fr: 'Ajouter' })}
           </Button>
         </div>

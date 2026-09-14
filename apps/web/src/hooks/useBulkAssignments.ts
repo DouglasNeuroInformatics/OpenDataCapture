@@ -12,11 +12,7 @@ import type {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios, { isAxiosError } from 'axios';
 
-/**
- * The key `useAssignmentsQuery` builds on. Extracted so an invalidation cannot drift from the query
- * it is meant to refresh.
- */
-export const ASSIGNMENTS_QUERY_KEY = ['assignments'] as const;
+import { ASSIGNMENTS_QUERY_KEY_PREFIX } from '@/hooks/useAssignmentsQuery';
 
 /**
  * Recover the structured refusal the API attaches to a rejected bulk request. Any other failure -
@@ -65,7 +61,7 @@ export function useCreateBulkAssignmentsMutation() {
     },
     onSuccess() {
       addNotification({ type: 'success' });
-      void queryClient.invalidateQueries({ queryKey: ASSIGNMENTS_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: [ASSIGNMENTS_QUERY_KEY_PREFIX] });
     },
     retry: false,
     throwOnError: false
