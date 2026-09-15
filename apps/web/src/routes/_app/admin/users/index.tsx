@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { isAllUndefined, snakeToCamelCase } from '@douglasneuroinformatics/libjs';
+import type { ZodErrorLike } from '@douglasneuroinformatics/libjs';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Button, DataTable, Dialog, Form, Heading, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -16,10 +17,19 @@ import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
 import { useDeleteUserMutation } from '@/hooks/useDeleteUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
+import { usePasswordGenerator } from '@/hooks/usePasswordGenerator';
+import type { PasswordFormValues } from '@/hooks/usePasswordGenerator';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
-import { $Email, $PhoneNumber, clearedIfBlank, omittedIfUnchanged } from '@/utils/validation';
+import {
+  $Email,
+  $PhoneNumber,
+  clearedIfBlank,
+  omittedIfUnchanged,
+  requiresGroup,
+  validationSummary
+} from '@/utils/validation';
 
 type UpdateUserFormData = {
   additionalPermissions?: Partial<UserPermission>[];
@@ -29,6 +39,15 @@ type UpdateUserFormData = {
   groupIds: Set<string>;
   password?: string | undefined;
   phoneNumber?: string | undefined;
+};
+
+/**
+ * `mustResetPassword` is not a form field — it is derived at submission from whether the password
+ * being saved is the generated one, so it is carried alongside the form data rather than in it.
+ */
+type UpdateUserSubmitData = UpdateUserFormData & {
+  additionalPermissions?: UserPermission[];
+  mustResetPassword?: boolean;
 };
 
 type UpdateUserFormInputData = {
@@ -43,11 +62,114 @@ type UpdateUserFormInputData = {
 const UpdateUserForm: React.FC<{
   data: UpdateUserFormInputData;
   onDelete: () => void;
-  onSubmit: (data: UpdateUserFormData & { additionalPermissions?: UserPermission[] }) => Promisable<void>;
-}> = ({ data, onDelete, onSubmit }) => {
+  onError: (error: ZodErrorLike) => void;
+  onSubmit: (data: UpdateUserSubmitData) => Promisable<void>;
+}> = ({ data, onDelete, onError, onSubmit }) => {
   const { disableDelete, groupOptions, initialValues } = data;
   const { resolvedLanguage, t } = useTranslation();
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const { applyGeneratedPassword, generatedPassword, generatePassword, isGeneratedPassword } = usePasswordGenerator();
+
+  // libui's `record-array` field resets itself to a single blank record whenever its `fieldset`
+  // changes identity, so an inline literal would discard the permissions it was seeded with on the
+  // next render of this component -- which a background refetch of either query triggers.
+  const additionalPermissionsFieldset = useMemo<FormTypes.Fieldset<UserPermission>>(
+    () => ({
+      action: {
+        kind: 'string',
+        label: t({
+          en: 'Action',
+          es: 'Acción',
+          fr: 'Action'
+        }),
+        options: {
+          create: t({
+            en: 'Create',
+            es: 'Crear',
+            fr: 'Créer'
+          }),
+          delete: t({
+            en: 'Delete',
+            es: 'Eliminar',
+            fr: 'Supprimer'
+          }),
+          manage: t({
+            en: 'Manage (All)',
+            es: 'Gestionar (todo)',
+            fr: 'Gérer (Tout)'
+          }),
+          read: t({
+            en: 'Read',
+            es: 'Leer',
+            fr: 'Lire'
+          }),
+          update: t({
+            en: 'Update',
+            es: 'Actualizar',
+            fr: 'Modifier'
+          })
+        },
+        variant: 'select'
+      },
+      subject: {
+        kind: 'string',
+        label: t({
+          en: 'Resource',
+          es: 'Recurso',
+          fr: 'Ressource'
+        }),
+        options: {
+          all: t({
+            en: 'All',
+            es: 'Todo',
+            fr: 'Tous'
+          }),
+          Assignment: t({
+            en: 'Assignment',
+            es: 'Asignación',
+            fr: 'Assignation'
+          }),
+          Group: t({
+            en: 'Group',
+            es: 'Grupo',
+            fr: 'Groupe'
+          }),
+          Instrument: t({
+            en: 'Instrument',
+            es: 'Instrumento',
+            fr: 'Instrument'
+          }),
+          InstrumentRecord: t({
+            en: 'Instrument Record',
+            es: 'Registro de instrumento',
+            fr: "Enregistrement de l'instrument"
+          }),
+          InstrumentRepo: t({
+            en: 'Instrument Repository',
+            es: 'Repositorio de instrumentos',
+            fr: "Dépôt d'instruments"
+          }),
+          Session: t({
+            en: 'Session',
+            es: 'Sesión',
+            fr: 'Session'
+          }),
+          Subject: t({
+            en: 'Subject',
+            es: 'Sujeto',
+            fr: 'Client'
+          }),
+          User: t({
+            en: 'User',
+            es: 'Usuario',
+            fr: 'Utilisateur'
+          })
+        },
+        variant: 'select'
+      }
+    }),
+    [resolvedLanguage]
+  );
 
   const $UpdateUserFormData = useMemo(() => {
     return z
@@ -93,15 +215,12 @@ const UpdateUserForm: React.FC<{
         });
       })
       .check((ctx) => {
-        if (ctx.value.groupIds.size <= 0 && data.selectedUserBasePermission !== 'ADMIN') {
+        const permissions = { basePermissionLevel: data.selectedUserBasePermission, disabled: ctx.value.disabled };
+        if (requiresGroup(permissions) && ctx.value.groupIds.size <= 0) {
           ctx.issues.push({
             code: 'custom',
-            input: ctx.value.confirmPassword,
-            message: t({
-              en: 'Standard user must be part of a group',
-              es: 'El usuario estándar debe pertenecer a un grupo',
-              fr: "Un utilisateur standard doit faire partie d'un groupe"
-            }),
+            input: ctx.value.groupIds,
+            message: t('common.groupRequired'),
             path: ['groupIds']
           });
         }
@@ -116,7 +235,10 @@ const UpdateUserForm: React.FC<{
           });
         }
       }) satisfies z.ZodType<UpdateUserFormData>;
-  }, [resolvedLanguage, initialValues?.phoneNumber]);
+    // `selectedUserBasePermission` decides whether a group is required, so a schema built for the
+    // previously selected user must not be reused: two users differing only in permission level
+    // would otherwise share one schema and be validated against the wrong rule.
+  }, [data.selectedUserBasePermission, resolvedLanguage, initialValues?.phoneNumber]);
 
   return (
     <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
@@ -137,6 +259,7 @@ const UpdateUserForm: React.FC<{
                 calculateStrength: (password) => {
                   return estimatePasswordStrength(password).score;
                 },
+                generatePassword,
                 kind: 'string',
                 label: t('common.password'),
                 variant: 'password'
@@ -181,100 +304,7 @@ const UpdateUserForm: React.FC<{
             }),
             fields: {
               additionalPermissions: {
-                fieldset: {
-                  action: {
-                    kind: 'string',
-                    label: t({
-                      en: 'Action',
-                      es: 'Acción',
-                      fr: 'Action'
-                    }),
-                    options: {
-                      create: t({
-                        en: 'Create',
-                        es: 'Crear',
-                        fr: 'Créer'
-                      }),
-                      delete: t({
-                        en: 'Delete',
-                        es: 'Eliminar',
-                        fr: 'Supprimer'
-                      }),
-                      manage: t({
-                        en: 'Manage (All)',
-                        es: 'Gestionar (todo)',
-                        fr: 'Gérer (Tout)'
-                      }),
-                      read: t({
-                        en: 'Read',
-                        es: 'Leer',
-                        fr: 'Lire'
-                      }),
-                      update: t({
-                        en: 'Update',
-                        es: 'Actualizar',
-                        fr: 'Modifier'
-                      })
-                    },
-                    variant: 'select'
-                  },
-                  subject: {
-                    kind: 'string',
-                    label: t({
-                      en: 'Resource',
-                      es: 'Recurso',
-                      fr: 'Ressource'
-                    }),
-                    options: {
-                      all: t({
-                        en: 'All',
-                        es: 'Todo',
-                        fr: 'Tous'
-                      }),
-                      Assignment: t({
-                        en: 'Assignment',
-                        es: 'Asignación',
-                        fr: 'Assignation'
-                      }),
-                      Group: t({
-                        en: 'Group',
-                        es: 'Grupo',
-                        fr: 'Groupe'
-                      }),
-                      Instrument: t({
-                        en: 'Instrument',
-                        es: 'Instrumento',
-                        fr: 'Instrument'
-                      }),
-                      InstrumentRecord: t({
-                        en: 'Instrument Record',
-                        es: 'Registro de instrumento',
-                        fr: "Enregistrement de l'instrument"
-                      }),
-                      InstrumentRepo: t({
-                        en: 'Instrument Repository',
-                        es: 'Repositorio de instrumentos',
-                        fr: "Dépôt d'instruments"
-                      }),
-                      Session: t({
-                        en: 'Session',
-                        es: 'Sesión',
-                        fr: 'Session'
-                      }),
-                      Subject: t({
-                        en: 'Subject',
-                        es: 'Sujeto',
-                        fr: 'Client'
-                      }),
-                      User: t({
-                        en: 'User',
-                        es: 'Usuario',
-                        fr: 'Utilisateur'
-                      })
-                    },
-                    variant: 'select'
-                  }
-                },
+                fieldset: additionalPermissionsFieldset,
                 kind: 'record-array',
                 label: t({
                   en: 'Permission',
@@ -326,9 +356,23 @@ const UpdateUserForm: React.FC<{
         }}
         key={JSON.stringify(initialValues)}
         submitBtnLabel={t('core.save')}
+        subscribe={{
+          // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
+          // position, so `setValues` is inferred as an error type rather than a setter.
+          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) =>
+            applyGeneratedPassword(setValues),
+          selector: () => generatedPassword
+        }}
         validationSchema={$UpdateUserFormData}
+        onError={onError}
         onSubmit={({ additionalPermissions, ...data }) =>
-          onSubmit({ additionalPermissions: additionalPermissions as undefined | UserPermission[], ...data })
+          onSubmit({
+            additionalPermissions: additionalPermissions as undefined | UserPermission[],
+            ...data,
+            // Left undefined when the password field is blank, so saving other changes to a user who
+            // still owes a reset does not quietly lift it.
+            mustResetPassword: data.password ? isGeneratedPassword(data.password) : undefined
+          })
         }
       />
       <Dialog.Content>
@@ -370,6 +414,12 @@ const RouteComponent = () => {
   const updateUserMutation = useUpdateUserMutation();
   const [selectedUser, setSelectedUser] = useState<null | User>(null);
   const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
+  const [submitErrorMessage, setSubmitErrorMessage] = useState<null | string>(null);
+
+  const openManageSheet = (user: User) => {
+    setSubmitErrorMessage(null);
+    setSelectedUser(user);
+  };
 
   const [data, setData] = useState<null | UpdateUserFormInputData>(null);
 
@@ -399,7 +449,13 @@ const RouteComponent = () => {
   }, [groupsQuery.data, selectedUser]);
 
   return (
-    <Sheet open={Boolean(selectedUser)} onOpenChange={() => setSelectedUser(null)}>
+    <Sheet
+      open={Boolean(selectedUser)}
+      onOpenChange={() => {
+        setSubmitErrorMessage(null);
+        setSelectedUser(null);
+      }}
+    >
       <PageHeader>
         <Heading className="text-center" variant="h2">
           {t({
@@ -445,7 +501,7 @@ const RouteComponent = () => {
         rowActions={[
           {
             label: t('common.manage'),
-            onSelect: setSelectedUser
+            onSelect: openManageSheet
           }
         ]}
         togglesComponent={() => (
@@ -462,7 +518,7 @@ const RouteComponent = () => {
         onRowClick={(user) => setHighlightedRowId(user.id)}
         onRowDoubleClick={(user) => {
           setHighlightedRowId(user.id);
-          setSelectedUser(user);
+          openManageSheet(user);
         }}
       />
       <Sheet.Content className="flex flex-col p-0" data-testid="admin-user-edit-sheet">
@@ -475,6 +531,20 @@ const RouteComponent = () => {
               fr: 'Apportez des modifications à cet utilisateur ici. Cliquez sur « Enregistrer » lorsque vous avez terminé.'
             })}
           </Sheet.Description>
+          {/* In the header, which does not scroll: a rejected field can be several sections away
+              from the submit button, and inline is then off-screen at the moment of the failure. */}
+          {submitErrorMessage && (
+            <div className="text-destructive text-sm font-medium" data-testid="admin-user-edit-error" role="alert">
+              <p>
+                {t({
+                  en: 'Your changes were not saved',
+                  es: 'Sus cambios no se guardaron',
+                  fr: "Vos modifications n'ont pas été enregistrées"
+                })}
+              </p>
+              <p>{submitErrorMessage}</p>
+            </div>
+          )}
         </Sheet.Header>
         <Sheet.Body className="grow overflow-y-scroll px-6 pb-6">
           <WithFallback
@@ -486,7 +556,9 @@ const RouteComponent = () => {
                 deleteUserMutation.mutate({ id: selectedUser!.id });
                 setSelectedUser(null);
               },
+              onError: (error) => setSubmitErrorMessage(validationSummary(error)),
               onSubmit: ({ confirmPassword: _, email, groupIds, phoneNumber, ...data }) => {
+                setSubmitErrorMessage(null);
                 updateUserMutation.mutate(
                   {
                     data: {

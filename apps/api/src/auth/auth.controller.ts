@@ -15,7 +15,7 @@ export class AuthController {
 
   @Get('create-instrument-token')
   @HttpCode(HttpStatus.OK)
-  @RouteAccess({ action: 'create', subject: 'Instrument' })
+  @RouteAccess({ action: 'manage', subject: 'Instrument' })
   @ThrottleLoginRequest()
   async getCreateInstrumentToken(@CurrentUser() currentUser: RequestUser): Promise<{ accessToken: string }> {
     return this.authService.getCreateInstrumentToken(currentUser);

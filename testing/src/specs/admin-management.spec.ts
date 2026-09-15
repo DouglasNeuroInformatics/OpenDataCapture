@@ -110,6 +110,56 @@ test.describe('admin management', () => {
     await expect(page).toHaveURL('/admin/users/create');
   });
 
+  test('should reject a non-admin user created without a group', async ({ authenticateAs, page, uniqueId }) => {
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users/create');
+
+    await page.getByLabel('Username').fill(`user${uniqueId}`);
+    await page.getByLabel('Password', { exact: true }).fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('Confirm Password').fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('First Name').fill('Test');
+    await page.getByLabel('Last Name').fill('User');
+    // By testid rather than `getByRole('combobox').first()`: when mail is enabled a welcome-email
+    // language select renders above the form, and `.first()` then opens the wrong one.
+    await page.getByTestId('basePermissionLevel-select-trigger').click();
+    await page.getByTestId('basePermissionLevel-select-item-GROUP_MANAGER').click();
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(
+      page.getByTestId('error-message-text').filter({ hasText: 'must belong to at least one group' })
+    ).toBeVisible();
+    await expect(page).toHaveURL('/admin/users/create');
+  });
+
+  test('should allow a disabled non-admin user with no group, since such an account only attributes uploaded data', async ({
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users/create');
+
+    await page.getByLabel('Username').fill(`user${uniqueId}`);
+    await page.getByLabel('Password', { exact: true }).fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('Confirm Password').fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('First Name').fill('Test');
+    await page.getByLabel('Last Name').fill('User');
+    await page.getByTestId('basePermissionLevel-select-trigger').click();
+    await page.getByTestId('basePermissionLevel-select-item-GROUP_MANAGER').click();
+    // The radio items carry stable ids (`<name>-true`), unlike their labels, which libui translates.
+    await page.locator('#disabled-true').click();
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    // Same dual outcome as the creation test below: a user created without an email gets the
+    // copy-it-manually dialog when a parallel worker holds mail enabled.
+    const fallback = page.getByTestId('welcome-email-fallback');
+    await expect(fallback.or(page.getByTestId('data-table-search-bar'))).toBeVisible();
+    if (await fallback.isVisible()) {
+      await fallback.getByRole('button', { name: 'Done' }).click();
+    }
+    await expect(page).toHaveURL('/admin/users');
+  });
+
   test('should create a user through the UI and show it in the users list @smoke', async ({
     api,
     authenticateAs,
@@ -151,9 +201,9 @@ test.describe('admin management', () => {
   });
 
   test('should edit and delete a user through the manage sheet', async ({ api, authenticateAs, page, uniqueId }) => {
-    // The update form requires a non-empty `groupIds` for any non-ADMIN role (see #1472) --
-    // asymmetric with the create form, which allows an empty group set -- so a groupless user can
-    // never actually be saved from this sheet. Seed one with a group to isolate the behavior under test.
+    // Both forms require a non-empty `groupIds` for any non-ADMIN role that is not disabled, so a
+    // groupless user can never be saved from this sheet. Seed one with a group to isolate the
+    // behavior under test.
     const group = await api.createGroup({ name: `E2E Group ${uniqueId}` });
     const { user } = await api.createUser({ groupIds: [group.id] });
 
@@ -180,6 +230,31 @@ test.describe('admin management', () => {
 
     await expect(page.getByRole('heading', { name: 'Success' }).last()).toBeVisible();
     await expect(page.getByTestId('data-table-row').filter({ hasText: user.username })).toHaveCount(0);
+  });
+
+  test('should say why a save failed when the rejected field is scrolled out of view', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    // The API accepts a non-admin user with no group; the manage sheet, like the create form, does
+    // not. Groups is its last section, so the inline rejection sits below the fold of a sheet the
+    // admin submits from the top of -- the submit otherwise reads as a no-op (#1472).
+    const { user } = await api.createUser({ groupIds: [] });
+
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users');
+    await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(user.username);
+    await page.getByTestId('data-table-row').dblclick();
+
+    const editSheet = page.getByTestId('admin-user-edit-sheet');
+    await editSheet.getByLabel('Email').fill(`${user.username}@example.com`);
+    await editSheet.getByRole('button', { name: 'Submit' }).click();
+
+    const submitError = page.getByTestId('admin-user-edit-error');
+    await expect(submitError).toBeVisible();
+    await expect(submitError).toContainText('must belong to at least one group');
+    await expect(editSheet).toBeVisible();
   });
 
   test('should create a user whose email was typed and then cleared', async ({ authenticateAs, page, uniqueId }) => {
@@ -217,6 +292,33 @@ test.describe('admin management', () => {
 
   test('should reject a phone number with too few digits over the API', async ({ api }) => {
     await expect(api.createUser({ phoneNumber: '123' })).rejects.toThrow(/Phone number must contain at least 7 digits/);
+  });
+
+  test('should show the permissions a user already holds when the edit sheet is first opened', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+    await api.updateUser(user.id, { additionalPermissions: [{ action: 'read', subject: 'Subject' }] });
+
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users');
+    await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(user.username);
+    await page.getByTestId('data-table-row').dblclick();
+
+    const editSheet = page.getByTestId('admin-user-edit-sheet');
+    await expect(editSheet.getByTestId('action-select-trigger')).toContainText('Read');
+    await expect(editSheet.getByTestId('subject-select-trigger')).toContainText('Subject');
+
+    // Any re-render of the sheet -- a background refetch landing, or opening this dialog and
+    // thinking better of it -- used to reset the permission field to a blank row, so saving
+    // afterwards silently cleared the permissions the admin never saw.
+    await editSheet.getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole('button', { name: 'No' }).click();
+    await expect(editSheet.getByTestId('action-select-trigger')).toContainText('Read');
+    await expect(editSheet.getByTestId('subject-select-trigger')).toContainText('Subject');
   });
 
   test("should clear a user's email from the edit sheet", async ({ api, authenticateAs, page, uniqueId }) => {

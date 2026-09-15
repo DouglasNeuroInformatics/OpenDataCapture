@@ -37,6 +37,11 @@ export class CreateUserDto implements CreateUserData {
   lastName: string;
 
   @ApiProperty({
+    description: 'Whether the user must choose a new password before they may use the app'
+  })
+  mustResetPassword?: boolean;
+
+  @ApiProperty({
     description: 'A password with an accessed strength of three or more, see https://github.com/zxcvbn-ts/zxcvbn'
   })
   password: string;

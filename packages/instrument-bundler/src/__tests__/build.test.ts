@@ -65,6 +65,15 @@ describe('build', () => {
       expect(js).toContain('/runtime/v1/react@19.x/jsx-runtime');
     });
 
+    it('should skip a binary asset when scanning inputs for the react version, rather than fail to match against it', async () => {
+      const inputs = [
+        { content: `export default { content: <div>Block</div> };`, name: 'index.tsx' },
+        { content: new Uint8Array([0, 1, 2]), name: 'icon.png' }
+      ];
+      const { js } = await build({ inputs });
+      expect(js).toContain('/runtime/v1/react@19.x/jsx-runtime');
+    });
+
     it('should refuse to guess when the source imports two versions of react', async () => {
       const inputs = [
         { content: `import '/runtime/v1/react@18.x';\nimport '/runtime/v1/react@19.x';`, name: 'index.tsx' }
@@ -105,6 +114,13 @@ describe('build', () => {
           err.cause instanceof Error &&
           err.cause.errors[0].text === 'Could not resolve "missing"'
         );
+      });
+    });
+
+    it('should describe a non-Error rejection by its type and string form, rather than assume a message property', async () => {
+      vi.spyOn(esbuild, 'build').mockRejectedValueOnce('a plain string rejection');
+      await expect(build(options)).rejects.toSatisfy((err: any) => {
+        return err.message === 'Unexpected error while invoking esbuild: string: a plain string rejection';
       });
     });
 

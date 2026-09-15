@@ -10,6 +10,7 @@ export const currentUser: CurrentUser = Object.freeze({
   groups: [],
   id: '123',
   lastName: 'Doe',
+  mustResetPassword: false,
   username: 'JaneDoe'
 });
 

@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "jsxImportSource": "/runtime/v1/react@19.x",

@@ -103,4 +103,4 @@ is exported from `src/index.ts`, and every `data-testid` it carried survived the
 | `apps/playground/AGENTS.md`             | UI in the instrument editor — its load-bearing top-level `await`s and the example-catalog directory convention                                                         |
 | `storybook/AGENTS.md`                   | Writing a story, or running the one Storybook instance                                                                                                                 |
 | `.agents/skills/odc-web-route/SKILL.md` | The change is a page under `src/routes`, its loader, or the query hook it prefetches                                                                                   |
-| `.agents/skills/odc-testing/SKILL.md`   | Placing the test — `packages/react-core` and `apps/gateway` contribute no vitest project, so a test file beside the component runs nowhere                             |
+| `.agents/skills/odc-testing/SKILL.md`   | Placing the test — `apps/gateway` contributes no vitest project, so a test file beside the component runs nowhere                                                      |

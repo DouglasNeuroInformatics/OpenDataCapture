@@ -150,11 +150,10 @@ services:
       - fullstack
       - nogateway
   playground:
+    image: ghcr.io/douglasneuroinformatics/open-data-capture-playground:${RELEASE_CHANNEL}
     build:
       context: .
       dockerfile: ./apps/playground/Dockerfile
-    environment:
-      - NODE_ENV=production
     ports:
       - '3750:80'
     restart: unless-stopped

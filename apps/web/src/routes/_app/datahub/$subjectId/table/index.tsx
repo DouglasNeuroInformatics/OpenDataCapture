@@ -68,36 +68,39 @@ const RouteComponent = () => {
           </div>
         </div>
       </div>
-      <DataTable
-        disableSearch
-        columns={[
-          {
-            accessorKey: '__date__',
-            cell: (ctx) => {
-              const value = ctx.getValue();
-              if (value instanceof Date) {
-                return toBasicISOString(value);
-              }
-              return value;
+      {/* libui's `DataTable` drops a `data-testid`, so the record table's selector goes on a
+          wrapper. The Table tab link is `subject-table-tab`. */}
+      <div data-testid="subject-table">
+        <DataTable
+          disableSearch
+          columns={[
+            {
+              accessorKey: '__date__',
+              cell: (ctx) => {
+                const value = ctx.getValue();
+                if (value instanceof Date) {
+                  return toBasicISOString(value);
+                }
+                return value;
+              },
+              header: 'DATE_COLLECTED'
             },
-            header: 'DATE_COLLECTED'
-          },
-          ...columns
-        ]}
-        data={records}
-        data-testid="subject-table"
-        rowActions={[
-          {
-            label: t('common.view'),
-            onSelect: (row) => {
-              void navigate({ params: { recordId: row.__id__ }, to: './$recordId' });
+            ...columns
+          ]}
+          data={records}
+          rowActions={[
+            {
+              label: t('common.view'),
+              onSelect: (row) => {
+                void navigate({ params: { recordId: row.__id__ }, to: './$recordId' });
+              }
             }
-          }
-        ]}
-        onRowDoubleClick={(row) => {
-          void navigate({ params: { recordId: row.__id__ }, to: './$recordId' });
-        }}
-      />
+          ]}
+          onRowDoubleClick={(row) => {
+            void navigate({ params: { recordId: row.__id__ }, to: './$recordId' });
+          }}
+        />
+      </div>
     </div>
   );
 };

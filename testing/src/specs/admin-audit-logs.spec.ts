@@ -22,11 +22,32 @@ test.describe('admin audit logs', () => {
     await ApiClient.login(apiRequestContext, { password: ADMIN.password, username: ADMIN.username });
 
     const auditLogsPage = await getPageModel('/admin/audit/logs');
-    await auditLogsPage.filterBy('Login');
+    await auditLogsPage.filterBy('action', 'Login');
 
     const firstRow = auditLogsPage.dataTable.getByTestId('data-table-row').first();
     await expect(firstRow).toContainText('Login');
     await expect(firstRow).toContainText('User');
+  });
+
+  test('should show the chosen option on its filter button and put it in the URL', async ({ getPageModel }) => {
+    const auditLogsPage = await getPageModel('/admin/audit/logs');
+    await auditLogsPage.filterBy('entity', 'Session');
+
+    await expect(auditLogsPage.filterButton('entity')).toContainText('Session');
+    await expect(auditLogsPage.$ref).toHaveURL(/entity=SESSION/);
+  });
+
+  test('should clear every filter at once', async ({ getPageModel }) => {
+    const auditLogsPage = await getPageModel('/admin/audit/logs');
+    await expect(auditLogsPage.clearFiltersButton).toBeHidden();
+
+    await auditLogsPage.filterBy('action', 'Login');
+    await auditLogsPage.filterBy('entity', 'User');
+    await auditLogsPage.clearFiltersButton.click();
+
+    await expect(auditLogsPage.clearFiltersButton).toBeHidden();
+    await expect(auditLogsPage.$ref).not.toHaveURL(/action=|entity=/);
+    await expect(auditLogsPage.filterButton('action')).toHaveText('Action');
   });
 
   test('should download the audit logs as JSON', async ({ getPageModel }) => {

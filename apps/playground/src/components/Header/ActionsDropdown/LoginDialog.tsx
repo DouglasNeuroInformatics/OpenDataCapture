@@ -122,8 +122,8 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
           <Dialog.Title>{t({ en: 'Login', fr: 'Connexion' })}</Dialog.Title>
           <Dialog.Description>
             {t({
-              en: 'Login to your Open Data Capture instance. A special access token is used that grants permissions to create instruments only. You must have permission to create instruments to use this functionality.',
-              fr: "Connectez-vous à votre instance Open Data Capture. Un jeton d'accès spécial est utilisé pour accorder l'autorisation de créer uniquement des instruments. Vous devez avoir la permission de créer des instruments pour utiliser cette fonctionnalité."
+              en: 'Login to your Open Data Capture instance. A special access token is used that grants permissions over instruments only. You must have permission to manage instruments to use this functionality.',
+              fr: "Connectez-vous à votre instance Open Data Capture. Un jeton d'accès spécial est utilisé pour accorder des autorisations portant uniquement sur les instruments. Vous devez avoir la permission de gérer les instruments pour utiliser cette fonctionnalité."
             })}
           </Dialog.Description>
           <div className="mt-2 flex items-center gap-1 text-sm font-medium">
