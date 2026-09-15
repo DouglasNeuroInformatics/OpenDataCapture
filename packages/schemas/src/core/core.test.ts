@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { $Json, $LicenseIdentifier, $RegexString, toInstrumentAuthoringLanguage } from './core.js';
+import {
+  $Json,
+  $LicenseIdentifier,
+  $RegexString,
+  resolveActiveLanguage,
+  toInstrumentAuthoringLanguage
+} from './core.js';
 
 describe('$Json', () => {
   it('should accept a value nesting arrays and records of JSON literals', () => {
@@ -8,6 +14,20 @@ describe('$Json', () => {
   });
   it('should reject a value containing a function', () => {
     expect($Json.safeParse({ a: () => null }).success).toBe(false);
+  });
+});
+
+describe('resolveActiveLanguage', () => {
+  it('should keep a reader on their language while the instance still offers it', () => {
+    expect(resolveActiveLanguage('fr', ['en', 'fr'])).toBe('fr');
+  });
+
+  it('should move a reader off a deactivated language, which the toggle no longer offers a way out of', () => {
+    expect(resolveActiveLanguage('es', ['en', 'fr'])).toBe('en');
+  });
+
+  it('should fall back to the first offered language, so the result does not depend on click order', () => {
+    expect(resolveActiveLanguage('en', ['fr', 'es'])).toBe('fr');
   });
 });
 

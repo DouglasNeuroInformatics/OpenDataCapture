@@ -5,6 +5,7 @@ import { setupStateQueryOptions } from '@/hooks/useSetupStateQuery';
 import { DisclaimerProvider } from '@/providers/DisclaimerProvider';
 import { ForceClearQueryCacheProvider } from '@/providers/ForceClearQueryCacheProvider';
 import { WalkthroughProvider } from '@/providers/WalkthroughProvider';
+import { reconcileInterfaceLanguage } from '@/services/i18n';
 import { useAppStore } from '@/store';
 
 export const Route = createFileRoute('/_app')({
@@ -23,6 +24,8 @@ export const Route = createFileRoute('/_app')({
     if (currentUser?.mustResetPassword) {
       throw redirect({ to: '/auth/reset-password' });
     }
+    // Before the tree renders, so no component has to be told after the fact.
+    reconcileInterfaceLanguage(setupState.activeLanguages);
   },
   component: () => {
     return (
