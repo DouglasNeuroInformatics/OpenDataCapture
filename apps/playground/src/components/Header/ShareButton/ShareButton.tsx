@@ -50,7 +50,7 @@ export const ShareButton = () => {
             <Share2Icon />
           </Tooltip.Trigger>
         </Popover.Trigger>
-        <Popover.Content align="end" className="w-[520px] p-4">
+        <Popover.Content align="end" autofocus={false} className="w-[520px] p-4">
           <div className="flex flex-col space-y-2 text-center sm:text-left">
             <Heading variant="h5">{t({ en: 'Share Instrument', fr: "Partager l'instrument" })}</Heading>
             <p className="text-muted-foreground text-sm">
@@ -66,24 +66,15 @@ export const ShareButton = () => {
               <Label className="text-sm font-normal" htmlFor="readonly-fullscreen">
                 {t({ en: 'Preview Mode', fr: 'Mode aperçu' })}
               </Label>
-              <Tooltip>
-                <Tooltip.Trigger
-                  className="text-muted-foreground h-auto w-auto cursor-help p-0"
-                  size="icon"
-                  type="button"
-                  variant="ghost"
-                >
-                  <CircleHelpIcon className="h-4 w-4" />
-                </Tooltip.Trigger>
-                <Tooltip.Content className="max-w-60" side="top">
-                  <p>
-                    {t({
-                      en: 'Anyone with the link opens the instrument fullscreen as a preview they can try, with no editor and no ability to make changes.',
-                      fr: "Toute personne disposant du lien ouvre l'instrument en plein écran comme un aperçu qu'elle peut essayer, sans éditeur ni possibilité de le modifier."
-                    })}
-                  </p>
-                </Tooltip.Content>
-              </Tooltip>
+              <span className="group/help relative inline-flex cursor-help">
+                <CircleHelpIcon className="text-muted-foreground h-4 w-4" />
+                <span className="bg-popover text-popover-foreground pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden w-60 -translate-x-1/2 rounded-md border px-3 py-1.5 text-sm shadow-md group-hover/help:block">
+                  {t({
+                    en: 'Anyone with the link opens the instrument fullscreen as a preview they can try, with no editor and no ability to make changes.',
+                    fr: "Toute personne disposant du lien ouvre l'instrument en plein écran comme un aperçu qu'elle peut essayer, sans éditeur ni possibilité de le modifier."
+                  })}
+                </span>
+              </span>
             </div>
             <button
               aria-checked={isFullscreen}
