@@ -1,8 +1,8 @@
 # apps/playground
 
 The in-browser instrument editor at `playground.opendatacapture.org`. Monaco + esbuild-wasm + a live
-preview, built by Vite into a static `dist/` that is served by a plain file server (see the
-`Dockerfile` and the `deploy` script). Nothing on the server side belongs to it.
+preview, built by Vite into a static `dist/` that is served by Caddy (see the `Dockerfile`, `Caddyfile` and
+the `deploy` script). Nothing on the server side belongs to it; the image carries no Node.
 
 Read the root `AGENTS.md` first for the rules that apply everywhere.
 
