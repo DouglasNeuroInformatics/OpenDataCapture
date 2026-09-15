@@ -22,8 +22,12 @@ describe('encodeShareURL', () => {
   it('encodes against the hosted playground by default', () => {
     const url = encodeShareURL(instrument);
     expect(url.origin).toBe(DEFAULT_PLAYGROUND_URL);
-    expect(url.searchParams.get('files')).toBeTruthy();
-    expect(url.searchParams.get('label')).toBeTruthy();
+  });
+
+  it('should carry the payload in the fragment, so it is never sent to the server', () => {
+    const url = encodeShareURL({ ...instrument, fullscreen: true });
+    expect(url.search).toBe('');
+    expect(url.hash).toMatch(/files=.+&label=.+&fullscreen=1/);
   });
 
   it('honours a custom base URL', () => {
@@ -46,6 +50,19 @@ describe('decodeShareURL', () => {
   it('round-trips an encoded instrument', () => {
     const decoded = decodeShareURL(encodeShareURL(instrument));
     expect(decoded).toEqual(instrument);
+  });
+
+  it('should round-trip an instrument larger than a server header limit', () => {
+    const content = Array.from({ length: 5000 }, () => crypto.randomUUID()).join('\n');
+    const largeInstrument = { ...instrument, files: [{ content, name: 'index.ts' }] };
+    expect(decodeShareURL(encodeShareURL(largeInstrument))).toEqual(largeInstrument);
+  });
+
+  it('should still decode a query string link, so links shared before the fragment format keep working', () => {
+    const url = new URL(DEFAULT_PLAYGROUND_URL);
+    url.search = encodeShareURL({ ...instrument, fullscreen: true }).hash.slice(1);
+    expect(decodeShareURL(url)).toEqual(instrument);
+    expect(isFullscreenShareURL(url)).toBe(true);
   });
 
   it('returns null when no instrument is present', () => {

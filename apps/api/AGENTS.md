@@ -45,6 +45,14 @@ src/<feature>/
 
 There is no repository layer and no `entity/` folder — `Model<'X'>` _is_ the repository.
 
+**A single-segment route can be shadowed by a `:param` route on the same verb.** `perfectionist/sort-classes`
+is an eslint error, so `eslint --fix` orders controller handlers alphabetically — a handler you wrote
+above `@Get(':id')` does not stay there. Anything that sorts below it, such as a hypothetical
+`@Get('summary')` in `users.controller.ts`, is matched by `:id` instead, and the failure is a
+confusing 404 or cast error rather than a lint or type failure. Give such a route two segments so
+matching cannot depend on declaration order at all — `@Get('/check-username/:username')` is safe for
+exactly that reason.
+
 **A new module must be added to the `imports` array in `src/main.ts`** or its routes will not exist.
 Modules can be imported conditionally with `{ module: XModule, when: 'SOME_BOOLEAN_ENV_KEY' }`.
 
@@ -94,6 +102,15 @@ see `findInstrumentIdsBySubject` in `src/instruments/instruments.service.ts`.
 Granting a new `action`/`subject` pair means editing `src/auth/ability.factory.ts` and adding tests
 for **both** the allow and the deny case — see `src/auth/__tests__/ability.factory.test.ts`.
 
+`createForPayload` returns early, before the `basePermissionLevel` switch and before
+`additionalPermissions`, for a user whose token carries `mustResetPassword` — their only rule is
+`read User` conditioned on their own id, which is what `updateSelfById` is gated on. That is how
+"must reset before using the app" is enforced: as a permission set rather than as a guard holding an
+allowlist of exempt routes, so a route added later is refused without anyone remembering to refuse
+it. Note the two halves above apply in full: routes naming another subject 403 at the guard, while
+the four routes gated on `read User` still **pass** the guard — a conditional rule satisfies a
+subject-type check — and are confined instead by `accessibleQuery` applying the condition.
+
 CASL subjects are derived automatically from the Prisma `TypeMap`, so every model is a subject
 without you doing anything. But the subjects a user can be _granted_ through `additionalPermissions`
 come from **two hand-maintained lists that must agree with each other**: `enum AppSubject` in
@@ -122,8 +139,26 @@ or `ValidObjectIdPipe` explicitly — see `src/audit/audit.controller.ts` and
 
 ## Prisma / database
 
-Provider is **MongoDB, so there are no migrations** — `prisma db push` only, and nothing to check in
-after a schema change beyond `schema.prisma` itself.
+Provider is **MongoDB, so there are no migrations**. Nothing is checked in after a schema change
+beyond `schema.prisma` itself, and **nothing in this app runs `prisma db push`**. This workspace
+defines no `db:push` script, so the `db:push` that `dev`, `dev:test`, `lint` and `test:e2e` depend on
+resolves to nothing here; the only workspace that owns one is `apps/gateway`, whose datasource is
+SQLite. The Dockerfile only builds.
+
+**Indexes are created at startup instead**, by `ensureDatabaseIndexes` in `src/core/prisma.ts`,
+which the client factory awaits after `$connect()`. MongoDB creates a collection on first insert
+with only its `_id_` index, so without that step a deployed instance scans whole collections and
+enforces none of the schema's unique constraints. Adding an index means editing **both**
+`schema.prisma` and `DATABASE_INDEXES`, which
+`src/core/__tests__/prisma.spec.ts` asserts agree — `db push` drops any index the schema
+does not declare, and a runtime-only index would not survive one.
+
+**Do not point `prisma db push` at a database this application uses.** `InstrumentRecord.assignmentId`
+is optional but must carry `@unique`, because Prisma requires it on the defining side of the 1:1
+relation to `Assignment`. `db push` builds that index non-sparse, MongoDB indexes a missing field as
+null, and the second record collected outside a remote assignment is then rejected with a duplicate
+key error. `ensureDatabaseIndexes` creates it sparse and replaces a non-sparse one it finds, so an
+instance recovers on its next boot — but the push is still what broke it.
 
 `datasource db { url = env("_") }` in `apps/api/prisma/schema.prisma` is **deliberate**; the real
 connection string is built at runtime in `src/core/prisma.ts`. Do not "fix" it.
@@ -157,14 +192,45 @@ Adding a variable touches several files that must agree — follow
 
 ## Tests
 
-`pnpm exec vitest --project api`. These are **unit tests with a mocked Prisma layer**; there are no
-integration tests in the suite.
+`pnpm exec vitest --project api` runs two kinds of test, both in the `api` project.
 
+**Unit tests** — `src/**/*.spec.ts`, the bulk of the suite — mock the Prisma layer.
 `src/groups/__tests__/groups.service.spec.ts` is the canonical example. Build a testing module with
 `MockFactory.createForModelToken(getModelToken('Group'))` from
 `@douglasneuroinformatics/libnest/testing`, type mocks as `MockedInstance<Model<'Group'>>`, and
 assert Prisma arguments with `model.create.mock.lastCall?.[0]` and `toMatchObject`. A fresh module is
 compiled per test, so there is no shared mock state to reset.
+
+**Integration tests** — `test/**/*.test.ts` — boot the real application against a real database.
+`test/app.test.ts` is the only entry point: it imports every file in `test/suites/` in filename
+order and runs it, so a numeric prefix is how a suite declares it must run after another. A suite is
+a `defineSuite(name, function () { ... })` default export (`test/helpers.ts`) whose body reaches the
+booted app as `this.app` and drives it with fastify's `app.inject`.
+
+`test/helpers.ts` boots `appContainer.createApplicationInstance()` — the instance `src/main.ts`
+exports, so the suite exercises the real wiring, URI versioning (routes live under `/v1`) and docs
+rather than a module list assembled for tests. The fixture is file-scoped: one boot and one database
+per file. Three consequences worth knowing:
+
+- **`NODE_ENV` is `test` under vitest**, which is the whole database story — `PrismaModuleOptionsFactory`
+  starts a `mongodb-memory-server` replica set instead of dialing `MONGO_URI`, and `app.close()`
+  stops it via `onApplicationShutdown`. Nothing in the test sets a connection string.
+- **`__RELEASE__` must be stubbed.** `libnest build` replaces it with a literal, so under vitest the
+  identifier is undefined and any route reading it (`GET /v1/setup`) throws a `ReferenceError`.
+  `test/helpers.ts` stubs it once for every suite; a unit spec touching that path stubs its own.
+- **The OpenAPI document is built before `enableVersioning`**, so paths in `/spec.json` carry no
+  `/v1` prefix even though the live routes do.
+- **`GatewaySynchronizer` leaks a timer into the suite.** Its `onApplicationBootstrap` calls
+  `setInterval` without storing the handle, and `app.close()` cannot clear it. Nothing breaks while a
+  file finishes inside `GATEWAY_REFRESH_INTERVAL`; a longer one fires `sync()` mid-run, whose
+  database call may land after the replica set is stopped. Fix it at the source — store the handle
+  and clear it in `onApplicationShutdown` — rather than disabling `GATEWAY_ENABLED` for tests, which
+  would drop `GatewayModule`'s `forwardRef` circular dependency out of exactly the wiring these tests
+  exist to check.
+
+Provider overrides are deliberately not offered — nothing needs one yet. Adding them means
+`Test.createTestingModule({ imports: [appContainer.module] })`, which also means reproducing
+`configureApp`; export it from libnest rather than copying it here.
 
 The `apps/api/vitest.config.ts` `libnest` plugin is required — it applies the SWC decorator
 transforms, without which `@Injectable`/`@Body` metadata does not exist at runtime.

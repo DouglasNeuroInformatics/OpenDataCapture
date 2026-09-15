@@ -43,5 +43,5 @@ nowhere — not by the class, not by any consumer. It is dead; do not build on i
 `src/__tests__/index.test.ts` drives `interpret()` over hand-written bundles — a bundle is an async
 IIFE that resolves to the instrument, so a fixture is one that returns a plain object — and
 `src/__tests__/imports.test.ts` covers `findReactImport` against the specifiers a built bundle
-actually carries. There is still no project in `packages/react-core`, so `useInterpretedInstrument`
-is covered only by the Playwright suite in `testing/`.
+actually carries. `useInterpretedInstrument`, this package's other caller, is covered by
+`pnpm exec vitest --project react-core` and by the Playwright suite in `testing/`.

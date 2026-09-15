@@ -598,6 +598,9 @@ export default defineInstrument({
     en: ['Demographics'],
     fr: ['Démographie']
   },
+  // This questionnaire is long enough that a subject who realises they have been answering for the
+  // wrong person is better served starting over than clearing twenty fields by hand.
+  resetButton: true,
   content: [
     {
       fields: {

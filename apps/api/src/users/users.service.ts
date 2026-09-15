@@ -64,6 +64,7 @@ export class UsersService {
       firstName,
       groupIds,
       lastName,
+      mustResetPassword,
       password,
       phoneNumber,
       sex,
@@ -100,6 +101,7 @@ export class UsersService {
         },
         hashedPassword,
         lastName,
+        mustResetPassword,
         phoneNumber,
         sex,
         username: username
@@ -202,14 +204,12 @@ export class UsersService {
       throw new ForbiddenException();
     }
 
-    if (password) {
-      await this.validatePassword(password, currentUser.username);
-    }
-
     const { dateOfBirth, email, firstName, lastName, phoneNumber, sex } = data;
 
     let hashedPassword: string | undefined;
     if (password) {
+      await this.validatePassword(password, currentUser.username);
+      await this.validatePasswordIsNew(id, password);
       hashedPassword = await this.cryptoService.hashPassword(password);
     }
 
@@ -220,6 +220,9 @@ export class UsersService {
         firstName,
         hashedPassword,
         lastName,
+        // Choosing one's own password is the only thing that lifts a forced reset, so this is keyed
+        // on the password having changed rather than on anything the caller asked for.
+        mustResetPassword: password ? false : undefined,
         phoneNumber,
         sex
       },
@@ -263,6 +266,20 @@ export class UsersService {
         'PASSWORD_IN_DATA_BREACH',
         'Password has appeared in a known data breach and cannot be used'
       );
+    }
+  }
+
+  /**
+   * Reject a password the account already has. Without this a user could satisfy a forced reset by
+   * re-entering the very password it exists to replace, leaving it known to whoever issued it.
+   */
+  private async validatePasswordIsNew(id: string, password: string): Promise<void> {
+    const user = await this.userModel.findFirst({ omit: { hashedPassword: false }, where: { id } });
+    if (!user) {
+      throw new NotFoundException(`Failed to find user with ID: ${id}`);
+    }
+    if (await this.cryptoService.comparePassword(password, user.hashedPassword)) {
+      throw this.passwordError('PASSWORD_MATCHES_CURRENT', 'Password must not be the same as the current password');
     }
   }
 }

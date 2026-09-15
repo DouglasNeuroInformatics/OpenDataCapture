@@ -16,7 +16,7 @@ it. Read the `AGENTS.md` in a directory before editing it; this file only says w
 - **Versions are pinned in the `catalog:` block of `pnpm-workspace.yaml`.** A dependency entry says
   `"catalog:"`, never a literal version.
 - `tsc` in every `lint` script is a **typecheck only** — `noEmit: true` comes from
-  `@douglasneuroinformatics/tsconfig` via `tsconfig.base.json`. Nothing is emitted by `pnpm lint`.
+  `@douglasneuroinformatics/tsconfig` via `tsconfig.json`. Nothing is emitted by `pnpm lint`.
 
 ## Apps — `apps/*`
 
@@ -48,14 +48,14 @@ Nothing depends on an app. All five are leaves.
 | `instrument-utils`       | Helpers for working with instrument definitions                                      | no                                                           | `instrument-utils`       | api, react-core, web                                                                                                                      |
 | `licenses`               | SPDX + custom license metadata                                                       | no                                                           | none                     | outreach, react-core, runtime-core, runtime-v1, schemas, web                                                                              |
 | `playground-url`         | Encodes/decodes shareable playground URLs and editor file state                      | `dist` holds the `bin` only; the `.` export is still source  | `playground-url`         | playground                                                                                                                                |
-| `react-core`             | React components/hooks shared by more than one frontend                              | no                                                           | none                     | gateway, playground, serve-instrument, storybook, web                                                                                     |
+| `react-core`             | React components/hooks shared by more than one frontend                              | no                                                           | `react-core`             | gateway, playground, serve-instrument, storybook, web                                                                                     |
 | `release-info`           | Resolves version/branch/commit at build time                                         | no                                                           | `release-info`           | api, gateway, web                                                                                                                         |
 | `runtime-bundler`        | Bundles the instrument **runtime**; provides the `runtime-bundler` bin               | no                                                           | `runtime-bundler`        | runtime-v1                                                                                                                                |
 | `runtime-core`           | Public runtime API (`defineInstrument`, i18n, notifications)                         | **yes** — `tsc -b` → `lib`, esbuild + api-extractor → `dist` | none                     | api, gateway, instrument-interpreter, instrument-stubs, instrument-utils, outreach, playground, react-core, runtime-v1, schemas, web      |
-| `runtime-internal`       | Internal runtime execution primitives (interactive-task iframe/worker bootstrap)     | no                                                           | none                     | instrument-bundler, instrument-interpreter, react-core, runtime-v1, serve-instrument, subject-utils                                       |
+| `runtime-internal`       | Internal runtime execution primitives (interactive-task iframe/worker bootstrap)     | no                                                           | `runtime-internal`       | instrument-bundler, instrument-interpreter, react-core, runtime-v1, serve-instrument, subject-utils                                       |
 | `runtime-meta`           | Runtime version list and per-version asset manifest types                            | no                                                           | `runtime-meta`           | outreach, serve-instrument, vite-plugin-runtime                                                                                           |
 | `schemas`                | Zod schemas/types shared across tiers, one export per domain                         | no                                                           | `schemas`                | api, demo, gateway, instrument-interpreter, instrument-utils, outreach, playground, react-core, release-info, subject-utils, testing, web |
-| `serve-instrument`       | CLI/server for previewing one instrument outside the full app                        | **yes** — esbuild → `dist/cli.js` (the `bin`)                | none                     | nothing (published for external use)                                                                                                      |
+| `serve-instrument`       | CLI/server for previewing one instrument outside the full app                        | **yes** — esbuild → `dist/cli.js` (the `bin`)                | `serve-instrument`       | nothing (published for external use)                                                                                                      |
 | `subject-utils`          | Subject identification (deriving/hashing clinical subject IDs)                       | no                                                           | `subject-utils`          | api, react-core, web                                                                                                                      |
 | `vite-plugin-runtime`    | Vite plugin wiring the instrument runtime into an app build                          | no                                                           | `vite-plugin-runtime`    | gateway, playground, storybook, web                                                                                                       |
 
@@ -116,7 +116,7 @@ publishable when it is **not private and declares `publishConfig`**. There is no
 Cutting one: `.agents/docs/playbooks/cut-a-release.md`.
 
 `instrument-bundler`, `instrument-guidelines`, `playground-url`, `runtime-v1`, `serve-instrument` —
-all versioned together (`2.1.4` at time of writing, bumped by `scripts/increment-version.sh`; the
+all versioned together (`2.1.4` at time of writing, bumped by `scripts/increment-version.ts`; the
 root `package.json` version can run ahead of them). Everything else is `0.0.0` and internal.
 
 ## `vendor/`
@@ -131,7 +131,7 @@ library that instruments may import — `react@18.x`, `react@19.x`, `jspsych@7.x
 - Each wrapper's `exports` point at hand-written files under its own `src/` — usually `index.js` +
   `index.d.ts` re-exporting the real dependency by name, sometimes only a stylesheet
   (`normalize.css@8.x`).
-- **`vendor/**/\*`is excluded from`tsconfig.base.json`,\*\* so these are not typechecked with the rest
+- **`vendor/**/\*`is excluded from`tsconfig.json`,\*\* so these are not typechecked with the rest
   of the repo.
 - `runtime/v1` depends on all of them as `devDependencies` and is what turns them into the
   published runtime; many other workspaces alias individual wrappers under the real name
@@ -147,4 +147,4 @@ Adding one: `.agents/docs/playbooks/add-vendor-package.md`.
 | `docs/`    | User documentation, `docs/en` and `docs/fr`. **Symlinked into `apps/outreach/src/content/docs/{en,fr}/docs`** and rendered by Astro Starlight — edit here, not in `apps/outreach`.                                                                                 |
 | `blog/`    | Blog posts, flat `.md`. **Symlinked to `apps/outreach/src/content/blog`.** Frontmatter is validated by the `blog` collection schema in `apps/outreach/src/content/config.ts`, whose `author` field is a `reference('team')` into `apps/outreach/src/content/team`. |
 | `.agents/` | Agent-facing documentation (`.agents/docs`) and skills (`.agents/skills`). Not shipped, not linted.                                                                                                                                                                |
-| `scripts/` | Repo shell scripts invoked by root `package.json` — `generate-env.sh`, `list-publishable.sh`, `increment-version.sh`, `publish.sh`, `workspace.sh` and others.                                                                                                     |
+| `scripts/` | Repo scripts invoked by root `package.json` or by path — `generate-env.sh`, `list-publishable.sh`, `increment-version.ts`, `changelog.ts` (the generator it runs), `publish.sh`, `workspace.sh` and others. No tests, by decision.                                 |

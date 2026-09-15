@@ -2,7 +2,7 @@
 
 Generate shareable [Open Data Capture playground](https://playground.opendatacapture.org) links from instrument source files.
 
-A playground link embeds a snapshot of an instrument's source files directly in the URL (lz-string compressed). Anyone who opens the link gets that instrument loaded into the playground — no server or account required.
+A playground link embeds a snapshot of an instrument's source files directly in the URL fragment (lz-string compressed), which the browser never sends to the server, so link size is not bound by server header limits. Anyone who opens the link gets that instrument loaded into the playground — no server or account required.
 
 ## Library
 
@@ -13,7 +13,7 @@ const url = generatePlaygroundURL({
   files: [{ name: 'index.ts', content: 'export default { /* ... */ };' }],
   label: 'My Instrument'
 });
-// => https://playground.opendatacapture.org/?files=...&label=...
+// => https://playground.opendatacapture.org/#files=...&label=...
 ```
 
 | Export                           | Description                                                 |

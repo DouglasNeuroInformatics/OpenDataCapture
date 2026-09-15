@@ -1,7 +1,7 @@
 import type { FormInstrument, Language } from '@opendatacapture/runtime-core';
 import { describe, expect, it } from 'vitest';
 
-import { getFormFields } from '../form.js';
+import { extractFieldLabel, getFormFields } from '../form.js';
 
 type TData = { a: number; b: number };
 
@@ -27,5 +27,41 @@ describe('getFormFields', () => {
       { fields: { b: fieldB } }
     ];
     expect(getFormFields(content)).toEqual({ a: fieldA, b: fieldB });
+  });
+});
+
+describe('extractFieldLabel', () => {
+  const form = { content: { a: fieldA } } as unknown as FormInstrument<TData, Language>;
+
+  it("should return a static field's label directly", () => {
+    expect(extractFieldLabel<TData>(form, 'a')).toBe('A');
+  });
+
+  it("should call a dynamic field's render function with the given data and return its label", () => {
+    const dynamicForm = {
+      content: {
+        a: {
+          deps: [],
+          kind: 'dynamic',
+          render: (data: { a?: number }) => (data?.a ? { kind: 'number', label: 'Dynamic A', variant: 'input' } : null)
+        }
+      }
+    } as unknown as FormInstrument<TData, Language>;
+
+    expect(extractFieldLabel<TData>(dynamicForm, 'a', { a: 1, b: 2 })).toBe('Dynamic A');
+  });
+
+  it("should return undefined when a dynamic field's render function returns null for the given data", () => {
+    const dynamicForm = {
+      content: {
+        a: {
+          deps: [],
+          kind: 'dynamic',
+          render: () => null
+        }
+      }
+    } as unknown as FormInstrument<TData, Language>;
+
+    expect(extractFieldLabel<TData>(dynamicForm, 'a', { a: 1, b: 2 })).toBeUndefined();
   });
 });

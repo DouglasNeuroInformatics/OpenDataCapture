@@ -34,6 +34,7 @@ function logError(message: string): void {
 
 class InstrumentLoader {
   private encodedBundle: null | string;
+  private readonly watcher: fs.FSWatcher;
 
   constructor(
     private readonly target: string,
@@ -41,10 +42,14 @@ class InstrumentLoader {
     private readonly verbose: boolean
   ) {
     this.encodedBundle = null;
-    fs.watch(target, { recursive: false }, () => {
+    this.watcher = fs.watch(target, { recursive: false }, () => {
       log(chalk.yellow('↺') + chalk.dim(` [${this.label}] File changed, rebuilding...`));
       void this.updateEncodedBundle();
     });
+  }
+
+  close(): void {
+    this.watcher.close();
   }
 
   async getEncodedBundle(): Promise<null | string> {
@@ -94,6 +99,12 @@ class InstrumentLoaderMap {
     private readonly verbose: boolean
   ) {}
 
+  close(): void {
+    for (const loader of this.loaders.values()) {
+      loader.close();
+    }
+  }
+
   async getEncodedBundle(type: string, name: string): Promise<null | string> {
     const loader = this.loaders.get(`${type}/${name}`);
     if (!loader) {
@@ -138,6 +149,10 @@ class SingleModeHandler {
     this.instrumentLoader = params.instrumentLoader;
     this.runtimeMetadata = params.runtimeMetadata;
     this.verbose = params.verbose;
+  }
+
+  close(): void {
+    this.instrumentLoader.close();
   }
 
   async handle(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
@@ -201,6 +216,10 @@ class AllModeHandler {
     this.loaderMap = params.loaderMap;
     this.runtimeMetadata = params.runtimeMetadata;
     this.verbose = params.verbose;
+  }
+
+  close(): void {
+    this.loaderMap.close();
   }
 
   async handle(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
@@ -344,6 +363,7 @@ export class Server {
   }
 
   async stop(): Promise<void> {
+    this.handler.close();
     return new Promise((resolve, reject) => {
       this.server.close((err) => {
         if (err) {

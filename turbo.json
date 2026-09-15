@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [".env", "eslint.config.js", "tsconfig.base.json", "prettier.config.js"],
+  "globalDependencies": [".env", "eslint.config.js", "tsconfig.json", "prettier.config.js"],
   "globalEnv": ["NODE_ENV", "NODE_OPTIONS", "RELEASE_VERSION"],
   "tasks": {
     // A package-scoped task replaces the generic one rather than merging with it,
@@ -41,6 +41,7 @@
     "lint": {
       "dependsOn": ["^build", "^db:generate", "db:push"]
     },
+    "//#lint:root": {},
     "test:e2e": {
       "dependsOn": ["^build", "^db:generate", "db:push"]
     },

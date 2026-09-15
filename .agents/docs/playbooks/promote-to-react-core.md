@@ -90,12 +90,12 @@ so nothing that passed lint in `apps/web` fails on style here; what breaks is re
    Carry every `data-testid` across unchanged, or the existing spec stops selecting it
    (`.agents/docs/playbooks/add-e2e-test.md`).
 
-10. **Place the tests.** `packages/react-core` contributes no vitest project, so a test file left beside
-    the component is collected by nothing and reported by nothing
-    (`.agents/skills/odc-testing/SKILL.md`). Either keep the unit test in the origin app's suite
-    (`pnpm exec vitest --project web`) importing the component from `@opendatacapture/react-core`, or
-    give react-core its own project first: `.agents/docs/playbooks/add-vitest-project.md`. The
-    end-to-end test is `.agents/docs/playbooks/add-e2e-test.md`.
+10. **Place the tests.** `packages/react-core` has its own vitest project
+    (`pnpm exec vitest --project react-core`, `happy-dom`), so a test may move with the component —
+    see that package's `AGENTS.md` §Tests for what the environment does and does not supply. Keeping
+    it in the origin app's suite (`pnpm exec vitest --project web`), importing the component from
+    `@opendatacapture/react-core`, is equally valid. The end-to-end test is
+    `.agents/docs/playbooks/add-e2e-test.md`.
 
 ## Verify
 

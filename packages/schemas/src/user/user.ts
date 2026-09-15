@@ -50,7 +50,8 @@ export type BasePermissionLevel = z.infer<typeof $BasePermissionLevel>;
 export const PASSWORD_ERROR_CODES = [
   'INSUFFICIENT_PASSWORD_STRENGTH',
   'PASSWORD_MATCHES_USERNAME',
-  'PASSWORD_IN_DATA_BREACH'
+  'PASSWORD_IN_DATA_BREACH',
+  'PASSWORD_MATCHES_CURRENT'
 ] as const;
 
 export type PasswordErrorCode = (typeof PASSWORD_ERROR_CODES)[number];
@@ -65,6 +66,12 @@ export const $User = $BaseModel.extend({
   firstName: z.string().min(1),
   groupIds: z.array(z.string()),
   lastName: z.string().min(1),
+  /**
+   * Whether this user must choose a new password before they may use the app. Set when an
+   * administrator generates a password on their behalf, and cleared the moment the user sets one
+   * themselves. Nullish because it postdates the users already in the database.
+   */
+  mustResetPassword: z.boolean().nullish(),
   // Not `$PhoneNumber`: this is the read model, which must still parse numbers stored before the
   // digit minimum existed. The rule is enforced on the write schemas below.
   phoneNumber: z.string().nullish(),
@@ -89,6 +96,7 @@ export const $CreateUserData = $User
     dateOfBirth: z.coerce.date().optional(),
     disabled: z.boolean().optional(),
     email: z.email().optional(),
+    mustResetPassword: z.boolean().optional(),
     password: z.string().min(1),
     phoneNumber: $PhoneNumber.optional(),
     sex: $Sex.optional()

@@ -26,9 +26,14 @@ it; a missing or `v`-prefixed value fails the build.
 The root `package.json` is located as `../../../package.json` relative to `src/`, so this package
 only works from its current path inside the workspace.
 
+**Both `parseAsync` calls must be `return await`, not `return`.** A bare `return` hands the promise
+back to the caller before it rejects, so the `catch` never runs and a raw `ZodError` escapes instead
+of the `Failed to parse release info for environment '<env>'` message that names the misconfigured
+variable. The two production tests assert on that message specifically, to keep the `await` there.
+
 ## Tests
 
-`pnpm exec vitest --project release-info`, in `src/__tests__/index.test.ts`. Only the production
-branch actually runs: the development block is written `describe.skipIf(() => process.env.CI)`, and
-because a function is always truthy that block is skipped everywhere, not just in CI. Treat the
-git-dependent path as untested.
+`pnpm exec vitest --project release-info`, in `src/__tests__/index.test.ts`. Both branches run: the
+development block mocks `child_process` through the `nodejs.util.promisify.custom` symbol, which has
+to be in place before the first import because `index.ts` captures `util.promisify(cp.exec)` at
+module load.

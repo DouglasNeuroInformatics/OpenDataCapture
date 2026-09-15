@@ -10,7 +10,7 @@ Versions are pinned in the `catalog:` block of `pnpm-workspace.yaml`, except the
 | --------------------- | ----------------------------------------------------- | ------------------------------- | ---------------------------------------------------- |
 | eslint-config         | ESLint flat-config factory for DNP TS/JS projects     | `eslint.config.js` (root)       | [eslint-config.md](eslint-config.md)                 |
 | prettier-config       | Prettier config factory + pre-commit binary           | `prettier.config.js` (root)     | [prettier-config.md](prettier-config.md)             |
-| tsconfig              | Shared `tsconfig.json` base                           | `tsconfig.base.json` (root)     | [tsconfig.md](tsconfig.md)                           |
+| tsconfig              | Shared `tsconfig.json` base                           | `tsconfig.json` (root)          | [tsconfig.md](tsconfig.md)                           |
 | esbuild-plugin-prisma | Copies the Prisma query engine into an esbuild outdir | `apps/gateway/scripts/build.ts` | [esbuild-plugin-prisma.md](esbuild-plugin-prisma.md) |
 
 ### Utilities & single-purpose libraries

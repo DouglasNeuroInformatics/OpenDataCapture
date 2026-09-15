@@ -93,6 +93,13 @@ describe('Resolver', () => {
         message: expect.stringContaining('cannot be empty object')
       });
     });
+
+    it('should fail to import a package where the specified package.json has no string name', async () => {
+      vi.spyOn(fs.promises, 'readFile').mockResolvedValueOnce(JSON.stringify({ exports: { '.': './index.js' } }));
+      await expect(resolver.resolve(PACKAGE_STUB.name)).rejects.toMatchObject({
+        message: expect.stringContaining(`property 'name' in file '${packageJsonPath}' - expected string`)
+      });
+    });
   });
 
   describe('invalid exports', () => {
@@ -191,6 +198,61 @@ describe('Resolver', () => {
           message: expect.stringContaining(`file '${abspath}' does not exist`)
         });
       });
+    });
+
+    it('should fail when an export path resolves to a directory rather than a file', async () => {
+      const relpath = './src';
+      const abspath = path.join(packageRoot, relpath + '.js');
+      vi.spyOn(fs, 'existsSync').mockReturnValueOnce(true).mockReturnValueOnce(true);
+      vi.spyOn(fs, 'lstatSync')
+        .mockReturnValueOnce({ isFile: () => true } as any)
+        .mockReturnValueOnce({ isFile: () => false } as any);
+      vi.spyOn(fs.promises, 'readFile').mockResolvedValueOnce(
+        JSON.stringify({ ...PACKAGE_STUB, exports: { '.': relpath + '.js' } })
+      );
+      await expect(resolver.resolve(PACKAGE_STUB.name)).rejects.toMatchObject({
+        message: expect.stringContaining(`file '${abspath}' exists but is not a regular file`)
+      });
+    });
+
+    it('should fail when an export condition value is neither a string nor undefined', async () => {
+      vi.spyOn(fs, 'existsSync').mockReturnValueOnce(true);
+      vi.spyOn(fs, 'lstatSync').mockReturnValueOnce({ isFile: () => true } as any);
+      vi.spyOn(fs.promises, 'readFile').mockResolvedValueOnce(
+        JSON.stringify({ ...PACKAGE_STUB, exports: { '.': { import: 123 } } })
+      );
+      await expect(resolver.resolve(PACKAGE_STUB.name)).rejects.toMatchObject({
+        message: expect.stringContaining("unexpected non-string value 'number' for 'import' condition")
+      });
+    });
+
+    it('should fail when an export value is neither a plain object nor a string', async () => {
+      vi.spyOn(fs, 'existsSync').mockReturnValueOnce(true);
+      vi.spyOn(fs, 'lstatSync').mockReturnValueOnce({ isFile: () => true } as any);
+      vi.spyOn(fs.promises, 'readFile').mockResolvedValueOnce(
+        JSON.stringify({ ...PACKAGE_STUB, exports: { '.': ['./src/main.js'] } })
+      );
+      await expect(resolver.resolve(PACKAGE_STUB.name)).rejects.toMatchObject({
+        message: expect.stringContaining('expected plain object or string, got')
+      });
+    });
+
+    it('should wrap an unexpected non-ResolverError raised while parsing an export, logging it first', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      vi.spyOn(fs, 'lstatSync').mockReturnValueOnce({ isFile: () => true } as any);
+      vi.spyOn(fs, 'existsSync')
+        .mockImplementationOnce(() => true)
+        .mockImplementationOnce(() => {
+          throw new TypeError('unexpected fs failure');
+        });
+      vi.spyOn(fs.promises, 'readFile').mockResolvedValueOnce(
+        JSON.stringify({ ...PACKAGE_STUB, exports: { '.': './src/main.js' } })
+      );
+      await expect(resolver.resolve(PACKAGE_STUB.name)).rejects.toMatchObject({
+        message: expect.stringContaining('unexpected fs failure')
+      });
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.any(TypeError));
+      consoleErrorSpy.mockRestore();
     });
   });
 

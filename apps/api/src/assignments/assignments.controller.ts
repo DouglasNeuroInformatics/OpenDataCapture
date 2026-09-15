@@ -1,9 +1,20 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
-import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query
+} from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import type { Assignment } from '@opendatacapture/schemas/assignment';
+import type { Assignment, BulkAssignmentPreflightResult } from '@opendatacapture/schemas/assignment';
 import { DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
 import type { EmailDeliveryResult, MailTemplate } from '@opendatacapture/schemas/mail';
 
@@ -15,6 +26,7 @@ import { GroupsService } from '@/groups/groups.service';
 import { MailService } from '@/mail/mail.service';
 
 import { AssignmentsService } from './assignments.service';
+import { BulkAssignmentPreflightDto, CreateBulkAssignmentsDto } from './dto/bulk-assignment.dto';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 import { SendAssignmentEmailDto } from './dto/send-assignment-email.dto';
 import { UpdateAssignmentDto } from './dto/update-assignment.dto';
@@ -28,11 +40,38 @@ export class AssignmentsController {
     private readonly mailService: MailService
   ) {}
 
+  // Both `bulk` routes must stay above `:id/email` and `:id`, or `bulk` is captured as an assignment
+  // id. `perfectionist/sort-classes` happens to preserve that today because `bulkPreflight` and
+  // `createBulk` sort ahead of `sendEmail` and `updateById` — renaming any of them could silently
+  // reverse it, so check the emitted order rather than assuming.
+  //
+  // `create Assignment` is the action these perform; the group, instrument and subject scoping that
+  // `RouteAccess` cannot express is enforced in the service, which also checks `read Subject` through
+  // `accessibleQuery` before any subject is used.
+  @ApiOperation({ summary: 'Validate a Bulk Assignment Request' })
+  // Creates nothing, so it answers 200 rather than the 201 a POST defaults to in Nest.
+  @HttpCode(HttpStatus.OK)
+  @Post('bulk/preflight')
+  @RouteAccess({ action: 'create', subject: 'Assignment' })
+  bulkPreflight(
+    @Body() data: BulkAssignmentPreflightDto,
+    @CurrentUser() currentUser: RequestUser
+  ): Promise<BulkAssignmentPreflightResult> {
+    return this.assignmentsService.bulkPreflight(data, currentUser);
+  }
+
   @ApiOperation({ summary: 'Create Assignment' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Assignment' })
   create(@Body() data: CreateAssignmentDto, @CurrentUser() currentUser: RequestUser): Promise<Assignment> {
     return this.assignmentsService.create(data, currentUser);
+  }
+
+  @ApiOperation({ summary: 'Create Assignments in Bulk' })
+  @Post('bulk')
+  @RouteAccess({ action: 'create', subject: 'Assignment' })
+  createBulk(@Body() data: CreateBulkAssignmentsDto, @CurrentUser() currentUser: RequestUser): Promise<Assignment[]> {
+    return this.assignmentsService.createBulk(data, currentUser);
   }
 
   @ApiOperation({ summary: 'Get All Assignments' })
