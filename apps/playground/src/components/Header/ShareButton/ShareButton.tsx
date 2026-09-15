@@ -68,7 +68,7 @@ export const ShareButton = () => {
               </Label>
               <span className="group/help relative inline-flex cursor-help">
                 <CircleHelpIcon className="text-muted-foreground h-4 w-4" />
-                <span className="bg-popover text-popover-foreground pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden w-60 -translate-x-1/2 rounded-md border px-3 py-1.5 text-sm shadow-md group-hover/help:block">
+                <span className="bg-primary text-primary-foreground pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden w-60 -translate-x-1/2 rounded-md px-3 py-1.5 text-xs group-hover/help:block">
                   {t({
                     en: 'Anyone with the link opens the instrument fullscreen as a preview they can try, with no editor and no ability to make changes.',
                     fr: "Toute personne disposant du lien ouvre l'instrument en plein écran comme un aperçu qu'elle peut essayer, sans éditeur ni possibilité de le modifier."
