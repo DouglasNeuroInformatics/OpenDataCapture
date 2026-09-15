@@ -30,7 +30,7 @@ There is no root `.` export — always import from a subpath.
 
 ### Translation — this is a hard rule
 
-Every user-facing string must go through `useTranslation`. Prefer an inline `t({ en, fr })` unless the string is used in more than one place, in which case add it to a namespaced translation JSON file:
+Every user-facing string must go through `useTranslation`. Prefer an inline `t({ en, es, fr })` unless the string is used in more than one place, in which case add it to a namespaced translation JSON file:
 
 ```tsx
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -38,8 +38,14 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 const { t } = useTranslation(); // inline strings
 const { t } = useTranslation('datahub'); // scoped to a translation namespace
 
-<Button>{t({ en: 'Accept', fr: 'Accepter' })}</Button>;
+<Button>{t({ en: 'Accept', es: 'Aceptar', fr: 'Accepter' })}</Button>;
 ```
+
+**Every interface language needs an entry.** A missing one resolves to English silently, so
+`requireCompleteTranslations` is declared for `apps/web`, `apps/gateway` and `packages/react-core`
+(`packages/react-core/src/complete-translations.d.ts` and each app's `src/services/i18n.ts`), which
+makes an incomplete `t({ … })` a type error caught by `pnpm lint`. `apps/playground` is deliberately
+outside that opt-in — its language selector offers only English and French.
 
 `useTranslation` also returns `resolvedLanguage` when you need the active locale.
 

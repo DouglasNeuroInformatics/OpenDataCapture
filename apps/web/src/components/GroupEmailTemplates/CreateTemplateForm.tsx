@@ -63,9 +63,9 @@ export const CreateTemplateForm = ({ isPending, onCreate, validateContent, valid
         ref={formRef}
         onSubmit={handleSubmit}
       >
-        <Heading variant="h5">{t({ en: 'New template', fr: 'Nouveau modèle' })}</Heading>
+        <Heading variant="h5">{t({ en: 'New template', es: 'Nueva plantilla', fr: 'Nouveau modèle' })}</Heading>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="template-name">{t({ en: 'Name', fr: 'Nom' })}</Label>
+          <Label htmlFor="template-name">{t({ en: 'Name', es: 'Nombre', fr: 'Nom' })}</Label>
           <Input
             data-testid="template-name"
             id="template-name"
@@ -82,7 +82,7 @@ export const CreateTemplateForm = ({ isPending, onCreate, validateContent, valid
         />
         <div>
           <Button data-testid="template-create-submit" disabled={isPending || Boolean(contentError)} type="submit">
-            {t({ en: 'Add template', fr: 'Ajouter le modèle' })}
+            {t({ en: 'Add template', es: 'Agregar plantilla', fr: 'Ajouter le modèle' })}
           </Button>
         </div>
       </form>
@@ -90,12 +90,15 @@ export const CreateTemplateForm = ({ isPending, onCreate, validateContent, valid
       <Dialog open={isConfirmingMissingTranslations} onOpenChange={setIsConfirmingMissingTranslations}>
         <Dialog.Content className="max-w-md">
           <Dialog.Header>
-            <Dialog.Title>{t({ en: 'Missing translations', fr: 'Traductions manquantes' })}</Dialog.Title>
+            <Dialog.Title>
+              {t({ en: 'Missing translations', es: 'Faltan traducciones', fr: 'Traductions manquantes' })}
+            </Dialog.Title>
           </Dialog.Header>
           <Dialog.Description>
             {t(
               {
                 en: 'Warning: This template is missing translations for: {}.',
+                es: 'Advertencia: a esta plantilla le faltan traducciones para: {}.',
                 fr: 'Attention : Ce modèle est sans traduction pour : {}.'
               },
               { args: [missingLanguages.map((code) => t(LANGUAGE_LABELS[code])).join(', ')] }
@@ -114,7 +117,7 @@ export const CreateTemplateForm = ({ isPending, onCreate, validateContent, valid
                 void create();
               }}
             >
-              {t({ en: 'Add anyway', fr: 'Ajouter quand même' })}
+              {t({ en: 'Add anyway', es: 'Agregar de todos modos', fr: 'Ajouter quand même' })}
             </Button>
           </Dialog.Footer>
         </Dialog.Content>

@@ -51,8 +51,10 @@ not every tool loads nested files.
   workspace name without the prefix. A `commit-msg` hook and the `Commitlint` CI job enforce it, and
   `CHANGELOG.md` is generated from the `feat`, `fix`, `perf` and breaking commits: one commit is one
   entry.
-- **All frontend user-facing strings go through `useTranslation`.** Prefer inline
-  `t({ en: '...', fr: '...' })` unless the string is used more than once.
+- **All frontend user-facing strings go through `useTranslation`.** Every language the frontend
+  exposes gets an entry. In web, gateway and react-core, prefer inline
+  `t({ en: '...', es: '...', fr: '...' })` unless the string is used more than once; each workspace
+  enables `requireCompleteTranslations`, so omitting a language is a type error caught by `pnpm lint`.
 - **Never run the `apps/web` route-tree generator.** `src/route-tree.ts` is generated and
   git-tracked, but the user regenerates it manually after route changes. Never hand-edit it either.
 - **If code needs a comment to be understood, the code is wrong** — rewrite it. Comments are for
