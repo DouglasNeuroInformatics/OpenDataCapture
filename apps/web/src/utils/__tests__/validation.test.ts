@@ -3,7 +3,15 @@ import { MIN_PHONE_DIGITS } from '@opendatacapture/schemas/user';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod/v4';
 
-import { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank, omittedIfUnchanged } from '../validation';
+import {
+  $Email,
+  $PhoneNumber,
+  clearedIfBlank,
+  omittedIfBlank,
+  omittedIfUnchanged,
+  requiresGroup,
+  validationSummary
+} from '../validation';
 
 const t: TranslateFunction<TranslationKey> = (arg) => (typeof arg === 'string' ? arg : (arg.en ?? ''));
 
@@ -104,5 +112,46 @@ describe('$Email', () => {
     const { issues } = parseEmail('jane.doe@');
     expect(issues).toHaveLength(1);
     expect(issues[0]!.message).toBe('Invalid email address');
+  });
+});
+
+describe('requiresGroup', () => {
+  it('should not require a group for an admin, who is never scoped to one', () => {
+    expect(requiresGroup({ basePermissionLevel: 'ADMIN' })).toBe(false);
+  });
+
+  it.each(['GROUP_MANAGER', 'STANDARD'] as const)('should require a group for a %s user', (basePermissionLevel) => {
+    expect(requiresGroup({ basePermissionLevel })).toBe(true);
+  });
+
+  it('should require a group when the permission level is null, since that is not an admin', () => {
+    expect(requiresGroup({ basePermissionLevel: null })).toBe(true);
+  });
+
+  it('should not require a group for a disabled account, which exists only to attribute uploaded data', () => {
+    expect(requiresGroup({ basePermissionLevel: 'STANDARD', disabled: true })).toBe(false);
+  });
+
+  it('should still require a group for a non-admin explicitly marked as enabled', () => {
+    expect(requiresGroup({ basePermissionLevel: 'STANDARD', disabled: false })).toBe(true);
+  });
+});
+
+describe('validationSummary', () => {
+  const errorWith = (...messages: string[]) => ({
+    issues: messages.map((message) => ({ code: 'custom', message, path: [] })),
+    name: 'ZodError'
+  });
+
+  it('should state every distinct reason the submit was rejected', () => {
+    expect(validationSummary(errorWith('Invalid email address', 'Passwords must match'))).toBe(
+      'Invalid email address Passwords must match'
+    );
+  });
+
+  it('should say a repeated reason once, since several blank fields raise one shared message', () => {
+    expect(validationSummary(errorWith('This field is required', 'This field is required'))).toBe(
+      'This field is required'
+    );
   });
 });

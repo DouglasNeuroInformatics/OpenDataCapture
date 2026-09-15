@@ -101,6 +101,25 @@ test.describe('remote assignment', () => {
     expect(secondUrl).not.toBe(firstUrl);
   });
 
+  // Entering by URL is the path a bookmarked link takes, and it runs the GATEWAY_ENABLED guard in
+  // `beforeLoad` on a cold document load rather than on a client-side transition from the tab.
+  // `getPageModel` asserts it landed on the URL it asked for, so a guard that wrongly bounced the
+  // request to the table tab fails here.
+  test('should allow deep-linking to the assignments tab while the gateway is deployed', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    await startSession(getPageModel, `Deep${uniqueId}`, `Subject${uniqueId}`, 'Male');
+
+    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
+    await page.waitForURL('**/datahub/**/table');
+    const subjectId = page.url().split('/datahub/')[1]!.split('/')[0]!;
+
+    const assignmentsPage = await getPageModel('/datahub/$subjectId/assignments', { subjectId });
+    await expect(assignmentsPage.assignmentRows).toHaveCount(0);
+  });
+
   test("should let a group manager cancel an outstanding assignment from the subject's assignments tab", async ({
     getPageModel,
     page,

@@ -1,1 +1,2 @@
 vendor/** linguist-vendored
+apps/web/src/utils/word-list.ts linguist-generated

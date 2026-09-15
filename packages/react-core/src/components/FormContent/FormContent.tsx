@@ -43,11 +43,18 @@ export const FormContent = ({ instrument, onSubmit, submitButtonLabel }: FormCon
           </Dialog.Content>
         </Dialog>
       </div>
+      {/*
+        libui's `resetBtn` and `preventResetValuesOnReset` are two ends of one switch: its `reset`
+        only empties the fields when the latter is absent, so offering the button while preventing
+        the clear would give a Reset that wipes validation errors and leaves every answer in place.
+        An instrument therefore either has a working button or has none.
+      */}
       <Form
-        preventResetValuesOnReset
         content={instrument.content}
         data-testid="form-content"
         initialValues={instrument.initialValues}
+        preventResetValuesOnReset={!instrument.resetButton}
+        resetBtn={instrument.resetButton}
         submitBtnLabel={submitButtonLabel ? t(submitButtonLabel) : undefined}
         validationSchema={instrument.validationSchema}
         onSubmit={(data) => void onSubmit({ data, kind: 'FORM' })}

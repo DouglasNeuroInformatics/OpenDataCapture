@@ -13,6 +13,7 @@
   "scripts": {
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
+    "test": "vitest",
     "storybook": "storybook dev -p 6006"
   },
   "peerDependencies": {
@@ -53,6 +54,9 @@
   "devDependencies": {
     "@opendatacapture/instrument-stubs": "workspace:*",
     "@storybook/react-vite": "catalog:",
+    "@testing-library/dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "happy-dom": "catalog:",
     "type-fest": "workspace:type-fest__4.x@*",
     "vite": "catalog:"
   }

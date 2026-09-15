@@ -5,7 +5,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { Assignment, CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
 import { AssignmentEmailForm } from '@/components/AssignmentEmailForm';
@@ -13,6 +13,7 @@ import { InstrumentShowcase } from '@/components/InstrumentShowcase';
 import { PageHeader } from '@/components/PageHeader';
 import { QRCode } from '@/components/QRCode';
 import { WithFallback } from '@/components/WithFallback';
+import { config } from '@/config';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
@@ -211,5 +212,10 @@ const RouteComponent = () => {
 };
 
 export const Route = createFileRoute('/_app/session/remote-assignment')({
+  beforeLoad: () => {
+    if (!config.setup.isGatewayEnabled) {
+      throw redirect({ to: '/dashboard' });
+    }
+  },
   component: RouteComponent
 });

@@ -21,6 +21,12 @@ export type TokenPayload = {
   groups: Group[];
   id: string;
   lastName: null | string;
+  /**
+   * Whether the holder must choose a new password before they may use the app. Carried on the token
+   * so `apps/web` can gate navigation without a request, and so `AbilityFactory` can narrow
+   * `permissions` to the reset itself — the two must agree, and this is the one place they can.
+   */
+  mustResetPassword: boolean;
   permissions: Permissions;
   username: string;
 };

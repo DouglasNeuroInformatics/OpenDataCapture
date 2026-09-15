@@ -116,6 +116,11 @@
     "es": "Nombre del grupo",
     "fr": "Nom du groupe"
   },
+  "groupRequired": {
+    "en": "A user who is not an administrator must belong to at least one group",
+    "es": "Un usuario que no es administrador debe pertenecer al menos a un grupo",
+    "fr": "Un utilisateur qui n'est pas administrateur doit appartenir à au moins un groupe"
+  },
   "groupTrend": {
     "en": "Group Trend",
     "es": "Tendencia del grupo",
@@ -191,6 +196,11 @@
     "es": "Esta contraseña ha aparecido en una filtración de datos conocida y no se puede utilizar",
     "fr": "Ce mot de passe est apparu dans une fuite de données connue et ne peut pas être utilisé"
   },
+  "passwordMatchesCurrent": {
+    "en": "Password must not be the same as your current password",
+    "es": "La contraseña no debe ser igual a su contraseña actual",
+    "fr": "Le mot de passe ne doit pas être identique à votre mot de passe actuel"
+  },
   "passwordMatchesUsername": {
     "en": "Password must not be the same as the username",
     "es": "La contraseña no debe ser igual al nombre de usuario",
@@ -217,7 +227,7 @@
     "fr": "Recherche"
   },
   "sendEmail": {
-    "en": "Send email",
+    "en": "Send Email",
     "es": "Enviar correo electrónico",
     "fr": "Envoyer un courriel"
   },

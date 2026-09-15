@@ -62,8 +62,9 @@ frontend shows — instruments and the apps' own forms alike. `apps/web/src/serv
 - A message written by the schema author always wins — both majors skip the error map entirely when
   an issue already carries one.
 
-Tests live in `apps/web/src/__tests__/zod-error-maps.test.ts` (this package has no vitest project).
-They drive `createZodErrorMaps` through per-parse maps rather than registering globally.
+Tests live in `apps/web/src/__tests__/zod-error-maps.test.ts`, on the adapter side of the seam
+rather than in this package's own project. They drive `createZodErrorMaps` through per-parse maps
+rather than registering globally.
 
 ## `@tanstack/react-router` is an optional peer — never import it
 
@@ -89,6 +90,22 @@ That absolute `/runtime/v1` URL only resolves in a host that installs the runtim
 Background: `.agents/docs/architecture/runtime-and-vendor.md` and
 `.agents/docs/architecture/instrument-pipeline.md`.
 
+## Each item of a series is a fresh form
+
+`SeriesInstrumentRenderer` keys `FormContent` and `InteractiveContent` by `currentItemIndex`, and
+that key is load-bearing. **A series may name the same instrument twice**, and `findBundleById` in
+`apps/api` then serves its two items as byte-identical bundles — so neither the bundle nor the
+instrument id distinguishes one administration from the next, and React reconciles the second onto
+the first. libui's `Form` initialises `values` from a `useState` initialiser and never re-syncs
+them, so a form left mounted presents one subject's answers back to them as their own on the next
+item. Nothing else unmounts it: with `params.skipProgress` there is no interstitial screen between
+items, and `reset()` empties the fields only for an instrument declaring `resetButton`.
+
+`useInterpretedInstrument` covers the other half — it reports `LOADING` while a newly passed bundle
+is interpreted rather than `DONE` with the instrument of the previous one. Both are needed: the hook
+sees no change when consecutive bundles are identical, and the key alone would leave the previous
+item's questions rendering until the next bundle resolves.
+
 ## globals.css
 
 `src/globals.css` is the Tailwind v4 entry every frontend imports — `apps/web/src/styles.css`,
@@ -111,13 +128,20 @@ pattern to copy.
 
 ## Tests
 
-**This package has no `vitest.config.ts`, so it contributes no vitest project and `pnpm test` skips
-it entirely** — the root config globs `packages/*/vitest.config.ts`. There are no tests here at all
-today.
+`pnpm exec vitest --project react-core` runs them; the project is `happy-dom`, and the environment
+caveats in `apps/web/AGENTS.md` apply. Most behaviour here is still covered only from a consumer's
+suite (`pnpm exec vitest --project web`) and by `testing/`.
 
-Behaviour changed here is currently only covered from a consumer's suite
-(`pnpm exec vitest --project web`) and by `testing/`. If a change warrants a unit test, add a
-config first — `.agents/docs/playbooks/add-vitest-project.md` is the order of operations; the
-environment caveats in `apps/web/AGENTS.md` apply.
+`src/components/InstrumentRenderer/__tests__/SeriesInstrumentRenderer.test.tsx` is the canonical
+file. It renders against **hand-written bundles** — an async IIFE resolving to the instrument, run
+by the real interpreter, so nothing needs building first. Two things follow from `new Function`
+evaluating that bundle: it closes over nothing in the test file, so anything it needs (a zod schema)
+is passed through `globalThis`; and the instrument it returns is not validated, so a fixture carries
+only the fields the component under test reads.
+
+libui's `t()` needs an initialised i18n, which no app supplies here — call
+`i18n.init({ translations: {} })` in `beforeAll`. `@testing-library/jest-dom` and
+`@testing-library/user-event` are **not** installed: assert with `toBeTruthy()`, interact with
+`fireEvent`.
 
 `pnpm --filter @opendatacapture/react-core lint` runs `tsc` then eslint.

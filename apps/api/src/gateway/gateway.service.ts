@@ -3,27 +3,30 @@ import type { webcrypto } from 'node:crypto';
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { LoggingService } from '@douglasneuroinformatics/libnest';
 import { HttpService } from '@nestjs/axios';
-import { BadGatewayException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadGatewayException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { $MutateAssignmentResponseBody, $RemoteAssignment } from '@opendatacapture/schemas/assignment';
 import type {
   Assignment,
   CreateRemoteAssignmentInputData,
+  CreateRemoteAssignmentsInputData,
   MutateAssignmentResponseBody,
   RemoteAssignment
 } from '@opendatacapture/schemas/assignment';
 import { $GatewayHealthcheckSuccessResult } from '@opendatacapture/schemas/gateway';
-import type { GatewayHealthcheckFailureResult, GatewayHealthcheckResult } from '@opendatacapture/schemas/gateway';
+import type {
+  GatewayHealthcheckFailureResult,
+  GatewayHealthcheckResult,
+  RemoteSetupState
+} from '@opendatacapture/schemas/gateway';
 
 import { InstrumentsService } from '@/instruments/instruments.service';
-import { SetupService } from '@/setup/setup.service';
 
 @Injectable()
 export class GatewayService {
   constructor(
     private readonly httpService: HttpService,
     private readonly instrumentsService: InstrumentsService,
-    private readonly loggingService: LoggingService,
-    private readonly setupService: SetupService
+    private readonly loggingService: LoggingService
   ) {}
 
   async createRemoteAssignment(
@@ -31,15 +34,48 @@ export class GatewayService {
     publicKey: webcrypto.CryptoKey
   ): Promise<MutateAssignmentResponseBody> {
     const instrument = await this.instrumentsService.findBundleById(assignment.instrumentId);
-    // The gateway cannot read this instance's setup state, so the languages it may offer this
-    // patient are sent with the assignment.
-    const { activeLanguages } = await this.setupService.getState();
     const response = await this.httpService.axiosRef.post(`/api/assignments`, {
       ...assignment,
-      activeLanguages,
       instrumentContainer: instrument,
       publicKey: Array.from(await HybridCrypto.serializePublicKey(publicKey))
     } satisfies CreateRemoteAssignmentInputData);
+    if (response.status !== HttpStatus.CREATED) {
+      throw new BadGatewayException(`Unexpected Status Code From Gateway: ${response.status}`, {
+        cause: response.statusText
+      });
+    }
+    return $MutateAssignmentResponseBody.parseAsync(response.data);
+  }
+
+  /**
+   * Send a whole batch to the gateway in one request.
+   *
+   * Each distinct instrument's bundle is fetched once and sent once, no matter how many assignments
+   * reference it — a batch is a handful of instruments across hundreds of subjects, so fetching per
+   * assignment would re-read and re-transmit the same compiled bundle hundreds of times.
+   *
+   * The gateway writes the batch in a transaction, so this either persists in full or not at all.
+   */
+  async createRemoteAssignments(
+    entries: { assignment: Assignment; publicKey: webcrypto.CryptoKey }[]
+  ): Promise<MutateAssignmentResponseBody> {
+    const instrumentIds = [...new Set(entries.map(({ assignment }) => assignment.instrumentId))];
+    const instruments = await Promise.all(
+      instrumentIds.map(async (instrumentId) => ({
+        instrumentContainer: await this.instrumentsService.findBundleById(instrumentId),
+        instrumentId
+      }))
+    );
+    const assignments = await Promise.all(
+      entries.map(async ({ assignment, publicKey }) => ({
+        ...assignment,
+        publicKey: Array.from(await HybridCrypto.serializePublicKey(publicKey))
+      }))
+    );
+    const response = await this.httpService.axiosRef.post(`/api/assignments/bulk`, {
+      assignments,
+      instruments
+    } satisfies CreateRemoteAssignmentsInputData);
     if (response.status !== HttpStatus.CREATED) {
       throw new BadGatewayException(`Unexpected Status Code From Gateway: ${response.status}`, {
         cause: response.statusText
@@ -105,5 +141,20 @@ export class GatewayService {
       };
     }
     return result.data;
+  }
+
+  /**
+   * Replace the setup state held by the gateway. The gateway cannot reach this instance, so it
+   * learns of a change only by being told; it is told on every synchronization pass rather than
+   * only when the state changes, which is what lets a gateway that missed the change — restarting,
+   * unreachable, redeployed with an empty in-memory copy — catch up on its own.
+   */
+  async updateRemoteSetupState(setupState: RemoteSetupState): Promise<void> {
+    const response = await this.httpService.axiosRef.put(`/api/setup-state`, setupState);
+    if (response.status !== HttpStatus.NO_CONTENT) {
+      throw new InternalServerErrorException(`Unexpected Status Code From Gateway: ${response.status}`, {
+        cause: response.statusText
+      });
+    }
   }
 }

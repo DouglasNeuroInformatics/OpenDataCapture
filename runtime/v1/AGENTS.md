@@ -58,7 +58,7 @@ Export-shape rules and the `.d.ts` import constraint are in `packages/runtime-bu
 
 ## Housekeeping
 
-`version` is bumped repo-wide by `scripts/increment-version.sh`; the release workflow publishes any
+`version` is bumped repo-wide by `scripts/increment-version.ts`; the release workflow publishes any
 package with a `publishConfig` whose version is not yet on npm. Do not hand-edit it.
 
 There is **no `lint` or `format` script here**, so `pnpm lint` never type-checks this directory.

@@ -302,6 +302,12 @@ declare type FormInstrument<
     initialValues?: PartialDeep<TData>;
     kind: 'FORM';
     measures: InstrumentMeasures<TData, TLanguage> | null;
+    /**
+     * Whether to offer a button that clears every answer. Defaults to false. The button takes effect
+     * immediately, with no confirmation step and no way to undo, so it suits a long form the subject
+     * may want to start over rather than a short one where a stray click costs more than it saves.
+     */
+    resetButton?: boolean;
   }
 >;
 

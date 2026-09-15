@@ -9,10 +9,11 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { Assignment, AssignmentStatus } from '@opendatacapture/schemas/assignment';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 import { AssignmentEmailForm } from '@/components/AssignmentEmailForm';
 import { QRCode } from '@/components/QRCode';
+import { config } from '@/config';
 import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
@@ -180,5 +181,10 @@ const RouteComponent = () => {
 };
 
 export const Route = createFileRoute('/_app/datahub/$subjectId/assignments')({
+  beforeLoad: ({ params }) => {
+    if (!config.setup.isGatewayEnabled) {
+      throw redirect({ params, to: '/datahub/$subjectId/table' });
+    }
+  },
   component: RouteComponent
 });

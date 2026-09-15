@@ -18,7 +18,7 @@ pnpm install                # install deps
 pnpm generate:env           # create .env from .env.template — required before anything else runs
 pnpm dev                    # run core apps (api, gateway, web) via turbo
 pnpm build                  # turbo build (all packages/apps)
-pnpm lint                   # turbo lint — this is `tsc && eslint --fix src` per package
+pnpm lint                   # turbo lint — `tsc && eslint --fix src` per package, plus lint:root for root-level scripts and configs
 pnpm format                 # turbo format (prettier per package)
 pnpm test                   # vitest across the workspace
 pnpm test:e2e               # playwright, in testing/
@@ -44,7 +44,13 @@ not every tool loads nested files.
   block of `pnpm-workspace.yaml` — reference `"catalog:"` in a `package.json`, never a literal
   version. `minimumReleaseAge` is 7 days, so a freshly published package will be rejected.
 - **Every change needs a unit test _and_ an end-to-end test in `testing/`.** See
-  `.agents/docs/playbooks/add-e2e-test.md`.
+  `.agents/docs/playbooks/add-e2e-test.md`. Utility scripts under `scripts/` are the one exception
+  and need no tests.
+- **Commit messages follow Conventional Commits.** `type(scope): subject`, where `type` is one of the
+  11 `@commitlint/config-conventional` types and `scope`, if present, is an `@opendatacapture/*`
+  workspace name without the prefix. A `commit-msg` hook and the `Commitlint` CI job enforce it, and
+  `CHANGELOG.md` is generated from the `feat`, `fix`, `perf` and breaking commits: one commit is one
+  entry.
 - **All frontend user-facing strings go through `useTranslation`.** Prefer inline
   `t({ en: '...', fr: '...' })` unless the string is used more than once.
 - **Never run the `apps/web` route-tree generator.** `src/route-tree.ts` is generated and

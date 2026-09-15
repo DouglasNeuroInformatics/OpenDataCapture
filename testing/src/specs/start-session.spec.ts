@@ -30,6 +30,56 @@ test.describe('start session', () => {
     await expect(startSessionPage.successMessage).toBeVisible();
   });
 
+  // The identifier combobox offers the subjects already enrolled in the group, so a brand new
+  // subject's identifier necessarily matches no option. Clicking away used to discard it.
+  test('should keep a custom identifier matching no existing subject when the options popup is dismissed', async ({
+    getPageModel,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.typeSubjectId(`unmatched-${uniqueId}`);
+    await startSessionPage.dismissSubjectIdOptions();
+
+    await expect(startSessionPage.subjectIdField).toHaveValue(`unmatched-${uniqueId}`);
+
+    await startSessionPage.fillSessionDetails('Male');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+  });
+
+  test('should start a session for a subject chosen from the existing custom identifiers', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const identifier = `returning-${uniqueId}`;
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.fillCustomIdentifier(identifier, 'Male');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    // The subject only becomes an option once it exists, and the options are read by the route
+    // loader, so the second visit has to be a fresh load rather than a client-side navigation.
+    await startSessionPage.endSession();
+    await page.reload();
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.typeSubjectId(identifier);
+    await startSessionPage.subjectIdOption(identifier).click();
+    await expect(startSessionPage.subjectIdField).toHaveValue(identifier);
+
+    await startSessionPage.fillSessionDetails('Male');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+  });
+
   test('should show a required-field error for every missing field when submitting the personal information form empty', async ({
     getPageModel
   }) => {

@@ -60,6 +60,12 @@ test.describe('data hub', () => {
     await page.getByRole('menuitem', { name: 'View' }).click();
 
     await expect(page).toHaveURL(new RegExp(`/datahub/${subjectId}/table$`));
+
+    // `subject-table` used to be the Table tab link, so selecting the record table by it silently
+    // got the tab instead (#1475). It is the table alone now, and the tab is `subject-table-tab`.
+    await expect(page.getByTestId('subject-table')).toHaveCount(1);
+    await expect(page.getByTestId('subject-table').getByTestId('data-table')).toHaveCount(1);
+    await expect(page.getByTestId('subject-table-tab')).toHaveAttribute('data-nav-url', `/datahub/${subjectId}/table`);
   });
 
   test('should navigate to a subject by custom identifier via the subject lookup dialog', async ({

@@ -33,6 +33,10 @@ describe('inferLoader', () => {
     expect(inferLoader('index.html')).toBe('text');
   });
 
+  it('should infer json loader for json', () => {
+    expect(inferLoader('data.json')).toBe('json');
+  });
+
   it('should infer js loader for js', () => {
     expect(inferLoader('script.js')).toBe('js');
   });

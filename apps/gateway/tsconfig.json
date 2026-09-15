@@ -1,10 +1,10 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]
     }
   },
-  "include": ["scripts/*", "src/**/*", "vite.config.ts"]
+  "include": ["scripts/*", "src/**/*", "vite.config.ts", "vitest.config.ts"]
 }

@@ -19,6 +19,7 @@ import {
   UsersIcon
 } from 'lucide-react';
 
+import { config } from '@/config';
 import { useAppStore } from '@/store';
 
 import { useSetupStateQuery } from './useSetupStateQuery';
@@ -86,7 +87,8 @@ export function useNavItems() {
         label: t('layout.navLinks.manageGroup'),
         url: '/group/manage'
       });
-      if (setupStateQuery.data.isMailEnabled) {
+      // These templates exist only to email a remote assignment link, which the gateway serves
+      if (setupStateQuery.data.isMailEnabled && config.setup.isGatewayEnabled) {
         globalItems.push({
           icon: MailIcon,
           label: t({ en: 'Email Templates', fr: 'Modèles de courriel' }),
@@ -176,7 +178,7 @@ export function useNavItems() {
       });
     }
     // Remote assignment requires the gateway to be enabled, since assignments are served through it
-    if (ability?.can('create', 'Assignment') && setupStateQuery.data.isGatewayEnabled) {
+    if (ability?.can('create', 'Assignment') && config.setup.isGatewayEnabled) {
       sessionItems.push({
         disabled: currentSession === null,
         icon: SendIcon,
@@ -198,7 +200,6 @@ export function useNavItems() {
     currentUser,
     resolvedLanguage,
     setupStateQuery.data.isExperimentalFeaturesEnabled,
-    setupStateQuery.data.isGatewayEnabled,
     setupStateQuery.data.isMailEnabled
   ]);
 

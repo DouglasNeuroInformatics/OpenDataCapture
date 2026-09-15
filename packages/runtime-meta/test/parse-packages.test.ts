@@ -35,4 +35,10 @@ describe('parsePackages', () => {
     });
     expect(packages.map((pkg) => pkg.name)).toStrictEqual(['react']);
   });
+
+  it('throws when a source path does not match the import path pattern', () => {
+    expect(() => parsePackages('v1', { html: [], sources: ['/leading-slash.js'], styles: [] })).toThrow(
+      'Unexpected import path pattern'
+    );
+  });
 });

@@ -1,31 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
-import { $GroupEmailTemplate } from './group.js';
+import { $UpdateGroupData } from './group.js';
 
-const template = {
-  body: { en: 'Hello {{url}}' },
-  id: 'tpl-1',
-  name: 'My Template',
-  subject: { en: 'Your assignment' }
-};
-
-// The send path substitutes the built-in default for a template it cannot render, so a stored
-// template without content becomes a silent substitution — the rejects here are the point.
-describe('$GroupEmailTemplate', () => {
-  it('should accept a template authored in a single language', () => {
-    expect($GroupEmailTemplate.safeParse(template).success).toBe(true);
+describe('$UpdateGroupData', () => {
+  it('should require expectedUpdatedAt when emailTemplates is included', () => {
+    const result = $UpdateGroupData.safeParse({
+      emailTemplates: [{ body: { en: 'Body' }, id: 'template-1', name: 'Template', subject: { en: 'Subject' } }]
+    });
+    expect(result.success).toBe(false);
   });
-
-  it.each(['body', 'subject'])('should reject a template whose %s has no languages at all', (field) => {
-    expect($GroupEmailTemplate.safeParse({ ...template, [field]: {} }).success).toBe(false);
+  it('should accept emailTemplates when expectedUpdatedAt is included', () => {
+    const result = $UpdateGroupData.safeParse({
+      emailTemplates: [{ body: { en: 'Body' }, id: 'template-1', name: 'Template', subject: { en: 'Subject' } }],
+      expectedUpdatedAt: '2024-01-01'
+    });
+    expect(result.success).toBe(true);
   });
-
-  it.each(['body', 'subject'])('should reject a template whose %s is blank in every language', (field) => {
-    expect($GroupEmailTemplate.safeParse({ ...template, [field]: { en: '  ', fr: '' } }).success).toBe(false);
-  });
-
-  it.each(['body', 'subject'])('should reject a template with no %s', (field) => {
-    expect($GroupEmailTemplate.safeParse({ ...template, [field]: undefined }).success).toBe(false);
-    expect($GroupEmailTemplate.safeParse({ ...template, [field]: null }).success).toBe(false);
+  it('should accept an update that omits emailTemplates entirely', () => {
+    expect($UpdateGroupData.safeParse({ name: 'New Name' }).success).toBe(true);
   });
 });

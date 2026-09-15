@@ -8,8 +8,8 @@ What is tested where, and what CI actually blocks a merge on. Writing an e2e tes
 The root `vitest.config.ts` declares
 `projects: ['apps/*/vitest.config.ts', 'packages/*/vitest.config.ts', 'runtime/*/vitest.config.ts']`.
 **A workspace with no `vitest.config.ts` of its own is invisible to `pnpm test`.** A test file added
-to `apps/gateway` or `packages/react-core` today is collected by nothing, reported by nothing, and
-passes CI green.
+to `apps/gateway` or `packages/instrument-library` today is collected by nothing, reported by
+nothing, and passes CI green.
 
 Check the table below before writing a unit test. If the package is not in it, add a
 `vitest.config.ts` in the same change — `.agents/docs/playbooks/add-vitest-project.md` is the order
@@ -28,28 +28,31 @@ path exercised against a real database is Playwright.
 
 ## Vitest projects
 
-Thirteen. Scope a run with `pnpm exec vitest --project <name>`; the name is the `name` field in that
+Sixteen. Scope a run with `pnpm exec vitest --project <name>`; the name is the `name` field in that
 package's config, which is **not** always the directory name.
 
-| Project                  | Package                           | Notable config                                                              |
-| ------------------------ | --------------------------------- | --------------------------------------------------------------------------- |
-| `api`                    | `apps/api`                        | libnest SWC plugin; `globals: true`; extra `include` for `src/**/*.spec.ts` |
-| `web`                    | `apps/web`                        | `environment: 'happy-dom'`; redeclares the `@` alias                        |
-| `instrument-bundler`     | `packages/instrument-bundler`     |                                                                             |
-| `instrument-interpreter` | `packages/instrument-interpreter` |                                                                             |
-| `instrument-utils`       | `packages/instrument-utils`       |                                                                             |
-| `playground-url`         | `packages/playground-url`         |                                                                             |
-| `release-info`           | `packages/release-info`           |                                                                             |
-| `runtime-bundler`        | `packages/runtime-bundler`        |                                                                             |
-| `runtime-meta`           | `packages/runtime-meta`           |                                                                             |
-| `schemas`                | `packages/schemas`                |                                                                             |
-| `subject-utils`          | `packages/subject-utils`          |                                                                             |
-| `vite-plugin-runtime`    | `packages/vite-plugin-runtime`    |                                                                             |
-| `runtime-v1`             | `runtime/v1`                      | directory is `v1`, project is `runtime-v1`                                  |
+| Project                  | Package                           | Notable config                                                                                                                                                                                           |
+| ------------------------ | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `api`                    | `apps/api`                        | libnest SWC plugin; `globals: true`; extra `include` for `src/**/*.spec.ts`                                                                                                                              |
+| `web`                    | `apps/web`                        | `environment: 'happy-dom'`; redeclares the `@` alias                                                                                                                                                     |
+| `instrument-bundler`     | `packages/instrument-bundler`     |                                                                                                                                                                                                          |
+| `instrument-interpreter` | `packages/instrument-interpreter` |                                                                                                                                                                                                          |
+| `instrument-utils`       | `packages/instrument-utils`       |                                                                                                                                                                                                          |
+| `playground-url`         | `packages/playground-url`         |                                                                                                                                                                                                          |
+| `react-core`             | `packages/react-core`             | `environment: 'happy-dom'`                                                                                                                                                                               |
+| `release-info`           | `packages/release-info`           |                                                                                                                                                                                                          |
+| `runtime-bundler`        | `packages/runtime-bundler`        |                                                                                                                                                                                                          |
+| `runtime-internal`       | `packages/runtime-internal`       | node environment; the `interactive/*.js` trio (iframe/worker bootstrap) is untested — see `packages/runtime-internal/AGENTS.md`                                                                          |
+| `runtime-meta`           | `packages/runtime-meta`           |                                                                                                                                                                                                          |
+| `schemas`                | `packages/schemas`                |                                                                                                                                                                                                          |
+| `serve-instrument`       | `packages/serve-instrument`       | node environment; `test/` mocks `fs.watch` (never closed by `Server.stop()`, see `packages/serve-instrument/AGENTS.md`) and stubs the built `client.js`/`__TAILWIND_STYLES__` that only exist post-build |
+| `subject-utils`          | `packages/subject-utils`          |                                                                                                                                                                                                          |
+| `vite-plugin-runtime`    | `packages/vite-plugin-runtime`    |                                                                                                                                                                                                          |
+| `runtime-v1`             | `runtime/v1`                      | directory is `v1`, project is `runtime-v1`                                                                                                                                                               |
 
 Everything else has no unit tests and no way to run them: `apps/gateway`, `apps/outreach`,
 `apps/playground`, and `packages/{demo, instrument-guidelines, instrument-library, instrument-stubs,
-licenses, react-core, runtime-core, runtime-internal, serve-instrument}`. `testing/`, `storybook/` and `vendor/**` fall outside the
+licenses, runtime-core}`. `testing/`, `storybook/` and `vendor/**` fall outside the
 project globs by design — `testing/` is Playwright, not vitest.
 
 ## Test environment
@@ -66,14 +69,15 @@ project globs by design — `testing/` is Playwright, not vitest.
 
 Read the canonical file before writing a test in that tier.
 
-| Package                       | Canonical file                                     | Shape                                                                                                                                                                                                                                                                                                         |
-| ----------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/api`                    | `src/groups/__tests__/groups.service.spec.ts`      | `Test.createTestingModule` + `MockFactory.createForModelToken(getModelToken('Group'))` from `@douglasneuroinformatics/libnest/testing`; mocks typed `MockedInstance<Model<'Group'>>`; assert with `model.create.mock.lastCall?.[0]` and `toMatchObject`. A fresh module per test, so no mock state to reset.  |
-| `apps/web`                    | `src/hooks/__tests__/useInstrumentBundle.test.ts`  | `vi.hoisted` + `vi.mock` for `axios` and `@/store`; a **real** `QueryClient` per test with `retry: false`, wrapped in `QueryClientProvider`.                                                                                                                                                                  |
-| `packages/schemas`            | `src/instrument/__tests__/instrument.form.test.ts` | Parse fixtures imported from `@opendatacapture/instrument-stubs/*`, never hand-written literals, so schema and fixture cannot drift.                                                                                                                                                                          |
-| `packages/instrument-bundler` | `src/__tests__/build.test.ts`                      | Fixtures are real instrument sources under `src/__tests__/repositories/{form,interactive}/`. `repositories/index.ts` reads each directory at import time into a `Map`; a test does `repositories.get('interactive')!`. Dropping a file in the folder adds it to the fixture — there is no manifest to update. |
-| `packages/runtime-bundler`    | `test/e2e.test.ts`                                 | Fixtures under `test/fixtures/` are minimal real npm packages (`name`, `type`, `exports`). The test copies them into a temp dir _as `node_modules`_, writes a bare `package.json`, runs the real `Bundler`, then dynamically imports the emitted output.                                                      |
-| `runtime/v1`                  | `test/vendor-pairing.test.ts`                      | Resolves the `vendor/` wrappers from the installed `node_modules` layout. It can fail on a stale install rather than on a code change.                                                                                                                                                                        |
+| Package                       | Canonical file                                                                  | Shape                                                                                                                                                                                                                                                                                                         |
+| ----------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/api`                    | `src/groups/__tests__/groups.service.spec.ts`                                   | `Test.createTestingModule` + `MockFactory.createForModelToken(getModelToken('Group'))` from `@douglasneuroinformatics/libnest/testing`; mocks typed `MockedInstance<Model<'Group'>>`; assert with `model.create.mock.lastCall?.[0]` and `toMatchObject`. A fresh module per test, so no mock state to reset.  |
+| `apps/web`                    | `src/hooks/__tests__/useInstrumentBundle.test.ts`                               | `vi.hoisted` + `vi.mock` for `axios` and `@/store`; a **real** `QueryClient` per test with `retry: false`, wrapped in `QueryClientProvider`.                                                                                                                                                                  |
+| `packages/react-core`         | `src/components/InstrumentRenderer/__tests__/SeriesInstrumentRenderer.test.tsx` | Renders a component against hand-written bundles — an async IIFE per instrument, evaluated by the real interpreter. `i18n.init({ translations: {} })` in `beforeAll`, `afterEach(cleanup)`, and `fireEvent` rather than `userEvent`, which is not installed.                                                  |
+| `packages/schemas`            | `src/instrument/__tests__/instrument.form.test.ts`                              | Parse fixtures imported from `@opendatacapture/instrument-stubs/*`, never hand-written literals, so schema and fixture cannot drift.                                                                                                                                                                          |
+| `packages/instrument-bundler` | `src/__tests__/build.test.ts`                                                   | Fixtures are real instrument sources under `src/__tests__/repositories/{form,interactive}/`. `repositories/index.ts` reads each directory at import time into a `Map`; a test does `repositories.get('interactive')!`. Dropping a file in the folder adds it to the fixture — there is no manifest to update. |
+| `packages/runtime-bundler`    | `test/e2e.test.ts`                                                              | Fixtures under `test/fixtures/` are minimal real npm packages (`name`, `type`, `exports`). The test copies them into a temp dir _as `node_modules`_, writes a bare `package.json`, runs the real `Bundler`, then dynamically imports the emitted output.                                                      |
+| `runtime/v1`                  | `test/vendor-pairing.test.ts`                                                   | Resolves the `vendor/` wrappers from the installed `node_modules` layout. It can fail on a stale install rather than on a code change.                                                                                                                                                                        |
 
 `testing/` is page-object style: page objects under `testing/src/pages/` mirroring the web route
 tree, specs under `testing/src/specs/`, shared helpers under `testing/src/support/`. Selectors are
@@ -104,7 +108,7 @@ dependency, generates both Prisma clients, and pushes the gateway SQLite schema 
 **`test` is not a turbo task at all.** Root `pnpm test` is `env-cmd vitest`: plain vitest, no build,
 no database. Only `testing` owns a `test:e2e` script; only `apps/gateway` owns a `db:push`.
 
-`globalDependencies` are `.env`, `eslint.config.js`, `tsconfig.base.json` and `prettier.config.js`.
+`globalDependencies` are `.env`, `eslint.config.js`, `tsconfig.json` and `prettier.config.js`.
 Touching any of them invalidates the cache for every task in the repo.
 
 ## What CI gates
@@ -135,6 +139,10 @@ Not gated, despite existing in the repo:
 
 `.github/workflows/release.yaml` (push to `main`) has a `Validate` job that runs `pnpm lint` only —
 **no unit tests and no e2e before a release build.**
+
+`.github/workflows/commitlint.yaml` (`pull_request` to any branch, so forks included) runs
+`commitlint` over the commits the pull request adds — `base.sha..head.sha`, never the history — against
+`commitlint.config.ts`. An unknown type fails; an unknown scope only warns (#1529).
 
 ## Playwright specifics
 

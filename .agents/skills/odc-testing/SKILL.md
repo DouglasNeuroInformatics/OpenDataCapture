@@ -10,14 +10,14 @@ finished on a green run alone.
 ## The package may have no unit tier at all
 
 **A workspace with no `vitest.config.ts` of its own contributes no project**, so a test file dropped
-into `packages/react-core` or `apps/gateway` today is collected by nothing, reported by nothing, and
-passes CI green, with no error to search for. `.agents/docs/architecture/testing-strategy.md` holds
+into `apps/gateway` or `packages/instrument-library` today is collected by nothing, reported by
+nothing, and passes CI green, with no error to search for. `.agents/docs/architecture/testing-strategy.md` holds
 the table of which packages have a project and which do not; check it before you write the file.
 
 When yours is not in that table, read that package's own `AGENTS.md` §Tests first: several
 workspaces are end-to-end-only by design and say so — `packages/instrument-library` (whose
-`.agents/docs/playbooks/add-instrument.md` step 7 makes the e2e test the whole answer),
-`apps/gateway`, and `packages/react-core` ("**if** a change warrants a unit test"). Where this one
+`.agents/docs/playbooks/add-instrument.md` step 7 makes the e2e test the whole answer) and
+`apps/gateway`. Where this one
 does, `.agents/docs/playbooks/add-vitest-project.md` is the ordering; for a package that renders
 React it adds a `happy-dom` devDependency, which the root hard rule says to confirm in-conversation
 before writing.

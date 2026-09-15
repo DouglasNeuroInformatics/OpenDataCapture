@@ -1,6 +1,6 @@
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { CreateGroupData, Group } from '@opendatacapture/schemas/group';
-import type { CreateUserData, User } from '@opendatacapture/schemas/user';
+import type { CreateUserData, UpdateUserData, User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
 import { E2E_MAIL_CONFIG, SEEDED_USER_PASSWORD } from './constants';
@@ -90,6 +90,18 @@ export class ApiClient {
       }),
       `set mail enabled to ${enabled}`
     );
+  }
+
+  /**
+   * Updates a user. `additionalPermissions` is on the update schema and not the create one, so
+   * seeding a user who holds any is necessarily two calls.
+   */
+  async updateUser(id: string, data: Partial<UpdateUserData>): Promise<User> {
+    const response = await this.request.patch(`${API}/users/${id}`, { data, headers: this.authHeaders });
+    if (!response.ok()) {
+      throw new Error(`Failed to update user '${id}' (${response.status()}): ${await response.text()}`);
+    }
+    return (await response.json()) as User;
   }
 
   private async expectJson<T>(
