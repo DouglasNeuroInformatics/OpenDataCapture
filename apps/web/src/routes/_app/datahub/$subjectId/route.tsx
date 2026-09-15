@@ -53,7 +53,7 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       <div className="mb-5 flex">
-        <TabLink label={t('layout.tabs.table')} pathname={`${basePathname}/table`} testId="subject-table" />
+        <TabLink label={t('layout.tabs.table')} pathname={`${basePathname}/table`} testId="subject-table-tab" />
         <TabLink label={t('layout.tabs.graph')} pathname={`${basePathname}/graph`} testId="subject-graph" />
         {config.setup.isGatewayEnabled && (
           <TabLink

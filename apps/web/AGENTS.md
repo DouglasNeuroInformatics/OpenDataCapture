@@ -81,6 +81,24 @@ export const subjectsQueryOptions = ({ params }: { params?: SubjectsQueryParams 
   `disableDefaultAuth`). Only the second half is mechanically enforced — eslint bans `axios.create`,
   but nothing stops you setting a React Query `retry`, so that one is on you.
 
+## Forms
+
+The libui `Form` has **no imperative way to set a field**, and a field's own control only ever writes
+its own value — the password variant's `generatePassword` calls `setValue`, which fills `password`
+and leaves `confirmPassword` untouched. To write into any _other_ field, use the `subscribe` prop:
+its effect refires whenever `selector` returns something new, and `onChange` receives a `setValues`.
+`src/hooks/usePasswordGenerator.ts` does both halves. Remounting with fresh `initialValues` via `key`
+also works and **discards every other field the user has already filled in**.
+
+Two traps in that prop:
+
+- `FormProps` leaves `TData` uninstantiated in `subscribe.onChange`'s **second** parameter, so
+  `setValues` infers as an error type and `@typescript-eslint/no-unsafe-argument` rejects passing it
+  anywhere. Annotate the parameter at the call site.
+- `perfectionist/sort-objects` alphabetizes the `fields` object, which is also its **render order** —
+  so `confirmPassword` sorts above `password`. Every form with a password pair carries an explicit
+  `eslint-disable` for this; follow that rather than accepting the sorted order.
+
 ## State
 
 One Zustand store, slice pattern. Slice _types_ all live in `store/types.ts`; each slice file exports

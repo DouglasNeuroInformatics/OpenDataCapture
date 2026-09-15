@@ -4,6 +4,7 @@ import { z } from 'zod/v4';
 
 import {
   $$InstrumentUIOption,
+  $$ScalarInstrument,
   $InstrumentDetails,
   $InstrumentKind,
   $InstrumentLanguage,
@@ -77,5 +78,16 @@ describe('$ScalarInstrument', () => {
   });
   it('should handle a multilingual form', () => {
     expect($ScalarInstrument.safeParse(bilingualFormInstrument.instance).success).toBe(true);
+  });
+});
+
+describe('$$ScalarInstrument', () => {
+  it('should narrow the language field to a single literal when specialized to that language', () => {
+    expect($$ScalarInstrument('en').safeParse(unilingualFormInstrument.instance).success).toBe(true);
+    expect($$ScalarInstrument('fr').safeParse(unilingualFormInstrument.instance).success).toBe(false);
+  });
+  it('should narrow the language field to a literal array when specialized to those languages', () => {
+    expect($$ScalarInstrument(['en', 'fr']).safeParse(bilingualFormInstrument.instance).success).toBe(true);
+    expect($$ScalarInstrument(['en', 'fr']).safeParse(unilingualFormInstrument.instance).success).toBe(false);
   });
 });

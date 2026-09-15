@@ -1,9 +1,17 @@
+import fs from 'fs';
 import path from 'path';
 
 import runtime from '@opendatacapture/vite-plugin-runtime';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
+
+// Read straight from the monorepo root rather than through `@opendatacapture/release-info`: that
+// package pulls in `@opendatacapture/schemas`, which ships raw TypeScript, and loading it here would
+// mean running this config under tsx as `apps/web` does.
+const { version } = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, '../../package.json'), 'utf-8')) as {
+  version: string;
+};
 
 export default defineConfig(({ mode }) => ({
   build: {
@@ -16,6 +24,7 @@ export default defineConfig(({ mode }) => ({
     target: 'es2022'
   },
   define: {
+    __APP_VERSION__: JSON.stringify(version),
     __GITHUB_REPO_URL__: `'${process.env.GITHUB_REPO_URL ?? '#'}'`
   },
   optimizeDeps: {

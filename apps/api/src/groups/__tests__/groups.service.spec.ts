@@ -42,13 +42,15 @@ describe('GroupsService', () => {
       expect(groupModel.create.mock.lastCall?.[0]).toMatchObject({ data: { name: 'Test Group' } });
     });
 
-    it('should connect only shared non-repo instruments', async () => {
+    it('should connect only shared non-repo instruments, matching an absent field as well as a null one, so an uploaded instrument is not skipped', async () => {
       instrumentModel.findMany.mockResolvedValueOnce([{ id: 'manual-1' }, { id: 'manual-2' }]);
       await groupsService.create({ name: 'Test Group', type: 'CLINICAL' });
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
         where: {
-          OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }],
-          sourceRepoId: null
+          AND: [
+            { OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }] },
+            { OR: [{ sourceRepoId: null }, { sourceRepoId: { isSet: false } }] }
+          ]
         }
       });
       expect(groupModel.create.mock.lastCall?.[0]).toMatchObject({

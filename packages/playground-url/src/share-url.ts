@@ -26,6 +26,17 @@ function encodeFiles(files: EditorFile[]): string {
 }
 
 /**
+ * Links carry their payload in the fragment, which the browser never sends to
+ * the server. Older links used the query string, where a large instrument
+ * exceeds the server's header limit (HTTP 431); it is still read so that links
+ * already shared keep working.
+ */
+function getShareParams(url: URL): URLSearchParams {
+  const fragmentParams = new URLSearchParams(url.hash.slice(1));
+  return fragmentParams.has('files') ? fragmentParams : url.searchParams;
+}
+
+/**
  * Encode an instrument's source files into a playground share URL. Anyone who
  * opens the returned link gets a snapshot of the provided files loaded into the
  * playground.
@@ -37,24 +48,28 @@ function encodeShareURL({
   label
 }: EncodeShareURLOptions): ShareURL {
   const url = new URL(baseURL) as ShareURL;
-  url.searchParams.append('files', encodeFiles(files));
-  url.searchParams.append('label', lz.compressToEncodedURIComponent(label));
+  const params = new URLSearchParams({
+    files: encodeFiles(files),
+    label: lz.compressToEncodedURIComponent(label)
+  });
   if (fullscreen) {
-    url.searchParams.append('fullscreen', '1');
+    params.append('fullscreen', '1');
   }
+  url.hash = params.toString();
   url.size = new TextEncoder().encode(url.href).length;
   return url;
 }
 
 /** Returns `true` if the URL requests the fullscreen, read-only preview mode. */
 function isFullscreenShareURL(url: URL): boolean {
-  return url.searchParams.get('fullscreen') === '1';
+  return getShareParams(url).get('fullscreen') === '1';
 }
 
 /** Decode an instrument from a playground share URL, or `null` if the URL carries no instrument. */
 function decodeShareURL(url: URL): null | PlaygroundInstrument {
-  const encodedFiles = url.searchParams.get('files');
-  const encodedLabel = url.searchParams.get('label');
+  const params = getShareParams(url);
+  const encodedFiles = params.get('files');
+  const encodedLabel = params.get('label');
   if (!(encodedFiles && encodedLabel)) {
     return null;
   }

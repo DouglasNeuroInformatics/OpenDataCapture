@@ -31,7 +31,7 @@ async function getGitCommit() {
 export async function getReleaseInfo(): Promise<ReleaseInfo> {
   try {
     if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-      return $DevelopmentReleaseInfo.parseAsync({
+      return await $DevelopmentReleaseInfo.parseAsync({
         branch: await getGitBranch(),
         buildTime: Date.now(),
         commit: await getGitCommit(),
@@ -42,7 +42,7 @@ export async function getReleaseInfo(): Promise<ReleaseInfo> {
           .then(({ version }) => version!)
       } satisfies DevelopmentReleaseInfo);
     } else if (process.env.NODE_ENV === 'production') {
-      return $ProductionReleaseInfo.parseAsync({
+      return await $ProductionReleaseInfo.parseAsync({
         buildTime: Date.now(),
         type: 'production',
         version: process.env.RELEASE_VERSION!

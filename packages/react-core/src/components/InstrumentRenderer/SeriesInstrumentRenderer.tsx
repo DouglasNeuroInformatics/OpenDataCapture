@@ -199,14 +199,20 @@ export const SeriesInstrumentRenderer = ({
                 .with({ status: 'DONE' }, () =>
                   match(scalarState)
                     .with({ instrument: { kind: 'FORM' } }, ({ instrument }) => (
+                      // Keyed by position, not by instrument: a series may administer the same
+                      // instrument twice, and its two items then carry byte-identical bundles. With
+                      // `skipProgress` there is no interstitial to unmount the form, so without this
+                      // React reconciles the next item onto the previous one and the answers of one
+                      // administration are presented to the subject as their own in the next.
                       <FormContent
                         instrument={instrument}
+                        key={currentItemIndex}
                         submitButtonLabel={submitButtonLabel}
                         onSubmit={handleSubmit}
                       />
                     ))
                     .with({ instrument: { kind: 'INTERACTIVE' } }, () => (
-                      <InteractiveContent bundle={scalarBundle!} onSubmit={handleSubmit} />
+                      <InteractiveContent bundle={scalarBundle!} key={currentItemIndex} onSubmit={handleSubmit} />
                     ))
                     .otherwise(() => null)
                 )

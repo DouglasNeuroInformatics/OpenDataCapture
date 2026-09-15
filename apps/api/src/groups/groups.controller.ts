@@ -14,9 +14,13 @@ import { GroupsService } from './groups.service';
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
+  // Gated on `manage all` (admin alone) rather than `create Group`. A group manager holds
+  // `manage Group` conditioned on their own groups, and the guard evaluates `@RouteAccess` against
+  // the subject type, where CASL ignores conditions -- so `create Group` admits every group
+  // manager. A create has no existing row for `GroupsService.create` to scope against either.
   @ApiOperation({ summary: 'Create Group' })
   @Post()
-  @RouteAccess({ action: 'create', subject: 'Group' })
+  @RouteAccess({ action: 'manage', subject: 'all' })
   create(@Body() createGroupDto: CreateGroupDto) {
     return this.groupsService.create(createGroupDto);
   }
