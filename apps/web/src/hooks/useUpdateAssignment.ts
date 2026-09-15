@@ -3,6 +3,8 @@ import type { UpdateAssignmentData } from '@opendatacapture/schemas/assignment';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
+import { ASSIGNMENTS_QUERY_KEY_PREFIX } from '@/hooks/useAssignmentsQuery';
+
 export function useUpdateAssignment() {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
@@ -12,7 +14,7 @@ export function useUpdateAssignment() {
     },
     onSuccess() {
       addNotification({ type: 'success' });
-      void queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      void queryClient.invalidateQueries({ queryKey: [ASSIGNMENTS_QUERY_KEY_PREFIX] });
     }
   });
 }

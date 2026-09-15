@@ -81,19 +81,50 @@ export function useNavItems() {
         url: '/upload'
       });
     }
+    // The bulk page is behind an instance toggle. With it off, the group links stay exactly where
+    // they were — two flat entries — so an instance that never turns this on sees no change at all.
+    // With it on they collapse into one group, whose children are gated independently: bulk assignment
+    // needs abilities managing a group does not, and holding only one of them must still surface it.
+    const isBulkEnabled = Boolean(setupStateQuery.data.isBulkRemoteAssignmentsEnabled);
+    const groupItems: NavItem[] = [];
     if (currentGroup && ability?.can('manage', 'Group')) {
-      globalItems.push({
+      groupItems.push({
         icon: UsersIcon,
         label: t('layout.navLinks.manageGroup'),
         url: '/group/manage'
       });
       // These templates exist only to email a remote assignment link, which the gateway serves
       if (setupStateQuery.data.isMailEnabled && config.setup.isGatewayEnabled) {
-        globalItems.push({
+        groupItems.push({
           icon: MailIcon,
           label: t({ en: 'Email Templates', fr: 'Modèles de courriel' }),
           url: '/group/email-templates'
         });
+      }
+    }
+    if (
+      isBulkEnabled &&
+      currentGroup &&
+      config.setup.isGatewayEnabled &&
+      ability?.can('create', 'Assignment') &&
+      ability.can('read', 'Assignment') &&
+      ability.can('read', 'Subject')
+    ) {
+      groupItems.push({
+        icon: SendIcon,
+        label: t({ en: 'Bulk Remote Assignments', fr: 'Tâches à distance en lot' }),
+        url: '/group/bulk-remote-assignments'
+      });
+    }
+    if (groupItems.length > 0) {
+      if (isBulkEnabled) {
+        globalItems.push({
+          children: groupItems,
+          icon: UsersIcon,
+          label: t({ en: 'Group Actions', fr: 'Actions de groupe' })
+        });
+      } else {
+        globalItems.push(...groupItems);
       }
     }
 
@@ -199,6 +230,7 @@ export function useNavItems() {
     currentSession,
     currentUser,
     resolvedLanguage,
+    setupStateQuery.data.isBulkRemoteAssignmentsEnabled,
     setupStateQuery.data.isExperimentalFeaturesEnabled,
     setupStateQuery.data.isMailEnabled
   ]);

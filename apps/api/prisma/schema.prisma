@@ -457,6 +457,7 @@ model SetupState {
   activeLanguages               Language[]      @default([en, fr])
   branding                      BrandingConfig?
   defaultAssignmentDurationDays Int?
+  isBulkRemoteAssignmentsEnabled Boolean?
   isDemo                        Boolean
   isExperimentalFeaturesEnabled Boolean?
   isSetup                       Boolean

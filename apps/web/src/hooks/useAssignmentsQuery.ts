@@ -2,6 +2,8 @@ import { $Assignment } from '@opendatacapture/schemas/assignment';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
+export const ASSIGNMENTS_QUERY_KEY_PREFIX = 'assignments' as const;
+
 export function useAssignmentsQuery({ params }: { params?: { subjectId?: string } }) {
   return useQuery({
     queryFn: async () => {
@@ -12,6 +14,6 @@ export function useAssignmentsQuery({ params }: { params?: { subjectId?: string 
       });
       return $Assignment.array().parse(response.data);
     },
-    queryKey: ['assignments', params?.subjectId]
+    queryKey: [ASSIGNMENTS_QUERY_KEY_PREFIX, params?.subjectId]
   });
 }
