@@ -44,6 +44,17 @@ export type AuthSlice = {
   revalidateToken: () => void;
 };
 
+export type EditorError = {
+  filename: string;
+  line: number;
+  message: string;
+};
+
+export type DiagnosticsSlice = {
+  editorErrors: EditorError[];
+  setEditorErrors: (editorErrors: EditorError[]) => void;
+};
+
 export type EditorState = {
   files: EditorFile[];
   indexFilename: null | string;
@@ -87,7 +98,13 @@ export type ViewerSlice = {
   };
 };
 
-export type AppStore = AuthSlice & EditorSlice & InstrumentSlice & SettingsSlice & TranspilerSlice & ViewerSlice;
+export type AppStore = AuthSlice &
+  DiagnosticsSlice &
+  EditorSlice &
+  InstrumentSlice &
+  SettingsSlice &
+  TranspilerSlice &
+  ViewerSlice;
 
 export type SliceCreator<T extends { [key: string]: unknown }> = StateCreator<
   AppStore,

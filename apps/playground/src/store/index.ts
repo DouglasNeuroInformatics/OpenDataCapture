@@ -10,6 +10,7 @@ import { immer } from 'zustand/middleware/immer';
 import { resolveIndexFilename } from '@/utils/file';
 
 import { createAuthSlice } from './slices/auth.slice';
+import { createDiagnosticsSlice } from './slices/diagnostics.slice';
 import { createEditorSlice } from './slices/editor.slice';
 import { createInstrumentSlice } from './slices/instrument.slice';
 import { createSettingsSlice } from './slices/settings.slice';
@@ -36,6 +37,7 @@ export const useAppStore = create(
       subscribeWithSelector(
         immer<AppStore>((...a) => ({
           ...createAuthSlice(...a),
+          ...createDiagnosticsSlice(...a),
           ...createEditorSlice(...a),
           ...createInstrumentSlice(...a),
           ...createSettingsSlice(...a),
