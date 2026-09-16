@@ -15,10 +15,10 @@ import type { WizardStep } from './types';
 const CANONICAL_FIELDS: CanonicalField[] = ['subjectId', 'firstName', 'lastName', 'dateOfBirth', 'sex'];
 
 const FIELD_LABELS: { [K in CanonicalField]: { en: string; fr: string } } = {
-  dateOfBirth: { en: 'Date of birth', fr: 'Date de naissance' },
-  firstName: { en: 'First name', fr: 'Prénom' },
-  lastName: { en: 'Last name', fr: 'Nom' },
-  sex: { en: 'Sex at birth', fr: 'Sexe à la naissance' },
+  dateOfBirth: { en: 'Date of Birth', fr: 'Date de naissance' },
+  firstName: { en: 'First Name', fr: 'Prénom' },
+  lastName: { en: 'Last Name', fr: 'Nom' },
+  sex: { en: 'Sex at Birth', fr: 'Sexe à la naissance' },
   subjectId: { en: 'Subject ID', fr: 'Identifiant du sujet' }
 } as const;
 
@@ -85,7 +85,7 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
           <Badge data-testid="bulk-detected-mode" variant="secondary">
             {mode === 'ID'
               ? t({ en: 'Subject ID', fr: 'Identifiant du sujet' })
-              : t({ en: 'Personal information', fr: 'Renseignements personnels' })}
+              : t({ en: 'Personal Information', fr: 'Renseignements personnels' })}
           </Badge>
         ) : null
       }
@@ -104,7 +104,7 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
         </React.Fragment>
       }
       step="SUBJECTS"
-      title={t({ en: 'Confirm the columns', fr: 'Confirmer les colonnes' })}
+      title={t({ en: 'Confirm the Columns', fr: 'Confirmer les colonnes' })}
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-map-step">
@@ -120,13 +120,15 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
         )}
 
         <div className="flex flex-col gap-2" data-testid="bulk-column-mapping">
-          <h3 className="text-sm font-medium">{t({ en: 'Column mapping', fr: 'Correspondance des colonnes' })}</h3>
-          <div className="overflow-hidden rounded-md border">
+          <h3 className="text-sm font-medium">{t({ en: 'Column Mapping', fr: 'Correspondance des colonnes' })}</h3>
+          <div className="overflow-hidden rounded-md border shadow-sm">
             <Table>
               <Table.Header className="bg-secondary [&_th]:text-secondary-foreground [&_th]:font-semibold">
                 <Table.Row>
-                  <Table.Head>{t({ en: 'Column in your file', fr: 'Colonne de votre fichier' })}</Table.Head>
-                  <Table.Head>{t({ en: 'Read as', fr: 'Interprétée comme' })}</Table.Head>
+                  <Table.Head className="py-3">
+                    {t({ en: 'Column in Your File', fr: 'Colonne de votre fichier' })}
+                  </Table.Head>
+                  <Table.Head className="py-3">{t({ en: 'Read As', fr: 'Interprétée comme' })}</Table.Head>
                 </Table.Row>
               </Table.Header>
               <Table.Body>
@@ -134,8 +136,8 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
                   const field = mapping[header];
                   return (
                     <Table.Row key={header}>
-                      <Table.Cell className="font-medium">{header}</Table.Cell>
-                      <Table.Cell>
+                      <Table.Cell className="py-3 font-medium">{header}</Table.Cell>
+                      <Table.Cell className="py-3">
                         <Select value={field ?? NOT_USED} onValueChange={(value) => setHeaderField(header, value)}>
                           <Select.Trigger
                             className={field ? 'w-48' : 'text-muted-foreground w-48 italic'}
@@ -144,7 +146,7 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
                             <Select.Value />
                           </Select.Trigger>
                           <Select.Content>
-                            <Select.Item value={NOT_USED}>{t({ en: 'Not used', fr: 'Non utilisée' })}</Select.Item>
+                            <Select.Item value={NOT_USED}>{t({ en: 'Not Used', fr: 'Non utilisée' })}</Select.Item>
                             {CANONICAL_FIELDS.filter((f) => !claimed.has(f) || f === field).map((f) => (
                               <Select.Item key={f} value={f}>
                                 {t(FIELD_LABELS[f])}
@@ -168,7 +170,7 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
               fr: `Aperçu des ${parsed.preview.length} premières lignes`
             })}
           </h3>
-          <div className="overflow-x-auto rounded-md border" data-testid="bulk-preview-table">
+          <div className="overflow-x-auto rounded-md border shadow-sm" data-testid="bulk-preview-table">
             <Table>
               <Table.Header className="bg-secondary [&_th]:text-secondary-foreground [&_th]:font-semibold">
                 <Table.Row>

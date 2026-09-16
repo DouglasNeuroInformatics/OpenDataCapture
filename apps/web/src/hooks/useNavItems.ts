@@ -112,7 +112,7 @@ export function useNavItems() {
     ) {
       groupItems.push({
         icon: SendIcon,
-        label: t({ en: 'Bulk Remote Assignments', fr: 'Tâches à distance en lot' }),
+        label: t({ en: 'Remote Assignments', fr: 'Tâches à distance' }),
         url: '/group/bulk-remote-assignments'
       });
     }

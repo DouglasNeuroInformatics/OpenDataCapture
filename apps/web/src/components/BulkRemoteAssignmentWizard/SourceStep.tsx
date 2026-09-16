@@ -113,9 +113,9 @@ export const SourceStep = ({
   };
 
   const modes: { label: string; value: SourceMode }[] = [
-    { label: t({ en: 'Select subjects', fr: 'Sélectionner des sujets' }), value: 'SELECT' },
-    { label: t({ en: 'Upload a file', fr: 'Téléverser un fichier' }), value: 'FILE' },
-    { label: t({ en: 'Paste data', fr: 'Coller des données' }), value: 'PASTE' }
+    { label: t({ en: 'Select Subjects', fr: 'Sélectionner des sujets' }), value: 'SELECT' },
+    { label: t({ en: 'Upload a File', fr: 'Téléverser un fichier' }), value: 'FILE' },
+    { label: t({ en: 'Paste Data', fr: 'Coller des données' }), value: 'PASTE' }
   ];
 
   // Every subject in the group is listed, not only those with a chosen identifier: a hash-identified
@@ -149,7 +149,7 @@ export const SourceStep = ({
         fr: 'Attribuez un ou plusieurs instruments à plusieurs sujets à la fois. Toutes les tâches sont créées ensemble.'
       })}
       step="SUBJECTS"
-      title={t({ en: 'Choose subjects', fr: 'Choisir les sujets' })}
+      title={t({ en: 'Choose Subjects', fr: 'Choisir les sujets' })}
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-source-step">
@@ -189,7 +189,10 @@ export const SourceStep = ({
                 {t({ en: 'This group has no subjects.', fr: 'Ce groupe n’a aucun sujet.' })}
               </p>
             ) : (
-              <div data-testid="bulk-subject-picker">
+              <div
+                className="overflow-hidden rounded-md border p-1 shadow-sm [&_td]:py-3 [&_th]:py-3"
+                data-testid="bulk-subject-picker"
+              >
                 <DataTable
                   columns={[
                     {
@@ -208,7 +211,7 @@ export const SourceStep = ({
                           filteredRows.length > 0 && filteredRows.every((row) => selected.has(row.id));
                         return (
                           <Checkbox
-                            aria-label={t({ en: 'Select all shown', fr: 'Tout sélectionner' })}
+                            aria-label={t({ en: 'Select All Shown', fr: 'Tout sélectionner' })}
                             checked={allFilteredSelected}
                             data-testid="bulk-select-all-subjects"
                             onCheckedChange={() => toggleFiltered(filteredRows)}
@@ -269,7 +272,7 @@ export const SourceStep = ({
                 type="button"
                 onClick={() => onSubjectsSelected([...selected])}
               >
-                {t({ en: 'Continue with selected', fr: 'Continuer avec la sélection' })}
+                {t({ en: 'Continue With Selected', fr: 'Continuer avec la sélection' })}
                 {selected.size > 0 && ` (${selected.size})`}
               </Button>
             </div>
@@ -319,7 +322,7 @@ export const SourceStep = ({
                 type="button"
                 onClick={() => void run(() => parseDelimitedText(pasted))}
               >
-                {t({ en: 'Use pasted data', fr: 'Utiliser les données collées' })}
+                {t({ en: 'Use Pasted Data', fr: 'Utiliser les données collées' })}
               </Button>
             </div>
           </div>

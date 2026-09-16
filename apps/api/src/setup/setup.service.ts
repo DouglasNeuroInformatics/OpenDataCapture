@@ -57,14 +57,18 @@ export class SetupService {
     // covers a document written before this setting existed, and this covers an instance with no
     // setup document at all.
     const [fallbackLanguage, ...otherLanguages] = savedOptions?.activeLanguages ?? [];
+    const isGatewayEnabled = this.configService.get('GATEWAY_ENABLED');
     return {
       activeLanguages: fallbackLanguage ? [fallbackLanguage, ...otherLanguages] : DEFAULT_ACTIVE_LANGUAGES,
       branding: branding.success ? branding.data : null,
       defaultAssignmentDurationDays: savedOptions?.defaultAssignmentDurationDays ?? null,
-      isBulkRemoteAssignmentsEnabled: savedOptions?.isBulkRemoteAssignmentsEnabled !== false,
+      // Derived from the gateway rather than reported as stored: a bulk assignment is only a link
+      // the gateway serves, so an instance that later dropped the gateway must report this off
+      // however the document was written while it had one.
+      isBulkRemoteAssignmentsEnabled: isGatewayEnabled && savedOptions?.isBulkRemoteAssignmentsEnabled !== false,
       isDemo: Boolean(savedOptions?.isDemo),
       isExperimentalFeaturesEnabled: Boolean(savedOptions?.isExperimentalFeaturesEnabled),
-      isGatewayEnabled: this.configService.get('GATEWAY_ENABLED'),
+      isGatewayEnabled,
       // Non-secret flag so the client can hide email UI when mail is off. The SMTP
       // configuration itself is never exposed here (this is a public route).
       isMailEnabled: isMailEnabled(savedOptions?.mailConfig),
@@ -99,6 +103,9 @@ export class SetupService {
     const setupState = await this.getSavedOptions();
     if (!setupState?.isSetup) {
       throw new ServiceUnavailableException('Cannot update state before setup');
+    }
+    if (rest.isBulkRemoteAssignmentsEnabled && !this.configService.get('GATEWAY_ENABLED')) {
+      throw new ForbiddenException('Cannot enable bulk remote assignments while the gateway is disabled');
     }
     const normalizedBranding = branding ? { resourceLinks: [], sectionsOrder: [], ...branding } : branding;
     await this.setupStateModel.update({

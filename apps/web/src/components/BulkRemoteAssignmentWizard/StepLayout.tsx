@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { Button, Card } from '@douglasneuroinformatics/libui/components';
+import { Card } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
-import { ChevronRightIcon } from 'lucide-react';
 
 import type { WizardStep } from './types';
 
@@ -50,32 +49,53 @@ const StepLayout = ({ aside, children, description, footer, onStepChange, step, 
       <Card.Header className="gap-3">
         {currentIndex !== -1 && (
           <nav aria-label={t({ en: 'Progress', fr: 'Progression' })} data-testid="bulk-breadcrumbs">
-            <ol className="flex flex-wrap items-center gap-1">
+            {/* Numbered markers joined by a rule, rather than a row of buttons: the buttons read as
+                three competing actions, and stretched across a wide card with nothing between them. */}
+            <ol className="flex w-full max-w-md items-center">
               {WIZARD_STEPS.map((name, index) => {
                 const isCurrent = index === currentIndex;
+                const isComplete = index < currentIndex;
                 // Only a step already completed can be revisited; jumping ahead would skip the work
                 // the later step depends on.
-                const isNavigable = index < currentIndex && Boolean(onStepChange);
-                const label = `${index + 1}. ${t(STEP_LABELS[name])}`;
+                const isNavigable = isComplete && Boolean(onStepChange);
                 return (
-                  <li className="flex items-center gap-1" key={name}>
+                  <li className={cn('flex items-center', index > 0 && 'flex-1')} key={name}>
                     {index > 0 && (
-                      <ChevronRightIcon aria-hidden="true" className="text-muted-foreground/50 h-3.5 w-3.5" />
+                      <span
+                        aria-hidden="true"
+                        className={cn('mx-2 h-px flex-1', isComplete || isCurrent ? 'bg-primary/40' : 'bg-border')}
+                      />
                     )}
-                    <Button
+                    <button
                       aria-current={isCurrent ? 'step' : undefined}
-                      // Disabled because you are already here, but not dimmed like a step you
-                      // cannot reach yet: it carries the accent so the position is obvious.
-                      className={cn(isCurrent && 'border-primary text-primary font-semibold disabled:opacity-100')}
+                      className={cn(
+                        'flex items-center gap-2 rounded-full text-sm transition-colors',
+                        isNavigable ? 'hover:text-foreground cursor-pointer' : 'cursor-default'
+                      )}
                       data-testid={`bulk-breadcrumb-${name}`}
                       disabled={!isNavigable}
-                      size="sm"
                       type="button"
-                      variant="outline"
                       onClick={() => onStepChange?.(STEP_ENTRY[name])}
                     >
-                      {label}
-                    </Button>
+                      <span
+                        className={cn(
+                          'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold',
+                          isCurrent && 'border-primary bg-primary text-primary-foreground',
+                          isComplete && 'border-primary/40 text-primary',
+                          !isCurrent && !isComplete && 'border-border text-muted-foreground'
+                        )}
+                      >
+                        {index + 1}
+                      </span>
+                      <span
+                        className={cn(
+                          'whitespace-nowrap',
+                          isCurrent ? 'text-foreground font-medium' : 'text-muted-foreground'
+                        )}
+                      >
+                        {t(STEP_LABELS[name])}
+                      </span>
+                    </button>
                   </li>
                 );
               })}

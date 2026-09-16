@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute, redirect } from '@tanstack/react-router';
@@ -34,13 +35,13 @@ const RouteComponent = () => {
     <React.Fragment>
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t({ en: 'Bulk Remote Assignments', fr: 'Tâches à distance en lot' })}
+          {t({ en: 'Remote Assignments', fr: 'Tâches à distance' })}
         </Heading>
       </PageHeader>
       <BulkRemoteAssignmentWizard
-        defaultExpiresAt={
-          getDefaultAssignmentExpiry(setupStateQuery.data.defaultAssignmentDurationDays).toISOString().split('T')[0]!
-        }
+        defaultExpiresAt={toBasicISOString(
+          getDefaultAssignmentExpiry(setupStateQuery.data.defaultAssignmentDurationDays)
+        )}
         groupId={currentGroup.id}
         groupName={currentGroup.name}
         instruments={instruments}

@@ -107,12 +107,12 @@ export const ReviewStep = ({
             type="button"
             onClick={() => onSubmit({ allowDuplicates })}
           >
-            {t({ en: 'Create assignments', fr: 'Créer les tâches' })}
+            {t({ en: 'Create Assignments', fr: 'Créer les tâches' })}
           </Button>
         </React.Fragment>
       }
       step="REVIEW"
-      title={t({ en: 'Review and create', fr: 'Réviser et créer' })}
+      title={t({ en: 'Review and Create', fr: 'Réviser et créer' })}
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-review-step">

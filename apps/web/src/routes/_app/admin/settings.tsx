@@ -91,7 +91,7 @@ const RouteComponent = () => {
   const uploaderLabel = t({ en: 'Enable Uploader', fr: 'Activer le téléversement' });
   const uploaderEnabled = setupStateQuery.data.isExperimentalFeaturesEnabled ?? false;
 
-  const bulkLabel = t({ en: 'Enable Bulk Remote Assignments', fr: 'Activer les tâches à distance en lot' });
+  const bulkLabel = t({ en: 'Enable Remote Assignments', fr: 'Activer les tâches à distance' });
   const bulkEnabled = setupStateQuery.data.isBulkRemoteAssignmentsEnabled ?? true;
 
   const activeLanguages = setupStateQuery.data.activeLanguages;

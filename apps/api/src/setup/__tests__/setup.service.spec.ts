@@ -2,6 +2,7 @@ import { ConfigService, getModelToken, LoggingService, PRISMA_CLIENT_TOKEN } fro
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
+import { ForbiddenException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -12,6 +13,7 @@ import { UsersService } from '@/users/users.service';
 import { SetupService } from '../setup.service';
 
 describe('SetupService', () => {
+  let configService: MockedInstance<ConfigService>;
   let setupService: SetupService;
   let setupStateModel: MockedInstance<Model<'SetupState'>>;
 
@@ -31,7 +33,8 @@ describe('SetupService', () => {
     }).compile();
     setupService = moduleRef.get(SetupService);
     setupStateModel = moduleRef.get(getModelToken('SetupState'));
-    moduleRef.get<MockedInstance<ConfigService>>(ConfigService).get.mockReturnValue(false);
+    configService = moduleRef.get<MockedInstance<ConfigService>>(ConfigService);
+    configService.get.mockReturnValue(false);
   });
 
   describe('updateState', () => {
@@ -59,6 +62,7 @@ describe('SetupService', () => {
 
   describe('isBulkRemoteAssignmentsEnabled', () => {
     it('should persist isBulkRemoteAssignmentsEnabled', async () => {
+      configService.get.mockReturnValue(true);
       setupStateModel.findFirst.mockResolvedValue({ id: 'setup-1', isSetup: true });
       await setupService.updateState({ isBulkRemoteAssignmentsEnabled: true });
       expect(setupStateModel.update.mock.lastCall?.[0]).toMatchObject({
@@ -67,7 +71,24 @@ describe('SetupService', () => {
       });
     });
 
+    it('should refuse to enable it without the gateway, which is what serves an assignment', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ id: 'setup-1', isSetup: true });
+      await expect(setupService.updateState({ isBulkRemoteAssignmentsEnabled: true })).rejects.toThrow(
+        ForbiddenException
+      );
+      expect(setupStateModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should allow disabling it without the gateway, so an instance is never stuck with it on', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ id: 'setup-1', isSetup: true });
+      await setupService.updateState({ isBulkRemoteAssignmentsEnabled: false });
+      expect(setupStateModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { isBulkRemoteAssignmentsEnabled: false }
+      });
+    });
+
     it('should return true when saved as true', async () => {
+      configService.get.mockReturnValue(true);
       setupStateModel.findFirst.mockResolvedValue({
         isBulkRemoteAssignmentsEnabled: true,
         isDemo: false,
@@ -77,13 +98,24 @@ describe('SetupService', () => {
     });
 
     it('should default to true when the field is absent, so a new instance has it enabled', async () => {
+      configService.get.mockReturnValue(true);
       setupStateModel.findFirst.mockResolvedValue({ isDemo: false, isSetup: true });
       await expect(setupService.getState()).resolves.toMatchObject({ isBulkRemoteAssignmentsEnabled: true });
     });
 
     it('should return false when explicitly disabled', async () => {
+      configService.get.mockReturnValue(true);
       setupStateModel.findFirst.mockResolvedValue({
         isBulkRemoteAssignmentsEnabled: false,
+        isDemo: false,
+        isSetup: true
+      });
+      await expect(setupService.getState()).resolves.toMatchObject({ isBulkRemoteAssignmentsEnabled: false });
+    });
+
+    it('should report it disabled without the gateway, even for a document saved while there was one', async () => {
+      setupStateModel.findFirst.mockResolvedValue({
+        isBulkRemoteAssignmentsEnabled: true,
         isDemo: false,
         isSetup: true
       });

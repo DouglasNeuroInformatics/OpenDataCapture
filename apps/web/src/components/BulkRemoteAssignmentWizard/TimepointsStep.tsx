@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Badge, Button, Input, Select } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { TrashIcon } from 'lucide-react';
@@ -49,7 +50,7 @@ export const TimepointsStep = ({
     (instrument) => !timepoints.some((timepoint) => timepoint.instrumentId === instrument.id)
   );
 
-  const todayISO = new Date().toISOString().split('T')[0]!;
+  const todayISO = toBasicISOString(new Date());
 
   const add = () => {
     const instrument = instruments.find(({ id }) => id === instrumentId);
@@ -83,7 +84,7 @@ export const TimepointsStep = ({
         </React.Fragment>
       }
       step="INSTRUMENTS"
-      title={t({ en: 'Choose instruments', fr: 'Choisir les instruments' })}
+      title={t({ en: 'Choose Instruments', fr: 'Choisir les instruments' })}
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-timepoints-step">
@@ -98,7 +99,7 @@ export const TimepointsStep = ({
             <Select value={instrumentId} onValueChange={setInstrumentId}>
               <Select.Trigger className="w-full" data-testid="bulk-instrument-select" id="bulk-instrument">
                 <span className="truncate">
-                  <Select.Value placeholder={t({ en: 'Choose an instrument', fr: 'Choisir un instrument' })} />
+                  <Select.Value placeholder={t({ en: 'Choose an Instrument', fr: 'Choisir un instrument' })} />
                 </span>
               </Select.Trigger>
               <Select.Content>
@@ -112,7 +113,7 @@ export const TimepointsStep = ({
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium" htmlFor="bulk-expiry">
-              {t({ en: 'Expires on', fr: 'Expire le' })}
+              {t({ en: 'Expires On', fr: 'Expire le' })}
             </label>
             <Input
               className="w-full"
@@ -151,7 +152,7 @@ export const TimepointsStep = ({
                 <div className="flex shrink-0 items-center gap-2">
                   <Badge variant="secondary">{timepoint.expiresAt}</Badge>
                   <button
-                    aria-label={t({ en: 'Remove instrument', fr: "Retirer l'instrument" })}
+                    aria-label={t({ en: 'Remove Instrument', fr: "Retirer l'instrument" })}
                     className="text-muted-foreground hover:text-destructive p-1"
                     type="button"
                     onClick={() => onChange(timepoints.filter((item) => item.instrumentId !== timepoint.instrumentId))}
