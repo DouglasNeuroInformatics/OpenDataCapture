@@ -20,6 +20,7 @@ import { SubjectDataTablePage } from '../pages/_app/datahub/$subjectId/table/ind
 import { DatahubPage } from '../pages/_app/datahub/index.page';
 import { GroupEmailTemplatesPage } from '../pages/_app/group/email-templates.page';
 import { GroupManagePage } from '../pages/_app/group/manage.page';
+import { RemoteAssignmentsPage } from '../pages/_app/group/remote-assignments.page';
 import { AccessibleInstrumentsPage } from '../pages/_app/instruments/accessible-instruments.page';
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { StartSessionPage } from '../pages/_app/session/start-session.page';
@@ -54,6 +55,7 @@ const pageModels = {
   '/datahub/$subjectId/table/$recordId': SubjectRecordDetailPage,
   '/group/email-templates': GroupEmailTemplatesPage,
   '/group/manage': GroupManagePage,
+  '/group/remote-assignments': RemoteAssignmentsPage,
   '/instruments/accessible-instruments': AccessibleInstrumentsPage,
   '/session/remote-assignment': RemoteAssignmentPage,
   '/session/start-session': StartSessionPage,
