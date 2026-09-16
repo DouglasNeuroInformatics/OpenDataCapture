@@ -32,7 +32,7 @@ const RouteComponent = () => {
     <div className="w-full">
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t({ en: 'Branding', fr: 'Image de marque' })}
+          {t({ en: 'Branding', es: 'Imagen de marca', fr: 'Image de marque' })}
         </Heading>
       </PageHeader>
       <div className="mx-auto w-full max-w-4xl">
@@ -40,10 +40,13 @@ const RouteComponent = () => {
           <div className="flex items-center gap-5 overflow-hidden rounded-2xl border border-slate-200/60 bg-white/90 p-5 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-sky-300/60 hover:shadow-xl dark:border-slate-700/60 dark:bg-slate-800/90 dark:hover:border-sky-600/60">
             <LoginPagePreview />
             <div className="min-w-0 flex-1">
-              <h3 className="text-foreground font-medium">{t({ en: 'Login Page', fr: 'Page de connexion' })}</h3>
+              <h3 className="text-foreground font-medium">
+                {t({ en: 'Login Page', es: 'Página de inicio de sesión', fr: 'Page de connexion' })}
+              </h3>
               <p className="text-muted-foreground mt-1 text-sm">
                 {t({
                   en: 'Customize the branding panel, colors, image, and text shown on the login page.',
+                  es: 'Personalice el panel de marca, los colores, la imagen y el texto que se muestran en la página de inicio de sesión.',
                   fr: "Personnalisez le panneau de marque, les couleurs, l'image et le texte affichés sur la page de connexion."
                 })}
               </p>

@@ -30,7 +30,9 @@ export const PreviewColumn = ({ editor, onOpenFullscreen, onPreviewLangChange, p
     <div className="lg:sticky lg:top-6 lg:self-start">
       {/* Preview header */}
       <div className="mb-2 flex items-center justify-between">
-        <Label className="text-muted-foreground">{t({ en: 'Live Preview', fr: 'Aperçu en direct' })}</Label>
+        <Label className="text-muted-foreground">
+          {t({ en: 'Live Preview', es: 'Vista previa en vivo', fr: 'Aperçu en direct' })}
+        </Label>
         <div className="flex items-center gap-1">
           {/* Language toggle — drives `previewLang` state; no content panes needed */}
           <Tabs value={previewLang} onValueChange={(v) => onPreviewLangChange(v as 'en' | 'fr')}>
@@ -44,7 +46,11 @@ export const PreviewColumn = ({ editor, onOpenFullscreen, onPreviewLangChange, p
             </Tabs.List>
           </Tabs>
           <Button
-            aria-label={t({ en: 'Fullscreen preview', fr: 'Aperçu plein écran' })}
+            aria-label={t({
+              en: 'Fullscreen preview',
+              es: 'Vista previa a pantalla completa',
+              fr: 'Aperçu plein écran'
+            })}
             size="sm"
             type="button"
             variant="ghost"

@@ -121,7 +121,7 @@ export const Sidebar = () => {
               <div data-testid="current-session-info">
                 <p>
                   {t(
-                    { en: '{}: {} {}', fr: '{} : {} {}' },
+                    { en: '{}: {} {}', es: '{}: {} {}', fr: '{} : {} {}' },
                     {
                       args: [t('core.fullName'), currentSession.subject.firstName, currentSession.subject.lastName]
                     }
@@ -129,7 +129,7 @@ export const Sidebar = () => {
                 </p>
                 <p>
                   {t(
-                    { en: '{}: {}', fr: '{} : {}' },
+                    { en: '{}: {}', es: '{}: {}', fr: '{} : {}' },
                     {
                       args: [
                         t('core.identificationData.dateOfBirth.label'),
@@ -140,7 +140,7 @@ export const Sidebar = () => {
                 </p>
                 <p>
                   {t(
-                    { en: '{}: {}', fr: '{} : {}' },
+                    { en: '{}: {}', es: '{}: {}', fr: '{} : {}' },
                     {
                       args: [
                         t('core.identificationData.sex.label'),
@@ -153,7 +153,10 @@ export const Sidebar = () => {
             ) : (
               <div data-testid="current-session-info">
                 <p>
-                  {t({ en: 'ID: {}', fr: 'ID : {}' }, { args: [removeSubjectIdScope(currentSession.subject!.id)] })}
+                  {t(
+                    { en: 'ID: {}', es: 'ID: {}', fr: 'ID : {}' },
+                    { args: [removeSubjectIdScope(currentSession.subject!.id)] }
+                  )}
                 </p>
               </div>
             )}

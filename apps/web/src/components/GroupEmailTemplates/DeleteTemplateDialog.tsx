@@ -16,12 +16,15 @@ export const DeleteTemplateDialog = ({ isPending, onConfirm, onOpenChange, templ
     <Dialog open={template !== null} onOpenChange={onOpenChange}>
       <Dialog.Content className="max-w-md">
         <Dialog.Header>
-          <Dialog.Title>{t({ en: 'Delete template', fr: 'Supprimer le modèle' })}</Dialog.Title>
+          <Dialog.Title>
+            {t({ en: 'Delete template', es: 'Eliminar plantilla', fr: 'Supprimer le modèle' })}
+          </Dialog.Title>
         </Dialog.Header>
         <Dialog.Description>
           {t(
             {
               en: 'Permanently delete "{}"? This cannot be undone.',
+              es: '¿Eliminar "{}" de forma permanente? Esta acción no se puede deshacer.',
               fr: 'Supprimer définitivement « {} » ? Cette action est irréversible.'
             },
             { args: [template?.name ?? ''] }
