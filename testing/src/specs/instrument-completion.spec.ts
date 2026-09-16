@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
 import { expect, test } from '../support/fixtures';
 
@@ -55,6 +57,57 @@ test.describe('instrument completion', () => {
     // and 'N/A' is what the hook falls back to when that field does not arrive.
     const { username } = await roleAccount('GROUP_MANAGER');
     await expect(page.getByTestId('subject-table-cell-username').first()).toHaveText(username);
+  });
+
+  // The set is serialized by the renderer, stored by the api, and revived by the web client, so
+  // these are the only tests that cross every hop a z.set() field takes before it is shown.
+  test.describe('z.set() fields', () => {
+    test.beforeEach(async ({ getPageModel, page, uniqueId }) => {
+      const startSessionPage = await getPageModel('/session/start-session');
+      await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+      await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+      await startSessionPage.fillSessionForm(`SetField${uniqueId}`, `Subject${uniqueId}`, 'Female');
+      await startSessionPage.submitForm();
+      await expect(startSessionPage.successMessage).toBeVisible();
+
+      await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+      await page.waitForURL('**/instruments/accessible-instruments');
+
+      const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
+      await expect(card).toBeVisible();
+      await card.click();
+
+      const instrumentPage = new RenderInstrumentPage(page);
+      await instrumentPage.begin();
+      await instrumentPage.completeHappinessQuestionnaireDissatisfied(['Money', 'Friends']);
+      await instrumentPage.submit();
+
+      await expect(instrumentPage.summaryHeading).toBeVisible();
+
+      await page.locator('[data-testid^="nav-button-/datahub/"]').click();
+      await page.waitForURL('**/datahub/**/table');
+
+      await page.getByRole('combobox').first().click();
+      await page.getByRole('option', { name: INSTRUMENT_TITLE }).click();
+    });
+
+    test('should show the members of a z.set() field in the subject table rather than [object Set]', async ({
+      page
+    }) => {
+      await expect(page.getByTestId('subject-table-cell-causesOfDissatisfaction').first()).toHaveText('MONEY, FRIENDS');
+    });
+
+    test('should export a z.set() field as the subject table displays it rather than {}', async ({ page }) => {
+      await expect(page.getByTestId('data-table-body').getByTestId('data-table-row').first()).toBeVisible();
+
+      const downloadPromise = page.waitForEvent('download');
+      await page.getByRole('button', { name: 'Download' }).click();
+      await page.getByRole('menuitem', { exact: true, name: 'CSV' }).click();
+      const download = await downloadPromise;
+
+      const csv = (await readFile(await download.path())).toString();
+      expect(csv).toContain('"MONEY, FRIENDS"');
+    });
   });
 
   test('should localize required-field errors from a zod v4 validation schema', async ({
