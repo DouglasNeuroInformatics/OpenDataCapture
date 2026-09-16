@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { resolveActiveLanguage } from '@opendatacapture/schemas/core';
 import type { ActiveLanguages } from '@opendatacapture/schemas/core';
 
 import { toLanguageToggleOptions } from '../utils/language';
@@ -8,21 +9,23 @@ import { toLanguageToggleOptions } from '../utils/language';
 /**
  * The languages an instance offers, as options for libui's `LanguageToggle`.
  *
- * Deactivating a language would otherwise strand every user already reading in it: their strings
- * still resolve, but the toggle no longer lists it, so they have no way back. Reconciling here —
- * rather than where an admin flips the setting — moves whoever is affected on their next load,
- * not just the admin who made the change.
+ * The effect covers an admin deactivating a language **during** a session: every component is
+ * subscribed to `languageChange` by then, so they all re-render. It cannot cover a tree that
+ * mounts already stranded — effects run child-first, so this fires before the ancestors rendering
+ * the toggle have subscribed, and they would keep the deactivated language. A host resolves that
+ * case before it renders (`apps/web` in the `_app` route's `beforeLoad`; `apps/gateway` picks the
+ * language server-side from the same set), which is why this only has to handle the live change.
  */
 export const useLanguageOptions = (activeLanguages: ActiveLanguages) => {
   const { changeLanguage, resolvedLanguage } = useTranslation();
 
-  const isActive = activeLanguages.includes(resolvedLanguage);
+  const reconciled = resolveActiveLanguage(resolvedLanguage, activeLanguages);
 
   useEffect(() => {
-    if (!isActive) {
-      changeLanguage(activeLanguages[0]);
+    if (reconciled !== resolvedLanguage) {
+      changeLanguage(reconciled);
     }
-  }, [isActive, activeLanguages]);
+  }, [reconciled, resolvedLanguage]);
 
   return toLanguageToggleOptions(activeLanguages);
 };
