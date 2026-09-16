@@ -5,7 +5,7 @@ import { useDownload, useNotificationsStore, useTranslation } from '@douglasneur
 import type { AnyUnilingualScalarInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import { omit } from 'lodash-es';
+import { mapValues, omit } from 'lodash-es';
 import { unparse } from 'papaparse';
 
 import { useInstrument } from '@/hooks/useInstrument';
@@ -13,6 +13,7 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
+import { formatRecordValue } from '@/utils/record-value';
 
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
@@ -69,7 +70,11 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       instrument.internal.edition
     }_${new Date().toISOString()}`;
 
-    const exportRecords = records.map((record) => omit(record, ['__time__', '__id__']));
+    const exportRecords = records.map((record) =>
+      mapValues(omit(record, ['__time__', '__id__']), (value) =>
+        value instanceof Set ? formatRecordValue(value) : value
+      )
+    );
 
     const makeWideRows = () => {
       const columnNames = Object.keys(exportRecords[0]!);
