@@ -10,6 +10,7 @@ import { SelectInstrument } from '@/components/SelectInstrument';
 import { TimeDropdown } from '@/components/TimeDropdown';
 import { useInstrumentVisualization } from '@/hooks/useInstrumentVisualization';
 import type { InstrumentVisualizationRecord } from '@/hooks/useInstrumentVisualization';
+import { formatRecordValue } from '@/utils/record-value';
 
 const RouteComponent = () => {
   const navigate = Route.useNavigate();
@@ -34,7 +35,7 @@ const RouteComponent = () => {
                 className="overflow-hidden text-ellipsis whitespace-nowrap"
                 data-testid={`subject-table-cell-${subItem}`}
               >
-                {String(value)}
+                {formatRecordValue(value)}
               </p>
             );
           },
