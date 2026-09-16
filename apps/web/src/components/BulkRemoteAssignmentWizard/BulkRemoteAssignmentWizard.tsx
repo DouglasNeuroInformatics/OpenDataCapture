@@ -13,6 +13,7 @@ import { ReviewStep } from './ReviewStep';
 import { SourceStep } from './SourceStep';
 import { StepLayout } from './StepLayout';
 import { TimepointsStep } from './TimepointsStep';
+import { WizardTable } from './WizardTable';
 
 type InstrumentOption = { id: string; title: string };
 
@@ -56,7 +57,7 @@ export const BulkRemoteAssignmentWizard = ({
   const wizard = useBulkAssignmentWizard({ groupId, instruments, subjectIdDisplayLength });
 
   return (
-    <div className="mx-auto flex max-w-[70rem] flex-col gap-6" data-testid="bulk-remote-assignment-wizard">
+    <div className="mx-auto flex w-full max-w-[70rem] flex-col gap-6" data-testid="bulk-remote-assignment-wizard">
       {wizard.step === 'SOURCE' && (
         <SourceStep
           selectedIds={wizard.subjectIds}
@@ -115,7 +116,13 @@ export const BulkRemoteAssignmentWizard = ({
           })}
           footer={
             <React.Fragment>
-              <Button data-testid="bulk-start-over" type="button" variant="outline" onClick={wizard.reset}>
+              <Button
+                className="mr-auto"
+                data-testid="bulk-start-over"
+                type="button"
+                variant="outline"
+                onClick={wizard.reset}
+              >
                 {t({ en: 'Start Over', fr: 'Recommencer' })}
               </Button>
               <Button
@@ -144,32 +151,31 @@ export const BulkRemoteAssignmentWizard = ({
             fr: `${wizard.assignments.length} tâches créées`
           })}
         >
-          <div className="max-h-96 overflow-auto rounded-md border shadow-sm" data-testid="bulk-done-step">
-            <Table>
-              <Table.Header className="bg-muted">
-                <Table.Row>
-                  <Table.Head className="py-3">{t('datahub.index.table.subject')}</Table.Head>
-                  <Table.Head className="py-3">{t({ en: 'Link', fr: 'Lien' })}</Table.Head>
-                  <Table.Head className="w-12 py-3" />
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {wizard.assignments.map((assignment) => (
-                  <Table.Row key={assignment.url}>
-                    <Table.Cell className="py-3 font-medium">
-                      {removeSubjectIdScope(assignment.subjectId).slice(0, subjectIdDisplayLength)}
-                    </Table.Cell>
-                    <Table.Cell className="text-muted-foreground max-w-0 truncate py-3 text-xs" title={assignment.url}>
-                      {assignment.url}
-                    </Table.Cell>
-                    <Table.Cell className="py-3">
-                      <CopyButton size="icon" text={assignment.url} variant="outline" />
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-          </div>
+          <WizardTable
+            className="max-h-96 overflow-auto"
+            data-testid="bulk-done-step"
+            head={
+              <React.Fragment>
+                <Table.Head>{t('datahub.index.table.subject')}</Table.Head>
+                <Table.Head>{t({ en: 'Link', fr: 'Lien' })}</Table.Head>
+                <Table.Head className="w-12" />
+              </React.Fragment>
+            }
+          >
+            {wizard.assignments.map((assignment) => (
+              <Table.Row key={assignment.url}>
+                <Table.Cell className="font-medium">
+                  {removeSubjectIdScope(assignment.subjectId).slice(0, subjectIdDisplayLength)}
+                </Table.Cell>
+                <Table.Cell className="text-muted-foreground max-w-0 truncate text-xs" title={assignment.url}>
+                  {assignment.url}
+                </Table.Cell>
+                <Table.Cell>
+                  <CopyButton size="icon" text={assignment.url} variant="outline" />
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </WizardTable>
         </StepLayout>
       )}
     </div>

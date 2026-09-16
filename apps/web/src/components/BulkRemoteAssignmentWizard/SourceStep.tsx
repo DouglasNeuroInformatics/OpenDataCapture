@@ -142,12 +142,48 @@ export const SourceStep = ({
     onSelectedChange([...next]);
   };
 
+  // A dropped file advances on its own, so only the other two modes have an action to offer.
+  const footers: { [K in SourceMode]?: React.ReactNode } = {
+    PASTE: (
+      <Button
+        data-testid="bulk-parse-pasted"
+        disabled={pasted.trim().length === 0}
+        type="button"
+        onClick={() => void run(() => parseDelimitedText(pasted))}
+      >
+        {t({ en: 'Use Pasted Data', fr: 'Utiliser les données collées' })}
+      </Button>
+    ),
+    SELECT: (
+      <React.Fragment>
+        {selected.size > BULK_ASSIGNMENT_MAX_SUBJECTS && (
+          <p className="text-destructive mr-auto text-sm">
+            {t({
+              en: `Selection is limited to ${BULK_ASSIGNMENT_MAX_SUBJECTS} subjects`,
+              fr: `La sélection est limitée à ${BULK_ASSIGNMENT_MAX_SUBJECTS} sujets`
+            })}
+          </p>
+        )}
+        <Button
+          data-testid="bulk-use-selected-subjects"
+          disabled={selected.size === 0 || selected.size > BULK_ASSIGNMENT_MAX_SUBJECTS}
+          type="button"
+          onClick={() => onSubjectsSelected([...selected])}
+        >
+          {t({ en: 'Continue With Selected', fr: 'Continuer avec la sélection' })}
+          {selected.size > 0 && ` (${selected.size})`}
+        </Button>
+      </React.Fragment>
+    )
+  };
+
   return (
     <StepLayout
       description={t({
         en: 'Assign one or more instruments to many subjects at once. Every assignment is created together.',
         fr: 'Attribuez un ou plusieurs instruments à plusieurs sujets à la fois. Toutes les tâches sont créées ensemble.'
       })}
+      footer={footers[mode]}
       step="SUBJECTS"
       title={t({ en: 'Choose Subjects', fr: 'Choisir les sujets' })}
       onStepChange={onStepChange}
@@ -162,10 +198,15 @@ export const SourceStep = ({
             setMode(value as SourceMode);
           }}
         >
-          <Tabs.List className="w-fit" data-testid="bulk-source-mode">
+          {/* Underlined rather than libui's filled pill: the pill is one page tint on another, and
+              the rule keeps to the card's own vocabulary. */}
+          <Tabs.List
+            className="h-auto w-full justify-start gap-6 rounded-none border-b bg-transparent p-0"
+            data-testid="bulk-source-mode"
+          >
             {modes.map((option) => (
               <Tabs.Trigger
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground -mb-px rounded-none border-b-2 border-transparent px-1 pb-3 pt-1 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                 data-testid={`bulk-source-mode-${option.value}`}
                 key={option.value}
                 value={option.value}
@@ -189,10 +230,7 @@ export const SourceStep = ({
                 {t({ en: 'This group has no subjects.', fr: 'Ce groupe n’a aucun sujet.' })}
               </p>
             ) : (
-              <div
-                className="overflow-hidden rounded-md border p-1 shadow-sm [&_td]:py-3 [&_th]:py-3"
-                data-testid="bulk-subject-picker"
-              >
+              <div data-testid="bulk-subject-picker">
                 <DataTable
                   columns={[
                     {
@@ -253,29 +291,13 @@ export const SourceStep = ({
                     }
                   ]}
                   data={rows}
+                  // The table paints its rows and ground in the page colour; inside the card they
+                  // take the card's, so the grid does not read as one more box.
+                  rootStyle={{ '--color-background': 'var(--color-card)' }}
                   onRowClick={(row) => toggle(row.id)}
                 />
               </div>
             )}
-            <div className="mt-3 flex justify-center">
-              {selected.size > BULK_ASSIGNMENT_MAX_SUBJECTS && (
-                <p className="text-destructive text-sm">
-                  {t({
-                    en: `Selection is limited to ${BULK_ASSIGNMENT_MAX_SUBJECTS} subjects`,
-                    fr: `La sélection est limitée à ${BULK_ASSIGNMENT_MAX_SUBJECTS} sujets`
-                  })}
-                </p>
-              )}
-              <Button
-                data-testid="bulk-use-selected-subjects"
-                disabled={selected.size === 0 || selected.size > BULK_ASSIGNMENT_MAX_SUBJECTS}
-                type="button"
-                onClick={() => onSubjectsSelected([...selected])}
-              >
-                {t({ en: 'Continue With Selected', fr: 'Continuer avec la sélection' })}
-                {selected.size > 0 && ` (${selected.size})`}
-              </Button>
-            </div>
           </div>
         )}
 
@@ -293,6 +315,7 @@ export const SourceStep = ({
                 'text/csv': ['.csv'],
                 'text/tab-separated-values': ['.tsv']
               }}
+              className="min-h-72"
               data-testid="bulk-file-dropzone"
               description={ACCEPTED_FILE_EXTENSIONS.join(', ')}
               file={null}
@@ -310,21 +333,12 @@ export const SourceStep = ({
               })}
             </p>
             <TextArea
+              className="min-h-72"
               data-testid="bulk-paste-input"
               rows={8}
               value={pasted}
               onChange={(event) => setPasted(event.target.value)}
             />
-            <div className="flex justify-center">
-              <Button
-                data-testid="bulk-parse-pasted"
-                disabled={pasted.trim().length === 0}
-                type="button"
-                onClick={() => void run(() => parseDelimitedText(pasted))}
-              >
-                {t({ en: 'Use Pasted Data', fr: 'Utiliser les données collées' })}
-              </Button>
-            </div>
           </div>
         )}
       </div>

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Badge, Button, Input, Select } from '@douglasneuroinformatics/libui/components';
+import { Button, Input, Select } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { TrashIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 
 import { StepLayout } from './StepLayout';
+import { TimepointTable } from './TimepointTable';
 
 import type { DraftTimepoint, WizardStep } from './types';
 
@@ -91,7 +92,7 @@ export const TimepointsStep = ({
         {/* Fixed column widths, and `minmax(0, …)` on the select so a long instrument title clips
           instead of widening its column. Laid out with flex and a min-width, the row re-flowed every
           time a different instrument was chosen. */}
-        <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,20rem)_10rem_auto]">
+        <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,20rem)_10rem_max-content]">
           <div className="flex min-w-0 flex-col gap-1">
             <label className="text-sm font-medium" htmlFor="bulk-instrument">
               {t({ en: 'Instrument', fr: 'Instrument' })}
@@ -126,42 +127,28 @@ export const TimepointsStep = ({
             />
           </div>
           <Button
+            className="gap-2"
             data-testid="bulk-add-timepoint"
             disabled={!instrumentId || !expiresAt || expiresAt <= todayISO}
             type="button"
+            variant="outline"
             onClick={add}
           >
+            <PlusIcon className="h-4 w-4" />
             {t({ en: 'Add', fr: 'Ajouter' })}
           </Button>
         </div>
 
-        <div className="flex flex-col gap-2" data-testid="bulk-timepoint-list">
+        <div data-testid="bulk-timepoint-list">
           {timepoints.length === 0 ? (
             <p className="text-muted-foreground text-sm italic">
               {t({ en: 'No instruments added yet.', fr: 'Aucun instrument ajouté.' })}
             </p>
           ) : (
-            timepoints.map((timepoint) => (
-              <div
-                className="flex items-center justify-between gap-3 rounded-md border px-3 py-2"
-                key={timepoint.instrumentId}
-              >
-                <span className="truncate text-sm" title={timepoint.instrumentTitle}>
-                  {timepoint.instrumentTitle}
-                </span>
-                <div className="flex shrink-0 items-center gap-2">
-                  <Badge variant="secondary">{timepoint.expiresAt}</Badge>
-                  <button
-                    aria-label={t({ en: 'Remove Instrument', fr: "Retirer l'instrument" })}
-                    className="text-muted-foreground hover:text-destructive p-1"
-                    type="button"
-                    onClick={() => onChange(timepoints.filter((item) => item.instrumentId !== timepoint.instrumentId))}
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            ))
+            <TimepointTable
+              timepoints={timepoints}
+              onRemove={(removed) => onChange(timepoints.filter((item) => item.instrumentId !== removed.instrumentId))}
+            />
           )}
         </div>
       </div>

@@ -8,6 +8,7 @@ import type { BulkParseError } from '@/utils/bulk-assignments';
 
 import { ErrorList } from './ErrorList';
 import { StepLayout } from './StepLayout';
+import { TimepointTable } from './TimepointTable';
 
 import type { DraftTimepoint, WizardStep } from './types';
 
@@ -118,20 +119,13 @@ export const ReviewStep = ({
       <div className="flex flex-col gap-4" data-testid="bulk-review-step">
         <ErrorList errors={messages} />
 
-        <div className="rounded-md border p-4">
-          <p className="mb-2 text-sm font-bold" data-testid="bulk-review-summary">
-            {t({
-              en: `${subjectCount} subjects × ${timepoints.length} instruments = ${subjectCount * timepoints.length} assignments`,
-              fr: `${subjectCount} sujets × ${timepoints.length} instruments = ${subjectCount * timepoints.length} tâches`
-            })}
-          </p>
-          <ul className="text-muted-foreground list-disc space-y-1 pl-5 text-sm">
-            {timepoints.map((timepoint) => {
-              const summary = `${timepoint.instrumentTitle} - ${timepoint.expiresAt}`;
-              return <li key={timepoint.instrumentId}>{summary}</li>;
-            })}
-          </ul>
-        </div>
+        <p className="text-sm font-medium" data-testid="bulk-review-summary">
+          {t({
+            en: `${subjectCount} subjects × ${timepoints.length} instruments = ${subjectCount * timepoints.length} assignments`,
+            fr: `${subjectCount} sujets × ${timepoints.length} instruments = ${subjectCount * timepoints.length} tâches`
+          })}
+        </p>
+        <TimepointTable timepoints={timepoints} />
 
         {hasConflict && (
           <label className="flex items-center gap-2 text-sm">

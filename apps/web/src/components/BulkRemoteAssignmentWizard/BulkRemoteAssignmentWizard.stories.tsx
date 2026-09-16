@@ -4,11 +4,13 @@ import type { Subject } from '@opendatacapture/schemas/subject';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import { withAppFrame } from '@/testing/withAppFrame';
+
 import { BulkRemoteAssignmentWizard } from './BulkRemoteAssignmentWizard';
 
 type Story = StoryObj<typeof BulkRemoteAssignmentWizard>;
 
-const subject = (id: string): Subject => ({
+const subject = (id: string, overrides: Partial<Pick<Subject, 'dateOfBirth' | 'sex'>> = {}): Subject => ({
   createdAt: new Date(),
   dateOfBirth: null,
   firstName: null,
@@ -16,29 +18,41 @@ const subject = (id: string): Subject => ({
   id,
   lastName: null,
   sex: null,
-  updatedAt: new Date()
+  updatedAt: new Date(),
+  ...overrides
 });
 
 export default {
   args: {
     defaultExpiresAt: new Date(Date.now() + 30 * 86_400_000).toISOString().split('T')[0]!,
     groupId: 'group-1',
+    groupName: 'Depression Clinic',
     instruments: [
       { id: 'instrument-1', title: 'Happiness Questionnaire' },
       { id: 'instrument-2', title: 'General Consent Form' }
     ],
     subjectIdDisplayLength: 9,
-    subjects: [subject('Depression_Clinic$001'), subject('Depression_Clinic$002')]
+    subjects: [
+      subject('Depression_Clinic$001', { dateOfBirth: new Date(1979, 7, 12), sex: 'MALE' }),
+      subject('Depression_Clinic$002', { dateOfBirth: new Date(1972, 1, 17), sex: 'FEMALE' }),
+      subject('Depression_Clinic$003'),
+      subject('Depression_Clinic$004', { dateOfBirth: new Date(1990, 4, 3), sex: 'FEMALE' }),
+      subject('Depression_Clinic$005')
+    ]
   },
   component: BulkRemoteAssignmentWizard,
-  // The wizard submits through a mutation, so it needs a client even in the states that never submit.
   decorators: [
+    // The wizard submits through a mutation, so it needs a client even in the states that never submit.
     (Story: React.ComponentType) => (
       <QueryClientProvider client={new QueryClient()}>
         <Story />
       </QueryClientProvider>
-    )
-  ]
+    ),
+    withAppFrame('Remote Assignments')
+  ],
+  parameters: {
+    layout: 'fullscreen'
+  }
 } as Meta<typeof BulkRemoteAssignmentWizard>;
 
 /** The entry state: pick existing subjects, upload a file, or paste delimited data. */

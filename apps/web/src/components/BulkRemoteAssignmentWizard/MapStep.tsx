@@ -9,6 +9,7 @@ import type { BulkParseError, BulkParseResult, BulkSourceMode, CanonicalField } 
 
 import { ErrorList } from './ErrorList';
 import { StepLayout } from './StepLayout';
+import { WizardTable } from './WizardTable';
 
 import type { WizardStep } from './types';
 
@@ -107,7 +108,7 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
       title={t({ en: 'Confirm the Columns', fr: 'Confirmer les colonnes' })}
       onStepChange={onStepChange}
     >
-      <div className="flex flex-col gap-4" data-testid="bulk-map-step">
+      <div className="flex flex-col gap-6" data-testid="bulk-map-step">
         <ErrorList errors={errors} />
 
         {mode === 'PII' && (
@@ -121,46 +122,41 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
 
         <div className="flex flex-col gap-2" data-testid="bulk-column-mapping">
           <h3 className="text-sm font-medium">{t({ en: 'Column Mapping', fr: 'Correspondance des colonnes' })}</h3>
-          <div className="overflow-hidden rounded-md border shadow-sm">
-            <Table>
-              <Table.Header className="bg-secondary [&_th]:text-secondary-foreground [&_th]:font-semibold">
-                <Table.Row>
-                  <Table.Head className="py-3">
-                    {t({ en: 'Column in Your File', fr: 'Colonne de votre fichier' })}
-                  </Table.Head>
-                  <Table.Head className="py-3">{t({ en: 'Read As', fr: 'Interprétée comme' })}</Table.Head>
+          <WizardTable
+            head={
+              <React.Fragment>
+                <Table.Head>{t({ en: 'Column in Your File', fr: 'Colonne de votre fichier' })}</Table.Head>
+                <Table.Head>{t({ en: 'Read As', fr: 'Interprétée comme' })}</Table.Head>
+              </React.Fragment>
+            }
+          >
+            {parsed.headers.map((header) => {
+              const field = mapping[header];
+              return (
+                <Table.Row key={header}>
+                  <Table.Cell className="font-medium">{header}</Table.Cell>
+                  <Table.Cell className="py-2">
+                    <Select value={field ?? NOT_USED} onValueChange={(value) => setHeaderField(header, value)}>
+                      <Select.Trigger
+                        className={field ? 'w-48' : 'text-muted-foreground w-48 italic'}
+                        data-testid={`bulk-map-select-${header}`}
+                      >
+                        <Select.Value />
+                      </Select.Trigger>
+                      <Select.Content>
+                        <Select.Item value={NOT_USED}>{t({ en: 'Not Used', fr: 'Non utilisée' })}</Select.Item>
+                        {CANONICAL_FIELDS.filter((f) => !claimed.has(f) || f === field).map((f) => (
+                          <Select.Item key={f} value={f}>
+                            {t(FIELD_LABELS[f])}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select>
+                  </Table.Cell>
                 </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {parsed.headers.map((header) => {
-                  const field = mapping[header];
-                  return (
-                    <Table.Row key={header}>
-                      <Table.Cell className="py-3 font-medium">{header}</Table.Cell>
-                      <Table.Cell className="py-3">
-                        <Select value={field ?? NOT_USED} onValueChange={(value) => setHeaderField(header, value)}>
-                          <Select.Trigger
-                            className={field ? 'w-48' : 'text-muted-foreground w-48 italic'}
-                            data-testid={`bulk-map-select-${header}`}
-                          >
-                            <Select.Value />
-                          </Select.Trigger>
-                          <Select.Content>
-                            <Select.Item value={NOT_USED}>{t({ en: 'Not Used', fr: 'Non utilisée' })}</Select.Item>
-                            {CANONICAL_FIELDS.filter((f) => !claimed.has(f) || f === field).map((f) => (
-                              <Select.Item key={f} value={f}>
-                                {t(FIELD_LABELS[f])}
-                              </Select.Item>
-                            ))}
-                          </Select.Content>
-                        </Select>
-                      </Table.Cell>
-                    </Table.Row>
-                  );
-                })}
-              </Table.Body>
-            </Table>
-          </div>
+              );
+            })}
+          </WizardTable>
         </div>
 
         <div className="flex flex-col gap-2">
@@ -170,26 +166,20 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
               fr: `Aperçu des ${parsed.preview.length} premières lignes`
             })}
           </h3>
-          <div className="overflow-x-auto rounded-md border shadow-sm" data-testid="bulk-preview-table">
-            <Table>
-              <Table.Header className="bg-secondary [&_th]:text-secondary-foreground [&_th]:font-semibold">
-                <Table.Row>
-                  {parsed.headers.map((header) => (
-                    <Table.Head key={header}>{header}</Table.Head>
-                  ))}
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {parsed.preview.map((row, index) => (
-                  <Table.Row key={index}>
-                    {parsed.headers.map((header) => (
-                      <Table.Cell key={header}>{row[header]}</Table.Cell>
-                    ))}
-                  </Table.Row>
+          <WizardTable
+            data-testid="bulk-preview-table"
+            head={parsed.headers.map((header) => (
+              <Table.Head key={header}>{header}</Table.Head>
+            ))}
+          >
+            {parsed.preview.map((row, index) => (
+              <Table.Row key={index}>
+                {parsed.headers.map((header) => (
+                  <Table.Cell key={header}>{row[header]}</Table.Cell>
                 ))}
-              </Table.Body>
-            </Table>
-          </div>
+              </Table.Row>
+            ))}
+          </WizardTable>
         </div>
       </div>
     </StepLayout>
