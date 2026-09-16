@@ -16,5 +16,8 @@ export class UpdateSetupStateDto implements UpdateSetupStateData {
   defaultAssignmentDurationDays?: null | number;
 
   @ApiProperty({ required: false })
+  isBulkRemoteAssignmentsEnabled?: boolean;
+
+  @ApiProperty({ required: false })
   isExperimentalFeaturesEnabled?: boolean;
 }

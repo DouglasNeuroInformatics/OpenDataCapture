@@ -1,0 +1,183 @@
+import React from 'react';
+
+import { Button, CopyButton, Table } from '@douglasneuroinformatics/libui/components';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { Subject } from '@opendatacapture/schemas/subject';
+import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
+
+import { useBulkAssignmentWizard } from '@/hooks/useBulkAssignmentWizard';
+import { resultCsvFilename, toResultCsv } from '@/utils/bulk-assignments';
+
+import { MapStep } from './MapStep';
+import { ReviewStep } from './ReviewStep';
+import { SourceStep } from './SourceStep';
+import { StepLayout } from './StepLayout';
+import { TimepointsStep } from './TimepointsStep';
+import { WizardTable } from './WizardTable';
+
+type InstrumentOption = { id: string; title: string };
+
+const downloadCsv = (csv: string) => {
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+  const anchor = document.createElement('a');
+  anchor.download = resultCsvFilename(new Date());
+  anchor.href = url;
+  anchor.click();
+  URL.revokeObjectURL(url);
+};
+
+export type BulkRemoteAssignmentWizardProps = {
+  /** Prefilled expiry for a new timepoint, as `YYYY-MM-DD`. */
+  defaultExpiresAt: string;
+  groupId: string;
+  /** Needed to turn a pasted custom identifier back into the scoped form it is stored under. */
+  groupName: string;
+  instruments: InstrumentOption[];
+  /** Group setting controlling how much of an identifier the subject picker shows. */
+  subjectIdDisplayLength: number;
+  subjects: Subject[];
+};
+
+/**
+ * Bulk remote assignment wizard.
+ *
+ * The operation is all-or-nothing end to end: the API refuses a batch it cannot create in full, so
+ * there is no partial-result state to render. A refusal returns the user to review with what to fix,
+ * and nothing has been created.
+ */
+export const BulkRemoteAssignmentWizard = ({
+  defaultExpiresAt,
+  groupId,
+  groupName,
+  instruments,
+  subjectIdDisplayLength,
+  subjects
+}: BulkRemoteAssignmentWizardProps) => {
+  const { t } = useTranslation();
+  const wizard = useBulkAssignmentWizard({ groupId, instruments, subjectIdDisplayLength });
+
+  return (
+    <div className="mx-auto flex w-full max-w-[70rem] flex-col gap-6" data-testid="bulk-remote-assignment-wizard">
+      {wizard.step === 'SOURCE' && (
+        <SourceStep
+          selectedIds={wizard.subjectIds}
+          subjectIdDisplayLength={subjectIdDisplayLength}
+          subjects={subjects}
+          onParsed={wizard.acceptParsed}
+          onSelectedChange={wizard.setSelectedSubjectIds}
+          onStepChange={wizard.goTo}
+          onSubjectsSelected={wizard.selectSubjects}
+        />
+      )}
+
+      {wizard.step === 'MAP' && wizard.parsed && (
+        <MapStep
+          groupName={groupName}
+          parsed={wizard.parsed}
+          onBack={() => wizard.goTo('SOURCE')}
+          onResolved={(ids) => wizard.resolveMapping(ids, wizard.parsed!.rows)}
+          onStepChange={wizard.goTo}
+        />
+      )}
+
+      {wizard.step === 'TIMEPOINTS' && (
+        <TimepointsStep
+          defaultExpiresAt={defaultExpiresAt}
+          instruments={instruments}
+          isLoading={wizard.isPreflighting}
+          subjectCount={wizard.subjectIds.length}
+          timepoints={wizard.timepoints}
+          onBack={() => wizard.goTo('SOURCE')}
+          onChange={wizard.setTimepoints}
+          onConfirm={wizard.confirmTimepoints}
+          onStepChange={wizard.goTo}
+        />
+      )}
+
+      {wizard.step === 'REVIEW' && (
+        <ReviewStep
+          describeSubject={wizard.describeSubject}
+          failure={wizard.failure}
+          isSubmitting={wizard.isSubmitting}
+          subjectCount={wizard.subjectIds.length}
+          timepoints={wizard.timepoints}
+          transportError={wizard.transportError}
+          onBack={() => wizard.goTo('TIMEPOINTS')}
+          onStepChange={wizard.goTo}
+          onSubmit={wizard.submit}
+        />
+      )}
+
+      {wizard.step === 'DONE' && (
+        <StepLayout
+          description={t({
+            en: 'Each subject has a link below. Copy them, or download a CSV to share with whoever is sending them out.',
+            fr: 'Chaque sujet a un lien ci-dessous. Copiez-les ou téléchargez un CSV à transmettre à la personne qui les enverra.'
+          })}
+          footer={
+            <React.Fragment>
+              <Button
+                className="mr-auto"
+                data-testid="bulk-start-over"
+                type="button"
+                variant="outline"
+                onClick={wizard.reset}
+              >
+                {t({ en: 'Start Over', fr: 'Recommencer' })}
+              </Button>
+              <Button
+                data-testid="bulk-copy-links"
+                type="button"
+                variant="outline"
+                onClick={() => void wizard.copyLinks()}
+                onMouseLeave={wizard.clearCopied}
+              >
+                {wizard.didCopy
+                  ? t({ en: 'Copied', fr: 'Copié' })
+                  : t({ en: 'Copy All Links', fr: 'Copier tous les liens' })}
+              </Button>
+              <Button
+                data-testid="bulk-download-csv"
+                type="button"
+                onClick={() => downloadCsv(toResultCsv(wizard.resultRows()))}
+              >
+                {t({ en: 'Download CSV', fr: 'Télécharger le CSV' })}
+              </Button>
+            </React.Fragment>
+          }
+          step={null}
+          title={t({
+            en: `${wizard.assignments.length} Assignments Created`,
+            fr: `${wizard.assignments.length} tâches créées`
+          })}
+        >
+          <WizardTable
+            className="max-h-96 overflow-auto"
+            data-testid="bulk-done-step"
+            head={
+              <React.Fragment>
+                <Table.Head>{t('datahub.index.table.subject')}</Table.Head>
+                <Table.Head>{t({ en: 'Link', fr: 'Lien' })}</Table.Head>
+                <Table.Head className="w-12" />
+              </React.Fragment>
+            }
+          >
+            {wizard.assignments.map((assignment) => (
+              <Table.Row key={assignment.url}>
+                <Table.Cell className="font-medium">
+                  {removeSubjectIdScope(assignment.subjectId).slice(0, subjectIdDisplayLength)}
+                </Table.Cell>
+                <Table.Cell className="text-muted-foreground max-w-0 truncate text-xs" title={assignment.url}>
+                  {assignment.url}
+                </Table.Cell>
+                <Table.Cell>
+                  <CopyButton size="icon" text={assignment.url} variant="outline" />
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </WizardTable>
+        </StepLayout>
+      )}
+    </div>
+  );
+};

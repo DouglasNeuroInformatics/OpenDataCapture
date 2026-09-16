@@ -24,6 +24,7 @@ import { Route as AppUploadInstrumentIdRouteImport } from './routes/_app/upload/
 import { Route as AppSessionStartSessionRouteImport } from './routes/_app/session/start-session'
 import { Route as AppSessionRemoteAssignmentRouteImport } from './routes/_app/session/remote-assignment'
 import { Route as AppInstrumentsAccessibleInstrumentsRouteImport } from './routes/_app/instruments/accessible-instruments'
+import { Route as AppGroupRemoteAssignmentsRouteImport } from './routes/_app/group/remote-assignments'
 import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
 import { Route as AppGroupEmailTemplatesRouteImport } from './routes/_app/group/email-templates'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
@@ -117,6 +118,12 @@ const AppInstrumentsAccessibleInstrumentsRoute =
   AppInstrumentsAccessibleInstrumentsRouteImport.update({
     id: '/instruments/accessible-instruments',
     path: '/instruments/accessible-instruments',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppGroupRemoteAssignmentsRoute =
+  AppGroupRemoteAssignmentsRouteImport.update({
+    id: '/group/remote-assignments',
+    path: '/group/remote-assignments',
     getParentRoute: () => AppRouteRoute,
   } as any)
 const AppGroupManageRoute = AppGroupManageRouteImport.update({
@@ -231,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/group/manage': typeof AppGroupManageRoute
+  '/group/remote-assignments': typeof AppGroupRemoteAssignmentsRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/session/start-session': typeof AppSessionStartSessionRoute
@@ -265,6 +273,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/group/manage': typeof AppGroupManageRoute
+  '/group/remote-assignments': typeof AppGroupRemoteAssignmentsRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/session/start-session': typeof AppSessionStartSessionRoute
@@ -301,6 +310,7 @@ export interface FileRoutesById {
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/_app/group/manage': typeof AppGroupManageRoute
+  '/_app/group/remote-assignments': typeof AppGroupRemoteAssignmentsRoute
   '/_app/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/_app/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/_app/session/start-session': typeof AppSessionStartSessionRoute
@@ -337,6 +347,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/group/email-templates'
     | '/group/manage'
+    | '/group/remote-assignments'
     | '/instruments/accessible-instruments'
     | '/session/remote-assignment'
     | '/session/start-session'
@@ -371,6 +382,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/group/email-templates'
     | '/group/manage'
+    | '/group/remote-assignments'
     | '/instruments/accessible-instruments'
     | '/session/remote-assignment'
     | '/session/start-session'
@@ -406,6 +418,7 @@ export interface FileRouteTypes {
     | '/_app/admin/settings'
     | '/_app/group/email-templates'
     | '/_app/group/manage'
+    | '/_app/group/remote-assignments'
     | '/_app/instruments/accessible-instruments'
     | '/_app/session/remote-assignment'
     | '/_app/session/start-session'
@@ -539,6 +552,13 @@ declare module '@tanstack/react-router' {
       path: '/instruments/accessible-instruments'
       fullPath: '/instruments/accessible-instruments'
       preLoaderRoute: typeof AppInstrumentsAccessibleInstrumentsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/group/remote-assignments': {
+      id: '/_app/group/remote-assignments'
+      path: '/group/remote-assignments'
+      fullPath: '/group/remote-assignments'
+      preLoaderRoute: typeof AppGroupRemoteAssignmentsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/group/manage': {
@@ -702,6 +722,7 @@ interface AppRouteRouteChildren {
   AppAdminSettingsRoute: typeof AppAdminSettingsRoute
   AppGroupEmailTemplatesRoute: typeof AppGroupEmailTemplatesRoute
   AppGroupManageRoute: typeof AppGroupManageRoute
+  AppGroupRemoteAssignmentsRoute: typeof AppGroupRemoteAssignmentsRoute
   AppInstrumentsAccessibleInstrumentsRoute: typeof AppInstrumentsAccessibleInstrumentsRoute
   AppSessionRemoteAssignmentRoute: typeof AppSessionRemoteAssignmentRoute
   AppSessionStartSessionRoute: typeof AppSessionStartSessionRoute
@@ -730,6 +751,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAdminSettingsRoute: AppAdminSettingsRoute,
   AppGroupEmailTemplatesRoute: AppGroupEmailTemplatesRoute,
   AppGroupManageRoute: AppGroupManageRoute,
+  AppGroupRemoteAssignmentsRoute: AppGroupRemoteAssignmentsRoute,
   AppInstrumentsAccessibleInstrumentsRoute:
     AppInstrumentsAccessibleInstrumentsRoute,
   AppSessionRemoteAssignmentRoute: AppSessionRemoteAssignmentRoute,

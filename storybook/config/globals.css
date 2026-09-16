@@ -1,0 +1,4 @@
+@import '@opendatacapture/react-core/globals.css';
+
+@source "../../apps/playground/src";
+@source "../../apps/web/src";
