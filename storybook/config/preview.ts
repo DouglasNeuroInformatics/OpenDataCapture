@@ -3,7 +3,7 @@ import type { Preview } from '@storybook/react-vite';
 import * as esbuild from 'esbuild-wasm';
 import esbuildWasmUrl from 'esbuild-wasm/esbuild.wasm?url';
 
-import '@opendatacapture/react-core/globals.css';
+import './globals.css';
 import '../../apps/web/src/services/i18n';
 
 await esbuild.initialize({
