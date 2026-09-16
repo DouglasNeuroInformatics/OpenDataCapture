@@ -42,16 +42,17 @@ const mockInfoQuery: {
 };
 
 const FIXED_TEST_DATE = new Date('2025-04-30T12:00:00Z');
+const createMockRecords = (data: { [key: string]: unknown }) => [
+  {
+    computedMeasures: {},
+    data,
+    date: FIXED_TEST_DATE,
+    session: { user: { username: 'testusername' } },
+    sessionId: '123'
+  }
+];
 const mockInstrumentRecords = {
-  data: [
-    {
-      computedMeasures: {},
-      data: { someValue: 'abc' },
-      date: FIXED_TEST_DATE,
-      session: { user: { username: 'testusername' } },
-      sessionId: '123'
-    }
-  ]
+  data: createMockRecords({ someValue: 'abc' })
 };
 
 vi.mock('@/hooks/useInstrument', () => ({
@@ -84,6 +85,39 @@ describe('useInstrumentVisualization', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockInfoQuery.data = [];
+    mockInstrumentRecords.data = createMockRecords({ someValue: 'abc' });
+  });
+
+  describe('set fields', () => {
+    const renderWithSetRecord = async () => {
+      mockInstrumentRecords.data = createMockRecords({ causes: new Set(['FRIENDS', 'MONEY']) });
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
+      await waitFor(() => {
+        expect(result.current.records.length).toBeGreaterThan(0);
+      });
+      return result;
+    };
+
+    it('should export a set in a wide table as the subject table displays it, not as {}', async () => {
+      const result = await renderWithSetRecord();
+      act(() => result.current.dl('CSV'));
+      const [, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
+      expect(getContentFn()).toContain(`testusername,"FRIENDS, MONEY"`);
+    });
+
+    it('should export a set in a long table as the subject table displays it, not as {}', async () => {
+      const result = await renderWithSetRecord();
+      act(() => result.current.dl('CSV Long'));
+      const [, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
+      expect(getContentFn()).toContain(`testusername,"FRIENDS, MONEY",causes`);
+    });
+
+    it('should export a set in JSON as the subject table displays it, not as {}', async () => {
+      const result = await renderWithSetRecord();
+      act(() => result.current.dl('JSON'));
+      const [, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
+      expect(await getContentFn()).toContain('"causes": "FRIENDS, MONEY"');
+    });
   });
 
   describe('CSV', () => {
