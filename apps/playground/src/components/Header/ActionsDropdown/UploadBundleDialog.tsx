@@ -6,10 +6,23 @@ import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import axios, { isAxiosError } from 'axios';
 import type { AxiosResponse } from 'axios';
+import { z } from 'zod/v4';
 
 import { useAppStore } from '@/store';
 
 const MAX_DISPLAYED_ERRORS = 5;
+
+const $ErrorResponseBody = z.object({
+  message: z.union([z.string(), z.array(z.string())])
+});
+
+const getResponseErrorMessage = (data: unknown): string | undefined => {
+  const result = $ErrorResponseBody.safeParse(data);
+  if (!result.success) {
+    return undefined;
+  }
+  return Array.isArray(result.data.message) ? result.data.message.join(', ') : result.data.message;
+};
 
 export type UploadBundleDialogProps = {
   isOpen: boolean;
@@ -94,16 +107,19 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen, onLoginRequired }: Uploa
       );
     } catch (err) {
       console.error(err);
-      let message: string;
-      if (isAxiosError(err)) {
-        message = err.response ? `${err.response.status} ${err.response.statusText}` : err.message;
-      } else {
-        message = 'Unknown Error';
+      const response = isAxiosError(err) ? err.response : undefined;
+      if (!response) {
+        addNotification({
+          message: isAxiosError(err) ? err.message : 'Unknown Error',
+          type: 'error',
+          title: t({ en: 'HTTP Request Failed', fr: 'Échec de la requête HTTP' })
+        });
+        return;
       }
       addNotification({
-        message,
+        message: getResponseErrorMessage(response.data),
         type: 'error',
-        title: t({ en: 'HTTP Request Failed', fr: 'Échec de la requête HTTP' })
+        title: [response.status, response.statusText].filter(Boolean).join(' - ')
       });
       return;
     }
