@@ -29,7 +29,7 @@ const GATEWAY_ROUTES = [
     redirectsTo: '/dashboard'
   },
   {
-    importRoute: async () => (await import('@/routes/_app/group/bulk-remote-assignments')).Route,
+    importRoute: async () => (await import('@/routes/_app/group/remote-assignments')).Route,
     params: {},
     redirectsTo: '/dashboard'
   }
@@ -77,7 +77,7 @@ describe.each(GATEWAY_ROUTES)('$redirectsTo guard', ({ importRoute, params, redi
 });
 
 describe('bulk remote assignments guard', () => {
-  const importRoute = async () => (await import('@/routes/_app/group/bulk-remote-assignments')).Route;
+  const importRoute = async () => (await import('@/routes/_app/group/remote-assignments')).Route;
 
   // Hiding the nav link is not enough: the page must not be reachable by url when an admin has
   // turned the feature off.

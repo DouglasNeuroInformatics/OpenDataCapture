@@ -52,7 +52,7 @@ const RouteComponent = () => {
   );
 };
 
-export const Route = createFileRoute('/_app/group/bulk-remote-assignments')({
+export const Route = createFileRoute('/_app/group/remote-assignments')({
   // Guarded rather than merely hidden from the nav: assignments are served by the gateway, and the
   // API only mounts AssignmentsModule when it is enabled, so a bookmarked link would otherwise reach
   // a page whose endpoints do not exist. The instance toggle gates it the same way.

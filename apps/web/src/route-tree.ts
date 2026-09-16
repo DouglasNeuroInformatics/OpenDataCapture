@@ -24,9 +24,9 @@ import { Route as AppUploadInstrumentIdRouteImport } from './routes/_app/upload/
 import { Route as AppSessionStartSessionRouteImport } from './routes/_app/session/start-session'
 import { Route as AppSessionRemoteAssignmentRouteImport } from './routes/_app/session/remote-assignment'
 import { Route as AppInstrumentsAccessibleInstrumentsRouteImport } from './routes/_app/instruments/accessible-instruments'
+import { Route as AppGroupRemoteAssignmentsRouteImport } from './routes/_app/group/remote-assignments'
 import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
 import { Route as AppGroupEmailTemplatesRouteImport } from './routes/_app/group/email-templates'
-import { Route as AppGroupBulkRemoteAssignmentsRouteImport } from './routes/_app/group/bulk-remote-assignments'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
 import { Route as AppAdminMailRouteImport } from './routes/_app/admin/mail'
 import { Route as AppDatahubSubjectIdRouteRouteImport } from './routes/_app/datahub/$subjectId/route'
@@ -120,6 +120,12 @@ const AppInstrumentsAccessibleInstrumentsRoute =
     path: '/instruments/accessible-instruments',
     getParentRoute: () => AppRouteRoute,
   } as any)
+const AppGroupRemoteAssignmentsRoute =
+  AppGroupRemoteAssignmentsRouteImport.update({
+    id: '/group/remote-assignments',
+    path: '/group/remote-assignments',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
 const AppGroupManageRoute = AppGroupManageRouteImport.update({
   id: '/group/manage',
   path: '/group/manage',
@@ -130,12 +136,6 @@ const AppGroupEmailTemplatesRoute = AppGroupEmailTemplatesRouteImport.update({
   path: '/group/email-templates',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppGroupBulkRemoteAssignmentsRoute =
-  AppGroupBulkRemoteAssignmentsRouteImport.update({
-    id: '/group/bulk-remote-assignments',
-    path: '/group/bulk-remote-assignments',
-    getParentRoute: () => AppRouteRoute,
-  } as any)
 const AppAdminSettingsRoute = AppAdminSettingsRouteImport.update({
   id: '/admin/settings',
   path: '/admin/settings',
@@ -236,9 +236,9 @@ export interface FileRoutesByFullPath {
   '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
   '/admin/mail': typeof AppAdminMailRoute
   '/admin/settings': typeof AppAdminSettingsRoute
-  '/group/bulk-remote-assignments': typeof AppGroupBulkRemoteAssignmentsRoute
   '/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/group/manage': typeof AppGroupManageRoute
+  '/group/remote-assignments': typeof AppGroupRemoteAssignmentsRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/session/start-session': typeof AppSessionStartSessionRoute
@@ -271,9 +271,9 @@ export interface FileRoutesByTo {
   '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
   '/admin/mail': typeof AppAdminMailRoute
   '/admin/settings': typeof AppAdminSettingsRoute
-  '/group/bulk-remote-assignments': typeof AppGroupBulkRemoteAssignmentsRoute
   '/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/group/manage': typeof AppGroupManageRoute
+  '/group/remote-assignments': typeof AppGroupRemoteAssignmentsRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/session/start-session': typeof AppSessionStartSessionRoute
@@ -308,9 +308,9 @@ export interface FileRoutesById {
   '/_app/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
   '/_app/admin/mail': typeof AppAdminMailRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
-  '/_app/group/bulk-remote-assignments': typeof AppGroupBulkRemoteAssignmentsRoute
   '/_app/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/_app/group/manage': typeof AppGroupManageRoute
+  '/_app/group/remote-assignments': typeof AppGroupRemoteAssignmentsRoute
   '/_app/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/_app/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/_app/session/start-session': typeof AppSessionStartSessionRoute
@@ -345,9 +345,9 @@ export interface FileRouteTypes {
     | '/datahub/$subjectId'
     | '/admin/mail'
     | '/admin/settings'
-    | '/group/bulk-remote-assignments'
     | '/group/email-templates'
     | '/group/manage'
+    | '/group/remote-assignments'
     | '/instruments/accessible-instruments'
     | '/session/remote-assignment'
     | '/session/start-session'
@@ -380,9 +380,9 @@ export interface FileRouteTypes {
     | '/datahub/$subjectId'
     | '/admin/mail'
     | '/admin/settings'
-    | '/group/bulk-remote-assignments'
     | '/group/email-templates'
     | '/group/manage'
+    | '/group/remote-assignments'
     | '/instruments/accessible-instruments'
     | '/session/remote-assignment'
     | '/session/start-session'
@@ -416,9 +416,9 @@ export interface FileRouteTypes {
     | '/_app/datahub/$subjectId'
     | '/_app/admin/mail'
     | '/_app/admin/settings'
-    | '/_app/group/bulk-remote-assignments'
     | '/_app/group/email-templates'
     | '/_app/group/manage'
+    | '/_app/group/remote-assignments'
     | '/_app/instruments/accessible-instruments'
     | '/_app/session/remote-assignment'
     | '/_app/session/start-session'
@@ -554,6 +554,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInstrumentsAccessibleInstrumentsRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/group/remote-assignments': {
+      id: '/_app/group/remote-assignments'
+      path: '/group/remote-assignments'
+      fullPath: '/group/remote-assignments'
+      preLoaderRoute: typeof AppGroupRemoteAssignmentsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/group/manage': {
       id: '/_app/group/manage'
       path: '/group/manage'
@@ -566,13 +573,6 @@ declare module '@tanstack/react-router' {
       path: '/group/email-templates'
       fullPath: '/group/email-templates'
       preLoaderRoute: typeof AppGroupEmailTemplatesRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/group/bulk-remote-assignments': {
-      id: '/_app/group/bulk-remote-assignments'
-      path: '/group/bulk-remote-assignments'
-      fullPath: '/group/bulk-remote-assignments'
-      preLoaderRoute: typeof AppGroupBulkRemoteAssignmentsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/admin/settings': {
@@ -720,9 +720,9 @@ interface AppRouteRouteChildren {
   AppDatahubSubjectIdRouteRoute: typeof AppDatahubSubjectIdRouteRouteWithChildren
   AppAdminMailRoute: typeof AppAdminMailRoute
   AppAdminSettingsRoute: typeof AppAdminSettingsRoute
-  AppGroupBulkRemoteAssignmentsRoute: typeof AppGroupBulkRemoteAssignmentsRoute
   AppGroupEmailTemplatesRoute: typeof AppGroupEmailTemplatesRoute
   AppGroupManageRoute: typeof AppGroupManageRoute
+  AppGroupRemoteAssignmentsRoute: typeof AppGroupRemoteAssignmentsRoute
   AppInstrumentsAccessibleInstrumentsRoute: typeof AppInstrumentsAccessibleInstrumentsRoute
   AppSessionRemoteAssignmentRoute: typeof AppSessionRemoteAssignmentRoute
   AppSessionStartSessionRoute: typeof AppSessionStartSessionRoute
@@ -749,9 +749,9 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDatahubSubjectIdRouteRoute: AppDatahubSubjectIdRouteRouteWithChildren,
   AppAdminMailRoute: AppAdminMailRoute,
   AppAdminSettingsRoute: AppAdminSettingsRoute,
-  AppGroupBulkRemoteAssignmentsRoute: AppGroupBulkRemoteAssignmentsRoute,
   AppGroupEmailTemplatesRoute: AppGroupEmailTemplatesRoute,
   AppGroupManageRoute: AppGroupManageRoute,
+  AppGroupRemoteAssignmentsRoute: AppGroupRemoteAssignmentsRoute,
   AppInstrumentsAccessibleInstrumentsRoute:
     AppInstrumentsAccessibleInstrumentsRoute,
   AppSessionRemoteAssignmentRoute: AppSessionRemoteAssignmentRoute,

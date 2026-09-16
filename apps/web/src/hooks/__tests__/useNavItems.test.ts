@@ -89,17 +89,17 @@ describe('useNavItems', () => {
   });
 
   it('should offer bulk remote assignments to a user holding the abilities that page needs', () => {
-    expect(navUrls()).toContain('/group/bulk-remote-assignments');
+    expect(navUrls()).toContain('/group/remote-assignments');
   });
 
   it('should omit bulk remote assignments when the gateway is not deployed', () => {
     mocks.config.setup.isGatewayEnabled = false;
-    expect(navUrls()).not.toContain('/group/bulk-remote-assignments');
+    expect(navUrls()).not.toContain('/group/remote-assignments');
   });
 
   it('should omit bulk remote assignments when the user cannot create an assignment', () => {
     mocks.can.mockImplementation((action, subject) => !(action === 'create' && subject === 'Assignment'));
-    expect(navUrls()).not.toContain('/group/bulk-remote-assignments');
+    expect(navUrls()).not.toContain('/group/remote-assignments');
   });
 
   // Each child is gated on its own requirements: losing assignment-create must not take the
@@ -107,7 +107,7 @@ describe('useNavItems', () => {
   it('should keep manage group available to a user who cannot create assignments', () => {
     mocks.can.mockImplementation((action, subject) => !(action === 'create' && subject === 'Assignment'));
     expect(navUrls()).toContain('/group/manage');
-    expect(navUrls()).not.toContain('/group/bulk-remote-assignments');
+    expect(navUrls()).not.toContain('/group/remote-assignments');
   });
 
   // With the instance toggle off, the group links must stay exactly where they were, so an
@@ -115,7 +115,7 @@ describe('useNavItems', () => {
   it('should leave the group links flat and hide the bulk page when the toggle is off', () => {
     mocks.setupState.isBulkRemoteAssignmentsEnabled = false;
     expect(navUrls()).toContain('/group/manage');
-    expect(navUrls()).not.toContain('/group/bulk-remote-assignments');
+    expect(navUrls()).not.toContain('/group/remote-assignments');
     expect(navLabels()).not.toContain('Group Actions');
   });
 
@@ -132,19 +132,19 @@ describe('useNavItems', () => {
     mocks.can.mockReturnValue(true);
     expect(navLabels()).toContain('Group Actions');
     expect(navUrls()).toContain('/group/manage');
-    expect(navUrls()).toContain('/group/bulk-remote-assignments');
+    expect(navUrls()).toContain('/group/remote-assignments');
   });
 
   it('should offer no group actions to a user with no current group, whatever their permissions', () => {
     mocks.store.currentGroup = null;
     expect(navLabels()).not.toContain('Group Actions');
-    expect(navUrls()).not.toContain('/group/bulk-remote-assignments');
+    expect(navUrls()).not.toContain('/group/remote-assignments');
     mocks.store.currentGroup = { id: 'group-1' };
   });
 
   it('should still render the group when only bulk assignments is available', () => {
     mocks.can.mockImplementation((action, subject) => !(action === 'manage' && subject === 'Group'));
-    expect(navUrls()).toContain('/group/bulk-remote-assignments');
+    expect(navUrls()).toContain('/group/remote-assignments');
     expect(navUrls()).not.toContain('/group/manage');
     expect(navLabels()).toContain('Group Actions');
   });
