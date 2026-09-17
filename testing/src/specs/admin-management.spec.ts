@@ -321,6 +321,36 @@ test.describe('admin management', () => {
     await expect(editSheet.getByTestId('subject-select-trigger')).toContainText('Subject');
   });
 
+  test('should save a user whose new password was typed and then cleared', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users');
+    await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(user.username);
+    await page.getByTestId('data-table-row').dblclick();
+
+    const editSheet = page.getByTestId('admin-user-edit-sheet');
+    const newPassword = editSheet.getByLabel('Set new password');
+
+    // The browser fills these fields with the administrator's own saved credentials, so clearing
+    // one is the ordinary way out of that -- and used to reject the field for being empty, and its
+    // confirmation for no longer matching.
+    await expect(newPassword).toHaveAttribute('autocomplete', 'new-password');
+    await expect(editSheet.getByLabel('Confirm new password')).toHaveAttribute('autocomplete', 'new-password');
+
+    await newPassword.fill(`${uniqueId}-then-cleared`);
+    await newPassword.clear();
+    await editSheet.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(editSheet).toBeHidden();
+  });
+
   test("should clear a user's email from the edit sheet", async ({ api, authenticateAs, page, uniqueId }) => {
     const email = `contact-${uniqueId}@example.org`;
     const group = await api.createGroup();
