@@ -244,10 +244,11 @@ const UpdateUserForm: React.FC<{
           content={[
             {
               fields: {
+                // No `calculateStrength`: libui renders the strength meter whenever that is given,
+                // and an empty field scores zero, so the meter reads as a red rejection of a field
+                // that is legitimately blank whenever the password is being left alone. Strength is
+                // still enforced below, on a password actually being set.
                 password: {
-                  calculateStrength: (password) => {
-                    return estimatePasswordStrength(password).score;
-                  },
                   generatePassword,
                   kind: 'string',
                   label: t({
