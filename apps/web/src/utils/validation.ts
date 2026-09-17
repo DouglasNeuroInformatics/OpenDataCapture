@@ -29,6 +29,14 @@ function omittedIfBlank(value: string | undefined) {
 }
 
 /**
+ * A password field left blank means "leave the password as it is", not "set an empty password", so
+ * the blank is normalized away before any other rule sees it. Without this, clearing a password the
+ * browser filled in rejects the field for being too short, and rejects its confirmation for not
+ * matching a value the user can no longer see.
+ */
+const $OptionalPassword = z.preprocess((value) => (value === '' ? undefined : value), z.string().min(1).optional());
+
+/**
  * A PATCH carries only what changed, so a value the user never touched is never re-validated by the
  * write schema. That matters for a number stored before the digit minimum existed: `$User` still
  * parses it so the form can show it, but `$UpdateUserData` would reject it on the way back out and
@@ -94,4 +102,13 @@ function validationSummary({ issues }: ZodErrorLike) {
   return Array.from(new Set(issues.map((issue) => issue.message))).join(' ');
 }
 
-export { $Email, $PhoneNumber, clearedIfBlank, omittedIfBlank, omittedIfUnchanged, requiresGroup, validationSummary };
+export {
+  $Email,
+  $OptionalPassword,
+  $PhoneNumber,
+  clearedIfBlank,
+  omittedIfBlank,
+  omittedIfUnchanged,
+  requiresGroup,
+  validationSummary
+};

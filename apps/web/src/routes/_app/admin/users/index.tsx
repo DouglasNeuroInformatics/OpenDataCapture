@@ -19,11 +19,13 @@ import { useDeleteUserMutation } from '@/hooks/useDeleteUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { usePasswordGenerator } from '@/hooks/usePasswordGenerator';
 import type { PasswordFormValues } from '@/hooks/usePasswordGenerator';
+import { useSuppressPasswordAutofill } from '@/hooks/useSuppressPasswordAutofill';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
 import {
   $Email,
+  $OptionalPassword,
   $PhoneNumber,
   clearedIfBlank,
   omittedIfUnchanged,
@@ -69,6 +71,7 @@ const UpdateUserForm: React.FC<{
   const { resolvedLanguage, t } = useTranslation();
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const { applyGeneratedPassword, generatedPassword, generatePassword, isGeneratedPassword } = usePasswordGenerator();
+  const suppressPasswordAutofill = useSuppressPasswordAutofill();
 
   // libui's `record-array` field resets itself to a single blank record whenever its `fieldset`
   // changes identity, so an inline literal would discard the permissions it was seeded with on the
@@ -159,11 +162,11 @@ const UpdateUserForm: React.FC<{
     return z
       .object({
         additionalPermissions: z.array($UserPermission.partial()).optional(),
-        confirmPassword: z.string().min(1).optional(),
+        confirmPassword: $OptionalPassword,
         disabled: z.boolean().optional(),
         email: $Email(t).optional(),
         groupIds: z.set(z.string()),
-        password: z.string().min(1).optional(),
+        password: $OptionalPassword,
         phoneNumber: $PhoneNumber(t, initialValues?.phoneNumber).optional()
       })
       .transform((arg) => {
@@ -226,131 +229,140 @@ const UpdateUserForm: React.FC<{
 
   return (
     <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
-      <Form
-        additionalButtons={{
-          left: (
-            <Dialog.Trigger asChild>
-              <Button className="w-full" disabled={disableDelete} type="button" variant="danger">
-                {t('core.delete')}
-              </Button>
-            </Dialog.Trigger>
-          )
-        }}
-        content={[
-          {
-            fields: {
-              password: {
-                calculateStrength: (password) => {
-                  return estimatePasswordStrength(password).score;
+      {/* `display: contents` so wrapping the form purely to reach its inputs changes no layout. */}
+      <div className="contents" key={JSON.stringify(initialValues)} ref={suppressPasswordAutofill}>
+        <Form
+          additionalButtons={{
+            left: (
+              <Dialog.Trigger asChild>
+                <Button className="w-full" disabled={disableDelete} type="button" variant="danger">
+                  {t('core.delete')}
+                </Button>
+              </Dialog.Trigger>
+            )
+          }}
+          content={[
+            {
+              fields: {
+                // No `calculateStrength`: libui renders the strength meter whenever that is given,
+                // and an empty field scores zero, so the meter reads as a red rejection of a field
+                // that is legitimately blank whenever the password is being left alone. Strength is
+                // still enforced below, on a password actually being set.
+                password: {
+                  generatePassword,
+                  kind: 'string',
+                  label: t({
+                    en: 'Set new password',
+                    fr: 'Définir un nouveau mot de passe'
+                  }),
+                  variant: 'password'
                 },
-                generatePassword,
-                kind: 'string',
-                label: t('common.password'),
-                variant: 'password'
+                // eslint-disable-next-line perfectionist/sort-objects
+                confirmPassword: {
+                  kind: 'string',
+                  label: t({
+                    en: 'Confirm new password',
+                    fr: 'Confirmer le nouveau mot de passe'
+                  }),
+                  variant: 'password'
+                }
               },
-              // eslint-disable-next-line perfectionist/sort-objects
-              confirmPassword: {
-                kind: 'string',
-                label: t('common.confirmPassword'),
-                variant: 'password'
-              }
+              title: t({
+                en: 'Login Credentials',
+                fr: 'Identifiants de connexion'
+              })
             },
-            title: t({
-              en: 'Login Credentials',
-              fr: 'Identifiants de connexion'
-            })
-          },
-          {
-            fields: {
-              email: {
-                kind: 'string',
-                label: t('common.email'),
-                variant: 'input'
+            {
+              fields: {
+                email: {
+                  kind: 'string',
+                  label: t('common.email'),
+                  variant: 'input'
+                },
+                phoneNumber: {
+                  kind: 'string',
+                  label: t('common.phoneNumber'),
+                  variant: 'input'
+                }
               },
-              phoneNumber: {
-                kind: 'string',
-                label: t('common.phoneNumber'),
-                variant: 'input'
-              }
+              title: t({
+                en: 'Update Contact Information',
+                fr: 'Mettre à jour les coordonnées'
+              })
             },
-            title: t({
-              en: 'Update Contact Information',
-              fr: 'Mettre à jour les coordonnées'
-            })
-          },
-          {
-            description: t({
-              en: 'IMPORTANT: These permissions are not specific to any group. To manage granular permissions, please use the API.',
-              fr: "IMPORTANT : Ces autorisations ne sont pas spécifiques à un groupe. Pour gérer des autorisations granulaires, veuillez utiliser l'API."
-            }),
-            fields: {
-              additionalPermissions: {
-                fieldset: additionalPermissionsFieldset,
-                kind: 'record-array',
-                label: t({
-                  en: 'Permission',
-                  fr: 'Autorisation'
-                })
+            {
+              description: t({
+                en: 'IMPORTANT: These permissions are not specific to any group. To manage granular permissions, please use the API.',
+                fr: "IMPORTANT : Ces autorisations ne sont pas spécifiques à un groupe. Pour gérer des autorisations granulaires, veuillez utiliser l'API."
+              }),
+              fields: {
+                additionalPermissions: {
+                  fieldset: additionalPermissionsFieldset,
+                  kind: 'record-array',
+                  label: t({
+                    en: 'Permission',
+                    fr: 'Autorisation'
+                  })
+                },
+                disabled: {
+                  description: t({
+                    en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
+                    fr: 'Utilisez cette option si l’utilisateur n’a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l’auteur de données téléversées.'
+                  }),
+                  kind: 'boolean',
+                  label: t({
+                    en: 'Disabled',
+                    fr: 'Désactivé'
+                  }),
+                  variant: 'radio'
+                }
               },
-              disabled: {
-                description: t({
-                  en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
-                  fr: 'Utilisez cette option si l’utilisateur n’a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l’auteur de données téléversées.'
-                }),
-                kind: 'boolean',
-                label: t({
-                  en: 'Disabled',
-                  fr: 'Désactivé'
-                }),
-                variant: 'radio'
-              }
+              title: t({
+                en: 'Authorization',
+                fr: 'Autorisation'
+              })
             },
-            title: t({
-              en: 'Authorization',
-              fr: 'Autorisation'
-            })
-          },
-          {
-            fields: {
-              groupIds: {
-                kind: 'set',
-                label: 'Group IDs',
-                options: groupOptions,
-                variant: 'listbox'
-              }
-            },
-            title: t({
-              en: 'Groups',
-              fr: 'Groupes'
+            {
+              fields: {
+                groupIds: {
+                  kind: 'set',
+                  label: 'Group IDs',
+                  options: groupOptions,
+                  variant: 'listbox'
+                }
+              },
+              title: t({
+                en: 'Groups',
+                fr: 'Groupes'
+              })
+            }
+          ]}
+          data-testid="update-user-form"
+          initialValues={{
+            ...initialValues,
+            disabled: initialValues?.disabled ?? false
+          }}
+          submitBtnLabel={t('core.save')}
+          subscribe={{
+            // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
+            // position, so `setValues` is inferred as an error type rather than a setter.
+            onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) =>
+              applyGeneratedPassword(setValues),
+            selector: () => generatedPassword
+          }}
+          validationSchema={$UpdateUserFormData}
+          onError={onError}
+          onSubmit={({ additionalPermissions, ...data }) =>
+            onSubmit({
+              additionalPermissions: additionalPermissions as undefined | UserPermission[],
+              ...data,
+              // Left undefined when the password field is blank, so saving other changes to a user who
+              // still owes a reset does not quietly lift it.
+              mustResetPassword: data.password ? isGeneratedPassword(data.password) : undefined
             })
           }
-        ]}
-        data-testid="update-user-form"
-        initialValues={{
-          ...initialValues,
-          disabled: initialValues?.disabled ?? false
-        }}
-        key={JSON.stringify(initialValues)}
-        submitBtnLabel={t('core.save')}
-        subscribe={{
-          // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
-          // position, so `setValues` is inferred as an error type rather than a setter.
-          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) =>
-            applyGeneratedPassword(setValues),
-          selector: () => generatedPassword
-        }}
-        validationSchema={$UpdateUserFormData}
-        onError={onError}
-        onSubmit={({ additionalPermissions, ...data }) =>
-          onSubmit({
-            additionalPermissions: additionalPermissions as undefined | UserPermission[],
-            ...data,
-            // Left undefined when the password field is blank, so saving other changes to a user who
-            // still owes a reset does not quietly lift it.
-            mustResetPassword: data.password ? isGeneratedPassword(data.password) : undefined
-          })
-        }
-      />
+        />
+      </div>
       <Dialog.Content>
         <Dialog.Header>
           <Dialog.Title>
