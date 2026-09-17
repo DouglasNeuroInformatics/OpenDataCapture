@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
   Badge,
   Button,
@@ -42,6 +43,9 @@ const PREVIEW_SUBMIT_LABEL = { en: 'Preview Submit', fr: 'Soumettre l’aperçu'
 
 type InstrumentItem = {
   authors?: null | string[];
+  // When a series instrument was created. Null for every other kind: a scalar instrument ships with
+  // the instance, so the date it was stored says nothing about the instrument itself.
+  createdAt: Date | null;
   description?: string;
   id: string;
   // The scalar instrument identity (name + edition); null for series instruments, which have no edition.
@@ -170,9 +174,25 @@ const InstrumentSection = ({
               >
                 {item.title}
               </button>
-              <Badge className="shrink-0" variant={item.source.kind === 'repo' ? 'secondary' : 'outline'}>
-                {item.source.kind === 'repo' ? item.source.name : t({ en: 'No repo', fr: 'Aucun dépôt' })}
-              </Badge>
+              {/* One cell for both tags, right-aligned, so the repo tag stays in a column of its own
+                  across rows whether or not a creation date precedes it. */}
+              <div className="flex shrink-0 items-center justify-end gap-1.5">
+                {item.createdAt && (
+                  <Badge
+                    data-testid={`instrument-created-at-${item.title}`}
+                    title={t({
+                      en: `Created on ${item.createdAt.toLocaleString()}`,
+                      fr: `Créé le ${item.createdAt.toLocaleString()}`
+                    })}
+                    variant="outline"
+                  >
+                    {toBasicISOString(item.createdAt)}
+                  </Badge>
+                )}
+                <Badge variant={item.source.kind === 'repo' ? 'secondary' : 'outline'}>
+                  {item.source.kind === 'repo' ? item.source.name : t({ en: 'No repo', fr: 'Aucun dépôt' })}
+                </Badge>
+              </div>
               <div className="flex shrink-0 items-center gap-1">
                 <button
                   aria-label={t({ en: 'Preview instrument', fr: "Aperçu de l'instrument" })}
@@ -927,6 +947,7 @@ const RouteComponent = () => {
         : { kind: 'manual' };
       const item: InstrumentItem = {
         authors: instrument.details.authors,
+        createdAt: instrument.kind === 'SERIES' ? (instrument.createdAt ?? null) : null,
         description: instrument.details.description,
         id: instrument.id,
         internal: instrument.kind === 'SERIES' ? null : instrument.internal,

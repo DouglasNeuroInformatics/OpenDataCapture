@@ -19,4 +19,9 @@ export class GroupManagePage extends AppPage {
   instrumentCheckbox(title: string): Locator {
     return this.$ref.getByTestId(`instrument-checkbox-${title}`);
   }
+
+  /** The creation-date tag, which only a series instrument carries. */
+  instrumentCreatedAt(title: string): Locator {
+    return this.$ref.getByTestId(`instrument-created-at-${title}`);
+  }
 }

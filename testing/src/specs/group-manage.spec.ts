@@ -1,6 +1,11 @@
 import { GroupManagePage } from '../pages/_app/group/manage.page';
 import { expect, test } from '../support/fixtures';
 
+/** Seeded as a series; `SCALAR_INSTRUMENT_TITLE` is one of the items it repeats. */
+const SERIES_INSTRUMENT_TITLE = 'Happiness Questionnaire (Repeated)';
+
+const SCALAR_INSTRUMENT_TITLE = 'Happiness Questionnaire';
+
 test.describe('group manage', () => {
   test('should give a newly created group access to every uploaded instrument, so a manager has something to administer', async ({
     adminToken,
@@ -31,6 +36,18 @@ test.describe('group manage', () => {
     const dialog = groupManagePage.$ref.getByRole('dialog');
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole('button', { name: 'Preview Form' })).toBeVisible();
+  });
+
+  // A series is created in the app, so its creation date is what tells two of them apart. A scalar
+  // instrument ships with the instance and its stored date says nothing about the instrument, so it
+  // gets no tag — an empty one would read as "created today" on a fresh install.
+  test('should tag a series instrument with its creation date, and no other kind', async ({ getPageModel }) => {
+    const groupManagePage = await getPageModel('/group/manage');
+
+    const createdAt = groupManagePage.instrumentCreatedAt(SERIES_INSTRUMENT_TITLE);
+    await expect(createdAt).toBeVisible();
+    await expect(createdAt).toHaveText(/^\d{4}-\d{2}-\d{2}$/);
+    await expect(groupManagePage.instrumentCreatedAt(SCALAR_INSTRUMENT_TITLE)).toHaveCount(0);
   });
 
   test('should update accessible instruments and group settings, and keep them after navigating away and back', async ({

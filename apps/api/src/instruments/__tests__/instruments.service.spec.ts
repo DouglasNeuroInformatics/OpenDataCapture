@@ -671,13 +671,43 @@ describe('InstrumentsService', () => {
       const result = await instrumentsService.findInfo();
 
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
-        select: { id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
+        select: { createdAt: true, id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
         where: { id: { in: ['owned', 'shared'] } }
       });
       expect(result).toMatchObject([
         { id: 'owned', seriesGroupId: 'group-1' },
         { id: 'shared', seriesGroupId: null }
       ]);
+    });
+
+    // A series is created in the app rather than shipped with it, so the client shows this date to
+    // tell two otherwise identical series apart. It is read off the stored record, which the
+    // evaluated instance does not carry.
+    it('should report when each series was created', async () => {
+      const createdAt = new Date('2024-03-01T12:00:00.000Z');
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([
+        { ...existingSeries, content: { items: [] }, id: 'series-1' }
+      ]);
+      instrumentModel.findMany.mockResolvedValue([
+        { createdAt, id: 'series-1', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
+      ]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(result).toMatchObject([{ createdAt, id: 'series-1' }]);
+    });
+
+    // The stored record is read separately from the evaluated instance, so an id present in one and
+    // absent from the other must leave the date empty rather than invent one.
+    it('should report a null creation date for a series with no stored record', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([
+        { ...existingSeries, content: { items: [] }, id: 'series-1' }
+      ]);
+      instrumentModel.findMany.mockResolvedValue([]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(result).toMatchObject([{ createdAt: null, id: 'series-1' }]);
     });
   });
 

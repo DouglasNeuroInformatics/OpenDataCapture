@@ -51,6 +51,7 @@ type InstrumentVirtualizationContext = {
 };
 
 type InstrumentMetadata = {
+  createdAt: Date;
   seriesGroupId: null | string;
   sourceRepoId: null | string;
   sourceRepoName: null | string;
@@ -419,6 +420,7 @@ export class InstrumentsService {
         }
         const info: SeriesInstrumentInfo = {
           ...base,
+          createdAt: metadata?.createdAt ?? null,
           kind: 'SERIES',
           seriesGroupId: metadata?.seriesGroupId ?? null,
           seriesItems,
@@ -499,9 +501,9 @@ export class InstrumentsService {
 
   /**
    * Map of instrument id -> the stored columns `findInfo` reports but cannot read off an evaluated
-   * instance: repository provenance, and the owning group of a generated series. Scoped to the
-   * requested ids and selecting only those fields, so it never loads full instrument records (notably
-   * the large `bundle`).
+   * instance: repository provenance, the owning group of a generated series, and when it was stored.
+   * Scoped to the requested ids and selecting only those fields, so it never loads full instrument
+   * records (notably the large `bundle`).
    */
   private async buildInstrumentMetadataMap(ids: string[]): Promise<Map<string, InstrumentMetadata>> {
     const map = new Map<string, InstrumentMetadata>();
@@ -509,11 +511,12 @@ export class InstrumentsService {
       return map;
     }
     const instruments = await this.instrumentModel.findMany({
-      select: { id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
+      select: { createdAt: true, id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
       where: { id: { in: ids } }
     });
     for (const inst of instruments) {
       map.set(inst.id, {
+        createdAt: inst.createdAt,
         seriesGroupId: inst.seriesGroupId,
         sourceRepoId: inst.sourceRepoId,
         sourceRepoName: inst.sourceRepoName
