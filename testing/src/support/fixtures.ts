@@ -11,6 +11,7 @@ import { BrandingLoginPagePage } from '../pages/_app/admin/branding/login-page.p
 import { InstrumentReposPage } from '../pages/_app/admin/instrument-repos/index.page';
 import { MailSettingsPage } from '../pages/_app/admin/mail.page';
 import { AdminSettingsPage } from '../pages/_app/admin/settings.page';
+import { AdminUserPage } from '../pages/_app/admin/users/$userId.page';
 import { ContactPage } from '../pages/_app/contact.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
 import { SubjectAssignmentsPage } from '../pages/_app/datahub/$subjectId/assignments.page';
@@ -43,6 +44,7 @@ const pageModels = {
   '/admin/instrument-repos': InstrumentReposPage,
   '/admin/mail': MailSettingsPage,
   '/admin/settings': AdminSettingsPage,
+  '/admin/users/$userId': AdminUserPage,
   '/auth/login': LoginPage,
   '/auth/reset-password': ResetPasswordPage,
   '/contact': ContactPage,
