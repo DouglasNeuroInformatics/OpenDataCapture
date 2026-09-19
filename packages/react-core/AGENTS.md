@@ -109,9 +109,10 @@ item's questions rendering until the next bundle resolves.
 ## globals.css
 
 `src/globals.css` is the Tailwind v4 entry every frontend imports — `apps/web/src/styles.css`,
-`apps/gateway/src/entry-client.tsx`, `apps/playground/src/main.tsx`, `storybook/config/preview.ts`.
-It holds three directives: the libui globals `@import` plus `@source` directives for libui and this
-package's `src`.
+`apps/gateway/src/entry-client.tsx`, `apps/playground/src/main.tsx`, and
+`storybook/config/globals.css`, which `@import`s it and then adds `@source` directives for the apps
+whose stories it hosts. It holds three directives: the libui globals `@import` plus `@source`
+directives for libui and this package's `src`.
 Those paths are relative to this file, so consumers do not declare their own `@source` for
 react-core, and anything added outside `src/` would not be scanned.
 

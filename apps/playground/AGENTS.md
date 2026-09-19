@@ -93,6 +93,14 @@ only caller, so tightening it silently breaks upload here and nowhere else (#139
 narrower because a bundle is evaluated server-side: whoever may create an instrument can already run
 code on the API. `testing/src/specs/authorization.spec.ts` pins the contract.
 
+Upload is gated on monaco's own diagnostics: `useEditorErrorSync` writes every error-severity marker
+owned by the `typescript` or `javascript` language into `editorErrors`, and `UploadBundleDialog`
+refuses to post while that list is non-empty. The transpiler state is not that gate — esbuild strips
+types without checking them, so an instrument that fails `tsc` still reaches `status: 'built'`. The
+hook asks for markers file by file, because monaco also holds models for the runtime declarations,
+`globals.d.ts` and files the user has deleted (`deleteFile` never disposes a model), none of which
+should block an upload.
+
 Share links come from `@opendatacapture/playground-url`, which lz-string-compresses file contents into
 the URL fragment. A link that differs only in its fragment does not reload the page, so `IndexPage`
 reads the URL through `useLocationHref`, which re-renders on `hashchange`; reading `location.href`

@@ -4,6 +4,18 @@ Every release of Open Data Capture from 2.0.0 onward is recorded here. Each sect
 commit history when the version changes, and becomes the body of the GitHub release. Releases before
 2.0.0 are listed in the [release history](https://github.com/DouglasNeuroinformatics/OpenDataCapture/releases).
 
+## 2.4.0
+
+### Features
+
+- **playground:** surface the API's own error message when an upload fails ([188ad51](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/188ad51f003692d03950d65670c27a23c851732b))
+- **playground:** block bundle upload while the editor reports type errors ([5498dca](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/5498dcabd30f2e86654fe2dd7017ac63168d17a7))
+
+### Bug Fixes
+
+- **playground:** match preview mode help tooltip to libui tooltip styling ([fa58149](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/fa58149996c2d6300402ce33282412a1c0c0cd2f))
+- **playground:** replace inner Radix tooltip with CSS-only tooltip in ShareButton ([746db5e](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/746db5ed361f5a8028138cce05c0627e23f7e2ae))
+
 ## 2.3.1
 
 ### Bug Fixes

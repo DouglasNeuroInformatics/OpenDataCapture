@@ -138,8 +138,10 @@ const SHARED_ROUTES = ['/user', '/instruments/accessible-instruments'] as const;
 
 test.describe('authorization', () => {
   test('should give a group manager the management navigation @smoke', async ({ getPageModel, page }) => {
-    await getPageModel('/dashboard');
-    await expect(page.getByTestId('sidebar')).toBeVisible();
+    const dashboardPage = await getPageModel('/dashboard');
+    // Bulk remote assignments is enabled by default, which nests group links under a collapsible
+    // "Group Actions" menu — expand it so the child nav buttons become visible.
+    await dashboardPage.expandNavGroup('Group Actions');
     for (const route of GROUP_MANAGER_ONLY_ROUTES) {
       await expect(page.getByTestId(`nav-button-${route}`)).toBeVisible();
     }

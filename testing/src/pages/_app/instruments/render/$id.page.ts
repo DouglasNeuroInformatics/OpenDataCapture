@@ -72,16 +72,22 @@ export class RenderInstrumentPage extends AppPage {
    * unreliable headless, so nudge them with arrow keys instead.
    */
   async completeHappinessQuestionnaire(steps = 4): Promise<void> {
-    const sliders = this.$ref.getByTestId('slider-thumb');
-    await sliders.first().waitFor({ state: 'visible' });
-    for (let index = 0; index < (await sliders.count()); index++) {
-      const slider = sliders.nth(index);
-      await slider.focus();
-      for (let step = 0; step < steps; step++) {
-        await slider.press('ArrowRight');
-      }
-    }
+    await this.setHappinessSliders(steps);
     await this.happinessSatisfiedRadio.click();
+  }
+
+  /**
+   * Answers the Happiness Questionnaire with "No" overall, which its validation schema only accepts
+   * alongside a reason, then checks each named cause in the `causesOfDissatisfaction` listbox — the
+   * instrument's `z.set()` field — in the order given.
+   */
+  async completeHappinessQuestionnaireDissatisfied(causes: string[], steps = 4): Promise<void> {
+    await this.setHappinessSliders(steps);
+    await this.$ref.getByRole('radio', { name: 'No' }).click();
+    await this.$ref.locator('[name="reasonNotSatisfied"]').fill('Not enough sleep');
+    for (const cause of causes) {
+      await this.$ref.getByRole('checkbox', { name: cause }).click();
+    }
   }
 
   async submit(): Promise<void> {
@@ -93,5 +99,17 @@ export class RenderInstrumentPage extends AppPage {
     await radio.evaluate((element: HTMLInputElement) => {
       element.click();
     });
+  }
+
+  private async setHappinessSliders(steps: number): Promise<void> {
+    const sliders = this.$ref.getByTestId('slider-thumb');
+    await sliders.first().waitFor({ state: 'visible' });
+    for (let index = 0; index < (await sliders.count()); index++) {
+      const slider = sliders.nth(index);
+      await slider.focus();
+      for (let step = 0; step < steps; step++) {
+        await slider.press('ArrowRight');
+      }
+    }
   }
 }
