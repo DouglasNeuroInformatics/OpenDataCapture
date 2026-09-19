@@ -28,14 +28,15 @@ type CellSelectProps = {
 };
 
 /**
- * A select sitting in a table cell, named for assistive technology by the column it sits under. The
- * trigger's own one-line clamp clips a long label without an ellipsis, so its span is truncated instead.
+ * A select sitting in a table cell, styled as the cell's text with a chevron rather than as a boxed
+ * control, and named for assistive technology by the column it sits under. The trigger's own one-line
+ * clamp clips a long label without an ellipsis, so its span is truncated instead.
  */
 const CellSelect = ({ label, name, onValueChange, options, placeholder, value }: CellSelectProps) => (
   <Select name={name} value={value ?? ''} onValueChange={onValueChange}>
     <Select.Trigger
       aria-label={label}
-      className="min-w-0 [&>span]:block [&>span]:min-w-0 [&>span]:truncate"
+      className="data-[placeholder]:text-muted-foreground h-auto min-w-0 border-0 bg-transparent px-0 py-0 shadow-none [&>span]:block [&>span]:min-w-0 [&>span]:truncate"
       data-testid={`${name}-select-trigger`}
     >
       <Select.Value placeholder={placeholder} />
@@ -203,9 +204,9 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
               )}
             </Table.Body>
             {/* The add controls are the table's last row, under the headers that name them. */}
-            <Table.Footer>
-              <Table.Row className="bg-background/60 hover:bg-background/60" data-testid="add-permission-row">
-                <Table.Cell className="py-2.5">
+            <Table.Footer className="bg-transparent font-normal">
+              <Table.Row data-testid="add-permission-row">
+                <Table.Cell>
                   <CellSelect
                     label={columnLabels.action}
                     name="action"
@@ -215,7 +216,7 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                     onValueChange={(value) => setAction($AppAction.parse(value))}
                   />
                 </Table.Cell>
-                <Table.Cell className="py-2.5">
+                <Table.Cell>
                   <CellSelect
                     label={columnLabels.subject}
                     name="subject"
@@ -225,7 +226,7 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                     onValueChange={(value) => setSubject($AppSubjectName.parse(value))}
                   />
                 </Table.Cell>
-                <Table.Cell className="py-2.5">
+                <Table.Cell>
                   {isScopable && (
                     <CellSelect
                       label={columnLabels.scope}
@@ -237,10 +238,10 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                     />
                   )}
                 </Table.Cell>
-                <Table.Cell className="py-2.5 text-right">
+                <Table.Cell className="py-1.5 text-right">
                   <Button
                     aria-label={t({ en: 'Add Permission', fr: 'Ajouter une autorisation' })}
-                    className="text-primary hover:text-primary"
+                    className="text-muted-foreground hover:text-primary"
                     disabled={!draft.success || updatePermissionsMutation.isPending}
                     size="icon"
                     type="button"
