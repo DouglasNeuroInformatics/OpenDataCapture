@@ -27,10 +27,17 @@ type CellSelectProps = {
   value: string | undefined;
 };
 
-/** A select sitting in a table cell, named for assistive technology by the column it sits under. */
+/**
+ * A select sitting in a table cell, named for assistive technology by the column it sits under. The
+ * trigger's own one-line clamp clips a long label without an ellipsis, so its span is truncated instead.
+ */
 const CellSelect = ({ label, name, onValueChange, options, placeholder, value }: CellSelectProps) => (
   <Select name={name} value={value ?? ''} onValueChange={onValueChange}>
-    <Select.Trigger aria-label={label} className="min-w-0" data-testid={`${name}-select-trigger`}>
+    <Select.Trigger
+      aria-label={label}
+      className="min-w-0 [&>span]:block [&>span]:min-w-0 [&>span]:truncate"
+      data-testid={`${name}-select-trigger`}
+    >
       <Select.Value placeholder={placeholder} />
     </Select.Trigger>
     <Select.Content data-testid={`${name}-select-content`}>
