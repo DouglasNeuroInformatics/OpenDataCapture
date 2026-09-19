@@ -126,7 +126,7 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
           fields: {
             groupIds: {
               kind: 'set',
-              label: t({ en: 'Member of', fr: 'Membre de' }),
+              label: t({ en: 'Member Of', fr: 'Membre de' }),
               options: groupOptions,
               variant: 'listbox'
             }
@@ -184,7 +184,7 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
         disabled: initialValues?.disabled ?? false
       }}
       key={JSON.stringify(initialValues)}
-      submitBtnLabel={t({ en: 'Save changes', fr: 'Enregistrer les modifications' })}
+      submitBtnLabel={t({ en: 'Save Changes', fr: 'Enregistrer les modifications' })}
       subscribe={{
         // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
         // position, so `setValues` is inferred as an error type rather than a setter.

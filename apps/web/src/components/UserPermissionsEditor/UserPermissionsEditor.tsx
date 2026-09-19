@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-import { Button, Card, Label, Select, Table } from '@douglasneuroinformatics/libui/components';
+import { Button, Card, Select, Table } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $AppAction, $AppSubjectName, isGroupScopableSubject } from '@opendatacapture/schemas/core';
 import type { AppAction, AppSubjectName, Permissions } from '@opendatacapture/schemas/core';
@@ -18,7 +18,7 @@ import {
   withPermission
 } from '@/utils/permissions';
 
-type SelectFieldProps = {
+type CellSelectProps = {
   label: string;
   name: string;
   onValueChange: (value: string) => void;
@@ -27,27 +27,21 @@ type SelectFieldProps = {
   value: string | undefined;
 };
 
-/** A labelled select laid out like libui's own form select, so the row reads as one of its forms. */
-const SelectField = ({ label, name, onValueChange, options, placeholder, value }: SelectFieldProps) => {
-  const triggerId = `${name}-select`;
-  return (
-    <div className="flex min-w-0 flex-col gap-3">
-      <Label htmlFor={triggerId}>{label}</Label>
-      <Select name={name} value={value ?? ''} onValueChange={onValueChange}>
-        <Select.Trigger data-testid={`${name}-select-trigger`} id={triggerId}>
-          <Select.Value placeholder={placeholder} />
-        </Select.Trigger>
-        <Select.Content data-testid={`${name}-select-content`}>
-          {Object.entries(options).map(([key, optionLabel]) => (
-            <Select.Item data-testid={`${name}-select-item-${key}`} key={key} value={key}>
-              {optionLabel}
-            </Select.Item>
-          ))}
-        </Select.Content>
-      </Select>
-    </div>
-  );
-};
+/** A select sitting in a table cell, named for assistive technology by the column it sits under. */
+const CellSelect = ({ label, name, onValueChange, options, placeholder, value }: CellSelectProps) => (
+  <Select name={name} value={value ?? ''} onValueChange={onValueChange}>
+    <Select.Trigger aria-label={label} data-testid={`${name}-select-trigger`}>
+      <Select.Value placeholder={placeholder} />
+    </Select.Trigger>
+    <Select.Content data-testid={`${name}-select-content`}>
+      {Object.entries(options).map(([key, optionLabel]) => (
+        <Select.Item data-testid={`${name}-select-item-${key}`} key={key} value={key}>
+          {optionLabel}
+        </Select.Item>
+      ))}
+    </Select.Content>
+  </Select>
+);
 
 type UserPermissionsEditorProps = {
   groups: Pick<Group, 'id' | 'name'>[];
@@ -86,7 +80,13 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
     User: t({ en: 'User', fr: 'Utilisateur' })
   };
 
-  const allGroupsLabel = t({ en: 'All groups', fr: 'Tous les groupes' });
+  const columnLabels = {
+    action: t({ en: 'Action', fr: 'Action' }),
+    scope: t({ en: 'Scope', fr: 'Portée' }),
+    subject: t({ en: 'Resource', fr: 'Ressource' })
+  };
+
+  const allGroupsLabel = t({ en: 'All Groups', fr: 'Tous les groupes' });
   const placeholder = t({ en: 'Choose…', fr: 'Choisir…' });
 
   const scopeOptions: { [id: string]: string } = {
@@ -101,8 +101,7 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
     updatePermissionsMutation.mutate({ id: user.id, permissions }, { onSuccess });
   };
 
-  const handleAdd = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleAdd = () => {
     if (!draft.success) {
       return;
     }
@@ -140,30 +139,29 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
           })}
         </Card.Description>
       </Card.Header>
-      <Card.Content className="flex flex-col gap-6">
-        {user.additionalPermissions.length === 0 ? (
-          <div
-            className="text-muted-foreground rounded-lg border border-dashed px-6 py-8 text-center text-sm"
-            data-testid="user-permissions-empty"
-          >
-            {t({
-              en: 'No additional permissions. Grant one below.',
-              fr: 'Aucune autorisation supplémentaire. Accordez-en une ci-dessous.'
-            })}
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-lg border">
-            <Table data-testid="user-permissions-table">
-              <Table.Header>
-                <Table.Row className="bg-muted/40 hover:bg-muted/40">
-                  <Table.Head>{t({ en: 'Action', fr: 'Action' })}</Table.Head>
-                  <Table.Head>{t({ en: 'Resource', fr: 'Ressource' })}</Table.Head>
-                  <Table.Head>{t({ en: 'Scope', fr: 'Portée' })}</Table.Head>
-                  <Table.Head className="w-16" />
+      <Card.Content>
+        <div className="overflow-hidden rounded-lg border">
+          <Table data-testid="user-permissions-table">
+            <Table.Header>
+              <Table.Row className="bg-background/60 hover:bg-background/60">
+                <Table.Head>{columnLabels.action}</Table.Head>
+                <Table.Head>{columnLabels.subject}</Table.Head>
+                <Table.Head>{columnLabels.scope}</Table.Head>
+                <Table.Head className="w-28" />
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {user.additionalPermissions.length === 0 ? (
+                <Table.Row data-testid="user-permissions-empty">
+                  <Table.Cell className="text-muted-foreground py-8 text-center" colSpan={4}>
+                    {t({
+                      en: 'No additional permissions. Grant one below.',
+                      fr: 'Aucune autorisation supplémentaire. Accordez-en une ci-dessous.'
+                    })}
+                  </Table.Cell>
                 </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {user.additionalPermissions.map((permission, index) => (
+              ) : (
+                user.additionalPermissions.map((permission, index) => (
                   <Table.Row
                     data-testid="user-permission-row"
                     key={`${index}-${permission.action}-${permission.subject}-${permission.groupId}`}
@@ -194,54 +192,62 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                       </Button>
                     </Table.Cell>
                   </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-          </div>
-        )}
-        <form
-          className="grid gap-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end"
-          data-testid="add-permission-form"
-          onSubmit={handleAdd}
-        >
-          <SelectField
-            label={t({ en: 'Action', fr: 'Action' })}
-            name="action"
-            options={actionLabels}
-            placeholder={placeholder}
-            value={action}
-            onValueChange={(value) => setAction($AppAction.parse(value))}
-          />
-          <SelectField
-            label={t({ en: 'Resource', fr: 'Ressource' })}
-            name="subject"
-            options={subjectLabels}
-            placeholder={placeholder}
-            value={subject}
-            onValueChange={(value) => setSubject($AppSubjectName.parse(value))}
-          />
-          {isScopable ? (
-            <SelectField
-              label={t({ en: 'Scope', fr: 'Portée' })}
-              name="scope"
-              options={scopeOptions}
-              placeholder={placeholder}
-              value={scope}
-              onValueChange={setScope}
-            />
-          ) : (
-            <div className="hidden sm:block" />
-          )}
-          <Button
-            className="gap-2"
-            disabled={!draft.success || updatePermissionsMutation.isPending}
-            type="submit"
-            variant="primary"
-          >
-            <PlusIcon className="h-4 w-4" />
-            {t({ en: 'Add permission', fr: 'Ajouter une autorisation' })}
-          </Button>
-        </form>
+                ))
+              )}
+            </Table.Body>
+            {/* The add controls are the table's last row, under the headers that name them. */}
+            <Table.Footer>
+              <Table.Row className="bg-background/60 hover:bg-background/60" data-testid="add-permission-row">
+                <Table.Cell className="py-2.5">
+                  <CellSelect
+                    label={columnLabels.action}
+                    name="action"
+                    options={actionLabels}
+                    placeholder={placeholder}
+                    value={action}
+                    onValueChange={(value) => setAction($AppAction.parse(value))}
+                  />
+                </Table.Cell>
+                <Table.Cell className="py-2.5">
+                  <CellSelect
+                    label={columnLabels.subject}
+                    name="subject"
+                    options={subjectLabels}
+                    placeholder={placeholder}
+                    value={subject}
+                    onValueChange={(value) => setSubject($AppSubjectName.parse(value))}
+                  />
+                </Table.Cell>
+                <Table.Cell className="py-2.5">
+                  {isScopable && (
+                    <CellSelect
+                      label={columnLabels.scope}
+                      name="scope"
+                      options={scopeOptions}
+                      placeholder={placeholder}
+                      value={scope}
+                      onValueChange={setScope}
+                    />
+                  )}
+                </Table.Cell>
+                <Table.Cell className="py-2.5 text-right">
+                  <Button
+                    aria-label={t({ en: 'Add Permission', fr: 'Ajouter une autorisation' })}
+                    className="gap-1.5"
+                    disabled={!draft.success || updatePermissionsMutation.isPending}
+                    size="sm"
+                    type="button"
+                    variant="primary"
+                    onClick={handleAdd}
+                  >
+                    <PlusIcon className="h-4 w-4" />
+                    {t({ en: 'Add', fr: 'Ajouter' })}
+                  </Button>
+                </Table.Cell>
+              </Table.Row>
+            </Table.Footer>
+          </Table>
+        </div>
       </Card.Content>
     </Card>
   );

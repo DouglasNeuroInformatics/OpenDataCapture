@@ -225,7 +225,7 @@ test.describe('admin management', () => {
     // so `.last()` targets the most recently raised one rather than an ambiguous match on both.
     await expect(page.getByRole('heading', { name: 'Success' }).last()).toBeVisible();
 
-    await page.getByRole('button', { name: 'Delete user' }).click();
+    await page.getByRole('button', { name: 'Delete User' }).click();
     await page.getByRole('button', { name: 'Yes' }).click();
 
     await expect(page).toHaveURL('/admin/users');
@@ -296,7 +296,7 @@ test.describe('admin management', () => {
     await expect(userPage.permissionRows).toHaveCount(1);
     await expect(userPage.permissionRows.first()).toContainText('Read');
     await expect(userPage.permissionRows.first()).toContainText('Subject');
-    await expect(userPage.permissionRows.first().getByTestId('user-permission-scope')).toContainText('All groups');
+    await expect(userPage.permissionRows.first().getByTestId('user-permission-scope')).toContainText('All Groups');
   });
 
   test("should clear a user's email from the user page", async ({ api, getPageModel, uniqueId }) => {
@@ -343,7 +343,7 @@ test.describe('admin management', () => {
     const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
     await userPage.selectOption('action', 'read');
     await userPage.selectOption('subject', 'Subject');
-    await userPage.addPermissionForm.getByTestId('scope-select-trigger').click();
+    await userPage.addPermissionRow.getByTestId('scope-select-trigger').click();
     await expect(userPage.$ref.getByTestId(`scope-select-item-${firstGroup.id}`)).toBeVisible();
     await expect(userPage.$ref.getByTestId(`scope-select-item-${otherGroup.id}`)).toHaveCount(0);
     await userPage.$ref.getByTestId(`scope-select-item-${secondGroup.id}`).click();
@@ -365,10 +365,10 @@ test.describe('admin management', () => {
     const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
     await userPage.selectOption('action', 'create');
     await userPage.selectOption('subject', 'Instrument');
-    await expect(userPage.addPermissionForm.getByTestId('scope-select-trigger')).toHaveCount(0);
+    await expect(userPage.addPermissionRow.getByTestId('scope-select-trigger')).toHaveCount(0);
     await userPage.submitPermission();
 
-    await expect(userPage.permissionRows.first().getByTestId('user-permission-scope')).toContainText('All groups');
+    await expect(userPage.permissionRows.first().getByTestId('user-permission-scope')).toContainText('All Groups');
     expect((await api.findUserById(user.id)).additionalPermissions).toStrictEqual([
       { action: 'create', groupId: null, subject: 'Instrument' }
     ]);
@@ -398,6 +398,6 @@ test.describe('admin management', () => {
     const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
     await expect(userPage.adminNotice).toBeVisible();
     await expect(userPage.permissionsTable).toHaveCount(0);
-    await expect(userPage.addPermissionForm).toHaveCount(0);
+    await expect(userPage.addPermissionRow).toHaveCount(0);
   });
 });

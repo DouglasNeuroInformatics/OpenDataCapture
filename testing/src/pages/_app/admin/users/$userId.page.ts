@@ -4,7 +4,7 @@ import type { Locator, Page } from '@playwright/test';
 import { AppPage } from '../../route.page';
 
 export class AdminUserPage extends AppPage {
-  readonly addPermissionForm: Locator;
+  readonly addPermissionRow: Locator;
   readonly adminNotice: Locator;
   readonly pageHeader: Locator;
   readonly permissionRows: Locator;
@@ -19,7 +19,7 @@ export class AdminUserPage extends AppPage {
     this.submitError = page.getByTestId('admin-user-edit-error');
     this.permissionsTable = page.getByTestId('user-permissions-table');
     this.permissionRows = page.getByTestId('user-permission-row');
-    this.addPermissionForm = page.getByTestId('add-permission-form');
+    this.addPermissionRow = page.getByTestId('add-permission-row');
     this.adminNotice = page.getByTestId('user-permissions-admin-notice');
   }
 
@@ -37,7 +37,7 @@ export class AdminUserPage extends AppPage {
   }
 
   async deleteUser() {
-    await this.$ref.getByRole('button', { name: 'Delete user' }).click();
+    await this.$ref.getByRole('button', { name: 'Delete User' }).click();
     await this.$ref.getByRole('button', { name: 'Yes' }).click();
   }
 
@@ -53,11 +53,11 @@ export class AdminUserPage extends AppPage {
 
   /** Opens one of the add-permission selects; the items render in a portal outside the form. */
   async selectOption(field: 'action' | 'scope' | 'subject', value: string) {
-    await this.addPermissionForm.getByTestId(`${field}-select-trigger`).click();
+    await this.addPermissionRow.getByTestId(`${field}-select-trigger`).click();
     await this.$ref.getByTestId(`${field}-select-item-${value}`).click();
   }
 
   async submitPermission() {
-    await this.addPermissionForm.getByRole('button', { name: 'Add permission' }).click();
+    await this.addPermissionRow.getByRole('button', { name: 'Add Permission' }).click();
   }
 }

@@ -46,7 +46,7 @@ describe('UserPermissionsEditor', () => {
 
   it('should mark an unscoped grant as applying to all groups', () => {
     render(<UserPermissionsEditor groups={groups} user={user} />);
-    expect(screen.getByText('All groups')).toBeTruthy();
+    expect(screen.getByText('All Groups')).toBeTruthy();
   });
 
   it('should say that a change waits for the next sign-in, since permissions are frozen into the token', () => {
@@ -70,13 +70,13 @@ describe('UserPermissionsEditor', () => {
 
   it('should offer no scope until a resource that takes one is chosen', () => {
     render(<UserPermissionsEditor groups={groups} user={user} />);
-    expect(screen.getByTestId('add-permission-form')).toBeTruthy();
+    expect(screen.getByTestId('add-permission-row')).toBeTruthy();
     expect(screen.queryByTestId('scope-select-trigger')).toBeNull();
   });
 
   it('should keep the add button disabled until an action and a resource are chosen', () => {
     render(<UserPermissionsEditor groups={groups} user={user} />);
-    const addButton = screen.getByRole('button', { name: 'Add permission' });
+    const addButton = screen.getByRole('button', { name: 'Add Permission' });
     expect(addButton.hasAttribute('disabled')).toBe(true);
   });
 
@@ -84,6 +84,6 @@ describe('UserPermissionsEditor', () => {
     render(<UserPermissionsEditor groups={groups} user={{ ...user, basePermissionLevel: 'ADMIN' }} />);
     expect(screen.getByTestId('user-permissions-admin-notice')).toBeTruthy();
     expect(screen.queryByTestId('user-permissions-table')).toBeNull();
-    expect(screen.queryByTestId('add-permission-form')).toBeNull();
+    expect(screen.queryByTestId('add-permission-row')).toBeNull();
   });
 });

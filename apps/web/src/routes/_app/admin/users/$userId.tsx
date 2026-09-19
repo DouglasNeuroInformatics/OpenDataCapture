@@ -139,7 +139,7 @@ const RouteComponent = () => {
         <UserPermissionsEditor groups={groups} user={user} />
         <Card>
           <Card.Header>
-            <Card.Title>{t({ en: 'Delete user', fr: "Supprimer l'utilisateur" })}</Card.Title>
+            <Card.Title>{t({ en: 'Delete User', fr: "Supprimer l'utilisateur" })}</Card.Title>
             <Card.Description>
               {isCurrentUser
                 ? t({
@@ -156,7 +156,7 @@ const RouteComponent = () => {
             <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
               <Dialog.Trigger asChild>
                 <Button disabled={isCurrentUser} type="button" variant="danger">
-                  {t({ en: 'Delete user', fr: "Supprimer l'utilisateur" })}
+                  {t({ en: 'Delete User', fr: "Supprimer l'utilisateur" })}
                 </Button>
               </Dialog.Trigger>
               <Dialog.Content>
