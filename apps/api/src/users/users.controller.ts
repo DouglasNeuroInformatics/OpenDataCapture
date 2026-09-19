@@ -1,6 +1,18 @@
 import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Delete, Get, Headers, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { $Language } from '@opendatacapture/schemas/core';
 import type { Language } from '@opendatacapture/schemas/core';
@@ -13,6 +25,7 @@ import { GroupsService } from '@/groups/groups.service';
 import { MailService } from '@/mail/mail.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserPermissionsDto } from './dto/update-user-permissions.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
@@ -83,6 +96,19 @@ export class UsersController {
   @RouteAccess({ action: 'update', subject: 'User' })
   updateById(@Param('id') id: string, @Body() update: UpdateUserDto, @CurrentUser('ability') ability: AppAbility) {
     return this.usersService.updateById(id, update, { ability });
+  }
+
+  @ApiOperation({ summary: 'Replace User Permissions' })
+  @Put(':id/permissions')
+  // `manage all` rather than `update User`: an `update User` grant is itself something this route
+  // hands out, and must not be enough to reach it, or the holder could grant themselves anything.
+  @RouteAccess({ action: 'manage', subject: 'all' })
+  updatePermissions(
+    @Param('id') id: string,
+    @Body() { permissions }: UpdateUserPermissionsDto,
+    @CurrentUser('ability') ability: AppAbility
+  ) {
+    return this.usersService.updatePermissions(id, permissions, { ability });
   }
 
   @ApiOperation({ summary: 'Self Update User' })

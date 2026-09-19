@@ -79,12 +79,17 @@ Two constraints on anything you write there:
   publish JSON Schema for every kind × language. This is why `$InstrumentValidationSchema` is
   `z.any().refine(...)` rather than `z.custom()`, which cannot be converted.
 
-## One security-relevant export
+## Two security-relevant exports
 
 `$AppSubjectName` in `src/core/core.ts` is the hand-maintained list of CASL subject names. It is not
 derived from `schema.prisma` and does not mirror it. A model that needs permission checks has to be
 added here as well as in `apps/api/src/auth/ability.factory.ts` —
 `.agents/docs/architecture/auth-and-permissions.md`.
+
+`$GroupScopableSubjectName`, beside it, is derived from that list by excluding `all` and
+`Instrument`, and is what `$UserPermission` checks a non-null `groupId` against. `apps/api` types
+its per-model group conditions over it, so narrowing the exclusion fails to compile there until the
+newly scopable subject's group field is named.
 
 ## Tests
 
