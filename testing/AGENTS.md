@@ -59,16 +59,16 @@ A page object is only reachable from a spec once it is registered in the `pageMo
 
 ## Fixtures
 
-| Fixture               | Scope       | Notes                                                                      |
-| --------------------- | ----------- | -------------------------------------------------------------------------- |
-| `getPageModel`        | test        | Authenticates as `actingRole`, navigates, returns the page object          |
-| `authenticateAs(who)` | test        | Injects a token without navigating; takes a role or `$LoginCredentials`    |
-| `actingRole`          | test option | Default `GROUP_MANAGER`; override with `test.use({ actingRole: 'ADMIN' })` |
-| `appState`            | test option | localStorage first-run gating, seeded for every test; defaults to accepted |
-| `uniqueId`            | test        | Short random suffix for seeded data                                        |
-| `api`                 | worker      | `ApiClient` as admin — `createGroup()` / `createUser()` for preconditions  |
-| `roleAccount(role)`   | worker      | Seeds a group + user per role once, then caches its token and username     |
-| `apiRequestContext`   | worker      | Raw `APIRequestContext` on the web origin, for driving the API directly    |
+| Fixture               | Scope       | Notes                                                                                              |
+| --------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `getPageModel`        | test        | Authenticates as `actingRole`, navigates, returns the page object                                  |
+| `authenticateAs(who)` | test        | Injects a token without navigating; takes a role or `$LoginCredentials`                            |
+| `actingRole`          | test option | Default `GROUP_MANAGER`; override with `test.use({ actingRole: 'ADMIN' })`                         |
+| `appState`            | test option | localStorage first-run gating, seeded for every test; defaults to accepted                         |
+| `uniqueId`            | test        | Short random suffix for seeded data                                                                |
+| `api`                 | worker      | `ApiClient` as admin — `createGroup()` / `createUser()` / `setUserPermissions()` for preconditions |
+| `roleAccount(role)`   | worker      | Seeds a group + user per role once, then caches its token and username                             |
+| `apiRequestContext`   | worker      | Raw `APIRequestContext` on the web origin, for driving the API directly                            |
 
 Set up preconditions over the API with the `api` fixture rather than by clicking through the UI;
 only drive the UI for the behaviour actually under test.

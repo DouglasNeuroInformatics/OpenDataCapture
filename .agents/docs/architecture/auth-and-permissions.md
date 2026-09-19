@@ -42,6 +42,7 @@ The full inventory of non-ordinary access declarations, current as of writing:
 | `POST /v1/groups`                 | `{ action: 'manage', subject: 'all' }`                                                        | `ADMIN` alone. `create Group` admitted every `GROUP_MANAGER`: their `manage Group` rule is conditioned on their own groups, and this check sees only the subject type (#1468).                                                     |
 | `POST /v1/instruments`            | `{ action: 'manage', subject: 'Instrument' }`                                                 | No base permission level grants `manage Instrument`, so this is `ADMIN`-only in practice.                                                                                                                                          |
 | `PATCH /v1/users/self-update/:id` | `{ action: 'read', subject: 'User' }`                                                         | Deliberately weak; `UsersService.updateSelfById` throws `ForbiddenException` unless `id === currentUser.id`. The controller carries a comment saying so.                                                                           |
+| `PUT /v1/users/:id/permissions`   | `{ action: 'manage', subject: 'all' }`                                                        | `ADMIN` alone. An `update User` grant is one of the things this route hands out, so it must not be enough to reach it, or the holder could grant themselves `manage all`. `$UpdateUserData` no longer carries the field either.    |
 | `GET /v1/summary`                 | five-element array (`read` on `Instrument`, `InstrumentRecord`, `Session`, `Subject`, `User`) | The only use of the multi-element array form; all five must pass.                                                                                                                                                                  |
 
 Adding a fourth `'public'` route, or a second `[]`, is a security decision — raise it rather than
@@ -103,7 +104,10 @@ Prisma results already carry `__modelName` — it is a computed field added by
 
 1. `AuthService.login` builds one with `AbilityFactory.createForPayload`, switching on
    `basePermissionLevel` (`ADMIN` / `GROUP_MANAGER` / `STANDARD`) and then applying the user's
-   `additionalPermissions` on top.
+   `additionalPermissions` on top. A stored rule carrying a `groupId` is applied with that model's
+   group condition from `GROUP_SCOPED_CONDITIONS` (`src/auth/ability.factory.ts`), so it reaches
+   only that group's rows; a `null` `groupId` is an unconditional rule, which is what every rule
+   written before the field existed reads back as.
 2. The **serialized rules** (`ability.rules`) are signed into the JWT alongside the payload,
    `expiresIn: '1h'`.
 3. On every request `JwtStrategy.validate` rebuilds the ability from those rules with
@@ -152,9 +156,19 @@ are therefore valid in `@RouteAccess` and in `AbilityFactory` rules (`Instrument
 in both) but cannot be granted as an `additionalPermission`. Treat that as the existing state, not
 as a licence to widen it silently.
 
+A third list, `$GroupScopableSubjectName` in the same schemas file, says which of these a per-user
+permission may be confined to one group on. It is derived from `$AppSubjectName` by excluding `all`
+(a condition on it would apply to every model, each naming its group field differently) and
+`Instrument` (a shared platform asset with no single owning group), so it needs no maintenance of
+its own. What it drives is `GROUP_SCOPED_CONDITIONS` in `src/auth/ability.factory.ts`, which names
+each scopable model's group field and is typed over the list — a subject taken out of the exclusion
+fails `tsc` in `apps/api` until its field is added there. `$UserPermission` refuses a `groupId` on
+any other subject at the boundary, and the factory throws on one it meets anyway.
+
 Adding a rule for a new model means editing `src/auth/ability.factory.ts` and adding tests for
 **both** the allow and the deny case. If it must also be assignable per-user, update the Prisma
-enum and `$AppSubjectName` together.
+enum and `$AppSubjectName` together, and either add its group field to `GROUP_SCOPED_CONDITIONS` or
+add it to the `$GroupScopableSubjectName` exclusion.
 
 ## Adjacent things that are not the permission system
 

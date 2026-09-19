@@ -25,9 +25,9 @@ const buildFieldset = () =>
   }) satisfies FormTypes.RecordArrayField['fieldset'];
 
 /**
- * Exercises the contract the manage-users route depends on: a `record-array` seeded from
- * `initialValues` keeps its records across a re-render only while its `fieldset` holds its
- * identity, which is why the route memoizes that object rather than writing it inline.
+ * Exercises a libui contract any form seeding a `record-array` depends on: records seeded from
+ * `initialValues` survive a re-render only while the `fieldset` holds its identity, so such a form
+ * must memoize that object rather than write it inline.
  */
 const RecordArrayForm = ({
   onSubmit,

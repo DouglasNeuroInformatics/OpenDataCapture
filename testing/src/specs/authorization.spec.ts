@@ -1,3 +1,4 @@
+import type { Permissions } from '@opendatacapture/schemas/core';
 import type { User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -53,6 +54,17 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
     screen: '/admin/users',
     send: (request, { headers, userId }) => request.delete(`${API}/users/${userId}`, { headers }),
     what: 'delete a user'
+  },
+  {
+    // Gated on `manage all` rather than `update User`: an `update User` grant is one of the things
+    // this route hands out, so holding one must not be enough to reach it.
+    screen: '/admin/users/$userId',
+    send: (request, { headers, userId }) =>
+      request.put(`${API}/users/${userId}/permissions`, {
+        data: { permissions: [{ action: 'manage', groupId: null, subject: 'all' }] },
+        headers
+      }),
+    what: 'grant another user a permission'
   },
   {
     // Both screens save through the same endpoint (`useUpdateSetupStateMutation`). The value sent
@@ -391,5 +403,76 @@ test.describe('server-side authorization', () => {
     const usernames = await readUsernames(apiRequestContext, await ApiClient.login(apiRequestContext, credentials));
 
     expect(usernames).toStrictEqual([user.username]);
+  });
+
+  // Row-level scoping is not observable in the api's own tests, whose model is mocked, so the grant
+  // an admin confines to one group from `/admin/users/$userId` is exercised here against real rows.
+  test('should confine a granted permission to the group it names, where an unscoped one reads every group', async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup({ name: `Granted Group ${uniqueId}` });
+    const outsiderGroup = await api.createGroup({ name: `Ungranted Group ${uniqueId}` });
+    const { credentials, user } = await api.createUser({ basePermissionLevel: 'STANDARD', groupIds: [group.id] });
+    const { user: teammate } = await api.createUser({ groupIds: [group.id] });
+    const { user: outsider } = await api.createUser({ groupIds: [outsiderGroup.id] });
+
+    // Permissions are signed into the token at login, so every grant needs a fresh one.
+    const usernamesGranted = async (permissions: Permissions) => {
+      await api.setUserPermissions(user.id, permissions);
+      return readUsernames(apiRequestContext, await ApiClient.login(apiRequestContext, credentials));
+    };
+
+    const scoped = await usernamesGranted([{ action: 'read', groupId: group.id, subject: 'User' }]);
+    expect(scoped).toContain(teammate.username);
+    expect(scoped).not.toContain(outsider.username);
+
+    const unscoped = await usernamesGranted([{ action: 'read', groupId: null, subject: 'User' }]);
+    expect(unscoped).toContain(outsider.username);
+  });
+
+  test('should refuse a grant confined to a group the user does not belong to', async ({ api, uniqueId }) => {
+    const group = await api.createGroup({ name: `Member Group ${uniqueId}` });
+    const otherGroup = await api.createGroup({ name: `Non-member Group ${uniqueId}` });
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    await expect(
+      api.setUserPermissions(user.id, [{ action: 'read', groupId: otherGroup.id, subject: 'User' }])
+    ).rejects.toThrow(/got 400/);
+  });
+
+  test('should ignore permissions sent through a profile update, so only the permissions route can grant', async ({
+    adminToken,
+    api,
+    apiRequestContext
+  }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    const response = await apiRequestContext.patch(`${API}/users/${user.id}`, {
+      data: { additionalPermissions: [{ action: 'manage', groupId: null, subject: 'all' }] },
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+
+    expect(response.ok()).toBe(true);
+    expect((await api.findUserById(user.id)).additionalPermissions).toStrictEqual([]);
+  });
+
+  test('should drop a grant confined to a group the user is removed from, and keep an unscoped one', async ({
+    api,
+    uniqueId
+  }) => {
+    const leavingGroup = await api.createGroup({ name: `Leaving Group ${uniqueId}` });
+    const stayingGroup = await api.createGroup({ name: `Staying Group ${uniqueId}` });
+    const { user } = await api.createUser({ groupIds: [leavingGroup.id, stayingGroup.id] });
+    await api.setUserPermissions(user.id, [
+      { action: 'read', groupId: leavingGroup.id, subject: 'User' },
+      { action: 'create', groupId: null, subject: 'Instrument' }
+    ]);
+
+    const updated = await api.updateUser(user.id, { groupIds: [stayingGroup.id] });
+
+    expect(updated.additionalPermissions).toStrictEqual([{ action: 'create', groupId: null, subject: 'Instrument' }]);
   });
 });
