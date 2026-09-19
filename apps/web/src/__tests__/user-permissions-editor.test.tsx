@@ -74,6 +74,12 @@ describe('UserPermissionsEditor', () => {
     expect(screen.queryByTestId('scope-select-trigger')).toBeNull();
   });
 
+  it('should keep the add button disabled until an action and a resource are chosen', () => {
+    render(<UserPermissionsEditor groups={groups} user={user} />);
+    const addButton = screen.getByRole('button', { name: 'Add permission' });
+    expect(addButton.hasAttribute('disabled')).toBe(true);
+  });
+
   it('should replace the editor with a notice for an administrator, who already holds everything', () => {
     render(<UserPermissionsEditor groups={groups} user={{ ...user, basePermissionLevel: 'ADMIN' }} />);
     expect(screen.getByTestId('user-permissions-admin-notice')).toBeTruthy();

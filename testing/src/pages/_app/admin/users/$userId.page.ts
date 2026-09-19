@@ -37,7 +37,7 @@ export class AdminUserPage extends AppPage {
   }
 
   async deleteUser() {
-    await this.$ref.getByRole('button', { name: 'Delete' }).click();
+    await this.$ref.getByRole('button', { name: 'Delete user' }).click();
     await this.$ref.getByRole('button', { name: 'Yes' }).click();
   }
 
@@ -58,6 +58,6 @@ export class AdminUserPage extends AppPage {
   }
 
   async submitPermission() {
-    await this.addPermissionForm.getByRole('button', { name: 'Submit' }).click();
+    await this.addPermissionForm.getByRole('button', { name: 'Add permission' }).click();
   }
 }

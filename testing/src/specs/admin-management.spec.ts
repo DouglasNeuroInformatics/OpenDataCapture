@@ -225,7 +225,7 @@ test.describe('admin management', () => {
     // so `.last()` targets the most recently raised one rather than an ambiguous match on both.
     await expect(page.getByRole('heading', { name: 'Success' }).last()).toBeVisible();
 
-    await page.getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole('button', { name: 'Delete user' }).click();
     await page.getByRole('button', { name: 'Yes' }).click();
 
     await expect(page).toHaveURL('/admin/users');
