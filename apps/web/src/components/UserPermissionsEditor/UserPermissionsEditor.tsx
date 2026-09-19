@@ -30,7 +30,7 @@ type CellSelectProps = {
 /** A select sitting in a table cell, named for assistive technology by the column it sits under. */
 const CellSelect = ({ label, name, onValueChange, options, placeholder, value }: CellSelectProps) => (
   <Select name={name} value={value ?? ''} onValueChange={onValueChange}>
-    <Select.Trigger aria-label={label} data-testid={`${name}-select-trigger`}>
+    <Select.Trigger aria-label={label} className="min-w-0" data-testid={`${name}-select-trigger`}>
       <Select.Value placeholder={placeholder} />
     </Select.Trigger>
     <Select.Content data-testid={`${name}-select-content`}>
@@ -141,13 +141,13 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
       </Card.Header>
       <Card.Content>
         <div className="overflow-hidden rounded-lg border">
-          <Table data-testid="user-permissions-table">
+          <Table className="table-fixed" data-testid="user-permissions-table">
             <Table.Header>
               <Table.Row className="bg-background/60 hover:bg-background/60">
-                <Table.Head>{columnLabels.action}</Table.Head>
-                <Table.Head>{columnLabels.subject}</Table.Head>
-                <Table.Head>{columnLabels.scope}</Table.Head>
-                <Table.Head className="w-28" />
+                <Table.Head className="w-[25%]">{columnLabels.action}</Table.Head>
+                <Table.Head className="w-[33%]">{columnLabels.subject}</Table.Head>
+                <Table.Head className="w-[30%]">{columnLabels.scope}</Table.Head>
+                <Table.Head className="w-16" />
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -233,15 +233,14 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                 <Table.Cell className="py-2.5 text-right">
                   <Button
                     aria-label={t({ en: 'Add Permission', fr: 'Ajouter une autorisation' })}
-                    className="gap-1.5"
+                    className="text-primary hover:text-primary"
                     disabled={!draft.success || updatePermissionsMutation.isPending}
-                    size="sm"
+                    size="icon"
                     type="button"
-                    variant="primary"
+                    variant="ghost"
                     onClick={handleAdd}
                   >
                     <PlusIcon className="h-4 w-4" />
-                    {t({ en: 'Add', fr: 'Ajouter' })}
                   </Button>
                 </Table.Cell>
               </Table.Row>
