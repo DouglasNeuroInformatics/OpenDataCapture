@@ -63,9 +63,10 @@ describe('UserPermissionsEditor', () => {
     });
   });
 
-  it('should show an empty state when the user holds no grants', () => {
+  it('should still offer the add row when the user holds no grants', () => {
     render(<UserPermissionsEditor groups={groups} user={{ ...user, additionalPermissions: [] }} />);
-    expect(screen.getByTestId('user-permissions-empty')).toBeTruthy();
+    expect(screen.queryAllByTestId('user-permission-row')).toHaveLength(0);
+    expect(screen.getByTestId('add-permission-row')).toBeTruthy();
   });
 
   it('should offer no scope until a resource that takes one is chosen', () => {

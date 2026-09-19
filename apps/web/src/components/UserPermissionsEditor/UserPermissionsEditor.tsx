@@ -158,50 +158,39 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {user.additionalPermissions.length === 0 ? (
-                <Table.Row data-testid="user-permissions-empty">
-                  <Table.Cell className="text-muted-foreground py-8 text-center" colSpan={4}>
-                    {t({
-                      en: 'No additional permissions. Grant one below.',
-                      fr: 'Aucune autorisation supplémentaire. Accordez-en une ci-dessous.'
-                    })}
+              {user.additionalPermissions.map((permission, index) => (
+                <Table.Row
+                  data-testid="user-permission-row"
+                  key={`${index}-${permission.action}-${permission.subject}-${permission.groupId}`}
+                >
+                  <Table.Cell className="font-medium">{actionLabels[permission.action]}</Table.Cell>
+                  <Table.Cell>{subjectLabels[permission.subject]}</Table.Cell>
+                  <Table.Cell data-testid="user-permission-scope">
+                    {permission.groupId === null ? (
+                      <span className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
+                        <GlobeIcon aria-hidden className="h-3.5 w-3.5" />
+                        {allGroupsLabel}
+                      </span>
+                    ) : (
+                      (groups.find((group) => group.id === permission.groupId)?.name ?? permission.groupId)
+                    )}
+                  </Table.Cell>
+                  <Table.Cell className="py-1.5 text-right">
+                    <Button
+                      aria-label={t({ en: 'Remove permission', fr: "Retirer l'autorisation" })}
+                      className="text-muted-foreground hover:text-destructive"
+                      data-testid="user-permission-remove"
+                      disabled={updatePermissionsMutation.isPending}
+                      size="icon"
+                      type="button"
+                      variant="ghost"
+                      onClick={() => save(withoutPermission(user.additionalPermissions, index))}
+                    >
+                      <Trash2Icon className="h-4 w-4" />
+                    </Button>
                   </Table.Cell>
                 </Table.Row>
-              ) : (
-                user.additionalPermissions.map((permission, index) => (
-                  <Table.Row
-                    data-testid="user-permission-row"
-                    key={`${index}-${permission.action}-${permission.subject}-${permission.groupId}`}
-                  >
-                    <Table.Cell className="font-medium">{actionLabels[permission.action]}</Table.Cell>
-                    <Table.Cell>{subjectLabels[permission.subject]}</Table.Cell>
-                    <Table.Cell data-testid="user-permission-scope">
-                      {permission.groupId === null ? (
-                        <span className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
-                          <GlobeIcon aria-hidden className="h-3.5 w-3.5" />
-                          {allGroupsLabel}
-                        </span>
-                      ) : (
-                        (groups.find((group) => group.id === permission.groupId)?.name ?? permission.groupId)
-                      )}
-                    </Table.Cell>
-                    <Table.Cell className="py-1.5 text-right">
-                      <Button
-                        aria-label={t({ en: 'Remove permission', fr: "Retirer l'autorisation" })}
-                        className="text-muted-foreground hover:text-destructive"
-                        data-testid="user-permission-remove"
-                        disabled={updatePermissionsMutation.isPending}
-                        size="icon"
-                        type="button"
-                        variant="ghost"
-                        onClick={() => save(withoutPermission(user.additionalPermissions, index))}
-                      >
-                        <Trash2Icon className="h-4 w-4" />
-                      </Button>
-                    </Table.Cell>
-                  </Table.Row>
-                ))
-              )}
+              ))}
             </Table.Body>
             {/* The add controls are the table's last row, under the headers that name them. */}
             <Table.Footer className="bg-transparent font-normal">
