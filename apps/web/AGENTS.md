@@ -177,7 +177,8 @@ add UI that an e2e test will drive.
 `pnpm exec vitest --project web`. Environment is happy-dom. There are no setup files anywhere in the
 repo, and `vite.config.ts` is **not** loaded during tests — `vitest.config.ts` supersedes it, which is
 why the `@` alias is redeclared there. Nothing that depends on `import.meta.env` injection or the
-runtime plugin works in a unit test.
+runtime plugin works in a unit test; mock `@/config` instead, and use `vi.stubEnv` for Vite's
+built-in `DEV` and `MODE` (`src/__tests__/app-route-guard.test.ts`).
 
 `src/hooks/__tests__/useInstrumentBundle.test.ts` is the canonical test — read it before writing one.
 Mock `axios` and `@/store` with `vi.hoisted` + `vi.mock`; wrap hooks in a fresh `QueryClient` with
