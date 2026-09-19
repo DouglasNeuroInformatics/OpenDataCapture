@@ -2,13 +2,12 @@ import { Card, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinforma
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Logo } from '@opendatacapture/react-core';
 import type { $LoginCredentials, AuthPayload } from '@opendatacapture/schemas/auth';
-import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 
 import { DemoBanner } from '@/components/DemoBanner';
 import { LoginBrandingPanel } from '@/components/LoginBranding';
 import { LoginForm } from '@/components/LoginForm';
-import { config } from '@/config';
 import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 import { getRightPanelGradient } from '@/utils/branding';
@@ -129,22 +128,6 @@ const RouteComponent = () => {
 };
 
 export const Route = createFileRoute('/auth/login')({
-  beforeLoad: async () => {
-    if (import.meta.env.DEV && import.meta.env.MODE !== 'test' && config.dev.isBypassAuthEnabled) {
-      const { login } = useAppStore.getState();
-      const response = await loginRequest({
-        password: config.dev.password!,
-        username: config.dev.username!
-      });
-      if (!response.success) {
-        throw new Error('Login failed');
-      }
-      login(response.accessToken);
-      throw redirect({
-        to: '/dashboard'
-      });
-    }
-  },
   component: RouteComponent,
   loader: ({ context }) => context.queryClient.ensureQueryData(setupStateQueryOptions())
 });
