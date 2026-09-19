@@ -3,8 +3,7 @@ import { useMemo, useState } from 'react';
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Badge, Button, Card, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { ArrowLeftIcon } from 'lucide-react';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
 import { PageHeader } from '@/components/PageHeader';
 import { UpdateUserForm } from '@/components/UpdateUserForm';
@@ -66,13 +65,6 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-6">
-        <Link
-          className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-sm transition-colors"
-          to="/admin/users"
-        >
-          <ArrowLeftIcon className="h-4 w-4" />
-          {t({ en: 'All users', fr: 'Tous les utilisateurs' })}
-        </Link>
         <Card>
           <Card.Header className="flex-row items-center gap-4 space-y-0">
             <UserIcon className="text-muted-foreground h-14 w-14 shrink-0" />
