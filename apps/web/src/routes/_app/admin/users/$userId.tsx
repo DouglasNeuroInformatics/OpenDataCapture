@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
 
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
-import { Badge, Button, Card, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
+import { Button, Card, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
+import { Chip } from '@/components/Chip';
 import { PageHeader } from '@/components/PageHeader';
 import { UpdateUserForm } from '@/components/UpdateUserForm';
 import type { UpdateUserFormInputData } from '@/components/UpdateUserForm';
@@ -78,16 +79,13 @@ const RouteComponent = () => {
               {userGroups.length > 0 && (
                 <div className="mt-2.5 flex flex-wrap gap-1.5">
                   {userGroups.map((group) => (
-                    <Badge key={group.id} variant="secondary">
-                      {group.name}
-                    </Badge>
+                    <Chip key={group.id}>{group.name}</Chip>
                   ))}
                 </div>
               )}
             </div>
           </Card.Header>
         </Card>
-        <UserPermissionsEditor groups={groups} user={user} />
         <Card>
           <Card.Header>
             <Card.Title>{t({ en: 'Account', fr: 'Compte' })}</Card.Title>
@@ -138,7 +136,8 @@ const RouteComponent = () => {
             />
           </Card.Content>
         </Card>
-        <Card className="border-destructive/40">
+        <UserPermissionsEditor groups={groups} user={user} />
+        <Card>
           <Card.Header>
             <Card.Title>{t({ en: 'Delete user', fr: "Supprimer l'utilisateur" })}</Card.Title>
             <Card.Description>

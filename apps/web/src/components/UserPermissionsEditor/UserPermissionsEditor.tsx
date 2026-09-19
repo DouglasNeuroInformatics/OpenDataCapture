@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Badge, Button, Card, Label, Select, Table } from '@douglasneuroinformatics/libui/components';
+import { Button, Card, Label, Select, Table } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $AppAction, $AppSubjectName, isGroupScopableSubject } from '@opendatacapture/schemas/core';
 import type { AppAction, AppSubjectName, Permissions } from '@opendatacapture/schemas/core';
@@ -8,6 +8,7 @@ import type { Group } from '@opendatacapture/schemas/group';
 import type { User } from '@opendatacapture/schemas/user';
 import { PlusIcon, Trash2Icon } from 'lucide-react';
 
+import { Chip } from '@/components/Chip';
 import { useUpdateUserPermissionsMutation } from '@/hooks/useUpdateUserPermissionsMutation';
 import {
   $AddPermissionFormData,
@@ -171,9 +172,11 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                     <Table.Cell>{subjectLabels[permission.subject]}</Table.Cell>
                     <Table.Cell data-testid="user-permission-scope">
                       {permission.groupId === null ? (
-                        <Badge variant="secondary">{allGroupsLabel}</Badge>
+                        <Chip variant="warning">{allGroupsLabel}</Chip>
                       ) : (
-                        (groups.find((group) => group.id === permission.groupId)?.name ?? permission.groupId)
+                        <Chip>
+                          {groups.find((group) => group.id === permission.groupId)?.name ?? permission.groupId}
+                        </Chip>
                       )}
                     </Table.Cell>
                     <Table.Cell className="py-1.5 text-right">
