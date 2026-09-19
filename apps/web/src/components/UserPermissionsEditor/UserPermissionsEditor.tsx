@@ -6,9 +6,8 @@ import { $AppAction, $AppSubjectName, isGroupScopableSubject } from '@opendataca
 import type { AppAction, AppSubjectName, Permissions } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { User } from '@opendatacapture/schemas/user';
-import { PlusIcon, Trash2Icon } from 'lucide-react';
+import { GlobeIcon, PlusIcon, Trash2Icon } from 'lucide-react';
 
-import { Chip } from '@/components/Chip';
 import { useUpdateUserPermissionsMutation } from '@/hooks/useUpdateUserPermissionsMutation';
 import {
   $AddPermissionFormData,
@@ -178,11 +177,12 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                     <Table.Cell>{subjectLabels[permission.subject]}</Table.Cell>
                     <Table.Cell data-testid="user-permission-scope">
                       {permission.groupId === null ? (
-                        <Chip variant="warning">{allGroupsLabel}</Chip>
+                        <span className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
+                          <GlobeIcon aria-hidden className="h-3.5 w-3.5" />
+                          {allGroupsLabel}
+                        </span>
                       ) : (
-                        <Chip>
-                          {groups.find((group) => group.id === permission.groupId)?.name ?? permission.groupId}
-                        </Chip>
+                        (groups.find((group) => group.id === permission.groupId)?.name ?? permission.groupId)
                       )}
                     </Table.Cell>
                     <Table.Cell className="py-1.5 text-right">
