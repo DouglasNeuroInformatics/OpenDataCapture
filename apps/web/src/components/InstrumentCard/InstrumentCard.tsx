@@ -32,6 +32,7 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
       kind: 'text',
       label: t({
         en: 'Authors',
+        es: 'Autores',
         fr: 'Auteurs'
       }),
       text: instrument.details.authors?.join(', ')
@@ -40,6 +41,7 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
       kind: 'text',
       label: t({
         en: 'Description',
+        es: 'Descripción',
         fr: 'Description'
       }),
       text: instrument.details.description
@@ -48,6 +50,7 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
       kind: 'text',
       label: t({
         en: 'Edition',
+        es: 'Edición',
         fr: 'Édition'
       }),
       text: instrument.kind === 'SERIES' ? undefined : instrument.internal.edition.toString()
@@ -56,6 +59,7 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
       kind: 'text',
       label: t({
         en: 'Languages',
+        es: 'Idiomas',
         fr: 'Langues'
       }),
       text: instrument.supportedLanguages
@@ -73,6 +77,7 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
       kind: 'text',
       label: t({
         en: 'License',
+        es: 'Licencia',
         fr: 'Licence'
       }),
       text: license?.name ?? 'NA',
@@ -90,10 +95,12 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
               {license?.isOpenSource
                 ? t({
                     en: 'This is a free and open-source license',
+                    es: 'Esta es una licencia libre y de código abierto',
                     fr: "Il s'agit d'une licence libre"
                   })
                 : t({
                     en: 'This is not a free and open source license',
+                    es: 'Esta no es una licencia libre y de código abierto',
                     fr: "Il ne s'agit pas d'une licence libre"
                   })}
             </p>
@@ -106,6 +113,7 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
       kind: 'link',
       label: t({
         en: 'Reference Link',
+        es: 'Enlace de referencia',
         fr: 'Lien vers la référence'
       })
     },
@@ -114,6 +122,7 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
       kind: 'link',
       label: t({
         en: 'Source Link',
+        es: 'Enlace al código fuente',
         fr: 'Lien vers le code source'
       })
     },
@@ -152,7 +161,7 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
             return (
               <div className="flex items-center gap-1" key={item.label}>
                 <p className="line-clamp-3 leading-tight">
-                  <span className="font-medium">{item.label + t({ en: ': ', fr: ' : ' })}</span>
+                  <span className="font-medium">{item.label + t({ en: ': ', es: ': ', fr: ' : ' })}</span>
                   {item.kind === 'text' && <span className="text-muted-foreground">{item.text}</span>}
                   {item.kind === 'link' && (
                     <a

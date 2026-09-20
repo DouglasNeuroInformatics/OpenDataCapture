@@ -29,11 +29,12 @@ export const InstrumentOverview = ({ beforeBegin, disableBegin, instrument, onNe
               <Heading variant="h5">
                 {t({
                   en: 'Estimated Duration',
+                  es: 'Duración estimada',
                   fr: 'Durée estimée'
                 })}
               </Heading>
               <p className="text-muted-foreground text-sm">
-                {t({ en: '{} minute(s)', fr: '{} minute(s)' }, { args: [estimatedDuration] })}
+                {t({ en: '{} minute(s)', es: '{} minuto(s)', fr: '{} minute(s)' }, { args: [estimatedDuration] })}
               </p>
             </>
           )}
@@ -43,6 +44,7 @@ export const InstrumentOverview = ({ beforeBegin, disableBegin, instrument, onNe
             <Heading variant="h5">
               {t({
                 en: 'Instructions',
+                es: 'Instrucciones',
                 fr: 'Instructions'
               })}
             </Heading>
@@ -56,6 +58,7 @@ export const InstrumentOverview = ({ beforeBegin, disableBegin, instrument, onNe
         disabled={disableBegin}
         label={t({
           en: 'Begin',
+          es: 'Comenzar',
           fr: 'Commencer'
         })}
         onClick={() => {

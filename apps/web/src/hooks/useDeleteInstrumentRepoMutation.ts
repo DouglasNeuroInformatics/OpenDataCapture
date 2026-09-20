@@ -17,7 +17,11 @@ export function useDeleteInstrumentRepoMutation() {
       addNotification({
         message: getApiErrorMessage(
           err,
-          t({ en: 'Failed to delete repository', fr: 'Échec de la suppression du dépôt' })
+          t({
+            en: 'Failed to delete repository',
+            es: 'Error al eliminar el repositorio',
+            fr: 'Échec de la suppression du dépôt'
+          })
         ),
         type: 'error'
       });

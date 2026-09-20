@@ -25,11 +25,13 @@ export function createFileInstrumentContentStore(props: FileInstrumentContentPro
             const actual = uploadMap[basename]!.length;
             if (actual < count.min || actual > count.max) {
               const required = count.min === count.max ? `${count.min}` : `between ${count.min} and ${count.max}`;
+              const requiredEs = count.min === count.max ? `${count.min}` : `entre ${count.min} y ${count.max}`;
               const requiredFr = count.min === count.max ? `${count.min}` : `entre ${count.min} et ${count.max}`;
               const isPluralRequired = count.min !== count.max || count.min !== 1;
               errors[basename] ??= [];
               errors[basename].push({
                 en: `You uploaded ${actual} file${actual === 1 ? '' : 's'}, but ${required} ${isPluralRequired ? 'are' : 'is'} required`,
+                es: `Subió ${actual} archivo${actual === 1 ? '' : 's'}, pero ${isPluralRequired ? 'se requieren' : 'se requiere'} ${requiredEs}`,
                 fr: `Vous avez téléchargé ${actual} fichier${actual === 1 ? '' : 's'}, mais ${requiredFr} ${isPluralRequired ? 'sont' : 'est'} requis`
               });
             }

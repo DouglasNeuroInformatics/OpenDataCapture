@@ -39,9 +39,9 @@ const RouteComponent = () => {
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   const permissionLabels: { [K in BasePermissionLevel]: string } = {
-    ADMIN: t({ en: 'Admin', fr: 'Admin' }),
-    GROUP_MANAGER: t({ en: 'Group Manager', fr: 'Responsable de groupe' }),
-    STANDARD: t({ en: 'Standard User', fr: 'Utilisateur standard' })
+    ADMIN: t({ en: 'Admin', es: 'Administrador', fr: 'Admin' }),
+    GROUP_MANAGER: t({ en: 'Group Manager', es: 'Administrador de grupo', fr: 'Responsable de groupe' }),
+    STANDARD: t({ en: 'Standard User', es: 'Usuario estándar', fr: 'Utilisateur standard' })
   };
 
   const permissionLevel = userInfo.data.basePermissionLevel
@@ -106,7 +106,7 @@ const RouteComponent = () => {
               </Card.Title>
               {permissionLevel && (
                 <p className="text-muted-foreground text-base" data-testid="user-info-role">
-                  {t({ en: 'Role', fr: 'Rôle' })}: {permissionLevel}
+                  {t({ en: 'Role', es: 'Rol', fr: 'Rôle' })}: {permissionLevel}
                 </p>
               )}
             </div>
@@ -158,6 +158,7 @@ const RouteComponent = () => {
             },
             title: t({
               en: 'Personal Information',
+              es: 'Información personal',
               fr: 'Informations personnelles'
             })
           }
@@ -194,6 +195,7 @@ const RouteComponent = () => {
             <Dialog.Description>
               {t({
                 en: 'Enter a new password for your account, then confirm it to save the change.',
+                es: 'Introduzca una nueva contraseña para su cuenta y confírmela para guardar el cambio.',
                 fr: 'Saisissez un nouveau mot de passe pour votre compte, puis confirmez-le pour enregistrer la modification.'
               })}
             </Dialog.Description>

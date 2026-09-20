@@ -10,6 +10,7 @@ const CapWidget: React.FC<{ onSolve: (token: string) => void }> = ({ onSolve }) 
 
   const label = t({
     en: "I'm a human",
+    es: 'Soy una persona',
     fr: 'Je suis un humain'
   });
 
@@ -33,10 +34,12 @@ const CapWidget: React.FC<{ onSolve: (token: string) => void }> = ({ onSolve }) 
       data-cap-api-endpoint="/api/auth/"
       data-cap-i18n-error-label={t({
         en: 'Error',
+        es: 'Error',
         fr: 'Erreur'
       })}
       data-cap-i18n-initial-state={t({
         en: "I'm a human",
+        es: 'Soy una persona',
         fr: 'Je suis un humain'
       })}
       data-cap-i18n-solved-label={label}

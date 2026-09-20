@@ -39,6 +39,7 @@ const AssignmentResultSlider: React.FC<{
           <Sheet.Description>
             {t({
               en: 'Share this link with the subject to complete the assignment remotely. If the link is lost, it can be found by navigating to View Current Subject, selecting the Assignments tab, and clicking on the assignment.',
+              es: 'Comparta este enlace con el sujeto para que complete la tarea de forma remota. Si se pierde el enlace, puede encontrarlo en Ver el sujeto actual, seleccionando la pestaña Asignaciones y haciendo clic en la asignación.',
               fr: "Partagez ce lien avec le client pour compléter la tâche à distance. Si le lien est perdu, il peut être retrouvé en naviguant vers Voir le client actuel, en sélectionnant l'onglet Tâches, puis en cliquant sur la tâche."
             })}
           </Sheet.Description>
@@ -49,6 +50,7 @@ const AssignmentResultSlider: React.FC<{
               <a className="hover:underline" href={url} rel="noreferrer" target="_blank">
                 {t({
                   en: 'Assignment Link',
+                  es: 'Enlace de la tarea',
                   fr: 'Lien de la tâche'
                 })}
               </a>
@@ -116,6 +118,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'Remote Assignment',
+            es: 'Tarea remota',
             fr: 'Tâche à distance'
           })}
         </Heading>
@@ -147,6 +150,7 @@ const RouteComponent = () => {
             <Dialog.Title>
               {t({
                 en: 'Create Remote Assignment',
+                es: 'Crear tarea remota',
                 fr: 'Créer une tâche à distance'
               })}
             </Dialog.Title>
@@ -154,6 +158,7 @@ const RouteComponent = () => {
               {t(
                 {
                   en: 'Assign "{}" to the current subject for remote completion.',
+                  es: 'Asignar "{}" al sujeto actual para que la complete de forma remota.',
                   fr: 'Assigner « {} » au client actuel pour complétion à distance.'
                 },
                 { args: [selectedInstrument?.details.title ?? ''] }
@@ -167,6 +172,7 @@ const RouteComponent = () => {
                 kind: 'date',
                 label: t({
                   en: 'Expires At',
+                  es: 'Vence el',
                   fr: "Date d'expiration"
                 })
               }
@@ -179,6 +185,7 @@ const RouteComponent = () => {
                 expiresAt: z.coerce.date().min(new Date(), {
                   message: t({
                     en: 'Expiry date must be in the future',
+                    es: 'La fecha de vencimiento debe ser futura',
                     fr: "La date d'expiration doit être dans le futur"
                   })
                 })

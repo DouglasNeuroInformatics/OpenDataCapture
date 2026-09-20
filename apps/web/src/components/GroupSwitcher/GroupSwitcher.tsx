@@ -38,7 +38,9 @@ export const GroupSwitcher = ({ className }: { className?: string }) => {
   }
 
   const label = (
-    <span className="text-[10px] font-medium tracking-tight text-sky-400">{t({ en: 'Group', fr: 'Groupe' })}</span>
+    <span className="text-[10px] font-medium tracking-tight text-sky-400">
+      {t({ en: 'Group', es: 'Grupo', fr: 'Groupe' })}
+    </span>
   );
 
   // A user in exactly one group has nothing to switch between, so show the group as static text styled
