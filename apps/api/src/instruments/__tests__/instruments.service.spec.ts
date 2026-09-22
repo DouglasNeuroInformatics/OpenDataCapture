@@ -50,7 +50,12 @@ const groupItemFilter = ({
   accessibleInstrumentIds = [],
   instrumentRepoIds = []
 }: { accessibleInstrumentIds?: string[]; instrumentRepoIds?: string[] } = {}) => ({
-  OR: [{ sourceRepoId: null }, { sourceRepoId: { in: instrumentRepoIds } }, { id: { in: accessibleInstrumentIds } }]
+  OR: [
+    { sourceRepoId: null },
+    { sourceRepoId: { isSet: false } },
+    { sourceRepoId: { in: instrumentRepoIds } },
+    { id: { in: accessibleInstrumentIds } }
+  ]
 });
 
 describe('InstrumentsService', () => {
@@ -283,6 +288,47 @@ describe('InstrumentsService', () => {
         }
       });
       expect(result).toEqual({ instrumentId: id, outcome: 'created' });
+    });
+
+    // `create` never writes `sourceRepoId`, so on a manually uploaded instrument the key is absent
+    // rather than null, and prisma compiles a `null` filter into a comparison that also requires the
+    // field to be present. Without the `isSet` branch every uploaded instrument reads as missing, and
+    // a group with no assigned repository can assemble no series at all.
+    it('should accept an item whose stored record has no sourceRepoId key, not only an explicit null', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
+      vi.spyOn(cryptoService, 'hash').mockImplementation((value) => `hash:${value}`);
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: {
+          __runtimeVersion: 1,
+          content: {
+            items: [
+              { edition: 1, name: 'FORM_A' },
+              { edition: 1, name: 'FORM_B' }
+            ]
+          },
+          details: { description: 'Uploaded Items', license: 'UNLICENSED', title: 'Uploaded Items' },
+          kind: 'SERIES',
+          language: 'en',
+          tags: ['Series']
+        }
+      } as any);
+      instrumentModel.exists.mockResolvedValue(false);
+      instrumentModel.findMany.mockResolvedValue([{ id: 'hash:FORM_A-1' }, { id: 'hash:FORM_B-1' }] as any);
+
+      await instrumentsService.createSeries({
+        confirmDuplicate: true,
+        details: { title: 'Uploaded Items' },
+        groupId: 'group-1',
+        items: [
+          { edition: 1, name: 'FORM_A' },
+          { edition: 1, name: 'FORM_B' }
+        ],
+        language: 'en'
+      });
+
+      const [{ where }] = instrumentModel.findMany.mock.calls.at(-1)!;
+      expect(where.AND[0].OR).toContainEqual({ sourceRepoId: { isSet: false } });
     });
 
     it('rejects a title that is already used (case-insensitively) by another instrument', async () => {
