@@ -392,7 +392,7 @@ export class InstrumentRecordsService {
       await this.groupsService.findById(groupId, options);
     }
 
-    const instrument = await this.instrumentsService.findById(instrumentId);
+    const instrument = await this.instrumentsService.findById(instrumentId, options);
     if (instrument.kind === 'SERIES') {
       throw new UnprocessableEntityException(
         `Cannot create instrument record for series instrument '${instrument.id}'`
@@ -463,11 +463,11 @@ export class InstrumentRecordsService {
         data: preProcessedRecords
       });
 
+      // Only the rows this call wrote. Filtering by instrument alone returned every group's records
+      // when `groupId` was omitted, and `accessibleQuery` cannot scope this read: a STANDARD uploader
+      // holds no `read InstrumentRecord` rule, which makes CASL throw rather than filter.
       return this.instrumentRecordModel.findMany({
-        where: {
-          groupId,
-          instrumentId
-        }
+        where: { sessionId: { in: createdSessionsArray.map((session) => session.id) } }
       });
     } catch (err) {
       await this.sessionsService.deleteByIds(createdSessionsArray.map((session) => session.id));

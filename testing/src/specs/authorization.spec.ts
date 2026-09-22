@@ -1,4 +1,6 @@
 import type { Permissions } from '@opendatacapture/schemas/core';
+import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { InstrumentRecord, UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import type { User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -264,6 +266,33 @@ async function readSeededBundle(request: APIRequestContext, token: string): Prom
   return ((await container.json()) as { bundle: string }).bundle;
 }
 
+/** The id of the latest edition of a seeded instrument, by its internal name. */
+async function findInstrumentId(request: APIRequestContext, token: string, name: string): Promise<string> {
+  const response = await request.get(`${API}/instruments/info`, { headers: { Authorization: `Bearer ${token}` } });
+  expect(response.ok()).toBe(true);
+  const instrument = ((await response.json()) as InstrumentInfo[]).find(
+    (info) => info.kind === 'FORM' && info.internal.name === name
+  );
+  if (!instrument) {
+    throw new Error(`Instrument '${name}' is not in the seeded catalog`);
+  }
+  return instrument.id;
+}
+
+/** One record satisfying the happiness questionnaire's validation schema, for the given subject. */
+function happinessRecord(subjectId: string): UploadInstrumentRecordsData['records'][number] {
+  return {
+    data: { isSatisfiedOverall: true, personalLifeSatisfaction: 8, professionalLifeSatisfaction: 7 },
+    date: new Date('2024-01-15'),
+    subjectId
+  };
+}
+
+/** `POST /instrument-records/upload` as the holder of the given token, with the raw response. */
+function uploadRecord(request: APIRequestContext, token: string, data: UploadInstrumentRecordsData) {
+  return request.post(`${API}/instrument-records/upload`, { data, headers: { Authorization: `Bearer ${token}` } });
+}
+
 /** The user list `/admin/users` renders, read with the given user's own token. */
 async function readUsernames(request: APIRequestContext, token: string): Promise<string[]> {
   const response = await request.get(`${API}/users`, { headers: { Authorization: `Bearer ${token}` } });
@@ -474,5 +503,39 @@ test.describe('server-side authorization', () => {
     const updated = await api.updateUser(user.id, { groupIds: [stayingGroup.id] });
 
     expect(updated.additionalPermissions).toStrictEqual([{ action: 'create', groupId: null, subject: 'Instrument' }]);
+  });
+
+  // The import route answers with the rows it wrote, and used to find them by re-querying the
+  // instrument with the request's optional `groupId` as the only filter. Omitting `groupId` therefore
+  // returned every group's records for that instrument to the lowest role, which `create
+  // InstrumentRecord` admits and which holds no `read InstrumentRecord` rule at all.
+  test('should answer an upload with only the records it wrote, never those of another group', async ({
+    api,
+    apiRequestContext,
+    roleAccount,
+    uniqueId
+  }) => {
+    const { accessToken: adminToken } = await roleAccount('ADMIN');
+    const { accessToken } = await roleAccount('STANDARD');
+    const foreignGroup = await api.createGroup({ name: `Foreign Group ${uniqueId}` });
+    const instrumentId = await findInstrumentId(apiRequestContext, adminToken, 'DNP_HAPPINESS_QUESTIONNAIRE');
+    const foreignSubjectId = `Foreign${uniqueId}`;
+    const ownSubjectId = `Own${uniqueId}`;
+
+    const seeded = await uploadRecord(apiRequestContext, adminToken, {
+      groupId: foreignGroup.id,
+      instrumentId,
+      records: [happinessRecord(foreignSubjectId)]
+    });
+    expect(seeded.status()).toBe(201);
+
+    const response = await uploadRecord(apiRequestContext, accessToken, {
+      instrumentId,
+      records: [happinessRecord(ownSubjectId)]
+    });
+
+    expect(response.status()).toBe(201);
+    const subjectIds = ((await response.json()) as InstrumentRecord[]).map((record) => record.subjectId);
+    expect(subjectIds).toStrictEqual([ownSubjectId]);
   });
 });
