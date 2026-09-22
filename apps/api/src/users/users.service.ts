@@ -9,6 +9,7 @@ import {
   Logger,
   NotFoundException
 } from '@nestjs/common';
+import type { Permissions } from '@opendatacapture/schemas/core';
 import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
 import type { PasswordErrorCode } from '@opendatacapture/schemas/user';
 import { pwnedPassword } from 'hibp';
@@ -187,11 +188,35 @@ export class UsersService {
     return this.userModel.update({
       data: {
         ...data,
+        additionalPermissions: groupIds ? await this.permissionsWithinGroups(id, groupIds, { ability }) : undefined,
         groups: {
           set: groupIds?.map((id) => ({ id }))
         },
         hashedPassword
       },
+      omit: {
+        hashedPassword: true
+      },
+      where: { AND: [accessibleQuery(ability, 'update', 'User')], id }
+    });
+  }
+
+  /**
+   * Replaces the user's additional permissions. A grant confined to a group is accepted only when the
+   * user belongs to that group, so what the web client offers and what this accepts are one rule.
+   */
+  async updatePermissions(id: string, permissions: Permissions, { ability }: EntityOperationOptions = {}) {
+    const user = await this.findById(id, { ability });
+    const foreignGroupIds = permissions
+      .map(({ groupId }) => groupId)
+      .filter((groupId): groupId is string => groupId !== null && !user.groupIds.includes(groupId));
+    if (foreignGroupIds.length) {
+      throw new BadRequestException(
+        `Permissions may only be scoped to a group the user belongs to: ${foreignGroupIds.join(', ')}`
+      );
+    }
+    return this.userModel.update({
+      data: { additionalPermissions: permissions },
       omit: {
         hashedPassword: true
       },
@@ -239,6 +264,15 @@ export class UsersService {
    */
   private passwordError(code: PasswordErrorCode, message: string): BadRequestException {
     return new BadRequestException({ code, error: 'Bad Request', message, statusCode: 400 });
+  }
+
+  /**
+   * The user's stored grants minus those confined to a group outside `groupIds`. A grant scoped to a
+   * group the user is leaving would otherwise keep reading that group's rows.
+   */
+  private async permissionsWithinGroups(id: string, groupIds: string[], options: EntityOperationOptions) {
+    const { additionalPermissions } = await this.findById(id, options);
+    return additionalPermissions.filter(({ groupId }) => groupId === null || groupIds.includes(groupId));
   }
 
   /**

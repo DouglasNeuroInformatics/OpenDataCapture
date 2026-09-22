@@ -120,6 +120,16 @@ list the same eight models plus `all`. Three models — `AuditLog`, `InstrumentR
 reachable only through rules the ability factory writes itself. Adding a model that users should be
 able to hold a permission on means editing both lists.
 
+A granted permission may be confined to one group. `AuthRule.groupId` names it (`null`, which is
+what every rule written before the field existed reads back as, means every group), and
+`GROUP_SCOPED_CONDITIONS` in `src/auth/ability.factory.ts` turns it into that model's group
+condition. That table is typed over `$GroupScopableSubjectName` (`packages/schemas/src/core/core.ts`:
+`$AppSubjectName` minus `all` and `Instrument`), so a scopable subject with no entry does not
+compile. Only `PUT /v1/users/:id/permissions`, gated on `manage all`, writes the field — it is
+deliberately absent from `$UpdateUserData`, since an `update User` grant must not be enough to hand
+out `manage all`. `UsersService.updatePermissions` accepts a scoped grant only for a group the user
+belongs to, and `updateById` drops the grants scoped to a group the user is removed from.
+
 Background: `.agents/docs/architecture/auth-and-permissions.md`.
 
 ## Validation

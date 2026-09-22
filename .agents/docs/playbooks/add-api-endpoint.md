@@ -59,7 +59,10 @@ examples live in other controllers, as noted there).
    `apps/api/src/auth/__tests__/ability.factory.test.ts`. To make the subject assignable as a
    per-user `additionalPermission`, two hand-maintained lists must be updated together: `enum
 AppSubject` in `apps/api/prisma/schema.prisma` and `$AppSubjectName` in
-   `packages/schemas/src/core/core.ts`. They are narrower than the derived list on purpose.
+   `packages/schemas/src/core/core.ts`. They are narrower than the derived list on purpose. If such
+   a grant may be confined to one group, its group field also goes in `GROUP_SCOPED_CONDITIONS`
+   (`apps/api/src/auth/ability.factory.ts`); that table is typed over `$GroupScopableSubjectName`,
+   so `tsc` reports the omission.
 
 9. **Service spec** at `apps/api/src/<feature>/__tests__/<feature>.service.spec.ts`. Copy the setup
    from `apps/api/src/groups/__tests__/groups.service.spec.ts`:

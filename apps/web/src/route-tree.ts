@@ -38,6 +38,7 @@ import { Route as AppInstrumentsRenderIdRouteImport } from './routes/_app/instru
 import { Route as AppDatahubSubjectIdGraphRouteImport } from './routes/_app/datahub/$subjectId/graph'
 import { Route as AppDatahubSubjectIdAssignmentsRouteImport } from './routes/_app/datahub/$subjectId/assignments'
 import { Route as AppAdminUsersCreateRouteImport } from './routes/_app/admin/users/create'
+import { Route as AppAdminUsersUserIdRouteImport } from './routes/_app/admin/users/$userId'
 import { Route as AppAdminGroupsCreateRouteImport } from './routes/_app/admin/groups/create'
 import { Route as AppAdminBrandingLoginPageRouteImport } from './routes/_app/admin/branding/login-page'
 import { Route as AppAdminAuditLogsRouteImport } from './routes/_app/admin/audit/logs'
@@ -195,6 +196,11 @@ const AppAdminUsersCreateRoute = AppAdminUsersCreateRouteImport.update({
   path: '/admin/users/create',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppAdminUsersUserIdRoute = AppAdminUsersUserIdRouteImport.update({
+  id: '/admin/users/$userId',
+  path: '/admin/users/$userId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppAdminGroupsCreateRoute = AppAdminGroupsCreateRouteImport.update({
   id: '/admin/groups/create',
   path: '/admin/groups/create',
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
+  '/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
   '/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
@@ -283,6 +290,7 @@ export interface FileRoutesByTo {
   '/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
+  '/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
   '/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
@@ -320,6 +328,7 @@ export interface FileRoutesById {
   '/_app/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/_app/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/_app/admin/groups/create': typeof AppAdminGroupsCreateRoute
+  '/_app/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/_app/admin/users/create': typeof AppAdminUsersCreateRoute
   '/_app/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/_app/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
@@ -357,6 +366,7 @@ export interface FileRouteTypes {
     | '/admin/audit/logs'
     | '/admin/branding/login-page'
     | '/admin/groups/create'
+    | '/admin/users/$userId'
     | '/admin/users/create'
     | '/datahub/$subjectId/assignments'
     | '/datahub/$subjectId/graph'
@@ -392,6 +402,7 @@ export interface FileRouteTypes {
     | '/admin/audit/logs'
     | '/admin/branding/login-page'
     | '/admin/groups/create'
+    | '/admin/users/$userId'
     | '/admin/users/create'
     | '/datahub/$subjectId/assignments'
     | '/datahub/$subjectId/graph'
@@ -428,6 +439,7 @@ export interface FileRouteTypes {
     | '/_app/admin/audit/logs'
     | '/_app/admin/branding/login-page'
     | '/_app/admin/groups/create'
+    | '/_app/admin/users/$userId'
     | '/_app/admin/users/create'
     | '/_app/datahub/$subjectId/assignments'
     | '/_app/datahub/$subjectId/graph'
@@ -652,6 +664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminUsersCreateRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/admin/users/$userId': {
+      id: '/_app/admin/users/$userId'
+      path: '/admin/users/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AppAdminUsersUserIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/admin/groups/create': {
       id: '/_app/admin/groups/create'
       path: '/admin/groups/create'
@@ -732,6 +751,7 @@ interface AppRouteRouteChildren {
   AppAdminAuditLogsRoute: typeof AppAdminAuditLogsRoute
   AppAdminBrandingLoginPageRoute: typeof AppAdminBrandingLoginPageRoute
   AppAdminGroupsCreateRoute: typeof AppAdminGroupsCreateRoute
+  AppAdminUsersUserIdRoute: typeof AppAdminUsersUserIdRoute
   AppAdminUsersCreateRoute: typeof AppAdminUsersCreateRoute
   AppInstrumentsRenderIdRoute: typeof AppInstrumentsRenderIdRoute
   AppAdminBrandingIndexRoute: typeof AppAdminBrandingIndexRoute
@@ -762,6 +782,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAdminAuditLogsRoute: AppAdminAuditLogsRoute,
   AppAdminBrandingLoginPageRoute: AppAdminBrandingLoginPageRoute,
   AppAdminGroupsCreateRoute: AppAdminGroupsCreateRoute,
+  AppAdminUsersUserIdRoute: AppAdminUsersUserIdRoute,
   AppAdminUsersCreateRoute: AppAdminUsersCreateRoute,
   AppInstrumentsRenderIdRoute: AppInstrumentsRenderIdRoute,
   AppAdminBrandingIndexRoute: AppAdminBrandingIndexRoute,

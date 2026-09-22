@@ -1,4 +1,5 @@
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
+import type { Permissions } from '@opendatacapture/schemas/core';
 import type { CreateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { CreateUserData, UpdateUserData, User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
@@ -77,6 +78,15 @@ export class ApiClient {
     );
   }
 
+  /** Reads a user back as admin, to check what a write actually stored. */
+  async findUserById(id: string): Promise<User> {
+    return this.expectJson<User>(
+      this.request.get(`${API}/users/${id}`, { headers: this.authHeaders }),
+      200,
+      `find user '${id}'`
+    );
+  }
+
   /**
    * Switch outgoing mail on or off instance-wide, (re)seeding {@link E2E_MAIL_CONFIG}. Every
    * caller must switch it back off — `isMailEnabled` is global, and leaving it on changes the UI
@@ -93,9 +103,18 @@ export class ApiClient {
   }
 
   /**
-   * Updates a user. `additionalPermissions` is on the update schema and not the create one, so
-   * seeding a user who holds any is necessarily two calls.
+   * Replaces a user's additional permissions. Permissions are not on the create schema, so seeding
+   * a user who holds any is necessarily two calls.
    */
+  async setUserPermissions(id: string, permissions: Permissions): Promise<User> {
+    return this.expectJson<User>(
+      this.request.put(`${API}/users/${id}/permissions`, { data: { permissions }, headers: this.authHeaders }),
+      200,
+      `set permissions of user '${id}'`
+    );
+  }
+
+  /** Updates a user's profile fields, which is everything except their permissions. */
   async updateUser(id: string, data: Partial<UpdateUserData>): Promise<User> {
     const response = await this.request.patch(`${API}/users/${id}`, { data, headers: this.authHeaders });
     if (!response.ok()) {

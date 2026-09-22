@@ -2,6 +2,7 @@ import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import type { Permissions } from '@opendatacapture/schemas/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { AppAbility } from '@/auth/auth.types';
@@ -129,6 +130,14 @@ describe('UsersController', () => {
       await usersController.create({ ...createUserData, groupIds: [] }, ability);
       expect(groupsService.findById).not.toHaveBeenCalled();
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ group: '' });
+    });
+  });
+
+  describe('updatePermissions', () => {
+    it('should forward the caller ability, so the write is scoped', async () => {
+      const permissions: Permissions = [{ action: 'read', groupId: 'group-1', subject: 'Subject' }];
+      await usersController.updatePermissions('user-1', { permissions }, ability);
+      expect(usersService.updatePermissions).toHaveBeenCalledWith('user-1', permissions, { ability });
     });
   });
 });

@@ -23,13 +23,42 @@ export const $AppSubjectName = z.enum([
   'User'
 ]);
 
+/**
+ * The subjects a per-user permission may be confined to one group on. `all` is excluded because a
+ * condition on it would be applied to every model, each of which names its group field differently.
+ * `Instrument` is excluded because instruments are shared platform assets with no single owning
+ * group. The api maps each of these to that model's group field, and is typed over this list so a
+ * subject added here fails to compile there until its field is named.
+ */
+export type GroupScopableSubjectName = z.infer<typeof $GroupScopableSubjectName>;
+export const $GroupScopableSubjectName = $AppSubjectName.exclude(['all', 'Instrument']);
+
+export const isGroupScopableSubject = (subject: AppSubjectName): subject is GroupScopableSubjectName =>
+  $GroupScopableSubjectName.safeParse(subject).success;
+
 export type BaseAppAbility = PureAbility<[AppAction, AppSubjectName]>;
 
 export type UserPermission = z.infer<typeof $UserPermission>;
-export const $UserPermission = z.object({
-  action: $AppAction,
-  subject: $AppSubjectName
-}) satisfies z.ZodType<RawRuleOf<BaseAppAbility>>;
+export const $UserPermission = z
+  .object({
+    action: $AppAction,
+    /**
+     * The group the grant is confined to, or null for every group. Nullable but never optional: an
+     * omitted scope is rejected, rather than read as a silent instance-wide grant.
+     */
+    groupId: z.string().nullable(),
+    subject: $AppSubjectName
+  })
+  .check((ctx) => {
+    if (ctx.value.groupId !== null && !isGroupScopableSubject(ctx.value.subject)) {
+      ctx.issues.push({
+        code: 'custom',
+        input: ctx.value.groupId,
+        message: 'This resource cannot be scoped to a group',
+        path: ['groupId']
+      });
+    }
+  }) satisfies z.ZodType<RawRuleOf<BaseAppAbility>>;
 
 export type Permissions = z.infer<typeof $Permissions>;
 export const $Permissions = z.array($UserPermission);

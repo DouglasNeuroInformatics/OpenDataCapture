@@ -1,6 +1,35 @@
 import { describe, expect, it } from 'vitest';
 
-import { $CreateUserData, $PhoneNumber, $SelfUpdateUserData, $User, MIN_PHONE_DIGITS } from './user.js';
+import {
+  $CreateUserData,
+  $PhoneNumber,
+  $SelfUpdateUserData,
+  $UpdateUserData,
+  $UpdateUserPermissionsData,
+  $User,
+  MIN_PHONE_DIGITS
+} from './user.js';
+
+describe('$UpdateUserData', () => {
+  it('should strip additionalPermissions, so a profile update cannot grant anything', () => {
+    const result = $UpdateUserData.safeParse({
+      additionalPermissions: [{ action: 'manage', groupId: null, subject: 'all' }]
+    });
+    expect(result.success).toBe(true);
+    expect(result.data).not.toHaveProperty('additionalPermissions');
+  });
+});
+
+describe('$UpdateUserPermissionsData', () => {
+  it('should accept an empty set, which is how every grant is revoked', () => {
+    expect($UpdateUserPermissionsData.safeParse({ permissions: [] }).success).toBe(true);
+  });
+
+  it('should reject a grant confined to a group on a resource that cannot be', () => {
+    const permissions = [{ action: 'read', groupId: 'group-1', subject: 'Instrument' }];
+    expect($UpdateUserPermissionsData.safeParse({ permissions }).success).toBe(false);
+  });
+});
 
 describe('$SelfUpdateUserData', () => {
   it('should accept null contact details, so an update can clear them', () => {
