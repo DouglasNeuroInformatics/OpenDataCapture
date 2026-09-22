@@ -32,8 +32,8 @@ is `.agents/docs/playbooks/add-e2e-test.md`; the tier-by-tier picture is
   `api.createUser()` instead when the test mutates that user's own login, so it cannot invalidate
   the cached token every other spec in the worker shares.
 - **`.env` at the repo root must exist.** `src/support/env.ts` reads `API_DEV_SERVER_PORT`,
-  `GATEWAY_DEV_SERVER_PORT` and `WEB_DEV_SERVER_PORT` and throws while `playwright.config.ts` is
-  loading if any is missing. `./scripts/generate-env.sh` produces it.
+  `GATEWAY_DEV_SERVER_PORT`, `PLAYGROUND_DEV_SERVER_PORT` and `WEB_DEV_SERVER_PORT` and throws while
+  `playwright.config.ts` is loading if any is missing. `./scripts/generate-env.sh` produces it.
 
 ## Layout
 
@@ -91,7 +91,11 @@ written as a literal in a spec.
 `pnpm test:e2e` from the repo root (turbo), or `pnpm --filter @opendatacapture/testing test:dev` for
 Playwright's UI mode. `playwright.config.ts` starts api, gateway and web itself through each app's
 `pnpm dev:test`, which sets `NODE_ENV=test` and so gives the API an in-memory Mongo replica set — no
-external database, and nothing to start by hand.
+external database, and nothing to start by hand. It also starts the playground through its plain
+`pnpm dev` (it has no backend and no test mode) for `src/specs/playground.spec.ts`, which reaches it
+by absolute URL from `playgroundURL` in `src/support/env.ts`: the playground is not an `apps/web`
+route, so `src/pages/playground/index.page.ts` extends nothing and is not in `pageModels`. Its
+preview is an iframe on the other loopback name, so the spec drives it through a `FrameLocator`.
 
 Projects: `setup` (with `teardown` attached), `chromium` (every spec), and `firefox`, which greps
 `/@smoke/`. **Cross-browser coverage exists only for tests whose title contains `@smoke`** — add the
