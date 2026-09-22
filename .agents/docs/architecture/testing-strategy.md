@@ -142,7 +142,7 @@ Not gated, despite existing in the repo:
 
 `.github/workflows/commitlint.yaml` (`pull_request` to any branch, so forks included) runs
 `commitlint` over the commits the pull request adds — `base.sha..head.sha`, never the history — against
-`commitlint.config.ts`. An unknown type fails; an unknown scope only warns (#1529).
+`commitlint.config.ts`. An unknown type fails, and so does a scope outside the workspace names.
 
 ## Playwright specifics
 

@@ -71,11 +71,12 @@ function readCommitsSince(tag: string): Commit[] {
   const commits: Commit[] = [];
   for (const raw of log.split('\0').filter((entry) => entry.trim())) {
     const commit = parseCommit(raw);
-    if (commit) {
-      commits.push(commit);
-    } else {
-      console.warn(`Warning: skipping commit ${raw.slice(0, 7)} because its message does not follow the convention`);
+    if (!commit) {
+      throw new Error(
+        `Commit ${raw.slice(0, 7)} does not follow the convention, so it cannot become a changelog entry`
+      );
     }
+    commits.push(commit);
   }
   return withoutReverted(commits);
 }
