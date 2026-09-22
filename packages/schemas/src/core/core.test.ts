@@ -6,6 +6,7 @@ import {
   $LicenseIdentifier,
   $RegexString,
   $UserPermission,
+  isGrantablePermission,
   toInstrumentAuthoringLanguage
 } from './core.js';
 
@@ -42,6 +43,23 @@ describe('$UserPermission', () => {
 
   it('should reject an omitted scope, so a forgotten group is never read as every group', () => {
     expect($UserPermission.safeParse({ action: 'read', subject: 'Subject' }).success).toBe(false);
+  });
+});
+
+describe('isGrantablePermission', () => {
+  it.each(['create', 'delete', 'manage', 'update'] as const)(
+    'should refuse %s User, since every route that writes a user is admin-only',
+    (action) => {
+      expect(isGrantablePermission({ action, subject: 'User' })).toBe(false);
+    }
+  );
+
+  it('should allow read User, which scopes the user list a grantee sees', () => {
+    expect(isGrantablePermission({ action: 'read', subject: 'User' })).toBe(true);
+  });
+
+  it('should allow a write on any other resource', () => {
+    expect(isGrantablePermission({ action: 'update', subject: 'Subject' })).toBe(true);
   });
 });
 

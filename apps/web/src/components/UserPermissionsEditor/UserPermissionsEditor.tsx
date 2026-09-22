@@ -2,16 +2,24 @@ import { useState } from 'react';
 
 import { Button, Card, Select, Table } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { $AppAction, $AppSubjectName, isGroupScopableSubject } from '@opendatacapture/schemas/core';
+import {
+  $AppAction,
+  $AppSubjectName,
+  isGrantablePermission,
+  isGroupScopableSubject
+} from '@opendatacapture/schemas/core';
 import type { AppAction, AppSubjectName, Permissions } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { User } from '@opendatacapture/schemas/user';
-import { GlobeIcon, PlusIcon, Trash2Icon } from 'lucide-react';
+import { GlobeIcon, PlusIcon, Trash2Icon, TriangleAlertIcon } from 'lucide-react';
 
+import { Chip } from '@/components/Chip';
 import { useUpdateUserPermissionsMutation } from '@/hooks/useUpdateUserPermissionsMutation';
 import {
   $AddPermissionFormData,
   ALL_GROUPS,
+  grantableActions,
+  grantableSubjects,
   toUserPermission,
   withoutPermission,
   withPermission
@@ -101,11 +109,21 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
     [ALL_GROUPS]: allGroupsLabel
   };
 
-  const isScopable = subject !== undefined && isGroupScopableSubject(subject);
-  const draft = $AddPermissionFormData.safeParse({ action, scope, subject });
+  const actionOptions = Object.fromEntries(grantableActions(subject).map((option) => [option, actionLabels[option]]));
+  const subjectOptions = Object.fromEntries(grantableSubjects(action).map((option) => [option, subjectLabels[option]]));
 
+  const isScopable = subject !== undefined && isGroupScopableSubject(subject);
+  const isManageAll = action === 'manage' && subject === 'all';
+  const draft = $AddPermissionFormData.safeParse({ action, scope, subject });
+  const hasIneffectiveGrants = !user.additionalPermissions.every(isGrantablePermission);
+
+  // A grant stored before it stopped being grantable is refused by the route, so it is left out of
+  // every save; the note above the table says so.
   const save = (permissions: Permissions, onSuccess?: () => void) => {
-    updatePermissionsMutation.mutate({ id: user.id, permissions }, { onSuccess });
+    updatePermissionsMutation.mutate(
+      { id: user.id, permissions: permissions.filter(isGrantablePermission) },
+      { onSuccess }
+    );
   };
 
   const handleAdd = () => {
@@ -147,6 +165,14 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
         </Card.Description>
       </Card.Header>
       <Card.Content>
+        {hasIneffectiveGrants && (
+          <p className="text-muted-foreground mb-3 text-sm" data-testid="user-permissions-ineffective-note">
+            {t({
+              en: 'Only an administrator can create, modify or delete users, so grants marked "No effect" do nothing. They are removed the next time this user\'s permissions are changed.',
+              fr: 'Seul un administrateur peut créer, modifier ou supprimer des utilisateurs : les autorisations marquées « Sans effet » ne font donc rien. Elles sont retirées à la prochaine modification des autorisations de cet utilisateur.'
+            })}
+          </p>
+        )}
         <div className="overflow-hidden rounded-lg border">
           <Table className="table-fixed" data-testid="user-permissions-table">
             <Table.Header>
@@ -164,7 +190,16 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                   key={`${index}-${permission.action}-${permission.subject}-${permission.groupId}`}
                 >
                   <Table.Cell className="font-medium">{actionLabels[permission.action]}</Table.Cell>
-                  <Table.Cell>{subjectLabels[permission.subject]}</Table.Cell>
+                  <Table.Cell>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {subjectLabels[permission.subject]}
+                      {!isGrantablePermission(permission) && (
+                        <Chip data-testid="user-permission-ineffective" variant="warning">
+                          {t({ en: 'No effect', fr: 'Sans effet' })}
+                        </Chip>
+                      )}
+                    </div>
+                  </Table.Cell>
                   <Table.Cell data-testid="user-permission-scope">
                     {permission.groupId === null ? (
                       <span className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
@@ -199,7 +234,7 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                   <CellSelect
                     label={columnLabels.action}
                     name="action"
-                    options={actionLabels}
+                    options={actionOptions}
                     placeholder={placeholder}
                     value={action}
                     onValueChange={(value) => setAction($AppAction.parse(value))}
@@ -209,7 +244,7 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                   <CellSelect
                     label={columnLabels.subject}
                     name="subject"
-                    options={subjectLabels}
+                    options={subjectOptions}
                     placeholder={placeholder}
                     value={subject}
                     onValueChange={(value) => setSubject($AppSubjectName.parse(value))}
@@ -244,6 +279,21 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
             </Table.Footer>
           </Table>
         </div>
+        {isManageAll && (
+          <div
+            className="mt-3 flex gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-300"
+            data-testid="manage-all-warning"
+            role="alert"
+          >
+            <TriangleAlertIcon aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
+            <p>
+              {t({
+                en: "Manage (All) makes this user an administrator: they can read and change every group's data, manage every user's account and permissions, and create instruments, which can run code on the server.",
+                fr: 'Gérer (Tout) fait de cet utilisateur un administrateur, qui peut consulter et modifier les données de tous les groupes, gérer le compte et les autorisations de chaque utilisateur, et créer des instruments, lesquels peuvent exécuter du code sur le serveur.'
+              })}
+            </p>
+          </div>
+        )}
       </Card.Content>
     </Card>
   );

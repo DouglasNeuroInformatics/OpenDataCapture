@@ -1,4 +1,6 @@
 import type { Permissions } from '@opendatacapture/schemas/core';
+import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { InstrumentRecord, UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import type { User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -264,6 +266,33 @@ async function readSeededBundle(request: APIRequestContext, token: string): Prom
   return ((await container.json()) as { bundle: string }).bundle;
 }
 
+/** The id of the latest edition of a seeded instrument, by its internal name. */
+async function findInstrumentId(request: APIRequestContext, token: string, name: string): Promise<string> {
+  const response = await request.get(`${API}/instruments/info`, { headers: { Authorization: `Bearer ${token}` } });
+  expect(response.ok()).toBe(true);
+  const instrument = ((await response.json()) as InstrumentInfo[]).find(
+    (info) => info.kind === 'FORM' && info.internal.name === name
+  );
+  if (!instrument) {
+    throw new Error(`Instrument '${name}' is not in the seeded catalog`);
+  }
+  return instrument.id;
+}
+
+/** One record satisfying the happiness questionnaire's validation schema, for the given subject. */
+function happinessRecord(subjectId: string): UploadInstrumentRecordsData['records'][number] {
+  return {
+    data: { isSatisfiedOverall: true, personalLifeSatisfaction: 8, professionalLifeSatisfaction: 7 },
+    date: new Date('2024-01-15'),
+    subjectId
+  };
+}
+
+/** `POST /instrument-records/upload` as the holder of the given token, with the raw response. */
+function uploadRecord(request: APIRequestContext, token: string, data: UploadInstrumentRecordsData) {
+  return request.post(`${API}/instrument-records/upload`, { data, headers: { Authorization: `Bearer ${token}` } });
+}
+
 /** The user list `/admin/users` renders, read with the given user's own token. */
 async function readUsernames(request: APIRequestContext, token: string): Promise<string[]> {
   const response = await request.get(`${API}/users`, { headers: { Authorization: `Bearer ${token}` } });
@@ -293,6 +322,34 @@ test.describe('server-side authorization', () => {
       }
     });
   }
+
+  // The requests above are refused because no base level grants a `User` write, and the permissions
+  // route refuses to store one. A grant stored before it did is still refused by the routes
+  // themselves, which the api's integration suite covers, since only it can write one directly.
+  test('should refuse to grant a write on users, which only an administrator may make', async ({ api }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    await expect(
+      api.setUserPermissions(user.id, [{ action: 'manage', groupId: group.id, subject: 'User' }])
+    ).rejects.toThrow(/got 400/);
+    expect((await api.findUserById(user.id)).additionalPermissions).toStrictEqual([]);
+  });
+
+  // Every route that writes a user is admin-only, so an administrator removing their own access could
+  // leave no account able to reach them again. Seeded rather than the shared admin, so a regression
+  // loses a throwaway account instead of the one every other spec logs in as.
+  test('should refuse an administrator deleting or disabling their own account', async ({ api, apiRequestContext }) => {
+    const { credentials, user } = await api.createUser({ basePermissionLevel: 'ADMIN' });
+    const headers = { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` };
+
+    const disabled = await apiRequestContext.patch(`${API}/users/${user.id}`, { data: { disabled: true }, headers });
+    const deleted = await apiRequestContext.delete(`${API}/users/${user.id}`, { headers });
+
+    expect.soft(disabled.status(), 'an administrator must not be able to disable themselves').toBe(403);
+    expect.soft(deleted.status(), 'an administrator must not be able to delete themselves').toBe(403);
+    expect((await api.findUserById(user.id)).disabled).not.toBe(true);
+  });
 
   // The playground uploads a bundle with a token minted by `GET /auth/create-instrument-token`, and
   // that token is the only non-interactive caller of `POST /instruments`. Nothing else in the suite
@@ -474,5 +531,39 @@ test.describe('server-side authorization', () => {
     const updated = await api.updateUser(user.id, { groupIds: [stayingGroup.id] });
 
     expect(updated.additionalPermissions).toStrictEqual([{ action: 'create', groupId: null, subject: 'Instrument' }]);
+  });
+
+  // The import route answers with the rows it wrote, and used to find them by re-querying the
+  // instrument with the request's optional `groupId` as the only filter. Omitting `groupId` therefore
+  // returned every group's records for that instrument to the lowest role, which `create
+  // InstrumentRecord` admits and which holds no `read InstrumentRecord` rule at all.
+  test('should answer an upload with only the records it wrote, never those of another group', async ({
+    api,
+    apiRequestContext,
+    roleAccount,
+    uniqueId
+  }) => {
+    const { accessToken: adminToken } = await roleAccount('ADMIN');
+    const { accessToken } = await roleAccount('STANDARD');
+    const foreignGroup = await api.createGroup({ name: `Foreign Group ${uniqueId}` });
+    const instrumentId = await findInstrumentId(apiRequestContext, adminToken, 'DNP_HAPPINESS_QUESTIONNAIRE');
+    const foreignSubjectId = `Foreign${uniqueId}`;
+    const ownSubjectId = `Own${uniqueId}`;
+
+    const seeded = await uploadRecord(apiRequestContext, adminToken, {
+      groupId: foreignGroup.id,
+      instrumentId,
+      records: [happinessRecord(foreignSubjectId)]
+    });
+    expect(seeded.status()).toBe(201);
+
+    const response = await uploadRecord(apiRequestContext, accessToken, {
+      instrumentId,
+      records: [happinessRecord(ownSubjectId)]
+    });
+
+    expect(response.status()).toBe(201);
+    const subjectIds = ((await response.json()) as InstrumentRecord[]).map((record) => record.subjectId);
+    expect(subjectIds).toStrictEqual([ownSubjectId]);
   });
 });

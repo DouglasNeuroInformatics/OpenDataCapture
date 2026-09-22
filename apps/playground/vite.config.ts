@@ -18,14 +18,19 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false,
     rollupOptions: {
-      external: ['esbuild']
+      external: ['esbuild'],
+      input: {
+        index: path.resolve(import.meta.dirname, 'index.html'),
+        preview: path.resolve(import.meta.dirname, 'preview.html')
+      }
     },
     sourcemap: true,
     target: 'es2022'
   },
   define: {
     __APP_VERSION__: JSON.stringify(version),
-    __GITHUB_REPO_URL__: `'${process.env.GITHUB_REPO_URL ?? '#'}'`
+    __GITHUB_REPO_URL__: `'${process.env.GITHUB_REPO_URL ?? '#'}'`,
+    __PREVIEW_ORIGIN__: JSON.stringify(process.env.PLAYGROUND_PREVIEW_ORIGIN ?? '')
   },
   optimizeDeps: {
     esbuildOptions: {
@@ -48,6 +53,11 @@ export default defineConfig(({ mode }) => ({
     }
   },
   server: {
+    // The preview frame runs on the other loopback name (see `resolvePreviewOrigin`). Left to
+    // resolve `localhost` itself, Vite listens on ::1 alone under Node 24, and 127.0.0.1 refuses to
+    // connect. Browsers try both addresses for `localhost`, so this serves both names without
+    // opening the server to the network the way `host: true` would.
+    host: '127.0.0.1',
     port: parseInt(process.env.PLAYGROUND_DEV_SERVER_PORT ?? '3750')
   }
 }));

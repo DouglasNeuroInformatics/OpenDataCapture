@@ -190,6 +190,24 @@ describe('InstrumentRecordsService', () => {
       instrumentRecordModel.findMany.mockResolvedValue([] as any);
     });
 
+    it('should look the instrument up with the caller ability, so the lookup is scoped like every other read', async () => {
+      const ability = createAppAbility([{ action: 'create', subject: 'InstrumentRecord' }]);
+
+      await instrumentRecordsService.upload({ ...baseUploadData }, { ability });
+
+      expect(instrumentsService.findById).toHaveBeenCalledWith('instrument-1', { ability });
+    });
+
+    it('should return only the records keyed on the sessions it created, so an upload without a group never reads other groups', async () => {
+      const foreignRecord = { groupId: 'other-group', id: 'record-2', instrumentId: 'instrument-1' };
+      instrumentRecordModel.findMany.mockResolvedValueOnce([foreignRecord] as any);
+
+      const result = await instrumentRecordsService.upload({ ...baseUploadData });
+
+      expect(instrumentRecordModel.findMany).toHaveBeenCalledWith({ where: { sessionId: { in: ['session-1'] } } });
+      expect(result).toStrictEqual([foreignRecord]);
+    });
+
     it('should call sessionsService.create with the provided username', async () => {
       usersService.findByUsername.mockResolvedValueOnce({ groups: [{ id: 'group-1' }], username: 'validuser' } as any);
 

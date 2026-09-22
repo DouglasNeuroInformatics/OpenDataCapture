@@ -1,9 +1,9 @@
 import { CryptoService, getModelToken } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { Permissions } from '@opendatacapture/schemas/core';
 import { pwnedPassword } from 'hibp';
@@ -17,6 +17,11 @@ import { UsersService } from '../users.service';
 
 vi.mock('hibp', () => ({ pwnedPassword: vi.fn() }));
 vi.mock('@douglasneuroinformatics/libpasswd', () => ({ estimatePasswordStrength: vi.fn() }));
+
+const admin = {
+  ability: createAppAbility([{ action: 'manage', subject: 'all' }]),
+  id: 'admin-1'
+} as RequestUser;
 
 const baseUser = {
   basePermissionLevel: 'STANDARD' as const,
@@ -114,7 +119,7 @@ describe('UsersService', () => {
     });
 
     it('should drop the grants confined to a group the user is leaving, and keep every other one', async () => {
-      await usersService.updateById('user-1', { groupIds: ['group-1'] });
+      await usersService.updateById('user-1', { groupIds: ['group-1'] }, admin);
       expect(userModel.update.mock.lastCall?.[0].data.additionalPermissions).toEqual([
         { action: 'read', groupId: 'group-1', subject: 'Subject' },
         { action: 'create', groupId: null, subject: 'Instrument' }
@@ -122,8 +127,48 @@ describe('UsersService', () => {
     });
 
     it('should leave the grants alone when the groups are not being changed', async () => {
-      await usersService.updateById('user-1', { firstName: 'Janet' });
+      await usersService.updateById('user-1', { firstName: 'Janet' }, admin);
       expect(userModel.update.mock.lastCall?.[0].data.additionalPermissions).toBeUndefined();
+    });
+
+    it('should refuse an administrator disabling their own account, so the last one cannot lock every admin out', async () => {
+      await expect(usersService.updateById(admin.id, { disabled: true }, admin)).rejects.toThrow(ForbiddenException);
+      expect(userModel.update).not.toHaveBeenCalled();
+    });
+
+    it.each(['GROUP_MANAGER', 'STANDARD', null] as const)(
+      'should refuse an administrator setting their own level to %s, so the last one cannot lock every admin out',
+      async (basePermissionLevel) => {
+        await expect(usersService.updateById(admin.id, { basePermissionLevel }, admin)).rejects.toThrow(
+          ForbiddenException
+        );
+        expect(userModel.update).not.toHaveBeenCalled();
+      }
+    );
+
+    it('should save an administrator editing their own account, since the admin form sends `disabled: false` on every save', async () => {
+      await usersService.updateById(admin.id, { disabled: false, firstName: 'Janet' }, admin);
+      expect(userModel.update).toHaveBeenCalledOnce();
+    });
+
+    it('should let an administrator disable and demote another user', async () => {
+      await usersService.updateById('user-1', { basePermissionLevel: 'STANDARD', disabled: true }, admin);
+      expect(userModel.update.mock.lastCall?.[0].data).toMatchObject({
+        basePermissionLevel: 'STANDARD',
+        disabled: true
+      });
+    });
+  });
+
+  describe('deleteById', () => {
+    it('should refuse an administrator deleting their own account, so the last one cannot remove every admin', async () => {
+      await expect(usersService.deleteById(admin.id, admin)).rejects.toThrow(ForbiddenException);
+      expect(userModel.delete).not.toHaveBeenCalled();
+    });
+
+    it('should let an administrator delete another user', async () => {
+      await usersService.deleteById('user-1', admin);
+      expect(userModel.delete.mock.lastCall?.[0].where).toMatchObject({ id: 'user-1' });
     });
   });
 

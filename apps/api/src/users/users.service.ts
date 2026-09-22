@@ -113,12 +113,15 @@ export class UsersService {
     });
   }
 
-  async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
+  async deleteById(id: string, currentUser: RequestUser) {
+    if (id === currentUser.id) {
+      throw new ForbiddenException('You may not delete your own account');
+    }
     return this.userModel.delete({
       omit: {
         hashedPassword: true
       },
-      where: { AND: [accessibleQuery(ability, 'delete', 'User')], id }
+      where: { AND: [accessibleQuery(currentUser.ability, 'delete', 'User')], id }
     });
   }
 
@@ -174,11 +177,14 @@ export class UsersService {
     return user;
   }
 
-  async updateById(
-    id: string,
-    { groupIds, password, ...data }: UpdateUserDto,
-    { ability }: EntityOperationOptions = {}
-  ) {
+  async updateById(id: string, { groupIds, password, ...data }: UpdateUserDto, currentUser: RequestUser) {
+    const { ability } = currentUser;
+    const isDemotion = data.basePermissionLevel !== undefined && data.basePermissionLevel !== 'ADMIN';
+    // Only an administrator reaches this route, so the last one to do this to themselves would leave
+    // no account able to reach it again, or any other admin-only route.
+    if (id === currentUser.id && (data.disabled || isDemotion)) {
+      throw new ForbiddenException('You may not remove your own administrator access');
+    }
     let hashedPassword: string | undefined;
     if (password) {
       const username = data.username ?? (await this.findById(id, { ability })).username;

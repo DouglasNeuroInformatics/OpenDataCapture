@@ -392,6 +392,33 @@ test.describe('admin management', () => {
     ]);
   });
 
+  // Every route that writes a user is admin-only, so a grant of any User action but read does nothing.
+  test('should offer only Read on User as a grant', async ({ api, getPageModel }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
+    await userPage.selectOption('subject', 'User');
+    await userPage.addPermissionRow.getByTestId('action-select-trigger').click();
+
+    await expect(userPage.$ref.getByTestId('action-select-item-read')).toBeVisible();
+    for (const action of ['create', 'delete', 'manage', 'update']) {
+      await expect(userPage.$ref.getByTestId(`action-select-item-${action}`)).toHaveCount(0);
+    }
+  });
+
+  test('should warn that Manage (All) on All makes the user an administrator', async ({ api, getPageModel }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
+    await userPage.selectOption('action', 'manage');
+    await expect(userPage.manageAllWarning).toHaveCount(0);
+    await userPage.selectOption('subject', 'all');
+
+    await expect(userPage.manageAllWarning).toBeVisible();
+  });
+
   test('should replace the permissions editor with a notice for an administrator', async ({ api, getPageModel }) => {
     const { user } = await api.createUser({ basePermissionLevel: 'ADMIN', groupIds: [] });
 

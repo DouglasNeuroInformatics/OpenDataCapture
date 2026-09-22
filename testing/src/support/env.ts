@@ -22,7 +22,11 @@ export const contactEmail = required('CONTACT_EMAIL');
 
 export const apiPort = requiredPort('API_DEV_SERVER_PORT');
 export const gatewayPort = requiredPort('GATEWAY_DEV_SERVER_PORT');
+export const playgroundPort = requiredPort('PLAYGROUND_DEV_SERVER_PORT');
 export const webPort = requiredPort('WEB_DEV_SERVER_PORT');
 
 // Tests run against the web origin; vite proxies `/api` through to the API server.
 export const baseURL = `http://localhost:${webPort}`;
+
+// The playground is its own static site with no backend; its specs navigate here by absolute URL.
+export const playgroundURL = `http://localhost:${playgroundPort}`;

@@ -12,6 +12,12 @@ vi.mock('@/hooks/useUpdateUserPermissionsMutation', () => ({
   useUpdateUserPermissionsMutation: () => ({ isPending: false, mutate: mocks.mutate })
 }));
 
+/** Opens one of the add-row selects from the keyboard, since happy-dom dispatches no pointer capture. */
+const choose = (field: 'action' | 'subject', value: string) => {
+  fireEvent.keyDown(screen.getByTestId(`${field}-select-trigger`), { key: 'Enter' });
+  fireEvent.click(screen.getByTestId(`${field}-select-item-${value}`));
+};
+
 const groups = [
   { id: 'group-1', name: 'Group One' },
   { id: 'group-2', name: 'Group Two' }
@@ -79,6 +85,41 @@ describe('UserPermissionsEditor', () => {
     render(<UserPermissionsEditor groups={groups} user={user} />);
     const addButton = screen.getByRole('button', { name: 'Add Permission' });
     expect(addButton.hasAttribute('disabled')).toBe(true);
+  });
+
+  describe('a grant stored before it stopped being grantable', () => {
+    const holder: User = {
+      ...user,
+      additionalPermissions: [...user.additionalPermissions, { action: 'update', groupId: null, subject: 'User' }]
+    };
+
+    it('should be marked as having no effect, with a note saying it will be removed', () => {
+      render(<UserPermissionsEditor groups={groups} user={holder} />);
+      expect(screen.getAllByTestId('user-permission-ineffective')).toHaveLength(1);
+      expect(screen.getByTestId('user-permissions-ineffective-note')).toBeTruthy();
+    });
+
+    it('should be left out of the next save, since the route refuses it', () => {
+      render(<UserPermissionsEditor groups={groups} user={holder} />);
+      fireEvent.click(screen.getAllByTestId('user-permission-remove')[0]!);
+      expect(mocks.mutate.mock.lastCall?.[0].permissions).toEqual([
+        { action: 'create', groupId: null, subject: 'Instrument' }
+      ]);
+    });
+  });
+
+  it('should not mark or note anything when every grant has an effect', () => {
+    render(<UserPermissionsEditor groups={groups} user={user} />);
+    expect(screen.queryByTestId('user-permission-ineffective')).toBeNull();
+    expect(screen.queryByTestId('user-permissions-ineffective-note')).toBeNull();
+  });
+
+  it('should warn that Manage (All) on All makes the user an administrator', () => {
+    render(<UserPermissionsEditor groups={groups} user={user} />);
+    choose('action', 'manage');
+    expect(screen.queryByTestId('manage-all-warning')).toBeNull();
+    choose('subject', 'all');
+    expect(screen.getByTestId('manage-all-warning')).toBeTruthy();
   });
 
   it('should replace the editor with a notice for an administrator, who already holds everything', () => {

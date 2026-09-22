@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { SetupState } from '@opendatacapture/schemas/setup';
 
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { InitAppDto } from './dto/init-app.dto';
 import { UpdateSetupStateDto } from './dto/update-setup-state.dto';
@@ -47,7 +47,7 @@ export class SetupController {
     summary: 'Update State'
   })
   @Patch()
-  @RouteAccess({ action: 'manage', subject: 'all' })
+  @RouteAccess(ADMIN_ONLY)
   updateState(@Body() data: UpdateSetupStateDto): Promise<Partial<SetupState>> {
     return this.setupService.updateState(data);
   }
