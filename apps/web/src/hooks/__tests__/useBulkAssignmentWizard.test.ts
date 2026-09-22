@@ -134,19 +134,6 @@ describe('useBulkAssignmentWizard', () => {
     expect(result.current.assignments).toEqual(created);
   });
 
-  it('should clear every collected value on reset, so a second batch starts clean', () => {
-    mocks.createMutate.mockImplementation((_payload: unknown, { onSuccess }: any) => onSuccess([]));
-    const { result } = renderWizard();
-    act(() => result.current.selectSubjects(['alice']));
-    act(() => result.current.setTimepoints([TIMEPOINT]));
-    act(() => result.current.submit({ allowDuplicates: false }));
-    act(() => result.current.reset());
-    expect(result.current.step).toBe('SOURCE');
-    expect(result.current.subjectIds).toEqual([]);
-    expect(result.current.timepoints).toEqual([]);
-    expect(result.current.assignments).toEqual([]);
-  });
-
   it('should tell the user to use the CSV when the browser offers no clipboard', async () => {
     Object.defineProperty(globalThis.navigator, 'clipboard', { configurable: true, value: undefined });
     const { result } = renderWizard();

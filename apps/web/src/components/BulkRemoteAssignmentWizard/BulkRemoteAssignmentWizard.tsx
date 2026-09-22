@@ -117,15 +117,6 @@ export const BulkRemoteAssignmentWizard = ({
           footer={
             <React.Fragment>
               <Button
-                className="mr-auto"
-                data-testid="bulk-start-over"
-                type="button"
-                variant="outline"
-                onClick={wizard.reset}
-              >
-                {t({ en: 'Start Over', fr: 'Recommencer' })}
-              </Button>
-              <Button
                 data-testid="bulk-copy-links"
                 type="button"
                 variant="outline"
