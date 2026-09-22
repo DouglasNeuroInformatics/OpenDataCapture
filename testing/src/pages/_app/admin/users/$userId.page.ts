@@ -6,6 +6,7 @@ import { AppPage } from '../../route.page';
 export class AdminUserPage extends AppPage {
   readonly addPermissionRow: Locator;
   readonly adminNotice: Locator;
+  readonly manageAllWarning: Locator;
   readonly pageHeader: Locator;
   readonly permissionRows: Locator;
   readonly permissionsTable: Locator;
@@ -21,6 +22,7 @@ export class AdminUserPage extends AppPage {
     this.permissionRows = page.getByTestId('user-permission-row');
     this.addPermissionRow = page.getByTestId('add-permission-row');
     this.adminNotice = page.getByTestId('user-permissions-admin-notice');
+    this.manageAllWarning = page.getByTestId('manage-all-warning');
   }
 
   /**

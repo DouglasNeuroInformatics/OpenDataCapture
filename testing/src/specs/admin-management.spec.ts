@@ -407,6 +407,18 @@ test.describe('admin management', () => {
     }
   });
 
+  test('should warn that Manage (All) on All makes the user an administrator', async ({ api, getPageModel }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
+    await userPage.selectOption('action', 'manage');
+    await expect(userPage.manageAllWarning).toHaveCount(0);
+    await userPage.selectOption('subject', 'all');
+
+    await expect(userPage.manageAllWarning).toBeVisible();
+  });
+
   test('should replace the permissions editor with a notice for an administrator', async ({ api, getPageModel }) => {
     const { user } = await api.createUser({ basePermissionLevel: 'ADMIN', groupIds: [] });
 

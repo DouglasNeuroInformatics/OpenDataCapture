@@ -11,7 +11,7 @@ import {
 import type { AppAction, AppSubjectName, Permissions } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { User } from '@opendatacapture/schemas/user';
-import { GlobeIcon, PlusIcon, Trash2Icon } from 'lucide-react';
+import { GlobeIcon, PlusIcon, Trash2Icon, TriangleAlertIcon } from 'lucide-react';
 
 import { Chip } from '@/components/Chip';
 import { useUpdateUserPermissionsMutation } from '@/hooks/useUpdateUserPermissionsMutation';
@@ -113,6 +113,7 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
   const subjectOptions = Object.fromEntries(grantableSubjects(action).map((option) => [option, subjectLabels[option]]));
 
   const isScopable = subject !== undefined && isGroupScopableSubject(subject);
+  const isManageAll = action === 'manage' && subject === 'all';
   const draft = $AddPermissionFormData.safeParse({ action, scope, subject });
   const hasIneffectiveGrants = !user.additionalPermissions.every(isGrantablePermission);
 
@@ -278,6 +279,21 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
             </Table.Footer>
           </Table>
         </div>
+        {isManageAll && (
+          <div
+            className="mt-3 flex gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-300"
+            data-testid="manage-all-warning"
+            role="alert"
+          >
+            <TriangleAlertIcon aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
+            <p>
+              {t({
+                en: "Manage (All) makes this user an administrator: they can read and change every group's data, manage every user's account and permissions, and create instruments, which can run code on the server.",
+                fr: 'Gérer (Tout) fait de cet utilisateur un administrateur, qui peut consulter et modifier les données de tous les groupes, gérer le compte et les autorisations de chaque utilisateur, et créer des instruments, lesquels peuvent exécuter du code sur le serveur.'
+              })}
+            </p>
+          </div>
+        )}
       </Card.Content>
     </Card>
   );
