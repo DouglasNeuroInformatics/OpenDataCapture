@@ -323,6 +323,79 @@ test.describe('server-side authorization', () => {
     });
   }
 
+  // The requests above are refused because no base level grants a `User` write. An administrator can
+  // grant one, and each request here would then end with the grantee holding `manage all` at their
+  // next login -- by promoting themselves, joining every group, or logging in as an account whose
+  // password they chose.
+  test('should refuse every write to a user from a group manager granted `manage User`', async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup({ name: `Grantee Group ${uniqueId}` });
+    const otherGroup = await api.createGroup({ name: `Other Group ${uniqueId}` });
+    const { credentials, user: grantee } = await api.createUser({ groupIds: [group.id] });
+    const { user: teammateAdmin } = await api.createUser({ basePermissionLevel: 'ADMIN', groupIds: [group.id] });
+    await api.setUserPermissions(grantee.id, [{ action: 'manage', groupId: group.id, subject: 'User' }]);
+    const headers = { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` };
+    const password = `chosen-oyster-lantern-${uniqueId}`;
+
+    const attempts: { [what: string]: () => Promise<APIResponse> } = {
+      'create an administrator': () =>
+        apiRequestContext.post(`${API}/users`, {
+          data: {
+            basePermissionLevel: 'ADMIN',
+            firstName: 'Escalation',
+            groupIds: [],
+            lastName: 'Probe',
+            password,
+            username: `probe${uniqueId}`
+          },
+          headers
+        }),
+      'delete an administrator in their group': () =>
+        apiRequestContext.delete(`${API}/users/${teammateAdmin.id}`, { headers }),
+      'join a group they do not manage': () =>
+        apiRequestContext.patch(`${API}/users/${grantee.id}`, {
+          data: { groupIds: [group.id, otherGroup.id] },
+          headers
+        }),
+      'raise their own permission level': () =>
+        apiRequestContext.patch(`${API}/users/${grantee.id}`, {
+          data: { basePermissionLevel: 'ADMIN' },
+          headers
+        }),
+      "set an administrator's password": () =>
+        apiRequestContext.patch(`${API}/users/${teammateAdmin.id}`, {
+          data: { mustResetPassword: false, password },
+          headers
+        })
+    };
+
+    for (const [what, send] of Object.entries(attempts)) {
+      expect.soft((await send()).status(), `a grantee must not be able to ${what}`).toBe(403);
+    }
+    expect(await api.findUserById(grantee.id)).toMatchObject({
+      basePermissionLevel: 'GROUP_MANAGER',
+      groupIds: [group.id]
+    });
+  });
+
+  // Every route that writes a user is admin-only, so an administrator removing their own access could
+  // leave no account able to reach them again. Seeded rather than the shared admin, so a regression
+  // loses a throwaway account instead of the one every other spec logs in as.
+  test('should refuse an administrator deleting or disabling their own account', async ({ api, apiRequestContext }) => {
+    const { credentials, user } = await api.createUser({ basePermissionLevel: 'ADMIN' });
+    const headers = { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` };
+
+    const disabled = await apiRequestContext.patch(`${API}/users/${user.id}`, { data: { disabled: true }, headers });
+    const deleted = await apiRequestContext.delete(`${API}/users/${user.id}`, { headers });
+
+    expect.soft(disabled.status(), 'an administrator must not be able to disable themselves').toBe(403);
+    expect.soft(deleted.status(), 'an administrator must not be able to delete themselves').toBe(403);
+    expect((await api.findUserById(user.id)).disabled).not.toBe(true);
+  });
+
   // The playground uploads a bundle with a token minted by `GET /auth/create-instrument-token`, and
   // that token is the only non-interactive caller of `POST /instruments`. Nothing else in the suite
   // exercises it, which is how #1392 severed the two: the route moved to `manage Instrument` while

@@ -29,6 +29,12 @@ import { UpdateUserPermissionsDto } from './dto/update-user-permissions.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
+/**
+ * Every route that writes another user's account is admin-only, never gated on the matching `User`
+ * action. A user's level, groups, password and permissions decide everything else they can do, so a
+ * grant reaching any of these would let its holder make themselves, or an account whose password
+ * they chose, an administrator.
+ */
 @ApiTags('Users')
 @Controller({ path: 'users' })
 export class UsersController {
@@ -47,7 +53,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Create User' })
   @Post()
-  @RouteAccess({ action: 'create', subject: 'User' })
+  @RouteAccess(ADMIN_ONLY)
   async create(
     @Body() user: CreateUserDto,
     @CurrentUser('ability') ability: AppAbility,
@@ -72,9 +78,9 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Delete User' })
   @Delete(':id')
-  @RouteAccess({ action: 'delete', subject: 'User' })
-  deleteById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
-    return this.usersService.deleteById(id, { ability });
+  @RouteAccess(ADMIN_ONLY)
+  deleteById(@Param('id') id: string, @CurrentUser() currentUser: RequestUser) {
+    return this.usersService.deleteById(id, currentUser);
   }
 
   @ApiOperation({ summary: 'Get All Users' })
@@ -93,15 +99,13 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Update User' })
   @Patch(':id')
-  @RouteAccess({ action: 'update', subject: 'User' })
-  updateById(@Param('id') id: string, @Body() update: UpdateUserDto, @CurrentUser('ability') ability: AppAbility) {
-    return this.usersService.updateById(id, update, { ability });
+  @RouteAccess(ADMIN_ONLY)
+  updateById(@Param('id') id: string, @Body() update: UpdateUserDto, @CurrentUser() currentUser: RequestUser) {
+    return this.usersService.updateById(id, update, currentUser);
   }
 
   @ApiOperation({ summary: 'Replace User Permissions' })
   @Put(':id/permissions')
-  // `manage all` rather than `update User`: an `update User` grant is itself something this route
-  // hands out, and must not be enough to reach it, or the holder could grant themselves anything.
   @RouteAccess(ADMIN_ONLY)
   updatePermissions(
     @Param('id') id: string,

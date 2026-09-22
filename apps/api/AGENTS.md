@@ -127,10 +127,11 @@ what every rule written before the field existed reads back as, means every grou
 `GROUP_SCOPED_CONDITIONS` in `src/auth/ability.factory.ts` turns it into that model's group
 condition. That table is typed over `$GroupScopableSubjectName` (`packages/schemas/src/core/core.ts`:
 `$AppSubjectName` minus `all` and `Instrument`), so a scopable subject with no entry does not
-compile. Only `PUT /v1/users/:id/permissions`, gated on `manage all`, writes the field — it is
-deliberately absent from `$UpdateUserData`, since an `update User` grant must not be enough to hand
-out `manage all`. `UsersService.updatePermissions` accepts a scoped grant only for a group the user
-belongs to, and `updateById` drops the grants scoped to a group the user is removed from.
+compile. Only `PUT /v1/users/:id/permissions` writes the field — it is deliberately absent from
+`$UpdateUserData` — and, like every route that writes a user, it is `ADMIN_ONLY` rather than gated
+on a `User` action; the route inventory in the architecture doc below says why.
+`UsersService.updatePermissions` accepts a scoped grant only for a group the user belongs to, and
+`updateById` drops the grants scoped to a group the user is removed from.
 
 Background: `.agents/docs/architecture/auth-and-permissions.md`.
 
