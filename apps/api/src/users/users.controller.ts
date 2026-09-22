@@ -20,7 +20,7 @@ import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
 import type { CreateUserResponse } from '@opendatacapture/schemas/user';
 
 import type { AppAbility } from '@/auth/auth.types';
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorator';
 import { GroupsService } from '@/groups/groups.service';
 import { MailService } from '@/mail/mail.service';
 
@@ -102,7 +102,7 @@ export class UsersController {
   @Put(':id/permissions')
   // `manage all` rather than `update User`: an `update User` grant is itself something this route
   // hands out, and must not be enough to reach it, or the holder could grant themselves anything.
-  @RouteAccess({ action: 'manage', subject: 'all' })
+  @RouteAccess(ADMIN_ONLY)
   updatePermissions(
     @Param('id') id: string,
     @Body() { permissions }: UpdateUserPermissionsDto,

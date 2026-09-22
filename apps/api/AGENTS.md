@@ -72,6 +72,8 @@ public route. This is eslint-enforced. Know what you are choosing:
 | `@RouteAccess('public')`            | No authentication at all. Only three routes use this; adding a fourth is a security decision. |
 | `@RouteAccess([])`                  | `[].every(...)` is `true` — **any authenticated user**. Easy to write by accident.            |
 | `@RouteAccess({ action, subject })` | `ability.can(action, subject)` on the subject _type_ only.                                    |
+| `@RouteAccess([{ … }, { … }])`      | `.every(...)` — all must pass.                                                                |
+| `@RouteAccess(ADMIN_ONLY)`          | `manage all`. The only declaration no narrower grant or conditional rule can satisfy.         |
 
 **2. Every service query must be scoped.** Take `{ ability }: EntityOperationOptions = {}` as the
 last parameter, have the controller forward `@CurrentUser('ability')`, and put `accessibleQuery` in
