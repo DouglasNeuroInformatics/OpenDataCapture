@@ -21,7 +21,8 @@ Every PR body ends with one `Co-Authored-By: ` line per distinct model across th
 and nothing else after them. No "Generated with" line, no tool credit.
 
 Read the models off the commits rather than from memory — a branch can carry commits from several
-models, and a hand-written commit carries none:
+models, and a hand-written commit carries none. `.agents/skills/odc-commit/SKILL.md` is where those
+trailers come from:
 
 ```sh
 git log --format='%(trailers:key=Co-authored-by,valueonly)' upstream/main..HEAD | sed '/^$/d' | sort -u
