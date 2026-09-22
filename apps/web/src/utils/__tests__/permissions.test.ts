@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 import {
   $AddPermissionFormData,
   ALL_GROUPS,
+  grantableActions,
+  grantableSubjects,
   toUserPermission,
   withoutPermission,
   withPermission
@@ -24,6 +26,32 @@ describe('$AddPermissionFormData', () => {
     expect($AddPermissionFormData.safeParse({ action: 'read', scope: 'group-1', subject: 'Subject' }).success).toBe(
       true
     );
+  });
+
+  it('should refuse a grant that writes users, which the permissions route would refuse too', () => {
+    const result = $AddPermissionFormData.safeParse({ action: 'update', scope: 'group-1', subject: 'User' });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(['action']);
+  });
+});
+
+describe('grantableActions', () => {
+  it('should offer every action before a resource is chosen', () => {
+    expect(grantableActions(undefined)).toEqual(['create', 'delete', 'manage', 'read', 'update']);
+  });
+
+  it('should offer only read on User, since every route that writes a user is admin-only', () => {
+    expect(grantableActions('User')).toEqual(['read']);
+  });
+});
+
+describe('grantableSubjects', () => {
+  it('should leave User out once a write is chosen', () => {
+    expect(grantableSubjects('update')).not.toContain('User');
+  });
+
+  it('should keep User for read', () => {
+    expect(grantableSubjects('read')).toContain('User');
   });
 });
 

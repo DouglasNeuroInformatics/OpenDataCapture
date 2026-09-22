@@ -29,6 +29,16 @@ describe('$UpdateUserPermissionsData', () => {
     const permissions = [{ action: 'read', groupId: 'group-1', subject: 'Instrument' }];
     expect($UpdateUserPermissionsData.safeParse({ permissions }).success).toBe(false);
   });
+
+  it('should reject a grant that writes users, naming the offending entry, since it would do nothing', () => {
+    const permissions = [
+      { action: 'read', groupId: null, subject: 'Subject' },
+      { action: 'update', groupId: null, subject: 'User' }
+    ];
+    const result = $UpdateUserPermissionsData.safeParse({ permissions });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(['permissions', 1]);
+  });
 });
 
 describe('$SelfUpdateUserData', () => {
@@ -91,5 +101,10 @@ describe('$PhoneNumber', () => {
 describe('$User', () => {
   it('should accept a stored number predating the digit minimum, so the read model still parses', () => {
     expect($User.shape.phoneNumber.safeParse('123').success).toBe(true);
+  });
+
+  it('should accept a stored grant that writes users, so a user holding one from before still parses', () => {
+    const additionalPermissions = [{ action: 'update', groupId: null, subject: 'User' }];
+    expect($User.shape.additionalPermissions.safeParse(additionalPermissions).success).toBe(true);
   });
 });

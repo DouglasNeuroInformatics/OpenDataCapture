@@ -104,6 +104,62 @@ export default defineSuite('user permissions', function () {
     });
   });
 
+  // The permissions route refuses a `User` write, but one stored before it did is still in the
+  // database, so it is written directly here. Each request would otherwise end with its holder an
+  // administrator at their next login.
+  describe('a user write grant stored before it was refused', () => {
+    const createUser = async (username: string, basePermissionLevel: 'ADMIN' | 'GROUP_MANAGER'): Promise<User> => {
+      const response = await this.app.inject({
+        headers: adminHeaders,
+        method: 'POST',
+        payload: {
+          basePermissionLevel,
+          firstName: 'Test',
+          groupIds: [group.id],
+          lastName: 'User',
+          password: PASSWORD,
+          username
+        },
+        url: '/v1/users'
+      });
+      expect(response.statusCode).toBe(201);
+      return response.json<User>();
+    };
+
+    it('should reach none of the routes that write a user', async () => {
+      const grantee = await createUser('grantee', 'GROUP_MANAGER');
+      const teammateAdmin = await createUser('teammate.admin', 'ADMIN');
+      await this.app.get<RuntimePrismaClient>(PRISMA_CLIENT_TOKEN).user.update({
+        data: { additionalPermissions: [{ action: 'manage', groupId: group.id, subject: 'User' }] },
+        where: { id: grantee.id }
+      });
+      const headers = { authorization: `Bearer ${await login(grantee.username)}` };
+
+      const attempts = [
+        { method: 'PATCH', payload: { basePermissionLevel: 'ADMIN' }, url: `/v1/users/${grantee.id}` },
+        { method: 'PATCH', payload: { groupIds: [group.id, otherGroup.id] }, url: `/v1/users/${grantee.id}` },
+        { method: 'PATCH', payload: { password: PASSWORD }, url: `/v1/users/${teammateAdmin.id}` },
+        { method: 'DELETE', url: `/v1/users/${teammateAdmin.id}` },
+        {
+          method: 'POST',
+          payload: {
+            basePermissionLevel: 'ADMIN',
+            firstName: 'Probe',
+            groupIds: [],
+            lastName: 'User',
+            password: PASSWORD,
+            username: 'probe'
+          },
+          url: '/v1/users'
+        }
+      ] as const;
+      for (const attempt of attempts) {
+        const response = await this.app.inject({ headers, ...attempt });
+        expect(response.statusCode, `${attempt.method} ${attempt.url}`).toBe(403);
+      }
+    });
+  });
+
   // Rules written before `AuthRule.groupId` existed have no such field at all. The web client parses
   // every user against `$User`, so this pins that Prisma reads the absent field back as null rather
   // than leaving it undefined, and that the factory then applies the rule as the unscoped grant it

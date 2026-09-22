@@ -81,6 +81,33 @@ describe('UserPermissionsEditor', () => {
     expect(addButton.hasAttribute('disabled')).toBe(true);
   });
 
+  describe('a grant stored before it stopped being grantable', () => {
+    const holder: User = {
+      ...user,
+      additionalPermissions: [...user.additionalPermissions, { action: 'update', groupId: null, subject: 'User' }]
+    };
+
+    it('should be marked as having no effect, with a note saying it will be removed', () => {
+      render(<UserPermissionsEditor groups={groups} user={holder} />);
+      expect(screen.getAllByTestId('user-permission-ineffective')).toHaveLength(1);
+      expect(screen.getByTestId('user-permissions-ineffective-note')).toBeTruthy();
+    });
+
+    it('should be left out of the next save, since the route refuses it', () => {
+      render(<UserPermissionsEditor groups={groups} user={holder} />);
+      fireEvent.click(screen.getAllByTestId('user-permission-remove')[0]!);
+      expect(mocks.mutate.mock.lastCall?.[0].permissions).toEqual([
+        { action: 'create', groupId: null, subject: 'Instrument' }
+      ]);
+    });
+  });
+
+  it('should not mark or note anything when every grant has an effect', () => {
+    render(<UserPermissionsEditor groups={groups} user={user} />);
+    expect(screen.queryByTestId('user-permission-ineffective')).toBeNull();
+    expect(screen.queryByTestId('user-permissions-ineffective-note')).toBeNull();
+  });
+
   it('should replace the editor with a notice for an administrator, who already holds everything', () => {
     render(<UserPermissionsEditor groups={groups} user={{ ...user, basePermissionLevel: 'ADMIN' }} />);
     expect(screen.getByTestId('user-permissions-admin-notice')).toBeTruthy();

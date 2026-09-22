@@ -323,62 +323,17 @@ test.describe('server-side authorization', () => {
     });
   }
 
-  // The requests above are refused because no base level grants a `User` write. An administrator can
-  // grant one, and each request here would then end with the grantee holding `manage all` at their
-  // next login -- by promoting themselves, joining every group, or logging in as an account whose
-  // password they chose.
-  test('should refuse every write to a user from a group manager granted `manage User`', async ({
-    api,
-    apiRequestContext,
-    uniqueId
-  }) => {
-    const group = await api.createGroup({ name: `Grantee Group ${uniqueId}` });
-    const otherGroup = await api.createGroup({ name: `Other Group ${uniqueId}` });
-    const { credentials, user: grantee } = await api.createUser({ groupIds: [group.id] });
-    const { user: teammateAdmin } = await api.createUser({ basePermissionLevel: 'ADMIN', groupIds: [group.id] });
-    await api.setUserPermissions(grantee.id, [{ action: 'manage', groupId: group.id, subject: 'User' }]);
-    const headers = { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` };
-    const password = `chosen-oyster-lantern-${uniqueId}`;
+  // The requests above are refused because no base level grants a `User` write, and the permissions
+  // route refuses to store one. A grant stored before it did is still refused by the routes
+  // themselves, which the api's integration suite covers, since only it can write one directly.
+  test('should refuse to grant a write on users, which only an administrator may make', async ({ api }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
 
-    const attempts: { [what: string]: () => Promise<APIResponse> } = {
-      'create an administrator': () =>
-        apiRequestContext.post(`${API}/users`, {
-          data: {
-            basePermissionLevel: 'ADMIN',
-            firstName: 'Escalation',
-            groupIds: [],
-            lastName: 'Probe',
-            password,
-            username: `probe${uniqueId}`
-          },
-          headers
-        }),
-      'delete an administrator in their group': () =>
-        apiRequestContext.delete(`${API}/users/${teammateAdmin.id}`, { headers }),
-      'join a group they do not manage': () =>
-        apiRequestContext.patch(`${API}/users/${grantee.id}`, {
-          data: { groupIds: [group.id, otherGroup.id] },
-          headers
-        }),
-      'raise their own permission level': () =>
-        apiRequestContext.patch(`${API}/users/${grantee.id}`, {
-          data: { basePermissionLevel: 'ADMIN' },
-          headers
-        }),
-      "set an administrator's password": () =>
-        apiRequestContext.patch(`${API}/users/${teammateAdmin.id}`, {
-          data: { mustResetPassword: false, password },
-          headers
-        })
-    };
-
-    for (const [what, send] of Object.entries(attempts)) {
-      expect.soft((await send()).status(), `a grantee must not be able to ${what}`).toBe(403);
-    }
-    expect(await api.findUserById(grantee.id)).toMatchObject({
-      basePermissionLevel: 'GROUP_MANAGER',
-      groupIds: [group.id]
-    });
+    await expect(
+      api.setUserPermissions(user.id, [{ action: 'manage', groupId: group.id, subject: 'User' }])
+    ).rejects.toThrow(/got 400/);
+    expect((await api.findUserById(user.id)).additionalPermissions).toStrictEqual([]);
   });
 
   // Every route that writes a user is admin-only, so an administrator removing their own access could

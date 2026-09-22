@@ -64,6 +64,14 @@ export type Permissions = z.infer<typeof $Permissions>;
 export const $Permissions = z.array($UserPermission);
 
 /**
+ * Whether a per-user permission can reach anything. Every route that writes a user is admin-only in
+ * `apps/api`, so a grant of any `User` action but `read` does nothing. A rule stored before this
+ * existed still parses through {@link $UserPermission}; only a new grant is refused.
+ */
+export const isGrantablePermission = ({ action, subject }: Pick<UserPermission, 'action' | 'subject'>): boolean =>
+  subject !== 'User' || action === 'read';
+
+/**
  * Every language the interface may be displayed in, in the order they are offered to a user.
  * This is the source the frontends derive from: `packages/react-core/src/types.ts` enables
  * exactly these in libui, so a language added here is offered by `apps/web` and `apps/gateway`

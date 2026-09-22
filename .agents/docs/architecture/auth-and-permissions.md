@@ -163,6 +163,14 @@ each scopable model's group field and is typed over the list — a subject taken
 fails `tsc` in `apps/api` until its field is added there. `$UserPermission` refuses a `groupId` on
 any other subject at the boundary, and the factory throws on one it meets anyway.
 
+**A pair can be storable and still do nothing.** Every route that writes a user is `ADMIN_ONLY`, so
+a grant of any `User` action but `read` reaches nothing. `isGrantablePermission`
+(`packages/schemas/src/core/core.ts`) is that rule: `$UpdateUserPermissionsData` refuses what it
+refuses, and the web permissions editor offers only what it allows. `$UserPermission` itself does
+not apply it, because it is also the read model and grants stored before the rule still have to
+parse; the editor marks those "No effect" and leaves them out of its next save. A new admin-only
+route that a grantable pair used to reach belongs in the same predicate.
+
 Adding a rule for a new model means editing `src/auth/ability.factory.ts` and adding tests for
 **both** the allow and the deny case. If it must also be assignable per-user, update the Prisma
 enum and `$AppSubjectName` together, and either add its group field to `GROUP_SCOPED_CONDITIONS` or
