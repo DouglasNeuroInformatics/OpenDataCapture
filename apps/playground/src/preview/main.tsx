@@ -6,7 +6,7 @@ import { CoreProvider } from '@douglasneuroinformatics/libui/providers';
 
 import { PreviewApp } from './PreviewApp';
 
-import '@opendatacapture/react-core/globals.css';
+import './preview.css';
 
 const root = document.getElementById('root')!;
 

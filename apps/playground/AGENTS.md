@@ -103,6 +103,13 @@ that reads `parent.document`, and instruments with `staticAssets` register a ser
 of which an opaque (`allow-same-origin`-less) sandbox permits. libui's `useTheme` also reads
 `localStorage` on first render, which throws in an opaque origin.
 
+The frame's stylesheet is `src/preview/preview.css`, not react-core's `globals.css` directly: it
+collapses every Tailwind breakpoint to `1px`, so the preview always renders an instrument's desktop
+layout. Tailwind's `sm:`/`md:` variants are viewport media queries, and the frame's viewport is the
+split-view panel, about 400 px wide; without the override the same instrument shows its phone layout
+there, with the summary's copy, download and print actions hidden — which is not what the editor
+page's own width used to produce.
+
 ## Talking to an ODC instance
 
 The playground has no backend and no baked-in API URL, but it is not offline-only: `LoginDialog` and
