@@ -1,3 +1,4 @@
+import type { CreateSessionData } from '@opendatacapture/schemas/session';
 import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
 
 import { ApiClient } from '../support/api-client';
@@ -61,5 +62,35 @@ test.describe('sessions', () => {
       lastName: 'Lovelace',
       sex: 'FEMALE'
     });
+  });
+
+  test('should refuse to create a session in a group the caller does not belong to, and write nothing', async ({
+    adminToken,
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const ownGroup = await api.createGroup();
+    const foreignGroup = await api.createGroup();
+    const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [ownGroup.id] });
+    const accessToken = await ApiClient.login(apiRequestContext, credentials);
+    const subjectId = `foreign-${uniqueId}`;
+    const data: CreateSessionData = {
+      date: new Date(),
+      groupId: foreignGroup.id,
+      subjectData: { id: subjectId },
+      type: 'IN_PERSON'
+    };
+
+    const response = await apiRequestContext.post('/api/v1/sessions', {
+      data,
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+
+    expect(response.status()).toBe(404);
+    const subjectResponse = await apiRequestContext.get(`/api/v1/subjects/${subjectId}`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    expect(subjectResponse.status()).toBe(404);
   });
 });
