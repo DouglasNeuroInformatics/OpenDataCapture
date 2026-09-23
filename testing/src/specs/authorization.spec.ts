@@ -257,6 +257,15 @@ test.describe('authorization', () => {
   });
 });
 
+/** The reduced token the playground uploads with, minted from a login token. */
+async function mintInstrumentToken(request: APIRequestContext, token: string): Promise<string> {
+  const response = await request.get(`${API}/auth/create-instrument-token`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  expect(response.ok()).toBe(true);
+  return ((await response.json()) as { accessToken: string }).accessToken;
+}
+
 /** A real, already-interpretable bundle: the first seeded instrument's own compiled source. */
 async function readSeededBundle(request: APIRequestContext, token: string): Promise<string> {
   const headers = { Authorization: `Bearer ${token}` };
@@ -385,6 +394,34 @@ test.describe('server-side authorization', () => {
 
       const response = await apiRequestContext.get(`${API}/auth/create-instrument-token`, {
         headers: { Authorization: `Bearer ${accessToken}` }
+      });
+
+      expect(response.status()).toBe(403);
+    });
+
+    test('should not let a minted token mint its successor, so it expires an hour after it was issued', async ({
+      adminToken,
+      apiRequestContext
+    }) => {
+      const instrumentToken = await mintInstrumentToken(apiRequestContext, adminToken);
+
+      const response = await apiRequestContext.get(`${API}/auth/create-instrument-token`, {
+        headers: { Authorization: `Bearer ${instrumentToken}` }
+      });
+
+      expect(response.status()).toBe(403);
+    });
+
+    // The token's `manage Instrument` satisfies this route's `delete Instrument` with no group
+    // condition, so a guard that admitted it would answer 404 for an id that exists in no group.
+    test('should refuse a minted token on a route its permissions satisfy other than the upload', async ({
+      adminToken,
+      apiRequestContext
+    }) => {
+      const instrumentToken = await mintInstrumentToken(apiRequestContext, adminToken);
+
+      const response = await apiRequestContext.delete(`${API}/instruments/${'0'.repeat(24)}`, {
+        headers: { Authorization: `Bearer ${instrumentToken}` }
       });
 
       expect(response.status()).toBe(403);

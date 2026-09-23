@@ -161,6 +161,7 @@ describe('UsersController', () => {
         firstName: 'Test',
         groups: [{ id: 'group-1' }] as Group[],
         id: 'user-1',
+        kind: 'login',
         lastName: 'User',
         mustResetPassword: false,
         username: 'test-user'

@@ -12,6 +12,7 @@ import type {
   InstrumentInfo
 } from '@opendatacapture/schemas/instrument';
 
+import { AcceptsInstrumentToken } from '@/core/decorators/accepts-instrument-token.decorator';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
@@ -22,6 +23,7 @@ import { InstrumentsService } from './instruments.service';
 export class InstrumentsController {
   constructor(private readonly instrumentsService: InstrumentsService) {}
 
+  @AcceptsInstrumentToken()
   @ApiOperation({ summary: 'Create Instrument' })
   @Post()
   @RouteAccess({ action: 'manage', subject: 'Instrument' })

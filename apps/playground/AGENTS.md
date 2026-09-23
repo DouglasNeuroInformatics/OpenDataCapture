@@ -121,7 +121,10 @@ The token `/v1/auth/create-instrument-token` mints is scoped to `manage Instrume
 `POST /v1/instruments` requires — the two actions must stay in step, and this dialog is that route's
 only caller, so tightening it silently breaks upload here and nowhere else (#1392). It is scoped no
 narrower because a bundle is evaluated server-side: whoever may create an instrument can already run
-code on the API. `testing/src/specs/authorization.spec.ts` pins the contract.
+code on the API. The API accepts that token only on `POST /v1/instruments` (the route carries
+`@AcceptsInstrumentToken()`), so it cannot mint its own successor or reach anything else; a new call
+here made with it will be refused unless its route is marked the same way.
+`testing/src/specs/authorization.spec.ts` pins the contract.
 
 Upload is gated on monaco's own diagnostics: `useEditorErrorSync` writes every error-severity marker
 owned by the `typescript` or `javascript` language into `editorErrors`, and `UploadBundleDialog`
