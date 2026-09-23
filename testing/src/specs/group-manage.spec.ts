@@ -1,3 +1,5 @@
+import type { Locator } from '@playwright/test';
+
 import { GroupManagePage } from '../pages/_app/group/manage.page';
 import { expect, test } from '../support/fixtures';
 
@@ -38,16 +40,56 @@ test.describe('group manage', () => {
     await expect(dialog.getByRole('button', { name: 'Preview Form' })).toBeVisible();
   });
 
-  // A series is created in the app, so its creation date is what tells two of them apart. A scalar
-  // instrument ships with the instance and its stored date says nothing about the instrument, so it
-  // gets no tag — an empty one would read as "created today" on a fresh install.
-  test('should tag a series instrument with its creation date, and no other kind', async ({ getPageModel }) => {
+  // Every instrument carries the date it was stored, whether it was uploaded, imported from a
+  // repository, or built here as a series.
+  test('should tag every instrument with the date it was added', async ({ getPageModel }) => {
     const groupManagePage = await getPageModel('/group/manage');
 
-    const createdAt = groupManagePage.instrumentCreatedAt(SERIES_INSTRUMENT_TITLE);
-    await expect(createdAt).toBeVisible();
-    await expect(createdAt).toHaveText(/^\d{4}-\d{2}-\d{2}$/);
-    await expect(groupManagePage.instrumentCreatedAt(SCALAR_INSTRUMENT_TITLE)).toHaveCount(0);
+    for (const title of [SERIES_INSTRUMENT_TITLE, SCALAR_INSTRUMENT_TITLE]) {
+      const createdAt = groupManagePage.instrumentCreatedAt(title);
+      await expect(createdAt).toBeVisible();
+      await expect(createdAt).toHaveText(/^\d{4}-\d{2}-\d{2}$/);
+    }
+  });
+
+  // The tags are what make the rows scannable, so they have to form columns rather than sit wherever
+  // each row's own content puts them — which is what a per-row grid did.
+  test('should line the tags and actions of every row into columns', async ({ getPageModel }) => {
+    const groupManagePage = await getPageModel('/group/manage');
+
+    const leftEdges = async (locator: Locator) => {
+      const boxes = await locator.evaluateAll((elements) =>
+        elements.map((element) => Math.round(element.getBoundingClientRect().left))
+      );
+      // One row proves nothing about a column, so require enough rows for the assertion to bite.
+      expect(boxes.length).toBeGreaterThan(1);
+      return new Set(boxes);
+    };
+
+    expect(await leftEdges(groupManagePage.instrumentPreviewButtons)).toHaveProperty('size', 1);
+    expect(await leftEdges(groupManagePage.instrumentCreatedAtTags)).toHaveProperty('size', 1);
+  });
+
+  // A series can be one this group built for itself or one shared across the whole instance, and the
+  // two are indistinguishable in the list. The seeded series is uploaded, so it belongs to no group.
+  test('should tell the previewer which groups a series is available to', async ({ getPageModel }) => {
+    const groupManagePage = await getPageModel('/group/manage');
+
+    await groupManagePage.instrumentPreviewButton(SERIES_INSTRUMENT_TITLE).click();
+    const dialog = groupManagePage.$ref.getByRole('dialog');
+    await expect(dialog.getByTestId('instrument-availability')).toHaveText('Available to: All groups');
+    // A plain date: the preview reports the day, not the minute the record happens to carry.
+    await expect(dialog.getByTestId('instrument-created-at')).toHaveText(/^Added: \d{4}-\d{2}-\d{2}$/);
+  });
+
+  // Only a series is owned by a group, so the line would be meaningless on a form.
+  test('should not claim an availability for a scalar instrument', async ({ getPageModel }) => {
+    const groupManagePage = await getPageModel('/group/manage');
+
+    await groupManagePage.instrumentPreviewButton(SCALAR_INSTRUMENT_TITLE).click();
+    const dialog = groupManagePage.$ref.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByTestId('instrument-availability')).toHaveCount(0);
   });
 
   test('should update accessible instruments and group settings, and keep them after navigating away and back', async ({

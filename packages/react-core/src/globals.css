@@ -3,3 +3,16 @@
 @source "../node_modules/@douglasneuroinformatics/libui";
 
 @source "../src";
+
+/* `data-mode` themes the page but tells the browser nothing: native controls, scrollbars and form
+   widgets keep their light appearance in dark mode, and an extension that re-themes pages cannot
+   tell this one is already dark, so it inverts an already-dark theme and leaves parts of it
+   unreadable. `color-scheme` is the standard signal for both, and tracks `data-mode` because the
+   app sets that itself rather than following the OS. */
+:root {
+  color-scheme: light;
+}
+
+[data-mode='dark'] {
+  color-scheme: dark;
+}

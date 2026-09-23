@@ -229,6 +229,8 @@ const $UnilingualScalarInstrument = $ScalarInstrument.extend({
  * displaying available instruments to the user.
  */
 type BaseInstrumentInfo<T extends BaseInstrument = BaseInstrument> = Omit<T, 'content' | 'kind'> & {
+  // When the instrument was stored. Null for one whose stored record could not be read back.
+  createdAt?: Date | null;
   id: string;
   // Provenance: null when uploaded manually; otherwise the source repository id (always present) and
   // its name (may be null for legacy instruments imported before names were stored).
@@ -249,10 +251,6 @@ type ScalarInstrumentInfo<T extends BaseInstrument = BaseInstrument> = BaseInstr
 
 /** Info for a series instrument, which bundles the scalar instruments referenced by `seriesItems`. */
 type SeriesInstrumentInfo<T extends BaseInstrument = BaseInstrument> = BaseInstrumentInfo<T> & {
-  // When the series was stored. A series is created in the app rather than shipped with it, so this
-  // is the only date that distinguishes one from another. Null for a series whose stored record could
-  // not be read back.
-  createdAt?: Date | null;
   kind: 'SERIES';
   // The group that created and owns this series, or null for a series shared across every group (one
   // uploaded directly, or created before series became group-owned). Only the owning group may delete
@@ -265,6 +263,7 @@ type SeriesInstrumentInfo<T extends BaseInstrument = BaseInstrument> = BaseInstr
 type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = ScalarInstrumentInfo<T> | SeriesInstrumentInfo<T>;
 
 const $BaseInstrumentInfo = $BaseInstrument.omit({ content: true, kind: true }).extend({
+  createdAt: z.coerce.date().nullish(),
   id: z.string(),
   sourceRepo: z
     .object({
@@ -280,7 +279,6 @@ const $ScalarInstrumentInfo = $BaseInstrumentInfo.extend({
 }) satisfies z.ZodType<ScalarInstrumentInfo>;
 
 const $SeriesInstrumentInfo = $BaseInstrumentInfo.extend({
-  createdAt: z.coerce.date().nullish(),
   kind: z.literal('SERIES'),
   seriesGroupId: z.string().nullish(),
   seriesItems: z.object({ id: z.string() }).array()

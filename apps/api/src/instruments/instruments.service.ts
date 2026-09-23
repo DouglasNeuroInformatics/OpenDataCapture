@@ -394,11 +394,14 @@ export class InstrumentsService {
 
     const results = new Map<string, InstrumentInfo>();
     for (const instance of instances) {
-      const base = pick(instance, ['__runtimeVersion', 'clientDetails', 'details', 'id', 'language', 'tags']);
+      const metadata = metadataMap.get(instance.id);
+      const base = {
+        ...pick(instance, ['__runtimeVersion', 'clientDetails', 'details', 'id', 'language', 'tags']),
+        createdAt: metadata?.createdAt ?? null
+      };
       // Expose the source repo id whenever the instrument came from a repo (so it can be filtered per
       // group). The name may be null for legacy instruments imported before names were stored; the
       // client still treats those as repo-sourced via their id.
-      const metadata = metadataMap.get(instance.id);
       const sourceRepo = metadata?.sourceRepoId
         ? { id: metadata.sourceRepoId, name: metadata.sourceRepoName ?? null }
         : null;
@@ -420,7 +423,6 @@ export class InstrumentsService {
         }
         const info: SeriesInstrumentInfo = {
           ...base,
-          createdAt: metadata?.createdAt ?? null,
           kind: 'SERIES',
           seriesGroupId: metadata?.seriesGroupId ?? null,
           seriesItems,

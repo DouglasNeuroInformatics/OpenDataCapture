@@ -680,10 +680,7 @@ describe('InstrumentsService', () => {
       ]);
     });
 
-    // A series is created in the app rather than shipped with it, so the client shows this date to
-    // tell two otherwise identical series apart. It is read off the stored record, which the
-    // evaluated instance does not carry.
-    it('should report when each series was created', async () => {
+    it('should report when each series was created, from the record rather than the evaluated instance', async () => {
       const createdAt = new Date('2024-03-01T12:00:00.000Z');
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([
         { ...existingSeries, content: { items: [] }, id: 'series-1' }
@@ -695,6 +692,17 @@ describe('InstrumentsService', () => {
       const result = await instrumentsService.findInfo();
 
       expect(result).toMatchObject([{ createdAt, id: 'series-1' }]);
+    });
+
+    it('should report when each scalar instrument was stored, since every kind is tagged with it', async () => {
+      const createdAt = new Date('2024-05-02T09:30:00.000Z');
+      instrumentModel.findMany.mockResolvedValue([
+        { createdAt, id: 'id-2', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
+      ]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(result).toMatchObject([{ createdAt, id: 'id-2' }]);
     });
 
     // The stored record is read separately from the evaluated instance, so an id present in one and
