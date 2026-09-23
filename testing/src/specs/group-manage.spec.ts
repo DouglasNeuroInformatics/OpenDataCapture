@@ -57,17 +57,20 @@ test.describe('group manage', () => {
   test('should line the tags and actions of every row into columns', async ({ getPageModel }) => {
     const groupManagePage = await getPageModel('/group/manage');
 
-    const leftEdges = async (locator: Locator) => {
-      const boxes = await locator.evaluateAll((elements) =>
+    // `evaluateAll` reads the DOM as it finds it, with none of a locator's waiting, so the rows have
+    // to be on the page before it runs — and more than one of them, or a single edge would satisfy
+    // any assertion about a column.
+    const distinctLeftEdges = async (locator: Locator) => {
+      await expect(locator.first()).toBeVisible();
+      await expect.poll(async () => locator.count()).toBeGreaterThan(1);
+      const edges = await locator.evaluateAll((elements) =>
         elements.map((element) => Math.round(element.getBoundingClientRect().left))
       );
-      // One row proves nothing about a column, so require enough rows for the assertion to bite.
-      expect(boxes.length).toBeGreaterThan(1);
-      return new Set(boxes);
+      return new Set(edges).size;
     };
 
-    expect(await leftEdges(groupManagePage.instrumentPreviewButtons)).toHaveProperty('size', 1);
-    expect(await leftEdges(groupManagePage.instrumentCreatedAtTags)).toHaveProperty('size', 1);
+    expect(await distinctLeftEdges(groupManagePage.instrumentPreviewButtons)).toBe(1);
+    expect(await distinctLeftEdges(groupManagePage.instrumentCreatedAtTags)).toBe(1);
   });
 
   // A series can be one this group built for itself or one shared across the whole instance, and the
