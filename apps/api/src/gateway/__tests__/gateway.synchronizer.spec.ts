@@ -142,6 +142,7 @@ describe('GatewaySynchronizer', () => {
     const SYNC_DURATION = 500;
 
     let concurrentSyncs: number;
+    let loggingService: MockedInstance<LoggingService>;
     let maxConcurrentSyncs: number;
     let sync: MockInstance<GatewaySynchronizer['sync']>;
 
@@ -161,6 +162,7 @@ describe('GatewaySynchronizer', () => {
         ]
       }).compile();
       gatewaySynchronizer = moduleRef.get(GatewaySynchronizer);
+      loggingService = moduleRef.get(LoggingService);
 
       concurrentSyncs = 0;
       maxConcurrentSyncs = 0;
@@ -203,6 +205,17 @@ describe('GatewaySynchronizer', () => {
 
       expect(sync.mock.calls.length).toBeGreaterThan(1);
       expect(maxConcurrentSyncs).toBe(1);
+    });
+
+    it('should log the failure rather than leave the rejection unhandled', async () => {
+      const cause = new Error('Unexpected');
+      sync.mockRejectedValueOnce(cause);
+      gatewaySynchronizer.onApplicationBootstrap();
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL);
+      await gatewaySynchronizer.onApplicationShutdown();
+
+      expect(loggingService.error).toHaveBeenCalledWith(expect.objectContaining({ cause }));
     });
 
     it('should stop synchronizing once the application shuts down', async () => {

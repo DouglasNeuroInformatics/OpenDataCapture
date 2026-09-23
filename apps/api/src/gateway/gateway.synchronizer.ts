@@ -19,9 +19,9 @@ import { GatewayService } from './gateway.service';
 @Injectable()
 export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicationShutdown {
   private isStopped = false;
+  private nextSyncTimer?: NodeJS.Timeout;
   private pendingSync?: Promise<void>;
   private readonly refreshInterval: number;
-  private timeout?: NodeJS.Timeout;
 
   constructor(
     configService: ConfigService,
@@ -42,8 +42,8 @@ export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicatio
 
   async onApplicationShutdown() {
     this.isStopped = true;
-    clearTimeout(this.timeout);
-    this.timeout = undefined;
+    clearTimeout(this.nextSyncTimer);
+    this.nextSyncTimer = undefined;
     await this.pendingSync;
   }
 
@@ -217,10 +217,10 @@ export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicatio
   }
 
   /**
-   * Run one pass, then schedule the next one `refreshInterval` after it finished — so the delay is
-   * a gap between passes, not a fixed period. A period would start a pass while the previous one
-   * was still running: a fetch that outlasts the interval then accumulates passes without bound,
-   * each holding a full assignment payload, until the process exhausts memory.
+   * `refreshInterval` is the gap between passes, not a fixed period. A period would start a pass
+   * while the previous one was still running: a fetch that outlasts the interval then accumulates
+   * passes without bound, each holding a full assignment payload, until the process exhausts
+   * memory.
    */
   private async runScheduledSync(): Promise<void> {
     const startedAt = Date.now();
@@ -240,7 +240,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicatio
   }
 
   private scheduleNextSync(): void {
-    this.timeout = setTimeout(() => {
+    this.nextSyncTimer = setTimeout(() => {
       this.pendingSync = this.runScheduledSync();
     }, this.refreshInterval);
   }
