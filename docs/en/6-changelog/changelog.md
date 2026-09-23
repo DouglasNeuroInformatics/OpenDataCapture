@@ -7,6 +7,14 @@ Every release of Open Data Capture from 2.0.0 onward is recorded here. Each sect
 commit history when the version changes, and becomes the body of the GitHub release. Releases before
 2.0.0 are listed in the [release history](https://github.com/DouglasNeuroinformatics/OpenDataCapture/releases).
 
+## 2.5.1
+
+### Bug Fixes
+
+- **playground:** read the preview origin at runtime instead of build time ([8022973](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/8022973190d14c73162afd6b33876bd9911c3b78))
+- **api:** open a new connection for every gateway request ([c3f3e79](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/c3f3e793c7dfa62f23c0234dd5978468d5cdfea7))
+- **api:** refuse the instrument token everywhere but instrument upload ([0826634](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/0826634945734767d7529bad494af2d7ef2278f9))
+
 ## 2.5.0
 
 ### Features

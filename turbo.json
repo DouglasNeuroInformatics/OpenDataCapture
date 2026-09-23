@@ -11,15 +11,7 @@
     },
     "build": {
       "dependsOn": ["^build", "db:generate"],
-      "env": [
-        "API_BASE_URL",
-        "CONTACT_EMAIL",
-        "DOCS_URL",
-        "GITHUB_REPO_URL",
-        "LICENSE_URL",
-        "GATEWAY_ENABLED",
-        "PLAYGROUND_PREVIEW_ORIGIN"
-      ],
+      "env": ["API_BASE_URL", "CONTACT_EMAIL", "DOCS_URL", "GITHUB_REPO_URL", "LICENSE_URL", "GATEWAY_ENABLED"],
       "outputs": ["dist/**"]
     },
     "db:generate": {
