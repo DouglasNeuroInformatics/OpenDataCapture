@@ -20,6 +20,12 @@ export type TokenPayload = {
   firstName: null | string;
   groups: Group[];
   id: string;
+  /**
+   * `'instrument'` marks the reduced token `GET /auth/create-instrument-token` mints. It carries only
+   * `kind` and `permissions`, and the API refuses it on every route not marked
+   * `@AcceptsInstrumentToken()`, so the fields it lacks are never read.
+   */
+  kind: 'instrument' | 'login';
   lastName: null | string;
   /**
    * Whether the holder must choose a new password before they may use the app. Carried on the token

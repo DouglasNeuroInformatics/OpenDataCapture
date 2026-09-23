@@ -53,7 +53,7 @@ copy.
 
 ## A schema only where something is parsed
 
-`src/auth/auth.ts` is the whole rule in 26 lines: `$LoginCredentials` is a schema because a request
+`src/auth/auth.ts` is the whole rule in one file: `$LoginCredentials` is a schema because a request
 body is parsed against it; `AuthPayload` and `TokenPayload` are plain types because nothing ever
 parses them. Do not add a schema for a shape that only crosses a typed boundary.
 
