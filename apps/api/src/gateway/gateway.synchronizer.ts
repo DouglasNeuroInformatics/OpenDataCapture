@@ -16,6 +16,8 @@ import { SetupService } from '@/setup/setup.service';
 
 import { GatewayService } from './gateway.service';
 
+const SYNC_TIMEOUT = 300_000;
+
 @Injectable()
 export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicationShutdown {
   private isStopped = false;
@@ -225,7 +227,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicatio
   private async runScheduledSync(): Promise<void> {
     const startedAt = Date.now();
     try {
-      await this.sync();
+      await this.syncWithTimeout();
       this.loggingService.log(`Done synchronizing with gateway in ${Date.now() - startedAt}ms`);
     } catch (err) {
       this.loggingService.error({
@@ -243,5 +245,22 @@ export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicatio
     this.nextSyncTimer = setTimeout(() => {
       this.pendingSync = this.runScheduledSync();
     }, this.refreshInterval);
+  }
+
+  /**
+   * A pass that never settles would hold the loop forever, since the next pass is scheduled only
+   * once the previous one finishes. Abandoning it gives up on that pass alone: whatever it left
+   * unsynchronized keeps its status and is picked up by the next pass.
+   */
+  private async syncWithTimeout(): Promise<void> {
+    const abandonedSync = Promise.withResolvers<never>();
+    const timer = setTimeout(() => {
+      abandonedSync.reject(new Error(`Gateway synchronization exceeded the maximum duration of ${SYNC_TIMEOUT}ms`));
+    }, SYNC_TIMEOUT);
+    try {
+      await Promise.race([this.sync(), abandonedSync.promise]);
+    } finally {
+      clearTimeout(timer);
+    }
   }
 }
