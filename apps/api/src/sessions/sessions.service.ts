@@ -84,18 +84,13 @@ export class SessionsService {
       }))
     });
 
-    const created = await this.sessionModel.findMany({
-      include: { subject: true },
-      where: { id: { in: ids } }
-    });
-    const byId = new Map(created.map((session) => [session.id, session]));
-    return ids.map((id) => {
-      const session = byId.get(id);
-      if (!session) {
-        throw new InternalServerErrorException(`Failed to read back created session with id: ${id}`);
-      }
-      return session;
-    });
+    // The caller never receives these sessions if the read-back fails, so it cannot roll them back.
+    try {
+      return await this.readBackInOrder(ids);
+    } catch (err) {
+      await this.deleteByIds(ids);
+      throw err;
+    }
   }
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
@@ -143,5 +138,20 @@ export class SessionsService {
       throw new NotFoundException(`Failed to find session with ID: ${id}`);
     }
     return session;
+  }
+
+  private async readBackInOrder(ids: string[]) {
+    const created = await this.sessionModel.findMany({
+      include: { subject: true },
+      where: { id: { in: ids } }
+    });
+    const byId = new Map(created.map((session) => [session.id, session]));
+    return ids.map((id) => {
+      const session = byId.get(id);
+      if (!session) {
+        throw new InternalServerErrorException(`Failed to read back created session with id: ${id}`);
+      }
+      return session;
+    });
   }
 }

@@ -152,6 +152,23 @@ describe('SessionsService', () => {
         })
       ).rejects.toBeInstanceOf(InternalServerErrorException);
     });
+
+    it('should delete the sessions it inserted when the read-back fails, since the caller never receives them to roll back', async () => {
+      sessionModel.findMany.mockRejectedValueOnce(new Error('read-back failed'));
+
+      await expect(
+        sessionsService.createMany({
+          entries: [entry('subject-a'), entry('subject-b')],
+          groupId: null,
+          type: 'RETROSPECTIVE'
+        })
+      ).rejects.toThrow('read-back failed');
+
+      const [{ data }] = sessionModel.createMany.mock.lastCall as [{ data: { id: string }[] }];
+      expect(sessionModel.deleteMany).toHaveBeenCalledWith({
+        where: { AND: [{}], id: { in: data.map((session) => session.id) } }
+      });
+    });
   });
 
   describe('create', () => {
