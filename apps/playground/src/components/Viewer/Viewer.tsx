@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { use, useCallback, useState } from 'react';
 
 import { Spinner } from '@douglasneuroinformatics/libui/components';
 import { useInterval, useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -8,6 +8,7 @@ import { match, P } from 'ts-pattern';
 
 import { useFilesRef } from '@/hooks/useFilesRef';
 import type { EditorFile } from '@/models/editor-file.model';
+import { fetchPlaygroundConfig } from '@/preview/config';
 import { resolvePreviewOrigin } from '@/preview/protocol';
 import type { PreviewErrorStage } from '@/preview/protocol';
 import { useAppStore } from '@/store';
@@ -17,6 +18,9 @@ import { CompileErrorFallback } from './CompileErrorFallback';
 import { PreviewFrame } from './PreviewFrame';
 import { PreviewOriginError } from './PreviewOriginError';
 import { RuntimeErrorFallback } from './RuntimeErrorFallback';
+
+// `use` needs the same promise on every render, so the config is requested once, as the module loads.
+const playgroundConfig = fetchPlaygroundConfig();
 
 /** An error the preview frame reported, kept with the bundle it belongs to so a rebuild clears it. */
 type PreviewError = {
@@ -37,7 +41,7 @@ export const Viewer = () => {
   const setState = useAppStore((store) => store.setTranspilerState);
   const { t } = useTranslation();
 
-  const previewOrigin = useMemo(() => resolvePreviewOrigin(window.location, __PREVIEW_ORIGIN__), []);
+  const previewOrigin = resolvePreviewOrigin(window.location, use(playgroundConfig).previewOrigin);
 
   const transpile = useCallback(async (files: EditorFile[]) => {
     setState({ status: 'building' });
