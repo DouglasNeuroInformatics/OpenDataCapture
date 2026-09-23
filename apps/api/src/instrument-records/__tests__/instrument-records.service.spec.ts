@@ -217,8 +217,17 @@ describe('InstrumentRecordsService', () => {
       expect(sessionsService.create).not.toHaveBeenCalled();
       expect(sessionsService.createMany).toHaveBeenCalledTimes(1);
       expect(sessionsService.createMany).toHaveBeenCalledWith(
-        expect.objectContaining({ groupId: 'group-1', type: 'RETROSPECTIVE', username: 'validuser' })
+        expect.objectContaining({ groupId: 'group-1', type: 'RETROSPECTIVE', username: 'validuser' }),
+        undefined
       );
+    });
+
+    it('should create the sessions with the caller ability, so their group and user lookups are scoped', async () => {
+      const ability = createAppAbility([{ action: 'create', subject: 'InstrumentRecord' }]);
+
+      await instrumentRecordsService.upload({ ...baseUploadData }, { ability });
+
+      expect(sessionsService.createMany).toHaveBeenCalledWith(expect.anything(), { ability });
     });
 
     it('should batch every record into a single session creation call', async () => {
@@ -300,7 +309,10 @@ describe('InstrumentRecordsService', () => {
       await instrumentRecordsService.upload({ ...baseUploadData });
 
       expect(usersService.findByUsername).not.toHaveBeenCalled();
-      expect(sessionsService.createMany).toHaveBeenCalledWith(expect.objectContaining({ username: undefined }));
+      expect(sessionsService.createMany).toHaveBeenCalledWith(
+        expect.objectContaining({ username: undefined }),
+        undefined
+      );
     });
 
     it('should reject an invalid record before creating any sessions', async () => {
@@ -322,7 +334,8 @@ describe('InstrumentRecordsService', () => {
       instrumentsService.findById.mockResolvedValue({
         ...mockInstrument,
         validationSchema: {
-          safeParse: (data: any) => (data.answer === 2 ? { error: { issues }, success: false } : { data, success: true })
+          safeParse: (data: any) =>
+            data.answer === 2 ? { error: { issues }, success: false } : { data, success: true }
         }
       } as any);
 

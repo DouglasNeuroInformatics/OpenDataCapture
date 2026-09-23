@@ -1,14 +1,15 @@
-import { getModelToken, LoggingService, PRISMA_CLIENT_TOKEN } from '@douglasneuroinformatics/libnest';
+import { getModelToken, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { InternalServerErrorException } from '@nestjs/common';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-import type { RuntimePrismaClient } from '@/core/prisma';
+import { createAppAbility } from '@/auth/ability.utils';
 import { GroupsService } from '@/groups/groups.service';
 import { SubjectsService } from '@/subjects/subjects.service';
+import { UsersService } from '@/users/users.service';
 
 import { SessionsService } from '../sessions.service';
 
@@ -17,7 +18,7 @@ describe('SessionsService', () => {
   let sessionModel: MockedInstance<Model<'Session'>>;
   let groupsService: MockedInstance<GroupsService>;
   let subjectsService: MockedInstance<SubjectsService>;
-  let prismaClient: MockedInstance<RuntimePrismaClient> & { [key: string]: any };
+  let usersService: MockedInstance<UsersService>;
 
   const entry = (id: string) => ({ date: new Date(), subjectData: { id } });
 
@@ -29,12 +30,7 @@ describe('SessionsService', () => {
         MockFactory.createForService(GroupsService),
         MockFactory.createForService(LoggingService),
         MockFactory.createForService(SubjectsService),
-        {
-          provide: PRISMA_CLIENT_TOKEN,
-          useValue: {
-            user: { findFirst: vi.fn() }
-          }
-        }
+        MockFactory.createForService(UsersService)
       ]
     }).compile();
 
@@ -42,11 +38,10 @@ describe('SessionsService', () => {
     sessionModel = moduleRef.get(getModelToken('Session'));
     groupsService = moduleRef.get(GroupsService);
     subjectsService = moduleRef.get(SubjectsService);
-    prismaClient = moduleRef.get(PRISMA_CLIENT_TOKEN);
+    usersService = moduleRef.get(UsersService);
 
     subjectsService.createMany.mockResolvedValue([] as any);
     subjectsService.addGroupForSubjects.mockResolvedValue({ count: 0 } as any);
-    prismaClient.user.findFirst.mockResolvedValue(null);
     sessionModel.createMany.mockResolvedValue({ count: 1 } as any);
     sessionModel.findMany.mockImplementation(({ where }: any) =>
       Promise.resolve(where.id.in.map((id: string) => ({ id })))
@@ -127,14 +122,65 @@ describe('SessionsService', () => {
 
     it('should resolve the user once for the whole batch and stamp it on every session', async () => {
       const entries = [entry('subject-a'), entry('subject-b')];
-      prismaClient.user.findFirst.mockResolvedValueOnce({ id: 'user-1', username: 'someone' });
+      usersService.findByUsername.mockResolvedValueOnce({ id: 'user-1', username: 'someone' } as any);
 
       await sessionsService.createMany({ entries, groupId: null, type: 'RETROSPECTIVE', username: 'someone' });
 
-      expect(prismaClient.user.findFirst).toHaveBeenCalledOnce();
+      expect(usersService.findByUsername).toHaveBeenCalledOnce();
       expect(sessionModel.createMany.mock.lastCall?.[0]).toMatchObject({
         data: [{ userId: 'user-1' }, { userId: 'user-1' }]
       });
+    });
+
+    it('should look the group up with the caller ability, so a group they cannot read is refused', async () => {
+      const ability = createAppAbility([{ action: 'read', conditions: { id: { in: ['group-1'] } }, subject: 'Group' }]);
+      groupsService.findById.mockResolvedValueOnce({ id: 'group-1' } as any);
+
+      await sessionsService.createMany(
+        { entries: [entry('subject-1')], groupId: 'group-1', type: 'RETROSPECTIVE' },
+        { ability }
+      );
+
+      expect(groupsService.findById).toHaveBeenCalledWith('group-1', { ability });
+    });
+
+    it('should write nothing when the caller may not read the group', async () => {
+      groupsService.findById.mockRejectedValueOnce(new NotFoundException());
+
+      await expect(
+        sessionsService.createMany({ entries: [entry('subject-1')], groupId: 'group-2', type: 'RETROSPECTIVE' })
+      ).rejects.toBeInstanceOf(NotFoundException);
+
+      expect(subjectsService.createMany).not.toHaveBeenCalled();
+      expect(sessionModel.createMany).not.toHaveBeenCalled();
+    });
+
+    it('should look the user up among the users the caller may read, so a caller cannot name anyone', async () => {
+      const ability = createAppAbility([{ action: 'read', conditions: { id: 'user-1' }, subject: 'User' }]);
+      usersService.findByUsername.mockResolvedValueOnce({ id: 'user-1', username: 'someone' } as any);
+
+      await sessionsService.createMany(
+        { entries: [entry('subject-1')], groupId: null, type: 'RETROSPECTIVE', username: 'someone' },
+        { ability }
+      );
+
+      expect(usersService.findByUsername).toHaveBeenCalledWith('someone', { ability });
+    });
+
+    it('should refuse a username it cannot find rather than create sessions with no user', async () => {
+      usersService.findByUsername.mockRejectedValueOnce(new NotFoundException());
+
+      await expect(
+        sessionsService.createMany({
+          entries: [entry('subject-1')],
+          groupId: null,
+          type: 'RETROSPECTIVE',
+          username: 'nobody'
+        })
+      ).rejects.toBeInstanceOf(NotFoundException);
+
+      expect(subjectsService.createMany).not.toHaveBeenCalled();
+      expect(sessionModel.createMany).not.toHaveBeenCalled();
     });
 
     // Without this, a session missing from the read-back would be handed to the caller as

@@ -433,15 +433,18 @@ export class InstrumentRecordsService {
 
     // One batched call rather than one session creation per record, which cost several queries each.
     // Returned in input order, so each record can be paired with its session by index.
-    const sessions = await this.sessionsService.createMany({
-      entries: validatedRecords.map((record) => ({
-        date: record.date,
-        subjectData: { id: record.subjectId }
-      })),
-      groupId: groupId ?? null,
-      type: 'RETROSPECTIVE',
-      username: username ?? undefined
-    });
+    const sessions = await this.sessionsService.createMany(
+      {
+        entries: validatedRecords.map((record) => ({
+          date: record.date,
+          subjectData: { id: record.subjectId }
+        })),
+        groupId: groupId ?? null,
+        type: 'RETROSPECTIVE',
+        username: username ?? undefined
+      },
+      options
+    );
 
     // Only the insert is rolled back on failure. Deleting the sessions after it has succeeded would
     // strand the records that now reference them, so the read-back below sits outside the catch.

@@ -1,16 +1,16 @@
-import { InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
+import { InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { CreateSessionData } from '@opendatacapture/schemas/session';
-import type { Prisma, Session, User } from '@prisma/client';
+import type { Prisma, Session } from '@prisma/client';
 import { ObjectId } from 'mongodb';
 
 import { accessibleQuery } from '@/auth/ability.utils';
-import type { RuntimePrismaClient } from '@/core/prisma';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { SubjectsService } from '@/subjects/subjects.service';
+import { UsersService } from '@/users/users.service';
 
 /** The batched form of `CreateSessionData`: what varies per session, and what the batch shares. */
 type CreateManySessionsData = Pick<CreateSessionData, 'groupId' | 'type' | 'username'> & {
@@ -20,11 +20,11 @@ type CreateManySessionsData = Pick<CreateSessionData, 'groupId' | 'type' | 'user
 @Injectable()
 export class SessionsService {
   constructor(
-    @InjectPrismaClient() private readonly prismaClient: RuntimePrismaClient,
     @InjectModel('Session') private readonly sessionModel: Model<'Session'>,
     private readonly groupsService: GroupsService,
     private readonly loggingService: LoggingService,
-    private readonly subjectsService: SubjectsService
+    private readonly subjectsService: SubjectsService,
+    private readonly usersService: UsersService
   ) {}
 
   async count(where: Prisma.SessionWhereInput = {}, { ability }: EntityOperationOptions = {}) {
@@ -33,13 +33,19 @@ export class SessionsService {
     });
   }
 
-  async create({ date, groupId, subjectData, type, username }: CreateSessionData): Promise<Session> {
-    const [session] = await this.createMany({
-      entries: [{ date, subjectData }],
-      groupId,
-      type,
-      username
-    });
+  async create(
+    { date, groupId, subjectData, type, username }: CreateSessionData,
+    options?: EntityOperationOptions
+  ): Promise<Session> {
+    const [session] = await this.createMany(
+      {
+        entries: [{ date, subjectData }],
+        groupId,
+        type,
+        username
+      },
+      options
+    );
     return session!;
   }
 
@@ -49,19 +55,22 @@ export class SessionsService {
    * Returned in the same order as `entries`, so a caller can pair each session with the input that
    * produced it without a second lookup.
    */
-  async createMany({ entries, groupId, type, username }: CreateManySessionsData): Promise<Session[]> {
+  async createMany(
+    { entries, groupId, type, username }: CreateManySessionsData,
+    { ability }: EntityOperationOptions = {}
+  ): Promise<Session[]> {
     if (entries.length === 0) {
       return [];
     }
     this.loggingService.debug({ message: `Attempting to create ${entries.length} session(s)` });
 
+    const user = username ? await this.usersService.findByUsername(username, { ability }) : null;
+    const group: Group | null = groupId ? await this.groupsService.findById(groupId, { ability }) : null;
+
+    // The subject writes are left unscoped. A caller's `read Subject` rule covers only its own
+    // groups, so a scoped existence check would miss a subject from another group and try to create
+    // it again, and a STANDARD caller holds no `update Subject` rule for the group association.
     await this.subjectsService.createMany(entries.map((entry) => entry.subjectData));
-
-    const user: null | Omit<User, 'hashedPassword'> = username
-      ? await this.prismaClient.user.findFirst({ where: { username } })
-      : null;
-
-    const group: Group | null = groupId ? await this.groupsService.findById(groupId) : null;
     if (group) {
       await this.subjectsService.addGroupForSubjects(
         Array.from(new Set(entries.map((entry) => entry.subjectData.id))),
