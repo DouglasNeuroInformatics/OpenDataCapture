@@ -1,9 +1,10 @@
 import type { Assignment } from '@opendatacapture/schemas/assignment';
+import type { Session } from '@opendatacapture/schemas/session';
 import type { Page } from '@playwright/test';
 
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
 import { ApiClient } from '../support/api-client';
-import { gatewayURL } from '../support/env';
+import { gatewayRefreshInterval, gatewayURL } from '../support/env';
 import { expect, test } from '../support/fixtures';
 
 import type { GetPageModel } from '../support/fixtures';
@@ -134,6 +135,50 @@ test.describe('gateway remote assignment', () => {
       await page.reload();
       await expect(page.getByRole('table')).toContainText('Complete', { timeout: 5_000 });
     }).toPass({ timeout: 90_000 });
+  });
+});
+
+test.describe('gateway malformed submission', () => {
+  test.describe.configure({ timeout: 180_000 });
+
+  // The API retries a submission it cannot ingest on every synchronization pass, so rejecting it
+  // after writing the session would leave one more session behind each time.
+  test('should not record a session for a submission shaped for another kind of instrument', async ({
+    adminToken,
+    api,
+    apiRequestContext,
+    context
+  }) => {
+    const assignment = await seedAssignment(api);
+    const adminHeaders = { Authorization: `Bearer ${adminToken}` };
+
+    const gatewayPage = await context.newPage();
+    await gatewayPage.goto(assignment.url);
+    await gatewayPage.locator('cap-widget').click();
+    await expect(gatewayPage.getByRole('button', { name: 'Begin' })).toBeEnabled({ timeout: 120_000 });
+
+    // The page hands the patient this token; a hand-written request can then claim any shape.
+    const { token } = await gatewayPage.evaluate(() => Reflect.get(window, '__ROOT_PROPS__'));
+    const submission = await apiRequestContext.patch(`${gatewayURL}/api/assignments/${assignment.id}`, {
+      data: { data: { answer: 1 }, kind: 'SERIES', status: 'COMPLETE' },
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    expect(submission.status()).toBe(200);
+    await gatewayPage.close();
+
+    await new Promise((resolve) => setTimeout(resolve, 2 * gatewayRefreshInterval));
+    const response = await apiRequestContext.get('/api/v1/sessions', { headers: adminHeaders });
+    const sessions = (await response.json()) as Session[];
+    const remoteSessions = sessions.filter(
+      (session) => session.subjectId === assignment.subjectId && session.type === 'REMOTE'
+    );
+    expect(remoteSessions).toHaveLength(0);
+
+    // Cancelling removes the row from the gateway, so the rest of the run is not synchronizing it.
+    await apiRequestContext.patch(`/api/v1/assignments/${assignment.id}`, {
+      data: { status: 'CANCELED' },
+      headers: adminHeaders
+    });
   });
 });
 

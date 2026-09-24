@@ -106,23 +106,8 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
     const instrument = await this.instrumentsService.findById(assignment.instrumentId);
 
-    // Creating the session enrols the subject in its group, so the group must never be the gateway's
-    // copy: that would let the gateway give another group access to the subject.
-    if ((remoteAssignment.groupId ?? null) !== assignment.groupId) {
-      this.loggingService.error(
-        `Gateway reported group '${remoteAssignment.groupId}' for assignment '${assignment.id}' in group '${assignment.groupId}'`
-      );
-    }
-
-    const session = await this.sessionsService.create({
-      date: remoteAssignment.completedAt,
-      groupId: assignment.groupId,
-      subjectData: {
-        id: assignment.subjectId
-      },
-      type: 'REMOTE'
-    });
-
+    // Checked before anything is written: only the catch below deletes the session, so a throw
+    // between creating it and that try would leave one behind on every synchronization pass.
     const cipherTexts: string[] = [];
     const symmetricKeys: string[] = [];
     let seriesItems: ScalarInstrumentInternal[] | undefined;
@@ -151,6 +136,23 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       cipherTexts.push(remoteAssignment.encryptedData);
       symmetricKeys.push(remoteAssignment.symmetricKey);
     }
+
+    // Creating the session enrols the subject in its group, so the group must never be the gateway's
+    // copy: that would let the gateway give another group access to the subject.
+    if ((remoteAssignment.groupId ?? null) !== assignment.groupId) {
+      this.loggingService.error(
+        `Gateway reported group '${remoteAssignment.groupId}' for assignment '${assignment.id}' in group '${assignment.groupId}'`
+      );
+    }
+
+    const session = await this.sessionsService.create({
+      date: remoteAssignment.completedAt,
+      groupId: assignment.groupId,
+      subjectData: {
+        id: assignment.subjectId
+      },
+      type: 'REMOTE'
+    });
 
     const createdRecordIds: string[] = [];
     try {

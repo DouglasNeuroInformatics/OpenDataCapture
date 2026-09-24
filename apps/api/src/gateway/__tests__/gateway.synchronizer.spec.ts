@@ -138,6 +138,29 @@ describe('GatewaySynchronizer', () => {
     });
   });
 
+  describe('malformed submission', () => {
+    it('should create no session for a submission shaped for another kind of instrument, since nothing would delete it', async () => {
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([
+        { ...createRemoteAssignment('assignment-1'), encryptedData: '$ciphertext', symmetricKey: '$key' }
+      ]);
+      await gatewaySynchronizer.sync();
+      expect(sessionsService.create).not.toHaveBeenCalled();
+    });
+
+    it('should create no session for a series submission with more items than the series has', async () => {
+      instrumentsService.findById.mockResolvedValue({
+        content: [{ edition: 1, name: 'ITEM_A' }],
+        id: CURRENT_EDITION_ID,
+        kind: 'SERIES'
+      });
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([
+        { ...createRemoteAssignment('assignment-1'), encryptedData: '$first$second', symmetricKey: '$key1$key2' }
+      ]);
+      await gatewaySynchronizer.sync();
+      expect(sessionsService.create).not.toHaveBeenCalled();
+    });
+  });
+
   describe('group', () => {
     beforeEach(() => {
       assignmentsService.findById.mockResolvedValue(createAssignment('assignment-1', 'group-stored'));
