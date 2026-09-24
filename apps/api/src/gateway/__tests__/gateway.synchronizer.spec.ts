@@ -31,6 +31,7 @@ describe('GatewaySynchronizer', () => {
   let gatewayService: MockedInstance<GatewayService>;
   let instrumentsService: MockedInstance<InstrumentsService>;
   let instrumentRecordsService: MockedInstance<InstrumentRecordsService>;
+  let loggingService: MockedInstance<LoggingService>;
   let sessionsService: MockedInstance<SessionsService>;
   let setupService: MockedInstance<SetupService>;
 
@@ -63,6 +64,7 @@ describe('GatewaySynchronizer', () => {
     gatewayService = moduleRef.get(GatewayService);
     instrumentsService = moduleRef.get(InstrumentsService);
     instrumentRecordsService = moduleRef.get(InstrumentRecordsService);
+    loggingService = moduleRef.get(LoggingService);
     sessionsService = moduleRef.get(SessionsService);
     setupService = moduleRef.get(SetupService);
 
@@ -133,6 +135,42 @@ describe('GatewaySynchronizer', () => {
       expect(instrumentRecordsService.create).toHaveBeenCalledTimes(2);
       expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledExactlyOnceWith('assignment-2');
       expect(assignmentsService.updateStatusById).toHaveBeenCalledExactlyOnceWith('assignment-2', 'COMPLETE');
+    });
+  });
+
+  describe('logging', () => {
+    const loggedErrors = () => JSON.stringify(loggingService.error.mock.calls);
+
+    it('should not log a submission that fails validation, since a process log has none of the access control a record has', async () => {
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([createRemoteAssignment('assignment-1')]);
+      vi.mocked(HybridCrypto).decrypt.mockResolvedValue(JSON.stringify({ answer: 'PATIENT-ANSWER' }));
+      instrumentRecordsService.create.mockRejectedValue(new UnprocessableEntityException('Failed validation'));
+
+      await gatewaySynchronizer.sync();
+
+      expect(loggingService.error).toHaveBeenCalled();
+      expect(loggedErrors()).not.toContain('PATIENT-ANSWER');
+    });
+
+    it('should not log decrypted text that is not valid JSON', async () => {
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([createRemoteAssignment('assignment-1')]);
+      vi.mocked(HybridCrypto).decrypt.mockResolvedValue('{"answer":"PATIENT-ANSWER"');
+
+      await gatewaySynchronizer.sync();
+
+      expect(loggingService.error).toHaveBeenCalled();
+      expect(loggedErrors()).not.toContain('PATIENT-ANSWER');
+    });
+
+    it('should not log the stored ciphertext and key of a malformed assignment, only its id', async () => {
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([
+        { ...createRemoteAssignment('assignment-1'), encryptedData: '$ciphertext', symmetricKey: '$encapsulated-key' }
+      ]);
+
+      await gatewaySynchronizer.sync();
+
+      expect(loggedErrors()).toContain('assignment-1');
+      expect(loggedErrors()).not.toContain('encapsulated-key');
     });
   });
 });

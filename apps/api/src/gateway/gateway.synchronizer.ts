@@ -121,7 +121,6 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
     if (instrument.kind === 'SERIES') {
       if (!(remoteAssignment.encryptedData.startsWith('$') && remoteAssignment.symmetricKey.startsWith('$'))) {
-        this.loggingService.error({ remoteAssignment });
         throw new InternalServerErrorException('Malformed remote assignment for series instrument');
       }
       cipherTexts.push(...remoteAssignment.encryptedData.slice(1).split('$'));
@@ -139,7 +138,6 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         );
       }
     } else if (remoteAssignment.encryptedData.includes('$') || remoteAssignment.symmetricKey.includes('$')) {
-      this.loggingService.error({ remoteAssignment });
       throw new InternalServerErrorException('Malformed remote assignment for scalar instrument');
     } else {
       cipherTexts.push(remoteAssignment.encryptedData);
@@ -171,7 +169,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         try {
           data = await $Json.parseAsync(JSON.parse(decryptedData));
         } catch (err) {
-          this.loggingService.error({ decryptedData, instrumentId, message: 'Failed to parse decrypted data' });
+          this.loggingService.error({ instrumentId, message: 'Failed to parse decrypted data' });
           throw err;
         }
 
@@ -190,7 +188,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
           this.loggingService.log(`Created record with ID: ${record.id}`);
           createdRecordIds.push(record.id);
         } catch (err) {
-          this.loggingService.error({ data, instrumentId, message: 'Failed to create instrument record' });
+          this.loggingService.error({ instrumentId, message: 'Failed to create instrument record' });
           throw err;
         }
       }
