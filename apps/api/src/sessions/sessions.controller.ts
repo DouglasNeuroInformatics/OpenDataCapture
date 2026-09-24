@@ -17,8 +17,8 @@ export class SessionsController {
   @ApiOperation({ description: 'Create Session' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Session' })
-  create(@Body() data: CreateSessionDto): Promise<Session> {
-    return this.sessionsService.create(data);
+  create(@Body() data: CreateSessionDto, @CurrentUser('ability') ability: AppAbility): Promise<Session> {
+    return this.sessionsService.create(data, { ability });
   }
 
   @ApiOperation({ description: 'Find all sessions and usernames attached to them' })
