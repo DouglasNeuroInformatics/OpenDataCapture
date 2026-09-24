@@ -106,9 +106,17 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
     const instrument = await this.instrumentsService.findById(assignment.instrumentId);
 
+    // Creating the session enrols the subject in its group, so the group must never be the gateway's
+    // copy: that would let the gateway give another group access to the subject.
+    if ((remoteAssignment.groupId ?? null) !== assignment.groupId) {
+      this.loggingService.error(
+        `Gateway reported group '${remoteAssignment.groupId}' for assignment '${assignment.id}' in group '${assignment.groupId}'`
+      );
+    }
+
     const session = await this.sessionsService.create({
       date: remoteAssignment.completedAt,
-      groupId: remoteAssignment.groupId ?? null,
+      groupId: assignment.groupId,
       subjectData: {
         id: assignment.subjectId
       },

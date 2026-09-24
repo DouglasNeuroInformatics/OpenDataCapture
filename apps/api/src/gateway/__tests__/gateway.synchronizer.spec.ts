@@ -35,6 +35,14 @@ describe('GatewaySynchronizer', () => {
   let sessionsService: MockedInstance<SessionsService>;
   let setupService: MockedInstance<SetupService>;
 
+  const createAssignment = (id: string, groupId: null | string = null) => ({
+    encryptionKeyPair: { privateKey: 'private-key', publicKey: 'public-key' },
+    groupId,
+    id,
+    instrumentId: CURRENT_EDITION_ID,
+    subjectId: 'subject-1'
+  });
+
   const createRemoteAssignment = (id: string): RemoteAssignment =>
     ({
       completedAt: new Date(),
@@ -69,15 +77,7 @@ describe('GatewaySynchronizer', () => {
     setupService = moduleRef.get(SetupService);
 
     setupService.getState.mockResolvedValue({ isSetup: true });
-    assignmentsService.findById.mockImplementation((id: string) =>
-      Promise.resolve({
-        encryptionKeyPair: { privateKey: 'private-key', publicKey: 'public-key' },
-        groupId: null,
-        id,
-        instrumentId: CURRENT_EDITION_ID,
-        subjectId: 'subject-1'
-      })
-    );
+    assignmentsService.findById.mockImplementation((id: string) => Promise.resolve(createAssignment(id)));
     instrumentsService.findById.mockResolvedValue({
       id: CURRENT_EDITION_ID,
       internal: { edition: 1, name: 'HAPPINESS_QUESTIONNAIRE' },
@@ -135,6 +135,26 @@ describe('GatewaySynchronizer', () => {
       expect(instrumentRecordsService.create).toHaveBeenCalledTimes(2);
       expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledExactlyOnceWith('assignment-2');
       expect(assignmentsService.updateStatusById).toHaveBeenCalledExactlyOnceWith('assignment-2', 'COMPLETE');
+    });
+  });
+
+  describe('group', () => {
+    beforeEach(() => {
+      assignmentsService.findById.mockResolvedValue(createAssignment('assignment-1', 'group-stored'));
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([
+        { ...createRemoteAssignment('assignment-1'), groupId: 'group-other' }
+      ]);
+      instrumentRecordsService.create.mockResolvedValue({ id: 'record-1' });
+    });
+
+    it("should file the session under the stored assignment's group, since creating it enrols the subject there", async () => {
+      await gatewaySynchronizer.sync();
+      expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ groupId: 'group-stored' }));
+    });
+
+    it('should log an error when the gateway reports another group, since only an altered row can', async () => {
+      await gatewaySynchronizer.sync();
+      expect(loggingService.error).toHaveBeenCalledWith(expect.stringContaining('group-other'));
     });
   });
 
