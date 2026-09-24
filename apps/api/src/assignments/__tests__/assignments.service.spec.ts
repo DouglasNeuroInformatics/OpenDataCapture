@@ -70,7 +70,7 @@ describe('AssignmentsService', () => {
         MockFactory.createForModelToken(getModelToken('Subject')),
         { provide: AuditLogger, useValue: { log: vi.fn() } },
         { provide: ConfigService, useValue: { get: () => 3500, getOrThrow: () => ({ origin: 'https://x' }) } },
-        { provide: GatewayService, useValue: { createRemoteAssignments: vi.fn() } },
+        { provide: GatewayService, useValue: { createRemoteAssignment: vi.fn(), createRemoteAssignments: vi.fn() } },
         { provide: LoggingService, useValue: { error: vi.fn() } }
       ]
     }).compile();
@@ -166,6 +166,30 @@ describe('AssignmentsService', () => {
     it('should not look for conflicts when the caller has already accepted duplicates', async () => {
       await assignmentsService.bulkPreflight(request({ allowDuplicates: true }), permissiveUser());
       expect(assignmentModel.findMany).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('create', () => {
+    const data = () => ({
+      expiresAt: futureDate(),
+      groupId: GROUP_ID,
+      instrumentId: 'instrument-1',
+      subjectId: 'subject-1'
+    });
+
+    it('should never return or transmit the encryption keypair, which would hand out the private key', async () => {
+      assignmentModel.create.mockImplementation(({ data }: any) =>
+        Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } })
+      );
+      const assignment = await assignmentsService.create(data(), permissiveUser());
+
+      expect(assignment).not.toHaveProperty('encryptionKeyPair');
+      expect(gatewayService.createRemoteAssignment.mock.lastCall?.[0]).not.toHaveProperty('encryptionKeyPair');
+    });
+
+    it('should connect no group to an ungrouped assignment, since connecting a null id would throw', async () => {
+      await assignmentsService.create({ ...data(), groupId: null }, permissiveUser());
+      expect(assignmentModel.create.mock.lastCall?.[0].data.group).toBeUndefined();
     });
   });
 

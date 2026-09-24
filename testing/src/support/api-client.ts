@@ -1,6 +1,8 @@
+import type { Assignment, CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Permissions } from '@opendatacapture/schemas/core';
 import type { CreateGroupData, Group } from '@opendatacapture/schemas/group';
+import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import type { CreateSessionData, Session } from '@opendatacapture/schemas/session';
 import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
@@ -37,6 +39,15 @@ export class ApiClient {
     return { Authorization: `Bearer ${this.token}` };
   }
 
+  /** Creates a remote assignment through the single-assignment route the web app uses. */
+  async createAssignment(data: CreateAssignmentData): Promise<Assignment> {
+    return this.expectJson<Assignment>(
+      this.request.post(`${API}/assignments`, { data, headers: this.authHeaders }),
+      201,
+      'create assignment'
+    );
+  }
+
   /** Creates a group and grants it access to every available instrument, so seeded users can use them. */
   async createGroup(overrides: Partial<CreateGroupData> = {}): Promise<Group> {
     const data: CreateGroupData = { name: `Group ${randomId()}`, type: 'CLINICAL', ...overrides };
@@ -61,6 +72,12 @@ export class ApiClient {
       201,
       'create session'
     );
+  }
+
+  /** Enrols a new subject in a group the way the app does, by starting a session for it. */
+  async createSubject(groupId: string): Promise<string> {
+    const session = await this.createSession(groupId, { id: `subject_${randomId()}` });
+    return session.subjectId;
   }
 
   /** Creates a user (GROUP_MANAGER by default) and returns the login credentials for it. */
@@ -91,6 +108,16 @@ export class ApiClient {
       200,
       `find group '${id}'`
     );
+  }
+
+  /** The id of any instrument of this kind; every group from {@link createGroup} can use it. */
+  async findInstrumentId(kind: InstrumentInfo['kind']): Promise<string> {
+    const instruments = await this.getInstrumentInfo();
+    const instrument = instruments.find((info) => info.kind === kind);
+    if (!instrument) {
+      throw new Error(`Expected an instrument of kind '${kind}' to be available`);
+    }
+    return instrument.id;
   }
 
   /** The id of a seeded instrument, looked up by the internal name its source file declares. */
@@ -189,11 +216,15 @@ export class ApiClient {
   }
 
   private async getAccessibleInstrumentIds(): Promise<string[]> {
-    const instruments = await this.expectJson<{ id: string }[]>(
+    const instruments = await this.getInstrumentInfo();
+    return instruments.map((instrument) => instrument.id);
+  }
+
+  private async getInstrumentInfo(): Promise<InstrumentInfo[]> {
+    return this.expectJson<InstrumentInfo[]>(
       this.request.get(`${API}/instruments/info`, { headers: this.authHeaders }),
       200,
       'list instruments'
     );
-    return instruments.map((instrument) => instrument.id);
   }
 }
