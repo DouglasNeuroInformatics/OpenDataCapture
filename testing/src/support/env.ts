@@ -28,5 +28,8 @@ export const webPort = requiredPort('WEB_DEV_SERVER_PORT');
 // Tests run against the web origin; vite proxies `/api` through to the API server.
 export const baseURL = `http://localhost:${webPort}`;
 
+// The patient-facing gateway is its own origin; assignment links point here.
+export const gatewayURL = `http://localhost:${gatewayPort}`;
+
 // The playground is its own static site with no backend; its specs navigate here by absolute URL.
 export const playgroundURL = `http://localhost:${playgroundPort}`;

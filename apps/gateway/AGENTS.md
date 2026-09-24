@@ -118,9 +118,8 @@ hydrated tree can disagree with the SSR'd HTML until you do.
 
 ## Tests
 
-**There is no `apps/gateway/vitest.config.ts`**, so this app has no unit tests and
-`pnpm exec vitest --project gateway` does not exist. Adding a unit test means adding that config
-first — `.agents/docs/playbooks/add-vitest-project.md`.
+`pnpm exec vitest --project gateway` runs the unit tests in `src/**/__tests__/`. They cover request
+schemas only: nothing here starts the Express server, so a router's behaviour is tested end to end.
 
-The coverage that exists is `testing/src/specs/gateway-assignment.spec.ts`, which drives the real
+Most of the coverage is `testing/src/specs/gateway-assignment.spec.ts`, which drives the real
 two-origin flow through the Cap widget. See `.agents/docs/architecture/testing-strategy.md`.

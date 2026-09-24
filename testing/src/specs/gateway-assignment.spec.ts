@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test';
 
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
 import { ApiClient } from '../support/api-client';
+import { gatewayURL } from '../support/env';
 import { expect, test } from '../support/fixtures';
 
 import type { GetPageModel } from '../support/fixtures';
@@ -220,5 +221,14 @@ test.describe('gateway assignment errors', () => {
     });
     expect(response.status()).toBe(404);
     expect((await apiRequestContext.get(assignment.url)).status()).toBe(200);
+  });
+
+  // Proof of work is checked after the body is parsed, so an oversized id is refused whatever token
+  // accompanies it.
+  test('should refuse to verify an id longer than any assignment id', async ({ apiRequestContext }) => {
+    const response = await apiRequestContext.post(`${gatewayURL}/api/auth/verify`, {
+      data: { id: 'x'.repeat(10_000), token: 'unsolved' }
+    });
+    expect(response.status()).toBe(400);
   });
 });

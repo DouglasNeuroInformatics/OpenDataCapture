@@ -25,7 +25,7 @@ Nothing depends on an app. All five are leaves.
 | Workspace         | What it is                                                                                       | Build                                                  | Vitest project |
 | ----------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------ | -------------- |
 | `apps/api`        | NestJS backend on `libnest`; Fastify, MongoDB via Prisma, CASL                                   | `libnest build` → single `dist/app.js`                 | `api`          |
-| `apps/gateway`    | SSR app for patient self-administration of remote assignments; its own Prisma schema (`db:push`) | `vite build` ×2 (client + SSR) then `scripts/build.ts` | none           |
+| `apps/gateway`    | SSR app for patient self-administration of remote assignments; its own Prisma schema (`db:push`) | `vite build` ×2 (client + SSR) then `scripts/build.ts` | `gateway`      |
 | `apps/outreach`   | Astro marketing site and user docs                                                               | `astro build`                                          | none           |
 | `apps/playground` | In-browser instrument build/edit environment                                                     | `tsc && vite build`                                    | `playground`   |
 | `apps/web`        | Clinician-facing React SPA                                                                       | `tsc && vite build`                                    | `web`          |
