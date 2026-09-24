@@ -70,7 +70,14 @@ describe('AssignmentsService', () => {
         MockFactory.createForModelToken(getModelToken('Subject')),
         { provide: AuditLogger, useValue: { log: vi.fn() } },
         { provide: ConfigService, useValue: { get: () => 3500, getOrThrow: () => ({ origin: 'https://x' }) } },
-        { provide: GatewayService, useValue: { createRemoteAssignment: vi.fn(), createRemoteAssignments: vi.fn() } },
+        {
+          provide: GatewayService,
+          useValue: {
+            createRemoteAssignment: vi.fn(),
+            createRemoteAssignments: vi.fn(),
+            deleteRemoteAssignment: vi.fn()
+          }
+        },
         { provide: LoggingService, useValue: { error: vi.fn() } }
       ]
     }).compile();
@@ -262,6 +269,23 @@ describe('AssignmentsService', () => {
         'ASSIGNMENT',
         { groupId: GROUP_ID, metadata: { createdCount: '2', mode: 'BULK', requestedCount: '2' } }
       ]);
+    });
+  });
+
+  describe('updateById', () => {
+    it('should refuse an assignment the caller cannot update before deleting it on the gateway, which cannot be undone', async () => {
+      assignmentModel.exists.mockResolvedValueOnce(false);
+      await expect(
+        assignmentsService.updateById('assignment-1', { status: 'CANCELED' }, permissiveUser())
+      ).rejects.toBeInstanceOf(NotFoundException);
+      expect(gatewayService.deleteRemoteAssignment).not.toHaveBeenCalled();
+    });
+
+    it('should delete the gateway copy of an assignment the caller cancels, so its link stops working', async () => {
+      assignmentModel.exists.mockResolvedValueOnce(true);
+      assignmentModel.update.mockResolvedValueOnce({ groupId: GROUP_ID, id: 'assignment-1' });
+      await assignmentsService.updateById('assignment-1', { status: 'CANCELED' }, permissiveUser());
+      expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledExactlyOnceWith('assignment-1');
     });
   });
 });

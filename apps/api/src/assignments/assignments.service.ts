@@ -152,13 +152,14 @@ export class AssignmentsService {
   }
 
   async updateById(id: string, data: UpdateAssignmentData, currentUser: RequestUser) {
+    const where = { AND: [accessibleQuery(currentUser.ability, 'update', 'Assignment')], id };
+    if (!(await this.assignmentModel.exists(where))) {
+      throw new NotFoundException(`Failed to find assignment with ID: ${id}`);
+    }
     if (data.status === 'CANCELED') {
       await this.gatewayService.deleteRemoteAssignment(id);
     }
-    const assignment = await this.assignmentModel.update({
-      data,
-      where: { AND: [accessibleQuery(currentUser.ability, 'update', 'Assignment')], id }
-    });
+    const assignment = await this.assignmentModel.update({ data, where });
     await this.auditLogger.log('UPDATE', 'ASSIGNMENT', { groupId: assignment.groupId, userId: currentUser.id });
     return assignment;
   }

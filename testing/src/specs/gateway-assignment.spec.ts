@@ -1,3 +1,4 @@
+import type { Assignment } from '@opendatacapture/schemas/assignment';
 import type { Page } from '@playwright/test';
 
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
@@ -44,6 +45,17 @@ async function createRemoteAssignmentLink(getPageModel: GetPageModel, page: Page
   await expect(dialog).toBeHidden();
 
   return assignmentUrl;
+}
+
+/** Seeds a new group with one subject and an outstanding assignment for it, over the API. */
+async function seedAssignment(api: ApiClient): Promise<Assignment> {
+  const group = await api.createGroup();
+  return api.createAssignment({
+    expiresAt: new Date(Date.now() + 86_400_000),
+    groupId: group.id,
+    instrumentId: await api.findInstrumentId('FORM'),
+    subjectId: await api.createSubject(group.id)
+  });
 }
 
 test.describe('gateway remote assignment', () => {
@@ -188,5 +200,25 @@ test.describe('gateway assignment errors', () => {
       headers: { Authorization: `Bearer ${token}` }
     });
     expect([403, 404]).toContain(response.status());
+  });
+
+  // Cancelling deletes the gateway's copy of the assignment, which cannot be undone, so the row
+  // scoping has to be checked before that deletion rather than by the update that follows it.
+  test('should not let a manager outside the group cancel an assignment and kill its link', async ({
+    api,
+    apiRequestContext
+  }) => {
+    const assignment = await seedAssignment(api);
+
+    const outsiderGroup = await api.createGroup();
+    const { credentials } = await api.createUser({ groupIds: [outsiderGroup.id] });
+    const token = await ApiClient.login(apiRequestContext, credentials);
+
+    const response = await apiRequestContext.patch(`/api/v1/assignments/${assignment.id}`, {
+      data: { status: 'CANCELED' },
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    expect(response.status()).toBe(404);
+    expect((await apiRequestContext.get(assignment.url)).status()).toBe(200);
   });
 });
