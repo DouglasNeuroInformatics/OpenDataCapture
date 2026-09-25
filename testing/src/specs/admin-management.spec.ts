@@ -299,6 +299,28 @@ test.describe('admin management', () => {
     await expect(userPage.permissionRows.first().getByTestId('user-permission-scope')).toContainText('All Groups');
   });
 
+  test('should save a user whose new password was typed and then cleared', async ({ api, getPageModel, uniqueId }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
+    const newPassword = userPage.profileForm.getByLabel('Set new password');
+
+    // The browser fills these fields with the administrator's own saved credentials, so clearing
+    // one is the ordinary way out of that -- and used to reject the field for being empty, and its
+    // confirmation for no longer matching.
+    await expect(newPassword).toHaveAttribute('autocomplete', 'new-password');
+    await expect(userPage.profileForm.getByLabel('Confirm new password')).toHaveAttribute(
+      'autocomplete',
+      'new-password'
+    );
+
+    await newPassword.fill(`${uniqueId}-then-cleared`);
+    await newPassword.clear();
+    await userPage.saveProfile();
+    await expect(userPage.$ref.getByRole('heading', { name: 'Success' }).last()).toBeVisible();
+  });
+
   test("should clear a user's email from the user page", async ({ api, getPageModel, uniqueId }) => {
     const email = `contact-${uniqueId}@example.org`;
     const group = await api.createGroup();
