@@ -1,4 +1,65 @@
+import { ApiClient } from '../support/api-client';
 import { expect, test } from '../support/fixtures';
+
+// The identifier combobox is filled from this endpoint. It must never carry personal information,
+// and must list only the requested group's subjects, and only those the caller may read.
+test.describe('custom identifier suggestions', () => {
+  test('should list a group’s custom-id subjects but not those identified by personal information', async ({
+    api,
+    uniqueId
+  }) => {
+    const group = await api.createGroup();
+    const bareId = `bare-${uniqueId}`;
+    const customId = `custom-${uniqueId}`;
+    const personalInfoId = `personal-${uniqueId}`;
+    // The start-session form sends a custom-id subject's date of birth and sex, but no name.
+    await api.createSession(group.id, { id: bareId });
+    await api.createSession(group.id, { dateOfBirth: new Date('1990-01-01'), id: customId, sex: 'MALE' });
+    await api.createSession(group.id, {
+      dateOfBirth: new Date('1990-01-01'),
+      firstName: 'Ada',
+      id: personalInfoId,
+      lastName: 'Lovelace',
+      sex: 'FEMALE'
+    });
+
+    const ids = await api.findSubjectCustomIds(group.id);
+
+    expect(ids).toEqual(expect.arrayContaining([bareId, customId]));
+    expect(ids).not.toContain(personalInfoId);
+  });
+
+  test('should not list custom-id subjects from another group', async ({ api, uniqueId }) => {
+    const group = await api.createGroup();
+    const otherGroup = await api.createGroup();
+    const otherGroupId = `other-${uniqueId}`;
+    await api.createSession(otherGroup.id, { id: otherGroupId });
+
+    expect(await api.findSubjectCustomIds(group.id)).not.toContain(otherGroupId);
+  });
+
+  test('should list nothing to a group manager asking for a group they are not a member of', async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup();
+    const subjectId = `private-${uniqueId}`;
+    await api.createSession(group.id, { id: subjectId });
+    const { credentials } = await api.createUser({
+      basePermissionLevel: 'GROUP_MANAGER',
+      groupIds: [(await api.createGroup()).id]
+    });
+    const accessToken = await ApiClient.login(apiRequestContext, credentials);
+
+    const response = await apiRequestContext.get(`/api/v1/subjects/groups/${group.id}/custom-ids`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toStrictEqual([]);
+  });
+});
 
 test.describe('start session', () => {
   test('should display the start session form @smoke', async ({ getPageModel }) => {
