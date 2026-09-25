@@ -78,41 +78,11 @@ export class AssignmentsService {
     { expiresAt, groupId, instrumentId, subjectId }: CreateAssignmentDto,
     currentUser: RequestUser
   ): Promise<Assignment> {
-    const { privateKey, publicKey } = await HybridCrypto.generateKeyPair();
-    const id = crypto.randomUUID();
-    const assignment = await this.assignmentModel.create({
-      data: {
-        encryptionKeyPair: {
-          privateKey: Buffer.from(await HybridCrypto.serializePrivateKey(privateKey)),
-          publicKey: Buffer.from(await HybridCrypto.serializePublicKey(publicKey))
-        },
-        expiresAt,
-        group: groupId
-          ? {
-              connect: {
-                id: groupId
-              }
-            }
-          : undefined,
-        id,
-        instrument: {
-          connect: {
-            id: instrumentId
-          }
-        },
-        status: 'OUTSTANDING',
-        subject: {
-          connect: {
-            id: subjectId
-          }
-        },
-        url: `${this.assignmentBaseUrl}/assignments/${id}`
-      }
-    });
+    const { assignment, publicKey } = await this.stageAssignment({ expiresAt, groupId, instrumentId, subjectId });
     try {
       await this.gatewayService.createRemoteAssignment(assignment, publicKey);
     } catch (err) {
-      await this.assignmentModel.delete({ where: { id } });
+      await this.assignmentModel.delete({ where: { id: assignment.id } });
       throw err;
     }
     await this.auditLogger.log('CREATE', 'ASSIGNMENT', { groupId: groupId ?? null, userId: currentUser.id });
@@ -182,13 +152,14 @@ export class AssignmentsService {
   }
 
   async updateById(id: string, data: UpdateAssignmentData, currentUser: RequestUser) {
+    const where = { AND: [accessibleQuery(currentUser.ability, 'update', 'Assignment')], id };
+    if (!(await this.assignmentModel.exists(where))) {
+      throw new NotFoundException(`Failed to find assignment with ID: ${id}`);
+    }
     if (data.status === 'CANCELED') {
       await this.gatewayService.deleteRemoteAssignment(id);
     }
-    const assignment = await this.assignmentModel.update({
-      data,
-      where: { AND: [accessibleQuery(currentUser.ability, 'update', 'Assignment')], id }
-    });
+    const assignment = await this.assignmentModel.update({ data, where });
     await this.auditLogger.log('UPDATE', 'ASSIGNMENT', { groupId: assignment.groupId, userId: currentUser.id });
     return assignment;
   }
@@ -298,7 +269,7 @@ export class AssignmentsService {
     return { groupId, subjectIds, timepoints };
   }
 
-  /** Create the Mongo row and keypair for a single assignment within a batch. */
+  /** Create the Mongo row and keypair for a single assignment. */
   private async stageAssignment({
     expiresAt,
     groupId,
@@ -306,7 +277,7 @@ export class AssignmentsService {
     subjectId
   }: {
     expiresAt: Date;
-    groupId: string;
+    groupId?: null | string;
     instrumentId: string;
     subjectId: string;
   }): Promise<{ assignment: Assignment; publicKey: webcrypto.CryptoKey }> {
@@ -319,7 +290,7 @@ export class AssignmentsService {
           publicKey: Buffer.from(await HybridCrypto.serializePublicKey(publicKey))
         },
         expiresAt,
-        group: { connect: { id: groupId } },
+        group: groupId ? { connect: { id: groupId } } : undefined,
         id,
         instrument: { connect: { id: instrumentId } },
         status: 'OUTSTANDING',

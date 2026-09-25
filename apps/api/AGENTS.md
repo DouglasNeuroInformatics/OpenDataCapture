@@ -75,6 +75,11 @@ public route. This is eslint-enforced. Know what you are choosing:
 | `@RouteAccess([{ … }, { … }])`      | `.every(...)` — all must pass.                                                                |
 | `@RouteAccess(ADMIN_ONLY)`          | `manage all`. The only declaration no narrower grant or conditional rule can satisfy.         |
 
+Every declaration above except `'public'` is checked against a login token only. The reduced token
+`GET /v1/auth/create-instrument-token` mints is refused on any route without
+`@AcceptsInstrumentToken()`, whatever that token's permissions satisfy. Add it only to a route the
+playground's upload needs, and never to the minting route itself.
+
 **2. Every service query must be scoped.** Take `{ ability }: EntityOperationOptions = {}` as the
 last parameter, have the controller forward `@CurrentUser('ability')`, and put `accessibleQuery` in
 the `where`:

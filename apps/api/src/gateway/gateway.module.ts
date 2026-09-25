@@ -9,6 +9,7 @@ import { SessionsModule } from '@/sessions/sessions.module';
 import { SetupModule } from '@/setup/setup.module';
 
 import { GatewayController } from './gateway.controller';
+import { createGatewayHttpOptions } from './gateway.http';
 import { GatewayService } from './gateway.service';
 import { GatewaySynchronizer } from './gateway.synchronizer';
 
@@ -19,27 +20,7 @@ import { GatewaySynchronizer } from './gateway.synchronizer';
     forwardRef(() => AssignmentsModule),
     HttpModule.registerAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        let baseURL: string;
-        if (configService.get('NODE_ENV') === 'production') {
-          const internalNetworkUrl = configService.get('GATEWAY_INTERNAL_NETWORK_URL');
-          const siteAddress = configService.getOrThrow('GATEWAY_SITE_ADDRESS');
-          if (siteAddress.hostname === 'localhost' && internalNetworkUrl) {
-            baseURL = internalNetworkUrl.origin;
-          } else {
-            baseURL = siteAddress.origin;
-          }
-        } else {
-          const gatewayPort = configService.get('GATEWAY_DEV_SERVER_PORT');
-          baseURL = `http://localhost:${gatewayPort}`;
-        }
-        return {
-          baseURL,
-          headers: {
-            Authorization: `Bearer ${configService.get('GATEWAY_API_KEY')}`
-          }
-        };
-      }
+      useFactory: createGatewayHttpOptions
     }),
     InstrumentRecordsModule,
     InstrumentsModule,

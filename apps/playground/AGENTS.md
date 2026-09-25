@@ -89,12 +89,18 @@ against the schemas in `src/preview/protocol.ts`. The frame is served from a **d
 than the editor, so instrument code, including code that arrives in a share link, cannot read the
 editor's IndexedDB, where the store keeps the API token, or anything else on the editor's origin.
 
-`resolvePreviewOrigin` decides that origin. A hosted build names it with `PLAYGROUND_PREVIEW_ORIGIN`
-(a second hostname serving the same `dist/`), baked in as the `__PREVIEW_ORIGIN__` define; a dev
-server uses the other loopback name — `localhost` pairs with `127.0.0.1` — which is why
-`vite.config.ts` binds `server.host` to `127.0.0.1`, so both names answer. **When the only origin
-available is the editor's own, the viewer refuses to render** (`PreviewOriginError`) rather than
-fall back to same-origin evaluation: a frame on the editor's origin is no isolation at all.
+`resolvePreviewOrigin` decides that origin. A hosted playground names it with
+`PLAYGROUND_PREVIEW_ORIGIN` (a second hostname serving the same `dist/`), read at runtime rather than
+at build time, because one published image serves every deployment: the Caddyfile answers
+`/config.json` from the container's environment, `vite.config.ts`'s `playgroundConfig` plugin does
+the same for a dev server, and `Viewer.tsx` fetches it once and suspends until it arrives
+(`src/preview/config.ts`). A static host with neither must serve that file itself, or the viewer
+throws. `docs/en/2-tutorials/2.4-playground-deployment.md` is the operator's side of this. With the
+variable empty, a dev server uses the other loopback name — `localhost` pairs with `127.0.0.1` —
+which is why `vite.config.ts` binds `server.host` to `127.0.0.1`, so both names answer. **When the
+only origin available is the editor's own, the viewer refuses to render** (`PreviewOriginError`)
+rather than fall back to same-origin evaluation: a frame on the editor's origin is no isolation at
+all.
 
 The iframe keeps `sandbox` **with** `allow-same-origin`, and that is safe only because the origin
 differs. It is what lets the preview use its own storage, service workers and nested same-origin
@@ -121,7 +127,10 @@ The token `/v1/auth/create-instrument-token` mints is scoped to `manage Instrume
 `POST /v1/instruments` requires — the two actions must stay in step, and this dialog is that route's
 only caller, so tightening it silently breaks upload here and nowhere else (#1392). It is scoped no
 narrower because a bundle is evaluated server-side: whoever may create an instrument can already run
-code on the API. `testing/src/specs/authorization.spec.ts` pins the contract.
+code on the API. The API accepts that token only on `POST /v1/instruments` (the route carries
+`@AcceptsInstrumentToken()`), so it cannot mint its own successor or reach anything else; a new call
+here made with it will be refused unless its route is marked the same way.
+`testing/src/specs/authorization.spec.ts` pins the contract.
 
 Upload is gated on monaco's own diagnostics: `useEditorErrorSync` writes every error-severity marker
 owned by the `typescript` or `javascript` language into `editorErrors`, and `UploadBundleDialog`
@@ -143,19 +152,19 @@ directly means pasting a second share link into an open tab does nothing. Its `$
 `/* eslint-disable */`. Do not refactor it; treat it as third-party. `.vscode/Scratch/` is unrelated
 junk.
 
-`__GITHUB_REPO_URL__` and `__PREVIEW_ORIGIN__` are the build-time defines, declared in
-`src/vite-env.d.ts` and supplied from `process.env.GITHUB_REPO_URL` and
-`process.env.PLAYGROUND_PREVIEW_ORIGIN` in `vite.config.ts`; both must be listed under the `build`
-task's `env` in `turbo.json` or turbo's strict env mode hides them from the build.
+`__APP_VERSION__` and `__GITHUB_REPO_URL__` are the build-time defines, declared in
+`src/vite-env.d.ts` and supplied in `vite.config.ts`; `GITHUB_REPO_URL` must be listed under the
+`build` task's `env` in `turbo.json` or turbo's strict env mode hides it from the build. Anything
+that differs between deployments belongs in `/config.json` instead.
 
 ## Tests
 
 `pnpm exec vitest --project playground`, from the repo root. The project runs in node and covers
 only what is pure — `src/preview/__tests__/protocol.test.ts` pins the message schemas, error
-serialization and `resolvePreviewOrigin`. Anything that touches esbuild-wasm, Monaco workers or
-`/runtime/v1` has no test environment here; the frame itself, the origin split and the message
-bridge are exercised for real by `testing/src/specs/playground.spec.ts`, which Playwright runs
-against this app's dev server.
+serialization and `resolvePreviewOrigin`, and `config.test.ts` the `/config.json` contract.
+Anything that touches esbuild-wasm, Monaco workers or `/runtime/v1` has no test environment here;
+the frame itself, the origin split, the runtime config and the message bridge are exercised for real
+by `testing/src/specs/playground.spec.ts`, which Playwright runs against this app's dev server.
 
 Storybook collects `*.stories.tsx` under `src/components/` centrally through
 `storybook/config/main.ts` under the `Playground Components` prefix. See

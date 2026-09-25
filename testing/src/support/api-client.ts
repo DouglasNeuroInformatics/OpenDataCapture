@@ -1,6 +1,11 @@
+import type { Assignment, CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Permissions } from '@opendatacapture/schemas/core';
 import type { CreateGroupData, Group } from '@opendatacapture/schemas/group';
+import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
+import type { CreateSessionData, Session } from '@opendatacapture/schemas/session';
+import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
 import type { CreateUserData, UpdateUserData, User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
@@ -8,6 +13,8 @@ import { E2E_MAIL_CONFIG, SEEDED_USER_PASSWORD } from './constants';
 import { randomId } from './unique';
 
 const API = '/api/v1';
+
+type UploadRecord = UploadInstrumentRecordsData['records'][number];
 
 /** Typed helper for seeding preconditions (groups, users) and authenticating over the API. */
 export class ApiClient {
@@ -32,6 +39,15 @@ export class ApiClient {
     return { Authorization: `Bearer ${this.token}` };
   }
 
+  /** Creates a remote assignment through the single-assignment route the web app uses. */
+  async createAssignment(data: CreateAssignmentData): Promise<Assignment> {
+    return this.expectJson<Assignment>(
+      this.request.post(`${API}/assignments`, { data, headers: this.authHeaders }),
+      201,
+      'create assignment'
+    );
+  }
+
   /** Creates a group and grants it access to every available instrument, so seeded users can use them. */
   async createGroup(overrides: Partial<CreateGroupData> = {}): Promise<Group> {
     const data: CreateGroupData = { name: `Group ${randomId()}`, type: 'CLINICAL', ...overrides };
@@ -46,6 +62,22 @@ export class ApiClient {
       'grant instrument access'
     );
     return group;
+  }
+
+  /** Creates a session, and with it the subject it names. */
+  async createSession(groupId: null | string, subjectData: CreateSubjectData): Promise<Session> {
+    const data: CreateSessionData = { date: new Date(), groupId, subjectData, type: 'IN_PERSON' };
+    return this.expectJson<Session>(
+      this.request.post(`${API}/sessions`, { data, headers: this.authHeaders }),
+      201,
+      'create session'
+    );
+  }
+
+  /** Enrols a new subject in a group the way the app does, by starting a session for it. */
+  async createSubject(groupId: string): Promise<string> {
+    const session = await this.createSession(groupId, { id: `subject_${randomId()}` });
+    return session.subjectId;
   }
 
   /** Creates a user (GROUP_MANAGER by default) and returns the login credentials for it. */
@@ -76,6 +108,30 @@ export class ApiClient {
       200,
       `find group '${id}'`
     );
+  }
+
+  /** The id of any instrument of this kind; every group from {@link createGroup} can use it. */
+  async findInstrumentId(kind: InstrumentInfo['kind']): Promise<string> {
+    const instruments = await this.getInstrumentInfo();
+    const instrument = instruments.find((info) => info.kind === kind);
+    if (!instrument) {
+      throw new Error(`Expected an instrument of kind '${kind}' to be available`);
+    }
+    return instrument.id;
+  }
+
+  /** The id of a seeded instrument, looked up by the internal name its source file declares. */
+  async findInstrumentIdByName(name: string): Promise<string> {
+    const instruments = await this.expectJson<{ id: string; internal?: { name: string } }[]>(
+      this.request.get(`${API}/instruments/info`, { headers: this.authHeaders }),
+      200,
+      'list instruments'
+    );
+    const instrument = instruments.find((candidate) => candidate.internal?.name === name);
+    if (!instrument) {
+      throw new Error(`No instrument named '${name}' among ${instruments.length} returned`);
+    }
+    return instrument.id;
   }
 
   /** Reads a user back as admin, to check what a write actually stored. */
@@ -123,6 +179,23 @@ export class ApiClient {
     return (await response.json()) as User;
   }
 
+  /**
+   * Bulk-creates one record per entry, and with them the subjects and sessions they name. Returns
+   * the records the api reports created, which the upload contract scopes to this request alone.
+   */
+  async uploadRecords(
+    groupId: string,
+    instrumentId: string,
+    records: UploadRecord[]
+  ): Promise<{ subjectId: string }[]> {
+    const data: UploadInstrumentRecordsData = { groupId, instrumentId, records };
+    return this.expectJson<{ subjectId: string }[]>(
+      this.request.post(`${API}/instrument-records/upload`, { data, headers: this.authHeaders }),
+      201,
+      'upload instrument records'
+    );
+  }
+
   private async expectJson<T>(
     pending: ReturnType<APIRequestContext['post']>,
     status: number,
@@ -143,11 +216,15 @@ export class ApiClient {
   }
 
   private async getAccessibleInstrumentIds(): Promise<string[]> {
-    const instruments = await this.expectJson<{ id: string }[]>(
+    const instruments = await this.getInstrumentInfo();
+    return instruments.map((instrument) => instrument.id);
+  }
+
+  private async getInstrumentInfo(): Promise<InstrumentInfo[]> {
+    return this.expectJson<InstrumentInfo[]>(
       this.request.get(`${API}/instruments/info`, { headers: this.authHeaders }),
       200,
       'list instruments'
     );
-    return instruments.map((instrument) => instrument.id);
   }
 }

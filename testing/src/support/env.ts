@@ -8,7 +8,7 @@ function required(name: string): string {
   return value;
 }
 
-function requiredPort(name: string): number {
+function requiredNumber(name: string): number {
   const value = parseNumber(process.env[name]);
   if (Number.isNaN(value)) {
     throw new Error(`Expected ${name} to be a number, got ${process.env[name]}`);
@@ -20,13 +20,19 @@ function requiredPort(name: string): number {
 // value differs from the `.env.template` one CI generates, so a literal here only passes locally.
 export const contactEmail = required('CONTACT_EMAIL');
 
-export const apiPort = requiredPort('API_DEV_SERVER_PORT');
-export const gatewayPort = requiredPort('GATEWAY_DEV_SERVER_PORT');
-export const playgroundPort = requiredPort('PLAYGROUND_DEV_SERVER_PORT');
-export const webPort = requiredPort('WEB_DEV_SERVER_PORT');
+export const apiPort = requiredNumber('API_DEV_SERVER_PORT');
+export const gatewayPort = requiredNumber('GATEWAY_DEV_SERVER_PORT');
+export const playgroundPort = requiredNumber('PLAYGROUND_DEV_SERVER_PORT');
+export const webPort = requiredNumber('WEB_DEV_SERVER_PORT');
+
+/** How often, in milliseconds, the API pulls completed assignments from the gateway. */
+export const gatewayRefreshInterval = requiredNumber('GATEWAY_REFRESH_INTERVAL');
 
 // Tests run against the web origin; vite proxies `/api` through to the API server.
 export const baseURL = `http://localhost:${webPort}`;
+
+// The patient-facing gateway is its own origin; assignment links point here.
+export const gatewayURL = `http://localhost:${gatewayPort}`;
 
 // The playground is its own static site with no backend; its specs navigate here by absolute URL.
 export const playgroundURL = `http://localhost:${playgroundPort}`;

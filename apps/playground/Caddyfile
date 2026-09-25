@@ -1,4 +1,11 @@
 :80 {
+	# Deployment settings are read from the container's environment when Caddy starts, so one
+	# published image serves any host (see src/preview/config.ts).
+	handle /config.json {
+		header Content-Type application/json
+		header Cache-Control no-store
+		respond `{"previewOrigin":"{$PLAYGROUND_PREVIEW_ORIGIN}"}`
+	}
 	root * /srv
 	encode gzip zstd
 	try_files {path} /index.html

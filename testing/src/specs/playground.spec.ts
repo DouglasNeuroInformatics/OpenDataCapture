@@ -57,6 +57,19 @@ test.describe('playground', () => {
     await expect(playground.preview.getByRole('button', { name: 'Begin' })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
   });
 
+  test('should read the preview origin from the server at load, and refuse one equal to the editor', async ({
+    page
+  }) => {
+    await page.route('**/config.json', (route) => route.fulfill({ json: { previewOrigin: playgroundURL } }));
+    const playground = new PlaygroundPage(page);
+    await playground.goto();
+
+    await expect(page.getByRole('heading', { name: 'Preview Unavailable' })).toBeVisible({
+      timeout: PREVIEW_TIMEOUT
+    });
+    await expect(playground.previewFrame).toHaveCount(0);
+  });
+
   test("should run a share link's code without letting it reach the editor page", async ({ page, uniqueId }) => {
     const title = `Probe ${uniqueId}`;
     const playground = new PlaygroundPage(page);

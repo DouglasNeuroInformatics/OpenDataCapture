@@ -5,6 +5,9 @@ import runtime from '@opendatacapture/vite-plugin-runtime';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
+import type { Plugin } from 'vite';
+
+import type { PlaygroundConfig } from './src/preview/config';
 
 // Read straight from the monorepo root rather than through `@opendatacapture/release-info`: that
 // package pulls in `@opendatacapture/schemas`, which ships raw TypeScript, and loading it here would
@@ -12,6 +15,18 @@ import { defineConfig } from 'vite';
 const { version } = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, '../../package.json'), 'utf-8')) as {
   version: string;
 };
+
+/** Serves `/config.json` as the Caddyfile does in the published image, so both read the same variable. */
+const playgroundConfig = (): Plugin => ({
+  configureServer(server) {
+    server.middlewares.use('/config.json', (_request, response) => {
+      const config: PlaygroundConfig = { previewOrigin: process.env.PLAYGROUND_PREVIEW_ORIGIN ?? '' };
+      response.setHeader('Content-Type', 'application/json');
+      response.end(JSON.stringify(config));
+    });
+  },
+  name: 'playground-config'
+});
 
 export default defineConfig(({ mode }) => ({
   build: {
@@ -29,8 +44,7 @@ export default defineConfig(({ mode }) => ({
   },
   define: {
     __APP_VERSION__: JSON.stringify(version),
-    __GITHUB_REPO_URL__: `'${process.env.GITHUB_REPO_URL ?? '#'}'`,
-    __PREVIEW_ORIGIN__: JSON.stringify(process.env.PLAYGROUND_PREVIEW_ORIGIN ?? '')
+    __GITHUB_REPO_URL__: `'${process.env.GITHUB_REPO_URL ?? '#'}'`
   },
   optimizeDeps: {
     esbuildOptions: {
@@ -40,6 +54,7 @@ export default defineConfig(({ mode }) => ({
     include: ['react/*', 'react-dom/*']
   },
   plugins: [
+    playgroundConfig(),
     react(),
     runtime({
       disabled: mode === 'test',

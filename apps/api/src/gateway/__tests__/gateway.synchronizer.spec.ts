@@ -32,8 +32,17 @@ describe('GatewaySynchronizer', () => {
   let gatewayService: MockedInstance<GatewayService>;
   let instrumentsService: MockedInstance<InstrumentsService>;
   let instrumentRecordsService: MockedInstance<InstrumentRecordsService>;
+  let loggingService: MockedInstance<LoggingService>;
   let sessionsService: MockedInstance<SessionsService>;
   let setupService: MockedInstance<SetupService>;
+
+  const createAssignment = (id: string, groupId: null | string = null) => ({
+    encryptionKeyPair: { privateKey: 'private-key', publicKey: 'public-key' },
+    groupId,
+    id,
+    instrumentId: CURRENT_EDITION_ID,
+    subjectId: 'subject-1'
+  });
 
   const createRemoteAssignment = (id: string): RemoteAssignment =>
     ({
@@ -64,19 +73,12 @@ describe('GatewaySynchronizer', () => {
     gatewayService = moduleRef.get(GatewayService);
     instrumentsService = moduleRef.get(InstrumentsService);
     instrumentRecordsService = moduleRef.get(InstrumentRecordsService);
+    loggingService = moduleRef.get(LoggingService);
     sessionsService = moduleRef.get(SessionsService);
     setupService = moduleRef.get(SetupService);
 
     setupService.getState.mockResolvedValue({ isSetup: true });
-    assignmentsService.findById.mockImplementation((id: string) =>
-      Promise.resolve({
-        encryptionKeyPair: { privateKey: 'private-key', publicKey: 'public-key' },
-        groupId: null,
-        id,
-        instrumentId: CURRENT_EDITION_ID,
-        subjectId: 'subject-1'
-      })
-    );
+    assignmentsService.findById.mockImplementation((id: string) => Promise.resolve(createAssignment(id)));
     instrumentsService.findById.mockResolvedValue({
       id: CURRENT_EDITION_ID,
       internal: { edition: 1, name: 'HAPPINESS_QUESTIONNAIRE' },
@@ -137,12 +139,90 @@ describe('GatewaySynchronizer', () => {
     });
   });
 
+  describe('malformed submission', () => {
+    it('should create no session for a submission shaped for another kind of instrument, since nothing would delete it', async () => {
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([
+        { ...createRemoteAssignment('assignment-1'), encryptedData: '$ciphertext', symmetricKey: '$key' }
+      ]);
+      await gatewaySynchronizer.sync();
+      expect(sessionsService.create).not.toHaveBeenCalled();
+    });
+
+    it('should create no session for a series submission with more items than the series has', async () => {
+      instrumentsService.findById.mockResolvedValue({
+        content: [{ edition: 1, name: 'ITEM_A' }],
+        id: CURRENT_EDITION_ID,
+        kind: 'SERIES'
+      });
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([
+        { ...createRemoteAssignment('assignment-1'), encryptedData: '$first$second', symmetricKey: '$key1$key2' }
+      ]);
+      await gatewaySynchronizer.sync();
+      expect(sessionsService.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('group', () => {
+    beforeEach(() => {
+      assignmentsService.findById.mockResolvedValue(createAssignment('assignment-1', 'group-stored'));
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([
+        { ...createRemoteAssignment('assignment-1'), groupId: 'group-other' }
+      ]);
+      instrumentRecordsService.create.mockResolvedValue({ id: 'record-1' });
+    });
+
+    it("should file the session under the stored assignment's group, since creating it enrols the subject there", async () => {
+      await gatewaySynchronizer.sync();
+      expect(sessionsService.create).toHaveBeenCalledWith(expect.objectContaining({ groupId: 'group-stored' }));
+    });
+
+    it('should log an error when the gateway reports another group, since only an altered row can', async () => {
+      await gatewaySynchronizer.sync();
+      expect(loggingService.error).toHaveBeenCalledWith(expect.stringContaining('group-other'));
+    });
+  });
+
+  describe('logging', () => {
+    const loggedErrors = () => JSON.stringify(loggingService.error.mock.calls);
+
+    it('should not log a submission that fails validation, since a process log has none of the access control a record has', async () => {
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([createRemoteAssignment('assignment-1')]);
+      vi.mocked(HybridCrypto).decrypt.mockResolvedValue(JSON.stringify({ answer: 'PATIENT-ANSWER' }));
+      instrumentRecordsService.create.mockRejectedValue(new UnprocessableEntityException('Failed validation'));
+
+      await gatewaySynchronizer.sync();
+
+      expect(loggingService.error).toHaveBeenCalled();
+      expect(loggedErrors()).not.toContain('PATIENT-ANSWER');
+    });
+
+    it('should not log decrypted text that is not valid JSON', async () => {
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([createRemoteAssignment('assignment-1')]);
+      vi.mocked(HybridCrypto).decrypt.mockResolvedValue('{"answer":"PATIENT-ANSWER"');
+
+      await gatewaySynchronizer.sync();
+
+      expect(loggingService.error).toHaveBeenCalled();
+      expect(loggedErrors()).not.toContain('PATIENT-ANSWER');
+    });
+
+    it('should not log the stored ciphertext and key of a malformed assignment, only its id', async () => {
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([
+        { ...createRemoteAssignment('assignment-1'), encryptedData: '$ciphertext', symmetricKey: '$encapsulated-key' }
+      ]);
+
+      await gatewaySynchronizer.sync();
+
+      expect(loggedErrors()).toContain('assignment-1');
+      expect(loggedErrors()).not.toContain('encapsulated-key');
+    });
+  });
+
   describe('synchronization loop', () => {
     const REFRESH_INTERVAL = 100;
     const SYNC_DURATION = 500;
 
     let concurrentSyncs: number;
-    let loggingService: MockedInstance<LoggingService>;
     let maxConcurrentSyncs: number;
     let sync: MockInstance<GatewaySynchronizer['sync']>;
 

@@ -23,7 +23,9 @@ is `.agents/docs/playbooks/add-e2e-test.md`; the tier-by-tier picture is
   testid over there in the same change. Roles and labels are used only where no testid exists.
 - **One database, shared by every worker.** `setup` seeds it once through the UI and `teardown`
   drops it; `fullyParallel` is on. Any data a test creates must be uniquely named — use the
-  `uniqueId` fixture (`Subject${uniqueId}`), never a fixed string.
+  `uniqueId` fixture (`Subject${uniqueId}`), never a fixed string. Instance-wide settings cannot be
+  uniquely named, so a test that writes one and reads it back must not be `@smoke`: outside CI
+  (`workers: 1` there) its firefox copy runs alongside the chromium one and overwrites its value.
 - **`getPageModel` asserts it landed on the route it asked for** (`RootPage.goto` does
   `expect(page).toHaveURL(url)`). When the expected outcome _is_ a redirect, use `authenticateAs`
   plus a raw `page.goto` instead — see the standard-user cases in `src/specs/authorization.spec.ts`.
