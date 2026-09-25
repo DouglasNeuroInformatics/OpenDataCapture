@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import {
   Badge,
   Button,
@@ -34,14 +35,30 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
+import { buildSeriesAvailability } from '@/utils/series-availability';
+import type { SeriesAvailability } from '@/utils/series-availability';
 
 type InstrumentSource = { kind: 'manual' } | { kind: 'repo'; name: string };
+
+/**
+ * The row's trailing columns, as one set of measurements: an ISO date is a fixed width, the trash is
+ * hung in padding of its own width plus the column gap, and the create-series button spans the date
+ * and the eye. Written once because the four places that use them only line up while they agree.
+ */
+const DATE_COLUMN_WIDTH = '5.5rem';
+const COLUMN_GAP = '0.75rem';
+const ACTION_WIDTH = '1.5rem';
+const ACTION_GUTTER = `calc(${ACTION_WIDTH} + ${COLUMN_GAP})`;
 
 /** Passed to the renderer as a localizable value; the shared component resolves it to the active language. */
 const PREVIEW_SUBMIT_LABEL = { en: 'Preview Submit', fr: 'Soumettre l’aperçu' };
 
 type InstrumentItem = {
   authors?: null | string[];
+  // Null for a scalar instrument: only a series is ever owned by a single group.
+  availability: null | SeriesAvailability;
+  // When the instrument was stored: uploaded, imported from a repository, or built here as a series.
+  createdAt: Date | null;
   description?: string;
   id: string;
   // The scalar instrument identity (name + edition); null for series instruments, which have no edition.
@@ -149,11 +166,18 @@ const InstrumentSection = ({
           {t({ en: 'No instruments available.', fr: 'Aucun instrument disponible.' })}
         </p>
       ) : (
-        <div className="space-y-1">
+        // The tracks live on the section, not the row: a row that is its own grid sizes its columns
+        // from its own content and lines up with nothing.
+        <div className="grid grid-cols-[auto_1fr_auto_auto_auto] gap-y-1">
           {filtered.map((item) => (
             <div
-              className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 rounded-md px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800"
+              // The hover background is set explicitly, so pin the text against it rather than leaving it
+              // to whatever `--foreground` the surface resolves to.
+              // The trash is hung in the right padding, so the eye stops short of the section edge and
+              // the trash lands on it.
+              className="hover:text-foreground relative col-span-5 grid grid-cols-subgrid items-center gap-x-3 rounded-md py-1.5 pl-2 hover:bg-slate-50 dark:hover:bg-slate-800"
               key={item.id}
+              style={{ paddingRight: ACTION_GUTTER }}
             >
               <Checkbox
                 checked={selectedIds.has(item.id)}
@@ -170,35 +194,50 @@ const InstrumentSection = ({
               >
                 {item.title}
               </button>
-              <Badge className="shrink-0" variant={item.source.kind === 'repo' ? 'secondary' : 'outline'}>
-                {item.source.kind === 'repo' ? item.source.name : t({ en: 'No repo', fr: 'Aucun dépôt' })}
-              </Badge>
-              <div className="flex shrink-0 items-center gap-1">
+              {/* Repo names vary in length, so only their right edge can form a column. */}
+              <div className="flex justify-end">
+                <Badge variant={item.source.kind === 'repo' ? 'secondary' : 'outline'}>
+                  {item.source.kind === 'repo' ? item.source.name : t({ en: 'No repo', fr: 'Aucun dépôt' })}
+                </Badge>
+              </div>
+              {/* Fixed rather than content width, so a section whose rows have no date still reserves
+                  the column and its repo tags stay on the same line as every other section's. */}
+              <div className="flex justify-end" style={{ width: DATE_COLUMN_WIDTH }}>
+                {item.createdAt && (
+                  <Badge data-testid={`instrument-created-at-${item.title}`} variant="outline">
+                    {toBasicISOString(item.createdAt)}
+                  </Badge>
+                )}
+              </div>
+              {/* Lucide's eye leaves its iris `circle` unfilled; `fill-current` fills it with whatever
+                  colour the hover rule above has already set. */}
+              <button
+                aria-label={t({ en: 'Preview instrument', fr: "Aperçu de l'instrument" })}
+                className="text-muted-foreground hover:text-foreground p-1 transition-colors hover:[&_circle]:fill-current"
+                data-testid={`instrument-preview-${item.title}`}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPreview(item);
+                }}
+              >
+                <EyeIcon className="h-4 w-4" />
+              </button>
+              {/* Not a sixth column: one would collapse on rows without a delete and take the eye's
+                  position with it. */}
+              {onDelete && !readOnly && item.isDeletable && (
                 <button
-                  aria-label={t({ en: 'Preview instrument', fr: "Aperçu de l'instrument" })}
-                  className="text-muted-foreground hover:text-foreground p-1 transition-colors"
+                  aria-label={t({ en: 'Delete instrument', fr: "Supprimer l'instrument" })}
+                  className="text-muted-foreground hover:text-destructive absolute right-0 top-1/2 -translate-y-1/2 p-1 transition-colors"
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onPreview(item);
+                    onDelete(item);
                   }}
                 >
-                  <EyeIcon className="h-4 w-4" />
+                  <TrashIcon className="h-4 w-4" />
                 </button>
-                {onDelete && !readOnly && item.isDeletable && (
-                  <button
-                    aria-label={t({ en: 'Delete instrument', fr: "Supprimer l'instrument" })}
-                    className="text-muted-foreground hover:text-destructive p-1 transition-colors"
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(item);
-                    }}
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
+              )}
             </div>
           ))}
         </div>
@@ -273,6 +312,12 @@ const InstrumentPreviewDialog = ({
                 <span className="font-medium">{t({ en: 'Kind', fr: 'Type' })}: </span>
                 <span className="text-muted-foreground">{item.kind}</span>
               </div>
+              {item.description && (
+                <div>
+                  <span className="font-medium">{t({ en: 'Description', fr: 'Description' })}: </span>
+                  <span className="text-muted-foreground">{item.description}</span>
+                </div>
+              )}
               {item.kind === 'SERIES' && (
                 <div>
                   <span className="font-medium">
@@ -300,12 +345,6 @@ const InstrumentPreviewDialog = ({
                   <span className="text-muted-foreground">{item.authors.join(', ')}</span>
                 </div>
               )}
-              {item.description && (
-                <div>
-                  <span className="font-medium">{t({ en: 'Description', fr: 'Description' })}: </span>
-                  <span className="text-muted-foreground">{item.description}</span>
-                </div>
-              )}
               {item.internal && (
                 <div>
                   <span className="font-medium">{t({ en: 'Edition', fr: 'Édition' })}: </span>
@@ -315,9 +354,30 @@ const InstrumentPreviewDialog = ({
               <div>
                 <span className="font-medium">{t({ en: 'Source', fr: 'Source' })}: </span>
                 <span className="text-muted-foreground">
-                  {item.source.kind === 'repo' ? item.source.name : t({ en: 'No repo', fr: 'Aucun dépôt' })}
+                  {item.source.kind === 'repo'
+                    ? item.source.name
+                    : t({
+                        en: 'No repo; it was manually added to the platform',
+                        fr: 'Aucun dépôt ; ajouté manuellement à la plateforme'
+                      })}
                 </span>
               </div>
+              {item.createdAt && (
+                <div data-testid="instrument-created-at">
+                  <span className="font-medium">{t({ en: 'Added', fr: 'Ajouté le' })}: </span>
+                  <span className="text-muted-foreground">{toBasicISOString(item.createdAt)}</span>
+                </div>
+              )}
+              {item.availability && (
+                <div data-testid="instrument-availability">
+                  <span className="font-medium">{t({ en: 'Available to', fr: 'Disponible pour' })}: </span>
+                  <span className="text-muted-foreground">
+                    {item.availability.kind === 'all'
+                      ? t({ en: 'All groups', fr: 'Tous les groupes' })
+                      : (item.availability.name ?? t({ en: 'Another group', fr: 'Un autre groupe' }))}
+                  </span>
+                </div>
+              )}
             </div>
             <div className="mt-3 flex shrink-0 justify-center border-t border-slate-200 pt-3 dark:border-slate-800">
               <Button onClick={() => setShowForm(true)}>{t({ en: 'Preview Form', fr: 'Aperçu du formulaire' })}</Button>
@@ -345,6 +405,7 @@ const CreateSeriesInstrumentDialog = ({
   const { resolvedLanguage, t } = useTranslation();
   const createMutation = useCreateSeriesInstrumentMutation();
   const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [instructions, setInstructions] = useState('');
   const [search, setSearch] = useState('');
   // Ordered list of selected instrument ids — order determines the sequence of the series.
@@ -383,7 +444,9 @@ const CreateSeriesInstrumentDialog = ({
   // plain (unilingual) strings tagged with that language — the same shape any instrument would use.
   const buildPayload = (items: ScalarInstrumentInternal[]): $CreateSeriesInstrumentData => ({
     clientDetails: instructions.trim() ? { instructions: [instructions.trim()] } : undefined,
-    details: { title: title.trim() },
+    // An instrument's details require a description, and the server falls back to the title when none
+    // is given — so omitting the key leaves the series describing itself by name.
+    details: { ...(description.trim() ? { description: description.trim() } : {}), title: title.trim() },
     groupId,
     items,
     language: toInstrumentAuthoringLanguage(resolvedLanguage)
@@ -465,6 +528,21 @@ const CreateSeriesInstrumentDialog = ({
               )}
             </div>
             <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium" htmlFor="series-description">
+                {t({ en: 'Description', fr: 'Description' })}
+              </label>
+              <TextArea
+                id="series-description"
+                placeholder={t({
+                  en: 'Optional summary of the series, shown wherever it is listed.',
+                  fr: 'Résumé facultatif de la série, affiché partout où elle est listée.'
+                })}
+                rows={2}
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
               <label className="text-sm font-medium" htmlFor="series-instructions">
                 {t({ en: 'Instructions', fr: 'Instructions' })}
               </label>
@@ -503,7 +581,7 @@ const CreateSeriesInstrumentDialog = ({
                     const order = selectedIds.indexOf(form.id);
                     return (
                       <label
-                        className="grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-3 rounded-md px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800"
+                        className="hover:text-foreground grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-3 rounded-md px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800"
                         key={form.id}
                       >
                         <Checkbox checked={order !== -1} onCheckedChange={() => toggle(form.id)} />
@@ -701,10 +779,20 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         onPreview={setPreviewItem}
         onToggle={toggle}
       />
-      <div className="mb-2 flex items-center justify-between">
+      {/* The same right padding the rows carry, so the button ends on the eye's line rather than the
+          trash's. */}
+      <div className="mb-2 flex items-center justify-between" style={{ paddingRight: ACTION_GUTTER }}>
         <h3 className="text-sm font-semibold">{t('group.manage.series')}</h3>
         {!readOnly && (
-          <Button size="sm" type="button" variant="primary" onClick={() => setShowCreateSeries(true)}>
+          // The date column, the gap after it and the eye: the button spans exactly the two columns it
+          // sits above. Written from the same values those columns use, so the three stay in step.
+          <Button
+            size="sm"
+            style={{ width: `calc(${DATE_COLUMN_WIDTH} + ${COLUMN_GAP} + ${ACTION_WIDTH})` }}
+            type="button"
+            variant="primary"
+            onClick={() => setShowCreateSeries(true)}
+          >
             {t({ en: 'Create series', fr: 'Créer une série' })}
           </Button>
         )}
@@ -925,12 +1013,15 @@ const RouteComponent = () => {
       const source: InstrumentSource = repoId
         ? { kind: 'repo', name: instrument.sourceRepo?.name ?? t({ en: 'Unknown repository', fr: 'Dépôt inconnu' }) }
         : { kind: 'manual' };
+      const seriesGroupId = instrument.kind === 'SERIES' ? (instrument.seriesGroupId ?? null) : null;
       const item: InstrumentItem = {
         authors: instrument.details.authors,
+        availability: buildSeriesAvailability({ currentGroup, instrumentKind: instrument.kind, seriesGroupId }),
+        createdAt: instrument.createdAt ?? null,
         description: instrument.details.description,
         id: instrument.id,
         internal: instrument.kind === 'SERIES' ? null : instrument.internal,
-        isDeletable: instrument.kind === 'SERIES' && instrument.seriesGroupId === currentGroup?.id,
+        isDeletable: instrument.kind === 'SERIES' && seriesGroupId === currentGroup?.id,
         kind: instrument.kind,
         seriesItems: instrument.kind === 'SERIES' ? instrument.seriesItems : undefined,
         source,
@@ -978,6 +1069,7 @@ const RouteComponent = () => {
     accessibleInstrumentIds,
     availableInstruments,
     currentGroup?.id,
+    currentGroup?.name,
     defaultIdentificationMethod,
     instrumentRepoIds,
     resolvedLanguage,
