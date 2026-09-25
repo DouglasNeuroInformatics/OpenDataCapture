@@ -51,10 +51,11 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    `package.json` plus every path `scripts/list-publishable.sh` returns, runs
    `scripts/changelog.ts write <version>`, which inserts a `## <version>` section into `CHANGELOG.md` and
    regenerates `docs/en/6-changelog/changelog.md` from it, and re-reads every version field to assert the
-   lockstep of step 4. A commit whose message does not follow the convention is skipped with
-   `Warning: skipping commit <sha> …` — read those lines, because the entry is simply absent (#1529 tracks
-   making that a failure). Done when its output carries one `✓ <file> → <version>` line per package, a
-   `Wrote the <version> section` line, and ends `✓ All 6 packages report <version>`.
+   lockstep of step 4. A commit whose message the generator cannot read fails the run with
+   `Error: Commit <sha> does not follow the convention …` and writes nothing — reword that commit before
+   you release, so that no change drops silently out of the changelog. Done when its output carries one
+   `✓ <file> → <version>` line per package, a `Wrote the <version> section` line, and ends
+   `✓ All 6 packages report <version>`.
 
 4. **Confirm the lockstep before you commit.**
 

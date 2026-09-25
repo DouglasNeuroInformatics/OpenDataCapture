@@ -1,9 +1,18 @@
+import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
+
 import { UploadInstrumentPage } from '../pages/_app/upload/$instrumentId.page';
 import { expect, test } from '../support/fixtures';
 
 // The plain "Happiness Questionnaire" (kind FORM); a similarly-named consent-bundled edition also
 // exists in the catalog but is kind SERIES, so it never appears in the upload instrument list.
 const INSTRUMENT_TITLE = 'Happiness Questionnaire';
+
+/** A minimal payload satisfying the seeded happiness questionnaire's validation schema. */
+const HAPPINESS_RECORD = {
+  isSatisfiedOverall: true,
+  personalLifeSatisfaction: 8,
+  professionalLifeSatisfaction: 7
+};
 
 test.describe('upload', () => {
   test('should upload a valid CSV and create a record for the subject it names @smoke', async ({
@@ -58,5 +67,53 @@ test.describe('upload', () => {
     await uploadInstrumentPage.tryAgainButton.click();
     await expect(uploadInstrumentPage.errorHeading).not.toBeVisible();
     await expect(uploadInstrumentPage.submitButton).toBeVisible();
+  });
+
+  // The response was previously every record in the group for the instrument, so a second upload
+  // leaked the first one's records back to the caller. An earlier upload to the same group and
+  // instrument is what distinguishes the scoped response from the group-wide one.
+  test('should answer a batch upload with exactly the records it created', async ({ api, uniqueId }) => {
+    const group = await api.createGroup();
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    await api.uploadRecords(group.id, instrumentId, [
+      { data: HAPPINESS_RECORD, date: new Date(), subjectId: `upload-${uniqueId}-earlier` }
+    ]);
+
+    const batch = ['a', 'b', 'c'].map((suffix) => `upload-${uniqueId}-${suffix}`);
+    const records = await api.uploadRecords(
+      group.id,
+      instrumentId,
+      batch.map((subjectId) => ({ data: HAPPINESS_RECORD, date: new Date(), subjectId }))
+    );
+
+    expect(records).toHaveLength(3);
+    expect(new Set(records.map((record) => record.subjectId))).toStrictEqual(new Set(batch));
+  });
+
+  // The bulk payload has nowhere to carry a file, so a record for a file instrument could only ever
+  // be incomplete. The upload is refused before anything is written.
+  test('should refuse a batch upload for a file instrument without writing a session or record', async ({
+    adminToken,
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup();
+    const headers = { Authorization: `Bearer ${adminToken}` };
+    const subjectId = `file-${uniqueId}`;
+    const data: UploadInstrumentRecordsData = {
+      groupId: group.id,
+      instrumentId: await api.findInstrumentIdByName('ARBITRARY_SINGLE_FILE'),
+      records: [{ data: {}, date: new Date(), subjectId }]
+    };
+
+    const response = await apiRequestContext.post('/api/v1/instrument-records/upload', { data, headers });
+
+    expect(response.status()).toBe(422);
+    // Sessions are created only after the subjects they name, so a missing subject means no session.
+    const subject = await apiRequestContext.get(`/api/v1/subjects/${subjectId}`, { headers });
+    expect(subject.status()).toBe(404);
+    const records = await apiRequestContext.get(`/api/v1/instrument-records?groupId=${group.id}`, { headers });
+    expect(await records.json()).toStrictEqual([]);
   });
 });

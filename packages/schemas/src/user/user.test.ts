@@ -1,6 +1,45 @@
 import { describe, expect, it } from 'vitest';
 
-import { $CreateUserData, $PhoneNumber, $SelfUpdateUserData, $User, MIN_PHONE_DIGITS } from './user.js';
+import {
+  $CreateUserData,
+  $PhoneNumber,
+  $SelfUpdateUserData,
+  $UpdateUserData,
+  $UpdateUserPermissionsData,
+  $User,
+  MIN_PHONE_DIGITS
+} from './user.js';
+
+describe('$UpdateUserData', () => {
+  it('should strip additionalPermissions, so a profile update cannot grant anything', () => {
+    const result = $UpdateUserData.safeParse({
+      additionalPermissions: [{ action: 'manage', groupId: null, subject: 'all' }]
+    });
+    expect(result.success).toBe(true);
+    expect(result.data).not.toHaveProperty('additionalPermissions');
+  });
+});
+
+describe('$UpdateUserPermissionsData', () => {
+  it('should accept an empty set, which is how every grant is revoked', () => {
+    expect($UpdateUserPermissionsData.safeParse({ permissions: [] }).success).toBe(true);
+  });
+
+  it('should reject a grant confined to a group on a resource that cannot be', () => {
+    const permissions = [{ action: 'read', groupId: 'group-1', subject: 'Instrument' }];
+    expect($UpdateUserPermissionsData.safeParse({ permissions }).success).toBe(false);
+  });
+
+  it('should reject a grant that writes users, naming the offending entry, since it would do nothing', () => {
+    const permissions = [
+      { action: 'read', groupId: null, subject: 'Subject' },
+      { action: 'update', groupId: null, subject: 'User' }
+    ];
+    const result = $UpdateUserPermissionsData.safeParse({ permissions });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(['permissions', 1]);
+  });
+});
 
 describe('$SelfUpdateUserData', () => {
   it('should accept null contact details, so an update can clear them', () => {
@@ -62,5 +101,10 @@ describe('$PhoneNumber', () => {
 describe('$User', () => {
   it('should accept a stored number predating the digit minimum, so the read model still parses', () => {
     expect($User.shape.phoneNumber.safeParse('123').success).toBe(true);
+  });
+
+  it('should accept a stored grant that writes users, so a user holding one from before still parses', () => {
+    const additionalPermissions = [{ action: 'update', groupId: null, subject: 'User' }];
+    expect($User.shape.additionalPermissions.safeParse(additionalPermissions).success).toBe(true);
   });
 });

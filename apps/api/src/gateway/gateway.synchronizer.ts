@@ -106,22 +106,14 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
     const instrument = await this.instrumentsService.findById(assignment.instrumentId);
 
-    const session = await this.sessionsService.create({
-      date: remoteAssignment.completedAt,
-      groupId: remoteAssignment.groupId ?? null,
-      subjectData: {
-        id: assignment.subjectId
-      },
-      type: 'REMOTE'
-    });
-
+    // Checked before anything is written: only the catch below deletes the session, so a throw
+    // between creating it and that try would leave one behind on every synchronization pass.
     const cipherTexts: string[] = [];
     const symmetricKeys: string[] = [];
     let seriesItems: ScalarInstrumentInternal[] | undefined;
 
     if (instrument.kind === 'SERIES') {
       if (!(remoteAssignment.encryptedData.startsWith('$') && remoteAssignment.symmetricKey.startsWith('$'))) {
-        this.loggingService.error({ remoteAssignment });
         throw new InternalServerErrorException('Malformed remote assignment for series instrument');
       }
       cipherTexts.push(...remoteAssignment.encryptedData.slice(1).split('$'));
@@ -139,12 +131,28 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         );
       }
     } else if (remoteAssignment.encryptedData.includes('$') || remoteAssignment.symmetricKey.includes('$')) {
-      this.loggingService.error({ remoteAssignment });
       throw new InternalServerErrorException('Malformed remote assignment for scalar instrument');
     } else {
       cipherTexts.push(remoteAssignment.encryptedData);
       symmetricKeys.push(remoteAssignment.symmetricKey);
     }
+
+    // Creating the session enrols the subject in its group, so the group must never be the gateway's
+    // copy: that would let the gateway give another group access to the subject.
+    if ((remoteAssignment.groupId ?? null) !== assignment.groupId) {
+      this.loggingService.error(
+        `Gateway reported group '${remoteAssignment.groupId}' for assignment '${assignment.id}' in group '${assignment.groupId}'`
+      );
+    }
+
+    const session = await this.sessionsService.create({
+      date: remoteAssignment.completedAt,
+      groupId: assignment.groupId,
+      subjectData: {
+        id: assignment.subjectId
+      },
+      type: 'REMOTE'
+    });
 
     const createdRecordIds: string[] = [];
     try {
@@ -171,7 +179,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         try {
           data = await $Json.parseAsync(JSON.parse(decryptedData));
         } catch (err) {
-          this.loggingService.error({ decryptedData, instrumentId, message: 'Failed to parse decrypted data' });
+          this.loggingService.error({ instrumentId, message: 'Failed to parse decrypted data' });
           throw err;
         }
 
@@ -190,7 +198,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
           this.loggingService.log(`Created record with ID: ${record.id}`);
           createdRecordIds.push(record.id);
         } catch (err) {
-          this.loggingService.error({ data, instrumentId, message: 'Failed to create instrument record' });
+          this.loggingService.error({ instrumentId, message: 'Failed to create instrument record' });
           throw err;
         }
       }

@@ -9,7 +9,8 @@
     "deploy": "rsync -r dist/* unrjos@cloud1.douglasneuroinformatics.ca:/home/unrjos/www/playground.opendatacapture.org",
     "dev": "NODE_ENV=development pnpm exec vite",
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "lint": "tsc && eslint --fix src",
+    "test": "env-cmd -f ../../.env vitest"
   },
   "dependencies": {
     "@douglasneuroinformatics/libcrypto": "catalog:",

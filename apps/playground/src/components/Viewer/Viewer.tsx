@@ -1,31 +1,47 @@
-import { useCallback, useState } from 'react';
+import { use, useCallback, useState } from 'react';
 
 import { Spinner } from '@douglasneuroinformatics/libui/components';
 import { useInterval, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 import { bundle } from '@opendatacapture/instrument-bundler';
-import { ScalarInstrumentRenderer } from '@opendatacapture/react-core';
-import { ErrorBoundary } from 'react-error-boundary';
 import { match, P } from 'ts-pattern';
 
 import { useFilesRef } from '@/hooks/useFilesRef';
 import type { EditorFile } from '@/models/editor-file.model';
+import { fetchPlaygroundConfig } from '@/preview/config';
+import { resolvePreviewOrigin } from '@/preview/protocol';
+import type { PreviewErrorStage } from '@/preview/protocol';
 import { useAppStore } from '@/store';
 import { editorFileToInput, hashFiles } from '@/utils/file';
 
 import { CompileErrorFallback } from './CompileErrorFallback';
+import { PreviewFrame } from './PreviewFrame';
+import { PreviewOriginError } from './PreviewOriginError';
 import { RuntimeErrorFallback } from './RuntimeErrorFallback';
+
+// `use` needs the same promise on every render, so the config is requested once, as the module loads.
+const playgroundConfig = fetchPlaygroundConfig();
+
+/** An error the preview frame reported, kept with the bundle it belongs to so a rebuild clears it. */
+type PreviewError = {
+  bundle: string;
+  error: Error;
+  stage: PreviewErrorStage;
+};
 
 export const Viewer = () => {
   const editorFilesRef = useFilesRef();
   const indexFilename = useAppStore((store) => store.indexFilename);
   const refreshInterval = useAppStore((store) => store.settings.refreshInterval);
   const [filesHash, setFilesHash] = useState<string>('');
+  const [previewError, setPreviewError] = useState<null | PreviewError>(null);
 
   const key = useAppStore((store) => store.viewer.key);
   const state = useAppStore((store) => store.transpilerState);
   const setState = useAppStore((store) => store.setTranspilerState);
   const { t } = useTranslation();
+
+  const previewOrigin = resolvePreviewOrigin(window.location, use(playgroundConfig).previewOrigin);
 
   const transpile = useCallback(async (files: EditorFile[]) => {
     setState({ status: 'building' });
@@ -56,46 +72,57 @@ export const Viewer = () => {
       .catch(console.error);
   }, refreshInterval);
 
+  const handleSubmit = (data: unknown) => {
+    // eslint-disable-next-line no-alert
+    alert(
+      JSON.stringify(
+        {
+          _message: t({
+            en: 'The following data will be submitted',
+            fr: 'Les données suivantes seront soumises'
+          }),
+          data
+        },
+        null,
+        2
+      )
+    );
+  };
+
+  const context = { files: editorFilesRef.current, indexFilename };
+
   return (
     <div
       className="h-full overflow-y-scroll pr-1.5 lg:pr-3"
       key={key}
       style={{ scrollbarColor: 'var(--muted) var(--background)', scrollbarWidth: 'thin' }}
     >
-      {match(state)
-        .with({ status: 'built' }, ({ bundle }) => (
-          <ErrorBoundary
-            FallbackComponent={(props) => (
-              <RuntimeErrorFallback context={{ files: editorFilesRef.current, indexFilename }} {...props} />
-            )}
-          >
-            <ScalarInstrumentRenderer
-              options={{ validate: true }}
-              target={{ bundle, id: null! }}
-              onCompileError={(error) => setState({ error, status: 'error' })}
-              onSubmit={({ data }) => {
-                // eslint-disable-next-line no-alert
-                alert(
-                  JSON.stringify(
-                    {
-                      _message: t({
-                        en: 'The following data will be submitted',
-                        fr: 'Les données suivantes seront soumises'
-                      }),
-                      data
-                    },
-                    null,
-                    2
-                  )
-                );
-              }}
-            />
-          </ErrorBoundary>
+      {match({ previewOrigin, state })
+        .with({ previewOrigin: { status: 'error' } }, ({ previewOrigin }) => (
+          <PreviewOriginError reason={previewOrigin.reason} />
         ))
-        .with({ status: 'error' }, (props) => (
-          <CompileErrorFallback context={{ files: editorFilesRef.current, indexFilename }} {...props} />
-        ))
-        .with({ status: P.union('building', 'initial') }, () => <Spinner />)
+        .with(
+          { previewOrigin: { status: 'ok' }, state: { status: 'built' } },
+          ({ previewOrigin, state: { bundle } }) => {
+            if (previewError?.bundle === bundle) {
+              return previewError.stage === 'interpret' ? (
+                <CompileErrorFallback context={context} error={previewError.error} />
+              ) : (
+                <RuntimeErrorFallback context={context} error={previewError.error} />
+              );
+            }
+            return (
+              <PreviewFrame
+                bundle={bundle}
+                previewOrigin={previewOrigin.origin}
+                onError={(stage, error) => setPreviewError({ bundle, error, stage })}
+                onSubmit={handleSubmit}
+              />
+            );
+          }
+        )
+        .with({ state: { status: 'error' } }, ({ state }) => <CompileErrorFallback context={context} {...state} />)
+        .with({ state: { status: P.union('building', 'initial') } }, () => <Spinner />)
         .exhaustive()}
     </div>
   );

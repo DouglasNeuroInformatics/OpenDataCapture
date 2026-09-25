@@ -43,8 +43,6 @@ function readWorkspaceScopes(): string[] {
 export default {
   extends: ['@commitlint/config-conventional'],
   rules: {
-    // A warning while contributors adopt the workspace names as scopes. Raising this to an error
-    // is tracked in https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues/1529
-    'scope-enum': [1, 'always', readWorkspaceScopes()]
+    'scope-enum': [2, 'always', readWorkspaceScopes()]
   }
 };

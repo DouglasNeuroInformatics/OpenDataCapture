@@ -154,6 +154,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/playground/Dockerfile
+    environment:
+      - PLAYGROUND_PREVIEW_ORIGIN
     ports:
       - '3750:80'
     restart: unless-stopped

@@ -129,17 +129,6 @@ export function useBulkAssignmentWizard({
     isPreflighting: preflightMutation.isPending,
     isSubmitting: createMutation.isPending,
     parsed,
-    reset: () => {
-      setParsed(null);
-      setSubjectIds([]);
-      setTimepoints([]);
-      setAssignments([]);
-      setSourceRows(undefined);
-      setFailure(null);
-      setTransportError(false);
-      setDidCopy(false);
-      setStep('SOURCE');
-    },
     /** Subject ids resolved from the mapped columns, in the row order they were supplied. */
     resolveMapping: (ids: string[], rows: BulkParseResult['rows']) => {
       setSubjectIds(ids);

@@ -4,6 +4,7 @@ import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import type { Subject } from '@prisma/client';
 import { pick } from 'lodash-es';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -47,6 +48,29 @@ describe('SubjectsService', () => {
     prismaClient = moduleRef.get(PRISMA_CLIENT_TOKEN);
   });
 
+  describe('addGroupForSubjects', () => {
+    // The exclusion belongs in the query, not the caller: mongodb arrays admit duplicates, so a
+    // caller filtering against a list it read earlier would push the id twice under concurrency.
+    it('should skip subjects already in the group from within the query itself', async () => {
+      await subjectsService.addGroupForSubjects(['subject-1', 'subject-2'], 'group-1');
+
+      expect(subjectModel.updateMany.mock.lastCall?.[0]).toMatchObject({
+        data: { groupIds: { push: 'group-1' } },
+        where: {
+          id: { in: ['subject-1', 'subject-2'] },
+          NOT: { groupIds: { has: 'group-1' } }
+        }
+      });
+    });
+
+    it('should associate every subject in one write rather than one per subject', async () => {
+      await subjectsService.addGroupForSubjects(['subject-1', 'subject-2', 'subject-3'], 'group-1');
+
+      expect(subjectModel.updateMany).toHaveBeenCalledOnce();
+      expect(subjectModel.update).not.toHaveBeenCalled();
+    });
+  });
+
   describe('create', () => {
     it('should call the subject model', async () => {
       const subject = {
@@ -71,6 +95,36 @@ describe('SubjectsService', () => {
           sex: 'MALE'
         })
       ).rejects.toBeInstanceOf(ConflictException);
+    });
+  });
+
+  describe('createMany', () => {
+    // `demo.service.ts` hands `sessionsService.create` a whole row, which reaches this method.
+    it('should keep the demographics of a new subject and drop the fields the caller may not set', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([]);
+      const row: Subject = {
+        createdAt: new Date(0),
+        dateOfBirth: new Date(2000, 0, 1),
+        firstName: 'Ada',
+        groupIds: ['group-9'],
+        id: 'subject-1',
+        lastName: 'Lovelace',
+        sex: 'FEMALE',
+        updatedAt: new Date(0)
+      };
+
+      await subjectsService.createMany([row]);
+
+      expect(subjectModel.createMany.mock.lastCall?.[0].data).toStrictEqual([
+        {
+          dateOfBirth: row.dateOfBirth,
+          firstName: 'Ada',
+          groupIds: [],
+          id: 'subject-1',
+          lastName: 'Lovelace',
+          sex: 'FEMALE'
+        }
+      ]);
     });
   });
 

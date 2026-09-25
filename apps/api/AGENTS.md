@@ -72,6 +72,13 @@ public route. This is eslint-enforced. Know what you are choosing:
 | `@RouteAccess('public')`            | No authentication at all. Only three routes use this; adding a fourth is a security decision. |
 | `@RouteAccess([])`                  | `[].every(...)` is `true` — **any authenticated user**. Easy to write by accident.            |
 | `@RouteAccess({ action, subject })` | `ability.can(action, subject)` on the subject _type_ only.                                    |
+| `@RouteAccess([{ … }, { … }])`      | `.every(...)` — all must pass.                                                                |
+| `@RouteAccess(ADMIN_ONLY)`          | `manage all`. The only declaration no narrower grant or conditional rule can satisfy.         |
+
+Every declaration above except `'public'` is checked against a login token only. The reduced token
+`GET /v1/auth/create-instrument-token` mints is refused on any route without
+`@AcceptsInstrumentToken()`, whatever that token's permissions satisfy. Add it only to a route the
+playground's upload needs, and never to the minting route itself.
 
 **2. Every service query must be scoped.** Take `{ ability }: EntityOperationOptions = {}` as the
 last parameter, have the controller forward `@CurrentUser('ability')`, and put `accessibleQuery` in
@@ -119,6 +126,17 @@ list the same eight models plus `all`. Three models — `AuditLog`, `InstrumentR
 `SetupState` — appear in neither, so no user can be granted a permission naming them; they are
 reachable only through rules the ability factory writes itself. Adding a model that users should be
 able to hold a permission on means editing both lists.
+
+A granted permission may be confined to one group. `AuthRule.groupId` names it (`null`, which is
+what every rule written before the field existed reads back as, means every group), and
+`GROUP_SCOPED_CONDITIONS` in `src/auth/ability.factory.ts` turns it into that model's group
+condition. That table is typed over `$GroupScopableSubjectName` (`packages/schemas/src/core/core.ts`:
+`$AppSubjectName` minus `all` and `Instrument`), so a scopable subject with no entry does not
+compile. Only `PUT /v1/users/:id/permissions` writes the field — it is deliberately absent from
+`$UpdateUserData` — and, like every route that writes a user, it is `ADMIN_ONLY` rather than gated
+on a `User` action; the route inventory in the architecture doc below says why.
+`UsersService.updatePermissions` accepts a scoped grant only for a group the user belongs to, and
+`updateById` drops the grants scoped to a group the user is removed from.
 
 Background: `.agents/docs/architecture/auth-and-permissions.md`.
 
