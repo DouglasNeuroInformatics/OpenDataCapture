@@ -8,6 +8,7 @@ import type { Subject } from '@prisma/client';
 import { pick } from 'lodash-es';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 import type { RuntimePrismaClient } from '@/core/prisma';
 
 import { SubjectsService } from '../subjects.service';
@@ -203,6 +204,51 @@ describe('SubjectsService', () => {
     it('should throw NotFoundException when subject does not exist', async () => {
       subjectModel.findFirst.mockResolvedValueOnce(null);
       await expect(subjectsService.deleteById('123')).rejects.toBeInstanceOf(NotFoundException);
+    });
+  });
+
+  describe('findCustomIds', () => {
+    const findManyArgs = () =>
+      subjectModel.findMany.mock.lastCall?.[0] as { select: unknown; where: { AND: unknown[] } };
+
+    it('should return only the ids, so no personal information leaves the database', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([{ id: 'group$a' }, { id: 'group$b' }]);
+      await expect(subjectsService.findCustomIds('group-1')).resolves.toStrictEqual(['group$a', 'group$b']);
+      expect(findManyArgs().select).toStrictEqual({ id: true });
+    });
+
+    it('should constrain the query to what the caller may read, so it cannot list subjects from other groups', async () => {
+      // An unconditional read rule yields `{}`, which is indistinguishable from no ability at all.
+      const ability = createAppAbility([
+        { action: 'read', conditions: { groupIds: { hasSome: ['group-1'] } }, subject: 'Subject' }
+      ]);
+      subjectModel.findMany.mockResolvedValueOnce([]);
+      await subjectsService.findCustomIds('group-1', { ability });
+      expect(findManyArgs().where.AND[0]).toStrictEqual(accessibleQuery(ability, 'read', 'Subject'));
+    });
+
+    it('should exclude subjects outside the requested group', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([]);
+      await subjectsService.findCustomIds('group-1');
+      expect(findManyArgs().where.AND).toContainEqual({ groupIds: { has: 'group-1' } });
+    });
+
+    // A subject with every field set is identified by personal information, so no clause matches it.
+    it('should match a subject missing any one personal-info field, whether null or absent from the document', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([]);
+      await subjectsService.findCustomIds('group-1');
+      expect(findManyArgs().where.AND).toContainEqual({
+        OR: [
+          { dateOfBirth: null },
+          { dateOfBirth: { isSet: false } },
+          { firstName: null },
+          { firstName: { isSet: false } },
+          { lastName: null },
+          { lastName: { isSet: false } },
+          { sex: null },
+          { sex: { isSet: false } }
+        ]
+      });
     });
   });
 
