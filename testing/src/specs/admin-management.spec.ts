@@ -287,6 +287,15 @@ test.describe('admin management', () => {
     await expect(api.createUser({ phoneNumber: '123' })).rejects.toThrow(/Phone number must contain at least 7 digits/);
   });
 
+  test('should return to the users list from the back link on the user page', async ({ api, getPageModel, page }) => {
+    const { user } = await api.createUser();
+
+    const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
+    await userPage.backLink.click();
+
+    await expect(page).toHaveURL('/admin/users');
+  });
+
   test('should list the permissions a user already holds on the user page', async ({ api, getPageModel }) => {
     const group = await api.createGroup();
     const { user } = await api.createUser({ groupIds: [group.id] });

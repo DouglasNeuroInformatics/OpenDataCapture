@@ -6,6 +6,7 @@ import { AppPage } from '../../route.page';
 export class AdminUserPage extends AppPage {
   readonly addPermissionRow: Locator;
   readonly adminNotice: Locator;
+  readonly backLink: Locator;
   readonly manageAllWarning: Locator;
   readonly pageHeader: Locator;
   readonly permissionRows: Locator;
@@ -15,6 +16,7 @@ export class AdminUserPage extends AppPage {
 
   constructor(page: Page) {
     super(page);
+    this.backLink = page.getByTestId('admin-user-back');
     this.pageHeader = page.getByTestId('page-header');
     this.profileForm = page.getByTestId('update-user-form');
     this.submitError = page.getByTestId('admin-user-edit-error');

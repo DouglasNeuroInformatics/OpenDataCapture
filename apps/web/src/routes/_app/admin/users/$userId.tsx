@@ -3,7 +3,8 @@ import { useMemo, useState } from 'react';
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Button, Card, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { ChevronLeftIcon } from '@heroicons/react/24/solid';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 
 import { Chip } from '@/components/Chip';
 import { PageHeader } from '@/components/PageHeader';
@@ -67,22 +68,32 @@ const RouteComponent = () => {
       </PageHeader>
       <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-6">
         <Card>
-          <Card.Header className="flex-row items-center gap-4 space-y-0">
-            <UserIcon className="text-muted-foreground h-14 w-14 shrink-0" />
-            <div className="min-w-0 flex-1">
-              <Card.Title className="text-lg" data-testid="admin-user-username">
-                {user.username}
-              </Card.Title>
-              <p className="text-muted-foreground mt-1 text-sm" data-testid="admin-user-identity">
-                {identityLine}
-              </p>
-              {userGroups.length > 0 && (
-                <div className="mt-2.5 flex flex-wrap gap-1.5">
-                  {userGroups.map((group) => (
-                    <Chip key={group.id}>{group.name}</Chip>
-                  ))}
-                </div>
-              )}
+          <Card.Header className="gap-4 space-y-0">
+            <Link
+              className="text-muted-foreground focus-visible:ring-ring focus-visible:outline-hidden flex items-center gap-0.5 self-start rounded-sm text-[11px] font-semibold uppercase tracking-widest transition-colors hover:text-blue-600 focus-visible:ring-1 dark:hover:text-blue-400"
+              data-testid="admin-user-back"
+              to="/admin/users"
+            >
+              <ChevronLeftIcon className="h-3.5 w-3.5" />
+              {t({ en: 'Return', fr: 'Retour' })}
+            </Link>
+            <div className="flex items-center gap-4">
+              <UserIcon className="text-muted-foreground h-14 w-14 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <Card.Title className="text-lg" data-testid="admin-user-username">
+                  {user.username}
+                </Card.Title>
+                <p className="text-muted-foreground mt-1 text-sm" data-testid="admin-user-identity">
+                  {identityLine}
+                </p>
+                {userGroups.length > 0 && (
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {userGroups.map((group) => (
+                      <Chip key={group.id}>{group.name}</Chip>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </Card.Header>
         </Card>
