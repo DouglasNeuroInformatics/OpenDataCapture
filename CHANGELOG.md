@@ -4,6 +4,28 @@ Every release of Open Data Capture from 2.0.0 onward is recorded here. Each sect
 commit history when the version changes, and becomes the body of the GitHub release. Releases before
 2.0.0 are listed in the [release history](https://github.com/DouglasNeuroinformatics/OpenDataCapture/releases).
 
+## 2.5.2
+
+### Bug Fixes
+
+- write odc-cli's stored token readable by its owner only ([8d5e642](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/8d5e642e863308fa9f08657e0a64c8ba51c7c45a))
+- **api:** validate a remote submission before creating its session ([a5174d7](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/a5174d707fb71731be67716cae830f59d9aafa67))
+- **api:** file a remote session under the assignment's own group ([5ae4b60](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/5ae4b6076e702535df9fd4940e3fdb591dd66a80))
+- **api:** keep patients' submissions out of the synchronizer's logs ([24378a7](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/24378a7d593bd0b7d14d9d4c854e253c64e92c22))
+- **gateway:** bound the assignment id the verification route stores ([d15a4e9](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/d15a4e95c66e54f8df9a94adf34c0708025542a1))
+- **api:** check the caller may update an assignment before cancelling it ([96cb228](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/96cb228a44acadea6ff3efcd3a78d9ed001312f2))
+- **api:** stop returning an assignment's private key when it is created ([e8a9729](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/e8a9729b6e01a8ea800e314338e25bfe59c56ec1))
+- generate the .env file readable by its owner only ([c32430d](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/c32430db2671bfa41a1f366f7d11c24073536ca7))
+- **api:** cap a gateway synchronization pass at five minutes ([43b7888](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/43b78889d71ca6cb52c301d6b0cb08b9bff4ee7a))
+- **api:** scope the group and user a new session names to the caller ([d6966cf](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/d6966cf6f670230ff42f5d74eac3a01c76242859))
+- **api:** delete the sessions a batch inserted when their read-back fails ([aeb0f0f](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/aeb0f0f021c00fcc2cdbfa8b34dd85c65e27b02e))
+- **api:** drop the subject read-back and fail loudly on a session read-back gap ([9a40e2c](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/9a40e2cbdbf89f5a9c604c06efafba1d80123b59))
+- **api:** stop gateway synchronizations from overlapping ([a45c97f](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/a45c97fa9f1e22c0f8e923f1e8e134d6d895d3aa))
+
+### Performance
+
+- **api:** batch session creation and scope the upload response ([24e3775](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/24e37759bc97f131b52b881faf7aca54bec9485a))
+
 ## 2.5.1
 
 ### Bug Fixes
