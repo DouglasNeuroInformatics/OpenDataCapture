@@ -9,6 +9,7 @@ import {
   Logger,
   NotFoundException
 } from '@nestjs/common';
+import type { Permissions } from '@opendatacapture/schemas/core';
 import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
 import type { PasswordErrorCode } from '@opendatacapture/schemas/user';
 import { pwnedPassword } from 'hibp';
@@ -112,12 +113,15 @@ export class UsersService {
     });
   }
 
-  async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
+  async deleteById(id: string, currentUser: RequestUser) {
+    if (id === currentUser.id) {
+      throw new ForbiddenException('You may not delete your own account');
+    }
     return this.userModel.delete({
       omit: {
         hashedPassword: true
       },
-      where: { AND: [accessibleQuery(ability, 'delete', 'User')], id }
+      where: { AND: [accessibleQuery(currentUser.ability, 'delete', 'User')], id }
     });
   }
 
@@ -173,11 +177,14 @@ export class UsersService {
     return user;
   }
 
-  async updateById(
-    id: string,
-    { groupIds, password, ...data }: UpdateUserDto,
-    { ability }: EntityOperationOptions = {}
-  ) {
+  async updateById(id: string, { groupIds, password, ...data }: UpdateUserDto, currentUser: RequestUser) {
+    const { ability } = currentUser;
+    const isDemotion = data.basePermissionLevel !== undefined && data.basePermissionLevel !== 'ADMIN';
+    // Only an administrator reaches this route, so the last one to do this to themselves would leave
+    // no account able to reach it again, or any other admin-only route.
+    if (id === currentUser.id && (data.disabled || isDemotion)) {
+      throw new ForbiddenException('You may not remove your own administrator access');
+    }
     let hashedPassword: string | undefined;
     if (password) {
       const username = data.username ?? (await this.findById(id, { ability })).username;
@@ -187,11 +194,35 @@ export class UsersService {
     return this.userModel.update({
       data: {
         ...data,
+        additionalPermissions: groupIds ? await this.permissionsWithinGroups(id, groupIds, { ability }) : undefined,
         groups: {
           set: groupIds?.map((id) => ({ id }))
         },
         hashedPassword
       },
+      omit: {
+        hashedPassword: true
+      },
+      where: { AND: [accessibleQuery(ability, 'update', 'User')], id }
+    });
+  }
+
+  /**
+   * Replaces the user's additional permissions. A grant confined to a group is accepted only when the
+   * user belongs to that group, so what the web client offers and what this accepts are one rule.
+   */
+  async updatePermissions(id: string, permissions: Permissions, { ability }: EntityOperationOptions = {}) {
+    const user = await this.findById(id, { ability });
+    const foreignGroupIds = permissions
+      .map(({ groupId }) => groupId)
+      .filter((groupId): groupId is string => groupId !== null && !user.groupIds.includes(groupId));
+    if (foreignGroupIds.length) {
+      throw new BadRequestException(
+        `Permissions may only be scoped to a group the user belongs to: ${foreignGroupIds.join(', ')}`
+      );
+    }
+    return this.userModel.update({
+      data: { additionalPermissions: permissions },
       omit: {
         hashedPassword: true
       },
@@ -239,6 +270,15 @@ export class UsersService {
    */
   private passwordError(code: PasswordErrorCode, message: string): BadRequestException {
     return new BadRequestException({ code, error: 'Bad Request', message, statusCode: 400 });
+  }
+
+  /**
+   * The user's stored grants minus those confined to a group outside `groupIds`. A grant scoped to a
+   * group the user is leaving would otherwise keep reading that group's rows.
+   */
+  private async permissionsWithinGroups(id: string, groupIds: string[], options: EntityOperationOptions) {
+    const { additionalPermissions } = await this.findById(id, options);
+    return additionalPermissions.filter(({ groupId }) => groupId === null || groupIds.includes(groupId));
   }
 
   /**

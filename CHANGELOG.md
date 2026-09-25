@@ -4,6 +4,38 @@ Every release of Open Data Capture from 2.0.0 onward is recorded here. Each sect
 commit history when the version changes, and becomes the body of the GitHub release. Releases before
 2.0.0 are listed in the [release history](https://github.com/DouglasNeuroinformatics/OpenDataCapture/releases).
 
+## 2.5.1
+
+### Bug Fixes
+
+- **playground:** read the preview origin at runtime instead of build time ([8022973](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/8022973190d14c73162afd6b33876bd9911c3b78))
+- **api:** open a new connection for every gateway request ([c3f3e79](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/c3f3e793c7dfa62f23c0234dd5978468d5cdfea7))
+- **api:** refuse the instrument token everywhere but instrument upload ([0826634](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/0826634945734767d7529bad494af2d7ef2278f9))
+
+## 2.5.0
+
+### Features
+
+- **web:** drop the empty-state row from the permissions table ([f395257](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/f395257928c510535ce50e730acab88251d6b1a7))
+- **web:** show a grant scope as plain text, marking every-group grants with an icon ([8ea344f](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/8ea344f50fd2f91a8e758fe339ba3fb4be762b9f))
+- **web:** style the add-permission row like the grants above it ([7725b39](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/7725b39b012b2a812d528c2c451ffbbbd559b952))
+- **web:** hold the permissions table columns still and match the add control to remove ([7da8beb](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/7da8bebb198affdbf4ba8d62907e26940876bf2a))
+- **web:** put the add-permission controls in the table footer ([c284b65](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/c284b65a77574b658f7a5916f1a06cd586b52583))
+- **web:** reorder the user page and give scopes a visible chip ([04c2b50](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/04c2b50066ea6ff3cd5e23148ac3f8a5bf83ae53))
+- **web:** drop the back link from the user page ([fa315ef](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/fa315ef92d1f52370cd3949016e9795641cdd9df))
+- **web:** lay the user page out as identity, permissions, account and delete cards ([9773f7d](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/9773f7debff1d2b6c8d8f9612f6a49adf0314cb6))
+- **web:** manage a user and their permissions on a dedicated page ([46046b4](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/46046b40e0bf7a311b3a7b1a105e8a9bbd1d4c51))
+- **api:** confine additional permissions to a group ([8c4cbee](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/8c4cbeeedc55f953b2eb387427ebdbe914a99451))
+
+### Bug Fixes
+
+- **playground:** keep the desktop layout in the preview frame ([35e5ef1](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/35e5ef15ccad675e6589c6bf590c07e277711c19))
+- **playground:** run instrument previews on a second origin ([66c1425](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/66c1425a3f3057be54695035175fa564c9801905))
+- **api:** return only the records an upload wrote, not every group's ([49fd5a9](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/49fd5a9476f2c6e6169e6d74da821e3fef9c472e))
+- **web:** stop refetching the instrument bundle when the window regains focus ([7fd9025](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/7fd90256f60f9f14415bd200d80947e947903238))
+- **web:** truncate a long label in the permissions table selects with an ellipsis ([6398fbe](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/6398fbe9ded482a9610e0b4e385f6bbd8a27e03b))
+- **api:** match uploaded instruments when validating series items ([9f435e3](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/9f435e3e5038564d7caaf6e0d1391884be0c6164))
+
 ## 2.4.0
 
 ### Features

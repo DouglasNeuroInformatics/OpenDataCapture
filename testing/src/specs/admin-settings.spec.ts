@@ -29,9 +29,10 @@ test.describe('admin settings', () => {
     await expect(page.getByTestId('nav-button-/upload')).toHaveCount(0);
   });
 
-  test('should persist the default assignment duration @smoke', async ({ getPageModel, page, uniqueId }) => {
-    // The setting is instance-wide and every project shares one database, so a fixed value would already
-    // be stored by the time the second browser runs, and the settings page would skip the save entirely.
+  // Not `@smoke`: the setting is one instance-wide value, and outside CI the firefox copy runs alongside
+  // this one, so each would overwrite the other's value between its save and its reload. The value is
+  // random so that it never matches the one already stored, which the settings page would not save.
+  test('should persist the default assignment duration', async ({ getPageModel, page, uniqueId }) => {
     const durationDays = 1 + (Number.parseInt(uniqueId, 16) % MAX_ASSIGNMENT_DURATION_DAYS);
 
     const settingsPage = await getPageModel('/admin/settings');

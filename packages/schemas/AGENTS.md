@@ -53,7 +53,7 @@ copy.
 
 ## A schema only where something is parsed
 
-`src/auth/auth.ts` is the whole rule in 26 lines: `$LoginCredentials` is a schema because a request
+`src/auth/auth.ts` is the whole rule in one file: `$LoginCredentials` is a schema because a request
 body is parsed against it; `AuthPayload` and `TokenPayload` are plain types because nothing ever
 parses them. Do not add a schema for a shape that only crosses a typed boundary.
 
@@ -79,12 +79,21 @@ Two constraints on anything you write there:
   publish JSON Schema for every kind × language. This is why `$InstrumentValidationSchema` is
   `z.any().refine(...)` rather than `z.custom()`, which cannot be converted.
 
-## One security-relevant export
+## Three security-relevant exports
 
 `$AppSubjectName` in `src/core/core.ts` is the hand-maintained list of CASL subject names. It is not
 derived from `schema.prisma` and does not mirror it. A model that needs permission checks has to be
 added here as well as in `apps/api/src/auth/ability.factory.ts` —
 `.agents/docs/architecture/auth-and-permissions.md`.
+
+`$GroupScopableSubjectName`, beside it, is derived from that list by excluding `all` and
+`Instrument`, and is what `$UserPermission` checks a non-null `groupId` against. `apps/api` types
+its per-model group conditions over it, so narrowing the exclusion fails to compile there until the
+newly scopable subject's group field is named.
+
+`isGrantablePermission`, in the same file, says which storable pairs a new grant may name. It is
+applied by `$UpdateUserPermissionsData` and not by `$UserPermission`, which must still parse grants
+stored before it — `.agents/docs/architecture/auth-and-permissions.md` says why.
 
 ## Tests
 

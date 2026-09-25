@@ -49,6 +49,23 @@ describe('useDeleteSeriesInstrumentMutation', () => {
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['instrument-info'] });
   });
 
+  // A series id is a hash of its title, items and owning group, so a series recreated with the same
+  // title and items reuses the id of the deleted one, and its bundle is never revalidated.
+  it('removes the cached bundles, so a series recreated under the same id is not served the old bundle', async () => {
+    mockAxios.delete.mockResolvedValue({ data: { id: 'series-1' } });
+    const { queryClient, result } = renderDeleteMutation();
+    queryClient.setQueryData(['instrument-bundle', 'group-1', 'series-1'], {
+      bundle: '__BUNDLE__',
+      id: 'series-1',
+      kind: 'SERIES'
+    });
+
+    result.current.mutate({ id: 'series-1' });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(queryClient.getQueryData(['instrument-bundle', 'group-1', 'series-1'])).toBeUndefined();
+  });
+
   it('runs onSuccess and onSettled after a successful delete', async () => {
     mockAxios.delete.mockResolvedValue({ data: { id: 'series-1' } });
     const onSettled = vi.fn();

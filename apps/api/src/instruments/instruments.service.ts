@@ -706,6 +706,11 @@ export class InstrumentsService {
    * The rule mirrors the visibility test the manage page applies client-side: not sourced from a repo,
    * sourced from a repo currently assigned to the group, or already accessible to it — the last so a
    * selection survives its repository later being unassigned.
+   *
+   * "Not sourced from a repo" needs the `isSet` fallback: `create` never writes `sourceRepoId`, so on
+   * a manually uploaded instrument the key is absent rather than null, and prisma compiles a `null`
+   * filter into a comparison that also requires the field to be present. Without it every uploaded
+   * instrument reads as missing, and a group with no assigned repository can assemble no series at all.
    */
   private async validateSeriesInstrument(instrument: SeriesInstrument, seriesGroupId?: string) {
     const items = getSeriesInstrumentItems(instrument.content);
@@ -727,6 +732,7 @@ export class InstrumentsService {
             ? {
                 OR: [
                   { sourceRepoId: null },
+                  { sourceRepoId: { isSet: false } },
                   { sourceRepoId: { in: group.instrumentRepoIds ?? [] } },
                   { id: { in: group.accessibleInstrumentIds ?? [] } }
                 ]

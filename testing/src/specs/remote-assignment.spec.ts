@@ -120,6 +120,19 @@ test.describe('remote assignment', () => {
     await expect(assignmentsPage.assignmentRows).toHaveCount(0);
   });
 
+  test('should not return the private key the submission is encrypted to when creating an assignment', async ({
+    api
+  }) => {
+    const group = await api.createGroup();
+    const assignment = await api.createAssignment({
+      expiresAt: new Date(Date.now() + 86_400_000),
+      groupId: group.id,
+      instrumentId: await api.findInstrumentId('FORM'),
+      subjectId: await api.createSubject(group.id)
+    });
+    expect(assignment).not.toHaveProperty('encryptionKeyPair');
+  });
+
   test("should let a group manager cancel an outstanding assignment from the subject's assignments tab", async ({
     getPageModel,
     page,
