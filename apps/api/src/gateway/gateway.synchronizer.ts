@@ -1,7 +1,7 @@
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { ConfigService, LoggingService } from '@douglasneuroinformatics/libnest';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import type { OnApplicationBootstrap } from '@nestjs/common';
+import type { OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { getSeriesInstrumentItems } from '@opendatacapture/instrument-utils';
 import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
 import type { RemoteAssignment } from '@opendatacapture/schemas/assignment';
@@ -16,8 +16,13 @@ import { SetupService } from '@/setup/setup.service';
 
 import { GatewayService } from './gateway.service';
 
+const SYNC_TIMEOUT = 300_000;
+
 @Injectable()
-export class GatewaySynchronizer implements OnApplicationBootstrap {
+export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicationShutdown {
+  private isStopped = false;
+  private nextSyncTimer?: NodeJS.Timeout;
+  private pendingSync?: Promise<void>;
   private readonly refreshInterval: number;
 
   constructor(
@@ -34,7 +39,14 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   }
 
   onApplicationBootstrap() {
-    setInterval(() => void this.sync(), this.refreshInterval);
+    this.scheduleNextSync();
+  }
+
+  async onApplicationShutdown() {
+    this.isStopped = true;
+    clearTimeout(this.nextSyncTimer);
+    this.nextSyncTimer = undefined;
+    await this.pendingSync;
   }
 
   async sync() {
@@ -87,7 +99,6 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         });
       }
     }
-    this.loggingService.log('Done synchronizing with gateway');
   }
 
   private async handleAssignmentComplete(remoteAssignment: RemoteAssignment) {
@@ -212,6 +223,52 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       await this.sessionsService.deleteById(session.id);
       this.loggingService.log(`Deleted session with ID: ${session.id}`);
       throw err;
+    }
+  }
+
+  /**
+   * `refreshInterval` is the gap between passes, not a fixed period. A period would start a pass
+   * while the previous one was still running: a fetch that outlasts the interval then accumulates
+   * passes without bound, each holding a full assignment payload, until the process exhausts
+   * memory.
+   */
+  private async runScheduledSync(): Promise<void> {
+    const startedAt = Date.now();
+    try {
+      await this.syncWithTimeout();
+      this.loggingService.log(`Done synchronizing with gateway in ${Date.now() - startedAt}ms`);
+    } catch (err) {
+      this.loggingService.error({
+        cause: err,
+        error: `Gateway synchronization failed after ${Date.now() - startedAt}ms`
+      });
+    } finally {
+      if (!this.isStopped) {
+        this.scheduleNextSync();
+      }
+    }
+  }
+
+  private scheduleNextSync(): void {
+    this.nextSyncTimer = setTimeout(() => {
+      this.pendingSync = this.runScheduledSync();
+    }, this.refreshInterval);
+  }
+
+  /**
+   * A pass that never settles would hold the loop forever, since the next pass is scheduled only
+   * once the previous one finishes. Abandoning it gives up on that pass alone: whatever it left
+   * unsynchronized keeps its status and is picked up by the next pass.
+   */
+  private async syncWithTimeout(): Promise<void> {
+    const abandonedSync = Promise.withResolvers<never>();
+    const timer = setTimeout(() => {
+      abandonedSync.reject(new Error(`Gateway synchronization exceeded the maximum duration of ${SYNC_TIMEOUT}ms`));
+    }, SYNC_TIMEOUT);
+    try {
+      await Promise.race([this.sync(), abandonedSync.promise]);
+    } finally {
+      clearTimeout(timer);
     }
   }
 }
