@@ -219,6 +219,7 @@ describe('GatewaySynchronizer', () => {
   });
 
   describe('synchronization loop', () => {
+    const FIVE_MINUTES = 300_000;
     const REFRESH_INTERVAL = 100;
     const SYNC_DURATION = 500;
 
@@ -307,6 +308,29 @@ describe('GatewaySynchronizer', () => {
       await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL * 20);
 
       expect(sync).toHaveBeenCalledOnce();
+    });
+
+    it('should abandon a pass that has run for five minutes, so a stalled synchronization cannot halt the loop', async () => {
+      sync.mockImplementationOnce(() => Promise.withResolvers<void>().promise);
+      gatewaySynchronizer.onApplicationBootstrap();
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL + FIVE_MINUTES);
+
+      expect(loggingService.error).toHaveBeenCalledWith(expect.objectContaining({ cause: expect.any(Error) }));
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL + SYNC_DURATION);
+      expect(sync).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not abandon a pass that finishes within five minutes', async () => {
+      sync.mockImplementationOnce(async () => {
+        await new Promise((resolve) => setTimeout(resolve, FIVE_MINUTES - 1));
+      });
+      gatewaySynchronizer.onApplicationBootstrap();
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL + FIVE_MINUTES);
+
+      expect(loggingService.error).not.toHaveBeenCalled();
     });
 
     it('should await the in-flight synchronization on shutdown, so no pass outlives the application', async () => {

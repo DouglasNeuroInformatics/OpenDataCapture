@@ -241,9 +241,10 @@ per file. Three consequences worth knowing:
 - **`GatewaySynchronizer` owns a timer for the lifetime of the suite.** It schedules each pass with
   `setTimeout` only once the previous pass has finished, stores the handle, and clears it in
   `onApplicationShutdown`, where it also awaits the in-flight pass — so `app.close()` leaves nothing
-  that can fire `sync()` after the replica set is stopped. Keep it that way rather than disabling
-  `GATEWAY_ENABLED` for tests, which would drop `GatewayModule`'s `forwardRef` circular dependency
-  out of exactly the wiring these tests exist to check.
+  that can fire `sync()` after the replica set is stopped. That await is bounded: a pass is abandoned
+  after five minutes, so a stalled gateway call cannot hang `app.close()` either. Keep it that way
+  rather than disabling `GATEWAY_ENABLED` for tests, which would drop `GatewayModule`'s `forwardRef`
+  circular dependency out of exactly the wiring these tests exist to check.
 
 Provider overrides are deliberately not offered — nothing needs one yet. Adding them means
 `Test.createTestingModule({ imports: [appContainer.module] })`, which also means reproducing
