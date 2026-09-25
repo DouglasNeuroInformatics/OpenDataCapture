@@ -134,6 +134,15 @@ export class ApiClient {
     return instrument.id;
   }
 
+  /** The ids the start-session form suggests for a group: its subjects identified by a custom id. */
+  async findSubjectCustomIds(groupId: string): Promise<string[]> {
+    return this.expectJson<string[]>(
+      this.request.get(`${API}/subjects/groups/${groupId}/custom-ids`, { headers: this.authHeaders }),
+      200,
+      `find the custom subject ids of group '${groupId}'`
+    );
+  }
+
   /** Reads a user back as admin, to check what a write actually stored. */
   async findUserById(id: string): Promise<User> {
     return this.expectJson<User>(
