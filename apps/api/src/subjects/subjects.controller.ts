@@ -1,5 +1,5 @@
 import { $BooleanLike } from '@douglasneuroinformatics/libjs';
-import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
+import { CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import z from 'zod/v4';
@@ -50,5 +50,12 @@ export class SubjectsController {
   @RouteAccess({ action: 'read', subject: 'Subject' })
   findById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
     return this.subjectsService.findById(id, { ability });
+  }
+
+  @ApiOperation({ summary: 'Get the Custom IDs of a Group’s Subjects' })
+  @Get('groups/:groupId/custom-ids')
+  @RouteAccess({ action: 'read', subject: 'Subject' })
+  findCustomIds(@Param('groupId', ValidObjectIdPipe) groupId: string, @CurrentUser('ability') ability: AppAbility) {
+    return this.subjectsService.findCustomIds(groupId, { ability });
   }
 }
