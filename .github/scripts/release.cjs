@@ -8,9 +8,17 @@ const fs = require('node:fs');
  * skipped a release (`build` pushes bare tags, and it only matched `v`-prefixed ones) but did
  * fail the whole workflow once a bad release was deleted and took the `latest` tag with it.
  *
+ * A manual dispatch is refused on any other ref, so a branch cannot publish `latest`, npm packages
+ * or a `v*` tag. This only stops an accidental dispatch: the dispatched ref supplies this file too.
+ * The `release` environment's branch policy and the npm trusted publisher are what enforce it.
+ *
  * @param {import('github-script').AsyncFunctionArguments} args
  */
-module.exports = ({ core }) => {
+module.exports = ({ context, core }) => {
+  if (context.ref !== 'refs/heads/main') {
+    core.setFailed(`Releases are cut from refs/heads/main only, not ${context.ref}`);
+    return;
+  }
   /** @type {string} */
   const version = JSON.parse(fs.readFileSync('package.json', 'utf-8')).version;
   core.setOutput('version', version);

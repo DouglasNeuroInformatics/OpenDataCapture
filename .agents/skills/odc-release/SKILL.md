@@ -5,7 +5,8 @@ description: Ship a release of Open Data Capture — bump the version, publish t
 
 A release is **one version bump merged to `main`** — after that `.github/workflows/release.yaml` builds the
 images, publishes the npm packages and creates the GitHub release with no further input. It also fires on
-`workflow_dispatch`, which releases again with no bump and no merge. The release body is the new version's
+`workflow_dispatch` from `main`, which releases again with no bump and no merge; a dispatch from any other ref
+fails `configure`. The release body is the new version's
 section of `CHANGELOG.md`, which `scripts/increment-version.ts` generates from the commits since the last tag;
 the `release` job fails, rather than publishing an empty body, when that section is missing. Which workspaces publish: `.agents/docs/workspace-map.md`; how each artifact is selected: the job
 table in `.agents/docs/playbooks/cut-a-release.md`.
@@ -52,7 +53,7 @@ from the run.
 Machinery oddities, verified and already understood — say so in your reply and carry on. A red `build` is not one
 of them; that is a failure to fix.
 
-- Every push to `main` performs a full release — `release.cjs` sets `should_release` to `'true'` unconditionally, on
+- Every push to `main` performs a full release — `release.cjs` sets `should_release` to `'true'` on every run from `main`, on
   purpose. It consults nothing outside the repository, so no registry state can wedge it; do not add a gate that
   reads GHCR or npm back. The gate that used to live there is in `.agents/docs/playbooks/cut-a-release.md`.
 - No playground image ships — the matrix filter drops it.
