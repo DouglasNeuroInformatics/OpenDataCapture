@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
-import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
+import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { createFileRoute, useLocation } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 
@@ -11,7 +11,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { StartSessionForm } from '@/components/StartSessionForm';
 import type { StartSessionFormData } from '@/components/StartSessionForm';
 import { useCreateSessionMutation } from '@/hooks/useCreateSessionMutation';
-import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
+import { subjectCustomIdsQueryOptions, useSubjectCustomIdsQuery } from '@/hooks/useSubjectCustomIdsQuery';
 import { useAppStore } from '@/store';
 
 const RouteComponent = () => {
@@ -30,11 +30,9 @@ const RouteComponent = () => {
 
   const { t } = useTranslation('session');
   const createSessionMutation = useCreateSessionMutation();
-  const subjectsQuery = useSubjectsQuery({ params: { groupId: currentGroup?.id } });
+  const subjectCustomIdsQuery = useSubjectCustomIdsQuery({ params: { groupId: currentGroup?.id } });
 
-  const customSubjectIds = subjectsQuery.data
-    .filter((subject) => !isSubjectWithPersonalInfo(subject))
-    .map((subject) => removeSubjectIdScope(subject.id));
+  const customSubjectIds = subjectCustomIdsQuery.data.map(removeSubjectIdScope);
 
   useEffect(() => {
     if (currentSession === null) {
@@ -121,6 +119,6 @@ export const Route = createFileRoute('/_app/session/start-session')({
   component: RouteComponent,
   loader: async ({ context }) => {
     const { currentGroup } = useAppStore.getState();
-    await context.queryClient.ensureQueryData(subjectsQueryOptions({ params: { groupId: currentGroup?.id } }));
+    await context.queryClient.ensureQueryData(subjectCustomIdsQueryOptions({ params: { groupId: currentGroup?.id } }));
   }
 });

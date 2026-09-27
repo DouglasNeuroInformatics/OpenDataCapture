@@ -26,6 +26,10 @@ export const $Subject = $BaseModel.extend({
   sex: $Sex.nullish()
 });
 
+/** The ids of a group's subjects that are identified by a custom id rather than personal information. */
+export type SubjectCustomIds = z.infer<typeof $SubjectCustomIds>;
+export const $SubjectCustomIds = $Subject.shape.id.array();
+
 export type CreateSubjectData = z.infer<typeof $CreateSubjectData>;
 export const $CreateSubjectData = $Subject.pick({
   dateOfBirth: true,

@@ -168,6 +168,28 @@ export class SubjectsService {
     return subject;
   }
 
+  /**
+   * The ids of a group's subjects that are identified by a custom id rather than by personal
+   * information, i.e. those missing at least one of the fields a personal-info id is hashed from.
+   *
+   * On MongoDB a Prisma `null` filter does not match a document where the field is absent, so each
+   * field is matched on both `null` and `isSet: false`.
+   */
+  async findCustomIds(groupId: string, { ability }: EntityOperationOptions = {}): Promise<string[]> {
+    const personalInfoFields = ['dateOfBirth', 'firstName', 'lastName', 'sex'] as const;
+    const subjects = await this.subjectModel.findMany({
+      select: { id: true },
+      where: {
+        AND: [
+          accessibleQuery(ability, 'read', 'Subject'),
+          { groupIds: { has: groupId } },
+          { OR: personalInfoFields.flatMap((field) => [{ [field]: null }, { [field]: { isSet: false } }]) }
+        ]
+      }
+    });
+    return subjects.map((subject) => subject.id);
+  }
+
   private async querySubjectIdsWithRecords(groupId?: string): Promise<string[]> {
     const records = await this.prismaClient.instrumentRecord.findMany({
       distinct: ['subjectId'],
