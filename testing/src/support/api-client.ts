@@ -101,6 +101,15 @@ export class ApiClient {
     return { credentials: { password, username }, user };
   }
 
+  /** Reads a subject's assignments back as admin, to check whether a write by another role took effect. */
+  async findAssignments(subjectId: string): Promise<Assignment[]> {
+    return this.expectJson<Assignment[]>(
+      this.request.get(`${API}/assignments`, { headers: this.authHeaders, params: { subjectId } }),
+      200,
+      `find the assignments of subject '${subjectId}'`
+    );
+  }
+
   /** Reads a group back as admin, to check whether a write by another role actually took effect. */
   async findGroupById(id: string): Promise<Group> {
     return this.expectJson<Group>(
