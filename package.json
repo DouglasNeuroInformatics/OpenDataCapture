@@ -29,7 +29,7 @@
     "preview:core": "env-cmd turbo run preview --filter=@opendatacapture/api --filter=@opendatacapture/gateway --filter=@opendatacapture/web",
     "start": "turbo run start",
     "test": "env-cmd vitest",
-    "test:coverage": "vitest --coverage",
+    "test:coverage": "env-cmd vitest --coverage",
     "test:e2e": "env-cmd turbo run test:e2e",
     "ws": "./scripts/workspace.sh $@"
   },
