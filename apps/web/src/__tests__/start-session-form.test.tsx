@@ -1,4 +1,5 @@
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
+import type { Group } from '@opendatacapture/schemas/group';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -8,10 +9,23 @@ import '@/services/i18n';
 
 const onSubmit = vi.fn();
 
-const renderForm = (customSubjectIds: string[]) => {
+const groupWithIdPattern: Group = {
+  accessibleInstrumentIds: [],
+  createdAt: new Date('2026-01-01'),
+  id: 'group-1',
+  instrumentRepoIds: [],
+  name: 'Group One',
+  settings: { defaultIdentificationMethod: 'CUSTOM_ID', idValidationRegex: '^[a-z]+$' },
+  subjectIds: [],
+  type: 'CLINICAL',
+  updatedAt: new Date('2026-01-02'),
+  userIds: []
+};
+
+const renderForm = (customSubjectIds: string[], currentGroup: Group | null = null) => {
   render(
     <StartSessionForm
-      currentGroup={null}
+      currentGroup={currentGroup}
       customSubjectIds={customSubjectIds}
       readOnly={false}
       username="admin"
@@ -46,6 +60,8 @@ const submit = (form: HTMLElement) => {
 };
 
 const submittedSubjectId = () => onSubmit.mock.lastCall?.[0].subjectData.id;
+
+const errorMessages = () => screen.queryAllByTestId('error-message-text').map((element) => element.textContent);
 
 beforeEach(() => {
   // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
@@ -96,5 +112,30 @@ describe('StartSessionForm', () => {
     submit(form);
     await waitFor(() => expect(screen.getByText('Illegal character: $')).toBeTruthy());
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should show only the illegal-character error for an identifier containing the scope separator, not a contradictory required-field error', async () => {
+    const form = renderForm([]);
+    typeIdentifier('abc$def');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual(['Illegal character: $']));
+  });
+
+  it('should show only the required-field error for an identifier that was typed and then cleared', async () => {
+    const form = renderForm([]);
+    typeIdentifier('abc');
+    typeIdentifier('');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual(['This field is required']));
+  });
+
+  it("should show only the group's pattern error for an identifier the pattern rejects, so the regex check still applies", async () => {
+    const form = renderForm([], groupWithIdPattern);
+    typeIdentifier('abc1');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual(['Must match regular expression: ^[a-z]+$']));
   });
 });

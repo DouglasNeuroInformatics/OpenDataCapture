@@ -170,16 +170,19 @@ test.describe('start session', () => {
     await expect(startSessionPage.errorMessages).toHaveText('This field is required');
   });
 
-  test('should reject a custom identifier containing an illegal character', async ({ getPageModel }) => {
+  test('should reject a custom identifier containing an illegal character with that error alone, not a contradictory required-field one', async ({
+    getPageModel
+  }) => {
     const startSessionPage = await getPageModel('/session/start-session');
     await startSessionPage.sessionForm.waitFor({ state: 'visible' });
     await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
-    await startSessionPage.subjectIdField.fill('subject$1');
+    await startSessionPage.subjectIdField.fill('abc$def');
     await startSessionPage.sessionForm.locator('[name="subjectDateOfBirth"]').fill('1990-01-01');
     await startSessionPage.sessionForm.locator('[name="subjectSex"]').selectOption('MALE');
     await startSessionPage.submitForm();
 
-    await expect(startSessionPage.errorMessages.filter({ hasText: 'Illegal character: $' })).toBeVisible();
+    await expect(startSessionPage.errorMessages).toHaveCount(1);
+    await expect(startSessionPage.errorMessages).toHaveText('Illegal character: $');
     await expect(startSessionPage.successMessage).not.toBeVisible();
   });
 
