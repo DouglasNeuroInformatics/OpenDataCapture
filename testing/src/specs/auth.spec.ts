@@ -15,6 +15,23 @@ test.describe('authentication', () => {
     await loginPage.expect.toHaveURL('/dashboard');
   });
 
+  test.describe('demo instance', () => {
+    test('should show the demo information over the login page as soon as it loads', async ({ getPageModel }) => {
+      const loginPage = await getPageModel('/auth/login');
+      await expect(loginPage.demoDialog).toBeVisible();
+    });
+
+    test('should reveal the login form once the demo information is dismissed', async ({ getPageModel }) => {
+      const loginPage = await getPageModel('/auth/login');
+      await expect(loginPage.demoDialog).toBeVisible();
+      await loginPage.dismissDemoDialog();
+
+      const usernameField = loginPage.loginForm.getByLabel('username');
+      await usernameField.click();
+      await expect(usernameField).toBeFocused();
+    });
+  });
+
   test.describe('invalid credentials', () => {
     test('should show an error and stay on the login page for a wrong password', async ({
       api,
