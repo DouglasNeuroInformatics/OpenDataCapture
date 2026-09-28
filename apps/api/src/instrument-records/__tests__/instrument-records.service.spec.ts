@@ -1,11 +1,12 @@
 import type { Model } from '@douglasneuroinformatics/libnest';
-import { getModelToken } from '@douglasneuroinformatics/libnest';
+import { getModelToken, LoggingService } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 import { StorageService } from '@/storage/storage.service';
 import { UsersService } from '@/users/users.service';
@@ -553,6 +554,35 @@ describe('InstrumentRecordsService', () => {
         username: 'testuser',
         value: 85
       });
+    });
+
+    it("should export a group manager's own group and no other, since each raw row is checked as an instrument record", async () => {
+      const exportRow = (groupId: string): RecordType => ({
+        computedMeasures: { score: 85 },
+        date: '2023-01-01',
+        groupId,
+        id: `record-${groupId}`,
+        instrumentId: 'instrument-1',
+        session: { date: '2023-01-01', id: `session-${groupId}`, type: 'IN_PERSON', user: { username: 'testuser' } },
+        subject: { age: 20, groupIds: [groupId], id: `subject-${groupId}`, sex: 'MALE' }
+      });
+      const ability = new AbilityFactory(
+        MockFactory.createMock(LoggingService) as unknown as LoggingService
+      ).createForPayload({
+        additionalPermissions: undefined,
+        basePermissionLevel: 'GROUP_MANAGER',
+        firstName: 'Test',
+        groups: [{ id: 'group-1' }],
+        id: 'user-1',
+        lastName: 'User',
+        username: 'manager-user'
+      } as any);
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([exportRow('group-1'), exportRow('group-2')]);
+      instrumentsService.findById.mockResolvedValue({ id: 'instrument-1', internal: { edition: 1, name: 'Test' } });
+
+      const result = await instrumentRecordsService.exportRecords({}, { ability });
+
+      expect(result.map((entry) => entry.groupId)).toStrictEqual(['group-1']);
     });
 
     it('should join and project the session user by a cast-hardened lookup, so the export includes the username of whoever ran the session', async () => {
