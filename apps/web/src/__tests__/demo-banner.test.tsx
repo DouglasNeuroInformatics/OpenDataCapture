@@ -1,5 +1,6 @@
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { DEMO_USERS } from '@opendatacapture/demo';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DemoBanner } from '@/components/DemoBanner';
@@ -32,5 +33,14 @@ describe('DemoBanner', () => {
     dismiss();
     fireEvent.click(screen.getByRole('button', { name: 'How to Use?' }));
     expect(screen.getByRole('dialog', { name: 'Demo Information' })).toBeTruthy();
+  });
+
+  it("should log in with the credentials of whichever demo user's row was chosen, so every listed account works", () => {
+    const onLogin = vi.fn();
+    render(<DemoBanner onLogin={onLogin} />);
+    for (const { username } of DEMO_USERS) {
+      fireEvent.click(within(screen.getByRole('row', { name: new RegExp(username) })).getByRole('button'));
+    }
+    expect(onLogin.mock.calls).toEqual(DEMO_USERS.map(({ password, username }) => [{ password, username }]));
   });
 });

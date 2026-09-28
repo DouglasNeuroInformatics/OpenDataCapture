@@ -7,11 +7,14 @@ import { RootPage } from '../__root.page';
 export class LoginPage extends RootPage {
   readonly _requiresAuth = false;
   readonly demoDialog: Locator;
+  /** One row per demo account, each with a button that logs straight in as it. */
+  readonly demoUserRows: Locator;
   readonly loginForm: Locator;
 
   constructor(page: Page) {
     super(page);
     this.demoDialog = page.getByTestId('demo-dialog');
+    this.demoUserRows = this.demoDialog.getByRole('row').filter({ has: page.getByRole('cell') });
     this.loginForm = page.getByTestId('login-form');
   }
 

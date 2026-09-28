@@ -30,6 +30,21 @@ test.describe('authentication', () => {
       await usernameField.click();
       await expect(usernameField).toBeFocused();
     });
+
+    // A standard user's dashboard redirects to the start-session form, so pick a group manager, and
+    // the last one, so a button wired to the first row's user would show the wrong username.
+    test('should log in as the demo user whose row is chosen in the demo information', async ({
+      getPageModel,
+      page
+    }) => {
+      const loginPage = await getPageModel('/auth/login');
+      const demoUserRow = loginPage.demoUserRows.filter({ hasText: 'Group Manager' }).last();
+      const username = await demoUserRow.getByRole('cell').first().innerText();
+      await demoUserRow.getByRole('button').click();
+
+      await loginPage.expect.toHaveURL('/dashboard');
+      await expect(page.getByTestId('user-dropup-trigger')).toHaveText(username);
+    });
   });
 
   test.describe('invalid credentials', () => {
