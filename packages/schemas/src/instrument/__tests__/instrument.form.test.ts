@@ -51,6 +51,20 @@ describe('$FormInstrument', () => {
   it('should reject a non-boolean resetButton', () => {
     expect($FormInstrument.safeParse({ ...unilingualFormInstrument.instance, resetButton: 'yes' }).success).toBe(false);
   });
+
+  // Stripped for the same reason as resetButton above, the summary would fall back to the instrument's
+  // default visibility and show a measure its author hid, or hide one they marked visible.
+  it.each([
+    { instance: unilingualFormInstrument.instance, kind: 'unilingual', label: 'Is Negative' },
+    { instance: bilingualFormInstrument.instance, kind: 'bilingual', label: { en: 'Is Negative', fr: 'Est négatif' } }
+  ])('should preserve the visibility of a $kind computed measure rather than stripping it', ({ instance, label }) => {
+    const result = $FormInstrument.safeParse({
+      ...instance,
+      measures: { isNegative: { kind: 'computed', label, value: () => false, visibility: 'hidden' } }
+    });
+    expect(result.success).toBe(true);
+    expect(result.data?.measures?.isNegative).toHaveProperty('visibility', 'hidden');
+  });
 });
 
 describe('$FormInstrumentBlock', () => {
