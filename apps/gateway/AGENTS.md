@@ -3,7 +3,8 @@
 The patient-facing app that serves one remote assignment per page. Express 5 + React 19, server
 rendered. `apps/api` is its only programmatic client — `apps/api/src/gateway/gateway.service.ts`
 creates, fetches and deletes assignments here over HTTP, and the patient is given a link to
-`/assignments/:id`.
+`/assignments/:id`. `/` renders a landing page telling anyone who arrives without that link to open
+it; `RootProps` is a union on `kind` so both pages share `Root`'s shell.
 
 **Traffic only ever flows API → gateway.** This app holds no address or credential for the API, so
 it cannot ask for anything: whatever it needs to know about the instance it serves has to be pushed.
@@ -119,7 +120,8 @@ hydrated tree can disagree with the SSR'd HTML until you do.
 ## Tests
 
 `pnpm exec vitest --project gateway` runs the unit tests in `src/**/__tests__/`. They cover request
-schemas only: nothing here starts the Express server, so a router's behaviour is tested end to end.
+schemas and pure helpers such as `resolveLanguage` only: nothing here starts the Express server, so
+a router's behaviour is tested end to end.
 
 Most of the coverage is `testing/src/specs/gateway-assignment.spec.ts`, which drives the real
 two-origin flow through the Cap widget. See `.agents/docs/architecture/testing-strategy.md`.
