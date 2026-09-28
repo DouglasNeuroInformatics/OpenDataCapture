@@ -1,10 +1,18 @@
+import { LoggingService } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { NotFoundException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
+import type { Permissions } from '@opendatacapture/schemas/core';
+import type { Group } from '@opendatacapture/schemas/group';
+import type { BasePermissionLevel } from '@opendatacapture/schemas/user';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AbilityFactory } from '@/auth/ability.factory';
 import type { AppAbility } from '@/auth/auth.types';
+import { ROUTE_ACCESS_METADATA_KEY } from '@/core/decorators/route-access.decorator';
+import type { ProtectedRoutePermissionSet } from '@/core/decorators/route-access.decorator';
 import { GroupsService } from '@/groups/groups.service';
 import { MailService } from '@/mail/mail.service';
 
@@ -129,6 +137,54 @@ describe('UsersController', () => {
       await usersController.create({ ...createUserData, groupIds: [] }, ability);
       expect(groupsService.findById).not.toHaveBeenCalled();
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ group: '' });
+    });
+  });
+
+  describe('updatePermissions', () => {
+    it('should forward the caller ability, so the write is scoped', async () => {
+      const permissions: Permissions = [{ action: 'read', groupId: 'group-1', subject: 'Subject' }];
+      await usersController.updatePermissions('user-1', { permissions }, ability);
+      expect(usersService.updatePermissions).toHaveBeenCalledWith('user-1', permissions, { ability });
+    });
+  });
+
+  // What `JwtAuthGuard` itself computes for each route that writes a user: the declared access,
+  // evaluated against a whole ability. `manage User` covers every action a narrower declaration could
+  // name, so a holder refused here is refused by any declaration short of `manage all`.
+  describe('route access for writes to a user', () => {
+    const WRITE_HANDLERS = ['create', 'deleteById', 'updateById', 'updatePermissions'] as const;
+
+    const abilityFor = (basePermissionLevel: BasePermissionLevel, additionalPermissions: Permissions = []) =>
+      new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
+        additionalPermissions,
+        basePermissionLevel,
+        firstName: 'Test',
+        groups: [{ id: 'group-1' }] as Group[],
+        id: 'user-1',
+        kind: 'login',
+        lastName: 'User',
+        mustResetPassword: false,
+        username: 'test-user'
+      });
+
+    const declaredAccess = (handler: (typeof WRITE_HANDLERS)[number]) =>
+      new Reflector().get<ProtectedRoutePermissionSet>(
+        ROUTE_ACCESS_METADATA_KEY,
+        Object.getOwnPropertyDescriptor(UsersController.prototype, handler)!.value
+      );
+
+    it.each(WRITE_HANDLERS)(
+      'should refuse %s to a group manager granted `manage User`, who could otherwise make themselves an administrator',
+      (handler) => {
+        const { action, subject } = declaredAccess(handler);
+        const grantee = abilityFor('GROUP_MANAGER', [{ action: 'manage', groupId: null, subject: 'User' }]);
+        expect(grantee.can(action, subject)).toBe(false);
+      }
+    );
+
+    it.each(WRITE_HANDLERS)('should allow %s to an administrator', (handler) => {
+      const { action, subject } = declaredAccess(handler);
+      expect(abilityFor('ADMIN').can(action, subject)).toBe(true);
     });
   });
 });

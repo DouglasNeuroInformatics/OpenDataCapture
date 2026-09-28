@@ -1,7 +1,7 @@
 {
   "name": "opendatacapture",
   "type": "module",
-  "version": "2.3.1",
+  "version": "2.5.2",
   "private": true,
   "packageManager": "pnpm@10.34.3",
   "license": "Apache-2.0",
@@ -29,7 +29,7 @@
     "preview:core": "env-cmd turbo run preview --filter=@opendatacapture/api --filter=@opendatacapture/gateway --filter=@opendatacapture/web",
     "start": "turbo run start",
     "test": "env-cmd vitest",
-    "test:coverage": "vitest --coverage",
+    "test:coverage": "env-cmd vitest --coverage",
     "test:e2e": "env-cmd turbo run test:e2e",
     "ws": "./scripts/workspace.sh $@"
   },

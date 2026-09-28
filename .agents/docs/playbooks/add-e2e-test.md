@@ -4,12 +4,14 @@ Adding or extending a Playwright spec in `testing/`. Conventions and the reasoni
 in `testing/AGENTS.md` — read it first; this file is the order of operations.
 
 **Prerequisites, once per machine.** `.env` must exist at the repo root (`pnpm generate:env`):
-`testing/src/support/env.ts` reads `API_DEV_SERVER_PORT`, `GATEWAY_DEV_SERVER_PORT` and
-`WEB_DEV_SERVER_PORT`, and throws while `playwright.config.ts` is still loading if one is missing.
+`testing/src/support/env.ts` reads `API_DEV_SERVER_PORT`, `GATEWAY_DEV_SERVER_PORT`,
+`PLAYGROUND_DEV_SERVER_PORT` and `WEB_DEV_SERVER_PORT`, and throws while `playwright.config.ts` is
+still loading if one is missing.
 Browsers must be installed:
 `pnpm --filter @opendatacapture/testing exec playwright install chromium firefox`. Nothing else
 needs starting — `playwright.config.ts` launches api, gateway and web itself through each app's
-`pnpm dev:test`, and the API brings up an in-memory Mongo replica set.
+`pnpm dev:test`, plus the playground through its `pnpm dev`, and the API brings up an in-memory
+Mongo replica set.
 
 ## Steps
 

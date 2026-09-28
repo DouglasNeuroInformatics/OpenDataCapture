@@ -1472,6 +1472,9 @@ importers:
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
         version: 3.2.1(neverthrow@8.2.0)(zod@4.4.3)
+      '@opendatacapture/playground-url':
+        specifier: workspace:*
+        version: link:../packages/playground-url
       '@opendatacapture/schemas':
         specifier: workspace:*
         version: link:../packages/schemas

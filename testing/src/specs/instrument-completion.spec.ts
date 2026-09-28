@@ -222,6 +222,56 @@ test.describe('instrument completion', () => {
     await expect(page.getByTestId('data-table-body').getByTestId('data-table-row')).toHaveCount(2);
   });
 
+  // Clinicians switch between the app and other programs during a visit. The bundle behind an
+  // instrument id never changes, and a refetch that failed — an expired token, say — would hand the
+  // open instrument, and everything entered into it, to the route error boundary.
+  test('should not request the bundle again after the tab is hidden and shown again', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Focus${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+    await expect(instrumentPage.submitButton).toBeVisible();
+
+    const bundleRequests: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().includes('/v1/instruments/bundle/')) {
+        bundleRequests.push(request.url());
+      }
+    });
+
+    // Headless Chromium keeps the tab visible, so the state is overridden and the event dispatched by
+    // hand. React Query's focusManager listens for visibilitychange on the window, which the event
+    // reaches from the document.
+    const setTabVisibility = (visibilityState: 'hidden' | 'visible') =>
+      page.evaluate((state) => {
+        Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => state });
+        document.dispatchEvent(new Event('visibilitychange', { bubbles: true }));
+      }, visibilityState);
+
+    await setTabVisibility('hidden');
+    await setTabVisibility('visible');
+    await page.waitForTimeout(500);
+
+    expect(bundleRequests).toEqual([]);
+    await expect(instrumentPage.submitButton).toBeVisible();
+  });
+
   test('should show a validation error for a postal code that does not match the expected format', async ({
     getPageModel,
     page,

@@ -2,7 +2,7 @@ import * as path from 'node:path';
 
 import { defineConfig, devices } from '@playwright/test';
 
-import { apiPort, baseURL, gatewayPort, webPort } from './src/support/env';
+import { apiPort, baseURL, gatewayPort, playgroundPort, webPort } from './src/support/env';
 
 const webServerDefaults = {
   gracefulShutdown: { signal: 'SIGINT', timeout: 1000 },
@@ -57,6 +57,12 @@ export default defineConfig({
       command: 'pnpm dev:test',
       cwd: path.resolve(import.meta.dirname, '../apps/web'),
       url: `http://localhost:${webPort}`
+    },
+    {
+      ...webServerDefaults,
+      command: 'pnpm dev',
+      cwd: path.resolve(import.meta.dirname, '../apps/playground'),
+      url: `http://localhost:${playgroundPort}`
     }
   ],
   workers: process.env.CI ? 1 : undefined

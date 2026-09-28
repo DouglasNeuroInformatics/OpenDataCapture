@@ -42,9 +42,10 @@ function readWorkspaceScopes(): string[] {
 
 export default {
   extends: ['@commitlint/config-conventional'],
+  // Dependabot's bodies carry release-note links far past the 100-character line limit. Its headers
+  // are fixed by `commit-message.prefix` in .github/dependabot.yml, so there is nothing to lint.
+  ignores: [(message: string) => message.includes('Signed-off-by: dependabot[bot] <support@github.com>')],
   rules: {
-    // A warning while contributors adopt the workspace names as scopes. Raising this to an error
-    // is tracked in https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues/1529
-    'scope-enum': [1, 'always', readWorkspaceScopes()]
+    'scope-enum': [2, 'always', readWorkspaceScopes()]
   }
 };

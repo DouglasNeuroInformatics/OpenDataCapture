@@ -1,7 +1,7 @@
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { ConfigService, LoggingService } from '@douglasneuroinformatics/libnest';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import type { OnApplicationBootstrap } from '@nestjs/common';
+import type { OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { getSeriesInstrumentItems } from '@opendatacapture/instrument-utils';
 import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
 import type { RemoteAssignment } from '@opendatacapture/schemas/assignment';
@@ -16,8 +16,13 @@ import { SetupService } from '@/setup/setup.service';
 
 import { GatewayService } from './gateway.service';
 
+const SYNC_TIMEOUT = 300_000;
+
 @Injectable()
-export class GatewaySynchronizer implements OnApplicationBootstrap {
+export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicationShutdown {
+  private isStopped = false;
+  private nextSyncTimer?: NodeJS.Timeout;
+  private pendingSync?: Promise<void>;
   private readonly refreshInterval: number;
 
   constructor(
@@ -34,7 +39,14 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
   }
 
   onApplicationBootstrap() {
-    setInterval(() => void this.sync(), this.refreshInterval);
+    this.scheduleNextSync();
+  }
+
+  async onApplicationShutdown() {
+    this.isStopped = true;
+    clearTimeout(this.nextSyncTimer);
+    this.nextSyncTimer = undefined;
+    await this.pendingSync;
   }
 
   async sync() {
@@ -87,7 +99,6 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         });
       }
     }
-    this.loggingService.log('Done synchronizing with gateway');
   }
 
   private async handleAssignmentComplete(remoteAssignment: RemoteAssignment) {
@@ -106,22 +117,14 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
 
     const instrument = await this.instrumentsService.findById(assignment.instrumentId);
 
-    const session = await this.sessionsService.create({
-      date: remoteAssignment.completedAt,
-      groupId: remoteAssignment.groupId ?? null,
-      subjectData: {
-        id: assignment.subjectId
-      },
-      type: 'REMOTE'
-    });
-
+    // Checked before anything is written: only the catch below deletes the session, so a throw
+    // between creating it and that try would leave one behind on every synchronization pass.
     const cipherTexts: string[] = [];
     const symmetricKeys: string[] = [];
     let seriesItems: ScalarInstrumentInternal[] | undefined;
 
     if (instrument.kind === 'SERIES') {
       if (!(remoteAssignment.encryptedData.startsWith('$') && remoteAssignment.symmetricKey.startsWith('$'))) {
-        this.loggingService.error({ remoteAssignment });
         throw new InternalServerErrorException('Malformed remote assignment for series instrument');
       }
       cipherTexts.push(...remoteAssignment.encryptedData.slice(1).split('$'));
@@ -139,12 +142,28 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         );
       }
     } else if (remoteAssignment.encryptedData.includes('$') || remoteAssignment.symmetricKey.includes('$')) {
-      this.loggingService.error({ remoteAssignment });
       throw new InternalServerErrorException('Malformed remote assignment for scalar instrument');
     } else {
       cipherTexts.push(remoteAssignment.encryptedData);
       symmetricKeys.push(remoteAssignment.symmetricKey);
     }
+
+    // Creating the session enrols the subject in its group, so the group must never be the gateway's
+    // copy: that would let the gateway give another group access to the subject.
+    if ((remoteAssignment.groupId ?? null) !== assignment.groupId) {
+      this.loggingService.error(
+        `Gateway reported group '${remoteAssignment.groupId}' for assignment '${assignment.id}' in group '${assignment.groupId}'`
+      );
+    }
+
+    const session = await this.sessionsService.create({
+      date: remoteAssignment.completedAt,
+      groupId: assignment.groupId,
+      subjectData: {
+        id: assignment.subjectId
+      },
+      type: 'REMOTE'
+    });
 
     const createdRecordIds: string[] = [];
     try {
@@ -171,7 +190,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
         try {
           data = await $Json.parseAsync(JSON.parse(decryptedData));
         } catch (err) {
-          this.loggingService.error({ decryptedData, instrumentId, message: 'Failed to parse decrypted data' });
+          this.loggingService.error({ instrumentId, message: 'Failed to parse decrypted data' });
           throw err;
         }
 
@@ -190,7 +209,7 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
           this.loggingService.log(`Created record with ID: ${record.id}`);
           createdRecordIds.push(record.id);
         } catch (err) {
-          this.loggingService.error({ data, instrumentId, message: 'Failed to create instrument record' });
+          this.loggingService.error({ instrumentId, message: 'Failed to create instrument record' });
           throw err;
         }
       }
@@ -204,6 +223,52 @@ export class GatewaySynchronizer implements OnApplicationBootstrap {
       await this.sessionsService.deleteById(session.id);
       this.loggingService.log(`Deleted session with ID: ${session.id}`);
       throw err;
+    }
+  }
+
+  /**
+   * `refreshInterval` is the gap between passes, not a fixed period. A period would start a pass
+   * while the previous one was still running: a fetch that outlasts the interval then accumulates
+   * passes without bound, each holding a full assignment payload, until the process exhausts
+   * memory.
+   */
+  private async runScheduledSync(): Promise<void> {
+    const startedAt = Date.now();
+    try {
+      await this.syncWithTimeout();
+      this.loggingService.log(`Done synchronizing with gateway in ${Date.now() - startedAt}ms`);
+    } catch (err) {
+      this.loggingService.error({
+        cause: err,
+        error: `Gateway synchronization failed after ${Date.now() - startedAt}ms`
+      });
+    } finally {
+      if (!this.isStopped) {
+        this.scheduleNextSync();
+      }
+    }
+  }
+
+  private scheduleNextSync(): void {
+    this.nextSyncTimer = setTimeout(() => {
+      this.pendingSync = this.runScheduledSync();
+    }, this.refreshInterval);
+  }
+
+  /**
+   * A pass that never settles would hold the loop forever, since the next pass is scheduled only
+   * once the previous one finishes. Abandoning it gives up on that pass alone: whatever it left
+   * unsynchronized keeps its status and is picked up by the next pass.
+   */
+  private async syncWithTimeout(): Promise<void> {
+    const abandonedSync = Promise.withResolvers<never>();
+    const timer = setTimeout(() => {
+      abandonedSync.reject(new Error(`Gateway synchronization exceeded the maximum duration of ${SYNC_TIMEOUT}ms`));
+    }, SYNC_TIMEOUT);
+    try {
+      await Promise.race([this.sync(), abandonedSync.promise]);
+    } finally {
+      clearTimeout(timer);
     }
   }
 }

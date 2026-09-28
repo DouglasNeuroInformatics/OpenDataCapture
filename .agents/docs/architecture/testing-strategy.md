@@ -8,8 +8,8 @@ What is tested where, and what CI actually blocks a merge on. Writing an e2e tes
 The root `vitest.config.ts` declares
 `projects: ['apps/*/vitest.config.ts', 'packages/*/vitest.config.ts', 'runtime/*/vitest.config.ts']`.
 **A workspace with no `vitest.config.ts` of its own is invisible to `pnpm test`.** A test file added
-to `apps/gateway` or `packages/instrument-library` today is collected by nothing, reported by
-nothing, and passes CI green.
+to `packages/instrument-library` today is collected by nothing, reported by nothing, and passes CI
+green.
 
 Check the table below before writing a unit test. If the package is not in it, add a
 `vitest.config.ts` in the same change — `.agents/docs/playbooks/add-vitest-project.md` is the order
@@ -28,31 +28,33 @@ path exercised against a real database is Playwright.
 
 ## Vitest projects
 
-Sixteen. Scope a run with `pnpm exec vitest --project <name>`; the name is the `name` field in that
+Eighteen. Scope a run with `pnpm exec vitest --project <name>`; the name is the `name` field in that
 package's config, which is **not** always the directory name.
 
-| Project                  | Package                           | Notable config                                                                                                                                                                                           |
-| ------------------------ | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `api`                    | `apps/api`                        | libnest SWC plugin; `globals: true`; extra `include` for `src/**/*.spec.ts`                                                                                                                              |
-| `web`                    | `apps/web`                        | `environment: 'happy-dom'`; redeclares the `@` alias                                                                                                                                                     |
-| `instrument-bundler`     | `packages/instrument-bundler`     |                                                                                                                                                                                                          |
-| `instrument-interpreter` | `packages/instrument-interpreter` |                                                                                                                                                                                                          |
-| `instrument-utils`       | `packages/instrument-utils`       |                                                                                                                                                                                                          |
-| `playground-url`         | `packages/playground-url`         |                                                                                                                                                                                                          |
-| `react-core`             | `packages/react-core`             | `environment: 'happy-dom'`                                                                                                                                                                               |
-| `release-info`           | `packages/release-info`           |                                                                                                                                                                                                          |
-| `runtime-bundler`        | `packages/runtime-bundler`        |                                                                                                                                                                                                          |
-| `runtime-internal`       | `packages/runtime-internal`       | node environment; the `interactive/*.js` trio (iframe/worker bootstrap) is untested — see `packages/runtime-internal/AGENTS.md`                                                                          |
-| `runtime-meta`           | `packages/runtime-meta`           |                                                                                                                                                                                                          |
-| `schemas`                | `packages/schemas`                |                                                                                                                                                                                                          |
-| `serve-instrument`       | `packages/serve-instrument`       | node environment; `test/` mocks `fs.watch` (never closed by `Server.stop()`, see `packages/serve-instrument/AGENTS.md`) and stubs the built `client.js`/`__TAILWIND_STYLES__` that only exist post-build |
-| `subject-utils`          | `packages/subject-utils`          |                                                                                                                                                                                                          |
-| `vite-plugin-runtime`    | `packages/vite-plugin-runtime`    |                                                                                                                                                                                                          |
-| `runtime-v1`             | `runtime/v1`                      | directory is `v1`, project is `runtime-v1`                                                                                                                                                               |
+| Project                  | Package                           | Notable config                                                                                                                                                                                                 |
+| ------------------------ | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `api`                    | `apps/api`                        | libnest SWC plugin; `globals: true`; extra `include` for `src/**/*.spec.ts`                                                                                                                                    |
+| `web`                    | `apps/web`                        | `environment: 'happy-dom'`; redeclares the `@` alias                                                                                                                                                           |
+| `gateway`                | `apps/gateway`                    | redeclares the `@` alias. Request schemas only — the routers are covered by `testing/src/specs/gateway-assignment.spec.ts`                                                                                     |
+| `instrument-bundler`     | `packages/instrument-bundler`     |                                                                                                                                                                                                                |
+| `instrument-interpreter` | `packages/instrument-interpreter` |                                                                                                                                                                                                                |
+| `instrument-utils`       | `packages/instrument-utils`       |                                                                                                                                                                                                                |
+| `playground`             | `apps/playground`                 | node environment; redeclares the `@` alias. Only `src/preview/protocol.ts` is unit-testable — the preview frame, its origin split and the message bridge are covered by `testing/src/specs/playground.spec.ts` |
+| `playground-url`         | `packages/playground-url`         |                                                                                                                                                                                                                |
+| `react-core`             | `packages/react-core`             | `environment: 'happy-dom'`                                                                                                                                                                                     |
+| `release-info`           | `packages/release-info`           |                                                                                                                                                                                                                |
+| `runtime-bundler`        | `packages/runtime-bundler`        |                                                                                                                                                                                                                |
+| `runtime-internal`       | `packages/runtime-internal`       | node environment; the `interactive/*.js` trio (iframe/worker bootstrap) is untested — see `packages/runtime-internal/AGENTS.md`                                                                                |
+| `runtime-meta`           | `packages/runtime-meta`           |                                                                                                                                                                                                                |
+| `schemas`                | `packages/schemas`                |                                                                                                                                                                                                                |
+| `serve-instrument`       | `packages/serve-instrument`       | node environment; `test/` mocks `fs.watch` (never closed by `Server.stop()`, see `packages/serve-instrument/AGENTS.md`) and stubs the built `client.js`/`__TAILWIND_STYLES__` that only exist post-build       |
+| `subject-utils`          | `packages/subject-utils`          |                                                                                                                                                                                                                |
+| `vite-plugin-runtime`    | `packages/vite-plugin-runtime`    |                                                                                                                                                                                                                |
+| `runtime-v1`             | `runtime/v1`                      | directory is `v1`, project is `runtime-v1`                                                                                                                                                                     |
 
-Everything else has no unit tests and no way to run them: `apps/gateway`, `apps/outreach`,
-`apps/playground`, and `packages/{demo, instrument-guidelines, instrument-library, instrument-stubs,
-licenses, runtime-core}`. `testing/`, `storybook/` and `vendor/**` fall outside the
+Everything else has no unit tests and no way to run them: `apps/outreach` and
+`packages/{demo, instrument-guidelines, instrument-library, instrument-stubs, licenses,
+runtime-core}`. `testing/`, `storybook/` and `vendor/**` fall outside the
 project globs by design — `testing/` is Playwright, not vitest.
 
 ## Test environment
@@ -142,7 +144,7 @@ Not gated, despite existing in the repo:
 
 `.github/workflows/commitlint.yaml` (`pull_request` to any branch, so forks included) runs
 `commitlint` over the commits the pull request adds — `base.sha..head.sha`, never the history — against
-`commitlint.config.ts`. An unknown type fails; an unknown scope only warns (#1529).
+`commitlint.config.ts`. An unknown type fails, and so does a scope outside the workspace names.
 
 ## Playwright specifics
 

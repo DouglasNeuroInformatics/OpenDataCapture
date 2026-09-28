@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
+    "@opendatacapture/playground-url": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@playwright/test": "^1.60.0",
     "type-fest": "workspace:type-fest__4.x@*"

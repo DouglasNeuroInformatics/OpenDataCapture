@@ -28,6 +28,17 @@ an entry to the `stories` array.
 `null` for everything else. **A `packages/react-core` story that imports `@/…` will fail to
 resolve** — react-core has no `@` alias of its own, so import relatively or by package name there.
 
+## Tailwind scans only the directories named in `config/globals.css`
+
+`@tailwindcss/vite` auto-detects sources from the Vite root, which here is `storybook/` — a
+directory that contains no components. `config/preview.ts` therefore imports `config/globals.css`,
+which `@import`s react-core's entry (that file carries its own `@source` directives for libui and
+react-core, so those are never repeated here) and adds `@source` for `apps/playground/src` and
+`apps/web/src`. A utility class used only inside one of those apps is generated only because its
+directory is listed: leave one out and every story from it renders unstyled, with no warning in
+the console or the build. Scanning a new story directory in `main.ts` means adding its `@source`
+here too.
+
 ## Writing a story
 
 `packages/react-core/src/components/CopyButton/CopyButton.stories.tsx` is the minimal shape; read it

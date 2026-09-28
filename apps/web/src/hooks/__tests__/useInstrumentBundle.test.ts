@@ -1,8 +1,8 @@
 import type { PropsWithChildren } from 'react';
 import { createElement } from 'react';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook, waitFor } from '@testing-library/react';
+import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useInstrumentBundle } from '../useInstrumentBundle';
@@ -50,6 +50,24 @@ describe('useInstrumentBundle', () => {
       id: 'instrument-1',
       kind: 'FORM'
     });
+  });
+
+  // A clinician switching between the app and another program mid-instrument would otherwise
+  // re-download a bundle of many megabytes, and a refetch that failed would hand the open instrument,
+  // and everything entered into it, to the route error boundary.
+  it('does not refetch the bundle when the window regains focus', async () => {
+    const { result } = renderBundleQuery('instrument-1');
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    focusManager.setFocused(false);
+    focusManager.setFocused(true);
+    // React Query resumes paused mutations before it revisits the queries, so a refetch would arrive
+    // some ticks after the focus event rather than during it.
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+
+    expect(mockAxios.get).toHaveBeenCalledOnce();
   });
 
   it('does not request anything until an instrument is selected', () => {

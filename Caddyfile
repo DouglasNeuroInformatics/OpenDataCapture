@@ -1,11 +1,24 @@
 {$SITE_ADDRESS} {
 	redir /api /api/
 
+	# Parsed the way the api parses it: trimmed and case-insensitive.
+	map {env.STORAGE_ENABLED} {storage_enabled} {
+		~(?i)^\s*true\s*$ yes
+		default no
+	}
+
 	handle_path /api/* {
 		reverse_proxy api
 	}
 
-	handle_path /storage/* {
+	# rustfs runs even when storage is off, with placeholder credentials an old .env leaves in place,
+	# so it is only reachable from outside while the api is actually using it.
+	@storage {
+		path /storage/*
+		vars {storage_enabled} yes
+	}
+	handle @storage {
+		uri strip_prefix /storage
 		reverse_proxy rustfs:9000 {
 			header_up Host rustfs:9000
 		}

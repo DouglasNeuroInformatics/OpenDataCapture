@@ -24,6 +24,7 @@ import { Route as AppUploadInstrumentIdRouteImport } from './routes/_app/upload/
 import { Route as AppSessionStartSessionRouteImport } from './routes/_app/session/start-session'
 import { Route as AppSessionRemoteAssignmentRouteImport } from './routes/_app/session/remote-assignment'
 import { Route as AppInstrumentsAccessibleInstrumentsRouteImport } from './routes/_app/instruments/accessible-instruments'
+import { Route as AppGroupRemoteAssignmentsRouteImport } from './routes/_app/group/remote-assignments'
 import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
 import { Route as AppGroupEmailTemplatesRouteImport } from './routes/_app/group/email-templates'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
@@ -37,6 +38,7 @@ import { Route as AppInstrumentsRenderIdRouteImport } from './routes/_app/instru
 import { Route as AppDatahubSubjectIdGraphRouteImport } from './routes/_app/datahub/$subjectId/graph'
 import { Route as AppDatahubSubjectIdAssignmentsRouteImport } from './routes/_app/datahub/$subjectId/assignments'
 import { Route as AppAdminUsersCreateRouteImport } from './routes/_app/admin/users/create'
+import { Route as AppAdminUsersUserIdRouteImport } from './routes/_app/admin/users/$userId'
 import { Route as AppAdminGroupsCreateRouteImport } from './routes/_app/admin/groups/create'
 import { Route as AppAdminBrandingLoginPageRouteImport } from './routes/_app/admin/branding/login-page'
 import { Route as AppAdminAuditLogsRouteImport } from './routes/_app/admin/audit/logs'
@@ -119,6 +121,12 @@ const AppInstrumentsAccessibleInstrumentsRoute =
     path: '/instruments/accessible-instruments',
     getParentRoute: () => AppRouteRoute,
   } as any)
+const AppGroupRemoteAssignmentsRoute =
+  AppGroupRemoteAssignmentsRouteImport.update({
+    id: '/group/remote-assignments',
+    path: '/group/remote-assignments',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
 const AppGroupManageRoute = AppGroupManageRouteImport.update({
   id: '/group/manage',
   path: '/group/manage',
@@ -188,6 +196,11 @@ const AppAdminUsersCreateRoute = AppAdminUsersCreateRouteImport.update({
   path: '/admin/users/create',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppAdminUsersUserIdRoute = AppAdminUsersUserIdRouteImport.update({
+  id: '/admin/users/$userId',
+  path: '/admin/users/$userId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppAdminGroupsCreateRoute = AppAdminGroupsCreateRouteImport.update({
   id: '/admin/groups/create',
   path: '/admin/groups/create',
@@ -231,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/group/manage': typeof AppGroupManageRoute
+  '/group/remote-assignments': typeof AppGroupRemoteAssignmentsRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/session/start-session': typeof AppSessionStartSessionRoute
@@ -240,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
+  '/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
   '/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
@@ -265,6 +280,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/group/manage': typeof AppGroupManageRoute
+  '/group/remote-assignments': typeof AppGroupRemoteAssignmentsRoute
   '/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/session/start-session': typeof AppSessionStartSessionRoute
@@ -274,6 +290,7 @@ export interface FileRoutesByTo {
   '/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
+  '/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
   '/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
@@ -301,6 +318,7 @@ export interface FileRoutesById {
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/_app/group/manage': typeof AppGroupManageRoute
+  '/_app/group/remote-assignments': typeof AppGroupRemoteAssignmentsRoute
   '/_app/instruments/accessible-instruments': typeof AppInstrumentsAccessibleInstrumentsRoute
   '/_app/session/remote-assignment': typeof AppSessionRemoteAssignmentRoute
   '/_app/session/start-session': typeof AppSessionStartSessionRoute
@@ -310,6 +328,7 @@ export interface FileRoutesById {
   '/_app/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/_app/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/_app/admin/groups/create': typeof AppAdminGroupsCreateRoute
+  '/_app/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/_app/admin/users/create': typeof AppAdminUsersCreateRoute
   '/_app/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
   '/_app/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
@@ -337,6 +356,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/group/email-templates'
     | '/group/manage'
+    | '/group/remote-assignments'
     | '/instruments/accessible-instruments'
     | '/session/remote-assignment'
     | '/session/start-session'
@@ -346,6 +366,7 @@ export interface FileRouteTypes {
     | '/admin/audit/logs'
     | '/admin/branding/login-page'
     | '/admin/groups/create'
+    | '/admin/users/$userId'
     | '/admin/users/create'
     | '/datahub/$subjectId/assignments'
     | '/datahub/$subjectId/graph'
@@ -371,6 +392,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/group/email-templates'
     | '/group/manage'
+    | '/group/remote-assignments'
     | '/instruments/accessible-instruments'
     | '/session/remote-assignment'
     | '/session/start-session'
@@ -380,6 +402,7 @@ export interface FileRouteTypes {
     | '/admin/audit/logs'
     | '/admin/branding/login-page'
     | '/admin/groups/create'
+    | '/admin/users/$userId'
     | '/admin/users/create'
     | '/datahub/$subjectId/assignments'
     | '/datahub/$subjectId/graph'
@@ -406,6 +429,7 @@ export interface FileRouteTypes {
     | '/_app/admin/settings'
     | '/_app/group/email-templates'
     | '/_app/group/manage'
+    | '/_app/group/remote-assignments'
     | '/_app/instruments/accessible-instruments'
     | '/_app/session/remote-assignment'
     | '/_app/session/start-session'
@@ -415,6 +439,7 @@ export interface FileRouteTypes {
     | '/_app/admin/audit/logs'
     | '/_app/admin/branding/login-page'
     | '/_app/admin/groups/create'
+    | '/_app/admin/users/$userId'
     | '/_app/admin/users/create'
     | '/_app/datahub/$subjectId/assignments'
     | '/_app/datahub/$subjectId/graph'
@@ -541,6 +566,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInstrumentsAccessibleInstrumentsRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/group/remote-assignments': {
+      id: '/_app/group/remote-assignments'
+      path: '/group/remote-assignments'
+      fullPath: '/group/remote-assignments'
+      preLoaderRoute: typeof AppGroupRemoteAssignmentsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/group/manage': {
       id: '/_app/group/manage'
       path: '/group/manage'
@@ -632,6 +664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminUsersCreateRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/admin/users/$userId': {
+      id: '/_app/admin/users/$userId'
+      path: '/admin/users/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AppAdminUsersUserIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/admin/groups/create': {
       id: '/_app/admin/groups/create'
       path: '/admin/groups/create'
@@ -702,6 +741,7 @@ interface AppRouteRouteChildren {
   AppAdminSettingsRoute: typeof AppAdminSettingsRoute
   AppGroupEmailTemplatesRoute: typeof AppGroupEmailTemplatesRoute
   AppGroupManageRoute: typeof AppGroupManageRoute
+  AppGroupRemoteAssignmentsRoute: typeof AppGroupRemoteAssignmentsRoute
   AppInstrumentsAccessibleInstrumentsRoute: typeof AppInstrumentsAccessibleInstrumentsRoute
   AppSessionRemoteAssignmentRoute: typeof AppSessionRemoteAssignmentRoute
   AppSessionStartSessionRoute: typeof AppSessionStartSessionRoute
@@ -711,6 +751,7 @@ interface AppRouteRouteChildren {
   AppAdminAuditLogsRoute: typeof AppAdminAuditLogsRoute
   AppAdminBrandingLoginPageRoute: typeof AppAdminBrandingLoginPageRoute
   AppAdminGroupsCreateRoute: typeof AppAdminGroupsCreateRoute
+  AppAdminUsersUserIdRoute: typeof AppAdminUsersUserIdRoute
   AppAdminUsersCreateRoute: typeof AppAdminUsersCreateRoute
   AppInstrumentsRenderIdRoute: typeof AppInstrumentsRenderIdRoute
   AppAdminBrandingIndexRoute: typeof AppAdminBrandingIndexRoute
@@ -730,6 +771,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAdminSettingsRoute: AppAdminSettingsRoute,
   AppGroupEmailTemplatesRoute: AppGroupEmailTemplatesRoute,
   AppGroupManageRoute: AppGroupManageRoute,
+  AppGroupRemoteAssignmentsRoute: AppGroupRemoteAssignmentsRoute,
   AppInstrumentsAccessibleInstrumentsRoute:
     AppInstrumentsAccessibleInstrumentsRoute,
   AppSessionRemoteAssignmentRoute: AppSessionRemoteAssignmentRoute,
@@ -740,6 +782,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAdminAuditLogsRoute: AppAdminAuditLogsRoute,
   AppAdminBrandingLoginPageRoute: AppAdminBrandingLoginPageRoute,
   AppAdminGroupsCreateRoute: AppAdminGroupsCreateRoute,
+  AppAdminUsersUserIdRoute: AppAdminUsersUserIdRoute,
   AppAdminUsersCreateRoute: AppAdminUsersCreateRoute,
   AppInstrumentsRenderIdRoute: AppInstrumentsRenderIdRoute,
   AppAdminBrandingIndexRoute: AppAdminBrandingIndexRoute,

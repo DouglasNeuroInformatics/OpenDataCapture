@@ -59,10 +59,14 @@ choice once written.
 
 What a _user_ can be granted through `additionalPermissions` is not the CASL subject list Prisma
 derives: it is `enum AppSubject` (`apps/api/prisma/schema.prisma`) and `$AppSubjectName`
-(`packages/schemas/src/core/core.ts`), hand-written and deliberately narrower.
+(`packages/schemas/src/core/core.ts`), hand-written and deliberately narrower. A grant may also be
+confined to one group, and the subjects that allows are `$GroupScopableSubjectName` (the same list
+minus `all` and `Instrument`); `GROUP_SCOPED_CONDITIONS` in `apps/api/src/auth/ability.factory.ts`
+names each one's group field and is typed over that list, so `tsc` reports a missing entry.
 
-**Done when** a model users must hold a permission on appears in both lists in the same commit, or
-your reply says you left the pair narrower deliberately.
+**Done when** a model users must hold a permission on appears in both lists in the same commit —
+and in `GROUP_SCOPED_CONDITIONS` unless `$GroupScopableSubjectName` excludes it — or your reply
+says you left the pair narrower deliberately.
 
 ## Where the procedure lives
 

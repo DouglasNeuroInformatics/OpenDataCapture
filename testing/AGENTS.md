@@ -23,7 +23,9 @@ is `.agents/docs/playbooks/add-e2e-test.md`; the tier-by-tier picture is
   testid over there in the same change. Roles and labels are used only where no testid exists.
 - **One database, shared by every worker.** `setup` seeds it once through the UI and `teardown`
   drops it; `fullyParallel` is on. Any data a test creates must be uniquely named — use the
-  `uniqueId` fixture (`Subject${uniqueId}`), never a fixed string.
+  `uniqueId` fixture (`Subject${uniqueId}`), never a fixed string. Instance-wide settings cannot be
+  uniquely named, so a test that writes one and reads it back must not be `@smoke`: outside CI
+  (`workers: 1` there) its firefox copy runs alongside the chromium one and overwrites its value.
 - **`getPageModel` asserts it landed on the route it asked for** (`RootPage.goto` does
   `expect(page).toHaveURL(url)`). When the expected outcome _is_ a redirect, use `authenticateAs`
   plus a raw `page.goto` instead — see the standard-user cases in `src/specs/authorization.spec.ts`.
@@ -32,8 +34,8 @@ is `.agents/docs/playbooks/add-e2e-test.md`; the tier-by-tier picture is
   `api.createUser()` instead when the test mutates that user's own login, so it cannot invalidate
   the cached token every other spec in the worker shares.
 - **`.env` at the repo root must exist.** `src/support/env.ts` reads `API_DEV_SERVER_PORT`,
-  `GATEWAY_DEV_SERVER_PORT` and `WEB_DEV_SERVER_PORT` and throws while `playwright.config.ts` is
-  loading if any is missing. `./scripts/generate-env.sh` produces it.
+  `GATEWAY_DEV_SERVER_PORT`, `PLAYGROUND_DEV_SERVER_PORT` and `WEB_DEV_SERVER_PORT` and throws while
+  `playwright.config.ts` is loading if any is missing. `./scripts/generate-env.sh` produces it.
 
 ## Layout
 
@@ -59,16 +61,16 @@ A page object is only reachable from a spec once it is registered in the `pageMo
 
 ## Fixtures
 
-| Fixture               | Scope       | Notes                                                                      |
-| --------------------- | ----------- | -------------------------------------------------------------------------- |
-| `getPageModel`        | test        | Authenticates as `actingRole`, navigates, returns the page object          |
-| `authenticateAs(who)` | test        | Injects a token without navigating; takes a role or `$LoginCredentials`    |
-| `actingRole`          | test option | Default `GROUP_MANAGER`; override with `test.use({ actingRole: 'ADMIN' })` |
-| `appState`            | test option | localStorage first-run gating, seeded for every test; defaults to accepted |
-| `uniqueId`            | test        | Short random suffix for seeded data                                        |
-| `api`                 | worker      | `ApiClient` as admin — `createGroup()` / `createUser()` for preconditions  |
-| `roleAccount(role)`   | worker      | Seeds a group + user per role once, then caches its token and username     |
-| `apiRequestContext`   | worker      | Raw `APIRequestContext` on the web origin, for driving the API directly    |
+| Fixture               | Scope       | Notes                                                                                              |
+| --------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `getPageModel`        | test        | Authenticates as `actingRole`, navigates, returns the page object                                  |
+| `authenticateAs(who)` | test        | Injects a token without navigating; takes a role or `$LoginCredentials`                            |
+| `actingRole`          | test option | Default `GROUP_MANAGER`; override with `test.use({ actingRole: 'ADMIN' })`                         |
+| `appState`            | test option | localStorage first-run gating, seeded for every test; defaults to accepted                         |
+| `uniqueId`            | test        | Short random suffix for seeded data                                                                |
+| `api`                 | worker      | `ApiClient` as admin — `createGroup()` / `createUser()` / `setUserPermissions()` for preconditions |
+| `roleAccount(role)`   | worker      | Seeds a group + user per role once, then caches its token and username                             |
+| `apiRequestContext`   | worker      | Raw `APIRequestContext` on the web origin, for driving the API directly                            |
 
 Set up preconditions over the API with the `api` fixture rather than by clicking through the UI;
 only drive the UI for the behaviour actually under test.
@@ -91,7 +93,11 @@ written as a literal in a spec.
 `pnpm test:e2e` from the repo root (turbo), or `pnpm --filter @opendatacapture/testing test:dev` for
 Playwright's UI mode. `playwright.config.ts` starts api, gateway and web itself through each app's
 `pnpm dev:test`, which sets `NODE_ENV=test` and so gives the API an in-memory Mongo replica set — no
-external database, and nothing to start by hand.
+external database, and nothing to start by hand. It also starts the playground through its plain
+`pnpm dev` (it has no backend and no test mode) for `src/specs/playground.spec.ts`, which reaches it
+by absolute URL from `playgroundURL` in `src/support/env.ts`: the playground is not an `apps/web`
+route, so `src/pages/playground/index.page.ts` extends nothing and is not in `pageModels`. Its
+preview is an iframe on the other loopback name, so the spec drives it through a `FrameLocator`.
 
 Projects: `setup` (with `teardown` attached), `chromium` (every spec), and `firefox`, which greps
 `/@smoke/`. **Cross-browser coverage exists only for tests whose title contains `@smoke`** — add the

@@ -3,7 +3,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import type { AppAbility } from '@/auth/auth.types';
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -20,7 +20,7 @@ export class GroupsController {
   // manager. A create has no existing row for `GroupsService.create` to scope against either.
   @ApiOperation({ summary: 'Create Group' })
   @Post()
-  @RouteAccess({ action: 'manage', subject: 'all' })
+  @RouteAccess(ADMIN_ONLY)
   create(@Body() createGroupDto: CreateGroupDto) {
     return this.groupsService.create(createGroupDto);
   }

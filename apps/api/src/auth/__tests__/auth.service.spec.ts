@@ -21,6 +21,7 @@ const BASE_PAYLOAD = {
   firstName: 'Test',
   groups: [{ id: 'group-1' }],
   id: 'user-1',
+  kind: 'login',
   lastName: 'User',
   username: 'test-user'
 };
@@ -65,6 +66,11 @@ describe('AuthService', () => {
       expect(ability.can('manage', 'all')).toBe(false);
       expect(ability.can('read', 'Subject')).toBe(false);
       expect(ability.can('read', 'InstrumentRecord')).toBe(false);
+    });
+
+    it('should mark the minted token as an instrument token, so the guard admits it only where an upload needs it', async () => {
+      await authService.getCreateInstrumentToken(requestUserFor('ADMIN'));
+      expect(jwtService.signAsync.mock.lastCall?.[0]).toMatchObject({ kind: 'instrument' });
     });
 
     it('should refuse a group manager, whose create grant covers series instruments rather than arbitrary bundles', async () => {

@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
 
-import { $BaseModel, $Permissions } from '../core/core.js';
+import { $BaseModel, $Permissions, isGrantablePermission } from '../core/core.js';
 import { $EmailDeliveryResult } from '../mail/mail.js';
 import { $Sex } from '../subject/subject.js';
 
@@ -102,12 +102,32 @@ export const $CreateUserData = $User
     sex: $Sex.optional()
   });
 
-/** Optional contact details are nullable here, and only here, so an update can clear one. */
+/**
+ * Optional contact details are nullable here, and only here, so an update can clear one.
+ * `additionalPermissions` is deliberately absent: it is written only through
+ * {@link $UpdateUserPermissionsData}, whose route is gated more tightly than a profile update.
+ */
 export type UpdateUserData = z.infer<typeof $UpdateUserData>;
 export const $UpdateUserData = $CreateUserData.partial().extend({
-  additionalPermissions: $Permissions.optional(),
   email: z.email().nullish(),
   phoneNumber: $PhoneNumber.nullish()
+});
+
+/** The complete set of a user's additional permissions; a write replaces what is stored. */
+export type UpdateUserPermissionsData = z.infer<typeof $UpdateUserPermissionsData>;
+export const $UpdateUserPermissionsData = z.object({
+  permissions: $Permissions.check((ctx) => {
+    ctx.value.forEach((permission, index) => {
+      if (!isGrantablePermission(permission)) {
+        ctx.issues.push({
+          code: 'custom',
+          input: permission,
+          message: 'Only an administrator can create, modify or delete users, so this permission would do nothing',
+          path: [index]
+        });
+      }
+    });
+  })
 });
 
 export type $SelfUpdateUserData = z.infer<typeof $SelfUpdateUserData>;

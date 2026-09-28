@@ -5,6 +5,9 @@ IFS=$'\n\t'
 
 [ "${BASH_VERSINFO:-0}" -ge 5 ] || (echo "Error: Bash >= 5.0 is required for this script" >&2 && exit 1)
 
+# The generated .env holds SECRET_KEY, which signs every API token, so no other account may read it
+umask 077
+
 projectRoot="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
 secretKey=$(openssl rand -hex 32)
 

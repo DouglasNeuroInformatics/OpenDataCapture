@@ -19,30 +19,29 @@ metadata is absent, so a forgotten decorator is a 500, never an open route. It i
 eslint-enforced: `REQUIRE_ROUTE_ACCESS` in the root `eslint.config.js` flags any
 `@Get`/`@Post`/`@Patch`/`@Put`/`@Delete` method in `apps/api/src/**/*.controller.ts` without it.
 
-| Value                        | Meaning                                                                                      |
-| ---------------------------- | -------------------------------------------------------------------------------------------- |
-| `'public'`                   | No authentication at all. Three routes use it — see below.                                   |
-| `{ action, subject }`        | `ability.can(action, subject)` against the subject **name**.                                 |
-| `[{ action, subject }, ...]` | `.every(...)` — all must pass.                                                               |
-| `[]`                         | `[].every(...)` is `true`, so this is **any authenticated user**. Easy to write by accident. |
+The values it takes, and what each grants, are tabled in `apps/api/AGENTS.md` §Permissions.
+`ADMIN_ONLY`, exported from `src/core/decorators/route-access.decorator.ts`, is
+`{ action: 'manage', subject: 'all' }`.
 
 Routes are URI-versioned (`version: '1'` in `src/main.ts`), so paths are `/v1/...`.
 
 The full inventory of non-ordinary access declarations, current as of writing:
 
-| Route                             | Declaration                                                                                   | Why it is safe                                                                                                                                                                                                                     |
-| --------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `POST /v1/auth/login`             | `'public'`                                                                                    | `@ThrottleLoginRequest()`; credentials checked in `AuthService.login`.                                                                                                                                                             |
-| `GET /v1/setup`                   | `'public'`                                                                                    | Returns only `SetupState` (branding, flags, release, uptime).                                                                                                                                                                      |
-| `POST /v1/setup`                  | `'public'`                                                                                    | **`SetupService.initApp` drops the whole database.** Its only protection is `if (savedOptions?.isSetup && !isDev) throw new ForbiddenException()` — an initialised production instance refuses, a development instance never does. |
-| `DELETE /v1/setup`                | `{ action: 'delete', subject: 'all' }`                                                        | Also refuses unless `NODE_ENV === 'test'`.                                                                                                                                                                                         |
-| `PATCH /v1/setup`                 | `{ action: 'manage', subject: 'all' }`                                                        | Only `ADMIN` gets `manage all`.                                                                                                                                                                                                    |
-| `GET /v1/audit/logs`              | `{ action: 'manage', subject: 'all' }`                                                        | `AuditService.find` is deliberately unscoped; the guard is the whole check.                                                                                                                                                        |
-| `GET /v1/gateway/healthcheck`     | `[]`                                                                                          | Any authenticated user. Module only loads when `GATEWAY_ENABLED`.                                                                                                                                                                  |
-| `POST /v1/groups`                 | `{ action: 'manage', subject: 'all' }`                                                        | `ADMIN` alone. `create Group` admitted every `GROUP_MANAGER`: their `manage Group` rule is conditioned on their own groups, and this check sees only the subject type (#1468).                                                     |
-| `POST /v1/instruments`            | `{ action: 'manage', subject: 'Instrument' }`                                                 | No base permission level grants `manage Instrument`, so this is `ADMIN`-only in practice.                                                                                                                                          |
-| `PATCH /v1/users/self-update/:id` | `{ action: 'read', subject: 'User' }`                                                         | Deliberately weak; `UsersService.updateSelfById` throws `ForbiddenException` unless `id === currentUser.id`. The controller carries a comment saying so.                                                                           |
-| `GET /v1/summary`                 | five-element array (`read` on `Instrument`, `InstrumentRecord`, `Session`, `Subject`, `User`) | The only use of the multi-element array form; all five must pass.                                                                                                                                                                  |
+| Route                                                           | Declaration                                                                                   | Why it is safe                                                                                                                                                                                                                                                                                                                                                                                   |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `POST /v1/auth/login`                                           | `'public'`                                                                                    | `@ThrottleLoginRequest()`; credentials checked in `AuthService.login`.                                                                                                                                                                                                                                                                                                                           |
+| `GET /v1/setup`                                                 | `'public'`                                                                                    | Returns only `SetupState` (branding, flags, release, uptime).                                                                                                                                                                                                                                                                                                                                    |
+| `POST /v1/setup`                                                | `'public'`                                                                                    | **`SetupService.initApp` drops the whole database.** Its only protection is `if (savedOptions?.isSetup && !isDev) throw new ForbiddenException()` — an initialised production instance refuses, a development instance never does.                                                                                                                                                               |
+| `DELETE /v1/setup`                                              | `{ action: 'delete', subject: 'all' }`                                                        | Also refuses unless `NODE_ENV === 'test'`.                                                                                                                                                                                                                                                                                                                                                       |
+| `PATCH /v1/setup`                                               | `ADMIN_ONLY`                                                                                  | Only `ADMIN` gets `manage all`.                                                                                                                                                                                                                                                                                                                                                                  |
+| `GET /v1/audit/logs`                                            | `ADMIN_ONLY`                                                                                  | `AuditService.find` is deliberately unscoped; the guard is the whole check.                                                                                                                                                                                                                                                                                                                      |
+| `GET /v1/gateway/healthcheck`                                   | `[]`                                                                                          | Any login token; an instrument token is refused. Module only loads when `GATEWAY_ENABLED`.                                                                                                                                                                                                                                                                                                       |
+| `POST /v1/groups`                                               | `ADMIN_ONLY`                                                                                  | `ADMIN` alone. `create Group` admitted every `GROUP_MANAGER`: their `manage Group` rule is conditioned on their own groups, and this check sees only the subject type (#1468).                                                                                                                                                                                                                   |
+| `POST /v1/instruments`                                          | `{ action: 'manage', subject: 'Instrument' }`                                                 | No base permission level grants `manage Instrument`, so this is `ADMIN`-only in practice. Also `@AcceptsInstrumentToken()`: the only route the playground's minted token reaches.                                                                                                                                                                                                                |
+| `PATCH /v1/users/self-update/:id`                               | `{ action: 'read', subject: 'User' }`                                                         | Deliberately weak; `UsersService.updateSelfById` throws `ForbiddenException` unless `id === currentUser.id`. The controller carries a comment saying so.                                                                                                                                                                                                                                         |
+| `PUT /v1/users/:id/permissions`                                 | `ADMIN_ONLY`                                                                                  | `ADMIN` alone. An `update User` grant is one of the things this route hands out, so it must not be enough to reach it, or the holder could grant themselves `manage all`. `$UpdateUserData` no longer carries the field either.                                                                                                                                                                  |
+| `POST /v1/users`, `PATCH /v1/users/:id`, `DELETE /v1/users/:id` | `ADMIN_ONLY`                                                                                  | `ADMIN` alone, whatever `User` action a grant names. Level, groups and password are what the rest of a user's access derives from, so a grantee could otherwise promote themselves, join every group, or log in as an admin whose password they set. `UsersService` also refuses an admin deleting, disabling or demoting their own account, so the last one cannot lock every admin-only route. |
+| `GET /v1/summary`                                               | five-element array (`read` on `Instrument`, `InstrumentRecord`, `Session`, `Subject`, `User`) | The only use of the multi-element array form; all five must pass.                                                                                                                                                                                                                                                                                                                                |
 
 Adding a fourth `'public'` route, or a second `[]`, is a security decision — raise it rather than
 deciding alone.
@@ -103,7 +102,10 @@ Prisma results already carry `__modelName` — it is a computed field added by
 
 1. `AuthService.login` builds one with `AbilityFactory.createForPayload`, switching on
    `basePermissionLevel` (`ADMIN` / `GROUP_MANAGER` / `STANDARD`) and then applying the user's
-   `additionalPermissions` on top.
+   `additionalPermissions` on top. A stored rule carrying a `groupId` is applied with that model's
+   group condition from `GROUP_SCOPED_CONDITIONS` (`src/auth/ability.factory.ts`), so it reaches
+   only that group's rows; a `null` `groupId` is an unconditional rule, which is what every rule
+   written before the field existed reads back as.
 2. The **serialized rules** (`ability.rules`) are signed into the JWT alongside the payload,
    `expiresIn: '1h'`.
 3. On every request `JwtStrategy.validate` rebuilds the ability from those rules with
@@ -118,9 +120,15 @@ Consequences worth knowing:
 - **JWT expiry is ignored in development.** `ignoreExpiration: configService.getOrThrow('NODE_ENV') === 'development'`
   in `src/auth/strategies/jwt.strategy.ts`. A dev token never expires; do not conclude from local
   testing that expiry works.
-- `AuthService.getCreateInstrumentToken` mints a second, narrower token signed with **only**
-  `{ permissions: [{ action: 'create', subject: 'Instrument' }] }`. It carries no `id`, `username` or
-  `groups`, so `@CurrentUser()` fields other than `ability` are `undefined` on any route it reaches.
+- Every token carries a `kind`. `AuthService.login` signs `'login'`;
+  `AuthService.getCreateInstrumentToken` mints a second, narrower token signed with **only**
+  `{ kind: 'instrument', permissions: [{ action: 'manage', subject: 'Instrument' }] }`, for the
+  playground to upload bundles with. `JwtAuthGuard` refuses an `'instrument'` token on every route
+  not marked `@AcceptsInstrumentToken()` (`src/core/decorators/accepts-instrument-token.decorator.ts`),
+  whatever its `@RouteAccess` — today only `POST /v1/instruments`, which takes no `@CurrentUser()`,
+  so the `id`, `username` and `groups` the token lacks are never read. The minting route is not
+  marked: it requires the very permission it hands out, so admitting the token there would let one
+  token renew itself forever.
 
 The `RequestUser` shape (`TokenPayload` plus `ability`) is declared in the `declare module`
 augmentation at the top of `apps/api/libnest.config.ts`.
@@ -152,9 +160,27 @@ are therefore valid in `@RouteAccess` and in `AbilityFactory` rules (`Instrument
 in both) but cannot be granted as an `additionalPermission`. Treat that as the existing state, not
 as a licence to widen it silently.
 
+A third list, `$GroupScopableSubjectName` in the same schemas file, says which of these a per-user
+permission may be confined to one group on. It is derived from `$AppSubjectName` by excluding `all`
+(a condition on it would apply to every model, each naming its group field differently) and
+`Instrument` (a shared platform asset with no single owning group), so it needs no maintenance of
+its own. What it drives is `GROUP_SCOPED_CONDITIONS` in `src/auth/ability.factory.ts`, which names
+each scopable model's group field and is typed over the list — a subject taken out of the exclusion
+fails `tsc` in `apps/api` until its field is added there. `$UserPermission` refuses a `groupId` on
+any other subject at the boundary, and the factory throws on one it meets anyway.
+
+**A pair can be storable and still do nothing.** Every route that writes a user is `ADMIN_ONLY`, so
+a grant of any `User` action but `read` reaches nothing. `isGrantablePermission`
+(`packages/schemas/src/core/core.ts`) is that rule: `$UpdateUserPermissionsData` refuses what it
+refuses, and the web permissions editor offers only what it allows. `$UserPermission` itself does
+not apply it, because it is also the read model and grants stored before the rule still have to
+parse; the editor marks those "No effect" and leaves them out of its next save. A new admin-only
+route that a grantable pair used to reach belongs in the same predicate.
+
 Adding a rule for a new model means editing `src/auth/ability.factory.ts` and adding tests for
 **both** the allow and the deny case. If it must also be assignable per-user, update the Prisma
-enum and `$AppSubjectName` together.
+enum and `$AppSubjectName` together, and either add its group field to `GROUP_SCOPED_CONDITIONS` or
+add it to the `$GroupScopableSubjectName` exclusion.
 
 ## Adjacent things that are not the permission system
 

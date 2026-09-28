@@ -3,6 +3,7 @@ import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import MonacoEditor from '@monaco-editor/react';
 
+import { useEditorErrorSync } from '@/hooks/useEditorErrorSync';
 import { useFilesRef } from '@/hooks/useFilesRef';
 import { useRuntime } from '@/hooks/useRuntime';
 import type { EditorFile } from '@/models/editor-file.model';
@@ -37,6 +38,8 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
 
   const [defaultFile, setDefaultFile] = useState<(EditorFile & { id: string }) | null>(null);
   const filesRef = useFilesRef();
+
+  useEditorErrorSync(isMounted ? monacoRef.current : null);
 
   useImperativeHandle(
     ref,

@@ -91,6 +91,13 @@ const RouteComponent = () => {
   const uploaderLabel = t({ en: 'Enable Uploader', es: 'Activar la carga de datos', fr: 'Activer le téléversement' });
   const uploaderEnabled = setupStateQuery.data.isExperimentalFeaturesEnabled ?? false;
 
+  const bulkLabel = t({
+    en: 'Enable Remote Assignments',
+    es: 'Activar las tareas remotas',
+    fr: 'Activer les tâches à distance'
+  });
+  const bulkEnabled = setupStateQuery.data.isBulkRemoteAssignmentsEnabled ?? true;
+
   const activeLanguages = setupStateQuery.data.activeLanguages;
 
   // Rebuilt by filtering LANGUAGES rather than appending, so the stored order is always the
@@ -187,6 +194,30 @@ const RouteComponent = () => {
                   checked={uploaderEnabled}
                   label={uploaderLabel}
                   onCheckedChange={(checked) => autosave({ isExperimentalFeaturesEnabled: checked })}
+                />
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium">{bulkLabel}</p>
+                  <HoverCard>
+                    <HoverCard.Trigger asChild>
+                      <button className="text-muted-foreground hover:text-foreground transition-colors" type="button">
+                        <CircleHelpIcon className="h-4 w-4" />
+                      </button>
+                    </HoverCard.Trigger>
+                    <HoverCard.Content className="w-72 text-sm">
+                      {t({
+                        en: 'When enabled, the group links are collected under a Group Actions menu with an added page for assigning one or more instruments to many subjects at once. When disabled, those links stay where they are.',
+                        es: 'Cuando está activada, los enlaces del grupo se reúnen bajo un menú Acciones del grupo con una página adicional para asignar uno o varios instrumentos a muchos sujetos a la vez. Cuando está desactivada, esos enlaces permanecen donde están.',
+                        fr: 'Lorsqu’elle est activée, les liens de groupe sont regroupés sous un menu Actions de groupe avec une page permettant d’attribuer un ou plusieurs instruments à plusieurs sujets à la fois. Lorsqu’elle est désactivée, ces liens restent inchangés.'
+                      })}
+                    </HoverCard.Content>
+                  </HoverCard>
+                </div>
+                <Toggle
+                  checked={bulkEnabled}
+                  label={bulkLabel}
+                  onCheckedChange={(checked) => autosave({ isBulkRemoteAssignmentsEnabled: checked })}
                 />
               </div>
             </SettingSection>

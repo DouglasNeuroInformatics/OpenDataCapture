@@ -3,10 +3,29 @@ import { createPrismaAbility } from '@casl/prisma';
 import { LoggingService } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
 import type { TokenPayload } from '@opendatacapture/schemas/auth';
+import { isGroupScopableSubject } from '@opendatacapture/schemas/core';
+import type { GroupScopableSubjectName } from '@opendatacapture/schemas/core';
+
+import type { PrismaModelWhereInputMap } from '@/core/prisma';
 
 import { createAppAbility, detectAppSubject } from './ability.utils';
 
 import type { AppAbility, Permission } from './auth.types';
+
+/**
+ * The condition confining a per-user permission to one group, per model that can carry one. The
+ * fields are the same ones the group manager rules below use. Typed over the schema's list, so a
+ * subject made scopable there fails to compile here until its group field is named.
+ */
+export const GROUP_SCOPED_CONDITIONS = {
+  Assignment: (groupId) => ({ groupId: { in: [groupId] } }),
+  Group: (groupId) => ({ id: { in: [groupId] } }),
+  InstrumentRecord: (groupId) => ({ groupId: { in: [groupId] } }),
+  InstrumentRepo: (groupId) => ({ groupIds: { hasSome: [groupId] } }),
+  Session: (groupId) => ({ groupId: { in: [groupId] } }),
+  Subject: (groupId) => ({ groupIds: { hasSome: [groupId] } }),
+  User: (groupId) => ({ groupIds: { hasSome: [groupId] } })
+} satisfies { [K in GroupScopableSubjectName]: (groupId: string) => NonNullable<PrismaModelWhereInputMap[K]> };
 
 @Injectable()
 export class AbilityFactory {
@@ -68,8 +87,16 @@ export class AbilityFactory {
         ability.can('read', 'User', { id: payload.id });
         break;
     }
-    payload.additionalPermissions?.forEach(({ action, subject }) => {
-      ability.can(action, subject);
+    payload.additionalPermissions?.forEach(({ action, groupId, subject }) => {
+      if (groupId === null) {
+        ability.can(action, subject);
+      } else if (isGroupScopableSubject(subject)) {
+        ability.can(action, subject, GROUP_SCOPED_CONDITIONS[subject](groupId));
+      } else {
+        // The schema refuses this shape at the boundary; a stored row that has it anyway is applied
+        // under neither reading, since either one silently changes what the grant means.
+        throw new Error(`Cannot confine permission '${action} ${subject}' to group '${groupId}'`);
+      }
     });
     return ability.build({
       detectSubjectType: detectAppSubject
