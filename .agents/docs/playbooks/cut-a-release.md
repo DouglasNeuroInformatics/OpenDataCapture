@@ -110,7 +110,9 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    the dispatched ref supplies its own copy of the workflow, so that check stops accidents only. What
    holds against a branch is hosted configuration, and it must stay in place: the `release`
    environment allows deployments from `main` only, each package's npm trusted publisher names
-   `release.yaml` and the `release` environment, and a tag ruleset restricts `v*` to admins. GHCR is
+   `release.yaml` and the `release` environment, and the `Release tags` ruleset lets only admins
+   move or delete a `v*` tag. It cannot restrict creation: `Create Release` makes the tag with
+   `GITHUB_TOKEN`, and GitHub refuses the Actions app as a repository ruleset bypass actor. GHCR is
    not covered — any workflow on a branch can push an image with `GITHUB_TOKEN`.
 
    **Four images ship: api, gateway, web and playground.** The filter keeps only compose services
