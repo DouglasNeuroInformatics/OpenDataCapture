@@ -5,7 +5,8 @@ import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { UnprocessableEntityException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { RemoteAssignment } from '@opendatacapture/schemas/assignment';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
 
 import { AssignmentsService } from '@/assignments/assignments.service';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
@@ -214,6 +215,135 @@ describe('GatewaySynchronizer', () => {
 
       expect(loggedErrors()).toContain('assignment-1');
       expect(loggedErrors()).not.toContain('encapsulated-key');
+    });
+  });
+
+  describe('synchronization loop', () => {
+    const FIVE_MINUTES = 300_000;
+    const REFRESH_INTERVAL = 100;
+    const SYNC_DURATION = 500;
+
+    let concurrentSyncs: number;
+    let maxConcurrentSyncs: number;
+    let sync: MockInstance<GatewaySynchronizer['sync']>;
+
+    beforeEach(async () => {
+      vi.useFakeTimers();
+      const moduleRef = await Test.createTestingModule({
+        providers: [
+          GatewaySynchronizer,
+          MockFactory.createForService(AssignmentsService),
+          { provide: ConfigService, useValue: { get: () => REFRESH_INTERVAL } },
+          MockFactory.createForService(GatewayService),
+          MockFactory.createForService(InstrumentsService),
+          MockFactory.createForService(InstrumentRecordsService),
+          MockFactory.createForService(LoggingService),
+          MockFactory.createForService(SessionsService),
+          MockFactory.createForService(SetupService)
+        ]
+      }).compile();
+      gatewaySynchronizer = moduleRef.get(GatewaySynchronizer);
+      loggingService = moduleRef.get(LoggingService);
+
+      concurrentSyncs = 0;
+      maxConcurrentSyncs = 0;
+      sync = vi.spyOn(gatewaySynchronizer, 'sync').mockImplementation(async () => {
+        concurrentSyncs++;
+        maxConcurrentSyncs = Math.max(maxConcurrentSyncs, concurrentSyncs);
+        await new Promise((resolve) => setTimeout(resolve, SYNC_DURATION));
+        concurrentSyncs--;
+      });
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should never run two synchronizations at once, so a slow pass cannot accumulate overlapping passes', async () => {
+      gatewaySynchronizer.onApplicationBootstrap();
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL * 50);
+
+      expect(maxConcurrentSyncs).toBe(1);
+      expect(sync.mock.calls.length).toBeGreaterThan(1);
+    });
+
+    it('should wait the refresh interval after a pass finishes before starting the next one', async () => {
+      gatewaySynchronizer.onApplicationBootstrap();
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL + SYNC_DURATION);
+      expect(sync).toHaveBeenCalledOnce();
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL);
+      expect(sync).toHaveBeenCalledTimes(2);
+    });
+
+    it('should keep synchronizing after a pass throws, so one failure does not end the loop', async () => {
+      sync.mockRejectedValueOnce(new Error('Unexpected'));
+      gatewaySynchronizer.onApplicationBootstrap();
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL * 20);
+
+      expect(sync.mock.calls.length).toBeGreaterThan(1);
+      expect(maxConcurrentSyncs).toBe(1);
+    });
+
+    it('should log the failure rather than leave the rejection unhandled', async () => {
+      const cause = new Error('Unexpected');
+      sync.mockRejectedValueOnce(cause);
+      gatewaySynchronizer.onApplicationBootstrap();
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL);
+      await gatewaySynchronizer.onApplicationShutdown();
+
+      expect(loggingService.error).toHaveBeenCalledWith(expect.objectContaining({ cause }));
+    });
+
+    it('should stop synchronizing once the application shuts down', async () => {
+      gatewaySynchronizer.onApplicationBootstrap();
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL + SYNC_DURATION);
+      expect(sync).toHaveBeenCalledOnce();
+
+      await gatewaySynchronizer.onApplicationShutdown();
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL * 20);
+
+      expect(sync).toHaveBeenCalledOnce();
+    });
+
+    it('should abandon a pass that has run for five minutes, so a stalled synchronization cannot halt the loop', async () => {
+      sync.mockImplementationOnce(() => Promise.withResolvers<void>().promise);
+      gatewaySynchronizer.onApplicationBootstrap();
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL + FIVE_MINUTES);
+
+      expect(loggingService.error).toHaveBeenCalledWith(expect.objectContaining({ cause: expect.any(Error) }));
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL + SYNC_DURATION);
+      expect(sync).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not abandon a pass that finishes within five minutes', async () => {
+      sync.mockImplementationOnce(async () => {
+        await new Promise((resolve) => setTimeout(resolve, FIVE_MINUTES - 1));
+      });
+      gatewaySynchronizer.onApplicationBootstrap();
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL + FIVE_MINUTES);
+
+      expect(loggingService.error).not.toHaveBeenCalled();
+    });
+
+    it('should await the in-flight synchronization on shutdown, so no pass outlives the application', async () => {
+      gatewaySynchronizer.onApplicationBootstrap();
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL);
+      expect(concurrentSyncs).toBe(1);
+
+      const shutdown = gatewaySynchronizer.onApplicationShutdown();
+      await vi.advanceTimersByTimeAsync(SYNC_DURATION);
+      await shutdown;
+
+      expect(concurrentSyncs).toBe(0);
+      expect(sync).toHaveBeenCalledOnce();
     });
   });
 });

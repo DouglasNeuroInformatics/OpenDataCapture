@@ -8,6 +8,7 @@ import type { BulkAssignmentFailure } from '@opendatacapture/schemas/assignment'
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AuditLogger } from '@/audit/audit.logger';
+import { AbilityFactory } from '@/auth/ability.factory';
 import { createAppAbility } from '@/auth/ability.utils';
 import { GatewayService } from '@/gateway/gateway.service';
 
@@ -25,6 +26,17 @@ const futureDate = () => new Date(Date.now() + 86_400_000);
 const permissiveUser = () =>
   ({
     ability: createAppAbility([{ action: 'manage', subject: 'all' }]),
+    id: 'user-1'
+  }) as any;
+
+/** The ability `AbilityFactory` builds at login, so group conditions are the ones production applies. */
+const userAt = (basePermissionLevel: 'ADMIN' | 'GROUP_MANAGER', groupId = GROUP_ID) =>
+  ({
+    ability: new AbilityFactory({ verbose: vi.fn() } as any).createForPayload({
+      basePermissionLevel,
+      groups: [{ id: groupId }],
+      id: 'user-1'
+    } as any),
     id: 'user-1'
   }) as any;
 
@@ -197,6 +209,57 @@ describe('AssignmentsService', () => {
     it('should connect no group to an ungrouped assignment, since connecting a null id would throw', async () => {
       await assignmentsService.create({ ...data(), groupId: null }, permissiveUser());
       expect(assignmentModel.create.mock.lastCall?.[0].data.group).toBeUndefined();
+    });
+
+    it('should refuse a group the caller cannot read, as though it did not exist', async () => {
+      groupModel.findFirst.mockResolvedValueOnce(null);
+      await expect(assignmentsService.create(data(), permissiveUser())).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('should refuse a group manager an assignment filed under a group they do not manage', async () => {
+      await expect(assignmentsService.create(data(), userAt('GROUP_MANAGER', 'group-2'))).rejects.toBeInstanceOf(
+        ForbiddenException
+      );
+    });
+
+    it('should refuse an instrument the group has not opted into', async () => {
+      const failure = await failureOf(
+        assignmentsService.create({ ...data(), instrumentId: 'instrument-other' }, userAt('GROUP_MANAGER'))
+      );
+      expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-other'], kind: 'INSTRUMENT_UNAVAILABLE' });
+    });
+
+    it('should refuse a subject outside the group, so its participant link cannot be issued elsewhere', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([]);
+      const failure = await failureOf(assignmentsService.create(data(), userAt('GROUP_MANAGER')));
+      expect(failure.issues).toContainEqual({ kind: 'SUBJECT_UNAVAILABLE', subjectIds: ['subject-1'] });
+    });
+
+    it('should write nothing to the model or the gateway when the request is refused', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([]);
+      await expect(assignmentsService.create(data(), userAt('GROUP_MANAGER'))).rejects.toThrow();
+      expect(assignmentModel.create).not.toHaveBeenCalled();
+      expect(gatewayService.createRemoteAssignment).not.toHaveBeenCalled();
+    });
+
+    it('should not look for conflicts, since a single assignment may duplicate an outstanding one', async () => {
+      await assignmentsService.create(data(), userAt('GROUP_MANAGER'));
+      expect(assignmentModel.findMany).not.toHaveBeenCalled();
+    });
+
+    it.each([null, undefined])(
+      'should refuse a group manager an assignment with groupId %s, since every rule they hold names a group',
+      async (groupId) => {
+        await expect(assignmentsService.create({ ...data(), groupId }, userAt('GROUP_MANAGER'))).rejects.toBeInstanceOf(
+          ForbiddenException
+        );
+        expect(assignmentModel.create).not.toHaveBeenCalled();
+      }
+    );
+
+    it('should allow an administrator an ungrouped assignment, which the web client sends when no group is selected', async () => {
+      await assignmentsService.create({ ...data(), groupId: undefined }, userAt('ADMIN'));
+      expect(gatewayService.createRemoteAssignment).toHaveBeenCalledTimes(1);
     });
   });
 

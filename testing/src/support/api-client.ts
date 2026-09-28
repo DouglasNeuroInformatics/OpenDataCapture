@@ -101,6 +101,15 @@ export class ApiClient {
     return { credentials: { password, username }, user };
   }
 
+  /** Reads a subject's assignments back as admin, to check whether a write by another role took effect. */
+  async findAssignments(subjectId: string): Promise<Assignment[]> {
+    return this.expectJson<Assignment[]>(
+      this.request.get(`${API}/assignments`, { headers: this.authHeaders, params: { subjectId } }),
+      200,
+      `find the assignments of subject '${subjectId}'`
+    );
+  }
+
   /** Reads a group back as admin, to check whether a write by another role actually took effect. */
   async findGroupById(id: string): Promise<Group> {
     return this.expectJson<Group>(
@@ -132,6 +141,15 @@ export class ApiClient {
       throw new Error(`No instrument named '${name}' among ${instruments.length} returned`);
     }
     return instrument.id;
+  }
+
+  /** The ids the start-session form suggests for a group: its subjects identified by a custom id. */
+  async findSubjectCustomIds(groupId: string): Promise<string[]> {
+    return this.expectJson<string[]>(
+      this.request.get(`${API}/subjects/groups/${groupId}/custom-ids`, { headers: this.authHeaders }),
+      200,
+      `find the custom subject ids of group '${groupId}'`
+    );
   }
 
   /** Reads a user back as admin, to check what a write actually stored. */

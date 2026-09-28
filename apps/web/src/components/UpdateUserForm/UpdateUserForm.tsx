@@ -11,7 +11,8 @@ import { z } from 'zod/v4';
 
 import { usePasswordGenerator } from '@/hooks/usePasswordGenerator';
 import type { PasswordFormValues } from '@/hooks/usePasswordGenerator';
-import { $Email, $PhoneNumber, requiresGroup } from '@/utils/validation';
+import { useSuppressPasswordAutofill } from '@/hooks/useSuppressPasswordAutofill';
+import { $Email, $OptionalPassword, $PhoneNumber, requiresGroup } from '@/utils/validation';
 
 type UpdateUserFormData = {
   confirmPassword?: string | undefined;
@@ -48,15 +49,16 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
   const { groupOptions, initialValues } = data;
   const { resolvedLanguage, t } = useTranslation();
   const { applyGeneratedPassword, generatedPassword, generatePassword, isGeneratedPassword } = usePasswordGenerator();
+  const suppressPasswordAutofill = useSuppressPasswordAutofill();
 
   const $UpdateUserFormData = useMemo(() => {
     return z
       .object({
-        confirmPassword: z.string().min(1).optional(),
+        confirmPassword: $OptionalPassword,
         disabled: z.boolean().optional(),
         email: $Email(t).optional(),
         groupIds: z.set(z.string()),
-        password: z.string().min(1).optional(),
+        password: $OptionalPassword,
         phoneNumber: $PhoneNumber(t, initialValues?.phoneNumber).optional()
       })
       .check((ctx) => {
@@ -98,111 +100,113 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
   }, [data.selectedUserBasePermission, resolvedLanguage, initialValues?.phoneNumber]);
 
   return (
-    <Form
-      content={[
-        {
-          fields: {
-            email: {
-              kind: 'string',
-              label: t('common.email'),
-              variant: 'input'
-            },
-            phoneNumber: {
-              kind: 'string',
-              label: t('common.phoneNumber'),
-              variant: 'input'
-            }
-          },
-          title: t({
-            en: 'Contact',
-            fr: 'Coordonnées'
-          })
-        },
-        {
-          description: t({
-            en: 'A permission scoped to a group is dropped when the user leaves that group.',
-            fr: "Une autorisation limitée à un groupe est retirée lorsque l'utilisateur quitte ce groupe."
-          }),
-          fields: {
-            groupIds: {
-              kind: 'set',
-              label: t({ en: 'Member Of', fr: 'Membre de' }),
-              options: groupOptions,
-              variant: 'listbox'
-            }
-          },
-          title: t('common.groups')
-        },
-        {
-          fields: {
-            disabled: {
-              description: t({
-                en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
-                fr: 'Utilisez cette option si l’utilisateur n’a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l’auteur de données téléversées.'
-              }),
-              kind: 'boolean',
-              label: t({
-                en: 'Disabled',
-                fr: 'Désactivé'
-              }),
-              variant: 'radio'
-            }
-          },
-          title: t({
-            en: 'Status',
-            fr: 'Statut'
-          })
-        },
-        {
-          description: t({
-            en: 'Leave blank to keep the current password.',
-            fr: 'Laissez vide pour conserver le mot de passe actuel.'
-          }),
-          fields: {
-            password: {
-              calculateStrength: (password) => {
-                return estimatePasswordStrength(password).score;
+    <div className="contents" key={JSON.stringify(initialValues)} ref={suppressPasswordAutofill}>
+      <Form
+        content={[
+          {
+            fields: {
+              email: {
+                kind: 'string',
+                label: t('common.email'),
+                variant: 'input'
               },
-              generatePassword,
-              kind: 'string',
-              label: t('common.password'),
-              variant: 'password'
+              phoneNumber: {
+                kind: 'string',
+                label: t('common.phoneNumber'),
+                variant: 'input'
+              }
             },
-            // eslint-disable-next-line perfectionist/sort-objects
-            confirmPassword: {
-              kind: 'string',
-              label: t('common.confirmPassword'),
-              variant: 'password'
-            }
+            title: t({
+              en: 'Contact',
+              fr: 'Coordonnées'
+            })
           },
-          title: t('common.password')
+          {
+            description: t({
+              en: 'A permission scoped to a group is dropped when the user leaves that group.',
+              fr: "Une autorisation limitée à un groupe est retirée lorsque l'utilisateur quitte ce groupe."
+            }),
+            fields: {
+              groupIds: {
+                kind: 'set',
+                label: t({ en: 'Member Of', fr: 'Membre de' }),
+                options: groupOptions,
+                variant: 'listbox'
+              }
+            },
+            title: t('common.groups')
+          },
+          {
+            fields: {
+              disabled: {
+                description: t({
+                  en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
+                  fr: 'Utilisez cette option si l’utilisateur n’a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l’auteur de données téléversées.'
+                }),
+                kind: 'boolean',
+                label: t({
+                  en: 'Disabled',
+                  fr: 'Désactivé'
+                }),
+                variant: 'radio'
+              }
+            },
+            title: t({
+              en: 'Status',
+              fr: 'Statut'
+            })
+          },
+          {
+            description: t({
+              en: 'Leave blank to keep the current password.',
+              fr: 'Laissez vide pour conserver le mot de passe actuel.'
+            }),
+            fields: {
+              // No `calculateStrength`: libui renders the strength meter whenever that is given, and
+              // scores a blank field zero — painting red a field that is legitimately blank whenever
+              // the password is being left alone. Strength is still enforced above, on a password
+              // actually being set.
+              password: {
+                generatePassword,
+                kind: 'string',
+                label: t({ en: 'Set new password', fr: 'Définir un nouveau mot de passe' }),
+                variant: 'password'
+              },
+              // eslint-disable-next-line perfectionist/sort-objects
+              confirmPassword: {
+                kind: 'string',
+                label: t({ en: 'Confirm new password', fr: 'Confirmer le nouveau mot de passe' }),
+                variant: 'password'
+              }
+            },
+            title: t('common.password')
+          }
+        ]}
+        data-testid="update-user-form"
+        initialValues={{
+          ...initialValues,
+          disabled: initialValues?.disabled ?? false
+        }}
+        submitBtnLabel={t({ en: 'Save Changes', fr: 'Enregistrer les modifications' })}
+        subscribe={{
+          // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
+          // position, so `setValues` is inferred as an error type rather than a setter.
+          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) =>
+            applyGeneratedPassword(setValues),
+          selector: () => generatedPassword
+        }}
+        validationSchema={$UpdateUserFormData}
+        onError={onError}
+        onSubmit={(data) =>
+          onSubmit({
+            ...data,
+            // Left undefined when the password field is blank, so saving other changes to a user
+            // who still owes a reset does not quietly lift it.
+            mustResetPassword: data.password ? isGeneratedPassword(data.password) : undefined
+          })
         }
-      ]}
-      data-testid="update-user-form"
-      initialValues={{
-        ...initialValues,
-        disabled: initialValues?.disabled ?? false
-      }}
-      key={JSON.stringify(initialValues)}
-      submitBtnLabel={t({ en: 'Save Changes', fr: 'Enregistrer les modifications' })}
-      subscribe={{
-        // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
-        // position, so `setValues` is inferred as an error type rather than a setter.
-        onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) =>
-          applyGeneratedPassword(setValues),
-        selector: () => generatedPassword
-      }}
-      validationSchema={$UpdateUserFormData}
-      onError={onError}
-      onSubmit={(data) =>
-        onSubmit({
-          ...data,
-          // Left undefined when the password field is blank, so saving other changes to a user who
-          // still owes a reset does not quietly lift it.
-          mustResetPassword: data.password ? isGeneratedPassword(data.password) : undefined
-        })
-      }
-    />
+      />
+    </div>
   );
 };
 

@@ -94,17 +94,26 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
 
 7. **Watch the run:** `gh run watch`, or `gh run list --workflow=Release --limit 1` for its id.
 
-   | Job           | What it does                                                                                                                                                    | Skips when                                                   |
-   | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-   | `configure`   | derives the build matrix from `docker compose config` through the jq filter described below; runs `release.cjs` for `version` and `should_release`              | never                                                        |
-   | `validate`    | `pnpm lint`                                                                                                                                                     | never                                                        |
-   | `build`       | buildx `linux/amd64,linux/arm64` per matrix leg, pushing `latest` and the bare version, with `RELEASE_VERSION` as a build arg                                   | never — guards on `should_release`, which is always `'true'` |
-   | `publish-npm` | turbo-builds each publishable package and its closure, then publishes each version not already on npm, over OIDC (no `NPM_TOKEN`)                               | never — same guard                                           |
-   | `release`     | extracts the `## ${version}` section of `CHANGELOG.md` (`scripts/changelog.ts section`) and creates the GitHub release tagged `v${version}` with it as the body | any of its `needs` skipped or failed                         |
+   | Job           | What it does                                                                                                                                                    | Skips when                                                                        |
+   | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+   | `configure`   | derives the build matrix from `docker compose config` through the jq filter described below; runs `release.cjs` for `version` and `should_release`              | never; **fails** when dispatched from any ref but `main`                          |
+   | `validate`    | `pnpm lint`                                                                                                                                                     | never                                                                             |
+   | `build`       | buildx `linux/amd64,linux/arm64` per matrix leg, pushing `latest` and the bare version, with `RELEASE_VERSION` as a build arg                                   | never — guards on `should_release`, which is `'true'` whenever `configure` passed |
+   | `publish-npm` | turbo-builds each publishable package and its closure, then publishes each version not already on npm, over OIDC (no `NPM_TOKEN`), in the `release` environment | never — same guard                                                                |
+   | `release`     | extracts the `## ${version}` section of `CHANGELOG.md` (`scripts/changelog.ts section`) and creates the GitHub release tagged `v${version}` with it as the body | any of its `needs` skipped or failed                                              |
 
    `release` **fails** — not skips — with `CHANGELOG.md has no section for <version>` when the bump
    bypassed `increment-version.ts`. That is deliberate: an empty body would look like every release
    before the changelog existed and would hide the bypass.
+
+   **Only `main` publishes.** `release.cjs` fails `configure` on a dispatch from any other ref, but
+   the dispatched ref supplies its own copy of the workflow, so that check stops accidents only. What
+   holds against a branch is hosted configuration, and it must stay in place: the `release`
+   environment allows deployments from `main` only, each package's npm trusted publisher names
+   `release.yaml` and the `release` environment, and the `Release tags` ruleset lets only admins
+   move or delete a `v*` tag. It cannot restrict creation: `Create Release` makes the tag with
+   `GITHUB_TOKEN`, and GitHub refuses the Actions app as a repository ruleset bypass actor. GHCR is
+   not covered — any workflow on a branch can push an image with `GITHUB_TOKEN`.
 
    **Four images ship: api, gateway, web and playground.** The filter keeps only compose services
    declaring **both** `build` and `image`, so a new image is a compose service with both keys and
@@ -117,7 +126,7 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    (`packages/release-info/AGENTS.md`).
 
 8. **Expect a full build even when nothing changed.** `release.cjs` reads the root `package.json`
-   version and sets `should_release` to `'true'` unconditionally — by design, and it reads nothing
+   version and sets `should_release` to `'true'` on every run from `main` — by design, and it reads nothing
    outside the repository to decide. Pushing without a bump re-pushes the same image tags and updates
    the existing GitHub release in place rather than skipping. That is the intended behaviour, not a
    finding.

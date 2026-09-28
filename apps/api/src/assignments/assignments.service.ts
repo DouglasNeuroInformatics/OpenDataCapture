@@ -78,6 +78,14 @@ export class AssignmentsService {
     { expiresAt, groupId, instrumentId, subjectId }: CreateAssignmentDto,
     currentUser: RequestUser
   ): Promise<Assignment> {
+    if (groupId) {
+      await this.resolveBulkRequest(
+        { allowDuplicates: true, groupId, subjectIds: [subjectId], timepoints: [{ expiresAt, instrumentId }] },
+        currentUser
+      );
+    } else if (!currentUser.ability.can('create', forcedAppSubject('Assignment', { groupId: null }))) {
+      throw new ForbiddenException('Insufficient permissions to create an assignment outside a group');
+    }
     const { assignment, publicKey } = await this.stageAssignment({ expiresAt, groupId, instrumentId, subjectId });
     try {
       await this.gatewayService.createRemoteAssignment(assignment, publicKey);
@@ -194,9 +202,9 @@ export class AssignmentsService {
   }
 
   /**
-   * Every authorization and validity check a bulk operation depends on, in one place so preflight
-   * and create cannot drift apart. Throws with all issues attached; returns the resolved request
-   * when there are none.
+   * Every authorization and validity check a grouped assignment depends on, in one place so
+   * preflight, bulk create and single create cannot drift apart. Throws with all issues attached;
+   * returns the resolved request when there are none.
    */
   private async resolveBulkRequest(
     { allowDuplicates, groupId, subjectIds, timepoints }: BulkAssignmentPreflightData,

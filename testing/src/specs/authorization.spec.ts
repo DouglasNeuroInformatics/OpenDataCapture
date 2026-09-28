@@ -1,3 +1,4 @@
+import type { CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { Permissions } from '@opendatacapture/schemas/core';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { InstrumentRecord, UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
@@ -302,6 +303,14 @@ function uploadRecord(request: APIRequestContext, token: string, data: UploadIns
   return request.post(`${API}/instrument-records/upload`, { data, headers: { Authorization: `Bearer ${token}` } });
 }
 
+/** `POST /assignments` as the holder of the given token, expiring tomorrow, with the raw response. */
+function createAssignment(request: APIRequestContext, token: string, data: Omit<CreateAssignmentData, 'expiresAt'>) {
+  return request.post(`${API}/assignments`, {
+    data: { ...data, expiresAt: new Date(Date.now() + 86_400_000) },
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
+
 /** The user list `/admin/users` renders, read with the given user's own token. */
 async function readUsernames(request: APIRequestContext, token: string): Promise<string[]> {
   const response = await request.get(`${API}/users`, { headers: { Authorization: `Bearer ${token}` } });
@@ -464,6 +473,46 @@ test.describe('server-side authorization', () => {
 
     expect(response.ok()).toBe(false);
     expect((await api.findGroupById(group.id)).id).toBe(group.id);
+  });
+
+  // `create Assignment` is satisfied at the guard by a group manager's rule for their own groups, so
+  // the service alone decides which group an assignment is filed under and who receives its link.
+  test('should not let a group manager file an assignment under a group they do not belong to', async ({
+    api,
+    apiRequestContext,
+    roleAccount,
+    uniqueId
+  }) => {
+    const foreignGroup = await api.createGroup({ name: `Foreign Group ${uniqueId}` });
+    const subjectId = await api.createSubject(foreignGroup.id);
+    const { accessToken } = await roleAccount('GROUP_MANAGER');
+
+    const response = await createAssignment(apiRequestContext, accessToken, {
+      groupId: foreignGroup.id,
+      instrumentId: await api.findInstrumentId('FORM'),
+      subjectId
+    });
+
+    expect(response.status()).toBe(404);
+    expect(await api.findAssignments(subjectId)).toStrictEqual([]);
+  });
+
+  test('should not let a group manager file an assignment under no group, even for their own subject', async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup({ name: `Manager Group ${uniqueId}` });
+    const { credentials } = await api.createUser({ groupIds: [group.id] });
+    const subjectId = await api.createSubject(group.id);
+
+    const response = await createAssignment(apiRequestContext, await ApiClient.login(apiRequestContext, credentials), {
+      instrumentId: await api.findInstrumentId('FORM'),
+      subjectId
+    });
+
+    expect(response.status()).toBe(403);
+    expect(await api.findAssignments(subjectId)).toStrictEqual([]);
   });
 
   // `/admin/users` renders a populated table for a non-admin, which is only acceptable because the

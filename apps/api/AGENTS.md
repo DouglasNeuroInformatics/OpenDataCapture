@@ -238,13 +238,13 @@ per file. Three consequences worth knowing:
   `test/helpers.ts` stubs it once for every suite; a unit spec touching that path stubs its own.
 - **The OpenAPI document is built before `enableVersioning`**, so paths in `/spec.json` carry no
   `/v1` prefix even though the live routes do.
-- **`GatewaySynchronizer` leaks a timer into the suite.** Its `onApplicationBootstrap` calls
-  `setInterval` without storing the handle, and `app.close()` cannot clear it. Nothing breaks while a
-  file finishes inside `GATEWAY_REFRESH_INTERVAL`; a longer one fires `sync()` mid-run, whose
-  database call may land after the replica set is stopped. Fix it at the source — store the handle
-  and clear it in `onApplicationShutdown` — rather than disabling `GATEWAY_ENABLED` for tests, which
-  would drop `GatewayModule`'s `forwardRef` circular dependency out of exactly the wiring these tests
-  exist to check.
+- **`GatewaySynchronizer` owns a timer for the lifetime of the suite.** It schedules each pass with
+  `setTimeout` only once the previous pass has finished, stores the handle, and clears it in
+  `onApplicationShutdown`, where it also awaits the in-flight pass — so `app.close()` leaves nothing
+  that can fire `sync()` after the replica set is stopped. That await is bounded: a pass is abandoned
+  after five minutes, so a stalled gateway call cannot hang `app.close()` either. Keep it that way
+  rather than disabling `GATEWAY_ENABLED` for tests, which would drop `GatewayModule`'s `forwardRef`
+  circular dependency out of exactly the wiring these tests exist to check.
 
 Provider overrides are deliberately not offered — nothing needs one yet. Adding them means
 `Test.createTestingModule({ imports: [appContainer.module] })`, which also means reproducing
