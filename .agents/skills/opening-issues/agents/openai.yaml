@@ -1,0 +1,3 @@
+interface:
+  display_name: 'Opening Issues'
+  short_description: 'File an issue with its type, priority, difficulty and area labels'

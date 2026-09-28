@@ -69,6 +69,7 @@ the expensive mistake: the wrong skill answers truthfully, just not the question
 | `tdd`                  | Driving a feature or a bug fix red-green-refactor                                                                                  | Not where a test file goes in this repo, or whether anything collects it — `odc-testing`          |
 | `review-pr`            | Triaging open pull requests — one verdict each, and which ones need the user                                                       | Not your own uncommitted diff — `code-review`                                                     |
 | `code-review`          | Reviewing the working diff since a fixed point, on Standards and on Spec                                                           | Not triage of what is open on GitHub — `review-pr`                                                |
+| `opening-issues`       | Filing a GitHub issue, or labelling one, with its type, priority, difficulty and area                                              | Not pull requests — `odc-open-pr`                                                                 |
 
 ## When you learn something this file could not tell you
 
