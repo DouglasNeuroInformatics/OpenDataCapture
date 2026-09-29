@@ -27,7 +27,7 @@ import { Prisma } from '@prisma/client';
 import type { InstrumentRecord as PrismaInstrumentRecord } from '@prisma/client';
 import { isNumber, mergeWith, pickBy } from 'lodash-es';
 
-import { accessibleQuery } from '@/auth/ability.utils';
+import { accessibleQuery, forcedAppSubject } from '@/auth/ability.utils';
 import type { AppAbility } from '@/auth/auth.types';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -588,17 +588,17 @@ export class InstrumentRecordsService {
       }
     ];
 
-    const records = (await this.instrumentRecordModel.aggregateRaw({ pipeline })) as unknown as unknown[];
+    const records = (await this.instrumentRecordModel.aggregateRaw({ pipeline })) as unknown as RecordType[];
 
     /**
      * We need to create a shallow copy of all records here, as the aggregateRaw method returns objects
      * with the Symbol(nodejs.util.inspect.custom) property defined, which is not serializable.
      */
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    return (records.filter((record) => appAbility.can('read', record as any)) as RecordType[]).map((record) => ({
-      ...record
-    }));
+    // Raw rows carry no model name, so CASL would resolve them as `Object` and match only `manage all`
+    return records
+      .filter((record) => appAbility.can('read', forcedAppSubject('InstrumentRecord', { groupId: record.groupId })))
+      .map((record) => ({ ...record }));
   }
 
   private serializeData(data: unknown) {

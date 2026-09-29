@@ -90,4 +90,26 @@ describe('$$ScalarInstrument', () => {
     expect($$ScalarInstrument(['en', 'fr']).safeParse(bilingualFormInstrument.instance).success).toBe(true);
     expect($$ScalarInstrument(['en', 'fr']).safeParse(unilingualFormInstrument.instance).success).toBe(false);
   });
+  it.each([
+    [
+      'English',
+      unilingualFormInstrument.instance,
+      unilingualFormInstrument.instance.measures?.hasNegativeFavoriteNumber
+    ],
+    [
+      'English and French',
+      bilingualFormInstrument.instance,
+      { kind: 'computed', label: { en: 'Is Negative', fr: 'Est négatif' }, value: () => false }
+    ]
+  ])(
+    "should keep a computed measure's visibility when specialized to %s, which is how each published JSON Schema is built",
+    (_, instance, measure) => {
+      const result = $$ScalarInstrument(instance.language).safeParse({
+        ...instance,
+        measures: { isNegative: { ...measure, visibility: 'hidden' } }
+      });
+      expect(result.success).toBe(true);
+      expect(result.data).toHaveProperty('measures.isNegative.visibility', 'hidden');
+    }
+  );
 });

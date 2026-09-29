@@ -1,6 +1,36 @@
+import { readFile } from 'node:fs/promises';
+
+import { HAPPINESS_RECORD } from '../support/constants';
 import { expect, test } from '../support/fixtures';
 
 test.describe('data hub', () => {
+  test("should export the records of a group manager's own group, since the export applies the caller's read rules", async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const group = await api.createGroup({ name: `Group${uniqueId}` });
+    const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    await api.uploadRecords(group.id, instrumentId, [
+      { data: HAPPINESS_RECORD, date: new Date(), subjectId: `export-${uniqueId}` }
+    ]);
+
+    await authenticateAs(credentials);
+    await page.goto('/datahub');
+    await expect(page.getByTestId('data-table-row')).toHaveCount(1);
+
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByTestId('datahub-export-dropdown').getByRole('button').click();
+    await page.getByRole('menuitem', { exact: true, name: 'JSON' }).click();
+    const download = await downloadPromise;
+
+    const exported = JSON.parse((await readFile(await download.path())).toString()) as { groupId: string }[];
+    expect(exported.length).toBeGreaterThan(0);
+    expect(exported.every((entry) => entry.groupId === group.id)).toBe(true);
+  });
+
   test('should display the data hub header', async ({ getPageModel }) => {
     const datahubPage = await getPageModel('/datahub');
     await expect(datahubPage.pageHeader).toBeVisible();

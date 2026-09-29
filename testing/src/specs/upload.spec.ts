@@ -1,18 +1,12 @@
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 
 import { UploadInstrumentPage } from '../pages/_app/upload/$instrumentId.page';
+import { HAPPINESS_RECORD } from '../support/constants';
 import { expect, test } from '../support/fixtures';
 
 // The plain "Happiness Questionnaire" (kind FORM); a similarly-named consent-bundled edition also
 // exists in the catalog but is kind SERIES, so it never appears in the upload instrument list.
 const INSTRUMENT_TITLE = 'Happiness Questionnaire';
-
-/** A minimal payload satisfying the seeded happiness questionnaire's validation schema. */
-const HAPPINESS_RECORD = {
-  isSatisfiedOverall: true,
-  personalLifeSatisfaction: 8,
-  professionalLifeSatisfaction: 7
-};
 
 test.describe('upload', () => {
   test('should upload a valid CSV and create a record for the subject it names @smoke', async ({

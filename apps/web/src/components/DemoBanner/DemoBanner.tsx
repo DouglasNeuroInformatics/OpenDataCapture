@@ -12,7 +12,7 @@ type DemoBannerProps = {
 export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
   const { t } = useTranslation();
   return (
-    <Dialog>
+    <Dialog defaultOpen>
       <div className="flex w-full items-center justify-center bg-sky-700 leading-tight text-white">
         <div className="container py-1.5">
           <div className="flex flex-col items-center justify-between lg:flex-row">
@@ -33,6 +33,7 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
       </div>
       <Dialog.Content
         className="w-[calc(100%-1rem)] max-w-[600px] px-2.5 sm:px-6"
+        data-testid="demo-dialog"
         onOpenAutoFocus={(event) => {
           event.preventDefault();
         }}

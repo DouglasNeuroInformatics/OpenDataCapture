@@ -15,6 +15,38 @@ test.describe('authentication', () => {
     await loginPage.expect.toHaveURL('/dashboard');
   });
 
+  test.describe('demo instance', () => {
+    test('should show the demo information over the login page as soon as it loads', async ({ getPageModel }) => {
+      const loginPage = await getPageModel('/auth/login');
+      await expect(loginPage.demoDialog).toBeVisible();
+    });
+
+    test('should reveal the login form once the demo information is dismissed', async ({ getPageModel }) => {
+      const loginPage = await getPageModel('/auth/login');
+      await expect(loginPage.demoDialog).toBeVisible();
+      await loginPage.dismissDemoDialog();
+
+      const usernameField = loginPage.loginForm.getByLabel('username');
+      await usernameField.click();
+      await expect(usernameField).toBeFocused();
+    });
+
+    // A standard user's dashboard redirects to the start-session form, so pick a group manager, and
+    // the last one, so a button wired to the first row's user would show the wrong username.
+    test('should log in as the demo user whose row is chosen in the demo information', async ({
+      getPageModel,
+      page
+    }) => {
+      const loginPage = await getPageModel('/auth/login');
+      const demoUserRow = loginPage.demoUserRows.filter({ hasText: 'Group Manager' }).last();
+      const username = await demoUserRow.getByRole('cell').first().innerText();
+      await demoUserRow.getByRole('button').click();
+
+      await loginPage.expect.toHaveURL('/dashboard');
+      await expect(page.getByTestId('user-dropup-trigger')).toHaveText(username);
+    });
+  });
+
   test.describe('invalid credentials', () => {
     test('should show an error and stay on the login page for a wrong password', async ({
       api,

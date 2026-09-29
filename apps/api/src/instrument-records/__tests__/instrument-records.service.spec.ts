@@ -1,11 +1,13 @@
 import type { Model } from '@douglasneuroinformatics/libnest';
-import { getModelToken } from '@douglasneuroinformatics/libnest';
+import { getModelToken, LoggingService } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 import { StorageService } from '@/storage/storage.service';
 import { UsersService } from '@/users/users.service';
@@ -552,6 +554,63 @@ describe('InstrumentRecordsService', () => {
         timestamp: expect.any(String),
         username: 'testuser',
         value: 85
+      });
+    });
+
+    describe('with the ability built at login', () => {
+      /**
+       * A raw aggregate row for one subject enrolled in both groups, so only the record's own
+       * `groupId` (null for a record collected outside any group) can tell the rows apart.
+       */
+      const exportRow = (groupId: null | string) => ({
+        computedMeasures: { score: 85 },
+        date: '2023-01-01',
+        groupId,
+        id: `record-${groupId}`,
+        instrumentId: 'instrument-1',
+        session: {
+          date: '2023-01-01',
+          id: `session-${groupId}`,
+          type: 'IN_PERSON' as const,
+          user: { username: 'testuser' }
+        },
+        subject: { age: 20, groupIds: ['group-1', 'group-2'], id: 'subject-1', sex: 'MALE' }
+      });
+
+      const abilityAt = (basePermissionLevel: 'ADMIN' | 'GROUP_MANAGER') =>
+        new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
+          additionalPermissions: undefined,
+          basePermissionLevel,
+          firstName: 'Test',
+          groups: [{ id: 'group-1' }],
+          id: 'user-1',
+          lastName: 'User',
+          username: 'test-user'
+        } as any);
+
+      const exportedGroupIds = async (
+        rows: ReturnType<typeof exportRow>[],
+        basePermissionLevel: 'ADMIN' | 'GROUP_MANAGER'
+      ) => {
+        instrumentRecordModel.aggregateRaw.mockResolvedValueOnce(rows);
+        instrumentsService.findById.mockResolvedValue({ id: 'instrument-1', internal: { edition: 1, name: 'Test' } });
+        const result = await instrumentRecordsService.exportRecords({}, { ability: abilityAt(basePermissionLevel) });
+        return result.map((entry) => entry.groupId);
+      };
+
+      it("should export a group manager's own group and no other, even for a subject shared with another, since each raw row is checked as an instrument record", async () => {
+        const rows = [exportRow('group-1'), exportRow('group-2')];
+        expect(await exportedGroupIds(rows, 'GROUP_MANAGER')).toStrictEqual(['group-1']);
+      });
+
+      it("should leave records collected outside any group out of a group manager's export, even for a subject in their group, as the record list does", async () => {
+        const rows = [exportRow('group-1'), exportRow(null)];
+        expect(await exportedGroupIds(rows, 'GROUP_MANAGER')).toStrictEqual(['group-1']);
+      });
+
+      it('should export every group and the records collected outside any group to an administrator, labelling the latter root', async () => {
+        const rows = [exportRow('group-1'), exportRow('group-2'), exportRow(null)];
+        expect(await exportedGroupIds(rows, 'ADMIN')).toStrictEqual(['group-1', 'group-2', DEFAULT_GROUP_NAME]);
       });
     });
 

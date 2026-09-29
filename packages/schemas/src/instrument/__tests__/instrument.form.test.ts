@@ -51,6 +51,48 @@ describe('$FormInstrument', () => {
   it('should reject a non-boolean resetButton', () => {
     expect($FormInstrument.safeParse({ ...unilingualFormInstrument.instance, resetButton: 'yes' }).success).toBe(false);
   });
+
+  // Stripped for the same reason as resetButton above, the summary would fall back to the instrument's
+  // default visibility and show a measure its author hid, or hide one they marked visible.
+  it.each(['hidden', 'visible'])(
+    'should preserve a computed measure marked %s rather than stripping it',
+    (visibility) => {
+      const { measures } = unilingualFormInstrument.instance;
+      const result = $FormInstrument.safeParse({
+        ...unilingualFormInstrument.instance,
+        measures: { hasNegativeFavoriteNumber: { ...measures?.hasNegativeFavoriteNumber, visibility } }
+      });
+      expect(result.success).toBe(true);
+      expect(result.data?.measures?.hasNegativeFavoriteNumber?.visibility).toBe(visibility);
+    }
+  );
+
+  it('should preserve the visibility of a constant measure rather than stripping it', () => {
+    const { measures } = unilingualFormInstrument.instance;
+    const result = $FormInstrument.safeParse({
+      ...unilingualFormInstrument.instance,
+      measures: { favoriteNumber: { ...measures?.favoriteNumber, visibility: 'hidden' } }
+    });
+    expect(result.success).toBe(true);
+    expect(result.data?.measures?.favoriteNumber?.visibility).toBe('hidden');
+  });
+
+  it('should reject a computed measure whose visibility is neither hidden nor visible, rather than stripping it', () => {
+    const { measures } = unilingualFormInstrument.instance;
+    const result = $FormInstrument.safeParse({
+      ...unilingualFormInstrument.instance,
+      measures: { hasNegativeFavoriteNumber: { ...measures?.hasNegativeFavoriteNumber, visibility: 'secret' } }
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues).toMatchObject([{ path: ['measures', 'hasNegativeFavoriteNumber', 'visibility'] }]);
+  });
+
+  it("should leave visibility unset on a computed measure that omits it, so the instrument's default decides", () => {
+    const result = $FormInstrument.safeParse(unilingualFormInstrument.instance);
+    const measure = result.data?.measures?.hasNegativeFavoriteNumber;
+    expect(measure).toMatchObject({ kind: 'computed' });
+    expect(measure?.visibility).toBeUndefined();
+  });
 });
 
 describe('$FormInstrumentBlock', () => {
