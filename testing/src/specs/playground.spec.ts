@@ -34,6 +34,33 @@ export default defineInstrument({
 `;
 }
 
+/**
+ * A form that shows its measures by default and has two computed measures, one of them marked hidden,
+ * so the summary should list exactly the other one.
+ */
+function measureVisibilityInstrumentSource(title: string): string {
+  return `
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { z } from '/runtime/v1/zod@3.x';
+
+export default defineInstrument({
+  kind: 'FORM',
+  language: 'en',
+  tags: ['Measures'],
+  internal: { edition: 1, name: 'MEASURE_VISIBILITY' },
+  clientDetails: { estimatedDuration: 1, instructions: ['Submit the form'] },
+  content: { note: { kind: 'string', label: 'Note', variant: 'input' } },
+  defaultMeasureVisibility: 'visible',
+  details: { description: 'Measure visibility', license: 'Apache-2.0', title: '${title}' },
+  measures: {
+    hiddenMeasure: { kind: 'computed', label: 'Hidden Measure', value: () => 1, visibility: 'hidden' },
+    shownMeasure: { kind: 'computed', label: 'Shown Measure', value: () => 2 }
+  },
+  validationSchema: z.object({ note: z.string().optional() })
+});
+`;
+}
+
 // The first paint waits on the 11 MB esbuild download and the toolchain boot; the preview then
 // compiles on a 2 s poll, so the whole chain is slower than the suite's default expect timeout.
 const PREVIEW_TIMEOUT = 60_000;
@@ -116,5 +143,26 @@ test.describe('playground', () => {
 
     await expect.poll(() => messages).toHaveLength(1);
     expect(messages[0]).toContain('The following data will be submitted');
+  });
+
+  // The preview validates every instrument it renders, and apps/web does too in development. That
+  // validation is what used to strip `visibility` from computed measures, so the default applied.
+  test('should leave a computed measure marked hidden out of the summary', async ({ page, uniqueId }) => {
+    const title = `Measures ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: measureVisibilityInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+
+    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
+    // Playwright dismisses the editor's submission `alert` on its own when nothing listens for it.
+    await playground.preview.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(playground.preview.getByText('Shown Measure')).toBeVisible();
+    await expect(playground.preview.getByText('Hidden Measure')).toHaveCount(0);
   });
 });

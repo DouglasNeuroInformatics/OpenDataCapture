@@ -88,8 +88,10 @@ the generated query and the literal share one. Prefer `AND`.
 
 When you hold a plain object rather than a Prisma result, CASL cannot infer its subject type. Use
 `forcedAppSubject(name, partial)` from `src/auth/ability.utils.ts`, which stamps the `__modelName`
-field that `detectAppSubject` reads. `src/instrument-records/files/files.service.ts` is the only
-production use:
+field that `detectAppSubject` reads. Rows from `aggregateRaw` are plain objects too, which is why
+`queryRecordsRaw` in `src/instrument-records/instrument-records.service.ts` checks each one this way;
+without it every row resolves to `Object` and only `manage all` can read it.
+`src/instrument-records/files/files.service.ts` is the reference example:
 
 ```ts
 currentUser.ability.can('create', forcedAppSubject('InstrumentRecordFile', { groupId: record.groupId }));

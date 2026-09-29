@@ -1,3 +1,4 @@
+import { StartSessionPage } from '../pages/_app/session/start-session.page';
 import { ApiClient } from '../support/api-client';
 import { expect, test } from '../support/fixtures';
 
@@ -161,25 +162,54 @@ test.describe('start session', () => {
     const startSessionPage = await getPageModel('/session/start-session');
     await startSessionPage.sessionForm.waitFor({ state: 'visible' });
     await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
-    // Date of birth and sex are filled directly, leaving only the identifier blank.
-    await startSessionPage.sessionForm.locator('[name="subjectDateOfBirth"]').fill('1990-01-01');
-    await startSessionPage.sessionForm.locator('[name="subjectSex"]').selectOption('MALE');
+    await startSessionPage.fillSubjectDetails('MALE');
     await startSessionPage.submitForm();
 
     await expect(startSessionPage.errorMessages).toHaveCount(1);
     await expect(startSessionPage.errorMessages).toHaveText('This field is required');
   });
 
-  test('should reject a custom identifier containing an illegal character', async ({ getPageModel }) => {
+  test('should reject a custom identifier containing an illegal character with that error alone, not a contradictory required-field one', async ({
+    getPageModel
+  }) => {
     const startSessionPage = await getPageModel('/session/start-session');
     await startSessionPage.sessionForm.waitFor({ state: 'visible' });
     await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
-    await startSessionPage.subjectIdField.fill('subject$1');
-    await startSessionPage.sessionForm.locator('[name="subjectDateOfBirth"]').fill('1990-01-01');
-    await startSessionPage.sessionForm.locator('[name="subjectSex"]').selectOption('MALE');
+    await startSessionPage.typeSubjectId('abc$def');
+    await startSessionPage.fillSubjectDetails('MALE');
     await startSessionPage.submitForm();
 
-    await expect(startSessionPage.errorMessages.filter({ hasText: 'Illegal character: $' })).toBeVisible();
+    await expect(startSessionPage.errorMessages).toHaveCount(1);
+    await expect(startSessionPage.subjectIdErrors).toHaveText('Illegal character: $');
+    await expect(startSessionPage.successMessage).not.toBeVisible();
+  });
+
+  test("should enforce the group's identifier pattern, yet still reject an illegal character in an identifier that pattern accepts", async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup({
+      settings: { defaultIdentificationMethod: 'CUSTOM_ID', idValidationRegex: '^[a-z$]+$' }
+    });
+    const { credentials } = await api.createUser({ groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const startSessionPage = new StartSessionPage(page);
+    await startSessionPage.goto('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.typeSubjectId('ABC');
+    await startSessionPage.fillSubjectDetails('MALE');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.subjectIdErrors).toHaveText('Must match regular expression: ^[a-z$]+$');
+
+    await startSessionPage.typeSubjectId('abc$def');
+    await startSessionPage.dismissSubjectIdOptions();
+    await startSessionPage.submitForm();
+
+    await expect(startSessionPage.errorMessages).toHaveCount(1);
+    await expect(startSessionPage.subjectIdErrors).toHaveText('Illegal character: $');
     await expect(startSessionPage.successMessage).not.toBeVisible();
   });
 

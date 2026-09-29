@@ -515,6 +515,58 @@ test.describe('server-side authorization', () => {
     expect(await api.findAssignments(subjectId)).toStrictEqual([]);
   });
 
+  test('should let an administrator file an assignment under no group, which the web client sends without one selected', async ({
+    adminToken,
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const { subjectId } = await api.createSession(null, { id: `Ungrouped${uniqueId}` });
+
+    const response = await createAssignment(apiRequestContext, adminToken, {
+      instrumentId: await api.findInstrumentId('FORM'),
+      subjectId
+    });
+
+    expect(response.status()).toBe(201);
+    const assignments = await api.findAssignments(subjectId);
+    expect(assignments).toMatchObject([{ groupId: null }]);
+
+    // Cancelling removes the row from the gateway, so the rest of the run is not synchronizing it.
+    await apiRequestContext.patch(`${API}/assignments/${assignments[0]!.id}`, {
+      data: { status: 'CANCELED' },
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+  });
+
+  // The web client exports only the current group and then keeps only the subjects its table lists,
+  // so no screen can show whether the api itself leaves another group's records out. Both records
+  // belong to one subject enrolled in both groups, so only each record's own group separates them.
+  // The body is msgpack, whose entries carry their record's group id as a plain string and never the
+  // subject's groups, so its bytes are searched.
+  test("should leave another group's records out of a group manager's export, even of a subject enrolled in both groups", async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const ownGroup = await api.createGroup({ name: `Exporting Group ${uniqueId}` });
+    const foreignGroup = await api.createGroup({ name: `Foreign Group ${uniqueId}` });
+    const { credentials } = await api.createUser({ groupIds: [ownGroup.id] });
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    const sharedSubjectId = `Shared${uniqueId}`;
+    await api.uploadRecords(ownGroup.id, instrumentId, [happinessRecord(sharedSubjectId)]);
+    await api.uploadRecords(foreignGroup.id, instrumentId, [happinessRecord(sharedSubjectId)]);
+
+    const response = await apiRequestContext.get(`${API}/instrument-records/export`, {
+      headers: { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` }
+    });
+
+    expect(response.status()).toBe(200);
+    const body = await response.body();
+    expect(body.includes(ownGroup.id)).toBe(true);
+    expect(body.includes(foreignGroup.id)).toBe(false);
+  });
+
   // `/admin/users` renders a populated table for a non-admin, which is only acceptable because the
   // rows it can read are the ones it may already see elsewhere in the app.
   test('should scope the user list a group manager reads to their own group', async ({

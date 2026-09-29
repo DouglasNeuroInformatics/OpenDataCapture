@@ -33,6 +33,9 @@ is `.agents/docs/playbooks/add-e2e-test.md`; the tier-by-tier picture is
   is meant to affect. Passing a role reuses the worker's cached user; pass `$LoginCredentials` from
   `api.createUser()` instead when the test mutates that user's own login, so it cannot invalidate
   the cached token every other spec in the worker shares.
+- **The login page opens a demo dialog over the form.** Setup runs with `initDemo: true`, so the
+  instance is a demo and its credentials dialog swallows every click on `/auth/login` until
+  dismissed. `LoginPage.fillLoginForm` dismisses it first; drive the form through that page object.
 - **`.env` at the repo root must exist.** `src/support/env.ts` reads `API_DEV_SERVER_PORT`,
   `GATEWAY_DEV_SERVER_PORT`, `PLAYGROUND_DEV_SERVER_PORT` and `WEB_DEV_SERVER_PORT` and throws while
   `playwright.config.ts` is loading if any is missing. `./scripts/generate-env.sh` produces it.

@@ -5,6 +5,8 @@ import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { BulkAssignmentFailure } from '@opendatacapture/schemas/assignment';
+import type { Permissions } from '@opendatacapture/schemas/core';
+import type { BasePermissionLevel } from '@opendatacapture/schemas/user';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AuditLogger } from '@/audit/audit.logger';
@@ -30,9 +32,14 @@ const permissiveUser = () =>
   }) as any;
 
 /** The ability `AbilityFactory` builds at login, so group conditions are the ones production applies. */
-const userAt = (basePermissionLevel: 'ADMIN' | 'GROUP_MANAGER', groupId = GROUP_ID) =>
+const userAt = (
+  basePermissionLevel: BasePermissionLevel,
+  groupId = GROUP_ID,
+  additionalPermissions: Permissions = []
+) =>
   ({
     ability: new AbilityFactory({ verbose: vi.fn() } as any).createForPayload({
+      additionalPermissions,
       basePermissionLevel,
       groups: [{ id: groupId }],
       id: 'user-1'
@@ -259,6 +266,17 @@ describe('AssignmentsService', () => {
 
     it('should allow an administrator an ungrouped assignment, which the web client sends when no group is selected', async () => {
       await assignmentsService.create({ ...data(), groupId: undefined }, userAt('ADMIN'));
+      expect(gatewayService.createRemoteAssignment).toHaveBeenCalledTimes(1);
+    });
+
+    it('should file a grouped assignment under the group it names, so that group can find and cancel it', async () => {
+      await assignmentsService.create(data(), userAt('GROUP_MANAGER'));
+      expect(assignmentModel.create.mock.lastCall?.[0].data.group).toStrictEqual({ connect: { id: GROUP_ID } });
+    });
+
+    it('should allow a grouped assignment to a user granted only assignment creation in that group, which is less than managing it', async () => {
+      const grantee = userAt('STANDARD', GROUP_ID, [{ action: 'create', groupId: GROUP_ID, subject: 'Assignment' }]);
+      await assignmentsService.create(data(), grantee);
       expect(gatewayService.createRemoteAssignment).toHaveBeenCalledTimes(1);
     });
   });
