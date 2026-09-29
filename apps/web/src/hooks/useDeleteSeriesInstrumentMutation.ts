@@ -37,6 +37,10 @@ export function useDeleteSeriesInstrumentMutation() {
       // The server has already detached the instrument from every group; callers that hold a stale copy
       // of the group's accessible ids (e.g. the manage page) reconcile it locally via onSuccess.
       void queryClient.invalidateQueries({ queryKey: ['instrument-info'] });
+      // A series id is a hash of its title, items and owning group, so recreating a deleted series with
+      // the same title and items yields the same id — and the bundle cached under it, which is never
+      // revalidated, would otherwise render the old series.
+      queryClient.removeQueries({ queryKey: ['instrument-bundle'] });
     },
     // The app default is throwOnError: true, which would rethrow the error during render and hand a
     // routine "this series still has records" refusal to the route error boundary.

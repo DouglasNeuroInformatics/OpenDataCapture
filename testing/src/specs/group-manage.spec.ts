@@ -65,6 +65,11 @@ test.describe('group manage', () => {
     // update just made. Navigating away and back in the same session instead reflects the store, which
     // the mutation's own response already updated.
     await page.getByTestId('nav-button-/dashboard').click();
+    // The group auto-closes on leaving /group/manage, so expanding before the URL settles could
+    // toggle a still-open group shut.
+    await expect(page).toHaveURL('/dashboard');
+    // Bulk remote assignments is enabled by default, nesting group links under "Group Actions"
+    await groupManagePage.expandNavGroup('Group Actions');
     await page.getByTestId('nav-button-/group/manage').click();
     await expect(page).toHaveURL('/group/manage');
 

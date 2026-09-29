@@ -31,7 +31,10 @@ export class AuthService {
     const limitedAbility = this.abilityFactory.createForPermissions([{ action: 'manage', subject: 'Instrument' }]);
 
     return {
-      accessToken: await this.jwtService.signAsync({ permissions: limitedAbility.rules }, { expiresIn: '1h' })
+      accessToken: await this.jwtService.signAsync(
+        { kind: 'instrument', permissions: limitedAbility.rules },
+        { expiresIn: '1h' }
+      )
     };
   }
 
@@ -63,6 +66,7 @@ export class AuthService {
       firstName: user.firstName,
       groups: user.groups,
       id: user.id,
+      kind: 'login',
       lastName: user.lastName,
       mustResetPassword: user.mustResetPassword ?? false,
       username: user.username

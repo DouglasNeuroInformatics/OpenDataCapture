@@ -4,7 +4,7 @@ import { $AuditLogsQueryParams } from '@opendatacapture/schemas/audit';
 import type { $AuditLogsPage } from '@opendatacapture/schemas/audit';
 import { z } from 'zod/v4';
 
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { AuditService } from './audit.service';
 
@@ -13,7 +13,7 @@ export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 
   @Get('logs')
-  @RouteAccess({ action: 'manage', subject: 'all' })
+  @RouteAccess(ADMIN_ONLY)
   find(
     @Query(new ParseSchemaPipe({ schema: $AuditLogsQueryParams }))
     query: z.infer<typeof $AuditLogsQueryParams>

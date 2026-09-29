@@ -15,6 +15,7 @@ import os
 
 from argparse import (
     _SubParsersAction,
+    Action,
     ArgumentParser,
     ArgumentTypeError,
     RawTextHelpFormatter,
@@ -192,7 +193,11 @@ class Config:
             self._dict['access_token'] = None
 
     def write(self) -> None:
-        with open(self._filepath, 'w') as file:
+        # The file holds a bearer token. os.open applies the mode only to a file it creates, so the
+        # chmod is what tightens one an earlier version left world-readable.
+        fd = os.open(self._filepath, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        os.chmod(self._filepath, 0o600)
+        with os.fdopen(fd, 'w') as file:
             json.dump(self._dict, file)
 
 
@@ -476,6 +481,19 @@ class SetupCommands:
 # --- Main CLI Entrypoint ---
 
 
+class ReadSecretFromStdin(Action):
+    """Store stdin, minus its trailing newline, so a password never has to appear in argv."""
+
+    def __init__(self, option_strings: list[str], dest: str, **kwargs: Any) -> None:
+        super().__init__(option_strings, dest, nargs=0, **kwargs)
+
+    def __call__(self, parser: ArgumentParser, namespace: Any, values: Any, option_string: str | None = None) -> None:
+        secret = sys.stdin.read().rstrip('\r\n')
+        if not secret:
+            parser.error(f'{option_string} read nothing from stdin')
+        setattr(namespace, self.dest, secret)
+
+
 class CLI:
     parser: ArgumentParser
     subparsers: _SubParsersAction[ArgumentParser]
@@ -509,7 +527,11 @@ class CLI:
 
         login_parser = subparsers.add_parser('login', help='authenticate with the ODC API and store the JWT locally')
         login_parser.add_argument('--username', type=str, required=True)
-        login_parser.add_argument('--password', type=str, required=True)
+        password_group = login_parser.add_mutually_exclusive_group(required=True)
+        password_group.add_argument('--password', type=str)
+        password_group.add_argument(
+            '--password-stdin', action=ReadSecretFromStdin, dest='password', help='read the password from stdin'
+        )
         login_parser.set_defaults(fn=AuthCommands.login)
 
         logout_parser = subparsers.add_parser('logout', help='remove the stored JWT (recommended for security)')
@@ -599,7 +621,14 @@ class CLI:
         admin_group.add_argument('--admin-first-name', required=True, help="administrator's first name")
         admin_group.add_argument('--admin-last-name', required=True, help="administrator's last name")
         admin_group.add_argument('--admin-username', required=True, help="administrator's username")
-        admin_group.add_argument('--admin-password', required=True, help="administrator's password")
+        admin_password_group = admin_group.add_mutually_exclusive_group(required=True)
+        admin_password_group.add_argument('--admin-password', help="administrator's password")
+        admin_password_group.add_argument(
+            '--admin-password-stdin',
+            action=ReadSecretFromStdin,
+            dest='admin_password',
+            help="read the administrator's password from stdin",
+        )
         
         app_group = init_parser.add_argument_group('General Application Options')
         app_group.add_argument(

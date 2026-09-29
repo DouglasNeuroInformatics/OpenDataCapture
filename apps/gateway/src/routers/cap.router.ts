@@ -12,8 +12,14 @@ const $Solution = z.object({
   token: z.string()
 }) satisfies z.ZodType<Solution>;
 
+/**
+ * Assignment ids are UUIDs. The bound is what matters: the verification set never forgets an id that
+ * matches no assignment, so this unauthenticated route must not store an arbitrarily large one.
+ */
+const MAX_ASSIGNMENT_ID_LENGTH = 64;
+
 const $VerifyRequest = z.object({
-  id: z.string(),
+  id: z.string().max(MAX_ASSIGNMENT_ID_LENGTH),
   token: z.string()
 });
 
@@ -58,4 +64,4 @@ router.post(
   })
 );
 
-export { router as capRouter };
+export { $VerifyRequest, router as capRouter };

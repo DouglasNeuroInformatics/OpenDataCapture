@@ -1,0 +1,15 @@
+@import '@opendatacapture/react-core/globals.css';
+
+/*
+ * The preview always renders an instrument's desktop layout. Before it moved into a frame the
+ * editor page's own width satisfied every breakpoint, even in the narrow split-view panel; the
+ * frame's viewport is that panel, so left as they are the breakpoints would switch the same
+ * instrument to its phone layout. Collapsing them keeps the preview as it was.
+ */
+@theme {
+  --breakpoint-sm: 1px;
+  --breakpoint-md: 1px;
+  --breakpoint-lg: 1px;
+  --breakpoint-xl: 1px;
+  --breakpoint-2xl: 1px;
+}

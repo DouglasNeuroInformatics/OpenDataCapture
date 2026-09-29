@@ -6,9 +6,12 @@ services:
     image: caddy:2.7-alpine
     restart: unless-stopped
     ports:
-      - ${APP_PORT}:80
+      # An .env from before BIND_ADDRESS existed keeps listening on every interface, so a pull does
+      # not cut off a proxy on another machine; new .env files set it to 127.0.0.1.
+      - ${BIND_ADDRESS:-0.0.0.0}:${APP_PORT}:80
     environment:
       - SITE_ADDRESS
+      - STORAGE_ENABLED
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
@@ -68,7 +71,7 @@ services:
       context: .
       dockerfile: ./apps/gateway/Dockerfile
     ports:
-      - ${GATEWAY_PORT}:80
+      - ${BIND_ADDRESS:-0.0.0.0}:${GATEWAY_PORT}:80
     expose:
       - 80
     profiles:
@@ -154,8 +157,10 @@ services:
     build:
       context: .
       dockerfile: ./apps/playground/Dockerfile
+    environment:
+      - PLAYGROUND_PREVIEW_ORIGIN
     ports:
-      - '3750:80'
+      - ${BIND_ADDRESS:-0.0.0.0}:${PLAYGROUND_PORT:-3750}:80
     restart: unless-stopped
     profiles:
       - fullstack

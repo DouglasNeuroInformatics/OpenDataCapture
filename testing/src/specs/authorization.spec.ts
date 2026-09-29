@@ -1,3 +1,7 @@
+import type { CreateAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { Permissions } from '@opendatacapture/schemas/core';
+import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { InstrumentRecord, UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import type { User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -53,6 +57,17 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
     screen: '/admin/users',
     send: (request, { headers, userId }) => request.delete(`${API}/users/${userId}`, { headers }),
     what: 'delete a user'
+  },
+  {
+    // Gated on `manage all` rather than `update User`: an `update User` grant is one of the things
+    // this route hands out, so holding one must not be enough to reach it.
+    screen: '/admin/users/$userId',
+    send: (request, { headers, userId }) =>
+      request.put(`${API}/users/${userId}/permissions`, {
+        data: { permissions: [{ action: 'manage', groupId: null, subject: 'all' }] },
+        headers
+      }),
+    what: 'grant another user a permission'
   },
   {
     // Both screens save through the same endpoint (`useUpdateSetupStateMutation`). The value sent
@@ -126,8 +141,10 @@ const SHARED_ROUTES = ['/user', '/instruments/accessible-instruments'] as const;
 
 test.describe('authorization', () => {
   test('should give a group manager the management navigation @smoke', async ({ getPageModel, page }) => {
-    await getPageModel('/dashboard');
-    await expect(page.getByTestId('sidebar')).toBeVisible();
+    const dashboardPage = await getPageModel('/dashboard');
+    // Bulk remote assignments is enabled by default, which nests group links under a collapsible
+    // "Group Actions" menu — expand it so the child nav buttons become visible.
+    await dashboardPage.expandNavGroup('Group Actions');
     for (const route of GROUP_MANAGER_ONLY_ROUTES) {
       await expect(page.getByTestId(`nav-button-${route}`)).toBeVisible();
     }
@@ -241,6 +258,15 @@ test.describe('authorization', () => {
   });
 });
 
+/** The reduced token the playground uploads with, minted from a login token. */
+async function mintInstrumentToken(request: APIRequestContext, token: string): Promise<string> {
+  const response = await request.get(`${API}/auth/create-instrument-token`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  expect(response.ok()).toBe(true);
+  return ((await response.json()) as { accessToken: string }).accessToken;
+}
+
 /** A real, already-interpretable bundle: the first seeded instrument's own compiled source. */
 async function readSeededBundle(request: APIRequestContext, token: string): Promise<string> {
   const headers = { Authorization: `Bearer ${token}` };
@@ -248,6 +274,41 @@ async function readSeededBundle(request: APIRequestContext, token: string): Prom
   const container = await request.get(`${API}/instruments/bundle/${instrument!.id}`, { headers });
   expect(container.ok()).toBe(true);
   return ((await container.json()) as { bundle: string }).bundle;
+}
+
+/** The id of the latest edition of a seeded instrument, by its internal name. */
+async function findInstrumentId(request: APIRequestContext, token: string, name: string): Promise<string> {
+  const response = await request.get(`${API}/instruments/info`, { headers: { Authorization: `Bearer ${token}` } });
+  expect(response.ok()).toBe(true);
+  const instrument = ((await response.json()) as InstrumentInfo[]).find(
+    (info) => info.kind === 'FORM' && info.internal.name === name
+  );
+  if (!instrument) {
+    throw new Error(`Instrument '${name}' is not in the seeded catalog`);
+  }
+  return instrument.id;
+}
+
+/** One record satisfying the happiness questionnaire's validation schema, for the given subject. */
+function happinessRecord(subjectId: string): UploadInstrumentRecordsData['records'][number] {
+  return {
+    data: { isSatisfiedOverall: true, personalLifeSatisfaction: 8, professionalLifeSatisfaction: 7 },
+    date: new Date('2024-01-15'),
+    subjectId
+  };
+}
+
+/** `POST /instrument-records/upload` as the holder of the given token, with the raw response. */
+function uploadRecord(request: APIRequestContext, token: string, data: UploadInstrumentRecordsData) {
+  return request.post(`${API}/instrument-records/upload`, { data, headers: { Authorization: `Bearer ${token}` } });
+}
+
+/** `POST /assignments` as the holder of the given token, expiring tomorrow, with the raw response. */
+function createAssignment(request: APIRequestContext, token: string, data: Omit<CreateAssignmentData, 'expiresAt'>) {
+  return request.post(`${API}/assignments`, {
+    data: { ...data, expiresAt: new Date(Date.now() + 86_400_000) },
+    headers: { Authorization: `Bearer ${token}` }
+  });
 }
 
 /** The user list `/admin/users` renders, read with the given user's own token. */
@@ -279,6 +340,34 @@ test.describe('server-side authorization', () => {
       }
     });
   }
+
+  // The requests above are refused because no base level grants a `User` write, and the permissions
+  // route refuses to store one. A grant stored before it did is still refused by the routes
+  // themselves, which the api's integration suite covers, since only it can write one directly.
+  test('should refuse to grant a write on users, which only an administrator may make', async ({ api }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    await expect(
+      api.setUserPermissions(user.id, [{ action: 'manage', groupId: group.id, subject: 'User' }])
+    ).rejects.toThrow(/got 400/);
+    expect((await api.findUserById(user.id)).additionalPermissions).toStrictEqual([]);
+  });
+
+  // Every route that writes a user is admin-only, so an administrator removing their own access could
+  // leave no account able to reach them again. Seeded rather than the shared admin, so a regression
+  // loses a throwaway account instead of the one every other spec logs in as.
+  test('should refuse an administrator deleting or disabling their own account', async ({ api, apiRequestContext }) => {
+    const { credentials, user } = await api.createUser({ basePermissionLevel: 'ADMIN' });
+    const headers = { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` };
+
+    const disabled = await apiRequestContext.patch(`${API}/users/${user.id}`, { data: { disabled: true }, headers });
+    const deleted = await apiRequestContext.delete(`${API}/users/${user.id}`, { headers });
+
+    expect.soft(disabled.status(), 'an administrator must not be able to disable themselves').toBe(403);
+    expect.soft(deleted.status(), 'an administrator must not be able to delete themselves').toBe(403);
+    expect((await api.findUserById(user.id)).disabled).not.toBe(true);
+  });
 
   // The playground uploads a bundle with a token minted by `GET /auth/create-instrument-token`, and
   // that token is the only non-interactive caller of `POST /instruments`. Nothing else in the suite
@@ -314,6 +403,34 @@ test.describe('server-side authorization', () => {
 
       const response = await apiRequestContext.get(`${API}/auth/create-instrument-token`, {
         headers: { Authorization: `Bearer ${accessToken}` }
+      });
+
+      expect(response.status()).toBe(403);
+    });
+
+    test('should not let a minted token mint its successor, so it expires an hour after it was issued', async ({
+      adminToken,
+      apiRequestContext
+    }) => {
+      const instrumentToken = await mintInstrumentToken(apiRequestContext, adminToken);
+
+      const response = await apiRequestContext.get(`${API}/auth/create-instrument-token`, {
+        headers: { Authorization: `Bearer ${instrumentToken}` }
+      });
+
+      expect(response.status()).toBe(403);
+    });
+
+    // The token's `manage Instrument` satisfies this route's `delete Instrument` with no group
+    // condition, so a guard that admitted it would answer 404 for an id that exists in no group.
+    test('should refuse a minted token on a route its permissions satisfy other than the upload', async ({
+      adminToken,
+      apiRequestContext
+    }) => {
+      const instrumentToken = await mintInstrumentToken(apiRequestContext, adminToken);
+
+      const response = await apiRequestContext.delete(`${API}/instruments/${'0'.repeat(24)}`, {
+        headers: { Authorization: `Bearer ${instrumentToken}` }
       });
 
       expect(response.status()).toBe(403);
@@ -358,6 +475,98 @@ test.describe('server-side authorization', () => {
     expect((await api.findGroupById(group.id)).id).toBe(group.id);
   });
 
+  // `create Assignment` is satisfied at the guard by a group manager's rule for their own groups, so
+  // the service alone decides which group an assignment is filed under and who receives its link.
+  test('should not let a group manager file an assignment under a group they do not belong to', async ({
+    api,
+    apiRequestContext,
+    roleAccount,
+    uniqueId
+  }) => {
+    const foreignGroup = await api.createGroup({ name: `Foreign Group ${uniqueId}` });
+    const subjectId = await api.createSubject(foreignGroup.id);
+    const { accessToken } = await roleAccount('GROUP_MANAGER');
+
+    const response = await createAssignment(apiRequestContext, accessToken, {
+      groupId: foreignGroup.id,
+      instrumentId: await api.findInstrumentId('FORM'),
+      subjectId
+    });
+
+    expect(response.status()).toBe(404);
+    expect(await api.findAssignments(subjectId)).toStrictEqual([]);
+  });
+
+  test('should not let a group manager file an assignment under no group, even for their own subject', async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup({ name: `Manager Group ${uniqueId}` });
+    const { credentials } = await api.createUser({ groupIds: [group.id] });
+    const subjectId = await api.createSubject(group.id);
+
+    const response = await createAssignment(apiRequestContext, await ApiClient.login(apiRequestContext, credentials), {
+      instrumentId: await api.findInstrumentId('FORM'),
+      subjectId
+    });
+
+    expect(response.status()).toBe(403);
+    expect(await api.findAssignments(subjectId)).toStrictEqual([]);
+  });
+
+  test('should let an administrator file an assignment under no group, which the web client sends without one selected', async ({
+    adminToken,
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const { subjectId } = await api.createSession(null, { id: `Ungrouped${uniqueId}` });
+
+    const response = await createAssignment(apiRequestContext, adminToken, {
+      instrumentId: await api.findInstrumentId('FORM'),
+      subjectId
+    });
+
+    expect(response.status()).toBe(201);
+    const assignments = await api.findAssignments(subjectId);
+    expect(assignments).toMatchObject([{ groupId: null }]);
+
+    // Cancelling removes the row from the gateway, so the rest of the run is not synchronizing it.
+    await apiRequestContext.patch(`${API}/assignments/${assignments[0]!.id}`, {
+      data: { status: 'CANCELED' },
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+  });
+
+  // The web client exports only the current group and then keeps only the subjects its table lists,
+  // so no screen can show whether the api itself leaves another group's records out. Both records
+  // belong to one subject enrolled in both groups, so only each record's own group separates them.
+  // The body is msgpack, whose entries carry their record's group id as a plain string and never the
+  // subject's groups, so its bytes are searched.
+  test("should leave another group's records out of a group manager's export, even of a subject enrolled in both groups", async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const ownGroup = await api.createGroup({ name: `Exporting Group ${uniqueId}` });
+    const foreignGroup = await api.createGroup({ name: `Foreign Group ${uniqueId}` });
+    const { credentials } = await api.createUser({ groupIds: [ownGroup.id] });
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    const sharedSubjectId = `Shared${uniqueId}`;
+    await api.uploadRecords(ownGroup.id, instrumentId, [happinessRecord(sharedSubjectId)]);
+    await api.uploadRecords(foreignGroup.id, instrumentId, [happinessRecord(sharedSubjectId)]);
+
+    const response = await apiRequestContext.get(`${API}/instrument-records/export`, {
+      headers: { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` }
+    });
+
+    expect(response.status()).toBe(200);
+    const body = await response.body();
+    expect(body.includes(ownGroup.id)).toBe(true);
+    expect(body.includes(foreignGroup.id)).toBe(false);
+  });
+
   // `/admin/users` renders a populated table for a non-admin, which is only acceptable because the
   // rows it can read are the ones it may already see elsewhere in the app.
   test('should scope the user list a group manager reads to their own group', async ({
@@ -389,5 +598,110 @@ test.describe('server-side authorization', () => {
     const usernames = await readUsernames(apiRequestContext, await ApiClient.login(apiRequestContext, credentials));
 
     expect(usernames).toStrictEqual([user.username]);
+  });
+
+  // Row-level scoping is not observable in the api's own tests, whose model is mocked, so the grant
+  // an admin confines to one group from `/admin/users/$userId` is exercised here against real rows.
+  test('should confine a granted permission to the group it names, where an unscoped one reads every group', async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup({ name: `Granted Group ${uniqueId}` });
+    const outsiderGroup = await api.createGroup({ name: `Ungranted Group ${uniqueId}` });
+    const { credentials, user } = await api.createUser({ basePermissionLevel: 'STANDARD', groupIds: [group.id] });
+    const { user: teammate } = await api.createUser({ groupIds: [group.id] });
+    const { user: outsider } = await api.createUser({ groupIds: [outsiderGroup.id] });
+
+    // Permissions are signed into the token at login, so every grant needs a fresh one.
+    const usernamesGranted = async (permissions: Permissions) => {
+      await api.setUserPermissions(user.id, permissions);
+      return readUsernames(apiRequestContext, await ApiClient.login(apiRequestContext, credentials));
+    };
+
+    const scoped = await usernamesGranted([{ action: 'read', groupId: group.id, subject: 'User' }]);
+    expect(scoped).toContain(teammate.username);
+    expect(scoped).not.toContain(outsider.username);
+
+    const unscoped = await usernamesGranted([{ action: 'read', groupId: null, subject: 'User' }]);
+    expect(unscoped).toContain(outsider.username);
+  });
+
+  test('should refuse a grant confined to a group the user does not belong to', async ({ api, uniqueId }) => {
+    const group = await api.createGroup({ name: `Member Group ${uniqueId}` });
+    const otherGroup = await api.createGroup({ name: `Non-member Group ${uniqueId}` });
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    await expect(
+      api.setUserPermissions(user.id, [{ action: 'read', groupId: otherGroup.id, subject: 'User' }])
+    ).rejects.toThrow(/got 400/);
+  });
+
+  test('should ignore permissions sent through a profile update, so only the permissions route can grant', async ({
+    adminToken,
+    api,
+    apiRequestContext
+  }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+
+    const response = await apiRequestContext.patch(`${API}/users/${user.id}`, {
+      data: { additionalPermissions: [{ action: 'manage', groupId: null, subject: 'all' }] },
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+
+    expect(response.ok()).toBe(true);
+    expect((await api.findUserById(user.id)).additionalPermissions).toStrictEqual([]);
+  });
+
+  test('should drop a grant confined to a group the user is removed from, and keep an unscoped one', async ({
+    api,
+    uniqueId
+  }) => {
+    const leavingGroup = await api.createGroup({ name: `Leaving Group ${uniqueId}` });
+    const stayingGroup = await api.createGroup({ name: `Staying Group ${uniqueId}` });
+    const { user } = await api.createUser({ groupIds: [leavingGroup.id, stayingGroup.id] });
+    await api.setUserPermissions(user.id, [
+      { action: 'read', groupId: leavingGroup.id, subject: 'User' },
+      { action: 'create', groupId: null, subject: 'Instrument' }
+    ]);
+
+    const updated = await api.updateUser(user.id, { groupIds: [stayingGroup.id] });
+
+    expect(updated.additionalPermissions).toStrictEqual([{ action: 'create', groupId: null, subject: 'Instrument' }]);
+  });
+
+  // The import route answers with the rows it wrote, and used to find them by re-querying the
+  // instrument with the request's optional `groupId` as the only filter. Omitting `groupId` therefore
+  // returned every group's records for that instrument to the lowest role, which `create
+  // InstrumentRecord` admits and which holds no `read InstrumentRecord` rule at all.
+  test('should answer an upload with only the records it wrote, never those of another group', async ({
+    api,
+    apiRequestContext,
+    roleAccount,
+    uniqueId
+  }) => {
+    const { accessToken: adminToken } = await roleAccount('ADMIN');
+    const { accessToken } = await roleAccount('STANDARD');
+    const foreignGroup = await api.createGroup({ name: `Foreign Group ${uniqueId}` });
+    const instrumentId = await findInstrumentId(apiRequestContext, adminToken, 'DNP_HAPPINESS_QUESTIONNAIRE');
+    const foreignSubjectId = `Foreign${uniqueId}`;
+    const ownSubjectId = `Own${uniqueId}`;
+
+    const seeded = await uploadRecord(apiRequestContext, adminToken, {
+      groupId: foreignGroup.id,
+      instrumentId,
+      records: [happinessRecord(foreignSubjectId)]
+    });
+    expect(seeded.status()).toBe(201);
+
+    const response = await uploadRecord(apiRequestContext, accessToken, {
+      instrumentId,
+      records: [happinessRecord(ownSubjectId)]
+    });
+
+    expect(response.status()).toBe(201);
+    const subjectIds = ((await response.json()) as InstrumentRecord[]).map((record) => record.subjectId);
+    expect(subjectIds).toStrictEqual([ownSubjectId]);
   });
 });

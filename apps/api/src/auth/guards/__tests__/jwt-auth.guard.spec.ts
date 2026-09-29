@@ -8,6 +8,8 @@ import type { Request } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
+import { ACCEPTS_INSTRUMENT_TOKEN_METADATA_KEY } from '@/core/decorators/accepts-instrument-token.decorator.js';
+import { ROUTE_ACCESS_METADATA_KEY } from '@/core/decorators/route-access.decorator.js';
 import type { RouteAccessType } from '@/core/decorators/route-access.decorator.js';
 
 import { AbilityFactory } from '../../ability.factory.js';
@@ -127,5 +129,53 @@ describe('JwtAuthGuard', () => {
     const ability = abilityFactory.createForPermissions([{ action: 'manage', subject: 'all' }]);
     getRequest.mockReturnValueOnce({ url: 'http://localhost:5500', user: { ability } as any });
     await expect(guard.canActivate(context)).resolves.toBe(true);
+  });
+
+  describe('instrument token', () => {
+    const MANAGE_INSTRUMENT = { action: 'manage', subject: 'Instrument' } satisfies RouteAccessType;
+
+    const declareRoute = (routeAccess: RouteAccessType, acceptsInstrumentToken?: true) => {
+      const metadata: { [key: string]: unknown } = {
+        [ACCEPTS_INSTRUMENT_TOKEN_METADATA_KEY]: acceptsInstrumentToken,
+        [ROUTE_ACCESS_METADATA_KEY]: routeAccess
+      };
+      reflector.get.mockImplementation((key: string) => metadata[key]);
+    };
+
+    const sendTokenOfKind = (kind: 'instrument' | 'login' | undefined) => {
+      BaseConstructor.prototype.canActivate.mockResolvedValueOnce(true);
+      const ability = abilityFactory.createForPermissions([MANAGE_INSTRUMENT]);
+      getRequest.mockReturnValueOnce({ url: 'http://localhost:5500', user: { ability, kind } as any });
+    };
+
+    it('should refuse it on an unmarked route its permissions satisfy, so it cannot mint its own successor', async () => {
+      declareRoute(MANAGE_INSTRUMENT);
+      sendTokenOfKind('instrument');
+      await expect(guard.canActivate(context)).resolves.toBe(false);
+    });
+
+    it('should admit it on a route marked to accept one, so the playground can upload a bundle', async () => {
+      declareRoute(MANAGE_INSTRUMENT, true);
+      sendTokenOfKind('instrument');
+      await expect(guard.canActivate(context)).resolves.toBe(true);
+    });
+
+    it('should still hold it to the route access declaration on a marked route', async () => {
+      declareRoute({ action: 'manage', subject: 'all' }, true);
+      sendTokenOfKind('instrument');
+      await expect(guard.canActivate(context)).resolves.toBe(false);
+    });
+
+    it('should admit a login token on an unmarked route its permissions satisfy', async () => {
+      declareRoute(MANAGE_INSTRUMENT);
+      sendTokenOfKind('login');
+      await expect(guard.canActivate(context)).resolves.toBe(true);
+    });
+
+    it('should treat a token signed before kind existed as a login token, so sessions open at deploy survive it', async () => {
+      declareRoute(MANAGE_INSTRUMENT);
+      sendTokenOfKind(undefined);
+      await expect(guard.canActivate(context)).resolves.toBe(true);
+    });
   });
 });

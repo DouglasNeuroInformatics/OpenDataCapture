@@ -6,6 +6,7 @@ import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request } from 'express';
 
+import { ACCEPTS_INSTRUMENT_TOKEN_METADATA_KEY } from '@/core/decorators/accepts-instrument-token.decorator.js';
 import { ROUTE_ACCESS_METADATA_KEY } from '@/core/decorators/route-access.decorator.js';
 import type { RouteAccessType } from '@/core/decorators/route-access.decorator.js';
 
@@ -39,6 +40,16 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     const isAuthenticated = await super.canActivate(context);
     if (isAuthenticated !== true) {
+      return false;
+    }
+
+    // A token signed before `kind` existed has none and is treated as a login token. Every such token
+    // has expired within the hour after deploy.
+    if (
+      request.user?.kind === 'instrument' &&
+      !this.reflector.get<true | undefined>(ACCEPTS_INSTRUMENT_TOKEN_METADATA_KEY, context.getHandler())
+    ) {
+      this.loggingService.verbose(`Refusing instrument token for url: ${request.url}`);
       return false;
     }
 

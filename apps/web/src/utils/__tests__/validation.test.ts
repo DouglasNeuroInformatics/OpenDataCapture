@@ -5,6 +5,7 @@ import { z } from 'zod/v4';
 
 import {
   $Email,
+  $OptionalPassword,
   $PhoneNumber,
   clearedIfBlank,
   omittedIfBlank,
@@ -58,6 +59,20 @@ describe('omittedIfUnchanged', () => {
 
   it('should send an edited value', () => {
     expect(omittedIfUnchanged('5145551234', '123')).toBe('5145551234');
+  });
+});
+
+describe('$OptionalPassword', () => {
+  it('should read a blank field as no password at all, so clearing one does not reject it', () => {
+    expect($OptionalPassword.parse('')).toBeUndefined();
+  });
+
+  it('should read an untouched field as no password at all', () => {
+    expect($OptionalPassword.parse(undefined)).toBeUndefined();
+  });
+
+  it('should leave a password the user typed untouched', () => {
+    expect($OptionalPassword.parse('pilot-cargo-vivid-mural-badge')).toBe('pilot-cargo-vivid-mural-badge');
   });
 });
 

@@ -1,4 +1,5 @@
 import * as fs from 'node:fs';
+import * as net from 'node:net';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
@@ -44,6 +45,20 @@ function stubClientBundle() {
   }) as typeof fs.promises.readFile);
 }
 
+// `Server.start` never rejects on `EADDRINUSE` (the error is emitted, not passed to the listen
+// callback), so a port that happens to be taken hangs the test until it times out. Asking the OS
+// for a free port avoids the collisions a random pick from a fixed range runs into on shared CI.
+function getFreePort(): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const probe = net.createServer();
+    probe.once('error', reject);
+    probe.listen(0, () => {
+      const { port } = probe.address() as net.AddressInfo;
+      probe.close(() => resolve(port));
+    });
+  });
+}
+
 let tmpDir: string;
 let port: number;
 
@@ -60,10 +75,10 @@ afterAll(() => {
   }
 });
 
-beforeEach(() => {
+beforeEach(async () => {
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'serve-instrument-server-'));
   tmpDirs.push(tmpDir);
-  port = 34000 + Math.floor(Math.random() * 1000);
+  port = await getFreePort();
   stubClientBundle();
   watchCallbacks.length = 0;
   watchCloses.length = 0;

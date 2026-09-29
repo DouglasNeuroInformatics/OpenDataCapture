@@ -318,6 +318,9 @@ enum AppAction {
 type AuthRule {
   action  AppAction
   subject AppSubject
+  /// The group this rule is confined to, or null for every group. Absent on rules written before
+  /// scoping existed; those read back as null and so stay unscoped, as they always were.
+  groupId String?    @db.ObjectId
 }
 
 model User {
@@ -457,6 +460,7 @@ model SetupState {
   activeLanguages               Language[]      @default([en, fr])
   branding                      BrandingConfig?
   defaultAssignmentDurationDays Int?
+  isBulkRemoteAssignmentsEnabled Boolean?
   isDemo                        Boolean
   isExperimentalFeaturesEnabled Boolean?
   isSetup                       Boolean

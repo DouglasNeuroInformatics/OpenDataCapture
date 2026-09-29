@@ -16,6 +16,13 @@ export const INIT_APP_OPTIONS = {
   recordsPerSubject: 10
 } satisfies InitAppOptions;
 
+/** A minimal payload satisfying the seeded happiness questionnaire's validation schema. */
+export const HAPPINESS_RECORD = {
+  isSatisfiedOverall: true,
+  personalLifeSatisfaction: 8,
+  professionalLifeSatisfaction: 7
+};
+
 /** Password used for every seeded (non-admin) user; must satisfy the app's complexity rules. */
 export const SEEDED_USER_PASSWORD = 'DataCapture2025_Test';
 
