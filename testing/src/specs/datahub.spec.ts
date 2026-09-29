@@ -65,6 +65,31 @@ test.describe('data hub', () => {
     await expect(page.getByTestId('data-table-empty-state')).toBeVisible();
   });
 
+  // The search bar is a form, and a native submit reloaded the page, which drops the in-memory access
+  // token and lands on the login page.
+  test('should keep the search results, and the user signed in, when Enter is pressed in the search bar', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const customIdentifier = `Enter${uniqueId}`;
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.fillCustomIdentifier(customIdentifier, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    const datahubPage = await getPageModel('/datahub');
+    await datahubPage.searchInput.fill(customIdentifier);
+    await datahubPage.searchInput.press('Enter');
+
+    await expect(page).toHaveURL(/\/datahub$/);
+    await expect(datahubPage.searchInput).toHaveValue(customIdentifier);
+    await expect(page.getByTestId('data-table-row')).toHaveCount(1);
+    await expect(page.getByTestId('data-table-row')).toContainText(customIdentifier.slice(0, 9));
+  });
+
   test('should open a subject from the list via the row action menu, landing on its record table', async ({
     getPageModel,
     page,
