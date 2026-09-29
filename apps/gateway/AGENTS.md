@@ -3,7 +3,8 @@
 The patient-facing app that serves one remote assignment per page. Express 5 + React 19, server
 rendered. `apps/api` is its only programmatic client — `apps/api/src/gateway/gateway.service.ts`
 creates, fetches and deletes assignments here over HTTP, and the patient is given a link to
-`/assignments/:id`.
+`/assignments/:id`. `/` renders a landing page telling anyone who arrives without that link to open
+it; `RootProps` is a union on `kind` so both pages share `Root`'s shell.
 
 **Traffic only ever flows API → gateway.** This app holds no address or credential for the API, so
 it cannot ask for anything: whatever it needs to know about the instance it serves has to be pushed.
@@ -120,8 +121,14 @@ hydrated tree can disagree with the SSR'd HTML until you do.
 
 ## Tests
 
-`pnpm exec vitest --project gateway` runs the unit tests in `src/**/__tests__/`. They cover request
-schemas only: nothing here starts the Express server, so a router's behaviour is tested end to end.
+`pnpm exec vitest --project gateway` runs the unit tests in `src/**/__tests__/`, in vitest's node
+environment. They cover request schemas, helpers such as `resolveLanguage`, and the HTML that
+`render` from `src/entry-server.tsx` produces for each `RootProps` variant. That last one also
+fails at import if anything reachable from `Root.tsx` touches `window` at module scope (see SSR
+traps). `src/lib/setup-state.ts` keeps its state at module level, so a test of the defaults before
+the first push needs `vi.resetModules()` and a dynamic import. Nothing here starts the Express server
+or hydrates in a browser, so a router's behaviour and anything after hydration are tested end to end.
 
 Most of the coverage is `testing/src/specs/gateway-assignment.spec.ts`, which drives the real
-two-origin flow through the Cap widget. See `.agents/docs/architecture/testing-strategy.md`.
+two-origin flow through the Cap widget; `testing/src/specs/gateway-landing.spec.ts` covers `/`. See
+`.agents/docs/architecture/testing-strategy.md`.

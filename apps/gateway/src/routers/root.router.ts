@@ -1,9 +1,8 @@
-import { $Language } from '@opendatacapture/schemas/core';
 import { $InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { Router } from 'express';
 
 import { prisma } from '@/lib/prisma';
-import { getActiveLanguages } from '@/lib/setup-state';
+import { getActiveLanguages, resolveLanguage } from '@/lib/setup-state';
 import { logger } from '@/logger';
 import type { RootProps } from '@/Root';
 import { ah } from '@/utils/async-handler';
@@ -42,26 +41,27 @@ router.get(
       initialSeriesIndex = assignment.encryptedData.slice(1).split('$').length;
     }
 
-    // Read server-side rather than from `window.location` so the SSR pass and the hydration pass
-    // resolve the same language; anything else renders the page in English and then swaps it.
-    const activeLanguages = getActiveLanguages();
-    const requestedLanguage = $Language.safeParse(req.query.lang);
-    const language =
-      requestedLanguage.success && activeLanguages.includes(requestedLanguage.data)
-        ? requestedLanguage.data
-        : activeLanguages[0];
-
     const token = generateToken(assignment.id);
     const html = res.locals.loadRoot({
-      activeLanguages,
+      activeLanguages: getActiveLanguages(),
       id,
       initialSeriesIndex,
-      language,
+      kind: 'assignment',
+      language: resolveLanguage(req.query.lang),
       target: targetParseResult.data,
       token
     } satisfies RootProps);
     res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
   })
 );
+
+router.get('/', (req, res) => {
+  const html = res.locals.loadRoot({
+    activeLanguages: getActiveLanguages(),
+    kind: 'landing',
+    language: resolveLanguage(req.query.lang)
+  } satisfies RootProps);
+  res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
+});
 
 export { router as rootRouter };

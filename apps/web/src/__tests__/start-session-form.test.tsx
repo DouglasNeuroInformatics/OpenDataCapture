@@ -1,4 +1,5 @@
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
+import type { Group } from '@opendatacapture/schemas/group';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -8,10 +9,23 @@ import '@/services/i18n';
 
 const onSubmit = vi.fn();
 
-const renderForm = (customSubjectIds: string[]) => {
+const groupWithIdPattern = (idValidationRegex: string): Group => ({
+  accessibleInstrumentIds: [],
+  createdAt: new Date('2026-01-01'),
+  id: 'group-1',
+  instrumentRepoIds: [],
+  name: 'Group One',
+  settings: { defaultIdentificationMethod: 'CUSTOM_ID', idValidationRegex },
+  subjectIds: [],
+  type: 'CLINICAL',
+  updatedAt: new Date('2026-01-02'),
+  userIds: []
+});
+
+const renderForm = (customSubjectIds: string[], currentGroup: Group | null = null) => {
   render(
     <StartSessionForm
-      currentGroup={null}
+      currentGroup={currentGroup}
       customSubjectIds={customSubjectIds}
       readOnly={false}
       username="admin"
@@ -46,6 +60,15 @@ const submit = (form: HTMLElement) => {
 };
 
 const submittedSubjectId = () => onSubmit.mock.lastCall?.[0].subjectData.id;
+
+/** Every error shown, with the field it landed on, so one that moved to the form's own errors fails too. */
+const errorMessages = () =>
+  screen.queryAllByTestId('error-message-text').map((element) => ({
+    field: element.closest('[data-field-group]')?.getAttribute('data-field-group'),
+    message: element.textContent
+  }));
+
+const subjectIdError = (message: string) => ({ field: 'subjectId', message });
 
 beforeEach(() => {
   // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
@@ -96,5 +119,55 @@ describe('StartSessionForm', () => {
     submit(form);
     await waitFor(() => expect(screen.getByText('Illegal character: $')).toBeTruthy());
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should show only the illegal-character error for an identifier containing the scope separator, not a contradictory required-field error', async () => {
+    const form = renderForm([]);
+    typeIdentifier('abc$def');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual([subjectIdError('Illegal character: $')]));
+  });
+
+  it('should show only the required-field error for an identifier that was typed and then cleared', async () => {
+    const form = renderForm([]);
+    typeIdentifier('abc');
+    typeIdentifier('');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual([subjectIdError('This field is required')]));
+  });
+
+  it("should show only the group's pattern error for an identifier the pattern rejects, so the regex check still applies", async () => {
+    const form = renderForm([], groupWithIdPattern('^[a-z]+$'));
+    typeIdentifier('abc1');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual([subjectIdError('Must match regular expression: ^[a-z]+$')]));
+  });
+
+  it("should reject an identifier containing the scope separator even when the group's pattern accepts it, since no group may make the scoped id ambiguous", async () => {
+    const form = renderForm([], groupWithIdPattern('^.+$'));
+    typeIdentifier('abc$def');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual([subjectIdError('Illegal character: $')]));
+  });
+
+  it("should show only the illegal-character error for an identifier the group's pattern also rejects, not a second error for the same field", async () => {
+    const form = renderForm([], groupWithIdPattern('^[a-z]+$'));
+    typeIdentifier('abc$def');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual([subjectIdError('Illegal character: $')]));
+  });
+
+  it("should submit an identifier the group's pattern accepts, scoped by that group's name", async () => {
+    const form = renderForm([], groupWithIdPattern('^[a-z]+$'));
+    typeIdentifier('abc');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(submittedSubjectId()).toBe('Group_One$abc');
   });
 });

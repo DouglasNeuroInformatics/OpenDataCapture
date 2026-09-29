@@ -170,18 +170,10 @@ export const StartSessionForm = ({
           subjectFirstName: z.string().optional(),
           subjectLastName: z.string().optional(),
           subjectIdentificationMethod: $SubjectIdentificationMethod,
-          subjectId: z
-            .string()
-            .min(1)
-            .refine(
-              (arg) => !arg.includes('$'),
-              t({
-                en: 'Illegal character: $',
-                es: 'Carácter no permitido: $',
-                fr: 'Caractère non autorisé : $'
-              })
-            )
-            .optional(),
+          // Every check on the identifier lives in the refinement below: zod v4 omits an optional
+          // property that failed its own checks from the value it hands the refinement, which then
+          // reads a typed identifier as missing and adds a contradictory required-field error.
+          subjectId: z.string().optional(),
           subjectDateOfBirth: z
             .date()
             .optional()
@@ -211,6 +203,16 @@ export const StartSessionForm = ({
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 message: t('core.form.requiredField'),
+                path: ['subjectId']
+              });
+            } else if (val.subjectId.includes('$')) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t({
+                  en: 'Illegal character: $',
+                  es: 'Carácter no permitido: $',
+                  fr: 'Caractère non autorisé : $'
+                }),
                 path: ['subjectId']
               });
             } else if (currentGroup?.settings.idValidationRegex) {

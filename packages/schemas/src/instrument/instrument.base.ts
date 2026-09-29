@@ -142,7 +142,8 @@ const $$ComputedInstrumentMeasure = <TLanguage extends InstrumentLanguage>(langu
     hidden: z.boolean().optional(),
     kind: z.literal('computed'),
     label: $$InstrumentUIOption(z.string(), language),
-    value: $AnyDynamicFunction
+    value: $AnyDynamicFunction,
+    visibility: $InstrumentMeasureVisibility.optional()
   }) satisfies z.ZodType<ComputedInstrumentMeasure<any, TLanguage>>;
 };
 

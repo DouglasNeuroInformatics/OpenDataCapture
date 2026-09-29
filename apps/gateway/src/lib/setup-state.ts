@@ -1,5 +1,5 @@
-import { DEFAULT_ACTIVE_LANGUAGES } from '@opendatacapture/schemas/core';
-import type { ActiveLanguages } from '@opendatacapture/schemas/core';
+import { $Language, DEFAULT_ACTIVE_LANGUAGES } from '@opendatacapture/schemas/core';
+import type { ActiveLanguages, Language } from '@opendatacapture/schemas/core';
 import type { RemoteSetupState } from '@opendatacapture/schemas/gateway';
 
 /**
@@ -14,6 +14,20 @@ let setupState: null | RemoteSetupState = null;
 
 export function getActiveLanguages(): ActiveLanguages {
   return setupState?.activeLanguages ?? DEFAULT_ACTIVE_LANGUAGES;
+}
+
+/**
+ * The language to render a page in: the one a `?lang=` query asks for when the instance offers it,
+ * otherwise the first active language. Resolved server-side rather than from `window.location` so
+ * the SSR pass and the hydration pass agree; anything else renders the page in English and then
+ * swaps it.
+ */
+export function resolveLanguage(requested: unknown): Language {
+  const activeLanguages = getActiveLanguages();
+  const requestedLanguage = $Language.safeParse(requested);
+  return requestedLanguage.success && activeLanguages.includes(requestedLanguage.data)
+    ? requestedLanguage.data
+    : activeLanguages[0];
 }
 
 export function updateSetupState(state: RemoteSetupState): void {
