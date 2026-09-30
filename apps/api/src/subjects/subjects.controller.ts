@@ -59,10 +59,10 @@ export class SubjectsController {
     return this.subjectsService.findCustomIds(groupId, { ability });
   }
 
-  @ApiOperation({ summary: 'Get the Custom IDs of Subjects in No Group' })
-  @Get('ungrouped/custom-ids')
+  @ApiOperation({ summary: 'Get the Custom IDs Scoped to the Default Group' })
+  @Get('default-group/custom-ids')
   @RouteAccess({ action: 'read', subject: 'Subject' })
-  findUngroupedCustomIds(@CurrentUser('ability') ability: AppAbility) {
-    return this.subjectsService.findUngroupedCustomIds({ ability });
+  findDefaultGroupCustomIds(@CurrentUser('ability') ability: AppAbility) {
+    return this.subjectsService.findDefaultGroupCustomIds({ ability });
   }
 }

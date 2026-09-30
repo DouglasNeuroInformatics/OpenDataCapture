@@ -1,6 +1,8 @@
 import { InjectModel, InjectPrismaClient } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
+import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import type { Prisma } from '@prisma/client';
 
 import { accessibleQuery } from '@/auth/ability.utils';
@@ -10,6 +12,15 @@ import type { EntityOperationOptions } from '@/core/types';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 
 const PERSONAL_INFO_FIELDS = ['dateOfBirth', 'firstName', 'lastName', 'sex'] as const;
+
+/**
+ * Prisma's MongoDB connector turns `startsWith` into an unescaped regex, so the `$` ending a subject
+ * id scope would anchor the pattern and match nothing. A lexical range selects the same ids.
+ */
+function idsWithPrefix(prefix: string): Prisma.StringFilter {
+  const lastCharCode = prefix.charCodeAt(prefix.length - 1);
+  return { gte: prefix, lt: prefix.slice(0, -1) + String.fromCharCode(lastCharCode + 1) };
+}
 
 /** A subject identified by personal information has every one of these fields set. */
 const IDENTIFIED_BY_CUSTOM_ID: Prisma.SubjectWhereInput = {
@@ -192,11 +203,20 @@ export class SubjectsService {
     return subjects.map((subject) => subject.id);
   }
 
-  async findUngroupedCustomIds({ ability }: EntityOperationOptions = {}): Promise<string[]> {
+  /**
+   * The custom ids a session without a group produces. Matched on the id's scope rather than on
+   * `groupIds`, because a later session, upload or assignment in a group adds that group to the
+   * subject without changing its id.
+   */
+  async findDefaultGroupCustomIds({ ability }: EntityOperationOptions = {}): Promise<string[]> {
     const subjects = await this.subjectModel.findMany({
       select: { id: true },
       where: {
-        AND: [accessibleQuery(ability, 'read', 'Subject'), { groupIds: { isEmpty: true } }, IDENTIFIED_BY_CUSTOM_ID]
+        AND: [
+          accessibleQuery(ability, 'read', 'Subject'),
+          { id: idsWithPrefix(encodeScopedSubjectId('', { groupName: DEFAULT_GROUP_NAME })) },
+          IDENTIFIED_BY_CUSTOM_ID
+        ]
       }
     });
     return subjects.map((subject) => subject.id);
