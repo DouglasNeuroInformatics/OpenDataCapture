@@ -21,6 +21,13 @@ describe('DemoBanner', () => {
     expect(screen.getByRole('dialog', { name: 'Demo Information' })).toBeTruthy();
   });
 
+  it('should brand the demo information with the Open Data Capture logo and name, as on the public site', () => {
+    render(<DemoBanner onLogin={vi.fn()} />);
+    const branding = within(screen.getByRole('dialog')).getByTestId('demo-dialog-branding');
+    expect(branding.querySelector('svg')).toBeTruthy();
+    expect(branding.textContent).toBe('Open Data Capture');
+  });
+
   it('should close the demo information when dismissed, so the login form is reachable', () => {
     render(<DemoBanner onLogin={vi.fn()} />);
     screen.getByRole('dialog');

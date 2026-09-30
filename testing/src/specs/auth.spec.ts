@@ -21,6 +21,12 @@ test.describe('authentication', () => {
       await expect(loginPage.demoDialog).toBeVisible();
     });
 
+    test('should brand the demo information with the Open Data Capture logo and name', async ({ getPageModel }) => {
+      const loginPage = await getPageModel('/auth/login');
+      await expect(loginPage.demoDialogBranding.locator('svg')).toBeVisible();
+      await expect(loginPage.demoDialogBranding).toHaveText('Open Data Capture');
+    });
+
     test('should reveal the login form once the demo information is dismissed', async ({ getPageModel }) => {
       const loginPage = await getPageModel('/auth/login');
       await expect(loginPage.demoDialog).toBeVisible();

@@ -2,6 +2,7 @@ import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Card, Dialog, Table, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { DEMO_USERS } from '@opendatacapture/demo';
+import { Logo } from '@opendatacapture/react-core';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import { InfoIcon, LogInIcon } from 'lucide-react';
 
@@ -38,6 +39,12 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
           event.preventDefault();
         }}
       >
+        <div className="mb-4 flex h-12 items-center px-1" data-testid="demo-dialog-branding">
+          <Logo className="h-full w-auto" variant="auto" />
+          <span className="ml-3 whitespace-nowrap text-xl font-semibold tracking-tight text-slate-700 dark:text-slate-300">
+            Open Data Capture
+          </span>
+        </div>
         <Dialog.Header className="w-full whitespace-break-spaces px-1">
           <Dialog.Title className="mb-2">{t('auth.demo.info')}</Dialog.Title>
           <Dialog.Description className="text-pretty text-left text-xs sm:text-sm">
