@@ -112,6 +112,7 @@ export const BulkRemoteAssignmentWizard = ({
         <StepLayout
           description={t({
             en: 'Each subject has a link below. Copy them, or download a CSV to share with whoever is sending them out.',
+            es: 'Cada sujeto tiene un enlace a continuación. Cópielos o descargue un CSV para compartirlo con quien los enviará.',
             fr: 'Chaque sujet a un lien ci-dessous. Copiez-les ou téléchargez un CSV à transmettre à la personne qui les enverra.'
           })}
           footer={
@@ -124,21 +125,22 @@ export const BulkRemoteAssignmentWizard = ({
                 onMouseLeave={wizard.clearCopied}
               >
                 {wizard.didCopy
-                  ? t({ en: 'Copied', fr: 'Copié' })
-                  : t({ en: 'Copy All Links', fr: 'Copier tous les liens' })}
+                  ? t({ en: 'Copied', es: 'Copiado', fr: 'Copié' })
+                  : t({ en: 'Copy All Links', es: 'Copiar todos los enlaces', fr: 'Copier tous les liens' })}
               </Button>
               <Button
                 data-testid="bulk-download-csv"
                 type="button"
                 onClick={() => downloadCsv(toResultCsv(wizard.resultRows()))}
               >
-                {t({ en: 'Download CSV', fr: 'Télécharger le CSV' })}
+                {t({ en: 'Download CSV', es: 'Descargar el CSV', fr: 'Télécharger le CSV' })}
               </Button>
             </React.Fragment>
           }
           step={null}
           title={t({
             en: `${wizard.assignments.length} Assignments Created`,
+            es: `${wizard.assignments.length} tareas creadas`,
             fr: `${wizard.assignments.length} tâches créées`
           })}
         >
@@ -148,7 +150,7 @@ export const BulkRemoteAssignmentWizard = ({
             head={
               <React.Fragment>
                 <Table.Head>{t('datahub.index.table.subject')}</Table.Head>
-                <Table.Head>{t({ en: 'Link', fr: 'Lien' })}</Table.Head>
+                <Table.Head>{t({ en: 'Link', es: 'Enlace', fr: 'Lien' })}</Table.Head>
                 <Table.Head className="w-12" />
               </React.Fragment>
             }

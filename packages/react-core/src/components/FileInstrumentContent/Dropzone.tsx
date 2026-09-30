@@ -83,6 +83,7 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
     if (fileCount === 0) {
       return t({
         en: 'Drag and Drop or Click to Upload',
+        es: 'Arrastre y suelte, o haga clic para subir',
         fr: 'Glissez-déposez ou cliquez pour télécharger'
       });
     } else if (fileCount <= 2) {
@@ -94,6 +95,7 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
 
     return t({
       en: `${displayed}, and ${remaining} more files...`,
+      es: `${displayed}, y ${remaining} archivos más...`,
       fr: `${displayed} et ${remaining} autres fichiers...`
     });
   }, [files, t]);
@@ -102,7 +104,7 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
     if (type === null) {
       return {
         icon: FileIcon,
-        label: t({ en: 'Any file type', fr: 'Tout type de fichier' })
+        label: t({ en: 'Any file type', es: 'Cualquier tipo de archivo', fr: 'Tout type de fichier' })
       };
     }
     return FILE_TYPE_DESCRIPTORS[type];
@@ -113,11 +115,13 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
     if (min === max) {
       return t({
         en: min === 1 ? 'Exactly 1 File Required' : `Exactly ${min} Files Required`,
+        es: min === 1 ? 'Se requiere exactamente 1 archivo' : `Se requieren exactamente ${min} archivos`,
         fr: min === 1 ? 'Exactement 1 fichier requis' : `Exactement ${min} fichiers requis`
       });
     }
     return t({
       en: `Between ${min} and ${max} Files Allowed`,
+      es: `Se permiten entre ${min} y ${max} archivos`,
       fr: `Entre ${min} et ${max} fichiers autorisés`
     });
   }, [count.min, count.max, t]);
@@ -129,7 +133,7 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
         <div className="flex min-w-0 flex-col">
           <span className="text-[13px] font-medium uppercase tracking-tight text-slate-500 dark:text-slate-400">
-            {t({ en: 'File Group', fr: 'Groupe de fichiers' })} {index + 1}
+            {t({ en: 'File Group', es: 'Grupo de archivos', fr: 'Groupe de fichiers' })} {index + 1}
           </span>
           <h3 className="truncate font-semibold tracking-tight text-slate-900 dark:text-slate-100">{label}</h3>
         </div>
@@ -159,6 +163,7 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
             {hasFiles
               ? t({
                   en: files.length === 1 ? '1 file selected' : `${files.length} files selected`,
+                  es: files.length === 1 ? '1 archivo seleccionado' : `${files.length} archivos seleccionados`,
                   fr: files.length === 1 ? '1 fichier sélectionné' : `${files.length} fichiers sélectionnés`
                 })
               : allowanceText}
@@ -171,13 +176,23 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
           issues={rejectedNames.map((name) =>
             t({
               en: `"${name}" was rejected — only ${typeDescriptor.label} files are accepted`,
+              es: `Se rechazó "${name}": solo se aceptan archivos ${typeDescriptor.label}`,
               fr: `« ${name} » a été rejeté — seuls les fichiers ${typeDescriptor.label} sont acceptés`
             })
           )}
-          title={t({ en: 'Unsupported file type', fr: 'Type de fichier non pris en charge' })}
+          title={t({
+            en: 'Unsupported file type',
+            es: 'Tipo de archivo no admitido',
+            fr: 'Type de fichier non pris en charge'
+          })}
         />
       )}
-      {issues && <ErrorBox issues={issues.map((issue) => t(issue))} title={t({ en: 'Invalid Input' })} />}
+      {issues && (
+        <ErrorBox
+          issues={issues.map((issue) => t(issue))}
+          title={t({ en: 'Invalid Input', es: 'Entrada no válida', fr: 'Entrée invalide' })}
+        />
+      )}
     </div>
   );
 });

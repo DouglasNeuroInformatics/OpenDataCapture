@@ -185,6 +185,7 @@ export const StartSessionForm = ({
               {
                 message: t({
                   en: `Subject must be above age of ${currentGroup?.settings.minimumAge}`,
+                  es: `El sujeto debe tener más de ${currentGroup?.settings.minimumAge} años`,
                   fr: `Le sujet doit avoir au moins ${currentGroup?.settings.minimumAge} ans`
                 })
               }
@@ -209,6 +210,7 @@ export const StartSessionForm = ({
                 code: z.ZodIssueCode.custom,
                 message: t({
                   en: 'Illegal character: $',
+                  es: 'Carácter no permitido: $',
                   fr: 'Caractère non autorisé : $'
                 }),
                 path: ['subjectId']

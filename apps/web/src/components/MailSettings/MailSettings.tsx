@@ -48,18 +48,25 @@ export const MailSettings = ({ config, newUserEmailTemplate }: MailSettingsProps
   const errorMessages: MailConfigFieldErrors = {
     host: t({
       en: 'Enter a valid host (e.g. smtp.example.org)',
+      es: 'Introduzca un servidor válido (p. ej. smtp.example.org)',
       fr: 'Entrez un hôte valide (p. ex. smtp.example.org)'
     }),
-    password: t({ en: 'A password is required', fr: 'Un mot de passe est requis' }),
+    password: t({ en: 'A password is required', es: 'La contraseña es obligatoria', fr: 'Un mot de passe est requis' }),
     port: t({
       en: 'Port must be a whole number between 1 and 65535',
+      es: 'El puerto debe ser un número entero entre 1 y 65535',
       fr: 'Le port doit être un nombre entier entre 1 et 65535'
     }),
     senderAddress: t({
       en: 'Enter a valid sender address (e.g. noreply@example.org)',
+      es: 'Introduzca una dirección de remitente válida (p. ej. noreply@example.org)',
       fr: "Entrez une adresse d'expéditeur valide (p. ex. noreply@example.org)"
     }),
-    username: t({ en: 'A username is required', fr: "Le nom d'utilisateur est requis" })
+    username: t({
+      en: 'A username is required',
+      es: 'El nombre de usuario es obligatorio',
+      fr: "Le nom d'utilisateur est requis"
+    })
   };
 
   /** Validate the live form into an API payload, collecting a message per offending field. */
@@ -88,6 +95,7 @@ export const MailSettings = ({ config, newUserEmailTemplate }: MailSettingsProps
       nextErrors.password = isServerChanged
         ? t({
             en: 'Re-enter the password for this mail server',
+            es: 'Vuelva a introducir la contraseña de este servidor de correo',
             fr: 'Saisissez à nouveau le mot de passe pour ce serveur'
           })
         : errorMessages.password;
@@ -124,9 +132,10 @@ export const MailSettings = ({ config, newUserEmailTemplate }: MailSettingsProps
       addNotification({
         message: t({
           en: 'Your changes were not saved. Check your connection and try again.',
+          es: 'Sus cambios no se guardaron. Compruebe su conexión e inténtelo de nuevo.',
           fr: "Vos modifications n'ont pas été enregistrées. Vérifiez votre connexion et réessayez."
         }),
-        title: t({ en: 'Save failed', fr: "Échec de l'enregistrement" }),
+        title: t({ en: 'Save failed', es: 'Error al guardar', fr: "Échec de l'enregistrement" }),
         type: 'error'
       });
     }
@@ -155,11 +164,12 @@ export const MailSettings = ({ config, newUserEmailTemplate }: MailSettingsProps
     <React.Fragment>
       <SectionCard data-testid="mail-enabled-card">
         <Heading className="mb-1" variant="h4">
-          {t({ en: 'Email', fr: 'Courriel' })}
+          {t({ en: 'Email', es: 'Correo electrónico', fr: 'Courriel' })}
         </Heading>
         <p className="text-muted-foreground mb-4 text-sm">
           {t({
             en: 'Turn outgoing email on to configure your mail server and templates. When off, the application behaves as if email is not available.',
+            es: 'Active el correo saliente para configurar el servidor de correo y las plantillas. Cuando está desactivado, la aplicación se comporta como si el correo no estuviera disponible.',
             fr: "Activez l'envoi de courriels pour configurer votre serveur de messagerie et vos modèles. Lorsque c'est désactivé, l'application se comporte comme si le courriel n'était pas disponible."
           })}
         </p>
@@ -171,7 +181,7 @@ export const MailSettings = ({ config, newUserEmailTemplate }: MailSettingsProps
             onCheckedChange={(checked) => void handleToggleEnabled(checked === true)}
           />
           <span className="text-sm font-medium">
-            {t({ en: 'Enable email sending', fr: "Activer l'envoi de courriels" })}
+            {t({ en: 'Enable email sending', es: 'Activar el envío de correo', fr: "Activer l'envoi de courriels" })}
           </span>
         </label>
       </SectionCard>

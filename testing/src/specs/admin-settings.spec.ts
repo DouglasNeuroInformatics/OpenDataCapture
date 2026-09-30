@@ -96,6 +96,29 @@ test.describe('admin settings', () => {
       await expect(sidebar).toContainText('Start Session');
       await expect(sidebar).not.toContainText('Iniciar una sesión');
     });
+
+    test('should render the admin nav in Spanish once Spanish is activated', async ({ getPageModel, page }) => {
+      const settingsPage = await getPageModel('/admin/settings');
+
+      // Spanish is off by default, so reaching it at all takes activating it first. The admin nav
+      // group and its submenu are inline `t()` strings rather than namespace keys, which is exactly
+      // where a missing Spanish entry hides: the page renders, in English.
+      const activated = waitForSetupPatch(page);
+      await settingsPage.activeLanguageCheckbox('es').click();
+      expect((await activated).ok()).toBe(true);
+
+      await settingsPage.selectLanguage('Español');
+      const sidebar = page.getByTestId('sidebar');
+      // The group header is a `NavGroup`, not a `NavButton`, so it carries no testid and is matched
+      // by role; its submenu items are `NavButton`s and are matched by theirs.
+      await expect(sidebar.getByRole('button', { name: 'Panel de administración' })).toBeVisible();
+      await expect(sidebar.getByTestId('nav-button-/admin/settings')).toContainText('Configuración de la aplicación');
+
+      await settingsPage.selectLanguage('English');
+      const removed = waitForSetupPatch(page);
+      await settingsPage.activeLanguageCheckbox('es').click();
+      expect((await removed).ok()).toBe(true);
+    });
   });
 
   test('should apply the group switcher position preference immediately', async ({ getPageModel }) => {

@@ -54,17 +54,22 @@ export const MailServerForm = ({
   return (
     <SectionCard data-testid="mail-server-card">
       <Heading className="mb-1" variant="h4">
-        {t({ en: 'Mail Server Configuration', fr: 'Configuration du serveur de courriel' })}
+        {t({
+          en: 'Mail Server Configuration',
+          es: 'Configuración del servidor de correo',
+          fr: 'Configuration du serveur de courriel'
+        })}
       </Heading>
       <p className="text-muted-foreground mb-4 text-sm">
         {t({
           en: 'Outgoing email is sent over an SMTP connection.',
+          es: 'El correo saliente se envía a través de una conexión SMTP.',
           fr: "L'envoi de courriels se fait via une connexion SMTP."
         })}
       </p>
       {/* new-password on the secret keeps the browser from autofilling the admin's own login */}
       <div className="flex flex-col gap-4">
-        <FormField error={errors.host} htmlFor="mail-host" label={t({ en: 'Host', fr: 'Hôte' })}>
+        <FormField error={errors.host} htmlFor="mail-host" label={t({ en: 'Host', es: 'Servidor', fr: 'Hôte' })}>
           <Input
             autoComplete="off"
             data-testid="mail-host"
@@ -79,11 +84,15 @@ export const MailServerForm = ({
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-1.5">
             <label className="text-sm font-medium" htmlFor="mail-encryption">
-              {t({ en: 'Encryption', fr: 'Chiffrement' })}
+              {t({ en: 'Encryption', es: 'Cifrado', fr: 'Chiffrement' })}
             </label>
             <Tooltip>
               <Tooltip.Trigger
-                aria-label={t({ en: 'About encryption options', fr: 'À propos des options de chiffrement' })}
+                aria-label={t({
+                  en: 'About encryption options',
+                  es: 'Acerca de las opciones de cifrado',
+                  fr: 'À propos des options de chiffrement'
+                })}
                 className="text-muted-foreground h-5 w-5 rounded-full p-0"
                 size="icon"
                 type="button"
@@ -95,12 +104,14 @@ export const MailServerForm = ({
                 <span>
                   {t({
                     en: 'STARTTLS (default port 587) is the modern default and recommended for most setups — it upgrades a plain connection to an encrypted one and has the best compatibility.',
+                    es: 'STARTTLS (puerto predeterminado 587) es la opción moderna por defecto y la recomendada para la mayoría de las configuraciones: convierte una conexión sin cifrar en una cifrada y ofrece la mejor compatibilidad.',
                     fr: 'STARTTLS (port par défaut 587) est la valeur par défaut moderne et recommandée — elle convertit une connexion en clair en connexion chiffrée et offre la meilleure compatibilité.'
                   })}
                 </span>
                 <span>
                   {t({
                     en: 'SSL/TLS (default port 465) is encrypted from the start, used by some providers and legacy systems. If unsure, choose STARTTLS.',
+                    es: 'SSL/TLS (puerto predeterminado 465) está cifrado desde el inicio y lo utilizan algunos proveedores y sistemas antiguos. Si no está seguro, elija STARTTLS.',
                     fr: 'SSL/TLS (port par défaut 465) est chiffré dès le départ, utilisé par certains fournisseurs et systèmes hérités. En cas de doute, choisissez STARTTLS.'
                   })}
                 </span>
@@ -117,7 +128,7 @@ export const MailServerForm = ({
             <Select.Content>
               <Select.Item value="starttls">STARTTLS</Select.Item>
               <Select.Item value="ssl">SSL/TLS</Select.Item>
-              <Select.Item value="none">{t({ en: 'None', fr: 'Aucun' })}</Select.Item>
+              <Select.Item value="none">{t({ en: 'None', es: 'Ninguno', fr: 'Aucun' })}</Select.Item>
             </Select.Content>
           </Select>
         </div>
@@ -126,13 +137,14 @@ export const MailServerForm = ({
           description={t(
             {
               en: 'Suggested port for {}: {}',
+              es: 'Puerto sugerido para {}: {}',
               fr: 'Port suggéré pour {} : {}'
             },
             { args: [values.encryption.toUpperCase(), PORT_DEFAULTS[values.encryption]] }
           )}
           error={errors.port}
           htmlFor="mail-port"
-          label={t({ en: 'Port', fr: 'Port' })}
+          label={t({ en: 'Port', es: 'Puerto', fr: 'Port' })}
         >
           <Input
             autoComplete="off"
@@ -149,7 +161,7 @@ export const MailServerForm = ({
         <FormField
           error={errors.username}
           htmlFor="mail-username"
-          label={t({ en: 'Username', fr: "Nom d'utilisateur" })}
+          label={t({ en: 'Username', es: 'Nombre de usuario', fr: "Nom d'utilisateur" })}
         >
           <Input
             autoComplete="off"
@@ -166,13 +178,14 @@ export const MailServerForm = ({
             hasStoredPassword
               ? t({
                   en: 'A password is set (shown masked). Edit the field to replace it.',
+                  es: 'Hay una contraseña definida (se muestra oculta). Edite el campo para reemplazarla.',
                   fr: 'Un mot de passe est défini (affiché masqué). Modifiez le champ pour le remplacer.'
                 })
               : undefined
           }
           error={errors.password}
           htmlFor="mail-password"
-          label={t({ en: 'Password', fr: 'Mot de passe' })}
+          label={t({ en: 'Password', es: 'Contraseña', fr: 'Mot de passe' })}
         >
           <Input
             data-1p-ignore
@@ -187,7 +200,10 @@ export const MailServerForm = ({
           />
         </FormField>
 
-        <FormField htmlFor="mail-sender-name" label={t({ en: 'Sender name', fr: "Nom de l'expéditeur" })}>
+        <FormField
+          htmlFor="mail-sender-name"
+          label={t({ en: 'Sender name', es: 'Nombre del remitente', fr: "Nom de l'expéditeur" })}
+        >
           <Input
             autoComplete="off"
             data-testid="mail-sender-name"
@@ -201,7 +217,7 @@ export const MailServerForm = ({
         <FormField
           error={errors.senderAddress}
           htmlFor="mail-sender-address"
-          label={t({ en: 'Sender address', fr: "Adresse de l'expéditeur" })}
+          label={t({ en: 'Sender address', es: 'Dirección del remitente', fr: "Adresse de l'expéditeur" })}
         >
           <Input
             autoComplete="off"

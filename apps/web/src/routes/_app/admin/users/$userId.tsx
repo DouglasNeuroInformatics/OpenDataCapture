@@ -42,7 +42,11 @@ const RouteComponent = () => {
   const userGroups = groups.filter((group) => user.groupIds.includes(group.id));
   const roleLabel = user.basePermissionLevel
     ? t(`common.${snakeToCamelCase(user.basePermissionLevel)}`)
-    : t({ en: 'No base permission level', fr: 'Aucun niveau de permission de base' });
+    : t({
+        en: 'No base permission level',
+        es: 'Sin nivel de permisos de base',
+        fr: 'Aucun niveau de permission de base'
+      });
   const identityLine = [`${user.firstName} ${user.lastName}`, roleLabel].join(' · ');
 
   const formData = useMemo<UpdateUserFormInputData>(
@@ -63,7 +67,7 @@ const RouteComponent = () => {
     <div data-testid="admin-user-page">
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t({ en: 'Manage User', fr: "Gérer l'utilisateur" })}
+          {t({ en: 'Manage User', es: 'Gestionar el usuario', fr: "Gérer l'utilisateur" })}
         </Heading>
       </PageHeader>
       <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-6">
@@ -75,7 +79,7 @@ const RouteComponent = () => {
               to="/admin/users"
             >
               <ChevronLeftIcon className="h-3.5 w-3.5" />
-              {t({ en: 'Return', fr: 'Retour' })}
+              {t({ en: 'Return', es: 'Volver', fr: 'Retour' })}
             </Link>
             <div className="flex items-center gap-4">
               <UserIcon className="text-muted-foreground h-14 w-14 shrink-0" />
@@ -99,10 +103,11 @@ const RouteComponent = () => {
         </Card>
         <Card>
           <Card.Header>
-            <Card.Title>{t({ en: 'Account', fr: 'Compte' })}</Card.Title>
+            <Card.Title>{t({ en: 'Account', es: 'Cuenta', fr: 'Compte' })}</Card.Title>
             <Card.Description>
               {t({
                 en: 'Contact details, group membership, status and password.',
+                es: 'Información de contacto, pertenencia a grupos, estado y contraseña.',
                 fr: 'Coordonnées, appartenance aux groupes, statut et mot de passe.'
               })}
             </Card.Description>
@@ -119,6 +124,7 @@ const RouteComponent = () => {
                 <p>
                   {t({
                     en: 'Your changes were not saved',
+                    es: 'Sus cambios no se guardaron',
                     fr: "Vos modifications n'ont pas été enregistrées"
                   })}
                 </p>
@@ -150,15 +156,19 @@ const RouteComponent = () => {
         <UserPermissionsEditor groups={groups} user={user} />
         <Card>
           <Card.Header>
-            <Card.Title>{t({ en: 'Delete User', fr: "Supprimer l'utilisateur" })}</Card.Title>
+            <Card.Title>
+              {t({ en: 'Delete User', es: 'Eliminar el usuario', fr: "Supprimer l'utilisateur" })}
+            </Card.Title>
             <Card.Description>
               {isCurrentUser
                 ? t({
                     en: 'You cannot delete the account you are signed in with.',
+                    es: 'No puede eliminar la cuenta con la que ha iniciado sesión.',
                     fr: 'Vous ne pouvez pas supprimer le compte avec lequel vous êtes connecté.'
                   })
                 : t({
                     en: 'Permanently removes this account. This cannot be undone.',
+                    es: 'Elimina esta cuenta de forma permanente. Esta acción no se puede deshacer.',
                     fr: 'Supprime définitivement ce compte. Cette action ne peut pas être annulée.'
                   })}
             </Card.Description>
@@ -167,7 +177,7 @@ const RouteComponent = () => {
             <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
               <Dialog.Trigger asChild>
                 <Button disabled={isCurrentUser} type="button" variant="danger">
-                  {t({ en: 'Delete User', fr: "Supprimer l'utilisateur" })}
+                  {t({ en: 'Delete User', es: 'Eliminar el usuario', fr: "Supprimer l'utilisateur" })}
                 </Button>
               </Dialog.Trigger>
               <Dialog.Content>
@@ -175,12 +185,14 @@ const RouteComponent = () => {
                   <Dialog.Title>
                     {t({
                       en: 'Are you absolutely sure?',
+                      es: '¿Está completamente seguro?',
                       fr: 'Êtes-vous absolument sûr ?'
                     })}
                   </Dialog.Title>
                   <Dialog.Description>
                     {t({
                       en: 'This action will permanently delete the account and cannot be undone.',
+                      es: 'Esta acción eliminará la cuenta de forma permanente y no se puede deshacer.',
                       fr: 'Cette action supprimera définitivement le compte et ne pourra pas être annulée.'
                     })}
                   </Dialog.Description>

@@ -118,18 +118,20 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
             },
             title: t({
               en: 'Contact',
+              es: 'Contacto',
               fr: 'Coordonnées'
             })
           },
           {
             description: t({
               en: 'A permission scoped to a group is dropped when the user leaves that group.',
+              es: 'Un permiso limitado a un grupo se retira cuando el usuario deja ese grupo.',
               fr: "Une autorisation limitée à un groupe est retirée lorsque l'utilisateur quitte ce groupe."
             }),
             fields: {
               groupIds: {
                 kind: 'set',
-                label: t({ en: 'Member Of', fr: 'Membre de' }),
+                label: t({ en: 'Member Of', es: 'Miembro de', fr: 'Membre de' }),
                 options: groupOptions,
                 variant: 'listbox'
               }
@@ -141,11 +143,13 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
               disabled: {
                 description: t({
                   en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
+                  es: 'Use esta opción si el usuario no debe iniciar sesión, por ejemplo, cuando la cuenta solo sirve para identificar al autor de los datos cargados.',
                   fr: 'Utilisez cette option si l’utilisateur n’a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l’auteur de données téléversées.'
                 }),
                 kind: 'boolean',
                 label: t({
                   en: 'Disabled',
+                  es: 'Desactivado',
                   fr: 'Désactivé'
                 }),
                 variant: 'radio'
@@ -153,12 +157,14 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
             },
             title: t({
               en: 'Status',
+              es: 'Estado',
               fr: 'Statut'
             })
           },
           {
             description: t({
               en: 'Leave blank to keep the current password.',
+              es: 'Deje el campo en blanco para conservar la contraseña actual.',
               fr: 'Laissez vide pour conserver le mot de passe actuel.'
             }),
             fields: {
@@ -169,13 +175,21 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
               password: {
                 generatePassword,
                 kind: 'string',
-                label: t({ en: 'Set new password', fr: 'Définir un nouveau mot de passe' }),
+                label: t({
+                  en: 'Set new password',
+                  es: 'Definir una nueva contraseña',
+                  fr: 'Définir un nouveau mot de passe'
+                }),
                 variant: 'password'
               },
               // eslint-disable-next-line perfectionist/sort-objects
               confirmPassword: {
                 kind: 'string',
-                label: t({ en: 'Confirm new password', fr: 'Confirmer le nouveau mot de passe' }),
+                label: t({
+                  en: 'Confirm new password',
+                  es: 'Confirmar la nueva contraseña',
+                  fr: 'Confirmer le nouveau mot de passe'
+                }),
                 variant: 'password'
               }
             },
@@ -187,7 +201,7 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
           ...initialValues,
           disabled: initialValues?.disabled ?? false
         }}
-        submitBtnLabel={t({ en: 'Save Changes', fr: 'Enregistrer les modifications' })}
+        submitBtnLabel={t({ en: 'Save Changes', es: 'Guardar los cambios', fr: 'Enregistrer les modifications' })}
         subscribe={{
           // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
           // position, so `setValues` is inferred as an error type rather than a setter.

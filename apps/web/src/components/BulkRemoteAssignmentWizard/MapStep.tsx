@@ -15,12 +15,12 @@ import type { WizardStep } from './types';
 
 const CANONICAL_FIELDS: CanonicalField[] = ['subjectId', 'firstName', 'lastName', 'dateOfBirth', 'sex'];
 
-const FIELD_LABELS: { [K in CanonicalField]: { en: string; fr: string } } = {
-  dateOfBirth: { en: 'Date of Birth', fr: 'Date de naissance' },
-  firstName: { en: 'First Name', fr: 'Prénom' },
-  lastName: { en: 'Last Name', fr: 'Nom' },
-  sex: { en: 'Sex at Birth', fr: 'Sexe à la naissance' },
-  subjectId: { en: 'Subject ID', fr: 'Identifiant du sujet' }
+const FIELD_LABELS: { [K in CanonicalField]: { en: string; es: string; fr: string } } = {
+  dateOfBirth: { en: 'Date of Birth', es: 'Fecha de nacimiento', fr: 'Date de naissance' },
+  firstName: { en: 'First Name', es: 'Nombre', fr: 'Prénom' },
+  lastName: { en: 'Last Name', es: 'Apellido', fr: 'Nom' },
+  sex: { en: 'Sex at Birth', es: 'Sexo al nacer', fr: 'Sexe à la naissance' },
+  subjectId: { en: 'Subject ID', es: 'Identificador del sujeto', fr: 'Identifiant du sujet' }
 } as const;
 
 const NOT_USED = '__not_used__';
@@ -61,6 +61,7 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
         {
           message: t({
             en: 'Map a subject ID column, or a complete set of first name, last name, date of birth and sex.',
+            es: 'Asocie una columna de identificador de sujeto, o un conjunto completo de nombre, apellido, fecha de nacimiento y sexo.',
             fr: "Associez une colonne d'identifiant, ou un ensemble complet de prénom, nom, date de naissance et sexe."
           })
         }
@@ -85,27 +86,28 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
         mode ? (
           <Badge data-testid="bulk-detected-mode" variant="secondary">
             {mode === 'ID'
-              ? t({ en: 'Subject ID', fr: 'Identifiant du sujet' })
-              : t({ en: 'Personal Information', fr: 'Renseignements personnels' })}
+              ? t({ en: 'Subject ID', es: 'Identificador del sujeto', fr: 'Identifiant du sujet' })
+              : t({ en: 'Personal Information', es: 'Información personal', fr: 'Renseignements personnels' })}
           </Badge>
         ) : null
       }
       description={t({
         en: `Check that the columns were read correctly. ${parsed.rows.length} rows found.`,
+        es: `Compruebe que las columnas se leyeron correctamente. Se encontraron ${parsed.rows.length} filas.`,
         fr: `Vérifiez que les colonnes ont été lues correctement. ${parsed.rows.length} lignes trouvées.`
       })}
       footer={
         <React.Fragment>
           <Button type="button" variant="outline" onClick={onBack}>
-            {t({ en: 'Back', fr: 'Retour' })}
+            {t({ en: 'Back', es: 'Atrás', fr: 'Retour' })}
           </Button>
           <Button data-testid="bulk-confirm-mapping" disabled={!mode} type="button" onClick={() => void resolve()}>
-            {t({ en: 'Continue', fr: 'Continuer' })}
+            {t({ en: 'Continue', es: 'Continuar', fr: 'Continuer' })}
           </Button>
         </React.Fragment>
       }
       step="SUBJECTS"
-      title={t({ en: 'Confirm the Columns', fr: 'Confirmer les colonnes' })}
+      title={t({ en: 'Confirm the Columns', es: 'Confirmar las columnas', fr: 'Confirmer les colonnes' })}
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-6" data-testid="bulk-map-step">
@@ -115,18 +117,23 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
           <p className="text-muted-foreground text-sm">
             {t({
               en: 'Subject identifiers are derived in your browser. The personal information in this file is never sent.',
+              es: 'Los identificadores de los sujetos se derivan en su navegador. La información personal de este archivo nunca se envía.',
               fr: 'Les identifiants sont dérivés dans votre navigateur. Les renseignements personnels de ce fichier ne sont jamais envoyés.'
             })}
           </p>
         )}
 
         <div className="flex flex-col gap-2" data-testid="bulk-column-mapping">
-          <h3 className="text-sm font-medium">{t({ en: 'Column Mapping', fr: 'Correspondance des colonnes' })}</h3>
+          <h3 className="text-sm font-medium">
+            {t({ en: 'Column Mapping', es: 'Correspondencia de columnas', fr: 'Correspondance des colonnes' })}
+          </h3>
           <WizardTable
             head={
               <React.Fragment>
-                <Table.Head>{t({ en: 'Column in Your File', fr: 'Colonne de votre fichier' })}</Table.Head>
-                <Table.Head>{t({ en: 'Read As', fr: 'Interprétée comme' })}</Table.Head>
+                <Table.Head>
+                  {t({ en: 'Column in Your File', es: 'Columna de su archivo', fr: 'Colonne de votre fichier' })}
+                </Table.Head>
+                <Table.Head>{t({ en: 'Read As', es: 'Interpretada como', fr: 'Interprétée comme' })}</Table.Head>
               </React.Fragment>
             }
           >
@@ -144,7 +151,9 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
                         <Select.Value />
                       </Select.Trigger>
                       <Select.Content>
-                        <Select.Item value={NOT_USED}>{t({ en: 'Not Used', fr: 'Non utilisée' })}</Select.Item>
+                        <Select.Item value={NOT_USED}>
+                          {t({ en: 'Not Used', es: 'No utilizada', fr: 'Non utilisée' })}
+                        </Select.Item>
                         {CANONICAL_FIELDS.filter((f) => !claimed.has(f) || f === field).map((f) => (
                           <Select.Item key={f} value={f}>
                             {t(FIELD_LABELS[f])}
@@ -163,6 +172,7 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
           <h3 className="text-sm font-medium">
             {t({
               en: `Preview of the first ${parsed.preview.length} rows`,
+              es: `Vista previa de las primeras ${parsed.preview.length} filas`,
               fr: `Aperçu des ${parsed.preview.length} premières lignes`
             })}
           </h3>

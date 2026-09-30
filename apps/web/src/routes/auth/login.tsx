@@ -1,6 +1,6 @@
-import { Card, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { Card, Heading, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { Logo } from '@opendatacapture/react-core';
+import { LanguageToggle, Logo } from '@opendatacapture/react-core';
 import type { $LoginCredentials, AuthPayload } from '@opendatacapture/schemas/auth';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
@@ -69,11 +69,8 @@ const RouteComponent = () => {
             </Card.Content>
             <Card.Footer className="text-muted-foreground flex justify-between" data-testid="login-footer-toggles">
               <LanguageToggle
+                activeLanguages={setupStateQuery.data.activeLanguages}
                 align="start"
-                options={{
-                  en: 'English',
-                  fr: 'Français'
-                }}
                 triggerClassName="border p-2"
                 variant="ghost"
               />
@@ -110,11 +107,8 @@ const RouteComponent = () => {
             </Card.Content>
             <Card.Footer className="text-muted-foreground flex justify-between" data-testid="login-footer-toggles">
               <LanguageToggle
+                activeLanguages={setupStateQuery.data.activeLanguages}
                 align="start"
-                options={{
-                  en: 'English',
-                  fr: 'Français'
-                }}
                 triggerClassName="border p-2"
                 variant="ghost"
               />

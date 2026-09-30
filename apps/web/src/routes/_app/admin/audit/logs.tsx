@@ -116,7 +116,7 @@ const AuditLogsToolbar = () => {
   return (
     <div className="flex flex-wrap items-center gap-2 pb-4" data-testid="audit-logs-toolbar">
       <FilterMenu
-        allLabel={t({ en: 'All Groups', fr: 'Tous les groupes' })}
+        allLabel={t({ en: 'All Groups', es: 'Todos los grupos', fr: 'Tous les groupes' })}
         data-testid="audit-logs-filter-group"
         label={t('common.group')}
         options={groups.map((group) => ({ label: group.name, value: group.id }))}
@@ -128,7 +128,7 @@ const AuditLogsToolbar = () => {
         }}
       />
       <FilterMenu
-        allLabel={t({ en: 'All Users', fr: 'Tous les utilisateurs' })}
+        allLabel={t({ en: 'All Users', es: 'Todos los usuarios', fr: 'Tous les utilisateurs' })}
         data-testid="audit-logs-filter-user"
         label={t('common.user')}
         options={availableUsers.map((user) => ({ label: user.username, value: user.id }))}
@@ -136,7 +136,7 @@ const AuditLogsToolbar = () => {
         onValueChange={(userId) => setSearch({ userId })}
       />
       <FilterMenu
-        allLabel={t({ en: 'Any Action', fr: 'Toute action' })}
+        allLabel={t({ en: 'Any Action', es: 'Cualquier acción', fr: 'Toute action' })}
         data-testid="audit-logs-filter-action"
         label={t('common.action')}
         options={ACTIONS.map((action) => ({ label: localize(action), value: action }))}
@@ -144,7 +144,7 @@ const AuditLogsToolbar = () => {
         onValueChange={(action) => setSearch({ action })}
       />
       <FilterMenu
-        allLabel={t({ en: 'Any Entity', fr: 'Toute entité' })}
+        allLabel={t({ en: 'Any Entity', es: 'Cualquier entidad', fr: 'Toute entité' })}
         data-testid="audit-logs-filter-entity"
         label={t('common.entity')}
         options={ENTITIES.map((entity) => ({ label: localize(entity), value: entity }))}
@@ -160,7 +160,7 @@ const AuditLogsToolbar = () => {
           onClick={() => void navigate({ search: {}, to: '.' })}
         >
           <XIcon className="h-3.5 w-3.5" />
-          {t({ en: 'Clear Filters', fr: 'Effacer les filtres' })}
+          {t({ en: 'Clear Filters', es: 'Borrar filtros', fr: 'Effacer les filtres' })}
         </Button>
       )}
       <Button

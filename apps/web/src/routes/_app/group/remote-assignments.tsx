@@ -35,7 +35,7 @@ const RouteComponent = () => {
     <React.Fragment>
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t({ en: 'Remote Assignments', fr: 'Tâches à distance' })}
+          {t({ en: 'Remote Assignments', es: 'Tareas remotas', fr: 'Tâches à distance' })}
         </Heading>
       </PageHeader>
       <BulkRemoteAssignmentWizard

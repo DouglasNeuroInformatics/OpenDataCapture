@@ -37,7 +37,7 @@ export const ErrorPage = ({ error }: ErrorPageProps) => {
     }
   };
 
-  let heading = t({ en: 'Unknown Error', fr: 'Erreur inconnue' });
+  let heading = t({ en: 'Unknown Error', es: 'Error desconocido', fr: 'Erreur inconnue' });
   if (isAxiosError(error) && error.status) {
     heading = `${error.status} - ${getReasonPhrase(error.status)}`;
   }
@@ -48,12 +48,13 @@ export const ErrorPage = ({ error }: ErrorPageProps) => {
       data-testid="error-page"
     >
       <h1 className="text-muted-foreground text-sm font-semibold uppercase tracking-wide">
-        {t({ en: 'Something Went Wrong', fr: "Une erreur s'est produite" })}
+        {t({ en: 'Something Went Wrong', es: 'Algo salió mal', fr: "Une erreur s'est produite" })}
       </h1>
       <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">{heading}</h3>
       <p className="text-muted-foreground mt-2 max-w-prose text-sm sm:text-base">
         {t({
           en: 'We apologize for the inconvenience. Please copy or download the error report using the buttons below and send it to your platform administrator for further assistance.',
+          es: 'Nos disculpamos por las molestias. Copie o descargue el informe de error con los botones de abajo y envíelo al administrador de su plataforma para obtener ayuda.',
           fr: "Nous nous excusons pour ce désagrément. Veuillez copier ou télécharger le rapport d'erreur à l'aide des boutons ci-dessous et l'envoyer à l'administrateur de votre plateforme pour obtenir de l'aide."
         })}
       </p>
@@ -69,9 +70,10 @@ export const ErrorPage = ({ error }: ErrorPageProps) => {
             setCopyState('READY');
           }}
         >
-          {copyState === 'COPIED' && t({ en: 'Copied', fr: 'Copié' })}
-          {copyState === 'FAILED' && t({ en: 'Copy Failed', fr: 'Échec de la copie' })}
-          {copyState === 'READY' && t({ en: 'Copy Error Report', fr: "Copier le rapport d'erreur" })}
+          {copyState === 'COPIED' && t({ en: 'Copied', es: 'Copiado', fr: 'Copié' })}
+          {copyState === 'FAILED' && t({ en: 'Copy Failed', es: 'Error al copiar', fr: 'Échec de la copie' })}
+          {copyState === 'READY' &&
+            t({ en: 'Copy Error Report', es: 'Copiar el informe de error', fr: "Copier le rapport d'erreur" })}
         </Button>
         <Button
           data-testid="download-error-report"
@@ -81,7 +83,11 @@ export const ErrorPage = ({ error }: ErrorPageProps) => {
             void download('error.json', report);
           }}
         >
-          {t({ en: 'Download Error Report', fr: "Télécharger le rapport d'erreur" })}
+          {t({
+            en: 'Download Error Report',
+            es: 'Descargar el informe de error',
+            fr: "Télécharger le rapport d'erreur"
+          })}
         </Button>
         <Button
           data-testid="reload-page"
@@ -91,7 +97,7 @@ export const ErrorPage = ({ error }: ErrorPageProps) => {
             window.location.assign(window.location.origin);
           }}
         >
-          {t({ en: 'Reload Page', fr: 'Recharger la page' })}
+          {t({ en: 'Reload Page', es: 'Volver a cargar la página', fr: 'Recharger la page' })}
         </Button>
       </div>
     </div>
