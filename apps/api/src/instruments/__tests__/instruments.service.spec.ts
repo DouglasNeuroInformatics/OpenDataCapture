@@ -717,13 +717,51 @@ describe('InstrumentsService', () => {
       const result = await instrumentsService.findInfo();
 
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
-        select: { id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
+        select: { createdAt: true, id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
         where: { id: { in: ['owned', 'shared'] } }
       });
       expect(result).toMatchObject([
         { id: 'owned', seriesGroupId: 'group-1' },
         { id: 'shared', seriesGroupId: null }
       ]);
+    });
+
+    it('should report when each series was created, from the record rather than the evaluated instance', async () => {
+      const createdAt = new Date('2024-03-01T12:00:00.000Z');
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([
+        { ...existingSeries, content: { items: [] }, id: 'series-1' }
+      ]);
+      instrumentModel.findMany.mockResolvedValue([
+        { createdAt, id: 'series-1', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
+      ]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(result).toMatchObject([{ createdAt, id: 'series-1' }]);
+    });
+
+    it('should report when each scalar instrument was stored, since every kind is tagged with it', async () => {
+      const createdAt = new Date('2024-05-02T09:30:00.000Z');
+      instrumentModel.findMany.mockResolvedValue([
+        { createdAt, id: 'id-2', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
+      ]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(result).toMatchObject([{ createdAt, id: 'id-2' }]);
+    });
+
+    // The stored record is read separately from the evaluated instance, so an id present in one and
+    // absent from the other must leave the date empty rather than invent one.
+    it('should report a null creation date for a series with no stored record', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([
+        { ...existingSeries, content: { items: [] }, id: 'series-1' }
+      ]);
+      instrumentModel.findMany.mockResolvedValue([]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(result).toMatchObject([{ createdAt: null, id: 'series-1' }]);
     });
   });
 
