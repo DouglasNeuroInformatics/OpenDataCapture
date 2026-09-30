@@ -8,8 +8,9 @@ export class LoginPage extends RootPage {
   readonly _requiresAuth = false;
   readonly demoDialog: Locator;
   readonly demoDialogBranding: Locator;
-  /** One row per demo account, each with a button that logs straight in as it. */
+  /** One row per demo account. A click anywhere in the row logs straight in as it. */
   readonly demoUserRows: Locator;
+  readonly demoUserTableHeaderRow: Locator;
   readonly loginForm: Locator;
 
   constructor(page: Page) {
@@ -17,7 +18,13 @@ export class LoginPage extends RootPage {
     this.demoDialog = page.getByTestId('demo-dialog');
     this.demoDialogBranding = this.demoDialog.getByTestId('demo-dialog-branding');
     this.demoUserRows = this.demoDialog.getByRole('row').filter({ has: page.getByRole('cell') });
+    this.demoUserTableHeaderRow = this.demoDialog.getByRole('row').filter({ has: page.getByRole('columnheader') });
     this.loginForm = page.getByTestId('login-form');
+  }
+
+  async backgroundColorWhileHovering(row: Locator) {
+    await row.hover();
+    return row.evaluate((element) => getComputedStyle(element).backgroundColor);
   }
 
   async dismissDemoDialog() {

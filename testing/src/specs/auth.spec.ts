@@ -51,6 +51,28 @@ test.describe('authentication', () => {
       await loginPage.expect.toHaveURL('/dashboard');
       await expect(page.getByTestId('user-dropup-trigger')).toHaveText(username);
     });
+
+    test('should log in from a click on the row itself, not only on its button', async ({ getPageModel, page }) => {
+      const loginPage = await getPageModel('/auth/login');
+      const demoUserRow = loginPage.demoUserRows.filter({ hasText: 'Group Manager' }).last();
+      const usernameCell = demoUserRow.getByRole('cell').first();
+      const username = await usernameCell.innerText();
+      await usernameCell.click();
+
+      await loginPage.expect.toHaveURL('/dashboard');
+      await expect(page.getByTestId('user-dropup-trigger')).toHaveText(username);
+    });
+
+    test('should highlight only the rows that log in, so the header does not look clickable', async ({
+      getPageModel
+    }) => {
+      const loginPage = await getPageModel('/auth/login');
+      const headerRow = loginPage.demoUserTableHeaderRow;
+      const restingColor = await headerRow.evaluate((element) => getComputedStyle(element).backgroundColor);
+
+      expect(await loginPage.backgroundColorWhileHovering(headerRow)).toBe(restingColor);
+      expect(await loginPage.backgroundColorWhileHovering(loginPage.demoUserRows.first())).not.toBe(restingColor);
+    });
   });
 
   test.describe('invalid credentials', () => {

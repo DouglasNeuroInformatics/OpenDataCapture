@@ -50,4 +50,22 @@ describe('DemoBanner', () => {
     }
     expect(onLogin.mock.calls).toEqual(DEMO_USERS.map(({ password, username }) => [{ password, username }]));
   });
+
+  it('should log in from a click anywhere in the row, so the whole row is the target and not just its button', () => {
+    const onLogin = vi.fn();
+    render(<DemoBanner onLogin={onLogin} />);
+    for (const { username } of DEMO_USERS) {
+      const cells = within(screen.getByRole('row', { name: new RegExp(username) })).getAllByRole('cell');
+      fireEvent.click(cells[0]!);
+    }
+    expect(onLogin.mock.calls).toEqual(DEMO_USERS.map(({ password, username }) => [{ password, username }]));
+  });
+
+  it('should log in once for a click on the row button, so the row and the button do not both fire', () => {
+    const onLogin = vi.fn();
+    render(<DemoBanner onLogin={onLogin} />);
+    const { password, username } = DEMO_USERS[0]!;
+    fireEvent.click(within(screen.getByRole('row', { name: new RegExp(username) })).getByRole('button'));
+    expect(onLogin).toHaveBeenCalledExactlyOnceWith({ password, username });
+  });
 });

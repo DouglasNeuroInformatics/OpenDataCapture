@@ -54,7 +54,8 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
         <Card className="text-muted-foreground w-full overflow-hidden rounded-md text-xs tracking-tighter sm:tracking-tight">
           <Table className="overflow-x-scroll">
             <Table.Header>
-              <Table.Row>
+              {/* Only a body row is clickable, so cancel the hover highlight `Table.Row` applies by default. */}
+              <Table.Row className="hover:bg-transparent">
                 <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
                   {t('auth.demo.username')}
                 </Table.Head>
@@ -69,7 +70,11 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
             </Table.Header>
             <Table.Body>
               {DEMO_USERS.map((user) => (
-                <Table.Row key={user.username}>
+                <Table.Row
+                  className="cursor-pointer"
+                  key={user.username}
+                  onClick={() => onLogin({ password: user.password, username: user.username })}
+                >
                   <Table.Cell className="p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">{user.username}</Table.Cell>
                   <Table.Cell className="p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
                     {user.groupNames.map((name) => (
@@ -83,13 +88,9 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
                   </Table.Cell>
                   <Table.Cell className="p-3 px-2.5 sm:px-3.5">
                     <Tooltip delayDuration={500}>
-                      <Tooltip.Trigger
-                        className="h-9 w-9"
-                        size="icon"
-                        type="button"
-                        variant="ghost"
-                        onClick={() => onLogin({ password: user.password, username: user.username })}
-                      >
+                      {/* No handler of its own: the click bubbles to the row, so the button stays the
+                          keyboard-reachable control without the row and it holding separate logic. */}
+                      <Tooltip.Trigger className="h-9 w-9" size="icon" type="button" variant="ghost">
                         <LogInIcon />
                       </Tooltip.Trigger>
                       <Tooltip.Content side="bottom">
