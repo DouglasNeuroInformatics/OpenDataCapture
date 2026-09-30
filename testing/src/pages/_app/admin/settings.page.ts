@@ -14,7 +14,7 @@ export class AdminSettingsPage extends AppPage {
     this.pageHeader = page.getByTestId('page-header');
     this.uploaderToggle = page.getByRole('switch', { name: 'Enable Uploader' });
     this.defaultAssignmentDurationInput = page.getByTestId('default-assignment-duration-input');
-    this.groupSwitcherPositionSelect = page.getByRole('combobox');
+    this.groupSwitcherPositionSelect = page.getByTestId('group-switcher-position-select');
   }
 
   activeLanguageCheckbox(language: Language): Locator {

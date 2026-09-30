@@ -323,7 +323,7 @@ const RouteComponent = () => {
                   value={groupSwitcherPosition}
                   onValueChange={(value) => setGroupSwitcherPosition(value as GroupSwitcherPosition)}
                 >
-                  <Select.Trigger className="w-[180px] shrink-0">
+                  <Select.Trigger className="w-[180px] shrink-0" data-testid="group-switcher-position-select">
                     <Select.Value />
                   </Select.Trigger>
                   <Select.Content>
