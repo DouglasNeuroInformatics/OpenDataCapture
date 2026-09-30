@@ -26,6 +26,7 @@ import { SearchSubmitGuard } from '@/components/SearchSubmitGuard';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
+import { getListedSubjectIds } from '@/utils/table';
 
 type DateFilter = {
   allowNull: boolean;
@@ -243,11 +244,9 @@ const Toggles: React.FC<{
 
     getExportRecords()
       .then((data): any => {
-        const listedSubjects = table
-          .getPrePaginationRowModel()
-          .rows.flatMap((row) => row.getVisibleCells().map((cell) => removeSubjectIdScope(cell.row.original.id)));
+        const listedSubjects = getListedSubjectIds(table);
 
-        const filteredData = data.filter((dataEntry) => listedSubjects.includes(dataEntry.subjectId));
+        const filteredData = data.filter((dataEntry) => listedSubjects.has(dataEntry.subjectId));
 
         if (filteredData.length < 1) {
           throw Error(
