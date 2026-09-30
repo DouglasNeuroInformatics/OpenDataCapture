@@ -1,3 +1,5 @@
+import type { Locator } from '@playwright/test';
+
 import { expect, test } from '../support/fixtures';
 
 test.describe('authentication', () => {
@@ -67,11 +69,14 @@ test.describe('authentication', () => {
       getPageModel
     }) => {
       const loginPage = await getPageModel('/auth/login');
-      const headerRow = loginPage.demoUserTableHeaderRow;
-      const restingColor = await headerRow.evaluate((element) => getComputedStyle(element).backgroundColor);
+      const backgroundColor = (row: Locator) => row.evaluate((element) => getComputedStyle(element).backgroundColor);
+      const restingColor = await backgroundColor(loginPage.demoTableHeaderRow);
 
-      expect(await loginPage.backgroundColorWhileHovering(headerRow)).toBe(restingColor);
-      expect(await loginPage.backgroundColorWhileHovering(loginPage.demoUserRows.first())).not.toBe(restingColor);
+      await loginPage.demoTableHeaderRow.hover();
+      expect(await backgroundColor(loginPage.demoTableHeaderRow)).toBe(restingColor);
+
+      await loginPage.demoUserRows.first().hover();
+      expect(await backgroundColor(loginPage.demoUserRows.first())).not.toBe(restingColor);
     });
   });
 

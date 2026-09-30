@@ -87,9 +87,9 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
                     {t(`common.${snakeToCamelCase(user.basePermissionLevel!)}`)}
                   </Table.Cell>
                   <Table.Cell className="p-3 px-2.5 sm:px-3.5">
+                    {/* The trigger carries no handler: its click bubbles to the row, so pointer and
+                        keyboard reach `onLogin` by the one path. */}
                     <Tooltip delayDuration={500}>
-                      {/* No handler of its own: the click bubbles to the row, so the button stays the
-                          keyboard-reachable control without the row and it holding separate logic. */}
                       <Tooltip.Trigger className="h-9 w-9" size="icon" type="button" variant="ghost">
                         <LogInIcon />
                       </Tooltip.Trigger>
