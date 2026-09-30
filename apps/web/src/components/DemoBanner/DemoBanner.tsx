@@ -2,6 +2,7 @@ import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Card, Dialog, Table, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { DEMO_USERS } from '@opendatacapture/demo';
+import { Logo } from '@opendatacapture/react-core';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import { InfoIcon, LogInIcon } from 'lucide-react';
 
@@ -38,6 +39,12 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
           event.preventDefault();
         }}
       >
+        <div className="mb-4 flex h-12 items-center px-1" data-testid="demo-dialog-branding">
+          <Logo className="h-full w-auto" variant="auto" />
+          <span className="ml-3 whitespace-nowrap text-xl font-semibold tracking-tight text-slate-700 dark:text-slate-300">
+            Open Data Capture
+          </span>
+        </div>
         <Dialog.Header className="w-full whitespace-break-spaces px-1">
           <Dialog.Title className="mb-2">{t('auth.demo.info')}</Dialog.Title>
           <Dialog.Description className="text-pretty text-left text-xs sm:text-sm">
@@ -47,7 +54,8 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
         <Card className="text-muted-foreground w-full overflow-hidden rounded-md text-xs tracking-tighter sm:tracking-tight">
           <Table className="overflow-x-scroll">
             <Table.Header>
-              <Table.Row>
+              {/* Only a body row is clickable, so cancel the hover highlight `Table.Row` applies by default. */}
+              <Table.Row className="hover:bg-transparent">
                 <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
                   {t('auth.demo.username')}
                 </Table.Head>
@@ -62,7 +70,11 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
             </Table.Header>
             <Table.Body>
               {DEMO_USERS.map((user) => (
-                <Table.Row key={user.username}>
+                <Table.Row
+                  className="cursor-pointer"
+                  key={user.username}
+                  onClick={() => onLogin({ password: user.password, username: user.username })}
+                >
                   <Table.Cell className="p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">{user.username}</Table.Cell>
                   <Table.Cell className="p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
                     {user.groupNames.map((name) => (
@@ -75,14 +87,10 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
                     {t(`common.${snakeToCamelCase(user.basePermissionLevel!)}`)}
                   </Table.Cell>
                   <Table.Cell className="p-3 px-2.5 sm:px-3.5">
+                    {/* The trigger carries no handler: its click bubbles to the row, so pointer and
+                        keyboard reach `onLogin` by the one path. */}
                     <Tooltip delayDuration={500}>
-                      <Tooltip.Trigger
-                        className="h-9 w-9"
-                        size="icon"
-                        type="button"
-                        variant="ghost"
-                        onClick={() => onLogin({ password: user.password, username: user.username })}
-                      >
+                      <Tooltip.Trigger className="h-9 w-9" size="icon" type="button" variant="ghost">
                         <LogInIcon />
                       </Tooltip.Trigger>
                       <Tooltip.Content side="bottom">
