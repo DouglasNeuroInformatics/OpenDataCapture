@@ -60,6 +60,41 @@ test.describe('custom identifier suggestions', () => {
     expect(response.status()).toBe(200);
     expect(await response.json()).toStrictEqual([]);
   });
+
+  test('should list custom-id subjects in no group, but not those in a group, when no group is given', async ({
+    api,
+    uniqueId
+  }) => {
+    const ungroupedId = `root$ungrouped-${uniqueId}`;
+    const groupedId = `grouped-${uniqueId}`;
+    await api.createSession(null, { id: ungroupedId });
+    await api.createSession((await api.createGroup()).id, { id: groupedId });
+
+    const ids = await api.findUngroupedSubjectCustomIds();
+
+    expect(ids).toContain(ungroupedId);
+    expect(ids).not.toContain(groupedId);
+  });
+
+  test('should list no ungrouped subjects to a group manager, since they may read only their own groups', async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    await api.createSession(null, { id: `root$ungrouped-${uniqueId}` });
+    const { credentials } = await api.createUser({
+      basePermissionLevel: 'GROUP_MANAGER',
+      groupIds: [(await api.createGroup()).id]
+    });
+    const accessToken = await ApiClient.login(apiRequestContext, credentials);
+
+    const response = await apiRequestContext.get('/api/v1/subjects/ungrouped/custom-ids', {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toStrictEqual([]);
+  });
 });
 
 test.describe('start session', () => {
@@ -140,6 +175,27 @@ test.describe('start session', () => {
     await startSessionPage.fillSessionDetails('Male');
     await startSessionPage.submitForm();
     await expect(startSessionPage.successMessage).toBeVisible();
+  });
+
+  test('should suggest subjects in no group to an admin who belongs to no group', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const identifier = `ungrouped-${uniqueId}`;
+    // With no current group the form scopes a custom id to the default group, as `root$<id>`.
+    await api.createSession(null, { id: `root$${identifier}` });
+    const { credentials } = await api.createUser({ basePermissionLevel: 'ADMIN', groupIds: [] });
+    await authenticateAs(credentials);
+    await page.goto('/session/start-session');
+
+    const startSessionPage = new StartSessionPage(page);
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.typeSubjectId(identifier);
+
+    await expect(startSessionPage.subjectIdOption(identifier)).toBeVisible();
   });
 
   test('should show a required-field error for every missing field when submitting the personal information form empty', async ({

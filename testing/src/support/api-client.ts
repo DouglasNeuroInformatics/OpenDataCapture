@@ -152,6 +152,15 @@ export class ApiClient {
     );
   }
 
+  /** The ids the start-session form suggests to a user with no group: custom-id subjects in no group. */
+  async findUngroupedSubjectCustomIds(): Promise<string[]> {
+    return this.expectJson<string[]>(
+      this.request.get(`${API}/subjects/ungrouped/custom-ids`, { headers: this.authHeaders }),
+      200,
+      'find the custom ids of subjects in no group'
+    );
+  }
+
   /** Reads a user back as admin, to check what a write actually stored. */
   async findUserById(id: string): Promise<User> {
     return this.expectJson<User>(
