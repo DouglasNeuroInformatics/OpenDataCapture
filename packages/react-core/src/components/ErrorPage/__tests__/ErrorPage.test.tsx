@@ -29,17 +29,41 @@ describe('ErrorPage', () => {
     expect(screen.getByText('404 - Not Found')).toBeTruthy();
   });
 
-  it('should download the error report when the error report button is clicked', async () => {
+  it('should download the error report when the download button is clicked', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock');
     const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
     render(<ErrorPage error={new Error('boom')} />);
-    fireEvent.click(screen.getByText('Error Report'));
+    fireEvent.click(screen.getByText('Download Error Report'));
     await waitFor(() => {
       expect(createObjectURLSpy).toHaveBeenCalled();
     });
     createObjectURLSpy.mockRestore();
     revokeObjectURLSpy.mockRestore();
+  });
+
+  it('should write the same report the download offers to the clipboard, so it need not be downloaded to be shared', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } });
+    render(<ErrorPage error={new Error('boom')} />);
+    fireEvent.click(screen.getByText('Copy Error Report'));
+    await waitFor(() => {
+      expect(screen.getByText('Copied')).toBeTruthy();
+    });
+    expect(JSON.parse(writeText.mock.calls[0]![0] as string)).toMatchObject({ message: 'boom' });
+    vi.unstubAllGlobals();
+  });
+
+  it('should report a failure to copy rather than appearing to have copied, since an insecure context has no clipboard', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.stubGlobal('navigator', { ...navigator, clipboard: undefined });
+    render(<ErrorPage error={new Error('boom')} />);
+    fireEvent.click(screen.getByText('Copy Error Report'));
+    await waitFor(() => {
+      expect(screen.getByText('Copy Failed')).toBeTruthy();
+    });
+    vi.unstubAllGlobals();
   });
 
   it('should reload the page when the reload button is clicked', () => {
