@@ -61,34 +61,46 @@ test.describe('custom identifier suggestions', () => {
     expect(await response.json()).toStrictEqual([]);
   });
 
-  test('should list custom-id subjects in no group, but not those in a group, when no group is given', async ({
+  test('should list custom ids scoped to the default group, but not those scoped to a named group, when no group is given', async ({
     api,
     uniqueId
   }) => {
-    const ungroupedId = `root$ungrouped-${uniqueId}`;
-    const groupedId = `grouped-${uniqueId}`;
-    await api.createSession(null, { id: ungroupedId });
-    await api.createSession((await api.createGroup()).id, { id: groupedId });
+    const rootScopedId = `root$default-${uniqueId}`;
+    const groupScopedId = `Clinic$named-${uniqueId}`;
+    await api.createSession(null, { id: rootScopedId });
+    await api.createSession((await api.createGroup()).id, { id: groupScopedId });
 
-    const ids = await api.findUngroupedSubjectCustomIds();
+    const ids = await api.findDefaultGroupSubjectCustomIds();
 
-    expect(ids).toContain(ungroupedId);
-    expect(ids).not.toContain(groupedId);
+    expect(ids).toContain(rootScopedId);
+    expect(ids).not.toContain(groupScopedId);
   });
 
-  test('should list no ungrouped subjects to a group manager, since they may read only their own groups', async ({
+  test('should still list a default group custom id after its subject is seen in a group', async ({
+    api,
+    uniqueId
+  }) => {
+    const rootScopedId = `root$regrouped-${uniqueId}`;
+    await api.createSession(null, { id: rootScopedId });
+    // Starting a session in a group adds that group to the subject, but leaves its id alone.
+    await api.createSession((await api.createGroup()).id, { id: rootScopedId });
+
+    expect(await api.findDefaultGroupSubjectCustomIds()).toContain(rootScopedId);
+  });
+
+  test('should list no default group subjects to a group manager outside their groups', async ({
     api,
     apiRequestContext,
     uniqueId
   }) => {
-    await api.createSession(null, { id: `root$ungrouped-${uniqueId}` });
+    await api.createSession(null, { id: `root$default-${uniqueId}` });
     const { credentials } = await api.createUser({
       basePermissionLevel: 'GROUP_MANAGER',
       groupIds: [(await api.createGroup()).id]
     });
     const accessToken = await ApiClient.login(apiRequestContext, credentials);
 
-    const response = await apiRequestContext.get('/api/v1/subjects/ungrouped/custom-ids', {
+    const response = await apiRequestContext.get('/api/v1/subjects/default-group/custom-ids', {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
 
@@ -177,15 +189,16 @@ test.describe('start session', () => {
     await expect(startSessionPage.successMessage).toBeVisible();
   });
 
-  test('should suggest subjects in no group to an admin who belongs to no group', async ({
+  test('should suggest default group subjects to an admin who belongs to no group, even once seen in a group', async ({
     api,
     authenticateAs,
     page,
     uniqueId
   }) => {
-    const identifier = `ungrouped-${uniqueId}`;
+    const identifier = `default-${uniqueId}`;
     // With no current group the form scopes a custom id to the default group, as `root$<id>`.
     await api.createSession(null, { id: `root$${identifier}` });
+    await api.createSession((await api.createGroup()).id, { id: `root$${identifier}` });
     const { credentials } = await api.createUser({ basePermissionLevel: 'ADMIN', groupIds: [] });
     await authenticateAs(credentials);
     await page.goto('/session/start-session');

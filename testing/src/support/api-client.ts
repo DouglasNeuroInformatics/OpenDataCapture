@@ -110,6 +110,15 @@ export class ApiClient {
     );
   }
 
+  /** The ids the start-session form suggests to a user with no group: custom ids scoped to the default group. */
+  async findDefaultGroupSubjectCustomIds(): Promise<string[]> {
+    return this.expectJson<string[]>(
+      this.request.get(`${API}/subjects/default-group/custom-ids`, { headers: this.authHeaders }),
+      200,
+      'find the custom subject ids scoped to the default group'
+    );
+  }
+
   /** Reads a group back as admin, to check whether a write by another role actually took effect. */
   async findGroupById(id: string): Promise<Group> {
     return this.expectJson<Group>(
@@ -149,15 +158,6 @@ export class ApiClient {
       this.request.get(`${API}/subjects/groups/${groupId}/custom-ids`, { headers: this.authHeaders }),
       200,
       `find the custom subject ids of group '${groupId}'`
-    );
-  }
-
-  /** The ids the start-session form suggests to a user with no group: custom-id subjects in no group. */
-  async findUngroupedSubjectCustomIds(): Promise<string[]> {
-    return this.expectJson<string[]>(
-      this.request.get(`${API}/subjects/ungrouped/custom-ids`, { headers: this.authHeaders }),
-      200,
-      'find the custom ids of subjects in no group'
     );
   }
 
