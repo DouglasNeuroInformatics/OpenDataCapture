@@ -9,6 +9,13 @@ import type { EntityOperationOptions } from '@/core/types';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
 
+const PERSONAL_INFO_FIELDS = ['dateOfBirth', 'firstName', 'lastName', 'sex'] as const;
+
+/** A subject identified by personal information has every one of these fields set. */
+const IDENTIFIED_BY_CUSTOM_ID: Prisma.SubjectWhereInput = {
+  OR: PERSONAL_INFO_FIELDS.flatMap((field) => [{ [field]: null }, { [field]: { isSet: false } }])
+};
+
 @Injectable()
 export class SubjectsService {
   constructor(
@@ -176,15 +183,20 @@ export class SubjectsService {
    * field is matched on both `null` and `isSet: false`.
    */
   async findCustomIds(groupId: string, { ability }: EntityOperationOptions = {}): Promise<string[]> {
-    const personalInfoFields = ['dateOfBirth', 'firstName', 'lastName', 'sex'] as const;
     const subjects = await this.subjectModel.findMany({
       select: { id: true },
       where: {
-        AND: [
-          accessibleQuery(ability, 'read', 'Subject'),
-          { groupIds: { has: groupId } },
-          { OR: personalInfoFields.flatMap((field) => [{ [field]: null }, { [field]: { isSet: false } }]) }
-        ]
+        AND: [accessibleQuery(ability, 'read', 'Subject'), { groupIds: { has: groupId } }, IDENTIFIED_BY_CUSTOM_ID]
+      }
+    });
+    return subjects.map((subject) => subject.id);
+  }
+
+  async findUngroupedCustomIds({ ability }: EntityOperationOptions = {}): Promise<string[]> {
+    const subjects = await this.subjectModel.findMany({
+      select: { id: true },
+      where: {
+        AND: [accessibleQuery(ability, 'read', 'Subject'), { groupIds: { isEmpty: true } }, IDENTIFIED_BY_CUSTOM_ID]
       }
     });
     return subjects.map((subject) => subject.id);
