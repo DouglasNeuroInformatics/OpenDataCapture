@@ -23,9 +23,10 @@ describe('subjectCustomIdsQueryOptions', () => {
     expect(get).toHaveBeenCalledWith('/v1/subjects/groups/group-1/custom-ids');
   });
 
-  it('should make no request without a group, so a user with no group is offered no subjects', async () => {
-    await expect(runQuery()).resolves.toStrictEqual([]);
-    expect(get).not.toHaveBeenCalled();
+  it('should request the ungrouped custom ids without a group, so an admin with no group is offered the subjects its sessions create', async () => {
+    get.mockResolvedValueOnce({ data: ['root$a'] });
+    await expect(runQuery()).resolves.toStrictEqual(['root$a']);
+    expect(get).toHaveBeenCalledWith('/v1/subjects/ungrouped/custom-ids');
   });
 
   it('should reject a response that is not a list of ids, so nothing unparsed reaches the form', async () => {
