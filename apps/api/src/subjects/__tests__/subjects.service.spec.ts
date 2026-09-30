@@ -252,29 +252,30 @@ describe('SubjectsService', () => {
     });
   });
 
-  describe('findUngroupedCustomIds', () => {
+  describe('findDefaultGroupCustomIds', () => {
     const findManyArgs = () =>
       subjectModel.findMany.mock.lastCall?.[0] as { select: unknown; where: { AND: unknown[] } };
 
     it('should return only the ids, so no personal information leaves the database', async () => {
       subjectModel.findMany.mockResolvedValueOnce([{ id: 'root$a' }]);
-      await expect(subjectsService.findUngroupedCustomIds()).resolves.toStrictEqual(['root$a']);
+      await expect(subjectsService.findDefaultGroupCustomIds()).resolves.toStrictEqual(['root$a']);
       expect(findManyArgs().select).toStrictEqual({ id: true });
     });
 
-    it('should constrain the query to what the caller may read, so a group manager is not shown ungrouped subjects', async () => {
+    it('should constrain the query to what the caller may read, so a group manager is not shown other groups’ subjects', async () => {
       const ability = createAppAbility([
         { action: 'read', conditions: { groupIds: { hasSome: ['group-1'] } }, subject: 'Subject' }
       ]);
       subjectModel.findMany.mockResolvedValueOnce([]);
-      await subjectsService.findUngroupedCustomIds({ ability });
+      await subjectsService.findDefaultGroupCustomIds({ ability });
       expect(findManyArgs().where.AND[0]).toStrictEqual(accessibleQuery(ability, 'read', 'Subject'));
     });
 
-    it('should match only subjects that belong to no group', async () => {
+    it('should match on the default group scope of the id, so a subject later added to a group is still offered', async () => {
       subjectModel.findMany.mockResolvedValueOnce([]);
-      await subjectsService.findUngroupedCustomIds();
-      expect(findManyArgs().where.AND).toContainEqual({ groupIds: { isEmpty: true } });
+      await subjectsService.findDefaultGroupCustomIds();
+      expect(findManyArgs().where.AND).toContainEqual({ id: { gte: 'root$', lt: 'root%' } });
+      expect(JSON.stringify(findManyArgs().where)).not.toContain('groupIds');
     });
 
     it('should match only subjects identified by a custom id, like the per-group lookup', async () => {
@@ -282,7 +283,7 @@ describe('SubjectsService', () => {
       await subjectsService.findCustomIds('group-1');
       const [, , groupedCustomIdClause] = findManyArgs().where.AND;
       subjectModel.findMany.mockResolvedValueOnce([]);
-      await subjectsService.findUngroupedCustomIds();
+      await subjectsService.findDefaultGroupCustomIds();
       expect(findManyArgs().where.AND).toContainEqual(groupedCustomIdClause);
     });
   });
