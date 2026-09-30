@@ -24,7 +24,7 @@ vi.mock('@/store', () => ({ useAppStore: { getState: () => mocks.store } }));
 
 const runGuard = async () => {
   const beforeLoad = Route.options.beforeLoad as (opts: object) => Promise<void>;
-  const queryClient = { fetchQuery: vi.fn().mockResolvedValue({ isSetup: true }) };
+  const queryClient = { fetchQuery: vi.fn().mockResolvedValue({ activeLanguages: ['en', 'fr'], isSetup: true }) };
   try {
     await beforeLoad({ context: { queryClient } });
   } catch (err) {
