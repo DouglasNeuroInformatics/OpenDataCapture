@@ -64,6 +64,22 @@ export class ApiClient {
     return group;
   }
 
+  /** Assembles a series owned by the group out of the first two forms available, returning its id. */
+  async createSeries(groupId: string, title: string): Promise<string> {
+    const items = (await this.getInstrumentInfo())
+      .flatMap((info) => (info.kind === 'FORM' ? [{ edition: info.internal.edition, name: info.internal.name }] : []))
+      .slice(0, 2);
+    const result = await this.expectJson<{ instrumentId: string; outcome: 'created' }>(
+      this.request.post(`${API}/instruments/series`, {
+        data: { confirmDuplicate: true, details: { title }, groupId, items, language: 'en' },
+        headers: this.authHeaders
+      }),
+      201,
+      'create series'
+    );
+    return result.instrumentId;
+  }
+
   /**
    * Creates a session, and with it the subject it names. A subject seeded this way holds no
    * instrument records, which is what distinguishes it under the "with records only" filter.

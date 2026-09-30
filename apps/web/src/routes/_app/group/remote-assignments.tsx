@@ -14,6 +14,7 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
+import { selectAdministrableInstruments } from '@/utils/administrable-instruments';
 import { getDefaultAssignmentExpiry } from '@/utils/assignment-duration';
 
 type Mode = 'CREATE' | 'DELETE' | 'LANDING';
@@ -74,9 +75,10 @@ const RouteComponent = () => {
     return null;
   }
 
-  const instruments = (instrumentInfoQuery.data ?? [])
-    .filter((instrument) => currentGroup.accessibleInstrumentIds.includes(instrument.id))
-    .map((instrument) => ({ id: instrument.id, title: instrument.details.title }));
+  // The API enforces the same rule, so an instrument missing here would be refused there anyway.
+  const instruments = selectAdministrableInstruments(instrumentInfoQuery.data ?? [], currentGroup).map(
+    (instrument) => ({ id: instrument.id, title: instrument.details.title })
+  );
 
   return (
     <React.Fragment>

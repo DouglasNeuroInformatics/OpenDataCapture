@@ -18,6 +18,7 @@ import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
+import { selectAdministrableInstruments } from '@/utils/administrable-instruments';
 import { getDefaultAssignmentExpiry } from '@/utils/assignment-duration';
 
 /** Slide-over panel shown after an assignment is created, displaying the URL, copy button, and QR code */
@@ -126,11 +127,7 @@ const RouteComponent = () => {
       <WithFallback
         Component={InstrumentShowcase}
         props={{
-          data: currentGroup
-            ? instrumentInfoQuery.data?.filter((instrument) => {
-                return currentGroup.accessibleInstrumentIds.includes(instrument.id);
-              })
-            : instrumentInfoQuery.data,
+          data: instrumentInfoQuery.data && selectAdministrableInstruments(instrumentInfoQuery.data, currentGroup),
           onSelect: (instrument) => {
             setSelectedInstrument(instrument);
             setIsCreateModalOpen(true);

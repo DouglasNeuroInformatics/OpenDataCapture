@@ -26,15 +26,18 @@ import type { WithID } from '@opendatacapture/schemas/core';
 import { $AnyInstrument, $CreateInstrumentData } from '@opendatacapture/schemas/instrument';
 import type {
   $CreateSeriesInstrumentData,
+  $UpdateSeriesInstrumentData,
   CreateSeriesInstrumentResult,
   InstrumentBundleContainer,
   InstrumentInfo,
   ScalarInstrumentBundleContainer,
   ScalarInstrumentInfo,
-  SeriesInstrumentInfo
+  SeriesInstrumentInfo,
+  SeriesInstrumentOverview
 } from '@opendatacapture/schemas/instrument';
 import { pick } from 'lodash-es';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { AppAbility } from '@/auth/auth.types';
 import type { EntityOperationOptions } from '@/core/types';
@@ -49,6 +52,7 @@ type InstrumentVirtualizationContext = {
 };
 
 type InstrumentMetadata = {
+  archivedAt: Date | null;
   createdAt: Date;
   seriesGroupId: null | string;
   sourceRepoId: null | string;
@@ -73,6 +77,7 @@ export class InstrumentsService {
     @InjectModel('Group') private readonly groupModel: Model<'Group'>,
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
+    private readonly auditLogger: AuditLogger,
     private readonly cryptoService: CryptoService,
     private readonly loggingService: LoggingService,
     private readonly virtualizationService: VirtualizationService<InstrumentVirtualizationContext>
@@ -318,7 +323,12 @@ export class InstrumentsService {
     currentUser?: RequestUser,
     requestedGroupId?: string
   ): Promise<InstrumentBundleContainer> {
-    const groupIds = currentUser ? this.resolveGroupIds(currentUser, requestedGroupId) : undefined;
+    // An administrator belongs to no group, yet previews every group's series from the admin pages, so
+    // their bundle lookups are not narrowed to their own groups; `accessibleQuery` still applies.
+    const groupIds =
+      currentUser && !currentUser.ability.can('manage', 'all')
+        ? this.resolveGroupIds(currentUser, requestedGroupId)
+        : undefined;
     const instance = await this.findById(id, { ability: currentUser?.ability }, groupIds);
     if (isScalarInstrument(instance)) {
       return {
@@ -368,84 +378,32 @@ export class InstrumentsService {
   }
 
   async findInfo<TKind extends InstrumentKind>(
-    { allEditions = false, ...query }: InstrumentInfoQuery<TKind> = {},
+    query: InstrumentInfoQuery<TKind> = {},
     currentUser?: RequestUser,
     requestedGroupId?: string
   ): Promise<InstrumentInfo[]> {
-    const options = { ability: currentUser?.ability };
     const groupIds = currentUser ? this.resolveGroupIds(currentUser, requestedGroupId) : undefined;
-    const instances = await this.find(query, options, groupIds);
+    return this.findInfoWithinGroups(query, { ability: currentUser?.ability }, groupIds);
+  }
 
-    const metadataMap = await this.buildInstrumentMetadataMap(instances.map((instance) => instance.id));
-    // Series resolve their `seriesItems` against the scalar instruments they reference. A `kind` filter can
-    // exclude those scalars from `instances`, so when the result set contains series we build the lookup
-    // from the full instrument set instead — otherwise a series' items would resolve to nothing.
-    const scalarSource =
-      query.kind && instances.some(isSeriesInstrument) ? await this.find({}, options, groupIds) : instances;
-    const scalarInstrumentIds = new Map(
-      scalarSource.flatMap((instance) =>
-        isScalarInstrument(instance) && instance.internal
-          ? [[`${instance.internal.name}:${instance.internal.edition}`, instance.id] as const]
-          : []
-      )
-    );
-
-    const results = new Map<string, InstrumentInfo>();
-    for (const instance of instances) {
-      const metadata = metadataMap.get(instance.id);
-      const base = {
-        ...pick(instance, ['__runtimeVersion', 'clientDetails', 'details', 'id', 'language', 'tags']),
-        createdAt: metadata?.createdAt ?? null
-      };
-      // Expose the source repo id whenever the instrument came from a repo (so it can be filtered per
-      // group). The name may be null for legacy instruments imported before names were stored; the
-      // client still treats those as repo-sourced via their id.
-      const sourceRepo = metadata?.sourceRepoId
-        ? { id: metadata.sourceRepoId, name: metadata.sourceRepoName ?? null }
-        : null;
-
-      if (isSeriesInstrument(instance)) {
-        const seriesItems: { id: string }[] = [];
-        for (const { edition, name } of getSeriesInstrumentItems(instance.content)) {
-          const itemId = scalarInstrumentIds.get(`${name}:${edition}`);
-          if (!itemId) {
-            // Callers use `seriesItems` to grant a group access to a series' constituent instruments,
-            // so a silently dropped item becomes a failure part-way through administering the series.
-            this.loggingService.error({
-              message: `Cannot resolve item '${name}' (edition ${edition}) of series instrument '${instance.id}'`,
-              seriesInstrumentId: instance.id
-            });
-            continue;
-          }
-          seriesItems.push({ id: itemId });
-        }
-        const info: SeriesInstrumentInfo = {
-          ...base,
-          kind: 'SERIES',
-          seriesGroupId: metadata?.seriesGroupId ?? null,
-          seriesItems,
-          sourceRepo
-        };
-        results.set(info.id, info);
-        continue;
-      }
-
-      const info: ScalarInstrumentInfo = {
-        ...base,
-        internal: instance.internal,
-        kind: instance.kind,
-        sourceRepo
-      };
-      if (allEditions) {
-        results.set(info.id, info);
-      } else {
-        const currentEntry = results.get(info.internal.name);
-        if (!currentEntry || !('internal' in currentEntry) || info.internal.edition > currentEntry.internal.edition) {
-          results.set(info.internal.name, info);
-        }
-      }
-    }
-    return Array.from(results.values());
+  /**
+   * Every series on the instance, whichever group owns it, with that group's name. Unlike `findInfo`,
+   * this is not narrowed to the caller's groups: it backs the administrators' overview, and an
+   * administrator belongs to no group, so the narrowing would hide every owned series from them.
+   */
+  async findSeriesOverview({ ability }: EntityOperationOptions = {}): Promise<SeriesInstrumentOverview[]> {
+    const infos = await this.findInfoWithinGroups({ kind: 'SERIES' }, { ability });
+    const seriesInfos = infos.filter((info): info is SeriesInstrumentInfo => info.kind === 'SERIES');
+    const ownerIds = [...new Set(seriesInfos.flatMap((info) => (info.seriesGroupId ? [info.seriesGroupId] : [])))];
+    const groups = await this.groupModel.findMany({
+      select: { id: true, name: true },
+      where: { AND: [accessibleQuery(ability, 'read', 'Group')], id: { in: ownerIds } }
+    });
+    const groupsById = new Map(groups.map((group) => [group.id, group]));
+    return seriesInfos.map((info) => ({
+      ...info,
+      seriesGroup: info.seriesGroupId ? (groupsById.get(info.seriesGroupId) ?? null) : null
+    }));
   }
 
   generateInstrumentId(instrument: AnyInstrument, seriesGroupId?: string) {
@@ -500,6 +458,41 @@ export class InstrumentsService {
   }
 
   /**
+   * Retire a series from new sessions and assignments, or return it to service. Already-collected
+   * records and outstanding assignments are deliberately left alone, so archiving loses no data and
+   * is fully reversible. Setting the state it already has changes nothing and is not audited.
+   */
+  async updateSeriesArchive(
+    id: string,
+    { isArchived }: $UpdateSeriesInstrumentData,
+    currentUser: RequestUser
+  ): Promise<{ archivedAt: Date | null; id: string }> {
+    const instrument = await this.instrumentModel.findFirst({
+      where: { AND: [accessibleQuery(currentUser.ability, 'update', 'Instrument')], id }
+    });
+    if (!instrument) {
+      throw new NotFoundException(`Failed to find instrument with ID: ${id}`);
+    }
+    const instance = await this.getInstrumentInstance(instrument);
+    if (!isSeriesInstrument(instance)) {
+      throw new ForbiddenException('Only series instruments can be archived');
+    }
+    if (Boolean(instrument.archivedAt) === isArchived) {
+      return { archivedAt: instrument.archivedAt, id };
+    }
+    const updated = await this.instrumentModel.update({
+      data: { archivedAt: isArchived ? new Date() : null },
+      where: { id }
+    });
+    await this.auditLogger.log(isArchived ? 'ARCHIVE' : 'UNARCHIVE', 'INSTRUMENT', {
+      groupId: instrument.seriesGroupId,
+      metadata: { instrumentId: id, title: this.describeTitle(instance.details.title) },
+      userId: currentUser.id
+    });
+    return { archivedAt: updated.archivedAt, id };
+  }
+
+  /**
    * Map of instrument id -> the stored columns `findInfo` reports but cannot read off an evaluated
    * instance: repository provenance, the owning group of a generated series, and when it was stored.
    * Scoped to the requested ids and selecting only those fields, so it never loads full instrument
@@ -511,11 +504,19 @@ export class InstrumentsService {
       return map;
     }
     const instruments = await this.instrumentModel.findMany({
-      select: { createdAt: true, id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
+      select: {
+        archivedAt: true,
+        createdAt: true,
+        id: true,
+        seriesGroupId: true,
+        sourceRepoId: true,
+        sourceRepoName: true
+      },
       where: { id: { in: ids } }
     });
     for (const inst of instruments) {
       map.set(inst.id, {
+        archivedAt: inst.archivedAt,
         createdAt: inst.createdAt,
         seriesGroupId: inst.seriesGroupId,
         sourceRepoId: inst.sourceRepoId,
@@ -534,6 +535,99 @@ export class InstrumentsService {
       InstrumentLanguage,
       string[]
     >;
+  }
+
+  /**
+   * The single source of this message. `InstrumentReposService.importInstrumentFromDir` reads the id
+   * back out of it to associate an already-stored instrument with the repository that provides it, so
+   * the id must stay quoted and the two throw sites must stay identical.
+   */
+  /** Audit metadata holds plain strings, so a multilingual title is recorded in English when it has one. */
+  private describeTitle(title: SeriesInstrument['details']['title']): string {
+    if (typeof title === 'string') {
+      return title;
+    }
+    return title.en ?? Object.values(title).join(' / ');
+  }
+
+  private async findInfoWithinGroups<TKind extends InstrumentKind>(
+    { allEditions = false, ...query }: InstrumentInfoQuery<TKind>,
+    options: EntityOperationOptions,
+    groupIds?: string[]
+  ): Promise<InstrumentInfo[]> {
+    const instances = await this.find(query, options, groupIds);
+
+    const metadataMap = await this.buildInstrumentMetadataMap(instances.map((instance) => instance.id));
+    // Series resolve their `seriesItems` against the scalar instruments they reference. A `kind` filter can
+    // exclude those scalars from `instances`, so when the result set contains series we build the lookup
+    // from the full instrument set instead — otherwise a series' items would resolve to nothing.
+    const scalarSource =
+      query.kind && instances.some(isSeriesInstrument) ? await this.find({}, options, groupIds) : instances;
+    const scalarInstrumentIds = new Map(
+      scalarSource.flatMap((instance) =>
+        isScalarInstrument(instance) && instance.internal
+          ? [[`${instance.internal.name}:${instance.internal.edition}`, instance.id] as const]
+          : []
+      )
+    );
+
+    const results = new Map<string, InstrumentInfo>();
+    for (const instance of instances) {
+      const metadata = metadataMap.get(instance.id);
+      const base = {
+        ...pick(instance, ['__runtimeVersion', 'clientDetails', 'details', 'id', 'language', 'tags']),
+        createdAt: metadata?.createdAt ?? null
+      };
+      // Expose the source repo id whenever the instrument came from a repo (so it can be filtered per
+      // group). The name may be null for legacy instruments imported before names were stored; the
+      // client still treats those as repo-sourced via their id.
+      const sourceRepo = metadata?.sourceRepoId
+        ? { id: metadata.sourceRepoId, name: metadata.sourceRepoName ?? null }
+        : null;
+
+      if (isSeriesInstrument(instance)) {
+        const seriesItems: { id: string }[] = [];
+        for (const { edition, name } of getSeriesInstrumentItems(instance.content)) {
+          const itemId = scalarInstrumentIds.get(`${name}:${edition}`);
+          if (!itemId) {
+            // Callers use `seriesItems` to grant a group access to a series' constituent instruments,
+            // so a silently dropped item becomes a failure part-way through administering the series.
+            this.loggingService.error({
+              message: `Cannot resolve item '${name}' (edition ${edition}) of series instrument '${instance.id}'`,
+              seriesInstrumentId: instance.id
+            });
+            continue;
+          }
+          seriesItems.push({ id: itemId });
+        }
+        const info: SeriesInstrumentInfo = {
+          ...base,
+          archivedAt: metadata?.archivedAt ?? null,
+          kind: 'SERIES',
+          seriesGroupId: metadata?.seriesGroupId ?? null,
+          seriesItems,
+          sourceRepo
+        };
+        results.set(info.id, info);
+        continue;
+      }
+
+      const info: ScalarInstrumentInfo = {
+        ...base,
+        internal: instance.internal,
+        kind: instance.kind,
+        sourceRepo
+      };
+      if (allEditions) {
+        results.set(info.id, info);
+      } else {
+        const currentEntry = results.get(info.internal.name);
+        if (!currentEntry || !('internal' in currentEntry) || info.internal.edition > currentEntry.internal.edition) {
+          results.set(info.internal.name, info);
+        }
+      }
+    }
+    return Array.from(results.values());
   }
 
   /**
@@ -629,11 +723,6 @@ export class InstrumentsService {
     );
   }
 
-  /**
-   * The single source of this message. `InstrumentReposService.importInstrumentFromDir` reads the id
-   * back out of it to associate an already-stored instrument with the repository that provides it, so
-   * the id must stay quoted and the two throw sites must stay identical.
-   */
   private instrumentExistsConflict(id: string): ConflictException {
     return new ConflictException(`Instrument with ID '${id}' already exists!`);
   }

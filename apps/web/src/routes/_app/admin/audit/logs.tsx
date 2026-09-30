@@ -23,7 +23,7 @@ type DateFormat = 'iso' | 'local';
 
 type SortOrder = 'asc' | 'desc';
 
-const ACTIONS: $AuditLogAction[] = ['CREATE', 'DELETE', 'UPDATE', 'LOGIN', 'SEND_EMAIL'];
+const ACTIONS: $AuditLogAction[] = ['CREATE', 'DELETE', 'UPDATE', 'ARCHIVE', 'UNARCHIVE', 'LOGIN', 'SEND_EMAIL'];
 
 const ENTITIES: $AuditLogEntity[] = [
   'ASSIGNMENT',

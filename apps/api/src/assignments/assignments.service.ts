@@ -43,6 +43,7 @@ export class AssignmentsService {
   constructor(
     @InjectModel('Assignment') private readonly assignmentModel: Model<'Assignment'>,
     @InjectModel('Group') private readonly groupModel: Model<'Group'>,
+    @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
     @InjectModel('Subject') private readonly subjectModel: Model<'Subject'>,
     configService: ConfigService,
     private readonly auditLogger: AuditLogger,
@@ -84,6 +85,11 @@ export class AssignmentsService {
       );
     } else if (!currentUser.ability.can('create', forcedAppSubject('Assignment', { groupId: null }))) {
       throw new ForbiddenException('Insufficient permissions to create an assignment outside a group');
+    } else if ((await this.findArchivedInstrumentIds([instrumentId])).length > 0) {
+      throw new UnprocessableEntityException({
+        code: 'BULK_ASSIGNMENT_REFUSED',
+        issues: [{ instrumentIds: [instrumentId], kind: 'INSTRUMENT_UNAVAILABLE' }]
+      } satisfies BulkAssignmentFailure);
     }
     const { assignment, publicKey } = await this.stageAssignment({ expiresAt, groupId, instrumentId, subjectId });
     try {
@@ -232,6 +238,18 @@ export class AssignmentsService {
   }
 
   /**
+   * Which of the given instruments an administrator has archived. Unscoped by the caller's ability:
+   * it only narrows ids the caller already named, and every other check on them is made separately.
+   */
+  private async findArchivedInstrumentIds(instrumentIds: string[]): Promise<string[]> {
+    const archived = await this.instrumentModel.findMany({
+      select: { id: true },
+      where: { archivedAt: { not: null }, id: { in: instrumentIds } }
+    });
+    return archived.map(({ id }) => id);
+  }
+
+  /**
    * Every authorization and validity check a grouped assignment depends on, in one place so
    * preflight, bulk create and single create cannot drift apart. Throws with all issues attached;
    * returns the resolved request when there are none.
@@ -254,10 +272,14 @@ export class AssignmentsService {
     const issues: BulkAssignmentIssue[] = [];
 
     // The group's own opt-in list is the authority: an instrument existing is not permission to
-    // assign it here.
+    // assign it here. An archived series stays on that list, so it can be unarchived without every
+    // group opting back in, and is refused separately.
     const accessibleInstrumentIds = new Set(group.accessibleInstrumentIds);
     const instrumentIds = timepoints.map(({ instrumentId }) => instrumentId);
-    const unavailableInstrumentIds = instrumentIds.filter((id) => !accessibleInstrumentIds.has(id));
+    const archivedInstrumentIds = new Set(await this.findArchivedInstrumentIds(instrumentIds));
+    const unavailableInstrumentIds = [
+      ...new Set(instrumentIds.filter((id) => !accessibleInstrumentIds.has(id) || archivedInstrumentIds.has(id)))
+    ];
     if (unavailableInstrumentIds.length > 0) {
       issues.push({ instrumentIds: unavailableInstrumentIds, kind: 'INSTRUMENT_UNAVAILABLE' });
     }
