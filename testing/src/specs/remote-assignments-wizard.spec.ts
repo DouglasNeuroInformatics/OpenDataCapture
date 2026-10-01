@@ -50,8 +50,8 @@ test.describe('remote assignments wizard', () => {
     }
 
     await authenticateAs(credentials);
-    await page.goto('/group/remote-assignments');
-    await expect(page).toHaveURL('/group/remote-assignments');
+    await page.goto('/group/remote-assignments?mode=create');
+    await expect(page).toHaveURL(/\/group\/remote-assignments\?mode=create/);
     const wizardPage = new RemoteAssignmentsPage(page);
     await expect(wizardPage.wizard).toBeVisible();
 

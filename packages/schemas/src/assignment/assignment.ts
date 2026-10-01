@@ -177,6 +177,17 @@ const $MutateAssignmentResponseBody = z.object({
   success: z.boolean()
 });
 
+type DeleteBulkAssignmentsData = z.infer<typeof $DeleteBulkAssignmentsData>;
+const $DeleteBulkAssignmentsData = z.object({
+  ids: z.array(z.string().min(1)).min(1)
+});
+
+type DeleteBulkAssignmentsResult = z.infer<typeof $DeleteBulkAssignmentsResult>;
+const $DeleteBulkAssignmentsResult = z.object({
+  deletedCount: z.number().int().nonnegative(),
+  failedIds: z.array(z.string())
+});
+
 type UpdateAssignmentData = z.infer<typeof $UpdateAssignmentData>;
 const $UpdateAssignmentData = z.object({
   status: $AssignmentStatus
@@ -201,6 +212,8 @@ export type {
   CreateBulkAssignmentsData,
   CreateRemoteAssignmentInputData,
   CreateRemoteAssignmentsInputData,
+  DeleteBulkAssignmentsData,
+  DeleteBulkAssignmentsResult,
   MutateAssignmentResponseBody,
   RemoteAssignment,
   UpdateAssignmentData,
@@ -219,6 +232,8 @@ export {
   $CreateBulkAssignmentsData,
   $CreateRemoteAssignmentData,
   $CreateRemoteAssignmentsData,
+  $DeleteBulkAssignmentsData,
+  $DeleteBulkAssignmentsResult,
   $MutateAssignmentResponseBody,
   $RemoteAssignment,
   $UpdateAssignmentData,

@@ -138,13 +138,44 @@ export class AssignmentsService {
     return staged.map(({ assignment }) => assignment);
   }
 
+  async deleteBulk(ids: string[], { ability }: EntityOperationOptions = {}) {
+    const assignments = await this.assignmentModel.findMany({
+      where: {
+        AND: [accessibleQuery(ability, 'delete', 'Assignment')],
+        id: { in: ids },
+        status: { in: ['OUTSTANDING', 'EXPIRED'] }
+      }
+    });
+
+    const deletedIds: string[] = [];
+    const failedIds: string[] = [];
+
+    for (const assignment of assignments) {
+      try {
+        if (assignment.status === 'OUTSTANDING') {
+          await this.gatewayService.deleteRemoteAssignment(assignment.id);
+        }
+        await this.assignmentModel.delete({ where: { id: assignment.id } });
+        deletedIds.push(assignment.id);
+      } catch (err) {
+        this.loggingService.error({
+          error: err,
+          message: `Failed to delete assignment ${assignment.id}`
+        });
+        failedIds.push(assignment.id);
+      }
+    }
+
+    return { deletedCount: deletedIds.length, failedIds };
+  }
+
   async find(
-    { subjectId }: { subjectId?: string } = {},
+    { groupId, subjectId }: { groupId?: string; subjectId?: string } = {},
     { ability }: EntityOperationOptions = {}
   ): Promise<Assignment[]> {
     return this.assignmentModel.findMany({
       where: {
-        AND: [accessibleQuery(ability, 'read', 'Assignment'), { subjectId }]
+        AND: [accessibleQuery(ability, 'read', 'Assignment'), { groupId, subjectId }]
       }
     });
   }

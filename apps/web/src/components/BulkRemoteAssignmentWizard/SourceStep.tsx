@@ -54,6 +54,7 @@ const SortableHeader = ({ column, label }: { column: TanstackTable.Column<Picker
 };
 
 type SourceStepProps = {
+  onBack?: () => void;
   onParsed: (parsed: BulkParseResult) => void;
   /** Selection is held by the wizard, so stepping away and back does not discard it. */
   onSelectedChange: (subjectIds: string[]) => void;
@@ -66,6 +67,7 @@ type SourceStepProps = {
 };
 
 export const SourceStep = ({
+  onBack,
   onParsed,
   onSelectedChange,
   onStepChange,
@@ -142,20 +144,30 @@ export const SourceStep = ({
     onSelectedChange([...next]);
   };
 
-  // A dropped file advances on its own, so only the other two modes have an action to offer.
-  const footers: { [K in SourceMode]?: React.ReactNode } = {
+  const backButton = onBack && (
+    <Button className="mr-auto" type="button" variant="outline" onClick={onBack}>
+      {t({ en: 'Back', es: 'Volver', fr: 'Retour' })}
+    </Button>
+  );
+
+  const footers: { [K in SourceMode]: React.ReactNode } = {
+    FILE: backButton ?? null,
     PASTE: (
-      <Button
-        data-testid="bulk-parse-pasted"
-        disabled={pasted.trim().length === 0}
-        type="button"
-        onClick={() => void run(() => parseDelimitedText(pasted))}
-      >
-        {t({ en: 'Use Pasted Data', es: 'Usar los datos pegados', fr: 'Utiliser les données collées' })}
-      </Button>
+      <React.Fragment>
+        {backButton}
+        <Button
+          data-testid="bulk-parse-pasted"
+          disabled={pasted.trim().length === 0}
+          type="button"
+          onClick={() => void run(() => parseDelimitedText(pasted))}
+        >
+          {t({ en: 'Use Pasted Data', es: 'Usar los datos pegados', fr: 'Utiliser les données collées' })}
+        </Button>
+      </React.Fragment>
     ),
     SELECT: (
       <React.Fragment>
+        {backButton}
         {selected.size > BULK_ASSIGNMENT_MAX_SUBJECTS && (
           <p className="text-destructive mr-auto text-sm">
             {t({

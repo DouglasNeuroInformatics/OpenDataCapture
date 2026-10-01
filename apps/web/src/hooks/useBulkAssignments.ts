@@ -36,9 +36,10 @@ export function useBulkAssignmentPreflightMutation() {
   return useMutation({
     // A refusal is a considered answer from the server, not a transient fault - retrying would
     // re-run the same validation and produce the same refusal.
-    meta: { disableDefaultErrorNotification: true },
     mutationFn: async (data: BulkAssignmentPreflightData) => {
-      const response = await axios.post('/v1/assignments/bulk/preflight', data);
+      const response = await axios.post('/v1/assignments/bulk/preflight', data, {
+        meta: { disableDefaultErrorNotification: true }
+      });
       return $BulkAssignmentPreflightResult.parse(response.data);
     },
     retry: false,
@@ -54,9 +55,10 @@ export function useCreateBulkAssignmentsMutation() {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
-    meta: { disableDefaultErrorNotification: true },
     mutationFn: async (data: CreateBulkAssignmentsData) => {
-      const response = await axios.post('/v1/assignments/bulk', data);
+      const response = await axios.post('/v1/assignments/bulk', data, {
+        meta: { disableDefaultErrorNotification: true }
+      });
       return $Assignment.array().parse(response.data);
     },
     onSuccess() {

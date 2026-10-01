@@ -15,7 +15,7 @@ export const ErrorList = ({ errors }: { errors: BulkParseError[] }) => {
   }
   return (
     <div
-      className="border-destructive/30 bg-destructive/10 text-destructive rounded-md border p-4"
+      className="bg-destructive text-destructive-foreground rounded-md border p-4"
       data-testid="bulk-error-list"
       role="alert"
     >

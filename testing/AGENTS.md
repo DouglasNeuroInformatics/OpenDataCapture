@@ -72,7 +72,7 @@ A page object is only reachable from a spec once it is registered in the `pageMo
 | `appState`             | test option | localStorage first-run gating, seeded for every test; defaults to accepted                         |
 | `uniqueId`             | test        | Short random suffix for seeded data                                                                |
 | `api`                  | worker      | `ApiClient` as admin — `createGroup()` / `createUser()` / `setUserPermissions()` for preconditions |
-| `isolatedGroupManager` | test        | Authenticates into a group created for this test alone; returns the group                         |
+| `isolatedGroupManager` | test        | Authenticates into a group created for this test alone; returns the group                          |
 | `roleAccount(role)`    | worker      | Seeds a group + user per role once, then caches its token and username                             |
 | `apiRequestContext`    | worker      | Raw `APIRequestContext` on the web origin, for driving the API directly                            |
 

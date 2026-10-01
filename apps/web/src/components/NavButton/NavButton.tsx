@@ -5,16 +5,17 @@ import { useNavigate } from '@tanstack/react-router';
 
 import type { NavItem } from '@/hooks/useNavItems';
 
-type NavButtonProps = Omit<NavItem, 'children' | 'url'> & {
+type NavButtonProps = Omit<NavItem, 'children' | 'search' | 'url'> & {
   activeClassName?: string;
   className?: string;
   isActive: boolean;
-  onClick?: (path: string) => void;
+  onClick?: (path: string, search?: { [key: string]: string }) => void;
+  search?: { [key: string]: string };
   url: string;
 };
 
 export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(function NavButton(
-  { activeClassName, className, disabled, icon: Icon, isActive, label, onClick, url, ...props },
+  { activeClassName, className, disabled, icon: Icon, isActive, label, onClick, search, url, ...props },
   ref
 ) {
   const navigate = useNavigate();
@@ -34,9 +35,9 @@ export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(fun
       type="button"
       onClick={() => {
         if (onClick) {
-          onClick(url);
+          onClick(url, search);
         } else {
-          void navigate({ to: url });
+          void navigate({ search: search, to: url });
         }
       }}
       {...props}
