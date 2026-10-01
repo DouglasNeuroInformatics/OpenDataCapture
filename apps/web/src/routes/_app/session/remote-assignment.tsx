@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Dialog, Form, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
-import type { Assignment, CreateAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { $CreateAssignmentData, Assignment } from '@opendatacapture/schemas/assignment';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod/v4';
@@ -189,7 +189,7 @@ const RouteComponent = () => {
                     fr: "La date d'expiration doit être dans le futur"
                   })
                 })
-              }) satisfies z.ZodType<Pick<CreateAssignmentData, 'expiresAt'>>
+              }) satisfies z.ZodType<Pick<$CreateAssignmentData, 'expiresAt'>>
             }
             onSubmit={async ({ expiresAt }) => {
               const created = await createAssignmentMutation.mutateAsync({

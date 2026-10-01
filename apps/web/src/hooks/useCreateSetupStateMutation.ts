@@ -1,5 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { InitAppOptions } from '@opendatacapture/schemas/setup';
+import type { $InitAppOptions } from '@opendatacapture/schemas/setup';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -9,7 +9,7 @@ export function useCreateSetupStateMutation() {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
-    mutationFn: (data: InitAppOptions) =>
+    mutationFn: (data: $InitAppOptions) =>
       axios.post('/v1/setup', data, {
         meta: {
           disableDefaultTimeout: true

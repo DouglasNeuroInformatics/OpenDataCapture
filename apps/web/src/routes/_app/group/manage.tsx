@@ -17,7 +17,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/react-core';
 import type { ScalarInstrumentInternal } from '@opendatacapture/runtime-core';
 import { $RegexString, toInstrumentAuthoringLanguage } from '@opendatacapture/schemas/core';
-import type { UpdateGroupData } from '@opendatacapture/schemas/group';
+import type { $UpdateGroupData } from '@opendatacapture/schemas/group';
 import type { $CreateSeriesInstrumentData } from '@opendatacapture/schemas/instrument';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
@@ -127,7 +127,7 @@ type ManageGroupFormProps = {
     instruments: CategorizedInstruments;
     settingsInitialValues: SettingsValues;
   };
-  onSubmit: (data: Partial<UpdateGroupData>) => Promisable<any>;
+  onSubmit: (data: Partial<$UpdateGroupData>) => Promisable<any>;
   readOnly: boolean;
 };
 

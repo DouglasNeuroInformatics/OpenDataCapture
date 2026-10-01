@@ -50,7 +50,7 @@ const $UniqueStrings = z
   .refine((values) => new Set(values).size === values.length, { message: 'Values must be unique' });
 
 /** The DTO transferred from the web client to the core API when creating an assignment */
-type CreateAssignmentData = z.infer<typeof $CreateAssignmentData>;
+type $CreateAssignmentData = z.infer<typeof $CreateAssignmentData>;
 const $CreateAssignmentData = z.object({
   expiresAt: $FutureDate,
   groupId: z.string().nullish(),
@@ -86,10 +86,10 @@ const $BulkAssignmentRequestBase = z.object({
     })
 });
 
-type BulkAssignmentPreflightData = z.infer<typeof $BulkAssignmentPreflightData>;
+type $BulkAssignmentPreflightData = z.infer<typeof $BulkAssignmentPreflightData>;
 const $BulkAssignmentPreflightData = $BulkAssignmentRequestBase;
 
-type CreateBulkAssignmentsData = z.infer<typeof $CreateBulkAssignmentsData>;
+type $CreateBulkAssignmentsData = z.infer<typeof $CreateBulkAssignmentsData>;
 const $CreateBulkAssignmentsData = $BulkAssignmentRequestBase;
 
 /**
@@ -177,7 +177,7 @@ const $MutateAssignmentResponseBody = z.object({
   success: z.boolean()
 });
 
-type DeleteBulkAssignmentsData = z.infer<typeof $DeleteBulkAssignmentsData>;
+type $DeleteBulkAssignmentsData = z.infer<typeof $DeleteBulkAssignmentsData>;
 const $DeleteBulkAssignmentsData = z.object({
   ids: z.array(z.string().min(1)).min(1)
 });
@@ -188,7 +188,7 @@ const $DeleteBulkAssignmentsResult = z.object({
   failedIds: z.array(z.string())
 });
 
-type UpdateAssignmentData = z.infer<typeof $UpdateAssignmentData>;
+type $UpdateAssignmentData = z.infer<typeof $UpdateAssignmentData>;
 const $UpdateAssignmentData = z.object({
   status: $AssignmentStatus
 });
@@ -205,18 +205,13 @@ export type {
   AssignmentStatus,
   BulkAssignmentFailure,
   BulkAssignmentIssue,
-  BulkAssignmentPreflightData,
   BulkAssignmentPreflightResult,
   BulkAssignmentTimepoint,
-  CreateAssignmentData,
-  CreateBulkAssignmentsData,
   CreateRemoteAssignmentInputData,
   CreateRemoteAssignmentsInputData,
-  DeleteBulkAssignmentsData,
   DeleteBulkAssignmentsResult,
   MutateAssignmentResponseBody,
   RemoteAssignment,
-  UpdateAssignmentData,
   UpdateRemoteAssignmentData
 };
 

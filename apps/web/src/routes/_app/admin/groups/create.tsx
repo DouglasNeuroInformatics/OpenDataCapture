@@ -1,7 +1,6 @@
 import { Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $CreateGroupData } from '@opendatacapture/schemas/group';
-import type { CreateGroupData } from '@opendatacapture/schemas/group';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -12,7 +11,7 @@ const RouteComponent = () => {
   const navigate = useNavigate();
   const createGroupMutation = useCreateGroupMutation();
 
-  const handleSubmit = (data: CreateGroupData) => {
+  const handleSubmit = (data: $CreateGroupData) => {
     createGroupMutation.mutate({ data });
     void navigate({ to: '..' });
   };

@@ -1,4 +1,4 @@
-import type { InitAppOptions } from '@opendatacapture/schemas/setup';
+import type { $InitAppOptions } from '@opendatacapture/schemas/setup';
 import type { Locator, Page } from '@playwright/test';
 
 import { RootPage } from './__root.page';
@@ -12,7 +12,7 @@ export class SetupPage extends RootPage {
     this.setupForm = page.getByTestId('setup-form');
   }
 
-  async fillSetupForm({ admin, dummySubjectCount, recordsPerSubject }: InitAppOptions) {
+  async fillSetupForm({ admin, dummySubjectCount, recordsPerSubject }: $InitAppOptions) {
     await this.setupForm.locator('input[name="firstName"]').fill(admin.firstName);
     await this.setupForm.locator('input[name="lastName"]').fill(admin.lastName);
     await this.setupForm.locator('input[name="username"]').fill(admin.username);

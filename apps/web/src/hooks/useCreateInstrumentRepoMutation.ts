@@ -1,5 +1,5 @@
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
+import type { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -12,7 +12,7 @@ export function useCreateInstrumentRepoMutation() {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const { t } = useTranslation();
   return useMutation({
-    mutationFn: ({ data }: { data: CreateInstrumentRepoData }) =>
+    mutationFn: ({ data }: { data: $CreateInstrumentRepoData }) =>
       axios.post('/v1/instrument-repos', data, { meta: { disableDefaultErrorNotification: true } }),
     onError(err) {
       addNotification({

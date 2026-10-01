@@ -1,12 +1,12 @@
-import type { Assignment, CreateAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { $CreateAssignmentData, Assignment } from '@opendatacapture/schemas/assignment';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Permissions } from '@opendatacapture/schemas/core';
-import type { CreateGroupData, Group } from '@opendatacapture/schemas/group';
+import type { $CreateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
-import type { CreateSessionData, Session } from '@opendatacapture/schemas/session';
-import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { CreateUserData, UpdateUserData, User } from '@opendatacapture/schemas/user';
+import type { $CreateSessionData, Session } from '@opendatacapture/schemas/session';
+import type { $CreateSubjectData } from '@opendatacapture/schemas/subject';
+import type { $CreateUserData, $UpdateUserData, User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
 import { E2E_MAIL_CONFIG, SEEDED_USER_PASSWORD } from './constants';
@@ -40,7 +40,7 @@ export class ApiClient {
   }
 
   /** Creates a remote assignment through the single-assignment route the web app uses. */
-  async createAssignment(data: CreateAssignmentData): Promise<Assignment> {
+  async createAssignment(data: $CreateAssignmentData): Promise<Assignment> {
     return this.expectJson<Assignment>(
       this.request.post(`${API}/assignments`, { data, headers: this.authHeaders }),
       201,
@@ -49,8 +49,8 @@ export class ApiClient {
   }
 
   /** Creates a group and grants it access to every available instrument, so seeded users can use them. */
-  async createGroup(overrides: Partial<CreateGroupData> = {}): Promise<Group> {
-    const data: CreateGroupData = { name: `Group ${randomId()}`, type: 'CLINICAL', ...overrides };
+  async createGroup(overrides: Partial<$CreateGroupData> = {}): Promise<Group> {
+    const data: $CreateGroupData = { name: `Group ${randomId()}`, type: 'CLINICAL', ...overrides };
     const group = await this.expectJson<Group>(
       this.request.post(`${API}/groups`, { data, headers: this.authHeaders }),
       201,
@@ -68,8 +68,8 @@ export class ApiClient {
    * Creates a session, and with it the subject it names. A subject seeded this way holds no
    * instrument records, which is what distinguishes it under the "with records only" filter.
    */
-  async createSession(groupId: null | string, subjectData: CreateSubjectData): Promise<Session> {
-    const data: CreateSessionData = { date: new Date(), groupId, subjectData, type: 'IN_PERSON' };
+  async createSession(groupId: null | string, subjectData: $CreateSubjectData): Promise<Session> {
+    const data: $CreateSessionData = { date: new Date(), groupId, subjectData, type: 'IN_PERSON' };
     return this.expectJson<Session>(
       this.request.post(`${API}/sessions`, { data, headers: this.authHeaders }),
       201,
@@ -84,10 +84,10 @@ export class ApiClient {
   }
 
   /** Creates a user (GROUP_MANAGER by default) and returns the login credentials for it. */
-  async createUser(overrides: Partial<CreateUserData> = {}): Promise<{ credentials: $LoginCredentials; user: User }> {
+  async createUser(overrides: Partial<$CreateUserData> = {}): Promise<{ credentials: $LoginCredentials; user: User }> {
     const username = overrides.username ?? `user_${randomId()}`;
     const password = overrides.password ?? SEEDED_USER_PASSWORD;
-    const data: CreateUserData = {
+    const data: $CreateUserData = {
       basePermissionLevel: 'GROUP_MANAGER',
       firstName: 'Test',
       groupIds: [],
@@ -201,7 +201,7 @@ export class ApiClient {
   }
 
   /** Updates a user's profile fields, which is everything except their permissions. */
-  async updateUser(id: string, data: Partial<UpdateUserData>): Promise<User> {
+  async updateUser(id: string, data: Partial<$UpdateUserData>): Promise<User> {
     const response = await this.request.patch(`${API}/users/${id}`, { data, headers: this.authHeaders });
     if (!response.ok()) {
       throw new Error(`Failed to update user '${id}' (${response.status()}): ${await response.text()}`);
