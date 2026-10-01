@@ -106,6 +106,9 @@ external database, and nothing to start by hand. It also starts the playground t
 by absolute URL from `playgroundURL` in `src/support/env.ts`: the playground is not an `apps/web`
 route, so `src/pages/playground/index.page.ts` extends nothing and is not in `pageModels`. Its
 preview is an iframe on the other loopback name, so the spec drives it through a `FrameLocator`.
+`src/specs/api-docs.spec.ts` likewise reaches the API reference by absolute URL, from `apiURL`: it
+is served from the root of the API, and its Redoc page requests `/spec.json`, which the web origin's
+`/api` proxy does not route.
 
 Projects: `setup` (with `teardown` attached), `chromium` (every spec), and `firefox`, which greps
 `/@smoke/`. **Cross-browser coverage exists only for tests whose title contains `@smoke`** — add the
