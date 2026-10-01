@@ -64,7 +64,10 @@ export class ApiClient {
     return group;
   }
 
-  /** Creates a session, and with it the subject it names. */
+  /**
+   * Creates a session, and with it the subject it names. A subject seeded this way holds no
+   * instrument records, which is what distinguishes it under the "with records only" filter.
+   */
   async createSession(groupId: null | string, subjectData: CreateSubjectData): Promise<Session> {
     const data: CreateSessionData = { date: new Date(), groupId, subjectData, type: 'IN_PERSON' };
     return this.expectJson<Session>(
