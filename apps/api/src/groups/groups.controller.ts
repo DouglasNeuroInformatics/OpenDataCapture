@@ -1,15 +1,12 @@
-import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import { ApiOperation, CurrentUser } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { $CreateGroupData, $UpdateGroupData } from '@opendatacapture/schemas/group';
 
 import type { AppAbility } from '@/auth/auth.types';
 import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorator';
 
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
 import { GroupsService } from './groups.service';
 
-@ApiTags('Groups')
 @Controller('groups')
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
@@ -21,8 +18,8 @@ export class GroupsController {
   @ApiOperation({ summary: 'Create Group' })
   @Post()
   @RouteAccess(ADMIN_ONLY)
-  create(@Body() createGroupDto: CreateGroupDto) {
-    return this.groupsService.create(createGroupDto);
+  create(@Body() data: $CreateGroupData) {
+    return this.groupsService.create(data);
   }
 
   @ApiOperation({ summary: 'Delete Group' })
@@ -49,7 +46,7 @@ export class GroupsController {
   @ApiOperation({ summary: 'Update Group' })
   @Patch(':id')
   @RouteAccess({ action: 'update', subject: 'Group' })
-  updateById(@Param('id') id: string, @Body() update: UpdateGroupDto, @CurrentUser('ability') ability?: AppAbility) {
+  updateById(@Param('id') id: string, @Body() update: $UpdateGroupData, @CurrentUser('ability') ability?: AppAbility) {
     return this.groupsService.updateById(id, update, { ability });
   }
 }

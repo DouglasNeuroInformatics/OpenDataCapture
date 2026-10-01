@@ -15,14 +15,14 @@ import {
   MAIL_TRANSPORT_TIMEOUTS
 } from '@opendatacapture/schemas/mail';
 import type {
+  $TestMailData,
+  $UpdateMailSettingsData,
   EmailDeliveryResult,
   MailConfig,
   MailSettings,
   MailTemplate,
-  TestMailData,
   TestMailResult,
-  UpdateMailConfigData,
-  UpdateMailSettingsData
+  UpdateMailConfigData
 } from '@opendatacapture/schemas/mail';
 import type { SetupState } from '@prisma/client';
 import { createTransport } from 'nodemailer';
@@ -153,7 +153,7 @@ export class MailService {
    * Test the SMTP connection, optionally sending a real message to `recipient`. When `config` is
    * supplied the (possibly unsaved) values are tested; otherwise the saved configuration is used.
    */
-  async test({ config, recipient }: TestMailData): Promise<TestMailResult> {
+  async test({ config, recipient }: $TestMailData): Promise<TestMailResult> {
     const { config: saved } = await this.readState();
     if (this.requiresNewPassword(config, saved)) {
       return { error: 'PASSWORD_REQUIRED', success: false };
@@ -185,7 +185,7 @@ export class MailService {
    * preserves the stored one so the secret never has to leave the server. Returns the
    * admin-facing settings (password stripped).
    */
-  async updateSettings(data: UpdateMailSettingsData): Promise<MailSettings> {
+  async updateSettings(data: $UpdateMailSettingsData): Promise<MailSettings> {
     const setupState = await this.setupStateModel.findFirst();
     if (!setupState?.isSetup) {
       throw new ServiceUnavailableException('Cannot update mail settings before setup');

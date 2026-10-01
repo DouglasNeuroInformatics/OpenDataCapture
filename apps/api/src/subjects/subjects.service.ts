@@ -2,6 +2,7 @@ import { InjectModel, InjectPrismaClient } from '@douglasneuroinformatics/libnes
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
+import { $CreateSubjectData } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import type { Prisma } from '@prisma/client';
 
@@ -9,8 +10,6 @@ import { accessibleQuery } from '@/auth/ability.utils';
 import type { AppAbility } from '@/auth/auth.types';
 import type { RuntimePrismaClient } from '@/core/prisma';
 import type { EntityOperationOptions } from '@/core/types';
-
-import { CreateSubjectDto } from './dto/create-subject.dto';
 
 const PERSONAL_INFO_FIELDS = ['dateOfBirth', 'firstName', 'lastName', 'sex'] as const;
 
@@ -62,7 +61,7 @@ export class SubjectsService {
   async create({
     id,
     ...data
-  }: CreateSubjectDto & {
+  }: $CreateSubjectData & {
     /** for demo purposes need to set createdAt manually */
     createdAt?: Date;
   }) {
@@ -78,9 +77,9 @@ export class SubjectsService {
     });
   }
 
-  async createMany(data: CreateSubjectDto[], { ability }: EntityOperationOptions = {}) {
+  async createMany(data: $CreateSubjectData[], { ability }: EntityOperationOptions = {}) {
     // keyed by id so duplicates within the request collapse, keeping the first entry for each
-    const requested = new Map<string, CreateSubjectDto>();
+    const requested = new Map<string, $CreateSubjectData>();
     for (const subject of data) {
       if (!requested.has(subject.id)) {
         requested.set(subject.id, subject);
