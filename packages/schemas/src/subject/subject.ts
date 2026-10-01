@@ -26,6 +26,10 @@ export const $Subject = $BaseModel.extend({
   sex: $Sex.nullish()
 });
 
+/** The details a custom-id subject may carry, which the start-session form fills in for an existing one. */
+export type SubjectDemographics = z.infer<typeof $SubjectDemographics>;
+export const $SubjectDemographics = $Subject.pick({ dateOfBirth: true, sex: true });
+
 /** The ids of a group's subjects that are identified by a custom id rather than personal information. */
 export type SubjectCustomIds = z.infer<typeof $SubjectCustomIds>;
 export const $SubjectCustomIds = $Subject.shape.id.array();

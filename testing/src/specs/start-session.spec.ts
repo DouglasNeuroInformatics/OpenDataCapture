@@ -1,3 +1,5 @@
+import type { Page } from '@playwright/test';
+
 import { StartSessionPage } from '../pages/_app/session/start-session.page';
 import { ApiClient } from '../support/api-client';
 import { expect, test } from '../support/fixtures';
@@ -54,6 +56,53 @@ test.describe('custom identifier suggestions', () => {
     const accessToken = await ApiClient.login(apiRequestContext, credentials);
 
     const response = await apiRequestContext.get(`/api/v1/subjects/groups/${group.id}/custom-ids`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toStrictEqual([]);
+  });
+
+  test('should list custom ids scoped to the default group, but not those scoped to a named group, when no group is given', async ({
+    api,
+    uniqueId
+  }) => {
+    const rootScopedId = `root$default-${uniqueId}`;
+    const groupScopedId = `Clinic$named-${uniqueId}`;
+    await api.createSession(null, { id: rootScopedId });
+    await api.createSession((await api.createGroup()).id, { id: groupScopedId });
+
+    const ids = await api.findDefaultGroupSubjectCustomIds();
+
+    expect(ids).toContain(rootScopedId);
+    expect(ids).not.toContain(groupScopedId);
+  });
+
+  test('should still list a default group custom id after its subject is seen in a group', async ({
+    api,
+    uniqueId
+  }) => {
+    const rootScopedId = `root$regrouped-${uniqueId}`;
+    await api.createSession(null, { id: rootScopedId });
+    // Starting a session in a group adds that group to the subject, but leaves its id alone.
+    await api.createSession((await api.createGroup()).id, { id: rootScopedId });
+
+    expect(await api.findDefaultGroupSubjectCustomIds()).toContain(rootScopedId);
+  });
+
+  test('should list no default group subjects to a group manager outside their groups', async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    await api.createSession(null, { id: `root$default-${uniqueId}` });
+    const { credentials } = await api.createUser({
+      basePermissionLevel: 'GROUP_MANAGER',
+      groupIds: [(await api.createGroup()).id]
+    });
+    const accessToken = await ApiClient.login(apiRequestContext, credentials);
+
+    const response = await apiRequestContext.get('/api/v1/subjects/default-group/custom-ids', {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
 
@@ -137,9 +186,32 @@ test.describe('start session', () => {
     await startSessionPage.subjectIdOption(identifier).click();
     await expect(startSessionPage.subjectIdField).toHaveValue(identifier);
 
-    await startSessionPage.fillSessionDetails('Male');
+    // The first session recorded the subject's date of birth and sex, so the form fills those in.
+    await startSessionPage.fillSessionTiming();
     await startSessionPage.submitForm();
     await expect(startSessionPage.successMessage).toBeVisible();
+  });
+
+  test('should suggest default group subjects to an admin who belongs to no group, even once seen in a group', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const identifier = `default-${uniqueId}`;
+    // With no current group the form scopes a custom id to the default group, as `root$<id>`.
+    await api.createSession(null, { id: `root$${identifier}` });
+    await api.createSession((await api.createGroup()).id, { id: `root$${identifier}` });
+    const { credentials } = await api.createUser({ basePermissionLevel: 'ADMIN', groupIds: [] });
+    await authenticateAs(credentials);
+    await page.goto('/session/start-session');
+
+    const startSessionPage = new StartSessionPage(page);
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.typeSubjectId(identifier);
+
+    await expect(startSessionPage.subjectIdOption(identifier)).toBeVisible();
   });
 
   test('should show a required-field error for every missing field when submitting the personal information form empty', async ({
@@ -232,5 +304,108 @@ test.describe('start session', () => {
     await page.getByTestId('nav-button-/dashboard').click();
     await page.waitForURL('**/dashboard');
     await expect(page.getByTestId('nav-button-/session/start-session')).toBeDisabled();
+  });
+});
+
+// A custom id says nothing about the subject behind it, so the form fills in what an existing subject
+// already records. These run as an admin with no group, whose custom ids carry the `root$` scope.
+test.describe('existing subject details', () => {
+  const openAsGrouplessAdmin = async ({
+    api,
+    authenticateAs,
+    page
+  }: {
+    api: ApiClient;
+    authenticateAs: (credentials: Awaited<ReturnType<ApiClient['createUser']>>['credentials']) => Promise<void>;
+    page: Page;
+  }) => {
+    const { credentials } = await api.createUser({ basePermissionLevel: 'ADMIN', groupIds: [] });
+    await authenticateAs(credentials);
+    await page.goto('/session/start-session');
+    const startSessionPage = new StartSessionPage(page);
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    return startSessionPage;
+  };
+
+  // Midday UTC, so the date the form shows is the same in any timezone the suite runs in.
+  const dateOfBirth = new Date('1990-06-15T12:00:00Z');
+
+  test('should fill in and lock the details of a subject chosen from the suggestions', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const identifier = `known-${uniqueId}`;
+    await api.createSession(null, { dateOfBirth, id: `root$${identifier}`, sex: 'FEMALE' });
+    const startSessionPage = await openAsGrouplessAdmin({ api, authenticateAs, page });
+
+    await startSessionPage.typeSubjectId(identifier);
+    await startSessionPage.subjectIdOption(identifier).click();
+
+    await expect(startSessionPage.dateOfBirthField).toHaveValue('1990-06-15');
+    await expect(startSessionPage.dateOfBirthField).toBeDisabled();
+    await expect(startSessionPage.sexField).toHaveValue('FEMALE');
+    await expect(startSessionPage.sexTrigger).toBeDisabled();
+
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+  });
+
+  test('should fill in the details when a typed identifier matches an existing subject, as picking it would', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const identifier = `typed-${uniqueId}`;
+    await api.createSession(null, { dateOfBirth, id: `root$${identifier}`, sex: 'MALE' });
+    const startSessionPage = await openAsGrouplessAdmin({ api, authenticateAs, page });
+
+    await startSessionPage.typeSubjectId(identifier);
+    await startSessionPage.dismissSubjectIdOptions();
+
+    await expect(startSessionPage.sexField).toHaveValue('MALE');
+    await expect(startSessionPage.sexTrigger).toBeDisabled();
+  });
+
+  test('should clear and unlock the details when the identifier changes to one no subject has', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const identifier = `before-${uniqueId}`;
+    await api.createSession(null, { dateOfBirth, id: `root$${identifier}`, sex: 'FEMALE' });
+    const startSessionPage = await openAsGrouplessAdmin({ api, authenticateAs, page });
+    await startSessionPage.typeSubjectId(identifier);
+    await startSessionPage.subjectIdOption(identifier).click();
+    await expect(startSessionPage.sexTrigger).toBeDisabled();
+
+    await startSessionPage.typeSubjectId(`new-${uniqueId}`);
+    await startSessionPage.dismissSubjectIdOptions();
+
+    await expect(startSessionPage.dateOfBirthField).toHaveValue('');
+    await expect(startSessionPage.dateOfBirthField).toBeEnabled();
+    await expect(startSessionPage.sexField).not.toHaveValue('FEMALE');
+    await expect(startSessionPage.sexTrigger).toBeEnabled();
+  });
+
+  test('should lock only the details the subject records, leaving the rest to fill in', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const identifier = `partial-${uniqueId}`;
+    await api.createSession(null, { id: `root$${identifier}`, sex: 'MALE' });
+    const startSessionPage = await openAsGrouplessAdmin({ api, authenticateAs, page });
+
+    await startSessionPage.typeSubjectId(identifier);
+    await startSessionPage.subjectIdOption(identifier).click();
+
+    await expect(startSessionPage.sexTrigger).toBeDisabled();
+    await expect(startSessionPage.dateOfBirthField).toBeEnabled();
   });
 });
