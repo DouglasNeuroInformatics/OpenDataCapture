@@ -14,7 +14,11 @@ import {
 } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import type { Assignment, BulkAssignmentPreflightResult } from '@opendatacapture/schemas/assignment';
+import type {
+  Assignment,
+  BulkAssignmentPreflightResult,
+  DeleteBulkAssignmentsResult
+} from '@opendatacapture/schemas/assignment';
 import { DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
 import type { EmailDeliveryResult, MailTemplate } from '@opendatacapture/schemas/mail';
 
@@ -28,6 +32,7 @@ import { MailService } from '@/mail/mail.service';
 import { AssignmentsService } from './assignments.service';
 import { BulkAssignmentPreflightDto, CreateBulkAssignmentsDto } from './dto/bulk-assignment.dto';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
+import { DeleteBulkAssignmentsDto } from './dto/delete-bulk-assignments.dto';
 import { SendAssignmentEmailDto } from './dto/send-assignment-email.dto';
 import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 
@@ -74,11 +79,26 @@ export class AssignmentsController {
     return this.assignmentsService.createBulk(data, currentUser);
   }
 
+  @ApiOperation({ summary: 'Delete Assignments in Bulk' })
+  @HttpCode(HttpStatus.OK)
+  @Post('bulk/delete')
+  @RouteAccess({ action: 'delete', subject: 'Assignment' })
+  deleteBulk(
+    @Body() data: DeleteBulkAssignmentsDto,
+    @CurrentUser('ability') ability?: AppAbility
+  ): Promise<DeleteBulkAssignmentsResult> {
+    return this.assignmentsService.deleteBulk(data.ids, { ability });
+  }
+
   @ApiOperation({ summary: 'Get All Assignments' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'Assignment' })
-  find(@CurrentUser('ability') ability?: AppAbility, @Query('subjectId') subjectId?: string): Promise<Assignment[]> {
-    return this.assignmentsService.find({ subjectId }, { ability });
+  find(
+    @CurrentUser('ability') ability?: AppAbility,
+    @Query('groupId') groupId?: string,
+    @Query('subjectId') subjectId?: string
+  ): Promise<Assignment[]> {
+    return this.assignmentsService.find({ groupId, subjectId }, { ability });
   }
 
   @ApiOperation({ summary: 'Email Assignment Link' })

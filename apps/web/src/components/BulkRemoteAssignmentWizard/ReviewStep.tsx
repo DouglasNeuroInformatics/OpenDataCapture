@@ -117,8 +117,6 @@ export const ReviewStep = ({
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-review-step">
-        <ErrorList errors={messages} />
-
         <p className="text-sm font-medium" data-testid="bulk-review-summary">
           {t({
             en: `${subjectCount} subjects × ${timepoints.length} instruments = ${subjectCount * timepoints.length} assignments`,
@@ -127,8 +125,10 @@ export const ReviewStep = ({
         </p>
         <TimepointTable timepoints={timepoints} />
 
+        <ErrorList errors={messages} />
+
         {hasConflict && (
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm font-semibold">
             <Checkbox
               checked={allowDuplicates}
               data-testid="bulk-allow-duplicates"

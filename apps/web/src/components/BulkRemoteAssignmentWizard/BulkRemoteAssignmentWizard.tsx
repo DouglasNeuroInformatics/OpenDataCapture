@@ -33,6 +33,7 @@ export type BulkRemoteAssignmentWizardProps = {
   /** Needed to turn a pasted custom identifier back into the scoped form it is stored under. */
   groupName: string;
   instruments: InstrumentOption[];
+  onBack?: () => void;
   /** Group setting controlling how much of an identifier the subject picker shows. */
   subjectIdDisplayLength: number;
   subjects: Subject[];
@@ -50,6 +51,7 @@ export const BulkRemoteAssignmentWizard = ({
   groupId,
   groupName,
   instruments,
+  onBack,
   subjectIdDisplayLength,
   subjects
 }: BulkRemoteAssignmentWizardProps) => {
@@ -63,6 +65,7 @@ export const BulkRemoteAssignmentWizard = ({
           selectedIds={wizard.subjectIds}
           subjectIdDisplayLength={subjectIdDisplayLength}
           subjects={subjects}
+          onBack={onBack}
           onParsed={wizard.acceptParsed}
           onSelectedChange={wizard.setSelectedSubjectIds}
           onStepChange={wizard.goTo}
@@ -116,6 +119,15 @@ export const BulkRemoteAssignmentWizard = ({
           })}
           footer={
             <React.Fragment>
+              <Button
+                className="mr-auto"
+                data-testid="bulk-create-more"
+                type="button"
+                variant="outline"
+                onClick={() => wizard.goTo('SOURCE')}
+              >
+                {t({ en: 'Create More', fr: 'Créer plus' })}
+              </Button>
               <Button
                 data-testid="bulk-copy-links"
                 type="button"

@@ -83,9 +83,9 @@ export const Navbar = () => {
                     items={props.children}
                     key={props.label}
                     label={props.label}
-                    onNavigate={(to) => {
+                    onNavigate={(to, search) => {
                       setIsOpen(false);
-                      void navigate({ to });
+                      void navigate({ search: search, to });
                     }}
                   />
                 ) : (
