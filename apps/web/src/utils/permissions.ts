@@ -10,6 +10,8 @@ import { z } from 'zod/v4';
 /** The scope option standing for every group. A group id is an ObjectId, so the two cannot collide. */
 const ALL_GROUPS = '__all__';
 
+type PermissionDraft = Partial<AddPermissionFormData>;
+
 type AddPermissionFormData = z.infer<typeof $AddPermissionFormData>;
 const $AddPermissionFormData = z
   .object({
@@ -58,6 +60,16 @@ const isSamePermission = (a: UserPermission, b: UserPermission): boolean =>
 const withPermission = (permissions: Permissions, permission: UserPermission): Permissions =>
   permissions.some((existing) => isSamePermission(existing, permission)) ? permissions : [...permissions, permission];
 
+/** A row with an action or resource chosen that is not yet a valid grant. The scope alone is preselected, so it does not count as started. */
+const isIncompleteDraft = (draft: PermissionDraft): boolean =>
+  (draft.action !== undefined || draft.subject !== undefined) && !$AddPermissionFormData.safeParse(draft).success;
+
+const withPermissionDrafts = (permissions: Permissions, drafts: PermissionDraft[]): Permissions =>
+  drafts.reduce((result, draft) => {
+    const parsed = $AddPermissionFormData.safeParse(draft);
+    return parsed.success ? withPermission(result, toUserPermission(parsed.data)) : result;
+  }, permissions);
+
 const withoutPermission = (permissions: Permissions, index: number): Permissions =>
   permissions.filter((_, i) => i !== index);
 
@@ -66,8 +78,10 @@ export {
   ALL_GROUPS,
   grantableActions,
   grantableSubjects,
+  isIncompleteDraft,
   toUserPermission,
   withoutPermission,
-  withPermission
+  withPermission,
+  withPermissionDrafts
 };
-export type { AddPermissionFormData };
+export type { AddPermissionFormData, PermissionDraft };

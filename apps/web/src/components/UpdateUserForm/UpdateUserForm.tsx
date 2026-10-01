@@ -3,10 +3,10 @@ import React, { useMemo } from 'react';
 import type { ZodErrorLike } from '@douglasneuroinformatics/libjs';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Form } from '@douglasneuroinformatics/libui/components';
+import type { FormProps } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
 import type { User } from '@opendatacapture/schemas/user';
-import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
 
 import { usePasswordGenerator } from '@/hooks/usePasswordGenerator';
@@ -41,11 +41,13 @@ type UpdateUserFormInputData = {
 
 type UpdateUserFormProps = {
   data: UpdateUserFormInputData;
+  hideSubmitButton?: boolean;
+  id?: string;
   onError: (error: ZodErrorLike) => void;
-  onSubmit: (data: UpdateUserSubmitData) => Promisable<void>;
+  onSubmit: FormProps<z.ZodType<UpdateUserSubmitData>>['onSubmit'];
 };
 
-export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps) => {
+export const UpdateUserForm = ({ data, hideSubmitButton, id, onError, onSubmit }: UpdateUserFormProps) => {
   const { groupOptions, initialValues } = data;
   const { resolvedLanguage, t } = useTranslation();
   const { applyGeneratedPassword, generatedPassword, generatePassword, isGeneratedPassword } = usePasswordGenerator();
@@ -101,7 +103,9 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
 
   return (
     <div className="contents" key={JSON.stringify(initialValues)} ref={suppressPasswordAutofill}>
+      {/* libui always renders a boolean radio's `true` option first, so the row is reversed to lead with Enabled. */}
       <Form
+        className="[&>div:has(#disabled-true)]:gap-2 [&_[role=radiogroup]:has(#disabled-true)]:flex [&_[role=radiogroup]:has(#disabled-true)]:flex-row-reverse [&_[role=radiogroup]:has(#disabled-true)]:justify-end [&_[role=radiogroup]:has(#disabled-true)]:gap-6 [&_[role=radiogroup]:has(#disabled-true)]:pt-2"
         content={[
           {
             fields: {
@@ -140,21 +144,21 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
             fields: {
               disabled: {
                 description: t({
-                  en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
-                  fr: 'Utilisez cette option si l’utilisateur n’a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l’auteur de données téléversées.'
+                  en: 'This option should be set to Disabled if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
+                  fr: 'Cette option doit être réglée sur Désactivé si l’utilisateur n’a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l’auteur de données téléversées.'
                 }),
                 kind: 'boolean',
                 label: t({
-                  en: 'Disabled',
-                  fr: 'Désactivé'
+                  en: 'Status',
+                  fr: 'Statut'
                 }),
+                options: {
+                  false: t({ en: 'Enabled', fr: 'Activé' }),
+                  true: t({ en: 'Disabled', fr: 'Désactivé' })
+                },
                 variant: 'radio'
               }
-            },
-            title: t({
-              en: 'Status',
-              fr: 'Statut'
-            })
+            }
           },
           {
             description: t({
@@ -182,7 +186,9 @@ export const UpdateUserForm = ({ data, onError, onSubmit }: UpdateUserFormProps)
             title: t('common.password')
           }
         ]}
+        customStyles={{ submitBtn: hideSubmitButton ? 'hidden' : undefined }}
         data-testid="update-user-form"
+        id={id}
         initialValues={{
           ...initialValues,
           disabled: initialValues?.disabled ?? false

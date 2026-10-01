@@ -1,4 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import type { Permissions } from '@opendatacapture/schemas/core';
 import type { UpdateUserData } from '@opendatacapture/schemas/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
@@ -9,8 +10,11 @@ export function useUpdateUserMutation() {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
-    mutationFn: async ({ data, id }: { data: UpdateUserData; id: string }) => {
+    mutationFn: async ({ data, id, permissions }: { data: UpdateUserData; id: string; permissions?: Permissions }) => {
       await axios.patch(`/v1/users/${id}`, data);
+      if (permissions !== undefined) {
+        await axios.put(`/v1/users/${id}/permissions`, { permissions });
+      }
     },
     onSuccess() {
       addNotification({ type: 'success' });

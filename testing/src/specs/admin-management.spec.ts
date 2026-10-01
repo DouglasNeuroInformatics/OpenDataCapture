@@ -30,6 +30,28 @@ test.describe('admin management', () => {
     await expect(page.getByTestId('data-table-body')).toContainText('admin');
   });
 
+  test('should show enabled and disabled accounts immediately left of archive status', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { user: enabled } = await api.createUser({ groupIds: [group.id] });
+    const { user: disabled } = await api.createUser({ disabled: true, groupIds: [group.id] });
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users');
+    await expect(page.getByTestId('data-table-head').getByRole('button', { name: 'Status' })).toBeVisible();
+    const headers = await page.getByTestId('data-table-head').getByRole('button').allTextContents();
+    expect(headers.filter(Boolean).indexOf('Enabled / Disabled')).toBe(headers.filter(Boolean).indexOf('Status') - 1);
+    const search = page.getByTestId('data-table-search-bar').getByRole('searchbox');
+    await search.fill(enabled.username);
+    await expect(page.getByTestId('user-login-status')).toHaveText('Enabled');
+    await expect(page.getByTestId('user-status-active')).toBeVisible();
+    await search.fill(disabled.username);
+    await expect(page.getByTestId('user-login-status')).toHaveText('Disabled');
+    await expect(page.getByTestId('user-status-active')).toBeVisible();
+  });
+
   test('should show a validation error when the group name is missing', async ({ authenticateAs, page }) => {
     await authenticateAs('ADMIN');
     await page.goto('/admin/groups/create');
@@ -218,17 +240,16 @@ test.describe('admin management', () => {
 
     const profileForm = page.getByTestId('update-user-form');
     await profileForm.getByLabel('Email').fill(`${user.username}@example.com`);
-    // The shared `Form` component's own submit button always has `aria-label="Submit"`, even though
-    // this form's visible label is "Save" -- see DouglasNeuroInformatics/libui#108.
-    await profileForm.getByRole('button', { name: 'Submit' }).click();
+    await page.getByTestId('save-user-changes').click();
     // The edit and archive toasts below can stack within the notification hub's shared 5s lifetime,
     // so `.last()` targets the most recently raised one rather than an ambiguous match on both.
     await expect(page.getByRole('heading', { name: 'Success' }).last()).toBeVisible();
 
-    await page.getByRole('button', { name: 'Archive User' }).click();
+    await page.getByRole('button', { exact: true, name: 'Archive' }).click();
     await page.getByRole('button', { name: 'Yes' }).click();
 
-    await expect(page).toHaveURL('/admin/users');
+    await expect(page.getByRole('button', { exact: true, name: 'Unarchive' })).toBeVisible();
+    expect((await api.findUserById(user.id)).archivedAt).toBeTruthy();
   });
 
   test('should say why a save failed when the rejected field is scrolled out of view', async ({
@@ -343,6 +364,116 @@ test.describe('admin management', () => {
     expect((await api.findUserById(user.id)).email).toBeNull();
   });
 
+  test('should save account and completed permission rows together without using plus to confirm them', async ({
+    api,
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+    const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
+    const email = `shared-save-${uniqueId}@example.org`;
+
+    await expect(userPage.profileForm.getByRole('button', { name: 'Submit' })).toBeHidden();
+    const save = page.getByTestId('save-user-changes');
+    const permissionsCard = page.getByTestId('user-permissions-card');
+    expect((await save.boundingBox())!.y).toBeGreaterThan((await permissionsCard.boundingBox())!.y);
+
+    await userPage.profileForm.getByLabel('Email').fill(email);
+    await userPage.addPermission({ action: 'read', subject: 'User' });
+    await userPage.addPermissionRowAfterCurrent();
+    await userPage.addPermission({ action: 'create', subject: 'Instrument' });
+    const beforeSave = await api.findUserById(user.id);
+    expect(beforeSave.email).not.toBe(email);
+    expect(beforeSave.additionalPermissions).toEqual([]);
+
+    await userPage.saveProfile();
+    await expect(userPage.permissionRows).toHaveCount(2);
+    await expect(page.getByRole('heading', { exact: true, name: 'Success' })).toHaveCount(1);
+    await page.reload();
+    await expect(userPage.profileForm.getByLabel('Email')).toHaveValue(email);
+    expect((await api.findUserById(user.id)).additionalPermissions).toEqual([
+      { action: 'read', groupId: group.id, subject: 'User' },
+      { action: 'create', groupId: null, subject: 'Instrument' }
+    ]);
+  });
+
+  test('should save no permissions when account validation fails', async ({ api, getPageModel }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+    const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
+    await userPage.addPermission({ action: 'read', subject: 'User' });
+    await userPage.profileForm.getByLabel('Email').fill('invalid-email');
+    await userPage.saveProfile();
+    await expect(userPage.submitError).toBeVisible();
+    expect((await api.findUserById(user.id)).additionalPermissions).toEqual([]);
+  });
+
+  test('should offer Enabled then Disabled on one line under Status, with Enabled chosen for an enabled user', async ({
+    api,
+    getPageModel
+  }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+    const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
+    const enabled = userPage.profileForm.getByLabel('Enabled', { exact: true });
+    const disabled = userPage.profileForm.getByLabel('Disabled', { exact: true });
+
+    await expect(enabled).toBeChecked();
+    await expect(disabled).not.toBeChecked();
+    const enabledBox = (await enabled.boundingBox())!;
+    const disabledBox = (await disabled.boundingBox())!;
+    expect(Math.abs(enabledBox.y - disabledBox.y)).toBeLessThan(2);
+    expect(disabledBox.x).toBeGreaterThan(enabledBox.x);
+    const statusLabel = userPage.profileForm.getByText('Status', { exact: true });
+    expect(enabledBox.y).toBeGreaterThan((await statusLabel.boundingBox())!.y);
+  });
+
+  test('should refuse to save while a permission row is half filled, rather than silently dropping it', async ({
+    api,
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const [group, otherGroup] = await Promise.all([api.createGroup(), api.createGroup()]);
+    const { user } = await api.createUser({ groupIds: [group.id, otherGroup.id] });
+    const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
+    await userPage.profileForm.getByLabel('Email').fill(`half-filled-${uniqueId}@example.org`);
+    // With two groups no scope is preselected, so this row cannot become a grant yet.
+    await userPage.addPermission({ action: 'read', subject: 'Subject' });
+
+    await page.getByTestId('save-user-changes').click();
+
+    await expect(page.getByTestId('permission-drafts-incomplete')).toBeVisible();
+    await expect(userPage.addPermissionRow).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.getByRole('heading', { exact: true, name: 'Success' })).toHaveCount(0);
+    const stored = await api.findUserById(user.id);
+    expect(stored.email).not.toBe(`half-filled-${uniqueId}@example.org`);
+    expect(stored.additionalPermissions).toEqual([]);
+
+    await userPage.selectOption('scope', otherGroup.id);
+    await userPage.saveProfile();
+    await expect(page.getByTestId('permission-drafts-incomplete')).toBeHidden();
+    await expect(userPage.permissionRows).toHaveCount(1);
+    expect((await api.findUserById(user.id)).additionalPermissions).toEqual([
+      { action: 'read', groupId: otherGroup.id, subject: 'Subject' }
+    ]);
+  });
+
+  test('should discard unsaved permission additions and removals on reload', async ({ api, getPageModel, page }) => {
+    const group = await api.createGroup();
+    const { user } = await api.createUser({ groupIds: [group.id] });
+    await api.setUserPermissions(user.id, [{ action: 'create', groupId: null, subject: 'Instrument' }]);
+    const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
+    await userPage.removePermission(0);
+    await userPage.addPermission({ action: 'read', subject: 'User' });
+    await page.reload();
+    await expect(userPage.permissionRows).toHaveCount(1);
+    await expect(userPage.permissionRows.first()).toContainText('Instrument');
+    await expect(userPage.addPermissionRow.getByTestId('action-select-trigger')).toContainText('Choose');
+  });
+
   test('should grant a permission confined to the one group a user belongs to from the user page @smoke', async ({
     api,
     getPageModel,
@@ -355,6 +486,8 @@ test.describe('admin management', () => {
     // The scope is left untouched: with a single group it is preselected, so the group is the
     // default rather than something the admin has to remember to choose.
     await userPage.addPermission({ action: 'read', subject: 'User' });
+    expect((await api.findUserById(user.id)).additionalPermissions).toStrictEqual([]);
+    await userPage.saveProfile();
 
     await expect(userPage.permissionRows).toHaveCount(1);
     await expect(userPage.permissionRows.first().getByTestId('user-permission-scope')).toContainText(group.name);
@@ -414,6 +547,8 @@ test.describe('admin management', () => {
     const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
     await expect(userPage.permissionRows).toHaveCount(2);
     await userPage.removePermission(0);
+    expect((await api.findUserById(user.id)).additionalPermissions).toHaveLength(2);
+    await userPage.saveProfile();
 
     await expect(userPage.permissionRows).toHaveCount(1);
     expect((await api.findUserById(user.id)).additionalPermissions).toStrictEqual([

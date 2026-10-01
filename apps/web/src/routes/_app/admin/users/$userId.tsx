@@ -3,8 +3,10 @@ import { useMemo, useState } from 'react';
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
 import { Button, Card, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { ChevronLeftIcon } from '@heroicons/react/24/solid';
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { ArchiveBoxArrowDownIcon, ArchiveBoxXMarkIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
+import { isGrantablePermission } from '@opendatacapture/schemas/core';
+import type { Permissions } from '@opendatacapture/schemas/core';
+import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { Chip } from '@/components/Chip';
 import { PageHeader } from '@/components/PageHeader';
@@ -14,17 +16,17 @@ import { UserIcon } from '@/components/UserIcon';
 import { UserPermissionsEditor } from '@/components/UserPermissionsEditor';
 import { useArchiveUserMutation } from '@/hooks/useArchiveUserMutation';
 import { useFindUserQuery, useFindUserQueryOptions } from '@/hooks/useFindUserQuery';
-import { useUnarchiveUserMutation } from '@/hooks/useUnarchiveUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
+import { useUnarchiveUserMutation } from '@/hooks/useUnarchiveUserMutation';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { useAppStore } from '@/store';
+import { isIncompleteDraft, withPermissionDrafts } from '@/utils/permissions';
+import type { PermissionDraft } from '@/utils/permissions';
 import { clearedIfBlank, omittedIfUnchanged, validationSummary } from '@/utils/validation';
 
-const RouteComponent = () => {
-  const { userId } = Route.useParams();
+const UserEditor = ({ userId }: { userId: string }) => {
   const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const groupsQuery = useGroupsQuery();
   const userQuery = useFindUserQuery(userId);
   const archiveUserMutation = useArchiveUserMutation();
@@ -32,13 +34,18 @@ const RouteComponent = () => {
   const updateUserMutation = useUpdateUserMutation();
   const [submitErrorMessage, setSubmitErrorMessage] = useState<null | string>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  // libui's `Form` clears its values after a successful submit, so the profile form is remounted
-  // from the saved user once a save lands. Keyed on this rather than on the query's refetch time so
-  // that saving a permission below does not discard edits typed here but not yet saved.
+  const [isSaving, setIsSaving] = useState(false);
+  const [highlightIncompleteDrafts, setHighlightIncompleteDrafts] = useState(false);
   const [savedProfileCount, setSavedProfileCount] = useState(0);
 
   const groups = groupsQuery.data;
   const user = userQuery.data;
+
+  const [localPermissions, setLocalPermissions] = useState<Permissions>(user.additionalPermissions);
+
+  const [permissionDrafts, setPermissionDrafts] = useState<PermissionDraft[]>([
+    { scope: user.groupIds.length === 1 ? user.groupIds[0] : undefined }
+  ]);
 
   const isCurrentUser = user.username === currentUser?.username;
   const userGroups = groups.filter((group) => user.groupIds.includes(group.id));
@@ -69,36 +76,97 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-6">
-        <Card>
-          <Card.Header className="gap-4 space-y-0">
-            <Link
-              className="text-muted-foreground focus-visible:ring-ring focus-visible:outline-hidden flex items-center gap-0.5 self-start rounded-sm text-[11px] font-semibold uppercase tracking-widest transition-colors hover:text-blue-600 focus-visible:ring-1 dark:hover:text-blue-400"
-              data-testid="admin-user-back"
-              to="/admin/users"
-            >
-              <ChevronLeftIcon className="h-3.5 w-3.5" />
-              {t({ en: 'Return', fr: 'Retour' })}
-            </Link>
-            <div className="flex items-center gap-4">
-              <UserIcon className="text-muted-foreground h-14 w-14 shrink-0" />
-              <div className="min-w-0 flex-1">
-                <Card.Title className="text-lg" data-testid="admin-user-username">
-                  {user.username}
-                </Card.Title>
-                <p className="text-muted-foreground mt-1 text-sm" data-testid="admin-user-identity">
-                  {identityLine}
-                </p>
-                {userGroups.length > 0 && (
-                  <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    {userGroups.map((group) => (
-                      <Chip key={group.id}>{group.name}</Chip>
-                    ))}
-                  </div>
+        <div className="flex flex-col gap-3">
+          <Link
+            className="text-muted-foreground focus-visible:ring-ring focus-visible:outline-hidden flex items-center gap-0.5 self-start rounded-sm text-[11px] font-semibold uppercase tracking-widest transition-colors hover:text-blue-600 focus-visible:ring-1 dark:hover:text-blue-400"
+            data-testid="admin-user-back"
+            to="/admin/users"
+          >
+            <ChevronLeftIcon className="h-3.5 w-3.5" />
+            {t({ en: 'Return', fr: 'Retour' })}
+          </Link>
+          <Card>
+            <Card.Header className="gap-4 space-y-0">
+              <div className="flex items-center gap-4">
+                <UserIcon className="text-muted-foreground h-14 w-14 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <Card.Title className="text-lg" data-testid="admin-user-username">
+                    {user.username}
+                  </Card.Title>
+                  <p className="text-muted-foreground mt-1 text-sm" data-testid="admin-user-identity">
+                    {identityLine}
+                  </p>
+                  {userGroups.length > 0 && (
+                    <div className="mt-2.5 flex flex-wrap gap-1.5">
+                      {userGroups.map((group) => (
+                        <Chip key={group.id}>{group.name}</Chip>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {user.archivedAt ? (
+                  <Button
+                    className="shrink-0 gap-2"
+                    disabled={isCurrentUser}
+                    type="button"
+                    variant="primary"
+                    onClick={() => unarchiveUserMutation.mutate({ id: user.id })}
+                  >
+                    <ArchiveBoxXMarkIcon className="h-4 w-4" />
+                    {t({ en: 'Unarchive', es: 'Desarchivar', fr: 'Désarchiver' })}
+                  </Button>
+                ) : (
+                  <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+                    <Dialog.Trigger asChild>
+                      <Button className="shrink-0 gap-2" disabled={isCurrentUser} type="button" variant="danger">
+                        <ArchiveBoxArrowDownIcon className="h-4 w-4" />
+                        {t({ en: 'Archive', es: 'Archivar', fr: 'Archiver' })}
+                      </Button>
+                    </Dialog.Trigger>
+                    <Dialog.Content>
+                      <Dialog.Header>
+                        <Dialog.Title>
+                          {t({
+                            en: 'Are you absolutely sure?',
+                            es: '¿Está absolutamente seguro?',
+                            fr: 'Êtes-vous absolument sûr ?'
+                          })}
+                        </Dialog.Title>
+                        <Dialog.Description>
+                          {t({
+                            en: 'This will archive the account and prevent the user from signing in.',
+                            es: 'Esto archivará la cuenta e impedirá que el usuario inicie sesión.',
+                            fr: "Cela archivera le compte et empêchera l'utilisateur de se connecter."
+                          })}
+                        </Dialog.Description>
+                      </Dialog.Header>
+                      <Dialog.Footer>
+                        <Button
+                          className="min-w-16"
+                          type="button"
+                          variant="danger"
+                          onClick={() => {
+                            archiveUserMutation.mutate({ id: user.id }, { onSuccess: () => setIsConfirmOpen(false) });
+                          }}
+                        >
+                          {t('core.yes')}
+                        </Button>
+                        <Button
+                          className="min-w-16"
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsConfirmOpen(false)}
+                        >
+                          {t('core.no')}
+                        </Button>
+                      </Dialog.Footer>
+                    </Dialog.Content>
+                  </Dialog>
                 )}
               </div>
-            </div>
-          </Card.Header>
-        </Card>
+            </Card.Header>
+          </Card>
+        </div>
         <Card>
           <Card.Header>
             <Card.Title>{t({ en: 'Account', fr: 'Compte' })}</Card.Title>
@@ -110,8 +178,6 @@ const RouteComponent = () => {
             </Card.Description>
           </Card.Header>
           <Card.Content>
-            {/* Above the form rather than beside the field: a rejected field can be several sections
-                away from the save button, and is then off-screen at the moment of the failure. */}
             {submitErrorMessage && (
               <div
                 className="text-destructive mb-6 text-sm font-medium"
@@ -127,118 +193,89 @@ const RouteComponent = () => {
                 <p>{submitErrorMessage}</p>
               </div>
             )}
+
             <UpdateUserForm
+              hideSubmitButton
               data={formData}
+              id="admin-user-account-form"
               key={savedProfileCount}
               onError={(error) => setSubmitErrorMessage(validationSummary(error))}
-              onSubmit={({ confirmPassword: _, email, groupIds, phoneNumber, ...data }) => {
+              onSubmit={async ({ confirmPassword: _, email, groupIds, phoneNumber, ...data }) => {
+                if (isSaving) return undefined;
+                if (permissionDrafts.some(isIncompleteDraft)) {
+                  setHighlightIncompleteDrafts(true);
+                  const errorMessage = t({
+                    en: 'A permission row is incomplete. Choose its action, resource and scope, or remove it.',
+                    fr: "Une ligne d'autorisation est incomplète. Choisissez son action, sa ressource et sa portée, ou retirez-la."
+                  });
+                  setSubmitErrorMessage(errorMessage);
+                  return { errorMessage, success: false };
+                }
+                setHighlightIncompleteDrafts(false);
+                setIsSaving(true);
                 setSubmitErrorMessage(null);
-                updateUserMutation.mutate(
-                  {
-                    data: {
-                      ...data,
-                      email: clearedIfBlank(email),
-                      groupIds: Array.from(groupIds),
-                      phoneNumber: omittedIfUnchanged(phoneNumber, user.phoneNumber)
-                    },
-                    id: user.id
-                  },
-                  { onSuccess: () => setSavedProfileCount((count) => count + 1) }
-                );
+                const accountData = {
+                  ...data,
+                  email: clearedIfBlank(email),
+                  groupIds: Array.from(groupIds),
+                  phoneNumber: omittedIfUnchanged(phoneNumber, user.phoneNumber)
+                };
+                try {
+                  const permissions = withPermissionDrafts(localPermissions, permissionDrafts)
+                    .filter(isGrantablePermission)
+                    .filter((permission) => permission.groupId === null || groupIds.has(permission.groupId));
+                  await updateUserMutation.mutateAsync({
+                    data: accountData,
+                    id: user.id,
+                    permissions: user.basePermissionLevel === 'ADMIN' ? undefined : permissions
+                  });
+                  await userQuery.refetch();
+                  setLocalPermissions(permissions);
+                  setPermissionDrafts([{ scope: groupIds.size === 1 ? Array.from(groupIds)[0] : undefined }]);
+                  setSavedProfileCount((count) => count + 1);
+                  return undefined;
+                } catch {
+                  const errorMessage = t({
+                    en: 'Could not save all changes. Reload the page to check the saved account and permissions.',
+                    fr: 'Impossible d’enregistrer toutes les modifications. Rechargez la page pour vérifier le compte et les autorisations enregistrés.'
+                  });
+                  setSubmitErrorMessage(errorMessage);
+                  return { errorMessage, success: false };
+                } finally {
+                  setIsSaving(false);
+                }
               }}
             />
           </Card.Content>
         </Card>
-        <UserPermissionsEditor groups={groups} user={user} />
-        <Card>
-          <Card.Header>
-            <Card.Title>
-              {user.disabled
-                ? t({ en: 'Unarchive User', es: 'Desarchivar usuario', fr: "Désarchiver l'utilisateur" })
-                : t({ en: 'Archive User', es: 'Archivar usuario', fr: "Archiver l'utilisateur" })}
-            </Card.Title>
-            <Card.Description>
-              {isCurrentUser
-                ? t({
-                    en: 'You cannot archive the account you are signed in with.',
-                    es: 'No puede archivar la cuenta con la que ha iniciado sesión.',
-                    fr: 'Vous ne pouvez pas archiver le compte avec lequel vous êtes connecté.'
-                  })
-                : user.disabled
-                  ? t({
-                      en: 'Restores this account. The user will be able to sign in again.',
-                      es: 'Restaura esta cuenta. El usuario podrá iniciar sesión de nuevo.',
-                      fr: "Restaure ce compte. L'utilisateur pourra se reconnecter."
-                    })
-                  : t({
-                      en: 'Disables this account. The user will no longer be able to sign in.',
-                      es: 'Desactiva esta cuenta. El usuario ya no podrá iniciar sesión.',
-                      fr: "Désactive ce compte. L'utilisateur ne pourra plus se connecter."
-                    })}
-            </Card.Description>
-          </Card.Header>
-          <Card.Footer>
-            <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-              <Dialog.Trigger asChild>
-                <Button disabled={isCurrentUser} type="button" variant={user.disabled ? 'primary' : 'danger'}>
-                  {user.disabled
-                    ? t({ en: 'Unarchive User', es: 'Desarchivar usuario', fr: "Désarchiver l'utilisateur" })
-                    : t({ en: 'Archive User', es: 'Archivar usuario', fr: "Archiver l'utilisateur" })}
-                </Button>
-              </Dialog.Trigger>
-              <Dialog.Content>
-                <Dialog.Header>
-                  <Dialog.Title>
-                    {t({
-                      en: 'Are you absolutely sure?',
-                      es: '¿Está absolutamente seguro?',
-                      fr: 'Êtes-vous absolument sûr ?'
-                    })}
-                  </Dialog.Title>
-                  <Dialog.Description>
-                    {user.disabled
-                      ? t({
-                          en: 'This will restore the account and allow the user to sign in again.',
-                          es: 'Esto restaurará la cuenta y permitirá que el usuario inicie sesión de nuevo.',
-                          fr: "Cela restaurera le compte et permettra à l'utilisateur de se reconnecter."
-                        })
-                      : t({
-                          en: 'This will archive the account and prevent the user from signing in.',
-                          es: 'Esto archivará la cuenta e impedirá que el usuario inicie sesión.',
-                          fr: "Cela archivera le compte et empêchera l'utilisateur de se connecter."
-                        })}
-                  </Dialog.Description>
-                </Dialog.Header>
-                <Dialog.Footer>
-                  <Button
-                    className="min-w-16"
-                    type="button"
-                    variant={user.disabled ? 'primary' : 'danger'}
-                    onClick={() => {
-                      const mutation = user.disabled ? unarchiveUserMutation : archiveUserMutation;
-                      mutation.mutate(
-                        { id: user.id },
-                        {
-                          onSuccess: () => {
-                            setIsConfirmOpen(false);
-                          }
-                        }
-                      );
-                    }}
-                  >
-                    {t('core.yes')}
-                  </Button>
-                  <Button className="min-w-16" type="button" variant="outline" onClick={() => setIsConfirmOpen(false)}>
-                    {t('core.no')}
-                  </Button>
-                </Dialog.Footer>
-              </Dialog.Content>
-            </Dialog>
-          </Card.Footer>
-        </Card>
+        <UserPermissionsEditor
+          drafts={permissionDrafts}
+          groups={groups}
+          highlightIncomplete={highlightIncompleteDrafts}
+          isSaving={isSaving}
+          permissions={localPermissions}
+          user={user}
+          onDraftsChange={setPermissionDrafts}
+          onPermissionsChange={setLocalPermissions}
+        />
+        <Button
+          className="w-full"
+          data-testid="save-user-changes"
+          disabled={isSaving}
+          form="admin-user-account-form"
+          type="submit"
+          variant="primary"
+        >
+          {t({ en: 'Save Changes', fr: 'Enregistrer les modifications' })}
+        </Button>
       </div>
     </div>
   );
+};
+
+const RouteComponent = () => {
+  const { userId } = Route.useParams();
+  return <UserEditor key={userId} userId={userId} />;
 };
 
 export const Route = createFileRoute('/_app/admin/users/$userId')({
