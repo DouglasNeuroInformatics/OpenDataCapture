@@ -40,8 +40,8 @@ export class AdminUserPage extends AppPage {
     await this.submitPermission();
   }
 
-  async deleteUser() {
-    await this.$ref.getByRole('button', { name: 'Delete User' }).click();
+  async archiveUser() {
+    await this.$ref.getByRole('button', { name: 'Archive User' }).click();
     await this.$ref.getByRole('button', { name: 'Yes' }).click();
   }
 

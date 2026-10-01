@@ -113,15 +113,16 @@ export class UsersService {
     });
   }
 
-  async deleteById(id: string, currentUser: RequestUser) {
+  async archiveById(id: string, currentUser: RequestUser) {
     if (id === currentUser.id) {
-      throw new ForbiddenException('You may not delete your own account');
+      throw new ForbiddenException('You may not archive your own account');
     }
-    return this.userModel.delete({
+    return this.userModel.update({
+      data: { disabled: true },
       omit: {
         hashedPassword: true
       },
-      where: { AND: [accessibleQuery(currentUser.ability, 'delete', 'User')], id }
+      where: { AND: [accessibleQuery(currentUser.ability, 'update', 'User')], id }
     });
   }
 

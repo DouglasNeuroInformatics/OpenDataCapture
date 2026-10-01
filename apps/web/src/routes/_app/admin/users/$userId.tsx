@@ -12,7 +12,7 @@ import { UpdateUserForm } from '@/components/UpdateUserForm';
 import type { UpdateUserFormInputData } from '@/components/UpdateUserForm';
 import { UserIcon } from '@/components/UserIcon';
 import { UserPermissionsEditor } from '@/components/UserPermissionsEditor';
-import { useDeleteUserMutation } from '@/hooks/useDeleteUserMutation';
+import { useArchiveUserMutation } from '@/hooks/useArchiveUserMutation';
 import { useFindUserQuery, useFindUserQueryOptions } from '@/hooks/useFindUserQuery';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
@@ -26,10 +26,10 @@ const RouteComponent = () => {
   const navigate = useNavigate();
   const groupsQuery = useGroupsQuery();
   const userQuery = useFindUserQuery(userId);
-  const deleteUserMutation = useDeleteUserMutation();
+  const archiveUserMutation = useArchiveUserMutation();
   const updateUserMutation = useUpdateUserMutation();
   const [submitErrorMessage, setSubmitErrorMessage] = useState<null | string>(null);
-  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [isConfirmArchiveOpen, setIsConfirmArchiveOpen] = useState(false);
   // libui's `Form` clears its values after a successful submit, so the profile form is remounted
   // from the saved user once a save lands. Keyed on this rather than on the query's refetch time so
   // that saving a permission below does not discard edits typed here but not yet saved.
@@ -150,24 +150,26 @@ const RouteComponent = () => {
         <UserPermissionsEditor groups={groups} user={user} />
         <Card>
           <Card.Header>
-            <Card.Title>{t({ en: 'Delete User', fr: "Supprimer l'utilisateur" })}</Card.Title>
+            <Card.Title>{t({ en: 'Archive User', es: 'Archivar usuario', fr: "Archiver l'utilisateur" })}</Card.Title>
             <Card.Description>
               {isCurrentUser
                 ? t({
-                    en: 'You cannot delete the account you are signed in with.',
-                    fr: 'Vous ne pouvez pas supprimer le compte avec lequel vous êtes connecté.'
+                    en: 'You cannot archive the account you are signed in with.',
+                    es: 'No puede archivar la cuenta con la que ha iniciado sesión.',
+                    fr: 'Vous ne pouvez pas archiver le compte avec lequel vous êtes connecté.'
                   })
                 : t({
-                    en: 'Permanently removes this account. This cannot be undone.',
-                    fr: 'Supprime définitivement ce compte. Cette action ne peut pas être annulée.'
+                    en: 'Disables this account. The user will no longer be able to sign in.',
+                    es: 'Desactiva esta cuenta. El usuario ya no podrá iniciar sesión.',
+                    fr: "Désactive ce compte. L'utilisateur ne pourra plus se connecter."
                   })}
             </Card.Description>
           </Card.Header>
           <Card.Footer>
-            <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
+            <Dialog open={isConfirmArchiveOpen} onOpenChange={setIsConfirmArchiveOpen}>
               <Dialog.Trigger asChild>
                 <Button disabled={isCurrentUser} type="button" variant="danger">
-                  {t({ en: 'Delete User', fr: "Supprimer l'utilisateur" })}
+                  {t({ en: 'Archive User', es: 'Archivar usuario', fr: "Archiver l'utilisateur" })}
                 </Button>
               </Dialog.Trigger>
               <Dialog.Content>
@@ -175,13 +177,15 @@ const RouteComponent = () => {
                   <Dialog.Title>
                     {t({
                       en: 'Are you absolutely sure?',
+                      es: '¿Está absolutamente seguro?',
                       fr: 'Êtes-vous absolument sûr ?'
                     })}
                   </Dialog.Title>
                   <Dialog.Description>
                     {t({
-                      en: 'This action will permanently delete the account and cannot be undone.',
-                      fr: 'Cette action supprimera définitivement le compte et ne pourra pas être annulée.'
+                      en: 'This will archive the account and prevent the user from signing in.',
+                      es: 'Esto archivará la cuenta e impedirá que el usuario inicie sesión.',
+                      fr: "Cela archivera le compte et empêchera l'utilisateur de se connecter."
                     })}
                   </Dialog.Description>
                 </Dialog.Header>
@@ -191,7 +195,7 @@ const RouteComponent = () => {
                     type="button"
                     variant="danger"
                     onClick={() => {
-                      deleteUserMutation.mutate(
+                      archiveUserMutation.mutate(
                         { id: user.id },
                         {
                           onSuccess: () => {
@@ -207,7 +211,7 @@ const RouteComponent = () => {
                     className="min-w-16"
                     type="button"
                     variant="outline"
-                    onClick={() => setIsConfirmDeleteOpen(false)}
+                    onClick={() => setIsConfirmArchiveOpen(false)}
                   >
                     {t('core.no')}
                   </Button>

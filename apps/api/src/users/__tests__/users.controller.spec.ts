@@ -152,7 +152,7 @@ describe('UsersController', () => {
   // evaluated against a whole ability. `manage User` covers every action a narrower declaration could
   // name, so a holder refused here is refused by any declaration short of `manage all`.
   describe('route access for writes to a user', () => {
-    const WRITE_HANDLERS = ['create', 'deleteById', 'updateById', 'updatePermissions'] as const;
+    const WRITE_HANDLERS = ['archiveById', 'create', 'updateById', 'updatePermissions'] as const;
 
     const abilityFor = (basePermissionLevel: BasePermissionLevel, additionalPermissions: Permissions = []) =>
       new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({

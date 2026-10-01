@@ -160,15 +160,16 @@ describe('UsersService', () => {
     });
   });
 
-  describe('deleteById', () => {
-    it('should refuse an administrator deleting their own account, so the last one cannot remove every admin', async () => {
-      await expect(usersService.deleteById(admin.id, admin)).rejects.toThrow(ForbiddenException);
-      expect(userModel.delete).not.toHaveBeenCalled();
+  describe('archiveById', () => {
+    it('should refuse an administrator archiving their own account, so the last one cannot remove every admin', async () => {
+      await expect(usersService.archiveById(admin.id, admin)).rejects.toThrow(ForbiddenException);
+      expect(userModel.update).not.toHaveBeenCalled();
     });
 
-    it('should let an administrator delete another user', async () => {
-      await usersService.deleteById('user-1', admin);
-      expect(userModel.delete.mock.lastCall?.[0].where).toMatchObject({ id: 'user-1' });
+    it('should set disabled to true instead of deleting the record', async () => {
+      await usersService.archiveById('user-1', admin);
+      expect(userModel.update.mock.lastCall?.[0].data).toMatchObject({ disabled: true });
+      expect(userModel.update.mock.lastCall?.[0].where).toMatchObject({ id: 'user-1' });
     });
   });
 

@@ -1,18 +1,6 @@
 import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Headers,
-  NotFoundException,
-  Param,
-  Patch,
-  Post,
-  Put,
-  Query
-} from '@nestjs/common';
+import { Body, Controller, Get, Headers, NotFoundException, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { $Language } from '@opendatacapture/schemas/core';
 import type { Language } from '@opendatacapture/schemas/core';
@@ -76,11 +64,11 @@ export class UsersController {
     return { ...created, welcomeEmail };
   }
 
-  @ApiOperation({ summary: 'Delete User' })
-  @Delete(':id')
+  @ApiOperation({ summary: 'Archive User' })
+  @Patch(':id/archive')
   @RouteAccess(ADMIN_ONLY)
-  deleteById(@Param('id') id: string, @CurrentUser() currentUser: RequestUser) {
-    return this.usersService.deleteById(id, currentUser);
+  archiveById(@Param('id') id: string, @CurrentUser() currentUser: RequestUser) {
+    return this.usersService.archiveById(id, currentUser);
   }
 
   @ApiOperation({ summary: 'Get All Users' })

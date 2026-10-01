@@ -200,7 +200,7 @@ test.describe('admin management', () => {
     await expect(page.getByTestId('data-table-row')).toContainText(username);
   });
 
-  test('should edit and delete a user from the user page', async ({ api, authenticateAs, page, uniqueId }) => {
+  test('should edit and archive a user from the user page', async ({ api, authenticateAs, page, uniqueId }) => {
     // Both forms require a non-empty `groupIds` for any non-ADMIN role that is not disabled, so a
     // groupless user can never be saved from the page. Seed one with a group to isolate the
     // behavior under test.
@@ -221,16 +221,14 @@ test.describe('admin management', () => {
     // The shared `Form` component's own submit button always has `aria-label="Submit"`, even though
     // this form's visible label is "Save" -- see DouglasNeuroInformatics/libui#108.
     await profileForm.getByRole('button', { name: 'Submit' }).click();
-    // The edit and delete toasts below can stack within the notification hub's shared 5s lifetime,
+    // The edit and archive toasts below can stack within the notification hub's shared 5s lifetime,
     // so `.last()` targets the most recently raised one rather than an ambiguous match on both.
     await expect(page.getByRole('heading', { name: 'Success' }).last()).toBeVisible();
 
-    await page.getByRole('button', { name: 'Delete User' }).click();
+    await page.getByRole('button', { name: 'Archive User' }).click();
     await page.getByRole('button', { name: 'Yes' }).click();
 
     await expect(page).toHaveURL('/admin/users');
-    await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(user.username);
-    await expect(page.getByTestId('data-table-row').filter({ hasText: user.username })).toHaveCount(0);
   });
 
   test('should say why a save failed when the rejected field is scrolled out of view', async ({
