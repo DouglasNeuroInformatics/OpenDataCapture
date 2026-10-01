@@ -10,6 +10,7 @@ import { pwnedPassword } from 'hibp';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 
 import { GroupsService } from '../../groups/groups.service';
@@ -43,6 +44,7 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         MockFactory.createForModelToken(getModelToken('User')),
+        MockFactory.createForService(AuditLogger),
         MockFactory.createForService(CryptoService),
         MockFactory.createForService(GroupsService)
       ]
@@ -161,26 +163,34 @@ describe('UsersService', () => {
   });
 
   describe('archiveById', () => {
+    beforeEach(() => {
+      userModel.update.mockResolvedValue({});
+    });
+
     it('should refuse an administrator archiving their own account, so the last one cannot remove every admin', async () => {
       await expect(usersService.archiveById(admin.id, admin)).rejects.toThrow(ForbiddenException);
       expect(userModel.update).not.toHaveBeenCalled();
     });
 
-    it('should set disabled to true instead of deleting the record', async () => {
+    it('should set archivedAt instead of deleting the record', async () => {
       await usersService.archiveById('user-1', admin);
-      expect(userModel.update.mock.lastCall?.[0].data).toMatchObject({ disabled: true });
+      expect(userModel.update.mock.lastCall?.[0].data.archivedAt).toBeInstanceOf(Date);
       expect(userModel.update.mock.lastCall?.[0].where).toMatchObject({ id: 'user-1' });
     });
   });
 
   describe('unarchiveById', () => {
+    beforeEach(() => {
+      userModel.update.mockResolvedValue({});
+    });
+
     it('should refuse an administrator unarchiving their own account', async () => {
       await expect(usersService.unarchiveById(admin.id, admin)).rejects.toThrow(ForbiddenException);
     });
 
-    it('should set disabled to false to restore the account', async () => {
+    it('should clear archivedAt to restore the account', async () => {
       await usersService.unarchiveById('user-1', admin);
-      expect(userModel.update.mock.lastCall?.[0].data).toMatchObject({ disabled: false });
+      expect(userModel.update.mock.lastCall?.[0].data).toMatchObject({ archivedAt: null });
       expect(userModel.update.mock.lastCall?.[0].where).toMatchObject({ id: 'user-1' });
     });
   });

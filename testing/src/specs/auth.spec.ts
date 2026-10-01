@@ -74,6 +74,34 @@ test.describe('authentication', () => {
       await expect(page.getByRole('heading', { name: 'Unauthorized' })).toBeVisible();
       await expect(page).toHaveURL('/auth/login');
     });
+
+    test('should not reveal that an account is archived to a wrong password', async ({ api, getPageModel, page }) => {
+      const group = await api.createGroup();
+      const { credentials, user } = await api.createUser({ groupIds: [group.id] });
+      await api.archiveUser(user.id);
+
+      const loginPage = await getPageModel('/auth/login');
+      await loginPage.fillLoginForm({ password: `wrong-${credentials.password}`, username: credentials.username });
+
+      await expect(page.getByRole('heading', { name: 'Unauthorized' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Account Archived' })).toHaveCount(0);
+    });
+  });
+
+  test('should tell an archived user with the right password that their account is archived', async ({
+    api,
+    getPageModel,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { credentials, user } = await api.createUser({ groupIds: [group.id] });
+    await api.archiveUser(user.id);
+
+    const loginPage = await getPageModel('/auth/login');
+    await loginPage.fillLoginForm(credentials);
+
+    await expect(page.getByRole('heading', { name: 'Account Archived' })).toBeVisible();
+    await expect(page).toHaveURL('/auth/login');
   });
 
   test('should log out and require re-authentication for protected routes', async ({ api, getPageModel, page }) => {

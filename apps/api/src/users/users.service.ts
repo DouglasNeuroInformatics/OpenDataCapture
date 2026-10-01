@@ -14,6 +14,7 @@ import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
 import type { PasswordErrorCode } from '@opendatacapture/schemas/user';
 import { pwnedPassword } from 'hibp';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -28,9 +29,29 @@ export class UsersService {
 
   constructor(
     @InjectModel('User') private readonly userModel: Model<'User'>,
+    private readonly auditLogger: AuditLogger,
     private readonly cryptoService: CryptoService,
     private readonly groupsService: GroupsService
   ) {}
+
+  async archiveById(id: string, currentUser: RequestUser) {
+    if (id === currentUser.id) {
+      throw new ForbiddenException('You may not archive your own account');
+    }
+    const user = await this.userModel.update({
+      data: { archivedAt: new Date() },
+      omit: {
+        hashedPassword: true
+      },
+      where: { AND: [accessibleQuery(currentUser.ability, 'update', 'User')], id }
+    });
+    await this.auditLogger.log('UPDATE', 'USER', {
+      groupId: null,
+      metadata: { action: 'archive', targetUserId: id },
+      userId: currentUser.id
+    });
+    return user;
+  }
 
   async checkUsernameExists(username: string, { ability }: EntityOperationOptions = {}): Promise<{ success: boolean }> {
     const user = await this.userModel.findFirst({
@@ -113,32 +134,6 @@ export class UsersService {
     });
   }
 
-  async archiveById(id: string, currentUser: RequestUser) {
-    if (id === currentUser.id) {
-      throw new ForbiddenException('You may not archive your own account');
-    }
-    return this.userModel.update({
-      data: { disabled: true },
-      omit: {
-        hashedPassword: true
-      },
-      where: { AND: [accessibleQuery(currentUser.ability, 'update', 'User')], id }
-    });
-  }
-
-  async unarchiveById(id: string, currentUser: RequestUser) {
-    if (id === currentUser.id) {
-      throw new ForbiddenException('You may not unarchive your own account');
-    }
-    return this.userModel.update({
-      data: { disabled: false },
-      omit: {
-        hashedPassword: true
-      },
-      where: { AND: [accessibleQuery(currentUser.ability, 'update', 'User')], id }
-    });
-  }
-
   /** Delete the user with the provided username, otherwise throws */
   async deleteByUsername(username: string, { ability }: EntityOperationOptions = {}) {
     const user = await this.findByUsername(username);
@@ -188,6 +183,25 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
     }
+    return user;
+  }
+
+  async unarchiveById(id: string, currentUser: RequestUser) {
+    if (id === currentUser.id) {
+      throw new ForbiddenException('You may not unarchive your own account');
+    }
+    const user = await this.userModel.update({
+      data: { archivedAt: null },
+      omit: {
+        hashedPassword: true
+      },
+      where: { AND: [accessibleQuery(currentUser.ability, 'update', 'User')], id }
+    });
+    await this.auditLogger.log('UPDATE', 'USER', {
+      groupId: null,
+      metadata: { action: 'unarchive', targetUserId: id },
+      userId: currentUser.id
+    });
     return user;
   }
 

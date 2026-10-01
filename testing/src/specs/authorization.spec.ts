@@ -369,7 +369,9 @@ test.describe('server-side authorization', () => {
 
     expect.soft(disabled.status(), 'an administrator must not be able to disable themselves').toBe(403);
     expect.soft(archived.status(), 'an administrator must not be able to archive themselves').toBe(403);
-    expect((await api.findUserById(user.id)).disabled).not.toBe(true);
+    const reloaded = await api.findUserById(user.id);
+    expect(reloaded.disabled).not.toBe(true);
+    expect(reloaded.archivedAt).toBeFalsy();
   });
 
   // The playground uploads a bundle with a token minted by `GET /auth/create-instrument-token`, and

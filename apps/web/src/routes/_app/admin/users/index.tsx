@@ -2,17 +2,35 @@ import React, { useState } from 'react';
 
 import { snakeToCamelCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
+import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import type { User } from '@opendatacapture/schemas/user';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useArchiveUserMutation } from '@/hooks/useArchiveUserMutation';
 import { useUnarchiveUserMutation } from '@/hooks/useUnarchiveUserMutation';
-import { useAppStore } from '@/store';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
+import { useAppStore } from '@/store';
 
-type ArchiveAction = { kind: 'archive'; user: User } | { kind: 'unarchive'; user: User };
+type ArchiveAction = { kind: 'archive'; user: User };
+
+const SortableHeader = ({ column, label }: { column: TanstackTable.Column<User>; label: string }) => {
+  const sorted = column.getIsSorted();
+  const Icon = sorted === 'asc' ? ChevronUpIcon : sorted === 'desc' ? ChevronDownIcon : ChevronsUpDownIcon;
+  return (
+    <button
+      className="hover:text-foreground flex items-center gap-1 transition-colors"
+      type="button"
+      onClick={() => column.toggleSorting()}
+    >
+      {label}
+      <Icon className={cn('h-3.5 w-3.5', !sorted && 'opacity-40')} />
+    </button>
+  );
+};
 
 const RouteComponent = () => {
   const { t } = useTranslation();
@@ -52,7 +70,7 @@ const RouteComponent = () => {
                 </span>
               );
             },
-            header: t('common.username')
+            header: ({ column }) => <SortableHeader column={column} label={t('common.username')} />
           },
           {
             accessorKey: 'basePermissionLevel',
@@ -66,19 +84,31 @@ const RouteComponent = () => {
               }
               return t(`common.${snakeToCamelCase(basePermissionLevel)}`);
             },
-            header: t('common.basePermissionLevel')
+            header: ({ column }) => <SortableHeader column={column} label={t('common.basePermissionLevel')} />
           },
           {
-            accessorKey: 'disabled',
+            accessorFn: (user) => Boolean(user.disabled),
+            cell: ({ row }) => (
+              <span data-testid="user-login-status">
+                {row.original.disabled ? t({ en: 'Disabled', fr: 'Désactivé' }) : t({ en: 'Enabled', fr: 'Activé' })}
+              </span>
+            ),
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Enabled / Disabled', fr: 'Activé / Désactivé' })} />
+            ),
+            id: 'disabled'
+          },
+          {
+            accessorKey: 'archivedAt',
             cell: (ctx) => {
               const user = ctx.row.original;
-              if (user.disabled) {
+              if (user.archivedAt) {
                 return (
                   <span className="text-destructive" data-testid="user-status-archived">
                     {t({
-                      en: `Archived on ${toBasicISOString(user.updatedAt)}`,
-                      es: `Archivado el ${toBasicISOString(user.updatedAt)}`,
-                      fr: `Archivé le ${toBasicISOString(user.updatedAt)}`
+                      en: `Archived on ${toBasicISOString(new Date(user.archivedAt))}`,
+                      es: `Archivado el ${toBasicISOString(new Date(user.archivedAt))}`,
+                      fr: `Archivé le ${toBasicISOString(new Date(user.archivedAt))}`
                     })}
                   </span>
                 );
@@ -89,7 +119,9 @@ const RouteComponent = () => {
                 </span>
               );
             },
-            header: t({ en: 'Status', es: 'Estado', fr: 'Statut' }),
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Status', es: 'Estado', fr: 'Statut' })} />
+            ),
             id: 'status'
           }
         ]}
@@ -101,14 +133,14 @@ const RouteComponent = () => {
             onSelect: openUser
           },
           {
-            disabled: (user) => user.username === currentUser?.username || Boolean(user.disabled),
+            disabled: (user) => user.username === currentUser?.username || Boolean(user.archivedAt),
             label: t({ en: 'Archive', es: 'Archivar', fr: 'Archiver' }),
             onSelect: (user) => setPendingAction({ kind: 'archive', user })
           },
           {
-            disabled: (user) => !user.disabled,
+            disabled: (user) => !user.archivedAt,
             label: t({ en: 'Unarchive', es: 'Desarchivar', fr: 'Désarchiver' }),
-            onSelect: (user) => setPendingAction({ kind: 'unarchive', user })
+            onSelect: (user) => unarchiveUserMutation.mutate({ id: user.id })
           }
         ]}
         togglesComponent={() => (
@@ -140,29 +172,22 @@ const RouteComponent = () => {
               })}
             </Dialog.Title>
             <Dialog.Description>
-              {pendingAction?.kind === 'archive'
-                ? t({
-                    en: 'This will archive the account and prevent the user from signing in.',
-                    es: 'Esto archivará la cuenta e impedirá que el usuario inicie sesión.',
-                    fr: "Cela archivera le compte et empêchera l'utilisateur de se connecter."
-                  })
-                : t({
-                    en: 'This will restore the account and allow the user to sign in again.',
-                    es: 'Esto restaurará la cuenta y permitirá que el usuario inicie sesión de nuevo.',
-                    fr: "Cela restaurera le compte et permettra à l'utilisateur de se reconnecter."
-                  })}
+              {t({
+                en: 'This will archive the account and prevent the user from signing in.',
+                es: 'Esto archivará la cuenta e impedirá que el usuario inicie sesión.',
+                fr: "Cela archivera le compte et empêchera l'utilisateur de se connecter."
+              })}
             </Dialog.Description>
           </Dialog.Header>
           <Dialog.Footer>
             <Button
               className="min-w-16"
-              data-testid={pendingAction?.kind === 'archive' ? 'confirm-archive-user' : 'confirm-unarchive-user'}
+              data-testid="confirm-archive-user"
               type="button"
-              variant={pendingAction?.kind === 'archive' ? 'danger' : 'primary'}
+              variant="danger"
               onClick={() => {
                 if (!pendingAction) return;
-                const mutation = pendingAction.kind === 'archive' ? archiveUserMutation : unarchiveUserMutation;
-                mutation.mutate({ id: pendingAction.user.id }, { onSuccess: () => setPendingAction(null) });
+                archiveUserMutation.mutate({ id: pendingAction.user.id }, { onSuccess: () => setPendingAction(null) });
               }}
             >
               {t('core.yes')}

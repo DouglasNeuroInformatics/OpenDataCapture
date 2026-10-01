@@ -2,7 +2,7 @@ import { CryptoService, LoggingService } from '@douglasneuroinformatics/libnest'
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -29,7 +29,9 @@ const BASE_PAYLOAD = {
 describe('AuthService', () => {
   let abilityFactory: AbilityFactory;
   let authService: AuthService;
+  let cryptoService: MockedInstance<CryptoService>;
   let jwtService: MockedInstance<JwtService>;
+  let usersService: MockedInstance<UsersService>;
 
   const requestUserFor = (basePermissionLevel: 'ADMIN' | 'GROUP_MANAGER' | 'STANDARD'): RequestUser => {
     const ability = abilityFactory.createForPayload({ ...BASE_PAYLOAD, basePermissionLevel } as any);
@@ -46,13 +48,48 @@ describe('AuthService', () => {
     abilityFactory = new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService);
     jwtService = MockFactory.createMock(JwtService);
     jwtService.signAsync.mockResolvedValue('__TOKEN__');
+    cryptoService = MockFactory.createMock(CryptoService);
+    usersService = MockFactory.createMock(UsersService);
     authService = new AuthService(
       abilityFactory,
       MockFactory.createMock(AuditLogger) as unknown as AuditLogger,
-      MockFactory.createMock(CryptoService) as unknown as CryptoService,
+      cryptoService as unknown as CryptoService,
       jwtService as unknown as JwtService,
-      MockFactory.createMock(UsersService) as unknown as UsersService
+      usersService as unknown as UsersService
     );
+  });
+
+  describe('login', () => {
+    const credentials = { password: 'guess', username: 'test-user' };
+
+    const storedUser = (status: { archivedAt?: Date; disabled?: boolean }) => ({
+      ...BASE_PAYLOAD,
+      basePermissionLevel: 'STANDARD',
+      groups: [],
+      hashedPassword: '__HASH__',
+      ...status
+    });
+
+    it.each([{ archivedAt: new Date() }, { disabled: true }])(
+      'should answer a wrong password for a %o account as invalid credentials, so a guess cannot reveal its status',
+      async (status) => {
+        usersService.findByUsername.mockResolvedValue(storedUser(status) as any);
+        cryptoService.comparePassword.mockResolvedValue(false);
+        await expect(authService.login(credentials)).rejects.toThrow(UnauthorizedException);
+      }
+    );
+
+    it('should refuse an archived account once the password is proven', async () => {
+      usersService.findByUsername.mockResolvedValue(storedUser({ archivedAt: new Date() }) as any);
+      cryptoService.comparePassword.mockResolvedValue(true);
+      await expect(authService.login(credentials)).rejects.toThrow('Account Archived');
+    });
+
+    it('should refuse a disabled account once the password is proven', async () => {
+      usersService.findByUsername.mockResolvedValue(storedUser({ disabled: true }) as any);
+      cryptoService.comparePassword.mockResolvedValue(true);
+      await expect(authService.login(credentials)).rejects.toThrow('Account Disabled');
+    });
   });
 
   describe('getCreateInstrumentToken', () => {

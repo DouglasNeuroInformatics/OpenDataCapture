@@ -39,6 +39,13 @@ export class ApiClient {
     return { Authorization: `Bearer ${this.token}` };
   }
 
+  async archiveUser(id: string): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/users/${id}/archive`, { headers: this.authHeaders }),
+      `archive user '${id}'`
+    );
+  }
+
   /** Creates a remote assignment through the single-assignment route the web app uses. */
   async createAssignment(data: CreateAssignmentData): Promise<Assignment> {
     return this.expectJson<Assignment>(

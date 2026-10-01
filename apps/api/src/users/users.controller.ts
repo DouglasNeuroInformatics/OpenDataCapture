@@ -32,6 +32,13 @@ export class UsersController {
     private readonly mailService: MailService
   ) {}
 
+  @ApiOperation({ summary: 'Archive User' })
+  @Patch(':id/archive')
+  @RouteAccess(ADMIN_ONLY)
+  archiveById(@Param('id') id: string, @CurrentUser() currentUser: RequestUser) {
+    return this.usersService.archiveById(id, currentUser);
+  }
+
   @ApiOperation({ summary: 'Get User by Username' })
   @Get('/check-username/:username')
   @RouteAccess({ action: 'read', subject: 'User' })
@@ -62,13 +69,6 @@ export class UsersController {
       username: user.username
     });
     return { ...created, welcomeEmail };
-  }
-
-  @ApiOperation({ summary: 'Archive User' })
-  @Patch(':id/archive')
-  @RouteAccess(ADMIN_ONLY)
-  archiveById(@Param('id') id: string, @CurrentUser() currentUser: RequestUser) {
-    return this.usersService.archiveById(id, currentUser);
   }
 
   @ApiOperation({ summary: 'Get All Users' })

@@ -12,14 +12,19 @@ import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStat
 import { useAppStore } from '@/store';
 import { getRightPanelGradient } from '@/utils/branding';
 
-type LoginResult = { accessToken: string; kind: 'success' } | { kind: 'archived' } | { kind: 'unauthorized' };
+type LoginResult =
+  | { accessToken: string; kind: 'success' }
+  | { kind: 'archived' }
+  | { kind: 'disabled' }
+  | { kind: 'unauthorized' };
 
 const loginRequest = async (credentials: $LoginCredentials): Promise<LoginResult> => {
   const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {
     validateStatus: (status) => status === 200 || status === 401 || status === 403
   });
   if (response.status === 403) {
-    return { kind: 'archived' };
+    const message = (response.data as { message?: string }).message;
+    return { kind: message === 'Account Archived' ? 'archived' : 'disabled' };
   }
   if (response.status === 401) {
     return { kind: 'unauthorized' };
@@ -52,6 +57,22 @@ const RouteComponent = () => {
           en: 'Account Archived',
           es: 'Cuenta archivada',
           fr: 'Compte archivé'
+        }),
+        type: 'error'
+      });
+      return;
+    }
+    if (result.kind === 'disabled') {
+      notifications.addNotification({
+        message: t({
+          en: 'This account is disabled. Please contact an administrator.',
+          es: 'Esta cuenta está desactivada. Comuníquese con un administrador.',
+          fr: 'Ce compte est désactivé. Veuillez contacter un administrateur.'
+        }),
+        title: t({
+          en: 'Account Disabled',
+          es: 'Cuenta desactivada',
+          fr: 'Compte désactivé'
         }),
         type: 'error'
       });

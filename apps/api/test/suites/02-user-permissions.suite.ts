@@ -139,7 +139,8 @@ export default defineSuite('user permissions', function () {
         { method: 'PATCH', payload: { basePermissionLevel: 'ADMIN' }, url: `/v1/users/${grantee.id}` },
         { method: 'PATCH', payload: { groupIds: [group.id, otherGroup.id] }, url: `/v1/users/${grantee.id}` },
         { method: 'PATCH', payload: { password: PASSWORD }, url: `/v1/users/${teammateAdmin.id}` },
-        { method: 'DELETE', url: `/v1/users/${teammateAdmin.id}` },
+        { method: 'PATCH', url: `/v1/users/${teammateAdmin.id}/archive` },
+        { method: 'PATCH', url: `/v1/users/${teammateAdmin.id}/unarchive` },
         {
           method: 'POST',
           payload: {

@@ -59,6 +59,7 @@ export type PasswordErrorCode = (typeof PASSWORD_ERROR_CODES)[number];
 export type User = z.infer<typeof $User>;
 export const $User = $BaseModel.extend({
   additionalPermissions: $Permissions,
+  archivedAt: z.coerce.date().nullish(),
   basePermissionLevel: $BasePermissionLevel.nullable(),
   dateOfBirth: z.coerce.date().nullish(),
   disabled: z.boolean().nullish(),
