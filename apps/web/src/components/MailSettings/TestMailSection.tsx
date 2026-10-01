@@ -42,9 +42,10 @@ export const TestMailSection = ({ buildConfig, onInvalid }: TestMailSectionProps
           addNotification({
             message: t({
               en: 'The test could not be completed (the server may be unreachable or the request timed out). Check the host, port, and credentials.',
+              es: 'No se pudo completar la prueba (puede que el servidor no esté accesible o que la solicitud haya expirado). Compruebe el servidor, el puerto y las credenciales.',
               fr: "Le test n'a pas pu être effectué (serveur injoignable ou délai dépassé). Vérifiez l'hôte, le port et les identifiants."
             }),
-            title: t({ en: 'Mail test failed', fr: 'Échec du test de courriel' }),
+            title: t({ en: 'Mail test failed', es: 'La prueba de correo falló', fr: 'Échec du test de courriel' }),
             type: 'error'
           });
         },
@@ -53,19 +54,31 @@ export const TestMailSection = ({ buildConfig, onInvalid }: TestMailSectionProps
           if (!outcome.success) {
             addNotification({
               message: mailErrorMessage(outcome.error),
-              title: t({ en: 'Mail test failed', fr: 'Échec du test de courriel' }),
+              title: t({ en: 'Mail test failed', es: 'La prueba de correo falló', fr: 'Échec du test de courriel' }),
               type: 'error'
             });
             return;
           }
           addNotification({
             message: withRecipient
-              ? t({ en: 'Test email sent to {}', fr: 'Courriel de test envoyé à {}' }, { args: [recipient] })
+              ? t(
+                  {
+                    en: 'Test email sent to {}',
+                    es: 'Correo de prueba enviado a {}',
+                    fr: 'Courriel de test envoyé à {}'
+                  },
+                  { args: [recipient] }
+                )
               : t({
                   en: 'Connected to the mail server successfully',
+                  es: 'Conexión con el servidor de correo establecida correctamente',
                   fr: 'Connexion au serveur de courriel réussie'
                 }),
-            title: t({ en: 'Mail test succeeded', fr: 'Test de courriel réussi' }),
+            title: t({
+              en: 'Mail test succeeded',
+              es: 'La prueba de correo se realizó correctamente',
+              fr: 'Test de courriel réussi'
+            }),
             type: 'success'
           });
         }
@@ -76,15 +89,16 @@ export const TestMailSection = ({ buildConfig, onInvalid }: TestMailSectionProps
   return (
     <SectionCard data-testid="mail-test-card">
       <Heading className="mb-5" variant="h4">
-        {t({ en: 'Verify Your Configuration', fr: 'Vérifiez votre configuration' })}
+        {t({ en: 'Verify Your Configuration', es: 'Verifique su configuración', fr: 'Vérifiez votre configuration' })}
       </Heading>
       <div className="flex flex-col gap-5">
         <div className="flex flex-col items-start gap-2">
           <div>
-            <p className="text-sm font-medium">{t({ en: 'Connection', fr: 'Connexion' })}</p>
+            <p className="text-sm font-medium">{t({ en: 'Connection', es: 'Conexión', fr: 'Connexion' })}</p>
             <p className="text-muted-foreground text-xs">
               {t({
                 en: 'Check that the server accepts the connection and your credentials.',
+                es: 'Compruebe que el servidor acepta la conexión y sus credenciales.',
                 fr: 'Vérifiez que le serveur accepte la connexion et vos identifiants.'
               })}
             </p>
@@ -98,8 +112,8 @@ export const TestMailSection = ({ buildConfig, onInvalid }: TestMailSectionProps
           >
             {testingMode === 'connection' && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
             {testingMode === 'connection'
-              ? t({ en: 'Testing…', fr: 'Test en cours…' })
-              : t({ en: 'Test connection', fr: 'Tester la connexion' })}
+              ? t({ en: 'Testing…', es: 'Probando…', fr: 'Test en cours…' })
+              : t({ en: 'Test connection', es: 'Probar la conexión', fr: 'Tester la connexion' })}
           </Button>
         </div>
 
@@ -107,10 +121,13 @@ export const TestMailSection = ({ buildConfig, onInvalid }: TestMailSectionProps
 
         <div className="flex flex-col items-start gap-2">
           <div>
-            <p className="text-sm font-medium">{t({ en: 'Send test email', fr: 'Envoyer un courriel de test' })}</p>
+            <p className="text-sm font-medium">
+              {t({ en: 'Send test email', es: 'Enviar correo de prueba', fr: 'Envoyer un courriel de test' })}
+            </p>
             <p className="text-muted-foreground text-xs">
               {t({
                 en: 'Deliver a real message to confirm everything works end to end.',
+                es: 'Entregue un mensaje real para confirmar que todo funciona de principio a fin.',
                 fr: 'Envoyez un message réel pour confirmer que tout fonctionne de bout en bout.'
               })}
             </p>
@@ -121,7 +138,11 @@ export const TestMailSection = ({ buildConfig, onInvalid }: TestMailSectionProps
             data-testid="mail-test-recipient"
             id="mail-test-recipient"
             name="odc-smtp-test-recipient"
-            placeholder={t({ en: 'recipient@example.org', fr: 'destinataire@exemple.org' })}
+            placeholder={t({
+              en: 'recipient@example.org',
+              es: 'destinatario@example.org',
+              fr: 'destinataire@exemple.org'
+            })}
             type="email"
             value={recipient}
             onChange={(event) => setRecipient(event.target.value)}
@@ -135,8 +156,8 @@ export const TestMailSection = ({ buildConfig, onInvalid }: TestMailSectionProps
           >
             {testingMode === 'email' && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
             {testingMode === 'email'
-              ? t({ en: 'Sending…', fr: 'Envoi en cours…' })
-              : t({ en: 'Send test email', fr: 'Envoyer un courriel de test' })}
+              ? t({ en: 'Sending…', es: 'Enviando…', fr: 'Envoi en cours…' })
+              : t({ en: 'Send test email', es: 'Enviar correo de prueba', fr: 'Envoyer un courriel de test' })}
           </Button>
         </div>
       </div>

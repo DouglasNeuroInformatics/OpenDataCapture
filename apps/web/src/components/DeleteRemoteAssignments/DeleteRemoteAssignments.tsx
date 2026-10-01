@@ -44,14 +44,14 @@ const StatusCell = ({ status }: { status: 'EXPIRED' | 'OUTSTANDING' }) => {
     return (
       <span className="flex items-center gap-1.5">
         <CircleDotIcon className="h-3.5 w-3.5 text-sky-600" />
-        {t({ en: 'Outstanding', fr: 'En attente' })}
+        {t({ en: 'Outstanding', es: 'Pendiente', fr: 'En attente' })}
       </span>
     );
   }
   return (
     <span className="flex items-center gap-1.5">
       <CircleAlertIcon className="h-3.5 w-3.5 text-amber-500" />
-      {t({ en: 'Expired', fr: 'Expiré' })}
+      {t({ en: 'Expired', es: 'Expirado', fr: 'Expiré' })}
     </span>
   );
 };
@@ -128,10 +128,13 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
     <Card className="overflow-hidden" data-testid="delete-remote-assignments">
       <div className="flex flex-col gap-3 px-6 py-4">
         <div className="flex flex-col gap-1.5">
-          <Card.Title className="text-lg">{t({ en: 'Delete Assignments', fr: 'Supprimer des tâches' })}</Card.Title>
+          <Card.Title className="text-lg">
+            {t({ en: 'Delete Assignments', es: 'Eliminar tareas', fr: 'Supprimer des tâches' })}
+          </Card.Title>
           <Card.Description>
             {t({
               en: 'Select outstanding or expired assignments to delete.',
+              es: 'Seleccione las tareas pendientes o expiradas para eliminar.',
               fr: 'Sélectionnez les tâches en attente ou expirées à supprimer.'
             })}
           </Card.Description>
@@ -141,6 +144,7 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
           <p className="text-muted-foreground py-8 text-center text-sm italic">
             {t({
               en: 'No outstanding or expired assignments in this group.',
+              es: 'No hay tareas pendientes o expiradas en este grupo.',
               fr: 'Aucune tâche en attente ou expirée dans ce groupe.'
             })}
           </p>
@@ -163,7 +167,11 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
                     filteredRows.length > 0 && filteredRows.every((row) => selectedIds.has(row.id));
                   return (
                     <Checkbox
-                      aria-label={t({ en: 'Select All Shown', fr: 'Tout sélectionner' })}
+                      aria-label={t({
+                        en: 'Select All Shown',
+                        es: 'Seleccionar todo lo mostrado',
+                        fr: 'Tout sélectionner'
+                      })}
                       checked={allFilteredSelected}
                       data-testid="delete-select-all-assignments"
                       onCheckedChange={() => toggleFiltered(filteredRows)}
@@ -190,7 +198,10 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
                   );
                 },
                 header: ({ column }) => (
-                  <SortableHeader column={column} label={t({ en: 'Instrument', fr: 'Instrument' })} />
+                  <SortableHeader
+                    column={column}
+                    label={t({ en: 'Instrument', es: 'Instrumento', fr: 'Instrument' })}
+                  />
                 ),
                 id: 'instrument',
                 minSize: 400,
@@ -199,7 +210,7 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
               {
                 accessorKey: 'createdAt',
                 header: ({ column }) => (
-                  <SortableHeader column={column} label={t({ en: 'Assigned', fr: 'Attribué' })} />
+                  <SortableHeader column={column} label={t({ en: 'Assigned', es: 'Asignado', fr: 'Attribué' })} />
                 ),
                 id: 'createdAt',
                 maxSize: 110,
@@ -207,7 +218,9 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
               },
               {
                 accessorKey: 'expiresAt',
-                header: ({ column }) => <SortableHeader column={column} label={t({ en: 'Expires', fr: 'Expire' })} />,
+                header: ({ column }) => (
+                  <SortableHeader column={column} label={t({ en: 'Expires', es: 'Expira', fr: 'Expire' })} />
+                ),
                 id: 'expiresAt',
                 maxSize: 110,
                 size: 110
@@ -215,7 +228,9 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
               {
                 accessorKey: 'status',
                 cell: ({ getValue }) => <StatusCell status={getValue<'EXPIRED' | 'OUTSTANDING'>()} />,
-                header: ({ column }) => <SortableHeader column={column} label={t({ en: 'Status', fr: 'Statut' })} />,
+                header: ({ column }) => (
+                  <SortableHeader column={column} label={t({ en: 'Status', es: 'Estado', fr: 'Statut' })} />
+                ),
                 id: 'status',
                 maxSize: 130,
                 size: 130
@@ -230,7 +245,7 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
       <div className="flex flex-wrap items-center justify-end gap-2 border-t px-6 py-3">
         {onBack && (
           <Button className="mr-auto" type="button" variant="outline" onClick={onBack}>
-            {t({ en: 'Back', fr: 'Retour' })}
+            {t({ en: 'Back', es: 'Volver', fr: 'Retour' })}
           </Button>
         )}
         {rows.length > 0 && (
@@ -241,7 +256,7 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
             variant="danger"
             onClick={() => setIsConfirmOpen(true)}
           >
-            {t({ en: 'Delete Selected', fr: 'Supprimer la sélection' })}
+            {t({ en: 'Delete Selected', es: 'Eliminar selección', fr: 'Supprimer la sélection' })}
             {selectedIds.size > 0 && ` (${selectedIds.size})`}
           </Button>
         )}
@@ -250,17 +265,20 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <Dialog.Content>
           <Dialog.Header>
-            <Dialog.Title>{t({ en: 'Delete Assignments', fr: 'Supprimer des tâches' })}</Dialog.Title>
+            <Dialog.Title>
+              {t({ en: 'Delete Assignments', es: 'Eliminar tareas', fr: 'Supprimer des tâches' })}
+            </Dialog.Title>
             <Dialog.Description>
               {t({
                 en: `Delete ${selectedIds.size} assignment${selectedIds.size === 1 ? '' : 's'}? This cannot be undone.`,
+                es: `¿Eliminar ${selectedIds.size} tarea${selectedIds.size === 1 ? '' : 's'}? Esta acción no se puede deshacer.`,
                 fr: `Supprimer ${selectedIds.size} tâche${selectedIds.size === 1 ? '' : 's'} ? Cette action est irréversible.`
               })}
             </Dialog.Description>
           </Dialog.Header>
           <Dialog.Footer>
             <Button type="button" variant="outline" onClick={() => setIsConfirmOpen(false)}>
-              {t({ en: 'Cancel', fr: 'Annuler' })}
+              {t({ en: 'Cancel', es: 'Cancelar', fr: 'Annuler' })}
             </Button>
             <Button
               data-testid="confirm-delete-assignments"
@@ -270,8 +288,8 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
               onClick={handleDelete}
             >
               {deleteMutation.isPending
-                ? t({ en: 'Deleting…', fr: 'Suppression…' })
-                : t({ en: 'Delete', fr: 'Supprimer' })}
+                ? t({ en: 'Deleting…', es: 'Eliminando…', fr: 'Suppression…' })
+                : t({ en: 'Delete', es: 'Eliminar', fr: 'Supprimer' })}
             </Button>
           </Dialog.Footer>
         </Dialog.Content>

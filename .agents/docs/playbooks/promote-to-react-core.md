@@ -38,7 +38,7 @@ so nothing that passed lint in `apps/web` fails on style here; what breaks is re
    the component is an internal part of `InstrumentRenderer` rather than something a consumer imports
    directly, leave it off the barrel and add it to that AGENTS.md's deliberately-unexported list.
 
-4. **Convert every keyed `t('namespace.key')` to inline `t({ en: '…', fr: '…' })`** — libui's own
+4. **Convert every keyed `t('namespace.key')` to inline `t({ en: '…', es: '…', fr: '…' })`** — libui's own
    registered namespace is the exception (`.agents/skills/odc-frontend/SKILL.md`). `apps/gateway`
    initialises i18n with no resources (`apps/gateway/src/services/i18n.ts`), and libui's
    `Translator.t()` logs `Failed to extract translation from object '{}'` and returns the

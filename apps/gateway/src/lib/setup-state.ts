@@ -1,4 +1,4 @@
-import { $Language, DEFAULT_ACTIVE_LANGUAGES } from '@opendatacapture/schemas/core';
+import { $Language, DEFAULT_ACTIVE_LANGUAGES, resolveActiveLanguage } from '@opendatacapture/schemas/core';
 import type { ActiveLanguages, Language } from '@opendatacapture/schemas/core';
 import type { RemoteSetupState } from '@opendatacapture/schemas/gateway';
 
@@ -25,8 +25,8 @@ export function getActiveLanguages(): ActiveLanguages {
 export function resolveLanguage(requested: unknown): Language {
   const activeLanguages = getActiveLanguages();
   const requestedLanguage = $Language.safeParse(requested);
-  return requestedLanguage.success && activeLanguages.includes(requestedLanguage.data)
-    ? requestedLanguage.data
+  return requestedLanguage.success
+    ? resolveActiveLanguage(requestedLanguage.data, activeLanguages)
     : activeLanguages[0];
 }
 

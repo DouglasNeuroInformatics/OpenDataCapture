@@ -1,13 +1,32 @@
 import { InjectModel, InjectPrismaClient } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
+import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import type { Prisma } from '@prisma/client';
 
 import { accessibleQuery } from '@/auth/ability.utils';
+import type { AppAbility } from '@/auth/auth.types';
 import type { RuntimePrismaClient } from '@/core/prisma';
 import type { EntityOperationOptions } from '@/core/types';
 
 import { CreateSubjectDto } from './dto/create-subject.dto';
+
+const PERSONAL_INFO_FIELDS = ['dateOfBirth', 'firstName', 'lastName', 'sex'] as const;
+
+/**
+ * Prisma's MongoDB connector turns `startsWith` into an unescaped regex, so the `$` ending a subject
+ * id scope would anchor the pattern and match nothing. A lexical range selects the same ids.
+ */
+function idsWithPrefix(prefix: string): Prisma.StringFilter {
+  const lastCharCode = prefix.charCodeAt(prefix.length - 1);
+  return { gte: prefix, lt: prefix.slice(0, -1) + String.fromCharCode(lastCharCode + 1) };
+}
+
+/** A subject identified by personal information has every one of these fields set. */
+const IDENTIFIED_BY_CUSTOM_ID: Prisma.SubjectWhereInput = {
+  OR: PERSONAL_INFO_FIELDS.flatMap((field) => [{ [field]: null }, { [field]: { isSet: false } }])
+};
 
 @Injectable()
 export class SubjectsService {
@@ -146,7 +165,7 @@ export class SubjectsService {
           AND: [
             accessibleQuery(ability, 'read', 'Subject'),
             groupInput,
-            { id: { in: await this.querySubjectIdsWithRecords(groupId) } }
+            { id: { in: await this.querySubjectIdsWithRecords(groupId, ability) } }
           ]
         }
       });
@@ -176,26 +195,64 @@ export class SubjectsService {
    * field is matched on both `null` and `isSet: false`.
    */
   async findCustomIds(groupId: string, { ability }: EntityOperationOptions = {}): Promise<string[]> {
-    const personalInfoFields = ['dateOfBirth', 'firstName', 'lastName', 'sex'] as const;
+    const subjects = await this.subjectModel.findMany({
+      select: { id: true },
+      where: {
+        AND: [accessibleQuery(ability, 'read', 'Subject'), { groupIds: { has: groupId } }, IDENTIFIED_BY_CUSTOM_ID]
+      }
+    });
+    return subjects.map((subject) => subject.id);
+  }
+
+  /**
+   * The custom ids a session without a group produces. Matched on the id's scope rather than on
+   * `groupIds`, because a later session, upload or assignment in a group adds that group to the
+   * subject without changing its id.
+   */
+  async findDefaultGroupCustomIds({ ability }: EntityOperationOptions = {}): Promise<string[]> {
     const subjects = await this.subjectModel.findMany({
       select: { id: true },
       where: {
         AND: [
           accessibleQuery(ability, 'read', 'Subject'),
-          { groupIds: { has: groupId } },
-          { OR: personalInfoFields.flatMap((field) => [{ [field]: null }, { [field]: { isSet: false } }]) }
+          { id: idsWithPrefix(encodeScopedSubjectId('', { groupName: DEFAULT_GROUP_NAME })) },
+          IDENTIFIED_BY_CUSTOM_ID
         ]
       }
     });
     return subjects.map((subject) => subject.id);
   }
 
-  private async querySubjectIdsWithRecords(groupId?: string): Promise<string[]> {
-    const records = await this.prismaClient.instrumentRecord.findMany({
-      distinct: ['subjectId'],
-      select: { subjectId: true },
-      where: groupId ? { groupId } : {}
+  /**
+   * The ids of subjects having at least one record, for the "with records only" filter.
+   *
+   * Grouped by the database rather than deduplicated after the fact: `distinct` is applied by the
+   * prisma query engine, so it returns one row per *record* over the wire and collapses them only
+   * once they have arrived.
+   *
+   * Deliberately not expressed as an `instrumentRecords: { some: ... }` relation filter on Subject.
+   * On mongodb prisma compiles that into a $lookup over the whole record collection, which measured
+   * far slower than either form here and carries the 100 MiB per-document ceiling that made the same
+   * construct fail outright elsewhere.
+   */
+  private async querySubjectIdsWithRecords(groupId?: string, ability?: AppAbility): Promise<string[]> {
+    // `accessibleQuery` throws rather than returning a restrictive filter when the ability holds no
+    // rule for the subject at all, and a STANDARD user holds `create` but not `read` on
+    // InstrumentRecord. This route's guard names `read Subject`, so such a caller reaches here; no
+    // readable records means no subjects qualify.
+    if (ability && !ability.can('read', 'InstrumentRecord')) {
+      return [];
+    }
+    // The accessibleQuery clause also drops records whose groupId is null: a group manager's rule is
+    // `groupId: { in: [...] }`, and prisma's `in` never matches null. That is intended — an
+    // admin-created, ungrouped record should not make a subject count as "with records" for a
+    // manager — but it is invisible at this call site, so it is recorded here.
+    const groups = await this.prismaClient.instrumentRecord.groupBy({
+      by: ['subjectId'],
+      where: {
+        AND: [accessibleQuery(ability, 'read', 'InstrumentRecord'), groupId ? { groupId } : {}]
+      }
     });
-    return records.map((r) => r.subjectId);
+    return groups.map((group) => group.subjectId);
   }
 }

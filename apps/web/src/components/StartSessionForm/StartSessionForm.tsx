@@ -1,5 +1,8 @@
 /* eslint-disable perfectionist/sort-objects */
 
+import { useRef, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+
 import { Form } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
@@ -13,9 +16,18 @@ import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/sub
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
 
+import { useSubjectDemographicsLookup } from '@/hooks/useSubjectDemographicsLookup';
 import { getValueForLanguage } from '@/utils/language';
 
 const currentDate = new Date();
+
+type StartSessionFormValues = FormTypes.PartialData<StartSessionFormData>;
+
+type AutofilledDemographics = Pick<StartSessionFormValues, 'subjectDateOfBirth' | 'subjectSex'>;
+
+/** Empty unless a custom identifier is in use, so switching method clears what it filled in. */
+const selectedCustomId = (values: StartSessionFormValues) =>
+  values.subjectIdentificationMethod === 'CUSTOM_ID' ? (values.subjectId ?? '') : '';
 
 type StartSessionFormData = {
   sessionDate: Date;
@@ -46,9 +58,39 @@ export const StartSessionForm = ({
   onSubmit
 }: StartSessionFormProps) => {
   const { resolvedLanguage, t } = useTranslation();
+  const lookupDemographics = useSubjectDemographicsLookup();
+  const [autofilled, setAutofilled] = useState<AutofilledDemographics>({});
+  const latestCustomId = useRef('');
   const minDateOfBirth = currentGroup?.settings.minimumAge
     ? new Date(currentDate.getTime() - currentGroup.settings.minimumAge * 31556952000)
     : undefined;
+
+  const scopeCustomId = (customId: string) =>
+    encodeScopedSubjectId(customId, { groupName: currentGroup?.name ?? DEFAULT_GROUP_NAME });
+
+  const autofillExistingSubject = async (
+    values: StartSessionFormValues,
+    setValues: Dispatch<SetStateAction<StartSessionFormValues>>
+  ) => {
+    const customId = selectedCustomId(values);
+    latestCustomId.current = customId;
+    const demographics = customSubjectIds.includes(customId) ? await lookupDemographics(scopeCustomId(customId)) : null;
+    // A slower lookup for an identifier the user has since moved on from must not overwrite the newer one.
+    if (latestCustomId.current !== customId) {
+      return;
+    }
+    const next: AutofilledDemographics = {
+      subjectDateOfBirth: demographics?.dateOfBirth ?? undefined,
+      subjectSex: demographics?.sex ?? undefined
+    };
+    setValues((current) => ({
+      ...current,
+      subjectDateOfBirth:
+        next.subjectDateOfBirth ?? (autofilled.subjectDateOfBirth ? undefined : current.subjectDateOfBirth),
+      subjectSex: next.subjectSex ?? (autofilled.subjectSex ? undefined : current.subjectSex)
+    }));
+    setAutofilled(next);
+  };
 
   return (
     <Form
@@ -118,11 +160,13 @@ export const StartSessionForm = ({
               }
             },
             subjectDateOfBirth: {
+              disabled: autofilled.subjectDateOfBirth !== undefined,
               kind: 'date',
               label: t('core.identificationData.dateOfBirth.label')
             },
             subjectSex: {
               description: t('core.identificationData.sex.description'),
+              disabled: autofilled.subjectSex !== undefined,
               kind: 'string',
               label: t('core.identificationData.sex.label'),
               options: {
@@ -165,6 +209,10 @@ export const StartSessionForm = ({
       initialValues={initialValues}
       readOnly={readOnly}
       submitBtnLabel={t('core.submit')}
+      subscribe={{
+        onChange: autofillExistingSubject,
+        selector: selectedCustomId
+      }}
       validationSchema={z
         .object({
           subjectFirstName: z.string().optional(),
@@ -185,6 +233,7 @@ export const StartSessionForm = ({
               {
                 message: t({
                   en: `Subject must be above age of ${currentGroup?.settings.minimumAge}`,
+                  es: `El sujeto debe tener más de ${currentGroup?.settings.minimumAge} años`,
                   fr: `Le sujet doit avoir au moins ${currentGroup?.settings.minimumAge} ans`
                 })
               }
@@ -209,6 +258,7 @@ export const StartSessionForm = ({
                 code: z.ZodIssueCode.custom,
                 message: t({
                   en: 'Illegal character: $',
+                  es: 'Carácter no permitido: $',
                   fr: 'Caractère non autorisé : $'
                 }),
                 path: ['subjectId']
@@ -267,9 +317,7 @@ export const StartSessionForm = ({
             sex: subjectSex!
           });
         } else {
-          subjectId = encodeScopedSubjectId(subjectId, {
-            groupName: currentGroup?.name ?? DEFAULT_GROUP_NAME
-          });
+          subjectId = scopeCustomId(subjectId);
         }
         await onSubmit({
           date: sessionDate,

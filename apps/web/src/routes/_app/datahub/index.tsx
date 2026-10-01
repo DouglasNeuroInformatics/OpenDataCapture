@@ -26,6 +26,7 @@ import { SearchSubmitGuard } from '@/components/SearchSubmitGuard';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
 import { downloadExcel } from '@/utils/excel';
+import { getListedSubjectIds } from '@/utils/table';
 
 type DateFilter = {
   allowNull: boolean;
@@ -59,7 +60,11 @@ const Filters: React.FC<{
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger asChild>
-        <Button className="flex items-center justify-between gap-2" variant="outline">
+        <Button
+          className="flex items-center justify-between gap-2"
+          data-testid="datahub-filters-trigger"
+          variant="outline"
+        >
           {t('common.filters')}
           <ChevronDownIcon className="opacity-50" />
         </Button>
@@ -107,13 +112,13 @@ const Filters: React.FC<{
             }}
             onSelect={(e) => e.preventDefault()}
           >
-            {t({ en: 'NULL', fr: 'NULL' })}
+            {t({ en: 'NULL', es: 'NULL', fr: 'NULL' })}
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Group>
         <DropdownMenu.Label>{t('core.identificationData.dateOfBirth.label')}</DropdownMenu.Label>
         <DropdownMenu.Group>
           <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
-            <span className="pb-1">{t({ en: 'Min:', fr: 'Min :' })}</span>
+            <span className="pb-1">{t({ en: 'Min:', es: 'Mín.:', fr: 'Min :' })}</span>
             <input
               className="text-muted-foreground pointer-events-auto rounded-sm border-b pb-0.5"
               type="date"
@@ -129,7 +134,7 @@ const Filters: React.FC<{
             />
           </div>
           <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
-            <span className="pb-1">{t({ en: 'Max:', fr: 'Max :' })}</span>
+            <span className="pb-1">{t({ en: 'Max:', es: 'Máx.:', fr: 'Max :' })}</span>
             <input
               className="text-muted-foreground pointer-events-auto rounded-sm border-b pb-0.5"
               type="date"
@@ -156,23 +161,26 @@ const Filters: React.FC<{
             }}
             onSelect={(e) => e.preventDefault()}
           >
-            {t({ en: 'NULL', fr: 'NULL' })}
+            {t({ en: 'NULL', es: 'NULL', fr: 'NULL' })}
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Group>
         <DropdownMenu.Group>
           <DropdownMenu.Label>
             {t({
               en: 'Subjects with records',
+              es: 'Sujetos con registros',
               fr: 'Sujets avec enregistrements'
             })}
           </DropdownMenu.Label>
           <DropdownMenu.CheckboxItem
             checked={hasRecords}
+            data-testid="datahub-filter-has-records"
             onCheckedChange={setHasRecords}
             onSelect={(e) => e.preventDefault()}
           >
             {t({
               en: 'With records only',
+              es: 'Solo con registros',
               fr: 'Avec enregistrements seulement'
             })}
           </DropdownMenu.CheckboxItem>
@@ -230,6 +238,7 @@ const Toggles: React.FC<{
     addNotification({
       message: t({
         en: 'Exporting entries, please wait...',
+        es: 'Exportando entradas, espere...',
         fr: 'Téléchargement des entrées, veuillez patienter...'
       }),
       type: 'info'
@@ -240,15 +249,17 @@ const Toggles: React.FC<{
 
     getExportRecords()
       .then((data): any => {
-        const listedSubjects = table
-          .getPrePaginationRowModel()
-          .rows.flatMap((row) => row.getVisibleCells().map((cell) => removeSubjectIdScope(cell.row.original.id)));
+        const listedSubjects = getListedSubjectIds(table);
 
-        const filteredData = data.filter((dataEntry) => listedSubjects.includes(dataEntry.subjectId));
+        const filteredData = data.filter((dataEntry) => listedSubjects.has(dataEntry.subjectId));
 
         if (filteredData.length < 1) {
           throw Error(
-            t({ en: 'Export failed: No entries to export', fr: "Échec de l'exportation : aucune entrée à exporter" })
+            t({
+              en: 'Export failed: No entries to export',
+              es: 'Error al exportar: no hay entradas que exportar',
+              fr: "Échec de l'exportation : aucune entrée à exporter"
+            })
           );
         }
 
@@ -268,7 +279,7 @@ const Toggles: React.FC<{
       })
       .then(() => {
         addNotification({
-          message: t({ en: 'Export successful', fr: 'Exportation réussie' }),
+          message: t({ en: 'Export successful', es: 'Exportación realizada correctamente', fr: 'Exportation réussie' }),
           type: 'success'
         });
       })
@@ -281,7 +292,7 @@ const Toggles: React.FC<{
           });
         } else {
           addNotification({
-            message: t({ en: 'Export failed', fr: "Échec de l'exportation" }),
+            message: t({ en: 'Export failed', es: 'Error al exportar', fr: "Échec de l'exportation" }),
             type: 'error'
           });
         }
@@ -301,6 +312,7 @@ const Toggles: React.FC<{
           >
             {t({
               en: 'Subject Lookup',
+              es: 'Buscar sujeto',
               fr: 'Trouver un client'
             })}
             <UserSearchIcon style={{ strokeWidth: '2px' }} />
@@ -391,7 +403,7 @@ const MasterDataTable: React.FC<{
             accessorKey: 'dateOfBirth',
             cell: (ctx) => {
               const value = ctx.getValue() as Date | null | undefined;
-              return value ? toBasicISOString(value) : t({ en: 'NULL', fr: 'NULL' });
+              return value ? toBasicISOString(value) : t({ en: 'NULL', es: 'NULL', fr: 'NULL' });
             },
             filterFn: (row, id, filter: DateFilter) => {
               const value = row.getValue(id);
@@ -415,7 +427,7 @@ const MasterDataTable: React.FC<{
                 case 'MALE':
                   return t('core.identificationData.sex.male');
                 default:
-                  return t({ en: 'NULL', fr: 'NULL' });
+                  return t({ en: 'NULL', es: 'NULL', fr: 'NULL' });
               }
             },
             filterFn: (row, id, filter: SexFilter) => {
@@ -451,7 +463,7 @@ const MasterDataTable: React.FC<{
         }}
         rowActions={[
           {
-            label: t({ en: 'View', fr: 'Voir' }),
+            label: t({ en: 'View', es: 'Ver', fr: 'Voir' }),
             onSelect
           }
         ]}

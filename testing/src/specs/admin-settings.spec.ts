@@ -46,26 +46,79 @@ test.describe('admin settings', () => {
     await expect(settingsPage.defaultAssignmentDurationInput).toHaveValue(String(durationDays));
   });
 
-  test('should hide the language toggle once only one language is offered', async ({ getPageModel, page }) => {
-    const settingsPage = await getPageModel('/admin/settings');
+  test.describe('active languages', () => {
+    // `activeLanguages` is one instance-wide document seeded with English and French, so these tests
+    // restore it at the end and must not run concurrently with each other.
+    test.describe.configure({ mode: 'serial' });
 
-    // `activeLanguages` is one instance-wide document seeded with English and French, so the
-    // deactivated language is restored at the end rather than left off for the next spec.
-    await expect(settingsPage.activeLanguageCheckbox('en')).toBeVisible();
-    await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toBeVisible();
+    test('should hide the language toggle once only one language is offered', async ({ getPageModel, page }) => {
+      const settingsPage = await getPageModel('/admin/settings');
 
-    const deactivated = waitForSetupPatch(page);
-    await settingsPage.activeLanguageCheckbox('fr').click();
-    expect((await deactivated).ok()).toBe(true);
+      await expect(settingsPage.activeLanguageCheckbox('en')).toBeVisible();
+      await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toBeVisible();
 
-    await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toHaveCount(0);
-    // The last remaining language cannot be turned off, so an instance always offers one.
-    await expect(settingsPage.activeLanguageCheckbox('en')).toBeDisabled();
+      const deactivated = waitForSetupPatch(page);
+      await settingsPage.activeLanguageCheckbox('fr').click();
+      expect((await deactivated).ok()).toBe(true);
 
-    const restored = waitForSetupPatch(page);
-    await settingsPage.activeLanguageCheckbox('fr').click();
-    expect((await restored).ok()).toBe(true);
-    await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toBeVisible();
+      await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toHaveCount(0);
+      // The last remaining language cannot be turned off, so an instance always offers one.
+      await expect(settingsPage.activeLanguageCheckbox('en')).toBeDisabled();
+
+      const restored = waitForSetupPatch(page);
+      await settingsPage.activeLanguageCheckbox('fr').click();
+      expect((await restored).ok()).toBe(true);
+      await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toBeVisible();
+    });
+
+    test('should move the sidebar to an offered language when the language being read is deactivated', async ({
+      getPageModel,
+      page
+    }) => {
+      const settingsPage = await getPageModel('/admin/settings');
+
+      // The sidebar is the casualty when this goes wrong: it renders the toggle, so it is the ancestor
+      // a correction made from the toggle cannot reach. `Iniciar una sesión` is a namespace string,
+      // translated on any branch. Spanish is restored to inactive at the end, as it is seeded.
+      const sidebar = page.getByTestId('sidebar');
+      const activated = waitForSetupPatch(page);
+      await settingsPage.activeLanguageCheckbox('es').click();
+      expect((await activated).ok()).toBe(true);
+
+      await sidebar.getByTestId('language-toggle').getByRole('button').click();
+      await page.getByRole('menuitem', { name: 'Español' }).click();
+      await expect(sidebar).toContainText('Iniciar una sesión');
+
+      const deactivatedSpanish = waitForSetupPatch(page);
+      await settingsPage.activeLanguageCheckbox('es').click();
+      expect((await deactivatedSpanish).ok()).toBe(true);
+
+      await expect(sidebar).toContainText('Start Session');
+      await expect(sidebar).not.toContainText('Iniciar una sesión');
+    });
+
+    test('should render the admin nav in Spanish once Spanish is activated', async ({ getPageModel, page }) => {
+      const settingsPage = await getPageModel('/admin/settings');
+
+      // Spanish is off by default, so reaching it at all takes activating it first. The admin nav
+      // group and its submenu are inline `t()` strings rather than namespace keys, which is exactly
+      // where a missing Spanish entry hides: the page renders, in English.
+      const activated = waitForSetupPatch(page);
+      await settingsPage.activeLanguageCheckbox('es').click();
+      expect((await activated).ok()).toBe(true);
+
+      await settingsPage.selectLanguage('Español');
+      const sidebar = page.getByTestId('sidebar');
+      // The group header is a `NavGroup`, not a `NavButton`, so it carries no testid and is matched
+      // by role; its submenu items are `NavButton`s and are matched by theirs.
+      await expect(sidebar.getByRole('button', { name: 'Panel de administración' })).toBeVisible();
+      await expect(sidebar.getByTestId('nav-button-/admin/settings')).toContainText('Configuración de la aplicación');
+
+      await settingsPage.selectLanguage('English');
+      const removed = waitForSetupPatch(page);
+      await settingsPage.activeLanguageCheckbox('es').click();
+      expect((await removed).ok()).toBe(true);
+    });
   });
 
   test('should apply the group switcher position preference immediately', async ({ getPageModel }) => {

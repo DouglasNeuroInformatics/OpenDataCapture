@@ -40,6 +40,7 @@ const useIssueMessages = (describeSubject: (subjectId: string) => string) => {
             items: issue.conflicts.map(({ subjectId }) => describeSubject(subjectId)),
             message: t({
               en: `${issue.conflicts.length} subject(s) already have an outstanding assignment for one of these instruments:`,
+              es: `${issue.conflicts.length} sujeto(s) ya tienen una tarea pendiente para uno de estos instrumentos:`,
               fr: `${issue.conflicts.length} sujet(s) ont déjà une tâche en cours pour l’un de ces instruments :`
             })
           };
@@ -48,6 +49,7 @@ const useIssueMessages = (describeSubject: (subjectId: string) => string) => {
             items: issue.instrumentIds,
             message: t({
               en: `This group cannot assign ${issue.instrumentIds.length} of the selected instrument(s):`,
+              es: `Este grupo no puede asignar ${issue.instrumentIds.length} de los instrumentos seleccionados:`,
               fr: `Ce groupe ne peut pas attribuer ${issue.instrumentIds.length} des instruments sélectionnés :`
             })
           };
@@ -56,6 +58,7 @@ const useIssueMessages = (describeSubject: (subjectId: string) => string) => {
             items: issue.subjectIds.map((subjectId) => describeSubject(subjectId)),
             message: t({
               en: `${issue.subjectIds.length} subject(s) are not available in this group:`,
+              es: `${issue.subjectIds.length} sujeto(s) no están disponibles en este grupo:`,
               fr: `${issue.subjectIds.length} sujet(s) ne sont pas disponibles dans ce groupe :`
             })
           };
@@ -86,6 +89,7 @@ export const ReviewStep = ({
     messages.push({
       message: t({
         en: 'The request could not be completed. Nothing has been created.',
+        es: 'No se pudo completar la solicitud. No se ha creado nada.',
         fr: 'La requête n’a pas pu être complétée. Rien n’a été créé.'
       })
     });
@@ -95,12 +99,13 @@ export const ReviewStep = ({
     <StepLayout
       description={t({
         en: 'All assignments are created together. If any of them cannot be created, none are.',
+        es: 'Todas las tareas se crean juntas. Si alguna de ellas no se puede crear, no se crea ninguna.',
         fr: 'Toutes les tâches sont créées ensemble. Si l’une d’elles échoue, aucune n’est créée.'
       })}
       footer={
         <React.Fragment>
           <Button disabled={isSubmitting} type="button" variant="outline" onClick={onBack}>
-            {t({ en: 'Back', fr: 'Retour' })}
+            {t({ en: 'Back', es: 'Atrás', fr: 'Retour' })}
           </Button>
           <Button
             data-testid="bulk-submit"
@@ -108,18 +113,19 @@ export const ReviewStep = ({
             type="button"
             onClick={() => onSubmit({ allowDuplicates })}
           >
-            {t({ en: 'Create Assignments', fr: 'Créer les tâches' })}
+            {t({ en: 'Create Assignments', es: 'Crear las tareas', fr: 'Créer les tâches' })}
           </Button>
         </React.Fragment>
       }
       step="REVIEW"
-      title={t({ en: 'Review and Create', fr: 'Réviser et créer' })}
+      title={t({ en: 'Review and Create', es: 'Revisar y crear', fr: 'Réviser et créer' })}
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-review-step">
         <p className="text-sm font-medium" data-testid="bulk-review-summary">
           {t({
             en: `${subjectCount} subjects × ${timepoints.length} instruments = ${subjectCount * timepoints.length} assignments`,
+            es: `${subjectCount} sujetos × ${timepoints.length} instrumentos = ${subjectCount * timepoints.length} tareas`,
             fr: `${subjectCount} sujets × ${timepoints.length} instruments = ${subjectCount * timepoints.length} tâches`
           })}
         </p>
@@ -136,6 +142,7 @@ export const ReviewStep = ({
             />
             {t({
               en: 'Assign anyway, creating a second assignment for those subjects',
+              es: 'Asignar de todos modos, creando una segunda tarea para esos sujetos',
               fr: 'Attribuer quand même, en créant une seconde tâche pour ces sujets'
             })}
           </label>

@@ -113,6 +113,7 @@ export function useBulkAssignmentWizard({
         addNotification({
           message: t({
             en: 'Could not copy to the clipboard. Download the CSV instead.',
+            es: 'No se pudo copiar al portapapeles. Descargue el CSV en su lugar.',
             fr: 'Impossible de copier dans le presse-papiers. Téléchargez plutôt le CSV.'
           }),
           type: 'error'

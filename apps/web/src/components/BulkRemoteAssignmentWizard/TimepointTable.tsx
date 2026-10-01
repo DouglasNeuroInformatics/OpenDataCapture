@@ -23,8 +23,8 @@ export const TimepointTable = ({ 'data-testid': testId, onRemove, timepoints }: 
       data-testid={testId}
       head={
         <React.Fragment>
-          <Table.Head>{t({ en: 'Instrument', fr: 'Instrument' })}</Table.Head>
-          <Table.Head>{t({ en: 'Expires On', fr: 'Expire le' })}</Table.Head>
+          <Table.Head>{t({ en: 'Instrument', es: 'Instrumento', fr: 'Instrument' })}</Table.Head>
+          <Table.Head>{t({ en: 'Expires On', es: 'Vence el', fr: 'Expire le' })}</Table.Head>
           {onRemove && <Table.Head className="w-12" />}
         </React.Fragment>
       }
@@ -36,7 +36,7 @@ export const TimepointTable = ({ 'data-testid': testId, onRemove, timepoints }: 
           {onRemove && (
             <Table.Cell className="py-2">
               <button
-                aria-label={t({ en: 'Remove Instrument', fr: "Retirer l'instrument" })}
+                aria-label={t({ en: 'Remove Instrument', es: 'Retirar el instrumento', fr: "Retirer l'instrument" })}
                 className="text-muted-foreground hover:text-destructive rounded-md p-1 transition-colors"
                 type="button"
                 onClick={() => onRemove(timepoint)}

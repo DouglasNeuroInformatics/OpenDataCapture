@@ -22,6 +22,7 @@ export const ErrorList = ({ errors }: { errors: BulkParseError[] }) => {
       <p className="mb-2 text-sm font-semibold">
         {t({
           en: 'Nothing has been created. Fix the following and try again:',
+          es: 'No se ha creado nada. Corrija lo siguiente y vuelva a intentarlo:',
           fr: 'Rien n’a été créé. Corrigez ce qui suit et réessayez :'
         })}
       </p>
@@ -29,7 +30,9 @@ export const ErrorList = ({ errors }: { errors: BulkParseError[] }) => {
         {errors.map((error, index) => (
           <li key={index}>
             {error.row !== undefined && (
-              <span className="font-medium">{t({ en: `Row ${error.row}: `, fr: `Ligne ${error.row} : ` })}</span>
+              <span className="font-medium">
+                {t({ en: `Row ${error.row}: `, es: `Fila ${error.row}: `, fr: `Ligne ${error.row} : ` })}
+              </span>
             )}
             {error.message}
             {error.items && error.items.length > 0 && (

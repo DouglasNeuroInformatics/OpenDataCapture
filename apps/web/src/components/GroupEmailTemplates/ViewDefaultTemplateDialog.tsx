@@ -16,10 +16,17 @@ export const ViewDefaultTemplateDialog = ({ onOpenChange, open }: ViewDefaultTem
     <Dialog open={open} onOpenChange={onOpenChange}>
       <Dialog.Content className="max-w-lg">
         <Dialog.Header>
-          <Dialog.Title>{t({ en: 'Built-in default template', fr: 'Modèle par défaut intégré' })}</Dialog.Title>
+          <Dialog.Title>
+            {t({
+              en: 'Built-in default template',
+              es: 'Plantilla predeterminada integrada',
+              fr: 'Modèle par défaut intégré'
+            })}
+          </Dialog.Title>
           <Dialog.Description>
             {t({
               en: 'This is the message sent for remote assignments when no custom template is active.',
+              es: 'Este es el mensaje que se envía para las tareas remotas cuando no hay ninguna plantilla personalizada activa.',
               fr: "Il s'agit du message envoyé pour les évaluations à distance lorsqu'aucun modèle personnalisé n'est actif."
             })}
           </Dialog.Description>

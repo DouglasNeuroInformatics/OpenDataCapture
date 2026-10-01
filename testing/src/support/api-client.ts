@@ -64,7 +64,10 @@ export class ApiClient {
     return group;
   }
 
-  /** Creates a session, and with it the subject it names. */
+  /**
+   * Creates a session, and with it the subject it names. A subject seeded this way holds no
+   * instrument records, which is what distinguishes it under the "with records only" filter.
+   */
   async createSession(groupId: null | string, subjectData: CreateSubjectData): Promise<Session> {
     const data: CreateSessionData = { date: new Date(), groupId, subjectData, type: 'IN_PERSON' };
     return this.expectJson<Session>(
@@ -107,6 +110,15 @@ export class ApiClient {
       this.request.get(`${API}/assignments`, { headers: this.authHeaders, params: { subjectId } }),
       200,
       `find the assignments of subject '${subjectId}'`
+    );
+  }
+
+  /** The ids the start-session form suggests to a user with no group: custom ids scoped to the default group. */
+  async findDefaultGroupSubjectCustomIds(): Promise<string[]> {
+    return this.expectJson<string[]>(
+      this.request.get(`${API}/subjects/default-group/custom-ids`, { headers: this.authHeaders }),
+      200,
+      'find the custom subject ids scoped to the default group'
     );
   }
 

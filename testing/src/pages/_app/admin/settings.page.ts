@@ -14,11 +14,17 @@ export class AdminSettingsPage extends AppPage {
     this.pageHeader = page.getByTestId('page-header');
     this.uploaderToggle = page.getByRole('switch', { name: 'Enable Uploader' });
     this.defaultAssignmentDurationInput = page.getByTestId('default-assignment-duration-input');
-    this.groupSwitcherPositionSelect = page.getByRole('combobox');
+    this.groupSwitcherPositionSelect = page.getByTestId('group-switcher-position-select');
   }
 
   activeLanguageCheckbox(language: Language): Locator {
     return this.$ref.getByTestId(`active-language-${language}`);
+  }
+
+  /** `name` is the language's autonym, which is how the toggle labels its options. */
+  async selectLanguage(name: string) {
+    await this.sidebar.getByTestId('language-toggle').getByRole('button').click();
+    await this.$ref.getByRole('menuitem', { name }).click();
   }
 
   async setDefaultAssignmentDuration(days: number) {

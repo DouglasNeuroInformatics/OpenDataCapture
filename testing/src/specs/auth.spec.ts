@@ -1,3 +1,5 @@
+import type { Locator } from '@playwright/test';
+
 import { expect, test } from '../support/fixtures';
 
 test.describe('authentication', () => {
@@ -19,6 +21,12 @@ test.describe('authentication', () => {
     test('should show the demo information over the login page as soon as it loads', async ({ getPageModel }) => {
       const loginPage = await getPageModel('/auth/login');
       await expect(loginPage.demoDialog).toBeVisible();
+    });
+
+    test('should brand the demo information with the Open Data Capture logo and name', async ({ getPageModel }) => {
+      const loginPage = await getPageModel('/auth/login');
+      await expect(loginPage.demoDialogBranding.locator('svg')).toBeVisible();
+      await expect(loginPage.demoDialogBranding).toHaveText('Open Data Capture');
     });
 
     test('should reveal the login form once the demo information is dismissed', async ({ getPageModel }) => {
@@ -44,6 +52,31 @@ test.describe('authentication', () => {
 
       await loginPage.expect.toHaveURL('/dashboard');
       await expect(page.getByTestId('user-dropup-trigger')).toHaveText(username);
+    });
+
+    test('should log in from a click on the row itself, not only on its button', async ({ getPageModel, page }) => {
+      const loginPage = await getPageModel('/auth/login');
+      const demoUserRow = loginPage.demoUserRows.filter({ hasText: 'Group Manager' }).last();
+      const usernameCell = demoUserRow.getByRole('cell').first();
+      const username = await usernameCell.innerText();
+      await usernameCell.click();
+
+      await loginPage.expect.toHaveURL('/dashboard');
+      await expect(page.getByTestId('user-dropup-trigger')).toHaveText(username);
+    });
+
+    test('should highlight only the rows that log in, so the header does not look clickable', async ({
+      getPageModel
+    }) => {
+      const loginPage = await getPageModel('/auth/login');
+      const backgroundColor = (row: Locator) => row.evaluate((element) => getComputedStyle(element).backgroundColor);
+      const restingColor = await backgroundColor(loginPage.demoTableHeaderRow);
+
+      await loginPage.demoTableHeaderRow.hover();
+      expect(await backgroundColor(loginPage.demoTableHeaderRow)).toBe(restingColor);
+
+      await loginPage.demoUserRows.first().hover();
+      expect(await backgroundColor(loginPage.demoUserRows.first())).not.toBe(restingColor);
     });
   });
 

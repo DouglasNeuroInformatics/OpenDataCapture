@@ -3,11 +3,15 @@ import type { Locator, Page } from '@playwright/test';
 import { AppPage } from '../route.page';
 
 export class StartSessionPage extends AppPage {
+  readonly dateOfBirthField: Locator;
   readonly endSessionButton: Locator;
   readonly errorMessages: Locator;
   readonly pageHeader: Locator;
   readonly selectField: Locator;
   readonly sessionForm: Locator;
+  /** The hidden native select that carries the value; `sexTrigger` is the control a user sees. */
+  readonly sexField: Locator;
+  readonly sexTrigger: Locator;
   /** Errors on the identifier field itself, unlike `errorMessages`, which spans the whole page. */
   readonly subjectIdErrors: Locator;
   readonly subjectIdField: Locator;
@@ -21,6 +25,9 @@ export class StartSessionPage extends AppPage {
     this.successMessage = page.getByRole('heading', { name: 'Session Successfully Started' });
     this.errorMessages = page.getByTestId('error-message-text');
     this.subjectIdField = this.sessionForm.locator('[name="subjectId"]');
+    this.dateOfBirthField = this.sessionForm.locator('[name="subjectDateOfBirth"]');
+    this.sexField = this.sessionForm.locator('[name="subjectSex"]');
+    this.sexTrigger = this.sessionForm.getByTestId('subjectSex-select-trigger');
     this.subjectIdErrors = this.sessionForm.locator('[data-field-group="subjectId"]').getByTestId('error-message-text');
     // The end session nav item opens a dialog rather than navigating, so it carries no route.
     this.endSessionButton = page.getByTestId('nav-button-#');
@@ -44,16 +51,8 @@ export class StartSessionPage extends AppPage {
 
   /** Everything the form needs beyond how the subject was identified. */
   async fillSessionDetails(sex: string) {
-    const sessionTypeSelector = this.sessionForm.locator('[name="sessionType"]');
-    const sessionDate = this.sessionForm.locator('[name="sessionDate"]');
-
     await this.fillSubjectDetails(sex);
-
-    await sessionTypeSelector.selectOption('Retrospective');
-
-    await sessionDate.waitFor({ state: 'visible' });
-    const expectedSessionDate = new Date().toISOString().split('T')[0]!;
-    await sessionDate.fill(expectedSessionDate);
+    await this.fillSessionTiming();
   }
 
   async fillSessionForm(firstName: string, lastName: string, sex: string) {
@@ -69,15 +68,24 @@ export class StartSessionPage extends AppPage {
     await this.fillSessionDetails(sex);
   }
 
+  /** A retrospective session dated today, without touching the subject's details. */
+  async fillSessionTiming() {
+    const sessionTypeSelector = this.sessionForm.locator('[name="sessionType"]');
+    const sessionDate = this.sessionForm.locator('[name="sessionDate"]');
+
+    await sessionTypeSelector.selectOption('Retrospective');
+
+    await sessionDate.waitFor({ state: 'visible' });
+    const expectedSessionDate = new Date().toISOString().split('T')[0]!;
+    await sessionDate.fill(expectedSessionDate);
+  }
+
   /** The subject's date of birth and sex, leaving the session at its in-person default. */
   async fillSubjectDetails(sex: string) {
-    const dateOfBirthField = this.sessionForm.locator('[name="subjectDateOfBirth"]');
-    const sexSelector = this.sessionForm.locator('[name="subjectSex"]');
+    await this.dateOfBirthField.waitFor({ state: 'visible' });
+    await this.dateOfBirthField.fill('1990-01-01');
 
-    await dateOfBirthField.waitFor({ state: 'visible' });
-    await dateOfBirthField.fill('1990-01-01');
-
-    await sexSelector.selectOption(sex);
+    await this.sexField.selectOption(sex);
   }
 
   async selectIdentificationMethod(methodName: string) {

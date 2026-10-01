@@ -83,10 +83,14 @@ const RouteComponent = () => {
       <PageHeader>
         <Heading className="text-center" variant="h2">
           {mode === 'CREATE'
-            ? t({ en: 'Create Remote Assignments', fr: 'Créer des tâches à distance' })
+            ? t({ en: 'Create Remote Assignments', es: 'Crear tareas remotas', fr: 'Créer des tâches à distance' })
             : mode === 'DELETE'
-              ? t({ en: 'Delete Remote Assignments', fr: 'Supprimer des tâches à distance' })
-              : t({ en: 'Remote Assignments', fr: 'Tâches à distance' })}
+              ? t({
+                  en: 'Delete Remote Assignments',
+                  es: 'Eliminar tareas remotas',
+                  fr: 'Supprimer des tâches à distance'
+                })
+              : t({ en: 'Remote Assignments', es: 'Tareas remotas', fr: 'Tâches à distance' })}
         </Heading>
       </PageHeader>
 
@@ -98,13 +102,13 @@ const RouteComponent = () => {
           <ActionCard
             icon={<CompositeIcon Badge={PlusIcon} />}
             testId="remote-assignments-create"
-            title={t({ en: 'Create Assignments', fr: 'Créer des tâches' })}
+            title={t({ en: 'Create Assignments', es: 'Crear tareas', fr: 'Créer des tâches' })}
             onClick={() => setMode('CREATE')}
           />
           <ActionCard
             icon={<CompositeIcon Badge={Trash2Icon} />}
             testId="remote-assignments-delete"
-            title={t({ en: 'Delete Assignments', fr: 'Supprimer des tâches' })}
+            title={t({ en: 'Delete Assignments', es: 'Eliminar tareas', fr: 'Supprimer des tâches' })}
             onClick={() => setMode('DELETE')}
           />
         </div>

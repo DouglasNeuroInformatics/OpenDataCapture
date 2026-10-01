@@ -32,11 +32,16 @@ export const FullscreenPreviewDialog = ({ editor, onOpenChange, open, previewLan
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Dialog.Title className="sr-only">
-          {t({ en: 'Login page fullscreen preview', fr: 'Aperçu plein écran de la page de connexion' })}
+          {t({
+            en: 'Login page fullscreen preview',
+            es: 'Vista previa a pantalla completa de la página de inicio de sesión',
+            fr: 'Aperçu plein écran de la page de connexion'
+          })}
         </Dialog.Title>
         <Dialog.Description className="sr-only">
           {t({
             en: 'A full-screen preview of how the login page will appear to users with the current branding settings.',
+            es: 'Una vista previa a pantalla completa de cómo verán los usuarios la página de inicio de sesión con la configuración de imagen de marca actual.',
             fr: 'Un aperçu plein écran de la page de connexion telle que les utilisateurs la verront avec les paramètres de personnalisation actuels.'
           })}
         </Dialog.Description>

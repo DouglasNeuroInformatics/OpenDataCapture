@@ -51,7 +51,7 @@ const ACTION_WIDTH = '1.5rem';
 const ACTION_GUTTER = `calc(${ACTION_WIDTH} + ${COLUMN_GAP})`;
 
 /** Passed to the renderer as a localizable value; the shared component resolves it to the active language. */
-const PREVIEW_SUBMIT_LABEL = { en: 'Preview Submit', fr: 'Soumettre l’aperçu' };
+const PREVIEW_SUBMIT_LABEL = { en: 'Preview Submit', es: 'Vista previa del envío', fr: 'Soumettre l’aperçu' };
 
 type InstrumentItem = {
   authors?: null | string[];
@@ -163,7 +163,11 @@ const InstrumentSection = ({
       {title && <h3 className="mb-2 text-sm font-semibold">{title}</h3>}
       {filtered.length === 0 ? (
         <p className="text-muted-foreground text-sm italic">
-          {t({ en: 'No instruments available.', fr: 'Aucun instrument disponible.' })}
+          {t({
+            en: 'No instruments available.',
+            es: 'No hay instrumentos disponibles.',
+            fr: 'Aucun instrument disponible.'
+          })}
         </p>
       ) : (
         // The tracks live on the section, not the row: a row that is its own grid sizes its columns
@@ -197,7 +201,9 @@ const InstrumentSection = ({
               {/* Repo names vary in length, so only their right edge can form a column. */}
               <div className="flex justify-end">
                 <Badge variant={item.source.kind === 'repo' ? 'secondary' : 'outline'}>
-                  {item.source.kind === 'repo' ? item.source.name : t({ en: 'No repo', fr: 'Aucun dépôt' })}
+                  {item.source.kind === 'repo'
+                    ? item.source.name
+                    : t({ en: 'No repo', es: 'Sin repositorio', fr: 'Aucun dépôt' })}
                 </Badge>
               </div>
               {/* Fixed rather than content width, so a section whose rows have no date still reserves
@@ -212,7 +218,11 @@ const InstrumentSection = ({
               {/* Lucide's eye leaves its iris `circle` unfilled; `fill-current` fills it with whatever
                   colour the hover rule above has already set. */}
               <button
-                aria-label={t({ en: 'Preview instrument', fr: "Aperçu de l'instrument" })}
+                aria-label={t({
+                  en: 'Preview instrument',
+                  es: 'Vista previa del instrumento',
+                  fr: "Aperçu de l'instrument"
+                })}
                 className="text-muted-foreground hover:text-foreground p-1 transition-colors hover:[&_circle]:fill-current"
                 data-testid={`instrument-preview-${item.title}`}
                 type="button"
@@ -227,7 +237,11 @@ const InstrumentSection = ({
                   position with it. */}
               {onDelete && !readOnly && item.isDeletable && (
                 <button
-                  aria-label={t({ en: 'Delete instrument', fr: "Supprimer l'instrument" })}
+                  aria-label={t({
+                    en: 'Delete instrument',
+                    es: 'Eliminar instrumento',
+                    fr: "Supprimer l'instrument"
+                  })}
                   className="text-muted-foreground hover:text-destructive absolute right-0 top-1/2 -translate-y-1/2 p-1 transition-colors"
                   type="button"
                   onClick={(e) => {
@@ -263,7 +277,7 @@ const InstrumentPreviewDialog = ({
   const bundleQuery = useInstrumentBundle(showForm ? item.id : null);
   const seriesItemTitles = useMemo(() => {
     return getSeriesPreviewItemTitles({
-      fallbackTitle: (index) => t({ en: `Item ${index + 1}`, fr: `Élément ${index + 1}` }),
+      fallbackTitle: (index) => t({ en: `Item ${index + 1}`, es: `Elemento ${index + 1}`, fr: `Élément ${index + 1}` }),
       items,
       seriesItems: item.seriesItems ?? []
     });
@@ -291,6 +305,7 @@ const InstrumentPreviewDialog = ({
               <p className="text-destructive py-4 text-center text-sm">
                 {t({
                   en: 'Failed to load instrument preview.',
+                  es: 'Error al cargar la vista previa del instrumento.',
                   fr: "Échec du chargement de l'aperçu de l'instrument."
                 })}
               </p>
@@ -309,24 +324,30 @@ const InstrumentPreviewDialog = ({
           <div className="flex max-h-[70vh] flex-col text-sm">
             <div className="min-h-0 space-y-3 overflow-y-auto pr-1">
               <div>
-                <span className="font-medium">{t({ en: 'Kind', fr: 'Type' })}: </span>
+                <span className="font-medium">{t({ en: 'Kind', es: 'Tipo', fr: 'Type' })}: </span>
                 <span className="text-muted-foreground">{item.kind}</span>
               </div>
               {item.description && (
                 <div>
-                  <span className="font-medium">{t({ en: 'Description', fr: 'Description' })}: </span>
+                  <span className="font-medium">
+                    {t({ en: 'Description', es: 'Descripción', fr: 'Description' })}:{' '}
+                  </span>
                   <span className="text-muted-foreground">{item.description}</span>
                 </div>
               )}
               {item.kind === 'SERIES' && (
                 <div>
                   <span className="font-medium">
-                    {t({ en: 'Series order', fr: 'Ordre de la série' })}
+                    {t({ en: 'Series order', es: 'Orden de la serie', fr: 'Ordre de la série' })}
                     {seriesItemTitles.length > 0 && ` (${seriesItemTitles.length})`}:{' '}
                   </span>
                   {seriesItemTitles.length === 0 ? (
                     <span className="text-muted-foreground">
-                      {t({ en: 'No items in this series.', fr: 'Aucun élément dans cette série.' })}
+                      {t({
+                        en: 'No items in this series.',
+                        es: 'No hay elementos en esta serie.',
+                        fr: 'Aucun élément dans cette série.'
+                      })}
                     </span>
                   ) : (
                     <ol className="text-muted-foreground mt-1 max-h-48 list-decimal space-y-1 overflow-auto rounded-md border border-slate-200 py-2 pl-8 pr-3 dark:border-slate-800">
@@ -341,46 +362,51 @@ const InstrumentPreviewDialog = ({
               )}
               {item.authors && item.authors.length > 0 && (
                 <div>
-                  <span className="font-medium">{t({ en: 'Authors', fr: 'Auteurs' })}: </span>
+                  <span className="font-medium">{t({ en: 'Authors', es: 'Autores', fr: 'Auteurs' })}: </span>
                   <span className="text-muted-foreground">{item.authors.join(', ')}</span>
                 </div>
               )}
               {item.internal && (
                 <div>
-                  <span className="font-medium">{t({ en: 'Edition', fr: 'Édition' })}: </span>
+                  <span className="font-medium">{t({ en: 'Edition', es: 'Edición', fr: 'Édition' })}: </span>
                   <span className="text-muted-foreground">{item.internal.edition}</span>
                 </div>
               )}
               <div>
-                <span className="font-medium">{t({ en: 'Source', fr: 'Source' })}: </span>
+                <span className="font-medium">{t({ en: 'Source', es: 'Origen', fr: 'Source' })}: </span>
                 <span className="text-muted-foreground">
                   {item.source.kind === 'repo'
                     ? item.source.name
                     : t({
                         en: 'No repo; it was manually added to the platform',
+                        es: 'Sin repositorio; se agregó manualmente a la plataforma',
                         fr: 'Aucun dépôt ; ajouté manuellement à la plateforme'
                       })}
                 </span>
               </div>
               {item.createdAt && (
                 <div data-testid="instrument-created-at">
-                  <span className="font-medium">{t({ en: 'Added', fr: 'Ajouté le' })}: </span>
+                  <span className="font-medium">{t({ en: 'Added', es: 'Agregado el', fr: 'Ajouté le' })}: </span>
                   <span className="text-muted-foreground">{toBasicISOString(item.createdAt)}</span>
                 </div>
               )}
               {item.availability && (
                 <div data-testid="instrument-availability">
-                  <span className="font-medium">{t({ en: 'Available to', fr: 'Disponible pour' })}: </span>
+                  <span className="font-medium">
+                    {t({ en: 'Available to', es: 'Disponible para', fr: 'Disponible pour' })}:{' '}
+                  </span>
                   <span className="text-muted-foreground">
                     {item.availability.kind === 'all'
-                      ? t({ en: 'All groups', fr: 'Tous les groupes' })
-                      : (item.availability.name ?? t({ en: 'Another group', fr: 'Un autre groupe' }))}
+                      ? t({ en: 'All groups', es: 'Todos los grupos', fr: 'Tous les groupes' })
+                      : (item.availability.name ?? t({ en: 'Another group', es: 'Otro grupo', fr: 'Un autre groupe' }))}
                   </span>
                 </div>
               )}
             </div>
             <div className="mt-3 flex shrink-0 justify-center border-t border-slate-200 pt-3 dark:border-slate-800">
-              <Button onClick={() => setShowForm(true)}>{t({ en: 'Preview Form', fr: 'Aperçu du formulaire' })}</Button>
+              <Button onClick={() => setShowForm(true)}>
+                {t({ en: 'Preview Form', es: 'Vista previa del formulario', fr: 'Aperçu du formulaire' })}
+              </Button>
             </div>
           </div>
         )}
@@ -463,7 +489,11 @@ const CreateSeriesInstrumentDialog = ({
       const result = await createMutation.mutateAsync(buildPayload(items));
       if (result.outcome === 'duplicate') {
         // The existing title comes back in its stored form (a plain string, or multilingual object).
-        setDuplicateOf(typeof result.existingTitle === 'string' ? result.existingTitle : t(result.existingTitle));
+        setDuplicateOf(
+          typeof result.existingTitle === 'string'
+            ? result.existingTitle
+            : result.existingTitle[toInstrumentAuthoringLanguage(resolvedLanguage)]
+        );
         return;
       }
       onCreated(result.instrumentId);
@@ -499,10 +529,17 @@ const CreateSeriesInstrumentDialog = ({
       >
         <Dialog.Content className="sm:max-w-[600px]">
           <Dialog.Header>
-            <Dialog.Title>{t({ en: 'Create Series Instrument', fr: 'Créer un instrument en série' })}</Dialog.Title>
+            <Dialog.Title>
+              {t({
+                en: 'Create Series Instrument',
+                es: 'Crear serie de instrumentos',
+                fr: 'Créer un instrument en série'
+              })}
+            </Dialog.Title>
             <Dialog.Description>
               {t({
                 en: 'Give the series a unique name, then select at least two instruments to include in order.',
+                es: 'Asigne un nombre único a la serie y seleccione al menos dos instrumentos para incluirlos en orden.',
                 fr: 'Donnez un nom unique à la série, puis sélectionnez au moins deux instruments à inclure dans l’ordre.'
               })}
             </Dialog.Description>
@@ -510,11 +547,15 @@ const CreateSeriesInstrumentDialog = ({
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium" htmlFor="series-name">
-                {t({ en: 'Name', fr: 'Nom' })}
+                {t({ en: 'Name', es: 'Nombre', fr: 'Nom' })}
               </label>
               <Input
                 id="series-name"
-                placeholder={t({ en: 'e.g. Baseline Battery', fr: 'p. ex. Batterie de base' })}
+                placeholder={t({
+                  en: 'e.g. Baseline Battery',
+                  es: 'p. ej. Batería inicial',
+                  fr: 'p. ex. Batterie de base'
+                })}
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
               />
@@ -522,6 +563,7 @@ const CreateSeriesInstrumentDialog = ({
                 <p className="text-destructive text-xs">
                   {t({
                     en: 'An instrument with this name already exists.',
+                    es: 'Ya existe un instrumento con este nombre.',
                     fr: 'Un instrument portant ce nom existe déjà.'
                   })}
                 </p>
@@ -529,12 +571,13 @@ const CreateSeriesInstrumentDialog = ({
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium" htmlFor="series-description">
-                {t({ en: 'Description', fr: 'Description' })}
+                {t({ en: 'Description', es: 'Descripción', fr: 'Description' })}
               </label>
               <TextArea
                 id="series-description"
                 placeholder={t({
                   en: 'Optional summary of the series, shown wherever it is listed.',
+                  es: 'Resumen opcional de la serie, mostrado en todos los lugares donde aparece.',
                   fr: 'Résumé facultatif de la série, affiché partout où elle est listée.'
                 })}
                 rows={2}
@@ -544,12 +587,13 @@ const CreateSeriesInstrumentDialog = ({
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium" htmlFor="series-instructions">
-                {t({ en: 'Instructions', fr: 'Instructions' })}
+                {t({ en: 'Instructions', es: 'Instrucciones', fr: 'Instructions' })}
               </label>
               <TextArea
                 id="series-instructions"
                 placeholder={t({
                   en: 'Optional instructions shown before the series begins.',
+                  es: 'Instrucciones opcionales que se muestran antes de que comience la serie.',
                   fr: 'Instructions facultatives affichées avant le début de la série.'
                 })}
                 rows={3}
@@ -559,22 +603,30 @@ const CreateSeriesInstrumentDialog = ({
             </div>
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium">
-                {t({ en: 'Available instruments', fr: 'Instruments disponibles' })}
+                {t({ en: 'Available instruments', es: 'Instrumentos disponibles', fr: 'Instruments disponibles' })}
                 {selectedIds.length > 0 && ` (${selectedIds.length})`}
               </span>
               <SearchBar
-                placeholder={t({ en: 'Search instruments...', fr: 'Rechercher des instruments...' })}
+                placeholder={t({
+                  en: 'Search instruments...',
+                  es: 'Buscar instrumentos...',
+                  fr: 'Rechercher des instruments...'
+                })}
                 value={search}
                 onValueChange={setSearch}
               />
               <div className="text-muted-foreground flex items-center justify-between px-2 text-xs font-medium uppercase">
-                <span>{t({ en: 'Instrument', fr: 'Instrument' })}</span>
-                <span>{t({ en: 'Series order', fr: 'Ordre de la série' })}</span>
+                <span>{t({ en: 'Instrument', es: 'Instrumento', fr: 'Instrument' })}</span>
+                <span>{t({ en: 'Series order', es: 'Orden de la serie', fr: 'Ordre de la série' })}</span>
               </div>
               <div className="max-h-[40vh] space-y-1 overflow-auto">
                 {filteredForms.length === 0 ? (
                   <p className="text-muted-foreground text-sm italic">
-                    {t({ en: 'No instruments available.', fr: 'Aucun instrument disponible.' })}
+                    {t({
+                      en: 'No instruments available.',
+                      es: 'No hay instrumentos disponibles.',
+                      fr: 'Aucun instrument disponible.'
+                    })}
                   </p>
                 ) : (
                   filteredForms.map((form) => {
@@ -598,10 +650,10 @@ const CreateSeriesInstrumentDialog = ({
           </div>
           <Dialog.Footer>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t({ en: 'Cancel', fr: 'Annuler' })}
+              {t({ en: 'Cancel', es: 'Cancelar', fr: 'Annuler' })}
             </Button>
             <Button disabled={!canCreate} type="button" onClick={() => void handleCreate()}>
-              {t({ en: 'Create', fr: 'Créer' })}
+              {t({ en: 'Create', es: 'Crear', fr: 'Créer' })}
             </Button>
           </Dialog.Footer>
         </Dialog.Content>
@@ -615,20 +667,23 @@ const CreateSeriesInstrumentDialog = ({
         >
           <Dialog.Content className="sm:max-w-[450px]">
             <Dialog.Header>
-              <Dialog.Title>{t({ en: 'Series Already Exists', fr: 'La série existe déjà' })}</Dialog.Title>
+              <Dialog.Title>
+                {t({ en: 'Series Already Exists', es: 'La serie ya existe', fr: 'La série existe déjà' })}
+              </Dialog.Title>
               <Dialog.Description>
                 {t({
                   en: `A series named "${duplicateOf}" already contains the same forms — you can use it instead. Do you still want to create "${title.trim()}"?`,
+                  es: `Una serie llamada "${duplicateOf}" ya contiene los mismos formularios: puede usarla en su lugar. ¿Aun así desea crear "${title.trim()}"?`,
                   fr: `Une série nommée « ${duplicateOf} » contient déjà les mêmes formulaires — vous pouvez l’utiliser à la place. Voulez-vous quand même créer « ${title.trim()} » ?`
                 })}
               </Dialog.Description>
             </Dialog.Header>
             <Dialog.Footer>
               <Button type="button" variant="outline" onClick={() => setDuplicateOf(null)}>
-                {t({ en: 'No', fr: 'Non' })}
+                {t({ en: 'No', es: 'No', fr: 'Non' })}
               </Button>
               <Button disabled={createMutation.isPending} type="button" onClick={() => void handleConfirmDuplicate()}>
-                {t({ en: 'Yes, create anyway', fr: 'Oui, créer quand même' })}
+                {t({ en: 'Yes, create anyway', es: 'Sí, crearla de todos modos', fr: 'Oui, créer quand même' })}
               </Button>
             </Dialog.Footer>
           </Dialog.Content>
@@ -664,20 +719,27 @@ const DeleteInstrumentDialog = ({
     >
       <Dialog.Content className="sm:max-w-[450px]">
         <Dialog.Header>
-          <Dialog.Title>{t({ en: 'Delete Series Instrument', fr: 'Supprimer l’instrument en série' })}</Dialog.Title>
+          <Dialog.Title>
+            {t({
+              en: 'Delete Series Instrument',
+              es: 'Eliminar serie de instrumentos',
+              fr: 'Supprimer l’instrument en série'
+            })}
+          </Dialog.Title>
           <Dialog.Description>
             {t({
               en: `Are you sure you want to delete "${item.title}"? This cannot be undone.`,
+              es: `¿Seguro que desea eliminar "${item.title}"? Esta acción no se puede deshacer.`,
               fr: `Êtes-vous sûr de vouloir supprimer « ${item.title} » ? Cette action est irréversible.`
             })}
           </Dialog.Description>
         </Dialog.Header>
         <Dialog.Footer>
           <Button type="button" variant="outline" onClick={onClose}>
-            {t({ en: 'No', fr: 'Non' })}
+            {t({ en: 'No', es: 'No', fr: 'Non' })}
           </Button>
           <Button disabled={deleteMutation.isPending} type="button" variant="danger" onClick={handleDelete}>
-            {t({ en: 'Yes, delete', fr: 'Oui, supprimer' })}
+            {t({ en: 'Yes, delete', es: 'Sí, eliminar', fr: 'Oui, supprimer' })}
           </Button>
         </Dialog.Footer>
       </Dialog.Content>
@@ -756,7 +818,11 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
       <p className="text-muted-foreground mb-3 mt-1 text-sm">{description}</p>
       <div className="mb-4">
         <SearchBar
-          placeholder={t({ en: 'Search instruments...', fr: 'Rechercher des instruments...' })}
+          placeholder={t({
+            en: 'Search instruments...',
+            es: 'Buscar instrumentos...',
+            fr: 'Rechercher des instruments...'
+          })}
           value={search}
           onValueChange={setSearch}
         />
@@ -793,7 +859,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
             variant="primary"
             onClick={() => setShowCreateSeries(true)}
           >
-            {t({ en: 'Create series', fr: 'Créer une série' })}
+            {t({ en: 'Create series', es: 'Crear serie', fr: 'Créer une série' })}
           </Button>
         )}
       </div>
@@ -815,6 +881,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                 kind: 'number',
                 label: t({
                   en: 'Preferred Subject ID Display Length',
+                  es: 'Longitud preferida del identificador de sujeto que se muestra',
                   fr: "La longueur d'affichage préférée de l'ID"
                 }),
                 variant: 'input'
@@ -822,6 +889,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
             },
             title: t({
               en: 'Display Settings',
+              es: 'Configuración de visualización',
               fr: "Paramètres d'affichage"
             })
           },
@@ -831,6 +899,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                 kind: 'boolean',
                 label: t({
                   en: 'Apply Minimum Age For Subjects',
+                  es: 'Aplicar una edad mínima a los sujetos',
                   fr: 'Appliquer un âge minimum aux sujets'
                 }),
                 variant: 'radio'
@@ -845,6 +914,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                       kind: 'number',
                       label: t({
                         en: 'Minimum Age',
+                        es: 'Edad mínima',
                         fr: 'Âge minimum'
                       }),
                       variant: 'input'
@@ -856,6 +926,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
             },
             title: t({
               en: 'Age Limit Settings',
+              es: 'Configuración del límite de edad',
               fr: "Paramètres de limite d'âge"
             })
           },
@@ -873,11 +944,13 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
               idValidationRegex: {
                 description: t({
                   en: 'Define a custom regular expression to validate subject IDs (see https://regexr.com for help designing your regular expression).',
+                  es: 'Defina una expresión regular personalizada para validar los identificadores de sujeto (consulte https://regexr.com para obtener ayuda al diseñarla).',
                   fr: "Définir une expression régulière pour valider les identifiants des sujets (voir https://regexr.com pour obtenir de l'aide dans la conception de votre expression régulière)."
                 }),
                 kind: 'string',
                 label: t({
                   en: 'ID Validation Pattern',
+                  es: 'Patrón de validación del identificador',
                   fr: "Modèle de validation d'identifiant"
                 }),
                 variant: 'input'
@@ -893,6 +966,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                     kind: 'string',
                     label: t({
                       en: 'Custom ID Validation Message (English)',
+                      es: 'Mensaje personalizado de validación del identificador (inglés)',
                       fr: 'Message de validation spécifique (en anglais)'
                     }),
                     variant: 'input'
@@ -910,6 +984,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                     kind: 'string',
                     label: t({
                       en: 'Custom ID Validation Message (French)',
+                      es: 'Mensaje personalizado de validación del identificador (francés)',
                       fr: 'Message de validation spécifique (en français)'
                     }),
                     variant: 'input'
@@ -940,6 +1015,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                 input: ctx.value.minimumAge,
                 message: t({
                   en: 'Please enter an age',
+                  es: 'Introduzca una edad',
                   fr: 'Veuillez entrer un âge'
                 }),
                 path: ['minimumAge']
@@ -1011,7 +1087,12 @@ const RouteComponent = () => {
       // name but is still repo-sourced (and so must not get the "manual" delete affordance). We fall back
       // to a placeholder label only for display.
       const source: InstrumentSource = repoId
-        ? { kind: 'repo', name: instrument.sourceRepo?.name ?? t({ en: 'Unknown repository', fr: 'Dépôt inconnu' }) }
+        ? {
+            kind: 'repo',
+            name:
+              instrument.sourceRepo?.name ??
+              t({ en: 'Unknown repository', es: 'Repositorio desconocido', fr: 'Dépôt inconnu' })
+          }
         : { kind: 'manual' };
       const seriesGroupId = instrument.kind === 'SERIES' ? (instrument.seriesGroupId ?? null) : null;
       const item: InstrumentItem = {

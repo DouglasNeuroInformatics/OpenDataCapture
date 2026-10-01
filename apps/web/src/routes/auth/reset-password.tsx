@@ -1,14 +1,15 @@
 import { useMemo, useState } from 'react';
 
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
-import { Button, Card, Form, Heading, LanguageToggle, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { Button, Card, Form, Heading, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { Logo } from '@opendatacapture/react-core';
+import { LanguageToggle, Logo } from '@opendatacapture/react-core';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
 import { usePasswordErrorMessage } from '@/hooks/usePasswordErrorMessage';
 import { useResetPasswordMutation } from '@/hooks/useResetPasswordMutation';
+import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 
 type ResetPasswordFormData = {
@@ -21,6 +22,7 @@ const RouteComponent = () => {
   const currentUser = useAppStore((store) => store.currentUser);
   const logout = useAppStore((store) => store.logout);
   const resetPasswordMutation = useResetPasswordMutation();
+  const setupStateQuery = useSetupStateQuery();
   const passwordErrorMessage = usePasswordErrorMessage();
   const notifications = useNotificationsStore();
   const [isChanged, setIsChanged] = useState(false);
@@ -71,7 +73,11 @@ const RouteComponent = () => {
           notifications.addNotification({
             message: passwordErrorMessage(
               err,
-              t({ en: 'Failed to change password', fr: 'Échec du changement de mot de passe' })
+              t({
+                en: 'Failed to change password',
+                es: 'No se pudo cambiar la contraseña',
+                fr: 'Échec du changement de mot de passe'
+              })
             ),
             type: 'error'
           });
@@ -88,7 +94,11 @@ const RouteComponent = () => {
           <Card.Header className="flex items-center justify-center">
             <Logo className="m-1.5 h-auto w-16" variant="auto" />
             <Heading variant="h3">
-              {t({ en: 'Choose a new password', fr: 'Choisissez un nouveau mot de passe' })}
+              {t({
+                en: 'Choose a new password',
+                es: 'Elija una nueva contraseña',
+                fr: 'Choisissez un nouveau mot de passe'
+              })}
             </Heading>
           </Card.Header>
           <Card.Content>
@@ -97,11 +107,12 @@ const RouteComponent = () => {
                 <p className="text-muted-foreground text-sm">
                   {t({
                     en: 'Your password has been changed. Sign in again to continue.',
+                    es: 'Su contraseña ha sido cambiada. Inicie sesión de nuevo para continuar.',
                     fr: 'Votre mot de passe a été modifié. Connectez-vous de nouveau pour continuer.'
                   })}
                 </p>
                 <Button type="button" onClick={logout}>
-                  {t({ en: 'Sign in', fr: 'Se connecter' })}
+                  {t({ en: 'Sign in', es: 'Iniciar sesión', fr: 'Se connecter' })}
                 </Button>
               </div>
             ) : (
@@ -109,6 +120,7 @@ const RouteComponent = () => {
                 <p className="text-muted-foreground mb-4 text-sm">
                   {t({
                     en: 'Your password was set for you, so you must choose your own before you can use the app.',
+                    es: 'Su contraseña fue definida por otra persona, así que debe elegir la suya antes de poder usar la aplicación.',
                     fr: "Votre mot de passe a été défini pour vous ; vous devez en choisir un vous-même avant de pouvoir utiliser l'application."
                   })}
                 </p>
@@ -130,7 +142,11 @@ const RouteComponent = () => {
                   data-form-type="other"
                   data-lpignore="true"
                   data-testid="reset-password-form"
-                  submitBtnLabel={t({ en: 'Change password', fr: 'Changer le mot de passe' })}
+                  submitBtnLabel={t({
+                    en: 'Change password',
+                    es: 'Cambiar la contraseña',
+                    fr: 'Changer le mot de passe'
+                  })}
                   validationSchema={$ResetPasswordFormData}
                   onSubmit={handleSubmit}
                 />
@@ -140,11 +156,8 @@ const RouteComponent = () => {
           <Card.Footer className="text-muted-foreground flex items-center justify-between">
             <div className="flex gap-1">
               <LanguageToggle
+                activeLanguages={setupStateQuery.data.activeLanguages}
                 align="start"
-                options={{
-                  en: 'English',
-                  fr: 'Français'
-                }}
                 triggerClassName="border p-2"
                 variant="ghost"
               />
@@ -152,7 +165,7 @@ const RouteComponent = () => {
             </div>
             {!isChanged && (
               <Button size="sm" type="button" variant="ghost" onClick={logout}>
-                {t({ en: 'Sign out', fr: 'Se déconnecter' })}
+                {t({ en: 'Sign out', es: 'Cerrar sesión', fr: 'Se déconnecter' })}
               </Button>
             )}
           </Card.Footer>
@@ -172,5 +185,6 @@ export const Route = createFileRoute('/auth/reset-password')({
       throw redirect({ to: '/dashboard' });
     }
   },
-  component: RouteComponent
+  component: RouteComponent,
+  loader: ({ context }) => context.queryClient.ensureQueryData(setupStateQueryOptions())
 });
