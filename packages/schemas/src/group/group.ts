@@ -44,14 +44,14 @@ export const $Group = $BaseModel.extend({
   userIds: z.array(z.string())
 });
 
-export type CreateGroupData = z.infer<typeof $CreateGroupData>;
+export type $CreateGroupData = z.infer<typeof $CreateGroupData>;
 export const $CreateGroupData = z.object({
   name: z.string().min(1),
   settings: $GroupSettings.optional(),
   type: $GroupType
 });
 
-export type UpdateGroupData = z.infer<typeof $UpdateGroupData>;
+export type $UpdateGroupData = z.infer<typeof $UpdateGroupData>;
 export const $UpdateGroupData = $Group
   .omit({
     subjectIds: true,

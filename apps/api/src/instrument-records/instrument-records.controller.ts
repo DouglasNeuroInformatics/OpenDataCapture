@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-classes */
 
-import { CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
+import { ApiOperation, CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
 import {
   Body,
   Controller,
@@ -14,7 +14,6 @@ import {
   Query,
   UseInterceptors
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import {
   $CreateInstrumentRecordData,
@@ -29,7 +28,6 @@ import { MsgpackInterceptor } from '@/core/interceptors/msgpack.interceptor';
 
 import { InstrumentRecordsService } from './instrument-records.service';
 
-@ApiTags('Instrument Records')
 @Controller('instrument-records')
 export class InstrumentRecordsController {
   constructor(private readonly instrumentRecordsService: InstrumentRecordsService) {}

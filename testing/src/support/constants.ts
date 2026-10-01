@@ -1,4 +1,4 @@
-import type { InitAppOptions } from '@opendatacapture/schemas/setup';
+import type { $InitAppOptions } from '@opendatacapture/schemas/setup';
 
 /** The admin account created during global setup; role fixtures log in with these credentials. */
 export const ADMIN = {
@@ -14,7 +14,7 @@ export const INIT_APP_OPTIONS = {
   enableExperimentalFeatures: false,
   initDemo: true,
   recordsPerSubject: 10
-} satisfies InitAppOptions;
+} satisfies $InitAppOptions;
 
 /** A minimal payload satisfying the seeded happiness questionnaire's validation schema. */
 export const HAPPINESS_RECORD = {

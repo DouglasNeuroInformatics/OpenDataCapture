@@ -1,4 +1,4 @@
-import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import { ApiOperation, CurrentUser } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import {
   BadRequestException,
@@ -12,14 +12,20 @@ import {
   Post,
   Query
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import {
+  $BulkAssignmentPreflightData,
+  $CancelAssignmentData,
+  $CreateAssignmentData,
+  $CreateBulkAssignmentsData,
+  $DeleteBulkAssignmentsData
+} from '@opendatacapture/schemas/assignment';
 import type {
   Assignment,
   BulkAssignmentPreflightResult,
   DeleteBulkAssignmentsResult
 } from '@opendatacapture/schemas/assignment';
-import { DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
+import { $SendAssignmentEmailData, DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
 import type { EmailDeliveryResult, MailTemplate } from '@opendatacapture/schemas/mail';
 
 import { AuditLogger } from '@/audit/audit.logger';
@@ -30,11 +36,6 @@ import { GroupsService } from '@/groups/groups.service';
 import { MailService } from '@/mail/mail.service';
 
 import { AssignmentsService } from './assignments.service';
-import { BulkAssignmentPreflightDto, CreateBulkAssignmentsDto } from './dto/bulk-assignment.dto';
-import { CreateAssignmentDto } from './dto/create-assignment.dto';
-import { DeleteBulkAssignmentsDto } from './dto/delete-bulk-assignments.dto';
-import { SendAssignmentEmailDto } from './dto/send-assignment-email.dto';
-import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 
 @Controller('assignments')
 export class AssignmentsController {
@@ -59,7 +60,7 @@ export class AssignmentsController {
   @Post('bulk/preflight')
   @RouteAccess({ action: 'create', subject: 'Assignment' })
   bulkPreflight(
-    @Body() data: BulkAssignmentPreflightDto,
+    @Body() data: $BulkAssignmentPreflightData,
     @CurrentUser() currentUser: RequestUser
   ): Promise<BulkAssignmentPreflightResult> {
     return this.assignmentsService.bulkPreflight(data, currentUser);
@@ -68,14 +69,14 @@ export class AssignmentsController {
   @ApiOperation({ summary: 'Create Assignment' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Assignment' })
-  create(@Body() data: CreateAssignmentDto, @CurrentUser() currentUser: RequestUser): Promise<Assignment> {
+  create(@Body() data: $CreateAssignmentData, @CurrentUser() currentUser: RequestUser): Promise<Assignment> {
     return this.assignmentsService.create(data, currentUser);
   }
 
   @ApiOperation({ summary: 'Create Assignments in Bulk' })
   @Post('bulk')
   @RouteAccess({ action: 'create', subject: 'Assignment' })
-  createBulk(@Body() data: CreateBulkAssignmentsDto, @CurrentUser() currentUser: RequestUser): Promise<Assignment[]> {
+  createBulk(@Body() data: $CreateBulkAssignmentsData, @CurrentUser() currentUser: RequestUser): Promise<Assignment[]> {
     return this.assignmentsService.createBulk(data, currentUser);
   }
 
@@ -84,7 +85,7 @@ export class AssignmentsController {
   @Post('bulk/delete')
   @RouteAccess({ action: 'delete', subject: 'Assignment' })
   deleteBulk(
-    @Body() data: DeleteBulkAssignmentsDto,
+    @Body() data: $DeleteBulkAssignmentsData,
     @CurrentUser('ability') ability?: AppAbility
   ): Promise<DeleteBulkAssignmentsResult> {
     return this.assignmentsService.deleteBulk(data.ids, { ability });
@@ -109,7 +110,7 @@ export class AssignmentsController {
   @Throttle({ long: { limit: ASSIGNMENT_EMAIL_THROTTLER_LIMIT, ttl: ASSIGNMENT_EMAIL_THROTTLER_TTL } })
   async sendEmail(
     @Param('id') id: string,
-    @Body() { language, recipient, templateId }: SendAssignmentEmailDto,
+    @Body() { language, recipient, templateId }: $SendAssignmentEmailData,
     @CurrentUser() currentUser: RequestUser
   ): Promise<EmailDeliveryResult> {
     const { ability } = currentUser;
@@ -152,7 +153,7 @@ export class AssignmentsController {
   @ApiOperation({ summary: 'Update Assignment' })
   @Patch(':id')
   @RouteAccess({ action: 'update', subject: 'Assignment' })
-  updateById(@Param('id') id: string, @Body() data: UpdateAssignmentDto, @CurrentUser() currentUser: RequestUser) {
+  updateById(@Param('id') id: string, @Body() data: $CancelAssignmentData, @CurrentUser() currentUser: RequestUser) {
     return this.assignmentsService.updateById(id, data, currentUser);
   }
 }

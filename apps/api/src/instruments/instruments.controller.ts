@@ -1,11 +1,10 @@
-import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import { ApiOperation, CurrentUser } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Delete, Get, Param, ParseBoolPipe, Post, Query } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 // Imported as a value (not a type-only import) so it doubles as the validation schema for the request
 // body while also annotating its type — no dedicated DTO class is needed.
-import { $CreateSeriesInstrumentData } from '@opendatacapture/schemas/instrument';
+import { $CreateInstrumentData, $CreateSeriesInstrumentData } from '@opendatacapture/schemas/instrument';
 import type {
   CreateSeriesInstrumentResult,
   InstrumentBundleContainer,
@@ -15,10 +14,8 @@ import type {
 import { AcceptsInstrumentToken } from '@/core/decorators/accepts-instrument-token.decorator';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
-import { CreateInstrumentDto } from './dto/create-instrument.dto';
 import { InstrumentsService } from './instruments.service';
 
-@ApiTags('Instruments')
 @Controller({ path: 'instruments' })
 export class InstrumentsController {
   constructor(private readonly instrumentsService: InstrumentsService) {}
@@ -27,7 +24,7 @@ export class InstrumentsController {
   @ApiOperation({ summary: 'Create Instrument' })
   @Post()
   @RouteAccess({ action: 'manage', subject: 'Instrument' })
-  create(@Body() data: CreateInstrumentDto): Promise<unknown> {
+  create(@Body() data: $CreateInstrumentData): Promise<unknown> {
     return this.instrumentsService.create(data);
   }
 

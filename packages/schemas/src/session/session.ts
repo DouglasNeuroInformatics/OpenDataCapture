@@ -16,7 +16,7 @@ export const $Session = $BaseModel.extend({
   userId: z.string().nullish()
 });
 
-export type CreateSessionData = z.infer<typeof $CreateSessionData>;
+export type $CreateSessionData = z.infer<typeof $CreateSessionData>;
 export const $CreateSessionData = z.object({
   date: z.coerce.date(),
   groupId: z.string().nullable(),

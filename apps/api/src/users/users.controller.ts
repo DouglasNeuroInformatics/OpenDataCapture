@@ -1,4 +1,4 @@
-import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
+import { ApiOperation, CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import {
   Body,
@@ -13,10 +13,14 @@ import {
   Put,
   Query
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { $Language } from '@opendatacapture/schemas/core';
 import type { Language } from '@opendatacapture/schemas/core';
-import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
+import {
+  $CreateUserData,
+  $SelfUpdateUserData,
+  $UpdateUserData,
+  $UpdateUserPermissionsData
+} from '@opendatacapture/schemas/user';
 import type { CreateUserResponse } from '@opendatacapture/schemas/user';
 
 import type { AppAbility } from '@/auth/auth.types';
@@ -24,9 +28,6 @@ import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorato
 import { GroupsService } from '@/groups/groups.service';
 import { MailService } from '@/mail/mail.service';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserPermissionsDto } from './dto/update-user-permissions.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
 /**
@@ -35,7 +36,6 @@ import { UsersService } from './users.service';
  * grant reaching any of these would let its holder make themselves, or an account whose password
  * they chose, an administrator.
  */
-@ApiTags('Users')
 @Controller({ path: 'users' })
 export class UsersController {
   constructor(
@@ -55,7 +55,7 @@ export class UsersController {
   @Post()
   @RouteAccess(ADMIN_ONLY)
   async create(
-    @Body() user: CreateUserDto,
+    @Body() user: $CreateUserData,
     @CurrentUser('ability') ability: AppAbility,
     @Headers('origin') origin?: string,
     @Query('language', new ParseSchemaPipe({ schema: $Language.optional() })) language?: Language
@@ -100,7 +100,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Update User' })
   @Patch(':id')
   @RouteAccess(ADMIN_ONLY)
-  updateById(@Param('id') id: string, @Body() update: UpdateUserDto, @CurrentUser() currentUser: RequestUser) {
+  updateById(@Param('id') id: string, @Body() update: $UpdateUserData, @CurrentUser() currentUser: RequestUser) {
     return this.usersService.updateById(id, update, currentUser);
   }
 
@@ -109,7 +109,7 @@ export class UsersController {
   @RouteAccess(ADMIN_ONLY)
   updatePermissions(
     @Param('id') id: string,
-    @Body() { permissions }: UpdateUserPermissionsDto,
+    @Body() { permissions }: $UpdateUserPermissionsData,
     @CurrentUser('ability') ability: AppAbility
   ) {
     return this.usersService.updatePermissions(id, permissions, { ability });

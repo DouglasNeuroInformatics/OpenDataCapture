@@ -1,7 +1,6 @@
-import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import { ApiOperation, CurrentUser } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
 import { $LoginCredentials } from '@opendatacapture/schemas/auth';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator.js';

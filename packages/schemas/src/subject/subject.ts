@@ -34,7 +34,7 @@ export const $SubjectDemographics = $Subject.pick({ dateOfBirth: true, sex: true
 export type SubjectCustomIds = z.infer<typeof $SubjectCustomIds>;
 export const $SubjectCustomIds = $Subject.shape.id.array();
 
-export type CreateSubjectData = z.infer<typeof $CreateSubjectData>;
+export type $CreateSubjectData = z.infer<typeof $CreateSubjectData>;
 export const $CreateSubjectData = $Subject.pick({
   dateOfBirth: true,
   firstName: true,

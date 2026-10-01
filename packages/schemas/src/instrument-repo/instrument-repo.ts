@@ -13,7 +13,7 @@ export const $InstrumentRepo = $BaseModel.extend({
   url: z.string().url()
 });
 
-export type CreateInstrumentRepoData = z.infer<typeof $CreateInstrumentRepoData>;
+export type $CreateInstrumentRepoData = z.infer<typeof $CreateInstrumentRepoData>;
 export const $CreateInstrumentRepoData = z.object({
   // Optional GitHub personal access token, required only for private repositories. It is stored
   // encrypted on the server and never returned to the client.

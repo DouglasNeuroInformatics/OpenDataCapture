@@ -31,13 +31,11 @@ examples live in other controllers, as noted there).
    `accessibleQuery(undefined, ...)` returns `{}`, meaning **no restriction at all**. Nothing catches
    an omitted ability: not tsc, not eslint, not a green test suite.
 
-4. **Request body typing**, if the handler takes a body. Pick one of the two patterns in use:
-   - a DTO class in `apps/api/src/<feature>/dto/<verb>-<x>.dto.ts` carrying **both**
-     `@ValidationSchema($CreateXData)` and `implements CreateXData` — see
-     `apps/api/src/groups/dto/create-group.dto.ts`;
-   - or the schema as the parameter type (`@Body() data: $CreateSeriesInstrumentData`), which **must
-     be a value import**. `import type` erases the runtime binding and the pipe throws when the route
-     is called. See `apps/api/src/instruments/instruments.controller.ts`.
+4. **Request body typing**, if the handler takes a body. Type the parameter as the schema
+   (`@Body() data: $CreateXData`), declared in `packages/schemas` as a `$`-prefixed type and const
+   sharing one name. It **must be a value import**: `import type` erases the runtime binding and the
+   pipe throws when the route is called. The same schema is what the API reference documents the body
+   from. See `apps/api/src/groups/groups.controller.ts`.
 
 5. **Controller handler** in `apps/api/src/<feature>/<feature>.controller.ts`. Every handler needs
    `@RouteAccess` (eslint-enforced; missing it is a 500 at request time, not an open route), and any

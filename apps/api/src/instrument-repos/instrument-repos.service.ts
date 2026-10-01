@@ -14,14 +14,13 @@ import {
 import type { OnModuleInit } from '@nestjs/common';
 import { bundle, BUNDLER_FILE_EXT_REGEX, inferLoader } from '@opendatacapture/instrument-bundler';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
+import { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
 import JSZip from 'jszip';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import { decryptSecret, encryptSecret } from '@/core/secret-cipher';
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
-
-import type { CreateInstrumentRepoDto } from './dto/create-instrument-repo.dto';
 
 @Injectable()
 export class InstrumentReposService implements OnModuleInit {
@@ -34,7 +33,7 @@ export class InstrumentReposService implements OnModuleInit {
     private readonly loggingService: LoggingService
   ) {}
 
-  async create({ accessToken, url }: CreateInstrumentRepoDto) {
+  async create({ accessToken, url }: $CreateInstrumentRepoData) {
     const { owner, repoName } = this.parseGitHubUrl(url);
     const normalizedUrl = this.normalizeUrl(url);
 

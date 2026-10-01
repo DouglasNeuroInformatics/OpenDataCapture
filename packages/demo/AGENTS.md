@@ -14,7 +14,7 @@ log in (the password itself is never rendered as text). Nothing here is a secret
 nothing here may be reused for a real account or copied into a seed path that runs against a real
 database.
 
-**`dummyIdPrefix` is not part of the group schema.** `DemoGroup` is `CreateGroupData` plus that
+**`dummyIdPrefix` is not part of the group schema.** `DemoGroup` is `$CreateGroupData` plus that
 extra key; `DemoService` destructures it off before calling `groupsService.create` and prefixes the
 generated research IDs with it. A group whose `settings.idValidationRegex` requires a prefix but
 that carries no matching `dummyIdPrefix` seeds subject IDs that fail their own group's validation.

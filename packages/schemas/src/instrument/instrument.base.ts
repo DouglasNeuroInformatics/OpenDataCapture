@@ -301,7 +301,7 @@ type TranslatedInstrumentInfo = UnilingualInstrumentInfo & {
 /** @internal */
 type MultilingualInstrumentInfo = Simplify<InstrumentInfo<BaseInstrument<Language[]>>>;
 
-type CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
+type $CreateInstrumentData = z.infer<typeof $CreateInstrumentData>;
 const $CreateInstrumentData = z.object({
   bundle: z.string().min(1)
 });
@@ -389,7 +389,6 @@ export {
 };
 
 export type {
-  CreateInstrumentData,
   CreateSeriesInstrumentResult,
   InstrumentBundleContainer,
   InstrumentInfo,

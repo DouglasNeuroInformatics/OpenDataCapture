@@ -36,7 +36,6 @@ export default AppFactory.create({
       url: 'https://www.apache.org/licenses/LICENSE-2.0'
     },
     path: '/',
-    tags: ['Authentication', 'Groups', 'Instruments', 'Instrument Records', 'Mail', 'Subjects', 'Users'],
     title: 'Open Data Capture'
   },
   envSchema: $Env,

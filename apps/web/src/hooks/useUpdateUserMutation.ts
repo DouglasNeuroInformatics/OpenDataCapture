@@ -1,5 +1,5 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
-import type { UpdateUserData } from '@opendatacapture/schemas/user';
+import type { $UpdateUserData } from '@opendatacapture/schemas/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -9,7 +9,7 @@ export function useUpdateUserMutation() {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
-    mutationFn: async ({ data, id }: { data: UpdateUserData; id: string }) => {
+    mutationFn: async ({ data, id }: { data: $UpdateUserData; id: string }) => {
       await axios.patch(`/v1/users/${id}`, data);
     },
     onSuccess() {

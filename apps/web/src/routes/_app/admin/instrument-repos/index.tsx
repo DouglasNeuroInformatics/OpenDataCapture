@@ -4,7 +4,7 @@ import type { FormEvent } from 'react';
 import { Button, DataTable, Dialog, Heading, Input, Label, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
-import type { CreateInstrumentRepoData, InstrumentRepo } from '@opendatacapture/schemas/instrument-repo';
+import type { InstrumentRepo } from '@opendatacapture/schemas/instrument-repo';
 import { createFileRoute } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 
@@ -21,7 +21,7 @@ const AddRepoForm = ({
   onSubmit
 }: {
   isPending: boolean;
-  onSubmit: (data: CreateInstrumentRepoData) => void;
+  onSubmit: (data: $CreateInstrumentRepoData) => void;
 }) => {
   const { t } = useTranslation();
   const [url, setUrl] = useState('');
