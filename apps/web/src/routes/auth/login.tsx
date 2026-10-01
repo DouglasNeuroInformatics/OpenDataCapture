@@ -12,17 +12,19 @@ import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStat
 import { useAppStore } from '@/store';
 import { getRightPanelGradient } from '@/utils/branding';
 
-const loginRequest = async (
-  credentials: $LoginCredentials
-): Promise<{ accessToken: string; success: true } | { success: false }> => {
+type LoginResult = { accessToken: string; kind: 'success' } | { kind: 'archived' } | { kind: 'unauthorized' };
+
+const loginRequest = async (credentials: $LoginCredentials): Promise<LoginResult> => {
   const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {
-    validateStatus: (status) => status === 200 || status === 401
+    validateStatus: (status) => status === 200 || status === 401 || status === 403
   });
-  if (response.status === 401) {
-    console.error(response);
-    return { success: false };
+  if (response.status === 403) {
+    return { kind: 'archived' };
   }
-  return { accessToken: response.data.accessToken, success: true };
+  if (response.status === 401) {
+    return { kind: 'unauthorized' };
+  }
+  return { accessToken: response.data.accessToken, kind: 'success' };
 };
 
 const RouteComponent = () => {
@@ -39,7 +41,23 @@ const RouteComponent = () => {
 
   const handleLogin = async (credentials: $LoginCredentials) => {
     const result = await loginRequest(credentials);
-    if (!result.success) {
+    if (result.kind === 'archived') {
+      notifications.addNotification({
+        message: t({
+          en: 'Your account has been archived. Please contact an administrator to restore it.',
+          es: 'Su cuenta ha sido archivada. Comuníquese con un administrador para restaurarla.',
+          fr: 'Votre compte a été archivé. Veuillez contacter un administrateur pour le restaurer.'
+        }),
+        title: t({
+          en: 'Account Archived',
+          es: 'Cuenta archivada',
+          fr: 'Compte archivé'
+        }),
+        type: 'error'
+      });
+      return;
+    }
+    if (result.kind === 'unauthorized') {
       notifications.addNotification({
         message: t('unauthorizedError.message'),
         title: t('unauthorizedError.title'),

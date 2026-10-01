@@ -14,6 +14,7 @@ import { UserIcon } from '@/components/UserIcon';
 import { UserPermissionsEditor } from '@/components/UserPermissionsEditor';
 import { useArchiveUserMutation } from '@/hooks/useArchiveUserMutation';
 import { useFindUserQuery, useFindUserQueryOptions } from '@/hooks/useFindUserQuery';
+import { useUnarchiveUserMutation } from '@/hooks/useUnarchiveUserMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { useAppStore } from '@/store';
@@ -27,9 +28,10 @@ const RouteComponent = () => {
   const groupsQuery = useGroupsQuery();
   const userQuery = useFindUserQuery(userId);
   const archiveUserMutation = useArchiveUserMutation();
+  const unarchiveUserMutation = useUnarchiveUserMutation();
   const updateUserMutation = useUpdateUserMutation();
   const [submitErrorMessage, setSubmitErrorMessage] = useState<null | string>(null);
-  const [isConfirmArchiveOpen, setIsConfirmArchiveOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   // libui's `Form` clears its values after a successful submit, so the profile form is remounted
   // from the saved user once a save lands. Keyed on this rather than on the query's refetch time so
   // that saving a permission below does not discard edits typed here but not yet saved.
@@ -150,7 +152,11 @@ const RouteComponent = () => {
         <UserPermissionsEditor groups={groups} user={user} />
         <Card>
           <Card.Header>
-            <Card.Title>{t({ en: 'Archive User', es: 'Archivar usuario', fr: "Archiver l'utilisateur" })}</Card.Title>
+            <Card.Title>
+              {user.disabled
+                ? t({ en: 'Unarchive User', es: 'Desarchivar usuario', fr: "Désarchiver l'utilisateur" })
+                : t({ en: 'Archive User', es: 'Archivar usuario', fr: "Archiver l'utilisateur" })}
+            </Card.Title>
             <Card.Description>
               {isCurrentUser
                 ? t({
@@ -158,18 +164,26 @@ const RouteComponent = () => {
                     es: 'No puede archivar la cuenta con la que ha iniciado sesión.',
                     fr: 'Vous ne pouvez pas archiver le compte avec lequel vous êtes connecté.'
                   })
-                : t({
-                    en: 'Disables this account. The user will no longer be able to sign in.',
-                    es: 'Desactiva esta cuenta. El usuario ya no podrá iniciar sesión.',
-                    fr: "Désactive ce compte. L'utilisateur ne pourra plus se connecter."
-                  })}
+                : user.disabled
+                  ? t({
+                      en: 'Restores this account. The user will be able to sign in again.',
+                      es: 'Restaura esta cuenta. El usuario podrá iniciar sesión de nuevo.',
+                      fr: "Restaure ce compte. L'utilisateur pourra se reconnecter."
+                    })
+                  : t({
+                      en: 'Disables this account. The user will no longer be able to sign in.',
+                      es: 'Desactiva esta cuenta. El usuario ya no podrá iniciar sesión.',
+                      fr: "Désactive ce compte. L'utilisateur ne pourra plus se connecter."
+                    })}
             </Card.Description>
           </Card.Header>
           <Card.Footer>
-            <Dialog open={isConfirmArchiveOpen} onOpenChange={setIsConfirmArchiveOpen}>
+            <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
               <Dialog.Trigger asChild>
-                <Button disabled={isCurrentUser} type="button" variant="danger">
-                  {t({ en: 'Archive User', es: 'Archivar usuario', fr: "Archiver l'utilisateur" })}
+                <Button disabled={isCurrentUser} type="button" variant={user.disabled ? 'primary' : 'danger'}>
+                  {user.disabled
+                    ? t({ en: 'Unarchive User', es: 'Desarchivar usuario', fr: "Désarchiver l'utilisateur" })
+                    : t({ en: 'Archive User', es: 'Archivar usuario', fr: "Archiver l'utilisateur" })}
                 </Button>
               </Dialog.Trigger>
               <Dialog.Content>
@@ -182,24 +196,31 @@ const RouteComponent = () => {
                     })}
                   </Dialog.Title>
                   <Dialog.Description>
-                    {t({
-                      en: 'This will archive the account and prevent the user from signing in.',
-                      es: 'Esto archivará la cuenta e impedirá que el usuario inicie sesión.',
-                      fr: "Cela archivera le compte et empêchera l'utilisateur de se connecter."
-                    })}
+                    {user.disabled
+                      ? t({
+                          en: 'This will restore the account and allow the user to sign in again.',
+                          es: 'Esto restaurará la cuenta y permitirá que el usuario inicie sesión de nuevo.',
+                          fr: "Cela restaurera le compte et permettra à l'utilisateur de se reconnecter."
+                        })
+                      : t({
+                          en: 'This will archive the account and prevent the user from signing in.',
+                          es: 'Esto archivará la cuenta e impedirá que el usuario inicie sesión.',
+                          fr: "Cela archivera le compte et empêchera l'utilisateur de se connecter."
+                        })}
                   </Dialog.Description>
                 </Dialog.Header>
                 <Dialog.Footer>
                   <Button
                     className="min-w-16"
                     type="button"
-                    variant="danger"
+                    variant={user.disabled ? 'primary' : 'danger'}
                     onClick={() => {
-                      archiveUserMutation.mutate(
+                      const mutation = user.disabled ? unarchiveUserMutation : archiveUserMutation;
+                      mutation.mutate(
                         { id: user.id },
                         {
                           onSuccess: () => {
-                            void navigate({ to: '/admin/users' });
+                            setIsConfirmOpen(false);
                           }
                         }
                       );
@@ -207,12 +228,7 @@ const RouteComponent = () => {
                   >
                     {t('core.yes')}
                   </Button>
-                  <Button
-                    className="min-w-16"
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsConfirmArchiveOpen(false)}
-                  >
+                  <Button className="min-w-16" type="button" variant="outline" onClick={() => setIsConfirmOpen(false)}>
                     {t('core.no')}
                   </Button>
                 </Dialog.Footer>

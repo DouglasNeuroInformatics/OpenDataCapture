@@ -126,6 +126,19 @@ export class UsersService {
     });
   }
 
+  async unarchiveById(id: string, currentUser: RequestUser) {
+    if (id === currentUser.id) {
+      throw new ForbiddenException('You may not unarchive your own account');
+    }
+    return this.userModel.update({
+      data: { disabled: false },
+      omit: {
+        hashedPassword: true
+      },
+      where: { AND: [accessibleQuery(currentUser.ability, 'update', 'User')], id }
+    });
+  }
+
   /** Delete the user with the provided username, otherwise throws */
   async deleteByUsername(username: string, { ability }: EntityOperationOptions = {}) {
     const user = await this.findByUsername(username);

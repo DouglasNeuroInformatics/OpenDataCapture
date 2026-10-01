@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
+import { snakeToCamelCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { User } from '@opendatacapture/schemas/user';
@@ -8,17 +8,21 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useArchiveUserMutation } from '@/hooks/useArchiveUserMutation';
+import { useUnarchiveUserMutation } from '@/hooks/useUnarchiveUserMutation';
 import { useAppStore } from '@/store';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
+
+type ArchiveAction = { kind: 'archive'; user: User } | { kind: 'unarchive'; user: User };
 
 const RouteComponent = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const usersQuery = useUsersQuery();
   const archiveUserMutation = useArchiveUserMutation();
+  const unarchiveUserMutation = useUnarchiveUserMutation();
   const currentUser = useAppStore((store) => store.currentUser);
   const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
-  const [userToArchive, setUserToArchive] = useState<User | null>(null);
+  const [pendingAction, setPendingAction] = useState<ArchiveAction | null>(null);
 
   const openUser = (user: User) => {
     setHighlightedRowId(user.id);
@@ -63,6 +67,30 @@ const RouteComponent = () => {
               return t(`common.${snakeToCamelCase(basePermissionLevel)}`);
             },
             header: t('common.basePermissionLevel')
+          },
+          {
+            accessorKey: 'disabled',
+            cell: (ctx) => {
+              const user = ctx.row.original;
+              if (user.disabled) {
+                return (
+                  <span className="text-destructive" data-testid="user-status-archived">
+                    {t({
+                      en: `Archived on ${toBasicISOString(user.updatedAt)}`,
+                      es: `Archivado el ${toBasicISOString(user.updatedAt)}`,
+                      fr: `Archivé le ${toBasicISOString(user.updatedAt)}`
+                    })}
+                  </span>
+                );
+              }
+              return (
+                <span className="text-emerald-600 dark:text-emerald-400" data-testid="user-status-active">
+                  {t({ en: 'Active', es: 'Activo', fr: 'Actif' })}
+                </span>
+              );
+            },
+            header: t({ en: 'Status', es: 'Estado', fr: 'Statut' }),
+            id: 'status'
           }
         ]}
         data={usersQuery.data}
@@ -73,9 +101,14 @@ const RouteComponent = () => {
             onSelect: openUser
           },
           {
-            disabled: (user) => user.username === currentUser?.username,
+            disabled: (user) => user.username === currentUser?.username || Boolean(user.disabled),
             label: t({ en: 'Archive', es: 'Archivar', fr: 'Archiver' }),
-            onSelect: (user) => setUserToArchive(user)
+            onSelect: (user) => setPendingAction({ kind: 'archive', user })
+          },
+          {
+            disabled: (user) => !user.disabled,
+            label: t({ en: 'Unarchive', es: 'Desarchivar', fr: 'Désarchiver' }),
+            onSelect: (user) => setPendingAction({ kind: 'unarchive', user })
           }
         ]}
         togglesComponent={() => (
@@ -92,9 +125,9 @@ const RouteComponent = () => {
         onRowDoubleClick={openUser}
       />
       <Dialog
-        open={userToArchive !== null}
+        open={pendingAction !== null}
         onOpenChange={(open) => {
-          if (!open) setUserToArchive(null);
+          if (!open) setPendingAction(null);
         }}
       >
         <Dialog.Content>
@@ -107,28 +140,34 @@ const RouteComponent = () => {
               })}
             </Dialog.Title>
             <Dialog.Description>
-              {t({
-                en: 'This will archive the account and prevent the user from signing in.',
-                es: 'Esto archivará la cuenta e impedirá que el usuario inicie sesión.',
-                fr: "Cela archivera le compte et empêchera l'utilisateur de se connecter."
-              })}
+              {pendingAction?.kind === 'archive'
+                ? t({
+                    en: 'This will archive the account and prevent the user from signing in.',
+                    es: 'Esto archivará la cuenta e impedirá que el usuario inicie sesión.',
+                    fr: "Cela archivera le compte et empêchera l'utilisateur de se connecter."
+                  })
+                : t({
+                    en: 'This will restore the account and allow the user to sign in again.',
+                    es: 'Esto restaurará la cuenta y permitirá que el usuario inicie sesión de nuevo.',
+                    fr: "Cela restaurera le compte et permettra à l'utilisateur de se reconnecter."
+                  })}
             </Dialog.Description>
           </Dialog.Header>
           <Dialog.Footer>
             <Button
               className="min-w-16"
-              data-testid="confirm-archive-user"
+              data-testid={pendingAction?.kind === 'archive' ? 'confirm-archive-user' : 'confirm-unarchive-user'}
               type="button"
-              variant="danger"
+              variant={pendingAction?.kind === 'archive' ? 'danger' : 'primary'}
               onClick={() => {
-                if (userToArchive) {
-                  archiveUserMutation.mutate({ id: userToArchive.id }, { onSuccess: () => setUserToArchive(null) });
-                }
+                if (!pendingAction) return;
+                const mutation = pendingAction.kind === 'archive' ? archiveUserMutation : unarchiveUserMutation;
+                mutation.mutate({ id: pendingAction.user.id }, { onSuccess: () => setPendingAction(null) });
               }}
             >
               {t('core.yes')}
             </Button>
-            <Button className="min-w-16" type="button" variant="outline" onClick={() => setUserToArchive(null)}>
+            <Button className="min-w-16" type="button" variant="outline" onClick={() => setPendingAction(null)}>
               {t('core.no')}
             </Button>
           </Dialog.Footer>

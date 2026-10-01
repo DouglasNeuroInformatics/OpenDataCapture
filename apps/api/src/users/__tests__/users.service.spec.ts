@@ -173,6 +173,18 @@ describe('UsersService', () => {
     });
   });
 
+  describe('unarchiveById', () => {
+    it('should refuse an administrator unarchiving their own account', async () => {
+      await expect(usersService.unarchiveById(admin.id, admin)).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should set disabled to false to restore the account', async () => {
+      await usersService.unarchiveById('user-1', admin);
+      expect(userModel.update.mock.lastCall?.[0].data).toMatchObject({ disabled: false });
+      expect(userModel.update.mock.lastCall?.[0].where).toMatchObject({ id: 'user-1' });
+    });
+  });
+
   describe('updatePermissions', () => {
     beforeEach(() => {
       userModel.findFirst.mockResolvedValue({ groupIds: ['group-1'], id: 'user-1' });

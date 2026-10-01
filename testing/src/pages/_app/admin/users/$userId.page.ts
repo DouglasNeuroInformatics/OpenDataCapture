@@ -45,6 +45,11 @@ export class AdminUserPage extends AppPage {
     await this.$ref.getByRole('button', { name: 'Yes' }).click();
   }
 
+  async unarchiveUser() {
+    await this.$ref.getByRole('button', { name: 'Unarchive User' }).click();
+    await this.$ref.getByRole('button', { name: 'Yes' }).click();
+  }
+
   async removePermission(index: number) {
     await this.permissionRows.nth(index).getByTestId('user-permission-remove').click();
   }

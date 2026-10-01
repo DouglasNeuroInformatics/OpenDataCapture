@@ -85,6 +85,13 @@ export class UsersController {
     return this.usersService.findById(id, { ability });
   }
 
+  @ApiOperation({ summary: 'Unarchive User' })
+  @Patch(':id/unarchive')
+  @RouteAccess(ADMIN_ONLY)
+  unarchiveById(@Param('id') id: string, @CurrentUser() currentUser: RequestUser) {
+    return this.usersService.unarchiveById(id, currentUser);
+  }
+
   @ApiOperation({ summary: 'Update User' })
   @Patch(':id')
   @RouteAccess(ADMIN_ONLY)

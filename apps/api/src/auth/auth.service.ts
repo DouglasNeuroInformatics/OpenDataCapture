@@ -52,7 +52,7 @@ export class AuthService {
     }
 
     if (user.disabled) {
-      throw new ForbiddenException('Account Disabled');
+      throw new ForbiddenException('Account Archived');
     }
 
     const isCorrectPassword = await this.cryptoService.comparePassword(credentials.password, user.hashedPassword);
