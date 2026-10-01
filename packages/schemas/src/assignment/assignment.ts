@@ -193,6 +193,12 @@ const $UpdateAssignmentData = z.object({
   status: $AssignmentStatus
 });
 
+/** A client may only cancel an assignment; every other status is set by the gateway synchronizer */
+type $CancelAssignmentData = z.infer<typeof $CancelAssignmentData>;
+const $CancelAssignmentData = $UpdateAssignmentData.extend({
+  status: z.literal('CANCELED')
+});
+
 type UpdateRemoteAssignmentData = z.infer<typeof $UpdateRemoteAssignmentData>;
 const $UpdateRemoteAssignmentData = z.object({
   data: $Json.optional(),
@@ -223,6 +229,7 @@ export {
   $BulkAssignmentPreflightData,
   $BulkAssignmentPreflightResult,
   $BulkAssignmentTimepoint,
+  $CancelAssignmentData,
   $CreateAssignmentData,
   $CreateBulkAssignmentsData,
   $CreateRemoteAssignmentData,
