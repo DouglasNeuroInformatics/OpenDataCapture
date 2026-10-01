@@ -2,6 +2,7 @@ import { Select } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 
+import { useSwitchableGroups } from '@/hooks/useSwitchableGroups';
 import { useAppStore } from '@/store';
 
 /**
@@ -14,26 +15,24 @@ const SURFACE_CLASSNAME =
 /**
  * Whether the switcher will render anything. Call sites that draw chrome around it — a separator, a
  * sticky bar — need the same answer before laying that chrome out, otherwise they leave an empty
- * container behind for a user who belongs to no group.
+ * container behind for a user with no group to switch to.
  */
 export function useIsGroupSwitcherVisible() {
-  const currentGroup = useAppStore((store) => store.currentGroup);
-  const currentUser = useAppStore((store) => store.currentUser);
-  return Boolean(currentGroup && currentUser && currentUser.groups.length > 0);
+  return useSwitchableGroups().length > 0;
 }
 
 /**
- * The current group, and (when the user belongs to more than one) a control to switch between them.
+ * The current group, and (when there is more than one to choose from) a control to switch between them.
  * Renders the control alone with no surrounding layout: the sidebar, the mobile nav sheet, and the top
  * bar each place it differently, so spacing and width belong to the caller via `className`.
  */
 export const GroupSwitcher = ({ className }: { className?: string }) => {
   const changeGroup = useAppStore((store) => store.changeGroup);
   const currentGroup = useAppStore((store) => store.currentGroup);
-  const currentUser = useAppStore((store) => store.currentUser);
+  const groups = useSwitchableGroups();
   const { t } = useTranslation();
 
-  if (!currentGroup || !currentUser || currentUser.groups.length === 0) {
+  if (groups.length === 0) {
     return null;
   }
 
@@ -43,9 +42,9 @@ export const GroupSwitcher = ({ className }: { className?: string }) => {
     </span>
   );
 
-  // A user in exactly one group has nothing to switch between, so show the group as static text styled
-  // to match the trigger, rather than a select whose only option is the current value.
-  if (currentUser.groups.length === 1) {
+  // A user with exactly one group, already selected, has nothing to switch between, so show the group as
+  // static text styled to match the trigger, rather than a select whose only option is the current value.
+  if (groups.length === 1 && currentGroup) {
     return (
       <div
         className={cn(SURFACE_CLASSNAME, 'flex flex-col items-start rounded-md px-3', className)}
@@ -57,10 +56,12 @@ export const GroupSwitcher = ({ className }: { className?: string }) => {
     );
   }
 
+  // An admin who belongs to no group starts with none selected. Radix shows the placeholder only for an
+  // empty-string value; `undefined` would flip the select to uncontrolled once a group is chosen.
   return (
     <Select
-      value={currentGroup.id}
-      onValueChange={(id) => changeGroup(currentUser.groups.find((group) => group.id === id)!)}
+      value={currentGroup?.id ?? ''}
+      onValueChange={(id) => changeGroup(groups.find((group) => group.id === id)!)}
     >
       <Select.Trigger
         className={cn(
@@ -72,12 +73,14 @@ export const GroupSwitcher = ({ className }: { className?: string }) => {
       >
         <div className="flex flex-col items-start leading-tight">
           {label}
-          <Select.Value />
+          <Select.Value
+            placeholder={t({ en: 'Select a group', es: 'Seleccione un grupo', fr: 'Sélectionnez un groupe' })}
+          />
         </div>
       </Select.Trigger>
       <Select.Content>
         <Select.Group>
-          {currentUser.groups.map((group) => (
+          {groups.map((group) => (
             <Select.Item key={group.id} value={group.id}>
               {group.name}
             </Select.Item>
