@@ -58,11 +58,13 @@ export const InstrumentSummary = ({
   if (instrument.language === 'en') {
     language = t({
       en: 'English',
+      es: 'Inglés',
       fr: 'Anglais'
     });
   } else if (instrument.language === 'fr') {
     language = t({
       en: 'French',
+      es: 'Francés',
       fr: 'Français'
     });
   } else {
@@ -90,16 +92,20 @@ export const InstrumentSummary = ({
             {title
               ? t({
                   en: `Summary of Results for the ${title}`,
+                  // Leading with the title avoids `del`, which would force a gender onto every title.
+                  es: `${title}: resumen de resultados`,
                   fr: `${title} : résumé des résultats`
                 })
               : t({
                   en: 'Summary of Results',
+                  es: 'Resumen de resultados',
                   fr: 'Résumé des résultats'
                 })}
           </Heading>
           <p className="text-muted-foreground text-sm">
             {t({
               en: `Completed on ${dateCompleted}`,
+              es: `Completado el ${dateCompleted}`,
               fr: `Remplie le ${dateCompleted}`
             })}
           </p>
@@ -129,6 +135,7 @@ export const InstrumentSummary = ({
                   {
                     label: t({
                       en: 'Full Name',
+                      es: 'Nombre completo',
                       fr: 'Nom et prénom'
                     }),
                     value:
@@ -136,12 +143,14 @@ export const InstrumentSummary = ({
                         ? `${subject.firstName} ${subject.lastName}`
                         : t({
                             en: 'Anonymous',
+                            es: 'Anónimo',
                             fr: 'Anonyme'
                           })
                   },
                   {
                     label: t({
                       en: 'Date of Birth',
+                      es: 'Fecha de nacimiento',
                       fr: 'Date de naissance'
                     }),
                     value: subject.dateOfBirth ? toBasicISOString(subject.dateOfBirth) : null
@@ -149,17 +158,20 @@ export const InstrumentSummary = ({
                   {
                     label: t({
                       en: 'Sex at Birth',
+                      es: 'Sexo al nacer',
                       fr: 'Sexe à la naissance'
                     }),
                     value:
                       subject.sex === 'MALE'
                         ? t({
                             en: 'Male',
+                            es: 'Masculino',
                             fr: 'Masculin'
                           })
                         : subject.sex === 'FEMALE'
                           ? t({
                               en: 'Female',
+                              es: 'Femenino',
                               fr: 'Féminin'
                             })
                           : null
@@ -174,6 +186,7 @@ export const InstrumentSummary = ({
           }
           title={t({
             en: 'Subject',
+            es: 'Sujeto',
             fr: 'Client'
           })}
         />
@@ -183,6 +196,7 @@ export const InstrumentSummary = ({
           {
             label: t({
               en: 'Title',
+              es: 'Título',
               fr: 'Titre'
             }),
             value: title
@@ -190,6 +204,7 @@ export const InstrumentSummary = ({
           {
             label: t({
               en: 'Language',
+              es: 'Idioma',
               fr: 'Langue'
             }),
             value: language
@@ -197,6 +212,7 @@ export const InstrumentSummary = ({
           {
             label: t({
               en: 'Edition',
+              es: 'Edición',
               fr: 'Édition'
             }),
             value: instrument.internal.edition
@@ -204,6 +220,7 @@ export const InstrumentSummary = ({
         ]}
         title={t({
           en: 'Instrument',
+          es: 'Instrumento',
           fr: 'Instrument'
         })}
       />
@@ -212,6 +229,7 @@ export const InstrumentSummary = ({
           items={results}
           title={t({
             en: 'Results',
+            es: 'Resultados',
             fr: 'Résultats'
           })}
         />

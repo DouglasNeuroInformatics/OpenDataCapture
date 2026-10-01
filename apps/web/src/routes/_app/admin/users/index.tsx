@@ -53,6 +53,7 @@ const RouteComponent = () => {
         <Heading className="text-center" variant="h2">
           {t({
             en: 'Manage Users',
+            es: 'Gestionar usuarios',
             fr: 'Gérer les utilisateurs'
           })}
         </Heading>
@@ -79,6 +80,7 @@ const RouteComponent = () => {
               if (!basePermissionLevel) {
                 return t({
                   en: 'None',
+                  es: 'Ninguno',
                   fr: 'Aucune'
                 });
               }
@@ -90,11 +92,16 @@ const RouteComponent = () => {
             accessorFn: (user) => Boolean(user.disabled),
             cell: ({ row }) => (
               <span data-testid="user-login-status">
-                {row.original.disabled ? t({ en: 'Disabled', fr: 'Désactivé' }) : t({ en: 'Enabled', fr: 'Activé' })}
+                {row.original.disabled
+                  ? t({ en: 'Disabled', es: 'Desactivado', fr: 'Désactivé' })
+                  : t({ en: 'Enabled', es: 'Activado', fr: 'Activé' })}
               </span>
             ),
             header: ({ column }) => (
-              <SortableHeader column={column} label={t({ en: 'Enabled / Disabled', fr: 'Activé / Désactivé' })} />
+              <SortableHeader
+                column={column}
+                label={t({ en: 'Enabled / Disabled', es: 'Activado / Desactivado', fr: 'Activé / Désactivé' })}
+              />
             ),
             id: 'disabled'
           },
@@ -148,6 +155,7 @@ const RouteComponent = () => {
             <Link to="/admin/users/create">
               {t({
                 en: 'Add User',
+                es: 'Agregar usuario',
                 fr: 'Ajouter un utilisateur'
               })}
             </Link>

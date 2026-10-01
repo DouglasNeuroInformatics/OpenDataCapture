@@ -78,33 +78,37 @@ export const UserPermissionsEditor = ({
   const defaultScope = userGroups.length === 1 ? userGroups[0]?.id : undefined;
 
   const actionLabels: { [K in AppAction]: string } = {
-    create: t({ en: 'Create', fr: 'Créer' }),
-    delete: t({ en: 'Delete', fr: 'Supprimer' }),
-    manage: t({ en: 'Manage (All)', fr: 'Gérer (Tout)' }),
-    read: t({ en: 'Read', fr: 'Lire' }),
-    update: t({ en: 'Update', fr: 'Modifier' })
+    create: t({ en: 'Create', es: 'Crear', fr: 'Créer' }),
+    delete: t({ en: 'Delete', es: 'Eliminar', fr: 'Supprimer' }),
+    manage: t({ en: 'Manage (All)', es: 'Gestionar (todo)', fr: 'Gérer (Tout)' }),
+    read: t({ en: 'Read', es: 'Leer', fr: 'Lire' }),
+    update: t({ en: 'Update', es: 'Actualizar', fr: 'Modifier' })
   };
 
   const subjectLabels: { [K in AppSubjectName]: string } = {
-    all: t({ en: 'All', fr: 'Tous' }),
-    Assignment: t({ en: 'Assignment', fr: 'Assignation' }),
-    Group: t({ en: 'Group', fr: 'Groupe' }),
-    Instrument: t({ en: 'Instrument', fr: 'Instrument' }),
-    InstrumentRecord: t({ en: 'Instrument Record', fr: "Enregistrement de l'instrument" }),
-    InstrumentRepo: t({ en: 'Instrument Repository', fr: "Dépôt d'instruments" }),
-    Session: t({ en: 'Session', fr: 'Session' }),
-    Subject: t({ en: 'Subject', fr: 'Client' }),
-    User: t({ en: 'User', fr: 'Utilisateur' })
+    all: t({ en: 'All', es: 'Todo', fr: 'Tous' }),
+    Assignment: t({ en: 'Assignment', es: 'Asignación', fr: 'Assignation' }),
+    Group: t({ en: 'Group', es: 'Grupo', fr: 'Groupe' }),
+    Instrument: t({ en: 'Instrument', es: 'Instrumento', fr: 'Instrument' }),
+    InstrumentRecord: t({
+      en: 'Instrument Record',
+      es: 'Registro de instrumento',
+      fr: "Enregistrement de l'instrument"
+    }),
+    InstrumentRepo: t({ en: 'Instrument Repository', es: 'Repositorio de instrumentos', fr: "Dépôt d'instruments" }),
+    Session: t({ en: 'Session', es: 'Sesión', fr: 'Session' }),
+    Subject: t({ en: 'Subject', es: 'Sujeto', fr: 'Client' }),
+    User: t({ en: 'User', es: 'Usuario', fr: 'Utilisateur' })
   };
 
   const columnLabels = {
-    action: t({ en: 'Action', fr: 'Action' }),
-    scope: t({ en: 'Scope', fr: 'Portée' }),
-    subject: t({ en: 'Resource', fr: 'Ressource' })
+    action: t({ en: 'Action', es: 'Acción', fr: 'Action' }),
+    scope: t({ en: 'Scope', es: 'Alcance', fr: 'Portée' }),
+    subject: t({ en: 'Resource', es: 'Recurso', fr: 'Ressource' })
   };
 
-  const allGroupsLabel = t({ en: 'All Groups', fr: 'Tous les groupes' });
-  const placeholder = t({ en: 'Choose…', fr: 'Choisir…' });
+  const allGroupsLabel = t({ en: 'All Groups', es: 'Todos los grupos', fr: 'Tous les groupes' });
+  const placeholder = t({ en: 'Choose…', es: 'Elija…', fr: 'Choisir…' });
 
   const scopeOptions: { [id: string]: string } = {
     ...Object.fromEntries(userGroups.map((group) => [group.id, group.name])),
@@ -122,10 +126,11 @@ export const UserPermissionsEditor = ({
     return (
       <Card data-testid="user-permissions-card">
         <Card.Header>
-          <Card.Title>{t({ en: 'Permissions', fr: 'Autorisations' })}</Card.Title>
+          <Card.Title>{t({ en: 'Permissions', es: 'Permisos', fr: 'Autorisations' })}</Card.Title>
           <Card.Description data-testid="user-permissions-admin-notice">
             {t({
               en: 'Administrators hold every permission, so there is nothing further to grant.',
+              es: 'Los administradores tienen todos los permisos, por lo que no hay nada más que conceder.',
               fr: "Les administrateurs détiennent toutes les autorisations, il n'y a donc rien de plus à accorder."
             })}
           </Card.Description>
@@ -137,10 +142,11 @@ export const UserPermissionsEditor = ({
   return (
     <Card data-testid="user-permissions-card">
       <Card.Header>
-        <Card.Title>{t({ en: 'Permissions', fr: 'Autorisations' })}</Card.Title>
+        <Card.Title>{t({ en: 'Permissions', es: 'Permisos', fr: 'Autorisations' })}</Card.Title>
         <Card.Description data-testid="user-permissions-signin-note">
           {t({
             en: 'Grants added here come on top of the base permission level. Changes take effect the next time this user signs in.',
+            es: 'Los permisos concedidos aquí se suman al nivel de permisos de base. Los cambios se aplican la próxima vez que este usuario inicie sesión.',
             fr: "Les autorisations accordées ici s'ajoutent au niveau de base. Les modifications prennent effet à la prochaine connexion de cet utilisateur."
           })}
         </Card.Description>
@@ -150,6 +156,7 @@ export const UserPermissionsEditor = ({
           <p className="text-muted-foreground mb-3 text-sm" data-testid="user-permissions-ineffective-note">
             {t({
               en: 'Only an administrator can create, modify or delete users, so grants marked "No effect" do nothing. They are removed the next time this user\'s permissions are changed.',
+              es: 'Solo un administrador puede crear, modificar o eliminar usuarios, por lo que los permisos marcados como «Sin efecto» no hacen nada. Se retiran la próxima vez que se modifiquen los permisos de este usuario.',
               fr: 'Seul un administrateur peut créer, modifier ou supprimer des utilisateurs : les autorisations marquées « Sans effet » ne font donc rien. Elles sont retirées à la prochaine modification des autorisations de cet utilisateur.'
             })}
           </p>
@@ -176,7 +183,7 @@ export const UserPermissionsEditor = ({
                       {subjectLabels[permission.subject]}
                       {!isGrantablePermission(permission) && (
                         <Chip data-testid="user-permission-ineffective" variant="warning">
-                          {t({ en: 'No effect', fr: 'Sans effet' })}
+                          {t({ en: 'No effect', es: 'Sin efecto', fr: 'Sans effet' })}
                         </Chip>
                       )}
                     </div>
@@ -193,7 +200,11 @@ export const UserPermissionsEditor = ({
                   </Table.Cell>
                   <Table.Cell className="py-1.5 text-right">
                     <Button
-                      aria-label={t({ en: 'Remove permission', fr: "Retirer l'autorisation" })}
+                      aria-label={t({
+                        en: 'Remove permission',
+                        es: 'Retirar el permiso',
+                        fr: "Retirer l'autorisation"
+                      })}
                       className="text-muted-foreground hover:text-destructive"
                       data-testid="user-permission-remove"
                       disabled={isSaving}
@@ -260,7 +271,11 @@ export const UserPermissionsEditor = ({
                     </Table.Cell>
                     <Table.Cell className="py-1.5 text-right">
                       <Button
-                        aria-label={t({ en: 'Remove permission', fr: "Retirer l'autorisation" })}
+                        aria-label={t({
+                          en: 'Remove permission',
+                          es: 'Retirar el permiso',
+                          fr: "Retirer l'autorisation"
+                        })}
                         data-testid="permission-draft-remove"
                         disabled={isSaving}
                         size="icon"
@@ -271,7 +286,11 @@ export const UserPermissionsEditor = ({
                         <Trash2Icon className="h-4 w-4" />
                       </Button>
                       <Button
-                        aria-label={t({ en: 'Add Permission', fr: 'Ajouter une autorisation' })}
+                        aria-label={t({
+                          en: 'Add Permission',
+                          es: 'Agregar un permiso',
+                          fr: 'Ajouter une autorisation'
+                        })}
                         className="text-muted-foreground hover:text-primary"
                         disabled={isSaving}
                         size="icon"
@@ -289,7 +308,7 @@ export const UserPermissionsEditor = ({
                 <Table.Row>
                   <Table.Cell className="text-right" colSpan={4}>
                     <Button
-                      aria-label={t({ en: 'Add Permission', fr: 'Ajouter une autorisation' })}
+                      aria-label={t({ en: 'Add Permission', es: 'Agregar un permiso', fr: 'Ajouter une autorisation' })}
                       disabled={isSaving}
                       type="button"
                       variant="ghost"
@@ -311,6 +330,7 @@ export const UserPermissionsEditor = ({
           >
             {t({
               en: 'Complete or remove the highlighted permission rows before saving.',
+              es: 'Complete o elimine las filas de permisos resaltadas antes de guardar.',
               fr: "Complétez ou retirez les lignes d'autorisation en surbrillance avant d'enregistrer."
             })}
           </p>
@@ -325,6 +345,7 @@ export const UserPermissionsEditor = ({
             <p>
               {t({
                 en: "Manage (All) makes this user an administrator: they can read and change every group's data, manage every user's account and permissions, and create instruments, which can run code on the server.",
+                es: 'Gestionar (todo) convierte a este usuario en administrador: puede consultar y modificar los datos de todos los grupos, gestionar la cuenta y los permisos de cada usuario, y crear instrumentos, los cuales pueden ejecutar código en el servidor.',
                 fr: 'Gérer (Tout) fait de cet utilisateur un administrateur, qui peut consulter et modifier les données de tous les groupes, gérer le compte et les autorisations de chaque utilisateur, et créer des instruments, lesquels peuvent exécuter du code sur le serveur.'
               })}
             </p>

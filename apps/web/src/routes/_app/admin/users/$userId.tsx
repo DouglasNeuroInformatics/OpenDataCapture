@@ -51,7 +51,11 @@ const UserEditor = ({ userId }: { userId: string }) => {
   const userGroups = groups.filter((group) => user.groupIds.includes(group.id));
   const roleLabel = user.basePermissionLevel
     ? t(`common.${snakeToCamelCase(user.basePermissionLevel)}`)
-    : t({ en: 'No base permission level', fr: 'Aucun niveau de permission de base' });
+    : t({
+        en: 'No base permission level',
+        es: 'Sin nivel de permisos de base',
+        fr: 'Aucun niveau de permission de base'
+      });
   const identityLine = [`${user.firstName} ${user.lastName}`, roleLabel].join(' · ');
 
   const formData = useMemo<UpdateUserFormInputData>(
@@ -72,7 +76,7 @@ const UserEditor = ({ userId }: { userId: string }) => {
     <div data-testid="admin-user-page">
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {t({ en: 'Manage User', fr: "Gérer l'utilisateur" })}
+          {t({ en: 'Manage User', es: 'Gestionar el usuario', fr: "Gérer l'utilisateur" })}
         </Heading>
       </PageHeader>
       <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-6">
@@ -83,7 +87,7 @@ const UserEditor = ({ userId }: { userId: string }) => {
             to="/admin/users"
           >
             <ChevronLeftIcon className="h-3.5 w-3.5" />
-            {t({ en: 'Return', fr: 'Retour' })}
+            {t({ en: 'Return', es: 'Volver', fr: 'Retour' })}
           </Link>
           <Card>
             <Card.Header className="gap-4 space-y-0">
@@ -169,10 +173,11 @@ const UserEditor = ({ userId }: { userId: string }) => {
         </div>
         <Card>
           <Card.Header>
-            <Card.Title>{t({ en: 'Account', fr: 'Compte' })}</Card.Title>
+            <Card.Title>{t({ en: 'Account', es: 'Cuenta', fr: 'Compte' })}</Card.Title>
             <Card.Description>
               {t({
                 en: 'Contact details, group membership, status and password.',
+                es: 'Información de contacto, pertenencia a grupos, estado y contraseña.',
                 fr: 'Coordonnées, appartenance aux groupes, statut et mot de passe.'
               })}
             </Card.Description>
@@ -187,6 +192,7 @@ const UserEditor = ({ userId }: { userId: string }) => {
                 <p>
                   {t({
                     en: 'Your changes were not saved',
+                    es: 'Sus cambios no se guardaron',
                     fr: "Vos modifications n'ont pas été enregistrées"
                   })}
                 </p>
@@ -206,6 +212,7 @@ const UserEditor = ({ userId }: { userId: string }) => {
                   setHighlightIncompleteDrafts(true);
                   const errorMessage = t({
                     en: 'A permission row is incomplete. Choose its action, resource and scope, or remove it.',
+                    es: 'Una fila de permisos está incompleta. Elija su acción, recurso y alcance, o elimínela.',
                     fr: "Une ligne d'autorisation est incomplète. Choisissez son action, sa ressource et sa portée, ou retirez-la."
                   });
                   setSubmitErrorMessage(errorMessage);
@@ -237,6 +244,7 @@ const UserEditor = ({ userId }: { userId: string }) => {
                 } catch {
                   const errorMessage = t({
                     en: 'Could not save all changes. Reload the page to check the saved account and permissions.',
+                    es: 'No se pudieron guardar todos los cambios. Vuelva a cargar la página para comprobar la cuenta y los permisos guardados.',
                     fr: 'Impossible d’enregistrer toutes les modifications. Rechargez la page pour vérifier le compte et les autorisations enregistrés.'
                   });
                   setSubmitErrorMessage(errorMessage);
@@ -266,7 +274,7 @@ const UserEditor = ({ userId }: { userId: string }) => {
           type="submit"
           variant="primary"
         >
-          {t({ en: 'Save Changes', fr: 'Enregistrer les modifications' })}
+          {t({ en: 'Save Changes', es: 'Guardar los cambios', fr: 'Enregistrer les modifications' })}
         </Button>
       </div>
     </div>

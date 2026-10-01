@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import { resolveActiveLanguage } from '@opendatacapture/schemas/core';
+import type { ActiveLanguages } from '@opendatacapture/schemas/core';
 
 import auth from '../translations/auth.json';
 import common from '../translations/common.json';
@@ -17,6 +19,9 @@ import user from '../translations/user.json';
 
 declare module '@douglasneuroinformatics/libui/i18n' {
   export namespace UserConfig {
+    export interface Options {
+      requireCompleteTranslations: true;
+    }
     export interface Translations {
       auth: typeof auth;
       common: typeof common;
@@ -48,5 +53,20 @@ i18n.init({
     user
   }
 });
+
+/**
+ * Move a reader off a language their instance no longer offers.
+ *
+ * Called before the app renders rather than from a component: `changeLanguage` notifies only the
+ * components already subscribed, libui's `useTranslation` subscribes in an effect, and effects run
+ * child-first — so a correction made after mount never reaches the ancestors of whatever made it.
+ * The sidebar renders the language toggle, so the sidebar is what a late correction leaves behind.
+ */
+export const reconcileInterfaceLanguage = (activeLanguages: ActiveLanguages): void => {
+  const language = resolveActiveLanguage(i18n.resolvedLanguage, activeLanguages);
+  if (language !== i18n.resolvedLanguage) {
+    i18n.changeLanguage(language);
+  }
+};
 
 export default i18n;

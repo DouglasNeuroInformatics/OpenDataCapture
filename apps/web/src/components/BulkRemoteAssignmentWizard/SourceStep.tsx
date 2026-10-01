@@ -113,9 +113,9 @@ export const SourceStep = ({
   };
 
   const modes: { label: string; value: SourceMode }[] = [
-    { label: t({ en: 'Select Subjects', fr: 'Sélectionner des sujets' }), value: 'SELECT' },
-    { label: t({ en: 'Upload a File', fr: 'Téléverser un fichier' }), value: 'FILE' },
-    { label: t({ en: 'Paste Data', fr: 'Coller des données' }), value: 'PASTE' }
+    { label: t({ en: 'Select Subjects', es: 'Seleccionar sujetos', fr: 'Sélectionner des sujets' }), value: 'SELECT' },
+    { label: t({ en: 'Upload a File', es: 'Cargar un archivo', fr: 'Téléverser un fichier' }), value: 'FILE' },
+    { label: t({ en: 'Paste Data', es: 'Pegar datos', fr: 'Coller des données' }), value: 'PASTE' }
   ];
 
   // Every subject in the group is listed, not only those with a chosen identifier: a hash-identified
@@ -123,7 +123,7 @@ export const SourceStep = ({
   // rendered the way the rest of the app renders them - group scope removed, truncated to the group's
   // display length - with date of birth and sex alongside, since a digest identifies nobody on sight.
   const rows: PickerRow[] = subjects.map((subject) => ({
-    dateOfBirth: subject.dateOfBirth ? toBasicISOString(subject.dateOfBirth) : t({ en: 'NULL', fr: 'NUL' }),
+    dateOfBirth: subject.dateOfBirth ? toBasicISOString(subject.dateOfBirth) : t({ en: 'NULL', es: 'NULO', fr: 'NUL' }),
     id: subject.id,
     sex: subject.sex ?? '',
     subject: removeSubjectIdScope(subject.id).slice(0, subjectIdDisplayLength)
@@ -151,7 +151,7 @@ export const SourceStep = ({
         type="button"
         onClick={() => void run(() => parseDelimitedText(pasted))}
       >
-        {t({ en: 'Use Pasted Data', fr: 'Utiliser les données collées' })}
+        {t({ en: 'Use Pasted Data', es: 'Usar los datos pegados', fr: 'Utiliser les données collées' })}
       </Button>
     ),
     SELECT: (
@@ -160,6 +160,7 @@ export const SourceStep = ({
           <p className="text-destructive mr-auto text-sm">
             {t({
               en: `Selection is limited to ${BULK_ASSIGNMENT_MAX_SUBJECTS} subjects`,
+              es: `La selección está limitada a ${BULK_ASSIGNMENT_MAX_SUBJECTS} sujetos`,
               fr: `La sélection est limitée à ${BULK_ASSIGNMENT_MAX_SUBJECTS} sujets`
             })}
           </p>
@@ -170,7 +171,7 @@ export const SourceStep = ({
           type="button"
           onClick={() => onSubjectsSelected([...selected])}
         >
-          {t({ en: 'Continue With Selected', fr: 'Continuer avec la sélection' })}
+          {t({ en: 'Continue With Selected', es: 'Continuar con la selección', fr: 'Continuer avec la sélection' })}
           {selected.size > 0 && ` (${selected.size})`}
         </Button>
       </React.Fragment>
@@ -181,11 +182,12 @@ export const SourceStep = ({
     <StepLayout
       description={t({
         en: 'Assign one or more instruments to many subjects at once. Every assignment is created together.',
+        es: 'Asigne uno o varios instrumentos a muchos sujetos a la vez. Todas las tareas remotas se crean juntas.',
         fr: 'Attribuez un ou plusieurs instruments à plusieurs sujets à la fois. Toutes les tâches sont créées ensemble.'
       })}
       footer={footers[mode]}
       step="SUBJECTS"
-      title={t({ en: 'Choose Subjects', fr: 'Choisir les sujets' })}
+      title={t({ en: 'Choose Subjects', es: 'Elegir los sujetos', fr: 'Choisir les sujets' })}
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-source-step">
@@ -222,12 +224,17 @@ export const SourceStep = ({
             <p className="text-muted-foreground text-sm">
               {t({
                 en: 'Choose existing subjects in this group. Search, sort or filter to narrow the list.',
+                es: 'Elija sujetos existentes de este grupo. Busque, ordene o filtre para reducir la lista.',
                 fr: 'Choisissez des sujets existants de ce groupe. Cherchez, triez ou filtrez pour réduire la liste.'
               })}
             </p>
             {rows.length === 0 ? (
               <p className="text-muted-foreground text-sm italic">
-                {t({ en: 'This group has no subjects.', fr: 'Ce groupe n’a aucun sujet.' })}
+                {t({
+                  en: 'This group has no subjects.',
+                  es: 'Este grupo no tiene sujetos.',
+                  fr: 'Ce groupe n’a aucun sujet.'
+                })}
               </p>
             ) : (
               <div data-testid="bulk-subject-picker">
@@ -249,7 +256,11 @@ export const SourceStep = ({
                           filteredRows.length > 0 && filteredRows.every((row) => selected.has(row.id));
                         return (
                           <Checkbox
-                            aria-label={t({ en: 'Select All Shown', fr: 'Tout sélectionner' })}
+                            aria-label={t({
+                              en: 'Select All Shown',
+                              es: 'Seleccionar todo lo mostrado',
+                              fr: 'Tout sélectionner'
+                            })}
                             checked={allFilteredSelected}
                             data-testid="bulk-select-all-subjects"
                             onCheckedChange={() => toggleFiltered(filteredRows)}
@@ -282,7 +293,7 @@ export const SourceStep = ({
                         if (value === 'MALE') {
                           return t('core.identificationData.sex.male');
                         }
-                        return t({ en: 'NULL', fr: 'NUL' });
+                        return t({ en: 'NULL', es: 'NULO', fr: 'NUL' });
                       },
                       header: ({ column }) => (
                         <SortableHeader column={column} label={t('core.identificationData.sex.label')} />
@@ -306,6 +317,7 @@ export const SourceStep = ({
             <p className="text-muted-foreground text-sm">
               {t({
                 en: 'CSV, TSV or Excel. Include a subject ID column, or first name, last name, date of birth and sex.',
+                es: 'CSV, TSV o Excel. Incluya una columna de identificador de sujeto, o nombre, apellido, fecha de nacimiento y sexo.',
                 fr: 'CSV, TSV ou Excel. Incluez une colonne d’identifiant, ou prénom, nom, date de naissance et sexe.'
               })}
             </p>
@@ -329,6 +341,7 @@ export const SourceStep = ({
             <p className="text-muted-foreground text-sm">
               {t({
                 en: 'Comma, tab or semicolon separated, with a header row. Include a subject ID column, or first name, last name, date of birth and sex.',
+                es: 'Separado por comas, tabulaciones o puntos y comas, con una fila de encabezado. Incluya una columna de identificador de sujeto, o nombre, apellido, fecha de nacimiento y sexo.',
                 fr: 'Séparé par des virgules, tabulations ou points-virgules, avec une ligne d’en-tête. Incluez une colonne d’identifiant, ou prénom, nom, date de naissance et sexe.'
               })}
             </p>

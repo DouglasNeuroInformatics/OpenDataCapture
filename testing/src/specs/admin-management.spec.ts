@@ -11,8 +11,8 @@ test.describe('admin management', () => {
     await page.goto('/admin/groups/create');
 
     await page.getByLabel('Group Name').fill(groupName);
-    await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: 'Clinical' }).click();
+    await page.getByTestId('type-select-trigger').click();
+    await page.getByTestId('type-select-item-CLINICAL').click();
     await page.getByRole('button', { name: 'Submit' }).click();
 
     // Success toast + redirect are the app's own success signals; the "group is now listed" case is
@@ -122,8 +122,8 @@ test.describe('admin management', () => {
     await page.getByLabel('Confirm Password').fill('weak');
     await page.getByLabel('First Name').fill('Test');
     await page.getByLabel('Last Name').fill('User');
-    await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: 'Admin' }).click();
+    await page.getByTestId('basePermissionLevel-select-trigger').click();
+    await page.getByTestId('basePermissionLevel-select-item-ADMIN').click();
     await page.getByRole('button', { name: 'Submit' }).click();
 
     await expect(

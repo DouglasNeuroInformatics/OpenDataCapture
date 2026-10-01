@@ -17,48 +17,48 @@ export const RIGHT_PANEL_OPTIONS = [
 ] as const;
 export type RightPanelOption = (typeof RIGHT_PANEL_OPTIONS)[number];
 
-export const RIGHT_PANEL_LABELS: { [K in RightPanelOption]: { en: string; fr: string } } = {
-  custom: { en: 'Custom', fr: 'Personnalisé' },
-  forest: { en: 'Forest', fr: 'Forêt' },
-  midnight: { en: 'Midnight', fr: 'Minuit' },
-  none: { en: 'Default', fr: 'Par défaut' },
-  ocean: { en: 'Ocean', fr: 'Océan' },
-  rose: { en: 'Rose', fr: 'Rose' },
-  slate: { en: 'Slate', fr: 'Ardoise' },
-  violet: { en: 'Violet', fr: 'Violet' }
+export const RIGHT_PANEL_LABELS: { [K in RightPanelOption]: { en: string; es: string; fr: string } } = {
+  custom: { en: 'Custom', es: 'Personalizado', fr: 'Personnalisé' },
+  forest: { en: 'Forest', es: 'Bosque', fr: 'Forêt' },
+  midnight: { en: 'Midnight', es: 'Medianoche', fr: 'Minuit' },
+  none: { en: 'Default', es: 'Predeterminado', fr: 'Par défaut' },
+  ocean: { en: 'Ocean', es: 'Océano', fr: 'Océan' },
+  rose: { en: 'Rose', es: 'Rosa', fr: 'Rose' },
+  slate: { en: 'Slate', es: 'Pizarra', fr: 'Ardoise' },
+  violet: { en: 'Violet', es: 'Violeta', fr: 'Violet' }
 };
 
-export const THEME_LABELS: { [K in LoginTheme]: { en: string; fr: string } } = {
-  custom: { en: 'Custom', fr: 'Personnalisé' },
-  forest: { en: 'Forest', fr: 'Forêt' },
-  midnight: { en: 'Midnight', fr: 'Minuit' },
-  ocean: { en: 'Ocean', fr: 'Océan' },
-  rose: { en: 'Rose', fr: 'Rose' },
-  slate: { en: 'Slate', fr: 'Ardoise' },
-  sunset: { en: 'Sunset', fr: 'Coucher de soleil' },
-  violet: { en: 'Violet', fr: 'Violet' }
+export const THEME_LABELS: { [K in LoginTheme]: { en: string; es: string; fr: string } } = {
+  custom: { en: 'Custom', es: 'Personalizado', fr: 'Personnalisé' },
+  forest: { en: 'Forest', es: 'Bosque', fr: 'Forêt' },
+  midnight: { en: 'Midnight', es: 'Medianoche', fr: 'Minuit' },
+  ocean: { en: 'Ocean', es: 'Océano', fr: 'Océan' },
+  rose: { en: 'Rose', es: 'Rosa', fr: 'Rose' },
+  slate: { en: 'Slate', es: 'Pizarra', fr: 'Ardoise' },
+  sunset: { en: 'Sunset', es: 'Atardecer', fr: 'Coucher de soleil' },
+  violet: { en: 'Violet', es: 'Violeta', fr: 'Violet' }
 };
 
-export const LOGO_SIZE_LABELS: { [K in LogoSize]: { en: string; fr: string } } = {
-  custom: { en: 'Custom', fr: 'Personnalisé' },
-  large: { en: 'Large', fr: 'Grand' },
-  medium: { en: 'Medium', fr: 'Moyen' },
-  small: { en: 'Small', fr: 'Petit' },
-  xlarge: { en: 'Extra Large', fr: 'Très grand' }
+export const LOGO_SIZE_LABELS: { [K in LogoSize]: { en: string; es: string; fr: string } } = {
+  custom: { en: 'Custom', es: 'Personalizado', fr: 'Personnalisé' },
+  large: { en: 'Large', es: 'Grande', fr: 'Grand' },
+  medium: { en: 'Medium', es: 'Mediano', fr: 'Moyen' },
+  small: { en: 'Small', es: 'Pequeño', fr: 'Petit' },
+  xlarge: { en: 'Extra Large', es: 'Extra grande', fr: 'Très grand' }
 };
 
-export const LOGO_ALIGNMENT_LABELS: { [K in LogoAlignment]: { en: string; fr: string } } = {
-  center: { en: 'Center', fr: 'Centre' },
-  left: { en: 'Left', fr: 'Gauche' },
-  right: { en: 'Right', fr: 'Droite' }
+export const LOGO_ALIGNMENT_LABELS: { [K in LogoAlignment]: { en: string; es: string; fr: string } } = {
+  center: { en: 'Center', es: 'Centro', fr: 'Centre' },
+  left: { en: 'Left', es: 'Izquierda', fr: 'Gauche' },
+  right: { en: 'Right', es: 'Derecha', fr: 'Droite' }
 };
 
-export const SECTION_TITLES: { [K in PanelSection]: { en: string; fr: string } } = {
-  details: { en: 'Details', fr: 'Détails' },
-  logo: { en: 'Login Image', fr: 'Image de connexion' },
-  name: { en: 'Instance Name', fr: "Nom de l'instance" },
-  resources: { en: 'Resources', fr: 'Ressources' },
-  tagline: { en: 'Main Description', fr: 'Description principale' }
+export const SECTION_TITLES: { [K in PanelSection]: { en: string; es: string; fr: string } } = {
+  details: { en: 'Details', es: 'Detalles', fr: 'Détails' },
+  logo: { en: 'Login Image', es: 'Imagen de inicio de sesión', fr: 'Image de connexion' },
+  name: { en: 'Instance Name', es: 'Nombre de la instancia', fr: "Nom de l'instance" },
+  resources: { en: 'Resources', es: 'Recursos', fr: 'Ressources' },
+  tagline: { en: 'Main Description', es: 'Descripción principal', fr: 'Description principale' }
 };
 
 export const DEFAULT_SECTIONS_ORDER: PanelSection[] = ['logo', 'name', 'tagline', 'details', 'resources'];

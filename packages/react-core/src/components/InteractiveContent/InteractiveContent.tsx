@@ -205,7 +205,7 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
         <div className="flex h-full w-full items-center justify-center p-6">
           <div className="flex w-full max-w-lg flex-col gap-8">
             <h2 className="text-center text-2xl font-semibold tracking-tight">
-              {t({ en: 'Select Language', fr: 'Sélectionnez une langue' })}
+              {t({ en: 'Select Language', es: 'Seleccionar idioma', fr: 'Sélectionnez une langue' })}
             </h2>
             <div className="flex flex-col gap-2.5">
               {supportedLanguages.map((language) => {
@@ -239,17 +239,24 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
       <Dialog open={lockDialogOpen} onOpenChange={setLockDialogOpen}>
         <Dialog.Content onOpenAutoFocus={(event) => event.preventDefault()}>
           <Dialog.Header>
-            <Dialog.Title>{t({ en: 'Cannot Change Language', fr: 'Impossible de changer la langue' })}</Dialog.Title>
+            <Dialog.Title>
+              {t({
+                en: 'Cannot Change Language',
+                es: 'No se puede cambiar el idioma',
+                fr: 'Impossible de changer la langue'
+              })}
+            </Dialog.Title>
             <Dialog.Description>
               {t({
                 en: 'The language cannot be changed during this instrument.',
+                es: 'El idioma no se puede cambiar mientras se administra este instrumento.',
                 fr: 'La langue ne peut pas être modifiée pendant cet instrument.'
               })}
             </Dialog.Description>
           </Dialog.Header>
           <Dialog.Footer>
             <Button type="button" variant="primary" onClick={() => setLockDialogOpen(false)}>
-              {t({ en: 'OK', fr: 'OK' })}
+              {t({ en: 'OK', es: 'Aceptar', fr: 'OK' })}
             </Button>
           </Dialog.Footer>
         </Dialog.Content>

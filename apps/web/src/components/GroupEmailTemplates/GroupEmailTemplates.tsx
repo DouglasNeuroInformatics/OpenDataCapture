@@ -55,6 +55,7 @@ export const GroupEmailTemplates = () => {
         <EmptyState>
           {t({
             en: 'Select a group to manage its email templates.',
+            es: 'Seleccione un grupo para gestionar sus plantillas de correo.',
             fr: 'Sélectionnez un groupe pour gérer ses modèles de courriel.'
           })}
         </EmptyState>
@@ -69,12 +70,14 @@ export const GroupEmailTemplates = () => {
     if (issue === 'incomplete') {
       return t({
         en: 'Fill in the subject and body in each language you have started.',
+        es: 'Complete el asunto y el cuerpo en cada idioma que haya empezado.',
         fr: "Remplissez l'objet et le corps dans chaque langue commencée."
       });
     }
     if (issue === 'missing-vars') {
       return t({
         en: 'The body must include {{url}} and {{expiresAt}}.',
+        es: 'El cuerpo debe incluir {{url}} y {{expiresAt}}.',
         fr: 'Le corps doit inclure {{url}} et {{expiresAt}}.'
       });
     }
@@ -84,13 +87,17 @@ export const GroupEmailTemplates = () => {
   const validateName = (candidate: string, exceptId?: string): string | undefined => {
     const trimmed = candidate.trim();
     if (!trimmed) {
-      return t({ en: 'A name is required', fr: 'Un nom est requis' });
+      return t({ en: 'A name is required', es: 'El nombre es obligatorio', fr: 'Un nom est requis' });
     }
     const isDuplicate = templates.some(
       (template) => template.id !== exceptId && template.name.toLowerCase() === trimmed.toLowerCase()
     );
     return isDuplicate
-      ? t({ en: 'A template with this name already exists', fr: 'Un modèle avec ce nom existe déjà' })
+      ? t({
+          en: 'A template with this name already exists',
+          es: 'Ya existe una plantilla con este nombre',
+          fr: 'Un modèle avec ce nom existe déjà'
+        })
       : undefined;
   };
 
@@ -105,6 +112,7 @@ export const GroupEmailTemplates = () => {
       addNotification({
         message: t({
           en: 'The group is still loading — try again in a moment.',
+          es: 'El grupo aún se está cargando: inténtelo de nuevo en un momento.',
           fr: 'Le groupe est encore en cours de chargement — réessayez dans un instant.'
         }),
         type: 'error'
@@ -133,13 +141,15 @@ export const GroupEmailTemplates = () => {
         message: isConflict
           ? t({
               en: 'Someone else changed these templates while you were editing. Your changes were not saved — reload the page and try again.',
+              es: 'Otra persona modificó estas plantillas mientras usted editaba. Sus cambios no se guardaron: recargue la página e inténtelo de nuevo.',
               fr: "Quelqu'un d'autre a modifié ces modèles pendant votre édition. Vos modifications n'ont pas été enregistrées — rechargez la page et réessayez."
             })
           : t({
               en: 'Your changes were not saved. Check your connection and try again.',
+              es: 'Sus cambios no se guardaron. Compruebe su conexión e inténtelo de nuevo.',
               fr: "Vos modifications n'ont pas été enregistrées. Vérifiez votre connexion et réessayez."
             }),
-        title: t({ en: 'Save failed', fr: "Échec de l'enregistrement" }),
+        title: t({ en: 'Save failed', es: 'Error al guardar', fr: "Échec de l'enregistrement" }),
         type: 'error'
       });
       if (isConflict) {
@@ -167,6 +177,7 @@ export const GroupEmailTemplates = () => {
       addNotification({
         message: t({
           en: 'That was the default template, so the built-in message is now used.',
+          es: 'Esa era la plantilla predeterminada, por lo que ahora se usa el mensaje integrado.',
           fr: 'Ce modèle était le modèle par défaut ; le message intégré est désormais utilisé.'
         }),
         type: 'info'
@@ -185,11 +196,16 @@ export const GroupEmailTemplates = () => {
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6" data-testid="group-email-templates">
       <div>
         <Heading className="mb-2" variant="h4">
-          {t({ en: 'Remote Assignment Templates', fr: "Modèles d'évaluation à distance" })}
+          {t({
+            en: 'Remote Assignment Templates',
+            es: 'Plantillas de tareas remotas',
+            fr: "Modèles d'évaluation à distance"
+          })}
         </Heading>
         <p className="text-muted-foreground mb-3 text-sm">
           {t({
             en: 'Used when emailing a remote assignment link.',
+            es: 'Se usa al enviar por correo el enlace de una tarea remota.',
             fr: "Utilisés lors de l'envoi d'un lien d'évaluation à distance."
           })}
         </p>
@@ -197,7 +213,7 @@ export const GroupEmailTemplates = () => {
           <TemplateRow
             actions={
               <Button
-                aria-label={t({ en: 'View', fr: 'Voir' })}
+                aria-label={t({ en: 'View', es: 'Ver', fr: 'Voir' })}
                 data-testid="template-view-builtin"
                 size="icon"
                 type="button"
@@ -211,6 +227,7 @@ export const GroupEmailTemplates = () => {
             isPending={updateGroupMutation.isPending}
             label={t({
               en: 'Your Open Data Capture Assignment (built-in)',
+              es: 'Su tarea de Open Data Capture (integrada)',
               fr: 'Votre évaluation Open Data Capture (intégré)'
             })}
             rowId="builtin"
@@ -221,7 +238,7 @@ export const GroupEmailTemplates = () => {
               actions={
                 <React.Fragment>
                   <Button
-                    aria-label={t({ en: 'Edit', fr: 'Modifier' })}
+                    aria-label={t({ en: 'Edit', es: 'Editar', fr: 'Modifier' })}
                     data-testid={`template-edit-${template.id}`}
                     size="icon"
                     type="button"
@@ -254,6 +271,7 @@ export const GroupEmailTemplates = () => {
             <EmptyState>
               {t({
                 en: 'No custom templates yet — create one below to override the built-in message.',
+                es: 'Aún no hay plantillas personalizadas: cree una a continuación para sustituir el mensaje integrado.',
                 fr: 'Aucun modèle personnalisé — créez-en un ci-dessous pour remplacer le message intégré.'
               })}
             </EmptyState>

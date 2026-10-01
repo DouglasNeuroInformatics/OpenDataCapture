@@ -37,17 +37,26 @@ export const NewUserTemplateSection = ({ isSaving, onSave, template: saved }: Ne
     issue === 'incomplete'
       ? t({
           en: 'Fill in the subject and body for each language.',
+          es: 'Complete el asunto y el cuerpo para cada idioma.',
           fr: "Remplissez l'objet et le corps pour chaque langue."
         })
       : issue === 'missing-vars'
-        ? t({ en: 'The body must include {{username}}.', fr: 'Le corps doit inclure {{username}}.' })
+        ? t({
+            en: 'The body must include {{username}}.',
+            es: 'El cuerpo debe incluir {{username}}.',
+            fr: 'Le corps doit inclure {{username}}.'
+          })
         : undefined;
 
   return (
     <SectionCard data-testid="mail-template-card">
       <div className="mb-1 flex items-start justify-between gap-4">
         <Heading variant="h4">
-          {t({ en: 'New User Email Template', fr: 'Modèle de courriel pour les nouveaux utilisateurs' })}
+          {t({
+            en: 'New User Email Template',
+            es: 'Plantilla de correo para nuevos usuarios',
+            fr: 'Modèle de courriel pour les nouveaux utilisateurs'
+          })}
         </Heading>
         <Button
           className="shrink-0"
@@ -57,12 +66,13 @@ export const NewUserTemplateSection = ({ isSaving, onSave, template: saved }: Ne
           variant="outline"
           onClick={() => setTemplate(defaultTemplate())}
         >
-          {t({ en: 'Reset', fr: 'Réinitialiser' })}
+          {t({ en: 'Reset', es: 'Restablecer', fr: 'Réinitialiser' })}
         </Button>
       </div>
       <p className="text-muted-foreground mb-4 text-sm">
         {t({
           en: 'Sent automatically when a new user with an email address is created. The sender chooses the language.',
+          es: 'Se envía automáticamente cuando se crea un usuario nuevo con dirección de correo. El remitente elige el idioma.',
           fr: "Envoyé automatiquement lors de la création d'un nouvel utilisateur disposant d'une adresse courriel. L'expéditeur choisit la langue."
         })}
       </p>

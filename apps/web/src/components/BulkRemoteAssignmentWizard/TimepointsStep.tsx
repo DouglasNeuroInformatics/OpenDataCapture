@@ -67,12 +67,13 @@ export const TimepointsStep = ({
     <StepLayout
       description={t({
         en: `Each instrument is assigned to all ${subjectCount} selected subjects, with its own expiry.`,
+        es: `Cada instrumento se asigna a los ${subjectCount} sujetos seleccionados, con su propia fecha de vencimiento.`,
         fr: `Chaque instrument est attribué aux ${subjectCount} sujets sélectionnés, avec sa propre date d’expiration.`
       })}
       footer={
         <React.Fragment>
           <Button type="button" variant="outline" onClick={onBack}>
-            {t({ en: 'Back', fr: 'Retour' })}
+            {t({ en: 'Back', es: 'Atrás', fr: 'Retour' })}
           </Button>
           <Button
             data-testid="bulk-confirm-timepoints"
@@ -80,12 +81,12 @@ export const TimepointsStep = ({
             type="button"
             onClick={onConfirm}
           >
-            {t({ en: 'Review', fr: 'Réviser' })}
+            {t({ en: 'Review', es: 'Revisar', fr: 'Réviser' })}
           </Button>
         </React.Fragment>
       }
       step="INSTRUMENTS"
-      title={t({ en: 'Choose Instruments', fr: 'Choisir les instruments' })}
+      title={t({ en: 'Choose Instruments', es: 'Elegir los instrumentos', fr: 'Choisir les instruments' })}
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-timepoints-step">
@@ -95,12 +96,18 @@ export const TimepointsStep = ({
         <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,20rem)_10rem_max-content]">
           <div className="flex min-w-0 flex-col gap-1">
             <label className="text-sm font-medium" htmlFor="bulk-instrument">
-              {t({ en: 'Instrument', fr: 'Instrument' })}
+              {t({ en: 'Instrument', es: 'Instrumento', fr: 'Instrument' })}
             </label>
             <Select value={instrumentId} onValueChange={setInstrumentId}>
               <Select.Trigger className="w-full" data-testid="bulk-instrument-select" id="bulk-instrument">
                 <span className="truncate">
-                  <Select.Value placeholder={t({ en: 'Choose an Instrument', fr: 'Choisir un instrument' })} />
+                  <Select.Value
+                    placeholder={t({
+                      en: 'Choose an Instrument',
+                      es: 'Elegir un instrumento',
+                      fr: 'Choisir un instrument'
+                    })}
+                  />
                 </span>
               </Select.Trigger>
               <Select.Content>
@@ -114,7 +121,7 @@ export const TimepointsStep = ({
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium" htmlFor="bulk-expiry">
-              {t({ en: 'Expires On', fr: 'Expire le' })}
+              {t({ en: 'Expires On', es: 'Vence el', fr: 'Expire le' })}
             </label>
             <Input
               className="w-full"
@@ -135,14 +142,18 @@ export const TimepointsStep = ({
             onClick={add}
           >
             <PlusIcon className="h-4 w-4" />
-            {t({ en: 'Add', fr: 'Ajouter' })}
+            {t({ en: 'Add', es: 'Agregar', fr: 'Ajouter' })}
           </Button>
         </div>
 
         <div data-testid="bulk-timepoint-list">
           {timepoints.length === 0 ? (
             <p className="text-muted-foreground text-sm italic">
-              {t({ en: 'No instruments added yet.', fr: 'Aucun instrument ajouté.' })}
+              {t({
+                en: 'No instruments added yet.',
+                es: 'Aún no se ha agregado ningún instrumento.',
+                fr: 'Aucun instrument ajouté.'
+              })}
             </p>
           ) : (
             <TimepointTable

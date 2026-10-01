@@ -10,9 +10,9 @@ import type { WizardStep } from './types';
 const WIZARD_STEPS = ['SUBJECTS', 'INSTRUMENTS', 'REVIEW'] as const;
 
 const STEP_LABELS = {
-  INSTRUMENTS: { en: 'Instruments', fr: 'Instruments' },
-  REVIEW: { en: 'Review', fr: 'Révision' },
-  SUBJECTS: { en: 'Subjects', fr: 'Sujets' }
+  INSTRUMENTS: { en: 'Instruments', es: 'Instrumentos', fr: 'Instruments' },
+  REVIEW: { en: 'Review', es: 'Revisión', fr: 'Révision' },
+  SUBJECTS: { en: 'Subjects', es: 'Sujetos', fr: 'Sujets' }
 } as const;
 
 /** The screen a breadcrumb returns to. Subjects re-enters at the source step, not the mapping one. */
@@ -53,7 +53,7 @@ const StepLayout = ({ aside, children, description, footer, onStepChange, step, 
     <Card className="overflow-hidden">
       {currentIndex !== -1 && (
         <nav
-          aria-label={t({ en: 'Progress', fr: 'Progression' })}
+          aria-label={t({ en: 'Progress', es: 'Progreso', fr: 'Progression' })}
           className="border-b px-6 py-4"
           data-testid="bulk-breadcrumbs"
         >
