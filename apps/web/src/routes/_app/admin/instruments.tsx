@@ -8,7 +8,6 @@ import { cn } from '@douglasneuroinformatics/libui/utils';
 import { translateInstrumentInfo } from '@opendatacapture/instrument-utils';
 import type { InstrumentInfo, TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute } from '@tanstack/react-router';
-import { z } from 'zod/v4';
 
 import { InstrumentPreviewDialog } from '@/components/InstrumentPreviewDialog';
 import type { InstrumentPreviewItem, InstrumentSource } from '@/components/InstrumentPreviewDialog';
@@ -20,6 +19,7 @@ import {
   useSeriesInstrumentsOverviewQuery
 } from '@/hooks/useSeriesInstrumentsOverviewQuery';
 import { useUpdateSeriesInstrumentArchiveMutation } from '@/hooks/useUpdateSeriesInstrumentArchiveMutation';
+import { $AdminInstrumentsSearch } from '@/utils/admin-instruments-search';
 import { selectLatestEditions } from '@/utils/instrument-editions';
 import { sortSeriesOverviewRows } from '@/utils/series-overview';
 import type { SeriesOverviewRow } from '@/utils/series-overview';
@@ -400,5 +400,5 @@ export const Route = createFileRoute('/_app/admin/instruments')({
       context.queryClient.ensureQueryData(groupsQueryOptions())
     ]);
   },
-  validateSearch: z.object({ view: z.enum(['forms', 'series']).catch('forms') })
+  validateSearch: $AdminInstrumentsSearch
 });
