@@ -1,4 +1,5 @@
 import type { AppAction, AppSubjectName } from '@opendatacapture/schemas/core';
+import { expect } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
 
 import { AppPage } from '../../route.page';
@@ -22,7 +23,7 @@ export class AdminUserPage extends AppPage {
     this.submitError = page.getByTestId('admin-user-edit-error');
     this.permissionsTable = page.getByTestId('user-permissions-table');
     this.permissionRows = page.getByTestId('user-permission-row');
-    this.addPermissionRow = page.getByTestId('add-permission-row');
+    this.addPermissionRow = page.getByTestId('add-permission-row').last();
     this.adminNotice = page.getByTestId('user-permissions-admin-notice');
     this.manageAllWarning = page.getByTestId('manage-all-warning');
   }
@@ -37,11 +38,14 @@ export class AdminUserPage extends AppPage {
     if (scope !== undefined) {
       await this.selectOption('scope', scope);
     }
-    await this.submitPermission();
   }
 
-  async deleteUser() {
-    await this.$ref.getByRole('button', { name: 'Delete User' }).click();
+  async addPermissionRowAfterCurrent() {
+    await this.addPermissionRow.getByRole('button', { name: 'Add Permission' }).click();
+  }
+
+  async archiveUser() {
+    await this.$ref.getByRole('button', { name: 'Archive' }).click();
     await this.$ref.getByRole('button', { name: 'Yes' }).click();
   }
 
@@ -50,9 +54,8 @@ export class AdminUserPage extends AppPage {
   }
 
   async saveProfile() {
-    // The shared `Form` component's own submit button always has `aria-label="Submit"`, even though
-    // this form's visible label is "Save" -- see DouglasNeuroInformatics/libui#108.
-    await this.profileForm.getByRole('button', { name: 'Submit' }).click();
+    await this.$ref.getByTestId('save-user-changes').click();
+    await expect(this.$ref.getByTestId('save-user-changes')).toBeEnabled();
   }
 
   /** Opens one of the add-permission selects; the items render in a portal outside the form. */
@@ -62,6 +65,10 @@ export class AdminUserPage extends AppPage {
   }
 
   async submitPermission() {
-    await this.addPermissionRow.getByRole('button', { name: 'Add Permission' }).click();
+    await this.saveProfile();
+  }
+
+  async unarchiveUser() {
+    await this.$ref.getByRole('button', { name: 'Unarchive' }).click();
   }
 }

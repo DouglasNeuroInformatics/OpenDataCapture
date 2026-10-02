@@ -12,17 +12,24 @@ import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStat
 import { useAppStore } from '@/store';
 import { getRightPanelGradient } from '@/utils/branding';
 
-const loginRequest = async (
-  credentials: $LoginCredentials
-): Promise<{ accessToken: string; success: true } | { success: false }> => {
+type LoginResult =
+  | { accessToken: string; kind: 'success' }
+  | { kind: 'archived' }
+  | { kind: 'disabled' }
+  | { kind: 'unauthorized' };
+
+const loginRequest = async (credentials: $LoginCredentials): Promise<LoginResult> => {
   const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {
-    validateStatus: (status) => status === 200 || status === 401
+    validateStatus: (status) => status === 200 || status === 401 || status === 403
   });
-  if (response.status === 401) {
-    console.error(response);
-    return { success: false };
+  if (response.status === 403) {
+    const message = (response.data as { message?: string }).message;
+    return { kind: message === 'Account Archived' ? 'archived' : 'disabled' };
   }
-  return { accessToken: response.data.accessToken, success: true };
+  if (response.status === 401) {
+    return { kind: 'unauthorized' };
+  }
+  return { accessToken: response.data.accessToken, kind: 'success' };
 };
 
 const RouteComponent = () => {
@@ -39,7 +46,39 @@ const RouteComponent = () => {
 
   const handleLogin = async (credentials: $LoginCredentials) => {
     const result = await loginRequest(credentials);
-    if (!result.success) {
+    if (result.kind === 'archived') {
+      notifications.addNotification({
+        message: t({
+          en: 'Your account has been archived. Please contact an administrator to restore it.',
+          es: 'Su cuenta ha sido archivada. Comuníquese con un administrador para restaurarla.',
+          fr: 'Votre compte a été archivé. Veuillez contacter un administrateur pour le restaurer.'
+        }),
+        title: t({
+          en: 'Account Archived',
+          es: 'Cuenta archivada',
+          fr: 'Compte archivé'
+        }),
+        type: 'error'
+      });
+      return;
+    }
+    if (result.kind === 'disabled') {
+      notifications.addNotification({
+        message: t({
+          en: 'This account is disabled. Please contact an administrator.',
+          es: 'Esta cuenta está desactivada. Comuníquese con un administrador.',
+          fr: 'Ce compte est désactivé. Veuillez contacter un administrateur.'
+        }),
+        title: t({
+          en: 'Account Disabled',
+          es: 'Cuenta desactivada',
+          fr: 'Compte désactivé'
+        }),
+        type: 'error'
+      });
+      return;
+    }
+    if (result.kind === 'unauthorized') {
       notifications.addNotification({
         message: t('unauthorizedError.message'),
         title: t('unauthorizedError.title'),

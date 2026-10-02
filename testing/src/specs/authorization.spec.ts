@@ -55,8 +55,8 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
   },
   {
     screen: '/admin/users',
-    send: (request, { headers, userId }) => request.delete(`${API}/users/${userId}`, { headers }),
-    what: 'delete a user'
+    send: (request, { headers, userId }) => request.patch(`${API}/users/${userId}/archive`, { headers }),
+    what: 'archive a user'
   },
   {
     // Gated on `manage all` rather than `update User`: an `update User` grant is one of the things
@@ -357,16 +357,21 @@ test.describe('server-side authorization', () => {
   // Every route that writes a user is admin-only, so an administrator removing their own access could
   // leave no account able to reach them again. Seeded rather than the shared admin, so a regression
   // loses a throwaway account instead of the one every other spec logs in as.
-  test('should refuse an administrator deleting or disabling their own account', async ({ api, apiRequestContext }) => {
+  test('should refuse an administrator archiving or disabling their own account', async ({
+    api,
+    apiRequestContext
+  }) => {
     const { credentials, user } = await api.createUser({ basePermissionLevel: 'ADMIN' });
     const headers = { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` };
 
     const disabled = await apiRequestContext.patch(`${API}/users/${user.id}`, { data: { disabled: true }, headers });
-    const deleted = await apiRequestContext.delete(`${API}/users/${user.id}`, { headers });
+    const archived = await apiRequestContext.patch(`${API}/users/${user.id}/archive`, { headers });
 
     expect.soft(disabled.status(), 'an administrator must not be able to disable themselves').toBe(403);
-    expect.soft(deleted.status(), 'an administrator must not be able to delete themselves').toBe(403);
-    expect((await api.findUserById(user.id)).disabled).not.toBe(true);
+    expect.soft(archived.status(), 'an administrator must not be able to archive themselves').toBe(403);
+    const reloaded = await api.findUserById(user.id);
+    expect(reloaded.disabled).not.toBe(true);
+    expect(reloaded.archivedAt).toBeFalsy();
   });
 
   // The playground uploads a bundle with a token minted by `GET /auth/create-instrument-token`, and

@@ -1,16 +1,46 @@
+import { useState } from 'react';
+import type { ComponentProps } from 'react';
+
+import type { Permissions } from '@opendatacapture/schemas/core';
 import type { User } from '@opendatacapture/schemas/user';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { UserPermissionsEditor } from '@/components/UserPermissionsEditor';
+import type { PermissionDraft } from '@/utils/permissions';
 
 import '@/services/i18n';
 
-const mocks = vi.hoisted(() => ({ mutate: vi.fn() }));
+const onPermissionsChange = vi.fn();
+const onDraftsChange = vi.fn();
 
-vi.mock('@/hooks/useUpdateUserPermissionsMutation', () => ({
-  useUpdateUserPermissionsMutation: () => ({ isPending: false, mutate: mocks.mutate })
-}));
+const Editor = ({
+  groups,
+  highlightIncomplete,
+  user
+}: Pick<ComponentProps<typeof UserPermissionsEditor>, 'groups' | 'highlightIncomplete' | 'user'>) => {
+  const [permissions, setPermissions] = useState<Permissions>(user.additionalPermissions);
+  const [drafts, setDrafts] = useState<PermissionDraft[]>([
+    { scope: user.groupIds.length === 1 ? user.groupIds[0] : undefined }
+  ]);
+  return (
+    <UserPermissionsEditor
+      drafts={drafts}
+      groups={groups}
+      highlightIncomplete={highlightIncomplete}
+      permissions={permissions}
+      user={user}
+      onDraftsChange={(drafts) => {
+        setDrafts(drafts);
+        onDraftsChange(drafts);
+      }}
+      onPermissionsChange={(permissions) => {
+        setPermissions(permissions);
+        onPermissionsChange(permissions);
+      }}
+    />
+  );
+};
 
 /** Opens one of the add-row selects from the keyboard, since happy-dom dispatches no pointer capture. */
 const choose = (field: 'action' | 'subject', value: string) => {
@@ -45,46 +75,78 @@ describe('UserPermissionsEditor', () => {
   });
 
   it('should list every grant, naming the group a scoped one is confined to', () => {
-    render(<UserPermissionsEditor groups={groups} user={user} />);
+    render(<Editor groups={groups} user={user} />);
     expect(screen.getAllByTestId('user-permission-row')).toHaveLength(2);
     expect(screen.getByText('Group One')).toBeTruthy();
   });
 
   it('should mark an unscoped grant as applying to all groups', () => {
-    render(<UserPermissionsEditor groups={groups} user={user} />);
+    render(<Editor groups={groups} user={user} />);
     expect(screen.getByText('All Groups')).toBeTruthy();
   });
 
   it('should say that a change waits for the next sign-in, since permissions are frozen into the token', () => {
-    render(<UserPermissionsEditor groups={groups} user={user} />);
+    render(<Editor groups={groups} user={user} />);
     expect(screen.getByTestId('user-permissions-signin-note')).toBeTruthy();
   });
 
-  it('should save the full set minus the removed grant, since the route replaces what is stored', () => {
-    render(<UserPermissionsEditor groups={groups} user={user} />);
+  it('should stage removal without saving', () => {
+    render(<Editor groups={groups} user={user} />);
     fireEvent.click(screen.getAllByTestId('user-permission-remove')[0]!);
-    expect(mocks.mutate.mock.lastCall?.[0]).toEqual({
-      id: 'user-1',
-      permissions: [{ action: 'create', groupId: null, subject: 'Instrument' }]
-    });
+    expect(onPermissionsChange).toHaveBeenCalledWith([{ action: 'create', groupId: null, subject: 'Instrument' }]);
   });
 
   it('should still offer the add row when the user holds no grants', () => {
-    render(<UserPermissionsEditor groups={groups} user={{ ...user, additionalPermissions: [] }} />);
+    render(<Editor groups={groups} user={{ ...user, additionalPermissions: [] }} />);
     expect(screen.queryAllByTestId('user-permission-row')).toHaveLength(0);
     expect(screen.getByTestId('add-permission-row')).toBeTruthy();
   });
 
   it('should offer no scope until a resource that takes one is chosen', () => {
-    render(<UserPermissionsEditor groups={groups} user={user} />);
+    render(<Editor groups={groups} user={user} />);
     expect(screen.getByTestId('add-permission-row')).toBeTruthy();
     expect(screen.queryByTestId('scope-select-trigger')).toBeNull();
   });
 
-  it('should keep the add button disabled until an action and a resource are chosen', () => {
-    render(<UserPermissionsEditor groups={groups} user={user} />);
+  it('should add an empty row without committing any permission', () => {
+    render(<Editor groups={groups} user={user} />);
     const addButton = screen.getByRole('button', { name: 'Add Permission' });
-    expect(addButton.hasAttribute('disabled')).toBe(true);
+    fireEvent.click(addButton);
+    expect(screen.getAllByTestId('add-permission-row')).toHaveLength(2);
+    expect(onPermissionsChange).not.toHaveBeenCalled();
+  });
+
+  it('should stage a complete row without requiring the plus button', () => {
+    render(<Editor groups={groups} user={user} />);
+    choose('action', 'read');
+    choose('subject', 'User');
+    expect(onDraftsChange.mock.lastCall?.[0]).toEqual([{ action: 'read', scope: 'group-1', subject: 'User' }]);
+    expect(onPermissionsChange).not.toHaveBeenCalled();
+  });
+
+  it('should remove a draft without changing existing grants', () => {
+    render(<Editor groups={groups} user={user} />);
+    fireEvent.click(screen.getByTestId('permission-draft-remove'));
+    expect(screen.queryAllByTestId('add-permission-row')).toHaveLength(0);
+    expect(onPermissionsChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Add Permission' }));
+    expect(screen.getAllByTestId('add-permission-row')).toHaveLength(1);
+  });
+
+  it('should flag a started but unfinished row once a save has been refused', () => {
+    render(<Editor highlightIncomplete groups={groups} user={{ ...user, groupIds: ['group-1', 'group-2'] }} />);
+    expect(screen.queryByTestId('permission-drafts-incomplete')).toBeNull();
+    choose('action', 'read');
+    choose('subject', 'Subject');
+    expect(screen.getByTestId('add-permission-row').getAttribute('aria-invalid')).toBe('true');
+    expect(screen.getByTestId('permission-drafts-incomplete')).toBeTruthy();
+  });
+
+  it('should not flag an unfinished row before any save is attempted', () => {
+    render(<Editor groups={groups} user={{ ...user, groupIds: ['group-1', 'group-2'] }} />);
+    choose('action', 'read');
+    expect(screen.getByTestId('add-permission-row').getAttribute('aria-invalid')).toBeNull();
+    expect(screen.queryByTestId('permission-drafts-incomplete')).toBeNull();
   });
 
   describe('a grant stored before it stopped being grantable', () => {
@@ -94,28 +156,29 @@ describe('UserPermissionsEditor', () => {
     };
 
     it('should be marked as having no effect, with a note saying it will be removed', () => {
-      render(<UserPermissionsEditor groups={groups} user={holder} />);
+      render(<Editor groups={groups} user={holder} />);
       expect(screen.getAllByTestId('user-permission-ineffective')).toHaveLength(1);
       expect(screen.getByTestId('user-permissions-ineffective-note')).toBeTruthy();
     });
 
-    it('should be left out of the next save, since the route refuses it', () => {
-      render(<UserPermissionsEditor groups={groups} user={holder} />);
+    it('should preserve other grants while staging removal', () => {
+      render(<Editor groups={groups} user={holder} />);
       fireEvent.click(screen.getAllByTestId('user-permission-remove')[0]!);
-      expect(mocks.mutate.mock.lastCall?.[0].permissions).toEqual([
-        { action: 'create', groupId: null, subject: 'Instrument' }
+      expect(onPermissionsChange.mock.lastCall?.[0]).toEqual([
+        { action: 'create', groupId: null, subject: 'Instrument' },
+        { action: 'update', groupId: null, subject: 'User' }
       ]);
     });
   });
 
   it('should not mark or note anything when every grant has an effect', () => {
-    render(<UserPermissionsEditor groups={groups} user={user} />);
+    render(<Editor groups={groups} user={user} />);
     expect(screen.queryByTestId('user-permission-ineffective')).toBeNull();
     expect(screen.queryByTestId('user-permissions-ineffective-note')).toBeNull();
   });
 
   it('should warn that Manage (All) on All makes the user an administrator', () => {
-    render(<UserPermissionsEditor groups={groups} user={user} />);
+    render(<Editor groups={groups} user={user} />);
     choose('action', 'manage');
     expect(screen.queryByTestId('manage-all-warning')).toBeNull();
     choose('subject', 'all');
@@ -123,7 +186,7 @@ describe('UserPermissionsEditor', () => {
   });
 
   it('should replace the editor with a notice for an administrator, who already holds everything', () => {
-    render(<UserPermissionsEditor groups={groups} user={{ ...user, basePermissionLevel: 'ADMIN' }} />);
+    render(<Editor groups={groups} user={{ ...user, basePermissionLevel: 'ADMIN' }} />);
     expect(screen.getByTestId('user-permissions-admin-notice')).toBeTruthy();
     expect(screen.queryByTestId('user-permissions-table')).toBeNull();
     expect(screen.queryByTestId('add-permission-row')).toBeNull();

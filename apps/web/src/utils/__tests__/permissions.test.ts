@@ -6,9 +6,11 @@ import {
   ALL_GROUPS,
   grantableActions,
   grantableSubjects,
+  isIncompleteDraft,
   toUserPermission,
   withoutPermission,
-  withPermission
+  withPermission,
+  withPermissionDrafts
 } from '../permissions';
 
 describe('$AddPermissionFormData', () => {
@@ -96,5 +98,53 @@ describe('withoutPermission', () => {
       { action: 'read', groupId: null, subject: 'Subject' }
     ];
     expect(withoutPermission(permissions, 0)).toEqual([permissions[1]]);
+  });
+});
+
+describe('isIncompleteDraft', () => {
+  it('should not flag a blank row, even with its scope preselected, so an untouched add row never blocks a save', () => {
+    expect(isIncompleteDraft({})).toBe(false);
+    expect(isIncompleteDraft({ scope: 'group-1' })).toBe(false);
+  });
+
+  it('should flag a started row missing its resource', () => {
+    expect(isIncompleteDraft({ action: 'read' })).toBe(true);
+  });
+
+  it('should flag a scopable grant with no scope chosen, so it is not silently dropped', () => {
+    expect(isIncompleteDraft({ action: 'read', subject: 'Subject' })).toBe(true);
+  });
+
+  it('should not flag a complete row', () => {
+    expect(isIncompleteDraft({ action: 'create', subject: 'Instrument' })).toBe(false);
+    expect(isIncompleteDraft({ action: 'read', scope: 'group-1', subject: 'Subject' })).toBe(false);
+  });
+});
+
+describe('withPermissionDrafts', () => {
+  it('should include every complete row without requiring plus', () => {
+    expect(
+      withPermissionDrafts(
+        [],
+        [
+          { action: 'read', scope: 'group-1', subject: 'User' },
+          { action: 'create', subject: 'Instrument' }
+        ]
+      )
+    ).toEqual([
+      { action: 'read', groupId: 'group-1', subject: 'User' },
+      { action: 'create', groupId: null, subject: 'Instrument' }
+    ]);
+  });
+
+  it('should ignore unfinished rows and avoid duplicate grants', () => {
+    const permissions: Permissions = [{ action: 'read', groupId: 'group-1', subject: 'User' }];
+    expect(
+      withPermissionDrafts(permissions, [
+        {},
+        { action: 'read', subject: 'Subject' },
+        { action: 'read', scope: 'group-1', subject: 'User' }
+      ])
+    ).toEqual(permissions);
   });
 });

@@ -346,6 +346,7 @@ model User {
   phoneNumber           String?
   email                 String?
   disabled              Boolean?
+  archivedAt            DateTime?            @db.Date
 
   @@unique([username])
   @@map("UserModel")

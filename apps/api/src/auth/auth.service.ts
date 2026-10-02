@@ -51,13 +51,18 @@ export class AuthService {
       throw err;
     }
 
-    if (user.disabled) {
-      throw new ForbiddenException('Account Disabled');
-    }
-
+    // Account status is checked only once the password is proven, so a wrong guess cannot reveal
+    // whether a username exists or has been archived.
     const isCorrectPassword = await this.cryptoService.comparePassword(credentials.password, user.hashedPassword);
     if (isCorrectPassword !== true) {
       throw new UnauthorizedException('Invalid Credentials');
+    }
+
+    if (user.archivedAt) {
+      throw new ForbiddenException('Account Archived');
+    }
+    if (user.disabled) {
+      throw new ForbiddenException('Account Disabled');
     }
 
     const tokenPayload: Omit<TokenPayload, 'permissions'> = {

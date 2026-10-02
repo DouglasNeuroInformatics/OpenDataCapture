@@ -1,18 +1,6 @@
 import { ApiOperation, CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Headers,
-  NotFoundException,
-  Param,
-  Patch,
-  Post,
-  Put,
-  Query
-} from '@nestjs/common';
+import { Body, Controller, Get, Headers, NotFoundException, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { $Language } from '@opendatacapture/schemas/core';
 import type { Language } from '@opendatacapture/schemas/core';
 import {
@@ -43,6 +31,13 @@ export class UsersController {
     private readonly groupsService: GroupsService,
     private readonly mailService: MailService
   ) {}
+
+  @ApiOperation({ summary: 'Archive User' })
+  @Patch(':id/archive')
+  @RouteAccess(ADMIN_ONLY)
+  archiveById(@Param('id') id: string, @CurrentUser() currentUser: RequestUser) {
+    return this.usersService.archiveById(id, currentUser);
+  }
 
   @ApiOperation({ summary: 'Get User by Username' })
   @Get('/check-username/:username')
@@ -76,13 +71,6 @@ export class UsersController {
     return { ...created, welcomeEmail };
   }
 
-  @ApiOperation({ summary: 'Delete User' })
-  @Delete(':id')
-  @RouteAccess(ADMIN_ONLY)
-  deleteById(@Param('id') id: string, @CurrentUser() currentUser: RequestUser) {
-    return this.usersService.deleteById(id, currentUser);
-  }
-
   @ApiOperation({ summary: 'Get All Users' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'User' })
@@ -95,6 +83,13 @@ export class UsersController {
   @RouteAccess({ action: 'read', subject: 'User' })
   findById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
     return this.usersService.findById(id, { ability });
+  }
+
+  @ApiOperation({ summary: 'Unarchive User' })
+  @Patch(':id/unarchive')
+  @RouteAccess(ADMIN_ONLY)
+  unarchiveById(@Param('id') id: string, @CurrentUser() currentUser: RequestUser) {
+    return this.usersService.unarchiveById(id, currentUser);
   }
 
   @ApiOperation({ summary: 'Update User' })

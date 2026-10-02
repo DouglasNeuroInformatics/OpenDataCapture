@@ -1,7 +1,6 @@
-import { useState } from 'react';
-
 import { Button, Card, Select, Table } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import {
   $AppAction,
   $AppSubjectName,
@@ -14,18 +13,17 @@ import type { User } from '@opendatacapture/schemas/user';
 import { GlobeIcon, PlusIcon, Trash2Icon, TriangleAlertIcon } from 'lucide-react';
 
 import { Chip } from '@/components/Chip';
-import { useUpdateUserPermissionsMutation } from '@/hooks/useUpdateUserPermissionsMutation';
 import {
-  $AddPermissionFormData,
   ALL_GROUPS,
   grantableActions,
   grantableSubjects,
-  toUserPermission,
-  withoutPermission,
-  withPermission
+  isIncompleteDraft,
+  withoutPermission
 } from '@/utils/permissions';
+import type { PermissionDraft } from '@/utils/permissions';
 
 type CellSelectProps = {
+  disabled?: boolean;
   label: string;
   name: string;
   onValueChange: (value: string) => void;
@@ -34,13 +32,8 @@ type CellSelectProps = {
   value: string | undefined;
 };
 
-/**
- * A select sitting in a table cell, styled as the cell's text with a chevron rather than as a boxed
- * control, and named for assistive technology by the column it sits under. The trigger's own one-line
- * clamp clips a long label without an ellipsis, so its span is truncated instead.
- */
-const CellSelect = ({ label, name, onValueChange, options, placeholder, value }: CellSelectProps) => (
-  <Select name={name} value={value ?? ''} onValueChange={onValueChange}>
+const CellSelect = ({ disabled, label, name, onValueChange, options, placeholder, value }: CellSelectProps) => (
+  <Select disabled={disabled} name={name} value={value ?? ''} onValueChange={onValueChange}>
     <Select.Trigger
       aria-label={label}
       className="data-[placeholder]:text-muted-foreground h-auto min-w-0 border-0 bg-transparent px-0 py-0 shadow-none [&>span]:block [&>span]:min-w-0 [&>span]:truncate"
@@ -59,21 +52,30 @@ const CellSelect = ({ label, name, onValueChange, options, placeholder, value }:
 );
 
 type UserPermissionsEditorProps = {
+  drafts: PermissionDraft[];
   groups: Pick<Group, 'id' | 'name'>[];
+  highlightIncomplete?: boolean;
+  isSaving?: boolean;
+  onDraftsChange: (drafts: PermissionDraft[]) => void;
+  onPermissionsChange: (permissions: Permissions) => void;
+  permissions: Permissions;
   user: User;
 };
 
-export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorProps) => {
+export const UserPermissionsEditor = ({
+  drafts,
+  groups,
+  highlightIncomplete,
+  isSaving,
+  onDraftsChange,
+  onPermissionsChange,
+  permissions,
+  user
+}: UserPermissionsEditorProps) => {
   const { t } = useTranslation();
-  const updatePermissionsMutation = useUpdateUserPermissionsMutation();
 
   const userGroups = groups.filter((group) => user.groupIds.includes(group.id));
-  // With one group there is nothing to choose, so it is the scope unless the admin says otherwise.
   const defaultScope = userGroups.length === 1 ? userGroups[0]?.id : undefined;
-
-  const [action, setAction] = useState<AppAction>();
-  const [subject, setSubject] = useState<AppSubjectName>();
-  const [scope, setScope] = useState<string | undefined>(defaultScope);
 
   const actionLabels: { [K in AppAction]: string } = {
     create: t({ en: 'Create', es: 'Crear', fr: 'Créer' }),
@@ -113,32 +115,11 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
     [ALL_GROUPS]: allGroupsLabel
   };
 
-  const actionOptions = Object.fromEntries(grantableActions(subject).map((option) => [option, actionLabels[option]]));
-  const subjectOptions = Object.fromEntries(grantableSubjects(action).map((option) => [option, subjectLabels[option]]));
+  const isManageAll = drafts.some(({ action, subject }) => action === 'manage' && subject === 'all');
+  const hasIneffectiveGrants = !permissions.every(isGrantablePermission);
 
-  const isScopable = subject !== undefined && isGroupScopableSubject(subject);
-  const isManageAll = action === 'manage' && subject === 'all';
-  const draft = $AddPermissionFormData.safeParse({ action, scope, subject });
-  const hasIneffectiveGrants = !user.additionalPermissions.every(isGrantablePermission);
-
-  // A grant stored before it stopped being grantable is refused by the route, so it is left out of
-  // every save; the note above the table says so.
-  const save = (permissions: Permissions, onSuccess?: () => void) => {
-    updatePermissionsMutation.mutate(
-      { id: user.id, permissions: permissions.filter(isGrantablePermission) },
-      { onSuccess }
-    );
-  };
-
-  const handleAdd = () => {
-    if (!draft.success) {
-      return;
-    }
-    save(withPermission(user.additionalPermissions, toUserPermission(draft.data)), () => {
-      setAction(undefined);
-      setSubject(undefined);
-      setScope(defaultScope);
-    });
+  const updateDraft = (index: number, changes: PermissionDraft) => {
+    onDraftsChange(drafts.map((draft, draftIndex) => (draftIndex === index ? { ...draft, ...changes } : draft)));
   };
 
   if (user.basePermissionLevel === 'ADMIN') {
@@ -187,11 +168,11 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                 <Table.Head className="w-[25%]">{columnLabels.action}</Table.Head>
                 <Table.Head className="w-[33%]">{columnLabels.subject}</Table.Head>
                 <Table.Head className="w-[30%]">{columnLabels.scope}</Table.Head>
-                <Table.Head className="w-16" />
+                <Table.Head className="w-24" />
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {user.additionalPermissions.map((permission, index) => (
+              {permissions.map((permission, index) => (
                 <Table.Row
                   data-testid="user-permission-row"
                   key={`${index}-${permission.action}-${permission.subject}-${permission.groupId}`}
@@ -226,11 +207,11 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                       })}
                       className="text-muted-foreground hover:text-destructive"
                       data-testid="user-permission-remove"
-                      disabled={updatePermissionsMutation.isPending}
+                      disabled={isSaving}
                       size="icon"
                       type="button"
                       variant="ghost"
-                      onClick={() => save(withoutPermission(user.additionalPermissions, index))}
+                      onClick={() => onPermissionsChange(withoutPermission(permissions, index))}
                     >
                       <Trash2Icon className="h-4 w-4" />
                     </Button>
@@ -238,58 +219,122 @@ export const UserPermissionsEditor = ({ groups, user }: UserPermissionsEditorPro
                 </Table.Row>
               ))}
             </Table.Body>
-            {/* The add controls are the table's last row, under the headers that name them. */}
             <Table.Footer className="bg-transparent font-normal">
-              <Table.Row data-testid="add-permission-row">
-                <Table.Cell>
-                  <CellSelect
-                    label={columnLabels.action}
-                    name="action"
-                    options={actionOptions}
-                    placeholder={placeholder}
-                    value={action}
-                    onValueChange={(value) => setAction($AppAction.parse(value))}
-                  />
-                </Table.Cell>
-                <Table.Cell>
-                  <CellSelect
-                    label={columnLabels.subject}
-                    name="subject"
-                    options={subjectOptions}
-                    placeholder={placeholder}
-                    value={subject}
-                    onValueChange={(value) => setSubject($AppSubjectName.parse(value))}
-                  />
-                </Table.Cell>
-                <Table.Cell>
-                  {isScopable && (
-                    <CellSelect
-                      label={columnLabels.scope}
-                      name="scope"
-                      options={scopeOptions}
-                      placeholder={placeholder}
-                      value={scope}
-                      onValueChange={setScope}
-                    />
-                  )}
-                </Table.Cell>
-                <Table.Cell className="py-1.5 text-right">
-                  <Button
-                    aria-label={t({ en: 'Add Permission', es: 'Agregar un permiso', fr: 'Ajouter une autorisation' })}
-                    className="text-muted-foreground hover:text-primary"
-                    disabled={!draft.success || updatePermissionsMutation.isPending}
-                    size="icon"
-                    type="button"
-                    variant="ghost"
-                    onClick={handleAdd}
+              {drafts.map((draft, index) => {
+                const { action, scope, subject } = draft;
+                const isFlagged = highlightIncomplete && isIncompleteDraft(draft);
+                return (
+                  <Table.Row
+                    aria-invalid={isFlagged || undefined}
+                    className={cn(isFlagged && 'bg-destructive/10 hover:bg-destructive/10')}
+                    data-testid="add-permission-row"
+                    key={index}
                   >
-                    <PlusIcon className="h-4 w-4" />
-                  </Button>
-                </Table.Cell>
-              </Table.Row>
+                    <Table.Cell>
+                      <CellSelect
+                        disabled={isSaving}
+                        label={columnLabels.action}
+                        name="action"
+                        options={Object.fromEntries(
+                          grantableActions(subject).map((option) => [option, actionLabels[option]])
+                        )}
+                        placeholder={placeholder}
+                        value={action}
+                        onValueChange={(value) => updateDraft(index, { action: $AppAction.parse(value) })}
+                      />
+                    </Table.Cell>
+                    <Table.Cell>
+                      <CellSelect
+                        disabled={isSaving}
+                        label={columnLabels.subject}
+                        name="subject"
+                        options={Object.fromEntries(
+                          grantableSubjects(action).map((option) => [option, subjectLabels[option]])
+                        )}
+                        placeholder={placeholder}
+                        value={subject}
+                        onValueChange={(value) => updateDraft(index, { subject: $AppSubjectName.parse(value) })}
+                      />
+                    </Table.Cell>
+                    <Table.Cell>
+                      {subject !== undefined && isGroupScopableSubject(subject) && (
+                        <CellSelect
+                          disabled={isSaving}
+                          label={columnLabels.scope}
+                          name="scope"
+                          options={scopeOptions}
+                          placeholder={placeholder}
+                          value={scope}
+                          onValueChange={(scope) => updateDraft(index, { scope })}
+                        />
+                      )}
+                    </Table.Cell>
+                    <Table.Cell className="py-1.5 text-right">
+                      <Button
+                        aria-label={t({
+                          en: 'Remove permission',
+                          es: 'Retirar el permiso',
+                          fr: "Retirer l'autorisation"
+                        })}
+                        data-testid="permission-draft-remove"
+                        disabled={isSaving}
+                        size="icon"
+                        type="button"
+                        variant="ghost"
+                        onClick={() => onDraftsChange(drafts.filter((_, draftIndex) => draftIndex !== index))}
+                      >
+                        <Trash2Icon className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        aria-label={t({
+                          en: 'Add Permission',
+                          es: 'Agregar un permiso',
+                          fr: 'Ajouter une autorisation'
+                        })}
+                        className="text-muted-foreground hover:text-primary"
+                        disabled={isSaving}
+                        size="icon"
+                        type="button"
+                        variant="ghost"
+                        onClick={() => onDraftsChange([...drafts, { scope: defaultScope }])}
+                      >
+                        <PlusIcon className="h-4 w-4" />
+                      </Button>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
+              {drafts.length === 0 && (
+                <Table.Row>
+                  <Table.Cell className="text-right" colSpan={4}>
+                    <Button
+                      aria-label={t({ en: 'Add Permission', es: 'Agregar un permiso', fr: 'Ajouter une autorisation' })}
+                      disabled={isSaving}
+                      type="button"
+                      variant="ghost"
+                      onClick={() => onDraftsChange([{ scope: defaultScope }])}
+                    >
+                      <PlusIcon className="h-4 w-4" />
+                    </Button>
+                  </Table.Cell>
+                </Table.Row>
+              )}
             </Table.Footer>
           </Table>
         </div>
+        {highlightIncomplete && drafts.some(isIncompleteDraft) && (
+          <p
+            className="text-destructive mt-3 text-sm font-medium"
+            data-testid="permission-drafts-incomplete"
+            role="alert"
+          >
+            {t({
+              en: 'Complete or remove the highlighted permission rows before saving.',
+              es: 'Complete o elimine las filas de permisos resaltadas antes de guardar.',
+              fr: "Complétez ou retirez les lignes d'autorisation en surbrillance avant d'enregistrer."
+            })}
+          </p>
+        )}
         {isManageAll && (
           <div
             className="mt-3 flex gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-300"
