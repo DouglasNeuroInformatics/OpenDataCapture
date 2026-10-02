@@ -16,6 +16,8 @@ test.describe('admin instruments', () => {
   test('should reach the series view from the Instruments submenu in the sidebar', async ({ getPageModel, page }) => {
     await getPageModel('/admin/instruments');
     const sidebar = page.getByTestId('sidebar');
+    // The admin links sit in the Admin Panel section, which starts collapsed even on an admin page.
+    await sidebar.getByRole('button', { exact: true, name: 'Admin Panel' }).click();
     await sidebar.getByRole('button', { exact: true, name: 'Instruments' }).click();
     await sidebar.getByRole('button', { exact: true, name: 'Series' }).click();
     await expect(page).toHaveURL(/\/admin\/instruments\?view=series/);

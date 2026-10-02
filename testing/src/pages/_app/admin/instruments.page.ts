@@ -17,7 +17,8 @@ export class AdminInstrumentsPage extends AppPage {
   /** Picks a row action (`Preview`, `Archive`, `Unarchive`) from the menu of the row with this title. */
   async chooseRowAction(title: string, action: string): Promise<void> {
     await this.row(title).getByTestId('row-actions-trigger').click();
-    await this.$ref.getByRole('menuitem', { name: action }).click();
+    // Exact, since `Archive` is otherwise also a substring of `Unarchive`.
+    await this.$ref.getByRole('menuitem', { exact: true, name: action }).click();
   }
 
   /** Switches to the series view; its nav button shares the forms view's URL and so its test id. */
