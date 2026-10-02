@@ -1,5 +1,5 @@
-import type { CreateSessionData } from '@opendatacapture/schemas/session';
-import type { CreateSubjectData } from '@opendatacapture/schemas/subject';
+import type { $CreateSessionData } from '@opendatacapture/schemas/session';
+import type { $CreateSubjectData } from '@opendatacapture/schemas/subject';
 
 import { ApiClient } from '../support/api-client';
 import { expect, test } from '../support/fixtures';
@@ -41,7 +41,7 @@ test.describe('sessions', () => {
     uniqueId
   }) => {
     const group = await api.createGroup();
-    const subjectData: CreateSubjectData = {
+    const subjectData: $CreateSubjectData = {
       dateOfBirth: new Date('1990-05-17T00:00:00.000Z'),
       firstName: 'Ada',
       id: `clinical-${uniqueId}`,
@@ -75,7 +75,7 @@ test.describe('sessions', () => {
     const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [ownGroup.id] });
     const accessToken = await ApiClient.login(apiRequestContext, credentials);
     const subjectId = `foreign-${uniqueId}`;
-    const data: CreateSessionData = {
+    const data: $CreateSessionData = {
       date: new Date(),
       groupId: foreignGroup.id,
       subjectData: { id: subjectId },

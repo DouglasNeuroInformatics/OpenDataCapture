@@ -1,14 +1,12 @@
-import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import { ApiOperation, CurrentUser } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
 
 import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
-import { CreateInstrumentRepoDto } from './dto/create-instrument-repo.dto';
 import { InstrumentReposService } from './instrument-repos.service';
 
-@ApiTags('InstrumentRepos')
 @Controller('instrument-repos')
 export class InstrumentReposController {
   constructor(private readonly instrumentReposService: InstrumentReposService) {}
@@ -16,7 +14,7 @@ export class InstrumentReposController {
   @ApiOperation({ summary: 'Create Instrument Repo' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'InstrumentRepo' })
-  create(@Body() dto: CreateInstrumentRepoDto) {
+  create(@Body() dto: $CreateInstrumentRepoData) {
     return this.instrumentReposService.create(dto);
   }
 

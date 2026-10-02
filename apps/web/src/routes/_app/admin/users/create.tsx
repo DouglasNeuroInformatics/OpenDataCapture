@@ -7,7 +7,6 @@ import { Button, CopyButton, Dialog, Form, Heading, Label } from '@douglasneuroi
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@opendatacapture/schemas/core';
 import { $BasePermissionLevel, $CreateUserData } from '@opendatacapture/schemas/user';
-import type { CreateUserData } from '@opendatacapture/schemas/user';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 import { z } from 'zod/v4';
@@ -39,7 +38,7 @@ const RouteComponent = () => {
   const [fallbackMessage, setFallbackMessage] = React.useState<null | string>(null);
   const [emailLanguage, setEmailLanguage] = React.useState<Language>(resolvedLanguage);
 
-  const handleSubmit = async (data: CreateUserData) => {
+  const handleSubmit = async (data: $CreateUserData) => {
     // check if username exists
     const existingUsername = await axios.get<{ success: boolean }>(
       `/v1/users/check-username/${encodeURIComponent(data.username)}`

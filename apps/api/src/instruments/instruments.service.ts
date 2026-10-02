@@ -23,7 +23,7 @@ import type {
   SomeInstrument
 } from '@opendatacapture/runtime-core';
 import type { WithID } from '@opendatacapture/schemas/core';
-import { $AnyInstrument } from '@opendatacapture/schemas/instrument';
+import { $AnyInstrument, $CreateInstrumentData } from '@opendatacapture/schemas/instrument';
 import type {
   $CreateSeriesInstrumentData,
   CreateSeriesInstrumentResult,
@@ -38,8 +38,6 @@ import { pick } from 'lodash-es';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { AppAbility } from '@/auth/auth.types';
 import type { EntityOperationOptions } from '@/core/types';
-
-import { CreateInstrumentDto } from './dto/create-instrument.dto';
 
 /** The localized "series" tag applied to every generated series instrument. */
 const seriesTag = (language: Language): string => (language === 'fr' ? 'Série' : 'Series');
@@ -88,7 +86,7 @@ export class InstrumentsService {
   }
 
   async create(
-    { bundle }: CreateInstrumentDto,
+    { bundle }: $CreateInstrumentData,
     { seriesGroupId }: { seriesGroupId?: string } = {}
   ): Promise<WithID<AnyInstrument>> {
     const result = await this.virtualizationService.eval(bundle);

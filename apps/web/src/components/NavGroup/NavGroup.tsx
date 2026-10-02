@@ -15,7 +15,16 @@ type NavGroupProps = {
   icon: NavItem['icon'];
   items: NavItem[];
   label: string;
-  onNavigate?: (url: string) => void;
+  onNavigate?: (url: string, search?: { [key: string]: string }) => void;
+};
+
+const isItemActive = (item: NavItem, pathname: string, searchParams: { [key: string]: unknown }): boolean => {
+  if (item.children) {
+    return item.children.some((child) => isItemActive(child, pathname, searchParams));
+  }
+  if (item.url !== pathname) return false;
+  if (!item.search) return true;
+  return Object.entries(item.search).every(([k, v]) => String(searchParams[k]) === v);
 };
 
 export const NavGroup = ({
@@ -28,7 +37,8 @@ export const NavGroup = ({
   onNavigate
 }: NavGroupProps) => {
   const location = useLocation();
-  const containsActive = items.some((item) => item.url === location.pathname);
+  const searchParams = (location.search ?? {}) as { [key: string]: unknown };
+  const containsActive = items.some((item) => isItemActive(item, location.pathname, searchParams));
   const [isOpen, setIsOpen] = React.useState(containsActive);
 
   React.useEffect(() => {
@@ -37,7 +47,7 @@ export const NavGroup = ({
     } else {
       setIsOpen(false);
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   return (
     <div className="flex flex-col">
@@ -57,22 +67,33 @@ export const NavGroup = ({
       </button>
       {isOpen && (
         <div className="ml-4 flex flex-col border-l border-slate-500/30 pl-1">
-          {/* `children` is destructured out rather than spread: NavButton renders a <button>, and a
-              nested group's items would otherwise land in it as React children. */}
-          {items.map(({ children: _, disabled, url, ...props }) => (
-            <NavButton
-              activeClassName={activeClassName}
-              className={childClassName}
-              // Matches the flat items in Sidebar/Navbar: a disabled item stays reachable while it is
-              // the current route, so the user is never stranded on a page they cannot navigate from.
-              disabled={disabled && location.pathname !== url}
-              isActive={location.pathname === url}
-              key={url}
-              url={url!}
-              onClick={onNavigate}
-              {...props}
-            />
-          ))}
+          {items.map((item) =>
+            item.children ? (
+              <NavGroup
+                activeClassName={activeClassName}
+                childClassName={childClassName}
+                className={childClassName}
+                icon={item.icon}
+                items={item.children}
+                key={item.label}
+                label={item.label}
+                onNavigate={onNavigate}
+              />
+            ) : (
+              <NavButton
+                activeClassName={activeClassName}
+                className={childClassName}
+                disabled={item.disabled && location.pathname !== item.url}
+                icon={item.icon}
+                isActive={isItemActive(item, location.pathname, searchParams)}
+                key={`${item.url}${item.search ? `?${new URLSearchParams(item.search).toString()}` : ''}`}
+                label={item.label}
+                search={item.search}
+                url={item.url!}
+                onClick={onNavigate}
+              />
+            )
+          )}
         </div>
       )}
     </div>

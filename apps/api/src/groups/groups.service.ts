@@ -1,15 +1,13 @@
 import { InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { $CreateGroupData, $UpdateGroupData } from '@opendatacapture/schemas/group';
 import type { GroupEmailTemplate } from '@opendatacapture/schemas/group';
 import type { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
-
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
 
 @Injectable()
 export class GroupsService {
@@ -18,7 +16,7 @@ export class GroupsService {
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>
   ) {}
 
-  async create({ name, settings, type, ...data }: CreateGroupDto) {
+  async create({ name, settings, type, ...data }: $CreateGroupData) {
     const exists = await this.groupModel.exists({ name });
     if (exists) {
       throw new ConflictException(`Group with name '${name}' already exists!`);
@@ -84,7 +82,7 @@ export class GroupsService {
       instrumentRepoIds,
       settings,
       ...data
-    }: UpdateGroupDto,
+    }: $UpdateGroupData,
     { ability }: EntityOperationOptions = {}
   ) {
     const where: Prisma.GroupWhereInput = { AND: [accessibleQuery(ability, 'update', 'Group')], id };

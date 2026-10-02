@@ -1,14 +1,12 @@
+import { ApiOperation } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { $InitAppOptions, $UpdateSetupStateData } from '@opendatacapture/schemas/setup';
 import type { SetupState } from '@opendatacapture/schemas/setup';
 
 import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorator';
 
-import { InitAppDto } from './dto/init-app.dto';
-import { UpdateSetupStateDto } from './dto/update-setup-state.dto';
 import { SetupService } from './setup.service';
 
-@ApiTags('Setup')
 @Controller({ path: 'setup' })
 export class SetupController {
   constructor(private readonly setupService: SetupService) {}
@@ -38,8 +36,8 @@ export class SetupController {
   })
   @Post()
   @RouteAccess('public')
-  initApp(@Body() initAppDto: InitAppDto): Promise<{ success: boolean }> {
-    return this.setupService.initApp(initAppDto);
+  initApp(@Body() data: $InitAppOptions): Promise<{ success: boolean }> {
+    return this.setupService.initApp(data);
   }
 
   @ApiOperation({
@@ -48,7 +46,7 @@ export class SetupController {
   })
   @Patch()
   @RouteAccess(ADMIN_ONLY)
-  updateState(@Body() data: UpdateSetupStateDto): Promise<Partial<SetupState>> {
+  updateState(@Body() data: $UpdateSetupStateData): Promise<Partial<SetupState>> {
     return this.setupService.updateState(data);
   }
 }

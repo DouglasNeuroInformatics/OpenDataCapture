@@ -270,11 +270,11 @@ export type MailEncryption = z.infer<typeof $MailEncryption>;
 export type MailErrorCode = z.infer<typeof $MailErrorCode>;
 export type MailSettings = z.infer<typeof $MailSettings>;
 export type MailTemplate = z.infer<typeof $MailTemplate>;
-export type SendAssignmentEmailData = z.infer<typeof $SendAssignmentEmailData>;
-export type TestMailData = z.infer<typeof $TestMailData>;
+export type $SendAssignmentEmailData = z.infer<typeof $SendAssignmentEmailData>;
+export type $TestMailData = z.infer<typeof $TestMailData>;
 export type TestMailResult = z.infer<typeof $TestMailResult>;
 export type UpdateMailConfigData = z.infer<typeof $UpdateMailConfigData>;
-export type UpdateMailSettingsData = z.infer<typeof $UpdateMailSettingsData>;
+export type $UpdateMailSettingsData = z.infer<typeof $UpdateMailSettingsData>;
 
 export {
   $EmailDeliveryResult,

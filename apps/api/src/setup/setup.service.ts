@@ -10,7 +10,12 @@ import {
 import { DEFAULT_ACTIVE_LANGUAGES } from '@opendatacapture/schemas/core';
 import { isMailEnabled } from '@opendatacapture/schemas/mail';
 import { $BrandingConfig } from '@opendatacapture/schemas/setup';
-import type { CreateAdminData, InitAppOptions, SetupState, UpdateSetupStateData } from '@opendatacapture/schemas/setup';
+import type {
+  $InitAppOptions,
+  $UpdateSetupStateData,
+  CreateAdminData,
+  SetupState
+} from '@opendatacapture/schemas/setup';
 
 import type { RuntimePrismaClient } from '@/core/prisma';
 import { DemoService } from '@/demo/demo.service';
@@ -78,7 +83,13 @@ export class SetupService {
     } satisfies SetupState;
   }
 
-  async initApp({ admin, dummySubjectCount, enableExperimentalFeatures, initDemo, recordsPerSubject }: InitAppOptions) {
+  async initApp({
+    admin,
+    dummySubjectCount,
+    enableExperimentalFeatures,
+    initDemo,
+    recordsPerSubject
+  }: $InitAppOptions) {
     const isDev = this.configService.get('NODE_ENV') === 'development';
     const savedOptions = await this.getSavedOptions();
     if (savedOptions?.isSetup && !isDev) {
@@ -99,7 +110,7 @@ export class SetupService {
     return { success: true };
   }
 
-  async updateState({ branding, ...rest }: UpdateSetupStateData): Promise<Partial<SetupState>> {
+  async updateState({ branding, ...rest }: $UpdateSetupStateData): Promise<Partial<SetupState>> {
     const setupState = await this.getSavedOptions();
     if (!setupState?.isSetup) {
       throw new ServiceUnavailableException('Cannot update state before setup');

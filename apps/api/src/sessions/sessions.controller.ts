@@ -1,13 +1,12 @@
-import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import { ApiOperation, CurrentUser } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { $CreateSessionData } from '@opendatacapture/schemas/session';
 import type { SessionWithUser } from '@opendatacapture/schemas/session';
 import type { Session } from '@prisma/client';
 
 import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
-import { CreateSessionDto } from './dto/create-session.dto';
 import { SessionsService } from './sessions.service';
 
 @Controller('sessions')
@@ -17,7 +16,7 @@ export class SessionsController {
   @ApiOperation({ description: 'Create Session' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'Session' })
-  create(@Body() data: CreateSessionDto, @CurrentUser('ability') ability: AppAbility): Promise<Session> {
+  create(@Body() data: $CreateSessionData, @CurrentUser('ability') ability: AppAbility): Promise<Session> {
     return this.sessionsService.create(data, { ability });
   }
 

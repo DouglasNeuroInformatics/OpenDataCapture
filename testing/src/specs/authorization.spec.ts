@@ -1,4 +1,4 @@
-import type { CreateAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { $CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type { Permissions } from '@opendatacapture/schemas/core';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { InstrumentRecord, UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
@@ -304,7 +304,7 @@ function uploadRecord(request: APIRequestContext, token: string, data: UploadIns
 }
 
 /** `POST /assignments` as the holder of the given token, expiring tomorrow, with the raw response. */
-function createAssignment(request: APIRequestContext, token: string, data: Omit<CreateAssignmentData, 'expiresAt'>) {
+function createAssignment(request: APIRequestContext, token: string, data: Omit<$CreateAssignmentData, 'expiresAt'>) {
   return request.post(`${API}/assignments`, {
     data: { ...data, expiresAt: new Date(Date.now() + 86_400_000) },
     headers: { Authorization: `Bearer ${token}` }

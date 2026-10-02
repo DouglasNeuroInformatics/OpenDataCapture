@@ -9,7 +9,7 @@ import type { FormTypes } from '@opendatacapture/runtime-core';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import { $SessionType } from '@opendatacapture/schemas/session';
-import type { CreateSessionData } from '@opendatacapture/schemas/session';
+import type { $CreateSessionData } from '@opendatacapture/schemas/session';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { Sex, SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
@@ -44,7 +44,7 @@ type StartSessionFormProps = {
   currentGroup: Group | null;
   customSubjectIds: string[];
   initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
-  onSubmit: (data: CreateSessionData) => Promisable<void>;
+  onSubmit: (data: $CreateSessionData) => Promisable<void>;
   readOnly: boolean;
   username?: null | string;
 };

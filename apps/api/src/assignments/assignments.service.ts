@@ -5,22 +5,21 @@ import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import { ConfigService, InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { ForbiddenException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { $CreateAssignmentData } from '@opendatacapture/schemas/assignment';
 import type {
+  $BulkAssignmentPreflightData,
+  $CreateBulkAssignmentsData,
+  $UpdateAssignmentData,
   Assignment,
   BulkAssignmentFailure,
   BulkAssignmentIssue,
-  BulkAssignmentPreflightData,
-  BulkAssignmentPreflightResult,
-  CreateBulkAssignmentsData,
-  UpdateAssignmentData
+  BulkAssignmentPreflightResult
 } from '@opendatacapture/schemas/assignment';
 
 import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery, forcedAppSubject } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GatewayService } from '@/gateway/gateway.service';
-
-import { CreateAssignmentDto } from './dto/create-assignment.dto';
 
 /**
  * How many assignments a batch prepares at once. Key generation is CPU-bound, so an unbounded
@@ -65,7 +64,7 @@ export class AssignmentsService {
    * with every issue attached when it is not — a bulk operation is all-or-nothing, so there is no
    * such thing as a partially acceptable request.
    */
-  async bulkPreflight(data: BulkAssignmentPreflightData, currentUser: RequestUser) {
+  async bulkPreflight(data: $BulkAssignmentPreflightData, currentUser: RequestUser) {
     const { subjectIds, timepoints } = await this.resolveBulkRequest(data, currentUser);
     return {
       assignmentCount: subjectIds.length * timepoints.length,
@@ -75,7 +74,7 @@ export class AssignmentsService {
   }
 
   async create(
-    { expiresAt, groupId, instrumentId, subjectId }: CreateAssignmentDto,
+    { expiresAt, groupId, instrumentId, subjectId }: $CreateAssignmentData,
     currentUser: RequestUser
   ): Promise<Assignment> {
     if (groupId) {
@@ -105,7 +104,7 @@ export class AssignmentsService {
    * anything fails — validation, staging, or the gateway — every row staged by this call is deleted
    * and the caller is told what was wrong, leaving the instance exactly as it was.
    */
-  async createBulk(data: CreateBulkAssignmentsData, currentUser: RequestUser): Promise<Assignment[]> {
+  async createBulk(data: $CreateBulkAssignmentsData, currentUser: RequestUser): Promise<Assignment[]> {
     const { groupId, subjectIds, timepoints } = await this.resolveBulkRequest(data, currentUser);
 
     const staged: { assignment: Assignment; publicKey: webcrypto.CryptoKey }[] = [];
@@ -138,13 +137,44 @@ export class AssignmentsService {
     return staged.map(({ assignment }) => assignment);
   }
 
+  async deleteBulk(ids: string[], { ability }: EntityOperationOptions = {}) {
+    const assignments = await this.assignmentModel.findMany({
+      where: {
+        AND: [accessibleQuery(ability, 'delete', 'Assignment')],
+        id: { in: ids },
+        status: { in: ['OUTSTANDING', 'EXPIRED'] }
+      }
+    });
+
+    const deletedIds: string[] = [];
+    const failedIds: string[] = [];
+
+    for (const assignment of assignments) {
+      try {
+        if (assignment.status === 'OUTSTANDING') {
+          await this.gatewayService.deleteRemoteAssignment(assignment.id);
+        }
+        await this.assignmentModel.delete({ where: { id: assignment.id } });
+        deletedIds.push(assignment.id);
+      } catch (err) {
+        this.loggingService.error({
+          error: err,
+          message: `Failed to delete assignment ${assignment.id}`
+        });
+        failedIds.push(assignment.id);
+      }
+    }
+
+    return { deletedCount: deletedIds.length, failedIds };
+  }
+
   async find(
-    { subjectId }: { subjectId?: string } = {},
+    { groupId, subjectId }: { groupId?: string; subjectId?: string } = {},
     { ability }: EntityOperationOptions = {}
   ): Promise<Assignment[]> {
     return this.assignmentModel.findMany({
       where: {
-        AND: [accessibleQuery(ability, 'read', 'Assignment'), { subjectId }]
+        AND: [accessibleQuery(ability, 'read', 'Assignment'), { groupId, subjectId }]
       }
     });
   }
@@ -159,7 +189,7 @@ export class AssignmentsService {
     return assignment;
   }
 
-  async updateById(id: string, data: UpdateAssignmentData, currentUser: RequestUser) {
+  async updateById(id: string, data: $UpdateAssignmentData, currentUser: RequestUser) {
     const where = { AND: [accessibleQuery(currentUser.ability, 'update', 'Assignment')], id };
     if (!(await this.assignmentModel.exists(where))) {
       throw new NotFoundException(`Failed to find assignment with ID: ${id}`);
@@ -173,7 +203,7 @@ export class AssignmentsService {
   }
 
   /** used by the gateway internal system */
-  async updateStatusById(id: string, status: UpdateAssignmentData['status']) {
+  async updateStatusById(id: string, status: $UpdateAssignmentData['status']) {
     return this.assignmentModel.update({
       data: {
         status
@@ -207,7 +237,7 @@ export class AssignmentsService {
    * returns the resolved request when there are none.
    */
   private async resolveBulkRequest(
-    { allowDuplicates, groupId, subjectIds, timepoints }: BulkAssignmentPreflightData,
+    { allowDuplicates, groupId, subjectIds, timepoints }: $BulkAssignmentPreflightData,
     { ability }: RequestUser
   ) {
     // A group the caller cannot read is indistinguishable from one that does not exist.

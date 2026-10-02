@@ -84,7 +84,7 @@ export const $User = $BaseModel.extend({
 export type CreateUserResponse = z.infer<typeof $CreateUserResponse>;
 export const $CreateUserResponse = $User.extend({ welcomeEmail: $EmailDeliveryResult });
 
-export type CreateUserData = z.infer<typeof $CreateUserData>;
+export type $CreateUserData = z.infer<typeof $CreateUserData>;
 export const $CreateUserData = $User
   .pick({
     basePermissionLevel: true,
@@ -108,14 +108,14 @@ export const $CreateUserData = $User
  * `additionalPermissions` is deliberately absent: it is written only through
  * {@link $UpdateUserPermissionsData}, whose route is gated more tightly than a profile update.
  */
-export type UpdateUserData = z.infer<typeof $UpdateUserData>;
+export type $UpdateUserData = z.infer<typeof $UpdateUserData>;
 export const $UpdateUserData = $CreateUserData.partial().extend({
   email: z.email().nullish(),
   phoneNumber: $PhoneNumber.nullish()
 });
 
 /** The complete set of a user's additional permissions; a write replaces what is stored. */
-export type UpdateUserPermissionsData = z.infer<typeof $UpdateUserPermissionsData>;
+export type $UpdateUserPermissionsData = z.infer<typeof $UpdateUserPermissionsData>;
 export const $UpdateUserPermissionsData = z.object({
   permissions: $Permissions.check((ctx) => {
     ctx.value.forEach((permission, index) => {

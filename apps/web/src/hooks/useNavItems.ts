@@ -12,8 +12,10 @@ import {
   MailIcon,
   PackageIcon,
   PaletteIcon,
+  PlusIcon,
   SendIcon,
   ShieldIcon,
+  Trash2Icon,
   UploadIcon,
   UserCogIcon,
   UsersIcon
@@ -30,6 +32,8 @@ export type NavItem = {
   disabled?: boolean;
   icon: React.ComponentType<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
   label: string;
+  /** Search params to append to the URL when navigating. */
+  search?: { [key: string]: string };
   /** The route to navigate to. Omitted for collapsible group headers. */
   url?: string;
 };
@@ -111,9 +115,22 @@ export function useNavItems() {
       ability.can('read', 'Subject')
     ) {
       groupItems.push({
+        children: [
+          {
+            icon: PlusIcon,
+            label: t({ en: 'Create Assignments', es: 'Crear tareas', fr: 'Créer des tâches' }),
+            search: { mode: 'create' },
+            url: '/group/remote-assignments'
+          },
+          {
+            icon: Trash2Icon,
+            label: t({ en: 'Delete Assignments', es: 'Eliminar tareas', fr: 'Supprimer des tâches' }),
+            search: { mode: 'delete' },
+            url: '/group/remote-assignments'
+          }
+        ],
         icon: SendIcon,
-        label: t({ en: 'Remote Assignments', es: 'Tareas remotas', fr: 'Tâches à distance' }),
-        url: '/group/remote-assignments'
+        label: t({ en: 'Remote Assignments', es: 'Tareas remotas', fr: 'Tâches à distance' })
       });
     }
     if (groupItems.length > 0) {

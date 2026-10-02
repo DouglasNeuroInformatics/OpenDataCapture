@@ -353,6 +353,49 @@ describe('AssignmentsService', () => {
     });
   });
 
+  describe('deleteBulk', () => {
+    it('should delete outstanding assignments from the gateway and then from the database', async () => {
+      assignmentModel.findMany.mockResolvedValueOnce([
+        { id: 'a-1', status: 'OUTSTANDING' },
+        { id: 'a-2', status: 'OUTSTANDING' }
+      ]);
+      assignmentModel.delete.mockResolvedValue({});
+      const result = await assignmentsService.deleteBulk(['a-1', 'a-2'], { ability: permissiveUser().ability });
+      expect(result).toEqual({ deletedCount: 2, failedIds: [] });
+      expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledTimes(2);
+      expect(assignmentModel.delete).toHaveBeenCalledTimes(2);
+    });
+
+    it('should skip the gateway call for expired assignments, since their links are already dead', async () => {
+      assignmentModel.findMany.mockResolvedValueOnce([{ id: 'a-1', status: 'EXPIRED' }]);
+      assignmentModel.delete.mockResolvedValue({});
+      const result = await assignmentsService.deleteBulk(['a-1'], { ability: permissiveUser().ability });
+      expect(result).toEqual({ deletedCount: 1, failedIds: [] });
+      expect(gatewayService.deleteRemoteAssignment).not.toHaveBeenCalled();
+      expect(assignmentModel.delete).toHaveBeenCalledTimes(1);
+    });
+
+    it('should report a failed assignment without stopping the rest of the batch', async () => {
+      assignmentModel.findMany.mockResolvedValueOnce([
+        { id: 'a-1', status: 'OUTSTANDING' },
+        { id: 'a-2', status: 'OUTSTANDING' }
+      ]);
+      gatewayService.deleteRemoteAssignment.mockRejectedValueOnce(new Error('gateway down'));
+      assignmentModel.delete.mockResolvedValue({});
+      const result = await assignmentsService.deleteBulk(['a-1', 'a-2'], { ability: permissiveUser().ability });
+      expect(result.deletedCount).toBe(1);
+      expect(result.failedIds).toEqual(['a-1']);
+    });
+
+    it('should only find assignments with OUTSTANDING or EXPIRED status', async () => {
+      assignmentModel.findMany.mockResolvedValueOnce([]);
+      await assignmentsService.deleteBulk(['a-1'], { ability: permissiveUser().ability });
+      expect(assignmentModel.findMany.mock.lastCall?.[0]).toMatchObject({
+        where: { id: { in: ['a-1'] }, status: { in: ['OUTSTANDING', 'EXPIRED'] } }
+      });
+    });
+  });
+
   describe('updateById', () => {
     it('should refuse an assignment the caller cannot update before deleting it on the gateway, which cannot be undone', async () => {
       assignmentModel.exists.mockResolvedValueOnce(false);

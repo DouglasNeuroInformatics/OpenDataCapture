@@ -20,7 +20,7 @@ drives it. `libnest.config.ts` is the real entry configuration.
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | `@nestjs/config`                  | libnest `ConfigService`, typed from `$Env` — `.get(key)` is fully inferred                                  |
 | a `PrismaService` you write       | `@InjectModel('Group') private readonly groupModel: Model<'Group'>`                                         |
-| `class-validator` DTOs            | Zod, via `@ValidationSchema($Schema)` and a global `ValidationPipe`                                         |
+| `class-validator` DTOs            | Zod, via a schema-typed `@Body()` parameter and a global `ValidationPipe`                                   |
 | you register global pipes/filters | `AppFactory` registers the exception filter, validation pipe, throttler, config, crypto and logging modules |
 
 `libnest.config.ts` also carries the `declare module` augmentation that types `ConfigService`,
@@ -39,7 +39,6 @@ src/<feature>/
   <feature>.module.ts       @Module({ controllers, exports: [Service], providers: [Service] })
   <feature>.controller.ts   @Controller(path); @RouteAccess on every handler
   <feature>.service.ts      @Injectable; @InjectModel(...) per model
-  dto/create-<x>.dto.ts     @ValidationSchema($CreateXData) class CreateXDto implements CreateXData
   __tests__/<feature>.service.spec.ts
 ```
 
@@ -142,14 +141,17 @@ Background: `.agents/docs/architecture/auth-and-permissions.md`.
 
 ## Validation
 
-The global `ValidationPipe` runs on **request bodies only**. Two patterns, both in use:
+The global `ValidationPipe` runs on **request bodies only**. A body is typed as its schema:
+`@Body() data: $CreateGroupData`, where `packages/schemas` exports the schema as a type and a const
+under the same name. **It must be imported as a value.** `import type` erases the runtime binding
+and the pipe throws when the route is called.
 
-- **DTO class** (dominant): `@ValidationSchema($CreateGroupData)` on a class that also
-  `implements CreateGroupData`. The decorator supplies both validation and Swagger metadata; the
-  `implements` is what stops the class drifting from the schema. Both are required.
-- **Schema as the parameter type**: `@Body() data: $CreateSeriesInstrumentData`, where the schema is
-  exported as a type and a const under the same name. **It must be imported as a value.**
-  `import type` erases the runtime binding and the pipe throws when the route is called.
+That one identifier is also the API reference. libnest generates `/spec.json` from the Zod schema in
+each parameter's decorator metadata, so a body typed as anything else — a class, an interface — is
+documented as an empty schema. libnest's `@ValidationSchema` DTO classes still validate but are
+deprecated for exactly that reason; `test/suites/01-boot.suite.ts` fails on any undocumented body.
+`ApiOperation` comes from libnest, not `@nestjs/swagger` (which this app does not depend on), and an
+operation's tag is its controller's class name minus `Controller`.
 
 **Params and query strings are not validated automatically.** Use `new ParseSchemaPipe({ schema })`
 or `ValidObjectIdPipe` explicitly — see `src/audit/audit.controller.ts` and
@@ -236,8 +238,7 @@ per file. Three consequences worth knowing:
 - **`__RELEASE__` must be stubbed.** `libnest build` replaces it with a literal, so under vitest the
   identifier is undefined and any route reading it (`GET /v1/setup`) throws a `ReferenceError`.
   `test/helpers.ts` stubs it once for every suite; a unit spec touching that path stubs its own.
-- **The OpenAPI document is built before `enableVersioning`**, so paths in `/spec.json` carry no
-  `/v1` prefix even though the live routes do.
+- **Paths in `/spec.json` carry the `/v1` prefix**, exactly as the live routes do.
 - **`GatewaySynchronizer` owns a timer for the lifetime of the suite.** It schedules each pass with
   `setTimeout` only once the previous pass has finished, stores the handle, and clears it in
   `onApplicationShutdown`, where it also awaits the in-flight pass — so `app.close()` leaves nothing

@@ -2,7 +2,7 @@ import { InjectModel, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import type { Group } from '@opendatacapture/schemas/group';
-import type { CreateSessionData } from '@opendatacapture/schemas/session';
+import type { $CreateSessionData } from '@opendatacapture/schemas/session';
 import type { Prisma, Session } from '@prisma/client';
 import { ObjectId } from 'mongodb';
 
@@ -12,9 +12,9 @@ import { GroupsService } from '@/groups/groups.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 
-/** The batched form of `CreateSessionData`: what varies per session, and what the batch shares. */
-type CreateManySessionsData = Pick<CreateSessionData, 'groupId' | 'type' | 'username'> & {
-  entries: Pick<CreateSessionData, 'date' | 'subjectData'>[];
+/** The batched form of `$CreateSessionData`: what varies per session, and what the batch shares. */
+type CreateManySessionsData = Pick<$CreateSessionData, 'groupId' | 'type' | 'username'> & {
+  entries: Pick<$CreateSessionData, 'date' | 'subjectData'>[];
 };
 
 @Injectable()
@@ -34,7 +34,7 @@ export class SessionsService {
   }
 
   async create(
-    { date, groupId, subjectData, type, username }: CreateSessionData,
+    { date, groupId, subjectData, type, username }: $CreateSessionData,
     options?: EntityOperationOptions
   ): Promise<Session> {
     const [session] = await this.createMany(

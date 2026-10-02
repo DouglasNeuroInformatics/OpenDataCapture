@@ -10,7 +10,7 @@ import {
   NotFoundException
 } from '@nestjs/common';
 import type { Permissions } from '@opendatacapture/schemas/core';
-import { $SelfUpdateUserData } from '@opendatacapture/schemas/user';
+import { $CreateUserData, $SelfUpdateUserData, $UpdateUserData } from '@opendatacapture/schemas/user';
 import type { PasswordErrorCode } from '@opendatacapture/schemas/user';
 import { pwnedPassword } from 'hibp';
 
@@ -18,10 +18,6 @@ import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
-
-import { CreateUserDto } from './dto/create-user.dto';
-
-import type { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -91,7 +87,7 @@ export class UsersService {
       phoneNumber,
       sex,
       username
-    }: CreateUserDto,
+    }: $CreateUserData,
     options?: EntityOperationOptions
   ) {
     if (await this.userModel.exists({ username })) {
@@ -205,7 +201,7 @@ export class UsersService {
     return user;
   }
 
-  async updateById(id: string, { groupIds, password, ...data }: UpdateUserDto, currentUser: RequestUser) {
+  async updateById(id: string, { groupIds, password, ...data }: $UpdateUserData, currentUser: RequestUser) {
     const { ability } = currentUser;
     const isDemotion = data.basePermissionLevel !== undefined && data.basePermissionLevel !== 'ADMIN';
     // Only an administrator reaches this route, so the last one to do this to themselves would leave

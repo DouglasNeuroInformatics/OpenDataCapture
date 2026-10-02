@@ -31,6 +31,9 @@ export const gatewayRefreshInterval = requiredNumber('GATEWAY_REFRESH_INTERVAL')
 // Tests run against the web origin; vite proxies `/api` through to the API server.
 export const baseURL = `http://localhost:${webPort}`;
 
+// The API reference is served from the root of the API itself, which the web proxy does not reach.
+export const apiURL = `http://localhost:${apiPort}`;
+
 // The patient-facing gateway is its own origin; assignment links point here.
 export const gatewayURL = `http://localhost:${gatewayPort}`;
 
