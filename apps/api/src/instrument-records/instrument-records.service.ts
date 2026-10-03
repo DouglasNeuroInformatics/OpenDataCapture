@@ -3,7 +3,7 @@ import { join } from 'path';
 import { Worker } from 'worker_threads';
 
 import { replacer, reviver } from '@douglasneuroinformatics/libjs';
-import { InjectModel } from '@douglasneuroinformatics/libnest';
+import { InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import {
@@ -29,6 +29,7 @@ import { isNumber, mergeWith, pickBy } from 'lodash-es';
 
 import { accessibleQuery, forcedAppSubject } from '@/auth/ability.utils';
 import type { AppAbility } from '@/auth/auth.types';
+import type { RuntimePrismaClient } from '@/core/prisma';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
@@ -51,6 +52,8 @@ import type {
 @Injectable()
 export class InstrumentRecordsService {
   constructor(
+    @InjectPrismaClient() private readonly prismaClient: RuntimePrismaClient,
+    private readonly loggingService: LoggingService,
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
     @InjectModel('Session') private readonly sessionModel: Model<'Session'>,
     private readonly groupsService: GroupsService,
@@ -163,13 +166,31 @@ export class InstrumentRecordsService {
   }
 
   async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
-    const isExisting = await this.instrumentRecordModel.exists({ id });
-    if (!isExisting) {
+    const where = { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], id };
+    const record = await this.instrumentRecordModel.findFirst({ where });
+    if (!record) {
       throw new NotFoundException(`Could not find record with ID '${id}'`);
     }
-    return this.instrumentRecordModel.delete({
-      where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], id }
-    });
+    const files = await this.prismaClient.instrumentRecordFile.findMany({ where: { recordId: record.id } });
+    const [, deletedRecord] = await this.prismaClient.$transaction([
+      this.prismaClient.instrumentRecordFile.deleteMany({ where: { id: { in: files.map((file) => file.id) } } }),
+      this.prismaClient.instrumentRecord.delete({ where })
+    ]);
+    const storageFiles = files.map(({ basename, groupId, index, recordId }) => ({
+      groupId,
+      location: { basename, index },
+      recordId
+    }));
+    try {
+      await this.storageService.deleteObjects(storageFiles);
+    } catch (error) {
+      this.loggingService.error({
+        error,
+        files: storageFiles,
+        message: `Failed to delete storage objects after deleting record '${id}'; orphaned objects require cleanup`
+      });
+    }
+    return deletedRecord;
   }
 
   async exists(where: Prisma.InstrumentRecordWhereInput): Promise<boolean> {
