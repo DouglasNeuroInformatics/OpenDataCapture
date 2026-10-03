@@ -14,6 +14,11 @@
     "es": "Administrador",
     "fr": "Administrateur"
   },
+  "archive": {
+    "en": "Archive",
+    "es": "Archivar",
+    "fr": "Archiver"
+  },
   "assignment": {
     "en": "Assignment",
     "es": "Asignación",
@@ -301,6 +306,11 @@
     "en": "Time Collected",
     "es": "Hora de recopilación",
     "fr": "Horodatage"
+  },
+  "unarchive": {
+    "en": "Unarchive",
+    "es": "Desarchivar",
+    "fr": "Désarchiver"
   },
   "update": {
     "en": "Update",

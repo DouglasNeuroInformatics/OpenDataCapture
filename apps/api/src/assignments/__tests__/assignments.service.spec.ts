@@ -76,6 +76,7 @@ describe('AssignmentsService', () => {
   let assignmentsService: AssignmentsService;
   let assignmentModel: MockedInstance<Model<'Assignment'>>;
   let groupModel: MockedInstance<Model<'Group'>>;
+  let instrumentModel: MockedInstance<Model<'Instrument'>>;
   let subjectModel: MockedInstance<Model<'Subject'>>;
   let auditLogger: MockedInstance<AuditLogger>;
   let gatewayService: MockedInstance<GatewayService>;
@@ -86,6 +87,7 @@ describe('AssignmentsService', () => {
         AssignmentsService,
         MockFactory.createForModelToken(getModelToken('Assignment')),
         MockFactory.createForModelToken(getModelToken('Group')),
+        MockFactory.createForModelToken(getModelToken('Instrument')),
         MockFactory.createForModelToken(getModelToken('Subject')),
         { provide: AuditLogger, useValue: { log: vi.fn() } },
         { provide: ConfigService, useValue: { get: () => 3500, getOrThrow: () => ({ origin: 'https://x' }) } },
@@ -103,6 +105,7 @@ describe('AssignmentsService', () => {
 
     assignmentModel = moduleRef.get(getModelToken('Assignment'));
     groupModel = moduleRef.get(getModelToken('Group'));
+    instrumentModel = moduleRef.get(getModelToken('Instrument'));
     subjectModel = moduleRef.get(getModelToken('Subject'));
     auditLogger = moduleRef.get(AuditLogger);
     gatewayService = moduleRef.get(GatewayService);
@@ -111,6 +114,7 @@ describe('AssignmentsService', () => {
     groupModel.findFirst.mockResolvedValue({ accessibleInstrumentIds: ['instrument-1', 'instrument-2'], id: GROUP_ID });
     subjectModel.findMany.mockResolvedValue([{ id: 'subject-1' }, { id: 'subject-2' }]);
     assignmentModel.findMany.mockResolvedValue([]);
+    instrumentModel.findMany.mockResolvedValue([]);
     assignmentModel.create.mockImplementation(({ data }: any) =>
       Promise.resolve({ ...data, instrumentId: 'instrument-1' })
     );
@@ -153,6 +157,14 @@ describe('AssignmentsService', () => {
         )
       );
       expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-other'], kind: 'INSTRUMENT_UNAVAILABLE' });
+    });
+
+    // An archived series stays on the group's opt-in list so unarchiving restores it, so that list
+    // alone would still admit it.
+    it('should refuse an archived series the group has opted into, since archiving retires it from new assignments', async () => {
+      instrumentModel.findMany.mockResolvedValueOnce([{ id: 'instrument-1' }]);
+      const failure = await failureOf(assignmentsService.bulkPreflight(request(), permissiveUser()));
+      expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-1'], kind: 'INSTRUMENT_UNAVAILABLE' });
     });
 
     it('should restrict subjects to the selected group and the caller ability', async () => {
@@ -267,6 +279,13 @@ describe('AssignmentsService', () => {
     it('should allow an administrator an ungrouped assignment, which the web client sends when no group is selected', async () => {
       await assignmentsService.create({ ...data(), groupId: undefined }, userAt('ADMIN'));
       expect(gatewayService.createRemoteAssignment).toHaveBeenCalledTimes(1);
+    });
+
+    it('should refuse an administrator an ungrouped assignment of an archived series, which skips the group checks', async () => {
+      instrumentModel.findMany.mockResolvedValueOnce([{ id: 'instrument-1' }]);
+      const failure = await failureOf(assignmentsService.create({ ...data(), groupId: undefined }, userAt('ADMIN')));
+      expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-1'], kind: 'INSTRUMENT_UNAVAILABLE' });
+      expect(assignmentModel.create).not.toHaveBeenCalled();
     });
 
     it('should file a grouped assignment under the group it names, so that group can find and cancel it', async () => {

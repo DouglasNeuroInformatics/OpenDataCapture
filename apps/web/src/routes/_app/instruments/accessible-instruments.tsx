@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useAppStore } from '@/store';
+import { selectAdministrableInstruments } from '@/utils/administrable-instruments';
 
 const RouteComponent = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
@@ -31,11 +32,7 @@ const RouteComponent = () => {
       <WithFallback
         Component={InstrumentShowcase}
         props={{
-          data: currentGroup
-            ? instrumentInfoQuery.data?.filter((instrument) => {
-                return currentGroup.accessibleInstrumentIds.includes(instrument.id);
-              })
-            : instrumentInfoQuery.data,
+          data: instrumentInfoQuery.data && selectAdministrableInstruments(instrumentInfoQuery.data, currentGroup),
           onSelect: (instrument) => {
             void navigate({
               params: { id: instrument.id },

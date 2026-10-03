@@ -8,7 +8,9 @@ import { bundle } from '@opendatacapture/instrument-bundler';
 import type { SeriesInstrument } from '@opendatacapture/runtime-core';
 import type { WithID } from '@opendatacapture/schemas/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 
@@ -65,6 +67,7 @@ describe('InstrumentsService', () => {
   let instrumentModel: MockedInstance<Model<'Instrument'>>;
   let instrumentRecordModel: MockedInstance<Model<'InstrumentRecord'>>;
   let groupModel: MockedInstance<Model<'Group'>>;
+  let auditLogger: MockedInstance<AuditLogger>;
   let virtualizationService: MockedInstance<VirtualizationService<any>>;
   /** The same Map the service memoizes evaluated instances into — see the context assignment below. */
   let instanceCache: InstrumentVirtualizationContext['instruments'];
@@ -79,6 +82,7 @@ describe('InstrumentsService', () => {
         MockFactory.createForModelToken(getModelToken('Group')),
         MockFactory.createForModelToken(getModelToken('Instrument')),
         MockFactory.createForModelToken(getModelToken('InstrumentRecord')),
+        MockFactory.createForService(AuditLogger),
         MockFactory.createForService(CryptoService),
         MockFactory.createForService(LoggingService),
         MockFactory.createForService(VirtualizationService)
@@ -91,6 +95,7 @@ describe('InstrumentsService', () => {
     instrumentModel = moduleRef.get(getModelToken('Instrument'));
     instrumentRecordModel = moduleRef.get(getModelToken('InstrumentRecord'));
     groupModel = moduleRef.get(getModelToken('Group'));
+    auditLogger = moduleRef.get(AuditLogger);
     // Two lookups hit this: the caller's permission check on the target group, and the item-access
     // check in `validateSeriesInstrument`. The empty arrays mean "no repos assigned, nothing accessible
     // yet", so by default only non-repo instruments may be assembled into a series.
@@ -717,7 +722,14 @@ describe('InstrumentsService', () => {
       const result = await instrumentsService.findInfo();
 
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
-        select: { createdAt: true, id: true, seriesGroupId: true, sourceRepoId: true, sourceRepoName: true },
+        select: {
+          archivedAt: true,
+          createdAt: true,
+          id: true,
+          seriesGroupId: true,
+          sourceRepoId: true,
+          sourceRepoName: true
+        },
         where: { id: { in: ['owned', 'shared'] } }
       });
       expect(result).toMatchObject([
@@ -751,6 +763,26 @@ describe('InstrumentsService', () => {
       expect(result).toMatchObject([{ createdAt, id: 'id-2' }]);
     });
 
+    // Pickers drop an archived series, so it must reach them; records collected with it still need its info.
+    it('should report when each series was archived, and null for one still active', async () => {
+      const archivedAt = new Date('2024-06-01T00:00:00.000Z');
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([
+        { ...existingSeries, content: { items: [] }, id: 'archived' },
+        { ...existingSeries, content: { items: [] }, id: 'active' }
+      ]);
+      instrumentModel.findMany.mockResolvedValue([
+        { archivedAt, id: 'archived', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null },
+        { archivedAt: null, id: 'active', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
+      ]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(result).toMatchObject([
+        { archivedAt, id: 'archived' },
+        { archivedAt: null, id: 'active' }
+      ]);
+    });
+
     // The stored record is read separately from the evaluated instance, so an id present in one and
     // absent from the other must leave the date empty rather than invent one.
     it('should report a null creation date for a series with no stored record', async () => {
@@ -762,6 +794,149 @@ describe('InstrumentsService', () => {
       const result = await instrumentsService.findInfo();
 
       expect(result).toMatchObject([{ createdAt: null, id: 'series-1' }]);
+    });
+  });
+
+  describe('findSeriesOverview', () => {
+    const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+    let find: MockInstance<InstrumentsService['find']>;
+
+    beforeEach(() => {
+      find = vi.spyOn(instrumentsService, 'find').mockResolvedValue([
+        { ...existingSeries, content: { items: [] }, id: 'owned' },
+        { ...existingSeries, content: { items: [] }, id: 'shared' }
+      ]);
+      instrumentModel.findMany.mockResolvedValue([
+        { id: 'owned', seriesGroupId: 'group-1', sourceRepoId: null, sourceRepoName: null },
+        { id: 'shared', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
+      ]);
+      groupModel.findMany.mockResolvedValue([{ id: 'group-1', name: 'Depression Clinic' }]);
+    });
+
+    it('should list every group series rather than the caller groups, since an administrator belongs to none', async () => {
+      await instrumentsService.findSeriesOverview({ ability });
+      expect(find).toHaveBeenCalledWith({ kind: 'SERIES' }, { ability }, undefined);
+    });
+
+    it('should name the owning group of each series, and none for a series shared by every group', async () => {
+      const result = await instrumentsService.findSeriesOverview({ ability });
+      expect(result).toMatchObject([
+        { id: 'owned', seriesGroup: { id: 'group-1', name: 'Depression Clinic' } },
+        { id: 'shared', seriesGroup: null }
+      ]);
+    });
+
+    it('should look up only the owning groups, within what the caller may read', async () => {
+      await instrumentsService.findSeriesOverview({ ability });
+      expect(groupModel.findMany).toHaveBeenCalledWith({
+        select: { id: true, name: true },
+        where: { AND: [accessibleQuery(ability, 'read', 'Group')], id: { in: ['group-1'] } }
+      });
+    });
+  });
+
+  describe('findBundleById', () => {
+    const ownedSeriesFilter = (groupIds: string[]) => ({
+      OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }, { seriesGroupId: { in: groupIds } }]
+    });
+
+    beforeEach(() => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'form' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { internal: { edition: 1, name: 'FORM_A' }, kind: 'FORM' }
+      } as any);
+    });
+
+    it('should not narrow an administrator to their groups, so they can preview a series any group owns', async () => {
+      const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+      await instrumentsService.findBundleById('form', { ability, groups: [] } as any);
+      expect(instrumentModel.findFirst.mock.lastCall?.[0]).toMatchObject({
+        where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), {}] }
+      });
+    });
+
+    it('should still narrow anyone else to the series their own groups own', async () => {
+      const ability = createAppAbility([{ action: 'read', subject: 'Instrument' }]);
+      await instrumentsService.findBundleById('form', { ability, groups: [{ id: 'group-1' }] } as any);
+      expect(instrumentModel.findFirst.mock.lastCall?.[0]).toMatchObject({
+        where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), ownedSeriesFilter(['group-1'])] }
+      });
+    });
+  });
+
+  describe('updateSeriesArchive', () => {
+    const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+    const currentUser = { ability, id: 'admin-1' } as any;
+
+    const storeSeries = (stored: { archivedAt: Date | null; seriesGroupId: null | string }) => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'target', ...stored });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { ...existingSeries, id: 'target' }
+      } as any);
+      instrumentModel.update.mockImplementation(({ data }: any) => Promise.resolve({ id: 'target', ...data }));
+    };
+
+    it('should look the series up within what the caller may update', async () => {
+      instrumentModel.findFirst.mockResolvedValue(null);
+      await expect(instrumentsService.updateSeriesArchive('target', { isArchived: true }, currentUser)).rejects.toThrow(
+        NotFoundException
+      );
+      expect(instrumentModel.findFirst).toHaveBeenCalledWith({
+        where: { AND: [accessibleQuery(ability, 'update', 'Instrument')], id: 'target' }
+      });
+    });
+
+    it('should refuse a scalar instrument, since only series can be archived', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'scalar' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { internal: { edition: 1, name: 'FORM_A' }, kind: 'FORM' }
+      } as any);
+
+      await expect(instrumentsService.updateSeriesArchive('scalar', { isArchived: true }, currentUser)).rejects.toThrow(
+        ForbiddenException
+      );
+      expect(instrumentModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should stamp when an active series was archived and audit it under its owning group', async () => {
+      storeSeries({ archivedAt: null, seriesGroupId: 'group-1' });
+
+      const result = await instrumentsService.updateSeriesArchive('target', { isArchived: true }, currentUser);
+
+      expect(result.archivedAt).toBeInstanceOf(Date);
+      expect(auditLogger.log).toHaveBeenCalledWith('ARCHIVE', 'INSTRUMENT', {
+        groupId: 'group-1',
+        metadata: { instrumentId: 'target', title: 'Existing Series' },
+        userId: 'admin-1'
+      });
+    });
+
+    it('should clear the archive date when unarchiving, and audit a shared series under no group', async () => {
+      storeSeries({ archivedAt: new Date('2024-06-01T00:00:00.000Z'), seriesGroupId: null });
+
+      const result = await instrumentsService.updateSeriesArchive('target', { isArchived: false }, currentUser);
+
+      expect(instrumentModel.update).toHaveBeenCalledWith({ data: { archivedAt: null }, where: { id: 'target' } });
+      expect(result.archivedAt).toBeNull();
+      expect(auditLogger.log).toHaveBeenCalledWith(
+        'UNARCHIVE',
+        'INSTRUMENT',
+        expect.objectContaining({ groupId: null })
+      );
+    });
+
+    it('should keep the original archive date when archiving again, so the date records when it was retired', async () => {
+      const archivedAt = new Date('2024-06-01T00:00:00.000Z');
+      storeSeries({ archivedAt, seriesGroupId: 'group-1' });
+
+      const result = await instrumentsService.updateSeriesArchive('target', { isArchived: true }, currentUser);
+
+      expect(result.archivedAt).toBe(archivedAt);
+      expect(instrumentModel.update).not.toHaveBeenCalled();
+      expect(auditLogger.log).not.toHaveBeenCalled();
     });
   });
 
