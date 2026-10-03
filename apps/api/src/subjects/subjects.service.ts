@@ -1,4 +1,4 @@
-import { InjectModel, InjectPrismaClient } from '@douglasneuroinformatics/libnest';
+import { InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
@@ -10,6 +10,7 @@ import { accessibleQuery } from '@/auth/ability.utils';
 import type { AppAbility } from '@/auth/auth.types';
 import type { RuntimePrismaClient } from '@/core/prisma';
 import type { EntityOperationOptions } from '@/core/types';
+import { StorageService } from '@/storage/storage.service';
 
 const PERSONAL_INFO_FIELDS = ['dateOfBirth', 'firstName', 'lastName', 'sex'] as const;
 
@@ -31,7 +32,9 @@ const IDENTIFIED_BY_CUSTOM_ID: Prisma.SubjectWhereInput = {
 export class SubjectsService {
   constructor(
     @InjectPrismaClient() private readonly prismaClient: RuntimePrismaClient,
-    @InjectModel('Subject') private readonly subjectModel: Model<'Subject'>
+    @InjectModel('Subject') private readonly subjectModel: Model<'Subject'>,
+    private readonly loggingService: LoggingService,
+    private readonly storageService: StorageService
   ) {}
 
   /**
@@ -122,34 +125,48 @@ export class SubjectsService {
   }
 
   async deleteById(id: string, { ability, force }: EntityOperationOptions & { force?: boolean } = {}) {
-    const subject = await this.findById(id);
+    const where = { AND: [accessibleQuery(ability, 'delete', 'Subject')], id };
+    const subject = await this.subjectModel.findFirst({ where });
+    if (!subject) {
+      throw new NotFoundException(`Failed to find subject with id: ${id}`);
+    }
     if (!force) {
-      await this.subjectModel.delete({
-        where: { AND: [accessibleQuery(ability, 'delete', 'Subject')], id: subject.id }
-      });
+      await this.subjectModel.delete({ where });
       return { success: true };
     }
+    const recordWhere = { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], subjectId: subject.id };
+    const records = await this.prismaClient.instrumentRecord.findMany({
+      select: { id: true },
+      where: recordWhere
+    });
+    const recordIds = records.map((record) => record.id);
+    const files = await this.prismaClient.instrumentRecordFile.findMany({
+      where: { recordId: { in: recordIds } }
+    });
     await this.prismaClient.$transaction([
+      this.prismaClient.instrumentRecordFile.deleteMany({ where: { id: { in: files.map((file) => file.id) } } }),
       this.prismaClient.instrumentRecord.deleteMany({
-        where: {
-          subject: {
-            id: subject.id
-          }
-        }
+        where: { ...recordWhere, id: { in: recordIds } }
       }),
       this.prismaClient.session.deleteMany({
-        where: {
-          subject: {
-            id: subject.id
-          }
-        }
+        where: { AND: [accessibleQuery(ability, 'delete', 'Session')], subjectId: subject.id }
       }),
-      this.prismaClient.subject.deleteMany({
-        where: {
-          id: subject.id
-        }
-      })
+      this.prismaClient.subject.delete({ where })
     ]);
+    const storageFiles = files.map(({ basename, groupId, index, recordId }) => ({
+      groupId,
+      location: { basename, index },
+      recordId
+    }));
+    try {
+      await this.storageService.deleteObjects(storageFiles);
+    } catch (error) {
+      this.loggingService.error({
+        error,
+        files: storageFiles,
+        message: `Failed to delete storage objects after deleting subject '${id}'; orphaned objects require cleanup`
+      });
+    }
     return { success: true };
   }
 
