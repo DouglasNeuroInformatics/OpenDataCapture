@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, Checkbox, DataTable, FileDropzone, Tabs, TextArea } from '@douglasneuroinformatics/libui/components';
-import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { cn } from '@douglasneuroinformatics/libui/utils';
 import { BULK_ASSIGNMENT_MAX_SUBJECTS } from '@opendatacapture/schemas/assignment';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import { ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from 'lucide-react';
 
+import { SortableHeader } from '@/components/SortableHeader';
 import {
   ACCEPTED_FILE_EXTENSIONS,
   assertFileSize,
@@ -32,25 +30,6 @@ type PickerRow = {
   id: string;
   sex: string;
   subject: string;
-};
-
-/**
- * A clickable column label. `DataTableHead` renders whatever the column supplies, so the sort
- * affordance lives here rather than coming from the table.
- */
-const SortableHeader = ({ column, label }: { column: TanstackTable.Column<PickerRow>; label: string }) => {
-  const sorted = column.getIsSorted();
-  const Icon = sorted === 'asc' ? ChevronUpIcon : sorted === 'desc' ? ChevronDownIcon : ChevronsUpDownIcon;
-  return (
-    <button
-      className="hover:text-foreground flex items-center gap-1 transition-colors"
-      type="button"
-      onClick={() => column.toggleSorting()}
-    >
-      {label}
-      <Icon className={cn('h-3.5 w-3.5', !sorted && 'opacity-40')} />
-    </button>
-  );
 };
 
 type SourceStepProps = {

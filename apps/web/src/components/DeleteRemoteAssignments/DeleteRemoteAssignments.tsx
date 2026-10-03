@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, Card, Checkbox, DataTable, Dialog } from '@douglasneuroinformatics/libui/components';
-import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { cn } from '@douglasneuroinformatics/libui/utils';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import { ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon, CircleAlertIcon, CircleDotIcon } from 'lucide-react';
+import { CircleAlertIcon, CircleDotIcon } from 'lucide-react';
 
+import { SortableHeader } from '@/components/SortableHeader';
 import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useDeleteBulkAssignmentsMutation } from '@/hooks/useDeleteBulkAssignmentsMutation';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
@@ -21,21 +20,6 @@ type AssignmentRow = {
   instrument: string;
   status: 'EXPIRED' | 'OUTSTANDING';
   subject: string;
-};
-
-const SortableHeader = ({ column, label }: { column: TanstackTable.Column<AssignmentRow>; label: string }) => {
-  const sorted = column.getIsSorted();
-  const Icon = sorted === 'asc' ? ChevronUpIcon : sorted === 'desc' ? ChevronDownIcon : ChevronsUpDownIcon;
-  return (
-    <button
-      className="hover:text-foreground flex items-center gap-1 transition-colors"
-      type="button"
-      onClick={() => column.toggleSorting()}
-    >
-      {label}
-      <Icon className={cn('h-3.5 w-3.5', !sorted && 'opacity-40')} />
-    </button>
-  );
 };
 
 const StatusCell = ({ status }: { status: 'EXPIRED' | 'OUTSTANDING' }) => {
