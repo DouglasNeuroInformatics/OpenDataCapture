@@ -94,6 +94,13 @@ export class InstrumentRecordsController {
     return this.instrumentRecordsService.linearModel({ groupId, instrumentId }, { ability });
   }
 
+  @ApiOperation({ description: 'Per-subject record counts', summary: 'Summarize Records By Subject' })
+  @Get('summary/by-subject')
+  @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
+  summarizeBySubject(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string) {
+    return this.instrumentRecordsService.summarizeBySubject({ groupId }, { ability });
+  }
+
   @ApiOperation({ summary: 'Update Instrument Record' })
   @Patch(':id')
   @RouteAccess({ action: 'update', subject: 'InstrumentRecord' })
