@@ -122,7 +122,12 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
 /** Sidebar destinations a GROUP_MANAGER gets but a STANDARD user must not. */
 // `/group/email-templates` is deliberately absent: its nav item only renders when mail is
 // enabled instance-wide, which it is not for this suite. `mail.spec.ts` covers it there.
-const GROUP_MANAGER_ONLY_ROUTES = ['/dashboard', '/datahub', '/group/manage', '/session/remote-assignment'] as const;
+const GROUP_MANAGER_ONLY_ROUTES = [
+  '/dashboard',
+  '/datahub/subjects',
+  '/group/manage',
+  '/session/remote-assignment'
+] as const;
 
 /** Sidebar destinations behind `can('manage', 'all')`, gated to ADMIN alone. */
 const ADMIN_ONLY_ROUTES = [
@@ -145,6 +150,8 @@ test.describe('authorization', () => {
     // Bulk remote assignments is enabled by default, which nests group links under a collapsible
     // "Group Actions" menu — expand it so the child nav buttons become visible.
     await dashboardPage.expandNavGroup('Group Actions');
+    // The datahub is likewise a collapsible group, over its subject and instrument views.
+    await dashboardPage.expandNavGroup('Data Hub');
     for (const route of GROUP_MANAGER_ONLY_ROUTES) {
       await expect(page.getByTestId(`nav-button-${route}`)).toBeVisible();
     }
@@ -239,7 +246,7 @@ test.describe('authorization', () => {
     });
   });
 
-  // The populated case -- a group manager reaching /datahub/$subjectId/table and picking an
+  // The populated case -- a group manager reaching /datahub/subjects/$subjectId/table and picking an
   // instrument from the list -- is covered end to end by `instrument-completion.spec.ts`, which
   // administers one first so the list has something in it. This case only pins the contract for a
   // subject with no visible records: an empty list, not an error.

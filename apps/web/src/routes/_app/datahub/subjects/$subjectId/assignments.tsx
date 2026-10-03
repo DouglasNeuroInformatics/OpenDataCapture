@@ -180,10 +180,10 @@ const RouteComponent = () => {
   );
 };
 
-export const Route = createFileRoute('/_app/datahub/$subjectId/assignments')({
+export const Route = createFileRoute('/_app/datahub/subjects/$subjectId/assignments')({
   beforeLoad: ({ params }) => {
     if (!config.setup.isGatewayEnabled) {
-      throw redirect({ params, to: '/datahub/$subjectId/table' });
+      throw redirect({ params, to: '/datahub/subjects/$subjectId/table' });
     }
   },
   component: RouteComponent

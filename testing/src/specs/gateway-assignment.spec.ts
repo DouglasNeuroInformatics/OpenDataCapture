@@ -122,10 +122,10 @@ test.describe('gateway remote assignment', () => {
     await gatewayPage.close();
 
     // Back on the clinician side the assignment should now read as complete.
-    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-    await page.waitForURL('**/datahub/**/table');
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
     await page.getByRole('link', { name: 'Assignments' }).click();
-    await page.waitForURL('**/datahub/**/assignments');
+    await page.waitForURL('**/datahub/subjects/**/assignments');
 
     // The completion posts back from the gateway asynchronously (it can still read "Outstanding"
     // for a while on a slow runner), and assertion retries re-query the locator rather than

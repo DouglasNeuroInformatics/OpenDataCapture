@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
-import { AppPage } from '../../../route.page';
+import { AppPage } from '../../../../route.page';
 
 export class SubjectRecordDetailPage extends AppPage {
   readonly instrumentGroupHeading: Locator;

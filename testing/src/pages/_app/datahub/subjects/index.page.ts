@@ -1,11 +1,12 @@
 import type { Download, Locator, Page } from '@playwright/test';
 
-import { AppPage } from '../route.page';
+import { AppPage } from '../../route.page';
 
 export class DatahubPage extends AppPage {
+  readonly collectedPresetFilter: Locator;
   readonly exportDropdown: Locator;
   readonly filtersTrigger: Locator;
-  readonly hasRecordsFilter: Locator;
+  readonly minRecordsFilter: Locator;
   readonly pageHeader: Locator;
   readonly rowActionsTrigger: Locator;
   readonly rows: Locator;
@@ -16,7 +17,8 @@ export class DatahubPage extends AppPage {
     super(page);
     this.exportDropdown = page.getByTestId('datahub-export-dropdown');
     this.filtersTrigger = page.getByTestId('datahub-filters-trigger');
-    this.hasRecordsFilter = page.getByTestId('datahub-filter-has-records');
+    this.minRecordsFilter = page.getByTestId('datahub-filter-min-records');
+    this.collectedPresetFilter = page.getByTestId('datahub-filter-collected-preset');
     this.pageHeader = page.getByTestId('page-header');
     this.rowActionsTrigger = page.getByTestId('row-actions-trigger').first();
     this.rows = page.getByTestId('data-table-body').getByTestId('data-table-row');
@@ -37,9 +39,29 @@ export class DatahubPage extends AppPage {
     return started;
   }
 
-  /** Opens the filter menu and toggles "With records only", which refetches with `hasRecord=true`. */
-  async toggleWithRecordsOnly() {
+  /**
+   * Opens the filter menu and requires at least `count` records. A minimum of one is what the old
+   * "with records only" checkbox meant; every value narrows on the per-subject counts already
+   * loaded for the column rather than refetching.
+   */
+  async requireAtLeastRecords(count: number) {
     await this.filtersTrigger.click();
-    await this.hasRecordsFilter.click();
+    await this.minRecordsFilter.fill(String(count));
+  }
+
+  /** Opens the filter menu and picks a collection-date window. */
+  async selectCollectedWindow(
+    preset:
+      | 'all'
+      | 'custom'
+      | 'pastMonth'
+      | 'pastSixMonths'
+      | 'pastThreeMonths'
+      | 'pastTwoYears'
+      | 'pastWeek'
+      | 'pastYear'
+  ) {
+    await this.filtersTrigger.click();
+    await this.collectedPresetFilter.selectOption(preset);
   }
 }

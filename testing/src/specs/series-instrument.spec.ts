@@ -93,8 +93,8 @@ test.describe('series instrument', () => {
     await instrumentPage.submit();
     await expect(instrumentPage.seriesCompletionHeading).toBeVisible();
 
-    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-    await page.waitForURL('**/datahub/**/table');
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { exact: true, name: ITEM_INSTRUMENT_TITLE }).click();

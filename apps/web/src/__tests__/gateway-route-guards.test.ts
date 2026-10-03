@@ -19,9 +19,9 @@ const GATEWAY_ROUTES = [
     redirectsTo: '/dashboard'
   },
   {
-    importRoute: async () => (await import('@/routes/_app/datahub/$subjectId/assignments')).Route,
+    importRoute: async () => (await import('@/routes/_app/datahub/subjects/$subjectId/assignments')).Route,
     params: { subjectId: '123' },
-    redirectsTo: '/datahub/$subjectId/table'
+    redirectsTo: '/datahub/subjects/$subjectId/table'
   },
   {
     importRoute: async () => (await import('@/routes/_app/group/email-templates')).Route,
@@ -63,17 +63,33 @@ beforeEach(() => {
   mocks.config.setup.isGatewayEnabled = true;
 });
 
-describe.each(GATEWAY_ROUTES)('$redirectsTo guard', ({ importRoute, params, redirectsTo }) => {
-  it('should redirect away when the gateway is not deployed, so a bookmarked link cannot reach a page whose endpoints are not mounted', async () => {
-    mocks.config.setup.isGatewayEnabled = false;
-    const thrown = await runGuard(await importRoute(), params);
-    expect(isRedirect(thrown)).toBe(true);
-    expect((thrown as { options: { to: string } }).options.to).toBe(redirectsTo);
-  });
+/**
+ * Each case dynamically imports a real route module, which pulls in that page's whole component
+ * graph on first touch. Under the full suite's parallel load that cold transform has repeatedly
+ * exceeded vitest's 5s default, so these cases carry their own budget: the import cost is the
+ * fixture, not the thing under test.
+ */
+const IMPORT_TIMEOUT = 30_000;
 
-  it('should allow the route when the gateway is deployed', async () => {
-    expect(await runGuard(await importRoute(), params)).toBeNull();
-  });
+describe.each(GATEWAY_ROUTES)('$redirectsTo guard', ({ importRoute, params, redirectsTo }) => {
+  it(
+    'should redirect away when the gateway is not deployed, so a bookmarked link cannot reach a page whose endpoints are not mounted',
+    async () => {
+      mocks.config.setup.isGatewayEnabled = false;
+      const thrown = await runGuard(await importRoute(), params);
+      expect(isRedirect(thrown)).toBe(true);
+      expect((thrown as { options: { to: string } }).options.to).toBe(redirectsTo);
+    },
+    IMPORT_TIMEOUT
+  );
+
+  it(
+    'should allow the route when the gateway is deployed',
+    async () => {
+      expect(await runGuard(await importRoute(), params)).toBeNull();
+    },
+    IMPORT_TIMEOUT
+  );
 });
 
 describe('bulk remote assignments guard', () => {

@@ -20,7 +20,7 @@ test.describe('error page', () => {
   });
 
   test('should offer the report for copying beside the download when a route fails', async ({ page }) => {
-    await page.goto('/datahub');
+    await page.goto('/datahub/subjects');
     const errorPage = page.getByTestId('error-page');
     await expect(errorPage).toBeVisible();
     await expect(page.getByTestId('download-error-report')).toContainText('Download Error Report');
@@ -32,7 +32,7 @@ test.describe('error page', () => {
     page
   }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    await page.goto('/datahub');
+    await page.goto('/datahub/subjects');
     const copyButton = page.getByTestId('copy-error-report');
     await copyButton.click();
     await expect(copyButton).toContainText('Copied');

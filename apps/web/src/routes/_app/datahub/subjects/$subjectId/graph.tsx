@@ -178,6 +178,6 @@ const RouteComponent = () => {
   );
 };
 
-export const Route = createFileRoute('/_app/datahub/$subjectId/graph')({
+export const Route = createFileRoute('/_app/datahub/subjects/$subjectId/graph')({
   component: RouteComponent
 });

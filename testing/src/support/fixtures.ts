@@ -16,11 +16,11 @@ import { AdminSettingsPage } from '../pages/_app/admin/settings.page';
 import { AdminUserPage } from '../pages/_app/admin/users/$userId.page';
 import { ContactPage } from '../pages/_app/contact.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
-import { SubjectAssignmentsPage } from '../pages/_app/datahub/$subjectId/assignments.page';
-import { SubjectGraphPage } from '../pages/_app/datahub/$subjectId/graph.page';
-import { SubjectRecordDetailPage } from '../pages/_app/datahub/$subjectId/table/$recordId.page';
-import { SubjectDataTablePage } from '../pages/_app/datahub/$subjectId/table/index.page';
-import { DatahubPage } from '../pages/_app/datahub/index.page';
+import { SubjectAssignmentsPage } from '../pages/_app/datahub/subjects/$subjectId/assignments.page';
+import { SubjectGraphPage } from '../pages/_app/datahub/subjects/$subjectId/graph.page';
+import { SubjectRecordDetailPage } from '../pages/_app/datahub/subjects/$subjectId/table/$recordId.page';
+import { SubjectDataTablePage } from '../pages/_app/datahub/subjects/$subjectId/table/index.page';
+import { DatahubPage } from '../pages/_app/datahub/subjects/index.page';
 import { GroupEmailTemplatesPage } from '../pages/_app/group/email-templates.page';
 import { GroupManagePage } from '../pages/_app/group/manage.page';
 import { RemoteAssignmentsPage } from '../pages/_app/group/remote-assignments.page';
@@ -53,11 +53,11 @@ const pageModels = {
   '/auth/reset-password': ResetPasswordPage,
   '/contact': ContactPage,
   '/dashboard': DashboardPage,
-  '/datahub': DatahubPage,
-  '/datahub/$subjectId/assignments': SubjectAssignmentsPage,
-  '/datahub/$subjectId/graph': SubjectGraphPage,
-  '/datahub/$subjectId/table': SubjectDataTablePage,
-  '/datahub/$subjectId/table/$recordId': SubjectRecordDetailPage,
+  '/datahub/subjects': DatahubPage,
+  '/datahub/subjects/$subjectId/assignments': SubjectAssignmentsPage,
+  '/datahub/subjects/$subjectId/graph': SubjectGraphPage,
+  '/datahub/subjects/$subjectId/table': SubjectDataTablePage,
+  '/datahub/subjects/$subjectId/table/$recordId': SubjectRecordDetailPage,
   '/group/email-templates': GroupEmailTemplatesPage,
   '/group/manage': GroupManagePage,
   '/group/remote-assignments': RemoteAssignmentsPage,

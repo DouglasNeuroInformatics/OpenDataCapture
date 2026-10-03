@@ -32,7 +32,7 @@ test.describe('upload', () => {
     await expect(page.getByText('Success')).toBeVisible();
 
     // The subject list truncates the displayed id to 9 characters by default, so match on the prefix.
-    const datahubPage = await getPageModel('/datahub');
+    const datahubPage = await getPageModel('/datahub/subjects');
     await datahubPage.searchInput.fill(subjectId);
     await expect(page.getByTestId('data-table-row').filter({ hasText: subjectId.slice(0, 9) })).toBeVisible();
   });

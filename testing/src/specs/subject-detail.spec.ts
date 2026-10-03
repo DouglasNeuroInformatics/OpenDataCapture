@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test';
 
-import { SubjectAssignmentsPage } from '../pages/_app/datahub/$subjectId/assignments.page';
-import { SubjectGraphPage } from '../pages/_app/datahub/$subjectId/graph.page';
-import { SubjectRecordDetailPage } from '../pages/_app/datahub/$subjectId/table/$recordId.page';
+import { SubjectAssignmentsPage } from '../pages/_app/datahub/subjects/$subjectId/assignments.page';
+import { SubjectGraphPage } from '../pages/_app/datahub/subjects/$subjectId/graph.page';
+import { SubjectRecordDetailPage } from '../pages/_app/datahub/subjects/$subjectId/table/$recordId.page';
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { expect, test } from '../support/fixtures';
@@ -43,8 +43,10 @@ async function seedSubjectWithRecord(getPageModel: GetPageModel, page: Page, nam
   await instrumentPage.submit();
   await expect(instrumentPage.summaryHeading).toBeVisible();
 
-  await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-  await page.waitForURL('**/datahub/**/table');
+  // The datahub nav entry is a group over the subject and instrument views; only the current
+  // subject's own link carries a path segment after `subjects`.
+  await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+  await page.waitForURL('**/datahub/subjects/**/table');
 }
 
 test.describe('subject detail', () => {
@@ -93,8 +95,8 @@ test.describe('subject detail', () => {
 
     // The result slider is a modal sheet, so it blocks clicks on the sidebar underneath until dismissed.
     await page.keyboard.press('Escape');
-    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-    await page.waitForURL('**/datahub/**/table');
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
 
     await page.getByRole('link', { name: 'Assignments' }).click();
     await page.waitForURL('**/assignments');
