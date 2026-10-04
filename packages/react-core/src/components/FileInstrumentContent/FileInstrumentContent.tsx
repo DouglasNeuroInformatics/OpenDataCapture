@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import { Button } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -16,7 +16,7 @@ import { UploadProgressBar } from './UploadProgressBar';
 
 import type { FileInstrumentContentProps } from './types';
 
-const _FileInstrumentContent: React.FC<FileInstrumentContentProps> = ({ NavigationBlocker }) => {
+const _FileInstrumentContent: React.FC = () => {
   const actions = useFileInstrumentContentStore((store) => store.actions);
   const fileGroups = useFileInstrumentContentStore((store) => store.props.instrument.content.fileGroups);
   const onSuccess = useFileInstrumentContentStore((store) => store.props.onSuccess);
@@ -31,52 +31,40 @@ const _FileInstrumentContent: React.FC<FileInstrumentContentProps> = ({ Navigati
   }, [onSuccess, status]);
 
   return (
-    <Fragment>
-      <div
-        className="mx-auto mt-6 flex w-full flex-col gap-12"
-        style={{ pointerEvents: status === 'SUBMITTED' || status === 'PENDING' ? 'none' : undefined }}
-      >
-        <div className="flex flex-col gap-12">
-          {fileGroups.map((_, index) => (
-            <Dropzone index={index} key={index} />
-          ))}
-        </div>
-        <div className="flex flex-col gap-6">
-          {match(status)
-            .with('PENDING', () => <UploadProgressBar />)
-            .with('FAILED', () => (
-              <ErrorBox
-                title={t({
-                  en: 'Something went wrong',
-                  es: 'Algo salió mal',
-                  fr: "Une erreur s'est produite"
-                })}
-              />
-            ))
-            .otherwise(() => null)}
-          <Button
-            className="flex items-center gap-2"
-            disabled={status === 'PENDING' || status === 'SUBMITTED'}
-            type="button"
-            variant="primary"
-            onClick={() => void actions.submit()}
-          >
-            {t('libui.form.submit')}
-            {status === 'PENDING' && <RefreshCwIcon className="animate-spin" />}
-          </Button>
-        </div>
+    <div
+      className="mx-auto mt-6 flex w-full flex-col gap-12"
+      style={{ pointerEvents: status === 'SUBMITTED' || status === 'PENDING' ? 'none' : undefined }}
+    >
+      <div className="flex flex-col gap-12">
+        {fileGroups.map((_, index) => (
+          <Dropzone index={index} key={index} />
+        ))}
       </div>
-      {NavigationBlocker && (
-        <NavigationBlocker
-          active={status === 'PENDING'}
-          message={t({
-            en: 'Are you sure you want to leave this page? Data is currently uploading and will be lost if you leave this page now.',
-            es: '¿Seguro que desea salir de esta página? Se están cargando datos que se perderán si sale ahora.',
-            fr: 'Êtes-vous sûr de vouloir quitter cette page ? Des données sont en cours de téléversement et seront perdues si vous quittez la page maintenant.'
-          })}
-        />
-      )}
-    </Fragment>
+      <div className="flex flex-col gap-6">
+        {match(status)
+          .with('PENDING', () => <UploadProgressBar />)
+          .with('FAILED', () => (
+            <ErrorBox
+              title={t({
+                en: 'Something went wrong',
+                es: 'Algo salió mal',
+                fr: "Une erreur s'est produite"
+              })}
+            />
+          ))
+          .otherwise(() => null)}
+        <Button
+          className="flex items-center gap-2"
+          disabled={status === 'PENDING' || status === 'SUBMITTED'}
+          type="button"
+          variant="primary"
+          onClick={() => void actions.submit()}
+        >
+          {t('libui.form.submit')}
+          {status === 'PENDING' && <RefreshCwIcon className="animate-spin" />}
+        </Button>
+      </div>
+    </div>
   );
 };
 
@@ -84,7 +72,7 @@ export const FileInstrumentContent: React.FC<FileInstrumentContentProps> = (prop
   const storeRef = useRef(createFileInstrumentContentStore(props));
   return (
     <FileInstrumentContentStoreContext.Provider value={{ store: storeRef.current }}>
-      <_FileInstrumentContent {...props} />
+      <_FileInstrumentContent />
     </FileInstrumentContentStoreContext.Provider>
   );
 };

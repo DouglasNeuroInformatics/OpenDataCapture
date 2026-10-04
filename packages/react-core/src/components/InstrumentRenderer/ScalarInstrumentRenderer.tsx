@@ -90,7 +90,7 @@ export const ScalarInstrumentRenderer = ({
   };
 
   return (
-    <InstrumentRendererContainer className={className} index={index}>
+    <InstrumentRendererContainer className={className} index={index} NavigationBlocker={NavigationBlocker}>
       {match(interpreted)
         .with({ status: 'LOADING' }, () => <Spinner />)
         .with({ status: 'ERROR' }, ({ error }) => {
@@ -137,13 +137,7 @@ export const ScalarInstrumentRenderer = ({
               />
             ))
             .with({ index: 1, instrument: { kind: 'FILE' } }, ({ instrument }) => {
-              return (
-                <FileInstrumentContent
-                  instrument={{ ...instrument, id: target.id }}
-                  NavigationBlocker={NavigationBlocker}
-                  onSubmit={handleSubmit}
-                />
-              );
+              return <FileInstrumentContent instrument={{ ...instrument, id: target.id }} onSubmit={handleSubmit} />;
             })
             .with({ index: 2 }, () => (
               <InstrumentSummary

@@ -84,7 +84,7 @@ export const Sidebar = () => {
                       className="min-w-20"
                       onClick={() => {
                         endSession();
-                        void navigate({ to: '/session/start-session' }).then(() => {
+                        void navigate({ ignoreBlocker: true, to: '/session/start-session' }).then(() => {
                           setIsEndSessionModalOpen(false);
                         });
                       }}

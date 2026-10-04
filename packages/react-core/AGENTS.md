@@ -78,9 +78,11 @@ Gateway, playground and serve-instrument have no router. Nothing under `src/` im
 except `InstrumentRenderer.stories.tsx`.
 
 Router-dependent behaviour is **injected as a component prop**: `InstrumentRenderer` accepts
-`NavigationBlocker?: NavigationBlockerComponent` and forwards it to `FileInstrumentContent`;
-`apps/web/src/components/NavigationBlocker.tsx` is the implementation that calls `useBlocker`. Note
-that only the scalar path takes it — `SeriesInstrumentRenderer` has no such prop. Add any new
+`NavigationBlocker?: NavigationBlockerComponent`, and both the scalar and series renderers hand it to
+`InstrumentRendererContainer`, which keeps it active while the content step is showing (from "Begin"
+until the summary). `apps/web/src/components/NavigationBlocker.tsx` is the implementation that calls
+`useBlocker`. Render it nowhere else: TanStack runs every registered blocker in turn, so a second
+active one shows a second dialog after the user has already confirmed the first. Add any new
 host-specific behaviour the same way, as an injected component or callback.
 
 ## Interactive instruments run in an iframe

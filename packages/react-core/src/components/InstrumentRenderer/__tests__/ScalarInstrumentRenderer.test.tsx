@@ -1,9 +1,11 @@
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod/v4';
 
 import { ScalarInstrumentRenderer } from '../ScalarInstrumentRenderer';
+
+import type { NavigationBlockerProps } from '../../NavigationBlockerDialog';
 
 /**
  * A bundle is evaluated with `new Function`, so it can close over nothing in this file. The
@@ -12,9 +14,12 @@ import { ScalarInstrumentRenderer } from '../ScalarInstrumentRenderer';
 declare global {
   // eslint-disable-next-line no-var
   var __testValidationSchema: z.ZodTypeAny;
+  // eslint-disable-next-line no-var
+  var __testFileValidationSchema: z.ZodTypeAny;
 }
 
 globalThis.__testValidationSchema = z.object({ answer: z.string().min(1) });
+globalThis.__testFileValidationSchema = z.any();
 
 const FORM_BUNDLE = `(async () => ({
   __runtimeVersion: 1,
@@ -48,7 +53,8 @@ const FILE_BUNDLE = `(async () => ({
     license: 'Apache-2.0',
     title: 'Stub File'
   },
-  measures: null
+  measures: null,
+  validationSchema: globalThis.__testFileValidationSchema
 }))()`;
 
 const INTERACTIVE_BUNDLE = `(async () => ({
@@ -66,8 +72,20 @@ const INTERACTIVE_BUNDLE = `(async () => ({
   measures: null
 }))()`;
 
+const NavigationBlocker = vi.fn((_props: NavigationBlockerProps) => null);
+
+function isNavigationBlocked() {
+  return NavigationBlocker.mock.lastCall?.[0].active;
+}
+
 async function beginAt(bundle: string, onSubmit = vi.fn()) {
-  render(<ScalarInstrumentRenderer target={{ bundle, id: 'target-id' }} onSubmit={onSubmit} />);
+  render(
+    <ScalarInstrumentRenderer
+      NavigationBlocker={NavigationBlocker}
+      target={{ bundle, id: 'target-id' }}
+      onSubmit={onSubmit}
+    />
+  );
   fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
   return { onSubmit };
 }
@@ -78,7 +96,10 @@ describe('ScalarInstrumentRenderer', () => {
     i18n.changeLanguage('en');
   });
 
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    NavigationBlocker.mockClear();
+  });
 
   it('should show a spinner while the bundle is still being interpreted', () => {
     const { container } = render(
@@ -127,5 +148,48 @@ describe('ScalarInstrumentRenderer', () => {
   it('should render FileInstrumentContent for a FILE instrument', async () => {
     await beginAt(FILE_BUNDLE);
     expect(await screen.findByTestId('dropzone')).toBeTruthy();
+  });
+
+  it('should not block navigation from the overview, where nothing has been entered yet', async () => {
+    render(
+      <ScalarInstrumentRenderer
+        NavigationBlocker={NavigationBlocker}
+        target={{ bundle: FORM_BUNDLE, id: 'target-id' }}
+        onSubmit={vi.fn()}
+      />
+    );
+    await screen.findByRole('button', { name: 'Begin' });
+    expect(isNavigationBlocked()).toBe(false);
+  });
+
+  it('should block navigation once the instrument has begun, so a stray click cannot discard the responses', async () => {
+    await beginAt(FORM_BUNDLE);
+    await screen.findByLabelText('Answer');
+    expect(isNavigationBlocked()).toBe(true);
+  });
+
+  it('should stop blocking navigation once the responses have been submitted', async () => {
+    await beginAt(FORM_BUNDLE);
+    fireEvent.change(screen.getByLabelText('Answer'), { target: { value: 'hello' } });
+    fireEvent.submit(screen.getByTestId('form-content'));
+    await screen.findByText('Stub Form');
+    expect(isNavigationBlocked()).toBe(false);
+  });
+
+  it('should keep blocking navigation while uploaded files are still being saved', async () => {
+    const onSubmit = vi.fn(() => new Promise<void>(() => undefined));
+    await beginAt(FILE_BUNDLE, onSubmit);
+    const dropzone = await screen.findByTestId('dropzone');
+    await act(async () => {
+      fireEvent.change(dropzone.querySelector('input[type="file"]')!, {
+        target: { files: [new File(['content'], 'report.pdf', { type: 'application/pdf' })] }
+      });
+      await Promise.resolve();
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledOnce();
+    });
+    expect(isNavigationBlocked()).toBe(true);
   });
 });
