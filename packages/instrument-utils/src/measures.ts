@@ -1,5 +1,10 @@
 import { isPlainObject } from '@douglasneuroinformatics/libjs';
-import type { AnyUnilingualScalarInstrument, InstrumentMeasureValue } from '@opendatacapture/runtime-core';
+import type {
+  AnyUnilingualScalarInstrument,
+  InstrumentMeasures,
+  InstrumentMeasureValue,
+  Language
+} from '@opendatacapture/runtime-core';
 import { $InstrumentMeasureValue } from '@opendatacapture/schemas/instrument';
 import { match } from 'ts-pattern';
 
@@ -14,14 +19,16 @@ export function computeInstrumentMeasures(instrument: AnyUnilingualScalarInstrum
     console.error(`Cannot compute measures from data: ${JSON.stringify(data)} is not an object`);
     return computedMeasures;
   }
-  for (const key in instrument.measures) {
-    const result = match(instrument.measures[key]!)
+  // Widened because `data` is untyped: under an interactive instrument's `Json` data, `ConditionalKeys`
+  // makes `ref` a union of `Json[]` members (numbers, array methods), which cannot index `data`.
+  const measures: InstrumentMeasures<any, Language> | null = instrument.measures;
+  for (const key in measures) {
+    const result = match(measures[key]!)
       .with({ kind: 'computed' }, (measure) => {
-        // @ts-expect-error - this is ignored because it is safer than the previous (any) solution
         return { label: measure.label, value: measure.value(data) };
       })
       .with({ kind: 'const' }, (measure) => {
-        const result = $InstrumentMeasureValue.safeParse(data[key]);
+        const result = $InstrumentMeasureValue.safeParse(data[measure.ref]);
         if (!result.success) {
           console.error('Failed to Parse Constant Measure', result.error);
           return null;
@@ -32,10 +39,10 @@ export function computeInstrumentMeasures(instrument: AnyUnilingualScalarInstrum
           label = measure.label;
         } else if (isFormInstrument(instrument)) {
           // @ts-expect-error - this is ignored because it is safer than the previous (any) solution
-          label = extractFieldLabel(instrument, key, data);
+          label = extractFieldLabel(instrument, measure.ref, data);
         }
         if (!label) {
-          console.error(`Failed to extract label for key '${key}' from data '${JSON.stringify(data)}'`);
+          console.error(`Failed to extract label for key '${measure.ref}' from data '${JSON.stringify(data)}'`);
           return;
         }
         return { label, value: result.data };

@@ -47,6 +47,15 @@ describe('computeInstrumentMeasures', () => {
     expect(result.favoriteNumber).toEqual({ label: 'Favorite Number', value: 7 });
   });
 
+  it("should read a 'const' measure's value and label through its ref, so a measure keyed apart from its field still shows that field", () => {
+    const instrument = {
+      ...formInstrument,
+      measures: { favorite: { kind: 'const', ref: 'favoriteNumber' } }
+    } as unknown as AnyUnilingualScalarInstrument;
+    const result = computeInstrumentMeasures(instrument, { favoriteNumber: 7 });
+    expect(result.favorite).toEqual({ label: 'Favorite Number', value: 7 });
+  });
+
   it("should use a 'const' measure's own label when it declares one", () => {
     const instrument = {
       ...formInstrument,
