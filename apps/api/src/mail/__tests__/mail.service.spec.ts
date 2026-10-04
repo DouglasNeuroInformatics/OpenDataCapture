@@ -47,6 +47,7 @@ const newUserArgs = {
 };
 
 describe('MailService', () => {
+  let loggingService: MockedInstance<LoggingService>;
   let mailService: MailService;
   let setupStateModel: MockedInstance<Model<'SetupState'>>;
   let transporter: { sendMail: Mock; verify: Mock };
@@ -70,6 +71,7 @@ describe('MailService', () => {
       ]
     }).compile();
     moduleRef.get<MockedInstance<ConfigService>>(ConfigService).getOrThrow.mockReturnValue(SECRET_KEY);
+    loggingService = moduleRef.get(LoggingService);
     setupStateModel = moduleRef.get(getModelToken('SetupState'));
     mailService = moduleRef.get(MailService);
     transporter = { sendMail: vi.fn().mockResolvedValue({}), verify: vi.fn().mockResolvedValue(true) };
@@ -332,6 +334,17 @@ describe('MailService', () => {
       const result = await mailService.sendAssignmentEmail(assignmentArgs);
       expect(result.status).toBe('FAILED');
       expect(result.error).toBe('AUTHENTICATION_FAILED');
+    });
+
+    // SMTP servers echo the rejected address back, so masking only the recipient would still log it.
+    it('logs a failed delivery with the recipient masked, including where the SMTP error echoes it', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
+      transporter.sendMail.mockRejectedValueOnce(
+        new Error('550 5.1.1 <participant@x.org>: Recipient address rejected')
+      );
+      await mailService.sendAssignmentEmail({ ...assignmentArgs, recipient: 'participant@x.org' });
+      expect(loggingService.error).toHaveBeenCalledWith(expect.stringContaining('<p***@x.org>'));
+      expect(loggingService.error).not.toHaveBeenCalledWith(expect.stringContaining('participant@x.org'));
     });
 
     it('substitutes url/expiresAt and sends when enabled', async () => {

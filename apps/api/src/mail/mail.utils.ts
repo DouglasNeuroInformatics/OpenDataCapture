@@ -38,6 +38,20 @@ export function formatExpiryDate(expiresAt: Date | number | string, language: La
   }).format(new Date(expiresAt));
 }
 
+/**
+ * Mask every email address in `text` down to the first character of its local part and its full
+ * domain — `bob.smith@example.org` becomes `b***@example.org` — so a log line or audit entry still
+ * shows which domain mail went to without recording who it went to. Masked rather than hashed:
+ * hashing every address on a candidate list reverses an unsalted hash.
+ *
+ * Applied to whole lines, not just the recipient, because SMTP servers echo the rejected address
+ * back in their error (`550 5.1.1 <bob@example.org>: Recipient address rejected`).
+ */
+export function redactEmails(text: string): string {
+  // A local part is any run of characters other than whitespace and the RFC 5322 specials.
+  return text.replace(/([^\s"(),:;<>@[\]])[^\s"(),:;<>@[\]]*@/gu, '$1***@');
+}
+
 /** Pick a language from a localized string, falling back to any available language when the requested one is empty. */
 export function pickLocale(localized: LocalizedString, language: Language): string {
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty strings mean "no translation"; fall back intentionally

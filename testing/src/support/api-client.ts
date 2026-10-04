@@ -1,9 +1,13 @@
 import type { $CreateAssignmentData, Assignment } from '@opendatacapture/schemas/assignment';
+import { AUDIT_LOGS_MAX_PAGE_SIZE } from '@opendatacapture/schemas/audit';
+import type { $AuditLog, $AuditLogAction, $AuditLogsPage } from '@opendatacapture/schemas/audit';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Permissions } from '@opendatacapture/schemas/core';
 import type { $CreateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
+import { MAIL_CLIENT_TIMEOUT } from '@opendatacapture/schemas/mail';
+import type { $SendAssignmentEmailData, EmailDeliveryResult } from '@opendatacapture/schemas/mail';
 import type { $CreateSessionData, Session } from '@opendatacapture/schemas/session';
 import type { $CreateSubjectData } from '@opendatacapture/schemas/subject';
 import type { $CreateUserData, $UpdateUserData, User } from '@opendatacapture/schemas/user';
@@ -120,6 +124,19 @@ export class ApiClient {
     );
   }
 
+  /** The newest audit entries for one action, as the audit log page and its JSON download read them. */
+  async findAuditLogs(action: $AuditLogAction): Promise<$AuditLog[]> {
+    const { data } = await this.expectJson<$AuditLogsPage>(
+      this.request.get(`${API}/audit/logs`, {
+        headers: this.authHeaders,
+        params: { action, limit: AUDIT_LOGS_MAX_PAGE_SIZE }
+      }),
+      200,
+      `find the '${action}' audit logs`
+    );
+    return data;
+  }
+
   /** The ids the start-session form suggests to a user with no group: custom ids scoped to the default group. */
   async findDefaultGroupSubjectCustomIds(): Promise<string[]> {
     return this.expectJson<string[]>(
@@ -177,6 +194,19 @@ export class ApiClient {
       this.request.get(`${API}/users/${id}`, { headers: this.authHeaders }),
       200,
       `find user '${id}'`
+    );
+  }
+
+  /** Emails an assignment's link through the route the web app's send form uses, waiting out the SMTP budget. */
+  async sendAssignmentEmail(id: string, data: $SendAssignmentEmailData): Promise<EmailDeliveryResult> {
+    return this.expectJson<EmailDeliveryResult>(
+      this.request.post(`${API}/assignments/${id}/email`, {
+        data,
+        headers: this.authHeaders,
+        timeout: MAIL_CLIENT_TIMEOUT
+      }),
+      201,
+      `email assignment '${id}'`
     );
   }
 

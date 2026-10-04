@@ -34,6 +34,7 @@ import { ASSIGNMENT_EMAIL_THROTTLER_LIMIT, ASSIGNMENT_EMAIL_THROTTLER_TTL } from
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import { GroupsService } from '@/groups/groups.service';
 import { MailService } from '@/mail/mail.service';
+import { redactEmails } from '@/mail/mail.utils';
 
 import { AssignmentsService } from './assignments.service';
 
@@ -140,10 +141,11 @@ export class AssignmentsController {
     });
     // The entry must mean the instance's mail identity actually carried this credential toward
     // this address: nothing goes outbound for DISABLED or NO_RECIPIENT, so nothing is recorded.
+    // Every admin reads the audit log, so it keeps only the masked address.
     if (result.status === 'SENT' || result.status === 'FAILED') {
       await this.auditLogger.log('SEND_EMAIL', 'ASSIGNMENT', {
         groupId: assignment.groupId ?? null,
-        metadata: { assignmentId: id, recipient, status: result.status },
+        metadata: { assignmentId: id, recipient: redactEmails(recipient), status: result.status },
         userId: currentUser.id
       });
     }

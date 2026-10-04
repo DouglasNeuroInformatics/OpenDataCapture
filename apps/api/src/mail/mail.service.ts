@@ -36,6 +36,7 @@ import {
   formatExpiryDate,
   formatSender,
   pickLocale,
+  redactEmails,
   renderTemplate
 } from './mail.utils';
 
@@ -261,7 +262,7 @@ export class MailService {
       });
       return { message, recipient, status: 'SENT' };
     } catch (err) {
-      this.loggingService.error(`Failed to send "${subject}" to ${recipient}: ${String(err)}`);
+      this.loggingService.error(redactEmails(`Failed to send "${subject}" to ${recipient}: ${String(err)}`));
       return { error: describeMailError(err), message, recipient, status: 'FAILED' };
     }
   }

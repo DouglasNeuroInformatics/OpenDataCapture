@@ -260,5 +260,26 @@ test.describe('mail delivery', () => {
       await expect(feedback).toBeVisible({ timeout: 40_000 });
       await expect(feedback).not.toContainText('ENOTFOUND');
     });
+
+    // Every admin reads the audit log and can download it whole, so it records the domain an
+    // assignment link went to, never the participant's address.
+    test('should record only a masked recipient in the audit log', async ({ api, uniqueId }) => {
+      const recipient = `participant${uniqueId}@example.org`;
+      const group = await api.createGroup();
+      const assignment = await api.createAssignment({
+        expiresAt: new Date(Date.now() + 86_400_000),
+        groupId: group.id,
+        instrumentId: await api.findInstrumentId('FORM'),
+        subjectId: await api.createSubject(group.id)
+      });
+
+      const result = await api.sendAssignmentEmail(assignment.id, { language: 'en', recipient });
+      expect(result.status).toBe('FAILED');
+
+      const entries = await api.findAuditLogs('SEND_EMAIL');
+      const entry = entries.find(({ metadata }) => metadata?.assignmentId === assignment.id);
+      expect(entry?.metadata?.recipient).toBe('p***@example.org');
+      expect(JSON.stringify(entries)).not.toContain(recipient);
+    });
   });
 });
