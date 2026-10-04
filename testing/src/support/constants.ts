@@ -41,3 +41,6 @@ export const E2E_MAIL_CONFIG = {
   senderName: 'Open Data Capture',
   username: 'e2e'
 } as const;
+
+/** A typical phone screen, narrower than the `md` breakpoint at which `apps/web` switches to its desktop layout. */
+export const PHONE_VIEWPORT = { height: 844, width: 390 } as const;
