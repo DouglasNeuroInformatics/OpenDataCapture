@@ -115,7 +115,7 @@ export const Navbar = () => {
                   url="#"
                   onClick={() => {
                     endSession();
-                    void navigate({ to: '/session/start-session' });
+                    void navigate({ ignoreBlocker: true, to: '/session/start-session' });
                   }}
                 />
               )}

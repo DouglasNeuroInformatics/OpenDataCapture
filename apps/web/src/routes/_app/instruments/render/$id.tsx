@@ -33,7 +33,7 @@ const RouteComponent = () => {
 
   useEffect(() => {
     if (!currentSession?.id) {
-      void navigate({ to: '/instruments/accessible-instruments' });
+      void navigate({ ignoreBlocker: true, to: '/instruments/accessible-instruments' });
     }
   }, [currentSession?.id]);
 

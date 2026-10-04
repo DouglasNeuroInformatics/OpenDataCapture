@@ -6,7 +6,7 @@ import { useBlocker } from '@tanstack/react-router';
 
 export const NavigationBlocker: React.FC<NavigationBlockerProps> = ({ active, message }) => {
   const blocker = useBlocker({
-    enableBeforeUnload: true,
+    enableBeforeUnload: () => active,
     shouldBlockFn: () => active,
     withResolver: true
   });

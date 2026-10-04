@@ -26,9 +26,9 @@ export type InstrumentRendererProps = {
   target: InstrumentBundleContainer;
 };
 
-export const InstrumentRenderer = ({ NavigationBlocker, target, ...props }: InstrumentRendererProps) => {
+export const InstrumentRenderer = ({ target, ...props }: InstrumentRendererProps) => {
   if (target.kind === 'SERIES') {
     return <SeriesInstrumentRenderer target={target} {...props} />;
   }
-  return <ScalarInstrumentRenderer NavigationBlocker={NavigationBlocker} target={target} {...props} />;
+  return <ScalarInstrumentRenderer target={target} {...props} />;
 };

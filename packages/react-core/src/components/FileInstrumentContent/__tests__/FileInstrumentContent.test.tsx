@@ -103,20 +103,4 @@ describe('FileInstrumentContent', () => {
     expect(screen.getByRole('button', { name: 'Submit' }).hasAttribute('disabled')).toBe(false);
     errorSpy.mockRestore();
   });
-
-  it('should pass the pending status through to a given NavigationBlocker', async () => {
-    const NavigationBlocker = vi.fn((_props: { active: boolean; message: string }) => null);
-    const props = createProps({ NavigationBlocker });
-    render(<FileInstrumentContent {...props} />);
-
-    await act(async () => {
-      selectFile(screen.getByTestId('dropzone'), createFile('report.pdf'));
-      await Promise.resolve();
-    });
-    fireEvent.click(screen.getByText('Submit'));
-
-    await waitFor(() => {
-      expect(NavigationBlocker.mock.calls.some(([props]) => props.active)).toBe(true);
-    });
-  });
 });

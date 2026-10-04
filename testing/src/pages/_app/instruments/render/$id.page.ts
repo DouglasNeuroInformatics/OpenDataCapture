@@ -12,6 +12,8 @@ export class RenderInstrumentPage extends AppPage {
   readonly errorMessages: Locator;
   /** The Happiness Questionnaire's affirmative answer to "are you satisfied with your life?". */
   readonly happinessSatisfiedRadio: Locator;
+  /** Asks the clinician to confirm leaving an instrument whose responses have not been submitted. */
+  readonly leaveDialog: Locator;
   /** Rendered only for an instrument declaring `resetButton: true`; libui gives it this aria-label. */
   readonly resetButton: Locator;
   /** Shown once every item of a series has been administered, in place of a scalar summary. */
@@ -24,6 +26,7 @@ export class RenderInstrumentPage extends AppPage {
     this.beginButton = page.getByRole('button', { name: 'Begin' });
     this.consentPreamble = page.getByTestId('consent-preamble');
     this.happinessSatisfiedRadio = this.$ref.getByRole('radio', { name: 'Yes' });
+    this.leaveDialog = page.getByTestId('blocker-dialog');
     this.resetButton = page.getByRole('button', { name: 'Reset' });
     this.seriesCompletionHeading = page.getByRole('heading', { name: /Thank You/i });
     this.submitButton = page.getByRole('button', { name: 'Submit' });
@@ -88,6 +91,14 @@ export class RenderInstrumentPage extends AppPage {
     for (const cause of causes) {
       await this.$ref.getByRole('checkbox', { name: cause }).click();
     }
+  }
+
+  async confirmLeave(): Promise<void> {
+    await this.leaveDialog.getByRole('button', { name: 'Yes' }).click();
+  }
+
+  async declineLeave(): Promise<void> {
+    await this.leaveDialog.getByRole('button', { name: 'No' }).click();
   }
 
   async submit(): Promise<void> {

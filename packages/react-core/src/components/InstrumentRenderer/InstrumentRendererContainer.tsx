@@ -4,13 +4,21 @@ import { useTranslation, useWindowSize } from '@douglasneuroinformatics/libui/ho
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { FileCheckIcon, MonitorIcon, PrinterIcon } from 'lucide-react';
 
+import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
+
 export type InstrumentRendererContainerProps = {
   children: React.ReactNode;
   className?: string;
   index: 0 | 1 | 2;
+  NavigationBlocker?: NavigationBlockerComponent;
 };
 
-export const InstrumentRendererContainer = ({ children, className, index }: InstrumentRendererContainerProps) => {
+export const InstrumentRendererContainer = ({
+  children,
+  className,
+  index,
+  NavigationBlocker
+}: InstrumentRendererContainerProps) => {
   const { height, width } = useWindowSize();
   const { resolvedLanguage, t } = useTranslation();
   const icons = useRef<HTMLDivElement[]>([]);
@@ -96,6 +104,16 @@ export const InstrumentRendererContainer = ({ children, className, index }: Inst
         })}
       </div>
       {children}
+      {NavigationBlocker && (
+        <NavigationBlocker
+          active={index === 1}
+          message={t({
+            en: 'Are you sure you want to leave this page? Your responses to this instrument have not been saved and will be lost.',
+            es: '¿Seguro que desea salir de esta página? Sus respuestas a este instrumento no se han guardado y se perderán.',
+            fr: "Êtes-vous sûr de vouloir quitter cette page ? Vos réponses à cet instrument n'ont pas été enregistrées et seront perdues."
+          })}
+        />
+      )}
     </div>
   );
 };

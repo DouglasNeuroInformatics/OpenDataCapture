@@ -6,6 +6,8 @@ import { z } from 'zod/v4';
 
 import { SeriesInstrumentRenderer } from '../SeriesInstrumentRenderer';
 
+import type { NavigationBlockerProps } from '../../NavigationBlockerDialog';
+
 /**
  * A bundle is evaluated with `new Function`, so it can close over nothing in this file. The
  * validation schema is handed to it through `globalThis`, which is the one scope both share.
@@ -79,9 +81,21 @@ function getAnswerInput(): HTMLInputElement {
   return screen.getByLabelText('Answer');
 }
 
+const NavigationBlocker = vi.fn((_props: NavigationBlockerProps) => null);
+
+function isNavigationBlocked() {
+  return NavigationBlocker.mock.lastCall?.[0].active;
+}
+
 async function beginSeries({ skipProgress }: { skipProgress: boolean }) {
   const onSubmit = vi.fn();
-  render(<SeriesInstrumentRenderer target={createTarget({ skipProgress })} onSubmit={onSubmit} />);
+  render(
+    <SeriesInstrumentRenderer
+      NavigationBlocker={NavigationBlocker}
+      target={createTarget({ skipProgress })}
+      onSubmit={onSubmit}
+    />
+  );
   fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
   if (!skipProgress) {
     // Without `skipProgress`, the overview hands over to the interstitial screen rather than to the
@@ -109,7 +123,10 @@ describe('SeriesInstrumentRenderer', () => {
     i18n.changeLanguage('en');
   });
 
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    NavigationBlocker.mockClear();
+  });
 
   it('should present the next item of a skipProgress series with no answer filled in', async () => {
     const { onSubmit } = await beginSeries({ skipProgress: true });
@@ -157,6 +174,24 @@ describe('SeriesInstrumentRenderer', () => {
     await waitFor(() => {
       expect(screen.getByText('Thank You!')).toBeTruthy();
     });
+  });
+
+  it('should keep blocking navigation between items, so leaving cannot abandon the series partway', async () => {
+    const { onSubmit } = await beginSeries({ skipProgress: false });
+    await answerAndSubmit('first administration', onSubmit);
+    await screen.findByText('Series Instrument in Progress');
+    expect(isNavigationBlocked()).toBe(true);
+  });
+
+  it('should stop blocking navigation once every item has been submitted', async () => {
+    const { onSubmit } = await beginSeries({ skipProgress: true });
+    await answerAndSubmit('first administration', onSubmit);
+    await waitFor(() => {
+      expect(getAnswerInput().value).toBe('');
+    });
+    await answerAndSubmit('second administration', onSubmit);
+    await screen.findByText('Thank You!');
+    expect(isNavigationBlocked()).toBe(false);
   });
 
   it('should show a placeholder when an item bundle fails to interpret', async () => {

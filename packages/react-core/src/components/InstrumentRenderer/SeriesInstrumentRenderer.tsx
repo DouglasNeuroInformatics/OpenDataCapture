@@ -21,6 +21,7 @@ import { validateSubmission } from './validateSubmission';
 import type { LocalizedText, SubjectDisplayInfo } from '../../types';
 import type { FormContentSubmitResult } from '../FormContent';
 import type { InteractiveContentSubmitResult } from '../InteractiveContent';
+import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
 import type { InstrumentSubmitHandler } from './types';
 
 export type SeriesInstrumentRendererProps = {
@@ -30,6 +31,7 @@ export type SeriesInstrumentRendererProps = {
   /** When true, the "Begin" button on the overview screen is disabled. */
   disableBegin?: boolean;
   initialSeriesIndex?: number;
+  NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: InstrumentSubmitHandler<'SERIES'>;
   subject?: SubjectDisplayInfo;
   /** A localizable label for each constituent form's submit button. */
@@ -42,6 +44,7 @@ export const SeriesInstrumentRenderer = ({
   className,
   disableBegin,
   initialSeriesIndex,
+  NavigationBlocker,
   onSubmit,
   submitButtonLabel,
   target
@@ -127,7 +130,7 @@ export const SeriesInstrumentRenderer = ({
   }, [currentItemIndex, target.items.length]);
 
   return (
-    <InstrumentRendererContainer className={className} index={index}>
+    <InstrumentRendererContainer className={className} index={index} NavigationBlocker={NavigationBlocker}>
       {match(rootState)
         .with({ status: 'LOADING' }, () => <Spinner />)
         .with({ status: 'ERROR' }, () => (
