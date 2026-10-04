@@ -1,8 +1,25 @@
 import { readFile } from 'node:fs/promises';
 
 import { DatahubPage } from '../pages/_app/datahub/index.page';
-import { HAPPINESS_RECORD } from '../support/constants';
+import { HAPPINESS_RECORD, PHONE_VIEWPORT } from '../support/constants';
 import { expect, test } from '../support/fixtures';
+
+test.describe('data hub on a phone', () => {
+  test.use({ viewport: PHONE_VIEWPORT });
+
+  test('should keep every table control within the width of the search bar, so none is pushed off screen', async ({
+    getPageModel
+  }) => {
+    const datahubPage = await getPageModel('/datahub');
+    await expect(datahubPage.exportDropdown).toBeVisible();
+
+    const searchBarBox = (await datahubPage.searchBar.boundingBox())!;
+    for (const control of [datahubPage.subjectLookupButton, datahubPage.filtersTrigger, datahubPage.exportDropdown]) {
+      const controlBox = (await control.boundingBox())!;
+      expect(controlBox.x + controlBox.width).toBeLessThanOrEqual(searchBarBox.x + searchBarBox.width);
+    }
+  });
+});
 
 test.describe('data hub', () => {
   test("should export the records of a group manager's own group, since the export applies the caller's read rules", async ({

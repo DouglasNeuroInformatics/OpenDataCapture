@@ -61,7 +61,7 @@ const Filters: React.FC<{
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger asChild>
         <Button
-          className="flex items-center justify-between gap-2"
+          className="flex grow items-center justify-between gap-2 md:grow-0"
           data-testid="datahub-filters-trigger"
           variant="outline"
         >
@@ -300,11 +300,11 @@ const Toggles: React.FC<{
   };
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-wrap gap-3 md:flex-nowrap">
       <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
         <Dialog.Trigger asChild>
           <Button
-            className="gap-2"
+            className="grow gap-2 md:grow-0"
             data-spotlight-type="subject-lookup-search-button"
             data-testid="subject-lookup-search-button"
             id="subject-lookup-search-button"

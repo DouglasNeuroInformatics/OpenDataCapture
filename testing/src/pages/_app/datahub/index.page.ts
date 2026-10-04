@@ -9,7 +9,9 @@ export class DatahubPage extends AppPage {
   readonly pageHeader: Locator;
   readonly rowActionsTrigger: Locator;
   readonly rows: Locator;
+  readonly searchBar: Locator;
   readonly searchInput: Locator;
+  readonly subjectLookupButton: Locator;
   constructor(page: Page) {
     super(page);
     this.exportDropdown = page.getByTestId('datahub-export-dropdown');
@@ -18,7 +20,9 @@ export class DatahubPage extends AppPage {
     this.pageHeader = page.getByTestId('page-header');
     this.rowActionsTrigger = page.getByTestId('row-actions-trigger').first();
     this.rows = page.getByTestId('data-table-body').getByTestId('data-table-row');
-    this.searchInput = page.getByTestId('data-table-search-bar').getByRole('searchbox');
+    this.searchBar = page.getByTestId('data-table-search-bar');
+    this.searchInput = this.searchBar.getByRole('searchbox');
+    this.subjectLookupButton = page.getByTestId('subject-lookup-search-button');
   }
 
   /**

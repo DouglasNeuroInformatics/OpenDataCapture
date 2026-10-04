@@ -17,6 +17,15 @@ describe('InstrumentShowcase', () => {
     expect(fireEvent.keyDown(searchBar, { key: 'Enter' })).toBe(false);
   });
 
+  // happy-dom computes no layout, so the responsive stacking is asserted through its utility classes;
+  // testing/src/specs/accessible-instruments.spec.ts measures the rendered result at phone width.
+  it('should stack the search bar above the filters below the lg breakpoint, so a phone gives it the full width', () => {
+    render(<InstrumentShowcase data={[]} onSelect={vi.fn()} />);
+    const searchBar = screen.getByTestId('instrument-search-bar');
+    expect([...searchBar.classList]).toContain('w-full');
+    expect([...searchBar.parentElement!.classList]).toEqual(expect.arrayContaining(['flex-col', 'lg:flex-row']));
+  });
+
   it('should not select anything when Enter is pressed with no matching instruments', () => {
     const onSelect = vi.fn();
     render(<InstrumentShowcase data={[]} onSelect={onSelect} />);

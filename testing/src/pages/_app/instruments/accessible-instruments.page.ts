@@ -4,14 +4,18 @@ import { AppPage } from '../route.page';
 
 export class AccessibleInstrumentsPage extends AppPage {
   readonly instrumentShowcase: Locator;
+  readonly kindFilter: Locator;
   readonly pageHeader: Locator;
+  readonly searchBar: Locator;
   readonly searchBox: Locator;
 
   constructor(page: Page) {
     super(page);
     this.pageHeader = page.getByTestId('page-header');
     this.instrumentShowcase = page.getByTestId('instrument-showcase');
-    this.searchBox = page.getByTestId('instrument-search-bar').locator('input');
+    this.kindFilter = page.getByTestId('instrument-kind-filter');
+    this.searchBar = page.getByTestId('instrument-search-bar');
+    this.searchBox = this.searchBar.locator('input');
   }
 
   /** Cards carry a content-hash testid, so match on the visible title instead. */
