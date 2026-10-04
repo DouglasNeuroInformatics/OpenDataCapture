@@ -16,6 +16,28 @@ const formInstrument = {
   }
 } as unknown as AnyUnilingualScalarInstrument & { content: FormInstrument.Content<TData, Language> };
 
+type TDynamicData = { hasPet: boolean; petName?: string };
+
+const dynamicFormInstrument = {
+  content: {
+    hasPet: { kind: 'boolean', label: 'Has Pet', variant: 'radio' },
+    petName: {
+      deps: ['hasPet'],
+      kind: 'dynamic',
+      render: (data: FormInstrument.PartialData<TDynamicData>) => {
+        return data.hasPet ? { kind: 'string', label: 'Pet Name', variant: 'input' } : null;
+      }
+    }
+  },
+  internal: { edition: 1, name: 'STUB_DYNAMIC_FORM' },
+  kind: 'FORM',
+  language: 'en',
+  measures: {
+    labeledPetName: { kind: 'const', label: 'Name of Pet', ref: 'petName' },
+    petName: { kind: 'const', ref: 'petName' }
+  }
+} as unknown as AnyUnilingualScalarInstrument;
+
 const interactiveInstrument = {
   internal: { edition: 1, name: 'STUB_INTERACTIVE' },
   kind: 'INTERACTIVE',
@@ -79,5 +101,26 @@ describe('computeInstrumentMeasures', () => {
     const result = computeInstrumentMeasures(interactiveInstrument, { message: 'hello' });
     expect(result.message).toBeUndefined();
     expect(console.error).toHaveBeenCalledOnce();
+  });
+
+  it('should leave out a labeled measure on a dynamic field its data keeps hidden, since the respondent never saw it', () => {
+    const result = computeInstrumentMeasures(dynamicFormInstrument, { hasPet: false });
+    expect(result.labeledPetName).toBeUndefined();
+  });
+
+  it('should keep a labeled measure on a dynamic field once its data reveals it', () => {
+    const result = computeInstrumentMeasures(dynamicFormInstrument, { hasPet: true, petName: 'Rex' });
+    expect(result.labeledPetName).toEqual({ label: 'Name of Pet', value: 'Rex' });
+  });
+
+  it('should leave out an unlabeled measure on a hidden dynamic field without logging, since nothing failed', () => {
+    const result = computeInstrumentMeasures(dynamicFormInstrument, { hasPet: false });
+    expect(result.petName).toBeUndefined();
+    expect(console.error).not.toHaveBeenCalled();
+  });
+
+  it('should keep a measure on an unanswered static field, so the summary still shows it as missing', () => {
+    const result = computeInstrumentMeasures(formInstrument, {});
+    expect(result.favoriteNumber).toEqual({ label: 'Favorite Number', value: undefined });
   });
 });

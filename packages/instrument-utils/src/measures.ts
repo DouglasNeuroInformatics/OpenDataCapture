@@ -8,7 +8,7 @@ import type {
 import { $InstrumentMeasureValue } from '@opendatacapture/schemas/instrument';
 import { match } from 'ts-pattern';
 
-import { extractFieldLabel } from './form.js';
+import { extractFieldLabel, isFieldHidden } from './form.js';
 import { isFormInstrument } from './guards.js';
 
 export type ComputedMeasures = { [key: string]: { label: string; value: InstrumentMeasureValue } };
@@ -28,6 +28,9 @@ export function computeInstrumentMeasures(instrument: AnyUnilingualScalarInstrum
         return { label: measure.label, value: measure.value(data) };
       })
       .with({ kind: 'const' }, (measure) => {
+        if (isFormInstrument(instrument) && isFieldHidden(instrument, measure.ref, data)) {
+          return null;
+        }
         const result = $InstrumentMeasureValue.safeParse(data[measure.ref]);
         if (!result.success) {
           console.error('Failed to Parse Constant Measure', result.error);

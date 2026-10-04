@@ -7,6 +7,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { InstrumentSummary } from '../InstrumentSummary';
 
 const baseInstrument = {
+  content: {},
   details: { title: 'Stub Form' },
   internal: { edition: 1, name: 'STUB_FORM' },
   kind: 'FORM',
