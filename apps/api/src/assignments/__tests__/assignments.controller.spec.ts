@@ -172,13 +172,14 @@ describe('AssignmentsController', () => {
       });
     });
 
-    it('records who sent what to whom, with the outcome, in the audit entry', async () => {
+    // Every admin reads the audit log, so it records the domain the link went to, not the address.
+    it('records who sent what to which masked address, with the outcome, in the audit entry', async () => {
       assignmentsService.findById.mockResolvedValueOnce(assignment);
       groupsService.findById.mockResolvedValueOnce({ emailTemplates: [] });
-      await sendEmail({ language: 'en', recipient: 'p@x.org' });
+      await sendEmail({ language: 'en', recipient: 'participant@x.org' });
       expect(auditLogger.log).toHaveBeenCalledWith('SEND_EMAIL', 'ASSIGNMENT', {
         groupId: 'group-1',
-        metadata: { assignmentId: 'assignment-1', recipient: 'p@x.org', status: 'SENT' },
+        metadata: { assignmentId: 'assignment-1', recipient: 'p***@x.org', status: 'SENT' },
         userId: 'user-1'
       });
     });
@@ -216,6 +217,19 @@ describe('AssignmentsController', () => {
         status: 'SENT'
       });
       await expect(sendEmail({ language: 'en', recipient: 'p@x.org' })).resolves.toMatchObject({ status: 'SENT' });
+    });
+
+    // The clinician who typed the address needs it back to send the message by hand.
+    it('returns the full recipient to the caller even though the audit entry masks it', async () => {
+      assignmentsService.findById.mockResolvedValueOnce({ ...assignment, groupId: null });
+      mailService.sendAssignmentEmail.mockResolvedValueOnce({
+        message: 'rendered',
+        recipient: 'participant@x.org',
+        status: 'SENT'
+      });
+      await expect(sendEmail({ language: 'en', recipient: 'participant@x.org' })).resolves.toMatchObject({
+        recipient: 'participant@x.org'
+      });
     });
   });
 });

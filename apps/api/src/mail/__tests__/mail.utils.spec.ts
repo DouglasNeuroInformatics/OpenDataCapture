@@ -6,6 +6,7 @@ import {
   formatExpiryDate,
   formatSender,
   pickLocale,
+  redactEmails,
   renderTemplate
 } from '../mail.utils';
 
@@ -22,6 +23,36 @@ describe('renderTemplate', () => {
 
   it('leaves unknown placeholders untouched', () => {
     expect(renderTemplate('Hi {{missing}}', { name: 'x' })).toBe('Hi {{missing}}');
+  });
+});
+
+// Log lines and audit entries keep the domain mail went to, never who received it.
+describe('redactEmails', () => {
+  it('masks an address down to its first character and domain', () => {
+    expect(redactEmails('bob.smith@example.org')).toBe('b***@example.org');
+  });
+
+  it('masks every local part to the same length, so the mask does not reveal it', () => {
+    expect(redactEmails('a@example.org')).toBe(redactEmails('abcdefgh@example.org'));
+  });
+
+  it('masks an address an SMTP server echoes inside its error', () => {
+    expect(redactEmails('550 5.1.1 <bob.smith@example.org>: Recipient address rejected')).toBe(
+      '550 5.1.1 <b***@example.org>: Recipient address rejected'
+    );
+  });
+
+  it('masks every address in the text', () => {
+    expect(redactEmails('to alice@a.org, bob@b.org')).toBe('to a***@a.org, b***@b.org');
+  });
+
+  it('masks the whole local part when it holds an apostrophe or non-ASCII letters', () => {
+    expect(redactEmails("o'brien@example.org")).toBe('o***@example.org');
+    expect(redactEmails('jösé@example.org')).toBe('j***@example.org');
+  });
+
+  it('leaves text without an address unchanged', () => {
+    expect(redactEmails('getaddrinfo ENOTFOUND smtp.invalid.test')).toBe('getaddrinfo ENOTFOUND smtp.invalid.test');
   });
 });
 
