@@ -11,10 +11,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 import type { RuntimePrismaClient } from '@/core/prisma';
+import { StorageService } from '@/storage/storage.service';
 
 import { SubjectsService } from '../subjects.service';
 
 describe('SubjectsService', () => {
+  let storageService: MockedInstance<StorageService>;
+  let loggingService: MockedInstance<LoggingService>;
   let subjectsService: SubjectsService;
   let subjectModel: MockedInstance<Model<'Subject'>>;
   let prismaClient: MockedInstance<RuntimePrismaClient> & {
@@ -26,6 +29,8 @@ describe('SubjectsService', () => {
       providers: [
         MockFactory.createForService(CryptoService),
         SubjectsService,
+        MockFactory.createForService(StorageService),
+        MockFactory.createForService(LoggingService),
         MockFactory.createForModelToken(getModelToken('Subject')),
         {
           provide: PRISMA_CLIENT_TOKEN,
@@ -33,19 +38,25 @@ describe('SubjectsService', () => {
             $transaction: vi.fn(),
             instrumentRecord: {
               deleteMany: vi.fn(),
-              findMany: vi.fn(),
+              findMany: vi.fn().mockResolvedValue([]),
               groupBy: vi.fn()
+            },
+            instrumentRecordFile: {
+              deleteMany: vi.fn(),
+              findMany: vi.fn().mockResolvedValue([])
             },
             session: {
               deleteMany: vi.fn()
             },
             subject: {
-              deleteMany: vi.fn()
+              delete: vi.fn()
             }
           }
         }
       ]
     }).compile();
+    storageService = moduleRef.get(StorageService);
+    loggingService = moduleRef.get(LoggingService);
     subjectModel = moduleRef.get(getModelToken('Subject'));
     subjectsService = moduleRef.get(SubjectsService);
     prismaClient = moduleRef.get(PRISMA_CLIENT_TOKEN);
@@ -232,17 +243,118 @@ describe('SubjectsService', () => {
       expect(subjectModel.delete).not.toHaveBeenCalled();
       expect(prismaClient.$transaction).toHaveBeenCalledOnce();
     });
-    it('should pass operations to $transaction in order: instrumentRecord, session, subject', async () => {
+    it('should pass operations to $transaction in order: files, instrumentRecord, session, subject', async () => {
       subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      const fileOp = 'file-op';
+      prismaClient.instrumentRecordFile.deleteMany.mockReturnValueOnce(fileOp);
       const instrumentRecordOp = 'instrumentRecord-op';
       const sessionOp = 'session-op';
       const subjectOp = 'subject-op';
       prismaClient.instrumentRecord.deleteMany.mockReturnValueOnce(instrumentRecordOp);
       prismaClient.session.deleteMany.mockReturnValueOnce(sessionOp);
-      prismaClient.subject.deleteMany.mockReturnValueOnce(subjectOp);
+      prismaClient.subject.delete.mockReturnValueOnce(subjectOp);
       await subjectsService.deleteById('123', { force: true });
-      expect(prismaClient.$transaction).toHaveBeenCalledWith([instrumentRecordOp, sessionOp, subjectOp]);
+      expect(prismaClient.$transaction).toHaveBeenCalledWith([fileOp, instrumentRecordOp, sessionOp, subjectOp]);
     });
+    it('should scope the subject and its dependent records and sessions to delete permissions', async () => {
+      const ability = createAppAbility([
+        { action: 'delete', conditions: { groupIds: { has: 'group-1' } }, subject: 'Subject' },
+        { action: 'delete', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' },
+        { action: 'delete', conditions: { groupId: 'group-1' }, subject: 'Session' }
+      ]);
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      await subjectsService.deleteById('123', { ability, force: true });
+      const where = { AND: [accessibleQuery(ability, 'delete', 'Subject')], id: '123' };
+      expect(subjectModel.findFirst).toHaveBeenCalledWith({ where });
+      expect(prismaClient.subject.delete).toHaveBeenCalledWith({ where });
+      expect(prismaClient.instrumentRecord.findMany).toHaveBeenCalledWith({
+        select: { id: true },
+        where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], subjectId: '123' }
+      });
+      expect(prismaClient.instrumentRecord.deleteMany).toHaveBeenCalledWith({
+        where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], id: { in: [] }, subjectId: '123' }
+      });
+      expect(prismaClient.session.deleteMany).toHaveBeenCalledWith({
+        where: { AND: [accessibleQuery(ability, 'delete', 'Session')], subjectId: '123' }
+      });
+    });
+
+    it('should collect files from every authorized record and clean storage only after commit', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      prismaClient.instrumentRecord.findMany.mockResolvedValueOnce([{ id: 'record-1' }, { id: 'record-2' }]);
+      const files = [
+        { basename: 'file', groupId: 'group-1', id: 'file-1', index: 0, recordId: 'record-1' },
+        { basename: 'scan', groupId: null, id: 'file-2', index: 1, recordId: 'record-2' }
+      ];
+      prismaClient.instrumentRecordFile.findMany.mockResolvedValueOnce(files);
+      const commit = Promise.withResolvers<unknown[]>();
+      prismaClient.$transaction.mockReturnValueOnce(commit.promise);
+      const deletion = subjectsService.deleteById('123', { force: true });
+      await vi.waitFor(() => expect(prismaClient.$transaction).toHaveBeenCalledOnce());
+      expect(storageService.deleteObjects).not.toHaveBeenCalled();
+      commit.resolve([]);
+      await deletion;
+      expect(prismaClient.instrumentRecordFile.findMany).toHaveBeenCalledWith({
+        where: { recordId: { in: ['record-1', 'record-2'] } }
+      });
+      expect(prismaClient.instrumentRecordFile.deleteMany).toHaveBeenCalledWith({
+        where: { id: { in: ['file-1', 'file-2'] } }
+      });
+      expect(subjectModel.findFirst).toHaveBeenCalledBefore(prismaClient.instrumentRecord.findMany);
+      expect(prismaClient.instrumentRecordFile.findMany).toHaveBeenCalledBefore(
+        prismaClient.instrumentRecordFile.deleteMany
+      );
+      expect(storageService.deleteObjects).toHaveBeenCalledWith([
+        { groupId: 'group-1', location: { basename: 'file', index: 0 }, recordId: 'record-1' },
+        { groupId: null, location: { basename: 'scan', index: 1 }, recordId: 'record-2' }
+      ]);
+    });
+
+    it('should keep storage intact if any database deletion fails', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      prismaClient.$transaction.mockRejectedValueOnce(new Error('transaction failed'));
+      await expect(subjectsService.deleteById('123', { force: true })).rejects.toThrow('transaction failed');
+      expect(storageService.deleteObjects).not.toHaveBeenCalled();
+    });
+
+    it('should log storage cleanup failure after a successful force deletion', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      prismaClient.instrumentRecord.findMany.mockResolvedValueOnce([{ id: 'record-1' }]);
+      prismaClient.instrumentRecordFile.findMany.mockResolvedValueOnce([
+        { basename: 'file', groupId: null, id: 'file-1', index: 0, recordId: 'record-1' }
+      ]);
+      const error = new Error('storage failed');
+      storageService.deleteObjects.mockRejectedValueOnce(error);
+      await expect(subjectsService.deleteById('123', { force: true })).resolves.toEqual({ success: true });
+      expect(loggingService.error).toHaveBeenCalledWith({
+        error,
+        files: [{ groupId: null, location: { basename: 'file', index: 0 }, recordId: 'record-1' }],
+        message: expect.stringContaining('orphaned objects require cleanup')
+      });
+    });
+
+    it('should refuse an inaccessible subject before reading or deleting dependent data', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce(null);
+      const ability = createAppAbility([
+        { action: 'delete', conditions: { groupIds: { has: 'other-group' } }, subject: 'Subject' }
+      ]);
+      await expect(subjectsService.deleteById('123', { ability, force: true })).rejects.toBeInstanceOf(
+        NotFoundException
+      );
+      expect(prismaClient.instrumentRecord.findMany).not.toHaveBeenCalled();
+      expect(prismaClient.instrumentRecordFile.findMany).not.toHaveBeenCalled();
+      expect(prismaClient.$transaction).not.toHaveBeenCalled();
+      expect(storageService.deleteObjects).not.toHaveBeenCalled();
+    });
+
+    it('should leave dependent rows and storage alone when force is false', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      await expect(subjectsService.deleteById('123')).resolves.toEqual({ success: true });
+      expect(prismaClient.instrumentRecord.findMany).not.toHaveBeenCalled();
+      expect(prismaClient.instrumentRecordFile.deleteMany).not.toHaveBeenCalled();
+      expect(storageService.deleteObjects).not.toHaveBeenCalled();
+    });
+
     it('should throw NotFoundException when subject does not exist', async () => {
       subjectModel.findFirst.mockResolvedValueOnce(null);
       await expect(subjectsService.deleteById('123')).rejects.toBeInstanceOf(NotFoundException);

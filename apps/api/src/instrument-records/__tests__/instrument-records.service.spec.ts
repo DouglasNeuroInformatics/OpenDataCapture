@@ -1,11 +1,11 @@
 import type { Model } from '@douglasneuroinformatics/libnest';
-import { getModelToken, LoggingService } from '@douglasneuroinformatics/libnest';
+import { getModelToken, LoggingService, PRISMA_CLIENT_TOKEN } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
@@ -22,6 +22,10 @@ import { InstrumentRecordsService } from '../instrument-records.service';
 import type { RecordType } from '../thread-types';
 
 describe('InstrumentRecordsService', () => {
+  let loggingService: MockedInstance<LoggingService>;
+  let storageService: MockedInstance<StorageService>;
+  let fileModel: MockedInstance<Model<'InstrumentRecordFile'>>;
+  const transaction = vi.fn();
   let instrumentRecordsService: InstrumentRecordsService;
   let instrumentRecordModel: MockedInstance<Model<'InstrumentRecord'>>;
   let sessionModel: MockedInstance<Model<'Session'>>;
@@ -31,10 +35,27 @@ describe('InstrumentRecordsService', () => {
   let usersService: MockedInstance<UsersService>;
 
   beforeEach(async () => {
+    transaction.mockReset();
+    const recordProvider = MockFactory.createForModelToken(getModelToken('InstrumentRecord'));
+    const fileProvider = MockFactory.createForModelToken(getModelToken('InstrumentRecordFile'));
     const moduleRef = await Test.createTestingModule({
       providers: [
         InstrumentRecordsService,
-        MockFactory.createForModelToken(getModelToken('InstrumentRecord')),
+        recordProvider,
+        fileProvider,
+        MockFactory.createForService(LoggingService),
+        {
+          inject: [getModelToken('InstrumentRecord'), getModelToken('InstrumentRecordFile')],
+          provide: PRISMA_CLIENT_TOKEN,
+          useFactory: (
+            instrumentRecord: Model<'InstrumentRecord'>,
+            instrumentRecordFile: Model<'InstrumentRecordFile'>
+          ) => ({
+            $transaction: transaction,
+            instrumentRecord,
+            instrumentRecordFile
+          })
+        },
         MockFactory.createForModelToken(getModelToken('Session')),
         MockFactory.createForService(GroupsService),
         MockFactory.createForService(UsersService),
@@ -46,6 +67,9 @@ describe('InstrumentRecordsService', () => {
       ]
     }).compile();
 
+    fileModel = moduleRef.get(getModelToken('InstrumentRecordFile'));
+    storageService = moduleRef.get(StorageService);
+    loggingService = moduleRef.get(LoggingService);
     instrumentRecordModel = moduleRef.get(getModelToken('InstrumentRecord'));
     sessionModel = moduleRef.get(getModelToken('Session'));
     instrumentRecordsService = moduleRef.get(InstrumentRecordsService);
@@ -53,6 +77,96 @@ describe('InstrumentRecordsService', () => {
     sessionsService = moduleRef.get(SessionsService);
     subjectsService = moduleRef.get(SubjectsService);
     usersService = moduleRef.get(UsersService);
+  });
+
+  describe('deleteById', () => {
+    const file = { basename: 'file', groupId: 'group-1', id: 'file-1', index: 0, recordId: 'record-1' };
+    const storageFile = { groupId: 'group-1', location: { basename: 'file', index: 0 }, recordId: 'record-1' };
+
+    beforeEach(() => {
+      instrumentRecordModel.findFirst.mockResolvedValue({ id: 'record-1' });
+      fileModel.findMany.mockResolvedValue([file]);
+      transaction.mockResolvedValue([{ count: 1 }, { id: 'record-1' }]);
+    });
+
+    it('should apply delete permissions before looking up files and again when deleting', async () => {
+      const ability = createAppAbility([
+        { action: 'delete', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' }
+      ]);
+      await instrumentRecordsService.deleteById('record-1', { ability });
+      const where = { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], id: 'record-1' };
+      expect(instrumentRecordModel.findFirst).toHaveBeenCalledWith({ where });
+      expect(instrumentRecordModel.delete).toHaveBeenCalledWith({ where });
+      expect(fileModel.findMany).toHaveBeenCalledWith({ where: { recordId: 'record-1' } });
+      expect(instrumentRecordModel.findFirst).toHaveBeenCalledBefore(fileModel.findMany);
+    });
+
+    it('should delete the collected file rows before the record in one transaction', async () => {
+      const fileOperation = Promise.resolve({ count: 1 });
+      const recordOperation = Promise.resolve({ id: 'record-1' });
+      fileModel.deleteMany.mockReturnValueOnce(fileOperation);
+      instrumentRecordModel.delete.mockReturnValueOnce(recordOperation);
+      await expect(instrumentRecordsService.deleteById('record-1')).resolves.toEqual({ id: 'record-1' });
+      expect(transaction).toHaveBeenCalledWith([fileOperation, recordOperation]);
+      expect(fileModel.deleteMany).toHaveBeenCalledWith({ where: { id: { in: ['file-1'] } } });
+      expect(fileModel.findMany).toHaveBeenCalledBefore(fileModel.deleteMany);
+    });
+
+    it('should wait for the transaction to commit before deleting storage objects', async () => {
+      const commit = Promise.withResolvers<unknown[]>();
+      transaction.mockReturnValueOnce(commit.promise);
+      const deletion = instrumentRecordsService.deleteById('record-1');
+      await vi.waitFor(() => expect(transaction).toHaveBeenCalledOnce());
+      expect(storageService.deleteObjects).not.toHaveBeenCalled();
+      commit.resolve([{ count: 1 }, { id: 'record-1' }]);
+      await deletion;
+      expect(storageService.deleteObjects).toHaveBeenCalledWith([storageFile]);
+    });
+
+    it('should leave storage untouched if the database transaction fails', async () => {
+      transaction.mockRejectedValueOnce(new Error('transaction failed'));
+      await expect(instrumentRecordsService.deleteById('record-1')).rejects.toThrow('transaction failed');
+      expect(storageService.deleteObjects).not.toHaveBeenCalled();
+    });
+
+    it('should log orphaned objects without failing an already committed deletion', async () => {
+      const error = new Error('storage failed');
+      storageService.deleteObjects.mockRejectedValueOnce(error);
+      await expect(instrumentRecordsService.deleteById('record-1')).resolves.toEqual({ id: 'record-1' });
+      expect(loggingService.error).toHaveBeenCalledWith({
+        error,
+        files: [storageFile],
+        message: expect.stringContaining('orphaned objects require cleanup')
+      });
+    });
+
+    it('should delete records without files', async () => {
+      fileModel.findMany.mockResolvedValueOnce([]);
+      await expect(instrumentRecordsService.deleteById('record-1')).resolves.toEqual({ id: 'record-1' });
+      expect(storageService.deleteObjects).toHaveBeenCalledWith([]);
+    });
+
+    it('should report a missing or inaccessible record without reading its files', async () => {
+      instrumentRecordModel.findFirst.mockResolvedValueOnce(null);
+      const ability = createAppAbility([
+        { action: 'delete', conditions: { groupId: 'other-group' }, subject: 'InstrumentRecord' }
+      ]);
+      await expect(instrumentRecordsService.deleteById('record-1', { ability })).rejects.toBeInstanceOf(
+        NotFoundException
+      );
+      expect(fileModel.findMany).not.toHaveBeenCalled();
+      expect(transaction).not.toHaveBeenCalled();
+      expect(storageService.deleteObjects).not.toHaveBeenCalled();
+    });
+
+    it('should refuse callers without a delete rule before querying clinical data', async () => {
+      await expect(
+        instrumentRecordsService.deleteById('record-1', { ability: createAppAbility([]) })
+      ).rejects.toThrow();
+      expect(instrumentRecordModel.findFirst).not.toHaveBeenCalled();
+      expect(fileModel.findMany).not.toHaveBeenCalled();
+      expect(transaction).not.toHaveBeenCalled();
+    });
   });
 
   describe('findById', () => {

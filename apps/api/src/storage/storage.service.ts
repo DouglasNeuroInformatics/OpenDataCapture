@@ -1,5 +1,6 @@
 import {
   CreateBucketCommand,
+  DeleteObjectsCommand,
   GetObjectCommand,
   HeadBucketCommand,
   PutObjectCommand,
@@ -38,6 +39,26 @@ export class StorageService implements OnModuleInit {
 
   get isEnabled(): boolean {
     return this.enabled;
+  }
+
+  async deleteObjects(files: FileSearchParams[]): Promise<void> {
+    if (files.length === 0) {
+      return;
+    }
+    const { bucket, s3 } = this.requireStorage();
+    for (let offset = 0; offset < files.length; offset += 1000) {
+      const result = await s3.send(
+        new DeleteObjectsCommand({
+          Bucket: bucket,
+          Delete: {
+            Objects: files.slice(offset, offset + 1000).map((file) => ({ Key: this.getStorageKey(file) }))
+          }
+        })
+      );
+      if (result.Errors?.length) {
+        throw new Error(`Failed to delete storage objects: ${JSON.stringify(result.Errors)}`);
+      }
+    }
   }
 
   async getPresignedDownloadUrl(params: FileSearchParams): Promise<$PresignedUrlInfo> {
