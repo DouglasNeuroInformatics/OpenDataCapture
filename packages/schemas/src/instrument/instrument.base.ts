@@ -252,6 +252,9 @@ type ScalarInstrumentInfo<T extends BaseInstrument = BaseInstrument> = BaseInstr
 
 /** Info for a series instrument, which bundles the scalar instruments referenced by `seriesItems`. */
 type SeriesInstrumentInfo<T extends BaseInstrument = BaseInstrument> = BaseInstrumentInfo<T> & {
+  // When an administrator retired this series from new sessions and assignments, or null while it is
+  // active. Records already collected with it are unaffected, so readers of data must not filter on it.
+  archivedAt?: Date | null;
   kind: 'SERIES';
   // The group that created and owns this series, or null for a series shared across every group (one
   // uploaded directly, or created before series became group-owned). Only the owning group may delete
@@ -280,6 +283,7 @@ const $ScalarInstrumentInfo = $BaseInstrumentInfo.extend({
 }) satisfies z.ZodType<ScalarInstrumentInfo>;
 
 const $SeriesInstrumentInfo = $BaseInstrumentInfo.extend({
+  archivedAt: z.coerce.date().nullish(),
   kind: z.literal('SERIES'),
   seriesGroupId: z.string().nullish(),
   seriesItems: z.object({ id: z.string() }).array()
@@ -340,6 +344,18 @@ type CreateSeriesInstrumentResult =
   | { existingTitle: NonNullable<ClientInstrumentDetails['title']>; outcome: 'duplicate' }
   | { instrumentId: string; outcome: 'created' };
 
+/** A series as the administrators' overview lists it: its info, plus the name of the group that owns it. */
+type SeriesInstrumentOverview = z.infer<typeof $SeriesInstrumentOverview>;
+const $SeriesInstrumentOverview = $SeriesInstrumentInfo.extend({
+  // Null for a series shared across every group, matching a null `seriesGroupId`.
+  seriesGroup: z.object({ id: z.string(), name: z.string() }).nullable()
+});
+
+type $UpdateSeriesInstrumentData = z.infer<typeof $UpdateSeriesInstrumentData>;
+const $UpdateSeriesInstrumentData = z.object({
+  isArchived: z.boolean()
+});
+
 const $BaseInstrumentBundleContainer = z.object({
   id: z.string()
 });
@@ -384,8 +400,11 @@ export {
   $ScalarInstrument,
   $ScalarInstrumentBundleContainer,
   $ScalarInstrumentInternal,
+  $SeriesInstrumentInfo,
+  $SeriesInstrumentOverview,
   $UnilingualInstrumentDetails,
-  $UnilingualScalarInstrument
+  $UnilingualScalarInstrument,
+  $UpdateSeriesInstrumentData
 };
 
 export type {
@@ -397,6 +416,7 @@ export type {
   ScalarInstrumentInfo,
   SeriesInstrumentBundleContainer,
   SeriesInstrumentInfo,
+  SeriesInstrumentOverview,
   TranslatedInstrumentInfo,
   UnilingualInstrumentInfo
 };

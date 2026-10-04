@@ -10,6 +10,7 @@ import { AuditLogsPage } from '../pages/_app/admin/audit/logs.page';
 import { BrandingPage } from '../pages/_app/admin/branding/index.page';
 import { BrandingLoginPagePage } from '../pages/_app/admin/branding/login-page.page';
 import { InstrumentReposPage } from '../pages/_app/admin/instrument-repos/index.page';
+import { AdminInstrumentsPage } from '../pages/_app/admin/instruments.page';
 import { MailSettingsPage } from '../pages/_app/admin/mail.page';
 import { AdminSettingsPage } from '../pages/_app/admin/settings.page';
 import { AdminUserPage } from '../pages/_app/admin/users/$userId.page';
@@ -44,6 +45,7 @@ const pageModels = {
   '/admin/branding': BrandingPage,
   '/admin/branding/login-page': BrandingLoginPagePage,
   '/admin/instrument-repos': InstrumentReposPage,
+  '/admin/instruments': AdminInstrumentsPage,
   '/admin/mail': MailSettingsPage,
   '/admin/settings': AdminSettingsPage,
   '/admin/users/$userId': AdminUserPage,

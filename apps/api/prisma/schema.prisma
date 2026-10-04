@@ -33,6 +33,8 @@ enum AuditLogAction {
   DELETE
   LOGIN
   SEND_EMAIL
+  ARCHIVE
+  UNARCHIVE
 }
 
 enum AuditLogEntity {
@@ -223,6 +225,8 @@ model Instrument {
   createdAt      DateTime           @default(now()) @db.Date
   updatedAt      DateTime           @updatedAt @db.Date
   id             String             @id @map("_id")
+  // Set when an administrator retires a series from new sessions and assignments; null while active.
+  archivedAt     DateTime?          @db.Date
   assignments    Assignment[]
   bundle         String
   groups         Group[]            @relation(fields: [groupIds], references: [id])

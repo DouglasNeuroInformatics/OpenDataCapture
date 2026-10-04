@@ -4,10 +4,13 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import {
   BarChartBigIcon,
   CirclePlayIcon,
+  ClipboardListIcon,
   CogIcon,
   ComputerIcon,
   DatabaseIcon,
   EyeIcon,
+  FileTextIcon,
+  LayersIcon,
   LogsIcon,
   MailIcon,
   PackageIcon,
@@ -201,6 +204,28 @@ export function useNavItems() {
               fr: "Dépôts d'instruments"
             }),
             url: '/admin/instrument-repos'
+          },
+          {
+            children: [
+              {
+                icon: FileTextIcon,
+                label: t({
+                  en: 'Form & Interactive',
+                  es: 'Formularios e interactivos',
+                  fr: 'Formulaires et interactifs'
+                }),
+                search: { view: 'forms' },
+                url: '/admin/instruments'
+              },
+              {
+                icon: LayersIcon,
+                label: t({ en: 'Series', es: 'Series', fr: 'Séries' }),
+                search: { view: 'series' },
+                url: '/admin/instruments'
+              }
+            ],
+            icon: ClipboardListIcon,
+            label: t({ en: 'Instruments', es: 'Instrumentos', fr: 'Instruments' })
           },
           {
             icon: MailIcon,

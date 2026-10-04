@@ -29,6 +29,7 @@ import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
 import { Route as AppGroupEmailTemplatesRouteImport } from './routes/_app/group/email-templates'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
 import { Route as AppAdminMailRouteImport } from './routes/_app/admin/mail'
+import { Route as AppAdminInstrumentsRouteImport } from './routes/_app/admin/instruments'
 import { Route as AppDatahubSubjectIdRouteRouteImport } from './routes/_app/datahub/$subjectId/route'
 import { Route as AppAdminUsersIndexRouteImport } from './routes/_app/admin/users/index'
 import { Route as AppAdminInstrumentReposIndexRouteImport } from './routes/_app/admin/instrument-repos/index'
@@ -147,6 +148,11 @@ const AppAdminMailRoute = AppAdminMailRouteImport.update({
   path: '/admin/mail',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppAdminInstrumentsRoute = AppAdminInstrumentsRouteImport.update({
+  id: '/admin/instruments',
+  path: '/admin/instruments',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppDatahubSubjectIdRouteRoute =
   AppDatahubSubjectIdRouteRouteImport.update({
     id: '/datahub/$subjectId',
@@ -240,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
+  '/admin/instruments': typeof AppAdminInstrumentsRoute
   '/admin/mail': typeof AppAdminMailRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/email-templates': typeof AppGroupEmailTemplatesRoute
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/': typeof AppIndexRoute
   '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
+  '/admin/instruments': typeof AppAdminInstrumentsRoute
   '/admin/mail': typeof AppAdminMailRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/email-templates': typeof AppGroupEmailTemplatesRoute
@@ -314,6 +322,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/_app/': typeof AppIndexRoute
   '/_app/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
+  '/_app/admin/instruments': typeof AppAdminInstrumentsRoute
   '/_app/admin/mail': typeof AppAdminMailRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/group/email-templates': typeof AppGroupEmailTemplatesRoute
@@ -352,6 +361,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/datahub/$subjectId'
+    | '/admin/instruments'
     | '/admin/mail'
     | '/admin/settings'
     | '/group/email-templates'
@@ -388,6 +398,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/'
     | '/datahub/$subjectId'
+    | '/admin/instruments'
     | '/admin/mail'
     | '/admin/settings'
     | '/group/email-templates'
@@ -425,6 +436,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/_app/'
     | '/_app/datahub/$subjectId'
+    | '/_app/admin/instruments'
     | '/_app/admin/mail'
     | '/_app/admin/settings'
     | '/_app/group/email-templates'
@@ -601,6 +613,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminMailRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/admin/instruments': {
+      id: '/_app/admin/instruments'
+      path: '/admin/instruments'
+      fullPath: '/admin/instruments'
+      preLoaderRoute: typeof AppAdminInstrumentsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/datahub/$subjectId': {
       id: '/_app/datahub/$subjectId'
       path: '/datahub/$subjectId'
@@ -737,6 +756,7 @@ interface AppRouteRouteChildren {
   AppUserRoute: typeof AppUserRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDatahubSubjectIdRouteRoute: typeof AppDatahubSubjectIdRouteRouteWithChildren
+  AppAdminInstrumentsRoute: typeof AppAdminInstrumentsRoute
   AppAdminMailRoute: typeof AppAdminMailRoute
   AppAdminSettingsRoute: typeof AppAdminSettingsRoute
   AppGroupEmailTemplatesRoute: typeof AppGroupEmailTemplatesRoute
@@ -767,6 +787,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppUserRoute: AppUserRoute,
   AppIndexRoute: AppIndexRoute,
   AppDatahubSubjectIdRouteRoute: AppDatahubSubjectIdRouteRouteWithChildren,
+  AppAdminInstrumentsRoute: AppAdminInstrumentsRoute,
   AppAdminMailRoute: AppAdminMailRoute,
   AppAdminSettingsRoute: AppAdminSettingsRoute,
   AppGroupEmailTemplatesRoute: AppGroupEmailTemplatesRoute,

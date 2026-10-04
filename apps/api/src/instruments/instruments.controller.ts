@@ -1,18 +1,24 @@
 import { ApiOperation, CurrentUser } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Delete, Get, Param, ParseBoolPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseBoolPipe, Patch, Post, Query } from '@nestjs/common';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 // Imported as a value (not a type-only import) so it doubles as the validation schema for the request
 // body while also annotating its type — no dedicated DTO class is needed.
-import { $CreateInstrumentData, $CreateSeriesInstrumentData } from '@opendatacapture/schemas/instrument';
+import {
+  $CreateInstrumentData,
+  $CreateSeriesInstrumentData,
+  $UpdateSeriesInstrumentData
+} from '@opendatacapture/schemas/instrument';
 import type {
   CreateSeriesInstrumentResult,
   InstrumentBundleContainer,
-  InstrumentInfo
+  InstrumentInfo,
+  SeriesInstrumentOverview
 } from '@opendatacapture/schemas/instrument';
 
+import type { AppAbility } from '@/auth/auth.types';
 import { AcceptsInstrumentToken } from '@/core/decorators/accepts-instrument-token.decorator';
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { InstrumentsService } from './instruments.service';
 
@@ -69,6 +75,13 @@ export class InstrumentsController {
     return this.instrumentsService.findInfo({ allEditions, kind, subjectId }, currentUser, groupId);
   }
 
+  @ApiOperation({ summary: 'List Every Series Instrument' })
+  @Get('series')
+  @RouteAccess(ADMIN_ONLY)
+  findSeriesOverview(@CurrentUser('ability') ability: AppAbility): Promise<SeriesInstrumentOverview[]> {
+    return this.instrumentsService.findSeriesOverview({ ability });
+  }
+
   @ApiOperation({ summary: 'List Instruments' })
   @Get('list')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
@@ -78,5 +91,16 @@ export class InstrumentsController {
     @Query('kind') kind?: InstrumentKind
   ) {
     return this.instrumentsService.list({ kind }, currentUser, groupId);
+  }
+
+  @ApiOperation({ summary: 'Archive or Unarchive a Series Instrument' })
+  @Patch('series/:id')
+  @RouteAccess(ADMIN_ONLY)
+  updateSeriesArchive(
+    @Param('id') id: string,
+    @Body() data: $UpdateSeriesInstrumentData,
+    @CurrentUser() currentUser: RequestUser
+  ): Promise<{ archivedAt: Date | null; id: string }> {
+    return this.instrumentsService.updateSeriesArchive(id, data, currentUser);
   }
 }
