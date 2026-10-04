@@ -61,6 +61,41 @@ export default defineInstrument({
 `;
 }
 
+/**
+ * A form that asks for a pet's name only once the respondent says they have a pet. Both questions
+ * carry a labeled measure, so the toggle's measure is always in the summary and the name's only when
+ * the question was shown.
+ */
+function dynamicMeasureInstrumentSource(title: string): string {
+  return `
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { z } from '/runtime/v1/zod@3.x';
+
+export default defineInstrument({
+  kind: 'FORM',
+  language: 'en',
+  tags: ['Measures'],
+  internal: { edition: 1, name: 'DYNAMIC_MEASURE' },
+  clientDetails: { estimatedDuration: 1, instructions: ['Submit the form'] },
+  content: {
+    hasPet: { kind: 'boolean', label: 'Has Pet', variant: 'radio' },
+    petName: {
+      kind: 'dynamic',
+      deps: ['hasPet'],
+      render: (data) => (data.hasPet ? { kind: 'string', label: 'Pet Name', variant: 'input' } : null)
+    }
+  },
+  defaultMeasureVisibility: 'visible',
+  details: { description: 'Dynamic field measure', license: 'Apache-2.0', title: '${title}' },
+  measures: {
+    hasPet: { kind: 'const', label: 'Has Pet Measure', ref: 'hasPet' },
+    petName: { kind: 'const', label: 'Pet Name Measure', ref: 'petName' }
+  },
+  validationSchema: z.object({ hasPet: z.boolean(), petName: z.string().optional() })
+});
+`;
+}
+
 // The first paint waits on the 11 MB esbuild download and the toolchain boot; the preview then
 // compiles on a 2 s poll, so the whole chain is slower than the suite's default expect timeout.
 const PREVIEW_TIMEOUT = 60_000;
@@ -164,5 +199,50 @@ test.describe('playground', () => {
 
     await expect(playground.preview.getByText('Shown Measure')).toBeVisible();
     await expect(playground.preview.getByText('Hidden Measure')).toHaveCount(0);
+  });
+
+  test('should leave the measure on a dynamic question the respondent never saw out of the summary', async ({
+    page,
+    uniqueId
+  }) => {
+    const title = `Dynamic Measure ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: dynamicMeasureInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+
+    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
+    // The radio items carry stable ids (`<name>-true`), unlike their labels, which libui translates.
+    await playground.preview.locator('#hasPet-false').click();
+    await playground.preview.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(playground.preview.getByText('Has Pet Measure')).toBeVisible();
+    await expect(playground.preview.getByText('Pet Name Measure')).toHaveCount(0);
+  });
+
+  test('should list the measure on a dynamic question in the summary once the respondent reveals it', async ({
+    page,
+    uniqueId
+  }) => {
+    const title = `Dynamic Measure ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: dynamicMeasureInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+
+    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
+    await playground.preview.locator('#hasPet-true').click();
+    await playground.preview.getByLabel('Pet Name', { exact: true }).fill('Rex');
+    await playground.preview.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(playground.preview.getByText('Pet Name Measure')).toBeVisible();
   });
 });

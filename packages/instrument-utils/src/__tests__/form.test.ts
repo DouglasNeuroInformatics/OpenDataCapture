@@ -1,7 +1,7 @@
 import type { FormInstrument, Language } from '@opendatacapture/runtime-core';
 import { describe, expect, it } from 'vitest';
 
-import { extractFieldLabel, getFormFields } from '../form.js';
+import { extractFieldLabel, getFormFields, isFieldHidden } from '../form.js';
 
 type TData = { a: number; b: number };
 
@@ -63,5 +63,30 @@ describe('extractFieldLabel', () => {
     } as unknown as FormInstrument<TData, Language>;
 
     expect(extractFieldLabel<TData>(dynamicForm, 'a', { a: 1, b: 2 })).toBeUndefined();
+  });
+});
+
+describe('isFieldHidden', () => {
+  const form = {
+    content: {
+      a: fieldA,
+      b: {
+        deps: ['a'],
+        kind: 'dynamic',
+        render: (data: { a?: number }) => (data.a ? { kind: 'number', label: 'B', variant: 'input' } : null)
+      }
+    }
+  } as unknown as FormInstrument<TData, Language>;
+
+  it('should report a dynamic field hidden while its render function returns null for the data', () => {
+    expect(isFieldHidden<TData>(form, 'b', {})).toBe(true);
+  });
+
+  it('should report a dynamic field shown once its render function returns a field for the data', () => {
+    expect(isFieldHidden<TData>(form, 'b', { a: 1 })).toBe(false);
+  });
+
+  it('should never report a static field hidden, since the respondent always sees it', () => {
+    expect(isFieldHidden<TData>(form, 'a', {})).toBe(false);
   });
 });

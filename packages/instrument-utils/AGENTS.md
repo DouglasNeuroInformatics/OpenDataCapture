@@ -18,8 +18,10 @@ handled. That coupling is the point — do not add a catch-all pattern to make i
 fails `$InstrumentMeasureValue`, or whose label cannot be resolved, is `console.error`ed and dropped
 from the returned record; non-object `data` returns `{}`. The visible symptom is a summary missing a
 row, not an error. Check a measure's `ref` and `label` rather than trusting that the page rendered.
-A `computed` measure is different: its author-supplied `value(data)` function is called bare, so if
-it throws, the whole computation throws.
+A `const` measure on a dynamic form field that the data keeps hidden (`isFieldHidden`) is dropped
+without a log, label or not: the respondent never saw that question. A `computed` measure is
+different: its author-supplied `value(data)` function is called bare, so if it throws, the whole
+computation throws.
 
 **`isScalarInstrument` tests `Object.hasOwn(instrument, 'internal')`, not `kind`.** See
 `.agents/docs/architecture/instrument-pipeline.md` for why.
@@ -29,6 +31,6 @@ appearing in two groups silently keeps the last one.
 
 ## Tests
 
-`pnpm exec vitest --project instrument-utils`. `src/__tests__/` covers `getFormFields`; everything
-else here is still covered only through its consumers' suites (`apps/api`, `apps/web`) and the
-Playwright suite in `testing/`.
+`pnpm exec vitest --project instrument-utils`. `src/__tests__/` holds one file per module. The
+results summary that `computeInstrumentMeasures` feeds is exercised end to end by
+`testing/src/specs/playground.spec.ts`.

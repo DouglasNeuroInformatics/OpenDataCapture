@@ -15,6 +15,16 @@ export function getFormFields<TData extends FormInstrument.Data>(
   }, {}) as FormInstrument.Fields<TData, Language>;
 }
 
+/** Whether the field is a dynamic one that `data` keeps hidden, so the respondent never saw it */
+export function isFieldHidden<TData extends FormInstrument.Data>(
+  form: FormInstrument<TData, Language>,
+  key: string,
+  data: { [key: string]: unknown }
+) {
+  const field = getFormFields(form.content)[key];
+  return field?.kind === 'dynamic' && field.render(data as FormInstrument.PartialData<TData>) === null;
+}
+
 export function extractFieldLabel<TData extends FormInstrument.Data>(
   form: FormInstrument<TData, Language>,
   key: string,
