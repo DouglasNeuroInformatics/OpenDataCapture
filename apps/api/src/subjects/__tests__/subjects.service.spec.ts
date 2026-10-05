@@ -142,6 +142,56 @@ describe('SubjectsService', () => {
     });
   });
 
+  describe('createMany (existing and repeated subjects)', () => {
+    it('should create a subject named twice in one request only once, keeping its first entry', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([]);
+
+      await subjectsService.createMany([
+        { firstName: 'First', id: 'subject-1' },
+        { firstName: 'Second', id: 'subject-1' }
+      ]);
+
+      expect(subjectModel.createMany.mock.lastCall?.[0].data).toMatchObject([{ firstName: 'First', id: 'subject-1' }]);
+      expect(subjectModel.createMany.mock.lastCall?.[0].data).toHaveLength(1);
+    });
+
+    it('should create only the subjects that do not exist yet', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([{ id: 'subject-1' }]);
+
+      await subjectsService.createMany([{ id: 'subject-1' }, { id: 'subject-2' }]);
+
+      expect(subjectModel.createMany.mock.lastCall?.[0].data).toMatchObject([{ id: 'subject-2' }]);
+    });
+
+    it('should not issue a write when every subject already exists', async () => {
+      subjectModel.findMany.mockResolvedValueOnce([{ id: 'subject-1' }]);
+
+      await expect(subjectsService.createMany([{ id: 'subject-1' }])).resolves.toEqual([]);
+      expect(subjectModel.createMany).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('count', () => {
+    it('should count only the subjects the caller may read that match the filter', async () => {
+      const ability = createAppAbility([
+        { action: 'read', conditions: { groupIds: { has: 'group-1' } }, subject: 'Subject' }
+      ]);
+      subjectModel.count.mockResolvedValueOnce(4);
+
+      await expect(subjectsService.count({ sex: 'FEMALE' }, { ability })).resolves.toBe(4);
+      expect(subjectModel.count).toHaveBeenCalledWith({
+        where: { AND: [accessibleQuery(ability, 'read', 'Subject'), { sex: 'FEMALE' }] }
+      });
+    });
+
+    it('should count every subject when given no filter', async () => {
+      subjectModel.count.mockResolvedValueOnce(7);
+
+      await expect(subjectsService.count()).resolves.toBe(7);
+      expect(subjectModel.count).toHaveBeenCalledWith({ where: { AND: [{}, {}] } });
+    });
+  });
+
   describe('find', () => {
     it('should return the array returned by the subject model', async () => {
       subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
