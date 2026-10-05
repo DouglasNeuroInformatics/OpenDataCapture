@@ -58,9 +58,10 @@ describe('useDeleteInstrumentRepoMutation', () => {
   });
 
   it("should show the server's reason when the deletion is refused", async () => {
-    mockAxios.delete.mockRejectedValue({ response: { data: { message: 'Repository is in use' } } });
+    const serverError = { response: { data: { message: 'Repository is in use' } } };
+    mockAxios.delete.mockRejectedValue(serverError);
     const { result } = renderDeleteMutation();
-    await expect(result.current.mutateAsync({ id: 'repo-1' })).rejects.toBeTruthy();
+    await expect(result.current.mutateAsync({ id: 'repo-1' })).rejects.toBe(serverError);
     expect(addNotification).toHaveBeenCalledWith({ message: 'Repository is in use', type: 'error' });
   });
 

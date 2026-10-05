@@ -55,10 +55,20 @@ describe('useCreateSeriesInstrumentMutation', () => {
     });
   });
 
-  it('should announce the new series and refresh the instrument list, so it can be selected', async () => {
-    const { invalidateQueries, result } = renderCreateMutation();
+  it('should resolve to the created series, so the caller can select it', async () => {
+    const { result } = renderCreateMutation();
     await expect(result.current.mutateAsync(DATA)).resolves.toEqual({ instrumentId: 'series-1', outcome: 'created' });
+  });
+
+  it('should announce the new series once it is created', async () => {
+    const { result } = renderCreateMutation();
+    await result.current.mutateAsync(DATA);
     expect(addNotification).toHaveBeenCalledWith({ type: 'success' });
+  });
+
+  it('should refresh the instrument list, so the new series can be selected', async () => {
+    const { invalidateQueries, result } = renderCreateMutation();
+    await result.current.mutateAsync(DATA);
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['instrument-info'] });
   });
 
@@ -74,9 +84,10 @@ describe('useCreateSeriesInstrumentMutation', () => {
   });
 
   it("should show the server's reason when the series is refused", async () => {
-    mockAxios.post.mockRejectedValue({ response: { data: { message: 'Instrument not found' } } });
+    const serverError = { response: { data: { message: 'Instrument not found' } } };
+    mockAxios.post.mockRejectedValue(serverError);
     const { result } = renderCreateMutation();
-    await expect(result.current.mutateAsync(DATA)).rejects.toBeTruthy();
+    await expect(result.current.mutateAsync(DATA)).rejects.toBe(serverError);
     expect(addNotification).toHaveBeenCalledWith({ message: 'Instrument not found', type: 'error' });
   });
 

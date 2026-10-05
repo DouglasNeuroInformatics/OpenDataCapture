@@ -50,10 +50,15 @@ describe('useDeleteBulkAssignmentsMutation', () => {
     await expect(result.current.mutateAsync({ ids: ['assignment-1'] })).rejects.toThrow();
   });
 
-  it('should announce success and refresh every assignment list, so deleted links disappear', async () => {
-    const { invalidateQueries, result } = renderDeleteMutation();
+  it('should announce success once the batch is deleted', async () => {
+    const { result } = renderDeleteMutation();
     await result.current.mutateAsync({ ids: ['assignment-1'] });
     expect(addNotification).toHaveBeenCalledWith({ type: 'success' });
+  });
+
+  it('should refresh every assignment list, so deleted links disappear', async () => {
+    const { invalidateQueries, result } = renderDeleteMutation();
+    await result.current.mutateAsync({ ids: ['assignment-1'] });
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['assignments'] });
   });
 });

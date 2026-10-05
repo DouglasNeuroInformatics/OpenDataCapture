@@ -27,7 +27,7 @@ function renderFindUserQuery(id: string) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const wrapper = ({ children }: PropsWithChildren) =>
     createElement(QueryClientProvider, { client: queryClient }, createElement(Suspense, { fallback: null }, children));
-  return { ...renderHook(() => useFindUserQuery(id), { wrapper }), queryClient };
+  return renderHook(() => useFindUserQuery(id), { wrapper });
 }
 
 describe('useFindUserQuery', () => {

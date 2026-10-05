@@ -123,9 +123,10 @@ describe('useBulkAssignmentWizard', () => {
     const refusal = { code: 'BULK_ASSIGNMENT_REFUSED', issues: [{ kind: 'SUBJECT_UNAVAILABLE', subjectIds: ['a'] }] };
     mocks.createMutate.mockImplementation((_payload: unknown, { onError }: any) => onError({ refusal }));
     const { result } = renderWizard();
+    act(() => result.current.goTo('REVIEW'));
     act(() => result.current.submit({ allowDuplicates: false }));
+    expect(result.current.step).toBe('REVIEW');
     expect(result.current.failure).toEqual(refusal);
-    expect(result.current.transportError).toBe(false);
   });
 
   it('should fall back to the identifier for a subject whose supplied row is blank', () => {

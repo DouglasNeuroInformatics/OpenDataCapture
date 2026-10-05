@@ -51,7 +51,14 @@ describe('useCreateSetupStateMutation', () => {
 
   it('should refresh the setup state before settling, so the setup page is not shown again', async () => {
     const { invalidateQueries, result } = renderSetupMutation();
-    await result.current.mutateAsync(OPTIONS);
-    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['setup-state'] });
+    const { promise: refresh, resolve: finishRefresh } = Promise.withResolvers<void>();
+    invalidateQueries.mockReturnValue(refresh);
+    const onSettled = vi.fn();
+    const mutation = result.current.mutateAsync(OPTIONS).then(onSettled);
+    await vi.waitFor(() => expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['setup-state'] }));
+    expect(onSettled).not.toHaveBeenCalled();
+    finishRefresh();
+    await mutation;
+    expect(onSettled).toHaveBeenCalled();
   });
 });

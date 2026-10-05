@@ -63,10 +63,15 @@ describe('useCreateAssignment', () => {
     expect(assignment.expiresAt).toEqual(new Date(ASSIGNMENT.expiresAt));
   });
 
-  it('should announce success and refresh every assignment list, so the new link appears', async () => {
-    const { invalidateQueries, result } = renderCreateMutation();
+  it('should announce success once the assignment is created', async () => {
+    const { result } = renderCreateMutation();
     await result.current.mutateAsync({ data: DATA });
     expect(addNotification).toHaveBeenCalledWith({ type: 'success' });
+  });
+
+  it('should refresh every assignment list, so the new link appears', async () => {
+    const { invalidateQueries, result } = renderCreateMutation();
+    await result.current.mutateAsync({ data: DATA });
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['assignments'] });
   });
 });

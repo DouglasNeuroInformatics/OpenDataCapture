@@ -61,9 +61,10 @@ describe('useCreateInstrumentRepoMutation', () => {
   });
 
   it("should show the server's reason when the import is refused, so the user knows what to fix", async () => {
-    mockAxios.post.mockRejectedValue({ response: { data: { message: 'Repository already imported' } } });
+    const serverError = { response: { data: { message: 'Repository already imported' } } };
+    mockAxios.post.mockRejectedValue(serverError);
     const { result } = renderCreateMutation();
-    await expect(result.current.mutateAsync({ data: DATA })).rejects.toBeTruthy();
+    await expect(result.current.mutateAsync({ data: DATA })).rejects.toBe(serverError);
     expect(addNotification).toHaveBeenCalledWith({ message: 'Repository already imported', type: 'error' });
   });
 
