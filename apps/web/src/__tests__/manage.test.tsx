@@ -41,6 +41,9 @@ vi.mock('@/store', () => ({
   useAppStore: (selector: (store: { changeGroup: typeof mocks.changeGroup; currentGroup: Group | null }) => unknown) =>
     selector({ changeGroup: mocks.changeGroup, currentGroup: mocks.store.currentGroup })
 }));
+vi.mock('@/components/LoadingFallback', () => ({
+  LoadingFallback: () => <div data-testid="loading-fallback" />
+}));
 vi.mock('@/components/InstrumentPreviewDialog', () => ({
   InstrumentPreviewDialog: ({
     item,
@@ -154,6 +157,14 @@ const fillSeries = (dialog: HTMLElement, { picks, title }: { picks: string[]; ti
   }
 };
 
+const seriesOrder = (dialog: HTMLElement, title: string) => {
+  const row = within(dialog).getByTitle(title).closest('label');
+  if (!row) {
+    throw new Error(`No series item row holds "${title}"`);
+  }
+  return within(row).queryByText(/^\d+$/)?.textContent ?? null;
+};
+
 const createButton = (dialog: HTMLElement) => within(dialog).getByRole('button', { name: 'Create' });
 
 const resolveCreate = (result: CreateSeriesInstrumentResult) => mocks.createMutateAsync.mockResolvedValueOnce(result);
@@ -180,13 +191,14 @@ describe('manage group page', () => {
     it('should show a loading fallback until the instrument info has loaded', () => {
       mocks.instruments = undefined;
       renderPage();
-      expect(screen.getByText('Manage Group')).toBeTruthy();
+      expect(screen.getByTestId('loading-fallback')).toBeTruthy();
       expect(screen.queryByText('Accessible Instruments')).toBeNull();
     });
 
     it('should show a loading fallback when no group is selected, since there is nothing to manage', () => {
       mocks.store.currentGroup = null;
       renderPage();
+      expect(screen.getByTestId('loading-fallback')).toBeTruthy();
       expect(screen.queryByText('Accessible Instruments')).toBeNull();
     });
 
@@ -308,7 +320,19 @@ describe('manage group page', () => {
       expect(screen.queryByRole('button', { name: 'Delete instrument' })).toBeNull();
     });
 
-    it('should stay editable in a demo that is not a production build', () => {
+    it('should keep selection enabled in a demo that is not a production build', () => {
+      vi.stubEnv('PROD', false);
+      renderPage();
+      expect(checkbox('Happiness Questionnaire').hasAttribute('disabled')).toBe(false);
+    });
+
+    it('should keep the create control in a demo that is not a production build', () => {
+      vi.stubEnv('PROD', false);
+      renderPage();
+      expect(screen.getByRole('button', { name: 'Create series' })).toBeTruthy();
+    });
+
+    it('should leave out the demo-mode note in a demo that is not a production build', () => {
       vi.stubEnv('PROD', false);
       renderPage();
       expect(screen.queryByText(/disabled in demo mode/)).toBeNull();
@@ -389,12 +413,27 @@ describe('manage group page', () => {
       expect(within(dialog).getByText('No instruments available.')).toBeTruthy();
     });
 
-    it('should number the picked instruments in the order they were picked', () => {
+    it('should number the picked instruments by pick order rather than list order', () => {
+      renderPage();
+      const dialog = openCreateDialog();
+      fillSeries(dialog, { picks: ['Reaction Task', 'Breakfast Survey'], title: '' });
+      expect(seriesOrder(dialog, 'Reaction Task')).toBe('1');
+      expect(seriesOrder(dialog, 'Breakfast Survey')).toBe('2');
+    });
+
+    it('should renumber the remaining picks when one is unpicked', () => {
       renderPage();
       const dialog = openCreateDialog();
       fillSeries(dialog, { picks: ['Reaction Task', 'Breakfast Survey', 'Reaction Task'], title: '' });
-      expect(within(dialog).getByText(/Available instruments/).textContent).toContain('(1)');
-      expect(within(dialog).getByText('1').closest('label')?.textContent).toContain('Breakfast Survey');
+      expect(seriesOrder(dialog, 'Breakfast Survey')).toBe('1');
+      expect(seriesOrder(dialog, 'Reaction Task')).toBeNull();
+    });
+
+    it('should count the picked instruments in the list heading', () => {
+      renderPage();
+      const dialog = openCreateDialog();
+      fillSeries(dialog, { picks: ['Reaction Task', 'Breakfast Survey', 'Reaction Task'], title: '' });
+      expect(within(dialog).getByText(/Available instruments/).textContent).toBe('Available instruments (1)');
     });
 
     it('should refuse a name another instrument already uses, ignoring case and whitespace', () => {
@@ -537,6 +576,7 @@ describe('manage group page', () => {
       fireEvent.click(within(prompt).getByRole('button', { name: 'Yes, create anyway' }));
       await waitFor(() => expect(mocks.createMutateAsync).toHaveBeenCalledTimes(2));
       expect(screen.getByRole('dialog', { name: 'Series Already Exists' })).toBeTruthy();
+      expect(screen.getByRole('heading', { hidden: true, name: 'Create Series Instrument' })).toBeTruthy();
     });
 
     it('should do nothing on confirmation when a refetch has removed a picked instrument', async () => {
@@ -558,6 +598,7 @@ describe('manage group page', () => {
       const { prompt } = await submitDuplicate('Shared Battery');
       fireEvent.keyDown(prompt, { key: 'Escape' });
       expect(screen.queryByRole('dialog', { name: 'Series Already Exists' })).toBeNull();
+      expect(screen.getByRole('dialog', { name: 'Create Series Instrument' })).toBeTruthy();
     });
   });
 
@@ -612,8 +653,8 @@ describe('manage group page', () => {
     });
 
     it('should require an age once the minimum age is applied', async () => {
-      const { container } = renderPage();
-      fireEvent.click(container.querySelector('button[role="radio"][value="true"]')!);
+      renderPage();
+      fireEvent.click(within(screen.getByRole('radiogroup')).getByRole('radio', { name: 'True' }));
       submitSettings();
       expect(await screen.findByText('Please enter an age')).toBeTruthy();
       expect(mocks.updateMutateAsync).not.toHaveBeenCalled();
