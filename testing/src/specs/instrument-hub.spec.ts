@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
+import { InstrumentHubGraphPage } from '../pages/_app/datahub/instruments/$instrumentId/graph.page';
 import { InstrumentHubTablePage } from '../pages/_app/datahub/instruments/$instrumentId/table.page';
 import { InstrumentHubPage } from '../pages/_app/datahub/instruments/index.page';
 import { HAPPINESS_RECORD } from '../support/constants';
@@ -156,7 +157,6 @@ test.describe('instrument hub', () => {
 
   test('should plot the records of the instrument on its graph tab', async ({
     api,
-    getPageModel,
     isolatedGroupManager,
     page,
     uniqueId
@@ -177,7 +177,10 @@ test.describe('instrument hub', () => {
     await hubPage.goto('/datahub/instruments');
     await hubPage.open('Happiness Questionnaire');
 
-    const graphPage = await getPageModel('/datahub/instruments/$instrumentId/graph', { instrumentId });
+    // Reached by clicking the tab rather than through `getPageModel`, whose exact-URL assertion the
+    // route's own search-param defaults would fail.
+    await page.getByTestId('instrument-hub-graph-tab').click();
+    const graphPage = new InstrumentHubGraphPage(page);
     await expect(graphPage.chart).toBeVisible();
     await expect(graphPage.scatterMarks).toHaveCount(2);
 
