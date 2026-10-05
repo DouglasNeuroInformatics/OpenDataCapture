@@ -304,6 +304,29 @@ describe('FilesService', () => {
       );
     });
 
+    it('should create no files for an optional group sent empty and still mark the record complete', async () => {
+      mockPendingRecord('group-1');
+      instrumentsService.findById.mockResolvedValueOnce(
+        createInstrument([createFileGroup('scan', { max: 1, min: 1 }), createFileGroup('notes', { max: 2, min: 0 })])
+      );
+      await filesService.setUploadComplete(
+        RECORD_ID,
+        { uploads: { notes: [], scan: [createUpload({ basename: 'scan', index: 0 })] } },
+        adminUser
+      );
+      expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { files: { create: [{ basename: 'scan', index: 0 }] }, pending: false }
+      });
+    });
+
+    it('should crash with a type error when an optional group is omitted, documenting a bug in validateFiles', async () => {
+      mockPendingRecord('group-1');
+      instrumentsService.findById.mockResolvedValueOnce(
+        createInstrument([createFileGroup('notes', { max: 2, min: 0 })])
+      );
+      await expect(filesService.setUploadComplete(RECORD_ID, { uploads: {} }, adminUser)).rejects.toThrow(TypeError);
+    });
+
     it('should not mark the record complete when the file count is invalid', async () => {
       mockPendingRecord('group-1');
       instrumentsService.findById.mockResolvedValueOnce(

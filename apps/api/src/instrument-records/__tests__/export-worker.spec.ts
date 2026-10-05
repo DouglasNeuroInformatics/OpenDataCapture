@@ -181,6 +181,21 @@ describe('export-worker', () => {
     });
   });
 
+  it('should report a failure when an array measure is empty by the time it is expanded', async () => {
+    const parentPort = await loadInitializedWorker();
+    let lengthReads = 0;
+    const trials = new Proxy([{ rt: 1 }], {
+      get: (target, key, receiver) => {
+        if (key === 'length') {
+          return lengthReads++ === 0 ? 1 : 0;
+        }
+        return Reflect.get(target, key, receiver);
+      }
+    });
+    parentPort.send({ data: [createRecord({ computedMeasures: { trials } })], type: 'BEGIN_CHUNK_PROCESSING' });
+    expect(parentPort.postMessage).toHaveBeenCalledWith({ error: 'Record Array is Empty', success: false });
+  });
+
   it('should report an unknown error when processing throws a non-error value', async () => {
     const parentPort = await loadInitializedWorker();
     const record = createRecord();
