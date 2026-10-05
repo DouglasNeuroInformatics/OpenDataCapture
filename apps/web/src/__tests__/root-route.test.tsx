@@ -33,9 +33,20 @@ const renderRootRoute = () => {
   render(<RouterProvider router={router} />);
 };
 
+const importRootRouteFresh = async () => {
+  vi.resetModules();
+  // The translator and axios interceptors are process-wide singletons, which a second import would set up twice.
+  vi.doMock('@/services/i18n', () => ({}));
+  vi.doMock('@/services/axios', () => ({}));
+  await import('@/routes/__root');
+};
+
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  vi.doUnmock('@/services/i18n');
+  vi.doUnmock('@/services/axios');
+  mocks.localizeValidationErrors.mockClear();
 });
 
 describe('root route', () => {
@@ -49,7 +60,9 @@ describe('root route', () => {
     expect(await screen.findByTestId('connectivity-banner')).toBeTruthy();
   });
 
-  it('should localize validation errors as soon as the app loads', () => {
+  it('should localize validation errors as soon as the app loads', async () => {
+    mocks.localizeValidationErrors.mockClear();
+    await importRootRouteFresh();
     expect(mocks.localizeValidationErrors).toHaveBeenCalledOnce();
   });
 
@@ -57,11 +70,7 @@ describe('root route', () => {
     const error = new Error('Failed to load translations');
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     mocks.localizeValidationErrors.mockRejectedValueOnce(error);
-    vi.resetModules();
-    // The translator and axios interceptors are process-wide singletons, which a second import would set up twice.
-    vi.doMock('@/services/i18n', () => ({}));
-    vi.doMock('@/services/axios', () => ({}));
-    await import('@/routes/__root');
+    await importRootRouteFresh();
     await waitFor(() => expect(consoleError).toHaveBeenCalledWith(error));
   });
 });
