@@ -134,8 +134,14 @@ A component test (`Root.tsx`, `src/components/*`) that needs a DOM opts in per f
 imports without `window`. Import `@/services/i18n` first, or `useTranslation` throws `Cannot access
 getter 'resolvedLanguage' … before initialization` (`Root.tsx` imports it; a lone component does
 not). Under happy-dom `@cap.js/widget` no longer returns early and fetches from `cdn.jsdelivr.net`,
-so a test rendering `Cap.tsx` needs `vi.mock('@cap.js/widget', () => ({}))`. Nothing here starts the Express server or hydrates in a browser, so a router's
-behaviour and anything after hydration are tested end to end.
+so a test rendering `Cap.tsx` needs `vi.mock('@cap.js/widget', () => ({}))`.
+
+The router tests in `src/routers/__tests__/` mount each router on a throwaway Express app listening
+on port 0 and call it over real HTTP with `fetch`. The api and cap routers get the real
+`errorHandlerMiddleware` after them; the root router gets a middleware that stubs
+`res.locals.loadRoot`. They mock `@/lib/prisma`, `@/logger`, `@/lib/cap` and `@/config` with
+`vi.mock`. Nothing here hydrates in a browser, so hydration and the two-origin Cap flow are left to
+the end-to-end specs.
 
 Most of the coverage is `testing/src/specs/gateway-assignment.spec.ts`, which drives the real
 two-origin flow through the Cap widget; `testing/src/specs/gateway-landing.spec.ts` covers `/`. See

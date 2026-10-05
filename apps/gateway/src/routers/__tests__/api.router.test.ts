@@ -147,7 +147,7 @@ describe('$CreateRemoteAssignmentsData', () => {
 });
 
 describe('GET /assignments', () => {
-  it('should filter by the subject named in the query', async () => {
+  it("should filter by the subject named in the query, so the API sees only that subject's assignments", async () => {
     prisma.remoteAssignmentModel.findMany.mockResolvedValueOnce([{ id: 'assignment-1', status: 'OUTSTANDING' }]);
     const response = await request('GET', '/assignments?subjectId=subject-1');
     expect(await response.json()).toEqual([{ id: 'assignment-1', status: 'OUTSTANDING' }]);
@@ -200,7 +200,7 @@ describe('POST /assignments/bulk', () => {
   });
 
   it('should write every assignment in one transaction, so a failure leaves none behind', async () => {
-    prisma.remoteAssignmentModel.create.mockImplementation(({ data }: { data: { id: string } }) => data.id);
+    prisma.remoteAssignmentModel.create.mockReturnValueOnce('assignment-1').mockReturnValueOnce('assignment-2');
     const response = await request('POST', '/assignments/bulk', {
       assignments: [assignment, { ...assignment, id: 'assignment-2' }],
       instruments: [{ instrumentContainer, instrumentId: 'instrument-1' }]
@@ -220,7 +220,7 @@ describe('PATCH /assignments/:id', () => {
     expect(prisma.remoteAssignmentModel.findFirst).not.toHaveBeenCalled();
   });
 
-  it('should respond with not found for a verified id with no assignment', async () => {
+  it('should respond with not found for a verified id with no assignment, so a deleted assignment cannot be written to', async () => {
     markAssignmentVerified('missing');
     prisma.remoteAssignmentModel.findFirst.mockResolvedValueOnce(null);
     const response = await request('PATCH', '/assignments/missing', { kind: 'SCALAR' });
@@ -244,7 +244,7 @@ describe('PATCH /assignments/:id', () => {
     expect(await decrypt(privateKey, data.encryptedData, data.symmetricKey)).toBe(JSON.stringify({ score: 1 }));
   });
 
-  it('should leave an assignment that is not complete verified and without a completion date', async () => {
+  it('should keep an in-progress assignment verified and undated, so the patient can keep submitting', async () => {
     markAssignmentVerified('in-progress');
     await createStoredAssignment('in-progress', { encryptedData: null, symmetricKey: null });
     await request('PATCH', '/assignments/in-progress', { data: 1, kind: 'SCALAR' });
@@ -292,7 +292,7 @@ describe('DELETE /assignments/:id', () => {
     expect(prisma.remoteAssignmentModel.delete).not.toHaveBeenCalled();
   });
 
-  it('should delete an existing assignment', async () => {
+  it('should delete an existing assignment, so its link stops working once the API withdraws it', async () => {
     prisma.remoteAssignmentModel.findFirst.mockResolvedValueOnce({ id: 'assignment-1' });
     const response = await request('DELETE', '/assignments/assignment-1');
     expect(response.status).toBe(200);
@@ -316,7 +316,7 @@ describe('PUT /setup-state', () => {
 });
 
 describe('GET /healthcheck', () => {
-  it('should report the release the gateway was built from', async () => {
+  it('should report the release the gateway was built from, so the API can detect a version mismatch', async () => {
     const response = await request('GET', '/healthcheck');
     expect(await response.json()).toEqual({ ok: true, release, status: 200, uptime: expect.any(Number) });
   });

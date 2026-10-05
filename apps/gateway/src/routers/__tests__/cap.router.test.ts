@@ -54,7 +54,7 @@ function post(path: string, body: unknown) {
 }
 
 describe('$VerifyRequest', () => {
-  it('should accept an assignment id', () => {
+  it('should accept an assignment id, so a real assignment can be verified', () => {
     expect($VerifyRequest.safeParse({ id: crypto.randomUUID(), token: 'token' }).success).toBe(true);
   });
 

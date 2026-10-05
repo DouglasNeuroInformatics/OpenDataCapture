@@ -84,7 +84,7 @@ describe('GET /assignments/:id', () => {
     });
   });
 
-  it('should fail with a server error when the stored instrument no longer parses', async () => {
+  it('should fail with a server error when the stored instrument no longer parses, so a corrupt bundle is never rendered', async () => {
     storeAssignment({ targetStringified: JSON.stringify({ id: 'instrument-1' }) });
     const response = await fetch(`${baseUrl}/assignments/assignment-1`);
     expect(response.status).toBe(500);
@@ -104,7 +104,7 @@ describe('GET /assignments/:id', () => {
     });
   });
 
-  it('should resume a series after the items already submitted', async () => {
+  it('should resume a series after the items already submitted, so a returning patient does not repeat them', async () => {
     storeAssignment({ encryptedData: '$item-1$item-2' });
     expect(await getRootProps('/assignments/assignment-1')).toMatchObject({ initialSeriesIndex: 2 });
   });
@@ -116,7 +116,7 @@ describe('GET /assignments/:id', () => {
 });
 
 describe('GET /', () => {
-  it('should serve the rendered root as HTML', async () => {
+  it('should serve the rendered root as HTML, so the browser renders the landing page instead of showing markup', async () => {
     const response = await fetch(baseUrl);
     expect(response.status).toBe(200);
     expect(response.headers.get('Content-Type')).toMatch(/^text\/html/);
