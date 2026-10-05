@@ -8,9 +8,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useUpdateGroupMutation } from '../useUpdateGroupMutation';
 
 const mockAxios = vi.hoisted(() => ({ isAxiosError: vi.fn(() => false), patch: vi.fn() }));
-const store = vi.hoisted(() => ({ currentGroup: { id: 'group-1' } }));
+const addNotification = vi.hoisted(() => vi.fn());
+const store = vi.hoisted((): { currentGroup: null | { id: string } } => ({ currentGroup: { id: 'group-1' } }));
 
 vi.mock('axios', () => ({ default: mockAxios }));
+
+vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
+  useNotificationsStore: vi.fn((selector) => selector({ addNotification }))
+}));
 
 vi.mock('@/store', () => ({
   useAppStore: vi.fn((selector: (store: unknown) => unknown) => selector(store))
@@ -40,6 +45,7 @@ describe('useUpdateGroupMutation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAxios.patch.mockResolvedValue({ data: group });
+    store.currentGroup = { id: 'group-1' };
   });
 
   it('patches the currently selected group and keeps the default error toast', async () => {
@@ -62,5 +68,33 @@ describe('useUpdateGroupMutation', () => {
       { name: 'Renamed' },
       { meta: { disableDefaultErrorNotification: true } }
     );
+  });
+
+  it('should resolve to the parsed group, so the caller reads dates rather than strings', async () => {
+    const { result } = renderUpdateMutation();
+    await expect(result.current.mutateAsync({ name: 'Renamed' })).resolves.toMatchObject({
+      updatedAt: new Date('2026-01-02T00:00:00.000Z')
+    });
+  });
+
+  it('should raise a success toast by default', async () => {
+    const { result } = renderUpdateMutation();
+    await result.current.mutateAsync({ name: 'Renamed' });
+    expect(addNotification).toHaveBeenCalledWith({ type: 'success' });
+  });
+
+  it('should raise no toast for a caller that renders its own save feedback', async () => {
+    const { result } = renderUpdateMutation({ successNotification: false });
+    await result.current.mutateAsync({ name: 'Renamed' });
+    expect(addNotification).not.toHaveBeenCalled();
+  });
+
+  // Known defect: with no group selected the hook sends PATCH /v1/groups/undefined instead of
+  // failing. Drop `.fails` once the hook refuses the update.
+  it.fails('should refuse to patch when no group is selected, so no request reaches /v1/groups/undefined', async () => {
+    store.currentGroup = null;
+    const { result } = renderUpdateMutation({ throwOnError: false });
+    await expect(result.current.mutateAsync({ name: 'Renamed' })).rejects.toThrow();
+    expect(mockAxios.patch).not.toHaveBeenCalled();
   });
 });

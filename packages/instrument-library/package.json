@@ -16,12 +16,18 @@
     "available": "tsx scripts/available.ts",
     "build": "tsx ../instrument-bundler/src/cli.ts --clean --declaration --outdir dist src",
     "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src"
+    "lint": "tsc && eslint --fix src",
+    "test": "vitest"
   },
   "dependencies": {
     "@opendatacapture/runtime-v1": "workspace:*"
   },
   "devDependencies": {
-    "@opendatacapture/instrument-bundler": "workspace:*"
+    "@opendatacapture/instrument-bundler": "workspace:*",
+    "@testing-library/dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "happy-dom": "catalog:",
+    "react": "workspace:react__19.x@*",
+    "react-dom": "workspace:react-dom__19.x@*"
   }
 }

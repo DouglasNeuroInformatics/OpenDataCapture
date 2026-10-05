@@ -1,3 +1,4 @@
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import type { SeriesInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -15,10 +16,13 @@ import type { NavigationBlockerProps } from '../../NavigationBlockerDialog';
 declare global {
   var __testValidationSchema: z.ZodTypeAny;
   var __testInteractiveValidationSchema: z.ZodTypeAny;
+  var __testRejectingSchema: z.ZodTypeAny;
+  var __testSeriesParams: object;
 }
 
 globalThis.__testValidationSchema = z.object({ answer: z.string().min(1) });
 globalThis.__testInteractiveValidationSchema = z.object({ message: z.string() });
+globalThis.__testRejectingSchema = z.never();
 
 const ITEM_BUNDLE = `(async () => ({
   __runtimeVersion: 1,
@@ -79,6 +83,50 @@ function getAnswerInput(): HTMLInputElement {
   return screen.getByLabelText('Answer');
 }
 
+function createInteractiveItemBundle({ schema = '__testInteractiveValidationSchema', withInternal = true } = {}) {
+  return `(async () => ({
+    __runtimeVersion: 1,
+    kind: 'INTERACTIVE',
+    language: 'en',
+    tags: ['Test'],
+    ${withInternal ? "internal: { edition: 1, name: 'INTERACTIVE_ITEM' }," : ''}
+    content: {},
+    details: { description: 'An interactive series item', license: 'Apache-2.0', title: 'Interactive Item' },
+    measures: null,
+    validationSchema: globalThis.${schema}
+  }))()`;
+}
+
+/**
+ * A series whose params come from `globalThis.__testSeriesParams`, since the predicates in them are
+ * functions and the bundle can close over nothing in this file.
+ */
+function createParamsTarget(itemBundles: string[]): SeriesInstrumentBundleContainer {
+  return {
+    bundle: `(async () => ({
+      __runtimeVersion: 1,
+      kind: 'SERIES',
+      language: 'en',
+      tags: ['Test'],
+      content: { items: [], params: globalThis.__testSeriesParams },
+      details: { description: 'A series under test', license: 'Apache-2.0', title: 'Series Under Test' }
+    }))()`,
+    id: 'series-id',
+    items: itemBundles.map((bundle) => ({ bundle, id: 'item-id', kind: 'FORM' })),
+    kind: 'SERIES'
+  };
+}
+
+async function finishInteractiveItem(detail: unknown = { message: 'ok' }) {
+  await waitFor(() => {
+    expect(document.querySelector('iframe')).toBeTruthy();
+  });
+  await act(async () => {
+    document.dispatchEvent(new CustomEvent('done', { detail }));
+    await Promise.resolve();
+  });
+}
+
 const NavigationBlocker = vi.fn((_props: NavigationBlockerProps) => null);
 
 function isNavigationBlocked() {
@@ -124,6 +172,9 @@ describe('SeriesInstrumentRenderer', () => {
   afterEach(() => {
     cleanup();
     NavigationBlocker.mockClear();
+    vi.restoreAllMocks();
+    useNotificationsStore.setState({ notifications: [] });
+    Reflect.deleteProperty(globalThis, '__testSeriesParams');
   });
 
   it('should present the next item of a skipProgress series with no answer filled in', async () => {
@@ -254,5 +305,116 @@ describe('SeriesInstrumentRenderer', () => {
     await waitFor(() => {
       expect(screen.getByText('Thank You!')).toBeTruthy();
     });
+  });
+
+  it('should show a placeholder when the series bundle itself fails to interpret', async () => {
+    const target = { ...createTarget({ skipProgress: true }), bundle: "(() => { throw new Error('boom'); })()" };
+    render(<SeriesInstrumentRenderer target={target} onSubmit={vi.fn()} />);
+    expect(await screen.findByText('Failed to Load Instrument')).toBeTruthy();
+  });
+
+  it('should resume at the initial series index, counting the earlier items as completed', async () => {
+    render(
+      <SeriesInstrumentRenderer
+        initialSeriesIndex={1}
+        target={createTarget({ skipProgress: false })}
+        onSubmit={vi.fn()}
+      />
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    expect(await screen.findByText('Instruments Completed: 1/2')).toBeTruthy();
+  });
+
+  it('should refuse an initial series index past the last item', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(() =>
+      render(
+        <SeriesInstrumentRenderer
+          initialSeriesIndex={2}
+          target={createTarget({ skipProgress: true })}
+          onSubmit={vi.fn()}
+        />
+      )
+    ).toThrow("Initial series index '2' must be less than length of items '2'");
+  });
+
+  it('should refuse an item submission its validation schema rejects, rather than pass invalid data on', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    globalThis.__testSeriesParams = { skipProgress: true };
+    const onSubmit = vi.fn();
+    render(
+      <SeriesInstrumentRenderer
+        target={createParamsTarget([createInteractiveItemBundle({ schema: '__testRejectingSchema' })])}
+        onSubmit={onSubmit}
+      />
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    await finishInteractiveItem();
+    await waitFor(() => {
+      expect(useNotificationsStore.getState().notifications).toMatchObject([
+        { message: expect.stringContaining('The information submitted is invalid'), type: 'error' }
+      ]);
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should end the series early when its terminate predicate says so, marking the submission complete', async () => {
+    const terminate = vi.fn(() => true);
+    globalThis.__testSeriesParams = { skipProgress: true, terminate };
+    const onSubmit = vi.fn();
+    render(<SeriesInstrumentRenderer target={createParamsTarget([ITEM_BUNDLE, ITEM_BUNDLE])} onSubmit={onSubmit} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    await waitFor(() => {
+      expect(getAnswerInput()).toBeTruthy();
+    });
+    await answerAndSubmit('stop here', onSubmit);
+    expect(await screen.findByText('Thank You!')).toBeTruthy();
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ complete: true }));
+    expect(terminate).toHaveBeenCalledWith({ answer: 'stop here' }, { itemIndex: 0, itemName: 'REPEATED_FORM' });
+  });
+
+  it('should give the terminate predicate an empty item name for an item that declares none', async () => {
+    const terminate = vi.fn(() => false);
+    globalThis.__testSeriesParams = { skipProgress: true, terminate };
+    render(
+      <SeriesInstrumentRenderer
+        target={createParamsTarget([createInteractiveItemBundle({ withInternal: false })])}
+        onSubmit={vi.fn()}
+      />
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    await finishInteractiveItem();
+    await waitFor(() => {
+      expect(terminate).toHaveBeenCalledWith({ message: 'ok' }, { itemIndex: 0, itemName: '' });
+    });
+  });
+
+  it('should show the completion message the series supplies once it is complete', async () => {
+    globalThis.__testSeriesParams = {
+      completionMessage: () => ({ en: 'All done, thank you', fr: 'Tout est fait, merci' }),
+      skipProgress: true
+    };
+    render(
+      <SeriesInstrumentRenderer target={createParamsTarget([createInteractiveItemBundle()])} onSubmit={vi.fn()} />
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    await finishInteractiveItem();
+    expect(await screen.findByText('All done, thank you')).toBeTruthy();
+  });
+
+  it('should render no content for an item of a kind a series cannot administer', async () => {
+    globalThis.__testSeriesParams = { skipProgress: true };
+    const fileItemBundle = createInteractiveItemBundle().replace("kind: 'INTERACTIVE'", "kind: 'FILE'");
+    const { container } = render(
+      <SeriesInstrumentRenderer target={createParamsTarget([fileItemBundle])} onSubmit={vi.fn()} />
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    // The container's only child left is its step header once the content area renders nothing,
+    // which a spinner, form, iframe or error placeholder would each add to.
+    await waitFor(() => {
+      expect(container.firstElementChild?.childElementCount).toBe(1);
+    });
+    expect(container.querySelector('.animate-spinner, form, iframe')).toBeNull();
+    expect(screen.queryByText('Failed to Load Instrument')).toBeNull();
   });
 });

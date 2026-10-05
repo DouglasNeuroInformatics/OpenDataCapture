@@ -1,19 +1,32 @@
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import type { SubjectDisplayInfo } from '@opendatacapture/react-core';
-import type { AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
+import type { AnyUnilingualFormInstrument, UnilingualSeriesInstrument } from '@opendatacapture/runtime-core';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v3';
 
 import { InstrumentSummary } from '../InstrumentSummary';
 
-const baseInstrument = {
-  content: {},
-  details: { title: 'Stub Form' },
+const baseInstrument: AnyUnilingualFormInstrument = {
+  __runtimeVersion: 1,
+  content: { score: { kind: 'number', label: 'Score', variant: 'input' } },
+  details: { description: 'A form under test', license: 'Apache-2.0', title: 'Stub Form' },
   internal: { edition: 1, name: 'STUB_FORM' },
   kind: 'FORM',
   language: 'en',
-  measures: {}
-} as unknown as AnyUnilingualInstrument;
+  measures: {},
+  tags: [],
+  validationSchema: z.object({ score: z.number() })
+};
+
+const seriesInstrument: UnilingualSeriesInstrument = {
+  __runtimeVersion: 1,
+  content: [],
+  details: { description: 'A series under test', license: 'Apache-2.0', title: 'Stub Series' },
+  kind: 'SERIES',
+  language: 'en',
+  tags: []
+};
 
 describe('InstrumentSummary', () => {
   beforeAll(() => {
@@ -21,11 +34,15 @@ describe('InstrumentSummary', () => {
     i18n.changeLanguage('en');
   });
 
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
 
   it('should render nothing for a SERIES instrument', () => {
     const { container } = render(
-      <InstrumentSummary data={{}} instrument={{ kind: 'SERIES' } as any} timeCollected={Date.now()} />
+      <InstrumentSummary data={{}} instrument={seriesInstrument} timeCollected={Date.now()} />
     );
     expect(container.firstChild).toBeNull();
   });
@@ -38,32 +55,37 @@ describe('InstrumentSummary', () => {
   });
 
   it('should show French as the language for a French instrument', () => {
-    const instrument = { ...baseInstrument, language: 'fr' } as unknown as AnyUnilingualInstrument;
+    const instrument: AnyUnilingualFormInstrument = { ...baseInstrument, language: 'fr' };
     render(<InstrumentSummary data={{}} instrument={instrument} timeCollected={Date.now()} />);
     expect(screen.getByText('French')).toBeTruthy();
   });
 
   it('should download the data as JSON when the download button is clicked', async () => {
     const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock');
-    const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
     render(<InstrumentSummary data={{ answer: 'hello' }} instrument={baseInstrument} timeCollected={Date.now()} />);
     const buttons = screen.getAllByRole('button');
     fireEvent.click(buttons[1]!);
     await waitFor(() => {
       expect(createObjectURLSpy).toHaveBeenCalled();
     });
-    createObjectURLSpy.mockRestore();
-    revokeObjectURLSpy.mockRestore();
   });
 
   it('should render the language code as-is when it is neither en nor fr', () => {
-    const instrument = { ...baseInstrument, language: 'es' } as unknown as AnyUnilingualInstrument;
+    const instrument: AnyUnilingualFormInstrument = {
+      ...baseInstrument,
+      // @ts-expect-error - instruments are authored only in English and French; this guards a bundle that is not
+      language: 'es'
+    };
     render(<InstrumentSummary data={{}} instrument={instrument} timeCollected={Date.now()} />);
     expect(screen.getByText('es')).toBeTruthy();
   });
 
   it('should fall back to a generic heading when the title is blank', () => {
-    const instrument = { ...baseInstrument, details: { title: '  ' } } as unknown as AnyUnilingualInstrument;
+    const instrument: AnyUnilingualFormInstrument = {
+      ...baseInstrument,
+      details: { ...baseInstrument.details, title: '  ' }
+    };
     render(<InstrumentSummary data={{}} instrument={instrument} timeCollected={Date.now()} />);
     expect(screen.getByText('Summary of Results')).toBeTruthy();
   });
@@ -80,7 +102,6 @@ describe('InstrumentSummary', () => {
     const buttons = screen.getAllByRole('button');
     fireEvent.click(buttons[buttons.length - 1]!);
     expect(printSpy).toHaveBeenCalledOnce();
-    vi.unstubAllGlobals();
   });
 
   it('should show a personal-info subject group with their full name and details', () => {
@@ -122,28 +143,28 @@ describe('InstrumentSummary', () => {
   });
 
   it('should show a measure whose visibility is explicitly visible, even without displayAllMeasures', () => {
-    const instrument = {
+    const instrument: AnyUnilingualFormInstrument = {
       ...baseInstrument,
       measures: { score: { kind: 'const', label: 'Score', ref: 'score', visibility: 'visible' } }
-    } as unknown as AnyUnilingualInstrument;
+    };
     render(<InstrumentSummary data={{ score: 5 }} instrument={instrument} timeCollected={Date.now()} />);
     expect(screen.getByText('Results')).toBeTruthy();
   });
 
   it('should hide a measure whose visibility is explicitly hidden', () => {
-    const instrument = {
+    const instrument: AnyUnilingualFormInstrument = {
       ...baseInstrument,
       measures: { score: { hidden: true, kind: 'const', label: 'Score', ref: 'score' } }
-    } as unknown as AnyUnilingualInstrument;
+    };
     render(<InstrumentSummary data={{ score: 5 }} instrument={instrument} timeCollected={Date.now()} />);
     expect(screen.queryByText('Results')).toBeNull();
   });
 
   it('should show every measure when displayAllMeasures is true', () => {
-    const instrument = {
+    const instrument: AnyUnilingualFormInstrument = {
       ...baseInstrument,
       measures: { score: { hidden: true, kind: 'const', label: 'Score', ref: 'score' } }
-    } as unknown as AnyUnilingualInstrument;
+    };
     render(
       <InstrumentSummary displayAllMeasures data={{ score: 5 }} instrument={instrument} timeCollected={Date.now()} />
     );
@@ -151,12 +172,26 @@ describe('InstrumentSummary', () => {
   });
 
   it('should show a measure by default when the instrument declares defaultMeasureVisibility visible', () => {
-    const instrument = {
+    const instrument: AnyUnilingualFormInstrument = {
       ...baseInstrument,
       defaultMeasureVisibility: 'visible',
       measures: { score: { kind: 'const', label: 'Score', ref: 'score' } }
-    } as unknown as AnyUnilingualInstrument;
+    };
     render(<InstrumentSummary data={{ score: 5 }} instrument={instrument} timeCollected={Date.now()} />);
     expect(screen.getByText('Results')).toBeTruthy();
+  });
+
+  it('should copy a measure without a value as NA, so the copied summary has no blank lines', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } });
+    const instrument: AnyUnilingualFormInstrument = {
+      ...baseInstrument,
+      measures: { score: { kind: 'computed', label: 'Score', value: () => undefined, visibility: 'visible' } }
+    };
+    render(<InstrumentSummary data={{}} instrument={instrument} timeCollected={Date.now()} />);
+    fireEvent.click(screen.getAllByRole('button')[0]!);
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith('Score: NA');
+    });
   });
 });

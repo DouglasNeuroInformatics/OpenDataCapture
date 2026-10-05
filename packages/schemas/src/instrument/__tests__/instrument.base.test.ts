@@ -3,6 +3,7 @@ import { describe, expect, it, test } from 'vitest';
 import { z } from 'zod/v4';
 
 import {
+  $$BaseInstrument,
   $$InstrumentUIOption,
   $$ScalarInstrument,
   $InstrumentDetails,
@@ -60,6 +61,13 @@ describe('$$InstrumentUIOption', () => {
     expect($$InstrumentUIOption(z.number(), ['fr']).parse(obj)).toEqual({ fr: num });
     expect(() => $$InstrumentUIOption(z.string(), ['fr']).parse(obj)).toThrow();
     expect(() => $$InstrumentUIOption(z.number(), ['fr']).parse(num)).toThrow();
+  });
+});
+
+describe('$$BaseInstrument', () => {
+  it('should reject the language and tags when given a language outside its declared type, so an untyped caller fails closed', () => {
+    const result = $$BaseInstrument(0 as never).safeParse(unilingualFormInstrument.instance);
+    expect(result.error?.issues.map(({ path }) => path[0])).toEqual(expect.arrayContaining(['language', 'tags']));
   });
 });
 

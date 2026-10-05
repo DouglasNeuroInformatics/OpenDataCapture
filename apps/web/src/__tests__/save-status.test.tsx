@@ -28,4 +28,9 @@ describe('SaveStatus', () => {
     render(<SaveStatus state="saved" />);
     expect(screen.getByText('All changes saved')).toBeTruthy();
   });
+
+  it('should show progress while an autosave is in flight, so the user knows it has not finished', () => {
+    render(<SaveStatus state="saving" />);
+    expect(screen.getByText('Saving…')).toBeTruthy();
+  });
 });

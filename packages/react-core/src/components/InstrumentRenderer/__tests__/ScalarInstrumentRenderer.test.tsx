@@ -1,3 +1,4 @@
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -14,10 +15,12 @@ import type { NavigationBlockerProps } from '../../NavigationBlockerDialog';
 declare global {
   var __testValidationSchema: z.ZodTypeAny;
   var __testFileValidationSchema: z.ZodTypeAny;
+  var __testRejectingSchema: z.ZodTypeAny;
 }
 
 globalThis.__testValidationSchema = z.object({ answer: z.string().min(1) });
 globalThis.__testFileValidationSchema = z.any();
+globalThis.__testRejectingSchema = z.never();
 
 const FORM_BUNDLE = `(async () => ({
   __runtimeVersion: 1,
@@ -70,6 +73,21 @@ const INTERACTIVE_BUNDLE = `(async () => ({
   measures: null
 }))()`;
 
+const REJECTING_FILE_BUNDLE = FILE_BUNDLE.replace('__testFileValidationSchema', '__testRejectingSchema');
+
+const UNKNOWN_KIND_BUNDLE = INTERACTIVE_BUNDLE.replace("kind: 'INTERACTIVE'", "kind: 'UNKNOWN'");
+
+async function submitFile() {
+  const dropzone = await screen.findByTestId('dropzone');
+  await act(async () => {
+    fireEvent.change(dropzone.querySelector('input[type="file"]')!, {
+      target: { files: [new File(['content'], 'report.pdf', { type: 'application/pdf' })] }
+    });
+    await Promise.resolve();
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+}
+
 const NavigationBlocker = vi.fn((_props: NavigationBlockerProps) => null);
 
 function isNavigationBlocked() {
@@ -97,6 +115,8 @@ describe('ScalarInstrumentRenderer', () => {
   afterEach(() => {
     cleanup();
     NavigationBlocker.mockClear();
+    vi.restoreAllMocks();
+    useNotificationsStore.setState({ notifications: [] });
   });
 
   it('should show a spinner while the bundle is still being interpreted', () => {
@@ -189,5 +209,35 @@ describe('ScalarInstrumentRenderer', () => {
       expect(onSubmit).toHaveBeenCalledOnce();
     });
     expect(isNavigationBlocked()).toBe(true);
+  });
+
+  it('should still show the placeholder for a bundle that fails to evaluate when no error callback is given', async () => {
+    render(
+      <ScalarInstrumentRenderer
+        target={{ bundle: "(() => { throw new Error('boom'); })()", id: 'x' }}
+        onSubmit={vi.fn()}
+      />
+    );
+    expect(await screen.findByText('Failed to Load Instrument')).toBeTruthy();
+  });
+
+  it('should refuse a submission its validation schema rejects, rather than pass invalid data on', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { onSubmit } = await beginAt(REJECTING_FILE_BUNDLE);
+    await submitFile();
+    await waitFor(() => {
+      expect(useNotificationsStore.getState().notifications).toMatchObject([
+        { message: expect.stringContaining('The information submitted is invalid'), type: 'error' }
+      ]);
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should render no content for a bundle whose kind it has no content for', async () => {
+    await beginAt(UNKNOWN_KIND_BUNDLE);
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: 'Begin' })).toBeNull();
+    });
+    expect(document.querySelector('form, iframe, [data-testid="dropzone"]')).toBeNull();
   });
 });

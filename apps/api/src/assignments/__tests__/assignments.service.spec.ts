@@ -80,8 +80,10 @@ describe('AssignmentsService', () => {
   let subjectModel: MockedInstance<Model<'Subject'>>;
   let auditLogger: MockedInstance<AuditLogger>;
   let gatewayService: MockedInstance<GatewayService>;
+  let loggingService: MockedInstance<LoggingService>;
 
-  beforeEach(async () => {
+  /** Compiles a fresh service against `config`, since the participant link base is fixed at construction. */
+  const compile = async (config: { get: (key: string) => unknown; getOrThrow: (key: string) => unknown }) => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         AssignmentsService,
@@ -90,7 +92,7 @@ describe('AssignmentsService', () => {
         MockFactory.createForModelToken(getModelToken('Instrument')),
         MockFactory.createForModelToken(getModelToken('Subject')),
         { provide: AuditLogger, useValue: { log: vi.fn() } },
-        { provide: ConfigService, useValue: { get: () => 3500, getOrThrow: () => ({ origin: 'https://x' }) } },
+        { provide: ConfigService, useValue: config },
         {
           provide: GatewayService,
           useValue: {
@@ -109,6 +111,7 @@ describe('AssignmentsService', () => {
     subjectModel = moduleRef.get(getModelToken('Subject'));
     auditLogger = moduleRef.get(AuditLogger);
     gatewayService = moduleRef.get(GatewayService);
+    loggingService = moduleRef.get(LoggingService);
     assignmentsService = moduleRef.get(AssignmentsService);
 
     groupModel.findFirst.mockResolvedValue({ accessibleInstrumentIds: ['instrument-1', 'instrument-2'], id: GROUP_ID });
@@ -119,6 +122,10 @@ describe('AssignmentsService', () => {
       Promise.resolve({ ...data, instrumentId: 'instrument-1' })
     );
     assignmentModel.deleteMany.mockResolvedValue({ count: 0 });
+  };
+
+  beforeEach(async () => {
+    await compile({ get: () => 3500, getOrThrow: () => ({ origin: 'https://x' }) });
   });
 
   describe('bulkPreflight', () => {
@@ -298,6 +305,49 @@ describe('AssignmentsService', () => {
       await assignmentsService.create(data(), grantee);
       expect(gatewayService.createRemoteAssignment).toHaveBeenCalledTimes(1);
     });
+
+    it('should delete the staged row when the gateway refuses it, so no assignment exists without a working link', async () => {
+      const failure = new Error('gateway down');
+      gatewayService.createRemoteAssignment.mockRejectedValueOnce(failure);
+      await expect(assignmentsService.create(data(), permissiveUser())).rejects.toBe(failure);
+      const stagedId = assignmentModel.create.mock.lastCall?.[0].data.id;
+      expect(assignmentModel.delete).toHaveBeenCalledExactlyOnceWith({ where: { id: stagedId } });
+    });
+
+    it('should not record an audit entry when the gateway refuses the assignment, since nothing was created', async () => {
+      gatewayService.createRemoteAssignment.mockRejectedValueOnce(new Error('gateway down'));
+      await expect(assignmentsService.create(data(), permissiveUser())).rejects.toThrow();
+      expect(auditLogger.log).not.toHaveBeenCalled();
+    });
+
+    it('should record a grouped assignment in the audit log under its group', async () => {
+      await assignmentsService.create(data(), permissiveUser());
+      expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('CREATE', 'ASSIGNMENT', {
+        groupId: GROUP_ID,
+        userId: 'user-1'
+      });
+    });
+
+    it('should record an ungrouped assignment in the audit log with no group, since there is none to connect', async () => {
+      await assignmentsService.create({ ...data(), groupId: undefined }, userAt('ADMIN'));
+      expect(auditLogger.log.mock.lastCall?.[2]).toMatchObject({ groupId: null });
+    });
+
+    it('should point the participant link at the local gateway dev server outside production', async () => {
+      await assignmentsService.create(data(), permissiveUser());
+      const { id, url } = assignmentModel.create.mock.lastCall?.[0].data ?? {};
+      expect(url).toBe(`http://localhost:3500/assignments/${id}`);
+    });
+
+    it('should point the participant link at the gateway site address in production', async () => {
+      await compile({
+        get: (key) => (key === 'NODE_ENV' ? 'production' : undefined),
+        getOrThrow: () => new URL('https://gateway.example.org/ignored/path')
+      });
+      await assignmentsService.create(data(), permissiveUser());
+      const { id, url } = assignmentModel.create.mock.lastCall?.[0].data ?? {};
+      expect(url).toBe(`https://gateway.example.org/assignments/${id}`);
+    });
   });
 
   describe('createBulk', () => {
@@ -370,6 +420,33 @@ describe('AssignmentsService', () => {
         { groupId: GROUP_ID, metadata: { createdCount: '2', mode: 'BULK', requestedCount: '2' } }
       ]);
     });
+
+    it('should not attempt a rollback when staging fails before any row was staged', async () => {
+      const failure = new Error('key generation failed');
+      assignmentModel.create.mockRejectedValueOnce(failure);
+      await expect(
+        assignmentsService.createBulk(request({ subjectIds: ['subject-1'] }), permissiveUser())
+      ).rejects.toBe(failure);
+      expect(assignmentModel.deleteMany).not.toHaveBeenCalled();
+    });
+
+    it('should report the original failure when the rollback also fails, so the cleanup does not mask the cause', async () => {
+      const failure = new Error('gateway down');
+      gatewayService.createRemoteAssignments.mockRejectedValueOnce(failure);
+      assignmentModel.deleteMany.mockRejectedValueOnce(new Error('database down'));
+      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toBe(failure);
+    });
+
+    it('should log a failed rollback, so the orphaned rows can be found and removed', async () => {
+      gatewayService.createRemoteAssignments.mockRejectedValueOnce(new Error('gateway down'));
+      const rollbackFailure = new Error('database down');
+      assignmentModel.deleteMany.mockRejectedValueOnce(rollbackFailure);
+      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow();
+      expect(loggingService.error).toHaveBeenCalledExactlyOnceWith({
+        error: rollbackFailure,
+        message: 'ERROR: Failed to roll back staged bulk assignments'
+      });
+    });
   });
 
   describe('deleteBulk', () => {
@@ -413,6 +490,80 @@ describe('AssignmentsService', () => {
         where: { id: { in: ['a-1'] }, status: { in: ['OUTSTANDING', 'EXPIRED'] } }
       });
     });
+
+    it('should log each assignment that failed to delete, so the failure can be investigated', async () => {
+      const failure = new Error('gateway down');
+      assignmentModel.findMany.mockResolvedValueOnce([{ id: 'a-1', status: 'OUTSTANDING' }]);
+      gatewayService.deleteRemoteAssignment.mockRejectedValueOnce(failure);
+      await assignmentsService.deleteBulk(['a-1'], { ability: permissiveUser().ability });
+      expect(loggingService.error).toHaveBeenCalledExactlyOnceWith({
+        error: failure,
+        message: 'Failed to delete assignment a-1'
+      });
+    });
+
+    it('should apply no ability restriction for an internal caller that passes none', async () => {
+      assignmentModel.findMany.mockResolvedValueOnce([]);
+      await assignmentsService.deleteBulk(['a-1']);
+      expect(assignmentModel.findMany.mock.lastCall?.[0]?.where?.AND).toStrictEqual([{}]);
+    });
+  });
+
+  describe('find', () => {
+    it('should filter by the requested group and subject', async () => {
+      await assignmentsService.find(
+        { groupId: GROUP_ID, subjectId: 'subject-1' },
+        { ability: permissiveUser().ability }
+      );
+      expect(assignmentModel.findMany.mock.lastCall?.[0]?.where?.AND).toContainEqual({
+        groupId: GROUP_ID,
+        subjectId: 'subject-1'
+      });
+    });
+
+    it('should scope the query to what the caller may read, so other groups stay hidden', async () => {
+      await assignmentsService.find({}, { ability: userAt('GROUP_MANAGER').ability });
+      expect(assignmentModel.findMany.mock.lastCall?.[0]?.where?.AND?.[0]).toEqual({
+        OR: [{ groupId: { in: [GROUP_ID] } }]
+      });
+    });
+
+    it('should apply neither filter nor restriction for an internal caller that passes nothing', async () => {
+      await assignmentsService.find();
+      expect(assignmentModel.findMany.mock.lastCall?.[0]?.where?.AND).toStrictEqual([
+        {},
+        { groupId: undefined, subjectId: undefined }
+      ]);
+    });
+
+    it('should return the assignments the model finds', async () => {
+      const assignments = [{ id: 'a-1' }, { id: 'a-2' }];
+      assignmentModel.findMany.mockResolvedValueOnce(assignments);
+      await expect(assignmentsService.find()).resolves.toBe(assignments);
+    });
+  });
+
+  describe('findById', () => {
+    it('should return the assignment with that id', async () => {
+      const assignment = { id: 'assignment-1' };
+      assignmentModel.findFirst.mockResolvedValueOnce(assignment);
+      await expect(assignmentsService.findById('assignment-1', { ability: permissiveUser().ability })).resolves.toBe(
+        assignment
+      );
+    });
+
+    it('should refuse an assignment the caller cannot read as though it did not exist', async () => {
+      assignmentModel.findFirst.mockResolvedValueOnce(null);
+      await expect(assignmentsService.findById('assignment-1')).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('should scope the lookup to what the caller may read', async () => {
+      assignmentModel.findFirst.mockResolvedValueOnce({ id: 'assignment-1' });
+      await assignmentsService.findById('assignment-1', { ability: userAt('GROUP_MANAGER').ability });
+      expect(assignmentModel.findFirst.mock.lastCall?.[0]).toEqual({
+        where: { AND: [{ OR: [{ groupId: { in: [GROUP_ID] } }] }], id: 'assignment-1' }
+      });
+    });
   });
 
   describe('updateById', () => {
@@ -429,6 +580,42 @@ describe('AssignmentsService', () => {
       assignmentModel.update.mockResolvedValueOnce({ groupId: GROUP_ID, id: 'assignment-1' });
       await assignmentsService.updateById('assignment-1', { status: 'CANCELED' }, permissiveUser());
       expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledExactlyOnceWith('assignment-1');
+    });
+
+    it('should leave the gateway copy alone for a status other than canceled, since its link must keep working', async () => {
+      assignmentModel.exists.mockResolvedValueOnce(true);
+      assignmentModel.update.mockResolvedValueOnce({ groupId: GROUP_ID, id: 'assignment-1' });
+      await assignmentsService.updateById('assignment-1', { status: 'EXPIRED' }, permissiveUser());
+      expect(gatewayService.deleteRemoteAssignment).not.toHaveBeenCalled();
+    });
+
+    it('should record the update in the audit log under the assignment group', async () => {
+      assignmentModel.exists.mockResolvedValueOnce(true);
+      assignmentModel.update.mockResolvedValueOnce({ groupId: GROUP_ID, id: 'assignment-1' });
+      await assignmentsService.updateById('assignment-1', { status: 'CANCELED' }, permissiveUser());
+      expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('UPDATE', 'ASSIGNMENT', {
+        groupId: GROUP_ID,
+        userId: 'user-1'
+      });
+    });
+
+    it('should return the updated assignment', async () => {
+      const updated = { groupId: GROUP_ID, id: 'assignment-1', status: 'CANCELED' };
+      assignmentModel.exists.mockResolvedValueOnce(true);
+      assignmentModel.update.mockResolvedValueOnce(updated);
+      await expect(
+        assignmentsService.updateById('assignment-1', { status: 'CANCELED' }, permissiveUser())
+      ).resolves.toBe(updated);
+    });
+  });
+
+  describe('updateStatusById', () => {
+    it('should set the status the gateway reports on the assignment with that id', async () => {
+      await assignmentsService.updateStatusById('assignment-1', 'COMPLETE');
+      expect(assignmentModel.update).toHaveBeenCalledExactlyOnceWith({
+        data: { status: 'COMPLETE' },
+        where: { id: 'assignment-1' }
+      });
     });
   });
 });

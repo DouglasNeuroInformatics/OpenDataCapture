@@ -31,6 +31,7 @@ the prefix `worker.js` strips off incoming request pathnames. Moving the package
 
 `pnpm exec vitest --project runtime-internal`, in `src/__tests__/index.test.ts` — covers
 `evaluateInstrument`, `encodeUnicodeToBase64`, `decodeBase64ToUnicode` and `removeSubjectIdScope`.
-The `interactive/*.js` trio (`iframe.html`, `bootstrap.js`, `worker.js`) has no test of its own here
-— they only run inside a real browser iframe/worker — so their copy-verbatim guarantee is still
-covered upstream, by the `classic-script` fixture in `packages/runtime-bundler/test/e2e.test.ts`.
+`src/interactive/__tests__/` covers `bootstrap.js` and `worker.js` against stubbed browser globals
+(`navigator.serviceWorker`, `self`), since they only ever run inside a real iframe or
+service worker. Their copy-verbatim guarantee is covered upstream, by the `classic-script` fixture in
+`packages/runtime-bundler/test/e2e.test.ts`.

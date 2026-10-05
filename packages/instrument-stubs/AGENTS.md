@@ -37,6 +37,11 @@ failing `packages/schemas` test or a consumer's `tsc` error.
 
 ## Tests
 
-None of its own; there is no `vitest.config.ts` here. The stubs _are_ the fixtures for
-`packages/schemas/src/instrument/__tests__/*.test.ts`, so changing one changes what those tests
-assert.
+`pnpm exec vitest --project instrument-stubs` runs `src/__tests__/*.test.js` in vitest's node
+environment. **Tests are `.test.js`, not `.test.ts`**: vitest would run either, but with no
+`tsconfig.json` here eslint's typed parser rejects a `.ts` file with `couldn't find any
+tsconfig.json`, failing `lint`. Import the stub modules directly (`../forms.js`); each export is the
+`{ instance, ... }` object `createInstrumentStub` resolves to.
+
+The stubs are also the fixtures for `packages/schemas/src/instrument/__tests__/*.test.ts`, so
+changing one changes what those tests assert.

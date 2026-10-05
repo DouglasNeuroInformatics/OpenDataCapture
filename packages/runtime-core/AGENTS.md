@@ -83,11 +83,16 @@ Background on how a definition becomes a stored, runnable instrument:
 
 ## Tests
 
-**There is no `vitest.config.ts` here, so `pnpm test` runs nothing for this package.** The only tests
-are type-level: `src/__tests__/define.test-d.ts` and `src/types/__tests__/instrument.form.test-d.ts`,
-written with `expectTypeOf` from `expect-type` (a root devDependency). They are checked by the
-`tsc --noEmit` half of the `lint` script, because `tsconfig.json` includes all of `src/`.
+Two tiers, run by different tools.
 
-Run them with `pnpm --filter @opendatacapture/runtime-core lint`. A type change that breaks an
-assertion shows up as a tsc error, not a test failure — add cases to these files rather than reaching
-for a runtime test.
+- **Runtime behaviour: `pnpm exec vitest --project runtime-core`**, over `src/**/__tests__/*.test.ts`
+  in vitest's node environment. Tests import from source, not `lib/` or `dist/`, so no build is
+  needed; relative imports carry `.js` like the rest of `src/` (Node16 resolution). `i18n.ts` picks
+  `SynchronizedTranslator` or `StandaloneTranslator` from `window` **at import time**, so a test of a
+  browser branch needs a `// @vitest-environment happy-dom` docblock, and one that varies `window`
+  needs `vi.resetModules()` and a dynamic `import('../i18n.js')`.
+- **Types: `src/__tests__/define.test-d.ts` and `src/types/__tests__/instrument.form.test-d.ts`**,
+  written with `expectTypeOf` from `expect-type` (a root devDependency). vitest does not collect
+  them; the `tsc --noEmit` half of `pnpm --filter @opendatacapture/runtime-core lint` checks them,
+  because `tsconfig.json` includes all of `src/`. A type change that breaks an assertion is a tsc
+  error — add type cases here rather than a runtime test.

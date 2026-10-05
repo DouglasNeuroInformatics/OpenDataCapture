@@ -1,18 +1,28 @@
 import { CryptoService, getModelToken, LoggingService, VirtualizationService } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ConflictException, ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { bundle } from '@opendatacapture/instrument-bundler';
 import type { SeriesInstrument } from '@opendatacapture/runtime-core';
 import type { WithID } from '@opendatacapture/schemas/core';
+import type { Group } from '@opendatacapture/schemas/group';
+import { errAsync, okAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MockInstance } from 'vitest';
+import { z } from 'zod/v4';
 
 import { AuditLogger } from '@/audit/audit.logger';
 import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
+import type { AppAbility } from '@/auth/auth.types';
 
 import { InstrumentsService } from '../instruments.service';
 
@@ -44,6 +54,33 @@ const existingSeries: WithID<SeriesInstrument> = {
   tags: { en: ['Series'], fr: ['Série'] }
 };
 
+// A scalar instrument that passes `$AnyInstrument`, so `create` reaches the storage path.
+const interactiveInstrument = {
+  __runtimeVersion: 1,
+  content: { render: () => undefined },
+  details: { description: 'A reaction-time task', license: 'UNLICENSED', title: 'Reaction Time' },
+  internal: { edition: 1, name: 'REACTION_TIME' },
+  kind: 'INTERACTIVE',
+  language: 'en',
+  measures: null,
+  tags: ['Task'],
+  validationSchema: z.object({})
+} as const;
+
+/** A scalar form instance as `getInstrumentInstance` would evaluate it. */
+const formInstance = (name: string, edition: number, id = `hash:${name}-${edition}`) => ({
+  __runtimeVersion: 1 as const,
+  content: {},
+  details: { description: name, license: 'UNLICENSED' as const, title: name },
+  id,
+  internal: { edition, name },
+  kind: 'FORM' as const,
+  language: 'en' as const,
+  measures: null,
+  tags: ['Form'],
+  validationSchema: z.object({})
+});
+
 /**
  * The `where` fragment `validateSeriesInstrument` builds to restrict a series' items to the instruments
  * the owning group may administer.
@@ -60,6 +97,43 @@ const groupItemFilter = ({
   ]
 });
 
+/** A group the current user belongs to, with nothing assigned or accessible. */
+const createGroup = (id: string): Group => ({
+  accessibleInstrumentIds: [],
+  createdAt: new Date(0),
+  id,
+  instrumentRepoIds: [],
+  name: id,
+  settings: { defaultIdentificationMethod: 'PERSONAL_INFO' },
+  subjectIds: [],
+  type: 'CLINICAL',
+  updatedAt: new Date(0),
+  userIds: []
+});
+
+/** A logged-in user holding `ability`, belonging to `groups`. */
+const createRequestUser = (ability: AppAbility, groups: Group[] = []): RequestUser => ({
+  ability,
+  basePermissionLevel: 'GROUP_MANAGER',
+  firstName: 'Test',
+  groups,
+  id: 'admin-1',
+  kind: 'login',
+  lastName: 'User',
+  mustResetPassword: false,
+  permissions: [],
+  username: 'test-user'
+});
+
+/** The series definition `createSeries` last handed to the bundler. */
+const bundledDefinition = (): unknown => {
+  const content = vi.mocked(bundle).mock.lastCall?.[0].inputs[0]?.content;
+  if (typeof content !== 'string') {
+    throw new Error('Expected createSeries to bundle a source string');
+  }
+  return JSON.parse(content.replace(/^export default /, '').replace(/;$/, ''));
+};
+
 describe('InstrumentsService', () => {
   let instrumentsService: InstrumentsService;
   let cryptoService: MockedInstance<CryptoService>;
@@ -68,6 +142,7 @@ describe('InstrumentsService', () => {
   let instrumentRecordModel: MockedInstance<Model<'InstrumentRecord'>>;
   let groupModel: MockedInstance<Model<'Group'>>;
   let auditLogger: MockedInstance<AuditLogger>;
+  let loggingService: MockedInstance<LoggingService>;
   let virtualizationService: MockedInstance<VirtualizationService<any>>;
   /** The same Map the service memoizes evaluated instances into — see the context assignment below. */
   let instanceCache: InstrumentVirtualizationContext['instruments'];
@@ -96,6 +171,7 @@ describe('InstrumentsService', () => {
     instrumentRecordModel = moduleRef.get(getModelToken('InstrumentRecord'));
     groupModel = moduleRef.get(getModelToken('Group'));
     auditLogger = moduleRef.get(AuditLogger);
+    loggingService = moduleRef.get(LoggingService);
     // Two lookups hit this: the caller's permission check on the target group, and the item-access
     // check in `validateSeriesInstrument`. The empty arrays mean "no repos assigned, nothing accessible
     // yet", so by default only non-repo instruments may be assembled into a series.
@@ -385,10 +461,7 @@ describe('InstrumentsService', () => {
         language: 'en'
       });
 
-      const source = vi.mocked(bundle).mock.lastCall?.[0].inputs[0]!.content as string;
-      expect(JSON.parse(source.replace(/^export default /, '').replace(/;$/, ''))).toMatchObject({
-        details: { title: 'Padded Series' }
-      });
+      expect(bundledDefinition()).toMatchObject({ details: { title: 'Padded Series' } });
     });
 
     // Items are named by internal name + edition, which the caller controls entirely, so a manager could
@@ -520,6 +593,95 @@ describe('InstrumentsService', () => {
       instrumentModel.create.mockRejectedValueOnce(new Error('connection reset'));
 
       await expect(instrumentsService.create({ bundle: '__BUNDLE__' })).rejects.toThrowError('connection reset');
+    });
+
+    it('should refuse a bundle that cannot be interpreted, so a broken upload is never stored', async () => {
+      const cause = { message: 'Unexpected token', name: 'SyntaxError' };
+      virtualizationService.eval.mockReturnValue(errAsync(cause));
+
+      await expect(instrumentsService.create({ bundle: '__BUNDLE__' })).rejects.toMatchObject({
+        response: { cause, message: 'Failed to interpret instrument bundle' },
+        status: 422
+      });
+      expect(loggingService.error).toHaveBeenCalledWith(cause);
+      expect(instrumentModel.create).not.toHaveBeenCalled();
+    });
+
+    it('should refuse a bundle whose default export is not an instrument, reporting the validation issues', async () => {
+      virtualizationService.eval.mockReturnValue(okAsync({ kind: 'FORM' }));
+
+      await expect(instrumentsService.create({ bundle: '__BUNDLE__' })).rejects.toMatchObject({
+        response: {
+          issues: expect.arrayContaining([expect.objectContaining({ path: expect.any(Array) })]),
+          message: 'Instrument validation failed'
+        },
+        status: 422
+      });
+    });
+
+    it('should refuse an instrument that is already stored before attempting the insert', async () => {
+      instrumentModel.exists.mockResolvedValue(true);
+
+      await expect(instrumentsService.create({ bundle: '__BUNDLE__' })).rejects.toThrowError(
+        new ConflictException(`Instrument with ID '${seriesId}' already exists!`)
+      );
+      expect(instrumentModel.create).not.toHaveBeenCalled();
+    });
+
+    it('should refuse a series with fewer than two items, since it would orchestrate nothing', async () => {
+      virtualizationService.eval.mockReturnValue(
+        okAsync({ ...existingSeries, content: { items: [{ edition: 1, name: 'FORM_A' }] } })
+      );
+      instrumentModel.exists.mockResolvedValue(false);
+
+      await expect(instrumentsService.create({ bundle: '__BUNDLE__' })).rejects.toThrowError(
+        new UnprocessableEntityException('Series instrument must include at least two items')
+      );
+      expect(instrumentModel.create).not.toHaveBeenCalled();
+    });
+
+    it('should treat a group with no stored access lists as having none, rather than failing the lookup', async () => {
+      instrumentModel.exists.mockResolvedValue(false);
+      groupModel.findFirst.mockResolvedValue({ id: 'group-1' });
+
+      await instrumentsService.create({ bundle: '__BUNDLE__' }, { seriesGroupId: 'group-1' });
+
+      expect(instrumentModel.findMany.mock.lastCall?.[0]).toMatchObject({ where: { AND: [groupItemFilter()] } });
+    });
+
+    it('should store a scalar instrument under the hash of its name and edition', async () => {
+      virtualizationService.eval.mockReturnValue(okAsync(interactiveInstrument));
+      instrumentModel.exists.mockResolvedValue(false);
+
+      const result = await instrumentsService.create({ bundle: '__BUNDLE__' });
+
+      expect(result).toMatchObject({ id: 'hash:REACTION_TIME-1', kind: 'INTERACTIVE' });
+      expect(instrumentModel.create).toHaveBeenCalledWith({
+        data: { bundle: '__BUNDLE__', groups: undefined, id: 'hash:REACTION_TIME-1', seriesGroup: undefined }
+      });
+    });
+
+    it('should not grant a first edition to any group, since no group can hold an earlier one', async () => {
+      virtualizationService.eval.mockReturnValue(okAsync(interactiveInstrument));
+      instrumentModel.exists.mockResolvedValue(false);
+
+      await instrumentsService.create({ bundle: '__BUNDLE__' });
+
+      expect(groupModel.updateMany).not.toHaveBeenCalled();
+    });
+
+    it('should grant a new edition to every group holding the previous one, so upgrading keeps access', async () => {
+      virtualizationService.eval.mockReturnValue(
+        okAsync({ ...interactiveInstrument, internal: { edition: 2, name: 'REACTION_TIME' } })
+      );
+      instrumentModel.exists.mockResolvedValue(false);
+
+      await instrumentsService.create({ bundle: '__BUNDLE__' });
+
+      expect(groupModel.updateMany).toHaveBeenCalledWith({
+        data: { accessibleInstrumentIds: { push: ['hash:REACTION_TIME-2'] } },
+        where: { accessibleInstrumentIds: { has: 'hash:REACTION_TIME-1' } }
+      });
     });
   });
 
@@ -1011,6 +1173,292 @@ describe('InstrumentsService', () => {
 
       expect(instrumentModel.findMany.mock.lastCall?.[0]).toMatchObject({
         where: { AND: expect.arrayContaining([{ id: { in: [] } }]) }
+      });
+    });
+  });
+
+  describe('count', () => {
+    it('should count the instruments matching the query', async () => {
+      const find = vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries, formInstance('FORM_A', 1)]);
+
+      await expect(instrumentsService.count()).resolves.toBe(2);
+      expect(find).toHaveBeenCalledWith({}, {});
+    });
+  });
+
+  describe('find (evaluation)', () => {
+    beforeEach(() => {
+      instrumentModel.findMany.mockResolvedValue([
+        { bundle: 'FORM_BUNDLE', id: 'hash:FORM_A-1' },
+        { bundle: 'SERIES_BUNDLE', id: 'series-1' }
+      ]);
+      virtualizationService.eval.mockImplementation((code) =>
+        okAsync(code === 'FORM_BUNDLE' ? formInstance('FORM_A', 1) : existingSeries)
+      );
+    });
+
+    it('should return only instruments of the requested kind', async () => {
+      const result = await instrumentsService.find({ kind: 'FORM' });
+      expect(result.map(({ id }) => id)).toEqual(['hash:FORM_A-1']);
+    });
+
+    it('should tag each evaluated instance with its stored id, whatever id the bundle declares', async () => {
+      const result = await instrumentsService.find();
+      expect(result.map(({ id }) => id)).toEqual(['hash:FORM_A-1', 'series-1']);
+    });
+
+    it('should evaluate a stored bundle once and serve later lookups from the cache', async () => {
+      await instrumentsService.find();
+      await instrumentsService.find();
+      expect(virtualizationService.eval).toHaveBeenCalledTimes(2);
+    });
+
+    it('should scope owned series to the named series group in preference to the caller groups', async () => {
+      await instrumentsService.find({ seriesGroupId: 'group-2' }, {}, ['group-1']);
+      expect(instrumentModel.findMany.mock.lastCall?.[0]).toMatchObject({
+        where: {
+          AND: [
+            {},
+            { OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }, { seriesGroupId: 'group-2' }] },
+            {}
+          ]
+        }
+      });
+    });
+
+    it('should fail loudly when a stored bundle no longer evaluates, rather than omitting the instrument', async () => {
+      const cause = { message: 'boom', name: 'Error' };
+      virtualizationService.eval.mockReturnValue(errAsync(cause));
+
+      const error = await instrumentsService.find().catch((err: unknown) => err);
+
+      expect(error).toBeInstanceOf(InternalServerErrorException);
+      expect(error).toMatchObject({ cause, message: 'Failed to evaluate instrument' });
+    });
+  });
+
+  describe('findBundleById (resolution)', () => {
+    beforeEach(() => {
+      vi.spyOn(cryptoService, 'hash').mockImplementation((value) => `hash:${value}`);
+    });
+
+    it('should report a missing instrument as not found', async () => {
+      instrumentModel.findFirst.mockResolvedValue(null);
+      await expect(instrumentsService.findBundleById('missing')).rejects.toThrowError(
+        new NotFoundException('Failed to find instrument with ID: missing')
+      );
+    });
+
+    it('should bundle a series together with the bundle of every item, so it can be administered offline', async () => {
+      instrumentModel.findFirst.mockImplementation(({ where }: any) =>
+        Promise.resolve({ bundle: `${where.id}:bundle`, id: where.id })
+      );
+      virtualizationService.eval.mockImplementation((code) =>
+        okAsync(code === 'series-1:bundle' ? existingSeries : formInstance('FORM', 1))
+      );
+
+      await expect(instrumentsService.findBundleById('series-1')).resolves.toEqual({
+        bundle: 'series-1:bundle',
+        id: 'series-1',
+        items: [
+          { bundle: 'hash:FORM_A-1:bundle', id: 'hash:FORM_A-1', kind: 'FORM' },
+          { bundle: 'hash:FORM_B-1:bundle', id: 'hash:FORM_B-1', kind: 'FORM' }
+        ],
+        kind: 'SERIES'
+      });
+    });
+
+    it('should refuse an instance of an unknown kind, rather than serving a bundle no client can render', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'odd' });
+      virtualizationService.eval.mockReturnValue(okAsync({ kind: 'UNKNOWN' }));
+
+      await expect(instrumentsService.findBundleById('odd')).rejects.toThrowError(
+        new InternalServerErrorException('Unexpected instance kind: UNKNOWN')
+      );
+    });
+  });
+
+  describe('list', () => {
+    let find: MockInstance<InstrumentsService['find']>;
+
+    beforeEach(() => {
+      find = vi.spyOn(instrumentsService, 'find').mockResolvedValue([formInstance('FORM_A', 1)]);
+    });
+
+    it('should summarize each instrument by id, internal name and title', async () => {
+      await expect(instrumentsService.list()).resolves.toEqual([
+        { id: 'hash:FORM_A-1', internal: { edition: 1, name: 'FORM_A' }, title: 'FORM_A' }
+      ]);
+    });
+
+    it('should not narrow the listing to any group when there is no current user', async () => {
+      await instrumentsService.list();
+      expect(find).toHaveBeenCalledWith({}, { ability: undefined }, undefined);
+    });
+
+    it('should narrow the listing to a requested group the current user belongs to', async () => {
+      const ability = createAppAbility([{ action: 'read', subject: 'Instrument' }]);
+      const currentUser = createRequestUser(ability, [createGroup('group-1'), createGroup('group-2')]);
+
+      await instrumentsService.list({ kind: 'FORM' }, currentUser, 'group-2');
+
+      expect(find).toHaveBeenCalledWith({ kind: 'FORM' }, { ability }, ['group-2']);
+    });
+  });
+
+  describe('findInfo (resolution)', () => {
+    it('should not query stored metadata when no instrument matches', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
+
+      await expect(instrumentsService.findInfo()).resolves.toEqual([]);
+      expect(instrumentModel.findMany).not.toHaveBeenCalled();
+    });
+
+    it('should report the source repository of an imported instrument, with a null name for a legacy import', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([formInstance('FORM_A', 1), formInstance('FORM_B', 1)]);
+      instrumentModel.findMany.mockResolvedValue([
+        { id: 'hash:FORM_A-1', sourceRepoId: 'repo-1', sourceRepoName: 'Clinic Repo' },
+        { id: 'hash:FORM_B-1', sourceRepoId: 'repo-2', sourceRepoName: null }
+      ]);
+
+      await expect(instrumentsService.findInfo()).resolves.toMatchObject([
+        { id: 'hash:FORM_A-1', sourceRepo: { id: 'repo-1', name: 'Clinic Repo' } },
+        { id: 'hash:FORM_B-1', sourceRepo: { id: 'repo-2', name: null } }
+      ]);
+    });
+
+    it('should keep the latest edition when an earlier edition is listed after it', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([formInstance('FORM_A', 2), formInstance('FORM_A', 1)]);
+      instrumentModel.findMany.mockResolvedValue([]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(result.map(({ id }) => id)).toEqual(['hash:FORM_A-2']);
+    });
+
+    it('should resolve the items of a series to the ids of the stored scalar instruments', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([
+        formInstance('FORM_A', 1),
+        formInstance('FORM_B', 1),
+        existingSeries
+      ]);
+      instrumentModel.findMany.mockResolvedValue([]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(result.find(({ id }) => id === existingSeries.id)).toMatchObject({
+        seriesItems: [{ id: 'hash:FORM_A-1' }, { id: 'hash:FORM_B-1' }]
+      });
+    });
+
+    it('should log an item that cannot be resolved instead of silently dropping it from the series', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([formInstance('FORM_A', 1), existingSeries]);
+      instrumentModel.findMany.mockResolvedValue([]);
+
+      const result = await instrumentsService.findInfo();
+
+      expect(result.find(({ id }) => id === existingSeries.id)).toMatchObject({
+        seriesItems: [{ id: 'hash:FORM_A-1' }]
+      });
+      expect(loggingService.error).toHaveBeenCalledWith({
+        message: `Cannot resolve item 'FORM_B' (edition 1) of series instrument '${existingSeries.id}'`,
+        seriesInstrumentId: existingSeries.id
+      });
+    });
+  });
+
+  describe('findSeriesOverview (ownership)', () => {
+    it('should name no owning group when the caller may not read it', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([{ ...existingSeries, content: { items: [] } }]);
+      instrumentModel.findMany.mockResolvedValue([
+        { id: existingSeries.id, seriesGroupId: 'hidden-group', sourceRepoId: null, sourceRepoName: null }
+      ]);
+      groupModel.findMany.mockResolvedValue([]);
+
+      await expect(instrumentsService.findSeriesOverview()).resolves.toMatchObject([
+        { id: existingSeries.id, seriesGroup: null, seriesGroupId: 'hidden-group' }
+      ]);
+    });
+  });
+
+  describe('createSeries (titles and languages)', () => {
+    const items = [
+      { edition: 1, name: 'FORM_A' },
+      { edition: 1, name: 'FORM_B' }
+    ];
+
+    beforeEach(() => {
+      vi.spyOn(instrumentsService, 'create').mockResolvedValue({ ...existingSeries, id: 'created-id' });
+    });
+
+    it('should tag a multilingual series in each of its languages', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
+
+      await instrumentsService.createSeries({
+        details: { title: { en: 'Series', fr: 'Série' } },
+        groupId: 'group-1',
+        items,
+        language: ['en', 'fr']
+      });
+
+      expect(bundledDefinition()).toMatchObject({ tags: { en: ['Series'], fr: ['Série'] } });
+    });
+
+    it('should trim every language of a multilingual title before storing it', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
+
+      await instrumentsService.createSeries({
+        details: { title: { en: '  Series ', fr: ' Série  ' } },
+        groupId: 'group-1',
+        items,
+        language: ['en', 'fr']
+      });
+
+      expect(bundledDefinition()).toMatchObject({ details: { title: { en: 'Series', fr: 'Série' } } });
+    });
+
+    it('should name the language whose title is blank, so the author knows which to fill in', async () => {
+      await expect(
+        instrumentsService.createSeries({
+          details: { title: { en: 'Series', fr: '   ' } },
+          groupId: 'group-1',
+          items,
+          language: ['en', 'fr']
+        })
+      ).rejects.toThrowError(new UnprocessableEntityException("Instrument title cannot be blank for language 'fr'"));
+    });
+
+    it('should not treat a scalar instrument as a duplicate series, whatever its content', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([formInstance('FORM_A', 1)]);
+
+      await expect(
+        instrumentsService.createSeries({ details: { title: 'Series' }, groupId: 'group-1', items, language: 'en' })
+      ).resolves.toEqual({ instrumentId: 'created-id', outcome: 'created' });
+    });
+  });
+
+  describe('updateSeriesArchive (audit titles)', () => {
+    const currentUser = createRequestUser(createAppAbility([{ action: 'manage', subject: 'all' }]));
+
+    const archiveSeriesTitled = async (title: unknown) => {
+      instrumentModel.findFirst.mockResolvedValue({ archivedAt: null, bundle: '__BUNDLE__', id: 'target' });
+      virtualizationService.eval.mockReturnValue(okAsync({ ...existingSeries, details: { title } }));
+      instrumentModel.update.mockResolvedValue({ archivedAt: new Date(), id: 'target' });
+      await instrumentsService.updateSeriesArchive('target', { isArchived: true }, currentUser);
+      return auditLogger.log.mock.lastCall?.[2].metadata;
+    };
+
+    it('should record a unilingual title as written', async () => {
+      await expect(archiveSeriesTitled('Plain Title')).resolves.toEqual({
+        instrumentId: 'target',
+        title: 'Plain Title'
+      });
+    });
+
+    it('should record every language of a title with no English version', async () => {
+      await expect(archiveSeriesTitled({ es: 'Serie', fr: 'Série' })).resolves.toEqual({
+        instrumentId: 'target',
+        title: 'Serie / Série'
       });
     });
   });

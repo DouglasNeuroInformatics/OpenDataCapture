@@ -8,11 +8,14 @@ import type { BasePermissionLevel } from '@opendatacapture/schemas/user';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AbilityFactory } from '@/auth/ability.factory';
+import { createAppAbility } from '@/auth/ability.utils';
 import { ROUTE_ACCESS_METADATA_KEY } from '@/core/decorators/route-access.decorator';
 import type { ProtectedRoutePermissionSet } from '@/core/decorators/route-access.decorator';
 
 import { GroupsController } from '../groups.controller';
 import { GroupsService } from '../groups.service';
+
+const createAbility = () => createAppAbility([{ action: 'read', subject: 'Group' }]);
 
 describe('GroupsController', () => {
   let groupsController: GroupsController;
@@ -42,6 +45,12 @@ describe('GroupsController', () => {
     it('should return the array returned by the groups service', async () => {
       groupsService.findAll.mockResolvedValueOnce([{ name: 'Test Group' }]);
       await expect(groupsController.findAll()).resolves.toMatchObject([{ name: 'Test Group' }]);
+    });
+
+    it("should scope the listing to the current user's ability", async () => {
+      const ability = createAbility();
+      await groupsController.findAll(ability);
+      expect(groupsService.findAll).toHaveBeenCalledWith({ ability });
     });
   });
 
@@ -87,8 +96,42 @@ describe('GroupsController', () => {
   describe('findById', () => {
     it('should return the value provided by the groups service ', async () => {
       groupsService.findById.mockResolvedValueOnce({ name: 'Test Group' });
-      await expect(groupsService.findById('123')).resolves.toMatchObject({
+      await expect(groupsController.findById('123')).resolves.toMatchObject({
         name: 'Test Group'
+      });
+    });
+
+    it("should scope the lookup to the current user's ability", async () => {
+      const ability = createAbility();
+      await groupsController.findById('123', ability);
+      expect(groupsService.findById).toHaveBeenCalledWith('123', { ability });
+    });
+  });
+
+  describe('deleteById', () => {
+    it("should scope the deletion to the current user's ability", async () => {
+      const ability = createAbility();
+      await groupsController.deleteById('123', ability);
+      expect(groupsService.deleteById).toHaveBeenCalledWith('123', { ability });
+    });
+
+    it('should return the group deleted by the groups service', async () => {
+      groupsService.deleteById.mockResolvedValueOnce({ name: 'Test Group' });
+      await expect(groupsController.deleteById('123')).resolves.toMatchObject({ name: 'Test Group' });
+    });
+  });
+
+  describe('updateById', () => {
+    it("should forward the update scoped to the current user's ability", async () => {
+      const ability = createAbility();
+      await groupsController.updateById('123', { name: 'Renamed Group' }, ability);
+      expect(groupsService.updateById).toHaveBeenCalledWith('123', { name: 'Renamed Group' }, { ability });
+    });
+
+    it('should return the group updated by the groups service', async () => {
+      groupsService.updateById.mockResolvedValueOnce({ name: 'Renamed Group' });
+      await expect(groupsController.updateById('123', { name: 'Renamed Group' })).resolves.toMatchObject({
+        name: 'Renamed Group'
       });
     });
   });

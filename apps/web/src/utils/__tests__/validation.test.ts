@@ -53,6 +53,10 @@ describe('omittedIfUnchanged', () => {
     expect(omittedIfUnchanged('', null)).toBeUndefined();
   });
 
+  it('should treat a missing field over an absent value as unchanged', () => {
+    expect(omittedIfUnchanged(undefined, undefined)).toBeUndefined();
+  });
+
   it('should clear a value the user blanked out', () => {
     expect(omittedIfUnchanged('', '5145551234')).toBeNull();
   });

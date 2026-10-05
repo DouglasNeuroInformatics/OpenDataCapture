@@ -68,9 +68,9 @@ frontend shows — instruments and the apps' own forms alike. `apps/web/src/serv
 - A message written by the schema author always wins — both majors skip the error map entirely when
   an issue already carries one.
 
-Tests live in `apps/web/src/__tests__/zod-error-maps.test.ts`, on the adapter side of the seam
-rather than in this package's own project. They drive `createZodErrorMaps` through per-parse maps
-rather than registering globally.
+Most tests live in `apps/web/src/__tests__/zod-error-maps.test.ts`, on the adapter side of the seam;
+`src/utils/__tests__/zodErrorMap.test.ts` covers only the cases the web suite does not reach. Both
+drive `createZodErrorMaps` through per-parse maps rather than registering globally.
 
 ## `@tanstack/react-router` is an optional peer — never import it
 
@@ -138,8 +138,9 @@ pattern to copy.
 ## Tests
 
 `pnpm exec vitest --project react-core` runs them; the project is `happy-dom`, and the environment
-caveats in `apps/web/AGENTS.md` apply. Most behaviour here is still covered only from a consumer's
-suite (`pnpm exec vitest --project web`) and by `testing/`.
+caveats in `apps/web/AGENTS.md` apply. Its project also sets happy-dom's
+`disableIframePageLoading`, so rendering `InteractiveContent` never requests the `/runtime/v1` iframe
+page — happy-dom logs one `NotSupportedError` per iframe instead, which is expected.
 
 `src/components/InstrumentRenderer/__tests__/SeriesInstrumentRenderer.test.tsx` is the canonical
 file. It renders against **hand-written bundles** — an async IIFE resolving to the instrument, run

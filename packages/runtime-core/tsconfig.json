@@ -6,5 +6,5 @@
     "module": "Node16",
     "moduleResolution": "Node16"
   },
-  "include": ["lib/**/*", "src/**/*"]
+  "include": ["lib/**/*", "src/**/*", "vitest.config.ts"]
 }

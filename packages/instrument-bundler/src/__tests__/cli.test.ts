@@ -81,6 +81,49 @@ describe('cli', () => {
     ).toBe(true);
   });
 
+  it('should not try to create an output directory that already exists', async () => {
+    fs.mkdirSync(outputBase, { recursive: true });
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase, '--verbose'];
+    await import('../cli.js');
+    expect(
+      logSpy.mock.calls.some(([message]) => typeof message === 'string' && message.startsWith('Creating directory:'))
+    ).toBe(false);
+  });
+
+  it('should create the output directory when it does not exist yet', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase, '--verbose'];
+    await import('../cli.js');
+    expect(logSpy).toHaveBeenCalledWith(`Creating directory: ${outputBase}`);
+  });
+
+  it('should embed a binary asset next to the entry, reading it as bytes rather than text', async () => {
+    const pngBytes = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+      'base64'
+    );
+    fs.writeFileSync(path.join(inputBase, 'FORM_INSTRUMENT_STUB', 'logo.png'), pngBytes);
+    fs.writeFileSync(
+      path.join(inputBase, 'FORM_INSTRUMENT_STUB', 'index.ts'),
+      'import logo from "./logo.png"; export default { content: {}, details: { logo }, kind: "FORM", language: "en", measures: {} };'
+    );
+    process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase, '--raw'];
+    await import('../cli.js');
+    const content = fs.readFileSync(path.join(outputBase, 'FORM_INSTRUMENT_STUB.js'), 'utf-8');
+    expect(content).toContain(`data:image/png;base64,${pngBytes.toString('base64')}`);
+  });
+
+  it('should skip an instrument directory whose name contains glob metacharacters, a bug: the per-directory glob does not escape the path', async () => {
+    fs.mkdirSync(path.join(inputBase, '[x]'));
+    fs.writeFileSync(path.join(inputBase, '[x]', 'index.ts'), 'export default {};');
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase];
+    await import('../cli.js');
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to find any input files in directory'));
+    expect(fs.existsSync(path.join(outputBase, '[x].js'))).toBe(false);
+  });
+
   it('should exit with an error when the target directory does not exist', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     process.argv = ['node', 'cli.js', path.join(tmpDir, 'missing'), '--outdir', outputBase];

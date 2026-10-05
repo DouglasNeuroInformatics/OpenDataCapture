@@ -1,11 +1,20 @@
+import { EventEmitter } from 'events';
+import { Worker } from 'worker_threads';
+
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { getModelToken, LoggingService, PRISMA_CLIENT_TOKEN } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+  ServiceUnavailableException,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
@@ -21,7 +30,34 @@ import { InstrumentRecordsService } from '../instrument-records.service';
 
 import type { RecordType } from '../thread-types';
 
+// Every export runs the real worker unless a test swaps in a FakeWorker, so the protocol is exercised
+// end to end while the failure modes the real worker never produces can still be driven.
+vi.mock('worker_threads', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('worker_threads')>();
+  return {
+    ...actual,
+    Worker: vi.fn(function (filename: string) {
+      return new actual.Worker(filename);
+    })
+  };
+});
+
+class FakeWorker extends EventEmitter {
+  postMessage = vi.fn();
+  terminate = vi.fn(() => Promise.resolve(0));
+}
+
+function useFakeWorker() {
+  const fakeWorker = new FakeWorker();
+  vi.mocked(Worker).mockImplementationOnce(function () {
+    return fakeWorker as unknown as Worker;
+  });
+  return fakeWorker;
+}
+
 describe('InstrumentRecordsService', () => {
+  let groupsService: MockedInstance<GroupsService>;
+  let instrumentMeasuresService: MockedInstance<InstrumentMeasuresService>;
   let loggingService: MockedInstance<LoggingService>;
   let storageService: MockedInstance<StorageService>;
   let fileModel: MockedInstance<Model<'InstrumentRecordFile'>>;
@@ -67,6 +103,8 @@ describe('InstrumentRecordsService', () => {
       ]
     }).compile();
 
+    groupsService = moduleRef.get(GroupsService);
+    instrumentMeasuresService = moduleRef.get(InstrumentMeasuresService);
     fileModel = moduleRef.get(getModelToken('InstrumentRecordFile'));
     storageService = moduleRef.get(StorageService);
     loggingService = moduleRef.get(LoggingService);
@@ -77,6 +115,10 @@ describe('InstrumentRecordsService', () => {
     sessionsService = moduleRef.get(SessionsService);
     subjectsService = moduleRef.get(SubjectsService);
     usersService = moduleRef.get(UsersService);
+  });
+
+  afterEach(() => {
+    vi.mocked(Worker).mockReset();
   });
 
   describe('deleteById', () => {
@@ -263,6 +305,59 @@ describe('InstrumentRecordsService', () => {
       instrumentsService.findById.mockResolvedValue(mockFormInstrument as any);
       await instrumentRecordsService.create(baseCreateData);
       expect(instrumentRecordModel.create.mock.lastCall?.[0].data.seriesInstrument).toBeUndefined();
+    });
+
+    it('should reject a series instrument, since only its scalar items hold records', async () => {
+      instrumentsService.findById.mockResolvedValue({ id: 'series-1', kind: 'SERIES' });
+      await expect(
+        instrumentRecordsService.create({ ...baseCreateData, instrumentId: 'series-1' })
+      ).rejects.toBeInstanceOf(UnprocessableEntityException);
+      expect(instrumentRecordModel.create).not.toHaveBeenCalled();
+    });
+
+    it('should refuse a file instrument when storage is disabled, so no record waits for an upload that cannot happen', async () => {
+      instrumentsService.findById.mockResolvedValue({ ...mockFormInstrument, kind: 'FILE' });
+      Object.assign(storageService, { isEnabled: false });
+      await expect(instrumentRecordsService.create(baseCreateData)).rejects.toBeInstanceOf(ServiceUnavailableException);
+      expect(instrumentRecordModel.create).not.toHaveBeenCalled();
+    });
+
+    it('should create a file record as pending, since its files are attached afterwards', async () => {
+      instrumentsService.findById.mockResolvedValue({ ...mockFormInstrument, kind: 'FILE' });
+      Object.assign(storageService, { isEnabled: true });
+      await instrumentRecordsService.create(baseCreateData);
+      expect(instrumentRecordModel.create.mock.lastCall?.[0]).toMatchObject({ data: { pending: true } });
+    });
+
+    it('should report the validation issues when the data does not match the instrument schema', async () => {
+      const issues = [{ message: 'Required', path: ['answer'] }];
+      instrumentsService.findById.mockResolvedValue({
+        ...mockFormInstrument,
+        validationSchema: { safeParse: () => ({ error: { issues }, success: false }) }
+      });
+      await expect(instrumentRecordsService.create(baseCreateData)).rejects.toMatchObject({
+        response: { issues, statusCode: 422 }
+      });
+      expect(instrumentRecordModel.create).not.toHaveBeenCalled();
+    });
+
+    it('should store the measures computed from the submitted data', async () => {
+      const measures = { score: { kind: 'computed', label: 'Score', value: () => 1 } };
+      instrumentsService.findById.mockResolvedValue({ ...mockFormInstrument, measures });
+      instrumentMeasuresService.computeMeasures.mockReturnValueOnce({ score: 1 });
+      await instrumentRecordsService.create(baseCreateData);
+      expect(instrumentMeasuresService.computeMeasures).toHaveBeenCalledWith(measures, { answer: 1 });
+      expect(instrumentRecordModel.create.mock.lastCall?.[0]).toMatchObject({
+        data: { computedMeasures: { score: 1 } }
+      });
+    });
+
+    it('should connect the record to the group it was collected in', async () => {
+      instrumentsService.findById.mockResolvedValue(mockFormInstrument as any);
+      await instrumentRecordsService.create({ ...baseCreateData, groupId: 'group-1' });
+      expect(instrumentRecordModel.create.mock.lastCall?.[0]).toMatchObject({
+        data: { group: { connect: { id: 'group-1' } }, pending: false }
+      });
     });
 
     it('should reject a seriesInstrumentId that references a non-series instrument', async () => {
@@ -497,6 +592,52 @@ describe('InstrumentRecordsService', () => {
       expect(instrumentRecordModel.createMany).not.toHaveBeenCalled();
     });
 
+    it('should look the group up with the caller ability before writing anything', async () => {
+      const ability = createAppAbility([{ action: 'create', subject: 'InstrumentRecord' }]);
+      usersService.findByUsername.mockResolvedValueOnce({ groups: [{ id: 'group-1' }] });
+
+      await instrumentRecordsService.upload(
+        { ...baseUploadData, groupId: 'group-1', username: 'validuser' },
+        { ability }
+      );
+
+      expect(groupsService.findById).toHaveBeenCalledWith('group-1', { ability });
+    });
+
+    it('should reject a series instrument, since only its scalar items hold records', async () => {
+      instrumentsService.findById.mockResolvedValue({ ...mockInstrument, kind: 'SERIES' });
+
+      await expect(instrumentRecordsService.upload({ ...baseUploadData })).rejects.toBeInstanceOf(
+        UnprocessableEntityException
+      );
+
+      expect(sessionsService.createMany).not.toHaveBeenCalled();
+    });
+
+    it('should let an administrator upload without a group, creating ungrouped sessions', async () => {
+      usersService.findByUsername.mockResolvedValueOnce({ basePermissionLevel: 'ADMIN', groups: [] });
+
+      await instrumentRecordsService.upload({ ...baseUploadData, username: 'admin' });
+
+      expect(sessionsService.createMany).toHaveBeenCalledWith(
+        expect.objectContaining({ groupId: null, username: 'admin' }),
+        undefined
+      );
+    });
+
+    it('should store the computed measures of each record when the instrument defines measures', async () => {
+      const measures = { score: { kind: 'computed', label: 'Score', value: () => 1 } };
+      instrumentsService.findById.mockResolvedValue({ ...mockInstrument, measures });
+      instrumentMeasuresService.computeMeasures.mockReturnValueOnce({ score: 1 });
+
+      await instrumentRecordsService.upload({ ...baseUploadData });
+
+      expect(instrumentMeasuresService.computeMeasures).toHaveBeenCalledWith(measures, { answer: 1 });
+      expect(instrumentRecordModel.createMany.mock.lastCall?.[0]).toMatchObject({
+        data: [{ computedMeasures: { score: 1 } }]
+      });
+    });
+
     it('should create records via createMany with the processed record data', async () => {
       await instrumentRecordsService.upload({ ...baseUploadData });
 
@@ -525,6 +666,25 @@ describe('InstrumentRecordsService', () => {
           }
         })
       );
+    });
+
+    it('should verify the requested group and instrument exist before querying records', async () => {
+      await instrumentRecordsService.find({ groupId: 'group-1', instrumentId: 'instrument-1' });
+
+      expect(groupsService.findById).toHaveBeenCalledWith('group-1');
+      expect(instrumentsService.findById).toHaveBeenCalledWith('instrument-1');
+      expect(groupsService.findById).toHaveBeenCalledBefore(instrumentRecordModel.findMany);
+    });
+
+    it('should restrict the records to instruments of the requested kind', async () => {
+      instrumentsService.find.mockResolvedValueOnce([{ id: 'form-1' }, { id: 'form-2' }]);
+
+      await instrumentRecordsService.find({ kind: 'FORM' });
+
+      expect(instrumentsService.find).toHaveBeenCalledWith({ kind: 'FORM' });
+      expect(instrumentRecordModel.findMany.mock.lastCall?.[0].where.AND).toContainEqual({
+        instrumentId: { in: ['form-1', 'form-2'] }
+      });
     });
 
     it('should not join the instrument, whose bundle is large and unused here', async () => {
@@ -743,6 +903,312 @@ describe('InstrumentRecordsService', () => {
 
       const projectStage = pipeline.find((stage) => stage.$project);
       expect(projectStage.$project.session.user.username).toBe('$sessionUser.username');
+    });
+
+    it('should match only the requested group in the aggregation, so a scoped export reads no other group', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.exportRecords({ groupId: 'group-1' }, { ability: createAppAbility([]) });
+
+      const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
+      const matchStage = pipeline.find((stage) => stage.$match);
+      expect(matchStage.$match.$expr).toStrictEqual({ $eq: ['$groupId', { $toObjectId: 'group-1' }] });
+    });
+
+    describe('when the worker fails', () => {
+      const record = {
+        computedMeasures: { score: 85 },
+        date: '2023-01-01',
+        groupId: 'group-1',
+        id: 'record-1',
+        instrumentId: 'instrument-1',
+        session: { date: '2023-01-01', id: 'session-1', type: 'IN_PERSON' as const, user: null },
+        subject: { age: 20, groupIds: ['group-1'], id: 'subject-1', sex: 'MALE' }
+      } satisfies RecordType;
+      const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+
+      beforeEach(() => {
+        instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([record]);
+      });
+
+      it('should reject with the error the worker reports for a chunk', async () => {
+        instrumentsService.findById.mockResolvedValueOnce({
+          id: 'other-instrument',
+          internal: { edition: 1, name: 'X' }
+        });
+
+        await expect(instrumentRecordsService.exportRecords({}, { ability })).rejects.toThrow(
+          'Instrument not found for ID: instrument-1'
+        );
+      });
+
+      it('should reject and terminate the worker when it crashes', async () => {
+        instrumentsService.findById.mockResolvedValueOnce({ id: 'instrument-1', internal: { edition: 1, name: 'X' } });
+        const worker = useFakeWorker();
+        const error = new Error('worker crashed');
+
+        const result = instrumentRecordsService.exportRecords({}, { ability });
+        await vi.waitFor(() => expect(worker.postMessage).toHaveBeenCalledOnce());
+        worker.emit('error', error);
+
+        await expect(result).rejects.toBe(error);
+        expect(worker.terminate).toHaveBeenCalledOnce();
+      });
+
+      // Pins a reported defect: a failed INIT neither rejects nor terminates. Expected to change when the source is fixed.
+      it('should leave the export pending without sending a chunk when a worker fails to initialize', async () => {
+        instrumentsService.findById.mockResolvedValueOnce({ id: 'instrument-1', internal: { edition: 1, name: 'X' } });
+        const worker = useFakeWorker();
+
+        const result = instrumentRecordsService.exportRecords({}, { ability });
+        await vi.waitFor(() => expect(worker.postMessage).toHaveBeenCalledOnce());
+        worker.emit('message', { success: false });
+
+        await expect(Promise.race([result, Promise.resolve('pending')])).resolves.toBe('pending');
+        expect(worker.postMessage).toHaveBeenCalledTimes(1);
+        expect(worker.postMessage).toHaveBeenCalledWith({
+          data: [{ edition: 1, id: 'instrument-1', name: 'X' }],
+          type: 'INIT'
+        });
+        worker.emit('error', new Error('settle'));
+        await expect(result).rejects.toThrow('settle');
+      });
+    });
+  });
+
+  describe('count', () => {
+    it('should count only the records the caller may read that match the filter', async () => {
+      const ability = createAppAbility([
+        { action: 'read', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' }
+      ]);
+      instrumentRecordModel.count.mockResolvedValueOnce(3);
+
+      await expect(instrumentRecordsService.count({ subjectId: 'subject-1' }, { ability })).resolves.toBe(3);
+
+      expect(instrumentRecordModel.count).toHaveBeenCalledWith({
+        where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRecord'), { subjectId: 'subject-1' }] }
+      });
+    });
+
+    it('should count every record when given no filter or ability', async () => {
+      instrumentRecordModel.count.mockResolvedValueOnce(7);
+
+      await expect(instrumentRecordsService.count()).resolves.toBe(7);
+
+      expect(instrumentRecordModel.count).toHaveBeenCalledWith({ where: { AND: [{}, {}] } });
+    });
+  });
+
+  describe('exists', () => {
+    it('should report whether a record matches the given filter', async () => {
+      instrumentRecordModel.exists.mockResolvedValueOnce(true);
+
+      await expect(instrumentRecordsService.exists({ id: 'record-1' })).resolves.toBe(true);
+
+      expect(instrumentRecordModel.exists).toHaveBeenCalledWith({ id: 'record-1' });
+    });
+  });
+
+  describe('linearModel', () => {
+    const measures = { score: { kind: 'computed', label: 'Score', value: () => 1 } };
+    const recordAt = (time: number, computedMeasures: { [key: string]: unknown }) => ({
+      computedMeasures,
+      date: new Date(time)
+    });
+
+    const useInstrument = (instance: object) => {
+      instrumentsService.findById.mockResolvedValueOnce({ bundle: '', id: 'instrument-1' });
+      instrumentsService.getInstrumentInstance.mockResolvedValueOnce({ id: 'instrument-1', ...instance });
+    };
+
+    it('should verify the requested group exists before building the model', async () => {
+      useInstrument({ kind: 'FORM', measures: null });
+
+      await instrumentRecordsService.linearModel({ groupId: 'group-1', instrumentId: 'instrument-1' });
+
+      expect(groupsService.findById).toHaveBeenCalledWith('group-1');
+    });
+
+    it('should evaluate the stored instrument, since its measures live in the bundle', async () => {
+      const stored = { bundle: 'bundle', id: 'instrument-1' };
+      instrumentsService.findById.mockResolvedValueOnce(stored);
+      instrumentsService.getInstrumentInstance.mockResolvedValueOnce({ kind: 'FORM', measures: null });
+
+      await instrumentRecordsService.linearModel({ instrumentId: 'instrument-1' });
+
+      expect(instrumentsService.getInstrumentInstance).toHaveBeenCalledWith(stored);
+    });
+
+    it('should reject a series instrument, which has no measures of its own', async () => {
+      useInstrument({ kind: 'SERIES' });
+
+      await expect(instrumentRecordsService.linearModel({ instrumentId: 'instrument-1' })).rejects.toBeInstanceOf(
+        UnprocessableEntityException
+      );
+    });
+
+    it('should return no results without querying records when the instrument has no measures', async () => {
+      useInstrument({ kind: 'FORM', measures: null });
+
+      await expect(instrumentRecordsService.linearModel({ instrumentId: 'instrument-1' })).resolves.toStrictEqual({});
+
+      expect(instrumentRecordModel.findMany).not.toHaveBeenCalled();
+    });
+
+    it('should query only the readable records of the instrument and group', async () => {
+      const ability = createAppAbility([
+        { action: 'read', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' }
+      ]);
+      useInstrument({ kind: 'FORM', measures });
+      instrumentRecordModel.findMany.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.linearModel({ groupId: 'group-1', instrumentId: 'instrument-1' }, { ability });
+
+      expect(instrumentRecordModel.findMany).toHaveBeenCalledWith({
+        include: { instrument: true },
+        where: {
+          AND: [
+            accessibleQuery(ability, 'read', 'InstrumentRecord'),
+            { groupId: 'group-1' },
+            { instrumentId: 'instrument-1' }
+          ]
+        }
+      });
+    });
+
+    it('should return no results for fewer than three records, too few to fit a line', async () => {
+      useInstrument({ kind: 'FORM', measures });
+      instrumentRecordModel.findMany.mockResolvedValueOnce([recordAt(1, { score: 1 }), recordAt(2, { score: 2 })]);
+
+      await expect(instrumentRecordsService.linearModel({ instrumentId: 'instrument-1' })).resolves.toStrictEqual({});
+    });
+
+    it('should fit each numeric measure against the record date, ignoring non-numeric measures', async () => {
+      useInstrument({ kind: 'FORM', measures });
+      instrumentRecordModel.findMany.mockResolvedValueOnce([
+        recordAt(1, { label: 'a', score: 2 }),
+        recordAt(2, { label: 'b', score: 4 }),
+        recordAt(3, { label: 'c', score: 6 })
+      ]);
+
+      const results = await instrumentRecordsService.linearModel({ instrumentId: 'instrument-1' });
+
+      expect(Object.keys(results)).toStrictEqual(['score']);
+      expect(results.score!.slope).toBeCloseTo(2);
+      expect(results.score!.intercept).toBeCloseTo(0);
+    });
+  });
+
+  describe('updateById', () => {
+    const useRecord = (data: unknown) => {
+      instrumentRecordModel.findFirst.mockResolvedValueOnce({ data, id: 'record-1', instrumentId: 'instrument-1' });
+    };
+
+    const useInstrument = (instance: object = {}) => {
+      instrumentsService.findById.mockResolvedValueOnce({ bundle: '', id: 'instrument-1' });
+      instrumentsService.getInstrumentInstance.mockResolvedValueOnce({
+        measures: null,
+        validationSchema: { safeParseAsync: (data: unknown) => Promise.resolve({ data, success: true }) },
+        ...instance
+      });
+    };
+
+    beforeEach(() => {
+      instrumentRecordModel.update.mockResolvedValue({ id: 'record-1' });
+    });
+
+    it('should throw a NotFoundException when the record does not exist', async () => {
+      instrumentRecordModel.findFirst.mockResolvedValueOnce(null);
+
+      await expect(instrumentRecordsService.updateById('record-1', {})).rejects.toBeInstanceOf(NotFoundException);
+
+      expect(instrumentRecordModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should reject an object update to a record whose data is an array', async () => {
+      useRecord([{ answer: 1 }]);
+
+      await expect(instrumentRecordsService.updateById('record-1', { answer: 2 })).rejects.toBeInstanceOf(
+        BadRequestException
+      );
+
+      expect(instrumentRecordModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should merge the update into the existing data, keeping fields it does not mention', async () => {
+      useRecord({ answer: 1, comment: 'kept' });
+      useInstrument();
+
+      await instrumentRecordsService.updateById('record-1', { answer: 2 });
+
+      expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { computedMeasures: null, data: { answer: 2, comment: 'kept' } }
+      });
+    });
+
+    // Pins a reported defect: a submitted array is silently dropped. Expected to change when the source is fixed.
+    it('should ignore an array the update supplies for an existing array field', async () => {
+      useRecord({ answers: [1, 2, 3] });
+      useInstrument();
+
+      await instrumentRecordsService.updateById('record-1', { answers: [9] });
+
+      expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({ data: { data: { answers: [1, 2, 3] } } });
+    });
+
+    it('should merge an array update element by element into array data', async () => {
+      useRecord([{ answer: 1, comment: 'kept' }]);
+      useInstrument();
+
+      await instrumentRecordsService.updateById('record-1', [{ answer: 2 }]);
+
+      expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { data: [{ answer: 2, comment: 'kept' }] }
+      });
+    });
+
+    it('should reject merged data that no longer matches the instrument schema', async () => {
+      const issues = [{ message: 'Expected number', path: ['answer'] }];
+      useRecord({ answer: 1 });
+      useInstrument({
+        validationSchema: { safeParseAsync: () => Promise.resolve({ error: { issues }, success: false }) }
+      });
+
+      await expect(instrumentRecordsService.updateById('record-1', { answer: 'x' })).rejects.toMatchObject({
+        response: { issues, message: 'Merged data does not match validation schema' }
+      });
+      expect(instrumentRecordModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should recompute the measures from the merged data', async () => {
+      const measures = { score: { kind: 'computed', label: 'Score', value: () => 1 } };
+      useRecord({ answer: 1 });
+      useInstrument({ measures });
+      instrumentMeasuresService.computeMeasures.mockReturnValueOnce({ score: 2 });
+
+      await instrumentRecordsService.updateById('record-1', { answer: 2 });
+
+      expect(instrumentMeasuresService.computeMeasures).toHaveBeenCalledWith(measures, { answer: 2 });
+      expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { computedMeasures: { score: 2 } }
+      });
+    });
+
+    // Pins a reported defect: the PATCH route is gated on update, but the write is scoped by delete rules.
+    // Expected to change when the source is fixed.
+    it("should scope the write by the caller's delete rules", async () => {
+      const ability = createAppAbility([
+        { action: 'delete', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' }
+      ]);
+      useRecord({ answer: 1 });
+      useInstrument();
+
+      await instrumentRecordsService.updateById('record-1', { answer: 2 }, { ability });
+
+      expect(instrumentRecordModel.update.mock.lastCall?.[0].where).toStrictEqual({
+        AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')],
+        id: 'record-1'
+      });
     });
   });
 });

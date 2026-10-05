@@ -14,4 +14,10 @@ describe('StackTrace', () => {
     expect(screen.getByText(/:10:5\)/)).toBeTruthy();
     expect(screen.getByText(/:20:1\)/)).toBeTruthy();
   });
+
+  it('should link a native frame, which has no file, to nowhere rather than a broken URL', () => {
+    render(<StackTrace stack={['Error: boom', '    at foo (native)'].join('\n')} />);
+    fireEvent.click(screen.getByText('Stack'));
+    expect(screen.getByRole('link').getAttribute('href')).toBe('#');
+  });
 });

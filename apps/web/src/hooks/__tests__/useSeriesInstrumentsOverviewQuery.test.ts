@@ -1,8 +1,15 @@
-import { QueryClient } from '@tanstack/react-query';
+import type { PropsWithChildren } from 'react';
+import { createElement, Suspense } from 'react';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { seriesInstrumentsOverviewQueryOptions } from '../useSeriesInstrumentsOverviewQuery';
+import {
+  seriesInstrumentsOverviewQueryOptions,
+  useSeriesInstrumentsOverviewQuery
+} from '../useSeriesInstrumentsOverviewQuery';
 
 vi.mock('axios');
 
@@ -41,5 +48,25 @@ describe('seriesInstrumentsOverviewQueryOptions', () => {
       archivedAt: new Date('2024-06-01T00:00:00.000Z'),
       seriesGroup: { name: 'Depression Clinic' }
     });
+  });
+});
+
+describe('useSeriesInstrumentsOverviewQuery', () => {
+  beforeEach(() => {
+    get.mockReset();
+  });
+
+  it('should suspend until the overview loads, then hand the parsed series to the page', async () => {
+    get.mockResolvedValueOnce({ data: [series] });
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const wrapper = ({ children }: PropsWithChildren) =>
+      createElement(
+        QueryClientProvider,
+        { client: queryClient },
+        createElement(Suspense, { fallback: null }, children)
+      );
+    const { result } = renderHook(() => useSeriesInstrumentsOverviewQuery(), { wrapper });
+    await waitFor(() => expect(result.current?.data).toHaveLength(1));
+    expect(result.current.data[0]?.id).toBe('series-1');
   });
 });

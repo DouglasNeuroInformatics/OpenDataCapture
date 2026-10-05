@@ -1,8 +1,12 @@
-import { QueryClient } from '@tanstack/react-query';
+import type { PropsWithChildren } from 'react';
+import { createElement, Suspense } from 'react';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { subjectCustomIdsQueryOptions } from '../useSubjectCustomIdsQuery';
+import { subjectCustomIdsQueryOptions, useSubjectCustomIdsQuery } from '../useSubjectCustomIdsQuery';
 
 vi.mock('axios');
 
@@ -38,5 +42,24 @@ describe('subjectCustomIdsQueryOptions', () => {
     expect(subjectCustomIdsQueryOptions({ params: { groupId: 'group-1' } }).queryKey).not.toStrictEqual(
       subjectCustomIdsQueryOptions({ params: { groupId: 'group-2' } }).queryKey
     );
+  });
+});
+
+describe('useSubjectCustomIdsQuery', () => {
+  beforeEach(() => {
+    get.mockReset();
+  });
+
+  it("should suspend until the group's custom ids load, then return them to the form", async () => {
+    get.mockResolvedValueOnce({ data: ['group$a'] });
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const wrapper = ({ children }: PropsWithChildren) =>
+      createElement(
+        QueryClientProvider,
+        { client: queryClient },
+        createElement(Suspense, { fallback: null }, children)
+      );
+    const { result } = renderHook(() => useSubjectCustomIdsQuery({ params: { groupId: 'group-1' } }), { wrapper });
+    await waitFor(() => expect(result.current?.data).toStrictEqual(['group$a']));
   });
 });

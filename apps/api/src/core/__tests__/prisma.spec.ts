@@ -1,9 +1,36 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import { describe, expect, it, vi } from 'vitest';
+import { ConfigService } from '@douglasneuroinformatics/libnest';
+import { Test } from '@nestjs/testing';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { buildIndexName, DATABASE_INDEXES, ensureDatabaseIndexes } from '../prisma';
+import { buildIndexName, DATABASE_INDEXES, ensureDatabaseIndexes, PrismaModuleOptionsFactory } from '../prisma';
+
+/** Stands in for the extended client, recording the options each `new PrismaClient` received. */
+const prismaClient = vi.hoisted(() => {
+  const constructorOptions: unknown[] = [];
+  return { $connect: vi.fn(), $runCommandRaw: vi.fn(), constructorOptions };
+});
+
+vi.mock('@prisma/client', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@prisma/client')>()),
+  PrismaClient: class {
+    constructor(options: unknown) {
+      prismaClient.constructorOptions.push(options);
+    }
+    $extends() {
+      return prismaClient;
+    }
+  }
+}));
+
+/** Only `getUri` is read from the replica set the factory starts. */
+const createReplSet = vi.hoisted(() => vi.fn<(options: unknown) => Promise<{ getUri: (db: string) => string }>>());
+
+vi.mock('mongodb-memory-server', () => ({
+  MongoMemoryReplSet: { create: createReplSet }
+}));
 
 type IndexSpecification = {
   key: { [field: string]: number };
@@ -143,6 +170,109 @@ describe('ensureDatabaseIndexes', () => {
   it('should fail loudly when an index cannot be built, naming the collection', async () => {
     const { client } = mockClient({}, 'UserModel');
     await expect(ensureDatabaseIndexes(client)).rejects.toThrow(/UserModel/);
+  });
+
+  it('should replace an index that differs from the declaration only in uniqueness', async () => {
+    const { client, commands } = mockClient({
+      SessionModel: [{ key: orderedKey('groupId', 'date'), name: 'SessionModel_groupId_date_idx', unique: true }]
+    });
+    await ensureDatabaseIndexes(client);
+    expect(commands).toContainEqual({ dropIndexes: 'SessionModel', index: 'SessionModel_groupId_date_idx' });
+  });
+
+  // Some server versions report a missing namespace by message alone, without the numeric code.
+  it('should recognize a missing collection by its message when MongoDB reports no error code', async () => {
+    const client = {
+      $runCommandRaw: vi.fn((command: { [key: string]: unknown }) =>
+        'listIndexes' in command
+          ? Promise.reject(new Error('ns does not exist: test.UserModel'))
+          : Promise.resolve({ ok: 1 })
+      )
+    };
+    await expect(ensureDatabaseIndexes(client)).resolves.toBeUndefined();
+  });
+
+  it('should propagate any other failure to list indexes, rather than rebuilding indexes it cannot see', async () => {
+    const failure = Object.assign(new Error('not authorized'), { code: 13 });
+    const client = { $runCommandRaw: vi.fn(() => Promise.reject(failure)) };
+    await expect(ensureDatabaseIndexes(client)).rejects.toBe(failure);
+  });
+
+  it('should fail loudly when listIndexes returns an unexpected shape, naming the collection', async () => {
+    const client = { $runCommandRaw: vi.fn(() => Promise.resolve({ ok: 1 })) };
+    await expect(ensureDatabaseIndexes(client)).rejects.toThrow(
+      "Failed to parse listIndexes output for collection 'AssignmentModel'"
+    );
+  });
+});
+
+describe('PrismaModuleOptionsFactory', () => {
+  const externalEnv = {
+    MONGO_DIRECT_CONNECTION: true,
+    MONGO_REPLICA_SET: 'rs0',
+    MONGO_RETRY_WRITES: false,
+    MONGO_URI: new URL('mongodb://db.example.org:27017'),
+    MONGO_WRITE_CONCERN: 'majority',
+    NODE_ENV: 'production'
+  };
+
+  const createFactory = async (env: { [key: string]: unknown }) => {
+    const moduleRef = await Test.createTestingModule({
+      providers: [PrismaModuleOptionsFactory, { provide: ConfigService, useValue: { get: (key: string) => env[key] } }]
+    }).compile();
+    return moduleRef.get(PrismaModuleOptionsFactory);
+  };
+
+  const lastDatasourceUrl = () => {
+    const options = prismaClient.constructorOptions.at(-1);
+    return options && typeof options === 'object' && 'datasourceUrl' in options ? options.datasourceUrl : undefined;
+  };
+
+  beforeEach(() => {
+    prismaClient.constructorOptions.length = 0;
+    prismaClient.$connect.mockReset();
+    prismaClient.$runCommandRaw.mockReset();
+    prismaClient.$runCommandRaw.mockImplementation(mockClient().client.$runCommandRaw);
+    createReplSet.mockReset();
+  });
+
+  it('should connect to a fresh in-memory replica set under test, so tests never touch a real database', async () => {
+    createReplSet.mockResolvedValueOnce({
+      getUri: (db) => `mongodb://127.0.0.1:41234/${db}?replicaSet=rs0`
+    });
+    await (await createFactory({ NODE_ENV: 'test' })).create();
+    expect(createReplSet).toHaveBeenCalledExactlyOnceWith({ replSet: { count: 1, name: 'rs0' } });
+    expect(lastDatasourceUrl()).toBe('mongodb://127.0.0.1:41234/test?replicaSet=rs0');
+  });
+
+  it('should connect to the configured database for the environment, passing only the options that are set', async () => {
+    await (await createFactory(externalEnv)).create();
+    expect(lastDatasourceUrl()).toBe(
+      'mongodb://db.example.org:27017/data-capture-production?directConnection=true&replicaSet=rs0&w=majority'
+    );
+  });
+
+  it('should not start an in-memory replica set outside tests', async () => {
+    await (await createFactory(externalEnv)).create();
+    expect(createReplSet).not.toHaveBeenCalled();
+  });
+
+  it('should omit password hashes from every user query by default, so none reaches a response by accident', async () => {
+    await (await createFactory(externalEnv)).create();
+    expect(prismaClient.constructorOptions.at(-1)).toMatchObject({ omit: { user: { hashedPassword: true } } });
+  });
+
+  it('should connect and reconcile indexes before handing out the client', async () => {
+    const options = await (await createFactory(externalEnv)).create();
+    expect(prismaClient.$connect).toHaveBeenCalledOnce();
+    expect(prismaClient.$runCommandRaw).toHaveBeenCalledWith(expect.objectContaining({ createIndexes: 'UserModel' }));
+    expect(options).toStrictEqual({ client: prismaClient });
+  });
+
+  it('should shut down cleanly when it started no in-memory replica set', async () => {
+    const factory = await createFactory(externalEnv);
+    await factory.create();
+    await expect(factory.onApplicationShutdown()).resolves.toBeUndefined();
   });
 });
 

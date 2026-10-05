@@ -1,9 +1,13 @@
+import type { PropsWithChildren } from 'react';
+import { createElement } from 'react';
+
 import { AUDIT_LOGS_MAX_PAGE_SIZE, AUDIT_LOGS_PAGE_SIZE } from '@opendatacapture/schemas/audit';
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { auditLogsQueryOptions, fetchAllAuditLogs } from '../useAuditLogsQuery';
+import { auditLogsQueryOptions, fetchAllAuditLogs, useAuditLogsQuery } from '../useAuditLogsQuery';
 
 vi.mock('axios');
 
@@ -51,6 +55,27 @@ describe('auditLogsQueryOptions', () => {
     const first = auditLogsQueryOptions({ params: { page: 1 } }).queryKey;
     const second = auditLogsQueryOptions({ params: { page: 2 } }).queryKey;
     expect(first).not.toStrictEqual(second);
+  });
+});
+
+describe('useAuditLogsQuery', () => {
+  const renderAuditLogsQuery = (options?: Parameters<typeof useAuditLogsQuery>[0]) => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const wrapper = ({ children }: PropsWithChildren) =>
+      createElement(QueryClientProvider, { children, client: queryClient });
+    return renderHook(() => useAuditLogsQuery(options), { wrapper });
+  };
+
+  beforeEach(() => {
+    get.mockReset();
+  });
+
+  it("should query with the caller's params and expose the parsed page as its data", async () => {
+    get.mockResolvedValueOnce(page([log('a')], 2, 1));
+    const { result } = renderAuditLogsQuery({ params: { page: 2 } });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(get.mock.lastCall?.[1]).toMatchObject({ params: { page: 2 } });
+    expect(result.current.data?.data.map(({ id }) => id)).toStrictEqual(['a']);
   });
 });
 

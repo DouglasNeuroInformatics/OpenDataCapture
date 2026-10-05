@@ -254,6 +254,24 @@ describe('Resolver', () => {
       expect(consoleErrorSpy).toHaveBeenCalledWith(expect.any(TypeError));
       consoleErrorSpy.mockRestore();
     });
+
+    it('should wrap a non-error value raised while parsing an export as an unknown error', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      vi.spyOn(fs, 'lstatSync').mockReturnValueOnce({ isFile: () => true } as any);
+      vi.spyOn(fs, 'existsSync')
+        .mockImplementationOnce(() => true)
+        .mockImplementationOnce(() => {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error -- the resolver must wrap a thrown value that is not an Error
+          throw 'not an error';
+        });
+      vi.spyOn(fs.promises, 'readFile').mockResolvedValueOnce(
+        JSON.stringify({ ...PACKAGE_STUB, exports: { '.': './src/main.js' } })
+      );
+      await expect(resolver.resolve(PACKAGE_STUB.name)).rejects.toMatchObject({
+        message: expect.stringContaining('Unknown Error')
+      });
+      consoleErrorSpy.mockRestore();
+    });
   });
 
   describe('valid packages', () => {

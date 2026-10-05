@@ -103,6 +103,24 @@ describe('cli', () => {
     platformSpy.mockRestore();
   });
 
+  it('should open with xdg-open on a platform that is neither darwin nor win32', async () => {
+    fs.writeFileSync(path.join(tmpDir, 'index.ts'), 'export default {};');
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+    process.argv = ['node', 'cli.js', tmpDir, '--open'];
+    const { spawn } = await import('node:child_process');
+    await import('./cli.js');
+    expect(spawn).toHaveBeenLastCalledWith('xdg-open', expect.anything(), expect.objectContaining({ shell: false }));
+  });
+
+  it('should silently ignore a file that is neither shareable text nor a known binary asset', async () => {
+    fs.writeFileSync(path.join(tmpDir, 'index.ts'), 'export default {};');
+    fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Notes');
+    process.argv = ['node', 'cli.js', tmpDir];
+    await import('./cli.js');
+    expect(stderrSpy).toHaveBeenCalledWith(expect.stringContaining('Encoded 1 file '));
+    expect(stderrSpy).not.toHaveBeenCalledWith(expect.stringContaining('README.md'));
+  });
+
   it('should not pluralize the file count when exactly one file was encoded', async () => {
     fs.writeFileSync(path.join(tmpDir, 'index.ts'), 'export default {};');
     process.argv = ['node', 'cli.js', tmpDir];

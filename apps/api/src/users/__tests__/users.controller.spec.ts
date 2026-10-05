@@ -1,4 +1,5 @@
 import { LoggingService } from '@douglasneuroinformatics/libnest';
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { NotFoundException } from '@nestjs/common';
@@ -10,7 +11,7 @@ import type { BasePermissionLevel } from '@opendatacapture/schemas/user';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AbilityFactory } from '@/auth/ability.factory';
-import type { AppAbility } from '@/auth/auth.types';
+import { createAppAbility } from '@/auth/ability.utils';
 import { ROUTE_ACCESS_METADATA_KEY } from '@/core/decorators/route-access.decorator';
 import type { ProtectedRoutePermissionSet } from '@/core/decorators/route-access.decorator';
 import { GroupsService } from '@/groups/groups.service';
@@ -19,7 +20,20 @@ import { MailService } from '@/mail/mail.service';
 import { UsersController } from '../users.controller';
 import { UsersService } from '../users.service';
 
-const ability = {} as AppAbility;
+const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+
+const currentUser: RequestUser = {
+  ability,
+  basePermissionLevel: 'ADMIN',
+  firstName: 'Jane',
+  groups: [],
+  id: 'user-1',
+  kind: 'login',
+  lastName: 'Doe',
+  mustResetPassword: false,
+  permissions: [],
+  username: 'jane.doe'
+};
 
 const createUserData = {
   basePermissionLevel: 'STANDARD' as const,
@@ -137,6 +151,68 @@ describe('UsersController', () => {
       await usersController.create({ ...createUserData, groupIds: [] }, ability);
       expect(groupsService.findById).not.toHaveBeenCalled();
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ group: '' });
+    });
+  });
+
+  describe('archiveById', () => {
+    it('should forward the current user, so the service can refuse self-archival', async () => {
+      usersService.archiveById.mockResolvedValue({ id: 'user-2' });
+      await expect(usersController.archiveById('user-2', currentUser)).resolves.toEqual({ id: 'user-2' });
+      expect(usersService.archiveById).toHaveBeenCalledWith('user-2', currentUser);
+    });
+  });
+
+  describe('checkUsernameExists', () => {
+    it('should forward the caller ability, so the lookup is scoped', async () => {
+      usersService.checkUsernameExists.mockResolvedValue({ success: true });
+      await expect(usersController.checkUsernameExists('jane.doe', ability)).resolves.toEqual({ success: true });
+      expect(usersService.checkUsernameExists).toHaveBeenCalledWith('jane.doe', { ability });
+    });
+  });
+
+  describe('find', () => {
+    it('should forward the group filter and the caller ability, so the listing is scoped', async () => {
+      usersService.find.mockResolvedValue([{ id: 'user-1' }]);
+      await expect(usersController.find(ability, 'group-1')).resolves.toEqual([{ id: 'user-1' }]);
+      expect(usersService.find).toHaveBeenCalledWith({ groupId: 'group-1' }, { ability });
+    });
+  });
+
+  describe('findById', () => {
+    it('should forward the caller ability, so the lookup is scoped', async () => {
+      usersService.findById.mockResolvedValue({ id: 'user-1' });
+      await expect(usersController.findById('user-1', ability)).resolves.toEqual({ id: 'user-1' });
+      expect(usersService.findById).toHaveBeenCalledWith('user-1', { ability });
+    });
+  });
+
+  describe('unarchiveById', () => {
+    it('should forward the current user, so the service can refuse self-unarchival', async () => {
+      usersService.unarchiveById.mockResolvedValue({ id: 'user-2' });
+      await expect(usersController.unarchiveById('user-2', currentUser)).resolves.toEqual({ id: 'user-2' });
+      expect(usersService.unarchiveById).toHaveBeenCalledWith('user-2', currentUser);
+    });
+  });
+
+  describe('updateById', () => {
+    it('should forward the update and the current user, so the service can refuse self-demotion', async () => {
+      usersService.updateById.mockResolvedValue({ firstName: 'Janet', id: 'user-2' });
+      await expect(usersController.updateById('user-2', { firstName: 'Janet' }, currentUser)).resolves.toEqual({
+        firstName: 'Janet',
+        id: 'user-2'
+      });
+      expect(usersService.updateById).toHaveBeenCalledWith('user-2', { firstName: 'Janet' }, currentUser);
+    });
+  });
+
+  describe('updateSelfById', () => {
+    it('should forward the update and the current user, so the service can refuse editing someone else', async () => {
+      usersService.updateSelfById.mockResolvedValue({ firstName: 'Janet', id: 'user-1' });
+      await expect(usersController.updateSelfById('user-1', { firstName: 'Janet' }, currentUser)).resolves.toEqual({
+        firstName: 'Janet',
+        id: 'user-1'
+      });
+      expect(usersService.updateSelfById).toHaveBeenCalledWith('user-1', { firstName: 'Janet' }, currentUser);
     });
   });
 

@@ -28,6 +28,17 @@ vi.mock('node:fs', async (importOriginal) => {
   };
 });
 
+// `bundle` is wrapped, not replaced: every test still runs the real bundler, and one test can make it
+// reject with a non-Error value, which no real instrument source provokes.
+vi.mock('@opendatacapture/instrument-bundler', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@opendatacapture/instrument-bundler')>();
+  return { ...actual, bundle: vi.fn(actual.bundle) };
+});
+
+import { bundle } from '@opendatacapture/instrument-bundler';
+import { decodeBase64ToUnicode } from '@opendatacapture/runtime-internal';
+import { MANIFEST_FILENAME } from '@opendatacapture/runtime-meta';
+
 import { Server } from '../server';
 
 // `renderPage` reads its client bundle from a built `client.js` next to the compiled `server.js`,
@@ -82,6 +93,7 @@ beforeEach(async () => {
   stubClientBundle();
   watchCallbacks.length = 0;
   watchCloses.length = 0;
+  vi.mocked(bundle).mockClear();
 });
 
 afterEach(() => {
@@ -95,6 +107,33 @@ const FORM_SOURCE = `export default {
   language: 'en',
   measures: {}
 };`;
+
+const PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+
+async function withServer(mode: 'all' | 'single', run: () => Promise<void>, verbose = false) {
+  const server = await Server.create({ mode, port, target: tmpDir, verbose });
+  await server.start();
+  try {
+    await run();
+  } finally {
+    await server.stop();
+  }
+}
+
+function spyOnLogs(method: 'error' | 'log') {
+  const spy = vi.spyOn(console, method).mockImplementation(() => undefined);
+  return {
+    some: (pattern: RegExp) => spy.mock.calls.some(([message]) => typeof message === 'string' && pattern.test(message))
+  };
+}
+
+function extractEncodedBundle(html: string) {
+  const encodedBundle = /"encodedBundle":"([^"]+)"/.exec(html)?.[1];
+  if (!encodedBundle) {
+    throw new Error('The page carries no encoded bundle');
+  }
+  return decodeBase64ToUnicode(encodedBundle);
+}
 
 describe('Server — single mode', () => {
   it('should serve the compiled instrument at the root path', async () => {
@@ -178,19 +217,74 @@ describe('Server — single mode', () => {
     }
   });
 
-  it('should report 503 while the bundle has not yet compiled', async () => {
+  it('should reuse the compiled bundle on a repeat request, so serving a page does not rebuild it', async () => {
+    fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
+    await withServer('single', async () => {
+      await fetch(`http://localhost:${port}/`);
+      await fetch(`http://localhost:${port}/`);
+    });
+    expect(bundle).toHaveBeenCalledOnce();
+  });
+
+  it('should inline an imported image as a data URL, so binary assets survive bundling', async () => {
+    fs.writeFileSync(path.join(tmpDir, 'logo.png'), Buffer.from(PNG_BASE64, 'base64'));
+    fs.writeFileSync(
+      path.join(tmpDir, 'index.ts'),
+      FORM_SOURCE.replace('export default {', "import logo from './logo.png';\nexport default {\n  logo,")
+    );
+    await withServer('single', async () => {
+      const res = await fetch(`http://localhost:${port}/`);
+      expect(extractEncodedBundle(await res.text())).toContain(`data:image/png;base64,${PNG_BASE64}`);
+    });
+  });
+
+  it('should log how long the build took in verbose mode', async () => {
+    fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
+    const logs = spyOnLogs('log');
+    await withServer(
+      'single',
+      async () => {
+        await fetch(`http://localhost:${port}/`);
+      },
+      true
+    );
+    expect(logs.some(/Bundle ready \(\d+ms\)/)).toBe(true);
+  });
+
+  it('should report 503 and log the failure when the instrument does not compile', async () => {
+    const errors = spyOnLogs('error');
+    await withServer('single', async () => {
+      const res = await fetch(`http://localhost:${port}/`);
+      expect(res.status).toBe(503);
+    });
+    expect(errors.some(/Failed to compile instrument/)).toBe(true);
+  });
+
+  it('should log a non-Error bundler rejection as-is, so an odd failure is still reported', async () => {
+    fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
+    vi.mocked(bundle).mockRejectedValueOnce('plain failure');
+    const errors = spyOnLogs('error');
+    await withServer('single', async () => {
+      await fetch(`http://localhost:${port}/`);
+    });
+    expect(errors.some(/plain failure/)).toBe(true);
+  });
+
+  it('should serve the runtime manifest, so instruments can resolve runtime imports', async () => {
+    fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
+    await withServer('single', async () => {
+      const res = await fetch(`http://localhost:${port}/runtime/v1/${MANIFEST_FILENAME}`);
+      expect(res.headers.get('content-type')).toBe('application/json');
+      expect(await res.json()).toMatchObject({ sources: expect.any(Array) });
+    });
+  });
+
+  it('should reject a second stop, since the http server is no longer running', async () => {
     fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
     const server = await Server.create({ mode: 'single', port, target: tmpDir, verbose: false });
     await server.start();
-    try {
-      // The bundle compiles lazily, on first request, so a request racing the very first one can
-      // still observe PENDING — but by the time this awaits, the first request already resolved
-      // it, so assert on the documented contract instead: either outcome is a defined response.
-      const res = await fetch(`http://localhost:${port}/`);
-      expect([200, 503]).toContain(res.status);
-    } finally {
-      await server.stop();
-    }
+    await server.stop();
+    await expect(server.stop()).rejects.toThrow();
   });
 });
 
@@ -275,5 +369,50 @@ describe('Server — all mode', () => {
     } finally {
       await server.stop();
     }
+  });
+
+  it('should ignore a loose file under a kind directory, so only instrument directories are listed', async () => {
+    fs.mkdirSync(path.join(tmpDir, 'forms', 'happiness'), { recursive: true });
+    fs.writeFileSync(path.join(tmpDir, 'forms', 'happiness', 'index.ts'), FORM_SOURCE);
+    fs.writeFileSync(path.join(tmpDir, 'forms', 'NOTES.md'), '# notes');
+    await withServer('all', async () => {
+      const html = await (await fetch(`http://localhost:${port}/`)).text();
+      expect(html).toContain('/forms/happiness');
+      expect(html).not.toContain('NOTES');
+    });
+  });
+
+  it('should 404 an instrument that fails to compile and log its key', async () => {
+    fs.mkdirSync(path.join(tmpDir, 'forms', 'broken'), { recursive: true });
+    const errors = spyOnLogs('error');
+    await withServer('all', async () => {
+      const res = await fetch(`http://localhost:${port}/forms/broken`);
+      expect(res.status).toBe(404);
+    });
+    expect(errors.some(/Failed to compile forms\/broken/)).toBe(true);
+  });
+
+  it('should log each request with its status in verbose mode', async () => {
+    fs.mkdirSync(path.join(tmpDir, 'forms'), { recursive: true });
+    const logs = spyOnLogs('log');
+    await withServer(
+      'all',
+      async () => {
+        await fetch(`http://localhost:${port}/nowhere`);
+        await vi.waitFor(() => {
+          expect(logs.some(/GET \/nowhere 404/)).toBe(true);
+        });
+      },
+      true
+    );
+  });
+
+  it('should serve the runtime manifest, so instruments can resolve runtime imports', async () => {
+    fs.mkdirSync(path.join(tmpDir, 'forms'), { recursive: true });
+    await withServer('all', async () => {
+      const res = await fetch(`http://localhost:${port}/runtime/v1/${MANIFEST_FILENAME}`);
+      expect(res.headers.get('content-type')).toBe('application/json');
+      expect(await res.json()).toMatchObject({ sources: expect.any(Array) });
+    });
   });
 });
