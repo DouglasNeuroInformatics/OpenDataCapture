@@ -87,7 +87,7 @@ const lastNotification = () => useNotificationsStore.getState().notifications.at
 beforeEach(() => {
   // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
   cleanup();
-  vi.clearAllMocks();
+  vi.resetAllMocks();
   i18n.changeLanguage('en');
   mocks.isMailEnabled = true;
   mocks.isPending = false;
@@ -228,11 +228,14 @@ describe('AssignmentEmailForm', () => {
     respondToSend(({ onSuccess }) => onSuccess({ message: 'ok', status: 'SENT' }));
     render(<AssignmentEmailForm assignment={assignment} />);
     submit('p@x.org');
-    const feedback = screen.getByTestId('assignment-email-feedback');
-    expect([feedback.textContent, feedback.className]).toEqual([
-      'Assignment link sent to p@x.org',
-      'text-xs font-medium'
-    ]);
+    expect(screen.getByTestId('assignment-email-feedback').textContent).toBe('Assignment link sent to p@x.org');
+  });
+
+  it('should not style a sent confirmation as an error, so success is not mistaken for failure', () => {
+    respondToSend(({ onSuccess }) => onSuccess({ message: 'ok', status: 'SENT' }));
+    render(<AssignmentEmailForm assignment={assignment} />);
+    submit('p@x.org');
+    expect(screen.getByTestId('assignment-email-feedback').classList.contains('text-destructive')).toBe(false);
   });
 
   it('should raise a success notification once the email is sent', () => {
@@ -265,15 +268,18 @@ describe('AssignmentEmailForm', () => {
     expect(screen.getByTestId<HTMLInputElement>('assignment-email').value).toBe('p@x.org');
   });
 
-  it('should report a failed request inline as an error', () => {
+  it('should report a failed request inline', () => {
     respondToSend(({ onError }) => onError());
     render(<AssignmentEmailForm assignment={assignment} />);
     submit('p@x.org');
-    const feedback = screen.getByTestId('assignment-email-feedback');
-    expect([feedback.textContent, feedback.className]).toEqual([
-      'The email could not be sent',
-      'text-destructive text-xs font-medium'
-    ]);
+    expect(screen.getByTestId('assignment-email-feedback').textContent).toBe('The email could not be sent');
+  });
+
+  it('should style a failed request as an error, so it is not mistaken for a confirmation', () => {
+    respondToSend(({ onError }) => onError());
+    render(<AssignmentEmailForm assignment={assignment} />);
+    submit('p@x.org');
+    expect(screen.getByTestId('assignment-email-feedback').classList.contains('text-destructive')).toBe(true);
   });
 
   it('should raise an error notification when the request fails', () => {

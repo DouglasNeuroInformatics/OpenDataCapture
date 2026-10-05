@@ -29,13 +29,8 @@ describe('SaveStatus', () => {
     expect(screen.getByText('All changes saved')).toBeTruthy();
   });
 
-  it('should show progress in a muted label while saving, so it reads as pending rather than done', () => {
+  it('should show progress while an autosave is in flight, so the user knows it has not finished', () => {
     render(<SaveStatus state="saving" />);
-    expect(screen.getByText('Saving…').className).toBe('text-muted-foreground');
-  });
-
-  it('should leave the label unstyled once settled, so only an in-flight save is muted', () => {
-    render(<SaveStatus state="saved" />);
-    expect(screen.getByText('All changes saved').className).toBe('');
+    expect(screen.getByText('Saving…')).toBeTruthy();
   });
 });

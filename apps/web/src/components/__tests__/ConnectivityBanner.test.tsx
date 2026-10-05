@@ -35,11 +35,12 @@ describe('ConnectivityBanner', () => {
     expect(screen.getByRole('status').textContent).toBe('Offline — waiting for connection…');
   });
 
-  it('should update when the connection drops after mounting', () => {
+  it('should appear as soon as the connection drops, so a mid-session outage is reported without a reload', () => {
     render(<ConnectivityBanner />);
+    expect(screen.queryByRole('status')).toBeNull();
     act(() => {
       useAppStore.setState({ isOnline: false });
     });
-    expect(screen.getByRole('status')).toBeTruthy();
+    expect(screen.getByRole('status').textContent).toBe('Offline — waiting for connection…');
   });
 });
