@@ -18,6 +18,29 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
   })
 }));
 
+const requestFullscreen = vi.fn(() => Promise.resolve());
+const exitFullscreen = vi.fn(() => Promise.resolve());
+
+/** happy-dom implements no Fullscreen API, so it is installed here with `element` as the fullscreen element. */
+function installFullscreen(element: Element | null) {
+  Object.defineProperty(HTMLElement.prototype, 'requestFullscreen', { configurable: true, value: requestFullscreen });
+  Object.defineProperty(document, 'exitFullscreen', { configurable: true, value: exitFullscreen });
+  Object.defineProperty(document, 'fullscreenElement', { configurable: true, value: element });
+}
+
+function renderWithLanguageToggle({ enableLanguageLock }: { enableLanguageLock: boolean }) {
+  render(
+    <InteractiveContent
+      enableLanguageToggle
+      bundle="bundle text"
+      enableLanguageLock={enableLanguageLock}
+      supportedLanguages={['en', 'fr']}
+      onSubmit={vi.fn()}
+    />
+  );
+  fireEvent.keyDown(screen.getAllByRole('button').at(-1)!, { key: 'Enter' });
+}
+
 /** Dispatches a `CustomEvent` the way an instrument bundle running in the iframe would, on `document`. */
 function dispatch<TDetail>(type: string, detail: TDetail) {
   document.dispatchEvent(new CustomEvent(type, { detail }));
@@ -28,7 +51,12 @@ describe('InteractiveContent', () => {
     vi.clearAllMocks();
   });
 
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    Reflect.deleteProperty(HTMLElement.prototype, 'requestFullscreen');
+    Reflect.deleteProperty(document, 'exitFullscreen');
+    Reflect.deleteProperty(document, 'fullscreenElement');
+  });
 
   it('should render the iframe directly when there is at most one supported language', () => {
     render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
@@ -137,7 +165,8 @@ describe('InteractiveContent', () => {
     fireEvent.click(zoomOut!);
     fireEvent.click(zoomOut!);
     fireEvent.click(zoomOut!);
-    // Clamped at 25: a fifth click in a row would otherwise take it to 0 or negative.
+    // Clamped at 25: this fifth click in a row would otherwise take it to 0.
+    fireEvent.click(zoomOut!);
     expect(screen.getByText('25%')).toBeTruthy();
   });
 
@@ -165,24 +194,45 @@ describe('InteractiveContent', () => {
     expect(screen.queryByText('Cannot Change Language')).toBeNull();
   });
 
-  it('should route a language toggle selection through the same lock check as the changeLanguage event', () => {
-    render(
-      <InteractiveContent
-        enableLanguageLock
-        enableLanguageToggle
-        bundle="bundle text"
-        supportedLanguages={['en', 'fr']}
-        onSubmit={vi.fn()}
-      />
-    );
-    const toggleTrigger = screen.getAllByRole('button').at(-1)!;
-    fireEvent.click(toggleTrigger);
-    const frenchItem = screen.queryByText(/Fran|Anglais/);
-    if (frenchItem) {
-      fireEvent.click(frenchItem);
-    }
-    // Whether or not Radix opened the menu under happy-dom, the language must not have changed
-    // directly — either the item was never reached, or the lock intercepted the selection.
+  it('should change the language from the toggle menu when the language is not locked', async () => {
+    renderWithLanguageToggle({ enableLanguageLock: false });
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'French' }));
+    expect(changeLanguage).toHaveBeenCalledWith('fr');
+  });
+
+  it('should open the lock dialog instead of changing language from the toggle menu when locked', async () => {
+    renderWithLanguageToggle({ enableLanguageLock: true });
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'French' }));
     expect(changeLanguage).not.toHaveBeenCalled();
+    expect(await screen.findByText('Cannot Change Language')).toBeTruthy();
+  });
+
+  it('should enter fullscreen on mount when the instrument asks to start fullscreen', () => {
+    installFullscreen(null);
+    render(
+      <InteractiveContent defaultFullscreen bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />
+    );
+    expect(requestFullscreen.mock.contexts[0]).toBe(document.querySelector('iframe'));
+  });
+
+  it('should not enter fullscreen on mount unless the instrument asks to', () => {
+    installFullscreen(null);
+    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    expect(requestFullscreen).not.toHaveBeenCalled();
+  });
+
+  it('should put the iframe in fullscreen from the fullscreen button when nothing is fullscreen', () => {
+    installFullscreen(null);
+    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    fireEvent.click(screen.getAllByRole('button')[2]!);
+    expect(requestFullscreen.mock.contexts[0]).toBe(document.querySelector('iframe'));
+  });
+
+  it('should leave fullscreen from the fullscreen button when already fullscreen', () => {
+    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    installFullscreen(document.querySelector('iframe'));
+    fireEvent.click(screen.getAllByRole('button')[2]!);
+    expect(exitFullscreen).toHaveBeenCalledOnce();
+    expect(requestFullscreen).not.toHaveBeenCalled();
   });
 });
