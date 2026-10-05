@@ -6,7 +6,7 @@ import { InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { createAppAbility } from '@/auth/ability.utils';
+import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 import { GroupsService } from '@/groups/groups.service';
 import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
@@ -232,6 +232,79 @@ describe('SessionsService', () => {
         data: [{ groupId: 'group-1', subjectId: 'subject-1', type: 'IN_PERSON' }]
       });
       expect(session.id).toBe(sessionModel.createMany.mock.lastCall?.[0].data[0].id);
+    });
+  });
+
+  describe('count', () => {
+    it('should count only the sessions the caller may read that match the filter', async () => {
+      const ability = createAppAbility([{ action: 'read', conditions: { groupId: 'group-1' }, subject: 'Session' }]);
+      sessionModel.count.mockResolvedValueOnce(3);
+
+      await expect(sessionsService.count({ type: 'REMOTE' }, { ability })).resolves.toBe(3);
+      expect(sessionModel.count).toHaveBeenCalledWith({
+        where: { AND: [accessibleQuery(ability, 'read', 'Session'), { type: 'REMOTE' }] }
+      });
+    });
+
+    it('should count every session when given no filter', async () => {
+      sessionModel.count.mockResolvedValueOnce(5);
+
+      await expect(sessionsService.count()).resolves.toBe(5);
+      expect(sessionModel.count).toHaveBeenCalledWith({ where: { AND: [{}, {}] } });
+    });
+  });
+
+  describe('deleteById', () => {
+    it('should delete the session only within what the caller may delete', async () => {
+      const ability = createAppAbility([{ action: 'delete', conditions: { groupId: 'group-1' }, subject: 'Session' }]);
+
+      await sessionsService.deleteById('session-1', { ability });
+
+      expect(sessionModel.delete).toHaveBeenCalledWith({
+        where: { AND: [accessibleQuery(ability, 'delete', 'Session')], id: 'session-1' }
+      });
+    });
+
+    it('should delete the session unconditionally when no ability is given', async () => {
+      await sessionsService.deleteById('session-1');
+      expect(sessionModel.delete).toHaveBeenCalledWith({ where: { AND: [{}], id: 'session-1' } });
+    });
+  });
+
+  describe('findAllIncludeUsernames', () => {
+    it('should return the group sessions with their subject and the username of who ran them', async () => {
+      const sessions = [{ id: 'session-1', subject: { id: 'subject-1' }, user: { username: 'jdoe' } }];
+      sessionModel.findMany.mockResolvedValueOnce(sessions as any);
+
+      await expect(sessionsService.findAllIncludeUsernames('group-1')).resolves.toBe(sessions);
+      expect(sessionModel.findMany).toHaveBeenCalledWith({
+        include: { subject: true, user: { select: { username: true } } },
+        where: { AND: [{}, { groupId: 'group-1' }] }
+      });
+    });
+
+    it('should report a group with no sessions as not found', async () => {
+      sessionModel.findMany.mockResolvedValueOnce([]);
+      await expect(sessionsService.findAllIncludeUsernames('group-1')).rejects.toBeInstanceOf(NotFoundException);
+    });
+  });
+
+  describe('findById', () => {
+    it('should return the session when the caller may read it', async () => {
+      const ability = createAppAbility([{ action: 'read', conditions: { groupId: 'group-1' }, subject: 'Session' }]);
+      sessionModel.findFirst.mockResolvedValueOnce({ id: 'session-1' } as any);
+
+      await expect(sessionsService.findById('session-1', { ability })).resolves.toEqual({ id: 'session-1' });
+      expect(sessionModel.findFirst).toHaveBeenCalledWith({
+        where: { AND: [accessibleQuery(ability, 'read', 'Session')], id: 'session-1' }
+      });
+    });
+
+    it('should report a session that does not exist or cannot be read as not found', async () => {
+      sessionModel.findFirst.mockResolvedValueOnce(null);
+      await expect(sessionsService.findById('missing')).rejects.toThrowError(
+        new NotFoundException('Failed to find session with ID: missing')
+      );
     });
   });
 });
