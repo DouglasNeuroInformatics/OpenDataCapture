@@ -29,11 +29,10 @@ describe('ViewDefaultTemplateDialog', () => {
     );
   });
 
-  it('should keep the built-in subject unchanged when edited, since the template is read-only', () => {
+  it('should make the built-in subject and body read-only, since the default template cannot be edited', () => {
     render(<ViewDefaultTemplateDialog open onOpenChange={vi.fn()} />);
-    const subject = screen.getByTestId<HTMLInputElement>('template-builtin-subject');
-    fireEvent.change(subject, { target: { value: 'Tampered' } });
-    expect(subject.value).toBe(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.subject.en);
+    expect(screen.getByTestId<HTMLInputElement>('template-builtin-subject').readOnly).toBe(true);
+    expect(screen.getByTestId<HTMLTextAreaElement>('template-builtin-body').readOnly).toBe(true);
   });
 
   it('should request closing when the close button is clicked', () => {
