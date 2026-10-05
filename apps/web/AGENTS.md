@@ -10,17 +10,17 @@ Read the root `AGENTS.md` first for the rules that apply everywhere.
 The organizing principle is **layer folders, not feature folders**. There is no `src/features`,
 `src/lib` or `src/api`.
 
-| Directory                                                        | Holds                                                                                  |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `src/routes/`                                                    | **Route files and nothing else** — see below                                           |
-| `src/components/`                                                | Shared presentational components                                                       |
-| `src/hooks/`                                                     | All data fetching — one file per hook, named after its export                          |
-| `src/services/`                                                  | Module-level side-effect singletons: `axios.ts`, `i18n.ts`, `react-query.ts`, `zod.ts` |
-| `src/store/`                                                     | The single Zustand store: `index.ts`, `types.ts`, `slices/*.slice.ts`                  |
-| `src/providers/`                                                 | Context/HOC providers used by `_app/route.tsx`                                         |
-| `src/utils/`                                                     | Pure helpers only                                                                      |
-| `src/translations/`                                              | Namespace JSON, registered in `src/services/i18n.ts`                                   |
-| `src/__tests__/`, `src/hooks/__tests__/`, `src/utils/__tests__/` | Tests                                                                                  |
+| Directory           | Holds                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| `src/routes/`       | **Route files and nothing else** — see below                                           |
+| `src/components/`   | Shared presentational components                                                       |
+| `src/hooks/`        | All data fetching — one file per hook, named after its export                          |
+| `src/services/`     | Module-level side-effect singletons: `axios.ts`, `i18n.ts`, `react-query.ts`, `zod.ts` |
+| `src/store/`        | The single Zustand store: `index.ts`, `types.ts`, `slices/*.slice.ts`                  |
+| `src/providers/`    | Context/HOC providers used by `_app/route.tsx`                                         |
+| `src/utils/`        | Pure helpers only                                                                      |
+| `src/translations/` | Namespace JSON, registered in `src/services/i18n.ts`                                   |
+| `__tests__/`        | Unit tests, beside the code under test — see "Tests"                                   |
 
 `@/*` aliases `src/*` and is declared in **three files that must agree**: `vite.config.ts`,
 `vitest.config.ts` and `tsconfig.json`. Use `@/` across layers, relative imports within a folder.

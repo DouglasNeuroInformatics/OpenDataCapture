@@ -131,6 +131,13 @@ describe('_app guard', () => {
     await runGuard({ activeLanguages: ['fr'] });
     expect(i18n.resolvedLanguage).toBe('fr');
   });
+
+  it('should keep a reader on a language the instance still offers', async () => {
+    i18n.changeLanguage('fr');
+    mocks.store.accessToken = 'token';
+    await runGuard({ activeLanguages: ['en', 'fr'] });
+    expect(i18n.resolvedLanguage).toBe('fr');
+  });
 });
 
 describe('_app layout', () => {
