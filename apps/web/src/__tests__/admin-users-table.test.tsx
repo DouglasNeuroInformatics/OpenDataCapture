@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import type { User } from '@opendatacapture/schemas/user';
 import { QueryClient } from '@tanstack/react-query';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/admin/users/index';
 
@@ -78,8 +78,17 @@ const runLoader = (queryClient: QueryClient) => {
   return loader({ context: { queryClient } } as Parameters<typeof loader>[0]);
 };
 
+/** Gives the closing dialog an exit animation, so Radix keeps it mounted after its state clears. */
+const animateDialogExit = () => {
+  const style = document.createElement('style');
+  style.textContent = '[role="dialog"][data-state="closed"] { animation-name: exit; }';
+  document.head.append(style);
+  onTestFinished(() => style.remove());
+};
+
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.archiveUser.mockReset();
   mocks.currentUser = null;
 });
 
@@ -209,15 +218,12 @@ describe('admin users table', () => {
   });
 
   it('should ignore a confirmation clicked while the dialog is closing, since the user is already archived', () => {
-    const style = document.createElement('style');
-    style.textContent = '[role="dialog"][data-state="closed"] { animation-name: exit; }';
-    document.head.append(style);
+    animateDialogExit();
     mocks.archiveUser.mockImplementation((_: unknown, options: { onSuccess: () => void }) => options.onSuccess());
     renderTable([userFixture()]);
     fireEvent.click(rowAction('Archive'));
     fireEvent.click(screen.getByTestId('confirm-archive-user'));
     fireEvent.click(screen.getByTestId('confirm-archive-user'));
-    style.remove();
     expect(mocks.archiveUser).toHaveBeenCalledTimes(1);
   });
 

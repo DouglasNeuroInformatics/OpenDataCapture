@@ -3,7 +3,7 @@ import type { EmailDeliveryResult } from '@opendatacapture/schemas/mail';
 import { QueryClient } from '@tanstack/react-query';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { AxiosError, AxiosHeaders } from 'axios';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/admin/users/create';
 
@@ -103,7 +103,13 @@ const animateDialogExit = () => {
   const style = document.createElement('style');
   style.textContent = '[role="dialog"][data-state="closed"] { animation-name: exit; }';
   document.head.append(style);
-  return () => style.remove();
+  onTestFinished(() => style.remove());
+};
+
+const stubClipboardWrite = () => {
+  const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
+  onTestFinished(() => writeText.mockRestore());
+  return writeText;
 };
 
 beforeEach(() => {
@@ -201,7 +207,7 @@ describe('create user route', () => {
     expect(screen.queryByTestId('welcome-email-language')).toBeNull();
   });
 
-  it('should behave as if mail were disabled when the server reports mail as disabled', async () => {
+  it('should confirm the creation without email details when the welcome email reports delivery as disabled', async () => {
     mocks.isMailEnabled = true;
     fillAndSubmit();
     await waitFor(() => expect(mocks.navigate).toHaveBeenCalledWith({ to: '..' }));
@@ -290,15 +296,17 @@ describe('create user route', () => {
     expect(mocks.navigate).toHaveBeenCalledWith({ to: '..' });
   });
 
-  it('should clear the welcome message from the dialog while it closes', async () => {
-    const restoreAnimations = animateDialogExit();
+  it('should not copy a stale welcome message while the dialog closes', async () => {
+    animateDialogExit();
+    const writeText = stubClipboardWrite();
     mocks.isMailEnabled = true;
     mocks.mutateAsync.mockResolvedValue({ welcomeEmail: welcomeEmail({ status: 'NO_RECIPIENT' }) });
     fillAndSubmit();
-    fireEvent.click(await screen.findByRole('button', { name: 'Done' }));
-    const closingDialog = screen.getByTestId('welcome-email-fallback');
-    restoreAnimations();
-    expect(closingDialog.querySelector('pre')!.textContent).toBe('');
+    const doneButton = await screen.findByRole('button', { name: 'Done' });
+    const copyButton = doneButton.previousElementSibling!;
+    fireEvent.click(doneButton);
+    fireEvent.click(copyButton);
+    expect(writeText).toHaveBeenCalledWith('');
   });
 
   it('should rate the strength of the password as it is typed', () => {
