@@ -89,7 +89,7 @@ describe('AssignmentsController', () => {
   });
 
   describe('deleteBulk', () => {
-    it('should delete only the requested ids within the caller ability, so other groups are untouched', async () => {
+    it('should forward the requested ids with the caller ability, so the service can scope the deletion', async () => {
       const result = { deletedCount: 2, failedIds: [] };
       assignmentsService.deleteBulk.mockResolvedValueOnce(result);
       await expect(assignmentsController.deleteBulk({ ids: ['a-1', 'a-2'] }, currentUser.ability)).resolves.toBe(

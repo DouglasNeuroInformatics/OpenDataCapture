@@ -16,6 +16,8 @@ import { AuthService } from '../auth.service.js';
 import type { Permission } from '../auth.types.js';
 
 /** The base payload `login` signs, minus the permission level each test supplies. */
+type StoredUser = Awaited<ReturnType<UsersService['findByUsername']>>;
+
 const BASE_PAYLOAD = {
   additionalPermissions: undefined,
   firstName: 'Test',
@@ -64,31 +66,46 @@ describe('AuthService', () => {
   describe('login', () => {
     const credentials = { password: 'guess', username: 'test-user' };
 
-    const storedUser = (status: { archivedAt?: Date; disabled?: boolean }) => ({
-      ...BASE_PAYLOAD,
+    const storedUser = (overrides: Partial<StoredUser> = {}): StoredUser => ({
+      __modelName: 'User',
+      additionalPermissions: [],
+      archivedAt: null,
       basePermissionLevel: 'STANDARD',
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      dateOfBirth: null,
+      disabled: null,
+      email: null,
+      firstName: 'Test',
+      groupIds: [],
       groups: [],
       hashedPassword: '__HASH__',
-      ...status
+      id: 'user-1',
+      lastName: 'User',
+      mustResetPassword: null,
+      phoneNumber: null,
+      sex: null,
+      updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+      username: 'test-user',
+      ...overrides
     });
 
     it.each([{ archivedAt: new Date() }, { disabled: true }])(
       'should answer a wrong password for a %o account as invalid credentials, so a guess cannot reveal its status',
       async (status) => {
-        usersService.findByUsername.mockResolvedValue(storedUser(status) as any);
+        usersService.findByUsername.mockResolvedValue(storedUser(status));
         cryptoService.comparePassword.mockResolvedValue(false);
         await expect(authService.login(credentials)).rejects.toThrow(UnauthorizedException);
       }
     );
 
     it('should refuse an archived account once the password is proven', async () => {
-      usersService.findByUsername.mockResolvedValue(storedUser({ archivedAt: new Date() }) as any);
+      usersService.findByUsername.mockResolvedValue(storedUser({ archivedAt: new Date() }));
       cryptoService.comparePassword.mockResolvedValue(true);
       await expect(authService.login(credentials)).rejects.toThrow('Account Archived');
     });
 
     it('should refuse a disabled account once the password is proven', async () => {
-      usersService.findByUsername.mockResolvedValue(storedUser({ disabled: true }) as any);
+      usersService.findByUsername.mockResolvedValue(storedUser({ disabled: true }));
       cryptoService.comparePassword.mockResolvedValue(true);
       await expect(authService.login(credentials)).rejects.toThrow('Account Disabled');
     });
@@ -105,13 +122,13 @@ describe('AuthService', () => {
     });
 
     it('should return the signed token once the password is proven for an active account', async () => {
-      usersService.findByUsername.mockResolvedValue(storedUser({}) as any);
+      usersService.findByUsername.mockResolvedValue(storedUser());
       cryptoService.comparePassword.mockResolvedValue(true);
       await expect(authService.login(credentials)).resolves.toStrictEqual({ accessToken: '__TOKEN__' });
     });
 
     it('should sign a login token carrying the permissions derived from the account, so the guard needs no lookup', async () => {
-      usersService.findByUsername.mockResolvedValue(storedUser({}) as any);
+      usersService.findByUsername.mockResolvedValue(storedUser());
       cryptoService.comparePassword.mockResolvedValue(true);
       await authService.login(credentials);
       expect(jwtService.signAsync.mock.lastCall?.[0]).toMatchObject({
@@ -123,28 +140,28 @@ describe('AuthService', () => {
     });
 
     it('should treat an account with no reset flag as not needing a reset, since older accounts never stored one', async () => {
-      usersService.findByUsername.mockResolvedValue(storedUser({}) as any);
+      usersService.findByUsername.mockResolvedValue(storedUser());
       cryptoService.comparePassword.mockResolvedValue(true);
       await authService.login(credentials);
       expect(jwtService.signAsync.mock.lastCall?.[0]).toMatchObject({ mustResetPassword: false });
     });
 
     it('should carry a pending password reset on the token, so the web client can force the reset', async () => {
-      usersService.findByUsername.mockResolvedValue({ ...storedUser({}), mustResetPassword: true } as any);
+      usersService.findByUsername.mockResolvedValue(storedUser({ mustResetPassword: true }));
       cryptoService.comparePassword.mockResolvedValue(true);
       await authService.login(credentials);
       expect(jwtService.signAsync.mock.lastCall?.[0]).toMatchObject({ mustResetPassword: true });
     });
 
     it('should record the login in the audit log under the user, outside any group', async () => {
-      usersService.findByUsername.mockResolvedValue(storedUser({}) as any);
+      usersService.findByUsername.mockResolvedValue(storedUser());
       cryptoService.comparePassword.mockResolvedValue(true);
       await authService.login(credentials);
       expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('LOGIN', 'USER', { groupId: null, userId: 'user-1' });
     });
 
     it('should not record a login in the audit log when the password is wrong', async () => {
-      usersService.findByUsername.mockResolvedValue(storedUser({}) as any);
+      usersService.findByUsername.mockResolvedValue(storedUser());
       cryptoService.comparePassword.mockResolvedValue(false);
       await expect(authService.login(credentials)).rejects.toThrow(UnauthorizedException);
       expect(auditLogger.log).not.toHaveBeenCalled();

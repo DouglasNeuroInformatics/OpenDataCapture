@@ -4,7 +4,7 @@ import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { faker } from '@faker-js/faker';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { DEMO_GROUPS } from '@opendatacapture/demo';
+import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
 import type { $CreateGroupData } from '@opendatacapture/schemas/group';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -132,13 +132,12 @@ describe('DemoService', () => {
 
   it('should add each demo user to the groups named for them', async () => {
     await demoService.init({ dummySubjectCount: 0, recordsPerSubject: 0 });
-    expect(usersService.create.mock.calls[0]?.[0]).toMatchObject({
-      groupIds: ['Depression Clinic-id', 'Psychosis Lab-id'],
-      username: 'JaneDoe'
-    });
+    expect(usersService.create.mock.calls.map(([user]) => [user.username, user.groupIds])).toStrictEqual(
+      DEMO_USERS.map(({ groupNames, username }) => [username, groupNames.map((name) => `${name}-id`)])
+    );
   });
 
-  it('should name the database it initializes in the log, so a demo is never seeded into the wrong one', async () => {
+  it('should name the database it initializes in the log, so an operator can see where the demo was seeded', async () => {
     await demoService.init({ dummySubjectCount: 0, recordsPerSubject: 0 });
     expect(loggingService.log).toHaveBeenCalledWith("Initializing demo for database: 'data-capture-test'");
   });

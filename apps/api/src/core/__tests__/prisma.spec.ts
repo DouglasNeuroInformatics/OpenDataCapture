@@ -8,11 +8,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildIndexName, DATABASE_INDEXES, ensureDatabaseIndexes, PrismaModuleOptionsFactory } from '../prisma';
 
 /** Stands in for the extended client, recording the options each `new PrismaClient` received. */
-const prismaClient = vi.hoisted(() => ({
-  $connect: vi.fn(),
-  $runCommandRaw: vi.fn(),
-  constructorOptions: [] as unknown[]
-}));
+const prismaClient = vi.hoisted(() => {
+  const constructorOptions: unknown[] = [];
+  return { $connect: vi.fn(), $runCommandRaw: vi.fn(), constructorOptions };
+});
 
 vi.mock('@prisma/client', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@prisma/client')>()),
