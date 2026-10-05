@@ -9,14 +9,18 @@ import '@/services/i18n';
 
 type MutationCallbacks = { onError: (err: unknown) => void; onSuccess: () => void };
 
-const mocks = vi.hoisted(() => ({
-  logout: vi.fn(),
-  mutate: vi.fn(),
-  state: {
+type GuardState = {
+  accessToken: null | string;
+  currentUser: null | { id: string; mustResetPassword: boolean; username: string };
+};
+
+const mocks = vi.hoisted(() => {
+  const state: GuardState = {
     accessToken: 'token-123',
     currentUser: { id: 'user-1', mustResetPassword: true, username: 'Zebra-Quantum-Lantern-42' }
-  }
-}));
+  };
+  return { logout: vi.fn(), mutate: vi.fn(), state };
+});
 
 vi.mock('@/hooks/useResetPasswordMutation', () => ({ useResetPasswordMutation: () => ({ mutate: mocks.mutate }) }));
 vi.mock('@/hooks/useSetupStateQuery', () => ({
@@ -64,7 +68,6 @@ const guardRedirect = () => {
 describe('reset password page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
     useNotificationsStore.setState({ notifications: [] });
     mocks.state.accessToken = 'token-123';
     mocks.state.currentUser = { id: 'user-1', mustResetPassword: true, username: 'Zebra-Quantum-Lantern-42' };

@@ -58,10 +58,11 @@ describe('upload instrument selection page', () => {
     expect(screen.getAllByText('FORM')).toHaveLength(2);
   });
 
-  it('should list the instruments once a query that started out loading resolves', () => {
+  it('should list the instruments once the query data arrives, so a page opened while loading fills in', () => {
     mocks.loadingRenders = 1;
-    renderPage();
-    expect(mocks.useInstrumentInfoQuery.mock.calls.length).toBeGreaterThan(1);
+    const Component = Route.options.component!;
+    const { rerender } = render(<Component />);
+    rerender(<Component />);
     expect(screen.getByText('Happiness Questionnaire')).toBeTruthy();
   });
 

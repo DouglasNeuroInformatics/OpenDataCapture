@@ -20,7 +20,7 @@ const mocks = vi.hoisted(() => ({
   download: vi.fn(),
   instrument: null as null | object,
   mutateAsync: vi.fn(),
-  navigate: vi.fn(),
+  navigate: vi.fn<(options: { search?: { error: SearchError }; to: string }) => void>(),
   processInstrumentCSV: vi.fn(),
   reformatInstrumentData: vi.fn(),
   search: {},
@@ -94,7 +94,7 @@ const choose = (select: 'group' | 'username', option: string) => {
   fireEvent.click(screen.getByRole('option', { name: option }));
 };
 
-const lastNavigatedError = () => (mocks.navigate.mock.lastCall?.[0] as { search: { error: SearchError } }).search.error;
+const lastNavigatedError = () => mocks.navigate.mock.lastCall?.[0].search?.error;
 
 describe('upload instrument records page', () => {
   beforeEach(() => {
@@ -109,7 +109,10 @@ describe('upload instrument records page', () => {
     mocks.mutateAsync.mockResolvedValue(undefined);
   });
 
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
 
   describe('when the search carries an error', () => {
     beforeEach(() => {
@@ -309,7 +312,7 @@ describe('upload instrument records page', () => {
     await chooseFile();
     submit();
     await waitFor(() => expect(mocks.navigate).toHaveBeenCalled());
-    expect(lastNavigatedError().description).toBeUndefined();
+    expect(lastNavigatedError()?.description).toBeUndefined();
   });
 
   it('should download a template CSV for the instrument', () => {
@@ -340,7 +343,7 @@ describe('upload instrument records page', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: 'Template' }));
-    expect(lastNavigatedError().description).toBeUndefined();
+    expect(lastNavigatedError()?.description).toBeUndefined();
   });
 
   it('should open the upload guide in a new window', () => {

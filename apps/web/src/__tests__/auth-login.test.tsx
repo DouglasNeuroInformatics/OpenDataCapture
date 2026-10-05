@@ -11,7 +11,13 @@ import '@/services/i18n';
 const mocks = vi.hoisted(() => ({
   login: vi.fn(),
   navigate: vi.fn(),
-  post: vi.fn(),
+  post: vi.fn<
+    (
+      url: string,
+      data: unknown,
+      config: { validateStatus: (status: number) => boolean }
+    ) => Promise<{ data: object; status: number }>
+  >(),
   setupState: { activeLanguages: ['en'], branding: null as BrandingConfig | null, isDemo: false }
 }));
 
@@ -85,8 +91,14 @@ describe('login page', () => {
     renderPage();
     fireEvent.click(screen.getByTestId('login-submit'));
     await waitFor(() => expect(mocks.post).toHaveBeenCalled());
-    const { validateStatus } = mocks.post.mock.lastCall?.[2] as { validateStatus: (status: number) => boolean };
-    expect([200, 401, 403, 404, 500].map(validateStatus)).toEqual([true, true, true, false, false]);
+    const validateStatus = mocks.post.mock.lastCall?.[2].validateStatus;
+    expect([200, 401, 403, 404, 500].map((status) => validateStatus?.(status))).toEqual([
+      true,
+      true,
+      true,
+      false,
+      false
+    ]);
   });
 
   it('should store the access token and open the dashboard after a successful login', async () => {
