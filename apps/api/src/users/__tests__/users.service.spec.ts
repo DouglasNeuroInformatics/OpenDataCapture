@@ -3,7 +3,7 @@ import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
-import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { Permissions } from '@opendatacapture/schemas/core';
 import { pwnedPassword } from 'hibp';
@@ -37,6 +37,7 @@ describe('UsersService', () => {
   let usersService: UsersService;
   let userModel: MockedInstance<Model<'User'>>;
   let cryptoService: MockedInstance<CryptoService>;
+  let groupsService: MockedInstance<GroupsService>;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -52,6 +53,7 @@ describe('UsersService', () => {
     userModel = moduleRef.get(getModelToken('User'));
     usersService = moduleRef.get(UsersService);
     cryptoService = moduleRef.get(CryptoService);
+    groupsService = moduleRef.get(GroupsService);
 
     userModel.exists.mockResolvedValue(false);
     userModel.create.mockResolvedValue({});
@@ -59,6 +61,148 @@ describe('UsersService', () => {
     // By default the password is strong and has not appeared in a breach.
     (estimatePasswordStrength as Mock).mockReturnValue({ feedback: {}, score: 4, success: true });
     (pwnedPassword as Mock).mockResolvedValue(0);
+  });
+
+  describe('checkUsernameExists', () => {
+    it('should report success when an accessible user has the username', async () => {
+      userModel.findFirst.mockResolvedValue({ id: 'user-1', username: 'jane.doe' });
+      await expect(usersService.checkUsernameExists('jane.doe')).resolves.toEqual({ success: true });
+    });
+
+    it('should report failure when no accessible user has the username', async () => {
+      userModel.findFirst.mockResolvedValue(null);
+      await expect(usersService.checkUsernameExists('jane.doe')).resolves.toEqual({ success: false });
+    });
+
+    it('should scope the lookup to the caller ability, so it cannot probe users outside their groups', async () => {
+      userModel.findFirst.mockResolvedValue(null);
+      await usersService.checkUsernameExists('jane.doe', { ability: admin.ability });
+      expect(userModel.findFirst.mock.lastCall?.[0].where).toEqual({
+        AND: [accessibleQuery(admin.ability, 'read', 'User'), { username: 'jane.doe' }]
+      });
+    });
+  });
+
+  describe('count', () => {
+    it('should count only the users matching the filter that the caller can read', async () => {
+      userModel.count.mockResolvedValue(3);
+      await expect(usersService.count({ disabled: false }, { ability: admin.ability })).resolves.toBe(3);
+      expect(userModel.count).toHaveBeenCalledWith({
+        where: { AND: [accessibleQuery(admin.ability, 'read', 'User'), { disabled: false }] }
+      });
+    });
+
+    it('should count every user when called without a filter or ability', async () => {
+      userModel.count.mockResolvedValue(5);
+      await expect(usersService.count()).resolves.toBe(5);
+      expect(userModel.count).toHaveBeenCalledWith({ where: { AND: [{}, {}] } });
+    });
+  });
+
+  describe('create', () => {
+    it('should refuse a username that is already taken, before hashing anything', async () => {
+      userModel.exists.mockResolvedValue(true);
+      await expect(usersService.create({ ...baseUser })).rejects.toThrow(ConflictException);
+      expect(cryptoService.hashPassword).not.toHaveBeenCalled();
+    });
+
+    it('should refuse a group that cannot be resolved, so the user is never connected to it', async () => {
+      groupsService.findById.mockResolvedValue(null);
+      await expect(usersService.create({ ...baseUser, groupIds: ['group-1'] })).rejects.toThrow(NotFoundException);
+      expect(userModel.create).not.toHaveBeenCalled();
+    });
+
+    it('should look up each group with the caller options and connect the user to all of them', async () => {
+      groupsService.findById.mockImplementation((id: string) => Promise.resolve({ id }));
+      await usersService.create({ ...baseUser, groupIds: ['group-1', 'group-2'] }, { ability: admin.ability });
+      expect(groupsService.findById).toHaveBeenCalledWith('group-1', { ability: admin.ability });
+      expect(userModel.create.mock.lastCall?.[0].data.groups).toEqual({
+        connect: [{ id: 'group-1' }, { id: 'group-2' }]
+      });
+    });
+
+    it('should store the hashed password rather than the plaintext one', async () => {
+      await usersService.create({ ...baseUser });
+      expect(userModel.create.mock.lastCall?.[0]).toMatchObject({
+        data: { additionalPermissions: [], hashedPassword: 'hashed-password' },
+        omit: { hashedPassword: true }
+      });
+    });
+  });
+
+  describe('deleteByUsername', () => {
+    it("should delete the found user's record within the caller's delete scope", async () => {
+      userModel.findFirst.mockResolvedValue({ id: 'user-1', username: 'jane.doe' });
+      userModel.delete.mockResolvedValue({ id: 'user-1' });
+      await expect(usersService.deleteByUsername('jane.doe', { ability: admin.ability })).resolves.toEqual({
+        id: 'user-1'
+      });
+      expect(userModel.delete.mock.lastCall?.[0].where).toEqual({
+        AND: [accessibleQuery(admin.ability, 'delete', 'User')],
+        id: 'user-1'
+      });
+    });
+
+    it('should throw when no user has the username, rather than deleting anything', async () => {
+      userModel.findFirst.mockResolvedValue(null);
+      await expect(usersService.deleteByUsername('jane.doe')).rejects.toThrow(NotFoundException);
+      expect(userModel.delete).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('find', () => {
+    beforeEach(() => {
+      userModel.findMany.mockResolvedValue([{ id: 'user-1' }]);
+    });
+
+    it('should restrict the listing to members of the requested group', async () => {
+      await expect(usersService.find({ groupId: 'group-1' }, { ability: admin.ability })).resolves.toEqual([
+        { id: 'user-1' }
+      ]);
+      expect(userModel.findMany.mock.lastCall?.[0].where).toEqual({
+        AND: [accessibleQuery(admin.ability, 'read', 'User'), { groupIds: { has: 'group-1' } }]
+      });
+    });
+
+    it('should apply no group filter when none is requested', async () => {
+      await usersService.find();
+      expect(userModel.findMany.mock.lastCall?.[0].where).toEqual({ AND: [{}, { groupIds: undefined }] });
+    });
+  });
+
+  describe('findById', () => {
+    it('should return the user found within the caller read scope', async () => {
+      userModel.findFirst.mockResolvedValue({ id: 'user-1' });
+      await expect(usersService.findById('user-1', { ability: admin.ability })).resolves.toEqual({ id: 'user-1' });
+      expect(userModel.findFirst.mock.lastCall?.[0]).toMatchObject({
+        omit: { hashedPassword: true },
+        where: { AND: [accessibleQuery(admin.ability, 'read', 'User')], id: 'user-1' }
+      });
+    });
+
+    it('should throw when the user cannot be found', async () => {
+      userModel.findFirst.mockResolvedValue(null);
+      await expect(usersService.findById('user-1')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('findByUsername', () => {
+    it('should omit the hashed password by default, so it never leaks into a response', async () => {
+      userModel.findFirst.mockResolvedValue({ id: 'user-1' });
+      await usersService.findByUsername('jane.doe');
+      expect(userModel.findFirst.mock.lastCall?.[0].omit).toEqual({ hashedPassword: true });
+    });
+
+    it('should include the hashed password when asked, so login can verify it', async () => {
+      userModel.findFirst.mockResolvedValue({ hashedPassword: 'hashed', id: 'user-1' });
+      await usersService.findByUsername('jane.doe', { includeHashedPassword: true });
+      expect(userModel.findFirst.mock.lastCall?.[0].omit).toEqual({ hashedPassword: false });
+    });
+
+    it('should throw when no accessible user has the username', async () => {
+      userModel.findFirst.mockResolvedValue(null);
+      await expect(usersService.findByUsername('jane.doe')).rejects.toThrow(NotFoundException);
+    });
   });
 
   describe('create (password policy)', () => {
@@ -151,6 +295,27 @@ describe('UsersService', () => {
     it('should save an administrator editing their own account, since the admin form sends `disabled: false` on every save', async () => {
       await usersService.updateById(admin.id, { disabled: false, firstName: 'Janet' }, admin);
       expect(userModel.update).toHaveBeenCalledOnce();
+    });
+
+    it('should hash a new password and never write the plaintext one', async () => {
+      await usersService.updateById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, admin);
+      expect(cryptoService.hashPassword).toHaveBeenCalledWith('jf8&Kd0!mZq2wLx');
+      expect(userModel.update.mock.lastCall?.[0].data).toMatchObject({ hashedPassword: 'hashed-password' });
+      expect(userModel.update.mock.lastCall?.[0].data).not.toHaveProperty('password');
+    });
+
+    it('should check a new password against the stored username when the username is not being changed', async () => {
+      await expect(usersService.updateById('user-1', { password: 'Jane.Doe' }, admin)).rejects.toMatchObject({
+        response: { code: 'PASSWORD_MATCHES_USERNAME' }
+      });
+      expect(userModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should check a new password against the incoming username when the username is being changed', async () => {
+      await expect(
+        usersService.updateById('user-1', { password: 'New.Name', username: 'new.name' }, admin)
+      ).rejects.toMatchObject({ response: { code: 'PASSWORD_MATCHES_USERNAME' } });
+      expect(userModel.findFirst).not.toHaveBeenCalled();
     });
 
     it('should let an administrator disable and demote another user', async () => {
@@ -256,6 +421,21 @@ describe('UsersService', () => {
     it('should leave mustResetPassword untouched when no password is set, so editing a profile cannot lift it', async () => {
       await usersService.updateSelfById('user-1', { firstName: 'Janet' }, currentUser);
       expect(userModel.update.mock.lastCall?.[0].data.mustResetPassword).toBeUndefined();
+    });
+
+    it("should refuse to update another user's account through the self-update route", async () => {
+      await expect(usersService.updateSelfById('user-2', { firstName: 'Janet' }, currentUser)).rejects.toThrow(
+        ForbiddenException
+      );
+      expect(userModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw when the account disappears before its current password can be compared', async () => {
+      userModel.findFirst.mockResolvedValue(null);
+      await expect(usersService.updateSelfById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, currentUser)).rejects.toThrow(
+        NotFoundException
+      );
+      expect(userModel.update).not.toHaveBeenCalled();
     });
 
     it('should reject the password already on the account, so a forced reset cannot be satisfied by it', async () => {
