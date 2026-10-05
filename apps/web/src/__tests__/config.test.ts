@@ -74,7 +74,10 @@ describe('config', () => {
 
   it('should fail to load with an invalid value, so a misconfigured deployment does not start', async () => {
     vi.stubEnv('CONTACT_EMAIL', 'not-an-email');
-    await expect(loadConfig()).rejects.toThrow();
+    await expect(loadConfig()).rejects.toMatchObject({
+      issues: [expect.objectContaining({ path: ['meta', 'contactEmail'] })],
+      name: 'ZodError'
+    });
   });
 
   it('should freeze the parsed config, so nothing can change it at runtime', async () => {

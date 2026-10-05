@@ -3,6 +3,7 @@ import type { Subject } from '@opendatacapture/schemas/subject';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ClipboardListIcon, DatabaseIcon, LayersIcon, UsersIcon } from 'lucide-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 
 import type { NavItem } from '@/hooks/useNavItems';
 import type { GroupSwitcherPosition } from '@/store/types';
@@ -17,9 +18,16 @@ type MockStore = {
   groupSwitcherPosition: GroupSwitcherPosition;
 };
 
-const mocks = vi.hoisted(() => {
+type Mocks = {
+  isGroupSwitcherVisible: boolean;
+  navigate: Mock;
+  navItems: NavItem[][];
+  store: MockStore;
+};
+
+const mocks = vi.hoisted((): Mocks => {
   const store: MockStore = { currentSession: null, endSession: vi.fn(), groupSwitcherPosition: 'sidebar' };
-  return { isGroupSwitcherVisible: false, navigate: vi.fn(), navItems: [] as NavItem[][], store };
+  return { isGroupSwitcherVisible: false, navigate: vi.fn(), navItems: [], store };
 });
 
 vi.mock('@tanstack/react-router', () => ({

@@ -2,9 +2,9 @@ import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type { Group, GroupSettings } from '@opendatacapture/schemas/group';
 import { generateSubjectHash } from '@opendatacapture/subject-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import axios from 'axios';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { StartSessionForm } from '@/components/StartSessionForm';
 
@@ -32,13 +32,16 @@ const groupWithSettings = (settings: Partial<GroupSettings>): Group => ({
 
 const groupWithIdPattern = (idValidationRegex: string) => groupWithSettings({ idValidationRegex });
 
+const createQueryClient = () => new QueryClient({ defaultOptions: { queries: { retry: false } } });
+
 const renderForm = (
   customSubjectIds: string[],
   currentGroup: Group | null = null,
-  method: 'CUSTOM_ID' | 'PERSONAL_INFO' = 'CUSTOM_ID'
+  method: 'CUSTOM_ID' | 'PERSONAL_INFO' = 'CUSTOM_ID',
+  queryClient = createQueryClient()
 ) => {
   render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+    <QueryClientProvider client={queryClient}>
       <StartSessionForm
         currentGroup={currentGroup}
         customSubjectIds={customSubjectIds}
@@ -75,6 +78,20 @@ const submit = (form: HTMLElement) => {
   fireEvent.click(screen.getByLabelText('Submit'));
 };
 
+const submitButton = () => screen.getByLabelText<HTMLButtonElement>('Submit');
+
+/**
+ * The form holds its submit button disabled on a real 500ms timer after `onSubmit` resolves, then
+ * updates its state. Waiting for the button to come back keeps that update inside the test, rather
+ * than landing after the environment is torn down.
+ */
+const submitAndSettle = async (form: HTMLElement) => {
+  submit(form);
+  await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+  await waitFor(() => expect(submitButton().disabled).toBe(true));
+  await waitFor(() => expect(submitButton().disabled).toBe(false), { timeout: 1000 });
+};
+
 const submittedSubjectId = () => onSubmit.mock.lastCall?.[0].subjectData.id;
 
 const dateOfBirthInput = () => screen.getByTestId<HTMLInputElement>('date-input');
@@ -105,6 +122,10 @@ beforeEach(() => {
   get.mockResolvedValue({ data: null, status: 404 });
 });
 
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 describe('StartSessionForm', () => {
   // A new subject's identifier is by definition absent from the options, so the combobox has to keep
   // text matching no option rather than reverting to the empty selection when the popup closes.
@@ -112,8 +133,7 @@ describe('StartSessionForm', () => {
     const form = renderForm(['alpha']);
     typeIdentifier('gamma');
     closeIdentifierPopup();
-    submit(form);
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    await submitAndSettle(form);
     expect(submittedSubjectId()).toBe(`${DEFAULT_GROUP_NAME}$gamma`);
   });
 
@@ -134,8 +154,7 @@ describe('StartSessionForm', () => {
     const form = renderForm(['alpha']);
     typeIdentifier('alpha');
     fireEvent.click(screen.getByTestId('subjectId-combobox-item-alpha'));
-    submit(form);
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    await submitAndSettle(form);
     expect(submittedSubjectId()).toBe(`${DEFAULT_GROUP_NAME}$alpha`);
   });
 
@@ -195,8 +214,7 @@ describe('StartSessionForm', () => {
     const form = renderForm([], groupWithIdPattern('^[a-z]+$'));
     typeIdentifier('abc');
     closeIdentifierPopup();
-    submit(form);
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    await submitAndSettle(form);
     expect(submittedSubjectId()).toBe('Group_One$abc');
   });
 });
@@ -224,8 +242,7 @@ describe('StartSessionForm with an existing subject', () => {
     const form = renderForm(['alpha']);
     pickIdentifier('alpha');
     await waitFor(() => expect(sexTrigger().disabled).toBe(true));
-    submit(form);
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    await submitAndSettle(form);
     expect(onSubmit.mock.lastCall?.[0].subjectData).toMatchObject({
       dateOfBirth: new Date('1990-06-15'),
       sex: 'FEMALE'
@@ -265,8 +282,7 @@ describe('StartSessionForm with a custom identifier', () => {
     const form = renderForm([], groupWithSettings({}));
     typeIdentifier('abc');
     closeIdentifierPopup();
-    submit(form);
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    await submitAndSettle(form);
     expect(onSubmit.mock.lastCall?.[0]).toMatchObject({ groupId: 'group-1', username: 'admin' });
   });
 
@@ -280,8 +296,7 @@ describe('StartSessionForm with a custom identifier', () => {
     fireEvent.change(form.querySelector('[name="subjectIdentificationMethod"]')!, { target: { value: 'CUSTOM_ID' } });
     typeIdentifier('abc');
     closeIdentifierPopup();
-    submit(form);
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    await submitAndSettle(form);
     expect(onSubmit.mock.lastCall?.[0]).toMatchObject({ groupId: null, username: null });
   });
 
@@ -301,22 +316,26 @@ describe('StartSessionForm with a custom identifier', () => {
     const form = renderForm([], groupWithIdPattern('['));
     typeIdentifier('abc');
     closeIdentifierPopup();
-    submit(form);
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    await submitAndSettle(form);
     expect(consoleError).toHaveBeenCalledWith(expect.any(SyntaxError));
-    consoleError.mockRestore();
   });
 
   it('should ignore a lookup that resolves after the identifier has moved on, so stale details never overwrite newer ones', async () => {
     let resolveFirst!: (value: { data: { dateOfBirth: string; sex: string }; status: number }) => void;
     get.mockReturnValueOnce(new Promise((resolve) => (resolveFirst = resolve)));
     existingSubject({ dateOfBirth: '2000-01-01', sex: 'MALE' });
-    renderForm(['alpha', 'beta']);
+    const queryClient = createQueryClient();
+    const fetchQuery = vi.spyOn(queryClient, 'fetchQuery');
+    renderForm(['alpha', 'beta'], null, 'CUSTOM_ID', queryClient);
     pickIdentifier('alpha');
     pickIdentifier('beta');
     await waitFor(() => expect(dateOfBirthInput().value).toBe('2000-01-01'));
-    resolveFirst({ data: { dateOfBirth: '1990-06-15', sex: 'FEMALE' }, status: 200 });
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    const staleLookup = fetchQuery.mock.results[0]!.value;
+    // The form awaited this promise first, so its continuation has run by the time this await returns.
+    await act(async () => {
+      resolveFirst({ data: { dateOfBirth: '1990-06-15', sex: 'FEMALE' }, status: 200 });
+      await staleLookup;
+    });
     expect(dateOfBirthInput().value).toBe('2000-01-01');
   });
 });
@@ -339,8 +358,7 @@ describe('StartSessionForm with personal information', () => {
   it('should identify the subject by a hash of their personal information, so no name is stored as an id', async () => {
     const form = renderForm([], null, 'PERSONAL_INFO');
     fillPersonalInfo(form, { dateOfBirth: '1990-06-15', firstName: 'Jane' });
-    submit(form);
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    await submitAndSettle(form);
     const expectedId = await generateSubjectHash({
       dateOfBirth: new Date('1990-06-15'),
       firstName: 'Jane',
@@ -374,8 +392,7 @@ describe('StartSessionForm with personal information', () => {
   it("should accept a date of birth older than the group's minimum age", async () => {
     const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
     fillPersonalInfo(form, { dateOfBirth: '1990-06-15', firstName: 'Jane' });
-    submit(form);
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    await submitAndSettle(form);
   });
 });
 
