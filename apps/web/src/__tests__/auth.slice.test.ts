@@ -56,6 +56,7 @@ describe('createAuthSlice', () => {
   });
 
   afterEach(() => {
+    delete window.__PLAYWRIGHT_ACCESS_TOKEN__;
     vi.restoreAllMocks();
   });
 
@@ -123,7 +124,6 @@ describe('createAuthSlice', () => {
     window.__PLAYWRIGHT_ACCESS_TOKEN__ = createAccessToken(createPayload([createGroup('e2e')]));
     vi.resetModules();
     const { useAppStore: freshStore } = await import('@/store');
-    delete window.__PLAYWRIGHT_ACCESS_TOKEN__;
     expect(freshStore.getState().currentUser?.username).toBe('jdoe');
     expect(freshStore.getState().currentGroup?.id).toBe('e2e');
   });

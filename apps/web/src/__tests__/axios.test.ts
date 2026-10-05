@@ -3,13 +3,21 @@ import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import axios, { AxiosError, AxiosHeaders } from 'axios';
 import type { AxiosAdapter, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 
 import { isTransientError } from '@/services/axios';
 
 import '@/services/i18n';
 
-const store = vi.hoisted(() => ({
-  accessToken: null as null | string,
+type StoreFixture = {
+  accessToken: null | string;
+  beginRetry: Mock;
+  endRetry: Mock;
+  setIsOnline: Mock;
+};
+
+const store = vi.hoisted((): StoreFixture => ({
+  accessToken: null,
   beginRetry: vi.fn(),
   endRetry: vi.fn(),
   setIsOnline: vi.fn()
@@ -59,15 +67,20 @@ describe('isTransientError', () => {
   const config: InternalAxiosRequestConfig = { headers: new AxiosHeaders() };
 
   it.each([
-    ['a dropped connection, which never received a response', createError(config), true],
-    ['a gateway error from the hospital network', createError(config, 502), true],
-    ['an unavailable upstream', createError(config, 503), true],
-    ['a gateway timeout', createError(config, 504), true],
-    ['an error the server deliberately returned', createError(config, 500), false],
-    ['a client error', createError(config, 400), false],
-    ['an error that did not come from axios', new Error('boom'), false]
-  ])('should classify %s', (_, error, expected) => {
-    expect(isTransientError(error)).toBe(expected);
+    ['a dropped connection, which never received a response', createError(config)],
+    ['a gateway error from the hospital network', createError(config, 502)],
+    ['an unavailable upstream', createError(config, 503)],
+    ['a gateway timeout', createError(config, 504)]
+  ])('should treat %s as transient, so it is retried', (_, error) => {
+    expect(isTransientError(error)).toBe(true);
+  });
+
+  it.each([
+    ['an error the server deliberately returned', createError(config, 500)],
+    ['a client error', createError(config, 400)],
+    ['an error that did not come from axios', new Error('boom')]
+  ])('should not treat %s as transient, so it surfaces immediately', (_, error) => {
+    expect(isTransientError(error)).toBe(false);
   });
 });
 
@@ -200,6 +213,19 @@ describe('axios', () => {
       expect(adapter).toHaveBeenCalledTimes(3);
     });
 
+    it('should cap the retry delay at two seconds, so a long outage does not stretch the wait between attempts', async () => {
+      vi.mocked(Math.random).mockReturnValue(1);
+      vi.useFakeTimers();
+      const adapter = createAdapter({ fail: true }, { fail: true }, { fail: true }, { fail: true }, { fail: true });
+      void axios.get('/v1/subjects', { adapter });
+      await vi.advanceTimersByTimeAsync(250 + 500 + 1000 + 2000);
+      expect(adapter).toHaveBeenCalledTimes(5);
+      await vi.advanceTimersByTimeAsync(1999);
+      expect(adapter).toHaveBeenCalledTimes(5);
+      await vi.advanceTimersByTimeAsync(1);
+      expect(adapter).toHaveBeenCalledTimes(6);
+    });
+
     it('should give up once the retry budget is spent, and tell the user the server is unreachable', async () => {
       const adapter = createAdapter({ fail: 503 });
       const request = axios.get('/v1/subjects', { adapter, retryStartedAt: Date.now() - 15_000 });
@@ -278,17 +304,19 @@ describe('axios', () => {
       expect(store.setIsOnline).toHaveBeenCalledWith(true);
     });
 
-    it('should not listen for connectivity where there is no window', async () => {
-      const addEventListener = vi.spyOn(window, 'addEventListener');
+    it('should load where there is no window, so the module does not crash outside a browser', async () => {
       const useRequestInterceptor = vi.spyOn(axios.interceptors.request, 'use');
       const useResponseInterceptor = vi.spyOn(axios.interceptors.response, 'use');
       vi.stubGlobal('window', undefined);
       vi.resetModules();
-      await import('@/services/axios');
-      // The re-imported module shares this file's axios instance; eject its duplicate interceptors.
-      axios.interceptors.request.eject(useRequestInterceptor.mock.results[0]?.value);
-      axios.interceptors.response.eject(useResponseInterceptor.mock.results[0]?.value);
-      expect(addEventListener).not.toHaveBeenCalled();
+      const reimport = import('@/services/axios');
+      try {
+        await expect(reimport).resolves.toBeDefined();
+      } finally {
+        // The re-imported module shares this file's axios instance; eject its duplicate interceptors.
+        axios.interceptors.request.eject(useRequestInterceptor.mock.results[0]?.value);
+        axios.interceptors.response.eject(useResponseInterceptor.mock.results[0]?.value);
+      }
     });
   });
 
