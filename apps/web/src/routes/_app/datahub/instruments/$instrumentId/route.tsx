@@ -15,6 +15,7 @@ import { TabLink } from '@/components/TabLink';
 import { TimeDropdown } from '@/components/TimeDropdown';
 import { useCollectionMethodLabels } from '@/hooks/useCollectionMethodLabels';
 import { NO_SERIES, useInstrumentHubFacets } from '@/hooks/useInstrumentHubFacets';
+import { COLOUR_BY_OPTIONS } from '@/hooks/useRecordChartSeries';
 import { CHART_PALETTE_NAMES } from '@/utils/chart-palette';
 
 const COLLECTION_METHODS = $SessionType.options;
@@ -30,8 +31,9 @@ const Filters = ({ seriesOptions }: { seriesOptions: Map<string, null | string> 
 
   const [isOpen, setIsOpen] = useState(false);
 
-  // An absent `series` search param means every series; the dropdown has to materialise that into
-  // an explicit list before it can remove one from it.
+  // An absent `methods`/`series` search param means every one of them; the dropdown has to
+  // materialise that into an explicit list before it can remove one from it.
+  const selectedMethods = methods ?? COLLECTION_METHODS;
   const selectedSeries = series ?? Array.from(seriesOptions.keys());
 
   const setMethods = (next: SessionType[]) => {
@@ -60,11 +62,11 @@ const Filters = ({ seriesOptions }: { seriesOptions: Map<string, null | string> 
         <DropdownMenu.Group>
           {COLLECTION_METHODS.map((method) => (
             <DropdownMenu.CheckboxItem
-              checked={methods.includes(method)}
+              checked={selectedMethods.includes(method)}
               data-testid={`instrument-hub-filter-method-${method}`}
               key={method}
               onCheckedChange={(checked) => {
-                setMethods(checked ? [...methods, method] : methods.filter((item) => item !== method));
+                setMethods(checked ? [...selectedMethods, method] : selectedMethods.filter((item) => item !== method));
               }}
               onSelect={(e) => e.preventDefault()}
             >
@@ -160,14 +162,15 @@ export const Route = createFileRoute('/_app/datahub/instruments/$instrumentId')(
   component: RouteComponent,
   validateSearch: z.object({
     chart: z.enum(['scatter', 'distribution']).default('scatter'),
-    colourBy: z.enum(['none', 'method', 'series']).default('none'),
+    colourBy: z.enum(COLOUR_BY_OPTIONS).default('none'),
     /**
      * One measure, not several: both chart forms put the measure on an axis and spend colour on the
      * grouping dimension instead, and a second measure of a different scale would need a second
      * y-axis.
      */
     measure: z.string().optional(),
-    methods: $SessionType.array().default(COLLECTION_METHODS),
+    /** Absent means every method, which an empty array deliberately does not */
+    methods: $SessionType.array().optional(),
     minDate: z.coerce.date().optional(),
     palette: z.enum(CHART_PALETTE_NAMES).default('default'),
     /** Absent means every series, which an empty array deliberately does not */

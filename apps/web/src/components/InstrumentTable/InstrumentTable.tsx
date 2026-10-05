@@ -4,12 +4,14 @@ import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ActionDropdown, Button, DataTable, DropdownMenu } from '@douglasneuroinformatics/libui/components';
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import { ChevronDownIcon } from 'lucide-react';
 import { unparse } from 'papaparse';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { SortableHeader } from '@/components/SortableHeader';
 import { TruncatedCell } from '@/components/TruncatedCell';
+import { useInstrumentKindLabels } from '@/hooks/useInstrumentKindLabels';
 import { resolveTheme } from '@/utils/chart-theme';
 import { downloadSubjectTableExcel } from '@/utils/excel';
 import { getInstrumentKindColor } from '@/utils/tag-colors';
@@ -17,12 +19,13 @@ import { getInstrumentKindColor } from '@/utils/tag-colors';
 /** Shown where an instrument has no source repository, or has never been collected */
 const EMPTY_CELL = '—';
 
-const INSTRUMENT_KINDS = ['FORM', 'INTERACTIVE', 'FILE', 'SERIES'] as const;
+/** Listed in the order a reader is most likely to meet them, not the enum's own order. */
+const INSTRUMENT_KINDS = ['FORM', 'INTERACTIVE', 'FILE', 'SERIES'] as const satisfies readonly InstrumentKind[];
 
 type InstrumentRow = {
   edition: null | number;
   id: string;
-  kind: string;
+  kind: InstrumentKind;
   lastCollectedAt: Date | null;
   recordCount: number;
   source: null | string;
@@ -30,23 +33,17 @@ type InstrumentRow = {
   title: string;
 };
 
-type KindFilter = string[];
+type KindFilter = InstrumentKind[];
 
 /** A kind tag, matching the treatment the subject table gives sex. */
-const InstrumentKindCell = ({ kind }: { kind: string }) => {
+const InstrumentKindCell = ({ kind }: { kind: InstrumentKind }) => {
   const [theme] = useTheme();
-  const { t } = useTranslation();
-  const labels: { [key: string]: string } = {
-    FILE: t({ en: 'File', es: 'Archivo', fr: 'Fichier' }),
-    FORM: t({ en: 'Form', es: 'Formulario', fr: 'Formulaire' }),
-    INTERACTIVE: t({ en: 'Interactive', es: 'Interactivo', fr: 'Interactif' }),
-    SERIES: t({ en: 'Series', es: 'Serie', fr: 'Série' })
-  };
+  const labels = useInstrumentKindLabels();
   return (
     <ColorTagCell
       color={getInstrumentKindColor(kind, resolveTheme(theme))}
       data-testid="instrument-cell-kind"
-      label={labels[kind] ?? kind}
+      label={labels[kind]}
     />
   );
 };
@@ -59,6 +56,7 @@ const Toolbar = ({ rows, table }: { rows: InstrumentRow[]; table: TanstackTable.
   const { t } = useTranslation();
   const download = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
+  const kindLabels = useInstrumentKindLabels();
   const [isOpen, setIsOpen] = useState(false);
 
   const kindColumn = table.getAllColumns().find((column) => column.id === 'kind');
@@ -135,7 +133,7 @@ const Toolbar = ({ rows, table }: { rows: InstrumentRow[]; table: TanstackTable.
                 }}
                 onSelect={(e) => e.preventDefault()}
               >
-                {kind}
+                {kindLabels[kind]}
               </DropdownMenu.CheckboxItem>
             ))}
           </DropdownMenu.Group>
@@ -251,7 +249,7 @@ export const InstrumentTable = ({ 'data-testid': testId, onOpen, rowActions = []
           },
           {
             accessorKey: 'kind',
-            cell: (ctx) => <InstrumentKindCell kind={ctx.getValue() as string} />,
+            cell: (ctx) => <InstrumentKindCell kind={ctx.getValue() as InstrumentKind} />,
             filterFn: (row, id, filter: KindFilter) => filter.includes(row.getValue(id)),
             header: ({ column }) => (
               <SortableHeader column={column} label={t({ en: 'Kind', es: 'Tipo', fr: 'Type' })} />

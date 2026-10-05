@@ -25,14 +25,14 @@ export type RecordType = {
   };
 };
 
-export type InitData = {
+export type InitInstruments = {
   edition: number;
   id: string;
   name: string;
 }[];
 
 export type InitPayload = {
-  instruments: InitData;
+  instruments: InitInstruments;
   /** Series instrument id to its title, since a series carries no language-independent name */
   seriesNames: { [id: string]: string };
 };

@@ -7,7 +7,10 @@ import type { InstrumentVisualizationRecord } from '@/hooks/useInstrumentVisuali
 import { getCategoricalColor, MAX_CATEGORICAL_GROUPS, NEUTRAL_MARK, OTHER_GROUP_KEY } from '@/utils/chart-palette';
 import type { ChartPaletteName } from '@/utils/chart-palette';
 
-type ColourBy = 'method' | 'none' | 'series';
+/** The grouping dimensions a chart may spend colour on. Source of truth for the search param. */
+const COLOUR_BY_OPTIONS = ['none', 'method', 'series'] as const;
+
+type ColourBy = (typeof COLOUR_BY_OPTIONS)[number];
 
 type RecordChartPoint = {
   time: number;
@@ -123,4 +126,5 @@ export function useRecordChartSeries({ colourBy, measure, palette, records }: Us
   }, [colourBy, collectionMethodLabels, individual, measure, other, palette, records, theme, ungrouped, unlabelled]);
 }
 
+export { COLOUR_BY_OPTIONS };
 export type { ColourBy, RecordChartPoint, RecordChartSeries };

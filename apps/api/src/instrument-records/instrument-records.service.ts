@@ -45,12 +45,28 @@ import { InstrumentMeasuresService } from './instrument-measures.service';
 
 import type {
   BeginChunkProcessingMessage,
-  InitData,
   InitialMessage,
+  InitInstruments,
   InitMessage,
   RecordType,
   WorkerMessage
 } from './thread-types';
+
+type RecordSummaryFold = Map<string, { lastCollectedAt: Date | null; recordCount: number; subjectIds: Set<string> }>;
+
+/**
+ * Projects a fold keyed by instrument id into the wire shape, replacing the subject id set with its
+ * size. Shared by the per-instrument and per-series summaries, which differ only in what they keyed
+ * the fold on.
+ */
+function toInstrumentSummaries(summaries: RecordSummaryFold): InstrumentRecordSummary[] {
+  return Array.from(summaries, ([instrumentId, summary]) => ({
+    instrumentId,
+    lastCollectedAt: summary.lastCollectedAt,
+    recordCount: summary.recordCount,
+    subjectCount: summary.subjectIds.size
+  }));
+}
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -224,7 +240,7 @@ export class InstrumentRecordsService {
       chunks.push(records.slice(i, i + chunkSize));
     }
 
-    const availableInstrumentArray: InitData = instruments
+    const availableInstrumentArray: InitInstruments = instruments
       .values()
       .toArray()
       .map((item) => {
@@ -390,13 +406,7 @@ export class InstrumentRecordsService {
     { groupId }: { groupId?: string } = {},
     { ability }: Required<Pick<EntityOperationOptions, 'ability'>>
   ): Promise<InstrumentRecordSummary[]> {
-    const summaries = await this.summarizeRecords('instrumentId', groupId, ability);
-    return Array.from(summaries, ([instrumentId, summary]) => ({
-      instrumentId,
-      lastCollectedAt: summary.lastCollectedAt,
-      recordCount: summary.recordCount,
-      subjectCount: summary.subjectIds.size
-    }));
+    return toInstrumentSummaries(await this.summarizeRecords('instrumentId', groupId, ability));
   }
 
   /**
@@ -407,13 +417,7 @@ export class InstrumentRecordsService {
     { groupId }: { groupId?: string } = {},
     { ability }: Required<Pick<EntityOperationOptions, 'ability'>>
   ): Promise<InstrumentRecordSummary[]> {
-    const summaries = await this.summarizeRecords('seriesInstrumentId', groupId, ability);
-    return Array.from(summaries, ([instrumentId, summary]) => ({
-      instrumentId,
-      lastCollectedAt: summary.lastCollectedAt,
-      recordCount: summary.recordCount,
-      subjectCount: summary.subjectIds.size
-    }));
+    return toInstrumentSummaries(await this.summarizeRecords('seriesInstrumentId', groupId, ability));
   }
 
   /** Per-subject collection statistics for the subject hub's listing. */
@@ -728,7 +732,7 @@ export class InstrumentRecordsService {
     by: 'instrumentId' | 'seriesInstrumentId' | 'subjectId',
     groupId: string | undefined,
     ability: AppAbility
-  ): Promise<Map<string, { lastCollectedAt: Date | null; recordCount: number; subjectIds: Set<string> }>> {
+  ): Promise<RecordSummaryFold> {
     if (groupId) {
       await this.groupsService.findById(groupId);
     }
@@ -782,7 +786,7 @@ export class InstrumentRecordsService {
       subjectId: null | string;
     }[];
 
-    const summaries = new Map<string, { lastCollectedAt: Date | null; recordCount: number; subjectIds: Set<string> }>();
+    const summaries: RecordSummaryFold = new Map();
     for (const row of rows) {
       // Raw rows carry no model name, so CASL would resolve them as `Object` and match only `manage all`
       if (!ability.can('read', forcedAppSubject('InstrumentRecord', { groupId: row.groupId }))) {

@@ -3,9 +3,9 @@ import { useMemo } from 'react';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { useParams } from '@tanstack/react-router';
 
+import { useInstrumentInfoById } from '@/hooks/useInstrumentInfoById';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
-import { useSeriesNames } from '@/hooks/useSeriesNames';
 import { useAppStore } from '@/store';
 import { getEditionOptions } from '@/utils/instrument-editions';
 
@@ -31,7 +31,7 @@ export function useInstrumentHubFacets() {
   const infoQuery = useInstrumentInfoQuery({ params: { allEditions: true } });
   const recordsQuery = useInstrumentRecords({ params: { groupId: currentGroup?.id, instrumentId } });
 
-  const seriesNames = useSeriesNames();
+  const seriesInfoById = useInstrumentInfoById({ kind: 'SERIES' });
 
   const editionLabel = t({ en: 'Edition', es: 'Edición', fr: 'Édition' });
   const editionOptions = useMemo(
@@ -53,10 +53,10 @@ export function useInstrumentHubFacets() {
     const options = new Map<string, null | string>();
     for (const record of recordsQuery.data ?? []) {
       const seriesId = record.seriesInstrumentId ?? null;
-      options.set(seriesId ?? NO_SERIES, seriesId ? (seriesNames[seriesId] ?? null) : null);
+      options.set(seriesId ?? NO_SERIES, seriesId ? (seriesInfoById[seriesId]?.title ?? null) : null);
     }
     return options;
-  }, [recordsQuery.data, seriesNames]);
+  }, [recordsQuery.data, seriesInfoById]);
 
   return { editionOptions, isSeries, seriesOptions, title };
 }

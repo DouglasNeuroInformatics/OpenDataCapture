@@ -5,6 +5,7 @@ import type { SessionType } from '@opendatacapture/schemas/session';
 
 import { TruncatedCell } from '@/components/TruncatedCell';
 import { useCollectionMethodLabels } from '@/hooks/useCollectionMethodLabels';
+import { NO_SERIES } from '@/hooks/useInstrumentHubFacets';
 import type { InstrumentVisualizationRecord } from '@/hooks/useInstrumentVisualization';
 
 /** Shown where a record carries no series, or a session whose type could not be resolved */
@@ -49,7 +50,7 @@ export function useRecordMetadataColumns({
       },
       // Filtered on the id rather than the displayed name, since a name is not a stable identity.
       // The empty string stands for a record collected outside any series.
-      filterFn: (row, _id, filter: string[]) => filter.includes(row.original.__seriesId__ ?? ''),
+      filterFn: (row, _id, filter: string[]) => filter.includes(row.original.__seriesId__ ?? NO_SERIES),
       header: 'SERIES',
       id: '__seriesName__'
     });

@@ -1,15 +1,8 @@
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
+
 import { getCategoricalColor, NEUTRAL_MARK } from '@/utils/chart-palette';
 
 type Mode = 'dark' | 'light';
-
-/**
- * Colours for the nominal values tagged in tables.
- *
- * Values come from the validated categorical palette rather than new hex, so the app holds one set
- * of nominal colours instead of a second ad-hoc one that drifts. Each is paired with its label
- * wherever it is rendered, so the colour is redundant rather than load-bearing — which is what makes
- * it safe for a colourblind reader, and why a theme's slot separation is not a constraint here.
- */
 
 /**
  * Baby pink for female, baby blue for male, grey for a subject whose sex was never recorded.
@@ -31,11 +24,16 @@ function getSexColor(sex: null | string, mode: Mode): string {
   return NEUTRAL_MARK[mode];
 }
 
-/** One slot per instrument kind, in the order a reader is most likely to meet them. */
-function getInstrumentKindColor(kind: string, mode: Mode): string {
-  const slots: { [key: string]: number } = { FILE: 2, FORM: 0, INTERACTIVE: 1 };
+/**
+ * One palette slot per instrument kind.
+ *
+ * A series is the neutral mark rather than a fourth hue: the palette holds three validated slots,
+ * and a generated fourth is never the answer.
+ */
+function getInstrumentKindColor(kind: InstrumentKind, mode: Mode): string {
+  const slots: { [K in InstrumentKind]: null | number } = { FILE: 2, FORM: 0, INTERACTIVE: 1, SERIES: null };
   const slot = slots[kind];
-  return slot === undefined ? NEUTRAL_MARK[mode] : getCategoricalColor(slot, mode, 'default');
+  return slot === null ? NEUTRAL_MARK[mode] : getCategoricalColor(slot, mode, 'default');
 }
 
 export { getInstrumentKindColor, getSexColor };

@@ -16,6 +16,7 @@ import {
 import type { RecordChartSeries } from '@/hooks/useRecordChartSeries';
 import {
   AXIS_STROKE,
+  CHART_SURFACE,
   inkColors,
   resolveTheme,
   tooltipStyles,
@@ -107,7 +108,7 @@ export const RecordScatterChart = ({ measureLabel, series, trend, xLabel }: Reco
             fill={item.color}
             key={item.key}
             name={item.label}
-            stroke={tooltipStyles[resolvedTheme].backgroundColor}
+            stroke={CHART_SURFACE[resolvedTheme]}
             strokeWidth={2}
           />
         ))}

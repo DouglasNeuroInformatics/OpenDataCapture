@@ -11,14 +11,26 @@ const inkColors: { [K in Theme]: string } = {
   light: '#475569'
 };
 
+/**
+ * The page surface a chart is drawn on.
+ *
+ * Named separately from the tooltip that also uses it, because a mark outlined against the surface
+ * needs the surface colour — reading it off the tooltip's own style made the ring change whenever
+ * the tooltip was restyled.
+ */
+const CHART_SURFACE: { [K in Theme]: string } = {
+  dark: '#0f172a',
+  light: '#f1f5f9'
+};
+
 const tooltipStyles: { [K in Theme]: React.CSSProperties } = {
   dark: {
-    backgroundColor: '#0f172a',
+    backgroundColor: CHART_SURFACE.dark,
     borderColor: inkColors.light,
     borderRadius: '2px'
   },
   light: {
-    backgroundColor: '#f1f5f9',
+    backgroundColor: CHART_SURFACE.light,
     borderColor: inkColors.dark,
     borderRadius: '2px'
   }
@@ -43,4 +55,13 @@ function resolveTheme(theme: string | undefined): Theme {
   return theme === 'dark' ? 'dark' : 'light';
 }
 
-export { AXIS_STROKE, inkColors, resolveTheme, tooltipStyles, X_AXIS_HEIGHT, X_AXIS_LABEL_OFFSET, Y_AXIS_WIDTH };
+export {
+  AXIS_STROKE,
+  CHART_SURFACE,
+  inkColors,
+  resolveTheme,
+  tooltipStyles,
+  X_AXIS_HEIGHT,
+  X_AXIS_LABEL_OFFSET,
+  Y_AXIS_WIDTH
+};

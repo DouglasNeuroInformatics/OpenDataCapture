@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ActionDropdown, DataTable, TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
@@ -11,7 +12,7 @@ import type { InstrumentRow } from '@/components/InstrumentTable';
 import { TruncatedCell } from '@/components/TruncatedCell';
 import { useInstrumentHubFacets } from '@/hooks/useInstrumentHubFacets';
 import { useInstrumentHubRecords } from '@/hooks/useInstrumentHubRecords';
-import { useInstrumentTitles } from '@/hooks/useInstrumentTitles';
+import { useInstrumentInfoById } from '@/hooks/useInstrumentInfoById';
 import type { InstrumentVisualizationRecord } from '@/hooks/useInstrumentVisualization';
 import { useRecordMetadataColumns } from '@/hooks/useRecordMetadataColumns';
 import { useAppStore } from '@/store';
@@ -27,7 +28,10 @@ const FIXED_COLUMN_PREFIX = '__';
  * what this series collected, not the instrument's global ones, which is what a per-instrument
  * summary would give.
  */
-function useSeriesMemberRows(records: InstrumentVisualizationRecord[], titles: { [id: string]: string }) {
+function useSeriesMemberRows(
+  records: InstrumentVisualizationRecord[],
+  infoById: { [id: string]: { kind: InstrumentKind; title: string } }
+) {
   return useMemo<InstrumentRow[]>(() => {
     const members = new Map<string, { lastCollectedAt: Date | null; subjectIds: Set<string>; total: number }>();
     for (const record of records) {
@@ -45,14 +49,16 @@ function useSeriesMemberRows(records: InstrumentVisualizationRecord[], titles: {
     return Array.from(members, ([id, member]) => ({
       edition: null,
       id,
-      kind: 'FORM',
+      // A series composes scalar instruments of any kind, so the member's own kind is carried
+      // through rather than assumed — a FILE or INTERACTIVE member is not a form.
+      kind: infoById[id]?.kind ?? 'FORM',
       lastCollectedAt: member.lastCollectedAt,
       recordCount: member.total,
       source: null,
       subjectCount: member.subjectIds.size,
-      title: titles[id] ?? id
+      title: infoById[id]?.title ?? id
     }));
-  }, [records, titles]);
+  }, [records, infoById]);
 }
 
 const RouteComponent = () => {
@@ -60,12 +66,12 @@ const RouteComponent = () => {
   const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
   const { dl, records } = useInstrumentHubRecords();
   const { isSeries } = useInstrumentHubFacets();
-  const instrumentTitles = useInstrumentTitles();
+  const instrumentInfoById = useInstrumentInfoById({ allEditions: true });
   const metadataColumns = useRecordMetadataColumns({ omitSeries: isSeries });
   const subjectIdDisplaySetting = useAppStore((store) => store.currentGroup?.settings.subjectIdDisplayLength);
 
   const { t } = useTranslation();
-  const seriesMembers = useSeriesMemberRows(records, instrumentTitles);
+  const seriesMembers = useSeriesMemberRows(records, instrumentInfoById);
 
   const measureColumns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(() => {
     const columns: TanstackTable.ColumnDef<InstrumentVisualizationRecord>[] = [];
@@ -74,7 +80,7 @@ const RouteComponent = () => {
     if (isSeries) {
       return [
         {
-          accessorFn: (record) => instrumentTitles[record.__instrumentId__] ?? record.__instrumentId__,
+          accessorFn: (record) => instrumentInfoById[record.__instrumentId__]?.title ?? record.__instrumentId__,
           cell: (ctx) => {
             const title = ctx.getValue() as string;
             return <TruncatedCell data-testid="instrument-table-cell-instrument" title={title} value={title} />;
@@ -98,7 +104,7 @@ const RouteComponent = () => {
       }
     }
     return columns;
-  }, [instrumentTitles, isSeries, records[0]]);
+  }, [instrumentInfoById, isSeries, records[0]]);
 
   const viewRecord = (record: InstrumentVisualizationRecord) => {
     void navigate({
@@ -128,11 +134,7 @@ const RouteComponent = () => {
           data-spotlight-type="export-data-dropdown"
           data-testid="instrument-hub-export-dropdown"
           disabled={records.length === 0}
-          options={
-            isSeries
-              ? ['TSV Long', 'CSV Long', 'Excel Long']
-              : ['TSV', 'TSV Long', 'JSON', 'CSV', 'CSV Long', 'Excel', 'Excel Long']
-          }
+          options={['TSV', 'TSV Long', 'JSON', 'CSV', 'CSV Long', 'Excel', 'Excel Long']}
           title={t('core.download')}
           triggerClassName="min-w-32"
           onSelection={dl}

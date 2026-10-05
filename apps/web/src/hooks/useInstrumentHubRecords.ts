@@ -21,7 +21,10 @@ export function useInstrumentHubRecords() {
 
   const filterRecord = useCallback(
     (record: InstrumentVisualizationRecord) => {
-      if (record.__method__ && !methods.includes(record.__method__)) {
+      // An absent `methods` filter means every method, which an empty array deliberately does not.
+      // A record whose session was deleted carries no method, so it matches no explicit selection —
+      // it survives the unfiltered view and is excluded as soon as the filter narrows.
+      if (methods && (!record.__method__ || !methods.includes(record.__method__))) {
         return false;
       }
       // An absent `series` filter means every series, which is not an empty selection.

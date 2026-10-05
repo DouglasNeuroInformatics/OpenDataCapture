@@ -35,16 +35,32 @@ test.describe('instrument hub', () => {
     await expect(row).toContainText('2');
   });
 
-  test('should not list series instruments, which hold no records of their own', async ({
+  // A series' own counts are what it orchestrated, not its members' global totals, so the row is
+  // only meaningful once something has actually been collected through it.
+  test('should list a series with what it collected, and open it onto the instruments it is made of', async ({
+    api,
     isolatedGroupManager,
-    page
+    page,
+    uniqueId
   }) => {
-    await isolatedGroupManager();
+    const group = await isolatedGroupManager();
+    const seriesTitle = `Hub Series ${uniqueId}`;
+    const seriesId = await api.createSeries(group.id, seriesTitle);
+    const instrumentId = await api.findInstrumentIdByName(HAPPINESS);
+    const session = await api.createSession(group.id, { id: `series-${uniqueId}` });
+    await api.createRecord(group.id, instrumentId, session, HAPPINESS_RECORD, seriesId);
+
     const hubPage = new InstrumentHubPage(page);
     await hubPage.goto('/datahub/instruments');
 
-    await expect(hubPage.rows.first()).toBeVisible();
-    await expect(hubPage.rows).not.toContainText('SERIES');
+    const row = hubPage.row(seriesTitle).first();
+    await expect(row).toBeVisible();
+    await expect(row).toContainText('Series');
+
+    await hubPage.open(seriesTitle);
+    // The member list is the records' own instruments, so the instrument administered through the
+    // series is there even though the series itself holds no records under its own id.
+    await expect(page.getByTestId('instrument-hub-series-members')).toContainText('Happiness Questionnaire');
   });
 
   // Sorting is the only way to find an instrument in a long catalog without searching for it, so

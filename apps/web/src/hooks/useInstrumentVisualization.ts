@@ -11,9 +11,9 @@ import { mapValues, omit } from 'lodash-es';
 import { unparse } from 'papaparse';
 
 import { useInstrument } from '@/hooks/useInstrument';
+import { useInstrumentInfoById } from '@/hooks/useInstrumentInfoById';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
-import { useSeriesNames } from '@/hooks/useSeriesNames';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
 import { getEditionOptions } from '@/utils/instrument-editions';
@@ -100,7 +100,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   }, [params.instrumentId]);
 
   const instrument = useInstrument(instrumentId) as AnyUnilingualScalarInstrument;
-  const seriesNames = useSeriesNames();
+  const seriesInfoById = useInstrumentInfoById({ kind: 'SERIES' });
 
   const instrumentInfoQuery = useInstrumentInfoQuery({
     params: { allEditions: true, kind: params.kind, subjectId: params.subjectId }
@@ -278,7 +278,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
             __instrumentId__: record.instrumentId,
             __method__: record.session?.type ?? null,
             __seriesId__: seriesId,
-            __seriesName__: seriesId ? (seriesNames[seriesId] ?? null) : null,
+            __seriesName__: seriesId ? (seriesInfoById[seriesId]?.title ?? null) : null,
             __subjectId__: record.subjectId,
             __time__: record.date.getTime(),
             username: record.session?.user?.username ?? 'N/A',
@@ -300,7 +300,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         type: 'error'
       });
     }
-  }, [recordsQuery.data, seriesNames]);
+  }, [recordsQuery.data, seriesInfoById]);
 
   const instrumentOptions: { [key: string]: string } = useMemo(() => {
     // only show the latest edition of each instrument; older editions are selectable via editionOptions
