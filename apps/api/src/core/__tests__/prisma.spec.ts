@@ -25,8 +25,10 @@ vi.mock('@prisma/client', async (importOriginal) => ({
   }
 }));
 
-/** Only `getUri` is read from the replica set the factory starts. */
-const createReplSet = vi.hoisted(() => vi.fn<(options: unknown) => Promise<{ getUri: (db: string) => string }>>());
+/** Only `getUri` and `stop` are used on the replica set the factory starts. */
+const createReplSet = vi.hoisted(() =>
+  vi.fn<(options: unknown) => Promise<{ getUri: (db: string) => string; stop: () => Promise<boolean> }>>()
+);
 
 vi.mock('mongodb-memory-server', () => ({
   MongoMemoryReplSet: { create: createReplSet }
@@ -238,7 +240,8 @@ describe('PrismaModuleOptionsFactory', () => {
 
   it('should connect to a fresh in-memory replica set under test, so tests never touch a real database', async () => {
     createReplSet.mockResolvedValueOnce({
-      getUri: (db) => `mongodb://127.0.0.1:41234/${db}?replicaSet=rs0`
+      getUri: (db) => `mongodb://127.0.0.1:41234/${db}?replicaSet=rs0`,
+      stop: vi.fn()
     });
     await (await createFactory({ NODE_ENV: 'test' })).create();
     expect(createReplSet).toHaveBeenCalledExactlyOnceWith({ replSet: { count: 1, name: 'rs0' } });
@@ -267,6 +270,15 @@ describe('PrismaModuleOptionsFactory', () => {
     expect(prismaClient.$connect).toHaveBeenCalledOnce();
     expect(prismaClient.$runCommandRaw).toHaveBeenCalledWith(expect.objectContaining({ createIndexes: 'UserModel' }));
     expect(options).toStrictEqual({ client: prismaClient });
+  });
+
+  it('should stop the in-memory replica set on shutdown, so no mongod outlives the application', async () => {
+    const stop = vi.fn(() => Promise.resolve(true));
+    createReplSet.mockResolvedValueOnce({ getUri: (db) => `mongodb://127.0.0.1:41234/${db}`, stop });
+    const factory = await createFactory({ NODE_ENV: 'test' });
+    await factory.create();
+    await factory.onApplicationShutdown();
+    expect(stop).toHaveBeenCalledOnce();
   });
 
   it('should shut down cleanly when it started no in-memory replica set', async () => {
