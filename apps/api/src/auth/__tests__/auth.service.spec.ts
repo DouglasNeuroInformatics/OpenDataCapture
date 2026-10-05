@@ -2,7 +2,7 @@ import { CryptoService, LoggingService } from '@douglasneuroinformatics/libnest'
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -28,6 +28,7 @@ const BASE_PAYLOAD = {
 
 describe('AuthService', () => {
   let abilityFactory: AbilityFactory;
+  let auditLogger: MockedInstance<AuditLogger>;
   let authService: AuthService;
   let cryptoService: MockedInstance<CryptoService>;
   let jwtService: MockedInstance<JwtService>;
@@ -50,9 +51,10 @@ describe('AuthService', () => {
     jwtService.signAsync.mockResolvedValue('__TOKEN__');
     cryptoService = MockFactory.createMock(CryptoService);
     usersService = MockFactory.createMock(UsersService);
+    auditLogger = MockFactory.createMock(AuditLogger);
     authService = new AuthService(
       abilityFactory,
-      MockFactory.createMock(AuditLogger) as unknown as AuditLogger,
+      auditLogger as unknown as AuditLogger,
       cryptoService as unknown as CryptoService,
       jwtService as unknown as JwtService,
       usersService as unknown as UsersService
@@ -89,6 +91,63 @@ describe('AuthService', () => {
       usersService.findByUsername.mockResolvedValue(storedUser({ disabled: true }) as any);
       cryptoService.comparePassword.mockResolvedValue(true);
       await expect(authService.login(credentials)).rejects.toThrow('Account Disabled');
+    });
+
+    it('should answer an unknown username as invalid credentials, so a guess cannot reveal which usernames exist', async () => {
+      usersService.findByUsername.mockRejectedValue(new NotFoundException());
+      await expect(authService.login(credentials)).rejects.toThrow(new UnauthorizedException('Invalid Credentials'));
+    });
+
+    it('should let an unexpected lookup failure propagate rather than disguise it as bad credentials', async () => {
+      const failure = new Error('database unreachable');
+      usersService.findByUsername.mockRejectedValue(failure);
+      await expect(authService.login(credentials)).rejects.toBe(failure);
+    });
+
+    it('should return the signed token once the password is proven for an active account', async () => {
+      usersService.findByUsername.mockResolvedValue(storedUser({}) as any);
+      cryptoService.comparePassword.mockResolvedValue(true);
+      await expect(authService.login(credentials)).resolves.toStrictEqual({ accessToken: '__TOKEN__' });
+    });
+
+    it('should sign a login token carrying the permissions derived from the account, so the guard needs no lookup', async () => {
+      usersService.findByUsername.mockResolvedValue(storedUser({}) as any);
+      cryptoService.comparePassword.mockResolvedValue(true);
+      await authService.login(credentials);
+      expect(jwtService.signAsync.mock.lastCall?.[0]).toMatchObject({
+        id: 'user-1',
+        kind: 'login',
+        permissions: expect.arrayContaining([expect.objectContaining({ action: 'read', subject: 'Instrument' })]),
+        username: 'test-user'
+      });
+    });
+
+    it('should treat an account with no reset flag as not needing a reset, since older accounts never stored one', async () => {
+      usersService.findByUsername.mockResolvedValue(storedUser({}) as any);
+      cryptoService.comparePassword.mockResolvedValue(true);
+      await authService.login(credentials);
+      expect(jwtService.signAsync.mock.lastCall?.[0]).toMatchObject({ mustResetPassword: false });
+    });
+
+    it('should carry a pending password reset on the token, so the web client can force the reset', async () => {
+      usersService.findByUsername.mockResolvedValue({ ...storedUser({}), mustResetPassword: true } as any);
+      cryptoService.comparePassword.mockResolvedValue(true);
+      await authService.login(credentials);
+      expect(jwtService.signAsync.mock.lastCall?.[0]).toMatchObject({ mustResetPassword: true });
+    });
+
+    it('should record the login in the audit log under the user, outside any group', async () => {
+      usersService.findByUsername.mockResolvedValue(storedUser({}) as any);
+      cryptoService.comparePassword.mockResolvedValue(true);
+      await authService.login(credentials);
+      expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('LOGIN', 'USER', { groupId: null, userId: 'user-1' });
+    });
+
+    it('should not record a login in the audit log when the password is wrong', async () => {
+      usersService.findByUsername.mockResolvedValue(storedUser({}) as any);
+      cryptoService.comparePassword.mockResolvedValue(false);
+      await expect(authService.login(credentials)).rejects.toThrow(UnauthorizedException);
+      expect(auditLogger.log).not.toHaveBeenCalled();
     });
   });
 
