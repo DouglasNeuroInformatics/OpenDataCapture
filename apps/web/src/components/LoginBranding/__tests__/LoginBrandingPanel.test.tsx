@@ -1,3 +1,4 @@
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import type { BrandingConfig } from '@opendatacapture/schemas/setup';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -21,10 +22,14 @@ const renderPanel = (
 const panel = () => screen.getByTestId('login-branding-panel');
 const heading = () => screen.getByRole('heading', { level: 1 });
 const logoImage = () => screen.getByRole('img');
+const builtInLogo = () => panel().querySelector('svg[viewBox="0 0 320 259"]');
 const sectionTexts = () => [...panel().children[1]!.children].map((section) => section.textContent);
 
 describe('LoginBrandingPanel', () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    i18n.changeLanguage('en');
+  });
 
   describe('instance name', () => {
     it('should fall back to the product name, so an unbranded instance still has a heading', () => {
@@ -38,8 +43,9 @@ describe('LoginBrandingPanel', () => {
     });
 
     it('should show the name in the interface language when no language is passed', () => {
+      i18n.changeLanguage('fr');
       renderPanel({ instanceName: { en: 'Clinic', fr: 'Clinique' } });
-      expect(heading().textContent).toBe('Clinic');
+      expect(heading().textContent).toBe('Clinique');
     });
 
     it('should bold the name by default, so a heading stands out without configuration', () => {
@@ -153,12 +159,12 @@ describe('LoginBrandingPanel', () => {
   describe('logo', () => {
     it('should render the built-in logo when no custom logo is configured', () => {
       renderPanel();
-      expect(panel().querySelector('svg[viewBox="0 0 320 259"]')).not.toBeNull();
+      expect(builtInLogo()).not.toBeNull();
     });
 
     it('should hide the logo when it is turned off', () => {
       renderPanel({ showLogo: false });
-      expect(panel().querySelector('svg[viewBox="0 0 320 259"]')).toBeNull();
+      expect(builtInLogo()).toBeNull();
     });
 
     it('should render the uploaded logo, labelled with the instance name for screen readers', () => {
@@ -175,13 +181,14 @@ describe('LoginBrandingPanel', () => {
     it('should fall back to the built-in logo when the url source has no url, rather than the stale upload', () => {
       renderPanel({ customLogoSrc: UPLOADED_LOGO, logoSource: 'url' });
       expect(screen.queryByRole('img')).toBeNull();
+      expect(builtInLogo()).not.toBeNull();
     });
 
     it('should fall back to the built-in logo when the image fails to load, so a broken link shows no icon', () => {
       renderPanel({ customLogoSrc: UPLOADED_LOGO });
       fireEvent.error(logoImage());
       expect(screen.queryByRole('img')).toBeNull();
-      expect(panel().querySelector('svg[viewBox="0 0 320 259"]')).not.toBeNull();
+      expect(builtInLogo()).not.toBeNull();
     });
 
     it('should retry the image when its source changes after a failure, so fixing the url takes effect', () => {
@@ -277,9 +284,8 @@ describe('LoginBrandingPanel', () => {
       expect(helpLink().getAttribute('rel')).toBe('noopener noreferrer');
     });
 
-    it('should skip a link with no label, so an untitled link is never shown', () => {
+    it('should skip a link whose label is blank, so an untitled link is never shown', () => {
       renderPanel(branding);
-      expect(screen.queryByRole('link', { name: '' })).toBeNull();
       expect(panel().querySelector('a[href="https://blank.example.org"]')).toBeNull();
     });
 
