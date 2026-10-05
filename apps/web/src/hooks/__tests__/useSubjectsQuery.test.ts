@@ -44,14 +44,21 @@ describe('useSubjectsQuery', () => {
   });
 
   it('should key the cache on every filter, so a narrower list is not served for a broader one', () => {
-    expect(subjectsQueryOptions({ params: { groupId: 'group-1', hasRecord: true } }).queryKey).toStrictEqual([
-      'subjects',
-      'group-1',
-      true
-    ]);
+    expect(subjectsQueryOptions({ params: { groupId: 'group-1' } }).queryKey).not.toStrictEqual(
+      subjectsQueryOptions({ params: { groupId: 'group-1', hasRecord: true } }).queryKey
+    );
   });
 
-  it('should key the unfiltered list apart from any group, so it does not collide with a filtered one', () => {
-    expect(subjectsQueryOptions().queryKey).toStrictEqual(['subjects', undefined, undefined]);
+  it('should key the unfiltered list apart from a group, so the two lists do not collide', () => {
+    expect(subjectsQueryOptions().queryKey).not.toStrictEqual(
+      subjectsQueryOptions({ params: { groupId: 'group-1' } }).queryKey
+    );
+  });
+
+  it('should prefix every key with subjects, so invalidating subjects refreshes every filtered list', () => {
+    expect([
+      subjectsQueryOptions().queryKey[0],
+      subjectsQueryOptions({ params: { groupId: 'group-1' } }).queryKey[0]
+    ]).toStrictEqual(['subjects', 'subjects']);
   });
 });

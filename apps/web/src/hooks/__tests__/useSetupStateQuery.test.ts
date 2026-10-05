@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { setupStateQueryOptions, useSetupStateQuery } from '../useSetupStateQuery';
+import { SETUP_STATE_QUERY_KEY, setupStateQueryOptions, useSetupStateQuery } from '../useSetupStateQuery';
 
 const mockAxios = vi.hoisted(() => ({ get: vi.fn() }));
 
@@ -44,7 +44,18 @@ describe('useSetupStateQuery', () => {
     await expect(new QueryClient().fetchQuery(setupStateQueryOptions())).rejects.toThrow();
   });
 
-  it('should never consider the setup state stale, so it is refetched only when a save invalidates it', () => {
-    expect(setupStateQueryOptions().staleTime).toBe(Infinity);
+  it('should serve a later read from the cache, so the setup endpoint is not hit again', async () => {
+    const queryClient = new QueryClient();
+    await queryClient.fetchQuery(setupStateQueryOptions());
+    await queryClient.fetchQuery(setupStateQueryOptions());
+    expect(mockAxios.get).toHaveBeenCalledTimes(1);
+  });
+
+  it('should refetch once a save invalidates the setup state, so the app reads the new flags', async () => {
+    const queryClient = new QueryClient();
+    await queryClient.fetchQuery(setupStateQueryOptions());
+    await queryClient.invalidateQueries({ queryKey: [SETUP_STATE_QUERY_KEY] });
+    await queryClient.fetchQuery(setupStateQueryOptions());
+    expect(mockAxios.get).toHaveBeenCalledTimes(2);
   });
 });

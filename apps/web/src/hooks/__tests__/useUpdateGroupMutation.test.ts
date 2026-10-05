@@ -89,10 +89,12 @@ describe('useUpdateGroupMutation', () => {
     expect(addNotification).not.toHaveBeenCalled();
   });
 
-  it('should patch an undefined group id when no group is selected', async () => {
+  // Known defect: with no group selected the hook sends PATCH /v1/groups/undefined instead of
+  // failing. Drop `.fails` once the hook refuses the update.
+  it.fails('should refuse to patch when no group is selected, so no request reaches /v1/groups/undefined', async () => {
     store.currentGroup = null;
-    const { result } = renderUpdateMutation();
-    await result.current.mutateAsync({ name: 'Renamed' });
-    expect(mockAxios.patch).toHaveBeenCalledWith('/v1/groups/undefined', { name: 'Renamed' }, expect.anything());
+    const { result } = renderUpdateMutation({ throwOnError: false });
+    await expect(result.current.mutateAsync({ name: 'Renamed' })).rejects.toThrow();
+    expect(mockAxios.patch).not.toHaveBeenCalled();
   });
 });

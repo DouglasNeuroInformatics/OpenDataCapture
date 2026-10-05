@@ -43,6 +43,12 @@ describe('subjectCustomIdsQueryOptions', () => {
       subjectCustomIdsQueryOptions({ params: { groupId: 'group-2' } }).queryKey
     );
   });
+});
+
+describe('useSubjectCustomIdsQuery', () => {
+  beforeEach(() => {
+    get.mockReset();
+  });
 
   it("should suspend until the group's custom ids load, then return them to the form", async () => {
     get.mockResolvedValueOnce({ data: ['group$a'] });

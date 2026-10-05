@@ -49,6 +49,12 @@ describe('seriesInstrumentsOverviewQueryOptions', () => {
       seriesGroup: { name: 'Depression Clinic' }
     });
   });
+});
+
+describe('useSeriesInstrumentsOverviewQuery', () => {
+  beforeEach(() => {
+    get.mockReset();
+  });
 
   it('should suspend until the overview loads, then hand the parsed series to the page', async () => {
     get.mockResolvedValueOnce({ data: [series] });
