@@ -68,9 +68,9 @@ frontend shows — instruments and the apps' own forms alike. `apps/web/src/serv
 - A message written by the schema author always wins — both majors skip the error map entirely when
   an issue already carries one.
 
-Most tests live in `apps/web/src/__tests__/zod-error-maps.test.ts`, on the adapter side of the seam;
-`src/utils/__tests__/zodErrorMap.test.ts` covers only the cases the web suite does not reach. Both
-drive `createZodErrorMaps` through per-parse maps rather than registering globally.
+`src/utils/__tests__/zodErrorMap.test.ts` drives `createZodErrorMaps` through per-parse maps rather
+than registering globally. A case that depends on the reader switching language mid-session builds
+its maps over libui's real `i18n`; every other case uses a fixed-language translator.
 
 ## `@tanstack/react-router` is an optional peer — never import it
 
