@@ -2,7 +2,7 @@ import { cloneElement } from 'react';
 import type { ReactElement } from 'react';
 
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
-import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { LineGraph } from '../LineGraph';
@@ -57,6 +57,7 @@ describe('LineGraph', () => {
 
   afterEach(() => {
     cleanup();
+    vi.useRealTimers();
     window.localStorage.clear();
   });
 
@@ -109,13 +110,17 @@ describe('LineGraph', () => {
     expect(lineCurves(renderGraph([{ ...scoreLine, type: 'monotone' }]))[0]?.getAttribute('d')).toContain('C');
   });
 
-  // Recharts draws error bars only once the line animation has finished.
-  it('should draw error bars only for the lines given an error key', { timeout: 10_000 }, async () => {
+  // Recharts draws error bars only once the line animation, driven by requestAnimationFrame, has finished.
+  it('should draw error bars only for the lines given an error key', async () => {
+    vi.useFakeTimers({
+      toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance', 'setTimeout', 'clearTimeout', 'Date']
+    });
     const container = renderGraph([
       { ...scoreLine, err: 'scoreError' },
       { name: 'Error', val: 'scoreError' }
     ]);
-    await waitFor(() => expect(container.querySelectorAll('.recharts-errorBars')).toHaveLength(1), { timeout: 5000 });
+    await act(() => vi.advanceTimersByTimeAsync(2000));
+    expect(container.querySelectorAll('.recharts-errorBars')).toHaveLength(1);
     expect(container.querySelectorAll('.recharts-errorBar')).toHaveLength(data.length);
   });
 });
