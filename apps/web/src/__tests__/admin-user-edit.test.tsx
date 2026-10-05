@@ -149,7 +149,10 @@ beforeEach(() => {
   mocks.state.user = mocks.makeUser();
 });
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe('admin user route', () => {
   it('should prefetch the groups and the user in the loader, so the editor renders without a waterfall', async () => {
@@ -405,6 +408,16 @@ describe('admin user route', () => {
       expect(mocks.formMounted).toHaveBeenCalledOnce();
       await submit();
       expect(mocks.formMounted).toHaveBeenCalledTimes(2);
+    });
+
+    it('should reset unsaved edits when the admin opens another user, so they are not saved against the wrong account', () => {
+      const { rerender } = renderPage();
+      act(() => editorProps().onDraftsChange([{ action: 'create' }]));
+      vi.mocked(Route.useParams).mockReturnValue({ userId: 'user-2' });
+      mocks.state.user = { ...mocks.makeUser(), groupIds: ['group-2'], id: 'user-2', username: 'john.roe' };
+      const Component = Route.options.component!;
+      rerender(<Component />);
+      expect(editorProps().drafts).toEqual([{ scope: 'group-2' }]);
     });
 
     it('should clear an earlier error once a save goes through', async () => {
