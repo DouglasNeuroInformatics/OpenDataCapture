@@ -8,20 +8,42 @@ import '@/routes/_app/group/remote-assignments';
 import '@/services/i18n';
 
 /** The parts of the route options under test, typed by what this file passes to them. */
+type LoaderContext = { context: { queryClient: { ensureQueryData: (options: object) => Promise<unknown> } } };
+
 type CapturedRouteOptions = {
+  beforeLoad: (ctx: LoaderContext) => Promise<void>;
   component: FC;
-  loader: (ctx: { context: { queryClient: { ensureQueryData: (options: object) => Promise<unknown> } } }) => void;
+  loader: (ctx: LoaderContext) => void;
   validateSearch: (search: { [key: string]: unknown }) => { mode?: string };
 };
 
-const mocks = vi.hoisted(() => ({
-  BulkRemoteAssignmentWizard: vi.fn((_props: object) => <div data-testid="bulk-wizard" />),
-  DeleteRemoteAssignments: vi.fn((_props: object) => <div data-testid="delete-assignments" />),
-  instrumentInfo: undefined as undefined | { details: { title: string }; id: string; kind: 'FORM' }[],
-  route: {} as CapturedRouteOptions,
-  search: {},
-  store: { currentGroup: null as Group | null }
-}));
+type MockState = {
+  config: { setup: { isGatewayEnabled: boolean } };
+  instrumentInfo: undefined | { details: { title: string }; id: string; kind: 'FORM' }[];
+  route: CapturedRouteOptions;
+  search: { mode?: string };
+  store: { currentGroup: Group | null };
+};
+
+const mocks = vi.hoisted(() => {
+  const state: MockState = {
+    config: { setup: { isGatewayEnabled: true } },
+    instrumentInfo: undefined,
+    route: {
+      beforeLoad: () => Promise.resolve(),
+      component: () => null,
+      loader: () => undefined,
+      validateSearch: () => ({})
+    },
+    search: {},
+    store: { currentGroup: null }
+  };
+  return {
+    ...state,
+    BulkRemoteAssignmentWizard: vi.fn((_props: object) => <div data-testid="bulk-wizard" />),
+    DeleteRemoteAssignments: vi.fn((_props: object) => <div data-testid="delete-assignments" />)
+  };
+});
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
@@ -30,7 +52,7 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
     return { options, useSearch: () => mocks.search };
   }
 }));
-vi.mock('@/config', () => ({ config: { setup: { isGatewayEnabled: true } } }));
+vi.mock('@/config', () => ({ config: mocks.config }));
 vi.mock('@/components/BulkRemoteAssignmentWizard', () => ({
   BulkRemoteAssignmentWizard: mocks.BulkRemoteAssignmentWizard
 }));
@@ -77,6 +99,7 @@ const runLoader = (ensureQueryData: (options: object) => Promise<unknown>) => {
 
 beforeEach(() => {
   vi.useFakeTimers({ now: new Date('2026-01-01T00:00:00Z'), toFake: ['Date'] });
+  mocks.config.setup.isGatewayEnabled = true;
   mocks.instrumentInfo = undefined;
   mocks.search = {};
   mocks.store.currentGroup = createGroup();
@@ -196,11 +219,38 @@ describe('RemoteAssignmentsPage', () => {
   });
 });
 
+describe('beforeLoad', () => {
+  const runGuard = (setupState: { isBulkRemoteAssignmentsEnabled: boolean }) =>
+    mocks.route.beforeLoad({ context: { queryClient: { ensureQueryData: () => Promise.resolve(setupState) } } });
+
+  it('should redirect to the dashboard when the gateway is not deployed', async () => {
+    mocks.config.setup.isGatewayEnabled = false;
+    await expect(runGuard({ isBulkRemoteAssignmentsEnabled: true })).rejects.toMatchObject({
+      options: { to: '/dashboard' }
+    });
+  });
+
+  it('should redirect to the dashboard when an administrator has turned bulk assignments off', async () => {
+    await expect(runGuard({ isBulkRemoteAssignmentsEnabled: false })).rejects.toMatchObject({
+      options: { to: '/dashboard' }
+    });
+  });
+
+  it('should allow the page when the gateway is deployed and bulk assignments are on', async () => {
+    await expect(runGuard({ isBulkRemoteAssignmentsEnabled: true })).resolves.toBeUndefined();
+  });
+});
+
 describe('loader', () => {
-  it('should prefetch the subjects of the current group', () => {
+  it('should prefetch the setup state, so the wizard has its default expiry ready', () => {
     const ensureQueryData = vi.fn(() => Promise.resolve());
     runLoader(ensureQueryData);
     expect(ensureQueryData).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['setup-state'] }));
+  });
+
+  it('should prefetch the subjects of the current group', () => {
+    const ensureQueryData = vi.fn(() => Promise.resolve());
+    runLoader(ensureQueryData);
     expect(ensureQueryData).toHaveBeenCalledWith(
       expect.objectContaining({ queryKey: ['subjects', 'group-1', undefined] })
     );

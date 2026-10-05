@@ -8,12 +8,20 @@ import '@/services/i18n';
 
 type InstrumentInfoStub = { details: { title: string }; id: string; kind: 'FORM' };
 
-const mocks = vi.hoisted(() => ({
-  instrumentInfo: undefined as InstrumentInfoStub[] | undefined,
-  navigate: vi.fn(),
-  route: {} as { component: FC },
-  store: { currentGroup: null as null | { accessibleInstrumentIds: string[] } }
-}));
+type MockState = {
+  instrumentInfo: InstrumentInfoStub[] | undefined;
+  route: { component: FC };
+  store: { currentGroup: null | { accessibleInstrumentIds: string[] } };
+};
+
+const mocks = vi.hoisted(() => {
+  const state: MockState = {
+    instrumentInfo: undefined,
+    route: { component: () => null },
+    store: { currentGroup: null }
+  };
+  return { ...state, navigate: vi.fn() };
+});
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),

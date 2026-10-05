@@ -255,8 +255,9 @@ describe('submitting a result', () => {
   it('should refuse to upload a file group the server offers no urls for', async () => {
     mocks.axios.get.mockResolvedValue({ data: { scans: null } });
     await expect(submit(createFileContext({ scans: [scanA] }))).rejects.toThrow(
-      "Files to upload (1) for file group with basename 'scans' exceeds available presigned URLs (undefined)"
+      /basename 'scans' exceeds available presigned URLs/
     );
+    expect(mocks.axios.put).not.toHaveBeenCalled();
   });
 
   it('should check every file group before uploading, so one the instrument lacks does not mask an oversized one', async () => {

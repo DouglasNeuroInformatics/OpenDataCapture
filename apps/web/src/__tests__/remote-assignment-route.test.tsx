@@ -10,16 +10,20 @@ import '@/services/i18n';
 
 type InstrumentInfoStub = { details: { title: string }; id: string; kind: 'FORM'; supportedLanguages: string[] };
 
+type CapturedRouteOptions = { beforeLoad: () => void; component: FC };
+
 type MockState = {
+  config: { setup: { isGatewayEnabled: boolean } };
   instrumentInfo: InstrumentInfoStub[] | undefined;
-  route: { component: FC };
+  route: CapturedRouteOptions;
   store: { currentGroup: null | { accessibleInstrumentIds: string[]; id: string }; currentSession: null | Session };
 };
 
 const mocks = vi.hoisted(() => {
   const state: MockState = {
+    config: { setup: { isGatewayEnabled: true } },
     instrumentInfo: undefined,
-    route: { component: () => null },
+    route: { beforeLoad: () => undefined, component: () => null },
     store: { currentGroup: null, currentSession: null }
   };
   return {
@@ -33,13 +37,13 @@ const mocks = vi.hoisted(() => {
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
-  createFileRoute: () => (options: { component: FC }) => {
+  createFileRoute: () => (options: CapturedRouteOptions) => {
     mocks.route = options;
     return { options };
   },
   useNavigate: () => mocks.navigate
 }));
-vi.mock('@/config', () => ({ config: { setup: { isGatewayEnabled: true } } }));
+vi.mock('@/config', () => ({ config: mocks.config }));
 vi.mock('@/components/AssignmentEmailForm', () => ({ AssignmentEmailForm: mocks.AssignmentEmailForm }));
 vi.mock('@/components/QRCode', () => ({ QRCode: mocks.QRCode }));
 vi.mock('@/components/InstrumentShowcase', () => ({
@@ -121,6 +125,7 @@ const createAssignment = async () => {
 
 beforeEach(() => {
   vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+  mocks.config.setup.isGatewayEnabled = true;
   mocks.instrumentInfo = [allowed, { ...allowed, details: { title: 'Excluded' }, id: 'instrument-2' }];
   mocks.store.currentGroup = { accessibleInstrumentIds: ['instrument-1'], id: 'group-1' };
   mocks.store.currentSession = session;
@@ -226,5 +231,18 @@ describe('RemoteAssignmentPage', () => {
     await createAssignment();
     fireEvent.click(screen.getByText('Close', { ignore: '.sr-only', selector: 'button' }));
     await waitFor(() => expect(screen.queryByRole('link', { name: 'Assignment Link' })).toBeNull());
+  });
+});
+
+describe('beforeLoad', () => {
+  it('should redirect to the dashboard when the gateway is not deployed', () => {
+    mocks.config.setup.isGatewayEnabled = false;
+    expect(() => mocks.route.beforeLoad()).toThrow(
+      expect.objectContaining({ options: expect.objectContaining({ to: '/dashboard' }) })
+    );
+  });
+
+  it('should allow the page when the gateway is deployed', () => {
+    expect(() => mocks.route.beforeLoad()).not.toThrow();
   });
 });

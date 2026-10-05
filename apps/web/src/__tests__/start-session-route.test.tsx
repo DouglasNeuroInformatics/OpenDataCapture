@@ -190,17 +190,22 @@ describe('StartSessionPage', () => {
     expect(screen.getByText('Session Successfully Started')).toBeTruthy();
   });
 
-  it('should reset the initial values to the defaults once the session ends, not keep those the walkthrough supplied', () => {
-    mocks.locationState = { initialValues: { subjectId: 'DEMO' } };
-    mocks.store.currentSession = session;
-    const { rerender } = render(<StartSessionPage />);
-    mocks.store.currentSession = null;
-    rerender(<StartSessionPage />);
-    expect(formProps().initialValues).toEqual({
-      sessionType: 'IN_PERSON',
-      subjectIdentificationMethod: 'PERSONAL_INFO'
-    });
-  });
+  // Known defect: the reset effect runs only after the remounted form has already read the walkthrough values.
+  it.fails(
+    'should mount the form with the defaults once the session ends, not the values the walkthrough supplied',
+    () => {
+      mocks.locationState = { initialValues: { subjectId: 'DEMO' } };
+      mocks.store.currentSession = session;
+      const { rerender } = render(<StartSessionPage />);
+      const callsBeforeSessionEnds = mocks.StartSessionForm.mock.calls.length;
+      mocks.store.currentSession = null;
+      rerender(<StartSessionPage />);
+      expect(mocks.StartSessionForm.mock.calls[callsBeforeSessionEnds]![0].initialValues).toEqual({
+        sessionType: 'IN_PERSON',
+        subjectIdentificationMethod: 'PERSONAL_INFO'
+      });
+    }
+  );
 });
 
 describe('loader', () => {
