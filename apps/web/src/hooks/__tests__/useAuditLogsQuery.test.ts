@@ -1,9 +1,13 @@
+import type { PropsWithChildren } from 'react';
+import { createElement } from 'react';
+
 import { AUDIT_LOGS_MAX_PAGE_SIZE, AUDIT_LOGS_PAGE_SIZE } from '@opendatacapture/schemas/audit';
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { auditLogsQueryOptions, fetchAllAuditLogs } from '../useAuditLogsQuery';
+import { auditLogsQueryOptions, fetchAllAuditLogs, useAuditLogsQuery } from '../useAuditLogsQuery';
 
 vi.mock('axios');
 
@@ -51,6 +55,34 @@ describe('auditLogsQueryOptions', () => {
     const first = auditLogsQueryOptions({ params: { page: 1 } }).queryKey;
     const second = auditLogsQueryOptions({ params: { page: 2 } }).queryKey;
     expect(first).not.toStrictEqual(second);
+  });
+});
+
+describe('useAuditLogsQuery', () => {
+  const renderAuditLogsQuery = (options?: Parameters<typeof useAuditLogsQuery>[0]) => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const wrapper = ({ children }: PropsWithChildren) =>
+      createElement(QueryClientProvider, { children, client: queryClient });
+    return renderHook(() => useAuditLogsQuery(options), { wrapper });
+  };
+
+  beforeEach(() => {
+    get.mockReset();
+  });
+
+  it('should load the first page of every log when called without filters', async () => {
+    get.mockResolvedValueOnce(page([log('a')], 1, 1));
+    const { result } = renderAuditLogsQuery();
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(get).toHaveBeenCalledWith('/v1/audit/logs', { params: { limit: AUDIT_LOGS_PAGE_SIZE } });
+    expect(result.current.data?.data.map(({ id }) => id)).toStrictEqual(['a']);
+  });
+
+  it('should request the page the caller asks for', async () => {
+    get.mockResolvedValueOnce(page([], 2, 0));
+    const { result } = renderAuditLogsQuery({ params: { page: 2 } });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(get).toHaveBeenCalledWith('/v1/audit/logs', { params: { limit: AUDIT_LOGS_PAGE_SIZE, page: 2 } });
   });
 });
 

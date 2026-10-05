@@ -102,6 +102,76 @@ describe('useBulkAssignmentWizard', () => {
     expect(result.current.failure).toEqual(refusal);
   });
 
+  it('should move to review with no refusal when preflight passes', () => {
+    mocks.preflightMutate.mockImplementation((_payload: unknown, { onSuccess }: any) => onSuccess());
+    const { result } = renderWizard();
+    act(() => result.current.selectSubjects(['alice']));
+    act(() => result.current.confirmTimepoints());
+    expect(result.current.step).toBe('REVIEW');
+    expect(result.current.failure).toBeNull();
+  });
+
+  it('should still reach review when preflight fails without a refusal, rather than strand the user', () => {
+    mocks.preflightMutate.mockImplementation((_payload: unknown, { onError }: any) => onError(new Error('offline')));
+    const { result } = renderWizard();
+    act(() => result.current.confirmTimepoints());
+    expect(result.current.step).toBe('REVIEW');
+    expect(result.current.failure).toBeNull();
+  });
+
+  it('should keep a refused submission on the review step, so the user can see what to fix', () => {
+    const refusal = { code: 'BULK_ASSIGNMENT_REFUSED', issues: [{ kind: 'SUBJECT_UNAVAILABLE', subjectIds: ['a'] }] };
+    mocks.createMutate.mockImplementation((_payload: unknown, { onError }: any) => onError({ refusal }));
+    const { result } = renderWizard();
+    act(() => result.current.submit({ allowDuplicates: false }));
+    expect(result.current.failure).toEqual(refusal);
+    expect(result.current.transportError).toBe(false);
+  });
+
+  it('should fall back to the identifier for a subject whose supplied row is blank', () => {
+    const { result } = renderWizard();
+    act(() => result.current.resolveMapping(['alice-id', 'bob-id'], [{ subjectId: '' }]));
+    expect(result.current.describeSubject('alice-id')).toBe('alice-id');
+    expect(result.current.describeSubject('bob-id')).toBe('bob-id');
+  });
+
+  it('should truncate a fallback identifier to the configured display length', () => {
+    const { result } = renderWizard();
+    expect(result.current.describeSubject('a-very-long-subject-id')).toBe('a-very-lo');
+  });
+
+  it('should drop uploaded rows when subjects are then picked by hand, since they no longer line up', () => {
+    const { result } = renderWizard();
+    act(() => result.current.resolveMapping(['alice-id'], [{ subjectId: 'alice' }]));
+    act(() => result.current.selectSubjects(['alice-id']));
+    expect(result.current.describeSubject('alice-id')).toBe('alice-id');
+  });
+
+  it('should name each result by its instrument title and the row the user supplied', () => {
+    const created = [
+      {
+        expiresAt: new Date('2030-01-01T00:00:00.000Z'),
+        instrumentId: 'instrument-1',
+        subjectId: 'alice-id',
+        url: 'http://link'
+      }
+    ];
+    mocks.createMutate.mockImplementation((_payload: unknown, { onSuccess }: any) => onSuccess(created));
+    const { result } = renderWizard();
+    act(() => result.current.resolveMapping(['alice-id'], [{ subjectId: 'alice' }]));
+    act(() => result.current.submit({ allowDuplicates: false }));
+    expect(result.current.resultRows()).toEqual([
+      expect.objectContaining({ instrument: 'Happiness Questionnaire', subjectId: 'alice', url: 'http://link' })
+    ]);
+  });
+
+  it('should let a hand selection be edited in place without leaving the step', () => {
+    const { result } = renderWizard();
+    act(() => result.current.setSelectedSubjectIds(['alice']));
+    expect(result.current.subjectIds).toEqual(['alice']);
+    expect(result.current.step).toBe('SOURCE');
+  });
+
   it('should report a transport failure rather than dressing it up as a refusal', () => {
     mocks.createMutate.mockImplementation((_payload: unknown, { onError }: any) => onError(new Error('offline')));
     const { result } = renderWizard();
@@ -148,5 +218,13 @@ describe('useBulkAssignmentWizard', () => {
     await act(() => result.current.copyLinks());
     expect(mocks.writeText).toHaveBeenCalled();
     expect(result.current.didCopy).toBe(true);
+  });
+
+  it('should clear the copied confirmation, so a later copy can be acknowledged again', async () => {
+    mocks.writeText.mockResolvedValue(undefined);
+    const { result } = renderWizard();
+    await act(() => result.current.copyLinks());
+    act(() => result.current.clearCopied());
+    expect(result.current.didCopy).toBe(false);
   });
 });
