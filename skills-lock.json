@@ -91,6 +91,12 @@
       "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
       "computedHash": "66e8a50c83c3c724fcfe0769701b665c56cec220cc4f49cc1aee8bdfc07de94a"
     },
+    "interview": {
+      "source": "joshunrau/skills",
+      "sourceType": "github",
+      "skillPath": "skills/interview/SKILL.md",
+      "computedHash": "8c4282946c760be30b49f1fbf5645bb0aedac285e6cac5c8f9e8c8b68f35a422"
+    },
     "loop-me": {
       "source": "mattpocock/skills",
       "sourceType": "github",
