@@ -21,7 +21,7 @@
     "force-reinstall": "pnpm clean && pnpm install",
     "format": "turbo run format",
     "generate:env": "./scripts/generate-env.sh",
-    "knip": "knip",
+    "knip": "NODE_ENV=development env-cmd knip",
     "lint": "turbo run lint lint:root",
     "lint:root": "tsc --noEmit && eslint --fix commitlint.config.ts knip.ts scripts vitest.config.ts",
     "postinstall": "turbo telemetry disable",
