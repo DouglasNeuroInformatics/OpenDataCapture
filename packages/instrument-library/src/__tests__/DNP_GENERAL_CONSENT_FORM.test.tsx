@@ -29,6 +29,7 @@ describe('DNP_GENERAL_CONSENT_FORM', () => {
   });
 
   it('should accept either answer to the consent question, so declining is recorded too', () => {
+    expect(instrument.validationSchema.safeParse({ consent: true }).success).toBe(true);
     expect(instrument.validationSchema.safeParse({ consent: false }).success).toBe(true);
   });
 

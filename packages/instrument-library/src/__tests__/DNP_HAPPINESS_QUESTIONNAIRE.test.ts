@@ -40,6 +40,10 @@ describe('DNP_HAPPINESS_QUESTIONNAIRE', () => {
   });
 
   describe('causesOfDissatisfaction', () => {
+    it('should stay hidden until the subject has answered whether they are satisfied', () => {
+      expect(getDynamicField('causesOfDissatisfaction').render({})).toBeNull();
+    });
+
     it('should stay hidden for a satisfied subject, who has no causes to list', () => {
       expect(getDynamicField('causesOfDissatisfaction').render({ isSatisfiedOverall: true })).toBeNull();
     });

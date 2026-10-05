@@ -28,7 +28,7 @@ describe('DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE', () => {
       expect(getStringField('gender').options.fr).toEqual({ female: 'Femme', male: 'Homme', nonBinary: 'Non-binaire' });
     });
 
-    it('should offer exactly the values the schema accepts, so every selectable option validates', () => {
+    it('should accept every offered marital status, so no selectable option fails validation', () => {
       for (const key of Object.keys(getStringField('maritalStatus').options.en)) {
         expect(instrument.validationSchema.safeParse({ maritalStatus: key }).success).toBe(true);
       }
