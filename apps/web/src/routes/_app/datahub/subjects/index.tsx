@@ -49,14 +49,7 @@ type HasSearchStringFilter = {
 
 /** A named window over the collection date, or an explicit one the user typed */
 type CollectedPreset =
-  | 'all'
-  | 'custom'
-  | 'pastMonth'
-  | 'pastSixMonths'
-  | 'pastThreeMonths'
-  | 'pastTwoYears'
-  | 'pastWeek'
-  | 'pastYear';
+  'all' | 'custom' | 'pastMonth' | 'pastSixMonths' | 'pastThreeMonths' | 'pastTwoYears' | 'pastWeek' | 'pastYear';
 
 type CollectedFilter = {
   max: Date | null;
@@ -111,7 +104,7 @@ const Filters: React.FC<{
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger asChild>
         <Button
-          className="flex items-center justify-between gap-2"
+          className="flex grow items-center justify-between gap-2 md:grow-0"
           data-testid="datahub-filters-trigger"
           variant="outline"
         >
@@ -167,7 +160,7 @@ const Filters: React.FC<{
         </DropdownMenu.Group>
         <DropdownMenu.Label>{t('core.identificationData.dateOfBirth.label')}</DropdownMenu.Label>
         <DropdownMenu.Group>
-          <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
+          <div className="relative flex items-center justify-between gap-1 rounded-xs px-2 pt-1.5 pb-1 text-sm transition-colors">
             <span className="pb-1">{t({ en: 'Min:', es: 'Mín.:', fr: 'Min :' })}</span>
             <input
               className="bg-popover text-foreground pointer-events-auto rounded-sm border-b pb-0.5"
@@ -183,7 +176,7 @@ const Filters: React.FC<{
               }}
             />
           </div>
-          <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
+          <div className="relative flex items-center justify-between gap-1 rounded-xs px-2 pt-1.5 pb-1 text-sm transition-colors">
             <span className="pb-1">{t({ en: 'Max:', es: 'Máx.:', fr: 'Max :' })}</span>
             <input
               className="bg-popover text-foreground pointer-events-auto rounded-sm border-b pb-0.5"
@@ -219,7 +212,7 @@ const Filters: React.FC<{
           {/* A minimum of one is what the old "with records only" checkbox meant, so the two
               controls collapsed into this one rather than sitting beside each other saying
               nearly the same thing. */}
-          <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
+          <div className="relative flex items-center justify-between gap-1 rounded-xs px-2 pt-1.5 pb-1 text-sm transition-colors">
             <span className="pb-1">{t({ en: 'At least:', es: 'Al menos:', fr: 'Au moins :' })}</span>
             <input
               className="bg-popover text-foreground pointer-events-auto w-16 rounded-sm border-b pb-0.5"
@@ -233,7 +226,7 @@ const Filters: React.FC<{
               onChange={(event) => setMinRecords(event.target.value)}
             />
           </div>
-          <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
+          <div className="relative flex items-center justify-between gap-1 rounded-xs px-2 pt-1.5 pb-1 text-sm transition-colors">
             <span className="pb-1">{t({ en: 'Collected:', es: 'Recopilado:', fr: 'Collecté :' })}</span>
             {/* A native select renders with the user agent's own white background, which reads as a
                 bright block in dark mode — so it carries the popover surface tokens explicitly, and
@@ -244,16 +237,13 @@ const Filters: React.FC<{
               value={collectedFilter.preset}
               onChange={(event) => {
                 const preset = event.target.value as CollectedPreset;
-                collectedColumn.setFilterValue(
-                  (prevValue: CollectedFilter): CollectedFilter => ({
-                    // A preset owns both bounds; only `custom` leaves them to the user, and it
-                    // starts from whatever window the preset had so the dates are a nudge, not blank.
-                    max: preset === 'custom' ? prevValue.max : null,
-                    min:
-                      preset === 'custom' ? (prevValue.min ?? presetMinDate(prevValue.preset)) : presetMinDate(preset),
-                    preset
-                  })
-                );
+                collectedColumn.setFilterValue((prevValue: CollectedFilter): CollectedFilter => ({
+                  // A preset owns both bounds; only `custom` leaves them to the user, and it
+                  // starts from whatever window the preset had so the dates are a nudge, not blank.
+                  max: preset === 'custom' ? prevValue.max : null,
+                  min: preset === 'custom' ? (prevValue.min ?? presetMinDate(prevValue.preset)) : presetMinDate(preset),
+                  preset
+                }));
               }}
             >
               <option value="all">{t({ en: 'Any time', es: 'Cualquier fecha', fr: 'Toute période' })}</option>
@@ -268,7 +258,7 @@ const Filters: React.FC<{
           </div>
           {collectedFilter.preset === 'custom' && (
             <React.Fragment>
-              <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
+              <div className="relative flex items-center justify-between gap-1 rounded-xs px-2 pt-1.5 pb-1 text-sm transition-colors">
                 <span className="pb-1">{t({ en: 'Min:', es: 'Mín.:', fr: 'Min :' })}</span>
                 <input
                   className="bg-popover text-foreground pointer-events-auto rounded-sm border-b pb-0.5"
@@ -276,13 +266,14 @@ const Filters: React.FC<{
                   type="date"
                   value={collectedFilter.min ? toBasicISOString(collectedFilter.min) : ''}
                   onChange={(event) => {
-                    collectedColumn.setFilterValue(
-                      (prevValue: CollectedFilter): CollectedFilter => ({ ...prevValue, min: event.target.valueAsDate })
-                    );
+                    collectedColumn.setFilterValue((prevValue: CollectedFilter): CollectedFilter => ({
+                      ...prevValue,
+                      min: event.target.valueAsDate
+                    }));
                   }}
                 />
               </div>
-              <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
+              <div className="relative flex items-center justify-between gap-1 rounded-xs px-2 pt-1.5 pb-1 text-sm transition-colors">
                 <span className="pb-1">{t({ en: 'Max:', es: 'Máx.:', fr: 'Max :' })}</span>
                 <input
                   className="bg-popover text-foreground pointer-events-auto rounded-sm border-b pb-0.5"
@@ -290,9 +281,10 @@ const Filters: React.FC<{
                   type="date"
                   value={collectedFilter.max ? toBasicISOString(collectedFilter.max) : ''}
                   onChange={(event) => {
-                    collectedColumn.setFilterValue(
-                      (prevValue: CollectedFilter): CollectedFilter => ({ ...prevValue, max: event.target.valueAsDate })
-                    );
+                    collectedColumn.setFilterValue((prevValue: CollectedFilter): CollectedFilter => ({
+                      ...prevValue,
+                      max: event.target.valueAsDate
+                    }));
                   }}
                 />
               </div>
@@ -414,11 +406,11 @@ const Toggles: React.FC<{
   };
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-wrap gap-3 md:flex-nowrap">
       <Dialog open={isLookupOpen} onOpenChange={setIsLookupOpen}>
         <Dialog.Trigger asChild>
           <Button
-            className="gap-2"
+            className="grow gap-2 md:grow-0"
             data-spotlight-type="subject-lookup-search-button"
             data-testid="subject-lookup-search-button"
             id="subject-lookup-search-button"
@@ -651,12 +643,10 @@ const MasterDataTable: React.FC<{
         onSearchChange={(value, table) => {
           setSearchString(value);
           const subjectIdColumn = table.getColumn('subjectId')!;
-          subjectIdColumn.setFilterValue(
-            (prevValue: HasSearchStringFilter): HasSearchStringFilter => ({
-              ...prevValue,
-              searchString: value
-            })
-          );
+          subjectIdColumn.setFilterValue((prevValue: HasSearchStringFilter): HasSearchStringFilter => ({
+            ...prevValue,
+            searchString: value
+          }));
         }}
       />
     </SearchSubmitGuard>

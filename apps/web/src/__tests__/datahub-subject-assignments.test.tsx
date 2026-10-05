@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AssignmentEmailFormProps } from '@/components/AssignmentEmailForm';
-import { Route } from '@/routes/_app/datahub/$subjectId/assignments';
+import { Route } from '@/routes/_app/datahub/subjects/$subjectId/assignments';
 
 import '@/services/i18n';
 

@@ -1,10 +1,10 @@
-import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
+import type { InstrumentRecordsExport, SubjectRecordSummary } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { pack } from 'msgpackr/pack';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Route } from '@/routes/_app/datahub/index';
+import { Route } from '@/routes/_app/datahub/subjects/index';
 
 import '@/services/i18n';
 
@@ -29,9 +29,10 @@ const mocks = vi.hoisted(() => ({
     currentGroup: null as null | StoreGroup,
     currentUser: { username: 'jdoe' }
   },
+  subjectRecordSummaryQueryOptions: vi.fn((options: object) => ({ options, queryKey: ['subject-record-summary'] })),
   subjects: [] as Subject[],
   subjectsQueryOptions: vi.fn((options: object) => ({ options, queryKey: ['subjects'] })),
-  subjectsWithRecords: [] as Subject[]
+  summaries: [] as SubjectRecordSummary[]
 }));
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
@@ -52,9 +53,11 @@ vi.mock('@/components/IdentificationForm', () => ({
 }));
 vi.mock('@/hooks/useSubjectsQuery', () => ({
   subjectsQueryOptions: mocks.subjectsQueryOptions,
-  useSubjectsQuery: ({ params }: { params: { hasRecord?: boolean } }) => ({
-    data: params.hasRecord ? mocks.subjectsWithRecords : mocks.subjects
-  })
+  useSubjectsQuery: () => ({ data: mocks.subjects })
+}));
+vi.mock('@/hooks/useSubjectRecordSummaryQuery', () => ({
+  subjectRecordSummaryQueryOptions: mocks.subjectRecordSummaryQueryOptions,
+  useSubjectRecordSummaryQuery: () => ({ data: mocks.summaries })
 }));
 vi.mock('@/store', () => ({
   useAppStore: Object.assign((selector: (store: typeof mocks.store) => unknown) => selector(mocks.store), {
@@ -139,7 +142,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.store.currentGroup = { id: 'group-1', settings: {} };
   mocks.subjects = [ALICE, BOB, CAROL];
-  mocks.subjectsWithRecords = [BOB];
+  // Only Bob has records, so a minimum of one narrows the list to him alone.
+  mocks.summaries = [{ lastCollectedAt: new Date('2026-01-01'), recordCount: 2, subjectId: BOB.id }];
   vi.spyOn(Route, 'useNavigate').mockReturnValue(mocks.navigate);
 });
 
@@ -157,6 +161,18 @@ describe('data hub route', () => {
     await loader({ context: { queryClient: { ensureQueryData } } });
     expect(mocks.subjectsQueryOptions).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
     expect(ensureQueryData).toHaveBeenCalledWith(mocks.subjectsQueryOptions.mock.results[0]!.value);
+  });
+
+  // The record counts and collection dates are columns of the first paint, so the summary is
+  // prefetched beside the subjects rather than suspending the table a second time.
+  it('should prefetch the per-subject record summary alongside the subjects', async () => {
+    const loader = Route.options.loader as (opts: {
+      context: { queryClient: { ensureQueryData: (options: unknown) => Promise<unknown> } };
+    }) => Promise<void>;
+    const ensureQueryData = vi.fn().mockResolvedValue([]);
+    await loader({ context: { queryClient: { ensureQueryData } } });
+    expect(mocks.subjectRecordSummaryQueryOptions).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
+    expect(ensureQueryData).toHaveBeenCalledWith(mocks.subjectRecordSummaryQueryOptions.mock.results[0]!.value);
   });
 
   it('should open the subject table when a row is double-clicked', () => {
@@ -270,11 +286,29 @@ describe('data hub filters', () => {
     expect(listedSubjects()).toEqual(['alice-123', 'bob']);
   });
 
-  it('should list only subjects with records when that option is checked', () => {
+  // A minimum of one is what the old "with records only" checkbox meant. The count comes from the
+  // per-subject summary already loaded for the column, so the filter never refetches.
+  it('should list only subjects holding at least the minimum number of records', () => {
     renderDataHub();
     openFilters();
-    fireEvent.click(screen.getByTestId('datahub-filter-has-records'));
+    fireEvent.change(screen.getByTestId('datahub-filter-min-records'), { target: { value: '1' } });
     expect(listedSubjects()).toEqual(['bob']);
+  });
+
+  it('should list every subject again when the minimum record count is cleared', () => {
+    renderDataHub();
+    openFilters();
+    const minRecords = screen.getByTestId('datahub-filter-min-records');
+    fireEvent.change(minRecords, { target: { value: '1' } });
+    fireEvent.change(minRecords, { target: { value: '' } });
+    expect(listedSubjects()).toEqual(['alice-123', 'bob', 'carol']);
+  });
+
+  it('should exclude a subject whose record count falls short of the minimum', () => {
+    renderDataHub();
+    openFilters();
+    fireEvent.change(screen.getByTestId('datahub-filter-min-records'), { target: { value: '3' } });
+    expect(listedSubjects()).toEqual([]);
   });
 });
 

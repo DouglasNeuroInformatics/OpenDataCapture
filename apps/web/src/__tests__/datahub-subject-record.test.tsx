@@ -10,7 +10,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Route } from '@/routes/_app/datahub/$subjectId/table/$recordId';
+import { Route } from '@/routes/_app/datahub/subjects/$subjectId/table/$recordId';
 
 import '@/services/i18n';
 

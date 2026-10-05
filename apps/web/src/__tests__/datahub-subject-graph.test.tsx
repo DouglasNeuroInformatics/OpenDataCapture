@@ -5,7 +5,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { LineGraphLine } from '@/components/LineGraph';
-import { Route } from '@/routes/_app/datahub/$subjectId/graph';
+import { Route } from '@/routes/_app/datahub/subjects/$subjectId/graph';
 
 import '@/services/i18n';
 

@@ -3,7 +3,7 @@ import type { PropsWithChildren, ReactNode } from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Route } from '@/routes/_app/datahub/$subjectId/route';
+import { Route } from '@/routes/_app/datahub/subjects/$subjectId/route';
 
 import '@/services/i18n';
 

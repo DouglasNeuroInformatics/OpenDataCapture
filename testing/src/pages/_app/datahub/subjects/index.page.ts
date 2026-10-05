@@ -45,23 +45,22 @@ export class DatahubPage extends AppPage {
    * loaded for the column rather than refetching.
    */
   async requireAtLeastRecords(count: number) {
-    await this.filtersTrigger.click();
+    await this.openFilters();
     await this.minRecordsFilter.fill(String(count));
   }
 
   /** Opens the filter menu and picks a collection-date window. */
   async selectCollectedWindow(
     preset:
-      | 'all'
-      | 'custom'
-      | 'pastMonth'
-      | 'pastSixMonths'
-      | 'pastThreeMonths'
-      | 'pastTwoYears'
-      | 'pastWeek'
-      | 'pastYear'
+      'all' | 'custom' | 'pastMonth' | 'pastSixMonths' | 'pastThreeMonths' | 'pastTwoYears' | 'pastWeek' | 'pastYear'
   ) {
-    await this.filtersTrigger.click();
+    await this.openFilters();
     await this.collectedPresetFilter.selectOption(preset);
+  }
+
+  private async openFilters() {
+    if ((await this.filtersTrigger.getAttribute('data-state')) !== 'open') {
+      await this.filtersTrigger.click();
+    }
   }
 }
