@@ -3,6 +3,7 @@ import type { GatewayHealthcheckResult } from '@opendatacapture/schemas/gateway'
 import type { ReleaseInfo } from '@opendatacapture/schemas/setup';
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { Route } from '@/routes/_app/about';
 
@@ -48,6 +49,11 @@ const renderPage = () => {
 
 const itemsOf = (testId: string) => {
   return Array.from(screen.getByTestId(testId).querySelectorAll('li'), (item) => item.textContent);
+};
+
+const uptimeSeconds = () => {
+  const [hours, minutes, seconds] = itemsOf('about-core-api-info').at(-1)!.slice('Uptime: '.length).split(':');
+  return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
 };
 
 const runLoader = async (isGatewayEnabled: boolean) => {
@@ -105,14 +111,26 @@ describe('about page', () => {
     expect(itemsOf('about-core-api-info')).toContain('Uptime: 25:01:01');
   });
 
-  it('should keep the uptime counting while the page is open', () => {
+  it('should advance the uptime by exactly one second per tick, so the counter neither skips nor stalls', () => {
+    vi.useFakeTimers();
+    renderPage();
+    const ticks = Array.from({ length: 3 }, () => {
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      return uptimeSeconds();
+    });
+    expect([ticks[1]! - ticks[0]!, ticks[2]! - ticks[1]!]).toEqual([1, 1]);
+  });
+
+  // Known defect: TimeValue increments its counter and then formats counter + 1, so the display leads by a second.
+  it.fails('should show the starting uptime plus the seconds elapsed since the page opened', () => {
     vi.useFakeTimers();
     renderPage();
     act(() => {
       vi.advanceTimersByTime(3000);
     });
-    const [hours, minutes, seconds] = itemsOf('about-core-api-info').at(-1)!.slice('Uptime: '.length).split(':');
-    expect(Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds)).toBeGreaterThanOrEqual(8);
+    expect(itemsOf('about-core-api-info')).toContain('Uptime: 00:00:08');
   });
 
   it('should show an error instead of crashing when the uptime cannot be formatted', () => {
@@ -172,7 +190,7 @@ describe('about loader', () => {
 
   it('should reject a malformed gateway healthcheck rather than render it', async () => {
     mocks.axios.get.mockResolvedValue({ data: { ok: 'maybe' } });
-    await expect(runLoader(true)).rejects.toThrow();
+    await expect(runLoader(true)).rejects.toBeInstanceOf(z.ZodError);
   });
 
   it('should not contact the gateway when it is disabled', async () => {

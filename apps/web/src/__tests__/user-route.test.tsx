@@ -17,7 +17,7 @@ const STRONG_PASSWORD = 'Correct-Horse-Battery-Staple-42';
 
 const mocks = vi.hoisted(() => ({
   currentUser: { id: 'user-1', username: 'jdoe' },
-  mutate: vi.fn(),
+  mutate: vi.fn<(variables: unknown, options: MutateOptions) => void>(),
   useFindUserQuery: vi.fn(),
   userData: {}
 }));
@@ -160,7 +160,7 @@ describe('user account page', () => {
         { onSuccess: expect.any(Function) }
       );
     });
-    const [, options] = mocks.mutate.mock.calls[0] as [unknown, MutateOptions];
+    const [, options] = mocks.mutate.mock.lastCall!;
     act(() => options.onSuccess());
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).toBeNull();

@@ -57,6 +57,7 @@ type DashboardMocks = {
   };
   summary: QueryResult<Summary>;
   tooltipProps: TooltipProps;
+  useInstrumentRecords: Mock<(options: unknown) => void>;
   users: QueryResult<{ username: string }[]>;
   useSummaryQuery: Mock<(options: unknown) => void>;
   useUsersQuery: Mock<(options: unknown) => void>;
@@ -70,6 +71,7 @@ const mocks = vi.hoisted((): DashboardMocks => ({
   store: { currentGroup: null, currentUser: null },
   summary: {},
   tooltipProps: { active: false },
+  useInstrumentRecords: vi.fn(),
   users: {},
   useSummaryQuery: vi.fn(),
   useUsersQuery: vi.fn()
@@ -92,7 +94,12 @@ vi.mock('@/hooks/useSummaryQuery', async (importOriginal) => ({
   }
 }));
 vi.mock('@/hooks/useInstrumentInfoQuery', () => ({ useInstrumentInfoQuery: () => mocks.instruments }));
-vi.mock('@/hooks/useInstrumentRecords', () => ({ useInstrumentRecords: () => mocks.records }));
+vi.mock('@/hooks/useInstrumentRecords', () => ({
+  useInstrumentRecords: (options: unknown) => {
+    mocks.useInstrumentRecords(options);
+    return mocks.records;
+  }
+}));
 vi.mock('@/hooks/useUsersQuery', () => ({
   useUsersQuery: (options: unknown) => {
     mocks.useUsersQuery(options);
@@ -182,6 +189,7 @@ describe('dashboard page', () => {
     renderPage();
     expect(mocks.useSummaryQuery).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
     expect(mocks.useUsersQuery).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
+    expect(mocks.useInstrumentRecords).toHaveBeenCalledWith({ enabled: true, params: { groupId: 'group-1' } });
   });
 
   it.each([
@@ -288,17 +296,29 @@ describe('dashboard page', () => {
     expect(subjectsChart().getByTestId('x-axis').textContent).toBe('Mar 2');
   });
 
-  it('should show nothing in the tooltips while no point is hovered', () => {
-    mocks.tooltipProps = { active: true, label: DAY_2, payload: [] };
+  it('should show nothing in the tooltips while no point is hovered, even if recharts still holds a payload', () => {
+    mocks.tooltipProps = {
+      active: false,
+      label: DAY_2,
+      payload: [
+        { dataKey: 'records', value: 2 },
+        { dataKey: 'sessions', value: 4 },
+        { dataKey: 'value', value: 7 }
+      ]
+    };
     renderPage();
     expect(recordsChart().getByTestId('chart-tooltip').textContent).toBe('');
     expect(subjectsChart().getByTestId('chart-tooltip').textContent).toBe('');
   });
 
-  it('should show nothing in the tooltips when recharts provides no payload', () => {
-    mocks.tooltipProps = { active: true, label: DAY_2 };
+  it.each([
+    ['an empty payload', []],
+    ['no payload', undefined]
+  ])('should show nothing in the tooltips of a hovered point when recharts provides %s', (_, payload) => {
+    mocks.tooltipProps = { active: true, label: DAY_2, payload };
     renderPage();
     expect(recordsChart().getByTestId('chart-tooltip').textContent).toBe('');
+    expect(subjectsChart().getByTestId('chart-tooltip').textContent).toBe('');
   });
 
   it('should show the date, records and sessions of the hovered point', () => {

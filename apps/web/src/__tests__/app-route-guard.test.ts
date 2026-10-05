@@ -1,6 +1,8 @@
 import { createElement } from 'react';
 import type { ReactNode } from 'react';
 
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import type { ActiveLanguages } from '@opendatacapture/schemas/core';
 import { isRedirect } from '@tanstack/react-router';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -47,9 +49,11 @@ vi.mock('@/providers/ForceClearQueryCacheProvider', () => ({
   ForceClearQueryCacheProvider: components.ForceClearQueryCacheProvider
 }));
 
-const runGuard = async (setupState: { isSetup: boolean } = { isSetup: true }) => {
+const runGuard = async (setupState: { activeLanguages?: ActiveLanguages; isSetup?: boolean } = {}) => {
   const beforeLoad = Route.options.beforeLoad as (opts: object) => Promise<void>;
-  const queryClient = { fetchQuery: vi.fn().mockResolvedValue({ activeLanguages: ['en', 'fr'], ...setupState }) };
+  const queryClient = {
+    fetchQuery: vi.fn().mockResolvedValue({ activeLanguages: ['en', 'fr'], isSetup: true, ...setupState })
+  };
   try {
     await beforeLoad({ context: { queryClient } });
   } catch (err) {
@@ -70,6 +74,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  i18n.changeLanguage('en');
 });
 
 describe('_app guard', () => {
@@ -118,6 +123,13 @@ describe('_app guard', () => {
     const thrown = await runGuard();
     expect(isRedirect(thrown)).toBe(true);
     expect(thrown).toMatchObject({ options: { to: '/auth/reset-password' } });
+  });
+
+  it('should switch the interface to an active language before rendering, so a deactivated language is never shown', async () => {
+    i18n.changeLanguage('en');
+    mocks.store.accessToken = 'token';
+    await runGuard({ activeLanguages: ['fr'] });
+    expect(i18n.resolvedLanguage).toBe('fr');
   });
 });
 
