@@ -51,4 +51,17 @@ describe('CopyButton', () => {
     });
     errorSpy.mockRestore();
   });
+
+  it('should not copy again while showing success, so repeated clicks do not rewrite the clipboard', async () => {
+    const { container } = render(<CopyButton text="copy me" />);
+    const button = container.querySelector('button')!;
+    const readyIcon = button.innerHTML;
+    fireEvent.click(button);
+    await waitFor(() => {
+      expect(button.innerHTML).not.toBe(readyIcon);
+    });
+    fireEvent.click(button);
+    // eslint-disable-next-line @typescript-eslint/unbound-method -- a vitest mock, never invoked as a method
+    expect(navigator.clipboard.writeText).toHaveBeenCalledOnce();
+  });
 });

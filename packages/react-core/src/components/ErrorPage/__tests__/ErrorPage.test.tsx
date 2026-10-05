@@ -66,6 +66,19 @@ describe('ErrorPage', () => {
     vi.unstubAllGlobals();
   });
 
+  it('should offer the copy again once the mouse leaves, so a failed copy can be retried', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.stubGlobal('navigator', { ...navigator, clipboard: undefined });
+    render(<ErrorPage error={new Error('boom')} />);
+    fireEvent.click(screen.getByText('Copy Error Report'));
+    await waitFor(() => {
+      expect(screen.getByText('Copy Failed')).toBeTruthy();
+    });
+    fireEvent.mouseLeave(screen.getByTestId('copy-error-report'));
+    expect(screen.getByText('Copy Error Report')).toBeTruthy();
+    vi.unstubAllGlobals();
+  });
+
   it('should reload the page when the reload button is clicked', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const assignSpy = vi.spyOn(window.location, 'assign').mockImplementation(() => undefined);

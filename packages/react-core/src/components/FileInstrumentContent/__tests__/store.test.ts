@@ -101,4 +101,39 @@ describe('createFileInstrumentContentStore', () => {
     expect(errorSpy).toHaveBeenCalledWith(new Error('upload failed'));
     errorSpy.mockRestore();
   });
+
+  it('should ask for a range in the plural when the group allows a range', async () => {
+    const store = createFileInstrumentContentStore(
+      createProps({}, [{ basename: 'document', count: { max: 3, min: 2 }, label: 'Document', type: null }])
+    );
+    store.getState().actions.setFiles('document', [createFile('a.pdf')]);
+    await store.getState().actions.submit();
+    expect(store.getState().errors.document).toEqual([
+      {
+        en: 'You uploaded 1 file, but between 2 and 3 are required',
+        es: 'Subió 1 archivo, pero se requieren entre 2 y 3',
+        fr: 'Vous avez téléchargé 1 fichier, mais entre 2 et 3 sont requis'
+      }
+    ]);
+  });
+
+  it('should ask for a single required file in the singular', async () => {
+    const store = createFileInstrumentContentStore(createProps());
+    await store.getState().actions.submit();
+    expect(store.getState().errors.document).toEqual([
+      {
+        en: 'You uploaded 0 files, but 1 is required',
+        es: 'Subió 0 archivos, pero se requiere 1',
+        fr: 'Vous avez téléchargé 0 fichiers, mais 1 est requis'
+      }
+    ]);
+  });
+
+  it('should ask for an exact count above one in the plural', async () => {
+    const store = createFileInstrumentContentStore(
+      createProps({}, [{ basename: 'document', count: { max: 2, min: 2 }, label: 'Document', type: null }])
+    );
+    await store.getState().actions.submit();
+    expect(store.getState().errors.document?.[0]?.en).toBe('You uploaded 0 files, but 2 are required');
+  });
 });
