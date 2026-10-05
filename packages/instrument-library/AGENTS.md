@@ -74,7 +74,9 @@ grouped by kind; `--title` prints a flat list. **It reads `dist`, not `src`, so 
 
 - **Put tests in the top-level `src/__tests__/` only.** The build turns every directory holding an
   `index.*` into a bundle and reads each entry in it as a file, so a `__tests__/` inside an
-  instrument directory fails `pnpm build` (see "Instrument directories must be flat").
+  instrument directory fails `pnpm build` (see "Instrument directories must be flat"). Name each
+  test after the instrument it covers (`DNP_STROOP_TASK.test.tsx`); this folder is why
+  `eslint.config.js` turns `odc/unit-test-names-subject` off here.
 - **Import the instrument's source default export**, with its extension:
   `import instrument from '../forms/DNP_HAPPINESS_QUESTIONNAIRE/index.ts'` (`.tsx` where the entry
   is). That is the `defineInstrument` result, not the bundle string `dist` exports.

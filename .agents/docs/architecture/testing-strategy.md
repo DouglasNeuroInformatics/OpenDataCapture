@@ -17,11 +17,11 @@ of operations.
 
 ## Tiers
 
-| Tier       | Runner     | Where                                                    | Command              |
-| ---------- | ---------- | -------------------------------------------------------- | -------------------- |
-| Unit       | vitest     | `src/__tests__/` (or `test/`) in a participating package | `pnpm test:coverage` |
-| End-to-end | Playwright | `testing/src/specs/`                                     | `pnpm test:e2e`      |
-| Type-check | `tsc`      | —                                                        | `pnpm lint`          |
+| Tier       | Runner     | Where                                                                 | Command              |
+| ---------- | ---------- | --------------------------------------------------------------------- | -------------------- |
+| Unit       | vitest     | `__tests__/<file>.test.ts` beside `<file>.ts`, or a package's `test/` | `pnpm test:coverage` |
+| End-to-end | Playwright | `testing/src/specs/`                                                  | `pnpm test:e2e`      |
+| Type-check | `tsc`      | —                                                                     | `pnpm lint`          |
 
 There is no integration tier. `apps/api` unit tests mock the Prisma layer entirely; the only code
 path exercised against a real database is Playwright.
