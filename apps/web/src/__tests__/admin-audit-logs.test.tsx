@@ -181,7 +181,10 @@ beforeEach(() => {
   mocks.download.mockResolvedValue(undefined);
 });
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe('audit logs route', () => {
   it('should prefetch the filtered logs, the groups and the users, keyed on the search', async () => {
@@ -355,6 +358,8 @@ describe('audit logs table', () => {
     renderPage();
     fireEvent.keyDown(screen.getByLabelText('Date Format'), { key: 'Enter' });
     fireEvent.click(screen.getByRole('menuitemcheckbox', { name: 'ISO 8601' }));
+    fireEvent.keyDown(document.body, { key: 'Escape' });
+    expect(screen.queryAllByRole('menuitemcheckbox')).toHaveLength(0);
     fireEvent.keyDown(screen.getByLabelText('Date Format'), { key: 'Enter' });
     const checked = screen.getAllByRole('menuitemcheckbox').map((item) => item.getAttribute('aria-checked'));
     expect(checked).toEqual(['false', 'true']);

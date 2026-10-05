@@ -304,14 +304,19 @@ describe('admin groups route', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
-  it('should not save from a sheet that is already closing, since no group is selected any more', () => {
+  it('should ignore a save from a sheet that is already closing, rather than crash on the cleared selection', () => {
     const removeStyle = animateSheetExit();
+    const uncaughtErrors: unknown[] = [];
+    const collectError = (event: ErrorEvent) => uncaughtErrors.push(event.error);
+    window.addEventListener('error', collectError);
     try {
       renderPage();
       fireEvent.keyDown(openSheet(), { key: 'Escape' });
       save();
+      expect(uncaughtErrors).toEqual([]);
       expect(mocks.patch).not.toHaveBeenCalled();
     } finally {
+      window.removeEventListener('error', collectError);
       removeStyle();
     }
   });

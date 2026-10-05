@@ -45,10 +45,10 @@ describe('branding route', () => {
   it('should preview a light logo on the branding panel and a theme-aware logo on the form', () => {
     render(<BrandingPage />);
     const logos = screen.getByRole('link', { name: /Login Page/ }).querySelectorAll('svg');
-    expect(Array.from(logos, (logo) => logo.getAttribute('class'))).toEqual([
-      expect.stringContaining('fill-slate-300'),
-      expect.stringContaining('dark:fill-slate-300')
-    ]);
+    const fillClasses = Array.from(logos, (logo) =>
+      Array.from(logo.classList).filter((token) => token.includes('fill-'))
+    );
+    expect(fillClasses).toEqual([['fill-slate-300'], ['fill-sky-900', 'dark:fill-slate-300']]);
   });
 });
 
