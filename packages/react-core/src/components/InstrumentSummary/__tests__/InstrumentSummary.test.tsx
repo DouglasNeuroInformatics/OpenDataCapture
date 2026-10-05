@@ -159,4 +159,19 @@ describe('InstrumentSummary', () => {
     render(<InstrumentSummary data={{ score: 5 }} instrument={instrument} timeCollected={Date.now()} />);
     expect(screen.getByText('Results')).toBeTruthy();
   });
+
+  it('should copy a measure without a value as NA, so the copied summary has no blank lines', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } });
+    const instrument = {
+      ...baseInstrument,
+      measures: { score: { kind: 'computed', label: 'Score', value: () => undefined, visibility: 'visible' } }
+    } as unknown as AnyUnilingualInstrument;
+    render(<InstrumentSummary data={{}} instrument={instrument} timeCollected={Date.now()} />);
+    fireEvent.click(screen.getAllByRole('button')[0]!);
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith('Score: NA');
+    });
+    vi.unstubAllGlobals();
+  });
 });
