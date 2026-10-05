@@ -11,7 +11,7 @@ import type { BasePermissionLevel } from '@opendatacapture/schemas/user';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AbilityFactory } from '@/auth/ability.factory';
-import type { AppAbility } from '@/auth/auth.types';
+import { createAppAbility } from '@/auth/ability.utils';
 import { ROUTE_ACCESS_METADATA_KEY } from '@/core/decorators/route-access.decorator';
 import type { ProtectedRoutePermissionSet } from '@/core/decorators/route-access.decorator';
 import { GroupsService } from '@/groups/groups.service';
@@ -20,9 +20,20 @@ import { MailService } from '@/mail/mail.service';
 import { UsersController } from '../users.controller';
 import { UsersService } from '../users.service';
 
-const ability = {} as AppAbility;
+const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
 
-const currentUser = { ability, id: 'user-1', username: 'jane.doe' } as RequestUser;
+const currentUser: RequestUser = {
+  ability,
+  basePermissionLevel: 'ADMIN',
+  firstName: 'Jane',
+  groups: [],
+  id: 'user-1',
+  kind: 'login',
+  lastName: 'Doe',
+  mustResetPassword: false,
+  permissions: [],
+  username: 'jane.doe'
+};
 
 const createUserData = {
   basePermissionLevel: 'STANDARD' as const,

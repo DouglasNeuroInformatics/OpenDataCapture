@@ -106,16 +106,23 @@ describe('UsersService', () => {
       expect(cryptoService.hashPassword).not.toHaveBeenCalled();
     });
 
-    it('should refuse a group that cannot be resolved, so the user is never connected to it', async () => {
-      groupsService.findById.mockResolvedValue(null);
+    it('should propagate a group lookup that finds nothing, so the user is never connected to it', async () => {
+      groupsService.findById.mockRejectedValue(new NotFoundException());
       await expect(usersService.create({ ...baseUser, groupIds: ['group-1'] })).rejects.toThrow(NotFoundException);
       expect(userModel.create).not.toHaveBeenCalled();
     });
 
-    it('should look up each group with the caller options and connect the user to all of them', async () => {
+    it('should look up every group with the caller options, so no group outside their scope can be joined', async () => {
       groupsService.findById.mockImplementation((id: string) => Promise.resolve({ id }));
       await usersService.create({ ...baseUser, groupIds: ['group-1', 'group-2'] }, { ability: admin.ability });
+      expect(groupsService.findById).toHaveBeenCalledTimes(2);
       expect(groupsService.findById).toHaveBeenCalledWith('group-1', { ability: admin.ability });
+      expect(groupsService.findById).toHaveBeenCalledWith('group-2', { ability: admin.ability });
+    });
+
+    it('should connect the user to every requested group, so membership matches the request', async () => {
+      groupsService.findById.mockImplementation((id: string) => Promise.resolve({ id }));
+      await usersService.create({ ...baseUser, groupIds: ['group-1', 'group-2'] });
       expect(userModel.create.mock.lastCall?.[0].data.groups).toEqual({
         connect: [{ id: 'group-1' }, { id: 'group-2' }]
       });
@@ -123,10 +130,18 @@ describe('UsersService', () => {
 
     it('should store the hashed password rather than the plaintext one', async () => {
       await usersService.create({ ...baseUser });
-      expect(userModel.create.mock.lastCall?.[0]).toMatchObject({
-        data: { additionalPermissions: [], hashedPassword: 'hashed-password' },
-        omit: { hashedPassword: true }
-      });
+      expect(userModel.create.mock.lastCall?.[0].data).toMatchObject({ hashedPassword: 'hashed-password' });
+      expect(userModel.create.mock.lastCall?.[0].data).not.toHaveProperty('password');
+    });
+
+    it('should omit the hashed password from the created user, so it never reaches the response', async () => {
+      await usersService.create({ ...baseUser });
+      expect(userModel.create.mock.lastCall?.[0].omit).toEqual({ hashedPassword: true });
+    });
+
+    it('should start the user with no additional permissions, so access comes only from their base level', async () => {
+      await usersService.create({ ...baseUser });
+      expect(userModel.create.mock.lastCall?.[0].data.additionalPermissions).toEqual([]);
     });
   });
 
