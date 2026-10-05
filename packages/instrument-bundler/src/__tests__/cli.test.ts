@@ -81,11 +81,21 @@ describe('cli', () => {
     ).toBe(true);
   });
 
-  it('should write into an output directory that already exists rather than fail to create it', async () => {
+  it('should not try to create an output directory that already exists', async () => {
     fs.mkdirSync(outputBase, { recursive: true });
-    process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase];
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase, '--verbose'];
     await import('../cli.js');
-    expect(fs.existsSync(path.join(outputBase, 'FORM_INSTRUMENT_STUB.js'))).toBe(true);
+    expect(
+      logSpy.mock.calls.some(([message]) => typeof message === 'string' && message.startsWith('Creating directory:'))
+    ).toBe(false);
+  });
+
+  it('should create the output directory when it does not exist yet', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase, '--verbose'];
+    await import('../cli.js');
+    expect(logSpy).toHaveBeenCalledWith(`Creating directory: ${outputBase}`);
   });
 
   it('should embed a binary asset next to the entry, reading it as bytes rather than text', async () => {
@@ -104,7 +114,7 @@ describe('cli', () => {
     expect(content).toContain(`data:image/png;base64,${pngBytes.toString('base64')}`);
   });
 
-  it('should warn and skip a target directory whose name the input glob cannot match', async () => {
+  it('should skip an instrument directory whose name contains glob metacharacters, a bug: the per-directory glob does not escape the path', async () => {
     fs.mkdirSync(path.join(inputBase, '[x]'));
     fs.writeFileSync(path.join(inputBase, '[x]', 'index.ts'), 'export default {};');
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
