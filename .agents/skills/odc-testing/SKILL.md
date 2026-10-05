@@ -73,9 +73,7 @@ package. Two things it does not carry:
   and `env-cmd` exits before vitest starts when `.env` is absent.
 - **happy-dom, which `apps/web` runs under, computes no layout**: `getBoundingClientRect` and
   `offsetWidth` return 0, so assert on rendered content, never on geometry or visibility. happy-dom
-  ≥ 20 supplies its own no-op `ResizeObserver`, so the stub in
-  `apps/web/src/__tests__/data-table-server-mode.test.tsx` never assigns — copying it buys nothing,
-  whatever `apps/web/AGENTS.md` §Tests still says about needing one.
+  ≥ 20 supplies its own no-op `ResizeObserver`, so no test needs to stub one.
 
 Writing a component test under `apps/web`? That same §Tests adds the `@/services/i18n` side-effect
 import libui controls need.

@@ -334,6 +334,20 @@ describe('audit logs table', () => {
     expect(cellTexts().slice(1, 3)).toEqual(['N/A', 'N/A']);
   });
 
+  it('should show every log of the page the server returned, without paginating them again', () => {
+    const logs = Array.from({ length: 25 }, (_, index) => logFixture({ id: `log-${index}` }));
+    mocks.auditLogsPage = { data: logs, pageCount: 500, total: 12500 };
+    renderPage();
+    expect(rows()).toHaveLength(25);
+  });
+
+  it('should build the page controls from the page count the server reports, not from the logs on screen', () => {
+    renderPage();
+    const pageLabels = screen.getAllByRole('button', { hidden: true }).map((button) => button.textContent);
+    expect(pageLabels).toContain('3');
+    expect(pageLabels).not.toContain('4');
+  });
+
   it('should show an empty table until the first page arrives', () => {
     mocks.auditLogsPage = undefined;
     renderPage();

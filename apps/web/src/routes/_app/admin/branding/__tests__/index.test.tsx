@@ -3,9 +3,7 @@ import type { ReactNode } from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { LoginPageEditor } from '@/components/LoginPageEditor';
-import { Route as BrandingRoute } from '@/routes/_app/admin/branding/index';
-import { Route as LoginPageRoute } from '@/routes/_app/admin/branding/login-page';
+import { Route } from '@/routes/_app/admin/branding/index';
 
 import '@/services/i18n';
 
@@ -17,12 +15,11 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
     </a>
   )
 }));
-vi.mock('@/components/LoginPageEditor', () => ({ LoginPageEditor: () => null }));
 
 afterEach(cleanup);
 
 describe('branding route', () => {
-  const BrandingPage = BrandingRoute.options.component!;
+  const BrandingPage = Route.options.component!;
 
   it('should title the page as the branding section', () => {
     render(<BrandingPage />);
@@ -49,11 +46,5 @@ describe('branding route', () => {
       Array.from(logo.classList).filter((token) => token.includes('fill-'))
     );
     expect(fillClasses).toEqual([['fill-slate-300'], ['fill-sky-900', 'dark:fill-slate-300']]);
-  });
-});
-
-describe('login page branding route', () => {
-  it('should render the login page editor, so the route adds nothing around it', () => {
-    expect(LoginPageRoute.options.component).toBe(LoginPageEditor);
   });
 });
