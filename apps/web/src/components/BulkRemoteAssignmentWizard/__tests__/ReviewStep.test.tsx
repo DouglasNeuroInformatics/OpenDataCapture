@@ -63,10 +63,13 @@ describe('ReviewStep', () => {
     expect(screen.getByTestId('bulk-review-summary').textContent).toBe('3 subjects × 2 instruments = 6 assignments');
   });
 
-  it('should list each instrument with its expiry', () => {
+  it('should list every instrument in the batch beside its own expiry', () => {
     renderReviewStep();
-    expect(screen.getByText('Happiness Questionnaire')).toBeTruthy();
-    expect(screen.getByText('2026-12-01')).toBeTruthy();
+    const rows = [...screen.getByTestId('bulk-review-step').querySelectorAll('tbody tr')];
+    expect(rows.map((row) => [...row.querySelectorAll('td')].map(({ textContent }) => textContent))).toEqual([
+      ['Happiness Questionnaire', '2026-11-01'],
+      ['General Consent Form', '2026-12-01']
+    ]);
   });
 
   it('should submit without allowing duplicates when the preflight passed', () => {

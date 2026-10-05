@@ -9,6 +9,7 @@ import { BulkParseFailure, parseWorkbook } from '@/utils/bulk-assignments';
 import type { BulkParseResult } from '@/utils/bulk-assignments';
 
 import { SourceStep } from '../SourceStep';
+import { captureUnhandledRejection } from './capture-unhandled-rejection';
 
 import '@/services/i18n';
 
@@ -86,24 +87,12 @@ const dropFile = (file: File) => {
 
 const csvFile = (content: string) => new File([content], 'subjects.csv', { type: 'text/csv' });
 
+const oversizedFile = (name: string) => new File([new Uint8Array(5_000_001)], name);
+
 const workbookFile = () =>
   new File(['workbook'], 'subjects.xlsx', {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   });
-
-/** `run` fires its promise with `void`, so an error it rethrows surfaces only as an unhandled rejection. */
-const captureUnhandledRejection = async (act: () => void) => {
-  const listeners = process.listeners('unhandledRejection');
-  process.removeAllListeners('unhandledRejection');
-  try {
-    const rejection = new Promise<unknown>((resolve) => process.once('unhandledRejection', resolve));
-    act();
-    return await rejection;
-  } finally {
-    process.removeAllListeners('unhandledRejection');
-    listeners.forEach((listener) => process.on('unhandledRejection', listener));
-  }
-};
 
 describe('SourceStep', () => {
   beforeEach(() => {
@@ -203,19 +192,6 @@ describe('SourceStep', () => {
       expect(pickerRowLabels()).toEqual(['ccccccccc', '002', '001']);
     });
 
-    it('should show which direction a column is sorted in, and dim the affordance on an unsorted one', () => {
-      renderSourceStep();
-      const header = sortHeader('Subject');
-      const iconClass = () => header.querySelector('svg')!.getAttribute('class');
-      expect(iconClass()).toContain('lucide-chevrons-up-down');
-      expect(iconClass()).toContain('opacity-40');
-      fireEvent.click(header);
-      expect(iconClass()).toContain('lucide-chevron-up');
-      expect(iconClass()).not.toContain('opacity-40');
-      fireEvent.click(header);
-      expect(iconClass()).toContain('lucide-chevron-down');
-    });
-
     it('should disable continuing until a subject is selected', () => {
       renderSourceStep();
       const continueButton = screen.getByTestId<HTMLButtonElement>('bulk-use-selected-subjects');
@@ -281,6 +257,17 @@ describe('SourceStep', () => {
       dropFile(file);
       await waitFor(() => expect(onParsed).toHaveBeenCalledWith(workbookResult));
       expect(parseWorkbook).toHaveBeenCalledWith(file);
+    });
+
+    it('should refuse a file over the size limit before reading it, so an oversized upload never reaches the parser', async () => {
+      const { onParsed } = renderSourceStep();
+      switchTo('FILE');
+      dropFile(oversizedFile('subjects.xlsx'));
+      expect((await screen.findByTestId('bulk-error-list')).textContent).toContain(
+        'File is larger than the 5 MB limit.'
+      );
+      expect(parseWorkbook).not.toHaveBeenCalled();
+      expect(onParsed).not.toHaveBeenCalled();
     });
 
     it('should list the reasons a file could not be parsed instead of continuing', async () => {

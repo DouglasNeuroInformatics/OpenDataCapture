@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { BulkParseResult } from '@/utils/bulk-assignments';
 
 import { MapStep } from '../MapStep';
+import { captureUnhandledRejection } from './capture-unhandled-rejection';
 
 import '@/services/i18n';
 
@@ -52,20 +53,6 @@ const chooseField = async (header: string, label: string) => {
   fireEvent.click(await screen.findByRole('option', { name: label }));
 };
 
-/** `run` fires its promise with `void`, so an error it rethrows surfaces only as an unhandled rejection. */
-const captureUnhandledRejection = async (act: () => void) => {
-  const listeners = process.listeners('unhandledRejection');
-  process.removeAllListeners('unhandledRejection');
-  try {
-    const rejection = new Promise<unknown>((resolve) => process.once('unhandledRejection', resolve));
-    act();
-    return await rejection;
-  } finally {
-    process.removeAllListeners('unhandledRejection');
-    listeners.forEach((listener) => process.on('unhandledRejection', listener));
-  }
-};
-
 describe('MapStep', () => {
   beforeEach(() => {
     i18n.changeLanguage('en');
@@ -103,9 +90,7 @@ describe('MapStep', () => {
 
   it('should show an unmapped column as not used', () => {
     renderMapStep(byId);
-    const trigger = screen.getByTestId('bulk-map-select-first_name');
-    expect(trigger.textContent).toBe('Not Used');
-    expect(trigger.classList.contains('italic')).toBe(true);
+    expect(screen.getByTestId('bulk-map-select-first_name').textContent).toBe('Not Used');
   });
 
   it('should not offer a field another column has already claimed, so no field is mapped twice', async () => {

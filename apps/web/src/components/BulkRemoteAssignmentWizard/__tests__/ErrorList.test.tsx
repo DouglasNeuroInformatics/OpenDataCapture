@@ -37,9 +37,9 @@ describe('ErrorList', () => {
 
   it('should list the detail items beneath their message, so a refusal names every affected subject', () => {
     render(<ErrorList errors={[{ items: ['alice', 'bob'], message: '2 subject(s) are unavailable:' }]} />);
-    const nested = screen.getByRole('alert').querySelector('li ul')!;
+    const nested = screen.getByRole('alert').querySelector<HTMLElement>('li ul')!;
     expect(
-      within(nested as HTMLElement)
+      within(nested)
         .getAllByRole('listitem')
         .map(({ textContent }) => textContent)
     ).toEqual(['alice', 'bob']);
