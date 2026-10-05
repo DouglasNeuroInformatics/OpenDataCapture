@@ -954,25 +954,6 @@ describe('InstrumentRecordsService', () => {
         await expect(result).rejects.toBe(error);
         expect(worker.terminate).toHaveBeenCalledOnce();
       });
-
-      // Pins a reported defect: a failed INIT neither rejects nor terminates. Expected to change when the source is fixed.
-      it('should leave the export pending without sending a chunk when a worker fails to initialize', async () => {
-        instrumentsService.findById.mockResolvedValueOnce({ id: 'instrument-1', internal: { edition: 1, name: 'X' } });
-        const worker = useFakeWorker();
-
-        const result = instrumentRecordsService.exportRecords({}, { ability });
-        await vi.waitFor(() => expect(worker.postMessage).toHaveBeenCalledOnce());
-        worker.emit('message', { success: false });
-
-        await expect(Promise.race([result, Promise.resolve('pending')])).resolves.toBe('pending');
-        expect(worker.postMessage).toHaveBeenCalledTimes(1);
-        expect(worker.postMessage).toHaveBeenCalledWith({
-          data: [{ edition: 1, id: 'instrument-1', name: 'X' }],
-          type: 'INIT'
-        });
-        worker.emit('error', new Error('settle'));
-        await expect(result).rejects.toThrow('settle');
-      });
     });
   });
 

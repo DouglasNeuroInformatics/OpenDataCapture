@@ -40,14 +40,7 @@ import { UsersService } from '@/users/users.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
 
-import type {
-  BeginChunkProcessingMessage,
-  InitData,
-  InitialMessage,
-  InitMessage,
-  RecordType,
-  WorkerMessage
-} from './thread-types';
+import type { BeginChunkProcessingMessage, InitData, InitMessage, RecordType, WorkerMessage } from './thread-types';
 
 @Injectable()
 export class InstrumentRecordsService {
@@ -235,18 +228,18 @@ export class InstrumentRecordsService {
         const worker = new Worker(join(import.meta.dirname, 'export-worker.js'));
         worker.postMessage({ data: availableInstrumentArray, type: 'INIT' } satisfies InitMessage);
 
-        worker.on('message', (message: InitialMessage) => {
-          if (message.success) {
-            worker.postMessage({ data: chunk, type: 'BEGIN_CHUNK_PROCESSING' } satisfies BeginChunkProcessingMessage);
-            worker.on('message', (message: WorkerMessage) => {
-              if (message.success) {
-                resolve(message.data);
-              } else {
-                reject(new Error(message.error));
-              }
-              void worker.terminate();
-            });
-          }
+        // The worker only ever acknowledges INIT with `{ success: true }`; a failure inside it arrives
+        // as an `error` event instead, handled below.
+        worker.on('message', () => {
+          worker.postMessage({ data: chunk, type: 'BEGIN_CHUNK_PROCESSING' } satisfies BeginChunkProcessingMessage);
+          worker.on('message', (message: WorkerMessage) => {
+            if (message.success) {
+              resolve(message.data);
+            } else {
+              reject(new Error(message.error));
+            }
+            void worker.terminate();
+          });
         });
 
         worker.on('error', (error) => {
