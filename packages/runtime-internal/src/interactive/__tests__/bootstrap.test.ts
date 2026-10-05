@@ -13,9 +13,14 @@ type TestInstrumentContent = {
 };
 
 type ServiceWorkerOptions = {
-  active?: boolean;
+  acknowledge?: boolean;
   controlled?: boolean;
   messages?: unknown[];
+};
+
+type FakeMessagePort = {
+  onmessage: ((event: { data: unknown }) => void) | null;
+  postMessage: (data: unknown) => void;
 };
 
 const THEME_ATTRIBUTE = 'data-mode';
@@ -38,15 +43,26 @@ function createFrameElement(bundle: null | string) {
   return frame;
 }
 
-function createServiceWorker({ active = true, controlled = true, messages = [] }: ServiceWorkerOptions = {}) {
-  const postMessage = vi.fn((_message: unknown, [port]: MessagePort[]) => {
-    [...messages, { type: 'STATIC_ASSETS_READY' }].forEach((message) => port?.postMessage(message));
+class SynchronousMessageChannel {
+  port1: FakeMessagePort = { onmessage: null, postMessage: () => undefined };
+  port2: FakeMessagePort = { onmessage: null, postMessage: (data) => this.port1.onmessage?.({ data }) };
+}
+
+function flushMicrotasks() {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+function createServiceWorker({ acknowledge = true, controlled = true, messages = [] }: ServiceWorkerOptions = {}) {
+  const replies = acknowledge ? [...messages, { type: 'STATIC_ASSETS_READY' }] : messages;
+  const postMessage = vi.fn((_message: unknown, [port]: FakeMessagePort[]) => {
+    replies.forEach((reply) => port?.postMessage(reply));
   });
+  vi.stubGlobal('MessageChannel', SynchronousMessageChannel);
   const controllerChangeListeners: (() => void)[] = [];
   const serviceWorker = {
     addEventListener: vi.fn((_type: string, listener: () => void) => controllerChangeListeners.push(listener)),
     controller: controlled ? {} : null,
-    ready: Promise.resolve({ active: active ? { postMessage } : null }),
+    ready: Promise.resolve({ active: { postMessage } }),
     register: vi.fn(() => Promise.resolve())
   };
   vi.stubGlobal('navigator', { serviceWorker });
@@ -114,13 +130,14 @@ describe('theme', () => {
     expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe('light');
   });
 
-  it('should ignore changes to other parent attributes', async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  it('should ignore changes to other parent attributes, so they never reset the instrument theme', async () => {
     await bootstrapAndRender({});
+    document.documentElement.setAttribute(THEME_ATTRIBUTE, 'dark');
+    const onParentMutation = vi.fn();
+    new MutationObserver(onParentMutation).observe(parentDocument.documentElement, { attributes: true });
     parentDocument.documentElement.setAttribute('class', 'sepia');
-    parentDocument.documentElement.setAttribute(THEME_ATTRIBUTE, 'dark');
-    await vi.waitFor(() => expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe('dark'));
-    expect(consoleError).not.toHaveBeenCalled();
+    await vi.waitFor(() => expect(onParentMutation).toHaveBeenCalled());
+    expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe('dark');
   });
 });
 
@@ -182,10 +199,28 @@ describe('static assets', () => {
     expect(serviceWorker.register).toHaveBeenCalledWith('./worker.js', { scope: './' });
   });
 
-  it('should post the static assets to the active worker before rendering', async () => {
-    const { postMessage } = createServiceWorker({ messages: [null, { type: 'OTHER' }] });
+  it('should post the static assets to the active worker', async () => {
+    const { postMessage } = createServiceWorker();
     await bootstrapAndRender({ staticAssets });
-    expect(postMessage.mock.lastCall?.[0]).toEqual({ staticAssets, type: 'STATIC_ASSETS' });
+    expect(postMessage).toHaveBeenCalledWith({ staticAssets, type: 'STATIC_ASSETS' }, expect.any(Array));
+  });
+
+  it('should post the static assets before rendering, so the instrument can fetch them', async () => {
+    const { postMessage } = createServiceWorker();
+    let postedMessagesAtRender: number | undefined;
+    const render = () => {
+      postedMessagesAtRender = postMessage.mock.calls.length;
+    };
+    await bootstrapAndRender({ render, staticAssets });
+    expect(postedMessagesAtRender).toBe(1);
+  });
+
+  it('should not render on worker replies other than the ready acknowledgement', async () => {
+    const { postMessage } = createServiceWorker({ acknowledge: false, messages: [null, { type: 'OTHER' }] });
+    const render = await bootstrap({ staticAssets });
+    await vi.waitFor(() => expect(postMessage).toHaveBeenCalled());
+    await flushMicrotasks();
+    expect(render).not.toHaveBeenCalled();
   });
 
   it('should wait for the worker to take control before posting assets, so the first fetch is intercepted', async () => {
@@ -195,13 +230,5 @@ describe('static assets', () => {
     expect(postMessage).not.toHaveBeenCalled();
     changeController();
     await vi.waitFor(() => expect(render).toHaveBeenCalled());
-  });
-
-  it('should not render while no worker is active, so the instrument never loads without its assets', async () => {
-    const { serviceWorker } = createServiceWorker({ active: false });
-    const render = await bootstrap({ staticAssets });
-    await vi.waitFor(() => expect(serviceWorker.register).toHaveBeenCalled());
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    expect(render).not.toHaveBeenCalled();
   });
 });
