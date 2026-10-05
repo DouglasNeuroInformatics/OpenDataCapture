@@ -34,6 +34,7 @@ describe('useInstrument', () => {
   afterEach(() => {
     cleanup();
     vi.clearAllMocks();
+    vi.restoreAllMocks();
     vi.unstubAllEnvs();
   });
 
@@ -64,13 +65,16 @@ describe('useInstrument', () => {
     expect(mocks.interpreter.interpret).toHaveBeenCalledWith('__BILINGUAL__', { id: 'bilingual-1', validate: false });
   });
 
-  it('should log a bundle that fails to interpret and provide no instrument', async () => {
+  it('should log a bundle that fails to interpret and drop the previously loaded instrument', async () => {
     const error = new Error('Invalid bundle');
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { rerender, result } = renderHook(() => useInstrument('bilingual-1'));
+    await waitFor(() => expect(result.current).not.toBeNull());
     mocks.interpreter.interpret.mockRejectedValue(error);
-    const { result } = renderHook(() => useInstrument('bilingual-1'));
+    mocks.bundleQuery.data = { bundle: '__INVALID__', id: 'invalid-1', kind: 'FORM' };
+    rerender();
     await waitFor(() => expect(consoleError).toHaveBeenCalledWith(error));
-    expect(result.current).toBeNull();
+    await waitFor(() => expect(result.current).toBeNull());
   });
 
   it('should replace the instrument when a different bundle loads', async () => {

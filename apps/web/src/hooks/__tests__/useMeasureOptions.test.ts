@@ -1,8 +1,8 @@
 import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
-import { renderHook } from '@testing-library/react';
+import { cleanup, renderHook } from '@testing-library/react';
 import { omit } from 'lodash-es';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { z } from 'zod/v4';
 
 import { useMeasureOptions } from '../useMeasureOptions';
@@ -21,27 +21,29 @@ function formInstrument({
   };
 }
 
-const STUB = formInstrument({
-  measures: {
-    favoriteNumber: { kind: 'const', ref: 'favoriteNumber' },
-    hasNegativeFavoriteNumber: { kind: 'computed', label: 'Has Negative Favorite Number', value: () => false }
-  }
-});
-
 function measureOptionsFor(instrument: AnyUnilingualFormInstrument | null) {
   return renderHook(() => useMeasureOptions(instrument)).result.current;
 }
 
 describe('useMeasureOptions', () => {
+  afterEach(cleanup);
+
   it('should offer no measures before an instrument is loaded', () => {
     expect(measureOptionsFor(null)).toEqual([]);
   });
 
-  it('should label a computed measure with its own label and a constant one with its field label', () => {
-    expect(measureOptionsFor(STUB)).toEqual([
-      { key: 'favoriteNumber', label: 'Favorite Number' },
-      { key: 'hasNegativeFavoriteNumber', label: 'Has Negative Favorite Number' }
-    ]);
+  it('should label a computed measure with its own label', () => {
+    const instrument = formInstrument({
+      measures: { isNegative: { kind: 'computed', label: 'Is Negative', value: () => false } }
+    });
+    expect(measureOptionsFor(instrument)).toEqual([{ key: 'isNegative', label: 'Is Negative' }]);
+  });
+
+  it('should label a constant measure without a label of its own with its field label', () => {
+    const instrument = formInstrument({
+      measures: { favoriteNumber: { kind: 'const', ref: 'favoriteNumber' } }
+    });
+    expect(measureOptionsFor(instrument)).toEqual([{ key: 'favoriteNumber', label: 'Favorite Number' }]);
   });
 
   it('should prefer the label a constant measure declares over its field label', () => {

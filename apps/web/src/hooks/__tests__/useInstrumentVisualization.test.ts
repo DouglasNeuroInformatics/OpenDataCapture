@@ -1,6 +1,6 @@
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { act, renderHook, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useInstrumentVisualization } from '../useInstrumentVisualization';
 
@@ -85,6 +85,11 @@ describe('useInstrumentVisualization', () => {
     mockStore.currentGroup = { id: 'testGroupId' };
     mockInfoQuery.data = [];
     mockInstrumentRecords.data = createMockRecords({ someValue: 'abc' });
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
   });
 
   describe('set fields', () => {
@@ -399,13 +404,15 @@ describe('useInstrumentVisualization', () => {
         expect(mockAddNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
       });
       expect(consoleError).toHaveBeenCalled();
-      consoleError.mockRestore();
     });
 
-    it('should show no records until they have loaded', () => {
+    it('should show no records until they have loaded, without reporting an error', () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
       mockInstrumentRecords.data = undefined;
       const { result } = renderHook(() => useInstrumentVisualization({ params: { subjectId: 'testId' } }));
       expect(result.current.records).toEqual([]);
+      expect(mockAddNotification).not.toHaveBeenCalled();
+      expect(consoleError).not.toHaveBeenCalled();
     });
   });
 

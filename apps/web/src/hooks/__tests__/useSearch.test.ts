@@ -1,5 +1,5 @@
-import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { act, cleanup, renderHook } from '@testing-library/react';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { useSearch } from '../useSearch';
 
@@ -12,6 +12,8 @@ const PEOPLE: Person[] = [
 ];
 
 describe('useSearch', () => {
+  afterEach(cleanup);
+
   it('should return every item before anything is searched', () => {
     const { result } = renderHook(() => useSearch(PEOPLE, 'firstName'));
     expect(result.current.filteredData).toEqual(PEOPLE);

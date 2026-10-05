@@ -1,10 +1,12 @@
 import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
-import { renderHook } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { cleanup, renderHook } from '@testing-library/react';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { useInstrumentInterpreter } from '../useInstrumentInterpreter';
 
 describe('useInstrumentInterpreter', () => {
+  afterEach(cleanup);
+
   it('should provide an instrument interpreter', () => {
     const { result } = renderHook(() => useInstrumentInterpreter());
     expect(result.current).toBeInstanceOf(InstrumentInterpreter);

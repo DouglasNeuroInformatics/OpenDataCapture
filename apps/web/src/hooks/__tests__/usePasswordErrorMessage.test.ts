@@ -1,6 +1,7 @@
-import { renderHook } from '@testing-library/react';
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import { cleanup, renderHook } from '@testing-library/react';
 import { AxiosError, AxiosHeaders } from 'axios';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { usePasswordErrorMessage } from '../usePasswordErrorMessage';
 
@@ -25,13 +26,23 @@ function messageFor(err: unknown) {
 }
 
 describe('usePasswordErrorMessage', () => {
+  afterEach(() => {
+    cleanup();
+    i18n.changeLanguage('en');
+  });
+
   it.each([
     ['INSUFFICIENT_PASSWORD_STRENGTH', 'Insufficient password strength'],
     ['PASSWORD_IN_DATA_BREACH', 'This password has appeared in a known data breach and cannot be used'],
     ['PASSWORD_MATCHES_CURRENT', 'Password must not be the same as your current password'],
     ['PASSWORD_MATCHES_USERNAME', 'Password must not be the same as the username']
-  ])('should explain the %s policy rejection in the reader’s language', (code, message) => {
+  ])('should explain the %s policy rejection with its own message', (code, message) => {
     expect(messageFor(rejection(400, { code }))).toBe(message);
+  });
+
+  it('should explain a policy rejection in the reader’s language', () => {
+    i18n.changeLanguage('fr');
+    expect(messageFor(rejection(400, { code: 'INSUFFICIENT_PASSWORD_STRENGTH' }))).toBe('Mot de passe trop faible');
   });
 
   it('should fall back for an error that did not come from axios', () => {
