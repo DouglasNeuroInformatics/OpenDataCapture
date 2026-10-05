@@ -150,8 +150,7 @@ interface ConstantInstrumentMeasure<TData, TLanguage extends InstrumentLanguage>
 }
 
 type InstrumentMeasure<TData, TLanguage extends InstrumentLanguage> =
-  | ComputedInstrumentMeasure<TData, TLanguage>
-  | ConstantInstrumentMeasure<TData, TLanguage>;
+  ComputedInstrumentMeasure<TData, TLanguage> | ConstantInstrumentMeasure<TData, TLanguage>;
 
 type InstrumentMeasures<TData, TLanguage extends InstrumentLanguage> = {
   [key: string]: InstrumentMeasure<TData, TLanguage>;
@@ -197,8 +196,7 @@ type SeriesParams<TItemName extends string = string, TData = any> = {
 };
 
 type SeriesContent<TItemName extends string = string, TData = any> =
-  | ScalarInstrumentInternal[]
-  | { items: ScalarInstrumentInternal[]; params?: SeriesParams<TItemName, TData> };
+  ScalarInstrumentInternal[] | { items: ScalarInstrumentInternal[]; params?: SeriesParams<TItemName, TData> };
 
 interface SeriesInstrument<TLanguage extends InstrumentLanguage> extends BaseInstrument<TLanguage> {
   content: SeriesContent;
@@ -386,8 +384,7 @@ type DynamicFieldsetField<TLanguage, TFieldsetValue, TValue> = {
 
 type Fieldset<TLanguage, TFieldset> = {
   [K in keyof TFieldset]:
-    | DynamicFieldsetField<TLanguage, TFieldset, TFieldset[K]>
-    | ScalarField<TLanguage, TFieldset[K]>;
+    DynamicFieldsetField<TLanguage, TFieldset, TFieldset[K]> | ScalarField<TLanguage, TFieldset[K]>;
 };
 
 interface RecordArrayField<TLanguage, TValue> extends BaseField<TLanguage> {

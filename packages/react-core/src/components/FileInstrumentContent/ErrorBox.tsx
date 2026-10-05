@@ -17,7 +17,7 @@ export const ErrorBox: React.FC<
     >
       <div className="flex items-center gap-2">
         <AlertCircleIcon className="shrink-0" style={{ height: '16px', strokeWidth: '2px', width: '16px' }} />
-        <p className="text-tiny font-medium leading-none">{title}</p>
+        <p className="text-tiny leading-none font-medium">{title}</p>
       </div>
       {issues && (
         <ul className="flex flex-col gap-0.5 pl-6 text-xs">

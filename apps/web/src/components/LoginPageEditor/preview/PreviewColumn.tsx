@@ -63,7 +63,7 @@ export const PreviewColumn = ({ editor, onOpenFullscreen, onPreviewLangChange, p
 
       {/* Preview card — mirrors the actual login page layout: two-panel when
           branding is enabled, centered single-panel when disabled. */}
-      <div className="bg-background aspect-4/3 flex w-full overflow-hidden rounded-xl border shadow-sm">
+      <div className="bg-background flex aspect-4/3 w-full overflow-hidden rounded-xl border shadow-sm">
         {form.enableBranding && (
           <LoginBrandingPanel
             preview

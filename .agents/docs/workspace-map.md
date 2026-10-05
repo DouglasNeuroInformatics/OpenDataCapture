@@ -6,8 +6,8 @@ it. Read the `AGENTS.md` in a directory before editing it; this file only says w
 ## Before you add or move anything
 
 - **Workspace globs are `apps/*`, `packages/*`, `runtime/*`, `storybook`, `testing`, `vendor/**/\*`**
-(`pnpm-workspace.yaml`). A new directory under one of those is a workspace the moment it has a
-`package.json`. `cli/`, `docs/`, `blog/`and`.agents/` are not workspaces.
+  (`pnpm-workspace.yaml`). A new directory under one of those is a workspace the moment it has a
+  `package.json`. `cli/`, `docs/`, `blog/`and`.agents/` are not workspaces.
 - There are **27 first-party workspaces plus 38 under `vendor/`** — 66 entries including the root, as
   reported by `pnpm ls -r --depth -1`. The tables below cover the 27; `vendor/` is described as one
   group because every entry there follows the same shape.

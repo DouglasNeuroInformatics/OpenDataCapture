@@ -1,4 +1,4 @@
-@plugin "@tailwindcss/typography";
+@plugin '@tailwindcss/typography';
 @import '@douglasneuroinformatics/libui/tailwind/globals.css';
 @import './common.css';
 

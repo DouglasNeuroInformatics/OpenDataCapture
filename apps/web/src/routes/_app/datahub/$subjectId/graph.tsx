@@ -161,7 +161,7 @@ const RouteComponent = () => {
         </div>
       </div>
       <div
-        className="bg-card text-muted-foreground shadow-xs rounded-md border p-6 tracking-tight"
+        className="bg-card text-muted-foreground rounded-md border p-6 tracking-tight shadow-xs"
         data-testid="subject-graph-chart"
         ref={graphContainerRef}
       >

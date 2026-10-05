@@ -9,7 +9,7 @@ const { t } = useTranslations(Astro.url);
 <section class="flex min-h-[calc(100vh-4rem)] gap-12 text-center lg:-mt-8 lg:text-left" id="hero-section">
   <div class="flex translate-y-10 flex-col justify-center opacity-0 transition-all duration-1000 lg:w-1/2 xl:w-7/12">
     <h1
-      class="text-pretty text-3xl font-bold tracking-tight text-slate-900 md:text-4xl xl:text-5xl dark:text-slate-100"
+      class="text-3xl font-bold tracking-tight text-pretty text-slate-900 md:text-4xl xl:text-5xl dark:text-slate-100"
     >
       {t('landing.hero.heading')}
     </h1>
@@ -18,7 +18,7 @@ const { t } = useTranslations(Astro.url);
     </p>
     <div class="mt-5 flex justify-center gap-3 lg:justify-start">
       <a
-        class="focus:outline-hidden flex items-center justify-center rounded-md bg-slate-800 px-6 py-2 font-medium text-slate-100 shadow-md hover:bg-slate-700 dark:bg-sky-700 dark:hover:bg-sky-600"
+        class="flex items-center justify-center rounded-md bg-slate-800 px-6 py-2 font-medium text-slate-100 shadow-md hover:bg-slate-700 focus:outline-hidden dark:bg-sky-700 dark:hover:bg-sky-600"
         href="https://demo.opendatacapture.org"
         rel="noreferrer"
         target="_blank"
@@ -26,7 +26,7 @@ const { t } = useTranslations(Astro.url);
         {t('landing.hero.viewDemo')}
       </a>
       <button
-        class="focus:outline-hidden flex items-center justify-center rounded-md border bg-inherit px-6 py-2 font-medium shadow-md"
+        class="flex items-center justify-center rounded-md border bg-inherit px-6 py-2 font-medium shadow-md focus:outline-hidden"
         id="learn-more-btn"
         type="button"
       >

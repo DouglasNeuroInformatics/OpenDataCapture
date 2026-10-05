@@ -9,7 +9,7 @@ export const ToggledContent: React.FC<{ children: React.ReactNode; label: string
   return (
     <div>
       <button
-        className="flex w-min items-center justify-center gap-1 whitespace-nowrap rounded-md py-0.5 font-semibold"
+        className="flex w-min items-center justify-center gap-1 rounded-md py-0.5 font-semibold whitespace-nowrap"
         type="button"
         onClick={() => {
           setIsOpen(!isOpen);

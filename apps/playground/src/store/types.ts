@@ -25,10 +25,7 @@ export type TranspilerInitialState = {
 };
 
 export type TranspilerState =
-  | TranspilerBuildingState
-  | TranspilerBuiltState
-  | TranspilerErrorState
-  | TranspilerInitialState;
+  TranspilerBuildingState | TranspilerBuiltState | TranspilerErrorState | TranspilerInitialState;
 
 export type TranspilerSlice = {
   setTranspilerState: (state: TranspilerState) => void;

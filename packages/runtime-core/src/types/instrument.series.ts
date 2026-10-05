@@ -42,8 +42,7 @@ declare namespace SeriesInstrument {
   };
 
   export type Content<TItemName extends string = string, TData = any> =
-    | ScalarInstrumentInternal[]
-    | { items: ScalarInstrumentInternal[]; params?: Params<TItemName, TData> };
+    ScalarInstrumentInternal[] | { items: ScalarInstrumentInternal[]; params?: Params<TItemName, TData> };
 }
 
 /** @public */

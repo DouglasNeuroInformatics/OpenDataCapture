@@ -8,9 +8,7 @@ import type { FormContentSubmitResult } from '../FormContent';
 import type { InteractiveContentSubmitResult } from '../InteractiveContent';
 
 export type AnyContentResult =
-  | FileInstrumentContentSubmitResult
-  | FormContentSubmitResult
-  | InteractiveContentSubmitResult;
+  FileInstrumentContentSubmitResult | FormContentSubmitResult | InteractiveContentSubmitResult;
 
 export namespace InstrumentSubmitHandler {
   type ContextMixin<TResult extends { [key: string]: any }> = Simplify<

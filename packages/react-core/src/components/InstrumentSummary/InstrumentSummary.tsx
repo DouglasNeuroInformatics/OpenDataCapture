@@ -85,7 +85,7 @@ export const InstrumentSummary = ({
   const title = (instrument.clientDetails?.title ?? instrument.details.title).trim();
 
   return (
-    <div className="print:bg-primary-foreground space-y-6 print:fixed print:left-0 print:top-0 print:z-50 print:h-screen print:w-screen">
+    <div className="print:bg-primary-foreground space-y-6 print:fixed print:top-0 print:left-0 print:z-50 print:h-screen print:w-screen">
       <div className="flex">
         <div className="grow">
           <Heading variant="h4">

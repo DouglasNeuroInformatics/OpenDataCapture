@@ -15,7 +15,7 @@ export const Footer = () => {
         <div className="mb-1 flex flex-row flex-wrap font-medium lg:flex-nowrap">
           <div className="flex w-1/2 items-center justify-center lg:w-auto">
             <a
-              className="underline-offset-3 p-1 text-center hover:underline lg:mx-2"
+              className="p-1 text-center underline-offset-3 hover:underline lg:mx-2"
               href={config.meta.docsUrl}
               rel="noreferrer"
               target="_blank"
@@ -25,7 +25,7 @@ export const Footer = () => {
           </div>
           <div className="flex w-1/2 items-center justify-center lg:w-auto">
             <a
-              className="underline-offset-3 p-1 text-center hover:underline lg:mx-2"
+              className="p-1 text-center underline-offset-3 hover:underline lg:mx-2"
               href={config.meta.licenseUrl}
               rel="noreferrer"
               target="_blank"
@@ -35,7 +35,7 @@ export const Footer = () => {
           </div>
           <div className="flex w-1/2 items-center justify-center lg:w-auto">
             <a
-              className="underline-offset-3 p-1 text-center hover:underline lg:mx-2"
+              className="p-1 text-center underline-offset-3 hover:underline lg:mx-2"
               href={config.meta.githubRepoUrl}
               rel="noreferrer"
               target="_blank"
@@ -44,7 +44,7 @@ export const Footer = () => {
             </a>
           </div>
           <div className="flex w-1/2 items-center justify-center lg:w-auto">
-            <Link className="underline-offset-3 p-1 text-center hover:underline lg:mx-2" to="/contact">
+            <Link className="p-1 text-center underline-offset-3 hover:underline lg:mx-2" to="/contact">
               {t('footer.contact')}
             </Link>
           </div>

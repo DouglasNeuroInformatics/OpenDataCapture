@@ -470,7 +470,7 @@ const Walkthrough = () => {
         <Card className="max-w-md">
           <Card.Header className="pb-4">
             <Card.Title className="mr-4">{currentStep.title}</Card.Title>
-            <Button className="absolute right-2 top-2" size="icon" type="button" variant="ghost" onClick={close}>
+            <Button className="absolute top-2 right-2" size="icon" type="button" variant="ghost" onClick={close}>
               <XIcon className="h-4 w-4" />
             </Button>
           </Card.Header>

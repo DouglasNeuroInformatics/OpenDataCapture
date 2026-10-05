@@ -117,7 +117,7 @@ const Filters: React.FC<{
         </DropdownMenu.Group>
         <DropdownMenu.Label>{t('core.identificationData.dateOfBirth.label')}</DropdownMenu.Label>
         <DropdownMenu.Group>
-          <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
+          <div className="relative flex items-center justify-between gap-1 rounded-xs px-2 pt-1.5 pb-1 text-sm transition-colors">
             <span className="pb-1">{t({ en: 'Min:', es: 'Mín.:', fr: 'Min :' })}</span>
             <input
               className="text-muted-foreground pointer-events-auto rounded-sm border-b pb-0.5"
@@ -133,7 +133,7 @@ const Filters: React.FC<{
               }}
             />
           </div>
-          <div className="rounded-xs relative flex items-center justify-between gap-1 px-2 pb-1 pt-1.5 text-sm transition-colors">
+          <div className="relative flex items-center justify-between gap-1 rounded-xs px-2 pt-1.5 pb-1 text-sm transition-colors">
             <span className="pb-1">{t({ en: 'Max:', es: 'Máx.:', fr: 'Max :' })}</span>
             <input
               className="text-muted-foreground pointer-events-auto rounded-sm border-b pb-0.5"
@@ -473,12 +473,10 @@ const MasterDataTable: React.FC<{
         onSearchChange={(value, table) => {
           setSearchString(value);
           const subjectIdColumn = table.getColumn('subjectId')!;
-          subjectIdColumn.setFilterValue(
-            (prevValue: HasSearchStringFilter): HasSearchStringFilter => ({
-              ...prevValue,
-              searchString: value
-            })
-          );
+          subjectIdColumn.setFilterValue((prevValue: HasSearchStringFilter): HasSearchStringFilter => ({
+            ...prevValue,
+            searchString: value
+          }));
         }}
       />
     </SearchSubmitGuard>

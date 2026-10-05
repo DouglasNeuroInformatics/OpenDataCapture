@@ -357,7 +357,7 @@ const RouteComponent = () => {
               })}
             </Dialog.Description>
           </Dialog.Header>
-          <pre className="bg-muted max-h-72 overflow-auto whitespace-pre-wrap rounded-md p-4 text-sm">
+          <pre className="bg-muted max-h-72 overflow-auto rounded-md p-4 text-sm whitespace-pre-wrap">
             {fallbackMessage}
           </pre>
           <Dialog.Footer>

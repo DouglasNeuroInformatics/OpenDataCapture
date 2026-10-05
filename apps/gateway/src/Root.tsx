@@ -113,7 +113,7 @@ export const Root = (props: RootProps) => {
             </div>
           </div>
         </header>
-        <main className="container flex min-h-0 max-w-3xl grow flex-col pb-16 pt-32 xl:max-w-5xl">
+        <main className="container flex min-h-0 max-w-3xl grow flex-col pt-32 pb-16 xl:max-w-5xl">
           {props.kind === 'assignment' ? <Assignment {...props} /> : <Landing />}
         </main>
       </div>

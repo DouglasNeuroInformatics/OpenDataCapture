@@ -28,7 +28,7 @@ export const SaveStatus = ({ state }: { state: 'error' | 'idle' | 'saved' | 'sav
   const { icon, label } = CONTENT[state];
   return (
     <div
-      className="border-border bg-card/95 fixed bottom-4 right-4 z-50 flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-md backdrop-blur"
+      className="border-border bg-card/95 fixed right-4 bottom-4 z-50 flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-md backdrop-blur"
       data-testid={`save-status-${state}`}
     >
       {icon}

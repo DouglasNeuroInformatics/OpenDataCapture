@@ -208,7 +208,7 @@ const InstrumentSection = ({
                     es: 'Eliminar instrumento',
                     fr: "Supprimer l'instrument"
                   })}
-                  className="text-muted-foreground hover:text-destructive absolute right-0 top-1/2 -translate-y-1/2 p-1 transition-colors"
+                  className="text-muted-foreground hover:text-destructive absolute top-1/2 right-0 -translate-y-1/2 p-1 transition-colors"
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -626,7 +626,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         />
       )}
       <Heading variant="h4">{t('group.manage.accessibleInstruments')}</Heading>
-      <p className="text-muted-foreground mb-3 mt-1 text-sm">{description}</p>
+      <p className="text-muted-foreground mt-1 mb-3 text-sm">{description}</p>
       <div className="mb-4">
         <SearchBar
           placeholder={t({

@@ -12,7 +12,7 @@ export const ContextMenuCheckboxItem = forwardRef<
     <ContextMenuPrimitive.CheckboxItem
       checked={checked}
       className={cn(
-        'focus:bg-accent focus:text-accent-foreground rounded-xs outline-hidden relative flex cursor-default select-none items-center py-1.5 pl-8 pr-2 text-sm data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        'focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center rounded-xs py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className
       )}
       ref={ref}

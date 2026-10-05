@@ -220,7 +220,7 @@ export const SourceStep = ({
           >
             {modes.map((option) => (
               <Tabs.Trigger
-                className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground -mb-px rounded-none border-b-2 border-transparent px-1 pb-3 pt-1 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground -mb-px rounded-none border-b-2 border-transparent px-1 pt-1 pb-3 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                 data-testid={`bulk-source-mode-${option.value}`}
                 key={option.value}
                 value={option.value}

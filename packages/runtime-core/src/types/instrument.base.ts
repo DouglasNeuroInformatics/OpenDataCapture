@@ -144,8 +144,7 @@ type ConstantInstrumentMeasure<
 
 /** @public */
 type InstrumentMeasure<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> =
-  | ComputedInstrumentMeasure<TData, TLanguage>
-  | ConstantInstrumentMeasure<TData, TLanguage>;
+  ComputedInstrumentMeasure<TData, TLanguage> | ConstantInstrumentMeasure<TData, TLanguage>;
 
 /** @public */
 type InstrumentMeasures<TData = any, TLanguage extends InstrumentLanguage = InstrumentLanguage> = {

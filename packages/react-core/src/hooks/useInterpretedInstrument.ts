@@ -8,13 +8,10 @@ import type { AnyInstrument, AnyUnilingualInstrument, Language } from '@opendata
 
 /** The outcome of interpreting one bundle, kept alongside the bundle that produced it. */
 type Interpretation =
-  | { bundle: string; error: Error; status: 'ERROR' }
-  | { bundle: string; instrument: AnyInstrument; status: 'DONE' };
+  { bundle: string; error: Error; status: 'ERROR' } | { bundle: string; instrument: AnyInstrument; status: 'DONE' };
 
 export type InterpretedInstrumentState<TInstrument extends AnyUnilingualInstrument = AnyUnilingualInstrument> =
-  | { error: Error; status: 'ERROR' }
-  | { instrument: TInstrument; status: 'DONE' }
-  | { status: 'LOADING' };
+  { error: Error; status: 'ERROR' } | { instrument: TInstrument; status: 'DONE' } | { status: 'LOADING' };
 
 /**
  * Interpret an instrument bundle directly in the browser

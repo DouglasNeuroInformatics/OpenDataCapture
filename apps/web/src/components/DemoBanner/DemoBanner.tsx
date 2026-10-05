@@ -41,13 +41,13 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
       >
         <div className="mb-4 flex h-12 items-center px-1" data-testid="demo-dialog-branding">
           <Logo className="h-full w-auto" variant="auto" />
-          <span className="ml-3 whitespace-nowrap text-xl font-semibold tracking-tight text-slate-700 dark:text-slate-300">
+          <span className="ml-3 text-xl font-semibold tracking-tight whitespace-nowrap text-slate-700 dark:text-slate-300">
             Open Data Capture
           </span>
         </div>
-        <Dialog.Header className="w-full whitespace-break-spaces px-1">
+        <Dialog.Header className="w-full px-1 whitespace-break-spaces">
           <Dialog.Title className="mb-2">{t('auth.demo.info')}</Dialog.Title>
-          <Dialog.Description className="text-pretty text-left text-xs sm:text-sm">
+          <Dialog.Description className="text-left text-xs text-pretty sm:text-sm">
             {t('auth.demo.summary')}
           </Dialog.Description>
         </Dialog.Header>
