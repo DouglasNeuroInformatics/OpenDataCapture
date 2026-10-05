@@ -9,5 +9,5 @@
     },
     "types": ["@opendatacapture/runtime-v1/env", "node"]
   },
-  "include": ["scripts/*", "src/**/*"]
+  "include": ["scripts/*", "src/**/*", "vitest.config.ts"]
 }

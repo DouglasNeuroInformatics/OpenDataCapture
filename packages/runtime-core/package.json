@@ -21,7 +21,8 @@
     "build:dist": "pnpm exec esbuild --bundle --format=esm --target=es2020 --outfile=dist/index.js --platform=browser lib/index.js && api-extractor run -c config/api-extractor.json",
     "build:lib": "tsc -b tsconfig.build.json",
     "format": "prettier --write src",
-    "lint": "tsc --noEmit && eslint --fix src"
+    "lint": "tsc --noEmit && eslint --fix src",
+    "test": "vitest"
   },
   "peerDependencies": {
     "react": "workspace:react__19.x@*"
@@ -40,6 +41,7 @@
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
-    "esbuild": "catalog:"
+    "esbuild": "catalog:",
+    "happy-dom": "catalog:"
   }
 }

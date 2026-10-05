@@ -71,9 +71,10 @@ advice does not apply here; everything it says about the definition object does.
    Skipping this step compiles, builds, and produces an instrument that is never in a demo instance —
    `DNP_STROOP_TASK` is the live example of that.
 
-7. **Add an end-to-end test** in `testing/` — see `.agents/docs/playbooks/add-e2e-test.md`. There are
-   no unit tests here: `packages/instrument-library` has no `vitest.config.ts`, so `pnpm test` runs
-   nothing for it.
+7. **Add a unit test and an end-to-end test.** The unit test goes in the top-level
+   `packages/instrument-library/src/__tests__/`, never inside the instrument directory (§Tests in
+   `packages/instrument-library/AGENTS.md`). The e2e test goes in `testing/` — see
+   `.agents/docs/playbooks/add-e2e-test.md`.
 
 ## Verify
 

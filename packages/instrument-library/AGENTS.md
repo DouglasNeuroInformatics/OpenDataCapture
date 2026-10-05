@@ -70,8 +70,22 @@ grouped by kind; `--title` prints a flat list. **It reads `dist`, not `src`, so 
 
 ## Tests
 
-**This package has no `vitest.config.ts` and therefore no unit tests** (adding one:
-`.agents/docs/playbooks/add-vitest-project.md`). Correctness is covered by the bundler's own suite and by
-Playwright: `testing/src/specs/instrument-completion.spec.ts` and `gateway-assignment.spec.ts` drive
+`pnpm exec vitest --project instrument-library` runs the unit tests, in happy-dom.
+
+- **Put tests in the top-level `src/__tests__/` only.** The build turns every directory holding an
+  `index.*` into a bundle and reads each entry in it as a file, so a `__tests__/` inside an
+  instrument directory fails `pnpm build` (see "Instrument directories must be flat").
+- **Import the instrument's source default export**, with its extension:
+  `import instrument from '../forms/DNP_HAPPINESS_QUESTIONNAIRE/index.ts'` (`.tsx` where the entry
+  is). That is the `defineInstrument` result, not the bundle string `dist` exports.
+- **No build is needed.** `vitest.config.ts` aliases `/runtime/v1/@opendatacapture/runtime-core` to
+  `packages/runtime-core/src` and every other `/runtime/v1/<name>@<range>[/<subpath>]` to the
+  `vendor/<name>@<range>/src/` wrapper it is built from — `tsconfig.json`'s `paths` to
+  `runtime/v1/dist` applies only to `tsc`. A runtime import of a new vendored library resolves the
+  same way once its `vendor/` wrapper exists.
+- React renders: `content.render(done)` of an interactive task mounts into `document.body`, and
+  `@testing-library/react` is a devDependency. CSS imports load as empty modules.
+
+End-to-end coverage is Playwright: `testing/src/specs/instrument-completion.spec.ts` and `gateway-assignment.spec.ts` drive
 `Happiness Questionnaire` end to end. See `.agents/docs/architecture/testing-strategy.md` and
 `.agents/docs/architecture/instrument-pipeline.md`.

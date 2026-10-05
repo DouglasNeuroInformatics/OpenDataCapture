@@ -126,8 +126,16 @@ environment. They cover request schemas, helpers such as `resolveLanguage`, and 
 `render` from `src/entry-server.tsx` produces for each `RootProps` variant. That last one also
 fails at import if anything reachable from `Root.tsx` touches `window` at module scope (see SSR
 traps). `src/lib/setup-state.ts` keeps its state at module level, so a test of the defaults before
-the first push needs `vi.resetModules()` and a dynamic import. Nothing here starts the Express server
-or hydrates in a browser, so a router's behaviour and anything after hydration are tested end to end.
+the first push needs `vi.resetModules()` and a dynamic import.
+
+A component test (`Root.tsx`, `src/components/*`) that needs a DOM opts in per file with a
+`// @vitest-environment happy-dom` docblock on its first line and renders with
+`@testing-library/react`; the project default stays node so the SSR tests keep proving `Root.tsx`
+imports without `window`. Import `@/services/i18n` first, or `useTranslation` throws `Cannot access
+getter 'resolvedLanguage' … before initialization` (`Root.tsx` imports it; a lone component does
+not). Under happy-dom `@cap.js/widget` no longer returns early and fetches from `cdn.jsdelivr.net`,
+so a test rendering `Cap.tsx` needs `vi.mock('@cap.js/widget', () => ({}))`. Nothing here starts the Express server or hydrates in a browser, so a router's
+behaviour and anything after hydration are tested end to end.
 
 Most of the coverage is `testing/src/specs/gateway-assignment.spec.ts`, which drives the real
 two-origin flow through the Cap widget; `testing/src/specs/gateway-landing.spec.ts` covers `/`. See
