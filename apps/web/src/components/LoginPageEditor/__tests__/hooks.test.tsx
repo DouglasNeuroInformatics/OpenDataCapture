@@ -14,7 +14,11 @@ import type { BrandingEditor } from '../hooks';
 
 type BlockerOptions = { enableBeforeUnload: () => boolean; shouldBlockFn: () => boolean; withResolver: boolean };
 
-const mockAxios = vi.hoisted(() => ({ get: vi.fn(), isAxiosError: vi.fn(() => false), patch: vi.fn() }));
+const mockAxios = vi.hoisted(() => ({
+  get: vi.fn(),
+  isAxiosError: vi.fn(() => false),
+  patch: vi.fn<(url: string, body: { branding: BrandingConfig }) => Promise<unknown>>()
+}));
 const addNotification = vi.hoisted(() => vi.fn());
 const useBlocker = vi.hoisted(() => vi.fn((_options: BlockerOptions) => ({ status: 'idle' })));
 const readLogoAsWebpDataUrl = vi.hoisted(() => vi.fn<(file: File) => Promise<string>>());
@@ -70,6 +74,8 @@ const FULL_BRANDING: BrandingConfig = {
   taglineFontSize: 18
 };
 
+const FULL_FORM_LINKS = [{ href: 'https://example.com', label: { en: '', fr: 'Lien' } }];
+
 const VALID_LINK = { href: 'https://example.com', label: { en: 'Docs', fr: '' } };
 
 function createSetupState(branding: BrandingConfig | null): SetupState {
@@ -101,8 +107,7 @@ function submit(result: { current: BrandingEditor }) {
 async function submitAndCapture(result: { current: BrandingEditor }) {
   submit(result);
   await waitFor(() => expect(mockAxios.patch).toHaveBeenCalled());
-  const [, payload] = mockAxios.patch.mock.lastCall as [string, { branding: BrandingConfig }];
-  return payload.branding;
+  return mockAxios.patch.mock.lastCall![1].branding;
 }
 
 // React Query notifies observers on a zero-delay timeout, so the hook sees new server data a macrotask later.
@@ -123,7 +128,10 @@ describe('useBrandingForm', () => {
     mockAxios.patch.mockResolvedValue({});
   });
 
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
 
   describe('initial state', () => {
     it('should fall back on the defaults when nothing has been saved', () => {
@@ -168,29 +176,49 @@ describe('useBrandingForm', () => {
 
     it('should load every saved value into the form', () => {
       const { result } = renderBrandingForm(FULL_BRANDING);
-      expect(result.current.form).toMatchObject({
+      expect(result.current.form).toEqual({
         boldDetails: true,
         boldName: false,
+        boldResourceLinks: true,
+        boldTagline: true,
         customLogoHeight: '120',
         customLogoSrc: 'data:image/png;base64,AAAA',
         customLogoUrl: 'https://example.com/logo.png',
         customLogoWidth: '240',
         customPrimaryColor: '#111111',
+        customSecondaryColor: '#222222',
+        detailsFontSize: 14,
+        enableBranding: true,
+        instanceDetails: { en: 'Details', fr: 'Détails' },
         instanceName: { en: 'Name', fr: 'Nom' },
+        instanceTagline: { en: 'Tagline', fr: 'Slogan' },
+        loginTheme: 'forest',
+        logoAlignment: 'center',
+        logoSize: 'large',
         logoSource: 'url',
+        nameAlignment: 'right',
+        nameFontSize: 32,
         panelTextColor: '#333333',
+        resourceLinks: FULL_FORM_LINKS,
+        resourceLinksFontSize: 12,
         rightPanelOption: 'ocean',
+        rightPanelPrimaryColor: '#444444',
+        rightPanelSecondaryColor: '#555555',
         sectionsOrder: ['resources', 'details', 'tagline', 'name', 'logo'],
+        showDetails: false,
         showFooterLinks: false,
-        showResourceLinks: true
+        showLogo: false,
+        showResourceLinks: true,
+        showTagline: false,
+        taglineFontSize: 18
       });
     });
 
     it('should turn a missing resource link label into an empty string, so the inputs stay controlled', () => {
-      const { result } = renderBrandingForm(FULL_BRANDING);
-      expect(result.current.form.resourceLinks).toEqual([
-        { href: 'https://example.com', label: { en: '', fr: 'Lien' } }
-      ]);
+      const { result } = renderBrandingForm({
+        resourceLinks: [{ href: 'https://example.com', label: { fr: 'Lien' } }]
+      });
+      expect(result.current.form.resourceLinks).toEqual(FULL_FORM_LINKS);
     });
 
     it('should move a legacy http logo saved in the upload slot into the url slot', () => {
@@ -312,6 +340,17 @@ describe('useBrandingForm', () => {
       expect(readLogoAsWebpDataUrl).not.toHaveBeenCalled();
     });
 
+    it.each(['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'])(
+      'should accept a %s logo for encoding',
+      (type) => {
+        readLogoAsWebpDataUrl.mockReturnValue(new Promise(() => undefined));
+        const { result } = renderBrandingForm();
+        const file = new File(['x'], 'logo', { type });
+        act(() => result.current.handleLogoFile(file));
+        expect(readLogoAsWebpDataUrl).toHaveBeenCalledWith(file);
+      }
+    );
+
     it('should store the encoded image as the uploaded logo', async () => {
       readLogoAsWebpDataUrl.mockResolvedValue('data:image/webp;base64,BBBB');
       const { result } = renderBrandingForm();
@@ -328,7 +367,6 @@ describe('useBrandingForm', () => {
         expect(addNotification).toHaveBeenCalledWith(expect.objectContaining({ title: 'Invalid image', type: 'error' }))
       );
       expect(consoleError).toHaveBeenCalledWith(new Error('decode failed'));
-      consoleError.mockRestore();
     });
   });
 
@@ -478,6 +516,16 @@ describe('useBrandingForm', () => {
   });
 
   describe('previewBranding', () => {
+    it('should preview every form value in the saved shape', () => {
+      const { result } = renderBrandingForm(FULL_BRANDING);
+      expect(result.current.previewBranding).toEqual({
+        ...FULL_BRANDING,
+        resourceLinks: FULL_FORM_LINKS,
+        rightPanelPrimaryColor: null,
+        rightPanelSecondaryColor: null
+      });
+    });
+
     it('should preview an empty logo slot as null, so the panel shows no broken image', () => {
       const { result } = renderBrandingForm();
       expect(result.current.previewBranding).toMatchObject({ customLogoSrc: null, customLogoUrl: null });
@@ -546,6 +594,17 @@ describe('useBrandingForm', () => {
       expect(mockAxios.patch).not.toHaveBeenCalled();
     });
 
+    it('should save every field of a fully customized form as it was loaded', async () => {
+      const customized: BrandingConfig = {
+        ...FULL_BRANDING,
+        loginTheme: 'custom',
+        logoSize: 'custom',
+        rightPanelTheme: 'custom'
+      };
+      const { result } = renderBrandingForm(customized);
+      expect(await submitAndCapture(result)).toEqual(customized);
+    });
+
     it('should send the branding to the setup endpoint', async () => {
       const { result } = renderBrandingForm();
       submit(result);
@@ -606,7 +665,6 @@ describe('useBrandingForm', () => {
     it('should save a preset right panel theme without custom colors', async () => {
       const { result } = renderBrandingForm(FULL_BRANDING);
       expect(await submitAndCapture(result)).toMatchObject({
-        panelTextColor: '#333333',
         rightPanelPrimaryColor: null,
         rightPanelSecondaryColor: null,
         rightPanelTheme: 'ocean'

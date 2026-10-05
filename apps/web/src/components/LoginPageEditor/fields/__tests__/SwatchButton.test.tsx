@@ -1,3 +1,5 @@
+import type React from 'react';
+
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -14,8 +16,16 @@ describe('SwatchButton', () => {
   });
 
   it('should not submit a surrounding form, since picking a theme is not saving it', () => {
-    render(<SwatchButton isSelected={false} label="Ocean" style={{}} onClick={vi.fn()} />);
-    expect(screen.getByRole('button').getAttribute('type')).toBe('button');
+    const onClick = vi.fn();
+    const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <SwatchButton isSelected={false} label="Ocean" style={{}} onClick={onClick} />
+      </form>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Ocean' }));
+    expect(onClick).toHaveBeenCalledOnce();
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
   it('should ring the selected swatch, so the active theme stands out', () => {

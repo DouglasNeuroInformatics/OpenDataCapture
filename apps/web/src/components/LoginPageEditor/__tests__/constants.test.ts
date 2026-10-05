@@ -2,13 +2,10 @@ import { LOGIN_THEMES, PANEL_SECTIONS } from '@opendatacapture/schemas/setup';
 import { describe, expect, it } from 'vitest';
 
 import {
-  ACCEPTED_LOGO_MIME_TYPES,
   DEFAULT_PANEL_TEXT_COLOR,
   DEFAULT_SECTIONS_ORDER,
   HEX_PATTERN,
-  RIGHT_PANEL_LABELS,
   RIGHT_PANEL_OPTIONS,
-  THEME_LABELS,
   URL_PATTERN
 } from '../constants';
 
@@ -42,14 +39,5 @@ describe('LoginPageEditor constants', () => {
 
   it('should offer the default right panel and every theme but sunset, so the swatch grid stays 2 by 4', () => {
     expect([...RIGHT_PANEL_OPTIONS].sort()).toEqual(['none', ...LOGIN_THEMES.filter((t) => t !== 'sunset')].sort());
-  });
-
-  it('should label every right panel option and every theme', () => {
-    expect(Object.keys(RIGHT_PANEL_LABELS).sort()).toEqual([...RIGHT_PANEL_OPTIONS].sort());
-    expect(Object.keys(THEME_LABELS).sort()).toEqual([...LOGIN_THEMES].sort());
-  });
-
-  it('should accept only image types', () => {
-    expect(ACCEPTED_LOGO_MIME_TYPES.every((type) => type.startsWith('image/'))).toBe(true);
   });
 });
