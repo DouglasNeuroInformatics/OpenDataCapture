@@ -217,21 +217,6 @@ describe('Server — single mode', () => {
     }
   });
 
-  it('should report 503 while the bundle has not yet compiled', async () => {
-    fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
-    const server = await Server.create({ mode: 'single', port, target: tmpDir, verbose: false });
-    await server.start();
-    try {
-      // The bundle compiles lazily, on first request, so a request racing the very first one can
-      // still observe PENDING — but by the time this awaits, the first request already resolved
-      // it, so assert on the documented contract instead: either outcome is a defined response.
-      const res = await fetch(`http://localhost:${port}/`);
-      expect([200, 503]).toContain(res.status);
-    } finally {
-      await server.stop();
-    }
-  });
-
   it('should reuse the compiled bundle on a repeat request, so serving a page does not rebuild it', async () => {
     fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
     await withServer('single', async () => {

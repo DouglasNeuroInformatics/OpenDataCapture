@@ -50,12 +50,15 @@ is still an unhandled rejection. Only the argument/option parsers exit cleanly t
 
 `pnpm exec vitest --project serve-instrument`. `src/__tests__/cli.test.ts` drives the CLI with a
 stubbed `process.argv` and a fresh module per test, `Server` itself mocked out.
-`src/__tests__/root.test.tsx` renders `Root` with `renderToStaticMarkup` — no DOM, so
-`LanguageSwitcher`'s interactive half goes unexercised. `src/__tests__/server.test.ts` starts a real
-`Server` against real temp-directory fixtures and drives it with real `fetch` calls; it stubs the
-`client.js` / `__TAILWIND_STYLES__` globals that only exist post-build, and replaces `fs.watch` at
-the module level (it is a named ESM export, which `vi.spyOn` cannot touch) so a test can fire the
-rebuild callback on demand and assert every watcher's `close()` ran after `stop()`.
+`src/__tests__/root.test.tsx` runs under happy-dom: the static pages go through
+`renderToStaticMarkup`, while `LanguageSwitcher` and the `alert` `onSubmit` are driven through
+`createRoot` and `act`. `src/__tests__/client.test.tsx` mocks `react-dom/client`'s `hydrateRoot` and
+stubs the `__ROOT_PROPS__` global before importing the entry. `src/__tests__/server.test.ts` starts a
+real `Server` against real temp-directory fixtures and drives it with real `fetch` calls; it stubs the
+`client.js` / `__TAILWIND_STYLES__` globals that only exist post-build, wraps instrument-bundler's
+`bundle` in `vi.fn(actual.bundle)` so a test can force a rejection, and replaces `fs.watch` at the
+module level (it is a named ESM export, which `vi.spyOn` cannot touch) so a test can fire the rebuild
+callback on demand and assert every watcher's `close()` ran after `stop()`.
 
 There is no `dev` script either: `pnpm --filter @opendatacapture/serve-instrument build`, then
 `node dist/cli.js <dir>`.

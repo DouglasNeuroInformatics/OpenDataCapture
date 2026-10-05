@@ -28,7 +28,7 @@ describe('client', () => {
     expect(hydrateRoot.mock.lastCall?.[0]).toBe(document.getElementById('root'));
   });
 
-  it('should hydrate Root in strict mode with the props the server injected', () => {
+  it('should hydrate Root in strict mode with the server-injected props, so the client tree matches the SSR markup', () => {
     expect(hydrateRoot.mock.lastCall?.[1]).toMatchObject({
       props: { children: { props: ROOT_PROPS, type: Root } },
       type: StrictMode

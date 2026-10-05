@@ -42,6 +42,8 @@ const SUBMITTABLE_BUNDLE = `(async () => ({
   validationSchema: globalThis.__serveInstrumentValidationSchema
 }))()`;
 
+const SUBMITTED_ALERT = JSON.stringify({ _message: 'The following data will be submitted', data: {} }, null, 2);
+
 const mountedRoots: ReactRoot[] = [];
 
 function renderIntoDocument(element: ReactNode) {
@@ -149,7 +151,7 @@ describe('Root', () => {
     );
     await submitInstrument(container);
     await vi.waitFor(() => {
-      expect(alert).toHaveBeenCalledWith(expect.stringContaining('The following data will be submitted'));
+      expect(alert).toHaveBeenCalledWith(SUBMITTED_ALERT);
     });
   });
 
@@ -166,7 +168,7 @@ describe('Root', () => {
     );
     await submitInstrument(container);
     await vi.waitFor(() => {
-      expect(alert).toHaveBeenCalledWith(expect.stringContaining('The following data will be submitted'));
+      expect(alert).toHaveBeenCalledWith(SUBMITTED_ALERT);
     });
   });
 });
