@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ah } from '../async-handler';
 
 describe('ah', () => {
-  it('should pass the request, response and next function through to the wrapped handler', () => {
+  it('should pass the request, response and next function through to the wrapped handler, so it behaves like a plain express handler', () => {
     const fn = vi.fn<(req: Request, res: Response, next: NextFunction) => Promise<void>>(() => Promise.resolve());
     const next = vi.fn();
     ah(fn)(express.request, express.response, next);

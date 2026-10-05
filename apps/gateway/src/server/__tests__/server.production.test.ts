@@ -1,5 +1,6 @@
 import { once } from 'events';
 import fs from 'fs';
+import type { Server } from 'http';
 
 import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -51,11 +52,11 @@ class TestProductionServer extends ProductionServer {
   }
 }
 
-const closeServers: (() => void)[] = [];
+const openServers: Server[] = [];
 
 async function request(path: string, init?: RequestInit) {
   const httpServer = new TestProductionServer().listenOnRandomPort();
-  closeServers.push(() => httpServer.close());
+  openServers.push(httpServer);
   await once(httpServer, 'listening');
   const address = httpServer.address();
   if (typeof address !== 'object' || address === null) {
@@ -64,8 +65,13 @@ async function request(path: string, init?: RequestInit) {
   return fetch(`http://localhost:${address.port}${path}`, init);
 }
 
-afterEach(() => {
-  closeServers.splice(0).forEach((close) => close());
+afterEach(async () => {
+  await Promise.all(
+    openServers.splice(0).map((httpServer) => {
+      httpServer.closeAllConnections();
+      return new Promise((resolve) => httpServer.close(resolve));
+    })
+  );
 });
 
 afterAll(() => {
@@ -73,7 +79,7 @@ afterAll(() => {
 });
 
 describe('ProductionServer', () => {
-  it('should serve the built client assets from the root path', async () => {
+  it('should serve the built client assets from the root path, so the prerendered page can load its scripts', async () => {
     const response = await request('/assets/app.js');
     expect(await response.text()).toBe(LARGE_ASSET);
   });
@@ -88,16 +94,16 @@ describe('ProductionServer', () => {
     expect(response.status).toBe(404);
   });
 
-  it('should compress responses for clients that accept it', async () => {
+  it('should compress responses for clients that accept it, so patients on slow connections load faster', async () => {
     const response = await request('/assets/app.js', { headers: { 'Accept-Encoding': 'gzip' } });
     expect(response.headers.get('content-encoding')).toBe('gzip');
   });
 
-  it('should use the built client index.html as the template', () => {
+  it('should use the built client index.html as the template, so the page references the hashed production assets', () => {
     expect(new TestProductionServer().template()).toBe(TEMPLATE);
   });
 
-  it('should load the render function from the built ssr entry', async () => {
+  it('should load the render function from the built ssr entry, so production renders without vite', async () => {
     const render = await new TestProductionServer().render();
     expect(render({ activeLanguages: ['en'], kind: 'landing', language: 'en' })).toStrictEqual({
       html: 'rendered landing'

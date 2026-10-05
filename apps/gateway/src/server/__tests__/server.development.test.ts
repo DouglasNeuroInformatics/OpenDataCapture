@@ -1,7 +1,8 @@
 import { once } from 'events';
 import fs from 'fs';
+import type { Server } from 'http';
 
-import { afterAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
 
 import { config } from '@/config';
 import type { RenderFunction } from '@/entry-server';
@@ -57,6 +58,20 @@ class TestDevelopmentServer extends DevelopmentServer {
   }
 }
 
+const openServers: Server[] = [];
+
+afterEach(async () => {
+  await Promise.all(
+    openServers.splice(0).map((httpServer) => {
+      httpServer.closeAllConnections();
+      return new Promise((resolve) => httpServer.close(resolve));
+    })
+  );
+  vite.ssrFixStacktrace.mockClear();
+  vite.ssrLoadModule.mockClear();
+  vite.transformIndexHtml.mockClear();
+});
+
 afterAll(() => {
   fs.rmSync(config.root, { force: true, recursive: true });
 });
@@ -68,13 +83,13 @@ describe('DevelopmentServer', () => {
 
   it('should mount the vite middlewares, so client assets are served with hot reload', async () => {
     const httpServer = new TestDevelopmentServer().listenOnRandomPort();
+    openServers.push(httpServer);
     await once(httpServer, 'listening');
     const address = httpServer.address();
     if (typeof address !== 'object' || address === null) {
       throw new Error(`Expected the server to listen on a port, got: ${address}`);
     }
     const response = await fetch(`http://localhost:${address.port}/src/entry-client.tsx`);
-    httpServer.close();
     expect(await response.text()).toBe('served by vite');
   });
 
@@ -84,14 +99,14 @@ describe('DevelopmentServer', () => {
     expect(vite.ssrFixStacktrace).toHaveBeenCalledWith(error);
   });
 
-  it('should load the render function from the esbuild entry through vite', async () => {
+  it('should load the render function from the esbuild entry through vite, so ssr picks up source changes without a restart', async () => {
     const render: RenderFunction = () => ({ html: '' });
     vite.ssrLoadModule.mockResolvedValueOnce({ render });
     await expect(new TestDevelopmentServer().render()).resolves.toBe(render);
     expect(vite.ssrLoadModule).toHaveBeenCalledWith('/dist/entry-server.js');
   });
 
-  it('should read index.html from the app root and let vite transform it for the requested url', async () => {
+  it('should read index.html from the app root and let vite transform it for the requested url, so the page gets the hot reload client', async () => {
     await expect(new TestDevelopmentServer().template('/assignments/1')).resolves.toBe(
       '/assignments/1 <html>template</html>'
     );

@@ -14,7 +14,7 @@ type LogEntry = { level: number; req?: string; res?: number };
 const { API_KEY, landingProps, logLines } = vi.hoisted(() => ({
   API_KEY: 'k'.repeat(32),
   landingProps: { activeLanguages: ['en', 'fr'], kind: 'landing', language: 'en' } satisfies RootProps,
-  logLines: [] as string[]
+  logLines: new Array<string>()
 }));
 
 vi.mock('@/config', () => ({ config: { apiKey: API_KEY, port: 0 } }));
@@ -132,7 +132,7 @@ describe('BaseServer', () => {
       expect(server.templateUrls).toStrictEqual(['/?lang=fr']);
     });
 
-    it('should respond with a 500 when the render function cannot be loaded', async () => {
+    it('should respond with a generic 500 when the render function cannot be loaded, so the patient sees no stack trace', async () => {
       const server = new TestServer(() => Promise.reject(new Error('missing bundle')));
       const response = await request(server, '/');
       expect(response.status).toBe(500);
@@ -173,7 +173,7 @@ describe('BaseServer', () => {
       expect(await response.json()).toStrictEqual({ challenge: true });
     });
 
-    it('should reject an api request without the api key', async () => {
+    it('should reject an api request without the api key, so only the api can create or update assignments', async () => {
       const response = await request(new TestServer(), '/api/echo', { body: '{}', method: 'POST' });
       expect(response.status).toBe(401);
     });
@@ -190,14 +190,14 @@ describe('BaseServer', () => {
   });
 
   describe('request logging', () => {
-    it('should log a request as its method and url with the response status code', async () => {
+    it('should log a request as its method and url with the response status code, so each log line identifies the request', async () => {
       await request(new TestServer(), '/api/healthcheck');
       await vi.waitFor(() => {
         expect(readLogEntries()).toContainEqual(expect.objectContaining({ req: 'GET /api/healthcheck', res: 200 }));
       });
     });
 
-    it('should log a successful response at the info level', async () => {
+    it('should log a successful response at the info level, so ordinary traffic does not raise alerts', async () => {
       await request(new TestServer(), '/api/healthcheck');
       await vi.waitFor(() => {
         expect(readLogEntries()).toContainEqual(expect.objectContaining({ level: 30, res: 200 }));
@@ -213,7 +213,7 @@ describe('BaseServer', () => {
   });
 
   describe('listen', () => {
-    it('should listen on the configured port by default and log where the server started', async () => {
+    it('should listen on the configured port by default and log where it started, so the operator knows where to connect', async () => {
       const logInfo = vi.spyOn(logger, 'info');
       const httpServer = new TestServer().listen();
       openServers.push(httpServer);

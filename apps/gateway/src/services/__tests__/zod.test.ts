@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { i18n } from '../i18n';
 import { localizeValidationErrors } from '../zod';
@@ -8,6 +8,10 @@ const { localizeZodErrors } = vi.hoisted(() => ({
 }));
 
 vi.mock('@opendatacapture/react-core', () => ({ localizeZodErrors }));
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
 
 describe('localizeValidationErrors', () => {
   it('should localize both the app and runtime zod instances, so instrument validation messages are translated too', async () => {
