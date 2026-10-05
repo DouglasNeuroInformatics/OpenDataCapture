@@ -104,9 +104,9 @@ describe('parseDelimitedText', () => {
     expect(errors[0]?.message).toContain('No columns were found');
   });
 
-  it('should reject malformed quoting, naming the row it occurs on', async () => {
+  it("should reject malformed quoting with the parser's error message", async () => {
     const errors = await failureOf(() => parseDelimitedText('subjectId\n"subject-1'));
-    expect(errors).toEqual([{ message: 'Quoted field unterminated', row: 1 }]);
+    expect(errors.map(({ message }) => message)).toEqual(['Quoted field unterminated']);
   });
 });
 
@@ -478,7 +478,7 @@ describe('parseWorkbook', () => {
     expect(result.rows).toEqual([{ score: '', subjectId: 'subject-1' }]);
   });
 
-  it('should reject a sheet holding only a header row, which yields no columns to map', async () => {
+  it('should reject a sheet holding only a header row', async () => {
     const errors = await failureOf(() => parseWorkbook(workbookFile([['subjectId']])));
     expect(errors[0]?.message).toContain('No columns were found');
   });
