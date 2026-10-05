@@ -46,6 +46,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   Reflect.deleteProperty(window, 'frameElement');
+  document.documentElement.removeAttribute('dir');
   vi.restoreAllMocks();
 });
 
