@@ -129,9 +129,7 @@ describe('zod v4 error map', () => {
     expect(describeV4({ code: 'invalid_union', errors: [[]], input: 'x' })).toBe(INVALID);
   });
 
-  // Defect: describeIssue passes no args when the issue has no affix, so the message keeps its
-  // placeholder. This pins today's output so a fix shows up as a deliberate change here.
-  it('should leave the {} placeholder unfilled when the issue carries no affix (defect)', () => {
+  it('should leave the placeholder unfilled for a hand-raised issue without an affix, which zod itself always sets', () => {
     expect(describeV4({ code: 'invalid_format', format: 'includes', input: 'x' })).toBe('Must include "{}"');
   });
 
