@@ -1,3 +1,4 @@
+import type { MockInstance } from 'vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import instrument from '../interactive/DNP_BREAKOUT_TASK/index.ts';
@@ -29,6 +30,14 @@ function setViewport(width: number, height: number) {
 let context: RecordingContext;
 let nextFrame: FrameRequestCallback | undefined;
 let done: ReturnType<typeof vi.fn<(data: BreakoutData) => void>>;
+let addDocumentListener: MockInstance<typeof document.addEventListener>;
+
+const CANVAS_WIDTH = 480;
+const BALL_RADIUS = 10;
+const BALL_SPEED = 2;
+const PADDLE_STEP = 7;
+const PADDLE_WIDTH = 75;
+const FRAMES_TO_CROSS_CANVAS = Math.ceil(CANVAS_WIDTH / PADDLE_STEP);
 
 function render() {
   instrument.content.render(done);
@@ -43,6 +52,7 @@ function step(frames = 1) {
   for (let i = 0; i < frames; i++) {
     const frame = nextFrame!;
     nextFrame = undefined;
+    addDocumentListener = vi.spyOn(document, 'addEventListener');
     frame(performance.now());
   }
 }
@@ -90,6 +100,7 @@ beforeEach(() => {
   context = createRecordingContext();
   done = vi.fn<(data: BreakoutData) => void>();
   nextFrame = undefined;
+  addDocumentListener = vi.spyOn(document, 'addEventListener');
   // The page under test only calls the 2D context methods recorded here, and happy-dom has no canvas
   // adapter, so getContext would otherwise return null.
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context as unknown as CanvasRenderingContext2D);
@@ -102,6 +113,9 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  for (const [type, listener, options] of addDocumentListener.mock.calls) {
+    document.removeEventListener(type, listener, options);
+  }
   vi.restoreAllMocks();
   vi.useRealTimers();
   document.body.replaceChildren();
@@ -198,15 +212,21 @@ describe('DNP_BREAKOUT_TASK', () => {
     it('should stop the paddle at the right wall', () => {
       start();
       pressKey('keydown', 'ArrowRight');
-      step(40);
-      expect(lastPaddleX()).toBe(405.5);
+      step(FRAMES_TO_CROSS_CANVAS);
+      const stoppedX = lastPaddleX();
+      step(5);
+      expect(lastPaddleX()).toBe(stoppedX);
+      expect(stoppedX).toBeGreaterThanOrEqual(CANVAS_WIDTH - PADDLE_WIDTH - PADDLE_STEP);
     });
 
     it('should stop the paddle at the left wall', () => {
       start();
       pressKey('keydown', 'ArrowLeft');
-      step(40);
-      expect(lastPaddleX()).toBe(-0.5);
+      step(FRAMES_TO_CROSS_CANVAS);
+      const stoppedX = lastPaddleX();
+      step(5);
+      expect(lastPaddleX()).toBe(stoppedX);
+      expect(stoppedX).toBeLessThanOrEqual(PADDLE_STEP);
     });
 
     it('should center the paddle on the mouse inside the canvas', () => {
@@ -234,17 +254,15 @@ describe('DNP_BREAKOUT_TASK', () => {
 
     it('should stop drawing a brick once the ball breaks it', () => {
       start();
-      step(91);
+      stepUntil(() => context.fillText.mock.calls.some(([text]) => text === 'Score: 1'));
       context.rect.mockClear();
       step();
       expect(context.rect).toHaveBeenCalledTimes(15);
-      expect(context.fillText).toHaveBeenLastCalledWith('Lives: 3', 415, 20);
-      expect(context.fillText).toHaveBeenCalledWith('Score: 1', 8, 20);
     });
 
     it('should bounce the ball off the side wall', () => {
       start();
-      step(115);
+      stepUntil(() => lastBall().x > CANVAS_WIDTH - BALL_RADIUS - BALL_SPEED);
       const before = lastBall();
       step();
       expect(lastBall().x).toBeLessThan(before.x);

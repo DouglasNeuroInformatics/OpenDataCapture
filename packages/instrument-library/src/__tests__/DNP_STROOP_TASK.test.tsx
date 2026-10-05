@@ -1,8 +1,24 @@
+import type { Root } from '/runtime/v1/react-dom@19.x/client.js';
+
 import { act, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import instrument from '../interactive/DNP_STROOP_TASK/index.tsx';
 import { StroopTask } from '../interactive/DNP_STROOP_TASK/StroopTask.tsx';
+
+const mountedRoots = vi.hoisted((): Root[] => []);
+
+vi.mock('/runtime/v1/react-dom@19.x/client.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('/runtime/v1/react-dom@19.x/client.js')>();
+  return {
+    ...actual,
+    createRoot: (...args: Parameters<typeof actual.createRoot>) => {
+      const root = actual.createRoot(...args);
+      mountedRoots.push(root);
+      return root;
+    }
+  };
+});
 
 vi.mock('../interactive/DNP_STROOP_TASK/StroopTask.tsx', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../interactive/DNP_STROOP_TASK/StroopTask.tsx')>();
@@ -16,6 +32,10 @@ function render(done: (data: { score: number }) => void) {
 }
 
 afterEach(() => {
+  act(() => {
+    mountedRoots.forEach((root) => root.unmount());
+  });
+  mountedRoots.length = 0;
   document.body.replaceChildren();
   vi.clearAllMocks();
 });
