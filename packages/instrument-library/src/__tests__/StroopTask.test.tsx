@@ -47,15 +47,17 @@ describe('StroopTask', () => {
     ]);
   });
 
-  it('should award a point when the clicked color matches the ink color', () => {
+  it('should award a point when the clicked color matches the ink color rather than the word', () => {
+    vi.mocked(Math.random).mockReturnValueOnce(RANDOM_RED).mockReturnValueOnce(RANDOM_BLUE);
     renderStroopTask();
-    fireEvent.click(screen.getByRole('button', { name: 'RED' }));
+    fireEvent.click(screen.getByRole('button', { name: 'BLUE' }));
     expect(screen.getByRole('heading', { name: 'Score: 1' })).toBeTruthy();
   });
 
-  it('should withhold the point when the clicked color differs from the ink color', () => {
+  it('should withhold the point when the clicked color matches only the word, not the ink color', () => {
+    vi.mocked(Math.random).mockReturnValueOnce(RANDOM_RED).mockReturnValueOnce(RANDOM_BLUE);
     renderStroopTask();
-    fireEvent.click(screen.getByRole('button', { name: 'BLUE' }));
+    fireEvent.click(screen.getByRole('button', { name: 'RED' }));
     expect(screen.getByRole('heading', { name: 'Score: 0' })).toBeTruthy();
   });
 
