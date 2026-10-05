@@ -40,11 +40,17 @@ describe('SubjectsController', () => {
     expect(subjectsService.create).toHaveBeenCalledWith({ id: 'subject-1' });
   });
 
-  it('should delete a subject within what the caller may delete, forcing only when asked', async () => {
+  it('should delete a subject within what the caller may delete, forcing when asked', async () => {
     subjectsService.deleteById.mockResolvedValue({ id: 'subject-1' });
 
     await expect(subjectsController.deleteById('subject-1', true, ability)).resolves.toEqual({ id: 'subject-1' });
     expect(subjectsService.deleteById).toHaveBeenCalledWith('subject-1', { ability, force: true });
+  });
+
+  it('should leave force unset when the query omits it, so a subject with records is not deleted by default', async () => {
+    await subjectsController.deleteById('subject-1', undefined, ability);
+
+    expect(subjectsService.deleteById).toHaveBeenCalledWith('subject-1', { ability, force: undefined });
   });
 
   it('should list the subjects of the requested group within what the caller may read', async () => {

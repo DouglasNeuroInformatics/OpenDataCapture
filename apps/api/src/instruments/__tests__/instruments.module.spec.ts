@@ -26,12 +26,12 @@ describe('InstrumentsModule', () => {
     );
   });
 
-  // Vitest runs its workers under the `development` condition, whose workspace-relative target Node rejects
-  // (`pnpm dev` resolves it through swc-node's tsconfig `paths` instead), so the specifier Node receives is
-  // observable here only through the error naming the subpath import it was looked up as.
-  it('should resolve a runtime import through the api #runtime subpath import', () => {
-    expect(() =>
-      getVirtualizationContext().__resolveImport('/runtime/v1/@opendatacapture/runtime-core/index.js')
-    ).toThrowError("'#runtime/v1/*'");
+  // Known defect: the `development` target of `#runtime/v1/*` in apps/api/package.json is
+  // `../../runtime/v1/dist/*`, which is not package-relative, so Node rejects it with
+  // ERR_INVALID_PACKAGE_TARGET under `--conditions=development` (as vitest and `pnpm dev` run).
+  it.fails('should resolve a runtime import to the built runtime, even under the development condition', () => {
+    expect(getVirtualizationContext().__resolveImport('/runtime/v1/@opendatacapture/runtime-core/index.js')).toBe(
+      new URL('../../../../../runtime/v1/dist/@opendatacapture/runtime-core/index.js', import.meta.url).href
+    );
   });
 });

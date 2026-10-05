@@ -13,6 +13,7 @@ import { Test } from '@nestjs/testing';
 import { bundle } from '@opendatacapture/instrument-bundler';
 import type { SeriesInstrument } from '@opendatacapture/runtime-core';
 import type { WithID } from '@opendatacapture/schemas/core';
+import type { Group } from '@opendatacapture/schemas/group';
 import { errAsync, okAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MockInstance } from 'vitest';
@@ -21,6 +22,7 @@ import { z } from 'zod/v4';
 import { AuditLogger } from '@/audit/audit.logger';
 import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
+import type { AppAbility } from '@/auth/auth.types';
 
 import { InstrumentsService } from '../instruments.service';
 
@@ -94,6 +96,43 @@ const groupItemFilter = ({
     { id: { in: accessibleInstrumentIds } }
   ]
 });
+
+/** A group the current user belongs to, with nothing assigned or accessible. */
+const createGroup = (id: string): Group => ({
+  accessibleInstrumentIds: [],
+  createdAt: new Date(0),
+  id,
+  instrumentRepoIds: [],
+  name: id,
+  settings: { defaultIdentificationMethod: 'PERSONAL_INFO' },
+  subjectIds: [],
+  type: 'CLINICAL',
+  updatedAt: new Date(0),
+  userIds: []
+});
+
+/** A logged-in user holding `ability`, belonging to `groups`. */
+const createRequestUser = (ability: AppAbility, groups: Group[] = []): RequestUser => ({
+  ability,
+  basePermissionLevel: 'GROUP_MANAGER',
+  firstName: 'Test',
+  groups,
+  id: 'admin-1',
+  kind: 'login',
+  lastName: 'User',
+  mustResetPassword: false,
+  permissions: [],
+  username: 'test-user'
+});
+
+/** The series definition `createSeries` last handed to the bundler. */
+const bundledDefinition = (): unknown => {
+  const content = vi.mocked(bundle).mock.lastCall?.[0].inputs[0]?.content;
+  if (typeof content !== 'string') {
+    throw new Error('Expected createSeries to bundle a source string');
+  }
+  return JSON.parse(content.replace(/^export default /, '').replace(/;$/, ''));
+};
 
 describe('InstrumentsService', () => {
   let instrumentsService: InstrumentsService;
@@ -422,10 +461,7 @@ describe('InstrumentsService', () => {
         language: 'en'
       });
 
-      const source = vi.mocked(bundle).mock.lastCall?.[0].inputs[0]!.content as string;
-      expect(JSON.parse(source.replace(/^export default /, '').replace(/;$/, ''))).toMatchObject({
-        details: { title: 'Padded Series' }
-      });
+      expect(bundledDefinition()).toMatchObject({ details: { title: 'Padded Series' } });
     });
 
     // Items are named by internal name + edition, which the caller controls entirely, so a manager could
@@ -574,12 +610,12 @@ describe('InstrumentsService', () => {
     it('should refuse a bundle whose default export is not an instrument, reporting the validation issues', async () => {
       virtualizationService.eval.mockReturnValue(okAsync({ kind: 'FORM' }));
 
-      const error: unknown = await instrumentsService.create({ bundle: '__BUNDLE__' }).catch((err: unknown) => err);
-
-      expect(error).toBeInstanceOf(UnprocessableEntityException);
-      expect((error as UnprocessableEntityException).getResponse()).toMatchObject({
-        issues: expect.arrayContaining([expect.objectContaining({ path: expect.any(Array) })]),
-        message: 'Instrument validation failed'
+      await expect(instrumentsService.create({ bundle: '__BUNDLE__' })).rejects.toMatchObject({
+        response: {
+          issues: expect.arrayContaining([expect.objectContaining({ path: expect.any(Array) })]),
+          message: 'Instrument validation failed'
+        },
+        status: 422
       });
     });
 
@@ -606,7 +642,7 @@ describe('InstrumentsService', () => {
 
     it('should treat a group with no stored access lists as having none, rather than failing the lookup', async () => {
       instrumentModel.exists.mockResolvedValue(false);
-      groupModel.findFirst.mockResolvedValue({ id: 'group-1' } as any);
+      groupModel.findFirst.mockResolvedValue({ id: 'group-1' });
 
       await instrumentsService.create({ bundle: '__BUNDLE__' }, { seriesGroupId: 'group-1' });
 
@@ -1155,7 +1191,7 @@ describe('InstrumentsService', () => {
       instrumentModel.findMany.mockResolvedValue([
         { bundle: 'FORM_BUNDLE', id: 'hash:FORM_A-1' },
         { bundle: 'SERIES_BUNDLE', id: 'series-1' }
-      ] as any);
+      ]);
       virtualizationService.eval.mockImplementation((code) =>
         okAsync(code === 'FORM_BUNDLE' ? formInstance('FORM_A', 1) : existingSeries)
       );
@@ -1233,7 +1269,7 @@ describe('InstrumentsService', () => {
     });
 
     it('should refuse an instance of an unknown kind, rather than serving a bundle no client can render', async () => {
-      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'odd' } as any);
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'odd' });
       virtualizationService.eval.mockReturnValue(okAsync({ kind: 'UNKNOWN' }));
 
       await expect(instrumentsService.findBundleById('odd')).rejects.toThrowError(
@@ -1262,7 +1298,7 @@ describe('InstrumentsService', () => {
 
     it('should narrow the listing to a requested group the current user belongs to', async () => {
       const ability = createAppAbility([{ action: 'read', subject: 'Instrument' }]);
-      const currentUser = { ability, groups: [{ id: 'group-1' }, { id: 'group-2' }] } as unknown as RequestUser;
+      const currentUser = createRequestUser(ability, [createGroup('group-1'), createGroup('group-2')]);
 
       await instrumentsService.list({ kind: 'FORM' }, currentUser, 'group-2');
 
@@ -1283,7 +1319,7 @@ describe('InstrumentsService', () => {
       instrumentModel.findMany.mockResolvedValue([
         { id: 'hash:FORM_A-1', sourceRepoId: 'repo-1', sourceRepoName: 'Clinic Repo' },
         { id: 'hash:FORM_B-1', sourceRepoId: 'repo-2', sourceRepoName: null }
-      ] as any);
+      ]);
 
       await expect(instrumentsService.findInfo()).resolves.toMatchObject([
         { id: 'hash:FORM_A-1', sourceRepo: { id: 'repo-1', name: 'Clinic Repo' } },
@@ -1336,7 +1372,7 @@ describe('InstrumentsService', () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([{ ...existingSeries, content: { items: [] } }]);
       instrumentModel.findMany.mockResolvedValue([
         { id: existingSeries.id, seriesGroupId: 'hidden-group', sourceRepoId: null, sourceRepoName: null }
-      ] as any);
+      ]);
       groupModel.findMany.mockResolvedValue([]);
 
       await expect(instrumentsService.findSeriesOverview()).resolves.toMatchObject([
@@ -1350,12 +1386,6 @@ describe('InstrumentsService', () => {
       { edition: 1, name: 'FORM_A' },
       { edition: 1, name: 'FORM_B' }
     ];
-
-    /** The series definition `createSeries` handed to the bundler. */
-    const bundledDefinition = () => {
-      const source = vi.mocked(bundle).mock.lastCall?.[0].inputs[0]!.content as string;
-      return JSON.parse(source.replace(/^export default /, '').replace(/;$/, '')) as { [key: string]: unknown };
-    };
 
     beforeEach(() => {
       vi.spyOn(instrumentsService, 'create').mockResolvedValue({ ...existingSeries, id: 'created-id' });
@@ -1408,13 +1438,13 @@ describe('InstrumentsService', () => {
   });
 
   describe('updateSeriesArchive (audit titles)', () => {
-    const currentUser = { ability: createAppAbility([{ action: 'manage', subject: 'all' }]), id: 'admin-1' };
+    const currentUser = createRequestUser(createAppAbility([{ action: 'manage', subject: 'all' }]));
 
     const archiveSeriesTitled = async (title: unknown) => {
-      instrumentModel.findFirst.mockResolvedValue({ archivedAt: null, bundle: '__BUNDLE__', id: 'target' } as any);
+      instrumentModel.findFirst.mockResolvedValue({ archivedAt: null, bundle: '__BUNDLE__', id: 'target' });
       virtualizationService.eval.mockReturnValue(okAsync({ ...existingSeries, details: { title } }));
-      instrumentModel.update.mockResolvedValue({ archivedAt: new Date(), id: 'target' } as any);
-      await instrumentsService.updateSeriesArchive('target', { isArchived: true }, currentUser as RequestUser);
+      instrumentModel.update.mockResolvedValue({ archivedAt: new Date(), id: 'target' });
+      await instrumentsService.updateSeriesArchive('target', { isArchived: true }, currentUser);
       return auditLogger.log.mock.lastCall?.[2].metadata;
     };
 
