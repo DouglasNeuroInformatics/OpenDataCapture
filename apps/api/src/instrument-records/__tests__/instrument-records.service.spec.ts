@@ -65,7 +65,6 @@ describe('InstrumentRecordsService', () => {
   let instrumentRecordsService: InstrumentRecordsService;
   let instrumentRecordModel: MockedInstance<Model<'InstrumentRecord'>>;
   let sessionModel: MockedInstance<Model<'Session'>>;
-  let groupsService: MockedInstance<GroupsService>;
   let instrumentsService: MockedInstance<InstrumentsService>;
   let sessionsService: MockedInstance<SessionsService>;
   let subjectsService: MockedInstance<SubjectsService>;
@@ -112,7 +111,6 @@ describe('InstrumentRecordsService', () => {
     instrumentRecordModel = moduleRef.get(getModelToken('InstrumentRecord'));
     sessionModel = moduleRef.get(getModelToken('Session'));
     instrumentRecordsService = moduleRef.get(InstrumentRecordsService);
-    groupsService = moduleRef.get(GroupsService);
     instrumentsService = moduleRef.get(InstrumentsService);
     sessionsService = moduleRef.get(SessionsService);
     subjectsService = moduleRef.get(SubjectsService);

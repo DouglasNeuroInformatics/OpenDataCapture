@@ -207,6 +207,6 @@ describe('useNavItems', () => {
     mocks.store.currentSession = { subjectId: 'subject-1' };
     expect(navItemAt('/session/start-session')?.disabled).toBe(true);
     expect(navItemAt('/instruments/accessible-instruments')?.disabled).toBe(false);
-    expect(navItemAt('/datahub/subject-1/table')?.disabled).toBe(false);
+    expect(navItemAt('/datahub/subjects/subject-1/table')?.disabled).toBe(false);
   });
 });

@@ -97,7 +97,9 @@ describe('subject assignments route guard', () => {
     mocks.config.setup.isGatewayEnabled = false;
     const thrown = runGuard();
     expect(isRedirect(thrown)).toBe(true);
-    expect(thrown).toMatchObject({ options: { params: { subjectId: 'subject-1' }, to: '/datahub/$subjectId/table' } });
+    expect(thrown).toMatchObject({
+      options: { params: { subjectId: 'subject-1' }, to: '/datahub/subjects/$subjectId/table' }
+    });
   });
 
   it('should allow the route when the gateway is deployed', () => {

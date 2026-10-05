@@ -239,7 +239,7 @@ describe('Walkthrough', () => {
 
   it('should center a bottom-center popover under its target', async () => {
     stubPopoverSize(120, 60);
-    addTarget('<a data-nav-url="/datahub/123/table"></a>', { bottom: 80, left: 100, right: 300, top: 50 });
+    addTarget('<a data-nav-url="/datahub/subjects/123/table"></a>', { bottom: 80, left: 100, right: 300, top: 50 });
     renderProvider();
     clickNext(13);
     await waitFor(() => expect(popoverPosition('Table')).toEqual({ x: 140, y: 100 }));

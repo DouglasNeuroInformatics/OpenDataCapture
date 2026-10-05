@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
   config: { setup: { isGatewayEnabled: true } },
   currentGroup: null as null | { settings: { subjectIdDisplayLength?: number } },
   outlet: (): ReactNode => 'Outlet Content',
-  pathname: '/datahub/root$abcdefghijkl/table'
+  pathname: '/datahub/subjects/root$abcdefghijkl/table'
 }));
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
@@ -40,7 +40,7 @@ beforeEach(() => {
   mocks.config.setup.isGatewayEnabled = true;
   mocks.currentGroup = null;
   mocks.outlet = () => 'Outlet Content';
-  mocks.pathname = '/datahub/root$abcdefghijkl/table';
+  mocks.pathname = '/datahub/subjects/root$abcdefghijkl/table';
   vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'root$abcdefghijkl' });
 });
 
@@ -63,12 +63,14 @@ describe('subject layout route', () => {
 
   it('should link each tab to its page under the subject', () => {
     renderLayout();
-    expect(screen.getByTestId('subject-table-tab').getAttribute('href')).toBe('/datahub/root$abcdefghijkl/table');
-    expect(screen.getByTestId('subject-graph').getAttribute('href')).toBe('/datahub/root$abcdefghijkl/graph');
+    expect(screen.getByTestId('subject-table-tab').getAttribute('href')).toBe(
+      '/datahub/subjects/root$abcdefghijkl/table'
+    );
+    expect(screen.getByTestId('subject-graph').getAttribute('href')).toBe('/datahub/subjects/root$abcdefghijkl/graph');
   });
 
   it('should highlight only the tab whose page is open', () => {
-    mocks.pathname = '/datahub/root$abcdefghijkl/graph';
+    mocks.pathname = '/datahub/subjects/root$abcdefghijkl/graph';
     renderLayout();
     expect(screen.getByTestId('subject-graph').classList.contains('border-sky-500')).toBe(true);
     expect(screen.getByTestId('subject-table-tab').classList.contains('border-sky-500')).toBe(false);
@@ -77,7 +79,7 @@ describe('subject layout route', () => {
   it('should offer the assignments tab when the gateway is deployed', () => {
     renderLayout();
     expect(screen.getByTestId('subject-assignment').getAttribute('href')).toBe(
-      '/datahub/root$abcdefghijkl/assignments'
+      '/datahub/subjects/root$abcdefghijkl/assignments'
     );
   });
 

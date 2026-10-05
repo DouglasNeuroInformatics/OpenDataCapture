@@ -209,7 +209,7 @@ describe('dashboard page', () => {
   it('should open the data hub from the subjects statistic', () => {
     renderPage();
     fireEvent.click(screen.getByTestId('statistic-subjects'));
-    expect(mocks.navigate).toHaveBeenCalledWith({ to: '/datahub' });
+    expect(mocks.navigate).toHaveBeenCalledWith({ to: '/datahub/subjects' });
   });
 
   it('should list every user of the group in the users dialog', () => {
