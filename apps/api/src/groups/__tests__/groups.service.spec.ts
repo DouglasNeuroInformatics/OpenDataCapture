@@ -7,6 +7,8 @@ import { Test } from '@nestjs/testing';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { createAppAbility } from '@/auth/ability.utils';
+
 import { GroupsService } from '../groups.service';
 
 /** A minimal template satisfying `$GroupEmailTemplate`, which requires renderable content. */
@@ -58,6 +60,31 @@ describe('GroupsService', () => {
       });
     });
 
+    it('should identify subjects by personal information by default in a clinical group', async () => {
+      await groupsService.create({ name: 'Test Group', type: 'CLINICAL' });
+      expect(groupModel.create.mock.lastCall?.[0]).toMatchObject({
+        data: { settings: { defaultIdentificationMethod: 'PERSONAL_INFO' } }
+      });
+    });
+
+    it('should identify subjects by custom id by default in a research group', async () => {
+      await groupsService.create({ name: 'Test Group', type: 'RESEARCH' });
+      expect(groupModel.create.mock.lastCall?.[0]).toMatchObject({
+        data: { settings: { defaultIdentificationMethod: 'CUSTOM_ID' } }
+      });
+    });
+
+    it('should let explicit settings override the default identification method', async () => {
+      await groupsService.create({
+        name: 'Test Group',
+        settings: { defaultIdentificationMethod: 'CUSTOM_ID' },
+        type: 'CLINICAL'
+      });
+      expect(groupModel.create.mock.lastCall?.[0]).toMatchObject({
+        data: { settings: { defaultIdentificationMethod: 'CUSTOM_ID' } }
+      });
+    });
+
     it('should throw a ConflictException if a group with the same name already exists in the db', async () => {
       groupModel.exists.mockResolvedValueOnce(true);
       await expect(groupsService.create({ name: 'Test Group', type: 'CLINICAL' })).rejects.toBeInstanceOf(
@@ -66,7 +93,29 @@ describe('GroupsService', () => {
     });
   });
 
+  describe('deleteById', () => {
+    it('should delete the group with the provided id', async () => {
+      groupModel.delete.mockResolvedValueOnce({ id: '123', name: 'Test Group' });
+      await expect(groupsService.deleteById('123')).resolves.toMatchObject({ name: 'Test Group' });
+      expect(groupModel.delete.mock.lastCall?.[0]).toMatchObject({ where: { id: '123' } });
+    });
+
+    it("should restrict the deletion to groups the user's ability may delete", async () => {
+      const ability = createAppAbility([{ action: 'delete', conditions: { id: 'group-1' }, subject: 'Group' }]);
+      await groupsService.deleteById('123', { ability });
+      expect(groupModel.delete.mock.lastCall?.[0]).toEqual({
+        where: { AND: [{ OR: [{ id: 'group-1' }] }], id: '123' }
+      });
+    });
+  });
+
   describe('updateById', () => {
+    it('should throw a NotFoundException when no accessible group has the provided id', async () => {
+      groupModel.findFirst.mockResolvedValueOnce(null);
+      await expect(groupsService.updateById('123', { name: 'Test Group' })).rejects.toBeInstanceOf(NotFoundException);
+      expect(groupModel.update).not.toHaveBeenCalled();
+    });
+
     it('should set the instrumentRepos relation from instrumentRepoIds', async () => {
       groupModel.findFirst.mockResolvedValueOnce({ name: 'Test Group', settings: {} });
       await groupsService.updateById('123', { instrumentRepoIds: ['repo-1', 'repo-2'] });
