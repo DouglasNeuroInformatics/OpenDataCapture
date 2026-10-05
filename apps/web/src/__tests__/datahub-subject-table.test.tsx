@@ -31,7 +31,7 @@ vi.mock('@/hooks/useInstrumentVisualization', () => ({
 const navigate = vi.fn();
 
 const record = (overrides: Partial<VisualizationRecord> = {}): VisualizationRecord => ({
-  __date__: new Date(2026, 0, 15),
+  __date__: new Date('2026-01-15'),
   __id__: 'record-1',
   __time__: 0,
   totalScore: 7,
