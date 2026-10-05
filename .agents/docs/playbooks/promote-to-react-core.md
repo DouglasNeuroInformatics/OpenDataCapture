@@ -104,7 +104,7 @@ pnpm --filter @opendatacapture/react-core lint      # no app aliases in this pro
 pnpm --filter @opendatacapture/web lint
 pnpm --filter @opendatacapture/gateway lint         # meaningful only once step 9 wired the consumer
 pnpm exec vitest --project web
-pnpm lint && pnpm test
+pnpm lint && pnpm test:coverage
 pnpm test:e2e
 pnpm --filter @opendatacapture/storybook storybook  # port 6006 — listed under React Core, not Web
 ```

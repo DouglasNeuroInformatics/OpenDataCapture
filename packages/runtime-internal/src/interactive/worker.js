@@ -63,11 +63,6 @@ addEventListener('message', (event) => {
 });
 
 worker.addEventListener('fetch', (_event) => {
-  if (!staticAssets) {
-    console.error('staticAssets is not defined');
-    return;
-  }
-
   const event = /** @type {FetchEvent} */ (_event);
   const url = new URL(event.request.url);
   let pathname = url.pathname;

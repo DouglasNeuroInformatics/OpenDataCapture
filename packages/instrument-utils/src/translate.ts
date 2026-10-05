@@ -35,7 +35,7 @@ import {
 } from './guards.js';
 
 /**
- * Determine the target language for translation based on instrument and preferred language.
+ * Determine the language to translate a multilingual instrument into.
  *
  * The preferred language is the one the user is reading the *interface* in, which is a wider set
  * than instruments are authored in. A reader whose language no instrument offers is served the
@@ -45,13 +45,7 @@ import {
  * @param preferredLanguage - The language the user is reading the interface in.
  * @returns The target language for translation.
  */
-function getTargetLanguage(
-  instrument: Pick<AnyInstrument, 'language'>,
-  preferredLanguage: InterfaceLanguage
-): Language {
-  if (typeof instrument.language === 'string') {
-    return instrument.language;
-  }
+function getTargetLanguage(instrument: { language: Language[] }, preferredLanguage: InterfaceLanguage): Language {
   const preferred = $InstrumentAuthoringLanguage.safeParse(preferredLanguage);
   if (preferred.success && instrument.language.includes(preferred.data)) {
     return preferred.data;

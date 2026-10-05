@@ -43,12 +43,7 @@ const ArchiveDialog = ({ onClose, row }: { onClose: () => void; row: SeriesRow }
   const groupLabel = row.groupName ?? t({ en: 'All groups', es: 'Todos los grupos', fr: 'Tous les groupes' });
 
   return (
-    <Dialog
-      open
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-    >
+    <Dialog open onOpenChange={onClose}>
       <Dialog.Content className="sm:max-w-[500px]" data-testid="archive-series-dialog">
         <Dialog.Header>
           <Dialog.Title>
@@ -98,7 +93,7 @@ type InstrumentRow = {
 
 type InstrumentViewProps = {
   // Every scalar instrument, of every edition, so a series' items can be named in its preview.
-  scalarInstruments: TranslatedInstrumentInfo[];
+  scalarInstruments: Exclude<TranslatedInstrumentInfo, { kind: 'SERIES' }>[];
 };
 
 const useInstrumentSource = () => {
@@ -118,9 +113,7 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
   const toSource = useInstrumentSource();
   const [previewItem, setPreviewItem] = useState<InstrumentPreviewItem | null>(null);
 
-  const rows: InstrumentRow[] = selectLatestEditions(
-    scalarInstruments.flatMap((info) => (info.kind === 'SERIES' ? [] : [info]))
-  )
+  const rows: InstrumentRow[] = selectLatestEditions(scalarInstruments)
     .map((info) => {
       const source = toSource(info.sourceRepo);
       return {

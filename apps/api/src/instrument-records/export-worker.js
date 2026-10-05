@@ -16,28 +16,19 @@ try {
 }
 
 /**
- * @typedef {Object} SuccessExpand
+ * @typedef {Object} ExpandedMeasure
  * @property {string} measure
  * @property {any} measureValue
- * @property {true} success
  */
-
-/**
- * @typedef {Object} FailureExpand
- * @property {string} message
- * @property {false} success
- */
-
-/** @typedef {SuccessExpand | FailureExpand} ExpandDataType */
 
 /**
  * Flattens nested record array data into a list of expandable data objects.
  * @param {any[]} listEntry - The array of records to expand.
- * @returns {ExpandDataType[]} An array of expanded measure objects.
+ * @returns {ExpandedMeasure[]} An array of expanded measure objects.
  * @throws {Error} If the provided listEntry is empty.
  */
 function expandData(listEntry) {
-  /** @type {SuccessExpand[]} */
+  /** @type {ExpandedMeasure[]} */
   const validRecordArrayList = [];
   if (listEntry.length < 1) {
     throw new Error('Record Array is Empty');
@@ -46,8 +37,7 @@ function expandData(listEntry) {
     for (const [dataKey, dataValue] of Object.entries(objectEntry)) {
       validRecordArrayList.push({
         measure: dataKey,
-        measureValue: dataValue,
-        success: true
+        measureValue: dataValue
       });
     }
   }
@@ -123,9 +113,6 @@ function handleChunkComplete(_data) {
 
       const expanded = expandData(measureValue);
       for (const entry of expanded) {
-        if (!entry.success) {
-          throw new Error(`exportRecords: ${instrument.name}.${measureKey} — ${entry.message}`);
-        }
         rows.push({
           groupId: record.groupId ?? DEFAULT_GROUP_NAME,
           instrumentEdition: instrument.edition,

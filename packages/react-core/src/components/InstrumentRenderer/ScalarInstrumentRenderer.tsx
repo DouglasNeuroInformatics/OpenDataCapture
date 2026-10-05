@@ -62,10 +62,11 @@ export const ScalarInstrumentRenderer = ({
   const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
 
-  const handleSubmit = async ({ data, ...result }: AnyContentResult) => {
-    if (interpreted.status === 'DONE') {
+  const createSubmitHandler =
+    (instrument: AnyUnilingualScalarInstrument) =>
+    async ({ data, ...result }: AnyContentResult) => {
       const serializedData = JSON.parse(JSON.stringify(data, replacer)) as Json;
-      const validationResult = validateSubmission(interpreted.instrument, serializedData);
+      const validationResult = validateSubmission(instrument, serializedData);
       if (!validationResult.success) {
         console.error(validationResult.issues);
         addNotification({
@@ -78,16 +79,15 @@ export const ScalarInstrumentRenderer = ({
         });
         return;
       }
-    }
-    await onSubmit?.({
-      ...result,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      data: JSON.parse(JSON.stringify(data, replacer)),
-      instrumentId: target.id
-    });
-    setIndex(2);
-    setData(data);
-  };
+      await onSubmit?.({
+        ...result,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        data: JSON.parse(JSON.stringify(data, replacer)),
+        instrumentId: target.id
+      });
+      setIndex(2);
+      setData(data);
+    };
 
   return (
     <InstrumentRendererContainer className={className} index={index} NavigationBlocker={NavigationBlocker}>
@@ -123,7 +123,11 @@ export const ScalarInstrumentRenderer = ({
               />
             ))
             .with({ index: 1, instrument: { kind: 'FORM' } }, ({ instrument }) => (
-              <FormContent instrument={instrument} submitButtonLabel={submitButtonLabel} onSubmit={handleSubmit} />
+              <FormContent
+                instrument={instrument}
+                submitButtonLabel={submitButtonLabel}
+                onSubmit={createSubmitHandler(instrument)}
+              />
             ))
             .with({ index: 1, instrument: { kind: 'INTERACTIVE' } }, ({ instrument }) => (
               <InteractiveContent
@@ -133,11 +137,16 @@ export const ScalarInstrumentRenderer = ({
                 enableLanguageSelect={instrument.content.enableLanguageSelect}
                 enableLanguageToggle={instrument.content.enableLanguageToggle}
                 supportedLanguages={instrument.supportedLanguages}
-                onSubmit={handleSubmit}
+                onSubmit={createSubmitHandler(instrument)}
               />
             ))
             .with({ index: 1, instrument: { kind: 'FILE' } }, ({ instrument }) => {
-              return <FileInstrumentContent instrument={{ ...instrument, id: target.id }} onSubmit={handleSubmit} />;
+              return (
+                <FileInstrumentContent
+                  instrument={{ ...instrument, id: target.id }}
+                  onSubmit={createSubmitHandler(instrument)}
+                />
+              );
             })
             .with({ index: 2 }, () => (
               <InstrumentSummary

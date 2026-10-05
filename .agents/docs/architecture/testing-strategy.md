@@ -17,11 +17,11 @@ of operations.
 
 ## Tiers
 
-| Tier       | Runner     | Where                                                    | Command         |
-| ---------- | ---------- | -------------------------------------------------------- | --------------- |
-| Unit       | vitest     | `src/__tests__/` (or `test/`) in a participating package | `pnpm test`     |
-| End-to-end | Playwright | `testing/src/specs/`                                     | `pnpm test:e2e` |
-| Type-check | `tsc`      | —                                                        | `pnpm lint`     |
+| Tier       | Runner     | Where                                                    | Command              |
+| ---------- | ---------- | -------------------------------------------------------- | -------------------- |
+| Unit       | vitest     | `src/__tests__/` (or `test/`) in a participating package | `pnpm test:coverage` |
+| End-to-end | Playwright | `testing/src/specs/`                                     | `pnpm test:e2e`      |
+| Type-check | `tsc`      | —                                                        | `pnpm lint`          |
 
 There is no integration tier. `apps/api` unit tests mock the Prisma layer entirely; the only code
 path exercised against a real database is Playwright.
@@ -115,6 +115,25 @@ no database. Only `testing` owns a `test:e2e` script; only `apps/gateway` owns a
 `globalDependencies` are `.env`, `eslint.config.js`, `tsconfig.json` and `prettier.config.js`.
 Touching any of them invalidates the cache for every task in the repo.
 
+## Coverage
+
+`pnpm test:coverage` is the unit gate, locally and in CI. The root `vitest.config.ts` sets
+`coverage.thresholds: { 100: true }`, so the run fails when statements, branches, functions or lines
+drop below 100%. The scope is its `coverage.include` — `apps/{api,gateway,web}/src` and
+`packages/*/src`; `runtime/**` and `apps/playground` are outside it — minus `coverage.exclude`,
+which lists only non-code: test fixtures and helpers (`__tests__`, `__mocks__`,
+`apps/web/src/testing`), the generated `route-tree.ts`, and the bare entrypoints.
+
+- **A line no test can reach is dead code.** Prove it (the types, every caller, the library's
+  contract) and delete it, or restructure so the impossible state cannot be written — e.g. ts-pattern
+  `.exhaustive()` instead of `.otherwise(() => null)`. Never add an ignore comment or an exclude entry
+  to pass.
+- **A scoped run fails the threshold by construction**: `--project`, a file filter or a narrowed
+  `--coverage.include` measures a fraction of the scope. Add `--coverage.thresholds.100=false` to it
+  and read the per-file report.
+- `apps/api` confines its SWC transform to its own files (`apps/api/vitest.config.ts`); letting SWC
+  transform the workspace packages it imports makes the merged report count their functions twice.
+
 ## What CI gates
 
 `.github/workflows/ci.yaml`, one job (`lint-and-test`, ubuntu-latest), triggered on
@@ -125,7 +144,7 @@ Touching any of them invalidates the cache for every task in the repo.
 | 1   | Generate Environment | `./scripts/generate-env.sh`                            |
 | 2   | Install Dependencies | `pnpm install --frozen-lockfile`                       |
 | 3   | Lint                 | `pnpm lint`                                            |
-| 4   | Unit Tests           | `pnpm test`                                            |
+| 4   | Unit Tests           | `pnpm test:coverage`                                   |
 | 5   | Install Playwright   | chromium + firefox `--with-deps`, capped at 10 minutes |
 | 6   | End-to-End Tests     | `pnpm test:e2e`                                        |
 
@@ -135,8 +154,6 @@ does not hide their results.
 Not gated, despite existing in the repo:
 
 - **No separate type-check step** — it is folded into step 3.
-- **No coverage.** Nothing in CI runs `pnpm test:coverage`, and the root config declares no
-  `thresholds`. Its `include` is `apps/**/*` and `packages/**/*`, so `runtime/**` is outside it.
 - **No knip step**, although `knip.ts` and a `pnpm knip` script exist.
 - **No format check.** Prettier runs only in the `.husky/pre-commit` hook (`prettier-pre-commit`),
   which formats rather than verifies; the hook does not run lint or tests.

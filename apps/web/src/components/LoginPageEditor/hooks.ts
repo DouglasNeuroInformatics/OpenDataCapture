@@ -372,7 +372,7 @@ export const useBrandingForm = () => {
           logoSource: form.logoSource,
           nameAlignment: form.nameAlignment,
           nameFontSize: form.nameFontSize,
-          panelTextColor: HEX_PATTERN.test(form.panelTextColor) ? form.panelTextColor : null,
+          panelTextColor: form.panelTextColor,
           resourceLinks: form.showResourceLinks ? cleanedLinks : [],
           resourceLinksFontSize: form.resourceLinksFontSize,
           rightPanelPrimaryColor: form.rightPanelOption === 'custom' ? form.rightPanelPrimaryColor : null,

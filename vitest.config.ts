@@ -28,7 +28,10 @@ export default defineConfig({
       include: ['apps/{api,gateway,web}/src/**/*.?(c|m)[jt]s?(x)', 'packages/*/src/**/*.?(c|m)[jt]s?(x)'],
       provider: 'v8',
       reportsDirectory: path.resolve(import.meta.dirname, 'coverage'),
-      skipFull: true
+      skipFull: true,
+      thresholds: {
+        100: true
+      }
     },
     include: ['**/*/test.?(c|m)[jt]s?(x)', '**/*.{test,spec}.?(c|m)[jt]s?(x)'],
     projects: ['apps/*/vitest.config.ts', 'packages/*/vitest.config.ts', 'runtime/*/vitest.config.ts'],

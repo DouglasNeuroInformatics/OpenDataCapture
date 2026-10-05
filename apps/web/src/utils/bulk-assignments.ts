@@ -260,7 +260,9 @@ export function parseDelimitedText(input: string): BulkParseResult {
   if (fatal.length > 0) {
     throw new BulkParseFailure(fatal.map((error) => ({ message: error.message, row: error.row })));
   }
-  return buildResult(parsed.meta.fields ?? [], parsed.data);
+  // Papa Parse always reports the header row as `meta.fields` in header mode; its types mark the field
+  // optional only because it is absent when `header` is false.
+  return buildResult(parsed.meta.fields!, parsed.data);
 }
 
 /**

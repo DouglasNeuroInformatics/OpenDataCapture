@@ -37,14 +37,15 @@ exception rather than editing the tree yourself.
 ## 2. Test, and make the run name your file
 
 ```sh
-pnpm test
+pnpm test:coverage                  # fails below 100% on any metric — see testing-strategy.md §Coverage
 pnpm exec vitest list --filesOnly   # a green run prints counts only; this prints the collected files
 ```
 
 A test file the listing never names was collected by nothing —
 `.agents/skills/odc-testing/SKILL.md` opens on that failure and owns both the diagnosis and the fix.
 
-**Done when** the run is green _and_ `list --filesOnly` names every test file this change added.
+**Done when** the run is green at 100% coverage _and_ `list --filesOnly` names every test file this
+change added.
 
 ## 3. Run the end-to-end suite, or raise the exception
 

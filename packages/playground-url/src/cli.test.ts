@@ -85,12 +85,13 @@ describe('cli', () => {
     expect(isFullscreenShareURL(url)).toBe(true);
   });
 
-  it('should open the generated link in the browser when --open is given', async () => {
-    const { spawn } = await import('node:child_process');
+  it('should open the generated link with open on macOS when --open is given', async () => {
     fs.writeFileSync(path.join(tmpDir, 'index.ts'), 'export default {};');
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin');
     process.argv = ['node', 'cli.js', tmpDir, '--open'];
+    const { spawn } = await import('node:child_process');
     await import('./cli.js');
-    expect(spawn).toHaveBeenCalled();
+    expect(spawn).toHaveBeenLastCalledWith('open', expect.anything(), expect.objectContaining({ shell: false }));
   });
 
   it("should open with the platform's own command on win32 and any other platform", async () => {

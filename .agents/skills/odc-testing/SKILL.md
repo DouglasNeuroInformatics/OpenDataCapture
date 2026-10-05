@@ -27,11 +27,11 @@ and the e2e test carries the change, or this change adds its `vitest.config.ts`.
 
 ## Choose the tier before you choose the file
 
-| What you changed                                        | The tier that can prove it                 | Runner          |
-| ------------------------------------------------------- | ------------------------------------------ | --------------- |
-| A pure function, a schema, a hook, a rendered component | Unit, in that package's own project        | `pnpm test`     |
-| Who can see or do what; anything reading real rows      | End-to-end only                            | `pnpm test:e2e` |
-| A type contract — inference, a discriminated union      | The type-check, which is `tsc` inside lint | `pnpm lint`     |
+| What you changed                                        | The tier that can prove it                 | Runner               |
+| ------------------------------------------------------- | ------------------------------------------ | -------------------- |
+| A pure function, a schema, a hook, a rendered component | Unit, in that package's own project        | `pnpm test:coverage` |
+| Who can see or do what; anything reading real rows      | End-to-end only                            | `pnpm test:e2e`      |
+| A type contract — inference, a discriminated union      | The type-check, which is `tsc` inside lint | `pnpm lint`          |
 
 **There is no integration tier, and the middle row is why.** `apps/api` unit tests mock the Prisma
 layer entirely (`apps/api/src/groups/__tests__/groups.service.spec.ts`), so the only code path

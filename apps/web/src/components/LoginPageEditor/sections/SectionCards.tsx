@@ -510,7 +510,5 @@ export const SectionCard = ({ editor, section }: { editor: BrandingEditor; secti
       return <ResourcesCard editor={editor} />;
     case 'tagline':
       return <TaglineCard editor={editor} />;
-    default:
-      return null;
   }
 };

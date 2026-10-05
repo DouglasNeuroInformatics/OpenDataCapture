@@ -53,19 +53,27 @@ type InstrumentItem = InstrumentPreviewItem & {
   isDeletable: boolean;
 };
 
+type SeriesInstrumentItem = InstrumentItem & { seriesItems: { id: string }[] };
+
 type CategorizedInstruments = {
   form: InstrumentItem[];
   interactive: InstrumentItem[];
-  series: InstrumentItem[];
+  series: SeriesInstrumentItem[];
 };
 
-const expandSelectedSeriesIds = ({ selectedIds, series }: { selectedIds: Set<string>; series: InstrumentItem[] }) => {
+const expandSelectedSeriesIds = ({
+  selectedIds,
+  series
+}: {
+  selectedIds: Set<string>;
+  series: SeriesInstrumentItem[];
+}) => {
   const expandedIds = new Set(selectedIds);
   for (const item of series) {
     if (!selectedIds.has(item.id)) {
       continue;
     }
-    for (const seriesItem of item.seriesItems ?? []) {
+    for (const seriesItem of item.seriesItems) {
       expandedIds.add(seriesItem.id);
     }
   }
@@ -332,12 +340,7 @@ const CreateSeriesInstrumentDialog = ({
 
   return (
     <React.Fragment>
-      <Dialog
-        open
-        onOpenChange={(open) => {
-          if (!open) onClose();
-        }}
-      >
+      <Dialog open onOpenChange={onClose}>
         <Dialog.Content className="sm:max-w-[600px]">
           <Dialog.Header>
             <Dialog.Title>
@@ -470,12 +473,7 @@ const CreateSeriesInstrumentDialog = ({
         </Dialog.Content>
       </Dialog>
       {duplicateOf !== null && (
-        <Dialog
-          open
-          onOpenChange={(open) => {
-            if (!open) setDuplicateOf(null);
-          }}
-        >
+        <Dialog open onOpenChange={() => setDuplicateOf(null)}>
           <Dialog.Content className="sm:max-w-[450px]">
             <Dialog.Header>
               <Dialog.Title>
@@ -522,12 +520,7 @@ const DeleteInstrumentDialog = ({
     deleteMutation.mutate({ id: item.id }, { onSettled: onClose, onSuccess: () => onDeleted(item.id) });
 
   return (
-    <Dialog
-      open
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-    >
+    <Dialog open onOpenChange={onClose}>
       <Dialog.Content className="sm:max-w-[450px]">
         <Dialog.Header>
           <Dialog.Title>
@@ -570,15 +563,6 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
   // the group's accessible ids (seeded from the auth store) may still list them; we drop them at save time
   // so a just-deleted instrument is never re-sent as a dangling relation.
   const [deletedIds, setDeletedIds] = useState<Set<string>>(() => new Set());
-
-  // Reseed the selection only when the user switches groups. `initialSelectedIds` gets a new identity
-  // on every instrument-info refetch — including the one triggered by creating a series — and resyncing
-  // on that would discard unsaved edits, among them the newly created series we just selected.
-  const [syncedGroupId, setSyncedGroupId] = useState(groupId);
-  if (syncedGroupId !== groupId) {
-    setSyncedGroupId(groupId);
-    setSelectedIds(new Set(initialSelectedIds));
-  }
 
   const toggle = (id: string) => {
     setSelectedIds((prev) => {
@@ -929,7 +913,7 @@ const RouteComponent = () => {
       } else if (instrument.kind === 'INTERACTIVE') {
         instruments.interactive.push(item);
       } else if (instrument.kind === 'SERIES') {
-        instruments.series.push(item);
+        instruments.series.push({ ...item, seriesItems: instrument.seriesItems });
       }
     }
 
@@ -981,6 +965,8 @@ const RouteComponent = () => {
           {t('manage.pageTitle')}
         </Heading>
       </PageHeader>
+      {/* The key remounts the form on a group switch, the only time its selection may be reseeded:
+          `initialSelectedIds` changes identity on every refetch, and reseeding then would drop unsaved edits. */}
       <WithFallback
         Component={ManageGroupForm}
         key={currentGroup?.id}

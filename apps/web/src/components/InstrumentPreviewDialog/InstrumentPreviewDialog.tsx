@@ -68,12 +68,7 @@ export const InstrumentPreviewDialog = ({ item, items, onClose }: InstrumentPrev
   }, [item.seriesItems, items, t]);
 
   return (
-    <Dialog
-      open
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-    >
+    <Dialog open onOpenChange={onClose}>
       <Dialog.Content className={showForm ? 'sm:max-w-[800px]' : 'max-h-[85vh] sm:max-w-[560px]'}>
         <Dialog.Header>
           <Dialog.Title>{item.title}</Dialog.Title>
