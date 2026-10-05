@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { $FileLocation, $FileMetadata, $PresignedUrlInfo, $PresignedUrls, $UploadCompleteData } from './storage.js';
+import { $FileLocation, $FileMetadata, $PresignedUrlInfo, $PresignedUrls, $UploadCompleteData } from '../storage.js';
 
 describe('$FileLocation', () => {
   it('should accept a basename and non-negative integer index', () => {

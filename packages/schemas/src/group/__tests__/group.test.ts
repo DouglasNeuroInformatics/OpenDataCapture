@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { $UpdateGroupData } from './group.js';
+import { $UpdateGroupData } from '../group.js';
 
 describe('$UpdateGroupData', () => {
   it('should require expectedUpdatedAt when emailTemplates is included', () => {

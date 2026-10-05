@@ -33,7 +33,7 @@ export default defineConfig({
         100: true
       }
     },
-    include: ['**/*/test.?(c|m)[jt]s?(x)', '**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+    include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
     projects: ['apps/*/vitest.config.ts', 'packages/*/vitest.config.ts', 'runtime/*/vitest.config.ts'],
     watch: false
   }

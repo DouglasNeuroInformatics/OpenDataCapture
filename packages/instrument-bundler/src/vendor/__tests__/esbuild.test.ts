@@ -2,9 +2,9 @@ import * as path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import * as esbuild from '../vendor/esbuild.js';
+import * as esbuild from '../esbuild.js';
 
-const VENDOR_DIR = path.resolve(import.meta.dirname, '../vendor');
+const VENDOR_DIR = path.resolve(import.meta.dirname, '..');
 
 describe('vendor/esbuild', () => {
   it('should keep initializing its exports when tree shaken, so a bundled API does not lose the build binding', async () => {

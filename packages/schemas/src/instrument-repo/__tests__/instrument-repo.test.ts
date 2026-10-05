@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { $CreateInstrumentRepoData, $InstrumentRepo } from './instrument-repo.js';
+import { $CreateInstrumentRepoData, $InstrumentRepo } from '../instrument-repo.js';
 
 describe('$InstrumentRepo', () => {
   it('should accept a repo with lastSyncedAt omitted, since it is nullish', () => {

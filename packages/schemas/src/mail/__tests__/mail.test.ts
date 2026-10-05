@@ -8,9 +8,9 @@ import {
   DEFAULT_NEW_USER_EMAIL_TEMPLATE,
   isMailEnabled,
   isSameMailServer
-} from './mail.js';
+} from '../mail.js';
 
-import type { MailConfig } from './mail.js';
+import type { MailConfig } from '../mail.js';
 
 const config: MailConfig = {
   enabled: true,

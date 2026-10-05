@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { $Summary } from './summary.js';
+import { $Summary } from '../summary.js';
 
 describe('$Summary', () => {
   it('should parse a valid summary', async () => {

@@ -7,7 +7,7 @@ import {
   $CreateAssignmentData,
   $CreateBulkAssignmentsData,
   BULK_ASSIGNMENT_MAX_SUBJECTS
-} from './assignment.js';
+} from '../assignment.js';
 
 const futureDate = () => new Date(Date.now() + 86_400_000);
 

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-const tree: Record<string, string[]> = {
+const tree: { [key: string]: string[] } = {
   '/base': ['index.js', 'sub'],
   '/base/sub': ['page.html', 'styles.css', 'types.d.ts']
 };
@@ -9,8 +9,8 @@ vi.mock('fs', () => ({
   existsSync: (path: string) => Object.hasOwn(tree, path),
   lstatSync: (path: string) => ({ isDirectory: () => Object.hasOwn(tree, path) }),
   promises: {
-    readdir: async (dir: string) => tree[dir] ?? [],
-    readFile: async (path: string) => `content:${path}`
+    readdir: (dir: string) => Promise.resolve(tree[dir] ?? []),
+    readFile: (path: string) => Promise.resolve(`content:${path}`)
   }
 }));
 
@@ -20,7 +20,8 @@ vi.mock('module', () => ({
   })
 }));
 
-const { generateManifest, generateMetadata, MANIFEST_FILENAME, resolveRuntimeAsset } = await import('../src/index.js');
+const { generateManifest, generateMetadata, MANIFEST_FILENAME, parsePackages, resolveRuntimeAsset } =
+  await import('../index.js');
 
 describe('generateManifest', () => {
   it('should group files under a directory into sources, styles, declarations and html by extension', async () => {
@@ -106,5 +107,46 @@ describe('resolveRuntimeAsset', () => {
 
   it('should return null for a filepath the manifest does not list', async () => {
     await expect(resolveRuntimeAsset('/v1/missing.js', metadata)).resolves.toBeNull();
+  });
+});
+
+describe('parsePackages', () => {
+  it('groups files under the package parsed from their path', () => {
+    const packages = parsePackages('v1', {
+      html: [],
+      sources: ['react@19.x/index.js', 'react@19.x/jsx-runtime.js'],
+      styles: ['normalize.css@8.x/normalize.css']
+    });
+    expect(packages).toStrictEqual([
+      {
+        exports: {
+          css: [],
+          html: [],
+          js: ['/runtime/v1/react@19.x/index.js', '/runtime/v1/react@19.x/jsx-runtime.js']
+        },
+        name: 'react',
+        version: '19.x'
+      },
+      {
+        exports: { css: ['/runtime/v1/normalize.css@8.x/normalize.css'], html: [], js: [] },
+        name: 'normalize.css',
+        version: '8.x'
+      }
+    ]);
+  });
+
+  it('omits underscore-prefixed bundler output from all packages', () => {
+    const packages = parsePackages('v1', {
+      html: [],
+      sources: ['_chunks/ABCD1234.js', 'react@19.x/index.js'],
+      styles: []
+    });
+    expect(packages.map((pkg) => pkg.name)).toStrictEqual(['react']);
+  });
+
+  it('throws when a source path does not match the import path pattern', () => {
+    expect(() => parsePackages('v1', { html: [], sources: ['/leading-slash.js'], styles: [] })).toThrow(
+      'Unexpected import path pattern'
+    );
   });
 });

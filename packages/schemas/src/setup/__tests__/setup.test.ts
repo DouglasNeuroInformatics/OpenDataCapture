@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { $BrandingConfig, $UpdateSetupStateData } from './setup.js';
+import { $BrandingConfig, $UpdateSetupStateData } from '../setup.js';
 
 describe('$BrandingConfig', () => {
   describe('customLogoSrc', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { $LoginCredentials } from './auth.js';
+import { $LoginCredentials } from '../auth.js';
 
 describe('$LoginCredentials', () => {
   it('should accept a non-empty username and password', () => {

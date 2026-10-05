@@ -8,7 +8,7 @@ import {
   $LinearRegressionResults,
   $UpdateInstrumentRecordData,
   $UploadInstrumentRecordsData
-} from './instrument-records.js';
+} from '../instrument-records.js';
 
 describe('$CreateInstrumentRecordData', () => {
   it('should accept the required fields with the optional ones omitted', () => {

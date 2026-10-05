@@ -9,7 +9,7 @@ import {
   isGrantablePermission,
   resolveActiveLanguage,
   toInstrumentAuthoringLanguage
-} from './core.js';
+} from '../core.js';
 
 describe('$GroupScopableSubjectName', () => {
   it.each(['all', 'Instrument'])(

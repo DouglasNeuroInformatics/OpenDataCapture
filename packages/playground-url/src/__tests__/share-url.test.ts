@@ -6,9 +6,9 @@ import {
   encodeShareURL,
   generatePlaygroundURL,
   isFullscreenShareURL
-} from './share-url.js';
+} from '../share-url.js';
 
-import type { PlaygroundInstrument } from './models.js';
+import type { PlaygroundInstrument } from '../models.js';
 
 const instrument: PlaygroundInstrument = {
   files: [

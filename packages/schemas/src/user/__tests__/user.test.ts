@@ -8,7 +8,7 @@ import {
   $UpdateUserPermissionsData,
   $User,
   MIN_PHONE_DIGITS
-} from './user.js';
+} from '../user.js';
 
 describe('$UpdateUserData', () => {
   it('should strip additionalPermissions, so a profile update cannot grant anything', () => {

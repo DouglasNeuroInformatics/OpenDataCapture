@@ -27,7 +27,7 @@ TypeScript would change what `exports` resolves to.
 
 ## Tests
 
-`pnpm exec vitest --project runtime-meta`. There is a `vitest.config.ts` here, and tests live in
-`test/` (not `src/__tests__/`) — `test/parse-packages.test.ts` is the only one. `generateManifest` and
-the plugin behavior around it are covered instead by
-`packages/vite-plugin-runtime/src/__tests__/plugin.test.ts`, which mocks `fs`.
+`pnpm exec vitest --project runtime-meta`. There is a `vitest.config.ts` here, and
+`src/__tests__/index.test.ts` covers every export of `src/index.js`, with `fs` and `module` mocked.
+The plugin behavior built on top of them is covered by
+`packages/vite-plugin-runtime/src/__tests__/plugin.test.ts`.

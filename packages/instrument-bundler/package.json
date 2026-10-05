@@ -21,7 +21,7 @@
     "instrument-bundler": "./src/cli.ts"
   },
   "files": [
-    "!/src/__tests__",
+    "!/src/**/__tests__",
     "/src"
   ],
   "scripts": {
