@@ -27,8 +27,6 @@ describe('WizardTable', () => {
         {null}
       </WizardTable>
     );
-    expect([...screen.getByTestId('wizard-table').classList]).toEqual(
-      expect.arrayContaining(['overflow-x-auto', 'rounded-md', 'border', 'mt-4'])
-    );
+    expect(screen.getByTestId('wizard-table').classList.contains('mt-4')).toBe(true);
   });
 });

@@ -4,6 +4,7 @@ import type { Assignment } from '@opendatacapture/schemas/assignment';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 
 import { DeleteRemoteAssignments } from '@/components/DeleteRemoteAssignments';
 
@@ -11,12 +12,17 @@ import '@/services/i18n';
 
 type DeleteMutationOptions = { onSuccess: () => void };
 
-const mocks = vi.hoisted(() => ({
-  assignments: undefined as Assignment[] | undefined,
-  deleteMutate: vi.fn<(variables: { ids: string[] }, options: DeleteMutationOptions) => void>(),
-  instrumentInfo: undefined as undefined | { details: { title: string }; id: string }[],
-  isPending: false
-}));
+type MockState = {
+  assignments?: Assignment[];
+  deleteMutate: Mock<(variables: { ids: string[] }, options: DeleteMutationOptions) => void>;
+  instrumentInfo?: { details: { title: string }; id: string }[];
+  isPending: boolean;
+};
+
+const mocks = vi.hoisted(() => {
+  const state: MockState = { deleteMutate: vi.fn(), isPending: false };
+  return state;
+});
 
 vi.mock('@/hooks/useAssignmentsQuery', () => ({
   ASSIGNMENTS_QUERY_KEY_PREFIX: 'assignments',
@@ -81,7 +87,7 @@ const openConfirmation = (...ids: string[]) => {
 
 beforeEach(() => {
   cleanup();
-  vi.clearAllMocks();
+  vi.resetAllMocks();
   mocks.assignments = [];
   mocks.instrumentInfo = [];
   mocks.isPending = false;
