@@ -188,6 +188,35 @@ describe('MailService', () => {
       });
     });
 
+    it('saves only the new-user template when no configuration is sent, leaving the stored one untouched', async () => {
+      const template = { body: { en: 'Welcome {{username}}' }, subject: { en: 'Welcome' } };
+      setupStateModel.findFirst.mockResolvedValue({ id: '1', isSetup: true, mailConfig: stored(validConfig) });
+      setupStateModel.update.mockResolvedValue({ mailConfig: stored(validConfig), newUserEmailTemplate: template });
+
+      const settings = await mailService.updateSettings({ newUserEmailTemplate: template });
+
+      expect(setupStateModel.update).toHaveBeenCalledWith({
+        data: { newUserEmailTemplate: { set: template } },
+        where: { id: '1' }
+      });
+      expect(settings.newUserEmailTemplate).toEqual(template);
+    });
+
+    it('stores a missing sender name as null, so it reads back the same as an explicit blank', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ id: '1', isSetup: true, mailConfig: stored(validConfig) });
+      await mailService.updateSettings({ config: { ...validConfig, senderName: undefined } });
+      expect(setupStateModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { mailConfig: { set: { senderName: null } } }
+      });
+    });
+
+    it('refuses a configuration without a password when none has ever been stored', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ id: '1', isSetup: true });
+      await expect(
+        mailService.updateSettings({ config: { ...validConfig, password: undefined } })
+      ).rejects.toBeInstanceOf(BadRequestException);
+    });
+
     // Same host, but downgrading encryption would otherwise reuse the password in the clear.
     it('refuses to reuse the stored password when the encryption changes', async () => {
       setupStateModel.findFirst.mockResolvedValue({ id: '1', isSetup: true, mailConfig: stored(validConfig) });
@@ -240,6 +269,27 @@ describe('MailService', () => {
       expect(result.error).toBe('UNKNOWN');
     });
 
+    it('tests unsaved settings with the password they were given', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
+      const result = await mailService.test({ config: { ...validConfig, password: 'typed-secret' } });
+      expect(result).toEqual({ success: true });
+      expect(createTransport).toHaveBeenCalledWith(
+        expect.objectContaining({ auth: { pass: 'typed-secret', user: 'user' } })
+      );
+    });
+
+    it('tests unsaved settings for the same server with the decrypted stored password', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
+      await mailService.test({ config: { ...validConfig, password: undefined, senderName: 'New Name' } });
+      expect(createTransport).toHaveBeenCalledWith(expect.objectContaining({ auth: { pass: 'secret', user: 'user' } }));
+    });
+
+    it('authenticates with an empty password when the stored server needs none', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: { ...validConfig, password: '' } });
+      await mailService.test({});
+      expect(createTransport).toHaveBeenCalledWith(expect.objectContaining({ auth: { pass: '', user: 'user' } }));
+    });
+
     it('reports when mail has not been configured', async () => {
       setupStateModel.findFirst.mockResolvedValue(null);
       expect(await mailService.test({})).toMatchObject({ success: false });
@@ -272,6 +322,26 @@ describe('MailService', () => {
       const result = await mailService.sendNewUserEmail(newUserArgs);
       expect(result.message).not.toMatch(/password:/i);
       expect(result.message).not.toMatch(/\{\{password\}\}/);
+    });
+
+    it('sends the stored new-user template in place of the built-in default', async () => {
+      setupStateModel.findFirst.mockResolvedValue({
+        mailConfig: stored(validConfig),
+        newUserEmailTemplate: { body: { en: 'Hi {{firstName}}' }, subject: { en: 'Your account' } }
+      });
+      const result = await mailService.sendNewUserEmail(newUserArgs);
+      expect(result.message).toBe('Hi Jane');
+      expect(transporter.sendMail.mock.lastCall?.[0]).toMatchObject({ subject: 'Your account' });
+    });
+
+    // A template whose subject has no content would send a blank subject line.
+    it('falls back to the built-in default when the stored subject has no content', async () => {
+      setupStateModel.findFirst.mockResolvedValue({
+        mailConfig: stored(validConfig),
+        newUserEmailTemplate: { body: { en: 'Hi {{firstName}}' }, subject: { en: '' } }
+      });
+      const result = await mailService.sendNewUserEmail(newUserArgs);
+      expect(result.message).toContain('jdoe');
     });
 
     it('renders the French content when language is fr', async () => {

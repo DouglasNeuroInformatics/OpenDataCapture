@@ -146,4 +146,9 @@ describe('describeMailError', () => {
     expect(describeMailError(new Error('0FC2C9C667C0000:error:0A00010B:SSL routines'))).not.toContain('0FC2C9');
     expect(describeMailError('something weird')).toBe('UNKNOWN');
   });
+
+  it('collapses a nullish rejection to UNKNOWN rather than throwing while classifying it', () => {
+    expect(describeMailError(null)).toBe('UNKNOWN');
+    expect(describeMailError(undefined)).toBe('UNKNOWN');
+  });
 });
