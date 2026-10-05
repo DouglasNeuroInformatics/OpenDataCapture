@@ -1,10 +1,8 @@
-import fs from 'fs/promises';
-import os from 'os';
-import path from 'path';
+import * as fs from 'fs/promises';
 
 import esbuild from 'esbuild';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
-import type { MockedFunction } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { MockedFunction, MockInstance } from 'vitest';
 
 import { Bundler } from '../bundler.js';
 import * as resolverModule from '../resolver.js';
@@ -36,6 +34,10 @@ vi.mock('esbuild', () => ({
   }
 }));
 
+vi.mock('fs/promises', () => ({
+  rm: vi.fn()
+}));
+
 describe('Bundler', () => {
   let bundler: Bundler;
   let resolver: { resolve: MockedFunction<resolverModule.Resolver['resolve']> };
@@ -45,7 +47,6 @@ describe('Bundler', () => {
     vi.spyOn(resolverModule, 'Resolver').mockImplementationOnce(function () {
       Object.setPrototypeOf(this, resolver);
     });
-    vi.spyOn(fs, 'rmdir').mockImplementation(vi.fn());
     bundler = new Bundler(BUNDLER_OPTIONS);
   });
 
@@ -58,6 +59,11 @@ describe('Bundler', () => {
     it('should resolve if there are no errors', async () => {
       resolver.resolve.mockResolvedValueOnce({ ...RESOLVED_PACKAGE });
       await expect(bundler.bundle()).resolves.toBe(undefined);
+    });
+    it('should remove the configured outdir before building, so stale bundles do not survive a rebuild', async () => {
+      resolver.resolve.mockResolvedValueOnce({ ...RESOLVED_PACKAGE });
+      await bundler.bundle();
+      expect(fs.rm).toHaveBeenLastCalledWith('dist', { force: true, recursive: true });
     });
   });
 
@@ -76,8 +82,7 @@ describe('Bundler', () => {
         },
         name: 'jquery__1.0.0'
       });
-      const outdir = path.join(os.tmpdir(), 'runtime-bundler-entry-points');
-      await new Bundler({ ...BUNDLER_OPTIONS, outdir }).bundle();
+      await new Bundler(BUNDLER_OPTIONS).bundle();
       expect(vi.mocked(esbuild.build).mock.lastCall![0].entryPoints).toEqual([
         { in: '/pkg/index.js', out: 'jquery@1.0.0/index' },
         { in: '/pkg/index.d.ts', out: 'jquery@1.0.0/index.d' },
@@ -93,21 +98,27 @@ describe('Bundler', () => {
         Object.setPrototypeOf(this, resolver);
       });
       resolver.resolve.mockResolvedValueOnce({ ...RESOLVED_PACKAGE });
-      return new Bundler({ ...BUNDLER_OPTIONS, outdir: path.join(os.tmpdir(), 'runtime-bundler-verbose'), verbose });
+      return new Bundler({ ...BUNDLER_OPTIONS, verbose });
     };
 
-    it('should log the resolved packages when verbose is enabled, so a misconfigured include can be diagnosed', async () => {
-      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
-      await createBundler(true).bundle();
-      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Found packages:'));
+    let logSpy: MockInstance<typeof console.log>;
+
+    beforeEach(() => {
+      logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
       logSpy.mockRestore();
     });
 
+    it('should log the resolved packages when verbose is enabled, so a misconfigured include can be diagnosed', async () => {
+      await createBundler(true).bundle();
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Found packages:'));
+    });
+
     it('should not log anything when verbose is disabled', async () => {
-      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
       await createBundler(false).bundle();
       expect(logSpy).not.toHaveBeenCalled();
-      logSpy.mockRestore();
     });
   });
 });
