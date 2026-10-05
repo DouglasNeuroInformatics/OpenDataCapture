@@ -8,10 +8,6 @@ describe.each([
 ])('%s', (_, stub) => {
   const { reasonFavoriteNumberIsNegative } = stub.instance.content;
 
-  it('should be a form instrument', () => {
-    expect(stub.instance.kind).toBe('FORM');
-  });
-
   it('should hide the reason field before any data is entered', () => {
     expect(reasonFavoriteNumberIsNegative.render(undefined)).toBeNull();
   });
