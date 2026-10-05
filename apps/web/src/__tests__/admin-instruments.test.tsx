@@ -154,7 +154,10 @@ beforeEach(() => {
   mocks.seriesOverview = [];
 });
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe('admin instruments page', () => {
   it('should prefetch the series overview and groups in the loader, so either view renders without a waterfall', async () => {
@@ -368,13 +371,20 @@ describe('admin instruments series view', () => {
     expect(mocks.archive.mutate).not.toHaveBeenCalled();
   });
 
-  it('should toggle the archive status on a double click', () => {
+  it('should ask for confirmation before archiving an active series on a double click', () => {
     mocks.seriesOverview = [overviewFixture()];
     renderPage('series');
     fireEvent.doubleClick(rows()[0]!);
     expect(
       within(screen.getByTestId('archive-series-dialog')).getByText(/^"Baseline Battery" \(All groups\)/)
     ).toBeTruthy();
+  });
+
+  it('should unarchive an archived series straight away on a double click, since it is not destructive', () => {
+    mocks.seriesOverview = [overviewFixture({ archivedAt: new Date('2026-09-02') })];
+    renderPage('series');
+    fireEvent.doubleClick(rows()[0]!);
+    expect(mocks.archive.mutate).toHaveBeenCalledWith({ id: 'series-1', isArchived: false });
   });
 
   it('should ignore a double click while an archive change is in flight, so it is not sent twice', () => {

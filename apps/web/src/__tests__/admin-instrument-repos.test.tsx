@@ -221,7 +221,7 @@ describe('admin instrument repositories page', () => {
   });
 
   it('should close the add dialog once the import succeeds', () => {
-    mocks.createRepo.mockImplementation((_: unknown, options: { onSuccess: () => void }) => options.onSuccess());
+    mocks.createRepo.mockImplementationOnce((_: unknown, options: { onSuccess: () => void }) => options.onSuccess());
     renderPage();
     openAddDialog();
     submitAddForm({ url: 'https://github.com/owner/repository' });
