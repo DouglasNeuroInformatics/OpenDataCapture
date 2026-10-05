@@ -78,6 +78,6 @@ touched exactly two of these: `.env.template` and `$Env`, replacing a direct
 grep -n YOUR_KEY .env    # present after regeneration
 pnpm dev                 # $Env is validated at boot; an invalid value crashes here. Ctrl-C once up
 pnpm lint                # tsc + the no-process.env rule
-pnpm test
+pnpm test:coverage
 pnpm build               # only this catches a missing turbo.json `env` entry
 ```

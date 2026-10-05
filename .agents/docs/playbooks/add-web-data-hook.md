@@ -73,5 +73,5 @@ step type-checks and compiles, and fails at runtime or serves the wrong cached d
 ```sh
 pnpm exec vitest apps/web/src/hooks/__tests__/<hookName>.test.ts   # the new test alone
 pnpm exec vitest --project web                                     # every web test
-pnpm lint && pnpm test                                             # required before you are done
+pnpm lint && pnpm test:coverage                                    # required before you are done
 ```

@@ -82,7 +82,7 @@ advice does not apply here; everything it says about the definition object does.
 pnpm exec turbo run build --filter=@opendatacapture/instrument-library  # builds runtime/v1 first
 pnpm --filter @opendatacapture/instrument-library run available         # reads dist, not src
 pnpm lint
-pnpm test
+pnpm test:coverage
 pnpm test:e2e
 ```
 
