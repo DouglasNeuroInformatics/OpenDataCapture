@@ -34,7 +34,7 @@ and the e2e test carries the change, or this change adds its `vitest.config.ts`.
 | A type contract — inference, a discriminated union      | The type-check, which is `tsc` inside lint | `pnpm lint`          |
 
 **There is no integration tier, and the middle row is why.** `apps/api` unit tests mock the Prisma
-layer entirely (`apps/api/src/groups/__tests__/groups.service.spec.ts`), so the only code path
+layer entirely (`apps/api/src/groups/__tests__/groups.service.test.ts`), so the only code path
 exercised against a database is Playwright: a permissions or scoping change that a green unit suite
 appears to cover has not been tested at all. The type-check tier has no file of its own — a type
 that must hold is asserted by code that would not compile if it broke.

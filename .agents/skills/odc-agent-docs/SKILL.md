@@ -72,7 +72,7 @@ is optional and holds what no step owns (`add-blog-post.md`).
 - **The trap comes before the conventions**, under `## Traps` or a heading that states the trap as a
   sentence (`## Nothing in this directory is checked by anything`, `vendor/AGENTS.md`).
 - **Name the canonical file to read** for each recurring task, by path, the way `apps/api/AGENTS.md`
-  names `src/groups/__tests__/groups.service.spec.ts`.
+  names `src/groups/__tests__/groups.service.test.ts`.
 - **Close on how the work is checked** — `## Tests` giving `pnpm exec vitest --project <name>`, or
   stating there is no project and what covers the behaviour instead (`packages/react-core/AGENTS.md`).
   Where vitest is not the answer the section keeps another name (`docs/AGENTS.md`,
