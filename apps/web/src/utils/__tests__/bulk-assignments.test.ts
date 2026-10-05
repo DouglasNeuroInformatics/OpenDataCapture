@@ -1,16 +1,24 @@
 import { generateSubjectHash } from '@opendatacapture/subject-utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { read, utils, write } from 'xlsx';
 
 import {
+  assertFileSize,
   buildResultRows,
   BulkParseFailure,
   isWorkbookFile,
   parseDelimitedText,
+  parseWorkbook,
   resolveSubjectIds,
   resultCsvFilename,
   toResultCsv,
   toResultTsv
 } from '../bulk-assignments';
+
+vi.mock('xlsx', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('xlsx')>();
+  return { ...actual, read: vi.fn(actual.read) };
+});
 
 const resolve = (input: string, maxSubjects = 500) => resolveSubjectIds(parseDelimitedText(input), { maxSubjects });
 
@@ -90,6 +98,16 @@ describe('parseDelimitedText', () => {
     const errors = await failureOf(() => parseDelimitedText('subjectId\n'));
     expect(errors[0]?.message).toContain('no data rows');
   });
+
+  it('should reject empty input, which has no header row to map', async () => {
+    const errors = await failureOf(() => parseDelimitedText('   '));
+    expect(errors[0]?.message).toContain('No columns were found');
+  });
+
+  it('should reject malformed quoting, naming the row it occurs on', async () => {
+    const errors = await failureOf(() => parseDelimitedText('subjectId\n"subject-1'));
+    expect(errors).toEqual([{ message: 'Quoted field unterminated', row: 1 }]);
+  });
 });
 
 describe('resolveSubjectIds', () => {
@@ -154,6 +172,11 @@ describe('resolveSubjectIds', () => {
       resolve('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M\nAnne,Roy,2000-01-02,X')
     );
     expect(errors[0]).toMatchObject({ row: 3 });
+  });
+
+  it('should reject a PII row with a blank field, since a hash cannot be derived from it', async () => {
+    const errors = await failureOf(() => resolve('firstName,lastName,dateOfBirth,sex\nJean,,2000-01-01,M'));
+    expect(errors[0]).toMatchObject({ message: 'Missing first name, last name, date of birth or sex', row: 2 });
   });
 
   it('should reject a missing id in ID mode', async () => {
@@ -388,5 +411,94 @@ describe('resolveSubjectIds identifier forms', () => {
 
   it('should pass values through unchanged when no group is known', async () => {
     await expect(resolveSubjectIds(idCsv('ex_111'), { maxSubjects: 10 })).resolves.toEqual(['ex_111']);
+  });
+});
+
+describe('assertFileSize', () => {
+  it('should accept a file at exactly the size limit', () => {
+    expect(() => assertFileSize(new File([new Uint8Array(5_000_000)], 'subjects.csv'))).not.toThrow();
+  });
+
+  it('should refuse a file over the size limit before it is read, so the tab cannot lock up', async () => {
+    const errors = await failureOf(() => assertFileSize(new File([new Uint8Array(5_000_001)], 'subjects.csv')));
+    expect(errors[0]?.message).toBe('File is larger than the 5 MB limit.');
+  });
+});
+
+describe('parseWorkbook', () => {
+  /** A real .xlsx file whose first sheet holds the given rows, the first of which is the header. */
+  const workbookFile = (rows: unknown[][]) => {
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, utils.aoa_to_sheet(rows, { cellDates: true }), 'Subjects');
+    const bytes: ArrayBuffer = write(workbook, { bookType: 'xlsx', type: 'array' });
+    return new File([bytes], 'subjects.xlsx');
+  };
+
+  it('should parse the first sheet of a workbook', async () => {
+    const result = await parseWorkbook(workbookFile([['subjectId'], ['subject-1'], ['subject-2']]));
+    expect(result.mode).toBe('ID');
+    expect(result.rows).toEqual([{ subjectId: 'subject-1' }, { subjectId: 'subject-2' }]);
+  });
+
+  it('should trim headers and values, so a padded cell maps and matches like a clean one', async () => {
+    const result = await parseWorkbook(workbookFile([[' Subject ID '], ['  subject-1  ']]));
+    expect(result.mapping).toEqual({ 'Subject ID': 'subjectId' });
+    expect(result.rows).toEqual([{ 'Subject ID': 'subject-1' }]);
+  });
+
+  it('should write a date cell as an ISO date, so it passes the date of birth validation', async () => {
+    const result = await parseWorkbook(
+      workbookFile([
+        ['firstName', 'lastName', 'dateOfBirth', 'sex'],
+        ['Jean', 'Tremblay', new Date(Date.UTC(1982, 2, 14)), 'M']
+      ])
+    );
+    expect(result.rows[0]?.dateOfBirth).toBe('1982-03-14');
+  });
+
+  it('should stringify number and boolean cells', async () => {
+    const result = await parseWorkbook(
+      workbookFile([
+        ['subjectId', 'visit', 'consented'],
+        [1001, 2, true]
+      ])
+    );
+    expect(result.rows).toEqual([{ consented: 'true', subjectId: '1001', visit: '2' }]);
+  });
+
+  it('should read an error cell as blank rather than as its error code', async () => {
+    const file = workbookFile([
+      ['subjectId', 'score'],
+      ['subject-1', 0]
+    ]);
+    const workbook = read(await file.arrayBuffer(), { type: 'array' });
+    workbook.Sheets.Subjects!.B2 = { t: 'e', v: 0 };
+    const bytes: ArrayBuffer = write(workbook, { bookType: 'xlsx', type: 'array' });
+    const result = await parseWorkbook(new File([bytes], 'subjects.xlsx'));
+    expect(result.rows).toEqual([{ score: '', subjectId: 'subject-1' }]);
+  });
+
+  it('should reject a sheet holding only a header row, which yields no columns to map', async () => {
+    const errors = await failureOf(() => parseWorkbook(workbookFile([['subjectId']])));
+    expect(errors[0]?.message).toContain('No columns were found');
+  });
+
+  it('should reject a file that cannot be read as a workbook', async () => {
+    const corrupt = new File([new Uint8Array([0x50, 0x4b, 0x03, 0x04, 1, 2, 3, 4, 5, 6, 7, 8, 9])], 'subjects.xlsx');
+    const errors = await failureOf(() => parseWorkbook(corrupt));
+    expect(errors[0]?.message).toBe('The file could not be read as a workbook. It may be corrupt or unsupported.');
+  });
+
+  it('should reject a workbook without any sheets', async () => {
+    vi.mocked(read).mockReturnValueOnce({ SheetNames: [], Sheets: {} });
+    const errors = await failureOf(() => parseWorkbook(workbookFile([['subjectId'], ['subject-1']])));
+    expect(errors[0]?.message).toBe('The workbook contains no sheets.');
+  });
+
+  it('should refuse an oversized file without reading it', async () => {
+    vi.mocked(read).mockClear();
+    const errors = await failureOf(() => parseWorkbook(new File([new Uint8Array(5_000_001)], 'subjects.xlsx')));
+    expect(errors[0]?.message).toContain('5 MB limit');
+    expect(read).not.toHaveBeenCalled();
   });
 });
