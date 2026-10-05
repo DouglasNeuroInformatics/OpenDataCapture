@@ -80,10 +80,10 @@ describe('LoginPageEditor', () => {
     expect(fireEvent.keyDown(getInstanceNameInput(), { key: 'a' })).toBe(true);
   });
 
-  it('should save the edited branding when the form is submitted', () => {
+  it('should save the edited branding from the Save button, although it sits outside the form', () => {
     render(<LoginPageEditor />);
     fireEvent.change(getInstanceNameInput(), { target: { value: 'Acme Clinic' } });
-    fireEvent.submit(getBrandingForm());
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(mocks.mutate).toHaveBeenCalledWith(
       { branding: expect.objectContaining({ instanceName: { en: 'Acme Clinic', fr: null } }) },
       expect.anything()

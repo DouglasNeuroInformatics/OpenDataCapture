@@ -72,7 +72,12 @@ describe('FullscreenPreviewDialog', () => {
     expect(getPreviewDialog()).toBeTruthy();
   });
 
-  it('should hint the username field in the preview language', () => {
+  it('should hint the username field in English', () => {
+    render(<FullscreenPreviewDialogHarness />);
+    expect(screen.getByRole<HTMLInputElement>('textbox').placeholder).toBe('Username');
+  });
+
+  it('should hint the username field in French when previewing French', () => {
     render(<FullscreenPreviewDialogHarness previewLang="fr" />);
     expect(screen.getByRole<HTMLInputElement>('textbox').placeholder).toBe("Nom d'utilisateur");
   });
@@ -107,10 +112,15 @@ describe('FullscreenPreviewDialog', () => {
     expect(getPreviewDialog().contains(document.activeElement)).toBe(false);
   });
 
-  it('should omit the branding panel and widen the login form when branding is disabled', () => {
-    mocks.branding = { ...BRANDED, enableBranding: false, rightPanelTheme: 'ocean' };
+  it('should omit the branding panel when branding is disabled', () => {
+    mocks.branding = { ...BRANDED, enableBranding: false };
     render(<FullscreenPreviewDialogHarness />);
     expect(screen.queryByRole('heading', { name: 'Acme Clinic' })).toBeNull();
+  });
+
+  it('should widen the login form to full width when branding is disabled', () => {
+    mocks.branding = { ...BRANDED, enableBranding: false };
+    render(<FullscreenPreviewDialogHarness />);
     expect([...getLoginFormSide().classList]).toContain('w-full');
   });
 

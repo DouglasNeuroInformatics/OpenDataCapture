@@ -73,7 +73,15 @@ describe('readLogoAsWebpDataUrl', () => {
     expect(toDataURL).toHaveBeenCalledWith('image/webp', 0.92);
   });
 
-  it('should keep the original when the WebP is no smaller, so re-encoding never grows the payload', async () => {
+  it('should keep the original when the WebP is the same size, since re-encoding would gain nothing', async () => {
+    const file = pngFile(4);
+    const original = await readOriginal(file);
+    const webpPrefix = 'data:image/webp;base64,';
+    toDataURL.mockReturnValue(webpPrefix + 'A'.repeat(original.length - webpPrefix.length));
+    await expect(readLogoAsWebpDataUrl(file)).resolves.toBe(original);
+  });
+
+  it('should keep the original when the WebP is larger, so re-encoding never grows the payload', async () => {
     const file = pngFile(4);
     const original = await readOriginal(file);
     toDataURL.mockReturnValue(`data:image/webp;base64,${'A'.repeat(original.length)}`);

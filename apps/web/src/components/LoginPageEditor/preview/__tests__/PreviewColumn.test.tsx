@@ -125,7 +125,7 @@ describe('PreviewColumn', () => {
     expect(getLoginFormMock(container).style.backgroundImage).toBe('');
   });
 
-  it('should submit the branding form from the Save button, although it sits outside the form', () => {
+  it('should target the branding form from the Save button, since it sits outside the form', () => {
     render(<PreviewColumnHarness />);
     const save = screen.getByRole('button', { name: 'Save' });
     expect([save.getAttribute('type'), save.getAttribute('form')]).toEqual(['submit', FORM_ID]);
