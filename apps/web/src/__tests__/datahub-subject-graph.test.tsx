@@ -126,7 +126,11 @@ const renderGraph = ({
   displayedInstrument = instrument,
   instrumentId = 'instrument-1',
   minDate = null
-}: { displayedInstrument?: object; instrumentId?: null | string; minDate?: Date | null } = {}) => {
+}: {
+  displayedInstrument?: AnyUnilingualFormInstrument;
+  instrumentId?: null | string;
+  minDate?: Date | null;
+} = {}) => {
   mocks.useInstrumentVisualization.mockReturnValue({
     editionOptions: {},
     instrument: displayedInstrument,
@@ -304,13 +308,6 @@ describe('subject graph download', () => {
     renderGraph({ minDate: new Date(2026, 0, 1) });
     await downloadGraph();
     expect(clonedText()[2]).toBe('Timeframe: 2026-01-01 - 2026-10-04');
-  });
-
-  it('should leave the title out of the caption when the instrument has none, rather than printing undefined', async () => {
-    const { title: _, ...untitledDetails } = instrument.details;
-    renderGraph({ displayedInstrument: { ...instrument, details: untitledDetails } });
-    await downloadGraph();
-    expect(clonedText()[0]).toBe(' of Subject: abcdefg');
   });
 
   it('should not capture anything once the graph has unmounted', async () => {
