@@ -203,7 +203,11 @@ explains it.
 tooling rearrange it. Where ordering is load-bearing, the existing code carries an explicit
 `eslint-disable` comment; follow that pattern rather than fighting the rule.
 
-**Tests.** Keep test bodies short; each verifies one behavior. Descriptions are concise, grammatical
+**Tests.** A unit test is `<file>.test.ts(x)` in a `__tests__/` folder beside the file it tests:
+`src/index.ts` is tested by `src/__tests__/index.test.ts`. A suite that drives a whole package, like
+`apps/api/test/`, lives in that package's `test/` folder instead. Two eslint rules (`odc/*` in
+`eslint.config.js`) enforce the layout; `packages/instrument-library` is the one exception, for the
+reason its `AGENTS.md` gives. Keep test bodies short; each verifies one behavior. Descriptions are concise, grammatical
 sentences stating the behavioral reason, e.g. `'should key the cache on every parameter, so paging
 does not serve a stale page'`.
 

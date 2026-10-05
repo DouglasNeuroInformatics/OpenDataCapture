@@ -210,12 +210,12 @@ add it to the `$GroupScopableSubjectName` exclusion.
   _and_ a deny.
 - `src/auth/__tests__/ability.utils.test.ts` — pins the `undefined` ability behavior and
   `forcedAppSubject`.
-- `src/auth/guards/__tests__/jwt-auth.guard.spec.ts` — the guard's own branches.
+- `src/auth/guards/__tests__/jwt-auth.guard.test.ts` — the guard's own branches.
 
 Service tests mock the Prisma layer, so they verify the arguments passed to the model, not the
 database's answer. Assert the `where` clause the same way the existing specs assert `data`:
 `model.<method>.mock.lastCall?.[0]` plus `toMatchObject` — see
-`src/groups/__tests__/groups.service.spec.ts`.
+`src/groups/__tests__/groups.service.test.ts`.
 
 Row-level scoping is not observable in a unit test with a mocked model, which is why an end-to-end
 test in `testing/` is required for anything that changes who can see what.

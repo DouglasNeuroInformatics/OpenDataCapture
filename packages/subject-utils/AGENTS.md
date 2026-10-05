@@ -22,6 +22,5 @@ crashing beats deriving a wrong ID. Leave it in place.
 
 ## Tests
 
-`pnpm exec vitest --project subject-utils`. There is a `vitest.config.ts` here. The test file is
-**`src/test.ts`** — an unusual name that is picked up by the root vitest `include` glob
-`**/*/test.?(c|m)[jt]s?(x)`. A new test needs either that name or a `*.test.ts` suffix.
+`pnpm exec vitest --project subject-utils`. There is a `vitest.config.ts` here, and every export is
+tested in `src/__tests__/index.test.ts`.

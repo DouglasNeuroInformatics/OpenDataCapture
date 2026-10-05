@@ -25,6 +25,11 @@ describe('generateSubjectHash', () => {
       await generateSubjectHash({ ...validIdentificationData, firstName: 'Jane' })
     );
   });
+  it('should hash different identification data to different strings', async () => {
+    await expect(generateSubjectHash({ ...validIdentificationData, lastName: 'Smith' })).resolves.not.toEqual(
+      await generateSubjectHash(validIdentificationData)
+    );
+  });
   it('should reject a missing dateOfBirth', async () => {
     await expect(generateSubjectHash({ ...validIdentificationData, dateOfBirth: 'not-a-date' as any })).rejects.toThrow(
       /dateOfBirth/

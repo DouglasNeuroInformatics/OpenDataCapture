@@ -100,11 +100,11 @@ stored before it — `.agents/docs/architecture/auth-and-permissions.md` says wh
 `pnpm exec vitest --project schemas`. There is a `vitest.config.ts`; no setup files, no environment
 beyond node.
 
-Tests live in two places: `src/instrument/__tests__/*.test.ts`, and colocated `*.test.ts` beside the
-schema for `setup` and `summary`. Fixtures come from the `@opendatacapture/instrument-stubs`
+Each module's tests live in a `__tests__/` folder beside it, named after the file they test
+(`src/setup/__tests__/setup.test.ts` tests `src/setup/setup.ts`). Fixtures come from the `@opendatacapture/instrument-stubs`
 devDependency (`@opendatacapture/instrument-stubs/forms`), not hand-written objects — see
 `src/instrument/__tests__/instrument.form.test.ts`.
 
 Assert with `safeParse(...).success`, and cover the reject case as well as the accept case. Where a
-schema is a security boundary the rejects are the point: `src/setup/setup.test.ts` exists to pin
+schema is a security boundary the rejects are the point: `src/setup/__tests__/setup.test.ts` exists to pin
 down that `javascript:` and `data:text/html` never pass `$BrandingConfig`.
