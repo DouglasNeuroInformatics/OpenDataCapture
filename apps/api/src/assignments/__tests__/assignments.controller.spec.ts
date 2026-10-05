@@ -60,6 +60,74 @@ describe('AssignmentsController', () => {
     expect(assignmentsController).toBeDefined();
   });
 
+  describe('bulkPreflight', () => {
+    it('should validate the batch as the current user, so the service applies their group and subject scoping', async () => {
+      const data = { allowDuplicates: false, groupId: 'group-1', subjectIds: ['subject-1'], timepoints: [] };
+      const preflight = { assignmentCount: 0, subjectCount: 1, timepointCount: 0 };
+      assignmentsService.bulkPreflight.mockResolvedValueOnce(preflight);
+      await expect(assignmentsController.bulkPreflight(data, currentUser)).resolves.toBe(preflight);
+      expect(assignmentsService.bulkPreflight).toHaveBeenCalledExactlyOnceWith(data, currentUser);
+    });
+  });
+
+  describe('create', () => {
+    it('should create the assignment as the current user, so the service can check and audit it', async () => {
+      const data = { expiresAt: assignment.expiresAt, groupId: 'group-1', instrumentId: 'i-1', subjectId: 's-1' };
+      assignmentsService.create.mockResolvedValueOnce(assignment);
+      await expect(assignmentsController.create(data, currentUser)).resolves.toBe(assignment);
+      expect(assignmentsService.create).toHaveBeenCalledExactlyOnceWith(data, currentUser);
+    });
+  });
+
+  describe('createBulk', () => {
+    it('should create the batch as the current user, so the service can check and audit it', async () => {
+      const data = { allowDuplicates: true, groupId: 'group-1', subjectIds: ['subject-1'], timepoints: [] };
+      assignmentsService.createBulk.mockResolvedValueOnce([assignment]);
+      await expect(assignmentsController.createBulk(data, currentUser)).resolves.toStrictEqual([assignment]);
+      expect(assignmentsService.createBulk).toHaveBeenCalledExactlyOnceWith(data, currentUser);
+    });
+  });
+
+  describe('deleteBulk', () => {
+    it('should delete only the requested ids within the caller ability, so other groups are untouched', async () => {
+      const result = { deletedCount: 2, failedIds: [] };
+      assignmentsService.deleteBulk.mockResolvedValueOnce(result);
+      await expect(assignmentsController.deleteBulk({ ids: ['a-1', 'a-2'] }, currentUser.ability)).resolves.toBe(
+        result
+      );
+      expect(assignmentsService.deleteBulk).toHaveBeenCalledExactlyOnceWith(['a-1', 'a-2'], {
+        ability: currentUser.ability
+      });
+    });
+  });
+
+  describe('find', () => {
+    it('should filter by the requested group and subject within the caller ability', async () => {
+      assignmentsService.find.mockResolvedValueOnce([assignment]);
+      await expect(assignmentsController.find(currentUser.ability, 'group-1', 'subject-1')).resolves.toStrictEqual([
+        assignment
+      ]);
+      expect(assignmentsService.find).toHaveBeenCalledExactlyOnceWith(
+        { groupId: 'group-1', subjectId: 'subject-1' },
+        { ability: currentUser.ability }
+      );
+    });
+  });
+
+  describe('updateById', () => {
+    it('should update the assignment as the current user, so the service can scope and audit it', async () => {
+      assignmentsService.updateById.mockResolvedValueOnce({ ...assignment, status: 'CANCELED' });
+      await expect(
+        assignmentsController.updateById('assignment-1', { status: 'CANCELED' }, currentUser)
+      ).resolves.toMatchObject({ status: 'CANCELED' });
+      expect(assignmentsService.updateById).toHaveBeenCalledExactlyOnceWith(
+        'assignment-1',
+        { status: 'CANCELED' },
+        currentUser
+      );
+    });
+  });
+
   describe('sendEmail', () => {
     const sendEmail = (body: { language: Language; recipient: string; templateId?: null | string }) =>
       assignmentsController.sendEmail('assignment-1', body, currentUser);
