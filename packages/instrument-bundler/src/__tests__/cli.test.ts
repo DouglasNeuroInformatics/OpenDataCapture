@@ -81,6 +81,39 @@ describe('cli', () => {
     ).toBe(true);
   });
 
+  it('should write into an output directory that already exists rather than fail to create it', async () => {
+    fs.mkdirSync(outputBase, { recursive: true });
+    process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase];
+    await import('../cli.js');
+    expect(fs.existsSync(path.join(outputBase, 'FORM_INSTRUMENT_STUB.js'))).toBe(true);
+  });
+
+  it('should embed a binary asset next to the entry, reading it as bytes rather than text', async () => {
+    const pngBytes = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+      'base64'
+    );
+    fs.writeFileSync(path.join(inputBase, 'FORM_INSTRUMENT_STUB', 'logo.png'), pngBytes);
+    fs.writeFileSync(
+      path.join(inputBase, 'FORM_INSTRUMENT_STUB', 'index.ts'),
+      'import logo from "./logo.png"; export default { content: {}, details: { logo }, kind: "FORM", language: "en", measures: {} };'
+    );
+    process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase, '--raw'];
+    await import('../cli.js');
+    const content = fs.readFileSync(path.join(outputBase, 'FORM_INSTRUMENT_STUB.js'), 'utf-8');
+    expect(content).toContain(`data:image/png;base64,${pngBytes.toString('base64')}`);
+  });
+
+  it('should warn and skip a target directory whose name the input glob cannot match', async () => {
+    fs.mkdirSync(path.join(inputBase, '[x]'));
+    fs.writeFileSync(path.join(inputBase, '[x]', 'index.ts'), 'export default {};');
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase];
+    await import('../cli.js');
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to find any input files in directory'));
+    expect(fs.existsSync(path.join(outputBase, '[x].js'))).toBe(false);
+  });
+
   it('should exit with an error when the target directory does not exist', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     process.argv = ['node', 'cli.js', path.join(tmpDir, 'missing'), '--outdir', outputBase];
