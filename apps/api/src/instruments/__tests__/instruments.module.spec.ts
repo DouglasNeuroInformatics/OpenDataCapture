@@ -26,9 +26,10 @@ describe('InstrumentsModule', () => {
     );
   });
 
-  // Known defect: the `development` target of `#runtime/v1/*` in apps/api/package.json is
+  // Known defect (#1653): the `development` target of `#runtime/v1/*` in apps/api/package.json is
   // `../../runtime/v1/dist/*`, which is not package-relative, so Node rejects it with
-  // ERR_INVALID_PACKAGE_TARGET under `--conditions=development` (as vitest and `pnpm dev` run).
+  // ERR_INVALID_PACKAGE_TARGET under `--conditions=development`. vitest and worker threads hit it;
+  // the `pnpm dev` main thread does not, because libnest resolves through swc-node.
   it.fails('should resolve a runtime import to the built runtime, even under the development condition', () => {
     expect(getVirtualizationContext().__resolveImport('/runtime/v1/@opendatacapture/runtime-core/index.js')).toBe(
       new URL('../../../../../runtime/v1/dist/@opendatacapture/runtime-core/index.js', import.meta.url).href
