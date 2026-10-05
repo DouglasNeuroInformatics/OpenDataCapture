@@ -2,10 +2,10 @@ import type { PropsWithChildren } from 'react';
 
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { GroupSwitcher } from '@/components/GroupSwitcher';
+import { GroupSwitcher, useIsGroupSwitcherVisible } from '@/components/GroupSwitcher';
 
 import '@/services/i18n';
 
@@ -80,5 +80,48 @@ describe('GroupSwitcher', () => {
     const switcher = screen.getByTestId('group-switcher');
     expect(switcher.tagName).toBe('DIV');
     expect(switcher.textContent).toContain('Own Group');
+  });
+
+  it('should offer a select to a non-admin with one group but none selected, so they can pick it', () => {
+    store.currentGroup = null;
+    store.currentUser = asUser({ groups: [{ id: 'own', name: 'Own Group' }], isAdmin: false });
+    render(<GroupSwitcher />, { wrapper: Wrapper });
+    expect(screen.getByTestId('group-switcher').textContent).toContain('Select a group');
+  });
+
+  it('should show the current group in the select when there are several to choose from', () => {
+    const groups = [
+      { id: 'a', name: 'Group A' },
+      { id: 'b', name: 'Group B' }
+    ];
+    store.currentGroup = groups[1]!;
+    store.currentUser = asUser({ groups, isAdmin: false });
+    render(<GroupSwitcher />, { wrapper: Wrapper });
+    expect(screen.getByTestId('group-switcher').textContent).toContain('Group B');
+  });
+
+  it('should change to the group chosen in the select', () => {
+    const groups = [
+      { id: 'a', name: 'Group A' },
+      { id: 'b', name: 'Group B' }
+    ];
+    store.currentGroup = groups[0]!;
+    store.currentUser = asUser({ groups, isAdmin: false });
+    render(<GroupSwitcher />, { wrapper: Wrapper });
+    fireEvent.click(screen.getByTestId('group-switcher'));
+    fireEvent.click(screen.getByRole('option', { name: 'Group B' }));
+    expect(store.changeGroup).toHaveBeenCalledWith(groups[1]);
+  });
+
+  it('should report the switcher as hidden when there is no group to switch to, so callers skip its chrome', () => {
+    store.currentUser = asUser({ groups: [], isAdmin: false });
+    const { result } = renderHook(() => useIsGroupSwitcherVisible(), { wrapper: Wrapper });
+    expect(result.current).toBe(false);
+  });
+
+  it('should report the switcher as visible when the user has a group', () => {
+    store.currentUser = asUser({ groups: [{ id: 'own', name: 'Own Group' }], isAdmin: false });
+    const { result } = renderHook(() => useIsGroupSwitcherVisible(), { wrapper: Wrapper });
+    expect(result.current).toBe(true);
   });
 });
