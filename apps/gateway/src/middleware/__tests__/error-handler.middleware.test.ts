@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { logger } from '@/logger';
 import { HttpException } from '@/utils/http-exception';
@@ -15,6 +15,10 @@ function createResponse({ headersSent }: { headersSent: boolean }) {
 describe('errorHandlerMiddleware', () => {
   beforeEach(() => {
     vi.spyOn(logger, 'error').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('should log every error, so failures are visible in the server output', () => {

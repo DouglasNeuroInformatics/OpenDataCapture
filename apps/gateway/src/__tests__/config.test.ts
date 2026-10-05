@@ -46,7 +46,9 @@ describe('config', () => {
 
   it('should refuse to start with an API key shorter than 32 characters, so the key cannot be guessed', async () => {
     vi.stubEnv('GATEWAY_API_KEY', 'short');
-    await expect(loadConfig()).rejects.toThrow();
+    await expect(loadConfig()).rejects.toMatchObject({
+      issues: [expect.objectContaining({ code: 'too_small', path: ['apiKey'] })]
+    });
   });
 
   it('should resolve the root to the gateway app directory', async () => {
