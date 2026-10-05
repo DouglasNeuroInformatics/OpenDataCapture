@@ -9,7 +9,11 @@ import '@/services/i18n';
 
 const mocks = vi.hoisted(() => {
   const can = vi.fn((_action: string, _subject: string) => true);
-  const store: { currentGroup: null | { id: string }; currentSession: null; currentUser: unknown } = {
+  const store: {
+    currentGroup: null | { id: string };
+    currentSession: null | { subjectId: string };
+    currentUser: unknown;
+  } = {
     currentGroup: { id: 'group-1' },
     currentSession: null,
     currentUser: { ability: { can } }
@@ -52,7 +56,16 @@ beforeEach(() => {
   mocks.config.setup.isGatewayEnabled = true;
   mocks.setupState.isMailEnabled = false;
   mocks.setupState.isBulkRemoteAssignmentsEnabled = true;
+  mocks.setupState.isExperimentalFeaturesEnabled = false;
+  mocks.store.currentGroup = { id: 'group-1' };
+  mocks.store.currentSession = null;
+  mocks.store.currentUser = { ability: { can: mocks.can } };
 });
+
+const navItemAt = (url: string) =>
+  renderHook(() => useNavItems())
+    .result.current.flat()
+    .find((item) => item.url === url);
 
 describe('useNavItems', () => {
   it('should offer remote assignment when the gateway is deployed', () => {
@@ -147,5 +160,37 @@ describe('useNavItems', () => {
     expect(navUrls()).toContain('/group/remote-assignments');
     expect(navUrls()).not.toContain('/group/manage');
     expect(navLabels()).toContain('Group Actions');
+  });
+
+  it('should omit the upload page unless experimental features are enabled', () => {
+    expect(navUrls()).not.toContain('/upload');
+  });
+
+  it('should offer the upload page when experimental features are enabled', () => {
+    mocks.setupState.isExperimentalFeaturesEnabled = true;
+    expect(navUrls()).toContain('/upload');
+  });
+
+  it('should offer no navigation to a user without any permissions', () => {
+    mocks.can.mockReturnValue(false);
+    expect(renderHook(() => useNavItems()).result.current).toEqual([]);
+  });
+
+  it('should offer no navigation before a user is logged in', () => {
+    mocks.store.currentUser = null;
+    expect(renderHook(() => useNavItems()).result.current).toEqual([]);
+  });
+
+  it('should only allow starting a session while none is in progress', () => {
+    expect(navItemAt('/session/start-session')?.disabled).toBe(false);
+    expect(navItemAt('/instruments/accessible-instruments')?.disabled).toBe(true);
+    expect(navItemAt('/session/remote-assignment')?.disabled).toBe(true);
+  });
+
+  it('should enable the session pages and link to the subject once a session is in progress', () => {
+    mocks.store.currentSession = { subjectId: 'subject-1' };
+    expect(navItemAt('/session/start-session')?.disabled).toBe(true);
+    expect(navItemAt('/instruments/accessible-instruments')?.disabled).toBe(false);
+    expect(navItemAt('/datahub/subject-1/table')?.disabled).toBe(false);
   });
 });
