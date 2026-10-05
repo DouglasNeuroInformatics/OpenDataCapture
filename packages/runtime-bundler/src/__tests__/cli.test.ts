@@ -11,6 +11,15 @@ let tmpDir: string;
 let originalCwd: string;
 let exitSpy: ReturnType<typeof vi.spyOn>;
 
+/** Replaces the real bundler for one import of `cli.ts`, so a test controls whether a bundle succeeds. */
+function mockBundle(bundle: () => Promise<void>) {
+  vi.doMock('../bundler.js', () => ({
+    Bundler: class {
+      bundle = bundle;
+    }
+  }));
+}
+
 beforeEach(() => {
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runtime-bundler-cli-'));
   originalCwd = process.cwd();
@@ -22,6 +31,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.doUnmock('../bundler.js');
   process.chdir(originalCwd);
   fs.rmSync(tmpDir, { force: true, recursive: true });
   exitSpy.mockRestore();
@@ -68,5 +78,24 @@ describe('cli', () => {
       errorSpy.mock.calls.some(([message]) => typeof message === 'string' && message.includes('does-not-exist'))
     ).toBe(true);
     expect(logSpy).not.toHaveBeenCalledWith('Success!');
+  });
+
+  it('should bundle a single config object and report success', async () => {
+    fs.writeFileSync(path.join(tmpDir, 'runtime.config.js'), "export default { include: [], outdir: 'dist' };\n");
+    const bundle = vi.fn(() => Promise.resolve());
+    mockBundle(bundle);
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    await import('../cli.js');
+    expect(bundle).toHaveBeenCalledTimes(1);
+    expect(logSpy).toHaveBeenCalledWith('Success!');
+  });
+
+  it('should log a thrown non-error value as is, since it carries no message', async () => {
+    fs.writeFileSync(path.join(tmpDir, 'runtime.config.js'), "export default { include: [], outdir: 'dist' };\n");
+    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- the cli must report a rejection that is not an Error
+    mockBundle(() => Promise.reject('not an error'));
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    await import('../cli.js');
+    expect(errorSpy).toHaveBeenCalledWith('not an error');
   });
 });

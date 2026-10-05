@@ -1,5 +1,8 @@
 import fs from 'fs/promises';
+import os from 'os';
+import path from 'path';
 
+import esbuild from 'esbuild';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import type { MockedFunction } from 'vitest';
 
@@ -55,6 +58,56 @@ describe('Bundler', () => {
     it('should resolve if there are no errors', async () => {
       resolver.resolve.mockResolvedValueOnce({ ...RESOLVED_PACKAGE });
       await expect(bundler.bundle()).resolves.toBe(undefined);
+    });
+  });
+
+  describe('entry points', () => {
+    it('should build module, declaration and asset entry points named after the versioned package, skipping package.json', async () => {
+      vi.spyOn(resolverModule, 'Resolver').mockImplementationOnce(function () {
+        Object.setPrototypeOf(this, resolver);
+      });
+      resolver.resolve.mockResolvedValueOnce({
+        ...RESOLVED_PACKAGE,
+        exports: {
+          '.': { import: '/pkg/index.js', types: '/pkg/index.d.ts' },
+          './legacy': { default: '/pkg/legacy.js' },
+          './package.json': { default: '/pkg/package.json' },
+          './style.css': { copy: '/pkg/style.css' }
+        },
+        name: 'jquery__1.0.0'
+      });
+      const outdir = path.join(os.tmpdir(), 'runtime-bundler-entry-points');
+      await new Bundler({ ...BUNDLER_OPTIONS, outdir }).bundle();
+      expect(vi.mocked(esbuild.build).mock.lastCall![0].entryPoints).toEqual([
+        { in: '/pkg/index.js', out: 'jquery@1.0.0/index' },
+        { in: '/pkg/index.d.ts', out: 'jquery@1.0.0/index.d' },
+        { in: '/pkg/legacy.js', out: 'jquery@1.0.0/legacy' },
+        { in: '/pkg/style.css', out: 'jquery@1.0.0/style' }
+      ]);
+    });
+  });
+
+  describe('verbose logging', () => {
+    const createBundler = (verbose: boolean) => {
+      vi.spyOn(resolverModule, 'Resolver').mockImplementationOnce(function () {
+        Object.setPrototypeOf(this, resolver);
+      });
+      resolver.resolve.mockResolvedValueOnce({ ...RESOLVED_PACKAGE });
+      return new Bundler({ ...BUNDLER_OPTIONS, outdir: path.join(os.tmpdir(), 'runtime-bundler-verbose'), verbose });
+    };
+
+    it('should log the resolved packages when verbose is enabled, so a misconfigured include can be diagnosed', async () => {
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+      await createBundler(true).bundle();
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Found packages:'));
+      logSpy.mockRestore();
+    });
+
+    it('should not log anything when verbose is disabled', async () => {
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+      await createBundler(false).bundle();
+      expect(logSpy).not.toHaveBeenCalled();
+      logSpy.mockRestore();
     });
   });
 });
