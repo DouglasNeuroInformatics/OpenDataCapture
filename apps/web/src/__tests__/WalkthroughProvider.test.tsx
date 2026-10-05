@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { WalkthroughProvider } from '../WalkthroughProvider';
+import { WalkthroughProvider } from '@/providers/WalkthroughProvider';
 
 import '@/services/i18n';
 

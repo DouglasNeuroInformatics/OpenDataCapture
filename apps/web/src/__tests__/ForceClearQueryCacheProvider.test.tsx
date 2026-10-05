@@ -20,7 +20,7 @@ const CHILD_TEXT = 'Page';
 const loadProvider = async (isForceClearQueryCacheEnabled: boolean) => {
   mocks.config.dev.isForceClearQueryCacheEnabled = isForceClearQueryCacheEnabled;
   vi.resetModules();
-  const { ForceClearQueryCacheProvider } = await import('../ForceClearQueryCacheProvider');
+  const { ForceClearQueryCacheProvider } = await import('@/providers/ForceClearQueryCacheProvider');
   return ForceClearQueryCacheProvider;
 };
 

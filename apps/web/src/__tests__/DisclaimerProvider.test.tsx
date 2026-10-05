@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { DisclaimerProvider } from '../DisclaimerProvider';
+import { DisclaimerProvider } from '@/providers/DisclaimerProvider';
 
 import '@/services/i18n';
 
