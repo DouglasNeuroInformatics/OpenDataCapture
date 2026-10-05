@@ -85,6 +85,8 @@ const exportEntry = (subjectId: string): InstrumentRecordsExport[number] => ({
   instrumentEdition: 1,
   instrumentName: 'HAPPINESS_QUESTIONNAIRE',
   measure: 'overallHappiness',
+  seriesId: null,
+  seriesName: null,
   sessionDate: '2026-01-01',
   sessionId: 'session-1',
   sessionType: 'IN_PERSON',

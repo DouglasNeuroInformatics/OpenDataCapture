@@ -735,7 +735,7 @@ describe('InstrumentRecordsService', () => {
       await instrumentRecordsService.find({ subjectId: 'subject-1' });
 
       expect(sessionModel.findMany).toHaveBeenCalledWith({
-        select: { id: true, user: { select: { username: true } } },
+        select: { id: true, type: true, user: { select: { username: true } } },
         where: { AND: [{}, { id: { in: ['session-1', 'session-2'] } }] }
       });
     });
@@ -751,7 +751,7 @@ describe('InstrumentRecordsService', () => {
       await instrumentRecordsService.find({ subjectId: 'subject-1' }, { ability });
 
       expect(sessionModel.findMany).toHaveBeenCalledWith({
-        select: { id: true, user: { select: { username: true } } },
+        select: { id: true, type: true, user: { select: { username: true } } },
         where: { AND: [accessibleQuery(ability, 'read', 'Session'), { id: { in: ['session-1'] } }] }
       });
     });
@@ -786,6 +786,7 @@ describe('InstrumentRecordsService', () => {
           groupId: '123',
           id: 'record-1',
           instrumentId: 'instrument-1',
+          seriesInstrumentId: null,
           session: {
             date: '2023-01-01',
             id: 'session-1',
@@ -922,6 +923,7 @@ describe('InstrumentRecordsService', () => {
         groupId: 'group-1',
         id: 'record-1',
         instrumentId: 'instrument-1',
+        seriesInstrumentId: null,
         session: { date: '2023-01-01', id: 'session-1', type: 'IN_PERSON' as const, user: null },
         subject: { age: 20, groupIds: ['group-1'], id: 'subject-1', sex: 'MALE' }
       } satisfies RecordType;
@@ -967,7 +969,7 @@ describe('InstrumentRecordsService', () => {
         await expect(Promise.race([result, Promise.resolve('pending')])).resolves.toBe('pending');
         expect(worker.postMessage).toHaveBeenCalledTimes(1);
         expect(worker.postMessage).toHaveBeenCalledWith({
-          data: [{ edition: 1, id: 'instrument-1', name: 'X' }],
+          data: { instruments: [{ edition: 1, id: 'instrument-1', name: 'X' }], seriesNames: {} },
           type: 'INIT'
         });
         worker.emit('error', new Error('settle'));
@@ -1234,13 +1236,20 @@ describe('InstrumentRecordsService', () => {
       const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
       expect(pipeline.find((stage) => stage.$group).$group._id).toStrictEqual({
         groupId: { $ifNull: ['$groupId', null] },
+        key: { $ifNull: ['$subjectId', null] },
         subjectId: { $ifNull: ['$subjectId', null] }
       });
     });
 
     it('should key the summary on the subject, so the subject hub can read a row per subject', async () => {
       instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
-        { groupId: 'group-1', lastCollectedAt: '2025-02-02T00:00:00.000Z', recordCount: 4, subjectId: 'subject-1' }
+        {
+          groupId: 'group-1',
+          key: 'subject-1',
+          lastCollectedAt: '2025-02-02T00:00:00.000Z',
+          recordCount: 4,
+          subjectId: 'subject-1'
+        }
       ]);
 
       const [summary] = await instrumentRecordsService.summarizeBySubject({}, { ability: ADMIN });
@@ -1257,8 +1266,8 @@ describe('InstrumentRecordsService', () => {
         { action: 'read', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' }
       ]);
       instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
-        { groupId: 'group-1', lastCollectedAt: null, recordCount: 2, subjectId: 'subject-1' },
-        { groupId: 'group-2', lastCollectedAt: null, recordCount: 7, subjectId: 'subject-1' }
+        { groupId: 'group-1', key: 'subject-1', lastCollectedAt: null, recordCount: 2, subjectId: 'subject-1' },
+        { groupId: 'group-2', key: 'subject-1', lastCollectedAt: null, recordCount: 7, subjectId: 'subject-1' }
       ]);
 
       const [summary] = await instrumentRecordsService.summarizeBySubject({}, { ability });
@@ -1270,8 +1279,20 @@ describe('InstrumentRecordsService', () => {
     // is the later of the two rather than whichever arrived last.
     it('should fold a subject appearing in several readable groups into one row', async () => {
       instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
-        { groupId: 'group-1', lastCollectedAt: '2025-01-01T00:00:00.000Z', recordCount: 2, subjectId: 'subject-1' },
-        { groupId: 'group-2', lastCollectedAt: '2025-03-03T00:00:00.000Z', recordCount: 3, subjectId: 'subject-1' }
+        {
+          groupId: 'group-1',
+          key: 'subject-1',
+          lastCollectedAt: '2025-01-01T00:00:00.000Z',
+          recordCount: 2,
+          subjectId: 'subject-1'
+        },
+        {
+          groupId: 'group-2',
+          key: 'subject-1',
+          lastCollectedAt: '2025-03-03T00:00:00.000Z',
+          recordCount: 3,
+          subjectId: 'subject-1'
+        }
       ]);
 
       const summaries = await instrumentRecordsService.summarizeBySubject({}, { ability: ADMIN });
@@ -1287,10 +1308,86 @@ describe('InstrumentRecordsService', () => {
 
     it('should skip a row whose subject could not be resolved, rather than keying a summary on null', async () => {
       instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
-        { groupId: 'group-1', lastCollectedAt: null, recordCount: 2, subjectId: null }
+        { groupId: 'group-1', key: null, lastCollectedAt: null, recordCount: 2, subjectId: null }
       ]);
 
       expect(await instrumentRecordsService.summarizeBySubject({}, { ability: ADMIN })).toStrictEqual([]);
+    });
+  });
+
+  describe('summarizeByInstrument', () => {
+    const ADMIN = createAppAbility([{ action: 'manage', subject: 'all' }]);
+
+    it('should group by the instrument, so the hub can read a row per instrument', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.summarizeByInstrument({}, { ability: ADMIN });
+
+      const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
+      expect(pipeline.find((stage) => stage.$group).$group._id.key).toStrictEqual({
+        $ifNull: ['$instrumentId', null]
+      });
+    });
+
+    // The count is of subjects, not records, which is the whole reason the pipeline groups by subject
+    // and folds here: one subject completing an instrument four times is still one subject.
+    it('should count a subject once however many records they contributed', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', key: 'instrument-1', lastCollectedAt: null, recordCount: 4, subjectId: 'subject-1' },
+        { groupId: 'group-1', key: 'instrument-1', lastCollectedAt: null, recordCount: 1, subjectId: 'subject-2' }
+      ]);
+
+      const [summary] = await instrumentRecordsService.summarizeByInstrument({}, { ability: ADMIN });
+
+      expect(summary).toStrictEqual({
+        instrumentId: 'instrument-1',
+        lastCollectedAt: null,
+        recordCount: 5,
+        subjectCount: 2
+      });
+    });
+
+    // Summing per-group counts would report this subject twice. Unioning the ids is what makes the
+    // count exact for a caller who can read both groups.
+    it('should count a subject shared by two readable groups once', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', key: 'instrument-1', lastCollectedAt: null, recordCount: 1, subjectId: 'subject-1' },
+        { groupId: 'group-2', key: 'instrument-1', lastCollectedAt: null, recordCount: 1, subjectId: 'subject-1' }
+      ]);
+
+      const [summary] = await instrumentRecordsService.summarizeByInstrument({}, { ability: ADMIN });
+
+      expect(summary).toMatchObject({ recordCount: 2, subjectCount: 1 });
+    });
+  });
+
+  describe('summarizeBySeries', () => {
+    const ADMIN = createAppAbility([{ action: 'manage', subject: 'all' }]);
+
+    it('should group by the series instrument, so a series row spans the instruments it composes', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.summarizeBySeries({}, { ability: ADMIN });
+
+      const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
+      expect(pipeline.find((stage) => stage.$group).$group._id.key).toStrictEqual({
+        $ifNull: ['$seriesInstrumentId', null]
+      });
+    });
+
+    // Grouping by series buckets every individually collected record under a null key. Those are not
+    // a series and must not become a row, or the hub would show one labelled nothing.
+    it('should drop the null bucket holding every record collected outside a series', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', key: null, lastCollectedAt: null, recordCount: 90, subjectId: 'subject-1' },
+        { groupId: 'group-1', key: 'series-1', lastCollectedAt: null, recordCount: 2, subjectId: 'subject-1' }
+      ]);
+
+      const summaries = await instrumentRecordsService.summarizeBySeries({}, { ability: ADMIN });
+
+      expect(summaries).toStrictEqual([
+        { instrumentId: 'series-1', lastCollectedAt: null, recordCount: 2, subjectCount: 1 }
+      ]);
     });
   });
 });

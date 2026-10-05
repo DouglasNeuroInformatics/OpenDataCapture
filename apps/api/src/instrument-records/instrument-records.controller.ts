@@ -62,9 +62,13 @@ export class InstrumentRecordsController {
     minDate?: Date,
     @Query('groupId') groupId?: string,
     @Query('instrumentId') instrumentId?: string,
+    @Query('seriesInstrumentId') seriesInstrumentId?: string,
     @Query('subjectId') subjectId?: string
   ) {
-    return this.instrumentRecordsService.find({ groupId, instrumentId, kind, minDate, subjectId }, { ability });
+    return this.instrumentRecordsService.find(
+      { groupId, instrumentId, kind, minDate, seriesInstrumentId, subjectId },
+      { ability }
+    );
   }
 
   @ApiOperation({ summary: 'Delete Record' })
@@ -92,6 +96,20 @@ export class InstrumentRecordsController {
     @Query('groupId') groupId?: string
   ): Promise<{ [key: string]: { intercept: number; slope: number; stdErr: number } }> {
     return this.instrumentRecordsService.linearModel({ groupId, instrumentId }, { ability });
+  }
+
+  @ApiOperation({ description: 'Per-instrument record and subject counts', summary: 'Summarize Records By Instrument' })
+  @Get('summary/by-instrument')
+  @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
+  summarizeByInstrument(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string) {
+    return this.instrumentRecordsService.summarizeByInstrument({ groupId }, { ability });
+  }
+
+  @ApiOperation({ description: 'Per-series record counts', summary: 'Summarize Records By Series' })
+  @Get('summary/by-series')
+  @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
+  summarizeBySeries(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string) {
+    return this.instrumentRecordsService.summarizeBySeries({ groupId }, { ability });
   }
 
   @ApiOperation({ description: 'Per-subject record counts', summary: 'Summarize Records By Subject' })

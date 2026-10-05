@@ -50,6 +50,11 @@
       "en": "Retrospective",
       "es": "Retrospectiva",
       "fr": "Rétrospective"
+    },
+    "remote": {
+      "en": "Remote",
+      "es": "A distancia",
+      "fr": "À distance"
     }
   }
 }

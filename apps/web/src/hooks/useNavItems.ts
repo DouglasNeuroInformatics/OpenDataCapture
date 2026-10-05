@@ -70,8 +70,8 @@ export function useNavItems() {
         url: '/dashboard'
       });
     }
-    // The datahub becomes a group so its views can be read along different axes. Only the subject
-    // view exists today; the instrument one lands next and joins this group beside it.
+    // The two halves of the datahub read the same records along different axes, and are gated
+    // independently: holding only one must still surface a working menu.
     const datahubItems: NavItem[] = [];
     if (ability?.can('read', 'Subject') && ability.can('read', 'InstrumentRecord')) {
       datahubItems.push({
@@ -79,6 +79,13 @@ export function useNavItems() {
         label: t({ en: 'Subjects', es: 'Sujetos', fr: 'Clients' }),
         url: '/datahub/subjects'
       });
+      if (ability.can('read', 'Instrument')) {
+        datahubItems.push({
+          icon: ClipboardListIcon,
+          label: t({ en: 'Instruments', es: 'Instrumentos', fr: 'Instruments' }),
+          url: '/datahub/instruments'
+        });
+      }
     }
     if (datahubItems.length > 0) {
       globalItems.push({

@@ -4,7 +4,6 @@ import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { ActionDropdown, ListboxDropdown } from '@douglasneuroinformatics/libui/components';
 import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
 import { createFileRoute } from '@tanstack/react-router';
 import html2canvas from 'html2canvas';
 
@@ -31,7 +30,7 @@ const RouteComponent = () => {
       }
     });
   const { t } = useTranslation();
-  const measureOptions = useMeasureOptions(instrument as AnyUnilingualFormInstrument);
+  const measureOptions = useMeasureOptions(instrument);
   const [selectedMeasures, setSelectedMeasures] = useState<ListboxDropdownOption[]>([]);
 
   const linearModelQuery = useLinearModelQuery({

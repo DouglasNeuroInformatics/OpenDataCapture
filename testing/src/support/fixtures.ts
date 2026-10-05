@@ -16,6 +16,9 @@ import { AdminSettingsPage } from '../pages/_app/admin/settings.page';
 import { AdminUserPage } from '../pages/_app/admin/users/$userId.page';
 import { ContactPage } from '../pages/_app/contact.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
+import { InstrumentHubGraphPage } from '../pages/_app/datahub/instruments/$instrumentId/graph.page';
+import { InstrumentHubTablePage } from '../pages/_app/datahub/instruments/$instrumentId/table.page';
+import { InstrumentHubPage } from '../pages/_app/datahub/instruments/index.page';
 import { SubjectAssignmentsPage } from '../pages/_app/datahub/subjects/$subjectId/assignments.page';
 import { SubjectGraphPage } from '../pages/_app/datahub/subjects/$subjectId/graph.page';
 import { SubjectRecordDetailPage } from '../pages/_app/datahub/subjects/$subjectId/table/$recordId.page';
@@ -53,6 +56,9 @@ const pageModels = {
   '/auth/reset-password': ResetPasswordPage,
   '/contact': ContactPage,
   '/dashboard': DashboardPage,
+  '/datahub/instruments': InstrumentHubPage,
+  '/datahub/instruments/$instrumentId/graph': InstrumentHubGraphPage,
+  '/datahub/instruments/$instrumentId/table': InstrumentHubTablePage,
   '/datahub/subjects': DatahubPage,
   '/datahub/subjects/$subjectId/assignments': SubjectAssignmentsPage,
   '/datahub/subjects/$subjectId/graph': SubjectGraphPage,

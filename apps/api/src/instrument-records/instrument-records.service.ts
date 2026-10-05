@@ -14,12 +14,14 @@ import {
   ServiceUnavailableException,
   UnprocessableEntityException
 } from '@nestjs/common';
+import { translateInstrument } from '@opendatacapture/instrument-utils';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
   InstrumentRecordQueryParams,
   InstrumentRecordsExport,
+  InstrumentRecordSummary,
   LinearRegressionResults,
   SubjectRecordSummary,
   UploadInstrumentRecordsData
@@ -212,6 +214,8 @@ export class InstrumentRecordsService {
 
     const instruments = new Map(instrumentsArray.map((instrument) => [instrument.id, instrument]));
 
+    const seriesNames = await this.resolveSeriesNames(records);
+
     const numWorkers = Math.min(cpus().length, Math.ceil(records.length / 100)); // Use up to CPU count, chunk size 100
     const chunkSize = Math.ceil(records.length / numWorkers);
     const chunks = [];
@@ -234,7 +238,10 @@ export class InstrumentRecordsService {
     const workerPromises = chunks.map((chunk) => {
       return new Promise<InstrumentRecordsExport>((resolve, reject) => {
         const worker = new Worker(join(import.meta.dirname, 'export-worker.js'));
-        worker.postMessage({ data: availableInstrumentArray, type: 'INIT' } satisfies InitMessage);
+        worker.postMessage({
+          data: { instruments: availableInstrumentArray, seriesNames },
+          type: 'INIT'
+        } satisfies InitMessage);
 
         worker.on('message', (message: InitialMessage) => {
           if (message.success) {
@@ -263,7 +270,7 @@ export class InstrumentRecordsService {
   }
 
   async find(
-    { groupId, instrumentId, kind, minDate, subjectId }: InstrumentRecordQueryParams,
+    { groupId, instrumentId, kind, minDate, seriesInstrumentId, subjectId }: InstrumentRecordQueryParams,
     { ability }: EntityOperationOptions = {}
   ): Promise<InstrumentRecord[]> {
     if (groupId) {
@@ -271,6 +278,14 @@ export class InstrumentRecordsService {
     }
     if (instrumentId) {
       await this.instrumentsService.findById(instrumentId);
+    }
+    if (seriesInstrumentId) {
+      const series = await this.instrumentsService.findById(seriesInstrumentId);
+      if (series.kind !== 'SERIES') {
+        throw new UnprocessableEntityException(
+          `Instrument '${seriesInstrumentId}' is not a series instrument, so it orchestrates no records`
+        );
+      }
     }
 
     const instrumentKindIds = await this.instrumentsService
@@ -287,6 +302,7 @@ export class InstrumentRecordsService {
           { groupId },
           { instrumentId },
           { instrumentId: { in: instrumentKindIds } },
+          { seriesInstrumentId },
           accessibleQuery(ability, 'read', 'InstrumentRecord'),
           { subjectId },
           // records created before the file instrument feature do not have the pending field at all,
@@ -296,14 +312,15 @@ export class InstrumentRecordsService {
       }
     });
 
-    // Only the per-subject view renders the username column. /dashboard fetches every record in the
-    // group and reads `instrumentId` alone, so labelling there would buy a second query with an `$in`
-    // as long as the group's record list for a field that is thrown away.
-    if (!subjectId) {
+    // The per-subject, per-instrument and per-series views render the collection method and username
+    // columns; /dashboard fetches every record in the group and reads `instrumentId` alone, so
+    // labelling there would buy a second query with an `$in` as long as the group's record list for
+    // fields it throws away. Any of these filters bounds the set enough to be worth joining.
+    if (!subjectId && !instrumentId && !seriesInstrumentId) {
       return records;
     }
 
-    return this.withSessionUsernames(records, ability);
+    return this.withSessionMetadata(records, ability);
   }
 
   async findById(id: string, { ability }: EntityOperationOptions = {}) {
@@ -365,82 +382,46 @@ export class InstrumentRecordsService {
   }
 
   /**
-   * Per-subject record counts and latest collection date, for the subject hub's listing.
+   * Per-instrument collection statistics for the instrument hub's listing.
    *
-   * Aggregation groups by group and subject rather than by subject alone, and the final fold happens
-   * here in JS, because the per-row `groupId` is what the ability check needs. The grouped set is
-   * bounded by subjects, not by records.
+   * See `summarizeRecords` for why the fold happens in JS rather than in the aggregation.
    */
+  async summarizeByInstrument(
+    { groupId }: { groupId?: string } = {},
+    { ability }: Required<Pick<EntityOperationOptions, 'ability'>>
+  ): Promise<InstrumentRecordSummary[]> {
+    const summaries = await this.summarizeRecords('instrumentId', groupId, ability);
+    return Array.from(summaries, ([instrumentId, summary]) => ({
+      instrumentId,
+      lastCollectedAt: summary.lastCollectedAt,
+      recordCount: summary.recordCount,
+      subjectCount: summary.subjectIds.size
+    }));
+  }
+
+  /**
+   * Per-series collection statistics: everything a series orchestrated, across the scalar
+   * instruments it composes. This is what makes a series row in the instrument hub worth opening.
+   */
+  async summarizeBySeries(
+    { groupId }: { groupId?: string } = {},
+    { ability }: Required<Pick<EntityOperationOptions, 'ability'>>
+  ): Promise<InstrumentRecordSummary[]> {
+    const summaries = await this.summarizeRecords('seriesInstrumentId', groupId, ability);
+    return Array.from(summaries, ([instrumentId, summary]) => ({
+      instrumentId,
+      lastCollectedAt: summary.lastCollectedAt,
+      recordCount: summary.recordCount,
+      subjectCount: summary.subjectIds.size
+    }));
+  }
+
+  /** Per-subject collection statistics for the subject hub's listing. */
   async summarizeBySubject(
     { groupId }: { groupId?: string } = {},
     { ability }: Required<Pick<EntityOperationOptions, 'ability'>>
   ): Promise<SubjectRecordSummary[]> {
-    if (groupId) {
-      await this.groupsService.findById(groupId);
-    }
-
-    const pipeline = [
-      {
-        $match: {
-          // records created before the file instrument feature do not have the field at all
-          $or: [{ pending: { $exists: false } }, { pending: null }, { pending: false }],
-          ...(groupId ? { $expr: { $eq: ['$groupId', { $toObjectId: groupId }] } } : {})
-        }
-      },
-      {
-        // `$ifNull` is load-bearing, not defensive. A grouping expression that resolves to nothing —
-        // `groupId` on a record belonging to no group — is omitted from `_id` entirely rather than
-        // stored as null, and `$project` then omits the field from the row too. Normalising here is
-        // what lets the fold below treat the shape as fixed instead of remembering a key can simply
-        // be missing.
-        $group: {
-          _id: {
-            groupId: { $ifNull: ['$groupId', null] },
-            subjectId: { $ifNull: ['$subjectId', null] }
-          },
-          lastCollectedAt: { $max: '$date' },
-          recordCount: { $sum: 1 }
-        }
-      },
-      {
-        $project: {
-          _id: 0,
-          groupId: { $toString: '$_id.groupId' },
-          lastCollectedAt: { $dateToString: { date: '$lastCollectedAt' } },
-          recordCount: 1,
-          subjectId: '$_id.subjectId'
-        }
-      }
-    ];
-
-    const rows = (await this.instrumentRecordModel.aggregateRaw({ pipeline })) as unknown as {
-      groupId: null | string;
-      lastCollectedAt: null | string;
-      recordCount: number;
-      subjectId: null | string;
-    }[];
-
-    const summaries = new Map<string, { lastCollectedAt: Date | null; recordCount: number }>();
-    for (const row of rows) {
-      // Raw rows carry no model name, so CASL would resolve them as `Object` and match only `manage all`
-      if (!ability.can('read', forcedAppSubject('InstrumentRecord', { groupId: row.groupId }))) {
-        continue;
-      }
-      if (row.subjectId === null) {
-        continue;
-      }
-      let summary = summaries.get(row.subjectId);
-      if (!summary) {
-        summary = { lastCollectedAt: null, recordCount: 0 };
-        summaries.set(row.subjectId, summary);
-      }
-      summary.recordCount += row.recordCount;
-      const lastCollectedAt = row.lastCollectedAt ? new Date(row.lastCollectedAt) : null;
-      if (lastCollectedAt && (!summary.lastCollectedAt || lastCollectedAt > summary.lastCollectedAt)) {
-        summary.lastCollectedAt = lastCollectedAt;
-      }
-    }
-
+    const summaries = await this.summarizeRecords('subjectId', groupId, ability);
     return Array.from(summaries, ([subjectId, summary]) => ({
       lastCollectedAt: summary.lastCollectedAt,
       recordCount: summary.recordCount,
@@ -654,13 +635,15 @@ export class InstrumentRecordsService {
               format: '%Y-%m-%d'
             }
           },
-          groupId: {
-            $toString: '$groupId'
-          },
+          // `$ifNull` for the same reason as in `summarizeRecords`: `$toString` of a missing field is
+          // itself missing, so a record belonging to no group would drop `groupId` from the row
+          // entirely and arrive as undefined behind a type that says it is a string.
+          groupId: { $toString: { $ifNull: ['$groupId', null] } },
           id: {
             $toString: '$_id'
           },
           instrumentId: 1,
+          seriesInstrumentId: { $ifNull: ['$seriesInstrumentId', null] },
           session: {
             date: {
               $dateToString: {
@@ -707,20 +690,136 @@ export class InstrumentRecordsService {
       .map((record) => ({ ...record }));
   }
 
+  /**
+   * Map every series instrument referenced by these records to its title.
+   *
+   * A series instrument has no `internal.name`, so unlike the scalar instruments beside it in the
+   * export there is no language-independent identifier to use — the title is translated here, to
+   * `en`, because a background worker has no request language. The stable identifier an analysis
+   * should key on is the accompanying `seriesId`.
+   */
+  private async resolveSeriesNames(records: RecordType[]): Promise<{ [id: string]: string }> {
+    const seriesIds = new Set(
+      records.flatMap((record) => (record.seriesInstrumentId ? [record.seriesInstrumentId] : []))
+    );
+    const entries = await Promise.all(
+      seriesIds.values().map(async (id) => {
+        const instrument = await this.instrumentsService.findById(id);
+        return [id, translateInstrument(instrument, 'en').details.title] as const;
+      })
+    );
+    return Object.fromEntries(entries);
+  }
+
   private serializeData(data: unknown) {
     return JSON.parse(JSON.stringify(data, replacer)) as unknown;
   }
 
   /**
-   * Label each record with the user who conducted its session, so clients can show that column
-   * without fetching every session in the group.
+   * Record counts, distinct subjects and the latest collection date, keyed by `by`.
+   *
+   * Aggregation groups by group, key and subject rather than by the key alone, and the final fold
+   * happens here in JS, for two reasons: the per-row `groupId` is what the ability check needs, and
+   * unioning subject ids across groups is what makes a distinct subject count exact for an unscoped
+   * caller instead of a sum that counts a shared subject twice. The grouped set is bounded by
+   * subjects × keys, not by records.
+   */
+  private async summarizeRecords(
+    by: 'instrumentId' | 'seriesInstrumentId' | 'subjectId',
+    groupId: string | undefined,
+    ability: AppAbility
+  ): Promise<Map<string, { lastCollectedAt: Date | null; recordCount: number; subjectIds: Set<string> }>> {
+    if (groupId) {
+      await this.groupsService.findById(groupId);
+    }
+
+    const pipeline = [
+      {
+        $match: {
+          // records created before the file instrument feature do not have the field at all
+          $or: [{ pending: { $exists: false } }, { pending: null }, { pending: false }],
+          ...(groupId ? { $expr: { $eq: ['$groupId', { $toObjectId: groupId }] } } : {})
+        }
+      },
+      {
+        // `$ifNull` is load-bearing, not defensive. A grouping expression that resolves to nothing —
+        // `seriesInstrumentId` on a record collected outside any series, `groupId` on one belonging
+        // to no group — is omitted from `_id` entirely rather than stored as null, and `$project`
+        // then omits the field from the row too. Normalising here is what lets every consumer below
+        // treat the shape as fixed instead of remembering that a key can simply be missing.
+        $group: {
+          _id: {
+            groupId: { $ifNull: ['$groupId', null] },
+            key: { $ifNull: [`$${by}`, null] },
+            subjectId: { $ifNull: ['$subjectId', null] }
+          },
+          lastCollectedAt: { $max: '$date' },
+          recordCount: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          groupId: { $toString: '$_id.groupId' },
+          key: '$_id.key',
+          lastCollectedAt: { $dateToString: { date: '$lastCollectedAt' } },
+          recordCount: 1,
+          subjectId: '$_id.subjectId'
+        }
+      }
+    ];
+
+    /**
+     * Every field is present because the pipeline normalises each grouping key with `$ifNull`; the
+     * nullable ones are genuinely null rather than absent. Keep that guarantee if the pipeline
+     * changes, or the optionality has to come back here and at every use below.
+     */
+    const rows = (await this.instrumentRecordModel.aggregateRaw({ pipeline })) as unknown as {
+      groupId: null | string;
+      key: null | string;
+      lastCollectedAt: null | string;
+      recordCount: number;
+      subjectId: null | string;
+    }[];
+
+    const summaries = new Map<string, { lastCollectedAt: Date | null; recordCount: number; subjectIds: Set<string> }>();
+    for (const row of rows) {
+      // Raw rows carry no model name, so CASL would resolve them as `Object` and match only `manage all`
+      if (!ability.can('read', forcedAppSubject('InstrumentRecord', { groupId: row.groupId }))) {
+        continue;
+      }
+      // Grouping by series buckets every record collected outside one under a null key. Those are
+      // not a series and have no row to belong to.
+      if (row.key === null) {
+        continue;
+      }
+      let summary = summaries.get(row.key);
+      if (!summary) {
+        summary = { lastCollectedAt: null, recordCount: 0, subjectIds: new Set() };
+        summaries.set(row.key, summary);
+      }
+      summary.recordCount += row.recordCount;
+      if (row.subjectId !== null) {
+        summary.subjectIds.add(row.subjectId);
+      }
+      const lastCollectedAt = row.lastCollectedAt ? new Date(row.lastCollectedAt) : null;
+      if (lastCollectedAt && (!summary.lastCollectedAt || lastCollectedAt > summary.lastCollectedAt)) {
+        summary.lastCollectedAt = lastCollectedAt;
+      }
+    }
+    return summaries;
+  }
+
+  /**
+   * Label each record with its session's data collection method and the user who conducted it, so
+   * clients can show those columns without fetching every session in the group.
    *
    * Deliberately a second scoped query rather than an `include` on the relation: `session` is
    * declared required, so Prisma aborts the whole query with "Inconsistent query result" if any one
    * record's session has since been deleted. Looking the sessions up by id degrades to a missing
-   * username for that record instead of a failed request.
+   * type and username for that record instead of a failed request.
    */
-  private async withSessionUsernames(
+  private async withSessionMetadata(
     records: PrismaInstrumentRecord[],
     ability?: AppAbility
   ): Promise<InstrumentRecord[]> {
@@ -728,7 +827,7 @@ export class InstrumentRecordsService {
       return [];
     }
     const sessions = await this.sessionModel.findMany({
-      select: { id: true, user: { select: { username: true } } },
+      select: { id: true, type: true, user: { select: { username: true } } },
       where: {
         AND: [
           // Depends on the caller holding some `read Session` rule: given none at all, this throws a
@@ -739,10 +838,13 @@ export class InstrumentRecordsService {
         ]
       }
     });
-    const usernameBySessionId = new Map(sessions.map((session) => [session.id, session.user?.username ?? null]));
-    return records.map((record) => ({
-      ...record,
-      session: { user: { username: usernameBySessionId.get(record.sessionId) ?? null } }
-    }));
+    const sessionById = new Map(sessions.map((session) => [session.id, session]));
+    return records.map((record) => {
+      const session = sessionById.get(record.sessionId);
+      return {
+        ...record,
+        session: { type: session?.type ?? null, user: { username: session?.user?.username ?? null } }
+      };
+    });
   }
 }

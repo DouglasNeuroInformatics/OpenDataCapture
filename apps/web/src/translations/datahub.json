@@ -105,9 +105,9 @@
         "fr": "Exporter"
       },
       "exportHelpText": {
-        "en": "This data is provided in an ultra-long format. Each row corresponds to the value for a single measure. Rows corresponding to the same record will have matching subject identifiers and timestamps.",
-        "es": "Estos datos se proporcionan en un formato ultralargo. Cada fila corresponde al valor de una sola medida. Las filas correspondientes al mismo registro tendrán identificadores de sujeto y marcas de tiempo coincidentes.",
-        "fr": "Ces données sont fournies dans un format ultra-long. Chaque ligne correspond à la valeur d'une seule mesure. Les lignes correspondant à un même enregistrement auront des identifiants de sujet et des horodatages correspondants."
+        "en": "This data is provided in an ultra-long format. Each row corresponds to the value for a single measure. Rows corresponding to the same record will have matching subject identifiers and timestamps. The sessionType column is the data collection method. The seriesId and seriesName columns name the series that collected the record, and are empty for a record collected individually.",
+        "es": "Estos datos se proporcionan en un formato ultralargo. Cada fila corresponde al valor de una sola medida. Las filas correspondientes al mismo registro tendrán identificadores de sujeto y marcas de tiempo coincidentes. La columna sessionType es el método de recopilación de datos. Las columnas seriesId y seriesName indican la serie que recopiló el registro y están vacías si el registro se recopiló individualmente.",
+        "fr": "Ces données sont fournies dans un format ultra-long. Chaque ligne correspond à la valeur d'une seule mesure. Les lignes correspondant à un même enregistrement auront des identifiants de sujet et des horodatages correspondants. La colonne sessionType correspond à la méthode de collecte des données. Les colonnes seriesId et seriesName désignent la série qui a collecté l'enregistrement et sont vides pour un enregistrement collecté individuellement."
       },
       "filters": {
         "en": "Filters",

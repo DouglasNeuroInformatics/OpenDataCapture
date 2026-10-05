@@ -5,6 +5,7 @@ import {
   $InstrumentRecord,
   $InstrumentRecordFile,
   $InstrumentRecordFiles,
+  $InstrumentRecordSummary,
   $LinearRegressionResults,
   $UpdateInstrumentRecordData,
   $UploadInstrumentRecordsData
@@ -81,6 +82,50 @@ describe('$InstrumentRecord', () => {
         updatedAt: '2024-01-01'
       }).success
     ).toBe(false);
+  });
+});
+
+describe('$InstrumentRecord session metadata', () => {
+  const base = {
+    createdAt: '2024-01-01',
+    data: { value: 1 },
+    date: '2024-01-01',
+    id: 'record-1',
+    instrumentId: 'instrument-1',
+    sessionId: 'session-1',
+    subjectId: 'subject-1',
+    updatedAt: '2024-01-01'
+  };
+  it('should accept the data collection method on the session, which is the column the datahub renders', () => {
+    const result = $InstrumentRecord.safeParse({ ...base, session: { type: 'REMOTE', user: { username: 'alice' } } });
+    expect(result.success).toBe(true);
+    expect(result.data?.session?.type).toBe('REMOTE');
+  });
+  // A record whose session was deleted reads back without a type, which must not fail the response.
+  it('should accept a null collection method', () => {
+    expect($InstrumentRecord.safeParse({ ...base, session: { type: null, user: null } }).success).toBe(true);
+  });
+  it('should reject a collection method that is not a session type', () => {
+    expect($InstrumentRecord.safeParse({ ...base, session: { type: 'IN_CLINIC' } }).success).toBe(false);
+  });
+});
+
+describe('$InstrumentRecordSummary', () => {
+  const base = { instrumentId: 'instrument-1', lastCollectedAt: '2024-01-01', recordCount: 5, subjectCount: 3 };
+  it('should accept a summary and coerce its collection date', () => {
+    const result = $InstrumentRecordSummary.safeParse(base);
+    expect(result.success).toBe(true);
+    expect(result.data?.lastCollectedAt).toStrictEqual(new Date('2024-01-01'));
+  });
+  // An instrument accessible to the caller but never collected has no date to report.
+  it('should accept a null collection date', () => {
+    expect($InstrumentRecordSummary.safeParse({ ...base, lastCollectedAt: null }).success).toBe(true);
+  });
+  it('should reject a negative count, which no aggregation can legitimately produce', () => {
+    expect($InstrumentRecordSummary.safeParse({ ...base, recordCount: -1 }).success).toBe(false);
+  });
+  it('should reject a fractional subject count, since subjects are counted not measured', () => {
+    expect($InstrumentRecordSummary.safeParse({ ...base, subjectCount: 1.5 }).success).toBe(false);
   });
 });
 

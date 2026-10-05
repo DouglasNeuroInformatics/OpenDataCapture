@@ -44,9 +44,24 @@ describe('InstrumentRecordsController', () => {
 
   it('should pass every query filter to find, scoped to the caller ability', async () => {
     const minDate = new Date('2025-01-01');
-    await instrumentRecordsController.find(ability, 'FORM', minDate, 'group-1', 'instrument-1', 'subject-1');
+    await instrumentRecordsController.find(
+      ability,
+      'FORM',
+      minDate,
+      'group-1',
+      'instrument-1',
+      'series-1',
+      'subject-1'
+    );
     expect(instrumentRecordsService.find).toHaveBeenCalledWith(
-      { groupId: 'group-1', instrumentId: 'instrument-1', kind: 'FORM', minDate, subjectId: 'subject-1' },
+      {
+        groupId: 'group-1',
+        instrumentId: 'instrument-1',
+        kind: 'FORM',
+        minDate,
+        seriesInstrumentId: 'series-1',
+        subjectId: 'subject-1'
+      },
       { ability }
     );
   });

@@ -125,6 +125,7 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
 const GROUP_MANAGER_ONLY_ROUTES = [
   '/dashboard',
   '/datahub/subjects',
+  '/datahub/instruments',
   '/group/manage',
   '/session/remote-assignment'
 ] as const;

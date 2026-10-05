@@ -103,12 +103,22 @@ describe('useNavItems', () => {
 
   // The datahub is a parent over its views rather than a link of its own, so the subject listing is
   // reachable only as a child and the group itself carries no url to navigate to.
-  it('should offer the subject view nested under the data hub parent', () => {
-    const datahub = renderHook(() => useNavItems())
+  const datahubItem = () =>
+    renderHook(() => useNavItems())
       .result.current.flat()
       .find((item) => item.label === 'Data Hub');
+
+  it('should nest both views under the data hub parent, which is itself not a destination', () => {
+    const datahub = datahubItem();
     expect(datahub?.url).toBeUndefined();
-    expect(datahub?.children?.map((child) => child.url)).toStrictEqual(['/datahub/subjects']);
+    expect(datahub?.children?.map((child) => child.url)).toStrictEqual(['/datahub/subjects', '/datahub/instruments']);
+  });
+
+  // The two halves are gated independently, so a user who may read records but not the instrument
+  // catalog still gets a working menu rather than an empty group or no datahub at all.
+  it('should offer the subject view alone to a user who cannot read instruments', () => {
+    mocks.can.mockImplementation((action, subject) => !(action === 'read' && subject === 'Instrument'));
+    expect(datahubItem()?.children?.map((child) => child.url)).toStrictEqual(['/datahub/subjects']);
   });
 
   it('should omit the data hub entirely when the user cannot read both subjects and records', () => {

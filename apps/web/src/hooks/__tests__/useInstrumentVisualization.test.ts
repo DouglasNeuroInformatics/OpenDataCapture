@@ -44,8 +44,10 @@ const createMockRecords = (data: { [key: string]: unknown }) => [
     computedMeasures: {},
     data,
     date: FIXED_TEST_DATE,
+    instrumentId: 'instrument-1',
     session: { user: { username: 'testusername' } },
-    sessionId: '123'
+    sessionId: '123',
+    subjectId: 'group-1$subject-1'
   }
 ];
 const mockInstrumentRecords: { data?: { [key: string]: unknown }[] } = {
@@ -113,7 +115,7 @@ describe('useInstrumentVisualization', () => {
       const result = await renderWithSetRecord();
       act(() => result.current.dl('CSV Long'));
       const [, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
-      expect(getContentFn()).toContain(`testusername,"FRIENDS, MONEY",causes`);
+      expect(getContentFn()).toContain(`testusername,causes,"FRIENDS, MONEY"`);
     });
 
     it('should export a set in JSON as the subject table displays it, not as {}', async () => {
@@ -138,7 +140,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvContents = getContentFn();
       expect(csvContents).toMatch(
-        `GroupID,subjectId,Date,Username,someValue\r\ntestGroupId,testId,${toBasicISOString(FIXED_TEST_DATE)},testusername,abc`
+        `GroupID,SubjectID,Date,CollectionMethod,SeriesID,SeriesName,Username,someValue\r\ntestGroupId,subject-1,${toBasicISOString(FIXED_TEST_DATE)},,,,testusername,abc`
       );
     });
   });
@@ -156,7 +158,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.tsv');
       const tsvContents = getContentFn();
       expect(tsvContents).toMatch(
-        `GroupID\tsubjectId\tDate\tUsername\tsomeValue\r\ntestGroupId\ttestId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestusername\tabc`
+        `GroupID\tSubjectID\tDate\tCollectionMethod\tSeriesID\tSeriesName\tUsername\tsomeValue\r\ntestGroupId\tsubject-1\t${toBasicISOString(FIXED_TEST_DATE)}\t\t\t\ttestusername\tabc`
       );
     });
   });
@@ -175,7 +177,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvLongContents = getContentFn();
       expect(csvLongContents).toMatch(
-        `GroupID,Date,SubjectID,Username,Value,Variable\r\ntestGroupId,${toBasicISOString(FIXED_TEST_DATE)},testId,testusername,abc,someValue`
+        `GroupID,SubjectID,Date,CollectionMethod,SeriesID,SeriesName,Username,Variable,Value\r\ntestGroupId,subject-1,${toBasicISOString(FIXED_TEST_DATE)},,,,testusername,someValue,abc`
       );
     });
   });
@@ -194,7 +196,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toMatch('.tsv');
       const tsvLongContents = getContentFn();
       expect(tsvLongContents).toMatch(
-        `GroupID\tDate\tSubjectID\tUsername\tValue\tVariable\r\ntestGroupId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestId\ttestusername\tabc\tsomeValue`
+        `GroupID\tSubjectID\tDate\tCollectionMethod\tSeriesID\tSeriesName\tUsername\tVariable\tValue\r\ntestGroupId\tsubject-1\t${toBasicISOString(FIXED_TEST_DATE)}\t\t\t\ttestusername\tsomeValue\tabc`
       );
     });
   });
@@ -214,9 +216,12 @@ describe('useInstrumentVisualization', () => {
 
       expect(excelContents).toEqual([
         {
+          CollectionMethod: null,
           Date: '2025-04-30',
           GroupID: 'testGroupId',
-          subjectId: 'testId',
+          SeriesID: null,
+          SeriesName: null,
+          SubjectID: 'subject-1',
           // eslint-disable-next-line perfectionist/sort-objects
           someValue: 'abc',
           Username: 'testusername'
@@ -241,9 +246,12 @@ describe('useInstrumentVisualization', () => {
 
       expect(excelContents).toEqual([
         {
+          CollectionMethod: null,
           Date: '2025-04-30',
           GroupID: 'testGroupId',
-          SubjectID: 'testId',
+          SeriesID: null,
+          SeriesName: null,
+          SubjectID: 'subject-1',
           Username: 'testusername',
           Value: 'abc',
           Variable: 'someValue'
@@ -317,7 +325,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toMatch('.json');
       const jsonContents = await getContentFn();
       expect(jsonContents).toContain('"someValue": "abc"');
-      expect(jsonContents).toContain('"subjectID": "testId"');
+      expect(jsonContents).toContain('"SubjectID": "subject-1"');
     });
   });
 
@@ -383,12 +391,25 @@ describe('useInstrumentVisualization', () => {
 
     it('should merge the computed measures into the record, ignoring data that is not an object', async () => {
       const result = await renderWithRecords([
-        { computedMeasures: { total: 3 }, data: null, date: FIXED_TEST_DATE, id: 'record-1', session: null }
+        {
+          computedMeasures: { total: 3 },
+          data: null,
+          date: FIXED_TEST_DATE,
+          id: 'record-1',
+          instrumentId: 'instrument-1',
+          session: null,
+          subjectId: 'group-1$subject-1'
+        }
       ]);
       expect(result.current.records).toEqual([
         {
           __date__: FIXED_TEST_DATE,
           __id__: 'record-1',
+          __instrumentId__: 'instrument-1',
+          __method__: null,
+          __seriesId__: null,
+          __seriesName__: null,
+          __subjectId__: 'group-1$subject-1',
           __time__: FIXED_TEST_DATE.getTime(),
           total: 3,
           username: 'N/A'
