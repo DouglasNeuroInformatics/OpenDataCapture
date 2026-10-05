@@ -54,7 +54,7 @@ export const NavGroup = ({
       <button
         aria-expanded={isOpen}
         className={cn(
-          'flex h-9 items-center justify-start whitespace-nowrap rounded-md px-3 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800 hover:text-slate-100',
+          'flex h-9 items-center justify-start rounded-md px-3 text-sm font-medium whitespace-nowrap text-slate-200 transition-colors hover:bg-slate-800 hover:text-slate-100',
           className
         )}
         data-spotlight-type="nav-group"

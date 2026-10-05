@@ -42,7 +42,7 @@ export const CodeErrorBlock = ({ context, error }: CodeErrorBlockProps) => {
             <div className="w-8 shrink-0 border-r text-right">
               <span className="pr-2">{index + 1}</span>
             </div>
-            <div className="whitespace-pre-wrap px-4">
+            <div className="px-4 whitespace-pre-wrap">
               <span>{leftPadding}</span>
               <span
                 className={cn(

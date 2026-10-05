@@ -9,7 +9,7 @@ export const CommandList = forwardRef<
 >(function CommandList({ className, ...props }, ref) {
   return (
     <CommandPrimitive.List
-      className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden', className)}
+      className={cn('max-h-[300px] overflow-x-hidden overflow-y-auto', className)}
       ref={ref}
       {...props}
     />

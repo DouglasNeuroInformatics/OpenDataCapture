@@ -106,7 +106,7 @@ export const Editor = () => {
       <div className="flex h-full overflow-hidden">
         <motion.div
           animate={{ width: isSidebarOpen ? 320 : 0 }}
-          className="shadow-xs h-full shrink-0 overflow-scroll border-r border-slate-900/10 dark:border-slate-100/25"
+          className="h-full shrink-0 overflow-scroll border-r border-slate-900/10 shadow-xs dark:border-slate-100/25"
           initial={{ width: 0 }}
         >
           <div className="h-full w-full">

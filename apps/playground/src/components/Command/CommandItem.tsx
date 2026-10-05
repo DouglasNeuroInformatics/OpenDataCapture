@@ -10,7 +10,7 @@ export const CommandItem = forwardRef<
   return (
     <CommandPrimitive.Item
       className={cn(
-        'aria-selected:bg-accent aria-selected:text-accent-foreground rounded-xs outline-hidden relative flex cursor-pointer select-none items-center px-2 py-1.5 text-sm data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+        'aria-selected:bg-accent aria-selected:text-accent-foreground relative flex cursor-pointer items-center rounded-xs px-2 py-1.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
         className
       )}
       ref={ref}

@@ -14,7 +14,7 @@ export const withAppFrame = (title: string): Decorator => {
   const AppFrame: Decorator = (Story) => (
     <div className="flex h-screen w-screen">
       <div className="w-[19rem] shrink-0 bg-slate-900" />
-      <div className="scrollbar-none relative flex grow flex-col overflow-y-scroll pt-14 md:pt-0">
+      <div className="relative flex grow scrollbar-none flex-col overflow-y-scroll pt-14 md:pt-0">
         <main className="container flex grow flex-col">
           <PageHeader>
             <Heading className="text-center" variant="h2">

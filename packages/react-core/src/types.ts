@@ -30,9 +30,7 @@ declare global {
 }
 
 export type InterpretedInstrumentState<T extends AnyUnilingualInstrument = AnyUnilingualInstrument> =
-  | { error: Error; status: 'ERROR' }
-  | { instrument: T; status: 'DONE' }
-  | { status: 'LOADING' };
+  { error: Error; status: 'ERROR' } | { instrument: T; status: 'DONE' } | { status: 'LOADING' };
 
 /** A localizable string: per-language text that a component resolves with `t()` to the active language. */
 export type LocalizedText = {

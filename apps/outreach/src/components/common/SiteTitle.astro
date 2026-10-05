@@ -12,7 +12,7 @@ const { className } = Astro.props;
 
 <a class={cn('flex h-10 items-center no-underline [&>svg]:h-full [&>svg]:w-auto', className)} href={translatePath('/')}>
   <Logo class="fill-sky-900 dark:fill-slate-100" />
-  <span class="ml-3 whitespace-nowrap font-semibold tracking-tight text-slate-700 dark:text-slate-300">
+  <span class="ml-3 font-semibold tracking-tight whitespace-nowrap text-slate-700 dark:text-slate-300">
     {t('meta.title')}
   </span>
 </a>

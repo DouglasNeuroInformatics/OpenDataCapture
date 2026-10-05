@@ -82,7 +82,7 @@ const UserEditor = ({ userId }: { userId: string }) => {
       <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-6">
         <div className="flex flex-col gap-3">
           <Link
-            className="text-muted-foreground focus-visible:ring-ring focus-visible:outline-hidden flex items-center gap-0.5 self-start rounded-sm text-[11px] font-semibold uppercase tracking-widest transition-colors hover:text-blue-600 focus-visible:ring-1 dark:hover:text-blue-400"
+            className="text-muted-foreground focus-visible:ring-ring flex items-center gap-0.5 self-start rounded-sm text-[11px] font-semibold tracking-widest uppercase transition-colors hover:text-blue-600 focus-visible:ring-1 focus-visible:outline-hidden dark:hover:text-blue-400"
             data-testid="admin-user-back"
             to="/admin/users"
           >

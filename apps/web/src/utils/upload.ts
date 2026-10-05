@@ -677,11 +677,7 @@ export namespace Zod4 {
   >;
 
   type ZodConvertResult =
-    | ArrayZodConvertResult
-    | BaseZodConvertResult
-    | EnumZodConvertResult
-    | ObjectZodConvertResult
-    | SetZodConvertResult;
+    ArrayZodConvertResult | BaseZodConvertResult | EnumZodConvertResult | ObjectZodConvertResult | SetZodConvertResult;
 
   function parseZodSchema(schema: unknown, isOptional = false): ZodConvertResult {
     switch (true) {

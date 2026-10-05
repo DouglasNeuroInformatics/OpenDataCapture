@@ -132,7 +132,7 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
     <div className="flex flex-col gap-2.5">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
         <div className="flex min-w-0 flex-col">
-          <span className="text-[13px] font-medium uppercase tracking-tight text-slate-500 dark:text-slate-400">
+          <span className="text-[13px] font-medium tracking-tight text-slate-500 uppercase dark:text-slate-400">
             {t({ en: 'File Group', es: 'Grupo de archivos', fr: 'Groupe de fichiers' })} {index + 1}
           </span>
           <h3 className="truncate font-semibold tracking-tight text-slate-900 dark:text-slate-100">{label}</h3>

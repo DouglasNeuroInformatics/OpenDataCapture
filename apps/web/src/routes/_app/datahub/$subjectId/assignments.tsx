@@ -73,7 +73,7 @@ const AssignmentSlider: React.FC<{
           />
           <Button
             disabled
-            className="w-full whitespace-nowrap text-sm"
+            className="w-full text-sm whitespace-nowrap"
             label={t('datahub.assignments.resendNotification')}
             variant="secondary"
           />
@@ -113,7 +113,7 @@ const AssignmentsTable: React.FC<{
   };
 
   return (
-    <div className="bg-card text-muted-foreground shadow-xs rounded-md border tracking-tight">
+    <div className="bg-card text-muted-foreground rounded-md border tracking-tight shadow-xs">
       <Table>
         <Table.Header>
           <Table.Row>

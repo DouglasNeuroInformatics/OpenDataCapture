@@ -16,8 +16,8 @@ allowBuilds:
 blockExoticSubdeps: true
 catalog:
   '@casl/ability': '^6.7.1'
-  '@commitlint/cli': '^21.2.2'
-  '@commitlint/config-conventional': '^21.2.2'
+  '@commitlint/cli': '^21.2.3'
+  '@commitlint/config-conventional': '^21.2.3'
   '@casl/prisma': '^1.4.1'
   '@douglasneuroinformatics/esbuild-plugin-prisma': 'latest'
   '@douglasneuroinformatics/libcrypto': '^0.0.6'
@@ -26,37 +26,36 @@ catalog:
   '@douglasneuroinformatics/libstats': '^0.2.1'
   '@douglasneuroinformatics/libui': ^6.16.1
   '@douglasneuroinformatics/libui-form-types': ^1.4.0
-  '@microsoft/api-extractor': '^7.47.6'
+  '@microsoft/api-extractor': '^7.59.2'
   '@prisma/client': '^6.9.0'
-  '@tailwindcss/vite': '4.3.0'
-  '@testing-library/dom': '^10.4.0'
+  '@tailwindcss/vite': '4.3.3'
+  '@testing-library/dom': '^10.4.2'
   '@testing-library/jest-dom': '^6.5.0'
-  '@testing-library/react': '^16.0.1'
+  '@testing-library/react': '^16.3.3'
   '@testing-library/user-event': '^14.5.2'
-  axios: ^1.18.0
-  commander: '^12.1.0'
-  esbuild: '0.23.x'
-  esbuild-wasm: '0.23.x'
-  happy-dom: '^20.0.2'
-  msgpackr: ^1.11.8
-  motion: '11.15.0'
+  axios: ^1.20.0
+  commander: '^15.0.0'
+  esbuild: '0.28.x'
+  esbuild-wasm: '0.28.x'
+  happy-dom: '~20.11.15'
+  msgpackr: ^2.1.0
+  motion: '13.4.4'
   neverthrow: ^8.2.0
-  nodemailer: ^7.0.12
-  '@types/nodemailer': ^7.0.5
+  nodemailer: ^10.0.11
   conventional-commits-parser: '^7.1.2'
   nodemon: '^3.1.9'
   prisma: '^6.9.0'
-  react-dropzone: ^14.3.8
-  '@tailwindcss/postcss': '4.3.0'
-  tailwindcss: '4.3.0'
-  tsx: '4.8.2'
-  serialize-error: '^11.0.3'
-  vite: '^6.3.3'
-  zustand: ^5.0.13
-  '@storybook/addon-docs': '^10.3.5'
-  '@storybook/addon-themes': '^10.3.5'
-  '@storybook/react-vite': '^10.3.5'
-  'storybook': '^10.3.5'
+  react-dropzone: ^20.1.2
+  '@tailwindcss/postcss': '4.3.3'
+  tailwindcss: '4.3.3'
+  tsx: '4.23.15'
+  serialize-error: '^13.0.1'
+  vite: '^7.3.6'
+  zustand: ^5.0.15
+  '@storybook/addon-docs': '10.5.6'
+  '@storybook/addon-themes': '10.5.6'
+  '@storybook/react-vite': '10.5.6'
+  'storybook': '10.5.6'
 catalogs:
   react19:
     react: 19.1.0

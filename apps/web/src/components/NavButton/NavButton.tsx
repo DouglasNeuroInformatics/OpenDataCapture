@@ -22,7 +22,7 @@ export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(fun
   return (
     <button
       className={cn(
-        'flex h-9 items-center justify-start whitespace-nowrap rounded-md px-3 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800 hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-50',
+        'flex h-9 items-center justify-start rounded-md px-3 text-sm font-medium whitespace-nowrap text-slate-200 transition-colors hover:bg-slate-800 hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-50',
         isActive && 'bg-slate-800 text-slate-100',
         isActive && activeClassName,
         className

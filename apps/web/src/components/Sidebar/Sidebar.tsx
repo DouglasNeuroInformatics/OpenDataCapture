@@ -47,7 +47,7 @@ export const Sidebar = () => {
           <hr className="mt-2 h-[1px] border-none bg-slate-700" />
         </div>
       )}
-      <nav className="scrollbar-none flex min-h-0 flex-1 flex-col divide-y divide-slate-700 overflow-y-auto">
+      <nav className="flex min-h-0 flex-1 scrollbar-none flex-col divide-y divide-slate-700 overflow-y-auto">
         {navItems.map((items, i) => (
           <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
             {items.map(({ disabled, url, ...props }) =>

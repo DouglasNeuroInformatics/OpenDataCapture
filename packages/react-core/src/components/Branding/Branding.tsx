@@ -16,7 +16,7 @@ export const Branding = ({ className, fontSize = 'lg', logoVariant = 'auto', onC
       <Logo className="h-full w-auto" variant={logoVariant} />
       <span
         className={cn(
-          'ml-3 whitespace-nowrap font-bold leading-tight subpixel-antialiased',
+          'ml-3 leading-tight font-bold whitespace-nowrap subpixel-antialiased',
           fontSize === 'lg' && 'text-lg',
           fontSize === 'md' && 'text-base',
           fontSize === 'sm' && 'text-sm'

@@ -19,9 +19,7 @@ export default config(
     typescript: { enabled: true }
   },
   {
-    ignores: [
-      /* generated files, vendored code, ... */
-    ]
+    ignores: [/* generated files, vendored code, ... */]
   }
 );
 ```

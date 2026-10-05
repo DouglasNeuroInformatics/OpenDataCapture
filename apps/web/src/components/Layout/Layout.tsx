@@ -25,7 +25,7 @@ export const Layout = () => {
           scroll container rather than escaping to the viewport and inflating
           the document height. */}
       <div
-        className="scrollbar-none relative flex grow flex-col overflow-y-scroll pt-14 md:pt-0"
+        className="relative flex grow scrollbar-none flex-col overflow-y-scroll pt-14 md:pt-0"
         data-testid="layout-main"
       >
         {groupSwitcherPosition === 'topbar' && isGroupSwitcherVisible && (

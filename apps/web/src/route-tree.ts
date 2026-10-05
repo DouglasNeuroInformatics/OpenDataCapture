@@ -9,50 +9,50 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SetupRouteImport } from './routes/setup'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
+import { Route as SetupRouteImport } from './routes/setup'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
-import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
-import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as AppUserRouteImport } from './routes/_app/user'
-import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
-import { Route as AppContactRouteImport } from './routes/_app/contact'
 import { Route as AppAboutRouteImport } from './routes/_app/about'
-import { Route as AppUploadIndexRouteImport } from './routes/_app/upload/index'
-import { Route as AppDatahubIndexRouteImport } from './routes/_app/datahub/index'
-import { Route as AppUploadInstrumentIdRouteImport } from './routes/_app/upload/$instrumentId'
-import { Route as AppSessionStartSessionRouteImport } from './routes/_app/session/start-session'
-import { Route as AppSessionRemoteAssignmentRouteImport } from './routes/_app/session/remote-assignment'
-import { Route as AppInstrumentsAccessibleInstrumentsRouteImport } from './routes/_app/instruments/accessible-instruments'
-import { Route as AppGroupRemoteAssignmentsRouteImport } from './routes/_app/group/remote-assignments'
-import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
-import { Route as AppGroupEmailTemplatesRouteImport } from './routes/_app/group/email-templates'
-import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
-import { Route as AppAdminMailRouteImport } from './routes/_app/admin/mail'
+import { Route as AppContactRouteImport } from './routes/_app/contact'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppUserRouteImport } from './routes/_app/user'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AppAdminInstrumentsRouteImport } from './routes/_app/admin/instruments'
+import { Route as AppAdminMailRouteImport } from './routes/_app/admin/mail'
+import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
+import { Route as AppDatahubIndexRouteImport } from './routes/_app/datahub/index'
 import { Route as AppDatahubSubjectIdRouteRouteImport } from './routes/_app/datahub/$subjectId/route'
-import { Route as AppAdminUsersIndexRouteImport } from './routes/_app/admin/users/index'
-import { Route as AppAdminInstrumentReposIndexRouteImport } from './routes/_app/admin/instrument-repos/index'
-import { Route as AppAdminGroupsIndexRouteImport } from './routes/_app/admin/groups/index'
-import { Route as AppAdminBrandingIndexRouteImport } from './routes/_app/admin/branding/index'
-import { Route as AppInstrumentsRenderIdRouteImport } from './routes/_app/instruments/render/$id'
-import { Route as AppDatahubSubjectIdGraphRouteImport } from './routes/_app/datahub/$subjectId/graph'
-import { Route as AppDatahubSubjectIdAssignmentsRouteImport } from './routes/_app/datahub/$subjectId/assignments'
-import { Route as AppAdminUsersCreateRouteImport } from './routes/_app/admin/users/create'
-import { Route as AppAdminUsersUserIdRouteImport } from './routes/_app/admin/users/$userId'
-import { Route as AppAdminGroupsCreateRouteImport } from './routes/_app/admin/groups/create'
-import { Route as AppAdminBrandingLoginPageRouteImport } from './routes/_app/admin/branding/login-page'
+import { Route as AppGroupEmailTemplatesRouteImport } from './routes/_app/group/email-templates'
+import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
+import { Route as AppGroupRemoteAssignmentsRouteImport } from './routes/_app/group/remote-assignments'
+import { Route as AppInstrumentsAccessibleInstrumentsRouteImport } from './routes/_app/instruments/accessible-instruments'
+import { Route as AppSessionRemoteAssignmentRouteImport } from './routes/_app/session/remote-assignment'
+import { Route as AppSessionStartSessionRouteImport } from './routes/_app/session/start-session'
+import { Route as AppUploadIndexRouteImport } from './routes/_app/upload/index'
+import { Route as AppUploadInstrumentIdRouteImport } from './routes/_app/upload/$instrumentId'
 import { Route as AppAdminAuditLogsRouteImport } from './routes/_app/admin/audit/logs'
+import { Route as AppAdminBrandingIndexRouteImport } from './routes/_app/admin/branding/index'
+import { Route as AppAdminBrandingLoginPageRouteImport } from './routes/_app/admin/branding/login-page'
+import { Route as AppAdminGroupsIndexRouteImport } from './routes/_app/admin/groups/index'
+import { Route as AppAdminGroupsCreateRouteImport } from './routes/_app/admin/groups/create'
+import { Route as AppAdminInstrumentReposIndexRouteImport } from './routes/_app/admin/instrument-repos/index'
+import { Route as AppAdminUsersIndexRouteImport } from './routes/_app/admin/users/index'
+import { Route as AppAdminUsersUserIdRouteImport } from './routes/_app/admin/users/$userId'
+import { Route as AppAdminUsersCreateRouteImport } from './routes/_app/admin/users/create'
+import { Route as AppDatahubSubjectIdAssignmentsRouteImport } from './routes/_app/datahub/$subjectId/assignments'
+import { Route as AppDatahubSubjectIdGraphRouteImport } from './routes/_app/datahub/$subjectId/graph'
+import { Route as AppInstrumentsRenderIdRouteImport } from './routes/_app/instruments/render/$id'
 import { Route as AppDatahubSubjectIdTableIndexRouteImport } from './routes/_app/datahub/$subjectId/table/index'
 import { Route as AppDatahubSubjectIdTableRecordIdRouteImport } from './routes/_app/datahub/$subjectId/table/$recordId'
 
+const AppRouteRoute = AppRouteRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
   path: '/setup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppRouteRoute = AppRouteRouteImport.update({
-  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -60,24 +60,9 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/auth/reset-password',
-  path: '/auth/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppUserRoute = AppUserRouteImport.update({
-  id: '/user',
-  path: '/user',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppDashboardRoute = AppDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AppAboutRoute = AppAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppContactRoute = AppContactRouteImport.update({
@@ -85,62 +70,29 @@ const AppContactRoute = AppContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppAboutRoute = AppAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppUploadIndexRoute = AppUploadIndexRouteImport.update({
-  id: '/upload/',
-  path: '/upload/',
+const AppUserRoute = AppUserRouteImport.update({
+  id: '/user',
+  path: '/user',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppDatahubIndexRoute = AppDatahubIndexRouteImport.update({
-  id: '/datahub/',
-  path: '/datahub/',
-  getParentRoute: () => AppRouteRoute,
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppUploadInstrumentIdRoute = AppUploadInstrumentIdRouteImport.update({
-  id: '/upload/$instrumentId',
-  path: '/upload/$instrumentId',
-  getParentRoute: () => AppRouteRoute,
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppSessionStartSessionRoute = AppSessionStartSessionRouteImport.update({
-  id: '/session/start-session',
-  path: '/session/start-session',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppSessionRemoteAssignmentRoute =
-  AppSessionRemoteAssignmentRouteImport.update({
-    id: '/session/remote-assignment',
-    path: '/session/remote-assignment',
-    getParentRoute: () => AppRouteRoute,
-  } as any)
-const AppInstrumentsAccessibleInstrumentsRoute =
-  AppInstrumentsAccessibleInstrumentsRouteImport.update({
-    id: '/instruments/accessible-instruments',
-    path: '/instruments/accessible-instruments',
-    getParentRoute: () => AppRouteRoute,
-  } as any)
-const AppGroupRemoteAssignmentsRoute =
-  AppGroupRemoteAssignmentsRouteImport.update({
-    id: '/group/remote-assignments',
-    path: '/group/remote-assignments',
-    getParentRoute: () => AppRouteRoute,
-  } as any)
-const AppGroupManageRoute = AppGroupManageRouteImport.update({
-  id: '/group/manage',
-  path: '/group/manage',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppGroupEmailTemplatesRoute = AppGroupEmailTemplatesRouteImport.update({
-  id: '/group/email-templates',
-  path: '/group/email-templates',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppAdminSettingsRoute = AppAdminSettingsRouteImport.update({
-  id: '/admin/settings',
-  path: '/admin/settings',
+const AppAdminInstrumentsRoute = AppAdminInstrumentsRouteImport.update({
+  id: '/admin/instruments',
+  path: '/admin/instruments',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppAdminMailRoute = AppAdminMailRouteImport.update({
@@ -148,9 +100,14 @@ const AppAdminMailRoute = AppAdminMailRouteImport.update({
   path: '/admin/mail',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppAdminInstrumentsRoute = AppAdminInstrumentsRouteImport.update({
-  id: '/admin/instruments',
-  path: '/admin/instruments',
+const AppAdminSettingsRoute = AppAdminSettingsRouteImport.update({
+  id: '/admin/settings',
+  path: '/admin/settings',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppDatahubIndexRoute = AppDatahubIndexRouteImport.update({
+  id: '/datahub/',
+  path: '/datahub/',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppDatahubSubjectIdRouteRoute =
@@ -159,57 +116,57 @@ const AppDatahubSubjectIdRouteRoute =
     path: '/datahub/$subjectId',
     getParentRoute: () => AppRouteRoute,
   } as any)
-const AppAdminUsersIndexRoute = AppAdminUsersIndexRouteImport.update({
-  id: '/admin/users/',
-  path: '/admin/users/',
+const AppGroupEmailTemplatesRoute = AppGroupEmailTemplatesRouteImport.update({
+  id: '/group/email-templates',
+  path: '/group/email-templates',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppAdminInstrumentReposIndexRoute =
-  AppAdminInstrumentReposIndexRouteImport.update({
-    id: '/admin/instrument-repos/',
-    path: '/admin/instrument-repos/',
+const AppGroupManageRoute = AppGroupManageRouteImport.update({
+  id: '/group/manage',
+  path: '/group/manage',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppGroupRemoteAssignmentsRoute =
+  AppGroupRemoteAssignmentsRouteImport.update({
+    id: '/group/remote-assignments',
+    path: '/group/remote-assignments',
     getParentRoute: () => AppRouteRoute,
   } as any)
-const AppAdminGroupsIndexRoute = AppAdminGroupsIndexRouteImport.update({
-  id: '/admin/groups/',
-  path: '/admin/groups/',
+const AppInstrumentsAccessibleInstrumentsRoute =
+  AppInstrumentsAccessibleInstrumentsRouteImport.update({
+    id: '/instruments/accessible-instruments',
+    path: '/instruments/accessible-instruments',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppSessionRemoteAssignmentRoute =
+  AppSessionRemoteAssignmentRouteImport.update({
+    id: '/session/remote-assignment',
+    path: '/session/remote-assignment',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppSessionStartSessionRoute = AppSessionStartSessionRouteImport.update({
+  id: '/session/start-session',
+  path: '/session/start-session',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppUploadIndexRoute = AppUploadIndexRouteImport.update({
+  id: '/upload/',
+  path: '/upload/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppUploadInstrumentIdRoute = AppUploadInstrumentIdRouteImport.update({
+  id: '/upload/$instrumentId',
+  path: '/upload/$instrumentId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppAdminAuditLogsRoute = AppAdminAuditLogsRouteImport.update({
+  id: '/admin/audit/logs',
+  path: '/admin/audit/logs',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppAdminBrandingIndexRoute = AppAdminBrandingIndexRouteImport.update({
   id: '/admin/branding/',
   path: '/admin/branding/',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppInstrumentsRenderIdRoute = AppInstrumentsRenderIdRouteImport.update({
-  id: '/instruments/render/$id',
-  path: '/instruments/render/$id',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppDatahubSubjectIdGraphRoute =
-  AppDatahubSubjectIdGraphRouteImport.update({
-    id: '/graph',
-    path: '/graph',
-    getParentRoute: () => AppDatahubSubjectIdRouteRoute,
-  } as any)
-const AppDatahubSubjectIdAssignmentsRoute =
-  AppDatahubSubjectIdAssignmentsRouteImport.update({
-    id: '/assignments',
-    path: '/assignments',
-    getParentRoute: () => AppDatahubSubjectIdRouteRoute,
-  } as any)
-const AppAdminUsersCreateRoute = AppAdminUsersCreateRouteImport.update({
-  id: '/admin/users/create',
-  path: '/admin/users/create',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppAdminUsersUserIdRoute = AppAdminUsersUserIdRouteImport.update({
-  id: '/admin/users/$userId',
-  path: '/admin/users/$userId',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppAdminGroupsCreateRoute = AppAdminGroupsCreateRouteImport.update({
-  id: '/admin/groups/create',
-  path: '/admin/groups/create',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppAdminBrandingLoginPageRoute =
@@ -218,9 +175,52 @@ const AppAdminBrandingLoginPageRoute =
     path: '/admin/branding/login-page',
     getParentRoute: () => AppRouteRoute,
   } as any)
-const AppAdminAuditLogsRoute = AppAdminAuditLogsRouteImport.update({
-  id: '/admin/audit/logs',
-  path: '/admin/audit/logs',
+const AppAdminGroupsIndexRoute = AppAdminGroupsIndexRouteImport.update({
+  id: '/admin/groups/',
+  path: '/admin/groups/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppAdminGroupsCreateRoute = AppAdminGroupsCreateRouteImport.update({
+  id: '/admin/groups/create',
+  path: '/admin/groups/create',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppAdminInstrumentReposIndexRoute =
+  AppAdminInstrumentReposIndexRouteImport.update({
+    id: '/admin/instrument-repos/',
+    path: '/admin/instrument-repos/',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppAdminUsersIndexRoute = AppAdminUsersIndexRouteImport.update({
+  id: '/admin/users/',
+  path: '/admin/users/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppAdminUsersUserIdRoute = AppAdminUsersUserIdRouteImport.update({
+  id: '/admin/users/$userId',
+  path: '/admin/users/$userId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppAdminUsersCreateRoute = AppAdminUsersCreateRouteImport.update({
+  id: '/admin/users/create',
+  path: '/admin/users/create',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppDatahubSubjectIdAssignmentsRoute =
+  AppDatahubSubjectIdAssignmentsRouteImport.update({
+    id: '/assignments',
+    path: '/assignments',
+    getParentRoute: () => AppDatahubSubjectIdRouteRoute,
+  } as any)
+const AppDatahubSubjectIdGraphRoute =
+  AppDatahubSubjectIdGraphRouteImport.update({
+    id: '/graph',
+    path: '/graph',
+    getParentRoute: () => AppDatahubSubjectIdRouteRoute,
+  } as any)
+const AppInstrumentsRenderIdRoute = AppInstrumentsRenderIdRouteImport.update({
+  id: '/instruments/render/$id',
+  path: '/instruments/render/$id',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppDatahubSubjectIdTableIndexRoute =
@@ -473,18 +473,18 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/setup': {
-      id: '/setup'
-      path: '/setup'
-      fullPath: '/setup'
-      preLoaderRoute: typeof SetupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_app': {
       id: '/_app'
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AppRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/setup': {
+      id: '/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof SetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -494,32 +494,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/auth/reset-password': {
-      id: '/auth/reset-password'
-      path: '/auth/reset-password'
-      fullPath: '/auth/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_app/user': {
-      id: '/_app/user'
-      path: '/user'
-      fullPath: '/user'
-      preLoaderRoute: typeof AppUserRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/dashboard': {
-      id: '/_app/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AppDashboardRouteImport
+    '/_app/about': {
+      id: '/_app/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AppAboutRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/contact': {
@@ -529,81 +508,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppContactRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/about': {
-      id: '/_app/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AppAboutRouteImport
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/upload/': {
-      id: '/_app/upload/'
-      path: '/upload'
-      fullPath: '/upload/'
-      preLoaderRoute: typeof AppUploadIndexRouteImport
+    '/_app/user': {
+      id: '/_app/user'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof AppUserRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/datahub/': {
-      id: '/_app/datahub/'
-      path: '/datahub'
-      fullPath: '/datahub/'
-      preLoaderRoute: typeof AppDatahubIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/upload/$instrumentId': {
-      id: '/_app/upload/$instrumentId'
-      path: '/upload/$instrumentId'
-      fullPath: '/upload/$instrumentId'
-      preLoaderRoute: typeof AppUploadInstrumentIdRouteImport
-      parentRoute: typeof AppRouteRoute
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/session/start-session': {
-      id: '/_app/session/start-session'
-      path: '/session/start-session'
-      fullPath: '/session/start-session'
-      preLoaderRoute: typeof AppSessionStartSessionRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/session/remote-assignment': {
-      id: '/_app/session/remote-assignment'
-      path: '/session/remote-assignment'
-      fullPath: '/session/remote-assignment'
-      preLoaderRoute: typeof AppSessionRemoteAssignmentRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/instruments/accessible-instruments': {
-      id: '/_app/instruments/accessible-instruments'
-      path: '/instruments/accessible-instruments'
-      fullPath: '/instruments/accessible-instruments'
-      preLoaderRoute: typeof AppInstrumentsAccessibleInstrumentsRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/group/remote-assignments': {
-      id: '/_app/group/remote-assignments'
-      path: '/group/remote-assignments'
-      fullPath: '/group/remote-assignments'
-      preLoaderRoute: typeof AppGroupRemoteAssignmentsRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/group/manage': {
-      id: '/_app/group/manage'
-      path: '/group/manage'
-      fullPath: '/group/manage'
-      preLoaderRoute: typeof AppGroupManageRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/group/email-templates': {
-      id: '/_app/group/email-templates'
-      path: '/group/email-templates'
-      fullPath: '/group/email-templates'
-      preLoaderRoute: typeof AppGroupEmailTemplatesRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/admin/settings': {
-      id: '/_app/admin/settings'
-      path: '/admin/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AppAdminSettingsRouteImport
+    '/_app/admin/instruments': {
+      id: '/_app/admin/instruments'
+      path: '/admin/instruments'
+      fullPath: '/admin/instruments'
+      preLoaderRoute: typeof AppAdminInstrumentsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/admin/mail': {
@@ -613,11 +550,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminMailRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/admin/instruments': {
-      id: '/_app/admin/instruments'
-      path: '/admin/instruments'
-      fullPath: '/admin/instruments'
-      preLoaderRoute: typeof AppAdminInstrumentsRouteImport
+    '/_app/admin/settings': {
+      id: '/_app/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AppAdminSettingsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/datahub/': {
+      id: '/_app/datahub/'
+      path: '/datahub'
+      fullPath: '/datahub/'
+      preLoaderRoute: typeof AppDatahubIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/datahub/$subjectId': {
@@ -627,25 +571,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDatahubSubjectIdRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/admin/users/': {
-      id: '/_app/admin/users/'
-      path: '/admin/users'
-      fullPath: '/admin/users/'
-      preLoaderRoute: typeof AppAdminUsersIndexRouteImport
+    '/_app/group/email-templates': {
+      id: '/_app/group/email-templates'
+      path: '/group/email-templates'
+      fullPath: '/group/email-templates'
+      preLoaderRoute: typeof AppGroupEmailTemplatesRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/admin/instrument-repos/': {
-      id: '/_app/admin/instrument-repos/'
-      path: '/admin/instrument-repos'
-      fullPath: '/admin/instrument-repos/'
-      preLoaderRoute: typeof AppAdminInstrumentReposIndexRouteImport
+    '/_app/group/manage': {
+      id: '/_app/group/manage'
+      path: '/group/manage'
+      fullPath: '/group/manage'
+      preLoaderRoute: typeof AppGroupManageRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/admin/groups/': {
-      id: '/_app/admin/groups/'
-      path: '/admin/groups'
-      fullPath: '/admin/groups/'
-      preLoaderRoute: typeof AppAdminGroupsIndexRouteImport
+    '/_app/group/remote-assignments': {
+      id: '/_app/group/remote-assignments'
+      path: '/group/remote-assignments'
+      fullPath: '/group/remote-assignments'
+      preLoaderRoute: typeof AppGroupRemoteAssignmentsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/instruments/accessible-instruments': {
+      id: '/_app/instruments/accessible-instruments'
+      path: '/instruments/accessible-instruments'
+      fullPath: '/instruments/accessible-instruments'
+      preLoaderRoute: typeof AppInstrumentsAccessibleInstrumentsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/session/remote-assignment': {
+      id: '/_app/session/remote-assignment'
+      path: '/session/remote-assignment'
+      fullPath: '/session/remote-assignment'
+      preLoaderRoute: typeof AppSessionRemoteAssignmentRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/session/start-session': {
+      id: '/_app/session/start-session'
+      path: '/session/start-session'
+      fullPath: '/session/start-session'
+      preLoaderRoute: typeof AppSessionStartSessionRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/upload/': {
+      id: '/_app/upload/'
+      path: '/upload'
+      fullPath: '/upload/'
+      preLoaderRoute: typeof AppUploadIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/upload/$instrumentId': {
+      id: '/_app/upload/$instrumentId'
+      path: '/upload/$instrumentId'
+      fullPath: '/upload/$instrumentId'
+      preLoaderRoute: typeof AppUploadInstrumentIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/admin/audit/logs': {
+      id: '/_app/admin/audit/logs'
+      path: '/admin/audit/logs'
+      fullPath: '/admin/audit/logs'
+      preLoaderRoute: typeof AppAdminAuditLogsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/admin/branding/': {
@@ -655,39 +641,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminBrandingIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/instruments/render/$id': {
-      id: '/_app/instruments/render/$id'
-      path: '/instruments/render/$id'
-      fullPath: '/instruments/render/$id'
-      preLoaderRoute: typeof AppInstrumentsRenderIdRouteImport
+    '/_app/admin/branding/login-page': {
+      id: '/_app/admin/branding/login-page'
+      path: '/admin/branding/login-page'
+      fullPath: '/admin/branding/login-page'
+      preLoaderRoute: typeof AppAdminBrandingLoginPageRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/datahub/$subjectId/graph': {
-      id: '/_app/datahub/$subjectId/graph'
-      path: '/graph'
-      fullPath: '/datahub/$subjectId/graph'
-      preLoaderRoute: typeof AppDatahubSubjectIdGraphRouteImport
-      parentRoute: typeof AppDatahubSubjectIdRouteRoute
-    }
-    '/_app/datahub/$subjectId/assignments': {
-      id: '/_app/datahub/$subjectId/assignments'
-      path: '/assignments'
-      fullPath: '/datahub/$subjectId/assignments'
-      preLoaderRoute: typeof AppDatahubSubjectIdAssignmentsRouteImport
-      parentRoute: typeof AppDatahubSubjectIdRouteRoute
-    }
-    '/_app/admin/users/create': {
-      id: '/_app/admin/users/create'
-      path: '/admin/users/create'
-      fullPath: '/admin/users/create'
-      preLoaderRoute: typeof AppAdminUsersCreateRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/admin/users/$userId': {
-      id: '/_app/admin/users/$userId'
-      path: '/admin/users/$userId'
-      fullPath: '/admin/users/$userId'
-      preLoaderRoute: typeof AppAdminUsersUserIdRouteImport
+    '/_app/admin/groups/': {
+      id: '/_app/admin/groups/'
+      path: '/admin/groups'
+      fullPath: '/admin/groups/'
+      preLoaderRoute: typeof AppAdminGroupsIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/admin/groups/create': {
@@ -697,18 +662,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminGroupsCreateRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/admin/branding/login-page': {
-      id: '/_app/admin/branding/login-page'
-      path: '/admin/branding/login-page'
-      fullPath: '/admin/branding/login-page'
-      preLoaderRoute: typeof AppAdminBrandingLoginPageRouteImport
+    '/_app/admin/instrument-repos/': {
+      id: '/_app/admin/instrument-repos/'
+      path: '/admin/instrument-repos'
+      fullPath: '/admin/instrument-repos/'
+      preLoaderRoute: typeof AppAdminInstrumentReposIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/admin/audit/logs': {
-      id: '/_app/admin/audit/logs'
-      path: '/admin/audit/logs'
-      fullPath: '/admin/audit/logs'
-      preLoaderRoute: typeof AppAdminAuditLogsRouteImport
+    '/_app/admin/users/': {
+      id: '/_app/admin/users/'
+      path: '/admin/users'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof AppAdminUsersIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/admin/users/$userId': {
+      id: '/_app/admin/users/$userId'
+      path: '/admin/users/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AppAdminUsersUserIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/admin/users/create': {
+      id: '/_app/admin/users/create'
+      path: '/admin/users/create'
+      fullPath: '/admin/users/create'
+      preLoaderRoute: typeof AppAdminUsersCreateRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/datahub/$subjectId/assignments': {
+      id: '/_app/datahub/$subjectId/assignments'
+      path: '/assignments'
+      fullPath: '/datahub/$subjectId/assignments'
+      preLoaderRoute: typeof AppDatahubSubjectIdAssignmentsRouteImport
+      parentRoute: typeof AppDatahubSubjectIdRouteRoute
+    }
+    '/_app/datahub/$subjectId/graph': {
+      id: '/_app/datahub/$subjectId/graph'
+      path: '/graph'
+      fullPath: '/datahub/$subjectId/graph'
+      preLoaderRoute: typeof AppDatahubSubjectIdGraphRouteImport
+      parentRoute: typeof AppDatahubSubjectIdRouteRoute
+    }
+    '/_app/instruments/render/$id': {
+      id: '/_app/instruments/render/$id'
+      path: '/instruments/render/$id'
+      fullPath: '/instruments/render/$id'
+      preLoaderRoute: typeof AppInstrumentsRenderIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/datahub/$subjectId/table/': {

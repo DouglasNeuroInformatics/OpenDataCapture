@@ -137,7 +137,7 @@ type ResourcesSectionProps = {
 const ResourcesSection = ({ boldResourceLinks, fontSize, lang, links, preview, tc, tl }: ResourcesSectionProps) => (
   <div className="relative z-10 flex flex-col gap-2">
     <p
-      className={cn('font-semibold uppercase tracking-wider', tc('text-slate-100'), preview ? 'text-[9px]' : 'text-xs')}
+      className={cn('font-semibold tracking-wider uppercase', tc('text-slate-100'), preview ? 'text-[9px]' : 'text-xs')}
       style={fontStyle(fontSize, preview)}
     >
       {tl({ en: 'Resources', es: 'Recursos', fr: 'Ressources' })}

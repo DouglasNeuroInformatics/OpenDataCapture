@@ -161,8 +161,7 @@ declare namespace FormInstrument {
     }
   > = {
     [K in keyof TFieldset]:
-      | DynamicFieldsetField<TLanguage, TFieldset, TFieldset[K]>
-      | ScalarField<TLanguage, TFieldset[K]>;
+      DynamicFieldsetField<TLanguage, TFieldset, TFieldset[K]> | ScalarField<TLanguage, TFieldset[K]>;
   };
 
   type RecordArrayField<
@@ -288,8 +287,7 @@ declare namespace FormInstrument {
   };
 
   type Content<TData extends Data = Data, TLanguage extends InstrumentLanguage = InstrumentLanguage> =
-    | (Block<TData> | FieldsGroup<TData, TLanguage>)[]
-    | Fields<TData, TLanguage>;
+    (Block<TData> | FieldsGroup<TData, TLanguage>)[] | Fields<TData, TLanguage>;
 }
 
 /** @public */

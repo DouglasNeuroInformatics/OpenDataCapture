@@ -30,18 +30,18 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
     {
       team.map(({ data: { fullName, suffix, position, image, description } }) => (
         <li class="translate-y-6 opacity-0 transition-all duration-500 ease-in-out">
-          <div class="shadow-xs relative grid h-full gap-8 rounded-md border border-slate-300 bg-slate-50 p-5 md:grid-cols-4 md:rounded-none md:border-none md:bg-inherit md:p-0 md:shadow-none lg:grid-cols-3 dark:border-slate-600 dark:bg-slate-800 md:dark:bg-inherit">
-            <div class="absolute left-5 top-5 h-14 w-14 md:static md:flex md:h-auto md:w-auto md:items-center md:justify-center">
+          <div class="relative grid h-full gap-8 rounded-md border border-slate-300 bg-slate-50 p-5 shadow-xs md:grid-cols-4 md:rounded-none md:border-none md:bg-inherit md:p-0 md:shadow-none lg:grid-cols-3 dark:border-slate-600 dark:bg-slate-800 md:dark:bg-inherit">
+            <div class="absolute top-5 left-5 h-14 w-14 md:static md:flex md:h-auto md:w-auto md:items-center md:justify-center">
               <Headshot className="md:rounded-lg md:shadow-lg" src={image} alt={fullName} />
             </div>
             <div class="flex flex-col md:col-span-3 lg:col-span-2">
               <div class="mb-2 flex h-14 flex-col justify-between py-2.5 pl-[4.25rem] md:mb-0 md:py-1.5 md:pl-0">
-                <h5 class="font-bold leading-none tracking-tight md:text-lg">{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h5>
-                <span class="text-sm font-semibold leading-none tracking-tight text-sky-700 md:text-base dark:text-sky-500 md:dark:text-sky-400">
+                <h5 class="leading-none font-bold tracking-tight md:text-lg">{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h5>
+                <span class="text-sm leading-none font-semibold tracking-tight text-sky-700 md:text-base dark:text-sky-500 md:dark:text-sky-400">
                   {position[resolvedLanguage]}
                 </span>
               </div>
-              <p class="py-1.5 text-sm font-normal leading-tight text-slate-700 dark:text-slate-300">
+              <p class="py-1.5 text-sm leading-tight font-normal text-slate-700 dark:text-slate-300">
                 {description[resolvedLanguage]}
               </p>
             </div>

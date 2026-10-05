@@ -13,7 +13,7 @@ Two modules do real work at import time, and both are fragile.
 - **`src/pages/IndexPage.tsx`** calls `await initialize({ wasmURL })` from `esbuild-wasm` above the
   component. esbuild-wasm throws `Cannot call "initialize" more than once` on a second call, so this
   must stay in exactly one module. `src/App.tsx` reaches it through `React.lazy`, which is what puts
-  the 11 MB `esbuild.wasm` download behind the Suspense fallback. Importing `IndexPage` eagerly, or
+  the 13 MB `esbuild.wasm` download behind the Suspense fallback. Importing `IndexPage` eagerly, or
   adding a second `initialize()`, breaks the app at boot.
 - **`src/components/Editor/setup.ts`** configures Monaco (workers, compiler options, themes, prettier
   as the formatter) inside a top-level `await loader.init()` block. `Editor.tsx` pulls it in with a

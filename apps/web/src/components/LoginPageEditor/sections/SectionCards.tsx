@@ -165,7 +165,7 @@ const LogoCard = ({ editor }: CardProps) => {
                   {form.customLogoSrc && (
                     <Button
                       aria-label={t({ en: 'Remove', es: 'Quitar', fr: 'Retirer' })}
-                      className="bg-background/80 hover:bg-background absolute right-1.5 top-1.5 h-7 w-7 rounded-full border p-0 shadow-sm backdrop-blur-sm"
+                      className="bg-background/80 hover:bg-background absolute top-1.5 right-1.5 h-7 w-7 rounded-full border p-0 shadow-sm backdrop-blur-sm"
                       size="sm"
                       type="button"
                       variant="ghost"

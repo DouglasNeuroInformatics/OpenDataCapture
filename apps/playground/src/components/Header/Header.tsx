@@ -18,7 +18,7 @@ export const Header = () => {
         <Branding
           className={cn(
             '[&>span]:hidden lg:[&>span]:inline',
-            __GITHUB_REPO_URL__ && 'underline-offset-3 cursor-pointer hover:underline'
+            __GITHUB_REPO_URL__ && 'cursor-pointer underline-offset-3 hover:underline'
           )}
           onClick={() => {
             window.open(__GITHUB_REPO_URL__, '_blank');

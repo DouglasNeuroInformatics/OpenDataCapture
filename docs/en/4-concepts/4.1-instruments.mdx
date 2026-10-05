@@ -76,15 +76,9 @@ type BaseInstrument = {
   __runtimeVersion: 1;
   kind: 'FORM' | 'INTERACTIVE' | 'SERIES';
   language: Language | Language[];
-  details: {
-    /* researcher-facing metadata; localized fields depend on language */
-  };
-  clientDetails?: {
-    /* subject-facing metadata; localized fields depend on language */
-  };
-  content: {
-    /* becomes specific after narrowing by kind */
-  };
+  details: {/* researcher-facing metadata; localized fields depend on language */};
+  clientDetails?: {/* subject-facing metadata; localized fields depend on language */};
+  content: {/* becomes specific after narrowing by kind */};
 };
 ```
 

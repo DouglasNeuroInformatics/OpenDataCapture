@@ -134,7 +134,7 @@ export const InstrumentPreviewDialog = ({ item, items, onClose }: InstrumentPrev
                       })}
                     </span>
                   ) : (
-                    <ol className="text-muted-foreground mt-1 max-h-48 list-decimal space-y-1 overflow-auto rounded-md border border-slate-200 py-2 pl-8 pr-3 dark:border-slate-800">
+                    <ol className="text-muted-foreground mt-1 max-h-48 list-decimal space-y-1 overflow-auto rounded-md border border-slate-200 py-2 pr-3 pl-8 dark:border-slate-800">
                       {seriesItemTitles.map((title, index) => (
                         <li className="break-words" key={`${title}-${index}`}>
                           {title}

@@ -17,7 +17,7 @@
     "storybook": "storybook dev -p 6006"
   },
   "peerDependencies": {
-    "@tanstack/react-router": "^1.127.3",
+    "@tanstack/react-router": "^1.170.40",
     "axios": "catalog:",
     "react": "workspace:react__19.x@*",
     "react-dom": "workspace:react-dom__19.x@*",
@@ -43,7 +43,7 @@
     "@opendatacapture/subject-utils": "workspace:*",
     "http-status-codes": "^2.3.0",
     "lodash-es": "workspace:lodash-es__4.x@*",
-    "lucide-react": "^0.473.0",
+    "lucide-react": "^0.577.0",
     "motion": "catalog:",
     "react-dropzone": "catalog:",
     "serialize-error": "catalog:",

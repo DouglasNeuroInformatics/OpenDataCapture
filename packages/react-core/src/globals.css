@@ -1,8 +1,8 @@
 @import '@douglasneuroinformatics/libui/tailwind/globals.css';
 
-@source "../node_modules/@douglasneuroinformatics/libui";
+@source '../node_modules/@douglasneuroinformatics/libui';
 
-@source "../src";
+@source '../src';
 
 /* `data-mode` themes the page but tells the browser nothing: native controls, scrollbars and form
    widgets keep their light appearance in dark mode, and an extension that re-themes pages cannot

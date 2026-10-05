@@ -105,7 +105,7 @@ export const UpdateUserForm = ({ data, hideSubmitButton, id, onError, onSubmit }
     <div className="contents" key={JSON.stringify(initialValues)} ref={suppressPasswordAutofill}>
       {/* libui always renders a boolean radio's `true` option first, so the row is reversed to lead with Enabled. */}
       <Form
-        className="[&>div:has(#disabled-true)]:gap-2 [&_[role=radiogroup]:has(#disabled-true)]:flex [&_[role=radiogroup]:has(#disabled-true)]:flex-row-reverse [&_[role=radiogroup]:has(#disabled-true)]:justify-end [&_[role=radiogroup]:has(#disabled-true)]:gap-6 [&_[role=radiogroup]:has(#disabled-true)]:pt-2"
+        className="[&_[role=radiogroup]:has(#disabled-true)]:flex [&_[role=radiogroup]:has(#disabled-true)]:flex-row-reverse [&_[role=radiogroup]:has(#disabled-true)]:justify-end [&_[role=radiogroup]:has(#disabled-true)]:gap-6 [&_[role=radiogroup]:has(#disabled-true)]:pt-2 [&>div:has(#disabled-true)]:gap-2"
         content={[
           {
             fields: {

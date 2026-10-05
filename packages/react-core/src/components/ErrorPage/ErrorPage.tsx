@@ -47,7 +47,7 @@ export const ErrorPage = ({ error }: ErrorPageProps) => {
       className="flex min-h-screen flex-col items-center justify-center gap-1 p-3 text-center"
       data-testid="error-page"
     >
-      <h1 className="text-muted-foreground text-sm font-semibold uppercase tracking-wide">
+      <h1 className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
         {t({ en: 'Something Went Wrong', es: 'Algo salió mal', fr: "Une erreur s'est produite" })}
       </h1>
       <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">{heading}</h3>
