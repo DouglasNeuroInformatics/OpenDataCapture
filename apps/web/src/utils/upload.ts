@@ -157,12 +157,6 @@ function extractRecordArrayEntry(entry: string): { [key: string]: string }[] {
 
   return recordArrayDataList.map((listData) => {
     const recordsList = listData.split(',');
-    if (!recordsList) {
-      throw new UploadError({
-        en: `Record in the record array was left undefined`,
-        fr: `L'enregistrement dans le tableau d'enregistrements n'est pas défini`
-      });
-    }
     if (recordsList.some((str) => str === '')) {
       throw new UploadError({
         en: `One or more of the record array fields was left empty`,
@@ -565,9 +559,6 @@ export namespace Zod3 {
           for (let i = 0; i < headers.length; i++) {
             const key = headers[i]!.trim();
             const rawValue = elements[i]!.trim();
-            if (rawValue === '\n') {
-              continue;
-            }
 
             //Check for non visible char in every row, return error if present
             const nonVisibleChars = nonVisibleCharChecker(rawValue);
@@ -634,7 +625,7 @@ export namespace Zod3 {
 export namespace Zod4 {
   export type TypeName = Extract<
     z4.core.$ZodTypeDef['type'],
-    'array' | 'boolean' | 'date' | 'enum' | 'int' | 'number' | 'object' | 'optional' | 'set' | 'string'
+    'array' | 'boolean' | 'date' | 'enum' | 'number' | 'object' | 'optional' | 'set' | 'string'
   >;
 
   type BaseZodConvertResult = {
@@ -760,7 +751,6 @@ export namespace Zod4 {
         return parseDateEntry(entry);
       case 'enum':
         return entry;
-      case 'int':
       case 'number':
         return parseNumberEntry(entry);
       case 'set':
@@ -789,7 +779,6 @@ export namespace Zod4 {
         possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
         return formatOptionalEntry(possibleEnumOutputs, convertResult.isOptional);
       }
-      case 'int':
       case 'number':
         return formatOptionalEntry('number', convertResult.isOptional);
       case 'object': {
@@ -918,7 +907,6 @@ export namespace Zod4 {
             const key = headers[i]!.trim();
             const cell = elements[i];
             const rawValue = cell == null ? '' : cell.trim();
-            if (rawValue === '\n') continue;
             // Return error if any non‑visible character is present
             const nonVisibleChars = nonVisibleCharChecker(rawValue);
             if (nonVisibleChars !== null) {

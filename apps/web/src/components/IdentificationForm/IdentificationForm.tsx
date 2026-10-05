@@ -136,7 +136,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
                 path: ['id']
               });
             }
-          } else if (val.identificationMethod === 'PERSONAL_INFO') {
+          } else {
             const requiredKeys = ['firstName', 'lastName', 'sex', 'dateOfBirth'] as const;
             for (const key of requiredKeys) {
               if (!val[key]) {

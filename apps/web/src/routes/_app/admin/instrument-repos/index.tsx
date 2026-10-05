@@ -150,14 +150,12 @@ const RouteComponent = () => {
   return (
     <Dialog
       open={isDialogOpen || isConfirmDeleteOpen || isViewOpen}
-      onOpenChange={(open) => {
-        if (!open) {
-          setIsDialogOpen(false);
-          setIsConfirmDeleteOpen(false);
-          setIsViewOpen(false);
-          setRepoToView(null);
-          setRepoToDelete(null);
-        }
+      onOpenChange={() => {
+        setIsDialogOpen(false);
+        setIsConfirmDeleteOpen(false);
+        setIsViewOpen(false);
+        setRepoToView(null);
+        setRepoToDelete(null);
       }}
     >
       <PageHeader>

@@ -11,8 +11,8 @@ export type EmailTemplateEditorProps = {
   error?: string;
   /** Namespaces the control ids and test ids, so two editors can coexist on one page. */
   idPrefix: string;
-  onChange: (template: MailTemplate) => void;
-  readOnly?: boolean;
+  /** Omit to show the template read-only. */
+  onChange?: (template: MailTemplate) => void;
   template: MailTemplate;
   /** Placeholder names offered as insert buttons above the body. */
   variables?: readonly string[];
@@ -23,7 +23,6 @@ export const EmailTemplateEditor = ({
   error,
   idPrefix,
   onChange,
-  readOnly = false,
   template,
   variables = []
 }: EmailTemplateEditorProps) => {
@@ -36,15 +35,15 @@ export const EmailTemplateEditor = ({
   const body = template.body[language] ?? '';
   const subject = template.subject[language] ?? '';
 
-  const insertVariable = (variable: string) => {
+  const insertVariable = (edit: (template: MailTemplate) => void, variable: string) => {
     const tag = `{{${variable}}}`;
     const cursor = bodyCursorRef.current;
     if (cursor === null) {
-      onChange({ ...template, body: { ...template.body, [language]: body ? `${body} ${tag}` : tag } });
+      edit({ ...template, body: { ...template.body, [language]: body ? `${body} ${tag}` : tag } });
       return;
     }
     bodyCursorRef.current = { end: cursor.start + tag.length, start: cursor.start + tag.length };
-    onChange({
+    edit({
       ...template,
       body: { ...template.body, [language]: body.slice(0, cursor.start) + tag + body.slice(cursor.end) }
     });
@@ -67,10 +66,11 @@ export const EmailTemplateEditor = ({
         <Input
           data-testid={`${idPrefix}-subject`}
           id={`${idPrefix}-subject`}
-          readOnly={readOnly}
+          readOnly={!onChange}
           value={subject}
-          onChange={(event) =>
-            onChange({ ...template, subject: { ...template.subject, [language]: event.target.value } })
+          onChange={
+            onChange &&
+            ((event) => onChange({ ...template, subject: { ...template.subject, [language]: event.target.value } }))
           }
         />
       </div>
@@ -78,7 +78,7 @@ export const EmailTemplateEditor = ({
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Label htmlFor={`${idPrefix}-body`}>{t({ en: 'Body', es: 'Cuerpo', fr: 'Corps' })}</Label>
-          {!readOnly && variables.length > 0 && (
+          {onChange && variables.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-muted-foreground text-xs">
                 {t({ en: 'Insert:', es: 'Insertar:', fr: 'Insérer :' })}
@@ -94,7 +94,7 @@ export const EmailTemplateEditor = ({
                     size="sm"
                     type="button"
                     variant="outline"
-                    onClick={() => insertVariable(variable)}
+                    onClick={() => insertVariable(onChange, variable)}
                   >
                     {tag}
                   </Button>
@@ -107,7 +107,7 @@ export const EmailTemplateEditor = ({
           className="min-h-[15rem]"
           data-testid={`${idPrefix}-body`}
           id={`${idPrefix}-body`}
-          readOnly={readOnly}
+          readOnly={!onChange}
           value={body}
           onBlur={(event: React.FocusEvent<HTMLTextAreaElement>) => {
             bodyCursorRef.current = {
@@ -115,7 +115,10 @@ export const EmailTemplateEditor = ({
               start: event.currentTarget.selectionStart
             };
           }}
-          onChange={(event) => onChange({ ...template, body: { ...template.body, [language]: event.target.value } })}
+          onChange={
+            onChange &&
+            ((event) => onChange({ ...template, body: { ...template.body, [language]: event.target.value } }))
+          }
         />
         {error && (
           <p className="text-destructive text-xs font-medium" data-testid={`${idPrefix}-error`}>

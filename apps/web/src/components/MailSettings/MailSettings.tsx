@@ -4,6 +4,7 @@ import { Checkbox, Heading } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $UpdateMailConfigData, isSameMailServer } from '@opendatacapture/schemas/mail';
 import type { MailConfigDto, MailTemplate, UpdateMailConfigData } from '@opendatacapture/schemas/mail';
+import { z } from 'zod/v4';
 
 import { SectionCard } from '@/components/SectionCard';
 import { useUpdateMailSettingsMutation } from '@/hooks/useUpdateMailSettingsMutation';
@@ -101,11 +102,12 @@ export const MailSettings = ({ config, newUserEmailTemplate }: MailSettingsProps
         : errorMessages.password;
     }
     if (!parsed.success) {
-      const isFormField = (key: unknown): key is keyof MailConfigFormValues => typeof key === 'string' && key in values;
-      for (const issue of parsed.error.issues) {
-        const [field] = issue.path;
-        if (isFormField(field)) {
-          nextErrors[field] = errorMessages[field] ?? issue.message;
+      // Only these fields can fail: `enabled` and `encryption` come from typed controls, and the
+      // optional `senderName` and `password` accept any string.
+      const { fieldErrors } = z.flattenError(parsed.error);
+      for (const field of ['host', 'port', 'senderAddress', 'username'] as const) {
+        if (fieldErrors[field]) {
+          nextErrors[field] = errorMessages[field];
         }
       }
       return { errors: nextErrors };

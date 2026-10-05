@@ -54,21 +54,9 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
     });
   };
 
-  const resolve = async () => {
+  const resolve = async (sourceMode: BulkSourceMode) => {
     setErrors([]);
-    if (!mode) {
-      setErrors([
-        {
-          message: t({
-            en: 'Map a subject ID column, or a complete set of first name, last name, date of birth and sex.',
-            es: 'Asocie una columna de identificador de sujeto, o un conjunto completo de nombre, apellido, fecha de nacimiento y sexo.',
-            fr: "Associez une colonne d'identifiant, ou un ensemble complet de prénom, nom, date de naissance et sexe."
-          })
-        }
-      ]);
-      return;
-    }
-    const resolvedParsed: BulkParseResult = { ...parsed, mapping, mode };
+    const resolvedParsed: BulkParseResult = { ...parsed, mapping, mode: sourceMode };
     try {
       onResolved(await resolveSubjectIds(resolvedParsed, { groupName, maxSubjects: BULK_ASSIGNMENT_MAX_SUBJECTS }));
     } catch (err) {
@@ -101,7 +89,12 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
           <Button type="button" variant="outline" onClick={onBack}>
             {t({ en: 'Back', es: 'Atrás', fr: 'Retour' })}
           </Button>
-          <Button data-testid="bulk-confirm-mapping" disabled={!mode} type="button" onClick={() => void resolve()}>
+          <Button
+            data-testid="bulk-confirm-mapping"
+            disabled={!mode}
+            type="button"
+            onClick={mode ? () => void resolve(mode) : undefined}
+          >
             {t({ en: 'Continue', es: 'Continuar', fr: 'Continuer' })}
           </Button>
         </React.Fragment>

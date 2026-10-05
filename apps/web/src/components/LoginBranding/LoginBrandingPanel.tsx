@@ -17,7 +17,6 @@ import { BookOpenIcon, GithubIcon, LinkIcon } from 'lucide-react';
 import { config } from '@/config';
 import { getLoginGradient } from '@/utils/branding';
 import { getValueForLanguage } from '@/utils/language';
-import type { LocalizedValues } from '@/utils/language';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -131,7 +130,7 @@ type ResourcesSectionProps = {
   links: ResourceLink[];
   preview: boolean;
   tc: (slateClass: string) => null | string;
-  tl: (obj: LocalizedValues<string>) => string;
+  tl: (copy: { [L in Language]: string }) => string;
 };
 
 const ResourcesSection = ({ boldResourceLinks, fontSize, lang, links, preview, tc, tl }: ResourcesSectionProps) => (
@@ -147,7 +146,7 @@ const ResourcesSection = ({ boldResourceLinks, fontSize, lang, links, preview, t
       style={fontStyle(fontSize, preview)}
     >
       {links.map((link, index) => {
-        const linkLabel = getValueForLanguage(link.label ?? {}, lang)?.trim();
+        const linkLabel = getValueForLanguage(link.label, lang)?.trim();
         if (!linkLabel) return null;
         return (
           <a
@@ -174,7 +173,7 @@ type PanelFooterProps = {
   preview: boolean;
   showFooterLinks: boolean;
   tc: (slateClass: string) => null | string;
-  tl: (obj: LocalizedValues<string>) => string;
+  tl: (copy: { [L in Language]: string }) => string;
 };
 
 const PanelFooter = ({ preview, showFooterLinks, tc, tl }: PanelFooterProps) => (
@@ -226,7 +225,7 @@ export const LoginBrandingPanel = ({
   const { resolvedLanguage } = useTranslation();
   const lang = langOverride ?? resolvedLanguage;
 
-  const tl = (obj: LocalizedValues<string>): string => getValueForLanguage(obj, lang) ?? '';
+  const tl = (copy: { [L in Language]: string }): string => copy[lang];
 
   const derived = useMemo(() => {
     const instanceName = getValueForLanguage(branding?.instanceName ?? {}, lang)?.trim() ?? DEFAULT_INSTANCE_NAME;
