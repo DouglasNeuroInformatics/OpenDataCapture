@@ -43,8 +43,8 @@ const Editor = ({
 };
 
 /** Opens one of the add-row selects from the keyboard, since happy-dom dispatches no pointer capture. */
-const choose = (field: 'action' | 'subject', value: string) => {
-  fireEvent.keyDown(screen.getByTestId(`${field}-select-trigger`), { key: 'Enter' });
+const choose = (field: 'action' | 'scope' | 'subject', value: string, rowIndex = 0) => {
+  fireEvent.keyDown(screen.getAllByTestId(`${field}-select-trigger`)[rowIndex]!, { key: 'Enter' });
   fireEvent.click(screen.getByTestId(`${field}-select-item-${value}`));
 };
 
@@ -122,6 +122,31 @@ describe('UserPermissionsEditor', () => {
     choose('subject', 'User');
     expect(onDraftsChange.mock.lastCall?.[0]).toEqual([{ action: 'read', scope: 'group-1', subject: 'User' }]);
     expect(onPermissionsChange).not.toHaveBeenCalled();
+  });
+
+  it('should stage the group chosen as the scope, so a grant can be confined to any group the user belongs to', () => {
+    render(<Editor groups={groups} user={{ ...user, groupIds: ['group-1', 'group-2'] }} />);
+    choose('action', 'read');
+    choose('subject', 'Subject');
+    choose('scope', 'group-2');
+    expect(onDraftsChange.mock.lastCall?.[0]).toEqual([{ action: 'read', scope: 'group-2', subject: 'Subject' }]);
+  });
+
+  it('should leave the other drafts untouched when one row changes', () => {
+    render(<Editor groups={groups} user={user} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Add Permission' }));
+    choose('action', 'read', 1);
+    expect(onDraftsChange.mock.lastCall?.[0]).toEqual([{ scope: 'group-1' }, { action: 'read', scope: 'group-1' }]);
+  });
+
+  it('should show the raw group id for a grant scoped to a group it cannot name, so the grant is still identifiable', () => {
+    render(
+      <Editor
+        groups={groups}
+        user={{ ...user, additionalPermissions: [{ action: 'read', groupId: 'group-9', subject: 'Subject' }] }}
+      />
+    );
+    expect(screen.getByTestId('user-permission-scope').textContent).toBe('group-9');
   });
 
   it('should remove a draft without changing existing grants', () => {

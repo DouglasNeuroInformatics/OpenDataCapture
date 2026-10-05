@@ -1,5 +1,6 @@
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
-import type { Group } from '@opendatacapture/schemas/group';
+import type { Group, GroupSettings } from '@opendatacapture/schemas/group';
+import { generateSubjectHash } from '@opendatacapture/subject-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import axios from 'axios';
@@ -16,20 +17,26 @@ const get = vi.mocked(axios).get;
 
 const onSubmit = vi.fn();
 
-const groupWithIdPattern = (idValidationRegex: string): Group => ({
+const groupWithSettings = (settings: Partial<GroupSettings>): Group => ({
   accessibleInstrumentIds: [],
   createdAt: new Date('2026-01-01'),
   id: 'group-1',
   instrumentRepoIds: [],
   name: 'Group One',
-  settings: { defaultIdentificationMethod: 'CUSTOM_ID', idValidationRegex },
+  settings: { defaultIdentificationMethod: 'CUSTOM_ID', ...settings },
   subjectIds: [],
   type: 'CLINICAL',
   updatedAt: new Date('2026-01-02'),
   userIds: []
 });
 
-const renderForm = (customSubjectIds: string[], currentGroup: Group | null = null) => {
+const groupWithIdPattern = (idValidationRegex: string) => groupWithSettings({ idValidationRegex });
+
+const renderForm = (
+  customSubjectIds: string[],
+  currentGroup: Group | null = null,
+  method: 'CUSTOM_ID' | 'PERSONAL_INFO' = 'CUSTOM_ID'
+) => {
   render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <StartSessionForm
@@ -43,7 +50,7 @@ const renderForm = (customSubjectIds: string[], currentGroup: Group | null = nul
   );
   const form = screen.getByTestId('start-session-form');
   fireEvent.change(form.querySelector('[name="subjectIdentificationMethod"]')!, {
-    target: { value: 'CUSTOM_ID' }
+    target: { value: method }
   });
   return form;
 };
@@ -250,5 +257,133 @@ describe('StartSessionForm with an existing subject', () => {
     await waitFor(() => expect(dateOfBirthInput().disabled).toBe(false));
     expect(dateOfBirthInput().value).toBe('');
     expect(sexTrigger().disabled).toBe(false);
+  });
+});
+
+describe('StartSessionForm with a custom identifier', () => {
+  it('should attribute the session to the current group, so it is filed where the clinician is working', async () => {
+    const form = renderForm([], groupWithSettings({}));
+    typeIdentifier('abc');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit.mock.lastCall?.[0]).toMatchObject({ groupId: 'group-1', username: 'admin' });
+  });
+
+  it('should submit a null username when none is known, rather than an undefined one the API would reject', async () => {
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <StartSessionForm currentGroup={null} customSubjectIds={[]} readOnly={false} onSubmit={onSubmit} />
+      </QueryClientProvider>
+    );
+    const form = screen.getByTestId('start-session-form');
+    fireEvent.change(form.querySelector('[name="subjectIdentificationMethod"]')!, { target: { value: 'CUSTOM_ID' } });
+    typeIdentifier('abc');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit.mock.lastCall?.[0]).toMatchObject({ groupId: null, username: null });
+  });
+
+  it("should show the group's own message for an identifier its pattern rejects, in the clinician's language", async () => {
+    const form = renderForm(
+      [],
+      groupWithSettings({ idValidationRegex: '^[a-z]+$', idValidationRegexErrorMessage: { en: 'Lowercase only' } })
+    );
+    typeIdentifier('ABC');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual([subjectIdError('Lowercase only')]));
+  });
+
+  it("should log and accept an identifier when the group's pattern is not a valid regular expression, so a bad setting does not block every session", async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const form = renderForm([], groupWithIdPattern('['));
+    typeIdentifier('abc');
+    closeIdentifierPopup();
+    submit(form);
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(consoleError).toHaveBeenCalledWith(expect.any(SyntaxError));
+    consoleError.mockRestore();
+  });
+
+  it('should ignore a lookup that resolves after the identifier has moved on, so stale details never overwrite newer ones', async () => {
+    let resolveFirst!: (value: { data: { dateOfBirth: string; sex: string }; status: number }) => void;
+    get.mockReturnValueOnce(new Promise((resolve) => (resolveFirst = resolve)));
+    existingSubject({ dateOfBirth: '2000-01-01', sex: 'MALE' });
+    renderForm(['alpha', 'beta']);
+    pickIdentifier('alpha');
+    pickIdentifier('beta');
+    await waitFor(() => expect(dateOfBirthInput().value).toBe('2000-01-01'));
+    resolveFirst({ data: { dateOfBirth: '1990-06-15', sex: 'FEMALE' }, status: 200 });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(dateOfBirthInput().value).toBe('2000-01-01');
+  });
+});
+
+describe('StartSessionForm with personal information', () => {
+  const fillPersonalInfo = (form: HTMLElement, values: { dateOfBirth?: string; firstName?: string }) => {
+    if (values.firstName) {
+      fireEvent.change(form.querySelector('[name="subjectFirstName"]')!, { target: { value: values.firstName } });
+    }
+    fireEvent.change(form.querySelector('[name="subjectLastName"]')!, { target: { value: 'Doe' } });
+    if (values.dateOfBirth) {
+      // The date field commits what was typed only when it loses focus.
+      fireEvent.focus(dateOfBirthInput());
+      fireEvent.change(dateOfBirthInput(), { target: { value: values.dateOfBirth } });
+      fireEvent.blur(dateOfBirthInput());
+    }
+    fireEvent.change(form.querySelector('[name="subjectSex"]')!, { target: { value: 'FEMALE' } });
+  };
+
+  it('should identify the subject by a hash of their personal information, so no name is stored as an id', async () => {
+    const form = renderForm([], null, 'PERSONAL_INFO');
+    fillPersonalInfo(form, { dateOfBirth: '1990-06-15', firstName: 'Jane' });
+    submit(form);
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    const expectedId = await generateSubjectHash({
+      dateOfBirth: new Date('1990-06-15'),
+      firstName: 'Jane',
+      lastName: 'Doe',
+      sex: 'FEMALE'
+    });
+    expect(submittedSubjectId()).toBe(expectedId);
+  });
+
+  it('should require only the personal details left blank, so the clinician sees exactly what is missing', async () => {
+    const form = renderForm([], null, 'PERSONAL_INFO');
+    fillPersonalInfo(form, {});
+    submit(form);
+    await waitFor(() =>
+      expect(errorMessages()).toEqual([
+        { field: 'subjectFirstName', message: 'This field is required' },
+        { field: 'subjectDateOfBirth', message: 'This field is required' }
+      ])
+    );
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("should reject a date of birth younger than the group's minimum age", async () => {
+    const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
+    fillPersonalInfo(form, { dateOfBirth: '2020-01-01', firstName: 'Jane' });
+    submit(form);
+    await waitFor(() => expect(screen.getByText('Subject must be above age of 18')).toBeTruthy());
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("should accept a date of birth older than the group's minimum age", async () => {
+    const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
+    fillPersonalInfo(form, { dateOfBirth: '1990-06-15', firstName: 'Jane' });
+    submit(form);
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+  });
+});
+
+describe('StartSessionForm session type', () => {
+  it('should ask for the assessment date only for a retrospective session, since an in-person one happens today', () => {
+    const form = renderForm([]);
+    expect(screen.queryByText('Date Assessed')).toBeNull();
+    fireEvent.change(form.querySelector('[name="sessionType"]')!, { target: { value: 'RETROSPECTIVE' } });
+    expect(screen.getByText('Date Assessed')).toBeTruthy();
   });
 });
