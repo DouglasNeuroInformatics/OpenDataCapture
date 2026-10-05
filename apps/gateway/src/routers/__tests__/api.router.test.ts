@@ -147,7 +147,7 @@ describe('$CreateRemoteAssignmentsData', () => {
 });
 
 describe('GET /assignments', () => {
-  it("should filter by the subject named in the query, so the API sees only that subject's assignments", async () => {
+  it('should filter by the subject named in the query, so the API sees only the assignments of that subject', async () => {
     prisma.remoteAssignmentModel.findMany.mockResolvedValueOnce([{ id: 'assignment-1', status: 'OUTSTANDING' }]);
     const response = await request('GET', '/assignments?subjectId=subject-1');
     expect(await response.json()).toEqual([{ id: 'assignment-1', status: 'OUTSTANDING' }]);
