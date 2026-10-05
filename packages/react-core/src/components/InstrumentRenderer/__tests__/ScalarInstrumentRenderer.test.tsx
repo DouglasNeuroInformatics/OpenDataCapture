@@ -12,9 +12,7 @@ import type { NavigationBlockerProps } from '../../NavigationBlockerDialog';
  * validation schema is handed to it through `globalThis`, which is the one scope both share.
  */
 declare global {
-  // eslint-disable-next-line no-var
   var __testValidationSchema: z.ZodTypeAny;
-  // eslint-disable-next-line no-var
   var __testFileValidationSchema: z.ZodTypeAny;
 }
 

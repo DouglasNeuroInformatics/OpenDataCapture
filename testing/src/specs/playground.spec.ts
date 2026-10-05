@@ -96,7 +96,7 @@ export default defineInstrument({
 `;
 }
 
-// The first paint waits on the 11 MB esbuild download and the toolchain boot; the preview then
+// The first paint waits on the 13 MB esbuild download and the toolchain boot; the preview then
 // compiles on a 2 s poll, so the whole chain is slower than the suite's default expect timeout.
 const PREVIEW_TIMEOUT = 60_000;
 
