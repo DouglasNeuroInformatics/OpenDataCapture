@@ -23,7 +23,7 @@ const NO_TAILWIND_MERGE = {
 const NO_TESTS_IN_ROUTES = {
   group: ['vitest', '@testing-library/*'],
   message:
-    'The TanStack route generator scans every file under src/routes and warns on any that does not export a Route. Put tests in src/hooks/__tests__/, src/utils/__tests__/ or src/__tests__/.'
+    'The TanStack route generator scans every file under src/routes except __tests__/ folders, and warns on any that does not export a Route. Put the test in a __tests__/ folder beside the route.'
 };
 
 const NO_AXIOS_INSTANCE = {
@@ -115,6 +115,7 @@ export default config(
   },
   {
     files: ['apps/web/src/routes/**/*'],
+    ignores: ['apps/web/src/routes/**/__tests__/**'],
     rules: {
       'no-restricted-imports': [
         'error',

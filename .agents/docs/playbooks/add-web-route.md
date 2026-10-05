@@ -63,9 +63,10 @@ That error is the expected state of a correct new route, not a bug to fix. Never
    right `ability.can(...)`. `NavItem.url` is typed `url?: string`, so a wrong URL there compiles and 404s
    at runtime — copy it from your `createFileRoute` literal.
 
-9. **Put nothing else in `src/routes/`.** Tests go in `apps/web/src/__tests__/`, helpers in
-   `src/components/` or `src/utils/`. Importing `vitest` or `@testing-library/*` from `src/routes/`
-   is an eslint error.
+9. **Put nothing else in `src/routes/` but the route's `__tests__/` folder.** Helpers go in
+   `src/components/` or `src/utils/`. The generator skips `__tests__/` folders only because of
+   `routeFileIgnorePattern` in `apps/web/vite.config.ts`, and importing `vitest` or
+   `@testing-library/*` anywhere else under `src/routes/` is an eslint error.
 
 10. **Ask the user to regenerate the route tree** (it happens when they run `pnpm dev` for `web`).
     Steps 11 and 12, and `pnpm lint`, cannot pass before this.
@@ -75,7 +76,8 @@ That error is the expected state of a correct new route, not a bug to fix. Never
     `testing/src/generated/route.d.ts`. The new route literal does not exist for `getPageModel` or
     the `pageModels` map until this runs. You may run this one yourself.
 
-12. **Add the tests.** A unit test under `apps/web/src/__tests__/`, and an e2e test —
+12. **Add the tests.** A unit test named after the route file, in a `__tests__/` folder beside it
+    (`routes/_app/admin/__tests__/mail.test.tsx` tests `routes/_app/admin/mail.tsx`), and an e2e test —
     `.agents/docs/playbooks/add-e2e-test.md`, which covers the page object and registering it in
     `testing/src/support/fixtures.ts`.
 

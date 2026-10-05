@@ -30,10 +30,12 @@ The organizing principle is **layer folders, not feature folders**. There is no 
 `src/route-tree.ts` is generated and git-tracked. **Never hand-edit it and never run the
 generator** — the user does that manually after route changes.
 
-**Only route files may live under `src/routes/`.** The generator scans the directory
-indiscriminately and warns about any file that does not `export const Route`. Tests importing
-`vitest` or `@testing-library/*` from there is an eslint error. Put a test in `src/hooks/__tests__/`,
-`src/utils/__tests__/` or `src/__tests__/`, and a helper in `src/hooks/` or `src/utils/`.
+**Only route files and their `__tests__/` folders may live under `src/routes/`.** The generator
+scans the directory indiscriminately and warns about any file that does not `export const Route`;
+`routeFileIgnorePattern: '^__tests__$'` in `vite.config.ts` is the only thing keeping it out of the
+test folders. Importing `vitest` or `@testing-library/*` anywhere else under `src/routes/` is an
+eslint error. Put a route's test in a `__tests__/` folder beside it, and a helper in `src/hooks/` or
+`src/utils/`.
 
 Naming: `__root.tsx` is the root; `_app/` is a pathless layout (contributes no URL segment);
 `route.tsx` is a directory's layout; `index.tsx` is its `/`; `$param` is dynamic; ordinary routes are
