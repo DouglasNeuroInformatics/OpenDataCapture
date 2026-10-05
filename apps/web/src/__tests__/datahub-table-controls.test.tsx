@@ -10,10 +10,19 @@ import '@/services/i18n';
 
 type StoreGroup = { id: string; settings: { subjectIdDisplayLength?: number } };
 
+type Notification = { message?: string; type: 'error' | 'info' | 'success' | 'warning' };
+
+type AxiosGetConfig = {
+  meta?: { disableDefaultTimeout?: boolean };
+  params?: { groupId?: string };
+  responseType?: 'arraybuffer';
+  validateStatus?: (status: number) => boolean;
+};
+
 const mocks = vi.hoisted(() => ({
-  addNotification: vi.fn(),
-  axios: { get: vi.fn() },
-  download: vi.fn(),
+  addNotification: vi.fn<(notification: Notification) => void>(),
+  axios: { get: vi.fn<(url: string, config?: AxiosGetConfig) => Promise<unknown>>() },
+  download: vi.fn<(filename: string, data: string) => Promise<void>>(),
   downloadExcel: vi.fn(),
   navigate: vi.fn(),
   store: {
@@ -115,6 +124,15 @@ const exportAs = (option: string) => {
 
 const resolveExport = (entries: InstrumentRecordsExport) => {
   mocks.axios.get.mockResolvedValue({ data: pack(entries) });
+};
+
+const notified = (...types: Notification['type'][]) =>
+  mocks.addNotification.mock.calls.some(([notification]) => types.includes(notification.type));
+
+/** Runs out the export's 350ms minimum wait, then waits for the notification that ends the export. */
+const settleExport = async () => {
+  await vi.advanceTimersByTimeAsync(350);
+  await waitFor(() => expect(notified('success', 'error')).toBe(true));
 };
 
 beforeEach(() => {
@@ -266,13 +284,13 @@ describe('data hub subject lookup', () => {
     fireEvent.click(screen.getByTestId('identification-form-submit'));
   };
 
-  it('should treat a missing subject as an answer rather than a request error', () => {
+  it('should accept 200 and 404 but reject other statuses, so a missing subject is reported rather than thrown', async () => {
     mocks.axios.get.mockResolvedValue({ data: {}, status: 404 });
     renderDataHub();
     lookUp();
-    const { validateStatus } = mocks.axios.get.mock.calls[0]![1] as { validateStatus: (status: number) => boolean };
-    expect(mocks.axios.get.mock.calls[0]![0]).toBe('/v1/subjects/lookup-id');
-    expect([200, 404, 500].map(validateStatus)).toEqual([true, true, false]);
+    await waitFor(() => expect(notified('warning')).toBe(true));
+    const config = mocks.axios.get.mock.calls[0]?.[1];
+    expect([200, 404, 500].map((status) => config?.validateStatus?.(status))).toEqual([true, true, false]);
   });
 
   it('should warn and close the lookup when the subject does not exist', async () => {
@@ -288,19 +306,26 @@ describe('data hub subject lookup', () => {
     renderDataHub();
     lookUp();
     await waitFor(() => expect(mocks.navigate).toHaveBeenCalledWith({ to: './ROOT$bob/table' }));
+    expect(mocks.axios.get).toHaveBeenCalledWith('/v1/subjects/lookup-id', expect.anything());
     expect(mocks.addNotification).toHaveBeenCalledWith({ type: 'success' });
   });
 });
 
 describe('data hub export', () => {
   beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
-  it('should request the export of the current group as binary', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('should request the export of the current group as binary', async () => {
     resolveExport([exportEntry('bob')]);
     renderDataHub();
     exportAs('JSON');
+    await settleExport();
     expect(mocks.axios.get).toHaveBeenCalledWith('/v1/instrument-records/export', {
       meta: { disableDefaultTimeout: true },
       params: { groupId: 'group-1' },
@@ -308,11 +333,14 @@ describe('data hub export', () => {
     });
   });
 
-  it('should tell the user the export has started, since it can take a while', () => {
+  it('should tell the user the export has started, since it can take a while', async () => {
     resolveExport([exportEntry('bob')]);
     renderDataHub();
     exportAs('JSON');
-    expect(mocks.addNotification).toHaveBeenCalledWith({ message: 'Exporting entries, please wait...', type: 'info' });
+    await settleExport();
+    expect(mocks.addNotification.mock.calls[0]).toEqual([
+      { message: 'Exporting entries, please wait...', type: 'info' }
+    ]);
   });
 
   it('should export only the entries of subjects the table lists', async () => {
@@ -320,17 +348,18 @@ describe('data hub export', () => {
     renderDataHub();
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'bob' } });
     exportAs('JSON');
-    await waitFor(() => expect(mocks.download).toHaveBeenCalled());
-    const [filename, content] = mocks.download.mock.calls[0]! as [string, string];
+    await settleExport();
+    const [filename, content] = mocks.download.mock.calls[0] ?? [];
     expect(filename).toMatch(/^jdoe_.+\.json$/);
-    expect(JSON.parse(content)).toEqual([exportEntry('bob')]);
+    expect(JSON.parse(content ?? 'null')).toEqual([exportEntry('bob')]);
   });
 
   it('should download a CSV together with a README explaining its long format', async () => {
     resolveExport([exportEntry('bob')]);
     renderDataHub();
     exportAs('CSV');
-    await waitFor(() => expect(mocks.download).toHaveBeenCalledTimes(2));
+    await settleExport();
+    expect(mocks.download).toHaveBeenCalledTimes(2);
     expect(mocks.download.mock.calls[0]![0]).toBe('README.txt');
     expect(mocks.download.mock.calls[0]![1]).toMatch(/ultra-long format/);
     expect(mocks.download.mock.calls[1]![0]).toMatch(/^jdoe_.+\.csv$/);
@@ -341,30 +370,27 @@ describe('data hub export', () => {
     resolveExport([exportEntry('bob')]);
     renderDataHub();
     exportAs('Excel');
-    await waitFor(() =>
-      expect(mocks.downloadExcel).toHaveBeenCalledWith(expect.stringMatching(/^jdoe_.+\.xlsx$/), [exportEntry('bob')])
-    );
+    await settleExport();
+    expect(mocks.downloadExcel).toHaveBeenCalledWith(expect.stringMatching(/^jdoe_.+\.xlsx$/), [exportEntry('bob')]);
   });
 
   it('should confirm a successful export', async () => {
     resolveExport([exportEntry('bob')]);
     renderDataHub();
     exportAs('JSON');
-    await waitFor(() =>
-      expect(mocks.addNotification).toHaveBeenCalledWith({ message: 'Export successful', type: 'success' })
-    );
+    await settleExport();
+    expect(mocks.addNotification).toHaveBeenCalledWith({ message: 'Export successful', type: 'success' });
   });
 
   it('should fail the export when none of its entries belong to a listed subject', async () => {
     resolveExport([exportEntry('someone-else')]);
     renderDataHub();
     exportAs('JSON');
-    await waitFor(() =>
-      expect(mocks.addNotification).toHaveBeenCalledWith({
-        message: 'Export failed: No entries to export',
-        type: 'error'
-      })
-    );
+    await settleExport();
+    expect(mocks.addNotification).toHaveBeenCalledWith({
+      message: 'Export failed: No entries to export',
+      type: 'error'
+    });
     expect(mocks.download).not.toHaveBeenCalled();
   });
 
@@ -372,9 +398,8 @@ describe('data hub export', () => {
     mocks.axios.get.mockRejectedValue('network down');
     renderDataHub();
     exportAs('JSON');
-    await waitFor(() =>
-      expect(mocks.addNotification).toHaveBeenCalledWith({ message: 'Export failed', type: 'error' })
-    );
+    await settleExport();
+    expect(mocks.addNotification).toHaveBeenCalledWith({ message: 'Export failed', type: 'error' });
     expect(console.error).toHaveBeenCalledWith('network down');
   });
 });

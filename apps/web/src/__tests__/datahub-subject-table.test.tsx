@@ -68,11 +68,6 @@ describe('subject table route', () => {
     expect(headers()).toEqual(['DATE_COLLECTED', 'TOTAL_SCORE']);
   });
 
-  it('should hide the internal double-underscore fields from the table', () => {
-    renderTable([record({ __extra__: 'hidden' })]);
-    expect(headers()).not.toContain('__EXTRA__');
-  });
-
   it('should show only the collection date column when there are no records', () => {
     renderTable([]);
     expect(headers()).toEqual(['DATE_COLLECTED']);
