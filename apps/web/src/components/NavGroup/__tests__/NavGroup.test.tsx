@@ -6,10 +6,12 @@ import type { NavItem } from '@/hooks/useNavItems';
 
 import { NavGroup } from '../NavGroup';
 
-const mocks = vi.hoisted(() => ({
-  location: { pathname: '/', search: {} },
-  navigate: vi.fn()
-}));
+type MockLocation = { pathname: string; search?: { [key: string]: unknown } };
+
+const mocks = vi.hoisted(() => {
+  const location: MockLocation = { pathname: '/', search: {} };
+  return { location, navigate: vi.fn() };
+});
 
 vi.mock('@tanstack/react-router', () => ({
   useLocation: () => mocks.location,
