@@ -29,6 +29,7 @@ describe('createFileInstrumentContentStore', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it('should start with one empty upload slot per file group, ready to submit', () => {
@@ -99,7 +100,6 @@ describe('createFileInstrumentContentStore', () => {
     expect(store.getState().status).toBe('FAILED');
     expect(store.getState().uploadState).toBeNull();
     expect(errorSpy).toHaveBeenCalledWith(new Error('upload failed'));
-    errorSpy.mockRestore();
   });
 
   it('should ask for a range in the plural when the group allows a range', async () => {

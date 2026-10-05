@@ -56,6 +56,7 @@ describe('InteractiveContent', () => {
     Reflect.deleteProperty(HTMLElement.prototype, 'requestFullscreen');
     Reflect.deleteProperty(document, 'exitFullscreen');
     Reflect.deleteProperty(document, 'fullscreenElement');
+    vi.restoreAllMocks();
   });
 
   it('should render the iframe directly when there is at most one supported language', () => {
@@ -144,7 +145,6 @@ describe('InteractiveContent', () => {
     });
     expect(updateTheme).not.toHaveBeenCalled();
     expect(errorSpy).toHaveBeenCalled();
-    errorSpy.mockRestore();
   });
 
   it("should forward an 'addNotification' event's detail to the notifications store", () => {

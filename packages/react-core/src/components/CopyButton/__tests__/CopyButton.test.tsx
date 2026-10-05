@@ -11,7 +11,10 @@ describe('CopyButton', () => {
     });
   });
 
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
 
   it('should copy the given text to the clipboard when clicked', async () => {
     const { container } = render(<CopyButton text="copy me" />);
@@ -49,7 +52,6 @@ describe('CopyButton', () => {
     await waitFor(() => {
       expect(errorSpy).toHaveBeenCalled();
     });
-    errorSpy.mockRestore();
   });
 
   it('should not copy again while showing success, so repeated clicks do not rewrite the clipboard', async () => {

@@ -172,6 +172,9 @@ describe('SeriesInstrumentRenderer', () => {
   afterEach(() => {
     cleanup();
     NavigationBlocker.mockClear();
+    vi.restoreAllMocks();
+    useNotificationsStore.setState({ notifications: [] });
+    Reflect.deleteProperty(globalThis, '__testSeriesParams');
   });
 
   it('should present the next item of a skipProgress series with no answer filled in', async () => {
@@ -333,7 +336,6 @@ describe('SeriesInstrumentRenderer', () => {
         />
       )
     ).toThrow("Initial series index '2' must be less than length of items '2'");
-    vi.restoreAllMocks();
   });
 
   it('should refuse an item submission its validation schema rejects, rather than pass invalid data on', async () => {
@@ -354,7 +356,6 @@ describe('SeriesInstrumentRenderer', () => {
       ]);
     });
     expect(onSubmit).not.toHaveBeenCalled();
-    vi.restoreAllMocks();
   });
 
   it('should end the series early when its terminate predicate says so, marking the submission complete', async () => {
@@ -404,13 +405,16 @@ describe('SeriesInstrumentRenderer', () => {
   it('should render no content for an item of a kind a series cannot administer', async () => {
     globalThis.__testSeriesParams = { skipProgress: true };
     const fileItemBundle = createInteractiveItemBundle().replace("kind: 'INTERACTIVE'", "kind: 'FILE'");
-    render(<SeriesInstrumentRenderer target={createParamsTarget([fileItemBundle])} onSubmit={vi.fn()} />);
+    const { container } = render(
+      <SeriesInstrumentRenderer target={createParamsTarget([fileItemBundle])} onSubmit={vi.fn()} />
+    );
     fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    // The container's only child left is its step header once the content area renders nothing,
+    // which a spinner, form, iframe or error placeholder would each add to.
     await waitFor(() => {
-      expect(screen.queryByRole('button', { name: 'Begin' })).toBeNull();
+      expect(container.firstElementChild?.childElementCount).toBe(1);
     });
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    expect(document.querySelector('form, iframe')).toBeNull();
+    expect(container.querySelector('.animate-spinner, form, iframe')).toBeNull();
     expect(screen.queryByText('Failed to Load Instrument')).toBeNull();
   });
 });

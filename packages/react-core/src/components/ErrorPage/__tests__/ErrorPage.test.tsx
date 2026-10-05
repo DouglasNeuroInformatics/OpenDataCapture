@@ -11,14 +11,17 @@ describe('ErrorPage', () => {
     i18n.changeLanguage('en');
   });
 
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
 
   it('should log the error and show a generic heading for a plain error', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     render(<ErrorPage error={new Error('boom')} />);
     expect(screen.getByText('Unknown Error')).toBeTruthy();
     expect(errorSpy).toHaveBeenCalledWith(new Error('boom'));
-    errorSpy.mockRestore();
   });
 
   it('should show the status code and reason phrase for an axios error carrying a status', () => {
@@ -32,14 +35,12 @@ describe('ErrorPage', () => {
   it('should download the error report when the download button is clicked', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock');
-    const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
     render(<ErrorPage error={new Error('boom')} />);
     fireEvent.click(screen.getByText('Download Error Report'));
     await waitFor(() => {
       expect(createObjectURLSpy).toHaveBeenCalled();
     });
-    createObjectURLSpy.mockRestore();
-    revokeObjectURLSpy.mockRestore();
   });
 
   it('should write the same report the download offers to the clipboard, so it need not be downloaded to be shared', async () => {
@@ -52,7 +53,6 @@ describe('ErrorPage', () => {
       expect(screen.getByText('Copied')).toBeTruthy();
     });
     expect(JSON.parse(writeText.mock.calls[0]![0] as string)).toMatchObject({ message: 'boom' });
-    vi.unstubAllGlobals();
   });
 
   it('should report a failure to copy rather than appearing to have copied, since an insecure context has no clipboard', async () => {
@@ -63,7 +63,6 @@ describe('ErrorPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Copy Failed')).toBeTruthy();
     });
-    vi.unstubAllGlobals();
   });
 
   it('should offer the copy again once the mouse leaves, so a failed copy can be retried', async () => {
@@ -76,7 +75,6 @@ describe('ErrorPage', () => {
     });
     fireEvent.mouseLeave(screen.getByTestId('copy-error-report'));
     expect(screen.getByText('Copy Error Report')).toBeTruthy();
-    vi.unstubAllGlobals();
   });
 
   it('should reload the page when the reload button is clicked', () => {
@@ -85,6 +83,5 @@ describe('ErrorPage', () => {
     render(<ErrorPage error={new Error('boom')} />);
     fireEvent.click(screen.getByText('Reload Page'));
     expect(assignSpy).toHaveBeenCalledWith(window.location.origin);
-    assignSpy.mockRestore();
   });
 });

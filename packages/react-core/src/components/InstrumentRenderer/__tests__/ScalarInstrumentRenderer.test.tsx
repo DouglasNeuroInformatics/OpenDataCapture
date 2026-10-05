@@ -115,6 +115,8 @@ describe('ScalarInstrumentRenderer', () => {
   afterEach(() => {
     cleanup();
     NavigationBlocker.mockClear();
+    vi.restoreAllMocks();
+    useNotificationsStore.setState({ notifications: [] });
   });
 
   it('should show a spinner while the bundle is still being interpreted', () => {
@@ -229,7 +231,6 @@ describe('ScalarInstrumentRenderer', () => {
       ]);
     });
     expect(onSubmit).not.toHaveBeenCalled();
-    vi.restoreAllMocks();
   });
 
   it('should render no content for a bundle whose kind it has no content for', async () => {

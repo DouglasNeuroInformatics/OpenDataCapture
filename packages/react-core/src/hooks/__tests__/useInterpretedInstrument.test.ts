@@ -1,7 +1,7 @@
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
 import { renderHook, waitFor } from '@testing-library/react';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { useInterpretedInstrument } from '../useInterpretedInstrument';
 
@@ -26,6 +26,10 @@ describe('useInterpretedInstrument', () => {
   beforeAll(() => {
     i18n.init({ translations: {} });
     i18n.changeLanguage('en');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('should report LOADING until the bundle has been interpreted', () => {
@@ -82,7 +86,6 @@ describe('useInterpretedInstrument', () => {
       expect(errorSpy).toHaveBeenCalled();
     });
     expect(result.current).toMatchObject({ instrument: { details: { title: 'Fast' } }, status: 'DONE' });
-    errorSpy.mockRestore();
   });
 
   it('should recover from a bundle that fails to interpret, rather than reporting its error for the next one', async () => {
@@ -110,7 +113,6 @@ describe('useInterpretedInstrument', () => {
       expect(result.current.status).toBe('ERROR');
     });
     expect(result.current).toMatchObject({ error: { cause: 'not an Error instance' } });
-    vi.restoreAllMocks();
   });
 
   it('should report every language of a multilingual instrument as supported', async () => {
