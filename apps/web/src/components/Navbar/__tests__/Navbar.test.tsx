@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { ClipboardListIcon, DatabaseIcon, LayersIcon, UsersIcon } from 'lucide-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 
 import type { NavItem } from '@/hooks/useNavItems';
 
@@ -8,14 +9,21 @@ import { Navbar } from '../Navbar';
 
 import '@/services/i18n';
 
-const mocks = vi.hoisted(() => ({
-  isDesktop: false,
-  isGroupSwitcherVisible: false,
-  navigate: vi.fn(),
-  navItems: [] as NavItem[][],
-  search: {},
-  store: { currentSession: null as null | { id: string }, endSession: vi.fn() }
-}));
+const mocks = vi.hoisted(() => {
+  const navItems: NavItem[][] = [];
+  const store: { currentSession: null | { id: string }; endSession: Mock } = {
+    currentSession: null,
+    endSession: vi.fn()
+  };
+  return {
+    isDesktop: false,
+    isGroupSwitcherVisible: false,
+    navigate: vi.fn(),
+    navItems,
+    search: {},
+    store
+  };
+});
 
 vi.mock('@tanstack/react-router', () => ({
   useLocation: () => ({ pathname: window.location.pathname, search: mocks.search }),
@@ -162,6 +170,7 @@ describe('Navbar', () => {
   it('should close the sheet when the viewport grows to desktop size, so it does not linger beside the sidebar', () => {
     const { rerender } = render(<Navbar />);
     openMenu();
+    expect(isMenuOpen()).toBe(true);
     mocks.isDesktop = true;
     rerender(<Navbar />);
     expect(isMenuOpen()).toBe(false);

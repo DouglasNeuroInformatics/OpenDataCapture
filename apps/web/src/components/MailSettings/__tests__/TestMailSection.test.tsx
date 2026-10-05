@@ -95,7 +95,7 @@ describe('TestMailSection', () => {
     expect(lastNotification()?.message).toBe('Test email sent to admin@example.org');
   });
 
-  it('should explain a failed test in the reader language using the error code the server returned', async () => {
+  it('should explain a failed test using the error code the server returned', async () => {
     mocks.post.mockResolvedValue({ data: { error: 'AUTHENTICATION_FAILED', success: false } });
     renderSection();
     fireEvent.click(connectionButton());
