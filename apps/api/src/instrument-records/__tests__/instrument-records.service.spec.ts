@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
@@ -115,6 +115,10 @@ describe('InstrumentRecordsService', () => {
     sessionsService = moduleRef.get(SessionsService);
     subjectsService = moduleRef.get(SubjectsService);
     usersService = moduleRef.get(UsersService);
+  });
+
+  afterEach(() => {
+    vi.mocked(Worker).mockReset();
   });
 
   describe('deleteById', () => {
@@ -337,14 +341,22 @@ describe('InstrumentRecordsService', () => {
       expect(instrumentRecordModel.create).not.toHaveBeenCalled();
     });
 
-    it('should store the computed measures and connect the group when both apply', async () => {
+    it('should store the measures computed from the submitted data', async () => {
       const measures = { score: { kind: 'computed', label: 'Score', value: () => 1 } };
       instrumentsService.findById.mockResolvedValue({ ...mockFormInstrument, measures });
       instrumentMeasuresService.computeMeasures.mockReturnValueOnce({ score: 1 });
-      await instrumentRecordsService.create({ ...baseCreateData, groupId: 'group-1' });
+      await instrumentRecordsService.create(baseCreateData);
       expect(instrumentMeasuresService.computeMeasures).toHaveBeenCalledWith(measures, { answer: 1 });
       expect(instrumentRecordModel.create.mock.lastCall?.[0]).toMatchObject({
-        data: { computedMeasures: { score: 1 }, group: { connect: { id: 'group-1' } }, pending: false }
+        data: { computedMeasures: { score: 1 } }
+      });
+    });
+
+    it('should connect the record to the group it was collected in', async () => {
+      instrumentsService.findById.mockResolvedValue(mockFormInstrument as any);
+      await instrumentRecordsService.create({ ...baseCreateData, groupId: 'group-1' });
+      expect(instrumentRecordModel.create.mock.lastCall?.[0]).toMatchObject({
+        data: { group: { connect: { id: 'group-1' } }, pending: false }
       });
     });
 
@@ -943,7 +955,8 @@ describe('InstrumentRecordsService', () => {
         expect(worker.terminate).toHaveBeenCalledOnce();
       });
 
-      it('should not send a chunk to a worker that failed to initialize', async () => {
+      // Pins a reported defect: a failed INIT neither rejects nor terminates. Expected to change when the source is fixed.
+      it('should leave the export pending without sending a chunk when a worker fails to initialize', async () => {
         instrumentsService.findById.mockResolvedValueOnce({ id: 'instrument-1', internal: { edition: 1, name: 'X' } });
         const worker = useFakeWorker();
 
@@ -951,6 +964,7 @@ describe('InstrumentRecordsService', () => {
         await vi.waitFor(() => expect(worker.postMessage).toHaveBeenCalledOnce());
         worker.emit('message', { success: false });
 
+        await expect(Promise.race([result, Promise.resolve('pending')])).resolves.toBe('pending');
         expect(worker.postMessage).toHaveBeenCalledTimes(1);
         expect(worker.postMessage).toHaveBeenCalledWith({
           data: [{ edition: 1, id: 'instrument-1', name: 'X' }],
@@ -1132,7 +1146,8 @@ describe('InstrumentRecordsService', () => {
       });
     });
 
-    it('should keep an existing nested array when the update supplies one', async () => {
+    // Pins a reported defect: a submitted array is silently dropped. Expected to change when the source is fixed.
+    it('should ignore an array the update supplies for an existing array field', async () => {
       useRecord({ answers: [1, 2, 3] });
       useInstrument();
 
@@ -1179,7 +1194,9 @@ describe('InstrumentRecordsService', () => {
       });
     });
 
-    it('should scope the write to the records the caller may modify', async () => {
+    // Pins a reported defect: the PATCH route is gated on update, but the write is scoped by delete rules.
+    // Expected to change when the source is fixed.
+    it("should scope the write by the caller's delete rules", async () => {
       const ability = createAppAbility([
         { action: 'delete', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' }
       ]);

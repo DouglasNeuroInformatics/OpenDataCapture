@@ -371,12 +371,12 @@ describe('InstrumentReposService', () => {
       });
     });
 
-    it('should leave an instrument alone while its repo exists or when it carries no repo', async () => {
+    it.each([
+      { instrument: { id: 'i1', sourceRepoId: 'repoA', sourceRepoName: 'A' }, reason: 'while its repo exists' },
+      { instrument: { id: 'i2', sourceRepoId: null, sourceRepoName: null }, reason: 'when it carries no repo' }
+    ])('should leave an instrument alone $reason', async ({ instrument }) => {
       instrumentRepoModel.findMany.mockResolvedValueOnce([{ id: 'repoA', instrumentIds: [], name: 'A' }]);
-      instrumentModel.findMany.mockResolvedValueOnce([
-        { id: 'i1', sourceRepoId: 'repoA', sourceRepoName: 'A' },
-        { id: 'i2', sourceRepoId: null, sourceRepoName: null }
-      ]);
+      instrumentModel.findMany.mockResolvedValueOnce([instrument]);
 
       await internal.reconcileOrphanedInstruments();
 
@@ -468,6 +468,7 @@ describe('InstrumentReposService', () => {
       tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'odc-repos-spec-'));
       // os.tmpdir() reads TMPDIR, so every directory the import creates lands where the test can see it.
       vi.stubEnv('TMPDIR', tempRoot);
+      expect(os.tmpdir()).toBe(tempRoot);
       fetchMock = vi.fn<typeof fetch>();
       vi.stubGlobal('fetch', fetchMock);
       vi.mocked(bundle)
@@ -542,18 +543,23 @@ describe('InstrumentReposService', () => {
       );
     });
 
-    it('should remove its temporary directory whether or not the download succeeds', async () => {
-      const discoverSpy = vi.spyOn(internal, 'discoverInstrumentDirs');
+    it('should remove its temporary directory after a successful import', async () => {
       fetchMock.mockResolvedValueOnce(await zipball(instrumentFiles('forms', 'A')));
+
       await service.create({ url });
-      expect(discoverSpy.mock.lastCall?.[0].startsWith(tempRoot)).toBe(true);
+
+      expect(fs.readdirSync(tempRoot)).toStrictEqual([]);
+    });
+
+    it('should remove its temporary directory when the download fails', async () => {
       fetchMock.mockResolvedValue(new Response(null, { status: 500 }));
+
       await expect(service.create({ url })).rejects.toBeInstanceOf(BadGatewayException);
 
       expect(fs.readdirSync(tempRoot)).toStrictEqual([]);
     });
 
-    it('should bundle every discovered instrument, series last, and record provenance only on those it created', async () => {
+    it('should import the series after the scalars, because a series cannot be stored before its items', async () => {
       fetchMock.mockResolvedValueOnce(
         await zipball({
           ...instrumentFiles('series', 'S'),
@@ -561,20 +567,26 @@ describe('InstrumentReposService', () => {
           ...instrumentFiles('file', 'F')
         })
       );
-      instrumentsService.create
-        .mockResolvedValueOnce({ id: 'file-id' })
-        .mockResolvedValueOnce({ id: 'form-id' })
-        .mockResolvedValueOnce({ id: 'series-id' });
+      vi.mocked(bundle).mockImplementation(({ inputs }) => Promise.resolve(String(inputs[0]?.content)));
+      instrumentsService.create.mockImplementation(({ bundle }) => Promise.resolve({ id: bundle }));
 
       await service.create({ url });
 
-      expect(instrumentRepoModel.create.mock.lastCall?.[0].data.instrumentIds).toStrictEqual([
-        'file-id',
-        'form-id',
-        'series-id'
-      ]);
+      const instrumentIds = instrumentRepoModel.create.mock.lastCall?.[0].data.instrumentIds;
+      expect(instrumentIds).toHaveLength(3);
+      expect(instrumentIds?.at(-1)).toBe("export default 'S';");
+    });
+
+    it("should tag each instrument it creates with the repo's id and name", async () => {
+      fetchMock.mockResolvedValueOnce(
+        await zipball({ ...instrumentFiles('forms', 'A'), ...instrumentFiles('file', 'F') })
+      );
+      instrumentsService.create.mockResolvedValueOnce({ id: 'file-id' }).mockResolvedValueOnce({ id: 'form-id' });
+
+      await service.create({ url });
+
       expect(instrumentModel.update.mock.calls.map(([args]) => args)).toStrictEqual(
-        ['file-id', 'form-id', 'series-id'].map((id) => ({
+        ['file-id', 'form-id'].map((id) => ({
           data: { sourceRepoId: 'repo-1', sourceRepoName: 'repo' },
           where: { id }
         }))
@@ -625,22 +637,27 @@ describe('InstrumentReposService', () => {
       expect(instrumentRepoModel.create.mock.lastCall?.[0].data.instrumentIds).toStrictEqual(['b-id']);
     });
 
-    it('should read media as binary and skip files the bundler cannot load', async () => {
+    it('should read media as binary, so images reach the bundler intact', async () => {
       const image = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
       fetchMock.mockResolvedValueOnce(
-        await zipball({
-          ...instrumentFiles('forms', 'A'),
-          'lib/forms/A/logo.png': image,
-          'lib/forms/A/README.md': '# A'
-        })
+        await zipball({ ...instrumentFiles('forms', 'A'), 'lib/forms/A/logo.png': image })
       );
 
       await service.create({ url });
 
-      const inputs = vi.mocked(bundle).mock.lastCall?.[0].inputs;
-      expect(inputs).toHaveLength(2);
-      expect(inputs).toContainEqual({ content: "export default 'A';", name: 'index.ts' });
-      expect(inputs).toContainEqual({ content: image, name: 'logo.png' });
+      expect(vi.mocked(bundle).mock.lastCall?.[0].inputs).toContainEqual({ content: image, name: 'logo.png' });
+    });
+
+    it('should skip files the bundler cannot load', async () => {
+      fetchMock.mockResolvedValueOnce(
+        await zipball({ ...instrumentFiles('forms', 'A'), 'lib/forms/A/README.md': '# A' })
+      );
+
+      await service.create({ url });
+
+      expect(vi.mocked(bundle).mock.lastCall?.[0].inputs).toStrictEqual([
+        { content: "export default 'A';", name: 'index.ts' }
+      ]);
     });
 
     it('should skip an instrument directory with nothing to bundle', async () => {
