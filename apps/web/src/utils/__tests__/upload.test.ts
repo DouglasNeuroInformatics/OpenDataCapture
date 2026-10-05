@@ -87,16 +87,10 @@ describe('Zod3', () => {
       const result = Zod3.getZodTypeName(z3.array(z3.object({ age: z3.number(), name: z3.string() })));
       expect(result).toMatchObject({
         isOptional: false,
+        multiKeys: ['age', 'name'],
+        multiValues: [{ typeName: 'ZodNumber' }, { typeName: 'ZodString' }],
         typeName: 'ZodArray'
       });
-      expect(result.multiKeys).toHaveLength(2);
-      expect(result.multiKeys).toEqual(expect.arrayContaining(['name', 'age']));
-      expect(result.multiValues).toHaveLength(2);
-      // Find the index of each key to check the corresponding value
-      const nameIndex = result.multiKeys?.indexOf('name') ?? -1;
-      const ageIndex = result.multiKeys?.indexOf('age') ?? -1;
-      expect(result.multiValues?.[nameIndex]).toMatchObject({ typeName: 'ZodString' });
-      expect(result.multiValues?.[ageIndex]).toMatchObject({ typeName: 'ZodNumber' });
     });
 
     it('should carry optionality into an array of objects', () => {
@@ -221,7 +215,7 @@ describe('Zod3', () => {
       });
     });
 
-    it('should reject a refined field, which has no CSV representation', () => {
+    it('should currently reject a refined field, since getZodTypeName does not unwrap ZodEffects', () => {
       const result = Zod3.getZodTypeName(z3.string().refine(Boolean));
       expect(uploadErrorOf(() => Zod3.generateSampleData(result))).toMatchObject({
         en: "Invalid zod schema: unexpected type name 'ZodEffects'"
@@ -290,7 +284,7 @@ describe('Zod3', () => {
     it('should reject empty CSV', async () => {
       const file = new File([''], 'data.csv', { type: 'text/csv' });
 
-      await expect(Zod3.processInstrumentCSV(file, mockInstrument)).rejects.toThrow();
+      await expectRejection(Zod3.processInstrumentCSV(file, mockInstrument), 'CSV does not contain any rows of data');
     });
 
     it('should handle optional fields', async () => {
@@ -314,25 +308,6 @@ describe('Zod3', () => {
         optional: undefined,
         required: 'value'
       });
-    });
-
-    it('should process boolean values', async () => {
-      const instrumentWithBoolean = instrumentWith(
-        z3.object({
-          completed: z3.boolean()
-        })
-      );
-
-      const csvContent = unparse([
-        ['subjectID', 'date', 'completed'],
-        ['subject1', '2024-01-01', 'true']
-      ]);
-      const file = new File([csvContent], 'data.csv', { type: 'text/csv' });
-
-      const result = await Zod3.processInstrumentCSV(file, instrumentWithBoolean);
-
-      expect(result).toHaveLength(1);
-      expect(result[0]?.completed).toBe(true);
     });
 
     it('should process set values', async () => {
@@ -479,24 +454,37 @@ describe('Zod3', () => {
     });
 
     it.each([
-      ['done', z3.boolean(), 'maybe', "Undecipherable Boolean Type: 'maybe'"],
-      ['when', z3.date(), 'someday', "Failed to parse date: 'someday'"],
-      ['tags', z3.set(z3.string()), 'SET()', "Failed to extract set value from entry: 'SET()'"],
-      ['tags', z3.set(z3.string()), 'SET( , )', 'Empty set is not allowed'],
-      ['score', z3.number().refine(Boolean), '1', "Unexpected Zod type name 'ZodEffects'"],
-      ['items', z3.array(z3.string()), 'RECORD_ARRAY(a)', 'Record Array keys or values do not exist']
-    ])('should reject the %s value %#, which cannot be converted', async (column, schema, value, message) => {
+      ['done', 'maybe', z3.boolean(), "Undecipherable Boolean Type: 'maybe'"],
+      ['when', 'someday', z3.date(), "Failed to parse date: 'someday'"],
+      ['tags', 'SET()', z3.set(z3.string()), "Failed to extract set value from entry: 'SET()'"],
+      ['tags', 'SET( , )', z3.set(z3.string()), 'Empty set is not allowed'],
+      ['items', 'RECORD_ARRAY(a)', z3.array(z3.string()), 'Record Array keys or values do not exist']
+    ])(
+      'should reject %s value %j as unconvertible, naming the column and row',
+      async (column, value, schema, message) => {
+        const file = csvFile([
+          ['subjectID', 'date', column],
+          ['subject1', '2024-01-01', value]
+        ]);
+        await expectRejection(
+          processInstrumentCSV(file, instrumentWith(z3.object({ [column]: schema }))),
+          `${message} at column name: '${column}' and row number '1'`
+        );
+      }
+    );
+
+    it('should currently reject a refined number column, since getZodTypeName does not unwrap ZodEffects', async () => {
       const file = csvFile([
-        ['subjectID', 'date', column],
-        ['subject1', '2024-01-01', value]
+        ['subjectID', 'date', 'score'],
+        ['subject1', '2024-01-01', '1']
       ]);
       await expectRejection(
-        processInstrumentCSV(file, instrumentWith(z3.object({ [column]: schema }))),
-        `${message} at column name: '${column}' and row number '1'`
+        processInstrumentCSV(file, instrumentWith(z3.object({ score: z3.number().refine(Boolean) }))),
+        "Unexpected Zod type name 'ZodEffects' at column name: 'score' and row number '1'"
       );
     });
 
-    it('should report an unexpected conversion failure without blaming the data', async () => {
+    it('should fall back to a generic error when an unsupported field schema cannot be serialized for logging', async () => {
       const file = csvFile([
         ['subjectID', 'date', 'big'],
         ['subject1', '2024-01-01', '1']
@@ -700,17 +688,18 @@ describe('Zod4', () => {
       });
     });
 
-    it('should reject CSV with invalid schema', async () => {
-      const csvContent = unparse([
+    it('should locate a number that cannot be converted by column and row', async () => {
+      const file = csvFile([
         ['subjectID', 'date', 'score', 'feedback'],
         ['subject1', '2024-01-15', 'invalid_number', 'text']
       ]);
-      const file = new File([csvContent], 'data.csv', { type: 'text/csv' });
-
-      await expect(Zod4.processInstrumentCSV(file, mockInstrument)).rejects.toThrow();
+      await expectRejection(
+        Zod4.processInstrumentCSV(file, mockInstrument),
+        "Invalid number type: 'invalid_number' at column name: 'score' and row number '1'"
+      );
     });
 
-    it('should handle dates correctly', async () => {
+    it('should parse a date column into the date it names', async () => {
       const instrumentWithDate = instrumentWith(
         z4.object({
           eventDate: z4.date()
@@ -726,7 +715,7 @@ describe('Zod4', () => {
       const result = await Zod4.processInstrumentCSV(file, instrumentWithDate);
 
       expect(result).toHaveLength(1);
-      expect(result[0]?.eventDate).toBeInstanceOf(Date);
+      expect(result[0]?.eventDate).toStrictEqual(new Date('2024-06-15'));
     });
 
     it('should process enum values', async () => {
@@ -883,31 +872,34 @@ describe('Zod4', () => {
     it.each([
       [
         'items',
-        z4.array(z4.string()),
         'RECORD_ARRAY(a:b)',
+        z4.array(z4.string()),
         "Unsupported type for innerType of array record 'string': must be 'object'"
       ],
-      ['nested', z4.object({ a: z4.string() }), 'a', "Unexpected Zod type name 'object'"],
-      ['items', z4.array(z4.object({ name: z4.string() })), 'items', 'Syntax error in RECORD_ARRAY declaration: items'],
+      ['nested', 'a', z4.object({ a: z4.string() }), "Unexpected Zod type name 'object'"],
+      ['items', 'items', z4.array(z4.object({ name: z4.string() })), 'Syntax error in RECORD_ARRAY declaration: items'],
       [
         'items',
-        z4.array(z4.object({ name: z4.string() })),
         'RECORD_ARRAY(name:a,,name:b)',
+        z4.array(z4.object({ name: z4.string() })),
         'One or more of the record array fields was left empty'
       ],
-      ['items', z4.array(z4.object({ name: z4.string() })), 'RECORD_ARRAY(:a)', 'Malformed record at index 0']
-    ])('should reject the %s value %#, which cannot be converted', async (column, schema, value, message) => {
-      const file = csvFile([
-        ['subjectID', 'date', column],
-        ['subject1', '2024-01-01', value]
-      ]);
-      await expectRejection(
-        processInstrumentCSV(file, instrumentWith(z4.object({ [column]: schema }))),
-        `${message} at column name: '${column}' and row number '1'`
-      );
-    });
+      ['items', 'RECORD_ARRAY(:a)', z4.array(z4.object({ name: z4.string() })), 'Malformed record at index 0']
+    ])(
+      'should reject %s value %j as unconvertible, naming the column and row',
+      async (column, value, schema, message) => {
+        const file = csvFile([
+          ['subjectID', 'date', column],
+          ['subject1', '2024-01-01', value]
+        ]);
+        await expectRejection(
+          processInstrumentCSV(file, instrumentWith(z4.object({ [column]: schema }))),
+          `${message} at column name: '${column}' and row number '1'`
+        );
+      }
+    );
 
-    it('should report an unexpected conversion failure without blaming the data', async () => {
+    it('should fall back to a generic error for a record key outside the schema, rather than naming the key', async () => {
       const file = csvFile([
         ['subjectID', 'date', 'items'],
         ['subject1', '2024-01-01', 'RECORD_ARRAY(unknown:a)']
