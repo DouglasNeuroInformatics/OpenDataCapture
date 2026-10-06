@@ -186,9 +186,5 @@ Flag these rather than fixing them in passing — each one is load-bearing somew
   pnpm location; `@opendatacapture/api#db:generate` is therefore declared `cache: false` so a cache
   hit never restores an empty output set. Changing either half changes what a `db:generate` run
   produces.
-- `packages/instrument-bundler/vitest.config.ts` aliases `/runtime/v1` to
-  `packages/instrument-bundler/runtime/v1/dist`, a directory that does not exist. It is inert today:
-  the fixtures under `src/__tests__/repositories/` are read as raw strings and handed to the bundler,
-  never resolved by vitest. Do not rely on the alias.
 - Root `test` is `env-cmd vitest` but `test:coverage` is `vitest --coverage` with no `env-cmd`, so
   the two do not run under the same environment.
