@@ -17,21 +17,14 @@ import { AdminUserPage } from '../pages/_app/admin/users/$userId.page';
 import { ContactPage } from '../pages/_app/contact.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
 import { SubjectAssignmentsPage } from '../pages/_app/datahub/$subjectId/assignments.page';
-import { SubjectGraphPage } from '../pages/_app/datahub/$subjectId/graph.page';
-import { SubjectRecordDetailPage } from '../pages/_app/datahub/$subjectId/table/$recordId.page';
-import { SubjectDataTablePage } from '../pages/_app/datahub/$subjectId/table/index.page';
 import { DatahubPage } from '../pages/_app/datahub/index.page';
 import { GroupEmailTemplatesPage } from '../pages/_app/group/email-templates.page';
 import { GroupManagePage } from '../pages/_app/group/manage.page';
-import { RemoteAssignmentsPage } from '../pages/_app/group/remote-assignments.page';
 import { AccessibleInstrumentsPage } from '../pages/_app/instruments/accessible-instruments.page';
-import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { StartSessionPage } from '../pages/_app/session/start-session.page';
-import { UploadInstrumentPage } from '../pages/_app/upload/$instrumentId.page';
 import { UploadPage } from '../pages/_app/upload/index.page';
 import { UserPage } from '../pages/_app/user.page';
 import { LoginPage } from '../pages/auth/login.page';
-import { ResetPasswordPage } from '../pages/auth/reset-password.page';
 import { ApiClient } from './api-client';
 import { ADMIN } from './constants';
 import { baseURL } from './env';
@@ -50,22 +43,15 @@ const pageModels = {
   '/admin/settings': AdminSettingsPage,
   '/admin/users/$userId': AdminUserPage,
   '/auth/login': LoginPage,
-  '/auth/reset-password': ResetPasswordPage,
   '/contact': ContactPage,
   '/dashboard': DashboardPage,
   '/datahub': DatahubPage,
   '/datahub/$subjectId/assignments': SubjectAssignmentsPage,
-  '/datahub/$subjectId/graph': SubjectGraphPage,
-  '/datahub/$subjectId/table': SubjectDataTablePage,
-  '/datahub/$subjectId/table/$recordId': SubjectRecordDetailPage,
   '/group/email-templates': GroupEmailTemplatesPage,
   '/group/manage': GroupManagePage,
-  '/group/remote-assignments': RemoteAssignmentsPage,
   '/instruments/accessible-instruments': AccessibleInstrumentsPage,
-  '/session/remote-assignment': RemoteAssignmentPage,
   '/session/start-session': StartSessionPage,
   '/upload': UploadPage,
-  '/upload/$instrumentId': UploadInstrumentPage,
   '/user': UserPage
 } satisfies { [K in RouteTo]?: any };
 

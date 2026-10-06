@@ -42,9 +42,8 @@ run outside turbo — a bare `tsc`, `vitest`, storybook — does not.
 
 **Some breakage is known, documented, and deliberately left alone.** Before calling anything a new bug, read the
 `AGENTS.md` of the package that owns it — that is where these are recorded (the always-skipped development block in
-`packages/release-info`, `testing`'s `test:chrome` naming a Playwright project that does not exist), with the build-
-and test-infrastructure ones in the `Known warts` section of `.agents/docs/architecture/testing-strategy.md`. Name any
-you hit in your reply and leave it as it is.
+`packages/release-info`), with the build- and test-infrastructure ones in the `Known warts` section of
+`.agents/docs/architecture/testing-strategy.md`. Name any you hit in your reply and leave it as it is.
 
 ## Quiet and wrong
 

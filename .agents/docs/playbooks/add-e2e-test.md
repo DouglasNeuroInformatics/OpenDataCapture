@@ -32,10 +32,11 @@ Mongo replica set.
    (`testing/src/pages/auth/login.page.ts` is the example). Read
    `testing/src/pages/_app/session/start-session.page.ts` for the shape.
 
-4. **Register it in the `pageModels` map in `testing/src/support/fixtures.ts`**, keyed by the exact
-   route literal — e.g. `'/datahub/$subjectId/table': SubjectDataTablePage`. The map is
-   `satisfies { [K in RouteTo]?: any }`, so a key that is not a real route fails `tsc`. A page object
-   missing from the map is unreachable from a spec.
+4. **Register it in the `pageModels` map in `testing/src/support/fixtures.ts`** when the spec
+   navigates to it with `getPageModel`, keyed by the exact route literal — e.g.
+   `'/datahub/$subjectId/assignments': SubjectAssignmentsPage`. The map is
+   `satisfies { [K in RouteTo]?: any }`, so a key that is not a real route fails `tsc`. A page the
+   spec reaches by clicking through the app needs no entry; construct it with `new XPage(page)`.
 
 5. **Write the spec** at `testing/src/specs/<flow>.spec.ts`, importing from the fixtures module:
 
@@ -80,6 +81,3 @@ pnpm --filter @opendatacapture/testing test:e2e src/specs/<flow>.spec.ts  # one 
 pnpm --filter @opendatacapture/testing test:dev                           # Playwright UI mode
 pnpm test:e2e                                                             # whole suite, from repo root
 ```
-
-Ignore the `test:chrome` script: its `--project='*Desktop Chrome'` matches none of the four project
-names and errors immediately.

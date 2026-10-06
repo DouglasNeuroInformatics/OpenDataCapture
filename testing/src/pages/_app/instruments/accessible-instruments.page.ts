@@ -5,13 +5,11 @@ import { AppPage } from '../route.page';
 export class AccessibleInstrumentsPage extends AppPage {
   readonly instrumentShowcase: Locator;
   readonly kindFilter: Locator;
-  readonly pageHeader: Locator;
   readonly searchBar: Locator;
   readonly searchBox: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.pageHeader = page.getByTestId('page-header');
     this.instrumentShowcase = page.getByTestId('instrument-showcase');
     this.kindFilter = page.getByTestId('instrument-kind-filter');
     this.searchBar = page.getByTestId('instrument-search-bar');
@@ -21,12 +19,6 @@ export class AccessibleInstrumentsPage extends AppPage {
   /** Cards carry a content-hash testid, so match on the visible title instead. */
   instrumentCard(title: string): Locator {
     return this.instrumentShowcase.locator('[data-testid^="instrument-card-"]').filter({ hasText: title }).first();
-  }
-
-  async openInstrument(title: string): Promise<void> {
-    const card = this.instrumentCard(title);
-    await card.waitFor({ state: 'visible' });
-    await card.click();
   }
 
   async search(query: string): Promise<void> {
