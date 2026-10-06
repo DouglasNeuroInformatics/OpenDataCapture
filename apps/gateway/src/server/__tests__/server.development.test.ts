@@ -2,7 +2,7 @@ import { once } from 'events';
 import fs from 'fs';
 import type { Server } from 'http';
 
-import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { config } from '@/config';
 import type { RenderFunction } from '@/entry-server';
@@ -60,6 +60,12 @@ class TestDevelopmentServer extends DevelopmentServer {
 
 const openServers: Server[] = [];
 
+let createServerCalls: unknown[][];
+
+beforeAll(() => {
+  createServerCalls = [...createServer.mock.calls];
+});
+
 afterEach(async () => {
   await Promise.all(
     openServers.splice(0).map((httpServer) => {
@@ -78,7 +84,7 @@ afterAll(() => {
 
 describe('DevelopmentServer', () => {
   it('should create vite in middleware mode, so express stays in charge of the http server', () => {
-    expect(createServer).toHaveBeenCalledWith({ appType: 'custom', server: { middlewareMode: true } });
+    expect(createServerCalls).toStrictEqual([[{ appType: 'custom', server: { middlewareMode: true } }]]);
   });
 
   it('should mount the vite middlewares, so client assets are served with hot reload', async () => {
