@@ -361,7 +361,7 @@ export const LoginBrandingPanel = ({
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/25"
+        className="pointer-events-none absolute inset-0 bg-linear-to-r from-transparent via-transparent to-black/25"
       />
 
       <div className={cn('flex flex-1 flex-col', preview ? 'gap-4' : 'gap-8')}>

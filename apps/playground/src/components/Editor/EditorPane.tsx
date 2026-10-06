@@ -131,7 +131,7 @@ export const EditorPane = () => {
 
   return (
     <MonacoEditor
-      className="h-full min-h-[576px]"
+      className="h-full min-h-144"
       defaultLanguage={fileType satisfies 'css' | 'html' | 'javascript' | 'json' | 'typescript'}
       defaultValue={defaultFile.content}
       keepCurrentModel={true}

@@ -30,7 +30,7 @@ export const Layout = () => {
       >
         {groupSwitcherPosition === 'topbar' && isGroupSwitcherVisible && (
           <div className="bg-background/80 sticky top-0 z-20 hidden items-center justify-end px-4 py-2 backdrop-blur-lg md:flex md:h-16">
-            <GroupSwitcher className="w-[180px]" />
+            <GroupSwitcher className="w-45" />
           </div>
         )}
         <main className="container flex grow flex-col">

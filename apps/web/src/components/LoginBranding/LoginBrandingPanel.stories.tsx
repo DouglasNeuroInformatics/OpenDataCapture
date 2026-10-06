@@ -24,7 +24,7 @@ export const Default: Story = {
 export const Preview: Story = {
   args: {
     branding: baseBranding,
-    className: 'h-96 w-[36rem]',
+    className: 'h-96 w-xl',
     preview: true
   }
 };

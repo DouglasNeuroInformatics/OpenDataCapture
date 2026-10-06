@@ -34,17 +34,17 @@ export const Sidebar = () => {
 
   return (
     <div
-      className="flex h-screen w-[19rem] flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700"
+      className="flex h-screen w-76 flex-col bg-slate-900 px-3 py-2 text-slate-100 shadow-lg dark:border-r dark:border-slate-700"
       data-testid="sidebar"
     >
       <div data-testid="sidebar-branding-container" id="sidebar-branding-container">
         <Branding className="h-12" fontSize="md" logoVariant="light" />
       </div>
-      <hr className="my-2 h-[1px] border-none bg-slate-700" />
+      <hr className="my-2 h-px border-none bg-slate-700" />
       {groupSwitcherPosition === 'sidebar' && isGroupSwitcherVisible && (
         <div className="mb-2">
           <GroupSwitcher />
-          <hr className="mt-2 h-[1px] border-none bg-slate-700" />
+          <hr className="mt-2 h-px border-none bg-slate-700" />
         </div>
       )}
       <nav className="flex min-h-0 flex-1 scrollbar-none flex-col divide-y divide-slate-700 overflow-y-auto">
@@ -116,7 +116,7 @@ export const Sidebar = () => {
             initial={{ opacity: 0 }}
           >
             <h5 className="text-sm font-medium">{t('common.sessionInProgress')}</h5>
-            <hr className="my-1.5 h-[1px] border-none bg-slate-700" />
+            <hr className="my-1.5 h-px border-none bg-slate-700" />
             {isSubjectWithPersonalInfo(currentSession.subject!) ? (
               <div data-testid="current-session-info">
                 <p>
@@ -163,7 +163,7 @@ export const Sidebar = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      <hr className="my-1 h-[1px] border-none bg-slate-700" />
+      <hr className="my-1 h-px border-none bg-slate-700" />
       <div className="flex items-center justify-between py-2">
         <UserDropup />
         <div className="flex h-full items-center gap-2">

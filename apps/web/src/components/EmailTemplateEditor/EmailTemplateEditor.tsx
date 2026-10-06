@@ -104,7 +104,7 @@ export const EmailTemplateEditor = ({
           )}
         </div>
         <TextArea
-          className="min-h-[15rem]"
+          className="min-h-60"
           data-testid={`${idPrefix}-body`}
           id={`${idPrefix}-body`}
           readOnly={!onChange}
