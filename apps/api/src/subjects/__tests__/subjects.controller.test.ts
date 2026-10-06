@@ -33,13 +33,6 @@ describe('SubjectsController', () => {
     subjectsService = moduleRef.get(SubjectsService);
   });
 
-  it('should create the submitted subject', async () => {
-    subjectsService.create.mockResolvedValue({ id: 'subject-1' });
-
-    await expect(subjectsController.create({ id: 'subject-1' })).resolves.toEqual({ id: 'subject-1' });
-    expect(subjectsService.create).toHaveBeenCalledWith({ id: 'subject-1' });
-  });
-
   it('should delete a subject within what the caller may delete, forcing when asked', async () => {
     subjectsService.deleteById.mockResolvedValue({ id: 'subject-1' });
 

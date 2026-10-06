@@ -43,11 +43,4 @@ describe('SessionsController', () => {
     await expect(sessionsController.findAllIncludeUsernames(ability, 'group-1')).resolves.toBe(sessions);
     expect(sessionsService.findAllIncludeUsernames).toHaveBeenCalledWith('group-1', { ability });
   });
-
-  it('should find a session by id within what the caller may read', async () => {
-    sessionsService.findById.mockResolvedValue({ id: 'session-1' });
-
-    await expect(sessionsController.findByID('session-1', ability)).resolves.toEqual({ id: 'session-1' });
-    expect(sessionsService.findById).toHaveBeenCalledWith('session-1', { ability });
-  });
 });

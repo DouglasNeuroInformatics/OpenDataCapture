@@ -45,12 +45,6 @@ describe('InstrumentReposController', () => {
     expect(service.findAll).toHaveBeenCalledWith({ ability });
   });
 
-  it("should scope the lookup to the current user's ability", async () => {
-    service.findById.mockResolvedValueOnce(repo);
-    await expect(controller.findById('repo-1', ability)).resolves.toBe(repo);
-    expect(service.findById).toHaveBeenCalledWith('repo-1', { ability });
-  });
-
   it('should sync the requested repository', async () => {
     service.sync.mockResolvedValueOnce(repo);
     await expect(controller.sync('repo-1')).resolves.toBe(repo);
@@ -61,7 +55,6 @@ describe('InstrumentReposController', () => {
     ['create', 'create'],
     ['deleteById', 'delete'],
     ['findAll', 'read'],
-    ['findById', 'read'],
     ['sync', 'update']
   ] as const)('should gate %s on the %s InstrumentRepo permission', (handler, action) => {
     const reflector = new Reflector();

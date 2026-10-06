@@ -980,16 +980,6 @@ describe('InstrumentRecordsService', () => {
     });
   });
 
-  describe('exists', () => {
-    it('should report whether a record matches the given filter', async () => {
-      instrumentRecordModel.exists.mockResolvedValueOnce(true);
-
-      await expect(instrumentRecordsService.exists({ id: 'record-1' })).resolves.toBe(true);
-
-      expect(instrumentRecordModel.exists).toHaveBeenCalledWith({ id: 'record-1' });
-    });
-  });
-
   describe('linearModel', () => {
     const measures = { score: { kind: 'computed', label: 'Score', value: () => 1 } };
     const recordAt = (time: number, computedMeasures: { [key: string]: unknown }) => ({

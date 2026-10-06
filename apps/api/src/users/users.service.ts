@@ -127,17 +127,6 @@ export class UsersService {
     });
   }
 
-  /** Delete the user with the provided username, otherwise throws */
-  async deleteByUsername(username: string, { ability }: EntityOperationOptions = {}) {
-    const user = await this.findByUsername(username);
-    return this.userModel.delete({
-      omit: {
-        hashedPassword: true
-      },
-      where: { AND: [accessibleQuery(ability, 'delete', 'User')], id: user.id }
-    });
-  }
-
   async find({ groupId }: { groupId?: string } = {}, { ability }: EntityOperationOptions = {}) {
     return this.userModel.findMany({
       omit: {

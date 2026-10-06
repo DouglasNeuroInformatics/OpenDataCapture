@@ -153,12 +153,12 @@ describe('InstrumentsController', () => {
     expect(instrumentsService.findBundleById).toHaveBeenCalledWith('form-1', currentUser, 'group-1');
   });
 
-  it('should list instruments of the requested kind within the requested group', async () => {
+  it('should list instruments of the requested kind for the current user', async () => {
     const listed = [{ id: 'form-1', internal: { edition: 1, name: 'FORM_A' }, title: 'Form A' }];
     instrumentsService.list.mockResolvedValue(listed);
 
-    await expect(instrumentsController.list(currentUser, 'group-1', 'FORM')).resolves.toBe(listed);
-    expect(instrumentsService.list).toHaveBeenCalledWith({ kind: 'FORM' }, currentUser, 'group-1');
+    await expect(instrumentsController.list(currentUser, 'FORM')).resolves.toBe(listed);
+    expect(instrumentsService.list).toHaveBeenCalledWith({ kind: 'FORM' }, currentUser);
   });
 
   it('should archive on behalf of the current user, so the change is audited under their id', async () => {

@@ -14,12 +14,10 @@ type AppSubjects = 'all' | Subjects<AppSubjectModels>;
 
 type AppSubjectName = Extract<AppSubjects, string>;
 
-type AppSubjectModel = Extract<AppSubjects, object>;
-
 type AppAbilities = [AppAction, AppSubjects];
 
 type AppAbility = PureAbility<AppAbilities, PrismaQuery>;
 
 type Permission = RawRuleOf<PureAbility<[AppAction, AppSubjectName], PrismaQuery>>;
 
-export type { AppAbilities, AppAbility, AppAction, AppSubjectModel, AppSubjectModels, AppSubjectName, Permission };
+export type { AppAbilities, AppAbility, AppAction, AppSubjectModels, AppSubjectName, Permission };

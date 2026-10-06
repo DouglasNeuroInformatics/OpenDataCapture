@@ -151,16 +151,10 @@ describe('GatewayService', () => {
       url: 'https://gateway.example.org/assignments/assignment-1'
     };
 
-    it('should filter the remote assignments by the provided subject', async () => {
-      axiosRef.get.mockResolvedValueOnce(response(200, []));
-      await gatewayService.fetchRemoteAssignments({ subjectId: 'subject-1' });
-      expect(axiosRef.get).toHaveBeenCalledWith('/api/assignments', { params: { subjectId: 'subject-1' } });
-    });
-
-    it('should request every remote assignment when no subject is provided', async () => {
+    it('should request every remote assignment from the gateway', async () => {
       axiosRef.get.mockResolvedValueOnce(response(200, []));
       await gatewayService.fetchRemoteAssignments();
-      expect(axiosRef.get).toHaveBeenCalledWith('/api/assignments', { params: { subjectId: undefined } });
+      expect(axiosRef.get).toHaveBeenCalledWith('/api/assignments');
     });
 
     it('should return the remote assignments with their dates parsed', async () => {

@@ -94,12 +94,8 @@ export class GatewayService {
     return $MutateAssignmentResponseBody.parseAsync(response.data);
   }
 
-  async fetchRemoteAssignments({ subjectId }: { subjectId?: string } = {}): Promise<RemoteAssignment[]> {
-    const response = await this.httpService.axiosRef.get(`/api/assignments`, {
-      params: {
-        subjectId
-      }
-    });
+  async fetchRemoteAssignments(): Promise<RemoteAssignment[]> {
+    const response = await this.httpService.axiosRef.get('/api/assignments');
     if (response.status !== HttpStatus.OK) {
       throw new BadGatewayException(`Unexpected Status Code From Gateway: ${response.status}`, {
         cause: response.statusText

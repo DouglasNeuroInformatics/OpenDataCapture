@@ -125,6 +125,8 @@ const createRequestUser = (ability: AppAbility, groups: Group[] = []): RequestUs
   username: 'test-user'
 });
 
+const adminUser = createRequestUser(createAppAbility([{ action: 'manage', subject: 'all' }]));
+
 /** The series definition `createSeries` last handed to the bundler. */
 const bundledDefinition = (): unknown => {
   const content = vi.mocked(bundle).mock.lastCall?.[0].inputs[0]?.content;
@@ -199,22 +201,29 @@ describe('InstrumentsService', () => {
       const findSpy = vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries]);
       const createSpy = vi.spyOn(instrumentsService, 'create');
 
-      const result = await instrumentsService.createSeries({
-        details: { title: 'My New Series' },
-        groupId: 'group-1',
-        items: [
-          { edition: 1, name: 'FORM_A' },
-          { edition: 1, name: 'FORM_B' }
-        ],
-        language: 'en'
-      });
+      const result = await instrumentsService.createSeries(
+        {
+          details: { title: 'My New Series' },
+          groupId: 'group-1',
+          items: [
+            { edition: 1, name: 'FORM_A' },
+            { edition: 1, name: 'FORM_B' }
+          ],
+          language: 'en'
+        },
+        adminUser
+      );
 
       expect(result).toEqual({
         existingTitle: { en: 'Existing Series', fr: 'Série existante' },
         outcome: 'duplicate'
       });
-      expect(findSpy).toHaveBeenNthCalledWith(1, { seriesGroupId: 'group-1' }, {});
-      expect(findSpy).toHaveBeenNthCalledWith(2, { kind: 'SERIES', seriesGroupId: 'group-1' }, { ability: undefined });
+      expect(findSpy).toHaveBeenNthCalledWith(1, { seriesGroupId: 'group-1' }, { ability: adminUser.ability });
+      expect(findSpy).toHaveBeenNthCalledWith(
+        2,
+        { kind: 'SERIES', seriesGroupId: 'group-1' },
+        { ability: adminUser.ability }
+      );
       expect(createSpy).not.toHaveBeenCalled();
     });
 
@@ -222,15 +231,18 @@ describe('InstrumentsService', () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries]);
       const createSpy = vi.spyOn(instrumentsService, 'create').mockResolvedValue({ id: 'reordered-id' } as any);
 
-      const result = await instrumentsService.createSeries({
-        details: { title: 'Reordered Series' },
-        groupId: 'group-1',
-        items: [
-          { edition: 1, name: 'FORM_B' },
-          { edition: 1, name: 'FORM_A' }
-        ],
-        language: 'en'
-      });
+      const result = await instrumentsService.createSeries(
+        {
+          details: { title: 'Reordered Series' },
+          groupId: 'group-1',
+          items: [
+            { edition: 1, name: 'FORM_B' },
+            { edition: 1, name: 'FORM_A' }
+          ],
+          language: 'en'
+        },
+        adminUser
+      );
 
       expect(createSpy).toHaveBeenCalledWith({ bundle: '__BUNDLE__' }, { seriesGroupId: 'group-1' });
       expect(result).toEqual({ instrumentId: 'reordered-id', outcome: 'created' });
@@ -240,16 +252,19 @@ describe('InstrumentsService', () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries]);
       const createSpy = vi.spyOn(instrumentsService, 'create').mockResolvedValue({ id: 'new-id' } as any);
 
-      const result = await instrumentsService.createSeries({
-        confirmDuplicate: true,
-        details: { title: 'My New Series' },
-        groupId: 'group-1',
-        items: [
-          { edition: 1, name: 'FORM_A' },
-          { edition: 1, name: 'FORM_B' }
-        ],
-        language: 'en'
-      });
+      const result = await instrumentsService.createSeries(
+        {
+          confirmDuplicate: true,
+          details: { title: 'My New Series' },
+          groupId: 'group-1',
+          items: [
+            { edition: 1, name: 'FORM_A' },
+            { edition: 1, name: 'FORM_B' }
+          ],
+          language: 'en'
+        },
+        adminUser
+      );
 
       expect(createSpy).toHaveBeenCalledWith({ bundle: '__BUNDLE__' }, { seriesGroupId: 'group-1' });
       expect(result).toEqual({ instrumentId: 'new-id', outcome: 'created' });
@@ -259,15 +274,18 @@ describe('InstrumentsService', () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries]);
       const createSpy = vi.spyOn(instrumentsService, 'create').mockResolvedValue({ id: 'fresh-id' } as any);
 
-      const result = await instrumentsService.createSeries({
-        details: { title: 'Totally New' },
-        groupId: 'group-1',
-        items: [
-          { edition: 1, name: 'FORM_C' },
-          { edition: 1, name: 'FORM_D' }
-        ],
-        language: 'en'
-      });
+      const result = await instrumentsService.createSeries(
+        {
+          details: { title: 'Totally New' },
+          groupId: 'group-1',
+          items: [
+            { edition: 1, name: 'FORM_C' },
+            { edition: 1, name: 'FORM_D' }
+          ],
+          language: 'en'
+        },
+        adminUser
+      );
 
       expect(createSpy).toHaveBeenCalledWith({ bundle: '__BUNDLE__' }, { seriesGroupId: 'group-1' });
       expect(result).toEqual({ instrumentId: 'fresh-id', outcome: 'created' });
@@ -277,16 +295,19 @@ describe('InstrumentsService', () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
       vi.spyOn(instrumentsService, 'create').mockResolvedValue({ id: 'generated-id' } as any);
 
-      await instrumentsService.createSeries({
-        clientDetails: { instructions: ['Complete the instruments in order.'] },
-        details: { description: 'Optional description', title: 'Generated Series' },
-        groupId: 'group-1',
-        items: [
-          { edition: 2, name: 'FORM_B' },
-          { edition: 1, name: 'FORM_A' }
-        ],
-        language: 'en'
-      });
+      await instrumentsService.createSeries(
+        {
+          clientDetails: { instructions: ['Complete the instruments in order.'] },
+          details: { description: 'Optional description', title: 'Generated Series' },
+          groupId: 'group-1',
+          items: [
+            { edition: 2, name: 'FORM_B' },
+            { edition: 1, name: 'FORM_A' }
+          ],
+          language: 'en'
+        },
+        adminUser
+      );
 
       expect(bundle).toHaveBeenCalledTimes(1);
 
@@ -346,13 +367,16 @@ describe('InstrumentsService', () => {
       instrumentModel.exists.mockResolvedValue(false);
       instrumentModel.findMany.mockResolvedValue([{ id: 'hash:FORM_A-1' }, { id: 'hash:FORM_B-1' }] as any);
 
-      const result = await instrumentsService.createSeries({
-        confirmDuplicate: true,
-        details: { title: 'Stored Series' },
-        groupId: 'group-1',
-        items,
-        language: 'en'
-      });
+      const result = await instrumentsService.createSeries(
+        {
+          confirmDuplicate: true,
+          details: { title: 'Stored Series' },
+          groupId: 'group-1',
+          items,
+          language: 'en'
+        },
+        adminUser
+      );
 
       expect(virtualizationService.eval).toHaveBeenCalledWith('__BUNDLE__');
       expect(instrumentModel.exists).toHaveBeenCalledWith({ id });
@@ -397,16 +421,19 @@ describe('InstrumentsService', () => {
       instrumentModel.exists.mockResolvedValue(false);
       instrumentModel.findMany.mockResolvedValue([{ id: 'hash:FORM_A-1' }, { id: 'hash:FORM_B-1' }] as any);
 
-      await instrumentsService.createSeries({
-        confirmDuplicate: true,
-        details: { title: 'Uploaded Items' },
-        groupId: 'group-1',
-        items: [
-          { edition: 1, name: 'FORM_A' },
-          { edition: 1, name: 'FORM_B' }
-        ],
-        language: 'en'
-      });
+      await instrumentsService.createSeries(
+        {
+          confirmDuplicate: true,
+          details: { title: 'Uploaded Items' },
+          groupId: 'group-1',
+          items: [
+            { edition: 1, name: 'FORM_A' },
+            { edition: 1, name: 'FORM_B' }
+          ],
+          language: 'en'
+        },
+        adminUser
+      );
 
       const [{ where }] = instrumentModel.findMany.mock.calls.at(-1)!;
       expect(where.AND[0].OR).toContainEqual({ sourceRepoId: { isSet: false } });
@@ -417,15 +444,18 @@ describe('InstrumentsService', () => {
       const createSpy = vi.spyOn(instrumentsService, 'create');
 
       await expect(
-        instrumentsService.createSeries({
-          details: { title: 'existing series' },
-          groupId: 'group-1',
-          items: [
-            { edition: 1, name: 'FORM_X' },
-            { edition: 1, name: 'FORM_Y' }
-          ],
-          language: 'en'
-        })
+        instrumentsService.createSeries(
+          {
+            details: { title: 'existing series' },
+            groupId: 'group-1',
+            items: [
+              { edition: 1, name: 'FORM_X' },
+              { edition: 1, name: 'FORM_Y' }
+            ],
+            language: 'en'
+          },
+          adminUser
+        )
       ).rejects.toThrow(ConflictException);
       expect(createSpy).not.toHaveBeenCalled();
     });
@@ -434,15 +464,18 @@ describe('InstrumentsService', () => {
       const createSpy = vi.spyOn(instrumentsService, 'create');
 
       await expect(
-        instrumentsService.createSeries({
-          details: { title: '   ' },
-          groupId: 'group-1',
-          items: [
-            { edition: 1, name: 'FORM_X' },
-            { edition: 1, name: 'FORM_Y' }
-          ],
-          language: 'en'
-        })
+        instrumentsService.createSeries(
+          {
+            details: { title: '   ' },
+            groupId: 'group-1',
+            items: [
+              { edition: 1, name: 'FORM_X' },
+              { edition: 1, name: 'FORM_Y' }
+            ],
+            language: 'en'
+          },
+          adminUser
+        )
       ).rejects.toThrow(UnprocessableEntityException);
       expect(createSpy).not.toHaveBeenCalled();
     });
@@ -451,15 +484,18 @@ describe('InstrumentsService', () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
       vi.spyOn(instrumentsService, 'create').mockResolvedValue({ id: 'created-id' } as any);
 
-      await instrumentsService.createSeries({
-        details: { title: '  Padded Series  ' },
-        groupId: 'group-1',
-        items: [
-          { edition: 1, name: 'FORM_X' },
-          { edition: 1, name: 'FORM_Y' }
-        ],
-        language: 'en'
-      });
+      await instrumentsService.createSeries(
+        {
+          details: { title: '  Padded Series  ' },
+          groupId: 'group-1',
+          items: [
+            { edition: 1, name: 'FORM_X' },
+            { edition: 1, name: 'FORM_Y' }
+          ],
+          language: 'en'
+        },
+        adminUser
+      );
 
       expect(bundledDefinition()).toMatchObject({ details: { title: 'Padded Series' } });
     });
@@ -490,13 +526,16 @@ describe('InstrumentsService', () => {
       instrumentModel.findMany.mockResolvedValue([{ id: 'hash:FORM_A-1' }] as any);
 
       await expect(
-        instrumentsService.createSeries({
-          confirmDuplicate: true,
-          details: { title: 'S' },
-          groupId: 'group-1',
-          items,
-          language: 'en'
-        })
+        instrumentsService.createSeries(
+          {
+            confirmDuplicate: true,
+            details: { title: 'S' },
+            groupId: 'group-1',
+            items,
+            language: 'en'
+          },
+          adminUser
+        )
       ).rejects.toThrow(UnprocessableEntityException);
       expect(instrumentModel.create).not.toHaveBeenCalled();
     });
@@ -527,13 +566,16 @@ describe('InstrumentsService', () => {
       instrumentModel.exists.mockResolvedValue(false);
       instrumentModel.findMany.mockResolvedValue([{ id: 'hash:FORM_A-1' }, { id: 'hash:FORM_B-1' }] as any);
 
-      await instrumentsService.createSeries({
-        confirmDuplicate: true,
-        details: { title: 'S' },
-        groupId: 'group-1',
-        items,
-        language: 'en'
-      });
+      await instrumentsService.createSeries(
+        {
+          confirmDuplicate: true,
+          details: { title: 'S' },
+          groupId: 'group-1',
+          items,
+          language: 'en'
+        },
+        adminUser
+      );
 
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
         select: { id: true },
@@ -549,15 +591,18 @@ describe('InstrumentsService', () => {
       groupModel.findFirst.mockResolvedValue(null);
 
       await expect(
-        instrumentsService.createSeries({
-          details: { title: 'Inaccessible Group Series' },
-          groupId: 'group-2',
-          items: [
-            { edition: 1, name: 'FORM_A' },
-            { edition: 1, name: 'FORM_B' }
-          ],
-          language: 'en'
-        })
+        instrumentsService.createSeries(
+          {
+            details: { title: 'Inaccessible Group Series' },
+            groupId: 'group-2',
+            items: [
+              { edition: 1, name: 'FORM_A' },
+              { edition: 1, name: 'FORM_B' }
+            ],
+            language: 'en'
+          },
+          adminUser
+        )
       ).rejects.toThrow(NotFoundException);
       expect(instrumentModel.create).not.toHaveBeenCalled();
     });
@@ -743,15 +788,33 @@ describe('InstrumentsService', () => {
       await expect(instrumentsService.findInfo({}, currentUser, 'group-2')).rejects.toThrow(ForbiddenException);
       expect(instrumentModel.findMany).not.toHaveBeenCalled();
     });
+
+    it('narrows the owned series to a requested group the current user belongs to', async () => {
+      const ability = createAppAbility([{ action: 'read', subject: 'Instrument' }]);
+      const currentUser = createRequestUser(ability, [createGroup('group-1'), createGroup('group-2')]);
+      instrumentModel.findMany.mockResolvedValue([]);
+
+      await instrumentsService.findInfo({}, currentUser, 'group-2');
+
+      expect(instrumentModel.findMany.mock.lastCall?.[0]).toMatchObject({
+        where: {
+          AND: expect.arrayContaining([
+            {
+              OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }, { seriesGroupId: { in: ['group-2'] } }]
+            }
+          ])
+        }
+      });
+    });
   });
 
   describe('deleteById', () => {
     it('throws when the instrument does not exist', async () => {
       instrumentModel.findFirst.mockResolvedValue(null);
-      await expect(instrumentsService.deleteById('missing')).rejects.toThrow(NotFoundException);
+      await expect(instrumentsService.deleteById('missing', adminUser)).rejects.toThrow(NotFoundException);
       expect(instrumentModel.findFirst).toHaveBeenCalledWith({
         where: {
-          AND: [{}],
+          AND: [accessibleQuery(adminUser.ability, 'delete', 'Instrument')],
           id: 'missing'
         }
       });
@@ -764,7 +827,7 @@ describe('InstrumentsService', () => {
         value: { internal: { edition: 1, name: 'FORM_A' }, kind: 'FORM' }
       } as any);
 
-      await expect(instrumentsService.deleteById('scalar')).rejects.toThrow(ForbiddenException);
+      await expect(instrumentsService.deleteById('scalar', adminUser)).rejects.toThrow(ForbiddenException);
       expect(instrumentModel.delete).not.toHaveBeenCalled();
     });
 
@@ -777,7 +840,7 @@ describe('InstrumentsService', () => {
       // Records collected through a series carry it in seriesInstrumentId (never as their instrumentId).
       instrumentRecordModel.count.mockResolvedValue(3);
 
-      await expect(instrumentsService.deleteById('target')).rejects.toThrow(ForbiddenException);
+      await expect(instrumentsService.deleteById('target', adminUser)).rejects.toThrow(ForbiddenException);
       expect(instrumentRecordModel.count).toHaveBeenCalledWith({
         where: { OR: [{ instrumentId: 'target' }, { seriesInstrumentId: 'target' }] }
       });
@@ -795,7 +858,7 @@ describe('InstrumentsService', () => {
       instrumentRecordModel.count.mockResolvedValue(0);
       assignmentModel.count.mockResolvedValue(1);
 
-      await expect(instrumentsService.deleteById('target')).rejects.toThrow(ForbiddenException);
+      await expect(instrumentsService.deleteById('target', adminUser)).rejects.toThrow(ForbiddenException);
       expect(assignmentModel.count).toHaveBeenCalledWith({ where: { instrumentId: 'target' } });
       expect(instrumentModel.delete).not.toHaveBeenCalled();
     });
@@ -809,7 +872,7 @@ describe('InstrumentsService', () => {
       instrumentRecordModel.count.mockResolvedValue(0);
       groupModel.findMany.mockResolvedValue([{ accessibleInstrumentIds: ['other', 'target'], id: 'g1' }]);
 
-      const result = await instrumentsService.deleteById('target');
+      const result = await instrumentsService.deleteById('target', adminUser);
 
       expect(groupModel.update).toHaveBeenCalledWith({
         data: { accessibleInstrumentIds: { set: ['other'] } },
@@ -828,7 +891,7 @@ describe('InstrumentsService', () => {
       instrumentRecordModel.count.mockResolvedValue(0);
       groupModel.findMany.mockResolvedValue([]);
 
-      await instrumentsService.deleteById('target');
+      await instrumentsService.deleteById('target', adminUser);
 
       // Checking the kind populates the cache, so a delete always leaves an entry behind to clean up.
       expect(instanceCache.has('target')).toBe(false);
@@ -841,7 +904,7 @@ describe('InstrumentsService', () => {
         value: { internal: { edition: 1, name: 'FORM_A' }, kind: 'FORM' }
       } as any);
 
-      await expect(instrumentsService.deleteById('scalar')).rejects.toThrow(ForbiddenException);
+      await expect(instrumentsService.deleteById('scalar', adminUser)).rejects.toThrow(ForbiddenException);
 
       expect(instanceCache.has('scalar')).toBe(true);
     });
@@ -858,12 +921,12 @@ describe('InstrumentsService', () => {
     });
 
     it('should return only the latest edition of each instrument by default', async () => {
-      const result = await instrumentsService.findInfo();
+      const result = await instrumentsService.findInfo({}, adminUser);
       expect(result.map((info) => info.id)).toEqual(['id-2']);
     });
 
     it('should return every edition when allEditions is set', async () => {
-      const result = await instrumentsService.findInfo({ allEditions: true });
+      const result = await instrumentsService.findInfo({ allEditions: true }, adminUser);
       expect(result.map((info) => info.id)).toEqual(['id-1', 'id-2']);
     });
 
@@ -881,7 +944,7 @@ describe('InstrumentsService', () => {
         { id: 'shared', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
       ]);
 
-      const result = await instrumentsService.findInfo();
+      const result = await instrumentsService.findInfo({}, adminUser);
 
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
         select: {
@@ -909,7 +972,7 @@ describe('InstrumentsService', () => {
         { createdAt, id: 'series-1', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
       ]);
 
-      const result = await instrumentsService.findInfo();
+      const result = await instrumentsService.findInfo({}, adminUser);
 
       expect(result).toMatchObject([{ createdAt, id: 'series-1' }]);
     });
@@ -920,7 +983,7 @@ describe('InstrumentsService', () => {
         { createdAt, id: 'id-2', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
       ]);
 
-      const result = await instrumentsService.findInfo();
+      const result = await instrumentsService.findInfo({}, adminUser);
 
       expect(result).toMatchObject([{ createdAt, id: 'id-2' }]);
     });
@@ -937,7 +1000,7 @@ describe('InstrumentsService', () => {
         { archivedAt: null, id: 'active', seriesGroupId: null, sourceRepoId: null, sourceRepoName: null }
       ]);
 
-      const result = await instrumentsService.findInfo();
+      const result = await instrumentsService.findInfo({}, adminUser);
 
       expect(result).toMatchObject([
         { archivedAt, id: 'archived' },
@@ -953,7 +1016,7 @@ describe('InstrumentsService', () => {
       ]);
       instrumentModel.findMany.mockResolvedValue([]);
 
-      const result = await instrumentsService.findInfo();
+      const result = await instrumentsService.findInfo({}, adminUser);
 
       expect(result).toMatchObject([{ createdAt: null, id: 'series-1' }]);
     });
@@ -1178,7 +1241,7 @@ describe('InstrumentsService', () => {
   });
 
   describe('count', () => {
-    it('should count the instruments matching the query', async () => {
+    it('should count every instrument', async () => {
       const find = vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries, formInstance('FORM_A', 1)]);
 
       await expect(instrumentsService.count()).resolves.toBe(2);
@@ -1286,23 +1349,18 @@ describe('InstrumentsService', () => {
     });
 
     it('should summarize each instrument by id, internal name and title', async () => {
-      await expect(instrumentsService.list()).resolves.toEqual([
+      await expect(instrumentsService.list({}, adminUser)).resolves.toEqual([
         { id: 'hash:FORM_A-1', internal: { edition: 1, name: 'FORM_A' }, title: 'FORM_A' }
       ]);
     });
 
-    it('should not narrow the listing to any group when there is no current user', async () => {
-      await instrumentsService.list();
-      expect(find).toHaveBeenCalledWith({}, { ability: undefined }, undefined);
-    });
-
-    it('should narrow the listing to a requested group the current user belongs to', async () => {
+    it("should narrow the listing to the current user's groups", async () => {
       const ability = createAppAbility([{ action: 'read', subject: 'Instrument' }]);
       const currentUser = createRequestUser(ability, [createGroup('group-1'), createGroup('group-2')]);
 
-      await instrumentsService.list({ kind: 'FORM' }, currentUser, 'group-2');
+      await instrumentsService.list({ kind: 'FORM' }, currentUser);
 
-      expect(find).toHaveBeenCalledWith({ kind: 'FORM' }, { ability }, ['group-2']);
+      expect(find).toHaveBeenCalledWith({ kind: 'FORM' }, { ability }, ['group-1', 'group-2']);
     });
   });
 
@@ -1310,7 +1368,7 @@ describe('InstrumentsService', () => {
     it('should not query stored metadata when no instrument matches', async () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
 
-      await expect(instrumentsService.findInfo()).resolves.toEqual([]);
+      await expect(instrumentsService.findInfo({}, adminUser)).resolves.toEqual([]);
       expect(instrumentModel.findMany).not.toHaveBeenCalled();
     });
 
@@ -1321,7 +1379,7 @@ describe('InstrumentsService', () => {
         { id: 'hash:FORM_B-1', sourceRepoId: 'repo-2', sourceRepoName: null }
       ]);
 
-      await expect(instrumentsService.findInfo()).resolves.toMatchObject([
+      await expect(instrumentsService.findInfo({}, adminUser)).resolves.toMatchObject([
         { id: 'hash:FORM_A-1', sourceRepo: { id: 'repo-1', name: 'Clinic Repo' } },
         { id: 'hash:FORM_B-1', sourceRepo: { id: 'repo-2', name: null } }
       ]);
@@ -1331,7 +1389,7 @@ describe('InstrumentsService', () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([formInstance('FORM_A', 2), formInstance('FORM_A', 1)]);
       instrumentModel.findMany.mockResolvedValue([]);
 
-      const result = await instrumentsService.findInfo();
+      const result = await instrumentsService.findInfo({}, adminUser);
 
       expect(result.map(({ id }) => id)).toEqual(['hash:FORM_A-2']);
     });
@@ -1344,7 +1402,7 @@ describe('InstrumentsService', () => {
       ]);
       instrumentModel.findMany.mockResolvedValue([]);
 
-      const result = await instrumentsService.findInfo();
+      const result = await instrumentsService.findInfo({}, adminUser);
 
       expect(result.find(({ id }) => id === existingSeries.id)).toMatchObject({
         seriesItems: [{ id: 'hash:FORM_A-1' }, { id: 'hash:FORM_B-1' }]
@@ -1355,7 +1413,7 @@ describe('InstrumentsService', () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([formInstance('FORM_A', 1), existingSeries]);
       instrumentModel.findMany.mockResolvedValue([]);
 
-      const result = await instrumentsService.findInfo();
+      const result = await instrumentsService.findInfo({}, adminUser);
 
       expect(result.find(({ id }) => id === existingSeries.id)).toMatchObject({
         seriesItems: [{ id: 'hash:FORM_A-1' }]
@@ -1394,12 +1452,15 @@ describe('InstrumentsService', () => {
     it('should tag a multilingual series in each of its languages', async () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
 
-      await instrumentsService.createSeries({
-        details: { title: { en: 'Series', fr: 'Série' } },
-        groupId: 'group-1',
-        items,
-        language: ['en', 'fr']
-      });
+      await instrumentsService.createSeries(
+        {
+          details: { title: { en: 'Series', fr: 'Série' } },
+          groupId: 'group-1',
+          items,
+          language: ['en', 'fr']
+        },
+        adminUser
+      );
 
       expect(bundledDefinition()).toMatchObject({ tags: { en: ['Series'], fr: ['Série'] } });
     });
@@ -1407,24 +1468,30 @@ describe('InstrumentsService', () => {
     it('should trim every language of a multilingual title before storing it', async () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
 
-      await instrumentsService.createSeries({
-        details: { title: { en: '  Series ', fr: ' Série  ' } },
-        groupId: 'group-1',
-        items,
-        language: ['en', 'fr']
-      });
+      await instrumentsService.createSeries(
+        {
+          details: { title: { en: '  Series ', fr: ' Série  ' } },
+          groupId: 'group-1',
+          items,
+          language: ['en', 'fr']
+        },
+        adminUser
+      );
 
       expect(bundledDefinition()).toMatchObject({ details: { title: { en: 'Series', fr: 'Série' } } });
     });
 
     it('should name the language whose title is blank, so the author knows which to fill in', async () => {
       await expect(
-        instrumentsService.createSeries({
-          details: { title: { en: 'Series', fr: '   ' } },
-          groupId: 'group-1',
-          items,
-          language: ['en', 'fr']
-        })
+        instrumentsService.createSeries(
+          {
+            details: { title: { en: 'Series', fr: '   ' } },
+            groupId: 'group-1',
+            items,
+            language: ['en', 'fr']
+          },
+          adminUser
+        )
       ).rejects.toThrowError(new UnprocessableEntityException("Instrument title cannot be blank for language 'fr'"));
     });
 
@@ -1432,19 +1499,20 @@ describe('InstrumentsService', () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([formInstance('FORM_A', 1)]);
 
       await expect(
-        instrumentsService.createSeries({ details: { title: 'Series' }, groupId: 'group-1', items, language: 'en' })
+        instrumentsService.createSeries(
+          { details: { title: 'Series' }, groupId: 'group-1', items, language: 'en' },
+          adminUser
+        )
       ).resolves.toEqual({ instrumentId: 'created-id', outcome: 'created' });
     });
   });
 
   describe('updateSeriesArchive (audit titles)', () => {
-    const currentUser = createRequestUser(createAppAbility([{ action: 'manage', subject: 'all' }]));
-
     const archiveSeriesTitled = async (title: unknown) => {
       instrumentModel.findFirst.mockResolvedValue({ archivedAt: null, bundle: '__BUNDLE__', id: 'target' });
       virtualizationService.eval.mockReturnValue(okAsync({ ...existingSeries, details: { title } }));
       instrumentModel.update.mockResolvedValue({ archivedAt: new Date(), id: 'target' });
-      await instrumentsService.updateSeriesArchive('target', { isArchived: true }, currentUser);
+      await instrumentsService.updateSeriesArchive('target', { isArchived: true }, adminUser);
       return auditLogger.log.mock.lastCall?.[2].metadata;
     };
 

@@ -145,26 +145,6 @@ describe('UsersService', () => {
     });
   });
 
-  describe('deleteByUsername', () => {
-    it("should delete the found user's record within the caller's delete scope", async () => {
-      userModel.findFirst.mockResolvedValue({ id: 'user-1', username: 'jane.doe' });
-      userModel.delete.mockResolvedValue({ id: 'user-1' });
-      await expect(usersService.deleteByUsername('jane.doe', { ability: admin.ability })).resolves.toEqual({
-        id: 'user-1'
-      });
-      expect(userModel.delete.mock.lastCall?.[0].where).toEqual({
-        AND: [accessibleQuery(admin.ability, 'delete', 'User')],
-        id: 'user-1'
-      });
-    });
-
-    it('should throw when no user has the username, rather than deleting anything', async () => {
-      userModel.findFirst.mockResolvedValue(null);
-      await expect(usersService.deleteByUsername('jane.doe')).rejects.toThrow(NotFoundException);
-      expect(userModel.delete).not.toHaveBeenCalled();
-    });
-  });
-
   describe('find', () => {
     beforeEach(() => {
       userModel.findMany.mockResolvedValue([{ id: 'user-1' }]);

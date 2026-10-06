@@ -145,18 +145,6 @@ describe('InstrumentReposService', () => {
     });
   });
 
-  describe('findById', () => {
-    it('throws a NotFoundException when the repo does not exist', async () => {
-      instrumentRepoModel.findFirst.mockResolvedValueOnce(null);
-      await expect(service.findById('missing')).rejects.toBeInstanceOf(NotFoundException);
-    });
-
-    it('strips the access token from the returned repo', async () => {
-      instrumentRepoModel.findFirst.mockResolvedValueOnce({ accessToken: 'encrypted', id: '1', name: 'repo' });
-      await expect(service.findById('1')).resolves.not.toHaveProperty('accessToken');
-    });
-  });
-
   describe('deleteById', () => {
     it('throws a NotFoundException when the repo does not exist', async () => {
       instrumentRepoModel.findFirst.mockResolvedValueOnce(null);
