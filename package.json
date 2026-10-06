@@ -36,7 +36,7 @@
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
     "@douglasneuroinformatics/eslint-config": "^6.0.0",
-    "@douglasneuroinformatics/prettier-config": "^0.3.0",
+    "@douglasneuroinformatics/prettier-config": "^0.4.0",
     "@douglasneuroinformatics/tsconfig": "^2.0.0",
     "@types/node": "24.x",
     "@vitest/coverage-v8": "^5.0.2",
