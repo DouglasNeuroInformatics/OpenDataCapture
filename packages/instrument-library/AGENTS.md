@@ -10,8 +10,7 @@ Read the root `AGENTS.md` first for the rules that apply everywhere.
 
 **`apps/api/src/demo/demo.service.ts` holds one hand-written named import per instrument.** Adding a
 directory here and nothing else produces a bundle that is built, exported, and never loaded by
-anything. `src/interactive/DNP_STROOP_TASK` is the live proof: it builds, `pnpm run available` lists
-it, and it does not exist in a demo instance because no import was added.
+anything.
 
 **Order in `demo.service.init` is load-bearing for series.** `validateSeriesInstrument` in
 `instruments.service.ts` rejects a `SERIES` whose `content.items` (`{ name, edition }` pairs) do not
@@ -44,16 +43,17 @@ needs no `package.json` edit. A new top-level kind directory would need a new ex
 
 ## Authoring rules the bundler enforces at build time
 
-Read `src/forms/DNP_HAPPINESS_QUESTIONNAIRE/index.ts` (multilingual form) and
-`src/interactive/DNP_STROOP_TASK/` (multi-file JSX task) before writing one. The authoring spec
-itself is `packages/instrument-guidelines/AGENTS.md` — note it is a **published npm artifact**
-written for users outside this repo, so its instruction to put files in `lib/forms` / `lib/interactive`
-does not apply here.
+Read `src/forms/DNP_HAPPINESS_QUESTIONNAIRE/index.ts` (multilingual form),
+`src/interactive/DNP_BREAKOUT_TASK/` (interactive task with a stylesheet) and
+`src/forms/DNP_GENERAL_CONSENT_FORM/index.tsx` (JSX in a form block) before writing one. The
+authoring spec itself is `packages/instrument-guidelines/AGENTS.md` — note it is a **published npm
+artifact** written for users outside this repo, so its instruction to put files in `lib/forms` /
+`lib/interactive` does not apply here.
 
 - **Instrument directories must be flat.** The CLI globs `<dir>/*` and reads every entry as a file,
   so a subdirectory fails the build with `Cannot infer loader due to unexpected extension`.
-- **Relative imports need their file extension** (`./StroopTask.tsx`, `./styles.css`); esbuild will
-  not resolve `./StroopTask`. `allowImportingTsExtensions` is on for this reason.
+- **Relative imports need their file extension** (`./styles.css`, `./Component.tsx`); esbuild will
+  not resolve `./Component`. `allowImportingTsExtensions` is on for this reason.
 - Runtime imports use the absolute `/runtime/v1/...` specifier, resolved by the `paths` mapping in
   `tsconfig.json` to `runtime/v1/dist/*`. **`runtime/v1` must be built or `pnpm lint` (`tsc`) fails**
   — turbo handles this via `^build`. Background: `.agents/docs/architecture/runtime-and-vendor.md`.
@@ -75,7 +75,7 @@ grouped by kind; `--title` prints a flat list. **It reads `dist`, not `src`, so 
 - **Put tests in the top-level `src/__tests__/` only.** The build turns every directory holding an
   `index.*` into a bundle and reads each entry in it as a file, so a `__tests__/` inside an
   instrument directory fails `pnpm build` (see "Instrument directories must be flat"). Name each
-  test after the instrument it covers (`DNP_STROOP_TASK.test.tsx`); this folder is why
+  test after the instrument it covers (`DNP_BREAKOUT_TASK.test.ts`); this folder is why
   `eslint.config.js` turns `odc/unit-test-names-subject` off here.
 - **Import the instrument's source default export**, with its extension:
   `import instrument from '../forms/DNP_HAPPINESS_QUESTIONNAIRE/index.ts'` (`.tsx` where the entry
@@ -85,8 +85,9 @@ grouped by kind; `--title` prints a flat list. **It reads `dist`, not `src`, so 
   `vendor/<name>@<range>/src/` wrapper it is built from — `tsconfig.json`'s `paths` to
   `runtime/v1/dist` applies only to `tsc`. A runtime import of a new vendored library resolves the
   same way once its `vendor/` wrapper exists.
-- React renders: `content.render(done)` of an interactive task mounts into `document.body`, and
-  `@testing-library/react` is a devDependency. CSS imports load as empty modules.
+- `content.render(done)` of an interactive task mounts into `document.body`; JSX (a form `block`'s
+  `render`) is rendered with `@testing-library/react`, a devDependency. CSS imports load as empty
+  modules.
 
 End-to-end coverage is Playwright: `testing/src/specs/instrument-completion.spec.ts` and `gateway-assignment.spec.ts` drive
 `Happiness Questionnaire` end to end. See `.agents/docs/architecture/testing-strategy.md` and
