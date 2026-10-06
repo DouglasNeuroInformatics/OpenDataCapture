@@ -28,9 +28,11 @@ this package by `import/extensions: ['error', 'always', { ignorePackages: true }
 **`import/exports-last` has no autofix.** It reports every export that appears before the last
 non-export statement, so a private helper must be declared _before_ the first export or lint fails
 and you fix it by hand. Two shapes are in use: files where every declaration is inline-exported
-(`src/group/group.ts`), and files with private helpers first and one `export { ... }` block at the
-bottom (`src/setup/setup.ts`, all of `src/instrument/`). Adding a private helper to a file of the
-first kind means converting it to the second.
+(`src/auth/auth.ts`), and files with private helpers first and one `export { ... }` block at the
+bottom (`src/setup/setup.ts`, `src/mail/mail.ts`, all of `src/instrument/`). A private helper that
+depends only on imports can sit above the first export of an inline-exported file
+(`src/group/group.ts`, `src/user/user.ts`). One that depends on an exported schema of the same file
+cannot be hoisted that way, so adding it means converting the file to the bottom-export shape.
 
 ## Naming
 
@@ -65,11 +67,14 @@ two drift.
 
 The one barrel in the package (`instrument.ts` re-exports the six sibling files), and the only place
 using schema **factories**: `$$Name(language?)` returns a schema specialised to `'en'`, `'fr'`,
-`['en', 'fr']` or, with no argument, the permissive union. Every file pairs the factory with its
-default instance — `const $FormInstrument = $$FormInstrument()`.
+`['en', 'fr']` or, with no argument, the permissive union. A default instance such as
+`const $AnyInstrument = $$AnyInstrument()` exists only where something parses without naming a
+language (`apps/api` and `instrument-interpreter` parse against `$AnyInstrument`) or another schema
+in the folder composes it (`$BaseInstrumentInfo` extends `$BaseInstrument`). Do not add one
+speculatively; tests call the factory with no argument instead.
 
-Read `src/instrument/instrument.file.ts` before adding one — it is short and shows the whole shape.
-Two constraints on anything you write there:
+Read `src/instrument/instrument.file.ts` before adding a factory — it is short and shows the whole
+shape. Two constraints on anything you write there:
 
 - **Every schema is checked against its `@opendatacapture/runtime-core` counterpart** with
   `satisfies z.ZodType<FileInstrument<TLanguage>>`. `runtime-core` is the source of truth; this
