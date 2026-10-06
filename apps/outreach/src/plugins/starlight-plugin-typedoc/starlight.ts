@@ -11,24 +11,19 @@ import type { StarlightTypeDocSidebarOptions } from './index';
 
 const externalLinkRegex = /^(http|ftp)s?:\/\//;
 
-const sidebarDefaultOptions = {
-  collapsed: false,
-  label: 'API'
-} satisfies StarlightTypeDocSidebarOptions;
-
 const starlightTypeDocSidebarGroupLabel = Symbol('StarlightTypeDocSidebarGroupLabel');
 
-export function getSidebarGroupPlaceholder(label = starlightTypeDocSidebarGroupLabel): SidebarGroup {
+export function getSidebarGroupPlaceholder(): SidebarGroup {
   return {
     items: [],
-    label: label.toString()
+    label: starlightTypeDocSidebarGroupLabel.toString()
   };
 }
 
 export function getSidebarFromReflections(
   sidebar: StarlightUserConfigSidebar,
   sidebarGroupPlaceholder: SidebarGroup,
-  options: StarlightTypeDocSidebarOptions = {},
+  options: StarlightTypeDocSidebarOptions,
   reflections: DeclarationReflection | ProjectReflection,
   baseOutputDirectory: string
 ): StarlightUserConfigSidebar {
@@ -82,9 +77,9 @@ function getSidebarGroupFromPackageReflections(
   });
 
   return {
-    collapsed: options.collapsed ?? sidebarDefaultOptions.collapsed,
+    collapsed: options.collapsed,
     items: groups.filter((item): item is SidebarGroup => item !== undefined),
-    label: options.label ?? sidebarDefaultOptions.label
+    label: options.label
   };
 }
 
@@ -102,7 +97,7 @@ function getSidebarGroupFromReflections(
   const groups = reflections.groups ?? [];
 
   return {
-    collapsed: options.collapsed ?? sidebarDefaultOptions.collapsed,
+    collapsed: options.collapsed,
     items: groups
       .flatMap((group) => {
         if (group.title === 'Modules') {
@@ -148,7 +143,7 @@ function getSidebarGroupFromReflections(
         };
       })
       .filter((item): item is SidebarGroup => item !== undefined),
-    label: label ?? options.label ?? sidebarDefaultOptions.label
+    label: label ?? options.label
   };
 }
 
@@ -213,7 +208,7 @@ export function getRelativeURL(url: string, baseUrl: string, pageUrl?: string): 
     .map((segment) => slug(segment))
     .filter((segment) => segment !== '');
 
-  let constructedUrl = typeof baseUrl === 'string' ? baseUrl : '';
+  let constructedUrl = baseUrl;
   constructedUrl += segments.length > 0 ? `${segments.join('/')}/` : '';
   constructedUrl += slug(filePath.name);
   constructedUrl += '/';
