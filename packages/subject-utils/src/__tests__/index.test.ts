@@ -88,7 +88,7 @@ describe('isSubjectWithPersonalInfo', () => {
 
 describe('encodeScopedSubjectId', () => {
   it('should join the group name and subject ID with a $, replacing spaces with underscores', () => {
-    expect(encodeScopedSubjectId(123, { groupName: 'My Group' })).toBe('My_Group$123');
+    expect(encodeScopedSubjectId('123', { groupName: 'My Group' })).toBe('My_Group$123');
   });
 });
 

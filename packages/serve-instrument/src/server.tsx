@@ -143,12 +143,10 @@ type ServerMode = 'all' | 'single';
 class SingleModeHandler {
   private instrumentLoader: InstrumentLoader;
   private runtimeMetadata: RuntimeMetadataMap;
-  private verbose: boolean;
 
-  constructor(params: { instrumentLoader: InstrumentLoader; runtimeMetadata: RuntimeMetadataMap; verbose: boolean }) {
+  constructor(params: { instrumentLoader: InstrumentLoader; runtimeMetadata: RuntimeMetadataMap }) {
     this.instrumentLoader = params.instrumentLoader;
     this.runtimeMetadata = params.runtimeMetadata;
-    this.verbose = params.verbose;
   }
 
   close(): void {
@@ -339,8 +337,7 @@ export class Server {
     return new this({
       handler: new SingleModeHandler({
         instrumentLoader: new InstrumentLoader(target, '', verbose),
-        runtimeMetadata,
-        verbose
+        runtimeMetadata
       }),
       port
     });
