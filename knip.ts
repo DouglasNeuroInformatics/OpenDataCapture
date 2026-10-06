@@ -57,9 +57,7 @@ const config: KnipConfig = {
       entry: ['src/preview/main.tsx!'],
       ignoreIssues: {
         // loaded as raw text through import.meta.glob and compiled by the instrument bundler
-        'src/instruments/*/*/*/index.{js,jsx,ts,tsx}': ['exports'],
-        // a port of CodeMirror's vim bindings, treated as third-party (see AGENTS.md)
-        'src/vim/**': ['exports', 'types']
+        'src/instruments/*/*/*/index.{js,jsx,ts,tsx}': ['exports']
       }
     },
     'apps/web': {
