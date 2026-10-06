@@ -106,9 +106,4 @@ helpers (`transform`, `resolve`, `utils`, `preprocess`, `parse`, `schemas`).
 Fixtures are type-checked by `pnpm lint` — `tsconfig.json` includes `src/**/*` and maps
 `/runtime/v1/*` to `../../runtime/v1/dist/*`, so `runtime/v1` must be built for `tsc` to pass.
 
-`vitest.config.ts` declares an alias `'/runtime/v1' -> ./runtime/v1/dist` **relative to this package**,
-a directory that does not exist. Nothing in the suite resolves that specifier through vite (fixtures
-are read as text and handed to esbuild, which marks those imports external), and all tests pass. Treat
-it as dead config; do not build anything on top of it.
-
 There is no `build` script here — `package.json` exports `./src/index.ts` directly.

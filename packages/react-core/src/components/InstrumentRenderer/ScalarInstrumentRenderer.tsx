@@ -79,7 +79,7 @@ export const ScalarInstrumentRenderer = ({
         });
         return;
       }
-      await onSubmit?.({
+      await onSubmit({
         ...result,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         data: JSON.parse(JSON.stringify(data, replacer)),
@@ -141,12 +141,7 @@ export const ScalarInstrumentRenderer = ({
               />
             ))
             .with({ index: 1, instrument: { kind: 'FILE' } }, ({ instrument }) => {
-              return (
-                <FileInstrumentContent
-                  instrument={{ ...instrument, id: target.id }}
-                  onSubmit={createSubmitHandler(instrument)}
-                />
-              );
+              return <FileInstrumentContent instrument={instrument} onSubmit={createSubmitHandler(instrument)} />;
             })
             .with({ index: 2 }, () => (
               <InstrumentSummary

@@ -53,7 +53,7 @@ const unitTestLayout = {
     'test-tooling-in-tests-folder': {
       create(context) {
         const folders = context.filename.split(path.sep);
-        if (folders.includes('__tests__') || folders.includes('__mocks__')) {
+        if (folders.includes('__tests__')) {
           return {};
         }
         return {
@@ -66,7 +66,7 @@ const unitTestLayout = {
       },
       meta: {
         messages: {
-          testTooling: "'{{source}}' is test tooling; only a file in a __tests__/ or __mocks__/ folder may import it."
+          testTooling: "'{{source}}' is test tooling; only a file in a __tests__/ folder may import it."
         },
         schema: [],
         type: 'problem'
@@ -127,7 +127,6 @@ export default config(
   {
     ignores: [
       'apps/playground/src/instruments/examples/interactive/Interactive-With-Legacy-Script/legacy.js',
-      'runtime/v1/src/**/*.d.ts',
       'vendor/**/*'
     ]
   },

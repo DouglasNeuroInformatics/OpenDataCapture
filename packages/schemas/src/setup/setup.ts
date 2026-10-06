@@ -237,7 +237,6 @@ export type BrandingConfig = z.infer<typeof $BrandingConfig>;
 export type BrandingText = z.infer<typeof $BrandingText>;
 export type CreateAdminData = z.infer<typeof $CreateAdminData>;
 export type DevelopmentReleaseInfo = z.infer<typeof $DevelopmentReleaseInfo>;
-export type FontSize = (typeof FONT_SIZES)[number];
 export type $InitAppOptions = z.infer<typeof $InitAppOptions>;
 export type LoginTheme = (typeof LOGIN_THEMES)[number];
 export type LogoAlignment = (typeof LOGO_ALIGNMENTS)[number];
@@ -252,21 +251,16 @@ export type $UpdateSetupStateData = z.infer<typeof $UpdateSetupStateData>;
 
 export {
   $BrandingConfig,
-  $BrandingText,
-  $CreateAdminData,
   $DevelopmentReleaseInfo,
   $InitAppOptions,
   $ProductionReleaseInfo,
   $ReleaseInfo,
-  $ReleaseVersion,
-  $ResourceLink,
   $SetupState,
   $UpdateSetupStateData,
   FONT_SIZES,
   LOGIN_THEMES,
   LOGO_ALIGNMENTS,
   LOGO_SIZES,
-  LOGO_SOURCES,
   MAX_ASSIGNMENT_DURATION_DAYS,
   PANEL_SECTIONS
 };

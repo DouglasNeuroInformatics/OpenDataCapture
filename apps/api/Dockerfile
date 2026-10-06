@@ -1,7 +1,6 @@
 FROM node:lts-krypton AS base
 WORKDIR /app
 ARG RELEASE_VERSION
-ENV GATEWAY_DATABASE_URL="file:/dev/null"
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
 ENV NODE_OPTIONS="--max-old-space-size=8192"
@@ -25,7 +24,6 @@ RUN turbo build --filter=@opendatacapture/api
 # RUN SERVER
 FROM base AS runner
 COPY --from=installer /app/apps/api/dist/ /app/dist/
-COPY --from=installer /app/apps/api/public/ /app/public/
 COPY --from=installer /app/apps/api/dist/runtime/ /runtime/
 
 RUN echo '{ "type": "module", "imports": { "#runtime/v1/*": "./dist/runtime/v1/*" } }' > package.json

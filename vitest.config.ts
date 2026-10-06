@@ -6,9 +6,7 @@ export default defineConfig({
   test: {
     coverage: {
       exclude: [
-        '**/.storybook/**',
         '**/coverage/**',
-        '**/cypress/**',
         '**/dist/**',
         '**/node_modules/**',
         '**/public/**',
@@ -17,7 +15,6 @@ export default defineConfig({
         '**/*{.,-}{test,test-d,spec}.?(c|m)[jt]s?(x)',
         '**/*.config.?(c|m)[jt]s?(x)',
         '**/*.stories.?(c|m)[jt]s?(x)',
-        '**/__mocks__/**',
         '**/__tests__/**',
         'apps/gateway/src/entry-client.tsx',
         'apps/gateway/src/main.ts',

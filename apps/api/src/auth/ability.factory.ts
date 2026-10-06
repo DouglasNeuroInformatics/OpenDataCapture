@@ -17,7 +17,7 @@ import type { AppAbility, Permission } from './auth.types';
  * fields are the same ones the group manager rules below use. Typed over the schema's list, so a
  * subject made scopable there fails to compile here until its group field is named.
  */
-export const GROUP_SCOPED_CONDITIONS = {
+const GROUP_SCOPED_CONDITIONS = {
   Assignment: (groupId) => ({ groupId: { in: [groupId] } }),
   Group: (groupId) => ({ id: { in: [groupId] } }),
   InstrumentRecord: (groupId) => ({ groupId: { in: [groupId] } }),

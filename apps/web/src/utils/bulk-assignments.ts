@@ -414,4 +414,4 @@ export function toResultCsv(rows: { [key: string]: string }[]): string {
 
 export { buildResultRows, detectMode, resultCsvFilename, toResultTsv };
 
-export type { BulkParseError, BulkParseResult, BulkSourceMode, CanonicalField, ResultAssignment };
+export type { BulkParseError, BulkParseResult, BulkSourceMode, CanonicalField };

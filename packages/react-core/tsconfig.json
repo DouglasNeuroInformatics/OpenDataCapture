@@ -5,7 +5,7 @@
     "paths": {
       "/runtime/v1/*": ["../../runtime/v1/dist/*"]
     },
-    "types": ["vite/client"]
+    "types": []
   },
   "include": ["src/**/*", "vitest.config.ts"]
 }

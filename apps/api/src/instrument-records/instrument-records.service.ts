@@ -186,10 +186,6 @@ export class InstrumentRecordsService {
     return deletedRecord;
   }
 
-  async exists(where: Prisma.InstrumentRecordWhereInput): Promise<boolean> {
-    return this.instrumentRecordModel.exists(where);
-  }
-
   async exportRecords(
     { groupId }: { groupId?: string } = {},
     { ability }: Required<Pick<EntityOperationOptions, 'ability'>>

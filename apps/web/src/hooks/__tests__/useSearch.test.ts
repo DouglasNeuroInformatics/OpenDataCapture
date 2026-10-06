@@ -15,12 +15,12 @@ describe('useSearch', () => {
   afterEach(cleanup);
 
   it('should return every item before anything is searched', () => {
-    const { result } = renderHook(() => useSearch(PEOPLE, 'firstName'));
+    const { result } = renderHook(() => useSearch(PEOPLE, (person) => person.firstName));
     expect(result.current.filteredData).toEqual(PEOPLE);
   });
 
-  it('should filter on the given key, ignoring case', () => {
-    const { result } = renderHook(() => useSearch(PEOPLE, 'firstName'));
+  it('should filter on the selected string, ignoring case', () => {
+    const { result } = renderHook(() => useSearch(PEOPLE, (person) => person.firstName));
     act(() => result.current.setSearchTerm('AL'));
     expect(result.current.searchTerm).toBe('AL');
     expect(result.current.filteredData).toEqual([{ firstName: 'Alan', lastName: 'Turing' }]);
@@ -33,7 +33,7 @@ describe('useSearch', () => {
   });
 
   it('should reapply the current search when the data changes', () => {
-    const { rerender, result } = renderHook(({ data }) => useSearch(data, 'lastName'), {
+    const { rerender, result } = renderHook(({ data }) => useSearch(data, (person) => person.lastName), {
       initialProps: { data: PEOPLE }
     });
     act(() => result.current.setSearchTerm('ing'));

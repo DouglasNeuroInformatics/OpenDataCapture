@@ -3,7 +3,6 @@
 /* eslint-disable no-console */
 
 import fs from 'fs';
-import module from 'module';
 import path from 'path';
 
 import { getReleaseInfo } from '@opendatacapture/release-info';
@@ -11,8 +10,6 @@ import esbuild from 'esbuild';
 
 const outdir = path.resolve(import.meta.dirname, '../dist');
 const tsconfig = path.resolve(import.meta.dirname, '../tsconfig.json');
-
-const require = module.createRequire(import.meta.url);
 
 if (fs.existsSync(outdir)) {
   await fs.promises.rm(outdir, { recursive: true });
@@ -42,20 +39,6 @@ const ctx = await esbuild.context({
   outdir,
   platform: 'node',
   plugins: [
-    {
-      name: 'raw',
-      setup(build) {
-        build.onResolve({ filter: /^.*\?raw$/ }, (args) => {
-          return {
-            namespace: 'raw',
-            path: require.resolve(args.path, { paths: [path.dirname(args.importer)] })
-          };
-        });
-        build.onLoad({ filter: /.*/, namespace: 'raw' }, async (args) => {
-          return { contents: await fs.promises.readFile(args.path, 'utf-8'), loader: 'text' };
-        });
-      }
-    },
     {
       name: 'rebuild',
       setup(build) {

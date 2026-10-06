@@ -63,7 +63,6 @@ const $CreateAssignmentData = z.object({
  * applies every one of them to every selected subject, so N subjects and M timepoints create N * M
  * assignments.
  */
-type BulkAssignmentTimepoint = z.infer<typeof $BulkAssignmentTimepoint>;
 const $BulkAssignmentTimepoint = z.object({
   expiresAt: $FutureDate,
   instrumentId: z.string().min(1)
@@ -212,7 +211,6 @@ export type {
   BulkAssignmentFailure,
   BulkAssignmentIssue,
   BulkAssignmentPreflightResult,
-  BulkAssignmentTimepoint,
   CreateRemoteAssignmentInputData,
   CreateRemoteAssignmentsInputData,
   DeleteBulkAssignmentsResult,
@@ -223,12 +221,10 @@ export type {
 
 export {
   $Assignment,
-  $AssignmentStatus,
   $BulkAssignmentFailure,
   $BulkAssignmentIssue,
   $BulkAssignmentPreflightData,
   $BulkAssignmentPreflightResult,
-  $BulkAssignmentTimepoint,
   $CancelAssignmentData,
   $CreateAssignmentData,
   $CreateBulkAssignmentsData,

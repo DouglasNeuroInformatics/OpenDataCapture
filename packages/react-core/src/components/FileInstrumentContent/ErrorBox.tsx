@@ -1,18 +1,11 @@
 import type React from 'react';
 
-import { cn } from '@douglasneuroinformatics/libui/utils';
 import { AlertCircleIcon } from 'lucide-react';
 
-export const ErrorBox: React.FC<
-  { className?: string; issues?: string[]; message?: never; title: string } | { className?: string; message: string }
-> = ({ className, ...props }) => {
-  const { issues, title } = typeof props.message === 'string' ? { issues: null, title: props.message } : props;
+export const ErrorBox: React.FC<{ issues?: string[]; title: string }> = ({ issues, title }) => {
   return (
     <div
-      className={cn(
-        'border-destructive/50 bg-destructive/10 text-destructive flex flex-col gap-2 rounded-md border p-3',
-        className
-      )}
+      className="border-destructive/50 bg-destructive/10 text-destructive flex flex-col gap-2 rounded-md border p-3"
       data-testid="error-box"
     >
       <div className="flex items-center gap-2">

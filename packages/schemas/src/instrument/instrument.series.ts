@@ -24,6 +24,4 @@ const $$SeriesInstrument = <TLanguage extends InstrumentLanguage>(language?: TLa
   }) satisfies z.ZodType<SeriesInstrument<TLanguage>>;
 };
 
-const $SeriesInstrument = $$SeriesInstrument() satisfies z.ZodType<SeriesInstrument>;
-
-export { $$SeriesInstrument, $SeriesInstrument };
+export { $$SeriesInstrument };

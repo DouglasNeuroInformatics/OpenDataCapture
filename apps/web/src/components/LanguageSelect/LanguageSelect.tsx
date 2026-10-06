@@ -1,13 +1,11 @@
 import { Select } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { cn } from '@douglasneuroinformatics/libui/utils';
 import { $Language } from '@opendatacapture/schemas/core';
 import type { Language } from '@opendatacapture/schemas/core';
 
 import { LANGUAGE_LABELS, LANGUAGES } from '@/utils/language';
 
 export type LanguageSelectProps = {
-  className?: string;
   'data-testid'?: string;
   id?: string;
   onChange: (language: Language) => void;
@@ -18,7 +16,6 @@ export type LanguageSelectProps = {
 
 /** Picks the language a message is composed or sent in. */
 export const LanguageSelect = ({
-  className,
   'data-testid': testId,
   id,
   onChange,
@@ -28,7 +25,7 @@ export const LanguageSelect = ({
   const { t } = useTranslation();
   return (
     <Select value={value} onValueChange={(next) => onChange($Language.parse(next))}>
-      <Select.Trigger className={cn('w-[180px]', className)} data-testid={testId} id={id}>
+      <Select.Trigger className="w-[180px]" data-testid={testId} id={id}>
         <Select.Value />
       </Select.Trigger>
       <Select.Content>

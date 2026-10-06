@@ -209,18 +209,6 @@ model InstrumentRecordFile {
 
 // Instruments
 
-enum InstrumentKind {
-  FILE
-  FORM
-  INTERACTIVE
-  SERIES
-}
-
-type InstrumentInternal {
-  name    String
-  edition Float
-}
-
 model Instrument {
   createdAt      DateTime           @default(now()) @db.Date
   updatedAt      DateTime           @updatedAt @db.Date

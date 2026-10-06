@@ -6,19 +6,16 @@ allowBuilds:
   '@prisma/engines': true
   '@scarf/scarf': false
   '@swc/core': true
-  cypress: true
   esbuild: true
   mongodb-memory-server: true
   msgpackr-extract: false
   prisma: true
   sharp: true
-  sqlite3: true
 blockExoticSubdeps: true
 catalog:
   '@casl/ability': '^6.7.1'
   '@commitlint/cli': '^21.2.3'
   '@commitlint/config-conventional': '^21.2.3'
-  '@casl/prisma': '^1.4.1'
   '@douglasneuroinformatics/esbuild-plugin-prisma': 'latest'
   '@douglasneuroinformatics/libcrypto': '^0.0.6'
   '@douglasneuroinformatics/libjs': ^3.2.1
@@ -30,9 +27,7 @@ catalog:
   '@prisma/client': '^6.9.0'
   '@tailwindcss/vite': '4.3.3'
   '@testing-library/dom': '^10.4.2'
-  '@testing-library/jest-dom': '^6.5.0'
   '@testing-library/react': '^16.3.3'
-  '@testing-library/user-event': '^14.5.2'
   axios: ^1.20.0
   commander: '^15.0.0'
   esbuild: '0.28.x'
@@ -43,7 +38,6 @@ catalog:
   neverthrow: ^8.2.0
   nodemailer: ^10.0.11
   conventional-commits-parser: '^7.1.2'
-  nodemon: '^3.1.9'
   prisma: '^6.9.0'
   react-dropzone: ^20.1.2
   '@tailwindcss/postcss': '4.3.3'

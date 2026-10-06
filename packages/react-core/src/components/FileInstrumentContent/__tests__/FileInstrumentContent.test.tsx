@@ -58,9 +58,8 @@ describe('FileInstrumentContent', () => {
     expect(props.onSubmit).not.toHaveBeenCalled();
   });
 
-  it('should submit successfully and call onSuccess once uploaded', async () => {
-    const onSuccess = vi.fn();
-    const props = createProps({ onSuccess });
+  it('should submit the selected file once it is uploaded', async () => {
+    const props = createProps();
     render(<FileInstrumentContent {...props} />);
 
     await act(async () => {
@@ -77,9 +76,8 @@ describe('FileInstrumentContent', () => {
     });
 
     await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalledOnce();
+      expect(props.onSubmit).toHaveBeenCalledOnce();
     });
-    expect(props.onSubmit).toHaveBeenCalledOnce();
   });
 
   it('should show a generic error and re-enable submission when the upload fails', async () => {

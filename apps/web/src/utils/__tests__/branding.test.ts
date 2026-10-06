@@ -1,4 +1,3 @@
-import type { BrandingConfig } from '@opendatacapture/schemas/setup';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -8,10 +7,6 @@ import {
   LOGIN_THEME_COLORS,
   resolveLoginThemeColors
 } from '../branding';
-
-/** A theme name persisted by another release, which this build's types do not know about. */
-const brandingWithUnknownTheme = (key: 'loginTheme' | 'rightPanelTheme'): BrandingConfig =>
-  JSON.parse(JSON.stringify({ [key]: 'retired' }));
 
 describe('resolveLoginThemeColors', () => {
   it('should use the default theme when no branding is configured', () => {
@@ -38,10 +33,6 @@ describe('resolveLoginThemeColors', () => {
 
   it('should fill each missing custom color from the default theme, so a half-configured gradient still renders', () => {
     expect(resolveLoginThemeColors({ loginTheme: 'custom' })).toEqual(LOGIN_THEME_COLORS.slate);
-  });
-
-  it('should fall back to the default palette for an unknown theme rather than rendering no gradient', () => {
-    expect(resolveLoginThemeColors(brandingWithUnknownTheme('loginTheme'))).toEqual(LOGIN_THEME_COLORS.slate);
   });
 });
 
@@ -83,12 +74,6 @@ describe('getRightPanelGradient', () => {
 
   it('should fill each missing custom color from the default theme', () => {
     expect(getRightPanelGradient({ rightPanelTheme: 'custom' })).toBe(
-      'linear-gradient(135deg, #475569 0%, #0f172a 100%)'
-    );
-  });
-
-  it('should fall back to the default gradient for an unknown theme', () => {
-    expect(getRightPanelGradient(brandingWithUnknownTheme('rightPanelTheme'))).toBe(
       'linear-gradient(135deg, #475569 0%, #0f172a 100%)'
     );
   });

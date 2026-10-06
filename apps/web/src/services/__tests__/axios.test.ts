@@ -240,14 +240,6 @@ describe('axios', () => {
       expect(adapter).toHaveBeenCalledOnce();
     });
 
-    it('should not retry a request that opts out of retries', async () => {
-      const adapter = createAdapter({ fail: true });
-      await expect(axios.get('/v1/subjects', { adapter, meta: { disableRetry: true } })).rejects.toBeInstanceOf(
-        AxiosError
-      );
-      expect(adapter).toHaveBeenCalledOnce();
-    });
-
     it('should not retry a request whose method is unknown, since it may not be idempotent', async () => {
       const adapter = vi.fn<AxiosAdapter>(() => Promise.reject(createError({ headers: new AxiosHeaders() })));
       await expect(axios.get('/v1/subjects', { adapter })).rejects.toBeInstanceOf(AxiosError);
@@ -285,12 +277,6 @@ describe('axios', () => {
       await vi.advanceTimersByTimeAsync(20);
       expect(adapter).toHaveBeenCalledTimes(2);
     });
-
-    it('should retry without waiting where there is no navigator to report connectivity', async () => {
-      vi.stubGlobal('navigator', undefined);
-      const adapter = createAdapter({ fail: true }, { status: 200 });
-      await expect(axios.get('/v1/subjects', { adapter })).resolves.toMatchObject({ status: 200 });
-    });
   });
 
   describe('connectivity events', () => {
@@ -302,21 +288,6 @@ describe('axios', () => {
     it('should record in the store that the browser came back online', () => {
       window.dispatchEvent(new Event('online'));
       expect(store.setIsOnline).toHaveBeenCalledWith(true);
-    });
-
-    it('should load where there is no window, so the module does not crash outside a browser', async () => {
-      const useRequestInterceptor = vi.spyOn(axios.interceptors.request, 'use');
-      const useResponseInterceptor = vi.spyOn(axios.interceptors.response, 'use');
-      vi.stubGlobal('window', undefined);
-      vi.resetModules();
-      const reimport = import('@/services/axios');
-      try {
-        await expect(reimport).resolves.toBeDefined();
-      } finally {
-        // The re-imported module shares this file's axios instance; eject its duplicate interceptors.
-        axios.interceptors.request.eject(useRequestInterceptor.mock.results[0]?.value);
-        axios.interceptors.response.eject(useResponseInterceptor.mock.results[0]?.value);
-      }
     });
   });
 

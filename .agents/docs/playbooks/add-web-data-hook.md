@@ -40,7 +40,6 @@ step type-checks and compiles, and fails at runtime or serves the wrong cached d
 
    | `meta` key                        | Use when                                      |
    | --------------------------------- | --------------------------------------------- |
-   | `disableRetry`                    | An idempotent request must not be retried     |
    | `disableDefaultTimeout`           | The server may legitimately take >10s (setup) |
    | `disableDefaultErrorNotification` | The caller shows its own error message        |
    | `disableDefaultAuth`              | The request must go out unauthenticated       |

@@ -2,14 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Resizable } from './Resizable';
 
-type Story = StoryObj<typeof Resizable>;
+type Story = StoryObj<typeof Resizable.PanelGroup>;
 
-export default { component: Resizable } as Meta<typeof Resizable>;
+export default { component: Resizable.PanelGroup } as Meta<typeof Resizable.PanelGroup>;
 
 export const Default: Story = {
   args: {
     children: (
-      <Resizable.PanelGroup className="max-w-md rounded-lg border" direction="horizontal">
+      <>
         <Resizable.Panel defaultSize={50}>
           <div className="flex h-[200px] items-center justify-center p-6">
             <span className="font-semibold">One</span>
@@ -31,7 +31,9 @@ export const Default: Story = {
             </Resizable.Panel>
           </Resizable.PanelGroup>
         </Resizable.Panel>
-      </Resizable.PanelGroup>
-    )
+      </>
+    ),
+    className: 'max-w-md rounded-lg border',
+    direction: 'horizontal'
   }
 };

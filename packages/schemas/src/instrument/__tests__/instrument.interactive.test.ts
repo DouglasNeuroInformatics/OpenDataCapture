@@ -1,10 +1,10 @@
 import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
 import { describe, expect, it } from 'vitest';
 
-import { $InteractiveInstrument } from '../instrument.interactive.js';
+import { $$InteractiveInstrument } from '../instrument.interactive.js';
 
-describe('$InteractiveInstrument', () => {
+describe('$$InteractiveInstrument', () => {
   it('should successfully parse valid instruments', () => {
-    expect($InteractiveInstrument.safeParse(interactiveInstrument.instance).success).toBe(true);
+    expect($$InteractiveInstrument().safeParse(interactiveInstrument.instance).success).toBe(true);
   });
 });

@@ -105,16 +105,6 @@ export class InstrumentReposService implements OnModuleInit {
     return repos.map((repo) => this.stripSecrets(repo));
   }
 
-  async findById(id: string, { ability }: EntityOperationOptions = {}) {
-    const repo = await this.instrumentRepoModel.findFirst({
-      where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRepo')], id }
-    });
-    if (!repo) {
-      throw new NotFoundException(`Failed to find instrument repo with ID: ${id}`);
-    }
-    return this.stripSecrets(repo);
-  }
-
   async onModuleInit(): Promise<void> {
     // Self-heal any instruments left orphaned by repositories deleted before this logic existed.
     try {
