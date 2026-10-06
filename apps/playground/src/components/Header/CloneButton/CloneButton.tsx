@@ -41,7 +41,7 @@ export const CloneButton = () => {
             <CopyPlusIcon />
           </Tooltip.Trigger>
         </Dialog.Trigger>
-        <Dialog.Content className="sm:max-w-[475px]">
+        <Dialog.Content className="sm:max-w-118.75">
           <Dialog.Header>
             <Dialog.Title>{t({ en: 'Create New Instrument', fr: 'Créer un nouvel instrument' })}</Dialog.Title>
             <Dialog.Description>

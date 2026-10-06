@@ -341,7 +341,7 @@ const CreateSeriesInstrumentDialog = ({
   return (
     <React.Fragment>
       <Dialog open onOpenChange={onClose}>
-        <Dialog.Content className="sm:max-w-[600px]">
+        <Dialog.Content className="sm:max-w-150">
           <Dialog.Header>
             <Dialog.Title>
               {t({
@@ -474,7 +474,7 @@ const CreateSeriesInstrumentDialog = ({
       </Dialog>
       {duplicateOf !== null && (
         <Dialog open onOpenChange={() => setDuplicateOf(null)}>
-          <Dialog.Content className="sm:max-w-[450px]">
+          <Dialog.Content className="sm:max-w-112.5">
             <Dialog.Header>
               <Dialog.Title>
                 {t({ en: 'Series Already Exists', es: 'La serie ya existe', fr: 'La série existe déjà' })}
@@ -521,7 +521,7 @@ const DeleteInstrumentDialog = ({
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <Dialog.Content className="sm:max-w-[450px]">
+      <Dialog.Content className="sm:max-w-112.5">
         <Dialog.Header>
           <Dialog.Title>
             {t({

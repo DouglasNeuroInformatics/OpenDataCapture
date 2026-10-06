@@ -44,7 +44,7 @@ const navLinks = [
       <nav class="flex gap-3 overflow-hidden duration-300" id="nav-dropdown">
         {navLinks.map((props) => <NavLink {...props} />)}
       </nav>
-      <div class="mx-5 h-8 w-[1px] rounded-md bg-slate-300 dark:bg-slate-700"></div>
+      <div class="mx-5 h-8 w-px rounded-md bg-slate-300 dark:bg-slate-700"></div>
       <div class="flex grow justify-end gap-3">
         <ThemeToggle />
         <LanguageToggle />
@@ -62,7 +62,7 @@ const navLinks = [
 >
 </div>
 <div
-  class="fixed right-0 z-30 flex h-screen w-full max-w-[28rem] translate-x-[28rem] flex-col overflow-y-scroll bg-slate-50 py-6 shadow-xl transition-transform duration-300 dark:bg-slate-800"
+  class="fixed right-0 z-30 flex h-screen w-full max-w-md translate-x-112 flex-col overflow-y-scroll bg-slate-50 py-6 shadow-xl transition-transform duration-300 dark:bg-slate-800"
   id="mobile-slider"
 >
   <div class="flex items-center justify-between px-4">
@@ -91,7 +91,7 @@ const navLinks = [
   const closeSlider = () => {
     document.body.style.overflow = 'auto';
     backdrop.style.opacity = '0%';
-    slider.classList.add('translate-x-[28rem]');
+    slider.classList.add('translate-x-112');
     setTimeout(() => {
       backdrop.style.height = '0vh';
       backdrop.style.width = '0vw';
@@ -103,7 +103,7 @@ const navLinks = [
     backdrop.style.height = '100vh';
     backdrop.style.width = '100vw';
     backdrop.style.opacity = '50%';
-    slider.classList.remove('translate-x-[28rem]');
+    slider.classList.remove('translate-x-112');
   };
 
   close.addEventListener('click', closeSlider);

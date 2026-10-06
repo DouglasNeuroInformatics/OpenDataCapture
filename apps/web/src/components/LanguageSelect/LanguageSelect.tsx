@@ -25,7 +25,7 @@ export const LanguageSelect = ({
   const { t } = useTranslation();
   return (
     <Select value={value} onValueChange={(next) => onChange($Language.parse(next))}>
-      <Select.Trigger className="w-[180px]" data-testid={testId} id={id}>
+      <Select.Trigger className="w-45" data-testid={testId} id={id}>
         <Select.Value />
       </Select.Trigger>
       <Select.Content>

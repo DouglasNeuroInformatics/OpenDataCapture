@@ -44,7 +44,7 @@ const ArchiveDialog = ({ onClose, row }: { onClose: () => void; row: SeriesRow }
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <Dialog.Content className="sm:max-w-[500px]" data-testid="archive-series-dialog">
+      <Dialog.Content className="sm:max-w-125" data-testid="archive-series-dialog">
         <Dialog.Header>
           <Dialog.Title>
             {t({

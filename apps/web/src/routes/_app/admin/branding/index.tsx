@@ -15,7 +15,7 @@ const LoginPagePreview = () => (
       <div className="h-1 w-10 rounded-full bg-white/60" />
       <div className="h-0.5 w-7 rounded-full bg-white/40" />
     </div>
-    <div className="flex w-[45%] flex-col items-center justify-center gap-1.5 bg-gradient-to-b from-[#0ea5e9]/10 to-[#0c4a6e]/10 p-2 dark:from-[#0ea5e9]/20 dark:to-[#0c4a6e]/20">
+    <div className="flex w-[45%] flex-col items-center justify-center gap-1.5 bg-linear-to-b from-[#0ea5e9]/10 to-[#0c4a6e]/10 p-2 dark:from-[#0ea5e9]/20 dark:to-[#0c4a6e]/20">
       <Logo className="h-auto w-3 opacity-60" variant="auto" />
       <div className="bg-muted-foreground/30 h-0.5 w-6 rounded-full" />
       <div className="border-border bg-muted h-2.5 w-8 rounded-sm border" />

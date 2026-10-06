@@ -255,7 +255,7 @@ const RouteComponent = () => {
                       </HoverCard>
                     </div>
                     <Input
-                      className="w-[90px] shrink-0"
+                      className="w-22.5 shrink-0"
                       data-testid="default-assignment-duration-input"
                       inputMode="numeric"
                       max={MAX_ASSIGNMENT_DURATION_DAYS}
@@ -323,7 +323,7 @@ const RouteComponent = () => {
                   value={groupSwitcherPosition}
                   onValueChange={(value) => setGroupSwitcherPosition(value as GroupSwitcherPosition)}
                 >
-                  <Select.Trigger className="w-[180px] shrink-0" data-testid="group-switcher-position-select">
+                  <Select.Trigger className="w-45 shrink-0" data-testid="group-switcher-position-select">
                     <Select.Value />
                   </Select.Trigger>
                   <Select.Content>
