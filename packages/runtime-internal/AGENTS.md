@@ -4,7 +4,7 @@ Four small helpers (`evaluateInstrument`, `encodeUnicodeToBase64`, `decodeBase64
 `removeSubjectIdScope`) plus the interactive-task trio `src/interactive/{iframe.html,bootstrap.js,worker.js}`.
 Private, and **there is no build step** — `exports` points straight at `src/`, with a hand-written
 `src/index.d.ts` beside plain `src/index.js`. Consumed by `instrument-bundler`,
-`instrument-interpreter`, `react-core`, `serve-instrument`, `subject-utils`, and included in
+`instrument-interpreter`, `serve-instrument`, `subject-utils`, and included in
 `runtime/v1/runtime.config.js` so it is also served under `/runtime/v1/...`.
 
 ## Traps

@@ -34,10 +34,6 @@
       "persistent": true
     },
     "format": {},
-    "inject": {
-      "dependsOn": ["build"],
-      "outputs": ["dist/**"]
-    },
     "lint": {
       "dependsOn": ["^build", "^db:generate", "db:push"]
     },

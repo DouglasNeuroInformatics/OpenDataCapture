@@ -26,7 +26,6 @@
     "lint:root": "tsc --noEmit && eslint --fix commitlint.config.ts knip.ts scripts vitest.config.ts",
     "postinstall": "turbo telemetry disable",
     "prepare": "husky",
-    "preview:core": "env-cmd turbo run preview --filter=@opendatacapture/api --filter=@opendatacapture/gateway --filter=@opendatacapture/web",
     "start": "turbo run start",
     "test": "env-cmd vitest",
     "test:coverage": "env-cmd vitest --coverage",
@@ -39,16 +38,10 @@
     "@douglasneuroinformatics/eslint-config": "^6.0.0",
     "@douglasneuroinformatics/prettier-config": "^0.3.0",
     "@douglasneuroinformatics/tsconfig": "^2.0.0",
-    "@swc-node/register": "^1.12.1",
-    "@swc/cli": "^0.8.1",
-    "@swc/core": "^1.16.2",
-    "@swc/helpers": "^0.5.23",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "24.x",
-    "@vitest/browser": "^4.1.11",
     "@vitest/coverage-v8": "^4.1.11",
     "conventional-commits-parser": "catalog:",
-    "dotenv": "^18.0.4",
     "env-cmd": "^11.0.0",
     "eslint": "9.39.x",
     "expect-type": "^1.4.0",
@@ -62,7 +55,6 @@
     "tsx": "catalog:",
     "turbo": "^2.11.5",
     "typescript": "6.0.x",
-    "unplugin-swc": "^2.0.0",
     "vitest": "^4.1.11"
   },
   "os": [
@@ -89,15 +81,12 @@
       "@prisma/engines",
       "@swc/core",
       "@tailwindcss/oxide",
-      "cypress",
       "esbuild",
       "mongodb-memory-server",
       "msgpackr-extract",
-      "msw",
       "oxc-resolver",
       "prisma",
-      "sharp",
-      "sqlite3"
+      "sharp"
     ],
     "ignoredBuiltDependencies": [
       "@scarf/scarf"
