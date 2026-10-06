@@ -2,7 +2,7 @@ import path from 'node:path';
 
 import { defineProject, mergeConfig } from 'vitest/config';
 
-import baseConfig from '../../vitest.config';
+import { baseConfig } from '../../vitest.config';
 
 const repositoryRoot = path.resolve(import.meta.dirname, '../..');
 

@@ -63,6 +63,11 @@ project globs by design — `testing/` is Playwright, not vitest.
 
 - **There are no setup files anywhere in the repo.** No `setupFiles`, no `globalSetup`. Whatever a
   test needs, it arranges in its own body.
+- **Every mock's recorded calls are cleared before each test** — Vitest's `clearMocks` defaults to
+  `true`, and no config here overrides it. A call made at import time or in `beforeAll` is gone by
+  the time an `it` runs, so copy what the assertion reads into a variable at the end of `beforeAll`,
+  as `packages/serve-instrument/src/__tests__/client.test.tsx` does. Implementations survive the
+  clear.
 - **`@testing-library/jest-dom` is not installed.** `toBeInTheDocument()` does not exist; assert
   `expect(screen.getByText(x)).toBeTruthy()`.
 - Workspace packages export TypeScript source from `exports` (`@opendatacapture/schemas` maps

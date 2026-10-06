@@ -40,7 +40,7 @@
     "@douglasneuroinformatics/tsconfig": "^2.0.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "24.x",
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "^5.0.2",
     "conventional-commits-parser": "catalog:",
     "env-cmd": "^11.0.0",
     "eslint": "9.39.x",
@@ -55,7 +55,7 @@
     "tsx": "catalog:",
     "turbo": "^2.11.5",
     "typescript": "6.0.x",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.2"
   },
   "os": [
     "darwin",
@@ -70,7 +70,6 @@
       "@types/react": "-",
       "@types/react-dom": "-",
       "find-my-way@9": "^9.7.0",
-      "fastify@5": "^5.12.5",
       "typescript": "6.0.x",
       "yaml@2": "^2.9.0"
     },

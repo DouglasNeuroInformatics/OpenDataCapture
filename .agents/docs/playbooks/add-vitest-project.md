@@ -34,7 +34,7 @@ of your file means the config is absent.
    ```ts
    import { defineProject, mergeConfig } from 'vitest/config';
 
-   import baseConfig from '../../vitest.config';
+   import { baseConfig } from '../../vitest.config';
 
    export default mergeConfig(
      baseConfig,
@@ -51,6 +51,14 @@ of your file means the config is absent.
    globs and `watch: false`; `root: import.meta.dirname` is what scopes those globs to this package
    rather than the repo. Every project file uses `defineProject` — `defineConfig` belongs to the root
    config alone.
+
+   Merge the named `baseConfig`, never the root's default export. The default export adds `coverage`
+   and `projects`, and Vitest reads a `projects` field inside a project config as a nested set of
+   projects, re-resolved against the package directory, so every run stops before collecting a file:
+
+   ```
+   Error: No projects were found in "packages/schemas/vitest.config.ts". Make sure your configuration is correct.
+   ```
 
 3. **Name the project after the directory.** The `name` field is the string `--project` takes, and it
    is the directory basename everywhere except `runtime/v1`, whose project is `runtime-v1` because
@@ -76,19 +84,11 @@ of your file means the config is absent.
    `packages/runtime-bundler` and `packages/runtime-meta` do — a `test/` directory outside the
    tsconfig `include` is type-checked by nothing.
 
-6. **Add the `test` script, and do not rely on it.** `"test": "vitest"` under `packages/` and
-   `runtime/`, `"test": "env-cmd -f ../../.env vitest"` for an app, matching every project that
-   already exists. Running it does not work today: `mergeConfig` inherits the root `test.projects`
-   globs along with everything else, and started from inside the package they re-resolve against that
-   directory and match nothing —
-
-   ```
-   Error: No projects were found. Make sure your configuration is correct. The projects definition: […]
-   ```
-
-   Scope a run from the repo root instead: `pnpm exec vitest --project <name>`. Root `pnpm test` runs
-   the projects directly and never reads this script; `vitest` is a root devDependency, so the package
-   declares nothing.
+6. **Add the `test` script.** `"test": "vitest"` under `packages/` and `runtime/`,
+   `"test": "env-cmd -f ../../.env vitest"` for an app, matching every project that already exists.
+   `pnpm --filter @opendatacapture/<pkg> test` runs this one project from the package directory. Root
+   `pnpm test` runs the projects directly and never reads this script; `vitest` is a root
+   devDependency, so the package declares nothing.
 
 7. **Place the test file inside the inherited glob.** That is `**/*.{test,spec}.?(c|m)[jt]s?(x)`,
    relative to the package `root`; the house convention is a `__tests__/` folder beside the subject,

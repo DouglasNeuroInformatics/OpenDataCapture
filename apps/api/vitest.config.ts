@@ -4,7 +4,7 @@ import libnest from '@douglasneuroinformatics/libnest/testing/plugin';
 import { defineProject, mergeConfig } from 'vitest/config';
 import type { Plugin } from 'vitest/config';
 
-import baseConfig from '../../vitest.config';
+import { baseConfig } from '../../vitest.config';
 
 const [swcPlugin, libnestPlugin] = libnest({
   baseUrl: path.resolve(import.meta.dirname, 'src'),
