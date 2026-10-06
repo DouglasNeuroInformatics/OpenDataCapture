@@ -146,8 +146,8 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0(@typescript-eslint/parser@8.60.1(eslint@9.39.5(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.5(jiti@2.7.0))(typescript@6.0.3)
       '@douglasneuroinformatics/prettier-config':
-        specifier: ^0.3.0
-        version: 0.3.0(husky@9.1.7)(prettier-plugin-astro@0.14.1)(prettier-plugin-tailwindcss@0.8.1(prettier-plugin-astro@0.14.1)(prettier@3.9.9))(prettier@3.9.9)
+        specifier: ^0.4.0
+        version: 0.4.0(husky@9.1.7)(prettier-plugin-astro@0.14.1)(prettier-plugin-tailwindcss@0.8.1(prettier-plugin-astro@0.14.1)(prettier@3.9.9))(prettier@3.9.9)
       '@douglasneuroinformatics/tsconfig':
         specifier: ^2.0.0
         version: 2.0.0(typescript@6.0.3)
@@ -2246,13 +2246,13 @@ packages:
       tailwindcss: ^4.1.0
       zod: ^3.25.x
 
-  '@douglasneuroinformatics/prettier-config@0.3.0':
-    resolution: {integrity: sha512-pa8AXwRQHmq99nbYsAfWjfk0MOT0sjidsfP0VMaWEvDQy4l055kLwggWa0aqc5C6V3ZubA56K4gx5+r3/drslQ==}
+  '@douglasneuroinformatics/prettier-config@0.4.0':
+    resolution: {integrity: sha512-uB8vV0ExwUPfxTxdTvyOmWOxIwIKt9KdTmUXwSErIbDb1nTJ1BWbb+jXSeWD22BjvBuSty8mC7B7SoB8PhPamA==}
     hasBin: true
     peerDependencies:
       husky: 9.x
       prettier: 3.x
-      prettier-plugin-astro: 0.x
+      prettier-plugin-astro: 0.x || 1.x
       prettier-plugin-svelte: 3.x
       prettier-plugin-tailwindcss: 0.x
     peerDependenciesMeta:
@@ -11956,7 +11956,7 @@ snapshots:
       - neverthrow
       - use-sync-external-store
 
-  '@douglasneuroinformatics/prettier-config@0.3.0(husky@9.1.7)(prettier-plugin-astro@0.14.1)(prettier-plugin-tailwindcss@0.8.1(prettier-plugin-astro@0.14.1)(prettier@3.9.9))(prettier@3.9.9)':
+  '@douglasneuroinformatics/prettier-config@0.4.0(husky@9.1.7)(prettier-plugin-astro@0.14.1)(prettier-plugin-tailwindcss@0.8.1(prettier-plugin-astro@0.14.1)(prettier@3.9.9))(prettier@3.9.9)':
     dependencies:
       prettier: 3.9.9
     optionalDependencies:
