@@ -84,4 +84,4 @@ export {
   withPermission,
   withPermissionDrafts
 };
-export type { AddPermissionFormData, PermissionDraft };
+export type { PermissionDraft };

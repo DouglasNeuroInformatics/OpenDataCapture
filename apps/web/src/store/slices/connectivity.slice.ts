@@ -11,7 +11,7 @@ export const createConnectivitySlice: SliceCreator<ConnectivitySlice> = (set) =>
       state.pendingRetries = Math.max(0, state.pendingRetries - 1);
     });
   },
-  isOnline: typeof navigator === 'undefined' ? true : navigator.onLine,
+  isOnline: navigator.onLine,
   pendingRetries: 0,
   setIsOnline: (isOnline: boolean) => {
     set((state) => {

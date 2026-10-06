@@ -121,8 +121,8 @@ Touching any of them invalidates the cache for every task in the repo.
 `coverage.thresholds: { 100: true }`, so the run fails when statements, branches, functions or lines
 drop below 100%. The scope is its `coverage.include` — `apps/{api,gateway,web}/src` and
 `packages/*/src`; `runtime/**` and `apps/playground` are outside it — minus `coverage.exclude`,
-which lists only non-code: test fixtures and helpers (`__tests__`, `__mocks__`,
-`apps/web/src/testing`), the generated `route-tree.ts`, and the bare entrypoints.
+which lists only non-code: test fixtures and helpers (`__tests__`, `apps/web/src/testing`), the
+generated `route-tree.ts`, and the bare entrypoints.
 
 - **A line no test can reach is dead code.** Prove it (the types, every caller, the library's
   contract) and delete it, or restructure so the impossible state cannot be written — e.g. ts-pattern

@@ -23,7 +23,6 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/hooks/useGroupQuery', () => ({
-  GROUP_QUERY_KEY: 'group',
   useGroupQuery: mocks.useGroupQuery
 }));
 

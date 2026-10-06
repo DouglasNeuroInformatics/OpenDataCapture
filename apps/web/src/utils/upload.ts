@@ -188,9 +188,9 @@ function getTemplateFilename(instrumentInternal: AnyUnilingualFormInstrument['in
 }
 
 export namespace Zod3 {
-  export type ZodTypeName = Extract<`${z3.ZodFirstPartyTypeKind}`, (typeof ZOD_TYPE_NAMES)[number]>;
+  type ZodTypeName = Extract<`${z3.ZodFirstPartyTypeKind}`, (typeof ZOD_TYPE_NAMES)[number]>;
 
-  export type RequiredZodTypeName = Exclude<ZodTypeName, 'ZodEffects' | 'ZodOptional'>;
+  type RequiredZodTypeName = Exclude<ZodTypeName, 'ZodEffects' | 'ZodOptional'>;
 
   type AnyZodTypeDef = z3.ZodTypeDef & { typeName: ZodTypeName };
 
@@ -216,7 +216,7 @@ export namespace Zod3 {
     return isObjectLike(value) && value.constructor.name === 'ZodObject';
   }
 
-  export function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
+  function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
     return isPlainObject(value) && ZOD_TYPE_NAMES.includes(value.typeName as ZodTypeName);
   }
 
@@ -224,7 +224,7 @@ export namespace Zod3 {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodOptional;
   }
 
-  export function isZodEnumDef(def: AnyZodTypeDef): def is z3.ZodEnumDef {
+  function isZodEnumDef(def: AnyZodTypeDef): def is z3.ZodEnumDef {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodEnum;
   }
 
@@ -244,7 +244,7 @@ export namespace Zod3 {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodEffects;
   }
 
-  export function interpretZodArray(def: ZodObjectArrayDef, isOptional?: boolean): ZodTypeNameResult {
+  function interpretZodArray(def: ZodObjectArrayDef, isOptional?: boolean): ZodTypeNameResult {
     const listOfZodElements: ZodTypeNameResult[] = [];
     const listOfZodKeys: string[] = [];
 
@@ -623,7 +623,7 @@ export namespace Zod3 {
 }
 
 export namespace Zod4 {
-  export type TypeName = Extract<
+  type TypeName = Extract<
     z4.core.$ZodTypeDef['type'],
     'array' | 'boolean' | 'date' | 'enum' | 'number' | 'object' | 'optional' | 'set' | 'string'
   >;

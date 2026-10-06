@@ -51,10 +51,4 @@ describe('createConnectivitySlice', () => {
     const freshStore = await importFreshStore();
     expect(freshStore.getState().isOnline).toBe(false);
   });
-
-  it('should assume it is online where there is no navigator to ask', async () => {
-    vi.stubGlobal('navigator', undefined);
-    const freshStore = await importFreshStore();
-    expect(freshStore.getState().isOnline).toBe(true);
-  });
 });
