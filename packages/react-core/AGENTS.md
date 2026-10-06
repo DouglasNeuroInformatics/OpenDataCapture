@@ -20,8 +20,8 @@ other workspaces, not in this one.
 - **Four components are deliberately absent from that list** — `FormContent`, `InteractiveContent`,
   `FileInstrumentContent`, `InstrumentOverview` — along with `src/hooks/useInterpretedInstrument.ts`.
   They are internal parts of `InstrumentRenderer`. Do not export one unless a consumer needs it.
-- **There are no deep import paths.** The exports map is exactly `.`, `./globals.css` and
-  `./package.json`, so `@opendatacapture/react-core/components/Foo` will not resolve.
+- **There are no deep import paths.** The exports map is exactly `.` and `./globals.css`, so
+  `@opendatacapture/react-core/components/Foo` will not resolve.
 
 A component earns a place here when a _second_ frontend needs it. Anything only `apps/web` renders
 belongs in `apps/web/src/components`.
@@ -72,10 +72,9 @@ frontend shows — instruments and the apps' own forms alike. `apps/web/src/serv
 than registering globally. A case that depends on the reader switching language mid-session builds
 its maps over libui's real `i18n`; every other case uses a fixed-language translator.
 
-## `@tanstack/react-router` is an optional peer — never import it
+## Never import `@tanstack/react-router`
 
-Gateway, playground and serve-instrument have no router. Nothing under `src/` imports the router
-except `InstrumentRenderer.stories.tsx`.
+Gateway, playground and serve-instrument have no router, and react-core does not depend on it.
 
 Router-dependent behaviour is **injected as a component prop**: `InstrumentRenderer` accepts
 `NavigationBlocker?: NavigationBlockerComponent`, and both the scalar and series renderers hand it to
@@ -129,7 +128,7 @@ react-core, and anything added outside `src/` would not be scanned.
 `storybook/config/main.ts` scans **`packages/react-core/src/components`** with the title prefix
 "React Core". A `*.stories.tsx` anywhere else under `src/` is invisible. Fixtures come from the
 `@opendatacapture/instrument-stubs` devDependency. Run with
-`pnpm --filter @opendatacapture/react-core storybook`.
+`pnpm --filter @opendatacapture/storybook storybook`.
 
 Import siblings by relative path. `InstrumentSummary.tsx` importing `CopyButton` from
 `@opendatacapture/react-core` (a Node self-reference back through the barrel) is an outlier, not the

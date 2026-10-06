@@ -18,7 +18,7 @@ import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
 import { validateSubmission } from './validateSubmission';
 
-import type { LocalizedText, SubjectDisplayInfo } from '../../types';
+import type { LocalizedText } from '../../types';
 import type { FormContentSubmitResult } from '../FormContent';
 import type { InteractiveContentSubmitResult } from '../InteractiveContent';
 import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
@@ -33,7 +33,6 @@ export type SeriesInstrumentRendererProps = {
   initialSeriesIndex?: number;
   NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: InstrumentSubmitHandler<'SERIES'>;
-  subject?: SubjectDisplayInfo;
   /** A localizable label for each constituent form's submit button. */
   submitButtonLabel?: LocalizedText;
   target: SeriesInstrumentBundleContainer;
@@ -97,7 +96,7 @@ export const SeriesInstrumentRenderer = ({
       const itemName = instrument.internal?.name ?? '';
       const shouldTerminate = params.terminate?.(parsedData, { itemIndex: currentItemIndex, itemName }) ?? false;
 
-      await onSubmit?.({
+      await onSubmit({
         complete: isLastItem || shouldTerminate,
         data: parsedData,
         index,
@@ -178,11 +177,7 @@ export const SeriesInstrumentRenderer = ({
                   })}
                 </p>
                 <div className="pt-2">
-                  <Button
-                    disabled={isInstrumentInProgress}
-                    type="button"
-                    onClick={() => setIsInstrumentInProgress(true)}
-                  >
+                  <Button type="button" onClick={() => setIsInstrumentInProgress(true)}>
                     {t({ en: 'Begin', es: 'Comenzar', fr: 'Commencer' })}
                   </Button>
                 </div>
