@@ -147,17 +147,11 @@ describe('$CreateRemoteAssignmentsData', () => {
 });
 
 describe('GET /assignments', () => {
-  it('should filter by the subject named in the query, so the API sees only the assignments of that subject', async () => {
+  it('should list every assignment, since the API reconciles the whole set on each sync', async () => {
     prisma.remoteAssignmentModel.findMany.mockResolvedValueOnce([{ id: 'assignment-1', status: 'OUTSTANDING' }]);
-    const response = await request('GET', '/assignments?subjectId=subject-1');
+    const response = await request('GET', '/assignments');
     expect(await response.json()).toEqual([{ id: 'assignment-1', status: 'OUTSTANDING' }]);
-    expect(prisma.remoteAssignmentModel.findMany).toHaveBeenCalledWith({ where: { subjectId: 'subject-1' } });
-  });
-
-  it('should ignore a repeated subject query rather than filtering on an array', async () => {
-    prisma.remoteAssignmentModel.findMany.mockResolvedValueOnce([]);
-    await request('GET', '/assignments?subjectId=a&subjectId=b');
-    expect(prisma.remoteAssignmentModel.findMany).toHaveBeenCalledWith({ where: { subjectId: undefined } });
+    expect(prisma.remoteAssignmentModel.findMany).toHaveBeenCalledWith();
   });
 });
 
