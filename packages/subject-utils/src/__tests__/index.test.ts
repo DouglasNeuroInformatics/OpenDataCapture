@@ -25,6 +25,11 @@ describe('generateSubjectHash', () => {
       await generateSubjectHash({ ...validIdentificationData, firstName: 'Jane' })
     );
   });
+  it('should hash different identification data to different strings', async () => {
+    await expect(generateSubjectHash({ ...validIdentificationData, lastName: 'Smith' })).resolves.not.toEqual(
+      await generateSubjectHash(validIdentificationData)
+    );
+  });
   it('should reject a missing dateOfBirth', async () => {
     await expect(generateSubjectHash({ ...validIdentificationData, dateOfBirth: 'not-a-date' as any })).rejects.toThrow(
       /dateOfBirth/
@@ -83,7 +88,7 @@ describe('isSubjectWithPersonalInfo', () => {
 
 describe('encodeScopedSubjectId', () => {
   it('should join the group name and subject ID with a $, replacing spaces with underscores', () => {
-    expect(encodeScopedSubjectId(123, { groupName: 'My Group' })).toBe('My_Group$123');
+    expect(encodeScopedSubjectId('123', { groupName: 'My Group' })).toBe('My_Group$123');
   });
 });
 

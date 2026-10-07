@@ -28,7 +28,7 @@ export function isFieldHidden<TData extends FormInstrument.Data>(
 export function extractFieldLabel<TData extends FormInstrument.Data>(
   form: FormInstrument<TData, Language>,
   key: string,
-  data: null | TData = null
+  data: TData
 ) {
   const field = getFormFields(form.content)[key]!;
   if (field.kind === 'dynamic') {

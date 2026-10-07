@@ -6,7 +6,7 @@ import type { Promisable } from 'type-fest';
 
 import type { LocalizedText } from '../../types';
 
-export type UploadMap = {
+type UploadMap = {
   [basename: string]: File[];
 };
 
@@ -51,7 +51,6 @@ export type FileInstrumentContentSubmitResult = {
 };
 
 export type FileInstrumentContentProps = {
-  instrument: AnyUnilingualFileInstrument & { id: string };
+  instrument: AnyUnilingualFileInstrument;
   onSubmit: (result: FileInstrumentContentSubmitResult) => Promisable<void>;
-  onSuccess?: () => Promisable<void>;
 };

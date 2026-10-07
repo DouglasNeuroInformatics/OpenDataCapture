@@ -111,7 +111,7 @@ return { client } satisfies PrismaModuleOptions;
 
 Everywhere else, inject a model: `@InjectModel('Group') private readonly groupModel: Model<'Group'>`.
 
-### Unit tests (`apps/api/src/**/__tests__/*.spec.ts`)
+### Unit tests (`apps/api/src/**/__tests__/*.test.ts`)
 
 ```ts
 import { getModelToken } from '@douglasneuroinformatics/libnest';

@@ -31,7 +31,7 @@ jobs:
       - name: Lint
         run: pnpm lint
       - name: Unit Tests
-        run: pnpm test
+        run: pnpm test:coverage
       - name: Install Playwright
         # Cap the step so a hang fails fast instead of hitting the 6h job limit, skip the interactive
         # apt prompt, and install only the browsers the e2e suite uses.

@@ -1,13 +1,24 @@
-import { QueryClient } from '@tanstack/react-query';
+import type { PropsWithChildren } from 'react';
+import { createElement, Suspense } from 'react';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { subjectRecordSummaryQueryOptions } from '../useSubjectRecordSummaryQuery';
+import { subjectRecordSummaryQueryOptions, useSubjectRecordSummaryQuery } from '../useSubjectRecordSummaryQuery';
 
 vi.mock('axios');
 
 const runQuery = (groupId?: string) =>
   new QueryClient().fetchQuery(subjectRecordSummaryQueryOptions({ params: { groupId } }));
+
+const renderSummaryQuery = (groupId?: string) => {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const wrapper = ({ children }: PropsWithChildren) =>
+    createElement(QueryClientProvider, { client: queryClient }, createElement(Suspense, { fallback: null }, children));
+  return renderHook(() => useSubjectRecordSummaryQuery({ params: { groupId } }), { wrapper });
+};
 
 // eslint-disable-next-line @typescript-eslint/unbound-method -- a vitest mock, never invoked as a method
 const get = vi.mocked(axios).get;
@@ -43,6 +54,12 @@ describe('subjectRecordSummaryQueryOptions', () => {
   it('should reject a negative record count, so nothing unparsed reaches the table', async () => {
     get.mockResolvedValueOnce({ data: [{ lastCollectedAt: null, recordCount: -1, subjectId: 'subject-1' }] });
     await expect(runQuery('group-1')).rejects.toThrow();
+  });
+
+  it('should suspend until the summary resolves, so the table never renders a row without its counts', async () => {
+    get.mockResolvedValueOnce({ data: [{ lastCollectedAt: null, recordCount: 0, subjectId: 'subject-1' }] });
+    const { result } = renderSummaryQuery('group-1');
+    await waitFor(() => expect(result.current?.data).toHaveLength(1));
   });
 
   it('should key the cache on the group, so switching group does not serve the previous group counts', () => {

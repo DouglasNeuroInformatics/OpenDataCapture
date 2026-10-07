@@ -2,7 +2,7 @@
 
 Generic UI components for DNP projects, built with React and Tailwind CSS.
 
-**Status in Open Data Capture:** used extensively — ~194 files, concentrated in `apps/web` (105) and `apps/playground` (52), plus `packages/react-core` (31), `apps/gateway`, `apps/outreach`, and `packages/serve-instrument`. It is the primary source of UI components, hooks, i18n, and theming for every frontend surface. (`storybook` declares it as a dependency but imports it only through the components it renders.)
+**Status in Open Data Capture:** used extensively — ~194 files, concentrated in `apps/web` (105) and `apps/playground` (52), plus `packages/react-core` (31), `apps/gateway`, `apps/outreach`, and `packages/serve-instrument`. It is the primary source of UI components, hooks, i18n, and theming for every frontend surface.
 
 There is no root `.` export — always import from a subpath.
 
@@ -102,7 +102,7 @@ ls  apps/web/node_modules/@douglasneuroinformatics/libui/src/hooks              
 cat apps/web/node_modules/@douglasneuroinformatics/libui/src/utils/index.ts
 ```
 
-Also resolvable from `apps/gateway`, `apps/playground`, `apps/outreach`, `packages/react-core`, `packages/serve-instrument`, and `storybook`.
+Also resolvable from `apps/gateway`, `apps/playground`, `apps/outreach`, `packages/react-core`, and `packages/serve-instrument`.
 
 ## Docs
 

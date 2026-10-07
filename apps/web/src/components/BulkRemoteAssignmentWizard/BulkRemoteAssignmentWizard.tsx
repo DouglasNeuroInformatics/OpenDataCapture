@@ -59,7 +59,7 @@ export const BulkRemoteAssignmentWizard = ({
   const wizard = useBulkAssignmentWizard({ groupId, instruments, subjectIdDisplayLength });
 
   return (
-    <div className="mx-auto flex w-full max-w-[70rem] flex-col gap-6" data-testid="bulk-remote-assignment-wizard">
+    <div className="mx-auto flex w-full max-w-280 flex-col gap-6" data-testid="bulk-remote-assignment-wizard">
       {wizard.step === 'SOURCE' && (
         <SourceStep
           selectedIds={wizard.subjectIds}

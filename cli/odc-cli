@@ -21,7 +21,7 @@ from argparse import (
     RawTextHelpFormatter,
 )
 from datetime import datetime, timezone
-from typing import Any, Callable, TypedDict
+from typing import Any, Callable
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse, quote
 from urllib.request import Request, urlopen
@@ -51,10 +51,6 @@ Requires:
 """
 
 config: Config  # initialized in main
-
-# --- Types ---
-
-JwtPayload = TypedDict('JwtPayload', {'basePermissionLevel': str})
 
 # --- Decorators ---
 

@@ -8,8 +8,7 @@ import {
   $$ScalarInstrument,
   $InstrumentDetails,
   $InstrumentKind,
-  $InstrumentLanguage,
-  $ScalarInstrument
+  $InstrumentLanguage
 } from '../instrument.base.js';
 
 test('$InstrumentKind', () => {
@@ -77,15 +76,6 @@ describe('$InstrumentDetails', () => {
   });
   it('should handle multilingual details', () => {
     expect($InstrumentDetails.safeParse(bilingualFormInstrument.instance.details).success).toBe(true);
-  });
-});
-
-describe('$ScalarInstrument', () => {
-  it('should handle a unilingual form', () => {
-    expect($ScalarInstrument.safeParse(unilingualFormInstrument.instance).success).toBe(true);
-  });
-  it('should handle a multilingual form', () => {
-    expect($ScalarInstrument.safeParse(bilingualFormInstrument.instance).success).toBe(true);
   });
 });
 

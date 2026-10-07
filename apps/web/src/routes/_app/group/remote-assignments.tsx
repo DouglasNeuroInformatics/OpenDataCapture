@@ -130,7 +130,7 @@ const RouteComponent = () => {
       )}
 
       {mode === 'DELETE' && (
-        <div className="mx-auto w-full max-w-[70rem]">
+        <div className="mx-auto w-full max-w-280">
           <DeleteRemoteAssignments
             groupId={currentGroup.id}
             subjectIdDisplayLength={currentGroup.settings.subjectIdDisplayLength ?? 9}

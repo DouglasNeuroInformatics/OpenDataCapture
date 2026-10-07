@@ -70,9 +70,9 @@ export abstract class BaseServer {
 
   protected fixStacktrace?(err: Error): void;
 
-  listen(port = config.port) {
-    return this.app.listen(port, () => {
-      logger.info(`Server started at http://localhost:${port}`);
+  listen() {
+    return this.app.listen(config.port, () => {
+      logger.info(`Server started at http://localhost:${config.port}`);
     });
   }
 

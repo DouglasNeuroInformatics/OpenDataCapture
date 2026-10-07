@@ -5,8 +5,7 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "exports": {
-    ".": "./src/index.ts",
-    "./assets/*": "./src/assets/*"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "format": "prettier --write src",

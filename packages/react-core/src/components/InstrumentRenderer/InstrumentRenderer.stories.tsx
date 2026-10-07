@@ -5,7 +5,6 @@ import { bilingualInteractiveInstrument, interactiveInstrument } from '@opendata
 import { seriesInstrument } from '@opendatacapture/instrument-stubs/series';
 import type { ScalarInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { createMemoryHistory, createRootRoute, createRouter, RouterProvider } from '@tanstack/react-router';
 
 import { InstrumentRenderer } from './InstrumentRenderer';
 
@@ -96,21 +95,7 @@ export const BilingualFile: Story = {
       }
     },
     target: bilingualFileTarget
-  },
-  decorators: [
-    (Story) => {
-      return (
-        <RouterProvider
-          router={createRouter({
-            history: createMemoryHistory(),
-            routeTree: createRootRoute({
-              component: Story
-            })
-          })}
-        />
-      );
-    }
-  ]
+  }
 };
 
 export const UnilingualInteractive: Story = {

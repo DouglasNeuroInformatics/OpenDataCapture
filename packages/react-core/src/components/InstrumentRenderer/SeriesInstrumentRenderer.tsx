@@ -18,7 +18,7 @@ import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
 import { validateSubmission } from './validateSubmission';
 
-import type { LocalizedText, SubjectDisplayInfo } from '../../types';
+import type { LocalizedText } from '../../types';
 import type { FormContentSubmitResult } from '../FormContent';
 import type { InteractiveContentSubmitResult } from '../InteractiveContent';
 import type { NavigationBlockerComponent } from '../NavigationBlockerDialog';
@@ -33,7 +33,6 @@ export type SeriesInstrumentRendererProps = {
   initialSeriesIndex?: number;
   NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: InstrumentSubmitHandler<'SERIES'>;
-  subject?: SubjectDisplayInfo;
   /** A localizable label for each constituent form's submit button. */
   submitButtonLabel?: LocalizedText;
   target: SeriesInstrumentBundleContainer;
@@ -75,10 +74,11 @@ export const SeriesInstrumentRenderer = ({
   const params = rootState.status === 'DONE' ? getSeriesInstrumentParams(rootState.instrument.content) : {};
   const skipProgress = params.skipProgress ?? false;
 
-  const handleSubmit = async ({ data }: FormContentSubmitResult | InteractiveContentSubmitResult) => {
-    const parsedData = JSON.parse(JSON.stringify(data, replacer)) as Json;
-    if (scalarState.status === 'DONE') {
-      const validationResult = validateSubmission(scalarState.instrument, parsedData);
+  const createSubmitHandler =
+    (instrument: AnyUnilingualScalarInstrument) =>
+    async ({ data }: FormContentSubmitResult | InteractiveContentSubmitResult) => {
+      const parsedData = JSON.parse(JSON.stringify(data, replacer)) as Json;
+      const validationResult = validateSubmission(instrument, parsedData);
       if (!validationResult.success) {
         console.error(validationResult.issues);
         addNotification({
@@ -91,34 +91,32 @@ export const SeriesInstrumentRenderer = ({
         });
         return;
       }
-    }
-    const isLastItem = currentItemIndex === target.items.length - 1;
-    // `scalarState` is DONE here (its content is what was just submitted); its
-    // `internal.name` gives the item name for the predicate context.
-    const itemName = scalarState.status === 'DONE' ? (scalarState.instrument.internal?.name ?? '') : '';
-    const shouldTerminate = params.terminate?.(parsedData, { itemIndex: currentItemIndex, itemName }) ?? false;
+      const isLastItem = currentItemIndex === target.items.length - 1;
+      // The item name is the predicate context `terminate` receives.
+      const itemName = instrument.internal?.name ?? '';
+      const shouldTerminate = params.terminate?.(parsedData, { itemIndex: currentItemIndex, itemName }) ?? false;
 
-    await onSubmit?.({
-      complete: isLastItem || shouldTerminate,
-      data: parsedData,
-      index,
-      instrumentId: scalarId!,
-      kind: 'SERIES',
-      seriesInstrumentId: target.id
-    });
+      await onSubmit({
+        complete: isLastItem || shouldTerminate,
+        data: parsedData,
+        index,
+        instrumentId: scalarId!,
+        kind: 'SERIES',
+        seriesInstrumentId: target.id
+      });
 
-    if (isLastItem || shouldTerminate) {
-      setCompletion({ itemName, terminated: shouldTerminate });
-    }
-    if (shouldTerminate) {
-      setIndex(2);
-      return;
-    }
-    setCurrentItemIndex(currentItemIndex + 1);
-    if (!skipProgress) {
-      setIsInstrumentInProgress(false);
-    }
-  };
+      if (isLastItem || shouldTerminate) {
+        setCompletion({ itemName, terminated: shouldTerminate });
+      }
+      if (shouldTerminate) {
+        setIndex(2);
+        return;
+      }
+      setCurrentItemIndex(currentItemIndex + 1);
+      if (!skipProgress) {
+        setIsInstrumentInProgress(false);
+      }
+    };
 
   const completionMessage =
     params.completionMessage?.({ itemName: completion?.itemName, terminated: completion?.terminated ?? false }) ?? null;
@@ -179,11 +177,7 @@ export const SeriesInstrumentRenderer = ({
                   })}
                 </p>
                 <div className="pt-2">
-                  <Button
-                    disabled={isInstrumentInProgress}
-                    type="button"
-                    onClick={() => setIsInstrumentInProgress(true)}
-                  >
+                  <Button type="button" onClick={() => setIsInstrumentInProgress(true)}>
                     {t({ en: 'Begin', es: 'Comenzar', fr: 'Commencer' })}
                   </Button>
                 </div>
@@ -218,15 +212,19 @@ export const SeriesInstrumentRenderer = ({
                         instrument={instrument}
                         key={currentItemIndex}
                         submitButtonLabel={submitButtonLabel}
-                        onSubmit={handleSubmit}
+                        onSubmit={createSubmitHandler(instrument)}
                       />
                     ))
-                    .with({ instrument: { kind: 'INTERACTIVE' } }, () => (
-                      <InteractiveContent bundle={scalarBundle!} key={currentItemIndex} onSubmit={handleSubmit} />
+                    .with({ instrument: { kind: 'INTERACTIVE' } }, ({ instrument }) => (
+                      <InteractiveContent
+                        bundle={scalarBundle!}
+                        key={currentItemIndex}
+                        onSubmit={createSubmitHandler(instrument)}
+                      />
                     ))
                     .otherwise(() => null)
                 )
-                .otherwise(() => null)
+                .exhaustive()
             )
             .with({ index: 2 }, () => (
               <div className="mx-auto flex max-w-prose grow flex-col items-center justify-center space-y-1 py-32 text-center">
@@ -257,7 +255,7 @@ export const SeriesInstrumentRenderer = ({
                 </p>
               </div>
             ))
-            .otherwise(() => null)
+            .exhaustive()
         )
         .exhaustive()}
     </InstrumentRendererContainer>

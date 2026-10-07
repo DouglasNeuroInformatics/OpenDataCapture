@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 import { Reflection } from 'typedoc';
-import type { Comment, CommentDisplayPart, CommentTag, Options } from 'typedoc';
+import type { Comment, CommentDisplayPart, Options } from 'typedoc';
 import { MarkdownPageEvent, MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
 
 import { getAsideMarkdown, getRelativeURL } from './starlight';
@@ -56,7 +56,7 @@ class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
 
       for (const blockTag of comment.blockTags) {
         if (this.#isCustomBlockCommentTagType(blockTag.tag)) {
-          customTags.push({ blockTag, type: blockTag.tag });
+          customTags.push({ type: blockTag.tag });
         } else {
           blockTag.content = blockTag.content.map((part) => this.#parseCommentDisplayPart(part));
           filteredComment.blockTags.push(blockTag);
@@ -90,7 +90,7 @@ class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
             break;
           }
           case '@deprecated': {
-            markdown = this.#addDeprecatedAside(markdown, customCommentTag.blockTag);
+            markdown = this.#addDeprecatedAside(markdown);
             break;
           }
           case '@experimental': {
@@ -120,7 +120,7 @@ class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
     return `${markdown}\n\n${getAsideMarkdown(...args)}`;
   }
 
-  #addDeprecatedAside(markdown: string, _blockTag: CommentTag) {
+  #addDeprecatedAside(markdown: string) {
     const content = 'This API is no longer supported and may be removed in a future release.';
     return this.#addAside(markdown, 'caution', 'Deprecated', content);
   }
@@ -138,11 +138,6 @@ class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
 type CustomBlockTagType = (typeof customBlockTagTypes)[number];
 type CustomModifierTagType = (typeof customModifiersTagTypes)[number];
 
-type CustomTag =
-  | {
-      blockTag: CommentTag;
-      type: CustomBlockTagType;
-    }
-  | { type: CustomModifierTagType };
+type CustomTag = { type: CustomBlockTagType | CustomModifierTagType };
 
 export { StarlightTypeDocTheme };

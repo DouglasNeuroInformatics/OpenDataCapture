@@ -9,7 +9,6 @@ export class AdminUserPage extends AppPage {
   readonly adminNotice: Locator;
   readonly backLink: Locator;
   readonly manageAllWarning: Locator;
-  readonly pageHeader: Locator;
   readonly permissionRows: Locator;
   readonly permissionsTable: Locator;
   readonly profileForm: Locator;
@@ -18,7 +17,6 @@ export class AdminUserPage extends AppPage {
   constructor(page: Page) {
     super(page);
     this.backLink = page.getByTestId('admin-user-back');
-    this.pageHeader = page.getByTestId('page-header');
     this.profileForm = page.getByTestId('update-user-form');
     this.submitError = page.getByTestId('admin-user-edit-error');
     this.permissionsTable = page.getByTestId('user-permissions-table');
@@ -44,11 +42,6 @@ export class AdminUserPage extends AppPage {
     await this.addPermissionRow.getByRole('button', { name: 'Add Permission' }).click();
   }
 
-  async archiveUser() {
-    await this.$ref.getByRole('button', { name: 'Archive' }).click();
-    await this.$ref.getByRole('button', { name: 'Yes' }).click();
-  }
-
   async removePermission(index: number) {
     await this.permissionRows.nth(index).getByTestId('user-permission-remove').click();
   }
@@ -66,9 +59,5 @@ export class AdminUserPage extends AppPage {
 
   async submitPermission() {
     await this.saveProfile();
-  }
-
-  async unarchiveUser() {
-    await this.$ref.getByRole('button', { name: 'Unarchive' }).click();
   }
 }

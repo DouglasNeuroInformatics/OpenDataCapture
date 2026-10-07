@@ -40,7 +40,6 @@ export default mergeConfig(
     root: import.meta.dirname,
     test: {
       globals: true,
-      include: ['src/**/*.spec.ts', 'test/**/*.test.ts'],
       name: 'api'
     }
   })

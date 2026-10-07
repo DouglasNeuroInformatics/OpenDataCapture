@@ -27,6 +27,4 @@ const $$InteractiveInstrument = <TLanguage extends InstrumentLanguage>(language?
   }) satisfies z.ZodType<InteractiveInstrument<InteractiveInstrument.Data, TLanguage>>;
 };
 
-const $InteractiveInstrument = $$InteractiveInstrument() satisfies z.ZodType<InteractiveInstrument>;
-
-export { $$InteractiveInstrument, $InteractiveInstrument };
+export { $$InteractiveInstrument };

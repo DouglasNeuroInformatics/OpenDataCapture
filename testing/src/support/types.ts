@@ -9,6 +9,18 @@ declare global {
   }
 }
 
+type ExtractParams<TPath extends string> = Split<TPath, '/'>[number] extends infer TUnion
+  ? TUnion extends `$${infer TParam}`
+    ? TParam
+    : never
+  : never;
+
+type RouteParams<TPath extends RouteTo> = {
+  [K in ExtractParams<TPath>]: number | string;
+} extends infer TParams
+  ? IfEmptyObject<TParams, void, TParams>
+  : never;
+
 export type Role = 'ADMIN' | 'GROUP_MANAGER' | 'STANDARD';
 
 /** The `app` localStorage store the web app reads for first-run gating. */
@@ -19,18 +31,6 @@ export type AppState = {
 
 // Generated from apps/web's route tree by scripts/gen-routes.ts (see src/generated/route.d.ts).
 export type RouteTo = import('../generated/route.d.ts').RouteTo;
-
-export type ExtractParams<TPath extends string> = Split<TPath, '/'>[number] extends infer TUnion
-  ? TUnion extends `$${infer TParam}`
-    ? TParam
-    : never
-  : never;
-
-export type RouteParams<TPath extends RouteTo> = {
-  [K in ExtractParams<TPath>]: number | string;
-} extends infer TParams
-  ? IfEmptyObject<TParams, void, TParams>
-  : never;
 
 export type NavigateVariadicArgs<TPath extends RouteTo> = IfNever<
   ExtractParams<TPath>,

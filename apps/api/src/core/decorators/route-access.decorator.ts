@@ -4,14 +4,14 @@ import type { AppAction, AppSubjectName } from '../../auth/auth.types.js';
 
 const ROUTE_ACCESS_METADATA_KEY = 'ODC_ROUTE_ACCESS_TOKEN';
 
-export type PublicRouteAccess = 'public';
+type PublicRouteAccess = 'public';
+
+type ProtectedRouteAccess = ProtectedRoutePermissionSet | ProtectedRoutePermissionSet[];
 
 export type ProtectedRoutePermissionSet = {
   action: AppAction;
   subject: AppSubjectName;
 };
-
-export type ProtectedRouteAccess = ProtectedRoutePermissionSet | ProtectedRoutePermissionSet[];
 
 export type RouteAccessType = ProtectedRouteAccess | PublicRouteAccess;
 

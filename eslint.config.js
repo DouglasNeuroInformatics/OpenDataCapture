@@ -1,3 +1,6 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+
 import { config } from '@douglasneuroinformatics/eslint-config';
 
 // Restricted imports and syntax are declared as constants because flat config *replaces* a rule's
@@ -20,12 +23,6 @@ const NO_TAILWIND_MERGE = {
   name: 'tailwind-merge'
 };
 
-const NO_TESTS_IN_ROUTES = {
-  group: ['vitest', '@testing-library/*'],
-  message:
-    'The TanStack route generator scans every file under src/routes and warns on any that does not export a Route. Put tests in src/hooks/__tests__/, src/utils/__tests__/ or src/__tests__/.'
-};
-
 const NO_AXIOS_INSTANCE = {
   message:
     'apps/web uses the default axios instance; the retry, offline and error-notification interceptors in src/services/axios.ts are installed on it. A separate instance silently bypasses all of them.',
@@ -43,6 +40,70 @@ const REQUIRE_ROUTE_ACCESS = {
     'Every controller handler needs @RouteAccess. Without it JwtAuthGuard throws InternalServerErrorException at request time. Note that @RouteAccess([]) grants access to any authenticated user.',
   selector:
     'MethodDefinition:has(Decorator > CallExpression > Identifier.callee[name=/^(Delete|Get|Patch|Post|Put)$/]):not(:has(Decorator > CallExpression > Identifier.callee[name="RouteAccess"]))'
+};
+
+const TEST_TOOLING = /^(?:vitest|@testing-library\/[^/]+)(?:\/|$)/;
+
+const UNIT_TEST_FILENAME = /^(?<subject>.+)\.(?<suffix>test|spec)\.[jt]sx?$/;
+
+const SUBJECT_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx'];
+
+const unitTestLayout = {
+  rules: {
+    'test-tooling-in-tests-folder': {
+      create(context) {
+        const folders = context.filename.split(path.sep);
+        if (folders.includes('__tests__')) {
+          return {};
+        }
+        return {
+          ImportDeclaration(node) {
+            if (TEST_TOOLING.test(node.source.value)) {
+              context.report({ data: { source: node.source.value }, messageId: 'testTooling', node });
+            }
+          }
+        };
+      },
+      meta: {
+        messages: {
+          testTooling: "'{{source}}' is test tooling; only a file in a __tests__/ folder may import it."
+        },
+        schema: [],
+        type: 'problem'
+      }
+    },
+    'unit-test-names-subject': {
+      create(context) {
+        const { base, dir } = path.parse(context.filename);
+        const { subject, suffix } = UNIT_TEST_FILENAME.exec(base).groups;
+        return {
+          Program(node) {
+            if (path.basename(dir) !== '__tests__') {
+              context.report({ messageId: 'outsideTestsFolder', node });
+              return;
+            }
+            if (suffix === 'spec') {
+              context.report({ messageId: 'specSuffix', node });
+            }
+            const subjectPath = path.join(dir, '..', subject);
+            if (!SUBJECT_EXTENSIONS.some((extension) => fs.existsSync(subjectPath + extension))) {
+              context.report({ data: { subject }, messageId: 'noSubject', node });
+            }
+          }
+        };
+      },
+      meta: {
+        messages: {
+          noSubject:
+            'A unit test is named after the file it tests, but there is no {{subject}}.ts, .tsx, .js or .jsx beside this __tests__/ folder.',
+          outsideTestsFolder: 'A unit test lives in a __tests__/ folder beside the file it tests.',
+          specSuffix: 'Name a unit test *.test.*; *.spec.* is the suffix of the Playwright suite in testing/.'
+        },
+        schema: [],
+        type: 'problem'
+      }
+    }
+  }
 };
 
 export default config(
@@ -66,7 +127,6 @@ export default config(
   {
     ignores: [
       'apps/playground/src/instruments/examples/interactive/Interactive-With-Legacy-Script/legacy.js',
-      'runtime/v1/src/**/*.d.ts',
       'vendor/**/*'
     ]
   },
@@ -114,12 +174,28 @@ export default config(
     }
   },
   {
-    files: ['apps/web/src/routes/**/*'],
+    plugins: {
+      odc: unitTestLayout
+    }
+  },
+  {
+    files: ['{apps,packages,runtime}/*/src/**/*.{js,jsx,ts,tsx}'],
     rules: {
-      'no-restricted-imports': [
-        'error',
-        { paths: [NO_BARE_ZOD, NO_CLSX, NO_TAILWIND_MERGE], patterns: [NO_TESTS_IN_ROUTES] }
-      ]
+      'odc/test-tooling-in-tests-folder': 'error'
+    }
+  },
+  {
+    files: ['{apps,packages,runtime}/*/src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
+    rules: {
+      'odc/unit-test-names-subject': 'error'
+    }
+  },
+  {
+    // A __tests__/ folder inside an instrument directory fails the build, so an instrument's tests sit
+    // in the top-level folder, named after the instrument rather than a file beside them.
+    files: ['packages/instrument-library/src/__tests__/*'],
+    rules: {
+      'odc/unit-test-names-subject': 'off'
     }
   },
   {

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 
 import { Button } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -19,16 +19,9 @@ import type { FileInstrumentContentProps } from './types';
 const _FileInstrumentContent: React.FC = () => {
   const actions = useFileInstrumentContentStore((store) => store.actions);
   const fileGroups = useFileInstrumentContentStore((store) => store.props.instrument.content.fileGroups);
-  const onSuccess = useFileInstrumentContentStore((store) => store.props.onSuccess);
   const status = useFileInstrumentContentStore((store) => store.status);
 
   const { t } = useTranslation();
-
-  useEffect(() => {
-    if (status === 'SUBMITTED') {
-      onSuccess?.();
-    }
-  }, [onSuccess, status]);
 
   return (
     <div

@@ -194,8 +194,8 @@ export class PrismaModuleOptionsFactory implements OnApplicationShutdown {
   private async createMemoryConnection(): Promise<string> {
     // prevent mongodb-memory-server from being included in the production bundle
     const { MongoMemoryReplSet } = await import('mongodb-memory-server');
-    const replSet = await MongoMemoryReplSet.create({ replSet: { count: 1, name: 'rs0' } });
-    return new URL(replSet.getUri('test')).href;
+    this.memoryReplSet = await MongoMemoryReplSet.create({ replSet: { count: 1, name: 'rs0' } });
+    return new URL(this.memoryReplSet.getUri('test')).href;
   }
 
   private getExternalConnection(): string {

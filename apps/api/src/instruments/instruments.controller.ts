@@ -85,12 +85,8 @@ export class InstrumentsController {
   @ApiOperation({ summary: 'List Instruments' })
   @Get('list')
   @RouteAccess({ action: 'read', subject: 'Instrument' })
-  async list(
-    @CurrentUser() currentUser: RequestUser,
-    @Query('groupId') groupId?: string,
-    @Query('kind') kind?: InstrumentKind
-  ) {
-    return this.instrumentsService.list({ kind }, currentUser, groupId);
+  async list(@CurrentUser() currentUser: RequestUser, @Query('kind') kind?: InstrumentKind) {
+    return this.instrumentsService.list({ kind }, currentUser);
   }
 
   @ApiOperation({ summary: 'Archive or Unarchive a Series Instrument' })

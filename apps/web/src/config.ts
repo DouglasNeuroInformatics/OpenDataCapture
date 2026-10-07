@@ -2,12 +2,6 @@ import { $BooleanLike, deepFreeze } from '@douglasneuroinformatics/libjs';
 import { z } from 'zod/v4';
 
 const $Config = z.object({
-  analytics: z
-    .object({
-      plausibleBaseUrl: z.string().min(1),
-      plausibleDataDomain: z.string().min(1)
-    })
-    .optional(),
   dev: z.object({
     disableTutorial: $BooleanLike.optional(),
     isBypassAuthEnabled: $BooleanLike.optional(),
@@ -30,13 +24,6 @@ const $Config = z.object({
 
 export const config = await $Config
   .parseAsync({
-    analytics:
-      import.meta.env.PLAUSIBLE_BASE_URL && import.meta.env.PLAUSIBLE_WEB_DATA_DOMAIN
-        ? {
-            plausibleBaseUrl: import.meta.env.PLAUSIBLE_BASE_URL,
-            plausibleDataDomain: import.meta.env.PLAUSIBLE_WEB_DATA_DOMAIN
-          }
-        : undefined,
     dev: {
       disableTutorial: import.meta.env.VITE_DEV_DISABLE_TUTORIAL,
       isBypassAuthEnabled: import.meta.env.VITE_DEV_BYPASS_AUTH,

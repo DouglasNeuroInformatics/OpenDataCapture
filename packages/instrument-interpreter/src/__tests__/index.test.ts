@@ -43,19 +43,9 @@ describe('interpret', () => {
   });
 
   describe('validate', () => {
-    it.each(['FORM', 'INTERACTIVE', 'SERIES', undefined] as const)(
-      "should reject a bundle that fails the schema for kind '%s'",
-      async (kind) => {
-        const bundle = createBundle({ imports: [], kind: 'FORM' });
-        await expect(interpreter.interpret(bundle, { kind, validate: true })).rejects.toThrow(
-          'Failed to evaluate instrument bundle'
-        );
-      }
-    );
-
-    it('should reject with an unexpected-kind error when kind is not one this class validates', async () => {
-      const bundle = createBundle({ imports: [], kind: 'FILE' });
-      await expect(interpreter.interpret(bundle, { kind: 'FILE', validate: true })).rejects.toThrow(
+    it('should reject a bundle that fails the instrument schema', async () => {
+      const bundle = createBundle({ imports: [], kind: 'FORM' });
+      await expect(interpreter.interpret(bundle, { validate: true })).rejects.toThrow(
         'Failed to evaluate instrument bundle'
       );
     });

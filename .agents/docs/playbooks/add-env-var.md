@@ -55,9 +55,11 @@ below in order; each skipped one type-checks and compiles, then produces `undefi
    `env-cmd -f ../../.env`, which is why only build-time reads need this step.
 
 8. **If the browser needs it, three files in `apps/web` must agree:** `apps/web/.env.public` (the
-   manifest `@import-meta-env/unplugin` and the `inject`/`start` scripts read — values are substituted
-   into `dist/index.html` after the build, not baked in), the `ImportMetaEnv` interface in
-   `apps/web/src/vite-env.d.ts`, and the parsed `config` object in `apps/web/src/config.ts`.
+   manifest `@import-meta-env/unplugin`, the `start` script and the web Docker image's
+   `import-meta-env` read — values are substituted into `dist/index.html` after the build, not baked
+   in), the `ImportMetaEnv` interface in `apps/web/src/vite-env.d.ts`, and the parsed `config` object
+   in `apps/web/src/config.ts` (unless only the inline script in `apps/web/index.html` reads it, as
+   `PLAUSIBLE_*` are).
 
 9. **If it must reach the production stack, add it to `docker-compose.yaml`** under the `environment:`
    list of the service that reads it (`api`, `gateway`, `web`). A bare `- YOUR_KEY` forwards the value
@@ -78,6 +80,6 @@ touched exactly two of these: `.env.template` and `$Env`, replacing a direct
 grep -n YOUR_KEY .env    # present after regeneration
 pnpm dev                 # $Env is validated at boot; an invalid value crashes here. Ctrl-C once up
 pnpm lint                # tsc + the no-process.env rule
-pnpm test
+pnpm test:coverage
 pnpm build               # only this catches a missing turbo.json `env` entry
 ```

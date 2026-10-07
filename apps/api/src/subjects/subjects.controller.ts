@@ -1,7 +1,6 @@
 import { $BooleanLike } from '@douglasneuroinformatics/libjs';
 import { ApiOperation, CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
-import { $CreateSubjectData } from '@opendatacapture/schemas/subject';
+import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import z from 'zod/v4';
 
 import type { AppAbility } from '@/auth/auth.types';
@@ -12,13 +11,6 @@ import { SubjectsService } from './subjects.service';
 @Controller('subjects')
 export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
-
-  @ApiOperation({ summary: 'Create Subject' })
-  @Post()
-  @RouteAccess({ action: 'create', subject: 'Subject' })
-  create(@Body() subject: $CreateSubjectData) {
-    return this.subjectsService.create(subject);
-  }
 
   @ApiOperation({ summary: 'Delete Subject' })
   @Delete(':id')

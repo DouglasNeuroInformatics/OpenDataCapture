@@ -56,7 +56,7 @@ so nothing that passed lint in `apps/web` fails on style here; what breaks is re
    becomes an injected component, an `href`, or data passed in: `InstrumentRenderer`'s
    `NavigationBlocker?: NavigationBlockerComponent`, implemented by
    `apps/web/src/components/NavigationBlocker.tsx`, is the pattern, and `packages/react-core/AGENTS.md`
-   carries the rule and its exceptions. Declaring `@tanstack/react-query` here instead would make the
+   carries the rule. Declaring `@tanstack/react-query` here instead would make the
    import resolve and the typecheck pass; the throw arrives only at render, which nothing before the
    Verify block's `pnpm test:e2e` reaches — and only where step 9's second consumer renders it.
 
@@ -104,7 +104,7 @@ pnpm --filter @opendatacapture/react-core lint      # no app aliases in this pro
 pnpm --filter @opendatacapture/web lint
 pnpm --filter @opendatacapture/gateway lint         # meaningful only once step 9 wired the consumer
 pnpm exec vitest --project web
-pnpm lint && pnpm test
+pnpm lint && pnpm test:coverage
 pnpm test:e2e
 pnpm --filter @opendatacapture/storybook storybook  # port 6006 — listed under React Core, not Web
 ```

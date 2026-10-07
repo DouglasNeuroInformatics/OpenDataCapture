@@ -153,7 +153,7 @@ export const InstrumentSummary = ({
                       es: 'Fecha de nacimiento',
                       fr: 'Date de naissance'
                     }),
-                    value: subject.dateOfBirth ? toBasicISOString(subject.dateOfBirth) : null
+                    value: toBasicISOString(subject.dateOfBirth)
                   },
                   {
                     label: t({
@@ -168,13 +168,11 @@ export const InstrumentSummary = ({
                             es: 'Masculino',
                             fr: 'Masculin'
                           })
-                        : subject.sex === 'FEMALE'
-                          ? t({
-                              en: 'Female',
-                              es: 'Femenino',
-                              fr: 'Féminin'
-                            })
-                          : null
+                        : t({
+                            en: 'Female',
+                            es: 'Femenino',
+                            fr: 'Féminin'
+                          })
                   }
                 ]
               : [

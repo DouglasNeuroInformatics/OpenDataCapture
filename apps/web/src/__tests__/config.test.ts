@@ -10,8 +10,6 @@ const REQUIRED_ENV = {
 };
 
 const OPTIONAL_ENV = [
-  'PLAUSIBLE_BASE_URL',
-  'PLAUSIBLE_WEB_DATA_DOMAIN',
   'VITE_DEV_BYPASS_AUTH',
   'VITE_DEV_DISABLE_TUTORIAL',
   'VITE_DEV_FORCE_CLEAR_QUERY_CACHE',
@@ -46,22 +44,6 @@ describe('config', () => {
       licenseUrl: 'https://example.org/license'
     });
     expect(config.setup).toEqual({ apiBaseUrl: '/api', isGatewayEnabled: true });
-  });
-
-  it('should enable analytics when both the plausible url and data domain are set', async () => {
-    vi.stubEnv('PLAUSIBLE_BASE_URL', 'https://plausible.example.org');
-    vi.stubEnv('PLAUSIBLE_WEB_DATA_DOMAIN', 'app.example.org');
-    const config = await loadConfig();
-    expect(config.analytics).toEqual({
-      plausibleBaseUrl: 'https://plausible.example.org',
-      plausibleDataDomain: 'app.example.org'
-    });
-  });
-
-  it('should leave analytics off when only the plausible url is set, since events need a domain to report to', async () => {
-    vi.stubEnv('PLAUSIBLE_BASE_URL', 'https://plausible.example.org');
-    const config = await loadConfig();
-    expect(config.analytics).toBeUndefined();
   });
 
   it('should coerce the string-valued development options into booleans and numbers', async () => {

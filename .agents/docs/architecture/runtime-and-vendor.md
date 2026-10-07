@@ -3,7 +3,7 @@
 Six workspaces have `runtime` in the name and they do different jobs. This file tells them apart,
 explains the three unrelated ways `runtime/v1` is spelled in an import, and documents `vendor/`.
 
-**`runtime/v1/dist` is gitignored and nothing works until it is built.** Nine `tsconfig.json` files
+**`runtime/v1/dist` is gitignored and nothing works until it is built.** Eight `tsconfig.json` files
 map a path into it, so `pnpm lint` fails across most of the repo on a cold checkout. Build it with
 `pnpm --filter @opendatacapture/runtime-v1 build`, or just `pnpm build` (turbo's `^build` ordering
 gets there).
@@ -59,7 +59,7 @@ path**, which only resolves because they are copied byte-for-byte (see
 ### `packages/runtime-bundler`
 
 Ships TypeScript source directly (`exports: "./src/index.ts"`, `bin` → `src/cli.ts` under tsx). The
-CLI reads `runtime.config.js` from the working directory, validates it with `$UserConfigs`, and for
+CLI reads `runtime.config.js` from the working directory, validates it with `$Config`, and for
 each `include` entry resolves `<pkg>/package.json` through a `createRequire` rooted at the config
 file. **An entry in `include` must therefore also be a dependency of the workspace holding the
 config.**
@@ -120,7 +120,7 @@ The same artifact is addressed three ways. They are not interchangeable.
 
 | Spelling                      | Resolved by                 | Declared in                                                                                                                                                                                           |
 | ----------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/runtime/v1/<pkg>`           | the browser, over HTTP      | served by `vite-plugin-runtime` (dev) or the copied `dist/runtime/v1` (prod); type-checked via `paths` in eight `tsconfig.json` files; marked external by `packages/instrument-bundler/src/plugin.ts` |
+| `/runtime/v1/<pkg>`           | the browser, over HTTP      | served by `vite-plugin-runtime` (dev) or the copied `dist/runtime/v1` (prod); type-checked via `paths` in seven `tsconfig.json` files; marked external by `packages/instrument-bundler/src/plugin.ts` |
 | `#runtime/v1/*`               | Node subpath imports        | `apps/api/package.json` `imports` **and** `apps/api/tsconfig.json` `paths`                                                                                                                            |
 | `@opendatacapture/runtime-v1` | ordinary package resolution | a `dependencies` entry, used to locate `dist` on disk                                                                                                                                                 |
 
@@ -195,6 +195,6 @@ The value of an entry in a wrapper's `exports` decides how it is built. See
 | A vendor directory name `<name>@<ver>` ↔ its `package.json` `name` `<name>__<ver>`                                                                                                                                                                             | wrong output URL; `vendor-pairing.test.ts` cannot find the paired wrapper      |
 | A wrapper's sibling-wrapper dependency ↔ its pinned real peer                                                                                                                                                                                                  | duplicate library instances at runtime; caught by `vendor-pairing.test.ts`     |
 | `packages/runtime-core/package.json` `exports` ↔ what its three build stages emit                                                                                                                                                                              | a subpath resolves to a file that no longer exists                             |
-| The eight `tsconfig.json` files mapping `/runtime/v1/*`                                                                                                                                                                                                        | that workspace stops type-checking instrument imports                          |
+| Every `tsconfig.json` mapping `/runtime/v1/*`                                                                                                                                                                                                                  | that workspace stops type-checking instrument imports                          |
 | `jsxImportSource: '/runtime/v1/react@19.x'` in `packages/instrument-library/tsconfig.json` and `apps/playground/src/components/Editor/setup.ts` ↔ the react a bundle is built against, which `packages/instrument-bundler/src/build.ts` derives per instrument | the editor or `tsc` type-checks against a different React than the bundle uses |
 | `src/index.js` ↔ `src/index.d.ts` in `runtime-internal` and `runtime-meta`                                                                                                                                                                                     | hand-written declarations; nothing checks them against the implementation      |

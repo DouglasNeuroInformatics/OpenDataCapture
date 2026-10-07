@@ -49,11 +49,6 @@
     "es": "Crear",
     "fr": "Créer"
   },
-  "currentSession": {
-    "en": "Current Session",
-    "es": "Sesión actual",
-    "fr": "Session en cours"
-  },
   "customIdentifier": {
     "en": "Custom Identifier",
     "es": "Identificador personalizado",
@@ -80,11 +75,6 @@
     "fr": "Entité"
   },
   "errors": {
-    "failedToChangeLanguage": {
-      "en": "Failed to change languages",
-      "es": "No se pudo cambiar el idioma",
-      "fr": "Le changement de langue n'a pas été effectué"
-    },
     "noDataToExport": {
       "en": "No Data to Export",
       "es": "No hay datos para exportar",
@@ -100,11 +90,6 @@
     "en": "Filters",
     "es": "Filtros",
     "fr": "Filtres"
-  },
-  "graph": {
-    "en": "Graph",
-    "es": "Gráfico",
-    "fr": "Graphique"
   },
   "group": {
     "en": "Group",
@@ -186,11 +171,6 @@
     "es": "Gestionar",
     "fr": "Gérer"
   },
-  "method": {
-    "en": "Method",
-    "es": "Método",
-    "fr": "Méthode"
-  },
   "password": {
     "en": "Password",
     "es": "Contraseña",
@@ -257,11 +237,6 @@
     "fr": "Client"
   },
   "subjectIdentification": {
-    "description": {
-      "en": "The following items are used to compute a unique identifier that enables consistent cross-session identification.",
-      "es": "Los siguientes elementos se utilizan para calcular un identificador único que permite una identificación coherente entre sesiones.",
-      "fr": "Les éléments suivants sont utilisés pour calculer un identifiant unique qui permet une identification cohérente entre les sessions."
-    },
     "firstName": {
       "description": {
         "en": "The subject's first name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as a fixed ASCII transliteration.",
@@ -292,20 +267,10 @@
       "fr": "Identification du client"
     }
   },
-  "tags": {
-    "en": "Tags",
-    "es": "Etiquetas",
-    "fr": "Tags"
-  },
   "time": {
     "en": "Time",
     "es": "Hora",
     "fr": "Heure"
-  },
-  "timeCollected": {
-    "en": "Time Collected",
-    "es": "Hora de recopilación",
-    "fr": "Horodatage"
   },
   "unarchive": {
     "en": "Unarchive",
@@ -316,11 +281,6 @@
     "en": "Update",
     "es": "Actualizar",
     "fr": "Mise à jour"
-  },
-  "uploadSuccessful": {
-    "en": "Upload Successful",
-    "es": "Carga exitosa",
-    "fr": "Téléversement réussi"
   },
   "user": {
     "en": "User",

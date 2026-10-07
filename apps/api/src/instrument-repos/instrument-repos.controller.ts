@@ -32,13 +32,6 @@ export class InstrumentReposController {
     return this.instrumentReposService.findAll({ ability });
   }
 
-  @ApiOperation({ summary: 'Get Instrument Repo' })
-  @Get(':id')
-  @RouteAccess({ action: 'read', subject: 'InstrumentRepo' })
-  findById(@Param('id') id: string, @CurrentUser('ability') ability?: AppAbility) {
-    return this.instrumentReposService.findById(id, { ability });
-  }
-
   @ApiOperation({ summary: 'Sync Instrument Repo' })
   @Post(':id/sync')
   @RouteAccess({ action: 'update', subject: 'InstrumentRepo' })

@@ -57,10 +57,12 @@ and set `_requiresAuth = false` — that flag is what makes `getPageModel` injec
 `src/pages/_app/session/start-session.page.ts` for the shape: locators assigned in the constructor,
 interactions as small async methods.
 
-A page object is only reachable from a spec once it is registered in the `pageModels` map in
-`src/support/fixtures.ts`, keyed by the real route literal. The map is
-`satisfies { [K in RouteTo]?: any }`, so a key that is not a route fails type-check. Routes with
-`$param` segments take a typed params object as `getPageModel`'s second argument.
+`getPageModel` reaches a page object only once it is registered in the `pageModels` map in
+`src/support/fixtures.ts`, keyed by the real route literal. Register one when a spec navigates to it
+directly; a page the spec reaches by clicking through the app is constructed with `new XPage(page)`
+instead. The map is `satisfies { [K in RouteTo]?: any }`, so a key that is not a route fails
+type-check. Routes with `$param` segments take a typed params object as `getPageModel`'s second
+argument.
 
 ## Fixtures
 
@@ -118,6 +120,3 @@ There is **no `vitest.config.ts` here and no unit tier**; `pnpm test` never look
 
 `lint` is `pnpm gen:routes && tsc && eslint --fix .` — note the `.`, not `src`, so the config and
 scripts are checked too.
-
-The `test:chrome` script passes `--project='*Desktop Chrome'`, which matches none of the four project
-names and errors immediately. Use `test:e2e`.

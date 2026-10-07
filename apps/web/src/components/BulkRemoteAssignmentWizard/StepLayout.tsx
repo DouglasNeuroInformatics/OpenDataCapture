@@ -125,6 +125,4 @@ const StepLayout = ({ aside, children, description, footer, onStepChange, step, 
   );
 };
 
-export type { WizardStepName };
-
-export { StepLayout, WIZARD_STEPS };
+export { StepLayout };

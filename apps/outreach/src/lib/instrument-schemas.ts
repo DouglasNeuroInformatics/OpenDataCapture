@@ -6,9 +6,9 @@ const LANGUAGE_NAMES = {
   fr: 'French'
 };
 
-export const SCHEMA_KINDS = ['form', 'interactive', 'series', 'any'] as const;
+const SCHEMA_KINDS = ['form', 'interactive', 'series', 'any'] as const;
 
-export const SCHEMA_LANGUAGES = ['en', 'fr', ['en', 'fr']] as const satisfies InstrumentLanguage[];
+const SCHEMA_LANGUAGES = ['en', 'fr', ['en', 'fr']] as const satisfies InstrumentLanguage[];
 
 export function getSchemaProps() {
   return SCHEMA_KINDS.flatMap((kind) => {

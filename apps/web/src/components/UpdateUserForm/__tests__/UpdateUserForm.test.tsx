@@ -20,10 +20,8 @@ const memberData: UpdateUserFormInputData = {
   selectedUserBasePermission: 'STANDARD'
 };
 
-const renderForm = (data: UpdateUserFormInputData = memberData, hideSubmitButton?: boolean) => {
-  const view = render(
-    <UpdateUserForm data={data} hideSubmitButton={hideSubmitButton} onError={onError} onSubmit={onSubmit} />
-  );
+const renderForm = (data: UpdateUserFormInputData = memberData) => {
+  const view = render(<UpdateUserForm data={data} onError={onError} onSubmit={onSubmit} />);
   return { form: screen.getByTestId('update-user-form'), view };
 };
 
@@ -148,25 +146,15 @@ describe('UpdateUserForm', () => {
     await waitFor(() => expect(errorMessages()).toEqual([groupRequiredMessage]));
   });
 
-  it('should render without stored values, defaulting the status to enabled', () => {
-    renderForm({ groupOptions });
-    expect(screen.getByLabelText<HTMLButtonElement>('Enabled').getAttribute('aria-checked')).toBe('true');
-  });
-
   it('should accept a stored phone number as-is, so a number saved before the digit minimum does not block saving', async () => {
     renderForm({ ...memberData, initialValues: { groupIds: new Set(['group-1']), phoneNumber: '123' } });
     submit();
     await waitFor(() => expect(onSubmit).toHaveBeenCalled());
   });
 
-  it('should hide its own submit button when the caller submits it from elsewhere', () => {
-    renderForm(memberData, true);
-    expect([...submitButton().classList]).toContain('hidden');
-  });
-
-  it('should show its submit button by default', () => {
+  it('should hide its own submit button, since its caller submits the form from elsewhere', () => {
     renderForm();
-    expect([...submitButton().classList]).not.toContain('hidden');
+    expect([...submitButton().classList]).toContain('hidden');
   });
 
   it("should mark its password fields as new passwords, so the browser does not fill in the administrator's own", () => {

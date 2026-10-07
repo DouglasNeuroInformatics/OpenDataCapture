@@ -98,10 +98,7 @@ export class UsersService {
 
     // Check that all group exist and are accessible to the user
     for (const id of groupIds) {
-      const group = await this.groupsService.findById(id, options);
-      if (!group) {
-        throw new NotFoundException(`Failed to resolve group with ID: ${id}`);
-      }
+      await this.groupsService.findById(id, options);
     }
 
     const hashedPassword = await this.cryptoService.hashPassword(password);
@@ -127,17 +124,6 @@ export class UsersService {
       omit: {
         hashedPassword: true
       }
-    });
-  }
-
-  /** Delete the user with the provided username, otherwise throws */
-  async deleteByUsername(username: string, { ability }: EntityOperationOptions = {}) {
-    const user = await this.findByUsername(username);
-    return this.userModel.delete({
-      omit: {
-        hashedPassword: true
-      },
-      where: { AND: [accessibleQuery(ability, 'delete', 'User')], id: user.id }
     });
   }
 

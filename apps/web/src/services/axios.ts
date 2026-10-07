@@ -17,8 +17,6 @@ declare module 'axios' {
       // message (e.g. a mutation onError) without the user seeing two notifications.
       disableDefaultErrorNotification?: boolean;
       disableDefaultTimeout?: boolean;
-      // Opt a request out of the automatic transient-failure retry (still applies only to idempotent methods).
-      disableRetry?: boolean;
     };
     // Internal: number of transient-failure retries already attempted for this request.
     retryCount?: number;
@@ -58,9 +56,6 @@ function isTransientError(error: unknown): boolean {
 
 /** Only idempotent methods are safe to retry automatically — retrying a write risks duplicate submissions. */
 function isRetryable(requestConfig: InternalAxiosRequestConfig, error: unknown): boolean {
-  if (requestConfig.meta?.disableRetry) {
-    return false;
-  }
   const method = requestConfig.method?.toLowerCase();
   if (!method || !IDEMPOTENT_METHODS.has(method)) {
     return false;
@@ -80,7 +75,7 @@ function sleep(ms: number): Promise<void> {
 
 /** Resolve once the browser reports it is back online, or after `timeout` ms, whichever comes first. */
 function waitForOnline(timeout: number): Promise<void> {
-  if (typeof navigator === 'undefined' || navigator.onLine) {
+  if (navigator.onLine) {
     return Promise.resolve();
   }
   return new Promise((resolve) => {
@@ -101,10 +96,8 @@ function waitForOnline(timeout: number): Promise<void> {
 }
 
 // Reflect the browser's connectivity in the store so the UI (banner, recovery screen) can react.
-if (typeof window !== 'undefined') {
-  window.addEventListener('online', () => useAppStore.getState().setIsOnline(true));
-  window.addEventListener('offline', () => useAppStore.getState().setIsOnline(false));
-}
+window.addEventListener('online', () => useAppStore.getState().setIsOnline(true));
+window.addEventListener('offline', () => useAppStore.getState().setIsOnline(false));
 
 axios.interceptors.request.use((config) => {
   const accessToken = useAppStore.getState().accessToken;

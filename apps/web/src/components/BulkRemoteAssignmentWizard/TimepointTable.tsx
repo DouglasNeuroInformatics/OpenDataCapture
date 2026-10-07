@@ -9,18 +9,16 @@ import { WizardTable } from './WizardTable';
 import type { DraftTimepoint } from './types';
 
 type TimepointTableProps = {
-  'data-testid'?: string;
   /** When given, each row ends with a remove button. */
   onRemove?: (timepoint: DraftTimepoint) => void;
   timepoints: DraftTimepoint[];
 };
 
 /** The instruments in the batch and when each expires, as the instruments and review steps both list them. */
-export const TimepointTable = ({ 'data-testid': testId, onRemove, timepoints }: TimepointTableProps) => {
+export const TimepointTable = ({ onRemove, timepoints }: TimepointTableProps) => {
   const { t } = useTranslation();
   return (
     <WizardTable
-      data-testid={testId}
       head={
         <React.Fragment>
           <Table.Head>{t({ en: 'Instrument', es: 'Instrumento', fr: 'Instrument' })}</Table.Head>

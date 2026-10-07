@@ -62,20 +62,17 @@ const RouteComponent = () => {
         const subjectId = params.subjectId.slice(0, 7);
 
         graphDesc.innerText = t('datahub.downloadInfo.subjectText', {
-          args: [formType ?? '', subjectId ?? '']
+          args: [formType, subjectId]
         });
 
         graphDesc.className = 'p-2 font-semibold text-center';
         element.prepend(graphDesc);
 
-        if (selectedMeasures) {
-          const graphMeasure = document.createElement('p');
-          graphMeasure.innerText = t('datahub.downloadInfo.measurement');
-          selectedMeasures.map((measure) => measure.label).join(', ');
-          graphMeasure.innerText += selectedMeasures.map((measure) => measure.label).join(', ');
-          graphMeasure.className = 'p-2 font-semibold';
-          element.append(graphMeasure);
-        }
+        const graphMeasure = document.createElement('p');
+        graphMeasure.innerText = t('datahub.downloadInfo.measurement');
+        graphMeasure.innerText += selectedMeasures.map((measure) => measure.label).join(', ');
+        graphMeasure.className = 'p-2 font-semibold';
+        element.append(graphMeasure);
 
         const graphTime = document.createElement('p');
         if (minDate) {

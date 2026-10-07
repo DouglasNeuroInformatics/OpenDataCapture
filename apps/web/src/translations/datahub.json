@@ -109,11 +109,6 @@
         "es": "Estos datos se proporcionan en un formato ultralargo. Cada fila corresponde al valor de una sola medida. Las filas correspondientes al mismo registro tendrán identificadores de sujeto y marcas de tiempo coincidentes.",
         "fr": "Ces données sont fournies dans un format ultra-long. Chaque ligne correspond à la valeur d'une seule mesure. Les lignes correspondant à un même enregistrement auront des identifiants de sujet et des horodatages correspondants."
       },
-      "filters": {
-        "en": "Filters",
-        "es": "Filtros",
-        "fr": "Filtres"
-      },
       "subject": {
         "en": "Subject",
         "es": "Sujeto",
@@ -126,39 +121,12 @@
       "fr": "Centre de données"
     }
   },
-  "files": {
-    "dateCollected": {
-      "en": "Date Collected",
-      "es": "Fecha de recopilación",
-      "fr": "Date de collecte"
-    },
-    "download": {
-      "en": "Download",
-      "es": "Descargar",
-      "fr": "Télécharger"
-    },
-    "empty": {
-      "en": "No files have been uploaded for this subject.",
-      "es": "No se han cargado archivos para este sujeto.",
-      "fr": "Aucun fichier n'a été téléversé pour ce client."
-    },
-    "instrument": {
-      "en": "Instrument",
-      "es": "Instrumento",
-      "fr": "Instrument"
-    }
-  },
   "layout": {
     "tabs": {
       "assignments": {
         "en": "Assignments",
         "es": "Asignaciones",
         "fr": "Assignations"
-      },
-      "files": {
-        "en": "Files",
-        "es": "Archivos",
-        "fr": "Fichiers"
       },
       "graph": {
         "en": "Graph",
@@ -170,19 +138,9 @@
         "es": "Tabla",
         "fr": "Tableau"
       }
-    },
-    "title": {
-      "en": "Instrument Records for Subject {{id}}",
-      "es": "Registros de instrumentos del sujeto {{id}}",
-      "fr": "Dossiers d'instruments pour le client {{id}}"
     }
   },
   "visualization": {
-    "instrument": {
-      "en": "Instrument",
-      "es": "Instrumento",
-      "fr": "Instrument"
-    },
     "measures": {
       "en": "Measures",
       "es": "Medidas",
@@ -197,11 +155,6 @@
       "en": "Select an instrument",
       "es": "Seleccione un instrumento",
       "fr": "Sélectionnez un instrument"
-    },
-    "selectMeasures": {
-      "en": "Please select one or more measures",
-      "es": "Por favor, seleccione una o más medidas",
-      "fr": "Veuillez sélectionner au moins une mesure"
     },
     "timeframe": {
       "en": "Timeframe",
@@ -229,11 +182,6 @@
       "en": "Date Collected",
       "es": "Fecha de recopilación",
       "fr": "Date d'enregistrement"
-    },
-    "yLabel": {
-      "en": "Value",
-      "es": "Valor",
-      "fr": "Valeur"
     }
   }
 }

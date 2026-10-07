@@ -16,23 +16,7 @@ import type { Promisable, Simplify } from 'type-fest';
 
 import { LANGUAGE_LABELS } from '../../utils/language';
 
-export type InteractiveContentSubmitResult = {
-  data: Json;
-  kind: Extract<InstrumentKind, 'INTERACTIVE'>;
-};
-
-export type InteractiveContentProps = Simplify<
-  Pick<
-    InteractiveInstrument['content'],
-    'defaultFullscreen' | 'enableLanguageLock' | 'enableLanguageSelect' | 'enableLanguageToggle'
-  > & {
-    bundle: string;
-    onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
-    supportedLanguages?: Language[];
-  }
->;
-
-export const _InteractiveContent = React.memo<InteractiveContentProps>(function _InteractiveContent({
+const _InteractiveContent = React.memo<InteractiveContentProps>(function _InteractiveContent({
   bundle,
   defaultFullscreen,
   enableLanguageLock,
@@ -264,6 +248,22 @@ export const _InteractiveContent = React.memo<InteractiveContentProps>(function 
     </div>
   );
 });
+
+export type InteractiveContentSubmitResult = {
+  data: Json;
+  kind: Extract<InstrumentKind, 'INTERACTIVE'>;
+};
+
+export type InteractiveContentProps = Simplify<
+  Pick<
+    InteractiveInstrument['content'],
+    'defaultFullscreen' | 'enableLanguageLock' | 'enableLanguageSelect' | 'enableLanguageToggle'
+  > & {
+    bundle: string;
+    onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
+    supportedLanguages?: Language[];
+  }
+>;
 
 export const InteractiveContent = React.memo<InteractiveContentProps>(function InteractiveContent(props) {
   return <_InteractiveContent {...props} />;

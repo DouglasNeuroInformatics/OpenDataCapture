@@ -16,9 +16,5 @@ declare global {
     __ROOT_PROPS__: RootProps;
   }
 
-  interface ImportMeta {
-    readonly env: ImportMetaEnv;
-  }
-
   const __RELEASE__: ReleaseInfo;
 }
