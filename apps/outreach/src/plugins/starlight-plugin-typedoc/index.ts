@@ -47,12 +47,13 @@ export function starlightTypeDocPlugin(options: StarlightTypeDocOptions): Starli
   return {
     hooks: {
       async setup({ astroConfig, config, logger, updateConfig }) {
-        const { baseOutputDirectory, reflections } = await generateTypeDoc(options, astroConfig, logger);
+        const { baseOutputDirectory, pageUrls, reflections } = await generateTypeDoc(options, astroConfig, logger);
         const sidebar = getSidebarFromReflections(
           config.sidebar,
           starlightTypeDocSidebarGroup,
           options.sidebar,
           reflections,
+          pageUrls,
           baseOutputDirectory
         );
         updateConfig({ sidebar });

@@ -4,11 +4,12 @@ import url from 'node:url';
 
 import type { AstroConfig, AstroIntegrationLogger } from 'astro';
 import { Application, PageEvent, ParameterType, RendererEvent } from 'typedoc';
-import type { Reflection, TypeDocOptions } from 'typedoc';
+import type { RouterTarget, TypeDocOptions } from 'typedoc';
 import type { MarkdownPageEvent, PluginOptions } from 'typedoc-plugin-markdown';
 
 import { StarlightTypeDocLogger } from './logger';
 import { addFrontmatter } from './markdown';
+import { StarlightTypeDocRouter } from './router';
 import { getStarlightTypeDocOutputDirectory } from './starlight';
 import { StarlightTypeDocTheme } from './theme';
 
@@ -20,6 +21,7 @@ const defaultTypeDocConfig: TypeDocConfig = {
   excludeProtected: true,
   githubPages: false,
   readme: 'none',
+  router: 'starlight-typedoc',
   theme: 'starlight-typedoc'
 };
 
@@ -32,8 +34,24 @@ const markdownPluginConfig: TypeDocConfig = {
 async function generateTypeDoc(options: StarlightTypeDocOptions, config: AstroConfig, logger: AstroIntegrationLogger) {
   const baseOutputDirectory = options.output;
   const outputDirectory = `${options.locale}/${baseOutputDirectory}`;
+  const outputPath = path.join(url.fileURLToPath(config.srcDir), 'content/docs', outputDirectory);
 
-  const app = await bootstrapApp(options.entryPoints, options.tsconfig, outputDirectory, config.base, logger);
+  const app = await bootstrapApp(
+    options.entryPoints,
+    options.tsconfig,
+    outputDirectory,
+    outputPath,
+    config.base,
+    logger
+  );
+
+  const pageUrls = new Map<RouterTarget, string>();
+  app.renderer.on(RendererEvent.END, ({ pages }) => {
+    for (const page of pages) {
+      pageUrls.set(page.model, page.url);
+    }
+  });
+
   const reflections = await app.convert();
 
   if (
@@ -43,17 +61,16 @@ async function generateTypeDoc(options: StarlightTypeDocOptions, config: AstroCo
     throw new Error('Failed to generate TypeDoc documentation.');
   }
 
-  const outputPath = path.join(url.fileURLToPath(config.srcDir), 'content/docs', outputDirectory);
+  await app.generateOutputs(reflections);
 
-  await app.generateDocs(reflections, outputPath);
-
-  return { baseOutputDirectory, reflections };
+  return { baseOutputDirectory, pageUrls, reflections };
 }
 
 async function bootstrapApp(
   entryPoints: TypeDocOptions['entryPoints'],
   tsconfig: TypeDocOptions['tsconfig'],
   outputDirectory: string,
+  outputPath: string,
   base: string,
   logger: AstroIntegrationLogger
 ) {
@@ -63,17 +80,18 @@ async function bootstrapApp(
     ...defaultTypeDocConfig,
     ...markdownPluginConfig,
     entryPoints,
+    outputs: [{ name: 'markdown', path: outputPath }],
     plugin: ['typedoc-plugin-markdown'],
     tsconfig
   });
   app.logger = new StarlightTypeDocLogger(logger);
-  // @ts-expect-error - inherited code
+  app.renderer.defineRouter('starlight-typedoc', StarlightTypeDocRouter);
   app.renderer.defineTheme('starlight-typedoc', StarlightTypeDocTheme);
-  app.renderer.on(PageEvent.BEGIN, (event: PageEvent<Reflection>) => {
+  app.renderer.on(PageEvent.BEGIN, (event) => {
     // @ts-expect-error - inherited code
     onRendererPageBegin(event);
   });
-  app.renderer.on(PageEvent.END, (event: PageEvent<Reflection>) => {
+  app.renderer.on(PageEvent.END, (event) => {
     // @ts-expect-error - inherited code
     const shouldRemovePage = onRendererPageEnd(event);
     if (shouldRemovePage) {

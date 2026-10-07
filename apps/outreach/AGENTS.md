@@ -55,6 +55,14 @@ group there.
 `lib/index.d.ts` on every build, so hand edits are lost. To change that API reference, change
 runtime-core's TSDoc. Background: `.agents/docs/architecture/runtime-and-vendor.md`.
 
+The plugin is a fork of upstream `starlight-typedoc`, built on typedoc's router: the sidebar comes from
+the page URLs typedoc reports at `RendererEvent.END`, and `theme.ts` overrides `urlTo` to emit
+absolute Starlight links. `router.ts` keeps namespaces exported from the package root at
+`namespaces/<Name>/`; typedoc-plugin-markdown's member router would nest them under
+`@opendatacapture/`, which moves their URLs and drops the Namespaces sidebar group. After upgrading
+typedoc or typedoc-plugin-markdown, build before and after and diff the generated directory, its
+links and anchors, and the sidebar.
+
 ## Content collections
 
 Config is `src/content/config.ts` — the legacy Astro path, **not** `src/content.config.ts`. The
