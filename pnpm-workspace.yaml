@@ -13,7 +13,7 @@ allowBuilds:
   sharp: true
 blockExoticSubdeps: true
 catalog:
-  '@casl/ability': '^6.7.1'
+  '@casl/ability': '^7.0.1'
   '@commitlint/cli': '^21.2.3'
   '@commitlint/config-conventional': '^21.2.3'
   '@douglasneuroinformatics/esbuild-plugin-prisma': 'latest'

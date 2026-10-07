@@ -17,8 +17,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1141.0",
     "@aws-sdk/s3-request-presigner": "^3.1141.0",
-    "@casl/ability": "^6.7.5",
-    "@casl/prisma": "^1.5.1",
+    "@casl/ability": "catalog:",
+    "@casl/prisma": "^2.0.2",
     "@douglasneuroinformatics/libcrypto": "catalog:",
     "@douglasneuroinformatics/libjs": "catalog:",
     "@douglasneuroinformatics/libnest": "^10.0.0",
