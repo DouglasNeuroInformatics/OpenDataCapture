@@ -7,35 +7,38 @@ import { defineConfig } from 'vite';
 const playgroundSourceRoot = path.resolve(import.meta.dirname, '../apps/playground/src');
 const webSourceRoot = path.resolve(import.meta.dirname, '../apps/web/src');
 
+/** @type {import('vite').Plugin} */
+const sourceRootAlias = {
+  enforce: 'pre',
+  name: 'source-root-alias',
+  resolveId(source, importer, options) {
+    if (source !== '@' && !source.startsWith('@/')) {
+      return null;
+    }
+    const sourceRoot = [playgroundSourceRoot, webSourceRoot].find((root) => importer?.startsWith(root));
+    if (!sourceRoot) {
+      return null;
+    }
+    return this.resolve(sourceRoot + source.slice(1), importer, options);
+  }
+};
+
 export default defineConfig({
   build: {
     target: 'es2022'
   },
   optimizeDeps: {
-    esbuildOptions: {
-      target: 'es2022'
+    rolldownOptions: {
+      transform: {
+        target: 'es2022'
+      }
     }
   },
   plugins: [
+    sourceRootAlias,
     runtime({
       rootDir: import.meta.dirname
     }),
     tailwindcss()
-  ],
-  resolve: {
-    alias: [
-      {
-        customResolver: async function (source, importer) {
-          if (importer?.startsWith(playgroundSourceRoot)) {
-            return this.resolve(source.replace('{{ROOT}}', playgroundSourceRoot));
-          } else if (importer?.startsWith(webSourceRoot)) {
-            return this.resolve(source.replace('{{ROOT}}', webSourceRoot));
-          }
-          return null;
-        },
-        find: '@',
-        replacement: '{{ROOT}}'
-      }
-    ]
-  }
+  ]
 });

@@ -44,7 +44,7 @@ catalog:
   tailwindcss: '4.3.3'
   tsx: '4.23.15'
   serialize-error: '^13.0.1'
-  vite: '^7.3.6'
+  vite: '^8.3.1'
   zustand: ^5.0.15
   '@storybook/addon-docs': '^10.6.1'
   '@storybook/addon-themes': '^10.6.1'

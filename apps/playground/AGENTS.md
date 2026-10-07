@@ -14,10 +14,10 @@ must stay in exactly one module. `src/App.tsx` reaches it through `React.lazy`, 
 the 13 MB `esbuild.wasm` download behind the Suspense fallback. Importing `IndexPage` eagerly, or
 adding a second `initialize()`, breaks the app at boot.
 
-It depends on `build.target` and `optimizeDeps.esbuildOptions.target` being `es2022` in
+It depends on `build.target` and `optimizeDeps.rolldownOptions.transform.target` being `es2022` in
 `vite.config.ts`. Lowering either one is how top-level await silently stops compiling.
 
-`rollupOptions.external: ['esbuild']` is also required. `packages/instrument-bundler/src/vendor/esbuild.ts`
+`build.rolldownOptions.external: ['esbuild']` is also required. `packages/instrument-bundler/src/vendor/esbuild.ts`
 picks between `esbuild` and `esbuild-wasm` on `typeof window`; without the external, Vite tries to
 pull the Node package into the browser bundle. Background:
 `.agents/docs/architecture/runtime-and-vendor.md`.
@@ -59,7 +59,7 @@ degraded experience. `tsc` needs it too: the tsconfig maps `/runtime/v1/*` to `.
 which is the only reason example instruments importing `/runtime/v1/zod@3.x` type-check.
 
 `build.emptyOutDir` is `false` on purpose. The runtime plugin copies the runtime into
-`dist/runtime/<version>` from `buildStart`, and Vite empties the output directory _after_ the rollup
+`dist/runtime/<version>` from `buildStart`, and Vite empties the output directory _after_ the Rolldown
 build finishes. The cost is that `dist/` accumulates stale files — delete it by hand when a build
 looks wrong.
 

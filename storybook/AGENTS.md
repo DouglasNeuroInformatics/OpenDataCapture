@@ -41,9 +41,9 @@ pattern but reports "Already up to date" and leaves the link in place. Delete th
 
 ## The `@` alias resolves by importer, and only for two apps
 
-`vite.config.js` replaces the usual static alias with a `customResolver` that maps `@` to
-`apps/playground/src` or `apps/web/src` depending on which file did the importing, and returns
-`null` for everything else. **A `packages/react-core` story that imports `@/…` will fail to
+`vite.config.js` replaces the usual static alias with a `source-root-alias` plugin (`enforce: 'pre'`)
+that maps `@` to `apps/playground/src` or `apps/web/src` depending on which file did the importing,
+and returns `null` for everything else. **A `packages/react-core` story that imports `@/…` will fail to
 resolve** — react-core has no `@` alias of its own, so import relatively or by package name there.
 
 ## Tailwind scans only the directories named in `config/globals.css`

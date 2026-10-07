@@ -62,7 +62,7 @@ so nothing that passed lint in `apps/web` fails on style here; what breaks is re
 
 6. **Repoint every `@/…` import.** `packages/react-core/tsconfig.json` declares one path mapping,
    `/runtime/v1/*` — there is no `@/*` here, so every `@/…` specifier is a module-resolution error.
-   Storybook agrees: its `vite.config.js` resolves `@` through a `customResolver` keyed on the
+   Storybook agrees: its `vite.config.js` resolves `@` through a `source-root-alias` plugin keyed on the
    importing file and returns `null` for anything outside `apps/web/src` and `apps/playground/src`.
    `@/components/*` becomes a relative sibling import. Everything else — `@/store`, `@/hooks/*`,
    `@/config`, `@/services/*`, `@/utils/*` — does not move; it becomes a prop or callback per step 5.
