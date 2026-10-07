@@ -8,24 +8,44 @@ Read the root `AGENTS.md` first for the rules that apply everywhere.
 
 ## Top-level await is load-bearing
 
-Two modules do real work at import time, and both are fragile.
+**`src/pages/IndexPage.tsx`** calls `await initialize({ wasmURL })` from `esbuild-wasm` above the
+component. esbuild-wasm throws `Cannot call "initialize" more than once` on a second call, so this
+must stay in exactly one module. `src/App.tsx` reaches it through `React.lazy`, which is what puts
+the 13 MB `esbuild.wasm` download behind the Suspense fallback. Importing `IndexPage` eagerly, or
+adding a second `initialize()`, breaks the app at boot.
 
-- **`src/pages/IndexPage.tsx`** calls `await initialize({ wasmURL })` from `esbuild-wasm` above the
-  component. esbuild-wasm throws `Cannot call "initialize" more than once` on a second call, so this
-  must stay in exactly one module. `src/App.tsx` reaches it through `React.lazy`, which is what puts
-  the 13 MB `esbuild.wasm` download behind the Suspense fallback. Importing `IndexPage` eagerly, or
-  adding a second `initialize()`, breaks the app at boot.
-- **`src/components/Editor/setup.ts`** configures Monaco (workers, compiler options, themes, prettier
-  as the formatter) inside a top-level `await loader.init()` block. `Editor.tsx` pulls it in with a
-  bare `import './setup'` for the side effect.
-
-Both depend on `build.target` and `optimizeDeps.esbuildOptions.target` being `es2022` in
+It depends on `build.target` and `optimizeDeps.esbuildOptions.target` being `es2022` in
 `vite.config.ts`. Lowering either one is how top-level await silently stops compiling.
 
 `rollupOptions.external: ['esbuild']` is also required. `packages/instrument-bundler/src/vendor/esbuild.ts`
 picks between `esbuild` and `esbuild-wasm` on `typeof window`; without the external, Vite tries to
 pull the Node package into the browser bundle. Background:
 `.agents/docs/architecture/runtime-and-vendor.md`.
+
+## Monaco is wired up by hand
+
+**`src/components/Editor/setup.ts` configures Monaco at import time** — workers, compiler options,
+themes, prettier as the formatter. `Editor.tsx` pulls it in with a bare `import './setup'` for the
+side effect, so it has run before any editor exists.
+
+**`src/components/Editor/MonacoEditor.tsx` is the editor component**, in place of
+`@monaco-editor/react`, whose 4.7 types import `monaco-editor/esm/vs/editor/editor.api`, a path the
+`exports` map `monaco-editor` 0.56 added no longer resolves. It keeps one model per `path` and never
+disposes one: `EditorPane` is keyed by instrument and filename, so every file switch remounts the
+editor, and the surviving model is what keeps the file's content and undo history. It restores each
+model's cursor and scroll position on the way back. Only `EditorPane` disposes models: all of them,
+on an instrument switch or when it unmounts.
+
+**Deep imports go through that `exports` map**, which sends `monaco-editor/<path>` to
+`esm/vs/<path>.js`. The language workers come from
+`monaco-editor/languages/features/<language>/<language>.worker`; the `esm/vs/language/*` paths the
+Monaco docs still show are deprecated re-exports. `SuggestAdapter` comes from
+`monaco-editor/languages/features/typescript/tsMode`, an internal module with no types of its own,
+declared in `src/typings/monaco-editor.d.ts`. `setup.ts` switches off the built-in completion
+provider (`completionItems: false`) and registers a subclass whose only change is quotes as trigger
+characters, so string-literal completions open as you type. The TypeScript API is the top-level
+`monaco.typescript` namespace; `monaco.languages.typescript` has been an empty `{ deprecated: true }`
+since 0.57.
 
 ## Running it
 
@@ -167,8 +187,11 @@ and covers only what is pure — `src/preview/__tests__/protocol.test.ts` pins t
 error serialization and `resolvePreviewOrigin`, and `config.test.ts` the `/config.json` contract. A
 component that renders on a server can still be pinned through `react-dom/server`'s
 `renderToStaticMarkup`, as `src/components/Resizable/__tests__/` does for the attributes its classes
-key on. Anything that touches esbuild-wasm, Monaco workers or `/runtime/v1` has no test environment
-here; the frame itself, the origin split, the runtime config, the message bridge and the resizable
+key on. A component test that needs a DOM opts in per file with a `// @vitest-environment happy-dom`
+docblock on its first line and renders with `@testing-library/react`;
+`src/components/Editor/__tests__/MonacoEditor.test.tsx` does, against a mocked `monaco-editor`,
+because Monaco itself does not run under happy-dom. Anything that touches esbuild-wasm, Monaco
+workers or `/runtime/v1` has no test environment here; the frame itself, the origin split, the runtime config, the message bridge and the resizable
 editor/preview split are exercised for real by `testing/src/specs/playground.spec.ts`, which
 Playwright runs against this app's dev server.
 
