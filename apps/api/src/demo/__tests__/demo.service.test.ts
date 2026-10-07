@@ -6,6 +6,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { DEMO_GROUPS, DEMO_USERS } from '@opendatacapture/demo';
 import type { $CreateGroupData } from '@opendatacapture/schemas/group';
+import { $Sex } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -147,6 +148,12 @@ describe('DemoService', () => {
     const [subject] = subjectsService.create.mock.lastCall ?? [];
     const { dateOfBirth, firstName, lastName, sex } = subject;
     expect(subject.id).toBe(await generateSubjectHash({ dateOfBirth, firstName, lastName, sex }));
+  });
+
+  it('should draw dummy subjects from every sex the subject schema accepts and no other', async () => {
+    await demoService.init({ dummySubjectCount: 20, recordsPerSubject: 0 });
+    const sexes = subjectsService.create.mock.calls.map(([subject]) => subject.sex);
+    expect(new Set(sexes)).toStrictEqual(new Set($Sex.options));
   });
 
   it('should number dummy subjects in a custom-id group in sequence under the group prefix', async () => {
