@@ -15,10 +15,10 @@ const [swcPlugin, libnestPlugin] = libnest({
 
 const apiFilePattern = new RegExp(`^${(import.meta.dirname + path.sep).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`);
 
-// libnest exposes no include option and its SWC plugin disables esbuild outright, so SWC would also
-// transform the workspace packages this project imports. SWC source maps place functions differently
-// from the esbuild transform every other project uses, which makes merged coverage count each of those
-// functions twice, with one copy never hit. SWC is only needed for the decorators in this app.
+// libnest exposes no include option and its SWC plugin tries to disable the default transform, so SWC
+// would also transform the workspace packages this project imports. SWC source maps place functions
+// differently from the Oxc transform every other project uses, which makes merged coverage count each
+// of those functions twice, with one copy never hit. SWC is only needed for the decorators in this app.
 const apiOnlySwcPlugin: Plugin = {
   ...swcPlugin,
   config: undefined,
@@ -33,7 +33,7 @@ const apiOnlySwcPlugin: Plugin = {
 export default mergeConfig(
   baseConfig,
   defineProject({
-    esbuild: {
+    oxc: {
       exclude: [/\.js$/, apiFilePattern]
     },
     plugins: [apiOnlySwcPlugin, libnestPlugin],
