@@ -334,6 +334,9 @@ describe('data hub collected filter', () => {
     fireEvent.change(screen.getByTestId('datahub-filter-collected-preset'), { target: { value: preset } });
   };
 
+  const collectedInput = (bound: 'max' | 'min') =>
+    screen.getByTestId<HTMLInputElement>(`datahub-filter-collected-${bound}`);
+
   beforeEach(() => {
     mocks.summaries = [
       { lastCollectedAt: OVER_A_YEAR_AGO, recordCount: 1, subjectId: ALICE.id },
@@ -380,7 +383,7 @@ describe('data hub collected filter', () => {
     openFilters();
     selectPreset('pastWeek');
     selectPreset('custom');
-    expect(screen.getByTestId('datahub-filter-collected-min').value).not.toBe('');
+    expect(collectedInput('min').value).not.toBe('');
   });
 
   it('should keep the chosen custom bounds in the inputs when the menu is reopened', () => {
@@ -390,8 +393,8 @@ describe('data hub collected filter', () => {
     fireEvent.change(screen.getByTestId('datahub-filter-collected-min'), { target: { value: '2025-01-01' } });
     fireEvent.change(screen.getByTestId('datahub-filter-collected-max'), { target: { value: '2027-01-01' } });
     reopenFilters();
-    expect(screen.getByTestId('datahub-filter-collected-min').value).toBe('2025-01-01');
-    expect(screen.getByTestId('datahub-filter-collected-max').value).toBe('2027-01-01');
+    expect(collectedInput('min').value).toBe('2025-01-01');
+    expect(collectedInput('max').value).toBe('2027-01-01');
   });
 });
 
