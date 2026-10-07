@@ -39,15 +39,14 @@ const renderGraph = (
 const lineCurves = (container: HTMLElement) => [...container.querySelectorAll('.recharts-line-curve')];
 
 const xAxisTicks = (container: HTMLElement) =>
-  [...container.querySelectorAll('.recharts-xAxis .recharts-cartesian-axis-tick-value')].map(
+  [...container.querySelectorAll('.recharts-xAxis-tick-labels .recharts-cartesian-axis-tick-value')].map(
     (tick) => tick.textContent
   );
 
-/** happy-dom's MouseEvent has no pageX/pageY, which recharts reads to find the hovered point. */
-const hover = (container: HTMLElement, { pageX, pageY }: { pageX: number; pageY: number }) => {
-  const event = new MouseEvent('mousemove', { bubbles: true });
-  Object.defineProperties(event, { pageX: { value: pageX }, pageY: { value: pageY } });
-  fireEvent(container.querySelector('.recharts-wrapper')!, event);
+/** Recharts handles a mouse move on the next animation frame, so wait for one before reading the tooltip. */
+const hover = async (container: HTMLElement, { clientX, clientY }: { clientX: number; clientY: number }) => {
+  fireEvent.mouseMove(container.querySelector('.recharts-wrapper')!, { clientX, clientY });
+  await act(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
 };
 
 describe('LineGraph', () => {
@@ -74,14 +73,23 @@ describe('LineGraph', () => {
     expect(lineCurves(renderGraph([scoreLine], undefined))).toHaveLength(1);
   });
 
-  it('should label the tooltip with the full date in the interface language', () => {
+  it('should label the tooltip with the full date in the interface language', async () => {
     void i18n.changeLanguage('fr');
     const container = renderGraph();
-    hover(container, { pageX: 420, pageY: 200 });
+    await hover(container, { clientX: 420, clientY: 200 });
     expect(container.querySelector('.recharts-tooltip-label')?.textContent).toMatch(/^vendredi 2 janvier 2026/);
   });
 
-  it('should name each line in the legend', () => {
+  it('should list the hovered values in the tooltip in the order the lines are given, not alphabetically', async () => {
+    const container = renderGraph([scoreLine, { name: 'Error', val: 'scoreError' }]);
+    await hover(container, { clientX: 420, clientY: 200 });
+    expect([...container.querySelectorAll('.recharts-tooltip-item-name')].map((item) => item.textContent)).toEqual([
+      'Score',
+      'Error'
+    ]);
+  });
+
+  it('should name each line in the legend in the order the lines are given, not alphabetically', () => {
     const container = renderGraph([scoreLine, { name: 'Error', val: 'scoreError' }]);
     expect([...container.querySelectorAll('.recharts-legend-item-text')].map((item) => item.textContent)).toEqual([
       'Score',
