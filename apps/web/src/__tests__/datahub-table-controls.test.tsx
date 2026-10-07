@@ -23,7 +23,7 @@ const mocks = vi.hoisted(() => ({
   addNotification: vi.fn<(notification: Notification) => void>(),
   axios: { get: vi.fn<(url: string, config?: AxiosGetConfig) => Promise<unknown>>() },
   download: vi.fn<(filename: string, data: string) => Promise<void>>(),
-  downloadExcel: vi.fn(),
+  downloadSubjectTableExcel: vi.fn(),
   navigate: vi.fn(),
   store: {
     currentGroup: null as null | StoreGroup,
@@ -64,7 +64,7 @@ vi.mock('@/store', () => ({
     getState: () => mocks.store
   })
 }));
-vi.mock('@/utils/excel', () => ({ downloadExcel: mocks.downloadExcel }));
+vi.mock('@/utils/excel', () => ({ downloadSubjectTableExcel: mocks.downloadSubjectTableExcel }));
 
 const subject = (id: string, overrides: Partial<Subject> = {}): Subject => ({
   createdAt: new Date('2026-01-01'),
@@ -123,7 +123,7 @@ const dateOfBirthInputs = () => {
 };
 
 const exportAs = (option: string) => {
-  fireEvent.keyDown(screen.getByRole('button', { name: 'Export' }), { key: 'Enter' });
+  fireEvent.keyDown(screen.getByRole('button', { name: 'Download' }), { key: 'Enter' });
   fireEvent.click(screen.getByRole('menuitem', { name: option }));
 };
 
@@ -387,7 +387,8 @@ describe('data hub export', () => {
     await settleExport();
     const [filename, content] = mocks.download.mock.calls[0] ?? [];
     expect(filename).toMatch(/^jdoe_.+\.json$/);
-    expect(JSON.parse(content ?? 'null')).toEqual([exportEntry('bob')]);
+    const { seriesId: _, ...expected } = exportEntry('bob');
+    expect(JSON.parse(content ?? 'null')).toEqual([expected]);
   });
 
   it('should download a CSV together with a README explaining its long format', async () => {
@@ -407,7 +408,12 @@ describe('data hub export', () => {
     renderDataHub();
     exportAs('Excel');
     await settleExport();
-    expect(mocks.downloadExcel).toHaveBeenCalledWith(expect.stringMatching(/^jdoe_.+\.xlsx$/), [exportEntry('bob')]);
+    const { seriesId: _, ...expected } = exportEntry('bob');
+    expect(mocks.downloadSubjectTableExcel).toHaveBeenCalledWith(
+      expect.stringMatching(/^jdoe_.+\.xlsx$/),
+      [expected],
+      'Records'
+    );
   });
 
   it('should confirm a successful export', async () => {

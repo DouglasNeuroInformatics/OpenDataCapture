@@ -101,6 +101,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
   const instrument = useInstrument(instrumentId) as AnyUnilingualScalarInstrument;
   const seriesInfoById = useInstrumentInfoById({ kind: 'SERIES' });
+  // Every edition, because a record names the exact one administered — and across a series the
+  // export spans several instruments, so each row has to say which produced it.
+  const instrumentInfoById = useInstrumentInfoById({ allEditions: true });
 
   const instrumentInfoQuery = useInstrumentInfoQuery({
     params: { allEditions: true, kind: params.kind, subjectId: params.subjectId }
@@ -143,6 +146,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         collectionMethod: record.__method__,
         date: toBasicISOString(record.__date__),
         groupId: currentGroup ? currentGroup.id : DEFAULT_GROUP_NAME,
+        instrumentEdition: instrumentInfoById[record.__instrumentId__]?.edition ?? null,
+        // Falls back to the id so a row is never anonymous, even if the catalog no longer lists it.
+        instrumentName: instrumentInfoById[record.__instrumentId__]?.title ?? record.__instrumentId__,
         seriesId: record.__seriesId__,
         seriesName: record.__seriesName__,
         subjectId: removeSubjectIdScope(record.__subjectId__),
@@ -155,6 +161,8 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       const row: { [key: string]: any } = {};
       row.GroupID = meta.groupId;
       row.SubjectID = meta.subjectId;
+      row.InstrumentName = meta.instrumentName;
+      row.InstrumentEdition = meta.instrumentEdition;
       row.Date = meta.date;
       row.CollectionMethod = meta.collectionMethod;
       row.SeriesID = meta.seriesId;
@@ -163,11 +171,22 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       return row;
     };
 
+    /**
+     * Every measure any record carries, so a set spanning several instruments keeps all of their
+     * fields. Each row is given the whole key set because papaparse takes its header from the first
+     * row alone — without this, a series export silently dropped every column the first record's
+     * instrument happened not to measure.
+     */
+    const allMeasureKeys = Array.from(new Set(exportRecords.flatMap(({ measures }) => Object.keys(measures))));
+
     const makeWideRows = () => {
       return exportRecords.map(({ measures, meta }) => {
         const row = withMetadataColumns(meta);
-        for (const [key, value] of Object.entries(measures)) {
-          row[key] = typeof value === 'object' ? JSON.stringify(value) : value;
+        for (const key of allMeasureKeys) {
+          const value = measures[key];
+          // An instrument that does not measure this field leaves the cell empty rather than
+          // claiming a value it never collected.
+          row[key] = value === undefined ? '' : typeof value === 'object' ? JSON.stringify(value) : value;
         }
         return row;
       });

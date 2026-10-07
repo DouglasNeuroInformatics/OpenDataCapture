@@ -1,54 +1,44 @@
 /**
- * The categorical palettes for charts that colour marks by a grouping dimension.
+ * The categorical palettes every datahub chart draws with, so the instrument and subject graphs
+ * read the same way and a reader moving between them is not relearning the colours.
  *
- * Three slots per theme, not more: a scatter puts every pair of series on screen at once, and only
- * a three-colour set clears the colourblind and normal-vision separation floors against both
- * surfaces as an all-pairs set. A grouping with more values folds its tail into `OTHER_GROUP_KEY`
- * rather than growing the palette. Each theme's dark column is the same three hues re-stepped for
- * the dark surface, not an automatic inversion of the light one.
+ * Each theme leads with the three hues it is named for, then carries three more in the same key.
+ * The two consumers take different amounts of that run: a grouping dimension stops at
+ * `MAX_CATEGORICAL_GROUPS` and folds its tail into `OTHER_GROUP_KEY`, because an unbounded legend
+ * of near-hues is unreadable; a measure selection has a named line per entry and so spends the
+ * whole run before cycling.
  *
- * Every theme was verified with the data-visualization skill's palette validator at `--pairs all`
- * in both modes, and all three clear the 6–8 CVD band outright rather than relying on secondary
- * encoding — worst-pair CVD ΔE: default 9.2 light / 9.4 dark, berry 13.0 / 13.0, jade 9.2 / 9.4.
+ * Each theme's dark column is the same hues re-stepped for the dark surface, not an inversion of
+ * the light one.
  *
- * Slot order matters as well as membership: slot one is what an ungrouped chart draws with and what
- * the first group takes, so each theme leads with the hue it is named for. `jade` therefore carries
- * the same three hues as the set it replaced, led by the green-teal instead of the orange — it is
- * the only green-led trio that passes, since jade with magenta and yellow collapses to ΔE 1.6 in
- * dark and green with blue and orange fails outright in both modes.
- *
- * The hues of a theme are deliberately spread around the wheel. Sets drawn from one side of it —
- * an all-warm orange/red/yellow, or a blue/violet/aqua — were tried and rejected: they fail the
- * separation floors outright (orange↔red ΔE 5.6, blue↔violet 1.9 in dark), because small hue gaps
- * cannot survive a colourblind transform. A single-hue ramp is likewise absent: it fails the
- * ordinal light-end contrast check, and a nominal grouping is not a magnitude to shade anyway.
- *
- * Several light-mode slots sit below 3:1 against the light surface, which obliges the relief the
- * charts already carry: a legend, and the sibling table showing the same records.
+ * - default: white / grey / light blue, then steel, slate and pale cyan.
+ * - berry: blue / purple / pink, then indigo, magenta and rose.
+ * - jade: green / yellow / orange, then teal, olive and red-orange.
+ * - ember: deep red / light yellow / beige, then burnt orange, olive and taupe.
  */
 const CHART_PALETTE_THEMES = {
   berry: {
-    dark: ['#d55181', '#008300', '#3987e5'],
-    light: ['#e87ba4', '#008300', '#2a78d6']
+    dark: ['#5b9bd5', '#9b72cb', '#e57aad', '#6b5bd5', '#c850c8', '#e8859b'],
+    light: ['#3a7cc6', '#7b4fb8', '#d4548e', '#4a3cb5', '#a830a8', '#d4607a']
   },
   default: {
-    dark: ['#3987e5', '#d95926', '#199e70'],
-    light: ['#2a78d6', '#eb6834', '#1baf7a']
+    dark: ['#e0e0e0', '#9e9e9e', '#7db8e0', '#4a7fa5', '#6b7f8f', '#b5dce8'],
+    light: ['#b0b0b0', '#6b6b6b', '#4a90c4', '#2f6690', '#53697a', '#7fc4d8']
+  },
+  ember: {
+    dark: ['#c0392b', '#f5d76e', '#d8c3a5', '#e07b39', '#a8a847', '#8c6b52'],
+    light: ['#a52a1f', '#d4b63c', '#b39b7d', '#c2621f', '#86862f', '#6e5240']
   },
   jade: {
-    dark: ['#199e70', '#9085e9', '#d95926'],
-    light: ['#1baf7a', '#4a3aa7', '#eb6834']
+    dark: ['#34c775', '#f0c040', '#e88a3a', '#2aa89a', '#b5c040', '#e05c2a'],
+    light: ['#1fa85c', '#d4a017', '#d06e1e', '#1a8f82', '#8f9a24', '#c04418']
   }
 } as const;
 
 type ChartPaletteName = keyof typeof CHART_PALETTE_THEMES;
 
-/**
- * Dropdown order, with `default` pinned first. Written out rather than derived from the themes
- * object, whose key order is alphabetical because eslint sorts object literals — which would bury
- * the default in the middle. `chart-palette.test.ts` pins both the leading entry and completeness.
- */
-const CHART_PALETTE_NAMES = ['default', 'berry', 'jade'] as const satisfies readonly ChartPaletteName[];
+/** Dropdown order, with `default` pinned first. `chart-palette.test.ts` pins both the leading entry and completeness. */
+const CHART_PALETTE_NAMES = ['default', 'berry', 'jade', 'ember'] as const satisfies readonly ChartPaletteName[];
 
 /**
  * Grey, deliberately outside every theme, for the folded tail — a bucket, not a group. An ungrouped
@@ -61,10 +51,29 @@ const NEUTRAL_MARK = {
 
 const OTHER_GROUP_KEY = '__other__';
 
-const MAX_CATEGORICAL_GROUPS = CHART_PALETTE_THEMES.default.light.length;
+/**
+ * How many groups a colour-by dimension may draw before the rest fold into `OTHER_GROUP_KEY`. Three
+ * rather than the whole run: a scatter puts every pair of groups on screen at once, and only the
+ * leading trio holds a colourblind-safe separation as an all-pairs set.
+ */
+const MAX_CATEGORICAL_GROUPS = 3;
 
+/** The colour of a grouping's nth slot, or the neutral mark once the caller should have folded. */
 function getCategoricalColor(index: number, theme: 'dark' | 'light', palette: ChartPaletteName): string {
+  if (index >= MAX_CATEGORICAL_GROUPS) {
+    return NEUTRAL_MARK[theme];
+  }
   return CHART_PALETTE_THEMES[palette][theme][index] ?? NEUTRAL_MARK[theme];
+}
+
+/**
+ * The colour of the nth measure in a selection, cycling once the theme runs out. Cycling is honest
+ * here in a way it would not be for a grouping, because every line carries its own name in the
+ * legend — whereas a repeated hue across two unlabelled groups is simply wrong.
+ */
+function getMeasureColor(index: number, theme: 'dark' | 'light', palette: ChartPaletteName): string {
+  const colors = CHART_PALETTE_THEMES[palette][theme];
+  return colors[index % colors.length]!;
 }
 
 /** The theme's colours in slot order, for rendering a swatch of what a palette looks like. */
@@ -76,6 +85,7 @@ export {
   CHART_PALETTE_NAMES,
   CHART_PALETTE_THEMES,
   getCategoricalColor,
+  getMeasureColor,
   getPaletteSwatch,
   MAX_CATEGORICAL_GROUPS,
   NEUTRAL_MARK,

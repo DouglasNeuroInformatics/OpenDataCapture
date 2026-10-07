@@ -74,6 +74,7 @@ export const RecordDistributionChart = ({
         </YAxis>
         <Tooltip
           contentStyle={tooltipStyles[resolvedTheme]}
+          cursor={{ fill: resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)' }}
           labelStyle={{ color: inkColors[resolvedTheme], fontWeight: 500 }}
         />
         {series.map((item) => (

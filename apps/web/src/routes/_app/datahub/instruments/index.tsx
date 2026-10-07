@@ -1,11 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
-import { InstrumentPreviewDialog } from '@/components/InstrumentPreviewDialog';
-import type { InstrumentPreviewItem } from '@/components/InstrumentPreviewDialog';
 import { InstrumentTable } from '@/components/InstrumentTable';
 import type { InstrumentRow } from '@/components/InstrumentTable';
 import { PageHeader } from '@/components/PageHeader';
@@ -18,7 +16,6 @@ import { useAppStore } from '@/store';
 
 const RouteComponent = () => {
   const navigate = useNavigate();
-  const [preview, setPreview] = useState<InstrumentPreviewItem | null>(null);
   const currentGroup = useAppStore((store) => store.currentGroup);
   const { t } = useTranslation();
 
@@ -30,31 +27,6 @@ const RouteComponent = () => {
   const seriesSummaryQuery = useInstrumentRecordSummaryQuery({
     params: { bySeries: true, groupId: currentGroup?.id }
   });
-
-  const infoById = useMemo(
-    () => new Map((instrumentInfoQuery.data ?? []).map((info) => [info.id, info])),
-    [instrumentInfoQuery.data]
-  );
-
-  /**
-   * The shape the shared preview dialog takes. `items` is only consulted to name a series' children,
-   * and this list has no series in it, so the dialog is handed an empty one.
-   */
-  const toPreviewItem = (row: InstrumentRow): InstrumentPreviewItem => {
-    const info = infoById.get(row.id);
-    return {
-      authors: info?.details.authors ?? null,
-      availability: null,
-      createdAt: info?.createdAt ?? null,
-      description: info?.details.description,
-      id: row.id,
-      internal: info && info.kind !== 'SERIES' ? info.internal : null,
-      kind: row.kind,
-      seriesItems: info?.kind === 'SERIES' ? info.seriesItems : undefined,
-      source: row.source === null ? { kind: 'manual' } : { kind: 'repo', name: row.source },
-      title: row.title
-    };
-  };
 
   const data = useMemo<InstrumentRow[]>(() => {
     const summaries = new Map(summaryQuery.data.map((summary) => [summary.instrumentId, summary]));
@@ -91,18 +63,7 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <InstrumentTable
-        data-testid="instrument-hub-table"
-        rowActions={[
-          {
-            label: t({ en: 'Preview', es: 'Vista previa', fr: 'Aperçu' }),
-            onSelect: (row) => setPreview(toPreviewItem(row))
-          }
-        ]}
-        rows={data}
-        onOpen={openInstrument}
-      />
-      {preview && <InstrumentPreviewDialog item={preview} items={[]} onClose={() => setPreview(null)} />}
+      <InstrumentTable data-testid="instrument-hub-table" rows={data} onOpen={openInstrument} />
     </React.Fragment>
   );
 };

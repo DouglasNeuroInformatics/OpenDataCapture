@@ -6,7 +6,8 @@ import { useInstrumentInfoById } from '../useInstrumentInfoById';
 type InfoQueryParams = { allEditions?: boolean; kind?: string; subjectId?: string };
 
 const mocks = vi.hoisted(() => ({
-  data: undefined as undefined | { details: { title: string }; id: string; kind: string }[],
+  data: undefined as
+    undefined | { details: { title: string }; id: string; internal?: { edition: number }; kind: string }[],
   /** What the hook asked the catalog for, captured so the slice can be asserted */
   params: undefined as InfoQueryParams | undefined
 }));
@@ -28,22 +29,23 @@ describe('useInstrumentInfoById', () => {
 
   it('should key every instrument by its id, carrying the kind beside the title', () => {
     mocks.data = [
-      { details: { title: 'Happiness Questionnaire' }, id: 'hq-1', kind: 'FORM' },
-      { details: { title: 'Stroop Task' }, id: 'stroop-1', kind: 'INTERACTIVE' }
+      { details: { title: 'Happiness Questionnaire' }, id: 'hq-1', internal: { edition: 1 }, kind: 'FORM' },
+      { details: { title: 'Stroop Task' }, id: 'stroop-1', internal: { edition: 3 }, kind: 'INTERACTIVE' }
     ];
     const { result } = renderHook(() => useInstrumentInfoById());
     expect(result.current).toStrictEqual({
-      'hq-1': { kind: 'FORM', title: 'Happiness Questionnaire' },
-      'stroop-1': { kind: 'INTERACTIVE', title: 'Stroop Task' }
+      'hq-1': { edition: 1, kind: 'FORM', title: 'Happiness Questionnaire' },
+      'stroop-1': { edition: 3, kind: 'INTERACTIVE', title: 'Stroop Task' }
     });
   });
 
   // A series' member list reads the kind off this map, so an INTERACTIVE member must not be
   // reported as a form.
   it('should report a non-form kind as itself', () => {
-    mocks.data = [{ details: { title: 'Upload' }, id: 'file-1', kind: 'FILE' }];
+    mocks.data = [{ details: { title: 'Upload' }, id: 'file-1', internal: { edition: 1 }, kind: 'FILE' }];
     const { result } = renderHook(() => useInstrumentInfoById());
     expect(result.current['file-1']?.kind).toBe('FILE');
+    expect(result.current['file-1']?.edition).toBe(1);
   });
 
   it('should pass the requested slice of the catalog straight through to the query', () => {

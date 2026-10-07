@@ -4,7 +4,7 @@ import type { InstrumentKind } from '@opendatacapture/runtime-core';
 
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 
-type InstrumentInfoById = { [id: string]: { kind: InstrumentKind; title: string } };
+type InstrumentInfoById = { [id: string]: { edition: null | number; kind: InstrumentKind; title: string } };
 
 /**
  * The accessible instrument catalog keyed by id, narrowed by the same params the info query takes.
@@ -22,7 +22,16 @@ export function useInstrumentInfoById<TKind extends InstrumentKind>(params?: {
   const query = useInstrumentInfoQuery({ params });
   return useMemo(
     () =>
-      Object.fromEntries((query.data ?? []).map((info) => [info.id, { kind: info.kind, title: info.details.title }])),
+      Object.fromEntries(
+        (query.data ?? []).map((info) => [
+          info.id,
+          {
+            edition: info.kind !== 'SERIES' ? info.internal.edition : null,
+            kind: info.kind,
+            title: info.details.title
+          }
+        ])
+      ),
     [query.data]
   );
 }

@@ -42,6 +42,7 @@ beforeEach(() => {
   mocks.outlet = () => 'Outlet Content';
   mocks.pathname = '/datahub/subjects/root$abcdefghijkl/table';
   vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'root$abcdefghijkl' });
+  vi.spyOn(Route, 'useSearch').mockReturnValue({});
 });
 
 afterEach(() => {
@@ -87,6 +88,21 @@ describe('subject layout route', () => {
     mocks.config.setup.isGatewayEnabled = false;
     renderLayout();
     expect(screen.queryByTestId('subject-assignment')).toBeNull();
+  });
+
+  it('should return to the subject index when the subject was opened from it', () => {
+    renderLayout();
+    expect(screen.getByTestId('subject-hub-back').getAttribute('href')).toBe('/datahub/subjects');
+  });
+
+  // Reached from an instrument's record table, the subject belongs to that listing — returning to
+  // the subject index would drop the reader somewhere they never were.
+  it('should return to the instrument record table the subject was opened from', () => {
+    vi.spyOn(Route, 'useSearch').mockReturnValue({ fromInstrument: 'hq-1' });
+    renderLayout();
+    expect(screen.getByTestId('subject-hub-back').getAttribute('href')).toBe(
+      '/datahub/instruments/$instrumentId/table'
+    );
   });
 
   it('should render the selected tab page below the tabs', () => {

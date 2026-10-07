@@ -1,50 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
 import type { LineGraphLine } from '@/components/LineGraph';
-
-const COLOR_PALETTE: readonly string[] = [
-  '#D81B60',
-  '#1E88E5',
-  '#FD08FA',
-  '#A06771',
-  '#353A9B',
-  '#D90323',
-  '#9C9218',
-  '#CF0583',
-  '#4075A3'
-];
+import { getMeasureColor } from '@/utils/chart-palette';
+import type { ChartPaletteName } from '@/utils/chart-palette';
+import { resolveTheme } from '@/utils/chart-theme';
 
 type UseGraphLinesOptions = {
+  palette: ChartPaletteName;
   selectedMeasures: ListboxDropdownOption[];
 };
 
-export function useGraphLines({ selectedMeasures }: UseGraphLinesOptions) {
+export function useGraphLines({ palette, selectedMeasures }: UseGraphLinesOptions) {
   const { resolvedLanguage, t } = useTranslation('common');
-  const [lines, setLines] = useState<LineGraphLine[]>([]);
+  const [theme] = useTheme();
+  const mode = resolveTheme(theme);
 
-  useEffect(() => {
+  return useMemo(() => {
     const lines: LineGraphLine[] = [];
-    for (let i = 0; i < selectedMeasures.length; i++) {
-      const measure = selectedMeasures[i]!;
+    for (const [index, measure] of selectedMeasures.entries()) {
+      const stroke = getMeasureColor(index, mode, palette);
       lines.push({
         name: measure.label,
-        stroke: COLOR_PALETTE[i],
+        stroke,
         val: measure.key
       });
       lines.push({
         legendType: 'none',
         name: `${measure.label} (${t('groupTrend')})`,
-        stroke: COLOR_PALETTE[i],
+        stroke,
         strokeDasharray: '5 5',
         strokeWidth: 0.5,
         val: measure.key + 'Group'
       });
     }
-    setLines(lines);
-  }, [resolvedLanguage, selectedMeasures]);
-
-  return lines;
+    return lines;
+    // Keyed on `resolvedLanguage` rather than `t`, which is a fresh closure every render and would
+    // make this memo recompute always. The language is what actually changes the trend label.
+  }, [mode, palette, resolvedLanguage, selectedMeasures]);
 }

@@ -1,35 +1,21 @@
-import { Select, Tabs } from '@douglasneuroinformatics/libui/components';
-import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useRef } from 'react';
+
+import { ActionDropdown, Select, Tabs } from '@douglasneuroinformatics/libui/components';
+import { useDownload, useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute } from '@tanstack/react-router';
 
 import { RecordDistributionChart } from '@/components/RecordDistributionChart';
 import { RecordScatterChart } from '@/components/RecordScatterChart';
+import { SelectChartPalette } from '@/components/SelectChartPalette';
 import { useInstrumentHubRecords } from '@/hooks/useInstrumentHubRecords';
 import { useLinearModelQuery } from '@/hooks/useLinearModelQuery';
 import { useMeasureOptions } from '@/hooks/useMeasureOptions';
 import { useRecordChartSeries } from '@/hooks/useRecordChartSeries';
 import type { ColourBy } from '@/hooks/useRecordChartSeries';
 import { useAppStore } from '@/store';
-import { CHART_PALETTE_NAMES, getPaletteSwatch } from '@/utils/chart-palette';
-import type { ChartPaletteName } from '@/utils/chart-palette';
+import { chartImageFilename, renderChartPng } from '@/utils/chart-image';
+import { MAX_CATEGORICAL_GROUPS } from '@/utils/chart-palette';
 import { resolveTheme } from '@/utils/chart-theme';
-
-/**
- * The hues a palette would actually draw with, so the choice is visible rather than named. Shows
- * one dot when there is no grouping, because only the first slot is used then.
- */
-const PaletteSwatch = ({ palette, slots }: { palette: ChartPaletteName; slots: number }) => {
-  const [theme] = useTheme();
-  return (
-    <span className="flex shrink-0 items-center gap-0.5">
-      {getPaletteSwatch(palette, resolveTheme(theme))
-        .slice(0, slots)
-        .map((color) => (
-          <span className="h-2.5 w-2.5 rounded-full" key={color} style={{ backgroundColor: color }} />
-        ))}
-    </span>
-  );
-};
 
 const RouteComponent = () => {
   const navigate = Route.useNavigate();
@@ -37,16 +23,43 @@ const RouteComponent = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const { instrument, instrumentId, records } = useInstrumentHubRecords();
   const { t } = useTranslation();
+  const downloadFile = useDownload();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
+  const [theme] = useTheme();
+  const chartContainerRef = useRef<HTMLDivElement>(null);
 
-  const paletteLabels: { [K in ChartPaletteName]: string } = {
-    berry: t({ en: 'Berry', es: 'Baya', fr: 'Baie' }),
-    default: t({ en: 'Default', es: 'Predeterminada', fr: 'Par défaut' }),
-    jade: t({ en: 'Jade', es: 'Jade', fr: 'Jade' })
-  };
+  const title = instrument?.details.title ?? t({ en: 'Instrument', es: 'Instrumento', fr: 'Instrument' });
 
   const measureOptions = useMeasureOptions(instrument);
   const selectedMeasure = measure ?? measureOptions[0]?.key;
   const measureLabel = measureOptions.find((option) => option.key === selectedMeasure)?.label ?? '';
+
+  const handlePngDownload = async () => {
+    if (!chartContainerRef.current) {
+      return;
+    }
+    try {
+      const blob = await renderChartPng(chartContainerRef.current, {
+        headings: [title, measureLabel].filter(Boolean),
+        // Only a grouped chart has a legend on screen, and only then does the capture need one.
+        legend: series.length > 1 ? series.map((item) => ({ color: item.color, label: item.label })) : [],
+        mode: resolveTheme(theme)
+      });
+      await downloadFile(chartImageFilename(title), () => blob, { blobType: 'image/png' });
+    } catch (error) {
+      console.error(error);
+      addNotification({
+        // The cause is named rather than swallowed: without it the toast says only that something
+        // went wrong, which is no more actionable than the button doing nothing.
+        message: `${t({
+          en: 'The chart could not be saved as an image',
+          es: 'No se pudo guardar el gráfico como imagen',
+          fr: "Le graphique n'a pas pu être enregistré comme image"
+        })}: ${error instanceof Error ? error.message : String(error)}`,
+        type: 'error'
+      });
+    }
+  };
 
   const { isNumeric, series } = useRecordChartSeries({ colourBy, measure: selectedMeasure, palette, records });
 
@@ -120,33 +133,30 @@ const RouteComponent = () => {
               </Select.Group>
             </Select.Content>
           </Select>
-          <Select
+          <SelectChartPalette
+            data-testid="instrument-hub-palette-trigger"
+            slots={colourBy === 'none' ? 1 : MAX_CATEGORICAL_GROUPS}
             value={palette}
-            onValueChange={(value) => {
-              void navigate({ search: (prev) => ({ ...prev, palette: value as ChartPaletteName }) });
+            onSelect={(selected) => {
+              void navigate({ search: (prev) => ({ ...prev, palette: selected }) });
             }}
-          >
-            <Select.Trigger className="min-w-36" data-testid="instrument-hub-palette-trigger">
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Group>
-                {CHART_PALETTE_NAMES.map((name) => (
-                  <Select.Item key={name} value={name}>
-                    <span className="flex items-center gap-2">
-                      <PaletteSwatch palette={name} slots={colourBy === 'none' ? 1 : 3} />
-                      {paletteLabels[name]}
-                    </span>
-                  </Select.Item>
-                ))}
-              </Select.Group>
-            </Select.Content>
-          </Select>
+          />
+          <ActionDropdown
+            data-testid="instrument-hub-graph-export-dropdown"
+            disabled={records.length === 0}
+            options={{ png: 'PNG' }}
+            title={t('datahub.downloadInfo.download')}
+            triggerClassName="min-w-32"
+            onSelection={() => {
+              void handlePngDownload();
+            }}
+          />
         </div>
       </div>
       <div
         className="bg-card text-muted-foreground rounded-md border p-6 tracking-tight shadow-xs"
         data-testid="instrument-hub-chart"
+        ref={chartContainerRef}
       >
         {!hasData ? (
           <p className="py-16 text-center">

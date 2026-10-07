@@ -1,7 +1,5 @@
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 
-import { getCategoricalColor, NEUTRAL_MARK } from '@/utils/chart-palette';
-
 type Mode = 'dark' | 'light';
 
 /**
@@ -17,23 +15,31 @@ const SEX_COLORS = {
   MALE: '#89cff0'
 } as const;
 
+/**
+ * One named colour per instrument kind, held here rather than taken from the chart palette: the
+ * palette is a per-user chart setting, and choosing one must not recolour a table's kind column.
+ */
+const INSTRUMENT_KIND_COLORS = {
+  FILE: { dark: '#22c55e', light: '#16a34a' },
+  FORM: { dark: '#3b82f6', light: '#2563eb' },
+  INTERACTIVE: { dark: '#ef4444', light: '#dc2626' },
+  SERIES: { dark: '#eab308', light: '#ca8a04' }
+} as const satisfies { [K in InstrumentKind]: { dark: string; light: string } };
+
+const NEUTRAL_COLOR = {
+  dark: '#a3a3a3',
+  light: '#525252'
+} as const;
+
 function getSexColor(sex: null | string, mode: Mode): string {
   if (sex === 'FEMALE' || sex === 'MALE') {
     return SEX_COLORS[sex];
   }
-  return NEUTRAL_MARK[mode];
+  return NEUTRAL_COLOR[mode];
 }
 
-/**
- * One palette slot per instrument kind.
- *
- * A series is the neutral mark rather than a fourth hue: the palette holds three validated slots,
- * and a generated fourth is never the answer.
- */
 function getInstrumentKindColor(kind: InstrumentKind, mode: Mode): string {
-  const slots: { [K in InstrumentKind]: null | number } = { FILE: 2, FORM: 0, INTERACTIVE: 1, SERIES: null };
-  const slot = slots[kind];
-  return slot === null ? NEUTRAL_MARK[mode] : getCategoricalColor(slot, mode, 'default');
+  return INSTRUMENT_KIND_COLORS[kind][mode];
 }
 
 export { getInstrumentKindColor, getSexColor };

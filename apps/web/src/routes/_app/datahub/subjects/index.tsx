@@ -20,6 +20,7 @@ import { ChevronDownIcon, UserSearchIcon } from 'lucide-react';
 import { unpack } from 'msgpackr/unpack';
 import { unparse } from 'papaparse';
 
+import { CollectedFilterMenu } from '@/components/CollectedFilterMenu';
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { IdentificationForm } from '@/components/IdentificationForm';
 import { PageHeader } from '@/components/PageHeader';
@@ -28,12 +29,11 @@ import { SortableHeader } from '@/components/SortableHeader';
 import { subjectRecordSummaryQueryOptions, useSubjectRecordSummaryQuery } from '@/hooks/useSubjectRecordSummaryQuery';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
-import { downloadExcel } from '@/utils/excel';
+import { DEFAULT_COLLECTED_FILTER, matchesCollectedFilter } from '@/utils/collected-filter';
+import type { CollectedFilter } from '@/utils/collected-filter';
+import { downloadSubjectTableExcel } from '@/utils/excel';
 import { getListedSubjectIds } from '@/utils/table';
 import { getSexColor } from '@/utils/tag-colors';
-
-/** Shown where a subject has never had a record collected */
-const EMPTY_CELL = '—';
 
 type DateFilter = {
   allowNull: boolean;
@@ -46,39 +46,6 @@ type SexFilter = (null | Sex)[];
 type HasSearchStringFilter = {
   searchString: string;
 };
-
-/** A named window over the collection date, or an explicit one the user typed */
-type CollectedPreset =
-  'all' | 'custom' | 'pastMonth' | 'pastSixMonths' | 'pastThreeMonths' | 'pastTwoYears' | 'pastWeek' | 'pastYear';
-
-type CollectedFilter = {
-  max: Date | null;
-  min: Date | null;
-  preset: CollectedPreset;
-};
-
-/** The earliest date a preset admits, or null for no lower bound */
-function presetMinDate(preset: CollectedPreset): Date | null {
-  const now = new Date();
-  const monthsAgo = (count: number) => new Date(new Date(now).setMonth(now.getMonth() - count));
-  const yearsAgo = (count: number) => new Date(new Date(now).setFullYear(now.getFullYear() - count));
-  switch (preset) {
-    case 'pastMonth':
-      return monthsAgo(1);
-    case 'pastSixMonths':
-      return monthsAgo(6);
-    case 'pastThreeMonths':
-      return monthsAgo(3);
-    case 'pastTwoYears':
-      return yearsAgo(2);
-    case 'pastWeek':
-      return new Date(new Date(now).setDate(now.getDate() - 7));
-    case 'pastYear':
-      return yearsAgo(1);
-    default:
-      return null;
-  }
-}
 
 const Filters: React.FC<{
   minRecords: string;
@@ -226,70 +193,11 @@ const Filters: React.FC<{
               onChange={(event) => setMinRecords(event.target.value)}
             />
           </div>
-          <div className="relative flex items-center justify-between gap-1 rounded-xs px-2 pt-1.5 pb-1 text-sm transition-colors">
-            <span className="pb-1">{t({ en: 'Collected:', es: 'Recopilado:', fr: 'Collecté :' })}</span>
-            {/* A native select renders with the user agent's own white background, which reads as a
-                bright block in dark mode — so it carries the popover surface tokens explicitly, and
-                the options do too, since those are painted separately. */}
-            <select
-              className="bg-popover text-foreground [&>option]:bg-popover [&>option]:text-foreground pointer-events-auto rounded-sm border-b pb-0.5"
-              data-testid="datahub-filter-collected-preset"
-              value={collectedFilter.preset}
-              onChange={(event) => {
-                const preset = event.target.value as CollectedPreset;
-                collectedColumn.setFilterValue((prevValue: CollectedFilter): CollectedFilter => ({
-                  // A preset owns both bounds; only `custom` leaves them to the user, and it
-                  // starts from whatever window the preset had so the dates are a nudge, not blank.
-                  max: preset === 'custom' ? prevValue.max : null,
-                  min: preset === 'custom' ? (prevValue.min ?? presetMinDate(prevValue.preset)) : presetMinDate(preset),
-                  preset
-                }));
-              }}
-            >
-              <option value="all">{t({ en: 'Any time', es: 'Cualquier fecha', fr: 'Toute période' })}</option>
-              <option value="pastWeek">{t({ en: 'This week', es: 'Esta semana', fr: 'Cette semaine' })}</option>
-              <option value="pastMonth">{t({ en: 'This month', es: 'Este mes', fr: 'Ce mois-ci' })}</option>
-              <option value="pastThreeMonths">{t({ en: '3 months', es: '3 meses', fr: '3 mois' })}</option>
-              <option value="pastSixMonths">{t({ en: '6 months', es: '6 meses', fr: '6 mois' })}</option>
-              <option value="pastYear">{t({ en: 'This year', es: 'Este año', fr: 'Cette année' })}</option>
-              <option value="pastTwoYears">{t({ en: '2 years', es: '2 años', fr: '2 ans' })}</option>
-              <option value="custom">{t({ en: 'Custom', es: 'Personalizado', fr: 'Personnalisé' })}</option>
-            </select>
-          </div>
-          {collectedFilter.preset === 'custom' && (
-            <React.Fragment>
-              <div className="relative flex items-center justify-between gap-1 rounded-xs px-2 pt-1.5 pb-1 text-sm transition-colors">
-                <span className="pb-1">{t({ en: 'Min:', es: 'Mín.:', fr: 'Min :' })}</span>
-                <input
-                  className="bg-popover text-foreground pointer-events-auto rounded-sm border-b pb-0.5"
-                  data-testid="datahub-filter-collected-min"
-                  type="date"
-                  value={collectedFilter.min ? toBasicISOString(collectedFilter.min) : ''}
-                  onChange={(event) => {
-                    collectedColumn.setFilterValue((prevValue: CollectedFilter): CollectedFilter => ({
-                      ...prevValue,
-                      min: event.target.valueAsDate
-                    }));
-                  }}
-                />
-              </div>
-              <div className="relative flex items-center justify-between gap-1 rounded-xs px-2 pt-1.5 pb-1 text-sm transition-colors">
-                <span className="pb-1">{t({ en: 'Max:', es: 'Máx.:', fr: 'Max :' })}</span>
-                <input
-                  className="bg-popover text-foreground pointer-events-auto rounded-sm border-b pb-0.5"
-                  data-testid="datahub-filter-collected-max"
-                  type="date"
-                  value={collectedFilter.max ? toBasicISOString(collectedFilter.max) : ''}
-                  onChange={(event) => {
-                    collectedColumn.setFilterValue((prevValue: CollectedFilter): CollectedFilter => ({
-                      ...prevValue,
-                      max: event.target.valueAsDate
-                    }));
-                  }}
-                />
-              </div>
-            </React.Fragment>
-          )}
+          <CollectedFilterMenu
+            testIdPrefix="datahub-filter"
+            value={collectedFilter}
+            onChange={(next) => collectedColumn.setFilterValue(next)}
+          />
         </DropdownMenu.Group>
       </DropdownMenu.Content>
     </DropdownMenu>
@@ -369,15 +277,17 @@ const Toggles: React.FC<{
           );
         }
 
+        const exportData = filteredData.map(({ seriesId: _, ...rest }) => rest);
+
         switch (option) {
           case 'CSV':
             void download('README.txt', t('datahub.index.table.exportHelpText'));
-            void download(`${baseFilename}.csv`, unparse(filteredData));
+            void download(`${baseFilename}.csv`, unparse(exportData));
             break;
           case 'Excel':
-            return downloadExcel(`${baseFilename}.xlsx`, filteredData);
+            return downloadSubjectTableExcel(`${baseFilename}.xlsx`, exportData, 'Records');
           case 'JSON':
-            return download(`${baseFilename}.json`, JSON.stringify(filteredData, null, 2));
+            return download(`${baseFilename}.json`, JSON.stringify(exportData, null, 2));
         }
       })
       .then(() => {
@@ -439,7 +349,7 @@ const Toggles: React.FC<{
         data-spotlight-type="export-data-dropdown"
         data-testid="datahub-export-dropdown"
         options={['CSV', 'JSON', 'Excel']}
-        title={t('datahub.index.table.export')}
+        title={t('core.download')}
         onSelection={handleExportSelection}
       />
     </div>
@@ -579,19 +489,10 @@ const MasterDataTable: React.FC<{
             accessorFn: (subject) => summaries.get(subject.id)?.lastCollectedAt ?? null,
             cell: (ctx) => {
               const value = ctx.getValue() as Date | null;
-              return value ? toBasicISOString(value) : EMPTY_CELL;
+              return value ? toBasicISOString(value) : t({ en: 'None', es: 'Ninguno', fr: 'Aucun' });
             },
-            filterFn: (row, id, filter: CollectedFilter) => {
-              const value = row.getValue(id);
-              // A subject with nothing collected cannot satisfy a window, but must survive "any time".
-              if (!value) {
-                return filter.preset === 'all';
-              }
-              if (filter.min && value < filter.min) {
-                return false;
-              }
-              return !(filter.max && value > filter.max);
-            },
+            filterFn: (row, id, filter: CollectedFilter) =>
+              matchesCollectedFilter(row.getValue<Date | null>(id), filter),
             header: ({ column }) => (
               <SortableHeader
                 column={column}
@@ -627,7 +528,7 @@ const MasterDataTable: React.FC<{
             },
             {
               id: 'lastCollectedAt',
-              value: { max: null, min: null, preset: 'all' } satisfies CollectedFilter
+              value: DEFAULT_COLLECTED_FILTER
             }
           ]
         }}

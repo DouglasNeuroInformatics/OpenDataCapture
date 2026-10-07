@@ -9,14 +9,13 @@ import { Route } from '@/routes/_app/datahub/subjects/$subjectId/graph';
 
 import '@/services/i18n';
 
-type CloneHandler = (document: Document, element: HTMLElement) => void;
-
 type DownloadFunction = (filename: string, fetchData: () => Blob, options: { blobType: string }) => Promise<void>;
 
 const mocks = vi.hoisted(() => ({
+  addNotification: vi.fn<(notification: { message: string; type: string }) => void>(),
   download: vi.fn<DownloadFunction>(),
   downloadSelection: { current: null as ((option: string) => void) | null },
-  html2canvas: vi.fn<(element: HTMLElement, options: { onclone: CloneHandler }) => Promise<HTMLCanvasElement>>(),
+  navigate: vi.fn(),
   setInstrumentId: vi.fn(),
   setMinDate: vi.fn(),
   useGraphData: vi.fn(),
@@ -26,7 +25,6 @@ const mocks = vi.hoisted(() => ({
   useMeasureOptions: vi.fn()
 }));
 
-vi.mock('html2canvas', () => ({ default: mocks.html2canvas }));
 vi.mock('@/hooks/useGraphData', () => ({ useGraphData: mocks.useGraphData }));
 vi.mock('@/hooks/useGraphLines', () => ({ useGraphLines: mocks.useGraphLines }));
 vi.mock('@/hooks/useInstrumentVisualization', () => ({ useInstrumentVisualization: mocks.useInstrumentVisualization }));
@@ -38,7 +36,9 @@ vi.mock('@/store', () => ({
 }));
 vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/hooks')>()),
-  useDownload: () => mocks.download
+  useDownload: () => mocks.download,
+  useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) =>
+    selector({ addNotification: mocks.addNotification })
 }));
 vi.mock('@douglasneuroinformatics/libui/components', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/components')>()),
@@ -76,7 +76,7 @@ vi.mock('@douglasneuroinformatics/libui/components', async (importOriginal) => (
 }));
 vi.mock('@/components/LineGraph', () => ({
   LineGraph: ({ data, lines, xAxis }: { data: unknown; lines: unknown; xAxis: { key: string; label: string } }) => (
-    <span
+    <svg
       data-graph-data={JSON.stringify(data)}
       data-key={xAxis.key}
       data-label={xAxis.label}
@@ -93,6 +93,17 @@ vi.mock('@/components/SelectInstrument', () => ({
 vi.mock('@/components/SelectEdition', () => ({
   SelectEdition: ({ onSelect, value }: { onSelect: (id: string) => void; value: null | string }) => (
     <button data-testid="select-edition" data-value={value} type="button" onClick={() => onSelect('instrument-3')} />
+  )
+}));
+vi.mock('@/components/SelectChartPalette', () => ({
+  SelectChartPalette: ({ onSelect, slots, value }: { onSelect: (p: string) => void; slots: number; value: string }) => (
+    <button
+      data-slots={slots}
+      data-testid="select-palette"
+      data-value={value}
+      type="button"
+      onClick={() => onSelect('jade')}
+    />
   )
 }));
 vi.mock('@/components/TimeDropdown', () => ({
@@ -119,8 +130,47 @@ const graphData = [{ __time__: 1, score: 3 }];
 const lines: LineGraphLine[] = [{ name: 'Score', val: 'score' }];
 const pngBlob = new Blob(['png'], { type: 'image/png' });
 
-let clonedChart: HTMLElement | null = null;
 let encodedBlob: Blob | null = pngBlob;
+
+/**
+ * The capture draws onto a canvas, which happy-dom has no 2D context for — so the context is
+ * recorded instead, letting a test assert what the image would say.
+ */
+let drawnText: string[] = [];
+let drawnImages = 0;
+
+const fakeContext = {
+  arc: () => undefined,
+  beginPath: () => undefined,
+  drawImage: () => {
+    drawnImages += 1;
+  },
+  fill: () => undefined,
+  fillRect: () => undefined,
+  fillStyle: '',
+  fillText: (text: string) => {
+    drawnText.push(text);
+  },
+  font: '',
+  measureText: (text: string) => ({ width: text.length * 6 }),
+  scale: () => undefined,
+  textAlign: ''
+};
+
+/** A detached image never loads a data URL under happy-dom, so the decode is resolved here. */
+class FakeImage {
+  private onLoad: (() => void) | null = null;
+
+  set src(_value: string) {
+    queueMicrotask(() => this.onLoad?.());
+  }
+
+  addEventListener(type: string, listener: () => void) {
+    if (type === 'load') {
+      this.onLoad = listener;
+    }
+  }
+}
 
 const renderGraph = ({
   displayedInstrument = instrument,
@@ -156,23 +206,22 @@ const downloadGraph = async () => {
   await waitFor(() => expect(mocks.download).toHaveBeenCalled());
 };
 
-const clonedText = () => Array.from(clonedChart!.querySelectorAll(':scope > p'), (paragraph) => paragraph.textContent);
-
 beforeEach(() => {
-  clonedChart = null;
   encodedBlob = pngBlob;
-  mocks.html2canvas.mockImplementation((_, { onclone }) => {
-    clonedChart = document.createElement('div');
-    onclone(document, clonedChart);
-    const canvas = document.createElement('canvas');
-    canvas.toBlob = (callback) => callback(encodedBlob);
-    return Promise.resolve(canvas);
-  });
+  drawnText = [];
+  drawnImages = 0;
+  vi.stubGlobal('Image', FakeImage);
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
+    fakeContext as unknown as CanvasRenderingContext2D
+  );
+  vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation((callback) => callback(encodedBlob));
   mocks.useGraphData.mockReturnValue(graphData);
   mocks.useGraphLines.mockReturnValue(lines);
   mocks.useLinearModelQuery.mockReturnValue({ data: models });
   mocks.useMeasureOptions.mockReturnValue(measureOptions);
   vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'abcdefghijkl' });
+  vi.spyOn(Route, 'useSearch').mockReturnValue({ palette: 'default' });
+  vi.spyOn(Route, 'useNavigate').mockReturnValue(mocks.navigate);
 });
 
 afterEach(() => {
@@ -183,10 +232,12 @@ afterEach(() => {
 });
 
 describe('subject graph route', () => {
-  it('should visualize only the form records of the subject in the url', () => {
+  // Every kind the subject holds records for, not forms alone: an interactive instrument's measures
+  // plot the same way, and filtering to forms left them unreachable from the dropdown.
+  it('should visualize the records of the subject in the url whatever kind collected them', () => {
     renderGraph();
     expect(mocks.useInstrumentVisualization).toHaveBeenCalledWith({
-      params: { kind: 'FORM', subjectId: 'abcdefghijkl' }
+      params: { subjectId: 'abcdefghijkl' }
     });
   });
 
@@ -235,7 +286,7 @@ describe('subject graph route', () => {
     renderGraph();
     selectAllMeasures();
     expect(mocks.useGraphData).toHaveBeenLastCalledWith({ models, records, selectedMeasures: measureOptions });
-    expect(lastSelectedMeasures()).toEqual({ selectedMeasures: measureOptions });
+    expect(lastSelectedMeasures()).toEqual({ palette: 'default', selectedMeasures: measureOptions });
   });
 
   it('should plot the graph data and lines against collection time', () => {
@@ -259,7 +310,7 @@ describe('subject graph route', () => {
       selectAllMeasures();
       fireEvent.click(screen.getByTestId(testId));
       expect(mocks.setInstrumentId).toHaveBeenCalledWith(id);
-      expect(lastSelectedMeasures()).toEqual({ selectedMeasures: [] });
+      expect(lastSelectedMeasures()).toEqual({ palette: 'default', selectedMeasures: [] });
     }
   );
 
@@ -276,10 +327,11 @@ describe('subject graph route', () => {
 });
 
 describe('subject graph download', () => {
-  it('should capture the rendered chart', async () => {
+  // The chart's own SVG is rasterized, rather than the page being screenshotted around it.
+  it('should draw the rendered chart into the capture', async () => {
     renderGraph();
     await downloadGraph();
-    expect(mocks.html2canvas.mock.lastCall?.[0]).toBe(screen.getByTestId('subject-graph-chart'));
+    expect(drawnImages).toBe(1);
   });
 
   it('should save the capture as a png named after the truncated subject id', async () => {
@@ -295,8 +347,9 @@ describe('subject graph download', () => {
     renderGraph();
     selectAllMeasures();
     await downloadGraph();
-    expect(clonedText()).toEqual([
+    expect(drawnText).toEqual([
       'Unilingual Form of Subject: abcdefg',
+      'Score',
       'Measures: Score, Mood',
       'Timeframe: All time'
     ]);
@@ -307,7 +360,14 @@ describe('subject graph download', () => {
     vi.setSystemTime(new Date(2026, 9, 4));
     renderGraph({ minDate: new Date(2026, 0, 1) });
     await downloadGraph();
-    expect(clonedText()[2]).toBe('Timeframe: 2026-01-01 - 2026-10-04');
+    expect(drawnText.at(-1)).toBe('Timeframe: 2026-01-01 - 2026-10-04');
+  });
+
+  // An empty selection has nothing to name, and the line read as "Measures: " with a dangling colon.
+  it('should leave out the measures caption when none is selected', async () => {
+    renderGraph();
+    await downloadGraph();
+    expect(drawnText).toEqual(['Unilingual Form of Subject: abcdefg', 'Score', 'Timeframe: All time']);
   });
 
   it('should not capture anything once the graph has unmounted', async () => {
@@ -315,22 +375,23 @@ describe('subject graph download', () => {
     unmount();
     mocks.downloadSelection.current!('png');
     await act(() => Promise.resolve());
-    expect(mocks.html2canvas).not.toHaveBeenCalled();
+    expect(drawnImages).toBe(0);
+    expect(mocks.download).not.toHaveBeenCalled();
   });
 
-  it('should not save a file when the capture cannot be encoded as a png', async () => {
+  // A download that quietly does nothing is indistinguishable from a broken button, so the failure
+  // is reported rather than left to escape as an unhandled rejection.
+  it('should report the failure and save nothing when the capture cannot be encoded as a png', async () => {
     encodedBlob = null;
-    const vitestListeners = process.listeners('unhandledRejection');
-    process.removeAllListeners('unhandledRejection');
-    try {
-      const rejection = new Promise((resolve) => process.once('unhandledRejection', resolve));
-      renderGraph();
-      fireEvent.click(screen.getByRole('button', { name: 'Download' }));
-      // The page fires the download without awaiting it, so the failure surfaces as an unhandled rejection.
-      await expect(rejection).resolves.toEqual(new Error('blob does not exist'));
-    } finally {
-      vitestListeners.forEach((listener) => process.on('unhandledRejection', listener));
-    }
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    renderGraph();
+    fireEvent.click(screen.getByRole('button', { name: 'Download' }));
+    await waitFor(() => expect(mocks.addNotification).toHaveBeenCalled());
+    // The cause is named in the message, so a failure is diagnosable rather than merely reported.
+    expect(mocks.addNotification).toHaveBeenCalledWith({
+      message: 'The chart could not be saved as an image: The chart could not be encoded as an image',
+      type: 'error'
+    });
     expect(mocks.download).not.toHaveBeenCalled();
   });
 });

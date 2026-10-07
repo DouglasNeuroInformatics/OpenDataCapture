@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import type { SessionType } from '@opendatacapture/schemas/session';
-import { cleanup, render, renderHook, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useRecordMetadataColumns } from '../useRecordMetadataColumns';
 
@@ -32,6 +32,15 @@ const renderCell = (columnId: string, value: unknown, original: InstrumentVisual
   render(<>{cell({ getValue: () => value, row: { original } })}</>);
 };
 
+/** Renders one column's header the way the table would, returning its sort toggle. */
+const renderHeader = (columnId: string, omitSeries = false) => {
+  const column = columns(omitSeries).find((candidate) => candidate.id === columnId)!;
+  const header = (column as { header: (ctx: unknown) => ReactNode }).header;
+  const toggleSorting = vi.fn();
+  render(<>{header({ column: { getIsSorted: () => false, toggleSorting } })}</>);
+  return toggleSorting;
+};
+
 describe('useRecordMetadataColumns', () => {
   beforeEach(() => {
     i18n.changeLanguage('en');
@@ -40,12 +49,22 @@ describe('useRecordMetadataColumns', () => {
   afterEach(cleanup);
 
   it('should show both provenance columns under the names the export uses', () => {
-    expect(columns().map((column) => column.header)).toStrictEqual(['COLLECTION_METHOD', 'SERIES']);
+    expect(columns().map((column) => column.id)).toStrictEqual(['__method__', '__seriesName__']);
+    expect(renderHeader('__method__') && screen.getByRole('button').textContent).toBe('COLLECTION_METHOD');
+    cleanup();
+    expect(renderHeader('__seriesName__') && screen.getByRole('button').textContent).toBe('SERIES');
   });
 
   // Every row on a series' own page names that same series, so the column says nothing there.
   it('should omit the series column when asked', () => {
-    expect(columns(true).map((column) => column.header)).toStrictEqual(['COLLECTION_METHOD']);
+    expect(columns(true).map((column) => column.id)).toStrictEqual(['__method__']);
+  });
+
+  // These sit mid-table beside sortable columns, so a plain label would read as the odd one out.
+  it.each(['__method__', '__seriesName__'])('should let the %s column be sorted from its header', (columnId) => {
+    const toggleSorting = renderHeader(columnId);
+    fireEvent.click(screen.getByRole('button'));
+    expect(toggleSorting).toHaveBeenCalled();
   });
 
   it('should translate the collection method rather than showing the stored enum', () => {
@@ -55,9 +74,9 @@ describe('useRecordMetadataColumns', () => {
 
   // A record whose session was deleted reads back without a type, which must not render as blank
   // or as "null".
-  it('should show an em dash for a record whose collection method is unknown', () => {
+  it('should name the absence for a record whose collection method is unknown', () => {
     renderCell('__method__', null, record({ __method__: null }));
-    expect(screen.getByTestId('record-cell-collection-method').textContent).toBe('—');
+    expect(screen.getByTestId('record-cell-collection-method').textContent).toBe('None');
   });
 
   it('should show the series name when the record was collected under one', () => {
@@ -67,9 +86,9 @@ describe('useRecordMetadataColumns', () => {
 
   // The presence of a series name is itself the individual-vs-series answer, so the absence has to
   // read as "none" rather than as missing data.
-  it('should show an em dash for a record collected individually', () => {
+  it('should name the absence for a record collected individually', () => {
     renderCell('__seriesName__', null, record());
-    expect(screen.getByTestId('record-cell-series').textContent).toBe('—');
+    expect(screen.getByTestId('record-cell-series').textContent).toBe('None');
   });
 
   it('should filter the method column on the stored value, not the translated label', () => {

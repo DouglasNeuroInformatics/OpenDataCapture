@@ -79,7 +79,7 @@ describe('useInstrumentHubFacets', () => {
   // collected under is not an option.
   it('should offer only the series its records were collected under', () => {
     mocks.records = [{ seriesInstrumentId: 'series-1' }];
-    mocks.seriesInfoById = { 'series-1': { kind: 'SERIES', title: 'Happiness Series' } };
+    mocks.seriesInfoById = { 'series-1': { edition: null, kind: 'SERIES', title: 'Happiness Series' } };
     const { result } = renderHook(() => useInstrumentHubFacets());
     expect(Array.from(result.current.seriesOptions)).toStrictEqual([['series-1', 'Happiness Series']]);
   });

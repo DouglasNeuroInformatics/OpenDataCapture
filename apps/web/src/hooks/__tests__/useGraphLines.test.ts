@@ -2,6 +2,8 @@ import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import { CHART_PALETTE_THEMES } from '@/utils/chart-palette';
+
 import { useGraphLines } from '../useGraphLines';
 
 import '@/services/i18n';
@@ -15,6 +17,9 @@ const NO_MEASURES: { key: string; label: string }[] = [];
 const ONLY_SCORE = [SCORE];
 const SCORE_AND_MOOD = [SCORE, MOOD];
 
+// `useTheme` defaults to the light surface under happy-dom, which has no colour-scheme preference.
+const LIGHT = CHART_PALETTE_THEMES.default.light;
+
 describe('useGraphLines', () => {
   beforeEach(() => {
     i18n.changeLanguage('en');
@@ -23,18 +28,18 @@ describe('useGraphLines', () => {
   afterEach(cleanup);
 
   it('should draw no lines when no measure is selected', () => {
-    const { result } = renderHook(() => useGraphLines({ selectedMeasures: NO_MEASURES }));
+    const { result } = renderHook(() => useGraphLines({ palette: 'default', selectedMeasures: NO_MEASURES }));
     expect(result.current).toEqual([]);
   });
 
   it('should pair each measure with a dashed group trend line in the same colour', () => {
-    const { result } = renderHook(() => useGraphLines({ selectedMeasures: ONLY_SCORE }));
+    const { result } = renderHook(() => useGraphLines({ palette: 'default', selectedMeasures: ONLY_SCORE }));
     expect(result.current).toEqual([
-      { name: 'Score', stroke: '#D81B60', val: 'score' },
+      { name: 'Score', stroke: LIGHT[0], val: 'score' },
       {
         legendType: 'none',
         name: 'Score (Group Trend)',
-        stroke: '#D81B60',
+        stroke: LIGHT[0],
         strokeDasharray: '5 5',
         strokeWidth: 0.5,
         val: 'scoreGroup'
@@ -43,17 +48,23 @@ describe('useGraphLines', () => {
   });
 
   it('should give each measure its own colour, so the lines can be told apart', () => {
-    const { result } = renderHook(() => useGraphLines({ selectedMeasures: SCORE_AND_MOOD }));
+    const { result } = renderHook(() => useGraphLines({ palette: 'default', selectedMeasures: SCORE_AND_MOOD }));
     expect(result.current.map((line) => [line.val, line.stroke])).toEqual([
-      ['score', '#D81B60'],
-      ['scoreGroup', '#D81B60'],
-      ['mood', '#1E88E5'],
-      ['moodGroup', '#1E88E5']
+      ['score', LIGHT[0]],
+      ['scoreGroup', LIGHT[0]],
+      ['mood', LIGHT[1]],
+      ['moodGroup', LIGHT[1]]
     ]);
   });
 
+  // The palette is a search param, so a shared link has to reproduce the colours it was made with.
+  it('should draw from the chosen palette rather than always the default', () => {
+    const { result } = renderHook(() => useGraphLines({ palette: 'jade', selectedMeasures: ONLY_SCORE }));
+    expect(result.current[0]!.stroke).toBe(CHART_PALETTE_THEMES.jade.light[0]);
+  });
+
   it('should relabel the group trend when the language changes', () => {
-    const { result } = renderHook(() => useGraphLines({ selectedMeasures: ONLY_SCORE }));
+    const { result } = renderHook(() => useGraphLines({ palette: 'default', selectedMeasures: ONLY_SCORE }));
     act(() => {
       i18n.changeLanguage('fr');
     });
