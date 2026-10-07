@@ -46,15 +46,21 @@ catalog:
   serialize-error: '^13.0.1'
   vite: '^7.3.6'
   zustand: ^5.0.15
-  '@storybook/addon-docs': '10.5.6'
-  '@storybook/addon-themes': '10.5.6'
-  '@storybook/react-vite': '10.5.6'
-  'storybook': '10.5.6'
+  '@storybook/addon-docs': '^10.6.1'
+  '@storybook/addon-themes': '^10.6.1'
+  '@storybook/react-vite': '^10.6.1'
+  'storybook': '^10.6.1'
 catalogs:
   react19:
     react: 19.1.0
     react-dom: 19.1.0
     react-is: 19.1.0
+# storybook's published types import @storybook/react without depending on it. Hoisted, that import
+# reaches a different peer variant than the stories use, TypeScript merges the two copies onto it,
+# and every story's args become `any` (storybook/AGENTS.md).
+hoistPattern:
+  - '*'
+  - '!@storybook/react'
 minimumReleaseAge: 10080 # 7 days
 minimumReleaseAgeExclude:
   - '@douglasneuroinformatics/*'
