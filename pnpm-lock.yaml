@@ -614,8 +614,8 @@ importers:
         specifier: ^6.1.6
         version: 6.1.6(react@vendor+react@19.x)
       react-resizable-panels:
-        specifier: ^3.0.6
-        version: 3.0.6(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
+        specifier: ^4.14.1
+        version: 4.14.1(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
       ts-pattern:
         specifier: workspace:ts-pattern__5.x@*
         version: link:../../vendor/ts-pattern@5.x
@@ -9438,11 +9438,11 @@ packages:
       react: ^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
-  react-resizable-panels@3.0.6:
-    resolution: {integrity: sha512-b3qKHQ3MLqOgSS+FRYKapNkJZf5EQzuf6+RLiq1/IlTHw99YrZ2NJZLk4hQIzTnnIkRg2LUqyVinu6YWWpUYew==}
+  react-resizable-panels@4.14.1:
+    resolution: {integrity: sha512-OB1bXDNTLcGgTTbaX6Dn5efZhlMboSnkfr1w4xpsJTHPEbRJpACBhXpgRCXozgPO1ztgFeZRUe5J3mFNCVKm5g==}
     peerDependencies:
-      react: ^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
-      react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
 
   react-smooth@4.0.4:
     resolution: {integrity: sha512-gnGKTpYwqL0Iii09gHobNolvX4Kiq4PKx6eWBCYYix+8cdw+cGo3do906l1NBPKkSWx1DghC1dlWG9L2uGd61Q==}
@@ -19825,7 +19825,7 @@ snapshots:
       react: link:vendor/react@19.x
       react-dom: link:vendor/react-dom@19.x
 
-  react-resizable-panels@3.0.6(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x):
+  react-resizable-panels@4.14.1(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x):
     dependencies:
       react: link:vendor/react@19.x
       react-dom: link:vendor/react-dom@19.x

@@ -11,12 +11,13 @@ export const MainContent = () => {
   return (
     <main className="flex grow flex-col overflow-hidden py-4">
       {isDesktop ? (
-        <Resizable.PanelGroup direction="horizontal">
-          <Resizable.Panel defaultSize={66} minSize={25}>
+        // A Panel's id is also its data-testid, which is the only testid the library lets it carry.
+        <Resizable.PanelGroup orientation="horizontal">
+          <Resizable.Panel defaultSize="66%" id="editor-pane" minSize="25%">
             <Editor />
           </Resizable.Panel>
           <Resizable.Handle className="mr-12" />
-          <Resizable.Panel defaultSize={34} minSize={25}>
+          <Resizable.Panel defaultSize="34%" id="preview-pane" minSize="25%">
             <Viewer />
           </Resizable.Panel>
         </Resizable.PanelGroup>
