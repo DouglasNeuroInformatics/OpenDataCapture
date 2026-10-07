@@ -23,6 +23,8 @@ const panel = () => screen.getByTestId('login-branding-panel');
 const heading = () => screen.getByRole('heading', { level: 1 });
 const logoImage = () => screen.getByRole('img');
 const builtInLogo = () => panel().querySelector('svg[viewBox="0 0 320 259"]');
+const sourceCodeMark = () =>
+  screen.getByRole('link', { name: 'Source Code' }).querySelector('svg[viewBox="0 0 16 16"]')!;
 const sectionTexts = () => [...panel().children[1]!.children].map((section) => section.textContent);
 
 describe('LoginBrandingPanel', () => {
@@ -338,6 +340,16 @@ describe('LoginBrandingPanel', () => {
       renderPanel();
       expect(screen.getByRole('link', { name: 'Source Code' }).getAttribute('href')).toBe('https://github.example.org');
       expect(screen.getByRole('link', { name: 'Documentation' }).getAttribute('href')).toBe('https://docs.example.org');
+    });
+
+    it('should mark the source code link with the GitHub mark at the footer icon size', () => {
+      renderPanel();
+      expect(sourceCodeMark().getAttribute('class')).toBe('h-4 w-4');
+    });
+
+    it('should shrink the GitHub mark in preview mode, so it scales with the miniature footer', () => {
+      renderPanel(null, { preview: true });
+      expect(sourceCodeMark().getAttribute('class')).toBe('h-3 w-3');
     });
 
     it('should hide the footer links when they are turned off', () => {

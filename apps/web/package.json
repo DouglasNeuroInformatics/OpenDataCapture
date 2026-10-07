@@ -41,7 +41,7 @@
     "immer": "^11.1.18",
     "jwt-decode": "^4.0.0",
     "lodash-es": "workspace:lodash-es__4.x@*",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "^1.49.0",
     "motion": "catalog:",
     "msgpackr": "catalog:",
     "papaparse": "workspace:papaparse__5.x@*",
