@@ -54,6 +54,7 @@ catalogs:
   react19:
     react: 19.1.0
     react-dom: 19.1.0
+    react-is: 19.1.0
 minimumReleaseAge: 10080 # 7 days
 minimumReleaseAgeExclude:
   - '@douglasneuroinformatics/*'
