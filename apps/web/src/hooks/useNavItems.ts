@@ -70,11 +70,21 @@ export function useNavItems() {
         url: '/dashboard'
       });
     }
+    // The datahub becomes a group so its views can be read along different axes. Only the subject
+    // view exists today; the instrument one lands next and joins this group beside it.
+    const datahubItems: NavItem[] = [];
     if (ability?.can('read', 'Subject') && ability.can('read', 'InstrumentRecord')) {
+      datahubItems.push({
+        icon: UsersIcon,
+        label: t({ en: 'Subjects', es: 'Sujetos', fr: 'Clients' }),
+        url: '/datahub/subjects'
+      });
+    }
+    if (datahubItems.length > 0) {
       globalItems.push({
+        children: datahubItems,
         icon: DatabaseIcon,
-        label: t('layout.navLinks.datahub'),
-        url: '/datahub'
+        label: t('layout.navLinks.datahub')
       });
     }
     if (
@@ -269,7 +279,7 @@ export function useNavItems() {
         disabled: currentSession === null,
         icon: EyeIcon,
         label: t('layout.navLinks.viewCurrentSubject'),
-        url: `/datahub/${currentSession?.subjectId}/table`
+        url: `/datahub/subjects/${currentSession?.subjectId}/table`
       });
     }
     setNavItems([globalItems, adminItems, sessionItems].filter((arr) => arr.length));

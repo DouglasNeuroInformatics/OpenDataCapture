@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AssignmentEmailFormProps } from '@/components/AssignmentEmailForm';
-import { Route } from '@/routes/_app/datahub/$subjectId/assignments';
+import { Route } from '@/routes/_app/datahub/subjects/$subjectId/assignments';
 
 import '@/services/i18n';
 
@@ -97,7 +97,9 @@ describe('subject assignments route guard', () => {
     mocks.config.setup.isGatewayEnabled = false;
     const thrown = runGuard();
     expect(isRedirect(thrown)).toBe(true);
-    expect(thrown).toMatchObject({ options: { params: { subjectId: 'subject-1' }, to: '/datahub/$subjectId/table' } });
+    expect(thrown).toMatchObject({
+      options: { params: { subjectId: 'subject-1' }, to: '/datahub/subjects/$subjectId/table' }
+    });
   });
 
   it('should allow the route when the gateway is deployed', () => {

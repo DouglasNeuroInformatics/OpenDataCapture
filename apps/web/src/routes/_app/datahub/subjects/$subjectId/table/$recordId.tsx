@@ -146,7 +146,7 @@ const RouteComponent = () => {
   );
 };
 
-export const Route = createFileRoute('/_app/datahub/$subjectId/table/$recordId')({
+export const Route = createFileRoute('/_app/datahub/subjects/$subjectId/table/$recordId')({
   component: RouteComponent,
   loader: async ({ context, params }) => {
     const record = await context.queryClient.ensureQueryData(

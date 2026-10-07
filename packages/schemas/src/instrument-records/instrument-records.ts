@@ -110,3 +110,11 @@ export const $InstrumentRecordFile = $FileMetadata.omit({ location: true }).exte
 
 export type $InstrumentRecordFiles = z.infer<typeof $InstrumentRecordFiles>;
 export const $InstrumentRecordFiles = z.record(z.string(), z.array($InstrumentRecordFile));
+
+export type SubjectRecordSummary = z.infer<typeof $SubjectRecordSummary>;
+export const $SubjectRecordSummary = z.object({
+  /** The most recent record date, or null for a subject whose records all lack one */
+  lastCollectedAt: z.coerce.date().nullable(),
+  recordCount: z.int().nonnegative(),
+  subjectId: z.string()
+});

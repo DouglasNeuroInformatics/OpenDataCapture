@@ -101,6 +101,22 @@ describe('useNavItems', () => {
     expect(navLabels()).toContain('Group Actions');
   });
 
+  // The datahub is a parent over its views rather than a link of its own, so the subject listing is
+  // reachable only as a child and the group itself carries no url to navigate to.
+  it('should offer the subject view nested under the data hub parent', () => {
+    const datahub = renderHook(() => useNavItems())
+      .result.current.flat()
+      .find((item) => item.label === 'Data Hub');
+    expect(datahub?.url).toBeUndefined();
+    expect(datahub?.children?.map((child) => child.url)).toStrictEqual(['/datahub/subjects']);
+  });
+
+  it('should omit the data hub entirely when the user cannot read both subjects and records', () => {
+    mocks.can.mockImplementation((action, subject) => !(action === 'read' && subject === 'InstrumentRecord'));
+    expect(navLabels()).not.toContain('Data Hub');
+    expect(navUrls()).not.toContain('/datahub/subjects');
+  });
+
   it('should offer bulk remote assignments to a user holding the abilities that page needs', () => {
     expect(navUrls()).toContain('/group/remote-assignments');
   });
@@ -191,6 +207,6 @@ describe('useNavItems', () => {
     mocks.store.currentSession = { subjectId: 'subject-1' };
     expect(navItemAt('/session/start-session')?.disabled).toBe(true);
     expect(navItemAt('/instruments/accessible-instruments')?.disabled).toBe(false);
-    expect(navItemAt('/datahub/subject-1/table')?.disabled).toBe(false);
+    expect(navItemAt('/datahub/subjects/subject-1/table')?.disabled).toBe(false);
   });
 });

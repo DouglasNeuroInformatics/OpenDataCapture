@@ -72,6 +72,13 @@ describe('InstrumentRecordsController', () => {
     );
   });
 
+  it('should summarize the records of the requested group, scoped to the caller ability', async () => {
+    const summary = [{ lastCollectedAt: new Date('2025-01-01'), recordCount: 2, subjectId: 'subject-1' }];
+    instrumentRecordsService.summarizeBySubject.mockResolvedValueOnce(summary);
+    await expect(instrumentRecordsController.summarizeBySubject(ability, 'group-1')).resolves.toBe(summary);
+    expect(instrumentRecordsService.summarizeBySubject).toHaveBeenCalledWith({ groupId: 'group-1' }, { ability });
+  });
+
   it('should update the record with the unwrapped data, scoped to the caller ability', async () => {
     await instrumentRecordsController.updateById('record-1', { data: { score: 2 } }, ability);
     expect(instrumentRecordsService.updateById).toHaveBeenCalledWith('record-1', { score: 2 }, { ability });

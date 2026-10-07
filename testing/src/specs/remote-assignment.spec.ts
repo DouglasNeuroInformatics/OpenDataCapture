@@ -112,11 +112,11 @@ test.describe('remote assignment', () => {
   }) => {
     await startSession(getPageModel, `Deep${uniqueId}`, `Subject${uniqueId}`, 'Male');
 
-    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-    await page.waitForURL('**/datahub/**/table');
-    const subjectId = page.url().split('/datahub/')[1]!.split('/')[0]!;
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
+    const subjectId = page.url().split('/datahub/subjects/')[1]!.split('/')[0]!;
 
-    const assignmentsPage = await getPageModel('/datahub/$subjectId/assignments', { subjectId });
+    const assignmentsPage = await getPageModel('/datahub/subjects/$subjectId/assignments', { subjectId });
     await expect(assignmentsPage.assignmentRows).toHaveCount(0);
   });
 
@@ -150,10 +150,10 @@ test.describe('remote assignment', () => {
     await expect(remoteAssignmentPage.urlInput).toBeVisible();
     await remoteAssignmentPage.closeResultButton.click();
 
-    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-    await page.waitForURL('**/datahub/**/table');
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
     await page.getByRole('link', { name: 'Assignments' }).click();
-    await page.waitForURL('**/datahub/**/assignments');
+    await page.waitForURL('**/datahub/subjects/**/assignments');
 
     await page.getByRole('row').filter({ hasText: 'Happiness Questionnaire' }).click();
     await page.getByRole('button', { name: 'Cancel' }).click();

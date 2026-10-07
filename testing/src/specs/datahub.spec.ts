@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-import { DatahubPage } from '../pages/_app/datahub/index.page';
+import { DatahubPage } from '../pages/_app/datahub/subjects/index.page';
 import { HAPPINESS_RECORD, PHONE_VIEWPORT } from '../support/constants';
 import { expect, test } from '../support/fixtures';
 
@@ -10,7 +10,7 @@ test.describe('data hub on a phone', () => {
   test('should keep every table control within the width of the search bar, so none is pushed off screen', async ({
     getPageModel
   }) => {
-    const datahubPage = await getPageModel('/datahub');
+    const datahubPage = await getPageModel('/datahub/subjects');
     await expect(datahubPage.exportDropdown).toBeVisible();
 
     const searchBarBox = (await datahubPage.searchBar.boundingBox())!;
@@ -36,7 +36,7 @@ test.describe('data hub', () => {
     ]);
 
     await authenticateAs(credentials);
-    await page.goto('/datahub');
+    await page.goto('/datahub/subjects');
     await expect(page.getByTestId('data-table-row')).toHaveCount(1);
 
     const downloadPromise = page.waitForEvent('download');
@@ -50,7 +50,7 @@ test.describe('data hub', () => {
   });
 
   test('should display the data hub header', async ({ getPageModel }) => {
-    const datahubPage = await getPageModel('/datahub');
+    const datahubPage = await getPageModel('/datahub/subjects');
     await expect(datahubPage.pageHeader).toBeVisible();
     await expect(datahubPage.pageHeader).toContainText('Data Hub');
   });
@@ -67,15 +67,15 @@ test.describe('data hub', () => {
     await startSessionPage.submitForm();
     await expect(startSessionPage.successMessage).toBeVisible();
 
-    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-    await page.waitForURL('**/datahub/**/table');
-    const [, subjectId] = /\/datahub\/([^/]+)\/table/.exec(page.url()) ?? [];
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
+    const [, subjectId] = /\/datahub\/subjects\/([^/]+)\/table/.exec(page.url()) ?? [];
     if (!subjectId) {
       throw new Error(`Failed to extract subjectId from URL: ${page.url()}`);
     }
     const displayedId = subjectId.slice(0, 9);
 
-    const datahubPage = await getPageModel('/datahub');
+    const datahubPage = await getPageModel('/datahub/subjects');
     await datahubPage.searchInput.fill(displayedId);
     await expect(page.getByTestId('data-table-row').filter({ hasText: displayedId })).toBeVisible();
 
@@ -98,11 +98,11 @@ test.describe('data hub', () => {
     await startSessionPage.submitForm();
     await expect(startSessionPage.successMessage).toBeVisible();
 
-    const datahubPage = await getPageModel('/datahub');
+    const datahubPage = await getPageModel('/datahub/subjects');
     await datahubPage.searchInput.fill(customIdentifier);
     await datahubPage.searchInput.press('Enter');
 
-    await expect(page).toHaveURL(/\/datahub$/);
+    await expect(page).toHaveURL(/\/datahub\/subjects$/);
     await expect(datahubPage.searchInput).toHaveValue(customIdentifier);
     await expect(page.getByTestId('data-table-row')).toHaveCount(1);
     await expect(page.getByTestId('data-table-row')).toContainText(customIdentifier.slice(0, 9));
@@ -120,25 +120,28 @@ test.describe('data hub', () => {
     await startSessionPage.submitForm();
     await expect(startSessionPage.successMessage).toBeVisible();
 
-    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-    await page.waitForURL('**/datahub/**/table');
-    const [, subjectId] = /\/datahub\/([^/]+)\/table/.exec(page.url()) ?? [];
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
+    const [, subjectId] = /\/datahub\/subjects\/([^/]+)\/table/.exec(page.url()) ?? [];
     if (!subjectId) {
       throw new Error(`Failed to extract subjectId from URL: ${page.url()}`);
     }
 
-    const datahubPage = await getPageModel('/datahub');
+    const datahubPage = await getPageModel('/datahub/subjects');
     await datahubPage.searchInput.fill(subjectId.slice(0, 9));
     await datahubPage.rowActionsTrigger.click();
     await page.getByRole('menuitem', { name: 'View' }).click();
 
-    await expect(page).toHaveURL(new RegExp(`/datahub/${subjectId}/table$`));
+    await expect(page).toHaveURL(new RegExp(`/datahub/subjects/${subjectId}/table$`));
 
     // `subject-table` used to be the Table tab link, so selecting the record table by it silently
     // got the tab instead (#1475). It is the table alone now, and the tab is `subject-table-tab`.
     await expect(page.getByTestId('subject-table')).toHaveCount(1);
     await expect(page.getByTestId('subject-table').getByTestId('data-table')).toHaveCount(1);
-    await expect(page.getByTestId('subject-table-tab')).toHaveAttribute('data-nav-url', `/datahub/${subjectId}/table`);
+    await expect(page.getByTestId('subject-table-tab')).toHaveAttribute(
+      'data-nav-url',
+      `/datahub/subjects/${subjectId}/table`
+    );
   });
 
   test('should navigate to a subject by custom identifier via the subject lookup dialog', async ({
@@ -154,7 +157,7 @@ test.describe('data hub', () => {
     await startSessionPage.submitForm();
     await expect(startSessionPage.successMessage).toBeVisible();
 
-    await getPageModel('/datahub');
+    await getPageModel('/datahub/subjects');
     await page.getByTestId('subject-lookup-search-button').click();
 
     const identificationForm = page.getByTestId('identification-form');
@@ -162,7 +165,7 @@ test.describe('data hub', () => {
     await identificationForm.locator('[name="id"]').fill(customIdentifier);
     await identificationForm.getByRole('button', { name: 'Submit' }).click();
 
-    await expect(page).toHaveURL(/\/datahub\/.+\/table$/);
+    await expect(page).toHaveURL(/\/datahub\/subjects\/.+\/table$/);
   });
 
   // The export endpoint returns every record in the group; which of them reach the file is decided
@@ -185,7 +188,7 @@ test.describe('data hub', () => {
     );
 
     const datahubPage = new DatahubPage(page);
-    await datahubPage.goto('/datahub');
+    await datahubPage.goto('/datahub/subjects');
     await expect(datahubPage.rows).toHaveCount(2);
 
     await datahubPage.searchInput.fill(listed);
@@ -198,7 +201,7 @@ test.describe('data hub', () => {
     expect([...new Set(payload.map((row) => row.subjectId))]).toStrictEqual([listed]);
   });
 
-  test('should list only subjects holding records once "with records only" is applied', async ({
+  test('should list only subjects holding records once a minimum record count is applied', async ({
     api,
     isolatedGroupManager,
     page,
@@ -217,15 +220,47 @@ test.describe('data hub', () => {
     ]);
 
     const datahubPage = new DatahubPage(page);
-    await datahubPage.goto('/datahub');
+    await datahubPage.goto('/datahub/subjects');
     await expect(datahubPage.rows).toHaveCount(3);
 
-    await datahubPage.toggleWithRecordsOnly();
+    await datahubPage.requireAtLeastRecords(1);
 
     await expect(datahubPage.rows).toHaveCount(1);
     // The cell renders at most the id's first nine characters (the subjectIdDisplayLength default),
     // so the assertion matches the visible prefix rather than the full seeded id.
     await expect(datahubPage.rows).toContainText(withRecord.slice(0, 9));
+  });
+
+  // The counts and the date window are read from the per-subject summary, so a filter that narrows
+  // on them is the only thing proving that summary actually reached the table.
+  test('should narrow the list by a minimum record count and by a collection-date window', async ({
+    api,
+    isolatedGroupManager,
+    page,
+    uniqueId
+  }) => {
+    const group = await isolatedGroupManager();
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    const twice = `twice-${uniqueId}`;
+    const once = `once-${uniqueId}`;
+    await api.uploadRecords(group.id, instrumentId, [
+      { data: HAPPINESS_RECORD, date: new Date(), subjectId: twice },
+      { data: HAPPINESS_RECORD, date: new Date(), subjectId: twice },
+      { data: HAPPINESS_RECORD, date: new Date(), subjectId: once }
+    ]);
+
+    const datahubPage = new DatahubPage(page);
+    await datahubPage.goto('/datahub/subjects');
+    await expect(datahubPage.rows).toHaveCount(2);
+
+    // Two records exist for one subject only, so a minimum of two must leave exactly that subject.
+    await datahubPage.requireAtLeastRecords(2);
+    await expect(datahubPage.rows).toHaveCount(1);
+    await expect(datahubPage.rows).toContainText(twice.slice(0, 9));
+
+    // Everything was collected just now, so the tightest window keeps it and nothing is lost.
+    await datahubPage.selectCollectedWindow('pastMonth');
+    await expect(datahubPage.rows).toHaveCount(1);
   });
 
   // `GET /v1/subjects` is gated on `read Subject`, which a standard user holds, but resolving

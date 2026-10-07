@@ -21,6 +21,7 @@ import type {
   InstrumentRecordQueryParams,
   InstrumentRecordsExport,
   LinearRegressionResults,
+  SubjectRecordSummary,
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
 import { Prisma } from '@prisma/client';
@@ -350,6 +351,90 @@ export class InstrumentRecordsService {
       results[measure] = linearRegression(new Float64Array(data[measure]![0]), new Float64Array(data[measure]![1]));
     }
     return results;
+  }
+
+  /**
+   * Per-subject record counts and latest collection date, for the subject hub's listing.
+   *
+   * Aggregation groups by group and subject rather than by subject alone, and the final fold happens
+   * here in JS, because the per-row `groupId` is what the ability check needs. The grouped set is
+   * bounded by subjects, not by records.
+   */
+  async summarizeBySubject(
+    { groupId }: { groupId?: string } = {},
+    { ability }: Required<Pick<EntityOperationOptions, 'ability'>>
+  ): Promise<SubjectRecordSummary[]> {
+    if (groupId) {
+      await this.groupsService.findById(groupId);
+    }
+
+    const pipeline = [
+      {
+        $match: {
+          // records created before the file instrument feature do not have the field at all
+          $or: [{ pending: { $exists: false } }, { pending: null }, { pending: false }],
+          ...(groupId ? { $expr: { $eq: ['$groupId', { $toObjectId: groupId }] } } : {})
+        }
+      },
+      {
+        // `$ifNull` is load-bearing, not defensive. A grouping expression that resolves to nothing —
+        // `groupId` on a record belonging to no group — is omitted from `_id` entirely rather than
+        // stored as null, and `$project` then omits the field from the row too. Normalising here is
+        // what lets the fold below treat the shape as fixed instead of remembering a key can simply
+        // be missing.
+        $group: {
+          _id: {
+            groupId: { $ifNull: ['$groupId', null] },
+            subjectId: { $ifNull: ['$subjectId', null] }
+          },
+          lastCollectedAt: { $max: '$date' },
+          recordCount: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          groupId: { $toString: '$_id.groupId' },
+          lastCollectedAt: { $dateToString: { date: '$lastCollectedAt' } },
+          recordCount: 1,
+          subjectId: '$_id.subjectId'
+        }
+      }
+    ];
+
+    const rows = (await this.instrumentRecordModel.aggregateRaw({ pipeline })) as unknown as {
+      groupId: null | string;
+      lastCollectedAt: null | string;
+      recordCount: number;
+      subjectId: null | string;
+    }[];
+
+    const summaries = new Map<string, { lastCollectedAt: Date | null; recordCount: number }>();
+    for (const row of rows) {
+      // Raw rows carry no model name, so CASL would resolve them as `Object` and match only `manage all`
+      if (!ability.can('read', forcedAppSubject('InstrumentRecord', { groupId: row.groupId }))) {
+        continue;
+      }
+      if (row.subjectId === null) {
+        continue;
+      }
+      let summary = summaries.get(row.subjectId);
+      if (!summary) {
+        summary = { lastCollectedAt: null, recordCount: 0 };
+        summaries.set(row.subjectId, summary);
+      }
+      summary.recordCount += row.recordCount;
+      const lastCollectedAt = row.lastCollectedAt ? new Date(row.lastCollectedAt) : null;
+      if (lastCollectedAt && (!summary.lastCollectedAt || lastCollectedAt > summary.lastCollectedAt)) {
+        summary.lastCollectedAt = lastCollectedAt;
+      }
+    }
+
+    return Array.from(summaries, ([subjectId, summary]) => ({
+      lastCollectedAt: summary.lastCollectedAt,
+      recordCount: summary.recordCount,
+      subjectId
+    }));
   }
 
   async updateById(id: string, data: unknown[] | { [key: string]: unknown }, { ability }: EntityOperationOptions = {}) {

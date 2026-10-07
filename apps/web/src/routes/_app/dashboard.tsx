@@ -230,7 +230,7 @@ const RouteComponent = () => {
               data-testid="statistic-subjects"
               onClick={() => {
                 void navigate({
-                  to: '/datahub'
+                  to: '/datahub/subjects'
                 });
               }}
             >

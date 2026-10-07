@@ -1182,4 +1182,86 @@ describe('InstrumentRecordsService', () => {
       });
     });
   });
+
+  describe('summarizeBySubject', () => {
+    const ADMIN = createAppAbility([{ action: 'manage', subject: 'all' }]);
+
+    it('should verify the group exists before summarizing it, so an unknown group is a 404 rather than an empty result', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.summarizeBySubject({ groupId: 'group-1' }, { ability: ADMIN });
+
+      expect(groupsService.findById).toHaveBeenCalledWith('group-1');
+    });
+
+    // Mongodb omits a grouping expression that resolves to nothing from `_id`, and `$project` then
+    // drops the field from the row entirely. `$ifNull` is what keeps the row shape fixed, so the
+    // fold can be written against it rather than guarding for an absent field.
+    it('should normalise every grouping key with $ifNull, so a missing field arrives as null rather than absent', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.summarizeBySubject({}, { ability: ADMIN });
+
+      const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
+      expect(pipeline.find((stage) => stage.$group).$group._id).toStrictEqual({
+        groupId: { $ifNull: ['$groupId', null] },
+        subjectId: { $ifNull: ['$subjectId', null] }
+      });
+    });
+
+    it('should key the summary on the subject, so the subject hub can read a row per subject', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', lastCollectedAt: '2025-02-02T00:00:00.000Z', recordCount: 4, subjectId: 'subject-1' }
+      ]);
+
+      const [summary] = await instrumentRecordsService.summarizeBySubject({}, { ability: ADMIN });
+
+      expect(summary).toStrictEqual({
+        lastCollectedAt: new Date('2025-02-02T00:00:00.000Z'),
+        recordCount: 4,
+        subjectId: 'subject-1'
+      });
+    });
+
+    it("should drop rows from a group the caller cannot read, so a shared subject does not leak another group's count", async () => {
+      const ability = createAppAbility([
+        { action: 'read', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' }
+      ]);
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', lastCollectedAt: null, recordCount: 2, subjectId: 'subject-1' },
+        { groupId: 'group-2', lastCollectedAt: null, recordCount: 7, subjectId: 'subject-1' }
+      ]);
+
+      const [summary] = await instrumentRecordsService.summarizeBySubject({}, { ability });
+
+      expect(summary).toMatchObject({ recordCount: 2, subjectId: 'subject-1' });
+    });
+
+    // A subject seen in two readable groups is one row in the table, so the counts add and the date
+    // is the later of the two rather than whichever arrived last.
+    it('should fold a subject appearing in several readable groups into one row', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', lastCollectedAt: '2025-01-01T00:00:00.000Z', recordCount: 2, subjectId: 'subject-1' },
+        { groupId: 'group-2', lastCollectedAt: '2025-03-03T00:00:00.000Z', recordCount: 3, subjectId: 'subject-1' }
+      ]);
+
+      const summaries = await instrumentRecordsService.summarizeBySubject({}, { ability: ADMIN });
+
+      expect(summaries).toStrictEqual([
+        {
+          lastCollectedAt: new Date('2025-03-03T00:00:00.000Z'),
+          recordCount: 5,
+          subjectId: 'subject-1'
+        }
+      ]);
+    });
+
+    it('should skip a row whose subject could not be resolved, rather than keying a summary on null', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', lastCollectedAt: null, recordCount: 2, subjectId: null }
+      ]);
+
+      expect(await instrumentRecordsService.summarizeBySubject({}, { ability: ADMIN })).toStrictEqual([]);
+    });
+  });
 });

@@ -134,10 +134,10 @@ const Walkthrough = () => {
           </p>
         ),
         navigateOptions: {
-          to: '/datahub'
+          to: '/datahub/subjects'
         },
         position: 'bottom-left',
-        target: 'button[data-nav-url="/datahub"]',
+        target: 'button[data-nav-url="/datahub/subjects"]',
         title: t({
           en: 'Data Hub',
           es: 'Centro de datos',
@@ -155,7 +155,7 @@ const Walkthrough = () => {
           </p>
         ),
         navigateOptions: {
-          to: '/datahub'
+          to: '/datahub/subjects'
         },
         position: 'bottom-left',
         target: '#datahub-subject-search-bar',
@@ -176,7 +176,7 @@ const Walkthrough = () => {
           </p>
         ),
         navigateOptions: {
-          to: '/datahub'
+          to: '/datahub/subjects'
         },
         position: 'bottom-left',
         target: '[data-spotlight-type="subject-lookup-search-button"]',
@@ -193,7 +193,7 @@ const Walkthrough = () => {
           fr: 'Ici, vous pouvez exporter toutes vos données dans différents formats.'
         }),
         navigateOptions: {
-          to: '/datahub'
+          to: '/datahub/subjects'
         },
         position: 'bottom-right',
         target: '[data-spotlight-type="export-data-dropdown"]',
@@ -321,10 +321,10 @@ const Walkthrough = () => {
           fr: "Sur cette page, vous pouvez consulter les données du client pour lequel la session est en cours. Pour accéder aux données d'autres clients, utilisez le bouton de recherche sur la page du centre de données."
         }),
         navigateOptions: {
-          to: '/datahub/123/table'
+          to: '/datahub/subjects/123/table'
         },
         position: 'bottom-left',
-        target: 'button[data-nav-url="/datahub/123/table"]',
+        target: 'button[data-nav-url="/datahub/subjects/123/table"]',
         title: t({
           en: 'View Subject',
           es: 'Ver el sujeto',
@@ -338,10 +338,10 @@ const Walkthrough = () => {
           fr: 'Ici, vous pouvez voir les enregistrements que ce client a complétés pour un instrument donné'
         }),
         navigateOptions: {
-          to: '/datahub/123/table'
+          to: '/datahub/subjects/123/table'
         },
         position: 'bottom-center',
-        target: 'a[data-nav-url="/datahub/123/table"]',
+        target: 'a[data-nav-url="/datahub/subjects/123/table"]',
         title: t({
           en: 'Table',
           es: 'Tabla',
@@ -355,7 +355,7 @@ const Walkthrough = () => {
           fr: 'Ici, vous pouvez exporter les données du tableau au format CSV ou JSON.'
         }),
         navigateOptions: {
-          to: '/datahub/123/table'
+          to: '/datahub/subjects/123/table'
         },
         position: 'bottom-right',
         target: 'div[data-spotlight-type="export-data-dropdown"]',
@@ -372,10 +372,10 @@ const Walkthrough = () => {
           fr: "Ici, vous pouvez créer des graphiques personnalisés pour visualiser les données longitudinales d'un client donné."
         }),
         navigateOptions: {
-          to: '/datahub/123/graph'
+          to: '/datahub/subjects/123/graph'
         },
         position: 'bottom-right',
-        target: 'a[data-nav-url="/datahub/123/graph"]',
+        target: 'a[data-nav-url="/datahub/subjects/123/graph"]',
         title: t({
           en: 'Graph',
           es: 'Gráfico',
@@ -391,10 +391,10 @@ const Walkthrough = () => {
                 fr: 'Ici, vous pouvez créer et visualiser des assignations, qui sont des instruments que le client doit compléter à la maison.'
               }),
               navigateOptions: {
-                to: '/datahub/123/assignments'
+                to: '/datahub/subjects/123/assignments'
               },
               position: 'bottom-left',
-              target: 'a[data-nav-url="/datahub/123/assignments"]',
+              target: 'a[data-nav-url="/datahub/subjects/123/assignments"]',
               title: t({
                 en: 'Assignments',
                 es: 'Asignaciones',

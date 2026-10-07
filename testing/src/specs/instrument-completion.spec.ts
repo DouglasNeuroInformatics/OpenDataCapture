@@ -43,8 +43,8 @@ test.describe('instrument completion', () => {
 
     // "View Current Subject" targets the active subject's record table directly, which is far more
     // robust than matching a hashed row in the data hub list.
-    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-    await page.waitForURL('**/datahub/**/table');
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: INSTRUMENT_TITLE }).click();
@@ -84,8 +84,8 @@ test.describe('instrument completion', () => {
 
       await expect(instrumentPage.summaryHeading).toBeVisible();
 
-      await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-      await page.waitForURL('**/datahub/**/table');
+      await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+      await page.waitForURL('**/datahub/subjects/**/table');
 
       await page.getByRole('combobox').first().click();
       await page.getByRole('option', { name: INSTRUMENT_TITLE }).click();
@@ -174,8 +174,8 @@ test.describe('instrument completion', () => {
 
     await expect(instrumentPage.summaryHeading).toBeVisible();
 
-    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-    await page.waitForURL('**/datahub/**/table');
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: DEMOGRAPHICS_INSTRUMENT_TITLE }).click();
@@ -213,8 +213,8 @@ test.describe('instrument completion', () => {
       await expect(instrumentPage.summaryHeading).toBeVisible();
     }
 
-    await page.locator('[data-testid^="nav-button-/datahub/"]').click();
-    await page.waitForURL('**/datahub/**/table');
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
 
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: INSTRUMENT_TITLE }).click();

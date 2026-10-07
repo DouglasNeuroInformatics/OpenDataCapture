@@ -22,7 +22,7 @@ test.describe('dashboard', () => {
   test('should navigate to the data hub when the subjects statistic is clicked', async ({ getPageModel, page }) => {
     const dashboardPage = await getPageModel('/dashboard');
     await dashboardPage.statisticSubjects.click();
-    await expect(page).toHaveURL('/datahub');
+    await expect(page).toHaveURL('/datahub/subjects');
   });
 
   test('should open a dialog listing users when the users statistic is clicked', async ({ getPageModel }) => {

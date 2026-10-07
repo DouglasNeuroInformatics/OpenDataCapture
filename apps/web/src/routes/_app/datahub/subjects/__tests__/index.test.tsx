@@ -1,10 +1,10 @@
-import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
+import type { InstrumentRecordsExport, SubjectRecordSummary } from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { pack } from 'msgpackr/pack';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Route } from '@/routes/_app/datahub/index';
+import { Route } from '@/routes/_app/datahub/subjects/index';
 
 import '@/services/i18n';
 
@@ -29,9 +29,11 @@ const mocks = vi.hoisted(() => ({
     currentGroup: null as null | StoreGroup,
     currentUser: { username: 'jdoe' }
   },
+  subjectRecordSummaryQueryOptions: vi.fn((options: object) => ({ options, queryKey: ['subject-record-summary'] })),
   subjects: [] as Subject[],
   subjectsQueryOptions: vi.fn((options: object) => ({ options, queryKey: ['subjects'] })),
-  subjectsWithRecords: [] as Subject[]
+  summaries: [] as SubjectRecordSummary[],
+  theme: 'light'
 }));
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
@@ -42,7 +44,8 @@ vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/hooks')>()),
   useDownload: () => mocks.download,
   useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) =>
-    selector({ addNotification: mocks.addNotification })
+    selector({ addNotification: mocks.addNotification }),
+  useTheme: () => [mocks.theme]
 }));
 vi.mock('axios', () => ({ default: mocks.axios }));
 vi.mock('@/components/IdentificationForm', () => ({
@@ -52,9 +55,11 @@ vi.mock('@/components/IdentificationForm', () => ({
 }));
 vi.mock('@/hooks/useSubjectsQuery', () => ({
   subjectsQueryOptions: mocks.subjectsQueryOptions,
-  useSubjectsQuery: ({ params }: { params: { hasRecord?: boolean } }) => ({
-    data: params.hasRecord ? mocks.subjectsWithRecords : mocks.subjects
-  })
+  useSubjectsQuery: () => ({ data: mocks.subjects })
+}));
+vi.mock('@/hooks/useSubjectRecordSummaryQuery', () => ({
+  subjectRecordSummaryQueryOptions: mocks.subjectRecordSummaryQueryOptions,
+  useSubjectRecordSummaryQuery: () => ({ data: mocks.summaries })
 }));
 vi.mock('@/store', () => ({
   useAppStore: Object.assign((selector: (store: typeof mocks.store) => unknown) => selector(mocks.store), {
@@ -138,8 +143,10 @@ const settleExport = async () => {
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.store.currentGroup = { id: 'group-1', settings: {} };
+  mocks.theme = 'light';
   mocks.subjects = [ALICE, BOB, CAROL];
-  mocks.subjectsWithRecords = [BOB];
+  // Only Bob has records, so a minimum of one narrows the list to him alone.
+  mocks.summaries = [{ lastCollectedAt: new Date('2026-01-01'), recordCount: 2, subjectId: BOB.id }];
   vi.spyOn(Route, 'useNavigate').mockReturnValue(mocks.navigate);
 });
 
@@ -157,6 +164,18 @@ describe('data hub route', () => {
     await loader({ context: { queryClient: { ensureQueryData } } });
     expect(mocks.subjectsQueryOptions).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
     expect(ensureQueryData).toHaveBeenCalledWith(mocks.subjectsQueryOptions.mock.results[0]!.value);
+  });
+
+  // The record counts and collection dates are columns of the first paint, so the summary is
+  // prefetched beside the subjects rather than suspending the table a second time.
+  it('should prefetch the per-subject record summary alongside the subjects', async () => {
+    const loader = Route.options.loader as (opts: {
+      context: { queryClient: { ensureQueryData: (options: unknown) => Promise<unknown> } };
+    }) => Promise<void>;
+    const ensureQueryData = vi.fn().mockResolvedValue([]);
+    await loader({ context: { queryClient: { ensureQueryData } } });
+    expect(mocks.subjectRecordSummaryQueryOptions).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
+    expect(ensureQueryData).toHaveBeenCalledWith(mocks.subjectRecordSummaryQueryOptions.mock.results[0]!.value);
   });
 
   it('should open the subject table when a row is double-clicked', () => {
@@ -202,6 +221,15 @@ describe('data hub subject columns', () => {
     renderDataHub();
     const sexes = screen.getAllByTestId('data-table-row').map((row) => row.children[2]!.textContent);
     expect(sexes).toEqual(['Male', 'Female', 'NULL']);
+  });
+
+  // The unrecorded-sex tag is the one grey that has to change with the surface it sits on, since a
+  // single grey cannot stay visible against both.
+  it('should lighten the unknown sex tag in dark mode', () => {
+    mocks.theme = 'dark';
+    renderDataHub();
+    const dot = screen.getAllByTestId('subject-cell-sex')[2]!.firstElementChild as HTMLElement;
+    expect(dot.style.backgroundColor).toBe('#a3a3a3');
   });
 
   it('should match the search against subject ids case-insensitively', () => {
@@ -270,11 +298,103 @@ describe('data hub filters', () => {
     expect(listedSubjects()).toEqual(['alice-123', 'bob']);
   });
 
-  it('should list only subjects with records when that option is checked', () => {
+  // A minimum of one is what the old "with records only" checkbox meant. The count comes from the
+  // per-subject summary already loaded for the column, so the filter never refetches.
+  it('should list only subjects holding at least the minimum number of records', () => {
     renderDataHub();
     openFilters();
-    fireEvent.click(screen.getByTestId('datahub-filter-has-records'));
+    fireEvent.change(screen.getByTestId('datahub-filter-min-records'), { target: { value: '1' } });
     expect(listedSubjects()).toEqual(['bob']);
+  });
+
+  it('should list every subject again when the minimum record count is cleared', () => {
+    renderDataHub();
+    openFilters();
+    const minRecords = screen.getByTestId('datahub-filter-min-records');
+    fireEvent.change(minRecords, { target: { value: '1' } });
+    fireEvent.change(minRecords, { target: { value: '' } });
+    expect(listedSubjects()).toEqual(['alice-123', 'bob', 'carol']);
+  });
+
+  it('should exclude a subject whose record count falls short of the minimum', () => {
+    renderDataHub();
+    openFilters();
+    fireEvent.change(screen.getByTestId('datahub-filter-min-records'), { target: { value: '3' } });
+    expect(listedSubjects()).toEqual([]);
+  });
+});
+
+describe('data hub collected filter', () => {
+  const daysAgo = (count: number) => new Date(Date.now() - count * 24 * 60 * 60 * 1000);
+
+  const RECENT = daysAgo(3);
+  const OVER_A_YEAR_AGO = daysAgo(400);
+
+  const selectPreset = (preset: string) => {
+    fireEvent.change(screen.getByTestId('datahub-filter-collected-preset'), { target: { value: preset } });
+  };
+
+  const collectedInput = (bound: 'max' | 'min') =>
+    screen.getByTestId<HTMLInputElement>(`datahub-filter-collected-${bound}`);
+
+  beforeEach(() => {
+    mocks.summaries = [
+      { lastCollectedAt: OVER_A_YEAR_AGO, recordCount: 1, subjectId: ALICE.id },
+      { lastCollectedAt: RECENT, recordCount: 2, subjectId: BOB.id }
+    ];
+  });
+
+  // Carol has never had a record collected, so she belongs to "any time" and to no window.
+  it.each([
+    ['all', ['alice-123', 'bob', 'carol']],
+    ['pastWeek', ['bob']],
+    ['pastMonth', ['bob']],
+    ['pastThreeMonths', ['bob']],
+    ['pastSixMonths', ['bob']],
+    ['pastYear', ['bob']],
+    ['pastTwoYears', ['alice-123', 'bob']]
+  ])('should list the subjects collected within the %s window', (preset, expected) => {
+    renderDataHub();
+    openFilters();
+    selectPreset(preset);
+    expect(listedSubjects()).toEqual(expected);
+  });
+
+  it('should hide a subject collected before a custom minimum date', () => {
+    renderDataHub();
+    openFilters();
+    selectPreset('custom');
+    fireEvent.change(screen.getByTestId('datahub-filter-collected-min'), { target: { value: '2026-01-01' } });
+    expect(listedSubjects()).toEqual(['bob']);
+  });
+
+  it('should hide a subject collected after a custom maximum date', () => {
+    renderDataHub();
+    openFilters();
+    selectPreset('custom');
+    fireEvent.change(screen.getByTestId('datahub-filter-collected-max'), { target: { value: '2026-01-01' } });
+    expect(listedSubjects()).toEqual(['alice-123']);
+  });
+
+  // Switching to a custom window starts from the preset's own bounds, so the dates are a nudge
+  // rather than two blank inputs.
+  it('should seed the custom minimum from the preset the user is leaving', () => {
+    renderDataHub();
+    openFilters();
+    selectPreset('pastWeek');
+    selectPreset('custom');
+    expect(collectedInput('min').value).not.toBe('');
+  });
+
+  it('should keep the chosen custom bounds in the inputs when the menu is reopened', () => {
+    renderDataHub();
+    openFilters();
+    selectPreset('custom');
+    fireEvent.change(screen.getByTestId('datahub-filter-collected-min'), { target: { value: '2025-01-01' } });
+    fireEvent.change(screen.getByTestId('datahub-filter-collected-max'), { target: { value: '2027-01-01' } });
+    reopenFilters();
+    expect(collectedInput('min').value).toBe('2025-01-01');
+    expect(collectedInput('max').value).toBe('2027-01-01');
   });
 });
 

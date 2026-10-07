@@ -22,7 +22,6 @@ import { Route as AppAdminInstrumentsRouteImport } from './routes/_app/admin/ins
 import { Route as AppAdminMailRouteImport } from './routes/_app/admin/mail'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
 import { Route as AppDatahubIndexRouteImport } from './routes/_app/datahub/index'
-import { Route as AppDatahubSubjectIdRouteRouteImport } from './routes/_app/datahub/$subjectId/route'
 import { Route as AppGroupEmailTemplatesRouteImport } from './routes/_app/group/email-templates'
 import { Route as AppGroupManageRouteImport } from './routes/_app/group/manage'
 import { Route as AppGroupRemoteAssignmentsRouteImport } from './routes/_app/group/remote-assignments'
@@ -40,11 +39,13 @@ import { Route as AppAdminInstrumentReposIndexRouteImport } from './routes/_app/
 import { Route as AppAdminUsersIndexRouteImport } from './routes/_app/admin/users/index'
 import { Route as AppAdminUsersUserIdRouteImport } from './routes/_app/admin/users/$userId'
 import { Route as AppAdminUsersCreateRouteImport } from './routes/_app/admin/users/create'
-import { Route as AppDatahubSubjectIdAssignmentsRouteImport } from './routes/_app/datahub/$subjectId/assignments'
-import { Route as AppDatahubSubjectIdGraphRouteImport } from './routes/_app/datahub/$subjectId/graph'
+import { Route as AppDatahubSubjectsIndexRouteImport } from './routes/_app/datahub/subjects/index'
+import { Route as AppDatahubSubjectsSubjectIdRouteRouteImport } from './routes/_app/datahub/subjects/$subjectId/route'
 import { Route as AppInstrumentsRenderIdRouteImport } from './routes/_app/instruments/render/$id'
-import { Route as AppDatahubSubjectIdTableIndexRouteImport } from './routes/_app/datahub/$subjectId/table/index'
-import { Route as AppDatahubSubjectIdTableRecordIdRouteImport } from './routes/_app/datahub/$subjectId/table/$recordId'
+import { Route as AppDatahubSubjectsSubjectIdAssignmentsRouteImport } from './routes/_app/datahub/subjects/$subjectId/assignments'
+import { Route as AppDatahubSubjectsSubjectIdGraphRouteImport } from './routes/_app/datahub/subjects/$subjectId/graph'
+import { Route as AppDatahubSubjectsSubjectIdTableIndexRouteImport } from './routes/_app/datahub/subjects/$subjectId/table/index'
+import { Route as AppDatahubSubjectsSubjectIdTableRecordIdRouteImport } from './routes/_app/datahub/subjects/$subjectId/table/$recordId'
 
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/_app',
@@ -110,12 +111,6 @@ const AppDatahubIndexRoute = AppDatahubIndexRouteImport.update({
   path: '/datahub/',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppDatahubSubjectIdRouteRoute =
-  AppDatahubSubjectIdRouteRouteImport.update({
-    id: '/datahub/$subjectId',
-    path: '/datahub/$subjectId',
-    getParentRoute: () => AppRouteRoute,
-  } as any)
 const AppGroupEmailTemplatesRoute = AppGroupEmailTemplatesRouteImport.update({
   id: '/group/email-templates',
   path: '/group/email-templates',
@@ -206,34 +201,45 @@ const AppAdminUsersCreateRoute = AppAdminUsersCreateRouteImport.update({
   path: '/admin/users/create',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppDatahubSubjectIdAssignmentsRoute =
-  AppDatahubSubjectIdAssignmentsRouteImport.update({
-    id: '/assignments',
-    path: '/assignments',
-    getParentRoute: () => AppDatahubSubjectIdRouteRoute,
-  } as any)
-const AppDatahubSubjectIdGraphRoute =
-  AppDatahubSubjectIdGraphRouteImport.update({
-    id: '/graph',
-    path: '/graph',
-    getParentRoute: () => AppDatahubSubjectIdRouteRoute,
+const AppDatahubSubjectsIndexRoute = AppDatahubSubjectsIndexRouteImport.update({
+  id: '/datahub/subjects/',
+  path: '/datahub/subjects/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppDatahubSubjectsSubjectIdRouteRoute =
+  AppDatahubSubjectsSubjectIdRouteRouteImport.update({
+    id: '/datahub/subjects/$subjectId',
+    path: '/datahub/subjects/$subjectId',
+    getParentRoute: () => AppRouteRoute,
   } as any)
 const AppInstrumentsRenderIdRoute = AppInstrumentsRenderIdRouteImport.update({
   id: '/instruments/render/$id',
   path: '/instruments/render/$id',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppDatahubSubjectIdTableIndexRoute =
-  AppDatahubSubjectIdTableIndexRouteImport.update({
+const AppDatahubSubjectsSubjectIdAssignmentsRoute =
+  AppDatahubSubjectsSubjectIdAssignmentsRouteImport.update({
+    id: '/assignments',
+    path: '/assignments',
+    getParentRoute: () => AppDatahubSubjectsSubjectIdRouteRoute,
+  } as any)
+const AppDatahubSubjectsSubjectIdGraphRoute =
+  AppDatahubSubjectsSubjectIdGraphRouteImport.update({
+    id: '/graph',
+    path: '/graph',
+    getParentRoute: () => AppDatahubSubjectsSubjectIdRouteRoute,
+  } as any)
+const AppDatahubSubjectsSubjectIdTableIndexRoute =
+  AppDatahubSubjectsSubjectIdTableIndexRouteImport.update({
     id: '/table/',
     path: '/table/',
-    getParentRoute: () => AppDatahubSubjectIdRouteRoute,
+    getParentRoute: () => AppDatahubSubjectsSubjectIdRouteRoute,
   } as any)
-const AppDatahubSubjectIdTableRecordIdRoute =
-  AppDatahubSubjectIdTableRecordIdRouteImport.update({
+const AppDatahubSubjectsSubjectIdTableRecordIdRoute =
+  AppDatahubSubjectsSubjectIdTableRecordIdRouteImport.update({
     id: '/table/$recordId',
     path: '/table/$recordId',
-    getParentRoute: () => AppDatahubSubjectIdRouteRoute,
+    getParentRoute: () => AppDatahubSubjectsSubjectIdRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -245,7 +251,6 @@ export interface FileRoutesByFullPath {
   '/user': typeof AppUserRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
   '/admin/instruments': typeof AppAdminInstrumentsRoute
   '/admin/mail': typeof AppAdminMailRoute
   '/admin/settings': typeof AppAdminSettingsRoute
@@ -258,20 +263,22 @@ export interface FileRoutesByFullPath {
   '/upload/$instrumentId': typeof AppUploadInstrumentIdRoute
   '/datahub/': typeof AppDatahubIndexRoute
   '/upload/': typeof AppUploadIndexRoute
+  '/datahub/subjects/$subjectId': typeof AppDatahubSubjectsSubjectIdRouteRouteWithChildren
   '/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
-  '/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
-  '/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
   '/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
   '/admin/branding/': typeof AppAdminBrandingIndexRoute
   '/admin/groups/': typeof AppAdminGroupsIndexRoute
   '/admin/instrument-repos/': typeof AppAdminInstrumentReposIndexRoute
   '/admin/users/': typeof AppAdminUsersIndexRoute
-  '/datahub/$subjectId/table/$recordId': typeof AppDatahubSubjectIdTableRecordIdRoute
-  '/datahub/$subjectId/table/': typeof AppDatahubSubjectIdTableIndexRoute
+  '/datahub/subjects/': typeof AppDatahubSubjectsIndexRoute
+  '/datahub/subjects/$subjectId/assignments': typeof AppDatahubSubjectsSubjectIdAssignmentsRoute
+  '/datahub/subjects/$subjectId/graph': typeof AppDatahubSubjectsSubjectIdGraphRoute
+  '/datahub/subjects/$subjectId/table/$recordId': typeof AppDatahubSubjectsSubjectIdTableRecordIdRoute
+  '/datahub/subjects/$subjectId/table/': typeof AppDatahubSubjectsSubjectIdTableIndexRoute
 }
 export interface FileRoutesByTo {
   '/setup': typeof SetupRoute
@@ -282,7 +289,6 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/': typeof AppIndexRoute
-  '/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
   '/admin/instruments': typeof AppAdminInstrumentsRoute
   '/admin/mail': typeof AppAdminMailRoute
   '/admin/settings': typeof AppAdminSettingsRoute
@@ -295,20 +301,22 @@ export interface FileRoutesByTo {
   '/upload/$instrumentId': typeof AppUploadInstrumentIdRoute
   '/datahub': typeof AppDatahubIndexRoute
   '/upload': typeof AppUploadIndexRoute
+  '/datahub/subjects/$subjectId': typeof AppDatahubSubjectsSubjectIdRouteRouteWithChildren
   '/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
-  '/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
-  '/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
   '/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
   '/admin/branding': typeof AppAdminBrandingIndexRoute
   '/admin/groups': typeof AppAdminGroupsIndexRoute
   '/admin/instrument-repos': typeof AppAdminInstrumentReposIndexRoute
   '/admin/users': typeof AppAdminUsersIndexRoute
-  '/datahub/$subjectId/table/$recordId': typeof AppDatahubSubjectIdTableRecordIdRoute
-  '/datahub/$subjectId/table': typeof AppDatahubSubjectIdTableIndexRoute
+  '/datahub/subjects': typeof AppDatahubSubjectsIndexRoute
+  '/datahub/subjects/$subjectId/assignments': typeof AppDatahubSubjectsSubjectIdAssignmentsRoute
+  '/datahub/subjects/$subjectId/graph': typeof AppDatahubSubjectsSubjectIdGraphRoute
+  '/datahub/subjects/$subjectId/table/$recordId': typeof AppDatahubSubjectsSubjectIdTableRecordIdRoute
+  '/datahub/subjects/$subjectId/table': typeof AppDatahubSubjectsSubjectIdTableIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -321,7 +329,6 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/_app/': typeof AppIndexRoute
-  '/_app/datahub/$subjectId': typeof AppDatahubSubjectIdRouteRouteWithChildren
   '/_app/admin/instruments': typeof AppAdminInstrumentsRoute
   '/_app/admin/mail': typeof AppAdminMailRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
@@ -334,20 +341,22 @@ export interface FileRoutesById {
   '/_app/upload/$instrumentId': typeof AppUploadInstrumentIdRoute
   '/_app/datahub/': typeof AppDatahubIndexRoute
   '/_app/upload/': typeof AppUploadIndexRoute
+  '/_app/datahub/subjects/$subjectId': typeof AppDatahubSubjectsSubjectIdRouteRouteWithChildren
   '/_app/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/_app/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/_app/admin/groups/create': typeof AppAdminGroupsCreateRoute
   '/_app/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/_app/admin/users/create': typeof AppAdminUsersCreateRoute
-  '/_app/datahub/$subjectId/assignments': typeof AppDatahubSubjectIdAssignmentsRoute
-  '/_app/datahub/$subjectId/graph': typeof AppDatahubSubjectIdGraphRoute
   '/_app/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
   '/_app/admin/branding/': typeof AppAdminBrandingIndexRoute
   '/_app/admin/groups/': typeof AppAdminGroupsIndexRoute
   '/_app/admin/instrument-repos/': typeof AppAdminInstrumentReposIndexRoute
   '/_app/admin/users/': typeof AppAdminUsersIndexRoute
-  '/_app/datahub/$subjectId/table/$recordId': typeof AppDatahubSubjectIdTableRecordIdRoute
-  '/_app/datahub/$subjectId/table/': typeof AppDatahubSubjectIdTableIndexRoute
+  '/_app/datahub/subjects/': typeof AppDatahubSubjectsIndexRoute
+  '/_app/datahub/subjects/$subjectId/assignments': typeof AppDatahubSubjectsSubjectIdAssignmentsRoute
+  '/_app/datahub/subjects/$subjectId/graph': typeof AppDatahubSubjectsSubjectIdGraphRoute
+  '/_app/datahub/subjects/$subjectId/table/$recordId': typeof AppDatahubSubjectsSubjectIdTableRecordIdRoute
+  '/_app/datahub/subjects/$subjectId/table/': typeof AppDatahubSubjectsSubjectIdTableIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -360,7 +369,6 @@ export interface FileRouteTypes {
     | '/user'
     | '/auth/login'
     | '/auth/reset-password'
-    | '/datahub/$subjectId'
     | '/admin/instruments'
     | '/admin/mail'
     | '/admin/settings'
@@ -373,20 +381,22 @@ export interface FileRouteTypes {
     | '/upload/$instrumentId'
     | '/datahub/'
     | '/upload/'
+    | '/datahub/subjects/$subjectId'
     | '/admin/audit/logs'
     | '/admin/branding/login-page'
     | '/admin/groups/create'
     | '/admin/users/$userId'
     | '/admin/users/create'
-    | '/datahub/$subjectId/assignments'
-    | '/datahub/$subjectId/graph'
     | '/instruments/render/$id'
     | '/admin/branding/'
     | '/admin/groups/'
     | '/admin/instrument-repos/'
     | '/admin/users/'
-    | '/datahub/$subjectId/table/$recordId'
-    | '/datahub/$subjectId/table/'
+    | '/datahub/subjects/'
+    | '/datahub/subjects/$subjectId/assignments'
+    | '/datahub/subjects/$subjectId/graph'
+    | '/datahub/subjects/$subjectId/table/$recordId'
+    | '/datahub/subjects/$subjectId/table/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/setup'
@@ -397,7 +407,6 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/'
-    | '/datahub/$subjectId'
     | '/admin/instruments'
     | '/admin/mail'
     | '/admin/settings'
@@ -410,20 +419,22 @@ export interface FileRouteTypes {
     | '/upload/$instrumentId'
     | '/datahub'
     | '/upload'
+    | '/datahub/subjects/$subjectId'
     | '/admin/audit/logs'
     | '/admin/branding/login-page'
     | '/admin/groups/create'
     | '/admin/users/$userId'
     | '/admin/users/create'
-    | '/datahub/$subjectId/assignments'
-    | '/datahub/$subjectId/graph'
     | '/instruments/render/$id'
     | '/admin/branding'
     | '/admin/groups'
     | '/admin/instrument-repos'
     | '/admin/users'
-    | '/datahub/$subjectId/table/$recordId'
-    | '/datahub/$subjectId/table'
+    | '/datahub/subjects'
+    | '/datahub/subjects/$subjectId/assignments'
+    | '/datahub/subjects/$subjectId/graph'
+    | '/datahub/subjects/$subjectId/table/$recordId'
+    | '/datahub/subjects/$subjectId/table'
   id:
     | '__root__'
     | '/_app'
@@ -435,7 +446,6 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/_app/'
-    | '/_app/datahub/$subjectId'
     | '/_app/admin/instruments'
     | '/_app/admin/mail'
     | '/_app/admin/settings'
@@ -448,20 +458,22 @@ export interface FileRouteTypes {
     | '/_app/upload/$instrumentId'
     | '/_app/datahub/'
     | '/_app/upload/'
+    | '/_app/datahub/subjects/$subjectId'
     | '/_app/admin/audit/logs'
     | '/_app/admin/branding/login-page'
     | '/_app/admin/groups/create'
     | '/_app/admin/users/$userId'
     | '/_app/admin/users/create'
-    | '/_app/datahub/$subjectId/assignments'
-    | '/_app/datahub/$subjectId/graph'
     | '/_app/instruments/render/$id'
     | '/_app/admin/branding/'
     | '/_app/admin/groups/'
     | '/_app/admin/instrument-repos/'
     | '/_app/admin/users/'
-    | '/_app/datahub/$subjectId/table/$recordId'
-    | '/_app/datahub/$subjectId/table/'
+    | '/_app/datahub/subjects/'
+    | '/_app/datahub/subjects/$subjectId/assignments'
+    | '/_app/datahub/subjects/$subjectId/graph'
+    | '/_app/datahub/subjects/$subjectId/table/$recordId'
+    | '/_app/datahub/subjects/$subjectId/table/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -562,13 +574,6 @@ declare module '@tanstack/react-router' {
       path: '/datahub'
       fullPath: '/datahub/'
       preLoaderRoute: typeof AppDatahubIndexRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/datahub/$subjectId': {
-      id: '/_app/datahub/$subjectId'
-      path: '/datahub/$subjectId'
-      fullPath: '/datahub/$subjectId'
-      preLoaderRoute: typeof AppDatahubSubjectIdRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/group/email-templates': {
@@ -690,19 +695,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminUsersCreateRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/datahub/$subjectId/assignments': {
-      id: '/_app/datahub/$subjectId/assignments'
-      path: '/assignments'
-      fullPath: '/datahub/$subjectId/assignments'
-      preLoaderRoute: typeof AppDatahubSubjectIdAssignmentsRouteImport
-      parentRoute: typeof AppDatahubSubjectIdRouteRoute
+    '/_app/datahub/subjects/': {
+      id: '/_app/datahub/subjects/'
+      path: '/datahub/subjects'
+      fullPath: '/datahub/subjects/'
+      preLoaderRoute: typeof AppDatahubSubjectsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
     }
-    '/_app/datahub/$subjectId/graph': {
-      id: '/_app/datahub/$subjectId/graph'
-      path: '/graph'
-      fullPath: '/datahub/$subjectId/graph'
-      preLoaderRoute: typeof AppDatahubSubjectIdGraphRouteImport
-      parentRoute: typeof AppDatahubSubjectIdRouteRoute
+    '/_app/datahub/subjects/$subjectId': {
+      id: '/_app/datahub/subjects/$subjectId'
+      path: '/datahub/subjects/$subjectId'
+      fullPath: '/datahub/subjects/$subjectId'
+      preLoaderRoute: typeof AppDatahubSubjectsSubjectIdRouteRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/instruments/render/$id': {
       id: '/_app/instruments/render/$id'
@@ -711,42 +716,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInstrumentsRenderIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/datahub/$subjectId/table/': {
-      id: '/_app/datahub/$subjectId/table/'
+    '/_app/datahub/subjects/$subjectId/assignments': {
+      id: '/_app/datahub/subjects/$subjectId/assignments'
+      path: '/assignments'
+      fullPath: '/datahub/subjects/$subjectId/assignments'
+      preLoaderRoute: typeof AppDatahubSubjectsSubjectIdAssignmentsRouteImport
+      parentRoute: typeof AppDatahubSubjectsSubjectIdRouteRoute
+    }
+    '/_app/datahub/subjects/$subjectId/graph': {
+      id: '/_app/datahub/subjects/$subjectId/graph'
+      path: '/graph'
+      fullPath: '/datahub/subjects/$subjectId/graph'
+      preLoaderRoute: typeof AppDatahubSubjectsSubjectIdGraphRouteImport
+      parentRoute: typeof AppDatahubSubjectsSubjectIdRouteRoute
+    }
+    '/_app/datahub/subjects/$subjectId/table/': {
+      id: '/_app/datahub/subjects/$subjectId/table/'
       path: '/table'
-      fullPath: '/datahub/$subjectId/table/'
-      preLoaderRoute: typeof AppDatahubSubjectIdTableIndexRouteImport
-      parentRoute: typeof AppDatahubSubjectIdRouteRoute
+      fullPath: '/datahub/subjects/$subjectId/table/'
+      preLoaderRoute: typeof AppDatahubSubjectsSubjectIdTableIndexRouteImport
+      parentRoute: typeof AppDatahubSubjectsSubjectIdRouteRoute
     }
-    '/_app/datahub/$subjectId/table/$recordId': {
-      id: '/_app/datahub/$subjectId/table/$recordId'
+    '/_app/datahub/subjects/$subjectId/table/$recordId': {
+      id: '/_app/datahub/subjects/$subjectId/table/$recordId'
       path: '/table/$recordId'
-      fullPath: '/datahub/$subjectId/table/$recordId'
-      preLoaderRoute: typeof AppDatahubSubjectIdTableRecordIdRouteImport
-      parentRoute: typeof AppDatahubSubjectIdRouteRoute
+      fullPath: '/datahub/subjects/$subjectId/table/$recordId'
+      preLoaderRoute: typeof AppDatahubSubjectsSubjectIdTableRecordIdRouteImport
+      parentRoute: typeof AppDatahubSubjectsSubjectIdRouteRoute
     }
   }
 }
 
-interface AppDatahubSubjectIdRouteRouteChildren {
-  AppDatahubSubjectIdAssignmentsRoute: typeof AppDatahubSubjectIdAssignmentsRoute
-  AppDatahubSubjectIdGraphRoute: typeof AppDatahubSubjectIdGraphRoute
-  AppDatahubSubjectIdTableRecordIdRoute: typeof AppDatahubSubjectIdTableRecordIdRoute
-  AppDatahubSubjectIdTableIndexRoute: typeof AppDatahubSubjectIdTableIndexRoute
+interface AppDatahubSubjectsSubjectIdRouteRouteChildren {
+  AppDatahubSubjectsSubjectIdAssignmentsRoute: typeof AppDatahubSubjectsSubjectIdAssignmentsRoute
+  AppDatahubSubjectsSubjectIdGraphRoute: typeof AppDatahubSubjectsSubjectIdGraphRoute
+  AppDatahubSubjectsSubjectIdTableRecordIdRoute: typeof AppDatahubSubjectsSubjectIdTableRecordIdRoute
+  AppDatahubSubjectsSubjectIdTableIndexRoute: typeof AppDatahubSubjectsSubjectIdTableIndexRoute
 }
 
-const AppDatahubSubjectIdRouteRouteChildren: AppDatahubSubjectIdRouteRouteChildren =
+const AppDatahubSubjectsSubjectIdRouteRouteChildren: AppDatahubSubjectsSubjectIdRouteRouteChildren =
   {
-    AppDatahubSubjectIdAssignmentsRoute: AppDatahubSubjectIdAssignmentsRoute,
-    AppDatahubSubjectIdGraphRoute: AppDatahubSubjectIdGraphRoute,
-    AppDatahubSubjectIdTableRecordIdRoute:
-      AppDatahubSubjectIdTableRecordIdRoute,
-    AppDatahubSubjectIdTableIndexRoute: AppDatahubSubjectIdTableIndexRoute,
+    AppDatahubSubjectsSubjectIdAssignmentsRoute:
+      AppDatahubSubjectsSubjectIdAssignmentsRoute,
+    AppDatahubSubjectsSubjectIdGraphRoute:
+      AppDatahubSubjectsSubjectIdGraphRoute,
+    AppDatahubSubjectsSubjectIdTableRecordIdRoute:
+      AppDatahubSubjectsSubjectIdTableRecordIdRoute,
+    AppDatahubSubjectsSubjectIdTableIndexRoute:
+      AppDatahubSubjectsSubjectIdTableIndexRoute,
   }
 
-const AppDatahubSubjectIdRouteRouteWithChildren =
-  AppDatahubSubjectIdRouteRoute._addFileChildren(
-    AppDatahubSubjectIdRouteRouteChildren,
+const AppDatahubSubjectsSubjectIdRouteRouteWithChildren =
+  AppDatahubSubjectsSubjectIdRouteRoute._addFileChildren(
+    AppDatahubSubjectsSubjectIdRouteRouteChildren,
   )
 
 interface AppRouteRouteChildren {
@@ -755,7 +777,6 @@ interface AppRouteRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppUserRoute: typeof AppUserRoute
   AppIndexRoute: typeof AppIndexRoute
-  AppDatahubSubjectIdRouteRoute: typeof AppDatahubSubjectIdRouteRouteWithChildren
   AppAdminInstrumentsRoute: typeof AppAdminInstrumentsRoute
   AppAdminMailRoute: typeof AppAdminMailRoute
   AppAdminSettingsRoute: typeof AppAdminSettingsRoute
@@ -768,6 +789,7 @@ interface AppRouteRouteChildren {
   AppUploadInstrumentIdRoute: typeof AppUploadInstrumentIdRoute
   AppDatahubIndexRoute: typeof AppDatahubIndexRoute
   AppUploadIndexRoute: typeof AppUploadIndexRoute
+  AppDatahubSubjectsSubjectIdRouteRoute: typeof AppDatahubSubjectsSubjectIdRouteRouteWithChildren
   AppAdminAuditLogsRoute: typeof AppAdminAuditLogsRoute
   AppAdminBrandingLoginPageRoute: typeof AppAdminBrandingLoginPageRoute
   AppAdminGroupsCreateRoute: typeof AppAdminGroupsCreateRoute
@@ -778,6 +800,7 @@ interface AppRouteRouteChildren {
   AppAdminGroupsIndexRoute: typeof AppAdminGroupsIndexRoute
   AppAdminInstrumentReposIndexRoute: typeof AppAdminInstrumentReposIndexRoute
   AppAdminUsersIndexRoute: typeof AppAdminUsersIndexRoute
+  AppDatahubSubjectsIndexRoute: typeof AppDatahubSubjectsIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
@@ -786,7 +809,6 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppUserRoute: AppUserRoute,
   AppIndexRoute: AppIndexRoute,
-  AppDatahubSubjectIdRouteRoute: AppDatahubSubjectIdRouteRouteWithChildren,
   AppAdminInstrumentsRoute: AppAdminInstrumentsRoute,
   AppAdminMailRoute: AppAdminMailRoute,
   AppAdminSettingsRoute: AppAdminSettingsRoute,
@@ -800,6 +822,8 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppUploadInstrumentIdRoute: AppUploadInstrumentIdRoute,
   AppDatahubIndexRoute: AppDatahubIndexRoute,
   AppUploadIndexRoute: AppUploadIndexRoute,
+  AppDatahubSubjectsSubjectIdRouteRoute:
+    AppDatahubSubjectsSubjectIdRouteRouteWithChildren,
   AppAdminAuditLogsRoute: AppAdminAuditLogsRoute,
   AppAdminBrandingLoginPageRoute: AppAdminBrandingLoginPageRoute,
   AppAdminGroupsCreateRoute: AppAdminGroupsCreateRoute,
@@ -810,6 +834,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAdminGroupsIndexRoute: AppAdminGroupsIndexRoute,
   AppAdminInstrumentReposIndexRoute: AppAdminInstrumentReposIndexRoute,
   AppAdminUsersIndexRoute: AppAdminUsersIndexRoute,
+  AppDatahubSubjectsIndexRoute: AppDatahubSubjectsIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
