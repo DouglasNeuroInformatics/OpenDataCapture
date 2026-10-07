@@ -480,7 +480,7 @@ export class InstrumentRecordsService {
 
     // Only the rows this call wrote. Filtering by instrument alone returned every group's records
     // when `groupId` was omitted, and `accessibleQuery` cannot scope this read: a STANDARD uploader
-    // holds no `read InstrumentRecord` rule, which makes CASL throw rather than filter.
+    // holds no `read InstrumentRecord` rule, which makes `accessibleQuery` throw rather than filter.
     return this.instrumentRecordModel.findMany({
       where: {
         sessionId: { in: sessions.map((session) => session.id) }
