@@ -245,4 +245,22 @@ test.describe('playground', () => {
 
     await expect(playground.preview.getByText('Pet Name Measure')).toBeVisible();
   });
+
+  // react-resizable-panels reads a bare number as pixels, so a pane size written as `66` rather than
+  // `"66%"` still type-checks and renders, only at the wrong size.
+  test('should split the editor and preview two to one, and stop the editor at a quarter when dragged narrower', async ({
+    page
+  }) => {
+    const playground = new PlaygroundPage(page);
+    await playground.goto();
+    await expect(playground.editorPane).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+    await expect.poll(() => playground.editorShare()).toBeCloseTo(0.66, 1);
+
+    const editor = (await playground.editorPane.boundingBox())!;
+    await playground.dragPaneSeparatorTo(editor.x + editor.width / 2);
+    await expect.poll(() => playground.editorShare()).toBeCloseTo(0.33, 1);
+
+    await playground.dragPaneSeparatorTo(editor.x);
+    await expect.poll(() => playground.editorShare()).toBeCloseTo(0.25, 1);
+  });
 });

@@ -150,6 +150,11 @@ directly means pasting a second share link into an open tab does nothing. Its `$
 
 `.vscode/Scratch/` is unrelated junk.
 
+The editor/preview split in `src/components/MainContent/MainContent.tsx` gives every
+`react-resizable-panels` size as a percentage string. Version 4 reads a bare number as pixels, so
+`defaultSize={66}` still type-checks and renders, at the wrong size; the split test in
+`testing/src/specs/playground.spec.ts` measures the panes to catch it.
+
 `__APP_VERSION__` and `__GITHUB_REPO_URL__` are the build-time defines, declared in
 `src/vite-env.d.ts` and supplied in `vite.config.ts`; `GITHUB_REPO_URL` must be listed under the
 `build` task's `env` in `turbo.json` or turbo's strict env mode hides it from the build. Anything
@@ -157,12 +162,15 @@ that differs between deployments belongs in `/config.json` instead.
 
 ## Tests
 
-`pnpm exec vitest --project playground`, from the repo root. The project runs in node and covers
-only what is pure — `src/preview/__tests__/protocol.test.ts` pins the message schemas, error
-serialization and `resolvePreviewOrigin`, and `config.test.ts` the `/config.json` contract.
-Anything that touches esbuild-wasm, Monaco workers or `/runtime/v1` has no test environment here;
-the frame itself, the origin split, the runtime config and the message bridge are exercised for real
-by `testing/src/specs/playground.spec.ts`, which Playwright runs against this app's dev server.
+`pnpm exec vitest --project playground`, from the repo root. The project runs in node, with no DOM,
+and covers only what is pure — `src/preview/__tests__/protocol.test.ts` pins the message schemas,
+error serialization and `resolvePreviewOrigin`, and `config.test.ts` the `/config.json` contract. A
+component that renders on a server can still be pinned through `react-dom/server`'s
+`renderToStaticMarkup`, as `src/components/Resizable/__tests__/` does for the attributes its classes
+key on. Anything that touches esbuild-wasm, Monaco workers or `/runtime/v1` has no test environment
+here; the frame itself, the origin split, the runtime config, the message bridge and the resizable
+editor/preview split are exercised for real by `testing/src/specs/playground.spec.ts`, which
+Playwright runs against this app's dev server.
 
 Storybook collects `*.stories.tsx` under `src/components/` centrally through
 `storybook/config/main.ts` under the `Playground Components` prefix. See
