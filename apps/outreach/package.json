@@ -35,7 +35,7 @@
     "github-slugger": "^2.0.0",
     "sharp": "^0.34.5",
     "tailwindcss": "catalog:",
-    "typedoc": "0.27.x",
-    "typedoc-plugin-markdown": "4.4.x"
+    "typedoc": "^0.28.20",
+    "typedoc-plugin-markdown": "^4.13.1"
   }
 }

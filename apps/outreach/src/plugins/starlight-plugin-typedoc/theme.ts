@@ -1,5 +1,3 @@
-import path from 'node:path';
-
 import { Reflection } from 'typedoc';
 import type { Comment, CommentDisplayPart, Options } from 'typedoc';
 import { MarkdownPageEvent, MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
@@ -31,13 +29,11 @@ class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
       part.kind === 'inline-tag' &&
       (part.tag === '@link' || part.tag === '@linkcode' || part.tag === '@linkplain') &&
       part.target instanceof Reflection &&
-      typeof part.target.url === 'string'
+      this.router.hasUrl(part.target)
     ) {
       return {
         ...part,
-        target: this.getRelativeUrl(
-          path.posix.join(this.options.getValue('entryPointStrategy') === 'packages' ? '../..' : '..', part.target.url)
-        )
+        target: this.urlTo(part.target)
       };
     }
 
@@ -109,11 +105,11 @@ class StarlightTypeDocThemeRenderContext extends MarkdownThemeContext {
     this.#markdownThemeContext = new MarkdownThemeContext(theme, event, options);
   }
 
-  override getRelativeUrl(url: string): string {
+  override urlTo(reflection: Reflection): string {
     const outputDirectory = this.options.getValue('starlight-typedoc-output');
     const baseUrl = typeof outputDirectory === 'string' ? outputDirectory : '';
 
-    return getRelativeURL(url, baseUrl, this.page.url);
+    return getRelativeURL(this.router.getFullUrl(reflection), baseUrl, this.page.url);
   }
 
   #addAside(markdown: string, ...args: Parameters<typeof getAsideMarkdown>) {

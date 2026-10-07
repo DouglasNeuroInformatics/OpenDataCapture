@@ -1,4 +1,4 @@
-import type { PureAbility, RawRuleOf } from '@casl/ability';
+import type { Ability, RawRuleOf } from '@casl/ability';
 import { licenses } from '@opendatacapture/licenses';
 import type { LicenseIdentifier } from '@opendatacapture/licenses';
 import type { Language as InstrumentAuthoringLanguage, Json, JsonLiteral } from '@opendatacapture/runtime-core';
@@ -38,7 +38,7 @@ export const $GroupScopableSubjectName = $AppSubjectName.exclude(['all', 'Instru
 export const isGroupScopableSubject = (subject: AppSubjectName): subject is GroupScopableSubjectName =>
   $GroupScopableSubjectName.safeParse(subject).success;
 
-export type BaseAppAbility = PureAbility<[AppAction, AppSubjectName]>;
+export type BaseAppAbility = Ability<[AppAction, AppSubjectName]>;
 
 export type UserPermission = z.infer<typeof $UserPermission>;
 export const $UserPermission = z

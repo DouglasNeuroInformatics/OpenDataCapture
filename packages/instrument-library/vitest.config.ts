@@ -2,7 +2,8 @@ import path from 'node:path';
 
 import { defineProject, mergeConfig } from 'vitest/config';
 
-import baseConfig from '../../vitest.config';
+import { baseConfig } from '../../vitest.config';
+import { lowerDecorators } from '../runtime-core/vitest.config';
 
 const repositoryRoot = path.resolve(import.meta.dirname, '../..');
 
@@ -14,6 +15,7 @@ const PACKAGE_SPECIFIER = String.raw`((?:@[^/]+/)?[^/@]+@[^/]+)`;
 export default mergeConfig(
   baseConfig,
   defineProject({
+    plugins: [lowerDecorators],
     resolve: {
       alias: [
         {

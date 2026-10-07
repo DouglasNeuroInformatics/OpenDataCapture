@@ -1,7 +1,24 @@
-import { describe, expect, it, test } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { InstrumentBundlerError } from '../error.js';
 import { parse, parseImports, parseModuleSpecifier } from '../parse.js';
+
+const lexerCalls = vi.hoisted(() => [] as ('init' | 'parse')[]);
+
+vi.mock('es-module-lexer', async (importOriginal) => {
+  const lexer = await importOriginal<typeof import('es-module-lexer')>();
+  return {
+    ...lexer,
+    init: async () => {
+      await lexer.init();
+      lexerCalls.push('init');
+    },
+    parse: (source: string) => {
+      lexerCalls.push('parse');
+      return lexer.parse(source);
+    }
+  };
+});
 
 const code = `
 import React, { useState } from 'react';
@@ -14,27 +31,47 @@ export const foo = null;
 export default foo;
 `;
 
-test('parse', () => {
-  const result = parse(code);
-  expect(result).toMatchObject({
-    exports: [{ exportName: 'foo' }, { exportName: 'default' }],
-    imports: [
-      {
-        importPath: 'react',
-        importType: 'Static',
-        statement: "import React, { useState } from 'react'"
-      },
-      {
-        importPath: './App.tsx',
-        importType: 'Static',
-        statement: "import { App } from './App.tsx'"
-      },
-      {
-        importPath: '/hello.js',
-        importType: 'Dynamic',
-        statement: "import('/hello.js')"
-      }
-    ]
+describe('parse', () => {
+  it('should finish compiling the lexer before it first parses, so parse never compiles it synchronously on a browser main thread', () => {
+    parse(code);
+    expect(lexerCalls.slice(0, 2)).toEqual(['init', 'parse']);
+  });
+
+  it('should report the path, type and statement of each import and the name of each export', () => {
+    expect(parse(code)).toMatchObject({
+      exports: [{ exportName: 'foo' }, { exportName: 'default' }],
+      imports: [
+        {
+          importPath: 'react',
+          importType: 'Static',
+          statement: "import React, { useState } from 'react'"
+        },
+        {
+          importPath: './App.tsx',
+          importType: 'Static',
+          statement: "import { App } from './App.tsx'"
+        },
+        {
+          importPath: '/hello.js',
+          importType: 'Dynamic',
+          statement: "import('/hello.js')"
+        }
+      ]
+    });
+  });
+
+  it('should classify import.meta as ImportMeta, so parseImports can tell it apart from an import', () => {
+    expect(parse(`const url = import.meta.url;`).imports).toMatchObject([{ importType: 'ImportMeta' }]);
+  });
+
+  it('should classify the module request of a star re-export as a static import', () => {
+    expect(parse(`export * from './core.js';`).imports).toMatchObject([
+      { importPath: './core.js', importType: 'Static', statement: `export * from './core.js'` }
+    ]);
+  });
+
+  it('should leave a star re-export out of the exports, since it exports no name of its own', () => {
+    expect(parse(`export * from './core.js';`).exports).toEqual([]);
   });
 });
 

@@ -21,11 +21,29 @@ Note the asymmetry: `apps/web` is scanned from `src`, the other two only from `s
 `apps/gateway` and every other package are not scanned at all. Covering a new location means adding
 an entry to the `stories` array.
 
+## `@storybook/react` must not be hoisted, or every story's `args` lose their types
+
+`pnpm-workspace.yaml` sets `hoistPattern: ['*', '!@storybook/react']`. Since Storybook 10.5.7 the
+`storybook` package's own declarations import `@storybook/react` without depending on it (#1619).
+Hoisted, that import resolves to `node_modules/.pnpm/node_modules/@storybook/react`, the peer
+variant installed for this workspace's real `react`, which has no types: `react` ships none and
+root `package.json` deletes `@types/react` (`vendor/AGENTS.md`). The stories reach a second variant,
+paired with `vendor/react@19.x`, through `@storybook/react-vite`. TypeScript treats copies with the
+same name and version as one package and keeps the first it loads, so every story is checked
+against the copy without React types: `ComponentProps` does not resolve and
+`StoryObj<typeof Component>` gives `args` no type. **Remove the exclusion and every story's `args`
+become `any` without an error**; only a callback in `args` fails, with TS7006 in the owning
+package's `tsc`.
+
+A checkout installed before the exclusion keeps its hoisted link: `pnpm install` records the new
+pattern but reports "Already up to date" and leaves the link in place. Delete the root
+`node_modules` and install again; `node_modules/.pnpm/node_modules/@storybook/react` must not exist.
+
 ## The `@` alias resolves by importer, and only for two apps
 
-`vite.config.js` replaces the usual static alias with a `customResolver` that maps `@` to
-`apps/playground/src` or `apps/web/src` depending on which file did the importing, and returns
-`null` for everything else. **A `packages/react-core` story that imports `@/…` will fail to
+`vite.config.js` replaces the usual static alias with a `source-root-alias` plugin (`enforce: 'pre'`)
+that maps `@` to `apps/playground/src` or `apps/web/src` depending on which file did the importing,
+and returns `null` for everything else. **A `packages/react-core` story that imports `@/…` will fail to
 resolve** — react-core has no `@` alias of its own, so import relatively or by package name there.
 
 ## Tailwind scans only the directories named in `config/globals.css`

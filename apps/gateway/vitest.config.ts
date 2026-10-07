@@ -2,7 +2,7 @@ import path from 'path';
 
 import { defineProject, mergeConfig } from 'vitest/config';
 
-import baseConfig from '../../vitest.config';
+import { baseConfig } from '../../vitest.config';
 
 export default mergeConfig(
   baseConfig,

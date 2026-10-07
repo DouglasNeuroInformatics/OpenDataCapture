@@ -7,7 +7,7 @@ import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import type { Plugin } from 'vite';
 
-import type { PlaygroundConfig } from './src/preview/config';
+import type { PlaygroundConfig } from './src/preview/config.ts';
 
 // Read straight from the monorepo root rather than through `@opendatacapture/release-info`: that
 // package pulls in `@opendatacapture/schemas`, which ships raw TypeScript, and loading it here would
@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     chunkSizeWarningLimit: 1000,
     emptyOutDir: false,
-    rollupOptions: {
+    rolldownOptions: {
       external: ['esbuild'],
       input: {
         index: path.resolve(import.meta.dirname, 'index.html'),
@@ -47,8 +47,10 @@ export default defineConfig(({ mode }) => ({
     __GITHUB_REPO_URL__: `'${process.env.GITHUB_REPO_URL ?? '#'}'`
   },
   optimizeDeps: {
-    esbuildOptions: {
-      target: 'es2022'
+    rolldownOptions: {
+      transform: {
+        target: 'es2022'
+      }
     },
     exclude: ['@swc/wasm-web'],
     include: ['react/*', 'react-dom/*']
