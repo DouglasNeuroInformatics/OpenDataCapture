@@ -22,6 +22,10 @@ describe('extractInputFileExtension', () => {
   it('should return null for filenames without extensions', () => {
     expect(extractInputFileExtension('filename')).toBeNull();
   });
+
+  it('should lower-case the extension, so an upper-case match is still a BundlerInputFileExtension', () => {
+    expect(extractInputFileExtension('a.PNG')).toBe('.png');
+  });
 });
 
 describe('inferLoader', () => {
@@ -59,6 +63,10 @@ describe('inferLoader', () => {
     expect(inferLoader('image.png')).toBe('dataurl');
     expect(inferLoader('image.svg')).toBe('dataurl');
     expect(inferLoader('image.webp')).toBe('dataurl');
+  });
+
+  it('should infer the loader from an upper-case extension, so camera files like IMG_0001.JPG bundle like .jpg', () => {
+    expect(inferLoader('IMG_0001.JPG')).toBe('dataurl');
   });
 
   it('should throw an error for unsupported extensions', () => {
