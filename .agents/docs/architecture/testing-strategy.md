@@ -105,7 +105,8 @@ Exceptions worth knowing:
 
 ## Turbo task graph
 
-`lint`, `dev`, `dev:test` and `test:e2e` all depend on `["^build", "^db:generate", "db:push"]`
+`lint`, `dev`, `dev:test` and `test:e2e` all depend on `["^build", "^db:generate", "db:push"]`.
+`test:e2e` additionally specifies `"cache": false` because it requires a live server and database.
 (`build` itself depends on `^build` and `db:generate`). A cold `pnpm lint` therefore builds every
 dependency, generates both Prisma clients, and pushes the gateway SQLite schema — it is not fast.
 

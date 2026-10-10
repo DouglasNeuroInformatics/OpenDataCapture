@@ -39,6 +39,7 @@
     },
     "//#lint:root": {},
     "test:e2e": {
+      "cache": false,
       "dependsOn": ["^build", "^db:generate", "db:push"]
     },
     "start": {
