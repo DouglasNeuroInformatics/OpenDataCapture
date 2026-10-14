@@ -16,7 +16,7 @@ type WizardTableProps = {
  * header row, so the mapping, instrument, review and result tables all read as the same thing.
  */
 export const WizardTable = ({ children, className, 'data-testid': testId, head }: WizardTableProps) => (
-  <div className={cn('overflow-x-auto rounded-md border', className)} data-testid={testId}>
+  <div className={cn('bg-background overflow-x-auto rounded-md border', className)} data-testid={testId}>
     <Table>
       <Table.Header className="bg-muted/40">
         <Table.Row>{head}</Table.Row>

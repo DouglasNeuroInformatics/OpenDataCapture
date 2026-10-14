@@ -121,6 +121,7 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
             {t({ en: 'Column Mapping', es: 'Correspondencia de columnas', fr: 'Correspondance des colonnes' })}
           </h3>
           <WizardTable
+            className="max-h-[28rem] overflow-y-auto"
             head={
               <React.Fragment>
                 <Table.Head>

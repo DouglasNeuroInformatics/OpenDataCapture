@@ -221,7 +221,6 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
               }
             ]}
             data={rows}
-            rootStyle={{ '--color-background': 'var(--color-card)' }}
             onRowClick={(row) => toggle(row.id)}
           />
         )}
