@@ -82,7 +82,8 @@ export default defineConfig({
         },
         {
           autogenerate: { directory: 'docs/2-tutorials' },
-          label: 'Tutorials'
+          label: 'Tutorials',
+          translations: { fr: 'Tutoriels' }
         },
         {
           autogenerate: { directory: 'docs/3-guides' },
@@ -94,11 +95,13 @@ export default defineConfig({
         },
         {
           autogenerate: { directory: 'docs/5-reference' },
-          label: 'Reference'
+          label: 'Reference',
+          translations: { fr: 'Référence' }
         },
         {
           label: 'Changelog',
-          slug: 'docs/changelog'
+          slug: 'docs/changelog',
+          translations: { fr: 'Journal des modifications' }
         },
         starlightTypeDocSidebarGroup
       ],
