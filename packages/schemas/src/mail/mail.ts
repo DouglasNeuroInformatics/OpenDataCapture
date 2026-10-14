@@ -174,6 +174,21 @@ const DEFAULT_NEW_USER_EMAIL_TEMPLATE = {
       'New to Open Data Capture? This guide will help you get started:',
       'https://opendatacapture.org/en/docs/guides/how-to-get-started-with-odc/'
     ].join('\n'),
+    es: [
+      'Hola {{firstName}},',
+      '',
+      'Se ha creado una cuenta para usted en Open Data Capture.',
+      '',
+      'Nombre de usuario: {{username}}',
+      'Grupo(s): {{group}}',
+      '',
+      'Puede iniciar sesión aquí: {{url}}',
+      '',
+      'Su administrador le proporcionará su contraseña por separado. Por seguridad, cámbiela después de iniciar sesión por primera vez.',
+      '',
+      '¿Nuevo en Open Data Capture? Esta guía le ayudará a comenzar:',
+      'https://opendatacapture.org/en/docs/guides/how-to-get-started-with-odc/'
+    ].join('\n'),
     fr: [
       'Bonjour {{firstName}},',
       '',
@@ -192,6 +207,7 @@ const DEFAULT_NEW_USER_EMAIL_TEMPLATE = {
   },
   subject: {
     en: 'Your Open Data Capture account',
+    es: 'Su cuenta de Open Data Capture',
     fr: 'Votre compte Open Data Capture'
   }
 } as const satisfies z.infer<typeof $MailTemplate>;
@@ -211,6 +227,18 @@ const DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE = {
       '',
       'Thank you.'
     ].join('\n'),
+    es: [
+      'Hola,',
+      '',
+      'Se le ha asignado un cuestionario para completar en Open Data Capture.',
+      '',
+      'Por favor, complételo utilizando el enlace seguro a continuación:',
+      '{{url}}',
+      '',
+      'Este enlace expira el {{expiresAt}}.',
+      '',
+      'Gracias.'
+    ].join('\n'),
     fr: [
       'Bonjour,',
       '',
@@ -226,6 +254,7 @@ const DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE = {
   },
   subject: {
     en: 'Your Open Data Capture assignment',
+    es: 'Su evaluación de Open Data Capture',
     fr: 'Votre évaluation Open Data Capture'
   }
 } as const satisfies z.infer<typeof $MailTemplate>;

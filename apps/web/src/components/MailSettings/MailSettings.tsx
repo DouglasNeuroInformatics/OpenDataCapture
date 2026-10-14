@@ -3,6 +3,7 @@ import React from 'react';
 import { Checkbox, Heading } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $UpdateMailConfigData, isSameMailServer } from '@opendatacapture/schemas/mail';
+import type { Language } from '@opendatacapture/schemas/core';
 import type { MailConfigDto, MailTemplate, UpdateMailConfigData } from '@opendatacapture/schemas/mail';
 import { z } from 'zod/v4';
 
@@ -32,11 +33,12 @@ const initialValues = (config: MailConfigDto | null): MailConfigFormValues => ({
 });
 
 export type MailSettingsProps = {
+  activeLanguages: readonly Language[];
   config: MailConfigDto | null;
   newUserEmailTemplate: MailTemplate;
 };
 
-export const MailSettings = ({ config, newUserEmailTemplate }: MailSettingsProps) => {
+export const MailSettings = ({ activeLanguages, config, newUserEmailTemplate }: MailSettingsProps) => {
   const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const updateMutation = useUpdateMailSettingsMutation();
@@ -202,6 +204,7 @@ export const MailSettings = ({ config, newUserEmailTemplate }: MailSettingsProps
           <TestMailSection buildConfig={buildConfig} onInvalid={setErrors} />
 
           <NewUserTemplateSection
+            activeLanguages={activeLanguages}
             isSaving={updateMutation.isPending}
             template={newUserEmailTemplate}
             onSave={(next) => void save({ newUserEmailTemplate: next })}

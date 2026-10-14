@@ -27,6 +27,10 @@ vi.mock('@/store', () => ({
   useAppStore: vi.fn((selector: (state: typeof store) => unknown) => selector(store))
 }));
 
+vi.mock('@/hooks/useSetupStateQuery', () => ({
+  useSetupStateQuery: () => ({ data: { activeLanguages: ['en', 'fr'] } })
+}));
+
 const reminder: GroupEmailTemplate = {
   body: { en: 'Open {{url}} before {{expiresAt}}' },
   id: 'tpl-a',

@@ -11,6 +11,8 @@ export type EmailTemplateEditorProps = {
   error?: string;
   /** Namespaces the control ids and test ids, so two editors can coexist on one page. */
   idPrefix: string;
+  /** The languages to offer in the language picker; defaults to all supported languages. */
+  languages?: readonly Language[];
   /** Omit to show the template read-only. */
   onChange?: (template: MailTemplate) => void;
   template: MailTemplate;
@@ -22,6 +24,7 @@ export type EmailTemplateEditorProps = {
 export const EmailTemplateEditor = ({
   error,
   idPrefix,
+  languages,
   onChange,
   template,
   variables = []
@@ -56,6 +59,7 @@ export const EmailTemplateEditor = ({
         <LanguageSelect
           data-testid={`${idPrefix}-language`}
           id={`${idPrefix}-language`}
+          options={languages}
           value={language}
           onChange={setLanguage}
         />

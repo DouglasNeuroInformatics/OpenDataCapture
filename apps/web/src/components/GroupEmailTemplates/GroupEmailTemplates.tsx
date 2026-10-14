@@ -9,6 +9,7 @@ import { isAxiosError } from 'axios';
 import { EyeIcon, PencilIcon, Trash2Icon } from 'lucide-react';
 
 import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
 import { ASSIGNMENT_TEMPLATE_VARS, checkTemplateIssue } from '@/utils/email-template';
@@ -31,6 +32,8 @@ const EmptyState = ({ children }: EmptyStateProps) => (
 export const GroupEmailTemplates = () => {
   const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
+  const { data: setupState } = useSetupStateQuery();
+  const activeLanguages = setupState.activeLanguages;
   const currentGroup = useAppStore((store) => store.currentGroup);
   const groupId = currentGroup?.id;
   const queryClient = useQueryClient();
@@ -280,15 +283,21 @@ export const GroupEmailTemplates = () => {
       </div>
 
       <CreateTemplateForm
+        activeLanguages={activeLanguages}
         isPending={updateGroupMutation.isPending}
         validateContent={validateContent}
         validateName={(name) => validateName(name)}
         onCreate={handleCreate}
       />
 
-      <ViewDefaultTemplateDialog open={isViewingDefault} onOpenChange={setIsViewingDefault} />
+      <ViewDefaultTemplateDialog
+        activeLanguages={activeLanguages}
+        open={isViewingDefault}
+        onOpenChange={setIsViewingDefault}
+      />
 
       <EditTemplateDialog
+        activeLanguages={activeLanguages}
         isPending={updateGroupMutation.isPending}
         template={editing}
         validateContent={validateContent}

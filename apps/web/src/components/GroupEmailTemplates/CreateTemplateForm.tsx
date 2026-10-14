@@ -2,15 +2,17 @@ import React from 'react';
 
 import { Button, Dialog, Heading, Input, Label } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { Language } from '@opendatacapture/schemas/core';
 import type { MailTemplate } from '@opendatacapture/schemas/mail';
 
 import { EmailTemplateEditor } from '@/components/EmailTemplateEditor';
 import { ASSIGNMENT_TEMPLATE_VARS } from '@/utils/email-template';
-import { LANGUAGE_LABELS, LANGUAGES } from '@/utils/language';
+import { LANGUAGE_LABELS } from '@/utils/language';
 
 const emptyTemplate = (): MailTemplate => ({ body: {}, subject: {} });
 
 export type CreateTemplateFormProps = {
+  activeLanguages: readonly Language[];
   isPending: boolean;
   /** Resolves true once the template is saved; the form clears only then. */
   onCreate: (name: string, template: MailTemplate) => Promise<boolean>;
@@ -18,7 +20,13 @@ export type CreateTemplateFormProps = {
   validateName: (name: string) => string | undefined;
 };
 
-export const CreateTemplateForm = ({ isPending, onCreate, validateContent, validateName }: CreateTemplateFormProps) => {
+export const CreateTemplateForm = ({
+  activeLanguages,
+  isPending,
+  onCreate,
+  validateContent,
+  validateName
+}: CreateTemplateFormProps) => {
   const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const formRef = React.useRef<HTMLFormElement>(null);
@@ -27,7 +35,7 @@ export const CreateTemplateForm = ({ isPending, onCreate, validateContent, valid
   const [isConfirmingMissingTranslations, setIsConfirmingMissingTranslations] = React.useState(false);
 
   const contentError = validateContent(draft);
-  const missingLanguages = LANGUAGES.filter((code) => !draft.body[code]?.trim());
+  const missingLanguages = activeLanguages.filter((code) => !draft.body[code]?.trim());
 
   const create = async () => {
     if (!(await onCreate(name.trim(), draft))) {
@@ -76,6 +84,7 @@ export const CreateTemplateForm = ({ isPending, onCreate, validateContent, valid
         <EmailTemplateEditor
           error={contentError}
           idPrefix="template-create"
+          languages={activeLanguages}
           template={draft}
           variables={ASSIGNMENT_TEMPLATE_VARS}
           onChange={setDraft}
