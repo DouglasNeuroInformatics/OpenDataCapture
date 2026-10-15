@@ -70,7 +70,8 @@ export default defineConfig({
           output: 'runtime-core-docs',
           sidebar: {
             collapsed: true,
-            label: 'Runtime Core API'
+            label: 'Runtime Core API',
+            translations: { fr: 'API de Runtime Core' }
           },
           tsconfig: path.resolve(runtimeCoreRoot, 'tsconfig.json')
         })
