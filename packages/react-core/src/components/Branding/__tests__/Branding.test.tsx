@@ -6,7 +6,7 @@ import { Branding } from '../Branding';
 describe('Branding', () => {
   afterEach(cleanup);
 
-  it.each(['lg', 'md', 'sm'] as const)('should render the wordmark at font size %s', (fontSize) => {
+  it.each(['lg', 'md'] as const)('should render the wordmark at font size %s', (fontSize) => {
     render(<Branding fontSize={fontSize} />);
     expect(screen.getByText('Open Data Capture')).toBeTruthy();
   });

@@ -201,7 +201,6 @@ const UserEditor = ({ userId }: { userId: string }) => {
             )}
 
             <UpdateUserForm
-              hideSubmitButton
               data={formData}
               id="admin-user-account-form"
               key={savedProfileCount}

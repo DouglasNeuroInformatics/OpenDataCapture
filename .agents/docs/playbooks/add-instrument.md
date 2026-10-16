@@ -17,7 +17,7 @@ advice does not apply here; everything it says about the definition object does.
    | `kind` in the definition | Directory                  | Read first                                                     |
    | ------------------------ | -------------------------- | -------------------------------------------------------------- |
    | `'FORM'`                 | `src/forms/` (plural)      | `src/forms/DNP_HAPPINESS_QUESTIONNAIRE/index.ts`               |
-   | `'INTERACTIVE'`          | `src/interactive/`         | `src/interactive/DNP_STROOP_TASK/` (multi-file JSX)            |
+   | `'INTERACTIVE'`          | `src/interactive/`         | `src/interactive/DNP_BREAKOUT_TASK/index.ts`                   |
    | `'SERIES'`               | `src/series/`              | `src/series/DNP_HAPPINESS_QUESTIONNAIRE_WITH_CONSENT/index.ts` |
    | `'FILE'`                 | `src/file/` (**singular**) | `src/file/MRI_SCAN_SESSION/index.ts`                           |
 
@@ -25,7 +25,7 @@ advice does not apply here; everything it says about the definition object does.
    `src/**/*/index.{js,jsx,ts,tsx}`, so the directory is the unit of work and `index.*` is the only
    fixed filename. **The directory must be flat**: the CLI then globs `<dir>/*` and reads every entry
    as a file, so a subdirectory fails the build with a `Cannot infer loader` error. Relative imports
-   need their extension (`'./StroopTask.tsx'`, `'./styles.css'`).
+   need their extension (`'./styles.css'`, `'./Component.tsx'`).
 
 3. **Import everything from `/runtime/v1/...`**, never from `node_modules` or a workspace package:
 
@@ -68,8 +68,7 @@ advice does not apply here; everything it says about the definition object does.
 
    then `await this.instrumentsService.create({ bundle: myNewForm })` inside `init`. **Order in
    `init` is load-bearing**: a series must be created after every instrument it references (step 5).
-   Skipping this step compiles, builds, and produces an instrument that is never in a demo instance —
-   `DNP_STROOP_TASK` is the live example of that.
+   Skipping this step compiles, builds, and produces an instrument that is never in a demo instance.
 
 7. **Add a unit test and an end-to-end test.** The unit test goes in the top-level
    `packages/instrument-library/src/__tests__/`, never inside the instrument directory (§Tests in
@@ -82,7 +81,7 @@ advice does not apply here; everything it says about the definition object does.
 pnpm exec turbo run build --filter=@opendatacapture/instrument-library  # builds runtime/v1 first
 pnpm --filter @opendatacapture/instrument-library run available         # reads dist, not src
 pnpm lint
-pnpm test
+pnpm test:coverage
 pnpm test:e2e
 ```
 

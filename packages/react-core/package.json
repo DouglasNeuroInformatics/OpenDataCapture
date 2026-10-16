@@ -7,27 +7,19 @@
   "license": "Apache-2.0",
   "exports": {
     ".": "./src/index.ts",
-    "./globals.css": "./src/globals.css",
-    "./package.json": "./package.json"
+    "./globals.css": "./src/globals.css"
   },
   "scripts": {
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
-    "test": "vitest",
-    "storybook": "storybook dev -p 6006"
+    "test": "vitest"
   },
   "peerDependencies": {
-    "@tanstack/react-router": "^1.170.40",
     "axios": "catalog:",
     "react": "workspace:react__19.x@*",
     "react-dom": "workspace:react-dom__19.x@*",
     "tailwindcss": "catalog:",
     "zod": "workspace:zod__3.x@*"
-  },
-  "peerDependenciesMeta": {
-    "@tanstack/react-router": {
-      "optional": true
-    }
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
@@ -35,9 +27,7 @@
     "@opendatacapture/instrument-bundler": "workspace:*",
     "@opendatacapture/instrument-interpreter": "workspace:*",
     "@opendatacapture/instrument-utils": "workspace:*",
-    "@opendatacapture/licenses": "workspace:*",
     "@opendatacapture/runtime-core": "workspace:*",
-    "@opendatacapture/runtime-internal": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@opendatacapture/subject-utils": "workspace:*",

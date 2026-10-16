@@ -30,6 +30,4 @@ const $$FileInstrument = <TLanguage extends InstrumentLanguage>(language?: TLang
   }) satisfies z.ZodType<FileInstrument<TLanguage>>;
 };
 
-const $FileInstrument = $$FileInstrument() satisfies z.ZodType<FileInstrument>;
-
-export { $$FileInstrument, $FileInstrument };
+export { $$FileInstrument };

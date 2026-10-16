@@ -65,7 +65,7 @@ bundler may delete any standalone top-level statement. Writing the switch as an 
 assigns to a hoisted `var` puts the initialization in such a statement: `apps/api`'s production
 bundle dropped the entire module and every instrument import failed with
 `ReferenceError: build is not defined` — a failure that only appears in a bundled build, never under
-`pnpm dev`. `src/__tests__/vendor.test.ts` bundles the module with tree shaking to guard this.
+`pnpm dev`. `src/vendor/__tests__/esbuild.test.ts` bundles the module with tree shaking to guard this.
 
 **`src/parse.ts` is vendored** from `parse-imports` (Apache-2.0, adapted to TypeScript and to run in a
 browser). Treat it as third-party: fix it upstream-style or not at all.
@@ -105,10 +105,5 @@ helpers (`transform`, `resolve`, `utils`, `preprocess`, `parse`, `schemas`).
 
 Fixtures are type-checked by `pnpm lint` — `tsconfig.json` includes `src/**/*` and maps
 `/runtime/v1/*` to `../../runtime/v1/dist/*`, so `runtime/v1` must be built for `tsc` to pass.
-
-`vitest.config.ts` declares an alias `'/runtime/v1' -> ./runtime/v1/dist` **relative to this package**,
-a directory that does not exist. Nothing in the suite resolves that specifier through vite (fixtures
-are read as text and handed to esbuild, which marks those imports external), and all tests pass. Treat
-it as dead config; do not build anything on top of it.
 
 There is no `build` script here — `package.json` exports `./src/index.ts` directly.

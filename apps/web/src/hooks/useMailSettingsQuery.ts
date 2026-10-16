@@ -2,7 +2,7 @@ import { $MailSettings } from '@opendatacapture/schemas/mail';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-export const MAIL_SETTINGS_QUERY_KEY = 'mail-settings';
+const MAIL_SETTINGS_QUERY_KEY = 'mail-settings';
 
 export const mailSettingsQueryOptions = () => {
   return queryOptions({

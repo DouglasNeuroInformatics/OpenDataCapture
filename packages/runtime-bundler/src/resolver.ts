@@ -32,15 +32,6 @@ export class Resolver {
         explanation: `resolution of '${id}/package.json' was unsuccessful`
       });
     }
-    if (!fs.existsSync(packageJsonPath)) {
-      throw ResolverError.forPackage(id, {
-        explanation: `resolved package.json file '${packageJsonPath}' does not exist`
-      });
-    } else if (!fs.lstatSync(packageJsonPath).isFile()) {
-      throw ResolverError.forPackage(id, {
-        explanation: `resolved package.json file '${packageJsonPath}' exists, but is not a file`
-      });
-    }
 
     const packageJsonContent = await fs.promises.readFile(packageJsonPath, 'utf-8');
     const packageRoot = path.dirname(packageJsonPath);

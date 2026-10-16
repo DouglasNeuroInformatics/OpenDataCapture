@@ -3,7 +3,7 @@ import path from 'node:path';
 import url from 'node:url';
 
 import type { AstroConfig, AstroIntegrationLogger } from 'astro';
-import { Application, PageEvent, ParameterType, RendererEvent, TSConfigReader } from 'typedoc';
+import { Application, PageEvent, ParameterType, RendererEvent } from 'typedoc';
 import type { Reflection, TypeDocOptions } from 'typedoc';
 import type { MarkdownPageEvent, PluginOptions } from 'typedoc-plugin-markdown';
 
@@ -30,18 +30,10 @@ const markdownPluginConfig: TypeDocConfig = {
 };
 
 async function generateTypeDoc(options: StarlightTypeDocOptions, config: AstroConfig, logger: AstroIntegrationLogger) {
-  const baseOutputDirectory = options.output ?? 'api';
-  const outputDirectory = options.locale ? `${options.locale}/${baseOutputDirectory}` : baseOutputDirectory;
+  const baseOutputDirectory = options.output;
+  const outputDirectory = `${options.locale}/${baseOutputDirectory}`;
 
-  const app = await bootstrapApp(
-    options.entryPoints,
-    options.tsconfig,
-    options.typeDoc,
-    outputDirectory,
-    options.pagination ?? false,
-    config.base,
-    logger
-  );
+  const app = await bootstrapApp(options.entryPoints, options.tsconfig, outputDirectory, config.base, logger);
   const reflections = await app.convert();
 
   if (
@@ -53,23 +45,15 @@ async function generateTypeDoc(options: StarlightTypeDocOptions, config: AstroCo
 
   const outputPath = path.join(url.fileURLToPath(config.srcDir), 'content/docs', outputDirectory);
 
-  if (options.watch) {
-    await app.convertAndWatch(async (reflections) => {
-      await app.generateDocs(reflections, outputPath);
-    });
-  } else {
-    await app.generateDocs(reflections, outputPath);
-  }
+  await app.generateDocs(reflections, outputPath);
 
-  return { baseOutputDirectory, outputDirectory, reflections };
+  return { baseOutputDirectory, reflections };
 }
 
 async function bootstrapApp(
   entryPoints: TypeDocOptions['entryPoints'],
   tsconfig: TypeDocOptions['tsconfig'],
-  config: TypeDocConfig = {},
   outputDirectory: string,
-  pagination: boolean,
   base: string,
   logger: AstroIntegrationLogger
 ) {
@@ -78,23 +62,20 @@ async function bootstrapApp(
   const app = await Application.bootstrapWithPlugins({
     ...defaultTypeDocConfig,
     ...markdownPluginConfig,
-    ...config,
     entryPoints,
-    // typedoc-plugin-markdown must be applied here so that it isn't overwritten by any additional applied plugins
-    plugin: [...(config.plugin ?? []), 'typedoc-plugin-markdown'],
+    plugin: ['typedoc-plugin-markdown'],
     tsconfig
   });
   app.logger = new StarlightTypeDocLogger(logger);
-  app.options.addReader(new TSConfigReader());
   // @ts-expect-error - inherited code
   app.renderer.defineTheme('starlight-typedoc', StarlightTypeDocTheme);
   app.renderer.on(PageEvent.BEGIN, (event: PageEvent<Reflection>) => {
     // @ts-expect-error - inherited code
-    onRendererPageBegin(event, pagination);
+    onRendererPageBegin(event);
   });
   app.renderer.on(PageEvent.END, (event: PageEvent<Reflection>) => {
     // @ts-expect-error - inherited code
-    const shouldRemovePage = onRendererPageEnd(event, pagination);
+    const shouldRemovePage = onRendererPageEnd(event);
     if (shouldRemovePage) {
       pagesToRemove.push(event.filename);
     }
@@ -112,17 +93,17 @@ async function bootstrapApp(
   return app;
 }
 
-function onRendererPageBegin(event: MarkdownPageEvent, pagination: boolean) {
+function onRendererPageBegin(event: MarkdownPageEvent) {
   if (event.frontmatter) {
     event.frontmatter.editUrl = false;
-    event.frontmatter.next = pagination;
-    event.frontmatter.prev = pagination;
+    event.frontmatter.next = false;
+    event.frontmatter.prev = false;
     event.frontmatter.title = event.model.name;
   }
 }
 
 // Returning `true` will delete the page from the filesystem.
-function onRendererPageEnd(event: MarkdownPageEvent, pagination: boolean) {
+function onRendererPageEnd(event: MarkdownPageEvent) {
   if (!event.contents) {
     return false;
   } else if (/^.+[/\\]README\.md$/.test(event.url)) {
@@ -136,8 +117,8 @@ function onRendererPageEnd(event: MarkdownPageEvent, pagination: boolean) {
   if (!event.frontmatter) {
     event.contents = addFrontmatter(event.contents, {
       editUrl: false,
-      next: pagination,
-      prev: pagination,
+      next: false,
+      prev: false,
       // Wrap in quotes to prevent issue with special characters in frontmatter
       title: `"${event.model.name}"`
     });
@@ -152,6 +133,6 @@ function onRendererEnd(pagesToRemove: string[]) {
   }
 }
 
-export type TypeDocConfig = Partial<Omit<TypeDocOptions, 'entryPoints' | 'tsconfig'> & PluginOptions>;
+type TypeDocConfig = Partial<Omit<TypeDocOptions, 'entryPoints' | 'tsconfig'> & PluginOptions>;
 
 export { generateTypeDoc };

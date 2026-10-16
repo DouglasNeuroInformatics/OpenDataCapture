@@ -32,16 +32,15 @@ that never says the word storage. Step 4 is where you avoid it.
    Done when `node --version` is v24.15.0 or newer and `pnpm --version` prints.
 
 3. **Generate `.env` — once per clone.** `pnpm generate:env` runs `scripts/generate-env.sh`, which
-   writes `.env` wholesale from `.env.template`: it fills `PROJECT_ROOT`, mints `SECRET_KEY`,
-   `GATEWAY_API_KEY`, `STORAGE_ACCESS_KEY` and `STORAGE_SECRET_KEY` with `openssl rand -hex`, and
-   points `GATEWAY_DATABASE_URL` at a sqlite file under `apps/gateway/data` (creating the
-   directory). Never re-run it over a working `.env`: it discards every local override and mints a
-   fresh `SECRET_KEY`, which invalidates live sessions and permanently orphans any stored
-   instrument-repo credential — `InstrumentReposService` encrypts those under `sha256(SECRET_KEY)`.
+   writes `.env` wholesale from `.env.template`: it mints `SECRET_KEY`, `GATEWAY_API_KEY`,
+   `STORAGE_ACCESS_KEY` and `STORAGE_SECRET_KEY` with `openssl rand -hex`, and points
+   `GATEWAY_DATABASE_URL` at a sqlite file under `apps/gateway/data` (creating the directory). Never
+   re-run it over a working `.env`: it discards every local override and mints a fresh `SECRET_KEY`,
+   which invalidates live sessions and permanently orphans any stored instrument-repo credential —
+   `InstrumentReposService` encrypts those under `sha256(SECRET_KEY)`.
    Adding one variable to an existing `.env` is `.agents/docs/playbooks/add-env-var.md`.
 
-   Done when `.env` exists, `PROJECT_ROOT` is the absolute repo root, and none of the four generated
-   keys is empty.
+   Done when `.env` exists and none of the four generated keys is empty.
 
 4. **Set `STORAGE_ENABLED=false` in `.env`** unless an S3-compatible service is listening on
    `STORAGE_ENDPOINT`. With it false, `StorageModule` provides `null` for the `S3Client`,

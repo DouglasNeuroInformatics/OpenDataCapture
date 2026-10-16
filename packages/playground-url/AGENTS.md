@@ -32,6 +32,9 @@ query string is sent to the server, and a large instrument pushes the request li
 
 ## Tests
 
-`pnpm exec vitest --project playground-url`. The one test file, `src/share-url.test.ts`, sits beside
-the source rather than in a `__tests__/` folder and is round-trip based: encode, decode, assert
-equality. Follow that shape.
+`pnpm exec vitest --project playground-url`. `src/__tests__/share-url.test.ts` is round-trip based:
+encode, decode, assert equality — follow that shape for the library. `src/__tests__/cli.test.ts` runs
+the CLI by importing `src/cli.ts` with a
+stubbed `process.argv` and a mocked `spawn`. Pin `process.platform` in any test that reaches
+`openInBrowser`: CI runs on Linux, so a branch only the host OS takes is uncovered there and fails
+the 100% coverage gate.

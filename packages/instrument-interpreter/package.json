@@ -16,8 +16,5 @@
     "@opendatacapture/runtime-core": "workspace:*",
     "@opendatacapture/runtime-internal": "workspace:*",
     "@opendatacapture/schemas": "workspace:*"
-  },
-  "devDependencies": {
-    "type-fest": "workspace:type-fest__4.x@*"
   }
 }

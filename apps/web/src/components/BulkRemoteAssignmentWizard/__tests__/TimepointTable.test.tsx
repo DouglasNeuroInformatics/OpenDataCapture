@@ -16,8 +16,8 @@ afterEach(cleanup);
 
 describe('TimepointTable', () => {
   it('should list each instrument with its expiry', () => {
-    render(<TimepointTable data-testid="timepoint-table" timepoints={timepoints} />);
-    const rows = screen.getByTestId('timepoint-table').querySelectorAll('tbody tr');
+    const { container } = render(<TimepointTable timepoints={timepoints} />);
+    const rows = container.querySelectorAll('tbody tr');
     expect([...rows].map((row) => row.textContent)).toEqual([
       'Happiness Questionnaire2030-01-01',
       'General Consent Form2030-06-01'

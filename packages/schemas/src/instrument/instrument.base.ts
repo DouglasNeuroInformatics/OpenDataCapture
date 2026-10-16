@@ -12,10 +12,7 @@ import type {
   InstrumentMeasureVisibility,
   InstrumentUIOption,
   InstrumentValidationSchema,
-  ScalarInstrument,
-  UnilingualClientInstrumentDetails,
-  UnilingualInstrumentDetails,
-  UnilingualInstrumentMeasures
+  ScalarInstrument
 } from '@opendatacapture/runtime-core';
 import type { Simplify } from 'type-fest';
 import { z } from 'zod/v4';
@@ -97,11 +94,6 @@ const $$ClientInstrumentDetails = <TLanguage extends InstrumentLanguage>(languag
 
 const $ClientInstrumentDetails = $$ClientInstrumentDetails() satisfies z.ZodType<ClientInstrumentDetails>;
 
-const $UnilingualClientInstrumentDetails = $ClientInstrumentDetails.extend({
-  instructions: z.array(z.string().min(1)).optional(),
-  title: z.string().min(1).optional()
-}) satisfies z.ZodType<UnilingualClientInstrumentDetails>;
-
 const $$InstrumentDetails = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return $$ClientInstrumentDetails(language)
     .required({ title: true })
@@ -115,12 +107,6 @@ const $$InstrumentDetails = <TLanguage extends InstrumentLanguage>(language?: TL
 };
 
 const $InstrumentDetails = $$InstrumentDetails() satisfies z.ZodType<InstrumentDetails>;
-
-const $UnilingualInstrumentDetails = $InstrumentDetails.extend({
-  description: z.string().min(1),
-  instructions: z.array(z.string().min(1)).optional(),
-  title: z.string().min(1)
-}) satisfies z.ZodType<UnilingualInstrumentDetails>;
 
 const $InstrumentMeasureVisibility: z.ZodType<InstrumentMeasureVisibility> = z.enum(['hidden', 'visible']);
 
@@ -147,14 +133,6 @@ const $$ComputedInstrumentMeasure = <TLanguage extends InstrumentLanguage>(langu
   }) satisfies z.ZodType<ComputedInstrumentMeasure<any, TLanguage>>;
 };
 
-const $UnilingualComputedInstrumentMeasure = z.object({
-  hidden: z.boolean().optional(),
-  kind: z.literal('computed'),
-  label: z.string(),
-  value: $AnyDynamicFunction,
-  visibility: $InstrumentMeasureVisibility.optional()
-}) satisfies z.ZodType<ComputedInstrumentMeasure<any, Language>>;
-
 const $$ConstantInstrumentMeasure = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return z.object({
     hidden: z.boolean().optional(),
@@ -165,25 +143,12 @@ const $$ConstantInstrumentMeasure = <TLanguage extends InstrumentLanguage>(langu
   }) satisfies z.ZodType<ConstantInstrumentMeasure<any, TLanguage>>;
 };
 
-const $UnilingualConstantInstrumentMeasure = z.object({
-  hidden: z.boolean().optional(),
-  kind: z.literal('const'),
-  label: z.string().optional(),
-  ref: z.string(),
-  visibility: $InstrumentMeasureVisibility.optional()
-}) satisfies z.ZodType<ConstantInstrumentMeasure<any, Language>>;
-
 const $$InstrumentMeasures = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return z.record(
     z.string(),
     z.discriminatedUnion('kind', [$$ComputedInstrumentMeasure(language), $$ConstantInstrumentMeasure(language)])
   ) satisfies z.ZodType<InstrumentMeasures<any, TLanguage>>;
 };
-
-const $UnilingualInstrumentMeasures = z.record(
-  z.string(),
-  z.discriminatedUnion('kind', [$UnilingualComputedInstrumentMeasure, $UnilingualConstantInstrumentMeasure])
-) satisfies z.ZodType<UnilingualInstrumentMeasures>;
 
 const $$BaseInstrument = <const TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return z.object({
@@ -213,16 +178,6 @@ const $$ScalarInstrument = <TLanguage extends InstrumentLanguage>(language?: TLa
     validationSchema: $InstrumentValidationSchema
   }) satisfies z.ZodType<ScalarInstrument<any, TLanguage>>;
 };
-
-const $ScalarInstrument = $$ScalarInstrument() satisfies z.ZodType<ScalarInstrument>;
-
-const $UnilingualScalarInstrument = $ScalarInstrument.extend({
-  clientDetails: $UnilingualClientInstrumentDetails.optional(),
-  details: $UnilingualInstrumentDetails,
-  language: $InstrumentAuthoringLanguage,
-  measures: $UnilingualInstrumentMeasures.nullable(),
-  tags: z.array(z.string().min(1))
-}) satisfies z.ZodType<ScalarInstrument<any, Language>>;
 
 /**
  * The fields common to every instrument's "info" (essential describing data, omitting the content and
@@ -385,8 +340,6 @@ export {
   $$InstrumentUIOption,
   $$ScalarInstrument,
   $AnyDynamicFunction,
-  $BaseInstrument,
-  $ClientInstrumentDetails,
   $CreateInstrumentData,
   $CreateSeriesInstrumentData,
   $InstrumentBundleContainer,
@@ -396,14 +349,8 @@ export {
   $InstrumentLanguage,
   $InstrumentMeasureValue,
   $InstrumentValidationSchema,
-  $RecordArrayFieldValue,
-  $ScalarInstrument,
-  $ScalarInstrumentBundleContainer,
   $ScalarInstrumentInternal,
-  $SeriesInstrumentInfo,
   $SeriesInstrumentOverview,
-  $UnilingualInstrumentDetails,
-  $UnilingualScalarInstrument,
   $UpdateSeriesInstrumentData
 };
 

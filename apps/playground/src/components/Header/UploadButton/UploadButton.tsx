@@ -79,9 +79,6 @@ export const UploadButton = () => {
         setIsOpen={setIsDialogOpen}
         title={t({ en: 'Upload Archive', fr: 'Téléverser une archive' })}
         onSubmit={handleSubmit}
-        onValidate={() => {
-          return { result: 'success' };
-        }}
       />
     </React.Fragment>
   );

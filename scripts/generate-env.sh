@@ -19,7 +19,6 @@ gatewayDbUrl="file:$gatewayDataDir/gateway.db"
 # Read .env.template and replace placeholders
 envFile="$projectRoot/.env.template"
 envContent=$(cat "$envFile")
-envContent=${envContent//PROJECT_ROOT=/"PROJECT_ROOT=$projectRoot"}
 # Anchor to line start so this does not also match STORAGE_SECRET_KEY=
 envContent=${envContent//$'\n'SECRET_KEY=/$'\n'"SECRET_KEY=$secretKey"}
 envContent=${envContent//GATEWAY_DATABASE_URL=/"GATEWAY_DATABASE_URL=$gatewayDbUrl"}

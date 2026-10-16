@@ -20,7 +20,6 @@
     "@opendatacapture/instrument-bundler": "workspace:*",
     "@opendatacapture/playground-url": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
-    "@opendatacapture/runtime-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@radix-ui/react-context-menu": "^2.3.7",
@@ -41,10 +40,8 @@
     "react-dropzone": "catalog:",
     "react-error-boundary": "^6.1.6",
     "react-resizable-panels": "^3.0.6",
-    "stacktrace-parser": "^0.1.11",
     "ts-pattern": "workspace:ts-pattern__5.x@*",
     "zod": "workspace:zod__3.x@*",
-    "zod-validation-error": "^5.0.0",
     "zustand": "catalog:"
   },
   "devDependencies": {

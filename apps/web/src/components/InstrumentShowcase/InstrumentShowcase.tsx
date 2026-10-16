@@ -62,9 +62,8 @@ export const InstrumentShowcase: React.FC<{
   }, [availableInstruments]);
 
   useEffect(() => {
-    if (highlightedIndex < 0 || !listRef.current) return;
-    const items = listRef.current.querySelectorAll<HTMLElement>('[data-instrument-index]');
-    items[highlightedIndex]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const items = listRef.current?.querySelectorAll<HTMLElement>('[data-instrument-index]');
+    items?.[highlightedIndex]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [highlightedIndex]);
 
   const handleKeyDown = useCallback(

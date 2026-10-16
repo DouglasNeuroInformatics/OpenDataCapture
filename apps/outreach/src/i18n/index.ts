@@ -2,7 +2,6 @@ import { get } from 'lodash-es';
 
 import blog from './translations/blog.json';
 import common from './translations/common.json';
-import docs from './translations/docs.json';
 import faq from './translations/faq.json';
 import landing from './translations/landing.json';
 import meta from './translations/meta.json';
@@ -19,7 +18,6 @@ type ExtractTranslationKey<T extends { [key: string]: unknown }, Key = keyof T> 
 const TRANSLATIONS = {
   blog,
   common,
-  docs,
   faq,
   landing,
   meta,
@@ -27,8 +25,6 @@ const TRANSLATIONS = {
 };
 
 type Translations = typeof TRANSLATIONS;
-
-type TranslationMode = 'client' | 'static';
 
 type Language = 'en' | 'fr';
 
@@ -71,5 +67,5 @@ const useTranslations: UseTranslations = (url) => {
   return { altLanguage, altURL, resolvedLanguage, t, translatePath } as const;
 };
 
-export { TRANSLATIONS, useTranslations };
-export type { Language, TranslationKey, TranslationMode, Translations };
+export { useTranslations };
+export type { Language };

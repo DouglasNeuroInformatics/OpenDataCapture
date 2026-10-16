@@ -50,7 +50,7 @@ export const ShareButton = () => {
             <Share2Icon />
           </Tooltip.Trigger>
         </Popover.Trigger>
-        <Popover.Content align="end" autofocus={false} className="w-[520px] p-4">
+        <Popover.Content align="end" autofocus={false} className="w-130 p-4">
           <div className="flex flex-col space-y-2 text-center sm:text-left">
             <Heading variant="h5">{t({ en: 'Share Instrument', fr: "Partager l'instrument" })}</Heading>
             <p className="text-muted-foreground text-sm">

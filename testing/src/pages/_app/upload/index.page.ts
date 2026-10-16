@@ -3,12 +3,10 @@ import type { Locator, Page } from '@playwright/test';
 import { AppPage } from '../route.page';
 
 export class UploadPage extends AppPage {
-  readonly pageHeader: Locator;
   readonly searchInput: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.pageHeader = page.getByTestId('page-header');
     this.searchInput = page.getByPlaceholder('Search by Instrument Title');
   }
 

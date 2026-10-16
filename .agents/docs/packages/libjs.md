@@ -2,7 +2,7 @@
 
 A collection of utility functions and types for Node.js and the browser.
 
-**Status in Open Data Capture:** the most widely spread DNP package here — imported in ~40 files across `apps/api`, `apps/web`, `apps/playground`, `packages/demo`, `packages/instrument-utils`, `packages/react-core`, `packages/runtime-bundler`, `packages/schemas`, `packages/serve-instrument`, and `testing`. (`packages/instrument-stubs` and `packages/vite-plugin-runtime` also declare it, with no current imports.)
+**Status in Open Data Capture:** the most widely spread DNP package here — imported in ~40 files across `apps/api`, `apps/web`, `apps/playground`, `packages/demo`, `packages/instrument-stubs`, `packages/instrument-utils`, `packages/react-core`, `packages/runtime-bundler`, `packages/schemas`, `packages/serve-instrument`, and `testing`.
 
 Single root export; there are no subpaths.
 

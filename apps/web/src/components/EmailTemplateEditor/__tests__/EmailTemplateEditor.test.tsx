@@ -114,8 +114,8 @@ describe('EmailTemplateEditor', () => {
     expect(screen.queryByText('Insert:')).toBeNull();
   });
 
-  it('should lock the fields and hide the insert buttons when read-only', () => {
-    renderEditor({ readOnly: true, variables: ['name'] });
+  it('should lock the fields and hide the insert buttons without a change handler, so a template can be shown read-only', () => {
+    renderEditor({ onChange: undefined, variables: ['name'] });
     expect(subjectInput().readOnly).toBe(true);
     expect(bodyInput().readOnly).toBe(true);
     expect(screen.queryByTestId('invite-insert-name')).toBeNull();

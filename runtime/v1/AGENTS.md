@@ -14,11 +14,11 @@ Read the root `AGENTS.md` first for the rules that apply everywhere.
 `runtime.config.js`. Until that has run, a fresh checkout is broken in ways whose error messages do
 not mention this directory:
 
-| Consumer                                                                                                                      | Failure when `dist/` is missing                                                                                                                                                                              |
-| ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `packages/vite-plugin-runtime`                                                                                                | `generateMetadata` in `packages/runtime-meta/src/index.js` calls `generateManifest`, whose `resolveDir` runs `readdir` on it → ENOENT while the Vite config is being resolved (the plugin factory awaits it) |
-| `apps/api`                                                                                                                    | the `#runtime/v1/*` subpath import declared in `apps/api/package.json` resolves to nothing                                                                                                                   |
-| `instrument-bundler`, `instrument-library`, `playground`, `schemas`, `react-core`, `serve-instrument`, `gateway`, `storybook` | their tsconfig `paths` map `/runtime/v1/*` → `../../runtime/v1/dist/*`, so every instrument import is an unresolved module                                                                                   |
+| Consumer                                                                                                     | Failure when `dist/` is missing                                                                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `packages/vite-plugin-runtime`                                                                               | `generateMetadata` in `packages/runtime-meta/src/index.js` calls `generateManifest`, whose `resolveDir` runs `readdir` on it → ENOENT while the Vite config is being resolved (the plugin factory awaits it) |
+| `apps/api`                                                                                                   | the `#runtime/v1/*` subpath import declared in `apps/api/package.json` resolves to nothing                                                                                                                   |
+| `instrument-bundler`, `instrument-library`, `playground`, `react-core`, `serve-instrument`, `gateway`, `web` | their tsconfig `paths` map `/runtime/v1/*` → `../../runtime/v1/dist/*`, so every instrument import is an unresolved module                                                                                   |
 
 Turbo covers this for `build` and `lint` (both depend on `^build`) but not for a bare `tsc` or
 `vitest` run. The build `rm -rf`s `outdir` before writing, so nothing hand-placed in `dist/` survives.
@@ -62,8 +62,6 @@ Export-shape rules and the `.d.ts` import constraint are in `packages/runtime-bu
 package with a `publishConfig` whose version is not yet on npm. Do not hand-edit it.
 
 There is **no `lint` or `format` script here**, so `pnpm lint` never type-checks this directory.
-`tsconfig.json` still lists `build.ts` and `src/**/*`, neither of which exists, and
-`eslint.config.js` ignores both `runtime/v1/src/**/*.d.ts` and all of `vendor/`.
 
 ## Tests
 

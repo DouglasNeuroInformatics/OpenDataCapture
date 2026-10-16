@@ -50,5 +50,5 @@ export const $BuildFailure = z.object({
   warnings: z.array($Message)
 }) satisfies z.ZodType<BuildFailure>;
 
-export { $BundleOptions, $BundlerInput };
+export { $BundleOptions };
 export type { BundleOptions, BundlerInput };

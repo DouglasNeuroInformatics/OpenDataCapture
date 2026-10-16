@@ -150,14 +150,12 @@ const RouteComponent = () => {
   return (
     <Dialog
       open={isDialogOpen || isConfirmDeleteOpen || isViewOpen}
-      onOpenChange={(open) => {
-        if (!open) {
-          setIsDialogOpen(false);
-          setIsConfirmDeleteOpen(false);
-          setIsViewOpen(false);
-          setRepoToView(null);
-          setRepoToDelete(null);
-        }
+      onOpenChange={() => {
+        setIsDialogOpen(false);
+        setIsConfirmDeleteOpen(false);
+        setIsViewOpen(false);
+        setRepoToView(null);
+        setRepoToDelete(null);
       }}
     >
       <PageHeader>
@@ -256,7 +254,7 @@ const RouteComponent = () => {
         }}
       />
       {isDialogOpen && (
-        <Dialog.Content className="sm:max-w-[475px]">
+        <Dialog.Content className="sm:max-w-118.75">
           <Dialog.Header>
             <Dialog.Title>
               {t({
@@ -282,7 +280,7 @@ const RouteComponent = () => {
         </Dialog.Content>
       )}
       {isViewOpen && repoToView && (
-        <Dialog.Content className="sm:max-w-[900px]">
+        <Dialog.Content className="sm:max-w-225">
           <Dialog.Header>
             <Dialog.Title>
               {t({

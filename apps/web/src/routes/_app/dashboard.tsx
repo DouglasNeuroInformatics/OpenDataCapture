@@ -405,7 +405,7 @@ const RouteComponent = () => {
           >
             <div className="p-8 pb-4">
               <div className="flex items-center gap-4">
-                <div className="rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-600/20 p-3 transition-all duration-300 group-hover:from-blue-500/30 group-hover:to-indigo-600/30">
+                <div className="rounded-xl bg-linear-to-br from-blue-500/20 to-indigo-600/20 p-3 transition-all duration-300 group-hover:from-blue-500/30 group-hover:to-indigo-600/30">
                   <DocumentTextIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
@@ -529,7 +529,7 @@ const RouteComponent = () => {
           >
             <div className="p-8 pb-4">
               <div className="flex items-center gap-4">
-                <div className="rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-600/20 p-3 transition-all duration-300 group-hover:from-amber-500/30 group-hover:to-orange-600/30">
+                <div className="rounded-xl bg-linear-to-br from-amber-500/20 to-orange-600/20 p-3 transition-all duration-300 group-hover:from-amber-500/30 group-hover:to-orange-600/30">
                   <UserIcon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>

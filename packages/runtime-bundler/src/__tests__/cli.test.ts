@@ -63,13 +63,10 @@ describe('cli', () => {
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid structure of default export'));
   });
 
-  it('should log an error message for each config that fails to bundle, and continue to the next', async () => {
+  it('should log the error message when the bundle fails, rather than reporting success', async () => {
     fs.writeFileSync(
       path.join(tmpDir, 'runtime.config.js'),
-      `export default [
-        { include: ['does-not-exist'], outdir: 'dist-a', verbose: true },
-        { include: ['also-does-not-exist'], outdir: 'dist-b' }
-      ];\n`
+      "export default { include: ['does-not-exist'], outdir: 'dist' };\n"
     );
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);

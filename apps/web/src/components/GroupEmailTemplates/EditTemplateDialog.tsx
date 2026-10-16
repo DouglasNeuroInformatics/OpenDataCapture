@@ -29,8 +29,8 @@ const EditTemplateForm = ({
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const [name, setName] = React.useState(template.name);
   const [draft, setDraft] = React.useState<MailTemplate>({
-    body: template.body ?? {},
-    subject: template.subject ?? {}
+    body: template.body,
+    subject: template.subject
   });
 
   const contentError = validateContent(draft);

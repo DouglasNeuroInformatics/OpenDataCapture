@@ -1,5 +1,4 @@
 import { Heading } from '@douglasneuroinformatics/libui/components';
-import { cn } from '@douglasneuroinformatics/libui/utils';
 import { InstrumentBundlerError } from '@opendatacapture/instrument-bundler';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 
@@ -9,7 +8,6 @@ import { StackTrace } from './StackTrace';
 import { ToggledContent } from './ToggledContent';
 
 export type InstrumentErrorFallbackProps = {
-  className?: string;
   context: {
     files: BundlerInput[];
     indexFilename: null | string;
@@ -19,15 +17,9 @@ export type InstrumentErrorFallbackProps = {
   title: string;
 };
 
-export const InstrumentErrorFallback = ({
-  className,
-  context,
-  description,
-  error,
-  title
-}: InstrumentErrorFallbackProps) => {
-  return error ? (
-    <div className={cn('space-y-2', className)}>
+export const InstrumentErrorFallback = ({ context, description, error, title }: InstrumentErrorFallbackProps) => {
+  return (
+    <div className="space-y-2">
       <div className="pb-2">
         <Heading className="font-bold" variant="h4">
           {title}
@@ -45,5 +37,5 @@ export const InstrumentErrorFallback = ({
       )}
       {error.stack && <StackTrace stack={error.stack} />}
     </div>
-  ) : null;
+  );
 };

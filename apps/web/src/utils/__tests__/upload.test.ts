@@ -558,10 +558,6 @@ describe('Zod4', () => {
       expect(result).toBe('number (optional)');
     });
 
-    it('should describe an integer as a number', () => {
-      expect(Zod4.generateSampleData({ isOptional: false, typeName: 'int' })).toBe('number');
-    });
-
     it('should generate sample data for enum type', () => {
       const result = Zod4.generateSampleData({
         enumValues: ['option1', 'option2', 'option3'],
@@ -623,6 +619,16 @@ describe('Zod4', () => {
   });
 
   describe('createUploadTemplateCSV', () => {
+    it('should describe an integer column as a number, since zod 4 integers are number schemas', () => {
+      const { content } = createUploadTemplateCSV(instrumentWith(z4.object({ age: z4.int() })));
+      expect(content).toBe(
+        unparse([
+          ['subjectID', 'date', 'age'],
+          ['string', 'yyyy-mm-dd', 'number']
+        ])
+      );
+    });
+
     it('should list the internal columns, then every field with sample data', () => {
       const schema = z4.object({
         count: z4.number().optional(),

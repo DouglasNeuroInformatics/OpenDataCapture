@@ -36,7 +36,7 @@ import { createRoot } from '/runtime/v1/react-dom@19.x/client.js';
 
 These resolve differently on each tier and are covered in
 `.agents/docs/architecture/runtime-and-vendor.md`. Sibling files use ordinary relative imports
-(`'./styles.css'`, `'./StroopTask.tsx'`).
+(`'./styles.css'`, `'./Component.tsx'`).
 
 Three places produce instrument source:
 

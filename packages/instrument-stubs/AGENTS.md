@@ -1,8 +1,8 @@
 # packages/instrument-stubs
 
 Fixture instruments for tests and Storybook, one export per kind (`./file`, `./forms`,
-`./interactive`, `./series`). Consumed by `packages/schemas` tests, `packages/react-core` and
-`apps/web` stories, and `storybook`.
+`./interactive`, `./series`). Consumed by `packages/schemas` and `apps/web` tests, and by
+`packages/react-core` and `apps/web` stories, which `storybook` renders.
 
 Written in vanilla JavaScript deliberately: the same stubs are bundled by esbuild in the browser and
 in Node, and transpilation differences between the two would break that. Do not add a `.ts` file
@@ -38,10 +38,11 @@ failing `packages/schemas` test or a consumer's `tsc` error.
 ## Tests
 
 `pnpm exec vitest --project instrument-stubs` runs `src/__tests__/*.test.js` in vitest's node
-environment. **Tests are `.test.js`, not `.test.ts`**: vitest would run either, but with no
-`tsconfig.json` here eslint's typed parser rejects a `.ts` file with `couldn't find any
-tsconfig.json`, failing `lint`. Import the stub modules directly (`../forms.js`); each export is the
-`{ instance, ... }` object `createInstrumentStub` resolves to.
+environment; a test that needs a DOM (as `interactive.test.js` does) opts into happy-dom with a
+`// @vitest-environment happy-dom` header. **Tests are `.test.js`, not `.test.ts`**: vitest would
+run either, but with no `tsconfig.json` here eslint's typed parser rejects a `.ts` file with
+`couldn't find any tsconfig.json`, failing `lint`. Import the stub modules directly
+(`../forms.js`); each export is the `{ instance, ... }` object `createInstrumentStub` resolves to.
 
 The stubs are also the fixtures for `packages/schemas/src/instrument/__tests__/*.test.ts`, so
 changing one changes what those tests assert.

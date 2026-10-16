@@ -9,8 +9,6 @@ import { CommandGroup } from './CommandGroup';
 import { CommandInput } from './CommandInput';
 import { CommandItem } from './CommandItem';
 import { CommandList } from './CommandList';
-import { CommandSeparator } from './CommandSeparator';
-import { CommandShortcut } from './CommandShortcut';
 
 type CommandRootProps = Simplify<React.ComponentPropsWithoutRef<typeof CommandPrimitive>>;
 
@@ -35,7 +33,5 @@ export const Command = Object.assign(CommandRoot, {
   Group: CommandGroup,
   Input: CommandInput,
   Item: CommandItem,
-  List: CommandList,
-  Separator: CommandSeparator,
-  Shortcut: CommandShortcut
+  List: CommandList
 });

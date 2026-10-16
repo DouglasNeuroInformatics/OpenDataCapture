@@ -3,8 +3,7 @@ import { z } from 'zod/v4';
 import { $AuthoredLocalizedString, $BaseModel, $LocalizedString, $RegexString } from '../core/core.js';
 import { $SubjectIdentificationMethod } from '../subject/subject.js';
 
-export type GroupSettings = z.infer<typeof $GroupSettings>;
-export const $GroupSettings = z.object({
+const $GroupSettings = z.object({
   defaultIdentificationMethod: $SubjectIdentificationMethod,
   idValidationRegex: $RegexString.nullish(),
   idValidationRegexErrorMessage: $LocalizedString.nullish(),
@@ -12,8 +11,7 @@ export const $GroupSettings = z.object({
   subjectIdDisplayLength: z.number().nullish()
 });
 
-export type GroupType = z.infer<typeof $GroupType>;
-export const $GroupType = z.enum(['CLINICAL', 'RESEARCH']);
+const $GroupType = z.enum(['CLINICAL', 'RESEARCH']);
 
 /**
  * A named remote-assignment email template authored by a group manager. Bodies support the
@@ -21,13 +19,16 @@ export const $GroupType = z.enum(['CLINICAL', 'RESEARCH']);
  * least one language: a stored template with neither would otherwise reach a participant as an
  * empty subject over a bare link, reported as sent.
  */
-export type GroupEmailTemplate = z.infer<typeof $GroupEmailTemplate>;
-export const $GroupEmailTemplate = z.object({
+const $GroupEmailTemplate = z.object({
   body: $AuthoredLocalizedString,
   id: z.string().min(1),
   name: z.string().min(1),
   subject: $AuthoredLocalizedString
 });
+
+export type GroupSettings = z.infer<typeof $GroupSettings>;
+
+export type GroupEmailTemplate = z.infer<typeof $GroupEmailTemplate>;
 
 export type Group = z.infer<typeof $Group>;
 export const $Group = $BaseModel.extend({

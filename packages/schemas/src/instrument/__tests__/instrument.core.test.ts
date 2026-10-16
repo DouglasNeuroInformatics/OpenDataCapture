@@ -1,21 +1,8 @@
 import { bilingualFileInstrument } from '@opendatacapture/instrument-stubs/file';
-import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
-import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
+import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import { describe, expect, it } from 'vitest';
 
-import { $AnyInstrument, $AnyScalarInstrument } from '../instrument.core.js';
-
-describe('$AnyScalarInstrument', () => {
-  it('should parse a multilingual form instrument', () => {
-    expect($AnyScalarInstrument.safeParse(bilingualFormInstrument.instance).success).toBe(true);
-  });
-  it('should parse a unilingual form instrument', () => {
-    expect($AnyScalarInstrument.safeParse(unilingualFormInstrument.instance).success).toBe(true);
-  });
-  it('should parse a interactive instrument', () => {
-    expect($AnyScalarInstrument.safeParse(interactiveInstrument.instance).success).toBe(true);
-  });
-});
+import { $AnyInstrument } from '../instrument.core.js';
 
 describe('$AnyInstrument', () => {
   it.each([

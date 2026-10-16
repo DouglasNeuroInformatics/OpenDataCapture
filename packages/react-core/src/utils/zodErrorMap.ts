@@ -557,4 +557,4 @@ const localizeZodErrors = async ({
 };
 
 export { createZodErrorMaps, localizeZodErrors };
-export type { TranslatorLike, ZodErrorMaps, ZodErrorMapTarget };
+export type { TranslatorLike };

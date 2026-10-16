@@ -9,14 +9,6 @@ import { Resolver } from './resolver.js';
 import type { BundlerOptions, EntryPoint, ExportCondition, ResolvedPackage } from './types.js';
 
 export class Bundler {
-  private logger = {
-    verbose: (message: string) => {
-      if (this.options.verbose) {
-        // eslint-disable-next-line no-console
-        console.log(message);
-      }
-    }
-  };
   private resolver: Resolver;
 
   constructor(private options: BundlerOptions) {
@@ -25,9 +17,7 @@ export class Bundler {
 
   async bundle(): Promise<void> {
     const packages = await this.findPackages();
-    this.logger.verbose(`Found packages: ${JSON.stringify(packages, null, 2)}`);
     const { assetEntryPoints, moduleEntryPoints } = this.getEntryPoints(packages);
-    this.logger.verbose(`Found entry points: ${JSON.stringify({ assetEntryPoints, moduleEntryPoints }, null, 2)}`);
 
     await fs.rm(this.options.outdir, { force: true, recursive: true });
     await esbuild.build({

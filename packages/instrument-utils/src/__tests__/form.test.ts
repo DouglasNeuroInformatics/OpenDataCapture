@@ -34,7 +34,7 @@ describe('extractFieldLabel', () => {
   const form = { content: { a: fieldA } } as unknown as FormInstrument<TData, Language>;
 
   it("should return a static field's label directly", () => {
-    expect(extractFieldLabel<TData>(form, 'a')).toBe('A');
+    expect(extractFieldLabel<TData>(form, 'a', { a: 1, b: 2 })).toBe('A');
   });
 
   it("should call a dynamic field's render function with the given data and return its label", () => {

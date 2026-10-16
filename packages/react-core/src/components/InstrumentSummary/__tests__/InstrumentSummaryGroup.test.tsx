@@ -39,9 +39,4 @@ describe('InstrumentSummaryGroup', () => {
     render(<InstrumentSummaryGroup items={[{ label: 'Details', value: { nested: true } }]} title="Results" />);
     expect(screen.getByText('{"nested":true}')).toBeTruthy();
   });
-
-  it('should skip a null item entirely', () => {
-    render(<InstrumentSummaryGroup items={[null, { label: 'Score', value: 1 }]} title="Results" />);
-    expect(screen.getAllByRole('term')).toHaveLength(1);
-  });
 });

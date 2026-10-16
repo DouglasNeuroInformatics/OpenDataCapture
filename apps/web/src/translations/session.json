@@ -23,11 +23,6 @@
       "en": "The assessment must be in the past",
       "es": "La evaluación debe estar en el pasado",
       "fr": "L'évaluation doit être dans le passé"
-    },
-    "mustBeAdult": {
-      "en": "The subject must be at least 18 years old",
-      "es": "El sujeto debe tener al menos 18 años de edad",
-      "fr": "Le client doit avoir au moins 18 ans"
     }
   },
   "startSession": {

@@ -68,4 +68,4 @@ async function buildClient() {
 await fs.promises.rm(outdir, { force: true, recursive: true });
 await fs.promises.mkdir(outdir);
 
-await Promise.all([buildCli(), buildClient(), buildStyles()]);
+await Promise.all([buildCli(), buildClient()]);

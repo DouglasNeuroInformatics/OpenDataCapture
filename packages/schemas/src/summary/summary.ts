@@ -1,7 +1,6 @@
 import { z } from 'zod/v4';
 
-export type $Trend = z.infer<typeof $Trend>;
-export const $Trend = z.array(
+const $Trend = z.array(
   z.object({
     timestamp: z.int().nonnegative(),
     value: z.int().nonnegative()

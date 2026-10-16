@@ -21,13 +21,7 @@ async function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
-export async function loadAssetAsBase64(url: string): Promise<string> {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return blobToBase64(blob);
-}
-
-export async function loadNativeFileContent(file: File): Promise<string> {
+async function loadNativeFileContent(file: File): Promise<string> {
   let content: string;
   if (isBase64EncodedFileType(file.name)) {
     content = await blobToBase64(file);
@@ -35,6 +29,12 @@ export async function loadNativeFileContent(file: File): Promise<string> {
     content = await file.text();
   }
   return content;
+}
+
+export async function loadAssetAsBase64(url: string): Promise<string> {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return blobToBase64(blob);
 }
 
 export async function loadEditorFilesFromNative(files: File[]) {

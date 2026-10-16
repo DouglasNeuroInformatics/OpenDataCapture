@@ -20,21 +20,14 @@ import { InstrumentHubGraphPage } from '../pages/_app/datahub/instruments/$instr
 import { InstrumentHubTablePage } from '../pages/_app/datahub/instruments/$instrumentId/table.page';
 import { InstrumentHubPage } from '../pages/_app/datahub/instruments/index.page';
 import { SubjectAssignmentsPage } from '../pages/_app/datahub/subjects/$subjectId/assignments.page';
-import { SubjectGraphPage } from '../pages/_app/datahub/subjects/$subjectId/graph.page';
-import { SubjectRecordDetailPage } from '../pages/_app/datahub/subjects/$subjectId/table/$recordId.page';
-import { SubjectDataTablePage } from '../pages/_app/datahub/subjects/$subjectId/table/index.page';
 import { DatahubPage } from '../pages/_app/datahub/subjects/index.page';
 import { GroupEmailTemplatesPage } from '../pages/_app/group/email-templates.page';
 import { GroupManagePage } from '../pages/_app/group/manage.page';
-import { RemoteAssignmentsPage } from '../pages/_app/group/remote-assignments.page';
 import { AccessibleInstrumentsPage } from '../pages/_app/instruments/accessible-instruments.page';
-import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { StartSessionPage } from '../pages/_app/session/start-session.page';
-import { UploadInstrumentPage } from '../pages/_app/upload/$instrumentId.page';
 import { UploadPage } from '../pages/_app/upload/index.page';
 import { UserPage } from '../pages/_app/user.page';
 import { LoginPage } from '../pages/auth/login.page';
-import { ResetPasswordPage } from '../pages/auth/reset-password.page';
 import { ApiClient } from './api-client';
 import { ADMIN } from './constants';
 import { baseURL } from './env';
@@ -53,7 +46,6 @@ const pageModels = {
   '/admin/settings': AdminSettingsPage,
   '/admin/users/$userId': AdminUserPage,
   '/auth/login': LoginPage,
-  '/auth/reset-password': ResetPasswordPage,
   '/contact': ContactPage,
   '/dashboard': DashboardPage,
   '/datahub/instruments': InstrumentHubPage,
@@ -61,17 +53,11 @@ const pageModels = {
   '/datahub/instruments/$instrumentId/table': InstrumentHubTablePage,
   '/datahub/subjects': DatahubPage,
   '/datahub/subjects/$subjectId/assignments': SubjectAssignmentsPage,
-  '/datahub/subjects/$subjectId/graph': SubjectGraphPage,
-  '/datahub/subjects/$subjectId/table': SubjectDataTablePage,
-  '/datahub/subjects/$subjectId/table/$recordId': SubjectRecordDetailPage,
   '/group/email-templates': GroupEmailTemplatesPage,
   '/group/manage': GroupManagePage,
-  '/group/remote-assignments': RemoteAssignmentsPage,
   '/instruments/accessible-instruments': AccessibleInstrumentsPage,
-  '/session/remote-assignment': RemoteAssignmentPage,
   '/session/start-session': StartSessionPage,
   '/upload': UploadPage,
-  '/upload/$instrumentId': UploadInstrumentPage,
   '/user': UserPage
 } satisfies { [K in RouteTo]?: any };
 

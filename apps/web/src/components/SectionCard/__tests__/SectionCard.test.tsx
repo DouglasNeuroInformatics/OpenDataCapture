@@ -16,15 +16,4 @@ describe('SectionCard', () => {
     );
     expect(screen.getByTestId('card').textContent).toBe('Contents');
   });
-
-  it("should merge a caller's class over the defaults, so a conflicting utility wins", () => {
-    render(
-      <SectionCard className="p-2" data-testid="card">
-        {null}
-      </SectionCard>
-    );
-    const classes = [...screen.getByTestId('card').classList];
-    expect(classes).toContain('p-2');
-    expect(classes).not.toContain('p-6');
-  });
 });

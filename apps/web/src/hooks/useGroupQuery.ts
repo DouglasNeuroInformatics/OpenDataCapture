@@ -2,7 +2,7 @@ import { $Group } from '@opendatacapture/schemas/group';
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-export const GROUP_QUERY_KEY = 'group';
+const GROUP_QUERY_KEY = 'group';
 
 export const groupQueryOptions = (groupId: null | string | undefined) =>
   queryOptions({

@@ -17,8 +17,6 @@
     "zod": "workspace:zod__3.x@*"
   },
   "devDependencies": {
-    "@douglasneuroinformatics/libui": "catalog:",
-    "@opendatacapture/instrument-stubs": "workspace:*",
     "@opendatacapture/react-core": "workspace:*",
     "@opendatacapture/runtime-v1": "workspace:*",
     "@opendatacapture/vite-plugin-runtime": "workspace:*",
@@ -28,7 +26,6 @@
     "@tailwindcss/vite": "catalog:",
     "esbuild-wasm": "catalog:",
     "storybook": "catalog:",
-    "type-fest": "workspace:type-fest__4.x@*",
     "vite": "catalog:"
   }
 }

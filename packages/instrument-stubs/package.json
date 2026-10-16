@@ -21,5 +21,8 @@
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
     "zod": "workspace:zod__3.x@*"
+  },
+  "devDependencies": {
+    "happy-dom": "catalog:"
   }
 }

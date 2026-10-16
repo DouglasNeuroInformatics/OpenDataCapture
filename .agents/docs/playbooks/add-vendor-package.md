@@ -73,5 +73,5 @@ pnpm --filter @opendatacapture/runtime-v1 build   # READ THE OUTPUT — it logs 
 ls runtime/v1/dist/<name>@<range>                 # step 8 was silent if this is missing
 pnpm exec vitest --project runtime-v1             # peer pairing
 pnpm exec vitest --project runtime-bundler
-pnpm lint && pnpm test
+pnpm lint && pnpm test:coverage
 ```

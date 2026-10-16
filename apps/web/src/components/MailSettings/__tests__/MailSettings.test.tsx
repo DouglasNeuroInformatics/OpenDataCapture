@@ -191,6 +191,21 @@ describe('MailSettings', () => {
       expect(mocks.patch).not.toHaveBeenCalled();
     });
 
+    it('should flag only the field that is invalid, so valid entries are not marked as errors', () => {
+      renderSettings(null);
+      toggleEnabled();
+      fillNewServer();
+      type('mail-sender-address', 'not-an-address');
+      saveConfig();
+      expect(fieldError('mail-sender-address')).toBe('Enter a valid sender address (e.g. noreply@example.org)');
+      expect([fieldError('mail-host'), fieldError('mail-port'), fieldError('mail-username')]).toEqual([
+        undefined,
+        undefined,
+        undefined
+      ]);
+      expect(mocks.patch).not.toHaveBeenCalled();
+    });
+
     it('should require a password when none is stored, even if every other field is valid', () => {
       renderSettings({ ...storedConfig, hasPassword: false });
       saveConfig();

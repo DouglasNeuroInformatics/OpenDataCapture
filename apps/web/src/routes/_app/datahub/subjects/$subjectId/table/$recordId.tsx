@@ -4,7 +4,6 @@ import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/
 import { InstrumentSummary } from '@opendatacapture/react-core';
 import type { AnyUnilingualFileInstrument } from '@opendatacapture/runtime-core';
 import type { InstrumentRecord } from '@opendatacapture/schemas/instrument-records';
-import type { Subject } from '@opendatacapture/schemas/subject';
 import { createFileRoute } from '@tanstack/react-router';
 import { DownloadIcon } from 'lucide-react';
 
@@ -16,7 +15,6 @@ import { subjectQueryOptions, useSubjectQuery } from '@/hooks/useSubjectQuery';
 type FileInstrumentRecordViewProps = {
   instrument: AnyUnilingualFileInstrument;
   record: InstrumentRecord;
-  subject: Subject;
 };
 
 const FileInstrumentRecordView = ({ instrument, record }: FileInstrumentRecordViewProps) => {
@@ -134,7 +132,7 @@ const RouteComponent = () => {
   return (
     <div className="container py-8">
       {instrument.kind === 'FILE' ? (
-        <FileInstrumentRecordView instrument={instrument} record={instrumentRecord} subject={subject} />
+        <FileInstrumentRecordView instrument={instrument} record={instrumentRecord} />
       ) : (
         <InstrumentSummary
           displayAllMeasures

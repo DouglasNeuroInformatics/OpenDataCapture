@@ -4,8 +4,8 @@ import { Logo } from '../Logo';
 
 export type BrandingProps = {
   className?: string;
-  fontSize?: 'lg' | 'md' | 'sm';
-  logoVariant?: 'auto' | 'dark' | 'light';
+  fontSize?: 'lg' | 'md';
+  logoVariant?: 'auto' | 'light';
   onClick?: () => void;
 };
 
@@ -18,8 +18,7 @@ export const Branding = ({ className, fontSize = 'lg', logoVariant = 'auto', onC
         className={cn(
           'ml-3 leading-tight font-bold whitespace-nowrap subpixel-antialiased',
           fontSize === 'lg' && 'text-lg',
-          fontSize === 'md' && 'text-base',
-          fontSize === 'sm' && 'text-sm'
+          fontSize === 'md' && 'text-base'
         )}
       >
         Open Data Capture

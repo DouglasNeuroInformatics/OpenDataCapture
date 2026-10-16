@@ -1,11 +1,4 @@
 {
-  "branding": {
-    "title": {
-      "en": "Open Data Capture",
-      "es": "Open Data Capture",
-      "fr": "Open Data Capture"
-    }
-  },
   "endSessionModal": {
     "message": {
       "en": "Are you sure you want to end the current session? If you choose to proceed, you'll be taken back to the begin session page.",
@@ -45,11 +38,6 @@
       "en": "Administer Instrument",
       "es": "Administrar instrumento",
       "fr": "Administrer un instrument"
-    },
-    "createInstrument": {
-      "en": "Add Instrument",
-      "es": "Agregar instrumento",
-      "fr": "Ajouter un instrument"
     },
     "dashboard": {
       "en": "Dashboard",

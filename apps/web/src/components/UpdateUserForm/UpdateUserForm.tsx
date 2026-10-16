@@ -35,19 +35,18 @@ type UpdateUserFormInputData = {
   groupOptions: {
     [id: string]: string;
   };
-  initialValues?: FormTypes.PartialNullableData<UpdateUserFormData>;
+  initialValues: FormTypes.PartialNullableData<UpdateUserFormData>;
   selectedUserBasePermission?: User['basePermissionLevel'];
 };
 
 type UpdateUserFormProps = {
   data: UpdateUserFormInputData;
-  hideSubmitButton?: boolean;
   id?: string;
   onError: (error: ZodErrorLike) => void;
   onSubmit: FormProps<z.ZodType<UpdateUserSubmitData>>['onSubmit'];
 };
 
-export const UpdateUserForm = ({ data, hideSubmitButton, id, onError, onSubmit }: UpdateUserFormProps) => {
+export const UpdateUserForm = ({ data, id, onError, onSubmit }: UpdateUserFormProps) => {
   const { groupOptions, initialValues } = data;
   const { resolvedLanguage, t } = useTranslation();
   const { applyGeneratedPassword, generatedPassword, generatePassword, isGeneratedPassword } = usePasswordGenerator();
@@ -61,7 +60,7 @@ export const UpdateUserForm = ({ data, hideSubmitButton, id, onError, onSubmit }
         email: $Email(t).optional(),
         groupIds: z.set(z.string()),
         password: $OptionalPassword,
-        phoneNumber: $PhoneNumber(t, initialValues?.phoneNumber).optional()
+        phoneNumber: $PhoneNumber(t, initialValues.phoneNumber).optional()
       })
       .check((ctx) => {
         if (ctx.value.password && !estimatePasswordStrength(ctx.value.password).success) {
@@ -99,7 +98,7 @@ export const UpdateUserForm = ({ data, hideSubmitButton, id, onError, onSubmit }
     // `selectedUserBasePermission` decides whether a group is required, so a schema built for the
     // previously selected user must not be reused: two users differing only in permission level
     // would otherwise share one schema and be validated against the wrong rule.
-  }, [data.selectedUserBasePermission, resolvedLanguage, initialValues?.phoneNumber]);
+  }, [data.selectedUserBasePermission, resolvedLanguage, initialValues.phoneNumber]);
 
   return (
     <div className="contents" key={JSON.stringify(initialValues)} ref={suppressPasswordAutofill}>
@@ -199,14 +198,13 @@ export const UpdateUserForm = ({ data, hideSubmitButton, id, onError, onSubmit }
             title: t('common.password')
           }
         ]}
-        customStyles={{ submitBtn: hideSubmitButton ? 'hidden' : undefined }}
+        customStyles={{ submitBtn: 'hidden' }}
         data-testid="update-user-form"
         id={id}
         initialValues={{
           ...initialValues,
-          disabled: initialValues?.disabled ?? false
+          disabled: initialValues.disabled ?? false
         }}
-        submitBtnLabel={t({ en: 'Save Changes', es: 'Guardar los cambios', fr: 'Enregistrer les modifications' })}
         subscribe={{
           // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
           // position, so `setValues` is inferred as an error type rather than a setter.

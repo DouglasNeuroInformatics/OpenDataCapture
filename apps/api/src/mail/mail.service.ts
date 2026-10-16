@@ -156,13 +156,14 @@ export class MailService {
    */
   async test({ config, recipient }: $TestMailData): Promise<TestMailResult> {
     const { config: saved } = await this.readState();
-    if (this.requiresNewPassword(config, saved)) {
+    const resolve = this.configResolver(config, saved);
+    if (resolve === 'PASSWORD_REQUIRED') {
       return { error: 'PASSWORD_REQUIRED', success: false };
     }
     try {
       // Resolution decrypts an inherited stored password, so it belongs inside the collapse: an
       // undecryptable secret must report a code here exactly as it does on a real send.
-      const resolved = this.resolveConfig(config, saved);
+      const resolved = resolve();
       if (!resolved) {
         return { error: 'UNKNOWN', success: false };
       }
@@ -192,17 +193,19 @@ export class MailService {
       throw new ServiceUnavailableException('Cannot update mail settings before setup');
     }
     const { config: saved } = this.parseState(setupState);
-    if (this.requiresNewPassword(data.config, saved)) {
-      throw new BadRequestException('A password is required when changing the mail server');
+    let nextConfig: MailConfig | undefined;
+    if (data.config) {
+      const password = this.passwordSource(data.config, saved);
+      if (!password) {
+        throw new BadRequestException('A password is required when changing the mail server');
+      }
+      // A kept password is inherited as its stored ciphertext, so updating settings never has to
+      // decrypt the old secret — after a SECRET_KEY rotation the admin recovers by re-entering it.
+      nextConfig = this.mergeConfig(
+        data.config,
+        'plaintext' in password ? this.encryptPassword(password.plaintext) : password.ciphertext
+      );
     }
-    // A kept password is inherited as its stored ciphertext, so updating settings never has to
-    // decrypt the old secret — after a SECRET_KEY rotation the admin recovers by re-entering it.
-    const nextConfig = data.config
-      ? this.mergeConfig(
-          data.config,
-          data.config.password ? this.encryptPassword(data.config.password) : (saved?.password ?? '')
-        )
-      : undefined;
     const updated = await this.setupStateModel.update({
       data: {
         ...(nextConfig ? { mailConfig: { set: nextConfig } } : {}),
@@ -211,6 +214,30 @@ export class MailService {
       where: { id: setupState.id }
     });
     return this.toSettings(this.parseState(updated));
+  }
+
+  /**
+   * How a (possibly partial) payload resolves into a complete config ready to authenticate with:
+   * a resolver to call, or `PASSWORD_REQUIRED` when the payload may not inherit the stored
+   * password. Calling the resolver decrypts an inherited password, so callers decide where that
+   * failure lands.
+   */
+  private configResolver(
+    partial: undefined | UpdateMailConfigData,
+    saved: MailConfig | null
+  ): 'PASSWORD_REQUIRED' | (() => MailConfig | null) {
+    if (!partial) {
+      return () => saved && this.decryptConfig(saved);
+    }
+    const password = this.passwordSource(partial, saved);
+    if (!password) {
+      return 'PASSWORD_REQUIRED';
+    }
+    return () =>
+      this.mergeConfig(
+        partial,
+        'plaintext' in password ? password.plaintext : this.decryptPassword(password.ciphertext)
+      );
   }
 
   private createTransporter(config: MailConfig): Transporter {
@@ -269,7 +296,7 @@ export class MailService {
 
   /** Encrypt the SMTP password so a database dump yields no working mail credential. */
   private encryptPassword(plaintext: string): string {
-    return plaintext ? encryptSecret(plaintext, this.configService.getOrThrow('SECRET_KEY')) : '';
+    return encryptSecret(plaintext, this.configService.getOrThrow('SECRET_KEY'));
   }
 
   /** Combine an update payload with an already-resolved password into a complete config. */
@@ -315,33 +342,26 @@ export class MailService {
     };
   }
 
+  /**
+   * Where a payload's password comes from: its own, or for a blank one the stored ciphertext.
+   * Inheritance is confined to the server the stored password belongs to — see
+   * {@link isSameMailServer} — and null means the payload has to supply one.
+   */
+  private passwordSource(
+    partial: UpdateMailConfigData,
+    saved: MailConfig | null
+  ): null | { ciphertext: string } | { plaintext: string } {
+    if (partial.password) {
+      return { plaintext: partial.password };
+    }
+    if (saved && isSameMailServer(saved, partial)) {
+      return { ciphertext: saved.password };
+    }
+    return null;
+  }
+
   private async readState(): Promise<MailState> {
     return this.parseState(await this.setupStateModel.findFirst());
-  }
-
-  /**
-   * Whether the caller has to supply a password rather than inheriting the stored one. Inheritance
-   * is confined to the server the password belongs to — see {@link isSameMailServer}.
-   */
-  private requiresNewPassword(partial: undefined | UpdateMailConfigData, saved: MailConfig | null): boolean {
-    if (!partial || partial.password) {
-      return false;
-    }
-    return !saved || !isSameMailServer(saved, partial);
-  }
-
-  /**
-   * Resolve a (possibly partial) update payload into a complete config ready to authenticate
-   * with — an inherited stored password is decrypted here. Callers reject the payload with
-   * {@link requiresNewPassword} first, which is what confines inheritance to the server the
-   * stored password belongs to.
-   */
-  private resolveConfig(partial: undefined | UpdateMailConfigData, saved: MailConfig | null): MailConfig | null {
-    if (!partial) {
-      return saved && this.decryptConfig(saved);
-    }
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- a blank password means "keep the stored one"; fall through intentionally
-    return this.mergeConfig(partial, partial.password || this.decryptPassword(saved?.password ?? ''));
   }
 
   private async send(transporter: Transporter, config: MailConfig, { body, subject, to }: MailMessage): Promise<void> {

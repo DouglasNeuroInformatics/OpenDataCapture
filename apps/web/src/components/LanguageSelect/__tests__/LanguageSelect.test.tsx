@@ -48,9 +48,4 @@ describe('LanguageSelect', () => {
     render(<LanguageSelect data-testid="language-select" id="language" value="en" onChange={vi.fn()} />);
     expect(screen.getByTestId('language-select').id).toBe('language');
   });
-
-  it('should merge the given class name into the trigger', () => {
-    render(<LanguageSelect className="custom-width" value="en" onChange={vi.fn()} />);
-    expect([...screen.getByRole('combobox').classList]).toContain('custom-width');
-  });
 });

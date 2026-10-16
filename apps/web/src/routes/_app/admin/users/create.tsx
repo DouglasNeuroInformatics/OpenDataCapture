@@ -223,7 +223,7 @@ const RouteComponent = () => {
                   return {
                     kind: 'set',
                     label: t('common.groups'),
-                    options: Object.fromEntries((groupsQuery.data ?? []).map((group) => [group.id, group.name])),
+                    options: Object.fromEntries(groupsQuery.data.map((group) => [group.id, group.name])),
                     variant: 'listbox'
                   };
                 }
@@ -337,11 +337,9 @@ const RouteComponent = () => {
       />
       <Dialog
         open={fallbackMessage !== null}
-        onOpenChange={(open) => {
-          if (!open) {
-            setFallbackMessage(null);
-            void navigate({ to: '..' });
-          }
+        onOpenChange={() => {
+          setFallbackMessage(null);
+          void navigate({ to: '..' });
         }}
       >
         <Dialog.Content className="max-w-lg" data-testid="welcome-email-fallback">

@@ -33,4 +33,4 @@ type EntryPoint = {
 
 export type BundlerOptions = Config & { configFilepath: string };
 
-export type { AssetExport, EntryPoint, ExportCondition, ModuleExport, PackageExport, ResolvedPackage };
+export type { EntryPoint, ExportCondition, ModuleExport, PackageExport, ResolvedPackage };

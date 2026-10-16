@@ -11,7 +11,7 @@ import { match } from 'ts-pattern';
 import { extractFieldLabel, isFieldHidden } from './form.js';
 import { isFormInstrument } from './guards.js';
 
-export type ComputedMeasures = { [key: string]: { label: string; value: InstrumentMeasureValue } };
+type ComputedMeasures = { [key: string]: { label: string; value: InstrumentMeasureValue } };
 
 export function computeInstrumentMeasures(instrument: AnyUnilingualScalarInstrument, data: unknown) {
   const computedMeasures: ComputedMeasures = {};

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { Button, Dialog, Form, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -95,6 +95,7 @@ const RouteComponent = () => {
 
   const [selectedInstrument, setSelectedInstrument] = useState<null | TranslatedInstrumentInfo>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const createDialogRef = useRef<HTMLDivElement>(null);
   const [isResultSliderOpen, setIsResultSliderOpen] = useState(false);
   const [assignment, setAssignment] = useState<Assignment | null>(null);
 
@@ -136,11 +137,10 @@ const RouteComponent = () => {
       />
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
         <Dialog.Content
+          ref={createDialogRef}
           onOpenAutoFocus={(event) => {
             event.preventDefault();
-            if (event.currentTarget instanceof HTMLElement) {
-              event.currentTarget.querySelector<HTMLButtonElement>('button[type="submit"]')?.focus();
-            }
+            createDialogRef.current?.querySelector<HTMLButtonElement>('button[type="submit"]')?.focus();
           }}
         >
           <Dialog.Header>

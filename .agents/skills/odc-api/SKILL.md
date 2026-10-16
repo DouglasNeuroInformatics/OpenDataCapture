@@ -23,8 +23,9 @@ in this repo, and the only thing standing in front of it is you reading the `whe
 `{ ability }: EntityOperationOptions` and its controller forwards `@CurrentUser('ability')`, or it
 takes `currentUser?: RequestUser` and reads `.ability` off it itself while its controller forwards
 `@CurrentUser()` — the second shape is `apps/api/src/instruments/instruments.service.ts` and
-`apps/api/src/instrument-records/files/files.service.ts`. In `instruments.service.ts` the parameter
-is optional, so a call site that omits it compiles and queries unscoped.
+`apps/api/src/instrument-records/files/files.service.ts`. In `instruments.service.ts` only
+`findBundleById` takes it as optional, because the gateway resolves an assignment's bundle unscoped,
+so a call site there that omits it compiles and queries every group.
 
 **Unscoped is a decision, not an omission.** `AuditService.find` takes no ability at all, because a
 manage-all guard is the whole check on `GET /v1/audit/logs`; the inventory of routes that are

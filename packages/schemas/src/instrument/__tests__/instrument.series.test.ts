@@ -1,11 +1,11 @@
 import { seriesInstrument } from '@opendatacapture/instrument-stubs/series';
 import { describe, expect, it } from 'vitest';
 
-import { $SeriesInstrument } from '../instrument.series.js';
+import { $$SeriesInstrument } from '../instrument.series.js';
 
-describe('$SeriesInstrument', () => {
+describe('$$SeriesInstrument', () => {
   it('should successfully parse a valid series instrument', () => {
-    expect($SeriesInstrument.safeParse(seriesInstrument.instance).success).toBe(true);
+    expect($$SeriesInstrument().safeParse(seriesInstrument.instance).success).toBe(true);
   });
 
   it('should accept a function as the terminate param', () => {
@@ -16,7 +16,7 @@ describe('$SeriesInstrument', () => {
         params: { terminate: () => true }
       }
     };
-    expect($SeriesInstrument.safeParse(instance).success).toBe(true);
+    expect($$SeriesInstrument().safeParse(instance).success).toBe(true);
   });
 
   it('should accept a function as the completionMessage param', () => {
@@ -27,7 +27,7 @@ describe('$SeriesInstrument', () => {
         params: { completionMessage: () => ({ en: 'Done' }) }
       }
     };
-    expect($SeriesInstrument.safeParse(instance).success).toBe(true);
+    expect($$SeriesInstrument().safeParse(instance).success).toBe(true);
   });
 
   it('should reject a non-function completionMessage param', () => {
@@ -38,7 +38,7 @@ describe('$SeriesInstrument', () => {
         params: { completionMessage: { en: 'Done' } }
       }
     };
-    expect($SeriesInstrument.safeParse(instance).success).toBe(false);
+    expect($$SeriesInstrument().safeParse(instance).success).toBe(false);
   });
 
   it('should reject a non-function terminate param', () => {
@@ -49,6 +49,6 @@ describe('$SeriesInstrument', () => {
         params: { terminate: 'nope' }
       }
     };
-    expect($SeriesInstrument.safeParse(instance).success).toBe(false);
+    expect($$SeriesInstrument().safeParse(instance).success).toBe(false);
   });
 });

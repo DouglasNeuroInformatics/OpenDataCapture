@@ -61,8 +61,9 @@ component's hook passes.
 
 Add a `data-testid` to whatever the e2e test will click or assert on, then open
 `.agents/docs/playbooks/add-e2e-test.md` before writing the spec — it owns the selector contract and
-the fixture registration. The unit test goes where the change is: `src/hooks/__tests__/` for a query
-hook, which is the usual case for a route, otherwise `src/utils/__tests__/` or `src/__tests__/`.
+the fixture registration. The unit test goes in a `__tests__/` folder beside the file that changed,
+named after it: `src/hooks/__tests__/` for a query hook, `src/routes/**/__tests__/` for the route
+itself.
 
 The playbook's `## Verify` block is the check to run, with one ordering caveat: `pnpm test:e2e`
 boots `apps/web` through `pnpm dev:test` (`testing/playwright.config.ts`), which regenerates

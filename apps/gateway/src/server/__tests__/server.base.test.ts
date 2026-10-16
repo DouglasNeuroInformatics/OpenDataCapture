@@ -89,7 +89,7 @@ class StacktraceFixingServer extends TestServer {
 const openServers: Server[] = [];
 
 async function request(server: BaseServer, path: string, init?: RequestInit) {
-  const httpServer = server.listen(0);
+  const httpServer = server.listen();
   openServers.push(httpServer);
   await once(httpServer, 'listening');
   const address = httpServer.address();
@@ -213,7 +213,7 @@ describe('BaseServer', () => {
   });
 
   describe('listen', () => {
-    it('should listen on the configured port by default and log where it started, so the operator knows where to connect', async () => {
+    it('should listen on the configured port and log where it started, so the operator knows where to connect', async () => {
       const logInfo = vi.spyOn(logger, 'info');
       const httpServer = new TestServer().listen();
       openServers.push(httpServer);

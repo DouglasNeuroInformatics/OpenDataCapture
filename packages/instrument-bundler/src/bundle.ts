@@ -1,5 +1,4 @@
 import { encodeUnicodeToBase64 } from '@opendatacapture/runtime-internal';
-import type { LogLevel } from 'esbuild';
 
 import { build } from './build.js';
 import { preprocess } from './preprocess.js';
@@ -43,7 +42,7 @@ const GLOBALS = `
  * @param input - the bundle with no static imports and exports,
  * @returns the minified bundle wrapped in an IIFE
  */
-export async function createBundle(output: BuildOutput, options: { logLevel?: LogLevel; minify: boolean }) {
+export async function createBundle(output: BuildOutput, options: { minify: boolean }) {
   let inject = '';
   const style = output.css ? `"${encodeUnicodeToBase64(output.css)}"` : undefined;
   const scripts = output.legacyScripts?.length
@@ -75,5 +74,5 @@ export async function bundle({ inputs, logLevel = 'warning', minify = true }: Bu
   preprocess(inputs);
   const result = await build({ inputs, logLevel });
   result.js = transformImports(result.js);
-  return createBundle(result, { logLevel, minify });
+  return createBundle(result, { minify });
 }

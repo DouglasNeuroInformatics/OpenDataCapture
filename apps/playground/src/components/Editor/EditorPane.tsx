@@ -1,4 +1,4 @@
-import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import MonacoEditor from '@monaco-editor/react';
@@ -14,16 +14,7 @@ import { EditorPanePlaceholder } from './EditorPanePlaceholder';
 
 import type { MonacoEditorType, MonacoType } from './types';
 
-export type EditorPaneRef = {
-  editor: MonacoEditorType | null;
-  monaco: MonacoType | null;
-};
-
-export type EditorPaneProps = {
-  onEditorMount?: (editor: MonacoEditorType, monaco: MonacoType) => void;
-};
-
-export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(function EditorPane({ onEditorMount }, ref) {
+export const EditorPane = () => {
   const selectedFilename = useAppStore((store) => store.selectedFilename);
   const setSelectedFileContent = useAppStore((store) => store.setSelectedFileContent);
   const selectedInstrumentId = useAppStore((store) => store.selectedInstrument.id);
@@ -33,22 +24,12 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
   const { t } = useTranslation();
   const { libs } = useRuntime('v1');
 
-  const editorRef = useRef<MonacoEditorType | null>(null);
   const monacoRef = useRef<MonacoType | null>(null);
 
   const [defaultFile, setDefaultFile] = useState<(EditorFile & { id: string }) | null>(null);
   const filesRef = useFilesRef();
 
   useEditorErrorSync(isMounted ? monacoRef.current : null);
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      editor: editorRef.current,
-      monaco: monacoRef.current
-    }),
-    [isMounted]
-  );
 
   useEffect(() => {
     const monaco = monacoRef.current;
@@ -108,11 +89,9 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
     };
   }, [isMounted, selectedInstrumentId]);
 
-  const handleEditorDidMount = (editor: MonacoEditorType, monaco: MonacoType) => {
-    editorRef.current = editor;
+  const handleEditorDidMount = (_editor: MonacoEditorType, monaco: MonacoType) => {
     monacoRef.current = monaco;
     setIsMounted(true);
-    onEditorMount?.(editor, monaco);
   };
 
   if (!defaultFile) {
@@ -152,7 +131,7 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
 
   return (
     <MonacoEditor
-      className="h-full min-h-[576px]"
+      className="h-full min-h-144"
       defaultLanguage={fileType satisfies 'css' | 'html' | 'javascript' | 'json' | 'typescript'}
       defaultValue={defaultFile.content}
       keepCurrentModel={true}
@@ -188,4 +167,4 @@ export const EditorPane = React.forwardRef<EditorPaneRef, EditorPaneProps>(funct
       onMount={handleEditorDidMount}
     />
   );
-});
+};

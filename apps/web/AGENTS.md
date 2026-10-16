@@ -10,17 +10,17 @@ Read the root `AGENTS.md` first for the rules that apply everywhere.
 The organizing principle is **layer folders, not feature folders**. There is no `src/features`,
 `src/lib` or `src/api`.
 
-| Directory                                                        | Holds                                                                                  |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `src/routes/`                                                    | **Route files and nothing else** — see below                                           |
-| `src/components/`                                                | Shared presentational components                                                       |
-| `src/hooks/`                                                     | All data fetching — one file per hook, named after its export                          |
-| `src/services/`                                                  | Module-level side-effect singletons: `axios.ts`, `i18n.ts`, `react-query.ts`, `zod.ts` |
-| `src/store/`                                                     | The single Zustand store: `index.ts`, `types.ts`, `slices/*.slice.ts`                  |
-| `src/providers/`                                                 | Context/HOC providers used by `_app/route.tsx`                                         |
-| `src/utils/`                                                     | Pure helpers only                                                                      |
-| `src/translations/`                                              | Namespace JSON, registered in `src/services/i18n.ts`                                   |
-| `src/__tests__/`, `src/hooks/__tests__/`, `src/utils/__tests__/` | Tests                                                                                  |
+| Directory           | Holds                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| `src/routes/`       | **Route files and nothing else** — see below                                           |
+| `src/components/`   | Shared presentational components                                                       |
+| `src/hooks/`        | All data fetching — one file per hook, named after its export                          |
+| `src/services/`     | Module-level side-effect singletons: `axios.ts`, `i18n.ts`, `react-query.ts`, `zod.ts` |
+| `src/store/`        | The single Zustand store: `index.ts`, `types.ts`, `slices/*.slice.ts`                  |
+| `src/providers/`    | Context/HOC providers used by `_app/route.tsx`                                         |
+| `src/utils/`        | Pure helpers only                                                                      |
+| `src/translations/` | Namespace JSON, registered in `src/services/i18n.ts`                                   |
+| `__tests__/`        | Unit tests, beside the code under test — see "Tests"                                   |
 
 `@/*` aliases `src/*` and is declared in **three files that must agree**: `vite.config.ts`,
 `vitest.config.ts` and `tsconfig.json`. Use `@/` across layers, relative imports within a folder.
@@ -30,10 +30,12 @@ The organizing principle is **layer folders, not feature folders**. There is no 
 `src/route-tree.ts` is generated and git-tracked. **Never hand-edit it and never run the
 generator** — the user does that manually after route changes.
 
-**Only route files may live under `src/routes/`.** The generator scans the directory
-indiscriminately and warns about any file that does not `export const Route`. Tests importing
-`vitest` or `@testing-library/*` from there is an eslint error. Put a test in `src/hooks/__tests__/`,
-`src/utils/__tests__/` or `src/__tests__/`, and a helper in `src/hooks/` or `src/utils/`.
+**Only route files and their `__tests__/` folders may live under `src/routes/`.** The generator
+scans the directory indiscriminately and warns about any file that does not `export const Route`;
+`routeFileIgnorePattern: '^__tests__$'` in `vite.config.ts` is the only thing keeping it out of the
+test folders. Importing `vitest` or `@testing-library/*` anywhere else under `src/routes/` is an
+eslint error. Put a route's test in a `__tests__/` folder beside it, and a helper in `src/hooks/` or
+`src/utils/`.
 
 Naming: `__root.tsx` is the root; `_app/` is a pathless layout (contributes no URL segment);
 `route.tsx` is a directory's layout; `index.tsx` is its `/`; `$param` is dynamic; ordinary routes are
@@ -77,9 +79,9 @@ export const subjectsQueryOptions = ({ params }: { params?: SubjectsQueryParams 
 - **Do not add a React Query `retry`, and do not create a second axios instance.** Retries live in
   `src/services/axios.ts`: it retries only idempotent methods on transient errors, under a total
   budget, and drives `ConnectivityBanner` through the store. Opt out of its defaults per-request with
-  the `meta` bag (`disableRetry`, `disableDefaultTimeout`, `disableDefaultErrorNotification`,
-  `disableDefaultAuth`). Only the second half is mechanically enforced — eslint bans `axios.create`,
-  but nothing stops you setting a React Query `retry`, so that one is on you.
+  the `meta` bag (`disableDefaultTimeout`, `disableDefaultErrorNotification`, `disableDefaultAuth`).
+  Only the second half is mechanically enforced — eslint bans `axios.create`, but nothing stops you
+  setting a React Query `retry`, so that one is on you.
 
 ## Forms
 
@@ -183,7 +185,7 @@ add UI that an e2e test will drive.
 repo, and `vite.config.ts` is **not** loaded during tests — `vitest.config.ts` supersedes it, which is
 why the `@` alias is redeclared there. Nothing that depends on `import.meta.env` injection or the
 runtime plugin works in a unit test; mock `@/config` instead, and use `vi.stubEnv` for Vite's
-built-in `DEV` and `MODE` (`src/__tests__/app-route-guard.test.ts`).
+built-in `DEV` and `MODE` (`src/routes/_app/__tests__/route.test.ts`).
 
 `src/hooks/__tests__/useInstrumentBundle.test.ts` is the canonical test — read it before writing one.
 Mock `axios` and `@/store` with `vi.hoisted` + `vi.mock`; wrap hooks in a fresh `QueryClient` with

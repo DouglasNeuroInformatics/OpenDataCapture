@@ -30,7 +30,7 @@ export function resolveLoginThemeColors(branding?: BrandingConfig | null): Login
       secondary: branding?.customSecondaryColor ?? LOGIN_THEME_COLORS.slate.secondary
     };
   }
-  return LOGIN_THEME_COLORS[theme] ?? LOGIN_THEME_COLORS.slate;
+  return LOGIN_THEME_COLORS[theme];
 }
 
 /** Build the CSS `linear-gradient(...)` used by the login branding panel. */
@@ -51,6 +51,6 @@ export function getRightPanelGradient(branding?: BrandingConfig | null): null | 
     const secondary = branding?.rightPanelSecondaryColor ?? LOGIN_THEME_COLORS.slate.secondary;
     return `linear-gradient(135deg, ${primary} 0%, ${secondary} 100%)`;
   }
-  const colors = LOGIN_THEME_COLORS[theme] ?? LOGIN_THEME_COLORS.slate;
+  const colors = LOGIN_THEME_COLORS[theme];
   return `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`;
 }

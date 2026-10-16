@@ -4,7 +4,7 @@ import Screenshot from '../common/Screenshot.astro';
 
 type Props = {
   reversed?: boolean;
-  id?: string;
+  id: string;
   heading: string;
   subheading: string;
   description: string;
@@ -17,7 +17,7 @@ type Props = {
 const screenshotId = crypto.randomUUID();
 const mainContentId = crypto.randomUUID();
 
-const { description, id = crypto.randomUUID(), heading, subheading, screenshot, reversed } = Astro.props;
+const { description, id, heading, subheading, screenshot, reversed } = Astro.props;
 ---
 
 <section class="mb-32 grid gap-8 lg:mb-40 lg:grid-cols-2 lg:gap-12 xl:mb-72" id={id}>

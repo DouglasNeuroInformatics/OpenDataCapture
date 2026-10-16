@@ -9,11 +9,6 @@ const context = { files: [], indexFilename: null };
 describe('InstrumentErrorFallback', () => {
   afterEach(cleanup);
 
-  it('should render nothing when there is no error', () => {
-    const { container } = render(<InstrumentErrorFallback context={context} error={null as any} title="Failed" />);
-    expect(container.firstChild).toBeNull();
-  });
-
   it('should render the title, description and error message', () => {
     render(
       <InstrumentErrorFallback

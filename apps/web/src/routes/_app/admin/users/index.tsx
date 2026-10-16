@@ -164,12 +164,7 @@ const RouteComponent = () => {
         onRowClick={(user) => setHighlightedRowId(user.id)}
         onRowDoubleClick={openUser}
       />
-      <Dialog
-        open={pendingAction !== null}
-        onOpenChange={(open) => {
-          if (!open) setPendingAction(null);
-        }}
-      >
+      <Dialog open={pendingAction !== null} onOpenChange={() => setPendingAction(null)}>
         <Dialog.Content>
           <Dialog.Header>
             <Dialog.Title>

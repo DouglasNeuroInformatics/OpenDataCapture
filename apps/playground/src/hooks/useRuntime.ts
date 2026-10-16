@@ -5,15 +5,11 @@ import { difference, mapKeys } from 'lodash-es';
 
 type RuntimeManifest = {
   declarations: string[];
-  sources: string[];
 };
 
 export function useRuntime(version: string) {
   const [declarations, setDeclarations] = useState<{ [key: string]: string }>({});
-  const [manifest, setManifest] = useState<RuntimeManifest>({
-    declarations: [],
-    sources: []
-  });
+  const [manifest, setManifest] = useState<RuntimeManifest>({ declarations: [] });
 
   const loadDeclaration = async (filename: string) => {
     const response = await axios.get<string>(`/runtime/${version}/${filename}`);

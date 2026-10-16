@@ -45,6 +45,7 @@ export default defineConfig(async ({ command }) => {
       tanstackRouter({
         autoCodeSplitting: true,
         generatedRouteTree: './src/route-tree.ts',
+        routeFileIgnorePattern: '^__tests__$',
         target: 'react'
       }),
       react(),

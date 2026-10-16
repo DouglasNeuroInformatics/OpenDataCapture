@@ -51,8 +51,7 @@ both extend `BaseServer`, which owns the middleware order:
 
 Reordering those lines is a security change. Wrap every async handler in `ah()`
 (`src/utils/async-handler.ts`); an unwrapped rejection never reaches `errorHandlerMiddleware`.
-Throw `HttpException(status, message)`. `src/middleware/not-found.middleware.ts` is defined but
-never mounted — an unknown path currently gets Express's built-in 404.
+Throw `HttpException(status, message)`. An unknown path gets Express's built-in 404.
 
 Auth is not the web app's JWT. Two credentials, both sent as `Authorization: Bearer …`:
 `config.apiKey` (`GATEWAY_API_KEY`, used by `apps/api`), and a per-assignment token

@@ -36,7 +36,7 @@ const CellSelect = ({ disabled, label, name, onValueChange, options, placeholder
   <Select disabled={disabled} name={name} value={value ?? ''} onValueChange={onValueChange}>
     <Select.Trigger
       aria-label={label}
-      className="data-[placeholder]:text-muted-foreground h-auto min-w-0 border-0 bg-transparent px-0 py-0 shadow-none [&>span]:block [&>span]:min-w-0 [&>span]:truncate"
+      className="data-placeholder:text-muted-foreground h-auto min-w-0 border-0 bg-transparent px-0 py-0 shadow-none [&>span]:block [&>span]:min-w-0 [&>span]:truncate"
       data-testid={`${name}-select-trigger`}
     >
       <Select.Value placeholder={placeholder} />

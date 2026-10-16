@@ -12,20 +12,23 @@ const LOOPBACK_ALIASES: { [hostname: string]: string } = {
   localhost: '127.0.0.1'
 };
 
-export type SerializedError = {
-  cause?: SerializedError;
-  message: string;
-  name: string;
-  stack?: string;
-};
-export const $SerializedError: z.ZodType<SerializedError> = z.object({
+const $SerializedError: z.ZodType<SerializedError> = z.object({
   cause: z.lazy(() => $SerializedError).optional(),
   message: z.string(),
   name: z.string(),
   stack: z.string().optional()
 });
 
-export const $PreviewTheme = z.enum(['dark', 'light']);
+const $PreviewTheme = z.enum(['dark', 'light']);
+
+const $PreviewErrorStage = z.enum(['interpret', 'runtime']);
+
+export type SerializedError = {
+  cause?: SerializedError;
+  message: string;
+  name: string;
+  stack?: string;
+};
 
 export type EditorMessage = z.infer<typeof $EditorMessage>;
 export const $EditorMessage = z.discriminatedUnion('type', [
@@ -38,7 +41,6 @@ export const $EditorMessage = z.discriminatedUnion('type', [
 ]);
 
 export type PreviewErrorStage = z.infer<typeof $PreviewErrorStage>;
-export const $PreviewErrorStage = z.enum(['interpret', 'runtime']);
 
 export type PreviewMessage = z.infer<typeof $PreviewMessage>;
 export const $PreviewMessage = z.discriminatedUnion('type', [

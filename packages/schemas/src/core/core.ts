@@ -5,6 +5,8 @@ import type { Language as InstrumentAuthoringLanguage, Json, JsonLiteral } from 
 import type { Simplify } from 'type-fest';
 import { z } from 'zod/v4';
 
+const $JsonLiteral: z.ZodType<JsonLiteral> = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+
 export const DEFAULT_GROUP_NAME = 'root';
 
 export type AppAction = z.infer<typeof $AppAction>;
@@ -150,39 +152,26 @@ export const $LocalizedString = z.object({
  * actually see — an email subject or body that renders as nothing is a broken message, not a
  * translation choice.
  */
-export type AuthoredLocalizedString = z.infer<typeof $AuthoredLocalizedString>;
 export const $AuthoredLocalizedString = $LocalizedString.refine(
   (localized) => Object.values(localized).some((entry) => typeof entry === 'string' && entry.trim().length > 0),
   'At least one language must have content'
 );
 
-export type BaseModel = z.infer<typeof $BaseModel>;
 export const $BaseModel = z.object({
   createdAt: z.coerce.date(),
   id: z.string(),
   updatedAt: z.coerce.date()
 });
 
-export const $JsonLiteral: z.ZodType<JsonLiteral> = z.union([z.string(), z.number(), z.boolean(), z.null()]);
-
 export const $Json: z.ZodType<Json> = z.lazy(() =>
   z.union([$JsonLiteral, z.array($Json), z.record(z.string(), $Json)])
 );
-
-export type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
 
 export const $LicenseIdentifier = z
   .string()
   .refine((arg) => licenses.has(arg as LicenseIdentifier)) as z.ZodType<LicenseIdentifier>;
 
 export type WithID<T extends { [key: string]: any }> = Simplify<T & { id: string }>;
-
-export const $Error: z.ZodType<Error> = z.object({
-  cause: z.unknown(),
-  message: z.string(),
-  name: z.string(),
-  stack: z.string().optional()
-});
 
 export const $RegexString = z.string().refine(
   (arg) => {

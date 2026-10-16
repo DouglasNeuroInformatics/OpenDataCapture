@@ -5,6 +5,10 @@ import { match, P } from 'ts-pattern';
 
 import type { EditorFile } from '@/models/editor-file.model';
 
+function resolveIndexFile(files: EditorFile[]) {
+  return files.length ? resolveIndexInput(files) : null;
+}
+
 export type FileType = 'asset' | 'css' | 'html' | 'javascript' | 'json' | 'typescript';
 
 export function inferFileType(filename: string): FileType | null {
@@ -35,10 +39,6 @@ export function isBase64EncodedFileType(filename: string) {
   return ['.jpeg', '.jpg', '.mp3', '.mp4', '.png', '.webp'].includes(extractInputFileExtension(filename)!);
 }
 
-export function resolveIndexFile(files: EditorFile[]) {
-  return files.length ? resolveIndexInput(files) : null;
-}
-
 export function resolveIndexFilename(files: EditorFile[]) {
   return resolveIndexFile(files)?.name ?? null;
 }
@@ -51,8 +51,6 @@ export function getImageMIMEType(filename: string) {
       return 'image/jpeg';
     case '.png':
       return 'image/png';
-    case '.svg':
-      return 'image/svg+xml';
     case '.webp':
       return 'image/webp';
     default:

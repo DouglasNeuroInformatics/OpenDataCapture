@@ -21,5 +21,8 @@
     "format": "prettier --write src",
     "lint": "tsc && eslint --fix src",
     "test": "vitest"
+  },
+  "devDependencies": {
+    "happy-dom": "catalog:"
   }
 }

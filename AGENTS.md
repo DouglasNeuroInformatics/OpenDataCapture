@@ -21,17 +21,20 @@ pnpm build                  # turbo build (all packages/apps)
 pnpm lint                   # turbo lint — `tsc && eslint --fix src` per package, plus lint:root for root-level scripts and configs
 pnpm format                 # turbo format (prettier per package)
 pnpm test                   # vitest across the workspace
+pnpm test:coverage          # vitest with coverage — fails below 100%, the gate CI and "Before you are done" run
 pnpm test:e2e               # playwright, in testing/
 ```
 
 Scope a run to one package with `pnpm --filter @opendatacapture/<pkg> <script>` or turbo's
 `--filter=<pkg>`. Scope vitest to one project with `pnpm exec vitest --project <name>` (names come
 from the `name` field in each package's `vitest.config.ts`, e.g. `api`, `web`, `schemas`). Run a
-single file with `pnpm exec vitest path/to/file.test.ts`.
+single file with `pnpm exec vitest path/to/file.test.ts`. A scoped run with `--coverage` measures
+only what it ran against the whole coverage scope, so add `--coverage.thresholds.100=false` to it.
 
-`pnpm lint` and `pnpm test` both need `.env` to exist. `pnpm lint` also needs a generated Prisma
-client, so a cold run is not fast. A fresh clone needs more than `pnpm install` before `pnpm dev`
-serves anything — `.agents/docs/playbooks/run-locally.md` is the order of operations.
+`pnpm lint`, `pnpm test` and `pnpm test:coverage` all need `.env` to exist. `pnpm lint` also needs a
+generated Prisma client, so a cold run is not fast. A fresh clone needs more than `pnpm install`
+before `pnpm dev` serves anything — `.agents/docs/playbooks/run-locally.md` is the order of
+operations.
 
 ## Hard rules
 
@@ -46,6 +49,11 @@ not every tool loads nested files.
 - **Every change needs a unit test _and_ an end-to-end test in `testing/`.** See
   `.agents/docs/playbooks/add-e2e-test.md`. Utility scripts under `scripts/` are the one exception
   and need no tests.
+- **Unit test coverage stays at 100%.** `pnpm test:coverage` fails below 100% statements, branches,
+  functions or lines, and CI runs it. Code no test can reach is dead code: prove it dead (the types,
+  the callers, the library contract) and delete it. Never add a coverage-ignore comment or widen
+  `coverage.exclude` to get past the gate; that list is for non-code — fixtures, generated files and
+  bare entrypoints.
 - **Commit messages follow Conventional Commits.** `type(scope): subject`, where `type` is one of the
   11 `@commitlint/config-conventional` types and `scope`, if present, is an `@opendatacapture/*`
   workspace name without the prefix. A `commit-msg` hook and the `Commitlint` CI job enforce it, and
@@ -64,7 +72,8 @@ not every tool loads nested files.
 
 ### Before you are done
 
-1. Run `pnpm lint`, `pnpm test`, and `pnpm test:e2e` from the repo root and fix every failure.
+1. Run `pnpm lint`, `pnpm test:coverage`, and `pnpm test:e2e` from the repo root and fix every
+   failure, a coverage shortfall included.
 2. **Re-read the `AGENTS.md` of every package or app you modified and confirm your change does not
    contradict it.** If it does, either revise the change or update that `AGENTS.md` in the same
    commit — never leave the two disagreeing.
@@ -194,7 +203,11 @@ explains it.
 tooling rearrange it. Where ordering is load-bearing, the existing code carries an explicit
 `eslint-disable` comment; follow that pattern rather than fighting the rule.
 
-**Tests.** Keep test bodies short; each verifies one behavior. Descriptions are concise, grammatical
+**Tests.** A unit test is `<file>.test.ts(x)` in a `__tests__/` folder beside the file it tests:
+`src/index.ts` is tested by `src/__tests__/index.test.ts`. A suite that drives a whole package, like
+`apps/api/test/`, lives in that package's `test/` folder instead. Two eslint rules (`odc/*` in
+`eslint.config.js`) enforce the layout; `packages/instrument-library` is the one exception, for the
+reason its `AGENTS.md` gives. Keep test bodies short; each verifies one behavior. Descriptions are concise, grammatical
 sentences stating the behavioral reason, e.g. `'should key the cache on every parameter, so paging
 does not serve a stale page'`.
 

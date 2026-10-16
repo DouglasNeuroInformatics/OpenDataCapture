@@ -39,7 +39,7 @@ src/<feature>/
   <feature>.module.ts       @Module({ controllers, exports: [Service], providers: [Service] })
   <feature>.controller.ts   @Controller(path); @RouteAccess on every handler
   <feature>.service.ts      @Injectable; @InjectModel(...) per model
-  __tests__/<feature>.service.spec.ts
+  __tests__/<feature>.service.test.ts
 ```
 
 There is no repository layer and no `entity/` folder — `Model<'X'>` _is_ the repository.
@@ -170,7 +170,7 @@ which the client factory awaits after `$connect()`. MongoDB creates a collection
 with only its `_id_` index, so without that step a deployed instance scans whole collections and
 enforces none of the schema's unique constraints. Adding an index means editing **both**
 `schema.prisma` and `DATABASE_INDEXES`, which
-`src/core/__tests__/prisma.spec.ts` asserts agree — `db push` drops any index the schema
+`src/core/__tests__/prisma.test.ts` asserts agree — `db push` drops any index the schema
 does not declare, and a runtime-only index would not survive one.
 
 **Do not point `prisma db push` at a database this application uses.** `InstrumentRecord.assignmentId`
@@ -214,8 +214,8 @@ Adding a variable touches several files that must agree — follow
 
 `pnpm exec vitest --project api` runs two kinds of test, both in the `api` project.
 
-**Unit tests** — `src/**/*.spec.ts`, the bulk of the suite — mock the Prisma layer.
-`src/groups/__tests__/groups.service.spec.ts` is the canonical example. Build a testing module with
+**Unit tests** — `src/**/__tests__/*.test.ts`, the bulk of the suite — mock the Prisma layer.
+`src/groups/__tests__/groups.service.test.ts` is the canonical example. Build a testing module with
 `MockFactory.createForModelToken(getModelToken('Group'))` from
 `@douglasneuroinformatics/libnest/testing`, type mocks as `MockedInstance<Model<'Group'>>`, and
 assert Prisma arguments with `model.create.mock.lastCall?.[0]` and `toMatchObject`. A fresh module is

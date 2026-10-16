@@ -62,8 +62,8 @@ AppSubject` in `apps/api/prisma/schema.prisma` and `$AppSubjectName` in
    (`apps/api/src/auth/ability.factory.ts`); that table is typed over `$GroupScopableSubjectName`,
    so `tsc` reports the omission.
 
-9. **Service spec** at `apps/api/src/<feature>/__tests__/<feature>.service.spec.ts`. Copy the setup
-   from `apps/api/src/groups/__tests__/groups.service.spec.ts`:
+9. **Service spec** at `apps/api/src/<feature>/__tests__/<feature>.service.test.ts`. Copy the setup
+   from `apps/api/src/groups/__tests__/groups.service.test.ts`:
    `MockFactory.createForModelToken(getModelToken('X'))` per injected model, then assert with
    `model.<method>.mock.lastCall?.[0]` and `toMatchObject`. Assert the `where` clause, not only
    `data`.

@@ -287,7 +287,7 @@ export const StartSessionForm = ({
                 console.error(err);
               }
             }
-          } else if (val.subjectIdentificationMethod === 'PERSONAL_INFO') {
+          } else {
             const requiredKeys = ['subjectFirstName', 'subjectLastName', 'subjectSex', 'subjectDateOfBirth'] as const;
             for (const key of requiredKeys) {
               if (!val[key]) {

@@ -3,6 +3,12 @@ import { z } from 'zod/v4';
 import { $ActiveLanguages } from '../core/core.js';
 import { $ReleaseInfo } from '../setup/setup.js';
 
+const $GatewayHealthcheckFailureResult = z.object({
+  ok: z.literal(false),
+  status: z.number(),
+  statusText: z.string()
+});
+
 /**
  * The instance-level state the gateway needs in order to render an assignment, pushed by `apps/api`
  * on every synchronization pass. Deliberately a projection of `SetupState` rather than the whole
@@ -24,11 +30,6 @@ export const $GatewayHealthcheckSuccessResult = z.object({
 });
 
 export type GatewayHealthcheckFailureResult = z.infer<typeof $GatewayHealthcheckFailureResult>;
-export const $GatewayHealthcheckFailureResult = z.object({
-  ok: z.literal(false),
-  status: z.number(),
-  statusText: z.string()
-});
 
 export type GatewayHealthcheckResult = z.infer<typeof $GatewayHealthcheckResult>;
 export const $GatewayHealthcheckResult = z.discriminatedUnion('ok', [

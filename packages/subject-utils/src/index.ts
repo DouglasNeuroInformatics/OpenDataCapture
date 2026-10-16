@@ -51,7 +51,7 @@ export function isSubjectWithPersonalInfo<T extends SubjectPersonalInfo>(
   return true;
 }
 
-export function encodeScopedSubjectId(id: number | string, options: { groupName: string }) {
+export function encodeScopedSubjectId(id: string, options: { groupName: string }) {
   return options.groupName.replaceAll(' ', '_') + '$' + id;
 }
 

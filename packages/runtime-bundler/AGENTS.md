@@ -60,8 +60,7 @@ declarations are rewritten; `export ... from 'pkg'` in a `.d.ts` passes through 
 
 `src/cli.ts` (the `runtime-bundler` bin, run with `tsx`) resolves `runtime.config.js` from
 `process.cwd()`, so it only works when invoked from `runtime/v1`, and `outdir` is relative to that
-cwd. The default export is validated by `$UserConfigs` in `src/schemas.ts` and may be one config or an
-array.
+cwd. The default export is validated by `$Config` in `src/schemas.ts`.
 
 **A bundle failure is logged and the process still exits 0.** A broken runtime build will not fail
 CI on its own — check the output, or the tests below.

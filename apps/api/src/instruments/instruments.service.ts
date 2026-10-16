@@ -83,11 +83,8 @@ export class InstrumentsService {
     private readonly virtualizationService: VirtualizationService<InstrumentVirtualizationContext>
   ) {}
 
-  async count<TKind extends InstrumentKind>(
-    query: InstrumentQuery<TKind> = {},
-    options: EntityOperationOptions = {}
-  ): Promise<number> {
-    return (await this.find(query, options)).length;
+  async count(options: EntityOperationOptions = {}): Promise<number> {
+    return (await this.find({}, options)).length;
   }
 
   async create(
@@ -170,9 +167,9 @@ export class InstrumentsService {
    */
   async createSeries(
     { clientDetails, confirmDuplicate, details, groupId, items, language }: $CreateSeriesInstrumentData,
-    currentUser?: RequestUser
+    currentUser: RequestUser
   ): Promise<CreateSeriesInstrumentResult> {
-    const options = { ability: currentUser?.ability };
+    const options = { ability: currentUser.ability };
     const group = await this.groupModel.findFirst({
       select: { id: true },
       where: { AND: [accessibleQuery(options.ability, 'update', 'Group')], id: groupId }
@@ -209,10 +206,10 @@ export class InstrumentsService {
    * instruments and never have records of their own (records belong to their constituent members).
    * Scalar instruments are shared platform assets and are never removed through this path.
    */
-  async deleteById(id: string, currentUser?: RequestUser): Promise<{ id: string }> {
+  async deleteById(id: string, currentUser: RequestUser): Promise<{ id: string }> {
     const instrument = await this.instrumentModel.findFirst({
       where: {
-        AND: [accessibleQuery(currentUser?.ability, 'delete', 'Instrument')],
+        AND: [accessibleQuery(currentUser.ability, 'delete', 'Instrument')],
         id
       }
     });
@@ -378,12 +375,12 @@ export class InstrumentsService {
   }
 
   async findInfo<TKind extends InstrumentKind>(
-    query: InstrumentInfoQuery<TKind> = {},
-    currentUser?: RequestUser,
+    query: InstrumentInfoQuery<TKind>,
+    currentUser: RequestUser,
     requestedGroupId?: string
   ): Promise<InstrumentInfo[]> {
-    const groupIds = currentUser ? this.resolveGroupIds(currentUser, requestedGroupId) : undefined;
-    return this.findInfoWithinGroups(query, { ability: currentUser?.ability }, groupIds);
+    const groupIds = this.resolveGroupIds(currentUser, requestedGroupId);
+    return this.findInfoWithinGroups(query, { ability: currentUser.ability }, groupIds);
   }
 
   /**
@@ -442,13 +439,8 @@ export class InstrumentsService {
     return instance;
   }
 
-  async list<TKind extends InstrumentKind>(
-    query: InstrumentQuery<TKind> = {},
-    currentUser?: RequestUser,
-    requestedGroupId?: string
-  ) {
-    const groupIds = currentUser ? this.resolveGroupIds(currentUser, requestedGroupId) : undefined;
-    return this.find(query, { ability: currentUser?.ability }, groupIds).then((arr) => {
+  async list<TKind extends InstrumentKind>(query: InstrumentQuery<TKind>, currentUser: RequestUser) {
+    return this.find(query, { ability: currentUser.ability }, this.resolveGroupIds(currentUser)).then((arr) => {
       return arr.map((instrument) => ({
         id: instrument.id,
         internal: instrument.internal,

@@ -21,9 +21,6 @@ that carries no matching `dummyIdPrefix` seeds subject IDs that fail their own g
 The two are written next to each other in `src/index.ts` so they can be checked together — keep it
 that way.
 
-The `"./assets/*"` entry in `package.json` `exports` points at `./src/assets/*`, which does not
-exist. It resolves to nothing; do not build on it.
-
 ## Tests
 
 None, and there is no `vitest.config.ts` here. This data is exercised indirectly by `apps/api` and

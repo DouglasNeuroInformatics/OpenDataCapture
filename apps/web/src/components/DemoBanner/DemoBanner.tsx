@@ -33,7 +33,7 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
         </div>
       </div>
       <Dialog.Content
-        className="w-[calc(100%-1rem)] max-w-[600px] px-2.5 sm:px-6"
+        className="w-[calc(100%-1rem)] max-w-150 px-2.5 sm:px-6"
         data-testid="demo-dialog"
         onOpenAutoFocus={(event) => {
           event.preventDefault();

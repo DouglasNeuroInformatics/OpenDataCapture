@@ -8,13 +8,12 @@ export const $SubjectIdentificationMethod = z.enum(['CUSTOM_ID', 'PERSONAL_INFO'
 export type Sex = z.infer<typeof $Sex>;
 export const $Sex = z.enum(['MALE', 'FEMALE']);
 
-export type ClinicalSubjectIdentificationData = z.infer<typeof $ClinicalSubjectIdentificationData>;
-export const $ClinicalSubjectIdentificationData = z.object({
-  dateOfBirth: z.coerce.date(),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  sex: $Sex
-});
+export type ClinicalSubjectIdentificationData = {
+  dateOfBirth: Date;
+  firstName: string;
+  lastName: string;
+  sex: Sex;
+};
 
 export type Subject = z.infer<typeof $Subject>;
 export const $Subject = $BaseModel.extend({

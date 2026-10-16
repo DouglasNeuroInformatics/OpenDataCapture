@@ -148,9 +148,7 @@ directly means pasting a second share link into an open tab does nothing. Its `$
 
 ## Odds and ends
 
-`src/vim/` is a vendored port of CodeMirror's vim bindings to Monaco, top-to-bottom
-`/* eslint-disable */`. Do not refactor it; treat it as third-party. `.vscode/Scratch/` is unrelated
-junk.
+`.vscode/Scratch/` is unrelated junk.
 
 `__APP_VERSION__` and `__GITHUB_REPO_URL__` are the build-time defines, declared in
 `src/vite-env.d.ts` and supplied in `vite.config.ts`; `GITHUB_REPO_URL` must be listed under the

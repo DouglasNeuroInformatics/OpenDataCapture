@@ -385,8 +385,8 @@ describe('useBrandingForm', () => {
     it('should accept a custom size with only a width', () => {
       const { result } = renderBrandingForm({ customLogoWidth: 200, logoSize: 'custom' });
       expect(result.current.isCustomSizeInvalid).toBe(false);
-      expect(result.current.customWidth).toBe(200);
-      expect(result.current.customHeight).toBeNull();
+      expect(result.current.previewBranding.customLogoWidth).toBe(200);
+      expect(result.current.previewBranding.customLogoHeight).toBeNull();
     });
 
     it.each([
@@ -411,7 +411,7 @@ describe('useBrandingForm', () => {
     it('should ignore the custom colors while a preset left theme is selected', () => {
       const { result } = renderBrandingForm({ customPrimaryColor: null, loginTheme: 'forest' });
       act(() => result.current.update('customPrimaryColor', 'bad'));
-      expect(result.current.isCustomColorInvalid).toBe(false);
+      expect(result.current.isSubmitDisabled).toBe(false);
     });
 
     it.each([
@@ -420,18 +420,18 @@ describe('useBrandingForm', () => {
     ] as const)('should flag an invalid custom %s left color', (_, key) => {
       const { result } = renderBrandingForm({ loginTheme: 'custom' });
       act(() => result.current.update(key, 'bad'));
-      expect(result.current.isCustomColorInvalid).toBe(true);
+      expect(result.current.isSubmitDisabled).toBe(true);
     });
 
     it('should accept valid custom left colors', () => {
       const { result } = renderBrandingForm({ loginTheme: 'custom' });
-      expect(result.current.isCustomColorInvalid).toBe(false);
+      expect(result.current.isSubmitDisabled).toBe(false);
     });
 
     it('should ignore the custom right colors while a preset right theme is selected', () => {
       const { result } = renderBrandingForm({ rightPanelTheme: 'ocean' });
       act(() => result.current.update('rightPanelPrimaryColor', 'bad'));
-      expect(result.current.isRightPanelCustomColorInvalid).toBe(false);
+      expect(result.current.isSubmitDisabled).toBe(false);
     });
 
     it.each([
@@ -440,18 +440,18 @@ describe('useBrandingForm', () => {
     ] as const)('should flag an invalid custom %s right color', (_, key) => {
       const { result } = renderBrandingForm({ rightPanelTheme: 'custom' });
       act(() => result.current.update(key, 'bad'));
-      expect(result.current.isRightPanelCustomColorInvalid).toBe(true);
+      expect(result.current.isSubmitDisabled).toBe(true);
     });
 
     it('should accept valid custom right colors', () => {
       const { result } = renderBrandingForm({ rightPanelTheme: 'custom' });
-      expect(result.current.isRightPanelCustomColorInvalid).toBe(false);
+      expect(result.current.isSubmitDisabled).toBe(false);
     });
 
     it('should flag an invalid panel text color, since that field is always shown', () => {
       const { result } = renderBrandingForm();
       act(() => result.current.update('panelTextColor', ''));
-      expect(result.current.isPanelTextColorInvalid).toBe(true);
+      expect(result.current.isSubmitDisabled).toBe(true);
     });
   });
 
@@ -459,7 +459,7 @@ describe('useBrandingForm', () => {
     it('should ignore invalid links while the section is hidden', () => {
       const { result } = renderBrandingForm({ showResourceLinks: false });
       act(() => result.current.addResourceLink());
-      expect(result.current.hasInvalidResourceLinks).toBe(false);
+      expect(result.current.isSubmitDisabled).toBe(false);
     });
 
     it.each([
@@ -471,7 +471,7 @@ describe('useBrandingForm', () => {
       act(() => result.current.addResourceLink());
       act(() => result.current.updateResourceLinkHref(1, link.href));
       act(() => result.current.updateResourceLinkLabel(1, 'en', link.label.en));
-      expect(result.current.hasInvalidResourceLinks).toBe(true);
+      expect(result.current.isSubmitDisabled).toBe(true);
     });
 
     it('should accept a link labelled in French only', () => {
@@ -479,7 +479,7 @@ describe('useBrandingForm', () => {
         resourceLinks: [{ href: 'https://example.com', label: { fr: 'Lien' } }],
         showResourceLinks: true
       });
-      expect(result.current.hasInvalidResourceLinks).toBe(false);
+      expect(result.current.isSubmitDisabled).toBe(false);
     });
   });
 

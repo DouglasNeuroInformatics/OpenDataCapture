@@ -35,7 +35,7 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
               <Headshot className="md:rounded-lg md:shadow-lg" src={image} alt={fullName} />
             </div>
             <div class="flex flex-col md:col-span-3 lg:col-span-2">
-              <div class="mb-2 flex h-14 flex-col justify-between py-2.5 pl-[4.25rem] md:mb-0 md:py-1.5 md:pl-0">
+              <div class="mb-2 flex h-14 flex-col justify-between py-2.5 pl-17 md:mb-0 md:py-1.5 md:pl-0">
                 <h5 class="leading-none font-bold tracking-tight md:text-lg">{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h5>
                 <span class="text-sm leading-none font-semibold tracking-tight text-sky-700 md:text-base dark:text-sky-500 md:dark:text-sky-400">
                   {position[resolvedLanguage]}

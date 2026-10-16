@@ -20,12 +20,29 @@ type TranspilerBuildingState = {
   status: 'building';
 };
 
+type TranspilerState = TranspilerBuildingState | TranspilerBuiltState | TranspilerErrorState | TranspilerInitialState;
+
+type EditorState = {
+  files: EditorFile[];
+  indexFilename: null | string;
+  openFilenames: string[];
+  selectedFilename: null | string;
+};
+
+type EditorActions = {
+  addFile: (file: EditorFile) => void;
+  addFiles: (files: EditorFile[]) => void;
+  closeFile: (name: string) => void;
+  deleteFile: (name: string) => void;
+  renameFile: (currentName: string, updatedName: string) => void;
+  selectFile: (name: string) => void;
+  setSelectedFileContent: (content: string) => void;
+  updateFile: (name: string, update: Partial<EditorFile>) => void;
+};
+
 export type TranspilerInitialState = {
   status: 'initial';
 };
-
-export type TranspilerState =
-  TranspilerBuildingState | TranspilerBuiltState | TranspilerErrorState | TranspilerInitialState;
 
 export type TranspilerSlice = {
   setTranspilerState: (state: TranspilerState) => void;
@@ -50,24 +67,6 @@ export type EditorError = {
 export type DiagnosticsSlice = {
   editorErrors: EditorError[];
   setEditorErrors: (editorErrors: EditorError[]) => void;
-};
-
-export type EditorState = {
-  files: EditorFile[];
-  indexFilename: null | string;
-  openFilenames: string[];
-  selectedFilename: null | string;
-};
-
-export type EditorActions = {
-  addFile: (file: EditorFile) => void;
-  addFiles: (files: EditorFile[]) => void;
-  closeFile: (name: string) => void;
-  deleteFile: (name: string) => void;
-  renameFile: (currentName: string, updatedName: string) => void;
-  selectFile: (name: string) => void;
-  setSelectedFileContent: (content: string) => void;
-  updateFile: (name: string, update: Partial<EditorFile>) => void;
 };
 
 export type EditorSlice = Simplify<EditorActions & EditorState>;

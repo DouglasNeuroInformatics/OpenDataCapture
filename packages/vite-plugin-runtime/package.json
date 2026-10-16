@@ -18,8 +18,5 @@
   },
   "dependencies": {
     "@opendatacapture/runtime-meta": "workspace:*"
-  },
-  "devDependencies": {
-    "@douglasneuroinformatics/libjs": "catalog:"
   }
 }

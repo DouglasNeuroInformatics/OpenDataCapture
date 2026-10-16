@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { extractInputFileExtension } from '@opendatacapture/instrument-bundler';
@@ -9,7 +9,6 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/store';
 import { isImageLikeFileExtension } from '@/utils/file';
 import { loadEditorFilesFromNative } from '@/utils/load';
-import { VimMode } from '@/vim';
 
 import { FileUploadDialog } from '../FileUploadDialog';
 import { DeleteFileDialog } from './DeleteFileDialog';
@@ -19,8 +18,6 @@ import { EditorFileButton } from './EditorFileButton';
 import { EditorPane } from './EditorPane';
 import { EditorPanePlaceholder } from './EditorPanePlaceholder';
 import { EditorTab } from './EditorTab';
-
-import type { EditorPaneRef } from './EditorPane';
 
 import './setup';
 
@@ -59,22 +56,6 @@ export const Editor = () => {
 
   const selectedFilename = useAppStore((store) => store.selectedFilename);
   const deleteFilenameRef = useRef<null | string>(null);
-
-  const isVimModeEnabled = useAppStore((store) => Boolean(store.settings.enableVimMode));
-  const [isEditorMounted, setIsEditorMounted] = useState(false);
-  const editorPaneRef = useRef<EditorPaneRef>(null);
-  const vimModeRef = useRef<null | VimMode>(null);
-
-  useEffect(() => {
-    if (isEditorMounted) {
-      if (isVimModeEnabled) {
-        vimModeRef.current ??= new VimMode(editorPaneRef.current!.editor!);
-        vimModeRef.current.enable();
-      } else {
-        vimModeRef.current?.disable();
-      }
-    }
-  }, [isEditorMounted, isVimModeEnabled]);
 
   return (
     <div className="flex h-full w-full flex-col border border-r-0 bg-slate-50 dark:bg-slate-800">
@@ -139,7 +120,7 @@ export const Editor = () => {
           </div>
         </motion.div>
         {openFilenames.length ? (
-          <EditorPane ref={editorPaneRef} onEditorMount={() => setIsEditorMounted(true)} />
+          <EditorPane />
         ) : (
           <EditorPanePlaceholder>
             {t({ en: 'No File Selected', fr: 'Aucun fichier sélectionné' })}

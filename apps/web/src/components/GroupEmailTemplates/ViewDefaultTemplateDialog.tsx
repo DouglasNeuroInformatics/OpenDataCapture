@@ -31,12 +31,7 @@ export const ViewDefaultTemplateDialog = ({ onOpenChange, open }: ViewDefaultTem
             })}
           </Dialog.Description>
         </Dialog.Header>
-        <EmailTemplateEditor
-          readOnly
-          idPrefix="template-builtin"
-          template={DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE}
-          onChange={() => undefined}
-        />
+        <EmailTemplateEditor idPrefix="template-builtin" template={DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE} />
         <Dialog.Footer>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             {t('core.close')}

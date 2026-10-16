@@ -52,5 +52,3 @@ export type BeginChunkProcessingMessage = {
 export type ParentMessage = BeginChunkProcessingMessage | InitMessage;
 
 export type WorkerMessage = { data: InstrumentRecordsExport; success: true } | { error: string; success: false };
-
-export type InitialMessage = { success: true };

@@ -90,13 +90,11 @@ of your file means the config is absent.
    the projects directly and never reads this script; `vitest` is a root devDependency, so the package
    declares nothing.
 
-7. **Place the test file inside the inherited globs.** Those are
-   `**/*.{test,spec}.?(c|m)[jt]s?(x)` and `**/*/test.?(c|m)[jt]s?(x)`, both relative to the package
-   `root`; the house convention is `src/__tests__/<subject>.test.ts`. Only reach for a project-level
-   `include` when a file must live outside them — `mergeConfig` concatenates arrays, so a project
-   `include` _adds_ to the root globs rather than replacing them. `apps/api` is the proof: its own
-   `include` is `['src/**/*.spec.ts', 'test/**/*.test.ts']`, and
-   `src/auth/__tests__/ability.utils.test.ts` matches neither, yet is collected.
+7. **Place the test file inside the inherited glob.** That is `**/*.{test,spec}.?(c|m)[jt]s?(x)`,
+   relative to the package `root`; the house convention is a `__tests__/` folder beside the subject,
+   with the spec named after it (`src/__tests__/index.test.ts` tests `src/index.ts`). Only reach for
+   a project-level `include` when a file must live outside that glob — `mergeConfig` concatenates
+   arrays, so a project `include` _adds_ to the root glob rather than replacing it.
 
 8. **Prove the file is collected, then prove it can fail.** If the package imports
    `instrument-library`, `runtime-core` or `runtime/v1`, run `pnpm build` once first — those three
