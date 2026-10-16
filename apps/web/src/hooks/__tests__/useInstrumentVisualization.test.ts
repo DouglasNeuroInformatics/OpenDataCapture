@@ -571,7 +571,7 @@ describe('useInstrumentVisualization', () => {
     // The per-instrument view takes its instrument from the route, so navigating between editions
     // changes it underneath the hook rather than through setInstrumentId.
     it('should adopt the instrument the route names when it changes underneath the hook', () => {
-      const { result, rerender } = renderHook(
+      const { rerender, result } = renderHook(
         ({ instrumentId }: { instrumentId: string }) => useInstrumentVisualization({ params: { instrumentId } }),
         { initialProps: { instrumentId: 'hq-1' } }
       );

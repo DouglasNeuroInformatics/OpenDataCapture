@@ -5,9 +5,9 @@ import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { RecordScatterChart } from '../RecordScatterChart';
-
 import type { RecordChartSeries } from '@/hooks/useRecordChartSeries';
+
+import { RecordScatterChart } from '../RecordScatterChart';
 
 import '@/services/i18n';
 

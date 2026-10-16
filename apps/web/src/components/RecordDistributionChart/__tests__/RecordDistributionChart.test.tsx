@@ -4,9 +4,9 @@ import type { ReactElement } from 'react';
 import { act, cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { RecordDistributionChart } from '../RecordDistributionChart';
-
 import type { RecordChartSeries } from '@/hooks/useRecordChartSeries';
+
+import { RecordDistributionChart } from '../RecordDistributionChart';
 
 import '@/services/i18n';
 

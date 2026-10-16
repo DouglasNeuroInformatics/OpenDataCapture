@@ -192,6 +192,13 @@ describe('instrument graph route', () => {
     expect(screen.getByTestId('scatter-chart').dataset.measureLabel).toBe('');
   });
 
+  // An instrument declaring no measures has nothing to chart, and the control must still render.
+  it('should leave the measure control empty for an instrument with no measures', () => {
+    mocks.useMeasureOptions.mockReturnValue([]);
+    renderGraph();
+    expect(screen.getByTestId('instrument-hub-measure-trigger').textContent).toBe('Please select one or more measures');
+  });
+
   it('should offer the measures of the opened instrument', () => {
     renderGraph();
     expect(mocks.useMeasureOptions).toHaveBeenCalledWith(instrument);
@@ -300,10 +307,15 @@ describe('instrument graph trend', () => {
 
 describe('instrument graph download', () => {
   it('should save the capture as a png named after the instrument', async () => {
+    const blob = new Blob(['png'], { type: 'image/png' });
+    mocks.renderChartPng.mockResolvedValue(blob);
     renderGraph();
     await downloadChart();
+    const [filename, fetchData, options] = mocks.download.mock.lastCall as [string, () => Blob, object];
     expect(mocks.chartImageFilename).toHaveBeenCalledWith('Unilingual Form');
-    expect(mocks.download.mock.lastCall?.[0]).toBe('Unilingual Form.png');
+    expect(filename).toBe('Unilingual Form.png');
+    expect(fetchData()).toBe(blob);
+    expect(options).toEqual({ blobType: 'image/png' });
   });
 
   it('should caption the capture with the instrument and the charted measure', async () => {

@@ -127,4 +127,4 @@ export function useRecordChartSeries({ colourBy, measure, palette, records }: Us
 }
 
 export { COLOUR_BY_OPTIONS };
-export type { ColourBy, RecordChartPoint, RecordChartSeries };
+export type { ColourBy, RecordChartSeries };

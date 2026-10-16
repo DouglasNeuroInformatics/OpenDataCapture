@@ -1,6 +1,10 @@
 import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
-import type { AnyUnilingualFormInstrument, AnyUnilingualScalarInstrument } from '@opendatacapture/runtime-core';
+import type {
+  AnyUnilingualFormInstrument,
+  AnyUnilingualInteractiveInstrument,
+  AnyUnilingualScalarInstrument
+} from '@opendatacapture/runtime-core';
 import { cleanup, renderHook } from '@testing-library/react';
 import { omit } from 'lodash-es';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -22,13 +26,15 @@ function formInstrument({
   };
 }
 
-/** The interactive stub, retyped with the given measures — it declares none of its own. */
-function interactiveWithMeasures(measures: AnyUnilingualScalarInstrument['measures']): AnyUnilingualScalarInstrument {
-  return {
-    ...omit(interactiveInstrument.instance, ['measures', 'validationSchema']),
-    measures,
-    validationSchema: z.object({})
-  };
+/**
+ * The interactive stub, retyped with the given measures. The stub's own type leaves `language` open,
+ * so it is narrowed here rather than at every call site.
+ */
+function interactiveWithMeasures(
+  measures: AnyUnilingualInteractiveInstrument['measures']
+): AnyUnilingualInteractiveInstrument {
+  const instance = interactiveInstrument.instance as AnyUnilingualInteractiveInstrument;
+  return { ...omit(instance, ['measures']), measures };
 }
 
 function measureOptionsFor(instrument: AnyUnilingualScalarInstrument | null) {

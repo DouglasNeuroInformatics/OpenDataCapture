@@ -66,4 +66,3 @@ function binDistribution(series: RecordChartSeries[], isNumeric: boolean): Distr
 }
 
 export { binDistribution };
-export type { DistributionRow };

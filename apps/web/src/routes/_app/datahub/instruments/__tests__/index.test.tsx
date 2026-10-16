@@ -49,8 +49,10 @@ vi.mock('@/components/InstrumentTable', () => ({
   InstrumentTable: ({ onOpen, rows }: { onOpen: (row: InstrumentRow) => void; rows: InstrumentRow[] }) => (
     <ul>
       {rows.map((row) => (
-        <li data-testid={`row-${row.id}`} key={row.id} onClick={() => onOpen(row)}>
-          {JSON.stringify(row)}
+        <li key={row.id}>
+          <button data-testid={`row-${row.id}`} type="button" onClick={() => onOpen(row)}>
+            {JSON.stringify(row)}
+          </button>
         </li>
       ))}
     </ul>
@@ -81,7 +83,7 @@ const renderHub = () => {
   render(<Component />);
 };
 
-const rowFor = (id: string) => JSON.parse(screen.getByTestId(`row-${id}`).textContent!) as InstrumentRow;
+const rowFor = (id: string) => JSON.parse(screen.getByTestId(`row-${id}`).textContent) as InstrumentRow;
 
 beforeEach(() => {
   mocks.infos = [scalar('hq-1')];

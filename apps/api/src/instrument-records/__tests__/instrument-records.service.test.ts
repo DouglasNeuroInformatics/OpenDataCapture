@@ -687,6 +687,16 @@ describe('InstrumentRecordsService', () => {
       expect(instrumentRecordModel.findMany).not.toHaveBeenCalled();
     });
 
+    it('should query the records a series orchestrated', async () => {
+      instrumentsService.findById.mockResolvedValueOnce({ id: 'series-1', kind: 'SERIES' } as any);
+
+      await instrumentRecordsService.find({ seriesInstrumentId: 'series-1' });
+
+      expect(instrumentRecordModel.findMany.mock.lastCall?.[0].where.AND).toContainEqual({
+        seriesInstrumentId: 'series-1'
+      });
+    });
+
     it('should restrict the records to instruments of the requested kind', async () => {
       instrumentsService.find.mockResolvedValueOnce([{ id: 'form-1' }, { id: 'form-2' }]);
 
@@ -1381,6 +1391,18 @@ describe('InstrumentRecordsService', () => {
       const [summary] = await instrumentRecordsService.summarizeByInstrument({}, { ability: ADMIN });
 
       expect(summary).toMatchObject({ recordCount: 2, subjectCount: 1 });
+    });
+
+    // A record written before subjects were required carries no subject, and counting `null` as one
+    // would report a subject nobody can open.
+    it('should count no subject for a row naming none, while still counting its records', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', key: 'instrument-1', lastCollectedAt: null, recordCount: 2, subjectId: null }
+      ]);
+
+      const [summary] = await instrumentRecordsService.summarizeByInstrument({}, { ability: ADMIN });
+
+      expect(summary).toMatchObject({ recordCount: 2, subjectCount: 0 });
     });
   });
 

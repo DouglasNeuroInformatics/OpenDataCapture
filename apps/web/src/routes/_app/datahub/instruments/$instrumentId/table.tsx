@@ -154,19 +154,6 @@ const RouteComponent = () => {
 
   const measureColumns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(() => {
     const columns: TanstackTable.ColumnDef<InstrumentVisualizationRecord>[] = [];
-    if (isSeries) {
-      return [
-        {
-          accessorFn: (record) => instrumentInfoById[record.__instrumentId__]?.title ?? record.__instrumentId__,
-          cell: (ctx) => {
-            const title = ctx.getValue() as string;
-            return <TruncatedCell data-testid="instrument-table-cell-instrument" title={title} value={title} />;
-          },
-          header: ({ column }) => <SortableHeader column={column} label="INSTRUMENT" />,
-          id: '__instrument__'
-        }
-      ];
-    }
     for (const key in records[0]) {
       if (!key.startsWith(FIXED_COLUMN_PREFIX)) {
         columns.push({
@@ -181,7 +168,7 @@ const RouteComponent = () => {
       }
     }
     return columns;
-  }, [instrumentInfoById, isSeries, records[0]]);
+  }, [records[0]]);
 
   // Both subject destinations carry where they were opened from, so the subject hub's return comes
   // back to this record table rather than dropping the reader on the subject index.

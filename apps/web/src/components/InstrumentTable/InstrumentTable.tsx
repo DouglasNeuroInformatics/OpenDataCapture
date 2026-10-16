@@ -93,11 +93,13 @@ const Toolbar = ({
   // field was cleared, so typed digits landed after it instead of replacing it.
   const [minRecords, setMinRecords] = useState('');
 
-  const kindColumn = table.getAllColumns().find((column) => column.id === 'kind');
-  const kindFilter = (kindColumn?.getFilterValue() ?? []) as KindFilter;
-  const recordColumn = table.getAllColumns().find((column) => column.id === 'recordCount');
-  const collectedColumn = table.getAllColumns().find((column) => column.id === 'lastCollectedAt');
-  const collectedFilter = (collectedColumn?.getFilterValue() ?? DEFAULT_COLLECTED_FILTER) as CollectedFilter;
+  // Each column is declared below with these ids, and `initialState.columnFilters` seeds all three.
+  const columnsById = new Map(table.getAllColumns().map((column) => [column.id, column]));
+  const kindColumn = columnsById.get('kind')!;
+  const kindFilter = kindColumn.getFilterValue() as KindFilter;
+  const recordColumn = columnsById.get('recordCount')!;
+  const collectedColumn = columnsById.get('lastCollectedAt')!;
+  const collectedFilter = collectedColumn.getFilterValue() as CollectedFilter;
 
   /** Export what the table is listing, so a filtered view and its download agree. */
   const listed = useMemo(() => {
@@ -167,7 +169,7 @@ const Toolbar = ({
                 data-testid={`instrument-table-filter-kind-${kind}`}
                 key={kind}
                 onCheckedChange={(checked) => {
-                  kindColumn?.setFilterValue((previous: KindFilter) =>
+                  kindColumn.setFilterValue((previous: KindFilter) =>
                     checked ? [...previous, kind] : previous.filter((item) => item !== kind)
                   );
                 }}
@@ -191,14 +193,14 @@ const Toolbar = ({
                 onChange={(event) => {
                   setMinRecords(event.target.value);
                   // An empty field means no minimum, which is why the parse falls back to zero.
-                  recordColumn?.setFilterValue(Number.parseInt(event.target.value, 10) || 0);
+                  recordColumn.setFilterValue(Number.parseInt(event.target.value, 10) || 0);
                 }}
               />
             </div>
             <CollectedFilterMenu
               testIdPrefix="instrument-table-filter"
               value={collectedFilter}
-              onChange={(next) => collectedColumn?.setFilterValue(next)}
+              onChange={(next) => collectedColumn.setFilterValue(next)}
             />
           </DropdownMenu.Group>
         </DropdownMenu.Content>

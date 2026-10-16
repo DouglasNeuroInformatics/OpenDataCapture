@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { InstrumentRow } from '@/components/InstrumentTable';
@@ -27,7 +27,8 @@ const mocks = vi.hoisted(() => ({
   },
   infoById: {},
   openSeriesMember: { current: null as ((row: InstrumentRow) => void) | null },
-  records: [] as VisualizationRecord[]
+  records: [] as VisualizationRecord[],
+  subjectIdDisplayLength: undefined as number | undefined
 }));
 
 vi.mock('@/hooks/useInstrumentHubRecords', () => ({
@@ -39,7 +40,8 @@ vi.mock('@/hooks/useInstrumentHubFacets', () => ({
 }));
 vi.mock('@/hooks/useInstrumentInfoById', () => ({ useInstrumentInfoById: () => mocks.infoById }));
 vi.mock('@/store', () => ({
-  useAppStore: (selector: (store: { currentGroup: null }) => unknown) => selector({ currentGroup: null })
+  useAppStore: (selector: (store: { currentGroup: { settings: { subjectIdDisplayLength?: number } } }) => unknown) =>
+    selector({ currentGroup: { settings: { subjectIdDisplayLength: mocks.subjectIdDisplayLength } } })
 }));
 // Captured rather than rendered: the listing itself is covered by instrument-table.test.tsx, and
 // what matters here is the search the drill-down navigates with.
@@ -49,8 +51,19 @@ vi.mock('@/components/InstrumentTable', () => ({
     return <span data-testid="instrument-hub-series-members" />;
   }
 }));
-vi.mock('@/components/SelectEdition', () => ({ SelectEdition: () => <span /> }));
-vi.mock('@/components/TimeDropdown', () => ({ TimeDropdown: () => <span /> }));
+vi.mock('@/components/SelectEdition', () => ({
+  SelectEdition: ({ onSelect, value }: { onSelect: (id: string) => void; value: null | string }) => (
+    <button data-testid="select-edition" data-value={value} type="button" onClick={() => onSelect('hq-2')} />
+  )
+}));
+vi.mock('@/components/TimeDropdown', () => ({
+  TimeDropdown: ({ setMinTime }: { setMinTime: (value: Date | null) => void }) => (
+    <span>
+      <button data-testid="select-time" type="button" onClick={() => setMinTime(new Date(2026, 0, 1))} />
+      <button data-testid="clear-time" type="button" onClick={() => setMinTime(null)} />
+    </span>
+  )
+}));
 
 const navigate = vi.fn();
 
@@ -83,6 +96,11 @@ const headerButton = (label: string) =>
     (button) => button.textContent === label
   );
 
+const lastSearch = () => {
+  const [{ search }] = navigate.mock.lastCall as [{ search: (prev: object) => object }];
+  return search({});
+};
+
 beforeEach(() => {
   navigate.mockReset();
   mocks.facets.isSeries = false;
@@ -90,6 +108,7 @@ beforeEach(() => {
   mocks.infoById = {};
   mocks.openSeriesMember.current = null;
   mocks.records = [record()];
+  mocks.subjectIdDisplayLength = undefined;
   vi.spyOn(Route, 'useNavigate').mockReturnValue(navigate);
   vi.spyOn(Route, 'useParams').mockReturnValue({ instrumentId: 'hq-1' });
   vi.spyOn(Route, 'useSearch').mockReturnValue({});
@@ -123,6 +142,166 @@ describe('instrument hub table route', () => {
     expect(scores()).toEqual(['2', '9']);
     fireEvent.click(headerButton('TOTAL_SCORE')!);
     expect(scores()).toEqual(['9', '2']);
+  });
+
+  it('should show the collection date as an ISO date', () => {
+    renderTable();
+    expect(screen.getByText('2026-01-15')).toBeTruthy();
+  });
+
+  // A record whose date never parsed is shown as it stands rather than crashing the table.
+  it('should show a date that is not a date as it stands', () => {
+    mocks.records = [record({ __date__: 'not a date' })];
+    renderTable();
+    expect(screen.getByText('not a date')).toBeTruthy();
+  });
+
+  it("should truncate the subject id to the current group's display length", () => {
+    mocks.subjectIdDisplayLength = 3;
+    renderTable();
+    expect(screen.getByText('ali')).toBeTruthy();
+  });
+
+  it('should truncate the subject id to nine characters when the group sets no display length', () => {
+    mocks.records = [record({ __subjectId__: 'ROOT$abcdefghijkl' })];
+    renderTable();
+    expect(screen.getByText('abcdefghi')).toBeTruthy();
+  });
+
+  it('should open the record of the row that was double clicked', () => {
+    renderTable();
+    fireEvent.doubleClick(screen.getByTestId('data-table-row'));
+    expect(navigate).toHaveBeenCalledWith({
+      params: { recordId: 'record-1', subjectId: 'ROOT$alice' },
+      search: { fromInstrument: 'hq-1', fromSeries: undefined },
+      to: '/datahub/subjects/$subjectId/table/$recordId'
+    });
+  });
+
+  it('should mark the row that was clicked as the highlighted one', () => {
+    renderTable();
+    expect(screen.getByTestId('data-table-row').querySelector('[data-row-selected="false"]')).toBeTruthy();
+    fireEvent.click(screen.getByTestId('data-table-row'));
+    expect(screen.getByTestId('data-table-row').querySelector('[data-row-selected="true"]')).toBeTruthy();
+  });
+
+  it.each([
+    ['View Record', '/datahub/subjects/$subjectId/table/$recordId'],
+    ['View Subject', '/datahub/subjects/$subjectId/table']
+  ])('should open %s from the row actions, carrying where it was opened from', (label, to) => {
+    renderTable();
+    fireEvent.keyDown(screen.getByTestId('row-actions-trigger'), { key: 'Enter' });
+    fireEvent.click(within(screen.getByTestId('row-actions-dropdown')).getByRole('menuitem', { name: label }));
+    expect(navigate.mock.lastCall?.[0]).toMatchObject({ search: { fromInstrument: 'hq-1' }, to });
+  });
+
+  // The series the instrument was opened from has to survive onward navigation, or the subject hub's
+  // return link loses the trail back through the series.
+  it('should carry the series it was opened from onto the subject', () => {
+    vi.spyOn(Route, 'useSearch').mockReturnValue({ fromSeries: 'series-1' });
+    renderTable();
+    fireEvent.doubleClick(screen.getByTestId('data-table-row'));
+    expect(navigate.mock.lastCall?.[0]).toMatchObject({
+      search: { fromInstrument: 'hq-1', fromSeries: 'series-1' }
+    });
+  });
+
+  it('should open the chosen edition of the instrument', () => {
+    renderTable();
+    fireEvent.click(screen.getByTestId('select-edition'));
+    expect(navigate).toHaveBeenCalledWith({
+      params: { instrumentId: 'hq-2' },
+      to: '/datahub/instruments/$instrumentId/table'
+    });
+  });
+
+  it('should record the chosen timeframe in the url', () => {
+    renderTable();
+    fireEvent.click(screen.getByTestId('select-time'));
+    expect(lastSearch()).toEqual({ minDate: new Date(2026, 0, 1) });
+  });
+
+  // An undefined bound drops the parameter rather than putting a null in the url.
+  it('should drop the timeframe from the url when it is cleared', () => {
+    renderTable();
+    fireEvent.click(screen.getByTestId('clear-time'));
+    expect(lastSearch()).toEqual({ minDate: undefined });
+  });
+
+  it('should disable the export when there are no records to export', () => {
+    mocks.records = [];
+    renderTable();
+    expect(screen.getByRole('button', { name: 'Download' }).hasAttribute('disabled')).toBe(true);
+  });
+});
+
+describe('instrument hub table filters', () => {
+  const openFilters = () => fireEvent.keyDown(screen.getByTestId('instrument-hub-filters-trigger'), { key: 'Enter' });
+
+  it('should start with every collection method kept, so the table opens on the whole set', () => {
+    renderTable();
+    openFilters();
+    expect(screen.getByTestId('instrument-hub-filter-method-IN_PERSON').getAttribute('data-state')).toBe('checked');
+  });
+
+  it('should drop a collection method that is unchecked', () => {
+    renderTable();
+    openFilters();
+    fireEvent.click(screen.getByTestId('instrument-hub-filter-method-REMOTE'));
+    expect(lastSearch()).toEqual({ methods: ['RETROSPECTIVE', 'IN_PERSON'] });
+  });
+
+  it('should restore a collection method that is checked again', () => {
+    vi.spyOn(Route, 'useSearch').mockReturnValue({ methods: ['IN_PERSON'] });
+    renderTable();
+    openFilters();
+    fireEvent.click(screen.getByTestId('instrument-hub-filter-method-REMOTE'));
+    expect(lastSearch()).toEqual({ methods: ['IN_PERSON', 'REMOTE'] });
+  });
+
+  it('should offer each series its records were collected under by name', () => {
+    mocks.facets.seriesOptions = new Map([['series-1', 'Repeated Battery']]);
+    renderTable();
+    openFilters();
+    expect(screen.getByTestId('instrument-hub-filter-series-series-1').textContent).toBe('Repeated Battery');
+  });
+
+  // A record may name a series the caller cannot read, leaving the id as the only available label.
+  it('should offer a series it cannot name by its id', () => {
+    mocks.facets.seriesOptions = new Map([['series-1', null]]);
+    renderTable();
+    openFilters();
+    expect(screen.getByTestId('instrument-hub-filter-series-series-1').textContent).toBe('series-1');
+  });
+
+  it('should label the records collected outside any series as individual', () => {
+    mocks.facets.seriesOptions = new Map([['', null]]);
+    renderTable();
+    openFilters();
+    expect(screen.getByTestId('instrument-hub-filter-series-individual').textContent).toBe('Individual');
+  });
+
+  it('should drop a series that is unchecked', () => {
+    mocks.facets.seriesOptions = new Map([
+      ['series-1', 'Repeated Battery'],
+      ['series-2', 'Other Battery']
+    ]);
+    renderTable();
+    openFilters();
+    fireEvent.click(screen.getByTestId('instrument-hub-filter-series-series-1'));
+    expect(lastSearch()).toEqual({ series: ['series-2'] });
+  });
+
+  it('should restore a series that is checked again', () => {
+    mocks.facets.seriesOptions = new Map([
+      ['series-1', 'Repeated Battery'],
+      ['series-2', 'Other Battery']
+    ]);
+    vi.spyOn(Route, 'useSearch').mockReturnValue({ series: ['series-2'] });
+    renderTable();
+    openFilters();
+    fireEvent.click(screen.getByTestId('instrument-hub-filter-series-series-1'));
+    expect(lastSearch()).toEqual({ series: ['series-2', 'series-1'] });
   });
 });
 

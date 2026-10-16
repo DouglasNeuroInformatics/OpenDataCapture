@@ -2,9 +2,9 @@ import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SelectChartPalette } from '../SelectChartPalette';
-
 import { CHART_PALETTE_THEMES } from '@/utils/chart-palette';
+
+import { SelectChartPalette } from '../SelectChartPalette';
 
 import '@/services/i18n';
 
