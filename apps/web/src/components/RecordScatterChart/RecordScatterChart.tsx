@@ -87,10 +87,13 @@ export const RecordScatterChart = ({ measureLabel, series, trend, xLabel }: Reco
         />
         <Tooltip
           contentStyle={tooltipStyles[resolvedTheme]}
-          formatter={(value: number, name) => [value, name === 'time' ? xLabel : measureLabel]}
-          labelFormatter={(time: number) =>
-            new Intl.DateTimeFormat(resolvedLanguage, { dateStyle: 'medium' }).format(new Date(time))
-          }
+          // A scatter's tooltip carries no label of its own, so the date is formatted in the row
+          // recharts names after the x axis rather than through `labelFormatter`, which is never
+          // called here. Both rows are named by their axis already.
+          formatter={(value: number, name) => [
+            name === xLabel ? new Intl.DateTimeFormat(resolvedLanguage, { dateStyle: 'medium' }).format(value) : value,
+            name
+          ]}
           labelStyle={{ color: inkColors[resolvedTheme], fontWeight: 500 }}
         />
         {trendSegment && (

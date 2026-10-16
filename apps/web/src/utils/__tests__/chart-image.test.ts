@@ -108,6 +108,13 @@ describe('renderChartPng', () => {
     ).rejects.toThrow('There is no chart on screen to save');
   });
 
+  it('should report that the browser cannot encode an image rather than drawing onto nothing', async () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
+    await expect(renderChartPng(chartCard(), { mode: 'light' })).rejects.toThrow(
+      'This browser cannot encode the chart as an image'
+    );
+  });
+
   it('should report a failure to encode rather than resolving with nothing', async () => {
     encodedBlob = null;
     await expect(renderChartPng(chartCard(), { mode: 'light' })).rejects.toThrow(

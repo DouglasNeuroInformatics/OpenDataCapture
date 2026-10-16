@@ -63,7 +63,7 @@ function getCategoricalColor(index: number, theme: 'dark' | 'light', palette: Ch
   if (index >= MAX_CATEGORICAL_GROUPS) {
     return NEUTRAL_MARK[theme];
   }
-  return CHART_PALETTE_THEMES[palette][theme][index] ?? NEUTRAL_MARK[theme];
+  return CHART_PALETTE_THEMES[palette][theme][index]!;
 }
 
 /**

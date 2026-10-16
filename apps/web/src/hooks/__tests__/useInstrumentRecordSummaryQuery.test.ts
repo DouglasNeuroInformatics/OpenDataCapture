@@ -1,13 +1,27 @@
-import { QueryClient } from '@tanstack/react-query';
+import type { PropsWithChildren } from 'react';
+import { createElement, Suspense } from 'react';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { instrumentRecordSummaryQueryOptions } from '../useInstrumentRecordSummaryQuery';
+import {
+  instrumentRecordSummaryQueryOptions,
+  useInstrumentRecordSummaryQuery
+} from '../useInstrumentRecordSummaryQuery';
 
 vi.mock('axios');
 
 const runQuery = (params: { bySeries?: boolean; groupId?: string }) =>
   new QueryClient().fetchQuery(instrumentRecordSummaryQueryOptions({ params }));
+
+const renderSummaryQuery = () => {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const wrapper = ({ children }: PropsWithChildren) =>
+    createElement(QueryClientProvider, { client: queryClient }, createElement(Suspense, { fallback: null }, children));
+  return renderHook(() => useInstrumentRecordSummaryQuery(), { wrapper });
+};
 
 // eslint-disable-next-line @typescript-eslint/unbound-method -- a vitest mock, never invoked as a method
 const get = vi.mocked(axios).get;
@@ -64,6 +78,16 @@ describe('instrumentRecordSummaryQueryOptions', () => {
   it('should reject a fractional subject count, since subjects are counted not measured', async () => {
     get.mockResolvedValueOnce({ data: [summary({ subjectCount: 1.5 })] });
     await expect(runQuery({ groupId: 'group-1' })).rejects.toThrow();
+  });
+
+  // Called with no argument at all, which is how the hub lists every instrument across groups.
+  it('should suspend until the summary resolves, so the hub never lists an instrument without its counts', async () => {
+    get.mockResolvedValueOnce({ data: [summary()] });
+    const { result } = renderSummaryQuery();
+    await waitFor(() => expect(result.current?.data).toHaveLength(1));
+    expect(get).toHaveBeenCalledWith('/v1/instrument-records/summary/by-instrument', {
+      params: { groupId: undefined }
+    });
   });
 
   it('should key the cache on the group, so switching group does not serve the previous group counts', () => {

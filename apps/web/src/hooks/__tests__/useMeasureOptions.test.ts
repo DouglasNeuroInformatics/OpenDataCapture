@@ -1,5 +1,6 @@
 import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
-import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
+import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
+import type { AnyUnilingualFormInstrument, AnyUnilingualScalarInstrument } from '@opendatacapture/runtime-core';
 import { cleanup, renderHook } from '@testing-library/react';
 import { omit } from 'lodash-es';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -21,7 +22,16 @@ function formInstrument({
   };
 }
 
-function measureOptionsFor(instrument: AnyUnilingualFormInstrument | null) {
+/** The interactive stub, retyped with the given measures — it declares none of its own. */
+function interactiveWithMeasures(measures: AnyUnilingualScalarInstrument['measures']): AnyUnilingualScalarInstrument {
+  return {
+    ...omit(interactiveInstrument.instance, ['measures', 'validationSchema']),
+    measures,
+    validationSchema: z.object({})
+  };
+}
+
+function measureOptionsFor(instrument: AnyUnilingualScalarInstrument | null) {
   return renderHook(() => useMeasureOptions(instrument)).result.current;
 }
 
@@ -72,6 +82,13 @@ describe('useMeasureOptions', () => {
       measures: { reasonFavoriteNumberIsNegative: { kind: 'const', ref: 'reasonFavoriteNumberIsNegative' } }
     });
     expect(measureOptionsFor(instrument)).toEqual([]);
+  });
+
+  // An interactive instrument has no fields to borrow a label from, so the key is all there is.
+  it('should label a constant measure on a non-form instrument with its key', () => {
+    expect(
+      measureOptionsFor(interactiveWithMeasures({ favoriteNumber: { kind: 'const', ref: 'favoriteNumber' } }))
+    ).toEqual([{ key: 'favoriteNumber', label: 'favoriteNumber' }]);
   });
 
   it('should find the fields of a form whose content is split into groups', () => {

@@ -676,6 +676,17 @@ describe('InstrumentRecordsService', () => {
       expect(groupsService.findById).toHaveBeenCalledBefore(instrumentRecordModel.findMany);
     });
 
+    // Asking a scalar instrument for what it orchestrated is a mistake rather than an empty result,
+    // so it is refused instead of silently returning nothing.
+    it('should reject a seriesInstrumentId that names an instrument which is not a series', async () => {
+      instrumentsService.findById.mockResolvedValueOnce({ id: 'form-1', kind: 'FORM' } as any);
+
+      await expect(instrumentRecordsService.find({ seriesInstrumentId: 'form-1' })).rejects.toBeInstanceOf(
+        UnprocessableEntityException
+      );
+      expect(instrumentRecordModel.findMany).not.toHaveBeenCalled();
+    });
+
     it('should restrict the records to instruments of the requested kind', async () => {
       instrumentsService.find.mockResolvedValueOnce([{ id: 'form-1' }, { id: 'form-2' }]);
 
@@ -914,6 +925,47 @@ describe('InstrumentRecordsService', () => {
       const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
       const matchStage = pipeline.find((stage) => stage.$match);
       expect(matchStage.$match.$expr).toStrictEqual({ $eq: ['$groupId', { $toObjectId: 'group-1' }] });
+    });
+
+    // A series carries no language-independent name, so the worker is handed the titles resolved
+    // here rather than the ids — an export naming only ids says nothing about what collected a row.
+    it('should resolve the title of every series the records reference before handing them to the worker', async () => {
+      const record = {
+        computedMeasures: { score: 85 },
+        date: '2023-01-01',
+        groupId: 'group-1',
+        id: 'record-1',
+        instrumentId: 'instrument-1',
+        seriesInstrumentId: 'series-1',
+        session: { date: '2023-01-01', id: 'session-1', type: 'IN_PERSON' as const, user: null },
+        subject: { age: 20, groupIds: ['group-1'], id: 'subject-1', sex: 'MALE' }
+      } satisfies RecordType;
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([record]);
+      instrumentsService.findById
+        .mockResolvedValueOnce({ id: 'instrument-1', internal: { edition: 1, name: 'X' } } as any)
+        .mockResolvedValueOnce({
+          details: { title: 'Happiness Series' },
+          id: 'series-1',
+          kind: 'SERIES',
+          language: 'en'
+        } as any);
+      const worker = useFakeWorker();
+
+      const result = instrumentRecordsService.exportRecords(
+        {},
+        { ability: createAppAbility([{ action: 'manage', subject: 'all' }]) }
+      );
+      await vi.waitFor(() => expect(worker.postMessage).toHaveBeenCalledOnce());
+
+      expect(worker.postMessage).toHaveBeenCalledWith({
+        data: {
+          instruments: [{ edition: 1, id: 'instrument-1', name: 'X' }],
+          seriesNames: { 'series-1': 'Happiness Series' }
+        },
+        type: 'INIT'
+      });
+      worker.emit('error', new Error('settle'));
+      await expect(result).rejects.toThrow('settle');
     });
 
     describe('when the worker fails', () => {

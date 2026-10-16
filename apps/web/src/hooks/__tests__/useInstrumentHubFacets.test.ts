@@ -6,9 +6,11 @@ import { NO_SERIES, useInstrumentHubFacets } from '../useInstrumentHubFacets';
 import '@/services/i18n';
 
 const mocks = vi.hoisted(() => ({
-  infos: [] as { details: { title: string }; id: string; internal?: { edition: number; name: string }; kind: string }[],
+  infos: [] as
+    | undefined
+    | { details: { title: string }; id: string; internal?: { edition: number; name: string }; kind: string }[],
   instrumentId: 'hq-1',
-  records: [] as { seriesInstrumentId?: null | string }[],
+  records: [] as undefined | { seriesInstrumentId?: null | string }[],
   seriesInfoById: {}
 }));
 
@@ -88,6 +90,15 @@ describe('useInstrumentHubFacets', () => {
     mocks.records = [{ seriesInstrumentId: null }];
     const { result } = renderHook(() => useInstrumentHubFacets());
     expect(Array.from(result.current.seriesOptions)).toStrictEqual([[NO_SERIES, null]]);
+  });
+
+  // Both queries are plain `useQuery`, so the first render happens before either has resolved.
+  it('should offer no editions or series while the catalog and records are still loading', () => {
+    mocks.infos = undefined;
+    mocks.records = undefined;
+    const { result } = renderHook(() => useInstrumentHubFacets());
+    expect(result.current.editionOptions).toStrictEqual({});
+    expect(result.current.seriesOptions.size).toBe(0);
   });
 
   // A record may name a series the caller cannot read, leaving the id as the only available label.

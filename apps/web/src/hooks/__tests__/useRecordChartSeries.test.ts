@@ -126,6 +126,17 @@ describe('useRecordChartSeries', () => {
     });
     expect(series[0]!.points).toHaveLength(1);
   });
+  // A record-array measure holds a list, which no axis can place — but the records beside it still
+  // belong on the chart.
+  it('should skip a value that is neither a number nor text rather than plotting it', () => {
+    const { series } = render({
+      colourBy: 'none',
+      measure: 'score',
+      records: [recordOf({ score: 1 }), recordOf({ score: [{ item: 1 }] })]
+    });
+    expect(series[0]!.points).toHaveLength(1);
+  });
+
   // The palette is a search param, so a shared link has to reproduce the colours it was made with.
   it('should draw a group from the chosen palette theme rather than always the default', () => {
     const records = [recordOf({ __method__: 'REMOTE' })];

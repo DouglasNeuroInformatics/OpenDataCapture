@@ -59,7 +59,7 @@ function binDistribution(series: RecordChartSeries[], isNumeric: boolean): Distr
       // The final bin is closed at the top, so the maximum value is counted rather than overflowing.
       const index = Math.min(binCount - 1, Math.floor((Number(point.value) - min) / binWidth));
       const row = rows[index]!;
-      row[item.key] = ((row[item.key] as number | undefined) ?? 0) + 1;
+      row[item.key] = (row[item.key] as number) + 1;
     }
   }
   return rows;

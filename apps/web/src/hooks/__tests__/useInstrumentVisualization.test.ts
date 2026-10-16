@@ -551,5 +551,17 @@ describe('useInstrumentVisualization', () => {
       expect(result.current.instrumentOptions).toEqual({});
       expect(result.current.editionOptions).toEqual({});
     });
+
+    // The per-instrument view takes its instrument from the route, so navigating between editions
+    // changes it underneath the hook rather than through setInstrumentId.
+    it('should adopt the instrument the route names when it changes underneath the hook', () => {
+      const { result, rerender } = renderHook(
+        ({ instrumentId }: { instrumentId: string }) => useInstrumentVisualization({ params: { instrumentId } }),
+        { initialProps: { instrumentId: 'hq-1' } }
+      );
+      expect(result.current.instrumentId).toBe('hq-1');
+      rerender({ instrumentId: 'hq-2' });
+      expect(result.current.instrumentId).toBe('hq-2');
+    });
   });
 });
