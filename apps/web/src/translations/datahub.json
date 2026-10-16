@@ -156,6 +156,11 @@
       "es": "Seleccione un instrumento",
       "fr": "Sélectionnez un instrument"
     },
+    "selectMeasures": {
+      "en": "Please select one or more measures",
+      "es": "Por favor, seleccione una o más medidas",
+      "fr": "Veuillez sélectionner au moins une mesure"
+    },
     "timeframe": {
       "en": "Timeframe",
       "es": "Periodo",
