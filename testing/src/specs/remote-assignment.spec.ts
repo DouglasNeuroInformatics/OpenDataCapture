@@ -29,6 +29,38 @@ test.describe('remote assignment', () => {
     await expect(remoteAssignmentPage.instrumentShowcase).toBeVisible();
   });
 
+  test('should retain all tag options after searching, opening a remote assignment dialog, and clearing the search', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    await startSession(getPageModel, `Tag${uniqueId}`, `Subject${uniqueId}`, 'Male');
+
+    await page.getByTestId('nav-button-/session/remote-assignment').click();
+    await page.waitForURL('**/session/remote-assignment');
+
+    const remoteAssignmentPage = new RemoteAssignmentPage(page);
+    await expect(remoteAssignmentPage.instrumentShowcase).toBeVisible();
+    const tagFilter = page.getByTestId('instrument-tag-filter');
+    const tagButton = tagFilter.getByRole('button');
+    await tagButton.click();
+    await expect(page.getByRole('menuitemcheckbox').first()).toBeVisible();
+    const initialOptions = await page.getByRole('menuitemcheckbox').allTextContents();
+    expect(initialOptions.length).toBeGreaterThan(1);
+    await page.keyboard.press('Escape');
+
+    const searchInput = remoteAssignmentPage.instrumentShowcase.getByRole('searchbox');
+    await searchInput.fill('Happiness Questionnaire');
+    await remoteAssignmentPage.selectInstrument('Happiness Questionnaire');
+    await expect(remoteAssignmentPage.createDialog).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(remoteAssignmentPage.createDialog).not.toBeVisible();
+
+    await searchInput.fill('');
+    await tagButton.click();
+    await expect.poll(() => page.getByRole('menuitemcheckbox').allTextContents()).toEqual(initialOptions);
+  });
+
   test('should create a remote assignment and display the link', async ({ getPageModel, page, uniqueId }) => {
     await startSession(getPageModel, `Assign${uniqueId}`, `User${uniqueId}`, 'Female');
 
