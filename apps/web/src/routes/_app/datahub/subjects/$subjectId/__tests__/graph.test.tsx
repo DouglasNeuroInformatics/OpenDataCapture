@@ -177,7 +177,7 @@ const renderGraph = ({
   instrumentId = 'instrument-1',
   minDate = null
 }: {
-  displayedInstrument?: AnyUnilingualFormInstrument;
+  displayedInstrument?: AnyUnilingualFormInstrument | null;
   instrumentId?: null | string;
   minDate?: Date | null;
 } = {}) => {
@@ -324,6 +324,14 @@ describe('subject graph route', () => {
     fireEvent.click(screen.getByTestId('select-time'));
     expect(mocks.setMinDate).toHaveBeenCalledWith(new Date(2026, 0, 1));
   });
+
+  // The palette is held in the url so a shared link reproduces the colours it was made with.
+  it('should record the chosen palette in the url', () => {
+    renderGraph();
+    fireEvent.click(screen.getByTestId('select-palette'));
+    const [{ search }] = mocks.navigate.mock.lastCall as [{ search: (prev: object) => object }];
+    expect(search({ palette: 'default' })).toEqual({ palette: 'jade' });
+  });
 });
 
 describe('subject graph download', () => {
@@ -368,6 +376,27 @@ describe('subject graph download', () => {
     renderGraph();
     await downloadGraph();
     expect(drawnText).toEqual(['Unilingual Form of Subject: abcdefg', 'Score', 'Timeframe: All time']);
+  });
+
+  // The catalog resolves after the first paint, so a capture taken immediately has no title to name.
+  it('should caption the capture without an instrument name before the instrument is loaded', async () => {
+    renderGraph({ displayedInstrument: null });
+    await downloadGraph();
+    expect(drawnText[0]).toBe(' of Subject: abcdefg');
+  });
+
+  it('should report a failure that is not an error, rather than letting it escape unreported', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(() => {
+      throw 'canvas exploded';
+    });
+    renderGraph();
+    fireEvent.click(screen.getByRole('button', { name: 'Download' }));
+    await waitFor(() => expect(mocks.addNotification).toHaveBeenCalled());
+    expect(mocks.addNotification).toHaveBeenCalledWith({
+      message: 'The chart could not be saved as an image: canvas exploded',
+      type: 'error'
+    });
   });
 
   it('should not capture anything once the graph has unmounted', async () => {

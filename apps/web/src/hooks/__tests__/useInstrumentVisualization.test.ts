@@ -552,6 +552,22 @@ describe('useInstrumentVisualization', () => {
       expect(result.current.editionOptions).toEqual({});
     });
 
+    // The instrument table holds its filters in the URL and narrows every consumer through this
+    // predicate, which is what keeps a filtered table and its download describing the same set.
+    it('should narrow the records to those the supplied predicate keeps', async () => {
+      mockInstrumentRecords.data = [
+        ...createMockRecords({ someValue: 'abc' }),
+        { ...createMockRecords({ someValue: 'xyz' })[0]!, id: 'record-2', subjectId: 'group-1$subject-2' }
+      ];
+      const { result } = renderHook(() =>
+        useInstrumentVisualization({
+          params: { filterRecord: (record) => record.someValue === 'xyz', subjectId: 'testId' }
+        })
+      );
+      await waitFor(() => expect(result.current.records).toHaveLength(1));
+      expect(result.current.records[0]!.someValue).toBe('xyz');
+    });
+
     // The per-instrument view takes its instrument from the route, so navigating between editions
     // changes it underneath the hook rather than through setInstrumentId.
     it('should adopt the instrument the route names when it changes underneath the hook', () => {

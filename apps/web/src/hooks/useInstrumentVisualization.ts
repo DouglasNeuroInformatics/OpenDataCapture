@@ -152,7 +152,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         seriesId: record.__seriesId__,
         seriesName: record.__seriesName__,
         subjectId: removeSubjectIdScope(record.__subjectId__),
-        username: (record.username as null | string) ?? 'N/A'
+        username: record.username as string
       }
     }));
 

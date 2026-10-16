@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { CHART_PALETTE_THEMES, MAX_CATEGORICAL_GROUPS, NEUTRAL_MARK, OTHER_GROUP_KEY } from '@/utils/chart-palette';
 
@@ -7,8 +7,10 @@ import { useRecordChartSeries } from '../useRecordChartSeries';
 
 import type { InstrumentVisualizationRecord } from '../useInstrumentVisualization';
 
+const mocks = vi.hoisted(() => ({ theme: 'light' }));
+
 vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
-  useTheme: () => ['light'],
+  useTheme: () => [mocks.theme],
   useTranslation: () => ({ t: (value: string | { en: string }) => (typeof value === 'string' ? value : value.en) })
 }));
 
@@ -31,6 +33,10 @@ const render = (options: Omit<Options, 'palette'> & { palette?: Options['palette
   renderHook(() => useRecordChartSeries({ palette: 'default', ...options })).result.current;
 
 describe('useRecordChartSeries', () => {
+  afterEach(() => {
+    mocks.theme = 'light';
+  });
+
   it('should produce nothing until a measure is chosen', () => {
     const { series } = render({ colourBy: 'none', measure: undefined, records: [recordOf({})] });
     expect(series).toStrictEqual([]);
@@ -79,6 +85,28 @@ describe('useRecordChartSeries', () => {
   it('should label records collected outside a series as individual when grouping by series', () => {
     const { series } = render({ colourBy: 'series', measure: 'score', records: [recordOf({})] });
     expect(series[0]!.label).toBe('Individual');
+  });
+
+  // A record may name a series the caller cannot read, leaving the id as the only available label.
+  it('should fall back to the series id when the series cannot be named', () => {
+    const { series } = render({
+      colourBy: 'series',
+      measure: 'score',
+      records: [recordOf({ __seriesId__: 'series-unreadable', __seriesName__: null })]
+    });
+    expect(series[0]!.label).toBe('series-unreadable');
+  });
+
+  // A retrospective import may carry no session type, and those records still belong on the chart.
+  it('should group records with no collection method under an unknown group', () => {
+    const { series } = render({ colourBy: 'method', measure: 'score', records: [recordOf({ __method__: null })] });
+    expect(series[0]!.label).toBe('Unknown');
+  });
+
+  it('should draw from the dark column of the chosen palette on a dark page', () => {
+    mocks.theme = 'dark';
+    const { series } = render({ colourBy: 'none', measure: 'score', records: [recordOf({})] });
+    expect(series[0]!.color).toBe(CHART_PALETTE_THEMES.default.dark[0]);
   });
 
   // Colour must follow the group, never its rank, so the biggest group always takes the first slot

@@ -24,19 +24,19 @@ const fakeContext = {
   textAlign: ''
 };
 
+let decodeFails = false;
+
 /** A detached image never loads a data URL under happy-dom, so the decode is resolved here. */
 class FakeImage {
-  private onLoad: (() => void) | null = null;
+  private listeners: { [type: string]: (() => void) | undefined } = {};
 
   set src(value: string) {
     imageSource = value;
-    queueMicrotask(() => this.onLoad?.());
+    queueMicrotask(() => this.listeners[decodeFails ? 'error' : 'load']?.());
   }
 
   addEventListener(type: string, listener: () => void) {
-    if (type === 'load') {
-      this.onLoad = listener;
-    }
+    this.listeners[type] = listener;
   }
 }
 
@@ -47,6 +47,7 @@ const chartCard = (markup = '<svg width="600" height="300"><text>tick</text></sv
 };
 
 beforeEach(() => {
+  decodeFails = false;
   encodedBlob = pngBlob;
   drawnText = [];
   imageSource = '';
@@ -106,6 +107,13 @@ describe('renderChartPng', () => {
     await expect(
       renderChartPng(chartCard('<p>No records match the current filters.</p>'), { mode: 'light' })
     ).rejects.toThrow('There is no chart on screen to save');
+  });
+
+  // The serialized svg may name a font or an image the browser refuses, and the decode then never
+  // resolves — so the failure is surfaced rather than leaving the download hanging.
+  it('should report a failure to rasterize the chart', async () => {
+    decodeFails = true;
+    await expect(renderChartPng(chartCard(), { mode: 'light' })).rejects.toThrow('The chart could not be rasterized');
   });
 
   it('should report that the browser cannot encode an image rather than drawing onto nothing', async () => {
