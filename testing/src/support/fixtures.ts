@@ -16,6 +16,9 @@ import { AdminSettingsPage } from '../pages/_app/admin/settings.page';
 import { AdminUserPage } from '../pages/_app/admin/users/$userId.page';
 import { ContactPage } from '../pages/_app/contact.page';
 import { DashboardPage } from '../pages/_app/dashboard.page';
+import { InstrumentHubGraphPage } from '../pages/_app/datahub/instruments/$instrumentId/graph.page';
+import { InstrumentHubTablePage } from '../pages/_app/datahub/instruments/$instrumentId/table.page';
+import { InstrumentHubPage } from '../pages/_app/datahub/instruments/index.page';
 import { SubjectAssignmentsPage } from '../pages/_app/datahub/subjects/$subjectId/assignments.page';
 import { DatahubPage } from '../pages/_app/datahub/subjects/index.page';
 import { GroupEmailTemplatesPage } from '../pages/_app/group/email-templates.page';
@@ -45,6 +48,9 @@ const pageModels = {
   '/auth/login': LoginPage,
   '/contact': ContactPage,
   '/dashboard': DashboardPage,
+  '/datahub/instruments': InstrumentHubPage,
+  '/datahub/instruments/$instrumentId/graph': InstrumentHubGraphPage,
+  '/datahub/instruments/$instrumentId/table': InstrumentHubTablePage,
   '/datahub/subjects': DatahubPage,
   '/datahub/subjects/$subjectId/assignments': SubjectAssignmentsPage,
   '/group/email-templates': GroupEmailTemplatesPage,

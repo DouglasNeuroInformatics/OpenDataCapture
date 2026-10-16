@@ -3,9 +3,12 @@ import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrumen
 export type RecordType = {
   computedMeasures: null | { [key: string]: unknown };
   date: string;
-  groupId: string;
+  /** Null for a record belonging to no group; the pipeline normalises a missing field to null. */
+  groupId: null | string;
   id: string;
   instrumentId: string;
+  /** Null for a record collected outside any series */
+  seriesInstrumentId: null | string;
   session: {
     date: string;
     id: string;
@@ -22,14 +25,20 @@ export type RecordType = {
   };
 };
 
-export type InitData = {
+export type InitInstruments = {
   edition: number;
   id: string;
   name: string;
 }[];
 
+export type InitPayload = {
+  instruments: InitInstruments;
+  /** Series instrument id to its title, since a series carries no language-independent name */
+  seriesNames: { [id: string]: string };
+};
+
 export type InitMessage = {
-  data: InitData;
+  data: InitPayload;
   type: 'INIT';
 };
 

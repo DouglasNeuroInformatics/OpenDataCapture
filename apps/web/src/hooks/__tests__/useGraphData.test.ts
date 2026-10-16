@@ -9,6 +9,11 @@ import type { InstrumentVisualizationRecord } from '../useInstrumentVisualizatio
 const record = (time: number, measures: { [key: string]: number }): InstrumentVisualizationRecord => ({
   __date__: new Date(time),
   __id__: `record-${time}`,
+  __instrumentId__: 'instrument-1',
+  __method__: 'IN_PERSON',
+  __seriesId__: null,
+  __seriesName__: null,
+  __subjectId__: 'subject-1',
   __time__: time,
   ...measures
 });

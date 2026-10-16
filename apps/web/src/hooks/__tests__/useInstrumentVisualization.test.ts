@@ -44,8 +44,10 @@ const createMockRecords = (data: { [key: string]: unknown }) => [
     computedMeasures: {},
     data,
     date: FIXED_TEST_DATE,
+    instrumentId: 'instrument-1',
     session: { user: { username: 'testusername' } },
-    sessionId: '123'
+    sessionId: '123',
+    subjectId: 'group-1$subject-1'
   }
 ];
 const mockInstrumentRecords: { data?: { [key: string]: unknown }[] } = {
@@ -113,7 +115,7 @@ describe('useInstrumentVisualization', () => {
       const result = await renderWithSetRecord();
       act(() => result.current.dl('CSV Long'));
       const [, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
-      expect(getContentFn()).toContain(`testusername,"FRIENDS, MONEY",causes`);
+      expect(getContentFn()).toContain(`testusername,causes,"FRIENDS, MONEY"`);
     });
 
     it('should export a set in JSON as the subject table displays it, not as {}', async () => {
@@ -138,7 +140,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvContents = getContentFn();
       expect(csvContents).toMatch(
-        `GroupID,subjectId,Date,Username,someValue\r\ntestGroupId,testId,${toBasicISOString(FIXED_TEST_DATE)},testusername,abc`
+        `GroupID,SubjectID,InstrumentName,InstrumentEdition,Date,CollectionMethod,SeriesID,SeriesName,Username,someValue\r\ntestGroupId,subject-1,instrument-1,,${toBasicISOString(FIXED_TEST_DATE)},,,,testusername,abc`
       );
     });
   });
@@ -156,7 +158,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.tsv');
       const tsvContents = getContentFn();
       expect(tsvContents).toMatch(
-        `GroupID\tsubjectId\tDate\tUsername\tsomeValue\r\ntestGroupId\ttestId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestusername\tabc`
+        `GroupID\tSubjectID\tInstrumentName\tInstrumentEdition\tDate\tCollectionMethod\tSeriesID\tSeriesName\tUsername\tsomeValue\r\ntestGroupId\tsubject-1\tinstrument-1\t\t${toBasicISOString(FIXED_TEST_DATE)}\t\t\t\ttestusername\tabc`
       );
     });
   });
@@ -175,7 +177,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvLongContents = getContentFn();
       expect(csvLongContents).toMatch(
-        `GroupID,Date,SubjectID,Username,Value,Variable\r\ntestGroupId,${toBasicISOString(FIXED_TEST_DATE)},testId,testusername,abc,someValue`
+        `GroupID,SubjectID,InstrumentName,InstrumentEdition,Date,CollectionMethod,SeriesID,SeriesName,Username,Variable,Value\r\ntestGroupId,subject-1,instrument-1,,${toBasicISOString(FIXED_TEST_DATE)},,,,testusername,someValue,abc`
       );
     });
   });
@@ -194,7 +196,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toMatch('.tsv');
       const tsvLongContents = getContentFn();
       expect(tsvLongContents).toMatch(
-        `GroupID\tDate\tSubjectID\tUsername\tValue\tVariable\r\ntestGroupId\t${toBasicISOString(FIXED_TEST_DATE)}\ttestId\ttestusername\tabc\tsomeValue`
+        `GroupID\tSubjectID\tInstrumentName\tInstrumentEdition\tDate\tCollectionMethod\tSeriesID\tSeriesName\tUsername\tVariable\tValue\r\ntestGroupId\tsubject-1\tinstrument-1\t\t${toBasicISOString(FIXED_TEST_DATE)}\t\t\t\ttestusername\tsomeValue\tabc`
       );
     });
   });
@@ -214,9 +216,14 @@ describe('useInstrumentVisualization', () => {
 
       expect(excelContents).toEqual([
         {
+          CollectionMethod: null,
           Date: '2025-04-30',
           GroupID: 'testGroupId',
-          subjectId: 'testId',
+          InstrumentEdition: null,
+          InstrumentName: 'instrument-1',
+          SeriesID: null,
+          SeriesName: null,
+          SubjectID: 'subject-1',
           // eslint-disable-next-line perfectionist/sort-objects
           someValue: 'abc',
           Username: 'testusername'
@@ -241,9 +248,14 @@ describe('useInstrumentVisualization', () => {
 
       expect(excelContents).toEqual([
         {
+          CollectionMethod: null,
           Date: '2025-04-30',
           GroupID: 'testGroupId',
-          SubjectID: 'testId',
+          InstrumentEdition: null,
+          InstrumentName: 'instrument-1',
+          SeriesID: null,
+          SeriesName: null,
+          SubjectID: 'subject-1',
           Username: 'testusername',
           Value: 'abc',
           Variable: 'someValue'
@@ -251,6 +263,99 @@ describe('useInstrumentVisualization', () => {
       ]);
     });
   });
+  // A series' export spans several member instruments, so the instrument cannot be left to the
+  // filename the way a single instrument's export can — each row has to say what produced it.
+  describe('instrument provenance', () => {
+    const SERIES_RECORDS = [
+      {
+        computedMeasures: {},
+        data: { someValue: 'abc' },
+        date: FIXED_TEST_DATE,
+        instrumentId: 'member-1',
+        seriesInstrumentId: 'series-1',
+        session: { user: { username: 'testusername' } },
+        sessionId: '123',
+        subjectId: 'group-1$subject-1'
+      },
+      {
+        computedMeasures: {},
+        data: { otherValue: 7 },
+        date: FIXED_TEST_DATE,
+        instrumentId: 'member-2',
+        seriesInstrumentId: 'series-1',
+        session: { user: { username: 'testusername' } },
+        sessionId: '124',
+        subjectId: 'group-1$subject-1'
+      }
+    ];
+
+    const renderSeries = async () => {
+      mockUseInstrument.mockReturnValue(null);
+      mockInfoQuery.data = [
+        { details: { title: 'Member One' }, id: 'member-1', internal: { edition: 1, name: 'one' }, kind: 'FORM' },
+        { details: { title: 'Member Two' }, id: 'member-2', internal: { edition: 3, name: 'two' }, kind: 'FORM' }
+      ];
+      mockInstrumentRecords.data = SERIES_RECORDS;
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { seriesInstrumentId: 'series-1' } }));
+      await waitFor(() => {
+        expect(result.current.records.length).toBe(2);
+      });
+      return result;
+    };
+
+    it('should name the instrument and edition that produced each row', async () => {
+      const result = await renderSeries();
+      act(() => result.current.dl('Excel Long'));
+      const [, rows] = mockExcelDownloadFn.mock.calls[0] ?? [];
+      expect(rows).toEqual([
+        expect.objectContaining({ InstrumentEdition: 1, InstrumentName: 'Member One', Variable: 'someValue' }),
+        expect.objectContaining({ InstrumentEdition: 3, InstrumentName: 'Member Two', Variable: 'otherValue' })
+      ]);
+    });
+
+    // Papaparse takes its header from the first row alone, so without the union of every record's
+    // measures a series export silently dropped whatever the first instrument did not measure.
+    it("should keep every instrument's fields as columns in a wide export", async () => {
+      const result = await renderSeries();
+      act(() => result.current.dl('CSV'));
+      const [, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
+      const [header, firstRow, secondRow] = (getContentFn() as string).split('\r\n');
+      expect(header).toContain('someValue');
+      expect(header).toContain('otherValue');
+      // Each row fills only its own instrument's field and leaves the other blank rather than
+      // claiming a value it never collected.
+      expect(firstRow!.endsWith('abc,')).toBe(true);
+      expect(secondRow!.endsWith(',7')).toBe(true);
+    });
+
+    // Every member's measures reach one file, which is the point of exporting a whole series.
+    it('should carry every member instrument into a single export', async () => {
+      const result = await renderSeries();
+      act(() => result.current.dl('CSV Long'));
+      const [filename, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
+      expect(filename).toContain('series');
+      const contents = getContentFn() as string;
+      expect(contents).toContain('Member One');
+      expect(contents).toContain('Member Two');
+    });
+
+    it('should fall back to the id so a row is never anonymous when the catalog has dropped it', async () => {
+      mockUseInstrument.mockReturnValue(null);
+      mockInfoQuery.data = [];
+      mockInstrumentRecords.data = SERIES_RECORDS;
+      const { result } = renderHook(() => useInstrumentVisualization({ params: { seriesInstrumentId: 'series-1' } }));
+      await waitFor(() => {
+        expect(result.current.records.length).toBe(2);
+      });
+      act(() => result.current.dl('Excel Long'));
+      const [, rows] = mockExcelDownloadFn.mock.calls[0] ?? [];
+      expect(rows).toEqual([
+        expect.objectContaining({ InstrumentEdition: null, InstrumentName: 'member-1' }),
+        expect.objectContaining({ InstrumentEdition: null, InstrumentName: 'member-2' })
+      ]);
+    });
+  });
+
   describe('editions', () => {
     it('should list only the latest edition of an instrument, with every edition available as an option', async () => {
       mockInfoQuery.data = [
@@ -317,7 +422,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toMatch('.json');
       const jsonContents = await getContentFn();
       expect(jsonContents).toContain('"someValue": "abc"');
-      expect(jsonContents).toContain('"subjectID": "testId"');
+      expect(jsonContents).toContain('"SubjectID": "subject-1"');
     });
   });
 
@@ -383,12 +488,25 @@ describe('useInstrumentVisualization', () => {
 
     it('should merge the computed measures into the record, ignoring data that is not an object', async () => {
       const result = await renderWithRecords([
-        { computedMeasures: { total: 3 }, data: null, date: FIXED_TEST_DATE, id: 'record-1', session: null }
+        {
+          computedMeasures: { total: 3 },
+          data: null,
+          date: FIXED_TEST_DATE,
+          id: 'record-1',
+          instrumentId: 'instrument-1',
+          session: null,
+          subjectId: 'group-1$subject-1'
+        }
       ]);
       expect(result.current.records).toEqual([
         {
           __date__: FIXED_TEST_DATE,
           __id__: 'record-1',
+          __instrumentId__: 'instrument-1',
+          __method__: null,
+          __seriesId__: null,
+          __seriesName__: null,
+          __subjectId__: 'group-1$subject-1',
           __time__: FIXED_TEST_DATE.getTime(),
           total: 3,
           username: 'N/A'
@@ -432,6 +550,34 @@ describe('useInstrumentVisualization', () => {
       act(() => result.current.setInstrumentId('hq-1'));
       expect(result.current.instrumentOptions).toEqual({});
       expect(result.current.editionOptions).toEqual({});
+    });
+
+    // The instrument table holds its filters in the URL and narrows every consumer through this
+    // predicate, which is what keeps a filtered table and its download describing the same set.
+    it('should narrow the records to those the supplied predicate keeps', async () => {
+      mockInstrumentRecords.data = [
+        ...createMockRecords({ someValue: 'abc' }),
+        { ...createMockRecords({ someValue: 'xyz' })[0]!, id: 'record-2', subjectId: 'group-1$subject-2' }
+      ];
+      const { result } = renderHook(() =>
+        useInstrumentVisualization({
+          params: { filterRecord: (record) => record.someValue === 'xyz', subjectId: 'testId' }
+        })
+      );
+      await waitFor(() => expect(result.current.records).toHaveLength(1));
+      expect(result.current.records[0]!.someValue).toBe('xyz');
+    });
+
+    // The per-instrument view takes its instrument from the route, so navigating between editions
+    // changes it underneath the hook rather than through setInstrumentId.
+    it('should adopt the instrument the route names when it changes underneath the hook', () => {
+      const { rerender, result } = renderHook(
+        ({ instrumentId }: { instrumentId: string }) => useInstrumentVisualization({ params: { instrumentId } }),
+        { initialProps: { instrumentId: 'hq-1' } }
+      );
+      expect(result.current.instrumentId).toBe('hq-1');
+      rerender({ instrumentId: 'hq-2' });
+      expect(result.current.instrumentId).toBe('hq-2');
     });
   });
 });

@@ -65,12 +65,14 @@ afterEach(() => {
 describe('subject table route', () => {
   it('should add a snake-cased column for each record field, so the headers match the exported column names', () => {
     renderTable([record()]);
-    expect(headers()).toEqual(['DATE_COLLECTED', 'TOTAL_SCORE']);
+    expect(headers()).toEqual(['DATE_COLLECTED', 'COLLECTION_METHOD', 'SERIES', 'TOTAL_SCORE']);
   });
 
-  it('should show only the collection date column when there are no records', () => {
+  // The provenance columns describe where a record came from rather than what it measured, so they
+  // are fixed rather than derived from the records — they stand even with nothing to describe.
+  it('should show the date and provenance columns when there are no records', () => {
     renderTable([]);
-    expect(headers()).toEqual(['DATE_COLLECTED']);
+    expect(headers()).toEqual(['DATE_COLLECTED', 'COLLECTION_METHOD', 'SERIES']);
   });
 
   it('should render a multiple-choice answer as comma-separated text', () => {

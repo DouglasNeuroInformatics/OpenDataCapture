@@ -8,8 +8,10 @@ import { createFileRoute } from '@tanstack/react-router';
 import { SelectEdition } from '@/components/SelectEdition';
 import { SelectInstrument } from '@/components/SelectInstrument';
 import { TimeDropdown } from '@/components/TimeDropdown';
+import { TruncatedCell } from '@/components/TruncatedCell';
 import { useInstrumentVisualization } from '@/hooks/useInstrumentVisualization';
 import type { InstrumentVisualizationRecord } from '@/hooks/useInstrumentVisualization';
+import { useRecordMetadataColumns } from '@/hooks/useRecordMetadataColumns';
 import { formatRecordValue } from '@/utils/record-value';
 
 const RouteComponent = () => {
@@ -21,6 +23,7 @@ const RouteComponent = () => {
     });
 
   const { t } = useTranslation();
+  const metadataColumns = useRecordMetadataColumns();
 
   const columns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(() => {
     const columns: TanstackTable.ColumnDef<InstrumentVisualizationRecord>[] = [];
@@ -29,15 +32,8 @@ const RouteComponent = () => {
         columns.push({
           accessorKey: subItem,
           cell: (ctx) => {
-            const value = ctx.getValue();
-            return (
-              <p
-                className="overflow-hidden text-ellipsis whitespace-nowrap"
-                data-testid={`subject-table-cell-${subItem}`}
-              >
-                {formatRecordValue(value)}
-              </p>
-            );
+            const value = formatRecordValue(ctx.getValue());
+            return <TruncatedCell data-testid={`subject-table-cell-${subItem}`} title={String(value)} value={value} />;
           },
           header: camelToSnakeCase(subItem).toUpperCase(),
           id: subItem
@@ -86,6 +82,7 @@ const RouteComponent = () => {
               },
               header: 'DATE_COLLECTED'
             },
+            ...metadataColumns,
             ...columns
           ]}
           data={records}
