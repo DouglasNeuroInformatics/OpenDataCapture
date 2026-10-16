@@ -49,6 +49,7 @@ export const InstrumentSelector = () => {
                 {instruments.map((instrument) => (
                   <Command.Item
                     key={instrument.id}
+                    keywords={[instrument.label]}
                     value={instrument.id}
                     onSelect={(id) => {
                       setSelectedInstrument(id);

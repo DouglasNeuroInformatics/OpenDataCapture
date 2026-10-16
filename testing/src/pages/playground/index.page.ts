@@ -46,12 +46,10 @@ export class PlaygroundPage {
     await this.$ref.goto(url);
   }
 
-  /**
-   * Picks an example or template from the header's instrument list by its label. The list's search
-   * box matches on instrument ids rather than labels, so the option is clicked without filtering.
-   */
+  /** Picks an example or template from the header's instrument list by its label. */
   async selectInstrument(label: string): Promise<void> {
     await this.$ref.getByRole('combobox', { name: 'Load an instrument...' }).click();
+    await this.$ref.getByPlaceholder('Search...').fill(label);
     await this.$ref.getByRole('option', { exact: true, name: label }).click();
   }
 }
