@@ -108,9 +108,9 @@ test.describe('instrument hub', () => {
     await expect(tablePage.rows).toHaveCount(2);
     await expect(tablePage.collectionMethodCells.filter({ hasText: 'Retrospective' })).toHaveCount(1);
     await expect(tablePage.collectionMethodCells.filter({ hasText: 'In-Person' })).toHaveCount(1);
-    // Neither record came through a series, so both series cells stand empty.
+    // Neither record came through a series, so both series cells name the absence.
     await expect(tablePage.seriesCells).toHaveCount(2);
-    await expect(tablePage.seriesCells.first()).toHaveText('—');
+    await expect(tablePage.seriesCells.first()).toHaveText('None');
   });
 
   // The download is built from the rows the table holds, so a filter has to narrow both. Getting
