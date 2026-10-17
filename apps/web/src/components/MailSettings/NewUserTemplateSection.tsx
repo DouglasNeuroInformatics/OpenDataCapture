@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Button, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { Language } from '@opendatacapture/schemas/core';
 import { DEFAULT_NEW_USER_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
 import type { MailTemplate } from '@opendatacapture/schemas/mail';
 import { Loader2Icon } from 'lucide-react';
@@ -9,7 +10,7 @@ import { Loader2Icon } from 'lucide-react';
 import { EmailTemplateEditor } from '@/components/EmailTemplateEditor';
 import { SectionCard } from '@/components/SectionCard';
 import { checkTemplateIssue, NEW_USER_TEMPLATE_VARS, REQUIRED_NEW_USER_TEMPLATE_VARS } from '@/utils/email-template';
-import { LANGUAGES, omitBlankLanguages } from '@/utils/language';
+import { omitBlankLanguages } from '@/utils/language';
 
 const defaultTemplate = (): MailTemplate => ({
   body: { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE.body },
@@ -17,13 +18,19 @@ const defaultTemplate = (): MailTemplate => ({
 });
 
 export type NewUserTemplateSectionProps = {
+  activeLanguages: readonly Language[];
   isSaving: boolean;
   onSave: (template: MailTemplate) => void;
   template: MailTemplate;
 };
 
 /** Authors the welcome message sent when a user with an email address is created. */
-export const NewUserTemplateSection = ({ isSaving, onSave, template: saved }: NewUserTemplateSectionProps) => {
+export const NewUserTemplateSection = ({
+  activeLanguages,
+  isSaving,
+  onSave,
+  template: saved
+}: NewUserTemplateSectionProps) => {
   const { t } = useTranslation();
   const [template, setTemplate] = React.useState<MailTemplate>(() => ({
     body: { ...DEFAULT_NEW_USER_EMAIL_TEMPLATE.body, ...saved.body },
@@ -32,7 +39,7 @@ export const NewUserTemplateSection = ({ isSaving, onSave, template: saved }: Ne
 
   // Unlike a group template, this one is sent in whichever language the admin picks at creation
   // time, so every language has to be filled in rather than only the ones started.
-  const issue = checkTemplateIssue(template.subject, template.body, REQUIRED_NEW_USER_TEMPLATE_VARS, LANGUAGES);
+  const issue = checkTemplateIssue(template.subject, template.body, REQUIRED_NEW_USER_TEMPLATE_VARS, activeLanguages);
   const error =
     issue === 'incomplete'
       ? t({
@@ -79,6 +86,7 @@ export const NewUserTemplateSection = ({ isSaving, onSave, template: saved }: Ne
       <EmailTemplateEditor
         error={error}
         idPrefix="new-user-template"
+        languages={activeLanguages}
         template={template}
         variables={NEW_USER_TEMPLATE_VARS}
         onChange={setTemplate}

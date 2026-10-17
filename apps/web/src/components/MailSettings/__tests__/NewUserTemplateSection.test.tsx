@@ -13,9 +13,19 @@ const spanishOnly: MailTemplate = {
   subject: { es: 'Su cuenta' }
 };
 
-const renderSection = (template: MailTemplate = spanishOnly, isSaving = false) => {
+const ALL_LANGUAGES = ['en', 'es', 'fr'] as const;
+
+const renderSection = (
+  template: MailTemplate = spanishOnly,
+  {
+    activeLanguages = ALL_LANGUAGES,
+    isSaving = false
+  }: { activeLanguages?: readonly ('en' | 'es' | 'fr')[]; isSaving?: boolean } = {}
+) => {
   const onSave = vi.fn();
-  render(<NewUserTemplateSection isSaving={isSaving} template={template} onSave={onSave} />);
+  render(
+    <NewUserTemplateSection activeLanguages={activeLanguages} isSaving={isSaving} template={template} onSave={onSave} />
+  );
   return { onSave };
 };
 
@@ -44,8 +54,8 @@ describe('NewUserTemplateSection', () => {
     expect(subjectInput().value).toBe('Welcome aboard');
   });
 
-  it('should require every language, since the admin may send the message in any of them', () => {
-    renderSection({ body: {}, subject: {} });
+  it('should require every active language, since the admin may send the message in any of them', () => {
+    renderSection({ body: { en: 'Hello {{username}}', es: '' }, subject: { en: 'Welcome', es: '' } });
     expect(errorText()).toBe('Fill in the subject and body for each language.');
     expect(saveButton().hasAttribute('disabled')).toBe(true);
   });
@@ -79,7 +89,7 @@ describe('NewUserTemplateSection', () => {
   });
 
   it('should disable saving and show a spinner while a save is in flight', () => {
-    renderSection(spanishOnly, true);
+    renderSection(spanishOnly, { isSaving: true });
     expect(saveButton().hasAttribute('disabled')).toBe(true);
     expect(saveButton().querySelector('svg')).not.toBeNull();
   });
@@ -87,5 +97,14 @@ describe('NewUserTemplateSection', () => {
   it('should not show a spinner when idle', () => {
     renderSection();
     expect(saveButton().querySelector('svg')).toBeNull();
+  });
+
+  it('should not require inactive languages, so a template missing Spanish is valid when only English and French are enabled', () => {
+    renderSection(
+      { body: { en: 'Hello, your user is {{username}}' }, subject: { en: 'Your account' } },
+      { activeLanguages: ['en'] }
+    );
+    expect(errorText()).toBeUndefined();
+    expect(saveButton().hasAttribute('disabled')).toBe(false);
   });
 });

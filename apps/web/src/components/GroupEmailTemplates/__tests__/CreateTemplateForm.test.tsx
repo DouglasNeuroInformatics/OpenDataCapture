@@ -23,6 +23,7 @@ const renderForm = ({
 }: RenderOptions = {}) => {
   render(
     <CreateTemplateForm
+      activeLanguages={['en', 'fr']}
       isPending={isPending}
       validateContent={validateContent}
       validateName={validateName}
@@ -92,7 +93,7 @@ describe('CreateTemplateForm', () => {
     const { onCreate } = renderForm();
     fillEnglishOnly('Reminder');
     fireEvent.click(submitButton());
-    expect(screen.getByText('Warning: This template is missing translations for: Spanish, French.')).toBeTruthy();
+    expect(screen.getByText('Warning: This template is missing translations for: French.')).toBeTruthy();
     expect(onCreate).not.toHaveBeenCalled();
   });
 
@@ -116,11 +117,9 @@ describe('CreateTemplateForm', () => {
     expect(onCreate).not.toHaveBeenCalled();
   });
 
-  it('should create without a warning when every language is translated', () => {
+  it('should create without a warning when every active language is translated', () => {
     const { onCreate } = renderForm();
     fillEnglishOnly('Reminder');
-    switchLanguage('Spanish');
-    fillContent('Por favor', 'Abra {{url}} antes de {{expiresAt}}');
     switchLanguage('French');
     fillContent('Veuillez', 'Ouvrez {{url}} avant {{expiresAt}}');
     fireEvent.click(submitButton());
