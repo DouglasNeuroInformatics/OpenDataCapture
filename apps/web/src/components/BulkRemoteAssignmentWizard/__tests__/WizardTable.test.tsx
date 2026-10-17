@@ -29,4 +29,15 @@ describe('WizardTable', () => {
     );
     expect(screen.getByTestId('wizard-table').classList.contains('mt-4')).toBe(true);
   });
+
+  // `cn` lets a later class win, so a caller's own class must not cost the frame its surface —
+  // inheriting the card colour is what made these tables read differently from the subject table.
+  it('should keep the page background when a caller passes its own class', () => {
+    render(
+      <WizardTable className="mt-4" data-testid="wizard-table" head={<th>{headLabel}</th>}>
+        {null}
+      </WizardTable>
+    );
+    expect(screen.getByTestId('wizard-table').classList.contains('bg-background')).toBe(true);
+  });
 });
