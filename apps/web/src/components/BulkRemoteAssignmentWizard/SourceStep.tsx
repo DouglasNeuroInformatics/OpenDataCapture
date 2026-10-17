@@ -258,7 +258,9 @@ export const SourceStep = ({
                           />
                         );
                       },
-                      id: 'select'
+                      id: 'select',
+                      maxSize: 40,
+                      size: 40
                     },
                     {
                       accessorKey: 'subject',
@@ -293,9 +295,6 @@ export const SourceStep = ({
                     }
                   ]}
                   data={rows}
-                  // The table paints its rows and ground in the page colour; inside the card they
-                  // take the card's, so the grid does not read as one more box.
-                  rootStyle={{ '--color-background': 'var(--color-card)' }}
                   onRowClick={(row) => toggle(row.id)}
                 />
               </div>
@@ -318,7 +317,7 @@ export const SourceStep = ({
                 'text/csv': ['.csv'],
                 'text/tab-separated-values': ['.tsv']
               }}
-              className="min-h-72"
+              className="bg-background min-h-72"
               data-testid="bulk-file-dropzone"
               description={ACCEPTED_FILE_EXTENSIONS.join(', ')}
               file={null}
@@ -337,7 +336,7 @@ export const SourceStep = ({
               })}
             </p>
             <TextArea
-              className="min-h-72"
+              className="bg-background min-h-72"
               data-testid="bulk-paste-input"
               rows={8}
               value={pasted}

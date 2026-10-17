@@ -71,6 +71,15 @@ describe('MapStep', () => {
     expect(cells.map(({ textContent }) => textContent)).toEqual(['001', 'Alice', '002', 'Bob']);
   });
 
+  // A file with many columns grew the mapping table until the Continue button sat below the fold,
+  // so the frame is capped and scrolls within itself rather than lengthening the step.
+  it('should cap the column mapping table and scroll it, so a wide file cannot push the step controls away', () => {
+    renderMapStep(byId);
+    const frame = screen.getByTestId('bulk-column-mapping');
+    expect(frame.classList.contains('max-h-[28rem]')).toBe(true);
+    expect(frame.classList.contains('overflow-y-auto')).toBe(true);
+  });
+
   it('should badge a file with a subject ID column as identified by ID', () => {
     renderMapStep(byId);
     expect(screen.getByTestId('bulk-detected-mode').textContent).toBe('Subject ID');
