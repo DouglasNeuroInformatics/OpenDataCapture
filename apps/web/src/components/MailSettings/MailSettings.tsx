@@ -2,8 +2,8 @@ import React from 'react';
 
 import { Checkbox, Heading } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { $UpdateMailConfigData, isSameMailServer } from '@opendatacapture/schemas/mail';
 import type { Language } from '@opendatacapture/schemas/core';
+import { $UpdateMailConfigData, isSameMailServer } from '@opendatacapture/schemas/mail';
 import type { MailConfigDto, MailTemplate, UpdateMailConfigData } from '@opendatacapture/schemas/mail';
 import { z } from 'zod/v4';
 
