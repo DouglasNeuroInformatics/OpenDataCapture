@@ -165,15 +165,17 @@ function extractRecordArrayEntry(entry: string): { [key: string]: string }[] {
     }
     const records: { [key: string]: string } = {};
     recordsList.forEach((rawRecord, i) => {
-      const [recordKey, recordValue] = rawRecord.split(':').map((s) => s.trim());
-      if (!recordKey) {
+      const separatorIndex = rawRecord.indexOf(':');
+      const recordKey = rawRecord.slice(0, separatorIndex).trim();
+      const recordValue = rawRecord.slice(separatorIndex + 1).trim();
+      if (separatorIndex === -1 || !recordKey) {
         throw new UploadError({
           en: `Malformed record at index ${i}`,
           fr: `Enregistrement mal formé à l'index ${i}`
         });
       }
       //recordValue can be empty if the value is optional
-      records[recordKey] = recordValue!;
+      records[recordKey] = recordValue;
     });
     return records;
   });
