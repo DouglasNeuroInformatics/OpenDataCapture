@@ -141,7 +141,7 @@ function extractRecordArrayEntry(entry: string): { [key: string]: string }[] {
   entry = entry.trim();
   const opening = 'RECORD_ARRAY(';
   const closing = ')';
-  if (!entry.startsWith(opening) && !entry.endsWith(closing)) {
+  if (!entry.startsWith(opening) || !entry.endsWith(closing)) {
     throw new UploadError({
       en: `Syntax error in RECORD_ARRAY declaration: ${entry}`,
       fr: `Erreur de syntaxe dans la déclaration RECORD_ARRAY : ${entry}`
