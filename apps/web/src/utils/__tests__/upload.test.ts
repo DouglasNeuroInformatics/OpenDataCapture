@@ -536,6 +536,13 @@ describe('Zod3', () => {
       it('should leave out a field the record does not mention', async () => {
         await expect(processItems('RECORD_ARRAY(name:item1)')).resolves.toMatchObject([{ items: [{ name: 'item1' }] }]);
       });
+
+      it('should reject a record array missing its closing parenthesis, rather than dropping its last character', async () => {
+        await expectRejection(
+          processItems('RECORD_ARRAY(name:item1,quantity:12'),
+          "Syntax error in RECORD_ARRAY declaration: RECORD_ARRAY(name:item1,quantity:12 at column name: 'items' and row number '1'"
+        );
+      });
     });
   });
 });
