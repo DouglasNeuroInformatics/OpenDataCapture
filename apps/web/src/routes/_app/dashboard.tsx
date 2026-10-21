@@ -7,7 +7,7 @@ import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@h
 import type { AppSubjectName } from '@opendatacapture/schemas/core';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
@@ -501,11 +501,18 @@ const RouteComponent = () => {
                       return null;
                     }}
                   />
+                  <Legend />
                   <Area
                     activeDot={{ fill: chartColors.records.stroke, r: 6, stroke: '#fff', strokeWidth: 2 }}
                     dataKey="records"
                     dot={{ fill: chartColors.records.stroke, r: 4, strokeWidth: 2 }}
                     fill="url(#recordsGradient)"
+                    legendType="plainline"
+                    name={t({
+                      en: 'Records',
+                      es: 'Registros',
+                      fr: 'Enregistrements'
+                    })}
                     stroke={chartColors.records.stroke}
                     strokeWidth={3}
                     type="monotone"
@@ -515,7 +522,14 @@ const RouteComponent = () => {
                     dataKey="sessions"
                     dot={{ fill: chartColors.sessions.stroke, r: 4, strokeWidth: 2 }}
                     fill="url(#sessionsGradient)"
+                    legendType="plainline"
+                    name={t({
+                      en: 'Sessions',
+                      es: 'Sesiones',
+                      fr: 'Sessions'
+                    })}
                     stroke={chartColors.sessions.stroke}
+                    strokeDasharray="6 4"
                     strokeWidth={3}
                     type="monotone"
                   />
