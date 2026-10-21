@@ -224,6 +224,13 @@ export const StartSessionForm = ({
           subjectId: z.string().optional(),
           subjectDateOfBirth: z
             .date()
+            .max(currentDate, {
+              message: t({
+                en: 'Date of birth must be in the past',
+                es: 'La fecha de nacimiento debe estar en el pasado',
+                fr: 'La date de naissance doit être dans le passé'
+              })
+            })
             .optional()
             .refine(
               (date) => {
