@@ -214,6 +214,24 @@ test.describe('start session', () => {
     await expect(startSessionPage.subjectIdOption(identifier)).toBeVisible();
   });
 
+  test('should refuse to start a session for a subject whose date of birth is in the future', async ({
+    getPageModel,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.typeSubjectId(`future-${uniqueId}`);
+    await startSessionPage.dismissSubjectIdOptions();
+
+    await startSessionPage.fillDateOfBirth(`${new Date().getFullYear() + 1}-01-01`);
+    await startSessionPage.sexField.selectOption('Male');
+    await startSessionPage.submitForm();
+
+    await expect(startSessionPage.errorMessages).toContainText(['Date of birth must be in the past']);
+    await expect(startSessionPage.successMessage).toHaveCount(0);
+  });
+
   test('should show a required-field error for every missing field when submitting the personal information form empty', async ({
     getPageModel
   }) => {
