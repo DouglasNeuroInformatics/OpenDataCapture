@@ -404,3 +404,39 @@ describe('StartSessionForm session type', () => {
     expect(screen.getByText('Date Assessed')).toBeTruthy();
   });
 });
+
+describe('StartSessionForm date of birth', () => {
+  /** The date input commits typed text when it loses focus, not on each keystroke. */
+  const enterDateOfBirth = (date: string) => {
+    fireEvent.focus(dateOfBirthInput());
+    fireEvent.change(dateOfBirthInput(), { target: { value: date } });
+    fireEvent.blur(dateOfBirthInput());
+  };
+
+  const enterNewIdentifier = () => {
+    typeIdentifier('gamma');
+    closeIdentifierPopup();
+  };
+
+  it('should reject a date of birth in the future, since no subject can be born after today', async () => {
+    const form = renderForm([]);
+    enterNewIdentifier();
+    enterDateOfBirth(`${new Date().getFullYear() + 1}-01-01`);
+    submit(form);
+    await waitFor(() =>
+      expect(errorMessages()).toContainEqual({
+        field: 'subjectDateOfBirth',
+        message: 'Date of birth must be in the past'
+      })
+    );
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should accept a date of birth in the past, so the check does not block a valid session', async () => {
+    const form = renderForm([]);
+    enterNewIdentifier();
+    enterDateOfBirth('1990-01-01');
+    await submitAndSettle(form);
+    expect(onSubmit.mock.lastCall?.[0].subjectData.dateOfBirth).toStrictEqual(new Date('1990-01-01'));
+  });
+});
