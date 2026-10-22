@@ -1,12 +1,14 @@
 ---
 name: odc-release
-description: Ship a release of Open Data Capture — bump the version, publish the npm packages and the GHCR images, tag it. Use when a merge to main produced no new version, or when a release run logs `Skipping <pkg>@<version> (already published)`.
+description: Ship a release of Open Data Capture — bump the version, publish the npm packages and the GHCR images, tag it. Use when a merge to main produced no new version, when patching an older line from a release/<major>.<minor> branch, or when a release run logs `Skipping <pkg>@<version> (already published)`.
 ---
 
-A release is **one version bump merged to `main`** — after that `.github/workflows/release.yaml` builds the
-images, publishes the npm packages and creates the GitHub release with no further input. It also fires on
-`workflow_dispatch` from `main`, which releases again with no bump and no merge; a dispatch from any other ref
-fails `configure`. The release body is the new version's
+A release is **one version bump merged to `main`**, or bumped on a `release/<major>.<minor>` branch and
+dispatched — after that `.github/workflows/release.yaml` builds the images, publishes the npm packages and
+creates the GitHub release with no further input. A run is a release only when `v<version>` is not a git tag
+yet; any other run from `main` pushes the `edge` image alone, and a dispatch from any other ref fails
+`configure`. What each tag means and which run moves `latest`:
+`.agents/docs/architecture/release-channels.md`. The release body is the new version's
 section of `CHANGELOG.md`, which `scripts/increment-version.ts` generates from the commits since the last tag;
 the `release` job fails, rather than publishing an empty body, when that section is missing. Which workspaces publish: `.agents/docs/workspace-map.md`; how each artifact is selected: the job
 table in `.agents/docs/playbooks/cut-a-release.md`.
@@ -19,13 +21,13 @@ Every publishable package must carry the root version. Each publishes at **its o
 the publish step skips a version npm already carries, so a bump that moved the root alone leaves `publish-npm`
 green and npm untouched. Nothing compares those files, so **you are the lockstep check**: after the bump, every
 row of `scripts/list-publishable.sh` must carry the version in the root `package.json`, which that script never
-prints. `Skipping <pkg>@<version> (already published)` is the ordinary output of any push that carried no bump —
-a symptom only in the run for the commit that was supposed to bump. The mechanism, and the command that compares
+prints. `Skipping <pkg>@<version> (already published)` is the ordinary output of a re-run of a release that
+already published — a symptom only in the first run after a bump. The mechanism, and the command that compares
 the two: `.agents/docs/playbooks/cut-a-release.md`.
 
 ## `pnpm lint` is the only test the release path runs
 
-The `validate` job runs `pnpm lint` and stops there (`release.yaml:37-52`): the merge is the last moment a test
+The `validate` job runs `pnpm lint` and stops there (`release.yaml:44-59`): the merge is the last moment a test
 runs against this code, and after it a red suite ships silently. Get the branch green first with
 `.agents/skills/odc-done/SKILL.md`, and — since nothing you run locally builds the Docker images, and `build`
 gates both publishes — require `gh run list --workflow=Release --limit 1` green on `main` before you bump. What
@@ -34,13 +36,14 @@ CI does and does not gate: `.agents/docs/architecture/testing-strategy.md`.
 ## `skipped` is the shape of a release that never happened
 
 `publish-npm` and `release` inherit the default `success()` gate over their `needs`, so a `build` that dies takes
-both of them down and GitHub reports them **skipped** rather than failed (`release.yaml:53-56,92-100,140-145`).
-Read the cause off the run, not off the missing artifact:
+both of them down and GitHub reports them **skipped** rather than failed (`release.yaml:60-62,109-112,156-160`).
+On a run with no bump the two are skipped by design — `configure`'s `release` output is `false`; read it
+before anything else. Otherwise read the cause off the run, not off the missing artifact:
 
-- one leg `failure` and its siblings `cancelled` — `strategy.fail-fast: true` (`release.yaml:57-59`): an image
+- one leg `failure` and its siblings `cancelled` — `strategy.fail-fast: true` (`release.yaml:63-64`): an image
   that does not build, not a collision.
 - the whole run `cancelled` — the per-ref concurrency group with `cancel-in-progress: true`
-  (`release.yaml:9-11`): a second merge landed while it was in flight.
+  (`release.yaml:10-12`): a second merge landed while it was in flight.
 
 Recover by fixing the failing job and re-running the run (`gh run rerun <id>`); the publish step's version guard
 makes that safe. Cut another patch only when npm needs a version it has never seen.
@@ -53,10 +56,8 @@ from the run.
 Machinery oddities, verified and already understood — say so in your reply and carry on. A red `build` is not one
 of them; that is a failure to fix.
 
-- Every push to `main` performs a full release — `release.cjs` sets `should_release` to `'true'` on every run from `main`, on
-  purpose. It consults nothing outside the repository, so no registry state can wedge it; do not add a gate that
-  reads GHCR or npm back. The gate that used to live there is in `.agents/docs/playbooks/cut-a-release.md`.
-- No playground image ships — the matrix filter drops it.
+- Every push to `main` builds and pushes `edge` and `sha-<7>`, release or not, on purpose. The release decision
+  reads git tags only, so no registry state can wedge it; do not add a gate that reads GHCR or npm back.
 - Nothing enforces the version lockstep; you do, above.
 
 ## Pulling a bad release takes `latest` with it
@@ -67,7 +68,8 @@ both tags. Delete the two most recent releases and the images have no `latest` a
 and nothing in this repo reports that. Cut the replacement release promptly, or retag a known-good version by hand.
 Deleting the GitHub release and its `v<version>` tag is independent of the images and of npm, where a version older
 than 72h cannot be unpublished at all — pulling a release means pulling it in three places, and only the images
-carry `latest`.
+carry `latest`. **Deleting the `v<version>` tag re-arms the release:** the next push to `main` at that version
+publishes it again, because the tag's absence is the whole release decision.
 
 Done when every release-machinery oddity you hit is either in that list or in your reply — the reason for any one
 of them is in `.agents/docs/playbooks/cut-a-release.md`.

@@ -123,6 +123,7 @@ isn't one.
 | The six similarly-named `runtime-*` things, and `vendor/`       | `.agents/docs/architecture/runtime-and-vendor.md`   |
 | CASL, `@RouteAccess`, and group scoping                         | `.agents/docs/architecture/auth-and-permissions.md` |
 | What is tested where, and what CI gates                         | `.agents/docs/architecture/testing-strategy.md`     |
+| Image tags, npm dist-tags, `latest`, and release branches       | `.agents/docs/architecture/release-channels.md`     |
 
 ### Step-by-step playbooks
 
