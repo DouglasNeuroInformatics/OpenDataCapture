@@ -276,6 +276,41 @@ describe('admin instrument repositories page', () => {
     expect(editions).toEqual(['3', '-']);
   });
 
+  it('should list only the latest edition of an instrument the repository has bumped', () => {
+    mocks.instrumentInfo.data = [
+      {
+        ...scalarFixture({ edition: 4, id: 'form-1', title: 'General Information' }),
+        internal: { edition: 4, name: 'GI' }
+      },
+      {
+        ...scalarFixture({ edition: 5, id: 'form-2', title: 'General Information' }),
+        internal: { edition: 5, name: 'GI' }
+      }
+    ];
+    renderPage();
+    fireEvent.click(rowAction('View'));
+    const editions = within(screen.getByRole('dialog'))
+      .getAllByRole('listitem')
+      .map((item) => item.querySelectorAll('p')[2]!.textContent);
+    expect(editions).toEqual(['5']);
+  });
+
+  it('should count only the latest edition of each instrument once the instrument info has loaded', () => {
+    mocks.instrumentInfo.data = [
+      {
+        ...scalarFixture({ edition: 4, id: 'form-1', title: 'General Information' }),
+        internal: { edition: 4, name: 'GI' }
+      },
+      {
+        ...scalarFixture({ edition: 5, id: 'form-2', title: 'General Information' }),
+        internal: { edition: 5, name: 'GI' }
+      },
+      seriesFixture({ id: 'series-1', title: 'Baseline Battery' })
+    ];
+    renderPage([repoFixture({ instrumentIds: ['form-1', 'form-2', 'series-1'] })]);
+    expect(within(rows()[0]!).getByText('2')).toBeTruthy();
+  });
+
   it('should close the view dialog when it is dismissed', () => {
     renderPage();
     fireEvent.click(rowAction('View'));
