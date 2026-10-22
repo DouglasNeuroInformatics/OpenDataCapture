@@ -26,10 +26,10 @@ that never says the word storage. Step 4 is where you avoid it.
    Done when `bash --version` reports 5 or newer and `jq --version` and `openssl version` print.
 
 2. **Install Node and enable pnpm.** `nvm install $(cat .nvmrc)` — `.nvmrc` pins `lts/krypton` and
-   `engines.node` requires `>=v24.15.0`. Then `corepack enable`; the pnpm version comes from
+   `engines.node` requires `^24.22.1 || >=26.12.1`. Then `corepack enable`; the pnpm version comes from
    `packageManager` in `package.json`, so there is nothing to pick by hand.
 
-   Done when `node --version` is v24.15.0 or newer and `pnpm --version` prints.
+   Done when `node --version` is v24.22.1 or a newer v24, or v26.12.1 or newer and `pnpm --version` prints.
 
 3. **Generate `.env` — once per clone.** `pnpm generate:env` runs `scripts/generate-env.sh`, which
    writes `.env` wholesale from `.env.template`: it mints `SECRET_KEY`, `GATEWAY_API_KEY`,
