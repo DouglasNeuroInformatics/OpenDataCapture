@@ -11,7 +11,7 @@ gates is in `.agents/docs/architecture/testing-strategy.md`; the `RELEASE_VERSIO
 **Plan around this:** the root `package.json` version _is_ the release identity —
 `.github/scripts/release.cjs` reads it and it becomes both the container tag and the GitHub tag
 `v${version}` — but every npm package publishes at **its own** `package.json` version, and the publish
-step skips any version already on the registry (`release.yaml:147-155`):
+step skips any version already on the registry (`.github/scripts/publish-npm.cjs`):
 
 ```
 Skipping @opendatacapture/runtime-v1@<version> (already published)
@@ -96,13 +96,13 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
 
 7. **Watch the run:** `gh run watch`, or `gh run list --workflow=Release --limit 1` for its id.
 
-   | Job           | What it does                                                                                                                                                                              | Skips when                                                                                                                                              |
-   | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | `configure`   | derives the build matrix from `docker compose config` through the jq filter described below; runs `release.cjs` for the release plan                                                      | never; **fails** on a ref that is neither `main` nor `release/<major>.<minor>`, and on a release branch whose version is already tagged or off its line |
-   | `validate`    | `pnpm lint`                                                                                                                                                                               | never                                                                                                                                                   |
-   | `build`       | buildx `linux/amd64,linux/arm64` per matrix leg, pushing the tags the plan enables, with `RELEASE_VERSION` as a build arg                                                                 | never                                                                                                                                                   |
-   | `publish-npm` | turbo-builds each publishable package and its closure, then publishes each version not already on npm under the plan's `npmTag`, over OIDC (no `NPM_TOKEN`), in the `release` environment | `release` is `false` — the version is already tagged                                                                                                    |
-   | `release`     | extracts the `## ${version}` section of `CHANGELOG.md` (`scripts/changelog.ts section`) and creates the GitHub release tagged `v${version}` on the built commit, with it as the body      | `release` is `false`, or any of its `needs` skipped or failed                                                                                           |
+   | Job           | What it does                                                                                                                                                                                                                  | Skips when                                                                                                                                              |
+   | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | `configure`   | derives the build matrix from `docker compose config` through the jq filter described below; runs `release.cjs` for the release plan                                                                                          | never; **fails** on a ref that is neither `main` nor `release/<major>.<minor>`, and on a release branch whose version is already tagged or off its line |
+   | `validate`    | `pnpm lint`                                                                                                                                                                                                                   | never                                                                                                                                                   |
+   | `build`       | buildx `linux/amd64,linux/arm64` per matrix leg, pushing the tags the plan enables, with `RELEASE_VERSION` as a build arg                                                                                                     | never                                                                                                                                                   |
+   | `publish-npm` | turbo-builds each publishable package and its closure, then publishes each version not already on npm under the plan's `npmTag` (`.github/scripts/publish-npm.cjs`), over OIDC (no `NPM_TOKEN`), in the `release` environment | `release` is `false` — the version is already tagged                                                                                                    |
+   | `release`     | extracts the `## ${version}` section of `CHANGELOG.md` (`scripts/changelog.ts section`) and creates the GitHub release tagged `v${version}` on the built commit, with it as the body                                          | `release` is `false`, or any of its `needs` skipped or failed                                                                                           |
 
    `release` **fails** — not skips — with `CHANGELOG.md has no section for <version>` when the bump
    bypassed `increment-version.ts`. That is deliberate: an empty body would look like every release
@@ -180,7 +180,8 @@ npm dist-tag ls @opendatacapture/runtime-v1                                 # la
 
 `Publishing <name>@<version>` for every package is the first run after a bump. `Skipping <name>@<version>
 (already published)` is the **correct** output when re-running a release that already published — that
-version guard is what makes a re-run safe — and is a defect only on the first run after a bump.
+version guard is what makes a re-run safe — and is a defect only on the first run after a bump. A re-run whose
+`npmTag` no longer points at the published version fails instead of skipping; cut a fresh patch.
 
 The images have no read-only command of their own:
 `gh api /orgs/DouglasNeuroinformatics/packages/container/open-data-capture-api/versions` answers

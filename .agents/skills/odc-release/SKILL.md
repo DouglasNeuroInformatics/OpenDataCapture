@@ -36,7 +36,7 @@ CI does and does not gate: `.agents/docs/architecture/testing-strategy.md`.
 ## `skipped` is the shape of a release that never happened
 
 `publish-npm` and `release` inherit the default `success()` gate over their `needs`, so a `build` that dies takes
-both of them down and GitHub reports them **skipped** rather than failed (`release.yaml:62-64,111-114,158-162`).
+both of them down and GitHub reports them **skipped** rather than failed (`release.yaml:62-64,111-114,151-155`).
 On a run with no bump the two are skipped by design — `configure`'s `release` output is `false`; read it
 before anything else. Otherwise read the cause off the run, not off the missing artifact:
 
@@ -46,7 +46,9 @@ before anything else. Otherwise read the cause off the run, not off the missing 
   run (`release.yaml:12-14`): a third run arrived while this one waited. Dispatch it again.
 
 Recover by fixing the failing job and re-running the whole run (`gh run rerun <id>`); the publish step's version
-guard makes that safe. **Never `gh run rerun --failed` here:** it skips `configure` and reuses the plan from the
+guard makes that safe — unless a newer release landed in between and the re-run plans another `npmTag`: then
+`publish-npm` fails with `trusted publishing cannot move a dist-tag, so cut a fresh patch`, and a fresh patch is
+the fix. **Never `gh run rerun --failed` here:** it skips `configure` and reuses the plan from the
 failed run, whose tag snapshot may be stale — `latest` could then move back to an older release. Cut another patch only when npm needs a version it has never seen.
 
 Done when the answer to "the merge produced no new version" names the job that owns the missing artifact, quoted

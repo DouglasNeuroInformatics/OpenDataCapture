@@ -13,6 +13,7 @@
   },
   "include": [
     ".github/scripts/__tests__/*.ts",
+    ".github/scripts/publish-npm.cjs",
     ".github/scripts/release.cjs",
     ".github/vitest.config.ts",
     "commitlint.config.ts",

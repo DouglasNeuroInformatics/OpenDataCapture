@@ -6,6 +6,7 @@ import { defineConfig, mergeConfig } from 'vitest/config';
 // field inside a referenced project config as a nested set of projects.
 export const baseConfig = defineConfig({
   test: {
+
     include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
     watch: false
   }
@@ -34,7 +35,7 @@ export default mergeConfig(
           'apps/web/src/testing/**'
         ],
         include: [
-          '.github/scripts/release.cjs',
+          '.github/scripts/{publish-npm,release}.cjs',
           'apps/{api,gateway,web}/src/**/*.?(c|m)[jt]s?(x)',
           'packages/*/src/**/*.?(c|m)[jt]s?(x)'
         ],

@@ -25,6 +25,11 @@ again from fresh tags; `gh run rerun --failed` does not, so it is never used on 
 than a tag on its own line (`2.5.3` once `v2.5.4` exists), so a late retry cannot move the `2.5` image
 tag or the `release-2.5` dist-tag back.
 
+**A re-run never leaves an npm channel behind.** A re-run planned after a newer release can carry another
+`npmTag` than the run that published, and trusted publishing cannot move a dist-tag. So
+`.github/scripts/publish-npm.cjs` skips a published version only while `npmTag` points at it, and fails
+otherwise — the fix is a fresh patch, not a green run with `release-<major>.<minor>` on an older version.
+
 | Output    | Meaning                                                                                    |
 | --------- | ------------------------------------------------------------------------------------------ |
 | `release` | `v<version>` is not a tag yet, so this run publishes it                                    |
