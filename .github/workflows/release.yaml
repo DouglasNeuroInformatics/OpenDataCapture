@@ -2,13 +2,16 @@ name: Release
 on:
   push:
     branches: ['main']
+  # Release branches (release/<major>.<minor>) release on dispatch only; release.cjs refuses any other ref.
   workflow_dispatch:
 permissions:
   contents: write
   packages: write
+# One Release at a time across every ref: release.cjs plans from a tag snapshot, so a run on another
+# ref must not overlap it (.agents/docs/architecture/release-channels.md).
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 defaults:
   run:
     shell: bash
@@ -16,20 +19,26 @@ jobs:
   configure:
     runs-on: ubuntu-latest
     outputs:
-      should_release: ${{ steps.version.outputs.should_release }}
-      version: ${{ steps.version.outputs.version }}
+      channel: ${{ steps.plan.outputs.channel }}
+      edge: ${{ steps.plan.outputs.edge }}
+      latest: ${{ steps.plan.outputs.latest }}
       matrix: ${{ steps.matrix.outputs.matrix }}
+      npm_tag: ${{ steps.plan.outputs.npmTag }}
+      release: ${{ steps.plan.outputs.release }}
+      version: ${{ steps.plan.outputs.version }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # release.cjs reads every v* tag
       - name: Derive Build Matrix
         id: matrix
         run: |
           matrix=$(docker compose config --no-interpolate --format json \
             | jq -c '{include:[.services|to_entries[]|select(.value.build and .value.image)|{image:(.value.image|split(":")[0]),dockerfile:.value.build.dockerfile}]}')
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
-      - name: Determine Release Version
-        id: version
+      - name: Plan Release
+        id: plan
         uses: actions/github-script@v9
         with:
           script: |
@@ -53,7 +62,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: [configure, validate]
-    if: ${{ needs.configure.outputs.should_release == 'true' }}
     strategy:
       fail-fast: true
       matrix: ${{ fromJSON(needs.configure.outputs.matrix) }}
@@ -75,9 +83,13 @@ jobs:
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ${{ matrix.image }}
+          flavor: latest=false
           tags: |
-            type=raw,value=latest
-            type=raw,value=${{ needs.configure.outputs.version }}
+            type=raw,value=edge,enable=${{ needs.configure.outputs.edge }}
+            type=sha,prefix=sha-,format=short,enable=${{ needs.configure.outputs.edge }}
+            type=raw,value=${{ needs.configure.outputs.version }},enable=${{ needs.configure.outputs.release }}
+            type=raw,value=${{ needs.configure.outputs.channel }},enable=${{ needs.configure.outputs.release }}
+            type=raw,value=latest,enable=${{ needs.configure.outputs.latest }}
       - name: Build and Push Docker Images
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
@@ -91,7 +103,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
   publish-npm:
     runs-on: ubuntu-latest
-    # Its deployment-branch policy (main only) is what the npm trusted publisher is pinned to.
+    # Its deployment-branch policy (main and release/*) is what the npm trusted publisher is pinned to.
     environment: release
     permissions:
       contents: read
@@ -99,7 +111,7 @@ jobs:
     needs:
       - build
       - configure
-    if: ${{ needs.configure.outputs.should_release == 'true' }}
+    if: ${{ needs.configure.outputs.release == 'true' }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -128,23 +140,19 @@ jobs:
           done < <(scripts/list-publishable.sh)
           pnpm exec turbo run build "${filters[@]}"
       - name: Publish Packages
-        run: |
-          # Publish each marked package whose version is not already on npm. The version
-          # check keeps this idempotent across workflow re-runs.
-          while IFS=$'\t' read -r name version pkgPath; do
-            if [ -n "$(npm view "${name}@${version}" version 2>/dev/null)" ]; then
-              echo "Skipping ${name}@${version} (already published)"
-              continue
-            fi
-            echo "Publishing ${name}@${version}"
-            pnpm --filter "${name}" publish --no-git-checks
-          done < <(scripts/list-publishable.sh)
+        uses: actions/github-script@v9
+        env:
+          NPM_TAG: ${{ needs.configure.outputs.npm_tag }}
+        with:
+          script: |
+            await require('./.github/scripts/publish-npm.cjs')({ core, exec, npmTag: process.env.NPM_TAG })
   release:
     runs-on: ubuntu-latest
     needs:
       - build
       - configure
       - publish-npm
+    if: ${{ needs.configure.outputs.release == 'true' }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -165,4 +173,7 @@ jobs:
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           body_path: ${{ runner.temp }}/release-notes.md
+          make_latest: ${{ needs.configure.outputs.latest }}
           tag_name: v${{ needs.configure.outputs.version }}
+          # The action otherwise creates a new tag on the default branch, not on the commit this run built.
+          target_commitish: ${{ github.sha }}

@@ -6,7 +6,7 @@ What is tested where, and what CI actually blocks a merge on. Writing an e2e tes
 ## The failure that is silent
 
 The root `vitest.config.ts` declares
-`projects: ['apps/*/vitest.config.ts', 'packages/*/vitest.config.ts', 'runtime/*/vitest.config.ts']`.
+`projects: ['.github/vitest.config.ts', 'apps/*/vitest.config.ts', 'packages/*/vitest.config.ts', 'runtime/*/vitest.config.ts']`.
 **A workspace with no `vitest.config.ts` of its own is invisible to `pnpm test`.** A test file added
 to `packages/licenses` today is collected by nothing, reported by nothing, and passes CI
 green.
@@ -28,11 +28,12 @@ path exercised against a real database is Playwright.
 
 ## Vitest projects
 
-Twenty-one. Scope a run with `pnpm exec vitest --project <name>`; the name is the `name` field in that
+Twenty-two. Scope a run with `pnpm exec vitest --project <name>`; the name is the `name` field in that
 package's config, which is **not** always the directory name.
 
 | Project                  | Package                           | Notable config                                                                                                                                                                                                                                                                                                                          |
 | ------------------------ | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `github`                 | `.github`                         | not a workspace. Tests `scripts/release.cjs` (the release plan) and `scripts/publish-npm.cjs` (the npm publish step), the two `.github` files in the coverage `include`; `scripts/issues.cjs` stays untested                                                                                                                            |
 | `api`                    | `apps/api`                        | libnest SWC plugin, confined to `apps/api` sources; `globals: true`                                                                                                                                                                                                                                                                     |
 | `web`                    | `apps/web`                        | `environment: 'happy-dom'`; redeclares the `@` alias                                                                                                                                                                                                                                                                                    |
 | `gateway`                | `apps/gateway`                    | node environment; redeclares the `@` alias. Request schemas, `resolveLanguage`, and the HTML `src/entry-server.tsx` renders — the routers and hydration are covered by `testing/src/specs/gateway-*.spec.ts`. A component test opts into happy-dom per file with a `// @vitest-environment happy-dom` docblock                          |
@@ -137,7 +138,7 @@ generated `route-tree.ts`, and the bare entrypoints.
 ## What CI gates
 
 `.github/workflows/ci.yaml`, one job (`lint-and-test`, ubuntu-latest), triggered on
-`pull_request` to `main` and `workflow_dispatch` only.
+`pull_request` to `main` or a `release/**` branch, and `workflow_dispatch` only.
 
 | #   | Step                 | Command                                                |
 | --- | -------------------- | ------------------------------------------------------ |
@@ -158,7 +159,7 @@ Not gated, despite existing in the repo:
 - **No format check.** Prettier runs only in the `.husky/pre-commit` hook (`prettier-pre-commit`),
   which formats rather than verifies; the hook does not run lint or tests.
 
-`.github/workflows/release.yaml` (push to `main`) has a `Validate` job that runs `pnpm lint` only —
+`.github/workflows/release.yaml` (push to `main`, dispatch on `release/<major>.<minor>`) has a `Validate` job that runs `pnpm lint` only —
 **no unit tests and no e2e before a release build.**
 
 `.github/workflows/commitlint.yaml` (`pull_request` to any branch, so forks included) runs
