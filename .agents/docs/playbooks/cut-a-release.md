@@ -11,7 +11,7 @@ gates is in `.agents/docs/architecture/testing-strategy.md`; the `RELEASE_VERSIO
 **Plan around this:** the root `package.json` version _is_ the release identity —
 `.github/scripts/release.cjs` reads it and it becomes both the container tag and the GitHub tag
 `v${version}` — but every npm package publishes at **its own** `package.json` version, and the publish
-step skips any version already on the registry (`release.yaml:145-153`):
+step skips any version already on the registry (`release.yaml:147-155`):
 
 ```
 Skipping @opendatacapture/runtime-v1@<version> (already published)
@@ -87,8 +87,9 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    contributors. There is no changeset: `CHANGELOG.md` is the record, and the GitHub release body is a copy
    of its new section.
 
-6. **Land one release at a time.** The workflow's concurrency group is per-workflow-per-ref with
-   `cancel-in-progress: true` (`release.yaml:10-12`), so a second merge cancels the release in flight. A
+6. **Land one release at a time.** One concurrency group covers every ref, with
+   `cancel-in-progress: false` (`release.yaml:12-14`): a run waits for the one in flight, but GitHub keeps
+   only one waiting run, so a third run cancels the waiting one — dispatch it again. A
    `build` that is cancelled or fails leaves `publish-npm` and `release` reported as **skipped** rather
    than failed — `.agents/skills/odc-release/SKILL.md` reads that job tree; runs `30389796062` and
    `30378779338` show that tree.

@@ -15,6 +15,16 @@ release is `.agents/docs/playbooks/cut-a-release.md`; this file is the model it 
 image or package must not be able to wedge the next release (the GHCR lookup it replaced did exactly
 that).
 
+**One Release runs at a time, across every ref.** The plan is only as fresh as its tag snapshot, so
+`release.yaml` uses one concurrency group with no ref in it. Without it, a `release/2.5` dispatch and a
+release from `main` overlap, both see neither tag, both plan `latest`, and the one that finishes last
+owns `latest`; or two refs release the same version from different commits. A full re-run plans
+again from fresh tags; `gh run rerun --failed` does not, so it is never used on this workflow.
+
+**A release must be the newest of its line.** `planRelease` refuses an untagged version that is lower
+than a tag on its own line (`2.5.3` once `v2.5.4` exists), so a late retry cannot move the `2.5` image
+tag or the `release-2.5` dist-tag back.
+
 | Output    | Meaning                                                                                    |
 | --------- | ------------------------------------------------------------------------------------------ |
 | `release` | `v<version>` is not a tag yet, so this run publishes it                                    |

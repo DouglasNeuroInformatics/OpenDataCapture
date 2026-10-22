@@ -48,6 +48,12 @@ describe('planRelease', () => {
     });
   });
 
+  it('should refuse an untagged patch older than its line, so a retry cannot move the line tag back', () => {
+    expect(() => planRelease({ ref: RELEASE_2_5, tags: ['v2.5.2', 'v2.5.4'], version: '2.5.3' })).toThrow(
+      '2.5.3 is older than v2.5.4 on the 2.5 line; bump past it first'
+    );
+  });
+
   it('should ignore tags that are not plain versions when deciding latest', () => {
     expect(planRelease({ ref: MAIN, tags: ['v2-beta', 'v9.0.0-rc.1'], version: '2.6.0' })).toMatchObject({
       latest: true

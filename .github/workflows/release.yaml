@@ -7,9 +7,11 @@ on:
 permissions:
   contents: write
   packages: write
+# One Release at a time across every ref: release.cjs plans from a tag snapshot, so a run on another
+# ref must not overlap it (.agents/docs/architecture/release-channels.md).
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 defaults:
   run:
     shell: bash

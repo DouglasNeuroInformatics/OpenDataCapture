@@ -27,7 +27,7 @@ the two: `.agents/docs/playbooks/cut-a-release.md`.
 
 ## `pnpm lint` is the only test the release path runs
 
-The `validate` job runs `pnpm lint` and stops there (`release.yaml:44-59`): the merge is the last moment a test
+The `validate` job runs `pnpm lint` and stops there (`release.yaml:46-61`): the merge is the last moment a test
 runs against this code, and after it a red suite ships silently. Get the branch green first with
 `.agents/skills/odc-done/SKILL.md`, and — since nothing you run locally builds the Docker images, and `build`
 gates both publishes — require `gh run list --workflow=Release --limit 1` green on `main` before you bump. What
@@ -36,17 +36,18 @@ CI does and does not gate: `.agents/docs/architecture/testing-strategy.md`.
 ## `skipped` is the shape of a release that never happened
 
 `publish-npm` and `release` inherit the default `success()` gate over their `needs`, so a `build` that dies takes
-both of them down and GitHub reports them **skipped** rather than failed (`release.yaml:60-62,109-112,156-160`).
+both of them down and GitHub reports them **skipped** rather than failed (`release.yaml:62-64,111-114,158-162`).
 On a run with no bump the two are skipped by design — `configure`'s `release` output is `false`; read it
 before anything else. Otherwise read the cause off the run, not off the missing artifact:
 
-- one leg `failure` and its siblings `cancelled` — `strategy.fail-fast: true` (`release.yaml:63-64`): an image
+- one leg `failure` and its siblings `cancelled` — `strategy.fail-fast: true` (`release.yaml:65-66`): an image
   that does not build, not a collision.
-- the whole run `cancelled` — the per-ref concurrency group with `cancel-in-progress: true`
-  (`release.yaml:10-12`): a second merge landed while it was in flight.
+- the whole run `cancelled` before it started — one concurrency group covers every ref and keeps one waiting
+  run (`release.yaml:12-14`): a third run arrived while this one waited. Dispatch it again.
 
-Recover by fixing the failing job and re-running the run (`gh run rerun <id>`); the publish step's version guard
-makes that safe. Cut another patch only when npm needs a version it has never seen.
+Recover by fixing the failing job and re-running the whole run (`gh run rerun <id>`); the publish step's version
+guard makes that safe. **Never `gh run rerun --failed` here:** it skips `configure` and reuses the plan from the
+failed run, whose tag snapshot may be stale — `latest` could then move back to an older release. Cut another patch only when npm needs a version it has never seen.
 
 Done when the answer to "the merge produced no new version" names the job that owns the missing artifact, quoted
 from the run.

@@ -36,7 +36,8 @@ function compareVersions(left, right) {
  * a mistake and fails. `latest` follows the highest released version, whichever branch cut it.
  *
  * The decision reads only the repository — the version file and the git tags — never a registry: a
- * deleted image or package must not be able to wedge the next release.
+ * deleted image or package must not be able to wedge the next release. It is only as fresh as the
+ * tag snapshot, which is why `release.yaml` runs one Release at a time across every ref.
  *
  * @param {{ ref: string; tags: readonly string[]; version: string }} input
  * @returns {ReleasePlan}
@@ -59,12 +60,15 @@ function planRelease({ ref, tags, version }) {
   if (releaseBranch && !release) {
     throw new Error(`v${version} is already released; bump the version on ${ref} first`);
   }
-  const latest =
-    release &&
-    tags.every((tag) => {
-      const parsedTag = parseVersion(tag.slice(1));
-      return !parsedTag || compareVersions(parsedTag, parsedVersion) < 0;
-    });
+  const newerTags = tags.filter((tag) => {
+    const parsedTag = parseVersion(tag.slice(1));
+    return parsedTag && compareVersions(parsedTag, parsedVersion) > 0;
+  });
+  const newerTagOnLine = newerTags.find((tag) => tag.startsWith(`v${channel}.`));
+  if (release && newerTagOnLine) {
+    throw new Error(`${version} is older than ${newerTagOnLine} on the ${channel} line; bump past it first`);
+  }
+  const latest = release && newerTags.length === 0;
   return {
     channel,
     edge: isMain,
