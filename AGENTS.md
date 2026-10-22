@@ -11,7 +11,7 @@ you write code there.
 
 ## Commands
 
-Package manager is pnpm (>=10). Node >= v24.15.0 (see `.nvmrc`, currently `lts/krypton`).
+Package manager is pnpm (>=10). Node `^24.22.1 || >=26.12.1`, the October 2026 security releases (see `.nvmrc`, currently `lts/krypton`).
 
 ```sh
 pnpm install                # install deps
