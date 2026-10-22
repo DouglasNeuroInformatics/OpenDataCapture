@@ -10,7 +10,7 @@ export default defineConfig({
         '**/dist/**',
         '**/node_modules/**',
         '**/public/**',
-        '**/scripts/**',
+        '{apps,packages,runtime}/*/scripts/**',
         '**/*.d.?(c|m)ts',
         '**/*{.,-}{test,test-d,spec}.?(c|m)[jt]s?(x)',
         '**/*.config.?(c|m)[jt]s?(x)',
@@ -22,7 +22,11 @@ export default defineConfig({
         'apps/web/src/route-tree.ts',
         'apps/web/src/testing/**'
       ],
-      include: ['apps/{api,gateway,web}/src/**/*.?(c|m)[jt]s?(x)', 'packages/*/src/**/*.?(c|m)[jt]s?(x)'],
+      include: [
+        '.github/scripts/release.cjs',
+        'apps/{api,gateway,web}/src/**/*.?(c|m)[jt]s?(x)',
+        'packages/*/src/**/*.?(c|m)[jt]s?(x)'
+      ],
       provider: 'v8',
       reportsDirectory: path.resolve(import.meta.dirname, 'coverage'),
       skipFull: true,
@@ -31,7 +35,12 @@ export default defineConfig({
       }
     },
     include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
-    projects: ['apps/*/vitest.config.ts', 'packages/*/vitest.config.ts', 'runtime/*/vitest.config.ts'],
+    projects: [
+      '.github/vitest.config.ts',
+      'apps/*/vitest.config.ts',
+      'packages/*/vitest.config.ts',
+      'runtime/*/vitest.config.ts'
+    ],
     watch: false
   }
 });

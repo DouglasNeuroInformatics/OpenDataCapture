@@ -1,15 +1,17 @@
 # Cut a release
 
-A release is one version bump merged to `main`. Everything after the merge is automatic:
+A release is one version bump merged to `main`, or pushed to a `release/<major>.<minor>` branch and
+dispatched (§From a release branch below). Everything after that is automatic:
 `.github/workflows/release.yaml` builds and pushes the container images, publishes the npm packages, and
 creates the GitHub release, whose body is the new version's section of `CHANGELOG.md`. Which packages are publishable is in `.agents/docs/workspace-map.md`; what CI
 gates is in `.agents/docs/architecture/testing-strategy.md`; the `RELEASE_VERSION` build-arg contract is in
-`packages/release-info/AGENTS.md`. This file is only the order of operations.
+`packages/release-info/AGENTS.md`; what each image tag and npm dist-tag means, and which run moves
+`latest`, is in `.agents/docs/architecture/release-channels.md`. This file is only the order of operations.
 
 **Plan around this:** the root `package.json` version _is_ the release identity —
 `.github/scripts/release.cjs` reads it and it becomes both the container tag and the GitHub tag
 `v${version}` — but every npm package publishes at **its own** `package.json` version, and the publish
-step skips any version already on the registry (`release.yaml:132-139`):
+step skips any version already on the registry (`release.yaml:145-153`):
 
 ```
 Skipping @opendatacapture/runtime-v1@<version> (already published)
@@ -33,8 +35,8 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
 
 2. **Bump from a branch that already contains `main`.** `git fetch origin && git merge origin/main`.
    `increment-version.ts` derives the next version from the root `package.json` in your working tree
-   alone, so a branch trailing `main` computes a version that is already released — the run then re-pushes
-   the same image tags, updates the same GitHub release, and prints `Skipping` for every package. Done
+   alone, so a branch trailing `main` computes a version that is already released — the run then finds its
+   tag and pushes `edge` alone, releasing nothing. Done
    when `git merge-base --is-ancestor origin/main HEAD` exits 0.
 
 3. **Run `./scripts/increment-version.ts` from the repo root.** There is no `pnpm` script for it — invoke
@@ -79,41 +81,38 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    of it, and `--commit` answers that prompt up front. It commits only; the tag is the release workflow's
    (`v${version}`, on the GitHub release). Saying yes skips the step-4 read of `CHANGELOG.md`, which is the
    only review that section gets before it becomes the release body, so read the commit afterwards.
-   `ci.yaml` fires on `pull_request` to `main` and on
-   `workflow_dispatch`, never on a push, so a PR based on `dev` or any other branch runs no lint, no unit
-   tests and no e2e — silently (`commitlint.yaml` runs on a PR to any branch). In-repo work branches on
+   A PR against any base but `main` or `release/**` runs no lint, no unit tests and no e2e — silently
+   (`.agents/docs/architecture/testing-strategy.md` §What CI gates). In-repo work branches on
    origin and merges into `main`; `CONTRIBUTING.md` describes a fork path, which addresses outside
    contributors. There is no changeset: `CHANGELOG.md` is the record, and the GitHub release body is a copy
    of its new section.
 
 6. **Land one release at a time.** The workflow's concurrency group is per-workflow-per-ref with
-   `cancel-in-progress: true` (`release.yaml:9-11`), so a second merge cancels the release in flight. A
+   `cancel-in-progress: true` (`release.yaml:10-12`), so a second merge cancels the release in flight. A
    `build` that is cancelled or fails leaves `publish-npm` and `release` reported as **skipped** rather
    than failed — `.agents/skills/odc-release/SKILL.md` reads that job tree; runs `30389796062` and
    `30378779338` show that tree.
 
 7. **Watch the run:** `gh run watch`, or `gh run list --workflow=Release --limit 1` for its id.
 
-   | Job           | What it does                                                                                                                                                    | Skips when                                                                        |
-   | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-   | `configure`   | derives the build matrix from `docker compose config` through the jq filter described below; runs `release.cjs` for `version` and `should_release`              | never; **fails** when dispatched from any ref but `main`                          |
-   | `validate`    | `pnpm lint`                                                                                                                                                     | never                                                                             |
-   | `build`       | buildx `linux/amd64,linux/arm64` per matrix leg, pushing `latest` and the bare version, with `RELEASE_VERSION` as a build arg                                   | never — guards on `should_release`, which is `'true'` whenever `configure` passed |
-   | `publish-npm` | turbo-builds each publishable package and its closure, then publishes each version not already on npm, over OIDC (no `NPM_TOKEN`), in the `release` environment | never — same guard                                                                |
-   | `release`     | extracts the `## ${version}` section of `CHANGELOG.md` (`scripts/changelog.ts section`) and creates the GitHub release tagged `v${version}` with it as the body | any of its `needs` skipped or failed                                              |
+   | Job           | What it does                                                                                                                                                                              | Skips when                                                                                                                                              |
+   | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | `configure`   | derives the build matrix from `docker compose config` through the jq filter described below; runs `release.cjs` for the release plan                                                      | never; **fails** on a ref that is neither `main` nor `release/<major>.<minor>`, and on a release branch whose version is already tagged or off its line |
+   | `validate`    | `pnpm lint`                                                                                                                                                                               | never                                                                                                                                                   |
+   | `build`       | buildx `linux/amd64,linux/arm64` per matrix leg, pushing the tags the plan enables, with `RELEASE_VERSION` as a build arg                                                                 | never                                                                                                                                                   |
+   | `publish-npm` | turbo-builds each publishable package and its closure, then publishes each version not already on npm under the plan's `npmTag`, over OIDC (no `NPM_TOKEN`), in the `release` environment | `release` is `false` — the version is already tagged                                                                                                    |
+   | `release`     | extracts the `## ${version}` section of `CHANGELOG.md` (`scripts/changelog.ts section`) and creates the GitHub release tagged `v${version}` on the built commit, with it as the body      | `release` is `false`, or any of its `needs` skipped or failed                                                                                           |
 
    `release` **fails** — not skips — with `CHANGELOG.md has no section for <version>` when the bump
    bypassed `increment-version.ts`. That is deliberate: an empty body would look like every release
    before the changelog existed and would hide the bypass.
 
-   **Only `main` publishes.** `release.cjs` fails `configure` on a dispatch from any other ref, but
-   the dispatched ref supplies its own copy of the workflow, so that check stops accidents only. What
-   holds against a branch is hosted configuration, and it must stay in place: the `release`
-   environment allows deployments from `main` only, each package's npm trusted publisher names
-   `release.yaml` and the `release` environment, and the `Release tags` ruleset lets only admins
-   move or delete a `v*` tag. It cannot restrict creation: `Create Release` makes the tag with
-   `GITHUB_TOKEN`, and GitHub refuses the Actions app as a repository ruleset bypass actor. GHCR is
-   not covered — any workflow on a branch can push an image with `GITHUB_TOKEN`.
+   **Only `main` and `release/*` publish.** `release.cjs` fails `configure` on a dispatch from any
+   other ref, but the dispatched ref supplies its own copy of the workflow, so that check stops
+   accidents only. The hosted configuration that holds against a branch is listed in
+   `.agents/docs/architecture/release-channels.md` §Release branches, and it must stay in place. The
+   `Release tags` ruleset cannot restrict tag creation: `Create Release` makes the tag with
+   `GITHUB_TOKEN`, and GitHub refuses the Actions app as a repository ruleset bypass actor.
 
    **Four images ship: api, gateway, web and playground.** The filter keeps only compose services
    declaring **both** `build` and `image`, so a new image is a compose service with both keys and
@@ -125,19 +124,10 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
    leading `v` appears on the GitHub tag alone, and `RELEASE_VERSION` cannot carry one
    (`packages/release-info/AGENTS.md`).
 
-8. **Expect a full build even when nothing changed.** `release.cjs` reads the root `package.json`
-   version and sets `should_release` to `'true'` on every run from `main` — by design, and it reads nothing
-   outside the repository to decide. Pushing without a bump re-pushes the same image tags and updates
-   the existing GitHub release in place rather than skipping. That is the intended behaviour, not a
-   finding.
-
-   It used to ask GHCR which version carried the `latest` tag and skip when that matched. The
-   comparison never fired — the regex required a leading `v` and `build` pushes bare tags — while the
-   lookup threw `Failed to find package '<name>' with tag 'latest'` and failed `configure` outright
-   whenever no image carried `latest`. Deleting a bad release does exactly that: `build` pushes
-   `latest` and the version onto one manifest, so removing that version removes both tags. Do not
-   reintroduce a gate that depends on registry state — a deleted release must never be able to wedge
-   the next one.
+8. **Expect an `edge` build on every push to `main`, and a release only after a bump.** Without a
+   bump, `v<version>` is already a tag, so the run pushes `edge` and `sha-<7>` and skips
+   `publish-npm` and `release`. The decision reads git tags, never GHCR or npm — do not reintroduce a
+   gate that depends on registry state; `.agents/docs/architecture/release-channels.md` says why.
 
 9. **Confirm all three artifacts carry the new version** — the images, the npm packages, the GitHub
    release. Done when the `## Verify` block below is clean for each.
@@ -147,6 +137,28 @@ agreement — nothing in CI compares them, and hand edits have moved the root al
     Run the script properly, commit, merge again — re-running a version the registry already has
     publishes nothing, so the fix is always forward.
 
+## From a release branch
+
+A patch to a line `main` has moved past. The decision rules are in
+`.agents/docs/architecture/release-channels.md`; these are only the steps.
+
+1. **Cut `release/<major>.<minor>` from the commit the line's images were built from**, and push it.
+   The images' `org.opencontainers.image.revision` label names that commit; the `v*` tag may be older.
+2. **Pin the base image on the branch.** Replace `FROM node:lts-krypton` in every Dockerfile with the
+   exact version, as a `fix:` commit; the floating tag on a branch would rebuild an old release on
+   whatever Node is newest. To find the version, run `docker run --rm node:lts-krypton node --version`
+   on the day you cut it. `.agents/docs/architecture/release-channels.md` §Base images says why.
+3. **Land each fix on `main` first, then take it onto the branch by a PR against the branch.**
+   `ci.yaml` gates that PR as it gates one to `main`.
+4. **Bump on the branch with `./scripts/increment-version.ts --bump patch`**, steps 3–5 above, but the
+   PR's base is the branch. `git describe` on the branch finds the line's last tag, so the changelog
+   range is the branch's own commits.
+5. **Dispatch: `gh workflow run Release --ref release/<major>.<minor>`.** A push to the branch releases
+   nothing. `configure` fails if the version is already tagged or is not on the branch's line.
+6. **Merge the branch back into `main`.** That carries the `CHANGELOG.md` section and makes the tag
+   reachable, so the next range on `main` starts after it. Keep `main`'s version fields on a conflict
+   when `main` is ahead, and keep `main`'s floating `FROM node:lts-krypton` lines.
+
 ## Verify
 
 ```sh
@@ -154,9 +166,11 @@ node -p "require('./package.json').version" && scripts/list-publishable.sh  # ro
 gh run list --workflow=Release --limit 1                                    # the run for your merge commit
 gh run view <run-id> --json jobs -q '.jobs[]|"\(.name)\t\(.conclusion)"'    # every build leg, publish-npm and release: success
 gh run view <run-id> --log | grep -E 'Publishing|Skipping'
-npm view @opendatacapture/runtime-v1 version                                # the version you just cut
+npm view @opendatacapture/runtime-v1@<version> version                     # the version you just cut
 pnpm exec tsx scripts/changelog.ts section <version>                        # the section the release body was cut from; exit 1 if absent
-gh release view v<version>                                                  # exists, tagged with the leading v, body is that section
+gh release view v<version> --json tagName,isLatest                          # tagged with the leading v; isLatest per the plan
+git ls-remote origin "refs/tags/v<version>"                                 # the sha the run built, not main's head when cut from a branch
+npm dist-tag ls @opendatacapture/runtime-v1                                 # latest, or release-<major>.<minor>, on <version>
 ```
 
 `Publishing <name>@<version>` for every package is the first run after a bump. `Skipping <name>@<version>

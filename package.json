@@ -23,7 +23,7 @@
     "generate:env": "./scripts/generate-env.sh",
     "knip": "NODE_ENV=development env-cmd knip",
     "lint": "turbo run lint lint:root",
-    "lint:root": "tsc --noEmit && eslint --fix commitlint.config.ts knip.ts scripts vitest.config.ts",
+    "lint:root": "tsc --noEmit && eslint --fix .github/scripts/release.cjs .github/scripts/__tests__ commitlint.config.ts knip.ts scripts vitest.config.ts",
     "postinstall": "turbo telemetry disable",
     "prepare": "husky",
     "start": "turbo run start",
