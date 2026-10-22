@@ -23,7 +23,7 @@ export default defineConfig({
         'apps/web/src/testing/**'
       ],
       include: [
-        '.github/scripts/release.cjs',
+        '.github/scripts/{publish-npm,release}.cjs',
         'apps/{api,gateway,web}/src/**/*.?(c|m)[jt]s?(x)',
         'packages/*/src/**/*.?(c|m)[jt]s?(x)'
       ],
