@@ -6,7 +6,7 @@ description: Ship a release of Open Data Capture — bump the version, publish t
 A release is **one version bump merged to `main`**, or bumped on a `release/<major>.<minor>` branch and
 dispatched — after that `.github/workflows/release.yaml` builds the images, publishes the npm packages and
 creates the GitHub release with no further input. A run is a release only when `v<version>` is not a git tag
-yet; any other run from `main` pushes the `edge` image alone, and a dispatch from any other ref fails
+yet; any other run from `main` pushes only the `edge` and `sha-<7>` images, and a dispatch from any other ref fails
 `configure`. What each tag means and which run moves `latest`:
 `.agents/docs/architecture/release-channels.md`. The release body is the new version's
 section of `CHANGELOG.md`, which `scripts/increment-version.ts` generates from the commits since the last tag;

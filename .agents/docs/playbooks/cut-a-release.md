@@ -144,6 +144,10 @@ A patch to a line `main` has moved past. The decision rules are in
 
 1. **Cut `release/<major>.<minor>` from the commit the line's images were built from**, and push it.
    The images' `org.opencontainers.image.revision` label names that commit; the `v*` tag may be older.
+   **A commit older than release-branch support (#1822) carries the old machinery**: its `configure`
+   refuses any ref but `main`, and its `ci.yaml` gates no PR to the branch. Make the branch's first
+   commit, pushed directly, `git checkout origin/main -- .github/workflows/release.yaml
+.github/workflows/ci.yaml .github/scripts/release.cjs`; no later step works without it.
 2. **Pin the base image on the branch.** Replace `FROM node:lts-krypton` in every Dockerfile with the
    exact version, as a `fix:` commit; the floating tag on a branch would rebuild an old release on
    whatever Node is newest. To find the version, run `docker run --rm node:lts-krypton node --version`
@@ -153,8 +157,8 @@ A patch to a line `main` has moved past. The decision rules are in
 4. **Bump on the branch with `./scripts/increment-version.ts --bump patch`**, steps 3–5 above, but the
    PR's base is the branch. `git describe` on the branch finds the line's last tag, so the changelog
    range is the branch's own commits.
-5. **Dispatch: `gh workflow run Release --ref release/<major>.<minor>`.** A push to the branch releases
-   nothing. `configure` fails if the version is already tagged or is not on the branch's line.
+5. **Dispatch: `gh workflow run Release --ref release/<major>.<minor>`.** The dispatched ref supplies
+   the workflow, so this needs the machinery from step 1. A push to the branch releases nothing. `configure` fails if the version is already tagged or is not on the branch's line.
 6. **Merge the branch back into `main`.** That carries the `CHANGELOG.md` section and makes the tag
    reachable, so the next range on `main` starts after it. Keep `main`'s version fields on a conflict
    when `main` is ahead, and keep `main`'s floating `FROM node:lts-krypton` lines.
