@@ -9,7 +9,7 @@ export const BUNDLER_FILE_EXT_REGEX = /\.(css|html|jpeg|jpg|js|jsx|json|mp3|mp4|
 
 export function extractInputFileExtension(filename: string) {
   const ext = BUNDLER_FILE_EXT_REGEX.exec(filename)?.[0];
-  return (ext ?? null) as BundlerInputFileExtension | null;
+  return (ext?.toLowerCase() ?? null) as BundlerInputFileExtension | null;
 }
 
 export function inferLoader(filename: string): Loader {

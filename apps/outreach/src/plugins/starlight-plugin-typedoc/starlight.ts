@@ -31,7 +31,10 @@ export function getSidebarFromReflections(
     return sidebar;
   }
 
-  const sidebarGroup = getSidebarGroupFromReflections(options, reflections, baseOutputDirectory, baseOutputDirectory);
+  const sidebarGroup: SidebarGroup = {
+    ...getSidebarGroupFromReflections(options, reflections, baseOutputDirectory, baseOutputDirectory),
+    translations: options.translations
+  };
 
   function replaceSidebarGroupPlaceholder(group: SidebarManualGroup): SidebarGroup {
     if (group.label === sidebarGroupPlaceholder.label) {
@@ -238,7 +241,10 @@ export type SidebarGroup =
       };
       collapsed?: boolean;
       label: string;
+      translations?: SidebarTranslations;
     };
+
+export type SidebarTranslations = { [locale: string]: string };
 
 type SidebarManualGroup = {
   badge?:
@@ -251,6 +257,7 @@ type SidebarManualGroup = {
   collapsed?: boolean;
   items: (LinkItem | SidebarGroup)[];
   label: string;
+  translations?: SidebarTranslations;
 };
 
 type LinkItem = {

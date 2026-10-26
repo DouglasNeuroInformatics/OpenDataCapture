@@ -96,6 +96,43 @@ export default defineInstrument({
 `;
 }
 
+/** 1×1 PNG. The playground stores binary assets as base64 and decodes them before bundling. */
+const STIM_PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+
+/**
+ * An interactive instrument that paints an imported PNG. The extension stays upper case: that is
+ * the filename shape the playground bundles when it renders this preview.
+ */
+function uppercasePngInstrumentSource(title: string): string {
+  return `
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { z } from '/runtime/v1/zod@3.x';
+
+import stim from './stim.PNG';
+
+export default defineInstrument({
+  kind: 'INTERACTIVE',
+  language: 'en',
+  tags: ['Stimulus'],
+  internal: { edition: 1, name: 'UPPERCASE_PNG' },
+  clientDetails: { estimatedDuration: 1, instructions: ['Look at the image'] },
+  content: {
+    render() {
+      const image = document.createElement('img');
+      image.alt = 'Stimulus';
+      image.src = stim;
+      image.width = 32;
+      image.height = 32;
+      document.body.appendChild(image);
+    }
+  },
+  details: { description: 'Upper-case PNG import', license: 'Apache-2.0', title: '${title}' },
+  measures: {},
+  validationSchema: z.object({})
+});
+`;
+}
+
 // The first paint waits on the 13 MB esbuild download and the toolchain boot; the preview then
 // compiles on a 2 s poll, so the whole chain is slower than the suite's default expect timeout.
 const PREVIEW_TIMEOUT = 60_000;
@@ -146,6 +183,33 @@ test.describe('playground', () => {
     await expect(playground.preview.getByRole('button', { name: 'Begin' })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
     await expect(playground.preview.locator('body')).toHaveAttribute('data-probe', 'ran');
     await expect(page.locator('body')).not.toHaveAttribute('data-probe', /./);
+  });
+
+  test('should render a share link that imports an upper-case PNG, so the preview shows the stimulus', async ({
+    page,
+    uniqueId
+  }) => {
+    const title = `Upper PNG ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [
+          { content: uppercasePngInstrumentSource(title), name: 'index.ts' },
+          { content: STIM_PNG_BASE64, name: 'stim.PNG' }
+        ],
+        label: title
+      })
+    );
+
+    await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+    await playground.preview.getByRole('button', { name: 'Begin' }).click();
+
+    const stimulus = playground.preview
+      .frameLocator('iframe[name="interactive-instrument"]')
+      .getByRole('img', { name: 'Stimulus' });
+    await expect(stimulus).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+    await expect(stimulus).toHaveAttribute('src', `data:image/png;base64,${STIM_PNG_BASE64}`);
   });
 
   // An interactive instrument renders in a frame of its own inside the preview, which reads its
