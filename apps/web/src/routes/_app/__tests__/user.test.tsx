@@ -1,6 +1,8 @@
+import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import type { User } from '@opendatacapture/schemas/user';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { AxiosError, AxiosHeaders } from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/user';
@@ -11,14 +13,15 @@ type ProfileData = Partial<
   Pick<User, 'basePermissionLevel' | 'dateOfBirth' | 'email' | 'firstName' | 'lastName' | 'phoneNumber' | 'sex'>
 >;
 
-type MutateOptions = { onSuccess: () => void };
+type PasswordMutateOptions = { onError: (err: unknown) => void; onSuccess: () => void };
 
 const STRONG_PASSWORD = 'Correct-Horse-Battery-Staple-42';
 
 const mocks = vi.hoisted(() => ({
   currentUser: { id: 'user-1', username: 'jdoe' },
   dataUpdatedAt: 0,
-  mutate: vi.fn<(variables: unknown, options: MutateOptions) => void>(),
+  mutate: vi.fn(),
+  resetPassword: vi.fn<(variables: unknown, options: PasswordMutateOptions) => void>(),
   useFindUserQuery: vi.fn(),
   userData: {}
 }));
@@ -32,6 +35,9 @@ vi.mock('@/hooks/useFindUserQuery', () => ({
     mocks.useFindUserQuery(id);
     return { data: mocks.userData, dataUpdatedAt: mocks.dataUpdatedAt };
   }
+}));
+vi.mock('@/hooks/useResetPasswordMutation', () => ({
+  useResetPasswordMutation: () => ({ mutate: mocks.resetPassword })
 }));
 vi.mock('@/hooks/useSelfUpdateUserMutation', () => ({
   useSelfUpdateUserMutation: () => ({ mutate: mocks.mutate })
@@ -57,6 +63,17 @@ const openPasswordDialog = () => {
   return screen.getByRole('dialog');
 };
 
+const passwordRejection = (code: string) => {
+  const config = { headers: new AxiosHeaders() };
+  return new AxiosError('Request failed', 'ERR_BAD_REQUEST', config, null, {
+    config,
+    data: { code },
+    headers: {},
+    status: 400,
+    statusText: ''
+  });
+};
+
 const submitPasswords = (dialog: HTMLElement, password: string, confirmPassword: string) => {
   fireEvent.change(within(dialog).getByLabelText('Password'), { target: { value: password } });
   fireEvent.change(within(dialog).getByLabelText('Confirm Password'), { target: { value: confirmPassword } });
@@ -68,6 +85,7 @@ describe('user account page', () => {
     vi.clearAllMocks();
     i18n.changeLanguage('en');
     mocks.dataUpdatedAt = 0;
+    useNotificationsStore.setState({ notifications: [] });
     mocks.userData = FULL_PROFILE;
   });
 
@@ -142,30 +160,49 @@ describe('user account page', () => {
     renderPage();
     submitPasswords(openPasswordDialog(), 'abc', 'abc');
     expect(await screen.findByText('Insufficient password strength')).toBeTruthy();
-    expect(mocks.mutate).not.toHaveBeenCalled();
+    expect(mocks.resetPassword).not.toHaveBeenCalled();
   });
 
   it('should reject a confirmation that does not match the password', async () => {
     renderPage();
     submitPasswords(openPasswordDialog(), STRONG_PASSWORD, `${STRONG_PASSWORD}!`);
     expect(await screen.findByText('Passwords Must Match')).toBeTruthy();
-    expect(mocks.mutate).not.toHaveBeenCalled();
+    expect(mocks.resetPassword).not.toHaveBeenCalled();
   });
 
   it('should send only the new password and close the dialog once the update succeeds', async () => {
     renderPage();
     submitPasswords(openPasswordDialog(), STRONG_PASSWORD, STRONG_PASSWORD);
     await waitFor(() => {
-      expect(mocks.mutate).toHaveBeenCalledWith(
-        { data: { password: STRONG_PASSWORD }, id: 'user-1' },
-        { onSuccess: expect.any(Function) }
-      );
+      expect(mocks.resetPassword).toHaveBeenCalledWith({ id: 'user-1', password: STRONG_PASSWORD }, expect.anything());
     });
-    const [, options] = mocks.mutate.mock.lastCall!;
+    const [, options] = mocks.resetPassword.mock.lastCall!;
     act(() => options.onSuccess());
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).toBeNull();
     });
+    expect(useNotificationsStore.getState().notifications[0]).toMatchObject({ type: 'success' });
+  });
+
+  it.each([
+    [
+      'explain a password the server rejects',
+      passwordRejection('PASSWORD_MATCHES_CURRENT'),
+      'Password must not be the same as your current password'
+    ],
+    [
+      'fall back to a generic message for any other failure',
+      new AxiosError('Network Error', 'ERR_NETWORK'),
+      'Failed to change password'
+    ]
+  ])('should keep the dialog open and %s', async (_, err, message) => {
+    renderPage();
+    submitPasswords(openPasswordDialog(), STRONG_PASSWORD, STRONG_PASSWORD);
+    await waitFor(() => expect(mocks.resetPassword).toHaveBeenCalled());
+    const [, options] = mocks.resetPassword.mock.lastCall!;
+    act(() => options.onError(err));
+    expect(useNotificationsStore.getState().notifications[0]).toMatchObject({ message, type: 'error' });
+    expect(screen.getByRole('dialog')).toBeTruthy();
   });
 
   it('should keep unsaved profile edits when the user query refetches unchanged data', () => {

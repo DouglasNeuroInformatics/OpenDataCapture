@@ -179,3 +179,23 @@ test.describe('user account profile form', () => {
     await expect(userPage.firstNameField).toHaveValue('Test');
   });
 });
+
+test.describe('user account password policy', () => {
+  test('should keep the dialog open and explain why when the new password matches the current one', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { credentials } = await api.createUser({ groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const userPage = new UserPage(page);
+    await userPage.goto('/user');
+    await userPage.openPasswordDialog();
+    await userPage.submitNewPassword(credentials.password);
+
+    await expect(page.getByText('Password must not be the same as your current password')).toBeVisible();
+    await expect(userPage.passwordDialog).toBeVisible();
+  });
+});
