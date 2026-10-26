@@ -3,7 +3,7 @@ import { createElement } from 'react';
 
 import type { $CreateSeriesInstrumentData } from '@opendatacapture/schemas/instrument';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useCreateSeriesInstrumentMutation } from '../useCreateSeriesInstrumentMutation';
@@ -34,7 +34,7 @@ const DATA: $CreateSeriesInstrumentData = {
 };
 
 function renderCreateMutation() {
-  const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+  const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false, throwOnError: true } } });
   const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
   const wrapper = ({ children }: PropsWithChildren) =>
     createElement(QueryClientProvider, { children, client: queryClient });
@@ -95,6 +95,14 @@ describe('useCreateSeriesInstrumentMutation', () => {
     mockAxios.post.mockRejectedValue(new Error('Network Error'));
     const { result } = renderCreateMutation();
     await expect(result.current.mutateAsync(DATA)).rejects.toThrow('Network Error');
+    expect(addNotification).toHaveBeenCalledWith({ message: 'Failed to create series instrument', type: 'error' });
+  });
+
+  it('should report a rejection through its own notification without escaping to the route error boundary', async () => {
+    mockAxios.post.mockRejectedValueOnce(new Error('Network Error'));
+    const { result } = renderCreateMutation();
+    result.current.mutate(DATA);
+    await waitFor(() => expect(result.current.isError).toBe(true));
     expect(addNotification).toHaveBeenCalledWith({ message: 'Failed to create series instrument', type: 'error' });
   });
 });

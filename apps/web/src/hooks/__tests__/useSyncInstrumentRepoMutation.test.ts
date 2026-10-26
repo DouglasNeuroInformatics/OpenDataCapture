@@ -21,7 +21,7 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
 }));
 
 function renderSyncMutation() {
-  const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+  const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false, throwOnError: true } } });
   const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
   const wrapper = ({ children }: PropsWithChildren) =>
     createElement(QueryClientProvider, { children, client: queryClient });
@@ -86,5 +86,13 @@ describe('useSyncInstrumentRepoMutation', () => {
     result.current.mutate({ id: 'repo-1' });
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(addNotification).toHaveBeenLastCalledWith({ message: 'Failed to sync repository', type: 'error' });
+  });
+
+  it('should report a rejection through its own notification without escaping to the route error boundary', async () => {
+    mockAxios.post.mockRejectedValueOnce(new Error('Network Error'));
+    const { result } = renderSyncMutation();
+    result.current.mutate({ id: 'repo-1' });
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(addNotification).toHaveBeenCalledWith({ message: 'Failed to sync repository', type: 'error' });
   });
 });

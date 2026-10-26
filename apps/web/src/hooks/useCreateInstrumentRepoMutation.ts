@@ -42,6 +42,8 @@ export function useCreateInstrumentRepoMutation() {
       // Importing creates new instruments; refresh the instrument list shown elsewhere (dashboard,
       // manage-group, accessible instruments) so they appear without a hard reload.
       void queryClient.invalidateQueries({ queryKey: ['instrument-info'] });
-    }
+    },
+    // onError reports the failure; the app default would also hand it to the route error boundary.
+    throwOnError: false
   });
 }
