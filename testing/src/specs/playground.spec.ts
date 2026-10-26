@@ -488,3 +488,47 @@ test.describe('playground instrument deletion', () => {
     await expect(playground.preview.getByRole('heading', { name: title })).toHaveCount(0);
   });
 });
+
+/**
+ * A form that leaves measures hidden by default and marks its one measure with the deprecated
+ * `hidden: false`, which must still show it as `visibility: 'visible'` would.
+ */
+function deprecatedHiddenFalseInstrumentSource(title: string): string {
+  return `
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { z } from '/runtime/v1/zod@3.x';
+
+export default defineInstrument({
+  kind: 'FORM',
+  language: 'en',
+  tags: ['Measures'],
+  internal: { edition: 1, name: 'DEPRECATED_HIDDEN_FALSE' },
+  clientDetails: { estimatedDuration: 1, instructions: ['Submit the form'] },
+  content: { note: { kind: 'string', label: 'Note', variant: 'input' } },
+  details: { description: 'Deprecated hidden flag', license: 'Apache-2.0', title: '${title}' },
+  measures: {
+    legacyMeasure: { hidden: false, kind: 'computed', label: 'Legacy Measure', value: () => 3 }
+  },
+  validationSchema: z.object({ note: z.string().optional() })
+});
+`;
+}
+
+test.describe('playground deprecated measure visibility', () => {
+  test('should show a measure declaring the deprecated hidden: false in the summary', async ({ page, uniqueId }) => {
+    const title = `Deprecated Flag ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: deprecatedHiddenFalseInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+
+    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
+    await playground.preview.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(playground.preview.getByText('Legacy Measure', { exact: true })).toBeVisible();
+  });
+});

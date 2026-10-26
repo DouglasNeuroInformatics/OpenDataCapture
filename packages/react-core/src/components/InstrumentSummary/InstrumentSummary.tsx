@@ -43,7 +43,7 @@ export const InstrumentSummary = ({
     const measure = instrument.measures?.[key];
     if (measure?.visibility === 'hidden' || measure?.hidden === true) {
       return false;
-    } else if (measure?.visibility === 'visible' || measure?.visibility === false) {
+    } else if (measure?.visibility === 'visible' || measure?.hidden === false) {
       return true;
     }
     return instrument.defaultMeasureVisibility === 'visible';
