@@ -225,7 +225,10 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
               <DateFormatMenu value={dateFormat} onChange={setDateFormat} />
             </div>
           ),
-          size: 250
+          size: 250,
+          // The rows already arrive newest first, so the table's first toggle of its unsorted column
+          // must go to ascending, or the first click would request the order already on screen.
+          sortDescFirst: false
         },
         {
           accessorFn: (row) => row.user?.username ?? 'N/A',

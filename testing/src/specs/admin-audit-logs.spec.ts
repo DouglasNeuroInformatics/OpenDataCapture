@@ -60,3 +60,18 @@ test.describe('admin audit logs', () => {
     expect(download.suggestedFilename()).toMatch(/^ODC_Audit_Logs_\d+\.json$/);
   });
 });
+
+test.describe('admin audit logs sorting', () => {
+  test.use({ actingRole: 'ADMIN' });
+
+  test('should request the oldest logs first on the first click of the time header', async ({ getPageModel }) => {
+    const auditLogsPage = await getPageModel('/admin/audit/logs');
+
+    const ascendingRequest = auditLogsPage.$ref.waitForRequest(
+      (request) => request.url().includes('/v1/audit/logs') && request.url().includes('sortOrder=asc')
+    );
+    await auditLogsPage.timeHeaderButton.click();
+
+    await ascendingRequest;
+  });
+});

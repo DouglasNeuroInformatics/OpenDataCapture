@@ -390,13 +390,20 @@ describe('audit logs table', () => {
     expect(lastQueryParams()).toEqual({ page: 2, sortOrder: 'desc' });
   });
 
-  it('should request oldest first from the first page when the time column is flipped', () => {
+  it('should sort oldest first on the first click of the time header, since the logs already arrive newest first', () => {
     renderPage();
     goToPage(2);
     fireEvent.click(timeHeaderButton());
-    fireEvent.click(timeHeaderButton());
     expect(lastQueryParams()).toEqual({ page: 1, sortOrder: 'asc' });
     expect(timeHeaderButton().querySelector('.lucide-arrow-up')).toBeTruthy();
+  });
+
+  it('should return to newest first on the second click of the time header', () => {
+    renderPage();
+    fireEvent.click(timeHeaderButton());
+    fireEvent.click(timeHeaderButton());
+    expect(lastQueryParams()).toEqual({ page: 1, sortOrder: 'desc' });
+    expect(timeHeaderButton().querySelector('.lucide-arrow-down')).toBeTruthy();
   });
 
   it('should ignore a sorting change that does not involve the time column', () => {
