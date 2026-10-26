@@ -307,4 +307,44 @@ test.describe('instrument completion', () => {
     await expect(instrumentPage.errorMessages).toBeVisible();
     await expect(instrumentPage.errorMessages).toHaveText('Does not match the expected format');
   });
+
+  test('should accept a lowercase postal code and an age at immigration of 0, storing the postal code in uppercase', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Lowercase${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page
+      .locator('[data-testid^="instrument-card-"]')
+      .filter({ hasText: DEMOGRAPHICS_INSTRUMENT_TITLE })
+      .first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+    await instrumentPage.$ref.locator('[name="postalCode"]').fill('h4h 1r3');
+    await instrumentPage.$ref.locator('[name="ageAtImmigration"]').fill('0');
+    await instrumentPage.submit();
+
+    await expect(instrumentPage.summaryHeading).toBeVisible();
+
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
+
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: DEMOGRAPHICS_INSTRUMENT_TITLE }).click();
+
+    await expect(page.getByTestId('subject-table-cell-postalCode').first()).toHaveText('H4H 1R3');
+    await expect(page.getByTestId('subject-table-cell-ageAtImmigration').first()).toHaveText('0');
+  });
 });

@@ -52,5 +52,13 @@ describe('DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE', () => {
     it('should reject a postal code that is not in the Canadian format', () => {
       expect(instrument.validationSchema.safeParse({ postalCode: '90210' }).success).toBe(false);
     });
+
+    it('should accept a lowercase postal code and store it in uppercase, so a subject typing on a phone is not rejected', () => {
+      expect(instrument.validationSchema.safeParse({ postalCode: ' h4h 1r3 ' }).data?.postalCode).toBe('H4H 1R3');
+    });
+
+    it('should accept an age at immigration of 0, for a subject who immigrated as an infant', () => {
+      expect(instrument.validationSchema.safeParse({ ageAtImmigration: 0 }).success).toBe(true);
+    });
   });
 });
