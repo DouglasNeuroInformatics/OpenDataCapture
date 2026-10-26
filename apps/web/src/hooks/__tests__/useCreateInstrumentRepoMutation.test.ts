@@ -42,9 +42,21 @@ describe('useCreateInstrumentRepoMutation', () => {
   it('should suppress the default error toast, since the hook reports failures itself', async () => {
     const { result } = renderCreateMutation();
     await result.current.mutateAsync({ data: DATA });
-    expect(mockAxios.post).toHaveBeenCalledWith('/v1/instrument-repos', DATA, {
-      meta: { disableDefaultErrorNotification: true }
-    });
+    expect(mockAxios.post).toHaveBeenCalledWith(
+      '/v1/instrument-repos',
+      DATA,
+      expect.objectContaining({ meta: expect.objectContaining({ disableDefaultErrorNotification: true }) })
+    );
+  });
+
+  it('should opt out of the default request timeout, since an import can outlast it', async () => {
+    const { result } = renderCreateMutation();
+    await result.current.mutateAsync({ data: DATA });
+    expect(mockAxios.post).toHaveBeenCalledWith(
+      '/v1/instrument-repos',
+      DATA,
+      expect.objectContaining({ meta: expect.objectContaining({ disableDefaultTimeout: true }) })
+    );
   });
 
   it('should announce that the repository was imported', async () => {

@@ -13,7 +13,9 @@ export function useCreateInstrumentRepoMutation() {
   const { t } = useTranslation();
   return useMutation({
     mutationFn: ({ data }: { data: $CreateInstrumentRepoData }) =>
-      axios.post('/v1/instrument-repos', data, { meta: { disableDefaultErrorNotification: true } }),
+      axios.post('/v1/instrument-repos', data, {
+        meta: { disableDefaultErrorNotification: true, disableDefaultTimeout: true }
+      }),
     onError(err) {
       addNotification({
         message: getApiErrorMessage(

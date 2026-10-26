@@ -28,3 +28,30 @@ test.describe('admin instrument repos', () => {
     await expect(reposPage.githubUrlInput).toBeVisible();
   });
 });
+
+test.describe('admin instrument repos slow import', () => {
+  test.use({ actingRole: 'ADMIN' });
+
+  test('should wait out an import slower than the default request timeout and report success', async ({
+    getPageModel,
+    page
+  }) => {
+    test.setTimeout(60_000);
+    // Answered by the test rather than the API, which must not reach out to GitHub under NODE_ENV=test.
+    await page.route('**/v1/instrument-repos', async (route) => {
+      if (route.request().method() !== 'POST') {
+        return route.continue();
+      }
+      await new Promise((resolve) => setTimeout(resolve, 12_000));
+      return route.fulfill({ json: {}, status: 201 });
+    });
+    const reposPage = await getPageModel('/admin/instrument-repos');
+
+    await reposPage.addRepositoryButton.click();
+    await reposPage.githubUrlInput.fill('https://github.com/example/slow-instruments');
+    await reposPage.importButton.click();
+
+    await expect(reposPage.$ref.getByText('Repository imported successfully')).toBeVisible({ timeout: 30_000 });
+    await expect(reposPage.$ref.getByText('Failed to import repository')).toBeHidden();
+  });
+});

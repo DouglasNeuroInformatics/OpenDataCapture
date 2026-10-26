@@ -37,9 +37,21 @@ describe('useSyncInstrumentRepoMutation', () => {
   it('should sync the repository without the default error toast, since it raises its own', async () => {
     const { result } = renderSyncMutation();
     await result.current.mutateAsync({ id: 'repo-1' });
-    expect(mockAxios.post).toHaveBeenCalledWith('/v1/instrument-repos/repo-1/sync', undefined, {
-      meta: { disableDefaultErrorNotification: true }
-    });
+    expect(mockAxios.post).toHaveBeenCalledWith(
+      '/v1/instrument-repos/repo-1/sync',
+      undefined,
+      expect.objectContaining({ meta: expect.objectContaining({ disableDefaultErrorNotification: true }) })
+    );
+  });
+
+  it('should opt out of the default request timeout, since a sync can outlast it', async () => {
+    const { result } = renderSyncMutation();
+    await result.current.mutateAsync({ id: 'repo-1' });
+    expect(mockAxios.post).toHaveBeenCalledWith(
+      '/v1/instrument-repos/repo-1/sync',
+      undefined,
+      expect.objectContaining({ meta: expect.objectContaining({ disableDefaultTimeout: true }) })
+    );
   });
 
   it('should announce the sync before it finishes, since a sync can take a while', async () => {
