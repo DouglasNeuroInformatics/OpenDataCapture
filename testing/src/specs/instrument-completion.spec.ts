@@ -376,4 +376,38 @@ test.describe('instrument completion', () => {
     await expect(instrumentPage.$ref.getByText('Marital Status', { exact: true })).toBeVisible();
     await expect(instrumentPage.$ref.getByText('Age at Immigration (if applicable)', { exact: true })).toBeVisible();
   });
+
+  test('should show the missing-reason error under the reason field when a dissatisfied subject leaves it empty', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Reason${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+    await instrumentPage.answerHappinessQuestionnaireDissatisfiedWithoutReason();
+    await instrumentPage.submit();
+
+    // An issue without a path is rendered above the Submit button instead of under any field, so the
+    // single error must sit inside the reason field's group.
+    const reasonFieldGroup = page.locator('[data-field-group="reasonNotSatisfied"]');
+    await expect(reasonFieldGroup.getByTestId('error-message-text')).toHaveText(
+      'This field is required / Ce champ est obligatoire'
+    );
+    await expect(instrumentPage.errorMessages).toHaveCount(1);
+    await expect(instrumentPage.summaryHeading).toBeHidden();
+  });
 });

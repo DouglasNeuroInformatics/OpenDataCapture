@@ -98,6 +98,15 @@ describe('DNP_HAPPINESS_QUESTIONNAIRE', () => {
       expect(result.error?.issues[0]?.message).toBe('This field is required / Ce champ est obligatoire');
     });
 
+    it('should attach the missing-reason error to reasonNotSatisfied, so the form shows it under that field', () => {
+      const result = instrument.validationSchema.safeParse({
+        isSatisfiedOverall: false,
+        personalLifeSatisfaction: 2,
+        professionalLifeSatisfaction: 3
+      });
+      expect(result.error?.issues[0]?.path).toEqual(['reasonNotSatisfied']);
+    });
+
     it('should accept a dissatisfied subject who gives a reason and its causes', () => {
       const result = instrument.validationSchema.safeParse({
         causesOfDissatisfaction: new Set(['MONEY']),
