@@ -12,6 +12,7 @@ import '@/services/i18n';
 const STRONG_PASSWORD = 'violet-harbor-quantum-lantern-58';
 
 const mocks = vi.hoisted(() => ({
+  activeLanguages: ['en', 'es', 'fr'] as readonly ('en' | 'es' | 'fr')[],
   get: vi.fn(),
   groups: [] as { id: string; name: string }[],
   groupsQueryOptions: vi.fn(() => ({ queryKey: ['groups'] })),
@@ -36,7 +37,9 @@ vi.mock('@/hooks/useGroupsQuery', () => ({
   useGroupsQuery: () => ({ data: mocks.groups })
 }));
 vi.mock('@/hooks/useSetupStateQuery', () => ({
-  useSetupStateQuery: () => ({ data: { isMailEnabled: mocks.isMailEnabled } })
+  useSetupStateQuery: () => ({
+    data: { activeLanguages: mocks.activeLanguages, isMailEnabled: mocks.isMailEnabled }
+  })
 }));
 
 const welcomeEmail = (overrides: Partial<EmailDeliveryResult> = {}): EmailDeliveryResult => ({
@@ -115,6 +118,7 @@ const stubClipboardWrite = () => {
 beforeEach(() => {
   vi.clearAllMocks();
   useNotificationsStore.setState({ notifications: [] });
+  mocks.activeLanguages = ['en', 'es', 'fr'];
   mocks.groups = [];
   mocks.isMailEnabled = false;
   mocks.get.mockResolvedValue({ data: { success: false } });
@@ -222,6 +226,25 @@ describe('create user route', () => {
     fillCredentials(form);
     choosePermissionLevel(form, 'ADMIN');
     submit();
+    await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
+    expect(mocks.mutateAsync.mock.lastCall?.[0].language).toBe('fr');
+  });
+
+  // The mail page only authors the welcome template in the active languages, so offering another
+  // would send a language whose copy nobody can edit.
+  it('should offer the welcome email only in the languages the instance has enabled', () => {
+    mocks.activeLanguages = ['en', 'fr'];
+    mocks.isMailEnabled = true;
+    renderPage();
+    fireEvent.keyDown(screen.getByTestId('welcome-email-language'), { key: 'Enter' });
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toStrictEqual(['English', 'French']);
+  });
+
+  // The picker opens on the interface language, which the instance may since have disabled.
+  it('should send in an enabled language when the interface language is no longer one of them', async () => {
+    mocks.activeLanguages = ['fr'];
+    mocks.isMailEnabled = true;
+    fillAndSubmit();
     await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
     expect(mocks.mutateAsync.mock.lastCall?.[0].language).toBe('fr');
   });
