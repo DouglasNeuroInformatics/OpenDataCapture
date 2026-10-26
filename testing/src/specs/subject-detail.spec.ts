@@ -62,7 +62,8 @@ test.describe('subject detail', () => {
     await seedSubjectWithRecord(getPageModel, page, `Graph${uniqueId}`);
 
     await page.getByRole('link', { name: 'Graph' }).click();
-    await page.waitForURL('**/graph');
+    // The tab links carry the chart palette, so the glob has to allow a query string.
+    await page.waitForURL(/\/graph(\?|$)/);
 
     const graphPage = new SubjectGraphPage(page);
     await graphPage.selectInstrument(INSTRUMENT_TITLE);
@@ -99,7 +100,7 @@ test.describe('subject detail', () => {
     await page.waitForURL('**/datahub/subjects/**/table');
 
     await page.getByRole('link', { name: 'Assignments' }).click();
-    await page.waitForURL('**/assignments');
+    await page.waitForURL(/\/assignments(\?|$)/);
 
     const assignmentsPage = new SubjectAssignmentsPage(page);
     await expect(assignmentsPage.assignmentRows).toHaveCount(1);

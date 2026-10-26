@@ -65,12 +65,14 @@ afterEach(() => {
 describe('subject table route', () => {
   it('should add a snake-cased column for each record field, so the headers match the exported column names', () => {
     renderTable([record()]);
-    expect(headers()).toEqual(['DATE_COLLECTED', 'TOTAL_SCORE']);
+    expect(headers()).toEqual(['DATE_COLLECTED', 'COLLECTION_METHOD', 'SERIES', 'TOTAL_SCORE']);
   });
 
-  it('should show only the collection date column when there are no records', () => {
+  // The provenance columns describe where a record came from rather than what it measured, so they
+  // are fixed rather than derived from the records — they stand even with nothing to describe.
+  it('should show the date and provenance columns when there are no records', () => {
     renderTable([]);
-    expect(headers()).toEqual(['DATE_COLLECTED']);
+    expect(headers()).toEqual(['DATE_COLLECTED', 'COLLECTION_METHOD', 'SERIES']);
   });
 
   it('should render a multiple-choice answer as comma-separated text', () => {
@@ -105,6 +107,17 @@ describe('subject table route', () => {
     renderTable([], null);
     expect(screen.getByRole('button', { name: 'Download' }).hasAttribute('disabled')).toBe(true);
     expect(screen.getByTestId('time-dropdown-trigger').hasAttribute('disabled')).toBe(true);
+  });
+
+  // This view holds the bound in local state rather than the url, so it derives the date from the
+  // timeframe the control reports.
+  it('should restrict the records to the chosen timeframe', () => {
+    vi.useFakeTimers({ now: new Date(2026, 2, 15, 12), toFake: ['Date'] });
+    renderTable([record()]);
+    fireEvent.keyDown(screen.getByTestId('time-dropdown-trigger'), { key: 'Enter' });
+    fireEvent.click(screen.getByRole('option', { name: 'Past Year' }));
+    expect(mocks.visualization.setMinDate).toHaveBeenCalledWith(new Date(2025, 2, 15, 12));
+    vi.useRealTimers();
   });
 
   it('should download in the chosen format once an instrument is selected', () => {

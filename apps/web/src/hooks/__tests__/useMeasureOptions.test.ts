@@ -1,5 +1,10 @@
 import { unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
-import type { AnyUnilingualFormInstrument } from '@opendatacapture/runtime-core';
+import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
+import type {
+  AnyUnilingualFormInstrument,
+  AnyUnilingualInteractiveInstrument,
+  AnyUnilingualScalarInstrument
+} from '@opendatacapture/runtime-core';
 import { cleanup, renderHook } from '@testing-library/react';
 import { omit } from 'lodash-es';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -21,7 +26,18 @@ function formInstrument({
   };
 }
 
-function measureOptionsFor(instrument: AnyUnilingualFormInstrument | null) {
+/**
+ * The interactive stub, retyped with the given measures. The stub's own type leaves `language` open,
+ * so it is narrowed here rather than at every call site.
+ */
+function interactiveWithMeasures(
+  measures: AnyUnilingualInteractiveInstrument['measures']
+): AnyUnilingualInteractiveInstrument {
+  const instance = interactiveInstrument.instance as AnyUnilingualInteractiveInstrument;
+  return { ...omit(instance, ['measures']), measures };
+}
+
+function measureOptionsFor(instrument: AnyUnilingualScalarInstrument | null) {
   return renderHook(() => useMeasureOptions(instrument)).result.current;
 }
 
@@ -72,6 +88,13 @@ describe('useMeasureOptions', () => {
       measures: { reasonFavoriteNumberIsNegative: { kind: 'const', ref: 'reasonFavoriteNumberIsNegative' } }
     });
     expect(measureOptionsFor(instrument)).toEqual([]);
+  });
+
+  // An interactive instrument has no fields to borrow a label from, so the key is all there is.
+  it('should label a constant measure on a non-form instrument with its key', () => {
+    expect(
+      measureOptionsFor(interactiveWithMeasures({ favoriteNumber: { kind: 'const', ref: 'favoriteNumber' } }))
+    ).toEqual([{ key: 'favoriteNumber', label: 'favoriteNumber' }]);
   });
 
   it('should find the fields of a form whose content is split into groups', () => {

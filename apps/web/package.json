@@ -37,7 +37,6 @@
     "@tanstack/react-router": "^1.170.40",
     "@tanstack/react-router-devtools": "^1.167.2",
     "axios": "catalog:",
-    "html2canvas": "^1.4.1",
     "immer": "^11.1.18",
     "jwt-decode": "^4.0.0",
     "lodash-es": "workspace:lodash-es__4.x@*",

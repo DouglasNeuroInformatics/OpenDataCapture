@@ -3,6 +3,7 @@ import { z } from 'zod/v4';
 
 import { $BaseModel, $Json } from '../core/core.js';
 import { $InstrumentMeasureValue } from '../instrument/instrument.js';
+import { $SessionType } from '../session/session.js';
 import { $FileMetadata } from '../storage/storage.js';
 
 import type { SessionType } from '../session/session.js';
@@ -51,9 +52,13 @@ export const $InstrumentRecord = $BaseModel.extend({
   instrumentId: z.string(),
   pending: z.boolean().nullish(),
   seriesInstrumentId: z.string().nullish(),
-  /** The user who conducted the session, resolved server-side so clients need not join sessions themselves */
+  /**
+   * The session that collected this record, resolved server-side so clients need not join sessions
+   * themselves. `type` is the data collection method.
+   */
   session: z
     .object({
+      type: $SessionType.nullish(),
       user: z
         .object({
           username: z.string().nullish()
@@ -72,6 +77,10 @@ export type InstrumentRecordsExport = {
   instrumentEdition: number;
   instrumentName: string;
   measure: string;
+  /** The id of the series instrument that orchestrated collection, or null if collected individually */
+  seriesId: null | string;
+  /** The title of that series instrument, or null if collected individually */
+  seriesName: null | string;
   sessionDate: string;
   sessionId: string;
   sessionType: SessionType;
@@ -99,6 +108,8 @@ export type InstrumentRecordQueryParams = {
   instrumentId?: string;
   kind?: InstrumentKind;
   minDate?: Date;
+  /** Every record a series orchestrated, which spans the scalar instruments it composes */
+  seriesInstrumentId?: string;
   subjectId?: string;
 };
 
@@ -111,10 +122,20 @@ export const $InstrumentRecordFile = $FileMetadata.omit({ location: true }).exte
 export type $InstrumentRecordFiles = z.infer<typeof $InstrumentRecordFiles>;
 export const $InstrumentRecordFiles = z.record(z.string(), z.array($InstrumentRecordFile));
 
-export type SubjectRecordSummary = z.infer<typeof $SubjectRecordSummary>;
-export const $SubjectRecordSummary = z.object({
-  /** The most recent record date, or null for a subject whose records all lack one */
+export type InstrumentRecordSummary = z.infer<typeof $InstrumentRecordSummary>;
+export const $InstrumentRecordSummary = z.object({
+  instrumentId: z.string(),
+  /** The most recent record date, or null for an instrument whose records all lack one */
   lastCollectedAt: z.coerce.date().nullable(),
   recordCount: z.int().nonnegative(),
-  subjectId: z.string()
+  /** Distinct subjects, not records — a subject completing an instrument twice counts once */
+  subjectCount: z.int().nonnegative()
 });
+
+export type SubjectRecordSummary = z.infer<typeof $SubjectRecordSummary>;
+export const $SubjectRecordSummary = $InstrumentRecordSummary
+  .omit({
+    instrumentId: true,
+    subjectCount: true
+  })
+  .extend({ subjectId: z.string() });

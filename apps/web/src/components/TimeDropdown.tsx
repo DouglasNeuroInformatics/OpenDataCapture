@@ -1,26 +1,23 @@
 import { Select } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
+import type { TimeframeKey } from '@/utils/timeframe';
+
 type TimeDropdownProps = {
   disabled?: boolean;
-  setMinTime: (value: Date | null) => void;
+  /** Reports the chosen timeframe itself; the date it admits is derived with `timeframeMinDate` */
+  onSelect: (key: TimeframeKey) => void;
+  /** Drives the selection externally, for a view holding it in the URL */
+  value?: TimeframeKey;
 };
 
-export const TimeDropdown = ({ disabled, setMinTime }: TimeDropdownProps) => {
+export const TimeDropdown = ({ disabled, onSelect, value }: TimeDropdownProps) => {
   const { t } = useTranslation('datahub');
 
   return (
     <Select
-      defaultValue="all"
-      onValueChange={(selection) => {
-        if (selection === 'pastYear') {
-          setMinTime(new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
-        } else if (selection === 'pastMonth') {
-          setMinTime(new Date(new Date().setMonth(new Date().getMonth() - 1)));
-        } else {
-          setMinTime(null);
-        }
-      }}
+      {...(value === undefined ? { defaultValue: 'all' } : { value })}
+      onValueChange={(selection) => onSelect(selection as TimeframeKey)}
     >
       <Select.Trigger className="min-w-32" data-testid="time-dropdown-trigger" disabled={disabled}>
         <Select.Value placeholder={t('visualization.timeframe')} />

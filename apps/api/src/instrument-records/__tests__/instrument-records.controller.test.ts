@@ -42,12 +42,30 @@ describe('InstrumentRecordsController', () => {
     expect(instrumentRecordsService.upload).toHaveBeenCalledWith(data, { ability });
   });
 
-  it('should pass every query filter to find, scoped to the caller ability', async () => {
+  // The caller's groups are forwarded alongside the ability because a series lookup cannot be
+  // confined by `read Instrument`, which carries no group condition.
+  it('should pass every query filter to find, scoped to the caller ability and their groups', async () => {
     const minDate = new Date('2025-01-01');
-    await instrumentRecordsController.find(ability, 'FORM', minDate, 'group-1', 'instrument-1', 'subject-1');
+    await instrumentRecordsController.find(
+      ability,
+      [{ id: 'group-1' }, { id: 'group-2' }],
+      'FORM',
+      minDate,
+      'group-1',
+      'instrument-1',
+      'series-1',
+      'subject-1'
+    );
     expect(instrumentRecordsService.find).toHaveBeenCalledWith(
-      { groupId: 'group-1', instrumentId: 'instrument-1', kind: 'FORM', minDate, subjectId: 'subject-1' },
-      { ability }
+      {
+        groupId: 'group-1',
+        instrumentId: 'instrument-1',
+        kind: 'FORM',
+        minDate,
+        seriesInstrumentId: 'series-1',
+        subjectId: 'subject-1'
+      },
+      { ability, callerGroupIds: ['group-1', 'group-2'] }
     );
   });
 
@@ -77,6 +95,21 @@ describe('InstrumentRecordsController', () => {
     instrumentRecordsService.summarizeBySubject.mockResolvedValueOnce(summary);
     await expect(instrumentRecordsController.summarizeBySubject(ability, 'group-1')).resolves.toBe(summary);
     expect(instrumentRecordsService.summarizeBySubject).toHaveBeenCalledWith({ groupId: 'group-1' }, { ability });
+  });
+
+  it('should summarize the records per instrument, scoped to the caller ability', async () => {
+    const summary = [{ instrumentId: 'instrument-1', lastCollectedAt: null, recordCount: 2, subjectCount: 1 }];
+    instrumentRecordsService.summarizeByInstrument.mockResolvedValueOnce(summary);
+    await expect(instrumentRecordsController.summarizeByInstrument(ability, 'group-1')).resolves.toBe(summary);
+    expect(instrumentRecordsService.summarizeByInstrument).toHaveBeenCalledWith({ groupId: 'group-1' }, { ability });
+  });
+
+  // A series owns no records under its own id, so its totals come from a separate aggregation.
+  it('should summarize the records per series, scoped to the caller ability', async () => {
+    const summary = [{ instrumentId: 'series-1', lastCollectedAt: null, recordCount: 4, subjectCount: 2 }];
+    instrumentRecordsService.summarizeBySeries.mockResolvedValueOnce(summary);
+    await expect(instrumentRecordsController.summarizeBySeries(ability, 'group-1')).resolves.toBe(summary);
+    expect(instrumentRecordsService.summarizeBySeries).toHaveBeenCalledWith({ groupId: 'group-1' }, { ability });
   });
 
   it('should update the record with the unwrapped data, scoped to the caller ability', async () => {

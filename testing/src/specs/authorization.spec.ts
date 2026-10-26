@@ -125,6 +125,7 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
 const GROUP_MANAGER_ONLY_ROUTES = [
   '/dashboard',
   '/datahub/subjects',
+  '/datahub/instruments',
   '/group/manage',
   '/session/remote-assignment'
 ] as const;
@@ -577,6 +578,71 @@ test.describe('server-side authorization', () => {
     const body = await response.body();
     expect(body.includes(ownGroup.id)).toBe(true);
     expect(body.includes(foreignGroup.id)).toBe(false);
+  });
+
+  // The datahub's instrument hub reads these endpoints with no `groupId`, so each decides on its own
+  // what the caller may see rather than being confined by the request. The group manager here is
+  // seeded into a group holding no records at all, so anything the summaries name came from the
+  // other group.
+  test("should leave another group's records out of every datahub summary a group manager reads", async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const ownGroup = await api.createGroup({ name: `Hub Group ${uniqueId}` });
+    const foreignGroup = await api.createGroup({ name: `Foreign Hub Group ${uniqueId}` });
+    const { credentials } = await api.createUser({ groupIds: [ownGroup.id] });
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    await api.uploadRecords(foreignGroup.id, instrumentId, [happinessRecord(`ForeignHub${uniqueId}`)]);
+    const headers = { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` };
+
+    for (const summary of ['by-instrument', 'by-series', 'by-subject']) {
+      const response = await apiRequestContext.get(`${API}/instrument-records/summary/${summary}`, { headers });
+      expect.soft(response.status(), `summary/${summary} must answer a group manager`).toBe(200);
+      expect.soft(await response.json(), `summary/${summary} must name no record of another group`).toStrictEqual([]);
+    }
+  });
+
+  // `read Instrument` carries no group condition, so the ability cannot confine this lookup on its
+  // own: before the caller's groups narrowed it, a series another group owns answered 200 with an
+  // empty list where an unknown id answers 404 — the status alone reported that the series is real.
+  test("should answer for another group's series exactly as for one that does not exist", async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const ownGroup = await api.createGroup({ name: `Series Reader Group ${uniqueId}` });
+    const foreignGroup = await api.createGroup({ name: `Series Owner Group ${uniqueId}` });
+    const { credentials } = await api.createUser({ groupIds: [ownGroup.id] });
+    const foreignSeriesId = await api.createSeries(foreignGroup.id, `Foreign Series ${uniqueId}`);
+    const headers = { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` };
+
+    const records = (seriesInstrumentId: string) =>
+      apiRequestContext.get(`${API}/instrument-records?seriesInstrumentId=${seriesInstrumentId}`, { headers });
+
+    const foreign = await records(foreignSeriesId);
+    const absent = await records('0'.repeat(24));
+
+    expect(foreign.status(), "another group's series must not be distinguishable from an absent one").toBe(
+      absent.status()
+    );
+    expect(foreign.status()).toBe(404);
+  });
+
+  // The same lookup must still answer for a series the caller's own group owns, or the narrowing
+  // above would have closed the leak by breaking the hub it exists to serve.
+  test("should answer for a series the caller's own group owns", async ({ api, apiRequestContext, uniqueId }) => {
+    const ownGroup = await api.createGroup({ name: `Series Own Group ${uniqueId}` });
+    const { credentials } = await api.createUser({ groupIds: [ownGroup.id] });
+    const seriesId = await api.createSeries(ownGroup.id, `Own Series ${uniqueId}`);
+    const headers = { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` };
+
+    const response = await apiRequestContext.get(`${API}/instrument-records?seriesInstrumentId=${seriesId}`, {
+      headers
+    });
+
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toStrictEqual([]);
   });
 
   // `/admin/users` renders a populated table for a non-admin, which is only acceptable because the
