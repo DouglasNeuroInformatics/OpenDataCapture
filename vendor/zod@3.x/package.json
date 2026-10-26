@@ -23,6 +23,6 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "zod": "^3.25.67"
+    "zod": "^4.6.6"
   }
 }
