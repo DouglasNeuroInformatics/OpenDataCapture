@@ -1,10 +1,11 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useParams, useSearch } from '@tanstack/react-router';
 
 import { NO_SERIES, useInstrumentHubFacets } from '@/hooks/useInstrumentHubFacets';
 import { useInstrumentVisualization } from '@/hooks/useInstrumentVisualization';
 import type { InstrumentVisualizationRecord } from '@/hooks/useInstrumentVisualization';
+import { timeframeMinDate } from '@/utils/timeframe';
 
 const INSTRUMENT_HUB_ROUTE = '/_app/datahub/instruments/$instrumentId';
 
@@ -17,7 +18,11 @@ const INSTRUMENT_HUB_ROUTE = '/_app/datahub/instruments/$instrumentId';
  */
 export function useInstrumentHubRecords() {
   const { instrumentId } = useParams({ from: INSTRUMENT_HUB_ROUTE });
-  const { methods, minDate, series } = useSearch({ from: INSTRUMENT_HUB_ROUTE });
+  const { methods, minDateKey, series } = useSearch({ from: INSTRUMENT_HUB_ROUTE });
+
+  // The bound is relative to now, so it is held for as long as the chosen timeframe is: recomputing
+  // it per render would rewrite the record query's key on every pass.
+  const minDate = useMemo(() => timeframeMinDate(minDateKey) ?? undefined, [minDateKey]);
 
   const filterRecord = useCallback(
     (record: InstrumentVisualizationRecord) => {

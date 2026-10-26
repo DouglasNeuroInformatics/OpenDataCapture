@@ -42,10 +42,13 @@ describe('InstrumentRecordsController', () => {
     expect(instrumentRecordsService.upload).toHaveBeenCalledWith(data, { ability });
   });
 
-  it('should pass every query filter to find, scoped to the caller ability', async () => {
+  // The caller's groups are forwarded alongside the ability because a series lookup cannot be
+  // confined by `read Instrument`, which carries no group condition.
+  it('should pass every query filter to find, scoped to the caller ability and their groups', async () => {
     const minDate = new Date('2025-01-01');
     await instrumentRecordsController.find(
       ability,
+      [{ id: 'group-1' }, { id: 'group-2' }],
       'FORM',
       minDate,
       'group-1',
@@ -62,7 +65,7 @@ describe('InstrumentRecordsController', () => {
         seriesInstrumentId: 'series-1',
         subjectId: 'subject-1'
       },
-      { ability }
+      { ability, callerGroupIds: ['group-1', 'group-2'] }
     );
   });
 

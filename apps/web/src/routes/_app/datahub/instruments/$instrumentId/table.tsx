@@ -229,10 +229,10 @@ const RouteComponent = () => {
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
             <TimeDropdown
-              setMinTime={(minDate, key) => {
-                void navigate({ search: (prev) => ({ ...prev, minDate: minDate ?? undefined, minDateKey: key }) });
-              }}
               value={search.minDateKey}
+              onSelect={(minDateKey) => {
+                void navigate({ search: (prev) => ({ ...prev, minDateKey }) });
+              }}
             />
             <Filters seriesOptions={seriesOptions} />
             <ActionDropdown

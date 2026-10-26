@@ -13,6 +13,7 @@ type Search = {
   chart: 'distribution' | 'scatter';
   colourBy: 'method' | 'none' | 'series';
   measure?: string;
+  minDateKey: 'all' | 'pastMonth' | 'pastYear';
   palette: 'berry' | 'default' | 'ember' | 'jade';
 };
 
@@ -124,6 +125,7 @@ const renderGraph = ({
   displayedInstrument = instrument,
   instrumentId = 'hq-1',
   isNumeric = true,
+  recordsBeforeFilter,
   recordsOnPage = records,
   search = {},
   series = [seriesOf('ALL')]
@@ -131,11 +133,14 @@ const renderGraph = ({
   displayedInstrument?: AnyUnilingualFormInstrument | null;
   instrumentId?: null | string;
   isNumeric?: boolean;
+  /** The set before the collection-method and series filters ran; defaults to nothing excluded. */
+  recordsBeforeFilter?: { __id__: string }[];
   recordsOnPage?: { __id__: string }[];
   search?: Partial<Search>;
   series?: RecordChartSeries[];
 } = {}) => {
   mocks.useInstrumentHubRecords.mockReturnValue({
+    allRecords: recordsBeforeFilter ?? recordsOnPage,
     instrument: displayedInstrument,
     instrumentId,
     records: recordsOnPage
@@ -144,6 +149,7 @@ const renderGraph = ({
   vi.spyOn(Route, 'useSearch').mockReturnValue({
     chart: 'scatter',
     colourBy: 'none',
+    minDateKey: 'all',
     palette: 'default',
     ...search
   });
@@ -298,13 +304,29 @@ describe('instrument graph trend', () => {
     expect(screen.getByTestId('scatter-chart').dataset.trend).toBe('null');
   });
 
-  it('should drop the trend when any filter narrows the visible records', () => {
-    renderGraph({ search: { colourBy: 'none', measure: 'score' } });
-    expect(screen.getByTestId('scatter-chart').dataset.trend).not.toBe('null');
-    cleanup();
+  // The regression describes the whole group, so it stops describing what is plotted the moment a
+  // filter excludes a record.
+  it('should drop the trend once a filter has excluded a record', () => {
     renderGraph({
-      search: { colourBy: 'none', measure: 'score', methods: ['IN_PERSON'] } as unknown as Partial<Search>
+      recordsBeforeFilter: [{ __id__: 'record-1' }, { __id__: 'record-2' }],
+      recordsOnPage: [{ __id__: 'record-1' }]
     });
+    expect(mocks.useLinearModelQuery.mock.lastCall?.[0]).toMatchObject({ enabled: false });
+    expect(screen.getByTestId('scatter-chart').dataset.trend).toBe('null');
+  });
+
+  // Selecting every collection method, or every series, names a filter that excludes nothing. The
+  // plotted set is still the whole group's, so the regression still describes it.
+  it('should keep the trend for a filter that excludes nothing, such as every method selected', () => {
+    renderGraph({ recordsBeforeFilter: [{ __id__: 'record-1' }], recordsOnPage: [{ __id__: 'record-1' }] });
+    expect(mocks.useLinearModelQuery.mock.lastCall?.[0]).toMatchObject({ enabled: true });
+    expect(screen.getByTestId('scatter-chart').dataset.trend).not.toBe('null');
+  });
+
+  // The timeframe is applied by the query that produced both sets, so they come back equally
+  // bounded and no difference in length reveals it -- the chosen timeframe is what does.
+  it('should drop the trend for a bounded timeframe, which the record counts cannot reveal', () => {
+    renderGraph({ search: { minDateKey: 'pastYear' } });
     expect(mocks.useLinearModelQuery.mock.lastCall?.[0]).toMatchObject({ enabled: false });
     expect(screen.getByTestId('scatter-chart').dataset.trend).toBe('null');
   });

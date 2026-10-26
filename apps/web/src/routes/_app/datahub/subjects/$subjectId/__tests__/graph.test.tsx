@@ -107,13 +107,8 @@ vi.mock('@/components/SelectChartPalette', () => ({
   )
 }));
 vi.mock('@/components/TimeDropdown', () => ({
-  TimeDropdown: ({ disabled, setMinTime }: { disabled: boolean; setMinTime: (value: Date | null) => void }) => (
-    <button
-      data-testid="select-time"
-      disabled={disabled}
-      type="button"
-      onClick={() => setMinTime(new Date(2026, 0, 1))}
-    />
+  TimeDropdown: ({ disabled, onSelect }: { disabled: boolean; onSelect: (key: string) => void }) => (
+    <button data-testid="select-time" disabled={disabled} type="button" onClick={() => onSelect('pastYear')} />
   )
 }));
 
@@ -319,10 +314,14 @@ describe('subject graph route', () => {
     expect(screen.getByTestId('select-edition').dataset.value).toBe('instrument-1');
   });
 
+  // The control reports the timeframe; this view holds the bound it derives in local state rather
+  // than in the url.
   it('should restrict the records to the chosen timeframe', () => {
+    vi.useFakeTimers({ now: new Date(2026, 2, 15, 12), toFake: ['Date'] });
     renderGraph();
     fireEvent.click(screen.getByTestId('select-time'));
-    expect(mocks.setMinDate).toHaveBeenCalledWith(new Date(2026, 0, 1));
+    expect(mocks.setMinDate).toHaveBeenCalledWith(new Date(2025, 2, 15, 12));
+    vi.useRealTimers();
   });
 
   // The palette is held in the url so a shared link reproduces the colours it was made with.

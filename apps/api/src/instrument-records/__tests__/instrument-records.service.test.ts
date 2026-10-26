@@ -697,6 +697,31 @@ describe('InstrumentRecordsService', () => {
       });
     });
 
+    // An unscoped lookup answers for a series belonging to a group the caller cannot read, which
+    // separates "exists elsewhere" from "does not exist" by the status code alone: a readable id
+    // returns 200 and an empty list where an unknown one returns 404. `read Instrument` holds no
+    // group condition, so the ability cannot close that on its own -- the caller's groups must
+    // narrow the lookup.
+    it("should narrow a series lookup to the caller's own groups, so another group's series is indistinguishable from an absent one", async () => {
+      const ability = createAppAbility([{ action: 'read', subject: 'InstrumentRecord' }]);
+      instrumentsService.findById.mockResolvedValueOnce({ id: 'series-1', kind: 'SERIES' } as any);
+
+      await instrumentRecordsService.find({ seriesInstrumentId: 'series-1' }, { ability, callerGroupIds: ['group-1'] });
+
+      expect(instrumentsService.findById).toHaveBeenCalledWith('series-1', { ability }, ['group-1']);
+    });
+
+    // An administrator belongs to no group, so narrowing to their groups would hide every
+    // group-owned series from the one role that oversees all of them.
+    it('should not narrow a series lookup for an administrator, who belongs to no group', async () => {
+      const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+      instrumentsService.findById.mockResolvedValueOnce({ id: 'series-1', kind: 'SERIES' } as any);
+
+      await instrumentRecordsService.find({ seriesInstrumentId: 'series-1' }, { ability, callerGroupIds: [] });
+
+      expect(instrumentsService.findById).toHaveBeenCalledWith('series-1', { ability }, undefined);
+    });
+
     it('should restrict the records to instruments of the requested kind', async () => {
       instrumentsService.find.mockResolvedValueOnce([{ id: 'form-1' }, { id: 'form-2' }]);
 
@@ -974,6 +999,40 @@ describe('InstrumentRecordsService', () => {
         },
         type: 'INIT'
       });
+      worker.emit('error', new Error('settle'));
+      await expect(result).rejects.toThrow('settle');
+    });
+
+    // Resolving that title unscoped would read the name of a series owned by a group the caller
+    // cannot see, and write it into a file they are handed. Scoped, an unreadable series resolves to
+    // nothing and the row names it by id instead.
+    it("should resolve a series title with the caller ability, so no export names another group's series", async () => {
+      const record = {
+        computedMeasures: { score: 85 },
+        date: '2023-01-01',
+        groupId: 'group-1',
+        id: 'record-1',
+        instrumentId: 'instrument-1',
+        seriesInstrumentId: 'series-1',
+        session: { date: '2023-01-01', id: 'session-1', type: 'IN_PERSON' as const, user: null },
+        subject: { age: 20, groupIds: ['group-1'], id: 'subject-1', sex: 'MALE' }
+      } satisfies RecordType;
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([record]);
+      instrumentsService.findById
+        .mockResolvedValueOnce({ id: 'instrument-1', internal: { edition: 1, name: 'X' } } as any)
+        .mockResolvedValueOnce({
+          details: { title: 'Happiness Series' },
+          id: 'series-1',
+          kind: 'SERIES',
+          language: 'en'
+        } as any);
+      const worker = useFakeWorker();
+      const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+
+      const result = instrumentRecordsService.exportRecords({}, { ability });
+      await vi.waitFor(() => expect(worker.postMessage).toHaveBeenCalledOnce());
+
+      expect(instrumentsService.findById).toHaveBeenCalledWith('series-1', { ability });
       worker.emit('error', new Error('settle'));
       await expect(result).rejects.toThrow('settle');
     });

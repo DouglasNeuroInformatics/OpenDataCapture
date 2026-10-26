@@ -13,6 +13,7 @@ import { useInstrumentVisualization } from '@/hooks/useInstrumentVisualization';
 import type { InstrumentVisualizationRecord } from '@/hooks/useInstrumentVisualization';
 import { useRecordMetadataColumns } from '@/hooks/useRecordMetadataColumns';
 import { formatRecordValue } from '@/utils/record-value';
+import { timeframeMinDate } from '@/utils/timeframe';
 
 const RouteComponent = () => {
   const navigate = Route.useNavigate();
@@ -52,7 +53,7 @@ const RouteComponent = () => {
             <SelectEdition options={editionOptions} value={instrumentId} onSelect={setInstrumentId} />
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
-            <TimeDropdown disabled={!instrumentId} setMinTime={setMinDate} />
+            <TimeDropdown disabled={!instrumentId} onSelect={(key) => setMinDate(timeframeMinDate(key))} />
             <ActionDropdown
               widthFull
               data-spotlight-type="export-data-dropdown"

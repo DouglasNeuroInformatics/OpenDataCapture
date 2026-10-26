@@ -282,7 +282,7 @@ export class InstrumentRecordsService {
 
   async find(
     { groupId, instrumentId, kind, minDate, seriesInstrumentId, subjectId }: InstrumentRecordQueryParams,
-    { ability }: EntityOperationOptions = {}
+    { ability, callerGroupIds }: EntityOperationOptions & { callerGroupIds?: string[] } = {}
   ): Promise<InstrumentRecord[]> {
     if (groupId) {
       await this.groupsService.findById(groupId);
@@ -291,7 +291,13 @@ export class InstrumentRecordsService {
       await this.instrumentsService.findById(instrumentId);
     }
     if (seriesInstrumentId) {
-      const series = await this.instrumentsService.findById(seriesInstrumentId, { ability });
+      // `read Instrument` carries no group condition, so the ability alone cannot tell a series
+      // another group owns from one that does not exist: its id answers 200 with an empty list where
+      // an unknown id answers 404, and the difference reports whether the series is real. Narrowing
+      // to the caller's own groups is what collapses the two. An administrator belongs to no group
+      // and reads every group's series, so they are not narrowed.
+      const seriesGroupIds = ability?.can('manage', 'all') ? undefined : callerGroupIds;
+      const series = await this.instrumentsService.findById(seriesInstrumentId, { ability }, seriesGroupIds);
       if (series.kind !== 'SERIES') {
         throw new UnprocessableEntityException(
           `Instrument '${seriesInstrumentId}' is not a series instrument, so it orchestrates no records`

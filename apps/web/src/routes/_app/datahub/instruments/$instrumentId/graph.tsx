@@ -19,9 +19,9 @@ import { resolveTheme } from '@/utils/chart-theme';
 
 const RouteComponent = () => {
   const navigate = Route.useNavigate();
-  const { chart, colourBy, measure, methods, minDate, palette, series: seriesFilter } = Route.useSearch();
+  const { chart, colourBy, measure, minDateKey, palette } = Route.useSearch();
   const currentGroup = useAppStore((store) => store.currentGroup);
-  const { instrument, instrumentId, records } = useInstrumentHubRecords();
+  const { allRecords, instrument, instrumentId, records } = useInstrumentHubRecords();
   const { t } = useTranslation();
   const downloadFile = useDownload();
   const addNotification = useNotificationsStore((store) => store.addNotification);
@@ -64,9 +64,12 @@ const RouteComponent = () => {
   const { isNumeric, series } = useRecordChartSeries({ colourBy, measure: selectedMeasure, palette, records });
 
   // The regression is a property of the instrument across the whole group, so it is only an honest
-  // overlay when the plotted set has not been narrowed to a subgroup.
-  const hasActiveFilters = Boolean(methods ?? minDate ?? seriesFilter);
-  const isTrendComparable = colourBy === 'none' && series.length <= 1 && !hasActiveFilters;
+  // overlay when the plotted set has not been narrowed to a subgroup. What matters is whether a
+  // filter actually excluded something, not whether one is named: selecting every collection method
+  // leaves the set whole. The timeframe is applied by the query that produced `allRecords`, so it is
+  // the one bound not observable as a difference in length.
+  const isNarrowed = records.length !== allRecords.length || minDateKey !== 'all';
+  const isTrendComparable = colourBy === 'none' && series.length <= 1 && !isNarrowed;
   const linearModelQuery = useLinearModelQuery({
     enabled: Boolean(instrumentId) && isNumeric && isTrendComparable,
     params: { groupId: currentGroup?.id, instrumentId: instrumentId! }

@@ -109,6 +109,17 @@ describe('subject table route', () => {
     expect(screen.getByTestId('time-dropdown-trigger').hasAttribute('disabled')).toBe(true);
   });
 
+  // This view holds the bound in local state rather than the url, so it derives the date from the
+  // timeframe the control reports.
+  it('should restrict the records to the chosen timeframe', () => {
+    vi.useFakeTimers({ now: new Date(2026, 2, 15, 12), toFake: ['Date'] });
+    renderTable([record()]);
+    fireEvent.keyDown(screen.getByTestId('time-dropdown-trigger'), { key: 'Enter' });
+    fireEvent.click(screen.getByRole('option', { name: 'Past Year' }));
+    expect(mocks.visualization.setMinDate).toHaveBeenCalledWith(new Date(2025, 2, 15, 12));
+    vi.useRealTimers();
+  });
+
   it('should download in the chosen format once an instrument is selected', () => {
     renderTable([record()]);
     fireEvent.keyDown(screen.getByRole('button', { name: 'Download' }), { key: 'Enter' });

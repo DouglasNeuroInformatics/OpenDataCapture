@@ -70,10 +70,10 @@ vi.mock('@/components/SelectEdition', () => ({
   )
 }));
 vi.mock('@/components/TimeDropdown', () => ({
-  TimeDropdown: ({ setMinTime }: { setMinTime: (value: Date | null, key?: string) => void }) => (
-    <span>
-      <button data-testid="select-time" type="button" onClick={() => setMinTime(new Date(2026, 0, 1), 'pastYear')} />
-      <button data-testid="clear-time" type="button" onClick={() => setMinTime(null, 'all')} />
+  TimeDropdown: ({ onSelect, value }: { onSelect: (key: string) => void; value?: string }) => (
+    <span data-testid="time-dropdown" data-value={value}>
+      <button data-testid="select-time" type="button" onClick={() => onSelect('pastYear')} />
+      <button data-testid="clear-time" type="button" onClick={() => onSelect('all')} />
     </span>
   )
 }));
@@ -234,17 +234,24 @@ describe('instrument hub table route', () => {
     });
   });
 
-  it('should record the chosen timeframe in the url', () => {
+  // Only the timeframe itself goes in the url. An absolute date alongside it would still read "past
+  // year" long after the link was shared, while bounded to the instant it was made.
+  it('should record the chosen timeframe in the url, and no date derived from it', () => {
     renderTable();
     fireEvent.click(screen.getByTestId('select-time'));
-    expect(lastSearch()).toEqual({ minDate: new Date(2026, 0, 1), minDateKey: 'pastYear' });
+    expect(lastSearch()).toEqual({ minDateKey: 'pastYear' });
   });
 
-  // An undefined bound drops the parameter rather than putting a null in the url.
-  it('should drop the timeframe from the url when it is cleared', () => {
+  it('should return the url to all time when the timeframe is cleared', () => {
     renderTable();
     fireEvent.click(screen.getByTestId('clear-time'));
-    expect(lastSearch()).toEqual({ minDate: undefined, minDateKey: 'all' });
+    expect(lastSearch()).toEqual({ minDateKey: 'all' });
+  });
+
+  it('should drive the timeframe control from the url, so the choice survives a reload', () => {
+    vi.spyOn(Route, 'useSearch').mockReturnValue({ minDateKey: 'pastMonth' });
+    renderTable();
+    expect(screen.getByTestId('time-dropdown').dataset.value).toBe('pastMonth');
   });
 
   it('should disable the export when there are no records to export', () => {

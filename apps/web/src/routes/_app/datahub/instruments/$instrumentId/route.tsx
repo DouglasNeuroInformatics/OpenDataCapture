@@ -13,6 +13,7 @@ import { TabLink } from '@/components/TabLink';
 import { useInstrumentHubFacets } from '@/hooks/useInstrumentHubFacets';
 import { COLOUR_BY_OPTIONS } from '@/hooks/useRecordChartSeries';
 import { CHART_PALETTE_NAMES } from '@/utils/chart-palette';
+import { TIMEFRAME_KEYS } from '@/utils/timeframe';
 
 const RouteComponent = () => {
   const params = Route.useParams();
@@ -67,8 +68,7 @@ export const Route = createFileRoute('/_app/datahub/instruments/$instrumentId')(
     fromSeries: z.string().optional(),
     measure: z.string().optional(),
     methods: $SessionType.array().optional(),
-    minDate: z.coerce.date().optional(),
-    minDateKey: z.enum(['all', 'pastMonth', 'pastYear']).default('all'),
+    minDateKey: z.enum(TIMEFRAME_KEYS).default('all'),
     minRecords: z.coerce.number().int().min(0).default(0),
     palette: z.enum(CHART_PALETTE_NAMES).default('default'),
     series: z.string().array().optional()

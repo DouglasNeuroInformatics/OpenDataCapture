@@ -21,6 +21,7 @@ import { useAppStore } from '@/store';
 import { renderChartPng } from '@/utils/chart-image';
 import { CHART_PALETTE_NAMES } from '@/utils/chart-palette';
 import { inkColors, resolveTheme } from '@/utils/chart-theme';
+import { timeframeMinDate } from '@/utils/timeframe';
 
 const RouteComponent = () => {
   const downloadCanvas = useDownload();
@@ -137,7 +138,7 @@ const RouteComponent = () => {
               />
             </div>
             <div data-testid="time-select-dropdown-container">
-              <TimeDropdown disabled={!instrumentId} setMinTime={setMinDate} />
+              <TimeDropdown disabled={!instrumentId} onSelect={(key) => setMinDate(timeframeMinDate(key))} />
             </div>
             <div data-testid="palette-select-dropdown-container">
               <SelectChartPalette

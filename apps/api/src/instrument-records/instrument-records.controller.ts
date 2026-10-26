@@ -51,6 +51,7 @@ export class InstrumentRecordsController {
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
   find(
     @CurrentUser('ability') ability: AppAbility,
+    @CurrentUser('groups') groups: { id: string }[],
     @Query('kind') kind?: InstrumentKind,
     @Query(
       'minDate',
@@ -67,7 +68,7 @@ export class InstrumentRecordsController {
   ) {
     return this.instrumentRecordsService.find(
       { groupId, instrumentId, kind, minDate, seriesInstrumentId, subjectId },
-      { ability }
+      { ability, callerGroupIds: groups.map(({ id }) => id) }
     );
   }
 
