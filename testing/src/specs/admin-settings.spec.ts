@@ -135,6 +135,14 @@ test.describe('admin settings', () => {
     });
   });
 
+  // The checkboxes were listed in the canonical `LANGUAGES` order, which in English differs from
+  // alphabetical, so this one assertion tells a sorted list from an unsorted one.
+  test('should list the languages by their translated name', async ({ getPageModel }) => {
+    const settingsPage = await getPageModel('/admin/settings');
+
+    await expect(settingsPage.activeLanguageLabels).toHaveText(['English', 'French', 'Spanish']);
+  });
+
   test('should apply the group switcher position preference immediately', async ({ getPageModel }) => {
     const settingsPage = await getPageModel('/admin/settings');
 

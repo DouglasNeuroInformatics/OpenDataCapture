@@ -289,24 +289,26 @@ const RouteComponent = () => {
                   })}
                 </p>
               </div>
-              <div className="flex flex-col gap-3">
-                {LANGUAGES.map((language) => {
-                  const isActive = activeLanguages.includes(language);
-                  return (
-                    <div className="flex items-center gap-2.5" key={language}>
-                      <Checkbox
-                        checked={isActive}
-                        data-testid={`active-language-${language}`}
-                        disabled={isActive && activeLanguages.length === 1}
-                        id={`active-language-${language}`}
-                        onCheckedChange={() => toggleLanguage(language)}
-                      />
-                      <label className="text-sm font-medium" htmlFor={`active-language-${language}`}>
-                        {t(LANGUAGE_LABELS[language])}
-                      </label>
-                    </div>
-                  );
-                })}
+              <div className="flex flex-col gap-3" data-testid="active-languages">
+                {[...LANGUAGES]
+                  .sort((a, b) => t(LANGUAGE_LABELS[a]).localeCompare(t(LANGUAGE_LABELS[b])))
+                  .map((language) => {
+                    const isActive = activeLanguages.includes(language);
+                    return (
+                      <div className="flex items-center gap-2.5" key={language}>
+                        <Checkbox
+                          checked={isActive}
+                          data-testid={`active-language-${language}`}
+                          disabled={isActive && activeLanguages.length === 1}
+                          id={`active-language-${language}`}
+                          onCheckedChange={() => toggleLanguage(language)}
+                        />
+                        <label className="text-sm font-medium" htmlFor={`active-language-${language}`}>
+                          {t(LANGUAGE_LABELS[language])}
+                        </label>
+                      </div>
+                    );
+                  })}
               </div>
             </SettingSection>
             <Separator />

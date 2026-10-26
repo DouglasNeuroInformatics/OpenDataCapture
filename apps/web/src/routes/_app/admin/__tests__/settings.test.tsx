@@ -322,6 +322,15 @@ describe('admin settings route', () => {
       expect(screen.getByTestId<HTMLButtonElement>('active-language-en').disabled).toBe(true);
     });
 
+    // In English the sorted order differs from the canonical `LANGUAGES` order the checkboxes were
+    // listed in before, so this one assertion tells a sorted list from an unsorted one.
+    it('should list the languages by their translated name, so a long list is scannable', () => {
+      renderPage();
+      expect(
+        [...screen.getByTestId('active-languages').querySelectorAll('label')].map((label) => label.textContent)
+      ).toStrictEqual(['English', 'French', 'Spanish']);
+    });
+
     it('should never save an empty language list, even when the stored list repeats its only language', () => {
       mocks.state.setupState.activeLanguages = ['en', 'en'];
       renderPage();
