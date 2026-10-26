@@ -96,6 +96,27 @@ export default defineInstrument({
 `;
 }
 
+/** A form whose title includes a value imported from a subpath of the scoped runtime-core package. */
+function scopedSubpathInstrumentSource(title: string): string {
+  return `
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { FILE_TYPES } from '/runtime/v1/@opendatacapture/runtime-core/constants';
+import { z } from '/runtime/v1/zod@3.x';
+
+export default defineInstrument({
+  kind: 'FORM',
+  language: 'en',
+  tags: ['Constants'],
+  internal: { edition: 1, name: 'SCOPED_SUBPATH' },
+  clientDetails: { estimatedDuration: 1, instructions: ['Submit the form'] },
+  content: {},
+  details: { description: 'Scoped subpath import', license: 'Apache-2.0', title: \`${title} \${FILE_TYPES.images[0]}\` },
+  measures: {},
+  validationSchema: z.object({})
+});
+`;
+}
+
 /** 1×1 PNG. The playground stores binary assets as base64 and decodes them before bundling. */
 const STIM_PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -327,6 +348,25 @@ test.describe('playground', () => {
     await page.getByRole('button', { name: 'Cause' }).click();
     await expect(page.getByText(/Build failed with 1 error/)).toBeVisible();
     await expect(page.getByText(/reading 'inputs'/)).toHaveCount(0);
+  });
+
+  test('should load a subpath of a scoped runtime package, so its exports reach the instrument', async ({
+    page,
+    uniqueId
+  }) => {
+    const title = `Scoped Subpath ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: scopedSubpathInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+
+    await expect(playground.preview.getByRole('heading', { name: `${title} image/png` })).toBeVisible({
+      timeout: PREVIEW_TIMEOUT
+    });
   });
 });
 
