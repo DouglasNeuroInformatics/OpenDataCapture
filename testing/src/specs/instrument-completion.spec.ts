@@ -411,3 +411,40 @@ test.describe('instrument completion', () => {
     await expect(instrumentPage.summaryHeading).toBeHidden();
   });
 });
+
+test.describe('file instrument completion', () => {
+  test('should report a selection over the file limit as too many files, keeping the earlier selection', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`FileLimit${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: 'Arbitrary File Upload' }).first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+
+    const dropzone = page.getByTestId('dropzone');
+    const fileInput = dropzone.locator('input[type="file"]');
+    const createUpload = (name: string) => ({ buffer: Buffer.from('content'), mimeType: 'text/plain', name });
+
+    await fileInput.setInputFiles(createUpload('first.txt'));
+    await expect(dropzone).toContainText('first.txt');
+
+    await fileInput.setInputFiles([createUpload('a.txt'), createUpload('b.txt')]);
+    await expect(page.getByText('Only 1 file can be uploaded here; you selected 2')).toBeVisible();
+    await expect(page.getByText('Unsupported file type')).toBeHidden();
+    await expect(dropzone).toContainText('first.txt');
+  });
+});
