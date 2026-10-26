@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { AxiosError, AxiosHeaders } from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/admin/groups/create';
@@ -6,7 +7,7 @@ import { Route } from '@/routes/_app/admin/groups/create';
 import '@/services/i18n';
 
 const mocks = vi.hoisted(() => ({
-  mutate: vi.fn(),
+  mutateAsync: vi.fn(),
   navigate: vi.fn()
 }));
 
@@ -15,7 +16,7 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
   useNavigate: () => mocks.navigate
 }));
 vi.mock('@/hooks/useCreateGroupMutation', () => ({
-  useCreateGroupMutation: () => ({ mutate: mocks.mutate })
+  useCreateGroupMutation: () => ({ mutateAsync: mocks.mutateAsync })
 }));
 
 const CreateGroupPage = Route.options.component!;
@@ -29,8 +30,18 @@ const fillAndSubmit = ({ name, type }: { name: string; type: 'CLINICAL' | 'RESEA
   fireEvent.click(screen.getByLabelText('Submit'));
 };
 
+const conflict = (message: string) =>
+  new AxiosError('Request failed with status code 409', 'ERR_BAD_REQUEST', undefined, undefined, {
+    config: { headers: new AxiosHeaders() },
+    data: { message },
+    headers: {},
+    status: 409,
+    statusText: 'Conflict'
+  });
+
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.mutateAsync.mockResolvedValue({ data: {} });
 });
 
 afterEach(cleanup);
@@ -44,13 +55,27 @@ describe('create group route', () => {
   it('should create the group with the entered name and chosen type', async () => {
     fillAndSubmit({ name: 'Depression Clinic', type: 'RESEARCH' });
     await waitFor(() =>
-      expect(mocks.mutate).toHaveBeenCalledWith({ data: { name: 'Depression Clinic', type: 'RESEARCH' } })
+      expect(mocks.mutateAsync).toHaveBeenCalledWith({ data: { name: 'Depression Clinic', type: 'RESEARCH' } })
     );
   });
 
-  it('should return to the group list once the group is submitted', async () => {
+  it('should return to the group list once the group is created', async () => {
     fillAndSubmit({ name: 'Psychosis Lab', type: 'CLINICAL' });
     await waitFor(() => expect(mocks.navigate).toHaveBeenCalledWith({ to: '..' }));
+  });
+
+  it('should stay on the form when creating the group fails, so the entered name is not lost', async () => {
+    mocks.mutateAsync.mockRejectedValue(conflict("Group with name 'Psychosis Lab' already exists!"));
+    fillAndSubmit({ name: 'Psychosis Lab', type: 'CLINICAL' });
+    expect(await screen.findByText("Group with name 'Psychosis Lab' already exists!")).toBeTruthy();
+    expect(mocks.navigate).not.toHaveBeenCalled();
+    expect(field('name').value).toBe('Psychosis Lab');
+  });
+
+  it('should fall back to a generic message on the form when the failure carries no reason', async () => {
+    mocks.mutateAsync.mockRejectedValue(new Error('Network Error'));
+    fillAndSubmit({ name: 'Psychosis Lab', type: 'CLINICAL' });
+    expect(await screen.findByText('Failed to create group')).toBeTruthy();
   });
 
   it('should not create a group without a name, since the schema requires one', async () => {
@@ -58,6 +83,6 @@ describe('create group route', () => {
     fireEvent.change(field('type'), { target: { value: 'CLINICAL' } });
     fireEvent.click(screen.getByLabelText('Submit'));
     await waitFor(() => expect(screen.queryAllByTestId('error-message-text').length).toBeGreaterThan(0));
-    expect(mocks.mutate).not.toHaveBeenCalled();
+    expect(mocks.mutateAsync).not.toHaveBeenCalled();
   });
 });

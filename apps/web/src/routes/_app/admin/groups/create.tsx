@@ -5,15 +5,29 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateGroupMutation } from '@/hooks/useCreateGroupMutation';
+import { getApiErrorMessage } from '@/utils/error';
 
 const RouteComponent = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const createGroupMutation = useCreateGroupMutation();
 
-  const handleSubmit = (data: $CreateGroupData) => {
-    createGroupMutation.mutate({ data });
+  const handleSubmit = async (data: $CreateGroupData) => {
+    try {
+      await createGroupMutation.mutateAsync({ data });
+    } catch (err) {
+      const errorMessage = getApiErrorMessage(
+        err,
+        t({
+          en: 'Failed to create group',
+          es: 'Error al crear el grupo',
+          fr: 'Échec de la création du groupe'
+        })
+      );
+      return { errorMessage, success: false } as const;
+    }
     void navigate({ to: '..' });
+    return undefined;
   };
 
   return (

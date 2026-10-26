@@ -592,3 +592,27 @@ test.describe('admin management', () => {
     await expect(userPage.addPermissionRow).toHaveCount(0);
   });
 });
+
+test.describe('admin group creation conflicts', () => {
+  test('should stay on the form and say why when the group name is already taken', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const groupName = `E2E Duplicate Group ${uniqueId}`;
+    await api.createGroup({ name: groupName });
+
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/groups/create');
+
+    await page.getByLabel('Group Name').fill(groupName);
+    await page.getByTestId('type-select-trigger').click();
+    await page.getByTestId('type-select-item-CLINICAL').click();
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(page.getByTestId('error-message-text')).toContainText('already exists');
+    await expect(page).toHaveURL('/admin/groups/create');
+    await expect(page.getByLabel('Group Name')).toHaveValue(groupName);
+  });
+});
