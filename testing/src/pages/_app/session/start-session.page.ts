@@ -88,9 +88,7 @@ export class StartSessionPage extends AppPage {
 
   /** The subject's date of birth and sex, leaving the session at its in-person default. */
   async fillSubjectDetails(sex: string) {
-    await this.dateOfBirthField.waitFor({ state: 'visible' });
-    await this.dateOfBirthField.fill('1990-01-01');
-
+    await this.fillDateOfBirth('1990-01-01');
     await this.sexField.selectOption(sex);
   }
 
