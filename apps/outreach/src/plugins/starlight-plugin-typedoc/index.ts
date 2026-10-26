@@ -4,6 +4,8 @@ import type { TypeDocOptions } from 'typedoc';
 import { getSidebarFromReflections, getSidebarGroupPlaceholder } from './starlight';
 import { generateTypeDoc } from './typedoc';
 
+import type { SidebarTranslations } from './starlight';
+
 export type StarlightTypeDocSidebarOptions = {
   /**
    * Whether the generated documentation sidebar group should be collapsed by default.
@@ -14,6 +16,10 @@ export type StarlightTypeDocSidebarOptions = {
    * The generated documentation sidebar group label.
    */
   label: string;
+  /**
+   * The generated documentation sidebar group label, translated per locale.
+   */
+  translations?: SidebarTranslations;
 };
 
 export type StarlightTypeDocOptions = {
