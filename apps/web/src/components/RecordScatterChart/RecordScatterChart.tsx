@@ -45,7 +45,8 @@ export const RecordScatterChart = ({ measureLabel, series, trend, xLabel }: Reco
   const resolvedTheme = resolveTheme(theme);
 
   const times = series.flatMap((item) => item.points.map((point) => point.time));
-  const trendSegment = (() => {
+  // Typed as a pair rather than an array: `ReferenceLine`'s `segment` takes exactly two points.
+  const trendSegment = ((): [{ x: number; y: number }, { x: number; y: number }] | null => {
     if (!trend || times.length === 0) return null;
     let tMin = times[0]!;
     let tMax = times[0]!;
@@ -97,8 +98,10 @@ export const RecordScatterChart = ({ measureLabel, series, trend, xLabel }: Reco
           // A scatter's tooltip carries no label of its own, so the date is formatted in the row
           // recharts names after the x axis rather than through `labelFormatter`, which is never
           // called here. Both rows are named by their axis already.
-          formatter={(value: number, name) => [
-            name === xLabel ? new Intl.DateTimeFormat(resolvedLanguage, { dateStyle: 'medium' }).format(value) : value,
+          formatter={(value, name) => [
+            name === xLabel && typeof value === 'number'
+              ? new Intl.DateTimeFormat(resolvedLanguage, { dateStyle: 'medium' }).format(value)
+              : value,
             name
           ]}
           labelStyle={{ color: inkColors[resolvedTheme], fontWeight: 500 }}

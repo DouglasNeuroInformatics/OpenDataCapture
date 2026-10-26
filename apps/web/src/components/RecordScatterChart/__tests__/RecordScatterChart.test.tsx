@@ -76,9 +76,9 @@ describe('RecordScatterChart', () => {
   });
 
   it('should label the x axis ticks with ISO dates, so time points read the same in every locale', () => {
-    const ticks = [...renderChart().querySelectorAll('.recharts-xAxis .recharts-cartesian-axis-tick-value')].map(
-      (tick) => tick.textContent
-    );
+    const ticks = [
+      ...renderChart().querySelectorAll('.recharts-xAxis-tick-labels .recharts-cartesian-axis-tick-value')
+    ].map((tick) => tick.textContent);
     expect(ticks).toContain('2026-01-02');
   });
 

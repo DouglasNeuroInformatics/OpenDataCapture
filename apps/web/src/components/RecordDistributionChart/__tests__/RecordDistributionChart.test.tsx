@@ -34,7 +34,7 @@ const renderChart = (series: RecordChartSeries[], isNumeric = true) => {
 const bars = (container: HTMLElement) => [...container.querySelectorAll('.recharts-bar')];
 
 const tickLabels = (container: HTMLElement) =>
-  [...container.querySelectorAll('.recharts-xAxis .recharts-cartesian-axis-tick-value')].map(
+  [...container.querySelectorAll('.recharts-xAxis-tick-labels .recharts-cartesian-axis-tick-value')].map(
     (tick) => tick.textContent
   );
 
