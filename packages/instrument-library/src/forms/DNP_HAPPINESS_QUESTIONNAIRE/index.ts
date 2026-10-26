@@ -115,7 +115,7 @@ export default defineInstrument({
     estimatedDuration: 1,
     instructions: {
       en: ['Please answer the questions based on your current feelings.'],
-      fr: ['Veuillez répondre àux questions en fonction de vos sentiments actuels.']
+      fr: ['Veuillez répondre aux questions en fonction de vos sentiments actuels.']
     },
     title: {
       en: 'Questionnaire on Happiness',

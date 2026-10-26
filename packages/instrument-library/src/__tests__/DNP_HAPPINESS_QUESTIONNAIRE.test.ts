@@ -71,6 +71,14 @@ describe('DNP_HAPPINESS_QUESTIONNAIRE', () => {
     });
   });
 
+  describe('clientDetails', () => {
+    it('should ask French-speaking subjects to answer the questions in correct French', () => {
+      expect(instrument.clientDetails?.instructions?.fr).toEqual([
+        'Veuillez répondre aux questions en fonction de vos sentiments actuels.'
+      ]);
+    });
+  });
+
   describe('validationSchema', () => {
     it('should accept a satisfied subject who gives no reason', () => {
       const result = instrument.validationSchema.safeParse({

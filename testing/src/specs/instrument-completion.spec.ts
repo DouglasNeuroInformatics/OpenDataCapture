@@ -347,4 +347,33 @@ test.describe('instrument completion', () => {
     await expect(page.getByTestId('subject-table-cell-postalCode').first()).toHaveText('H4H 1R3');
     await expect(page.getByTestId('subject-table-cell-ageAtImmigration').first()).toHaveText('0');
   });
+
+  test('should label the marital status and age-at-immigration questions correctly in English', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Labels${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page
+      .locator('[data-testid^="instrument-card-"]')
+      .filter({ hasText: DEMOGRAPHICS_INSTRUMENT_TITLE })
+      .first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+
+    await expect(instrumentPage.$ref.getByText('Marital Status', { exact: true })).toBeVisible();
+    await expect(instrumentPage.$ref.getByText('Age at Immigration (if applicable)', { exact: true })).toBeVisible();
+  });
 });

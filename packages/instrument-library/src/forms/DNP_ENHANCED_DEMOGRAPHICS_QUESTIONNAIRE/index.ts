@@ -687,7 +687,7 @@ export default defineInstrument({
         maritalStatus: {
           kind: 'string',
           label: {
-            en: 'Martial Status',
+            en: 'Marital Status',
             fr: 'État matrimonial'
           },
           options: formatTranslatedOptions(maritalStatus),
@@ -767,7 +767,7 @@ export default defineInstrument({
         ageAtImmigration: {
           kind: 'number',
           label: {
-            en: 'Age at Immigration',
+            en: 'Age at Immigration (if applicable)',
             fr: "Âge à l'immigration (le cas échéant)"
           },
           max: 100,
@@ -804,7 +804,7 @@ export default defineInstrument({
   details: {
     description: {
       en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration. All questions are optional.',
-      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets. Toutes les questions sont optionnelles."
+      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. Toutes les questions sont optionnelles."
     },
 
     license: 'Apache-2.0',
