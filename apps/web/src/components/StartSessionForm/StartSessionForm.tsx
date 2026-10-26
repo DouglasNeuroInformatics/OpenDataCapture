@@ -218,33 +218,12 @@ export const StartSessionForm = ({
           subjectFirstName: z.string().optional(),
           subjectLastName: z.string().optional(),
           subjectIdentificationMethod: $SubjectIdentificationMethod,
-          // Every check on the identifier lives in the refinement below: zod v4 omits an optional
-          // property that failed its own checks from the value it hands the refinement, which then
-          // reads a typed identifier as missing and adds a contradictory required-field error.
+          // Every check on the identifier and the date of birth lives in the refinement below: zod v4
+          // omits an optional property that failed its own checks from the value it hands the
+          // refinement, which then reads the field as missing and adds a contradictory required-field
+          // error.
           subjectId: z.string().optional(),
-          subjectDateOfBirth: z
-            .date()
-            .max(currentDate, {
-              message: t({
-                en: 'Date of birth must be in the past',
-                es: 'La fecha de nacimiento debe estar en el pasado',
-                fr: 'La date de naissance doit être dans le passé'
-              })
-            })
-            .optional()
-            .refine(
-              (date) => {
-                if (!date || !minDateOfBirth) return true;
-                return date <= minDateOfBirth;
-              },
-              {
-                message: t({
-                  en: `Subject must be above age of ${currentGroup?.settings.minimumAge}`,
-                  es: `El sujeto debe tener más de ${currentGroup?.settings.minimumAge} años`,
-                  fr: `Le sujet doit avoir au moins ${currentGroup?.settings.minimumAge} ans`
-                })
-              }
-            ),
+          subjectDateOfBirth: z.date().optional(),
           subjectSex: z.enum(['MALE', 'FEMALE']).optional(),
           sessionType: $SessionType.exclude(['REMOTE']),
           sessionDate: z
@@ -305,6 +284,27 @@ export const StartSessionForm = ({
                 });
               }
             }
+          }
+          if (val.subjectDateOfBirth && val.subjectDateOfBirth > currentDate) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: t({
+                en: 'Date of birth must be in the past',
+                es: 'La fecha de nacimiento debe estar en el pasado',
+                fr: 'La date de naissance doit être dans le passé'
+              }),
+              path: ['subjectDateOfBirth']
+            });
+          } else if (val.subjectDateOfBirth && minDateOfBirth && val.subjectDateOfBirth > minDateOfBirth) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: t({
+                en: `Subject must be above age of ${currentGroup?.settings.minimumAge}`,
+                es: `El sujeto debe tener más de ${currentGroup?.settings.minimumAge} años`,
+                fr: `Le sujet doit avoir au moins ${currentGroup?.settings.minimumAge} ans`
+              }),
+              path: ['subjectDateOfBirth']
+            });
           }
         })}
       onSubmit={async ({
