@@ -43,7 +43,7 @@
     "@opendatacapture/subject-utils": "workspace:*",
     "@prisma/client": "catalog:",
     "axios": "catalog:",
-    "fastify": "^5.12.5",
+    "fastify": "^5.12.6",
     "hibp": "^15.2.1",
     "jszip": "^3.10.2",
     "lodash-es": "workspace:lodash-es__4.x@*",
