@@ -1,16 +1,18 @@
 import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { Language } from '@opendatacapture/schemas/core';
 import { DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE } from '@opendatacapture/schemas/mail';
 
 import { EmailTemplateEditor } from '@/components/EmailTemplateEditor';
 
 export type ViewDefaultTemplateDialogProps = {
+  activeLanguages: readonly Language[];
   onOpenChange: (open: boolean) => void;
   open: boolean;
 };
 
 /** Read-only view of the message sent when no custom template is active. */
-export const ViewDefaultTemplateDialog = ({ onOpenChange, open }: ViewDefaultTemplateDialogProps) => {
+export const ViewDefaultTemplateDialog = ({ activeLanguages, onOpenChange, open }: ViewDefaultTemplateDialogProps) => {
   const { t } = useTranslation();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -31,7 +33,11 @@ export const ViewDefaultTemplateDialog = ({ onOpenChange, open }: ViewDefaultTem
             })}
           </Dialog.Description>
         </Dialog.Header>
-        <EmailTemplateEditor idPrefix="template-builtin" template={DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE} />
+        <EmailTemplateEditor
+          idPrefix="template-builtin"
+          languages={activeLanguages}
+          template={DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE}
+        />
         <Dialog.Footer>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             {t('core.close')}

@@ -5,10 +5,12 @@ import { createFileRoute } from '@tanstack/react-router';
 import { MailSettings } from '@/components/MailSettings';
 import { PageHeader } from '@/components/PageHeader';
 import { mailSettingsQueryOptions, useMailSettingsQuery } from '@/hooks/useMailSettingsQuery';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 
 const RouteComponent = () => {
   const { t } = useTranslation();
   const { data: settings } = useMailSettingsQuery();
+  const { data: setupState } = useSetupStateQuery();
 
   return (
     <div className="w-full">
@@ -18,7 +20,11 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6" data-testid="mail-settings-page">
-        <MailSettings config={settings.config} newUserEmailTemplate={settings.newUserEmailTemplate} />
+        <MailSettings
+          activeLanguages={setupState.activeLanguages}
+          config={settings.config}
+          newUserEmailTemplate={settings.newUserEmailTemplate}
+        />
       </div>
     </div>
   );

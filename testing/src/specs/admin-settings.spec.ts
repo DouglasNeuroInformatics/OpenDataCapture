@@ -1,6 +1,7 @@
 import { MAX_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/setup';
 import type { Page } from '@playwright/test';
 
+import { GroupEmailTemplatesPage } from '../pages/_app/group/email-templates.page';
 import { expect, test } from '../support/fixtures';
 
 /** Every setting on this page autosaves, so the PATCH is the only signal that a change landed. */
@@ -118,6 +119,19 @@ test.describe('admin settings', () => {
       const removed = waitForSetupPatch(page);
       await settingsPage.activeLanguageCheckbox('es').click();
       expect((await removed).ok()).toBe(true);
+    });
+
+    // Authoring a template in a language the instance does not offer writes copy nothing can send.
+    // It lives here rather than in `group-email-templates.spec.ts` because the tests above turn
+    // Spanish on and off: run in parallel with them, an exact list of options would flake. Being in
+    // this serial block is also why the page is reached with a group manager's token by hand.
+    test('should offer no inactive language in the group email template editor', async ({ authenticateAs, page }) => {
+      await authenticateAs('GROUP_MANAGER');
+      await page.goto('/group/email-templates');
+
+      const templatesPage = new GroupEmailTemplatesPage(page);
+      await templatesPage.createLanguage.click();
+      await expect(templatesPage.openLanguageOptions).toHaveText(['English', 'French']);
     });
   });
 
