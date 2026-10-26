@@ -45,13 +45,20 @@ export const RecordScatterChart = ({ measureLabel, series, trend, xLabel }: Reco
   const resolvedTheme = resolveTheme(theme);
 
   const times = series.flatMap((item) => item.points.map((point) => point.time));
-  const trendSegment =
-    trend && times.length > 0
-      ? [
-          { x: Math.min(...times), y: trend.intercept + trend.slope * Math.min(...times) },
-          { x: Math.max(...times), y: trend.intercept + trend.slope * Math.max(...times) }
-        ]
-      : null;
+  const trendSegment = (() => {
+    if (!trend || times.length === 0) return null;
+    let tMin = times[0]!;
+    let tMax = times[0]!;
+    for (let i = 1; i < times.length; i++) {
+      const t = times[i]!;
+      if (t < tMin) tMin = t;
+      if (t > tMax) tMax = t;
+    }
+    return [
+      { x: tMin, y: trend.intercept + trend.slope * tMin },
+      { x: tMax, y: trend.intercept + trend.slope * tMax }
+    ];
+  })();
 
   return (
     <ResponsiveContainer height={400} width="100%">

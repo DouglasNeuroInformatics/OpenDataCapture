@@ -15,6 +15,11 @@ describe('binDistribution', () => {
     expect(binDistribution([], true)).toStrictEqual([]);
   });
 
+  it('should find the true minimum when it appears after a larger value', () => {
+    const rows = binDistribution([seriesOf('all', [10, 5, 8])], true);
+    expect(rows[0]!.bin).toMatch(/^5/);
+  });
+
   it('should count the maximum value rather than letting it overflow past the last bin', () => {
     const rows = binDistribution([seriesOf('all', [0, 10])], true);
     const total = rows.reduce((sum, row) => sum + (row.all as number), 0);
@@ -48,6 +53,26 @@ describe('binDistribution', () => {
       expect(row).toHaveProperty('a');
       expect(row).toHaveProperty('b');
     }
+  });
+
+  it('should place a bin boundary value in the higher bin, not one bin low from float division', () => {
+    const rows = binDistribution([seriesOf('all', [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])], true);
+    const binFor = (value: number) => {
+      for (const [index, row] of rows.entries()) {
+        if ((row.all as number) > 0 && index === Math.min(9, Math.floor(value * 10 + 1e-10))) {
+          return index;
+        }
+      }
+      return -1;
+    };
+    expect(binFor(0.3)).toBe(3);
+    expect(binFor(0.6)).toBe(6);
+    expect(binFor(0.7)).toBe(7);
+  });
+
+  it('should handle large datasets without a RangeError from spreading into Math.min/max', () => {
+    const values = Array.from({ length: 200_000 }, (_, i) => i);
+    expect(() => binDistribution([seriesOf('all', values)], true)).not.toThrow();
   });
 
   it('should count a categorical measure per distinct value instead of binning it', () => {

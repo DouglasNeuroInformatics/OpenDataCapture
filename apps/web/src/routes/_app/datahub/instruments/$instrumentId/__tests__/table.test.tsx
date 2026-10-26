@@ -46,9 +46,22 @@ vi.mock('@/store', () => ({
 // Captured rather than rendered: the listing itself is covered by instrument-table.test.tsx, and
 // what matters here is the search the drill-down navigates with.
 vi.mock('@/components/InstrumentTable', () => ({
-  InstrumentTable: ({ onOpen }: { onOpen: (row: InstrumentRow) => void }) => {
+  InstrumentTable: ({
+    minRecords,
+    onMinRecordsChange,
+    onOpen
+  }: {
+    minRecords?: number;
+    onMinRecordsChange?: (value: number) => void;
+    onOpen: (row: InstrumentRow) => void;
+  }) => {
     mocks.openSeriesMember.current = onOpen;
-    return <span data-testid="instrument-hub-series-members" />;
+    return (
+      <span data-testid="instrument-hub-series-members">
+        <span data-testid="series-min-records">{minRecords ?? 0}</span>
+        <button data-testid="change-min-records" type="button" onClick={() => onMinRecordsChange?.(5)} />
+      </span>
+    );
   }
 }));
 vi.mock('@/components/SelectEdition', () => ({
@@ -57,10 +70,10 @@ vi.mock('@/components/SelectEdition', () => ({
   )
 }));
 vi.mock('@/components/TimeDropdown', () => ({
-  TimeDropdown: ({ setMinTime }: { setMinTime: (value: Date | null) => void }) => (
+  TimeDropdown: ({ setMinTime }: { setMinTime: (value: Date | null, key?: string) => void }) => (
     <span>
-      <button data-testid="select-time" type="button" onClick={() => setMinTime(new Date(2026, 0, 1))} />
-      <button data-testid="clear-time" type="button" onClick={() => setMinTime(null)} />
+      <button data-testid="select-time" type="button" onClick={() => setMinTime(new Date(2026, 0, 1), 'pastYear')} />
+      <button data-testid="clear-time" type="button" onClick={() => setMinTime(null, 'all')} />
     </span>
   )
 }));
@@ -134,6 +147,12 @@ describe('instrument hub table route', () => {
       expect(headerButton(label)).toBeTruthy();
     }
   );
+
+  it('should derive measure columns from every record, not just the first', () => {
+    mocks.records = [record({ __id__: 'r-1', totalScore: 7 }), record({ __id__: 'r-2', mood: 'good', totalScore: 5 })];
+    renderTable();
+    expect(headers()).toEqual(['SUBJECT', 'DATE_COLLECTED', 'COLLECTION_METHOD', 'SERIES', 'TOTAL_SCORE', 'MOOD']);
+  });
 
   it('should reorder the rows when a header control is used', () => {
     mocks.records = [record({ __id__: 'r-1', totalScore: 2 }), record({ __id__: 'r-2', totalScore: 9 })];
@@ -218,14 +237,14 @@ describe('instrument hub table route', () => {
   it('should record the chosen timeframe in the url', () => {
     renderTable();
     fireEvent.click(screen.getByTestId('select-time'));
-    expect(lastSearch()).toEqual({ minDate: new Date(2026, 0, 1) });
+    expect(lastSearch()).toEqual({ minDate: new Date(2026, 0, 1), minDateKey: 'pastYear' });
   });
 
   // An undefined bound drops the parameter rather than putting a null in the url.
   it('should drop the timeframe from the url when it is cleared', () => {
     renderTable();
     fireEvent.click(screen.getByTestId('clear-time'));
-    expect(lastSearch()).toEqual({ minDate: undefined });
+    expect(lastSearch()).toEqual({ minDate: undefined, minDateKey: 'all' });
   });
 
   it('should disable the export when there are no records to export', () => {
@@ -315,6 +334,18 @@ describe('instrument hub series members', () => {
   // Opening a member from a series means "the subjects this series collected", not every record the
   // member instrument ever took — so the drill-down carries the series as a filter, not just as the
   // breadcrumb the return link reads.
+  it('should pass the url minRecords to the instrument table', () => {
+    vi.spyOn(Route, 'useSearch').mockReturnValue({ minRecords: 3 });
+    renderTable();
+    expect(screen.getByTestId('series-min-records').textContent).toBe('3');
+  });
+
+  it('should persist the minimum records filter in the url', () => {
+    renderTable();
+    fireEvent.click(screen.getByTestId('change-min-records'));
+    expect(lastSearch()).toEqual({ minRecords: 5 });
+  });
+
   it('should narrow a member instrument to the series it was opened from', () => {
     renderTable();
     mocks.openSeriesMember.current!({ id: 'member-1' } as InstrumentRow);

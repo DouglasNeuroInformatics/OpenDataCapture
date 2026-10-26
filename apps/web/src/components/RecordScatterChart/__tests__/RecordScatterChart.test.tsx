@@ -92,6 +92,21 @@ describe('RecordScatterChart', () => {
     expect(renderChart({ trend: { intercept: 0, slope: 1 } }).querySelector('.recharts-reference-line')).toBeTruthy();
   });
 
+  it('should span the trend line from the earliest point even when it comes last in the data', () => {
+    const reversed: RecordChartSeries = {
+      color: '#111111',
+      key: 'a',
+      label: 'a',
+      points: [
+        { time: JANUARY_SECOND, value: 20 },
+        { time: new Date(2026, 0, 1, 12).getTime(), value: 10 }
+      ]
+    };
+    expect(
+      renderChart({ series: [reversed], trend: { intercept: 0, slope: 1 } }).querySelector('.recharts-reference-line')
+    ).toBeTruthy();
+  });
+
   it('should draw no trend line when there is no regression', () => {
     expect(renderChart().querySelector('.recharts-reference-line')).toBeNull();
   });

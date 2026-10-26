@@ -298,6 +298,17 @@ describe('instrument graph trend', () => {
     expect(screen.getByTestId('scatter-chart').dataset.trend).toBe('null');
   });
 
+  it('should drop the trend when any filter narrows the visible records', () => {
+    renderGraph({ search: { colourBy: 'none', measure: 'score' } });
+    expect(screen.getByTestId('scatter-chart').dataset.trend).not.toBe('null');
+    cleanup();
+    renderGraph({
+      search: { colourBy: 'none', measure: 'score', methods: ['IN_PERSON'] } as unknown as Partial<Search>
+    });
+    expect(mocks.useLinearModelQuery.mock.lastCall?.[0]).toMatchObject({ enabled: false });
+    expect(screen.getByTestId('scatter-chart').dataset.trend).toBe('null');
+  });
+
   it('should draw no trend when the instrument has no regression for the charted measure', () => {
     mocks.useLinearModelQuery.mockReturnValue({ data: {} });
     renderGraph();

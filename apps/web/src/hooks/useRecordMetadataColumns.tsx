@@ -44,9 +44,9 @@ export function useRecordMetadataColumns({
     columns.push({
       accessorKey: '__seriesName__',
       cell: (ctx) => {
-        // A series title is the longest thing in the row and the first to wrap, which is what
-        // drove this column to one clipped line.
-        const label = (ctx.getValue() as null | string) ?? noneLabel;
+        const seriesId = ctx.row.original.__seriesId__;
+        const seriesName = ctx.getValue() as null | string;
+        const label = seriesId ? (seriesName ?? seriesId) : noneLabel;
         return <TruncatedCell data-testid="record-cell-series" title={label} value={label} />;
       },
       // Filtered on the id rather than the displayed name, since a name is not a stable identity.

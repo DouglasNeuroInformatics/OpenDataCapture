@@ -16,6 +16,7 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
 
 const recordOf = (overrides: Partial<InstrumentVisualizationRecord>): InstrumentVisualizationRecord => ({
   __date__: new Date('2024-01-01'),
+  __groupId__: 'group-1',
   __id__: 'record-1',
   __instrumentId__: 'instrument-1',
   __method__: 'IN_PERSON',

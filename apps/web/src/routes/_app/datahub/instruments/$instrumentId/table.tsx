@@ -152,23 +152,31 @@ const RouteComponent = () => {
   const { t } = useTranslation();
   const seriesMembers = useSeriesMemberRows(records, instrumentInfoById);
 
-  const measureColumns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(() => {
-    const columns: TanstackTable.ColumnDef<InstrumentVisualizationRecord>[] = [];
-    for (const key in records[0]) {
-      if (!key.startsWith(FIXED_COLUMN_PREFIX)) {
-        columns.push({
-          accessorKey: key,
-          cell: (ctx) => {
-            const value = formatRecordValue(ctx.getValue());
-            return <TruncatedCell data-testid={`instrument-table-cell-${key}`} title={String(value)} value={value} />;
-          },
-          header: ({ column }) => <SortableHeader column={column} label={camelToSnakeCase(key).toUpperCase()} />,
-          id: key
-        });
+  const measureKeys = useMemo(() => {
+    const keys = new Set<string>();
+    for (const record of records) {
+      for (const key in record) {
+        if (!key.startsWith(FIXED_COLUMN_PREFIX)) {
+          keys.add(key);
+        }
       }
     }
-    return columns;
-  }, [records[0]]);
+    return Array.from(keys);
+  }, [records]);
+
+  const measureColumns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(
+    () =>
+      measureKeys.map((key) => ({
+        accessorKey: key,
+        cell: (ctx) => {
+          const value = formatRecordValue(ctx.getValue());
+          return <TruncatedCell data-testid={`instrument-table-cell-${key}`} title={String(value)} value={value} />;
+        },
+        header: ({ column }) => <SortableHeader column={column} label={camelToSnakeCase(key).toUpperCase()} />,
+        id: key
+      })),
+    [measureKeys]
+  );
 
   // Both subject destinations carry where they were opened from, so the subject hub's return comes
   // back to this record table rather than dropping the reader on the subject index.
@@ -186,8 +194,12 @@ const RouteComponent = () => {
     return (
       <InstrumentTable
         data-testid="instrument-hub-series-members"
+        minRecords={search.minRecords}
         recordExport={dl}
         rows={seriesMembers}
+        onMinRecordsChange={(value) => {
+          void navigate({ search: (prev) => ({ ...prev, minRecords: value }) });
+        }}
         onOpen={(row) => {
           void navigate({
             params: { instrumentId: row.id },
@@ -217,9 +229,10 @@ const RouteComponent = () => {
           </div>
           <div className="flex flex-col gap-2 lg:flex-row">
             <TimeDropdown
-              setMinTime={(minDate) => {
-                void navigate({ search: (prev) => ({ ...prev, minDate: minDate ?? undefined }) });
+              setMinTime={(minDate, key) => {
+                void navigate({ search: (prev) => ({ ...prev, minDate: minDate ?? undefined, minDateKey: key }) });
               }}
+              value={search.minDateKey}
             />
             <Filters seriesOptions={seriesOptions} />
             <ActionDropdown

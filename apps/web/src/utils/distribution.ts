@@ -8,6 +8,17 @@ type DistributionRow = {
 
 const TARGET_BIN_COUNT = 10;
 
+function reduceMinMax(values: number[]): { max: number; min: number } {
+  let min = values[0]!;
+  let max = values[0]!;
+  for (let i = 1; i < values.length; i++) {
+    const v = values[i]!;
+    if (v < min) min = v;
+    if (v > max) max = v;
+  }
+  return { max, min };
+}
+
 /**
  * Counts each series' values into shared bins.
  *
@@ -36,9 +47,7 @@ function binDistribution(series: RecordChartSeries[], isNumeric: boolean): Distr
   if (values.length === 0) {
     return [];
   }
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  // A measure whose every record holds the same value has no range to divide, so it gets one bin.
+  const { max, min } = reduceMinMax(values);
   const binCount = min === max ? 1 : TARGET_BIN_COUNT;
   const binWidth = min === max ? 1 : (max - min) / binCount;
 
@@ -56,8 +65,8 @@ function binDistribution(series: RecordChartSeries[], isNumeric: boolean): Distr
 
   for (const item of series) {
     for (const point of item.points) {
-      // The final bin is closed at the top, so the maximum value is counted rather than overflowing.
-      const index = Math.min(binCount - 1, Math.floor((Number(point.value) - min) / binWidth));
+      const raw = (Number(point.value) - min) / binWidth;
+      const index = Math.min(binCount - 1, Math.floor(raw + 1e-10));
       const row = rows[index]!;
       row[item.key] = (row[item.key] as number) + 1;
     }

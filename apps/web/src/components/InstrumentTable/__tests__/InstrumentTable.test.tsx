@@ -125,6 +125,20 @@ describe('InstrumentTable', () => {
     expect(listedTitles()).toStrictEqual(['Stroop Task']);
   });
 
+  it('should initialize the minimum records input from the controlled value', () => {
+    render(
+      <InstrumentTable
+        minRecords={5}
+        rows={[row({ recordCount: 3 }), row({ id: 'hq-2', recordCount: 10, title: 'Big Study' })]}
+        onOpen={vi.fn()}
+      />
+    );
+    openFilters();
+    const input: HTMLInputElement = screen.getByTestId('instrument-table-filter-min-records');
+    expect(input.value).toBe('5');
+    expect(listedTitles()).toStrictEqual(['Big Study']);
+  });
+
   it('should list only instruments holding at least the minimum number of records', () => {
     renderTable([row(), row({ id: 'never-1', recordCount: 0, subjectCount: 0, title: 'Never Collected' })]);
     openFilters();

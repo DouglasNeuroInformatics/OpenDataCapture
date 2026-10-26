@@ -13,6 +13,7 @@ import '@/services/i18n';
 
 const record = (overrides: Partial<InstrumentVisualizationRecord> = {}): InstrumentVisualizationRecord => ({
   __date__: new Date('2025-01-01'),
+  __groupId__: 'group-1',
   __id__: 'record-1',
   __instrumentId__: 'instrument-1',
   __method__: 'IN_PERSON',
@@ -80,8 +81,17 @@ describe('useRecordMetadataColumns', () => {
   });
 
   it('should show the series name when the record was collected under one', () => {
-    renderCell('__seriesName__', 'Happiness Series', record({ __seriesName__: 'Happiness Series' }));
+    renderCell(
+      '__seriesName__',
+      'Happiness Series',
+      record({ __seriesId__: 'series-1', __seriesName__: 'Happiness Series' })
+    );
     expect(screen.getByTestId('record-cell-series').textContent).toBe('Happiness Series');
+  });
+
+  it('should fall back to the series id when the name has not resolved', () => {
+    renderCell('__seriesName__', null, record({ __seriesId__: 'series-1', __seriesName__: null }));
+    expect(screen.getByTestId('record-cell-series').textContent).toBe('series-1');
   });
 
   // The presence of a series name is itself the individual-vs-series answer, so the absence has to

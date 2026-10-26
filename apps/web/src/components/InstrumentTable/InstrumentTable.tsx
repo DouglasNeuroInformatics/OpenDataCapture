@@ -76,10 +76,14 @@ const InstrumentKindCell = ({ kind }: { kind: InstrumentKind }) => {
  * export exactly the rows left on screen.
  */
 const Toolbar = ({
+  minRecords: controlledMinRecords,
+  onMinRecordsChange,
   recordExport,
   rows,
   table
 }: {
+  minRecords?: number;
+  onMinRecordsChange?: (value: number) => void;
   recordExport?: (option: RecordExportOption) => void;
   rows: InstrumentRow[];
   table: TanstackTable.Table<InstrumentRow>;
@@ -89,9 +93,7 @@ const Toolbar = ({
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const kindLabels = useInstrumentKindLabels();
   const [isOpen, setIsOpen] = useState(false);
-  // Held as the raw string: coercing to a number on every keystroke re-seeded a `0` the moment the
-  // field was cleared, so typed digits landed after it instead of replacing it.
-  const [minRecords, setMinRecords] = useState('');
+  const [minRecords, setMinRecords] = useState(controlledMinRecords ? String(controlledMinRecords) : '');
 
   // Each column is declared below with these ids, and `initialState.columnFilters` seeds all three.
   const columnsById = new Map(table.getAllColumns().map((column) => [column.id, column]));
@@ -192,8 +194,9 @@ const Toolbar = ({
                 value={minRecords}
                 onChange={(event) => {
                   setMinRecords(event.target.value);
-                  // An empty field means no minimum, which is why the parse falls back to zero.
-                  recordColumn.setFilterValue(Number.parseInt(event.target.value, 10) || 0);
+                  const parsed = Number.parseInt(event.target.value, 10) || 0;
+                  recordColumn.setFilterValue(parsed);
+                  onMinRecordsChange?.(parsed);
                 }}
               />
             </div>
@@ -262,6 +265,8 @@ const Toolbar = ({
 
 type InstrumentTableProps = {
   'data-testid'?: string;
+  minRecords?: number;
+  onMinRecordsChange?: (value: number) => void;
   onOpen: (row: InstrumentRow) => void;
   /**
    * Offered as a second export section, for the records behind the listing rather than the listing
@@ -276,7 +281,14 @@ type InstrumentTableProps = {
  * The instrument listing, shared by the hub's index and by a series' own page so the two read the
  * same way: same columns, same sort affordances, same search, filters and export.
  */
-export const InstrumentTable = ({ 'data-testid': testId, onOpen, recordExport, rows }: InstrumentTableProps) => {
+export const InstrumentTable = ({
+  'data-testid': testId,
+  minRecords: controlledMinRecords,
+  onMinRecordsChange,
+  onOpen,
+  recordExport,
+  rows
+}: InstrumentTableProps) => {
   const { t } = useTranslation();
   const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
   const [preview, setPreview] = useState<InstrumentPreviewItem | null>(null);
@@ -313,11 +325,17 @@ export const InstrumentTable = ({ 'data-testid': testId, onOpen, recordExport, r
 
   const ToolbarWithRows = useMemo(() => {
     const Component = (props: { table: TanstackTable.Table<InstrumentRow> }) => (
-      <Toolbar {...props} recordExport={recordExport} rows={rows} />
+      <Toolbar
+        {...props}
+        minRecords={controlledMinRecords}
+        recordExport={recordExport}
+        rows={rows}
+        onMinRecordsChange={onMinRecordsChange}
+      />
     );
     Component.displayName = 'InstrumentTableToolbar';
     return Component;
-  }, [recordExport, rows]);
+  }, [controlledMinRecords, onMinRecordsChange, recordExport, rows]);
 
   return (
     <div className="flex grow flex-col" data-testid={testId}>
@@ -421,7 +439,7 @@ export const InstrumentTable = ({ 'data-testid': testId, onOpen, recordExport, r
           // eslint-disable-next-line perfectionist/sort-objects
           columnFilters: [
             { id: 'kind', value: [...INSTRUMENT_KINDS] satisfies KindFilter },
-            { id: 'recordCount', value: 0 },
+            { id: 'recordCount', value: controlledMinRecords ?? 0 },
             { id: 'lastCollectedAt', value: DEFAULT_COLLECTED_FILTER }
           ]
         }}

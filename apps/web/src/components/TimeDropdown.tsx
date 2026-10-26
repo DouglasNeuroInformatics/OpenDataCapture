@@ -1,27 +1,32 @@
 import { Select } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
+type TimeDropdownSelection = 'all' | 'pastMonth' | 'pastYear';
+
 type TimeDropdownProps = {
   disabled?: boolean;
-  setMinTime: (value: Date | null) => void;
+  setMinTime: (value: Date | null, key?: TimeDropdownSelection) => void;
+  value?: TimeDropdownSelection;
 };
 
-export const TimeDropdown = ({ disabled, setMinTime }: TimeDropdownProps) => {
+export const TimeDropdown = ({ disabled, setMinTime, value }: TimeDropdownProps) => {
   const { t } = useTranslation('datahub');
 
+  const handleChange = (selection: string) => {
+    const key = selection as TimeDropdownSelection;
+    if (key === 'pastYear') {
+      setMinTime(new Date(new Date().setFullYear(new Date().getFullYear() - 1)), key);
+    } else if (key === 'pastMonth') {
+      setMinTime(new Date(new Date().setMonth(new Date().getMonth() - 1)), key);
+    } else {
+      setMinTime(null, key);
+    }
+  };
+
+  const controlled = value !== undefined;
+
   return (
-    <Select
-      defaultValue="all"
-      onValueChange={(selection) => {
-        if (selection === 'pastYear') {
-          setMinTime(new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
-        } else if (selection === 'pastMonth') {
-          setMinTime(new Date(new Date().setMonth(new Date().getMonth() - 1)));
-        } else {
-          setMinTime(null);
-        }
-      }}
-    >
+    <Select {...(controlled ? { value } : { defaultValue: 'all' })} onValueChange={handleChange}>
       <Select.Trigger className="min-w-32" data-testid="time-dropdown-trigger" disabled={disabled}>
         <Select.Value placeholder={t('visualization.timeframe')} />
       </Select.Trigger>
@@ -41,3 +46,5 @@ export const TimeDropdown = ({ disabled, setMinTime }: TimeDropdownProps) => {
     </Select>
   );
 };
+
+export type { TimeDropdownSelection };

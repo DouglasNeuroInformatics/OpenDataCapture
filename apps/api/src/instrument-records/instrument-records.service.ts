@@ -225,7 +225,7 @@ export class InstrumentRecordsService {
 
     const instruments = new Map(instrumentsArray.map((instrument) => [instrument.id, instrument]));
 
-    const seriesNames = await this.resolveSeriesNames(records);
+    const seriesNames = await this.resolveSeriesNames(records, { ability });
 
     const numWorkers = Math.min(cpus().length, Math.ceil(records.length / 100)); // Use up to CPU count, chunk size 100
     const chunkSize = Math.ceil(records.length / numWorkers);
@@ -291,7 +291,7 @@ export class InstrumentRecordsService {
       await this.instrumentsService.findById(instrumentId);
     }
     if (seriesInstrumentId) {
-      const series = await this.instrumentsService.findById(seriesInstrumentId);
+      const series = await this.instrumentsService.findById(seriesInstrumentId, { ability });
       if (series.kind !== 'SERIES') {
         throw new UnprocessableEntityException(
           `Instrument '${seriesInstrumentId}' is not a series instrument, so it orchestrates no records`
@@ -697,13 +697,16 @@ export class InstrumentRecordsService {
    * `en`, because a background worker has no request language. The stable identifier an analysis
    * should key on is the accompanying `seriesId`.
    */
-  private async resolveSeriesNames(records: RecordType[]): Promise<{ [id: string]: string }> {
+  private async resolveSeriesNames(
+    records: RecordType[],
+    { ability }: EntityOperationOptions = {}
+  ): Promise<{ [id: string]: string }> {
     const seriesIds = new Set(
       records.flatMap((record) => (record.seriesInstrumentId ? [record.seriesInstrumentId] : []))
     );
     const entries = await Promise.all(
       seriesIds.values().map(async (id) => {
-        const instrument = await this.instrumentsService.findById(id);
+        const instrument = await this.instrumentsService.findById(id, { ability });
         return [id, translateInstrument(instrument, 'en').details.title] as const;
       })
     );

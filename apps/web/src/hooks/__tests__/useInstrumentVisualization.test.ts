@@ -44,6 +44,7 @@ const createMockRecords = (data: { [key: string]: unknown }) => [
     computedMeasures: {},
     data,
     date: FIXED_TEST_DATE,
+    groupId: 'group-1',
     instrumentId: 'instrument-1',
     session: { user: { username: 'testusername' } },
     sessionId: '123',
@@ -140,7 +141,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvContents = getContentFn();
       expect(csvContents).toMatch(
-        `GroupID,SubjectID,InstrumentName,InstrumentEdition,Date,CollectionMethod,SeriesID,SeriesName,Username,someValue\r\ntestGroupId,subject-1,instrument-1,,${toBasicISOString(FIXED_TEST_DATE)},,,,testusername,abc`
+        `GroupID,SubjectID,InstrumentName,InstrumentEdition,Date,CollectionMethod,SeriesID,SeriesName,Username,someValue\r\ngroup-1,subject-1,instrument-1,,${toBasicISOString(FIXED_TEST_DATE)},,,,testusername,abc`
       );
     });
   });
@@ -158,7 +159,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.tsv');
       const tsvContents = getContentFn();
       expect(tsvContents).toMatch(
-        `GroupID\tSubjectID\tInstrumentName\tInstrumentEdition\tDate\tCollectionMethod\tSeriesID\tSeriesName\tUsername\tsomeValue\r\ntestGroupId\tsubject-1\tinstrument-1\t\t${toBasicISOString(FIXED_TEST_DATE)}\t\t\t\ttestusername\tabc`
+        `GroupID\tSubjectID\tInstrumentName\tInstrumentEdition\tDate\tCollectionMethod\tSeriesID\tSeriesName\tUsername\tsomeValue\r\ngroup-1\tsubject-1\tinstrument-1\t\t${toBasicISOString(FIXED_TEST_DATE)}\t\t\t\ttestusername\tabc`
       );
     });
   });
@@ -177,7 +178,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toContain('.csv');
       const csvLongContents = getContentFn();
       expect(csvLongContents).toMatch(
-        `GroupID,SubjectID,InstrumentName,InstrumentEdition,Date,CollectionMethod,SeriesID,SeriesName,Username,Variable,Value\r\ntestGroupId,subject-1,instrument-1,,${toBasicISOString(FIXED_TEST_DATE)},,,,testusername,someValue,abc`
+        `GroupID,SubjectID,InstrumentName,InstrumentEdition,Date,CollectionMethod,SeriesID,SeriesName,Username,Variable,Value\r\ngroup-1,subject-1,instrument-1,,${toBasicISOString(FIXED_TEST_DATE)},,,,testusername,someValue,abc`
       );
     });
   });
@@ -196,7 +197,7 @@ describe('useInstrumentVisualization', () => {
       expect(filename).toMatch('.tsv');
       const tsvLongContents = getContentFn();
       expect(tsvLongContents).toMatch(
-        `GroupID\tSubjectID\tInstrumentName\tInstrumentEdition\tDate\tCollectionMethod\tSeriesID\tSeriesName\tUsername\tVariable\tValue\r\ntestGroupId\tsubject-1\tinstrument-1\t\t${toBasicISOString(FIXED_TEST_DATE)}\t\t\t\ttestusername\tsomeValue\tabc`
+        `GroupID\tSubjectID\tInstrumentName\tInstrumentEdition\tDate\tCollectionMethod\tSeriesID\tSeriesName\tUsername\tVariable\tValue\r\ngroup-1\tsubject-1\tinstrument-1\t\t${toBasicISOString(FIXED_TEST_DATE)}\t\t\t\ttestusername\tsomeValue\tabc`
       );
     });
   });
@@ -218,7 +219,7 @@ describe('useInstrumentVisualization', () => {
         {
           CollectionMethod: null,
           Date: '2025-04-30',
-          GroupID: 'testGroupId',
+          GroupID: 'group-1',
           InstrumentEdition: null,
           InstrumentName: 'instrument-1',
           SeriesID: null,
@@ -250,7 +251,7 @@ describe('useInstrumentVisualization', () => {
         {
           CollectionMethod: null,
           Date: '2025-04-30',
-          GroupID: 'testGroupId',
+          GroupID: 'group-1',
           InstrumentEdition: null,
           InstrumentName: 'instrument-1',
           SeriesID: null,
@@ -271,6 +272,7 @@ describe('useInstrumentVisualization', () => {
         computedMeasures: {},
         data: { someValue: 'abc' },
         date: FIXED_TEST_DATE,
+        groupId: 'group-1',
         instrumentId: 'member-1',
         seriesInstrumentId: 'series-1',
         session: { user: { username: 'testusername' } },
@@ -281,6 +283,7 @@ describe('useInstrumentVisualization', () => {
         computedMeasures: {},
         data: { otherValue: 7 },
         date: FIXED_TEST_DATE,
+        groupId: 'group-1',
         instrumentId: 'member-2',
         seriesInstrumentId: 'series-1',
         session: { user: { username: 'testusername' } },
@@ -464,21 +467,30 @@ describe('useInstrumentVisualization', () => {
       const result = await renderWithRecords(createMockRecords({ items: [{ a: 1, b: 2 }] }));
       act(() => result.current.dl('Excel Long'));
       expect(mockExcelDownloadFn.mock.calls[0]?.[1]).toEqual([
-        expect.objectContaining({ GroupID: 'testGroupId', Value: 1, Variable: 'items-a' }),
-        expect.objectContaining({ GroupID: 'testGroupId', Value: 2, Variable: 'items-b' })
+        expect.objectContaining({ GroupID: 'group-1', Value: 1, Variable: 'items-a' }),
+        expect.objectContaining({ GroupID: 'group-1', Value: 2, Variable: 'items-b' })
       ]);
     });
 
-    it('should attribute a wide export to the root group when no group is selected', async () => {
+    it('should attribute a wide export to the record group, not the current group', async () => {
       mockStore.currentGroup = null;
       const result = await renderWithRecords(createMockRecords({ someValue: 'abc' }));
+      act(() => result.current.dl('Excel'));
+      expect(mockExcelDownloadFn.mock.calls[0]?.[1]).toMatchObject([{ GroupID: 'group-1' }]);
+    });
+
+    it('should fall back to the root group name when the record carries no group', async () => {
+      const records = createMockRecords({ someValue: 'abc' });
+      delete (records[0] as { [key: string]: unknown }).groupId;
+      const result = await renderWithRecords(records);
       act(() => result.current.dl('Excel'));
       expect(mockExcelDownloadFn.mock.calls[0]?.[1]).toMatchObject([{ GroupID: 'root' }]);
     });
 
-    it('should attribute every long export row to the root group when no group is selected', async () => {
-      mockStore.currentGroup = null;
-      const result = await renderWithRecords(createMockRecords({ items: [{ a: 1 }], someValue: 'abc' }));
+    it('should attribute every long export row to the root group when the record carries no group', async () => {
+      const records = createMockRecords({ items: [{ a: 1 }], someValue: 'abc' });
+      delete (records[0] as { [key: string]: unknown }).groupId;
+      const result = await renderWithRecords(records);
       act(() => result.current.dl('Excel Long'));
       expect(mockExcelDownloadFn.mock.calls[0]?.[1]).toEqual([
         expect.objectContaining({ GroupID: 'root', Variable: 'items-a' }),
@@ -501,6 +513,7 @@ describe('useInstrumentVisualization', () => {
       expect(result.current.records).toEqual([
         {
           __date__: FIXED_TEST_DATE,
+          __groupId__: null,
           __id__: 'record-1',
           __instrumentId__: 'instrument-1',
           __method__: null,

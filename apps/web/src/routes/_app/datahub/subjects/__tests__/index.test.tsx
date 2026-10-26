@@ -473,8 +473,7 @@ describe('data hub export', () => {
     await settleExport();
     const [filename, content] = mocks.download.mock.calls[0] ?? [];
     expect(filename).toMatch(/^jdoe_.+\.json$/);
-    const { seriesId: _, ...expected } = exportEntry('bob');
-    expect(JSON.parse(content ?? 'null')).toEqual([expected]);
+    expect(JSON.parse(content ?? 'null')).toEqual([exportEntry('bob')]);
   });
 
   it('should download a CSV together with a README explaining its long format', async () => {
@@ -494,10 +493,9 @@ describe('data hub export', () => {
     renderDataHub();
     exportAs('Excel');
     await settleExport();
-    const { seriesId: _, ...expected } = exportEntry('bob');
     expect(mocks.downloadSubjectTableExcel).toHaveBeenCalledWith(
       expect.stringMatching(/^jdoe_.+\.xlsx$/),
-      [expected],
+      [exportEntry('bob')],
       'Records'
     );
   });

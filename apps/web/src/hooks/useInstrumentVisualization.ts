@@ -22,6 +22,7 @@ import { formatRecordValue } from '@/utils/record-value';
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
   __date__: Date;
+  __groupId__: null | string;
   __id__: string;
   /** The scalar instrument actually administered, which varies across a series */
   __instrumentId__: string;
@@ -38,6 +39,7 @@ type InstrumentVisualizationRecord = {
 /** The record fields that become fixed metadata columns rather than measure columns */
 const EXPORT_METADATA_KEYS = [
   '__date__',
+  '__groupId__',
   '__id__',
   '__instrumentId__',
   '__method__',
@@ -92,11 +94,11 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
   );
 
   // The per-instrument view takes its instrument from the route, so a navigation between editions
-  // changes it underneath this hook rather than through setInstrumentId.
+  // changes it underneath this hook rather than through setInstrumentId. A series page carries no
+  // instrumentId, so clear the state when the caller switches to one — otherwise the member's id
+  // survives the navigation and every download throws on the stale instrument.
   useEffect(() => {
-    if (params.instrumentId) {
-      setInstrumentId(params.instrumentId);
-    }
+    setInstrumentId(params.instrumentId ?? null);
   }, [params.instrumentId]);
 
   const instrument = useInstrument(instrumentId) as AnyUnilingualScalarInstrument;
@@ -145,7 +147,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       meta: {
         collectionMethod: record.__method__,
         date: toBasicISOString(record.__date__),
-        groupId: currentGroup ? currentGroup.id : DEFAULT_GROUP_NAME,
+        groupId: record.__groupId__ ?? DEFAULT_GROUP_NAME,
         instrumentEdition: instrumentInfoById[record.__instrumentId__]?.edition ?? null,
         // Falls back to the id so a row is never anonymous, even if the catalog no longer lists it.
         instrumentName: instrumentInfoById[record.__instrumentId__]?.title ?? record.__instrumentId__,
@@ -293,6 +295,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
           return {
             __date__: record.date,
+            __groupId__: record.groupId ?? null,
             __id__: record.id,
             __instrumentId__: record.instrumentId,
             __method__: record.session?.type ?? null,

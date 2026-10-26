@@ -277,7 +277,7 @@ const Toggles: React.FC<{
           );
         }
 
-        const exportData = filteredData.map(({ seriesId: _, ...rest }) => rest);
+        const exportData = filteredData;
 
         switch (option) {
           case 'CSV':

@@ -19,7 +19,7 @@ import { resolveTheme } from '@/utils/chart-theme';
 
 const RouteComponent = () => {
   const navigate = Route.useNavigate();
-  const { chart, colourBy, measure, palette } = Route.useSearch();
+  const { chart, colourBy, measure, methods, minDate, palette, series: seriesFilter } = Route.useSearch();
   const currentGroup = useAppStore((store) => store.currentGroup);
   const { instrument, instrumentId, records } = useInstrumentHubRecords();
   const { t } = useTranslation();
@@ -65,7 +65,8 @@ const RouteComponent = () => {
 
   // The regression is a property of the instrument across the whole group, so it is only an honest
   // overlay when the plotted set has not been narrowed to a subgroup.
-  const isTrendComparable = colourBy === 'none' && series.length <= 1;
+  const hasActiveFilters = Boolean(methods ?? minDate ?? seriesFilter);
+  const isTrendComparable = colourBy === 'none' && series.length <= 1 && !hasActiveFilters;
   const linearModelQuery = useLinearModelQuery({
     enabled: Boolean(instrumentId) && isNumeric && isTrendComparable,
     params: { groupId: currentGroup?.id, instrumentId: instrumentId! }

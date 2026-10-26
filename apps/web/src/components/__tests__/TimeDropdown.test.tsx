@@ -33,14 +33,14 @@ describe('TimeDropdown', () => {
     const setMinTime = vi.fn();
     render(<TimeDropdown setMinTime={setMinTime} />);
     choose('Past Year');
-    expect(setMinTime).toHaveBeenCalledWith(new Date(2025, 2, 15, 12));
+    expect(setMinTime).toHaveBeenCalledWith(new Date(2025, 2, 15, 12), 'pastYear');
   });
 
   it('should set the minimum time to one month ago when the past month is chosen', () => {
     const setMinTime = vi.fn();
     render(<TimeDropdown setMinTime={setMinTime} />);
     choose('Past Month');
-    expect(setMinTime).toHaveBeenCalledWith(new Date(2026, 1, 15, 12));
+    expect(setMinTime).toHaveBeenCalledWith(new Date(2026, 1, 15, 12), 'pastMonth');
   });
 
   it('should clear the minimum time when all time is chosen again, so no record is filtered out', () => {
@@ -48,7 +48,12 @@ describe('TimeDropdown', () => {
     render(<TimeDropdown setMinTime={setMinTime} />);
     choose('Past Year');
     choose('All-Time');
-    expect(setMinTime).toHaveBeenLastCalledWith(null);
+    expect(setMinTime).toHaveBeenLastCalledWith(null, 'all');
+  });
+
+  it('should reflect a controlled value so the selection survives a remount', () => {
+    render(<TimeDropdown setMinTime={vi.fn()} value="pastYear" />);
+    expect(trigger().textContent).toBe('Past Year');
   });
 
   it('should disable the trigger when asked', () => {
