@@ -19,12 +19,13 @@
  * limitations under the License.
  */
 
-import { parse as _parse, ImportType, init } from 'es-module-lexer';
+import { parse as _parse, init } from 'es-module-lexer';
+import type { Import as LexedImport } from 'es-module-lexer';
 import { removeSlashes } from 'slashes';
 
 import { InstrumentBundlerError } from './error.js';
 
-await init;
+await init();
 
 /**
  * A type representing what kind of module a specifier refers to.
@@ -284,19 +285,26 @@ export function parseModuleSpecifier(moduleSpecifierString: string, { isDynamicI
   } as const;
 }
 
+// es-module-lexer 2 reported the module request of `export * from` as a static import
+const importTypes = {
+  dynamic: 'Dynamic',
+  'import-meta': 'ImportMeta',
+  'reexport-star': 'Static',
+  static: 'Static'
+} as const satisfies { [TLexedType in LexedImport['type']]: 'Dynamic' | 'ImportMeta' | 'Static' };
+
 export function parse(code: string) {
   const [imports, exports] = _parse(code);
   return {
-    exports: exports.map(({ n }) => ({ exportName: n })),
-    imports: imports.map(({ d, e, n, s, se, ss, t }) => ({
-      dynamicImportStartIndex: d,
-      importPath: n,
-      importType: ImportType[t],
-      moduleSpecifierEndIndexExclusive: e,
-      moduleSpecifierStartIndex: s,
-      statement: code.slice(ss, se),
-      statementEndIndex: se,
-      statementStartIndex: ss
+    exports: exports.filter((record) => record.type !== 'reexport-all').map(({ name }) => ({ exportName: name })),
+    imports: imports.map(({ end, importEnd, importStart, specifier, start, type }) => ({
+      importPath: specifier,
+      importType: importTypes[type],
+      moduleSpecifierEndIndexExclusive: end,
+      moduleSpecifierStartIndex: start,
+      statement: code.slice(importStart, importEnd),
+      statementEndIndex: importEnd,
+      statementStartIndex: importStart
     }))
   };
 }
@@ -308,18 +316,18 @@ export function parseImports(code: string): Iterable<Import> {
     *[Symbol.iterator]() {
       for (let {
         // eslint-disable-next-line prefer-const
-        dynamicImportStartIndex,
+        importType,
         moduleSpecifierEndIndexExclusive,
         moduleSpecifierStartIndex,
         // eslint-disable-next-line prefer-const
         statementStartIndex
       } of imports) {
-        const isImportMeta = dynamicImportStartIndex === -2;
+        const isImportMeta = importType === 'ImportMeta';
         if (isImportMeta) {
           continue;
         }
 
-        const isDynamicImport = dynamicImportStartIndex > -1;
+        const isDynamicImport = importType === 'Dynamic';
 
         // Include string literal quotes in character range
         if (!isDynamicImport) {

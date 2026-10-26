@@ -72,14 +72,23 @@ that the controller actually forwards `@CurrentUser('ability')` — `EntityOpera
 is optional, so a controller that simply never passes it compiles and runs.
 
 **A defined ability holding no rule for the queried subject does not produce a deny-all filter —
-CASL's `accessibleBy` throws `ForbiddenError`.** That error is not an `HttpException`, so the
+`accessibleQuery` throws CASL's `ForbiddenError`.** That error is not an `HttpException`, so the
 global exception filter renders it as a 500. It is reachable whenever the route guard names a
 different subject than the service queries: a STANDARD user passes a `read Instrument` guard but
 holds no rule on `InstrumentRecord`, so a record query made on their behalf throws. The throw is
 deliberate — `accessibleQuery` is kept as-is rather than returning a deny-all filter — so where
 such a caller is legitimate, guard the query with `ability.can(action, subject)` and return the
 empty result instead; `findInstrumentIdsBySubject` in `src/instruments/instruments.service.ts` is
-the reference example.
+the reference example. `ability.can` refuses in every case where the query would throw, so the
+guard always pre-empts it.
+
+The throw is `accessibleQuery`'s own. `@casl/prisma` 2's `accessibleBy(...).ofType(...)` no longer
+throws: it returns `{ OR: [] }`, which Prisma ignores once it is nested in an `AND`
+(prisma/prisma#17367, reproducible on this MongoDB stack), so passed on it would lift the
+restriction rather than apply it. `accessibleQuery` throws on that marker instead, under exactly the
+condition `@casl/prisma` 1 threw. That is also why the client in `src/core/prisma.ts` carries no
+`createCaslExtension()`, which upstream offers to turn the marker into an empty result: the marker
+never reaches Prisma. Call `accessibleBy` only through `accessibleQuery`.
 
 One call site uses `{ ...accessibleQuery(...), id: subjectId }` instead of `AND: [...]`
 (`src/subjects/subjects.service.ts`). Spreading merges keys and will silently lose a condition if
@@ -208,8 +217,8 @@ add it to the `$GroupScopableSubjectName` exclusion.
 
 - `src/auth/__tests__/ability.factory.test.ts` — role-to-rule mapping. Each case asserts an allow
   _and_ a deny.
-- `src/auth/__tests__/ability.utils.test.ts` — pins the `undefined` ability behavior and
-  `forcedAppSubject`.
+- `src/auth/__tests__/ability.utils.test.ts` — pins the `undefined` ability behavior, the
+  no-rule throw (including `cannot` rules) and `forcedAppSubject`, against the real CASL.
 - `src/auth/guards/__tests__/jwt-auth.guard.test.ts` — the guard's own branches.
 
 Service tests mock the Prisma layer, so they verify the arguments passed to the model, not the

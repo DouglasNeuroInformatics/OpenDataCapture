@@ -1,5 +1,6 @@
 import type { Server } from 'http';
 
+import type Cap from '@cap.js/server';
 import express from 'express';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -10,11 +11,13 @@ import { $VerifyRequest, capRouter } from '../cap.router';
 
 const { cap } = vi.hoisted(() => ({
   cap: {
-    createChallenge: vi.fn(),
-    redeemChallenge: vi.fn(),
-    validateToken: vi.fn()
+    createChallenge: vi.fn<Cap['createChallenge']>(),
+    redeemChallenge: vi.fn<Cap['redeemChallenge']>(),
+    validateToken: vi.fn<Cap['validateToken']>()
   }
 }));
+
+const challenge = { challenge: { c: 1, d: 4, s: 2 }, expires: 1_000, token: 'challenge-token' };
 
 vi.mock('@/lib/cap', () => ({ cap }));
 vi.mock('@/logger', () => ({ logger: { error: vi.fn() } }));
@@ -64,11 +67,16 @@ describe('$VerifyRequest', () => {
 });
 
 describe('POST /challenge', () => {
-  it('should issue a challenge that expires in five minutes, so a stale challenge cannot be solved later', async () => {
-    cap.createChallenge.mockReturnValueOnce({ challenge: { c: 1, d: 4, s: 2 }, token: 'challenge-token' });
+  it('should respond with the challenge Cap resolves, not the pending promise, so the widget has a challenge to solve', async () => {
+    cap.createChallenge.mockResolvedValueOnce(challenge);
     const response = await post('/challenge', {});
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ challenge: { c: 1, d: 4, s: 2 }, token: 'challenge-token' });
+    expect(await response.json()).toEqual(challenge);
+  });
+
+  it('should issue a challenge that expires in five minutes, so a stale challenge cannot be solved later', async () => {
+    cap.createChallenge.mockResolvedValueOnce(challenge);
+    await post('/challenge', {});
     expect(cap.createChallenge).toHaveBeenCalledWith({ challengeDifficulty: 4, expiresMs: 300_000 });
   });
 });

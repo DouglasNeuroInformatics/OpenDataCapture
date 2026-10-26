@@ -12,8 +12,9 @@ import type {
   PanelSection,
   ResourceLink
 } from '@opendatacapture/schemas/setup';
-import { BookOpenIcon, GithubIcon, LinkIcon } from 'lucide-react';
+import { BookOpenIcon, LinkIcon } from 'lucide-react';
 
+import { GitHubIcon } from '@/components/GitHubIcon';
 import { config } from '@/config';
 import { getLoginGradient } from '@/utils/branding';
 import { getValueForLanguage } from '@/utils/language';
@@ -191,7 +192,7 @@ const PanelFooter = ({ preview, showFooterLinks, tc, tl }: PanelFooterProps) => 
           rel="noopener noreferrer"
           target="_blank"
         >
-          <GithubIcon className={preview ? 'h-3 w-3' : 'h-4 w-4'} />
+          <GitHubIcon className={preview ? 'h-3 w-3' : 'h-4 w-4'} />
           {tl({ en: 'Source Code', es: 'Código fuente', fr: 'Code source' })}
         </a>
         <a

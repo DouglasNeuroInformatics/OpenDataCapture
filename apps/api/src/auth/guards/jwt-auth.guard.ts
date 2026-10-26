@@ -1,4 +1,4 @@
-import { PureAbility } from '@casl/ability';
+import { Ability } from '@casl/ability';
 import { LoggingService } from '@douglasneuroinformatics/libnest';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import type { ExecutionContext } from '@nestjs/common';
@@ -55,7 +55,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     const ability = request.user?.ability;
 
-    if (!(ability instanceof PureAbility)) {
+    if (!(ability instanceof Ability)) {
       this.loggingService.error('User property of request does not include expected AppAbility');
       throw new InternalServerErrorException();
     }

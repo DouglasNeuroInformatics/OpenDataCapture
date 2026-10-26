@@ -15,7 +15,7 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
-import type { LineProps } from 'recharts';
+import type { LegendPayload, LineProps } from 'recharts';
 import type { ConditionalKeys } from 'type-fest';
 
 /** An array of arbitrary objects with data to graph  */
@@ -69,6 +69,8 @@ function LineGraphComponent<const T extends LineGraphData>({
   const { resolvedLanguage } = useTranslation('libui');
   const [theme] = useTheme();
 
+  const lineIndex = ({ dataKey }: Pick<LegendPayload, 'dataKey'>) => lines.findIndex(({ val }) => val === dataKey);
+
   return (
     <ResponsiveContainer height={400} width="100%">
       <LineChart data={[...data]} margin={{ bottom: 5, left: 15, right: 15, top: 5 }}>
@@ -99,8 +101,10 @@ function LineGraphComponent<const T extends LineGraphData>({
         />
         <Tooltip
           contentStyle={tooltipStyles[theme]}
-          labelFormatter={(time: number) => {
-            const date = new Date(time);
+          itemSorter={lineIndex}
+          // recharts types every tooltip label as a ReactNode, but on this number axis it is the x value
+          labelFormatter={(time) => {
+            const date = new Date(Number(time));
             return new Intl.DateTimeFormat(resolvedLanguage, {
               dateStyle: 'full',
               timeStyle: 'medium'
@@ -120,7 +124,7 @@ function LineGraphComponent<const T extends LineGraphData>({
             {err && <ErrorBar dataKey={err} stroke="#64748b" />}
           </Line>
         ))}
-        <Legend wrapperStyle={{ paddingLeft: 40, paddingTop: 10 }} />
+        <Legend itemSorter={lineIndex} wrapperStyle={{ paddingLeft: 40, paddingTop: 10 }} />
       </LineChart>
     </ResponsiveContainer>
   );

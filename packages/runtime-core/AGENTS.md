@@ -90,7 +90,10 @@ Two tiers, run by different tools.
   needed; relative imports carry `.js` like the rest of `src/` (Node16 resolution). `i18n.ts` picks
   `SynchronizedTranslator` or `StandaloneTranslator` from `window` **at import time**, so a test of a
   browser branch needs a `// @vitest-environment happy-dom` docblock, and one that varies `window`
-  needs `vi.resetModules()` and a dynamic `import('../i18n.js')`.
+  needs `vi.resetModules()` and a dynamic `import('../i18n.js')`. `vitest.config.ts` exports
+  `lowerDecorators`, which runs esbuild over source with decorators before Vite's Oxc transform: Oxc
+  cannot lower the TC39 decorators in `i18n.ts`, and Node cannot run them. Any project that runs
+  runtime-core source needs it in its `plugins`, as `packages/instrument-library` has.
 - **Types: `src/__tests__/define.test-d.ts` and `src/types/__tests__/instrument.form.test-d.ts`**,
   written with `expectTypeOf` from `expect-type` (a root devDependency). vitest does not collect
   them; the `tsc --noEmit` half of `pnpm --filter @opendatacapture/runtime-core lint` checks them,

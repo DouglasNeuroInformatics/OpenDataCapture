@@ -26,7 +26,7 @@ export default defineConfig(async ({ command }) => {
     build: {
       chunkSizeWarningLimit: 1000,
       emptyOutDir: false,
-      rollupOptions: {
+      rolldownOptions: {
         external: ['esbuild']
       },
       sourcemap: true,
@@ -36,8 +36,10 @@ export default defineConfig(async ({ command }) => {
       __RELEASE__: JSON.stringify(await getReleaseInfo())
     },
     optimizeDeps: {
-      esbuildOptions: {
-        target: 'es2022'
+      rolldownOptions: {
+        transform: {
+          target: 'es2022'
+        }
       },
       include: ['react/*', 'react-dom/*']
     },

@@ -84,7 +84,8 @@ grouped by kind; `--title` prints a flat list. **It reads `dist`, not `src`, so 
   `packages/runtime-core/src` and every other `/runtime/v1/<name>@<range>[/<subpath>]` to the
   `vendor/<name>@<range>/src/` wrapper it is built from — `tsconfig.json`'s `paths` to
   `runtime/v1/dist` applies only to `tsc`. A runtime import of a new vendored library resolves the
-  same way once its `vendor/` wrapper exists.
+  same way once its `vendor/` wrapper exists. That source needs runtime-core's `lowerDecorators`
+  plugin, which the config imports from `../runtime-core/vitest.config`.
 - `content.render(done)` of an interactive task mounts into `document.body`; JSX (a form `block`'s
   `render`) is rendered with `@testing-library/react`, a devDependency. CSS imports load as empty
   modules.

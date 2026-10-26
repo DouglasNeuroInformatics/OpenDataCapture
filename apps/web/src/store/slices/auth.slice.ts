@@ -1,4 +1,5 @@
-import { createMongoAbility, PureAbility } from '@casl/ability';
+import { createMongoAbility } from '@casl/ability';
+import type { Ability } from '@casl/ability';
 import type { TokenPayload } from '@opendatacapture/schemas/auth';
 import type { AppAction, AppSubjectName } from '@opendatacapture/schemas/core';
 import { jwtDecode } from 'jwt-decode';
@@ -7,7 +8,7 @@ import type { AuthSlice, SliceCreator } from '../types';
 
 const parseAccessToken = (accessToken: string) => {
   const { groups, permissions, ...rest } = jwtDecode<TokenPayload>(accessToken);
-  const ability = createMongoAbility<PureAbility<[AppAction, AppSubjectName], any>>(permissions);
+  const ability = createMongoAbility<Ability<[AppAction, AppSubjectName], any>>(permissions);
   return {
     currentGroup: groups[0],
     currentUser: {

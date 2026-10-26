@@ -1,4 +1,4 @@
-declare module 'monaco-editor/esm/vs/language/typescript/tsMode' {
+declare module 'monaco-editor/languages/features/typescript/tsMode' {
   export class SuggestAdapter {
     triggerCharacters?: string[];
     constructor(worker: any): void;
