@@ -1,3 +1,6 @@
+import type { SetupState } from '@opendatacapture/schemas/setup';
+
+import { AboutPage } from '../pages/_app/about.page';
 import { contactEmail } from '../support/env';
 import { expect, test } from '../support/fixtures';
 
@@ -62,5 +65,49 @@ test.describe('contact', () => {
       expect(mailtoLink).toContain(`mailto:${contactEmail}`);
       expect(mailtoLink).toContain(encodeURIComponent(message));
     }).toPass();
+  });
+});
+
+test.describe('about uptime', () => {
+  test('should fetch the API uptime when the page is opened rather than reuse the value cached on app load', async ({
+    getPageModel,
+    page
+  }) => {
+    const dashboardPage = await getPageModel('/dashboard');
+    await expect(dashboardPage.sidebar).toBeVisible();
+    const setupResponse = page.waitForResponse(
+      (response) => new URL(response.url()).pathname.endsWith('/v1/setup') && response.request().method() === 'GET'
+    );
+    await dashboardPage.sidebar.getByTestId('user-dropup-trigger').click();
+    await page.getByTestId('user-dropup-about').click();
+    const { uptime } = (await (await setupResponse).json()) as SetupState;
+
+    const aboutPage = new AboutPage(page);
+    await expect(aboutPage.coreApiInfo).toContainText('Uptime:');
+    expect(await aboutPage.getCoreApiUptimeSeconds()).toBeGreaterThanOrEqual(uptime);
+  });
+
+  // The router keeps the About match cached for five minutes, so a quick revisit is where a stale
+  // uptime would survive; the API's response is rewritten to stand in for a restart between visits.
+  test('should show the uptime fetched on a revisit rather than the one from the previous visit', async ({
+    getPageModel,
+    page
+  }) => {
+    const dashboardPage = await getPageModel('/dashboard');
+    const aboutPage = new AboutPage(page);
+    await dashboardPage.sidebar.getByTestId('user-dropup-trigger').click();
+    await page.getByTestId('user-dropup-about').click();
+    await expect(aboutPage.coreApiInfo).toContainText('Uptime:');
+    await page.goBack();
+    await expect(page).toHaveURL('/dashboard');
+
+    const restartedUptime = 100 * 3600;
+    await page.route('**/v1/setup', async (route) => {
+      const response = await route.fetch();
+      const setupState = (await response.json()) as SetupState;
+      await route.fulfill({ json: { ...setupState, uptime: restartedUptime }, response });
+    });
+    await page.goForward();
+    await expect(aboutPage.coreApiInfo).toContainText('Uptime: 100:00:0');
   });
 });
