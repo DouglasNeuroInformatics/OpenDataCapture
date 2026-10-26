@@ -48,6 +48,15 @@ const RouteComponent = () => {
     ? permissionLabels[userInfo.data.basePermissionLevel]
     : undefined;
 
+  const profileInitialValues: ProfileFormData = {
+    firstName: userInfo.data.firstName ?? '',
+    lastName: userInfo.data.lastName ?? '',
+    dateOfBirth: userInfo.data.dateOfBirth ?? undefined,
+    sex: userInfo.data.sex ?? undefined,
+    email: userInfo.data.email ?? '',
+    phoneNumber: userInfo.data.phoneNumber ?? ''
+  };
+
   const $ProfileFormData = useMemo(() => {
     return z.object({
       firstName: z.string().min(1).optional(),
@@ -118,6 +127,7 @@ const RouteComponent = () => {
         </Card.Header>
       </Card>
       <Form
+        preventResetValuesOnReset
         className="mx-auto mt-6 max-w-3xl"
         content={[
           {
@@ -166,15 +176,8 @@ const RouteComponent = () => {
         data-form-type="other"
         data-lpignore="true"
         data-testid="profile-form"
-        initialValues={{
-          firstName: userInfo.data.firstName ?? '',
-          lastName: userInfo.data.lastName ?? '',
-          dateOfBirth: userInfo.data.dateOfBirth ?? undefined,
-          sex: userInfo.data.sex ?? undefined,
-          email: userInfo.data.email ?? '',
-          phoneNumber: userInfo.data.phoneNumber ?? ''
-        }}
-        key={userInfo.dataUpdatedAt}
+        initialValues={profileInitialValues}
+        key={JSON.stringify(profileInitialValues)}
         submitBtnLabel={t('core.save')}
         validationSchema={$ProfileFormData}
         onSubmit={({ email, phoneNumber, ...rest }) => {

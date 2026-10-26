@@ -126,3 +126,56 @@ test.describe('user account', () => {
     await expect(userPage.phoneNumberField).toHaveValue('');
   });
 });
+
+test.describe('user account profile form', () => {
+  test('should keep unsaved profile edits when the user query refetches on returning to the tab', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { credentials, user } = await api.createUser({ groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const userPage = new UserPage(page);
+    await userPage.goto('/user');
+    await expect(userPage.firstNameField).toHaveValue('Test');
+
+    await userPage.firstNameField.fill('Unsaved');
+    // useSuspenseQuery clamps staleTime to at least 1s, so a focus event sooner than that refetches nothing
+    await expect(async () => {
+      const refetch = page.waitForResponse(
+        (response) => response.request().method() === 'GET' && response.url().endsWith(`/v1/users/${user.id}`),
+        { timeout: 1000 }
+      );
+      await page.evaluate(() => window.dispatchEvent(new Event('visibilitychange')));
+      await refetch;
+    }).toPass();
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+
+    await expect(userPage.firstNameField).toHaveValue('Unsaved');
+  });
+
+  test('should keep the saved values in the profile form after saving it unchanged', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { credentials, user } = await api.createUser({ groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const userPage = new UserPage(page);
+    await userPage.goto('/user');
+    await expect(userPage.firstNameField).toHaveValue('Test');
+
+    const refetch = page.waitForResponse(
+      (response) => response.request().method() === 'GET' && response.url().endsWith(`/v1/users/${user.id}`)
+    );
+    await userPage.saveProfile();
+    await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
+    await refetch;
+
+    await expect(userPage.firstNameField).toHaveValue('Test');
+  });
+});

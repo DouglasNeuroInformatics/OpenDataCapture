@@ -17,6 +17,7 @@ const STRONG_PASSWORD = 'Correct-Horse-Battery-Staple-42';
 
 const mocks = vi.hoisted(() => ({
   currentUser: { id: 'user-1', username: 'jdoe' },
+  dataUpdatedAt: 0,
   mutate: vi.fn<(variables: unknown, options: MutateOptions) => void>(),
   useFindUserQuery: vi.fn(),
   userData: {}
@@ -29,7 +30,7 @@ vi.mock('@/store', () => ({
 vi.mock('@/hooks/useFindUserQuery', () => ({
   useFindUserQuery: (id: string) => {
     mocks.useFindUserQuery(id);
-    return { data: mocks.userData, dataUpdatedAt: 0 };
+    return { data: mocks.userData, dataUpdatedAt: mocks.dataUpdatedAt };
   }
 }));
 vi.mock('@/hooks/useSelfUpdateUserMutation', () => ({
@@ -45,10 +46,9 @@ const FULL_PROFILE: ProfileData = {
   sex: 'FEMALE'
 };
 
-const renderPage = () => {
-  const Component = Route.options.component!;
-  return render(<Component />);
-};
+const Component = Route.options.component!;
+
+const renderPage = () => render(<Component />);
 
 const inputValue = (label: string) => screen.getByLabelText<HTMLInputElement>(label).value;
 
@@ -67,6 +67,7 @@ describe('user account page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     i18n.changeLanguage('en');
+    mocks.dataUpdatedAt = 0;
     mocks.userData = FULL_PROFILE;
   });
 
@@ -165,5 +166,34 @@ describe('user account page', () => {
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).toBeNull();
     });
+  });
+
+  it('should keep unsaved profile edits when the user query refetches unchanged data', () => {
+    const { rerender } = renderPage();
+    fireEvent.change(screen.getByLabelText('First Name'), { target: { value: 'Janet' } });
+    mocks.dataUpdatedAt = 1;
+    rerender(<Component />);
+    expect(inputValue('First Name')).toBe('Janet');
+  });
+
+  it('should keep the saved values in the profile form when a save leaves the stored profile unchanged', async () => {
+    const { rerender } = renderPage();
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await waitFor(() => {
+      expect(mocks.mutate).toHaveBeenCalled();
+    });
+    mocks.dataUpdatedAt = 1;
+    rerender(<Component />);
+    expect(inputValue('First Name')).toBe('Jane');
+    expect(inputValue('Email')).toBe('jane@example.org');
+  });
+
+  it('should reseed the profile form once the stored profile changes, so a save shows the saved values', () => {
+    const { rerender } = renderPage();
+    fireEvent.change(screen.getByLabelText('Last Name'), { target: { value: 'Unsaved' } });
+    mocks.userData = { ...FULL_PROFILE, firstName: 'Janet' };
+    rerender(<Component />);
+    expect(inputValue('First Name')).toBe('Janet');
+    expect(inputValue('Last Name')).toBe('Doe');
   });
 });
