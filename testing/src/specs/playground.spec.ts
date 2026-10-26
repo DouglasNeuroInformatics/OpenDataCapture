@@ -335,3 +335,32 @@ test.describe('playground interactive examples', () => {
     });
   }
 });
+
+test.describe('playground save button', () => {
+  test.describe.configure({ mode: 'default' });
+  test.slow();
+
+  test('should disable Save after switching from an edited saved instrument to an example', async ({
+    page,
+    uniqueId
+  }) => {
+    const title = `Save ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: measureVisibilityInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+    await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+
+    const saveButton = page.locator('button:has(svg.lucide-save)');
+    await page.locator('.monaco-editor .view-lines').click();
+    await page.keyboard.type('// edited');
+    await expect(saveButton).toBeEnabled();
+
+    await playground.selectInstrument('Form Reference');
+    await expect(saveButton).toBeDisabled();
+  });
+});
