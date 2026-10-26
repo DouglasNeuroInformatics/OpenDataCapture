@@ -66,6 +66,12 @@ describe('upload instrument selection page', () => {
     expect(screen.getByText('Happiness Questionnaire')).toBeTruthy();
   });
 
+  it('should render a bounded number of times while the query has no data, so loading does not loop', () => {
+    mocks.loadingRenders = 50;
+    renderPage();
+    expect(mocks.useInstrumentInfoQuery.mock.calls.length).toBeLessThanOrEqual(2);
+  });
+
   it('should narrow the list to instruments whose title matches the search term', () => {
     renderPage();
     fireEvent.change(screen.getByPlaceholderText('Search by Instrument Title'), { target: { value: 'sleep' } });
