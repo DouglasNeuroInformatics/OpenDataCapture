@@ -159,7 +159,10 @@ that differs between deployments belongs in `/config.json` instead.
 
 `pnpm exec vitest --project playground`, from the repo root. The project runs in node and covers
 only what is pure — `src/preview/__tests__/protocol.test.ts` pins the message schemas, error
-serialization and `resolvePreviewOrigin`, and `config.test.ts` the `/config.json` contract.
+serialization and `resolvePreviewOrigin`, and `config.test.ts` the `/config.json` contract. Store
+slice tests (`src/store/slices/__tests__/`) drive the real `useAppStore` with `idb-keyval` and
+`@/instruments` mocked, since the catalog's `import.meta.glob` assets and IndexedDB do not exist in
+node.
 Anything that touches esbuild-wasm, Monaco workers or `/runtime/v1` has no test environment here;
 the frame itself, the origin split, the runtime config and the message bridge are exercised for real
 by `testing/src/specs/playground.spec.ts`, which Playwright runs against this app's dev server.

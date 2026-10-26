@@ -364,3 +364,38 @@ test.describe('playground save button', () => {
     await expect(saveButton).toBeDisabled();
   });
 });
+
+test.describe('playground editor tabs', () => {
+  test.describe.configure({ mode: 'default' });
+  test.slow();
+
+  test('should keep the active tab selected when a background tab is closed', async ({ page, uniqueId }) => {
+    const title = `Tabs ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [
+          { content: measureVisibilityInstrumentSource(title), name: 'index.ts' },
+          { content: 'export const a = 1;', name: 'a.ts' },
+          { content: 'export const b = 2;', name: 'b.ts' }
+        ],
+        label: title
+      })
+    );
+    await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+
+    await page.locator('button:has(svg.lucide-columns-3)').click();
+    const fileButton = (filename: string) =>
+      page.locator('button', { has: page.locator(`input[value="${filename}"]`) });
+    await fileButton('a.ts').click();
+    await fileButton('b.ts').click();
+
+    const tab = (filename: string) => page.locator('button[aria-current]', { hasText: filename });
+    await expect(tab('b.ts')).toHaveAttribute('aria-current', 'true');
+
+    await tab('a.ts').locator('svg.lucide-x').click();
+    await expect(tab('a.ts')).toHaveCount(0);
+    await expect(tab('b.ts')).toHaveAttribute('aria-current', 'true');
+  });
+});
