@@ -310,3 +310,28 @@ test.describe('playground', () => {
     await expect(playground.preview.getByText('Pet Name Measure')).toBeVisible();
   });
 });
+
+test.describe('playground interactive examples', () => {
+  test.describe.configure({ mode: 'default' });
+  test.slow();
+
+  for (const label of ['Interactive With Static Assets', 'Interactive With Legacy Script']) {
+    test(`should submit the ${label} example when its Submit button is clicked`, async ({ page }) => {
+      const playground = new PlaygroundPage(page);
+      await playground.goto();
+      await playground.selectInstrument(label);
+
+      await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
+      const messages: string[] = [];
+      page.once('dialog', (dialog) => {
+        messages.push(dialog.message());
+        void dialog.dismiss();
+      });
+      const task = playground.preview.frameLocator('iframe[name="interactive-instrument"]');
+      await task.getByRole('button', { name: 'Submit' }).click({ timeout: PREVIEW_TIMEOUT });
+
+      await expect.poll(() => messages).toHaveLength(1);
+      expect(messages[0]).toContain('"message": "Hello"');
+    });
+  }
+});

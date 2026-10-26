@@ -18,7 +18,7 @@ export default defineInstrument({
     render(done) {
       const button = document.getElementById('submit-btn')!;
       button.addEventListener('click', () => {
-        done({ message });
+        done({ message: 'Hello' });
       });
     },
     html,
