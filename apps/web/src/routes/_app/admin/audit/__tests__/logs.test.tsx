@@ -192,10 +192,20 @@ describe('audit logs route', () => {
     const { ensureQueryData, promise } = runLoader(search);
     await promise;
     expect(ensureQueryData.mock.calls.map(([options]) => options.queryKey)).toEqual([
-      auditLogsQueryOptions({ params: search }).queryKey,
+      auditLogsQueryOptions({ params: { ...search, page: 1, sortOrder: 'desc' } }).queryKey,
       groupsQueryOptions().queryKey,
       usersQueryOptions().queryKey
     ]);
+  });
+
+  it('should prefetch the logs under the same key the table first reads, so the first page is not fetched twice', async () => {
+    const search: AuditLogsSearch = { entity: 'USER' };
+    mocks.search = search;
+    const { ensureQueryData, promise } = runLoader(search);
+    await promise;
+    renderPage();
+    const tableQueryKey = auditLogsQueryOptions(mocks.queryAuditLogs.mock.calls[0]![0]).queryKey;
+    expect(ensureQueryData.mock.calls[0]![0].queryKey).toEqual(tableQueryKey);
   });
 
   it('should reject a search naming an action that does not exist', () => {

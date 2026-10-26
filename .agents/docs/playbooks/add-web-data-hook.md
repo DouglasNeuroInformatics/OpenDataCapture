@@ -13,9 +13,11 @@ step type-checks and compiles, and fails at runtime or serves the wrong cached d
    is the entire pattern.
 
 3. **Export the `queryOptions` factory as well as the hook.** Route loaders prefetch through the
-   factory, e.g. `context.queryClient.ensureQueryData(auditLogsQueryOptions({ params: deps.search }))`
-   in `apps/web/src/routes/_app/admin/audit/logs.tsx`. A hook that inlines its options cannot be
-   prefetched by the route rendering it.
+   factory, as `apps/web/src/routes/_app/admin/audit/logs.tsx` does. A hook that inlines its options
+   cannot be prefetched by the route rendering it. **Pass the factory exactly the params the
+   component will pass the hook** — including any the component adds from its own state, such as
+   that route's `page` and `sortOrder`. A loader that omits one prefetches a different query key,
+   so the component fetches again on mount.
 
 4. **Parse in `queryFn`, never return `response.data` raw.** `$Subject.array().parse(response.data)`.
    This is the app's only validation boundary; everything downstream trusts the result.

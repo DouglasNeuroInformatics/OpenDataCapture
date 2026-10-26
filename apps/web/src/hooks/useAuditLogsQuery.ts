@@ -17,7 +17,10 @@ export const auditLogsQueryOptions = ({ params = {} }: { params?: AuditLogsQuery
   return queryOptions({
     placeholderData: keepPreviousData,
     queryFn: () => fetchAuditLogs({ limit: AUDIT_LOGS_PAGE_SIZE, ...params }),
-    queryKey: ['audit-logs', params]
+    queryKey: ['audit-logs', params],
+    // The route loader prefetches the first page right before the table mounts, and `useQuery` would
+    // otherwise refetch it at once as stale. One second is the floor `useSuspenseQuery` applies.
+    staleTime: 1000
   });
 };
 
