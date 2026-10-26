@@ -85,7 +85,10 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
       });
       build.onEnd((result) => {
         result.legacyScripts = [];
-        Object.keys(result.metafile!.inputs).forEach((path) => {
+        if (!result.metafile) {
+          return;
+        }
+        Object.keys(result.metafile.inputs).forEach((path) => {
           const script = legacyScripts.get(path.replace('bundle:', ''));
           if (!script) {
             return;

@@ -137,6 +137,13 @@ describe('build', () => {
       });
     });
 
+    it('should report only the source error when compilation fails, so authors do not see an internal TypeError', async () => {
+      const inputs = [{ content: "export default { kind: 'FORM', ;", name: 'index.ts' }];
+      await expect(build({ inputs })).rejects.toSatisfy((err: any) => {
+        return err.cause.errors.length === 1 && err.cause.errors[0].text === 'Expected identifier but found ";"';
+      });
+    });
+
     // it('should return javascript that can be executed with no further transformation', () => {
     //   const result = bundle(options);
     //   expect((0, eval)(result.js)).toMatchObject({ kind: 'INTERACTIVE' });

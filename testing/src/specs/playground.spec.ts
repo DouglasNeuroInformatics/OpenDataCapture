@@ -309,6 +309,25 @@ test.describe('playground', () => {
 
     await expect(playground.preview.getByText('Pet Name Measure')).toBeVisible();
   });
+
+  test("should report only the author's syntax error, without an internal bundler TypeError", async ({
+    page,
+    uniqueId
+  }) => {
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: "export default { kind: 'FORM', ;", name: 'index.ts' }],
+        label: `Syntax Error ${uniqueId}`
+      })
+    );
+
+    await expect(page.getByRole('heading', { name: 'Failed to Compile' })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+    await page.getByRole('button', { name: 'Cause' }).click();
+    await expect(page.getByText(/Build failed with 1 error/)).toBeVisible();
+    await expect(page.getByText(/reading 'inputs'/)).toHaveCount(0);
+  });
 });
 
 test.describe('playground interactive examples', () => {
