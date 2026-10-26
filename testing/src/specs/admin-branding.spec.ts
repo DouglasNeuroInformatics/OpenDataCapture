@@ -66,3 +66,21 @@ test.describe('login page instance name', () => {
     await restoredEditorPage.saveAndConfirm();
   });
 });
+
+test.describe('login image custom size', () => {
+  test.use({ actingRole: 'ADMIN' });
+
+  test('should allow saving after hiding a login image that has an incomplete custom size', async ({
+    getPageModel
+  }) => {
+    const editorPage = await getPageModel('/admin/branding/login-page');
+    await editorPage.showLogoCheckbox.check();
+    await editorPage.selectLogoSize('Custom');
+    await editorPage.customLogoWidthInput.fill('');
+    await editorPage.customLogoHeightInput.fill('');
+    await expect(editorPage.saveButton).toBeDisabled();
+
+    await editorPage.showLogoCheckbox.uncheck();
+    await expect(editorPage.saveButton).toBeEnabled();
+  });
+});

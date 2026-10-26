@@ -242,6 +242,7 @@ export const useBrandingForm = () => {
   const customHeight = parseDimension(form.customLogoHeight);
 
   const isCustomSizeInvalid =
+    form.showLogo &&
     form.logoSize === 'custom' &&
     ((form.customLogoWidth.trim() !== '' && customWidth === null) ||
       (form.customLogoHeight.trim() !== '' && customHeight === null) ||
