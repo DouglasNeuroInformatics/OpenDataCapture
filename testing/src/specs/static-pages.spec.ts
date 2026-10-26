@@ -111,3 +111,32 @@ test.describe('about uptime', () => {
     await expect(aboutPage.coreApiInfo).toContainText('Uptime: 100:00:0');
   });
 });
+
+test.describe('about uptime counter', () => {
+  test('should show the starting uptime plus the seconds elapsed since the page opened', async ({
+    getPageModel,
+    page
+  }) => {
+    await page.clock.install();
+    const dashboardPage = await getPageModel('/dashboard');
+    await dashboardPage.sidebar.getByTestId('user-dropup-trigger').click();
+    const aboutMenuItem = page.getByTestId('user-dropup-about');
+    await expect(aboutMenuItem).toBeVisible();
+
+    // Paused before About mounts, so the counter's first tick waits for the test to advance a full
+    // second; the 10ms steps only flush the zero-delay timers the navigation and its fetch schedule.
+    // The target leaves a second's margin because the page clock keeps running while it travels
+    // back here, and pauseAt rejects a time that has already passed.
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+    await aboutMenuItem.click();
+    const aboutPage = new AboutPage(page);
+    await expect(async () => {
+      await page.clock.runFor(10);
+      await expect(aboutPage.coreApiInfo).toContainText('Uptime:', { timeout: 100 });
+    }).toPass();
+
+    const initialUptime = await aboutPage.getCoreApiUptimeSeconds();
+    await page.clock.runFor(3000);
+    await expect.poll(() => aboutPage.getCoreApiUptimeSeconds()).toBe(initialUptime + 3);
+  });
+});

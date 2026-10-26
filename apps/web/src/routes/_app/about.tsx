@@ -91,7 +91,7 @@ const TimeValue: React.FC<{ value: number }> = ({ value }) => {
 
   useInterval(() => {
     valueRef.current = valueRef.current + 1;
-    setState(format(valueRef.current + 1));
+    setState(format(valueRef.current));
   }, 1000);
 
   return <span>{state}</span>;

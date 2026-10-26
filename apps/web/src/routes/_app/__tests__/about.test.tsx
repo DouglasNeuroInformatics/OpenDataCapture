@@ -123,8 +123,7 @@ describe('about page', () => {
     expect([ticks[1]! - ticks[0]!, ticks[2]! - ticks[1]!]).toEqual([1, 1]);
   });
 
-  // Known defect: TimeValue increments its counter and then formats counter + 1, so the display leads by a second.
-  it.fails('should show the starting uptime plus the seconds elapsed since the page opened', () => {
+  it('should show the starting uptime plus the seconds elapsed since the page opened', () => {
     vi.useFakeTimers();
     renderPage();
     act(() => {
