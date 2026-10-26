@@ -13,8 +13,10 @@ export default defineConfig(({ mode }) => ({
     target: 'es2022'
   },
   optimizeDeps: {
-    esbuildOptions: {
-      target: 'es2022'
+    rolldownOptions: {
+      transform: {
+        target: 'es2022'
+      }
     },
     include: ['react/*', 'react-dom/*']
   },

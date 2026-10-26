@@ -1,11 +1,12 @@
-import { createMongoAbility, PureAbility } from '@casl/ability';
+import { createMongoAbility } from '@casl/ability';
+import type { Ability } from '@casl/ability';
 import type { AppAction, AppSubjectName } from '@opendatacapture/schemas/core';
 import type { Session } from '@opendatacapture/schemas/session';
 
 import type { CurrentUser } from '@/store/types';
 
 export const currentUser: CurrentUser = Object.freeze({
-  ability: createMongoAbility<PureAbility<[AppAction, AppSubjectName], any>>([{ action: 'manage', subject: 'all' }]),
+  ability: createMongoAbility<Ability<[AppAction, AppSubjectName], any>>([{ action: 'manage', subject: 'all' }]),
   firstName: 'Jane',
   groups: [],
   id: '123',
