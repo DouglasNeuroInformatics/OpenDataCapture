@@ -114,6 +114,8 @@ Exceptions worth knowing:
 (`build` itself depends on `^build` and `db:generate`). A cold `pnpm lint` therefore builds every
 dependency, generates both Prisma clients, and pushes the gateway SQLite schema — it is not fast.
 
+`test:e2e` additionally specifies `"cache": false` because it requires a live server and database.
+
 **`test` is not a turbo task at all.** Root `pnpm test` is `env-cmd vitest`: plain vitest, no build,
 no database. Only `testing` owns a `test:e2e` script; only `apps/gateway` owns a `db:push`.
 
