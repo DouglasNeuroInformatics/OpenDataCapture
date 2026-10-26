@@ -6,7 +6,10 @@ import { $Sex } from '../subject/subject.js';
 
 const MIN_PHONE_DIGITS = 7;
 
-const PHONE_NUMBER_FORMAT = /^\+?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/;
+/** The E.164 maximum, country code included. */
+const MAX_PHONE_DIGITS = 15;
+
+const PHONE_NUMBER_FORMAT = /^\+?[\d\s().-]+$/;
 
 const PHONE_NUMBER_ERROR_MESSAGES = {
   INVALID_FORMAT: 'Invalid phone number',
@@ -25,10 +28,11 @@ function countPhoneDigits(value: string): number {
  * message instead of restating the rule.
  */
 function findPhoneNumberError(value: string): null | PhoneNumberErrorCode {
-  if (!PHONE_NUMBER_FORMAT.test(value)) {
+  const digitCount = countPhoneDigits(value);
+  if (!PHONE_NUMBER_FORMAT.test(value) || digitCount > MAX_PHONE_DIGITS) {
     return 'INVALID_FORMAT';
   }
-  return countPhoneDigits(value) < MIN_PHONE_DIGITS ? 'TOO_FEW_DIGITS' : null;
+  return digitCount < MIN_PHONE_DIGITS ? 'TOO_FEW_DIGITS' : null;
 }
 
 export const $PhoneNumber = z.string().check((ctx) => {

@@ -199,3 +199,24 @@ test.describe('user account password policy', () => {
     await expect(userPage.passwordDialog).toBeVisible();
   });
 });
+
+test.describe('user account phone number', () => {
+  test('should save an international phone number with a country code and spacing', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { credentials } = await api.createUser({ groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const userPage = new UserPage(page);
+    await userPage.goto('/user');
+    await userPage.phoneNumberField.fill('+1 514 555 1234');
+    await userPage.saveProfile();
+    await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
+
+    await page.reload();
+    await expect(userPage.phoneNumberField).toHaveValue('+1 514 555 1234');
+  });
+});
