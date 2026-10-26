@@ -25,14 +25,17 @@ const $VerifyRequest = z.object({
 
 const router = Router();
 
-router.post('/challenge', (_, res) => {
-  res.status(200).json(
-    cap.createChallenge({
-      challengeDifficulty: 4,
-      expiresMs: 60_000 * 5
-    })
-  );
-});
+router.post(
+  '/challenge',
+  ah(async (_, res) => {
+    res.status(200).json(
+      await cap.createChallenge({
+        challengeDifficulty: 4,
+        expiresMs: 60_000 * 5
+      })
+    );
+  })
+);
 
 router.post(
   '/redeem',

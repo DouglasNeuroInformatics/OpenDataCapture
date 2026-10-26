@@ -1,5 +1,4 @@
-import { PureAbility } from '@casl/ability';
-import type { RawRuleOf } from '@casl/ability';
+import type { Ability, RawRuleOf } from '@casl/ability';
 import type { PrismaQuery, Subjects } from '@casl/prisma';
 import { Prisma } from '@prisma/client';
 import type { DefaultSelection } from '@prisma/client/runtime/library';
@@ -16,8 +15,8 @@ type AppSubjectName = Extract<AppSubjects, string>;
 
 type AppAbilities = [AppAction, AppSubjects];
 
-type AppAbility = PureAbility<AppAbilities, PrismaQuery>;
+type AppAbility = Ability<AppAbilities, PrismaQuery>;
 
-type Permission = RawRuleOf<PureAbility<[AppAction, AppSubjectName], PrismaQuery>>;
+type Permission = RawRuleOf<Ability<[AppAction, AppSubjectName], PrismaQuery>>;
 
-export type { AppAbilities, AppAbility, AppAction, AppSubjectModels, AppSubjectName, Permission };
+export type { AppAbility, AppAction, AppSubjectModels, AppSubjectName, Permission };

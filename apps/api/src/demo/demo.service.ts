@@ -1,4 +1,4 @@
-import { randomValue, toUpperCase } from '@douglasneuroinformatics/libjs';
+import { randomValue } from '@douglasneuroinformatics/libjs';
 import { InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
 import { faker } from '@faker-js/faker';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
@@ -14,6 +14,7 @@ import happinessQuestionnaireWithConsent from '@opendatacapture/instrument-libra
 import type { FormInstrument, Language } from '@opendatacapture/runtime-core';
 import type { WithID } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
+import { $Sex } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 
 import type { RuntimePrismaClient } from '@/core/prisma';
@@ -106,7 +107,7 @@ export class DemoService {
           dateOfBirth: faker.date.birthdate(),
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
-          sex: toUpperCase(faker.person.sexType())
+          sex: faker.helpers.arrayElement($Sex.options)
         };
 
         let subjectId: string;

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import MonacoEditor from '@monaco-editor/react';
 
 import { useEditorErrorSync } from '@/hooks/useEditorErrorSync';
 import { useFilesRef } from '@/hooks/useFilesRef';
@@ -11,6 +10,7 @@ import { useAppStore } from '@/store';
 import { getImageMIMEType, inferFileType, isBase64EncodedFileType } from '@/utils/file';
 
 import { EditorPanePlaceholder } from './EditorPanePlaceholder';
+import { MonacoEditor } from './MonacoEditor';
 
 import type { MonacoEditorType, MonacoType } from './types';
 
@@ -39,8 +39,8 @@ export const EditorPane = () => {
     Object.keys(libs).forEach((filename) => {
       const uri = monaco.Uri.parse(filename);
       if (!monaco.editor.getModel(uri)) {
-        monaco.languages.typescript.javascriptDefaults.addExtraLib(libs[filename]!, filename);
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(libs[filename]!, filename);
+        monaco.typescript.javascriptDefaults.addExtraLib(libs[filename]!, filename);
+        monaco.typescript.typescriptDefaults.addExtraLib(libs[filename]!, filename);
         monaco.editor.createModel(libs[filename]!, 'typescript', uri);
       }
     });
@@ -78,7 +78,7 @@ export const EditorPane = () => {
       if (monaco.editor.getModel(uri)) {
         continue;
       } else if (fileType === 'typescript') {
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(file.content, file.name);
+        monaco.typescript.typescriptDefaults.addExtraLib(file.content, file.name);
         monaco.editor.createModel(file.content, 'typescript', uri);
       } else if (fileType === 'javascript') {
         monaco.editor.createModel(file.content, 'javascript', uri);
@@ -131,10 +131,9 @@ export const EditorPane = () => {
 
   return (
     <MonacoEditor
-      className="h-full min-h-144"
+      className="h-full min-h-144 w-full"
       defaultLanguage={fileType satisfies 'css' | 'html' | 'javascript' | 'json' | 'typescript'}
       defaultValue={defaultFile.content}
-      keepCurrentModel={true}
       key={defaultFile.id}
       options={{
         automaticLayout: true,
@@ -162,7 +161,7 @@ export const EditorPane = () => {
       path={defaultFile.name}
       theme={`odc-${theme}`}
       onChange={(value) => {
-        setSelectedFileContent(value ?? '');
+        setSelectedFileContent(value);
       }}
       onMount={handleEditorDidMount}
     />

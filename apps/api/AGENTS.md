@@ -253,9 +253,9 @@ Provider overrides are deliberately not offered — nothing needs one yet. Addin
 
 The `apps/api/vitest.config.ts` `libnest` plugin is required — it applies the SWC decorator
 transforms, without which `@Injectable`/`@Body` metadata does not exist at runtime. The config
-confines SWC to files under `apps/api` and leaves workspace packages to esbuild, as in every other
-project. Letting SWC transform them too makes the merged coverage report count each of their
-functions twice.
+confines SWC to files under `apps/api` and leaves workspace packages to Vite's Oxc transform, as in
+every other project; its `oxc.exclude` keeps Oxc off `apps/api` itself. Letting SWC transform them
+too makes the merged coverage report count each of their functions twice.
 
 Ignore `apps/api/.vscode/test/*` — it is stale, never runs, and references modules that no longer
 exist.

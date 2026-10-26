@@ -17,19 +17,22 @@ vi.mock('react-dom/client', () => ({ hydrateRoot }));
 const ROOT_PROPS: RootProps = { instruments: [{ name: 'happiness', type: 'forms' }], page: 'index' };
 
 describe('client', () => {
+  let hydrateRootArgs: Parameters<typeof hydrateRoot> | undefined;
+
   beforeAll(async () => {
     document.body.innerHTML = '<div id="root"></div>';
     vi.stubGlobal('__ROOT_PROPS__', ROOT_PROPS);
     await import('../client');
     vi.unstubAllGlobals();
+    hydrateRootArgs = hydrateRoot.mock.lastCall;
   });
 
   it('should hydrate the server-rendered #root element, so the SSR markup is reused rather than replaced', () => {
-    expect(hydrateRoot.mock.lastCall?.[0]).toBe(document.getElementById('root'));
+    expect(hydrateRootArgs?.[0]).toBe(document.getElementById('root'));
   });
 
   it('should hydrate Root in strict mode with the server-injected props, so the client tree matches the SSR markup', () => {
-    expect(hydrateRoot.mock.lastCall?.[1]).toMatchObject({
+    expect(hydrateRootArgs?.[1]).toMatchObject({
       props: { children: { props: ROOT_PROPS, type: Root } },
       type: StrictMode
     });

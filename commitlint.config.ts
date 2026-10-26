@@ -3,14 +3,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import yaml from 'js-yaml';
+import { load } from 'js-yaml';
 
 const WORKSPACE_NAME_PREFIX = '@opendatacapture/';
 
 const projectRoot = import.meta.dirname;
 
 function readWorkspaceGlobs(): string[] {
-  const workspace: unknown = yaml.load(fs.readFileSync(path.join(projectRoot, 'pnpm-workspace.yaml'), 'utf8'));
+  const workspace: unknown = load(fs.readFileSync(path.join(projectRoot, 'pnpm-workspace.yaml'), 'utf8'));
   if (typeof workspace !== 'object' || workspace === null || !('packages' in workspace)) {
     throw new Error("pnpm-workspace.yaml has no 'packages' field");
   }
