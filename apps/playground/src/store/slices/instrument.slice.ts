@@ -3,7 +3,18 @@ import { merge } from 'lodash-es';
 import { defaultInstruments, defaultSelectedInstrument } from '@/instruments';
 import { resolveIndexFilename } from '@/utils/file';
 
-import type { InstrumentSlice, SliceCreator } from '../types';
+import type { AppStore, InstrumentSlice, SliceCreator } from '../types';
+
+function loadDefaultInstrument(
+  state: Pick<AppStore, 'files' | 'indexFilename' | 'openFilenames' | 'selectedFilename' | 'selectedInstrument'>
+) {
+  const indexFilename = resolveIndexFilename(defaultSelectedInstrument.files)!;
+  state.selectedInstrument = defaultSelectedInstrument;
+  state.files = defaultSelectedInstrument.files;
+  state.indexFilename = indexFilename;
+  state.openFilenames = [indexFilename];
+  state.selectedFilename = indexFilename;
+}
 
 export const createInstrumentSlice: SliceCreator<InstrumentSlice> = (set) => ({
   addInstrument: (instrument) =>
@@ -19,18 +30,15 @@ export const createInstrumentSlice: SliceCreator<InstrumentSlice> = (set) => ({
   removeInstrument: (id) => {
     set((state) => {
       state.instruments = state.instruments.filter((item) => item.id !== id);
-      state.selectedInstrument = defaultSelectedInstrument;
+      if (state.selectedInstrument.id === id) {
+        loadDefaultInstrument(state);
+      }
     });
   },
   resetInstruments: () => {
     set((state) => {
-      const indexFilename = resolveIndexFilename(defaultSelectedInstrument.files)!;
       state.instruments = defaultInstruments;
-      state.selectedInstrument = defaultSelectedInstrument;
-      state.files = defaultSelectedInstrument.files;
-      state.indexFilename = indexFilename;
-      state.openFilenames = [indexFilename];
-      state.selectedFilename = indexFilename;
+      loadDefaultInstrument(state);
     });
   },
   selectedInstrument: defaultSelectedInstrument,

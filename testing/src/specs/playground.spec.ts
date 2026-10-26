@@ -399,3 +399,33 @@ test.describe('playground editor tabs', () => {
     await expect(tab('b.ts')).toHaveAttribute('aria-current', 'true');
   });
 });
+
+test.describe('playground instrument deletion', () => {
+  test.describe.configure({ mode: 'default' });
+  test.slow();
+
+  test('should show the default template after the selected saved instrument is deleted', async ({
+    page,
+    uniqueId
+  }) => {
+    const title = `Deleted ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: measureVisibilityInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+    await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+
+    await page.locator('button:has(svg.lucide-ellipsis-vertical)').click();
+    await page.getByRole('menuitem', { name: 'Delete Instrument' }).click();
+    await page.getByRole('dialog').getByRole('button', { exact: true, name: 'Delete' }).click();
+
+    await expect(playground.preview.getByRole('heading', { name: '<PLACEHOLDER>' })).toBeVisible({
+      timeout: PREVIEW_TIMEOUT
+    });
+    await expect(playground.preview.getByRole('heading', { name: title })).toHaveCount(0);
+  });
+});
