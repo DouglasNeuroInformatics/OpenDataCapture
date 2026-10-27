@@ -23,7 +23,7 @@ const mocks = vi.hoisted(() => ({
   addNotification: vi.fn<(notification: Notification) => void>(),
   axios: { get: vi.fn<(url: string, config?: AxiosGetConfig) => Promise<unknown>>() },
   download: vi.fn<(filename: string, data: string) => Promise<void>>(),
-  downloadExcel: vi.fn(),
+  downloadSubjectTableExcel: vi.fn(),
   navigate: vi.fn(),
   store: {
     currentGroup: null as null | StoreGroup,
@@ -66,7 +66,7 @@ vi.mock('@/store', () => ({
     getState: () => mocks.store
   })
 }));
-vi.mock('@/utils/excel', () => ({ downloadExcel: mocks.downloadExcel }));
+vi.mock('@/utils/excel', () => ({ downloadSubjectTableExcel: mocks.downloadSubjectTableExcel }));
 
 const subject = (id: string, overrides: Partial<Subject> = {}): Subject => ({
   createdAt: new Date('2026-01-01'),
@@ -87,6 +87,8 @@ const exportEntry = (subjectId: string): InstrumentRecordsExport[number] => ({
   instrumentEdition: 1,
   instrumentName: 'HAPPINESS_QUESTIONNAIRE',
   measure: 'overallHappiness',
+  seriesId: null,
+  seriesName: null,
   sessionDate: '2026-01-01',
   sessionId: 'session-1',
   sessionType: 'IN_PERSON',
@@ -123,7 +125,7 @@ const dateOfBirthInputs = () => {
 };
 
 const exportAs = (option: string) => {
-  fireEvent.keyDown(screen.getByRole('button', { name: 'Export' }), { key: 'Enter' });
+  fireEvent.keyDown(screen.getByRole('button', { name: 'Download' }), { key: 'Enter' });
   fireEvent.click(screen.getByRole('menuitem', { name: option }));
 };
 
@@ -491,7 +493,11 @@ describe('data hub export', () => {
     renderDataHub();
     exportAs('Excel');
     await settleExport();
-    expect(mocks.downloadExcel).toHaveBeenCalledWith(expect.stringMatching(/^jdoe_.+\.xlsx$/), [exportEntry('bob')]);
+    expect(mocks.downloadSubjectTableExcel).toHaveBeenCalledWith(
+      expect.stringMatching(/^jdoe_.+\.xlsx$/),
+      [exportEntry('bob')],
+      'Records'
+    );
   });
 
   it('should confirm a successful export', async () => {

@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { InitData, ParentMessage, RecordType } from '../thread-types';
+import type { InitPayload, ParentMessage, RecordType } from '../thread-types';
 
 class MockParentPort extends EventEmitter {
   postMessage = vi.fn();
@@ -14,7 +14,10 @@ class MockParentPort extends EventEmitter {
 
 const RUNTIME_INTERNAL_SPECIFIER = '#runtime/v1/@opendatacapture/runtime-internal/index.js';
 
-const initData: InitData = [{ edition: 2, id: 'instrument-1', name: 'Happiness Questionnaire' }];
+const initData: InitPayload = {
+  instruments: [{ edition: 2, id: 'instrument-1', name: 'Happiness Questionnaire' }],
+  seriesNames: { 'series-1': 'Happiness Series' }
+};
 
 const createRecord = (overrides: Partial<RecordType> = {}): RecordType => ({
   computedMeasures: { score: 85 },
@@ -22,6 +25,7 @@ const createRecord = (overrides: Partial<RecordType> = {}): RecordType => ({
   groupId: 'group-1',
   id: 'record-1',
   instrumentId: 'instrument-1',
+  seriesInstrumentId: null,
   session: {
     date: '2025-01-01',
     id: 'session-1',
@@ -42,6 +46,8 @@ const expectedRow = {
   instrumentEdition: 2,
   instrumentName: 'Happiness Questionnaire',
   measure: 'score',
+  seriesId: null,
+  seriesName: null,
   sessionDate: '2025-01-01',
   sessionId: 'session-1',
   sessionType: 'IN_PERSON',
@@ -100,6 +106,28 @@ describe('export-worker', () => {
     const parentPort = (await loadWorker())!;
     parentPort.send({ data: initData, type: 'INIT' });
     expect(parentPort.postMessage).toHaveBeenCalledWith({ success: true });
+  });
+
+  // The id is the stable identifier an analysis keys on; the name is carried beside it only because
+  // a bare id in a CSV is unreadable.
+  it('should carry both the series id and its resolved title on a record a series orchestrated', async () => {
+    const parentPort = await loadInitializedWorker();
+    parentPort.send({ data: [createRecord({ seriesInstrumentId: 'series-1' })], type: 'BEGIN_CHUNK_PROCESSING' });
+    expect(parentPort.postMessage).toHaveBeenLastCalledWith({
+      data: [{ ...expectedRow, seriesId: 'series-1', seriesName: 'Happiness Series' }],
+      success: true
+    });
+  });
+
+  // A series deleted since its records were collected still has an id on them, and the export has to
+  // report what it knows rather than failing the whole download.
+  it('should report the series id with a null title when no title was resolved for it', async () => {
+    const parentPort = await loadInitializedWorker();
+    parentPort.send({ data: [createRecord({ seriesInstrumentId: 'series-missing' })], type: 'BEGIN_CHUNK_PROCESSING' });
+    expect(parentPort.postMessage).toHaveBeenLastCalledWith({
+      data: [{ ...expectedRow, seriesId: 'series-missing', seriesName: null }],
+      success: true
+    });
   });
 
   it('should throw on an unknown message type, so a protocol mismatch is not silently ignored', async () => {

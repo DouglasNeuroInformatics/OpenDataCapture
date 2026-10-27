@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ListboxDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
 import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
@@ -21,7 +21,6 @@ export const InstrumentShowcase: React.FC<{
   const [filteredInstruments, setFilteredInstruments] = useState<TranslatedInstrumentInfo[]>(
     availableInstruments.toSorted((a, b) => a.details.title.localeCompare(b.details.title))
   );
-  const [tagOptions, setTagOptions] = useState<ListboxDropdownOption[]>([]);
   const [selectedKinds, setSelectedKinds] = useState<InstrumentShowcaseKindOption[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<InstrumentShowcaseLanguageOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<ListboxDropdownOption[]>([]);
@@ -50,16 +49,16 @@ export const InstrumentShowcase: React.FC<{
     setHighlightedIndex(0);
   }, [availableInstruments, selectedKinds, selectedLanguages, selectedTags, searchTerm]);
 
-  useEffect(() => {
-    setTagOptions(
-      Array.from(new Set(filteredInstruments.flatMap((item) => item.tags)))
+  const tagOptions = useMemo<ListboxDropdownOption[]>(
+    () =>
+      Array.from(new Set(availableInstruments.flatMap((item) => item.tags)))
         .map((item) => ({
           key: item,
           label: item
         }))
-        .sort((a, b) => a.label.localeCompare(b.label))
-    );
-  }, [availableInstruments]);
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [availableInstruments]
+  );
 
   useEffect(() => {
     const items = listRef.current?.querySelectorAll<HTMLElement>('[data-instrument-index]');

@@ -5,10 +5,14 @@ import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Permissions } from '@opendatacapture/schemas/core';
 import type { $CreateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
-import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
+import type {
+  $CreateInstrumentRecordData,
+  InstrumentRecord,
+  UploadInstrumentRecordsData
+} from '@opendatacapture/schemas/instrument-records';
 import { MAIL_CLIENT_TIMEOUT } from '@opendatacapture/schemas/mail';
 import type { $SendAssignmentEmailData, EmailDeliveryResult } from '@opendatacapture/schemas/mail';
-import type { $CreateSessionData, Session } from '@opendatacapture/schemas/session';
+import type { $CreateSessionData, Session, SessionType } from '@opendatacapture/schemas/session';
 import type { $CreateSubjectData } from '@opendatacapture/schemas/subject';
 import type { $CreateUserData, $UpdateUserData, User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
@@ -75,6 +79,34 @@ export class ApiClient {
     return group;
   }
 
+  /**
+   * Creates one record against a session, the way the app does when an instrument is completed in a
+   * sitting. Unlike {@link uploadRecords}, which always writes a RETROSPECTIVE session, this lets a
+   * spec choose the collection method the record will report.
+   */
+  async createRecord(
+    groupId: string,
+    instrumentId: string,
+    session: Session,
+    data: $CreateInstrumentRecordData['data'],
+    seriesInstrumentId?: string
+  ): Promise<InstrumentRecord> {
+    const body: $CreateInstrumentRecordData = {
+      data,
+      date: new Date(),
+      groupId,
+      instrumentId,
+      seriesInstrumentId,
+      sessionId: session.id,
+      subjectId: session.subjectId
+    };
+    return this.expectJson<InstrumentRecord>(
+      this.request.post(`${API}/instrument-records`, { data: body, headers: this.authHeaders }),
+      201,
+      'create instrument record'
+    );
+  }
+
   /** Assembles a series owned by the group out of the first two forms available, returning its id. */
   async createSeries(groupId: string, title: string): Promise<string> {
     const items = (await this.getInstrumentInfo())
@@ -95,8 +127,12 @@ export class ApiClient {
    * Creates a session, and with it the subject it names. A subject seeded this way holds no
    * instrument records, which is what distinguishes it under the "with records only" filter.
    */
-  async createSession(groupId: null | string, subjectData: $CreateSubjectData): Promise<Session> {
-    const data: $CreateSessionData = { date: new Date(), groupId, subjectData, type: 'IN_PERSON' };
+  async createSession(
+    groupId: null | string,
+    subjectData: $CreateSubjectData,
+    type: SessionType = 'IN_PERSON'
+  ): Promise<Session> {
+    const data: $CreateSessionData = { date: new Date(), groupId, subjectData, type };
     return this.expectJson<Session>(
       this.request.post(`${API}/sessions`, { data, headers: this.authHeaders }),
       201,

@@ -51,11 +51,18 @@ function expandData(listEntry) {
 let initData;
 
 /**
+ * Internal cache mapping a series instrument id to its title.
+ * @type {{ [id: string]: string }}
+ */
+let seriesNames = {};
+
+/**
  * Initializes the worker with instrument metadata.
- * * @param {Array<{id: string, edition: number, name: string}>} data - The initialization payload.
+ * @param {import('./thread-types').InitPayload} data - The initialization payload.
  */
 function handleInit(data) {
-  initData = new Map(data.map((instrument) => [instrument.id, instrument]));
+  initData = new Map(data.instruments.map((instrument) => [instrument.id, instrument]));
+  seriesNames = data.seriesNames;
   parentPort?.postMessage({ success: true });
 }
 
@@ -87,6 +94,9 @@ function handleChunkComplete(_data) {
 
     const rows = [];
 
+    const seriesId = record.seriesInstrumentId ?? null;
+    const seriesName = seriesId ? (seriesNames[seriesId] ?? null) : null;
+
     for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
       if (measureValue == null) continue;
 
@@ -96,6 +106,8 @@ function handleChunkComplete(_data) {
           instrumentEdition: instrument.edition,
           instrumentName: instrument.name,
           measure: measureKey,
+          seriesId,
+          seriesName,
           sessionDate: record.session.date,
           sessionId: record.session.id,
           sessionType: record.session.type,
@@ -118,6 +130,8 @@ function handleChunkComplete(_data) {
           instrumentEdition: instrument.edition,
           instrumentName: instrument.name,
           measure: `${measureKey} - ${entry.measure}`,
+          seriesId,
+          seriesName,
           sessionDate: record.session.date,
           sessionId: record.session.id,
           sessionType: record.session.type,

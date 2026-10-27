@@ -36,17 +36,16 @@
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
     "@douglasneuroinformatics/eslint-config": "^6.0.0",
-    "@douglasneuroinformatics/prettier-config": "^0.3.0",
+    "@douglasneuroinformatics/prettier-config": "^0.4.0",
     "@douglasneuroinformatics/tsconfig": "^2.0.0",
-    "@types/js-yaml": "^4.0.9",
     "@types/node": "24.x",
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "^5.0.2",
     "conventional-commits-parser": "catalog:",
     "env-cmd": "^11.0.0",
     "eslint": "9.39.x",
     "expect-type": "^1.4.0",
     "husky": "^9.1.7",
-    "js-yaml": "^4.3.2",
+    "js-yaml": "^5.4.2",
     "knip": "^6.38.0",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^0.14.1",
@@ -55,7 +54,7 @@
     "tsx": "catalog:",
     "turbo": "^2.11.5",
     "typescript": "6.0.x",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.2"
   },
   "os": [
     "darwin",
@@ -70,7 +69,6 @@
       "@types/react": "-",
       "@types/react-dom": "-",
       "find-my-way@9": "^9.7.0",
-      "fastify@5": "^5.12.5",
       "typescript": "6.0.x",
       "yaml@2": "^2.9.0"
     },

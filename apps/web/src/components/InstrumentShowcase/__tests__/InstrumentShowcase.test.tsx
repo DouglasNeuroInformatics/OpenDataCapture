@@ -185,6 +185,25 @@ describe('InstrumentShowcase', () => {
     ]);
   });
 
+  it('should offer every available tag after the data is passed again, so an active search cannot shrink the tag filter', async () => {
+    const onSelect = vi.fn();
+    const { rerender } = render(<InstrumentShowcase data={instruments} onSelect={onSelect} />);
+
+    search('Alpha');
+    await expectCardIds(['alpha']);
+    // The parent re-renders with a new array instance, as Remote Assignment does on dialog open.
+    rerender(<InstrumentShowcase data={[...instruments]} onSelect={onSelect} />);
+    search('');
+    await expectCardIds(['alpha', 'beta', 'gamma']);
+
+    openFilter('instrument-tag-filter');
+    expect(screen.getAllByRole('menuitemcheckbox').map((option) => option.textContent)).toEqual([
+      'Anxiety',
+      'Memory',
+      'Mood'
+    ]);
+  });
+
   it('should highlight the first instrument, so Enter has something to open', () => {
     renderShowcase();
     expect(isHighlighted(alpha)).toBe(true);

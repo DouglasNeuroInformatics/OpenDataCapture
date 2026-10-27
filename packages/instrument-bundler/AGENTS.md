@@ -68,7 +68,17 @@ bundle dropped the entire module and every instrument import failed with
 `pnpm dev`. `src/vendor/__tests__/esbuild.test.ts` bundles the module with tree shaking to guard this.
 
 **`src/parse.ts` is vendored** from `parse-imports` (Apache-2.0, adapted to TypeScript and to run in a
-browser). Treat it as third-party: fix it upstream-style or not at all.
+browser). Treat it as third-party: fix it upstream-style or not at all. The exception is `parse`, the
+adapter over `es-module-lexer`'s records, which upstream does not have: an `es-module-lexer` upgrade is
+ported there. Its `importTypes` map must classify every import `type` the lexer reports, so a new one
+is a compile error rather than an `undefined`.
+
+**Nothing visibly fails without the top-level `await init()` in `src/parse.ts`.** `es-module-lexer`
+falls back to compiling its Wasm synchronously inside the first `parse`, which Node, Chromium and
+Firefox all allow for a module this size, so the CLI, the unit tests and the playground keep working
+if the line goes. It stays because the library requires `init()` before `parse` on a browser main
+thread, where its README says synchronous compilation is restricted and where it would block the page.
+`src/__tests__/parse.test.ts` checks that `init` resolves before the first `parse`.
 
 ## Module resolution
 

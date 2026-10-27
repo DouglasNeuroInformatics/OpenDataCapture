@@ -33,7 +33,7 @@
     "@opendatacapture/subject-utils": "workspace:*",
     "http-status-codes": "^2.3.0",
     "lodash-es": "workspace:lodash-es__4.x@*",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "^1.49.0",
     "motion": "catalog:",
     "react-dropzone": "catalog:",
     "serialize-error": "catalog:",

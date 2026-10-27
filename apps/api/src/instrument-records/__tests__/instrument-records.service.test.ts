@@ -676,6 +676,52 @@ describe('InstrumentRecordsService', () => {
       expect(groupsService.findById).toHaveBeenCalledBefore(instrumentRecordModel.findMany);
     });
 
+    // Asking a scalar instrument for what it orchestrated is a mistake rather than an empty result,
+    // so it is refused instead of silently returning nothing.
+    it('should reject a seriesInstrumentId that names an instrument which is not a series', async () => {
+      instrumentsService.findById.mockResolvedValueOnce({ id: 'form-1', kind: 'FORM' } as any);
+
+      await expect(instrumentRecordsService.find({ seriesInstrumentId: 'form-1' })).rejects.toBeInstanceOf(
+        UnprocessableEntityException
+      );
+      expect(instrumentRecordModel.findMany).not.toHaveBeenCalled();
+    });
+
+    it('should query the records a series orchestrated', async () => {
+      instrumentsService.findById.mockResolvedValueOnce({ id: 'series-1', kind: 'SERIES' } as any);
+
+      await instrumentRecordsService.find({ seriesInstrumentId: 'series-1' });
+
+      expect(instrumentRecordModel.findMany.mock.lastCall?.[0].where.AND).toContainEqual({
+        seriesInstrumentId: 'series-1'
+      });
+    });
+
+    // An unscoped lookup answers for a series belonging to a group the caller cannot read, which
+    // separates "exists elsewhere" from "does not exist" by the status code alone: a readable id
+    // returns 200 and an empty list where an unknown one returns 404. `read Instrument` holds no
+    // group condition, so the ability cannot close that on its own -- the caller's groups must
+    // narrow the lookup.
+    it("should narrow a series lookup to the caller's own groups, so another group's series is indistinguishable from an absent one", async () => {
+      const ability = createAppAbility([{ action: 'read', subject: 'InstrumentRecord' }]);
+      instrumentsService.findById.mockResolvedValueOnce({ id: 'series-1', kind: 'SERIES' } as any);
+
+      await instrumentRecordsService.find({ seriesInstrumentId: 'series-1' }, { ability, callerGroupIds: ['group-1'] });
+
+      expect(instrumentsService.findById).toHaveBeenCalledWith('series-1', { ability }, ['group-1']);
+    });
+
+    // An administrator belongs to no group, so narrowing to their groups would hide every
+    // group-owned series from the one role that oversees all of them.
+    it('should not narrow a series lookup for an administrator, who belongs to no group', async () => {
+      const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+      instrumentsService.findById.mockResolvedValueOnce({ id: 'series-1', kind: 'SERIES' } as any);
+
+      await instrumentRecordsService.find({ seriesInstrumentId: 'series-1' }, { ability, callerGroupIds: [] });
+
+      expect(instrumentsService.findById).toHaveBeenCalledWith('series-1', { ability }, undefined);
+    });
+
     it('should restrict the records to instruments of the requested kind', async () => {
       instrumentsService.find.mockResolvedValueOnce([{ id: 'form-1' }, { id: 'form-2' }]);
 
@@ -735,7 +781,7 @@ describe('InstrumentRecordsService', () => {
       await instrumentRecordsService.find({ subjectId: 'subject-1' });
 
       expect(sessionModel.findMany).toHaveBeenCalledWith({
-        select: { id: true, user: { select: { username: true } } },
+        select: { id: true, type: true, user: { select: { username: true } } },
         where: { AND: [{}, { id: { in: ['session-1', 'session-2'] } }] }
       });
     });
@@ -751,7 +797,7 @@ describe('InstrumentRecordsService', () => {
       await instrumentRecordsService.find({ subjectId: 'subject-1' }, { ability });
 
       expect(sessionModel.findMany).toHaveBeenCalledWith({
-        select: { id: true, user: { select: { username: true } } },
+        select: { id: true, type: true, user: { select: { username: true } } },
         where: { AND: [accessibleQuery(ability, 'read', 'Session'), { id: { in: ['session-1'] } }] }
       });
     });
@@ -786,6 +832,7 @@ describe('InstrumentRecordsService', () => {
           groupId: '123',
           id: 'record-1',
           instrumentId: 'instrument-1',
+          seriesInstrumentId: null,
           session: {
             date: '2023-01-01',
             id: 'session-1',
@@ -915,6 +962,81 @@ describe('InstrumentRecordsService', () => {
       expect(matchStage.$match.$expr).toStrictEqual({ $eq: ['$groupId', { $toObjectId: 'group-1' }] });
     });
 
+    // A series carries no language-independent name, so the worker is handed the titles resolved
+    // here rather than the ids — an export naming only ids says nothing about what collected a row.
+    it('should resolve the title of every series the records reference before handing them to the worker', async () => {
+      const record = {
+        computedMeasures: { score: 85 },
+        date: '2023-01-01',
+        groupId: 'group-1',
+        id: 'record-1',
+        instrumentId: 'instrument-1',
+        seriesInstrumentId: 'series-1',
+        session: { date: '2023-01-01', id: 'session-1', type: 'IN_PERSON' as const, user: null },
+        subject: { age: 20, groupIds: ['group-1'], id: 'subject-1', sex: 'MALE' }
+      } satisfies RecordType;
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([record]);
+      instrumentsService.findById
+        .mockResolvedValueOnce({ id: 'instrument-1', internal: { edition: 1, name: 'X' } } as any)
+        .mockResolvedValueOnce({
+          details: { title: 'Happiness Series' },
+          id: 'series-1',
+          kind: 'SERIES',
+          language: 'en'
+        } as any);
+      const worker = useFakeWorker();
+
+      const result = instrumentRecordsService.exportRecords(
+        {},
+        { ability: createAppAbility([{ action: 'manage', subject: 'all' }]) }
+      );
+      await vi.waitFor(() => expect(worker.postMessage).toHaveBeenCalledOnce());
+
+      expect(worker.postMessage).toHaveBeenCalledWith({
+        data: {
+          instruments: [{ edition: 1, id: 'instrument-1', name: 'X' }],
+          seriesNames: { 'series-1': 'Happiness Series' }
+        },
+        type: 'INIT'
+      });
+      worker.emit('error', new Error('settle'));
+      await expect(result).rejects.toThrow('settle');
+    });
+
+    // Resolving that title unscoped would read the name of a series owned by a group the caller
+    // cannot see, and write it into a file they are handed. Scoped, an unreadable series resolves to
+    // nothing and the row names it by id instead.
+    it("should resolve a series title with the caller ability, so no export names another group's series", async () => {
+      const record = {
+        computedMeasures: { score: 85 },
+        date: '2023-01-01',
+        groupId: 'group-1',
+        id: 'record-1',
+        instrumentId: 'instrument-1',
+        seriesInstrumentId: 'series-1',
+        session: { date: '2023-01-01', id: 'session-1', type: 'IN_PERSON' as const, user: null },
+        subject: { age: 20, groupIds: ['group-1'], id: 'subject-1', sex: 'MALE' }
+      } satisfies RecordType;
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([record]);
+      instrumentsService.findById
+        .mockResolvedValueOnce({ id: 'instrument-1', internal: { edition: 1, name: 'X' } } as any)
+        .mockResolvedValueOnce({
+          details: { title: 'Happiness Series' },
+          id: 'series-1',
+          kind: 'SERIES',
+          language: 'en'
+        } as any);
+      const worker = useFakeWorker();
+      const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+
+      const result = instrumentRecordsService.exportRecords({}, { ability });
+      await vi.waitFor(() => expect(worker.postMessage).toHaveBeenCalledOnce());
+
+      expect(instrumentsService.findById).toHaveBeenCalledWith('series-1', { ability });
+      worker.emit('error', new Error('settle'));
+      await expect(result).rejects.toThrow('settle');
+    });
+
     describe('when the worker fails', () => {
       const record = {
         computedMeasures: { score: 85 },
@@ -922,6 +1044,7 @@ describe('InstrumentRecordsService', () => {
         groupId: 'group-1',
         id: 'record-1',
         instrumentId: 'instrument-1',
+        seriesInstrumentId: null,
         session: { date: '2023-01-01', id: 'session-1', type: 'IN_PERSON' as const, user: null },
         subject: { age: 20, groupIds: ['group-1'], id: 'subject-1', sex: 'MALE' }
       } satisfies RecordType;
@@ -1205,13 +1328,20 @@ describe('InstrumentRecordsService', () => {
       const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
       expect(pipeline.find((stage) => stage.$group).$group._id).toStrictEqual({
         groupId: { $ifNull: ['$groupId', null] },
+        key: { $ifNull: ['$subjectId', null] },
         subjectId: { $ifNull: ['$subjectId', null] }
       });
     });
 
     it('should key the summary on the subject, so the subject hub can read a row per subject', async () => {
       instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
-        { groupId: 'group-1', lastCollectedAt: '2025-02-02T00:00:00.000Z', recordCount: 4, subjectId: 'subject-1' }
+        {
+          groupId: 'group-1',
+          key: 'subject-1',
+          lastCollectedAt: '2025-02-02T00:00:00.000Z',
+          recordCount: 4,
+          subjectId: 'subject-1'
+        }
       ]);
 
       const [summary] = await instrumentRecordsService.summarizeBySubject({}, { ability: ADMIN });
@@ -1228,8 +1358,8 @@ describe('InstrumentRecordsService', () => {
         { action: 'read', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' }
       ]);
       instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
-        { groupId: 'group-1', lastCollectedAt: null, recordCount: 2, subjectId: 'subject-1' },
-        { groupId: 'group-2', lastCollectedAt: null, recordCount: 7, subjectId: 'subject-1' }
+        { groupId: 'group-1', key: 'subject-1', lastCollectedAt: null, recordCount: 2, subjectId: 'subject-1' },
+        { groupId: 'group-2', key: 'subject-1', lastCollectedAt: null, recordCount: 7, subjectId: 'subject-1' }
       ]);
 
       const [summary] = await instrumentRecordsService.summarizeBySubject({}, { ability });
@@ -1241,8 +1371,20 @@ describe('InstrumentRecordsService', () => {
     // is the later of the two rather than whichever arrived last.
     it('should fold a subject appearing in several readable groups into one row', async () => {
       instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
-        { groupId: 'group-1', lastCollectedAt: '2025-01-01T00:00:00.000Z', recordCount: 2, subjectId: 'subject-1' },
-        { groupId: 'group-2', lastCollectedAt: '2025-03-03T00:00:00.000Z', recordCount: 3, subjectId: 'subject-1' }
+        {
+          groupId: 'group-1',
+          key: 'subject-1',
+          lastCollectedAt: '2025-01-01T00:00:00.000Z',
+          recordCount: 2,
+          subjectId: 'subject-1'
+        },
+        {
+          groupId: 'group-2',
+          key: 'subject-1',
+          lastCollectedAt: '2025-03-03T00:00:00.000Z',
+          recordCount: 3,
+          subjectId: 'subject-1'
+        }
       ]);
 
       const summaries = await instrumentRecordsService.summarizeBySubject({}, { ability: ADMIN });
@@ -1258,10 +1400,98 @@ describe('InstrumentRecordsService', () => {
 
     it('should skip a row whose subject could not be resolved, rather than keying a summary on null', async () => {
       instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
-        { groupId: 'group-1', lastCollectedAt: null, recordCount: 2, subjectId: null }
+        { groupId: 'group-1', key: null, lastCollectedAt: null, recordCount: 2, subjectId: null }
       ]);
 
       expect(await instrumentRecordsService.summarizeBySubject({}, { ability: ADMIN })).toStrictEqual([]);
+    });
+  });
+
+  describe('summarizeByInstrument', () => {
+    const ADMIN = createAppAbility([{ action: 'manage', subject: 'all' }]);
+
+    it('should group by the instrument, so the hub can read a row per instrument', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.summarizeByInstrument({}, { ability: ADMIN });
+
+      const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
+      expect(pipeline.find((stage) => stage.$group).$group._id.key).toStrictEqual({
+        $ifNull: ['$instrumentId', null]
+      });
+    });
+
+    // The count is of subjects, not records, which is the whole reason the pipeline groups by subject
+    // and folds here: one subject completing an instrument four times is still one subject.
+    it('should count a subject once however many records they contributed', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', key: 'instrument-1', lastCollectedAt: null, recordCount: 4, subjectId: 'subject-1' },
+        { groupId: 'group-1', key: 'instrument-1', lastCollectedAt: null, recordCount: 1, subjectId: 'subject-2' }
+      ]);
+
+      const [summary] = await instrumentRecordsService.summarizeByInstrument({}, { ability: ADMIN });
+
+      expect(summary).toStrictEqual({
+        instrumentId: 'instrument-1',
+        lastCollectedAt: null,
+        recordCount: 5,
+        subjectCount: 2
+      });
+    });
+
+    // Summing per-group counts would report this subject twice. Unioning the ids is what makes the
+    // count exact for a caller who can read both groups.
+    it('should count a subject shared by two readable groups once', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', key: 'instrument-1', lastCollectedAt: null, recordCount: 1, subjectId: 'subject-1' },
+        { groupId: 'group-2', key: 'instrument-1', lastCollectedAt: null, recordCount: 1, subjectId: 'subject-1' }
+      ]);
+
+      const [summary] = await instrumentRecordsService.summarizeByInstrument({}, { ability: ADMIN });
+
+      expect(summary).toMatchObject({ recordCount: 2, subjectCount: 1 });
+    });
+
+    // A record written before subjects were required carries no subject, and counting `null` as one
+    // would report a subject nobody can open.
+    it('should count no subject for a row naming none, while still counting its records', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', key: 'instrument-1', lastCollectedAt: null, recordCount: 2, subjectId: null }
+      ]);
+
+      const [summary] = await instrumentRecordsService.summarizeByInstrument({}, { ability: ADMIN });
+
+      expect(summary).toMatchObject({ recordCount: 2, subjectCount: 0 });
+    });
+  });
+
+  describe('summarizeBySeries', () => {
+    const ADMIN = createAppAbility([{ action: 'manage', subject: 'all' }]);
+
+    it('should group by the series instrument, so a series row spans the instruments it composes', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.summarizeBySeries({}, { ability: ADMIN });
+
+      const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
+      expect(pipeline.find((stage) => stage.$group).$group._id.key).toStrictEqual({
+        $ifNull: ['$seriesInstrumentId', null]
+      });
+    });
+
+    // Grouping by series buckets every individually collected record under a null key. Those are not
+    // a series and must not become a row, or the hub would show one labelled nothing.
+    it('should drop the null bucket holding every record collected outside a series', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([
+        { groupId: 'group-1', key: null, lastCollectedAt: null, recordCount: 90, subjectId: 'subject-1' },
+        { groupId: 'group-1', key: 'series-1', lastCollectedAt: null, recordCount: 2, subjectId: 'subject-1' }
+      ]);
+
+      const summaries = await instrumentRecordsService.summarizeBySeries({}, { ability: ADMIN });
+
+      expect(summaries).toStrictEqual([
+        { instrumentId: 'series-1', lastCollectedAt: null, recordCount: 2, subjectCount: 1 }
+      ]);
     });
   });
 });
