@@ -34,6 +34,9 @@ vi.mock('@/hooks/useMailSettingsQuery', () => ({
   mailSettingsQueryOptions: mocks.mailSettingsQueryOptions,
   useMailSettingsQuery: () => ({ data: SETTINGS })
 }));
+vi.mock('@/hooks/useSetupStateQuery', () => ({
+  useSetupStateQuery: () => ({ data: { activeLanguages: ['en', 'fr'] } })
+}));
 
 const runLoader = (queryClient: QueryClient) => {
   const { loader } = Route.options;
@@ -71,6 +74,7 @@ describe('admin mail route', () => {
     renderPage();
     expect(screen.getByTestId('mail-settings-page').contains(screen.getByTestId('mail-settings-form'))).toBe(true);
     expect(mocks.MailSettings.mock.lastCall?.[0]).toEqual({
+      activeLanguages: ['en', 'fr'],
       config: SETTINGS.config,
       newUserEmailTemplate: SETTINGS.newUserEmailTemplate
     });

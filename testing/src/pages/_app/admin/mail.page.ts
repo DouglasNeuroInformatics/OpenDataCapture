@@ -13,6 +13,7 @@ export class MailSettingsPage extends AppPage {
   readonly serverCard: Locator;
   readonly templateBody: Locator;
   readonly templateCard: Locator;
+  readonly templateLanguage: Locator;
   readonly templateSave: Locator;
   readonly testConnection: Locator;
   readonly testRecipient: Locator;
@@ -33,7 +34,13 @@ export class MailSettingsPage extends AppPage {
     this.sendTest = page.getByTestId('mail-send-test');
     this.templateCard = page.getByTestId('mail-template-card');
     this.templateBody = page.getByTestId('new-user-template-body');
+    this.templateLanguage = page.getByTestId('new-user-template-language');
     this.templateSave = page.getByTestId('mail-template-save');
+  }
+
+  /** The options of the welcome template's language picker, once it is open. */
+  get openLanguageOptions(): Locator {
+    return this.$ref.getByRole('option');
   }
 
   /** Idempotent: a configuration left enabled by an earlier spec already shows the form. */

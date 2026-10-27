@@ -113,13 +113,13 @@ describe('isSameMailServer', () => {
 });
 
 describe('default templates', () => {
-  it.each(['en', 'fr'] as const)('should carry the required placeholders in %s', (language) => {
+  it.each(['en', 'es', 'fr'] as const)('should carry the required placeholders in %s', (language) => {
     expect(DEFAULT_NEW_USER_EMAIL_TEMPLATE.body[language]).toContain('{{username}}');
     expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body[language]).toContain('{{url}}');
     expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body[language]).toContain('{{expiresAt}}');
   });
 
-  it.each(['en', 'fr'] as const)('should have a non-empty subject and body in %s', (language) => {
+  it.each(['en', 'es', 'fr'] as const)('should have a non-empty subject and body in %s', (language) => {
     expect(DEFAULT_NEW_USER_EMAIL_TEMPLATE.subject[language].trim()).toBeTruthy();
     expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.subject[language].trim()).toBeTruthy();
   });

@@ -1,6 +1,11 @@
+import type { Language } from '@opendatacapture/schemas/core';
+
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { E2E_MAIL_CONFIG, SEEDED_USER_PASSWORD } from '../support/constants';
 import { expect, test } from '../support/fixtures';
+
+/** How a language picker labels each language with the interface in English. */
+const LANGUAGE_NAMES: { [L in Language]: string } = { en: 'English', es: 'Spanish', fr: 'French' };
 
 // Whether mail is on is a property of the instance, not of a test: it lives on `SetupState` and
 // `isMailEnabled` gates UI across the whole app. Two spec files touching it would be scheduled into
@@ -154,6 +159,24 @@ test.describe('mail delivery', () => {
       // The stored password is real, so this is the assertion that it never reaches the browser.
       await expect(mailPage.password).not.toHaveValue(E2E_MAIL_CONFIG.password);
       await expect(mailPage.$ref.locator('body')).not.toContainText(E2E_MAIL_CONFIG.password);
+    });
+
+    // A subset rather than an exact list: `admin-settings.spec.ts` turns Spanish on and off in a
+    // worker of its own, so the enabled set is read at the same moment the picker is. Without the
+    // scoping the picker offers every language the application ships, whatever the instance offers.
+    test('should offer the welcome template in no language the instance has disabled', async ({
+      api,
+      getPageModel
+    }) => {
+      const mailPage = await getPageModel('/admin/mail');
+      const enabled = new Set((await api.findActiveLanguages()).map((code) => LANGUAGE_NAMES[code]));
+
+      await mailPage.templateLanguage.click();
+      await expect(mailPage.openLanguageOptions.first()).toBeVisible();
+      const offered = await mailPage.openLanguageOptions.allTextContents();
+
+      expect(offered.length).toBeGreaterThan(0);
+      expect(offered.filter((name) => !enabled.has(name))).toStrictEqual([]);
     });
 
     test('should report a failed connection test in the reader’s language, not raw SMTP prose', async ({

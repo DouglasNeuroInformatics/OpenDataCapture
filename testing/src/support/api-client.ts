@@ -2,7 +2,7 @@ import type { $CreateAssignmentData, Assignment } from '@opendatacapture/schemas
 import { AUDIT_LOGS_MAX_PAGE_SIZE } from '@opendatacapture/schemas/audit';
 import type { $AuditLog, $AuditLogAction, $AuditLogsPage } from '@opendatacapture/schemas/audit';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
-import type { Permissions } from '@opendatacapture/schemas/core';
+import type { Language, Permissions } from '@opendatacapture/schemas/core';
 import type { $CreateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type {
@@ -165,6 +165,19 @@ export class ApiClient {
       'create user'
     );
     return { credentials: { password, username }, user };
+  }
+
+  /**
+   * The languages the instance currently offers. Read rather than assumed because
+   * `admin-settings.spec.ts` turns one on and off, in a worker of its own.
+   */
+  async findActiveLanguages(): Promise<Language[]> {
+    const setupState = await this.expectJson<{ activeLanguages: Language[] }>(
+      this.request.get(`${API}/setup`, { headers: this.authHeaders }),
+      200,
+      'find the active languages'
+    );
+    return setupState.activeLanguages;
   }
 
   /** Reads a subject's assignments back as admin, to check whether a write by another role took effect. */

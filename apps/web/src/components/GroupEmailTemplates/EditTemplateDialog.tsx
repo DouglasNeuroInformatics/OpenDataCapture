@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Button, Dialog, Input, Label } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { Language } from '@opendatacapture/schemas/core';
 import type { GroupEmailTemplate } from '@opendatacapture/schemas/group';
 import type { MailTemplate } from '@opendatacapture/schemas/mail';
 
@@ -9,6 +10,7 @@ import { EmailTemplateEditor } from '@/components/EmailTemplateEditor';
 import { ASSIGNMENT_TEMPLATE_VARS } from '@/utils/email-template';
 
 type EditTemplateFormProps = {
+  activeLanguages: readonly Language[];
   isPending: boolean;
   onCancel: () => void;
   onSave: (template: GroupEmailTemplate) => void;
@@ -18,6 +20,7 @@ type EditTemplateFormProps = {
 };
 
 const EditTemplateForm = ({
+  activeLanguages,
   isPending,
   onCancel,
   onSave,
@@ -62,6 +65,7 @@ const EditTemplateForm = ({
       <EmailTemplateEditor
         error={contentError}
         idPrefix="template-edit"
+        languages={activeLanguages}
         template={draft}
         variables={ASSIGNMENT_TEMPLATE_VARS}
         onChange={setDraft}
@@ -84,6 +88,7 @@ const EditTemplateForm = ({
 };
 
 export type EditTemplateDialogProps = {
+  activeLanguages: readonly Language[];
   isPending: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (template: GroupEmailTemplate) => void;
@@ -104,6 +109,7 @@ export const EditTemplateDialog = ({ template, ...props }: EditTemplateDialogPro
         {/* Mounted only while open, so the draft resets between templates. */}
         {template && (
           <EditTemplateForm
+            activeLanguages={props.activeLanguages}
             isPending={props.isPending}
             template={template}
             validateContent={props.validateContent}
