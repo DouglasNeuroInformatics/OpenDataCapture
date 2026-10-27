@@ -4,6 +4,17 @@ import { resolveIndexFilename } from '@/utils/file';
 
 import type { EditorSlice, SliceCreator } from '../types';
 
+function closeTab(state: Pick<EditorSlice, 'openFilenames' | 'selectedFilename'>, name: string) {
+  const currentIndex = state.openFilenames.indexOf(name);
+  if (currentIndex === -1) {
+    return;
+  }
+  state.openFilenames.splice(currentIndex, 1);
+  if (state.selectedFilename === name) {
+    state.selectedFilename = state.openFilenames.at(currentIndex - 1) ?? null;
+  }
+}
+
 export const createEditorSlice: SliceCreator<EditorSlice> = (set, get) => ({
   addFile: (file) => {
     set((state) => {
@@ -33,21 +44,13 @@ export const createEditorSlice: SliceCreator<EditorSlice> = (set, get) => ({
   },
   closeFile: (name) => {
     set((state) => {
-      const currentIndex = state.openFilenames.indexOf(name);
-      if (currentIndex > -1) {
-        state.openFilenames.splice(currentIndex, 1);
-        state.selectedFilename = state.openFilenames.at(currentIndex - 1) ?? null;
-      }
+      closeTab(state, name);
     });
   },
   deleteFile: (name) => {
     set((state) => {
       state.files = state.files.filter((file) => file.name !== name);
-      const currentIndex = state.openFilenames.indexOf(name);
-      if (currentIndex > -1) {
-        state.openFilenames.splice(currentIndex, 1);
-        state.selectedFilename = state.openFilenames.at(currentIndex - 1) ?? null;
-      }
+      closeTab(state, name);
     });
   },
   files: [],

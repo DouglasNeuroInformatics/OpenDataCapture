@@ -11,6 +11,7 @@ import { LoginForm } from '@/components/LoginForm';
 import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 import { getRightPanelGradient } from '@/utils/branding';
+import { getValueForLanguage } from '@/utils/language';
 
 type LoginResult =
   { accessToken: string; kind: 'success' } | { kind: 'archived' } | { kind: 'disabled' } | { kind: 'unauthorized' };
@@ -38,8 +39,8 @@ const RouteComponent = () => {
 
   const branding = setupStateQuery.data.branding;
   const enableBranding = branding?.enableBranding === true;
-  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-  const instanceName = branding?.instanceName?.[resolvedLanguage]?.trim() || 'Open Data Capture';
+  const instanceName =
+    getValueForLanguage(branding?.instanceName ?? {}, resolvedLanguage)?.trim() ?? 'Open Data Capture';
 
   const handleLogin = async (credentials: $LoginCredentials) => {
     const result = await loginRequest(credentials);

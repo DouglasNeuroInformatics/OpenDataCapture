@@ -106,7 +106,12 @@ describe('parseDelimitedText', () => {
 
   it("should reject malformed quoting with the parser's error message", async () => {
     const errors = await failureOf(() => parseDelimitedText('subjectId\n"subject-1'));
-    expect(errors.map(({ message }) => message)).toEqual(['Quoted field unterminated']);
+    expect(errors).toEqual([{ message: 'Quoted field unterminated', row: 2 }]);
+  });
+
+  it('should number a malformed line as the user sees it in their file, counting the header as row 1', async () => {
+    const errors = await failureOf(() => parseDelimitedText('subjectId\na\nb\n"c'));
+    expect(errors).toEqual([{ message: 'Quoted field unterminated', row: 4 }]);
   });
 });
 

@@ -9,6 +9,7 @@ export class AuditLogsPage extends AppPage {
   readonly dataTable: Locator;
   readonly downloadButton: Locator;
   readonly pageHeader: Locator;
+  readonly timeHeaderButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -16,6 +17,9 @@ export class AuditLogsPage extends AppPage {
     this.dataTable = page.getByTestId('data-table');
     this.clearFiltersButton = page.getByTestId('audit-logs-clear-filters');
     this.downloadButton = page.getByRole('button', { name: 'Download' });
+    this.timeHeaderButton = this.dataTable
+      .getByTestId('data-table-head')
+      .getByRole('button', { exact: true, name: 'Time' });
   }
 
   filterButton(filter: AuditLogsFilter) {

@@ -23,6 +23,10 @@ type DateFormat = 'iso' | 'local';
 
 type SortOrder = 'asc' | 'desc';
 
+const INITIAL_PAGE = 1;
+
+const INITIAL_SORT_ORDER: SortOrder = 'desc';
+
 const ACTIONS: $AuditLogAction[] = ['CREATE', 'DELETE', 'UPDATE', 'ARCHIVE', 'UNARCHIVE', 'LOGIN', 'SEND_EMAIL'];
 
 const ENTITIES: $AuditLogEntity[] = [
@@ -184,8 +188,8 @@ const AuditLogsToolbar = () => {
 };
 
 const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search }) => {
-  const [page, setPage] = useState(1);
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [page, setPage] = useState(INITIAL_PAGE);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(INITIAL_SORT_ORDER);
 
   const auditLogsQuery = useAuditLogsQuery({ params: { ...search, page, sortOrder } });
 
@@ -225,7 +229,10 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
               <DateFormatMenu value={dateFormat} onChange={setDateFormat} />
             </div>
           ),
-          size: 250
+          size: 250,
+          // The rows already arrive newest first, so the table's first toggle of its unsorted column
+          // must go to ascending, or the first click would request the order already on screen.
+          sortDescFirst: false
         },
         {
           accessorFn: (row) => row.user?.username ?? 'N/A',
@@ -278,7 +285,7 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
         const timestamp = state.find(({ id }) => id === 'timestamp');
         if (timestamp) {
           setSortOrder(timestamp.desc ? 'desc' : 'asc');
-          setPage(1);
+          setPage(INITIAL_PAGE);
         }
       }}
     />
@@ -310,7 +317,9 @@ export const Route = createFileRoute('/_app/admin/audit/logs')({
   // eslint-disable-next-line perfectionist/sort-objects
   loader: async ({ context, deps }) => {
     await Promise.all([
-      context.queryClient.ensureQueryData(auditLogsQueryOptions({ params: deps.search })),
+      context.queryClient.ensureQueryData(
+        auditLogsQueryOptions({ params: { ...deps.search, page: INITIAL_PAGE, sortOrder: INITIAL_SORT_ORDER } })
+      ),
       context.queryClient.ensureQueryData(groupsQueryOptions()),
       context.queryClient.ensureQueryData(usersQueryOptions())
     ]);

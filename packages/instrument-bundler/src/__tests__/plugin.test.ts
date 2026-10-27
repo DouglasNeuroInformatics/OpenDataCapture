@@ -79,6 +79,22 @@ describe('plugin — onResolve', () => {
     });
   });
 
+  it('should append .js to a subpath of a scoped runtime package, so only the bare package resolves to index.js', () => {
+    const resolveRuntime = (path: string) => resolve({ kind: 'import-statement', path } as OnResolveArgs);
+    expect(resolveRuntime('/runtime/v1/@opendatacapture/runtime-core/constants')).toEqual({
+      external: true,
+      path: '/runtime/v1/@opendatacapture/runtime-core/constants.js'
+    });
+    expect(resolveRuntime('/runtime/v1/@opendatacapture/runtime-core/constants.js')).toEqual({
+      external: true,
+      path: '/runtime/v1/@opendatacapture/runtime-core/constants.js'
+    });
+    expect(resolveRuntime('/runtime/v1/@opendatacapture/runtime-core')).toEqual({
+      external: true,
+      path: '/runtime/v1/@opendatacapture/runtime-core/index.js'
+    });
+  });
+
   it('should route anything else to the bundle namespace unresolved', () => {
     expect(resolve({ kind: 'import-statement', path: './sibling.ts' } as OnResolveArgs)).toEqual({
       namespace: 'bundle',

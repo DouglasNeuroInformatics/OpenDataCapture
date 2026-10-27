@@ -77,6 +77,17 @@ describe('useAuditLogsQuery', () => {
     expect(get.mock.lastCall?.[1]).toMatchObject({ params: { page: 2 } });
     expect(result.current.data?.data.map(({ id }) => id)).toStrictEqual(['a']);
   });
+
+  it('should not refetch on mount a page the route loader has just prefetched', async () => {
+    get.mockResolvedValue(page([log('a')], 1, 1));
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    await queryClient.ensureQueryData(auditLogsQueryOptions({ params: { page: 1 } }));
+    const wrapper = ({ children }: PropsWithChildren) =>
+      createElement(QueryClientProvider, { children, client: queryClient });
+    const { result } = renderHook(() => useAuditLogsQuery({ params: { page: 1 } }), { wrapper });
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(get).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('fetchAllAuditLogs', () => {

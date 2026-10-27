@@ -116,3 +116,20 @@ test.describe('remote assignments wizard', () => {
     expect(scrollHeight).toBeGreaterThan(clientHeight);
   });
 });
+
+test.describe('remote assignments wizard parse errors', () => {
+  test('should number a malformed pasted line as it is numbered in the pasted text', async ({
+    authenticateAs,
+    page
+  }) => {
+    await authenticateAs('GROUP_MANAGER');
+    await page.goto('/group/remote-assignments?mode=create');
+    await expect(page.getByTestId('bulk-remote-assignment-wizard')).toBeVisible();
+
+    await page.getByTestId('bulk-source-mode-PASTE').click();
+    await page.getByTestId('bulk-paste-input').fill('subjectId\n"subject-1');
+    await page.getByTestId('bulk-parse-pasted').click();
+
+    await expect(page.getByTestId('bulk-error-list')).toContainText('Row 2: Quoted field unterminated');
+  });
+});

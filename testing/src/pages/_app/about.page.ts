@@ -17,4 +17,10 @@ export class AboutPage extends AppPage {
     this.coreApiInfo = page.getByTestId('about-core-api-info');
     this.gatewayInfo = page.getByTestId('about-gateway-info');
   }
+
+  async getCoreApiUptimeSeconds() {
+    const uptimeText = await this.coreApiInfo.getByRole('listitem').filter({ hasText: 'Uptime:' }).textContent();
+    const [hours, minutes, seconds] = uptimeText!.slice('Uptime: '.length).split(':').map(Number);
+    return hours! * 3600 + minutes! * 60 + seconds!;
+  }
 }

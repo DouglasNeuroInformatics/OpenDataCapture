@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 type SearchInterface<T> = {
   filteredData: T[];
@@ -7,12 +7,12 @@ type SearchInterface<T> = {
 };
 
 export function useSearch<T>(data: T[], select: (item: T) => string): SearchInterface<T> {
-  const [filteredData, setFilteredData] = useState<T[]>(data);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    setFilteredData(data.filter((item) => select(item).toLowerCase().includes(searchTerm.toLowerCase())));
-  }, [data, searchTerm]);
+  const filteredData = useMemo(
+    () => data.filter((item) => select(item).toLowerCase().includes(searchTerm.toLowerCase())),
+    [data, searchTerm]
+  );
 
   return {
     filteredData,

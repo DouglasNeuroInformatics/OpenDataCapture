@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
 import { useInterval, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { isEqual } from 'lodash-es';
 import { SaveIcon } from 'lucide-react';
 
 import { useFilesRef } from '@/hooks/useFilesRef';
 import { useAppStore } from '@/store';
 
 import { ActionButton } from '../ActionButton';
+import { isSaveDisabled } from './is-save-disabled';
 
 export const SaveButton = () => {
   const [disabled, setDisabled] = useState(true);
@@ -16,9 +16,7 @@ export const SaveButton = () => {
   const updateSelectedInstrument = useAppStore((store) => store.updateSelectedInstrument);
 
   useInterval(() => {
-    if (selectedInstrument.category === 'Saved') {
-      setDisabled(isEqual(editorFiles.current, selectedInstrument.files));
-    }
+    setDisabled(isSaveDisabled(selectedInstrument, editorFiles.current));
   }, 1000);
 
   const { t } = useTranslation();

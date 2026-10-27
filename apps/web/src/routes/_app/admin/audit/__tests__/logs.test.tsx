@@ -192,10 +192,20 @@ describe('audit logs route', () => {
     const { ensureQueryData, promise } = runLoader(search);
     await promise;
     expect(ensureQueryData.mock.calls.map(([options]) => options.queryKey)).toEqual([
-      auditLogsQueryOptions({ params: search }).queryKey,
+      auditLogsQueryOptions({ params: { ...search, page: 1, sortOrder: 'desc' } }).queryKey,
       groupsQueryOptions().queryKey,
       usersQueryOptions().queryKey
     ]);
+  });
+
+  it('should prefetch the logs under the same key the table first reads, so the first page is not fetched twice', async () => {
+    const search: AuditLogsSearch = { entity: 'USER' };
+    mocks.search = search;
+    const { ensureQueryData, promise } = runLoader(search);
+    await promise;
+    renderPage();
+    const tableQueryKey = auditLogsQueryOptions(mocks.queryAuditLogs.mock.calls[0]![0]).queryKey;
+    expect(ensureQueryData.mock.calls[0]![0].queryKey).toEqual(tableQueryKey);
   });
 
   it('should reject a search naming an action that does not exist', () => {
@@ -390,13 +400,20 @@ describe('audit logs table', () => {
     expect(lastQueryParams()).toEqual({ page: 2, sortOrder: 'desc' });
   });
 
-  it('should request oldest first from the first page when the time column is flipped', () => {
+  it('should sort oldest first on the first click of the time header, since the logs already arrive newest first', () => {
     renderPage();
     goToPage(2);
     fireEvent.click(timeHeaderButton());
-    fireEvent.click(timeHeaderButton());
     expect(lastQueryParams()).toEqual({ page: 1, sortOrder: 'asc' });
     expect(timeHeaderButton().querySelector('.lucide-arrow-up')).toBeTruthy();
+  });
+
+  it('should return to newest first on the second click of the time header', () => {
+    renderPage();
+    fireEvent.click(timeHeaderButton());
+    fireEvent.click(timeHeaderButton());
+    expect(lastQueryParams()).toEqual({ page: 1, sortOrder: 'desc' });
+    expect(timeHeaderButton().querySelector('.lucide-arrow-down')).toBeTruthy();
   });
 
   it('should ignore a sorting change that does not involve the time column', () => {

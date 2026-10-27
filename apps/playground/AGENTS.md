@@ -184,16 +184,18 @@ that differs between deployments belongs in `/config.json` instead.
 
 `pnpm exec vitest --project playground`, from the repo root. The project runs in node, with no DOM,
 and covers only what is pure — `src/preview/__tests__/protocol.test.ts` pins the message schemas,
-error serialization and `resolvePreviewOrigin`, and `config.test.ts` the `/config.json` contract. A
-component that renders on a server can still be pinned through `react-dom/server`'s
+error serialization and `resolvePreviewOrigin`, and `config.test.ts` the `/config.json` contract.
+Store slice tests (`src/store/slices/__tests__/`) drive the real `useAppStore` with `idb-keyval` and
+`@/instruments` mocked, since the catalog's `import.meta.glob` assets and IndexedDB do not exist in
+node. A component that renders on a server can still be pinned through `react-dom/server`'s
 `renderToStaticMarkup`, as `src/components/Resizable/__tests__/` does for the attributes its classes
 key on. A component test that needs a DOM opts in per file with a `// @vitest-environment happy-dom`
 docblock on its first line and renders with `@testing-library/react`;
 `src/components/Editor/__tests__/MonacoEditor.test.tsx` does, against a mocked `monaco-editor`,
 because Monaco itself does not run under happy-dom. Anything that touches esbuild-wasm, Monaco
-workers or `/runtime/v1` has no test environment here; the frame itself, the origin split, the runtime config, the message bridge and the resizable
-editor/preview split are exercised for real by `testing/src/specs/playground.spec.ts`, which
-Playwright runs against this app's dev server.
+workers or `/runtime/v1` has no test environment here; the frame itself, the origin split, the
+runtime config, the message bridge and the resizable editor/preview split are exercised for real by
+`testing/src/specs/playground.spec.ts`, which Playwright runs against this app's dev server.
 
 Storybook collects `*.stories.tsx` under `src/components/` centrally through
 `storybook/config/main.ts` under the `Playground Components` prefix. See

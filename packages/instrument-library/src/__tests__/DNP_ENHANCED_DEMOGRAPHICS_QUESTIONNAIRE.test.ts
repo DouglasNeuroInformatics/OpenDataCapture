@@ -18,6 +18,22 @@ function getStringField(name: 'employmentStatus' | 'ethnicOrigin' | 'gender' | '
   throw new Error(`Expected a string field with options named '${name}'`);
 }
 
+function getFieldLabel(name: 'ageAtImmigration' | 'maritalStatus') {
+  if (!Array.isArray(instrument.content)) {
+    throw new Error('Expected the demographics content to be an array of groups');
+  }
+  for (const group of instrument.content) {
+    if (group.kind === 'block') {
+      continue;
+    }
+    const field = group.fields[name];
+    if (field && field.kind !== 'dynamic') {
+      return field.label;
+    }
+  }
+  throw new Error(`Expected a static field named '${name}'`);
+}
+
 describe('DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE', () => {
   describe('options', () => {
     it('should label each option in English for an English-speaking subject', () => {
@@ -32,6 +48,23 @@ describe('DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE', () => {
       for (const key of Object.keys(getStringField('maritalStatus').options.en)) {
         expect(instrument.validationSchema.safeParse({ maritalStatus: key }).success).toBe(true);
       }
+    });
+  });
+
+  describe('labels', () => {
+    it('should label the marital status question "Marital Status" in English', () => {
+      expect(getFieldLabel('maritalStatus').en).toBe('Marital Status');
+    });
+
+    it('should tell subjects in both languages that the age-at-immigration question applies only if relevant', () => {
+      expect(getFieldLabel('ageAtImmigration')).toEqual({
+        en: 'Age at Immigration (if applicable)',
+        fr: "Âge à l'immigration (le cas échéant)"
+      });
+    });
+
+    it('should state each sentence of the French description once', () => {
+      expect(instrument.details.description.fr.match(/enregistrement initial des sujets/g)).toHaveLength(1);
     });
   });
 
@@ -51,6 +84,14 @@ describe('DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE', () => {
 
     it('should reject a postal code that is not in the Canadian format', () => {
       expect(instrument.validationSchema.safeParse({ postalCode: '90210' }).success).toBe(false);
+    });
+
+    it('should accept a lowercase postal code and store it in uppercase, so a subject typing on a phone is not rejected', () => {
+      expect(instrument.validationSchema.safeParse({ postalCode: ' h4h 1r3 ' }).data?.postalCode).toBe('H4H 1R3');
+    });
+
+    it('should accept an age at immigration of 0, for a subject who immigrated as an infant', () => {
+      expect(instrument.validationSchema.safeParse({ ageAtImmigration: 0 }).success).toBe(true);
     });
   });
 });

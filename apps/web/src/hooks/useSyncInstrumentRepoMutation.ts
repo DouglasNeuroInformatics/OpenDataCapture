@@ -12,7 +12,9 @@ export function useSyncInstrumentRepoMutation() {
   const { t } = useTranslation();
   return useMutation({
     mutationFn: ({ id }: { id: string }) =>
-      axios.post(`/v1/instrument-repos/${id}/sync`, undefined, { meta: { disableDefaultErrorNotification: true } }),
+      axios.post(`/v1/instrument-repos/${id}/sync`, undefined, {
+        meta: { disableDefaultErrorNotification: true, disableDefaultTimeout: true }
+      }),
     onError(err) {
       addNotification({
         message: getApiErrorMessage(
@@ -49,6 +51,8 @@ export function useSyncInstrumentRepoMutation() {
       void queryClient.invalidateQueries({ queryKey: [INSTRUMENT_REPOS_QUERY_KEY] });
       // A sync can pull in new instruments; refresh the instrument list shown elsewhere.
       void queryClient.invalidateQueries({ queryKey: ['instrument-info'] });
-    }
+    },
+    // onError reports the failure; the app default would also hand it to the route error boundary.
+    throwOnError: false
   });
 }

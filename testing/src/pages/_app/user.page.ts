@@ -5,6 +5,7 @@ import { AppPage } from './route.page';
 export class UserPage extends AppPage {
   readonly changePasswordButton: Locator;
   readonly emailField: Locator;
+  readonly firstNameField: Locator;
   readonly pageHeader: Locator;
   readonly passwordDialog: Locator;
   readonly phoneNumberField: Locator;
@@ -21,6 +22,7 @@ export class UserPage extends AppPage {
     this.passwordDialog = page.getByRole('dialog', { name: 'Change Password' });
     this.profileForm = page.getByTestId('profile-form');
     this.emailField = this.profileForm.getByLabel('Email');
+    this.firstNameField = this.profileForm.getByLabel('First Name');
     this.phoneNumberField = this.profileForm.getByLabel('Phone Number');
   }
 

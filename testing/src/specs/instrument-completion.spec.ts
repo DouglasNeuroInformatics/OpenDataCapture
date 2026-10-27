@@ -307,4 +307,144 @@ test.describe('instrument completion', () => {
     await expect(instrumentPage.errorMessages).toBeVisible();
     await expect(instrumentPage.errorMessages).toHaveText('Does not match the expected format');
   });
+
+  test('should accept a lowercase postal code and an age at immigration of 0, storing the postal code in uppercase', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Lowercase${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page
+      .locator('[data-testid^="instrument-card-"]')
+      .filter({ hasText: DEMOGRAPHICS_INSTRUMENT_TITLE })
+      .first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+    await instrumentPage.$ref.locator('[name="postalCode"]').fill('h4h 1r3');
+    await instrumentPage.$ref.locator('[name="ageAtImmigration"]').fill('0');
+    await instrumentPage.submit();
+
+    await expect(instrumentPage.summaryHeading).toBeVisible();
+
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
+
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: DEMOGRAPHICS_INSTRUMENT_TITLE }).click();
+
+    await expect(page.getByTestId('subject-table-cell-postalCode').first()).toHaveText('H4H 1R3');
+    await expect(page.getByTestId('subject-table-cell-ageAtImmigration').first()).toHaveText('0');
+  });
+
+  test('should label the marital status and age-at-immigration questions correctly in English', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Labels${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page
+      .locator('[data-testid^="instrument-card-"]')
+      .filter({ hasText: DEMOGRAPHICS_INSTRUMENT_TITLE })
+      .first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+
+    await expect(instrumentPage.$ref.getByText('Marital Status', { exact: true })).toBeVisible();
+    await expect(instrumentPage.$ref.getByText('Age at Immigration (if applicable)', { exact: true })).toBeVisible();
+  });
+
+  test('should show the missing-reason error under the reason field when a dissatisfied subject leaves it empty', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Reason${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+    await instrumentPage.answerHappinessQuestionnaireDissatisfiedWithoutReason();
+    await instrumentPage.submit();
+
+    // An issue without a path is rendered above the Submit button instead of under any field, so the
+    // single error must sit inside the reason field's group.
+    const reasonFieldGroup = page.locator('[data-field-group="reasonNotSatisfied"]');
+    await expect(reasonFieldGroup.getByTestId('error-message-text')).toHaveText(
+      'This field is required / Ce champ est obligatoire'
+    );
+    await expect(instrumentPage.errorMessages).toHaveCount(1);
+    await expect(instrumentPage.summaryHeading).toBeHidden();
+  });
+});
+
+test.describe('file instrument completion', () => {
+  test('should report a selection over the file limit as too many files, keeping the earlier selection', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`FileLimit${uniqueId}`, `Subject${uniqueId}`, 'Female');
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+
+    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: 'Arbitrary File Upload' }).first();
+    await expect(card).toBeVisible();
+    await card.click();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+
+    const dropzone = page.getByTestId('dropzone');
+    const fileInput = dropzone.locator('input[type="file"]');
+    const createUpload = (name: string) => ({ buffer: Buffer.from('content'), mimeType: 'text/plain', name });
+
+    await fileInput.setInputFiles(createUpload('first.txt'));
+    await expect(dropzone).toContainText('first.txt');
+
+    await fileInput.setInputFiles([createUpload('a.txt'), createUpload('b.txt')]);
+    await expect(page.getByText('Only 1 file can be uploaded here; you selected 2')).toBeVisible();
+    await expect(page.getByText('Unsupported file type')).toBeHidden();
+    await expect(dropzone).toContainText('first.txt');
+  });
 });

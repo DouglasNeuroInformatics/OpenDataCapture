@@ -72,7 +72,6 @@ export default defineInstrument({
             en: 'Why do you feel dissatisfied with your life?',
             fr: 'Pourquoi vous sentez-vous insatisfait de votre vie ?'
           },
-          isRequired: false,
           kind: 'string',
           variant: 'textarea'
         };
@@ -115,7 +114,7 @@ export default defineInstrument({
     estimatedDuration: 1,
     instructions: {
       en: ['Please answer the questions based on your current feelings.'],
-      fr: ['Veuillez répondre àux questions en fonction de vos sentiments actuels.']
+      fr: ['Veuillez répondre aux questions en fonction de vos sentiments actuels.']
     },
     title: {
       en: 'Questionnaire on Happiness',
@@ -173,7 +172,8 @@ export default defineInstrument({
       if (!arg.isSatisfiedOverall && !arg.reasonNotSatisfied) {
         ctx.addIssue({
           code: 'custom',
-          message: 'This field is required / Ce champ est obligatoire'
+          message: 'This field is required / Ce champ est obligatoire',
+          path: ['reasonNotSatisfied']
         });
       }
     })

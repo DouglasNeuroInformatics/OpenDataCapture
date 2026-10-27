@@ -96,6 +96,18 @@ describe('$PhoneNumber', () => {
   it('should reject a blank value, since an absent number is spelled undefined or null', () => {
     expect($PhoneNumber.safeParse('').success).toBe(false);
   });
+
+  it.each(['+1 514 555 1234', '+1 (514) 555-1234', '+33 1 23 45 67 89', '01 23 45 67 89', '+44 20 7946 0958'])(
+    'should accept the phone number %s, so international and grouped national formats can be saved',
+    (phoneNumber) => {
+      expect($PhoneNumber.safeParse(phoneNumber).success).toBe(true);
+    }
+  );
+
+  it('should reject a number with more digits than E.164 allows', () => {
+    const result = $PhoneNumber.safeParse('+1 234 567 890 123 456');
+    expect(result.error?.issues[0]?.message).toBe('Invalid phone number');
+  });
 });
 
 describe('$User', () => {

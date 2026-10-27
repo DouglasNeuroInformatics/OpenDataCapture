@@ -687,7 +687,7 @@ export default defineInstrument({
         maritalStatus: {
           kind: 'string',
           label: {
-            en: 'Martial Status',
+            en: 'Marital Status',
             fr: 'État matrimonial'
           },
           options: formatTranslatedOptions(maritalStatus),
@@ -767,11 +767,11 @@ export default defineInstrument({
         ageAtImmigration: {
           kind: 'number',
           label: {
-            en: 'Age at Immigration',
+            en: 'Age at Immigration (if applicable)',
             fr: "Âge à l'immigration (le cas échéant)"
           },
           max: 100,
-          min: 1,
+          min: 0,
           variant: 'input'
         },
         isCanadianCitizen: {
@@ -804,7 +804,7 @@ export default defineInstrument({
   details: {
     description: {
       en: 'This instrument is designed to capture more specific demographic data, beyond that which is required for initial subject registration. All questions are optional.',
-      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. celles qui sont requises pour l'enregistrement initial des sujets. Toutes les questions sont optionnelles."
+      fr: "Cet instrument est conçu pour recueillir des données démographiques plus spécifiques que celles requises pour l'enregistrement initial des sujets. Toutes les questions sont optionnelles."
     },
 
     license: 'Apache-2.0',
@@ -816,7 +816,7 @@ export default defineInstrument({
   measures: {},
   validationSchema: z
     .object({
-      ageAtImmigration: z.number().int().gte(1).lte(100),
+      ageAtImmigration: z.number().int().gte(0).lte(100),
       annualIncome: z.number().int().gte(0).lte(1000000),
       employmentStatus: z.enum(extractKeysAsTuple(employmentStatus)),
       ethnicOrigin: z.enum(extractKeysAsTuple(ethnicOrigin)),
@@ -826,7 +826,7 @@ export default defineInstrument({
       isCanadianCitizen: z.boolean(),
       maritalStatus: z.enum(extractKeysAsTuple(maritalStatus)),
       numberChildren: z.number().int().gte(0).lte(20),
-      postalCode: z.string().regex(new RegExp('^[A-Z]\\d[A-Z][ -]?\\d[A-Z]\\d$')),
+      postalCode: z.string().trim().toUpperCase().regex(new RegExp('^[A-Z]\\d[A-Z][ -]?\\d[A-Z]\\d$')),
       religion: z.enum(extractKeysAsTuple(religion)),
       speaksEnglish: z.boolean(),
       speaksFrench: z.boolean(),

@@ -1,33 +1,27 @@
-import { useState } from 'react';
-
 import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
-import { Button, Dialog, ThemeToggle } from '@douglasneuroinformatics/libui/components';
+import { ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding, LanguageToggle } from '@opendatacapture/react-core';
 import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import { useLocation, useNavigate } from '@tanstack/react-router';
-import { StopCircle } from 'lucide-react';
+import { useLocation } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { useNavItems } from '@/hooks/useNavItems';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 
+import { EndSessionButton } from '../EndSessionButton';
 import { GroupSwitcher, useIsGroupSwitcherVisible } from '../GroupSwitcher';
 import { NavButton } from '../NavButton';
 import { NavGroup } from '../NavGroup';
 import { UserDropup } from '../UserDropup';
 
 export const Sidebar = () => {
-  const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false);
-
   const groupSwitcherPosition = useAppStore((store) => store.groupSwitcherPosition);
   const isGroupSwitcherVisible = useIsGroupSwitcherVisible();
   const navItems = useNavItems();
   const currentSession = useAppStore((store) => store.currentSession);
-  const endSession = useAppStore((store) => store.endSession);
   const location = useLocation();
-  const navigate = useNavigate();
   const { activeLanguages } = useSetupStateQuery().data;
 
   const { t } = useTranslation();
@@ -63,46 +57,7 @@ export const Sidebar = () => {
                 />
               )
             )}
-            {i === navItems.length - 1 && (
-              <Dialog open={isEndSessionModalOpen} onOpenChange={setIsEndSessionModalOpen}>
-                <Dialog.Trigger asChild>
-                  <NavButton
-                    disabled={currentSession === null}
-                    icon={StopCircle}
-                    isActive={false}
-                    label={t('layout.navLinks.endSession')}
-                    url="#"
-                  />
-                </Dialog.Trigger>
-                <Dialog.Content>
-                  <Dialog.Header>
-                    <Dialog.Title>{t('layout.endSessionModal.title')}</Dialog.Title>
-                    <Dialog.Description>{t('layout.endSessionModal.message')}</Dialog.Description>
-                  </Dialog.Header>
-                  <Dialog.Footer>
-                    <Button
-                      className="min-w-20"
-                      onClick={() => {
-                        endSession();
-                        void navigate({ ignoreBlocker: true, to: '/session/start-session' }).then(() => {
-                          setIsEndSessionModalOpen(false);
-                        });
-                      }}
-                    >
-                      {t('core.yes')}
-                    </Button>
-                    <Button
-                      className="min-w-20"
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsEndSessionModalOpen(false)}
-                    >
-                      {t('core.no')}
-                    </Button>
-                  </Dialog.Footer>
-                </Dialog.Content>
-              </Dialog>
-            )}
+            {i === navItems.length - 1 && <EndSessionButton />}
           </div>
         ))}
       </nav>

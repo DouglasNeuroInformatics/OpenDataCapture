@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Button, Card, Dialog, Form, Heading } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $Sex } from '@opendatacapture/schemas/subject';
 import type { BasePermissionLevel } from '@opendatacapture/schemas/user';
 import { createFileRoute } from '@tanstack/react-router';
@@ -13,6 +13,8 @@ import { z } from 'zod/v4';
 import { PageHeader } from '@/components/PageHeader';
 import { UserIcon } from '@/components/UserIcon';
 import { useFindUserQuery } from '@/hooks/useFindUserQuery';
+import { usePasswordErrorMessage } from '@/hooks/usePasswordErrorMessage';
+import { useResetPasswordMutation } from '@/hooks/useResetPasswordMutation';
 import { useSelfUpdateUserMutation } from '@/hooks/useSelfUpdateUserMutation';
 import { useAppStore } from '@/store';
 import { $Email, $PhoneNumber, clearedIfBlank, omittedIfUnchanged } from '@/utils/validation';
@@ -34,6 +36,9 @@ type PasswordFormData = {
 const RouteComponent = () => {
   const currentUser = useAppStore((store) => store.currentUser);
   const updateSelfUserMutation = useSelfUpdateUserMutation();
+  const resetPasswordMutation = useResetPasswordMutation();
+  const passwordErrorMessage = usePasswordErrorMessage();
+  const addNotification = useNotificationsStore((store) => store.addNotification);
   const { resolvedLanguage, t } = useTranslation();
   const userInfo = useFindUserQuery(currentUser!.id);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
@@ -47,6 +52,15 @@ const RouteComponent = () => {
   const permissionLevel = userInfo.data.basePermissionLevel
     ? permissionLabels[userInfo.data.basePermissionLevel]
     : undefined;
+
+  const profileInitialValues: ProfileFormData = {
+    firstName: userInfo.data.firstName ?? '',
+    lastName: userInfo.data.lastName ?? '',
+    dateOfBirth: userInfo.data.dateOfBirth ?? undefined,
+    sex: userInfo.data.sex ?? undefined,
+    email: userInfo.data.email ?? '',
+    phoneNumber: userInfo.data.phoneNumber ?? ''
+  };
 
   const $ProfileFormData = useMemo(() => {
     return z.object({
@@ -118,6 +132,7 @@ const RouteComponent = () => {
         </Card.Header>
       </Card>
       <Form
+        preventResetValuesOnReset
         className="mx-auto mt-6 max-w-3xl"
         content={[
           {
@@ -166,15 +181,8 @@ const RouteComponent = () => {
         data-form-type="other"
         data-lpignore="true"
         data-testid="profile-form"
-        initialValues={{
-          firstName: userInfo.data.firstName ?? '',
-          lastName: userInfo.data.lastName ?? '',
-          dateOfBirth: userInfo.data.dateOfBirth ?? undefined,
-          sex: userInfo.data.sex ?? undefined,
-          email: userInfo.data.email ?? '',
-          phoneNumber: userInfo.data.phoneNumber ?? ''
-        }}
-        key={userInfo.dataUpdatedAt}
+        initialValues={profileInitialValues}
+        key={JSON.stringify(profileInitialValues)}
         submitBtnLabel={t('core.save')}
         validationSchema={$ProfileFormData}
         onSubmit={({ email, phoneNumber, ...rest }) => {
@@ -220,9 +228,27 @@ const RouteComponent = () => {
               submitBtnLabel={t('core.save')}
               validationSchema={$PasswordFormData}
               onSubmit={(data) => {
-                updateSelfUserMutation.mutate(
-                  { data: { password: data.password }, id: currentUser!.id },
-                  { onSuccess: () => setIsPasswordDialogOpen(false) }
+                resetPasswordMutation.mutate(
+                  { id: currentUser!.id, password: data.password },
+                  {
+                    onError: (err) => {
+                      addNotification({
+                        message: passwordErrorMessage(
+                          err,
+                          t({
+                            en: 'Failed to change password',
+                            es: 'No se pudo cambiar la contraseña',
+                            fr: 'Échec du changement de mot de passe'
+                          })
+                        ),
+                        type: 'error'
+                      });
+                    },
+                    onSuccess: () => {
+                      addNotification({ type: 'success' });
+                      setIsPasswordDialogOpen(false);
+                    }
+                  }
                 );
               }}
             />

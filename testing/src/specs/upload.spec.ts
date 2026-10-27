@@ -111,3 +111,25 @@ test.describe('upload', () => {
     expect(await records.json()).toStrictEqual([]);
   });
 });
+
+test.describe('upload instrument selection while loading', () => {
+  // The page once copied its search results into state from an effect keyed on a fresh `data ?? []`,
+  // so it re-rendered in a loop for as long as the instrument list was still in flight.
+  test('should not re-render in a loop while the instrument list is loading', async ({ getPageModel, page }) => {
+    const errors: string[] = [];
+    page.on('console', (message) => {
+      if (message.type() === 'error') {
+        errors.push(message.text());
+      }
+    });
+    await page.route('**/v1/instruments/info*', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await route.continue();
+    });
+
+    await getPageModel('/upload');
+
+    await expect(page.getByRole('cell', { exact: true, name: INSTRUMENT_TITLE })).toBeVisible();
+    expect(errors.filter((error) => error.includes('Maximum update depth exceeded'))).toStrictEqual([]);
+  });
+});

@@ -126,3 +126,97 @@ test.describe('user account', () => {
     await expect(userPage.phoneNumberField).toHaveValue('');
   });
 });
+
+test.describe('user account profile form', () => {
+  test('should keep unsaved profile edits when the user query refetches on returning to the tab', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { credentials, user } = await api.createUser({ groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const userPage = new UserPage(page);
+    await userPage.goto('/user');
+    await expect(userPage.firstNameField).toHaveValue('Test');
+
+    await userPage.firstNameField.fill('Unsaved');
+    // useSuspenseQuery clamps staleTime to at least 1s, so a focus event sooner than that refetches nothing
+    await expect(async () => {
+      const refetch = page.waitForResponse(
+        (response) => response.request().method() === 'GET' && response.url().endsWith(`/v1/users/${user.id}`),
+        { timeout: 1000 }
+      );
+      await page.evaluate(() => window.dispatchEvent(new Event('visibilitychange')));
+      await refetch;
+    }).toPass();
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+
+    await expect(userPage.firstNameField).toHaveValue('Unsaved');
+  });
+
+  test('should keep the saved values in the profile form after saving it unchanged', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { credentials, user } = await api.createUser({ groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const userPage = new UserPage(page);
+    await userPage.goto('/user');
+    await expect(userPage.firstNameField).toHaveValue('Test');
+
+    const refetch = page.waitForResponse(
+      (response) => response.request().method() === 'GET' && response.url().endsWith(`/v1/users/${user.id}`)
+    );
+    await userPage.saveProfile();
+    await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
+    await refetch;
+
+    await expect(userPage.firstNameField).toHaveValue('Test');
+  });
+});
+
+test.describe('user account password policy', () => {
+  test('should keep the dialog open and explain why when the new password matches the current one', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { credentials } = await api.createUser({ groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const userPage = new UserPage(page);
+    await userPage.goto('/user');
+    await userPage.openPasswordDialog();
+    await userPage.submitNewPassword(credentials.password);
+
+    await expect(page.getByText('Password must not be the same as your current password')).toBeVisible();
+    await expect(userPage.passwordDialog).toBeVisible();
+  });
+});
+
+test.describe('user account phone number', () => {
+  test('should save an international phone number with a country code and spacing', async ({
+    api,
+    authenticateAs,
+    page
+  }) => {
+    const group = await api.createGroup();
+    const { credentials } = await api.createUser({ groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const userPage = new UserPage(page);
+    await userPage.goto('/user');
+    await userPage.phoneNumberField.fill('+1 514 555 1234');
+    await userPage.saveProfile();
+    await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
+
+    await page.reload();
+    await expect(userPage.phoneNumberField).toHaveValue('+1 514 555 1234');
+  });
+});

@@ -4,7 +4,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FileInstrument } from '@opendatacapture/runtime-core';
 import { BracesIcon, FileIcon, FileTextIcon, ImageIcon, SheetIcon, UploadIcon } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { useDropzone } from 'react-dropzone';
+import { ErrorCode, useDropzone } from 'react-dropzone';
 import type { FileRejection } from 'react-dropzone';
 
 import { ErrorBox } from './ErrorBox';
@@ -44,6 +44,10 @@ const FILE_TYPE_DESCRIPTORS: {
   'text/tsv': { extensions: ['.tsv'], icon: SheetIcon, label: 'TSV' }
 };
 
+const hasRejectionCode = (rejection: FileRejection, code: ErrorCode) => {
+  return rejection.errors.some((error) => error.code === code);
+};
+
 export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
   const { basename, count, label, type } = useFileInstrumentContentStore((store) => {
     return store.props.instrument.content.fileGroups[index]!;
@@ -54,10 +58,20 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
   const { t } = useTranslation();
 
   const [rejectedNames, setRejectedNames] = useState<string[]>([]);
+  const [overLimitSelectionCount, setOverLimitSelectionCount] = useState<null | number>(null);
 
   const handleDrop = useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-      setRejectedNames(fileRejections.map((rejection) => rejection.file.name));
+      setRejectedNames(
+        fileRejections
+          .filter((rejection) => hasRejectionCode(rejection, ErrorCode.FileInvalidType))
+          .map((rejection) => rejection.file.name)
+      );
+      if (fileRejections.some((rejection) => hasRejectionCode(rejection, ErrorCode.TooManyFiles))) {
+        setOverLimitSelectionCount(acceptedFiles.length + fileRejections.length);
+        return;
+      }
+      setOverLimitSelectionCount(null);
       setFiles(basename, acceptedFiles);
     },
     [basename]
@@ -185,6 +199,27 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
             es: 'Tipo de archivo no admitido',
             fr: 'Type de fichier non pris en charge'
           })}
+        />
+      )}
+      {overLimitSelectionCount !== null && (
+        <ErrorBox
+          issues={[
+            t({
+              en:
+                count.max === 1
+                  ? `Only 1 file can be uploaded here; you selected ${overLimitSelectionCount}`
+                  : `Up to ${count.max} files can be uploaded here; you selected ${overLimitSelectionCount}`,
+              es:
+                count.max === 1
+                  ? `Solo se puede subir 1 archivo aquí; seleccionó ${overLimitSelectionCount}`
+                  : `Se pueden subir hasta ${count.max} archivos aquí; seleccionó ${overLimitSelectionCount}`,
+              fr:
+                count.max === 1
+                  ? `Un seul fichier peut être téléchargé ici ; vous en avez sélectionné ${overLimitSelectionCount}`
+                  : `Jusqu'à ${count.max} fichiers peuvent être téléchargés ici ; vous en avez sélectionné ${overLimitSelectionCount}`
+            })
+          ]}
+          title={t({ en: 'Too many files', es: 'Demasiados archivos', fr: 'Trop de fichiers' })}
         />
       )}
       {issues && (

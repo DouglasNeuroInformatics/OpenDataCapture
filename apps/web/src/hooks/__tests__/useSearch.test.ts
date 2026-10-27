@@ -41,4 +41,14 @@ describe('useSearch', () => {
     rerender({ data: [...PEOPLE, added] });
     expect(result.current.filteredData).toEqual([{ firstName: 'Alan', lastName: 'Turing' }, added]);
   });
+
+  it('should render once when handed a fresh empty array on every render, so a loading caller does not loop', () => {
+    const STABLE_AFTER_LOOPING: Person[] = [];
+    let renders = 0;
+    renderHook(() => {
+      renders++;
+      return useSearch<Person>(renders < 50 ? [] : STABLE_AFTER_LOOPING, (person) => person.firstName);
+    });
+    expect(renders).toBe(1);
+  });
 });

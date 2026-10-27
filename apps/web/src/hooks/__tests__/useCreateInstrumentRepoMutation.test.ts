@@ -3,7 +3,7 @@ import { createElement } from 'react';
 
 import type { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useCreateInstrumentRepoMutation } from '../useCreateInstrumentRepoMutation';
@@ -26,7 +26,7 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
 const DATA: $CreateInstrumentRepoData = { url: 'https://github.com/example/instruments' };
 
 function renderCreateMutation() {
-  const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+  const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false, throwOnError: true } } });
   const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
   const wrapper = ({ children }: PropsWithChildren) =>
     createElement(QueryClientProvider, { children, client: queryClient });
@@ -42,9 +42,21 @@ describe('useCreateInstrumentRepoMutation', () => {
   it('should suppress the default error toast, since the hook reports failures itself', async () => {
     const { result } = renderCreateMutation();
     await result.current.mutateAsync({ data: DATA });
-    expect(mockAxios.post).toHaveBeenCalledWith('/v1/instrument-repos', DATA, {
-      meta: { disableDefaultErrorNotification: true }
-    });
+    expect(mockAxios.post).toHaveBeenCalledWith(
+      '/v1/instrument-repos',
+      DATA,
+      expect.objectContaining({ meta: expect.objectContaining({ disableDefaultErrorNotification: true }) })
+    );
+  });
+
+  it('should opt out of the default request timeout, since an import can outlast it', async () => {
+    const { result } = renderCreateMutation();
+    await result.current.mutateAsync({ data: DATA });
+    expect(mockAxios.post).toHaveBeenCalledWith(
+      '/v1/instrument-repos',
+      DATA,
+      expect.objectContaining({ meta: expect.objectContaining({ disableDefaultTimeout: true }) })
+    );
   });
 
   it('should announce that the repository was imported', async () => {
@@ -72,6 +84,14 @@ describe('useCreateInstrumentRepoMutation', () => {
     mockAxios.post.mockRejectedValue(new Error('Network Error'));
     const { result } = renderCreateMutation();
     await expect(result.current.mutateAsync({ data: DATA })).rejects.toThrow('Network Error');
+    expect(addNotification).toHaveBeenCalledWith({ message: 'Failed to import repository', type: 'error' });
+  });
+
+  it('should report a rejection through its own notification without escaping to the route error boundary', async () => {
+    mockAxios.post.mockRejectedValueOnce(new Error('Network Error'));
+    const { result } = renderCreateMutation();
+    result.current.mutate({ data: DATA });
+    await waitFor(() => expect(result.current.isError).toBe(true));
     expect(addNotification).toHaveBeenCalledWith({ message: 'Failed to import repository', type: 'error' });
   });
 });

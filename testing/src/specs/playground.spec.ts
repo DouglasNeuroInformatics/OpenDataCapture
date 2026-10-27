@@ -96,6 +96,27 @@ export default defineInstrument({
 `;
 }
 
+/** A form whose title includes a value imported from a subpath of the scoped runtime-core package. */
+function scopedSubpathInstrumentSource(title: string): string {
+  return `
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { FILE_TYPES } from '/runtime/v1/@opendatacapture/runtime-core/constants';
+import { z } from '/runtime/v1/zod@3.x';
+
+export default defineInstrument({
+  kind: 'FORM',
+  language: 'en',
+  tags: ['Constants'],
+  internal: { edition: 1, name: 'SCOPED_SUBPATH' },
+  clientDetails: { estimatedDuration: 1, instructions: ['Submit the form'] },
+  content: {},
+  details: { description: 'Scoped subpath import', license: 'Apache-2.0', title: \`${title} \${FILE_TYPES.images[0]}\` },
+  measures: {},
+  validationSchema: z.object({})
+});
+`;
+}
+
 /** 1×1 PNG. The playground stores binary assets as base64 and decodes them before bundling. */
 const STIM_PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -326,5 +347,206 @@ test.describe('playground', () => {
 
     await playground.dragPaneSeparatorTo(editor.x);
     await expect.poll(() => playground.editorShare()).toBeCloseTo(0.25, 1);
+  });
+
+  test("should report only the author's syntax error, without an internal bundler TypeError", async ({
+    page,
+    uniqueId
+  }) => {
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: "export default { kind: 'FORM', ;", name: 'index.ts' }],
+        label: `Syntax Error ${uniqueId}`
+      })
+    );
+
+    await expect(page.getByRole('heading', { name: 'Failed to Compile' })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+    await page.getByRole('button', { name: 'Cause' }).click();
+    await expect(page.getByText(/Build failed with 1 error/)).toBeVisible();
+    await expect(page.getByText(/reading 'inputs'/)).toHaveCount(0);
+  });
+
+  test('should load a subpath of a scoped runtime package, so its exports reach the instrument', async ({
+    page,
+    uniqueId
+  }) => {
+    const title = `Scoped Subpath ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: scopedSubpathInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+
+    await expect(playground.preview.getByRole('heading', { name: `${title} image/png` })).toBeVisible({
+      timeout: PREVIEW_TIMEOUT
+    });
+  });
+});
+
+test.describe('playground interactive examples', () => {
+  test.describe.configure({ mode: 'default' });
+  test.slow();
+
+  for (const label of ['Interactive With Static Assets', 'Interactive With Legacy Script']) {
+    test(`should submit the ${label} example when its Submit button is clicked`, async ({ page }) => {
+      const playground = new PlaygroundPage(page);
+      await playground.goto();
+      await playground.selectInstrument(label);
+
+      await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
+      const messages: string[] = [];
+      page.once('dialog', (dialog) => {
+        messages.push(dialog.message());
+        void dialog.dismiss();
+      });
+      const task = playground.preview.frameLocator('iframe[name="interactive-instrument"]');
+      await task.getByRole('button', { name: 'Submit' }).click({ timeout: PREVIEW_TIMEOUT });
+
+      await expect.poll(() => messages).toHaveLength(1);
+      expect(messages[0]).toContain('"message": "Hello"');
+    });
+  }
+});
+
+test.describe('playground save button', () => {
+  test.describe.configure({ mode: 'default' });
+  test.slow();
+
+  test('should disable Save after switching from an edited saved instrument to an example', async ({
+    page,
+    uniqueId
+  }) => {
+    const title = `Save ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: measureVisibilityInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+    await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+
+    const saveButton = page.locator('button:has(svg.lucide-save)');
+    await page.locator('.monaco-editor .view-lines').click();
+    await page.keyboard.type('// edited');
+    await expect(saveButton).toBeEnabled();
+
+    await playground.selectInstrument('Form Reference');
+    await expect(saveButton).toBeDisabled();
+  });
+});
+
+test.describe('playground editor tabs', () => {
+  test.describe.configure({ mode: 'default' });
+  test.slow();
+
+  test('should keep the active tab selected when a background tab is closed', async ({ page, uniqueId }) => {
+    const title = `Tabs ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [
+          { content: measureVisibilityInstrumentSource(title), name: 'index.ts' },
+          { content: 'export const a = 1;', name: 'a.ts' },
+          { content: 'export const b = 2;', name: 'b.ts' }
+        ],
+        label: title
+      })
+    );
+    await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+
+    await page.locator('button:has(svg.lucide-columns-3)').click();
+    const fileButton = (filename: string) =>
+      page.locator('button', { has: page.locator(`input[value="${filename}"]`) });
+    await fileButton('a.ts').click();
+    await fileButton('b.ts').click();
+
+    const tab = (filename: string) => page.locator('button[aria-current]', { hasText: filename });
+    await expect(tab('b.ts')).toHaveAttribute('aria-current', 'true');
+
+    await tab('a.ts').locator('svg.lucide-x').click();
+    await expect(tab('a.ts')).toHaveCount(0);
+    await expect(tab('b.ts')).toHaveAttribute('aria-current', 'true');
+  });
+});
+
+test.describe('playground instrument deletion', () => {
+  test.describe.configure({ mode: 'default' });
+  test.slow();
+
+  test('should show the default template after the selected saved instrument is deleted', async ({
+    page,
+    uniqueId
+  }) => {
+    const title = `Deleted ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: measureVisibilityInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+    await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+
+    await page.locator('button:has(svg.lucide-ellipsis-vertical)').click();
+    await page.getByRole('menuitem', { name: 'Delete Instrument' }).click();
+    await page.getByRole('dialog').getByRole('button', { exact: true, name: 'Delete' }).click();
+
+    await expect(playground.preview.getByRole('heading', { name: '<PLACEHOLDER>' })).toBeVisible({
+      timeout: PREVIEW_TIMEOUT
+    });
+    await expect(playground.preview.getByRole('heading', { name: title })).toHaveCount(0);
+  });
+});
+
+/**
+ * A form that leaves measures hidden by default and marks its one measure with the deprecated
+ * `hidden: false`, which must still show it as `visibility: 'visible'` would.
+ */
+function deprecatedHiddenFalseInstrumentSource(title: string): string {
+  return `
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { z } from '/runtime/v1/zod@3.x';
+
+export default defineInstrument({
+  kind: 'FORM',
+  language: 'en',
+  tags: ['Measures'],
+  internal: { edition: 1, name: 'DEPRECATED_HIDDEN_FALSE' },
+  clientDetails: { estimatedDuration: 1, instructions: ['Submit the form'] },
+  content: { note: { kind: 'string', label: 'Note', variant: 'input' } },
+  details: { description: 'Deprecated hidden flag', license: 'Apache-2.0', title: '${title}' },
+  measures: {
+    legacyMeasure: { hidden: false, kind: 'computed', label: 'Legacy Measure', value: () => 3 }
+  },
+  validationSchema: z.object({ note: z.string().optional() })
+});
+`;
+}
+
+test.describe('playground deprecated measure visibility', () => {
+  test('should show a measure declaring the deprecated hidden: false in the summary', async ({ page, uniqueId }) => {
+    const title = `Deprecated Flag ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: deprecatedHiddenFalseInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+
+    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
+    await playground.preview.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(playground.preview.getByText('Legacy Measure', { exact: true })).toBeVisible();
   });
 });

@@ -119,6 +119,43 @@ describe('Dropzone', () => {
     expect(screen.queryByText('Unsupported file type')).toBeNull();
   });
 
+  it('should report a too-many-files rejection as a count error, not as an unsupported file type', async () => {
+    renderDropzone({ type: 'application/pdf' });
+    await selectFiles([createFile('a.pdf'), createFile('b.pdf')]);
+    await waitFor(() => {
+      expect(screen.getByText('Only 1 file can be uploaded here; you selected 2')).toBeTruthy();
+    });
+    expect(screen.queryByText('Unsupported file type')).toBeNull();
+  });
+
+  it('should state the maximum in the plural when more than one file is allowed', async () => {
+    renderDropzone({ count: { max: 2, min: 1 } });
+    await selectFiles([createFile('a.pdf'), createFile('b.pdf'), createFile('c.pdf')]);
+    await waitFor(() => {
+      expect(screen.getByText('Up to 2 files can be uploaded here; you selected 3')).toBeTruthy();
+    });
+  });
+
+  it('should keep the previously selected files when a drop is rejected for exceeding the maximum', async () => {
+    const store = renderDropzone();
+    await selectFiles([createFile('report.pdf')]);
+    await selectFiles([createFile('a.pdf'), createFile('b.pdf')]);
+    await waitFor(() => {
+      expect(screen.getByText('Too many files')).toBeTruthy();
+    });
+    expect(store.getState().uploadMap.document?.map((file) => file.name)).toEqual(['report.pdf']);
+  });
+
+  it('should clear the count error once a selection within the maximum is made', async () => {
+    renderDropzone();
+    await selectFiles([createFile('a.pdf'), createFile('b.pdf')]);
+    await selectFiles([createFile('report.pdf')]);
+    await waitFor(() => {
+      expect(screen.getByText('report.pdf')).toBeTruthy();
+    });
+    expect(screen.queryByText('Too many files')).toBeNull();
+  });
+
   it('should show the validation issues the store recorded for its group', async () => {
     const store = renderDropzone();
     await act(() => store.getState().actions.submit());
