@@ -23,22 +23,23 @@ import { useSyncInstrumentRepoMutation } from '@/hooks/useSyncInstrumentRepoMuta
  * bumped form would be listed once per edition it has ever had.
  */
 function currentRepoInstruments(instruments: TranslatedInstrumentInfo[], repoId: string) {
-  const latest = new Map<string, TranslatedInstrumentInfo>();
-  for (const instrument of instruments) {
-    if (instrument.sourceRepo?.id !== repoId) {
-      continue;
-    }
-    // A series has no edition of its own, so each one is distinct.
+  const fromRepo = instruments.filter((instrument) => instrument.sourceRepo?.id === repoId);
+  // Keyed by internal name, which is what identifies one instrument across its editions. A series
+  // has no edition of its own, so it is never superseded and never keyed.
+  const latestEditions = new Map<string, number>();
+  for (const instrument of fromRepo) {
     if (instrument.kind === 'SERIES') {
-      latest.set(instrument.id, instrument);
       continue;
     }
-    const current = latest.get(instrument.internal.name);
-    if (!current || (current.kind !== 'SERIES' && current.internal.edition < instrument.internal.edition)) {
-      latest.set(instrument.internal.name, instrument);
+    const latest = latestEditions.get(instrument.internal.name);
+    if (latest === undefined || latest < instrument.internal.edition) {
+      latestEditions.set(instrument.internal.name, instrument.internal.edition);
     }
   }
-  return [...latest.values()];
+  return fromRepo.filter(
+    (instrument) =>
+      instrument.kind === 'SERIES' || latestEditions.get(instrument.internal.name) === instrument.internal.edition
+  );
 }
 
 const AddRepoForm = ({

@@ -297,6 +297,20 @@ describe('admin instrument repositories page', () => {
     expect(editions).toEqual(['5']);
   });
 
+  // The API orders by nothing this page controls, so the newest edition may arrive first.
+  it('should keep the latest edition even when it comes before the superseded one in the data', () => {
+    mocks.instrumentInfo.data = [
+      scalarFixture({ edition: 5, id: 'form-2', internalName: 'GI', title: 'General Information' }),
+      scalarFixture({ edition: 4, id: 'form-1', internalName: 'GI', title: 'General Information' })
+    ];
+    renderPage();
+    fireEvent.click(rowAction('View'));
+    const editions = within(screen.getByRole('dialog'))
+      .getAllByRole('listitem')
+      .map((item) => item.querySelectorAll('p')[2]!.textContent);
+    expect(editions).toEqual(['5']);
+  });
+
   it('should count only the latest edition of each instrument once the instrument info has loaded', () => {
     mocks.instrumentInfo.data = [
       scalarFixture({ edition: 4, id: 'form-1', internalName: 'GI', title: 'General Information' }),
