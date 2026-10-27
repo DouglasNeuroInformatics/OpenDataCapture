@@ -20,7 +20,7 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
             : { errors: [{ text: `Invalid dynamic import '${args.path}': must be http import` }] };
         } else if (/^\/runtime\/v1\/.*.css$/.test(args.path)) {
           return { namespace: namespaces.bundle, path: args.path };
-        } else if (/\/runtime\/v1\/(@.*\/)?[^/]+$/.test(args.path)) {
+        } else if (/^\/runtime\/v1\/(@[^/]+\/)?[^/]+$/.test(args.path)) {
           return { external: true, path: `${args.path}/index.js` };
         } else if (args.path.startsWith('/runtime/v1/')) {
           return { external: true, path: args.path.endsWith('.js') ? args.path : `${args.path}.js` };
@@ -85,7 +85,10 @@ export const plugin = (options: { inputs: BundlerInput[] }): Plugin => {
       });
       build.onEnd((result) => {
         result.legacyScripts = [];
-        Object.keys(result.metafile!.inputs).forEach((path) => {
+        if (!result.metafile) {
+          return;
+        }
+        Object.keys(result.metafile.inputs).forEach((path) => {
           const script = legacyScripts.get(path.replace('bundle:', ''));
           if (!script) {
             return;

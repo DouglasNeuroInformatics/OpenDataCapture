@@ -151,6 +151,15 @@ describe('InstrumentSummary', () => {
     expect(screen.getByText('Results')).toBeTruthy();
   });
 
+  it('should show a measure declaring the deprecated hidden: false, as it would one declaring visibility visible', () => {
+    const instrument: AnyUnilingualFormInstrument = {
+      ...baseInstrument,
+      measures: { score: { hidden: false, kind: 'const', label: 'Score', ref: 'score' } }
+    };
+    render(<InstrumentSummary data={{ score: 5 }} instrument={instrument} timeCollected={Date.now()} />);
+    expect(screen.getByText('Results')).toBeTruthy();
+  });
+
   it('should hide a measure whose visibility is explicitly hidden', () => {
     const instrument: AnyUnilingualFormInstrument = {
       ...baseInstrument,

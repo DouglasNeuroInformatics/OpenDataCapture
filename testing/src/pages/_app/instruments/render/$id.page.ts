@@ -39,6 +39,15 @@ export class RenderInstrumentPage extends AppPage {
     await this.$ref.getByRole('radio', { name: /I have read/ }).click();
   }
 
+  /**
+   * Answers the Happiness Questionnaire with "No" overall and leaves the reason empty, which its
+   * validation schema rejects.
+   */
+  async answerHappinessQuestionnaireDissatisfiedWithoutReason(steps = 4): Promise<void> {
+    await this.setHappinessSliders(steps);
+    await this.$ref.getByRole('radio', { name: 'No' }).click();
+  }
+
   async begin(): Promise<void> {
     await this.beginButton.waitFor({ state: 'visible' });
     await this.beginButton.click();

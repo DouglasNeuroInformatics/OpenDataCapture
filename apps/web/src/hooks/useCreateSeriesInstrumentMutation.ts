@@ -40,6 +40,8 @@ export function useCreateSeriesInstrumentMutation() {
       }
       addNotification({ type: 'success' });
       void queryClient.invalidateQueries({ queryKey: ['instrument-info'] });
-    }
+    },
+    // onError reports the failure; the app default would also hand it to the route error boundary.
+    throwOnError: false
   });
 }

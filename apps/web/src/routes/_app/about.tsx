@@ -91,7 +91,7 @@ const TimeValue: React.FC<{ value: number }> = ({ value }) => {
 
   useInterval(() => {
     valueRef.current = valueRef.current + 1;
-    setState(format(valueRef.current + 1));
+    setState(format(valueRef.current));
   }, 1000);
 
   return <span>{state}</span>;
@@ -226,8 +226,13 @@ const RouteComponent = () => {
 
 export const Route = createFileRoute('/_app/about')({
   component: RouteComponent,
-  loader: async ({ context }) => {
-    const { isGatewayEnabled } = await context.queryClient.ensureQueryData(setupStateQueryOptions());
-    return { gatewayHealthData: isGatewayEnabled ? await loadGatewayHealthcheckData() : null };
+  loader: {
+    handler: async ({ context }) => {
+      const { isGatewayEnabled } = await context.queryClient.fetchQuery({ ...setupStateQueryOptions(), staleTime: 0 });
+      return { gatewayHealthData: isGatewayEnabled ? await loadGatewayHealthcheckData() : null };
+    },
+    // TimeValue counts up from the uptime it mounted with, so the page must not mount before the
+    // reload resolves: a revisit within gcTime would otherwise render the previous visit's uptime.
+    staleReloadMode: 'blocking'
   }
 });

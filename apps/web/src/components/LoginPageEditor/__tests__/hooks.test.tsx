@@ -405,6 +405,13 @@ describe('useBrandingForm', () => {
       act(() => result.current.update('customLogoWidth', '  '));
       expect(result.current.isCustomSizeInvalid).toBe(false);
     });
+
+    it('should not block saving on the custom logo size while the login image is hidden, since nothing on screen explains it', () => {
+      const { result } = renderBrandingForm({ logoSize: 'custom' });
+      act(() => result.current.update('showLogo', false));
+      expect(result.current.isCustomSizeInvalid).toBe(false);
+      expect(result.current.isSubmitDisabled).toBe(false);
+    });
   });
 
   describe('color validation', () => {

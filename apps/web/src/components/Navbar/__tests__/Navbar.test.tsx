@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ClipboardListIcon, DatabaseIcon, LayersIcon, UsersIcon } from 'lucide-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
@@ -69,7 +69,7 @@ describe('Navbar', () => {
     mocks.isGroupSwitcherVisible = false;
     mocks.navItems = [globalItems, sessionItems];
     mocks.store.currentSession = null;
-    mocks.navigate.mockReset();
+    mocks.navigate.mockReset().mockResolvedValue(undefined);
     mocks.store.endSession.mockReset();
     window.history.replaceState(null, '', '/');
   });
@@ -139,13 +139,25 @@ describe('Navbar', () => {
     expect(endSessionButton().hasAttribute('disabled')).toBe(true);
   });
 
-  it('should end the session and go to the start page, bypassing any navigation blocker', () => {
+  it('should ask for confirmation before ending the session, so a stray tap cannot discard an instrument in progress', () => {
     mocks.store.currentSession = { id: 'session-1' };
     render(<Navbar />);
     openMenu();
     fireEvent.click(endSessionButton());
+    expect(screen.getByText('End Session')).toBeTruthy();
+    expect(mocks.store.endSession).not.toHaveBeenCalled();
+    expect(mocks.navigate).not.toHaveBeenCalled();
+  });
+
+  it('should end the session, go to the start page and close the sheet once the end is confirmed', async () => {
+    mocks.store.currentSession = { id: 'session-1' };
+    render(<Navbar />);
+    openMenu();
+    fireEvent.click(endSessionButton());
+    fireEvent.click(screen.getByRole('button', { name: 'Yes' }));
     expect(mocks.store.endSession).toHaveBeenCalledOnce();
     expect(mocks.navigate).toHaveBeenCalledWith({ ignoreBlocker: true, to: '/session/start-session' });
+    await waitFor(() => expect(isMenuOpen()).toBe(false));
   });
 
   it('should show the group switcher in the sheet when there is a group to switch between', () => {

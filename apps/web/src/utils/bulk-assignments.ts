@@ -258,7 +258,9 @@ export function parseDelimitedText(input: string): BulkParseResult {
   // per-field validation, with a row number attached.
   const fatal = parsed.errors.filter(({ code, type }) => type !== 'FieldMismatch' && code !== 'UndetectableDelimiter');
   if (fatal.length > 0) {
-    throw new BulkParseFailure(fatal.map((error) => ({ message: error.message, row: error.row })));
+    // What survives the filter is a `Quotes` error, which Papa Parse always reports with a row. That
+    // row counts the header line from zero, so one is added to number it as the user's file does.
+    throw new BulkParseFailure(fatal.map((error) => ({ message: error.message, row: error.row! + 1 })));
   }
   // Papa Parse always reports the header row as `meta.fields` in header mode; its types mark the field
   // optional only because it is absent when `header` is false.

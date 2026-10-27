@@ -57,10 +57,10 @@ const uptimeSeconds = () => {
 };
 
 const runLoader = async (isGatewayEnabled: boolean) => {
-  const ensureQueryData = vi.fn().mockResolvedValue({ isGatewayEnabled });
-  const loader = Route.options.loader as (opts: object) => Promise<unknown>;
-  const result = await loader({ context: { queryClient: { ensureQueryData } } });
-  return { ensureQueryData, result };
+  const fetchQuery = vi.fn().mockResolvedValue({ isGatewayEnabled });
+  const { handler } = Route.options.loader as { handler: (opts: object) => Promise<unknown> };
+  const result = await handler({ context: { queryClient: { fetchQuery } } });
+  return { fetchQuery, result };
 };
 
 describe('about page', () => {
@@ -123,8 +123,7 @@ describe('about page', () => {
     expect([ticks[1]! - ticks[0]!, ticks[2]! - ticks[1]!]).toEqual([1, 1]);
   });
 
-  // Known defect: TimeValue increments its counter and then formats counter + 1, so the display leads by a second.
-  it.fails('should show the starting uptime plus the seconds elapsed since the page opened', () => {
+  it('should show the starting uptime plus the seconds elapsed since the page opened', () => {
     vi.useFakeTimers();
     renderPage();
     act(() => {
@@ -182,8 +181,8 @@ describe('about loader', () => {
   it('should fetch the gateway healthcheck when the gateway is enabled', async () => {
     const healthcheck = { ok: false, status: 503, statusText: 'Service Unavailable' };
     mocks.axios.get.mockResolvedValue({ data: healthcheck });
-    const { ensureQueryData, result } = await runLoader(true);
-    expect(ensureQueryData).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['setup-state'] }));
+    const { fetchQuery, result } = await runLoader(true);
+    expect(fetchQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['setup-state'] }));
     expect(mocks.axios.get).toHaveBeenCalledWith('/v1/gateway/healthcheck');
     expect(result).toEqual({ gatewayHealthData: healthcheck });
   });
@@ -191,6 +190,15 @@ describe('about loader', () => {
   it('should reject a malformed gateway healthcheck rather than render it', async () => {
     mocks.axios.get.mockResolvedValue({ data: { ok: 'maybe' } });
     await expect(runLoader(true)).rejects.toBeInstanceOf(z.ZodError);
+  });
+
+  it('should fetch the API uptime when the page loads rather than reuse the cached setup state', async () => {
+    const { fetchQuery } = await runLoader(false);
+    expect(fetchQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['setup-state'], staleTime: 0 }));
+  });
+
+  it('should block a revisit on the reload, so the uptime counter never starts from the previous visit', () => {
+    expect(Route.options.loader).toMatchObject({ staleReloadMode: 'blocking' });
   });
 
   it('should not contact the gateway when it is disabled', async () => {

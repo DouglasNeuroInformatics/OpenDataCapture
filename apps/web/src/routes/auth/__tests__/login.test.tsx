@@ -183,12 +183,17 @@ describe('login page', () => {
 
     it.each([
       ['no instance name is configured', undefined],
-      ['the name has no entry for the reader language', { fr: 'Centre Douglas' }],
       ['the name is blank', { en: '   ' }]
     ])('should fall back to the product name when %s', (_, instanceName) => {
       mocks.setupState.branding = { enableBranding: true, instanceName };
       renderPage();
       expect(screen.getByRole('heading', { name: 'Open Data Capture' })).toBeTruthy();
+    });
+
+    it('should fall back to the instance name in another language, so the heading matches the branding panel', () => {
+      mocks.setupState.branding = { enableBranding: true, instanceName: { en: '  ', fr: 'Clinique Douglas' } };
+      renderPage();
+      expect(screen.getByRole('heading', { name: 'Clinique Douglas' })).toBeTruthy();
     });
 
     it('should paint the form panel with the configured gradient', () => {

@@ -60,3 +60,43 @@ test.describe('admin audit logs', () => {
     expect(download.suggestedFilename()).toMatch(/^ODC_Audit_Logs_\d+\.json$/);
   });
 });
+
+test.describe('admin audit logs sorting', () => {
+  test.use({ actingRole: 'ADMIN' });
+
+  test('should request the oldest logs first on the first click of the time header', async ({ getPageModel }) => {
+    const auditLogsPage = await getPageModel('/admin/audit/logs');
+
+    const ascendingRequest = auditLogsPage.$ref.waitForRequest(
+      (request) => request.url().includes('/v1/audit/logs') && request.url().includes('sortOrder=asc')
+    );
+    await auditLogsPage.timeHeaderButton.click();
+
+    await ascendingRequest;
+  });
+});
+
+test.describe('admin audit logs fetching', () => {
+  test.use({ actingRole: 'ADMIN' });
+
+  test('should fetch the logs once per navigation, not again when the table mounts', async ({ getPageModel, page }) => {
+    const auditLogsRequests: string[] = [];
+    page.on('request', (request) => {
+      if (request.method() === 'GET' && new URL(request.url()).pathname.endsWith('/v1/audit/logs')) {
+        auditLogsRequests.push(request.url());
+      }
+    });
+
+    const auditLogsPage = await getPageModel('/admin/audit/logs');
+    const firstRow = auditLogsPage.dataTable.getByTestId('data-table-row').first();
+    await expect(firstRow).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    expect(auditLogsRequests).toHaveLength(1);
+
+    await auditLogsPage.filterBy('action', 'Login');
+    await expect(auditLogsPage.$ref).toHaveURL(/action=LOGIN/);
+    await expect(firstRow).toContainText('Login');
+    await page.waitForLoadState('networkidle');
+    expect(auditLogsRequests).toHaveLength(2);
+  });
+});

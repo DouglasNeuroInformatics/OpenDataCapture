@@ -104,7 +104,8 @@ axios.interceptors.request.use((config) => {
 
   config.headers.setAccept(['application/json', 'application/x-msgpack']);
 
-  // Do not set timeout for setup (can be CPU intensive, especially on slow server)
+  // Opted out by requests that can legitimately outlast it: setup, and instrument repository
+  // imports and syncs, which can be CPU intensive, especially on a slow server
   if (!config.meta?.disableDefaultTimeout) {
     config.timeout = 10000; // abort request after 10 seconds
     config.timeoutErrorMessage = i18n.t({

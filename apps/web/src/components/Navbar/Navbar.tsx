@@ -4,27 +4,25 @@ import { Button, Separator, Sheet, ThemeToggle } from '@douglasneuroinformatics/
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding, LanguageToggle } from '@opendatacapture/react-core';
 import { useNavigate } from '@tanstack/react-router';
-import { MenuIcon, StopCircle } from 'lucide-react';
+import { MenuIcon } from 'lucide-react';
 
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useNavItems } from '@/hooks/useNavItems';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
-import { useAppStore } from '@/store';
 
+import { EndSessionButton } from '../EndSessionButton';
 import { GroupSwitcher, useIsGroupSwitcherVisible } from '../GroupSwitcher';
 import { NavButton } from '../NavButton';
 import { NavGroup } from '../NavGroup';
 import { UserDropup } from '../UserDropup';
 
 export const Navbar = () => {
-  const currentSession = useAppStore((store) => store.currentSession);
   const isGroupSwitcherVisible = useIsGroupSwitcherVisible();
   const [isOpen, setIsOpen] = useState(false);
   const navItems = useNavItems();
   const { activeLanguages } = useSetupStateQuery().data;
   const { t } = useTranslation('layout');
   const navigate = useNavigate();
-  const endSession = useAppStore((store) => store.endSession);
 
   // This is to prevent ugly styling when resizing the viewport
   const isDesktop = useIsDesktop();
@@ -105,18 +103,9 @@ export const Navbar = () => {
                 )
               )}
               {i === navItems.length - 1 && (
-                <NavButton
-                  activeClassName="bg-slate-200 text-slate-900"
+                <EndSessionButton
                   className="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
-                  disabled={currentSession === null}
-                  icon={StopCircle}
-                  isActive={false}
-                  label={t('navLinks.endSession')}
-                  url="#"
-                  onClick={() => {
-                    endSession();
-                    void navigate({ ignoreBlocker: true, to: '/session/start-session' });
-                  }}
+                  onEnded={() => setIsOpen(false)}
                 />
               )}
             </div>

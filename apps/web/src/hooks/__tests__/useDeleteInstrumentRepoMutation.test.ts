@@ -2,7 +2,7 @@ import type { PropsWithChildren } from 'react';
 import { createElement } from 'react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useDeleteInstrumentRepoMutation } from '../useDeleteInstrumentRepoMutation';
@@ -23,7 +23,7 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
 }));
 
 function renderDeleteMutation() {
-  const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+  const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false, throwOnError: true } } });
   const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
   const wrapper = ({ children }: PropsWithChildren) =>
     createElement(QueryClientProvider, { children, client: queryClient });
@@ -69,6 +69,14 @@ describe('useDeleteInstrumentRepoMutation', () => {
     mockAxios.delete.mockRejectedValue(new Error('Network Error'));
     const { result } = renderDeleteMutation();
     await expect(result.current.mutateAsync({ id: 'repo-1' })).rejects.toThrow('Network Error');
+    expect(addNotification).toHaveBeenCalledWith({ message: 'Failed to delete repository', type: 'error' });
+  });
+
+  it('should report a rejection through its own notification without escaping to the route error boundary', async () => {
+    mockAxios.delete.mockRejectedValueOnce(new Error('Network Error'));
+    const { result } = renderDeleteMutation();
+    result.current.mutate({ id: 'repo-1' });
+    await waitFor(() => expect(result.current.isError).toBe(true));
     expect(addNotification).toHaveBeenCalledWith({ message: 'Failed to delete repository', type: 'error' });
   });
 });

@@ -71,6 +71,14 @@ describe('DNP_HAPPINESS_QUESTIONNAIRE', () => {
     });
   });
 
+  describe('clientDetails', () => {
+    it('should ask French-speaking subjects to answer the questions in correct French', () => {
+      expect(instrument.clientDetails?.instructions?.fr).toEqual([
+        'Veuillez répondre aux questions en fonction de vos sentiments actuels.'
+      ]);
+    });
+  });
+
   describe('validationSchema', () => {
     it('should accept a satisfied subject who gives no reason', () => {
       const result = instrument.validationSchema.safeParse({
@@ -88,6 +96,15 @@ describe('DNP_HAPPINESS_QUESTIONNAIRE', () => {
         professionalLifeSatisfaction: 3
       });
       expect(result.error?.issues[0]?.message).toBe('This field is required / Ce champ est obligatoire');
+    });
+
+    it('should attach the missing-reason error to reasonNotSatisfied, so the form shows it under that field', () => {
+      const result = instrument.validationSchema.safeParse({
+        isSatisfiedOverall: false,
+        personalLifeSatisfaction: 2,
+        professionalLifeSatisfaction: 3
+      });
+      expect(result.error?.issues[0]?.path).toEqual(['reasonNotSatisfied']);
     });
 
     it('should accept a dissatisfied subject who gives a reason and its causes', () => {
