@@ -36,7 +36,11 @@ const RouteComponent = () => {
   // When the welcome email cannot be delivered, we surface its rendered text here so
   // the admin can copy it and send it manually. Navigation is deferred until dismissed.
   const [fallbackMessage, setFallbackMessage] = React.useState<null | string>(null);
-  const [emailLanguage, setEmailLanguage] = React.useState<Language>(resolvedLanguage);
+  const [emailLanguageChoice, setEmailLanguageChoice] = React.useState<Language>(resolvedLanguage);
+  // Clamp to what is offered: a language the instance has since disabled has no template on the
+  // mail page any more, and would leave the trigger blank while that language is still posted.
+  const activeLanguages = setupStateQuery.data.activeLanguages;
+  const emailLanguage = activeLanguages.includes(emailLanguageChoice) ? emailLanguageChoice : activeLanguages[0]!;
 
   const handleSubmit = async (data: $CreateUserData) => {
     // check if username exists
@@ -129,7 +133,12 @@ const RouteComponent = () => {
               fr: 'Langue du courriel de bienvenue'
             })}
           </Label>
-          <LanguageSelect data-testid="welcome-email-language" value={emailLanguage} onChange={setEmailLanguage} />
+          <LanguageSelect
+            data-testid="welcome-email-language"
+            options={activeLanguages}
+            value={emailLanguage}
+            onChange={setEmailLanguageChoice}
+          />
         </div>
       )}
       <Form

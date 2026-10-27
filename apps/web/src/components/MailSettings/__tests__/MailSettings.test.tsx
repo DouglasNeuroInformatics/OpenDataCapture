@@ -35,7 +35,7 @@ const renderSettings = (config: MailConfigDto | null) => {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
   render(
     <QueryClientProvider client={queryClient}>
-      <MailSettings config={config} newUserEmailTemplate={template} />
+      <MailSettings activeLanguages={['en', 'fr']} config={config} newUserEmailTemplate={template} />
     </QueryClientProvider>
   );
 };

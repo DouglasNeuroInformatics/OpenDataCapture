@@ -17,6 +17,11 @@ export class AdminSettingsPage extends AppPage {
     this.groupSwitcherPositionSelect = page.getByTestId('group-switcher-position-select');
   }
 
+  /** The labels beside the active-language checkboxes, in the order they are listed. */
+  get activeLanguageLabels(): Locator {
+    return this.$ref.getByTestId('active-languages').locator('label');
+  }
+
   activeLanguageCheckbox(language: Language): Locator {
     return this.$ref.getByTestId(`active-language-${language}`);
   }

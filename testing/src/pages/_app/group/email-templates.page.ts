@@ -6,6 +6,7 @@ export class GroupEmailTemplatesPage extends AppPage {
   readonly builtInDefaultBadge: Locator;
   readonly createAnyway: Locator;
   readonly createBody: Locator;
+  readonly createLanguage: Locator;
   readonly createSubject: Locator;
   readonly createSubmit: Locator;
   readonly deleteConfirm: Locator;
@@ -18,6 +19,7 @@ export class GroupEmailTemplatesPage extends AppPage {
     this.root = page.getByTestId('group-email-templates');
     this.name = page.getByTestId('template-name');
     this.createSubject = page.getByTestId('template-create-subject');
+    this.createLanguage = page.getByTestId('template-create-language');
     this.createBody = page.getByTestId('template-create-body');
     this.insertUrl = page.getByTestId('template-create-insert-url');
     this.createSubmit = page.getByTestId('template-create-submit');
@@ -29,6 +31,11 @@ export class GroupEmailTemplatesPage extends AppPage {
   /** The create form's inline validation message, shown when the body is missing a placeholder. */
   get createError(): Locator {
     return this.$ref.getByTestId('template-create-error');
+  }
+
+  /** The options of whichever language picker is currently open. */
+  get openLanguageOptions(): Locator {
+    return this.$ref.getByRole('option');
   }
 
   /** Create a template authored in one language, accepting the missing-translations warning. */

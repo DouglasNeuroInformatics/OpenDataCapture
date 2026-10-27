@@ -12,7 +12,7 @@ import { useGroupQuery } from '@/hooks/useGroupQuery';
 import { useMailErrorMessage } from '@/hooks/useMailErrorMessage';
 import { useSendAssignmentEmailMutation } from '@/hooks/useSendAssignmentEmailMutation';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
-import { authoredLanguages, LANGUAGES } from '@/utils/language';
+import { authoredLanguages } from '@/utils/language';
 
 const DEFAULT_TEMPLATE_OPTION = '__default__';
 
@@ -56,7 +56,16 @@ export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: Assignm
       : templates.find((template) => template.id === selectedTemplate)?.body;
 
   const authored = authoredLanguages(selectedBody);
-  const templateLanguages = authored.length > 0 ? authored : LANGUAGES;
+  // A template can only be sent in a language it was written in, and is only worth offering in one
+  // the instance still has enabled. Where the two do not overlap the template's own languages win:
+  // its copy exists nowhere else, so scoping it away would leave the template unsendable.
+  const templateLanguages = ((): readonly Language[] => {
+    if (authored.length === 0) {
+      return setupStateQuery.data.activeLanguages;
+    }
+    const active = authored.filter((code) => setupStateQuery.data.activeLanguages.includes(code));
+    return active.length > 0 ? active : authored;
+  })();
   const languageOptions = instrumentLanguages
     ? templateLanguages.filter((code) => instrumentLanguages.includes(code))
     : templateLanguages;

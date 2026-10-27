@@ -16,6 +16,7 @@ type SendEmailCallbacks = {
 };
 
 const mocks = vi.hoisted(() => ({
+  activeLanguages: ['en', 'es', 'fr'] as readonly ('en' | 'es' | 'fr')[],
   isMailEnabled: true,
   isPending: false,
   sendEmail: vi.fn(),
@@ -27,7 +28,9 @@ vi.mock('@/hooks/useGroupQuery', () => ({
 }));
 
 vi.mock('@/hooks/useSetupStateQuery', () => ({
-  useSetupStateQuery: () => ({ data: { isMailEnabled: mocks.isMailEnabled } })
+  useSetupStateQuery: () => ({
+    data: { activeLanguages: mocks.activeLanguages, isMailEnabled: mocks.isMailEnabled }
+  })
 }));
 
 vi.mock('@/hooks/useSendAssignmentEmailMutation', () => ({
@@ -52,6 +55,13 @@ const frenchOnlyTemplate: GroupEmailTemplate = {
   id: 'tpl-fr',
   name: 'Rappel',
   subject: { fr: 'Objet' }
+};
+
+const spanishOnlyTemplate: GroupEmailTemplate = {
+  body: { es: 'Enlace {{url}}' },
+  id: 'tpl-es',
+  name: 'Recordatorio',
+  subject: { es: 'Asunto' }
 };
 
 const englishTemplate: GroupEmailTemplate = {
@@ -88,6 +98,7 @@ beforeEach(() => {
   cleanup();
   vi.resetAllMocks();
   i18n.changeLanguage('en');
+  mocks.activeLanguages = ['en', 'es', 'fr'];
   mocks.isMailEnabled = true;
   mocks.isPending = false;
   useNotificationsStore.setState({ notifications: [] });
@@ -206,6 +217,24 @@ describe('AssignmentEmailForm', () => {
     fireEvent.click(screen.getByRole('option', { name: 'French' }));
     submit('p@x.org');
     expect(mocks.sendEmail.mock.lastCall?.[0]).toMatchObject({ language: 'fr' });
+  });
+
+  // The built-in template is written in every language the application ships, so without scoping
+  // the picker would offer one the instance has disabled and nobody can read the email in.
+  it('should offer only the languages the instance has enabled', () => {
+    mocks.activeLanguages = ['en', 'fr'];
+    render(<AssignmentEmailForm assignment={assignment} />);
+    fireEvent.keyDown(screen.getByTestId('assignment-language'), { key: 'Enter' });
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual(['English', 'French']);
+  });
+
+  // The copy exists in no other language, so scoping it away would leave the template unsendable.
+  it('should keep offering a template authored only in a disabled language, rather than nothing at all', () => {
+    mocks.activeLanguages = ['en', 'fr'];
+    mockGroup('tpl-es', [spanishOnlyTemplate]);
+    render(<AssignmentEmailForm assignment={assignment} />);
+    submit('p@x.org');
+    expect(mocks.sendEmail.mock.lastCall?.[0]).toMatchObject({ language: 'es', templateId: 'tpl-es' });
   });
 
   it('should disable sending while the group is loading, so the built-in default is not posted by accident', () => {

@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 
 import { Button, DataTable, Dialog, Heading, Input, Label, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
 import type { InstrumentRepo } from '@opendatacapture/schemas/instrument-repo';
 import { createFileRoute } from '@tanstack/react-router';
@@ -15,6 +16,31 @@ import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { instrumentReposQueryOptions, useInstrumentReposQuery } from '@/hooks/useInstrumentReposQuery';
 import { useSyncInstrumentRepoMutation } from '@/hooks/useSyncInstrumentRepoMutation';
+
+/**
+ * The instruments a repository currently provides: only the latest edition of each. A sync never
+ * drops superseded editions from a repository (records may still reference them), so without this a
+ * bumped form would be listed once per edition it has ever had.
+ */
+function currentRepoInstruments(instruments: TranslatedInstrumentInfo[], repoId: string) {
+  const fromRepo = instruments.filter((instrument) => instrument.sourceRepo?.id === repoId);
+  // Keyed by internal name, which is what identifies one instrument across its editions. A series
+  // has no edition of its own, so it is never superseded and never keyed.
+  const latestEditions = new Map<string, number>();
+  for (const instrument of fromRepo) {
+    if (instrument.kind === 'SERIES') {
+      continue;
+    }
+    const latest = latestEditions.get(instrument.internal.name);
+    if (latest === undefined || latest < instrument.internal.edition) {
+      latestEditions.set(instrument.internal.name, instrument.internal.edition);
+    }
+  }
+  return fromRepo.filter(
+    (instrument) =>
+      instrument.kind === 'SERIES' || latestEditions.get(instrument.internal.name) === instrument.internal.edition
+  );
+}
 
 const AddRepoForm = ({
   isPending,
@@ -118,8 +144,8 @@ const RouteComponent = () => {
   const createRepoMutation = useCreateInstrumentRepoMutation();
   const deleteRepoMutation = useDeleteInstrumentRepoMutation();
   const syncRepoMutation = useSyncInstrumentRepoMutation();
-  // Every edition, because this page audits what a repository contributed. The default collapses an
-  // instrument's editions to the latest one, which would disagree with the count in the table.
+  // Every edition, because the default collapses editions across all sources, not per repository;
+  // `currentRepoInstruments` then keeps the latest edition each repository provides.
   const instrumentInfoQuery = useInstrumentInfoQuery({ params: { allEditions: true } });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
@@ -191,7 +217,10 @@ const RouteComponent = () => {
             header: 'URL'
           },
           {
-            accessorFn: (row: InstrumentRepo) => row.instrumentIds.length,
+            accessorFn: (row: InstrumentRepo) =>
+              instrumentInfoQuery.data
+                ? currentRepoInstruments(instrumentInfoQuery.data, row.id).length
+                : row.instrumentIds.length,
             header: t({
               en: 'Instruments',
               es: 'Instrumentos',
@@ -291,9 +320,8 @@ const RouteComponent = () => {
             </Dialog.Title>
           </Dialog.Header>
           {(() => {
-            const repoInstruments = instrumentInfoQuery.data?.filter(
-              (instrument) => instrument.sourceRepo?.id === repoToView.id
-            );
+            const repoInstruments =
+              instrumentInfoQuery.data && currentRepoInstruments(instrumentInfoQuery.data, repoToView.id);
             if (instrumentInfoQuery.isLoading) {
               return (
                 <div className="flex justify-center py-6">

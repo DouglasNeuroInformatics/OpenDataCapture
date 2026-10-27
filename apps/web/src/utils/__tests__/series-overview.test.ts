@@ -29,4 +29,12 @@ describe('sortSeriesOverviewRows', () => {
     ];
     expect(titles(sortSeriesOverviewRows(rows))).toEqual(['Follow-up', 'Intake']);
   });
+
+  it('should order the series every group shares by title', () => {
+    const rows = [
+      { groupName: null, title: 'Intake' },
+      { groupName: null, title: 'Follow-up' }
+    ];
+    expect(titles(sortSeriesOverviewRows(rows))).toEqual(['Follow-up', 'Intake']);
+  });
 });

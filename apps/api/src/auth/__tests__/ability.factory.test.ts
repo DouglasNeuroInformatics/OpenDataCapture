@@ -89,6 +89,29 @@ describe('AbilityFactory', () => {
     expect(ability.can('manage', subject('Group', { id: 'group-2' }) as any)).toBe(false);
   });
 
+  // CASL 7 treats conditions that semantically match everything as no conditions at all, which in a
+  // `where` means no restriction. These pin that a group condition, even over no groups, is not one.
+  it.each([
+    ['InstrumentRecord', ['group-1', 'group-2'], { groupId: { in: ['group-1', 'group-2'] } }],
+    ['Session', ['group-1', 'group-2'], { groupId: { in: ['group-1', 'group-2'] } }],
+    ['Subject', ['group-1', 'group-2'], { groupIds: { hasSome: ['group-1', 'group-2'] } }],
+    ['User', ['group-1', 'group-2'], { groupIds: { hasSome: ['group-1', 'group-2'] } }],
+    ['InstrumentRecord', [], { groupId: { in: [] } }],
+    ['Subject', [], { groupIds: { hasSome: [] } }]
+  ] as const)("should confine a group manager's %s query to the groups %j", (modelName, groupIds, condition) => {
+    const ability = abilityFactory.createForPayload({
+      additionalPermissions: undefined,
+      basePermissionLevel: 'GROUP_MANAGER',
+      firstName: 'Test',
+      groups: groupIds.map((id) => ({ id })),
+      id: 'user-1',
+      lastName: 'User',
+      username: 'manager-user'
+    } as any);
+
+    expect(accessibleQuery(ability, 'read', modelName)).toStrictEqual({ OR: [condition] });
+  });
+
   it('should restrict series deletion to the manager group', () => {
     const ability = abilityFactory.createForPayload({
       additionalPermissions: undefined,

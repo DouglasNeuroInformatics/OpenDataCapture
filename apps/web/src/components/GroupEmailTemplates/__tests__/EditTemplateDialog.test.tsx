@@ -1,5 +1,6 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import type { Language } from '@opendatacapture/schemas/core';
 import type { GroupEmailTemplate } from '@opendatacapture/schemas/group';
 import type { MailTemplate } from '@opendatacapture/schemas/mail';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
@@ -16,7 +17,11 @@ const template: GroupEmailTemplate = {
   subject: { en: 'Please complete' }
 };
 
+/** Spanish deliberately left out, so a test can tell a scoped picker from an unscoped one. */
+const ACTIVE_LANGUAGES: readonly Language[] = ['en', 'fr'];
+
 type RenderOptions = {
+  activeLanguages?: readonly Language[];
   isPending?: boolean;
   validateContent?: (template: MailTemplate) => string | undefined;
   validateName?: (name: string) => string | undefined;
@@ -24,6 +29,7 @@ type RenderOptions = {
 };
 
 const renderDialog = ({
+  activeLanguages = ACTIVE_LANGUAGES,
   isPending = false,
   validateContent = () => undefined,
   validateName = () => undefined,
@@ -33,6 +39,7 @@ const renderDialog = ({
   const onSave = vi.fn();
   render(
     <EditTemplateDialog
+      activeLanguages={activeLanguages}
       isPending={isPending}
       template={value}
       validateContent={validateContent}
@@ -114,5 +121,12 @@ describe('EditTemplateDialog', () => {
     const { onOpenChange } = renderDialog();
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  // Offering a language the instance has disabled invites authoring copy nothing will ever send.
+  it('should offer only the languages the instance has enabled', () => {
+    renderDialog();
+    fireEvent.click(screen.getByTestId('template-edit-language'));
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toStrictEqual(['English', 'French']);
   });
 });

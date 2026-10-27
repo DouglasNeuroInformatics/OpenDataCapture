@@ -68,21 +68,29 @@ const groupFixture = (instrumentRepoIds: string[]): Group => ({
   userIds: []
 });
 
+/**
+ * `internalName` is what identifies the same instrument across editions, so two editions of one
+ * form are two fixtures sharing it. It is a parameter rather than something a caller overrides
+ * afterwards because spreading this union and re-adding `internal` makes the property fresh, and
+ * it is then checked against the series branch of {@link TranslatedInstrumentInfo}, which has none.
+ */
 const scalarFixture = ({
   edition = 1,
   id,
+  internalName = id,
   sourceRepo = { id: 'repo-1', name: 'Core Repo' },
   title
 }: {
   edition?: number;
   id: string;
+  internalName?: string;
   sourceRepo?: null | { id: string; name: null | string };
   title: string;
 }): TranslatedInstrumentInfo => ({
   __runtimeVersion: 1,
   details: { authors: null, description: `${title} description`, license: 'MIT', title },
   id,
-  internal: { edition, name: id },
+  internal: { edition, name: internalName },
   kind: 'FORM',
   language: 'en',
   sourceRepo,
@@ -274,6 +282,43 @@ describe('admin instrument repositories page', () => {
       .getAllByRole('listitem')
       .map((item) => item.querySelectorAll('p')[2]!.textContent);
     expect(editions).toEqual(['3', '-']);
+  });
+
+  it('should list only the latest edition of an instrument the repository has bumped', () => {
+    mocks.instrumentInfo.data = [
+      scalarFixture({ edition: 4, id: 'form-1', internalName: 'GI', title: 'General Information' }),
+      scalarFixture({ edition: 5, id: 'form-2', internalName: 'GI', title: 'General Information' })
+    ];
+    renderPage();
+    fireEvent.click(rowAction('View'));
+    const editions = within(screen.getByRole('dialog'))
+      .getAllByRole('listitem')
+      .map((item) => item.querySelectorAll('p')[2]!.textContent);
+    expect(editions).toEqual(['5']);
+  });
+
+  // The API orders by nothing this page controls, so the newest edition may arrive first.
+  it('should keep the latest edition even when it comes before the superseded one in the data', () => {
+    mocks.instrumentInfo.data = [
+      scalarFixture({ edition: 5, id: 'form-2', internalName: 'GI', title: 'General Information' }),
+      scalarFixture({ edition: 4, id: 'form-1', internalName: 'GI', title: 'General Information' })
+    ];
+    renderPage();
+    fireEvent.click(rowAction('View'));
+    const editions = within(screen.getByRole('dialog'))
+      .getAllByRole('listitem')
+      .map((item) => item.querySelectorAll('p')[2]!.textContent);
+    expect(editions).toEqual(['5']);
+  });
+
+  it('should count only the latest edition of each instrument once the instrument info has loaded', () => {
+    mocks.instrumentInfo.data = [
+      scalarFixture({ edition: 4, id: 'form-1', internalName: 'GI', title: 'General Information' }),
+      scalarFixture({ edition: 5, id: 'form-2', internalName: 'GI', title: 'General Information' }),
+      seriesFixture({ id: 'series-1', title: 'Baseline Battery' })
+    ];
+    renderPage([repoFixture({ instrumentIds: ['form-1', 'form-2', 'series-1'] })]);
+    expect(within(rows()[0]!).getByText('2')).toBeTruthy();
   });
 
   it('should close the view dialog when it is dismissed', () => {
