@@ -6,6 +6,8 @@ const EXTENSION = /\.[cm]?[jt]sx?$/u;
 
 const WORKSPACE_SOURCE = /^(?<root>.*[/\\](?:apps|packages|runtime)[/\\][^/\\]+[/\\]src)[/\\]/u;
 
+const MEMBER_PATH = /^(?:\.[\w$]+)*$/u;
+
 const exportedName = (node) => (node.type === 'Identifier' ? node.name : String(node.value));
 
 const isDescribe = (callee) => {
@@ -59,6 +61,7 @@ export const unitTestSubject = {
     const titles = new Set();
     const bindings = new Set();
     const subjectImports = [];
+    let importsModule = false;
 
     const resolveImport = (specifier) => {
       if (specifier.startsWith('@/') && sourceRoot) {
@@ -85,7 +88,10 @@ export const unitTestSubject = {
       }
     };
 
-    const isTitle = (value) => titles.has(value.replace(/\..*$/su, ''));
+    const isTitle = (value) => {
+      const names = importsModule ? [...titles, subject] : [...titles];
+      return names.some((name) => value.startsWith(name) && MEMBER_PATH.test(value.slice(name.length)));
+    };
 
     return {
       ImportDeclaration(node) {
@@ -93,6 +99,9 @@ export const unitTestSubject = {
           return;
         }
         subjectImports.push(node);
+        if (node.specifiers.length === 0 || node.specifiers.some(({ type }) => type === 'ImportNamespaceSpecifier')) {
+          importsModule = true;
+        }
         for (const specifier of node.specifiers) {
           addName(
             specifier.type === 'ImportSpecifier' ? exportedName(specifier.imported) : undefined,
@@ -105,7 +114,11 @@ export const unitTestSubject = {
           return;
         }
         subjectImports.push(node);
-        for (const { imported, local } of dynamicallyImportedNames(node)) {
+        const names = dynamicallyImportedNames(node);
+        if (names.length === 0) {
+          importsModule = true;
+        }
+        for (const { imported, local } of names) {
           addName(imported, local);
         }
       },
@@ -132,7 +145,8 @@ export const unitTestSubject = {
   },
   meta: {
     messages: {
-      describe: 'Title each top-level `describe` after a name this test imports from `{{subject}}`.',
+      describe:
+        'Title each top-level `describe` after a name this test imports from `{{subject}}`, or after `{{subject}}` when it imports the module itself, optionally followed by `.member`.',
       import: 'A unit test imports the file it tests, `{{subject}}`.'
     },
     schema: [],

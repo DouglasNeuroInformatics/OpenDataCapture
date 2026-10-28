@@ -208,7 +208,9 @@ that does not.
 **Tests.** A unit test is `<file>.test.ts(x)` in a `__tests__/` folder beside the file it tests:
 `src/index.ts` is tested by `src/__tests__/index.test.ts`. A suite that drives a whole package, like
 `apps/api/test/`, lives in that package's `test/` folder instead. A unit test imports the file it
-tests and titles each top-level `describe` after a name it imports from it. Three eslint rules
+tests and titles each top-level `describe` after a name it imports from it, or after the file's name
+when it imports the module itself (a side-effect import, `import * as`, or `await import()`) to test
+what loading it does. Three eslint rules
 enforce the layout: two in `eslint.config.js`, and `odc/unit-test-subject` in `.eslint/rules/`,
 where the repo's other custom rules live too. `packages/instrument-library` is the one exception, for
 the reason its `AGENTS.md` gives. Keep test bodies short; each verifies one behavior. Descriptions are concise, grammatical
