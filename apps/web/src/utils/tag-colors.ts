@@ -1,5 +1,7 @@
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 
+import type { InstrumentRepoSyncStatus } from './instrument-repo-sync';
+
 type Mode = 'dark' | 'light';
 
 /**
@@ -26,6 +28,13 @@ const INSTRUMENT_KIND_COLORS = {
   SERIES: { dark: '#eab308', light: '#ca8a04' }
 } as const satisfies { [K in InstrumentKind]: { dark: string; light: string } };
 
+/** Traffic-light hues for how a repository sync went, from the same scale as the kind colours. */
+const SYNC_STATUS_COLORS = {
+  FAILED: { dark: '#ef4444', light: '#dc2626' },
+  PARTIAL: { dark: '#f59e0b', light: '#d97706' },
+  SUCCESS: { dark: '#22c55e', light: '#16a34a' }
+} as const satisfies { [K in InstrumentRepoSyncStatus]: { dark: string; light: string } };
+
 const NEUTRAL_COLOR = {
   dark: '#a3a3a3',
   light: '#525252'
@@ -42,4 +51,8 @@ function getInstrumentKindColor(kind: InstrumentKind, mode: Mode): string {
   return INSTRUMENT_KIND_COLORS[kind][mode];
 }
 
-export { getInstrumentKindColor, getSexColor };
+function getSyncStatusColor(status: InstrumentRepoSyncStatus, mode: Mode): string {
+  return SYNC_STATUS_COLORS[status][mode];
+}
+
+export { getInstrumentKindColor, getSexColor, getSyncStatusColor };

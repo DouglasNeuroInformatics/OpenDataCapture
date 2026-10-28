@@ -63,7 +63,13 @@ describe('InstrumentReposController', () => {
     expect(service.findSyncLogs).toHaveBeenCalledWith({ ability });
   });
 
-  it.each(['findSyncLogs'] as const)(
+  it("should clear the sync history within the current user's ability", async () => {
+    service.deleteSyncLogs.mockResolvedValueOnce({ count: 2 });
+    await expect(controller.deleteSyncLogs(ability)).resolves.toStrictEqual({ count: 2 });
+    expect(service.deleteSyncLogs).toHaveBeenCalledWith({ ability });
+  });
+
+  it.each(['deleteSyncLogs', 'findSyncLogs'] as const)(
     'should restrict %s to administrators, since the history spans every repository',
     (handler) => {
       const reflector = new Reflector();

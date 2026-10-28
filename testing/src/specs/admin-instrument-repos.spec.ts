@@ -119,7 +119,11 @@ test.describe('admin instrument repos sync history', () => {
     await page.route('**/v1/instrument-repos', (route) =>
       route.request().method() === 'GET' ? route.fulfill({ json: [repo] }) : route.continue()
     );
-    await page.route('**/v1/instrument-repos/sync/logs', (route) => route.fulfill({ json: [partialSync] }));
+    await page.route('**/v1/instrument-repos/sync/logs', (route) =>
+      route.request().method() === 'DELETE'
+        ? route.fulfill({ json: { count: 1 } })
+        : route.fulfill({ json: [partialSync] })
+    );
   });
 
   test('should keep a long repository URL inside its column, even on the selected row', async ({ getPageModel }) => {
@@ -181,5 +185,23 @@ test.describe('admin instrument repos sync history', () => {
 
     await expect(reposPage.$ref.getByText('1 of 1 repositories had problems. See the sync history.')).toBeVisible();
     expect(syncAllRequested).toBe(true);
+  });
+
+  test('should clear the sync history only after warning that it is deleted from the database', async ({
+    getPageModel,
+    page
+  }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    const deleteRequest = page.waitForRequest(
+      (request) => request.method() === 'DELETE' && request.url().endsWith('/v1/instrument-repos/sync/logs')
+    );
+
+    await reposPage.clearHistoryButton.click();
+    const dialog = reposPage.$ref.getByRole('dialog');
+    await expect(dialog).toContainText('permanently deleted from the database');
+    await dialog.getByRole('button', { name: 'Yes' }).click();
+
+    await deleteRequest;
+    await expect(reposPage.$ref.getByText('Sync history cleared')).toBeVisible();
   });
 });

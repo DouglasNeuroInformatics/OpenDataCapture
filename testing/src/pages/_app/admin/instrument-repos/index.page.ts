@@ -4,6 +4,7 @@ import { AppPage } from '../../route.page';
 
 export class InstrumentReposPage extends AppPage {
   readonly addRepositoryButton: Locator;
+  readonly clearHistoryButton: Locator;
   /** The repositories table; the sync history below it is a second data table. */
   readonly dataTable: Locator;
   readonly githubUrlInput: Locator;
@@ -18,6 +19,7 @@ export class InstrumentReposPage extends AppPage {
     this.dataTable = page.getByTestId('data-table').first();
     this.syncLogTable = page.getByTestId('instrument-repo-sync-log');
     this.syncAllButton = page.getByRole('button', { name: 'Sync All' });
+    this.clearHistoryButton = page.getByRole('button', { name: 'Clear History' });
     this.addRepositoryButton = page.getByRole('button', { name: 'Add Repository' });
     this.githubUrlInput = page.getByLabel('GitHub URL');
     // A plain HTML form (not the shared `Form` component), so its accessible name is the literal label.

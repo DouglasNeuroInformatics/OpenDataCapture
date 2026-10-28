@@ -25,6 +25,13 @@ export class InstrumentReposController {
     return this.instrumentReposService.deleteById(id, { ability });
   }
 
+  @ApiOperation({ summary: 'Clear the Sync History of Every Instrument Repo' })
+  @Delete('sync/logs')
+  @RouteAccess(ADMIN_ONLY)
+  deleteSyncLogs(@CurrentUser('ability') ability?: AppAbility) {
+    return this.instrumentReposService.deleteSyncLogs({ ability });
+  }
+
   @ApiOperation({ summary: 'Get All Instrument Repos' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'InstrumentRepo' })

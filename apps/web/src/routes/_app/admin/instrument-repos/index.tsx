@@ -21,6 +21,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { InstrumentRepoSyncLogTable } from '@/components/InstrumentRepoSyncLogTable';
 import { PageHeader } from '@/components/PageHeader';
 import { TruncatedCell } from '@/components/TruncatedCell';
+import { useClearInstrumentRepoSyncLogsMutation } from '@/hooks/useClearInstrumentRepoSyncLogsMutation';
 import { useCreateInstrumentRepoMutation } from '@/hooks/useCreateInstrumentRepoMutation';
 import { useDeleteInstrumentRepoMutation } from '@/hooks/useDeleteInstrumentRepoMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
@@ -172,6 +173,7 @@ const RouteComponent = () => {
   const syncRepoMutation = useSyncInstrumentRepoMutation();
   const syncAllReposMutation = useSyncAllInstrumentReposMutation();
   const syncLogsQuery = useInstrumentRepoSyncLogsQuery();
+  const clearSyncLogsMutation = useClearInstrumentRepoSyncLogsMutation();
   // Every edition, because the default collapses editions across all sources, not per repository;
   // `currentRepoInstruments` then keeps the latest edition each repository provides.
   const instrumentInfoQuery = useInstrumentInfoQuery({ params: { allEditions: true } });
@@ -181,6 +183,7 @@ const RouteComponent = () => {
   const [repoToView, setRepoToView] = useState<InstrumentRepo | null>(null);
   const [instrumentSearch, setInstrumentSearch] = useState('');
   const [repoToShowLogs, setRepoToShowLogs] = useState<InstrumentRepo | null>(null);
+  const [isConfirmClearHistoryOpen, setIsConfirmClearHistoryOpen] = useState(false);
   const [repoToDelete, setRepoToDelete] = useState<InstrumentRepo | null>(null);
   const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
 
@@ -206,7 +209,7 @@ const RouteComponent = () => {
 
   return (
     <Dialog
-      open={isDialogOpen || isConfirmDeleteOpen || isViewOpen || repoToShowLogs !== null}
+      open={isDialogOpen || isConfirmDeleteOpen || isViewOpen || isConfirmClearHistoryOpen || repoToShowLogs !== null}
       onOpenChange={() => {
         setIsDialogOpen(false);
         setIsConfirmDeleteOpen(false);
@@ -214,6 +217,7 @@ const RouteComponent = () => {
         setRepoToView(null);
         setRepoToDelete(null);
         setRepoToShowLogs(null);
+        setIsConfirmClearHistoryOpen(false);
         setInstrumentSearch('');
       }}
     >
@@ -263,29 +267,23 @@ const RouteComponent = () => {
                 : row.instrumentIds.length;
             },
             header: t({
-              en: 'Instruments',
-              es: 'Instrumentos',
-              fr: 'Instruments'
+              en: 'Imported',
+              es: 'Importados',
+              fr: 'Importés'
             }),
             id: 'instrumentCount'
           },
           {
             cell: (ctx) => {
               const log = latestSyncLogByRepoId.get(ctx.row.original.id);
-              if (log?.message) {
-                return (
-                  <span className="text-destructive font-medium" data-testid="instrument-repo-failed-count">
-                    {t({ en: 'Sync failed', es: 'Sincronización fallida', fr: 'Échec de la synchronisation' })}
-                  </span>
-                );
+              if (!log) {
+                return '-';
               }
-              const failedCount = log?.failures.length ?? 0;
               return (
-                <span
-                  className={failedCount ? 'text-destructive font-medium' : undefined}
-                  data-testid="instrument-repo-failed-count"
-                >
-                  {failedCount}
+                <span data-testid="instrument-repo-failed-count">
+                  {log.message
+                    ? t({ en: 'Sync failed', es: 'Sincronización fallida', fr: 'Échec de la synchronisation' })
+                    : log.failures.length}
                 </span>
               );
             },
@@ -365,11 +363,61 @@ const RouteComponent = () => {
         }}
       />
       <section className="mt-10 flex flex-col gap-4">
-        <Heading variant="h4">
-          {t({ en: 'Sync History', es: 'Historial de sincronización', fr: 'Historique de synchronisation' })}
-        </Heading>
+        <div className="flex items-center justify-between">
+          <Heading variant="h4">
+            {t({ en: 'Sync History', es: 'Historial de sincronización', fr: 'Historique de synchronisation' })}
+          </Heading>
+          <Button
+            disabled={syncLogsQuery.data.length === 0 || clearSyncLogsMutation.isPending}
+            variant="outline"
+            onClick={() => setIsConfirmClearHistoryOpen(true)}
+          >
+            {t({ en: 'Clear History', es: 'Borrar historial', fr: "Effacer l'historique" })}
+          </Button>
+        </div>
         <InstrumentRepoSyncLogTable logs={syncLogsQuery.data} />
       </section>
+      {isConfirmClearHistoryOpen && (
+        <Dialog.Content>
+          <Dialog.Header>
+            <Dialog.Title>
+              {t({
+                en: 'Clear the sync history?',
+                es: '¿Borrar el historial de sincronización?',
+                fr: "Effacer l'historique de synchronisation ?"
+              })}
+            </Dialog.Title>
+            <Dialog.Description>
+              {t({
+                en: 'Every entry in the sync history will be permanently deleted from the database, including the reasons instruments failed. This cannot be undone. Repositories and their instruments are not affected.',
+                es: 'Todas las entradas del historial de sincronización se eliminarán permanentemente de la base de datos, incluidos los motivos por los que fallaron los instrumentos. Esta acción no se puede deshacer. Los repositorios y sus instrumentos no se verán afectados.',
+                fr: "Toutes les entrées de l'historique de synchronisation seront définitivement supprimées de la base de données, y compris les raisons des échecs des instruments. Cette action est irréversible. Les dépôts et leurs instruments ne sont pas touchés."
+              })}
+            </Dialog.Description>
+          </Dialog.Header>
+          <Dialog.Footer>
+            <Button
+              className="min-w-16"
+              type="button"
+              variant="danger"
+              onClick={() => {
+                clearSyncLogsMutation.mutate();
+                setIsConfirmClearHistoryOpen(false);
+              }}
+            >
+              {t('core.yes')}
+            </Button>
+            <Button
+              className="min-w-16"
+              type="button"
+              variant="outline"
+              onClick={() => setIsConfirmClearHistoryOpen(false)}
+            >
+              {t('core.no')}
+            </Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      )}
       {repoToShowLogs && (
         <Dialog.Content className="sm:max-w-275">
           <Dialog.Header>

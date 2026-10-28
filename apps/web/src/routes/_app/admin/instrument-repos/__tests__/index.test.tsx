@@ -11,6 +11,7 @@ import { Route } from '@/routes/_app/admin/instrument-repos/index';
 import '@/services/i18n';
 
 const mocks = vi.hoisted(() => ({
+  clearSyncLogs: vi.fn(),
   createRepo: vi.fn(),
   deleteRepo: vi.fn(),
   groups: [] as Group[],
@@ -34,6 +35,9 @@ vi.mock('@/hooks/useGroupsQuery', () => ({
   useGroupsQuery: () => ({ data: mocks.groups })
 }));
 vi.mock('@/hooks/useInstrumentInfoQuery', () => ({ useInstrumentInfoQuery: () => mocks.instrumentInfo }));
+vi.mock('@/hooks/useClearInstrumentRepoSyncLogsMutation', () => ({
+  useClearInstrumentRepoSyncLogsMutation: () => ({ isPending: false, mutate: mocks.clearSyncLogs })
+}));
 vi.mock('@/hooks/useCreateInstrumentRepoMutation', () => ({
   useCreateInstrumentRepoMutation: () => ({ isPending: mocks.isCreatePending, mutate: mocks.createRepo })
 }));
@@ -198,14 +202,12 @@ describe('Route', () => {
       syncLogFixture({ id: 'older' })
     ];
     renderPage();
-    const failedCount = within(rows()[0]!).getByTestId('instrument-repo-failed-count');
-    expect(failedCount.textContent).toBe('1');
-    expect(failedCount.className).toContain('text-destructive');
+    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('1');
   });
 
-  it('should show zero failed instruments for a repository with no sync history', () => {
+  it('should show a dash for the failed count of a repository with no sync history', () => {
     renderPage();
-    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('0');
+    expect(within(rows()[0]!).queryByTestId('instrument-repo-failed-count')).toBeNull();
   });
 
   it('should say the latest sync failed when the repository could not be read at all', () => {
@@ -233,6 +235,38 @@ describe('Route', () => {
     expect(within(history).getByText('Other Repo')).toBeTruthy();
   });
 
+  it('should not offer to clear an empty sync history', () => {
+    renderPage();
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Clear History' }).disabled).toBe(true);
+  });
+
+  it('should warn that clearing the history deletes it from the database before doing so', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: 'Clear History' }));
+    expect(screen.getByText('Clear the sync history?')).toBeTruthy();
+    expect(screen.getByRole('dialog').textContent).toContain('permanently deleted from the database');
+    expect(mocks.clearSyncLogs).not.toHaveBeenCalled();
+  });
+
+  it('should clear the history once the warning is accepted', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: 'Clear History' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Yes' }));
+    expect(mocks.clearSyncLogs).toHaveBeenCalledOnce();
+    expect(screen.queryByText('Clear the sync history?')).toBeNull();
+  });
+
+  it('should keep the history when the warning is declined', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: 'Clear History' }));
+    fireEvent.click(screen.getByRole('button', { name: 'No' }));
+    expect(mocks.clearSyncLogs).not.toHaveBeenCalled();
+    expect(screen.queryByText('Clear the sync history?')).toBeNull();
+  });
+
   it('should show only the selected repository in its logs dialog', () => {
     mocks.syncLogs = [syncLogFixture(), syncLogFixture({ id: 'log-2', repoId: 'repo-2', repoName: 'Other Repo' })];
     renderPage();
@@ -248,6 +282,8 @@ describe('Route', () => {
   });
 
   it('should show a dash for a repository that has never been synced', () => {
+    // A log keeps the failed count from rendering a dash of its own.
+    mocks.syncLogs = [syncLogFixture()];
     renderPage();
     expect(within(rows()[0]!).getByText('-')).toBeTruthy();
   });

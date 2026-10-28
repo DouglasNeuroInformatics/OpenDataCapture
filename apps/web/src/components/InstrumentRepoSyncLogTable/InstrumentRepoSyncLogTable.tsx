@@ -1,24 +1,12 @@
 import { Badge, DataTable } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRepoSyncLog, InstrumentRepoSyncStage } from '@opendatacapture/schemas/instrument-repo';
 
+import { ColorTagCell } from '@/components/ColorTagCell';
 import { SortableHeader } from '@/components/SortableHeader';
-
-type InstrumentRepoSyncStatus = 'FAILED' | 'PARTIAL' | 'SUCCESS';
-
-/** A sync that could not read the repository failed outright; one that skipped instruments partly succeeded. */
-function getSyncStatus(log: InstrumentRepoSyncLog): InstrumentRepoSyncStatus {
-  if (log.message) {
-    return 'FAILED';
-  }
-  return log.failures.length ? 'PARTIAL' : 'SUCCESS';
-}
-
-const STATUS_BADGE_CLASSES = {
-  FAILED: 'border-red-500/50 text-red-600 dark:text-red-400',
-  PARTIAL: 'border-amber-500/50 text-amber-600 dark:text-amber-400',
-  SUCCESS: 'border-green-500/50 text-green-600 dark:text-green-400'
-} satisfies { [K in InstrumentRepoSyncStatus]: string };
+import { getSyncStatus } from '@/utils/instrument-repo-sync';
+import type { InstrumentRepoSyncStatus } from '@/utils/instrument-repo-sync';
+import { getSyncStatusColor } from '@/utils/tag-colors';
 
 type InstrumentRepoSyncLogTableProps = {
   logs: InstrumentRepoSyncLog[];
@@ -26,6 +14,7 @@ type InstrumentRepoSyncLogTableProps = {
 
 export const InstrumentRepoSyncLogTable = ({ logs }: InstrumentRepoSyncLogTableProps) => {
   const { t } = useTranslation();
+  const [theme] = useTheme();
 
   const statusLabels = {
     FAILED: t({ en: 'Failed', es: 'Fallido', fr: 'Échec' }),
@@ -73,9 +62,11 @@ export const InstrumentRepoSyncLogTable = ({ logs }: InstrumentRepoSyncLogTableP
             cell: (ctx) => {
               const status = getSyncStatus(ctx.row.original);
               return (
-                <Badge className={STATUS_BADGE_CLASSES[status]} data-testid="sync-log-status" variant="outline">
-                  {statusLabels[status]}
-                </Badge>
+                <ColorTagCell
+                  color={getSyncStatusColor(status, theme === 'dark' ? 'dark' : 'light')}
+                  data-testid="sync-log-status"
+                  label={statusLabels[status]}
+                />
               );
             },
             header: ({ column }) => (

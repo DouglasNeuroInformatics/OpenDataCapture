@@ -379,6 +379,16 @@ describe('InstrumentReposService', () => {
     });
   });
 
+  describe('deleteSyncLogs', () => {
+    it('should erase every sync log the caller may delete', async () => {
+      instrumentRepoSyncLogModel.deleteMany.mockResolvedValueOnce({ count: 3 });
+
+      await expect(service.deleteSyncLogs()).resolves.toStrictEqual({ count: 3 });
+      expect(instrumentRepoSyncLogModel.deleteMany).toHaveBeenCalledWith({ where: {} });
+      expect(instrumentRepoModel.update).not.toHaveBeenCalled();
+    });
+  });
+
   describe('findSyncLogs', () => {
     it('should return the history newest first', async () => {
       instrumentRepoSyncLogModel.findMany.mockResolvedValueOnce([{ id: 'log-1' }]);

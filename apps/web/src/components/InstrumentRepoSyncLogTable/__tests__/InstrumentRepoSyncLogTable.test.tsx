@@ -1,10 +1,17 @@
 import type { InstrumentRepoSyncLog } from '@opendatacapture/schemas/instrument-repo';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { InstrumentRepoSyncLogTable } from '../InstrumentRepoSyncLogTable';
 
 import '@/services/i18n';
+
+const theme = vi.hoisted(() => ({ current: 'light' }));
+
+vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/hooks')>()),
+  useTheme: () => [theme.current, vi.fn()]
+}));
 
 const logFixture = (overrides: Partial<InstrumentRepoSyncLog> = {}): InstrumentRepoSyncLog => ({
   action: 'SYNC',
@@ -23,7 +30,10 @@ const rows = () => screen.getAllByTestId('data-table-row');
 
 const statuses = () => screen.getAllByTestId('sync-log-status').map((badge) => badge.textContent);
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  theme.current = 'light';
+});
 
 describe('InstrumentRepoSyncLogTable', () => {
   it('should mark a sync with no failed instrument as a success', () => {
@@ -101,5 +111,18 @@ describe('InstrumentRepoSyncLogTable', () => {
     );
     fireEvent.click(within(screen.getByTestId('data-table-head')).getByText('Status'));
     expect(statuses()).toEqual(['Failed', 'Success']);
+  });
+
+  it('should colour the status dot for the dark theme when the app is dark', () => {
+    theme.current = 'dark';
+    render(<InstrumentRepoSyncLogTable logs={[logFixture()]} />);
+    const dot = screen.getByTestId('sync-log-status').firstElementChild as HTMLElement;
+    expect(dot.style.backgroundColor).toBe('#22c55e');
+  });
+
+  it('should colour the status dot for the light theme otherwise', () => {
+    render(<InstrumentRepoSyncLogTable logs={[logFixture({ message: 'Repository not found' })]} />);
+    const dot = screen.getByTestId('sync-log-status').firstElementChild as HTMLElement;
+    expect(dot.style.backgroundColor).toBe('#dc2626');
   });
 });

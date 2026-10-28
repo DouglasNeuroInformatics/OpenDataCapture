@@ -157,6 +157,13 @@ export class InstrumentReposService implements OnModuleInit {
     return this.stripSecrets(deleted);
   }
 
+  /** Erase the whole sync history. The repositories and their instruments are untouched. */
+  async deleteSyncLogs({ ability }: EntityOperationOptions = {}) {
+    return this.instrumentRepoSyncLogModel.deleteMany({
+      where: accessibleQuery(ability, 'delete', 'InstrumentRepoSyncLog')
+    });
+  }
+
   async findAll({ ability }: EntityOperationOptions = {}) {
     const repos = await this.instrumentRepoModel.findMany({
       where: accessibleQuery(ability, 'read', 'InstrumentRepo')
