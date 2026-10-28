@@ -256,6 +256,38 @@ model InstrumentRepo {
   @@map("InstrumentRepoModel")
 }
 
+enum InstrumentRepoSyncAction {
+  IMPORT
+  SYNC
+}
+
+enum InstrumentRepoSyncStage {
+  BUNDLE
+  LOAD
+}
+
+type InstrumentRepoSyncFailure {
+  instrumentDir String
+  message       String
+  stage         InstrumentRepoSyncStage
+}
+
+// One entry per import or sync. Not related to InstrumentRepo, so the history outlives a deleted
+// repository; `repoName` is denormalized for the same reason.
+model InstrumentRepoSyncLog {
+  createdAt     DateTime                    @default(now()) @db.Date
+  updatedAt     DateTime                    @updatedAt @db.Date
+  id            String                      @id @default(auto()) @map("_id") @db.ObjectId
+  action        InstrumentRepoSyncAction
+  failures      InstrumentRepoSyncFailure[]
+  importedCount Int
+  message       String?
+  repoId        String?                     @db.ObjectId
+  repoName      String
+
+  @@map("InstrumentRepoSyncLogModel")
+}
+
 // Subjects
 
 enum Sex {

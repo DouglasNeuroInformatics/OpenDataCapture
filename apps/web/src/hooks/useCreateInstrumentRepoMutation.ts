@@ -6,6 +6,7 @@ import axios from 'axios';
 import { getApiErrorMessage } from '@/utils/error';
 
 import { INSTRUMENT_REPOS_QUERY_KEY } from './useInstrumentReposQuery';
+import { INSTRUMENT_REPO_SYNC_LOGS_QUERY_KEY } from './useInstrumentRepoSyncLogsQuery';
 
 export function useCreateInstrumentRepoMutation() {
   const queryClient = useQueryClient();
@@ -29,6 +30,10 @@ export function useCreateInstrumentRepoMutation() {
         ),
         type: 'error'
       });
+    },
+    onSettled() {
+      // A failed import is logged too, so the history changes either way.
+      void queryClient.invalidateQueries({ queryKey: [INSTRUMENT_REPO_SYNC_LOGS_QUERY_KEY] });
     },
     onSuccess() {
       addNotification({

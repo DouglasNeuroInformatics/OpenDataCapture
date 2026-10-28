@@ -3,7 +3,7 @@ import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
 
 import type { AppAbility } from '@/auth/auth.types';
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { InstrumentReposService } from './instrument-repos.service';
 
@@ -32,10 +32,24 @@ export class InstrumentReposController {
     return this.instrumentReposService.findAll({ ability });
   }
 
+  @ApiOperation({ summary: 'Get the Sync History of Every Instrument Repo' })
+  @Get('sync/logs')
+  @RouteAccess(ADMIN_ONLY)
+  findSyncLogs(@CurrentUser('ability') ability?: AppAbility) {
+    return this.instrumentReposService.findSyncLogs({ ability });
+  }
+
   @ApiOperation({ summary: 'Sync Instrument Repo' })
   @Post(':id/sync')
   @RouteAccess({ action: 'update', subject: 'InstrumentRepo' })
   sync(@Param('id') id: string) {
     return this.instrumentReposService.sync(id);
+  }
+
+  @ApiOperation({ summary: 'Sync Every Instrument Repo' })
+  @Post('sync/all')
+  @RouteAccess({ action: 'update', subject: 'InstrumentRepo' })
+  syncAll(@CurrentUser('ability') ability?: AppAbility) {
+    return this.instrumentReposService.syncAll({ ability });
   }
 }

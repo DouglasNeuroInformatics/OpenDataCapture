@@ -1,25 +1,41 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 
-import { Button, DataTable, Dialog, Heading, Input, Label, Spinner } from '@douglasneuroinformatics/libui/components';
+import {
+  Button,
+  DataTable,
+  Dialog,
+  Heading,
+  Input,
+  Label,
+  SearchBar,
+  Spinner
+} from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
-import type { InstrumentRepo } from '@opendatacapture/schemas/instrument-repo';
+import type { InstrumentRepo, InstrumentRepoSyncLog } from '@opendatacapture/schemas/instrument-repo';
 import { createFileRoute } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 
+import { InstrumentRepoSyncLogTable } from '@/components/InstrumentRepoSyncLogTable';
 import { PageHeader } from '@/components/PageHeader';
+import { TruncatedCell } from '@/components/TruncatedCell';
 import { useCreateInstrumentRepoMutation } from '@/hooks/useCreateInstrumentRepoMutation';
 import { useDeleteInstrumentRepoMutation } from '@/hooks/useDeleteInstrumentRepoMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { instrumentReposQueryOptions, useInstrumentReposQuery } from '@/hooks/useInstrumentReposQuery';
+import {
+  instrumentRepoSyncLogsQueryOptions,
+  useInstrumentRepoSyncLogsQuery
+} from '@/hooks/useInstrumentRepoSyncLogsQuery';
+import { useSyncAllInstrumentReposMutation } from '@/hooks/useSyncAllInstrumentReposMutation';
 import { useSyncInstrumentRepoMutation } from '@/hooks/useSyncInstrumentRepoMutation';
 
 /**
- * The instruments a repository currently provides: only the latest edition of each. A sync never
- * drops superseded editions from a repository (records may still reference them), so without this a
+ * The instruments a repository currently provides: only the latest edition of each. Superseded
+ * editions keep their repository provenance (records may still reference them), so without this a
  * bumped form would be listed once per edition it has ever had.
  */
 function currentRepoInstruments(instruments: TranslatedInstrumentInfo[], repoId: string) {
@@ -135,6 +151,17 @@ const AddRepoForm = ({
   );
 };
 
+/** The most recent log per repository; the API returns the history newest first. */
+function latestSyncLogs(logs: InstrumentRepoSyncLog[]) {
+  const latest = new Map<string, InstrumentRepoSyncLog>();
+  for (const log of logs) {
+    if (log.repoId && !latest.has(log.repoId)) {
+      latest.set(log.repoId, log);
+    }
+  }
+  return latest;
+}
+
 const RouteComponent = () => {
   const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
@@ -143,6 +170,8 @@ const RouteComponent = () => {
   const createRepoMutation = useCreateInstrumentRepoMutation();
   const deleteRepoMutation = useDeleteInstrumentRepoMutation();
   const syncRepoMutation = useSyncInstrumentRepoMutation();
+  const syncAllReposMutation = useSyncAllInstrumentReposMutation();
+  const syncLogsQuery = useInstrumentRepoSyncLogsQuery();
   // Every edition, because the default collapses editions across all sources, not per repository;
   // `currentRepoInstruments` then keeps the latest edition each repository provides.
   const instrumentInfoQuery = useInstrumentInfoQuery({ params: { allEditions: true } });
@@ -150,11 +179,14 @@ const RouteComponent = () => {
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [repoToView, setRepoToView] = useState<InstrumentRepo | null>(null);
+  const [instrumentSearch, setInstrumentSearch] = useState('');
+  const [repoToShowLogs, setRepoToShowLogs] = useState<InstrumentRepo | null>(null);
   const [repoToDelete, setRepoToDelete] = useState<InstrumentRepo | null>(null);
   const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
 
   // Compute which repos are currently assigned to at least one (live) group.
   const inUseRepoIds = new Set(groupsQuery.data.flatMap((group) => group.instrumentRepoIds));
+  const latestSyncLogByRepoId = latestSyncLogs(syncLogsQuery.data);
 
   const handleDeleteClick = (repo: InstrumentRepo) => {
     if (inUseRepoIds.has(repo.id)) {
@@ -174,13 +206,15 @@ const RouteComponent = () => {
 
   return (
     <Dialog
-      open={isDialogOpen || isConfirmDeleteOpen || isViewOpen}
+      open={isDialogOpen || isConfirmDeleteOpen || isViewOpen || repoToShowLogs !== null}
       onOpenChange={() => {
         setIsDialogOpen(false);
         setIsConfirmDeleteOpen(false);
         setIsViewOpen(false);
         setRepoToView(null);
         setRepoToDelete(null);
+        setRepoToShowLogs(null);
+        setInstrumentSearch('');
       }}
     >
       <PageHeader>
@@ -213,6 +247,13 @@ const RouteComponent = () => {
           },
           {
             accessorKey: 'url',
+            cell: (ctx) => (
+              <TruncatedCell
+                data-testid="instrument-repo-url"
+                title={ctx.row.original.url}
+                value={ctx.row.original.url}
+              />
+            ),
             header: 'URL'
           },
           {
@@ -227,6 +268,29 @@ const RouteComponent = () => {
               fr: 'Instruments'
             }),
             id: 'instrumentCount'
+          },
+          {
+            cell: (ctx) => {
+              const log = latestSyncLogByRepoId.get(ctx.row.original.id);
+              if (log?.message) {
+                return (
+                  <span className="text-destructive font-medium" data-testid="instrument-repo-failed-count">
+                    {t({ en: 'Sync failed', es: 'Sincronización fallida', fr: 'Échec de la synchronisation' })}
+                  </span>
+                );
+              }
+              const failedCount = log?.failures.length ?? 0;
+              return (
+                <span
+                  className={failedCount ? 'text-destructive font-medium' : undefined}
+                  data-testid="instrument-repo-failed-count"
+                >
+                  {failedCount}
+                </span>
+              );
+            },
+            header: t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' }),
+            id: 'failedCount'
           },
           {
             accessorFn: (row: InstrumentRepo) => {
@@ -264,18 +328,35 @@ const RouteComponent = () => {
             }
           },
           {
+            label: t({ en: 'Logs', es: 'Registros', fr: 'Journaux' }),
+            onSelect: setRepoToShowLogs
+          },
+          {
             label: t('core.delete'),
             onSelect: handleDeleteClick
           }
         ]}
         togglesComponent={() => (
-          <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
-            {t({
-              en: 'Add Repository',
-              es: 'Agregar repositorio',
-              fr: 'Ajouter un dépôt'
-            })}
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
+              {t({
+                en: 'Add Repository',
+                es: 'Agregar repositorio',
+                fr: 'Ajouter un dépôt'
+              })}
+            </Button>
+            <Button
+              disabled={syncAllReposMutation.isPending || reposQuery.data.length === 0}
+              variant="outline"
+              onClick={() => syncAllReposMutation.mutate()}
+            >
+              {t({
+                en: 'Sync All',
+                es: 'Sincronizar todo',
+                fr: 'Tout synchroniser'
+              })}
+            </Button>
+          </div>
         )}
         onRowClick={(repo) => setHighlightedRowId(repo.id)}
         onRowDoubleClick={(repo) => {
@@ -283,6 +364,28 @@ const RouteComponent = () => {
           syncRepoMutation.mutate({ id: repo.id });
         }}
       />
+      <section className="mt-10 flex flex-col gap-4">
+        <Heading variant="h4">
+          {t({ en: 'Sync History', es: 'Historial de sincronización', fr: 'Historique de synchronisation' })}
+        </Heading>
+        <InstrumentRepoSyncLogTable logs={syncLogsQuery.data} />
+      </section>
+      {repoToShowLogs && (
+        <Dialog.Content className="sm:max-w-275">
+          <Dialog.Header>
+            <Dialog.Title>
+              {t({
+                en: `Sync history of "${repoToShowLogs.name}"`,
+                es: `Historial de sincronización de "${repoToShowLogs.name}"`,
+                fr: `Historique de synchronisation de « ${repoToShowLogs.name} »`
+              })}
+            </Dialog.Title>
+          </Dialog.Header>
+          <div className="max-h-[70vh] overflow-auto">
+            <InstrumentRepoSyncLogTable logs={syncLogsQuery.data.filter((log) => log.repoId === repoToShowLogs.id)} />
+          </div>
+        </Dialog.Content>
+      )}
       {isDialogOpen && (
         <Dialog.Content className="sm:max-w-118.75">
           <Dialog.Header>
@@ -319,10 +422,35 @@ const RouteComponent = () => {
                 fr: `Instruments dans « ${repoToView.name} »`
               })}
             </Dialog.Title>
+            <Dialog.Description>
+              {t({ en: 'Source: ', es: 'Fuente: ', fr: 'Source : ' })}
+              <a
+                className="underline underline-offset-4"
+                data-testid="instrument-repo-source-link"
+                href={repoToView.url}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {repoToView.url}
+              </a>
+            </Dialog.Description>
           </Dialog.Header>
+          <SearchBar
+            placeholder={t({
+              en: 'Search instruments...',
+              es: 'Buscar instrumentos...',
+              fr: 'Rechercher des instruments...'
+            })}
+            value={instrumentSearch}
+            onValueChange={setInstrumentSearch}
+          />
           {(() => {
+            const searchTerm = instrumentSearch.trim().toLowerCase();
             const repoInstruments =
-              instrumentInfoQuery.data && currentRepoInstruments(instrumentInfoQuery.data, repoToView.id);
+              instrumentInfoQuery.data &&
+              currentRepoInstruments(instrumentInfoQuery.data, repoToView.id).filter((instrument) =>
+                instrument.details.title.toLowerCase().includes(searchTerm)
+              );
             if (instrumentInfoQuery.isLoading) {
               return (
                 <div className="flex justify-center py-6">
@@ -333,11 +461,17 @@ const RouteComponent = () => {
             if (!repoInstruments?.length) {
               return (
                 <p className="text-muted-foreground py-4 text-center text-sm">
-                  {t({
-                    en: 'No instruments found in this repository.',
-                    es: 'No se encontraron instrumentos en este repositorio.',
-                    fr: 'Aucun instrument trouvé dans ce dépôt.'
-                  })}
+                  {searchTerm
+                    ? t({
+                        en: 'No instruments match your search.',
+                        es: 'Ningún instrumento coincide con su búsqueda.',
+                        fr: 'Aucun instrument ne correspond à votre recherche.'
+                      })
+                    : t({
+                        en: 'No instruments found in this repository.',
+                        es: 'No se encontraron instrumentos en este repositorio.',
+                        fr: 'Aucun instrument trouvé dans ce dépôt.'
+                      })}
                 </p>
               );
             }
@@ -432,5 +566,6 @@ export const Route = createFileRoute('/_app/admin/instrument-repos/')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(instrumentReposQueryOptions());
     await context.queryClient.ensureQueryData(groupsQueryOptions());
+    await context.queryClient.ensureQueryData(instrumentRepoSyncLogsQueryOptions());
   }
 });

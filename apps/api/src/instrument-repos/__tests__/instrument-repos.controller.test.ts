@@ -51,11 +51,35 @@ describe('InstrumentReposController', () => {
     expect(service.sync).toHaveBeenCalledWith('repo-1');
   });
 
+  it("should sync every repository the current user's ability allows", async () => {
+    service.syncAll.mockResolvedValueOnce([]);
+    await expect(controller.syncAll(ability)).resolves.toStrictEqual([]);
+    expect(service.syncAll).toHaveBeenCalledWith({ ability });
+  });
+
+  it("should scope the sync history to the current user's ability", async () => {
+    service.findSyncLogs.mockResolvedValueOnce([]);
+    await expect(controller.findSyncLogs(ability)).resolves.toStrictEqual([]);
+    expect(service.findSyncLogs).toHaveBeenCalledWith({ ability });
+  });
+
+  it.each(['findSyncLogs'] as const)(
+    'should restrict %s to administrators, since the history spans every repository',
+    (handler) => {
+      const reflector = new Reflector();
+      expect(reflector.get(ROUTE_ACCESS_METADATA_KEY, InstrumentReposController.prototype[handler])).toStrictEqual({
+        action: 'manage',
+        subject: 'all'
+      });
+    }
+  );
+
   it.each([
     ['create', 'create'],
     ['deleteById', 'delete'],
     ['findAll', 'read'],
-    ['sync', 'update']
+    ['sync', 'update'],
+    ['syncAll', 'update']
   ] as const)('should gate %s on the %s InstrumentRepo permission', (handler, action) => {
     const reflector = new Reflector();
     expect(reflector.get(ROUTE_ACCESS_METADATA_KEY, InstrumentReposController.prototype[handler])).toStrictEqual({

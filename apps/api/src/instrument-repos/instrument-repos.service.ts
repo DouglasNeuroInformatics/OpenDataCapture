@@ -8,6 +8,7 @@ import {
   BadGatewayException,
   BadRequestException,
   ConflictException,
+  HttpException,
   Injectable,
   NotFoundException
 } from '@nestjs/common';
@@ -15,18 +16,58 @@ import type { OnModuleInit } from '@nestjs/common';
 import { bundle, BUNDLER_FILE_EXT_REGEX, inferLoader } from '@opendatacapture/instrument-bundler';
 import type { BundlerInput } from '@opendatacapture/instrument-bundler';
 import { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
+import type {
+  InstrumentRepoSyncAction,
+  InstrumentRepoSyncFailure,
+  InstrumentRepoSyncStage
+} from '@opendatacapture/schemas/instrument-repo';
 import JSZip from 'jszip';
+import { z } from 'zod/v4';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import { decryptSecret, encryptSecret } from '@/core/secret-cipher';
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
 
+type InstrumentImportResult =
+  | { created: boolean; id: string; kind: 'imported' }
+  | { kind: 'failed'; message: string; stage: InstrumentRepoSyncStage }
+  | { kind: 'skipped' };
+
+type RepoImportResult = { createdIds: string[]; failures: InstrumentRepoSyncFailure[]; instrumentIds: string[] };
+
+type InstrumentRepoRecord = Awaited<ReturnType<Model<'InstrumentRepo'>['findFirstOrThrow']>>;
+
+/**
+ * The detail Nest exceptions thrown by `InstrumentsService.create` carry beyond their message: a VM
+ * evaluation error as `cause`, schema validation errors as `issues`.
+ */
+const $ExceptionDetails = z.object({
+  cause: z.object({ message: z.string() }).optional(),
+  issues: z.array(z.object({ message: z.string(), path: z.array(z.union([z.string(), z.number()])) })).optional()
+});
+
+function describeImportError(error: unknown): string {
+  if (!(error instanceof Error)) {
+    return String(error);
+  }
+  const details = $ExceptionDetails.safeParse(error instanceof HttpException ? error.getResponse() : undefined);
+  if (!details.success) {
+    return error.message;
+  }
+  const reasons = [
+    details.data.cause?.message,
+    ...(details.data.issues ?? []).map(({ message, path }) => (path.length ? `${path.join('.')}: ${message}` : message))
+  ].filter((reason) => reason !== undefined);
+  return [error.message, ...reasons].join(' - ');
+}
+
 @Injectable()
 export class InstrumentReposService implements OnModuleInit {
   constructor(
     @InjectModel('Group') private readonly groupModel: Model<'Group'>,
     @InjectModel('InstrumentRepo') private readonly instrumentRepoModel: Model<'InstrumentRepo'>,
+    @InjectModel('InstrumentRepoSyncLog') private readonly instrumentRepoSyncLogModel: Model<'InstrumentRepoSyncLog'>,
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
     private readonly configService: ConfigService,
     private readonly instrumentsService: InstrumentsService,
@@ -48,10 +89,21 @@ export class InstrumentReposService implements OnModuleInit {
           where: { id: existing.id }
         });
       }
-      return this.sync(existing.id);
+      const result = await this.syncRepo(existing);
+      if (!result.ok) {
+        throw result.error;
+      }
+      return this.stripSecrets(result.repo);
     }
 
-    const { createdIds, instrumentIds } = await this.importInstruments(owner, repoName, accessToken);
+    let result: RepoImportResult;
+    try {
+      result = await this.importInstruments(owner, repoName, accessToken);
+    } catch (err) {
+      await this.recordSync({ action: 'IMPORT', error: err, repoId: null, repoName });
+      throw err;
+    }
+    const { createdIds, failures, instrumentIds } = result;
 
     const repo = await this.instrumentRepoModel.create({
       data: {
@@ -68,6 +120,13 @@ export class InstrumentReposService implements OnModuleInit {
     // Attribute provenance only to instruments this import actually created. Instruments that
     // already existed (e.g. added manually) keep their original provenance.
     await this.tagInstruments(createdIds, repo.id, repo.name);
+    await this.recordSync({
+      action: 'IMPORT',
+      failures,
+      importedCount: instrumentIds.length,
+      repoId: repo.id,
+      repoName
+    });
     // Re-adopt any pre-existing instruments orphaned by a previously-deleted copy of this repo.
     await this.reconcileOrphanedInstruments();
 
@@ -105,6 +164,13 @@ export class InstrumentReposService implements OnModuleInit {
     return repos.map((repo) => this.stripSecrets(repo));
   }
 
+  async findSyncLogs({ ability }: EntityOperationOptions = {}) {
+    return this.instrumentRepoSyncLogModel.findMany({
+      orderBy: { createdAt: 'desc' },
+      where: accessibleQuery(ability, 'read', 'InstrumentRepoSyncLog')
+    });
+  }
+
   async onModuleInit(): Promise<void> {
     // Self-heal any instruments left orphaned by repositories deleted before this logic existed.
     try {
@@ -119,26 +185,26 @@ export class InstrumentReposService implements OnModuleInit {
     if (!repo) {
       throw new NotFoundException(`Failed to find instrument repo with ID: ${id}`);
     }
+    const result = await this.syncRepo(repo);
+    if (!result.ok) {
+      throw result.error;
+    }
+    return result.log;
+  }
 
-    const accessToken = repo.accessToken ? this.decrypt(repo.accessToken) : undefined;
-    const { createdIds, instrumentIds } = await this.importInstruments(repo.owner, repo.repoName, accessToken);
-
-    const allInstrumentIds = [...new Set([...repo.instrumentIds, ...instrumentIds])];
-
-    // Only newly-created instruments need provenance set; ones already in the repo already have it.
-    await this.tagInstruments(createdIds, repo.id, repo.name);
-
-    const updated = await this.instrumentRepoModel.update({
-      data: {
-        instrumentIds: allInstrumentIds,
-        lastSyncedAt: new Date()
-      },
-      where: { id }
+  /**
+   * Sync every repository the caller may update, one at a time. A repository that cannot be read does
+   * not stop the rest: its failure is in the sync log returned for it.
+   */
+  async syncAll({ ability }: EntityOperationOptions = {}) {
+    const repos = await this.instrumentRepoModel.findMany({
+      where: accessibleQuery(ability, 'update', 'InstrumentRepo')
     });
-    // Re-adopt any instruments that were orphaned by a previously-deleted copy of this repo.
-    await this.reconcileOrphanedInstruments();
-
-    return this.stripSecrets(updated);
+    const logs = [];
+    for (const repo of repos) {
+      logs.push((await this.syncRepo(repo)).log);
+    }
+    return logs;
   }
 
   /**
@@ -264,24 +330,28 @@ export class InstrumentReposService implements OnModuleInit {
   }
 
   /**
-   * Bundle and create a single instrument from its directory. Returns its id and whether it was newly
-   * created, or `null` when there is nothing to import (no bundlable files). Re-throws unexpected
-   * errors so the caller can log and skip just this instrument.
+   * Bundle and create a single instrument from its directory. A failure is returned rather than thrown,
+   * with the stage it happened at, so the caller can record it and carry on with the rest of the repo.
    */
-  private async importInstrumentFromDir(dir: string): Promise<null | { created: boolean; id: string }> {
+  private async importInstrumentFromDir(dir: string): Promise<InstrumentImportResult> {
     const dirName = path.basename(dir);
-    const inputs = this.readInstrumentInputs(dir);
-    if (inputs.length === 0) {
-      this.loggingService.debug(`Skipping ${dirName}: no bundlable files found`);
-      return null;
+    let bundleStr: string;
+    try {
+      const inputs = this.readInstrumentInputs(dir);
+      if (inputs.length === 0) {
+        this.loggingService.debug(`Skipping ${dirName}: no bundlable files found`);
+        return { kind: 'skipped' };
+      }
+      this.loggingService.debug(`Bundling instrument from ${dirName} (${inputs.length} files)`);
+      bundleStr = await bundle({ inputs, minify: true });
+    } catch (err) {
+      return { kind: 'failed', message: describeImportError(err), stage: 'BUNDLE' };
     }
 
-    this.loggingService.debug(`Bundling instrument from ${dirName} (${inputs.length} files)`);
-    const bundleStr = await bundle({ inputs, minify: true });
     try {
       const instrument = await this.instrumentsService.create({ bundle: bundleStr });
       this.loggingService.debug(`Created instrument ${instrument.id} from ${dirName}`);
-      return { created: true, id: instrument.id };
+      return { created: true, id: instrument.id, kind: 'imported' };
     } catch (err) {
       // The instrument already exists (provided by another repo or uploaded manually). Recover its id
       // from the conflict message so we still associate the existing instrument with this repo.
@@ -289,26 +359,21 @@ export class InstrumentReposService implements OnModuleInit {
         const idMatch = /ID '([^']+)'/.exec(err.message);
         if (!idMatch?.[1]) {
           // The message is the only channel carrying the existing id. Losing it drops the instrument
-          // from this repo's list, so fail loudly rather than returning an empty result.
-          this.loggingService.error({
-            conflictMessage: err.message,
-            error: 'Cannot recover instrument id from conflict',
-            instrumentDir: dirName
-          });
-          return null;
+          // from this repo's list, so it is recorded as a failure rather than skipped.
+          return {
+            kind: 'failed',
+            message: `Cannot recover the existing instrument's id from: ${err.message}`,
+            stage: 'LOAD'
+          };
         }
         this.loggingService.debug(`Instrument from ${dirName} already exists, skipping creation`);
-        return { created: false, id: idMatch[1] };
+        return { created: false, id: idMatch[1], kind: 'imported' };
       }
-      throw err;
+      return { kind: 'failed', message: describeImportError(err), stage: 'LOAD' };
     }
   }
 
-  private async importInstruments(
-    owner: string,
-    repoName: string,
-    accessToken?: string
-  ): Promise<{ createdIds: string[]; instrumentIds: string[] }> {
+  private async importInstruments(owner: string, repoName: string, accessToken?: string): Promise<RepoImportResult> {
     this.loggingService.log(`Downloading ${owner}/${repoName}...`);
     const { repoDir, tmpDir } = await this.downloadAndExtractRepo(owner, repoName, accessToken);
 
@@ -319,29 +384,27 @@ export class InstrumentReposService implements OnModuleInit {
       // instrumentIds: every instrument the repo provides; createdIds: only those newly created here.
       const instrumentIds: string[] = [];
       const createdIds: string[] = [];
+      const failures: InstrumentRepoSyncFailure[] = [];
 
       for (const dir of instrumentDirs) {
-        try {
-          const result = await this.importInstrumentFromDir(dir);
-          if (!result) {
-            continue;
-          }
+        const result = await this.importInstrumentFromDir(dir);
+        if (result.kind === 'failed') {
+          // One bad instrument should not abort importing the rest of the repository.
+          const failure = { instrumentDir: path.basename(dir), message: result.message, stage: result.stage };
+          this.loggingService.error({ error: 'Failed to Import Instrument', ...failure });
+          failures.push(failure);
+        } else if (result.kind === 'imported') {
           instrumentIds.push(result.id);
           if (result.created) {
             createdIds.push(result.id);
           }
-        } catch (err) {
-          // One bad instrument should not abort importing the rest of the repository.
-          this.loggingService.error({
-            cause: err,
-            error: 'Failed to Import Instrument',
-            instrumentDir: path.basename(dir)
-          });
         }
       }
 
-      this.loggingService.log(`Imported ${instrumentIds.length} instruments from ${owner}/${repoName}`);
-      return { createdIds, instrumentIds };
+      this.loggingService.log(
+        `Imported ${instrumentIds.length} instruments from ${owner}/${repoName} (${failures.length} failed)`
+      );
+      return { createdIds, failures, instrumentIds };
     } finally {
       // Remove the exact temp directory we created (never its parent, the OS temp root).
       fs.rmSync(tmpDir, { force: true, recursive: true });
@@ -444,10 +507,54 @@ export class InstrumentReposService implements OnModuleInit {
     }
   }
 
+  private recordSync(
+    entry: { action: InstrumentRepoSyncAction; repoId: null | string; repoName: string } & (
+      { error: unknown } | { failures: InstrumentRepoSyncFailure[]; importedCount: number }
+    )
+  ) {
+    const { action, repoId, repoName } = entry;
+    const outcome =
+      'error' in entry
+        ? { failures: [], importedCount: 0, message: describeImportError(entry.error) }
+        : { failures: entry.failures, importedCount: entry.importedCount, message: null };
+    return this.instrumentRepoSyncLogModel.create({ data: { action, repoId, repoName, ...outcome } });
+  }
+
   /** Remove the encrypted access token before returning a repo to any client. */
   private stripSecrets<T extends { accessToken?: null | string }>(repo: T): Omit<T, 'accessToken'> {
     const { accessToken: _accessToken, ...rest } = repo;
     return rest;
+  }
+
+  private async syncRepo(repo: InstrumentRepoRecord) {
+    const accessToken = repo.accessToken ? this.decrypt(repo.accessToken) : undefined;
+    let result: RepoImportResult;
+    try {
+      result = await this.importInstruments(repo.owner, repo.repoName, accessToken);
+    } catch (error) {
+      const log = await this.recordSync({ action: 'SYNC', error, repoId: repo.id, repoName: repo.name });
+      return { error, log, ok: false as const };
+    }
+
+    // Only newly-created instruments need provenance set; ones already in the repo already have it.
+    await this.tagInstruments(result.createdIds, repo.id, repo.name);
+
+    // Replaced rather than merged, so the list is what the repository provides now. An edition dropped
+    // here stays in the database with its provenance tag, so groups can still see and administer it.
+    const updated = await this.instrumentRepoModel.update({
+      data: { instrumentIds: result.instrumentIds, lastSyncedAt: new Date() },
+      where: { id: repo.id }
+    });
+    const log = await this.recordSync({
+      action: 'SYNC',
+      failures: result.failures,
+      importedCount: result.instrumentIds.length,
+      repoId: repo.id,
+      repoName: repo.name
+    });
+    // Re-adopt any instruments that were orphaned by a previously-deleted copy of this repo.
+    await this.reconcileOrphanedInstruments();
+    return { log, ok: true as const, repo: updated };
   }
 
   /** Record provenance (repo id + denormalized name) on the given instruments. */

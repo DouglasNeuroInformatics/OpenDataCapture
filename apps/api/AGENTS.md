@@ -121,8 +121,8 @@ CASL subjects are derived automatically from the Prisma `TypeMap`, so every mode
 without you doing anything. But the subjects a user can be _granted_ through `additionalPermissions`
 come from **two hand-maintained lists that must agree with each other**: `enum AppSubject` in
 `prisma/schema.prisma` and `$AppSubjectName` in `packages/schemas/src/core/core.ts`. Both currently
-list the same eight models plus `all`. Three models — `AuditLog`, `InstrumentRecordFile` and
-`SetupState` — appear in neither, so no user can be granted a permission naming them; they are
+list the same eight models plus `all`. Four models — `AuditLog`, `InstrumentRecordFile`,
+`InstrumentRepoSyncLog` and `SetupState` — appear in neither, so no user can be granted a permission naming them; they are
 reachable only through rules the ability factory writes itself. Adding a model that users should be
 able to hold a permission on means editing both lists.
 

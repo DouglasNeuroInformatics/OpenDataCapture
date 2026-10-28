@@ -20,6 +20,18 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
   }))
 }));
 
+const syncLog = (failures: { instrumentDir: string; message: string; stage: 'BUNDLE' | 'LOAD' }[] = []) => ({
+  action: 'SYNC',
+  createdAt: '2026-10-28T00:00:00.000Z',
+  failures,
+  id: 'log-1',
+  importedCount: 3,
+  message: null,
+  repoId: 'repo-1',
+  repoName: 'core',
+  updatedAt: '2026-10-28T00:00:00.000Z'
+});
+
 function renderSyncMutation() {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false, throwOnError: true } } });
   const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
@@ -32,7 +44,7 @@ function renderSyncMutation() {
 describe('useSyncInstrumentRepoMutation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockAxios.post.mockResolvedValue({ data: {} });
+    mockAxios.post.mockResolvedValue({ data: syncLog() });
   });
 
   it('should sync the repository without the default error toast, since it raises its own', async () => {
@@ -70,6 +82,26 @@ describe('useSyncInstrumentRepoMutation', () => {
     expect(addNotification).toHaveBeenLastCalledWith({ message: 'Repository synced successfully', type: 'success' });
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['instrument-repos'] });
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['instrument-info'] });
+  });
+
+  it('should warn rather than announce success when some instruments failed, so they get fixed', async () => {
+    mockAxios.post.mockResolvedValueOnce({
+      data: syncLog([{ instrumentDir: 'PHQ_9', message: 'broken', stage: 'LOAD' }])
+    });
+    const { result } = renderSyncMutation();
+    await result.current.mutateAsync({ id: 'repo-1' });
+    expect(addNotification).toHaveBeenLastCalledWith({
+      message: 'Repository synced, but 1 instruments failed. See the sync history.',
+      type: 'warning'
+    });
+  });
+
+  it('should refresh the sync history even when the sync fails, because the failure is logged too', async () => {
+    mockAxios.post.mockRejectedValueOnce(new Error('down'));
+    const { invalidateQueries, result } = renderSyncMutation();
+    result.current.mutate({ id: 'repo-1' });
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['instrument-repo-sync-logs'] });
   });
 
   it('should report the reason the server gave when the sync fails', async () => {

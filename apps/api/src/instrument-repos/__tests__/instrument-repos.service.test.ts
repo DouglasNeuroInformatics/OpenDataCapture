@@ -6,7 +6,13 @@ import { ConfigService, getModelToken, LoggingService } from '@douglasneuroinfor
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { BadGatewayException, BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadGatewayException,
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { bundle } from '@opendatacapture/instrument-bundler';
 import JSZip from 'jszip';
@@ -31,10 +37,11 @@ type InternalService = {
     owner: string,
     repoName: string,
     accessToken?: string
-  ): Promise<{ createdIds: string[]; instrumentIds: string[] }>;
+  ): Promise<{ createdIds: string[]; failures: unknown[]; instrumentIds: string[] }>;
   normalizeUrl(url: string): string;
   parseGitHubUrl(url: string): { owner: string; repoName: string };
   reconcileOrphanedInstruments(): Promise<void>;
+  syncRepo(repo: unknown): Promise<{ error: unknown; ok: false } | { ok: true; repo: { id: string } }>;
 };
 
 describe('InstrumentReposService', () => {
@@ -43,6 +50,7 @@ describe('InstrumentReposService', () => {
   let groupModel: MockedInstance<Model<'Group'>>;
   let instrumentModel: MockedInstance<Model<'Instrument'>>;
   let instrumentRepoModel: MockedInstance<Model<'InstrumentRepo'>>;
+  let instrumentRepoSyncLogModel: MockedInstance<Model<'InstrumentRepoSyncLog'>>;
   let configService: MockedInstance<ConfigService>;
   let instrumentsService: MockedInstance<InstrumentsService>;
   let loggingService: MockedInstance<LoggingService>;
@@ -54,6 +62,7 @@ describe('InstrumentReposService', () => {
         MockFactory.createForModelToken(getModelToken('Group')),
         MockFactory.createForModelToken(getModelToken('Instrument')),
         MockFactory.createForModelToken(getModelToken('InstrumentRepo')),
+        MockFactory.createForModelToken(getModelToken('InstrumentRepoSyncLog')),
         MockFactory.createForService(ConfigService),
         MockFactory.createForService(InstrumentsService),
         MockFactory.createForService(LoggingService)
@@ -64,6 +73,7 @@ describe('InstrumentReposService', () => {
     groupModel = moduleRef.get(getModelToken('Group'));
     instrumentModel = moduleRef.get(getModelToken('Instrument'));
     instrumentRepoModel = moduleRef.get(getModelToken('InstrumentRepo'));
+    instrumentRepoSyncLogModel = moduleRef.get(getModelToken('InstrumentRepoSyncLog'));
 
     configService = moduleRef.get(ConfigService);
     instrumentsService = moduleRef.get(InstrumentsService);
@@ -76,6 +86,9 @@ describe('InstrumentReposService', () => {
     groupModel.count.mockResolvedValue(0);
     instrumentModel.findMany.mockResolvedValue([]);
     instrumentRepoModel.findMany.mockResolvedValue([]);
+    instrumentRepoSyncLogModel.create.mockImplementation(
+      ({ data }) => Promise.resolve({ id: 'log-1', ...data }) as never
+    );
   });
 
   it('should be defined', () => {
@@ -172,7 +185,7 @@ describe('InstrumentReposService', () => {
     it('imports a new repo, parsing owner/repoName from the URL and storing an encrypted token', async () => {
       const importSpy = vi
         .spyOn(internal, 'importInstruments')
-        .mockResolvedValue({ createdIds: ['i1'], instrumentIds: ['i1'] });
+        .mockResolvedValue({ createdIds: ['i1'], failures: [], instrumentIds: ['i1'] });
       instrumentRepoModel.findFirst.mockResolvedValueOnce(null);
       instrumentRepoModel.create.mockResolvedValueOnce({ id: 'r1', name: 'repo' });
 
@@ -195,7 +208,7 @@ describe('InstrumentReposService', () => {
     });
 
     it('stores a null token when none is provided', async () => {
-      vi.spyOn(internal, 'importInstruments').mockResolvedValue({ createdIds: [], instrumentIds: [] });
+      vi.spyOn(internal, 'importInstruments').mockResolvedValue({ createdIds: [], failures: [], instrumentIds: [] });
       instrumentRepoModel.findFirst.mockResolvedValueOnce(null);
       instrumentRepoModel.create.mockResolvedValueOnce({ id: 'r1', name: 'repo' });
 
@@ -208,18 +221,63 @@ describe('InstrumentReposService', () => {
 
     it('re-syncs an already-registered repo instead of creating a duplicate', async () => {
       instrumentRepoModel.findFirst.mockResolvedValueOnce({ id: 'existing' });
-      const syncSpy = vi.spyOn(service, 'sync').mockResolvedValue({ id: 'existing' } as never);
+      const syncSpy = vi
+        .spyOn(internal, 'syncRepo')
+        .mockResolvedValue({ ok: true, repo: { accessToken: 'secret', id: 'existing' } as never });
 
       const result = await service.create({ url: 'https://github.com/owner/repo' });
 
-      expect(syncSpy).toHaveBeenCalledWith('existing');
+      expect(syncSpy).toHaveBeenCalledWith({ id: 'existing' });
       expect(instrumentRepoModel.create).not.toHaveBeenCalled();
-      expect(result).toMatchObject({ id: 'existing' });
+      expect(result).toStrictEqual({ id: 'existing' });
+    });
+
+    it('should report a failed re-sync of an already-registered repo, so re-adding it is not silent', async () => {
+      const error = new BadGatewayException('GitHub is down');
+      instrumentRepoModel.findFirst.mockResolvedValueOnce({ id: 'existing' });
+      vi.spyOn(internal, 'syncRepo').mockResolvedValue({ error, ok: false });
+
+      await expect(service.create({ url: 'https://github.com/owner/repo' })).rejects.toBe(error);
+    });
+
+    it('should log a failed import with no repo id, because the repo was never created', async () => {
+      const error = new BadRequestException('Repository not found');
+      instrumentRepoModel.findFirst.mockResolvedValueOnce(null);
+      vi.spyOn(internal, 'importInstruments').mockRejectedValue(error);
+
+      await expect(service.create({ url: 'https://github.com/owner/repo' })).rejects.toBe(error);
+      expect(instrumentRepoModel.create).not.toHaveBeenCalled();
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data).toStrictEqual({
+        action: 'IMPORT',
+        failures: [],
+        importedCount: 0,
+        message: 'Repository not found',
+        repoId: null,
+        repoName: 'repo'
+      });
+    });
+
+    it('should log a successful import against the new repo, with the instruments that failed', async () => {
+      const failures = [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }];
+      instrumentRepoModel.findFirst.mockResolvedValueOnce(null);
+      instrumentRepoModel.create.mockResolvedValueOnce({ id: 'r1', name: 'repo' });
+      vi.spyOn(internal, 'importInstruments').mockResolvedValue({ createdIds: [], failures, instrumentIds: ['b'] });
+
+      await service.create({ url: 'https://github.com/owner/repo' });
+
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data).toStrictEqual({
+        action: 'IMPORT',
+        failures,
+        importedCount: 1,
+        message: null,
+        repoId: 'r1',
+        repoName: 'repo'
+      });
     });
 
     it('persists an updated token before re-syncing an existing repo', async () => {
       instrumentRepoModel.findFirst.mockResolvedValueOnce({ id: 'existing' });
-      vi.spyOn(service, 'sync').mockResolvedValue({ id: 'existing' } as never);
+      vi.spyOn(internal, 'syncRepo').mockResolvedValue({ ok: true, repo: { id: 'existing' } });
 
       await service.create({ accessToken: 'new-token', url: 'https://github.com/owner/repo' });
 
@@ -233,7 +291,7 @@ describe('InstrumentReposService', () => {
 
     it('does not touch the stored token when re-adding without one', async () => {
       instrumentRepoModel.findFirst.mockResolvedValueOnce({ id: 'existing' });
-      vi.spyOn(service, 'sync').mockResolvedValue({ id: 'existing' } as never);
+      vi.spyOn(internal, 'syncRepo').mockResolvedValue({ ok: true, repo: { id: 'existing' } });
 
       await service.create({ url: 'https://github.com/owner/repo' });
 
@@ -247,7 +305,7 @@ describe('InstrumentReposService', () => {
       await expect(service.sync('missing')).rejects.toBeInstanceOf(NotFoundException);
     });
 
-    it('decrypts the stored token, unions the instrument ids, and strips secrets', async () => {
+    it('should replace the instrument list with what the repo provides now, and return the sync log', async () => {
       const encryptedToken = internal.encrypt('stored-token');
       instrumentRepoModel.findFirst.mockResolvedValueOnce({
         accessToken: encryptedToken,
@@ -259,7 +317,7 @@ describe('InstrumentReposService', () => {
       });
       const importSpy = vi
         .spyOn(internal, 'importInstruments')
-        .mockResolvedValue({ createdIds: ['new'], instrumentIds: ['new'] });
+        .mockResolvedValue({ createdIds: ['new'], failures: [], instrumentIds: ['new'] });
       instrumentRepoModel.update.mockResolvedValueOnce({ accessToken: encryptedToken, id: 'r1', name: 'repo' });
 
       const result = await service.sync('r1');
@@ -267,9 +325,66 @@ describe('InstrumentReposService', () => {
       // The decrypted token (not the ciphertext) is what gets used to fetch the repo.
       expect(importSpy).toHaveBeenCalledWith('owner', 'repo', 'stored-token');
       expect(instrumentRepoModel.update).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ instrumentIds: ['old', 'new'] }) })
+        expect.objectContaining({ data: expect.objectContaining({ instrumentIds: ['new'] }) })
       );
-      expect(result).not.toHaveProperty('accessToken');
+      expect(result).toMatchObject({ action: 'SYNC', importedCount: 1, message: null, repoId: 'r1' });
+    });
+
+    it('should log a sync that could not read the repo, then report it', async () => {
+      const error = new BadGatewayException('GitHub is down');
+      instrumentRepoModel.findFirst.mockResolvedValueOnce({
+        accessToken: null,
+        id: 'r1',
+        instrumentIds: ['old'],
+        name: 'repo',
+        owner: 'owner',
+        repoName: 'repo'
+      });
+      vi.spyOn(internal, 'importInstruments').mockRejectedValue(error);
+
+      await expect(service.sync('r1')).rejects.toBe(error);
+      expect(instrumentRepoModel.update).not.toHaveBeenCalled();
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data).toMatchObject({
+        action: 'SYNC',
+        message: 'GitHub is down',
+        repoId: 'r1'
+      });
+    });
+  });
+
+  describe('syncAll', () => {
+    const repo = (id: string) => ({ accessToken: null, id, instrumentIds: [], name: id, owner: 'owner', repoName: id });
+
+    it('should sync every repo and carry on past one that cannot be read, returning a log for each', async () => {
+      instrumentRepoModel.findMany.mockResolvedValueOnce([repo('a'), repo('b')]);
+      instrumentRepoModel.update.mockResolvedValue({ id: 'b' });
+      vi.spyOn(internal, 'importInstruments')
+        .mockRejectedValueOnce(new BadGatewayException('GitHub is down'))
+        .mockResolvedValueOnce({ createdIds: [], failures: [], instrumentIds: ['x'] });
+
+      const logs = await service.syncAll();
+
+      expect(logs).toMatchObject([
+        { message: 'GitHub is down', repoId: 'a' },
+        { importedCount: 1, message: null, repoId: 'b' }
+      ]);
+    });
+
+    it('should only sync the repos the caller may update', async () => {
+      instrumentRepoModel.findMany.mockResolvedValueOnce([]);
+
+      await service.syncAll();
+
+      expect(instrumentRepoModel.findMany).toHaveBeenCalledWith({ where: {} });
+    });
+  });
+
+  describe('findSyncLogs', () => {
+    it('should return the history newest first', async () => {
+      instrumentRepoSyncLogModel.findMany.mockResolvedValueOnce([{ id: 'log-1' }]);
+
+      await expect(service.findSyncLogs()).resolves.toStrictEqual([{ id: 'log-1' }]);
+      expect(instrumentRepoSyncLogModel.findMany).toHaveBeenCalledWith({ orderBy: { createdAt: 'desc' }, where: {} });
     });
 
     it('should download without a token when the repo stores none, so public repos sync', async () => {
@@ -283,7 +398,7 @@ describe('InstrumentReposService', () => {
       });
       const importSpy = vi
         .spyOn(internal, 'importInstruments')
-        .mockResolvedValue({ createdIds: [], instrumentIds: [] });
+        .mockResolvedValue({ createdIds: [], failures: [], instrumentIds: [] });
       instrumentRepoModel.update.mockResolvedValueOnce({ id: 'r1' });
 
       await service.sync('r1');
@@ -593,7 +708,7 @@ describe('InstrumentReposService', () => {
       expect(instrumentModel.update).not.toHaveBeenCalled();
     });
 
-    it('should log a conflict that does not name the existing instrument and leave it out', async () => {
+    it('should record a conflict that does not name the existing instrument as a failure', async () => {
       const message = 'An instrument with the same title already exists';
       fetchMock.mockResolvedValueOnce(await zipball(instrumentFiles('forms', 'A')));
       instrumentsService.create.mockRejectedValueOnce(new ConflictException(message));
@@ -601,11 +716,9 @@ describe('InstrumentReposService', () => {
       await service.create({ url });
 
       expect(instrumentRepoModel.create.mock.lastCall?.[0].data.instrumentIds).toStrictEqual([]);
-      expect(loggingService.error).toHaveBeenCalledWith({
-        conflictMessage: message,
-        error: 'Cannot recover instrument id from conflict',
-        instrumentDir: 'A'
-      });
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data.failures).toStrictEqual([
+        { instrumentDir: 'A', message: `Cannot recover the existing instrument's id from: ${message}`, stage: 'LOAD' }
+      ]);
     });
 
     it('should log an instrument that fails to import and carry on with the rest', async () => {
@@ -618,11 +731,65 @@ describe('InstrumentReposService', () => {
       await service.create({ url });
 
       expect(loggingService.error).toHaveBeenCalledWith({
-        cause,
         error: 'Failed to Import Instrument',
-        instrumentDir: 'A'
+        instrumentDir: 'A',
+        message: 'invalid instrument',
+        stage: 'LOAD'
       });
       expect(instrumentRepoModel.create.mock.lastCall?.[0].data.instrumentIds).toStrictEqual(['b-id']);
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data).toMatchObject({
+        failures: [{ instrumentDir: 'A', message: 'invalid instrument', stage: 'LOAD' }],
+        importedCount: 1
+      });
+    });
+
+    it('should record an instrument whose source does not compile as a bundle failure', async () => {
+      fetchMock.mockResolvedValueOnce(await zipball(instrumentFiles('forms', 'A')));
+      vi.mocked(bundle).mockRejectedValueOnce(new Error('Unexpected token'));
+
+      await service.create({ url });
+
+      expect(instrumentsService.create).not.toHaveBeenCalled();
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data.failures).toStrictEqual([
+        { instrumentDir: 'A', message: 'Unexpected token', stage: 'BUNDLE' }
+      ]);
+    });
+
+    it.each([
+      {
+        error: new UnprocessableEntityException({
+          cause: { message: 'foo is not defined', name: 'ReferenceError' },
+          message: 'Failed to interpret instrument bundle'
+        }),
+        expected: 'Failed to interpret instrument bundle - foo is not defined',
+        reason: 'the error the bundle threw when evaluated'
+      },
+      {
+        error: new UnprocessableEntityException({
+          issues: [
+            { message: 'Required', path: ['details', 'title'] },
+            { message: 'Invalid instrument', path: [] }
+          ],
+          message: 'Instrument validation failed'
+        }),
+        expected: 'Instrument validation failed - details.title: Required - Invalid instrument',
+        reason: 'each validation issue and where it is'
+      },
+      {
+        error: new UnprocessableEntityException("Series item 'PHQ_9' edition 2 does not exist"),
+        expected: "Series item 'PHQ_9' edition 2 does not exist",
+        reason: 'the message alone when there is no further detail'
+      },
+      { error: 'not an error', expected: 'not an error', reason: 'whatever was thrown when it is not an Error' }
+    ])('should explain a load failure with $reason', async ({ error, expected }) => {
+      fetchMock.mockResolvedValueOnce(await zipball(instrumentFiles('forms', 'A')));
+      instrumentsService.create.mockRejectedValueOnce(error);
+
+      await service.create({ url });
+
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data.failures).toStrictEqual([
+        { instrumentDir: 'A', message: expected, stage: 'LOAD' }
+      ]);
     });
 
     it('should read media as binary, so images reach the bundler intact', async () => {

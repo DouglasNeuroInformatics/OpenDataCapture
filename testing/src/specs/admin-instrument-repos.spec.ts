@@ -86,3 +86,100 @@ test.describe('admin instrument repos refused import', () => {
     await expect(reposPage.$ref.getByTestId('error-page')).toBeHidden();
   });
 });
+
+test.describe('admin instrument repos sync history', () => {
+  test.use({ actingRole: 'ADMIN' });
+
+  // Answered by the test rather than the API, which must not reach out to GitHub under NODE_ENV=test.
+  const repo = {
+    createdAt: '2026-10-01T00:00:00.000Z',
+    groupIds: [],
+    id: '6a0000000000000000000001',
+    instrumentIds: ['a', 'b'],
+    lastSyncedAt: '2026-10-28T00:00:00.000Z',
+    name: 'ODC_MontembeaultLab_Instruments',
+    owner: 'DouglasNeuroInformatics',
+    repoName: 'ODC_MontembeaultLab_Instruments',
+    updatedAt: '2026-10-28T00:00:00.000Z',
+    url: 'https://github.com/DouglasNeuroInformatics/ODC_MontembeaultLab_Instruments'
+  };
+  const partialSync = {
+    action: 'SYNC',
+    createdAt: '2026-10-28T00:00:00.000Z',
+    failures: [{ instrumentDir: 'CPP_SERIES', message: "Series item 'PHQ_9' edition 2 does not exist", stage: 'LOAD' }],
+    id: '6a0000000000000000000002',
+    importedCount: 2,
+    message: null,
+    repoId: repo.id,
+    repoName: repo.name,
+    updatedAt: '2026-10-28T00:00:00.000Z'
+  };
+
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/v1/instrument-repos', (route) =>
+      route.request().method() === 'GET' ? route.fulfill({ json: [repo] }) : route.continue()
+    );
+    await page.route('**/v1/instrument-repos/sync/logs', (route) => route.fulfill({ json: [partialSync] }));
+  });
+
+  test('should keep a long repository URL inside its column, even on the selected row', async ({ getPageModel }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    const url = reposPage.dataTable.getByTestId('instrument-repo-url');
+
+    await url.click();
+
+    const overflow = await url.evaluate((element) => ({
+      clipped: element.scrollWidth > element.clientWidth,
+      spill: element.getBoundingClientRect().right - element.parentElement!.getBoundingClientRect().right
+    }));
+    expect(overflow.clipped).toBe(true);
+    expect(overflow.spill).toBeLessThanOrEqual(0);
+  });
+
+  test('should count the failed instruments and explain them in the sync history', async ({ getPageModel }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+
+    await expect(reposPage.dataTable.getByTestId('instrument-repo-failed-count')).toHaveText('1');
+    await expect(reposPage.syncLogTable.getByTestId('sync-log-status')).toHaveText('Partial success');
+    const messages = reposPage.syncLogTable.getByTestId('sync-log-messages');
+    await expect(messages).toContainText('CPP_SERIES');
+    await expect(messages).toContainText('Load');
+    await expect(messages).toContainText("Series item 'PHQ_9' edition 2 does not exist");
+  });
+
+  test('should open the sync history of one repository from its row actions', async ({ getPageModel }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+
+    await reposPage.selectRowAction(0, 'Logs');
+
+    const dialog = reposPage.$ref.getByRole('dialog');
+    await expect(dialog).toContainText(`Sync history of "${repo.name}"`);
+    await expect(dialog.getByTestId('sync-log-status')).toHaveText('Partial success');
+  });
+
+  test('should link the viewed repository to its source and offer an instrument search', async ({ getPageModel }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+
+    await reposPage.selectRowAction(0, 'View');
+
+    await expect(reposPage.$ref.getByTestId('instrument-repo-source-link')).toHaveAttribute('href', repo.url);
+    await expect(reposPage.$ref.getByPlaceholder('Search instruments...')).toBeVisible();
+  });
+
+  test('should sync every repository and warn when one of them had failed instruments', async ({
+    getPageModel,
+    page
+  }) => {
+    let syncAllRequested = false;
+    await page.route('**/v1/instrument-repos/sync/all', (route) => {
+      syncAllRequested = true;
+      return route.fulfill({ json: [partialSync] });
+    });
+    const reposPage = await getPageModel('/admin/instrument-repos');
+
+    await reposPage.syncAllButton.click();
+
+    await expect(reposPage.$ref.getByText('1 of 1 repositories had problems. See the sync history.')).toBeVisible();
+    expect(syncAllRequested).toBe(true);
+  });
+});

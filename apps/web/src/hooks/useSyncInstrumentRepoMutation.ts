@@ -1,20 +1,23 @@
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { $InstrumentRepoSyncLog } from '@opendatacapture/schemas/instrument-repo';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
 import { getApiErrorMessage } from '@/utils/error';
 
 import { INSTRUMENT_REPOS_QUERY_KEY } from './useInstrumentReposQuery';
+import { INSTRUMENT_REPO_SYNC_LOGS_QUERY_KEY } from './useInstrumentRepoSyncLogsQuery';
 
 export function useSyncInstrumentRepoMutation() {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const { t } = useTranslation();
   return useMutation({
-    mutationFn: ({ id }: { id: string }) => {
-      return axios.post(`/v1/instrument-repos/${id}/sync`, undefined, {
+    mutationFn: async ({ id }: { id: string }) => {
+      const response = await axios.post(`/v1/instrument-repos/${id}/sync`, undefined, {
         meta: { disableDefaultErrorNotification: true, disableDefaultTimeout: true }
       });
+      return $InstrumentRepoSyncLog.parse(response.data);
     },
     onError(err) {
       addNotification({
@@ -40,15 +43,31 @@ export function useSyncInstrumentRepoMutation() {
         type: 'info'
       });
     },
-    onSuccess() {
-      addNotification({
-        message: t({
-          en: 'Repository synced successfully',
-          es: 'Repositorio sincronizado correctamente',
-          fr: 'Dépôt synchronisé avec succès'
-        }),
-        type: 'success'
-      });
+    onSettled() {
+      // A failed sync is logged too, so the history changes either way.
+      void queryClient.invalidateQueries({ queryKey: [INSTRUMENT_REPO_SYNC_LOGS_QUERY_KEY] });
+    },
+    onSuccess(log) {
+      const failedCount = log.failures.length;
+      addNotification(
+        failedCount
+          ? {
+              message: t({
+                en: `Repository synced, but ${failedCount} instruments failed. See the sync history.`,
+                es: `Repositorio sincronizado, pero ${failedCount} instrumentos fallaron. Consulte el historial de sincronización.`,
+                fr: `Dépôt synchronisé, mais ${failedCount} instruments ont échoué. Consultez l'historique de synchronisation.`
+              }),
+              type: 'warning'
+            }
+          : {
+              message: t({
+                en: 'Repository synced successfully',
+                es: 'Repositorio sincronizado correctamente',
+                fr: 'Dépôt synchronisé avec succès'
+              }),
+              type: 'success'
+            }
+      );
       void queryClient.invalidateQueries({ queryKey: [INSTRUMENT_REPOS_QUERY_KEY] });
       // A sync can pull in new instruments; refresh the instrument list shown elsewhere.
       void queryClient.invalidateQueries({ queryKey: ['instrument-info'] });

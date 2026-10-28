@@ -53,7 +53,10 @@ be created before its series.
 
 **A series that references another repository still fails to import.** Nothing resolves dependencies
 across repositories or retries afterwards, so whether it works depends on the order the repos were
-added. Making this reliable needs a second resolution pass once every repo has been imported.
+added. Making this reliable needs a second resolution pass once every repo has been imported. Until
+then, the failure and its reason land in the repository's sync history (`InstrumentRepoSyncLog`, on
+the admin Instrument Repositories page), and syncing the repository again once its dependencies are
+stored imports the series.
 
 ## 2. Bundling
 
