@@ -49,6 +49,12 @@ export class StartSessionPage extends AppPage {
     await this.fillSessionDetails(sex);
   }
 
+  /** The date input commits what was typed only when it loses focus, so it is blurred explicitly. */
+  async fillDateOfBirth(date: string) {
+    await this.dateOfBirthField.fill(date);
+    await this.dateOfBirthField.blur();
+  }
+
   /** Everything the form needs beyond how the subject was identified. */
   async fillSessionDetails(sex: string) {
     await this.fillSubjectDetails(sex);
@@ -82,9 +88,7 @@ export class StartSessionPage extends AppPage {
 
   /** The subject's date of birth and sex, leaving the session at its in-person default. */
   async fillSubjectDetails(sex: string) {
-    await this.dateOfBirthField.waitFor({ state: 'visible' });
-    await this.dateOfBirthField.fill('1990-01-01');
-
+    await this.fillDateOfBirth('1990-01-01');
     await this.sexField.selectOption(sex);
   }
 

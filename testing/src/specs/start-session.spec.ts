@@ -214,6 +214,22 @@ test.describe('start session', () => {
     await expect(startSessionPage.subjectIdOption(identifier)).toBeVisible();
   });
 
+  test('should refuse a date of birth in the future with that error alone, not a contradictory required-field one', async ({
+    getPageModel,
+    uniqueId
+  }) => {
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+    await startSessionPage.fillSessionForm(`Future${uniqueId}`, `Subject${uniqueId}`, 'Male');
+    await startSessionPage.fillDateOfBirth(`${new Date().getFullYear() + 1}-01-01`);
+    await startSessionPage.submitForm();
+
+    await expect(startSessionPage.errorMessages).toHaveCount(1);
+    await expect(startSessionPage.errorMessages).toHaveText('Date of birth must be in the past');
+    await expect(startSessionPage.successMessage).toHaveCount(0);
+  });
+
   test('should show a required-field error for every missing field when submitting the personal information form empty', async ({
     getPageModel
   }) => {

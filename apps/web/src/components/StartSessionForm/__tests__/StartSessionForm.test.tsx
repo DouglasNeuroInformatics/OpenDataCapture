@@ -95,6 +95,25 @@ const submitAndSettle = async (form: HTMLElement) => {
 const submittedSubjectId = () => onSubmit.mock.lastCall?.[0].subjectData.id;
 
 const dateOfBirthInput = () => screen.getByTestId<HTMLInputElement>('date-input');
+
+/** The date input commits typed text when it loses focus, not on each keystroke. */
+const enterDateOfBirth = (date: string) => {
+  fireEvent.focus(dateOfBirthInput());
+  fireEvent.change(dateOfBirthInput(), { target: { value: date } });
+  fireEvent.blur(dateOfBirthInput());
+};
+
+const fillPersonalInfo = (form: HTMLElement, values: { dateOfBirth?: string; firstName?: string }) => {
+  if (values.firstName) {
+    fireEvent.change(form.querySelector('[name="subjectFirstName"]')!, { target: { value: values.firstName } });
+  }
+  fireEvent.change(form.querySelector('[name="subjectLastName"]')!, { target: { value: 'Doe' } });
+  if (values.dateOfBirth) {
+    enterDateOfBirth(values.dateOfBirth);
+  }
+  fireEvent.change(form.querySelector('[name="subjectSex"]')!, { target: { value: 'FEMALE' } });
+};
+
 const sexTrigger = () => screen.getByTestId<HTMLButtonElement>('subjectSex-select-trigger');
 
 const pickIdentifier = (identifier: string) => {
@@ -341,20 +360,6 @@ describe('StartSessionForm with a custom identifier', () => {
 });
 
 describe('StartSessionForm with personal information', () => {
-  const fillPersonalInfo = (form: HTMLElement, values: { dateOfBirth?: string; firstName?: string }) => {
-    if (values.firstName) {
-      fireEvent.change(form.querySelector('[name="subjectFirstName"]')!, { target: { value: values.firstName } });
-    }
-    fireEvent.change(form.querySelector('[name="subjectLastName"]')!, { target: { value: 'Doe' } });
-    if (values.dateOfBirth) {
-      // The date field commits what was typed only when it loses focus.
-      fireEvent.focus(dateOfBirthInput());
-      fireEvent.change(dateOfBirthInput(), { target: { value: values.dateOfBirth } });
-      fireEvent.blur(dateOfBirthInput());
-    }
-    fireEvent.change(form.querySelector('[name="subjectSex"]')!, { target: { value: 'FEMALE' } });
-  };
-
   it('should identify the subject by a hash of their personal information, so no name is stored as an id', async () => {
     const form = renderForm([], null, 'PERSONAL_INFO');
     fillPersonalInfo(form, { dateOfBirth: '1990-06-15', firstName: 'Jane' });
@@ -402,5 +407,47 @@ describe('StartSessionForm session type', () => {
     expect(screen.queryByText('Date Assessed')).toBeNull();
     fireEvent.change(form.querySelector('[name="sessionType"]')!, { target: { value: 'RETROSPECTIVE' } });
     expect(screen.getByText('Date Assessed')).toBeTruthy();
+  });
+});
+
+describe('StartSessionForm date of birth', () => {
+  const futureDateOfBirth = `${new Date().getFullYear() + 1}-01-01`;
+
+  const futureDateOfBirthError = { field: 'subjectDateOfBirth', message: 'Date of birth must be in the past' };
+
+  const enterNewIdentifier = () => {
+    typeIdentifier('gamma');
+    closeIdentifierPopup();
+  };
+
+  it('should reject a date of birth in the future, since no subject can be born after today', async () => {
+    const form = renderForm([]);
+    enterNewIdentifier();
+    enterDateOfBirth(futureDateOfBirth);
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual([futureDateOfBirthError]));
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should show only the future-date error with personal information, not a contradictory required-field error', async () => {
+    const form = renderForm([], null, 'PERSONAL_INFO');
+    fillPersonalInfo(form, { dateOfBirth: futureDateOfBirth, firstName: 'Jane' });
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual([futureDateOfBirthError]));
+  });
+
+  it("should show only the future-date error in a group with a minimum age, not a second error for the subject's age", async () => {
+    const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
+    fillPersonalInfo(form, { dateOfBirth: futureDateOfBirth, firstName: 'Jane' });
+    submit(form);
+    await waitFor(() => expect(errorMessages()).toEqual([futureDateOfBirthError]));
+  });
+
+  it('should accept a date of birth in the past, so the check does not block a valid session', async () => {
+    const form = renderForm([]);
+    enterNewIdentifier();
+    enterDateOfBirth('1990-01-01');
+    await submitAndSettle(form);
+    expect(onSubmit.mock.lastCall?.[0].subjectData.dateOfBirth).toStrictEqual(new Date('1990-01-01'));
   });
 });
