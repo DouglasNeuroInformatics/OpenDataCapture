@@ -4,7 +4,7 @@ import { expect, test } from '../support/fixtures';
 const INSTRUMENT_TITLE = 'Happiness Questionnaire';
 
 test.describe('form error summary', () => {
-  test('should tell the user under the submit button that fields need resolving', async ({
+  test('should tell the user under the submit button that fields need resolving and focus the first one', async ({
     getPageModel,
     page,
     uniqueId
@@ -28,6 +28,8 @@ test.describe('form error summary', () => {
     await instrumentPage.submit();
     await expect(instrumentPage.errorMessages.first()).toBeVisible();
     await expect(instrumentPage.errorSummary).toBeVisible();
+    await expect(instrumentPage.firstInvalidField).toBeInViewport();
+    await expect(instrumentPage.firstInvalidField.locator(':focus')).toHaveCount(1);
 
     await instrumentPage.completeHappinessQuestionnaire();
     await instrumentPage.submit();

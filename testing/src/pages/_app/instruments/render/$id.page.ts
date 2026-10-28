@@ -12,6 +12,8 @@ export class RenderInstrumentPage extends AppPage {
   readonly errorMessages: Locator;
   /** The red notice under the submit button after a submission fails validation. */
   readonly errorSummary: Locator;
+  /** The first field, in render order, that libui marked with an error message. */
+  readonly firstInvalidField: Locator;
   /** The Happiness Questionnaire's affirmative answer to "are you satisfied with your life?". */
   readonly happinessSatisfiedRadio: Locator;
   /** Asks the clinician to confirm leaving an instrument whose responses have not been submitted. */
@@ -35,6 +37,7 @@ export class RenderInstrumentPage extends AppPage {
     this.summaryHeading = page.getByRole('heading', { name: /Summary of Results/i });
     this.errorMessages = page.getByTestId('error-message-text');
     this.errorSummary = page.getByTestId('form-error-summary');
+    this.firstInvalidField = page.locator('[data-field-group]:has([data-testid="error-message-text"])').first();
   }
 
   /** Accepts the General Consent Form by selecting the affirmative radio option. */
