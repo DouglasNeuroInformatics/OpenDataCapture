@@ -96,10 +96,12 @@ test.describe('gateway remote assignment', () => {
     for (const message of await gatewayInstrument.errorMessages.allTextContents()) {
       expect(message).toBe('This field is required');
     }
+    await expect(gatewayInstrument.errorSummary).toBeVisible();
 
     await gatewayInstrument.completeHappinessQuestionnaire();
     await gatewayInstrument.submit();
     await expect(gatewayInstrument.summaryHeading).toBeVisible();
+    await expect(gatewayInstrument.errorSummary).toHaveCount(0);
 
     // Revisiting the same link after completion must not serve the instrument again. Reuses this
     // now-completed assignment rather than soloing a second, expensive Cap proof-of-work just to

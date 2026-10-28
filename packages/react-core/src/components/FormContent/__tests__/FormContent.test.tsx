@@ -97,4 +97,68 @@ describe('FormContent', () => {
       expect(onSubmit).toHaveBeenCalledWith({ data: { favoriteNumber: 7 }, kind: 'FORM' });
     });
   });
+
+  it('should not summarize errors before the form has been submitted', () => {
+    renderFormContent();
+    expect(screen.queryByTestId('form-error-summary')).toBeNull();
+  });
+
+  it('should summarize errors under the submit button when submission fails validation', async () => {
+    const onSubmit = renderFormContent();
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('form-error-summary').textContent).toMatch(/resolve the errors above/);
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should clear the error summary once the corrected answers submit', async () => {
+    const onSubmit = renderFormContent();
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await screen.findByTestId('form-error-summary');
+    fireEvent.change(screen.getByLabelText('Favorite Number'), { target: { value: '7' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalled();
+    });
+    expect(screen.queryByTestId('form-error-summary')).toBeNull();
+  });
+
+  it('should focus and scroll to the first invalid field, so the user lands on what needs fixing', async () => {
+    const scrollIntoView = vi.spyOn(HTMLElement.prototype, 'scrollIntoView').mockImplementation(() => undefined);
+    renderFormContent({
+      instrument: {
+        ...instrument,
+        content: {
+          favoriteNumber: { kind: 'number', label: 'Favorite Number', variant: 'input' },
+          nickname: { kind: 'string', label: 'Nickname', variant: 'input' }
+        },
+        validationSchema: z.object({ favoriteNumber: z.number(), nickname: z.string() })
+      }
+    });
+    fireEvent.change(screen.getByLabelText('Favorite Number'), { target: { value: '7' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByLabelText('Nickname'));
+    });
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' });
+    scrollIntoView.mockRestore();
+  });
+
+  it('should leave scrolling alone when the only error belongs to the whole form rather than a field', async () => {
+    const scrollIntoView = vi.spyOn(HTMLElement.prototype, 'scrollIntoView').mockImplementation(() => undefined);
+    renderFormContent({
+      instrument: {
+        ...instrument,
+        validationSchema: z
+          .object({ favoriteNumber: z.number() })
+          .refine(() => false, { message: 'Form-level problem' })
+      }
+    });
+    fireEvent.change(screen.getByLabelText('Favorite Number'), { target: { value: '7' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await screen.findByTestId('form-error-summary');
+    expect(scrollIntoView).not.toHaveBeenCalled();
+    scrollIntoView.mockRestore();
+  });
 });
