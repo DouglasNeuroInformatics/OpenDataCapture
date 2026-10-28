@@ -28,10 +28,12 @@ catalog:
   '@tailwindcss/vite': '4.3.3'
   '@testing-library/dom': '^10.4.2'
   '@testing-library/react': '^16.3.3'
+  '@vitest/eslint-plugin': '^1.6.27'
   axios: ^1.20.0
   commander: '^15.0.0'
   esbuild: '0.28.x'
   esbuild-wasm: '0.28.x'
+  eslint-plugin-playwright: '^2.12.1'
   happy-dom: '~20.11.15'
   msgpackr: ^2.1.0
   motion: '13.4.4'
