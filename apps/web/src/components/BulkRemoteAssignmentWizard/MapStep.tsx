@@ -116,11 +116,13 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
           </p>
         )}
 
-        <div className="flex flex-col gap-2" data-testid="bulk-column-mapping">
+        <div className="flex flex-col gap-2">
           <h3 className="text-sm font-medium">
             {t({ en: 'Column Mapping', es: 'Correspondencia de columnas', fr: 'Correspondance des colonnes' })}
           </h3>
           <WizardTable
+            className="max-h-112 overflow-y-auto"
+            data-testid="bulk-column-mapping"
             head={
               <React.Fragment>
                 <Table.Head>
