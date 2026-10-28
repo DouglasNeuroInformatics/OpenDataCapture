@@ -58,12 +58,13 @@ describe('useInstrumentRecordQuery', () => {
   it('should resolve to the record once the suspended request settles', async () => {
     mockAxios.get.mockResolvedValue({ data: RECORD });
     const queryClient = createQueryClient();
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(
         QueryClientProvider,
         { client: queryClient },
         createElement(Suspense, { fallback: null }, children)
       );
+    };
     const { result } = renderHook(() => useInstrumentRecordQuery({ params: { id: 'record-1' } }), { wrapper });
     await waitFor(() => expect(result.current).toBeTruthy());
     expect(result.current.data.id).toBe('record-1');

@@ -59,12 +59,13 @@ vi.mock('motion/react', async () => {
   };
 });
 
-const renderProvider = () =>
-  render(
+const renderProvider = () => {
+  return render(
     <WalkthroughProvider>
       <p>{CHILD_TEXT}</p>
     </WalkthroughProvider>
   );
+};
 
 const addTarget = (html: string, rect: Rect = { bottom: 0, left: 0, right: 0, top: 0 }) => {
   const container = document.createElement('div');
@@ -217,9 +218,9 @@ describe('WalkthroughProvider', () => {
 
     it('should log the selector of a target that is missing from the page', async () => {
       renderProvider();
-      await waitFor(() =>
-        expect(console.error).toHaveBeenCalledWith('Failed to find element with query: #sidebar-branding-container')
-      );
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith('Failed to find element with query: #sidebar-branding-container');
+      });
     });
 
     it('should place a bottom-left popover below the left edge of its target', async () => {

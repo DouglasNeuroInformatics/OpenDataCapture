@@ -141,9 +141,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     // Split each record into the metadata every exported row repeats and the measures that vary by
     // row, so the long format cannot mistake a metadata field for a measure.
     const exportRecords = records.map((record) => ({
-      measures: mapValues(omit(record, EXPORT_METADATA_KEYS), (value) =>
-        value instanceof Set ? formatRecordValue(value) : value
-      ),
+      measures: mapValues(omit(record, EXPORT_METADATA_KEYS), (value) => {
+        return value instanceof Set ? formatRecordValue(value) : value;
+      }),
       meta: {
         collectionMethod: record.__method__,
         date: toBasicISOString(record.__date__),
@@ -199,12 +199,12 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       if (!Array.isArray(measureValue)) {
         return [{ value: measureValue, variable: measureKey }];
       }
-      return measureValue.flatMap((arrayItem) =>
-        Object.entries(arrayItem as object).map(([arrayKey, arrayValue]) => ({
+      return measureValue.flatMap((arrayItem) => {
+        return Object.entries(arrayItem as object).map(([arrayKey, arrayValue]) => ({
           value: arrayValue as unknown,
           variable: `${measureKey}-${arrayKey}`
-        }))
-      );
+        }));
+      });
     };
 
     const makeLongRows = () => {
@@ -226,7 +226,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
 
     const parseHelper = (rows: unknown[], delimiter: string) => {
       return unparse(rows, {
-        delimiter: delimiter,
+        delimiter,
         escapeChar: '"',
         header: true,
         quoteChar: '"',

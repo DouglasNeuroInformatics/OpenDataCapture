@@ -1,6 +1,6 @@
-import { cpus } from 'os';
-import { join } from 'path';
-import { Worker } from 'worker_threads';
+import { cpus } from 'node:os';
+import { join } from 'node:path';
+import { Worker } from 'node:worker_threads';
 
 import { replacer, reviver } from '@douglasneuroinformatics/libjs';
 import { InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';

@@ -208,20 +208,21 @@ export const UpdateUserForm = ({ data, id, onError, onSubmit }: UpdateUserFormPr
         subscribe={{
           // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
           // position, so `setValues` is inferred as an error type rather than a setter.
-          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) =>
-            applyGeneratedPassword(setValues),
+          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) => {
+            applyGeneratedPassword(setValues);
+          },
           selector: () => generatedPassword
         }}
         validationSchema={$UpdateUserFormData}
         onError={onError}
-        onSubmit={(data) =>
-          onSubmit({
+        onSubmit={(data) => {
+          return onSubmit({
             ...data,
             // Left undefined when the password field is blank, so saving other changes to a user
             // who still owes a reset does not quietly lift it.
             mustResetPassword: data.password ? isGeneratedPassword(data.password) : undefined
-          })
-        }
+          });
+        }}
       />
     </div>
   );

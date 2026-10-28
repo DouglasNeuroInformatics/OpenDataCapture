@@ -38,20 +38,23 @@ vi.mock('@/hooks/useSetupStateQuery', () => ({
 
 /** Every reachable url, including those nested inside a collapsible group. */
 const navUrls = () => {
-  const collect = (items: NavItem[]): (string | undefined)[] =>
-    items.flatMap((item) => [item.url, ...collect(item.children ?? [])]);
+  const collect = (items: NavItem[]): (string | undefined)[] => {
+    return items.flatMap((item) => [item.url, ...collect(item.children ?? [])]);
+  };
   return collect(renderHook(() => useNavItems()).result.current.flat());
 };
 
-const navLabels = () =>
-  renderHook(() => useNavItems())
+const navLabels = () => {
+  return renderHook(() => useNavItems())
     .result.current.flat()
     .map((item) => item.label);
+};
 
-const navItemAt = (url: string) =>
-  renderHook(() => useNavItems())
+const navItemAt = (url: string) => {
+  return renderHook(() => useNavItems())
     .result.current.flat()
     .find((item) => item.url === url);
+};
 
 describe('useNavItems', () => {
   beforeEach(() => {
@@ -103,10 +106,11 @@ describe('useNavItems', () => {
 
   // The datahub is a parent over its views rather than a link of its own, so the subject listing is
   // reachable only as a child and the group itself carries no url to navigate to.
-  const datahubItem = () =>
-    renderHook(() => useNavItems())
+  const datahubItem = () => {
+    return renderHook(() => useNavItems())
       .result.current.flat()
       .find((item) => item.label === 'Data Hub');
+  };
 
   it('should nest both views under the data hub parent, which is itself not a destination', () => {
     const datahub = datahubItem();

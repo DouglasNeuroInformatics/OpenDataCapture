@@ -11,16 +11,18 @@ import { useUpdateUserMutation } from '../useUpdateUserMutation';
 const mocks = vi.hoisted(() => ({ addNotification: vi.fn(), patch: vi.fn(), put: vi.fn() }));
 vi.mock('axios', () => ({ default: { patch: mocks.patch, put: mocks.put } }));
 vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
-  useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) =>
-    selector(mocks)
+  useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) => {
+    return selector(mocks);
+  }
 }));
 
 const permissions: Permissions = [{ action: 'read', groupId: 'group-1', subject: 'Subject' }];
 
 function renderUpdateMutation() {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false, throwOnError: true } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return { ...renderHook(() => useUpdateUserMutation(), { wrapper }), queryClient };
 }
 

@@ -94,14 +94,15 @@ export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: Assignm
         templateId: selectedTemplate === DEFAULT_TEMPLATE_OPTION ? null : selectedTemplate
       },
       {
-        onError: () =>
+        onError: () => {
           fail(
             t({
               en: 'The email could not be sent',
               es: 'No se pudo enviar el correo',
               fr: "Le courriel n'a pas pu être envoyé"
             })
-          ),
+          );
+        },
         onSuccess: (result) => {
           if (result.status !== 'SENT') {
             fail(mailErrorMessage(result.error));

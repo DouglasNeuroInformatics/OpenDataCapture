@@ -97,8 +97,8 @@ const mockWizard = (step: WizardStep, overrides: Partial<Wizard> = {}): Wizard =
 
 const onBack = vi.fn();
 
-const renderWizard = () =>
-  render(
+const renderWizard = () => {
+  return render(
     <BulkRemoteAssignmentWizard
       defaultExpiresAt="2026-11-01"
       groupId="group-1"
@@ -109,6 +109,7 @@ const renderWizard = () =>
       onBack={onBack}
     />
   );
+};
 
 const propsOf = <TProps extends object>(component: React.FC<TProps>) => vi.mocked(component).mock.lastCall![0];
 

@@ -47,13 +47,19 @@ export const RecordScatterChart = ({ measureLabel, series, trend, xLabel }: Reco
   const times = series.flatMap((item) => item.points.map((point) => point.time));
   // Typed as a pair rather than an array: `ReferenceLine`'s `segment` takes exactly two points.
   const trendSegment = ((): [{ x: number; y: number }, { x: number; y: number }] | null => {
-    if (!trend || times.length === 0) return null;
+    if (!trend || times.length === 0) {
+      return null;
+    }
     let tMin = times[0]!;
     let tMax = times[0]!;
     for (let i = 1; i < times.length; i++) {
       const t = times[i]!;
-      if (t < tMin) tMin = t;
-      if (t > tMax) tMax = t;
+      if (t < tMin) {
+        tMin = t;
+      }
+      if (t > tMax) {
+        tMax = t;
+      }
     }
     return [
       { x: tMin, y: trend.intercept + trend.slope * tMin },

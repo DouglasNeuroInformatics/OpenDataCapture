@@ -63,11 +63,12 @@ const renderDialog = (item: InstrumentPreviewItem, onClose = vi.fn()) => {
 };
 
 /** The text of the detail row whose label starts with `label`, or undefined when that row is not rendered. */
-const detailText = (label: string) =>
-  screen
+const detailText = (label: string) => {
+  return screen
     .queryAllByText(new RegExp(`^${label}`), { selector: 'span.font-medium' })
     .map((element) => element.parentElement?.textContent)
     .at(0);
+};
 
 const previewForm = () => {
   fireEvent.click(screen.getByRole('button', { name: 'Preview Form' }));

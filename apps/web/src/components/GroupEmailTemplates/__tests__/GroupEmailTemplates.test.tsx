@@ -61,20 +61,21 @@ const makeGroup = (overrides: Partial<Group> = {}): Group => ({
   ...overrides
 });
 
-const conflictError = () =>
-  new AxiosError('Conflict', 'ERR_BAD_REQUEST', undefined, undefined, {
+const conflictError = () => {
+  return new AxiosError('Conflict', 'ERR_BAD_REQUEST', undefined, undefined, {
     config: { headers: new AxiosHeaders() },
     data: {},
     headers: {},
     status: 409,
     statusText: 'Conflict'
   });
+};
 
 const serveGroup = (group: Group) => {
   mockAxios.get.mockResolvedValue({ data: group });
-  mockAxios.patch.mockImplementation((_url, data) =>
-    Promise.resolve({ data: { ...group, ...data, updatedAt: new Date('2026-01-03T00:00:00.000Z') } })
-  );
+  mockAxios.patch.mockImplementation((_url, data) => {
+    return Promise.resolve({ data: { ...group, ...data, updatedAt: new Date('2026-01-03T00:00:00.000Z') } });
+  });
 };
 
 const renderTemplates = () => {
@@ -232,11 +233,11 @@ describe('GroupEmailTemplates', () => {
     mockAxios.get.mockReturnValue(new Promise(() => undefined));
     renderTemplates();
     createEnglishTemplate('Notice');
-    await waitFor(() =>
+    await waitFor(() => {
       expect(notifications()).toMatchObject([
         { message: 'The group is still loading — try again in a moment.', type: 'error' }
-      ])
-    );
+      ]);
+    });
     expect(mockAxios.patch).not.toHaveBeenCalled();
   });
 
@@ -322,15 +323,15 @@ describe('GroupEmailTemplates', () => {
     await renderLoaded();
     mockAxios.patch.mockRejectedValue(new Error('Network Error'));
     fireEvent.click(screen.getByTestId('template-set-active-tpl-a'));
-    await waitFor(() =>
+    await waitFor(() => {
       expect(notifications()).toMatchObject([
         {
           message: 'Your changes were not saved. Check your connection and try again.',
           title: 'Save failed',
           type: 'error'
         }
-      ])
-    );
+      ]);
+    });
     expect(mockAxios.get).toHaveBeenCalledOnce();
   });
 
@@ -338,7 +339,7 @@ describe('GroupEmailTemplates', () => {
     await renderLoaded();
     mockAxios.patch.mockRejectedValue(conflictError());
     fireEvent.click(screen.getByTestId('template-set-active-tpl-a'));
-    await waitFor(() =>
+    await waitFor(() => {
       expect(notifications()).toMatchObject([
         {
           message:
@@ -346,8 +347,8 @@ describe('GroupEmailTemplates', () => {
           title: 'Save failed',
           type: 'error'
         }
-      ])
-    );
+      ]);
+    });
   });
 
   it('should refetch the group after a conflict, so the next edit is composed on the latest revision', async () => {

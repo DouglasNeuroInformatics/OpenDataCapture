@@ -189,7 +189,9 @@ const RouteComponent = () => {
               type="button"
               variant="danger"
               onClick={() => {
-                if (!pendingAction) return;
+                if (!pendingAction) {
+                  return;
+                }
                 archiveUserMutation.mutate({ id: pendingAction.user.id }, { onSuccess: () => setPendingAction(null) });
               }}
             >

@@ -126,11 +126,12 @@ const existingSubject = (demographics: { dateOfBirth: null | string; sex: null |
 };
 
 /** Every error shown, with the field it landed on, so one that moved to the form's own errors fails too. */
-const errorMessages = () =>
-  screen.queryAllByTestId('error-message-text').map((element) => ({
+const errorMessages = () => {
+  return screen.queryAllByTestId('error-message-text').map((element) => ({
     field: element.closest('[data-field-group]')?.getAttribute('data-field-group'),
     message: element.textContent
   }));
+};
 
 const subjectIdError = (message: string) => ({ field: 'subjectId', message });
 
@@ -241,9 +242,9 @@ describe('StartSessionForm', () => {
     it('should look the subject up by the id the form would submit, so the details shown are that subject’s', async () => {
       renderForm(['alpha']);
       pickIdentifier('alpha');
-      await waitFor(() =>
-        expect(get).toHaveBeenCalledWith(`/v1/subjects/${DEFAULT_GROUP_NAME}%24alpha`, expect.anything())
-      );
+      await waitFor(() => {
+        expect(get).toHaveBeenCalledWith(`/v1/subjects/${DEFAULT_GROUP_NAME}%24alpha`, expect.anything());
+      });
     });
 
     it('should fill in and lock the date of birth and sex the subject already records', async () => {
@@ -376,12 +377,12 @@ describe('StartSessionForm', () => {
       const form = renderForm([], null, 'PERSONAL_INFO');
       fillPersonalInfo(form, {});
       submit(form);
-      await waitFor(() =>
+      await waitFor(() => {
         expect(errorMessages()).toEqual([
           { field: 'subjectFirstName', message: 'This field is required' },
           { field: 'subjectDateOfBirth', message: 'This field is required' }
-        ])
-      );
+        ]);
+      });
       expect(onSubmit).not.toHaveBeenCalled();
     });
 

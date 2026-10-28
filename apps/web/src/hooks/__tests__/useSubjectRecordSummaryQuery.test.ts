@@ -11,13 +11,19 @@ import { subjectRecordSummaryQueryOptions, useSubjectRecordSummaryQuery } from '
 
 vi.mock('axios');
 
-const runQuery = (groupId?: string) =>
-  new QueryClient().fetchQuery(subjectRecordSummaryQueryOptions({ params: { groupId } }));
+const runQuery = (groupId?: string) => {
+  return new QueryClient().fetchQuery(subjectRecordSummaryQueryOptions({ params: { groupId } }));
+};
 
 const renderSummaryQuery = (groupId?: string) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { client: queryClient }, createElement(Suspense, { fallback: null }, children));
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      createElement(Suspense, { fallback: null }, children)
+    );
+  };
   return renderHook(() => useSubjectRecordSummaryQuery({ params: { groupId } }), { wrapper });
 };
 

@@ -1,6 +1,6 @@
-import { once } from 'events';
-import fs from 'fs';
-import type { Server } from 'http';
+import { once } from 'node:events';
+import fs from 'node:fs';
+import type { Server } from 'node:http';
 
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
@@ -24,9 +24,9 @@ const { createServer, vite } = vi.hoisted(() => {
 vi.mock('vite', () => ({ createServer }));
 
 vi.mock('@/config', async () => {
-  const fs = await import('fs');
-  const os = await import('os');
-  const path = await import('path');
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const path = await import('node:path');
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gateway-development-'));
   fs.writeFileSync(path.join(root, 'index.html'), '<html>template</html>');
   return { config: { root } };
@@ -42,7 +42,7 @@ vi.mock('../server.base', async () => {
 
 class TestDevelopmentServer extends DevelopmentServer {
   fix(err: Error) {
-    return this.fixStacktrace(err);
+    this.fixStacktrace(err);
   }
 
   listenOnRandomPort() {

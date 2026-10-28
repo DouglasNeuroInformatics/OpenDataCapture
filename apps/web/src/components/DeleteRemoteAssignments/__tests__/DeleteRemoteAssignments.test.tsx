@@ -75,10 +75,11 @@ const deleteSelectedButton = () => screen.getByTestId<HTMLButtonElement>('delete
 const confirmButton = () => screen.getByTestId<HTMLButtonElement>('confirm-delete-assignments');
 const isChecked = (element: HTMLElement) => element.getAttribute('aria-checked') === 'true';
 
-const renderedRowIds = () =>
-  screen
+const renderedRowIds = () => {
+  return screen
     .getAllByTestId(/^delete-select-assignment-/)
     .map((element) => element.getAttribute('data-testid')!.replace('delete-select-assignment-', ''));
+};
 
 const openConfirmation = (...ids: string[]) => {
   ids.forEach((id) => fireEvent.click(rowCheckbox(id)));

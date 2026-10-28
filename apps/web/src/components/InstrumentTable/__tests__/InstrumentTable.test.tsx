@@ -27,8 +27,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/hooks')>()),
   useDownload: () => mocks.download,
-  useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) =>
-    selector({ addNotification: mocks.addNotification })
+  useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) => {
+    return selector({ addNotification: mocks.addNotification });
+  }
 }));
 vi.mock('@/utils/excel', () => ({ downloadSubjectTableExcel: mocks.downloadExcel }));
 // The dialog fetches the instrument bundle to render it; what matters here is the item built for it.
@@ -70,8 +71,11 @@ const openExport = () => fireEvent.keyDown(screen.getByRole('button', { name: 'D
 
 const exportItems = () => screen.queryAllByRole('menuitem').map((item) => item.textContent);
 
-const listedTitles = () =>
-  screen.queryAllByTestId('data-table-row').map((tableRow) => tableRow.querySelector('div')!.textContent?.trim() ?? '');
+const listedTitles = () => {
+  return screen
+    .queryAllByTestId('data-table-row')
+    .map((tableRow) => tableRow.querySelector('div')!.textContent?.trim() ?? '');
+};
 
 const openFilters = () => fireEvent.keyDown(screen.getByTestId('instrument-table-filters-trigger'), { key: 'Enter' });
 

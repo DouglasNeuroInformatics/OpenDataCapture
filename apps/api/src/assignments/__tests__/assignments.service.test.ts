@@ -25,19 +25,20 @@ const futureDate = () => new Date(Date.now() + 86_400_000);
  * hand-rolled `can` would not survive contact with it. Permitting everything keeps each test on the
  * service's own group/subject/instrument scoping rather than on CASL itself.
  */
-const permissiveUser = () =>
-  ({
+const permissiveUser = () => {
+  return {
     ability: createAppAbility([{ action: 'manage', subject: 'all' }]),
     id: 'user-1'
-  }) as any;
+  } as any;
+};
 
 /** The ability `AbilityFactory` builds at login, so group conditions are the ones production applies. */
 const userAt = (
   basePermissionLevel: BasePermissionLevel,
   groupId = GROUP_ID,
   additionalPermissions: Permissions = []
-) =>
-  ({
+) => {
+  return {
     ability: new AbilityFactory({ verbose: vi.fn() } as any).createForPayload({
       additionalPermissions,
       basePermissionLevel,
@@ -45,14 +46,16 @@ const userAt = (
       id: 'user-1'
     } as any),
     id: 'user-1'
-  }) as any;
+  } as any;
+};
 
 /** Can read (so the group resolves) but cannot create an assignment. */
-const readOnlyUser = () =>
-  ({
+const readOnlyUser = () => {
+  return {
     ability: createAppAbility([{ action: 'read', subject: 'all' }]),
     id: 'user-1'
-  }) as any;
+  } as any;
+};
 
 const request = (overrides: { [key: string]: any } = {}) => ({
   allowDuplicates: false,
@@ -118,9 +121,9 @@ describe('AssignmentsService', () => {
     subjectModel.findMany.mockResolvedValue([{ id: 'subject-1' }, { id: 'subject-2' }]);
     assignmentModel.findMany.mockResolvedValue([]);
     instrumentModel.findMany.mockResolvedValue([]);
-    assignmentModel.create.mockImplementation(({ data }: any) =>
-      Promise.resolve({ ...data, instrumentId: 'instrument-1' })
-    );
+    assignmentModel.create.mockImplementation(({ data }: any) => {
+      return Promise.resolve({ ...data, instrumentId: 'instrument-1' });
+    });
     assignmentModel.deleteMany.mockResolvedValue({ count: 0 });
   };
 
@@ -223,9 +226,9 @@ describe('AssignmentsService', () => {
     });
 
     it('should never return or transmit the encryption keypair, which would hand out the private key', async () => {
-      assignmentModel.create.mockImplementation(({ data }: any) =>
-        Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } })
-      );
+      assignmentModel.create.mockImplementation(({ data }: any) => {
+        return Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } });
+      });
       const assignment = await assignmentsService.create(data(), permissiveUser());
 
       expect(assignment).not.toHaveProperty('encryptionKeyPair');
@@ -368,9 +371,9 @@ describe('AssignmentsService', () => {
     });
 
     it('should never return or transmit the encryption keypair, which would hand out the private key', async () => {
-      assignmentModel.create.mockImplementation(({ data }: any) =>
-        Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } })
-      );
+      assignmentModel.create.mockImplementation(({ data }: any) => {
+        return Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } });
+      });
       const assignments = await assignmentsService.createBulk(request(), permissiveUser());
 
       expect(assignments.every((assignment) => !('encryptionKeyPair' in assignment))).toBe(true);

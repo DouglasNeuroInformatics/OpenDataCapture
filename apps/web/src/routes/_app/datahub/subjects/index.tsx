@@ -284,8 +284,10 @@ const Toggles: React.FC<{
             void download('README.txt', t('datahub.index.table.exportHelpText'));
             void download(`${baseFilename}.csv`, unparse(exportData));
             break;
-          case 'Excel':
-            return downloadSubjectTableExcel(`${baseFilename}.xlsx`, exportData, 'Records');
+          case 'Excel': {
+            downloadSubjectTableExcel(`${baseFilename}.xlsx`, exportData, 'Records');
+            return;
+          }
           case 'JSON':
             return download(`${baseFilename}.json`, JSON.stringify(exportData, null, 2));
         }
@@ -491,8 +493,9 @@ const MasterDataTable: React.FC<{
               const value = ctx.getValue() as Date | null;
               return value ? toBasicISOString(value) : t({ en: 'None', es: 'Ninguno', fr: 'Aucun' });
             },
-            filterFn: (row, id, filter: CollectedFilter) =>
-              matchesCollectedFilter(row.getValue<Date | null>(id), filter),
+            filterFn: (row, id, filter: CollectedFilter) => {
+              return matchesCollectedFilter(row.getValue<Date | null>(id), filter);
+            },
             header: ({ column }) => (
               <SortableHeader
                 column={column}

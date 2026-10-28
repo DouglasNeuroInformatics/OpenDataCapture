@@ -222,8 +222,9 @@ describe('Route', () => {
   });
 
   describe('beforeLoad', () => {
-    const runGuard = (setupState: { isBulkRemoteAssignmentsEnabled: boolean }) =>
-      beforeLoad({ context: { queryClient: { ensureQueryData: () => Promise.resolve(setupState) } } });
+    const runGuard = (setupState: { isBulkRemoteAssignmentsEnabled: boolean }) => {
+      return beforeLoad({ context: { queryClient: { ensureQueryData: () => Promise.resolve(setupState) } } });
+    };
 
     it('should redirect to the dashboard when the gateway is not deployed', async () => {
       mocks.config.setup.isGatewayEnabled = false;

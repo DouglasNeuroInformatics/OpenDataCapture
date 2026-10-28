@@ -18,8 +18,9 @@ vi.mock('@/store', () => ({
 
 function renderBundleQuery(id: null | string) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return { ...renderHook(() => useInstrumentBundle(id), { wrapper }), queryClient };
 }
 

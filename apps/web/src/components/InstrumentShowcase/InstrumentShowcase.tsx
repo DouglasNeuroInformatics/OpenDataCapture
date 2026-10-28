@@ -49,16 +49,14 @@ export const InstrumentShowcase: React.FC<{
     setHighlightedIndex(0);
   }, [availableInstruments, selectedKinds, selectedLanguages, selectedTags, searchTerm]);
 
-  const tagOptions = useMemo<ListboxDropdownOption[]>(
-    () =>
-      Array.from(new Set(availableInstruments.flatMap((item) => item.tags)))
-        .map((item) => ({
-          key: item,
-          label: item
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label)),
-    [availableInstruments]
-  );
+  const tagOptions = useMemo<ListboxDropdownOption[]>(() => {
+    return Array.from(new Set(availableInstruments.flatMap((item) => item.tags)))
+      .map((item) => ({
+        key: item,
+        label: item
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [availableInstruments]);
 
   useEffect(() => {
     const items = listRef.current?.querySelectorAll<HTMLElement>('[data-instrument-index]');
@@ -77,7 +75,9 @@ export const InstrumentShowcase: React.FC<{
         }
         return;
       }
-      if (filteredInstruments.length === 0) return;
+      if (filteredInstruments.length === 0) {
+        return;
+      }
       if (event.key === 'ArrowDown') {
         event.preventDefault();
         setHighlightedIndex((prev) => Math.min(prev + 1, filteredInstruments.length - 1));

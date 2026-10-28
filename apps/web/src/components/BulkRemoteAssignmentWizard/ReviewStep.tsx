@@ -32,8 +32,8 @@ type ReviewStepProps = {
  */
 const useIssueMessages = (describeSubject: (subjectId: string) => string) => {
   const { t } = useTranslation();
-  return (issues: BulkAssignmentIssue[]): BulkParseError[] =>
-    issues.map((issue) => {
+  return (issues: BulkAssignmentIssue[]): BulkParseError[] => {
+    return issues.map((issue) => {
       switch (issue.kind) {
         case 'CONFLICT':
           return {
@@ -64,6 +64,7 @@ const useIssueMessages = (describeSubject: (subjectId: string) => string) => {
           };
       }
     });
+  };
 };
 
 export const ReviewStep = ({

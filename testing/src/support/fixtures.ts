@@ -1,5 +1,3 @@
-/* eslint-disable no-empty-pattern */
-
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Group } from '@opendatacapture/schemas/group';
 import { request as apiRequestFactory, test as base, expect } from '@playwright/test';

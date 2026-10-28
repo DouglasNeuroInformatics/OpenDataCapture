@@ -13,8 +13,9 @@ vi.mock('axios');
 
 // Runs the options through a real client rather than invoking `queryFn` directly, so the test
 // exercises them the way the route does.
-const runQuery = (params?: Parameters<typeof auditLogsQueryOptions>[0]) =>
-  new QueryClient().fetchQuery(auditLogsQueryOptions(params));
+const runQuery = (params?: Parameters<typeof auditLogsQueryOptions>[0]) => {
+  return new QueryClient().fetchQuery(auditLogsQueryOptions(params));
+};
 
 // eslint-disable-next-line @typescript-eslint/unbound-method -- a vitest mock, never invoked as a method
 const get = vi.mocked(axios).get;
@@ -61,8 +62,9 @@ describe('auditLogsQueryOptions', () => {
 describe('useAuditLogsQuery', () => {
   const renderAuditLogsQuery = (options?: Parameters<typeof useAuditLogsQuery>[0]) => {
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(QueryClientProvider, { children, client: queryClient });
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(QueryClientProvider, { children, client: queryClient });
+    };
     return renderHook(() => useAuditLogsQuery(options), { wrapper });
   };
 
@@ -82,8 +84,9 @@ describe('useAuditLogsQuery', () => {
     get.mockResolvedValue(page([log('a')], 1, 1));
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     await queryClient.ensureQueryData(auditLogsQueryOptions({ params: { page: 1 } }));
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(QueryClientProvider, { children, client: queryClient });
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(QueryClientProvider, { children, client: queryClient });
+    };
     const { result } = renderHook(() => useAuditLogsQuery({ params: { page: 1 } }), { wrapper });
     await waitFor(() => expect(result.current.isFetching).toBe(false));
     expect(get).toHaveBeenCalledTimes(1);

@@ -1,4 +1,4 @@
-import type { Server } from 'http';
+import type { Server } from 'node:http';
 
 import type Cap from '@cap.js/server';
 import express from 'express';

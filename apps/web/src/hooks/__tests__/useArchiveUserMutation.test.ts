@@ -19,8 +19,9 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
 function renderArchiveMutation() {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
   const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return { ...renderHook(() => useArchiveUserMutation(), { wrapper }), invalidateQueries };
 }
 

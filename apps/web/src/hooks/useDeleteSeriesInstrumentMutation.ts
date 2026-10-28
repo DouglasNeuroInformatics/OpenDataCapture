@@ -21,8 +21,9 @@ export function useDeleteSeriesInstrumentMutation() {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const { t } = useTranslation();
   return useMutation({
-    mutationFn: ({ id }: { id: string }) =>
-      axios.delete(`/v1/instruments/${id}`, { meta: { disableDefaultErrorNotification: true } }),
+    mutationFn: ({ id }: { id: string }) => {
+      return axios.delete(`/v1/instruments/${id}`, { meta: { disableDefaultErrorNotification: true } });
+    },
     onError(err) {
       addNotification({
         message: getApiErrorMessage(

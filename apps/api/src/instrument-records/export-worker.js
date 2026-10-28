@@ -1,4 +1,4 @@
-import { parentPort } from 'worker_threads';
+import { parentPort } from 'node:worker_threads';
 
 /** @type {typeof import('@opendatacapture/schemas/core').DEFAULT_GROUP_NAME} */
 const DEFAULT_GROUP_NAME = 'root';
@@ -98,7 +98,9 @@ function handleChunkComplete(_data) {
     const seriesName = seriesId ? (seriesNames[seriesId] ?? null) : null;
 
     for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-      if (measureValue == null) continue;
+      if (measureValue == null) {
+        continue;
+      }
 
       if (!Array.isArray(measureValue)) {
         rows.push({
@@ -121,7 +123,9 @@ function handleChunkComplete(_data) {
         continue;
       }
 
-      if (measureValue.length < 1) continue;
+      if (measureValue.length < 1) {
+        continue;
+      }
 
       const expanded = expandData(measureValue);
       for (const entry of expanded) {

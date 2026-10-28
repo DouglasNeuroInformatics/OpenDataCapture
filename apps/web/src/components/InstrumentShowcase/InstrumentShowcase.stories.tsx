@@ -15,7 +15,9 @@ export const Default: Story = {
     data: [...Object.values(forms), ...Object.values(interactive), ...Object.values(series)].map(({ instance }) =>
       // The stubs are full instruments; `translateInstrumentInfo` only reads the fields common to every
       // `InstrumentInfo`, so a cast to its parameter type is sufficient for the story.
-      translateInstrumentInfo(instance as unknown as Parameters<typeof translateInstrumentInfo>[0], 'en')
+      {
+        return translateInstrumentInfo(instance as unknown as Parameters<typeof translateInstrumentInfo>[0], 'en');
+      }
     )
   }
 };

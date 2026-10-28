@@ -27,10 +27,9 @@ function extractRouteToMembers(sourceText: string): string[] {
   let members: null | string[] = null;
   const visit = (node: ts.Node): void => {
     if (ts.isInterfaceDeclaration(node) && node.name.text === 'FileRouteTypes') {
-      const toProperty = node.members.find(
-        (member): member is ts.PropertySignature =>
-          ts.isPropertySignature(member) && member.name.getText(sourceFile) === 'to'
-      );
+      const toProperty = node.members.find((member): member is ts.PropertySignature => {
+        return ts.isPropertySignature(member) && member.name.getText(sourceFile) === 'to';
+      });
       if (toProperty?.type && ts.isUnionTypeNode(toProperty.type)) {
         members = toProperty.type.types.flatMap((typeNode) => {
           if (ts.isLiteralTypeNode(typeNode) && ts.isStringLiteral(typeNode.literal)) {

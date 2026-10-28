@@ -127,11 +127,11 @@ axios.interceptors.response.use(
     if (!import.meta.env.DEV) {
       return response;
     }
-    return new Promise((resolve) =>
-      setTimeout(() => {
+    return new Promise((resolve) => {
+      return setTimeout(() => {
         resolve(response);
-      }, config.dev.networkLatency)
-    );
+      }, config.dev.networkLatency);
+    });
   },
   async (error) => {
     const requestConfig = isAxiosError(error) ? error.config : undefined;

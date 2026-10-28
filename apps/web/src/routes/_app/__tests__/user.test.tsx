@@ -27,8 +27,9 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/store', () => ({
-  useAppStore: (selector: (store: { currentUser: typeof mocks.currentUser }) => unknown) =>
-    selector({ currentUser: mocks.currentUser })
+  useAppStore: (selector: (store: { currentUser: typeof mocks.currentUser }) => unknown) => {
+    return selector({ currentUser: mocks.currentUser });
+  }
 }));
 vi.mock('@/hooks/useFindUserQuery', () => ({
   useFindUserQuery: (id: string) => {

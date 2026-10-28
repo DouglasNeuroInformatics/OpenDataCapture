@@ -18,21 +18,21 @@ describe('NavigationBlockerDialog', () => {
   });
 
   it('should render the message when open', () => {
-    render(<NavigationBlockerDialog message="Are you sure?" open={true} />);
+    render(<NavigationBlockerDialog open message="Are you sure?" />);
     expect(screen.getByTestId('blocker-dialog')).toBeTruthy();
     expect(screen.getByText('Are you sure?')).toBeTruthy();
   });
 
   it('should call onConfirm when the confirm button is clicked', () => {
     const onConfirm = vi.fn();
-    render(<NavigationBlockerDialog message="Are you sure?" open={true} onConfirm={onConfirm} />);
+    render(<NavigationBlockerDialog open message="Are you sure?" onConfirm={onConfirm} />);
     fireEvent.click(screen.getByText('Yes'));
     expect(onConfirm).toHaveBeenCalledOnce();
   });
 
   it('should call onCancel when the cancel button is clicked', () => {
     const onCancel = vi.fn();
-    render(<NavigationBlockerDialog message="Are you sure?" open={true} onCancel={onCancel} />);
+    render(<NavigationBlockerDialog open message="Are you sure?" onCancel={onCancel} />);
     fireEvent.click(screen.getByText('No'));
     expect(onCancel).toHaveBeenCalledOnce();
   });

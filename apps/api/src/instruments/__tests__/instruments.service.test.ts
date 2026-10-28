@@ -1255,9 +1255,9 @@ describe('InstrumentsService', () => {
         { bundle: 'FORM_BUNDLE', id: 'hash:FORM_A-1' },
         { bundle: 'SERIES_BUNDLE', id: 'series-1' }
       ]);
-      virtualizationService.eval.mockImplementation((code) =>
-        okAsync(code === 'FORM_BUNDLE' ? formInstance('FORM_A', 1) : existingSeries)
-      );
+      virtualizationService.eval.mockImplementation((code) => {
+        return okAsync(code === 'FORM_BUNDLE' ? formInstance('FORM_A', 1) : existingSeries);
+      });
     });
 
     it('should return only instruments of the requested kind', async () => {
@@ -1313,12 +1313,12 @@ describe('InstrumentsService', () => {
     });
 
     it('should bundle a series together with the bundle of every item, so it can be administered offline', async () => {
-      instrumentModel.findFirst.mockImplementation(({ where }: any) =>
-        Promise.resolve({ bundle: `${where.id}:bundle`, id: where.id })
-      );
-      virtualizationService.eval.mockImplementation((code) =>
-        okAsync(code === 'series-1:bundle' ? existingSeries : formInstance('FORM', 1))
-      );
+      instrumentModel.findFirst.mockImplementation(({ where }: any) => {
+        return Promise.resolve({ bundle: `${where.id}:bundle`, id: where.id });
+      });
+      virtualizationService.eval.mockImplementation((code) => {
+        return okAsync(code === 'series-1:bundle' ? existingSeries : formInstance('FORM', 1));
+      });
 
       await expect(instrumentsService.findBundleById('series-1')).resolves.toEqual({
         bundle: 'series-1:bundle',

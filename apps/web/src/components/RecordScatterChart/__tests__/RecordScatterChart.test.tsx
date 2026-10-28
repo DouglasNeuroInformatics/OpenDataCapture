@@ -14,8 +14,9 @@ import '@/services/i18n';
 // happy-dom computes no layout, so the container would measure 0x0 and recharts would draw nothing.
 vi.mock('recharts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('recharts')>()),
-  ResponsiveContainer: ({ children }: { children: ReactElement<{ height: number; width: number }> }) =>
-    cloneElement(children, { height: 400, width: 800 })
+  ResponsiveContainer: ({ children }: { children: ReactElement<{ height: number; width: number }> }) => {
+    return cloneElement(children, { height: 400, width: 800 });
+  }
 }));
 
 const JANUARY_SECOND = new Date(2026, 0, 2, 12).getTime();
@@ -130,11 +131,12 @@ describe('RecordScatterChart', () => {
     );
   });
 
-  const tooltipRows = (container: HTMLElement) =>
-    [...container.querySelectorAll('.recharts-tooltip-item')].map((item) => [
+  const tooltipRows = (container: HTMLElement) => {
+    return [...container.querySelectorAll('.recharts-tooltip-item')].map((item) => [
       item.querySelector('.recharts-tooltip-item-name')?.textContent,
       item.querySelector('.recharts-tooltip-item-value')?.textContent
     ]);
+  };
 
   it('should name the tooltip rows after the axes rather than the underlying keys', async () => {
     vi.useFakeTimers({

@@ -23,15 +23,15 @@ const SCORE = { key: 'score', label: 'Score' };
 
 describe('useGraphData', () => {
   it('should keep only the selected measures, so unselected ones are not plotted', () => {
-    const { result } = renderHook(() =>
-      useGraphData({ records: [record(1, { mood: 3, score: 10 })], selectedMeasures: [SCORE] })
-    );
+    const { result } = renderHook(() => {
+      return useGraphData({ records: [record(1, { mood: 3, score: 10 })], selectedMeasures: [SCORE] });
+    });
     expect(result.current).toEqual([{ __time__: 1, score: 10 }]);
   });
 
   it('should order the points by time, so the line is drawn left to right', () => {
-    const { result } = renderHook(() =>
-      useGraphData({
+    const { result } = renderHook(() => {
+      return useGraphData({
         records: [
           record(3, { score: 30 }),
           record(1, { score: 10 }),
@@ -39,16 +39,16 @@ describe('useGraphData', () => {
           record(2, { score: 21 })
         ],
         selectedMeasures: [SCORE]
-      })
-    );
+      });
+    });
     expect(result.current.map(({ __time__ }) => __time__)).toEqual([1, 2, 2, 3]);
   });
 
   it('should add the regression line for a measure with a model, rounded to two decimals', () => {
     const models: LinearRegressionResults = { score: { intercept: 1, slope: 0.3333, stdErr: 0 } };
-    const { result } = renderHook(() =>
-      useGraphData({ models, records: [record(2, { mood: 3, score: 10 })], selectedMeasures: [SCORE] })
-    );
+    const { result } = renderHook(() => {
+      return useGraphData({ models, records: [record(2, { mood: 3, score: 10 })], selectedMeasures: [SCORE] });
+    });
     expect(result.current).toEqual([{ __time__: 2, score: 10, scoreGroup: 1.67 }]);
   });
 

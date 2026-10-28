@@ -19,12 +19,13 @@ vi.mock('@/store', () => ({
 
 const CHILD_TEXT = 'Protected Content';
 
-const renderProvider = () =>
-  render(
+const renderProvider = () => {
+  return render(
     <DisclaimerProvider>
       <p>{CHILD_TEXT}</p>
     </DisclaimerProvider>
   );
+};
 
 describe('DisclaimerProvider', () => {
   beforeEach(() => {

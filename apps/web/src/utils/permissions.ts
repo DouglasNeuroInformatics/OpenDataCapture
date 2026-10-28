@@ -40,12 +40,16 @@ const $AddPermissionFormData = z
   });
 
 /** Every action, or once a resource is chosen, only those a grant on it can use. */
-const grantableActions = (subject: AppSubjectName | undefined): AppAction[] =>
-  $AppAction.options.filter((action) => subject === undefined || isGrantablePermission({ action, subject }));
+const grantableActions = (subject: AppSubjectName | undefined): AppAction[] => {
+  return $AppAction.options.filter((action) => subject === undefined || isGrantablePermission({ action, subject }));
+};
 
 /** Every resource, or once an action is chosen, only those a grant of it can reach. */
-const grantableSubjects = (action: AppAction | undefined): AppSubjectName[] =>
-  $AppSubjectName.options.filter((subject) => action === undefined || isGrantablePermission({ action, subject }));
+const grantableSubjects = (action: AppAction | undefined): AppSubjectName[] => {
+  return $AppSubjectName.options.filter(
+    (subject) => action === undefined || isGrantablePermission({ action, subject })
+  );
+};
 
 /** The stored form of a grant: null when the resource cannot be scoped, or every group was chosen. */
 const toUserPermission = ({ action, scope, subject }: AddPermissionFormData): UserPermission => ({
@@ -54,24 +58,33 @@ const toUserPermission = ({ action, scope, subject }: AddPermissionFormData): Us
   subject
 });
 
-const isSamePermission = (a: UserPermission, b: UserPermission): boolean =>
-  a.action === b.action && a.subject === b.subject && a.groupId === b.groupId;
+const isSamePermission = (a: UserPermission, b: UserPermission): boolean => {
+  return a.action === b.action && a.subject === b.subject && a.groupId === b.groupId;
+};
 
-const withPermission = (permissions: Permissions, permission: UserPermission): Permissions =>
-  permissions.some((existing) => isSamePermission(existing, permission)) ? permissions : [...permissions, permission];
+const withPermission = (permissions: Permissions, permission: UserPermission): Permissions => {
+  return permissions.some((existing) => isSamePermission(existing, permission))
+    ? permissions
+    : [...permissions, permission];
+};
 
 /** A row with an action or resource chosen that is not yet a valid grant. The scope alone is preselected, so it does not count as started. */
-const isIncompleteDraft = (draft: PermissionDraft): boolean =>
-  (draft.action !== undefined || draft.subject !== undefined) && !$AddPermissionFormData.safeParse(draft).success;
+const isIncompleteDraft = (draft: PermissionDraft): boolean => {
+  return (
+    (draft.action !== undefined || draft.subject !== undefined) && !$AddPermissionFormData.safeParse(draft).success
+  );
+};
 
-const withPermissionDrafts = (permissions: Permissions, drafts: PermissionDraft[]): Permissions =>
-  drafts.reduce((result, draft) => {
+const withPermissionDrafts = (permissions: Permissions, drafts: PermissionDraft[]): Permissions => {
+  return drafts.reduce((result, draft) => {
     const parsed = $AddPermissionFormData.safeParse(draft);
     return parsed.success ? withPermission(result, toUserPermission(parsed.data)) : result;
   }, permissions);
+};
 
-const withoutPermission = (permissions: Permissions, index: number): Permissions =>
-  permissions.filter((_, i) => i !== index);
+const withoutPermission = (permissions: Permissions, index: number): Permissions => {
+  return permissions.filter((_, i) => i !== index);
+};
 
 export {
   $AddPermissionFormData,

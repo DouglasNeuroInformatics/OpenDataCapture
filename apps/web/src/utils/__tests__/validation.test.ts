@@ -16,9 +16,11 @@ import {
 
 const t: TranslateFunction<TranslationKey> = (arg) => (typeof arg === 'string' ? arg : (arg.en ?? ''));
 
-const parseWith = (schema: z.ZodType<string>) => (value: string) => {
-  const result = schema.safeParse(value);
-  return { issues: result.error?.issues ?? [], success: result.success };
+const parseWith = (schema: z.ZodType<string>) => {
+  return (value: string) => {
+    const result = schema.safeParse(value);
+    return { issues: result.error?.issues ?? [], success: result.success };
+  };
 };
 
 const parseEmail = parseWith($Email(t));

@@ -572,11 +572,11 @@ describe('useInstrumentVisualization', () => {
         ...createMockRecords({ someValue: 'abc' }),
         { ...createMockRecords({ someValue: 'xyz' })[0]!, id: 'record-2', subjectId: 'group-1$subject-2' }
       ];
-      const { result } = renderHook(() =>
-        useInstrumentVisualization({
+      const { result } = renderHook(() => {
+        return useInstrumentVisualization({
           params: { filterRecord: (record) => record.someValue === 'xyz', subjectId: 'testId' }
-        })
-      );
+        });
+      });
       await waitFor(() => expect(result.current.records).toHaveLength(1));
       expect(result.current.records[0]!.someValue).toBe('xyz');
     });

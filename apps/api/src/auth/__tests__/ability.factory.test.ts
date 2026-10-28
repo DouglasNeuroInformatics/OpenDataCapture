@@ -236,8 +236,8 @@ describe('AbilityFactory', () => {
   });
 
   it('should refuse to build an ability from a stored grant confined to a group on a resource that cannot be', () => {
-    const build = () =>
-      abilityFactory.createForPayload({
+    const build = () => {
+      return abilityFactory.createForPayload({
         additionalPermissions: [{ action: 'read', groupId: 'group-1', subject: 'Instrument' }],
         basePermissionLevel: null,
         firstName: 'Test',
@@ -246,6 +246,7 @@ describe('AbilityFactory', () => {
         lastName: 'User',
         username: 'granted-user'
       } as any);
+    };
 
     expect(build).toThrow("Cannot confine permission 'read Instrument' to group 'group-1'");
   });

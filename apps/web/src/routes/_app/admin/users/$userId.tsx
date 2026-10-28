@@ -206,7 +206,9 @@ const UserEditor = ({ userId }: { userId: string }) => {
               key={savedProfileCount}
               onError={(error) => setSubmitErrorMessage(validationSummary(error))}
               onSubmit={async ({ confirmPassword: _, email, groupIds, phoneNumber, ...data }) => {
-                if (isSaving) return undefined;
+                if (isSaving) {
+                  return undefined;
+                }
                 if (permissionDrafts.some(isIncompleteDraft)) {
                   setHighlightIncompleteDrafts(true);
                   const errorMessage = t({

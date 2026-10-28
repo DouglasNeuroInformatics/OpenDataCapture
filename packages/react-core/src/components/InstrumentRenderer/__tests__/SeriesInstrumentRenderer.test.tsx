@@ -327,15 +327,15 @@ describe('SeriesInstrumentRenderer', () => {
 
   it('should refuse an initial series index past the last item', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    expect(() =>
-      render(
+    expect(() => {
+      return render(
         <SeriesInstrumentRenderer
           initialSeriesIndex={2}
           target={createTarget({ skipProgress: true })}
           onSubmit={vi.fn()}
         />
-      )
-    ).toThrow("Initial series index '2' must be less than length of items '2'");
+      );
+    }).toThrow("Initial series index '2' must be less than length of items '2'");
   });
 
   it('should refuse an item submission its validation schema rejects, rather than pass invalid data on', async () => {

@@ -53,8 +53,12 @@ const CompositeIcon = ({ Badge }: { Badge: React.FC<{ className?: string }> }) =
 );
 
 const searchModeToMode = (searchMode: string | undefined): Mode => {
-  if (searchMode === 'create') return 'CREATE';
-  if (searchMode === 'delete') return 'DELETE';
+  if (searchMode === 'create') {
+    return 'CREATE';
+  }
+  if (searchMode === 'delete') {
+    return 'DELETE';
+  }
   return 'LANDING';
 };
 

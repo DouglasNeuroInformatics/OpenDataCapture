@@ -43,8 +43,9 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
 vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/hooks')>()),
   useDownload: () => mocks.download,
-  useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) =>
-    selector({ addNotification: mocks.addNotification }),
+  useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) => {
+    return selector({ addNotification: mocks.addNotification });
+  },
   useTheme: () => [mocks.theme]
 }));
 vi.mock('axios', () => ({ default: mocks.axios }));
@@ -133,8 +134,9 @@ const resolveExport = (entries: InstrumentRecordsExport) => {
   mocks.axios.get.mockResolvedValue({ data: pack(entries) });
 };
 
-const notified = (...types: Notification['type'][]) =>
-  mocks.addNotification.mock.calls.some(([notification]) => types.includes(notification.type));
+const notified = (...types: Notification['type'][]) => {
+  return mocks.addNotification.mock.calls.some(([notification]) => types.includes(notification.type));
+};
 
 /** Runs out the export's 350ms minimum wait, then waits for the notification that ends the export. */
 const settleExport = async () => {
@@ -337,8 +339,9 @@ describe('Route', () => {
       fireEvent.change(screen.getByTestId('datahub-filter-collected-preset'), { target: { value: preset } });
     };
 
-    const collectedInput = (bound: 'max' | 'min') =>
-      screen.getByTestId<HTMLInputElement>(`datahub-filter-collected-${bound}`);
+    const collectedInput = (bound: 'max' | 'min') => {
+      return screen.getByTestId<HTMLInputElement>(`datahub-filter-collected-${bound}`);
+    };
 
     beforeEach(() => {
       mocks.summaries = [

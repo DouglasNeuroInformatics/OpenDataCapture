@@ -44,15 +44,16 @@ describe('GatewaySynchronizer', () => {
     subjectId: 'subject-1'
   });
 
-  const createRemoteAssignment = (id: string): RemoteAssignment =>
-    ({
+  const createRemoteAssignment = (id: string): RemoteAssignment => {
+    return {
       completedAt: new Date(),
       encryptedData: 'encrypted-data',
       groupId: null,
       id,
       status: 'COMPLETE',
       symmetricKey: 'symmetric-key'
-    }) as RemoteAssignment;
+    } as RemoteAssignment;
+  };
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({

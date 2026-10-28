@@ -164,19 +164,17 @@ const RouteComponent = () => {
     return Array.from(keys);
   }, [records]);
 
-  const measureColumns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(
-    () =>
-      measureKeys.map((key) => ({
-        accessorKey: key,
-        cell: (ctx) => {
-          const value = formatRecordValue(ctx.getValue());
-          return <TruncatedCell data-testid={`instrument-table-cell-${key}`} title={String(value)} value={value} />;
-        },
-        header: ({ column }) => <SortableHeader column={column} label={camelToSnakeCase(key).toUpperCase()} />,
-        id: key
-      })),
-    [measureKeys]
-  );
+  const measureColumns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(() => {
+    return measureKeys.map((key) => ({
+      accessorKey: key,
+      cell: (ctx) => {
+        const value = formatRecordValue(ctx.getValue());
+        return <TruncatedCell data-testid={`instrument-table-cell-${key}`} title={String(value)} value={value} />;
+      },
+      header: ({ column }) => <SortableHeader column={column} label={camelToSnakeCase(key).toUpperCase()} />,
+      id: key
+    }));
+  }, [measureKeys]);
 
   // Both subject destinations carry where they were opened from, so the subject hub's return comes
   // back to this record table rather than dropping the reader on the subject index.

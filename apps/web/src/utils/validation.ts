@@ -47,11 +47,11 @@ function omittedIfUnchanged(value: string | undefined, storedValue: null | strin
 }
 
 function $Email(t: TranslateFunction<TranslationKey>) {
-  return blankOr((value) =>
-    z.email().safeParse(value).success
+  return blankOr((value) => {
+    return z.email().safeParse(value).success
       ? null
-      : t({ en: 'Invalid email address', es: 'Dirección de correo no válida', fr: 'Adresse courriel invalide' })
-  );
+      : t({ en: 'Invalid email address', es: 'Dirección de correo no válida', fr: 'Adresse courriel invalide' });
+  });
 }
 
 /**

@@ -50,7 +50,7 @@ describe('NavButton', () => {
   });
 
   it('should apply the active styling and the caller active class when active', () => {
-    render(<NavButton activeClassName="is-current" icon={HomeIcon} isActive={true} label="Datahub" url="/datahub" />);
+    render(<NavButton isActive activeClassName="is-current" icon={HomeIcon} label="Datahub" url="/datahub" />);
     expect(classes()).toEqual(expect.arrayContaining(['bg-slate-800', 'is-current']));
   });
 

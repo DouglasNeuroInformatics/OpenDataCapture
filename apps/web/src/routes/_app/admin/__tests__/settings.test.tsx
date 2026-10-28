@@ -47,11 +47,12 @@ vi.mock('@/store', () => ({
       groupSwitcherPosition: GroupSwitcherPosition;
       setGroupSwitcherPosition: typeof mocks.setGroupSwitcherPosition;
     }) => TSelected
-  ) =>
-    selector({
+  ) => {
+    return selector({
       groupSwitcherPosition: mocks.state.groupSwitcherPosition,
       setGroupSwitcherPosition: mocks.setGroupSwitcherPosition
-    })
+    });
+  }
 }));
 
 const Page = Route.options.component!;

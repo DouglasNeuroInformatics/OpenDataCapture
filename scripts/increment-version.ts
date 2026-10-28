@@ -238,13 +238,12 @@ async function askConfirmation(prompt: Prompt, question: string): Promise<boolea
 
 function commitRelease(files: string[], version: string): void {
   // Explicit pathspecs, so anything else already staged stays staged rather than riding along.
-  const unchanged = files.filter(
-    (file) =>
-      !run('git', ['diff', '--name-only', 'HEAD', '--', file], {
-        stderr: 'inherit',
-        stdout: 'capture'
-      }).trim()
-  );
+  const unchanged = files.filter((file) => {
+    return !run('git', ['diff', '--name-only', 'HEAD', '--', file], {
+      stderr: 'inherit',
+      stdout: 'capture'
+    }).trim();
+  });
   if (unchanged.length > 0) {
     throw new Error(`Refusing to commit: these files were not modified by the bump: ${unchanged.join(', ')}`);
   }

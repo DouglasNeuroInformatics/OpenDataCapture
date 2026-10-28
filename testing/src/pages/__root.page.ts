@@ -20,7 +20,7 @@ export abstract class RootPage {
     let url: string = args[0];
     if (args[1]) {
       Object.entries(args[1]).forEach(([key, value]) => {
-        url = url.replace('$' + key, String(value));
+        url = url.replace(`$${key}`, String(value));
       });
     }
     return url;

@@ -11,10 +11,11 @@ export function useSyncInstrumentRepoMutation() {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const { t } = useTranslation();
   return useMutation({
-    mutationFn: ({ id }: { id: string }) =>
-      axios.post(`/v1/instrument-repos/${id}/sync`, undefined, {
+    mutationFn: ({ id }: { id: string }) => {
+      return axios.post(`/v1/instrument-repos/${id}/sync`, undefined, {
         meta: { disableDefaultErrorNotification: true, disableDefaultTimeout: true }
-      }),
+      });
+    },
     onError(err) {
       addNotification({
         message: getApiErrorMessage(

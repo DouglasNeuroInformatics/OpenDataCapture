@@ -35,8 +35,9 @@ export const $AppSubjectName = z.enum([
 export type GroupScopableSubjectName = z.infer<typeof $GroupScopableSubjectName>;
 export const $GroupScopableSubjectName = $AppSubjectName.exclude(['all', 'Instrument']);
 
-export const isGroupScopableSubject = (subject: AppSubjectName): subject is GroupScopableSubjectName =>
-  $GroupScopableSubjectName.safeParse(subject).success;
+export const isGroupScopableSubject = (subject: AppSubjectName): subject is GroupScopableSubjectName => {
+  return $GroupScopableSubjectName.safeParse(subject).success;
+};
 
 export type BaseAppAbility = Ability<[AppAction, AppSubjectName]>;
 
@@ -70,8 +71,9 @@ export const $Permissions = z.array($UserPermission);
  * `apps/api`, so a grant of any `User` action but `read` does nothing. A rule stored before this
  * existed still parses through {@link $UserPermission}; only a new grant is refused.
  */
-export const isGrantablePermission = ({ action, subject }: Pick<UserPermission, 'action' | 'subject'>): boolean =>
-  subject !== 'User' || action === 'read';
+export const isGrantablePermission = ({ action, subject }: Pick<UserPermission, 'action' | 'subject'>): boolean => {
+  return subject !== 'User' || action === 'read';
+};
 
 /**
  * Every language the interface may be displayed in, in the order they are offered to a user.
@@ -129,8 +131,9 @@ export const DEFAULT_ACTIVE_LANGUAGES: ActiveLanguages = ['en', 'fr'];
  * This is the one place that policy is decided; both the moment it is applied — before the app
  * renders, and again whenever an admin changes the set mid-session — resolve through here.
  */
-export const resolveActiveLanguage = (language: Language, activeLanguages: ActiveLanguages): Language =>
-  activeLanguages.includes(language) ? language : activeLanguages[0];
+export const resolveActiveLanguage = (language: Language, activeLanguages: ActiveLanguages): Language => {
+  return activeLanguages.includes(language) ? language : activeLanguages[0];
+};
 
 /**
  * A string authored in each of the application's languages. Every field is nullish so content
@@ -163,9 +166,9 @@ export const $BaseModel = z.object({
   updatedAt: z.coerce.date()
 });
 
-export const $Json: z.ZodType<Json> = z.lazy(() =>
-  z.union([$JsonLiteral, z.array($Json), z.record(z.string(), $Json)])
-);
+export const $Json: z.ZodType<Json> = z.lazy(() => {
+  return z.union([$JsonLiteral, z.array($Json), z.record(z.string(), $Json)]);
+});
 
 export const $LicenseIdentifier = z
   .string()

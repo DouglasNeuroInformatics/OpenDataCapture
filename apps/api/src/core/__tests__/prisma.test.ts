@@ -26,9 +26,9 @@ vi.mock('@prisma/client', async (importOriginal) => ({
 }));
 
 /** Only `getUri` and `stop` are used on the replica set the factory starts. */
-const createReplSet = vi.hoisted(() =>
-  vi.fn<(options: unknown) => Promise<{ getUri: (db: string) => string; stop: () => Promise<boolean> }>>()
-);
+const createReplSet = vi.hoisted(() => {
+  return vi.fn<(options: unknown) => Promise<{ getUri: (db: string) => string; stop: () => Promise<boolean> }>>();
+});
 
 vi.mock('mongodb-memory-server', () => ({
   MongoMemoryReplSet: { create: createReplSet }
@@ -66,14 +66,17 @@ function mockClient(existing: { [collection: string]: IndexSpecification[] } = {
 
 /** Built from a list because `perfectionist/sort-objects` alphabetizes an object literal, and the
  * order of an index's fields is the thing under test. */
-const orderedKey = (...fields: string[]): { [field: string]: number } =>
-  Object.fromEntries(fields.map((field) => [field, 1]));
+const orderedKey = (...fields: string[]): { [field: string]: number } => {
+  return Object.fromEntries(fields.map((field) => [field, 1]));
+};
 
-const createdIndexes = (commands: { [key: string]: any }[], collection: string): IndexSpecification[] =>
-  commands.find((command) => command.createIndexes === collection)?.indexes ?? [];
+const createdIndexes = (commands: { [key: string]: any }[], collection: string): IndexSpecification[] => {
+  return commands.find((command) => command.createIndexes === collection)?.indexes ?? [];
+};
 
-const findIndex = (commands: { [key: string]: any }[], collection: string, name: string) =>
-  createdIndexes(commands, collection).find((index) => index.name === name);
+const findIndex = (commands: { [key: string]: any }[], collection: string, name: string) => {
+  return createdIndexes(commands, collection).find((index) => index.name === name);
+};
 
 describe('buildIndexName', () => {
   // db push drops an index the schema does not name, so a name that differs from Prisma's leaves
@@ -185,11 +188,11 @@ describe('ensureDatabaseIndexes', () => {
   // Some server versions report a missing namespace by message alone, without the numeric code.
   it('should recognize a missing collection by its message when MongoDB reports no error code', async () => {
     const client = {
-      $runCommandRaw: vi.fn((command: { [key: string]: unknown }) =>
-        'listIndexes' in command
+      $runCommandRaw: vi.fn((command: { [key: string]: unknown }) => {
+        return 'listIndexes' in command
           ? Promise.reject(new Error('ns does not exist: test.UserModel'))
-          : Promise.resolve({ ok: 1 })
-      )
+          : Promise.resolve({ ok: 1 });
+      })
     };
     await expect(ensureDatabaseIndexes(client)).resolves.toBeUndefined();
   });

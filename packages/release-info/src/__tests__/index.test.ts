@@ -7,8 +7,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const { execMock, gitResult } = vi.hoisted(() => {
   const gitResult = { branch: { stderr: '', stdout: '' }, commit: { stderr: '', stdout: '' } };
   const execMock: unknown = Object.assign(vi.fn(), {
-    [Symbol.for('nodejs.util.promisify.custom')]: (command: string) =>
-      Promise.resolve(command.includes('abbrev-ref') ? gitResult.branch : gitResult.commit)
+    [Symbol.for('nodejs.util.promisify.custom')]: (command: string) => {
+      return Promise.resolve(command.includes('abbrev-ref') ? gitResult.branch : gitResult.commit);
+    }
   });
   return { execMock, gitResult };
 });

@@ -33,8 +33,8 @@ type PrivilegedRequest = {
 const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
   {
     screen: '/admin/users',
-    send: (request, { headers }) =>
-      request.post(`${API}/users`, {
+    send: (request, { headers }) => {
+      return request.post(`${API}/users`, {
         data: {
           basePermissionLevel: 'ADMIN',
           firstName: 'Escalation',
@@ -44,13 +44,15 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
           username: 'escalation-probe'
         },
         headers
-      }),
+      });
+    },
     what: 'create an administrator'
   },
   {
     screen: '/admin/users',
-    send: (request, { headers, userId }) =>
-      request.patch(`${API}/users/${userId}`, { data: { basePermissionLevel: 'ADMIN' }, headers }),
+    send: (request, { headers, userId }) => {
+      return request.patch(`${API}/users/${userId}`, { data: { basePermissionLevel: 'ADMIN' }, headers });
+    },
     what: "raise another user's permission level"
   },
   {
@@ -62,11 +64,12 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
     // Gated on `manage all` rather than `update User`: an `update User` grant is one of the things
     // this route hands out, so holding one must not be enough to reach it.
     screen: '/admin/users/$userId',
-    send: (request, { headers, userId }) =>
-      request.put(`${API}/users/${userId}/permissions`, {
+    send: (request, { headers, userId }) => {
+      return request.put(`${API}/users/${userId}/permissions`, {
         data: { permissions: [{ action: 'manage', groupId: null, subject: 'all' }] },
         headers
-      }),
+      });
+    },
     what: 'grant another user a permission'
   },
   {
@@ -74,22 +77,25 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
     // is the seeded one, so were this ever to succeed it would fail the assertion without also
     // changing instance-wide state under the admin settings spec.
     screen: '/admin/settings and /admin/branding',
-    send: (request, { headers }) =>
-      request.patch(`${API}/setup`, { data: { isExperimentalFeaturesEnabled: false }, headers }),
+    send: (request, { headers }) => {
+      return request.patch(`${API}/setup`, { data: { isExperimentalFeaturesEnabled: false }, headers });
+    },
     what: 'change instance-wide settings'
   },
   {
     // `POST /v1/groups` used to be declared `create Group`, which every group manager passes: the
     // guard sees the subject type, and their `manage Group` rule's condition is invisible to it.
     screen: '/admin/groups',
-    send: (request, { headers, userId }) =>
-      request.post(`${API}/groups`, { data: { name: `Escalation Probe ${userId}`, type: 'CLINICAL' }, headers }),
+    send: (request, { headers, userId }) => {
+      return request.post(`${API}/groups`, { data: { name: `Escalation Probe ${userId}`, type: 'CLINICAL' }, headers });
+    },
     what: 'create a group'
   },
   {
     screen: '/admin/instrument-repos',
-    send: (request, { headers }) =>
-      request.post(`${API}/instrument-repos`, { data: { url: 'https://github.com/example/example' }, headers }),
+    send: (request, { headers }) => {
+      return request.post(`${API}/instrument-repos`, { data: { url: 'https://github.com/example/example' }, headers });
+    },
     what: 'import an instrument repository'
   },
   {
@@ -106,8 +112,12 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
   },
   {
     screen: '/admin/mail',
-    send: (request, { headers }) =>
-      request.patch(`${API}/mail/settings`, { data: { newUserEmailTemplate: { body: {}, subject: {} } }, headers }),
+    send: (request, { headers }) => {
+      return request.patch(`${API}/mail/settings`, {
+        data: { newUserEmailTemplate: { body: {}, subject: {} } },
+        headers
+      });
+    },
     what: 'rewrite the mail configuration or templates'
   },
   {
@@ -617,8 +627,9 @@ test.describe('server-side authorization', () => {
     const foreignSeriesId = await api.createSeries(foreignGroup.id, `Foreign Series ${uniqueId}`);
     const headers = { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` };
 
-    const records = (seriesInstrumentId: string) =>
-      apiRequestContext.get(`${API}/instrument-records?seriesInstrumentId=${seriesInstrumentId}`, { headers });
+    const records = (seriesInstrumentId: string) => {
+      return apiRequestContext.get(`${API}/instrument-records?seriesInstrumentId=${seriesInstrumentId}`, { headers });
+    };
 
     const foreign = await records(foreignSeriesId);
     const absent = await records('0'.repeat(24));

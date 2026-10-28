@@ -173,9 +173,9 @@ describe('resolveSubjectIds', () => {
   });
 
   it('should number errors by the row of the user file, counting the header as row 1', async () => {
-    const errors = await failureOf(() =>
-      resolve('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M\nAnne,Roy,2000-01-02,X')
-    );
+    const errors = await failureOf(() => {
+      return resolve('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M\nAnne,Roy,2000-01-02,X');
+    });
     expect(errors[0]).toMatchObject({ row: 3 });
   });
 
@@ -195,9 +195,9 @@ describe('resolveSubjectIds', () => {
   });
 
   it('should reject two PII rows describing the same person, which resolve to one id', async () => {
-    const errors = await failureOf(() =>
-      resolve('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M\nJean,Tremblay,2000-01-01,M')
-    );
+    const errors = await failureOf(() => {
+      return resolve('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M\nJean,Tremblay,2000-01-01,M');
+    });
     expect(errors[0]?.message).toContain('more than once');
   });
 

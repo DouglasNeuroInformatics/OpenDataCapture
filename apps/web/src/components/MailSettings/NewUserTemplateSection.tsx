@@ -97,9 +97,9 @@ export const NewUserTemplateSection = ({
           disabled={isSaving || Boolean(error)}
           type="button"
           variant="primary"
-          onClick={() =>
-            onSave({ body: omitBlankLanguages(template.body), subject: omitBlankLanguages(template.subject) })
-          }
+          onClick={() => {
+            onSave({ body: omitBlankLanguages(template.body), subject: omitBlankLanguages(template.subject) });
+          }}
         >
           {isSaving && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
           {t('core.save')}

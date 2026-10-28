@@ -39,11 +39,12 @@ const renderCard = (
 };
 
 /** The text of the row whose label starts with `label`, or undefined when that row is not rendered. */
-const rowText = (label: string) =>
-  screen
+const rowText = (label: string) => {
+  return screen
     .queryAllByText(`${label}:`, { exact: false, selector: 'span' })
     .map((element) => element.parentElement?.textContent)
     .at(0);
+};
 
 const openLicenseTooltip = () => {
   fireEvent.focus(screen.getByRole('button', { name: '' }));

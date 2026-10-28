@@ -206,9 +206,9 @@ describe('Zod3', () => {
     it('should report an unexpected failure in a record array without a cause', () => {
       const multiValues = new Array<Zod3.ZodTypeNameResult>(1);
       expect(
-        uploadErrorOf(() =>
-          Zod3.generateSampleData({ isOptional: false, multiKeys: ['a'], multiValues, typeName: 'ZodArray' })
-        )
+        uploadErrorOf(() => {
+          return Zod3.generateSampleData({ isOptional: false, multiKeys: ['a'], multiValues, typeName: 'ZodArray' });
+        })
       ).toEqual({
         en: 'Invalid Record Array Error',
         fr: "Erreur de tableau d'enregistrements invalide"
@@ -511,14 +511,15 @@ describe('Zod3', () => {
         z3.object({ items: z3.array(z3.object({ name: z3.string(), quantity: z3.number().optional() })) })
       );
 
-      const processItems = (value: string) =>
-        processInstrumentCSV(
+      const processItems = (value: string) => {
+        return processInstrumentCSV(
           csvFile([
             ['subjectID', 'date', 'items'],
             ['subject1', '2024-01-01', value]
           ]),
           instrument
         );
+      };
 
       it('should convert each record with the type of its field', async () => {
         await expect(processItems('RECORD_ARRAY(name:item1,quantity:5;name:item2,quantity:3;)')).resolves.toMatchObject(

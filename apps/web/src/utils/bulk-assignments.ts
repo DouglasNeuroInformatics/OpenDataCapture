@@ -112,9 +112,9 @@ function buildMapping(headers: string[]): {
 
   for (const header of headers) {
     const normalized = normalizeHeader(header);
-    const field = (Object.keys(FIELD_ALIASES) as CanonicalField[]).find((candidate) =>
-      FIELD_ALIASES[candidate].includes(normalized)
-    );
+    const field = (Object.keys(FIELD_ALIASES) as CanonicalField[]).find((candidate) => {
+      return FIELD_ALIASES[candidate].includes(normalized);
+    });
     if (!field) {
       continue;
     }
@@ -295,8 +295,8 @@ export async function parseWorkbook(file: File): Promise<BulkParseResult> {
   const headers = Object.keys(rows[0] ?? {}).map((header) => header.trim());
   return buildResult(
     headers,
-    rows.map((row) =>
-      Object.fromEntries(
+    rows.map((row) => {
+      return Object.fromEntries(
         Object.entries(row).map(([key, value]) => [
           key.trim(),
           value instanceof Date
@@ -305,8 +305,8 @@ export async function parseWorkbook(file: File): Promise<BulkParseResult> {
               ? String(value).trim()
               : ''
         ])
-      )
-    )
+      );
+    })
   );
 }
 

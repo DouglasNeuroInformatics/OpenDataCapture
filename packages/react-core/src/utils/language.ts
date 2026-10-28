@@ -19,7 +19,8 @@ const LANGUAGE_LABELS = {
  * Options for libui's `LanguageToggle`, which labels each language with its own name so a reader
  * can find their language without already being able to read the interface.
  */
-const toLanguageToggleOptions = (languages: readonly Language[]): { [L in Language]?: string } =>
-  Object.fromEntries(languages.map((language) => [language, LANGUAGE_LABELS[language][language]]));
+const toLanguageToggleOptions = (languages: readonly Language[]): { [L in Language]?: string } => {
+  return Object.fromEntries(languages.map((language) => [language, LANGUAGE_LABELS[language][language]]));
+};
 
 export { LANGUAGE_LABELS, LANGUAGES, toLanguageToggleOptions };

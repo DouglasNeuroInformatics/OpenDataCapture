@@ -62,15 +62,15 @@ describe('DemoService', () => {
 
   /** Groups come back as created, falling back to personal-info identification like a real group. */
   const createGroupsIdentifiedBy = (method?: 'CUSTOM_ID') => {
-    groupsService.create.mockImplementation((data: $CreateGroupData) =>
-      Promise.resolve({
+    groupsService.create.mockImplementation((data: $CreateGroupData) => {
+      return Promise.resolve({
         ...data,
         id: `${data.name}-id`,
         settings: {
           defaultIdentificationMethod: method ?? data.settings?.defaultIdentificationMethod ?? 'PERSONAL_INFO'
         }
-      })
-    );
+      });
+    });
   };
 
   const subjectIds = () => subjectsService.create.mock.calls.map(([subject]) => subject.id);

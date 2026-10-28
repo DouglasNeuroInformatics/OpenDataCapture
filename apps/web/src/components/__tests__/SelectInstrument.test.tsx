@@ -8,8 +8,9 @@ import '@/services/i18n';
 
 const OPTIONS = { 'instrument-1': 'Happiness Questionnaire', 'instrument-2': 'Brief Psychiatric Rating Scale' };
 
-const openDropdown = () =>
-  fireEvent.keyDown(screen.getByTestId('select-instrument-dropdown-trigger'), { key: 'Enter' });
+const openDropdown = () => {
+  return fireEvent.keyDown(screen.getByTestId('select-instrument-dropdown-trigger'), { key: 'Enter' });
+};
 
 describe('SelectInstrument', () => {
   beforeEach(() => {

@@ -35,11 +35,13 @@ const createPayload = (groups: Group[]): TokenPayload => ({
   username: 'jdoe'
 });
 
-const encodeSegment = (value: object) =>
-  btoa(JSON.stringify(value)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+const encodeSegment = (value: object) => {
+  return btoa(JSON.stringify(value)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+};
 
-const createAccessToken = (payload: TokenPayload) =>
-  [encodeSegment({ alg: 'none', typ: 'JWT' }), encodeSegment(payload), 'signature'].join('.');
+const createAccessToken = (payload: TokenPayload) => {
+  return [encodeSegment({ alg: 'none', typ: 'JWT' }), encodeSegment(payload), 'signature'].join('.');
+};
 
 const session: Session = {
   createdAt: new Date('2026-01-01T00:00:00.000Z'),

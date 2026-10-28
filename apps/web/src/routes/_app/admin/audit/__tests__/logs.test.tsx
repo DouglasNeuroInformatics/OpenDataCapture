@@ -44,11 +44,13 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
-  createFileRoute: () => (options: object) => ({
-    options,
-    useNavigate: () => mocks.navigate,
-    useSearch: () => mocks.search
-  })
+  createFileRoute: () => {
+    return (options: object) => ({
+      options,
+      useNavigate: () => mocks.navigate,
+      useSearch: () => mocks.search
+    });
+  }
 }));
 vi.mock('@douglasneuroinformatics/libui/components', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@douglasneuroinformatics/libui/components')>();
@@ -145,10 +147,11 @@ const chooseFilter = (testId: string, label: string) => {
   fireEvent.click(within(openFilter(testId)).getByRole('menuitemradio', { name: label }));
 };
 
-const filterOptions = (testId: string) =>
-  within(openFilter(testId))
+const filterOptions = (testId: string) => {
+  return within(openFilter(testId))
     .getAllByRole('menuitemradio')
     .map((item) => item.textContent);
+};
 
 /** The search the last navigation produces from the current one. */
 const navigatedSearch = (current: AuditLogsSearch = mocks.search) => {

@@ -30,10 +30,11 @@ vi.mock('@/store', () => ({ useAppStore: { getState: () => mocks.store } }));
 
 const components = await vi.hoisted(async () => {
   const React = await import('react');
-  const wrapper =
-    (testId: string) =>
-    ({ children }: { children: ReactNode }) =>
-      React.createElement('div', { 'data-testid': testId }, children);
+  const wrapper = (testId: string) => {
+    return ({ children }: { children: ReactNode }) => {
+      return React.createElement('div', { 'data-testid': testId }, children);
+    };
+  };
   return {
     DisclaimerProvider: wrapper('disclaimer-provider'),
     ForceClearQueryCacheProvider: wrapper('force-clear-query-cache-provider'),

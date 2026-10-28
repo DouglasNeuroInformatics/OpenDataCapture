@@ -20,8 +20,9 @@ const session: Session = {
   userId: 'user-1'
 };
 
-const createStore = () =>
-  create(immer<AppStore>((...a) => ({ ...useAppStore.getState(), ...createSessionSlice(...a) })));
+const createStore = () => {
+  return create(immer<AppStore>((...a) => ({ ...useAppStore.getState(), ...createSessionSlice(...a) })));
+};
 
 describe('createSessionSlice', () => {
   let store: ReturnType<typeof createStore>;

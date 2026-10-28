@@ -40,14 +40,15 @@ const createResponse = (config: InternalAxiosRequestConfig, status: number): Axi
   statusText: ''
 });
 
-const createError = (config: InternalAxiosRequestConfig, status?: number) =>
-  new AxiosError(
+const createError = (config: InternalAxiosRequestConfig, status?: number) => {
+  return new AxiosError(
     'Request failed',
     status ? AxiosError.ERR_BAD_RESPONSE : AxiosError.ERR_NETWORK,
     config,
     null,
     status ? createResponse(config, status) : undefined
   );
+};
 
 /** An adapter that answers each call with the next outcome: a status to respond with, or an error to reject with. */
 const createAdapter = (...outcomes: ({ fail?: number | true } | { status: number })[]) => {

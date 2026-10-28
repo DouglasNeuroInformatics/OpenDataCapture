@@ -45,10 +45,12 @@ const renderTable = (records: VisualizationRecord[], instrumentId: null | string
   render(<Component />);
 };
 
-const headers = () =>
-  Array.from(screen.getByTestId('data-table-head').firstElementChild!.children, (header) => header.textContent).filter(
-    Boolean
-  );
+const headers = () => {
+  return Array.from(
+    screen.getByTestId('data-table-head').firstElementChild!.children,
+    (header) => header.textContent
+  ).filter(Boolean);
+};
 
 describe('Route', () => {
   beforeEach(() => {

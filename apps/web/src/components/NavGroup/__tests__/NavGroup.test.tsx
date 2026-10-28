@@ -28,8 +28,9 @@ const items: NavItem[] = [
   }
 ];
 
-const renderGroup = (onNavigate?: (url: string, search?: { [key: string]: string }) => void) =>
-  render(<NavGroup icon={LayersIcon} items={items} label="Tools" onNavigate={onNavigate} />);
+const renderGroup = (onNavigate?: (url: string, search?: { [key: string]: string }) => void) => {
+  return render(<NavGroup icon={LayersIcon} items={items} label="Tools" onNavigate={onNavigate} />);
+};
 
 const toggle = (label = 'Tools') => screen.getByRole('button', { name: label });
 const isExpanded = (label = 'Tools') => toggle(label).getAttribute('aria-expanded') === 'true';

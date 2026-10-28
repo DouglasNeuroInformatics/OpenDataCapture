@@ -46,16 +46,22 @@ const bilingualForm = {
         comment: {
           deps: [],
           kind: 'dynamic',
-          render: (data: { agree?: boolean }) =>
-            data?.agree ? { kind: 'string', label: { en: 'Comment', fr: 'Commentaire' }, variant: 'textarea' } : null
+          render: (data: { agree?: boolean }) => {
+            return data?.agree
+              ? { kind: 'string', label: { en: 'Comment', fr: 'Commentaire' }, variant: 'textarea' }
+              : null;
+          }
         },
         exposures: {
           fieldset: {
             reaction: {
               deps: [],
               kind: 'dynamic',
-              render: (data: { severity?: number }) =>
-                data?.severity ? { kind: 'string', label: { en: 'Reaction', fr: 'Réaction' }, variant: 'input' } : null
+              render: (data: { severity?: number }) => {
+                return data?.severity
+                  ? { kind: 'string', label: { en: 'Reaction', fr: 'Réaction' }, variant: 'input' }
+                  : null;
+              }
             },
             severity: {
               kind: 'number',

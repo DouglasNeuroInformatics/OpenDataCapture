@@ -18,13 +18,14 @@ type StorageEnv = {
 };
 
 /** A real client, so presigning runs offline exactly as it does against MinIO. */
-const createS3Client = () =>
-  new S3Client({
+const createS3Client = () => {
+  return new S3Client({
     credentials: { accessKeyId: 'access-key', secretAccessKey: 'secret-key' },
     endpoint: 'http://minio:9000',
     forcePathStyle: true,
     region: 'us-east-1'
   });
+};
 
 async function createStorageService(env: StorageEnv, s3: null | Pick<S3Client, 'send'> | S3Client) {
   const configService = MockFactory.createMock(ConfigService);
@@ -57,8 +58,12 @@ describe('StorageService', () => {
     }).compile();
     configService = configModule.get(ConfigService);
     configService.get.mockImplementation((key) => {
-      if (key === 'STORAGE_ENABLED') return true;
-      if (key === 'STORAGE_BUCKET') return 'test-bucket';
+      if (key === 'STORAGE_ENABLED') {
+        return true;
+      }
+      if (key === 'STORAGE_BUCKET') {
+        return 'test-bucket';
+      }
       return undefined;
     });
     const moduleRef = await Test.createTestingModule({

@@ -171,9 +171,9 @@ const Toolbar = ({
                 data-testid={`instrument-table-filter-kind-${kind}`}
                 key={kind}
                 onCheckedChange={(checked) => {
-                  kindColumn.setFilterValue((previous: KindFilter) =>
-                    checked ? [...previous, kind] : previous.filter((item) => item !== kind)
-                  );
+                  kindColumn.setFilterValue((previous: KindFilter) => {
+                    return checked ? [...previous, kind] : previous.filter((item) => item !== kind);
+                  });
                 }}
                 onSelect={(e) => e.preventDefault()}
               >
@@ -394,8 +394,9 @@ export const InstrumentTable = ({
               const value = ctx.getValue() as Date | null;
               return value ? toBasicISOString(value) : t({ en: 'None', es: 'Ninguno', fr: 'Aucun' });
             },
-            filterFn: (row, id, filter: CollectedFilter) =>
-              matchesCollectedFilter(row.getValue<Date | null>(id), filter),
+            filterFn: (row, id, filter: CollectedFilter) => {
+              return matchesCollectedFilter(row.getValue<Date | null>(id), filter);
+            },
             header: ({ column }) => (
               <SortableHeader
                 column={column}

@@ -11,8 +11,9 @@ import { subjectCustomIdsQueryOptions, useSubjectCustomIdsQuery } from '../useSu
 
 vi.mock('axios');
 
-const runQuery = (groupId?: string) =>
-  new QueryClient().fetchQuery(subjectCustomIdsQueryOptions({ params: { groupId } }));
+const runQuery = (groupId?: string) => {
+  return new QueryClient().fetchQuery(subjectCustomIdsQueryOptions({ params: { groupId } }));
+};
 
 // eslint-disable-next-line @typescript-eslint/unbound-method -- a vitest mock, never invoked as a method
 const get = vi.mocked(axios).get;
@@ -54,12 +55,13 @@ describe('useSubjectCustomIdsQuery', () => {
   it("should suspend until the group's custom ids load, then return them to the form", async () => {
     get.mockResolvedValueOnce({ data: ['group$a'] });
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(
         QueryClientProvider,
         { client: queryClient },
         createElement(Suspense, { fallback: null }, children)
       );
+    };
     const { result } = renderHook(() => useSubjectCustomIdsQuery({ params: { groupId: 'group-1' } }), { wrapper });
     await waitFor(() => expect(result.current?.data).toStrictEqual(['group$a']));
   });

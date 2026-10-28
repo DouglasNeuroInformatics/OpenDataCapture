@@ -13,8 +13,9 @@ export function useUpdateSeriesInstrumentArchiveMutation() {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const { t } = useTranslation();
   return useMutation({
-    mutationFn: ({ id, ...data }: $UpdateSeriesInstrumentData & { id: string }) =>
-      axios.patch(`/v1/instruments/series/${id}`, data, { meta: { disableDefaultErrorNotification: true } }),
+    mutationFn: ({ id, ...data }: $UpdateSeriesInstrumentData & { id: string }) => {
+      return axios.patch(`/v1/instruments/series/${id}`, data, { meta: { disableDefaultErrorNotification: true } });
+    },
     onError(err) {
       addNotification({
         message: getApiErrorMessage(

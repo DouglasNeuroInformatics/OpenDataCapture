@@ -98,7 +98,7 @@ program
       chalk.green('✓') +
         chalk.dim(` Encoded ${files.length} file${files.length === 1 ? '' : 's'} (${shareURL.size} bytes)\n`)
     );
-    process.stdout.write(shareURL.href + '\n');
+    process.stdout.write(`${shareURL.href}\n`);
 
     if (open) {
       openInBrowser(shareURL.href);

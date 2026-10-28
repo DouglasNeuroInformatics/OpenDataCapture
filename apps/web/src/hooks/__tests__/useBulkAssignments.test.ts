@@ -48,8 +48,9 @@ const assignment = {
 const renderWithClient = <T>(hook: () => T) => {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false }, queries: { retry: false } } });
   const result = renderHook(hook, {
-    wrapper: ({ children }: { children: React.ReactNode }) =>
-      React.createElement(QueryClientProvider, { client: queryClient }, children)
+    wrapper: ({ children }: { children: React.ReactNode }) => {
+      return React.createElement(QueryClientProvider, { client: queryClient }, children);
+    }
   });
   return { ...result, queryClient };
 };

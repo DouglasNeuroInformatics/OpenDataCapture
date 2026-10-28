@@ -7,8 +7,9 @@ import type { AppStore } from '@/store/types';
 
 import { createDisclaimerSlice } from '../disclaimer.slice';
 
-const createStore = () =>
-  create(immer<AppStore>((...a) => ({ ...useAppStore.getState(), ...createDisclaimerSlice(...a) })));
+const createStore = () => {
+  return create(immer<AppStore>((...a) => ({ ...useAppStore.getState(), ...createDisclaimerSlice(...a) })));
+};
 
 describe('createDisclaimerSlice', () => {
   let store: ReturnType<typeof createStore>;

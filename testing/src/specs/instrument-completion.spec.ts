@@ -258,11 +258,12 @@ test.describe('instrument completion', () => {
     // Headless Chromium keeps the tab visible, so the state is overridden and the event dispatched by
     // hand. React Query's focusManager listens for visibilitychange on the window, which the event
     // reaches from the document.
-    const setTabVisibility = (visibilityState: 'hidden' | 'visible') =>
-      page.evaluate((state) => {
+    const setTabVisibility = (visibilityState: 'hidden' | 'visible') => {
+      return page.evaluate((state) => {
         Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => state });
         document.dispatchEvent(new Event('visibilitychange', { bubbles: true }));
       }, visibilityState);
+    };
 
     await setTabVisibility('hidden');
     await setTabVisibility('visible');

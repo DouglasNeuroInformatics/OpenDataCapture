@@ -26,8 +26,9 @@ type StartSessionFormValues = FormTypes.PartialData<StartSessionFormData>;
 type AutofilledDemographics = Pick<StartSessionFormValues, 'subjectDateOfBirth' | 'subjectSex'>;
 
 /** Empty unless a custom identifier is in use, so switching method clears what it filled in. */
-const selectedCustomId = (values: StartSessionFormValues) =>
-  values.subjectIdentificationMethod === 'CUSTOM_ID' ? (values.subjectId ?? '') : '';
+const selectedCustomId = (values: StartSessionFormValues) => {
+  return values.subjectIdentificationMethod === 'CUSTOM_ID' ? (values.subjectId ?? '') : '';
+};
 
 type StartSessionFormData = {
   sessionDate: Date;
@@ -65,8 +66,9 @@ export const StartSessionForm = ({
     ? new Date(currentDate.getTime() - currentGroup.settings.minimumAge * 31556952000)
     : undefined;
 
-  const scopeCustomId = (customId: string) =>
-    encodeScopedSubjectId(customId, { groupName: currentGroup?.name ?? DEFAULT_GROUP_NAME });
+  const scopeCustomId = (customId: string) => {
+    return encodeScopedSubjectId(customId, { groupName: currentGroup?.name ?? DEFAULT_GROUP_NAME });
+  };
 
   const autofillExistingSubject = async (
     values: StartSessionFormValues,

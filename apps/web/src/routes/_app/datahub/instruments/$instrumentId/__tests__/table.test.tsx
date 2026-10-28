@@ -40,8 +40,9 @@ vi.mock('@/hooks/useInstrumentHubFacets', () => ({
 }));
 vi.mock('@/hooks/useInstrumentInfoById', () => ({ useInstrumentInfoById: () => mocks.infoById }));
 vi.mock('@/store', () => ({
-  useAppStore: (selector: (store: { currentGroup: { settings: { subjectIdDisplayLength?: number } } }) => unknown) =>
-    selector({ currentGroup: { settings: { subjectIdDisplayLength: mocks.subjectIdDisplayLength } } })
+  useAppStore: (selector: (store: { currentGroup: { settings: { subjectIdDisplayLength?: number } } }) => unknown) => {
+    return selector({ currentGroup: { settings: { subjectIdDisplayLength: mocks.subjectIdDisplayLength } } });
+  }
 }));
 // Captured rather than rendered: the listing itself is covered by instrument-table.test.tsx, and
 // what matters here is the search the drill-down navigates with.
@@ -98,16 +99,19 @@ const renderTable = () => {
   render(<Component />);
 };
 
-const headers = () =>
-  Array.from(screen.getByTestId('data-table-head').firstElementChild!.children, (header) => header.textContent).filter(
-    Boolean
-  );
+const headers = () => {
+  return Array.from(
+    screen.getByTestId('data-table-head').firstElementChild!.children,
+    (header) => header.textContent
+  ).filter(Boolean);
+};
 
 /** The sort control a header carries, or undefined when the header is plain text. */
-const headerButton = (label: string) =>
-  Array.from(screen.getByTestId('data-table-head').querySelectorAll('button')).find(
+const headerButton = (label: string) => {
+  return Array.from(screen.getByTestId('data-table-head').querySelectorAll('button')).find(
     (button) => button.textContent === label
   );
+};
 
 const lastSearch = () => {
   const [{ search }] = navigate.mock.lastCall as [{ search: (prev: object) => object }];

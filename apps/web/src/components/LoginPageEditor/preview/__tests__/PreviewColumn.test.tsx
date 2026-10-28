@@ -52,8 +52,9 @@ const BRANDED: BrandingConfig = {
   instanceName: { en: 'Acme Clinic', fr: 'Clinique Acme' }
 };
 
-const getLoginFormMock = (container: HTMLElement) =>
-  container.querySelector<HTMLElement>('.aspect-4\\/3 > div:last-child')!;
+const getLoginFormMock = (container: HTMLElement) => {
+  return container.querySelector<HTMLElement>('.aspect-4\\/3 > div:last-child')!;
+};
 
 describe('PreviewColumn', () => {
   beforeEach(() => {

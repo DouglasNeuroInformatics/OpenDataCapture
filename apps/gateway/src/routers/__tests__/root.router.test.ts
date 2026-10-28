@@ -1,4 +1,4 @@
-import type { Server } from 'http';
+import type { Server } from 'node:http';
 
 import express from 'express';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';

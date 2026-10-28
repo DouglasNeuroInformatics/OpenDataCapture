@@ -24,8 +24,9 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
 // makes the rejection case meaningful — without the override it would escape to the route error boundary.
 function renderDeleteMutation() {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { throwOnError: true } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return { ...renderHook(() => useDeleteSeriesInstrumentMutation(), { wrapper }), queryClient };
 }
 

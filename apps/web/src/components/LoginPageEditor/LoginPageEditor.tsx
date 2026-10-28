@@ -57,7 +57,9 @@ export const LoginPageEditor = () => {
             className="flex flex-col gap-6"
             id={FORM_ID}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && (e.target as HTMLElement).tagName === 'INPUT') e.preventDefault();
+              if (e.key === 'Enter' && (e.target as HTMLElement).tagName === 'INPUT') {
+                e.preventDefault();
+              }
             }}
             onSubmit={editor.handleSubmit}
           >

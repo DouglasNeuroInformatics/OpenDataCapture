@@ -14,8 +14,9 @@ vi.mock('axios', () => ({ default: mockAxios }));
 function renderResetPassword() {
   // Mirror the app's client, which sends every mutation error to the router error boundary by default
   const queryClient = new QueryClient({ defaultOptions: { mutations: { throwOnError: true } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return renderHook(() => useResetPasswordMutation(), { wrapper });
 }
 

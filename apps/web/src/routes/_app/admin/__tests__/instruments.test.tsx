@@ -128,8 +128,9 @@ const renderPage = (view?: 'forms' | 'series') => {
 
 const rows = () => screen.getAllByTestId('data-table-row');
 
-const cellTexts = (rowIndex = 0) =>
-  [...rows()[rowIndex]!.querySelectorAll('span[title]')].map((cell) => cell.getAttribute('title'));
+const cellTexts = (rowIndex = 0) => {
+  return [...rows()[rowIndex]!.querySelectorAll('span[title]')].map((cell) => cell.getAttribute('title'));
+};
 
 const rowAction = (label: string, rowIndex = 0) => {
   fireEvent.keyDown(within(rows()[rowIndex]!).getByTestId('row-actions-trigger'), { key: 'Enter' });

@@ -2,7 +2,7 @@
 
 /* eslint-disable no-console */
 
-import * as path from 'path';
+import * as path from 'node:path';
 
 import { Bundler } from './bundler.js';
 import { $Config } from './schemas.js';

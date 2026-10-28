@@ -55,12 +55,13 @@ describe('useGroupsQuery', () => {
   it('should resolve to the groups once the suspended request settles', async () => {
     mockAxios.get.mockResolvedValue({ data: [GROUP] });
     const queryClient = createQueryClient();
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(
         QueryClientProvider,
         { client: queryClient },
         createElement(Suspense, { fallback: null }, children)
       );
+    };
     const { result } = renderHook(() => useGroupsQuery(), { wrapper });
     await waitFor(() => expect(result.current).toBeTruthy());
     expect(result.current.data.map((group) => group.id)).toEqual(['group-1']);

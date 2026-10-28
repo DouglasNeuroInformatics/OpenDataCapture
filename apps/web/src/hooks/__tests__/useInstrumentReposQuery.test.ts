@@ -59,12 +59,13 @@ describe('useInstrumentReposQuery', () => {
   it('should resolve to the repos once the suspended request settles', async () => {
     mockAxios.get.mockResolvedValue({ data: [REPO] });
     const queryClient = createQueryClient();
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(
         QueryClientProvider,
         { client: queryClient },
         createElement(Suspense, { fallback: null }, children)
       );
+    };
     const { result } = renderHook(() => useInstrumentReposQuery(), { wrapper });
     await waitFor(() => expect(result.current).toBeTruthy());
     expect(result.current.data.map((repo) => repo.name)).toEqual(['My Repo']);

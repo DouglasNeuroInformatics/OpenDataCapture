@@ -243,7 +243,7 @@ test.describe('start session', () => {
     for (const message of await startSessionPage.errorMessages.allTextContents()) {
       expect(message).toBe('This field is required');
     }
-    await expect(startSessionPage.successMessage).not.toBeVisible();
+    await expect(startSessionPage.successMessage).toBeHidden();
   });
 
   test('should show a required-field error for a blank custom identifier', async ({ getPageModel }) => {
@@ -269,7 +269,7 @@ test.describe('start session', () => {
 
     await expect(startSessionPage.errorMessages).toHaveCount(1);
     await expect(startSessionPage.subjectIdErrors).toHaveText('Illegal character: $');
-    await expect(startSessionPage.successMessage).not.toBeVisible();
+    await expect(startSessionPage.successMessage).toBeHidden();
   });
 
   test("should enforce the group's identifier pattern, yet still reject an illegal character in an identifier that pattern accepts", async ({
@@ -298,7 +298,7 @@ test.describe('start session', () => {
 
     await expect(startSessionPage.errorMessages).toHaveCount(1);
     await expect(startSessionPage.subjectIdErrors).toHaveText('Illegal character: $');
-    await expect(startSessionPage.successMessage).not.toBeVisible();
+    await expect(startSessionPage.successMessage).toBeHidden();
   });
 
   test('should disable the Start Session nav link while a clinical session is active', async ({

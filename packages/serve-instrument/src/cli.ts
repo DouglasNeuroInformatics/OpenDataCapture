@@ -38,9 +38,9 @@ program
   .name(name)
   .version(version)
   .allowExcessArguments(false)
-  .argument('<target>', 'the directory containing the instrument', (target: string) =>
-    parseTarget(target, program.opts<{ all: boolean }>().all)
-  )
+  .argument('<target>', 'the directory containing the instrument', (target: string) => {
+    return parseTarget(target, program.opts<{ all: boolean }>().all);
+  })
   .option('-a, --all', 'serve all instruments from forms/ and interactive/ subdirectories')
   .option('-p --port <number>', 'the port to run the dev server on', parsePort, 3000)
   .option('-v, --verbose', 'enable verbose logging (includes request logs and build timing)')

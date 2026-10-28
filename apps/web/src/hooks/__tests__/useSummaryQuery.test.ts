@@ -19,8 +19,9 @@ const summary = {
 
 function renderSummaryQuery(...args: Parameters<typeof useSummaryQuery>) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return renderHook(() => useSummaryQuery(...args), { wrapper });
 }
 
@@ -50,8 +51,9 @@ describe('useSummaryQuery', () => {
 
   it('should keep the previous summary while another group loads, so the dashboard does not flash empty', async () => {
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(QueryClientProvider, { children, client: queryClient });
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(QueryClientProvider, { children, client: queryClient });
+    };
     const { rerender, result } = renderHook(({ groupId }) => useSummaryQuery({ params: { groupId } }), {
       initialProps: { groupId: 'group-1' },
       wrapper

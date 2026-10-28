@@ -162,9 +162,9 @@ export const useBrandingForm = () => {
   const updateResourceLinkLabel = (index: number, lang: 'en' | 'fr', value: string) => {
     setForm((prev) => ({
       ...prev,
-      resourceLinks: prev.resourceLinks.map((l, i) =>
-        i === index ? { ...l, label: { ...l.label, [lang]: value } } : l
-      )
+      resourceLinks: prev.resourceLinks.map((l, i) => {
+        return i === index ? { ...l, label: { ...l.label, [lang]: value } } : l;
+      })
     }));
   };
 
@@ -329,8 +329,9 @@ export const useBrandingForm = () => {
       isPanelTextColorInvalid ||
       isCustomSizeInvalid ||
       hasInvalidResourceLinks
-    )
+    ) {
       return;
+    }
     // Empty text fields persist as `null` rather than '' so the panel falls back
     // to its defaults; a BrandingText is omitted entirely when both langs are blank.
     const trim = (v: string) => (v.trim() ? v.trim() : null);

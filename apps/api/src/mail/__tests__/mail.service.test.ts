@@ -53,11 +53,12 @@ describe('MailService', () => {
   let transporter: { sendMail: Mock; verify: Mock };
 
   /** The password as it would come back out of the database. */
-  const persistedPassword = () =>
-    decryptSecret(
+  const persistedPassword = () => {
+    return decryptSecret(
       (setupStateModel.update.mock.lastCall?.[0] as PersistedUpdate).data.mailConfig.set.password,
       SECRET_KEY
     );
+  };
 
   beforeEach(async () => {
     // `createTransport` is a module-level mock, so its call history outlives the testing module.

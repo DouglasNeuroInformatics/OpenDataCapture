@@ -77,7 +77,7 @@ const TimeValue: React.FC<{ value: number }> = ({ value }) => {
     return parseDuration(uptime * 1000).match(
       ({ days, hours, minutes, seconds }) => {
         hours += days * 24;
-        return [hours, minutes, seconds].map((value) => (value < 10 ? '0' + value : value)).join(':');
+        return [hours, minutes, seconds].map((value) => (value < 10 ? `0${value}` : value)).join(':');
       },
       (err) => {
         console.error(err);

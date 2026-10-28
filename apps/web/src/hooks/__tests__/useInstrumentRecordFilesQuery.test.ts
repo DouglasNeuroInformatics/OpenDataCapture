@@ -54,12 +54,13 @@ describe('useInstrumentRecordFilesQuery', () => {
   it('should resolve to the files once the suspended request settles', async () => {
     mockAxios.get.mockResolvedValue({ data: FILES });
     const queryClient = createQueryClient();
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(
         QueryClientProvider,
         { client: queryClient },
         createElement(Suspense, { fallback: null }, children)
       );
+    };
     const { result } = renderHook(() => useInstrumentRecordFilesQuery({ params: { id: 'record-1' } }), { wrapper });
     await waitFor(() => expect(result.current).toBeTruthy());
     expect(Object.keys(result.current.data)).toEqual(['upload']);

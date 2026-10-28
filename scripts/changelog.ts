@@ -110,8 +110,9 @@ function formatEntry(commit: Commit, text: string): string {
 }
 
 function buildSections(commits: Commit[]): Section[] {
-  const entriesOfType = (type: string) =>
-    commits.filter((commit) => commit.type === type).map((commit) => formatEntry(commit, commit.subject));
+  const entriesOfType = (type: string) => {
+    return commits.filter((commit) => commit.type === type).map((commit) => formatEntry(commit, commit.subject));
+  };
   const sections: Section[] = [
     {
       entries: commits.flatMap((commit) => commit.breakingChanges.map((text) => formatEntry(commit, text))),
@@ -130,7 +131,7 @@ function renderRelease(version: string, commits: Commit[]): string {
     sections.length === 0
       ? ['This release contains no user-facing changes.']
       : sections.map((section) => [`### ${section.title}`, '', ...section.entries].join('\n'));
-  return [`## ${version}`, ...body].join('\n\n') + '\n';
+  return `${[`## ${version}`, ...body].join('\n\n')}\n`;
 }
 
 function insertRelease(changelog: string, version: string, release: string): string {
@@ -139,9 +140,9 @@ function insertRelease(changelog: string, version: string, release: string): str
   }
   const firstReleaseIndex = changelog.indexOf('\n## ');
   if (firstReleaseIndex === -1) {
-    return changelog.trimEnd() + '\n\n' + release;
+    return `${changelog.trimEnd()}\n\n${release}`;
   }
-  return changelog.slice(0, firstReleaseIndex + 1) + release + '\n' + changelog.slice(firstReleaseIndex + 1);
+  return `${changelog.slice(0, firstReleaseIndex + 1) + release}\n${changelog.slice(firstReleaseIndex + 1)}`;
 }
 
 function extractRelease(changelog: string, version: string): string {
@@ -151,7 +152,7 @@ function extractRelease(changelog: string, version: string): string {
   }
   const bodyStart = start + `\n## ${version}\n`.length;
   const nextReleaseIndex = changelog.indexOf('\n## ', bodyStart);
-  return changelog.slice(bodyStart, nextReleaseIndex === -1 ? undefined : nextReleaseIndex + 1).trim() + '\n';
+  return `${changelog.slice(bodyStart, nextReleaseIndex === -1 ? undefined : nextReleaseIndex + 1).trim()}\n`;
 }
 
 function toDocsCopy(changelog: string): string {

@@ -13,8 +13,12 @@ function reduceMinMax(values: number[]): { max: number; min: number } {
   let max = values[0]!;
   for (let i = 1; i < values.length; i++) {
     const v = values[i]!;
-    if (v < min) min = v;
-    if (v > max) max = v;
+    if (v < min) {
+      min = v;
+    }
+    if (v > max) {
+      max = v;
+    }
   }
   return { max, min };
 }

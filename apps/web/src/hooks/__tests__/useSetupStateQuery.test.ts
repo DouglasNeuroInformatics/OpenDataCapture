@@ -23,8 +23,13 @@ const setupState = {
 
 function renderSetupStateQuery() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { client: queryClient }, createElement(Suspense, { fallback: null }, children));
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      createElement(Suspense, { fallback: null }, children)
+    );
+  };
   return renderHook(() => useSetupStateQuery(), { wrapper });
 }
 

@@ -170,9 +170,9 @@ export class InstrumentReposService implements OnModuleInit {
           continue;
         }
         const instrumentDir = path.join(libDir, entry.name);
-        const hasIndex = ['index.ts', 'index.tsx', 'index.js', 'index.jsx'].some((f) =>
-          fs.existsSync(path.join(instrumentDir, f))
-        );
+        const hasIndex = ['index.ts', 'index.tsx', 'index.js', 'index.jsx'].some((f) => {
+          return fs.existsSync(path.join(instrumentDir, f));
+        });
         if (hasIndex) {
           dirs.push(instrumentDir);
         }

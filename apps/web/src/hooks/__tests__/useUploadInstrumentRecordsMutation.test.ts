@@ -25,8 +25,9 @@ const dataWithDate = { completedAt: date, score: 3 } as unknown as Json;
 
 function renderUploadMutation() {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return renderHook(() => useUploadInstrumentRecordsMutation(), { wrapper });
 }
 

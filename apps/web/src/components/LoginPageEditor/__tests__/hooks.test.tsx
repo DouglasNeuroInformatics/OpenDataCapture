@@ -363,9 +363,11 @@ describe('useBrandingForm', () => {
       readLogoAsWebpDataUrl.mockRejectedValue(new Error('decode failed'));
       const { result } = renderBrandingForm();
       act(() => result.current.handleLogoFile(pngFile()));
-      await waitFor(() =>
-        expect(addNotification).toHaveBeenCalledWith(expect.objectContaining({ title: 'Invalid image', type: 'error' }))
-      );
+      await waitFor(() => {
+        expect(addNotification).toHaveBeenCalledWith(
+          expect.objectContaining({ title: 'Invalid image', type: 'error' })
+        );
+      });
       expect(consoleError).toHaveBeenCalledWith(new Error('decode failed'));
     });
   });

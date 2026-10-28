@@ -20,18 +20,16 @@ export function useInstrumentInfoById<TKind extends InstrumentKind>(params?: {
   subjectId?: string;
 }): InstrumentInfoById {
   const query = useInstrumentInfoQuery({ params });
-  return useMemo(
-    () =>
-      Object.fromEntries(
-        (query.data ?? []).map((info) => [
-          info.id,
-          {
-            edition: info.kind !== 'SERIES' ? info.internal.edition : null,
-            kind: info.kind,
-            title: info.details.title
-          }
-        ])
-      ),
-    [query.data]
-  );
+  return useMemo(() => {
+    return Object.fromEntries(
+      (query.data ?? []).map((info) => [
+        info.id,
+        {
+          edition: info.kind !== 'SERIES' ? info.internal.edition : null,
+          kind: info.kind,
+          title: info.details.title
+        }
+      ])
+    );
+  }, [query.data]);
 }

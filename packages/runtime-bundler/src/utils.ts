@@ -1,4 +1,4 @@
-import { builtinModules } from 'module';
+import { builtinModules } from 'node:module';
 
 export function validatePackageName(name: string): { issue: string; success: false } | { success: true } {
   if (!name.length) {

@@ -27,8 +27,9 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
 vi.mock('@/components/LoadingFallback', () => ({ LoadingFallback: () => 'Loading Fallback' }));
 vi.mock('@/config', () => ({ config: mocks.config }));
 vi.mock('@/store', () => ({
-  useAppStore: (selector: (store: { currentGroup: typeof mocks.currentGroup }) => unknown) =>
-    selector({ currentGroup: mocks.currentGroup })
+  useAppStore: (selector: (store: { currentGroup: typeof mocks.currentGroup }) => unknown) => {
+    return selector({ currentGroup: mocks.currentGroup });
+  }
 }));
 
 const renderLayout = () => {

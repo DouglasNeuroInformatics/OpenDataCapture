@@ -7,8 +7,9 @@ import type { AppStore } from '@/store/types';
 
 import { createPreferencesSlice } from '../preferences.slice';
 
-const createStore = () =>
-  create(immer<AppStore>((...a) => ({ ...useAppStore.getState(), ...createPreferencesSlice(...a) })));
+const createStore = () => {
+  return create(immer<AppStore>((...a) => ({ ...useAppStore.getState(), ...createPreferencesSlice(...a) })));
+};
 
 describe('createPreferencesSlice', () => {
   let store: ReturnType<typeof createStore>;

@@ -76,12 +76,13 @@ export const SourceStep = ({
     }
   };
 
-  const handleFile = (file: File) =>
-    void run(async () => {
+  const handleFile = (file: File) => {
+    return void run(async () => {
       assertFileSize(file);
       // The workbook parser is the only path that pulls in `xlsx`, and it does so dynamically.
       return isWorkbookFile(file) ? parseWorkbook(file) : parseDelimitedText(await file.text());
     });
+  };
 
   const toggle = (id: string) => {
     const next = new Set(selected);

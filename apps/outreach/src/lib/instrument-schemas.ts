@@ -22,7 +22,7 @@ export function getSchemaProps() {
       return {
         meta: {
           displayName: `${capitalize(kind)} Instrument (${displayLanguage})`,
-          language: language
+          language
         },
         params: {
           kind,

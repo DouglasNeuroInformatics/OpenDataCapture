@@ -88,8 +88,9 @@ vi.mock('@/hooks/useUpdateUserMutation', () => ({
   useUpdateUserMutation: () => ({ mutateAsync: mocks.mutateAsync })
 }));
 vi.mock('@/store', () => ({
-  useAppStore: <TSelected,>(selector: (store: { currentUser: typeof mocks.state.currentUser }) => TSelected) =>
-    selector({ currentUser: mocks.state.currentUser })
+  useAppStore: <TSelected,>(selector: (store: { currentUser: typeof mocks.state.currentUser }) => TSelected) => {
+    return selector({ currentUser: mocks.state.currentUser });
+  }
 }));
 
 const GROUP_ONE = { id: 'group-1', name: 'Group One' };

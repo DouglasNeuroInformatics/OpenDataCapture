@@ -1,5 +1,5 @@
-import { EventEmitter } from 'events';
-import { Worker } from 'worker_threads';
+import { EventEmitter } from 'node:events';
+import { Worker } from 'node:worker_threads';
 
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { getModelToken, LoggingService, PRISMA_CLIENT_TOKEN } from '@douglasneuroinformatics/libnest';
@@ -36,7 +36,7 @@ vi.mock('worker_threads', async (importOriginal) => {
   const actual = await importOriginal<typeof import('worker_threads')>();
   return {
     ...actual,
-    Worker: vi.fn(function (filename: string) {
+    Worker: vi.fn(function MockWorker(filename: string) {
       return new actual.Worker(filename);
     })
   };
@@ -49,7 +49,7 @@ class FakeWorker extends EventEmitter {
 
 function useFakeWorker() {
   const fakeWorker = new FakeWorker();
-  vi.mocked(Worker).mockImplementationOnce(function () {
+  vi.mocked(Worker).mockImplementationOnce(function FakeWorkerConstructor() {
     return fakeWorker as unknown as Worker;
   });
   return fakeWorker;
@@ -545,8 +545,9 @@ describe('InstrumentRecordsService', () => {
       instrumentsService.findById.mockResolvedValue({
         ...mockInstrument,
         validationSchema: {
-          safeParse: (data: any) =>
-            data.answer === 2 ? { error: { issues }, success: false } : { data, success: true }
+          safeParse: (data: any) => {
+            return data.answer === 2 ? { error: { issues }, success: false } : { data, success: true };
+          }
         }
       } as any);
 
@@ -898,16 +899,19 @@ describe('InstrumentRecordsService', () => {
         subject: { age: 20, groupIds: ['group-1', 'group-2'], id: 'subject-1', sex: 'MALE' }
       });
 
-      const abilityAt = (basePermissionLevel: 'ADMIN' | 'GROUP_MANAGER') =>
-        new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
-          additionalPermissions: undefined,
-          basePermissionLevel,
-          firstName: 'Test',
-          groups: [{ id: 'group-1' }],
-          id: 'user-1',
-          lastName: 'User',
-          username: 'test-user'
-        } as any);
+      const abilityAt = (basePermissionLevel: 'ADMIN' | 'GROUP_MANAGER') => {
+        return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload(
+          {
+            additionalPermissions: undefined,
+            basePermissionLevel,
+            firstName: 'Test',
+            groups: [{ id: 'group-1' }],
+            id: 'user-1',
+            lastName: 'User',
+            username: 'test-user'
+          } as any
+        );
+      };
 
       const exportedGroupIds = async (
         rows: ReturnType<typeof exportRow>[],

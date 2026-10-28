@@ -189,7 +189,7 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <hr></hr>
+                  <hr />
                   <ul className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
                     {userInfoQuery.isLoading && <Spinner />}
                     {userInfoQuery.isError && (
@@ -263,7 +263,7 @@ const RouteComponent = () => {
                       fr: "Nombre d'instruments"
                     })}
                     value={summaryQuery.data.counts.instruments}
-                  ></StatisticCard>
+                  />
                 </Dialog.Trigger>
                 <Dialog.Content
                   data-spotlight-type="instruments-Modal-modal"
@@ -300,7 +300,7 @@ const RouteComponent = () => {
                           </p>{' '}
                           <p>{t({ en: 'Kind', es: 'Tipo', fr: 'Type' })}</p>
                         </div>
-                        <hr></hr>
+                        <hr />
                         {instrumentInfo.map((instrument, i) => {
                           return (
                             <motion.li
@@ -373,7 +373,7 @@ const RouteComponent = () => {
                           </p>{' '}
                           <p>{t({ en: 'Number', es: 'Número', fr: 'Nombre' })}</p>
                         </div>
-                        <hr></hr>
+                        <hr />
                         {recordCounter.map((instrument, i) => {
                           return (
                             <motion.li

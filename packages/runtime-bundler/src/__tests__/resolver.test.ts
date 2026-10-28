@@ -1,6 +1,6 @@
-import fs from 'fs';
-import module from 'module';
-import path from 'path';
+import fs from 'node:fs';
+import module from 'node:module';
+import path from 'node:path';
 
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
@@ -153,11 +153,11 @@ describe('Resolver', () => {
 
     it('should fail when an export path resolves to a directory rather than a file', async () => {
       const relpath = './src';
-      const abspath = path.join(packageRoot, relpath + '.js');
+      const abspath = path.join(packageRoot, `${relpath}.js`);
       vi.spyOn(fs, 'existsSync').mockReturnValueOnce(true);
       vi.spyOn(fs, 'lstatSync').mockReturnValueOnce({ isFile: () => false } as any);
       vi.spyOn(fs.promises, 'readFile').mockResolvedValueOnce(
-        JSON.stringify({ ...PACKAGE_STUB, exports: { '.': relpath + '.js' } })
+        JSON.stringify({ ...PACKAGE_STUB, exports: { '.': `${relpath}.js` } })
       );
       await expect(resolver.resolve(PACKAGE_STUB.name)).rejects.toMatchObject({
         message: expect.stringContaining(`file '${abspath}' exists but is not a regular file`)

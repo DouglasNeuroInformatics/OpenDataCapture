@@ -71,14 +71,15 @@ const repoFixture = (overrides: Partial<InstrumentRepo> = {}): InstrumentRepo =>
   ...overrides
 });
 
-const serverError = (data: unknown) =>
-  new AxiosError('Request failed', 'ERR_BAD_REQUEST', undefined, undefined, {
+const serverError = (data: unknown) => {
+  return new AxiosError('Request failed', 'ERR_BAD_REQUEST', undefined, undefined, {
     config: { headers: new AxiosHeaders() },
     data,
     headers: {},
     status: 400,
     statusText: 'Bad Request'
   });
+};
 
 const renderPage = (queryClient = new QueryClient()) => {
   const Component = Route.options.component!;
@@ -120,9 +121,9 @@ describe('Route', () => {
     useNotificationsStore.setState({ notifications: [] });
     mocks.groups = [groupFixture()];
     mocks.repos = [];
-    mocks.patch.mockImplementation((_url: string, body: { instrumentRepoIds: string[] }) =>
-      Promise.resolve({ data: { ...groupFixture(), instrumentRepoIds: body.instrumentRepoIds } })
-    );
+    mocks.patch.mockImplementation((_url: string, body: { instrumentRepoIds: string[] }) => {
+      return Promise.resolve({ data: { ...groupFixture(), instrumentRepoIds: body.instrumentRepoIds } });
+    });
   });
 
   afterEach(cleanup);
@@ -210,13 +211,13 @@ describe('Route', () => {
     openSheet();
     fireEvent.click(repoCheckbox('Core Instruments'));
     save();
-    await waitFor(() =>
+    await waitFor(() => {
       expect(mocks.patch).toHaveBeenCalledWith(
         '/v1/groups/group-1',
         { instrumentRepoIds: ['repo-2', 'repo-1'] },
         { meta: { disableDefaultErrorNotification: true } }
-      )
-    );
+      );
+    });
   });
 
   it('should revoke a repository that is unchecked before saving', async () => {
@@ -226,9 +227,9 @@ describe('Route', () => {
     openSheet();
     fireEvent.click(repoCheckbox('Core Instruments'));
     save();
-    await waitFor(() =>
-      expect(mocks.patch).toHaveBeenCalledWith('/v1/groups/group-1', { instrumentRepoIds: [] }, expect.anything())
-    );
+    await waitFor(() => {
+      expect(mocks.patch).toHaveBeenCalledWith('/v1/groups/group-1', { instrumentRepoIds: [] }, expect.anything());
+    });
   });
 
   it('should close the sheet and confirm success once the repositories are saved', async () => {
@@ -266,9 +267,9 @@ describe('Route', () => {
     renderPage();
     openSheet();
     save();
-    await waitFor(() =>
-      expect(lastNotification()).toMatchObject({ message: 'Failed to update group repositories', type: 'error' })
-    );
+    await waitFor(() => {
+      expect(lastNotification()).toMatchObject({ message: 'Failed to update group repositories', type: 'error' });
+    });
   });
 
   it('should ask for confirmation before deleting a group', () => {

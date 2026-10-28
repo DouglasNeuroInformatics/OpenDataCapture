@@ -30,14 +30,15 @@ const fillAndSubmit = ({ name, type }: { name: string; type: 'CLINICAL' | 'RESEA
   fireEvent.click(screen.getByLabelText('Submit'));
 };
 
-const conflict = (message: string) =>
-  new AxiosError('Request failed with status code 409', 'ERR_BAD_REQUEST', undefined, undefined, {
+const conflict = (message: string) => {
+  return new AxiosError('Request failed with status code 409', 'ERR_BAD_REQUEST', undefined, undefined, {
     config: { headers: new AxiosHeaders() },
     data: { message },
     headers: {},
     status: 409,
     statusText: 'Conflict'
   });
+};
 
 describe('Route', () => {
   beforeEach(() => {
@@ -54,9 +55,9 @@ describe('Route', () => {
 
   it('should create the group with the entered name and chosen type', async () => {
     fillAndSubmit({ name: 'Depression Clinic', type: 'RESEARCH' });
-    await waitFor(() =>
-      expect(mocks.mutateAsync).toHaveBeenCalledWith({ data: { name: 'Depression Clinic', type: 'RESEARCH' } })
-    );
+    await waitFor(() => {
+      expect(mocks.mutateAsync).toHaveBeenCalledWith({ data: { name: 'Depression Clinic', type: 'RESEARCH' } });
+    });
   });
 
   it('should return to the group list once the group is created', async () => {

@@ -10,7 +10,7 @@ test.describe('disclaimer', () => {
     const dialog = page.getByRole('dialog', { name: 'Disclaimer' });
     await expect(dialog).toBeVisible();
     await page.getByRole('button', { name: 'Accept' }).click();
-    await expect(dialog).not.toBeVisible();
+    await expect(dialog).toBeHidden();
 
     await expect(dashboardPage.pageHeader).toContainText('Dashboard');
   });

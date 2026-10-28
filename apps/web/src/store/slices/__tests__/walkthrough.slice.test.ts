@@ -7,8 +7,9 @@ import type { AppStore } from '@/store/types';
 
 import { createWalkthroughSlice } from '../walkthrough.slice';
 
-const createStore = () =>
-  create(immer<AppStore>((...a) => ({ ...useAppStore.getState(), ...createWalkthroughSlice(...a) })));
+const createStore = () => {
+  return create(immer<AppStore>((...a) => ({ ...useAppStore.getState(), ...createWalkthroughSlice(...a) })));
+};
 
 describe('createWalkthroughSlice', () => {
   let store: ReturnType<typeof createStore>;

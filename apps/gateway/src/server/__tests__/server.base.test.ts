@@ -1,5 +1,5 @@
-import { once } from 'events';
-import type { Server } from 'http';
+import { once } from 'node:events';
+import type { Server } from 'node:http';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

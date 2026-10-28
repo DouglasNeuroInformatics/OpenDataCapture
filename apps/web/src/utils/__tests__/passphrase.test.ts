@@ -9,9 +9,9 @@ describe('generatePassphrase', () => {
   });
 
   it('should draw every word from the word list, so no passphrase contains anything unvetted', () => {
-    const words = Array.from({ length: 50 }, () => generatePassphrase()).flatMap((passphrase) =>
-      passphrase.split(PASSPHRASE_SEPARATOR)
-    );
+    const words = Array.from({ length: 50 }, () => generatePassphrase()).flatMap((passphrase) => {
+      return passphrase.split(PASSPHRASE_SEPARATOR);
+    });
     expect(words.every((word) => WORD_LIST.includes(word))).toBe(true);
   });
 

@@ -37,8 +37,8 @@ export const collections = {
     type: 'data'
   }),
   team: defineCollection({
-    schema: ({ image }) =>
-      z.object({
+    schema: ({ image }) => {
+      return z.object({
         description: z.object({
           en: z.string().min(1),
           fr: z.string().min(1)
@@ -53,12 +53,13 @@ export const collections = {
         }),
         seniority: z.number().positive().int(),
         suffix: z.enum(['MD', 'PhD']).optional()
-      }),
+      });
+    },
     type: 'data'
   }),
   testimonials: defineCollection({
-    schema: ({ image }) =>
-      z.object({
+    schema: ({ image }) => {
+      return z.object({
         fullName: z.string().min(1),
         image: image().refine((arg) => arg.height === arg.width, {
           message: 'Image must be square (1:1 aspect ratio)'
@@ -72,7 +73,8 @@ export const collections = {
           fr: z.string().min(1)
         }),
         suffix: z.enum(['MD', 'PhD']).optional()
-      }),
+      });
+    },
     type: 'data'
   })
 };

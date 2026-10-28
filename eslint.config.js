@@ -228,7 +228,8 @@ export default config(
       'odc/multiline-arrow-body': 'error',
       'odc/no-coverage-ignore': 'error',
       'odc/require-disable-reason': 'error',
-      'prefer-arrow-callback': 'error',
+      // A named function passed to forwardRef or memo is what gives the component its display name.
+      'prefer-arrow-callback': ['error', { allowNamedFunctions: true }],
       'prefer-template': 'error',
       'preserve-caught-error': 'error',
       radix: 'error',

@@ -91,7 +91,7 @@ const { selectedInstrument } = useAppStore.getState();
 const indexFilename = resolveIndexFilename(selectedInstrument.files)!;
 useAppStore.setState({
   files: selectedInstrument.files,
-  indexFilename: indexFilename,
+  indexFilename,
   openFilenames: [indexFilename],
   selectedFilename: indexFilename
 });

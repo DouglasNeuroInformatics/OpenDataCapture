@@ -40,7 +40,7 @@ const RouteComponent = () => {
   // Clamp to what is offered: a language the instance has since disabled has no template on the
   // mail page any more, and would leave the trigger blank while that language is still posted.
   const activeLanguages = setupStateQuery.data.activeLanguages;
-  const emailLanguage = activeLanguages.includes(emailLanguageChoice) ? emailLanguageChoice : activeLanguages[0]!;
+  const emailLanguage = activeLanguages.includes(emailLanguageChoice) ? emailLanguageChoice : activeLanguages[0];
 
   const handleSubmit = async (data: $CreateUserData) => {
     // check if username exists
@@ -279,8 +279,9 @@ const RouteComponent = () => {
         subscribe={{
           // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
           // position, so `setValues` is inferred as an error type rather than a setter.
-          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) =>
-            applyGeneratedPassword(setValues),
+          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) => {
+            applyGeneratedPassword(setValues);
+          },
           selector: () => generatedPassword
         }}
         validationSchema={$CreateUserData
@@ -334,15 +335,15 @@ const RouteComponent = () => {
               });
             }
           })}
-        onSubmit={({ email, groupIds, phoneNumber, ...data }) =>
-          handleSubmit({
+        onSubmit={({ email, groupIds, phoneNumber, ...data }) => {
+          return handleSubmit({
             ...data,
             email: omittedIfBlank(email),
             groupIds: Array.from(groupIds ?? []),
             mustResetPassword: isGeneratedPassword(data.password),
             phoneNumber: omittedIfBlank(phoneNumber)
-          })
-        }
+          });
+        }}
       />
       <Dialog
         open={fallbackMessage !== null}

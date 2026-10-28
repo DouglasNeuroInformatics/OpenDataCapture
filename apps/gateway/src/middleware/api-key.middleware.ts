@@ -8,7 +8,8 @@ export const apiKeyMiddleware: RequestHandler = (req, _, next) => {
   const key = req.headers.authorization?.match(/^Bearer (.+)$/i)?.at(1);
   const isHealthCheck = req.originalUrl === '/api/healthcheck';
   if (isHealthCheck) {
-    return next();
+    next();
+    return;
   }
   if (key !== config.apiKey) {
     const assignmentId = /\/api\/assignments\/(.*)/.exec(req.originalUrl)?.at(1);

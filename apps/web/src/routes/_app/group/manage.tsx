@@ -127,7 +127,9 @@ const InstrumentSection = ({
 }) => {
   const { t } = useTranslation();
   const filtered = useMemo(() => {
-    if (!search) return items;
+    if (!search) {
+      return items;
+    }
     const lower = search.toLowerCase();
     return items.filter((item) => item.title.toLowerCase().includes(lower));
   }, [items, search]);
@@ -263,7 +265,9 @@ const CreateSeriesInstrumentDialog = ({
   const selectableForms = useMemo(() => forms.filter((form) => form.internal !== null), [forms]);
 
   const filteredForms = useMemo(() => {
-    if (!search) return selectableForms;
+    if (!search) {
+      return selectableForms;
+    }
     const lower = search.toLowerCase();
     return selectableForms.filter((form) => form.title.toLowerCase().includes(lower));
   }, [selectableForms, search]);
@@ -280,10 +284,11 @@ const CreateSeriesInstrumentDialog = ({
 
   const canCreate = title.trim().length > 0 && !titleTaken && selectedIds.length >= 2 && !createMutation.isPending;
 
-  const buildItems = () =>
-    selectedIds
+  const buildItems = () => {
+    return selectedIds
       .map((id) => selectableForms.find((form) => form.id === id)?.internal)
       .filter((internal): internal is ScalarInstrumentInternal => internal !== null && internal !== undefined);
+  };
 
   // The series is authored in the creator's current language, so the details/instructions are stored as
   // plain (unilingual) strings tagged with that language — the same shape any instrument would use.
@@ -516,8 +521,9 @@ const DeleteInstrumentDialog = ({
 
   // Close on either outcome: a series that is already in use is refused by the API, and leaving the
   // confirmation open after the user has been notified only invites them to press the button again.
-  const handleDelete = () =>
+  const handleDelete = () => {
     deleteMutation.mutate({ id: item.id }, { onSettled: onClose, onSuccess: () => onDeleted(item.id) });
+  };
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -669,6 +675,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         onToggle={toggle}
       />
       <Form
+        preventResetValuesOnReset
         content={[
           {
             fields: {
@@ -791,7 +798,6 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
           }
         ]}
         initialValues={settingsInitialValues}
-        preventResetValuesOnReset={true}
         readOnly={readOnly}
         validationSchema={z
           .object({

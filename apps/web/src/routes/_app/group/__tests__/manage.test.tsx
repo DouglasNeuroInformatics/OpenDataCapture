@@ -38,8 +38,11 @@ vi.mock('@/hooks/useUpdateGroupMutation', () => ({
   useUpdateGroupMutation: () => ({ mutateAsync: mocks.updateMutateAsync })
 }));
 vi.mock('@/store', () => ({
-  useAppStore: (selector: (store: { changeGroup: typeof mocks.changeGroup; currentGroup: Group | null }) => unknown) =>
-    selector({ changeGroup: mocks.changeGroup, currentGroup: mocks.store.currentGroup })
+  useAppStore: (
+    selector: (store: { changeGroup: typeof mocks.changeGroup; currentGroup: Group | null }) => unknown
+  ) => {
+    return selector({ changeGroup: mocks.changeGroup, currentGroup: mocks.store.currentGroup });
+  }
 }));
 vi.mock('@/components/LoadingFallback', () => ({
   LoadingFallback: () => <div data-testid="loading-fallback" />

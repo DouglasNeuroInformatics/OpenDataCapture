@@ -43,9 +43,9 @@ describe('SessionsService', () => {
     subjectsService.createMany.mockResolvedValue([] as any);
     subjectsService.addGroupForSubjects.mockResolvedValue({ count: 0 } as any);
     sessionModel.createMany.mockResolvedValue({ count: 1 } as any);
-    sessionModel.findMany.mockImplementation(({ where }: any) =>
-      Promise.resolve(where.id.in.map((id: string) => ({ id })))
-    );
+    sessionModel.findMany.mockImplementation(({ where }: any) => {
+      return Promise.resolve(where.id.in.map((id: string) => ({ id })));
+    });
   });
 
   describe('createMany', () => {
@@ -96,9 +96,9 @@ describe('SessionsService', () => {
 
     it('should return the sessions in the order the entries were given, so callers can pair by index', async () => {
       // The read-back is a findMany, which is free to return documents in any order.
-      sessionModel.findMany.mockImplementationOnce(({ where }: any) =>
-        Promise.resolve([...where.id.in].reverse().map((id: string) => ({ id })))
-      );
+      sessionModel.findMany.mockImplementationOnce(({ where }: any) => {
+        return Promise.resolve([...where.id.in].reverse().map((id: string) => ({ id })));
+      });
 
       const sessions = await sessionsService.createMany({
         entries: [entry('subject-a'), entry('subject-b')],
@@ -186,9 +186,9 @@ describe('SessionsService', () => {
     // Without this, a session missing from the read-back would be handed to the caller as
     // `undefined` typed `Session`, and `POST /sessions` would answer 201 with an empty body.
     it('should throw rather than return a gap when the read-back misses a created session', async () => {
-      sessionModel.findMany.mockImplementationOnce(({ where }: any) =>
-        Promise.resolve(where.id.in.slice(1).map((id: string) => ({ id })))
-      );
+      sessionModel.findMany.mockImplementationOnce(({ where }: any) => {
+        return Promise.resolve(where.id.in.slice(1).map((id: string) => ({ id })));
+      });
 
       await expect(
         sessionsService.createMany({

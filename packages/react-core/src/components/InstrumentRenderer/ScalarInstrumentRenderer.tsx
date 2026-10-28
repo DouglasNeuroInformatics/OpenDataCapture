@@ -62,9 +62,8 @@ export const ScalarInstrumentRenderer = ({
   const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
 
-  const createSubmitHandler =
-    (instrument: AnyUnilingualScalarInstrument) =>
-    async ({ data, ...result }: AnyContentResult) => {
+  const createSubmitHandler = (instrument: AnyUnilingualScalarInstrument) => {
+    return async ({ data, ...result }: AnyContentResult) => {
       const serializedData = JSON.parse(JSON.stringify(data, replacer)) as Json;
       const validationResult = validateSubmission(instrument, serializedData);
       if (!validationResult.success) {
@@ -88,6 +87,7 @@ export const ScalarInstrumentRenderer = ({
       setIndex(2);
       setData(data);
     };
+  };
 
   return (
     <InstrumentRendererContainer className={className} index={index} NavigationBlocker={NavigationBlocker}>
@@ -112,8 +112,8 @@ export const ScalarInstrumentRenderer = ({
             />
           );
         })
-        .with({ status: 'DONE' }, ({ instrument }) =>
-          match({ index, instrument })
+        .with({ status: 'DONE' }, ({ instrument }) => {
+          return match({ index, instrument })
             .with({ index: 0 }, () => (
               <InstrumentOverview
                 beforeBegin={beforeBegin}
@@ -152,8 +152,8 @@ export const ScalarInstrumentRenderer = ({
                 timeCollected={Date.now()}
               />
             ))
-            .otherwise(() => null)
-        )
+            .otherwise(() => null);
+        })
         .exhaustive()}
     </InstrumentRendererContainer>
   );

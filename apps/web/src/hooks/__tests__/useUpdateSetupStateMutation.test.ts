@@ -37,8 +37,13 @@ function renderSetupStateMutation(...args: Parameters<typeof useUpdateSetupState
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false, throwOnError: true } } });
   const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
   const onError = vi.fn();
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { client: queryClient }, createElement(ErrorBoundary, { children, onError }));
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      createElement(ErrorBoundary, { children, onError })
+    );
+  };
   return { ...renderHook(() => useUpdateSetupStateMutation(...args), { wrapper }), invalidateQueries, onError };
 }
 

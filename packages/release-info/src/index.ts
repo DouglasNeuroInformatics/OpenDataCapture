@@ -1,7 +1,7 @@
-import cp from 'child_process';
-import fs from 'fs/promises';
-import path from 'path';
-import util from 'util';
+import cp from 'node:child_process';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import util from 'node:util';
 
 import { $DevelopmentReleaseInfo, $ProductionReleaseInfo } from '@opendatacapture/schemas/setup';
 import type { DevelopmentReleaseInfo, ProductionReleaseInfo, ReleaseInfo } from '@opendatacapture/schemas/setup';

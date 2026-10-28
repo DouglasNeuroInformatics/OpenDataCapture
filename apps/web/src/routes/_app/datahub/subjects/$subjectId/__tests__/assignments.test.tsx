@@ -81,9 +81,9 @@ describe('Route', () => {
       { details: { title: 'Happiness Questionnaire' }, id: 'instrument-1', supportedLanguages: ['en', 'fr'] }
     ];
     mocks.useAssignmentsQuery.mockImplementation(() => ({ data: mocks.assignments }));
-    mocks.useInstrument.mockImplementation((id: null | string) =>
-      id && mocks.isInstrumentLoaded ? { details: { title: 'Loaded Instrument' } } : null
-    );
+    mocks.useInstrument.mockImplementation((id: null | string) => {
+      return id && mocks.isInstrumentLoaded ? { details: { title: 'Loaded Instrument' } } : null;
+    });
     vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'subject-1' });
   });
 

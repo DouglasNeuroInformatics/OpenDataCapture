@@ -98,13 +98,14 @@ type InstrumentViewProps = {
 
 const useInstrumentSource = () => {
   const { t } = useTranslation();
-  return (sourceRepo: InstrumentInfo['sourceRepo']): InstrumentSource =>
-    sourceRepo
+  return (sourceRepo: InstrumentInfo['sourceRepo']): InstrumentSource => {
+    return sourceRepo
       ? {
           kind: 'repo',
           name: sourceRepo.name ?? t({ en: 'Unknown repository', es: 'Repositorio desconocido', fr: 'Dépôt inconnu' })
         }
       : { kind: 'manual' };
+  };
 };
 
 const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
@@ -156,19 +157,23 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
             header: t({ en: 'Source', es: 'Origen', fr: 'Source' })
           },
           {
-            accessorFn: (row: InstrumentRow) =>
-              row.groupNames.length > 0 ? row.groupNames.join(', ') : t({ en: 'None', es: 'Ninguno', fr: 'Aucun' }),
+            accessorFn: (row: InstrumentRow) => {
+              return row.groupNames.length > 0
+                ? row.groupNames.join(', ')
+                : t({ en: 'None', es: 'Ninguno', fr: 'Aucun' });
+            },
             cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
             header: t({ en: 'Groups Using It', es: 'Grupos que lo usan', fr: 'Groupes qui l’utilisent' }),
             id: 'groups'
           },
           {
-            accessorFn: (row: InstrumentRow) =>
-              row.kind === 'INTERACTIVE'
+            accessorFn: (row: InstrumentRow) => {
+              return row.kind === 'INTERACTIVE'
                 ? t({ en: 'Interactive', es: 'Interactivo', fr: 'Interactif' })
                 : row.kind === 'FILE'
                   ? t({ en: 'File', es: 'Archivo', fr: 'Fichier' })
-                  : t({ en: 'Form', es: 'Formulario', fr: 'Formulaire' }),
+                  : t({ en: 'Form', es: 'Formulario', fr: 'Formulaire' });
+            },
             cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
             header: t({ en: 'Kind', es: 'Tipo', fr: 'Type' }),
             id: 'kind',

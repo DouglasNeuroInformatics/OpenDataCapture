@@ -100,9 +100,9 @@ describe('Route', () => {
     mocks.useInstrumentRecordQuery.mockImplementation(() => ({ data: currentRecord }));
     mocks.useSubjectQuery.mockImplementation(() => ({ data: subject }));
     useNotificationsStore.setState({ notifications: [] });
-    vi.spyOn(Route, 'useParams').mockImplementation((opts) =>
-      opts!.select!({ recordId: 'record-1', subjectId: 'subject-1' })
-    );
+    vi.spyOn(Route, 'useParams').mockImplementation((opts) => {
+      return opts!.select!({ recordId: 'record-1', subjectId: 'subject-1' });
+    });
   });
 
   afterEach(() => {
@@ -214,11 +214,11 @@ describe('Route', () => {
       const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
       renderRecord();
       clickDownload();
-      await waitFor(() =>
+      await waitFor(() => {
         expect(useNotificationsStore.getState().notifications).toMatchObject([
           { message: 'An unexpected error occurred', title: 'Error', type: 'error' }
-        ])
-      );
+        ]);
+      });
       expect(consoleError).toHaveBeenCalledWith(new Error('Failed to download (404)'));
     });
   });

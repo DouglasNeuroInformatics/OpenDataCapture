@@ -42,14 +42,16 @@ vi.mock('@/utils/chart-image', () => ({
   renderChartPng: mocks.renderChartPng
 }));
 vi.mock('@/store', () => ({
-  useAppStore: (selector: (store: { currentGroup: { id: string } }) => unknown) =>
-    selector({ currentGroup: { id: 'group-1' } })
+  useAppStore: (selector: (store: { currentGroup: { id: string } }) => unknown) => {
+    return selector({ currentGroup: { id: 'group-1' } });
+  }
 }));
 vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/hooks')>()),
   useDownload: () => mocks.download,
-  useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) =>
-    selector({ addNotification: mocks.addNotification })
+  useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) => {
+    return selector({ addNotification: mocks.addNotification });
+  }
 }));
 vi.mock('@douglasneuroinformatics/libui/components', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/components')>()),

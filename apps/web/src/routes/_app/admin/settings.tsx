@@ -104,9 +104,9 @@ const RouteComponent = () => {
   // canonical one — the first entry is what a user stranded by a deactivation falls back to,
   // and it must not depend on the order an admin happened to click.
   const toggleLanguage = (language: Language) => {
-    const updated = LANGUAGES.filter((code) =>
-      code === language ? !activeLanguages.includes(code) : activeLanguages.includes(code)
-    );
+    const updated = LANGUAGES.filter((code) => {
+      return code === language ? !activeLanguages.includes(code) : activeLanguages.includes(code);
+    });
     const [first, ...rest] = updated;
     if (!first) {
       return;

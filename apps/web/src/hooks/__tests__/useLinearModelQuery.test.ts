@@ -15,8 +15,9 @@ const RESULTS = { score: { intercept: 1, slope: 0.5, stdErr: 0.1 } };
 
 function renderLinearModel(...args: Parameters<typeof useLinearModelQuery>) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return { ...renderHook(() => useLinearModelQuery(...args), { wrapper }), queryClient };
 }
 

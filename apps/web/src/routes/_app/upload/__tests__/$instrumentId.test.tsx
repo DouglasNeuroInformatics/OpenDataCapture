@@ -34,12 +34,14 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
-  createFileRoute: () => (options: object) => ({
-    options,
-    useNavigate: () => mocks.navigate,
-    useParams: () => ({ instrumentId: 'instrument-1' }),
-    useSearch: () => mocks.search
-  })
+  createFileRoute: () => {
+    return (options: object) => ({
+      options,
+      useNavigate: () => mocks.navigate,
+      useParams: () => ({ instrumentId: 'instrument-1' }),
+      useSearch: () => mocks.search
+    });
+  }
 }));
 vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/hooks')>()),
@@ -177,9 +179,9 @@ describe('Route', () => {
     renderPage();
     await chooseFile();
     submit();
-    await waitFor(() =>
-      expect(mocks.mutateAsync).toHaveBeenCalledWith(mocks.reformatInstrumentData.mock.results[0]!.value)
-    );
+    await waitFor(() => {
+      expect(mocks.mutateAsync).toHaveBeenCalledWith(mocks.reformatInstrumentData.mock.results[0]!.value);
+    });
     expect(mocks.processInstrumentCSV).toHaveBeenCalledWith(csvFile, instrument);
     expect(mocks.reformatInstrumentData).toHaveBeenCalledWith({
       currentGroup: group,
@@ -230,9 +232,9 @@ describe('Route', () => {
     choose('username', 'bob');
     await chooseFile();
     submit();
-    await waitFor(() =>
-      expect(mocks.reformatInstrumentData).toHaveBeenCalledWith(expect.objectContaining({ currentUsername: 'bob' }))
-    );
+    await waitFor(() => {
+      expect(mocks.reformatInstrumentData).toHaveBeenCalledWith(expect.objectContaining({ currentUsername: 'bob' }));
+    });
   });
 
   it('should attribute the records to no user when N/A is chosen', async () => {
@@ -286,9 +288,9 @@ describe('Route', () => {
     expect(mocks.useUsersQuery).toHaveBeenLastCalledWith({ params: { groupId: 'group-2' } });
     await chooseFile();
     submit();
-    await waitFor(() =>
-      expect(mocks.reformatInstrumentData).toHaveBeenCalledWith(expect.objectContaining({ currentUsername: 'jane' }))
-    );
+    await waitFor(() => {
+      expect(mocks.reformatInstrumentData).toHaveBeenCalledWith(expect.objectContaining({ currentUsername: 'jane' }));
+    });
   });
 
   it('should report an upload error with its description in the search', async () => {

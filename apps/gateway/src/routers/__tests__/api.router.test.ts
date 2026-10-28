@@ -1,4 +1,4 @@
-import type { Server } from 'http';
+import type { Server } from 'node:http';
 
 import { HybridCrypto } from '@douglasneuroinformatics/libcrypto';
 import type { DecryptParams } from '@douglasneuroinformatics/libcrypto';

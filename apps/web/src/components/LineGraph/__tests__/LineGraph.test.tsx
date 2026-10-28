@@ -14,8 +14,9 @@ import '@/services/i18n';
 // happy-dom computes no layout, so the container would measure 0x0 and recharts would draw nothing.
 vi.mock('recharts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('recharts')>()),
-  ResponsiveContainer: ({ children }: { children: ReactElement<{ height: number; width: number }> }) =>
-    cloneElement(children, { height: 400, width: 800 })
+  ResponsiveContainer: ({ children }: { children: ReactElement<{ height: number; width: number }> }) => {
+    return cloneElement(children, { height: 400, width: 800 });
+  }
 }));
 
 const data = [
@@ -38,10 +39,11 @@ const renderGraph = (
 
 const lineCurves = (container: HTMLElement) => [...container.querySelectorAll('.recharts-line-curve')];
 
-const xAxisTicks = (container: HTMLElement) =>
-  [...container.querySelectorAll('.recharts-xAxis-tick-labels .recharts-cartesian-axis-tick-value')].map(
+const xAxisTicks = (container: HTMLElement) => {
+  return [...container.querySelectorAll('.recharts-xAxis-tick-labels .recharts-cartesian-axis-tick-value')].map(
     (tick) => tick.textContent
   );
+};
 
 /** Recharts handles a mouse move on the next animation frame, so wait for one before reading the tooltip. */
 const hover = async (container: HTMLElement, { clientX, clientY }: { clientX: number; clientY: number }) => {

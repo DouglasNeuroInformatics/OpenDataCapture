@@ -37,8 +37,8 @@ function runTask(root: HTMLDivElement, onComplete: (data: Data) => void) {
 
   canvas.width = width * ratio;
   canvas.height = height * ratio;
-  canvas.style.width = width + 'px';
-  canvas.style.height = height + 'px';
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
 
   root.appendChild(canvas);
 
@@ -157,13 +157,13 @@ function runTask(root: HTMLDivElement, onComplete: (data: Data) => void) {
   const drawScore = () => {
     ctx.font = '16px Arial';
     ctx.fillStyle = '#0095DD';
-    ctx.fillText('Score: ' + score, 8, 20);
+    ctx.fillText(`Score: ${score}`, 8, 20);
   };
 
   const drawLives = () => {
     ctx.font = '16px Arial';
     ctx.fillStyle = '#0095DD';
-    ctx.fillText('Lives: ' + lives, width - 65, 20);
+    ctx.fillText(`Lives: ${lives}`, width - 65, 20);
   };
 
   const draw = () => {
@@ -274,7 +274,7 @@ export default defineInstrument({
       kind: 'computed',
       label: 'Time Elapsed',
       value(data) {
-        return data.timeElapsed + 'ms';
+        return `${data.timeElapsed}ms`;
       }
     },
     win: {

@@ -52,7 +52,7 @@ export function isSubjectWithPersonalInfo<T extends SubjectPersonalInfo>(
 }
 
 export function encodeScopedSubjectId(id: string, options: { groupName: string }) {
-  return options.groupName.replaceAll(' ', '_') + '$' + id;
+  return `${options.groupName.replaceAll(' ', '_')}$${id}`;
 }
 
 export { removeSubjectIdScope } from '@opendatacapture/runtime-internal';
