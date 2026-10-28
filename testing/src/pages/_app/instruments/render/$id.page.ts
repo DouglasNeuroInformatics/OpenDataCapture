@@ -10,6 +10,8 @@ export class RenderInstrumentPage extends AppPage {
   readonly beginButton: Locator;
   readonly consentPreamble: Locator;
   readonly errorMessages: Locator;
+  /** The red notice under the submit button after a submission fails validation. */
+  readonly errorSummary: Locator;
   /** The Happiness Questionnaire's affirmative answer to "are you satisfied with your life?". */
   readonly happinessSatisfiedRadio: Locator;
   /** Asks the clinician to confirm leaving an instrument whose responses have not been submitted. */
@@ -32,6 +34,7 @@ export class RenderInstrumentPage extends AppPage {
     this.submitButton = page.getByRole('button', { name: 'Submit' });
     this.summaryHeading = page.getByRole('heading', { name: /Summary of Results/i });
     this.errorMessages = page.getByTestId('error-message-text');
+    this.errorSummary = page.getByTestId('form-error-summary');
   }
 
   /** Accepts the General Consent Form by selecting the affirmative radio option. */

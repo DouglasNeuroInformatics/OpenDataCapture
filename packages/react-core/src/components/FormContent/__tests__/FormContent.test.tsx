@@ -97,4 +97,30 @@ describe('FormContent', () => {
       expect(onSubmit).toHaveBeenCalledWith({ data: { favoriteNumber: 7 }, kind: 'FORM' });
     });
   });
+
+  it('should not summarize errors before the form has been submitted', () => {
+    renderFormContent();
+    expect(screen.queryByTestId('form-error-summary')).toBeNull();
+  });
+
+  it('should summarize errors under the submit button when submission fails validation', async () => {
+    const onSubmit = renderFormContent();
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('form-error-summary').textContent).toMatch(/resolve the errors above/);
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should clear the error summary once the corrected answers submit', async () => {
+    const onSubmit = renderFormContent();
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await screen.findByTestId('form-error-summary');
+    fireEvent.change(screen.getByLabelText('Favorite Number'), { target: { value: '7' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalled();
+    });
+    expect(screen.queryByTestId('form-error-summary')).toBeNull();
+  });
 });

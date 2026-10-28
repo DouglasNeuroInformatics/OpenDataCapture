@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { Button, Dialog, Form, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualFormInstrument, FormInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
@@ -17,6 +19,7 @@ export type FormContentProps = {
 
 export const FormContent = ({ instrument, onSubmit, submitButtonLabel }: FormContentProps) => {
   const { t } = useTranslation();
+  const [hasValidationErrors, setHasValidationErrors] = useState(false);
   const instructions = instrument.clientDetails?.instructions ?? instrument.details.instructions;
   return (
     <div className="space-y-6">
@@ -58,8 +61,21 @@ export const FormContent = ({ instrument, onSubmit, submitButtonLabel }: FormCon
         resetBtn={instrument.resetButton}
         submitBtnLabel={submitButtonLabel ? t(submitButtonLabel) : undefined}
         validationSchema={instrument.validationSchema}
-        onSubmit={(data) => void onSubmit({ data, kind: 'FORM' })}
+        onError={() => setHasValidationErrors(true)}
+        onSubmit={(data) => {
+          setHasValidationErrors(false);
+          void onSubmit({ data, kind: 'FORM' });
+        }}
       />
+      {hasValidationErrors && (
+        <p className="text-destructive text-sm font-medium" data-testid="form-error-summary" role="alert">
+          {t({
+            en: 'Some fields are incomplete or invalid. Please resolve the errors above before continuing.',
+            es: 'Algunos campos están incompletos o no son válidos. Corrija los errores anteriores antes de continuar.',
+            fr: 'Certains champs sont incomplets ou invalides. Veuillez corriger les erreurs ci-dessus avant de continuer.'
+          })}
+        </p>
+      )}
     </div>
   );
 };
