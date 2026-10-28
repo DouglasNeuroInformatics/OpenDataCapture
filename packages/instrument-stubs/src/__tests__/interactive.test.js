@@ -13,14 +13,16 @@ function getButton(name) {
   return button;
 }
 
-beforeEach(() => {
+function resetDocument() {
   document.body.innerHTML = '';
   document.body.removeAttribute('style');
   document.documentElement.setAttribute('lang', 'en');
-});
+}
 
 describe('interactiveInstrument', () => {
   const { content, validationSchema } = interactiveInstrument.instance;
+
+  beforeEach(resetDocument);
 
   it('should center its content in a full-viewport column', () => {
     content.render(vi.fn());
@@ -49,6 +51,8 @@ describe('interactiveInstrument', () => {
 
 describe('bilingualInteractiveInstrument', () => {
   const { content, validationSchema } = bilingualInteractiveInstrument.instance;
+
+  beforeEach(resetDocument);
 
   it('should label its buttons in the document language', () => {
     document.documentElement.setAttribute('lang', 'fr');

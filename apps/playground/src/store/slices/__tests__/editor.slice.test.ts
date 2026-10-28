@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useAppStore } from '@/store';
 
+import { createEditorSlice } from '../editor.slice';
+
 vi.mock('idb-keyval', () => ({ del: vi.fn(), get: vi.fn(), set: vi.fn() }));
 
 vi.mock('@/instruments', () => {
@@ -14,6 +16,8 @@ vi.mock('@/instruments', () => {
   };
   return { defaultInstruments: [defaultSelectedInstrument], defaultSelectedInstrument };
 });
+
+const { closeFile, deleteFile } = createEditorSlice(useAppStore.setState, useAppStore.getState, useAppStore);
 
 describe('createEditorSlice', () => {
   beforeEach(() => {
@@ -29,24 +33,24 @@ describe('createEditorSlice', () => {
   });
 
   it('should keep the active file selected when a background tab is closed', () => {
-    useAppStore.getState().closeFile('a.ts');
+    closeFile('a.ts');
     expect(useAppStore.getState().openFilenames).toEqual(['index.ts', 'b.ts']);
     expect(useAppStore.getState().selectedFilename).toBe('b.ts');
   });
 
   it('should keep the active file selected when a file open in a background tab is deleted', () => {
-    useAppStore.getState().deleteFile('a.ts');
+    deleteFile('a.ts');
     expect(useAppStore.getState().openFilenames).toEqual(['index.ts', 'b.ts']);
     expect(useAppStore.getState().selectedFilename).toBe('b.ts');
   });
 
   it('should select the tab to the left when the active tab is closed', () => {
-    useAppStore.getState().closeFile('b.ts');
+    closeFile('b.ts');
     expect(useAppStore.getState().selectedFilename).toBe('a.ts');
   });
 
   it('should select the tab to the left when the active file is deleted', () => {
-    useAppStore.getState().deleteFile('b.ts');
+    deleteFile('b.ts');
     expect(useAppStore.getState().files.map(({ name }) => name)).toEqual(['index.ts', 'a.ts']);
     expect(useAppStore.getState().selectedFilename).toBe('a.ts');
   });

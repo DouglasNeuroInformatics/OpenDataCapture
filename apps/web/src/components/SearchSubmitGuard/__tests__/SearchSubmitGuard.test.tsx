@@ -2,7 +2,7 @@ import { DataTable } from '@douglasneuroinformatics/libui/components';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import { SearchSubmitGuard } from '@/components/SearchSubmitGuard';
+import { SearchSubmitGuard } from '@/components/SearchSubmitGuard/SearchSubmitGuard';
 
 // Initialises the shared libui translator, which the table's controls read on render.
 import '@/services/i18n';
@@ -15,12 +15,12 @@ const renderTable = (guarded: boolean) => {
   return screen.getByTestId('data-table-search-bar');
 };
 
-beforeEach(() => {
-  // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
-  cleanup();
-});
-
 describe('SearchSubmitGuard', () => {
+  beforeEach(() => {
+    // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
+    cleanup();
+  });
+
   beforeAll(() => {
     // libui measures the table container; happy-dom has no layout engine.
     globalThis.ResizeObserver ??= class {

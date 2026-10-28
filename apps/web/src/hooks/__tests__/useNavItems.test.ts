@@ -48,26 +48,26 @@ const navLabels = () =>
     .result.current.flat()
     .map((item) => item.label);
 
-beforeEach(() => {
-  // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
-  cleanup();
-  vi.clearAllMocks();
-  mocks.can.mockReturnValue(true);
-  mocks.config.setup.isGatewayEnabled = true;
-  mocks.setupState.isMailEnabled = false;
-  mocks.setupState.isBulkRemoteAssignmentsEnabled = true;
-  mocks.setupState.isExperimentalFeaturesEnabled = false;
-  mocks.store.currentGroup = { id: 'group-1' };
-  mocks.store.currentSession = null;
-  mocks.store.currentUser = { ability: { can: mocks.can } };
-});
-
 const navItemAt = (url: string) =>
   renderHook(() => useNavItems())
     .result.current.flat()
     .find((item) => item.url === url);
 
 describe('useNavItems', () => {
+  beforeEach(() => {
+    // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
+    cleanup();
+    vi.clearAllMocks();
+    mocks.can.mockReturnValue(true);
+    mocks.config.setup.isGatewayEnabled = true;
+    mocks.setupState.isMailEnabled = false;
+    mocks.setupState.isBulkRemoteAssignmentsEnabled = true;
+    mocks.setupState.isExperimentalFeaturesEnabled = false;
+    mocks.store.currentGroup = { id: 'group-1' };
+    mocks.store.currentSession = null;
+    mocks.store.currentUser = { ability: { can: mocks.can } };
+  });
+
   it('should offer remote assignment when the gateway is deployed', () => {
     expect(navUrls()).toContain('/session/remote-assignment');
   });

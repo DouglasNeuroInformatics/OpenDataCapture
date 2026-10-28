@@ -114,7 +114,9 @@ describe('FilesService', () => {
         { action: 'read', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecordFile' }
       ]);
       instrumentRecordModel.findUnique.mockResolvedValueOnce(null);
-      await expect(filesService.find(RECORD_ID, createCurrentUser(ability))).rejects.toThrow();
+      await expect(filesService.find(RECORD_ID, createCurrentUser(ability))).rejects.toThrow(
+        `Could not find record with ID '${RECORD_ID}'`
+      );
       expect(instrumentRecordModel.findUnique.mock.lastCall?.[0]).toMatchObject({
         where: {
           AND: [
@@ -332,7 +334,9 @@ describe('FilesService', () => {
       instrumentsService.findById.mockResolvedValueOnce(
         createInstrument([createFileGroup('scan', { max: 1, min: 1 })])
       );
-      await expect(filesService.setUploadComplete(RECORD_ID, { uploads: {} }, adminUser)).rejects.toThrow();
+      await expect(filesService.setUploadComplete(RECORD_ID, { uploads: {} }, adminUser)).rejects.toThrow(
+        "Invalid file count for file group 'scan'"
+      );
       expect(instrumentRecordModel.update).not.toHaveBeenCalled();
     });
   });

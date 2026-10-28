@@ -4,6 +4,7 @@ import { createElement } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { useDeleteBulkAssignmentsMutation } from '../useDeleteBulkAssignmentsMutation';
 
@@ -47,7 +48,7 @@ describe('useDeleteBulkAssignmentsMutation', () => {
   it('should reject a malformed response rather than report a count the server never sent', async () => {
     mockAxios.post.mockResolvedValue({ data: { deletedCount: -1, failedIds: [] } });
     const { result } = renderDeleteMutation();
-    await expect(result.current.mutateAsync({ ids: ['assignment-1'] })).rejects.toThrow();
+    await expect(result.current.mutateAsync({ ids: ['assignment-1'] })).rejects.toThrow(z.ZodError);
   });
 
   it('should announce success once the batch is deleted', async () => {

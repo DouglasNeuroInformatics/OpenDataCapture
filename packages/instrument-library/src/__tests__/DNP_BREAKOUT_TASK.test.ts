@@ -96,32 +96,32 @@ function computeMeasure(key: string, data: BreakoutData) {
   return measure.value(data);
 }
 
-beforeEach(() => {
-  context = createRecordingContext();
-  done = vi.fn<(data: BreakoutData) => void>();
-  nextFrame = undefined;
-  addDocumentListener = vi.spyOn(document, 'addEventListener');
-  // The page under test only calls the 2D context methods recorded here, and happy-dom has no canvas
-  // adapter, so getContext would otherwise return null.
-  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context as unknown as CanvasRenderingContext2D);
-  vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
-    nextFrame = callback;
-    return 0;
-  });
-  vi.spyOn(window, 'devicePixelRatio', 'get').mockReturnValue(1);
-  setViewport(480, 320);
-});
-
-afterEach(() => {
-  for (const [type, listener, options] of addDocumentListener.mock.calls) {
-    document.removeEventListener(type, listener, options);
-  }
-  vi.restoreAllMocks();
-  vi.useRealTimers();
-  document.body.replaceChildren();
-});
-
 describe('DNP_BREAKOUT_TASK', () => {
+  beforeEach(() => {
+    context = createRecordingContext();
+    done = vi.fn<(data: BreakoutData) => void>();
+    nextFrame = undefined;
+    addDocumentListener = vi.spyOn(document, 'addEventListener');
+    // The page under test only calls the 2D context methods recorded here, and happy-dom has no canvas
+    // adapter, so getContext would otherwise return null.
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context as unknown as CanvasRenderingContext2D);
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      nextFrame = callback;
+      return 0;
+    });
+    vi.spyOn(window, 'devicePixelRatio', 'get').mockReturnValue(1);
+    setViewport(480, 320);
+  });
+
+  afterEach(() => {
+    for (const [type, listener, options] of addDocumentListener.mock.calls) {
+      document.removeEventListener(type, listener, options);
+    }
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+    document.body.replaceChildren();
+  });
+
   describe('measures', () => {
     it('should report the elapsed time in milliseconds', () => {
       expect(computeMeasure('timeElapsed', { livesRemaining: 2, timeElapsed: 1500 })).toBe('1500ms');

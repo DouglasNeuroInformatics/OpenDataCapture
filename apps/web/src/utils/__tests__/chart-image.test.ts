@@ -46,24 +46,24 @@ const chartCard = (markup = '<svg width="600" height="300"><text>tick</text></sv
   return container;
 };
 
-beforeEach(() => {
-  decodeFails = false;
-  encodedBlob = pngBlob;
-  drawnText = [];
-  imageSource = '';
-  vi.stubGlobal('Image', FakeImage);
-  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
-    fakeContext as unknown as CanvasRenderingContext2D
-  );
-  vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation((callback) => callback(encodedBlob));
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
-  vi.unstubAllGlobals();
-});
-
 describe('renderChartPng', () => {
+  beforeEach(() => {
+    decodeFails = false;
+    encodedBlob = pngBlob;
+    drawnText = [];
+    imageSource = '';
+    vi.stubGlobal('Image', FakeImage);
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
+      fakeContext as unknown as CanvasRenderingContext2D
+    );
+    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation((callback) => callback(encodedBlob));
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
   it('should encode the chart as a png', async () => {
     await expect(renderChartPng(chartCard(), { mode: 'light' })).resolves.toBe(pngBlob);
   });

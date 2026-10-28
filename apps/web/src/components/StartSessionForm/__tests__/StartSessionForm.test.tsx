@@ -6,7 +6,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import axios from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { StartSessionForm } from '@/components/StartSessionForm';
+import { StartSessionForm } from '@/components/StartSessionForm/StartSessionForm';
 
 import '@/services/i18n';
 
@@ -134,18 +134,18 @@ const errorMessages = () =>
 
 const subjectIdError = (message: string) => ({ field: 'subjectId', message });
 
-beforeEach(() => {
-  // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
-  cleanup();
-  vi.clearAllMocks();
-  get.mockResolvedValue({ data: null, status: 404 });
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
-
 describe('StartSessionForm', () => {
+  beforeEach(() => {
+    // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
+    cleanup();
+    vi.clearAllMocks();
+    get.mockResolvedValue({ data: null, status: 404 });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   // A new subject's identifier is by definition absent from the options, so the combobox has to keep
   // text matching no option rather than reverting to the empty selection when the popup closes.
   it('should submit an identifier that matches no existing subject, so a new subject can be enrolled', async () => {
@@ -236,218 +236,218 @@ describe('StartSessionForm', () => {
     await submitAndSettle(form);
     expect(submittedSubjectId()).toBe('Group_One$abc');
   });
-});
 
-describe('StartSessionForm with an existing subject', () => {
-  it('should look the subject up by the id the form would submit, so the details shown are that subject’s', async () => {
-    renderForm(['alpha']);
-    pickIdentifier('alpha');
-    await waitFor(() =>
-      expect(get).toHaveBeenCalledWith(`/v1/subjects/${DEFAULT_GROUP_NAME}%24alpha`, expect.anything())
-    );
-  });
+  describe('with an existing subject', () => {
+    it('should look the subject up by the id the form would submit, so the details shown are that subject’s', async () => {
+      renderForm(['alpha']);
+      pickIdentifier('alpha');
+      await waitFor(() =>
+        expect(get).toHaveBeenCalledWith(`/v1/subjects/${DEFAULT_GROUP_NAME}%24alpha`, expect.anything())
+      );
+    });
 
-  it('should fill in and lock the date of birth and sex the subject already records', async () => {
-    existingSubject({ dateOfBirth: '1990-06-15', sex: 'FEMALE' });
-    renderForm(['alpha']);
-    pickIdentifier('alpha');
-    await waitFor(() => expect(dateOfBirthInput().value).toBe('1990-06-15'));
-    expect(dateOfBirthInput().disabled).toBe(true);
-    expect(sexTrigger().disabled).toBe(true);
-  });
+    it('should fill in and lock the date of birth and sex the subject already records', async () => {
+      existingSubject({ dateOfBirth: '1990-06-15', sex: 'FEMALE' });
+      renderForm(['alpha']);
+      pickIdentifier('alpha');
+      await waitFor(() => expect(dateOfBirthInput().value).toBe('1990-06-15'));
+      expect(dateOfBirthInput().disabled).toBe(true);
+      expect(sexTrigger().disabled).toBe(true);
+    });
 
-  it('should submit the filled-in details, so the locked values reach the session', async () => {
-    existingSubject({ dateOfBirth: '1990-06-15', sex: 'FEMALE' });
-    const form = renderForm(['alpha']);
-    pickIdentifier('alpha');
-    await waitFor(() => expect(sexTrigger().disabled).toBe(true));
-    await submitAndSettle(form);
-    expect(onSubmit.mock.lastCall?.[0].subjectData).toMatchObject({
-      dateOfBirth: new Date('1990-06-15'),
-      sex: 'FEMALE'
+    it('should submit the filled-in details, so the locked values reach the session', async () => {
+      existingSubject({ dateOfBirth: '1990-06-15', sex: 'FEMALE' });
+      const form = renderForm(['alpha']);
+      pickIdentifier('alpha');
+      await waitFor(() => expect(sexTrigger().disabled).toBe(true));
+      await submitAndSettle(form);
+      expect(onSubmit.mock.lastCall?.[0].subjectData).toMatchObject({
+        dateOfBirth: new Date('1990-06-15'),
+        sex: 'FEMALE'
+      });
+    });
+
+    it('should lock only the details the subject records, leaving the rest editable', async () => {
+      existingSubject({ dateOfBirth: null, sex: 'MALE' });
+      renderForm(['alpha']);
+      pickIdentifier('alpha');
+      await waitFor(() => expect(sexTrigger().disabled).toBe(true));
+      expect(dateOfBirthInput().disabled).toBe(false);
+    });
+
+    it('should not look up an identifier absent from the options, since no subject can have it', () => {
+      renderForm(['alpha']);
+      typeIdentifier('gamma');
+      closeIdentifierPopup();
+      expect(get).not.toHaveBeenCalled();
+    });
+
+    it('should clear and unlock the details when the identifier changes to a new one, so a new subject inherits nothing', async () => {
+      existingSubject({ dateOfBirth: '1990-06-15', sex: 'FEMALE' });
+      renderForm(['alpha']);
+      pickIdentifier('alpha');
+      await waitFor(() => expect(dateOfBirthInput().disabled).toBe(true));
+      typeIdentifier('gamma');
+      closeIdentifierPopup();
+      await waitFor(() => expect(dateOfBirthInput().disabled).toBe(false));
+      expect(dateOfBirthInput().value).toBe('');
+      expect(sexTrigger().disabled).toBe(false);
     });
   });
 
-  it('should lock only the details the subject records, leaving the rest editable', async () => {
-    existingSubject({ dateOfBirth: null, sex: 'MALE' });
-    renderForm(['alpha']);
-    pickIdentifier('alpha');
-    await waitFor(() => expect(sexTrigger().disabled).toBe(true));
-    expect(dateOfBirthInput().disabled).toBe(false);
-  });
-
-  it('should not look up an identifier absent from the options, since no subject can have it', () => {
-    renderForm(['alpha']);
-    typeIdentifier('gamma');
-    closeIdentifierPopup();
-    expect(get).not.toHaveBeenCalled();
-  });
-
-  it('should clear and unlock the details when the identifier changes to a new one, so a new subject inherits nothing', async () => {
-    existingSubject({ dateOfBirth: '1990-06-15', sex: 'FEMALE' });
-    renderForm(['alpha']);
-    pickIdentifier('alpha');
-    await waitFor(() => expect(dateOfBirthInput().disabled).toBe(true));
-    typeIdentifier('gamma');
-    closeIdentifierPopup();
-    await waitFor(() => expect(dateOfBirthInput().disabled).toBe(false));
-    expect(dateOfBirthInput().value).toBe('');
-    expect(sexTrigger().disabled).toBe(false);
-  });
-});
-
-describe('StartSessionForm with a custom identifier', () => {
-  it('should attribute the session to the current group, so it is filed where the clinician is working', async () => {
-    const form = renderForm([], groupWithSettings({}));
-    typeIdentifier('abc');
-    closeIdentifierPopup();
-    await submitAndSettle(form);
-    expect(onSubmit.mock.lastCall?.[0]).toMatchObject({ groupId: 'group-1', username: 'admin' });
-  });
-
-  it('should submit a null username when none is known, rather than an undefined one the API would reject', async () => {
-    render(
-      <QueryClientProvider client={new QueryClient()}>
-        <StartSessionForm currentGroup={null} customSubjectIds={[]} readOnly={false} onSubmit={onSubmit} />
-      </QueryClientProvider>
-    );
-    const form = screen.getByTestId('start-session-form');
-    fireEvent.change(form.querySelector('[name="subjectIdentificationMethod"]')!, { target: { value: 'CUSTOM_ID' } });
-    typeIdentifier('abc');
-    closeIdentifierPopup();
-    await submitAndSettle(form);
-    expect(onSubmit.mock.lastCall?.[0]).toMatchObject({ groupId: null, username: null });
-  });
-
-  it("should show the group's own message for an identifier its pattern rejects, in the clinician's language", async () => {
-    const form = renderForm(
-      [],
-      groupWithSettings({ idValidationRegex: '^[a-z]+$', idValidationRegexErrorMessage: { en: 'Lowercase only' } })
-    );
-    typeIdentifier('ABC');
-    closeIdentifierPopup();
-    submit(form);
-    await waitFor(() => expect(errorMessages()).toEqual([subjectIdError('Lowercase only')]));
-  });
-
-  it("should log and accept an identifier when the group's pattern is not a valid regular expression, so a bad setting does not block every session", async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    const form = renderForm([], groupWithIdPattern('['));
-    typeIdentifier('abc');
-    closeIdentifierPopup();
-    await submitAndSettle(form);
-    expect(consoleError).toHaveBeenCalledWith(expect.any(SyntaxError));
-  });
-
-  it('should ignore a lookup that resolves after the identifier has moved on, so stale details never overwrite newer ones', async () => {
-    let resolveFirst!: (value: { data: { dateOfBirth: string; sex: string }; status: number }) => void;
-    get.mockReturnValueOnce(new Promise((resolve) => (resolveFirst = resolve)));
-    existingSubject({ dateOfBirth: '2000-01-01', sex: 'MALE' });
-    const queryClient = createQueryClient();
-    const fetchQuery = vi.spyOn(queryClient, 'fetchQuery');
-    renderForm(['alpha', 'beta'], null, 'CUSTOM_ID', queryClient);
-    pickIdentifier('alpha');
-    pickIdentifier('beta');
-    await waitFor(() => expect(dateOfBirthInput().value).toBe('2000-01-01'));
-    const staleLookup = fetchQuery.mock.results[0]!.value;
-    // The form awaited this promise first, so its continuation has run by the time this await returns.
-    await act(async () => {
-      resolveFirst({ data: { dateOfBirth: '1990-06-15', sex: 'FEMALE' }, status: 200 });
-      await staleLookup;
+  describe('with a custom identifier', () => {
+    it('should attribute the session to the current group, so it is filed where the clinician is working', async () => {
+      const form = renderForm([], groupWithSettings({}));
+      typeIdentifier('abc');
+      closeIdentifierPopup();
+      await submitAndSettle(form);
+      expect(onSubmit.mock.lastCall?.[0]).toMatchObject({ groupId: 'group-1', username: 'admin' });
     });
-    expect(dateOfBirthInput().value).toBe('2000-01-01');
-  });
-});
 
-describe('StartSessionForm with personal information', () => {
-  it('should identify the subject by a hash of their personal information, so no name is stored as an id', async () => {
-    const form = renderForm([], null, 'PERSONAL_INFO');
-    fillPersonalInfo(form, { dateOfBirth: '1990-06-15', firstName: 'Jane' });
-    await submitAndSettle(form);
-    const expectedId = await generateSubjectHash({
-      dateOfBirth: new Date('1990-06-15'),
-      firstName: 'Jane',
-      lastName: 'Doe',
-      sex: 'FEMALE'
+    it('should submit a null username when none is known, rather than an undefined one the API would reject', async () => {
+      render(
+        <QueryClientProvider client={new QueryClient()}>
+          <StartSessionForm currentGroup={null} customSubjectIds={[]} readOnly={false} onSubmit={onSubmit} />
+        </QueryClientProvider>
+      );
+      const form = screen.getByTestId('start-session-form');
+      fireEvent.change(form.querySelector('[name="subjectIdentificationMethod"]')!, { target: { value: 'CUSTOM_ID' } });
+      typeIdentifier('abc');
+      closeIdentifierPopup();
+      await submitAndSettle(form);
+      expect(onSubmit.mock.lastCall?.[0]).toMatchObject({ groupId: null, username: null });
     });
-    expect(submittedSubjectId()).toBe(expectedId);
+
+    it("should show the group's own message for an identifier its pattern rejects, in the clinician's language", async () => {
+      const form = renderForm(
+        [],
+        groupWithSettings({ idValidationRegex: '^[a-z]+$', idValidationRegexErrorMessage: { en: 'Lowercase only' } })
+      );
+      typeIdentifier('ABC');
+      closeIdentifierPopup();
+      submit(form);
+      await waitFor(() => expect(errorMessages()).toEqual([subjectIdError('Lowercase only')]));
+    });
+
+    it("should log and accept an identifier when the group's pattern is not a valid regular expression, so a bad setting does not block every session", async () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      const form = renderForm([], groupWithIdPattern('['));
+      typeIdentifier('abc');
+      closeIdentifierPopup();
+      await submitAndSettle(form);
+      expect(consoleError).toHaveBeenCalledWith(expect.any(SyntaxError));
+    });
+
+    it('should ignore a lookup that resolves after the identifier has moved on, so stale details never overwrite newer ones', async () => {
+      let resolveFirst!: (value: { data: { dateOfBirth: string; sex: string }; status: number }) => void;
+      get.mockReturnValueOnce(new Promise((resolve) => (resolveFirst = resolve)));
+      existingSubject({ dateOfBirth: '2000-01-01', sex: 'MALE' });
+      const queryClient = createQueryClient();
+      const fetchQuery = vi.spyOn(queryClient, 'fetchQuery');
+      renderForm(['alpha', 'beta'], null, 'CUSTOM_ID', queryClient);
+      pickIdentifier('alpha');
+      pickIdentifier('beta');
+      await waitFor(() => expect(dateOfBirthInput().value).toBe('2000-01-01'));
+      const staleLookup = fetchQuery.mock.results[0]!.value;
+      // The form awaited this promise first, so its continuation has run by the time this await returns.
+      await act(async () => {
+        resolveFirst({ data: { dateOfBirth: '1990-06-15', sex: 'FEMALE' }, status: 200 });
+        await staleLookup;
+      });
+      expect(dateOfBirthInput().value).toBe('2000-01-01');
+    });
   });
 
-  it('should require only the personal details left blank, so the clinician sees exactly what is missing', async () => {
-    const form = renderForm([], null, 'PERSONAL_INFO');
-    fillPersonalInfo(form, {});
-    submit(form);
-    await waitFor(() =>
-      expect(errorMessages()).toEqual([
-        { field: 'subjectFirstName', message: 'This field is required' },
-        { field: 'subjectDateOfBirth', message: 'This field is required' }
-      ])
-    );
-    expect(onSubmit).not.toHaveBeenCalled();
+  describe('with personal information', () => {
+    it('should identify the subject by a hash of their personal information, so no name is stored as an id', async () => {
+      const form = renderForm([], null, 'PERSONAL_INFO');
+      fillPersonalInfo(form, { dateOfBirth: '1990-06-15', firstName: 'Jane' });
+      await submitAndSettle(form);
+      const expectedId = await generateSubjectHash({
+        dateOfBirth: new Date('1990-06-15'),
+        firstName: 'Jane',
+        lastName: 'Doe',
+        sex: 'FEMALE'
+      });
+      expect(submittedSubjectId()).toBe(expectedId);
+    });
+
+    it('should require only the personal details left blank, so the clinician sees exactly what is missing', async () => {
+      const form = renderForm([], null, 'PERSONAL_INFO');
+      fillPersonalInfo(form, {});
+      submit(form);
+      await waitFor(() =>
+        expect(errorMessages()).toEqual([
+          { field: 'subjectFirstName', message: 'This field is required' },
+          { field: 'subjectDateOfBirth', message: 'This field is required' }
+        ])
+      );
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it("should reject a date of birth younger than the group's minimum age", async () => {
+      const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
+      fillPersonalInfo(form, { dateOfBirth: '2020-01-01', firstName: 'Jane' });
+      submit(form);
+      await waitFor(() => expect(screen.getByText('Subject must be above age of 18')).toBeTruthy());
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it("should accept a date of birth older than the group's minimum age", async () => {
+      const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
+      fillPersonalInfo(form, { dateOfBirth: '1990-06-15', firstName: 'Jane' });
+      await submitAndSettle(form);
+    });
   });
 
-  it("should reject a date of birth younger than the group's minimum age", async () => {
-    const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
-    fillPersonalInfo(form, { dateOfBirth: '2020-01-01', firstName: 'Jane' });
-    submit(form);
-    await waitFor(() => expect(screen.getByText('Subject must be above age of 18')).toBeTruthy());
-    expect(onSubmit).not.toHaveBeenCalled();
+  describe('session type', () => {
+    it('should ask for the assessment date only for a retrospective session, since an in-person one happens today', () => {
+      const form = renderForm([]);
+      expect(screen.queryByText('Date Assessed')).toBeNull();
+      fireEvent.change(form.querySelector('[name="sessionType"]')!, { target: { value: 'RETROSPECTIVE' } });
+      expect(screen.getByText('Date Assessed')).toBeTruthy();
+    });
   });
 
-  it("should accept a date of birth older than the group's minimum age", async () => {
-    const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
-    fillPersonalInfo(form, { dateOfBirth: '1990-06-15', firstName: 'Jane' });
-    await submitAndSettle(form);
-  });
-});
+  describe('date of birth', () => {
+    const futureDateOfBirth = `${new Date().getFullYear() + 1}-01-01`;
 
-describe('StartSessionForm session type', () => {
-  it('should ask for the assessment date only for a retrospective session, since an in-person one happens today', () => {
-    const form = renderForm([]);
-    expect(screen.queryByText('Date Assessed')).toBeNull();
-    fireEvent.change(form.querySelector('[name="sessionType"]')!, { target: { value: 'RETROSPECTIVE' } });
-    expect(screen.getByText('Date Assessed')).toBeTruthy();
-  });
-});
+    const futureDateOfBirthError = { field: 'subjectDateOfBirth', message: 'Date of birth must be in the past' };
 
-describe('StartSessionForm date of birth', () => {
-  const futureDateOfBirth = `${new Date().getFullYear() + 1}-01-01`;
+    const enterNewIdentifier = () => {
+      typeIdentifier('gamma');
+      closeIdentifierPopup();
+    };
 
-  const futureDateOfBirthError = { field: 'subjectDateOfBirth', message: 'Date of birth must be in the past' };
+    it('should reject a date of birth in the future, since no subject can be born after today', async () => {
+      const form = renderForm([]);
+      enterNewIdentifier();
+      enterDateOfBirth(futureDateOfBirth);
+      submit(form);
+      await waitFor(() => expect(errorMessages()).toEqual([futureDateOfBirthError]));
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
 
-  const enterNewIdentifier = () => {
-    typeIdentifier('gamma');
-    closeIdentifierPopup();
-  };
+    it('should show only the future-date error with personal information, not a contradictory required-field error', async () => {
+      const form = renderForm([], null, 'PERSONAL_INFO');
+      fillPersonalInfo(form, { dateOfBirth: futureDateOfBirth, firstName: 'Jane' });
+      submit(form);
+      await waitFor(() => expect(errorMessages()).toEqual([futureDateOfBirthError]));
+    });
 
-  it('should reject a date of birth in the future, since no subject can be born after today', async () => {
-    const form = renderForm([]);
-    enterNewIdentifier();
-    enterDateOfBirth(futureDateOfBirth);
-    submit(form);
-    await waitFor(() => expect(errorMessages()).toEqual([futureDateOfBirthError]));
-    expect(onSubmit).not.toHaveBeenCalled();
-  });
+    it("should show only the future-date error in a group with a minimum age, not a second error for the subject's age", async () => {
+      const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
+      fillPersonalInfo(form, { dateOfBirth: futureDateOfBirth, firstName: 'Jane' });
+      submit(form);
+      await waitFor(() => expect(errorMessages()).toEqual([futureDateOfBirthError]));
+    });
 
-  it('should show only the future-date error with personal information, not a contradictory required-field error', async () => {
-    const form = renderForm([], null, 'PERSONAL_INFO');
-    fillPersonalInfo(form, { dateOfBirth: futureDateOfBirth, firstName: 'Jane' });
-    submit(form);
-    await waitFor(() => expect(errorMessages()).toEqual([futureDateOfBirthError]));
-  });
-
-  it("should show only the future-date error in a group with a minimum age, not a second error for the subject's age", async () => {
-    const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
-    fillPersonalInfo(form, { dateOfBirth: futureDateOfBirth, firstName: 'Jane' });
-    submit(form);
-    await waitFor(() => expect(errorMessages()).toEqual([futureDateOfBirthError]));
-  });
-
-  it('should accept a date of birth in the past, so the check does not block a valid session', async () => {
-    const form = renderForm([]);
-    enterNewIdentifier();
-    enterDateOfBirth('1990-01-01');
-    await submitAndSettle(form);
-    expect(onSubmit.mock.lastCall?.[0].subjectData.dateOfBirth).toStrictEqual(new Date('1990-01-01'));
+    it('should accept a date of birth in the past, so the check does not block a valid session', async () => {
+      const form = renderForm([]);
+      enterNewIdentifier();
+      enterDateOfBirth('1990-01-01');
+      await submitAndSettle(form);
+      expect(onSubmit.mock.lastCall?.[0].subjectData.dateOfBirth).toStrictEqual(new Date('1990-01-01'));
+    });
   });
 });

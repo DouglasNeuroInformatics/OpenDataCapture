@@ -63,147 +63,149 @@ const runLoader = async (isGatewayEnabled: boolean) => {
   return { fetchQuery, result };
 };
 
-describe('about page', () => {
-  beforeEach(() => {
-    i18n.changeLanguage('en');
-    vi.stubGlobal('__RELEASE__', PRODUCTION_RELEASE);
-    mocks.setupState = { isGatewayEnabled: false, release: DEVELOPMENT_RELEASE, uptime: 5 };
-    mocks.gatewayHealthData = null;
-  });
+describe('Route', () => {
+  describe('about page', () => {
+    beforeEach(() => {
+      i18n.changeLanguage('en');
+      vi.stubGlobal('__RELEASE__', PRODUCTION_RELEASE);
+      mocks.setupState = { isGatewayEnabled: false, release: DEVELOPMENT_RELEASE, uptime: 5 };
+      mocks.gatewayHealthData = null;
+    });
 
-  afterEach(() => {
-    cleanup();
-    vi.restoreAllMocks();
-    vi.unstubAllGlobals();
-    vi.useRealTimers();
-  });
+    afterEach(() => {
+      cleanup();
+      vi.restoreAllMocks();
+      vi.unstubAllGlobals();
+      vi.useRealTimers();
+    });
 
-  it('should omit the branch and commit of a production web client, since a release is identified by its version', () => {
-    renderPage();
-    expect(itemsOf('about-web-client-info')).toEqual([
-      'Build Date: January 15, 2025',
-      'Build Type: Production',
-      'Version: 1.2.3'
-    ]);
-  });
+    it('should omit the branch and commit of a production web client, since a release is identified by its version', () => {
+      renderPage();
+      expect(itemsOf('about-web-client-info')).toEqual([
+        'Build Date: January 15, 2025',
+        'Build Type: Production',
+        'Version: 1.2.3'
+      ]);
+    });
 
-  it('should show the branch and commit of a non-production core API alongside its uptime', () => {
-    renderPage();
-    expect(itemsOf('about-core-api-info')).toEqual([
-      'Build Date: January 15, 2025',
-      'Build Type: Development',
-      'Version: 1.2.4',
-      'Branch: feature',
-      'Commit: abc1234',
-      'Uptime: 00:00:05'
-    ]);
-  });
+    it('should show the branch and commit of a non-production core API alongside its uptime', () => {
+      renderPage();
+      expect(itemsOf('about-core-api-info')).toEqual([
+        'Build Date: January 15, 2025',
+        'Build Type: Development',
+        'Version: 1.2.4',
+        'Branch: feature',
+        'Commit: abc1234',
+        'Uptime: 00:00:05'
+      ]);
+    });
 
-  it('should translate the test build type', () => {
-    mocks.setupState = { isGatewayEnabled: false, release: { ...DEVELOPMENT_RELEASE, type: 'test' }, uptime: 5 };
-    renderPage();
-    expect(itemsOf('about-core-api-info')).toContain('Build Type: Test');
-  });
+    it('should translate the test build type', () => {
+      mocks.setupState = { isGatewayEnabled: false, release: { ...DEVELOPMENT_RELEASE, type: 'test' }, uptime: 5 };
+      renderPage();
+      expect(itemsOf('about-core-api-info')).toContain('Build Type: Test');
+    });
 
-  it('should fold whole days of uptime into the hours, so a long-running server does not wrap around', () => {
-    mocks.setupState = { isGatewayEnabled: false, release: DEVELOPMENT_RELEASE, uptime: 90_061 };
-    renderPage();
-    expect(itemsOf('about-core-api-info')).toContain('Uptime: 25:01:01');
-  });
+    it('should fold whole days of uptime into the hours, so a long-running server does not wrap around', () => {
+      mocks.setupState = { isGatewayEnabled: false, release: DEVELOPMENT_RELEASE, uptime: 90_061 };
+      renderPage();
+      expect(itemsOf('about-core-api-info')).toContain('Uptime: 25:01:01');
+    });
 
-  it('should advance the uptime by exactly one second per tick, so the counter neither skips nor stalls', () => {
-    vi.useFakeTimers();
-    renderPage();
-    const ticks = Array.from({ length: 3 }, () => {
-      act(() => {
-        vi.advanceTimersByTime(1000);
+    it('should advance the uptime by exactly one second per tick, so the counter neither skips nor stalls', () => {
+      vi.useFakeTimers();
+      renderPage();
+      const ticks = Array.from({ length: 3 }, () => {
+        act(() => {
+          vi.advanceTimersByTime(1000);
+        });
+        return uptimeSeconds();
       });
-      return uptimeSeconds();
+      expect([ticks[1]! - ticks[0]!, ticks[2]! - ticks[1]!]).toEqual([1, 1]);
     });
-    expect([ticks[1]! - ticks[0]!, ticks[2]! - ticks[1]!]).toEqual([1, 1]);
-  });
 
-  it('should show the starting uptime plus the seconds elapsed since the page opened', () => {
-    vi.useFakeTimers();
-    renderPage();
-    act(() => {
-      vi.advanceTimersByTime(3000);
+    it('should show the starting uptime plus the seconds elapsed since the page opened', () => {
+      vi.useFakeTimers();
+      renderPage();
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+      expect(itemsOf('about-core-api-info')).toContain('Uptime: 00:00:08');
     });
-    expect(itemsOf('about-core-api-info')).toContain('Uptime: 00:00:08');
+
+    it('should show an error instead of crashing when the uptime cannot be formatted', () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      mocks.setupState = { isGatewayEnabled: false, release: DEVELOPMENT_RELEASE, uptime: -1 };
+      renderPage();
+      expect(itemsOf('about-core-api-info')).toContain('Uptime: ERROR');
+      expect(consoleError).toHaveBeenCalled();
+    });
+
+    it('should only report that a disabled gateway is disabled', () => {
+      renderPage();
+      expect(itemsOf('about-gateway-info')).toEqual(['Enabled: No']);
+    });
+
+    it('should show the release and uptime of a healthy gateway', () => {
+      mocks.setupState = { isGatewayEnabled: true, release: DEVELOPMENT_RELEASE, uptime: 5 };
+      mocks.gatewayHealthData = { ok: true, release: PRODUCTION_RELEASE, status: 200, uptime: 61 };
+      renderPage();
+      expect(itemsOf('about-gateway-info')).toEqual([
+        'Enabled: Yes',
+        'Status: 200',
+        'Build Date: January 15, 2025',
+        'Build Type: Production',
+        'Version: 1.2.3',
+        'Uptime: 00:01:01'
+      ]);
+    });
+
+    it('should show only the status of an unhealthy gateway, since it reports no release', () => {
+      mocks.setupState = { isGatewayEnabled: true, release: DEVELOPMENT_RELEASE, uptime: 5 };
+      mocks.gatewayHealthData = { ok: false, status: 503, statusText: 'Service Unavailable' };
+      renderPage();
+      expect(itemsOf('about-gateway-info')).toEqual(['Enabled: Yes', 'Status: 503']);
+    });
+
+    it('should show the date the page was generated', () => {
+      vi.useFakeTimers({ now: BUILD_TIME, toFake: ['Date'] });
+      renderPage();
+      expect(screen.getByText('Generated on January 15, 2025')).toBeTruthy();
+    });
   });
 
-  it('should show an error instead of crashing when the uptime cannot be formatted', () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    mocks.setupState = { isGatewayEnabled: false, release: DEVELOPMENT_RELEASE, uptime: -1 };
-    renderPage();
-    expect(itemsOf('about-core-api-info')).toContain('Uptime: ERROR');
-    expect(consoleError).toHaveBeenCalled();
-  });
+  describe('about loader', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
 
-  it('should only report that a disabled gateway is disabled', () => {
-    renderPage();
-    expect(itemsOf('about-gateway-info')).toEqual(['Enabled: No']);
-  });
+    it('should fetch the gateway healthcheck when the gateway is enabled', async () => {
+      const healthcheck = { ok: false, status: 503, statusText: 'Service Unavailable' };
+      mocks.axios.get.mockResolvedValue({ data: healthcheck });
+      const { fetchQuery, result } = await runLoader(true);
+      expect(fetchQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['setup-state'] }));
+      expect(mocks.axios.get).toHaveBeenCalledWith('/v1/gateway/healthcheck');
+      expect(result).toEqual({ gatewayHealthData: healthcheck });
+    });
 
-  it('should show the release and uptime of a healthy gateway', () => {
-    mocks.setupState = { isGatewayEnabled: true, release: DEVELOPMENT_RELEASE, uptime: 5 };
-    mocks.gatewayHealthData = { ok: true, release: PRODUCTION_RELEASE, status: 200, uptime: 61 };
-    renderPage();
-    expect(itemsOf('about-gateway-info')).toEqual([
-      'Enabled: Yes',
-      'Status: 200',
-      'Build Date: January 15, 2025',
-      'Build Type: Production',
-      'Version: 1.2.3',
-      'Uptime: 00:01:01'
-    ]);
-  });
+    it('should reject a malformed gateway healthcheck rather than render it', async () => {
+      mocks.axios.get.mockResolvedValue({ data: { ok: 'maybe' } });
+      await expect(runLoader(true)).rejects.toBeInstanceOf(z.ZodError);
+    });
 
-  it('should show only the status of an unhealthy gateway, since it reports no release', () => {
-    mocks.setupState = { isGatewayEnabled: true, release: DEVELOPMENT_RELEASE, uptime: 5 };
-    mocks.gatewayHealthData = { ok: false, status: 503, statusText: 'Service Unavailable' };
-    renderPage();
-    expect(itemsOf('about-gateway-info')).toEqual(['Enabled: Yes', 'Status: 503']);
-  });
+    it('should fetch the API uptime when the page loads rather than reuse the cached setup state', async () => {
+      const { fetchQuery } = await runLoader(false);
+      expect(fetchQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['setup-state'], staleTime: 0 }));
+    });
 
-  it('should show the date the page was generated', () => {
-    vi.useFakeTimers({ now: BUILD_TIME, toFake: ['Date'] });
-    renderPage();
-    expect(screen.getByText('Generated on January 15, 2025')).toBeTruthy();
-  });
-});
+    it('should block a revisit on the reload, so the uptime counter never starts from the previous visit', () => {
+      expect(Route.options.loader).toMatchObject({ staleReloadMode: 'blocking' });
+    });
 
-describe('about loader', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('should fetch the gateway healthcheck when the gateway is enabled', async () => {
-    const healthcheck = { ok: false, status: 503, statusText: 'Service Unavailable' };
-    mocks.axios.get.mockResolvedValue({ data: healthcheck });
-    const { fetchQuery, result } = await runLoader(true);
-    expect(fetchQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['setup-state'] }));
-    expect(mocks.axios.get).toHaveBeenCalledWith('/v1/gateway/healthcheck');
-    expect(result).toEqual({ gatewayHealthData: healthcheck });
-  });
-
-  it('should reject a malformed gateway healthcheck rather than render it', async () => {
-    mocks.axios.get.mockResolvedValue({ data: { ok: 'maybe' } });
-    await expect(runLoader(true)).rejects.toBeInstanceOf(z.ZodError);
-  });
-
-  it('should fetch the API uptime when the page loads rather than reuse the cached setup state', async () => {
-    const { fetchQuery } = await runLoader(false);
-    expect(fetchQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['setup-state'], staleTime: 0 }));
-  });
-
-  it('should block a revisit on the reload, so the uptime counter never starts from the previous visit', () => {
-    expect(Route.options.loader).toMatchObject({ staleReloadMode: 'blocking' });
-  });
-
-  it('should not contact the gateway when it is disabled', async () => {
-    const { result } = await runLoader(false);
-    expect(mocks.axios.get).not.toHaveBeenCalled();
-    expect(result).toEqual({ gatewayHealthData: null });
+    it('should not contact the gateway when it is disabled', async () => {
+      const { result } = await runLoader(false);
+      expect(mocks.axios.get).not.toHaveBeenCalled();
+      expect(result).toEqual({ gatewayHealthData: null });
+    });
   });
 });

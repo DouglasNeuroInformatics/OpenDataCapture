@@ -16,9 +16,9 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
   )
 }));
 
-afterEach(cleanup);
+describe('Route', () => {
+  afterEach(cleanup);
 
-describe('branding route', () => {
   const BrandingPage = Route.options.component!;
 
   it('should title the page as the branding section', () => {

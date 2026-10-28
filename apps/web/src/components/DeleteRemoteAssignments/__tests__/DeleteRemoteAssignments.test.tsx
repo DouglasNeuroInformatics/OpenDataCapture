@@ -6,7 +6,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
-import { DeleteRemoteAssignments } from '@/components/DeleteRemoteAssignments';
+import { DeleteRemoteAssignments } from '@/components/DeleteRemoteAssignments/DeleteRemoteAssignments';
 
 import '@/services/i18n';
 
@@ -85,15 +85,15 @@ const openConfirmation = (...ids: string[]) => {
   fireEvent.click(deleteSelectedButton());
 };
 
-beforeEach(() => {
-  cleanup();
-  vi.resetAllMocks();
-  mocks.assignments = [];
-  mocks.instrumentInfo = [];
-  mocks.isPending = false;
-});
-
 describe('DeleteRemoteAssignments', () => {
+  beforeEach(() => {
+    cleanup();
+    vi.resetAllMocks();
+    mocks.assignments = [];
+    mocks.instrumentInfo = [];
+    mocks.isPending = false;
+  });
+
   it('should show an empty state when there are no deletable assignments', () => {
     mocks.assignments = [makeAssignment({ id: 'a-1', status: 'COMPLETE' })];
     renderComponent();

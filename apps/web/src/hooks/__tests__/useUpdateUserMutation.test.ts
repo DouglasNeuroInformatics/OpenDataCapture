@@ -24,14 +24,14 @@ function renderUpdateMutation() {
   return { ...renderHook(() => useUpdateUserMutation(), { wrapper }), queryClient };
 }
 
-afterEach(cleanup);
-beforeEach(() => {
-  vi.resetAllMocks();
-  mocks.patch.mockResolvedValue({});
-  mocks.put.mockResolvedValue({});
-});
-
 describe('useUpdateUserMutation', () => {
+  afterEach(cleanup);
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mocks.patch.mockResolvedValue({});
+    mocks.put.mockResolvedValue({});
+  });
+
   it('should show one confirmation after both account and permissions save', async () => {
     const { queryClient, result } = renderUpdateMutation();
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries');

@@ -3,7 +3,7 @@ import { DEMO_USERS } from '@opendatacapture/demo';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { DemoBanner } from '@/components/DemoBanner';
+import { DemoBanner } from '@/components/DemoBanner/DemoBanner';
 
 import '@/services/i18n';
 

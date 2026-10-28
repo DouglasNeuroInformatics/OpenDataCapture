@@ -39,13 +39,13 @@ const renderWithQueryClient = async () => {
   return { clear, rerender: () => rerender(tree()) };
 };
 
-beforeEach(() => {
-  mocks.location.pathname = '/dashboard';
-});
-
-afterEach(cleanup);
-
 describe('ForceClearQueryCacheProvider', () => {
+  beforeEach(() => {
+    mocks.location.pathname = '/dashboard';
+  });
+
+  afterEach(cleanup);
+
   it('should be a plain fragment when the dev flag is off, so production pays nothing for it', async () => {
     expect(await loadProvider(false)).toBe(Fragment);
   });

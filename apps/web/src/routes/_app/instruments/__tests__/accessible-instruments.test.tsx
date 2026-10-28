@@ -3,21 +3,20 @@ import type { FC } from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import '@/routes/_app/instruments/accessible-instruments';
+import { Route } from '@/routes/_app/instruments/accessible-instruments';
+
 import '@/services/i18n';
 
 type InstrumentInfoStub = { details: { title: string }; id: string; kind: 'FORM' };
 
 type MockState = {
   instrumentInfo: InstrumentInfoStub[] | undefined;
-  route: { component: FC };
   store: { currentGroup: null | { accessibleInstrumentIds: string[] } };
 };
 
 const mocks = vi.hoisted(() => {
   const state: MockState = {
     instrumentInfo: undefined,
-    route: { component: () => null },
     store: { currentGroup: null }
   };
   return { ...state, navigate: vi.fn() };
@@ -25,10 +24,7 @@ const mocks = vi.hoisted(() => {
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
-  createFileRoute: () => (options: { component: FC }) => {
-    mocks.route = options;
-    return { options };
-  },
+  createFileRoute: () => (options: { component: FC }) => ({ options }),
   useNavigate: () => mocks.navigate
 }));
 vi.mock('@/components/InstrumentShowcase', () => ({
@@ -56,22 +52,22 @@ vi.mock('@/store', () => ({
   useAppStore: (selector: (store: typeof mocks.store) => unknown) => selector(mocks.store)
 }));
 
-const AccessibleInstrumentsPage = mocks.route.component;
+const AccessibleInstrumentsPage = Route.options.component!;
 
 const allowed: InstrumentInfoStub = { details: { title: 'Allowed' }, id: 'instrument-1', kind: 'FORM' };
 const excluded: InstrumentInfoStub = { details: { title: 'Excluded' }, id: 'instrument-2', kind: 'FORM' };
 
-beforeEach(() => {
-  mocks.instrumentInfo = [allowed, excluded];
-  mocks.store.currentGroup = { accessibleInstrumentIds: ['instrument-1'] };
-});
+describe('Route', () => {
+  beforeEach(() => {
+    mocks.instrumentInfo = [allowed, excluded];
+    mocks.store.currentGroup = { accessibleInstrumentIds: ['instrument-1'] };
+  });
 
-afterEach(() => {
-  cleanup();
-  vi.clearAllMocks();
-});
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
 
-describe('AccessibleInstrumentsPage', () => {
   it('should show the page title', () => {
     render(<AccessibleInstrumentsPage />);
     expect(screen.getByRole('heading', { name: 'Administer Instrument' })).toBeTruthy();

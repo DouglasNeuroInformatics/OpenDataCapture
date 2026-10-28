@@ -2,8 +2,8 @@ import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { InstrumentTable } from '@/components/InstrumentTable';
-import type { InstrumentRow } from '@/components/InstrumentTable';
+import { InstrumentTable } from '@/components/InstrumentTable/InstrumentTable';
+import type { InstrumentRow } from '@/components/InstrumentTable/InstrumentTable';
 
 import '@/services/i18n';
 
@@ -82,16 +82,16 @@ const openPreview = () => {
   fireEvent.click(screen.getByRole('menuitem', { name: 'Preview' }));
 };
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  mocks.instrumentInfo = [];
-  mocks.preview.current = null;
-  i18n.changeLanguage('en');
-});
-
-afterEach(cleanup);
-
 describe('InstrumentTable', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.instrumentInfo = [];
+    mocks.preview.current = null;
+    i18n.changeLanguage('en');
+  });
+
+  afterEach(cleanup);
+
   it('should list a row per instrument it is given', () => {
     renderTable([row(), row({ id: 'stroop-1', kind: 'INTERACTIVE', title: 'Stroop Task' })]);
     expect(listedTitles()).toStrictEqual(['Happiness Questionnaire', 'Stroop Task']);
@@ -328,123 +328,123 @@ describe('InstrumentTable', () => {
     fireEvent.click(screen.getByRole('menuitem', { name: 'View' }));
     expect(onOpen.mock.lastCall?.[0]).toMatchObject({ id: 'hq-1' });
   });
-});
 
-describe('InstrumentTable preview', () => {
-  // A row names an instrument by id alone, so the dialog's details come from the catalog.
-  it('should fill the preview from the catalog entry the row names', () => {
-    mocks.instrumentInfo = [
-      {
+  describe('preview', () => {
+    // A row names an instrument by id alone, so the dialog's details come from the catalog.
+    it('should fill the preview from the catalog entry the row names', () => {
+      mocks.instrumentInfo = [
+        {
+          createdAt: new Date('2025-01-01'),
+          details: { authors: ['A. Author'], description: 'How happy are you?', title: 'Happiness Questionnaire' },
+          id: 'hq-1',
+          internal: { edition: 1, name: 'HQ' },
+          kind: 'FORM'
+        }
+      ];
+      renderTable([row({ source: 'odc-instruments' })]);
+      openPreview();
+      expect(mocks.preview.current?.item).toStrictEqual({
+        authors: ['A. Author'],
+        availability: null,
         createdAt: new Date('2025-01-01'),
-        details: { authors: ['A. Author'], description: 'How happy are you?', title: 'Happiness Questionnaire' },
+        description: 'How happy are you?',
         id: 'hq-1',
         internal: { edition: 1, name: 'HQ' },
-        kind: 'FORM'
+        kind: 'FORM',
+        seriesItems: undefined,
+        source: { kind: 'repo', name: 'odc-instruments' },
+        title: 'Happiness Questionnaire'
+      });
+    });
+
+    // The catalog resolves after the first paint, and a row previewed meanwhile has only its own
+    // fields — which is still worth showing rather than refusing to open.
+    it('should preview a row the catalog does not hold, from the row alone', () => {
+      renderTable([row()]);
+      openPreview();
+      expect(mocks.preview.current?.item).toMatchObject({
+        authors: null,
+        createdAt: null,
+        description: undefined,
+        internal: null,
+        source: { kind: 'manual' },
+        title: 'Happiness Questionnaire'
+      });
+    });
+
+    // A series has no `internal`, and therefore no edition to read off it.
+    it('should preview a series by its members rather than by an edition it has none of', () => {
+      mocks.instrumentInfo = [
+        { details: { title: 'Member One' }, id: 'member-1', kind: 'FORM' },
+        { details: { title: 'Happiness Series' }, id: 'series-1', kind: 'SERIES', seriesItems: [{ id: 'member-1' }] }
+      ];
+      renderTable([row({ edition: null, id: 'series-1', kind: 'SERIES', title: 'Happiness Series' })]);
+      openPreview();
+      expect(mocks.preview.current?.item).toMatchObject({
+        internal: null,
+        kind: 'SERIES',
+        seriesItems: [{ id: 'member-1' }]
+      });
+    });
+
+    // A series names its members by id, so the dialog needs the catalog's titles to label them.
+    it('should offer the whole catalog as the names a series can be read against', () => {
+      mocks.instrumentInfo = [
+        { details: { title: 'Member One' }, id: 'member-1', kind: 'FORM' },
+        { details: { title: 'Happiness Series' }, id: 'series-1', kind: 'SERIES', seriesItems: [{ id: 'member-1' }] }
+      ];
+      renderTable([row()]);
+      openPreview();
+      expect(mocks.preview.current?.items).toStrictEqual([
+        { id: 'member-1', title: 'Member One' },
+        { id: 'series-1', title: 'Happiness Series' }
+      ]);
+    });
+
+    // The catalog is a plain `useQuery`, so the first render happens before it has resolved.
+    it('should preview a row while the catalog is still loading', () => {
+      mocks.instrumentInfo = undefined;
+      renderTable([row()]);
+      openPreview();
+      expect(mocks.preview.current?.item).toMatchObject({ title: 'Happiness Questionnaire' });
+      expect(mocks.preview.current?.items).toStrictEqual([]);
+    });
+
+    it('should close the preview, leaving the listing as it was', () => {
+      renderTable([row()]);
+      openPreview();
+      fireEvent.click(screen.getByTestId('close-preview'));
+      expect(screen.queryByTestId('instrument-preview-dialog')).toBeNull();
+      expect(listedTitles()).toStrictEqual(['Happiness Questionnaire']);
+    });
+  });
+
+  describe('record export', () => {
+    it('should split the menu into a listing section and a subject-data section', () => {
+      renderTableWithRecordExport([row()]);
+      openExport();
+      expect(screen.getByText('Instrument list')).toBeTruthy();
+      expect(screen.getByText('Subject data')).toBeTruthy();
+    });
+
+    // Both shapes of every format: wide spreads each instrument's measures across columns, long
+    // carries one row per measured value, and a series is legible either way.
+    it.each(['TSV', 'TSV Long', 'JSON', 'CSV', 'CSV Long', 'Excel', 'Excel Long'])(
+      'should request the %s shape when it is chosen',
+      (option) => {
+        const recordExport = renderTableWithRecordExport([row()]);
+        openExport();
+        fireEvent.click(screen.getByTestId(`instrument-table-export-records-${option}`));
+        expect(recordExport).toHaveBeenCalledWith(option);
       }
-    ];
-    renderTable([row({ source: 'odc-instruments' })]);
-    openPreview();
-    expect(mocks.preview.current?.item).toStrictEqual({
-      authors: ['A. Author'],
-      availability: null,
-      createdAt: new Date('2025-01-01'),
-      description: 'How happy are you?',
-      id: 'hq-1',
-      internal: { edition: 1, name: 'HQ' },
-      kind: 'FORM',
-      seriesItems: undefined,
-      source: { kind: 'repo', name: 'odc-instruments' },
-      title: 'Happiness Questionnaire'
-    });
-  });
+    );
 
-  // The catalog resolves after the first paint, and a row previewed meanwhile has only its own
-  // fields — which is still worth showing rather than refusing to open.
-  it('should preview a row the catalog does not hold, from the row alone', () => {
-    renderTable([row()]);
-    openPreview();
-    expect(mocks.preview.current?.item).toMatchObject({
-      authors: null,
-      createdAt: null,
-      description: undefined,
-      internal: null,
-      source: { kind: 'manual' },
-      title: 'Happiness Questionnaire'
-    });
-  });
-
-  // A series has no `internal`, and therefore no edition to read off it.
-  it('should preview a series by its members rather than by an edition it has none of', () => {
-    mocks.instrumentInfo = [
-      { details: { title: 'Member One' }, id: 'member-1', kind: 'FORM' },
-      { details: { title: 'Happiness Series' }, id: 'series-1', kind: 'SERIES', seriesItems: [{ id: 'member-1' }] }
-    ];
-    renderTable([row({ edition: null, id: 'series-1', kind: 'SERIES', title: 'Happiness Series' })]);
-    openPreview();
-    expect(mocks.preview.current?.item).toMatchObject({
-      internal: null,
-      kind: 'SERIES',
-      seriesItems: [{ id: 'member-1' }]
-    });
-  });
-
-  // A series names its members by id, so the dialog needs the catalog's titles to label them.
-  it('should offer the whole catalog as the names a series can be read against', () => {
-    mocks.instrumentInfo = [
-      { details: { title: 'Member One' }, id: 'member-1', kind: 'FORM' },
-      { details: { title: 'Happiness Series' }, id: 'series-1', kind: 'SERIES', seriesItems: [{ id: 'member-1' }] }
-    ];
-    renderTable([row()]);
-    openPreview();
-    expect(mocks.preview.current?.items).toStrictEqual([
-      { id: 'member-1', title: 'Member One' },
-      { id: 'series-1', title: 'Happiness Series' }
-    ]);
-  });
-
-  // The catalog is a plain `useQuery`, so the first render happens before it has resolved.
-  it('should preview a row while the catalog is still loading', () => {
-    mocks.instrumentInfo = undefined;
-    renderTable([row()]);
-    openPreview();
-    expect(mocks.preview.current?.item).toMatchObject({ title: 'Happiness Questionnaire' });
-    expect(mocks.preview.current?.items).toStrictEqual([]);
-  });
-
-  it('should close the preview, leaving the listing as it was', () => {
-    renderTable([row()]);
-    openPreview();
-    fireEvent.click(screen.getByTestId('close-preview'));
-    expect(screen.queryByTestId('instrument-preview-dialog')).toBeNull();
-    expect(listedTitles()).toStrictEqual(['Happiness Questionnaire']);
-  });
-});
-
-describe('InstrumentTable record export', () => {
-  it('should split the menu into a listing section and a subject-data section', () => {
-    renderTableWithRecordExport([row()]);
-    openExport();
-    expect(screen.getByText('Instrument list')).toBeTruthy();
-    expect(screen.getByText('Subject data')).toBeTruthy();
-  });
-
-  // Both shapes of every format: wide spreads each instrument's measures across columns, long
-  // carries one row per measured value, and a series is legible either way.
-  it.each(['TSV', 'TSV Long', 'JSON', 'CSV', 'CSV Long', 'Excel', 'Excel Long'])(
-    'should request the %s shape when it is chosen',
-    (option) => {
+    it('should keep the listing export separate from the subject-data export', () => {
       const recordExport = renderTableWithRecordExport([row()]);
       openExport();
-      fireEvent.click(screen.getByTestId(`instrument-table-export-records-${option}`));
-      expect(recordExport).toHaveBeenCalledWith(option);
-    }
-  );
-
-  it('should keep the listing export separate from the subject-data export', () => {
-    const recordExport = renderTableWithRecordExport([row()]);
-    openExport();
-    fireEvent.click(screen.getByTestId('instrument-table-export-listing-JSON'));
-    expect(recordExport).not.toHaveBeenCalled();
-    expect(mocks.download).toHaveBeenCalledWith(expect.stringMatching(/\.json$/), expect.any(Function));
+      fireEvent.click(screen.getByTestId('instrument-table-export-listing-JSON'));
+      expect(recordExport).not.toHaveBeenCalled();
+      expect(mocks.download).toHaveBeenCalledWith(expect.stringMatching(/\.json$/), expect.any(Function));
+    });
   });
 });

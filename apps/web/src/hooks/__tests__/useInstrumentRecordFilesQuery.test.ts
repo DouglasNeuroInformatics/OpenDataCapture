@@ -4,6 +4,7 @@ import { createElement, Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { instrumentRecordFilesQueryOptions, useInstrumentRecordFilesQuery } from '../useInstrumentRecordFilesQuery';
 
@@ -37,7 +38,7 @@ describe('instrumentRecordFilesQueryOptions', () => {
     mockAxios.get.mockResolvedValue({ data: { upload: [{ exp: 1700000000, name: 'scan.pdf', size: 100 }] } });
     await expect(
       createQueryClient().fetchQuery(instrumentRecordFilesQueryOptions({ params: { id: 'record-1' } }))
-    ).rejects.toThrow();
+    ).rejects.toThrow(z.ZodError);
   });
 
   it('should key the cache under the record, so invalidating the record also refreshes its files', () => {

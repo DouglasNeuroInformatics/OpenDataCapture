@@ -65,19 +65,19 @@ const submit = () => fireEvent.click(screen.getByLabelText('Submit'));
 
 const errorMessages = () => screen.queryAllByTestId('error-message-text').map((element) => element.textContent);
 
-beforeEach(() => {
-  mocks.mutation.isPending = false;
-  mocks.mutation.isSuccess = false;
-  mocks.mutation.mutateAsync.mockResolvedValue(undefined);
-  mocks.invalidate.mockResolvedValue(undefined);
-});
+describe('Route', () => {
+  beforeEach(() => {
+    mocks.mutation.isPending = false;
+    mocks.mutation.isSuccess = false;
+    mocks.mutation.mutateAsync.mockResolvedValue(undefined);
+    mocks.invalidate.mockResolvedValue(undefined);
+  });
 
-afterEach(() => {
-  cleanup();
-  vi.clearAllMocks();
-});
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
 
-describe('setup route', () => {
   it('should redirect to the dashboard from the loader once the instance is set up', async () => {
     const queryClient = new QueryClient();
     vi.spyOn(queryClient, 'fetchQuery').mockResolvedValue({ isSetup: true });

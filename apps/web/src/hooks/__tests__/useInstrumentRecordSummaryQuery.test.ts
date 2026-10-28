@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import {
   instrumentRecordSummaryQueryOptions,
@@ -77,7 +78,7 @@ describe('instrumentRecordSummaryQueryOptions', () => {
 
   it('should reject a fractional subject count, since subjects are counted not measured', async () => {
     get.mockResolvedValueOnce({ data: [summary({ subjectCount: 1.5 })] });
-    await expect(runQuery({ groupId: 'group-1' })).rejects.toThrow();
+    await expect(runQuery({ groupId: 'group-1' })).rejects.toThrow(z.ZodError);
   });
 
   // Called with no argument at all, which is how the hub lists every instrument across groups.

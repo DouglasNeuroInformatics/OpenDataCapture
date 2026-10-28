@@ -19,23 +19,23 @@ vi.mock('../server.js', () => ({
 
 let tmpDir: string;
 
-beforeEach(() => {
-  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'serve-instrument-cli-'));
-  serverCreate.mockResolvedValue({ start: serverStart });
-  vi.spyOn(process, 'exit').mockImplementation((code) => {
-    throw new Error(`EXIT:${code}`);
-  });
-  vi.resetModules();
-});
-
-afterEach(() => {
-  fs.rmSync(tmpDir, { force: true, recursive: true });
-  vi.restoreAllMocks();
-  serverCreate.mockReset();
-  serverStart.mockClear();
-});
-
 describe('cli', () => {
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'serve-instrument-cli-'));
+    serverCreate.mockResolvedValue({ start: serverStart });
+    vi.spyOn(process, 'exit').mockImplementation((code) => {
+      throw new Error(`EXIT:${code}`);
+    });
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { force: true, recursive: true });
+    vi.restoreAllMocks();
+    serverCreate.mockReset();
+    serverStart.mockClear();
+  });
+
   it('should start a single-mode server on the given directory with the default port', async () => {
     process.argv = ['node', 'cli.js', tmpDir];
     await import('../cli.js');

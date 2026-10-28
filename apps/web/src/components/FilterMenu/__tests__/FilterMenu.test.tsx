@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { FilterMenu } from '@/components/FilterMenu';
+import { FilterMenu } from '@/components/FilterMenu/FilterMenu';
 
 import '@/services/i18n';
 
@@ -28,12 +28,12 @@ const renderMenu = (value: undefined | Value, onValueChange = vi.fn()) => {
 
 const openMenu = () => fireEvent.keyDown(screen.getByTestId('filter'), { key: 'Enter' });
 
-beforeEach(() => {
-  // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
-  cleanup();
-});
-
 describe('FilterMenu', () => {
+  beforeEach(() => {
+    // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
+    cleanup();
+  });
+
   it('should show only the facet name while nothing is selected', () => {
     renderMenu(undefined);
     expect(screen.getByTestId('filter').textContent).toBe('Group');

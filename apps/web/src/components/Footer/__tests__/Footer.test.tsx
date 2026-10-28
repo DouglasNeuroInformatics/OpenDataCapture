@@ -21,9 +21,9 @@ vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to }: PropsWithChildren<{ to: string }>) => <a href={to}>{children}</a>
 }));
 
-afterEach(cleanup);
-
 describe('Footer', () => {
+  afterEach(cleanup);
+
   it.each([
     ['Documentation', 'https://docs.example.org'],
     ['License', 'https://license.example.org'],

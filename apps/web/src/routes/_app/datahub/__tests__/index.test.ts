@@ -13,7 +13,7 @@ const runBeforeLoad = () => {
   return null;
 };
 
-describe('_app datahub index route', () => {
+describe('Route', () => {
   it('should redirect to the subject hub, so a bookmarked /datahub link still lands on a page', () => {
     const thrown = runBeforeLoad();
     expect(isRedirect(thrown)).toBe(true);

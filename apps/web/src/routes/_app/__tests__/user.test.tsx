@@ -80,7 +80,7 @@ const submitPasswords = (dialog: HTMLElement, password: string, confirmPassword:
   fireEvent.click(within(dialog).getByRole('button', { name: 'Submit' }));
 };
 
-describe('user account page', () => {
+describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     i18n.changeLanguage('en');

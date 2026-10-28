@@ -161,257 +161,259 @@ const runLoader = async () => {
   return null;
 };
 
-describe('dashboard page', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    i18n.changeLanguage('en');
-    mocks.store.currentGroup = null;
-    mocks.summary = { data: SUMMARY };
-    mocks.instruments = { data: INSTRUMENTS };
-    mocks.records = { data: [{ instrumentId: 'alpha' }, { instrumentId: 'alpha' }, { instrumentId: 'beta' }] };
-    mocks.users = { data: [{ username: 'alice' }, { username: 'bob' }] };
-    mocks.tooltipProps = { active: false };
+describe('Route', () => {
+  describe('dashboard page', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+      i18n.changeLanguage('en');
+      mocks.store.currentGroup = null;
+      mocks.summary = { data: SUMMARY };
+      mocks.instruments = { data: INSTRUMENTS };
+      mocks.records = { data: [{ instrumentId: 'alpha' }, { instrumentId: 'alpha' }, { instrumentId: 'beta' }] };
+      mocks.users = { data: [{ username: 'alice' }, { username: 'bob' }] };
+      mocks.tooltipProps = { active: false };
+    });
+
+    afterEach(() => {
+      cleanup();
+      window.localStorage.clear();
+    });
+
+    it('should render nothing rather than crash when the summary is unavailable', () => {
+      mocks.summary = { data: undefined };
+      const { container } = renderPage();
+      expect(container.innerHTML).toBe('');
+    });
+
+    it('should scope every query to the current group', () => {
+      mocks.store.currentGroup = RESEARCH_GROUP;
+      renderPage();
+      expect(mocks.useSummaryQuery).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
+      expect(mocks.useUsersQuery).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
+      expect(mocks.useInstrumentRecords).toHaveBeenCalledWith({ enabled: true, params: { groupId: 'group-1' } });
+    });
+
+    it.each([
+      ['CLINICAL', 'Overview of Your Clinic'],
+      ['RESEARCH', 'Overview of Your Research Group']
+    ] as const)('should welcome a %s group with %s', (type, heading) => {
+      mocks.store.currentGroup = { ...RESEARCH_GROUP, type };
+      renderPage();
+      expect(screen.getByTestId('dashboard-welcome-heading').textContent).toBe(heading);
+    });
+
+    it('should summarize the whole application when no group is selected', () => {
+      renderPage();
+      expect(screen.getByTestId('dashboard-welcome-heading').textContent).toBe('Summary of Application State');
+    });
+
+    it('should open the data hub from the subjects statistic', () => {
+      renderPage();
+      fireEvent.click(screen.getByTestId('statistic-subjects'));
+      expect(mocks.navigate).toHaveBeenCalledWith({ to: '/datahub/subjects' });
+    });
+
+    it('should list every user of the group in the users dialog', () => {
+      renderPage();
+      const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
+      expect(listItems(dialog)).toEqual(['alice', 'bob']);
+    });
+
+    it('should show a spinner in the users dialog while users are loading', () => {
+      mocks.users = { isLoading: true };
+      renderPage();
+      const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
+      expect(dialog.querySelector('.animate-spinner')).toBeTruthy();
+    });
+
+    it('should report a failure to load users in the users dialog', () => {
+      mocks.users = { isError: true };
+      renderPage();
+      const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
+      expect(within(dialog).getByText('Error finding users')).toBeTruthy();
+    });
+
+    it('should list only the instruments the current group can access', () => {
+      mocks.store.currentGroup = RESEARCH_GROUP;
+      renderPage();
+      const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
+      expect(listItems(dialog)).toEqual(['Alpha Scale FORM']);
+    });
+
+    it('should list every instrument when no group is selected', () => {
+      renderPage();
+      const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
+      expect(listItems(dialog)).toEqual(['Alpha Scale FORM', 'Beta Task INTERACTIVE']);
+    });
+
+    it('should report a failure to load instruments in the instruments dialog', () => {
+      mocks.instruments = { data: undefined };
+      renderPage();
+      const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
+      expect(within(dialog).getByText('Error finding instruments')).toBeTruthy();
+    });
+
+    it('should count the records of each instrument in the records dialog', () => {
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      expect(listItems(dialog)).toEqual(['Alpha Scale 2', 'Beta Task 1']);
+    });
+
+    it('should count zero records for each instrument while records are unavailable', () => {
+      mocks.records = { data: undefined };
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      expect(listItems(dialog)).toEqual(['Alpha Scale 0', 'Beta Task 0']);
+    });
+
+    it('should report a failure to load instruments in the records dialog, since records are counted per instrument', () => {
+      mocks.instruments = { data: undefined };
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      expect(within(dialog).getByText('Error finding records')).toBeTruthy();
+    });
+
+    it('should chart records and sessions oldest first, counting a day without sessions as zero', () => {
+      renderPage();
+      expect(JSON.parse(recordsChart().getByTestId('area-chart').dataset.points!)).toEqual([
+        { records: 1, sessions: 0, timestamp: DAY_1 },
+        { records: 2, sessions: 0, timestamp: DAY_2 },
+        { records: 3, sessions: 5, timestamp: DAY_3 }
+      ]);
+    });
+
+    it('should chart subject growth oldest first without reordering the cached summary', () => {
+      renderPage();
+      expect(JSON.parse(subjectsChart().getByTestId('area-chart').dataset.points!)).toEqual([
+        { timestamp: DAY_1, value: 4 },
+        { timestamp: DAY_2, value: 7 }
+      ]);
+      expect(SUMMARY.trends.subjects[0]!.timestamp).toBe(DAY_2);
+    });
+
+    it('should label the x axis ticks of both charts with a short date', () => {
+      renderPage();
+      expect(recordsChart().getByTestId('x-axis').textContent).toBe('Mar 2');
+      expect(subjectsChart().getByTestId('x-axis').textContent).toBe('Mar 2');
+    });
+
+    it('should show nothing in the tooltips while no point is hovered, even if recharts still holds a payload', () => {
+      mocks.tooltipProps = {
+        active: false,
+        label: DAY_2,
+        payload: [
+          { dataKey: 'records', value: 2 },
+          { dataKey: 'sessions', value: 4 },
+          { dataKey: 'value', value: 7 }
+        ]
+      };
+      renderPage();
+      expect(recordsChart().getByTestId('chart-tooltip').textContent).toBe('');
+      expect(subjectsChart().getByTestId('chart-tooltip').textContent).toBe('');
+    });
+
+    it.each([
+      ['an empty payload', []],
+      ['no payload', undefined]
+    ])('should show nothing in the tooltips of a hovered point when recharts provides %s', (_, payload) => {
+      mocks.tooltipProps = { active: true, label: DAY_2, payload };
+      renderPage();
+      expect(recordsChart().getByTestId('chart-tooltip').textContent).toBe('');
+      expect(subjectsChart().getByTestId('chart-tooltip').textContent).toBe('');
+    });
+
+    it('should show the date, records and sessions of the hovered point', () => {
+      mocks.tooltipProps = {
+        active: true,
+        label: DAY_2,
+        payload: [
+          { dataKey: 'records', value: 2 },
+          { dataKey: 'sessions', value: 4 }
+        ]
+      };
+      renderPage();
+      expect(recordsChart().getByTestId('chart-tooltip').textContent).toBe('March 2, 2025Records: 2Sessions: 4');
+    });
+
+    it('should show zero for a series missing from the hovered point', () => {
+      mocks.tooltipProps = { active: true, label: DAY_2, payload: [{ dataKey: 'other', value: 9 }] };
+      renderPage();
+      expect(recordsChart().getByTestId('chart-tooltip').textContent).toBe('March 2, 2025Records: 0Sessions: 0');
+    });
+
+    it('should show the date and subject count of the hovered point', () => {
+      mocks.tooltipProps = { active: true, label: DAY_2, payload: [{ dataKey: 'value', value: 7 }] };
+      renderPage();
+      expect(subjectsChart().getByTestId('chart-tooltip').textContent).toBe('March 2, 2025Subjects: 7');
+    });
+
+    it('should draw the charts in the light palette by default', () => {
+      renderPage();
+      expect(recordsChart().getByTestId('area-records').dataset.stroke).toBe('#2563eb');
+      expect(recordsChart().getByTestId('area-sessions').dataset.stroke).toBe('#059669');
+      expect(subjectsChart().getByTestId('area-value').dataset.stroke).toBe('#d97706');
+      expect(recordsChart().getByTestId('grid').dataset.stroke).toBe('#e2e8f0');
+      expect(recordsChart().getByTestId('x-axis').dataset.stroke).toBe('#475569');
+    });
+
+    it('should draw the charts in the dark palette when the dark theme is selected', () => {
+      window.localStorage.setItem('theme', 'dark');
+      renderPage();
+      expect(recordsChart().getByTestId('area-records').dataset.stroke).toBe('#3b82f6');
+      expect(recordsChart().getByTestId('area-sessions').dataset.stroke).toBe('#10b981');
+      expect(subjectsChart().getByTestId('area-value').dataset.stroke).toBe('#f59e0b');
+      expect(subjectsChart().getByTestId('grid').dataset.stroke).toBe('#334155');
+      expect(subjectsChart().getByTestId('x-axis').dataset.stroke).toBe('#cbd5e1');
+    });
+
+    it('should style the tooltip for the dark theme when it is selected', () => {
+      window.localStorage.setItem('theme', 'dark');
+      mocks.tooltipProps = { active: true, label: DAY_2, payload: [{ dataKey: 'value', value: 7 }] };
+      renderPage();
+      expect(subjectsChart().getByText('March 2, 2025').parentElement!.style.backgroundColor).toBe('#1e293b');
+    });
   });
 
-  afterEach(() => {
-    cleanup();
-    window.localStorage.clear();
-  });
+  describe('dashboard loader', () => {
+    const READABLE_SUBJECTS = ['Instrument', 'InstrumentRecord', 'Session', 'Subject', 'User'];
 
-  it('should render nothing rather than crash when the summary is unavailable', () => {
-    mocks.summary = { data: undefined };
-    const { container } = renderPage();
-    expect(container.innerHTML).toBe('');
-  });
-
-  it('should scope every query to the current group', () => {
-    mocks.store.currentGroup = RESEARCH_GROUP;
-    renderPage();
-    expect(mocks.useSummaryQuery).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
-    expect(mocks.useUsersQuery).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
-    expect(mocks.useInstrumentRecords).toHaveBeenCalledWith({ enabled: true, params: { groupId: 'group-1' } });
-  });
-
-  it.each([
-    ['CLINICAL', 'Overview of Your Clinic'],
-    ['RESEARCH', 'Overview of Your Research Group']
-  ] as const)('should welcome a %s group with %s', (type, heading) => {
-    mocks.store.currentGroup = { ...RESEARCH_GROUP, type };
-    renderPage();
-    expect(screen.getByTestId('dashboard-welcome-heading').textContent).toBe(heading);
-  });
-
-  it('should summarize the whole application when no group is selected', () => {
-    renderPage();
-    expect(screen.getByTestId('dashboard-welcome-heading').textContent).toBe('Summary of Application State');
-  });
-
-  it('should open the data hub from the subjects statistic', () => {
-    renderPage();
-    fireEvent.click(screen.getByTestId('statistic-subjects'));
-    expect(mocks.navigate).toHaveBeenCalledWith({ to: '/datahub/subjects' });
-  });
-
-  it('should list every user of the group in the users dialog', () => {
-    renderPage();
-    const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
-    expect(listItems(dialog)).toEqual(['alice', 'bob']);
-  });
-
-  it('should show a spinner in the users dialog while users are loading', () => {
-    mocks.users = { isLoading: true };
-    renderPage();
-    const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
-    expect(dialog.querySelector('.animate-spinner')).toBeTruthy();
-  });
-
-  it('should report a failure to load users in the users dialog', () => {
-    mocks.users = { isError: true };
-    renderPage();
-    const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
-    expect(within(dialog).getByText('Error finding users')).toBeTruthy();
-  });
-
-  it('should list only the instruments the current group can access', () => {
-    mocks.store.currentGroup = RESEARCH_GROUP;
-    renderPage();
-    const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
-    expect(listItems(dialog)).toEqual(['Alpha Scale FORM']);
-  });
-
-  it('should list every instrument when no group is selected', () => {
-    renderPage();
-    const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
-    expect(listItems(dialog)).toEqual(['Alpha Scale FORM', 'Beta Task INTERACTIVE']);
-  });
-
-  it('should report a failure to load instruments in the instruments dialog', () => {
-    mocks.instruments = { data: undefined };
-    renderPage();
-    const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
-    expect(within(dialog).getByText('Error finding instruments')).toBeTruthy();
-  });
-
-  it('should count the records of each instrument in the records dialog', () => {
-    renderPage();
-    const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-    expect(listItems(dialog)).toEqual(['Alpha Scale 2', 'Beta Task 1']);
-  });
-
-  it('should count zero records for each instrument while records are unavailable', () => {
-    mocks.records = { data: undefined };
-    renderPage();
-    const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-    expect(listItems(dialog)).toEqual(['Alpha Scale 0', 'Beta Task 0']);
-  });
-
-  it('should report a failure to load instruments in the records dialog, since records are counted per instrument', () => {
-    mocks.instruments = { data: undefined };
-    renderPage();
-    const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-    expect(within(dialog).getByText('Error finding records')).toBeTruthy();
-  });
-
-  it('should chart records and sessions oldest first, counting a day without sessions as zero', () => {
-    renderPage();
-    expect(JSON.parse(recordsChart().getByTestId('area-chart').dataset.points!)).toEqual([
-      { records: 1, sessions: 0, timestamp: DAY_1 },
-      { records: 2, sessions: 0, timestamp: DAY_2 },
-      { records: 3, sessions: 5, timestamp: DAY_3 }
-    ]);
-  });
-
-  it('should chart subject growth oldest first without reordering the cached summary', () => {
-    renderPage();
-    expect(JSON.parse(subjectsChart().getByTestId('area-chart').dataset.points!)).toEqual([
-      { timestamp: DAY_1, value: 4 },
-      { timestamp: DAY_2, value: 7 }
-    ]);
-    expect(SUMMARY.trends.subjects[0]!.timestamp).toBe(DAY_2);
-  });
-
-  it('should label the x axis ticks of both charts with a short date', () => {
-    renderPage();
-    expect(recordsChart().getByTestId('x-axis').textContent).toBe('Mar 2');
-    expect(subjectsChart().getByTestId('x-axis').textContent).toBe('Mar 2');
-  });
-
-  it('should show nothing in the tooltips while no point is hovered, even if recharts still holds a payload', () => {
-    mocks.tooltipProps = {
-      active: false,
-      label: DAY_2,
-      payload: [
-        { dataKey: 'records', value: 2 },
-        { dataKey: 'sessions', value: 4 },
-        { dataKey: 'value', value: 7 }
-      ]
+    const grantRead = (subjects: string[]) => {
+      mocks.store.currentUser = {
+        ability: { can: (action, subject) => action === 'read' && subjects.includes(subject) }
+      };
     };
-    renderPage();
-    expect(recordsChart().getByTestId('chart-tooltip').textContent).toBe('');
-    expect(subjectsChart().getByTestId('chart-tooltip').textContent).toBe('');
-  });
 
-  it.each([
-    ['an empty payload', []],
-    ['no payload', undefined]
-  ])('should show nothing in the tooltips of a hovered point when recharts provides %s', (_, payload) => {
-    mocks.tooltipProps = { active: true, label: DAY_2, payload };
-    renderPage();
-    expect(recordsChart().getByTestId('chart-tooltip').textContent).toBe('');
-    expect(subjectsChart().getByTestId('chart-tooltip').textContent).toBe('');
-  });
+    beforeEach(() => {
+      vi.clearAllMocks();
+      mocks.store.currentGroup = RESEARCH_GROUP;
+      mocks.ensureQueryData.mockResolvedValue(SUMMARY);
+    });
 
-  it('should show the date, records and sessions of the hovered point', () => {
-    mocks.tooltipProps = {
-      active: true,
-      label: DAY_2,
-      payload: [
-        { dataKey: 'records', value: 2 },
-        { dataKey: 'sessions', value: 4 }
-      ]
-    };
-    renderPage();
-    expect(recordsChart().getByTestId('chart-tooltip').textContent).toBe('March 2, 2025Records: 2Sessions: 4');
-  });
+    it('should send a user without a session to start a session, since the dashboard needs their permissions', async () => {
+      mocks.store.currentUser = null;
+      const thrown = await runLoader();
+      expect(isRedirect(thrown)).toBe(true);
+      expect(thrown).toMatchObject({ options: { to: '/session/start-session' } });
+    });
 
-  it('should show zero for a series missing from the hovered point', () => {
-    mocks.tooltipProps = { active: true, label: DAY_2, payload: [{ dataKey: 'other', value: 9 }] };
-    renderPage();
-    expect(recordsChart().getByTestId('chart-tooltip').textContent).toBe('March 2, 2025Records: 0Sessions: 0');
-  });
+    it('should send a user who cannot read every summarized resource to start a session instead', async () => {
+      grantRead(READABLE_SUBJECTS.filter((subject) => subject !== 'User'));
+      const thrown = await runLoader();
+      expect(isRedirect(thrown)).toBe(true);
+      expect(mocks.ensureQueryData).not.toHaveBeenCalled();
+    });
 
-  it('should show the date and subject count of the hovered point', () => {
-    mocks.tooltipProps = { active: true, label: DAY_2, payload: [{ dataKey: 'value', value: 7 }] };
-    renderPage();
-    expect(subjectsChart().getByTestId('chart-tooltip').textContent).toBe('March 2, 2025Subjects: 7');
-  });
+    it('should prefetch the summary of the current group for a user who can read everything', async () => {
+      grantRead(READABLE_SUBJECTS);
+      expect(await runLoader()).toBeNull();
+      expect(mocks.ensureQueryData).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['summary', 'group-1'] }));
+    });
 
-  it('should draw the charts in the light palette by default', () => {
-    renderPage();
-    expect(recordsChart().getByTestId('area-records').dataset.stroke).toBe('#2563eb');
-    expect(recordsChart().getByTestId('area-sessions').dataset.stroke).toBe('#059669');
-    expect(subjectsChart().getByTestId('area-value').dataset.stroke).toBe('#d97706');
-    expect(recordsChart().getByTestId('grid').dataset.stroke).toBe('#e2e8f0');
-    expect(recordsChart().getByTestId('x-axis').dataset.stroke).toBe('#475569');
-  });
-
-  it('should draw the charts in the dark palette when the dark theme is selected', () => {
-    window.localStorage.setItem('theme', 'dark');
-    renderPage();
-    expect(recordsChart().getByTestId('area-records').dataset.stroke).toBe('#3b82f6');
-    expect(recordsChart().getByTestId('area-sessions').dataset.stroke).toBe('#10b981');
-    expect(subjectsChart().getByTestId('area-value').dataset.stroke).toBe('#f59e0b');
-    expect(subjectsChart().getByTestId('grid').dataset.stroke).toBe('#334155');
-    expect(subjectsChart().getByTestId('x-axis').dataset.stroke).toBe('#cbd5e1');
-  });
-
-  it('should style the tooltip for the dark theme when it is selected', () => {
-    window.localStorage.setItem('theme', 'dark');
-    mocks.tooltipProps = { active: true, label: DAY_2, payload: [{ dataKey: 'value', value: 7 }] };
-    renderPage();
-    expect(subjectsChart().getByText('March 2, 2025').parentElement!.style.backgroundColor).toBe('#1e293b');
-  });
-});
-
-describe('dashboard loader', () => {
-  const READABLE_SUBJECTS = ['Instrument', 'InstrumentRecord', 'Session', 'Subject', 'User'];
-
-  const grantRead = (subjects: string[]) => {
-    mocks.store.currentUser = {
-      ability: { can: (action, subject) => action === 'read' && subjects.includes(subject) }
-    };
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mocks.store.currentGroup = RESEARCH_GROUP;
-    mocks.ensureQueryData.mockResolvedValue(SUMMARY);
-  });
-
-  it('should send a user without a session to start a session, since the dashboard needs their permissions', async () => {
-    mocks.store.currentUser = null;
-    const thrown = await runLoader();
-    expect(isRedirect(thrown)).toBe(true);
-    expect(thrown).toMatchObject({ options: { to: '/session/start-session' } });
-  });
-
-  it('should send a user who cannot read every summarized resource to start a session instead', async () => {
-    grantRead(READABLE_SUBJECTS.filter((subject) => subject !== 'User'));
-    const thrown = await runLoader();
-    expect(isRedirect(thrown)).toBe(true);
-    expect(mocks.ensureQueryData).not.toHaveBeenCalled();
-  });
-
-  it('should prefetch the summary of the current group for a user who can read everything', async () => {
-    grantRead(READABLE_SUBJECTS);
-    expect(await runLoader()).toBeNull();
-    expect(mocks.ensureQueryData).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['summary', 'group-1'] }));
-  });
-
-  it('should prefetch the application-wide summary when no group is selected', async () => {
-    grantRead(READABLE_SUBJECTS);
-    mocks.store.currentGroup = null;
-    await runLoader();
-    expect(mocks.ensureQueryData).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['summary', undefined] }));
+    it('should prefetch the application-wide summary when no group is selected', async () => {
+      grantRead(READABLE_SUBJECTS);
+      mocks.store.currentGroup = null;
+      await runLoader();
+      expect(mocks.ensureQueryData).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['summary', undefined] }));
+    });
   });
 });

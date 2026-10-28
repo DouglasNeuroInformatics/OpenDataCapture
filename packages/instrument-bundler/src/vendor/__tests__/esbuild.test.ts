@@ -6,7 +6,7 @@ import * as esbuild from '../esbuild.js';
 
 const VENDOR_DIR = path.resolve(import.meta.dirname, '..');
 
-describe('vendor/esbuild', () => {
+describe('esbuild', () => {
   it('should keep initializing its exports when tree shaken, so a bundled API does not lose the build binding', async () => {
     const result = await esbuild.build({
       bundle: true,

@@ -3,9 +3,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { FormField } from '../FormField';
 
-afterEach(cleanup);
-
 describe('FormField', () => {
+  afterEach(cleanup);
+
   it('should associate the label with its control, so clicking the label focuses the input', () => {
     render(
       <FormField htmlFor="email" label="Email">

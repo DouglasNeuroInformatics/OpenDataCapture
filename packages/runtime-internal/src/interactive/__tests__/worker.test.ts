@@ -30,76 +30,78 @@ function fetchAsset(pathname: string) {
   return respondWith;
 }
 
-beforeEach(async () => {
-  listeners.clear();
-  vi.resetModules();
-  vi.stubGlobal('self', worker);
-  vi.stubGlobal('addEventListener', worker.addEventListener);
-  await import('../worker.js');
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-  vi.clearAllMocks();
-});
-
-describe('lifecycle', () => {
-  it('should skip waiting on install, so a new worker takes over without a reload', () => {
-    dispatch('install', {});
-    expect(worker.skipWaiting).toHaveBeenCalledOnce();
+describe('worker', () => {
+  beforeEach(async () => {
+    listeners.clear();
+    vi.resetModules();
+    vi.stubGlobal('self', worker);
+    vi.stubGlobal('addEventListener', worker.addEventListener);
+    await import('../worker.js');
   });
 
-  it('should claim all clients on activate, so the current page is controlled immediately', () => {
-    const waitUntil = vi.fn();
-    dispatch('activate', { waitUntil });
-    expect(worker.clients.claim).toHaveBeenCalledOnce();
-    expect(waitUntil).toHaveBeenCalledWith(worker.clients.claim.mock.results[0]?.value);
-  });
-});
-
-describe('message', () => {
-  it('should acknowledge received static assets on the transferred port', () => {
-    const postMessage = vi.fn();
-    dispatch('message', { data: { staticAssets: {}, type: 'STATIC_ASSETS' }, ports: [{ postMessage }] });
-    expect(postMessage).toHaveBeenCalledWith({ type: 'STATIC_ASSETS_READY' });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
   });
 
-  it('should ignore messages of another type, so unrelated messages register no assets', () => {
-    const postMessage = vi.fn();
-    dispatch('message', { data: { staticAssets: { '/a.txt': 'data:text/plain,a' } }, ports: [{ postMessage }] });
-    expect(postMessage).not.toHaveBeenCalled();
-    expect(fetchAsset('/a.txt')).not.toHaveBeenCalled();
-  });
-});
+  describe('lifecycle', () => {
+    it('should skip waiting on install, so a new worker takes over without a reload', () => {
+      dispatch('install', {});
+      expect(worker.skipWaiting).toHaveBeenCalledOnce();
+    });
 
-describe('fetch', () => {
-  it('should respond to a registered base64 image with its decoded bytes', async () => {
-    loadStaticAssets({ '/images/foo.png': `data:image/png;base64,${btoa('PNG')}` });
-    const response = fetchAsset('/images/foo.png').mock.lastCall?.[0];
-    expect(response?.headers.get('Content-Type')).toBe('image/png');
-    expect(await response?.text()).toBe('PNG');
+    it('should claim all clients on activate, so the current page is controlled immediately', () => {
+      const waitUntil = vi.fn();
+      dispatch('activate', { waitUntil });
+      expect(worker.clients.claim).toHaveBeenCalledOnce();
+      expect(waitUntil).toHaveBeenCalledWith(worker.clients.claim.mock.results[0]?.value);
+    });
   });
 
-  it('should respond to a registered plain text asset with its URI-decoded content', async () => {
-    loadStaticAssets({ '/hello.txt': 'data:text/plain,Hello%20World' });
-    const response = fetchAsset('/hello.txt').mock.lastCall?.[0];
-    expect(response?.headers.get('Content-Type')).toBe('text/plain');
-    expect(await response?.text()).toBe('Hello World');
+  describe('message', () => {
+    it('should acknowledge received static assets on the transferred port', () => {
+      const postMessage = vi.fn();
+      dispatch('message', { data: { staticAssets: {}, type: 'STATIC_ASSETS' }, ports: [{ postMessage }] });
+      expect(postMessage).toHaveBeenCalledWith({ type: 'STATIC_ASSETS_READY' });
+    });
+
+    it('should ignore messages of another type, so unrelated messages register no assets', () => {
+      const postMessage = vi.fn();
+      dispatch('message', { data: { staticAssets: { '/a.txt': 'data:text/plain,a' } }, ports: [{ postMessage }] });
+      expect(postMessage).not.toHaveBeenCalled();
+      expect(fetchAsset('/a.txt')).not.toHaveBeenCalled();
+    });
   });
 
-  it('should strip the served runtime prefix, so assets resolve relative to the iframe', async () => {
-    loadStaticAssets({ '/hello.txt': 'data:text/plain,hi' });
-    const response = fetchAsset(`${ASSET_PATH_PREFIX}/hello.txt`).mock.lastCall?.[0];
-    expect(await response?.text()).toBe('hi');
-  });
+  describe('fetch', () => {
+    it('should respond to a registered base64 image with its decoded bytes', async () => {
+      loadStaticAssets({ '/images/foo.png': `data:image/png;base64,${btoa('PNG')}` });
+      const response = fetchAsset('/images/foo.png').mock.lastCall?.[0];
+      expect(response?.headers.get('Content-Type')).toBe('image/png');
+      expect(await response?.text()).toBe('PNG');
+    });
 
-  it('should leave unregistered paths to the network', () => {
-    loadStaticAssets({ '/hello.txt': 'data:text/plain,hi' });
-    expect(fetchAsset('/other.txt')).not.toHaveBeenCalled();
-  });
+    it('should respond to a registered plain text asset with its URI-decoded content', async () => {
+      loadStaticAssets({ '/hello.txt': 'data:text/plain,Hello%20World' });
+      const response = fetchAsset('/hello.txt').mock.lastCall?.[0];
+      expect(response?.headers.get('Content-Type')).toBe('text/plain');
+      expect(await response?.text()).toBe('Hello World');
+    });
 
-  it('should throw for an unsupported data URL, so a bad asset fails loudly', () => {
-    loadStaticAssets({ '/data.json': 'data:application/json,{}' });
-    expect(() => fetchAsset('/data.json')).toThrow('Invalid or unsupported data URL');
+    it('should strip the served runtime prefix, so assets resolve relative to the iframe', async () => {
+      loadStaticAssets({ '/hello.txt': 'data:text/plain,hi' });
+      const response = fetchAsset(`${ASSET_PATH_PREFIX}/hello.txt`).mock.lastCall?.[0];
+      expect(await response?.text()).toBe('hi');
+    });
+
+    it('should leave unregistered paths to the network', () => {
+      loadStaticAssets({ '/hello.txt': 'data:text/plain,hi' });
+      expect(fetchAsset('/other.txt')).not.toHaveBeenCalled();
+    });
+
+    it('should throw for an unsupported data URL, so a bad asset fails loudly', () => {
+      loadStaticAssets({ '/data.json': 'data:application/json,{}' });
+      expect(() => fetchAsset('/data.json')).toThrow('Invalid or unsupported data URL');
+    });
   });
 });

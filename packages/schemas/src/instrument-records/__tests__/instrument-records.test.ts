@@ -83,30 +83,30 @@ describe('$InstrumentRecord', () => {
       }).success
     ).toBe(false);
   });
-});
 
-describe('$InstrumentRecord session metadata', () => {
-  const base = {
-    createdAt: '2024-01-01',
-    data: { value: 1 },
-    date: '2024-01-01',
-    id: 'record-1',
-    instrumentId: 'instrument-1',
-    sessionId: 'session-1',
-    subjectId: 'subject-1',
-    updatedAt: '2024-01-01'
-  };
-  it('should accept the data collection method on the session, which is the column the datahub renders', () => {
-    const result = $InstrumentRecord.safeParse({ ...base, session: { type: 'REMOTE', user: { username: 'alice' } } });
-    expect(result.success).toBe(true);
-    expect(result.data?.session?.type).toBe('REMOTE');
-  });
-  // A record whose session was deleted reads back without a type, which must not fail the response.
-  it('should accept a null collection method', () => {
-    expect($InstrumentRecord.safeParse({ ...base, session: { type: null, user: null } }).success).toBe(true);
-  });
-  it('should reject a collection method that is not a session type', () => {
-    expect($InstrumentRecord.safeParse({ ...base, session: { type: 'IN_CLINIC' } }).success).toBe(false);
+  describe('session metadata', () => {
+    const base = {
+      createdAt: '2024-01-01',
+      data: { value: 1 },
+      date: '2024-01-01',
+      id: 'record-1',
+      instrumentId: 'instrument-1',
+      sessionId: 'session-1',
+      subjectId: 'subject-1',
+      updatedAt: '2024-01-01'
+    };
+    it('should accept the data collection method on the session, which is the column the datahub renders', () => {
+      const result = $InstrumentRecord.safeParse({ ...base, session: { type: 'REMOTE', user: { username: 'alice' } } });
+      expect(result.success).toBe(true);
+      expect(result.data?.session?.type).toBe('REMOTE');
+    });
+    // A record whose session was deleted reads back without a type, which must not fail the response.
+    it('should accept a null collection method', () => {
+      expect($InstrumentRecord.safeParse({ ...base, session: { type: null, user: null } }).success).toBe(true);
+    });
+    it('should reject a collection method that is not a session type', () => {
+      expect($InstrumentRecord.safeParse({ ...base, session: { type: 'IN_CLINIC' } }).success).toBe(false);
+    });
   });
 });
 

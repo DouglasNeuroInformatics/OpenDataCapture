@@ -41,13 +41,13 @@ const submittedData = () => onSubmit.mock.lastCall?.[0];
 
 const groupRequiredMessage = 'A user who is not an administrator must belong to at least one group';
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
-
-afterEach(cleanup);
-
 describe('UpdateUserForm', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(cleanup);
+
   it('should start from the stored values, so an unchanged field is saved as it was', async () => {
     renderForm();
     submit();

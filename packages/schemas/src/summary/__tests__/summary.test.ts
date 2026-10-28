@@ -46,7 +46,7 @@ describe('$Summary', () => {
           subjects: []
         }
       })
-    ).rejects.toThrowError();
+    ).rejects.toThrowError('Too small: expected number to be >=0');
   });
   it('should reject a summary with a NaN value', async () => {
     await expect(() =>
@@ -64,6 +64,6 @@ describe('$Summary', () => {
           subjects: []
         }
       })
-    ).rejects.toThrowError();
+    ).rejects.toThrowError('expected number, received NaN');
   });
 });

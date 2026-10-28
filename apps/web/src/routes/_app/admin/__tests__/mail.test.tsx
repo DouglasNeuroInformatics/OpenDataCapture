@@ -51,13 +51,13 @@ const renderPage = () => {
   return render(<Component />);
 };
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
+describe('Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-afterEach(cleanup);
+  afterEach(cleanup);
 
-describe('admin mail route', () => {
   it('should prefetch the mail settings in the loader, so the page renders without a waterfall', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue(SETTINGS);

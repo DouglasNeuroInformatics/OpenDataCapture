@@ -14,20 +14,26 @@ type ResultExtension = {
 
 const extensions = vi.hoisted((): ResultExtension[] => []);
 
+const extendedClient = vi.hoisted(() => ({}));
+
 vi.mock('@prisma/generated-client', () => ({
   PrismaClient: class {
     $extends(extension: ResultExtension) {
       extensions.push(extension);
-      return this;
+      return extendedClient;
     }
   }
 }));
 
-await import('../prisma');
+const { prisma } = await import('../prisma');
 
 const getPublicKey = extensions[0]!.result.remoteAssignmentModel.getPublicKey;
 
 describe('prisma', () => {
+  it('should export the client returned by $extends, so every consumer gets the computed public key', () => {
+    expect(prisma).toBe(extendedClient);
+  });
+
   it('should always select the raw public key, since the computed field is derived from it', () => {
     expect(getPublicKey.needs).toEqual({ rawPublicKey: true });
   });

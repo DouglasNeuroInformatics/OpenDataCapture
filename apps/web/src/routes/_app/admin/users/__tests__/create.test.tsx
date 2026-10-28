@@ -115,19 +115,19 @@ const stubClipboardWrite = () => {
   return writeText;
 };
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  useNotificationsStore.setState({ notifications: [] });
-  mocks.activeLanguages = ['en', 'es', 'fr'];
-  mocks.groups = [];
-  mocks.isMailEnabled = false;
-  mocks.get.mockResolvedValue({ data: { success: false } });
-  mocks.mutateAsync.mockResolvedValue({ welcomeEmail: welcomeEmail({ status: 'DISABLED' }) });
-});
+describe('Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    useNotificationsStore.setState({ notifications: [] });
+    mocks.activeLanguages = ['en', 'es', 'fr'];
+    mocks.groups = [];
+    mocks.isMailEnabled = false;
+    mocks.get.mockResolvedValue({ data: { success: false } });
+    mocks.mutateAsync.mockResolvedValue({ welcomeEmail: welcomeEmail({ status: 'DISABLED' }) });
+  });
 
-afterEach(cleanup);
+  afterEach(cleanup);
 
-describe('create user route', () => {
   it('should prefetch the groups in the loader, so the group options render without a waterfall', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);

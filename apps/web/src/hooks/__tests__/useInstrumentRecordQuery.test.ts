@@ -4,6 +4,7 @@ import { createElement, Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { instrumentRecordQueryOptions, useInstrumentRecordQuery } from '../useInstrumentRecordQuery';
 
@@ -42,7 +43,7 @@ describe('instrumentRecordQueryOptions', () => {
     mockAxios.get.mockResolvedValue({ data: { id: 'record-1' } });
     await expect(
       createQueryClient().fetchQuery(instrumentRecordQueryOptions({ params: { id: 'record-1' } }))
-    ).rejects.toThrow();
+    ).rejects.toThrow(z.ZodError);
   });
 
   it('should key the cache under instrument-records, so invalidating the records also refreshes this one', () => {

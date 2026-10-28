@@ -219,6 +219,33 @@ describe('resolveSubjectIds', () => {
     expect(combined).not.toContain('Tremblay');
     expect(combined).not.toContain('2000-01-01');
   });
+
+  describe('identifier forms', () => {
+    const idCsv = (value: string) => parseDelimitedText(`subjectId\n${value}`);
+
+    it('should scope a custom identifier written the way the app displays it', async () => {
+      await expect(
+        resolveSubjectIds(idCsv('ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })
+      ).resolves.toEqual(['Depression_Clinic$ex_111']);
+    });
+
+    it('should leave an already scoped identifier alone', async () => {
+      await expect(
+        resolveSubjectIds(idCsv('Depression_Clinic$ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })
+      ).resolves.toEqual(['Depression_Clinic$ex_111']);
+    });
+
+    it('should leave a generated digest alone, since those are never scoped', async () => {
+      const digest = 'a'.repeat(64);
+      await expect(
+        resolveSubjectIds(idCsv(digest), { groupName: 'Depression Clinic', maxSubjects: 10 })
+      ).resolves.toEqual([digest]);
+    });
+
+    it('should pass values through unchanged when no group is known', async () => {
+      await expect(resolveSubjectIds(idCsv('ex_111'), { maxSubjects: 10 })).resolves.toEqual(['ex_111']);
+    });
+  });
 });
 
 describe('isWorkbookFile', () => {
@@ -307,32 +334,53 @@ describe('buildResultRows', () => {
     });
     expect(rows).toHaveLength(2);
   });
-});
 
-describe('buildResultRows subject columns', () => {
-  it('should carry the identifier untruncated, since a prefix cannot be pasted back in', () => {
-    const [row] = buildResultRows({
-      assignments: [
-        {
-          expiresAt: '2027-09-10T23:59:59.999Z',
-          instrumentId: 'i1',
-          subjectId: 'a'.repeat(64),
-          url: 'http://x/a1'
-        }
-      ],
-      instrumentTitleById: {}
+  describe('subject columns', () => {
+    it('should carry the identifier untruncated, since a prefix cannot be pasted back in', () => {
+      const [row] = buildResultRows({
+        assignments: [
+          {
+            expiresAt: '2027-09-10T23:59:59.999Z',
+            instrumentId: 'i1',
+            subjectId: 'a'.repeat(64),
+            url: 'http://x/a1'
+          }
+        ],
+        instrumentTitleById: {}
+      });
+      expect(row?.subject).toBe('a'.repeat(64));
     });
-    expect(row?.subject).toBe('a'.repeat(64));
-  });
 
-  it('should strip the group scope from a custom identifier, as the app does', () => {
-    const [row] = buildResultRows({
-      assignments: [
-        { expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'Depression_Clinic$ex_111', url: 'http://x/a1' }
-      ],
-      instrumentTitleById: {}
+    it('should strip the group scope from a custom identifier, as the app does', () => {
+      const [row] = buildResultRows({
+        assignments: [
+          { expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'Depression_Clinic$ex_111', url: 'http://x/a1' }
+        ],
+        instrumentTitleById: {}
+      });
+      expect(row?.subject).toBe('ex_111');
     });
-    expect(row?.subject).toBe('ex_111');
+
+    describe('result column order', () => {
+      it('should lead every row with the subject, ahead of the uploaded columns', () => {
+        const [row] = buildResultRows({
+          assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' }],
+          instrumentTitleById: {},
+          sourceRowBySubjectId: { 'subject-1': { firstName: 'Marie', lastName: 'Belanger' } }
+        });
+        // Pinned because `perfectionist` sorts object literals; the spread is what keeps this first.
+        expect(Object.keys(row!)[0]).toBe('subject');
+      });
+
+      it('should put the subject first in the clipboard table too', () => {
+        const rows = buildResultRows({
+          assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' }],
+          instrumentTitleById: {},
+          sourceRowBySubjectId: { 'subject-1': { firstName: 'Marie' } }
+        });
+        expect(toResultTsv(rows).split('\n')[0]?.split('\t')[0]).toBe('subject');
+      });
+    });
   });
 });
 
@@ -368,54 +416,6 @@ describe('toResultTsv', () => {
     });
     expect(Object.keys(rows[0]!)).not.toContain('subjectId');
     expect(rows[0]?.subject).toBe('a'.repeat(64));
-  });
-});
-
-describe('result column order', () => {
-  it('should lead every row with the subject, ahead of the uploaded columns', () => {
-    const [row] = buildResultRows({
-      assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' }],
-      instrumentTitleById: {},
-      sourceRowBySubjectId: { 'subject-1': { firstName: 'Marie', lastName: 'Belanger' } }
-    });
-    // Pinned because `perfectionist` sorts object literals; the spread is what keeps this first.
-    expect(Object.keys(row!)[0]).toBe('subject');
-  });
-
-  it('should put the subject first in the clipboard table too', () => {
-    const rows = buildResultRows({
-      assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' }],
-      instrumentTitleById: {},
-      sourceRowBySubjectId: { 'subject-1': { firstName: 'Marie' } }
-    });
-    expect(toResultTsv(rows).split('\n')[0]?.split('\t')[0]).toBe('subject');
-  });
-});
-
-describe('resolveSubjectIds identifier forms', () => {
-  const idCsv = (value: string) => parseDelimitedText(`subjectId\n${value}`);
-
-  it('should scope a custom identifier written the way the app displays it', async () => {
-    await expect(
-      resolveSubjectIds(idCsv('ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })
-    ).resolves.toEqual(['Depression_Clinic$ex_111']);
-  });
-
-  it('should leave an already scoped identifier alone', async () => {
-    await expect(
-      resolveSubjectIds(idCsv('Depression_Clinic$ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })
-    ).resolves.toEqual(['Depression_Clinic$ex_111']);
-  });
-
-  it('should leave a generated digest alone, since those are never scoped', async () => {
-    const digest = 'a'.repeat(64);
-    await expect(
-      resolveSubjectIds(idCsv(digest), { groupName: 'Depression Clinic', maxSubjects: 10 })
-    ).resolves.toEqual([digest]);
-  });
-
-  it('should pass values through unchanged when no group is known', async () => {
-    await expect(resolveSubjectIds(idCsv('ex_111'), { maxSubjects: 10 })).resolves.toEqual(['ex_111']);
   });
 });
 

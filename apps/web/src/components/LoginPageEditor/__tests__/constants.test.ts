@@ -9,7 +9,7 @@ import {
   URL_PATTERN
 } from '../constants';
 
-describe('LoginPageEditor constants', () => {
+describe('HEX_PATTERN', () => {
   it.each(['#abc', '#ABCDEF', '#0ea5e9'])('should accept the hex color %s', (color) => {
     expect(HEX_PATTERN.test(color)).toBe(true);
   });
@@ -17,7 +17,9 @@ describe('LoginPageEditor constants', () => {
   it.each(['abc', '#ab', '#abcd', '#gggggg', '#0ea5e9 '])('should reject the malformed hex color %s', (color) => {
     expect(HEX_PATTERN.test(color)).toBe(false);
   });
+});
 
+describe('URL_PATTERN', () => {
   it.each(['https://example.com', 'http://example.com/path?q=1'])('should accept the http url %s', (url) => {
     expect(URL_PATTERN.test(url)).toBe(true);
   });
@@ -28,15 +30,21 @@ describe('LoginPageEditor constants', () => {
       expect(URL_PATTERN.test(url)).toBe(false);
     }
   );
+});
 
+describe('DEFAULT_PANEL_TEXT_COLOR', () => {
   it('should seed the panel text picker with a valid hex color', () => {
     expect(HEX_PATTERN.test(DEFAULT_PANEL_TEXT_COLOR)).toBe(true);
   });
+});
 
+describe('DEFAULT_SECTIONS_ORDER', () => {
   it('should order every panel section exactly once by default', () => {
     expect([...DEFAULT_SECTIONS_ORDER].sort()).toEqual([...PANEL_SECTIONS].sort());
   });
+});
 
+describe('RIGHT_PANEL_OPTIONS', () => {
   it('should offer the default right panel and every theme but sunset, so the swatch grid stays 2 by 4', () => {
     expect([...RIGHT_PANEL_OPTIONS].sort()).toEqual(['none', ...LOGIN_THEMES.filter((t) => t !== 'sunset')].sort());
   });

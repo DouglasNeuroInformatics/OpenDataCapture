@@ -62,27 +62,27 @@ const openServers: Server[] = [];
 
 let createServerCalls: unknown[][];
 
-beforeAll(() => {
-  createServerCalls = [...createServer.mock.calls];
-});
-
-afterEach(async () => {
-  await Promise.all(
-    openServers.splice(0).map((httpServer) => {
-      httpServer.closeAllConnections();
-      return new Promise((resolve) => httpServer.close(resolve));
-    })
-  );
-  vite.ssrFixStacktrace.mockClear();
-  vite.ssrLoadModule.mockClear();
-  vite.transformIndexHtml.mockClear();
-});
-
-afterAll(() => {
-  fs.rmSync(config.root, { force: true, recursive: true });
-});
-
 describe('DevelopmentServer', () => {
+  beforeAll(() => {
+    createServerCalls = [...createServer.mock.calls];
+  });
+
+  afterEach(async () => {
+    await Promise.all(
+      openServers.splice(0).map((httpServer) => {
+        httpServer.closeAllConnections();
+        return new Promise((resolve) => httpServer.close(resolve));
+      })
+    );
+    vite.ssrFixStacktrace.mockClear();
+    vite.ssrLoadModule.mockClear();
+    vite.transformIndexHtml.mockClear();
+  });
+
+  afterAll(() => {
+    fs.rmSync(config.root, { force: true, recursive: true });
+  });
+
   it('should create vite in middleware mode, so express stays in charge of the http server', () => {
     expect(createServerCalls).toStrictEqual([[{ appType: 'custom', server: { middlewareMode: true } }]]);
   });

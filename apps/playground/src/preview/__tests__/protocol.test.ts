@@ -62,14 +62,16 @@ describe('serializeError', () => {
   });
 });
 
-describe('message schemas', () => {
+describe('$EditorMessage', () => {
   it('should accept a render message and reject one carrying a theme outside the known pair', () => {
     expect($EditorMessage.safeParse({ bundle: 'x', language: 'en', theme: 'dark', type: 'render' }).success).toBe(true);
     expect($EditorMessage.safeParse({ bundle: 'x', language: 'en', theme: 'sepia', type: 'render' }).success).toBe(
       false
     );
   });
+});
 
+describe('$PreviewMessage', () => {
   it('should reject a message from the frame that names an unknown type, so nothing acts on unparsed data', () => {
     expect($PreviewMessage.safeParse({ type: 'ready' }).success).toBe(true);
     expect($PreviewMessage.safeParse({ to: 'https://example.org', type: 'navigate' }).success).toBe(false);

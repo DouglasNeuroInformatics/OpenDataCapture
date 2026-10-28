@@ -7,12 +7,12 @@ import '@/services/i18n';
 
 const body = <div data-testid="step-body" />;
 
-beforeEach(() => {
-  // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
-  cleanup();
-});
-
 describe('StepLayout', () => {
+  beforeEach(() => {
+    // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
+    cleanup();
+  });
+
   it('should mark the current step and let only a completed step be revisited', () => {
     const onStepChange = vi.fn();
     render(

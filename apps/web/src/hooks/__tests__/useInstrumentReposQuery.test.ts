@@ -4,6 +4,7 @@ import { createElement, Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import {
   INSTRUMENT_REPOS_QUERY_KEY,
@@ -46,7 +47,7 @@ describe('instrumentReposQueryOptions', () => {
 
   it('should reject a repo whose url is not a url', async () => {
     mockAxios.get.mockResolvedValue({ data: [{ ...REPO, url: 'not a url' }] });
-    await expect(createQueryClient().fetchQuery(instrumentReposQueryOptions())).rejects.toThrow();
+    await expect(createQueryClient().fetchQuery(instrumentReposQueryOptions())).rejects.toThrow(z.ZodError);
   });
 
   it('should cache under the shared key, so the repo mutations can invalidate it', () => {

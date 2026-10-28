@@ -33,24 +33,38 @@ const interactive = {
 } as unknown as AnyInstrument;
 const series = { kind: 'SERIES', language: 'en' } as unknown as AnyInstrument;
 
-describe('isUnilingualInstrument and isUnilingualInstrumentInfo', () => {
+describe('isUnilingualInstrument', () => {
   it('should return true for an instrument whose language is a single string', () => {
     expect(isUnilingualInstrument(interactive)).toBe(true);
-    expect(isUnilingualInstrumentInfo(interactive as unknown as InstrumentInfo)).toBe(true);
   });
   it('should return false for an instrument whose language is an array', () => {
     expect(isUnilingualInstrument(bilingualFile)).toBe(false);
+  });
+});
+
+describe('isUnilingualInstrumentInfo', () => {
+  it('should return true for an instrument info whose language is a single string', () => {
+    expect(isUnilingualInstrumentInfo(interactive as unknown as InstrumentInfo)).toBe(true);
+  });
+  it('should return false for an instrument info whose language is an array', () => {
     expect(isUnilingualInstrumentInfo(bilingualFile as unknown as InstrumentInfo)).toBe(false);
   });
 });
 
-describe('isMultilingualInstrument and isMultilingualInstrumentInfo', () => {
+describe('isMultilingualInstrument', () => {
   it('should return true for an instrument whose language is an array', () => {
     expect(isMultilingualInstrument(bilingualFile)).toBe(true);
-    expect(isMultilingualInstrumentInfo(bilingualFile as unknown as InstrumentInfo)).toBe(true);
   });
   it('should return false for an instrument whose language is a single string', () => {
     expect(isMultilingualInstrument(interactive)).toBe(false);
+  });
+});
+
+describe('isMultilingualInstrumentInfo', () => {
+  it('should return true for an instrument info whose language is an array', () => {
+    expect(isMultilingualInstrumentInfo(bilingualFile as unknown as InstrumentInfo)).toBe(true);
+  });
+  it('should return false for an instrument info whose language is a single string', () => {
     expect(isMultilingualInstrumentInfo(interactive as unknown as InstrumentInfo)).toBe(false);
   });
 });

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { subjectCustomIdsQueryOptions, useSubjectCustomIdsQuery } from '../useSubjectCustomIdsQuery';
 
@@ -35,7 +36,7 @@ describe('subjectCustomIdsQueryOptions', () => {
 
   it('should reject a response that is not a list of ids, so nothing unparsed reaches the form', async () => {
     get.mockResolvedValueOnce({ data: [{ firstName: 'Jane', id: 'group$a' }] });
-    await expect(runQuery('group-1')).rejects.toThrow();
+    await expect(runQuery('group-1')).rejects.toThrow(z.ZodError);
   });
 
   it('should key the cache on the group, so switching group does not serve the previous group ids', () => {

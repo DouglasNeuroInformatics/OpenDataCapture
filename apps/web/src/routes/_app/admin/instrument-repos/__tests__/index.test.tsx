@@ -139,17 +139,17 @@ const runLoader = (queryClient: QueryClient) => {
   return loader({ context: { queryClient } } as Parameters<typeof loader>[0]);
 };
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  mocks.groups = [];
-  mocks.instrumentInfo = { data: undefined, isLoading: false };
-  mocks.isCreatePending = false;
-  useNotificationsStore.setState({ notifications: [] });
-});
+describe('Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.groups = [];
+    mocks.instrumentInfo = { data: undefined, isLoading: false };
+    mocks.isCreatePending = false;
+    useNotificationsStore.setState({ notifications: [] });
+  });
 
-afterEach(cleanup);
+  afterEach(cleanup);
 
-describe('admin instrument repositories page', () => {
   it('should prefetch the repositories and groups in the loader, so the page renders without a waterfall', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);

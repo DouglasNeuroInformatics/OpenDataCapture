@@ -54,11 +54,11 @@ const renderWithClient = <T>(hook: () => T) => {
   return { ...result, queryClient };
 };
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
-
 describe('useBulkAssignmentPreflightMutation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should parse the preflight result at the boundary', async () => {
     mocks.axios.post.mockResolvedValueOnce({
       data: { assignmentCount: 2, subjectCount: 1, timepointCount: 2 }
@@ -86,6 +86,10 @@ describe('useBulkAssignmentPreflightMutation', () => {
 });
 
 describe('useCreateBulkAssignmentsMutation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should parse created assignments and invalidate the assignments query', async () => {
     mocks.axios.post.mockResolvedValueOnce({ data: [assignment] });
     const { queryClient, result } = renderWithClient(() => useCreateBulkAssignmentsMutation());
@@ -108,6 +112,10 @@ describe('useCreateBulkAssignmentsMutation', () => {
 });
 
 describe('toBulkAssignmentFailure', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should recover the structured refusal from a rejected request', () => {
     mocks.isAxiosError.mockReturnValueOnce(true);
     const failure = toBulkAssignmentFailure({

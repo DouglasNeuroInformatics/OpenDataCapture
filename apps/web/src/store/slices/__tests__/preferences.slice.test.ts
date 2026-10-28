@@ -1,20 +1,28 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
 
 import { useAppStore } from '@/store';
+import type { AppStore } from '@/store/types';
 
-const initialState = useAppStore.getState();
+import { createPreferencesSlice } from '../preferences.slice';
+
+const createStore = () =>
+  create(immer<AppStore>((...a) => ({ ...useAppStore.getState(), ...createPreferencesSlice(...a) })));
 
 describe('createPreferencesSlice', () => {
+  let store: ReturnType<typeof createStore>;
+
   beforeEach(() => {
-    useAppStore.setState(initialState, true);
+    store = createStore();
   });
 
   it('should place the group switcher in the sidebar and prefer no group by default', () => {
-    expect(useAppStore.getState()).toMatchObject({ groupSwitcherPosition: 'sidebar', preferredGroupId: null });
+    expect(store.getState()).toMatchObject({ groupSwitcherPosition: 'sidebar', preferredGroupId: null });
   });
 
   it('should move the group switcher to the position the user chose', () => {
-    useAppStore.getState().setGroupSwitcherPosition('topbar');
-    expect(useAppStore.getState().groupSwitcherPosition).toBe('topbar');
+    store.getState().setGroupSwitcherPosition('topbar');
+    expect(store.getState().groupSwitcherPosition).toBe('topbar');
   });
 });

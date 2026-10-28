@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { GroupSwitcher, useIsGroupSwitcherVisible } from '@/components/GroupSwitcher';
+import { GroupSwitcher, useIsGroupSwitcherVisible } from '@/components/GroupSwitcher/GroupSwitcher';
 
 import '@/services/i18n';
 

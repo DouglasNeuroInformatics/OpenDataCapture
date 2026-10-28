@@ -86,15 +86,15 @@ const animateDialogExit = () => {
   onTestFinished(() => style.remove());
 };
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  mocks.archiveUser.mockReset();
-  mocks.currentUser = null;
-});
+describe('Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.archiveUser.mockReset();
+    mocks.currentUser = null;
+  });
 
-afterEach(cleanup);
+  afterEach(cleanup);
 
-describe('admin users table', () => {
   it.each([false, true, null, undefined])('should display disabled=%s independently of archive status', (disabled) => {
     renderTable([userFixture({ archivedAt: new Date('2026-10-01'), disabled })]);
     expect(screen.getByTestId('user-login-status').textContent).toBe(disabled ? 'Disabled' : 'Enabled');

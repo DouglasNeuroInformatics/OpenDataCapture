@@ -65,20 +65,20 @@ async function request(path: string, init?: RequestInit) {
   return fetch(`http://localhost:${address.port}${path}`, init);
 }
 
-afterEach(async () => {
-  await Promise.all(
-    openServers.splice(0).map((httpServer) => {
-      httpServer.closeAllConnections();
-      return new Promise((resolve) => httpServer.close(resolve));
-    })
-  );
-});
-
-afterAll(() => {
-  fs.rmSync(config.root, { force: true, recursive: true });
-});
-
 describe('ProductionServer', () => {
+  afterEach(async () => {
+    await Promise.all(
+      openServers.splice(0).map((httpServer) => {
+        httpServer.closeAllConnections();
+        return new Promise((resolve) => httpServer.close(resolve));
+      })
+    );
+  });
+
+  afterAll(() => {
+    fs.rmSync(config.root, { force: true, recursive: true });
+  });
+
   it('should serve the built client assets from the root path, so the prerendered page can load its scripts', async () => {
     const response = await request('/assets/app.js');
     expect(await response.text()).toBe(LARGE_ASSET);

@@ -6,6 +6,7 @@ import {
   $BulkAssignmentPreflightData,
   $CreateAssignmentData,
   $CreateBulkAssignmentsData,
+  $CreateRemoteAssignmentsData,
   BULK_ASSIGNMENT_MAX_SUBJECTS
 } from '../assignment.js';
 
@@ -19,11 +20,30 @@ const baseRequest = {
 
 const subjectIds = (count: number) => Array.from({ length: count }, (_, index) => `subject-${index}`);
 
-afterEach(() => {
-  vi.useRealTimers();
-});
+const instrumentContainer = {
+  bundle: 'export default {}',
+  id: 'instrument-1',
+  kind: 'FORM'
+};
+
+const remoteAssignment = {
+  completedAt: null,
+  createdAt: new Date().toISOString(),
+  expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
+  groupId: 'group-1',
+  id: 'assignment-1',
+  instrumentId: 'instrument-1',
+  publicKey: [1, 2, 3],
+  status: 'OUTSTANDING',
+  subjectId: 'subject-1',
+  url: 'http://localhost:3500/assignments/assignment-1'
+};
 
 describe('$CreateAssignmentData', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('should reject an expiry in the past', () => {
     expect(
       $CreateAssignmentData.safeParse({
@@ -140,5 +160,43 @@ describe('$BulkAssignmentFailure', () => {
 
   it('should reject a refusal with no issues, since the user could not be told what to fix', () => {
     expect($BulkAssignmentFailure.safeParse({ code: 'BULK_ASSIGNMENT_REFUSED', issues: [] }).success).toBe(false);
+  });
+});
+
+describe('$CreateRemoteAssignmentsData', () => {
+  it('should accept a batch carrying one container for many assignments, so a bundle is not repeated per row', () => {
+    const result = $CreateRemoteAssignmentsData.safeParse({
+      assignments: [
+        remoteAssignment,
+        { ...remoteAssignment, id: 'assignment-2', subjectId: 'subject-2' },
+        { ...remoteAssignment, id: 'assignment-3', subjectId: 'subject-3' }
+      ],
+      instruments: [{ instrumentContainer, instrumentId: 'instrument-1' }]
+    });
+    expect(result.success).toBe(true);
+    expect(result.data?.instruments).toHaveLength(1);
+    expect(result.data?.assignments).toHaveLength(3);
+  });
+
+  it('should reject a batch with no assignments, so an empty request is not a silent no-op', () => {
+    const result = $CreateRemoteAssignmentsData.safeParse({
+      assignments: [],
+      instruments: [{ instrumentContainer, instrumentId: 'instrument-1' }]
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject a batch with no instruments, since every assignment resolves its bundle by id', () => {
+    const result = $CreateRemoteAssignmentsData.safeParse({ assignments: [remoteAssignment], instruments: [] });
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject an assignment that names no instrument, which could not be paired to a container', () => {
+    const { instrumentId: _instrumentId, ...withoutInstrument } = remoteAssignment;
+    const result = $CreateRemoteAssignmentsData.safeParse({
+      assignments: [withoutInstrument],
+      instruments: [{ instrumentContainer, instrumentId: 'instrument-1' }]
+    });
+    expect(result.success).toBe(false);
   });
 });

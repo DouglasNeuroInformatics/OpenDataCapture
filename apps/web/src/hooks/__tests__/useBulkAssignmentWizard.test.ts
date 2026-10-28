@@ -43,15 +43,15 @@ const PARSED = {
 
 const renderWizard = () => renderHook(() => useBulkAssignmentWizard(OPTIONS));
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  Object.defineProperty(globalThis.navigator, 'clipboard', {
-    configurable: true,
-    value: { writeText: mocks.writeText }
-  });
-});
-
 describe('useBulkAssignmentWizard', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    Object.defineProperty(globalThis.navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: mocks.writeText }
+    });
+  });
+
   it('should start on the source step with nothing collected', () => {
     const { result } = renderWizard();
     expect(result.current.step).toBe('SOURCE');

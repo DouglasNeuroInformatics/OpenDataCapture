@@ -96,7 +96,7 @@ const choose = (select: 'group' | 'username', option: string) => {
 
 const lastNavigatedError = () => mocks.navigate.mock.lastCall?.[0].search?.error;
 
-describe('upload instrument records page', () => {
+describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useNotificationsStore.setState({ notifications: [] });

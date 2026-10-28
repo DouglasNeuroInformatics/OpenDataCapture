@@ -4,6 +4,7 @@ import { createElement } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { summaryQueryOptions, useSummaryQuery } from '../useSummaryQuery';
 
@@ -44,7 +45,7 @@ describe('useSummaryQuery', () => {
 
   it('should reject a summary with a negative count, so a corrupt total never reaches the dashboard', async () => {
     mockAxios.get.mockResolvedValueOnce({ data: { ...summary, counts: { ...summary.counts, users: -1 } } });
-    await expect(new QueryClient().fetchQuery(summaryQueryOptions())).rejects.toThrow();
+    await expect(new QueryClient().fetchQuery(summaryQueryOptions())).rejects.toThrow(z.ZodError);
   });
 
   it('should keep the previous summary while another group loads, so the dashboard does not flash empty', async () => {

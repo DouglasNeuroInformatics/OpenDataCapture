@@ -31,20 +31,20 @@ const renderLayout = () => {
   render(<Component />);
 };
 
-beforeEach(() => {
-  mocks.facets = { isSeries: false, title: 'Happiness Questionnaire' };
-  mocks.outlet = () => 'Outlet Content';
-  mocks.pathname = '/datahub/instruments/hq-1/table';
-  vi.spyOn(Route, 'useParams').mockReturnValue({ instrumentId: 'hq-1' });
-  vi.spyOn(Route, 'useSearch').mockReturnValue({ chart: 'scatter', colourBy: 'none', palette: 'default' });
-});
+describe('Route', () => {
+  beforeEach(() => {
+    mocks.facets = { isSeries: false, title: 'Happiness Questionnaire' };
+    mocks.outlet = () => 'Outlet Content';
+    mocks.pathname = '/datahub/instruments/hq-1/table';
+    vi.spyOn(Route, 'useParams').mockReturnValue({ instrumentId: 'hq-1' });
+    vi.spyOn(Route, 'useSearch').mockReturnValue({ chart: 'scatter', colourBy: 'none', palette: 'default' });
+  });
 
-afterEach(() => {
-  cleanup();
-  vi.restoreAllMocks();
-});
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
 
-describe('instrument layout route', () => {
   it('should name the opened instrument in the heading', () => {
     renderLayout();
     expect(screen.getByRole('heading').textContent).toBe('Happiness Questionnaire');

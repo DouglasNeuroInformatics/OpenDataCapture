@@ -4,6 +4,7 @@ import { createElement, Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { useFindUserQuery, useFindUserQueryOptions } from '../useFindUserQuery';
 
@@ -50,7 +51,7 @@ describe('useFindUserQuery', () => {
 
   it('should reject a malformed user rather than render an incomplete profile', async () => {
     mockAxios.get.mockResolvedValue({ data: { ...USER, username: '' } });
-    await expect(new QueryClient().fetchQuery(useFindUserQueryOptions('user-1'))).rejects.toThrow();
+    await expect(new QueryClient().fetchQuery(useFindUserQueryOptions('user-1'))).rejects.toThrow(z.ZodError);
   });
 });
 

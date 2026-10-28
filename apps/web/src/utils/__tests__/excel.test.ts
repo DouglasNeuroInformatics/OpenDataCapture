@@ -41,11 +41,11 @@ const recordsExport: InstrumentRecordsExport = [
   }
 ];
 
-afterEach(() => {
-  vi.mocked(writeFileXLSX).mockClear();
-});
-
 describe('downloadExcel', () => {
+  afterEach(() => {
+    vi.mocked(writeFileXLSX).mockClear();
+  });
+
   it('should download the workbook under the given filename', () => {
     downloadExcel('records.xlsx', recordsExport);
     expect(lastDownload().filename).toBe('records.xlsx');
@@ -60,6 +60,10 @@ describe('downloadExcel', () => {
 });
 
 describe('downloadSubjectTableExcel', () => {
+  afterEach(() => {
+    vi.mocked(writeFileXLSX).mockClear();
+  });
+
   it('should write the records into a sheet named after the subject table', () => {
     const records = [{ score: 12, subjectId: 'subject-1' }];
     downloadSubjectTableExcel('subject.xlsx', records, 'Subject 1');

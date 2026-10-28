@@ -114,19 +114,19 @@ const animateSheetExit = () => {
   return () => style.remove();
 };
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  useNotificationsStore.setState({ notifications: [] });
-  mocks.groups = [groupFixture()];
-  mocks.repos = [];
-  mocks.patch.mockImplementation((_url: string, body: { instrumentRepoIds: string[] }) =>
-    Promise.resolve({ data: { ...groupFixture(), instrumentRepoIds: body.instrumentRepoIds } })
-  );
-});
+describe('Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    useNotificationsStore.setState({ notifications: [] });
+    mocks.groups = [groupFixture()];
+    mocks.repos = [];
+    mocks.patch.mockImplementation((_url: string, body: { instrumentRepoIds: string[] }) =>
+      Promise.resolve({ data: { ...groupFixture(), instrumentRepoIds: body.instrumentRepoIds } })
+    );
+  });
 
-afterEach(cleanup);
+  afterEach(cleanup);
 
-describe('admin groups route', () => {
   it('should prefetch the groups and the instrument repositories, so the sheet never suspends', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);

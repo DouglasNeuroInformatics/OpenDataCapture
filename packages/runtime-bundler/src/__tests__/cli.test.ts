@@ -20,25 +20,25 @@ function mockBundle(bundle: () => Promise<void>) {
   }));
 }
 
-beforeEach(() => {
-  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runtime-bundler-cli-'));
-  originalCwd = process.cwd();
-  process.chdir(tmpDir);
-  exitSpy = vi.spyOn(process, 'exit').mockImplementation((code) => {
-    throw new Error(`EXIT:${code}`);
-  });
-  vi.resetModules();
-});
-
-afterEach(() => {
-  vi.doUnmock('../bundler.js');
-  process.chdir(originalCwd);
-  fs.rmSync(tmpDir, { force: true, recursive: true });
-  exitSpy.mockRestore();
-  vi.restoreAllMocks();
-});
-
 describe('cli', () => {
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runtime-bundler-cli-'));
+    originalCwd = process.cwd();
+    process.chdir(tmpDir);
+    exitSpy = vi.spyOn(process, 'exit').mockImplementation((code) => {
+      throw new Error(`EXIT:${code}`);
+    });
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    vi.doUnmock('../bundler.js');
+    process.chdir(originalCwd);
+    fs.rmSync(tmpDir, { force: true, recursive: true });
+    exitSpy.mockRestore();
+    vi.restoreAllMocks();
+  });
+
   it('should exit when runtime.config.js cannot be resolved from the working directory', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);

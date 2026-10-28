@@ -263,7 +263,9 @@ describe('AssignmentsService', () => {
 
     it('should write nothing to the model or the gateway when the request is refused', async () => {
       subjectModel.findMany.mockResolvedValueOnce([]);
-      await expect(assignmentsService.create(data(), userAt('GROUP_MANAGER'))).rejects.toThrow();
+      await expect(assignmentsService.create(data(), userAt('GROUP_MANAGER'))).rejects.toThrow(
+        UnprocessableEntityException
+      );
       expect(assignmentModel.create).not.toHaveBeenCalled();
       expect(gatewayService.createRemoteAssignment).not.toHaveBeenCalled();
     });
@@ -316,7 +318,7 @@ describe('AssignmentsService', () => {
 
     it('should not record an audit entry when the gateway refuses the assignment, since nothing was created', async () => {
       gatewayService.createRemoteAssignment.mockRejectedValueOnce(new Error('gateway down'));
-      await expect(assignmentsService.create(data(), permissiveUser())).rejects.toThrow();
+      await expect(assignmentsService.create(data(), permissiveUser())).rejects.toThrow('gateway down');
       expect(auditLogger.log).not.toHaveBeenCalled();
     });
 
@@ -399,7 +401,7 @@ describe('AssignmentsService', () => {
 
     it('should delete every staged row when the gateway rejects the batch, leaving nothing behind', async () => {
       gatewayService.createRemoteAssignments.mockRejectedValueOnce(new Error('gateway down'));
-      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow();
+      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow('gateway down');
       expect(assignmentModel.deleteMany).toHaveBeenCalledTimes(1);
       expect(assignmentModel.deleteMany.mock.lastCall?.[0]).toMatchObject({ where: { id: { in: expect.any(Array) } } });
       expect(assignmentModel.deleteMany.mock.lastCall?.[0].where.id.in).toHaveLength(2);
@@ -407,7 +409,7 @@ describe('AssignmentsService', () => {
 
     it('should not record an audit entry when the batch failed, since nothing was created', async () => {
       gatewayService.createRemoteAssignments.mockRejectedValueOnce(new Error('gateway down'));
-      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow();
+      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow('gateway down');
       expect(auditLogger.log).not.toHaveBeenCalled();
     });
 
@@ -441,7 +443,7 @@ describe('AssignmentsService', () => {
       gatewayService.createRemoteAssignments.mockRejectedValueOnce(new Error('gateway down'));
       const rollbackFailure = new Error('database down');
       assignmentModel.deleteMany.mockRejectedValueOnce(rollbackFailure);
-      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow();
+      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow('gateway down');
       expect(loggingService.error).toHaveBeenCalledExactlyOnceWith({
         error: rollbackFailure,
         message: 'ERROR: Failed to roll back staged bulk assignments'

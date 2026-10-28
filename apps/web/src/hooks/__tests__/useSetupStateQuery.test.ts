@@ -4,6 +4,7 @@ import { createElement, Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { SETUP_STATE_QUERY_KEY, setupStateQueryOptions, useSetupStateQuery } from '../useSetupStateQuery';
 
@@ -41,7 +42,7 @@ describe('useSetupStateQuery', () => {
 
   it('should reject a response that is not a setup state, so no unparsed flag reaches the app', async () => {
     mockAxios.get.mockResolvedValueOnce({ data: { isSetup: 'yes' } });
-    await expect(new QueryClient().fetchQuery(setupStateQueryOptions())).rejects.toThrow();
+    await expect(new QueryClient().fetchQuery(setupStateQueryOptions())).rejects.toThrow(z.ZodError);
   });
 
   it('should serve a later read from the cache, so the setup endpoint is not hit again', async () => {

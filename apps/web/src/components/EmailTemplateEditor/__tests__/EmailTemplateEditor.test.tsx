@@ -32,9 +32,9 @@ const blurBodyWithSelection = (start: number, end: number) => {
   fireEvent.blur(bodyInput());
 };
 
-afterEach(cleanup);
-
 describe('EmailTemplateEditor', () => {
+  afterEach(cleanup);
+
   it('should open on the interface language', () => {
     renderEditor();
     expect(subjectInput().value).toBe('Welcome');

@@ -26,16 +26,16 @@ const renderProvider = () =>
     </DisclaimerProvider>
   );
 
-beforeEach(() => {
-  mocks.store.isDisclaimerAccepted = false;
-});
-
-afterEach(() => {
-  cleanup();
-  vi.clearAllMocks();
-});
-
 describe('DisclaimerProvider', () => {
+  beforeEach(() => {
+    mocks.store.isDisclaimerAccepted = false;
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
   it('should render its children beneath the disclaimer', () => {
     renderProvider();
     expect(screen.getByText(CHILD_TEXT)).toBeTruthy();

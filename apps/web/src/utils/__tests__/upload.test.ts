@@ -48,15 +48,15 @@ function expectRejection(promise: Promise<unknown>, en: string) {
 
 let consoleError: ReturnType<typeof vi.spyOn>;
 
-beforeEach(() => {
-  consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-});
-
-afterEach(() => {
-  consoleError.mockRestore();
-});
-
 describe('Zod3', () => {
+  beforeEach(() => {
+    consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    consoleError.mockRestore();
+  });
+
   describe('getZodTypeName', () => {
     it('should parse basic string type', () => {
       const result = Zod3.getZodTypeName(z3.string());
@@ -541,6 +541,14 @@ describe('Zod3', () => {
 });
 
 describe('Zod4', () => {
+  beforeEach(() => {
+    consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    consoleError.mockRestore();
+  });
+
   describe('generateSampleData', () => {
     it('should generate sample data for string type', () => {
       const result = Zod4.generateSampleData({

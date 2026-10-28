@@ -202,9 +202,9 @@ describe('InstrumentRecordsService', () => {
     });
 
     it('should refuse callers without a delete rule before querying clinical data', async () => {
-      await expect(
-        instrumentRecordsService.deleteById('record-1', { ability: createAppAbility([]) })
-      ).rejects.toThrow();
+      await expect(instrumentRecordsService.deleteById('record-1', { ability: createAppAbility([]) })).rejects.toThrow(
+        `It's not allowed to run "delete" on "InstrumentRecord"`
+      );
       expect(instrumentRecordModel.findFirst).not.toHaveBeenCalled();
       expect(fileModel.findMany).not.toHaveBeenCalled();
       expect(transaction).not.toHaveBeenCalled();

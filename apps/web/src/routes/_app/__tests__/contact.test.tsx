@@ -22,7 +22,7 @@ const submitContactForm = (reasonLabel: string, message: string) => {
   fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
 };
 
-describe('contact page', () => {
+describe('Route', () => {
   const open = vi.fn();
 
   beforeEach(() => {

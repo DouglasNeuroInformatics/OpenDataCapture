@@ -37,6 +37,6 @@ describe('fetchPlaygroundConfig', () => {
 
   it('should throw when a fallback serves the editor page in its place, rather than read it as unconfigured', async () => {
     respondWith('<!doctype html>', { headers: { 'Content-Type': 'text/html' } });
-    await expect(fetchPlaygroundConfig()).rejects.toThrow();
+    await expect(fetchPlaygroundConfig()).rejects.toThrow(SyntaxError);
   });
 });

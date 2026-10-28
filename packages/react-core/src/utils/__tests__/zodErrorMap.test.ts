@@ -41,284 +41,288 @@ const describeV4 = (issue: z4.core.$ZodRawIssue) => maps.v4(issue);
 
 const JANUARY_15_2020 = new Date(2020, 0, 15);
 
-beforeAll(() => {
-  i18n.init({ translations: {} });
-});
-
-afterEach(() => {
-  i18n.changeLanguage('en');
-});
-
-describe('zod v3 error map', () => {
-  it.each([
-    ['a missing field is the required message', z3.object({ x: z3.string() }), {}, REQUIRED],
-    ['a null value reads as missing rather than a type error', z3.object({ x: z3.string() }), { x: null }, REQUIRED],
-    ['an empty string against min(1), which untouched text fields submit', z3.string().min(1), '', REQUIRED],
-    [
-      'an untouched union of literals, which zod would otherwise report as "Invalid input"',
-      z3.object({ x: z3.union([z3.literal(1), z3.literal(2)]) }),
-      {},
-      REQUIRED
-    ],
-    ['a decimal in an integer field', z3.number().int(), 1.5, 'Must be a whole number'],
-    ['a number where text is expected', z3.string(), 1, 'Must be text'],
-    ['text where a number is expected', z3.number(), 'x', 'Must be a number'],
-    ['text where a boolean is expected', z3.boolean(), 'x', 'Must be a valid selection'],
-    ['an unparseable date', z3.date(), new Date('nope'), 'Must be a valid date'],
-    ['a number below an inclusive minimum', z3.number().gte(1), 0, 'Must be 1 or greater'],
-    ['a number at an exclusive minimum', z3.number().gt(1), 1, 'Must be greater than 1'],
-    ['a number above an inclusive maximum', z3.number().lte(10), 12, 'Must be 10 or less'],
-    ['a large bound, grouped for readability', z3.number().lte(1000000), 2000000, 'Must be 1,000,000 or less'],
-    ['a string below its minimum length', z3.string().min(3), 'ab', 'Must be at least 3 characters'],
-    ['a string of the wrong exact length', z3.string().length(5), 'ab', 'Must be exactly 5 characters'],
-    ['a set below its minimum size', z3.set(z3.string()).min(2), new Set(['a']), 'Must select at least 2 options'],
-    [
-      'a single-option minimum, in the singular',
-      z3.set(z3.string()).min(1),
-      new Set(),
-      'Must select at least 1 option'
-    ],
-    ['an array above its maximum size', z3.array(z3.string()).max(1), ['a', 'b'], 'Must select at most 1 option'],
-    [
-      'a value failing a regex, without leaking the pattern',
-      z3.string().regex(/^[A-Z]$/),
-      'zz',
-      'Does not match the expected format'
-    ],
-    ['a malformed email address', z3.string().email(), 'x', 'Must be a valid email address'],
-    ['a malformed url', z3.string().url(), 'x', 'Must be a valid web address'],
-    ['a string missing its required prefix', z3.string().startsWith('ab'), 'zz', 'Must start with "ab"'],
-    ['a value outside an enum', z3.enum(['A', 'B']), 'C', 'Must be a valid selection'],
-    ['a number that is not a multiple of the divisor', z3.number().multipleOf(5), 7, 'Must be a multiple of 5'],
-    [
-      'a union whose branches disagree, which has no single explanation',
-      z3.union([z3.string(), z3.number()]),
-      true,
-      INVALID
-    ],
-    ['an issue the map does not model', z3.number().finite(), Infinity, INVALID],
-    [
-      'an unexpected key, which no form field can produce',
-      z3.object({ x: z3.string() }).strict(),
-      { x: 'a', y: 1 },
-      INVALID
-    ],
-    ['a missing literal as required', z3.literal(1), undefined, REQUIRED],
-    ['a null literal as required', z3.literal(1), null, REQUIRED],
-    ['a wrong literal as an invalid selection', z3.literal(1), 2, 'Must be a valid selection'],
-    [
-      'an unknown discriminator as an invalid selection',
-      z3.discriminatedUnion('type', [z3.object({ type: z3.literal('a') })]),
-      { type: 'b' },
-      'Must be a valid selection'
-    ],
-    ['text where a list is expected', z3.array(z3.string()), 'x', 'Must be a list of values'],
-    ['a type no form field produces as invalid', z3.symbol(), 1, INVALID],
-    ['a malformed datetime as an invalid date', z3.string().datetime(), 'x', 'Must be a valid date'],
-    ['a malformed time', z3.string().time(), 'x', 'Must be a valid time'],
-    ['a string missing its required substring', z3.string().includes('ab'), 'zz', 'Must include "ab"'],
-    ['a string missing its required suffix', z3.string().endsWith('ab'), 'zz', 'Must end with "ab"']
-  ])('should describe %s', (_, schema, value, expected) => {
-    expect(v3Message(schema, value)).toBe(expected);
+describe('createZodErrorMaps', () => {
+  beforeAll(() => {
+    i18n.init({ translations: {} });
   });
 
-  it('should format a date bound as a date rather than a timestamp', () => {
-    expect(v3Message(z3.date().min(JANUARY_15_2020), new Date(2019, 0, 1))).toBe(
-      'Must be on or after January 15, 2020'
-    );
+  afterEach(() => {
+    i18n.changeLanguage('en');
   });
 
-  it('should leave a message written by the schema author untouched', () => {
-    expect(v3Message(z3.string().min(3, { message: 'Trop court' }), 'ab')).toBe('Trop court');
+  describe('v3', () => {
+    it.each([
+      ['a missing field is the required message', z3.object({ x: z3.string() }), {}, REQUIRED],
+      ['a null value reads as missing rather than a type error', z3.object({ x: z3.string() }), { x: null }, REQUIRED],
+      ['an empty string against min(1), which untouched text fields submit', z3.string().min(1), '', REQUIRED],
+      [
+        'an untouched union of literals, which zod would otherwise report as "Invalid input"',
+        z3.object({ x: z3.union([z3.literal(1), z3.literal(2)]) }),
+        {},
+        REQUIRED
+      ],
+      ['a decimal in an integer field', z3.number().int(), 1.5, 'Must be a whole number'],
+      ['a number where text is expected', z3.string(), 1, 'Must be text'],
+      ['text where a number is expected', z3.number(), 'x', 'Must be a number'],
+      ['text where a boolean is expected', z3.boolean(), 'x', 'Must be a valid selection'],
+      ['an unparseable date', z3.date(), new Date('nope'), 'Must be a valid date'],
+      ['a number below an inclusive minimum', z3.number().gte(1), 0, 'Must be 1 or greater'],
+      ['a number at an exclusive minimum', z3.number().gt(1), 1, 'Must be greater than 1'],
+      ['a number above an inclusive maximum', z3.number().lte(10), 12, 'Must be 10 or less'],
+      ['a large bound, grouped for readability', z3.number().lte(1000000), 2000000, 'Must be 1,000,000 or less'],
+      ['a string below its minimum length', z3.string().min(3), 'ab', 'Must be at least 3 characters'],
+      ['a string of the wrong exact length', z3.string().length(5), 'ab', 'Must be exactly 5 characters'],
+      ['a set below its minimum size', z3.set(z3.string()).min(2), new Set(['a']), 'Must select at least 2 options'],
+      [
+        'a single-option minimum, in the singular',
+        z3.set(z3.string()).min(1),
+        new Set(),
+        'Must select at least 1 option'
+      ],
+      ['an array above its maximum size', z3.array(z3.string()).max(1), ['a', 'b'], 'Must select at most 1 option'],
+      [
+        'a value failing a regex, without leaking the pattern',
+        z3.string().regex(/^[A-Z]$/),
+        'zz',
+        'Does not match the expected format'
+      ],
+      ['a malformed email address', z3.string().email(), 'x', 'Must be a valid email address'],
+      ['a malformed url', z3.string().url(), 'x', 'Must be a valid web address'],
+      ['a string missing its required prefix', z3.string().startsWith('ab'), 'zz', 'Must start with "ab"'],
+      ['a value outside an enum', z3.enum(['A', 'B']), 'C', 'Must be a valid selection'],
+      ['a number that is not a multiple of the divisor', z3.number().multipleOf(5), 7, 'Must be a multiple of 5'],
+      [
+        'a union whose branches disagree, which has no single explanation',
+        z3.union([z3.string(), z3.number()]),
+        true,
+        INVALID
+      ],
+      ['an issue the map does not model', z3.number().finite(), Infinity, INVALID],
+      [
+        'an unexpected key, which no form field can produce',
+        z3.object({ x: z3.string() }).strict(),
+        { x: 'a', y: 1 },
+        INVALID
+      ],
+      ['a missing literal as required', z3.literal(1), undefined, REQUIRED],
+      ['a null literal as required', z3.literal(1), null, REQUIRED],
+      ['a wrong literal as an invalid selection', z3.literal(1), 2, 'Must be a valid selection'],
+      [
+        'an unknown discriminator as an invalid selection',
+        z3.discriminatedUnion('type', [z3.object({ type: z3.literal('a') })]),
+        { type: 'b' },
+        'Must be a valid selection'
+      ],
+      ['text where a list is expected', z3.array(z3.string()), 'x', 'Must be a list of values'],
+      ['a type no form field produces as invalid', z3.symbol(), 1, INVALID],
+      ['a malformed datetime as an invalid date', z3.string().datetime(), 'x', 'Must be a valid date'],
+      ['a malformed time', z3.string().time(), 'x', 'Must be a valid time'],
+      ['a string missing its required substring', z3.string().includes('ab'), 'zz', 'Must include "ab"'],
+      ['a string missing its required suffix', z3.string().endsWith('ab'), 'zz', 'Must end with "ab"']
+    ])('should describe %s', (_, schema, value, expected) => {
+      expect(v3Message(schema, value)).toBe(expected);
+    });
+
+    it('should format a date bound as a date rather than a timestamp', () => {
+      expect(v3Message(z3.date().min(JANUARY_15_2020), new Date(2019, 0, 1))).toBe(
+        'Must be on or after January 15, 2020'
+      );
+    });
+
+    it('should leave a message written by the schema author untouched', () => {
+      expect(v3Message(z3.string().min(3, { message: 'Trop court' }), 'ab')).toBe('Trop court');
+    });
+
+    it('should follow the language the reader switched to, since messages are built at parse time', () => {
+      const { v3 } = createZodErrorMaps(i18n);
+      i18n.changeLanguage('fr');
+      expect(v3Message(z3.object({ x: z3.string() }), {}, v3)).toBe('Ce champ est obligatoire');
+      expect(v3Message(z3.number().int(), 1.5, v3)).toBe('Doit être un nombre entier');
+      expect(v3Message(z3.string().min(3), 'ab', v3)).toBe('Doit contenir au moins 3 caractères');
+    });
+
+    it('should put zero in the singular in French, where English keeps it plural', () => {
+      expect(v3Message(z3.array(z3.string()).max(0), ['a'])).toBe('Must select at most 0 options');
+      expect(v3Message(z3.array(z3.string()).max(0), ['a'], mapsFor('fr').v3)).toBe(
+        'Doit sélectionner au plus 0 option'
+      );
+    });
+
+    it('should treat null as a type error when the schema expects null itself', () => {
+      expect(describeV3({ code: 'invalid_type', expected: 'null', path: [], received: 'null' })).toBe(INVALID);
+    });
+
+    it('should describe a union with no branch issues as invalid, having no message to repeat', () => {
+      expect(describeV3({ code: 'invalid_union', path: [], unionErrors: [new z3.ZodError([])] })).toBe(INVALID);
+    });
+
+    it('should describe an exact numeric size without a direction', () => {
+      expect(
+        describeV3({ code: 'too_small', exact: true, inclusive: true, minimum: 3, path: [], type: 'number' })
+      ).toBe('Must be exactly 3');
+    });
+
+    it('should treat a maximum without an exact flag as a bound', () => {
+      expect(describeV3({ code: 'too_big', inclusive: true, maximum: 2, path: [], type: 'array' })).toBe(
+        'Must select at most 2 options'
+      );
+    });
+
+    it('should treat a minimum without an exact flag as a bound', () => {
+      expect(describeV3({ code: 'too_small', inclusive: true, minimum: 2, path: [], type: 'array' })).toBe(
+        'Must select at least 2 options'
+      );
+    });
+
+    it('should describe a size issue on an undeclared type as invalid', () => {
+      // @ts-expect-error - zod's declarations list every size type it emits today; this guards a newer runtime
+      expect(describeV3({ code: 'too_big', inclusive: true, maximum: 2, path: [], type: 'map' })).toBe(INVALID);
+    });
+
+    it('should describe a minimum on an undeclared type as invalid', () => {
+      // @ts-expect-error - zod's declarations list every size type it emits today; this guards a newer runtime
+      expect(describeV3({ code: 'too_small', inclusive: true, minimum: 2, path: [], type: 'map' })).toBe(INVALID);
+    });
   });
 
-  it('should follow the language the reader switched to, since messages are built at parse time', () => {
-    const { v3 } = createZodErrorMaps(i18n);
-    i18n.changeLanguage('fr');
-    expect(v3Message(z3.object({ x: z3.string() }), {}, v3)).toBe('Ce champ est obligatoire');
-    expect(v3Message(z3.number().int(), 1.5, v3)).toBe('Doit être un nombre entier');
-    expect(v3Message(z3.string().min(3), 'ab', v3)).toBe('Doit contenir au moins 3 caractères');
-  });
+  describe('v4', () => {
+    it.each([
+      ['a missing field is the required message', z4.object({ x: z4.string() }), {}, REQUIRED],
+      ['a null value reads as missing rather than a type error', z4.object({ x: z4.string() }), { x: null }, REQUIRED],
+      ['an empty string against min(1), which untouched text fields submit', z4.string().min(1), '', REQUIRED],
+      [
+        'an untouched union of literals, which zod would otherwise report as "Invalid input"',
+        z4.object({ x: z4.union([z4.literal(1), z4.literal(2)]) }),
+        {},
+        REQUIRED
+      ],
+      ['a decimal in an integer field', z4.number().int(), 1.5, 'Must be a whole number'],
+      ['a number where text is expected', z4.string(), 1, 'Must be text'],
+      ['text where a number is expected', z4.number(), 'x', 'Must be a number'],
+      ['text where a boolean is expected', z4.boolean(), 'x', 'Must be a valid selection'],
+      ['a number below an inclusive minimum', z4.number().gte(1), 0, 'Must be 1 or greater'],
+      ['a number at an exclusive minimum', z4.number().gt(1), 1, 'Must be greater than 1'],
+      ['a number above an inclusive maximum', z4.number().lte(10), 12, 'Must be 10 or less'],
+      ['a large bound, grouped for readability', z4.number().lte(1000000), 2000000, 'Must be 1,000,000 or less'],
+      ['a string below its minimum length', z4.string().min(3), 'ab', 'Must be at least 3 characters'],
+      ['a string of the wrong exact length', z4.string().length(5), 'ab', 'Must be exactly 5 characters'],
+      ['a set below its minimum size', z4.set(z4.string()).min(2), new Set(['a']), 'Must select at least 2 options'],
+      [
+        'a single-option minimum, in the singular',
+        z4.set(z4.string()).min(1),
+        new Set(),
+        'Must select at least 1 option'
+      ],
+      ['an array above its maximum size', z4.array(z4.string()).max(1), ['a', 'b'], 'Must select at most 1 option'],
+      [
+        'a value failing a regex, without leaking the pattern',
+        z4.string().regex(/^[A-Z]$/),
+        'zz',
+        'Does not match the expected format'
+      ],
+      ['a malformed email address', z4.email(), 'x', 'Must be a valid email address'],
+      ['a malformed url', z4.url(), 'x', 'Must be a valid web address'],
+      ['a string missing its required prefix', z4.string().startsWith('ab'), 'zz', 'Must start with "ab"'],
+      ['a value outside an enum', z4.enum(['A', 'B']), 'C', 'Must be a valid selection'],
+      ['a number that is not a multiple of the divisor', z4.number().multipleOf(5), 7, 'Must be a multiple of 5'],
+      [
+        'a union whose branches disagree, which has no single explanation',
+        z4.union([z4.string(), z4.number()]),
+        true,
+        INVALID
+      ],
+      [
+        'an unexpected key, which no form field can produce',
+        z4.strictObject({ x: z4.string() }),
+        { x: 'a', y: 1 },
+        INVALID
+      ],
+      ['a null literal as required rather than a wrong option', z4.literal(1), null, REQUIRED],
+      ['a type no form field produces as invalid', z4.symbol(), 1, INVALID],
+      ['a malformed iso date as an invalid date', z4.iso.date(), 'x', 'Must be a valid date'],
+      ['a malformed iso datetime as an invalid date', z4.iso.datetime(), 'x', 'Must be a valid date'],
+      ['a malformed iso time', z4.iso.time(), 'x', 'Must be a valid time'],
+      ['a string missing its required substring', z4.string().includes('ab'), 'zz', 'Must include "ab"'],
+      ['a string missing its required suffix', z4.string().endsWith('ab'), 'zz', 'Must end with "ab"'],
+      ['a bigint that is not a multiple of the divisor', z4.bigint().multipleOf(5n), 7n, 'Must be a multiple of 5'],
+      [
+        'a date after its maximum',
+        z4.date().max(JANUARY_15_2020),
+        new Date(2021, 0, 1),
+        'Must be on or before January 15, 2020'
+      ]
+    ])('should describe %s', (_, schema, value, expected) => {
+      expect(v4Message(schema, value)).toBe(expected);
+    });
 
-  it('should put zero in the singular in French, where English keeps it plural', () => {
-    expect(v3Message(z3.array(z3.string()).max(0), ['a'])).toBe('Must select at most 0 options');
-    expect(v3Message(z3.array(z3.string()).max(0), ['a'], mapsFor('fr').v3)).toBe('Doit sélectionner au plus 0 option');
-  });
+    it('should format a date bound as a date rather than a timestamp', () => {
+      expect(v4Message(z4.date().min(JANUARY_15_2020), new Date(2019, 0, 1))).toBe(
+        'Must be on or after January 15, 2020'
+      );
+    });
 
-  it('should treat null as a type error when the schema expects null itself', () => {
-    expect(describeV3({ code: 'invalid_type', expected: 'null', path: [], received: 'null' })).toBe(INVALID);
-  });
+    it('should leave a message written by the schema author untouched', () => {
+      expect(v4Message(z4.string().min(3, { message: 'Trop court' }), 'ab')).toBe('Trop court');
+    });
 
-  it('should describe a union with no branch issues as invalid, having no message to repeat', () => {
-    expect(describeV3({ code: 'invalid_union', path: [], unionErrors: [new z3.ZodError([])] })).toBe(INVALID);
-  });
+    it('should follow the language the reader switched to, since messages are built at parse time', () => {
+      const { v4 } = createZodErrorMaps(i18n);
+      i18n.changeLanguage('fr');
+      expect(v4Message(z4.object({ x: z4.string() }), {}, v4)).toBe('Ce champ est obligatoire');
+      expect(v4Message(z4.number().int(), 1.5, v4)).toBe('Doit être un nombre entier');
+      expect(v4Message(z4.string().min(3), 'ab', v4)).toBe('Doit contenir au moins 3 caractères');
+    });
 
-  it('should describe an exact numeric size without a direction', () => {
-    expect(describeV3({ code: 'too_small', exact: true, inclusive: true, minimum: 3, path: [], type: 'number' })).toBe(
-      'Must be exactly 3'
-    );
-  });
+    it('should translate to Spanish, which the language table covers but few inline strings do', () => {
+      const { v4 } = mapsFor('es');
+      expect(v4Message(z4.object({ x: z4.string() }), {}, v4)).toBe('Este campo es obligatorio');
+      expect(v4Message(z4.string().min(3), 'ab', v4)).toBe('Debe tener al menos 3 caracteres');
+    });
 
-  it('should treat a maximum without an exact flag as a bound', () => {
-    expect(describeV3({ code: 'too_big', inclusive: true, maximum: 2, path: [], type: 'array' })).toBe(
-      'Must select at most 2 options'
-    );
-  });
+    it('should treat null as a type error when the schema expects null itself', () => {
+      expect(describeV4({ code: 'invalid_type', expected: 'null', input: null })).toBe(INVALID);
+    });
 
-  it('should treat a minimum without an exact flag as a bound', () => {
-    expect(describeV3({ code: 'too_small', inclusive: true, minimum: 2, path: [], type: 'array' })).toBe(
-      'Must select at least 2 options'
-    );
-  });
+    it('should describe a union with an empty branch as invalid, having no message to repeat', () => {
+      expect(describeV4({ code: 'invalid_union', errors: [[]], input: 'x' })).toBe(INVALID);
+    });
 
-  it('should describe a size issue on an undeclared type as invalid', () => {
-    // @ts-expect-error - zod's declarations list every size type it emits today; this guards a newer runtime
-    expect(describeV3({ code: 'too_big', inclusive: true, maximum: 2, path: [], type: 'map' })).toBe(INVALID);
-  });
+    it('should leave the placeholder unfilled for a hand-raised issue without an affix, which zod itself always sets', () => {
+      expect(describeV4({ code: 'invalid_format', format: 'includes', input: 'x' })).toBe('Must include "{}"');
+    });
 
-  it('should describe a minimum on an undeclared type as invalid', () => {
-    // @ts-expect-error - zod's declarations list every size type it emits today; this guards a newer runtime
-    expect(describeV3({ code: 'too_small', inclusive: true, minimum: 2, path: [], type: 'map' })).toBe(INVALID);
-  });
-});
+    it('should describe an exact numeric size without a direction', () => {
+      expect(describeV4({ code: 'too_small', exact: true, input: 1, minimum: 3, origin: 'number' })).toBe(
+        'Must be exactly 3'
+      );
+    });
 
-describe('zod v4 error map', () => {
-  it.each([
-    ['a missing field is the required message', z4.object({ x: z4.string() }), {}, REQUIRED],
-    ['a null value reads as missing rather than a type error', z4.object({ x: z4.string() }), { x: null }, REQUIRED],
-    ['an empty string against min(1), which untouched text fields submit', z4.string().min(1), '', REQUIRED],
-    [
-      'an untouched union of literals, which zod would otherwise report as "Invalid input"',
-      z4.object({ x: z4.union([z4.literal(1), z4.literal(2)]) }),
-      {},
-      REQUIRED
-    ],
-    ['a decimal in an integer field', z4.number().int(), 1.5, 'Must be a whole number'],
-    ['a number where text is expected', z4.string(), 1, 'Must be text'],
-    ['text where a number is expected', z4.number(), 'x', 'Must be a number'],
-    ['text where a boolean is expected', z4.boolean(), 'x', 'Must be a valid selection'],
-    ['a number below an inclusive minimum', z4.number().gte(1), 0, 'Must be 1 or greater'],
-    ['a number at an exclusive minimum', z4.number().gt(1), 1, 'Must be greater than 1'],
-    ['a number above an inclusive maximum', z4.number().lte(10), 12, 'Must be 10 or less'],
-    ['a large bound, grouped for readability', z4.number().lte(1000000), 2000000, 'Must be 1,000,000 or less'],
-    ['a string below its minimum length', z4.string().min(3), 'ab', 'Must be at least 3 characters'],
-    ['a string of the wrong exact length', z4.string().length(5), 'ab', 'Must be exactly 5 characters'],
-    ['a set below its minimum size', z4.set(z4.string()).min(2), new Set(['a']), 'Must select at least 2 options'],
-    [
-      'a single-option minimum, in the singular',
-      z4.set(z4.string()).min(1),
-      new Set(),
-      'Must select at least 1 option'
-    ],
-    ['an array above its maximum size', z4.array(z4.string()).max(1), ['a', 'b'], 'Must select at most 1 option'],
-    [
-      'a value failing a regex, without leaking the pattern',
-      z4.string().regex(/^[A-Z]$/),
-      'zz',
-      'Does not match the expected format'
-    ],
-    ['a malformed email address', z4.email(), 'x', 'Must be a valid email address'],
-    ['a malformed url', z4.url(), 'x', 'Must be a valid web address'],
-    ['a string missing its required prefix', z4.string().startsWith('ab'), 'zz', 'Must start with "ab"'],
-    ['a value outside an enum', z4.enum(['A', 'B']), 'C', 'Must be a valid selection'],
-    ['a number that is not a multiple of the divisor', z4.number().multipleOf(5), 7, 'Must be a multiple of 5'],
-    [
-      'a union whose branches disagree, which has no single explanation',
-      z4.union([z4.string(), z4.number()]),
-      true,
-      INVALID
-    ],
-    [
-      'an unexpected key, which no form field can produce',
-      z4.strictObject({ x: z4.string() }),
-      { x: 'a', y: 1 },
-      INVALID
-    ],
-    ['a null literal as required rather than a wrong option', z4.literal(1), null, REQUIRED],
-    ['a type no form field produces as invalid', z4.symbol(), 1, INVALID],
-    ['a malformed iso date as an invalid date', z4.iso.date(), 'x', 'Must be a valid date'],
-    ['a malformed iso datetime as an invalid date', z4.iso.datetime(), 'x', 'Must be a valid date'],
-    ['a malformed iso time', z4.iso.time(), 'x', 'Must be a valid time'],
-    ['a string missing its required substring', z4.string().includes('ab'), 'zz', 'Must include "ab"'],
-    ['a string missing its required suffix', z4.string().endsWith('ab'), 'zz', 'Must end with "ab"'],
-    ['a bigint that is not a multiple of the divisor', z4.bigint().multipleOf(5n), 7n, 'Must be a multiple of 5'],
-    [
-      'a date after its maximum',
-      z4.date().max(JANUARY_15_2020),
-      new Date(2021, 0, 1),
-      'Must be on or before January 15, 2020'
-    ]
-  ])('should describe %s', (_, schema, value, expected) => {
-    expect(v4Message(schema, value)).toBe(expected);
-  });
+    it('should print a bound given as a string verbatim', () => {
+      // @ts-expect-error - zod declares numeric bounds, yet already emits a Date for a date bound
+      expect(describeV4({ code: 'too_big', input: 11, maximum: '10', origin: 'number' })).toBe('Must be 10 or less');
+    });
 
-  it('should format a date bound as a date rather than a timestamp', () => {
-    expect(v4Message(z4.date().min(JANUARY_15_2020), new Date(2019, 0, 1))).toBe(
-      'Must be on or after January 15, 2020'
-    );
-  });
+    it('should format a date bound given as a bigint timestamp', () => {
+      const maximum = BigInt(JANUARY_15_2020.getTime());
+      expect(describeV4({ code: 'too_big', inclusive: false, input: 0, maximum, origin: 'date' })).toBe(
+        'Must be before January 15, 2020'
+      );
+    });
 
-  it('should leave a message written by the schema author untouched', () => {
-    expect(v4Message(z4.string().min(3, { message: 'Trop court' }), 'ab')).toBe('Trop court');
-  });
+    it('should format a date bound given as a string', () => {
+      // @ts-expect-error - zod declares numeric bounds, yet already emits a Date for a date bound
+      expect(describeV4({ code: 'too_small', input: 0, minimum: '2020-01-15T12:00:00', origin: 'date' })).toBe(
+        'Must be on or after January 15, 2020'
+      );
+    });
 
-  it('should follow the language the reader switched to, since messages are built at parse time', () => {
-    const { v4 } = createZodErrorMaps(i18n);
-    i18n.changeLanguage('fr');
-    expect(v4Message(z4.object({ x: z4.string() }), {}, v4)).toBe('Ce champ est obligatoire');
-    expect(v4Message(z4.number().int(), 1.5, v4)).toBe('Doit être un nombre entier');
-    expect(v4Message(z4.string().min(3), 'ab', v4)).toBe('Doit contenir au moins 3 caractères');
-  });
+    it('should describe a maximum on an origin with no size wording as invalid', () => {
+      expect(describeV4({ code: 'too_big', input: 1, maximum: 1, origin: 'file' })).toBe(INVALID);
+    });
 
-  it('should translate to Spanish, which the language table covers but few inline strings do', () => {
-    const { v4 } = mapsFor('es');
-    expect(v4Message(z4.object({ x: z4.string() }), {}, v4)).toBe('Este campo es obligatorio');
-    expect(v4Message(z4.string().min(3), 'ab', v4)).toBe('Debe tener al menos 3 caracteres');
-  });
-
-  it('should treat null as a type error when the schema expects null itself', () => {
-    expect(describeV4({ code: 'invalid_type', expected: 'null', input: null })).toBe(INVALID);
-  });
-
-  it('should describe a union with an empty branch as invalid, having no message to repeat', () => {
-    expect(describeV4({ code: 'invalid_union', errors: [[]], input: 'x' })).toBe(INVALID);
-  });
-
-  it('should leave the placeholder unfilled for a hand-raised issue without an affix, which zod itself always sets', () => {
-    expect(describeV4({ code: 'invalid_format', format: 'includes', input: 'x' })).toBe('Must include "{}"');
-  });
-
-  it('should describe an exact numeric size without a direction', () => {
-    expect(describeV4({ code: 'too_small', exact: true, input: 1, minimum: 3, origin: 'number' })).toBe(
-      'Must be exactly 3'
-    );
-  });
-
-  it('should print a bound given as a string verbatim', () => {
-    // @ts-expect-error - zod declares numeric bounds, yet already emits a Date for a date bound
-    expect(describeV4({ code: 'too_big', input: 11, maximum: '10', origin: 'number' })).toBe('Must be 10 or less');
-  });
-
-  it('should format a date bound given as a bigint timestamp', () => {
-    const maximum = BigInt(JANUARY_15_2020.getTime());
-    expect(describeV4({ code: 'too_big', inclusive: false, input: 0, maximum, origin: 'date' })).toBe(
-      'Must be before January 15, 2020'
-    );
-  });
-
-  it('should format a date bound given as a string', () => {
-    // @ts-expect-error - zod declares numeric bounds, yet already emits a Date for a date bound
-    expect(describeV4({ code: 'too_small', input: 0, minimum: '2020-01-15T12:00:00', origin: 'date' })).toBe(
-      'Must be on or after January 15, 2020'
-    );
-  });
-
-  it('should describe a maximum on an origin with no size wording as invalid', () => {
-    expect(describeV4({ code: 'too_big', input: 1, maximum: 1, origin: 'file' })).toBe(INVALID);
-  });
-
-  it('should describe a minimum on an origin with no size wording as invalid', () => {
-    expect(describeV4({ code: 'too_small', input: 1, minimum: 2, origin: 'file' })).toBe(INVALID);
+    it('should describe a minimum on an origin with no size wording as invalid', () => {
+      expect(describeV4({ code: 'too_small', input: 1, minimum: 2, origin: 'file' })).toBe(INVALID);
+    });
   });
 });
 

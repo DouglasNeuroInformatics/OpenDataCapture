@@ -65,7 +65,7 @@ const guardRedirect = () => {
   return null;
 };
 
-describe('reset password page', () => {
+describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useNotificationsStore.setState({ notifications: [] });

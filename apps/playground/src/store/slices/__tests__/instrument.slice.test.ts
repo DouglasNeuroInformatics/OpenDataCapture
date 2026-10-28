@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { InstrumentRepository } from '@/models/instrument-repository.model';
 import { useAppStore } from '@/store';
 
+import { createInstrumentSlice } from '../instrument.slice';
+
 vi.mock('idb-keyval', () => ({ del: vi.fn(), get: vi.fn(), set: vi.fn() }));
 
 vi.mock('@/instruments', () => {
@@ -32,16 +34,22 @@ const other: InstrumentRepository = {
   label: 'Other'
 };
 
+const { addInstrument, removeInstrument, resetInstruments, setSelectedInstrument } = createInstrumentSlice(
+  useAppStore.setState,
+  useAppStore.getState,
+  useAppStore
+);
+
 describe('createInstrumentSlice', () => {
   beforeEach(() => {
-    useAppStore.getState().resetInstruments();
-    useAppStore.getState().addInstrument(structuredClone(mine));
-    useAppStore.getState().addInstrument(structuredClone(other));
-    useAppStore.getState().setSelectedInstrument(mine.id);
+    resetInstruments();
+    addInstrument(structuredClone(mine));
+    addInstrument(structuredClone(other));
+    setSelectedInstrument(mine.id);
   });
 
   it("should load the default instrument's files when the selected instrument is removed, so the editor never shows a deleted instrument", () => {
-    useAppStore.getState().removeInstrument(mine.id);
+    removeInstrument(mine.id);
     const state = useAppStore.getState();
     expect(state.selectedInstrument.id).toBe('default');
     expect(state.files).toEqual([{ content: 'export default "template";', name: 'index.ts' }]);
@@ -51,7 +59,7 @@ describe('createInstrumentSlice', () => {
   });
 
   it('should leave the selection and editor unchanged when a different instrument is removed', () => {
-    useAppStore.getState().removeInstrument(other.id);
+    removeInstrument(other.id);
     const state = useAppStore.getState();
     expect(state.instruments.map(({ id }) => id)).toEqual(['default', 'mine']);
     expect(state.selectedInstrument.id).toBe(mine.id);

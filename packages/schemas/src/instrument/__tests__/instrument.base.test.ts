@@ -1,5 +1,5 @@
 import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
-import { describe, expect, it, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { z } from 'zod/v4';
 
 import {
@@ -11,19 +11,23 @@ import {
   $InstrumentLanguage
 } from '../instrument.base.js';
 
-test('$InstrumentKind', () => {
-  expect($InstrumentKind.safeParse('FORM').success).toBe(true);
-  expect($InstrumentKind.safeParse('INTERACTIVE').success).toBe(true);
+describe('$InstrumentKind', () => {
+  it('should accept the FORM and INTERACTIVE kinds', () => {
+    expect($InstrumentKind.safeParse('FORM').success).toBe(true);
+    expect($InstrumentKind.safeParse('INTERACTIVE').success).toBe(true);
+  });
 });
 
-test('$InstrumentLanguage', () => {
-  expect($InstrumentLanguage.safeParse('en').success).toBe(true);
-  expect($InstrumentLanguage.safeParse('fr').success).toBe(true);
-  expect($InstrumentLanguage.safeParse([]).success).toBe(false);
-  expect($InstrumentLanguage.safeParse(['en']).success).toBe(true);
-  expect($InstrumentLanguage.safeParse(['fr']).success).toBe(true);
-  expect($InstrumentLanguage.safeParse(['en', 'fr']).success).toBe(true);
-  expect($InstrumentLanguage.safeParse(['en', 'fr', 'en']).success).toBe(false);
+describe('$InstrumentLanguage', () => {
+  it('should accept one language or a non-empty list of distinct languages, and reject an empty or repeating list', () => {
+    expect($InstrumentLanguage.safeParse('en').success).toBe(true);
+    expect($InstrumentLanguage.safeParse('fr').success).toBe(true);
+    expect($InstrumentLanguage.safeParse([]).success).toBe(false);
+    expect($InstrumentLanguage.safeParse(['en']).success).toBe(true);
+    expect($InstrumentLanguage.safeParse(['fr']).success).toBe(true);
+    expect($InstrumentLanguage.safeParse(['en', 'fr']).success).toBe(true);
+    expect($InstrumentLanguage.safeParse(['en', 'fr', 'en']).success).toBe(false);
+  });
 });
 
 describe('$$InstrumentUIOption', () => {
@@ -32,34 +36,38 @@ describe('$$InstrumentUIOption', () => {
 
   it('should handle the language "en" successfully', () => {
     expect($$InstrumentUIOption(z.number(), 'en').parse(num)).toBe(num);
-    expect(() => $$InstrumentUIOption(z.string(), 'en').parse(num)).toThrow();
-    expect(() => $$InstrumentUIOption(z.number(), 'en').parse(obj)).toThrow();
+    expect(() => $$InstrumentUIOption(z.string(), 'en').parse(num)).toThrow('expected string, received number');
+    expect(() => $$InstrumentUIOption(z.number(), 'en').parse(obj)).toThrow('expected number, received object');
   });
 
   it('should handle the language "fr" successfully', () => {
     expect($$InstrumentUIOption(z.number(), 'fr').parse(num)).toBe(num);
-    expect(() => $$InstrumentUIOption(z.string(), 'fr').parse(num)).toThrow();
-    expect(() => $$InstrumentUIOption(z.number(), 'fr').parse(obj)).toThrow();
+    expect(() => $$InstrumentUIOption(z.string(), 'fr').parse(num)).toThrow('expected string, received number');
+    expect(() => $$InstrumentUIOption(z.number(), 'fr').parse(obj)).toThrow('expected number, received object');
   });
 
   it('should handle the language ["en", "fr"] successfully', () => {
     expect($$InstrumentUIOption(z.number(), ['en', 'fr']).parse(obj)).toEqual(obj);
-    expect(() => $$InstrumentUIOption(z.string(), ['en', 'fr']).parse(obj)).toThrow();
-    expect(() => $$InstrumentUIOption(z.number(), ['en', 'fr']).parse(num)).toThrow();
+    expect(() => $$InstrumentUIOption(z.string(), ['en', 'fr']).parse(obj)).toThrow('expected string, received number');
+    expect(() => $$InstrumentUIOption(z.number(), ['en', 'fr']).parse(num)).toThrow('expected object, received number');
   });
   it('should handle the language ["en", "fr", "fr] successfully', () => {
-    expect(() => $$InstrumentUIOption(z.string(), ['en', 'fr', 'fr']).parse(obj)).toThrow();
-    expect(() => $$InstrumentUIOption(z.number(), ['en', 'fr', 'fr']).parse(num)).toThrow();
+    expect(() => $$InstrumentUIOption(z.string(), ['en', 'fr', 'fr']).parse(obj)).toThrow(
+      'Array of languages must contain only unique values: en, fr, fr'
+    );
+    expect(() => $$InstrumentUIOption(z.number(), ['en', 'fr', 'fr']).parse(num)).toThrow(
+      'Array of languages must contain only unique values: en, fr, fr'
+    );
   });
   it('should handle the language ["en"] successfully', () => {
     expect($$InstrumentUIOption(z.number(), ['en']).parse(obj)).toEqual({ en: num });
-    expect(() => $$InstrumentUIOption(z.string(), ['en']).parse(obj)).toThrow();
-    expect(() => $$InstrumentUIOption(z.number(), ['en']).parse(num)).toThrow();
+    expect(() => $$InstrumentUIOption(z.string(), ['en']).parse(obj)).toThrow('expected string, received number');
+    expect(() => $$InstrumentUIOption(z.number(), ['en']).parse(num)).toThrow('expected object, received number');
   });
   it('should handle the language ["fr"] successfully', () => {
     expect($$InstrumentUIOption(z.number(), ['fr']).parse(obj)).toEqual({ fr: num });
-    expect(() => $$InstrumentUIOption(z.string(), ['fr']).parse(obj)).toThrow();
-    expect(() => $$InstrumentUIOption(z.number(), ['fr']).parse(num)).toThrow();
+    expect(() => $$InstrumentUIOption(z.string(), ['fr']).parse(obj)).toThrow('expected string, received number');
+    expect(() => $$InstrumentUIOption(z.number(), ['fr']).parse(num)).toThrow('expected object, received number');
   });
 });
 

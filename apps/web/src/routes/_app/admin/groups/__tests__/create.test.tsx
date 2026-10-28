@@ -39,14 +39,14 @@ const conflict = (message: string) =>
     statusText: 'Conflict'
   });
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  mocks.mutateAsync.mockResolvedValue({ data: {} });
-});
+describe('Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.mutateAsync.mockResolvedValue({ data: {} });
+  });
 
-afterEach(cleanup);
+  afterEach(cleanup);
 
-describe('create group route', () => {
   it('should title the page as adding a group', () => {
     render(<CreateGroupPage />);
     expect(screen.getByRole('heading', { level: 2, name: 'Add Group' })).toBeTruthy();

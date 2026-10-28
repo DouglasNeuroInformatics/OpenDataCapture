@@ -5,7 +5,7 @@ import type { AxiosAdapter, AxiosResponse, InternalAxiosRequestConfig } from 'ax
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
-import { isTransientError } from '@/services/axios';
+import * as axiosModule from '@/services/axios';
 
 import '@/services/i18n';
 
@@ -62,27 +62,6 @@ const createAdapter = (...outcomes: ({ fail?: number | true } | { status: number
 };
 
 const getNotifications = () => useNotificationsStore.getState().notifications;
-
-describe('isTransientError', () => {
-  const config: InternalAxiosRequestConfig = { headers: new AxiosHeaders() };
-
-  it.each([
-    ['a dropped connection, which never received a response', createError(config)],
-    ['a gateway error from the hospital network', createError(config, 502)],
-    ['an unavailable upstream', createError(config, 503)],
-    ['a gateway timeout', createError(config, 504)]
-  ])('should treat %s as transient, so it is retried', (_, error) => {
-    expect(isTransientError(error)).toBe(true);
-  });
-
-  it.each([
-    ['an error the server deliberately returned', createError(config, 500)],
-    ['a client error', createError(config, 400)],
-    ['an error that did not come from axios', new Error('boom')]
-  ])('should not treat %s as transient, so it surfaces immediately', (_, error) => {
-    expect(isTransientError(error)).toBe(false);
-  });
-});
 
 describe('axios', () => {
   beforeEach(() => {
@@ -325,6 +304,27 @@ describe('axios', () => {
       await expect(axios.get('/v1/subjects', { adapter: () => Promise.reject(error) })).rejects.toBe(error);
       expect(getNotifications()).toMatchObject([{ message: 'Unknown Error', type: 'error' }]);
       expect(consoleError).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe('isTransientError', () => {
+    const config: InternalAxiosRequestConfig = { headers: new AxiosHeaders() };
+
+    it.each([
+      ['a dropped connection, which never received a response', createError(config)],
+      ['a gateway error from the hospital network', createError(config, 502)],
+      ['an unavailable upstream', createError(config, 503)],
+      ['a gateway timeout', createError(config, 504)]
+    ])('should treat %s as transient, so it is retried', (_, error) => {
+      expect(axiosModule.isTransientError(error)).toBe(true);
+    });
+
+    it.each([
+      ['an error the server deliberately returned', createError(config, 500)],
+      ['a client error', createError(config, 400)],
+      ['an error that did not come from axios', new Error('boom')]
+    ])('should not treat %s as transient, so it surfaces immediately', (_, error) => {
+      expect(axiosModule.isTransientError(error)).toBe(false);
     });
   });
 });

@@ -288,36 +288,38 @@ describe('PrismaModuleOptionsFactory', () => {
   });
 });
 
-/**
- * db push drops any index schema.prisma does not declare, and creates any it does. Either list
- * drifting from the other silently loses an index on the next push.
- */
-describe('agreement with schema.prisma', () => {
-  const schema = fs.readFileSync(path.resolve(import.meta.dirname, '../../../prisma/schema.prisma'), 'utf-8');
+describe('DATABASE_INDEXES', () => {
+  /**
+   * db push drops any index schema.prisma does not declare, and creates any it does. Either list
+   * drifting from the other silently loses an index on the next push.
+   */
+  describe('agreement with schema.prisma', () => {
+    const schema = fs.readFileSync(path.resolve(import.meta.dirname, '../../../prisma/schema.prisma'), 'utf-8');
 
-  const declaredIndexes = [...schema.matchAll(/model\s+\w+\s*\{([\s\S]*?)\n\}/g)].flatMap(([, body]) => {
-    const collection = /@@map\("(\w+)"\)/.exec(body!)?.[1];
-    const compound = [...body!.matchAll(/@@(index|unique)\(\[([^\]]+)\]\)/g)].map(([, kind, fields]) => ({
-      fields: fields!.split(',').map((field) => field.trim()),
-      unique: kind === 'unique'
-    }));
-    const scalar = [...body!.matchAll(/^ {2}(\w+) +\S+ +[^\n]*@unique/gm)].map(([, field]) => ({
-      fields: [field!],
-      unique: true
-    }));
-    return [...compound, ...scalar].map((index) => ({ ...index, collection }));
-  });
+    const declaredIndexes = [...schema.matchAll(/model\s+\w+\s*\{([\s\S]*?)\n\}/g)].flatMap(([, body]) => {
+      const collection = /@@map\("(\w+)"\)/.exec(body!)?.[1];
+      const compound = [...body!.matchAll(/@@(index|unique)\(\[([^\]]+)\]\)/g)].map(([, kind, fields]) => ({
+        fields: fields!.split(',').map((field) => field.trim()),
+        unique: kind === 'unique'
+      }));
+      const scalar = [...body!.matchAll(/^ {2}(\w+) +\S+ +[^\n]*@unique/gm)].map(([, field]) => ({
+        fields: [field!],
+        unique: true
+      }));
+      return [...compound, ...scalar].map((index) => ({ ...index, collection }));
+    });
 
-  const identify = (index: { collection?: string; fields: string[]; unique?: boolean }) =>
-    `${index.collection}[${index.fields.join(',')}]${index.unique ? ' unique' : ''}`;
+    const identify = (index: { collection?: string; fields: string[]; unique?: boolean }) =>
+      `${index.collection}[${index.fields.join(',')}]${index.unique ? ' unique' : ''}`;
 
-  it('should declare in schema.prisma every index the application creates', () => {
-    expect(declaredIndexes.map(identify).toSorted()).toEqual(
-      expect.arrayContaining(DATABASE_INDEXES.map(identify).toSorted())
-    );
-  });
+    it('should declare in schema.prisma every index the application creates', () => {
+      expect(declaredIndexes.map(identify).toSorted()).toEqual(
+        expect.arrayContaining(DATABASE_INDEXES.map(identify).toSorted())
+      );
+    });
 
-  it('should create at runtime every index schema.prisma declares', () => {
-    expect(DATABASE_INDEXES.map(identify).toSorted()).toEqual(declaredIndexes.map(identify).toSorted());
+    it('should create at runtime every index schema.prisma declares', () => {
+      expect(DATABASE_INDEXES.map(identify).toSorted()).toEqual(declaredIndexes.map(identify).toSorted());
+    });
   });
 });

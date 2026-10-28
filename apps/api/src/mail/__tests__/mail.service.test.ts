@@ -82,7 +82,7 @@ describe('MailService', () => {
   describe('a stored configuration that no longer parses', () => {
     it('throws rather than reporting mail as unconfigured', async () => {
       setupStateModel.findFirst.mockResolvedValue({ mailConfig: { ...stored(validConfig), port: 'not-a-port' } });
-      await expect(mailService.getSettings()).rejects.toThrow();
+      await expect(mailService.getSettings()).rejects.toThrow('The stored mail configuration is invalid');
     });
   });
 

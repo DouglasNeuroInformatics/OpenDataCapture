@@ -36,21 +36,21 @@ const renderLayout = () => {
   render(<Component />);
 };
 
-beforeEach(() => {
-  mocks.config.setup.isGatewayEnabled = true;
-  mocks.currentGroup = null;
-  mocks.outlet = () => 'Outlet Content';
-  mocks.pathname = '/datahub/subjects/root$abcdefghijkl/table';
-  vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'root$abcdefghijkl' });
-  vi.spyOn(Route, 'useSearch').mockReturnValue({});
-});
+describe('Route', () => {
+  beforeEach(() => {
+    mocks.config.setup.isGatewayEnabled = true;
+    mocks.currentGroup = null;
+    mocks.outlet = () => 'Outlet Content';
+    mocks.pathname = '/datahub/subjects/root$abcdefghijkl/table';
+    vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'root$abcdefghijkl' });
+    vi.spyOn(Route, 'useSearch').mockReturnValue({});
+  });
 
-afterEach(() => {
-  cleanup();
-  vi.restoreAllMocks();
-});
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
 
-describe('subject layout route', () => {
   it('should show the unscoped subject id truncated to nine characters when the group sets no display length', () => {
     renderLayout();
     expect(screen.getByRole('heading').textContent).toBe('Instrument Records for Subject abcdefghi');
