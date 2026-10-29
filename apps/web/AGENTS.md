@@ -62,14 +62,15 @@ exact same key (hooks nothing prefetches may call `useQuery` inline).
 `src/hooks/useSubjectsQuery.ts` is the canonical example:
 
 ```ts
-export const subjectsQueryOptions = ({ params }: { params?: SubjectsQueryParams } = {}) =>
-  queryOptions({
+export const subjectsQueryOptions = ({ params }: { params?: SubjectsQueryParams } = {}) => {
+  return queryOptions({
     queryFn: async () => {
       const response = await axios.get('/v1/subjects', { params });
       return $Subject.array().parse(response.data); // parse at the boundary, always
     },
     queryKey: ['subjects', params?.groupId, params?.hasRecord]
   });
+};
 ```
 
 - Default to `useSuspenseQuery` so `.data` is non-nullable. Use `useQuery` only where paging or a
