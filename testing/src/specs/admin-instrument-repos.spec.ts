@@ -166,14 +166,18 @@ test.describe('admin instrument repos activity log', () => {
     const reposPage = await getPageModel('/admin/instrument-repos');
     const summary = reposPage.syncLogTable.getByTestId('sync-log-messages');
 
-    const layout = await summary.evaluate((element) => ({
-      clipped: element.scrollWidth > element.clientWidth,
-      lines: Math.round(
-        element.getBoundingClientRect().height / Number.parseFloat(window.getComputedStyle(element).lineHeight)
-      )
-    }));
-    expect(layout.clipped).toBe(true);
-    expect(layout.lines).toBe(1);
+    // Retried: the table re-renders when the second query settles, which can detach the row between
+    // the locator resolving and the measurement, leaving a node that reports no size at all.
+    await expect(async () => {
+      const layout = await summary.evaluate((element) => ({
+        clipped: element.scrollWidth > element.clientWidth,
+        lines: Math.round(
+          element.getBoundingClientRect().height / Number.parseFloat(window.getComputedStyle(element).lineHeight)
+        )
+      }));
+      expect(layout.clipped).toBe(true);
+      expect(layout.lines).toBe(1);
+    }).toPass();
 
     await reposPage.syncLogTable.getByTestId('sync-log-view-messages').click();
 
