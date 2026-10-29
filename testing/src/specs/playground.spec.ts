@@ -164,6 +164,15 @@ test.describe('playground', () => {
   test.describe.configure({ mode: 'default' });
   test.slow();
 
+  test('should find an instrument by its visible label in the selector', async ({ page }) => {
+    const playground = new PlaygroundPage(page);
+    await playground.goto();
+
+    await page.getByRole('combobox', { name: 'Load an instrument...' }).click();
+    await page.getByPlaceholder('Search...').fill('Form Reference');
+    await expect(page.getByRole('option', { exact: true, name: 'Form Reference' })).toBeVisible();
+  });
+
   test('should run the preview on an origin other than the editor and render the instrument there @smoke', async ({
     page
   }) => {
