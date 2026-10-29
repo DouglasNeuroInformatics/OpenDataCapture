@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import React from 'react';
 
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
@@ -31,7 +29,7 @@ const RouteComponent = () => {
   const setupStateQuery = useSetupStateQuery();
   const mailErrorMessage = useMailErrorMessage();
   const passwordErrorMessage = usePasswordErrorMessage();
-  const { applyGeneratedPassword, generatePassword, generatedPassword, isGeneratedPassword } = usePasswordGenerator();
+  const { applyGeneratedPassword, generatedPassword, generatePassword, isGeneratedPassword } = usePasswordGenerator();
 
   // When the welcome email cannot be delivered, we surface its rendered text here so
   // the admin can copy it and send it manually. Navigation is deferred until dismissed.
@@ -50,8 +48,8 @@ const RouteComponent = () => {
 
     if (existingUsername.data.success === true) {
       notification.addNotification({
-        type: 'error',
-        message: t('common.usernameExists')
+        message: t('common.usernameExists'),
+        type: 'error'
       });
       return;
     }
@@ -145,6 +143,7 @@ const RouteComponent = () => {
         className="mx-auto max-w-3xl"
         content={[
           {
+            /* eslint-disable perfectionist/sort-objects -- fields render in key order, so username, password and confirmPassword must stay in that order */
             fields: {
               username: {
                 kind: 'string',
@@ -166,6 +165,7 @@ const RouteComponent = () => {
                 variant: 'password'
               }
             },
+            /* eslint-enable perfectionist/sort-objects */
             title: t({
               en: 'Login Credentials',
               es: 'Credenciales de acceso',
@@ -192,11 +192,6 @@ const RouteComponent = () => {
             })
           },
           {
-            title: t({
-              en: 'Permissions',
-              es: 'Permisos',
-              fr: 'Autorisations'
-            }),
             fields: {
               basePermissionLevel: {
                 kind: 'string',
@@ -209,12 +204,12 @@ const RouteComponent = () => {
                 variant: 'select'
               },
               disabled: {
-                kind: 'boolean',
                 description: t({
                   en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
                   es: 'Use esta opción si el usuario no debe iniciar sesión, por ejemplo, cuando la cuenta solo sirve para identificar al autor de los datos cargados.',
                   fr: "Utilisez cette option si l'utilisateur n'a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l'auteur de données téléversées."
                 }),
+                kind: 'boolean',
                 label: t({
                   en: 'Disabled',
                   es: 'Desactivado',
@@ -223,8 +218,8 @@ const RouteComponent = () => {
                 variant: 'radio'
               },
               groupIds: {
-                kind: 'dynamic',
                 deps: ['basePermissionLevel'],
+                kind: 'dynamic',
                 render({ basePermissionLevel }) {
                   if (!basePermissionLevel || basePermissionLevel === 'ADMIN') {
                     return null;
@@ -237,9 +232,15 @@ const RouteComponent = () => {
                   };
                 }
               }
-            }
+            },
+            title: t({
+              en: 'Permissions',
+              es: 'Permisos',
+              fr: 'Autorisations'
+            })
           },
           {
+            /* eslint-disable perfectionist/sort-objects -- fields render in key order, and so do the sex options, so sorting would put dateOfBirth before the name fields and FEMALE before MALE */
             fields: {
               firstName: {
                 kind: 'string',
@@ -265,6 +266,7 @@ const RouteComponent = () => {
                 label: t('core.identificationData.dateOfBirth.label')
               }
             },
+            /* eslint-enable perfectionist/sort-objects */
             title: t({
               en: 'Additional Information',
               es: 'Información adicional',
@@ -279,8 +281,9 @@ const RouteComponent = () => {
         subscribe={{
           // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
           // position, so `setValues` is inferred as an error type rather than a setter.
-          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) =>
-            applyGeneratedPassword(setValues),
+          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) => {
+            applyGeneratedPassword(setValues);
+          },
           selector: () => generatedPassword
         }}
         validationSchema={$CreateUserData
@@ -289,9 +292,9 @@ const RouteComponent = () => {
           })
           .extend({
             basePermissionLevel: $BasePermissionLevel,
-            groupIds: z.set(z.string()).optional(),
             confirmPassword: z.string().min(1),
             email: $Email(t).optional(),
+            groupIds: z.set(z.string()).optional(),
             phoneNumber: $PhoneNumber(t).optional()
           })
           .check((ctx) => {
@@ -334,15 +337,15 @@ const RouteComponent = () => {
               });
             }
           })}
-        onSubmit={({ email, groupIds, phoneNumber, ...data }) =>
-          handleSubmit({
+        onSubmit={({ email, groupIds, phoneNumber, ...data }) => {
+          return handleSubmit({
             ...data,
             email: omittedIfBlank(email),
             groupIds: Array.from(groupIds ?? []),
             mustResetPassword: isGeneratedPassword(data.password),
             phoneNumber: omittedIfBlank(phoneNumber)
-          })
-        }
+          });
+        }}
       />
       <Dialog
         open={fallbackMessage !== null}

@@ -34,12 +34,14 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
-  createFileRoute: () => (options: object) => ({
-    options,
-    useNavigate: () => mocks.navigate,
-    useParams: () => ({ instrumentId: 'instrument-1' }),
-    useSearch: () => mocks.search
-  })
+  createFileRoute: () => {
+    return (options: object) => ({
+      options,
+      useNavigate: () => mocks.navigate,
+      useParams: () => ({ instrumentId: 'instrument-1' }),
+      useSearch: () => mocks.search
+    });
+  }
 }));
 vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/hooks')>()),
@@ -96,7 +98,9 @@ const choose = (select: 'group' | 'username', option: string) => {
 
 const lastNavigatedError = () => mocks.navigate.mock.lastCall?.[0].search?.error;
 
-describe('upload instrument records page', () => {
+const noop = () => undefined;
+
+describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useNotificationsStore.setState({ notifications: [] });
@@ -177,9 +181,9 @@ describe('upload instrument records page', () => {
     renderPage();
     await chooseFile();
     submit();
-    await waitFor(() =>
-      expect(mocks.mutateAsync).toHaveBeenCalledWith(mocks.reformatInstrumentData.mock.results[0]!.value)
-    );
+    await waitFor(() => {
+      expect(mocks.mutateAsync).toHaveBeenCalledWith(mocks.reformatInstrumentData.mock.results[0]!.value);
+    });
     expect(mocks.processInstrumentCSV).toHaveBeenCalledWith(csvFile, instrument);
     expect(mocks.reformatInstrumentData).toHaveBeenCalledWith({
       currentGroup: group,
@@ -198,7 +202,7 @@ describe('upload instrument records page', () => {
   });
 
   it('should show a spinner in place of the form while the upload is in flight', async () => {
-    mocks.mutateAsync.mockReturnValue(new Promise(() => undefined));
+    mocks.mutateAsync.mockReturnValue(new Promise(noop));
     renderPage();
     await chooseFile();
     submit();
@@ -230,9 +234,9 @@ describe('upload instrument records page', () => {
     choose('username', 'bob');
     await chooseFile();
     submit();
-    await waitFor(() =>
-      expect(mocks.reformatInstrumentData).toHaveBeenCalledWith(expect.objectContaining({ currentUsername: 'bob' }))
-    );
+    await waitFor(() => {
+      expect(mocks.reformatInstrumentData).toHaveBeenCalledWith(expect.objectContaining({ currentUsername: 'bob' }));
+    });
   });
 
   it('should attribute the records to no user when N/A is chosen', async () => {
@@ -286,9 +290,9 @@ describe('upload instrument records page', () => {
     expect(mocks.useUsersQuery).toHaveBeenLastCalledWith({ params: { groupId: 'group-2' } });
     await chooseFile();
     submit();
-    await waitFor(() =>
-      expect(mocks.reformatInstrumentData).toHaveBeenCalledWith(expect.objectContaining({ currentUsername: 'jane' }))
-    );
+    await waitFor(() => {
+      expect(mocks.reformatInstrumentData).toHaveBeenCalledWith(expect.objectContaining({ currentUsername: 'jane' }));
+    });
   });
 
   it('should report an upload error with its description in the search', async () => {

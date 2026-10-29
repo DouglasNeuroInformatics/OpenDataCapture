@@ -29,8 +29,9 @@ vi.mock('@/hooks/useSetupStateQuery', () => ({
 }));
 vi.mock('@/store', () => ({
   useAppStore: Object.assign(
-    (selector: (store: { logout: typeof mocks.logout } & typeof mocks.state) => unknown) =>
-      selector({ ...mocks.state, logout: mocks.logout }),
+    (selector: (store: { logout: typeof mocks.logout } & typeof mocks.state) => unknown) => {
+      return selector({ ...mocks.state, logout: mocks.logout });
+    },
     { getState: () => mocks.state }
   )
 }));
@@ -49,8 +50,9 @@ const fillIn = (password: string, confirmPassword = password) => {
 
 const submit = () => fireEvent.submit(screen.getByTestId('reset-password-form'));
 
-const respondWith = (outcome: (callbacks: MutationCallbacks) => void) =>
-  mocks.mutate.mockImplementation((_: unknown, callbacks: MutationCallbacks) => outcome(callbacks));
+const respondWith = (outcome: (callbacks: MutationCallbacks) => void) => {
+  return mocks.mutate.mockImplementation((_: unknown, callbacks: MutationCallbacks) => outcome(callbacks));
+};
 
 /** Where the guard redirects to, or null when it lets the route load. */
 const guardRedirect = () => {
@@ -65,7 +67,7 @@ const guardRedirect = () => {
   return null;
 };
 
-describe('reset password page', () => {
+describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useNotificationsStore.setState({ notifications: [] });

@@ -9,8 +9,9 @@ export function useCreateGroupMutation() {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   return useMutation({
-    mutationFn: ({ data }: { data: $CreateGroupData }) =>
-      axios.post('/v1/groups', data, { meta: { disableDefaultErrorNotification: true } }),
+    mutationFn: ({ data }: { data: $CreateGroupData }) => {
+      return axios.post('/v1/groups', data, { meta: { disableDefaultErrorNotification: true } });
+    },
     onSuccess() {
       addNotification({ type: 'success' });
       void queryClient.invalidateQueries({ queryKey: [GROUPS_QUERY_KEY] });

@@ -27,15 +27,16 @@ const RECORD = {
 
 /** Answer as the server would: a serialized body that only the request's own transform can revive. */
 function respondWithSerialized(body: unknown) {
-  mockAxios.get.mockImplementation((_url: string, config: GetConfig) =>
-    Promise.resolve({ data: config.transformResponse[0](JSON.stringify(body, replacer)) })
-  );
+  mockAxios.get.mockImplementation((_url: string, config: GetConfig) => {
+    return Promise.resolve({ data: config.transformResponse[0](JSON.stringify(body, replacer)) });
+  });
 }
 
 function renderRecords(...args: Parameters<typeof useInstrumentRecords>) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return { ...renderHook(() => useInstrumentRecords(...args), { wrapper }), queryClient };
 }
 

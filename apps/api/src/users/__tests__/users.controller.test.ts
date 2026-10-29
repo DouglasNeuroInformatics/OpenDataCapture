@@ -73,9 +73,9 @@ describe('UsersController', () => {
   describe('create', () => {
     beforeEach(() => {
       usersService.create.mockResolvedValue({ id: 'user-1', username: createUserData.username });
-      groupsService.findById.mockImplementation((id: string, _options?: unknown) =>
-        Promise.resolve({ id, name: `Name of ${id}` })
-      );
+      groupsService.findById.mockImplementation((id: string, _options?: unknown) => {
+        return Promise.resolve({ id, name: `Name of ${id}` });
+      });
       mailService.sendNewUserEmail.mockResolvedValue({
         message: 'rendered',
         recipient: createUserData.email,
@@ -134,9 +134,11 @@ describe('UsersController', () => {
     });
 
     it('omits groups the creator cannot read', async () => {
-      groupsService.findById.mockImplementation((id: string) =>
-        id === 'group-1' ? Promise.reject(new NotFoundException()) : Promise.resolve({ id, name: `Name of ${id}` })
-      );
+      groupsService.findById.mockImplementation((id: string) => {
+        return id === 'group-1'
+          ? Promise.reject(new NotFoundException())
+          : Promise.resolve({ id, name: `Name of ${id}` });
+      });
       await usersController.create(createUserData, ability);
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ group: 'Name of group-2' });
     });
@@ -230,8 +232,8 @@ describe('UsersController', () => {
   describe('route access for writes to a user', () => {
     const WRITE_HANDLERS = ['archiveById', 'create', 'unarchiveById', 'updateById', 'updatePermissions'] as const;
 
-    const abilityFor = (basePermissionLevel: BasePermissionLevel, additionalPermissions: Permissions = []) =>
-      new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
+    const abilityFor = (basePermissionLevel: BasePermissionLevel, additionalPermissions: Permissions = []) => {
+      return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
         additionalPermissions,
         basePermissionLevel,
         firstName: 'Test',
@@ -242,12 +244,14 @@ describe('UsersController', () => {
         mustResetPassword: false,
         username: 'test-user'
       });
+    };
 
-    const declaredAccess = (handler: (typeof WRITE_HANDLERS)[number]) =>
-      new Reflector().get<ProtectedRoutePermissionSet>(
+    const declaredAccess = (handler: (typeof WRITE_HANDLERS)[number]) => {
+      return new Reflector().get<ProtectedRoutePermissionSet>(
         ROUTE_ACCESS_METADATA_KEY,
         Object.getOwnPropertyDescriptor(UsersController.prototype, handler)!.value
       );
+    };
 
     it.each(WRITE_HANDLERS)(
       'should refuse %s to a group manager granted `manage User`, who could otherwise make themselves an administrator',

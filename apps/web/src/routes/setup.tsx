@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Card, Form, Heading, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -50,6 +48,7 @@ const RouteComponent = () => {
                     label: t('setup.admin.username'),
                     variant: 'input'
                   },
+                  // eslint-disable-next-line perfectionist/sort-objects -- fields render in key order, so password must follow username
                   password: {
                     calculateStrength: (password) => {
                       return estimatePasswordStrength(password).score;
@@ -58,6 +57,7 @@ const RouteComponent = () => {
                     label: t('setup.admin.password'),
                     variant: 'password'
                   },
+                  // eslint-disable-next-line perfectionist/sort-objects -- fields render in key order, so confirmPassword must follow password
                   confirmPassword: {
                     kind: 'string',
                     label: t('common.confirmPassword'),
@@ -78,7 +78,9 @@ const RouteComponent = () => {
                     },
                     variant: 'radio'
                   },
+                  // eslint-disable-next-line perfectionist/sort-objects -- fields render in key order, so the dynamic dummySubjectCount must follow the initDemo toggle it depends on
                   dummySubjectCount: {
+                    deps: ['initDemo'],
                     kind: 'dynamic',
                     render: (data) => {
                       if (!data?.initDemo) {
@@ -89,10 +91,10 @@ const RouteComponent = () => {
                         label: t('setup.demo.dummySubjectCount'),
                         variant: 'input'
                       };
-                    },
-                    deps: ['initDemo']
+                    }
                   },
                   recordsPerSubject: {
+                    deps: ['initDemo'],
                     kind: 'dynamic',
                     render: (data) => {
                       if (!data?.initDemo) {
@@ -103,8 +105,7 @@ const RouteComponent = () => {
                         label: t('setup.demo.recordsPerSubject'),
                         variant: 'input'
                       };
-                    },
-                    deps: ['initDemo']
+                    }
                   }
                 },
                 title: t('setup.demo.title')
@@ -115,17 +116,17 @@ const RouteComponent = () => {
             submitBtnLabel={t('core.submit')}
             validationSchema={z
               .object({
+                confirmPassword: z.string().min(1),
+                dummySubjectCount: z.number().int().nonnegative().optional(),
                 firstName: z.string().min(1),
+                initDemo: z.boolean(),
                 lastName: z.string().min(1),
-                username: z.string().min(1),
                 password: z
                   .string()
                   .min(1)
                   .refine((val) => estimatePasswordStrength(val).success, t('common.insufficientPasswordStrength')),
-                confirmPassword: z.string().min(1),
-                initDemo: z.boolean(),
                 recordsPerSubject: z.number().int().nonnegative().optional(),
-                dummySubjectCount: z.number().int().nonnegative().optional()
+                username: z.string().min(1)
               })
               .check((ctx) => {
                 if (ctx.value.confirmPassword !== ctx.value.password) {

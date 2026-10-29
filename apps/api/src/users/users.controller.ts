@@ -132,14 +132,14 @@ export class UsersController {
       return '';
     }
     const groups = await Promise.all(
-      groupIds.map((id) =>
-        this.groupsService.findById(id, { ability }).catch((err) => {
+      groupIds.map((id) => {
+        return this.groupsService.findById(id, { ability }).catch((err) => {
           if (err instanceof NotFoundException) {
             return null;
           }
           throw err;
-        })
-      )
+        });
+      })
     );
     return groups
       .filter((group): group is NonNullable<typeof group> => group !== null)

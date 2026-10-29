@@ -23,8 +23,9 @@ const panel = () => screen.getByTestId('login-branding-panel');
 const heading = () => screen.getByRole('heading', { level: 1 });
 const logoImage = () => screen.getByRole('img');
 const builtInLogo = () => panel().querySelector('svg[viewBox="0 0 320 259"]');
-const sourceCodeMark = () =>
-  screen.getByRole('link', { name: 'Source Code' }).querySelector('svg[viewBox="0 0 16 16"]')!;
+const sourceCodeMark = () => {
+  return screen.getByRole('link', { name: 'Source Code' }).querySelector('svg[viewBox="0 0 16 16"]')!;
+};
 const sectionTexts = () => [...panel().children[1]!.children].map((section) => section.textContent);
 
 describe('LoginBrandingPanel', () => {

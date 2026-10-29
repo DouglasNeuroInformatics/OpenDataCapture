@@ -2,34 +2,36 @@ import { describe, expect, it } from 'vitest';
 
 import { bilingualFormInstrument, unilingualFormInstrument } from '../forms.js';
 
-describe.each([
-  ['unilingualFormInstrument', unilingualFormInstrument],
-  ['bilingualFormInstrument', bilingualFormInstrument]
-])('%s', (_, stub) => {
-  const { reasonFavoriteNumberIsNegative } = stub.instance.content;
+/** @param {typeof unilingualFormInstrument | typeof bilingualFormInstrument} stub */
+function describeReasonField(stub) {
+  describe('reasonFavoriteNumberIsNegative', () => {
+    const { reasonFavoriteNumberIsNegative } = stub.instance.content;
 
-  it('should hide the reason field before any data is entered', () => {
-    expect(reasonFavoriteNumberIsNegative.render(undefined)).toBeNull();
-  });
+    it('should hide the reason field before any data is entered', () => {
+      expect(reasonFavoriteNumberIsNegative.render(undefined)).toBeNull();
+    });
 
-  it('should hide the reason field when the favorite number is zero', () => {
-    expect(reasonFavoriteNumberIsNegative.render({ favoriteNumber: 0 })).toBeNull();
-  });
+    it('should hide the reason field when the favorite number is zero', () => {
+      expect(reasonFavoriteNumberIsNegative.render({ favoriteNumber: 0 })).toBeNull();
+    });
 
-  it('should hide the reason field when the favorite number is positive', () => {
-    expect(reasonFavoriteNumberIsNegative.render({ favoriteNumber: 7 })).toBeNull();
-  });
+    it('should hide the reason field when the favorite number is positive', () => {
+      expect(reasonFavoriteNumberIsNegative.render({ favoriteNumber: 7 })).toBeNull();
+    });
 
-  it('should ask for a reason in a textarea when the favorite number is negative', () => {
-    expect(reasonFavoriteNumberIsNegative.render({ favoriteNumber: -7 })).toMatchObject({
-      kind: 'string',
-      variant: 'textarea'
+    it('should ask for a reason in a textarea when the favorite number is negative', () => {
+      expect(reasonFavoriteNumberIsNegative.render({ favoriteNumber: -7 })).toMatchObject({
+        kind: 'string',
+        variant: 'textarea'
+      });
     });
   });
-});
+}
 
 describe('unilingualFormInstrument', () => {
   const { content, measures } = unilingualFormInstrument.instance;
+
+  describeReasonField(unilingualFormInstrument);
 
   it('should label the reason field in English only', () => {
     expect(content.reasonFavoriteNumberIsNegative.render({ favoriteNumber: -1 })?.label).toBe(
@@ -48,6 +50,8 @@ describe('unilingualFormInstrument', () => {
 
 describe('bilingualFormInstrument', () => {
   const { validationSchema } = bilingualFormInstrument.instance;
+
+  describeReasonField(bilingualFormInstrument);
 
   it('should accept data with a numeric favorite number and a reason', () => {
     expect(validationSchema.safeParse({ favoriteNumber: -1, reasonFavoriteNumberIsNegative: 'why not' }).success).toBe(

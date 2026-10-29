@@ -1,5 +1,5 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 
 import esbuild from 'esbuild';
 
@@ -89,7 +89,7 @@ export class Bundler {
         if (packageExport.types) {
           moduleEntryPoints.push({
             in: packageExport.types,
-            out: out + '.d'
+            out: `${out}.d`
           });
         }
       }

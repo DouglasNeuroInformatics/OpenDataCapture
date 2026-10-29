@@ -11,13 +11,16 @@ describe('evaluateInstrument', () => {
   });
 });
 
-describe('encodeUnicodeToBase64 and decodeBase64ToUnicode', () => {
+describe('encodeUnicodeToBase64', () => {
+  it('should encode ASCII the same way as btoa', () => {
+    expect(encodeUnicodeToBase64('hello')).toBe(btoa('hello'));
+  });
+});
+
+describe('decodeBase64ToUnicode', () => {
   it('should round-trip a string containing multi-byte characters', () => {
     const original = 'héllo wörld 😀';
     expect(decodeBase64ToUnicode(encodeUnicodeToBase64(original))).toBe(original);
-  });
-  it('should encode ASCII the same way as btoa', () => {
-    expect(encodeUnicodeToBase64('hello')).toBe(btoa('hello'));
   });
 });
 

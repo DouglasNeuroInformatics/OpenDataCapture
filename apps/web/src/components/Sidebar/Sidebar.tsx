@@ -44,8 +44,8 @@ export const Sidebar = () => {
       <nav className="flex min-h-0 flex-1 scrollbar-none flex-col divide-y divide-slate-700 overflow-y-auto">
         {navItems.map((items, i) => (
           <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
-            {items.map(({ disabled, url, ...props }) =>
-              props.children ? (
+            {items.map(({ disabled, url, ...props }) => {
+              return props.children ? (
                 <NavGroup icon={props.icon} items={props.children} key={props.label} label={props.label} />
               ) : (
                 <NavButton
@@ -55,8 +55,8 @@ export const Sidebar = () => {
                   url={url!}
                   {...props}
                 />
-              )
-            )}
+              );
+            })}
             {i === navItems.length - 1 && <EndSessionButton />}
           </div>
         ))}

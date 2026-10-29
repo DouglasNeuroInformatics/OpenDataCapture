@@ -30,8 +30,9 @@ const recordOf = (overrides: Partial<InstrumentVisualizationRecord>): Instrument
 
 type Options = Parameters<typeof useRecordChartSeries>[0];
 
-const render = (options: Omit<Options, 'palette'> & { palette?: Options['palette'] }) =>
-  renderHook(() => useRecordChartSeries({ palette: 'default', ...options })).result.current;
+const render = (options: Omit<Options, 'palette'> & { palette?: Options['palette'] }) => {
+  return renderHook(() => useRecordChartSeries({ palette: 'default', ...options })).result.current;
+};
 
 describe('useRecordChartSeries', () => {
   afterEach(() => {
@@ -126,9 +127,9 @@ describe('useRecordChartSeries', () => {
   });
 
   it('should fold the groups past the palette into one Other series rather than inventing hues', () => {
-    const records = Array.from({ length: MAX_CATEGORICAL_GROUPS + 2 }, (_, index) =>
-      recordOf({ __seriesId__: `s${index}`, __seriesName__: `Series ${index}` })
-    );
+    const records = Array.from({ length: MAX_CATEGORICAL_GROUPS + 2 }, (_, index) => {
+      return recordOf({ __seriesId__: `s${index}`, __seriesName__: `Series ${index}` });
+    });
     const { series } = render({ colourBy: 'series', measure: 'score', records });
 
     expect(series).toHaveLength(MAX_CATEGORICAL_GROUPS + 1);
@@ -178,9 +179,9 @@ describe('useRecordChartSeries', () => {
 
   // Colour follows the entity, not its rank, so the folded tail stays outside every theme.
   it('should keep the folded tail neutral whichever palette is chosen', () => {
-    const records = Array.from({ length: MAX_CATEGORICAL_GROUPS + 2 }, (_, index) =>
-      recordOf({ __seriesId__: `s${index}`, __seriesName__: `Series ${index}` })
-    );
+    const records = Array.from({ length: MAX_CATEGORICAL_GROUPS + 2 }, (_, index) => {
+      return recordOf({ __seriesId__: `s${index}`, __seriesName__: `Series ${index}` });
+    });
     const { series } = render({ colourBy: 'series', measure: 'score', palette: 'jade', records });
     expect(series.at(-1)!.color).toBe(NEUTRAL_MARK.light);
   });

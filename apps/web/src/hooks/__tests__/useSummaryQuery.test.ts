@@ -4,6 +4,7 @@ import { createElement } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { summaryQueryOptions, useSummaryQuery } from '../useSummaryQuery';
 
@@ -18,8 +19,9 @@ const summary = {
 
 function renderSummaryQuery(...args: Parameters<typeof useSummaryQuery>) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return renderHook(() => useSummaryQuery(...args), { wrapper });
 }
 
@@ -44,19 +46,20 @@ describe('useSummaryQuery', () => {
 
   it('should reject a summary with a negative count, so a corrupt total never reaches the dashboard', async () => {
     mockAxios.get.mockResolvedValueOnce({ data: { ...summary, counts: { ...summary.counts, users: -1 } } });
-    await expect(new QueryClient().fetchQuery(summaryQueryOptions())).rejects.toThrow();
+    await expect(new QueryClient().fetchQuery(summaryQueryOptions())).rejects.toThrow(z.ZodError);
   });
 
   it('should keep the previous summary while another group loads, so the dashboard does not flash empty', async () => {
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(QueryClientProvider, { children, client: queryClient });
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(QueryClientProvider, { children, client: queryClient });
+    };
     const { rerender, result } = renderHook(({ groupId }) => useSummaryQuery({ params: { groupId } }), {
       initialProps: { groupId: 'group-1' },
       wrapper
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    mockAxios.get.mockReturnValueOnce(new Promise(() => undefined));
+    mockAxios.get.mockReturnValueOnce(Promise.withResolvers<never>().promise);
     rerender({ groupId: 'group-2' });
     expect(result.current).toMatchObject({ data: { counts: { records: 10 } }, isPlaceholderData: true });
   });

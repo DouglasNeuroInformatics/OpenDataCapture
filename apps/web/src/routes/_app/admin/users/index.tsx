@@ -17,9 +17,11 @@ import { useAppStore } from '@/store';
 
 type ArchiveAction = { kind: 'archive'; user: User };
 
+const SORTED_ICONS = { asc: ChevronUpIcon, desc: ChevronDownIcon };
+
 const SortableHeader = ({ column, label }: { column: TanstackTable.Column<User>; label: string }) => {
   const sorted = column.getIsSorted();
-  const Icon = sorted === 'asc' ? ChevronUpIcon : sorted === 'desc' ? ChevronDownIcon : ChevronsUpDownIcon;
+  const Icon = sorted ? SORTED_ICONS[sorted] : ChevronsUpDownIcon;
   return (
     <button
       className="hover:text-foreground flex items-center gap-1 transition-colors"
@@ -42,7 +44,7 @@ const RouteComponent = () => {
   const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
   const [pendingAction, setPendingAction] = useState<ArchiveAction | null>(null);
 
-  const openUser = (user: User) => {
+  const handleOpenUser = (user: User) => {
     setHighlightedRowId(user.id);
     void navigate({ params: { userId: user.id }, to: '/admin/users/$userId' });
   };
@@ -137,7 +139,7 @@ const RouteComponent = () => {
         rowActions={[
           {
             label: t('common.manage'),
-            onSelect: openUser
+            onSelect: handleOpenUser
           },
           {
             disabled: (user) => user.username === currentUser?.username || Boolean(user.archivedAt),
@@ -162,7 +164,7 @@ const RouteComponent = () => {
           </Button>
         )}
         onRowClick={(user) => setHighlightedRowId(user.id)}
-        onRowDoubleClick={openUser}
+        onRowDoubleClick={handleOpenUser}
       />
       <Dialog open={pendingAction !== null} onOpenChange={() => setPendingAction(null)}>
         <Dialog.Content>
@@ -189,7 +191,9 @@ const RouteComponent = () => {
               type="button"
               variant="danger"
               onClick={() => {
-                if (!pendingAction) return;
+                if (!pendingAction) {
+                  return;
+                }
                 archiveUserMutation.mutate({ id: pendingAction.user.id }, { onSuccess: () => setPendingAction(null) });
               }}
             >

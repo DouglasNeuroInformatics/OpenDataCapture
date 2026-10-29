@@ -1,12 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { SortableHeader } from '@/components/SortableHeader';
+import { SortableHeader } from '@/components/SortableHeader/SortableHeader';
 
 type Row = { id: string };
 
-const columnOf = (sorted: 'asc' | 'desc' | false, toggleSorting = vi.fn()) =>
-  ({ getIsSorted: () => sorted, toggleSorting }) as never;
+const columnOf = (sorted: 'asc' | 'desc' | false, toggleSorting = vi.fn()) => {
+  return { getIsSorted: () => sorted, toggleSorting } as never;
+};
 
 describe('SortableHeader', () => {
   it('should render the column label', () => {

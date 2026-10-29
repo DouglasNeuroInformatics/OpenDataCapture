@@ -45,7 +45,7 @@ That error is the expected state of a correct new route, not a bug to fix. Never
 
    ```ts
    loaderDeps: ({ search }) => ({ search }),
-   // eslint-disable-next-line perfectionist/sort-objects
+   // eslint-disable-next-line perfectionist/sort-objects -- loader's `deps` type comes from loaderDeps, written above it
    loader: async ({ context, deps }) => { ... }
    ```
 

@@ -60,7 +60,7 @@ const respondWith = (status: number, data: object) => mocks.post.mockResolvedVal
 
 const lastNotification = () => useNotificationsStore.getState().notifications.at(-1);
 
-describe('login page', () => {
+describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useNotificationsStore.setState({ notifications: [] });

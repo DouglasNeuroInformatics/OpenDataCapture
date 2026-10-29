@@ -1,4 +1,4 @@
-import * as fs from 'fs/promises';
+import * as fs from 'node:fs/promises';
 
 import esbuild from 'esbuild';
 import { beforeAll, describe, expect, it, vi } from 'vitest';

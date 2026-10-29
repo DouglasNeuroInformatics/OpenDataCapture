@@ -91,10 +91,11 @@ const switchTo = (mode: 'FILE' | 'PASTE' | 'SELECT') => {
 
 // The table is not exposed to the accessibility tree until it has measured its container, which
 // happy-dom never does, so rows are reached through their test ids rather than by role.
-const pickerRowLabels = () =>
-  screen
+const pickerRowLabels = () => {
+  return screen
     .getAllByTestId('data-table-row')
     .map((row) => row.querySelector('[role="checkbox"]')!.getAttribute('aria-label'));
+};
 
 const rowCheckbox = (subjectId: string) => screen.getByTestId(`bulk-select-subject-${subjectId}`);
 
@@ -118,10 +119,11 @@ const csvFile = (content: string) => new File([content], 'subjects.csv', { type:
 
 const oversizedFile = (name: string) => new File([new Uint8Array(5_000_001)], name);
 
-const workbookFile = () =>
-  new File(['workbook'], 'subjects.xlsx', {
+const workbookFile = () => {
+  return new File(['workbook'], 'subjects.xlsx', {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   });
+};
 
 describe('SourceStep', () => {
   beforeEach(() => {

@@ -52,8 +52,7 @@ const tooltipStyles: { [K in Theme]: React.CSSProperties } = {
   }
 };
 
-// eslint-disable-next-line react/function-component-definition
-function LineGraphComponent<const T extends LineGraphData>({
+const LineGraphComponent = <const T extends LineGraphData>({
   data,
   lines,
   xAxis
@@ -65,7 +64,7 @@ function LineGraphComponent<const T extends LineGraphData>({
     key?: ExtractValidKeys<T, number>; // unix time
     label?: string;
   };
-}) {
+}) => {
   const { resolvedLanguage } = useTranslation('libui');
   const [theme] = useTheme();
 
@@ -128,7 +127,7 @@ function LineGraphComponent<const T extends LineGraphData>({
       </LineChart>
     </ResponsiveContainer>
   );
-}
+};
 
 export const LineGraph = React.memo(LineGraphComponent) as typeof LineGraphComponent;
 

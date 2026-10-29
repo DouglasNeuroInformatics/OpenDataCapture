@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
+/* eslint-disable @typescript-eslint/consistent-type-definitions -- AxiosRequestConfig is augmented by declaration merging into axios's interface, which a type alias cannot do */
 
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
@@ -9,7 +9,7 @@ import { config } from '@/config';
 import { useAppStore } from '@/store';
 
 declare module 'axios' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- a merged declaration must repeat the type parameters of the interface it merges into
   export interface AxiosRequestConfig<D = any> {
     meta?: {
       disableDefaultAuth?: boolean;
@@ -70,7 +70,9 @@ function getRetryDelay(retryCount: number): number {
 }
 
 function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
 /** Resolve once the browser reports it is back online, or after `timeout` ms, whichever comes first. */
@@ -127,11 +129,11 @@ axios.interceptors.response.use(
     if (!import.meta.env.DEV) {
       return response;
     }
-    return new Promise((resolve) =>
+    return new Promise((resolve) => {
       setTimeout(() => {
         resolve(response);
-      }, config.dev.networkLatency)
-    );
+      }, config.dev.networkLatency);
+    });
   },
   async (error) => {
     const requestConfig = isAxiosError(error) ? error.config : undefined;

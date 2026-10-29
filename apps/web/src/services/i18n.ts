@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
-/* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/consistent-type-definitions -- libui's UserConfig.Options and Translations can only be augmented by merging into its interfaces; a type alias would redeclare them */
+/* eslint-disable @typescript-eslint/no-namespace -- libui exports UserConfig as a namespace, and augmenting a namespace requires redeclaring it */
 
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import { resolveActiveLanguage } from '@opendatacapture/schemas/core';

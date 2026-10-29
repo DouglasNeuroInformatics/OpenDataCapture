@@ -54,8 +54,11 @@ type LoginBrandingPanelProps = {
   preview?: boolean;
 };
 
-const fontStyle = (px: null | number | undefined, preview: boolean): React.CSSProperties =>
-  px ? { fontSize: `${preview ? Math.max(Math.round(px * PREVIEW_FONT_SCALE), PREVIEW_FONT_MIN_PX) : px}px` } : {};
+const fontStyle = (px: null | number | undefined, preview: boolean): React.CSSProperties => {
+  return px
+    ? { fontSize: `${preview ? Math.max(Math.round(px * PREVIEW_FONT_SCALE), PREVIEW_FONT_MIN_PX) : px}px` }
+    : {};
+};
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -148,7 +151,9 @@ const ResourcesSection = ({ boldResourceLinks, fontSize, lang, links, preview, t
     >
       {links.map((link, index) => {
         const linkLabel = getValueForLanguage(link.label, lang)?.trim();
-        if (!linkLabel) return null;
+        if (!linkLabel) {
+          return null;
+        }
         return (
           <a
             className={cn(

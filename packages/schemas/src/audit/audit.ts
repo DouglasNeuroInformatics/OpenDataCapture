@@ -1,3 +1,4 @@
+import { $NumberLike } from '@douglasneuroinformatics/libjs';
 import { z } from 'zod/v4';
 
 import { $Group } from '../group/group.js';
@@ -35,8 +36,8 @@ export const $AuditLogsQuerySearchParams = z.object({
 
 export type $AuditLogsQueryParams = z.infer<typeof $AuditLogsQueryParams>;
 export const $AuditLogsQueryParams = $AuditLogsQuerySearchParams.extend({
-  limit: z.coerce.number().int().positive().max(AUDIT_LOGS_MAX_PAGE_SIZE).default(AUDIT_LOGS_PAGE_SIZE),
-  page: z.coerce.number().int().positive().default(1),
+  limit: $NumberLike.pipe(z.number().int().positive().max(AUDIT_LOGS_MAX_PAGE_SIZE)).default(AUDIT_LOGS_PAGE_SIZE),
+  page: $NumberLike.pipe(z.number().int().positive()).default(1),
   sortOrder: z.enum(['asc', 'desc']).default('desc')
 });
 

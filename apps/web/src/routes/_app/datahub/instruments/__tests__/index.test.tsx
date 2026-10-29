@@ -85,18 +85,18 @@ const renderHub = () => {
 
 const rowFor = (id: string) => JSON.parse(screen.getByTestId(`row-${id}`).textContent) as InstrumentRow;
 
-beforeEach(() => {
-  mocks.infos = [scalar('hq-1')];
-  mocks.navigate.mockReset();
-  mocks.seriesSummaries = [];
-  mocks.store.currentGroup = null;
-  mocks.summaries = [summaryOf('hq-1')];
-  mocks.instrumentRecordSummaryQueryOptions.mockClear();
-});
+describe('Route', () => {
+  beforeEach(() => {
+    mocks.infos = [scalar('hq-1')];
+    mocks.navigate.mockReset();
+    mocks.seriesSummaries = [];
+    mocks.store.currentGroup = null;
+    mocks.summaries = [summaryOf('hq-1')];
+    mocks.instrumentRecordSummaryQueryOptions.mockClear();
+  });
 
-afterEach(cleanup);
+  afterEach(cleanup);
 
-describe('instrument hub index route', () => {
   it('should list an instrument with the counts collected under it', () => {
     renderHub();
     expect(rowFor('hq-1')).toMatchObject({ edition: 1, kind: 'FORM', recordCount: 3, subjectCount: 2 });

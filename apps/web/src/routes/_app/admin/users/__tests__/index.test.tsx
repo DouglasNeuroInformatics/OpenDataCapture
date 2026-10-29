@@ -32,8 +32,9 @@ vi.mock('@/hooks/useUnarchiveUserMutation', () => ({
   useUnarchiveUserMutation: () => ({ mutate: mocks.unarchiveUser })
 }));
 vi.mock('@/store', () => ({
-  useAppStore: (selector: (store: { currentUser: null | { username: string } }) => unknown) =>
-    selector({ currentUser: mocks.currentUser })
+  useAppStore: (selector: (store: { currentUser: null | { username: string } }) => unknown) => {
+    return selector({ currentUser: mocks.currentUser });
+  }
 }));
 
 const userFixture = (overrides: Partial<User> = {}): User => ({
@@ -59,16 +60,18 @@ const rows = () => screen.getAllByTestId('data-table-row');
 
 const usernames = () => rows().map((row) => row.querySelector('[data-row-selected]')!.parentElement!.textContent);
 
-const header = (label: string) =>
-  within(screen.getByTestId('data-table-head')).getByText(label, { selector: 'button' });
+const header = (label: string) => {
+  return within(screen.getByTestId('data-table-head')).getByText(label, { selector: 'button' });
+};
 
 const openRowActions = (rowIndex = 0) => {
   fireEvent.keyDown(within(rows()[rowIndex]!).getByTestId('row-actions-trigger'), { key: 'Enter' });
   return screen.getByTestId('row-actions-dropdown');
 };
 
-const rowAction = (label: string, rowIndex = 0) =>
-  within(openRowActions(rowIndex)).getByRole('menuitem', { name: label });
+const rowAction = (label: string, rowIndex = 0) => {
+  return within(openRowActions(rowIndex)).getByRole('menuitem', { name: label });
+};
 
 const runLoader = (queryClient: QueryClient) => {
   const { loader } = Route.options;
@@ -86,15 +89,15 @@ const animateDialogExit = () => {
   onTestFinished(() => style.remove());
 };
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  mocks.archiveUser.mockReset();
-  mocks.currentUser = null;
-});
+describe('Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.archiveUser.mockReset();
+    mocks.currentUser = null;
+  });
 
-afterEach(cleanup);
+  afterEach(cleanup);
 
-describe('admin users table', () => {
   it.each([false, true, null, undefined])('should display disabled=%s independently of archive status', (disabled) => {
     renderTable([userFixture({ archivedAt: new Date('2026-10-01'), disabled })]);
     expect(screen.getByTestId('user-login-status').textContent).toBe(disabled ? 'Disabled' : 'Enabled');

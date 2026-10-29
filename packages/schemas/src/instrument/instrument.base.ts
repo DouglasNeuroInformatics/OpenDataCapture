@@ -17,7 +17,7 @@ import type {
 import type { Simplify } from 'type-fest';
 import { z } from 'zod/v4';
 
-import { $InstrumentAuthoringLanguage, $LicenseIdentifier } from '../core/core.js';
+import { $DateLike, $InstrumentAuthoringLanguage, $LicenseIdentifier } from '../core/core.js';
 
 import type { InstrumentAuthoringLanguage as Language } from '../core/core.js';
 
@@ -222,7 +222,7 @@ type SeriesInstrumentInfo<T extends BaseInstrument = BaseInstrument> = BaseInstr
 type InstrumentInfo<T extends BaseInstrument = BaseInstrument> = ScalarInstrumentInfo<T> | SeriesInstrumentInfo<T>;
 
 const $BaseInstrumentInfo = $BaseInstrument.omit({ content: true, kind: true }).extend({
-  createdAt: z.coerce.date().nullish(),
+  createdAt: $DateLike.nullish(),
   id: z.string(),
   sourceRepo: z
     .object({
@@ -238,7 +238,7 @@ const $ScalarInstrumentInfo = $BaseInstrumentInfo.extend({
 }) satisfies z.ZodType<ScalarInstrumentInfo>;
 
 const $SeriesInstrumentInfo = $BaseInstrumentInfo.extend({
-  archivedAt: z.coerce.date().nullish(),
+  archivedAt: $DateLike.nullish(),
   kind: z.literal('SERIES'),
   seriesGroupId: z.string().nullish(),
   seriesItems: z.object({ id: z.string() }).array()

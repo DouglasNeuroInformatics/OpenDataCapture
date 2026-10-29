@@ -8,7 +8,7 @@ function resolveIndexInput<T extends BundlerInput>(inputs: T[]): T {
   }
   const extensions = ['.tsx', '.jsx', '.ts', '.js'];
   for (const extension of extensions) {
-    const match = inputs.find((file) => file.name === `index` + extension);
+    const match = inputs.find((file) => file.name === `index${extension}`);
     if (match) {
       return match;
     }

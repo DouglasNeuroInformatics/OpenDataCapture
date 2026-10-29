@@ -38,8 +38,11 @@ vi.mock('@/hooks/useUpdateGroupMutation', () => ({
   useUpdateGroupMutation: () => ({ mutateAsync: mocks.updateMutateAsync })
 }));
 vi.mock('@/store', () => ({
-  useAppStore: (selector: (store: { changeGroup: typeof mocks.changeGroup; currentGroup: Group | null }) => unknown) =>
-    selector({ changeGroup: mocks.changeGroup, currentGroup: mocks.store.currentGroup })
+  useAppStore: (
+    selector: (store: { changeGroup: typeof mocks.changeGroup; currentGroup: Group | null }) => unknown
+  ) => {
+    return selector({ changeGroup: mocks.changeGroup, currentGroup: mocks.store.currentGroup });
+  }
 }));
 vi.mock('@/components/LoadingFallback', () => ({
   LoadingFallback: () => <div data-testid="loading-fallback" />
@@ -169,24 +172,24 @@ const createButton = (dialog: HTMLElement) => within(dialog).getByRole('button',
 
 const resolveCreate = (result: CreateSeriesInstrumentResult) => mocks.createMutateAsync.mockResolvedValueOnce(result);
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  mocks.instruments = defaultInstruments();
-  mocks.isDemo = false;
-  mocks.store.currentGroup = makeGroup();
-  mocks.updateMutateAsync.mockResolvedValue({ ...makeGroup(), name: 'Updated Group' });
-  mocks.deleteMutate.mockImplementation((_: unknown, callbacks: DeleteCallbacks) => {
-    callbacks.onSuccess();
-    callbacks.onSettled();
+describe('Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.instruments = defaultInstruments();
+    mocks.isDemo = false;
+    mocks.store.currentGroup = makeGroup();
+    mocks.updateMutateAsync.mockResolvedValue({ ...makeGroup(), name: 'Updated Group' });
+    mocks.deleteMutate.mockImplementation((_: unknown, callbacks: DeleteCallbacks) => {
+      callbacks.onSuccess();
+      callbacks.onSettled();
+    });
   });
-});
 
-afterEach(() => {
-  cleanup();
-  vi.unstubAllEnvs();
-});
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllEnvs();
+  });
 
-describe('manage group page', () => {
   describe('instrument list', () => {
     it('should show a loading fallback until the instrument info has loaded', () => {
       mocks.instruments = undefined;

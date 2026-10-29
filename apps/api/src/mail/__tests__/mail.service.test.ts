@@ -53,11 +53,12 @@ describe('MailService', () => {
   let transporter: { sendMail: Mock; verify: Mock };
 
   /** The password as it would come back out of the database. */
-  const persistedPassword = () =>
-    decryptSecret(
+  const persistedPassword = () => {
+    return decryptSecret(
       (setupStateModel.update.mock.lastCall?.[0] as PersistedUpdate).data.mailConfig.set.password,
       SECRET_KEY
     );
+  };
 
   beforeEach(async () => {
     // `createTransport` is a module-level mock, so its call history outlives the testing module.
@@ -82,7 +83,7 @@ describe('MailService', () => {
   describe('a stored configuration that no longer parses', () => {
     it('throws rather than reporting mail as unconfigured', async () => {
       setupStateModel.findFirst.mockResolvedValue({ mailConfig: { ...stored(validConfig), port: 'not-a-port' } });
-      await expect(mailService.getSettings()).rejects.toThrow();
+      await expect(mailService.getSettings()).rejects.toThrow('The stored mail configuration is invalid');
     });
   });
 

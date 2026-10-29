@@ -1,16 +1,16 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
+/* eslint-disable @typescript-eslint/consistent-type-definitions -- ImportMetaEnv, ImportMeta and Window are augmented by declaration merging into global interfaces, which a type alias cannot do */
 
 /// <reference types="vite/client" />
 
 // All of these should be undefined in production
-interface ImportMetaDevEnv {
+type ImportMetaDevEnv = {
   readonly VITE_DEV_BYPASS_AUTH?: string;
   readonly VITE_DEV_DISABLE_TUTORIAL?: string;
   readonly VITE_DEV_FORCE_CLEAR_QUERY_CACHE?: string;
   readonly VITE_DEV_NETWORK_LATENCY?: string;
   readonly VITE_DEV_PASSWORD?: string;
   readonly VITE_DEV_USERNAME?: string;
-}
+};
 
 interface ImportMetaEnv extends ImportMetaDevEnv {
   readonly API_BASE_URL?: string;

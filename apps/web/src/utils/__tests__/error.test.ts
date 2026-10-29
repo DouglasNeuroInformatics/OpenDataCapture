@@ -5,14 +5,15 @@ import { getApiErrorMessage } from '../error';
 
 const FALLBACK = 'Something went wrong';
 
-const axiosErrorWithBody = (data: unknown) =>
-  new AxiosError('Request failed with status code 400', 'ERR_BAD_REQUEST', undefined, undefined, {
+const axiosErrorWithBody = (data: unknown) => {
+  return new AxiosError('Request failed with status code 400', 'ERR_BAD_REQUEST', undefined, undefined, {
     config: { headers: new AxiosHeaders() },
     data,
     headers: {},
     status: 400,
     statusText: 'Bad Request'
   });
+};
 
 describe('getApiErrorMessage', () => {
   it('should return the message the server put on the response body', () => {

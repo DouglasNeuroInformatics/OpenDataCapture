@@ -44,15 +44,16 @@ describe('GatewaySynchronizer', () => {
     subjectId: 'subject-1'
   });
 
-  const createRemoteAssignment = (id: string): RemoteAssignment =>
-    ({
+  const createRemoteAssignment = (id: string): RemoteAssignment => {
+    return {
       completedAt: new Date(),
       encryptedData: 'encrypted-data',
       groupId: null,
       id,
       status: 'COMPLETE',
       symmetricKey: 'symmetric-key'
-    }) as RemoteAssignment;
+    } as RemoteAssignment;
+  };
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -420,7 +421,9 @@ describe('GatewaySynchronizer', () => {
       sync = vi.spyOn(gatewaySynchronizer, 'sync').mockImplementation(async () => {
         concurrentSyncs++;
         maxConcurrentSyncs = Math.max(maxConcurrentSyncs, concurrentSyncs);
-        await new Promise((resolve) => setTimeout(resolve, SYNC_DURATION));
+        await new Promise((resolve) => {
+          setTimeout(resolve, SYNC_DURATION);
+        });
         concurrentSyncs--;
       });
     });
@@ -494,7 +497,9 @@ describe('GatewaySynchronizer', () => {
 
     it('should not abandon a pass that finishes within five minutes', async () => {
       sync.mockImplementationOnce(async () => {
-        await new Promise((resolve) => setTimeout(resolve, FIVE_MINUTES - 1));
+        await new Promise((resolve) => {
+          setTimeout(resolve, FIVE_MINUTES - 1);
+        });
       });
       gatewaySynchronizer.onApplicationBootstrap();
 

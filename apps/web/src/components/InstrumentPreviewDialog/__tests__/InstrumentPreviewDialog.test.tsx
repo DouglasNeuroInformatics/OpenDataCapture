@@ -63,11 +63,12 @@ const renderDialog = (item: InstrumentPreviewItem, onClose = vi.fn()) => {
 };
 
 /** The text of the detail row whose label starts with `label`, or undefined when that row is not rendered. */
-const detailText = (label: string) =>
-  screen
+const detailText = (label: string) => {
+  return screen
     .queryAllByText(new RegExp(`^${label}`), { selector: 'span.font-medium' })
     .map((element) => element.parentElement?.textContent)
     .at(0);
+};
 
 const previewForm = () => {
   fireEvent.click(screen.getByRole('button', { name: 'Preview Form' }));
@@ -75,7 +76,7 @@ const previewForm = () => {
 
 describe('InstrumentPreviewDialog', () => {
   beforeEach(() => {
-    void i18n.changeLanguage('en');
+    i18n.changeLanguage('en');
     bundle.state = { isError: false, isLoading: false };
     bundle.useInstrumentBundle.mockImplementation(() => bundle.state);
   });

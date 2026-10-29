@@ -412,8 +412,9 @@ describe('SubjectsService', () => {
   });
 
   describe('findCustomIds', () => {
-    const findManyArgs = () =>
-      subjectModel.findMany.mock.lastCall?.[0] as { select: unknown; where: { AND: unknown[] } };
+    const findManyArgs = () => {
+      return subjectModel.findMany.mock.lastCall?.[0] as { select: unknown; where: { AND: unknown[] } };
+    };
 
     it('should return only the ids, so no personal information leaves the database', async () => {
       subjectModel.findMany.mockResolvedValueOnce([{ id: 'group$a' }, { id: 'group$b' }]);
@@ -457,8 +458,9 @@ describe('SubjectsService', () => {
   });
 
   describe('findDefaultGroupCustomIds', () => {
-    const findManyArgs = () =>
-      subjectModel.findMany.mock.lastCall?.[0] as { select: unknown; where: { AND: unknown[] } };
+    const findManyArgs = () => {
+      return subjectModel.findMany.mock.lastCall?.[0] as { select: unknown; where: { AND: unknown[] } };
+    };
 
     it('should return only the ids, so no personal information leaves the database', async () => {
       subjectModel.findMany.mockResolvedValueOnce([{ id: 'root$a' }]);

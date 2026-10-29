@@ -73,151 +73,153 @@ const runGuard = () => {
   return null;
 };
 
-beforeEach(() => {
-  mocks.config.setup.isGatewayEnabled = true;
-  mocks.isInstrumentLoaded = true;
-  mocks.instrumentInfo = [
-    { details: { title: 'Happiness Questionnaire' }, id: 'instrument-1', supportedLanguages: ['en', 'fr'] }
-  ];
-  mocks.useAssignmentsQuery.mockImplementation(() => ({ data: mocks.assignments }));
-  mocks.useInstrument.mockImplementation((id: null | string) =>
-    id && mocks.isInstrumentLoaded ? { details: { title: 'Loaded Instrument' } } : null
-  );
-  vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'subject-1' });
-});
+describe('Route', () => {
+  beforeEach(() => {
+    mocks.config.setup.isGatewayEnabled = true;
+    mocks.isInstrumentLoaded = true;
+    mocks.instrumentInfo = [
+      { details: { title: 'Happiness Questionnaire' }, id: 'instrument-1', supportedLanguages: ['en', 'fr'] }
+    ];
+    mocks.useAssignmentsQuery.mockImplementation(() => ({ data: mocks.assignments }));
+    mocks.useInstrument.mockImplementation((id: null | string) => {
+      return id && mocks.isInstrumentLoaded ? { details: { title: 'Loaded Instrument' } } : null;
+    });
+    vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'subject-1' });
+  });
 
-afterEach(() => {
-  cleanup();
-  vi.clearAllMocks();
-  vi.restoreAllMocks();
-});
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+  });
 
-describe('subject assignments route guard', () => {
-  it('should redirect to the subject table when the gateway is not deployed, since assignments cannot be served', () => {
-    mocks.config.setup.isGatewayEnabled = false;
-    const thrown = runGuard();
-    expect(isRedirect(thrown)).toBe(true);
-    expect(thrown).toMatchObject({
-      options: { params: { subjectId: 'subject-1' }, to: '/datahub/subjects/$subjectId/table' }
+  describe('subject assignments route guard', () => {
+    it('should redirect to the subject table when the gateway is not deployed, since assignments cannot be served', () => {
+      mocks.config.setup.isGatewayEnabled = false;
+      const thrown = runGuard();
+      expect(isRedirect(thrown)).toBe(true);
+      expect(thrown).toMatchObject({
+        options: { params: { subjectId: 'subject-1' }, to: '/datahub/subjects/$subjectId/table' }
+      });
+    });
+
+    it('should allow the route when the gateway is deployed', () => {
+      expect(runGuard()).toBeNull();
     });
   });
 
-  it('should allow the route when the gateway is deployed', () => {
-    expect(runGuard()).toBeNull();
-  });
-});
+  describe('subject assignments table', () => {
+    it('should query the assignments of the subject in the url', () => {
+      renderAssignments([]);
+      expect(mocks.useAssignmentsQuery).toHaveBeenCalledWith({ params: { subjectId: 'subject-1' } });
+    });
 
-describe('subject assignments table', () => {
-  it('should query the assignments of the subject in the url', () => {
-    renderAssignments([]);
-    expect(mocks.useAssignmentsQuery).toHaveBeenCalledWith({ params: { subjectId: 'subject-1' } });
-  });
+    it('should render no rows while the assignments have not loaded', () => {
+      renderAssignments(undefined);
+      expect(screen.queryAllByTestId('assignment-row')).toHaveLength(0);
+    });
 
-  it('should render no rows while the assignments have not loaded', () => {
-    renderAssignments(undefined);
-    expect(screen.queryAllByTestId('assignment-row')).toHaveLength(0);
-  });
+    it('should show the instrument title and the assigned and expiry dates of each assignment', () => {
+      renderAssignments([createAssignment()]);
+      const cells = within(screen.getByTestId('assignment-row')).getAllByRole('cell');
+      expect(cells.map((cell) => cell.textContent)).toEqual([
+        'Happiness Questionnaire',
+        '2026-01-15',
+        '2026-07-01',
+        'Outstanding'
+      ]);
+    });
 
-  it('should show the instrument title and the assigned and expiry dates of each assignment', () => {
-    renderAssignments([createAssignment()]);
-    const cells = within(screen.getByTestId('assignment-row')).getAllByRole('cell');
-    expect(cells.map((cell) => cell.textContent)).toEqual([
-      'Happiness Questionnaire',
-      '2026-01-15',
-      '2026-07-01',
-      'Outstanding'
-    ]);
-  });
+    it('should fall back to the instrument id when the instrument is not among the known instruments', () => {
+      mocks.instrumentInfo = undefined;
+      renderAssignments([createAssignment()]);
+      expect(within(screen.getByTestId('assignment-row')).getAllByRole('cell')[0]!.textContent).toBe('instrument-1');
+    });
 
-  it('should fall back to the instrument id when the instrument is not among the known instruments', () => {
-    mocks.instrumentInfo = undefined;
-    renderAssignments([createAssignment()]);
-    expect(within(screen.getByTestId('assignment-row')).getAllByRole('cell')[0]!.textContent).toBe('instrument-1');
-  });
+    it.each<[AssignmentStatus, string]>([
+      ['CANCELED', 'Canceled'],
+      ['COMPLETE', 'Complete'],
+      ['EXPIRED', 'Expired'],
+      ['OUTSTANDING', 'Outstanding']
+    ])('should display the %s status as %s', (status, label) => {
+      renderAssignments([createAssignment({ status })]);
+      expect(within(screen.getByTestId('assignment-row')).getAllByRole('cell')[3]!.textContent).toBe(label);
+    });
 
-  it.each<[AssignmentStatus, string]>([
-    ['CANCELED', 'Canceled'],
-    ['COMPLETE', 'Complete'],
-    ['EXPIRED', 'Expired'],
-    ['OUTSTANDING', 'Outstanding']
-  ])('should display the %s status as %s', (status, label) => {
-    renderAssignments([createAssignment({ status })]);
-    expect(within(screen.getByTestId('assignment-row')).getAllByRole('cell')[3]!.textContent).toBe(label);
-  });
-
-  it('should mark only the clicked row as selected', () => {
-    renderAssignments([createAssignment(), createAssignment({ id: 'assignment-2' })]);
-    openAssignment(1);
-    const rows = screen.getAllByTestId('assignment-row');
-    expect(rows.map((row) => row.getAttribute('data-state'))).toEqual([null, 'selected']);
-  });
-});
-
-describe('subject assignment sheet', () => {
-  it('should stay closed until an assignment is selected', () => {
-    renderAssignments([createAssignment()]);
-    expect(screen.queryByRole('dialog')).toBeNull();
+    it('should mark only the clicked row as selected', () => {
+      renderAssignments([createAssignment(), createAssignment({ id: 'assignment-2' })]);
+      openAssignment(1);
+      const rows = screen.getAllByTestId('assignment-row');
+      expect(rows.map((row) => row.getAttribute('data-state'))).toEqual([null, 'selected']);
+    });
   });
 
-  it('should open with the title of the selected instrument when a row is clicked', () => {
-    renderAssignments([createAssignment()]);
-    openAssignment();
-    expect(within(screen.getByRole('dialog')).getByRole('heading').textContent).toBe('Loaded Instrument');
-  });
+  describe('subject assignment sheet', () => {
+    it('should stay closed until an assignment is selected', () => {
+      renderAssignments([createAssignment()]);
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
 
-  it('should load the instrument of the selected assignment', () => {
-    renderAssignments([createAssignment({ instrumentId: 'instrument-9' })]);
-    openAssignment();
-    expect(mocks.useInstrument).toHaveBeenLastCalledWith('instrument-9');
-  });
+    it('should open with the title of the selected instrument when a row is clicked', () => {
+      renderAssignments([createAssignment()]);
+      openAssignment();
+      expect(within(screen.getByRole('dialog')).getByRole('heading').textContent).toBe('Loaded Instrument');
+    });
 
-  it('should stay closed while the selected instrument has not loaded, so the sheet never shows an empty title', () => {
-    mocks.isInstrumentLoaded = false;
-    renderAssignments([createAssignment()]);
-    openAssignment();
-    expect(screen.queryByRole('dialog')).toBeNull();
-  });
+    it('should load the instrument of the selected assignment', () => {
+      renderAssignments([createAssignment({ instrumentId: 'instrument-9' })]);
+      openAssignment();
+      expect(mocks.useInstrument).toHaveBeenLastCalledWith('instrument-9');
+    });
 
-  it('should link to the assignment url and encode it as a qr code', () => {
-    renderAssignments([createAssignment()]);
-    openAssignment();
-    const url = 'https://gateway.example.org/assignments/assignment-1';
-    expect(screen.getByRole('link').getAttribute('href')).toBe(url);
-    expect(screen.getByTestId('qr-code').textContent).toBe(url);
-  });
+    it('should stay closed while the selected instrument has not loaded, so the sheet never shows an empty title', () => {
+      mocks.isInstrumentLoaded = false;
+      renderAssignments([createAssignment()]);
+      openAssignment();
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
 
-  it("should offer to email an outstanding assignment in the instrument's supported languages", () => {
-    renderAssignments([createAssignment()]);
-    openAssignment();
-    const emailForm = screen.getByTestId('assignment-email-form');
-    expect(emailForm.dataset.assignmentId).toBe('assignment-1');
-    expect(emailForm.dataset.languages).toBe('en,fr');
-  });
+    it('should link to the assignment url and encode it as a qr code', () => {
+      renderAssignments([createAssignment()]);
+      openAssignment();
+      const url = 'https://gateway.example.org/assignments/assignment-1';
+      expect(screen.getByRole('link').getAttribute('href')).toBe(url);
+      expect(screen.getByTestId('qr-code').textContent).toBe(url);
+    });
 
-  it('should not offer to email an assignment that can no longer be completed', () => {
-    renderAssignments([createAssignment({ status: 'COMPLETE' })]);
-    openAssignment();
-    expect(screen.queryByTestId('assignment-email-form')).toBeNull();
-  });
+    it("should offer to email an outstanding assignment in the instrument's supported languages", () => {
+      renderAssignments([createAssignment()]);
+      openAssignment();
+      const emailForm = screen.getByTestId('assignment-email-form');
+      expect(emailForm.dataset.assignmentId).toBe('assignment-1');
+      expect(emailForm.dataset.languages).toBe('en,fr');
+    });
 
-  it('should disable cancelling an assignment that is no longer outstanding', () => {
-    renderAssignments([createAssignment({ status: 'EXPIRED' })]);
-    openAssignment();
-    expect(screen.getByRole('button', { name: 'Cancel' }).hasAttribute('disabled')).toBe(true);
-  });
+    it('should not offer to email an assignment that can no longer be completed', () => {
+      renderAssignments([createAssignment({ status: 'COMPLETE' })]);
+      openAssignment();
+      expect(screen.queryByTestId('assignment-email-form')).toBeNull();
+    });
 
-  it('should cancel the selected assignment and close the sheet when cancel is clicked', () => {
-    renderAssignments([createAssignment({ id: 'assignment-7' })]);
-    openAssignment();
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(mocks.mutate).toHaveBeenCalledWith({ data: { status: 'CANCELED' }, params: { id: 'assignment-7' } });
-    expect(screen.queryByRole('dialog')).toBeNull();
-  });
+    it('should disable cancelling an assignment that is no longer outstanding', () => {
+      renderAssignments([createAssignment({ status: 'EXPIRED' })]);
+      openAssignment();
+      expect(screen.getByRole('button', { name: 'Cancel' }).hasAttribute('disabled')).toBe(true);
+    });
 
-  it('should close the sheet when it is dismissed', () => {
-    renderAssignments([createAssignment()]);
-    openAssignment();
-    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
-    expect(screen.queryByRole('dialog')).toBeNull();
+    it('should cancel the selected assignment and close the sheet when cancel is clicked', () => {
+      renderAssignments([createAssignment({ id: 'assignment-7' })]);
+      openAssignment();
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      expect(mocks.mutate).toHaveBeenCalledWith({ data: { status: 'CANCELED' }, params: { id: 'assignment-7' } });
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
+    it('should close the sheet when it is dismissed', () => {
+      renderAssignments([createAssignment()]);
+      openAssignment();
+      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
   });
 });

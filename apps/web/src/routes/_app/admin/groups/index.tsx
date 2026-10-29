@@ -81,7 +81,9 @@ const RouteComponent = () => {
   };
 
   const handleSave = () => {
-    if (!selectedGroup) return;
+    if (!selectedGroup) {
+      return;
+    }
     // The sheet is closed in the mutation's onSuccess so a failed save keeps the user's selection.
     updateGroupReposMutation.mutate({
       groupId: selectedGroup.id,

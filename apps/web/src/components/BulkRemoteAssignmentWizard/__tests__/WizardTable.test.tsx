@@ -6,9 +6,9 @@ import { WizardTable } from '../WizardTable';
 const headLabel = 'Name';
 const cellValue = 'Alice';
 
-afterEach(cleanup);
-
 describe('WizardTable', () => {
+  afterEach(cleanup);
+
   it('should put the head cells in the header and the children in the body', () => {
     render(
       <WizardTable head={<th>{headLabel}</th>}>

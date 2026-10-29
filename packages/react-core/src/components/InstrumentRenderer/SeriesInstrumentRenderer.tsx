@@ -74,9 +74,8 @@ export const SeriesInstrumentRenderer = ({
   const params = rootState.status === 'DONE' ? getSeriesInstrumentParams(rootState.instrument.content) : {};
   const skipProgress = params.skipProgress ?? false;
 
-  const createSubmitHandler =
-    (instrument: AnyUnilingualScalarInstrument) =>
-    async ({ data }: FormContentSubmitResult | InteractiveContentSubmitResult) => {
+  const createSubmitHandler = (instrument: AnyUnilingualScalarInstrument) => {
+    return async ({ data }: FormContentSubmitResult | InteractiveContentSubmitResult) => {
       const parsedData = JSON.parse(JSON.stringify(data, replacer)) as Json;
       const validationResult = validateSubmission(instrument, parsedData);
       if (!validationResult.success) {
@@ -117,6 +116,7 @@ export const SeriesInstrumentRenderer = ({
         setIsInstrumentInProgress(false);
       }
     };
+  };
 
   const completionMessage =
     params.completionMessage?.({ itemName: completion?.itemName, terminated: completion?.terminated ?? false }) ?? null;
@@ -145,8 +145,8 @@ export const SeriesInstrumentRenderer = ({
             })}
           />
         ))
-        .with({ status: 'DONE' }, ({ instrument }) =>
-          match({ index, instrument, isInstrumentInProgress })
+        .with({ status: 'DONE' }, ({ instrument }) => {
+          return match({ index, instrument, isInstrumentInProgress })
             .with({ index: 0 }, () => (
               <InstrumentOverview
                 beforeBegin={beforeBegin}
@@ -183,8 +183,8 @@ export const SeriesInstrumentRenderer = ({
                 </div>
               </div>
             ))
-            .with({ index: 1, isInstrumentInProgress: true }, () =>
-              match(scalarState)
+            .with({ index: 1, isInstrumentInProgress: true }, () => {
+              return match(scalarState)
                 .with({ status: 'ERROR' }, () => (
                   <ContentPlaceholder
                     message={t({
@@ -200,8 +200,8 @@ export const SeriesInstrumentRenderer = ({
                   />
                 ))
                 .with({ status: 'LOADING' }, () => <Spinner />)
-                .with({ status: 'DONE' }, () =>
-                  match(scalarState)
+                .with({ status: 'DONE' }, () => {
+                  return match(scalarState)
                     .with({ instrument: { kind: 'FORM' } }, ({ instrument }) => (
                       // Keyed by position, not by instrument: a series may administer the same
                       // instrument twice, and its two items then carry byte-identical bundles. With
@@ -222,10 +222,10 @@ export const SeriesInstrumentRenderer = ({
                         onSubmit={createSubmitHandler(instrument)}
                       />
                     ))
-                    .otherwise(() => null)
-                )
-                .exhaustive()
-            )
+                    .otherwise(() => null);
+                })
+                .exhaustive();
+            })
             .with({ index: 2 }, () => (
               <div className="mx-auto flex max-w-prose grow flex-col items-center justify-center space-y-1 py-32 text-center">
                 <CircleCheckIcon
@@ -255,8 +255,8 @@ export const SeriesInstrumentRenderer = ({
                 </p>
               </div>
             ))
-            .exhaustive()
-        )
+            .exhaustive();
+        })
         .exhaustive()}
     </InstrumentRendererContainer>
   );

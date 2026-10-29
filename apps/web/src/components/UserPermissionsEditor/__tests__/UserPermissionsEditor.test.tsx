@@ -6,7 +6,7 @@ import type { User } from '@opendatacapture/schemas/user';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { UserPermissionsEditor } from '@/components/UserPermissionsEditor';
+import { UserPermissionsEditor } from '@/components/UserPermissionsEditor/UserPermissionsEditor';
 import type { PermissionDraft } from '@/utils/permissions';
 
 import '@/services/i18n';

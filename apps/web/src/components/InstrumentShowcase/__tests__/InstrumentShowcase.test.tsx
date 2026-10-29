@@ -65,16 +65,18 @@ const renderShowcase = (data: TranslatedInstrumentInfo[] = instruments) => {
   return onSelect;
 };
 
-const cardIds = () =>
-  screen.getAllByTestId(/^instrument-card-/).map((card) => card.dataset.testid?.replace('instrument-card-', ''));
+const cardIds = () => {
+  return screen.getAllByTestId(/^instrument-card-/).map((card) => card.dataset.testid?.replace('instrument-card-', ''));
+};
 
 /** Even with animations skipped, an exiting card unmounts only once its exit settles. */
 const expectCardIds = async (ids: string[]) => {
   await waitFor(() => expect(cardIds()).toEqual(ids));
 };
 
-const isHighlighted = (instrument: TranslatedInstrumentInfo) =>
-  screen.getByTestId(`instrument-card-${instrument.id}`).classList.contains('ring-2');
+const isHighlighted = (instrument: TranslatedInstrumentInfo) => {
+  return screen.getByTestId(`instrument-card-${instrument.id}`).classList.contains('ring-2');
+};
 
 const pressKey = (key: string) => fireEvent.keyDown(screen.getByRole('searchbox'), { key });
 
@@ -102,7 +104,7 @@ describe('InstrumentShowcase', () => {
   });
 
   beforeEach(() => {
-    void i18n.changeLanguage('en');
+    i18n.changeLanguage('en');
   });
 
   afterEach(() => {

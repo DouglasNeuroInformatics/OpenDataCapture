@@ -57,8 +57,9 @@ export const MapStep = ({ groupName, knownSubjectIds, onBack, onResolved, onStep
     });
   };
 
-  const rowLabel = (rowNumber: number) =>
-    t({ en: `Row ${rowNumber}`, es: `Fila ${rowNumber}`, fr: `Ligne ${rowNumber}` });
+  const rowLabel = (rowNumber: number) => {
+    return t({ en: `Row ${rowNumber}`, es: `Fila ${rowNumber}`, fr: `Ligne ${rowNumber}` });
+  };
 
   /**
    * The group cannot place every row: the file may name a subject it does not have, or an identifier

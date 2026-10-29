@@ -20,7 +20,7 @@ export default defineInstrument({
     async render(done) {
       const jsPsych = initJsPsych({
         on_finish: () => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- jsPsych's DataCollection is not typed as the array that validationSchema infers, so the example casts it
           done(jsPsych.data.get() as any);
         }
       });
@@ -71,7 +71,7 @@ export default defineInstrument({
           task: 'fixation'
         },
         stimulus: '<div style="font-size:60px;">+</div>',
-        trial_duration: function () {
+        trial_duration() {
           return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000, 1250, 1500, 1750, 2000], 1)[0];
         },
         type: HtmlKeyboardResponsePlugin
@@ -83,7 +83,7 @@ export default defineInstrument({
           correct_response: jsPsych.timelineVariable('correct_response'),
           task: 'response'
         },
-        on_finish: function (data: { correct: boolean; correct_response: string; response: string }) {
+        on_finish(data: { correct: boolean; correct_response: string; response: string }) {
           data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
         },
         stimulus: jsPsych.timelineVariable('stimulus'),
@@ -101,7 +101,7 @@ export default defineInstrument({
 
       /* define debrief */
       const debrief_block = {
-        stimulus: function () {
+        stimulus() {
           const trials = jsPsych.data.get().filter({ task: 'response' });
           const correct_trials = trials.filter({ correct: true });
           const accuracy = Math.round((correct_trials.count() / trials.count()) * 100);

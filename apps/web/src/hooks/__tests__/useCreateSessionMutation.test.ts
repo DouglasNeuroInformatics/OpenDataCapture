@@ -5,6 +5,7 @@ import type { $CreateSessionData } from '@opendatacapture/schemas/session';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { useCreateSessionMutation } from '../useCreateSessionMutation';
 
@@ -37,8 +38,9 @@ const SESSION = {
 
 function renderCreateMutation() {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return renderHook(() => useCreateSessionMutation(), { wrapper });
 }
 
@@ -63,7 +65,7 @@ describe('useCreateSessionMutation', () => {
   it('should reject a malformed session rather than start one the app cannot describe', async () => {
     mockAxios.post.mockResolvedValue({ data: { ...SESSION, type: 'UNKNOWN' } });
     const { result } = renderCreateMutation();
-    await expect(result.current.mutateAsync(DATA)).rejects.toThrow();
+    await expect(result.current.mutateAsync(DATA)).rejects.toThrow(z.ZodError);
     expect(addNotification).not.toHaveBeenCalled();
   });
 

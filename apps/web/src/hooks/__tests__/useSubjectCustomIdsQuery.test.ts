@@ -5,13 +5,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { subjectCustomIdsQueryOptions, useSubjectCustomIdsQuery } from '../useSubjectCustomIdsQuery';
 
 vi.mock('axios');
 
-const runQuery = (groupId?: string) =>
-  new QueryClient().fetchQuery(subjectCustomIdsQueryOptions({ params: { groupId } }));
+const runQuery = (groupId?: string) => {
+  return new QueryClient().fetchQuery(subjectCustomIdsQueryOptions({ params: { groupId } }));
+};
 
 // eslint-disable-next-line @typescript-eslint/unbound-method -- a vitest mock, never invoked as a method
 const get = vi.mocked(axios).get;
@@ -35,7 +37,7 @@ describe('subjectCustomIdsQueryOptions', () => {
 
   it('should reject a response that is not a list of ids, so nothing unparsed reaches the form', async () => {
     get.mockResolvedValueOnce({ data: [{ firstName: 'Jane', id: 'group$a' }] });
-    await expect(runQuery('group-1')).rejects.toThrow();
+    await expect(runQuery('group-1')).rejects.toThrow(z.ZodError);
   });
 
   it('should key the cache on the group, so switching group does not serve the previous group ids', () => {
@@ -53,12 +55,13 @@ describe('useSubjectCustomIdsQuery', () => {
   it("should suspend until the group's custom ids load, then return them to the form", async () => {
     get.mockResolvedValueOnce({ data: ['group$a'] });
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(
         QueryClientProvider,
         { client: queryClient },
         createElement(Suspense, { fallback: null }, children)
       );
+    };
     const { result } = renderHook(() => useSubjectCustomIdsQuery({ params: { groupId: 'group-1' } }), { wrapper });
     await waitFor(() => expect(result.current?.data).toStrictEqual(['group$a']));
   });

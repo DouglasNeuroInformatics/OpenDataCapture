@@ -31,14 +31,16 @@ vi.mock('@/hooks/useInstrumentVisualization', () => ({ useInstrumentVisualizatio
 vi.mock('@/hooks/useLinearModelQuery', () => ({ useLinearModelQuery: mocks.useLinearModelQuery }));
 vi.mock('@/hooks/useMeasureOptions', () => ({ useMeasureOptions: mocks.useMeasureOptions }));
 vi.mock('@/store', () => ({
-  useAppStore: (selector: (store: { currentGroup: { id: string } }) => unknown) =>
-    selector({ currentGroup: { id: 'group-1' } })
+  useAppStore: (selector: (store: { currentGroup: { id: string } }) => unknown) => {
+    return selector({ currentGroup: { id: 'group-1' } });
+  }
 }));
 vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/hooks')>()),
   useDownload: () => mocks.download,
-  useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) =>
-    selector({ addNotification: mocks.addNotification })
+  useNotificationsStore: (selector: (store: { addNotification: typeof mocks.addNotification }) => unknown) => {
+    return selector({ addNotification: mocks.addNotification });
+  }
 }));
 vi.mock('@douglasneuroinformatics/libui/components', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/components')>()),
@@ -201,225 +203,227 @@ const downloadGraph = async () => {
   await waitFor(() => expect(mocks.download).toHaveBeenCalled());
 };
 
-beforeEach(() => {
-  encodedBlob = pngBlob;
-  drawnText = [];
-  drawnImages = 0;
-  vi.stubGlobal('Image', FakeImage);
-  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
-    fakeContext as unknown as CanvasRenderingContext2D
-  );
-  vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation((callback) => callback(encodedBlob));
-  mocks.useGraphData.mockReturnValue(graphData);
-  mocks.useGraphLines.mockReturnValue(lines);
-  mocks.useLinearModelQuery.mockReturnValue({ data: models });
-  mocks.useMeasureOptions.mockReturnValue(measureOptions);
-  vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'abcdefghijkl' });
-  vi.spyOn(Route, 'useSearch').mockReturnValue({ palette: 'default' });
-  vi.spyOn(Route, 'useNavigate').mockReturnValue(mocks.navigate);
-});
-
-afterEach(() => {
-  cleanup();
-  vi.clearAllMocks();
-  vi.restoreAllMocks();
-  vi.useRealTimers();
-});
-
-describe('subject graph route', () => {
-  // Every kind the subject holds records for, not forms alone: an interactive instrument's measures
-  // plot the same way, and filtering to forms left them unreachable from the dropdown.
-  it('should visualize the records of the subject in the url whatever kind collected them', () => {
-    renderGraph();
-    expect(mocks.useInstrumentVisualization).toHaveBeenCalledWith({
-      params: { subjectId: 'abcdefghijkl' }
-    });
+describe('Route', () => {
+  beforeEach(() => {
+    encodedBlob = pngBlob;
+    drawnText = [];
+    drawnImages = 0;
+    vi.stubGlobal('Image', FakeImage);
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
+      fakeContext as unknown as CanvasRenderingContext2D
+    );
+    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation((callback) => callback(encodedBlob));
+    mocks.useGraphData.mockReturnValue(graphData);
+    mocks.useGraphLines.mockReturnValue(lines);
+    mocks.useLinearModelQuery.mockReturnValue({ data: models });
+    mocks.useMeasureOptions.mockReturnValue(measureOptions);
+    vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'abcdefghijkl' });
+    vi.spyOn(Route, 'useSearch').mockReturnValue({ palette: 'default' });
+    vi.spyOn(Route, 'useNavigate').mockReturnValue(mocks.navigate);
   });
 
-  it('should not fetch the group trend before an instrument is selected', () => {
-    renderGraph({ instrumentId: null });
-    expect(mocks.useLinearModelQuery).toHaveBeenLastCalledWith({
-      enabled: false,
-      params: { groupId: 'group-1', instrumentId: null }
-    });
-  });
-
-  it('should fetch the group trend of the selected instrument within the current group', () => {
-    renderGraph();
-    expect(mocks.useLinearModelQuery).toHaveBeenLastCalledWith({
-      enabled: true,
-      params: { groupId: 'group-1', instrumentId: 'instrument-1' }
-    });
-  });
-
-  it.each(['Measures', 'Download'])('should disable the %s control until an instrument is selected', (name) => {
-    renderGraph({ instrumentId: null });
-    expect(screen.getByRole('button', { name }).hasAttribute('disabled')).toBe(true);
-  });
-
-  it('should disable the timeframe control until an instrument is selected', () => {
-    renderGraph({ instrumentId: null });
-    expect(screen.getByTestId('select-time').hasAttribute('disabled')).toBe(true);
-  });
-
-  it('should enable the measure, timeframe and download controls once an instrument is selected', () => {
-    renderGraph();
-    const controls = [
-      screen.getByRole('button', { name: 'Measures' }),
-      screen.getByTestId('select-time'),
-      screen.getByRole('button', { name: 'Download' })
-    ];
-    expect(controls.map((control) => control.hasAttribute('disabled'))).toEqual([false, false, false]);
-  });
-
-  it('should offer the measures of the selected instrument', () => {
-    renderGraph();
-    expect(mocks.useMeasureOptions).toHaveBeenCalledWith(instrument);
-  });
-
-  it('should graph the selected measures of the records against the group trend', () => {
-    renderGraph();
-    selectAllMeasures();
-    expect(mocks.useGraphData).toHaveBeenLastCalledWith({ models, records, selectedMeasures: measureOptions });
-    expect(lastSelectedMeasures()).toEqual({ palette: 'default', selectedMeasures: measureOptions });
-  });
-
-  it('should plot the graph data and lines against collection time', () => {
-    renderGraph();
-    const graph = screen.getByTestId('line-graph');
-    expect(graph.dataset).toMatchObject({
-      graphData: JSON.stringify(graphData),
-      key: '__time__',
-      label: 'Date Collected',
-      lines: JSON.stringify(lines)
-    });
-  });
-
-  it.each([
-    ['instrument', 'select-instrument', 'instrument-2'],
-    ['edition', 'select-edition', 'instrument-3']
-  ])(
-    'should clear the selected measures when another %s is selected, since they belong to the old one',
-    (_, testId, id) => {
-      renderGraph();
-      selectAllMeasures();
-      fireEvent.click(screen.getByTestId(testId));
-      expect(mocks.setInstrumentId).toHaveBeenCalledWith(id);
-      expect(lastSelectedMeasures()).toEqual({ palette: 'default', selectedMeasures: [] });
-    }
-  );
-
-  it('should mark the selected instrument as the current edition', () => {
-    renderGraph();
-    expect(screen.getByTestId('select-edition').dataset.value).toBe('instrument-1');
-  });
-
-  // The control reports the timeframe; this view holds the bound it derives in local state rather
-  // than in the url.
-  it('should restrict the records to the chosen timeframe', () => {
-    vi.useFakeTimers({ now: new Date(2026, 2, 15, 12), toFake: ['Date'] });
-    renderGraph();
-    fireEvent.click(screen.getByTestId('select-time'));
-    expect(mocks.setMinDate).toHaveBeenCalledWith(new Date(2025, 2, 15, 12));
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
     vi.useRealTimers();
   });
 
-  // The palette is held in the url so a shared link reproduces the colours it was made with.
-  it('should record the chosen palette in the url', () => {
-    renderGraph();
-    fireEvent.click(screen.getByTestId('select-palette'));
-    const [{ search }] = mocks.navigate.mock.lastCall as [{ search: (prev: object) => object }];
-    expect(search({ palette: 'default' })).toEqual({ palette: 'jade' });
-  });
-});
-
-describe('subject graph download', () => {
-  // The chart's own SVG is rasterized, rather than the page being screenshotted around it.
-  it('should draw the rendered chart into the capture', async () => {
-    renderGraph();
-    await downloadGraph();
-    expect(drawnImages).toBe(1);
-  });
-
-  it('should save the capture as a png named after the truncated subject id', async () => {
-    renderGraph();
-    await downloadGraph();
-    const [filename, fetchData, options] = mocks.download.mock.lastCall!;
-    expect(filename).toBe('abcdefg.png');
-    expect(fetchData()).toBe(pngBlob);
-    expect(options).toEqual({ blobType: 'image/png' });
-  });
-
-  it('should caption the capture with the instrument, subject, selected measures and an all-time timeframe', async () => {
-    renderGraph();
-    selectAllMeasures();
-    await downloadGraph();
-    expect(drawnText).toEqual([
-      'Unilingual Form of Subject: abcdefg',
-      'Score',
-      'Measures: Score, Mood',
-      'Timeframe: All time'
-    ]);
-  });
-
-  it('should caption the capture with the chosen timeframe up to today', async () => {
-    vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(new Date(2026, 9, 4));
-    renderGraph({ minDate: new Date(2026, 0, 1) });
-    await downloadGraph();
-    expect(drawnText.at(-1)).toBe('Timeframe: 2026-01-01 - 2026-10-04');
-  });
-
-  // An empty selection has nothing to name, and the line read as "Measures: " with a dangling colon.
-  it('should leave out the measures caption when none is selected', async () => {
-    renderGraph();
-    await downloadGraph();
-    expect(drawnText).toEqual(['Unilingual Form of Subject: abcdefg', 'Score', 'Timeframe: All time']);
-  });
-
-  // The catalog resolves after the first paint, so a capture taken immediately has no title to name.
-  it('should caption the capture without an instrument name before the instrument is loaded', async () => {
-    renderGraph({ displayedInstrument: null });
-    await downloadGraph();
-    expect(drawnText[0]).toBe(' of Subject: abcdefg');
-  });
-
-  it('should report a failure that is not an error, rather than letting it escape unreported', async () => {
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(() => {
-      throw 'canvas exploded';
+  describe('subject graph route', () => {
+    // Every kind the subject holds records for, not forms alone: an interactive instrument's measures
+    // plot the same way, and filtering to forms left them unreachable from the dropdown.
+    it('should visualize the records of the subject in the url whatever kind collected them', () => {
+      renderGraph();
+      expect(mocks.useInstrumentVisualization).toHaveBeenCalledWith({
+        params: { subjectId: 'abcdefghijkl' }
+      });
     });
-    renderGraph();
-    fireEvent.click(screen.getByRole('button', { name: 'Download' }));
-    await waitFor(() => expect(mocks.addNotification).toHaveBeenCalled());
-    expect(mocks.addNotification).toHaveBeenCalledWith({
-      message: 'The chart could not be saved as an image: canvas exploded',
-      type: 'error'
+
+    it('should not fetch the group trend before an instrument is selected', () => {
+      renderGraph({ instrumentId: null });
+      expect(mocks.useLinearModelQuery).toHaveBeenLastCalledWith({
+        enabled: false,
+        params: { groupId: 'group-1', instrumentId: null }
+      });
+    });
+
+    it('should fetch the group trend of the selected instrument within the current group', () => {
+      renderGraph();
+      expect(mocks.useLinearModelQuery).toHaveBeenLastCalledWith({
+        enabled: true,
+        params: { groupId: 'group-1', instrumentId: 'instrument-1' }
+      });
+    });
+
+    it.each(['Measures', 'Download'])('should disable the %s control until an instrument is selected', (name) => {
+      renderGraph({ instrumentId: null });
+      expect(screen.getByRole('button', { name }).hasAttribute('disabled')).toBe(true);
+    });
+
+    it('should disable the timeframe control until an instrument is selected', () => {
+      renderGraph({ instrumentId: null });
+      expect(screen.getByTestId('select-time').hasAttribute('disabled')).toBe(true);
+    });
+
+    it('should enable the measure, timeframe and download controls once an instrument is selected', () => {
+      renderGraph();
+      const controls = [
+        screen.getByRole('button', { name: 'Measures' }),
+        screen.getByTestId('select-time'),
+        screen.getByRole('button', { name: 'Download' })
+      ];
+      expect(controls.map((control) => control.hasAttribute('disabled'))).toEqual([false, false, false]);
+    });
+
+    it('should offer the measures of the selected instrument', () => {
+      renderGraph();
+      expect(mocks.useMeasureOptions).toHaveBeenCalledWith(instrument);
+    });
+
+    it('should graph the selected measures of the records against the group trend', () => {
+      renderGraph();
+      selectAllMeasures();
+      expect(mocks.useGraphData).toHaveBeenLastCalledWith({ models, records, selectedMeasures: measureOptions });
+      expect(lastSelectedMeasures()).toEqual({ palette: 'default', selectedMeasures: measureOptions });
+    });
+
+    it('should plot the graph data and lines against collection time', () => {
+      renderGraph();
+      const graph = screen.getByTestId('line-graph');
+      expect(graph.dataset).toMatchObject({
+        graphData: JSON.stringify(graphData),
+        key: '__time__',
+        label: 'Date Collected',
+        lines: JSON.stringify(lines)
+      });
+    });
+
+    it.each([
+      ['instrument', 'select-instrument', 'instrument-2'],
+      ['edition', 'select-edition', 'instrument-3']
+    ])(
+      'should clear the selected measures when another %s is selected, since they belong to the old one',
+      (_, testId, id) => {
+        renderGraph();
+        selectAllMeasures();
+        fireEvent.click(screen.getByTestId(testId));
+        expect(mocks.setInstrumentId).toHaveBeenCalledWith(id);
+        expect(lastSelectedMeasures()).toEqual({ palette: 'default', selectedMeasures: [] });
+      }
+    );
+
+    it('should mark the selected instrument as the current edition', () => {
+      renderGraph();
+      expect(screen.getByTestId('select-edition').dataset.value).toBe('instrument-1');
+    });
+
+    // The control reports the timeframe; this view holds the bound it derives in local state rather
+    // than in the url.
+    it('should restrict the records to the chosen timeframe', () => {
+      vi.useFakeTimers({ now: new Date(2026, 2, 15, 12), toFake: ['Date'] });
+      renderGraph();
+      fireEvent.click(screen.getByTestId('select-time'));
+      expect(mocks.setMinDate).toHaveBeenCalledWith(new Date(2025, 2, 15, 12));
+      vi.useRealTimers();
+    });
+
+    // The palette is held in the url so a shared link reproduces the colours it was made with.
+    it('should record the chosen palette in the url', () => {
+      renderGraph();
+      fireEvent.click(screen.getByTestId('select-palette'));
+      const [{ search }] = mocks.navigate.mock.lastCall as [{ search: (prev: object) => object }];
+      expect(search({ palette: 'default' })).toEqual({ palette: 'jade' });
     });
   });
 
-  it('should not capture anything once the graph has unmounted', async () => {
-    const { unmount } = renderGraph();
-    unmount();
-    mocks.downloadSelection.current!('png');
-    await act(() => Promise.resolve());
-    expect(drawnImages).toBe(0);
-    expect(mocks.download).not.toHaveBeenCalled();
-  });
-
-  // A download that quietly does nothing is indistinguishable from a broken button, so the failure
-  // is reported rather than left to escape as an unhandled rejection.
-  it('should report the failure and save nothing when the capture cannot be encoded as a png', async () => {
-    encodedBlob = null;
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    renderGraph();
-    fireEvent.click(screen.getByRole('button', { name: 'Download' }));
-    await waitFor(() => expect(mocks.addNotification).toHaveBeenCalled());
-    // The cause is named in the message, so a failure is diagnosable rather than merely reported.
-    expect(mocks.addNotification).toHaveBeenCalledWith({
-      message: 'The chart could not be saved as an image: The chart could not be encoded as an image',
-      type: 'error'
+  describe('subject graph download', () => {
+    // The chart's own SVG is rasterized, rather than the page being screenshotted around it.
+    it('should draw the rendered chart into the capture', async () => {
+      renderGraph();
+      await downloadGraph();
+      expect(drawnImages).toBe(1);
     });
-    expect(mocks.download).not.toHaveBeenCalled();
+
+    it('should save the capture as a png named after the truncated subject id', async () => {
+      renderGraph();
+      await downloadGraph();
+      const [filename, fetchData, options] = mocks.download.mock.lastCall!;
+      expect(filename).toBe('abcdefg.png');
+      expect(fetchData()).toBe(pngBlob);
+      expect(options).toEqual({ blobType: 'image/png' });
+    });
+
+    it('should caption the capture with the instrument, subject, selected measures and an all-time timeframe', async () => {
+      renderGraph();
+      selectAllMeasures();
+      await downloadGraph();
+      expect(drawnText).toEqual([
+        'Unilingual Form of Subject: abcdefg',
+        'Score',
+        'Measures: Score, Mood',
+        'Timeframe: All time'
+      ]);
+    });
+
+    it('should caption the capture with the chosen timeframe up to today', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date(2026, 9, 4));
+      renderGraph({ minDate: new Date(2026, 0, 1) });
+      await downloadGraph();
+      expect(drawnText.at(-1)).toBe('Timeframe: 2026-01-01 - 2026-10-04');
+    });
+
+    // An empty selection has nothing to name, and the line read as "Measures: " with a dangling colon.
+    it('should leave out the measures caption when none is selected', async () => {
+      renderGraph();
+      await downloadGraph();
+      expect(drawnText).toEqual(['Unilingual Form of Subject: abcdefg', 'Score', 'Timeframe: All time']);
+    });
+
+    // The catalog resolves after the first paint, so a capture taken immediately has no title to name.
+    it('should caption the capture without an instrument name before the instrument is loaded', async () => {
+      renderGraph({ displayedInstrument: null });
+      await downloadGraph();
+      expect(drawnText[0]).toBe(' of Subject: abcdefg');
+    });
+
+    it('should report a failure that is not an error, rather than letting it escape unreported', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(() => {
+        throw 'canvas exploded';
+      });
+      renderGraph();
+      fireEvent.click(screen.getByRole('button', { name: 'Download' }));
+      await waitFor(() => expect(mocks.addNotification).toHaveBeenCalled());
+      expect(mocks.addNotification).toHaveBeenCalledWith({
+        message: 'The chart could not be saved as an image: canvas exploded',
+        type: 'error'
+      });
+    });
+
+    it('should not capture anything once the graph has unmounted', async () => {
+      const { unmount } = renderGraph();
+      unmount();
+      mocks.downloadSelection.current!('png');
+      await act(() => Promise.resolve());
+      expect(drawnImages).toBe(0);
+      expect(mocks.download).not.toHaveBeenCalled();
+    });
+
+    // A download that quietly does nothing is indistinguishable from a broken button, so the failure
+    // is reported rather than left to escape as an unhandled rejection.
+    it('should report the failure and save nothing when the capture cannot be encoded as a png', async () => {
+      encodedBlob = null;
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      renderGraph();
+      fireEvent.click(screen.getByRole('button', { name: 'Download' }));
+      await waitFor(() => expect(mocks.addNotification).toHaveBeenCalled());
+      // The cause is named in the message, so a failure is diagnosable rather than merely reported.
+      expect(mocks.addNotification).toHaveBeenCalledWith({
+        message: 'The chart could not be saved as an image: The chart could not be encoded as an image',
+        type: 'error'
+      });
+      expect(mocks.download).not.toHaveBeenCalled();
+    });
   });
 });

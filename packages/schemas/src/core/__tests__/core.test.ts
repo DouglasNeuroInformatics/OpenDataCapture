@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  $DateLike,
   $GroupScopableSubjectName,
   $Json,
   $LicenseIdentifier,
@@ -10,6 +11,37 @@ import {
   resolveActiveLanguage,
   toInstrumentAuthoringLanguage
 } from '../core.js';
+
+describe('$DateLike', () => {
+  it('should accept a Date, returning the same instant', () => {
+    const date = new Date('2025-01-31T14:30:00.000Z');
+    expect($DateLike.parse(date)).toEqual(date);
+  });
+
+  it('should convert an ISO 8601 date-time in UTC to a Date', () => {
+    expect($DateLike.parse('2025-01-31T14:30:00.000Z')).toEqual(new Date('2025-01-31T14:30:00.000Z'));
+  });
+
+  it('should convert an ISO 8601 date-time with an offset to the instant it denotes', () => {
+    expect($DateLike.parse('2025-01-31T14:30:00+05:30')).toEqual(new Date('2025-01-31T09:00:00.000Z'));
+  });
+
+  it.each([
+    ['an empty string', ''],
+    ['null', null],
+    ['undefined', undefined],
+    ['a number', 1_738_333_800_000],
+    ['a boolean', true],
+    ['an object', {}],
+    ['a date without a time', '2025-01-31'],
+    ['a date-time without an offset, whose instant depends on the reader\u2019s time zone', '2025-01-31T14:30:00'],
+    ['a malformed string', 'yesterday'],
+    ['a date-time that does not exist', '2025-02-30T14:30:00Z'],
+    ['an invalid Date', new Date(Number.NaN)]
+  ])('should reject %s, rather than read it as some other moment', (_, value) => {
+    expect($DateLike.safeParse(value).success).toBe(false);
+  });
+});
 
 describe('$GroupScopableSubjectName', () => {
   it.each(['all', 'Instrument'])(

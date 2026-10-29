@@ -48,8 +48,9 @@ const renderReviewStep = (props: Partial<React.ComponentProps<typeof ReviewStep>
 
 const submitButton = () => screen.getByTestId<HTMLButtonElement>('bulk-submit');
 
-const errorItems = () =>
-  [...screen.getByTestId('bulk-error-list').querySelectorAll('li li')].map(({ textContent }) => textContent);
+const errorItems = () => {
+  return [...screen.getByTestId('bulk-error-list').querySelectorAll('li li')].map(({ textContent }) => textContent);
+};
 
 describe('ReviewStep', () => {
   beforeEach(() => {

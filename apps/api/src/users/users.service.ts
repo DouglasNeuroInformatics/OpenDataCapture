@@ -119,7 +119,7 @@ export class UsersService {
         mustResetPassword,
         phoneNumber,
         sex,
-        username: username
+        username
       },
       omit: {
         hashedPassword: true

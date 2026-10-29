@@ -34,6 +34,10 @@ depends only on imports can sit above the first export of an inline-exported fil
 (`src/group/group.ts`, `src/user/user.ts`). One that depends on an exported schema of the same file
 cannot be hoisted that way, so adding it means converting the file to the bottom-export shape.
 
+**Dates are `$DateLike`, never `z.coerce.date()`.** `$DateLike` in `src/core/core.ts` accepts a `Date`
+or an ISO 8601 date-time string (what `JSON.stringify` makes of a `Date`) and converts the string to a
+`Date`; `''`, `null`, a number or a date without a time are rejected, not read as some other moment.
+
 ## Naming
 
 Two variants coexist and both are deliberate.

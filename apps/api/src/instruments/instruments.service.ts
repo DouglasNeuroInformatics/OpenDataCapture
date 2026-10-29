@@ -253,12 +253,12 @@ export class InstrumentsService {
       where: { accessibleInstrumentIds: { has: id } }
     });
     await Promise.all(
-      groups.map((group) =>
-        this.groupModel.update({
+      groups.map((group) => {
+        return this.groupModel.update({
           data: { accessibleInstrumentIds: { set: group.accessibleInstrumentIds.filter((value) => value !== id) } },
           where: { id: group.id }
-        })
-      )
+        });
+      })
     );
     await this.instrumentModel.delete({ where: { id } });
     // `getInstrumentInstance` memoizes every instance it evaluates, including the one this method just
@@ -283,27 +283,20 @@ export class InstrumentsService {
       ? await this.findInstrumentIdsBySubject(query.subjectId, ability)
       : null;
 
+    let requestedSeriesGroup: undefined | { seriesGroupId: string | { in: string[] } };
+    if (query.seriesGroupId) {
+      requestedSeriesGroup = { seriesGroupId: query.seriesGroupId };
+    } else if (groupIds) {
+      requestedSeriesGroup = { seriesGroupId: { in: groupIds } };
+    }
+
     const instruments = await this.instrumentModel.findMany({
       where: {
         AND: [
           subjectInstrumentIds ? { id: { in: subjectInstrumentIds } } : {},
-          query.seriesGroupId
-            ? {
-                OR: [
-                  { seriesGroupId: null },
-                  { seriesGroupId: { isSet: false } },
-                  { seriesGroupId: query.seriesGroupId }
-                ]
-              }
-            : groupIds
-              ? {
-                  OR: [
-                    { seriesGroupId: null },
-                    { seriesGroupId: { isSet: false } },
-                    { seriesGroupId: { in: groupIds } }
-                  ]
-                }
-              : {},
+          requestedSeriesGroup
+            ? { OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }, requestedSeriesGroup] }
+            : {},
           accessibleQuery(ability, 'read', 'Instrument')
         ]
       }
@@ -556,11 +549,11 @@ export class InstrumentsService {
     const scalarSource =
       query.kind && instances.some(isSeriesInstrument) ? await this.find({}, options, groupIds) : instances;
     const scalarInstrumentIds = new Map(
-      scalarSource.flatMap((instance) =>
-        isScalarInstrument(instance) && instance.internal
+      scalarSource.flatMap((instance) => {
+        return isScalarInstrument(instance) && instance.internal
           ? [[`${instance.internal.name}:${instance.internal.edition}`, instance.id] as const]
-          : []
-      )
+          : [];
+      })
     );
 
     const results = new Map<string, InstrumentInfo>();
@@ -732,9 +725,9 @@ export class InstrumentsService {
     const normalize = (value: string) => value.trim().toLowerCase();
     const candidates = new Set(this.titleValues(title).map(normalize));
     const instances = await this.find({ seriesGroupId }, options);
-    return instances.some((instance) =>
-      this.titleValues(instance.details.title).some((value) => candidates.has(normalize(value)))
-    );
+    return instances.some((instance) => {
+      return this.titleValues(instance.details.title).some((value) => candidates.has(normalize(value)));
+    });
   }
 
   /**

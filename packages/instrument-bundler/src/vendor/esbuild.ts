@@ -1,12 +1,12 @@
 declare module 'esbuild' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/consistent-type-definitions
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/consistent-type-definitions -- an augmentation must repeat esbuild's BuildResult declaration, type parameter included, for the two to merge
   export interface BuildResult<ProvidedOptions extends BuildOptions = BuildOptions> {
     legacyScripts?: string[];
   }
 }
 
 declare module 'esbuild-wasm' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/consistent-type-definitions
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/consistent-type-definitions -- an augmentation must repeat esbuild-wasm's BuildResult declaration, type parameter included, for the two to merge
   export interface BuildResult<ProvidedOptions extends BuildOptions = BuildOptions> {
     legacyScripts?: string[];
   }

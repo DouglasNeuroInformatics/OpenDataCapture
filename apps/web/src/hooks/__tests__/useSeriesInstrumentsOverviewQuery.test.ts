@@ -59,12 +59,13 @@ describe('useSeriesInstrumentsOverviewQuery', () => {
   it('should suspend until the overview loads, then hand the parsed series to the page', async () => {
     get.mockResolvedValueOnce({ data: [series] });
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(
         QueryClientProvider,
         { client: queryClient },
         createElement(Suspense, { fallback: null }, children)
       );
+    };
     const { result } = renderHook(() => useSeriesInstrumentsOverviewQuery(), { wrapper });
     await waitFor(() => expect(result.current?.data).toHaveLength(1));
     expect(result.current.data[0]?.id).toBe('series-1');

@@ -49,7 +49,9 @@ class SynchronousMessageChannel {
 }
 
 function flushMicrotasks() {
-  return new Promise((resolve) => setTimeout(resolve, 0));
+  return new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
 }
 
 function createServiceWorker({ acknowledge = true, controlled = true, messages = [] }: ServiceWorkerOptions = {}) {
@@ -87,148 +89,150 @@ async function bootstrapAndRender(content: Partial<TestInstrumentContent>) {
   return render;
 }
 
-beforeEach(() => {
-  vi.resetModules();
-  document.head.innerHTML = '';
-  document.body.innerHTML = '';
-  document.documentElement.removeAttribute(THEME_ATTRIBUTE);
-  parentDocument = createParentDocument('light');
-  vi.stubGlobal('parent', { document: parentDocument });
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-  vi.restoreAllMocks();
-});
-
-describe('theme', () => {
-  it('should copy the parent theme on load, so the instrument matches the host app', async () => {
-    parentDocument.documentElement.setAttribute(THEME_ATTRIBUTE, 'dark');
-    await bootstrapAndRender({});
-    expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe('dark');
+describe('bootstrap', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    document.head.innerHTML = '';
+    document.body.innerHTML = '';
+    document.documentElement.removeAttribute(THEME_ATTRIBUTE);
+    parentDocument = createParentDocument('light');
+    vi.stubGlobal('parent', { document: parentDocument });
   });
 
-  it('should log an unexpected parent theme on load instead of applying it', async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    parentDocument.documentElement.setAttribute(THEME_ATTRIBUTE, 'sepia');
-    await bootstrapAndRender({});
-    expect(consoleError).toHaveBeenCalledWith(expect.stringContaining("'sepia'"));
-    expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBeNull();
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
-  it('should follow later parent theme changes, so toggling the host theme restyles the instrument', async () => {
-    await bootstrapAndRender({});
-    parentDocument.documentElement.setAttribute(THEME_ATTRIBUTE, 'dark');
-    await vi.waitFor(() => expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe('dark'));
+  describe('theme', () => {
+    it('should copy the parent theme on load, so the instrument matches the host app', async () => {
+      parentDocument.documentElement.setAttribute(THEME_ATTRIBUTE, 'dark');
+      await bootstrapAndRender({});
+      expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe('dark');
+    });
+
+    it('should log an unexpected parent theme on load instead of applying it', async () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      parentDocument.documentElement.setAttribute(THEME_ATTRIBUTE, 'sepia');
+      await bootstrapAndRender({});
+      expect(consoleError).toHaveBeenCalledWith(expect.stringContaining("'sepia'"));
+      expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBeNull();
+    });
+
+    it('should follow later parent theme changes, so toggling the host theme restyles the instrument', async () => {
+      await bootstrapAndRender({});
+      parentDocument.documentElement.setAttribute(THEME_ATTRIBUTE, 'dark');
+      await vi.waitFor(() => expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe('dark'));
+    });
+
+    it('should log an unexpected later parent theme instead of applying it', async () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      await bootstrapAndRender({});
+      parentDocument.documentElement.setAttribute(THEME_ATTRIBUTE, 'sepia');
+      await vi.waitFor(() => expect(consoleError).toHaveBeenCalledWith(expect.stringContaining("'sepia'")));
+      expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe('light');
+    });
+
+    it('should ignore changes to other parent attributes, so they never reset the instrument theme', async () => {
+      await bootstrapAndRender({});
+      document.documentElement.setAttribute(THEME_ATTRIBUTE, 'dark');
+      const onParentMutation = vi.fn();
+      new MutationObserver(onParentMutation).observe(parentDocument.documentElement, { attributes: true });
+      parentDocument.documentElement.setAttribute('class', 'sepia');
+      await vi.waitFor(() => expect(onParentMutation).toHaveBeenCalled());
+      expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe('dark');
+    });
   });
 
-  it('should log an unexpected later parent theme instead of applying it', async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    await bootstrapAndRender({});
-    parentDocument.documentElement.setAttribute(THEME_ATTRIBUTE, 'sepia');
-    await vi.waitFor(() => expect(consoleError).toHaveBeenCalledWith(expect.stringContaining("'sepia'")));
-    expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe('light');
+  describe('bundle', () => {
+    it('should throw when the frame element carries no bundle, so a broken embed fails loudly', async () => {
+      vi.stubGlobal('frameElement', createFrameElement(null));
+      await expect(import('../bootstrap.js')).rejects.toThrow("Failed to get 'data-bundle' attribute");
+    });
+
+    it('should throw when the script runs outside a frame', async () => {
+      vi.stubGlobal('frameElement', null);
+      await expect(import('../bootstrap.js')).rejects.toThrow("Failed to get 'data-bundle' attribute");
+    });
   });
 
-  it('should ignore changes to other parent attributes, so they never reset the instrument theme', async () => {
-    await bootstrapAndRender({});
-    document.documentElement.setAttribute(THEME_ATTRIBUTE, 'dark');
-    const onParentMutation = vi.fn();
-    new MutationObserver(onParentMutation).observe(parentDocument.documentElement, { attributes: true });
-    parentDocument.documentElement.setAttribute('class', 'sepia');
-    await vi.waitFor(() => expect(onParentMutation).toHaveBeenCalled());
-    expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe('dark');
-  });
-});
+  describe('content', () => {
+    it('should forward the data passed to done as a done event on the parent document', async () => {
+      const onDone = vi.fn();
+      parentDocument.addEventListener('done', (event) => onDone(event instanceof CustomEvent && event.detail));
+      await bootstrapAndRender({ render: (done) => done({ score: 42 }) });
+      expect(onDone).toHaveBeenCalledWith({ score: 42 });
+    });
 
-describe('bundle', () => {
-  it('should throw when the frame element carries no bundle, so a broken embed fails loudly', async () => {
-    vi.stubGlobal('frameElement', createFrameElement(null));
-    await expect(import('../bootstrap.js')).rejects.toThrow("Failed to get 'data-bundle' attribute");
-  });
+    it('should append a meta tag for each meta entry', async () => {
+      await bootstrapAndRender({ meta: { author: 'Jane Doe' } });
+      expect(document.head.querySelector<HTMLMetaElement>('meta[name="author"]')?.content).toBe('Jane Doe');
+    });
 
-  it('should throw when the script runs outside a frame', async () => {
-    vi.stubGlobal('frameElement', null);
-    await expect(import('../bootstrap.js')).rejects.toThrow("Failed to get 'data-bundle' attribute");
-  });
-});
+    it('should inject the decoded style into the head', async () => {
+      await bootstrapAndRender({ __injectHead: { style: encodeUnicodeToBase64('body { color: red; }') } });
+      expect(document.head.querySelector('style')?.textContent).toBe('body { color: red; }');
+    });
 
-describe('content', () => {
-  it('should forward the data passed to done as a done event on the parent document', async () => {
-    const onDone = vi.fn();
-    parentDocument.addEventListener('done', (event) => onDone(event instanceof CustomEvent && event.detail));
-    await bootstrapAndRender({ render: (done) => done({ score: 42 }) });
-    expect(onDone).toHaveBeenCalledWith({ score: 42 });
-  });
+    it('should inject the decoded scripts into the head', async () => {
+      await bootstrapAndRender({ __injectHead: { scripts: [encodeUnicodeToBase64('globalThis.injected = true;')] } });
+      const script = document.head.querySelector('script');
+      expect(script?.type).toBe('text/javascript');
+      expect(script?.textContent).toBe('globalThis.injected = true;');
+    });
 
-  it('should append a meta tag for each meta entry', async () => {
-    await bootstrapAndRender({ meta: { author: 'Jane Doe' } });
-    expect(document.head.querySelector<HTMLMetaElement>('meta[name="author"]')?.content).toBe('Jane Doe');
-  });
+    it('should append the instrument html to the body', async () => {
+      await bootstrapAndRender({ html: '<p id="greeting">Hello</p>' });
+      expect(document.getElementById('greeting')?.textContent).toBe('Hello');
+    });
 
-  it('should inject the decoded style into the head', async () => {
-    await bootstrapAndRender({ __injectHead: { style: encodeUnicodeToBase64('body { color: red; }') } });
-    expect(document.head.querySelector('style')?.textContent).toBe('body { color: red; }');
+    it('should inject nothing when the instrument declares only a render function', async () => {
+      await bootstrapAndRender({});
+      expect(document.head.childElementCount).toBe(0);
+      expect(document.body.childElementCount).toBe(0);
+    });
   });
 
-  it('should inject the decoded scripts into the head', async () => {
-    await bootstrapAndRender({ __injectHead: { scripts: [encodeUnicodeToBase64('globalThis.injected = true;')] } });
-    const script = document.head.querySelector('script');
-    expect(script?.type).toBe('text/javascript');
-    expect(script?.textContent).toBe('globalThis.injected = true;');
-  });
+  describe('static assets', () => {
+    const staticAssets = { '/hello.txt': 'data:text/plain,hi' };
 
-  it('should append the instrument html to the body', async () => {
-    await bootstrapAndRender({ html: '<p id="greeting">Hello</p>' });
-    expect(document.getElementById('greeting')?.textContent).toBe('Hello');
-  });
+    it('should register the service worker scoped to the iframe directory', async () => {
+      const { serviceWorker } = createServiceWorker();
+      await bootstrapAndRender({ staticAssets });
+      expect(serviceWorker.register).toHaveBeenCalledWith('./worker.js', { scope: './' });
+    });
 
-  it('should inject nothing when the instrument declares only a render function', async () => {
-    await bootstrapAndRender({});
-    expect(document.head.childElementCount).toBe(0);
-    expect(document.body.childElementCount).toBe(0);
-  });
-});
+    it('should post the static assets to the active worker', async () => {
+      const { postMessage } = createServiceWorker();
+      await bootstrapAndRender({ staticAssets });
+      expect(postMessage).toHaveBeenCalledWith({ staticAssets, type: 'STATIC_ASSETS' }, expect.any(Array));
+    });
 
-describe('static assets', () => {
-  const staticAssets = { '/hello.txt': 'data:text/plain,hi' };
+    it('should post the static assets before rendering, so the instrument can fetch them', async () => {
+      const { postMessage } = createServiceWorker();
+      let postedMessagesAtRender: number | undefined;
+      const render = () => {
+        postedMessagesAtRender = postMessage.mock.calls.length;
+      };
+      await bootstrapAndRender({ render, staticAssets });
+      expect(postedMessagesAtRender).toBe(1);
+    });
 
-  it('should register the service worker scoped to the iframe directory', async () => {
-    const { serviceWorker } = createServiceWorker();
-    await bootstrapAndRender({ staticAssets });
-    expect(serviceWorker.register).toHaveBeenCalledWith('./worker.js', { scope: './' });
-  });
+    it('should not render on worker replies other than the ready acknowledgement', async () => {
+      const { postMessage } = createServiceWorker({ acknowledge: false, messages: [null, { type: 'OTHER' }] });
+      const render = await bootstrap({ staticAssets });
+      await vi.waitFor(() => expect(postMessage).toHaveBeenCalled());
+      await flushMicrotasks();
+      expect(render).not.toHaveBeenCalled();
+    });
 
-  it('should post the static assets to the active worker', async () => {
-    const { postMessage } = createServiceWorker();
-    await bootstrapAndRender({ staticAssets });
-    expect(postMessage).toHaveBeenCalledWith({ staticAssets, type: 'STATIC_ASSETS' }, expect.any(Array));
-  });
-
-  it('should post the static assets before rendering, so the instrument can fetch them', async () => {
-    const { postMessage } = createServiceWorker();
-    let postedMessagesAtRender: number | undefined;
-    const render = () => {
-      postedMessagesAtRender = postMessage.mock.calls.length;
-    };
-    await bootstrapAndRender({ render, staticAssets });
-    expect(postedMessagesAtRender).toBe(1);
-  });
-
-  it('should not render on worker replies other than the ready acknowledgement', async () => {
-    const { postMessage } = createServiceWorker({ acknowledge: false, messages: [null, { type: 'OTHER' }] });
-    const render = await bootstrap({ staticAssets });
-    await vi.waitFor(() => expect(postMessage).toHaveBeenCalled());
-    await flushMicrotasks();
-    expect(render).not.toHaveBeenCalled();
-  });
-
-  it('should wait for the worker to take control before posting assets, so the first fetch is intercepted', async () => {
-    const { changeController, postMessage, serviceWorker } = createServiceWorker({ controlled: false });
-    const render = await bootstrap({ staticAssets });
-    await vi.waitFor(() => expect(serviceWorker.addEventListener).toHaveBeenCalled());
-    expect(postMessage).not.toHaveBeenCalled();
-    changeController();
-    await vi.waitFor(() => expect(render).toHaveBeenCalled());
+    it('should wait for the worker to take control before posting assets, so the first fetch is intercepted', async () => {
+      const { changeController, postMessage, serviceWorker } = createServiceWorker({ controlled: false });
+      const render = await bootstrap({ staticAssets });
+      await vi.waitFor(() => expect(serviceWorker.addEventListener).toHaveBeenCalled());
+      expect(postMessage).not.toHaveBeenCalled();
+      changeController();
+      await vi.waitFor(() => expect(render).toHaveBeenCalled());
+    });
   });
 });

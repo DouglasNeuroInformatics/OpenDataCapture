@@ -13,7 +13,7 @@ const runBeforeLoad = () => {
   return null;
 };
 
-describe('_app index route', () => {
+describe('Route', () => {
   it('should redirect to the dashboard, since the app root has no page of its own', () => {
     const thrown = runBeforeLoad();
     expect(isRedirect(thrown)).toBe(true);

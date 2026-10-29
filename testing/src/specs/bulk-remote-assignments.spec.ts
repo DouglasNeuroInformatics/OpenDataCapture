@@ -54,8 +54,9 @@ test.describe('bulk remote assignments', () => {
       .map(({ id }) => id);
   };
 
-  const post = (apiRequestContext: any, adminToken: string, path: string, data: unknown) =>
-    apiRequestContext.post(`${API}${path}`, { data, headers: { Authorization: `Bearer ${adminToken}` } });
+  const post = (apiRequestContext: any, adminToken: string, path: string, data: unknown) => {
+    return apiRequestContext.post(`${API}${path}`, { data, headers: { Authorization: `Bearer ${adminToken}` } });
+  };
 
   test('should create one assignment per subject per timepoint, and refuse a repeat as a conflict', async ({
     adminToken,

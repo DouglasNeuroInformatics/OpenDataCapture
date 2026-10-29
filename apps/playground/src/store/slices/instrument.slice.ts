@@ -17,15 +17,16 @@ function loadDefaultInstrument(
 }
 
 export const createInstrumentSlice: SliceCreator<InstrumentSlice> = (set) => ({
-  addInstrument: (instrument) =>
-    set((state) => {
+  addInstrument: (instrument) => {
+    return set((state) => {
       const isExisting = state.instruments.find((item) => instrument.id === item.id);
       if (isExisting) {
         console.error(`Instrument with ID '${instrument.id}' already exists`);
         return;
       }
       state.instruments.push(instrument);
-    }),
+    });
+  },
   instruments: defaultInstruments,
   removeInstrument: (id) => {
     set((state) => {

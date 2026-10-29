@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
 
-import { $BaseModel, $Permissions, isGrantablePermission } from '../core/core.js';
+import { $BaseModel, $DateLike, $Permissions, isGrantablePermission } from '../core/core.js';
 import { $EmailDeliveryResult } from '../mail/mail.js';
 import { $Sex } from '../subject/subject.js';
 
@@ -63,9 +63,9 @@ export type PasswordErrorCode = (typeof PASSWORD_ERROR_CODES)[number];
 export type User = z.infer<typeof $User>;
 export const $User = $BaseModel.extend({
   additionalPermissions: $Permissions,
-  archivedAt: z.coerce.date().nullish(),
+  archivedAt: $DateLike.nullish(),
   basePermissionLevel: $BasePermissionLevel.nullable(),
-  dateOfBirth: z.coerce.date().nullish(),
+  dateOfBirth: $DateLike.nullish(),
   disabled: z.boolean().nullish(),
   email: z.email().nullish(),
   firstName: z.string().min(1),
@@ -98,7 +98,7 @@ export const $CreateUserData = $User
     username: true
   })
   .extend({
-    dateOfBirth: z.coerce.date().optional(),
+    dateOfBirth: $DateLike.optional(),
     disabled: z.boolean().optional(),
     email: z.email().optional(),
     mustResetPassword: z.boolean().optional(),

@@ -106,6 +106,8 @@ async function beginAt(bundle: string, onSubmit = vi.fn()) {
   return { onSubmit };
 }
 
+const noop = () => undefined;
+
 describe('ScalarInstrumentRenderer', () => {
   beforeAll(() => {
     i18n.init({ translations: {} });
@@ -195,7 +197,7 @@ describe('ScalarInstrumentRenderer', () => {
   });
 
   it('should keep blocking navigation while uploaded files are still being saved', async () => {
-    const onSubmit = vi.fn(() => new Promise<void>(() => undefined));
+    const onSubmit = vi.fn(() => new Promise<void>(noop));
     await beginAt(FILE_BUNDLE, onSubmit);
     const dropzone = await screen.findByTestId('dropzone');
     await act(async () => {

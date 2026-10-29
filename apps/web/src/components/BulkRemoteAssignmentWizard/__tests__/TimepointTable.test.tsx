@@ -12,9 +12,9 @@ const timepoints: DraftTimepoint[] = [
   { expiresAt: '2030-06-01', instrumentId: 'instrument-2', instrumentTitle: 'General Consent Form' }
 ];
 
-afterEach(cleanup);
-
 describe('TimepointTable', () => {
+  afterEach(cleanup);
+
   it('should list each instrument with its expiry', () => {
     const { container } = render(<TimepointTable timepoints={timepoints} />);
     const rows = container.querySelectorAll('tbody tr');

@@ -16,11 +16,12 @@ test.describe('group switcher', () => {
     await dashboardPage.goto('/dashboard');
     await expect(dashboardPage.groupSwitcher).toContainText(memberGroup.name);
 
-    const scopedSummary = page.waitForRequest(
-      (request) =>
+    const scopedSummary = page.waitForRequest((request) => {
+      return (
         new URL(request.url()).pathname === '/v1/summary' &&
         new URL(request.url()).searchParams.get('groupId') === otherGroup.id
-    );
+      );
+    });
     await dashboardPage.switchGroup(otherGroup.name);
     await scopedSummary;
   });

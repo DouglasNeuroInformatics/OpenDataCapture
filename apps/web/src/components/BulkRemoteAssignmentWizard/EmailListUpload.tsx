@@ -124,12 +124,13 @@ export const EmailListUpload = ({
     }
   };
 
-  const handleFile = (file: File) =>
-    void run(async () => {
+  const handleFile = (file: File) => {
+    return void run(async () => {
       return isWorkbookFile(file)
         ? parseEmailListWorkbook(file)
         : (assertFileSize(file), parseEmailListText(await file.text()));
     });
+  };
 
   const claimed = new Set(Object.values(mapping).filter((field): field is EmailField => Boolean(field)));
 
@@ -148,7 +149,7 @@ export const EmailListUpload = ({
     });
   };
 
-  const applyMapping = () => {
+  const handleApplyMapping = () => {
     const {
       emails: resolved,
       missingEmail,
@@ -176,7 +177,7 @@ export const EmailListUpload = ({
     setExpanded(false);
   };
 
-  const downloadTemplate = () => {
+  const handleDownloadTemplate = () => {
     const rows = selectedIds.map((id) => `${removeSubjectIdScope(id)},`);
     downloadCsv(`subject_id,email\r\n${rows.join('\r\n')}`, 'email-list-template.csv');
   };
@@ -305,7 +306,7 @@ export const EmailListUpload = ({
                 })}
               </p>
               <div className="flex items-center gap-3">
-                <Button data-testid="email-list-download-template" type="button" onClick={downloadTemplate}>
+                <Button data-testid="email-list-download-template" type="button" onClick={handleDownloadTemplate}>
                   <DownloadIcon className="mr-1.5 h-4 w-4" />
                   {t(
                     {
@@ -406,7 +407,7 @@ export const EmailListUpload = ({
                   disabled={!hasSubjectId || !hasEmail}
                   size="sm"
                   type="button"
-                  onClick={applyMapping}
+                  onClick={handleApplyMapping}
                 >
                   {t({ en: 'Apply Emails', es: 'Aplicar correos', fr: 'Appliquer les courriels' })}
                 </Button>

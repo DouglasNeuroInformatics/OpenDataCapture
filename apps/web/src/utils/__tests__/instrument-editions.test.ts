@@ -5,16 +5,18 @@ import { getEditionOptions, selectLatestEditions } from '../instrument-editions'
 
 const instrument = (id: string, name: string, edition: number) => ({ id, internal: { edition, name } });
 
-const scalar = (id: string, name: string, edition: number) =>
-  ({
+const scalar = (id: string, name: string, edition: number) => {
+  return {
     details: { title: name },
     id,
     internal: { edition, name },
     kind: 'FORM'
-  }) as unknown as TranslatedInstrumentInfo;
+  } as unknown as TranslatedInstrumentInfo;
+};
 
-const series = (id: string) =>
-  ({ details: { title: id }, id, kind: 'SERIES', seriesItems: [] }) as unknown as TranslatedInstrumentInfo;
+const series = (id: string) => {
+  return { details: { title: id }, id, kind: 'SERIES', seriesItems: [] } as unknown as TranslatedInstrumentInfo;
+};
 
 describe('selectLatestEditions', () => {
   it('should keep only the highest edition of each instrument, whatever order the editions arrive in', () => {

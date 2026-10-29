@@ -13,22 +13,22 @@ let stderrSpy: ReturnType<typeof vi.spyOn>;
 
 vi.mock('node:child_process', () => ({ spawn: vi.fn(() => ({ unref: vi.fn() })) }));
 
-beforeEach(() => {
-  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'playground-url-cli-'));
-  vi.spyOn(process, 'exit').mockImplementation((code) => {
-    throw new Error(`EXIT:${code}`);
-  });
-  stdoutSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
-  stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
-  vi.resetModules();
-});
-
-afterEach(() => {
-  fs.rmSync(tmpDir, { force: true, recursive: true });
-  vi.restoreAllMocks();
-});
-
 describe('cli', () => {
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'playground-url-cli-'));
+    vi.spyOn(process, 'exit').mockImplementation((code) => {
+      throw new Error(`EXIT:${code}`);
+    });
+    stdoutSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+    stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { force: true, recursive: true });
+    vi.restoreAllMocks();
+  });
+
   it('should write a share URL to stdout for a directory of shareable source files', async () => {
     fs.writeFileSync(path.join(tmpDir, 'index.ts'), 'export default {};');
     process.argv = ['node', 'cli.js', tmpDir];

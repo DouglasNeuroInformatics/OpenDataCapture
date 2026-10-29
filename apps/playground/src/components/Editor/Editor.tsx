@@ -33,8 +33,8 @@ export const Editor = () => {
   const addFiles = useAppStore((store) => store.addFiles);
   const openFilenames = useAppStore((store) => store.openFilenames);
   const filenames = useAppStore(
-    useShallow((store) =>
-      store.files
+    useShallow((store) => {
+      return store.files
         .map((file) => file.name)
         .toSorted((a, b) => {
           if (a === store.indexFilename) {
@@ -50,8 +50,8 @@ export const Editor = () => {
             return -1;
           }
           return a.localeCompare(b);
-        })
-    )
+        });
+    })
   );
 
   const selectedFilename = useAppStore((store) => store.selectedFilename);

@@ -59,7 +59,7 @@ test.describe('upload', () => {
     await expect(page.getByText("Invalid number type: 'not-a-number'")).toBeVisible();
 
     await uploadInstrumentPage.tryAgainButton.click();
-    await expect(uploadInstrumentPage.errorHeading).not.toBeVisible();
+    await expect(uploadInstrumentPage.errorHeading).toBeHidden();
     await expect(uploadInstrumentPage.submitButton).toBeVisible();
   });
 
@@ -123,7 +123,9 @@ test.describe('upload instrument selection while loading', () => {
       }
     });
     await page.route('**/v1/instruments/info*', async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1500);
+      });
       await route.continue();
     });
 

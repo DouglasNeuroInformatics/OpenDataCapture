@@ -1,4 +1,4 @@
-/* eslint-disable import/exports-last */
+/* eslint-disable import/exports-last -- forked from starlight-typedoc, so each private helper stays beside the exported function that uses it for porting upstream changes */
 
 import path from 'node:path';
 
@@ -137,9 +137,11 @@ function getSidebarGroupFromReflections(
         const directory = `${outputDirectory}/${slug(group.title.toLowerCase())}`;
 
         // The groups generated using the `@group` tag do not have an associated directory on disk.
-        const isGroupWithDirectory = group.children.some((child) =>
-          path.posix.join(baseOutputDirectory, pageUrls.get(child)?.replace('\\', '/') ?? '').startsWith(directory)
-        );
+        const isGroupWithDirectory = group.children.some((child) => {
+          return path.posix
+            .join(baseOutputDirectory, pageUrls.get(child)?.replace('\\', '/') ?? '')
+            .startsWith(directory);
+        });
 
         if (!isGroupWithDirectory) {
           return undefined;

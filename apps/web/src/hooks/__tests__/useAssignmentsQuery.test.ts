@@ -26,8 +26,9 @@ const ASSIGNMENT = {
 
 function renderAssignmentsQuery(params?: { groupId?: string; subjectId?: string }) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return renderHook(() => useAssignmentsQuery({ params }), { wrapper });
 }
 

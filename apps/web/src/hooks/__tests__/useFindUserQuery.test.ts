@@ -4,6 +4,7 @@ import { createElement, Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { useFindUserQuery, useFindUserQueryOptions } from '../useFindUserQuery';
 
@@ -25,8 +26,13 @@ const USER = {
 
 function renderFindUserQuery(id: string) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { client: queryClient }, createElement(Suspense, { fallback: null }, children));
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      createElement(Suspense, { fallback: null }, children)
+    );
+  };
   return renderHook(() => useFindUserQuery(id), { wrapper });
 }
 
@@ -50,7 +56,7 @@ describe('useFindUserQuery', () => {
 
   it('should reject a malformed user rather than render an incomplete profile', async () => {
     mockAxios.get.mockResolvedValue({ data: { ...USER, username: '' } });
-    await expect(new QueryClient().fetchQuery(useFindUserQueryOptions('user-1'))).rejects.toThrow();
+    await expect(new QueryClient().fetchQuery(useFindUserQueryOptions('user-1'))).rejects.toThrow(z.ZodError);
   });
 });
 

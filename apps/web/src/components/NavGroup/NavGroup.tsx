@@ -22,8 +22,12 @@ const isItemActive = (item: NavItem, pathname: string, searchParams: { [key: str
   if (item.children) {
     return item.children.some((child) => isItemActive(child, pathname, searchParams));
   }
-  if (item.url !== pathname) return false;
-  if (!item.search) return true;
+  if (item.url !== pathname) {
+    return false;
+  }
+  if (!item.search) {
+    return true;
+  }
   return Object.entries(item.search).every(([k, v]) => String(searchParams[k]) === v);
 };
 
@@ -67,8 +71,8 @@ export const NavGroup = ({
       </button>
       {isOpen && (
         <div className="ml-4 flex flex-col border-l border-slate-500/30 pl-1">
-          {items.map((item) =>
-            item.children ? (
+          {items.map((item) => {
+            return item.children ? (
               <NavGroup
                 activeClassName={activeClassName}
                 childClassName={childClassName}
@@ -92,8 +96,8 @@ export const NavGroup = ({
                 url={item.url!}
                 onClick={onNavigate}
               />
-            )
-          )}
+            );
+          })}
         </div>
       )}
     </div>

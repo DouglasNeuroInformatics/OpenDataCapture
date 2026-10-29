@@ -118,9 +118,9 @@ export class AssignmentsService {
       // Bounded concurrency: key generation is CPU-bound, and a 500-subject batch spawning every
       // keypair at once would starve the event loop for the rest of the process.
       for (const batch of chunk(
-        timepoints.flatMap(({ expiresAt, instrumentId }) =>
-          subjectIds.map((subjectId) => ({ expiresAt, instrumentId, subjectId }))
-        ),
+        timepoints.flatMap(({ expiresAt, instrumentId }) => {
+          return subjectIds.map((subjectId) => ({ expiresAt, instrumentId, subjectId }));
+        }),
         BULK_KEYPAIR_CONCURRENCY
       )) {
         staged.push(...(await Promise.all(batch.map((row) => this.stageAssignment({ ...row, groupId })))));

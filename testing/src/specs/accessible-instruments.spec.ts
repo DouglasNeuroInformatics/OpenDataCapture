@@ -30,6 +30,6 @@ test.describe('accessible instruments', () => {
     await accessibleInstrumentsPage.search('Happiness');
 
     await expect(accessibleInstrumentsPage.instrumentCard('Happiness Questionnaire')).toBeVisible();
-    await expect(nonMatchingCard).not.toBeVisible();
+    await expect(nonMatchingCard).toBeHidden();
   });
 });

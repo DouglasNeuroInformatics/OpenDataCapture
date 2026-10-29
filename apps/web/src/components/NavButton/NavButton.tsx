@@ -37,7 +37,7 @@ export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(fun
         if (onClick) {
           onClick(url, search);
         } else {
-          void navigate({ search: search, to: url });
+          void navigate({ search, to: url });
         }
       }}
       {...props}

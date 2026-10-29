@@ -15,12 +15,13 @@ export function useSendAssignmentEmailMutation() {
       language: Language;
       recipient: string;
       templateId?: null | string;
-    }) =>
-      postAssignmentEmail(`/v1/assignments/${encodeURIComponent(assignmentId)}/email`, {
+    }) => {
+      return postAssignmentEmail(`/v1/assignments/${encodeURIComponent(assignmentId)}/email`, {
         language,
         recipient,
         templateId
-      }),
+      });
+    },
     // The caller renders its own failure message inline; escalating would replace the whole page.
     throwOnError: false
   });

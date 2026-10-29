@@ -143,9 +143,9 @@ function buildMapping(headers: string[]): {
 
   for (const header of headers) {
     const normalized = normalizeHeader(header);
-    const field = (Object.keys(FIELD_ALIASES) as CanonicalField[]).find((candidate) =>
-      FIELD_ALIASES[candidate].includes(normalized)
-    );
+    const field = (Object.keys(FIELD_ALIASES) as CanonicalField[]).find((candidate) => {
+      return FIELD_ALIASES[candidate].includes(normalized);
+    });
     if (!field) {
       continue;
     }
@@ -349,9 +349,9 @@ async function readWorkbook(file: File): Promise<SourceTable> {
   });
   return {
     headers: Object.keys(rows[0] ?? {}).map((header) => header.trim()),
-    rows: rows.map((row) =>
-      Object.fromEntries(Object.entries(row).map(([key, value]) => [key.trim(), cellToString(value)]))
-    )
+    rows: rows.map((row) => {
+      return Object.fromEntries(Object.entries(row).map(([key, value]) => [key.trim(), cellToString(value)]));
+    })
   };
 }
 

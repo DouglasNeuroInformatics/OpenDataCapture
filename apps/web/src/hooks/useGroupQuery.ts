@@ -4,8 +4,8 @@ import axios from 'axios';
 
 const GROUP_QUERY_KEY = 'group';
 
-export const groupQueryOptions = (groupId: null | string | undefined) =>
-  queryOptions({
+export const groupQueryOptions = (groupId: null | string | undefined) => {
+  return queryOptions({
     enabled: Boolean(groupId),
     queryFn: async () => {
       const response = await axios.get(`/v1/groups/${groupId}`);
@@ -13,6 +13,7 @@ export const groupQueryOptions = (groupId: null | string | undefined) =>
     },
     queryKey: [GROUP_QUERY_KEY, groupId]
   });
+};
 
 export function useGroupQuery(groupId: null | string | undefined) {
   return useQuery(groupQueryOptions(groupId));

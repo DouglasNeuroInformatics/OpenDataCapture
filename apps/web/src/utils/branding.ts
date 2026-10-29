@@ -45,7 +45,9 @@ export function getLoginGradient(branding?: BrandingConfig | null): string {
  */
 export function getRightPanelGradient(branding?: BrandingConfig | null): null | string {
   const theme = branding?.rightPanelTheme;
-  if (!theme) return null;
+  if (!theme) {
+    return null;
+  }
   if (theme === 'custom') {
     const primary = branding?.rightPanelPrimaryColor ?? LOGIN_THEME_COLORS.slate.primary;
     const secondary = branding?.rightPanelSecondaryColor ?? LOGIN_THEME_COLORS.slate.secondary;

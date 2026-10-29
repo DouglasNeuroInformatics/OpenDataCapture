@@ -48,7 +48,9 @@ describe('InstrumentMeasuresService', () => {
 
     it('should log the invalid data, so the failing record can be diagnosed', () => {
       const measures = { score: { kind: 'const', label: 'Total Score', ref: 'score' } } as const;
-      expect(() => instrumentMeasuresService.computeMeasures(measures, null)).toThrow();
+      expect(() => instrumentMeasuresService.computeMeasures(measures, null)).toThrow(
+        "Failed to compute measure 'Total Score'"
+      );
       expect(loggingService.error).toHaveBeenCalledWith({ data: null, message: 'Invalid Data' });
     });
 

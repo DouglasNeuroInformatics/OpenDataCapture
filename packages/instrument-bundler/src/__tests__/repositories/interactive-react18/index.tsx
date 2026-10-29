@@ -7,8 +7,12 @@ const Task = ({ done }: { done: (data: { value: number }) => void }) => {
   const [value, setValue] = useState(0);
   return (
     <div>
-      <button onClick={() => setValue(value + 1)}>Increment</button>
-      <button onClick={() => done({ value })}>Done</button>
+      <button type="button" onClick={() => setValue(value + 1)}>
+        Increment
+      </button>
+      <button type="button" onClick={() => done({ value })}>
+        Done
+      </button>
     </div>
   );
 };

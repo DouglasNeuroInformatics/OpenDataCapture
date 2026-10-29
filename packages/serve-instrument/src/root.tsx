@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import type { Language } from '@douglasneuroinformatics/libui/i18n';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { ScalarInstrumentRenderer } from '@opendatacapture/react-core';
 import { decodeBase64ToUnicode } from '@opendatacapture/runtime-internal';
 
@@ -20,8 +21,9 @@ const LanguageSwitcher: React.FC = () => {
     <div className="flex gap-2">
       {(['en', 'fr'] satisfies Language[]).map((l) => (
         <button
-          className={`text-sm uppercase ${lang === l ? 'font-bold underline' : 'text-gray-500 hover:text-gray-900'}`}
+          className={cn('text-sm uppercase', lang === l ? 'font-bold underline' : 'text-gray-500 hover:text-gray-900')}
           key={l}
+          type="button"
           onClick={() => i18n.changeLanguage(l)}
         >
           {l}
@@ -97,7 +99,7 @@ export const Root: React.FC<RootProps> = (props) => {
           key={props.encodedBundle}
           target={{ bundle: decodeBase64ToUnicode(props.encodedBundle), id: null! }}
           onSubmit={({ data }) => {
-            // eslint-disable-next-line no-alert
+            // eslint-disable-next-line no-alert -- the dev server has no backend to submit to, so a dialog shows the payload that would be sent
             alert(JSON.stringify({ _message: 'The following data will be submitted', data }, null, 2));
           }}
         />
@@ -126,7 +128,7 @@ export const Root: React.FC<RootProps> = (props) => {
         key={props.encodedBundle}
         target={{ bundle: decodeBase64ToUnicode(props.encodedBundle), id: null! }}
         onSubmit={({ data }) => {
-          // eslint-disable-next-line no-alert
+          // eslint-disable-next-line no-alert -- the dev server has no backend to submit to, so a dialog shows the payload that would be sent
           alert(JSON.stringify({ _message: 'The following data will be submitted', data }, null, 2));
         }}
       />

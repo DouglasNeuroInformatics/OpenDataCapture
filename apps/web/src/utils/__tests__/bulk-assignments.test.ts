@@ -26,8 +26,9 @@ vi.mock('xlsx', async (importOriginal) => {
 });
 
 /** The ids a resolve kept, which is what most of these tests are about. */
-const resolvedIds = async (...args: Parameters<typeof resolveSubjectIds>) =>
-  (await resolveSubjectIds(...args)).matched.map(({ id }) => id);
+const resolvedIds = async (...args: Parameters<typeof resolveSubjectIds>) => {
+  return (await resolveSubjectIds(...args)).matched.map(({ id }) => id);
+};
 
 const resolve = (input: string, maxSubjects = 500) => resolvedIds(parseDelimitedText(input), { maxSubjects });
 
@@ -182,9 +183,9 @@ describe('resolveSubjectIds', () => {
   });
 
   it('should number errors by the row of the user file, counting the header as row 1', async () => {
-    const errors = await failureOf(() =>
-      resolve('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M\nAnne,Roy,2000-01-02,X')
-    );
+    const errors = await failureOf(() => {
+      return resolve('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M\nAnne,Roy,2000-01-02,X');
+    });
     expect(errors[0]).toMatchObject({ row: 3 });
   });
 
@@ -204,9 +205,9 @@ describe('resolveSubjectIds', () => {
   });
 
   it('should reject two PII rows describing the same person, which resolve to one id', async () => {
-    const errors = await failureOf(() =>
-      resolve('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M\nJean,Tremblay,2000-01-01,M')
-    );
+    const errors = await failureOf(() => {
+      return resolve('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M\nJean,Tremblay,2000-01-01,M');
+    });
     expect(errors[0]?.message).toContain('more than once');
   });
 
@@ -227,6 +228,84 @@ describe('resolveSubjectIds', () => {
     expect(combined).not.toContain('Jean');
     expect(combined).not.toContain('Tremblay');
     expect(combined).not.toContain('2000-01-01');
+  });
+
+  describe('identifier forms', () => {
+    const idCsv = (value: string) => parseDelimitedText(`subjectId\n${value}`);
+
+    it('should scope a custom identifier written the way the app displays it', async () => {
+      await expect(resolvedIds(idCsv('ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })).resolves.toEqual([
+        'Depression_Clinic$ex_111'
+      ]);
+    });
+
+    it('should leave an already scoped identifier alone', async () => {
+      await expect(
+        resolvedIds(idCsv('Depression_Clinic$ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })
+      ).resolves.toEqual(['Depression_Clinic$ex_111']);
+    });
+
+    it('should leave a generated digest alone, since those are never scoped', async () => {
+      const digest = 'a'.repeat(64);
+      await expect(resolvedIds(idCsv(digest), { groupName: 'Depression Clinic', maxSubjects: 10 })).resolves.toEqual([
+        digest
+      ]);
+    });
+
+    it('should pass values through unchanged when no group is known', async () => {
+      await expect(resolvedIds(idCsv('ex_111'), { maxSubjects: 10 })).resolves.toEqual(['ex_111']);
+    });
+
+    it('should match a truncated identifier against known subjects by prefix', async () => {
+      const fullId = 'a'.repeat(64);
+      await expect(
+        resolvedIds(idCsv('aaaaaaaaa'), {
+          groupName: 'Depression Clinic',
+          knownSubjectIds: [fullId],
+          maxSubjects: 10
+        })
+      ).resolves.toEqual([fullId]);
+    });
+
+    it('should report an ambiguous truncated identifier as ambiguous, rather than guess one of the subjects', async () => {
+      const id1 = 'a'.repeat(64);
+      const id2 = `${'a'.repeat(63)}b`;
+      const resolution = await resolveSubjectIds(idCsv('aaaaaaaaa'), {
+        groupName: 'Depression Clinic',
+        knownSubjectIds: [id1, id2],
+        maxSubjects: 10
+      });
+      expect(resolution).toEqual({ ambiguousRows: [2], matched: [], unknownRows: [] });
+    });
+
+    it('should report a row naming a subject the group does not have, so a stranger is caught before the API', async () => {
+      const resolution = await resolveSubjectIds(idCsv('ex_111'), {
+        groupName: 'Depression Clinic',
+        knownSubjectIds: ['Depression_Clinic$ex_222'],
+        maxSubjects: 10
+      });
+      expect(resolution).toEqual({ ambiguousRows: [], matched: [], unknownRows: [2] });
+    });
+
+    it('should keep the rows the group can place beside the ones it cannot, so the caller can skip them', async () => {
+      const parsed = parseDelimitedText('subjectId\nex_111\nex_222');
+      const resolution = await resolveSubjectIds(parsed, {
+        groupName: 'Depression Clinic',
+        knownSubjectIds: ['Depression_Clinic$ex_222'],
+        maxSubjects: 10
+      });
+      expect(resolution).toEqual({
+        ambiguousRows: [],
+        matched: [{ id: 'Depression_Clinic$ex_222', rowNumber: 3 }],
+        unknownRows: [2]
+      });
+    });
+
+    it('should report personal information the group cannot place by row, never by name', async () => {
+      const parsed = parseDelimitedText('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M');
+      const resolution = await resolveSubjectIds(parsed, { knownSubjectIds: [], maxSubjects: 10 });
+      expect(resolution).toEqual({ ambiguousRows: [], matched: [], unknownRows: [2] });
+    });
   });
 });
 
@@ -316,32 +395,53 @@ describe('buildResultRows', () => {
     });
     expect(rows).toHaveLength(2);
   });
-});
 
-describe('buildResultRows subject columns', () => {
-  it('should carry the identifier untruncated, since a prefix cannot be pasted back in', () => {
-    const [row] = buildResultRows({
-      assignments: [
-        {
-          expiresAt: '2027-09-10T23:59:59.999Z',
-          instrumentId: 'i1',
-          subjectId: 'a'.repeat(64),
-          url: 'http://x/a1'
-        }
-      ],
-      instrumentTitleById: {}
+  describe('subject columns', () => {
+    it('should carry the identifier untruncated, since a prefix cannot be pasted back in', () => {
+      const [row] = buildResultRows({
+        assignments: [
+          {
+            expiresAt: '2027-09-10T23:59:59.999Z',
+            instrumentId: 'i1',
+            subjectId: 'a'.repeat(64),
+            url: 'http://x/a1'
+          }
+        ],
+        instrumentTitleById: {}
+      });
+      expect(row?.subject).toBe('a'.repeat(64));
     });
-    expect(row?.subject).toBe('a'.repeat(64));
-  });
 
-  it('should strip the group scope from a custom identifier, as the app does', () => {
-    const [row] = buildResultRows({
-      assignments: [
-        { expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'Depression_Clinic$ex_111', url: 'http://x/a1' }
-      ],
-      instrumentTitleById: {}
+    it('should strip the group scope from a custom identifier, as the app does', () => {
+      const [row] = buildResultRows({
+        assignments: [
+          { expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'Depression_Clinic$ex_111', url: 'http://x/a1' }
+        ],
+        instrumentTitleById: {}
+      });
+      expect(row?.subject).toBe('ex_111');
     });
-    expect(row?.subject).toBe('ex_111');
+
+    describe('result column order', () => {
+      it('should lead every row with the subject, ahead of the uploaded columns', () => {
+        const [row] = buildResultRows({
+          assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' }],
+          instrumentTitleById: {},
+          sourceRowBySubjectId: { 'subject-1': { firstName: 'Marie', lastName: 'Belanger' } }
+        });
+        // Pinned because `perfectionist` sorts object literals; the spread is what keeps this first.
+        expect(Object.keys(row!)[0]).toBe('subject');
+      });
+
+      it('should put the subject first in the clipboard table too', () => {
+        const rows = buildResultRows({
+          assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' }],
+          instrumentTitleById: {},
+          sourceRowBySubjectId: { 'subject-1': { firstName: 'Marie' } }
+        });
+        expect(toResultTsv(rows).split('\n')[0]?.split('\t')[0]).toBe('subject');
+      });
+    });
   });
 });
 
@@ -377,105 +477,6 @@ describe('toResultTsv', () => {
     });
     expect(Object.keys(rows[0]!)).not.toContain('subjectId');
     expect(rows[0]?.subject).toBe('a'.repeat(64));
-  });
-});
-
-describe('result column order', () => {
-  it('should lead every row with the subject, ahead of the uploaded columns', () => {
-    const [row] = buildResultRows({
-      assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' }],
-      instrumentTitleById: {},
-      sourceRowBySubjectId: { 'subject-1': { firstName: 'Marie', lastName: 'Belanger' } }
-    });
-    // Pinned because `perfectionist` sorts object literals; the spread is what keeps this first.
-    expect(Object.keys(row!)[0]).toBe('subject');
-  });
-
-  it('should put the subject first in the clipboard table too', () => {
-    const rows = buildResultRows({
-      assignments: [{ expiresAt: '2027-01-01', instrumentId: 'i1', subjectId: 'subject-1', url: 'http://x/a1' }],
-      instrumentTitleById: {},
-      sourceRowBySubjectId: { 'subject-1': { firstName: 'Marie' } }
-    });
-    expect(toResultTsv(rows).split('\n')[0]?.split('\t')[0]).toBe('subject');
-  });
-});
-
-describe('resolveSubjectIds identifier forms', () => {
-  const idCsv = (value: string) => parseDelimitedText(`subjectId\n${value}`);
-
-  it('should scope a custom identifier written the way the app displays it', async () => {
-    await expect(resolvedIds(idCsv('ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })).resolves.toEqual([
-      'Depression_Clinic$ex_111'
-    ]);
-  });
-
-  it('should leave an already scoped identifier alone', async () => {
-    await expect(
-      resolvedIds(idCsv('Depression_Clinic$ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })
-    ).resolves.toEqual(['Depression_Clinic$ex_111']);
-  });
-
-  it('should leave a generated digest alone, since those are never scoped', async () => {
-    const digest = 'a'.repeat(64);
-    await expect(resolvedIds(idCsv(digest), { groupName: 'Depression Clinic', maxSubjects: 10 })).resolves.toEqual([
-      digest
-    ]);
-  });
-
-  it('should pass values through unchanged when no group is known', async () => {
-    await expect(resolvedIds(idCsv('ex_111'), { maxSubjects: 10 })).resolves.toEqual(['ex_111']);
-  });
-
-  it('should match a truncated identifier against known subjects by prefix', async () => {
-    const fullId = 'a'.repeat(64);
-    await expect(
-      resolvedIds(idCsv('aaaaaaaaa'), {
-        groupName: 'Depression Clinic',
-        knownSubjectIds: [fullId],
-        maxSubjects: 10
-      })
-    ).resolves.toEqual([fullId]);
-  });
-
-  it('should report an ambiguous truncated identifier as ambiguous, rather than guess one of the subjects', async () => {
-    const id1 = 'a'.repeat(64);
-    const id2 = 'a'.repeat(63) + 'b';
-    const resolution = await resolveSubjectIds(idCsv('aaaaaaaaa'), {
-      groupName: 'Depression Clinic',
-      knownSubjectIds: [id1, id2],
-      maxSubjects: 10
-    });
-    expect(resolution).toEqual({ ambiguousRows: [2], matched: [], unknownRows: [] });
-  });
-
-  it('should report a row naming a subject the group does not have, so a stranger is caught before the API', async () => {
-    const resolution = await resolveSubjectIds(idCsv('ex_111'), {
-      groupName: 'Depression Clinic',
-      knownSubjectIds: ['Depression_Clinic$ex_222'],
-      maxSubjects: 10
-    });
-    expect(resolution).toEqual({ ambiguousRows: [], matched: [], unknownRows: [2] });
-  });
-
-  it('should keep the rows the group can place beside the ones it cannot, so the caller can skip them', async () => {
-    const parsed = parseDelimitedText('subjectId\nex_111\nex_222');
-    const resolution = await resolveSubjectIds(parsed, {
-      groupName: 'Depression Clinic',
-      knownSubjectIds: ['Depression_Clinic$ex_222'],
-      maxSubjects: 10
-    });
-    expect(resolution).toEqual({
-      ambiguousRows: [],
-      matched: [{ id: 'Depression_Clinic$ex_222', rowNumber: 3 }],
-      unknownRows: [2]
-    });
-  });
-
-  it('should report personal information the group cannot place by row, never by name', async () => {
-    const parsed = parseDelimitedText('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M');
-    const resolution = await resolveSubjectIds(parsed, { knownSubjectIds: [], maxSubjects: 10 });
-    expect(resolution).toEqual({ ambiguousRows: [], matched: [], unknownRows: [2] });
   });
 });
 
@@ -722,44 +723,44 @@ describe('parseEmailListWorkbook', () => {
     const errors = await failureOf(() => parseEmailListWorkbook(file));
     expect(errors[0]?.message).toContain('no sheets');
   });
-});
 
-describe('workbook cell values', () => {
-  const workbookOf = (rows: unknown[][]) => {
-    const workbook = utils.book_new();
-    utils.book_append_sheet(workbook, utils.aoa_to_sheet(rows), 'Sheet1');
-    const bytes: ArrayBuffer = write(workbook, { bookType: 'xlsx', type: 'array' });
-    return new File([bytes], 'cells.xlsx');
-  };
+  describe('cell values', () => {
+    const workbookOf = (rows: unknown[][]) => {
+      const workbook = utils.book_new();
+      utils.book_append_sheet(workbook, utils.aoa_to_sheet(rows), 'Sheet1');
+      const bytes: ArrayBuffer = write(workbook, { bookType: 'xlsx', type: 'array' });
+      return new File([bytes], 'cells.xlsx');
+    };
 
-  it('should read a number, a boolean and a padded string as trimmed text', async () => {
-    const result = await parseEmailListWorkbook(
-      workbookOf([
-        ['subject_id', 'count', 'flag'],
-        ['  alice  ', 42, true]
-      ])
-    );
-    expect(result.rows[0]).toEqual({ count: '42', flag: 'true', subject_id: 'alice' });
-  });
-
-  it('should read a date cell as a basic ISO date, so an ISO check can be applied to it', async () => {
-    // A date is why `cellDates` is set: a locale-formatted "3/14/1982" would fail that check.
-    const result = await parseEmailListWorkbook(
-      workbookOf([
-        ['subject_id', 'dob'],
-        ['alice', new Date('1982-03-14T00:00:00.000Z')]
-      ])
-    );
-    expect(result.rows[0]?.dob).toBe('1982-03-14');
-  });
-
-  it('should read a cell of an unsupported type as empty, rather than as the word for it', async () => {
-    vi.mocked(read).mockReturnValueOnce({
-      SheetNames: ['Sheet1'],
-      Sheets: { Sheet1: utils.aoa_to_sheet([['subject_id', 'odd']]) }
+    it('should read a number, a boolean and a padded string as trimmed text', async () => {
+      const result = await parseEmailListWorkbook(
+        workbookOf([
+          ['subject_id', 'count', 'flag'],
+          ['  alice  ', 42, true]
+        ])
+      );
+      expect(result.rows[0]).toEqual({ count: '42', flag: 'true', subject_id: 'alice' });
     });
-    vi.spyOn(utils, 'sheet_to_json').mockReturnValueOnce([{ odd: { nested: true }, subject_id: 'alice' }]);
-    const result = await parseEmailListWorkbook(new File([new Uint8Array(10)], 'odd.xlsx'));
-    expect(result.rows[0]).toEqual({ odd: '', subject_id: 'alice' });
+
+    it('should read a date cell as a basic ISO date, so an ISO check can be applied to it', async () => {
+      // A date is why `cellDates` is set: a locale-formatted "3/14/1982" would fail that check.
+      const result = await parseEmailListWorkbook(
+        workbookOf([
+          ['subject_id', 'dob'],
+          ['alice', new Date('1982-03-14T00:00:00.000Z')]
+        ])
+      );
+      expect(result.rows[0]?.dob).toBe('1982-03-14');
+    });
+
+    it('should read a cell of an unsupported type as empty, rather than as the word for it', async () => {
+      vi.mocked(read).mockReturnValueOnce({
+        SheetNames: ['Sheet1'],
+        Sheets: { Sheet1: utils.aoa_to_sheet([['subject_id', 'odd']]) }
+      });
+      vi.spyOn(utils, 'sheet_to_json').mockReturnValueOnce([{ odd: { nested: true }, subject_id: 'alice' }]);
+      const result = await parseEmailListWorkbook(new File([new Uint8Array(10)], 'odd.xlsx'));
+      expect(result.rows[0]).toEqual({ odd: '', subject_id: 'alice' });
+    });
   });
 });

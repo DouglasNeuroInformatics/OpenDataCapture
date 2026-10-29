@@ -12,15 +12,11 @@ export abstract class RootPage {
     this.$ref = page;
   }
 
-  get expect() {
-    return expect(this.$ref);
-  }
-
   protected getUrlWithParams<TPath extends RouteTo>(...args: NavigateArgs<TPath>) {
     let url: string = args[0];
     if (args[1]) {
       Object.entries(args[1]).forEach(([key, value]) => {
-        url = url.replace('$' + key, String(value));
+        url = url.replace(`$${key}`, String(value));
       });
     }
     return url;
@@ -29,6 +25,6 @@ export abstract class RootPage {
   async goto<TPath extends RouteTo>(...args: NavigateArgs<TPath>): Promise<void> {
     const url = this.getUrlWithParams(...args);
     await this.$ref.goto(url);
-    await this.expect.toHaveURL(url);
+    await expect(this.$ref).toHaveURL(url);
   }
 }

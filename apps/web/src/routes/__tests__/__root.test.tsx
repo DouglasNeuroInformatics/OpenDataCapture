@@ -41,15 +41,15 @@ const importRootRouteFresh = async () => {
   await import('@/routes/__root');
 };
 
-afterEach(() => {
-  cleanup();
-  vi.restoreAllMocks();
-  vi.doUnmock('@/services/i18n');
-  vi.doUnmock('@/services/axios');
-  mocks.localizeValidationErrors.mockClear();
-});
+describe('Route', () => {
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+    vi.doUnmock('@/services/i18n');
+    vi.doUnmock('@/services/axios');
+    mocks.localizeValidationErrors.mockClear();
+  });
 
-describe('root route', () => {
   it('should render the matched child route', async () => {
     renderRootRoute();
     expect(await screen.findByText(PAGE_TEXT)).toBeTruthy();

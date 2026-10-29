@@ -463,8 +463,9 @@ test.describe('playground editor tabs', () => {
     await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
 
     await page.locator('button:has(svg.lucide-columns-3)').click();
-    const fileButton = (filename: string) =>
-      page.locator('button', { has: page.locator(`input[value="${filename}"]`) });
+    const fileButton = (filename: string) => {
+      return page.locator('button', { has: page.locator(`input[value="${filename}"]`) });
+    };
     await fileButton('a.ts').click();
     await fileButton('b.ts').click();
 

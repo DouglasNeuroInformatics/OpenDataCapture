@@ -71,8 +71,8 @@ export const Navbar = () => {
         <nav className="flex w-full grow flex-col divide-y divide-slate-200 overflow-auto dark:divide-slate-700">
           {navItems.map((items, i) => (
             <div className="flex flex-col py-1 first:pt-0 last:pb-0" key={i}>
-              {items.map(({ disabled, url, ...props }) =>
-                props.children ? (
+              {items.map(({ disabled, url, ...props }) => {
+                return props.children ? (
                   <NavGroup
                     activeClassName="bg-slate-200 text-slate-900 dark:text-slate-100 dark:bg-slate-800"
                     childClassName="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"
@@ -83,7 +83,7 @@ export const Navbar = () => {
                     label={props.label}
                     onNavigate={(to, search) => {
                       setIsOpen(false);
-                      void navigate({ search: search, to });
+                      void navigate({ search, to });
                     }}
                   />
                 ) : (
@@ -100,8 +100,8 @@ export const Navbar = () => {
                     }}
                     {...props}
                   />
-                )
-              )}
+                );
+              })}
               {i === navItems.length - 1 && (
                 <EndSessionButton
                   className="text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 hover:dark:text-slate-100"

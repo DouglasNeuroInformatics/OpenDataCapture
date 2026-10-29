@@ -65,7 +65,7 @@ const RouteComponent = () => {
     const subjectId = params.subjectId.slice(0, 7);
     const footnotes = [
       minDate
-        ? t('datahub.downloadInfo.time') + toBasicISOString(minDate) + ' - ' + toBasicISOString(new Date())
+        ? `${t('datahub.downloadInfo.time') + toBasicISOString(minDate)} - ${toBasicISOString(new Date())}`
         : t('datahub.downloadInfo.allTime')
     ];
     if (selectedMeasures.length > 0) {

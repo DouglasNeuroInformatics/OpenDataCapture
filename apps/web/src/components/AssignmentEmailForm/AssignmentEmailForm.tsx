@@ -63,7 +63,7 @@ export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: Assignm
   // leave the trigger showing a value with no matching item while a different one is posted.
   const language = languageOptions.includes(languageChoice) ? languageChoice : (languageOptions[0] ?? 'en');
 
-  const sendEmail = () => {
+  const handleSendEmail = () => {
     if (!assignment || !recipient) {
       return;
     }
@@ -84,14 +84,15 @@ export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: Assignm
         templateId: selectedTemplate === DEFAULT_TEMPLATE_OPTION ? null : selectedTemplate
       },
       {
-        onError: () =>
+        onError: () => {
           fail(
             t({
               en: 'The email could not be sent',
               es: 'No se pudo enviar el correo',
               fr: "Le courriel n'a pas pu être envoyé"
             })
-          ),
+          );
+        },
         onSuccess: (result) => {
           if (result.status !== 'SENT') {
             fail(mailErrorMessage(result.error));
@@ -202,7 +203,7 @@ export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: Assignm
           disabled={!recipient || sendEmailMutation.isPending || groupQuery.isLoading}
           type="button"
           variant="primary"
-          onClick={sendEmail}
+          onClick={handleSendEmail}
         >
           {sendEmailMutation.isPending
             ? t({ en: 'Sending…', es: 'Enviando…', fr: 'Envoi en cours…' })

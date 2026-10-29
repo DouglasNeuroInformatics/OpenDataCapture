@@ -1,6 +1,6 @@
-import * as fs from 'fs/promises';
-import * as module from 'module';
-import * as path from 'path';
+import * as fs from 'node:fs/promises';
+import * as module from 'node:module';
+import * as path from 'node:path';
 
 import type { Plugin } from 'esbuild';
 import ts from 'typescript';

@@ -1,7 +1,7 @@
-import cp from 'child_process';
-import fs from 'fs/promises';
-import path from 'path';
-import util from 'util';
+import cp from 'node:child_process';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import util from 'node:util';
 
 import { $DevelopmentReleaseInfo, $ProductionReleaseInfo } from '@opendatacapture/schemas/setup';
 import type { DevelopmentReleaseInfo, ProductionReleaseInfo, ReleaseInfo } from '@opendatacapture/schemas/setup';
@@ -53,7 +53,7 @@ export async function getReleaseInfo(): Promise<ReleaseInfo> {
   } catch (err) {
     if (err instanceof z.ZodError) {
       console.error(err.issues);
-      throw new Error(`Failed to parse release info for environment '${process.env.NODE_ENV}'`);
+      throw new Error(`Failed to parse release info for environment '${process.env.NODE_ENV}'`, { cause: err });
     }
     throw err;
   }

@@ -3,7 +3,12 @@ import { createContext, useContext } from 'react';
 import { createStore, useStore } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
-import type { FileInstrumentContentProps, FileInstrumentContentStore, UploadProgressEvent } from './types';
+import type {
+  FileInstrumentContentErrors,
+  FileInstrumentContentProps,
+  FileInstrumentContentStore,
+  UploadProgressEvent
+} from './types';
 
 export const FileInstrumentContentStoreContext = createContext<{
   store: ReturnType<typeof createFileInstrumentContentStore>;
@@ -20,7 +25,7 @@ export function createFileInstrumentContentStore(props: FileInstrumentContentPro
         },
         submit: async () => {
           const { props, uploadMap } = get();
-          const errors: FileInstrumentContentStore.Errors = {};
+          const errors: FileInstrumentContentErrors = {};
           props.instrument.content.fileGroups.forEach(({ basename, count }) => {
             const actual = uploadMap[basename]!.length;
             if (actual < count.min || actual > count.max) {
@@ -76,7 +81,9 @@ export function createFileInstrumentContentStore(props: FileInstrumentContentPro
 
           const [result] = await Promise.allSettled([
             props.onSubmit({ data: {}, kind: 'FILE', onNext, onProgress, uploadMap }),
-            new Promise((resolve) => setTimeout(resolve, 300))
+            new Promise((resolve) => {
+              setTimeout(resolve, 300);
+            })
           ]);
 
           if (result.status === 'rejected') {
@@ -90,7 +97,9 @@ export function createFileInstrumentContentStore(props: FileInstrumentContentPro
             set((state) => {
               state.uploadState!.totalProgress = 100;
             });
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            await new Promise((resolve) => {
+              setTimeout(resolve, 500);
+            });
             set((state) => {
               state.status = 'SUBMITTED';
               state.uploadState = null;

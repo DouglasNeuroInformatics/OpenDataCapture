@@ -120,7 +120,7 @@ export const MailSettings = ({ activeLanguages, config, newUserEmailTemplate }: 
     return { payload: parsed.data };
   };
 
-  const set = <K extends keyof MailConfigFormValues>(key: K, value: MailConfigFormValues[K]) => {
+  const handleFieldChange = <K extends keyof MailConfigFormValues>(key: K, value: MailConfigFormValues[K]) => {
     setValues((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
@@ -157,7 +157,7 @@ export const MailSettings = ({ activeLanguages, config, newUserEmailTemplate }: 
   };
 
   const handleToggleEnabled = async (checked: boolean) => {
-    set('enabled', checked);
+    handleFieldChange('enabled', checked);
     if (config) {
       await save(
         { config: { ...config, enabled: checked, senderName: config.senderName ?? undefined } },
@@ -203,7 +203,7 @@ export const MailSettings = ({ activeLanguages, config, newUserEmailTemplate }: 
             hasStoredPassword={Boolean(config?.hasPassword)}
             isSaving={updateMutation.isPending}
             values={values}
-            onChange={set}
+            onChange={handleFieldChange}
             onSave={() => void handleSaveConfig()}
           />
 

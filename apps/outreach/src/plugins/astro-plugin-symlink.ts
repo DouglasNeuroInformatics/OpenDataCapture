@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import url from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import url from 'node:url';
 
 import type { ViteUserConfig } from 'astro';
 
@@ -14,7 +14,9 @@ function resolveTargetPlugin(plugins: null | PluginOption[] | undefined, targetN
       continue;
     } else if (Array.isArray(plugin)) {
       const target = resolveTargetPlugin(plugin, targetName);
-      if (target) return target;
+      if (target) {
+        return target;
+      }
     } else if (plugin.name === targetName) {
       return plugin;
     }

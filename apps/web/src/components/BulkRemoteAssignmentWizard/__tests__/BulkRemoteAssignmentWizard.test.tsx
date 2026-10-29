@@ -118,17 +118,19 @@ const onBack = vi.fn();
 
 // A fresh element each time: React bails out of a re-render given the same element back, which
 // would hide a change the mocked wizard hook has made.
-const wizardElement = () => (
-  <BulkRemoteAssignmentWizard
-    defaultExpiresAt="2026-11-01"
-    groupId="group-1"
-    groupName="Depression Clinic"
-    instruments={instruments}
-    subjectIdDisplayLength={9}
-    subjects={subjects}
-    onBack={onBack}
-  />
-);
+const wizardElement = () => {
+  return (
+    <BulkRemoteAssignmentWizard
+      defaultExpiresAt="2026-11-01"
+      groupId="group-1"
+      groupName="Depression Clinic"
+      instruments={instruments}
+      subjectIdDisplayLength={9}
+      subjects={subjects}
+      onBack={onBack}
+    />
+  );
+};
 
 const renderWizard = () => render(wizardElement());
 
@@ -142,8 +144,8 @@ const mockMutateAsync = vi.fn();
  */
 type GroupStub = Partial<Pick<Group, 'activeAssignmentEmailTemplateId' | 'emailTemplates'>>;
 
-const mockSetupState = (state: Partial<SetupState>) =>
-  vi.mocked(useSetupStateQuery).mockReturnValue({
+const mockSetupState = (state: Partial<SetupState>) => {
+  return vi.mocked(useSetupStateQuery).mockReturnValue({
     data: {
       activeLanguages: ['en', 'es', 'fr'],
       isDemo: false,
@@ -155,12 +157,14 @@ const mockSetupState = (state: Partial<SetupState>) =>
       ...state
     }
   } as ReturnType<typeof useSetupStateQuery>);
+};
 
-const mockGroup = (group: GroupStub | undefined, { isLoading = false }: { isLoading?: boolean } = {}) =>
-  vi.mocked(useGroupQuery).mockReturnValue({
+const mockGroup = (group: GroupStub | undefined, { isLoading = false }: { isLoading?: boolean } = {}) => {
+  return vi.mocked(useGroupQuery).mockReturnValue({
     data: group && { activeAssignmentEmailTemplateId: null, emailTemplates: [], ...group },
     isLoading
   } as ReturnType<typeof useGroupQuery>);
+};
 
 const setupMocks = ({
   activeLanguages = ['en', 'es', 'fr'],

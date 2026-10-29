@@ -32,8 +32,9 @@ const renderUpload = (overrides: Partial<React.ComponentProps<typeof EmailListUp
   const { rerender } = render(<EmailListUpload {...props} />);
   return {
     onEmailsMerged,
-    rerenderWith: (next: Partial<React.ComponentProps<typeof EmailListUpload>>) =>
-      rerender(<EmailListUpload {...props} {...next} />)
+    rerenderWith: (next: Partial<React.ComponentProps<typeof EmailListUpload>>) => {
+      rerender(<EmailListUpload {...props} {...next} />);
+    }
   };
 };
 

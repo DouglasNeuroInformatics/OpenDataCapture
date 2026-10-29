@@ -158,9 +158,9 @@ function translateStaticField(
         options: field.options[language]
       };
     })
-    .with({ kind: P.union('boolean', 'date', 'number', 'set', 'string') }, (field) =>
-      translateScalarField(field, language)
-    )
+    .with({ kind: P.union('boolean', 'date', 'number', 'set', 'string') }, (field) => {
+      return translateScalarField(field, language);
+    })
     .exhaustive();
 }
 

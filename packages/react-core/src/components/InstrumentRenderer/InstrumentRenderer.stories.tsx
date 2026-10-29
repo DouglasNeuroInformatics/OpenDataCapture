@@ -80,7 +80,8 @@ export const BilingualFile: Story = {
           const interval = setInterval(() => {
             if (loadedBytes >= totalBytes) {
               clearInterval(interval);
-              return resolve();
+              resolve();
+              return;
             }
             const chunkSize = Math.floor(Math.random() * 65536) + 32768;
             loadedBytes = Math.min(loadedBytes + chunkSize, totalBytes);

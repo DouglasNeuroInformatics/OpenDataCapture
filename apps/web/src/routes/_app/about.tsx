@@ -77,7 +77,7 @@ const TimeValue: React.FC<{ value: number }> = ({ value }) => {
     return parseDuration(uptime * 1000).match(
       ({ days, hours, minutes, seconds }) => {
         hours += days * 24;
-        return [hours, minutes, seconds].map((value) => (value < 10 ? '0' + value : value)).join(':');
+        return [hours, minutes, seconds].map((value) => (value < 10 ? `0${value}` : value)).join(':');
       },
       (err) => {
         console.error(err);
@@ -111,7 +111,7 @@ const InfoBlock: React.FC<{
         {Object.entries(items).map(([key, value]) => (
           <li key={key}>
             <span>{key}: </span>
-            {value.startsWith('Uptime=') ? <TimeValue value={parseInt(value.slice(7))} /> : <span>{value}</span>}
+            {value.startsWith('Uptime=') ? <TimeValue value={parseInt(value.slice(7), 10)} /> : <span>{value}</span>}
           </li>
         ))}
       </ul>

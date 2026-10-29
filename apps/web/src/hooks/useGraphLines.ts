@@ -33,7 +33,7 @@ export function useGraphLines({ palette, selectedMeasures }: UseGraphLinesOption
         stroke,
         strokeDasharray: '5 5',
         strokeWidth: 0.5,
-        val: measure.key + 'Group'
+        val: `${measure.key}Group`
       });
     }
     return lines;

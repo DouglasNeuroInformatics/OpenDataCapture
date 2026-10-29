@@ -1,6 +1,6 @@
-import { once } from 'events';
-import fs from 'fs';
-import type { Server } from 'http';
+import { once } from 'node:events';
+import fs from 'node:fs';
+import type { Server } from 'node:http';
 
 import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -14,9 +14,9 @@ const { LARGE_ASSET, TEMPLATE } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/config', async () => {
-  const fs = await import('fs');
-  const os = await import('os');
-  const path = await import('path');
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const path = await import('node:path');
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gateway-production-'));
   const write = (file: string, content: string) => {
     fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
@@ -65,20 +65,22 @@ async function request(path: string, init?: RequestInit) {
   return fetch(`http://localhost:${address.port}${path}`, init);
 }
 
-afterEach(async () => {
-  await Promise.all(
-    openServers.splice(0).map((httpServer) => {
-      httpServer.closeAllConnections();
-      return new Promise((resolve) => httpServer.close(resolve));
-    })
-  );
-});
-
-afterAll(() => {
-  fs.rmSync(config.root, { force: true, recursive: true });
-});
-
 describe('ProductionServer', () => {
+  afterEach(async () => {
+    await Promise.all(
+      openServers.splice(0).map((httpServer) => {
+        httpServer.closeAllConnections();
+        return new Promise((resolve) => {
+          httpServer.close(resolve);
+        });
+      })
+    );
+  });
+
+  afterAll(() => {
+    fs.rmSync(config.root, { force: true, recursive: true });
+  });
+
   it('should serve the built client assets from the root path, so the prerendered page can load its scripts', async () => {
     const response = await request('/assets/app.js');
     expect(await response.text()).toBe(LARGE_ASSET);

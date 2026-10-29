@@ -1,4 +1,4 @@
-import * as path from 'path';
+import * as path from 'node:path';
 
 import { MANIFEST_FILENAME } from '@opendatacapture/runtime-meta';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';

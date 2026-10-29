@@ -28,7 +28,9 @@ class UninitializedTranslator extends BaseTranslator {
 }
 
 function flushMutations() {
-  return new Promise((resolve) => setTimeout(resolve));
+  return new Promise((resolve) => {
+    setTimeout(resolve);
+  });
 }
 
 function mountInstrumentFrame(name: string) {
@@ -39,21 +41,25 @@ function mountInstrumentFrame(name: string) {
   return iframe;
 }
 
-beforeEach(() => {
+function resetDocumentLanguage() {
   document.documentElement.setAttribute('lang', 'en');
-});
+}
 
-afterEach(() => {
+function restoreEnvironment() {
   vi.unstubAllGlobals();
   Reflect.deleteProperty(window, 'frameElement');
   document.documentElement.removeAttribute('dir');
   vi.restoreAllMocks();
-});
+}
 
 describe('Translator', () => {
+  beforeEach(resetDocumentLanguage);
+
   beforeEach(() => {
     vi.resetModules();
   });
+
+  afterEach(restoreEnvironment);
 
   it('should be the StandaloneTranslator in a top-level browser window', async () => {
     const { StandaloneTranslator, Translator } = await import('../i18n.js');
@@ -74,6 +80,10 @@ describe('Translator', () => {
 });
 
 describe('BaseTranslator', () => {
+  beforeEach(resetDocumentLanguage);
+
+  afterEach(restoreEnvironment);
+
   it('should refuse to translate before initialization', () => {
     const translator = new StandaloneTranslator({ translations });
     expect(() => translator.t('untranslated')).toThrow(
@@ -209,6 +219,10 @@ describe('BaseTranslator', () => {
 });
 
 describe('StandaloneTranslator', () => {
+  beforeEach(resetDocumentLanguage);
+
+  afterEach(restoreEnvironment);
+
   it('should refuse to initialize outside of a browser', () => {
     const translator = new StandaloneTranslator({ translations });
     vi.stubGlobal('window', undefined);
@@ -224,6 +238,10 @@ describe('StandaloneTranslator', () => {
 });
 
 describe('SynchronizedTranslator', () => {
+  beforeEach(resetDocumentLanguage);
+
+  afterEach(restoreEnvironment);
+
   it('should refuse to initialize outside of a browser', () => {
     const translator = new SynchronizedTranslator({ translations });
     vi.stubGlobal('window', undefined);

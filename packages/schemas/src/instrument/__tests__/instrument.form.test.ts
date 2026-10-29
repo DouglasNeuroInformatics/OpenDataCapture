@@ -1,5 +1,6 @@
 import { bilingualFormInstrument, unilingualFormInstrument } from '@opendatacapture/instrument-stubs/forms';
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod/v4';
 
 import { $$FormInstrument, $FormInstrumentBlock } from '../instrument.form.js';
 
@@ -94,6 +95,48 @@ describe('$$FormInstrument', () => {
     const measure = result.data?.measures?.hasNegativeFavoriteNumber;
     expect(measure).toMatchObject({ kind: 'computed' });
     expect(measure?.visibility).toBeUndefined();
+  });
+
+  describe('number-record options', () => {
+    const parseWithOptions = (options: { [key: string]: string }) => {
+      return $$FormInstrument().safeParse({
+        ...unilingualFormInstrument.instance,
+        content: [
+          {
+            fields: {
+              mood: {
+                items: { sleep: { label: 'Sleep' } },
+                kind: 'number-record',
+                label: 'Mood',
+                options,
+                variant: 'likert'
+              }
+            }
+          }
+        ]
+      });
+    };
+
+    it.each(['1', '0', '-1', '2.5'])('should accept %s as a scale value, since object keys are strings', (key) => {
+      expect(parseWithOptions({ [key]: 'Label' }).success).toBe(true);
+    });
+
+    it.each(['', ' ', 'one', '1a', '1e3', '0x1', 'Infinity', 'NaN'])(
+      'should reject %j as a scale value, rather than read it as a number',
+      (key) => {
+        expect(parseWithOptions({ [key]: 'Label' }).success).toBe(false);
+      }
+    );
+
+    it('should keep the options addressable by their numeric value', () => {
+      const result = parseWithOptions({ '1': 'Never', '2': 'Always' });
+      expect(result.data?.content).toMatchObject([{ fields: { mood: { options: { 1: 'Never', 2: 'Always' } } } }]);
+    });
+
+    it('should convert to a JSON Schema, which apps/outreach publishes, naming the keys as strings', () => {
+      const schema = JSON.stringify(z.toJSONSchema($$FormInstrument('en')));
+      expect(schema).toContain('"propertyNames":{"type":"string","pattern"');
+    });
   });
 });
 

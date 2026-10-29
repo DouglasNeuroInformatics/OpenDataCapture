@@ -10,13 +10,13 @@ import { expect, test } from '../support/fixtures';
 test.describe('error page', () => {
   test.beforeEach(async ({ authenticateAs, page }) => {
     await authenticateAs('GROUP_MANAGER');
-    await page.route('**/v1/subjects*', (route) =>
-      route.fulfill({
+    await page.route('**/v1/subjects*', (route) => {
+      return route.fulfill({
         body: JSON.stringify({ error: 'Internal Server Error', message: 'Something broke', statusCode: 500 }),
         contentType: 'application/json',
         status: 500
-      })
-    );
+      });
+    });
   });
 
   test('should offer the report for copying beside the download when a route fails', async ({ page }) => {

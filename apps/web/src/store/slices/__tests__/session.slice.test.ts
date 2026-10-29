@@ -1,7 +1,12 @@
 import type { Session } from '@opendatacapture/schemas/session';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
 
 import { useAppStore } from '@/store';
+import type { AppStore } from '@/store/types';
+
+import { createSessionSlice } from '../session.slice';
 
 const session: Session = {
   createdAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -15,25 +20,29 @@ const session: Session = {
   userId: 'user-1'
 };
 
-const initialState = useAppStore.getState();
+const createStore = () => {
+  return create(immer<AppStore>((...a) => ({ ...useAppStore.getState(), ...createSessionSlice(...a) })));
+};
 
 describe('createSessionSlice', () => {
+  let store: ReturnType<typeof createStore>;
+
   beforeEach(() => {
-    useAppStore.setState(initialState, true);
+    store = createStore();
   });
 
   it('should start with no session in progress', () => {
-    expect(useAppStore.getState().currentSession).toBeNull();
+    expect(store.getState().currentSession).toBeNull();
   });
 
   it('should make a started session the current one', () => {
-    useAppStore.getState().startSession(session);
-    expect(useAppStore.getState().currentSession).toEqual(session);
+    store.getState().startSession(session);
+    expect(store.getState().currentSession).toEqual(session);
   });
 
   it('should clear the current session when it ends', () => {
-    useAppStore.getState().startSession(session);
-    useAppStore.getState().endSession();
-    expect(useAppStore.getState().currentSession).toBeNull();
+    store.getState().startSession(session);
+    store.getState().endSession();
+    expect(store.getState().currentSession).toBeNull();
   });
 });

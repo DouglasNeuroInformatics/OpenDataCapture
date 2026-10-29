@@ -37,7 +37,7 @@ const renderPage = () => {
   return render(<Component />);
 };
 
-describe('upload instrument selection page', () => {
+describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.instruments = INSTRUMENTS;

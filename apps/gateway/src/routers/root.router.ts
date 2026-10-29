@@ -18,22 +18,25 @@ router.get(
       where: { id }
     });
     if (!assignment) {
-      return next();
+      next();
+      return;
     } else if (assignment.completedAt) {
-      return res
+      res
         .status(409)
         .set({ 'Content-Type': 'application/json' })
         .json({ error: 'Conflict', message: 'Assignment already completed', statusCode: 409 });
+      return;
     }
 
     const targetParseResult = await $InstrumentBundleContainer.safeParseAsync(JSON.parse(assignment.targetStringified));
     if (!targetParseResult.success) {
       logger.error(targetParseResult.error.issues);
-      return res.status(500).set({ 'Content-Type': 'application/json' }).json({
+      res.status(500).set({ 'Content-Type': 'application/json' }).json({
         error: 'Internal Server Error',
         message: 'Failed to parse target instrument from database',
         statusCode: 500
       });
+      return;
     }
 
     let initialSeriesIndex: number | undefined;

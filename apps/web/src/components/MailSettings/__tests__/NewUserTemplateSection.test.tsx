@@ -35,7 +35,7 @@ const errorText = () => screen.queryByTestId('new-user-template-error')?.textCon
 
 describe('NewUserTemplateSection', () => {
   beforeEach(() => {
-    void i18n.changeLanguage('en');
+    i18n.changeLanguage('en');
   });
 
   afterEach(cleanup);

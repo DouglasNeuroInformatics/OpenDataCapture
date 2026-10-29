@@ -10,9 +10,10 @@ async function blobToBase64(blob: Blob): Promise<string> {
     reader.onload = () => {
       const result = reader.result;
       if (typeof result !== 'string') {
-        return reject(
+        reject(
           new Error(`Failed to load blob: unexpected type of FileReader result '${typeof result}', expected 'string'`)
         );
+        return;
       }
       resolve(result.replace('data:', '').replace(/^.+,/, ''));
     };

@@ -1,5 +1,5 @@
-import fs from 'fs/promises';
-import path from 'path';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 import { createServer } from 'vite';
 
@@ -24,7 +24,7 @@ export class DevelopmentServer extends BaseServer {
   }
 
   protected override fixStacktrace(err: Error) {
-    return this.vite.ssrFixStacktrace(err);
+    this.vite.ssrFixStacktrace(err);
   }
 
   protected async loadRender() {

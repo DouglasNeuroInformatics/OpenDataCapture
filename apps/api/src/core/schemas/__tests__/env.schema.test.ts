@@ -20,8 +20,9 @@ const storageEnv = {
   STORAGE_SECRET_KEY: 'secret'
 };
 
-const issueMessages = (input: { [key: string]: string }) =>
-  $Env.safeParse(input).error?.issues.map(({ message }) => message) ?? [];
+const issueMessages = (input: { [key: string]: string }) => {
+  return $Env.safeParse(input).error?.issues.map(({ message }) => message) ?? [];
+};
 
 describe('$Env', () => {
   it('should listen on port 80 when no dev server port is set, which is what the production container exposes', () => {

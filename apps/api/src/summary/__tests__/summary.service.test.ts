@@ -75,9 +75,9 @@ describe('SummaryService', () => {
     it('should pair each trend value with its own timestamp', async () => {
       // Resolve each count to the `lte` it was queried with, so a value that has drifted onto the
       // wrong timestamp is visible in the result rather than hidden behind identical counts.
-      sessionsService.count.mockImplementation((where: { date?: { lte: Date } }) =>
-        Promise.resolve(where.date ? where.date.lte.getTime() : 0)
-      );
+      sessionsService.count.mockImplementation((where: { date?: { lte: Date } }) => {
+        return Promise.resolve(where.date ? where.date.lte.getTime() : 0);
+      });
       const { trends } = await summaryService.getSummary();
       for (const point of trends.sessions) {
         expect(point.value).toBe(point.timestamp);

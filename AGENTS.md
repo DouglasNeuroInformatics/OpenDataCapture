@@ -51,9 +51,9 @@ not every tool loads nested files.
   and need no tests.
 - **Unit test coverage stays at 100%.** `pnpm test:coverage` fails below 100% statements, branches,
   functions or lines, and CI runs it. Code no test can reach is dead code: prove it dead (the types,
-  the callers, the library contract) and delete it. Never add a coverage-ignore comment or widen
-  `coverage.exclude` to get past the gate; that list is for non-code — fixtures, generated files and
-  bare entrypoints.
+  the callers, the library contract) and delete it. Never add a coverage-ignore comment (eslint
+  rejects one) or widen `coverage.exclude` to get past the gate; that list is for non-code —
+  fixtures, generated files and bare entrypoints.
 - **Commit messages follow Conventional Commits.** `type(scope): subject`, where `type` is one of the
   11 `@commitlint/config-conventional` types and `scope`, if present, is an `@opendatacapture/*`
   workspace name without the prefix. A `commit-msg` hook and the `Commitlint` CI job enforce it, and
@@ -201,13 +201,19 @@ explains it.
 `pnpm format`. In particular `perfectionist/sort-objects` alphabetizes every object literal and
 `import/exports-last` moves exports to the bottom — write code in a sensible order and let the
 tooling rearrange it. Where ordering is load-bearing, the existing code carries an explicit
-`eslint-disable` comment; follow that pattern rather than fighting the rule.
+`eslint-disable` comment; follow that pattern rather than fighting the rule. Every `eslint-disable`
+states why after `--`, as in `// eslint-disable-next-line <rule> -- <reason>`; eslint rejects one
+that does not.
 
 **Tests.** A unit test is `<file>.test.ts(x)` in a `__tests__/` folder beside the file it tests:
 `src/index.ts` is tested by `src/__tests__/index.test.ts`. A suite that drives a whole package, like
-`apps/api/test/`, lives in that package's `test/` folder instead. Two eslint rules (`odc/*` in
-`eslint.config.js`) enforce the layout; `packages/instrument-library` is the one exception, for the
-reason its `AGENTS.md` gives. Keep test bodies short; each verifies one behavior. Descriptions are concise, grammatical
+`apps/api/test/`, lives in that package's `test/` folder instead. A unit test imports the file it
+tests and titles each top-level `describe` after a name it imports from it, or after the file's name
+when it imports the module itself (a side-effect import, `import * as`, or `await import()`) to test
+what loading it does. Three eslint rules
+enforce the layout: two in `eslint.config.js`, and `odc/unit-test-subject` in `.eslint/rules/`,
+where the repo's other custom rules live too. `packages/instrument-library` is the one exception, for
+the reason its `AGENTS.md` gives. Keep test bodies short; each verifies one behavior. Descriptions are concise, grammatical
 sentences stating the behavioral reason, e.g. `'should key the cache on every parameter, so paging
 does not serve a stale page'`.
 

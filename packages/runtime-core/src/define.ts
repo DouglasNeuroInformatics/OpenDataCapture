@@ -14,7 +14,7 @@ import type { InteractiveInstrument } from './types/instrument.interactive.js';
 import type { SeriesInstrument } from './types/instrument.series.js';
 
 declare global {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-empty-object-type
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-empty-object-type -- OpenDataCaptureContext is an empty interface so runtime/v1/global.d.ts can merge isRepo into it, which a type alias cannot do
   interface OpenDataCaptureContext {}
 }
 

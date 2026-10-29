@@ -65,7 +65,7 @@ export const DemoBanner = ({ onLogin }: DemoBannerProps) => {
                 <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm">
                   {t('auth.demo.role')}
                 </Table.Head>
-                <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm"></Table.Head>
+                <Table.Head className="text-foreground p-3 px-2.5 text-xs sm:px-3.5 sm:text-sm" />
               </Table.Row>
             </Table.Header>
             <Table.Body>

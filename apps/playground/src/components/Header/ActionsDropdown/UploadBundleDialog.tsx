@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import { useEffect, useRef } from 'react';
 
 import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
@@ -30,7 +28,7 @@ export type UploadBundleDialogProps = {
   setIsOpen: (value: boolean) => void;
 };
 
-export const UploadBundleDialog = ({ isOpen, setIsOpen, onLoginRequired }: UploadBundleDialogProps) => {
+export const UploadBundleDialog = ({ isOpen, onLoginRequired, setIsOpen }: UploadBundleDialogProps) => {
   const addNotification = useNotificationsStore((store) => store.addNotification);
 
   const auth = useAppStore((store) => store.auth);
@@ -111,15 +109,15 @@ export const UploadBundleDialog = ({ isOpen, setIsOpen, onLoginRequired }: Uploa
       if (!response) {
         addNotification({
           message: isAxiosError(err) ? err.message : 'Unknown Error',
-          type: 'error',
-          title: t({ en: 'HTTP Request Failed', fr: 'Échec de la requête HTTP' })
+          title: t({ en: 'HTTP Request Failed', fr: 'Échec de la requête HTTP' }),
+          type: 'error'
         });
         return;
       }
       addNotification({
         message: getResponseErrorMessage(response.data),
-        type: 'error',
-        title: [response.status, response.statusText].filter(Boolean).join(' - ')
+        title: [response.status, response.statusText].filter(Boolean).join(' - '),
+        type: 'error'
       });
       return;
     }

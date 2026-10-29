@@ -1,4 +1,4 @@
-/* eslint-disable perfectionist/sort-classes */
+/* eslint-disable perfectionist/sort-classes -- the single-segment @Get('linear-model') must stay above @Get(':id'), which alphabetical order would put below it, where :id would match it first */
 
 import { ApiOperation, CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
 import {
@@ -15,12 +15,12 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
+import { $DateLike } from '@opendatacapture/schemas/core';
 import {
   $CreateInstrumentRecordData,
   $UpdateInstrumentRecordData,
   $UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
-import { z } from 'zod/v4';
 
 import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -57,7 +57,7 @@ export class InstrumentRecordsController {
       'minDate',
       new ParseSchemaPipe({
         isOptional: true,
-        schema: z.coerce.date()
+        schema: $DateLike
       })
     )
     minDate?: Date,

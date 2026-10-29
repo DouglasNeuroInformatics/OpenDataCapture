@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { TruncatedCell } from '@/components/TruncatedCell';
+import { TruncatedCell } from '@/components/TruncatedCell/TruncatedCell';
 
 describe('TruncatedCell', () => {
   it('should render the value', () => {

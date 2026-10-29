@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
 
-import { $BaseModel } from '../core/core.js';
+import { $BaseModel, $DateLike } from '../core/core.js';
 
 export type SubjectIdentificationMethod = z.infer<typeof $SubjectIdentificationMethod>;
 export const $SubjectIdentificationMethod = z.enum(['CUSTOM_ID', 'PERSONAL_INFO']);
@@ -17,7 +17,7 @@ export type ClinicalSubjectIdentificationData = {
 
 export type Subject = z.infer<typeof $Subject>;
 export const $Subject = $BaseModel.extend({
-  dateOfBirth: z.coerce.date().nullish(),
+  dateOfBirth: $DateLike.nullish(),
   firstName: z.string().min(1).nullish(),
   groupIds: z.array(z.string().min(1)),
   lastName: z.string().min(1).nullish(),

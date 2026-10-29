@@ -31,10 +31,10 @@ export class AdminUserPage extends AppPage {
    * is left alone when omitted, which is how a single-group user's preselected group is exercised.
    */
   async addPermission({ action, scope, subject }: { action: AppAction; scope?: string; subject: AppSubjectName }) {
-    await this.selectOption('action', action);
-    await this.selectOption('subject', subject);
+    await this.selectPermissionOption('action', action);
+    await this.selectPermissionOption('subject', subject);
     if (scope !== undefined) {
-      await this.selectOption('scope', scope);
+      await this.selectPermissionOption('scope', scope);
     }
   }
 
@@ -52,7 +52,7 @@ export class AdminUserPage extends AppPage {
   }
 
   /** Opens one of the add-permission selects; the items render in a portal outside the form. */
-  async selectOption(field: 'action' | 'scope' | 'subject', value: string) {
+  async selectPermissionOption(field: 'action' | 'scope' | 'subject', value: string) {
     await this.addPermissionRow.getByTestId(`${field}-select-trigger`).click();
     await this.$ref.getByTestId(`${field}-select-item-${value}`).click();
   }

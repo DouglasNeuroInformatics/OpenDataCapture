@@ -36,10 +36,9 @@ function currentRepoInstruments(instruments: TranslatedInstrumentInfo[], repoId:
       latestEditions.set(instrument.internal.name, instrument.internal.edition);
     }
   }
-  return fromRepo.filter(
-    (instrument) =>
-      instrument.kind === 'SERIES' || latestEditions.get(instrument.internal.name) === instrument.internal.edition
-  );
+  return fromRepo.filter((instrument) => {
+    return instrument.kind === 'SERIES' || latestEditions.get(instrument.internal.name) === instrument.internal.edition;
+  });
 }
 
 const AddRepoForm = ({
@@ -217,10 +216,11 @@ const RouteComponent = () => {
             header: 'URL'
           },
           {
-            accessorFn: (row: InstrumentRepo) =>
-              instrumentInfoQuery.data
+            accessorFn: (row: InstrumentRepo) => {
+              return instrumentInfoQuery.data
                 ? currentRepoInstruments(instrumentInfoQuery.data, row.id).length
-                : row.instrumentIds.length,
+                : row.instrumentIds.length;
+            },
             header: t({
               en: 'Instruments',
               es: 'Instrumentos',
@@ -229,8 +229,9 @@ const RouteComponent = () => {
             id: 'instrumentCount'
           },
           {
-            accessorFn: (row: InstrumentRepo) =>
-              row.lastSyncedAt ? new Date(row.lastSyncedAt).toLocaleDateString() : '-',
+            accessorFn: (row: InstrumentRepo) => {
+              return row.lastSyncedAt ? new Date(row.lastSyncedAt).toLocaleDateString() : '-';
+            },
             header: t({
               en: 'Last Synced',
               es: 'Última sincronización',

@@ -53,10 +53,23 @@ function readInstrumentFiles(target: string): EditorFile[] {
   return files;
 }
 
+function resolveOpenCommand(platform: NodeJS.Platform): string {
+  if (platform === 'darwin') {
+    return 'open';
+  }
+  if (platform === 'win32') {
+    return 'start';
+  }
+  return 'xdg-open';
+}
+
 /** Open a URL in the user's default browser, cross-platform, without extra dependencies. */
 function openInBrowser(url: string): void {
-  const command = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'start' : 'xdg-open';
-  spawn(command, [url], { detached: true, shell: process.platform === 'win32', stdio: 'ignore' }).unref();
+  spawn(resolveOpenCommand(process.platform), [url], {
+    detached: true,
+    shell: process.platform === 'win32',
+    stdio: 'ignore'
+  }).unref();
 }
 
 const program = new Command();
@@ -98,7 +111,7 @@ program
       chalk.green('✓') +
         chalk.dim(` Encoded ${files.length} file${files.length === 1 ? '' : 's'} (${shareURL.size} bytes)\n`)
     );
-    process.stdout.write(shareURL.href + '\n');
+    process.stdout.write(`${shareURL.href}\n`);
 
     if (open) {
       openInBrowser(shareURL.href);

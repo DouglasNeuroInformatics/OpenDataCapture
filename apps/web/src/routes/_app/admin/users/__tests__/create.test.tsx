@@ -115,19 +115,19 @@ const stubClipboardWrite = () => {
   return writeText;
 };
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  useNotificationsStore.setState({ notifications: [] });
-  mocks.activeLanguages = ['en', 'es', 'fr'];
-  mocks.groups = [];
-  mocks.isMailEnabled = false;
-  mocks.get.mockResolvedValue({ data: { success: false } });
-  mocks.mutateAsync.mockResolvedValue({ welcomeEmail: welcomeEmail({ status: 'DISABLED' }) });
-});
+describe('Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    useNotificationsStore.setState({ notifications: [] });
+    mocks.activeLanguages = ['en', 'es', 'fr'];
+    mocks.groups = [];
+    mocks.isMailEnabled = false;
+    mocks.get.mockResolvedValue({ data: { success: false } });
+    mocks.mutateAsync.mockResolvedValue({ welcomeEmail: welcomeEmail({ status: 'DISABLED' }) });
+  });
 
-afterEach(cleanup);
+  afterEach(cleanup);
 
-describe('create user route', () => {
   it('should prefetch the groups in the loader, so the group options render without a waterfall', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);
@@ -143,9 +143,9 @@ describe('create user route', () => {
   it('should refuse a username that already exists without creating the user', async () => {
     mocks.get.mockResolvedValue({ data: { success: true } });
     fillAndSubmit();
-    await waitFor(() =>
-      expect(lastNotification()).toMatchObject({ message: 'Username already exists', type: 'error' })
-    );
+    await waitFor(() => {
+      expect(lastNotification()).toMatchObject({ message: 'Username already exists', type: 'error' });
+    });
     expect(mocks.mutateAsync).not.toHaveBeenCalled();
   });
 
@@ -195,9 +195,9 @@ describe('create user route', () => {
       })
     );
     fillAndSubmit();
-    await waitFor(() =>
-      expect(lastNotification()?.message).toBe('This password has appeared in a known data breach and cannot be used')
-    );
+    await waitFor(() => {
+      expect(lastNotification()?.message).toBe('This password has appeared in a known data breach and cannot be used');
+    });
   });
 
   it('should confirm the creation and return to the users list when mail is disabled', async () => {
@@ -253,13 +253,13 @@ describe('create user route', () => {
     mocks.isMailEnabled = true;
     mocks.mutateAsync.mockResolvedValue({ welcomeEmail: welcomeEmail() });
     fillAndSubmit();
-    await waitFor(() =>
+    await waitFor(() => {
       expect(lastNotification()).toMatchObject({
         message: 'A welcome email was sent to jdoe@example.org',
         title: 'Welcome email sent',
         type: 'success'
-      })
-    );
+      });
+    });
     expect(mocks.navigate).toHaveBeenCalledWith({ to: '..' });
   });
 
@@ -276,13 +276,13 @@ describe('create user route', () => {
       welcomeEmail: welcomeEmail({ error: 'HOST_NOT_FOUND', status: 'FAILED' })
     });
     fillAndSubmit();
-    await waitFor(() =>
+    await waitFor(() => {
       expect(lastNotification()).toMatchObject({
         message: 'The mail server could not be found — check the host name.',
         title: 'Welcome email failed',
         type: 'error'
-      })
-    );
+      });
+    });
   });
 
   it('should show a failed welcome email for manual sending instead of leaving the page', async () => {
@@ -404,9 +404,9 @@ describe('create user route', () => {
     fillCredentials(form);
     choosePermissionLevel(form, 'STANDARD');
     submit();
-    await waitFor(() =>
-      expect(errorMessages()).toContain('A user who is not an administrator must belong to at least one group')
-    );
+    await waitFor(() => {
+      expect(errorMessages()).toContain('A user who is not an administrator must belong to at least one group');
+    });
     expect(mocks.get).not.toHaveBeenCalled();
   });
 
@@ -418,9 +418,9 @@ describe('create user route', () => {
     fireEvent.click(screen.getByLabelText('Group One'));
     fireEvent.click(screen.getByLabelText('Group One'));
     submit();
-    await waitFor(() =>
-      expect(errorMessages()).toContain('A user who is not an administrator must belong to at least one group')
-    );
+    await waitFor(() => {
+      expect(errorMessages()).toContain('A user who is not an administrator must belong to at least one group');
+    });
   });
 
   it('should submit the groups chosen for a user below administrator', async () => {

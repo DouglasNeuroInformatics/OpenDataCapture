@@ -95,12 +95,13 @@ export function useBulkAssignmentWizard({
     return supplied.length > 0 ? supplied : removeSubjectIdScope(subjectId).slice(0, subjectIdDisplayLength);
   };
 
-  const resultRows = () =>
-    buildResultRows({
+  const resultRows = () => {
+    return buildResultRows({
       assignments,
       instrumentTitleById: Object.fromEntries(instruments.map(({ id, title }) => [id, title])),
       sourceRowBySubjectId: sourceRows
     });
+  };
 
   return {
     /** A parsed file or pasted block, which still needs its columns confirmed. */

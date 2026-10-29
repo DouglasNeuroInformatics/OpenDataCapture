@@ -2,8 +2,9 @@ import { LANGUAGE_LABELS, LANGUAGES } from '@opendatacapture/react-core';
 import type { Language, LocalizedString } from '@opendatacapture/schemas/core';
 
 /** Blank text is absent text: content authored as `''` is a language the author left empty. */
-const isPresent = <TValue>(value: null | TValue | undefined): value is TValue =>
-  value !== null && value !== undefined && (typeof value !== 'string' || value.trim().length > 0);
+const isPresent = <TValue>(value: null | TValue | undefined): value is TValue => {
+  return value !== null && value !== undefined && (typeof value !== 'string' || value.trim().length > 0);
+};
 
 /** Content in some or all of the interface languages — a branding string, or a piece of UI copy. */
 export type LocalizedValues<TValue> = { [L in Language]?: null | TValue };
@@ -21,8 +22,9 @@ export const getValueForLanguage = <TValue>(
 ): TValue | undefined => [preferredLanguage, ...LANGUAGES].map((code) => values[code]).find(isPresent);
 
 /** The languages a localized string has non-blank content in, in {@link LANGUAGES} order. */
-export const authoredLanguages = (value: LocalizedString | null | undefined): Language[] =>
-  LANGUAGES.filter((code) => value?.[code]?.trim());
+export const authoredLanguages = (value: LocalizedString | null | undefined): Language[] => {
+  return LANGUAGES.filter((code) => value?.[code]?.trim());
+};
 
 /**
  * The languages a template may be sent in: the ones it was written in, scoped to the ones the
@@ -48,7 +50,8 @@ export const sendableLanguages = (
  * Keep only the languages that were actually authored. Iterating {@link LANGUAGES} rather than the
  * value's own keys is what stops anything but a known language reaching the API.
  */
-export const omitBlankLanguages = (value: LocalizedString | null | undefined): LocalizedString =>
-  Object.fromEntries(authoredLanguages(value).map((code) => [code, value?.[code]]));
+export const omitBlankLanguages = (value: LocalizedString | null | undefined): LocalizedString => {
+  return Object.fromEntries(authoredLanguages(value).map((code) => [code, value?.[code]]));
+};
 
 export { LANGUAGE_LABELS, LANGUAGES };

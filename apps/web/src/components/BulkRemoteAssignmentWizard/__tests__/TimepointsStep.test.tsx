@@ -56,16 +56,16 @@ const expiryInput = () => screen.getByTestId<HTMLInputElement>('bulk-expiry-inpu
 const addButton = () => screen.getByTestId<HTMLButtonElement>('bulk-add-timepoint');
 const reviewButton = () => screen.getByTestId<HTMLButtonElement>('bulk-confirm-timepoints');
 
-beforeEach(() => {
-  vi.useFakeTimers({ now: new Date(`${TODAY}T12:00:00`), toFake: ['Date'] });
-});
-
-afterEach(() => {
-  cleanup();
-  vi.useRealTimers();
-});
-
 describe('TimepointsStep', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ now: new Date(`${TODAY}T12:00:00`), toFake: ['Date'] });
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+  });
+
   it('should tell the user how many subjects each instrument is assigned to', () => {
     renderStep({ subjectCount: 7 });
     expect(

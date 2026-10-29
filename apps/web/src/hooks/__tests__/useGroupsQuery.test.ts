@@ -4,6 +4,7 @@ import { createElement, Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { GROUPS_QUERY_KEY, groupsQueryOptions, useGroupsQuery } from '../useGroupsQuery';
 
@@ -42,7 +43,7 @@ describe('groupsQueryOptions', () => {
 
   it('should reject a response that is not an array of groups', async () => {
     mockAxios.get.mockResolvedValue({ data: [{ id: 'group-1' }] });
-    await expect(createQueryClient().fetchQuery(groupsQueryOptions())).rejects.toThrow();
+    await expect(createQueryClient().fetchQuery(groupsQueryOptions())).rejects.toThrow(z.ZodError);
   });
 
   it('should cache under the shared key, so mutations can invalidate it', () => {
@@ -54,12 +55,13 @@ describe('useGroupsQuery', () => {
   it('should resolve to the groups once the suspended request settles', async () => {
     mockAxios.get.mockResolvedValue({ data: [GROUP] });
     const queryClient = createQueryClient();
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(
         QueryClientProvider,
         { client: queryClient },
         createElement(Suspense, { fallback: null }, children)
       );
+    };
     const { result } = renderHook(() => useGroupsQuery(), { wrapper });
     await waitFor(() => expect(result.current).toBeTruthy());
     expect(result.current.data.map((group) => group.id)).toEqual(['group-1']);

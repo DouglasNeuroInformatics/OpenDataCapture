@@ -11,13 +11,13 @@ import { DEFAULT_LOGIN_REQUEST_THROTTLER_LIMIT, DEFAULT_LOGIN_REQUEST_THROTTLER_
 const LOGIN_REQUEST_THROTTLER_LIMIT = $NumberLike
   .pipe(z.number().int().positive())
   .default(DEFAULT_LOGIN_REQUEST_THROTTLER_LIMIT)
-  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing, no-restricted-syntax
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing, no-restricted-syntax -- ConfigService does not exist when decorator arguments are evaluated, and || maps an empty variable to the default
   .parse(process.env.LOGIN_REQUEST_THROTTLER_LIMIT || undefined);
 
 const LOGIN_REQUEST_THROTTLER_TTL = $NumberLike
   .pipe(z.number().int().positive())
   .default(DEFAULT_LOGIN_REQUEST_THROTTLER_TTL)
-  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing, no-restricted-syntax
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing, no-restricted-syntax -- ConfigService does not exist when decorator arguments are evaluated, and || maps an empty variable to the default
   .parse(process.env.LOGIN_REQUEST_THROTTLER_TTL || undefined);
 
 export function ThrottleLoginRequest() {

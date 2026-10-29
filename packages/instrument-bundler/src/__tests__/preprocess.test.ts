@@ -7,12 +7,12 @@ describe('preprocess', () => {
     expect(() => preprocess([])).toThrowError('Received empty array for inputs');
   });
   it('should reject non-shallow names', () => {
-    expect(() =>
+    expect(() => {
       preprocess([
         { content: "export * from './utils/foo.js'", name: 'index.js' },
         { content: 'export const foo = null', name: 'utils/foo.js' }
-      ])
-    ).toThrowError(
+      ]);
+    }).toThrowError(
       "Illegal character '/' in input name 'utils/foo.js': expected shallow relative path (e.g., './foo.js')"
     );
   });

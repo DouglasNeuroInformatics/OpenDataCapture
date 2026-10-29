@@ -284,8 +284,10 @@ const Toggles: React.FC<{
             void download('README.txt', t('datahub.index.table.exportHelpText'));
             void download(`${baseFilename}.csv`, unparse(exportData));
             break;
-          case 'Excel':
-            return downloadSubjectTableExcel(`${baseFilename}.xlsx`, exportData, 'Records');
+          case 'Excel': {
+            downloadSubjectTableExcel(`${baseFilename}.xlsx`, exportData, 'Records');
+            return;
+          }
           case 'JSON':
             return download(`${baseFilename}.json`, JSON.stringify(exportData, null, 2));
         }
@@ -458,12 +460,11 @@ const MasterDataTable: React.FC<{
             accessorFn: (subject) => subject.sex ?? null,
             cell: (ctx) => {
               const sex = ctx.getValue() as null | Sex;
-              const label =
-                sex === 'FEMALE'
-                  ? t('core.identificationData.sex.female')
-                  : sex === 'MALE'
-                    ? t('core.identificationData.sex.male')
-                    : t({ en: 'NULL', es: 'NULL', fr: 'NULL' });
+              const sexLabels = {
+                FEMALE: t('core.identificationData.sex.female'),
+                MALE: t('core.identificationData.sex.male')
+              };
+              const label = sex ? sexLabels[sex] : t({ en: 'NULL', es: 'NULL', fr: 'NULL' });
               return (
                 <ColorTagCell
                   color={getSexColor(sex, theme === 'dark' ? 'dark' : 'light')}
@@ -491,8 +492,9 @@ const MasterDataTable: React.FC<{
               const value = ctx.getValue() as Date | null;
               return value ? toBasicISOString(value) : t({ en: 'None', es: 'Ninguno', fr: 'Aucun' });
             },
-            filterFn: (row, id, filter: CollectedFilter) =>
-              matchesCollectedFilter(row.getValue<Date | null>(id), filter),
+            filterFn: (row, id, filter: CollectedFilter) => {
+              return matchesCollectedFilter(row.getValue<Date | null>(id), filter);
+            },
             header: ({ column }) => (
               <SortableHeader
                 column={column}
@@ -505,8 +507,6 @@ const MasterDataTable: React.FC<{
         data={displayData}
         data-testid="master-data-table"
         initialState={{
-          columnPinning: { left: ['subjectId'] },
-          // eslint-disable-next-line perfectionist/sort-objects
           columnFilters: [
             {
               id: 'subjectId',
@@ -530,7 +530,8 @@ const MasterDataTable: React.FC<{
               id: 'lastCollectedAt',
               value: DEFAULT_COLLECTED_FILTER
             }
-          ]
+          ],
+          columnPinning: { left: ['subjectId'] }
         }}
         rowActions={[
           {

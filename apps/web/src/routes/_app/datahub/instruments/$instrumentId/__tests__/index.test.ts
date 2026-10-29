@@ -13,7 +13,7 @@ const runBeforeLoad = (args: { params: { instrumentId: string }; search: { palet
   return null;
 };
 
-describe('instrument hub index route', () => {
+describe('Route', () => {
   // The record table is the landing tab, so an instrument link with no tab still opens a page.
   it('should redirect to the record table, carrying the instrument and its filters', () => {
     const thrown = runBeforeLoad({ params: { instrumentId: 'hq-1' }, search: { palette: 'jade' } });

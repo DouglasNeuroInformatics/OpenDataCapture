@@ -35,6 +35,7 @@ export class StartSessionPage extends AppPage {
 
   /** Clicks outside the identifier combobox, which closes its popup and commits what was typed. */
   async dismissSubjectIdOptions() {
+    // eslint-disable-next-line playwright/prefer-locator -- pageHeader is a Locator; the rule takes any name starting with "page" for a Page
     await this.pageHeader.click();
   }
 

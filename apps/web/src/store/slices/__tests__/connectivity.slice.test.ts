@@ -1,18 +1,21 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
 
 import { useAppStore } from '@/store';
+import type { AppStore } from '@/store/types';
 
-const initialState = useAppStore.getState();
+import { createConnectivitySlice } from '../connectivity.slice';
 
-const importFreshStore = async () => {
-  vi.resetModules();
-  const { useAppStore: freshStore } = await import('@/store');
-  return freshStore;
+const createStore = () => {
+  return create(immer<AppStore>((...a) => ({ ...useAppStore.getState(), ...createConnectivitySlice(...a) })));
 };
 
 describe('createConnectivitySlice', () => {
+  let store: ReturnType<typeof createStore>;
+
   beforeEach(() => {
-    useAppStore.setState(initialState, true);
+    store = createStore();
   });
 
   afterEach(() => {
@@ -20,35 +23,34 @@ describe('createConnectivitySlice', () => {
   });
 
   it('should start with no requests retrying', () => {
-    expect(initialState.pendingRetries).toBe(0);
+    expect(store.getState().pendingRetries).toBe(0);
   });
 
   it('should count each request that begins retrying, so the banner knows connectivity is degraded', () => {
-    useAppStore.getState().beginRetry();
-    useAppStore.getState().beginRetry();
-    expect(useAppStore.getState().pendingRetries).toBe(2);
+    store.getState().beginRetry();
+    store.getState().beginRetry();
+    expect(store.getState().pendingRetries).toBe(2);
   });
 
   it('should uncount a request once its retry settles', () => {
-    useAppStore.getState().beginRetry();
-    useAppStore.getState().endRetry();
-    expect(useAppStore.getState().pendingRetries).toBe(0);
+    store.getState().beginRetry();
+    store.getState().endRetry();
+    expect(store.getState().pendingRetries).toBe(0);
   });
 
   it('should never count below zero, so an unmatched end cannot hide a later retry', () => {
-    useAppStore.getState().endRetry();
-    useAppStore.getState().beginRetry();
-    expect(useAppStore.getState().pendingRetries).toBe(1);
+    store.getState().endRetry();
+    store.getState().beginRetry();
+    expect(store.getState().pendingRetries).toBe(1);
   });
 
   it('should record the connectivity the browser reports', () => {
-    useAppStore.getState().setIsOnline(false);
-    expect(useAppStore.getState().isOnline).toBe(false);
+    store.getState().setIsOnline(false);
+    expect(store.getState().isOnline).toBe(false);
   });
 
-  it('should start offline when the browser loads without a connection', async () => {
+  it('should start offline when the browser loads without a connection', () => {
     vi.stubGlobal('navigator', { onLine: false });
-    const freshStore = await importFreshStore();
-    expect(freshStore.getState().isOnline).toBe(false);
+    expect(createStore().getState().isOnline).toBe(false);
   });
 });

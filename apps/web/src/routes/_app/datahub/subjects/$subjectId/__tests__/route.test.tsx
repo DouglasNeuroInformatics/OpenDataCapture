@@ -27,8 +27,9 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
 vi.mock('@/components/LoadingFallback', () => ({ LoadingFallback: () => 'Loading Fallback' }));
 vi.mock('@/config', () => ({ config: mocks.config }));
 vi.mock('@/store', () => ({
-  useAppStore: (selector: (store: { currentGroup: typeof mocks.currentGroup }) => unknown) =>
-    selector({ currentGroup: mocks.currentGroup })
+  useAppStore: (selector: (store: { currentGroup: typeof mocks.currentGroup }) => unknown) => {
+    return selector({ currentGroup: mocks.currentGroup });
+  }
 }));
 
 const renderLayout = () => {
@@ -36,21 +37,23 @@ const renderLayout = () => {
   render(<Component />);
 };
 
-beforeEach(() => {
-  mocks.config.setup.isGatewayEnabled = true;
-  mocks.currentGroup = null;
-  mocks.outlet = () => 'Outlet Content';
-  mocks.pathname = '/datahub/subjects/root$abcdefghijkl/table';
-  vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'root$abcdefghijkl' });
-  vi.spyOn(Route, 'useSearch').mockReturnValue({});
-});
+const noop = () => undefined;
 
-afterEach(() => {
-  cleanup();
-  vi.restoreAllMocks();
-});
+describe('Route', () => {
+  beforeEach(() => {
+    mocks.config.setup.isGatewayEnabled = true;
+    mocks.currentGroup = null;
+    mocks.outlet = () => 'Outlet Content';
+    mocks.pathname = '/datahub/subjects/root$abcdefghijkl/table';
+    vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'root$abcdefghijkl' });
+    vi.spyOn(Route, 'useSearch').mockReturnValue({});
+  });
 
-describe('subject layout route', () => {
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
   it('should show the unscoped subject id truncated to nine characters when the group sets no display length', () => {
     renderLayout();
     expect(screen.getByRole('heading').textContent).toBe('Instrument Records for Subject abcdefghi');
@@ -112,7 +115,7 @@ describe('subject layout route', () => {
 
   it('should show a loading fallback instead of the page while the page suspends', () => {
     mocks.outlet = () => {
-      throw new Promise<never>(() => undefined);
+      throw new Promise<never>(noop);
     };
     renderLayout();
     expect(screen.getByText('Loading Fallback')).toBeTruthy();

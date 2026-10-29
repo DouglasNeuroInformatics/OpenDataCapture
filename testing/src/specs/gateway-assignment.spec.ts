@@ -49,6 +49,24 @@ async function createRemoteAssignmentLink(getPageModel: GetPageModel, page: Page
   return assignmentUrl;
 }
 
+/**
+ * Which refusal arrives is a race with the API's gateway synchronizer, which runs every
+ * GATEWAY_REFRESH_INTERVAL (10s): until it sweeps the completed assignment across into a real
+ * record the gateway still holds it and answers 409, and once it has, the record is deleted
+ * from the gateway by design and the link is a 404. Asserting 409 alone made the test fail
+ * whenever a sync tick landed in the window, so both terminal answers are accepted and the
+ * invariant that actually matters — the instrument is not re-served — is asserted directly.
+ */
+async function expectCompletedAssignmentRefused(gatewayPage: Page, assignmentUrl: string) {
+  const response = await gatewayPage.goto(assignmentUrl);
+  const status = response?.status();
+  expect([404, 409]).toContain(status);
+  await expect(gatewayPage.getByRole('button', { name: 'Begin' })).toBeHidden();
+  if (status === 409) {
+    await expect(gatewayPage.getByText('Assignment already completed')).toBeVisible();
+  }
+}
+
 /** Seeds a new group with one subject and an outstanding assignment for it, over the API. */
 async function seedAssignment(api: ApiClient): Promise<Assignment> {
   const group = await api.createGroup();
@@ -106,20 +124,7 @@ test.describe('gateway remote assignment', () => {
     // Revisiting the same link after completion must not serve the instrument again. Reuses this
     // now-completed assignment rather than soloing a second, expensive Cap proof-of-work just to
     // exercise this branch.
-    //
-    // Which refusal arrives is a race with the API's gateway synchronizer, which runs every
-    // GATEWAY_REFRESH_INTERVAL (10s): until it sweeps the completed assignment across into a real
-    // record the gateway still holds it and answers 409, and once it has, the record is deleted
-    // from the gateway by design and the link is a 404. Asserting 409 alone made this test fail
-    // whenever a sync tick landed in the window, so both terminal answers are accepted and the
-    // invariant that actually matters — the instrument is not re-served — is asserted directly.
-    const revisitResponse = await gatewayPage.goto(assignmentUrl);
-    const revisitStatus = revisitResponse?.status();
-    expect([404, 409]).toContain(revisitStatus);
-    await expect(gatewayPage.getByRole('button', { name: 'Begin' })).toBeHidden();
-    if (revisitStatus === 409) {
-      await expect(gatewayPage.getByText('Assignment already completed')).toBeVisible();
-    }
+    await expectCompletedAssignmentRefused(gatewayPage, assignmentUrl);
 
     await gatewayPage.close();
 
@@ -168,7 +173,9 @@ test.describe('gateway malformed submission', () => {
     expect(submission.status()).toBe(200);
     await gatewayPage.close();
 
-    await new Promise((resolve) => setTimeout(resolve, 2 * gatewayRefreshInterval));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2 * gatewayRefreshInterval);
+    });
     const response = await apiRequestContext.get('/api/v1/sessions', { headers: adminHeaders });
     const sessions = (await response.json()) as Session[];
     const remoteSessions = sessions.filter(

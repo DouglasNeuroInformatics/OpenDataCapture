@@ -187,13 +187,13 @@ export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
       </div>
       {rejectedNames.length > 0 && (
         <ErrorBox
-          issues={rejectedNames.map((name) =>
-            t({
+          issues={rejectedNames.map((name) => {
+            return t({
               en: `"${name}" was rejected — only ${typeDescriptor.label} files are accepted`,
               es: `Se rechazó "${name}": solo se aceptan archivos ${typeDescriptor.label}`,
               fr: `« ${name} » a été rejeté — seuls les fichiers ${typeDescriptor.label} sont acceptés`
-            })
-          )}
+            });
+          })}
           title={t({
             en: 'Unsupported file type',
             es: 'Tipo de archivo no admitido',

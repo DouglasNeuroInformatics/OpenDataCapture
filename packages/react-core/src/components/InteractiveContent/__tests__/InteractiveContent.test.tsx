@@ -8,8 +8,9 @@ const changeLanguage = vi.hoisted(() => vi.fn());
 const updateTheme = vi.hoisted(() => vi.fn());
 
 vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
-  useNotificationsStore: (selector: (store: { addNotification: typeof addNotification }) => unknown) =>
-    selector({ addNotification }),
+  useNotificationsStore: (selector: (store: { addNotification: typeof addNotification }) => unknown) => {
+    return selector({ addNotification });
+  },
   useTheme: () => ['light', updateTheme],
   useTranslation: () => ({
     changeLanguage,

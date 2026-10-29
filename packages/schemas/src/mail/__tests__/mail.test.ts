@@ -140,20 +140,28 @@ describe('isSameMailServer', () => {
   });
 });
 
-describe('default templates', () => {
+describe('DEFAULT_NEW_USER_EMAIL_TEMPLATE', () => {
   it.each(['en', 'es', 'fr'] as const)('should carry the required placeholders in %s', (language) => {
     expect(DEFAULT_NEW_USER_EMAIL_TEMPLATE.body[language]).toContain('{{username}}');
-    expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body[language]).toContain('{{url}}');
-    expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body[language]).toContain('{{expiresAt}}');
   });
 
   it.each(['en', 'es', 'fr'] as const)('should have a non-empty subject and body in %s', (language) => {
     expect(DEFAULT_NEW_USER_EMAIL_TEMPLATE.subject[language].trim()).toBeTruthy();
-    expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.subject[language].trim()).toBeTruthy();
   });
 
   // Emailing a cleartext password is the thing this flow was changed to stop doing.
   it('should not put a password in the new-user welcome email', () => {
     expect(JSON.stringify(DEFAULT_NEW_USER_EMAIL_TEMPLATE)).not.toContain('{{password}}');
+  });
+});
+
+describe('DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE', () => {
+  it.each(['en', 'es', 'fr'] as const)('should carry the required placeholders in %s', (language) => {
+    expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body[language]).toContain('{{url}}');
+    expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.body[language]).toContain('{{expiresAt}}');
+  });
+
+  it.each(['en', 'es', 'fr'] as const)('should have a non-empty subject and body in %s', (language) => {
+    expect(DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE.subject[language].trim()).toBeTruthy();
   });
 });

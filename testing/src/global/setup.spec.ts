@@ -18,7 +18,7 @@ test.describe.serial('setup', () => {
     await setupPage.fillSetupForm(INIT_APP_OPTIONS);
     // Setup seeds demo data plus dummy records before redirecting; on a cold CI runner this
     // legitimately takes far longer than the default timeout.
-    await setupPage.expect.toHaveURL('/auth/login', { timeout: 90_000 });
+    await expect(setupPage.$ref).toHaveURL('/auth/login', { timeout: 90_000 });
   });
 
   test('should be set up afterward', async ({ request }) => {

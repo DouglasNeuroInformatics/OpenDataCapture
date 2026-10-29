@@ -179,7 +179,7 @@ const RouteComponent = () => {
             }}
             validationSchema={
               z.object({
-                expiresAt: z.coerce.date().min(new Date(), {
+                expiresAt: z.date().min(new Date(), {
                   message: t({
                     en: 'Expiry date must be in the future',
                     es: 'La fecha de vencimiento debe ser futura',

@@ -5,7 +5,8 @@ import type { $CreateSessionData, Session } from '@opendatacapture/schemas/sessi
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import '@/routes/_app/session/start-session';
+import { Route } from '@/routes/_app/session/start-session';
+
 import '@/services/i18n';
 
 type StartSessionFormProps = {
@@ -17,17 +18,13 @@ type StartSessionFormProps = {
   username?: string;
 };
 
-type CapturedRouteOptions = {
-  component: FC;
-  loader: (ctx: {
-    context: { queryClient: { ensureQueryData: (options: object) => Promise<unknown> } };
-  }) => Promise<void>;
-};
+type Loader = (ctx: {
+  context: { queryClient: { ensureQueryData: (options: object) => Promise<unknown> } };
+}) => Promise<void>;
 
 type MockState = {
   isPending: boolean;
   locationState: undefined | { initialValues?: { [key: string]: unknown } };
-  route: CapturedRouteOptions;
   store: {
     currentGroup: Group | null;
     currentSession: null | Session;
@@ -40,7 +37,6 @@ const mocks = vi.hoisted(() => {
   const state: MockState = {
     isPending: false,
     locationState: undefined,
-    route: { component: () => null, loader: () => Promise.resolve() },
     store: { currentGroup: null, currentSession: null, currentUser: null, startSession: vi.fn() }
   };
   return {
@@ -52,10 +48,7 @@ const mocks = vi.hoisted(() => {
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
-  createFileRoute: () => (options: CapturedRouteOptions) => {
-    mocks.route = options;
-    return { options };
-  },
+  createFileRoute: () => (options: { component: FC; loader: Loader }) => ({ options }),
   useLocation: () => ({ state: mocks.locationState })
 }));
 vi.mock('@/components/StartSessionForm', () => ({ StartSessionForm: mocks.StartSessionForm }));
@@ -98,131 +91,135 @@ const session: Session = {
   updatedAt: NOW
 };
 
-const StartSessionPage = mocks.route.component;
+const StartSessionPage = Route.options.component!;
+
+const loader = Route.options.loader as Loader;
 
 const formProps = () => mocks.StartSessionForm.mock.lastCall![0];
 
-beforeEach(() => {
-  mocks.isPending = false;
-  mocks.locationState = undefined;
-  mocks.store.currentGroup = group;
-  mocks.store.currentSession = null;
-  mocks.store.currentUser = { username: 'admin' };
-  mocks.mutateAsync.mockResolvedValue(session);
-});
-
-afterEach(() => {
-  cleanup();
-  vi.clearAllMocks();
-});
-
-describe('StartSessionPage', () => {
-  it('should show the page title', () => {
-    render(<StartSessionPage />);
-    expect(screen.getByRole('heading', { name: 'Start Session' })).toBeTruthy();
+describe('Route', () => {
+  beforeEach(() => {
+    mocks.isPending = false;
+    mocks.locationState = undefined;
+    mocks.store.currentGroup = group;
+    mocks.store.currentSession = null;
+    mocks.store.currentUser = { username: 'admin' };
+    mocks.mutateAsync.mockResolvedValue(session);
   });
 
-  it('should offer the form, editable, when no session is active', () => {
-    render(<StartSessionPage />);
-    expect(formProps()).toMatchObject({ currentGroup: group, readOnly: false, username: 'admin' });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
   });
 
-  it('should lock the form while the session is being created, so it cannot be submitted twice', () => {
-    mocks.isPending = true;
-    render(<StartSessionPage />);
-    expect(formProps().readOnly).toBe(true);
-  });
-
-  it('should suggest the custom ids of the group with their group scope removed', () => {
-    render(<StartSessionPage />);
-    expect(formProps().customSubjectIds).toEqual(['CUSTOM-1', 'CUSTOM-2']);
-  });
-
-  it('should pass no username when nobody is logged in', () => {
-    mocks.store.currentUser = null;
-    render(<StartSessionPage />);
-    expect(formProps().username).toBeUndefined();
-  });
-
-  it('should default to an in-person session identified by the method the group prefers', () => {
-    render(<StartSessionPage />);
-    expect(formProps().initialValues).toEqual({
-      sessionType: 'IN_PERSON',
-      subjectIdentificationMethod: 'PERSONAL_INFO'
+  describe('StartSessionPage', () => {
+    it('should show the page title', () => {
+      render(<StartSessionPage />);
+      expect(screen.getByRole('heading', { name: 'Start Session' })).toBeTruthy();
     });
-  });
 
-  it('should default to identifying by custom id when there is no group', () => {
-    mocks.store.currentGroup = null;
-    render(<StartSessionPage />);
-    expect(formProps().initialValues).toEqual({ sessionType: 'IN_PERSON', subjectIdentificationMethod: 'CUSTOM_ID' });
-  });
+    it('should offer the form, editable, when no session is active', () => {
+      render(<StartSessionPage />);
+      expect(formProps()).toMatchObject({ currentGroup: group, readOnly: false, username: 'admin' });
+    });
 
-  it('should mount the form with the values the walkthrough navigated here with', () => {
-    mocks.locationState = { initialValues: { subjectId: 'DEMO' } };
-    render(<StartSessionPage />);
-    expect(mocks.StartSessionForm.mock.calls[0]![0].initialValues).toEqual({ subjectId: 'DEMO' });
-  });
+    it('should lock the form while the session is being created, so it cannot be submitted twice', () => {
+      mocks.isPending = true;
+      render(<StartSessionPage />);
+      expect(formProps().readOnly).toBe(true);
+    });
 
-  it('should use the defaults when navigated here with state that carries no values', () => {
-    mocks.locationState = {};
-    render(<StartSessionPage />);
-    expect(mocks.StartSessionForm.mock.calls[0]![0].initialValues).toMatchObject({ sessionType: 'IN_PERSON' });
-  });
+    it('should suggest the custom ids of the group with their group scope removed', () => {
+      render(<StartSessionPage />);
+      expect(formProps().customSubjectIds).toEqual(['CUSTOM-1', 'CUSTOM-2']);
+    });
 
-  it('should start the created session with the type chosen in the form', async () => {
-    render(<StartSessionPage />);
-    const formData: $CreateSessionData = {
-      date: NOW,
-      groupId: 'group-1',
-      subjectData: { id: 'subject-1' },
-      type: 'IN_PERSON'
-    };
-    await act(() => formProps().onSubmit(formData));
-    expect(mocks.mutateAsync).toHaveBeenCalledWith(formData);
-    expect(mocks.store.startSession).toHaveBeenCalledWith({ ...session, type: 'IN_PERSON' });
-  });
+    it('should pass no username when nobody is logged in', () => {
+      mocks.store.currentUser = null;
+      render(<StartSessionPage />);
+      expect(formProps().username).toBeUndefined();
+    });
 
-  it('should replace the form with a confirmation while a session is active', () => {
-    mocks.store.currentSession = session;
-    render(<StartSessionPage />);
-    expect(screen.queryByTestId('start-session-form')).toBeNull();
-    expect(screen.getByText('Session Successfully Started')).toBeTruthy();
-  });
-
-  // Known defect: the reset effect runs only after the remounted form has already read the walkthrough values.
-  it.fails(
-    'should mount the form with the defaults once the session ends, not the values the walkthrough supplied',
-    () => {
-      mocks.locationState = { initialValues: { subjectId: 'DEMO' } };
-      mocks.store.currentSession = session;
-      const { rerender } = render(<StartSessionPage />);
-      const callsBeforeSessionEnds = mocks.StartSessionForm.mock.calls.length;
-      mocks.store.currentSession = null;
-      rerender(<StartSessionPage />);
-      expect(mocks.StartSessionForm.mock.calls[callsBeforeSessionEnds]![0].initialValues).toEqual({
+    it('should default to an in-person session identified by the method the group prefers', () => {
+      render(<StartSessionPage />);
+      expect(formProps().initialValues).toEqual({
         sessionType: 'IN_PERSON',
         subjectIdentificationMethod: 'PERSONAL_INFO'
       });
-    }
-  );
-});
+    });
 
-describe('loader', () => {
-  it('should prefetch the custom ids of the current group', async () => {
-    const ensureQueryData = vi.fn(() => Promise.resolve());
-    await mocks.route.loader({ context: { queryClient: { ensureQueryData } } });
-    expect(ensureQueryData).toHaveBeenCalledWith(
-      expect.objectContaining({ queryKey: ['subjects', 'custom-ids', 'group-1'] })
+    it('should default to identifying by custom id when there is no group', () => {
+      mocks.store.currentGroup = null;
+      render(<StartSessionPage />);
+      expect(formProps().initialValues).toEqual({ sessionType: 'IN_PERSON', subjectIdentificationMethod: 'CUSTOM_ID' });
+    });
+
+    it('should mount the form with the values the walkthrough navigated here with', () => {
+      mocks.locationState = { initialValues: { subjectId: 'DEMO' } };
+      render(<StartSessionPage />);
+      expect(mocks.StartSessionForm.mock.calls[0]![0].initialValues).toEqual({ subjectId: 'DEMO' });
+    });
+
+    it('should use the defaults when navigated here with state that carries no values', () => {
+      mocks.locationState = {};
+      render(<StartSessionPage />);
+      expect(mocks.StartSessionForm.mock.calls[0]![0].initialValues).toMatchObject({ sessionType: 'IN_PERSON' });
+    });
+
+    it('should start the created session with the type chosen in the form', async () => {
+      render(<StartSessionPage />);
+      const formData: $CreateSessionData = {
+        date: NOW,
+        groupId: 'group-1',
+        subjectData: { id: 'subject-1' },
+        type: 'IN_PERSON'
+      };
+      await act(() => formProps().onSubmit(formData));
+      expect(mocks.mutateAsync).toHaveBeenCalledWith(formData);
+      expect(mocks.store.startSession).toHaveBeenCalledWith({ ...session, type: 'IN_PERSON' });
+    });
+
+    it('should replace the form with a confirmation while a session is active', () => {
+      mocks.store.currentSession = session;
+      render(<StartSessionPage />);
+      expect(screen.queryByTestId('start-session-form')).toBeNull();
+      expect(screen.getByText('Session Successfully Started')).toBeTruthy();
+    });
+
+    // Known defect: the reset effect runs only after the remounted form has already read the walkthrough values.
+    it.fails(
+      'should mount the form with the defaults once the session ends, not the values the walkthrough supplied',
+      () => {
+        mocks.locationState = { initialValues: { subjectId: 'DEMO' } };
+        mocks.store.currentSession = session;
+        const { rerender } = render(<StartSessionPage />);
+        const callsBeforeSessionEnds = mocks.StartSessionForm.mock.calls.length;
+        mocks.store.currentSession = null;
+        rerender(<StartSessionPage />);
+        expect(mocks.StartSessionForm.mock.calls[callsBeforeSessionEnds]![0].initialValues).toEqual({
+          sessionType: 'IN_PERSON',
+          subjectIdentificationMethod: 'PERSONAL_INFO'
+        });
+      }
     );
   });
 
-  it('should prefetch the default group custom ids when no group is selected', async () => {
-    mocks.store.currentGroup = null;
-    const ensureQueryData = vi.fn(() => Promise.resolve());
-    await mocks.route.loader({ context: { queryClient: { ensureQueryData } } });
-    expect(ensureQueryData).toHaveBeenCalledWith(
-      expect.objectContaining({ queryKey: ['subjects', 'custom-ids', undefined] })
-    );
+  describe('loader', () => {
+    it('should prefetch the custom ids of the current group', async () => {
+      const ensureQueryData = vi.fn(() => Promise.resolve());
+      await loader({ context: { queryClient: { ensureQueryData } } });
+      expect(ensureQueryData).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['subjects', 'custom-ids', 'group-1'] })
+      );
+    });
+
+    it('should prefetch the default group custom ids when no group is selected', async () => {
+      mocks.store.currentGroup = null;
+      const ensureQueryData = vi.fn(() => Promise.resolve());
+      await loader({ context: { queryClient: { ensureQueryData } } });
+      expect(ensureQueryData).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['subjects', 'custom-ids', undefined] })
+      );
+    });
   });
 });

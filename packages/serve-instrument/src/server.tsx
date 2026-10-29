@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console -- the server logs to the terminal it was started from */
 
 import { renderToString } from 'react-dom/server';
 
@@ -83,7 +83,7 @@ class InstrumentLoader {
       log(chalk.green('✓') + labelPart + chalk.dim(' Bundle ready') + timing);
     } catch (err) {
       const formattedError = err instanceof Error ? formatError(err) : err;
-      logError(chalk.dim(String(formattedError)) + '\n');
+      logError(`${chalk.dim(String(formattedError))}\n`);
       const labelPart = this.label ? ` ${this.label}` : ' instrument';
       logError(chalk.red('✘') + chalk.bold.red(` Error: Failed to compile${labelPart}`));
     }
@@ -161,7 +161,7 @@ class SingleModeHandler {
       const encodedBundle = await this.instrumentLoader.getEncodedBundle();
       if (encodedBundle) {
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end('<!DOCTYPE html>' + (await this.renderPage({ encodedBundle, page: 'single' })));
+        res.end(`<!DOCTYPE html>${await this.renderPage({ encodedBundle, page: 'single' })}`);
       } else {
         res.writeHead(503, { 'Content-Type': 'text/plain' });
         res.end('Bundle Loading or Error (See Console)');
@@ -236,7 +236,7 @@ class AllModeHandler {
     if (req.url === '/') {
       const props: RootProps = { instruments: this.loaderMap.getInstrumentList(), page: 'index' };
       res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end('<!DOCTYPE html>' + (await this.renderPage(props)));
+      res.end(`<!DOCTYPE html>${await this.renderPage(props)}`);
       return;
     }
 
@@ -257,7 +257,7 @@ class AllModeHandler {
         page: 'instrument'
       };
       res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end('<!DOCTYPE html>' + (await this.renderPage(props)));
+      res.end(`<!DOCTYPE html>${await this.renderPage(props)}`);
       return;
     }
 
@@ -347,12 +347,9 @@ export class Server {
     return new Promise((resolve) => {
       this.server.listen(this.port, () => {
         log(
-          chalk.green('✓') +
-            chalk.bold(' Ready') +
-            '  ' +
-            chalk.dim('➜') +
-            '  ' +
-            chalk.cyan.underline(`http://localhost:${this.port}`)
+          `${chalk.green('✓') + chalk.bold(' Ready')}  ${chalk.dim('➜')}  ${chalk.cyan.underline(
+            `http://localhost:${this.port}`
+          )}`
         );
         resolve();
       });
@@ -364,9 +361,10 @@ export class Server {
     return new Promise((resolve, reject) => {
       this.server.close((err) => {
         if (err) {
-          return reject(err);
+          reject(err);
+          return;
         }
-        return resolve();
+        resolve();
       });
     });
   }

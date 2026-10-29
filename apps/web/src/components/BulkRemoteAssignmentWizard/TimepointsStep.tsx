@@ -53,7 +53,7 @@ export const TimepointsStep = ({
 
   const todayISO = toBasicISOString(new Date());
 
-  const add = () => {
+  const handleAddTimepoint = () => {
     const instrument = instruments.find(({ id }) => id === instrumentId);
     if (!instrument || !expiresAt || expiresAt <= todayISO) {
       return;
@@ -139,7 +139,7 @@ export const TimepointsStep = ({
             disabled={!instrumentId || !expiresAt || expiresAt <= todayISO}
             type="button"
             variant="outline"
-            onClick={add}
+            onClick={handleAddTimepoint}
           >
             <PlusIcon className="h-4 w-4" />
             {t({ en: 'Add', es: 'Agregar', fr: 'Ajouter' })}

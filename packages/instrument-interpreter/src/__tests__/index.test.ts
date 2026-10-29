@@ -12,7 +12,7 @@ function createBundle({ imports, kind }: { imports: string[]; kind: InstrumentKi
   })()`;
 }
 
-describe('interpret', () => {
+describe('InstrumentInterpreter.interpret', () => {
   const interpreter = new InstrumentInterpreter();
 
   it('should reject a form that imports react, so that upgrading the react of an application cannot break a stored instrument', async () => {

@@ -69,7 +69,9 @@ describe('useInterpretedInstrument', () => {
     await waitFor(() => {
       expect(result.current).toMatchObject({ instrument: { details: { title: 'Fast' } }, status: 'DONE' });
     });
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100);
+    });
     expect(result.current).toMatchObject({ instrument: { details: { title: 'Fast' } }, status: 'DONE' });
   });
 

@@ -88,8 +88,9 @@ vi.mock('@/hooks/useUpdateUserMutation', () => ({
   useUpdateUserMutation: () => ({ mutateAsync: mocks.mutateAsync })
 }));
 vi.mock('@/store', () => ({
-  useAppStore: <TSelected,>(selector: (store: { currentUser: typeof mocks.state.currentUser }) => TSelected) =>
-    selector({ currentUser: mocks.state.currentUser })
+  useAppStore: <TSelected,>(selector: (store: { currentUser: typeof mocks.state.currentUser }) => TSelected) => {
+    return selector({ currentUser: mocks.state.currentUser });
+  }
 }));
 
 const GROUP_ONE = { id: 'group-1', name: 'Group One' };
@@ -139,22 +140,24 @@ const errorAlert = () => screen.queryByTestId('admin-user-edit-error');
 
 const saveButton = () => screen.getByTestId<HTMLButtonElement>('save-user-changes');
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  vi.spyOn(Route, 'useParams').mockReturnValue({ userId: 'user-1' });
-  mocks.mutateAsync.mockResolvedValue(undefined);
-  mocks.refetch.mockResolvedValue(undefined);
-  mocks.state.currentUser = { username: 'admin' };
-  mocks.state.groups = [GROUP_ONE, GROUP_TWO];
-  mocks.state.user = mocks.makeUser();
-});
+const noop = () => undefined;
 
-afterEach(() => {
-  cleanup();
-  vi.restoreAllMocks();
-});
+describe('Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(Route, 'useParams').mockReturnValue({ userId: 'user-1' });
+    mocks.mutateAsync.mockResolvedValue(undefined);
+    mocks.refetch.mockResolvedValue(undefined);
+    mocks.state.currentUser = { username: 'admin' };
+    mocks.state.groups = [GROUP_ONE, GROUP_TWO];
+    mocks.state.user = mocks.makeUser();
+  });
 
-describe('admin user route', () => {
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
   it('should prefetch the groups and the user in the loader, so the editor renders without a waterfall', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue(undefined);
@@ -437,7 +440,7 @@ describe('admin user route', () => {
     });
 
     it('should lock the save controls while a save is in flight', () => {
-      mocks.mutateAsync.mockReturnValue(new Promise(() => undefined));
+      mocks.mutateAsync.mockReturnValue(new Promise(noop));
       renderPage();
       act(() => {
         void formProps().onSubmit(submitData());
@@ -447,7 +450,7 @@ describe('admin user route', () => {
     });
 
     it('should ignore a second submit while a save is in flight, so the account is not saved twice', async () => {
-      mocks.mutateAsync.mockReturnValue(new Promise(() => undefined));
+      mocks.mutateAsync.mockReturnValue(new Promise(noop));
       renderPage();
       act(() => {
         void formProps().onSubmit(submitData());

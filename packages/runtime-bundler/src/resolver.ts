@@ -1,6 +1,6 @@
-import fs from 'fs';
-import module from 'module';
-import path from 'path';
+import fs from 'node:fs';
+import module from 'node:module';
+import path from 'node:path';
 
 import { isPlainObject } from '@douglasneuroinformatics/libjs';
 

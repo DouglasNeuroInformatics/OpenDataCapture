@@ -1,5 +1,8 @@
+import type { ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
+import { BadRequestException } from '@nestjs/common';
+import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -9,6 +12,14 @@ import { InstrumentRecordsController } from '../instrument-records.controller';
 import { InstrumentRecordsService } from '../instrument-records.service';
 
 const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+
+/** The pipe the `find` handler applies to its `minDate` query parameter. */
+function getMinDatePipe(): ParseSchemaPipe<Date> {
+  const args = Reflect.getMetadata(ROUTE_ARGS_METADATA, InstrumentRecordsController, 'find') as {
+    [key: string]: { data?: string; pipes: ParseSchemaPipe<Date>[] };
+  };
+  return Object.values(args).find(({ data }) => data === 'minDate')!.pipes[0]!;
+}
 
 describe('InstrumentRecordsController', () => {
   let instrumentRecordsController: InstrumentRecordsController;
@@ -68,6 +79,23 @@ describe('InstrumentRecordsController', () => {
       { ability, callerGroupIds: ['group-1', 'group-2'] }
     );
   });
+
+  it('should read minDate from the ISO 8601 date-time the client serializes', async () => {
+    await expect(getMinDatePipe().transform('2025-01-01T00:00:00.000Z')).resolves.toEqual(
+      new Date('2025-01-01T00:00:00.000Z')
+    );
+  });
+
+  it('should leave minDate undefined when the query omits it, so no records are excluded', async () => {
+    await expect(getMinDatePipe().transform(undefined)).resolves.toBeUndefined();
+  });
+
+  it.each(['', '2025-01-01', 'yesterday'])(
+    'should reject %j as minDate, rather than filter on some other moment',
+    async (minDate) => {
+      await expect(getMinDatePipe().transform(minDate)).rejects.toBeInstanceOf(BadRequestException);
+    }
+  );
 
   it('should delete the record scoped to the caller ability and return no content', async () => {
     instrumentRecordsService.deleteById.mockResolvedValueOnce(undefined);

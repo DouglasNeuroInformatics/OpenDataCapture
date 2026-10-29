@@ -45,24 +45,26 @@ const renderTable = (records: VisualizationRecord[], instrumentId: null | string
   render(<Component />);
 };
 
-const headers = () =>
-  Array.from(screen.getByTestId('data-table-head').firstElementChild!.children, (header) => header.textContent).filter(
-    Boolean
-  );
+const headers = () => {
+  return Array.from(
+    screen.getByTestId('data-table-head').firstElementChild!.children,
+    (header) => header.textContent
+  ).filter(Boolean);
+};
 
-beforeEach(() => {
-  navigate.mockReset();
-  mocks.visualization.dl.mockReset();
-  vi.spyOn(Route, 'useNavigate').mockReturnValue(navigate);
-  vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'subject-1' });
-});
+describe('Route', () => {
+  beforeEach(() => {
+    navigate.mockReset();
+    mocks.visualization.dl.mockReset();
+    vi.spyOn(Route, 'useNavigate').mockReturnValue(navigate);
+    vi.spyOn(Route, 'useParams').mockReturnValue({ subjectId: 'subject-1' });
+  });
 
-afterEach(() => {
-  cleanup();
-  vi.restoreAllMocks();
-});
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
 
-describe('subject table route', () => {
   it('should add a snake-cased column for each record field, so the headers match the exported column names', () => {
     renderTable([record()]);
     expect(headers()).toEqual(['DATE_COLLECTED', 'COLLECTION_METHOD', 'SERIES', 'TOTAL_SCORE']);

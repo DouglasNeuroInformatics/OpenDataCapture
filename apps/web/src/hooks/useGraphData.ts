@@ -30,7 +30,7 @@ export function useGraphData({ models, records, selectedMeasures }: UseGraphData
         if (!model) {
           continue;
         }
-        graphRecord[key + 'Group'] = Number((model.intercept + model.slope * graphRecord.__time__).toFixed(2));
+        graphRecord[`${key}Group`] = Number((model.intercept + model.slope * graphRecord.__time__).toFixed(2));
       }
       graphRecords.push(graphRecord);
     }

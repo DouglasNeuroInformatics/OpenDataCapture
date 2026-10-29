@@ -129,8 +129,9 @@ describe('AssignmentsController', () => {
   });
 
   describe('sendEmail', () => {
-    const sendEmail = (body: { language: Language; recipient: string; templateId?: null | string }) =>
-      assignmentsController.sendEmail('assignment-1', body, currentUser);
+    const sendEmail = (body: { language: Language; recipient: string; templateId?: null | string }) => {
+      return assignmentsController.sendEmail('assignment-1', body, currentUser);
+    };
 
     it('uses the built-in default template when the assignment has no group', async () => {
       assignmentsService.findById.mockResolvedValueOnce({ ...assignment, groupId: null });

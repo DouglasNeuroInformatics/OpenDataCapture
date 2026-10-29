@@ -9,11 +9,11 @@ const { localizeZodErrors } = vi.hoisted(() => ({
 
 vi.mock('@opendatacapture/react-core', () => ({ localizeZodErrors }));
 
-afterEach(() => {
-  vi.clearAllMocks();
-});
-
 describe('localizeValidationErrors', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should localize both the app and runtime zod instances, so instrument validation messages are translated too', async () => {
     await localizeValidationErrors();
     expect(localizeZodErrors).toHaveBeenCalledWith(expect.objectContaining({ targets: ['app', 'runtime'] }));

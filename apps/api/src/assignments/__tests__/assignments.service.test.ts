@@ -25,19 +25,20 @@ const futureDate = () => new Date(Date.now() + 86_400_000);
  * hand-rolled `can` would not survive contact with it. Permitting everything keeps each test on the
  * service's own group/subject/instrument scoping rather than on CASL itself.
  */
-const permissiveUser = () =>
-  ({
+const permissiveUser = () => {
+  return {
     ability: createAppAbility([{ action: 'manage', subject: 'all' }]),
     id: 'user-1'
-  }) as any;
+  } as any;
+};
 
 /** The ability `AbilityFactory` builds at login, so group conditions are the ones production applies. */
 const userAt = (
   basePermissionLevel: BasePermissionLevel,
   groupId = GROUP_ID,
   additionalPermissions: Permissions = []
-) =>
-  ({
+) => {
+  return {
     ability: new AbilityFactory({ verbose: vi.fn() } as any).createForPayload({
       additionalPermissions,
       basePermissionLevel,
@@ -45,14 +46,16 @@ const userAt = (
       id: 'user-1'
     } as any),
     id: 'user-1'
-  }) as any;
+  } as any;
+};
 
 /** Can read (so the group resolves) but cannot create an assignment. */
-const readOnlyUser = () =>
-  ({
+const readOnlyUser = () => {
+  return {
     ability: createAppAbility([{ action: 'read', subject: 'all' }]),
     id: 'user-1'
-  }) as any;
+  } as any;
+};
 
 const request = (overrides: { [key: string]: any } = {}) => ({
   allowDuplicates: false,
@@ -118,9 +121,9 @@ describe('AssignmentsService', () => {
     subjectModel.findMany.mockResolvedValue([{ id: 'subject-1' }, { id: 'subject-2' }]);
     assignmentModel.findMany.mockResolvedValue([]);
     instrumentModel.findMany.mockResolvedValue([]);
-    assignmentModel.create.mockImplementation(({ data }: any) =>
-      Promise.resolve({ ...data, instrumentId: 'instrument-1' })
-    );
+    assignmentModel.create.mockImplementation(({ data }: any) => {
+      return Promise.resolve({ ...data, instrumentId: 'instrument-1' });
+    });
     assignmentModel.deleteMany.mockResolvedValue({ count: 0 });
   };
 
@@ -223,9 +226,9 @@ describe('AssignmentsService', () => {
     });
 
     it('should never return or transmit the encryption keypair, which would hand out the private key', async () => {
-      assignmentModel.create.mockImplementation(({ data }: any) =>
-        Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } })
-      );
+      assignmentModel.create.mockImplementation(({ data }: any) => {
+        return Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } });
+      });
       const assignment = await assignmentsService.create(data(), permissiveUser());
 
       expect(assignment).not.toHaveProperty('encryptionKeyPair');
@@ -263,7 +266,9 @@ describe('AssignmentsService', () => {
 
     it('should write nothing to the model or the gateway when the request is refused', async () => {
       subjectModel.findMany.mockResolvedValueOnce([]);
-      await expect(assignmentsService.create(data(), userAt('GROUP_MANAGER'))).rejects.toThrow();
+      await expect(assignmentsService.create(data(), userAt('GROUP_MANAGER'))).rejects.toThrow(
+        UnprocessableEntityException
+      );
       expect(assignmentModel.create).not.toHaveBeenCalled();
       expect(gatewayService.createRemoteAssignment).not.toHaveBeenCalled();
     });
@@ -316,7 +321,7 @@ describe('AssignmentsService', () => {
 
     it('should not record an audit entry when the gateway refuses the assignment, since nothing was created', async () => {
       gatewayService.createRemoteAssignment.mockRejectedValueOnce(new Error('gateway down'));
-      await expect(assignmentsService.create(data(), permissiveUser())).rejects.toThrow();
+      await expect(assignmentsService.create(data(), permissiveUser())).rejects.toThrow('gateway down');
       expect(auditLogger.log).not.toHaveBeenCalled();
     });
 
@@ -366,9 +371,9 @@ describe('AssignmentsService', () => {
     });
 
     it('should never return or transmit the encryption keypair, which would hand out the private key', async () => {
-      assignmentModel.create.mockImplementation(({ data }: any) =>
-        Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } })
-      );
+      assignmentModel.create.mockImplementation(({ data }: any) => {
+        return Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } });
+      });
       const assignments = await assignmentsService.createBulk(request(), permissiveUser());
 
       expect(assignments.every((assignment) => !('encryptionKeyPair' in assignment))).toBe(true);
@@ -399,7 +404,7 @@ describe('AssignmentsService', () => {
 
     it('should delete every staged row when the gateway rejects the batch, leaving nothing behind', async () => {
       gatewayService.createRemoteAssignments.mockRejectedValueOnce(new Error('gateway down'));
-      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow();
+      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow('gateway down');
       expect(assignmentModel.deleteMany).toHaveBeenCalledTimes(1);
       expect(assignmentModel.deleteMany.mock.lastCall?.[0]).toMatchObject({ where: { id: { in: expect.any(Array) } } });
       expect(assignmentModel.deleteMany.mock.lastCall?.[0].where.id.in).toHaveLength(2);
@@ -407,7 +412,7 @@ describe('AssignmentsService', () => {
 
     it('should not record an audit entry when the batch failed, since nothing was created', async () => {
       gatewayService.createRemoteAssignments.mockRejectedValueOnce(new Error('gateway down'));
-      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow();
+      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow('gateway down');
       expect(auditLogger.log).not.toHaveBeenCalled();
     });
 
@@ -441,7 +446,7 @@ describe('AssignmentsService', () => {
       gatewayService.createRemoteAssignments.mockRejectedValueOnce(new Error('gateway down'));
       const rollbackFailure = new Error('database down');
       assignmentModel.deleteMany.mockRejectedValueOnce(rollbackFailure);
-      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow();
+      await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toThrow('gateway down');
       expect(loggingService.error).toHaveBeenCalledExactlyOnceWith({
         error: rollbackFailure,
         message: 'ERROR: Failed to roll back staged bulk assignments'

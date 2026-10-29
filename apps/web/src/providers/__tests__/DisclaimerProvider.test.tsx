@@ -19,23 +19,24 @@ vi.mock('@/store', () => ({
 
 const CHILD_TEXT = 'Protected Content';
 
-const renderProvider = () =>
-  render(
+const renderProvider = () => {
+  return render(
     <DisclaimerProvider>
       <p>{CHILD_TEXT}</p>
     </DisclaimerProvider>
   );
-
-beforeEach(() => {
-  mocks.store.isDisclaimerAccepted = false;
-});
-
-afterEach(() => {
-  cleanup();
-  vi.clearAllMocks();
-});
+};
 
 describe('DisclaimerProvider', () => {
+  beforeEach(() => {
+    mocks.store.isDisclaimerAccepted = false;
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
   it('should render its children beneath the disclaimer', () => {
     renderProvider();
     expect(screen.getByText(CHILD_TEXT)).toBeTruthy();

@@ -21,6 +21,24 @@ export const EmailAllDialog = ({ bulkEmail }: EmailAllDialogProps) => {
   const pendingCount = bulkEmail.pending.length;
   const isRetry = pendingCount > 0 && bulkEmail.hasAttempted;
 
+  const idleLabel = isRetry
+    ? t(
+        {
+          en: 'Retry Failed ({})',
+          es: 'Reintentar los fallidos ({})',
+          fr: 'Réessayer les échecs ({})'
+        },
+        { args: [String(pendingCount)] }
+      )
+    : t(
+        {
+          en: 'Email All ({})',
+          es: 'Enviar todos ({})',
+          fr: 'Tout envoyer ({})'
+        },
+        { args: [String(pendingCount)] }
+      );
+
   const send = async () => {
     setIsOpen(false);
     await bulkEmail.sendAll();
@@ -44,23 +62,7 @@ export const EmailAllDialog = ({ bulkEmail }: EmailAllDialogProps) => {
                 },
                 { args: [String(bulkEmail.completedCount), String(pendingCount)] }
               )
-            : isRetry
-              ? t(
-                  {
-                    en: 'Retry Failed ({})',
-                    es: 'Reintentar los fallidos ({})',
-                    fr: 'Réessayer les échecs ({})'
-                  },
-                  { args: [String(pendingCount)] }
-                )
-              : t(
-                  {
-                    en: 'Email All ({})',
-                    es: 'Enviar todos ({})',
-                    fr: 'Tout envoyer ({})'
-                  },
-                  { args: [String(pendingCount)] }
-                )}
+            : idleLabel}
         </Button>
       </Dialog.Trigger>
       <Dialog.Content className="max-w-md">

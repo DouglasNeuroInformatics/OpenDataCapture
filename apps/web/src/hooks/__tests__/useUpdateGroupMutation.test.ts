@@ -36,8 +36,9 @@ const group = {
 
 function renderUpdateMutation(options?: Parameters<typeof useUpdateGroupMutation>[0]) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return renderHook(() => useUpdateGroupMutation(options), { wrapper });
 }
 
@@ -94,7 +95,7 @@ describe('useUpdateGroupMutation', () => {
   it.fails('should refuse to patch when no group is selected, so no request reaches /v1/groups/undefined', async () => {
     store.currentGroup = null;
     const { result } = renderUpdateMutation({ throwOnError: false });
-    await expect(result.current.mutateAsync({ name: 'Renamed' })).rejects.toThrow();
+    await expect(result.current.mutateAsync({ name: 'Renamed' })).rejects.toThrow(/group/i);
     expect(mockAxios.patch).not.toHaveBeenCalled();
   });
 });

@@ -29,8 +29,11 @@ export class SummaryService {
     const now = Date.now();
     const timestamps = Array.from({ length: TREND_POINT_COUNT }, (_, i) => now - THIRTY_DAYS_MS * i);
 
-    const countTrend = (countAsOf: (lte: Date) => Promise<number>): Promise<Summary['trends']['records']> =>
-      Promise.all(timestamps.map(async (timestamp) => ({ timestamp, value: await countAsOf(new Date(timestamp)) })));
+    const countTrend = (countAsOf: (lte: Date) => Promise<number>): Promise<Summary['trends']['records']> => {
+      return Promise.all(
+        timestamps.map(async (timestamp) => ({ timestamp, value: await countAsOf(new Date(timestamp)) }))
+      );
+    };
 
     // None of these counts depend on one another, so they are issued concurrently: the endpoint costs
     // the slowest query rather than the sum of all of them.

@@ -1,4 +1,3 @@
-/* eslint-disable import/exports-last */
 import { del, get, set } from 'idb-keyval';
 import { jwtDecode } from 'jwt-decode';
 import { pick } from 'lodash-es';
@@ -31,7 +30,7 @@ const storage: StateStorage = {
   }
 };
 
-export const useAppStore = create(
+const useAppStore = create(
   devtools(
     persist(
       subscribeWithSelector(
@@ -91,7 +90,9 @@ const { selectedInstrument } = useAppStore.getState();
 const indexFilename = resolveIndexFilename(selectedInstrument.files)!;
 useAppStore.setState({
   files: selectedInstrument.files,
-  indexFilename: indexFilename,
+  indexFilename,
   openFilenames: [indexFilename],
   selectedFilename: indexFilename
 });
+
+export { useAppStore };

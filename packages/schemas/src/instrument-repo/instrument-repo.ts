@@ -1,12 +1,12 @@
 import { z } from 'zod/v4';
 
-import { $BaseModel } from '../core/core.js';
+import { $BaseModel, $DateLike } from '../core/core.js';
 
 export type InstrumentRepo = z.infer<typeof $InstrumentRepo>;
 export const $InstrumentRepo = $BaseModel.extend({
   groupIds: z.array(z.string()),
   instrumentIds: z.array(z.string()),
-  lastSyncedAt: z.coerce.date().nullish(),
+  lastSyncedAt: $DateLike.nullish(),
   name: z.string().min(1),
   owner: z.string().min(1),
   repoName: z.string().min(1),

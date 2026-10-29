@@ -16,7 +16,7 @@ describe('$CreateInstrumentRecordData', () => {
     expect(
       $CreateInstrumentRecordData.safeParse({
         data: { value: 1 },
-        date: '2024-01-01',
+        date: '2024-01-01T00:00:00.000Z',
         instrumentId: 'instrument-1',
         sessionId: 'session-1',
         subjectId: 'subject-1'
@@ -27,7 +27,18 @@ describe('$CreateInstrumentRecordData', () => {
     expect(
       $CreateInstrumentRecordData.safeParse({
         data: { value: 1 },
-        date: '2024-01-01',
+        date: '2024-01-01T00:00:00.000Z',
+        sessionId: 'session-1',
+        subjectId: 'subject-1'
+      }).success
+    ).toBe(false);
+  });
+  it.each([null, '', '2024-01-01'])('should reject %j as the date, rather than record some other moment', (date) => {
+    expect(
+      $CreateInstrumentRecordData.safeParse({
+        data: { value: 1 },
+        date,
+        instrumentId: 'instrument-1',
         sessionId: 'session-1',
         subjectId: 'subject-1'
       }).success
@@ -49,7 +60,7 @@ describe('$UploadInstrumentRecordsData', () => {
     expect(
       $UploadInstrumentRecordsData.safeParse({
         instrumentId: 'instrument-1',
-        records: [{ data: { value: 1 }, date: '2024-01-01', subjectId: 'subject-1' }]
+        records: [{ data: { value: 1 }, date: '2024-01-01T00:00:00.000Z', subjectId: 'subject-1' }]
       }).success
     ).toBe(true);
   });
@@ -59,60 +70,65 @@ describe('$InstrumentRecord', () => {
   it('should accept a record with only its required fields', () => {
     expect(
       $InstrumentRecord.safeParse({
-        createdAt: '2024-01-01',
+        createdAt: '2024-01-01T00:00:00.000Z',
         data: { value: 1 },
-        date: '2024-01-01',
+        date: '2024-01-01T00:00:00.000Z',
         id: 'record-1',
         instrumentId: 'instrument-1',
         sessionId: 'session-1',
         subjectId: 'subject-1',
-        updatedAt: '2024-01-01'
+        updatedAt: '2024-01-01T00:00:00.000Z'
       }).success
     ).toBe(true);
   });
   it('should reject a record missing sessionId', () => {
     expect(
       $InstrumentRecord.safeParse({
-        createdAt: '2024-01-01',
+        createdAt: '2024-01-01T00:00:00.000Z',
         data: { value: 1 },
-        date: '2024-01-01',
+        date: '2024-01-01T00:00:00.000Z',
         id: 'record-1',
         instrumentId: 'instrument-1',
         subjectId: 'subject-1',
-        updatedAt: '2024-01-01'
+        updatedAt: '2024-01-01T00:00:00.000Z'
       }).success
     ).toBe(false);
   });
-});
 
-describe('$InstrumentRecord session metadata', () => {
-  const base = {
-    createdAt: '2024-01-01',
-    data: { value: 1 },
-    date: '2024-01-01',
-    id: 'record-1',
-    instrumentId: 'instrument-1',
-    sessionId: 'session-1',
-    subjectId: 'subject-1',
-    updatedAt: '2024-01-01'
-  };
-  it('should accept the data collection method on the session, which is the column the datahub renders', () => {
-    const result = $InstrumentRecord.safeParse({ ...base, session: { type: 'REMOTE', user: { username: 'alice' } } });
-    expect(result.success).toBe(true);
-    expect(result.data?.session?.type).toBe('REMOTE');
-  });
-  // A record whose session was deleted reads back without a type, which must not fail the response.
-  it('should accept a null collection method', () => {
-    expect($InstrumentRecord.safeParse({ ...base, session: { type: null, user: null } }).success).toBe(true);
-  });
-  it('should reject a collection method that is not a session type', () => {
-    expect($InstrumentRecord.safeParse({ ...base, session: { type: 'IN_CLINIC' } }).success).toBe(false);
+  describe('session metadata', () => {
+    const base = {
+      createdAt: '2024-01-01T00:00:00.000Z',
+      data: { value: 1 },
+      date: '2024-01-01T00:00:00.000Z',
+      id: 'record-1',
+      instrumentId: 'instrument-1',
+      sessionId: 'session-1',
+      subjectId: 'subject-1',
+      updatedAt: '2024-01-01T00:00:00.000Z'
+    };
+    it('should accept the data collection method on the session, which is the column the datahub renders', () => {
+      const result = $InstrumentRecord.safeParse({ ...base, session: { type: 'REMOTE', user: { username: 'alice' } } });
+      expect(result.success).toBe(true);
+      expect(result.data?.session?.type).toBe('REMOTE');
+    });
+    // A record whose session was deleted reads back without a type, which must not fail the response.
+    it('should accept a null collection method', () => {
+      expect($InstrumentRecord.safeParse({ ...base, session: { type: null, user: null } }).success).toBe(true);
+    });
+    it('should reject a collection method that is not a session type', () => {
+      expect($InstrumentRecord.safeParse({ ...base, session: { type: 'IN_CLINIC' } }).success).toBe(false);
+    });
   });
 });
 
 describe('$InstrumentRecordSummary', () => {
-  const base = { instrumentId: 'instrument-1', lastCollectedAt: '2024-01-01', recordCount: 5, subjectCount: 3 };
-  it('should accept a summary and coerce its collection date', () => {
+  const base = {
+    instrumentId: 'instrument-1',
+    lastCollectedAt: '2024-01-01T00:00:00.000Z',
+    recordCount: 5,
+    subjectCount: 3
+  };
+  it('should accept a summary and convert its collection date to a Date', () => {
     const result = $InstrumentRecordSummary.safeParse(base);
     expect(result.success).toBe(true);
     expect(result.data?.lastCollectedAt).toStrictEqual(new Date('2024-01-01'));

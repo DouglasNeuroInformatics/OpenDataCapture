@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -43,6 +43,26 @@ describe('config', () => {
     vi.stubEnv('GATEWAY_PROD_SERVER_PORT', '8080');
     await expect(loadConfig()).resolves.toMatchObject({ port: 8080 });
   });
+
+  it.each(['', 'abc', '0', '-1', '35.5'])(
+    'should refuse to start with %j as the dev server port, rather than listen on some other port',
+    async (port) => {
+      vi.stubEnv('GATEWAY_DEV_SERVER_PORT', port);
+      await expect(loadConfig()).rejects.toMatchObject({
+        issues: expect.arrayContaining([expect.objectContaining({ path: ['devServerPort'] })])
+      });
+    }
+  );
+
+  it.each(['', 'abc', '0', '-1', '80.5'])(
+    'should refuse to start with %j as the production port, rather than listen on some other port',
+    async (port) => {
+      vi.stubEnv('GATEWAY_PROD_SERVER_PORT', port);
+      await expect(loadConfig()).rejects.toMatchObject({
+        issues: expect.arrayContaining([expect.objectContaining({ path: ['prodServerPort'] })])
+      });
+    }
+  );
 
   it('should refuse to start with an API key shorter than 32 characters, so the key cannot be guessed', async () => {
     vi.stubEnv('GATEWAY_API_KEY', 'short');

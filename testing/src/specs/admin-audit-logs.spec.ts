@@ -72,7 +72,7 @@ test.describe('admin audit logs sorting', () => {
     );
     await auditLogsPage.timeHeaderButton.click();
 
-    await ascendingRequest;
+    expect((await ascendingRequest).url()).toContain('sortOrder=asc');
   });
 });
 
@@ -90,12 +90,14 @@ test.describe('admin audit logs fetching', () => {
     const auditLogsPage = await getPageModel('/admin/audit/logs');
     const firstRow = auditLogsPage.dataTable.getByTestId('data-table-row').first();
     await expect(firstRow).toBeVisible();
+    // eslint-disable-next-line playwright/no-networkidle -- proving no duplicate request fires needs a quiet period, which is what network idle is
     await page.waitForLoadState('networkidle');
     expect(auditLogsRequests).toHaveLength(1);
 
     await auditLogsPage.filterBy('action', 'Login');
     await expect(auditLogsPage.$ref).toHaveURL(/action=LOGIN/);
     await expect(firstRow).toContainText('Login');
+    // eslint-disable-next-line playwright/no-networkidle -- proving no duplicate request fires needs a quiet period, which is what network idle is
     await page.waitForLoadState('networkidle');
     expect(auditLogsRequests).toHaveLength(2);
   });

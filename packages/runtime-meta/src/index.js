@@ -1,6 +1,6 @@
-import * as fs from 'fs';
-import * as module from 'module';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as module from 'node:module';
+import * as path from 'node:path';
 
 /** @type {(path: string) => Promise<boolean>} */
 const isDirectory = async (path) => fs.existsSync(path) && fs.lstatSync(path).isDirectory();
@@ -56,7 +56,7 @@ export function parsePackages(runtimeVersion, manifest) {
       throw new Error(`Unexpected import path pattern: ${filename}`);
     }
     const [name, version] = /** @type {[string, string]} */ (match.slice(1, 3));
-    const key = name + '$' + version;
+    const key = `${name}$${version}`;
     if (!packages.has(key)) {
       packages.set(key, { exports: { css: [], html: [], js: [] }, name, version });
     }

@@ -97,12 +97,13 @@ export const SourceStep = ({
     }
   };
 
-  const handleFile = (file: File) =>
-    void run(async () => {
+  const handleFile = (file: File) => {
+    return void run(async () => {
       assertFileSize(file);
       // The workbook parser is the only path that pulls in `xlsx`, and it does so dynamically.
       return isWorkbookFile(file) ? parseWorkbook(file) : parseDelimitedText(await file.text());
     });
+  };
 
   const toggle = (id: string) => {
     const next = new Set(selected);
@@ -346,9 +347,9 @@ export const SourceStep = ({
                                   placeholder={t({ en: 'Email', es: 'Correo', fr: 'Courriel' })}
                                   type="email"
                                   value={emails[row.original.id] ?? ''}
-                                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                    onEmailsChange({ ...emails, [row.original.id]: event.target.value })
-                                  }
+                                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                    onEmailsChange({ ...emails, [row.original.id]: event.target.value });
+                                  }}
                                   onClick={(event: React.MouseEvent) => event.stopPropagation()}
                                 />
                               ),

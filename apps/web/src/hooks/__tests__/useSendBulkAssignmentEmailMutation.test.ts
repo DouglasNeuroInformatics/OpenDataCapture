@@ -16,8 +16,9 @@ const delivered = { message: 'rendered', recipient: 'p@x.org', status: 'SENT' };
 
 function renderSendMutation() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return renderHook(() => useSendBulkAssignmentEmailMutation(), { wrapper });
 }
 

@@ -17,8 +17,9 @@ const renderSelect = ({ onSelect = vi.fn(), slots = 3 } = {}) => {
 
 const open = () => fireEvent.keyDown(trigger(), { key: 'Enter' });
 
-const swatchColors = (option: HTMLElement) =>
-  [...option.querySelectorAll<HTMLElement>('span[style]')].map((dot) => dot.style.backgroundColor);
+const swatchColors = (option: HTMLElement) => {
+  return [...option.querySelectorAll<HTMLElement>('span[style]')].map((dot) => dot.style.backgroundColor);
+};
 
 describe('SelectChartPalette', () => {
   beforeEach(() => {

@@ -154,9 +154,9 @@ describe('MapStep', () => {
   it('should resolve custom identifiers into their group-scoped form, since that is how they are stored', async () => {
     const { onResolved } = renderMapStep(byId);
     fireEvent.click(continueButton());
-    await waitFor(() =>
-      expect(onResolved).toHaveBeenCalledWith(['Depression_Clinic$001', 'Depression_Clinic$002'], idRows)
-    );
+    await waitFor(() => {
+      expect(onResolved).toHaveBeenCalledWith(['Depression_Clinic$001', 'Depression_Clinic$002'], idRows);
+    });
   });
 
   it('should resolve with the mapping the user chose rather than the one detected on parse', async () => {
@@ -164,9 +164,9 @@ describe('MapStep', () => {
     await chooseField('first_name', 'Not Used');
     await chooseField('subject_id', 'Subject ID');
     fireEvent.click(continueButton());
-    await waitFor(() =>
-      expect(onResolved).toHaveBeenCalledWith(['Depression_Clinic$001', 'Depression_Clinic$002'], idRows)
-    );
+    await waitFor(() => {
+      expect(onResolved).toHaveBeenCalledWith(['Depression_Clinic$001', 'Depression_Clinic$002'], idRows);
+    });
   });
 
   it('should derive a subject hash from personal information in the browser', async () => {
@@ -205,7 +205,7 @@ describe('MapStep', () => {
     const digest = 'a'.repeat(64);
     const { onResolved } = renderMapStep(
       { ...byId, preview: [{ subject_id: 'aaaaaaaaa' }], rows: [{ subject_id: 'aaaaaaaaa' }] },
-      [digest, 'a'.repeat(63) + 'b']
+      [digest, `${'a'.repeat(63)}b`]
     );
     fireEvent.click(continueButton());
     const errorList = await screen.findByTestId('bulk-error-list');
@@ -219,9 +219,9 @@ describe('MapStep', () => {
     await screen.findByTestId('bulk-error-list');
     fireEvent.click(screen.getByTestId('bulk-skip-unplaceable'));
     fireEvent.click(continueButton());
-    await waitFor(() =>
-      expect(screen.getByTestId('bulk-error-list').textContent).toContain('there is nothing to assign')
-    );
+    await waitFor(() => {
+      expect(screen.getByTestId('bulk-error-list').textContent).toContain('there is nothing to assign');
+    });
     expect(onResolved).not.toHaveBeenCalled();
   });
 

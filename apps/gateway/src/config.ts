@@ -1,12 +1,14 @@
-import path from 'path';
+import path from 'node:path';
 
 import { z } from 'zod/v4';
+
+const $Port = z.string().regex(/^\d+$/, { abort: true }).transform(Number).pipe(z.number().int().positive());
 
 const $Config = z
   .object({
     apiKey: z.string().min(32),
-    devServerPort: z.coerce.number().int().positive().optional(),
-    prodServerPort: z.coerce.number().int().positive().default(80),
+    devServerPort: $Port.optional(),
+    prodServerPort: $Port.default(80),
     root: z.string().min(1)
   })
   .refine((config) => Boolean(import.meta.env.PROD || config.devServerPort), {

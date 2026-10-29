@@ -5,23 +5,24 @@ import { useLocation } from '@tanstack/react-router';
 
 import { config } from '@/config';
 
-let ForceClearQueryCacheProvider: React.FC<{ children: React.ReactNode }>;
+type ForceClearQueryCacheProviderProps = {
+  children: React.ReactNode;
+};
 
-if (config.dev.isForceClearQueryCacheEnabled) {
-  // eslint-disable-next-line react/function-component-definition
-  ForceClearQueryCacheProvider = function ForceClearQueryCacheProvider({ children }) {
-    const queryClient = useQueryClient();
-    const location = useLocation();
+const ClearQueryCacheOnNavigation = ({ children }: ForceClearQueryCacheProviderProps) => {
+  const queryClient = useQueryClient();
+  const location = useLocation();
 
-    useEffect(() => {
-      //queryClient.clear();
-      queryClient.clear();
-    }, [location.pathname]);
+  useEffect(() => {
+    //queryClient.clear();
+    queryClient.clear();
+  }, [location.pathname]);
 
-    return <>{children}</>;
-  };
-} else {
-  ForceClearQueryCacheProvider = Fragment;
-}
+  return <>{children}</>;
+};
 
-export { ForceClearQueryCacheProvider };
+const { isForceClearQueryCacheEnabled } = config.dev;
+
+export const ForceClearQueryCacheProvider: React.FC<ForceClearQueryCacheProviderProps> = isForceClearQueryCacheEnabled
+  ? ClearQueryCacheOnNavigation
+  : Fragment;

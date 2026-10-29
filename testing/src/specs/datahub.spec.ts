@@ -1,8 +1,18 @@
 import { readFile } from 'node:fs/promises';
 
+import type { Page } from '@playwright/test';
+
 import { DatahubPage } from '../pages/_app/datahub/subjects/index.page';
 import { HAPPINESS_RECORD, PHONE_VIEWPORT } from '../support/constants';
 import { expect, test } from '../support/fixtures';
+
+function readSubjectIdFromUrl(page: Page) {
+  const [, subjectId] = /\/datahub\/subjects\/([^/]+)\/table/.exec(page.url()) ?? [];
+  if (!subjectId) {
+    throw new Error(`Failed to extract subjectId from URL: ${page.url()}`);
+  }
+  return subjectId;
+}
 
 test.describe('data hub on a phone', () => {
   test.use({ viewport: PHONE_VIEWPORT });
@@ -69,10 +79,7 @@ test.describe('data hub', () => {
 
     await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
     await page.waitForURL('**/datahub/subjects/**/table');
-    const [, subjectId] = /\/datahub\/subjects\/([^/]+)\/table/.exec(page.url()) ?? [];
-    if (!subjectId) {
-      throw new Error(`Failed to extract subjectId from URL: ${page.url()}`);
-    }
+    const subjectId = readSubjectIdFromUrl(page);
     const displayedId = subjectId.slice(0, 9);
 
     const datahubPage = await getPageModel('/datahub/subjects');
@@ -122,10 +129,7 @@ test.describe('data hub', () => {
 
     await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
     await page.waitForURL('**/datahub/subjects/**/table');
-    const [, subjectId] = /\/datahub\/subjects\/([^/]+)\/table/.exec(page.url()) ?? [];
-    if (!subjectId) {
-      throw new Error(`Failed to extract subjectId from URL: ${page.url()}`);
-    }
+    const subjectId = readSubjectIdFromUrl(page);
 
     const datahubPage = await getPageModel('/datahub/subjects');
     await datahubPage.searchInput.fill(subjectId.slice(0, 9));

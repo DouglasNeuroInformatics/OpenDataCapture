@@ -250,7 +250,7 @@ describe('MailSettings', () => {
     });
 
     it('should disable the save button while a save is in flight', async () => {
-      mocks.patch.mockReturnValue(new Promise(() => undefined));
+      mocks.patch.mockReturnValue(Promise.withResolvers<never>().promise);
       renderSettings(storedConfig);
       saveConfig();
       await waitFor(() => expect(screen.getByTestId('mail-save-config').hasAttribute('disabled')).toBe(true));

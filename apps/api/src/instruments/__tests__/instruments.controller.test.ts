@@ -66,20 +66,20 @@ describe('InstrumentsController', () => {
     const handlerNames = Object.getOwnPropertyNames(InstrumentsController.prototype).filter(
       (name) => name !== 'constructor'
     );
-    const accepting = handlerNames.filter((name) =>
-      new Reflector().get<true | undefined>(
+    const accepting = handlerNames.filter((name) => {
+      return new Reflector().get<true | undefined>(
         ACCEPTS_INSTRUMENT_TOKEN_METADATA_KEY,
         Object.getOwnPropertyDescriptor(InstrumentsController.prototype, name)!.value
-      )
-    );
+      );
+    });
     expect(accepting).toEqual(['create']);
   });
 
   // Every group's series, and retiring one, belong to administrators alone: a group manager may create
   // and delete their own group's series, which the guard would not tell apart from any other.
   describe.each(['findSeriesOverview', 'updateSeriesArchive'] as const)('route access for %s', (handlerName) => {
-    const abilityFor = (basePermissionLevel: BasePermissionLevel) =>
-      new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
+    const abilityFor = (basePermissionLevel: BasePermissionLevel) => {
+      return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
         basePermissionLevel,
         firstName: 'Test',
         groups: [{ id: 'group-1' }] as Group[],
@@ -89,6 +89,7 @@ describe('InstrumentsController', () => {
         mustResetPassword: false,
         username: 'test-user'
       });
+    };
     const { action, subject } = new Reflector().get<ProtectedRoutePermissionSet>(
       ROUTE_ACCESS_METADATA_KEY,
       Object.getOwnPropertyDescriptor(InstrumentsController.prototype, handlerName)!.value

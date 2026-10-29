@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import { useEffect } from 'react';
 
 import { asyncResultify } from '@douglasneuroinformatics/libjs';
@@ -17,9 +15,9 @@ import { useAppStore } from '@/store';
 type $LoginData = z.infer<typeof $LoginData>;
 const $LoginData = z.object({
   apiBaseUrl: z.url(),
-  username: z.string().min(1),
+  legacyLogin: z.boolean(),
   password: z.string().min(1),
-  legacyLogin: z.boolean()
+  username: z.string().min(1)
 });
 
 export type LoginDialogProps = {
@@ -90,9 +88,9 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
     const adminTokenResult = await getAdminToken(credentials, apiBaseUrl);
     if (adminTokenResult.isErr()) {
       addNotification({
-        type: 'error',
+        message: adminTokenResult.error,
         title: t({ en: 'Login Failed', fr: 'Échec de la connexion' }),
-        message: adminTokenResult.error
+        type: 'error'
       });
       return;
     }
@@ -103,9 +101,9 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
       const limitedTokenResult = await getLimitedToken(adminTokenResult.value.accessToken, apiBaseUrl);
       if (limitedTokenResult.isErr()) {
         addNotification({
-          type: 'error',
+          message: limitedTokenResult.error,
           title: t({ en: 'Failed to Get Limited Token', fr: "Échec de l'obtention d'un jeton limité" }),
-          message: limitedTokenResult.error
+          type: 'error'
         });
         return;
       }
@@ -148,7 +146,6 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
           <Form
             content={[
               {
-                title: t({ en: 'Instance Settings', fr: "Paramètres de l'instance" }),
                 fields: {
                   apiBaseUrl: {
                     description: t({
@@ -156,8 +153,8 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
                       fr: 'Le chemin de base de votre API REST Open Data Capture.'
                     }),
                     kind: 'string',
-                    placeholder: 'e.g., https://demo.opendatacapture.org/api',
                     label: t({ en: 'API Base URL', fr: "URL de base de l'API" }),
+                    placeholder: 'e.g., https://demo.opendatacapture.org/api',
                     variant: 'input'
                   },
                   legacyLogin: {
@@ -171,28 +168,30 @@ export const LoginDialog = ({ isOpen, setIsOpen }: LoginDialogProps) => {
                     }),
                     kind: 'boolean',
                     label: t({ en: 'Legacy Login Mode', fr: 'Mode de connexion hérité' }),
-                    variant: 'radio',
                     options: {
                       false: t({ en: 'No (Recommended)', fr: 'Non (Recommandé)' }),
                       true: t({ en: 'Yes', fr: 'Oui' })
-                    }
+                    },
+                    variant: 'radio'
                   }
-                }
+                },
+                title: t({ en: 'Instance Settings', fr: "Paramètres de l'instance" })
               },
               {
-                title: t({ en: 'Login Credentials', fr: 'Identifiants de connexion' }),
                 fields: {
                   username: {
                     kind: 'string',
                     label: t({ en: 'Username', fr: "Nom d'utilisateur" }),
                     variant: 'input'
                   },
+                  // eslint-disable-next-line perfectionist/sort-objects -- fields render in key order, so password must follow username
                   password: {
                     kind: 'string',
                     label: t({ en: 'Password', fr: 'Mot de passe' }),
                     variant: 'password'
                   }
-                }
+                },
+                title: t({ en: 'Login Credentials', fr: 'Identifiants de connexion' })
               }
             ]}
             initialValues={{ apiBaseUrl, legacyLogin: false }}

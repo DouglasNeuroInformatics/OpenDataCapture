@@ -59,8 +59,8 @@ describe('GroupsController', () => {
   // but the guard checks the subject type, for which CASL ignores conditions -- so the previous
   // `create Group` declaration admitted every group manager (#1468).
   describe('route access for create', () => {
-    const abilityFor = (basePermissionLevel: BasePermissionLevel) =>
-      new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
+    const abilityFor = (basePermissionLevel: BasePermissionLevel) => {
+      return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
         basePermissionLevel,
         firstName: 'Test',
         groups: [{ id: 'group-1' }] as Group[],
@@ -72,6 +72,7 @@ describe('GroupsController', () => {
         mustResetPassword: false,
         username: 'test-user'
       });
+    };
 
     // `@RouteAccess` stores its metadata on the handler itself, which is what the guard reads
     // through `context.getHandler()`.

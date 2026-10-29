@@ -6,7 +6,7 @@ import type { EmailDeliveryResult } from '@opendatacapture/schemas/mail';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AssignmentEmailForm } from '@/components/AssignmentEmailForm';
+import { AssignmentEmailForm } from '@/components/AssignmentEmailForm/AssignmentEmailForm';
 
 import '@/services/i18n';
 
@@ -93,19 +93,19 @@ const chooseTemplate = (label: string) => {
 
 const lastNotification = () => useNotificationsStore.getState().notifications.at(-1);
 
-beforeEach(() => {
-  // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
-  cleanup();
-  vi.resetAllMocks();
-  i18n.changeLanguage('en');
-  mocks.activeLanguages = ['en', 'es', 'fr'];
-  mocks.isMailEnabled = true;
-  mocks.isPending = false;
-  useNotificationsStore.setState({ notifications: [] });
-  mockGroup(null, []);
-});
-
 describe('AssignmentEmailForm', () => {
+  beforeEach(() => {
+    // There are no vitest setup files in this repo, so RTL never auto-unmounts between tests.
+    cleanup();
+    vi.resetAllMocks();
+    i18n.changeLanguage('en');
+    mocks.activeLanguages = ['en', 'es', 'fr'];
+    mocks.isMailEnabled = true;
+    mocks.isPending = false;
+    useNotificationsStore.setState({ notifications: [] });
+    mockGroup(null, []);
+  });
+
   // The server resolves the template from the assignment's own group; querying the currently
   // selected group instead would offer templates the server will never consider.
   it('queries the group the assignment belongs to', () => {

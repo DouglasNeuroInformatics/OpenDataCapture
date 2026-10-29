@@ -55,9 +55,7 @@ test.describe('login page instance name', () => {
     const loginPage = new LoginPage(page);
     await loginPage.goto('/auth/login');
     await loginPage.loginForm.waitFor();
-    if (await loginPage.demoDialog.isVisible()) {
-      await loginPage.dismissDemoDialog();
-    }
+    await loginPage.dismissDemoDialog();
     await expect(page.getByRole('heading', { level: 3, name: frenchOnlyName })).toBeVisible();
 
     const restoredEditorPage = await getPageModel('/admin/branding/login-page');

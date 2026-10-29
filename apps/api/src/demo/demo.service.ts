@@ -145,7 +145,7 @@ export class DemoService {
             data.reasonNotSatisfied = faker.lorem.sentence();
           }
           await this.instrumentRecordsService.create({
-            data: data,
+            data,
             date,
             groupId: group.id,
             instrumentId: hq.id,

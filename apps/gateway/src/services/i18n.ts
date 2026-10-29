@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
-/* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/consistent-type-definitions -- libui's UserConfig.Options can only be augmented by merging into its interface; a type alias would redeclare it */
+/* eslint-disable @typescript-eslint/no-namespace -- libui exports UserConfig as a namespace, and augmenting a namespace requires redeclaring it */
 
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 

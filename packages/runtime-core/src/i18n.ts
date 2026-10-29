@@ -152,7 +152,7 @@ class SynchronizedTranslator<T extends { [key: string]: unknown }>
     } else if (window.frameElement.getAttribute('name') !== 'interactive-instrument') {
       throw new Error('SynchronizedTranslator must be initialized in InstrumentRenderer');
     }
-    return super.init(options, window.frameElement);
+    super.init(options, window.frameElement);
   }
 }
 
@@ -170,7 +170,7 @@ class StandaloneTranslator<T extends { [key: string]: unknown }>
     if (typeof window === 'undefined') {
       throw new Error('Cannot initialize StandaloneTranslator outside of browser');
     }
-    return super.init(options, document.documentElement);
+    super.init(options, document.documentElement);
   }
 }
 

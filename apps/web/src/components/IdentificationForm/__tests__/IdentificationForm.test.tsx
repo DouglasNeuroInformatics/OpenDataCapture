@@ -61,14 +61,15 @@ const submit = () => {
   fireEvent.click(screen.getByLabelText('Submit'));
 };
 
-const fieldsWithErrors = () =>
-  screen
+const fieldsWithErrors = () => {
+  return screen
     .queryAllByTestId('error-message-text')
     .map((element) => element.closest('[data-field-group]')?.getAttribute('data-field-group'));
+};
 
 describe('IdentificationForm', () => {
   beforeEach(() => {
-    void i18n.changeLanguage('en');
+    i18n.changeLanguage('en');
     store.currentGroup = null;
     subjectUtils.generateSubjectHash.mockResolvedValue('subject-hash');
   });

@@ -1,4 +1,4 @@
-import * as fs from 'fs/promises';
+import * as fs from 'node:fs/promises';
 
 import type { OnLoadArgs, OnResolveArgs, PluginBuild } from 'esbuild';
 import ts from 'typescript';

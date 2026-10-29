@@ -127,7 +127,9 @@ const InstrumentSection = ({
 }) => {
   const { t } = useTranslation();
   const filtered = useMemo(() => {
-    if (!search) return items;
+    if (!search) {
+      return items;
+    }
     const lower = search.toLowerCase();
     return items.filter((item) => item.title.toLowerCase().includes(lower));
   }, [items, search]);
@@ -263,7 +265,9 @@ const CreateSeriesInstrumentDialog = ({
   const selectableForms = useMemo(() => forms.filter((form) => form.internal !== null), [forms]);
 
   const filteredForms = useMemo(() => {
-    if (!search) return selectableForms;
+    if (!search) {
+      return selectableForms;
+    }
     const lower = search.toLowerCase();
     return selectableForms.filter((form) => form.title.toLowerCase().includes(lower));
   }, [selectableForms, search]);
@@ -280,10 +284,11 @@ const CreateSeriesInstrumentDialog = ({
 
   const canCreate = title.trim().length > 0 && !titleTaken && selectedIds.length >= 2 && !createMutation.isPending;
 
-  const buildItems = () =>
-    selectedIds
+  const buildItems = () => {
+    return selectedIds
       .map((id) => selectableForms.find((form) => form.id === id)?.internal)
       .filter((internal): internal is ScalarInstrumentInternal => internal !== null && internal !== undefined);
+  };
 
   // The series is authored in the creator's current language, so the details/instructions are stored as
   // plain (unilingual) strings tagged with that language — the same shape any instrument would use.
@@ -516,8 +521,9 @@ const DeleteInstrumentDialog = ({
 
   // Close on either outcome: a series that is already in use is refused by the API, and leaving the
   // confirmation open after the user has been notified only invites them to press the button again.
-  const handleDelete = () =>
+  const handleDelete = () => {
     deleteMutation.mutate({ id: item.id }, { onSettled: onClose, onSuccess: () => onDeleted(item.id) });
+  };
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -564,7 +570,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
   // so a just-deleted instrument is never re-sent as a dangling relation.
   const [deletedIds, setDeletedIds] = useState<Set<string>>(() => new Set());
 
-  const toggle = (id: string) => {
+  const handleToggle = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -629,7 +635,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         selectedIds={selectedIds}
         title={t('group.manage.forms')}
         onPreview={setPreviewItem}
-        onToggle={toggle}
+        onToggle={handleToggle}
       />
       <InstrumentSection
         items={instruments.interactive}
@@ -638,7 +644,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         selectedIds={selectedIds}
         title={t('group.manage.interactive')}
         onPreview={setPreviewItem}
-        onToggle={toggle}
+        onToggle={handleToggle}
       />
       {/* The same right padding the rows carry, so the button ends on the eye's line rather than the
           trash's. */}
@@ -666,9 +672,10 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         title=""
         onDelete={setDeletingItem}
         onPreview={setPreviewItem}
-        onToggle={toggle}
+        onToggle={handleToggle}
       />
       <Form
+        preventResetValuesOnReset
         content={[
           {
             fields: {
@@ -699,7 +706,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                 }),
                 variant: 'radio'
               },
-              // eslint-disable-next-line perfectionist/sort-objects
+              // eslint-disable-next-line perfectionist/sort-objects -- fields render in key order, so the dynamic minimumAge must follow the minimumAgeApplied toggle it depends on
               minimumAge: {
                 deps: ['minimumAgeApplied'],
                 kind: 'dynamic',
@@ -791,7 +798,6 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
           }
         ]}
         initialValues={settingsInitialValues}
-        preventResetValuesOnReset={true}
         readOnly={readOnly}
         validationSchema={z
           .object({

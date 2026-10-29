@@ -23,8 +23,9 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
 function renderSyncMutation() {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false, throwOnError: true } } });
   const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return { ...renderHook(() => useSyncInstrumentRepoMutation(), { wrapper }), invalidateQueries };
 }
 
@@ -55,12 +56,12 @@ describe('useSyncInstrumentRepoMutation', () => {
   });
 
   it('should announce the sync before it finishes, since a sync can take a while', async () => {
-    mockAxios.post.mockReturnValueOnce(new Promise(() => undefined));
+    mockAxios.post.mockReturnValueOnce(Promise.withResolvers<never>().promise);
     const { result } = renderSyncMutation();
     result.current.mutate({ id: 'repo-1' });
-    await waitFor(() =>
-      expect(addNotification).toHaveBeenCalledExactlyOnceWith({ message: 'Syncing repository...', type: 'info' })
-    );
+    await waitFor(() => {
+      expect(addNotification).toHaveBeenCalledExactlyOnceWith({ message: 'Syncing repository...', type: 'info' });
+    });
   });
 
   it('should announce success and refresh the repositories and the instruments a sync may have added', async () => {

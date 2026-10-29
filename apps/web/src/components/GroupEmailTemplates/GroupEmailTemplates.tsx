@@ -165,7 +165,9 @@ export const GroupEmailTemplates = () => {
   const handleCreate = (name: string, template: MailTemplate) =>
     // Adding a template must not change what participants receive. The built-in default stays
     // active until someone chooses otherwise with "Set default".
-    persist([...templates, { ...template, id: crypto.randomUUID(), name }], activeId);
+    {
+      return persist([...templates, { ...template, id: crypto.randomUUID(), name }], activeId);
+    };
 
   const handleDelete = async (template: GroupEmailTemplate) => {
     // Deleting the default falls back to the built-in message rather than promoting whichever

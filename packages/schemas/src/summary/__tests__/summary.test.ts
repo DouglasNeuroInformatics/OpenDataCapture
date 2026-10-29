@@ -31,8 +31,8 @@ describe('$Summary', () => {
     ).resolves.toBeTypeOf('object');
   });
   it('should reject a summary with negative values', async () => {
-    await expect(() =>
-      $Summary.parseAsync({
+    await expect(() => {
+      return $Summary.parseAsync({
         counts: {
           instruments: -1,
           records: 0,
@@ -45,12 +45,12 @@ describe('$Summary', () => {
           sessions: [],
           subjects: []
         }
-      })
-    ).rejects.toThrowError();
+      });
+    }).rejects.toThrowError('Too small: expected number to be >=0');
   });
   it('should reject a summary with a NaN value', async () => {
-    await expect(() =>
-      $Summary.parseAsync({
+    await expect(() => {
+      return $Summary.parseAsync({
         counts: {
           instruments: 0,
           records: 0,
@@ -63,7 +63,7 @@ describe('$Summary', () => {
           sessions: [],
           subjects: []
         }
-      })
-    ).rejects.toThrowError();
+      });
+    }).rejects.toThrowError('expected number, received NaN');
   });
 });

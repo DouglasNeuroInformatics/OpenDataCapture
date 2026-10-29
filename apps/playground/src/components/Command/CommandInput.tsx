@@ -9,7 +9,7 @@ export const CommandInput = forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(function CommandInput({ className, ...props }, ref) {
   return (
-    // eslint-disable-next-line react/no-unknown-property
+    // eslint-disable-next-line react/no-unknown-property -- cmdk's stylesheet selects on the cmdk-input-wrapper attribute, which React's known-property list lacks
     <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
       <SearchIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
       <CommandPrimitive.Input

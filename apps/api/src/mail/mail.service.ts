@@ -241,11 +241,12 @@ export class MailService {
     if (!password) {
       return 'PASSWORD_REQUIRED';
     }
-    return () =>
-      this.mergeConfig(
+    return () => {
+      return this.mergeConfig(
         partial,
         'plaintext' in password ? password.plaintext : this.decryptPassword(password.ciphertext)
       );
+    };
   }
 
   private createTransporter(config: MailConfig): Transporter {

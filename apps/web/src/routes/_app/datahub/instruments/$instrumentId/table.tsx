@@ -164,25 +164,23 @@ const RouteComponent = () => {
     return Array.from(keys);
   }, [records]);
 
-  const measureColumns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(
-    () =>
-      measureKeys.map((key) => ({
-        accessorKey: key,
-        cell: (ctx) => {
-          const value = formatRecordValue(ctx.getValue());
-          return <TruncatedCell data-testid={`instrument-table-cell-${key}`} title={String(value)} value={value} />;
-        },
-        header: ({ column }) => <SortableHeader column={column} label={camelToSnakeCase(key).toUpperCase()} />,
-        id: key
-      })),
-    [measureKeys]
-  );
+  const measureColumns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(() => {
+    return measureKeys.map((key) => ({
+      accessorKey: key,
+      cell: (ctx) => {
+        const value = formatRecordValue(ctx.getValue());
+        return <TruncatedCell data-testid={`instrument-table-cell-${key}`} title={String(value)} value={value} />;
+      },
+      header: ({ column }) => <SortableHeader column={column} label={camelToSnakeCase(key).toUpperCase()} />,
+      id: key
+    }));
+  }, [measureKeys]);
 
   // Both subject destinations carry where they were opened from, so the subject hub's return comes
   // back to this record table rather than dropping the reader on the subject index.
   const fromHere = { fromInstrument: seriesInstrumentId, fromSeries: search.fromSeries };
 
-  const viewRecord = (record: InstrumentVisualizationRecord) => {
+  const handleViewRecord = (record: InstrumentVisualizationRecord) => {
     void navigate({
       params: { recordId: record.__id__, subjectId: record.__subjectId__ },
       search: fromHere,
@@ -281,7 +279,7 @@ const RouteComponent = () => {
           rowActions={[
             {
               label: t({ en: 'View Record', es: 'Ver registro', fr: "Voir l'enregistrement" }),
-              onSelect: viewRecord
+              onSelect: handleViewRecord
             },
             {
               label: t({ en: 'View Subject', es: 'Ver sujeto', fr: 'Voir le client' }),
@@ -295,7 +293,7 @@ const RouteComponent = () => {
             }
           ]}
           onRowClick={(row) => setHighlightedRowId(row.__id__)}
-          onRowDoubleClick={viewRecord}
+          onRowDoubleClick={handleViewRecord}
         />
       </div>
     </div>

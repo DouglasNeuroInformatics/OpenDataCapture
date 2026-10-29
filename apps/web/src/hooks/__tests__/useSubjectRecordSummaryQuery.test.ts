@@ -5,18 +5,25 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { subjectRecordSummaryQueryOptions, useSubjectRecordSummaryQuery } from '../useSubjectRecordSummaryQuery';
 
 vi.mock('axios');
 
-const runQuery = (groupId?: string) =>
-  new QueryClient().fetchQuery(subjectRecordSummaryQueryOptions({ params: { groupId } }));
+const runQuery = (groupId?: string) => {
+  return new QueryClient().fetchQuery(subjectRecordSummaryQueryOptions({ params: { groupId } }));
+};
 
 const renderSummaryQuery = (groupId?: string) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { client: queryClient }, createElement(Suspense, { fallback: null }, children));
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      createElement(Suspense, { fallback: null }, children)
+    );
+  };
   return renderHook(() => useSubjectRecordSummaryQuery({ params: { groupId } }), { wrapper });
 };
 
@@ -53,7 +60,7 @@ describe('subjectRecordSummaryQueryOptions', () => {
 
   it('should reject a negative record count, so nothing unparsed reaches the table', async () => {
     get.mockResolvedValueOnce({ data: [{ lastCollectedAt: null, recordCount: -1, subjectId: 'subject-1' }] });
-    await expect(runQuery('group-1')).rejects.toThrow();
+    await expect(runQuery('group-1')).rejects.toThrow(z.ZodError);
   });
 
   it('should suspend until the summary resolves, so the table never renders a row without its counts', async () => {

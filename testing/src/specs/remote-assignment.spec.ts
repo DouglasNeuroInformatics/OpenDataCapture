@@ -54,7 +54,7 @@ test.describe('remote assignment', () => {
     await remoteAssignmentPage.selectInstrument('Happiness Questionnaire');
     await expect(remoteAssignmentPage.createDialog).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(remoteAssignmentPage.createDialog).not.toBeVisible();
+    await expect(remoteAssignmentPage.createDialog).toBeHidden();
 
     await searchInput.fill('');
     await tagButton.click();
@@ -128,9 +128,9 @@ test.describe('remote assignment', () => {
     await expect(remoteAssignmentPage.instrumentShowcase).toBeVisible();
     await remoteAssignmentPage.selectInstrument('General Consent Form');
     await remoteAssignmentPage.submitAssignmentForm();
-    const secondUrl = await remoteAssignmentPage.urlInput.inputValue();
+    const secondUrl = remoteAssignmentPage.urlInput;
 
-    expect(secondUrl).not.toBe(firstUrl);
+    await expect(secondUrl).not.toHaveValue(firstUrl);
   });
 
   // Entering by URL is the path a bookmarked link takes, and it runs the GATEWAY_ENABLED guard in

@@ -63,9 +63,9 @@ test.describe('group manage', () => {
     const distinctLeftEdges = async (locator: Locator) => {
       await expect(locator.first()).toBeVisible();
       await expect.poll(async () => locator.count()).toBeGreaterThan(1);
-      const edges = await locator.evaluateAll((elements) =>
-        elements.map((element) => Math.round(element.getBoundingClientRect().left))
-      );
+      const edges = await locator.evaluateAll((elements) => {
+        return elements.map((element) => Math.round(element.getBoundingClientRect().left));
+      });
       return new Set(edges).size;
     };
 

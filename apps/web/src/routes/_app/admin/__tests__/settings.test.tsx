@@ -47,11 +47,12 @@ vi.mock('@/store', () => ({
       groupSwitcherPosition: GroupSwitcherPosition;
       setGroupSwitcherPosition: typeof mocks.setGroupSwitcherPosition;
     }) => TSelected
-  ) =>
-    selector({
+  ) => {
+    return selector({
       groupSwitcherPosition: mocks.state.groupSwitcherPosition,
       setGroupSwitcherPosition: mocks.setGroupSwitcherPosition
-    })
+    });
+  }
 }));
 
 const Page = Route.options.component!;
@@ -66,19 +67,19 @@ const lastMutateCallbacks = () => mocks.mutate.mock.lastCall![1];
 
 const savedData = () => mocks.mutate.mock.calls.map(([data]) => data);
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  mocks.config.setup.isGatewayEnabled = true;
-  mocks.state.groupSwitcherPosition = 'sidebar';
-  mocks.state.setupState = { activeLanguages: ['en'] };
-});
+describe('Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.config.setup.isGatewayEnabled = true;
+    mocks.state.groupSwitcherPosition = 'sidebar';
+    mocks.state.setupState = { activeLanguages: ['en'] };
+  });
 
-afterEach(() => {
-  cleanup();
-  vi.useRealTimers();
-});
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+  });
 
-describe('admin settings route', () => {
   it('should keep a failed autosave from replacing the page with the error boundary', () => {
     renderPage();
     expect(mocks.useUpdateSetupStateMutation).toHaveBeenCalledWith({ throwOnError: false });

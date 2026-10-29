@@ -3,12 +3,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../server.development', () => ({ DevelopmentServer: class DevelopmentServer {} }));
 vi.mock('../server.production', () => ({ ProductionServer: class ProductionServer {} }));
 
-afterEach(() => {
-  vi.unstubAllEnvs();
-  vi.resetModules();
-});
-
 describe('Server', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
   it('should be the development server in development, so ssr goes through vite', async () => {
     vi.stubEnv('DEV', true);
     const { Server } = await import('../index');

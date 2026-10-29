@@ -100,9 +100,9 @@ const useBulkAssignmentEmail = ({ assignments, emails, groupId }: UseBulkAssignm
    * mailing a second copy of every link that arrived - and a batch where nothing failed has nobody
    * left to write to, which is what retires the button.
    */
-  const pending = recipients.filter(({ assignmentIds }) =>
-    assignmentIds.some((assignmentId) => statuses[assignmentId] !== 'sent')
-  );
+  const pending = recipients.filter(({ assignmentIds }) => {
+    return assignmentIds.some((assignmentId) => statuses[assignmentId] !== 'sent');
+  });
   // Read off the batch on screen rather than off any send that ever happened, so the next batch -
   // whose assignments are new rows with new ids - starts sendable again.
   const hasSent = recipients.length > 0 && pending.length === 0;
@@ -111,9 +111,9 @@ const useBulkAssignmentEmail = ({ assignments, emails, groupId }: UseBulkAssignm
    * first attempt - true even when every message failed, and false for a batch created after one
    * was already emailed, since those are new assignments with ids no status mentions.
    */
-  const hasAttempted = recipients.some(({ assignmentIds }) =>
-    assignmentIds.some((assignmentId) => statuses[assignmentId])
-  );
+  const hasAttempted = recipients.some(({ assignmentIds }) => {
+    return assignmentIds.some((assignmentId) => statuses[assignmentId]);
+  });
 
   /**
    * Send one recipient's message, waiting out a rate limit rather than reporting it as a failure.
@@ -133,7 +133,9 @@ const useBulkAssignmentEmail = ({ assignments, emails, groupId }: UseBulkAssignm
         if (retryAfter === null || attempt === RATE_LIMIT_RETRIES) {
           return 'error';
         }
-        await new Promise((resolve) => setTimeout(resolve, retryAfter));
+        await new Promise((resolve) => {
+          setTimeout(resolve, retryAfter);
+        });
       }
     }
     return 'error';

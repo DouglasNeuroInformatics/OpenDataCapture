@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-namespace -- Zod3 and Zod4 each export same-named helpers (createUploadTemplateCSV, processInstrumentCSV) for one zod major, and callers address them as Zod3.x and Zod4.x */
 
 import { isNumberLike, isObjectLike, isPlainObject, isZodType, parseNumber } from '@douglasneuroinformatics/libjs';
 import type { Language } from '@douglasneuroinformatics/libui/i18n';
@@ -68,8 +68,8 @@ const ansiEscapeCode = '[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0
     '\u0000-\u0009\u000B-\u0019\u001b\u180e\u009b\u00ad\u200b\u2028\u2029\ufeff\ufe00-\ufe0f';
 
 const zeroWidthCharactersExceptNewline = new RegExp(
-  // eslint-disable-next-line no-misleading-character-class
-  '(?:' + ansiEscapeCode + ')|[' + zeroWidthCharacterExceptNewline + ']',
+  // eslint-disable-next-line no-misleading-character-class -- the class lists the zero-width and variation-selector code points on purpose, since they are what this check looks for
+  `(?:${ansiEscapeCode})|[${zeroWidthCharacterExceptNewline}]`,
   'g'
 );
 
@@ -353,7 +353,7 @@ export namespace Zod3 {
             });
           }
           for (const val of enumValues) {
-            possibleEnumOutputs += val + '/';
+            possibleEnumOutputs += `${val}/`;
           }
           possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
           return formatOptionalEntry(possibleEnumOutputs, isOptional);
@@ -376,19 +376,19 @@ export namespace Zod3 {
           for (let i = 0; i < multiValues.length; i++) {
             const inputData = multiValues[i]!;
             if (i === multiValues.length - 1 && multiValues[i] !== undefined) {
-              multiString += multiKeys[i] + ':' + generateSampleData(inputData);
+              multiString += `${multiKeys[i]}:${generateSampleData(inputData)}`;
             } else {
-              multiString += multiKeys[i] + ':' + generateSampleData(inputData) + ',';
+              multiString += `${multiKeys[i]}:${generateSampleData(inputData)},`;
             }
           }
           multiString += ';)';
           return multiString;
         } catch (e) {
           throw new UploadError({
-            en: `Invalid Record Array Error` + (e instanceof UploadError ? `: ${e.description.en}` : ''),
-            fr:
-              `Erreur de tableau d'enregistrements invalide` +
-              (e instanceof UploadError ? ` : ${e.description.fr}` : '')
+            en: `Invalid Record Array Error${e instanceof UploadError ? `: ${e.description.en}` : ''}`,
+            fr: `Erreur de tableau d'enregistrements invalide${
+              e instanceof UploadError ? ` : ${e.description.fr}` : ''
+            }`
           });
         }
       default:
@@ -488,13 +488,13 @@ export namespace Zod3 {
         });
       }
       instrumentSchemaWithInternal = instrumentSchemaDef.schema.extend({
-        date: z3.coerce.date(),
+        date: z3.date(),
         subjectID: z3.string().regex(SUBJECT_ID_REGEX)
       });
       shape = (instrumentSchemaWithInternal._def as z3.ZodObjectDef).shape();
     } else {
       instrumentSchemaWithInternal = instrumentSchema.extend({
-        date: z3.coerce.date(),
+        date: z3.date(),
         subjectID: z3.string().regex(SUBJECT_ID_REGEX)
       });
       shape = instrumentSchemaWithInternal.shape as { [key: string]: z3.ZodTypeAny };
@@ -512,12 +512,13 @@ export namespace Zod3 {
         const [headers, ...dataLines] = parseResultCsv.data satisfies string[][] as [string[], ...string[][]];
 
         if (!dataLines?.[0]) {
-          return reject(
+          reject(
             new UploadError({
               en: 'CSV does not contain any rows of data',
               fr: 'Le fichier CSV ne contient aucune ligne de données'
             })
           );
+          return;
         }
 
         let rowNumber = 1;
@@ -527,21 +528,23 @@ export namespace Zod3 {
 
         if (regexResultSubject !== null) {
           const charCode = regexResultSubject[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
-          return reject(
+          reject(
             new UploadError({
               en: `Subject ID at row ${rowNumber} contains non-visible character(s) (U+${charCode})`,
               fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visible(s) (U+${charCode})`
             })
           );
+          return;
         }
         if (regexResultDate !== null) {
           const charCode = regexResultDate[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
-          return reject(
+          reject(
             new UploadError({
               en: `Date at row ${rowNumber} contains non-visible character(s) (U+${charCode})`,
               fr: `Date à la ligne ${rowNumber} contient des caractères non visible(s)  (U+${charCode})`
             })
           );
+          return;
         }
 
         //remove sample data if included remove any mongolian vowel separators
@@ -564,58 +567,63 @@ export namespace Zod3 {
             const nonVisibleChars = nonVisibleCharChecker(rawValue);
             if (nonVisibleChars !== null) {
               const charCode = nonVisibleChars[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
-              return reject(
+              reject(
                 new UploadError({
                   en: `Value at row ${rowNumber} and column '${key}' contains non-visible character(s) (U+${charCode})`,
                   fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractère(s) non visibles (U+${charCode})`
                 })
               );
+              return;
             }
 
             if (shape[key] === undefined) {
-              return reject(
+              reject(
                 new UploadError({
                   en: `Schema value at column ${i} is not defined! Please check if Column has been edited/deleted from original template`,
                   fr: `La valeur du schéma à la colonne ${i} n'est pas définie ! Veuillez vérifier si la colonne a été modifiée/supprimée du modèle original`
                 })
               );
+              return;
             }
             try {
               const result = interpretZodConvertResult(getZodTypeName(shape[key]), rawValue);
               jsonLine[headers[i]!] = result;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
-                return reject(
+                reject(
                   new UploadError({
                     en: `${error.description.en} at column name: '${key}' and row number '${rowNumber}'`,
                     fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}'`
                   })
                 );
+                return;
               }
               console.error(error);
-              return reject(
+              reject(
                 new UploadError({
                   en: `Error parsing CSV`,
                   fr: `Erreur avec la CSV`
                 })
               );
+              return;
             }
           }
           const zodCheck = instrumentSchemaWithInternal.safeParse(jsonLine);
           if (!zodCheck.success) {
             console.error(zodCheck.error.issues);
             console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
-            return reject(
+            reject(
               new UploadError({
                 en: 'Schema parsing failed: refer to the browser console for further details',
                 fr: `Échec de l'analyse du schéma : reportez-vous à la console du navigateur pour plus de détails`
               })
             );
+            return;
           }
           result.push(zodCheck.data);
           rowNumber++;
         }
-        return resolve(result);
+        resolve(result);
       };
       reader.readAsText(input);
     });
@@ -741,9 +749,12 @@ export namespace Zod4 {
               fr: `Type non pris en charge pour innerType d'enregistrement de tableau '${convertResult.innerType.typeName}': doit être « objet »`
             });
           }
-          return mapValues(parsedRecord, (value, key): unknown =>
-            interpretZodConvertResult((convertResult.innerType as ObjectZodConvertResult).dimensions[key]!, value)
-          );
+          return mapValues(parsedRecord, (value, key): unknown => {
+            return interpretZodConvertResult(
+              (convertResult.innerType as ObjectZodConvertResult).dimensions[key]!,
+              value
+            );
+          });
         });
       case 'boolean':
         return parseBooleanEntry(entry);
@@ -774,7 +785,7 @@ export namespace Zod4 {
       case 'enum': {
         let possibleEnumOutputs = '';
         for (const val of convertResult.enumValues) {
-          possibleEnumOutputs += val + '/';
+          possibleEnumOutputs += `${val}/`;
         }
         possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
         return formatOptionalEntry(possibleEnumOutputs, convertResult.isOptional);
@@ -840,7 +851,7 @@ export namespace Zod4 {
     }
 
     const instrumentSchema = instrument.validationSchema.extend({
-      date: z4.coerce.date(),
+      date: z4.date(),
       subjectID: z4.string().regex(SUBJECT_ID_REGEX)
     });
 
@@ -857,12 +868,13 @@ export namespace Zod4 {
         const [headers, ...dataLines] = parseResultCsv.data satisfies string[][] as [string[], ...string[][]];
 
         if (!dataLines?.[0]) {
-          return reject(
+          reject(
             new UploadError({
               en: 'CSV does not contain any rows of data',
               fr: 'Le fichier CSV ne contient aucune ligne de données'
             })
           );
+          return;
         }
 
         //remove sample data if included (account for old mongolian vowel separator templates)
@@ -875,21 +887,23 @@ export namespace Zod4 {
 
         if (regexResultSubject !== null) {
           const charCode = regexResultSubject[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
-          return reject(
+          reject(
             new UploadError({
               en: `Subject ID at row ${rowNumber} contains non-visible characters (U+${charCode})`,
               fr: `L'ID du sujet à la ligne ${rowNumber} contient des caractères non visibles (U+${charCode})`
             })
           );
+          return;
         }
         if (regexResultDate !== null) {
           const charCode = regexResultDate[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
-          return reject(
+          reject(
             new UploadError({
               en: `Date at row ${rowNumber} contains non-visible characters (U+${charCode})`,
               fr: `Date à la ligne ${rowNumber} contient des caractères non visibles (U+${charCode})`
             })
           );
+          return;
         }
 
         if (
@@ -906,62 +920,67 @@ export namespace Zod4 {
           for (let i = 0; i < headers.length; i++) {
             const key = headers[i]!.trim();
             const cell = elements[i];
-            const rawValue = cell == null ? '' : cell.trim();
+            const rawValue = cell === undefined ? '' : cell.trim();
             // Return error if any non‑visible character is present
             const nonVisibleChars = nonVisibleCharChecker(rawValue);
             if (nonVisibleChars !== null) {
               const charCode = nonVisibleChars[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
-              return reject(
+              reject(
                 new UploadError({
                   en: `Value at row ${rowNumber} and column '${key}' contains non-visible characters (U+${charCode})`,
                   fr: `La valeur à la ligne ${rowNumber} et colonne '${key}' contient des caractères non visibles (U+${charCode})`
                 })
               );
+              return;
             }
             if (shape[key] === undefined) {
-              return reject(
+              reject(
                 new UploadError({
                   en: `Schema value at column ${i} is not defined! Please check if Column has been edited/deleted from original template`,
                   fr: `La valeur du schéma à la colonne ${i} n'est pas définie ! Veuillez vérifier si la colonne a été modifiée/supprimée du modèle original`
                 })
               );
+              return;
             }
             try {
               const result = interpretZodConvertResult(parseZodSchema(shape[key]), rawValue);
               jsonLine[headers[i]!] = result;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
-                return reject(
+                reject(
                   new UploadError({
                     en: `${error.description.en} at column name: '${key}' and row number '${rowNumber}'`,
                     fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}'`
                   })
                 );
+                return;
               }
               console.error(error);
-              return reject(
+              reject(
                 new UploadError({
                   en: `Error parsing CSV`,
                   fr: `Erreur avec la CSV`
                 })
               );
+              return;
             }
           }
           const zodCheck = instrumentSchema.safeParse(jsonLine);
           if (!zodCheck.success) {
             console.error(zodCheck.error.issues);
             console.error(`Failed to parse data: ${JSON.stringify(jsonLine)}`);
-            return reject(
+            reject(
               new UploadError({
                 en: 'Schema parsing failed: refer to the browser console for further details',
                 fr: `Échec de l'analyse du schéma : reportez-vous à la console du navigateur pour plus de détails`
               })
             );
+            return;
           }
           result.push(zodCheck.data as FormTypes.Data);
           rowNumber++;
         }
-        return resolve(result);
+        resolve(result);
       };
       reader.readAsText(input);
     });

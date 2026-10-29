@@ -12,28 +12,28 @@ let inputBase: string;
 let outputBase: string;
 let exitSpy: ReturnType<typeof vi.spyOn>;
 
-beforeEach(() => {
-  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'instrument-bundler-cli-'));
-  inputBase = path.join(tmpDir, 'input');
-  outputBase = path.join(tmpDir, 'output');
-  fs.mkdirSync(path.join(inputBase, 'FORM_INSTRUMENT_STUB'), { recursive: true });
-  fs.writeFileSync(
-    path.join(inputBase, 'FORM_INSTRUMENT_STUB', 'index.ts'),
-    'export default { content: {}, details: {}, kind: "FORM", language: "en", measures: {} };'
-  );
-  exitSpy = vi.spyOn(process, 'exit').mockImplementation((code) => {
-    throw new Error(`EXIT:${code}`);
-  });
-  vi.resetModules();
-});
-
-afterEach(() => {
-  fs.rmSync(tmpDir, { force: true, recursive: true });
-  exitSpy.mockRestore();
-  vi.restoreAllMocks();
-});
-
 describe('cli', () => {
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'instrument-bundler-cli-'));
+    inputBase = path.join(tmpDir, 'input');
+    outputBase = path.join(tmpDir, 'output');
+    fs.mkdirSync(path.join(inputBase, 'FORM_INSTRUMENT_STUB'), { recursive: true });
+    fs.writeFileSync(
+      path.join(inputBase, 'FORM_INSTRUMENT_STUB', 'index.ts'),
+      'export default { content: {}, details: {}, kind: "FORM", language: "en", measures: {} };'
+    );
+    exitSpy = vi.spyOn(process, 'exit').mockImplementation((code) => {
+      throw new Error(`EXIT:${code}`);
+    });
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { force: true, recursive: true });
+    exitSpy.mockRestore();
+    vi.restoreAllMocks();
+  });
+
   it('should write the raw bundle to a .js file mirroring the input directory name', async () => {
     process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase, '--raw'];
     await import('../cli.js');

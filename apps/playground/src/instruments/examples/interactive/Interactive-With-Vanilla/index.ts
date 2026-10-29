@@ -77,18 +77,15 @@ export default defineInstrument({
         for (let i = 0; i < brickColumnCount; i++) {
           for (let j = 0; j < brickRowCount; j++) {
             const b = bricks[i]![j]!;
-            if (b.status === 1) {
-              if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
-                dy = -dy;
-                b.status = 0;
-                score++;
-                // eslint-disable-next-line max-depth
-                if (score === brickRowCount * brickColumnCount) {
-                  done({
-                    livesRemaining: lives,
-                    timeElapsed: Date.now() - startTime
-                  });
-                }
+            if (b.status === 1 && x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+              dy = -dy;
+              b.status = 0;
+              score++;
+              if (score === brickRowCount * brickColumnCount) {
+                done({
+                  livesRemaining: lives,
+                  timeElapsed: Date.now() - startTime
+                });
               }
             }
           }
@@ -129,12 +126,12 @@ export default defineInstrument({
       function drawScore() {
         ctx.font = '16px Arial';
         ctx.fillStyle = '#0095DD';
-        ctx.fillText('Score: ' + score, 8, 20);
+        ctx.fillText(`Score: ${score}`, 8, 20);
       }
       function drawLives() {
         ctx.font = '16px Arial';
         ctx.fillStyle = '#0095DD';
-        ctx.fillText('Lives: ' + lives, canvas.width - 65, 20);
+        ctx.fillText(`Lives: ${lives}`, canvas.width - 65, 20);
       }
 
       function draw() {
@@ -210,7 +207,7 @@ export default defineInstrument({
       kind: 'computed',
       label: 'Time Elapsed',
       value(data) {
-        return data.timeElapsed + 'ms';
+        return `${data.timeElapsed}ms`;
       }
     },
     win: {

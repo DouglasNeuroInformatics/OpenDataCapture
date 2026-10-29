@@ -20,7 +20,9 @@ export default defineInstrument({
       root.render(
         <div>
           <h1>Interactive Task</h1>
-          <button onClick={() => done({ value: sum([1, 2, 3]) })}>Done</button>
+          <button type="button" onClick={() => done({ value: sum([1, 2, 3]) })}>
+            Done
+          </button>
         </div>
       );
     }

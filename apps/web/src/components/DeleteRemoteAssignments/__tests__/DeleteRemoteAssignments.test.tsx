@@ -6,7 +6,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
-import { DeleteRemoteAssignments } from '@/components/DeleteRemoteAssignments';
+import { DeleteRemoteAssignments } from '@/components/DeleteRemoteAssignments/DeleteRemoteAssignments';
 
 import '@/services/i18n';
 
@@ -75,25 +75,26 @@ const deleteSelectedButton = () => screen.getByTestId<HTMLButtonElement>('delete
 const confirmButton = () => screen.getByTestId<HTMLButtonElement>('confirm-delete-assignments');
 const isChecked = (element: HTMLElement) => element.getAttribute('aria-checked') === 'true';
 
-const renderedRowIds = () =>
-  screen
+const renderedRowIds = () => {
+  return screen
     .getAllByTestId(/^delete-select-assignment-/)
     .map((element) => element.getAttribute('data-testid')!.replace('delete-select-assignment-', ''));
+};
 
 const openConfirmation = (...ids: string[]) => {
   ids.forEach((id) => fireEvent.click(rowCheckbox(id)));
   fireEvent.click(deleteSelectedButton());
 };
 
-beforeEach(() => {
-  cleanup();
-  vi.resetAllMocks();
-  mocks.assignments = [];
-  mocks.instrumentInfo = [];
-  mocks.isPending = false;
-});
-
 describe('DeleteRemoteAssignments', () => {
+  beforeEach(() => {
+    cleanup();
+    vi.resetAllMocks();
+    mocks.assignments = [];
+    mocks.instrumentInfo = [];
+    mocks.isPending = false;
+  });
+
   it('should show an empty state when there are no deletable assignments', () => {
     mocks.assignments = [makeAssignment({ id: 'a-1', status: 'COMPLETE' })];
     renderComponent();

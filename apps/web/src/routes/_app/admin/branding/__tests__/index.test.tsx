@@ -16,9 +16,9 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
   )
 }));
 
-afterEach(cleanup);
+describe('Route', () => {
+  afterEach(cleanup);
 
-describe('branding route', () => {
   const BrandingPage = Route.options.component!;
 
   it('should title the page as the branding section', () => {
@@ -42,9 +42,9 @@ describe('branding route', () => {
   it('should preview a light logo on the branding panel and a theme-aware logo on the form', () => {
     render(<BrandingPage />);
     const logos = screen.getByRole('link', { name: /Login Page/ }).querySelectorAll('svg');
-    const fillClasses = Array.from(logos, (logo) =>
-      Array.from(logo.classList).filter((token) => token.includes('fill-'))
-    );
+    const fillClasses = Array.from(logos, (logo) => {
+      return Array.from(logo.classList).filter((token) => token.includes('fill-'));
+    });
     expect(fillClasses).toEqual([['fill-slate-300'], ['fill-sky-900', 'dark:fill-slate-300']]);
   });
 });

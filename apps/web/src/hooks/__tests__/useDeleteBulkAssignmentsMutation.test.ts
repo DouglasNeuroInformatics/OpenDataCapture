@@ -4,6 +4,7 @@ import { createElement } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod/v4';
 
 import { useDeleteBulkAssignmentsMutation } from '../useDeleteBulkAssignmentsMutation';
 
@@ -19,8 +20,9 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
 function renderDeleteMutation() {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
   const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return { ...renderHook(() => useDeleteBulkAssignmentsMutation(), { wrapper }), invalidateQueries };
 }
 
@@ -47,7 +49,7 @@ describe('useDeleteBulkAssignmentsMutation', () => {
   it('should reject a malformed response rather than report a count the server never sent', async () => {
     mockAxios.post.mockResolvedValue({ data: { deletedCount: -1, failedIds: [] } });
     const { result } = renderDeleteMutation();
-    await expect(result.current.mutateAsync({ ids: ['assignment-1'] })).rejects.toThrow();
+    await expect(result.current.mutateAsync({ ids: ['assignment-1'] })).rejects.toThrow(z.ZodError);
   });
 
   it('should announce success once the batch is deleted', async () => {
