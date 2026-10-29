@@ -59,9 +59,10 @@ artifact** written for users outside this repo, so its instruction to put files 
   — turbo handles this via `^build`. Background: `.agents/docs/architecture/runtime-and-vendor.md`.
 - The directory name matches `internal.name` in every instrument. `SERIES` instruments have no
   `internal` field at all.
-- **`perfectionist/sort-objects` is off for this package** (`eslint.config.js`, `files:
-['packages/instrument-library/**/*']`). Instrument definitions are written in reading order. Do not
-  reorder keys of an existing definition to look sorted.
+- **`perfectionist/sort-objects` is off for this package**, as it is for the playground's examples
+  and templates and for `packages/instrument-stubs` (one block in `eslint.config.js`). Instrument
+  definitions are written in reading order. Do not reorder keys of an existing definition to look
+  sorted.
 
 ## Checking what is in the catalog
 

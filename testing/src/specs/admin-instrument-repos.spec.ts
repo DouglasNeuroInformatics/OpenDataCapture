@@ -42,7 +42,9 @@ test.describe('admin instrument repos slow import', () => {
       if (route.request().method() !== 'POST') {
         return route.continue();
       }
-      await new Promise((resolve) => setTimeout(resolve, 12_000));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 12_000);
+      });
       return route.fulfill({ json: {}, status: 201 });
     });
     const reposPage = await getPageModel('/admin/instrument-repos');

@@ -1,4 +1,4 @@
-/* eslint-disable perfectionist/sort-objects */
+/* eslint-disable perfectionist/sort-objects -- the form renders fields in key order, so they must follow the order the user fills them in */
 
 import { useRef, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';

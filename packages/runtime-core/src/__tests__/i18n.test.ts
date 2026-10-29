@@ -28,7 +28,9 @@ class UninitializedTranslator extends BaseTranslator {
 }
 
 function flushMutations() {
-  return new Promise((resolve) => setTimeout(resolve));
+  return new Promise((resolve) => {
+    setTimeout(resolve);
+  });
 }
 
 function mountInstrumentFrame(name: string) {

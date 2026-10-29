@@ -230,6 +230,16 @@ function toResultTsv(rows: { [key: string]: string }[]): string {
   return Papa.unparse(rows, { delimiter: '\t', escapeFormulae: true });
 }
 
+function toCellText(value: unknown): string {
+  if (value instanceof Date) {
+    return toBasicISOString(value);
+  }
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value).trim();
+  }
+  return '';
+}
+
 /** Thrown by every parse and resolve entry point, carrying user-displayable, row-numbered errors. */
 export class BulkParseFailure extends Error {
   readonly errors: BulkParseError[];
@@ -296,16 +306,7 @@ export async function parseWorkbook(file: File): Promise<BulkParseResult> {
   return buildResult(
     headers,
     rows.map((row) => {
-      return Object.fromEntries(
-        Object.entries(row).map(([key, value]) => [
-          key.trim(),
-          value instanceof Date
-            ? toBasicISOString(value)
-            : typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
-              ? String(value).trim()
-              : ''
-        ])
-      );
+      return Object.fromEntries(Object.entries(row).map(([key, value]) => [key.trim(), toCellText(value)]));
     })
   );
 }

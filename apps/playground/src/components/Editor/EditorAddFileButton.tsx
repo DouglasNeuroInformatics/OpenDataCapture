@@ -24,7 +24,7 @@ export const EditorAddFileButton = ({ onSubmit, ...props }: EditorAddFileButtonP
     >
       <EditorFileIcon filename={filename} />
       <EditorInput
-        // eslint-disable-next-line jsx-a11y/no-autofocus
+        // eslint-disable-next-line jsx-a11y/no-autofocus -- the input mounts only after the user clicks to add a file, so focusing it follows their action
         autoFocus
         ref={ref}
         value={filename}

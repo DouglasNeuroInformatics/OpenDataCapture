@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-namespace */
-
 import type { InstrumentKind, Json } from '@opendatacapture/runtime-core';
 import type { Promisable, Simplify } from 'type-fest';
 
@@ -10,6 +8,7 @@ import type { InteractiveContentSubmitResult } from '../InteractiveContent';
 export type AnyContentResult =
   FileInstrumentContentSubmitResult | FormContentSubmitResult | InteractiveContentSubmitResult;
 
+// eslint-disable-next-line @typescript-eslint/no-namespace -- the namespace shares the type's name, so consumers write `InstrumentSubmitHandler.AnyContext`, which a type alias cannot offer
 export namespace InstrumentSubmitHandler {
   type ContextMixin<TResult extends { [key: string]: any }> = Simplify<
     TResult & {

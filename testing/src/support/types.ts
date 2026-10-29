@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
+/* eslint-disable @typescript-eslint/consistent-type-definitions -- this augments the global Window by declaration merging, which a type alias cannot do */
 
 import type { IfEmptyObject, IfNever, Split } from 'type-fest';
 

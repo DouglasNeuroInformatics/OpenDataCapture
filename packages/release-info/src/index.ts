@@ -53,7 +53,7 @@ export async function getReleaseInfo(): Promise<ReleaseInfo> {
   } catch (err) {
     if (err instanceof z.ZodError) {
       console.error(err.issues);
-      throw new Error(`Failed to parse release info for environment '${process.env.NODE_ENV}'`);
+      throw new Error(`Failed to parse release info for environment '${process.env.NODE_ENV}'`, { cause: err });
     }
     throw err;
   }

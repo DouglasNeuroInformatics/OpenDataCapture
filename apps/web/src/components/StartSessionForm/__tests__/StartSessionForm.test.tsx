@@ -342,7 +342,11 @@ describe('StartSessionForm', () => {
 
     it('should ignore a lookup that resolves after the identifier has moved on, so stale details never overwrite newer ones', async () => {
       let resolveFirst!: (value: { data: { dateOfBirth: string; sex: string }; status: number }) => void;
-      get.mockReturnValueOnce(new Promise((resolve) => (resolveFirst = resolve)));
+      get.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveFirst = resolve;
+        })
+      );
       existingSubject({ dateOfBirth: '2000-01-01', sex: 'MALE' });
       const queryClient = createQueryClient();
       const fetchQuery = vi.spyOn(queryClient, 'fetchQuery');

@@ -283,27 +283,20 @@ export class InstrumentsService {
       ? await this.findInstrumentIdsBySubject(query.subjectId, ability)
       : null;
 
+    let requestedSeriesGroup: undefined | { seriesGroupId: string | { in: string[] } };
+    if (query.seriesGroupId) {
+      requestedSeriesGroup = { seriesGroupId: query.seriesGroupId };
+    } else if (groupIds) {
+      requestedSeriesGroup = { seriesGroupId: { in: groupIds } };
+    }
+
     const instruments = await this.instrumentModel.findMany({
       where: {
         AND: [
           subjectInstrumentIds ? { id: { in: subjectInstrumentIds } } : {},
-          query.seriesGroupId
-            ? {
-                OR: [
-                  { seriesGroupId: null },
-                  { seriesGroupId: { isSet: false } },
-                  { seriesGroupId: query.seriesGroupId }
-                ]
-              }
-            : groupIds
-              ? {
-                  OR: [
-                    { seriesGroupId: null },
-                    { seriesGroupId: { isSet: false } },
-                    { seriesGroupId: { in: groupIds } }
-                  ]
-                }
-              : {},
+          requestedSeriesGroup
+            ? { OR: [{ seriesGroupId: null }, { seriesGroupId: { isSet: false } }, requestedSeriesGroup] }
+            : {},
           accessibleQuery(ability, 'read', 'Instrument')
         ]
       }

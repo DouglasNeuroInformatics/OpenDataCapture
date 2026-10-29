@@ -11,7 +11,7 @@ export type BrandingProps = {
 
 export const Branding = ({ className, fontSize = 'lg', logoVariant = 'auto', onClick }: BrandingProps) => {
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- onClick is optional and only the playground header passes it, as a pointer shortcut to the repository; the div is not a control when it is absent
     <div className={cn('flex h-10 items-center p-1', className)} onClick={onClick}>
       <Logo className="h-full w-auto" variant={logoVariant} />
       <span

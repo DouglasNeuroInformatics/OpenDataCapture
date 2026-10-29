@@ -37,6 +37,8 @@ const renderLayout = () => {
   render(<Component />);
 };
 
+const noop = () => undefined;
+
 describe('Route', () => {
   beforeEach(() => {
     mocks.config.setup.isGatewayEnabled = true;
@@ -113,7 +115,7 @@ describe('Route', () => {
 
   it('should show a loading fallback instead of the page while the page suspends', () => {
     mocks.outlet = () => {
-      throw new Promise<never>(() => undefined);
+      throw new Promise<never>(noop);
     };
     renderLayout();
     expect(screen.getByText('Loading Fallback')).toBeTruthy();

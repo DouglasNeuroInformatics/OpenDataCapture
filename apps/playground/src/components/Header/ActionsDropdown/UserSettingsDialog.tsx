@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import { Dialog, Form } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
@@ -27,7 +25,6 @@ export const UserSettingsDialog = ({ isOpen, setIsOpen }: UserSettingsDialogProp
           className="py-4"
           content={[
             {
-              title: t({ en: 'Default Instance Settings', fr: "Paramètres d'instance par défaut" }),
               fields: {
                 apiBaseUrl: {
                   description: t({
@@ -35,14 +32,14 @@ export const UserSettingsDialog = ({ isOpen, setIsOpen }: UserSettingsDialogProp
                     fr: 'Le chemin de base de votre API REST Open Data Capture.'
                   }),
                   kind: 'string',
-                  placeholder: 'e.g., https://demo.opendatacapture.org/api',
                   label: t({ en: 'API Base URL', fr: "URL de base de l'API" }),
+                  placeholder: 'e.g., https://demo.opendatacapture.org/api',
                   variant: 'input'
                 }
-              }
+              },
+              title: t({ en: 'Default Instance Settings', fr: "Paramètres d'instance par défaut" })
             },
             {
-              title: t({ en: 'Editor Settings', fr: "Paramètres de l'éditeur" }),
               fields: {
                 refreshInterval: {
                   description: t({
@@ -53,7 +50,8 @@ export const UserSettingsDialog = ({ isOpen, setIsOpen }: UserSettingsDialogProp
                   label: t({ en: 'Refresh Interval', fr: "Intervalle d'actualisation" }),
                   variant: 'input'
                 }
-              }
+              },
+              title: t({ en: 'Editor Settings', fr: "Paramètres de l'éditeur" })
             }
           ]}
           initialValues={settings}

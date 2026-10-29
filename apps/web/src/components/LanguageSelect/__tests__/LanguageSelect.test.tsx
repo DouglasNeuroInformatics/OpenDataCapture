@@ -14,7 +14,7 @@ const optionLabels = () => screen.getAllByRole('option').map((option) => option.
 
 describe('LanguageSelect', () => {
   beforeEach(() => {
-    void i18n.changeLanguage('en');
+    i18n.changeLanguage('en');
   });
 
   afterEach(cleanup);

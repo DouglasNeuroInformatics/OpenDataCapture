@@ -70,7 +70,7 @@ export const CloneButton = () => {
                   t({ en: 'An instrument with this label already exists', fr: 'Un instrument avec ce nom existe déjà' })
                 )
             })}
-            onSubmit={(data) => void handleSubmit(data)}
+            onSubmit={handleSubmit}
           />
         </Dialog.Content>
       </Dialog>

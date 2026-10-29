@@ -45,7 +45,11 @@ const lastNotification = () => useNotificationsStore.getState().notifications.at
 
 const deferResponse = () => {
   let resolve: (value: { data: unknown }) => void = () => undefined;
-  mocks.post.mockReturnValue(new Promise((done) => (resolve = done)));
+  mocks.post.mockReturnValue(
+    new Promise((done) => {
+      resolve = done;
+    })
+  );
   return (data: unknown) => resolve({ data });
 };
 

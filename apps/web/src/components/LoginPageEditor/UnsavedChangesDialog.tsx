@@ -26,7 +26,7 @@ export const UnsavedChangesDialog = ({ blocker }: { blocker: BrandingEditor['blo
           <Button type="button" variant="outline" onClick={() => blocker.proceed?.()}>
             {t({ en: 'Yes', es: 'Sí', fr: 'Oui' })}
           </Button>
-          {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
+          {/* eslint-disable-next-line jsx-a11y/no-autofocus -- a dialog focuses its first button by default, which here would make Enter discard the changes; "No" is the safe default */}
           <Button autoFocus type="button" onClick={() => blocker.reset?.()}>
             {t({ en: 'No', es: 'No', fr: 'Non' })}
           </Button>

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-namespace -- FileInstrument is one published name for the instrument type and its member types, which only a namespace merges */
 
 import type { Merge } from 'type-fest';
 

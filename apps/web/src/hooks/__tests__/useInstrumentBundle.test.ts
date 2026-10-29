@@ -65,7 +65,9 @@ describe('useInstrumentBundle', () => {
     // React Query resumes paused mutations before it revisits the queries, so a refetch would arrive
     // some ticks after the focus event rather than during it.
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 20));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 20);
+      });
     });
 
     expect(mockAxios.get).toHaveBeenCalledOnce();

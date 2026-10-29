@@ -188,7 +188,13 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
           const value = measures[key];
           // An instrument that does not measure this field leaves the cell empty rather than
           // claiming a value it never collected.
-          row[key] = value === undefined ? '' : typeof value === 'object' ? JSON.stringify(value) : value;
+          if (value === undefined) {
+            row[key] = '';
+          } else if (typeof value === 'object') {
+            row[key] = JSON.stringify(value);
+          } else {
+            row[key] = value;
+          }
         }
         return row;
       });

@@ -314,7 +314,7 @@ const RouteComponent = () => {
 export const Route = createFileRoute('/_app/admin/audit/logs')({
   component: RouteComponent,
   loaderDeps: ({ search }) => ({ search }),
-  // eslint-disable-next-line perfectionist/sort-objects
+  // eslint-disable-next-line perfectionist/sort-objects -- TanStack Router infers the loader's `deps` from loaderDeps, so loaderDeps must come first
   loader: async ({ context, deps }) => {
     await Promise.all([
       context.queryClient.ensureQueryData(

@@ -1,4 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
 import { useMemo, useState } from 'react';
 
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
@@ -54,30 +53,30 @@ const RouteComponent = () => {
     : undefined;
 
   const profileInitialValues: ProfileFormData = {
+    dateOfBirth: userInfo.data.dateOfBirth ?? undefined,
+    email: userInfo.data.email ?? '',
     firstName: userInfo.data.firstName ?? '',
     lastName: userInfo.data.lastName ?? '',
-    dateOfBirth: userInfo.data.dateOfBirth ?? undefined,
-    sex: userInfo.data.sex ?? undefined,
-    email: userInfo.data.email ?? '',
-    phoneNumber: userInfo.data.phoneNumber ?? ''
+    phoneNumber: userInfo.data.phoneNumber ?? '',
+    sex: userInfo.data.sex ?? undefined
   };
 
   const $ProfileFormData = useMemo(() => {
     return z.object({
+      dateOfBirth: z.date().optional(),
+      email: $Email(t).optional(),
       firstName: z.string().min(1).optional(),
       lastName: z.string().min(1).optional(),
-      dateOfBirth: z.date().optional(),
-      sex: $Sex.optional(),
-      email: $Email(t).optional(),
-      phoneNumber: $PhoneNumber(t, userInfo.data.phoneNumber).optional()
+      phoneNumber: $PhoneNumber(t, userInfo.data.phoneNumber).optional(),
+      sex: $Sex.optional()
     }) satisfies z.ZodType<ProfileFormData>;
   }, [resolvedLanguage, userInfo.data.phoneNumber]);
 
   const $PasswordFormData = useMemo(() => {
     return z
       .object({
-        password: z.string().min(1),
-        confirmPassword: z.string().min(1)
+        confirmPassword: z.string().min(1),
+        password: z.string().min(1)
       })
       .check((ctx) => {
         if (!estimatePasswordStrength(ctx.value.password).success) {
@@ -136,6 +135,7 @@ const RouteComponent = () => {
         className="mx-auto mt-6 max-w-3xl"
         content={[
           {
+            /* eslint-disable perfectionist/sort-objects -- fields render in key order, so sorting would put dateOfBirth and email before the name fields */
             fields: {
               firstName: {
                 kind: 'string',
@@ -171,6 +171,7 @@ const RouteComponent = () => {
                 variant: 'input'
               }
             },
+            /* eslint-enable perfectionist/sort-objects */
             title: t({
               en: 'Personal Information',
               es: 'Información personal',
@@ -217,6 +218,7 @@ const RouteComponent = () => {
                   label: t('common.password'),
                   variant: 'password'
                 },
+                // eslint-disable-next-line perfectionist/sort-objects -- fields render in key order, so confirmPassword must follow password
                 confirmPassword: {
                   kind: 'string',
                   label: t('common.confirmPassword'),

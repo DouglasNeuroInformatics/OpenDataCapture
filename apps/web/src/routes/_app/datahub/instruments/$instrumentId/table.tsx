@@ -180,7 +180,7 @@ const RouteComponent = () => {
   // back to this record table rather than dropping the reader on the subject index.
   const fromHere = { fromInstrument: seriesInstrumentId, fromSeries: search.fromSeries };
 
-  const viewRecord = (record: InstrumentVisualizationRecord) => {
+  const handleViewRecord = (record: InstrumentVisualizationRecord) => {
     void navigate({
       params: { recordId: record.__id__, subjectId: record.__subjectId__ },
       search: fromHere,
@@ -279,7 +279,7 @@ const RouteComponent = () => {
           rowActions={[
             {
               label: t({ en: 'View Record', es: 'Ver registro', fr: "Voir l'enregistrement" }),
-              onSelect: viewRecord
+              onSelect: handleViewRecord
             },
             {
               label: t({ en: 'View Subject', es: 'Ver sujeto', fr: 'Voir le client' }),
@@ -293,7 +293,7 @@ const RouteComponent = () => {
             }
           ]}
           onRowClick={(row) => setHighlightedRowId(row.__id__)}
-          onRowDoubleClick={viewRecord}
+          onRowDoubleClick={handleViewRecord}
         />
       </div>
     </div>

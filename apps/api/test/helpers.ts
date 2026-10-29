@@ -1,4 +1,4 @@
-/* eslint-disable no-empty-pattern */
+/* eslint-disable no-empty-pattern -- vitest rejects a fixture function whose first argument is not destructured, even when it uses no fixtures */
 
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import type { ReleaseInfo } from '@opendatacapture/schemas/setup';

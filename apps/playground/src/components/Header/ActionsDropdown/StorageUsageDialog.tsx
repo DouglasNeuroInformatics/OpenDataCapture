@@ -21,7 +21,9 @@ export const StorageUsageDialog = ({ isOpen, setIsOpen }: StorageUsageDialogProp
     setMessage(t({ en: 'Loading...', fr: 'Chargement...' }));
     const [updated] = await Promise.all([
       navigator.storage.estimate(),
-      new Promise((resolve) => setTimeout(resolve, 500))
+      new Promise((resolve) => {
+        setTimeout(resolve, 500);
+      })
     ]);
     setStorageEstimate(updated);
     setMessage(null);
@@ -65,7 +67,9 @@ export const StorageUsageDialog = ({ isOpen, setIsOpen }: StorageUsageDialogProp
             onClick={() => {
               useAppStore.persist.clearStorage();
               setMessage(t({ en: 'Deleting...', fr: 'Suppression...' }));
-              void new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
+              void new Promise((resolve) => {
+                setTimeout(resolve, 2000);
+              }).then(() => {
                 setUpdateKey(updateKey + 1);
               });
             }}

@@ -224,9 +224,8 @@ describe('useInstrumentVisualization', () => {
           InstrumentName: 'instrument-1',
           SeriesID: null,
           SeriesName: null,
-          SubjectID: 'subject-1',
-          // eslint-disable-next-line perfectionist/sort-objects
           someValue: 'abc',
+          SubjectID: 'subject-1',
           Username: 'testusername'
         }
       ]);

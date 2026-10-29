@@ -71,7 +71,9 @@ describe('DevelopmentServer', () => {
     await Promise.all(
       openServers.splice(0).map((httpServer) => {
         httpServer.closeAllConnections();
-        return new Promise((resolve) => httpServer.close(resolve));
+        return new Promise((resolve) => {
+          httpServer.close(resolve);
+        });
       })
     );
     vite.ssrFixStacktrace.mockClear();

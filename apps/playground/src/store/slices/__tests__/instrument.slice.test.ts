@@ -35,7 +35,7 @@ const other: InstrumentRepository = {
 };
 
 const { addInstrument, removeInstrument, resetInstruments, setSelectedInstrument } = createInstrumentSlice(
-  useAppStore.setState,
+  useAppStore.setState.bind(useAppStore),
   useAppStore.getState,
   useAppStore
 );

@@ -140,6 +140,8 @@ const errorAlert = () => screen.queryByTestId('admin-user-edit-error');
 
 const saveButton = () => screen.getByTestId<HTMLButtonElement>('save-user-changes');
 
+const noop = () => undefined;
+
 describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -438,7 +440,7 @@ describe('Route', () => {
     });
 
     it('should lock the save controls while a save is in flight', () => {
-      mocks.mutateAsync.mockReturnValue(new Promise(() => undefined));
+      mocks.mutateAsync.mockReturnValue(new Promise(noop));
       renderPage();
       act(() => {
         void formProps().onSubmit(submitData());
@@ -448,7 +450,7 @@ describe('Route', () => {
     });
 
     it('should ignore a second submit while a save is in flight, so the account is not saved twice', async () => {
-      mocks.mutateAsync.mockReturnValue(new Promise(() => undefined));
+      mocks.mutateAsync.mockReturnValue(new Promise(noop));
       renderPage();
       act(() => {
         void formProps().onSubmit(submitData());

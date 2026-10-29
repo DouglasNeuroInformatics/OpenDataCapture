@@ -49,7 +49,9 @@ class SynchronousMessageChannel {
 }
 
 function flushMicrotasks() {
-  return new Promise((resolve) => setTimeout(resolve, 0));
+  return new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
 }
 
 function createServiceWorker({ acknowledge = true, controlled = true, messages = [] }: ServiceWorkerOptions = {}) {

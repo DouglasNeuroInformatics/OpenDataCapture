@@ -19,7 +19,11 @@ describe('localizeValidationErrors', () => {
 
   it('should wait for the runtime zod to be localized before resolving, so instruments never render English errors', async () => {
     let finishLocalizing!: () => void;
-    localizeZodErrors.mockReturnValueOnce(new Promise<void>((resolve) => (finishLocalizing = resolve)));
+    localizeZodErrors.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finishLocalizing = resolve;
+      })
+    );
     const onResolved = vi.fn();
     const localization = localizeValidationErrors().then(onResolved);
     await Promise.resolve();

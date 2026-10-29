@@ -50,13 +50,13 @@ const defaults: monaco.typescript.ModeConfiguration = {
 monaco.typescript.javascriptDefaults.setModeConfiguration(defaults);
 monaco.typescript.typescriptDefaults.setModeConfiguration(defaults);
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- onLanguage ignores its listener's return value, and the listener must await the worker before it can register the provider
 monaco.languages.onLanguage('typescript', async () => {
   const worker = await monaco.typescript.getTypeScriptWorker();
   monaco.languages.registerCompletionItemProvider('typescript', new TypeScriptSuggestAdapter(worker));
 });
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
+// eslint-disable-next-line @typescript-eslint/no-misused-promises -- onLanguage ignores its listener's return value, and the listener must await the worker before it can register the provider
 monaco.languages.onLanguage('javascript', async () => {
   const worker = await monaco.typescript.getJavaScriptWorker();
   monaco.languages.registerCompletionItemProvider('javascript', new TypeScriptSuggestAdapter(worker));

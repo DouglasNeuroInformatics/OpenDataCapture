@@ -230,7 +230,7 @@ describe('GroupEmailTemplates', () => {
   });
 
   it('should refuse to save before the group has loaded, rather than appear to succeed', async () => {
-    mockAxios.get.mockReturnValue(new Promise(() => undefined));
+    mockAxios.get.mockReturnValue(Promise.withResolvers<never>().promise);
     renderTemplates();
     createEnglishTemplate('Notice');
     await waitFor(() => {

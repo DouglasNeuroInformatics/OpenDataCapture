@@ -56,7 +56,7 @@ describe('useSyncInstrumentRepoMutation', () => {
   });
 
   it('should announce the sync before it finishes, since a sync can take a while', async () => {
-    mockAxios.post.mockReturnValueOnce(new Promise(() => undefined));
+    mockAxios.post.mockReturnValueOnce(Promise.withResolvers<never>().promise);
     const { result } = renderSyncMutation();
     result.current.mutate({ id: 'repo-1' });
     await waitFor(() => {

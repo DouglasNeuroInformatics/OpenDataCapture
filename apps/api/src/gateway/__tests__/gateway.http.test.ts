@@ -16,11 +16,15 @@ describe('createGatewayHttpOptions', () => {
       connectionCount = 0;
       server = http.createServer((_, response) => response.end());
       server.on('connection', () => connectionCount++);
-      await new Promise<void>((resolve) => server.listen(0, 'localhost', resolve));
+      await new Promise<void>((resolve) => {
+        server.listen(0, 'localhost', resolve);
+      });
     });
 
     afterEach(async () => {
-      await new Promise((resolve) => server.close(resolve));
+      await new Promise((resolve) => {
+        server.close(resolve);
+      });
     });
 
     it('should open a new connection for every request, so none is sent on one the gateway has closed', async () => {

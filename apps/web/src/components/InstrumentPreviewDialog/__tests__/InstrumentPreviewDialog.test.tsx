@@ -76,7 +76,7 @@ const previewForm = () => {
 
 describe('InstrumentPreviewDialog', () => {
   beforeEach(() => {
-    void i18n.changeLanguage('en');
+    i18n.changeLanguage('en');
     bundle.state = { isError: false, isLoading: false };
     bundle.useInstrumentBundle.mockImplementation(() => bundle.state);
   });

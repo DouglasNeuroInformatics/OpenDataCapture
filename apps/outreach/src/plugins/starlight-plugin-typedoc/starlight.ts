@@ -1,4 +1,4 @@
-/* eslint-disable import/exports-last */
+/* eslint-disable import/exports-last -- forked from starlight-typedoc, so each private helper stays beside the exported function that uses it for porting upstream changes */
 
 import path from 'node:path';
 

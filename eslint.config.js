@@ -159,7 +159,12 @@ export default config(
     }
   },
   {
-    files: ['packages/instrument-library/**/*'],
+    // Instrument definitions are written in reading order, and a form's fields render in key order.
+    files: [
+      'apps/playground/src/instruments/{examples,templates}/**/*',
+      'packages/instrument-library/**/*',
+      'packages/instrument-stubs/src/{file,forms,interactive,series}.js'
+    ],
     rules: {
       'perfectionist/sort-objects': 'off'
     }
@@ -287,7 +292,11 @@ export default config(
   {
     ...playwright.configs['flat/recommended'],
     files: ['testing/src/**/*.ts'],
-    rules: PLAYWRIGHT_RECOMMENDED_RULES
+    rules: {
+      ...PLAYWRIGHT_RECOMMENDED_RULES,
+      // The fixture asserts that the page landed on the requested route.
+      'playwright/expect-expect': ['error', { assertFunctionNames: ['getPageModel'] }]
+    }
   },
   {
     files: ['{apps,packages,runtime}/*/src/**/*.{js,jsx,ts,tsx}'],

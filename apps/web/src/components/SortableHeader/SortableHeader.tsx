@@ -7,13 +7,15 @@ type SortableHeaderProps<TRow> = {
   label: string;
 };
 
+const SORT_ICONS = { asc: ChevronUpIcon, desc: ChevronDownIcon };
+
 /**
  * A clickable column label. `DataTableHead` renders whatever the column supplies, so the sort
  * affordance lives here rather than coming from the table.
  */
 export const SortableHeader = <TRow,>({ column, label }: SortableHeaderProps<TRow>) => {
   const sorted = column.getIsSorted();
-  const Icon = sorted === 'asc' ? ChevronUpIcon : sorted === 'desc' ? ChevronDownIcon : ChevronsUpDownIcon;
+  const Icon = sorted ? SORT_ICONS[sorted] : ChevronsUpDownIcon;
   return (
     <button
       className="hover:text-foreground flex items-center gap-1 transition-colors"

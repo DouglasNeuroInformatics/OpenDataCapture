@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import { createInstrumentStub } from './utils.js';
 
 /** @type {import('./utils.js').InstrumentStub<import('@opendatacapture/runtime-core').SeriesInstrument>} */

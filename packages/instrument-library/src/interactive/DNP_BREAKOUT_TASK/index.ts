@@ -102,18 +102,15 @@ function runTask(root: HTMLDivElement, onComplete: (data: Data) => void) {
     for (let i = 0; i < brickColumnCount; i++) {
       for (let j = 0; j < brickRowCount; j++) {
         const b = bricks[i]![j]!;
-        if (b.status === 1) {
-          if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
-            dy = -dy;
-            b.status = 0;
-            score++;
-            // eslint-disable-next-line max-depth
-            if (score === brickRowCount * brickColumnCount) {
-              onComplete({
-                livesRemaining: lives,
-                timeElapsed: Date.now() - startTime
-              });
-            }
+        if (b.status === 1 && x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+          dy = -dy;
+          b.status = 0;
+          score++;
+          if (score === brickRowCount * brickColumnCount) {
+            onComplete({
+              livesRemaining: lives,
+              timeElapsed: Date.now() - startTime
+            });
           }
         }
       }

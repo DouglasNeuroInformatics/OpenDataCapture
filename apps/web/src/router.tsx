@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
+/* eslint-disable @typescript-eslint/consistent-type-definitions -- Register and HistoryState are augmented by declaration merging into TanStack Router's interfaces, which a type alias cannot do */
 
 import { createRouter } from '@tanstack/react-router';
 

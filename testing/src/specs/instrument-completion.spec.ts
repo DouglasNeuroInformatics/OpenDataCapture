@@ -267,7 +267,13 @@ test.describe('instrument completion', () => {
 
     await setTabVisibility('hidden');
     await setTabVisibility('visible');
-    await page.waitForTimeout(500);
+    await page.evaluate(() => {
+      return new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        });
+      });
+    });
 
     expect(bundleRequests).toEqual([]);
     await expect(instrumentPage.submitButton).toBeVisible();

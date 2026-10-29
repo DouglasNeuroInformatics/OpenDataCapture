@@ -6,7 +6,9 @@ export const captureUnhandledRejection = async (act: () => void) => {
   const listeners = process.listeners('unhandledRejection');
   process.removeAllListeners('unhandledRejection');
   try {
-    const rejection = new Promise<unknown>((resolve) => process.once('unhandledRejection', resolve));
+    const rejection = new Promise<unknown>((resolve) => {
+      process.once('unhandledRejection', resolve);
+    });
     act();
     return await rejection;
   } finally {

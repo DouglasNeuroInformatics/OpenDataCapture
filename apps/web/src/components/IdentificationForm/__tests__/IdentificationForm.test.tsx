@@ -69,7 +69,7 @@ const fieldsWithErrors = () => {
 
 describe('IdentificationForm', () => {
   beforeEach(() => {
-    void i18n.changeLanguage('en');
+    i18n.changeLanguage('en');
     store.currentGroup = null;
     subjectUtils.generateSubjectHash.mockResolvedValue('subject-hash');
   });

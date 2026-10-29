@@ -78,6 +78,49 @@ const RouteComponent = () => {
 
   const hasData = series.some((item) => item.points.length > 0);
 
+  const renderChart = () => {
+    if (!hasData) {
+      return (
+        <p className="py-16 text-center">
+          {t({
+            en: 'No records match the current filters.',
+            es: 'Ningún registro coincide con los filtros actuales.',
+            fr: 'Aucun enregistrement ne correspond aux filtres actuels.'
+          })}
+        </p>
+      );
+    }
+    if (chart === 'distribution') {
+      return (
+        <RecordDistributionChart
+          countLabel={t({ en: 'Records', es: 'Registros', fr: 'Enregistrements' })}
+          isNumeric={isNumeric}
+          measureLabel={measureLabel}
+          series={series}
+        />
+      );
+    }
+    if (!isNumeric) {
+      return (
+        <p className="py-16 text-center">
+          {t({
+            en: 'This measure holds categories rather than numbers, so it can only be shown as a distribution.',
+            es: 'Esta medida contiene categorías en lugar de números, por lo que solo puede mostrarse como distribución.',
+            fr: 'Cette mesure contient des catégories et non des nombres : elle ne peut être affichée que sous forme de distribution.'
+          })}
+        </p>
+      );
+    }
+    return (
+      <RecordScatterChart
+        measureLabel={measureLabel}
+        series={series}
+        trend={trend}
+        xLabel={t('datahub.visualization.xLabel')}
+      />
+    );
+  };
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-2 lg:flex-row lg:justify-between">
@@ -162,37 +205,7 @@ const RouteComponent = () => {
         data-testid="instrument-hub-chart"
         ref={chartContainerRef}
       >
-        {!hasData ? (
-          <p className="py-16 text-center">
-            {t({
-              en: 'No records match the current filters.',
-              es: 'Ningún registro coincide con los filtros actuales.',
-              fr: 'Aucun enregistrement ne correspond aux filtres actuels.'
-            })}
-          </p>
-        ) : chart === 'distribution' ? (
-          <RecordDistributionChart
-            countLabel={t({ en: 'Records', es: 'Registros', fr: 'Enregistrements' })}
-            isNumeric={isNumeric}
-            measureLabel={measureLabel}
-            series={series}
-          />
-        ) : !isNumeric ? (
-          <p className="py-16 text-center">
-            {t({
-              en: 'This measure holds categories rather than numbers, so it can only be shown as a distribution.',
-              es: 'Esta medida contiene categorías en lugar de números, por lo que solo puede mostrarse como distribución.',
-              fr: 'Cette mesure contient des catégories et non des nombres : elle ne peut être affichée que sous forme de distribution.'
-            })}
-          </p>
-        ) : (
-          <RecordScatterChart
-            measureLabel={measureLabel}
-            series={series}
-            trend={trend}
-            xLabel={t('datahub.visualization.xLabel')}
-          />
-        )}
+        {renderChart()}
       </div>
     </div>
   );

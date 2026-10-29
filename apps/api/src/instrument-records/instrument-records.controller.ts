@@ -1,4 +1,4 @@
-/* eslint-disable perfectionist/sort-classes */
+/* eslint-disable perfectionist/sort-classes -- the single-segment @Get('linear-model') must stay above @Get(':id'), which alphabetical order would put below it, where :id would match it first */
 
 import { ApiOperation, CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
 import {

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-namespace -- Zod3 and Zod4 each export same-named helpers (createUploadTemplateCSV, processInstrumentCSV) for one zod major, and callers address them as Zod3.x and Zod4.x */
 
 import { isNumberLike, isObjectLike, isPlainObject, isZodType, parseNumber } from '@douglasneuroinformatics/libjs';
 import type { Language } from '@douglasneuroinformatics/libui/i18n';
@@ -68,7 +68,7 @@ const ansiEscapeCode = '[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0
     '\u0000-\u0009\u000B-\u0019\u001b\u180e\u009b\u00ad\u200b\u2028\u2029\ufeff\ufe00-\ufe0f';
 
 const zeroWidthCharactersExceptNewline = new RegExp(
-  // eslint-disable-next-line no-misleading-character-class
+  // eslint-disable-next-line no-misleading-character-class -- the class lists the zero-width and variation-selector code points on purpose, since they are what this check looks for
   `(?:${ansiEscapeCode})|[${zeroWidthCharacterExceptNewline}]`,
   'g'
 );
@@ -920,7 +920,7 @@ export namespace Zod4 {
           for (let i = 0; i < headers.length; i++) {
             const key = headers[i]!.trim();
             const cell = elements[i];
-            const rawValue = cell == null ? '' : cell.trim();
+            const rawValue = cell === undefined ? '' : cell.trim();
             // Return error if any non‑visible character is present
             const nonVisibleChars = nonVisibleCharChecker(rawValue);
             if (nonVisibleChars !== null) {

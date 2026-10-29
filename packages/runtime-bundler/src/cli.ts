@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-/* eslint-disable no-console */
+/* eslint-disable no-console -- the CLI reports progress and failures on the terminal */
 
 import * as path from 'node:path';
 

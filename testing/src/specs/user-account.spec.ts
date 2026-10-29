@@ -86,7 +86,7 @@ test.describe('user account', () => {
     // the worker shares.
     const loginPage = await getPageModel('/auth/login');
     await loginPage.fillLoginForm(credentials);
-    await loginPage.expect.toHaveURL('/dashboard');
+    await expect(loginPage.$ref).toHaveURL('/dashboard');
 
     await goToAccount(page);
 
@@ -98,7 +98,7 @@ test.describe('user account', () => {
     await logOut(page);
 
     await loginPage.fillLoginForm({ password: newPassword, username: credentials.username });
-    await loginPage.expect.toHaveURL('/dashboard');
+    await expect(loginPage.$ref).toHaveURL('/dashboard');
   });
 
   test('should clear contact details that are saved blank', async ({ api, authenticateAs, page, uniqueId }) => {
@@ -151,7 +151,13 @@ test.describe('user account profile form', () => {
       await page.evaluate(() => window.dispatchEvent(new Event('visibilitychange')));
       await refetch;
     }).toPass();
-    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await page.evaluate(() => {
+      return new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        });
+      });
+    });
 
     await expect(userPage.firstNameField).toHaveValue('Unsaved');
   });

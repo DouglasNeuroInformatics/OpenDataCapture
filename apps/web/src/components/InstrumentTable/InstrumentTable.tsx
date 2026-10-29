@@ -436,13 +436,12 @@ export const InstrumentTable = ({
         ]}
         data={rows}
         initialState={{
-          columnPinning: { left: ['title'] },
-          // eslint-disable-next-line perfectionist/sort-objects
           columnFilters: [
             { id: 'kind', value: [...INSTRUMENT_KINDS] satisfies KindFilter },
             { id: 'recordCount', value: controlledMinRecords ?? 0 },
             { id: 'lastCollectedAt', value: DEFAULT_COLLECTED_FILTER }
-          ]
+          ],
+          columnPinning: { left: ['title'] }
         }}
         rowActions={[
           { label: t('common.view'), onSelect: onOpen },

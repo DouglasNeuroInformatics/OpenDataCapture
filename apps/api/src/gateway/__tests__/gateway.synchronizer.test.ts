@@ -421,7 +421,9 @@ describe('GatewaySynchronizer', () => {
       sync = vi.spyOn(gatewaySynchronizer, 'sync').mockImplementation(async () => {
         concurrentSyncs++;
         maxConcurrentSyncs = Math.max(maxConcurrentSyncs, concurrentSyncs);
-        await new Promise((resolve) => setTimeout(resolve, SYNC_DURATION));
+        await new Promise((resolve) => {
+          setTimeout(resolve, SYNC_DURATION);
+        });
         concurrentSyncs--;
       });
     });
@@ -495,7 +497,9 @@ describe('GatewaySynchronizer', () => {
 
     it('should not abandon a pass that finishes within five minutes', async () => {
       sync.mockImplementationOnce(async () => {
-        await new Promise((resolve) => setTimeout(resolve, FIVE_MINUTES - 1));
+        await new Promise((resolve) => {
+          setTimeout(resolve, FIVE_MINUTES - 1);
+        });
       });
       gatewaySynchronizer.onApplicationBootstrap();
 

@@ -1,4 +1,4 @@
-/* eslint-disable import/exports-last */
+/* eslint-disable import/exports-last -- vendored from parse-imports, so each helper keeps its upstream position beside the exports that use it */
 
 /**
  * Adapted from https://github.com/TomerAberbach/parse-imports
@@ -244,7 +244,7 @@ function isConstantStringLiteral(stringLiteral: string) {
     (quoteCandidate) => stringLiteral.startsWith(quoteCandidate) && stringLiteral.endsWith(quoteCandidate)
   );
 
-  if (quote == null) {
+  if (quote === undefined) {
     return false;
   }
 
@@ -315,11 +315,11 @@ export function parseImports(code: string): Iterable<Import> {
   return {
     *[Symbol.iterator]() {
       for (let {
-        // eslint-disable-next-line prefer-const
+        // eslint-disable-next-line prefer-const -- moduleSpecifierStartIndex and moduleSpecifierEndIndexExclusive are reassigned below, and one destructuring declaration cannot mix let and const
         importType,
         moduleSpecifierEndIndexExclusive,
         moduleSpecifierStartIndex,
-        // eslint-disable-next-line prefer-const
+        // eslint-disable-next-line prefer-const -- moduleSpecifierStartIndex and moduleSpecifierEndIndexExclusive are reassigned below, and one destructuring declaration cannot mix let and const
         statementStartIndex
       } of imports) {
         const isImportMeta = importType === 'ImportMeta';

@@ -123,7 +123,9 @@ test.describe('upload instrument selection while loading', () => {
       }
     });
     await page.route('**/v1/instruments/info*', async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1500);
+      });
       await route.continue();
     });
 

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-namespace */
-
 import type { AnyUnilingualFileInstrument, FileInstrument, InstrumentKind } from '@opendatacapture/runtime-core';
 import type { AxiosProgressEvent } from 'axios';
 import type { Promisable } from 'type-fest';
@@ -10,37 +8,33 @@ type UploadMap = {
   [basename: string]: File[];
 };
 
+type UploadState = {
+  loadedFiles: number;
+  loadedSize: number;
+  totalFiles: number;
+  totalProgress: number;
+  totalSize: number;
+};
+
+type Status = 'FAILED' | 'PENDING' | 'READY' | 'SUBMITTED';
+
 export type UploadProgressEvent = Pick<AxiosProgressEvent, 'loaded' | 'progress' | 'total'>;
 
-export namespace FileInstrumentContentStore {
-  export type Errors = {
-    [basename: string]: LocalizedText[];
+export type FileInstrumentContentErrors = {
+  [basename: string]: LocalizedText[];
+};
+
+export type FileInstrumentContentStore = {
+  actions: {
+    setFiles: (id: string, files: File[]) => void;
+    submit: () => Promise<void>;
   };
-
-  type UploadState = {
-    loadedFiles: number;
-    loadedSize: number;
-    totalFiles: number;
-    totalProgress: number;
-    totalSize: number;
-  };
-
-  type Status = 'FAILED' | 'PENDING' | 'READY' | 'SUBMITTED';
-
-  export type StoreType = {
-    actions: {
-      setFiles: (id: string, files: File[]) => void;
-      submit: () => Promise<void>;
-    };
-    errors: Errors;
-    readonly props: FileInstrumentContentProps;
-    status: Status;
-    uploadMap: UploadMap;
-    uploadState: null | UploadState;
-  };
-}
-
-export type FileInstrumentContentStore = FileInstrumentContentStore.StoreType;
+  errors: FileInstrumentContentErrors;
+  readonly props: FileInstrumentContentProps;
+  status: Status;
+  uploadMap: UploadMap;
+  uploadState: null | UploadState;
+};
 
 export type FileInstrumentContentSubmitResult = {
   data: FileInstrument.Data;

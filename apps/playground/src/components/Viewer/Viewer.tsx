@@ -73,7 +73,7 @@ export const Viewer = () => {
   }, refreshInterval);
 
   const handleSubmit = (data: unknown) => {
-    // eslint-disable-next-line no-alert
+    // eslint-disable-next-line no-alert -- the preview has no backend to submit to, so a dialog shows the payload that would be sent
     alert(
       JSON.stringify(
         {

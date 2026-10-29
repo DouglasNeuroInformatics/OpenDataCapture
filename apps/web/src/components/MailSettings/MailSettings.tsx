@@ -120,7 +120,7 @@ export const MailSettings = ({ activeLanguages, config, newUserEmailTemplate }: 
     return { payload: parsed.data };
   };
 
-  const set = <K extends keyof MailConfigFormValues>(key: K, value: MailConfigFormValues[K]) => {
+  const handleFieldChange = <K extends keyof MailConfigFormValues>(key: K, value: MailConfigFormValues[K]) => {
     setValues((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
@@ -156,7 +156,7 @@ export const MailSettings = ({ activeLanguages, config, newUserEmailTemplate }: 
   };
 
   const handleToggleEnabled = async (checked: boolean) => {
-    set('enabled', checked);
+    handleFieldChange('enabled', checked);
     // Persist a disable immediately so the rest of the app reflects it. Enabling for the first
     // time only reveals the form — saving a valid configuration is what turns it on.
     if (!checked && config) {
@@ -197,7 +197,7 @@ export const MailSettings = ({ activeLanguages, config, newUserEmailTemplate }: 
             hasStoredPassword={Boolean(config?.hasPassword)}
             isSaving={updateMutation.isPending}
             values={values}
-            onChange={set}
+            onChange={handleFieldChange}
             onSave={() => void handleSaveConfig()}
           />
 

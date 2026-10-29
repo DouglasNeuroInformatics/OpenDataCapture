@@ -184,7 +184,7 @@ export const UpdateUserForm = ({ data, id, onError, onSubmit }: UpdateUserFormPr
                 }),
                 variant: 'password'
               },
-              // eslint-disable-next-line perfectionist/sort-objects
+              // eslint-disable-next-line perfectionist/sort-objects -- fields render in key order, so confirmPassword must follow password
               confirmPassword: {
                 kind: 'string',
                 label: t({

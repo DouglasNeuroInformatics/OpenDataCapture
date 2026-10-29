@@ -98,6 +98,8 @@ const choose = (select: 'group' | 'username', option: string) => {
 
 const lastNavigatedError = () => mocks.navigate.mock.lastCall?.[0].search?.error;
 
+const noop = () => undefined;
+
 describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -200,7 +202,7 @@ describe('Route', () => {
   });
 
   it('should show a spinner in place of the form while the upload is in flight', async () => {
-    mocks.mutateAsync.mockReturnValue(new Promise(() => undefined));
+    mocks.mutateAsync.mockReturnValue(new Promise(noop));
     renderPage();
     await chooseFile();
     submit();

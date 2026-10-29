@@ -104,7 +104,7 @@ describe('InstrumentShowcase', () => {
   });
 
   beforeEach(() => {
-    void i18n.changeLanguage('en');
+    i18n.changeLanguage('en');
   });
 
   afterEach(() => {

@@ -413,7 +413,7 @@ const Walkthrough = () => {
     targetRef.current?.setAttribute('data-spotlight', 'false');
   };
 
-  const close = () => {
+  const handleClose = () => {
     endSession();
     removeSpotlight();
     setIndex(0);
@@ -470,7 +470,7 @@ const Walkthrough = () => {
         <Card className="max-w-md">
           <Card.Header className="pb-4">
             <Card.Title className="mr-4">{currentStep.title}</Card.Title>
-            <Button className="absolute top-2 right-2" size="icon" type="button" variant="ghost" onClick={close}>
+            <Button className="absolute top-2 right-2" size="icon" type="button" variant="ghost" onClick={handleClose}>
               <XIcon className="h-4 w-4" />
             </Button>
           </Card.Header>
@@ -484,7 +484,7 @@ const Walkthrough = () => {
                 variant="ghost"
                 onClick={() => {
                   setIsWalkthroughComplete(true);
-                  close();
+                  handleClose();
                 }}
               >
                 {t({
@@ -508,7 +508,7 @@ const Walkthrough = () => {
               onClick={() => {
                 if (isLastStep) {
                   setIsWalkthroughComplete(true);
-                  close();
+                  handleClose();
                 } else {
                   setIndex(index + 1);
                 }

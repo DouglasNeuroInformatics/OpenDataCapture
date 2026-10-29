@@ -84,19 +84,21 @@ const RouteComponent = () => {
     (instrument) => ({ id: instrument.id, title: instrument.details.title })
   );
 
+  const headings: { [M in Mode]: string } = {
+    CREATE: t({ en: 'Create Remote Assignments', es: 'Crear tareas remotas', fr: 'Créer des tâches à distance' }),
+    DELETE: t({
+      en: 'Delete Remote Assignments',
+      es: 'Eliminar tareas remotas',
+      fr: 'Supprimer des tâches à distance'
+    }),
+    LANDING: t({ en: 'Remote Assignments', es: 'Tareas remotas', fr: 'Tâches à distance' })
+  };
+
   return (
     <React.Fragment>
       <PageHeader>
         <Heading className="text-center" variant="h2">
-          {mode === 'CREATE'
-            ? t({ en: 'Create Remote Assignments', es: 'Crear tareas remotas', fr: 'Créer des tâches à distance' })
-            : mode === 'DELETE'
-              ? t({
-                  en: 'Delete Remote Assignments',
-                  es: 'Eliminar tareas remotas',
-                  fr: 'Supprimer des tâches à distance'
-                })
-              : t({ en: 'Remote Assignments', es: 'Tareas remotas', fr: 'Tâches à distance' })}
+          {headings[mode]}
         </Heading>
       </PageHeader>
 

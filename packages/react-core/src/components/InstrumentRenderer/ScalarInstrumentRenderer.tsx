@@ -80,7 +80,7 @@ export const ScalarInstrumentRenderer = ({
       }
       await onSubmit({
         ...result,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- validateSubmission has just checked this round-trip against the instrument's schema, but onSubmit's data type varies by instrument kind and cannot be derived from what JSON.parse returns
         data: JSON.parse(JSON.stringify(data, replacer)),
         instrumentId: target.id
       });

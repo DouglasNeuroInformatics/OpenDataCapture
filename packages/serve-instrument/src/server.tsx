@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console -- the server logs to the terminal it was started from */
 
 import { renderToString } from 'react-dom/server';
 

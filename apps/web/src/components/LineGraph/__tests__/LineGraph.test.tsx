@@ -48,12 +48,16 @@ const xAxisTicks = (container: HTMLElement) => {
 /** Recharts handles a mouse move on the next animation frame, so wait for one before reading the tooltip. */
 const hover = async (container: HTMLElement, { clientX, clientY }: { clientX: number; clientY: number }) => {
   fireEvent.mouseMove(container.querySelector('.recharts-wrapper')!, { clientX, clientY });
-  await act(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+  const frame = Promise.withResolvers<void>();
+  requestAnimationFrame(() => {
+    frame.resolve();
+  });
+  await act(() => frame.promise);
 };
 
 describe('LineGraph', () => {
   beforeEach(() => {
-    void i18n.changeLanguage('en');
+    i18n.changeLanguage('en');
   });
 
   afterEach(() => {
@@ -76,7 +80,7 @@ describe('LineGraph', () => {
   });
 
   it('should label the tooltip with the full date in the interface language', async () => {
-    void i18n.changeLanguage('fr');
+    i18n.changeLanguage('fr');
     const container = renderGraph();
     await hover(container, { clientX: 420, clientY: 200 });
     expect(container.querySelector('.recharts-tooltip-label')?.textContent).toMatch(/^vendredi 2 janvier 2026/);

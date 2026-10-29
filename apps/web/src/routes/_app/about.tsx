@@ -111,7 +111,7 @@ const InfoBlock: React.FC<{
         {Object.entries(items).map(([key, value]) => (
           <li key={key}>
             <span>{key}: </span>
-            {value.startsWith('Uptime=') ? <TimeValue value={parseInt(value.slice(7))} /> : <span>{value}</span>}
+            {value.startsWith('Uptime=') ? <TimeValue value={parseInt(value.slice(7), 10)} /> : <span>{value}</span>}
           </li>
         ))}
       </ul>

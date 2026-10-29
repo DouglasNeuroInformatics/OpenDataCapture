@@ -50,9 +50,8 @@ export const LoginPageEditor = () => {
 
         <div className="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           {/* Stop Enter in a text input from submitting the whole form (it should
-            only submit via the explicit Save button). The key handler lives on
-            the <form> deliberately, hence the a11y rule is disabled here. */}
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+            only submit via the explicit Save button). */}
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- the Enter guard must sit on the <form> to cover every input inside it */}
           <form
             className="flex flex-col gap-6"
             id={FORM_ID}

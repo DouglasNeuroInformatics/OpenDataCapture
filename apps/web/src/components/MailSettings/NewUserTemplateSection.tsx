@@ -40,20 +40,19 @@ export const NewUserTemplateSection = ({
   // Unlike a group template, this one is sent in whichever language the admin picks at creation
   // time, so every active language has to be filled in rather than only the ones started.
   const issue = checkTemplateIssue(template.subject, template.body, REQUIRED_NEW_USER_TEMPLATE_VARS, activeLanguages);
-  const error =
-    issue === 'incomplete'
-      ? t({
-          en: 'Fill in the subject and body for each language.',
-          es: 'Complete el asunto y el cuerpo para cada idioma.',
-          fr: "Remplissez l'objet et le corps pour chaque langue."
-        })
-      : issue === 'missing-vars'
-        ? t({
-            en: 'The body must include {{username}}.',
-            es: 'El cuerpo debe incluir {{username}}.',
-            fr: 'Le corps doit inclure {{username}}.'
-          })
-        : undefined;
+  const issueMessages = {
+    incomplete: t({
+      en: 'Fill in the subject and body for each language.',
+      es: 'Complete el asunto y el cuerpo para cada idioma.',
+      fr: "Remplissez l'objet et le corps pour chaque langue."
+    }),
+    'missing-vars': t({
+      en: 'The body must include {{username}}.',
+      es: 'El cuerpo debe incluir {{username}}.',
+      fr: 'Le corps doit inclure {{username}}.'
+    })
+  };
+  const error = issue ? issueMessages[issue] : undefined;
 
   return (
     <SectionCard data-testid="mail-template-card">

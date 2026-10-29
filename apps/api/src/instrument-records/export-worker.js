@@ -98,7 +98,7 @@ function handleChunkComplete(_data) {
     const seriesName = seriesId ? (seriesNames[seriesId] ?? null) : null;
 
     for (const [measureKey, measureValue] of Object.entries(record.computedMeasures)) {
-      if (measureValue == null) {
+      if (measureValue === null || measureValue === undefined) {
         continue;
       }
 

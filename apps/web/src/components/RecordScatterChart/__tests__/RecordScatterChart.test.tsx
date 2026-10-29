@@ -52,7 +52,7 @@ const hoverFirstMark = async (container: HTMLElement) => {
 
 describe('RecordScatterChart', () => {
   beforeEach(() => {
-    void i18n.changeLanguage('en');
+    i18n.changeLanguage('en');
   });
 
   afterEach(() => {
@@ -150,7 +150,7 @@ describe('RecordScatterChart', () => {
   // The axis ticks are ISO, but the tooltip is prose and so follows the interface language. A raw
   // epoch is what the row shows if the date is left unformatted.
   it('should show the collection date in the interface language rather than its epoch', async () => {
-    void i18n.changeLanguage('fr');
+    i18n.changeLanguage('fr');
     vi.useFakeTimers({
       toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance', 'setTimeout', 'clearTimeout', 'Date']
     });

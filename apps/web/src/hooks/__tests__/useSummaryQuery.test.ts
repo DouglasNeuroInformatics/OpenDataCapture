@@ -59,7 +59,7 @@ describe('useSummaryQuery', () => {
       wrapper
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    mockAxios.get.mockReturnValueOnce(new Promise(() => undefined));
+    mockAxios.get.mockReturnValueOnce(Promise.withResolvers<never>().promise);
     rerender({ groupId: 'group-2' });
     expect(result.current).toMatchObject({ data: { counts: { records: 10 } }, isPlaceholderData: true });
   });

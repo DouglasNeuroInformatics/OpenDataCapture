@@ -168,11 +168,13 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
           },
           {
             accessorFn: (row: InstrumentRow) => {
-              return row.kind === 'INTERACTIVE'
-                ? t({ en: 'Interactive', es: 'Interactivo', fr: 'Interactif' })
-                : row.kind === 'FILE'
-                  ? t({ en: 'File', es: 'Archivo', fr: 'Fichier' })
-                  : t({ en: 'Form', es: 'Formulario', fr: 'Formulaire' });
+              if (row.kind === 'INTERACTIVE') {
+                return t({ en: 'Interactive', es: 'Interactivo', fr: 'Interactif' });
+              }
+              if (row.kind === 'FILE') {
+                return t({ en: 'File', es: 'Archivo', fr: 'Fichier' });
+              }
+              return t({ en: 'Form', es: 'Formulario', fr: 'Formulaire' });
             },
             cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
             header: t({ en: 'Kind', es: 'Tipo', fr: 'Type' }),

@@ -57,7 +57,7 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
         setLockDialogOpen(true);
         return;
       }
-      void changeLanguage(requested.data);
+      changeLanguage(requested.data);
     },
     [addNotification, changeLanguage, isLocked, t]
   );
@@ -200,7 +200,7 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
                     key={language}
                     type="button"
                     onClick={() => {
-                      void changeLanguage(language);
+                      changeLanguage(language);
                       setHasSelectedLanguage(true);
                     }}
                   >

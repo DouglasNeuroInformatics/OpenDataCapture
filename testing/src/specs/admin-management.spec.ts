@@ -1,5 +1,22 @@
+import type { Page } from '@playwright/test';
+
 import { SEEDED_USER_PASSWORD } from '../support/constants';
 import { expect, test } from '../support/fixtures';
+
+/**
+ * `mail.spec.ts` may hold mail enabled in a parallel local worker. A user created without an email
+ * then gets the copy-it-manually dialog before the redirect to the users list, which this dismisses.
+ * Without the dialog the app redirects straight away, and `requireSuccessToast` asserts its toast.
+ */
+async function dismissWelcomeEmailFallback(page: Page, { requireSuccessToast = false } = {}) {
+  const fallback = page.getByTestId('welcome-email-fallback');
+  await expect(fallback.or(page.getByTestId('data-table-search-bar'))).toBeVisible();
+  if (await fallback.isVisible()) {
+    await fallback.getByRole('button', { name: 'Done' }).click();
+  } else if (requireSuccessToast) {
+    await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
+  }
+}
 
 test.describe('admin management', () => {
   test.use({ actingRole: 'ADMIN' });
@@ -172,13 +189,7 @@ test.describe('admin management', () => {
     await page.locator('#disabled-true').click();
     await page.getByRole('button', { name: 'Submit' }).click();
 
-    // Same dual outcome as the creation test below: a user created without an email gets the
-    // copy-it-manually dialog when a parallel worker holds mail enabled.
-    const fallback = page.getByTestId('welcome-email-fallback');
-    await expect(fallback.or(page.getByTestId('data-table-search-bar'))).toBeVisible();
-    if (await fallback.isVisible()) {
-      await fallback.getByRole('button', { name: 'Done' }).click();
-    }
+    await dismissWelcomeEmailFallback(page);
     await expect(page).toHaveURL('/admin/users');
   });
 
@@ -206,16 +217,8 @@ test.describe('admin management', () => {
     await page.getByRole('checkbox', { name: group.name }).check();
     await page.getByRole('button', { name: 'Submit' }).click();
 
-    // `mail.spec.ts` may hold mail enabled in a parallel local worker; a user created without an
-    // email then gets the copy-it-manually dialog before navigating. Dismiss it — the user was
-    // created either way, and the users list below is the assertion that matters.
-    const fallback = page.getByTestId('welcome-email-fallback');
-    await expect(fallback.or(page.getByTestId('data-table-search-bar'))).toBeVisible();
-    if (await fallback.isVisible()) {
-      await fallback.getByRole('button', { name: 'Done' }).click();
-    } else {
-      await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
-    }
+    // The user was created either way, and the users list below is the assertion that matters.
+    await dismissWelcomeEmailFallback(page, { requireSuccessToast: true });
     await expect(page).toHaveURL('/admin/users');
 
     await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(username);
@@ -291,14 +294,7 @@ test.describe('admin management', () => {
     await page.getByTestId('basePermissionLevel-select-item-ADMIN').click();
     await createUserForm.getByRole('button', { name: 'Submit' }).click();
 
-    // `mail.spec.ts` may hold mail enabled in a parallel local worker, in which case a user with
-    // no email gets the copy-it-manually dialog before navigating. Dismiss it — the user was
-    // created either way, and the navigation is the assertion.
-    const fallback = page.getByTestId('welcome-email-fallback');
-    await expect(fallback.or(page.getByTestId('data-table-search-bar'))).toBeVisible();
-    if (await fallback.isVisible()) {
-      await fallback.getByRole('button', { name: 'Done' }).click();
-    }
+    await dismissWelcomeEmailFallback(page);
     await expect(page).toHaveURL('/admin/users');
   });
 
@@ -452,7 +448,7 @@ test.describe('admin management', () => {
     expect(stored.email).not.toBe(`half-filled-${uniqueId}@example.org`);
     expect(stored.additionalPermissions).toEqual([]);
 
-    await userPage.selectOption('scope', otherGroup.id);
+    await userPage.selectPermissionOption('scope', otherGroup.id);
     await userPage.saveProfile();
     await expect(page.getByTestId('permission-drafts-incomplete')).toBeHidden();
     await expect(userPage.permissionRows).toHaveCount(1);
@@ -503,8 +499,8 @@ test.describe('admin management', () => {
     const { user } = await api.createUser({ groupIds: [firstGroup.id, secondGroup.id] });
 
     const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
-    await userPage.selectOption('action', 'read');
-    await userPage.selectOption('subject', 'Subject');
+    await userPage.selectPermissionOption('action', 'read');
+    await userPage.selectPermissionOption('subject', 'Subject');
     await userPage.addPermissionRow.getByTestId('scope-select-trigger').click();
     await expect(userPage.$ref.getByTestId(`scope-select-item-${firstGroup.id}`)).toBeVisible();
     await expect(userPage.$ref.getByTestId(`scope-select-item-${otherGroup.id}`)).toHaveCount(0);
@@ -525,8 +521,8 @@ test.describe('admin management', () => {
     const { user } = await api.createUser({ groupIds: [group.id] });
 
     const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
-    await userPage.selectOption('action', 'create');
-    await userPage.selectOption('subject', 'Instrument');
+    await userPage.selectPermissionOption('action', 'create');
+    await userPage.selectPermissionOption('subject', 'Instrument');
     await expect(userPage.addPermissionRow.getByTestId('scope-select-trigger')).toHaveCount(0);
     await userPage.submitPermission();
 
@@ -562,7 +558,7 @@ test.describe('admin management', () => {
     const { user } = await api.createUser({ groupIds: [group.id] });
 
     const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
-    await userPage.selectOption('subject', 'User');
+    await userPage.selectPermissionOption('subject', 'User');
     await userPage.addPermissionRow.getByTestId('action-select-trigger').click();
 
     await expect(userPage.$ref.getByTestId('action-select-item-read')).toBeVisible();
@@ -576,9 +572,9 @@ test.describe('admin management', () => {
     const { user } = await api.createUser({ groupIds: [group.id] });
 
     const userPage = await getPageModel('/admin/users/$userId', { userId: user.id });
-    await userPage.selectOption('action', 'manage');
+    await userPage.selectPermissionOption('action', 'manage');
     await expect(userPage.manageAllWarning).toHaveCount(0);
-    await userPage.selectOption('subject', 'all');
+    await userPage.selectPermissionOption('subject', 'all');
 
     await expect(userPage.manageAllWarning).toBeVisible();
   });

@@ -10,6 +10,7 @@ import {
   Separator
 } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { DEFAULT_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/assignment';
 import type { Language } from '@opendatacapture/schemas/core';
 import { MAX_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/setup';
@@ -39,13 +40,19 @@ const Toggle = ({
   <button
     aria-checked={checked}
     aria-label={label}
-    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${checked ? 'bg-primary' : 'bg-slate-400 dark:bg-slate-600'}`}
+    className={cn(
+      'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
+      checked ? 'bg-primary' : 'bg-slate-400 dark:bg-slate-600'
+    )}
     role="switch"
     type="button"
     onClick={() => onCheckedChange(!checked)}
   >
     <span
-      className={`pointer-events-none block h-5 w-5 rounded-full bg-slate-200 shadow-lg ring-0 transition-transform ${checked ? 'translate-x-5' : 'translate-x-0'}`}
+      className={cn(
+        'pointer-events-none block h-5 w-5 rounded-full bg-slate-200 shadow-lg ring-0 transition-transform',
+        checked ? 'translate-x-5' : 'translate-x-0'
+      )}
     />
   </button>
 );
@@ -139,7 +146,7 @@ const RouteComponent = () => {
     return parsed;
   }, [autosave]);
 
-  const flushDurationOnBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+  const handleDurationBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     clearTimeout(durationDebounceRef.current);
     const parsed = parseDurationDays(event.target.value);
     if (parsed !== null && parsed !== savedDurationRef.current) {
@@ -262,7 +269,7 @@ const RouteComponent = () => {
                       min={1}
                       type="number"
                       value={durationDays}
-                      onBlur={flushDurationOnBlur}
+                      onBlur={handleDurationBlur}
                       onChange={(event) => {
                         setDurationDays(event.target.value);
                         clearTimeout(durationDebounceRef.current);

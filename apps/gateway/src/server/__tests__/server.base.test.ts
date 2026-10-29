@@ -108,7 +108,9 @@ describe('BaseServer', () => {
     await Promise.all(
       openServers.splice(0).map((httpServer) => {
         httpServer.closeAllConnections();
-        return new Promise((resolve) => httpServer.close(resolve));
+        return new Promise((resolve) => {
+          httpServer.close(resolve);
+        });
       })
     );
     logLines.length = 0;
@@ -159,8 +161,7 @@ describe('BaseServer', () => {
     });
 
     it('should not try to fix the stack trace of a thrown value that is not an error, since it has none', async () => {
-      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-      const server = new StacktraceFixingServer(() => Promise.reject('not an error'));
+      const server = new StacktraceFixingServer(vi.fn().mockRejectedValue('not an error'));
       const response = await request(server, '/');
       expect(response.status).toBe(500);
       expect(server.fixedErrors).toStrictEqual([]);

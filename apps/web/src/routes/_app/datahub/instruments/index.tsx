@@ -48,7 +48,7 @@ const RouteComponent = () => {
     });
   }, [instrumentInfoQuery.data, seriesSummaryQuery.data, summaryQuery.data]);
 
-  const openInstrument = (row: InstrumentRow) => {
+  const handleOpenInstrument = (row: InstrumentRow) => {
     void navigate({ params: { instrumentId: row.id }, to: '/datahub/instruments/$instrumentId/table' });
   };
 
@@ -63,7 +63,7 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <InstrumentTable data-testid="instrument-hub-table" rows={data} onOpen={openInstrument} />
+      <InstrumentTable data-testid="instrument-hub-table" rows={data} onOpen={handleOpenInstrument} />
     </React.Fragment>
   );
 };

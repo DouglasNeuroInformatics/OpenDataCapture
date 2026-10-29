@@ -114,7 +114,9 @@ async function submitAndCapture(result: { current: BrandingEditor }) {
 async function receiveServerBranding(queryClient: QueryClient, branding: BrandingConfig) {
   await act(async () => {
     queryClient.setQueryData([SETUP_STATE_QUERY_KEY], createSetupState(branding));
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
   });
 }
 
@@ -124,7 +126,7 @@ describe('useBrandingForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // The post-save refetch never settles, so a save never rehydrates the form from the server.
-    mockAxios.get.mockReturnValue(new Promise(() => undefined));
+    mockAxios.get.mockReturnValue(Promise.withResolvers<never>().promise);
     mockAxios.patch.mockResolvedValue({});
   });
 
@@ -343,7 +345,7 @@ describe('useBrandingForm', () => {
     it.each(['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'])(
       'should accept a %s logo for encoding',
       (type) => {
-        readLogoAsWebpDataUrl.mockReturnValue(new Promise(() => undefined));
+        readLogoAsWebpDataUrl.mockReturnValue(Promise.withResolvers<never>().promise);
         const { result } = renderBrandingForm();
         const file = new File(['x'], 'logo', { type });
         act(() => result.current.handleLogoFile(file));
@@ -517,7 +519,7 @@ describe('useBrandingForm', () => {
     });
 
     it('should disable Save while a save is in flight, so it cannot be sent twice', async () => {
-      mockAxios.patch.mockReturnValue(new Promise(() => undefined));
+      mockAxios.patch.mockReturnValue(Promise.withResolvers<never>().promise);
       const { result } = renderBrandingForm();
       submit(result);
       await waitFor(() => expect(result.current.isSubmitDisabled).toBe(true));
@@ -599,7 +601,11 @@ describe('useBrandingForm', () => {
     ])('should not save when %s, even if Enter bypassed the disabled button', async (_, branding) => {
       const { result } = renderBrandingForm(branding);
       submit(result);
-      await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+      await act(async () => {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 0);
+        });
+      });
       expect(mockAxios.patch).not.toHaveBeenCalled();
     });
 
@@ -743,7 +749,11 @@ describe('useBrandingForm', () => {
 
     it('should keep blocking navigation for an edit made while the save was in flight', async () => {
       let resolvePatch!: () => void;
-      mockAxios.patch.mockReturnValue(new Promise<void>((resolve) => (resolvePatch = resolve)));
+      mockAxios.patch.mockReturnValue(
+        new Promise<void>((resolve) => {
+          resolvePatch = resolve;
+        })
+      );
       const { result } = renderBrandingForm();
       act(() => result.current.update('enableBranding', true));
       submit(result);

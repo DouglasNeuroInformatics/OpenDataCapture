@@ -17,7 +17,11 @@ vi.mock('@/instruments', () => {
   return { defaultInstruments: [defaultSelectedInstrument], defaultSelectedInstrument };
 });
 
-const { closeFile, deleteFile } = createEditorSlice(useAppStore.setState, useAppStore.getState, useAppStore);
+const { closeFile, deleteFile } = createEditorSlice(
+  useAppStore.setState.bind(useAppStore),
+  useAppStore.getState,
+  useAppStore
+);
 
 describe('createEditorSlice', () => {
   beforeEach(() => {

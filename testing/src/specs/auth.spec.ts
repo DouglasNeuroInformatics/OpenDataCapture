@@ -14,7 +14,7 @@ test.describe('authentication', () => {
 
     const loginPage = await getPageModel('/auth/login');
     await loginPage.fillLoginForm(credentials);
-    await loginPage.expect.toHaveURL('/dashboard');
+    await expect(loginPage.$ref).toHaveURL('/dashboard');
   });
 
   test.describe('demo instance', () => {
@@ -50,7 +50,7 @@ test.describe('authentication', () => {
       const username = await demoUserRow.getByRole('cell').first().innerText();
       await demoUserRow.getByRole('button').click();
 
-      await loginPage.expect.toHaveURL('/dashboard');
+      await expect(loginPage.$ref).toHaveURL('/dashboard');
       await expect(page.getByTestId('user-dropup-trigger')).toHaveText(username);
     });
 
@@ -61,7 +61,7 @@ test.describe('authentication', () => {
       const username = await usernameCell.innerText();
       await usernameCell.click();
 
-      await loginPage.expect.toHaveURL('/dashboard');
+      await expect(loginPage.$ref).toHaveURL('/dashboard');
       await expect(page.getByTestId('user-dropup-trigger')).toHaveText(username);
     });
 
@@ -147,7 +147,7 @@ test.describe('authentication', () => {
 
     const loginPage = await getPageModel('/auth/login');
     await loginPage.fillLoginForm(credentials);
-    await loginPage.expect.toHaveURL('/dashboard');
+    await expect(loginPage.$ref).toHaveURL('/dashboard');
 
     await page.getByTestId('user-dropup-trigger').click();
     await page.getByTestId('user-dropup-logout').click();

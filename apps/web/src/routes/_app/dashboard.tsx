@@ -228,6 +228,7 @@ const RouteComponent = () => {
             <button
               className="group flex transform transition-all duration-300 hover:scale-105"
               data-testid="statistic-subjects"
+              type="button"
               onClick={() => {
                 void navigate({
                   to: '/datahub/subjects'

@@ -20,7 +20,7 @@ export default defineInstrument({
     async render(done) {
       const jsPsych = initJsPsych({
         on_finish: () => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- jsPsych's DataCollection is not typed as the array that validationSchema infers, so the example casts it
           done(jsPsych.data.get() as any);
         }
       });

@@ -62,7 +62,7 @@ describe('useSwitchableGroups', () => {
 
   it("should offer an admin their own groups until the platform's groups load, so the switcher does not blank out", () => {
     store.currentUser = asUser({ isAdmin: true });
-    mockAxios.get.mockReturnValue(new Promise(() => undefined));
+    mockAxios.get.mockReturnValue(Promise.withResolvers<never>().promise);
     const { result } = renderSwitchableGroups();
     expect(result.current).toEqual([ownGroup]);
   });
