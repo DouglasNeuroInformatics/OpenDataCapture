@@ -4,6 +4,7 @@ import { Button, Checkbox } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { BulkAssignmentFailure, BulkAssignmentIssue } from '@opendatacapture/schemas/assignment';
 
+import { unavailableSubjectIds } from '@/utils/bulk-assignments';
 import type { BulkParseError } from '@/utils/bulk-assignments';
 
 import { ErrorList } from './ErrorList';
@@ -19,7 +20,7 @@ type ReviewStepProps = {
   isSubmitting: boolean;
   onBack: () => void;
   onStepChange: (step: WizardStep) => void;
-  onSubmit: (options: { allowDuplicates: boolean }) => void;
+  onSubmit: (options: { allowDuplicates: boolean; skipUnavailable: boolean }) => void;
   subjectCount: number;
   timepoints: DraftTimepoint[];
   transportError: boolean;
@@ -79,11 +80,16 @@ export const ReviewStep = ({
 }: ReviewStepProps) => {
   const { t } = useTranslation();
   const [allowDuplicates, setAllowDuplicates] = useState(false);
+  const [skipUnavailable, setSkipUnavailable] = useState(false);
   const toMessages = useIssueMessages(describeSubject);
 
   const hasConflict = failure?.issues.some(({ kind }) => kind === 'CONFLICT') ?? false;
+  const hasUnavailableSubjects = failure?.issues.some(({ kind }) => kind === 'SUBJECT_UNAVAILABLE') ?? false;
+  const unavailableCount = unavailableSubjectIds(failure).length;
   const hasBlockingIssue =
-    failure?.issues.some(({ kind }) => kind === 'SUBJECT_UNAVAILABLE' || kind === 'INSTRUMENT_UNAVAILABLE') ?? false;
+    (failure?.issues.some(({ kind }) => kind === 'INSTRUMENT_UNAVAILABLE') ?? false) ||
+    (hasUnavailableSubjects && !skipUnavailable);
+  const effectiveSubjectCount = skipUnavailable ? subjectCount - unavailableCount : subjectCount;
   const messages = failure ? toMessages(failure.issues) : [];
   if (transportError) {
     messages.push({
@@ -98,9 +104,9 @@ export const ReviewStep = ({
   return (
     <StepLayout
       description={t({
-        en: 'All assignments are created together. If any of them cannot be created, none are.',
-        es: 'Todas las tareas se crean juntas. Si alguna de ellas no se puede crear, no se crea ninguna.',
-        fr: 'Toutes les tâches sont créées ensemble. Si l’une d’elles échoue, aucune n’est créée.'
+        en: `${effectiveSubjectCount} subjects × ${timepoints.length} instruments = ${effectiveSubjectCount * timepoints.length} assignments`,
+        es: `${effectiveSubjectCount} sujetos × ${timepoints.length} instrumentos = ${effectiveSubjectCount * timepoints.length} tareas`,
+        fr: `${effectiveSubjectCount} sujets × ${timepoints.length} instruments = ${effectiveSubjectCount * timepoints.length} tâches`
       })}
       footer={
         <React.Fragment>
@@ -111,7 +117,7 @@ export const ReviewStep = ({
             data-testid="bulk-submit"
             disabled={isSubmitting || hasBlockingIssue || (hasConflict && !allowDuplicates)}
             type="button"
-            onClick={() => onSubmit({ allowDuplicates })}
+            onClick={() => onSubmit({ allowDuplicates, skipUnavailable })}
           >
             {t({ en: 'Create Assignments', es: 'Crear las tareas', fr: 'Créer les tâches' })}
           </Button>
@@ -122,13 +128,6 @@ export const ReviewStep = ({
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-review-step">
-        <p className="text-sm font-medium" data-testid="bulk-review-summary">
-          {t({
-            en: `${subjectCount} subjects × ${timepoints.length} instruments = ${subjectCount * timepoints.length} assignments`,
-            es: `${subjectCount} sujetos × ${timepoints.length} instrumentos = ${subjectCount * timepoints.length} tareas`,
-            fr: `${subjectCount} sujets × ${timepoints.length} instruments = ${subjectCount * timepoints.length} tâches`
-          })}
-        </p>
         <TimepointTable timepoints={timepoints} />
 
         <ErrorList errors={messages} />
@@ -144,6 +143,20 @@ export const ReviewStep = ({
               en: 'Assign anyway, creating a second assignment for those subjects',
               es: 'Asignar de todos modos, creando una segunda tarea para esos sujetos',
               fr: 'Attribuer quand même, en créant une seconde tâche pour ces sujets'
+            })}
+          </label>
+        )}
+        {hasUnavailableSubjects && (
+          <label className="flex items-center gap-2 text-sm font-semibold">
+            <Checkbox
+              checked={skipUnavailable}
+              data-testid="bulk-skip-unavailable"
+              onCheckedChange={(checked) => setSkipUnavailable(checked === true)}
+            />
+            {t({
+              en: 'Create assignments anyway, skipping the unavailable subject(s)',
+              es: 'Crear las tareas de todos modos, omitiendo los sujetos no disponibles',
+              fr: 'Créer les tâches quand même, en ignorant les sujets non disponibles'
             })}
           </label>
         )}

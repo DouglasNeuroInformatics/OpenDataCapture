@@ -8,19 +8,28 @@ import {
   BulkParseFailure,
   isWorkbookFile,
   parseDelimitedText,
+  parseEmailListText,
+  parseEmailListWorkbook,
   parseWorkbook,
+  resolveEmailList,
   resolveSubjectIds,
   resultCsvFilename,
   toResultCsv,
   toResultTsv
 } from '../bulk-assignments';
 
+import type { CanonicalField } from '../bulk-assignments';
+
 vi.mock('xlsx', async (importOriginal) => {
   const actual = await importOriginal<typeof import('xlsx')>();
   return { ...actual, read: vi.fn(actual.read) };
 });
 
-const resolve = (input: string, maxSubjects = 500) => resolveSubjectIds(parseDelimitedText(input), { maxSubjects });
+/** The ids a resolve kept, which is what most of these tests are about. */
+const resolvedIds = async (...args: Parameters<typeof resolveSubjectIds>) =>
+  (await resolveSubjectIds(...args)).matched.map(({ id }) => id);
+
+const resolve = (input: string, maxSubjects = 500) => resolvedIds(parseDelimitedText(input), { maxSubjects });
 
 /** The errors carried by a rejected parse, so a test can assert on row numbers and wording. */
 const failureOf = async (run: () => unknown) => {
@@ -63,9 +72,9 @@ describe('parseDelimitedText', () => {
     expect(parseDelimitedText('identifiant\nsubject-1').mode).toBe('ID');
   });
 
-  it('should ignore columns that map to nothing, including email', () => {
+  it('should ignore columns that map to nothing but auto-detect email as a canonical field', () => {
     const result = parseDelimitedText('subjectId,email,notes\nsubject-1,a@b.co,hello');
-    expect(result.mapping).toEqual({ subjectId: 'subjectId' });
+    expect(result.mapping).toEqual({ email: 'email', subjectId: 'subjectId' });
   });
 
   it('should skip rows that are entirely empty rather than treating them as subjects', () => {
@@ -396,26 +405,77 @@ describe('resolveSubjectIds identifier forms', () => {
   const idCsv = (value: string) => parseDelimitedText(`subjectId\n${value}`);
 
   it('should scope a custom identifier written the way the app displays it', async () => {
-    await expect(
-      resolveSubjectIds(idCsv('ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })
-    ).resolves.toEqual(['Depression_Clinic$ex_111']);
+    await expect(resolvedIds(idCsv('ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })).resolves.toEqual([
+      'Depression_Clinic$ex_111'
+    ]);
   });
 
   it('should leave an already scoped identifier alone', async () => {
     await expect(
-      resolveSubjectIds(idCsv('Depression_Clinic$ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })
+      resolvedIds(idCsv('Depression_Clinic$ex_111'), { groupName: 'Depression Clinic', maxSubjects: 10 })
     ).resolves.toEqual(['Depression_Clinic$ex_111']);
   });
 
   it('should leave a generated digest alone, since those are never scoped', async () => {
     const digest = 'a'.repeat(64);
-    await expect(
-      resolveSubjectIds(idCsv(digest), { groupName: 'Depression Clinic', maxSubjects: 10 })
-    ).resolves.toEqual([digest]);
+    await expect(resolvedIds(idCsv(digest), { groupName: 'Depression Clinic', maxSubjects: 10 })).resolves.toEqual([
+      digest
+    ]);
   });
 
   it('should pass values through unchanged when no group is known', async () => {
-    await expect(resolveSubjectIds(idCsv('ex_111'), { maxSubjects: 10 })).resolves.toEqual(['ex_111']);
+    await expect(resolvedIds(idCsv('ex_111'), { maxSubjects: 10 })).resolves.toEqual(['ex_111']);
+  });
+
+  it('should match a truncated identifier against known subjects by prefix', async () => {
+    const fullId = 'a'.repeat(64);
+    await expect(
+      resolvedIds(idCsv('aaaaaaaaa'), {
+        groupName: 'Depression Clinic',
+        knownSubjectIds: [fullId],
+        maxSubjects: 10
+      })
+    ).resolves.toEqual([fullId]);
+  });
+
+  it('should report an ambiguous truncated identifier as ambiguous, rather than guess one of the subjects', async () => {
+    const id1 = 'a'.repeat(64);
+    const id2 = 'a'.repeat(63) + 'b';
+    const resolution = await resolveSubjectIds(idCsv('aaaaaaaaa'), {
+      groupName: 'Depression Clinic',
+      knownSubjectIds: [id1, id2],
+      maxSubjects: 10
+    });
+    expect(resolution).toEqual({ ambiguousRows: [2], matched: [], unknownRows: [] });
+  });
+
+  it('should report a row naming a subject the group does not have, so a stranger is caught before the API', async () => {
+    const resolution = await resolveSubjectIds(idCsv('ex_111'), {
+      groupName: 'Depression Clinic',
+      knownSubjectIds: ['Depression_Clinic$ex_222'],
+      maxSubjects: 10
+    });
+    expect(resolution).toEqual({ ambiguousRows: [], matched: [], unknownRows: [2] });
+  });
+
+  it('should keep the rows the group can place beside the ones it cannot, so the caller can skip them', async () => {
+    const parsed = parseDelimitedText('subjectId\nex_111\nex_222');
+    const resolution = await resolveSubjectIds(parsed, {
+      groupName: 'Depression Clinic',
+      knownSubjectIds: ['Depression_Clinic$ex_222'],
+      maxSubjects: 10
+    });
+    expect(resolution).toEqual({
+      ambiguousRows: [],
+      matched: [{ id: 'Depression_Clinic$ex_222', rowNumber: 3 }],
+      unknownRows: [2]
+    });
+  });
+
+  it('should report personal information the group cannot place by row, never by name', async () => {
+    const parsed = parseDelimitedText('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M');
+    const resolution = await resolveSubjectIds(parsed, { knownSubjectIds: [], maxSubjects: 10 });
+    expect(resolution).toEqual({ ambiguousRows: [], matched: [], unknownRows: [2] });
   });
 });
 
@@ -505,5 +565,201 @@ describe('parseWorkbook', () => {
     const errors = await failureOf(() => parseWorkbook(new File([new Uint8Array(5_000_001)], 'subjects.xlsx')));
     expect(errors[0]?.message).toContain('5 MB limit');
     expect(read).not.toHaveBeenCalled();
+  });
+});
+
+describe('resolveEmailList', () => {
+  const knownSubjectIds = ['GroupA$alice123', 'GroupA$bob456'];
+  /** The mapping the user confirmed on the upload panel, typed as that panel hands it over. */
+  const mapping: Partial<{ [key: string]: CanonicalField }> = { email: 'email', subject_id: 'subjectId' };
+
+  it('should match subject IDs to known subjects and extract emails', () => {
+    const rows = [
+      { email: 'alice@example.com', subject_id: 'alice123' },
+      { email: 'bob@example.com', subject_id: 'bob456' }
+    ];
+    const result = resolveEmailList(rows, mapping, { groupName: 'GroupA', knownSubjectIds });
+    expect(result.emails).toEqual({ GroupA$alice123: 'alice@example.com', GroupA$bob456: 'bob@example.com' });
+    expect(result.missingEmail).toEqual([]);
+    expect(result.unmatched).toEqual([]);
+  });
+
+  it('should count rather than keep a row whose subject ID does not match any known subject', () => {
+    const rows = [
+      { email: 'alice@example.com', subject_id: 'alice123' },
+      { email: 'unknown@example.com', subject_id: 'nobody' }
+    ];
+    const result = resolveEmailList(rows, mapping, { groupName: 'GroupA', knownSubjectIds });
+    expect(result.emails).toEqual({ GroupA$alice123: 'alice@example.com' });
+    expect(result.unmatched).toEqual(['nobody']);
+  });
+
+  it('should return an empty object when the mapping lacks a subject ID or email column', () => {
+    const rows = [{ email: 'alice@example.com', subject_id: 'alice123' }];
+    expect(resolveEmailList(rows, { subject_id: 'subjectId' }, { groupName: 'GroupA', knownSubjectIds })).toEqual({
+      emails: {},
+      missingEmail: [],
+      unmatched: []
+    });
+    expect(resolveEmailList(rows, { email: 'email' }, { groupName: 'GroupA', knownSubjectIds })).toEqual({
+      emails: {},
+      missingEmail: [],
+      unmatched: []
+    });
+  });
+
+  // A row naming an existing subject with no address is a gap the user can act on; a row naming
+  // nobody is attributable to no subject at all, so there is nothing to report about it.
+  it('should count an existing subject left without an address, and pass over a row naming nobody', () => {
+    const rows = [
+      { email: '', subject_id: 'alice123' },
+      { email: 'bob@example.com', subject_id: '' }
+    ];
+    const result = resolveEmailList(rows, mapping, { groupName: 'GroupA', knownSubjectIds });
+    expect(result.emails).toEqual({});
+    expect(result.missingEmail).toEqual(['GroupA$alice123']);
+    expect(result.unmatched).toEqual([]);
+  });
+
+  // Each count has to name its own reason: "does not exist" and "exists but has no address" are
+  // different things for the user to fix.
+  it('should count a missing subject apart from one found without an address', () => {
+    const rows = [
+      { email: 'alice@example.com', subject_id: 'alice123' },
+      { email: '', subject_id: 'bob456' },
+      { email: 'ghost@example.com', subject_id: 'nobody' }
+    ];
+    const result = resolveEmailList(rows, mapping, { groupName: 'GroupA', knownSubjectIds });
+    expect(result.emails).toEqual({ GroupA$alice123: 'alice@example.com' });
+    expect(result.missingEmail).toEqual(['GroupA$bob456']);
+    expect(result.unmatched).toEqual(['nobody']);
+  });
+
+  // The counts name subjects, so the same subject on two rows is one entry, and a subject given an
+  // address on either row is not reported as missing one.
+  it('should report each subject once, however many rows name it', () => {
+    const rows = [
+      { email: '', subject_id: 'bob456' },
+      { email: 'bob@example.com', subject_id: 'bob456' },
+      { email: 'ghost@example.com', subject_id: 'nobody' },
+      { email: '', subject_id: 'nobody' }
+    ];
+    const result = resolveEmailList(rows, mapping, { groupName: 'GroupA', knownSubjectIds });
+    expect(result.emails).toEqual({ GroupA$bob456: 'bob@example.com' });
+    expect(result.missingEmail).toEqual([]);
+    expect(result.unmatched).toEqual(['nobody']);
+  });
+
+  it('should match truncated subject IDs via prefix matching', () => {
+    const rows = [{ email: 'alice@example.com', subject_id: 'alice' }];
+    const result = resolveEmailList(rows, mapping, { groupName: 'GroupA', knownSubjectIds });
+    expect(result.emails).toEqual({ GroupA$alice123: 'alice@example.com' });
+  });
+});
+
+describe('parseEmailListText', () => {
+  it('should parse delimited text and return headers, rows and a best-guess mapping', () => {
+    const result = parseEmailListText('subject_id,email\nalice,alice@x.com\nbob,bob@x.com');
+    expect(result.headers).toEqual(['subject_id', 'email']);
+    expect(result.rows).toHaveLength(2);
+    expect(result.mapping).toMatchObject({ email: 'email', subject_id: 'subjectId' });
+  });
+
+  it('should reject input with no columns', () => {
+    expect(() => parseEmailListText('')).toThrow(BulkParseFailure);
+  });
+
+  it('should reject input with headers but no data rows', () => {
+    expect(() => parseEmailListText('subject_id,email\n')).toThrow(BulkParseFailure);
+  });
+});
+
+describe('parseEmailListWorkbook', () => {
+  const emailWorkbook = (rows: unknown[][]) => {
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, utils.aoa_to_sheet(rows), 'Emails');
+    const bytes: ArrayBuffer = write(workbook, { bookType: 'xlsx', type: 'array' });
+    return new File([bytes], 'emails.xlsx');
+  };
+
+  it('should parse the first sheet and auto-detect subject ID and email columns', async () => {
+    const result = await parseEmailListWorkbook(
+      emailWorkbook([
+        ['subject_id', 'email'],
+        ['alice', 'alice@x.com'],
+        ['bob', 'bob@x.com']
+      ])
+    );
+    expect(result.headers).toEqual(['subject_id', 'email']);
+    expect(result.mapping).toMatchObject({ email: 'email', subject_id: 'subjectId' });
+    expect(result.rows).toEqual([
+      { email: 'alice@x.com', subject_id: 'alice' },
+      { email: 'bob@x.com', subject_id: 'bob' }
+    ]);
+  });
+
+  it('should reject an empty workbook', async () => {
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, utils.aoa_to_sheet([]), 'Empty');
+    const bytes: ArrayBuffer = write(workbook, { bookType: 'xlsx', type: 'array' });
+    const file = new File([bytes], 'empty.xlsx');
+    const errors = await failureOf(() => parseEmailListWorkbook(file));
+    expect(errors[0]?.message).toContain('No columns');
+  });
+
+  it('should reject a corrupt file', async () => {
+    vi.mocked(read).mockImplementationOnce(() => {
+      throw new Error('corrupt');
+    });
+    const file = new File([new Uint8Array(10)], 'corrupt.xlsx');
+    const errors = await failureOf(() => parseEmailListWorkbook(file));
+    expect(errors[0]?.message).toContain('could not be read');
+  });
+
+  it('should reject a workbook with no sheets', async () => {
+    vi.mocked(read).mockReturnValueOnce({ SheetNames: [], Sheets: {} });
+    const file = new File([new Uint8Array(10)], 'no-sheets.xlsx');
+    const errors = await failureOf(() => parseEmailListWorkbook(file));
+    expect(errors[0]?.message).toContain('no sheets');
+  });
+});
+
+describe('workbook cell values', () => {
+  const workbookOf = (rows: unknown[][]) => {
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, utils.aoa_to_sheet(rows), 'Sheet1');
+    const bytes: ArrayBuffer = write(workbook, { bookType: 'xlsx', type: 'array' });
+    return new File([bytes], 'cells.xlsx');
+  };
+
+  it('should read a number, a boolean and a padded string as trimmed text', async () => {
+    const result = await parseEmailListWorkbook(
+      workbookOf([
+        ['subject_id', 'count', 'flag'],
+        ['  alice  ', 42, true]
+      ])
+    );
+    expect(result.rows[0]).toEqual({ count: '42', flag: 'true', subject_id: 'alice' });
+  });
+
+  it('should read a date cell as a basic ISO date, so an ISO check can be applied to it', async () => {
+    // A date is why `cellDates` is set: a locale-formatted "3/14/1982" would fail that check.
+    const result = await parseEmailListWorkbook(
+      workbookOf([
+        ['subject_id', 'dob'],
+        ['alice', new Date('1982-03-14T00:00:00.000Z')]
+      ])
+    );
+    expect(result.rows[0]?.dob).toBe('1982-03-14');
+  });
+
+  it('should read a cell of an unsupported type as empty, rather than as the word for it', async () => {
+    vi.mocked(read).mockReturnValueOnce({
+      SheetNames: ['Sheet1'],
+      Sheets: { Sheet1: utils.aoa_to_sheet([['subject_id', 'odd']]) }
+    });
+    vi.spyOn(utils, 'sheet_to_json').mockReturnValueOnce([{ odd: { nested: true }, subject_id: 'alice' }]);
+    const result = await parseEmailListWorkbook(new File([new Uint8Array(10)], 'odd.xlsx'));
+    expect(result.rows[0]).toEqual({ odd: '', subject_id: 'alice' });
   });
 });
