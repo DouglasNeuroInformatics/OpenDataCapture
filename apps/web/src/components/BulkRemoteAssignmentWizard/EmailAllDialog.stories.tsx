@@ -18,6 +18,7 @@ const recipients = [
 /** The send controller the dialog reads, stubbed rather than run: a story sends no mail. */
 const bulkEmail = (overrides: Partial<BulkAssignmentEmail> = {}): BulkAssignmentEmail => ({
   completedCount: 0,
+  hasAttempted: false,
   hasSent: false,
   isLoading: false,
   isSending: false,
@@ -81,6 +82,7 @@ export const Sending: Story = {
 export const RetryAfterFailure: Story = {
   args: {
     bulkEmail: bulkEmail({
+      hasAttempted: true,
       pending: [recipients[1]!],
       statuses: { 'assignment-1': 'sent', 'assignment-2': 'sent', 'assignment-3': 'error', 'assignment-4': 'sent' }
     })
@@ -91,6 +93,7 @@ export const RetryAfterFailure: Story = {
 export const AllSent: Story = {
   args: {
     bulkEmail: bulkEmail({
+      hasAttempted: true,
       hasSent: true,
       pending: [],
       statuses: { 'assignment-1': 'sent', 'assignment-2': 'sent', 'assignment-3': 'sent', 'assignment-4': 'sent' }

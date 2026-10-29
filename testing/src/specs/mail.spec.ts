@@ -279,7 +279,8 @@ test.describe('mail delivery', () => {
 
       await wizardPage.useSelectedSubjects.click();
       await expect(wizardPage.timepointsStep).toBeVisible();
-      await page.getByRole('button', { name: 'Continue' }).click();
+      await wizardPage.addFirstInstrument();
+      await expect(wizardPage.submitBatch).toBeEnabled({ timeout: 30_000 });
       await wizardPage.submitBatch.click();
 
       // The results table shows the address each link will go to, which is how the upload is proven

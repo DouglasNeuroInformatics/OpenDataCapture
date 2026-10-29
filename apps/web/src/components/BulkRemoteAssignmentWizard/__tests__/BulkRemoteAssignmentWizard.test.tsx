@@ -607,6 +607,19 @@ describe('BulkRemoteAssignmentWizard', () => {
       await waitFor(() => expect(screen.getByTestId<HTMLButtonElement>('bulk-email-all').disabled).toBe(true));
     });
 
+    // A batch of one whose only message failed is still a retry: nobody has their links.
+    it('should offer a retry when every message in the batch failed, not a fresh send', async () => {
+      setupMocks({ isMailEnabled: true });
+      mockMutateAsync.mockResolvedValue({ status: 'FAILED' });
+      mockWizard('DONE', {
+        assignments: [emailAssignments[0]!],
+        emails: { Depression_Clinic$0012345678: 'alice@example.com' }
+      });
+      renderWizard();
+      sendAll();
+      await waitFor(() => expect(screen.getByTestId('bulk-email-all').textContent).toBe('Retry Failed (1)'));
+    });
+
     it('should wait out a rate limit and send that recipient anyway, since the server sent nothing', async () => {
       setupMocks({ isMailEnabled: true });
       const throttled = Object.assign(new Error('Too Many Requests'), {

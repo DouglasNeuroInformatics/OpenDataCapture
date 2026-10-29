@@ -5,11 +5,13 @@ import { AppPage } from '../route.page';
 type WizardStepName = 'INSTRUMENTS' | 'REVIEW' | 'SUBJECTS';
 
 export class RemoteAssignmentsPage extends AppPage {
+  readonly addTimepoint: Locator;
   readonly breadcrumbs: Locator;
   /** The scrolling frame around the column mapping grid, capped so a wide file cannot lengthen the step. */
   readonly columnMapping: Locator;
   /** The confirm button of the mapping step, which the refusals have to sit above. */
   readonly confirmMapping: Locator;
+  readonly confirmTimepoints: Locator;
   /** The page column the wizard must fit inside; `Layout` renders exactly one `main`. */
   readonly container: Locator;
   readonly emailAll: Locator;
@@ -20,6 +22,7 @@ export class RemoteAssignmentsPage extends AppPage {
   readonly emailTable: Locator;
   readonly errorList: Locator;
   readonly fileInput: Locator;
+  readonly instrumentSelect: Locator;
   readonly mapStep: Locator;
   readonly parsePasted: Locator;
   readonly pasteInput: Locator;
@@ -47,6 +50,9 @@ export class RemoteAssignmentsPage extends AppPage {
     this.parsePasted = page.getByTestId('bulk-parse-pasted');
     this.pasteInput = page.getByTestId('bulk-paste-input');
     this.skipUnplaceable = page.getByTestId('bulk-skip-unplaceable');
+    this.addTimepoint = page.getByTestId('bulk-add-timepoint');
+    this.confirmTimepoints = page.getByTestId('bulk-confirm-timepoints');
+    this.instrumentSelect = page.getByTestId('bulk-instrument-select');
     this.submitBatch = page.getByTestId('bulk-submit');
     this.columnMapping = page.getByTestId('bulk-column-mapping');
     this.container = page.locator('main');
@@ -58,6 +64,14 @@ export class RemoteAssignmentsPage extends AppPage {
     this.timepointsStep = page.getByTestId('bulk-timepoints-step');
     this.useSelectedSubjects = page.getByTestId('bulk-use-selected-subjects');
     this.wizard = page.getByTestId('bulk-remote-assignment-wizard');
+  }
+
+  /** Add the first offered instrument as a timepoint and continue to review. */
+  async addFirstInstrument() {
+    await this.instrumentSelect.click();
+    await this.$ref.getByRole('option').first().click();
+    await this.addTimepoint.click();
+    await this.confirmTimepoints.click();
   }
 
   breadcrumb(step: WizardStepName): Locator {

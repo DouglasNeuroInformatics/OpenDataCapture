@@ -106,6 +106,14 @@ const useBulkAssignmentEmail = ({ assignments, emails, groupId }: UseBulkAssignm
   // Read off the batch on screen rather than off any send that ever happened, so the next batch -
   // whose assignments are new rows with new ids - starts sendable again.
   const hasSent = recipients.length > 0 && pending.length === 0;
+  /**
+   * Whether this batch has been sent at all, which is what makes what is left a retry rather than a
+   * first attempt - true even when every message failed, and false for a batch created after one
+   * was already emailed, since those are new assignments with ids no status mentions.
+   */
+  const hasAttempted = recipients.some(({ assignmentIds }) =>
+    assignmentIds.some((assignmentId) => statuses[assignmentId])
+  );
 
   /**
    * Send one recipient's message, waiting out a rate limit rather than reporting it as a failure.
@@ -193,6 +201,7 @@ const useBulkAssignmentEmail = ({ assignments, emails, groupId }: UseBulkAssignm
 
   return {
     completedCount,
+    hasAttempted,
     hasSent,
     isLoading: groupQuery.isLoading,
     isSending,

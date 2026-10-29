@@ -17,9 +17,9 @@ type EmailAllDialogProps = {
 export const EmailAllDialog = ({ bulkEmail }: EmailAllDialogProps) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  // What a send would write to now: everyone on a fresh batch, only the failures after a partial one.
+  // What a send would write to now: everyone on a fresh batch, only the failures after a send.
   const pendingCount = bulkEmail.pending.length;
-  const isRetry = pendingCount > 0 && pendingCount < bulkEmail.recipients.length;
+  const isRetry = pendingCount > 0 && bulkEmail.hasAttempted;
 
   const send = async () => {
     setIsOpen(false);
