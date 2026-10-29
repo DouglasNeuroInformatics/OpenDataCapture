@@ -110,8 +110,26 @@ vi.mock('@/hooks/useUsersQuery', () => ({
 // happy-dom computes no layout, so a real chart measures 0x0 and draws nothing; these stand-ins
 // expose the props the page hands to recharts instead.
 vi.mock('recharts', () => ({
-  Area: ({ dataKey, stroke }: { dataKey: string; stroke: string }) => (
-    <g data-stroke={stroke} data-testid={`area-${dataKey}`} />
+  Area: ({
+    dataKey,
+    legendType,
+    name,
+    stroke,
+    strokeDasharray
+  }: {
+    dataKey: string;
+    legendType?: string;
+    name?: string;
+    stroke: string;
+    strokeDasharray?: string;
+  }) => (
+    <g
+      data-legend-type={legendType}
+      data-name={name}
+      data-stroke={stroke}
+      data-stroke-dasharray={strokeDasharray}
+      data-testid={`area-${dataKey}`}
+    />
   ),
   AreaChart: ({ children, data }: { children: ReactNode; data: unknown[] }) => (
     <svg data-points={JSON.stringify(data)} data-testid="area-chart">
@@ -119,6 +137,7 @@ vi.mock('recharts', () => ({
     </svg>
   ),
   CartesianGrid: ({ stroke }: { stroke: string }) => <g data-stroke={stroke} data-testid="grid" />,
+  Legend: () => <g data-testid="chart-legend" />,
   ResponsiveContainer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   Tooltip: ({ content }: { content: (props: TooltipProps) => ReactNode }) => (
     <foreignObject data-testid="chart-tooltip">{content(mocks.tooltipProps)}</foreignObject>
@@ -270,6 +289,24 @@ describe('dashboard page', () => {
     renderPage();
     const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
     expect(within(dialog).getByText('Error finding records')).toBeTruthy();
+  });
+
+  it.each([
+    ['en', 'Records', 'Sessions'],
+    ['es', 'Registros', 'Sesiones'],
+    ['fr', 'Enregistrements', 'Sessions']
+  ] as const)('should label both trend series in %s without relying only on colour', (language, records, sessions) => {
+    i18n.changeLanguage(language);
+    renderPage();
+
+    expect(recordsChart().getByTestId('chart-legend')).toBeTruthy();
+    expect(subjectsChart().queryByTestId('chart-legend')).toBeNull();
+    expect(recordsChart().getByTestId('area-records').dataset.name).toBe(records);
+    expect(recordsChart().getByTestId('area-sessions').dataset.name).toBe(sessions);
+    expect(recordsChart().getByTestId('area-records').dataset.legendType).toBe('plainline');
+    expect(recordsChart().getByTestId('area-sessions').dataset.legendType).toBe('plainline');
+    expect(recordsChart().getByTestId('area-sessions').dataset.strokeDasharray).toBe('6 4');
+    expect(recordsChart().getByTestId('area-records').dataset.strokeDasharray).toBeUndefined();
   });
 
   it('should chart records and sessions oldest first, counting a day without sessions as zero', () => {
