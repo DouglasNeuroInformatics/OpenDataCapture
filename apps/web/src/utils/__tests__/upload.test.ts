@@ -549,6 +549,13 @@ describe('Zod3', () => {
           { items: [{ name: '10:30', quantity: 1 }] }
         ]);
       });
+
+      it('should reject a record array field with no colon as a malformed record', async () => {
+        await expectRejection(
+          processItems('RECORD_ARRAY(name:item1,quantity)'),
+          "Malformed record at index 1 at column name: 'items' and row number '1'"
+        );
+      });
     });
   });
 });
