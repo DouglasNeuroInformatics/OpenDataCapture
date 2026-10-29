@@ -39,6 +39,7 @@ async function renderWithBrandingEditor(
     branding,
     isDemo: false,
     isGatewayEnabled: false,
+    isMailEnabled: false,
     isSetup: true,
     release: { buildTime: 0, type: 'production', version: '1.0.0' },
     uptime: 0

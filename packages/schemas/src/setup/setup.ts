@@ -203,8 +203,12 @@ const $SetupState = z.object({
    * Whether outgoing email is globally enabled and configured. A derived, non-secret
    * flag (the SMTP configuration itself is admin-only, via the dedicated mail
    * endpoints) that lets the client hide all email-related UI when mail is off.
+   *
+   * Derived on every request rather than stored, so unlike the flags around it this one is never
+   * absent and defaults rather than reading as nullable: a client then decides whether to offer
+   * email on a boolean, with no `?? false` at each of its call sites.
    */
-  isMailEnabled: z.boolean().nullish(),
+  isMailEnabled: z.boolean().default(false),
   isSetup: z.boolean().nullable(),
   release: $ReleaseInfo,
   uptime: z.number()
