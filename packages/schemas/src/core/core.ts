@@ -160,10 +160,18 @@ export const $AuthoredLocalizedString = $LocalizedString.refine(
   'At least one language must have content'
 );
 
+/**
+ * A point in time as it crosses a tier boundary: a `Date`, or the ISO 8601 date-time string that
+ * `JSON.stringify` makes of one (`2025-01-31T14:30:00.000Z`, or with a UTC offset). The string is
+ * converted to a `Date`; every other input — `''`, `null`, a number, a date without a time — is
+ * rejected rather than read as some other moment.
+ */
+export const $DateLike = z.union([z.date(), z.iso.datetime({ offset: true }).transform((value) => new Date(value))]);
+
 export const $BaseModel = z.object({
-  createdAt: z.coerce.date(),
+  createdAt: $DateLike,
   id: z.string(),
-  updatedAt: z.coerce.date()
+  updatedAt: $DateLike
 });
 
 export const $Json: z.ZodType<Json> = z.lazy(() => {

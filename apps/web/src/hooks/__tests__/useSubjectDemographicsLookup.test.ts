@@ -18,7 +18,7 @@ describe('subjectDemographicsQueryOptions', () => {
 
   it('should return only the date of birth and sex, so no other subject data reaches the form', async () => {
     get.mockResolvedValueOnce({
-      data: { dateOfBirth: '1990-01-01', firstName: 'Jane', id: 'root$a', sex: 'FEMALE' },
+      data: { dateOfBirth: '1990-01-01T00:00:00.000Z', firstName: 'Jane', id: 'root$a', sex: 'FEMALE' },
       status: 200
     });
     await expect(runQuery('root$a')).resolves.toStrictEqual({ dateOfBirth: new Date('1990-01-01'), sex: 'FEMALE' });

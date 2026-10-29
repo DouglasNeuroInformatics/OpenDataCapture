@@ -6,14 +6,14 @@ describe('$InstrumentRepo', () => {
   it('should accept a repo with lastSyncedAt omitted, since it is nullish', () => {
     expect(
       $InstrumentRepo.safeParse({
-        createdAt: '2024-01-01',
+        createdAt: '2024-01-01T00:00:00.000Z',
         groupIds: [],
         id: 'repo-1',
         instrumentIds: [],
         name: 'My Repo',
         owner: 'douglasneuroinformatics',
         repoName: 'my-repo',
-        updatedAt: '2024-01-01',
+        updatedAt: '2024-01-01T00:00:00.000Z',
         url: 'https://github.com/douglasneuroinformatics/my-repo'
       }).success
     ).toBe(true);
@@ -21,14 +21,14 @@ describe('$InstrumentRepo', () => {
   it('should reject a repo with an empty name', () => {
     expect(
       $InstrumentRepo.safeParse({
-        createdAt: '2024-01-01',
+        createdAt: '2024-01-01T00:00:00.000Z',
         groupIds: [],
         id: 'repo-1',
         instrumentIds: [],
         name: '',
         owner: 'douglasneuroinformatics',
         repoName: 'my-repo',
-        updatedAt: '2024-01-01',
+        updatedAt: '2024-01-01T00:00:00.000Z',
         url: 'https://github.com/douglasneuroinformatics/my-repo'
       }).success
     ).toBe(false);

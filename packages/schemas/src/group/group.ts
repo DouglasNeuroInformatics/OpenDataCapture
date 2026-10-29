@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
 
-import { $AuthoredLocalizedString, $BaseModel, $LocalizedString, $RegexString } from '../core/core.js';
+import { $AuthoredLocalizedString, $BaseModel, $DateLike, $LocalizedString, $RegexString } from '../core/core.js';
 import { $SubjectIdentificationMethod } from '../subject/subject.js';
 
 const $GroupSettings = z.object({
@@ -67,7 +67,7 @@ export const $UpdateGroupData = $Group
      * The `updatedAt` of the group revision this update was composed against. The server rejects
      * the write when the group has moved on since.
      */
-    expectedUpdatedAt: z.coerce.date().optional()
+    expectedUpdatedAt: $DateLike.optional()
   })
   .check((ctx) => {
     // `emailTemplates` is replaced wholesale from the client's cached copy, so without a revision

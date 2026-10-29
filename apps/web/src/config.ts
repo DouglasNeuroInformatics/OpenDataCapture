@@ -1,4 +1,4 @@
-import { $BooleanLike, deepFreeze } from '@douglasneuroinformatics/libjs';
+import { $BooleanLike, $NumberLike, deepFreeze } from '@douglasneuroinformatics/libjs';
 import { z } from 'zod/v4';
 
 const $Config = z.object({
@@ -6,7 +6,7 @@ const $Config = z.object({
     disableTutorial: $BooleanLike.optional(),
     isBypassAuthEnabled: $BooleanLike.optional(),
     isForceClearQueryCacheEnabled: $BooleanLike.optional(),
-    networkLatency: z.coerce.number().int().nonnegative().optional(),
+    networkLatency: $NumberLike.pipe(z.number().int().nonnegative()).optional(),
     password: z.string().min(1).optional(),
     username: z.string().min(1).optional()
   }),

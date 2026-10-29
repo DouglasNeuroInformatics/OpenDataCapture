@@ -1,7 +1,7 @@
 import type { InstrumentKind, InstrumentMeasureValue } from '@opendatacapture/runtime-core';
 import { z } from 'zod/v4';
 
-import { $BaseModel, $Json } from '../core/core.js';
+import { $BaseModel, $DateLike, $Json } from '../core/core.js';
 import { $InstrumentMeasureValue } from '../instrument/instrument.js';
 import { $SessionType } from '../session/session.js';
 import { $FileMetadata } from '../storage/storage.js';
@@ -12,7 +12,7 @@ export type $CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecord
 export const $CreateInstrumentRecordData = z.object({
   assignmentId: z.string().optional(),
   data: $Json,
-  date: z.coerce.date(),
+  date: $DateLike,
   groupId: z.string().optional(),
   instrumentId: z.string(),
   seriesInstrumentId: z.string().optional(),
@@ -32,7 +32,7 @@ export const $UploadInstrumentRecordsData = z.object({
   records: z.array(
     z.object({
       data: $Json,
-      date: z.coerce.date(),
+      date: $DateLike,
       subjectId: z.string()
     })
   ),
@@ -47,7 +47,7 @@ export const $InstrumentRecord = $BaseModel.extend({
   assignmentId: z.string().nullish(),
   computedMeasures: z.record(z.string(), $InstrumentMeasureValue).nullish(),
   data: z.unknown(),
-  date: z.coerce.date(),
+  date: $DateLike,
   groupId: z.string().nullish(),
   instrumentId: z.string(),
   pending: z.boolean().nullish(),
@@ -126,7 +126,7 @@ export type InstrumentRecordSummary = z.infer<typeof $InstrumentRecordSummary>;
 export const $InstrumentRecordSummary = z.object({
   instrumentId: z.string(),
   /** The most recent record date, or null for an instrument whose records all lack one */
-  lastCollectedAt: z.coerce.date().nullable(),
+  lastCollectedAt: $DateLike.nullable(),
   recordCount: z.int().nonnegative(),
   /** Distinct subjects, not records — a subject completing an instrument twice counts once */
   subjectCount: z.int().nonnegative()

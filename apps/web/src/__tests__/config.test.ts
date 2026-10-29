@@ -46,13 +46,23 @@ describe('config', () => {
     expect(config.setup).toEqual({ apiBaseUrl: '/api', isGatewayEnabled: true });
   });
 
-  it('should coerce the string-valued development options into booleans and numbers', async () => {
+  it('should read the string-valued development options as booleans and numbers', async () => {
     vi.stubEnv('VITE_DEV_BYPASS_AUTH', 'true');
     vi.stubEnv('VITE_DEV_DISABLE_TUTORIAL', 'false');
     vi.stubEnv('VITE_DEV_NETWORK_LATENCY', '250');
     const config = await loadConfig();
     expect(config.dev).toMatchObject({ disableTutorial: false, isBypassAuthEnabled: true, networkLatency: 250 });
   });
+
+  it.each(['', 'slow', '-1', '2.5'])(
+    'should refuse to start with %j as the network latency, rather than simulate some other latency',
+    async (latency) => {
+      vi.stubEnv('VITE_DEV_NETWORK_LATENCY', latency);
+      await expect(loadConfig()).rejects.toMatchObject({
+        issues: [expect.objectContaining({ path: ['dev', 'networkLatency'] })]
+      });
+    }
+  );
 
   it('should fail to load with an invalid value, so a misconfigured deployment does not start', async () => {
     vi.stubEnv('CONTACT_EMAIL', 'not-an-email');

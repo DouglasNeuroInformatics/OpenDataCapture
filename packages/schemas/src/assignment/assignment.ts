@@ -1,7 +1,7 @@
 import { $Uint8ArrayLike } from '@douglasneuroinformatics/libjs';
 import { z } from 'zod/v4';
 
-import { $BaseModel, $Json } from '../core/core.js';
+import { $BaseModel, $DateLike, $Json } from '../core/core.js';
 import { $InstrumentBundleContainer } from '../instrument/instrument.base.js';
 const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
@@ -15,8 +15,8 @@ const DEFAULT_ASSIGNMENT_DURATION_DAYS = 365;
  */
 type Assignment = z.infer<typeof $Assignment>;
 const $Assignment = $BaseModel.extend({
-  completedAt: z.coerce.date().nullable(),
-  expiresAt: z.coerce.date(),
+  completedAt: $DateLike.nullable(),
+  expiresAt: $DateLike,
   groupId: z.string().min(1).nullish(),
   instrumentId: z.string().min(1),
   status: $AssignmentStatus,
@@ -40,7 +40,7 @@ const BULK_ASSIGNMENT_MAX_SUBJECTS = 500;
  * which in a long-running API process is whenever it booted — so a stale boundary would keep
  * accepting expiries that have since passed. The check has to read the clock per parse.
  */
-const $FutureDate = z.coerce.date().refine((value) => value.getTime() > Date.now(), {
+const $FutureDate = $DateLike.refine((value) => value.getTime() > Date.now(), {
   message: 'Expiry must be in the future'
 });
 

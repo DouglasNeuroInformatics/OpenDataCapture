@@ -122,7 +122,8 @@ const pickIdentifier = (identifier: string) => {
 };
 
 const existingSubject = (demographics: { dateOfBirth: null | string; sex: null | string }) => {
-  get.mockResolvedValueOnce({ data: demographics, status: 200 });
+  const dateOfBirth = demographics.dateOfBirth === null ? null : `${demographics.dateOfBirth}T00:00:00.000Z`;
+  get.mockResolvedValueOnce({ data: { ...demographics, dateOfBirth }, status: 200 });
 };
 
 /** Every error shown, with the field it landed on, so one that moved to the form's own errors fails too. */
@@ -352,7 +353,7 @@ describe('StartSessionForm', () => {
       const staleLookup = fetchQuery.mock.results[0]!.value;
       // The form awaited this promise first, so its continuation has run by the time this await returns.
       await act(async () => {
-        resolveFirst({ data: { dateOfBirth: '1990-06-15', sex: 'FEMALE' }, status: 200 });
+        resolveFirst({ data: { dateOfBirth: '1990-06-15T00:00:00.000Z', sex: 'FEMALE' }, status: 200 });
         await staleLookup;
       });
       expect(dateOfBirthInput().value).toBe('2000-01-01');

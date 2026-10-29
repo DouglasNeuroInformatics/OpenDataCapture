@@ -17,12 +17,13 @@ const NO_BARE_ZOD = {
   name: 'zod'
 };
 
-const NO_ZOD_COERCE = {
+// `z3` and `z4` are the names a file importing both zod majors gives them.
+const NO_ZOD_COERCE = ['z', 'z3', 'z4'].map((object) => ({
   message:
     "`z.coerce` turns inputs like `''`, `null` and `true` into valid values instead of rejecting them. Parse the format the input actually arrives in, then convert it: a date sent as an ISO string is `z.iso.datetime()`, turned into a `Date` once it validates.",
-  object: 'z',
+  object,
   property: 'coerce'
-};
+}));
 
 const NO_CLSX = {
   message: "Use `cn` from '@douglasneuroinformatics/libui/utils', which also merges conflicting Tailwind classes.",
@@ -214,7 +215,7 @@ export default config(
       'no-lonely-if': 'error',
       'no-nested-ternary': 'error',
       'no-promise-executor-return': 'error',
-      'no-restricted-properties': ['error', NO_ZOD_COERCE],
+      'no-restricted-properties': ['error', ...NO_ZOD_COERCE],
       'no-return-assign': 'error',
       'no-self-compare': 'error',
       'no-sequences': 'error',

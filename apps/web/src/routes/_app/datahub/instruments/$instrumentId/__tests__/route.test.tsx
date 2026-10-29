@@ -112,3 +112,24 @@ describe('Route', () => {
     expect(screen.getByText('Loading Fallback')).toBeTruthy();
   });
 });
+
+// The router JSON-parses each search value before validating it, so `?minRecords=5` arrives as a number.
+describe('minRecords search', () => {
+  type SearchValidator = { safeParse: (search: unknown) => { data?: { minRecords: number }; success: boolean } };
+  const validateSearch = Route.options.validateSearch as SearchValidator;
+
+  it('should default to no minimum', () => {
+    expect(validateSearch.safeParse({}).data?.minRecords).toBe(0);
+  });
+
+  it.each([0, 5])('should accept %j', (minRecords) => {
+    expect(validateSearch.safeParse({ minRecords }).data?.minRecords).toBe(minRecords);
+  });
+
+  it.each(['', '5', 'many', null, -1, 1.5])(
+    'should reject %j, rather than filter on some other minimum',
+    (minRecords) => {
+      expect(validateSearch.safeParse({ minRecords }).success).toBe(false);
+    }
+  );
+});

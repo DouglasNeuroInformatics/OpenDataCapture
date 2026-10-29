@@ -69,7 +69,7 @@ export const Route = createFileRoute('/_app/datahub/instruments/$instrumentId')(
     measure: z.string().optional(),
     methods: $SessionType.array().optional(),
     minDateKey: z.enum(TIMEFRAME_KEYS).default('all'),
-    minRecords: z.coerce.number().int().min(0).default(0),
+    minRecords: z.number().int().min(0).default(0),
     palette: z.enum(CHART_PALETTE_NAMES).default('default'),
     series: z.string().array().optional()
   })

@@ -18,6 +18,9 @@ const $StaticFieldKind: z.ZodType<FormTypes.StaticFieldKind> = z.enum([
   'set'
 ]);
 
+// Object keys are strings at runtime, so a likert scale's `{ 1: ..., 2: ... }` arrives keyed `'1'`, `'2'`
+const $NumericKey = z.string().regex(/^-?\d+(?:\.\d+)?$/);
+
 const $$FormInstrumentBaseField = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return z.object({
     description: $$InstrumentUIOption(z.string().min(1), language).optional(),
@@ -139,7 +142,7 @@ const $$FormInstrumentNumberRecordField = <TLanguage extends InstrumentLanguage>
       })
     ),
     kind: z.literal('number-record'),
-    options: $$InstrumentUIOption(z.record(z.coerce.number<PropertyKey>(), z.string()), language),
+    options: $$InstrumentUIOption(z.record($NumericKey, z.string()), language),
     variant: z.literal('likert')
   }) satisfies z.ZodType<FormInstrument.NumberRecordField<TLanguage>>;
 };

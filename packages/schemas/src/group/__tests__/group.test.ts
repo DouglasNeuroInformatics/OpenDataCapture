@@ -12,7 +12,7 @@ describe('$UpdateGroupData', () => {
   it('should accept emailTemplates when expectedUpdatedAt is included', () => {
     const result = $UpdateGroupData.safeParse({
       emailTemplates: [{ body: { en: 'Body' }, id: 'template-1', name: 'Template', subject: { en: 'Subject' } }],
-      expectedUpdatedAt: '2024-01-01'
+      expectedUpdatedAt: '2024-01-01T00:00:00.000Z'
     });
     expect(result.success).toBe(true);
   });

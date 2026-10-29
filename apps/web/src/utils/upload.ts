@@ -488,13 +488,13 @@ export namespace Zod3 {
         });
       }
       instrumentSchemaWithInternal = instrumentSchemaDef.schema.extend({
-        date: z3.coerce.date(),
+        date: z3.date(),
         subjectID: z3.string().regex(SUBJECT_ID_REGEX)
       });
       shape = (instrumentSchemaWithInternal._def as z3.ZodObjectDef).shape();
     } else {
       instrumentSchemaWithInternal = instrumentSchema.extend({
-        date: z3.coerce.date(),
+        date: z3.date(),
         subjectID: z3.string().regex(SUBJECT_ID_REGEX)
       });
       shape = instrumentSchemaWithInternal.shape as { [key: string]: z3.ZodTypeAny };
@@ -851,7 +851,7 @@ export namespace Zod4 {
     }
 
     const instrumentSchema = instrument.validationSchema.extend({
-      date: z4.coerce.date(),
+      date: z4.date(),
       subjectID: z4.string().regex(SUBJECT_ID_REGEX)
     });
 
