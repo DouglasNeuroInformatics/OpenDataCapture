@@ -1,6 +1,7 @@
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 
 import { UploadInstrumentPage } from '../pages/_app/upload/$instrumentId.page';
+import { UploadPage } from '../pages/_app/upload/index.page';
 import { HAPPINESS_RECORD } from '../support/constants';
 import { expect, test } from '../support/fixtures';
 
@@ -61,6 +62,41 @@ test.describe('upload', () => {
     await uploadInstrumentPage.tryAgainButton.click();
     await expect(uploadInstrumentPage.errorHeading).not.toBeVisible();
     await expect(uploadInstrumentPage.submitButton).toBeVisible();
+  });
+
+  // A cell missing its closing parenthesis was once accepted with its last character cut off, so
+  // `quantity:12` was stored as 1. No seeded instrument has a record-array field, so the test stores
+  // its own before creating the group that will use it.
+  test('should reject a record array cell missing its closing parenthesis, naming its column', async ({
+    api,
+    isolatedGroupManager,
+    page,
+    uniqueId
+  }) => {
+    const title = `Record Array Upload ${uniqueId}`;
+    await api.createInstrument(recordArrayFormBundle({ name: `RECORD_ARRAY_UPLOAD_${uniqueId}`, title }));
+    await isolatedGroupManager();
+    const csv = [
+      'subjectID,date,items',
+      `RecordArray${uniqueId},2024-01-15,"RECORD_ARRAY(name:item1,quantity:12"`
+    ].join('\n');
+
+    const uploadPage = new UploadPage(page);
+    await uploadPage.goto('/upload');
+    await uploadPage.selectInstrument(title);
+    await page.waitForURL('**/upload/**');
+
+    const uploadInstrumentPage = new UploadInstrumentPage(page);
+    await expect(uploadInstrumentPage.pageHeader).toContainText(title);
+    await uploadInstrumentPage.uploadFile({ buffer: Buffer.from(csv), mimeType: 'text/csv', name: 'items.csv' });
+    await uploadInstrumentPage.submitButton.click();
+
+    await expect(uploadInstrumentPage.errorHeading).toBeVisible();
+    await expect(
+      page.getByText(
+        "Syntax error in RECORD_ARRAY declaration: RECORD_ARRAY(name:item1,quantity:12 at column name: 'items' and row number '1'"
+      )
+    ).toBeVisible();
   });
 
   // The response was previously every record in the group for the instrument, so a second upload
@@ -133,3 +169,39 @@ test.describe('upload instrument selection while loading', () => {
     expect(errors.filter((error) => error.includes('Maximum update depth exceeded'))).toStrictEqual([]);
   });
 });
+
+/**
+ * A form with one record-array field, written as the bundle the api stores: an expression that
+ * evaluates to the instrument. Its runtime import resolves through the `__resolveImport` the api's
+ * sandbox provides, and against the web origin in the browser, as a bundled import would.
+ */
+function recordArrayFormBundle({ name, title }: { name: string; title: string }) {
+  return `(async () => {
+    const runtimeImport = (specifier) => import(globalThis.__resolveImport?.(specifier) ?? specifier);
+    const { z } = await runtimeImport('/runtime/v1/zod@3.x/index.js');
+    return {
+      __runtimeVersion: 1,
+      content: {
+        items: {
+          fieldset: {
+            name: { kind: 'string', label: 'Name', variant: 'input' },
+            quantity: { kind: 'number', label: 'Quantity', variant: 'input' }
+          },
+          kind: 'record-array',
+          label: 'Items'
+        }
+      },
+      details: {
+        description: 'A form with one record-array field',
+        license: 'Apache-2.0',
+        title: ${JSON.stringify(title)}
+      },
+      internal: { edition: 1, name: ${JSON.stringify(name)} },
+      kind: 'FORM',
+      language: 'en',
+      measures: null,
+      tags: [],
+      validationSchema: z.object({ items: z.array(z.object({ name: z.string(), quantity: z.number() })) })
+    };
+  })()`;
+}

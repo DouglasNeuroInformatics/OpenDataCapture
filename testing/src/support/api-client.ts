@@ -80,6 +80,28 @@ export class ApiClient {
   }
 
   /**
+   * Stores an instrument bundle the way the playground uploads one, with the reduced token minted by
+   * `GET /auth/create-instrument-token`. The id is derived from the bundle's internal name and
+   * edition, so each bundle needs a name of its own. Groups created afterwards can use it.
+   */
+  async createInstrument(bundle: string): Promise<string> {
+    const { accessToken } = await this.expectJson<{ accessToken: string }>(
+      this.request.get(`${API}/auth/create-instrument-token`, { headers: this.authHeaders }),
+      200,
+      'mint an instrument token'
+    );
+    const instrument = await this.expectJson<{ id: string }>(
+      this.request.post(`${API}/instruments`, {
+        data: { bundle },
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }),
+      201,
+      'create instrument'
+    );
+    return instrument.id;
+  }
+
+  /**
    * Creates one record against a session, the way the app does when an instrument is completed in a
    * sitting. Unlike {@link uploadRecords}, which always writes a RETROSPECTIVE session, this lets a
    * spec choose the collection method the record will report.
