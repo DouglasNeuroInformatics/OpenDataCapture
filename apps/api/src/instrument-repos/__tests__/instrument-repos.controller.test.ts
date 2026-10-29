@@ -57,10 +57,18 @@ describe('InstrumentReposController', () => {
     expect(service.syncAll).toHaveBeenCalledWith({ ability });
   });
 
-  it("should scope the activity log to the current user's ability", async () => {
-    service.findSyncLogs.mockResolvedValueOnce([]);
-    await expect(controller.findSyncLogs(ability)).resolves.toStrictEqual([]);
-    expect(service.findSyncLogs).toHaveBeenCalledWith({ ability });
+  it("should scope the activity log to the current user's ability, and pass the page asked for", async () => {
+    const query = { limit: 10, page: 2, sortOrder: 'desc' } as const;
+    const result = { data: [], pageCount: 0, total: 0 };
+    service.findSyncLogs.mockResolvedValueOnce(result);
+    await expect(controller.findSyncLogs(query, ability)).resolves.toBe(result);
+    expect(service.findSyncLogs).toHaveBeenCalledWith(query, { ability });
+  });
+
+  it("should scope the latest entry per repository to the current user's ability", async () => {
+    service.findLatestSyncLogs.mockResolvedValueOnce([]);
+    await expect(controller.findLatestSyncLogs(ability)).resolves.toStrictEqual([]);
+    expect(service.findLatestSyncLogs).toHaveBeenCalledWith({ ability });
   });
 
   it("should clear the activity log within the current user's ability", async () => {
@@ -69,7 +77,7 @@ describe('InstrumentReposController', () => {
     expect(service.deleteSyncLogs).toHaveBeenCalledWith({ ability });
   });
 
-  it.each(['deleteSyncLogs', 'findSyncLogs'] as const)(
+  it.each(['deleteSyncLogs', 'findLatestSyncLogs', 'findSyncLogs'] as const)(
     'should restrict %s to administrators, since the history spans every repository',
     (handler) => {
       const reflector = new Reflector();

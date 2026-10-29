@@ -398,23 +398,77 @@ describe('InstrumentReposService', () => {
   });
 
   describe('findSyncLogs', () => {
-    it('should return the history newest first', async () => {
-      instrumentRepoSyncLogModel.findMany.mockResolvedValueOnce([{ id: 'log-1' }]);
+    const query = { limit: 10, page: 1, sortOrder: 'desc' } as const;
 
-      await expect(service.findSyncLogs()).resolves.toStrictEqual([{ id: 'log-1' }]);
+    it('should return the requested page of the history, with how many pages there are', async () => {
+      instrumentRepoSyncLogModel.findMany.mockResolvedValueOnce([{ id: 'log-1' }]);
+      instrumentRepoSyncLogModel.count.mockResolvedValueOnce(25);
+
+      await expect(service.findSyncLogs(query)).resolves.toStrictEqual({
+        data: [{ id: 'log-1' }],
+        pageCount: 3,
+        total: 25
+      });
       expect(instrumentRepoSyncLogModel.findMany).toHaveBeenCalledWith({
         orderBy: { createdAt: 'desc' },
-        take: 500,
-        where: {}
+        skip: 0,
+        take: 10,
+        where: { AND: [{}], repoId: undefined }
       });
     });
 
-    it('should cap one request, so an append-only collection cannot grow the response without bound', async () => {
+    it('should skip the pages before the one asked for, so page three is not page one', async () => {
       instrumentRepoSyncLogModel.findMany.mockResolvedValueOnce([]);
+      instrumentRepoSyncLogModel.count.mockResolvedValueOnce(0);
 
-      await service.findSyncLogs();
+      await service.findSyncLogs({ ...query, page: 3 });
 
-      expect(instrumentRepoSyncLogModel.findMany.mock.lastCall?.[0]).toMatchObject({ take: 500 });
+      expect(instrumentRepoSyncLogModel.findMany.mock.lastCall?.[0]).toMatchObject({ skip: 20, take: 10 });
+    });
+
+    it('should confine the page to one repository when asked, so its dialog shows only its own', async () => {
+      instrumentRepoSyncLogModel.findMany.mockResolvedValueOnce([]);
+      instrumentRepoSyncLogModel.count.mockResolvedValueOnce(0);
+
+      await service.findSyncLogs({ ...query, repoId: 'r1' });
+
+      expect(instrumentRepoSyncLogModel.findMany.mock.lastCall?.[0]).toMatchObject({ where: { repoId: 'r1' } });
+    });
+
+    it('should order the history oldest first when asked, since the table sorts on the server', async () => {
+      instrumentRepoSyncLogModel.findMany.mockResolvedValueOnce([]);
+      instrumentRepoSyncLogModel.count.mockResolvedValueOnce(0);
+
+      await service.findSyncLogs({ ...query, sortOrder: 'asc' });
+
+      expect(instrumentRepoSyncLogModel.findMany.mock.lastCall?.[0]).toMatchObject({
+        orderBy: { createdAt: 'asc' }
+      });
+    });
+  });
+
+  describe('findLatestSyncLogs', () => {
+    it('should return the newest entry per repository, which no single page of the history holds', async () => {
+      instrumentRepoModel.findMany.mockResolvedValueOnce([{ id: 'r1' }, { id: 'r2' }]);
+      instrumentRepoSyncLogModel.findFirst
+        .mockResolvedValueOnce({ id: 'log-r1', repoId: 'r1' })
+        .mockResolvedValueOnce({ id: 'log-r2', repoId: 'r2' });
+
+      await expect(service.findLatestSyncLogs()).resolves.toStrictEqual([
+        { id: 'log-r1', repoId: 'r1' },
+        { id: 'log-r2', repoId: 'r2' }
+      ]);
+      expect(instrumentRepoSyncLogModel.findFirst.mock.lastCall?.[0]).toMatchObject({
+        orderBy: { createdAt: 'desc' },
+        where: { repoId: 'r2' }
+      });
+    });
+
+    it('should leave out a repository that has never been synced, rather than a null entry', async () => {
+      instrumentRepoModel.findMany.mockResolvedValueOnce([{ id: 'r1' }]);
+      instrumentRepoSyncLogModel.findFirst.mockResolvedValueOnce(null);
+
+      await expect(service.findLatestSyncLogs()).resolves.toStrictEqual([]);
     });
 
     it('should download without a token when the repo stores none, so public repos sync', async () => {

@@ -12,9 +12,19 @@ import { getSyncStatusColor } from '@/utils/tag-colors';
 
 type InstrumentRepoSyncLogTableProps = {
   logs: InstrumentRepoSyncLog[];
+  onPageChange: (page: number) => void;
+  onSortOrderChange: (sortOrder: 'asc' | 'desc') => void;
+  pageCount: number;
+  sortOrder: 'asc' | 'desc';
 };
 
-export const InstrumentRepoSyncLogTable = ({ logs }: InstrumentRepoSyncLogTableProps) => {
+export const InstrumentRepoSyncLogTable = ({
+  logs,
+  onPageChange,
+  onSortOrderChange,
+  pageCount,
+  sortOrder
+}: InstrumentRepoSyncLogTableProps) => {
   const { t } = useTranslation();
   const [theme] = useTheme();
   const [logToView, setLogToView] = useState<InstrumentRepoSyncLog | null>(null);
@@ -81,30 +91,35 @@ export const InstrumentRepoSyncLogTable = ({ logs }: InstrumentRepoSyncLogTableP
     <Fragment>
       <div data-testid="instrument-repo-sync-log">
         <DataTable
+          disableSearch
           columns={[
             {
-              accessorFn: (log: InstrumentRepoSyncLog) => log.createdAt.getTime(),
               cell: (ctx) => ctx.row.original.createdAt.toLocaleString(),
+              enableSorting: true,
               header: ({ column }) => (
-                <SortableHeader column={column} label={t({ en: 'Date', es: 'Fecha', fr: 'Date' })} />
+                <SortableHeader
+                  column={column}
+                  label={t({ en: 'Date', es: 'Fecha', fr: 'Date' })}
+                  sortOrder={sortOrder}
+                />
               ),
-              id: 'date'
+              id: 'date',
+              // The rows already arrive newest first, so the table's first toggle of its unsorted
+              // column must go to ascending, or the first click would request what is on screen.
+              sortDescFirst: false
             },
             {
               accessorKey: 'repoName',
-              header: ({ column }) => (
-                <SortableHeader column={column} label={t({ en: 'Repository', es: 'Repositorio', fr: 'Dépôt' })} />
-              )
+              enableSorting: false,
+              header: t({ en: 'Repository', es: 'Repositorio', fr: 'Dépôt' })
             },
             {
               accessorFn: (log: InstrumentRepoSyncLog) => actionLabels[log.action],
-              header: ({ column }) => (
-                <SortableHeader column={column} label={t({ en: 'Action', es: 'Acción', fr: 'Action' })} />
-              ),
+              enableSorting: false,
+              header: t({ en: 'Action', es: 'Acción', fr: 'Action' }),
               id: 'action'
             },
             {
-              accessorFn: (log: InstrumentRepoSyncLog) => getSyncStatus(log),
               cell: (ctx) => {
                 const status = getSyncStatus(ctx.row.original);
                 return (
@@ -115,22 +130,19 @@ export const InstrumentRepoSyncLogTable = ({ logs }: InstrumentRepoSyncLogTableP
                   />
                 );
               },
-              header: ({ column }) => (
-                <SortableHeader column={column} label={t({ en: 'Status', es: 'Estado', fr: 'Statut' })} />
-              ),
+              enableSorting: false,
+              header: t({ en: 'Status', es: 'Estado', fr: 'Statut' }),
               id: 'status'
             },
             {
               accessorKey: 'importedCount',
-              header: ({ column }) => (
-                <SortableHeader column={column} label={t({ en: 'Imported', es: 'Importados', fr: 'Importés' })} />
-              )
+              enableSorting: false,
+              header: t({ en: 'Imported', es: 'Importados', fr: 'Importés' })
             },
             {
               accessorFn: (log: InstrumentRepoSyncLog) => log.failures.length,
-              header: ({ column }) => (
-                <SortableHeader column={column} label={t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' })} />
-              ),
+              enableSorting: false,
+              header: t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' }),
               id: 'failedCount'
             },
             {
@@ -169,7 +181,11 @@ export const InstrumentRepoSyncLogTable = ({ logs }: InstrumentRepoSyncLogTableP
             }
           ]}
           data={logs}
-          initialState={{ sorting: [{ desc: true, id: 'date' }] }}
+          mode="server"
+          pageCount={pageCount}
+          onPaginationChange={({ pageIndex }) => onPageChange(pageIndex + 1)}
+          // Date is the only sortable column, so the state describes it or nothing.
+          onSortingChange={(state) => onSortOrderChange(state.some(({ desc }) => desc) ? 'desc' : 'asc')}
         />
       </div>
       <Dialog open={logToView !== null} onOpenChange={() => setLogToView(null)}>

@@ -31,6 +31,10 @@ import {
   instrumentRepoSyncLogsQueryOptions,
   useInstrumentRepoSyncLogsQuery
 } from '@/hooks/useInstrumentRepoSyncLogsQuery';
+import {
+  latestInstrumentRepoSyncLogsQueryOptions,
+  useLatestInstrumentRepoSyncLogsQuery
+} from '@/hooks/useLatestInstrumentRepoSyncLogsQuery';
 import { useSyncAllInstrumentReposMutation } from '@/hooks/useSyncAllInstrumentReposMutation';
 import { useSyncInstrumentRepoMutation } from '@/hooks/useSyncInstrumentRepoMutation';
 
@@ -152,20 +156,42 @@ const AddRepoForm = ({
   );
 };
 
-/** The most recent log per repository, by its own timestamp rather than its position in the list. */
-function latestSyncLogs(logs: InstrumentRepoSyncLog[]) {
-  const latest = new Map<string, InstrumentRepoSyncLog>();
+/** Keyed by repository, from the one entry per repository the API answers with. */
+function syncLogsByRepoId(logs: InstrumentRepoSyncLog[]) {
+  const byRepoId = new Map<string, InstrumentRepoSyncLog>();
   for (const log of logs) {
-    if (!log.repoId) {
-      continue;
-    }
-    const current = latest.get(log.repoId);
-    if (!current || current.createdAt < log.createdAt) {
-      latest.set(log.repoId, log);
+    if (log.repoId) {
+      byRepoId.set(log.repoId, log);
     }
   }
-  return latest;
+  return byRepoId;
 }
+
+const INITIAL_PAGE = 1;
+
+const INITIAL_SORT_ORDER = 'desc';
+
+/**
+ * One page of the activity log, for every repository or for one. It owns its own paging state, so
+ * the dialog's table and the one below the repositories table page independently of each other.
+ */
+const SyncLogTable = ({ repoId }: { repoId?: string }) => {
+  const [page, setPage] = useState<number>(INITIAL_PAGE);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(INITIAL_SORT_ORDER);
+  const syncLogsQuery = useInstrumentRepoSyncLogsQuery({ params: { page, repoId, sortOrder } });
+  return (
+    <InstrumentRepoSyncLogTable
+      logs={syncLogsQuery.data?.data ?? []}
+      pageCount={syncLogsQuery.data?.pageCount ?? 0}
+      sortOrder={sortOrder}
+      onPageChange={setPage}
+      onSortOrderChange={(order) => {
+        setSortOrder(order);
+        setPage(INITIAL_PAGE);
+      }}
+    />
+  );
+};
 
 const RouteComponent = () => {
   const { t } = useTranslation();
@@ -176,7 +202,12 @@ const RouteComponent = () => {
   const deleteRepoMutation = useDeleteInstrumentRepoMutation();
   const syncRepoMutation = useSyncInstrumentRepoMutation();
   const syncAllReposMutation = useSyncAllInstrumentReposMutation();
-  const syncLogsQuery = useInstrumentRepoSyncLogsQuery();
+  // The same first page the loader prefetched and `SyncLogTable` mounts on, so reading the total
+  // here costs no extra request.
+  const syncLogsQuery = useInstrumentRepoSyncLogsQuery({
+    params: { page: INITIAL_PAGE, sortOrder: INITIAL_SORT_ORDER }
+  });
+  const latestSyncLogsQuery = useLatestInstrumentRepoSyncLogsQuery();
   const clearSyncLogsMutation = useClearInstrumentRepoSyncLogsMutation();
   // Every edition, because the default collapses editions across all sources, not per repository;
   // `currentRepoInstruments` then keeps the latest edition each repository provides.
@@ -193,7 +224,7 @@ const RouteComponent = () => {
 
   // Compute which repos are currently assigned to at least one (live) group.
   const inUseRepoIds = new Set(groupsQuery.data.flatMap((group) => group.instrumentRepoIds));
-  const latestSyncLogByRepoId = latestSyncLogs(syncLogsQuery.data);
+  const latestSyncLogByRepoId = syncLogsByRepoId(latestSyncLogsQuery.data);
 
   const handleDeleteClick = (repo: InstrumentRepo) => {
     if (inUseRepoIds.has(repo.id)) {
@@ -372,14 +403,14 @@ const RouteComponent = () => {
             {t({ en: 'Activity Log', es: 'Registro de actividad', fr: "Journal d'activité" })}
           </Heading>
           <Button
-            disabled={syncLogsQuery.data.length === 0 || clearSyncLogsMutation.isPending}
+            disabled={!syncLogsQuery.data?.total || clearSyncLogsMutation.isPending}
             variant="outline"
             onClick={() => setIsConfirmClearHistoryOpen(true)}
           >
             {t({ en: 'Clear Log', es: 'Borrar registro', fr: 'Effacer le journal' })}
           </Button>
         </div>
-        <InstrumentRepoSyncLogTable logs={syncLogsQuery.data} />
+        <SyncLogTable />
       </section>
       {isConfirmClearHistoryOpen && (
         <Dialog.Content>
@@ -441,7 +472,7 @@ const RouteComponent = () => {
             </Dialog.Description>
           </Dialog.Header>
           <div className="max-h-[70vh] overflow-auto">
-            <InstrumentRepoSyncLogTable logs={syncLogsQuery.data.filter((log) => log.repoId === repoToShowLogs.id)} />
+            <SyncLogTable repoId={repoToShowLogs.id} />
           </div>
         </Dialog.Content>
       )}
@@ -626,7 +657,10 @@ export const Route = createFileRoute('/_app/admin/instrument-repos/')({
     await Promise.all([
       context.queryClient.ensureQueryData(instrumentReposQueryOptions()),
       context.queryClient.ensureQueryData(groupsQueryOptions()),
-      context.queryClient.ensureQueryData(instrumentRepoSyncLogsQueryOptions())
+      context.queryClient.ensureQueryData(
+        instrumentRepoSyncLogsQueryOptions({ params: { page: INITIAL_PAGE, sortOrder: INITIAL_SORT_ORDER } })
+      ),
+      context.queryClient.ensureQueryData(latestInstrumentRepoSyncLogsQueryOptions())
     ]);
   }
 });

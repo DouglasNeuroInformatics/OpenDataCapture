@@ -1,6 +1,10 @@
-import { ApiOperation, CurrentUser } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
+import { ApiOperation, CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  $CreateInstrumentRepoData,
+  $InstrumentRepoSyncLogsQueryParams
+} from '@opendatacapture/schemas/instrument-repo';
+import type { InstrumentRepoSyncLogsQueryParams } from '@opendatacapture/schemas/instrument-repo';
 
 import type { AppAbility } from '@/auth/auth.types';
 import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorator';
@@ -39,6 +43,13 @@ export class InstrumentReposController {
     return this.instrumentReposService.findAll({ ability });
   }
 
+  @ApiOperation({ summary: 'Get the Latest Activity Log Entry of Every Instrument Repo' })
+  @Get('sync/logs/latest')
+  @RouteAccess(ADMIN_ONLY)
+  findLatestSyncLogs(@CurrentUser('ability') ability?: AppAbility) {
+    return this.instrumentReposService.findLatestSyncLogs({ ability });
+  }
+
   /**
    * Admin-only where the two sync routes are not, because this is the one that crosses repositories.
    * `InstrumentRepoSyncLog` carries no group, and is absent from `$AppSubjectName` so that no user can
@@ -48,8 +59,12 @@ export class InstrumentReposController {
   @ApiOperation({ summary: 'Get the Activity Log of Every Instrument Repo' })
   @Get('sync/logs')
   @RouteAccess(ADMIN_ONLY)
-  findSyncLogs(@CurrentUser('ability') ability?: AppAbility) {
-    return this.instrumentReposService.findSyncLogs({ ability });
+  findSyncLogs(
+    @Query(new ParseSchemaPipe({ schema: $InstrumentRepoSyncLogsQueryParams }))
+    query: InstrumentRepoSyncLogsQueryParams,
+    @CurrentUser('ability') ability?: AppAbility
+  ) {
+    return this.instrumentReposService.findSyncLogs(query, { ability });
   }
 
   @ApiOperation({ summary: 'Sync Instrument Repo' })

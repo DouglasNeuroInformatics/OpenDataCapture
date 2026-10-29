@@ -19,6 +19,8 @@ import { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-r
 import type {
   InstrumentRepoSyncAction,
   InstrumentRepoSyncFailure,
+  InstrumentRepoSyncLogsPage,
+  InstrumentRepoSyncLogsQueryParams,
   InstrumentRepoSyncStage
 } from '@opendatacapture/schemas/instrument-repo';
 import JSZip from 'jszip';
@@ -37,12 +39,6 @@ type InstrumentImportResult =
 type RepoImportResult = { createdIds: string[]; failures: InstrumentRepoSyncFailure[]; instrumentIds: string[] };
 
 type InstrumentRepoRecord = Awaited<ReturnType<Model<'InstrumentRepo'>['findFirstOrThrow']>>;
-
-/**
- * The newest entries one request returns. The collection is append-only and nothing prunes it, so an
- * unbounded read grows with the instance's whole history.
- */
-const SYNC_LOG_LIMIT = 500;
 
 /**
  * The detail Nest exceptions thrown by `InstrumentsService.create` carry beyond their message: a VM
@@ -177,12 +173,46 @@ export class InstrumentReposService implements OnModuleInit {
     return repos.map((repo) => this.stripSecrets(repo));
   }
 
-  async findSyncLogs({ ability }: EntityOperationOptions = {}) {
-    return this.instrumentRepoSyncLogModel.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: SYNC_LOG_LIMIT,
-      where: accessibleQuery(ability, 'read', 'InstrumentRepoSyncLog')
+  /**
+   * The newest entry per repository, which is what the repositories table reads its failed count
+   * from. A page of the history cannot answer that question: the newest entry for a rarely-synced
+   * repository may be any distance down it.
+   */
+  async findLatestSyncLogs({ ability }: EntityOperationOptions = {}) {
+    const repos = await this.instrumentRepoModel.findMany({
+      select: { id: true },
+      where: accessibleQuery(ability, 'read', 'InstrumentRepo')
     });
+    const logs = await Promise.all(
+      repos.map((repo) =>
+        this.instrumentRepoSyncLogModel.findFirst({
+          orderBy: { createdAt: 'desc' },
+          where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRepoSyncLog')], repoId: repo.id }
+        })
+      )
+    );
+    return logs.filter((log) => log !== null);
+  }
+
+  /**
+   * One page of the history. The collection is append-only and nothing prunes it, so it is never
+   * returned whole: the client asks for the slice it is showing.
+   */
+  async findSyncLogs(
+    { limit, page, repoId, sortOrder }: InstrumentRepoSyncLogsQueryParams,
+    { ability }: EntityOperationOptions = {}
+  ): Promise<InstrumentRepoSyncLogsPage> {
+    const where = { AND: [accessibleQuery(ability, 'read', 'InstrumentRepoSyncLog')], repoId };
+    const [data, total] = await Promise.all([
+      this.instrumentRepoSyncLogModel.findMany({
+        orderBy: { createdAt: sortOrder },
+        skip: (page - 1) * limit,
+        take: limit,
+        where
+      }),
+      this.instrumentRepoSyncLogModel.count({ where })
+    ]);
+    return { data, pageCount: Math.ceil(total / limit), total };
   }
 
   async onModuleInit(): Promise<void> {

@@ -19,9 +19,13 @@ const mocks = vi.hoisted(() => ({
   instrumentInfo: { data: undefined as TranslatedInstrumentInfo[] | undefined, isLoading: false },
   instrumentReposQueryOptions: vi.fn(() => ({ queryKey: ['instrument-repos'] })),
   isCreatePending: false,
+  latestSyncLogs: [] as InstrumentRepoSyncLog[],
+  latestSyncLogsQueryOptions: vi.fn(() => ({ queryKey: ['instrument-repo-sync-logs', 'latest'] })),
   repos: [] as InstrumentRepo[],
   syncAllRepos: vi.fn(),
   syncLogs: [] as InstrumentRepoSyncLog[],
+  syncLogsParams: [] as { page?: number; repoId?: string; sortOrder?: string }[],
+  syncLogsPending: false,
   syncLogsQueryOptions: vi.fn(() => ({ queryKey: ['instrument-repo-sync-logs'] })),
   syncRepo: vi.fn()
 }));
@@ -51,8 +55,20 @@ vi.mock('@/hooks/useSyncAllInstrumentReposMutation', () => ({
   useSyncAllInstrumentReposMutation: () => ({ isPending: false, mutate: mocks.syncAllRepos })
 }));
 vi.mock('@/hooks/useInstrumentRepoSyncLogsQuery', () => ({
+  INSTRUMENT_REPO_SYNC_LOGS_QUERY_KEY: 'instrument-repo-sync-logs',
   instrumentRepoSyncLogsQueryOptions: mocks.syncLogsQueryOptions,
-  useInstrumentRepoSyncLogsQuery: () => ({ data: mocks.syncLogs })
+  useInstrumentRepoSyncLogsQuery: ({ params }: { params?: { repoId?: string } } = {}) => {
+    mocks.syncLogsParams.push(params ?? {});
+    if (mocks.syncLogsPending) {
+      return { data: undefined };
+    }
+    const data = params?.repoId ? mocks.syncLogs.filter((log) => log.repoId === params.repoId) : mocks.syncLogs;
+    return { data: { data, pageCount: 1, total: data.length } };
+  }
+}));
+vi.mock('@/hooks/useLatestInstrumentRepoSyncLogsQuery', () => ({
+  latestInstrumentRepoSyncLogsQueryOptions: mocks.latestSyncLogsQueryOptions,
+  useLatestInstrumentRepoSyncLogsQuery: () => ({ data: mocks.latestSyncLogs })
 }));
 
 const repoFixture = (overrides: Partial<InstrumentRepo> = {}): InstrumentRepo => ({
@@ -173,27 +189,31 @@ describe('Route', () => {
     mocks.instrumentInfo = { data: undefined, isLoading: false };
     mocks.isCreatePending = false;
     mocks.syncLogs = [];
+    mocks.latestSyncLogs = [];
+    mocks.syncLogsParams = [];
+    mocks.syncLogsPending = false;
     useNotificationsStore.setState({ notifications: [] });
   });
 
   afterEach(cleanup);
 
-  it('should prefetch the repositories, groups and activity log in the loader, so the page renders without a waterfall', async () => {
+  it('should prefetch the repositories, groups, first page and latest entries in the loader', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);
     await runLoader(queryClient);
     expect(ensureQueryData.mock.calls).toEqual([
       [{ queryKey: ['instrument-repos'] }],
       [{ queryKey: ['groups'] }],
-      [{ queryKey: ['instrument-repo-sync-logs'] }]
+      [{ queryKey: ['instrument-repo-sync-logs'] }],
+      [{ queryKey: ['instrument-repo-sync-logs', 'latest'] }]
     ]);
   });
 
-  it('should start all three prefetches before awaiting any, so the page does not wait out three round trips', async () => {
+  it('should start every prefetch before awaiting any, so the page does not wait out four round trips', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);
     const loading = runLoader(queryClient);
-    expect(ensureQueryData).toHaveBeenCalledTimes(3);
+    expect(ensureQueryData).toHaveBeenCalledTimes(4);
     await loading;
   });
 
@@ -204,36 +224,15 @@ describe('Route', () => {
     expect(cell.title).toBe('https://github.com/douglasneuroinformatics/core');
   });
 
-  it('should count the instruments that failed in the latest sync of each repository', () => {
-    mocks.syncLogs = [
-      syncLogFixture({ failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }], id: 'newest' }),
-      syncLogFixture({ id: 'older' })
-    ];
+  it("should count the instruments that failed in each repository's latest entry", () => {
+    mocks.latestSyncLogs = [syncLogFixture({ failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }] })];
     renderPage();
     expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('1');
   });
 
-  it('should read the failed count from the newest log by its timestamp, not by its place in the list', () => {
-    mocks.syncLogs = [
-      syncLogFixture({ createdAt: new Date('2026-10-01'), id: 'older' }),
-      syncLogFixture({
-        createdAt: new Date('2026-10-02'),
-        failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }],
-        id: 'newest'
-      })
-    ];
-    renderPage();
-    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('1');
-  });
-
-  it('should ignore a log with no repository, since a failed import is recorded before one exists', () => {
-    mocks.syncLogs = [
-      syncLogFixture({
-        createdAt: new Date('2026-10-03'),
-        id: 'orphan',
-        message: 'Repository not found',
-        repoId: null
-      }),
+  it('should ignore an entry with no repository, since a failed import is recorded before one exists', () => {
+    mocks.latestSyncLogs = [
+      syncLogFixture({ id: 'orphan', message: 'Repository not found', repoId: null }),
       syncLogFixture({ failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }], id: 'log-1' })
     ];
     renderPage();
@@ -246,9 +245,34 @@ describe('Route', () => {
   });
 
   it('should say the repository could not be read when the whole import or sync failed', () => {
-    mocks.syncLogs = [syncLogFixture({ message: 'Repository not found' })];
+    mocks.latestSyncLogs = [syncLogFixture({ message: 'Repository not found' })];
     renderPage();
     expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('Could not be read');
+  });
+
+  it('should render an empty activity log while its first page is still in flight', () => {
+    mocks.syncLogsPending = true;
+    renderPage();
+    expect(screen.getByText('No imports or syncs recorded yet.')).toBeTruthy();
+  });
+
+  it('should ask the server for the other order when the activity log is sorted by date', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    const log = within(screen.getByTestId('instrument-repo-sync-log'));
+
+    fireEvent.click(within(log.getByTestId('data-table-head')).getByText('Date'));
+
+    expect(mocks.syncLogsParams.at(-1)).toMatchObject({ page: 1, sortOrder: 'asc' });
+  });
+
+  it("should request one repository's own entries in its dialog, rather than filter the page on screen", () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+
+    fireEvent.click(rowAction('Logs'));
+
+    expect(mocks.syncLogsParams.some((params) => params.repoId === 'repo-1')).toBe(true);
   });
 
   it('should sync every repository from the Sync All button', () => {
@@ -326,8 +350,8 @@ describe('Route', () => {
   });
 
   it('should show a dash for a repository that has never been synced', () => {
-    // A log keeps the failed count from rendering a dash of its own.
-    mocks.syncLogs = [syncLogFixture()];
+    // A latest entry keeps the failed count from rendering a dash of its own.
+    mocks.latestSyncLogs = [syncLogFixture()];
     renderPage();
     expect(within(rows()[0]!).getByText('-')).toBeTruthy();
   });

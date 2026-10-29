@@ -126,10 +126,13 @@ test.describe('admin instrument repos activity log', () => {
     await page.route('**/v1/instrument-repos', (route) =>
       route.request().method() === 'GET' ? route.fulfill({ json: [repo] }) : route.continue()
     );
-    await page.route('**/v1/instrument-repos/sync/logs', (route) =>
+    // Regexes, not globs: the history is now requested with query parameters, and its two routes
+    // must not match each other.
+    await page.route(/\/v1\/instrument-repos\/sync\/logs\/latest/, (route) => route.fulfill({ json: [partialSync] }));
+    await page.route(/\/v1\/instrument-repos\/sync\/logs(\?|$)/, (route) =>
       route.request().method() === 'DELETE'
         ? route.fulfill({ json: { count: 1 } })
-        : route.fulfill({ json: [partialSync] })
+        : route.fulfill({ json: { data: [partialSync], pageCount: 1, total: 1 } })
     );
   });
 
@@ -184,11 +187,35 @@ test.describe('admin instrument repos activity log', () => {
     getPageModel,
     page
   }) => {
-    await page.route(/\/v1\/instrument-repos\/sync\/logs/, (route) => route.fulfill({ json: [] }));
+    await page.route(/\/v1\/instrument-repos\/sync\/logs(\?|$)/, (route) =>
+      route.fulfill({ json: { data: [], pageCount: 0, total: 0 } })
+    );
     const reposPage = await getPageModel('/admin/instrument-repos');
 
     await expect(reposPage.syncLogTable).toHaveText('No imports or syncs recorded yet.');
     await expect(reposPage.syncLogTable.getByTestId('data-table')).toHaveCount(0);
+  });
+
+  test('should ask the server for the next page, rather than hold the whole history', async ({
+    getPageModel,
+    page
+  }) => {
+    await page.route(/\/v1\/instrument-repos\/sync\/logs(\?|$)/, (route) => {
+      const requested = new URL(route.request().url()).searchParams.get('page') ?? '1';
+      return route.fulfill({
+        json: {
+          data: [{ ...partialSync, id: `log-${requested}`, repoName: `Repo on page ${requested}` }],
+          pageCount: 2,
+          total: 11
+        }
+      });
+    });
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    await expect(reposPage.syncLogTable).toContainText('Repo on page 1');
+
+    await reposPage.syncLogTable.getByRole('button', { name: '2' }).click();
+
+    await expect(reposPage.syncLogTable).toContainText('Repo on page 2');
   });
 
   test('should open the activity log of one repository from its row actions', async ({ getPageModel }) => {

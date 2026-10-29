@@ -49,3 +49,30 @@ export const $InstrumentRepoSyncLog = $BaseModel.extend({
   repoId: z.string().nullish(),
   repoName: z.string()
 });
+
+/** The number of activity log entries shown per page, matching the page size of the client's table. */
+export const INSTRUMENT_REPO_SYNC_LOGS_PAGE_SIZE = 10;
+
+/** Upper bound on `limit`, so a single request can never load an unbounded slice of the collection. */
+export const INSTRUMENT_REPO_SYNC_LOGS_MAX_PAGE_SIZE = 1000;
+
+export type InstrumentRepoSyncLogsQueryParams = z.infer<typeof $InstrumentRepoSyncLogsQueryParams>;
+export const $InstrumentRepoSyncLogsQueryParams = z.object({
+  limit: z.coerce
+    .number()
+    .int()
+    .positive()
+    .max(INSTRUMENT_REPO_SYNC_LOGS_MAX_PAGE_SIZE)
+    .default(INSTRUMENT_REPO_SYNC_LOGS_PAGE_SIZE),
+  page: z.coerce.number().int().positive().default(1),
+  /** Confines the page to one repository, which is what the per-repository dialog asks for. */
+  repoId: z.string().optional(),
+  sortOrder: z.enum(['asc', 'desc']).default('desc')
+});
+
+export type InstrumentRepoSyncLogsPage = z.infer<typeof $InstrumentRepoSyncLogsPage>;
+export const $InstrumentRepoSyncLogsPage = z.object({
+  data: z.array($InstrumentRepoSyncLog),
+  pageCount: z.int().nonnegative(),
+  total: z.int().nonnegative()
+});

@@ -26,6 +26,24 @@ const logFixture = (overrides: Partial<InstrumentRepoSyncLog> = {}): InstrumentR
   ...overrides
 });
 
+type TableProps = {
+  logs: InstrumentRepoSyncLog[];
+  onPageChange?: (page: number) => void;
+  onSortOrderChange?: (sortOrder: 'asc' | 'desc') => void;
+  pageCount?: number;
+  sortOrder?: 'asc' | 'desc';
+};
+
+const Table = ({ pageCount = 1, sortOrder = 'desc', ...props }: TableProps) => (
+  <InstrumentRepoSyncLogTable
+    pageCount={pageCount}
+    sortOrder={sortOrder}
+    onPageChange={() => undefined}
+    onSortOrderChange={() => undefined}
+    {...props}
+  />
+);
+
 const rows = () => screen.getAllByTestId('data-table-row');
 
 const statuses = () => screen.getAllByTestId('sync-log-status').map((badge) => badge.textContent);
@@ -37,18 +55,14 @@ afterEach(() => {
 
 describe('InstrumentRepoSyncLogTable', () => {
   it('should say so in one line when there is nothing to show, rather than render an empty table', () => {
-    render(<InstrumentRepoSyncLogTable logs={[]} />);
+    render(<Table logs={[]} />);
     expect(screen.getByText('No imports or syncs recorded yet.')).toBeTruthy();
     expect(screen.queryByTestId('data-table')).toBeNull();
   });
 
   it('should summarize one failure as a single plain-text line, clipped rather than wrapped', () => {
     const message = 'Instrument validation failed - content.0: Series item PHQ_9 edition 2 does not exist';
-    render(
-      <InstrumentRepoSyncLogTable
-        logs={[logFixture({ failures: [{ instrumentDir: 'CPP_SERIES', message, stage: 'LOAD' }] })]}
-      />
-    );
+    render(<Table logs={[logFixture({ failures: [{ instrumentDir: 'CPP_SERIES', message, stage: 'LOAD' }] })]} />);
     const summary = screen.getByTestId('sync-log-messages');
     expect(summary.textContent).toBe(`CPP_SERIES (Load): ${message}`);
     expect(summary.className).toContain('whitespace-nowrap');
@@ -57,7 +71,7 @@ describe('InstrumentRepoSyncLogTable', () => {
 
   it('should summarize several failures as a count, so the row stays one line however many there are', () => {
     render(
-      <InstrumentRepoSyncLogTable
+      <Table
         logs={[
           logFixture({
             failures: [
@@ -74,7 +88,7 @@ describe('InstrumentRepoSyncLogTable', () => {
   it('should show every failure in full when View is clicked, since the cell only holds a summary', () => {
     const message = 'Transform failed with 1 error: /BROKEN_FORM/index.ts:14:22: ERROR: Expected ")" but found "{"';
     render(
-      <InstrumentRepoSyncLogTable
+      <Table
         logs={[
           logFixture({
             failures: [
@@ -94,11 +108,7 @@ describe('InstrumentRepoSyncLogTable', () => {
   });
 
   it('should close the error dialog on dismissal, so another row can be inspected next', () => {
-    render(
-      <InstrumentRepoSyncLogTable
-        logs={[logFixture({ failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }] })]}
-      />
-    );
+    render(<Table logs={[logFixture({ failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }] })]} />);
     fireEvent.click(screen.getByTestId('sync-log-view-messages'));
     expect(screen.queryByTestId('sync-log-error-details')).toBeTruthy();
 
@@ -108,20 +118,20 @@ describe('InstrumentRepoSyncLogTable', () => {
   });
 
   it('should show the reason the whole repository could not be read in the dialog too', () => {
-    render(<InstrumentRepoSyncLogTable logs={[logFixture({ message: 'Repository not found (404)' })]} />);
+    render(<Table logs={[logFixture({ message: 'Repository not found (404)' })]} />);
     fireEvent.click(screen.getByTestId('sync-log-view-messages'));
     expect(within(screen.getByTestId('sync-log-error-details')).getByText('Repository not found (404)')).toBeTruthy();
   });
 
   it('should mark a sync with no failed instrument as a success', () => {
-    render(<InstrumentRepoSyncLogTable logs={[logFixture()]} />);
+    render(<Table logs={[logFixture()]} />);
     expect(statuses()).toEqual(['Success']);
     expect(within(rows()[0]!).getByText('-')).toBeTruthy();
   });
 
   it('should mark a sync that skipped some instruments as a partial success, and say which and why', () => {
     render(
-      <InstrumentRepoSyncLogTable
+      <Table
         logs={[
           logFixture({
             failures: [{ instrumentDir: 'PHQ_9', message: 'Instrument validation failed', stage: 'LOAD' }]
@@ -134,14 +144,14 @@ describe('InstrumentRepoSyncLogTable', () => {
   });
 
   it('should mark a sync that could not read the repository as failed, with the reason', () => {
-    render(<InstrumentRepoSyncLogTable logs={[logFixture({ importedCount: 0, message: 'Repository not found' })]} />);
+    render(<Table logs={[logFixture({ importedCount: 0, message: 'Repository not found' })]} />);
     expect(statuses()).toEqual(['Failed']);
     expect(screen.getByTestId('sync-log-messages').textContent).toBe('Repository not found');
   });
 
   it('should label an import and a compile failure in words rather than as codes', () => {
     render(
-      <InstrumentRepoSyncLogTable
+      <Table
         logs={[logFixture({ action: 'IMPORT', failures: [{ instrumentDir: 'A', message: 'x', stage: 'BUNDLE' }] })]}
       />
     );
@@ -149,53 +159,66 @@ describe('InstrumentRepoSyncLogTable', () => {
     expect(within(rows()[0]!).getByTestId('sync-log-messages').textContent).toBe('A (Compile): x');
   });
 
-  it('should list the newest entry first until another column is sorted', () => {
+  it('should render the page in the order it was given, since the server does the ordering', () => {
     render(
-      <InstrumentRepoSyncLogTable
+      <Table
         logs={[
-          logFixture({ createdAt: new Date('2026-09-01'), id: 'older', repoName: 'Older' }),
-          logFixture({ createdAt: new Date('2026-10-01'), id: 'newer', repoName: 'Newer' })
+          logFixture({ createdAt: new Date('2026-10-01'), id: 'newer', repoName: 'Newer' }),
+          logFixture({ createdAt: new Date('2026-09-01'), id: 'older', repoName: 'Older' })
         ]}
       />
     );
     expect(within(rows()[0]!).getByText('Newer')).toBeTruthy();
   });
 
-  it('should sort by a column when its header is clicked', () => {
-    render(
-      <InstrumentRepoSyncLogTable
-        logs={[
-          logFixture({ createdAt: new Date('2026-10-01'), id: 'b', repoName: 'Beta' }),
-          logFixture({ createdAt: new Date('2026-09-01'), id: 'a', repoName: 'Alpha' })
-        ]}
-      />
-    );
-    fireEvent.click(within(screen.getByTestId('data-table-head')).getByText('Repository'));
-    expect(within(rows()[0]!).getByText('Alpha')).toBeTruthy();
+  it('should ask for the other order when the date header is clicked, rather than sort the page', () => {
+    const onSortOrderChange = vi.fn();
+    render(<Table logs={[logFixture()]} onSortOrderChange={onSortOrderChange} />);
+
+    fireEvent.click(within(screen.getByTestId('data-table-head')).getByText('Date'));
+
+    expect(onSortOrderChange).toHaveBeenCalledWith('asc');
   });
 
-  it('should group entries by status when the status header is clicked', () => {
-    render(
-      <InstrumentRepoSyncLogTable
-        logs={[
-          logFixture({ createdAt: new Date('2026-10-02'), id: 'success' }),
-          logFixture({ createdAt: new Date('2026-10-01'), id: 'failed', message: 'Repository not found' })
-        ]}
-      />
-    );
-    fireEvent.click(within(screen.getByTestId('data-table-head')).getByText('Status'));
-    expect(statuses()).toEqual(['Failed', 'Success']);
+  it('should cycle the order it asks for, since the column clears back to ascending', () => {
+    const onSortOrderChange = vi.fn();
+    render(<Table logs={[logFixture()]} onSortOrderChange={onSortOrderChange} />);
+    const date = within(screen.getByTestId('data-table-head')).getByText('Date');
+
+    fireEvent.click(date);
+    fireEvent.click(date);
+    fireEvent.click(date);
+
+    expect(onSortOrderChange.mock.calls.flat()).toEqual(['asc', 'desc', 'asc']);
+  });
+
+  it('should offer no sorting on a column the server cannot order by, so no control can mislead', () => {
+    render(<Table logs={[logFixture({ message: 'Repository not found' })]} />);
+    const head = within(screen.getByTestId('data-table-head'));
+    expect(head.getByText('Date').tagName).toBe('BUTTON');
+    expect(head.getByText('Status').tagName).not.toBe('BUTTON');
+    expect(head.getByText('Repository').tagName).not.toBe('BUTTON');
+  });
+
+  it('should ask for the next page rather than hold the whole history', () => {
+    const onPageChange = vi.fn();
+    render(<Table logs={[logFixture()]} pageCount={3} onPageChange={onPageChange} />);
+
+    // The arrows carry no accessible name, so the test drives the numbered page button.
+    fireEvent.click(screen.getByRole('button', { name: '2' }));
+
+    expect(onPageChange).toHaveBeenCalledWith(2);
   });
 
   it('should colour the status dot for the dark theme when the app is dark', () => {
     theme.current = 'dark';
-    render(<InstrumentRepoSyncLogTable logs={[logFixture()]} />);
+    render(<Table logs={[logFixture()]} />);
     const dot = screen.getByTestId('sync-log-status').firstElementChild as HTMLElement;
     expect(dot.style.backgroundColor).toBe('#22c55e');
   });
 
   it('should colour the status dot for the light theme otherwise', () => {
-    render(<InstrumentRepoSyncLogTable logs={[logFixture({ message: 'Repository not found' })]} />);
+    render(<Table logs={[logFixture({ message: 'Repository not found' })]} />);
     const dot = screen.getByTestId('sync-log-status').firstElementChild as HTMLElement;
     expect(dot.style.backgroundColor).toBe('#dc2626');
   });
