@@ -39,6 +39,12 @@ type RepoImportResult = { createdIds: string[]; failures: InstrumentRepoSyncFail
 type InstrumentRepoRecord = Awaited<ReturnType<Model<'InstrumentRepo'>['findFirstOrThrow']>>;
 
 /**
+ * The newest entries one request returns. The collection is append-only and nothing prunes it, so an
+ * unbounded read grows with the instance's whole history.
+ */
+const SYNC_LOG_LIMIT = 500;
+
+/**
  * The detail Nest exceptions thrown by `InstrumentsService.create` carry beyond their message: a VM
  * evaluation error as `cause`, schema validation errors as `issues`.
  */
@@ -157,7 +163,7 @@ export class InstrumentReposService implements OnModuleInit {
     return this.stripSecrets(deleted);
   }
 
-  /** Erase the whole sync history. The repositories and their instruments are untouched. */
+  /** Erase the whole activity log. The repositories and their instruments are untouched. */
   async deleteSyncLogs({ ability }: EntityOperationOptions = {}) {
     return this.instrumentRepoSyncLogModel.deleteMany({
       where: accessibleQuery(ability, 'delete', 'InstrumentRepoSyncLog')
@@ -174,6 +180,7 @@ export class InstrumentReposService implements OnModuleInit {
   async findSyncLogs({ ability }: EntityOperationOptions = {}) {
     return this.instrumentRepoSyncLogModel.findMany({
       orderBy: { createdAt: 'desc' },
+      take: SYNC_LOG_LIMIT,
       where: accessibleQuery(ability, 'read', 'InstrumentRepoSyncLog')
     });
   }
@@ -187,8 +194,10 @@ export class InstrumentReposService implements OnModuleInit {
     }
   }
 
-  async sync(id: string) {
-    const repo = await this.instrumentRepoModel.findFirst({ where: { id } });
+  async sync(id: string, { ability }: EntityOperationOptions = {}) {
+    const repo = await this.instrumentRepoModel.findFirst({
+      where: { AND: [accessibleQuery(ability, 'update', 'InstrumentRepo')], id }
+    });
     if (!repo) {
       throw new NotFoundException(`Failed to find instrument repo with ID: ${id}`);
     }

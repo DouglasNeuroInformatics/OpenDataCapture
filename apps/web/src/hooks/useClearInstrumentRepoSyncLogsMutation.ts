@@ -18,9 +18,9 @@ export function useClearInstrumentRepoSyncLogsMutation() {
         message: getApiErrorMessage(
           err,
           t({
-            en: 'Failed to clear the sync history',
-            es: 'Error al borrar el historial de sincronización',
-            fr: "Échec de l'effacement de l'historique de synchronisation"
+            en: 'Failed to clear the activity log',
+            es: 'Error al borrar el registro de actividad',
+            fr: "Échec de l'effacement du journal d'activité"
           })
         ),
         type: 'error'
@@ -29,9 +29,9 @@ export function useClearInstrumentRepoSyncLogsMutation() {
     onSuccess() {
       addNotification({
         message: t({
-          en: 'Sync history cleared',
-          es: 'Historial de sincronización borrado',
-          fr: 'Historique de synchronisation effacé'
+          en: 'Activity log cleared',
+          es: 'Registro de actividad borrado',
+          fr: "Journal d'activité effacé"
         }),
         type: 'success'
       });

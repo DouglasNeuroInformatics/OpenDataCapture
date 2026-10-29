@@ -178,7 +178,7 @@ describe('Route', () => {
 
   afterEach(cleanup);
 
-  it('should prefetch the repositories, groups and sync history in the loader, so the page renders without a waterfall', async () => {
+  it('should prefetch the repositories, groups and activity log in the loader, so the page renders without a waterfall', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);
     await runLoader(queryClient);
@@ -187,6 +187,14 @@ describe('Route', () => {
       [{ queryKey: ['groups'] }],
       [{ queryKey: ['instrument-repo-sync-logs'] }]
     ]);
+  });
+
+  it('should start all three prefetches before awaiting any, so the page does not wait out three round trips', async () => {
+    const queryClient = new QueryClient();
+    const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);
+    const loading = runLoader(queryClient);
+    expect(ensureQueryData).toHaveBeenCalledTimes(3);
+    await loading;
   });
 
   it('should truncate a long URL in its cell and keep the full URL on hover, so it cannot run into the next column', () => {
@@ -205,15 +213,42 @@ describe('Route', () => {
     expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('1');
   });
 
-  it('should show a dash for the failed count of a repository with no sync history', () => {
+  it('should read the failed count from the newest log by its timestamp, not by its place in the list', () => {
+    mocks.syncLogs = [
+      syncLogFixture({ createdAt: new Date('2026-10-01'), id: 'older' }),
+      syncLogFixture({
+        createdAt: new Date('2026-10-02'),
+        failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }],
+        id: 'newest'
+      })
+    ];
+    renderPage();
+    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('1');
+  });
+
+  it('should ignore a log with no repository, since a failed import is recorded before one exists', () => {
+    mocks.syncLogs = [
+      syncLogFixture({
+        createdAt: new Date('2026-10-03'),
+        id: 'orphan',
+        message: 'Repository not found',
+        repoId: null
+      }),
+      syncLogFixture({ failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }], id: 'log-1' })
+    ];
+    renderPage();
+    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('1');
+  });
+
+  it('should show a dash for the failed count of a repository with no activity log', () => {
     renderPage();
     expect(within(rows()[0]!).queryByTestId('instrument-repo-failed-count')).toBeNull();
   });
 
-  it('should say the latest sync failed when the repository could not be read at all', () => {
+  it('should say the repository could not be read when the whole import or sync failed', () => {
     mocks.syncLogs = [syncLogFixture({ message: 'Repository not found' })];
     renderPage();
-    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('Sync failed');
+    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('Could not be read');
   });
 
   it('should sync every repository from the Sync All button', () => {
@@ -227,7 +262,7 @@ describe('Route', () => {
     expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Sync All' }).disabled).toBe(true);
   });
 
-  it('should show the sync history of every repository below the table', () => {
+  it('should show the activity log of every repository below the table', () => {
     mocks.syncLogs = [syncLogFixture(), syncLogFixture({ id: 'log-2', repoId: 'repo-2', repoName: 'Other Repo' })];
     renderPage();
     const history = screen.getByTestId('instrument-repo-sync-log');
@@ -235,16 +270,16 @@ describe('Route', () => {
     expect(within(history).getByText('Other Repo')).toBeTruthy();
   });
 
-  it('should not offer to clear an empty sync history', () => {
+  it('should not offer to clear an empty activity log', () => {
     renderPage();
-    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Clear History' }).disabled).toBe(true);
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Clear Log' }).disabled).toBe(true);
   });
 
   it('should warn that clearing the history deletes it from the database before doing so', () => {
     mocks.syncLogs = [syncLogFixture()];
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: 'Clear History' }));
-    expect(screen.getByText('Clear the sync history?')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Clear Log' }));
+    expect(screen.getByText('Clear the activity log?')).toBeTruthy();
     expect(screen.getByRole('dialog').textContent).toContain('permanently deleted from the database');
     expect(mocks.clearSyncLogs).not.toHaveBeenCalled();
   });
@@ -252,19 +287,19 @@ describe('Route', () => {
   it('should clear the history once the warning is accepted', () => {
     mocks.syncLogs = [syncLogFixture()];
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: 'Clear History' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Clear Log' }));
     fireEvent.click(screen.getByRole('button', { name: 'Yes' }));
     expect(mocks.clearSyncLogs).toHaveBeenCalledOnce();
-    expect(screen.queryByText('Clear the sync history?')).toBeNull();
+    expect(screen.queryByText('Clear the activity log?')).toBeNull();
   });
 
   it('should keep the history when the warning is declined', () => {
     mocks.syncLogs = [syncLogFixture()];
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: 'Clear History' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Clear Log' }));
     fireEvent.click(screen.getByRole('button', { name: 'No' }));
     expect(mocks.clearSyncLogs).not.toHaveBeenCalled();
-    expect(screen.queryByText('Clear the sync history?')).toBeNull();
+    expect(screen.queryByText('Clear the activity log?')).toBeNull();
   });
 
   it('should show only the selected repository in its logs dialog', () => {
@@ -272,8 +307,17 @@ describe('Route', () => {
     renderPage();
     fireEvent.click(rowAction('Logs'));
     const dialog = screen.getByRole('dialog');
-    expect(within(dialog).getByText('Sync history of "Core Repo"')).toBeTruthy();
+    expect(within(dialog).getByText('Activity log of "Core Repo"')).toBeTruthy();
     expect(within(dialog).queryByText('Other Repo')).toBeNull();
+  });
+
+  it('should describe the logs dialog, since a dialog without one is announced with its title alone', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    fireEvent.click(rowAction('Logs'));
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.getAttribute('aria-describedby')).toBeTruthy();
+    expect(within(dialog).getByText('Every import and sync of this repository, newest first.')).toBeTruthy();
   });
 
   it('should count the instruments a repository contributed', () => {

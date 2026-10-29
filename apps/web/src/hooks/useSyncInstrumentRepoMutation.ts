@@ -53,9 +53,9 @@ export function useSyncInstrumentRepoMutation() {
         failedCount
           ? {
               message: t({
-                en: `Repository synced, but ${failedCount} instruments failed. See the sync history.`,
-                es: `Repositorio sincronizado, pero ${failedCount} instrumentos fallaron. Consulte el historial de sincronización.`,
-                fr: `Dépôt synchronisé, mais ${failedCount} instruments ont échoué. Consultez l'historique de synchronisation.`
+                en: `Repository synced, but ${failedCount} instruments failed. See the activity log.`,
+                es: `Repositorio sincronizado, pero ${failedCount} instrumentos fallaron. Consulte el registro de actividad.`,
+                fr: `Dépôt synchronisé, mais ${failedCount} instruments ont échoué. Consultez le journal d'activité.`
               }),
               type: 'warning'
             }

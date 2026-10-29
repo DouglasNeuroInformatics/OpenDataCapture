@@ -36,6 +36,83 @@ afterEach(() => {
 });
 
 describe('InstrumentRepoSyncLogTable', () => {
+  it('should say so in one line when there is nothing to show, rather than render an empty table', () => {
+    render(<InstrumentRepoSyncLogTable logs={[]} />);
+    expect(screen.getByText('No imports or syncs recorded yet.')).toBeTruthy();
+    expect(screen.queryByTestId('data-table')).toBeNull();
+  });
+
+  it('should summarize one failure as a single plain-text line, clipped rather than wrapped', () => {
+    const message = 'Instrument validation failed - content.0: Series item PHQ_9 edition 2 does not exist';
+    render(
+      <InstrumentRepoSyncLogTable
+        logs={[logFixture({ failures: [{ instrumentDir: 'CPP_SERIES', message, stage: 'LOAD' }] })]}
+      />
+    );
+    const summary = screen.getByTestId('sync-log-messages');
+    expect(summary.textContent).toBe(`CPP_SERIES (Load): ${message}`);
+    expect(summary.className).toContain('whitespace-nowrap');
+    expect(summary.className).toContain('text-ellipsis');
+  });
+
+  it('should summarize several failures as a count, so the row stays one line however many there are', () => {
+    render(
+      <InstrumentRepoSyncLogTable
+        logs={[
+          logFixture({
+            failures: [
+              { instrumentDir: 'A', message: 'broken', stage: 'BUNDLE' },
+              { instrumentDir: 'B', message: 'also broken', stage: 'LOAD' }
+            ]
+          })
+        ]}
+      />
+    );
+    expect(screen.getByTestId('sync-log-messages').textContent).toBe('2 instruments failed');
+  });
+
+  it('should show every failure in full when View is clicked, since the cell only holds a summary', () => {
+    const message = 'Transform failed with 1 error: /BROKEN_FORM/index.ts:14:22: ERROR: Expected ")" but found "{"';
+    render(
+      <InstrumentRepoSyncLogTable
+        logs={[
+          logFixture({
+            failures: [
+              { instrumentDir: 'BROKEN_FORM', message, stage: 'BUNDLE' },
+              { instrumentDir: 'MOCA_V2', message: 'details.title: Expected string', stage: 'LOAD' }
+            ]
+          })
+        ]}
+      />
+    );
+    fireEvent.click(screen.getByTestId('sync-log-view-messages'));
+    const details = screen.getByTestId('sync-log-error-details');
+    expect(within(details).getByText(message)).toBeTruthy();
+    expect(within(details).getByText('details.title: Expected string')).toBeTruthy();
+    expect(within(details).getByText('BROKEN_FORM')).toBeTruthy();
+    expect(within(details).getByText('Compile')).toBeTruthy();
+  });
+
+  it('should close the error dialog on dismissal, so another row can be inspected next', () => {
+    render(
+      <InstrumentRepoSyncLogTable
+        logs={[logFixture({ failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }] })]}
+      />
+    );
+    fireEvent.click(screen.getByTestId('sync-log-view-messages'));
+    expect(screen.queryByTestId('sync-log-error-details')).toBeTruthy();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(screen.queryByTestId('sync-log-error-details')).toBeNull();
+  });
+
+  it('should show the reason the whole repository could not be read in the dialog too', () => {
+    render(<InstrumentRepoSyncLogTable logs={[logFixture({ message: 'Repository not found (404)' })]} />);
+    fireEvent.click(screen.getByTestId('sync-log-view-messages'));
+    expect(within(screen.getByTestId('sync-log-error-details')).getByText('Repository not found (404)')).toBeTruthy();
+  });
+
   it('should mark a sync with no failed instrument as a success', () => {
     render(<InstrumentRepoSyncLogTable logs={[logFixture()]} />);
     expect(statuses()).toEqual(['Success']);
@@ -53,16 +130,13 @@ describe('InstrumentRepoSyncLogTable', () => {
       />
     );
     expect(statuses()).toEqual(['Partial success']);
-    const messages = screen.getByTestId('sync-log-messages');
-    expect(within(messages).getByText('PHQ_9')).toBeTruthy();
-    expect(within(messages).getByText('Load')).toBeTruthy();
-    expect(messages.textContent).toContain('Instrument validation failed');
+    expect(screen.getByTestId('sync-log-messages').textContent).toBe('PHQ_9 (Load): Instrument validation failed');
   });
 
   it('should mark a sync that could not read the repository as failed, with the reason', () => {
     render(<InstrumentRepoSyncLogTable logs={[logFixture({ importedCount: 0, message: 'Repository not found' })]} />);
     expect(statuses()).toEqual(['Failed']);
-    expect(within(screen.getByTestId('sync-log-messages')).getByText('Repository not found')).toBeTruthy();
+    expect(screen.getByTestId('sync-log-messages').textContent).toBe('Repository not found');
   });
 
   it('should label an import and a compile failure in words rather than as codes', () => {
@@ -72,7 +146,7 @@ describe('InstrumentRepoSyncLogTable', () => {
       />
     );
     expect(within(rows()[0]!).getByText('Import')).toBeTruthy();
-    expect(within(rows()[0]!).getByText('Compile')).toBeTruthy();
+    expect(within(rows()[0]!).getByTestId('sync-log-messages').textContent).toBe('A (Compile): x');
   });
 
   it('should list the newest entry first until another column is sorted', () => {

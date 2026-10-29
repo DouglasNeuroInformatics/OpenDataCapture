@@ -96,7 +96,7 @@ describe('useSyncAllInstrumentReposMutation', () => {
     const { result } = renderSyncAllMutation();
     await result.current.mutateAsync();
     expect(addNotification).toHaveBeenLastCalledWith({
-      message: '2 of 3 repositories had problems. See the sync history.',
+      message: '2 of 3 repositories had problems. See the activity log.',
       type: 'warning'
     });
   });

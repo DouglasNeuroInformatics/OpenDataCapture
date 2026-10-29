@@ -45,10 +45,10 @@ describe('InstrumentReposController', () => {
     expect(service.findAll).toHaveBeenCalledWith({ ability });
   });
 
-  it('should sync the requested repository', async () => {
+  it("should scope the sync of one repository to the current user's ability", async () => {
     service.sync.mockResolvedValueOnce(repo);
-    await expect(controller.sync('repo-1')).resolves.toBe(repo);
-    expect(service.sync).toHaveBeenCalledWith('repo-1');
+    await expect(controller.sync('repo-1', ability)).resolves.toBe(repo);
+    expect(service.sync).toHaveBeenCalledWith('repo-1', { ability });
   });
 
   it("should sync every repository the current user's ability allows", async () => {
@@ -57,13 +57,13 @@ describe('InstrumentReposController', () => {
     expect(service.syncAll).toHaveBeenCalledWith({ ability });
   });
 
-  it("should scope the sync history to the current user's ability", async () => {
+  it("should scope the activity log to the current user's ability", async () => {
     service.findSyncLogs.mockResolvedValueOnce([]);
     await expect(controller.findSyncLogs(ability)).resolves.toStrictEqual([]);
     expect(service.findSyncLogs).toHaveBeenCalledWith({ ability });
   });
 
-  it("should clear the sync history within the current user's ability", async () => {
+  it("should clear the activity log within the current user's ability", async () => {
     service.deleteSyncLogs.mockResolvedValueOnce({ count: 2 });
     await expect(controller.deleteSyncLogs(ability)).resolves.toStrictEqual({ count: 2 });
     expect(service.deleteSyncLogs).toHaveBeenCalledWith({ ability });

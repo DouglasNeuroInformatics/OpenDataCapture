@@ -34,7 +34,7 @@ describe('useClearInstrumentRepoSyncLogsMutation', () => {
     mockAxios.delete.mockResolvedValue({ data: { count: 2 } });
   });
 
-  it('should delete the sync history without the default error toast, since it raises its own', async () => {
+  it('should delete the activity log without the default error toast, since it raises its own', async () => {
     const { result } = renderClearMutation();
     await result.current.mutateAsync();
     expect(mockAxios.delete).toHaveBeenCalledWith('/v1/instrument-repos/sync/logs', {
@@ -45,7 +45,7 @@ describe('useClearInstrumentRepoSyncLogsMutation', () => {
   it('should announce the history was cleared and refresh it', async () => {
     const { invalidateQueries, result } = renderClearMutation();
     await result.current.mutateAsync();
-    expect(addNotification).toHaveBeenLastCalledWith({ message: 'Sync history cleared', type: 'success' });
+    expect(addNotification).toHaveBeenLastCalledWith({ message: 'Activity log cleared', type: 'success' });
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['instrument-repo-sync-logs'] });
   });
 
@@ -54,6 +54,6 @@ describe('useClearInstrumentRepoSyncLogsMutation', () => {
     const { result } = renderClearMutation();
     result.current.mutate();
     await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(addNotification).toHaveBeenLastCalledWith({ message: 'Failed to clear the sync history', type: 'error' });
+    expect(addNotification).toHaveBeenLastCalledWith({ message: 'Failed to clear the activity log', type: 'error' });
   });
 });

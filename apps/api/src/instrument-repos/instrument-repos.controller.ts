@@ -25,7 +25,7 @@ export class InstrumentReposController {
     return this.instrumentReposService.deleteById(id, { ability });
   }
 
-  @ApiOperation({ summary: 'Clear the Sync History of Every Instrument Repo' })
+  @ApiOperation({ summary: 'Clear the Activity Log of Every Instrument Repo' })
   @Delete('sync/logs')
   @RouteAccess(ADMIN_ONLY)
   deleteSyncLogs(@CurrentUser('ability') ability?: AppAbility) {
@@ -39,7 +39,13 @@ export class InstrumentReposController {
     return this.instrumentReposService.findAll({ ability });
   }
 
-  @ApiOperation({ summary: 'Get the Sync History of Every Instrument Repo' })
+  /**
+   * Admin-only where the two sync routes are not, because this is the one that crosses repositories.
+   * `InstrumentRepoSyncLog` carries no group, and is absent from `$AppSubjectName` so that no user can
+   * be granted it, which leaves nothing to confine a read of the whole history to the repositories the
+   * caller may see. The sync routes return only the log of a repository the caller may already update.
+   */
+  @ApiOperation({ summary: 'Get the Activity Log of Every Instrument Repo' })
   @Get('sync/logs')
   @RouteAccess(ADMIN_ONLY)
   findSyncLogs(@CurrentUser('ability') ability?: AppAbility) {
@@ -49,8 +55,8 @@ export class InstrumentReposController {
   @ApiOperation({ summary: 'Sync Instrument Repo' })
   @Post(':id/sync')
   @RouteAccess({ action: 'update', subject: 'InstrumentRepo' })
-  sync(@Param('id') id: string) {
-    return this.instrumentReposService.sync(id);
+  sync(@Param('id') id: string, @CurrentUser('ability') ability?: AppAbility) {
+    return this.instrumentReposService.sync(id, { ability });
   }
 
   @ApiOperation({ summary: 'Sync Every Instrument Repo' })

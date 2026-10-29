@@ -1,4 +1,6 @@
-import { Badge, DataTable } from '@douglasneuroinformatics/libui/components';
+import { Fragment, useState } from 'react';
+
+import { Badge, Button, DataTable, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRepoSyncLog, InstrumentRepoSyncStage } from '@opendatacapture/schemas/instrument-repo';
 
@@ -15,6 +17,7 @@ type InstrumentRepoSyncLogTableProps = {
 export const InstrumentRepoSyncLogTable = ({ logs }: InstrumentRepoSyncLogTableProps) => {
   const { t } = useTranslation();
   const [theme] = useTheme();
+  const [logToView, setLogToView] = useState<InstrumentRepoSyncLog | null>(null);
 
   const statusLabels = {
     FAILED: t({ en: 'Failed', es: 'Fallido', fr: 'Échec' }),
@@ -32,91 +35,173 @@ export const InstrumentRepoSyncLogTable = ({ logs }: InstrumentRepoSyncLogTableP
     LOAD: t({ en: 'Load', es: 'Carga', fr: 'Chargement' })
   } satisfies { [K in InstrumentRepoSyncStage]: string };
 
+  /**
+   * The cell holds one line of plain text, so a reason long enough to wrap would otherwise make the
+   * row several times taller than the rest. The whole reason lives in the dialog the View button opens.
+   */
+  const summarize = ({ failures, message }: InstrumentRepoSyncLog): null | string => {
+    if (message) {
+      return message;
+    }
+    if (failures.length > 1) {
+      return t({
+        en: `${failures.length} instruments failed`,
+        es: `${failures.length} instrumentos fallaron`,
+        fr: `${failures.length} instruments ont échoué`
+      });
+    }
+    const [failure] = failures;
+    if (!failure) {
+      return null;
+    }
+    return `${failure.instrumentDir} (${stageLabels[failure.stage]}): ${failure.message}`;
+  };
+
+  /** Which import or sync the dialog is showing, since the dialog is detached from its row. */
+  const describeLog = (log: InstrumentRepoSyncLog) =>
+    `${log.repoName} · ${actionLabels[log.action]} · ${log.createdAt.toLocaleString()}`;
+
+  if (logs.length === 0) {
+    // Not an empty DataTable: its own empty state is a fixed 288px tall, which dwarfs the heading.
+    return (
+      <p
+        className="text-muted-foreground rounded-md border py-4 text-center text-sm"
+        data-testid="instrument-repo-sync-log"
+      >
+        {t({
+          en: 'No imports or syncs recorded yet.',
+          es: 'Aún no se han registrado importaciones ni sincronizaciones.',
+          fr: "Aucun import ni synchronisation enregistré pour l'instant."
+        })}
+      </p>
+    );
+  }
+
   return (
-    <div data-testid="instrument-repo-sync-log">
-      <DataTable
-        columns={[
-          {
-            accessorFn: (log: InstrumentRepoSyncLog) => log.createdAt.getTime(),
-            cell: (ctx) => ctx.row.original.createdAt.toLocaleString(),
-            header: ({ column }) => (
-              <SortableHeader column={column} label={t({ en: 'Date', es: 'Fecha', fr: 'Date' })} />
-            ),
-            id: 'date'
-          },
-          {
-            accessorKey: 'repoName',
-            header: ({ column }) => (
-              <SortableHeader column={column} label={t({ en: 'Repository', es: 'Repositorio', fr: 'Dépôt' })} />
-            )
-          },
-          {
-            accessorFn: (log: InstrumentRepoSyncLog) => actionLabels[log.action],
-            header: ({ column }) => (
-              <SortableHeader column={column} label={t({ en: 'Action', es: 'Acción', fr: 'Action' })} />
-            ),
-            id: 'action'
-          },
-          {
-            accessorFn: (log: InstrumentRepoSyncLog) => getSyncStatus(log),
-            cell: (ctx) => {
-              const status = getSyncStatus(ctx.row.original);
-              return (
-                <ColorTagCell
-                  color={getSyncStatusColor(status, theme === 'dark' ? 'dark' : 'light')}
-                  data-testid="sync-log-status"
-                  label={statusLabels[status]}
-                />
-              );
+    <Fragment>
+      <div data-testid="instrument-repo-sync-log">
+        <DataTable
+          columns={[
+            {
+              accessorFn: (log: InstrumentRepoSyncLog) => log.createdAt.getTime(),
+              cell: (ctx) => ctx.row.original.createdAt.toLocaleString(),
+              header: ({ column }) => (
+                <SortableHeader column={column} label={t({ en: 'Date', es: 'Fecha', fr: 'Date' })} />
+              ),
+              id: 'date'
             },
-            header: ({ column }) => (
-              <SortableHeader column={column} label={t({ en: 'Status', es: 'Estado', fr: 'Statut' })} />
-            ),
-            id: 'status'
-          },
-          {
-            accessorKey: 'importedCount',
-            header: ({ column }) => (
-              <SortableHeader column={column} label={t({ en: 'Imported', es: 'Importados', fr: 'Importés' })} />
-            )
-          },
-          {
-            accessorFn: (log: InstrumentRepoSyncLog) => log.failures.length,
-            header: ({ column }) => (
-              <SortableHeader column={column} label={t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' })} />
-            ),
-            id: 'failedCount'
-          },
-          {
-            cell: (ctx) => {
-              const { failures, message } = ctx.row.original;
-              if (!message && failures.length === 0) {
-                return '-';
-              }
-              return (
-                <ul className="flex flex-col gap-1 text-sm whitespace-normal" data-testid="sync-log-messages">
-                  {message && <li className="text-destructive">{message}</li>}
-                  {failures.map(({ instrumentDir, message, stage }) => (
-                    <li key={instrumentDir}>
-                      <span className="font-medium">{instrumentDir}</span>
-                      <Badge className="mx-1.5" variant="outline">
-                        {stageLabels[stage]}
-                      </Badge>
-                      {message}
-                    </li>
-                  ))}
-                </ul>
-              );
+            {
+              accessorKey: 'repoName',
+              header: ({ column }) => (
+                <SortableHeader column={column} label={t({ en: 'Repository', es: 'Repositorio', fr: 'Dépôt' })} />
+              )
             },
-            enableSorting: false,
-            header: t({ en: 'Messages', es: 'Mensajes', fr: 'Messages' }),
-            id: 'messages',
-            size: 480
-          }
-        ]}
-        data={logs}
-        initialState={{ sorting: [{ desc: true, id: 'date' }] }}
-      />
-    </div>
+            {
+              accessorFn: (log: InstrumentRepoSyncLog) => actionLabels[log.action],
+              header: ({ column }) => (
+                <SortableHeader column={column} label={t({ en: 'Action', es: 'Acción', fr: 'Action' })} />
+              ),
+              id: 'action'
+            },
+            {
+              accessorFn: (log: InstrumentRepoSyncLog) => getSyncStatus(log),
+              cell: (ctx) => {
+                const status = getSyncStatus(ctx.row.original);
+                return (
+                  <ColorTagCell
+                    color={getSyncStatusColor(status, theme === 'dark' ? 'dark' : 'light')}
+                    data-testid="sync-log-status"
+                    label={statusLabels[status]}
+                  />
+                );
+              },
+              header: ({ column }) => (
+                <SortableHeader column={column} label={t({ en: 'Status', es: 'Estado', fr: 'Statut' })} />
+              ),
+              id: 'status'
+            },
+            {
+              accessorKey: 'importedCount',
+              header: ({ column }) => (
+                <SortableHeader column={column} label={t({ en: 'Imported', es: 'Importados', fr: 'Importés' })} />
+              )
+            },
+            {
+              accessorFn: (log: InstrumentRepoSyncLog) => log.failures.length,
+              header: ({ column }) => (
+                <SortableHeader column={column} label={t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' })} />
+              ),
+              id: 'failedCount'
+            },
+            {
+              cell: (ctx) => {
+                const log = ctx.row.original;
+                const summary = summarize(log);
+                if (!summary) {
+                  return '-';
+                }
+                return (
+                  <div className="flex w-full items-center gap-2">
+                    <span
+                      className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+                      data-testid="sync-log-messages"
+                      title={summary}
+                    >
+                      {summary}
+                    </span>
+                    <Button
+                      className="h-6 shrink-0 px-2"
+                      data-testid="sync-log-view-messages"
+                      size="sm"
+                      type="button"
+                      variant="outline"
+                      onClick={() => setLogToView(log)}
+                    >
+                      {t('common.view')}
+                    </Button>
+                  </div>
+                );
+              },
+              enableSorting: false,
+              header: t({ en: 'Messages', es: 'Mensajes', fr: 'Messages' }),
+              id: 'messages',
+              size: 480
+            }
+          ]}
+          data={logs}
+          initialState={{ sorting: [{ desc: true, id: 'date' }] }}
+        />
+      </div>
+      <Dialog open={logToView !== null} onOpenChange={() => setLogToView(null)}>
+        {logToView && (
+          <Dialog.Content className="sm:max-w-150">
+            <Dialog.Header>
+              <Dialog.Title>
+                {t({ en: 'Error Details', es: 'Detalles del error', fr: "Détails de l'erreur" })}
+              </Dialog.Title>
+              <Dialog.Description>{describeLog(logToView)}</Dialog.Description>
+            </Dialog.Header>
+            <div className="flex max-h-[60vh] flex-col gap-4 overflow-auto" data-testid="sync-log-error-details">
+              {logToView.message && (
+                <pre className="text-destructive font-mono text-xs break-words whitespace-pre-wrap">
+                  {logToView.message}
+                </pre>
+              )}
+              {logToView.failures.map(({ instrumentDir, message, stage }) => (
+                <div key={instrumentDir}>
+                  <div className="mb-1.5 flex items-center gap-2">
+                    <span className="text-sm font-medium">{instrumentDir}</span>
+                    <Badge variant="outline">{stageLabels[stage]}</Badge>
+                  </div>
+                  <pre className="bg-muted rounded-md p-3 font-mono text-xs break-words whitespace-pre-wrap">
+                    {message}
+                  </pre>
+                </div>
+              ))}
+            </div>
+          </Dialog.Content>
+        )}
+      </Dialog>
+    </Fragment>
   );
 };

@@ -87,7 +87,7 @@ test.describe('admin instrument repos refused import', () => {
   });
 });
 
-test.describe('admin instrument repos sync history', () => {
+test.describe('admin instrument repos activity log', () => {
   test.use({ actingRole: 'ADMIN' });
 
   // Answered by the test rather than the API, which must not reach out to GitHub under NODE_ENV=test.
@@ -106,7 +106,14 @@ test.describe('admin instrument repos sync history', () => {
   const partialSync = {
     action: 'SYNC',
     createdAt: '2026-10-28T00:00:00.000Z',
-    failures: [{ instrumentDir: 'CPP_SERIES', message: "Series item 'PHQ_9' edition 2 does not exist", stage: 'LOAD' }],
+    failures: [
+      {
+        instrumentDir: 'CPP_SERIES',
+        message:
+          "Instrument validation failed - content.0.items.1: Series item 'PHQ_9' edition 2 does not exist on this instance, so the series cannot be resolved",
+        stage: 'LOAD'
+      }
+    ],
     id: '6a0000000000000000000002',
     importedCount: 2,
     message: null,
@@ -140,7 +147,7 @@ test.describe('admin instrument repos sync history', () => {
     expect(overflow.spill).toBeLessThanOrEqual(0);
   });
 
-  test('should count the failed instruments and explain them in the sync history', async ({ getPageModel }) => {
+  test('should count the failed instruments and explain them in the activity log', async ({ getPageModel }) => {
     const reposPage = await getPageModel('/admin/instrument-repos');
 
     await expect(reposPage.dataTable.getByTestId('instrument-repo-failed-count')).toHaveText('1');
@@ -148,16 +155,50 @@ test.describe('admin instrument repos sync history', () => {
     const messages = reposPage.syncLogTable.getByTestId('sync-log-messages');
     await expect(messages).toContainText('CPP_SERIES');
     await expect(messages).toContainText('Load');
-    await expect(messages).toContainText("Series item 'PHQ_9' edition 2 does not exist");
   });
 
-  test('should open the sync history of one repository from its row actions', async ({ getPageModel }) => {
+  test('should keep a long failure reason to one line in its cell, and show it in full on View', async ({
+    getPageModel
+  }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    const summary = reposPage.syncLogTable.getByTestId('sync-log-messages');
+
+    const layout = await summary.evaluate((element) => ({
+      clipped: element.scrollWidth > element.clientWidth,
+      lines: Math.round(
+        element.getBoundingClientRect().height / Number.parseFloat(window.getComputedStyle(element).lineHeight)
+      )
+    }));
+    expect(layout.clipped).toBe(true);
+    expect(layout.lines).toBe(1);
+
+    await reposPage.syncLogTable.getByTestId('sync-log-view-messages').click();
+
+    const details = reposPage.$ref.getByTestId('sync-log-error-details');
+    await expect(details).toContainText('CPP_SERIES');
+    await expect(details).toContainText('Load');
+    await expect(details).toContainText("Series item 'PHQ_9' edition 2 does not exist on this instance");
+  });
+
+  test('should say the activity log is empty in one line, rather than render an empty table', async ({
+    getPageModel,
+    page
+  }) => {
+    await page.route(/\/v1\/instrument-repos\/sync\/logs/, (route) => route.fulfill({ json: [] }));
+    const reposPage = await getPageModel('/admin/instrument-repos');
+
+    await expect(reposPage.syncLogTable).toHaveText('No imports or syncs recorded yet.');
+    await expect(reposPage.syncLogTable.getByTestId('data-table')).toHaveCount(0);
+  });
+
+  test('should open the activity log of one repository from its row actions', async ({ getPageModel }) => {
     const reposPage = await getPageModel('/admin/instrument-repos');
 
     await reposPage.selectRowAction(0, 'Logs');
 
     const dialog = reposPage.$ref.getByRole('dialog');
-    await expect(dialog).toContainText(`Sync history of "${repo.name}"`);
+    await expect(dialog).toContainText(`Activity log of "${repo.name}"`);
+    await expect(dialog).toHaveAttribute('aria-describedby', /.+/);
     await expect(dialog.getByTestId('sync-log-status')).toHaveText('Partial success');
   });
 
@@ -183,11 +224,11 @@ test.describe('admin instrument repos sync history', () => {
 
     await reposPage.syncAllButton.click();
 
-    await expect(reposPage.$ref.getByText('1 of 1 repositories had problems. See the sync history.')).toBeVisible();
+    await expect(reposPage.$ref.getByText('1 of 1 repositories had problems. See the activity log.')).toBeVisible();
     expect(syncAllRequested).toBe(true);
   });
 
-  test('should clear the sync history only after warning that it is deleted from the database', async ({
+  test('should clear the activity log only after warning that it is deleted from the database', async ({
     getPageModel,
     page
   }) => {
@@ -196,12 +237,12 @@ test.describe('admin instrument repos sync history', () => {
       (request) => request.method() === 'DELETE' && request.url().endsWith('/v1/instrument-repos/sync/logs')
     );
 
-    await reposPage.clearHistoryButton.click();
+    await reposPage.clearLogButton.click();
     const dialog = reposPage.$ref.getByRole('dialog');
     await expect(dialog).toContainText('permanently deleted from the database');
     await dialog.getByRole('button', { name: 'Yes' }).click();
 
     await deleteRequest;
-    await expect(reposPage.$ref.getByText('Sync history cleared')).toBeVisible();
+    await expect(reposPage.$ref.getByText('Activity log cleared')).toBeVisible();
   });
 });

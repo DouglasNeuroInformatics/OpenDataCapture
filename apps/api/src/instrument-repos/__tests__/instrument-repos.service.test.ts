@@ -305,6 +305,14 @@ describe('InstrumentReposService', () => {
       await expect(service.sync('missing')).rejects.toBeInstanceOf(NotFoundException);
     });
 
+    it("should look the repo up within the repos the caller may update, so a sync cannot reach another group's", async () => {
+      instrumentRepoModel.findFirst.mockResolvedValueOnce(null);
+
+      await expect(service.sync('r1')).rejects.toBeInstanceOf(NotFoundException);
+
+      expect(instrumentRepoModel.findFirst).toHaveBeenCalledWith({ where: { AND: [{}], id: 'r1' } });
+    });
+
     it('should replace the instrument list with what the repo provides now, and return the sync log', async () => {
       const encryptedToken = internal.encrypt('stored-token');
       instrumentRepoModel.findFirst.mockResolvedValueOnce({
@@ -394,7 +402,19 @@ describe('InstrumentReposService', () => {
       instrumentRepoSyncLogModel.findMany.mockResolvedValueOnce([{ id: 'log-1' }]);
 
       await expect(service.findSyncLogs()).resolves.toStrictEqual([{ id: 'log-1' }]);
-      expect(instrumentRepoSyncLogModel.findMany).toHaveBeenCalledWith({ orderBy: { createdAt: 'desc' }, where: {} });
+      expect(instrumentRepoSyncLogModel.findMany).toHaveBeenCalledWith({
+        orderBy: { createdAt: 'desc' },
+        take: 500,
+        where: {}
+      });
+    });
+
+    it('should cap one request, so an append-only collection cannot grow the response without bound', async () => {
+      instrumentRepoSyncLogModel.findMany.mockResolvedValueOnce([]);
+
+      await service.findSyncLogs();
+
+      expect(instrumentRepoSyncLogModel.findMany.mock.lastCall?.[0]).toMatchObject({ take: 500 });
     });
 
     it('should download without a token when the repo stores none, so public repos sync', async () => {

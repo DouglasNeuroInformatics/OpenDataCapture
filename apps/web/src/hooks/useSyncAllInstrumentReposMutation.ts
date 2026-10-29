@@ -62,9 +62,9 @@ export function useSyncAllInstrumentReposMutation() {
       }
       addNotification({
         message: t({
-          en: `${problemCount} of ${logs.length} repositories had problems. See the sync history.`,
-          es: `${problemCount} de ${logs.length} repositorios tuvieron problemas. Consulte el historial de sincronización.`,
-          fr: `${problemCount} dépôts sur ${logs.length} ont rencontré des problèmes. Consultez l'historique de synchronisation.`
+          en: `${problemCount} of ${logs.length} repositories had problems. See the activity log.`,
+          es: `${problemCount} de ${logs.length} repositorios tuvieron problemas. Consulte el registro de actividad.`,
+          fr: `${problemCount} dépôts sur ${logs.length} ont rencontré des problèmes. Consultez le journal d'activité.`
         }),
         type: 'warning'
       });

@@ -70,6 +70,7 @@ const DATABASE_INDEXES: DatabaseIndex[] = [
   { collection: 'InstrumentRecordModel', fields: ['instrumentId'] },
   { collection: 'InstrumentRecordModel', fields: ['sessionId'] },
   { collection: 'InstrumentRepoModel', fields: ['url'], unique: true },
+  { collection: 'InstrumentRepoSyncLogModel', fields: ['createdAt'] },
   { collection: 'SessionModel', fields: ['groupId', 'date'] },
   { collection: 'SessionModel', fields: ['subjectId'] },
   { collection: 'SubjectModel', fields: ['groupIds'] },

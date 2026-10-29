@@ -91,12 +91,12 @@ describe('useSyncInstrumentRepoMutation', () => {
     const { result } = renderSyncMutation();
     await result.current.mutateAsync({ id: 'repo-1' });
     expect(addNotification).toHaveBeenLastCalledWith({
-      message: 'Repository synced, but 1 instruments failed. See the sync history.',
+      message: 'Repository synced, but 1 instruments failed. See the activity log.',
       type: 'warning'
     });
   });
 
-  it('should refresh the sync history even when the sync fails, because the failure is logged too', async () => {
+  it('should refresh the activity log even when the sync fails, because the failure is logged too', async () => {
     mockAxios.post.mockRejectedValueOnce(new Error('down'));
     const { invalidateQueries, result } = renderSyncMutation();
     result.current.mutate({ id: 'repo-1' });

@@ -285,6 +285,7 @@ model InstrumentRepoSyncLog {
   repoId        String?                     @db.ObjectId
   repoName      String
 
+  @@index([createdAt])
   @@map("InstrumentRepoSyncLogModel")
 }
 

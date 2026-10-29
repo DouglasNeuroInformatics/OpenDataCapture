@@ -152,11 +152,15 @@ const AddRepoForm = ({
   );
 };
 
-/** The most recent log per repository; the API returns the history newest first. */
+/** The most recent log per repository, by its own timestamp rather than its position in the list. */
 function latestSyncLogs(logs: InstrumentRepoSyncLog[]) {
   const latest = new Map<string, InstrumentRepoSyncLog>();
   for (const log of logs) {
-    if (log.repoId && !latest.has(log.repoId)) {
+    if (!log.repoId) {
+      continue;
+    }
+    const current = latest.get(log.repoId);
+    if (!current || current.createdAt < log.createdAt) {
       latest.set(log.repoId, log);
     }
   }
@@ -267,9 +271,9 @@ const RouteComponent = () => {
                 : row.instrumentIds.length;
             },
             header: t({
-              en: 'Imported',
-              es: 'Importados',
-              fr: 'Importés'
+              en: 'Instruments',
+              es: 'Instrumentos',
+              fr: 'Instruments'
             }),
             id: 'instrumentCount'
           },
@@ -282,7 +286,7 @@ const RouteComponent = () => {
               return (
                 <span data-testid="instrument-repo-failed-count">
                   {log.message
-                    ? t({ en: 'Sync failed', es: 'Sincronización fallida', fr: 'Échec de la synchronisation' })
+                    ? t({ en: 'Could not be read', es: 'No se pudo leer', fr: 'Lecture impossible' })
                     : log.failures.length}
                 </span>
               );
@@ -365,14 +369,14 @@ const RouteComponent = () => {
       <section className="mt-10 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <Heading variant="h4">
-            {t({ en: 'Sync History', es: 'Historial de sincronización', fr: 'Historique de synchronisation' })}
+            {t({ en: 'Activity Log', es: 'Registro de actividad', fr: "Journal d'activité" })}
           </Heading>
           <Button
             disabled={syncLogsQuery.data.length === 0 || clearSyncLogsMutation.isPending}
             variant="outline"
             onClick={() => setIsConfirmClearHistoryOpen(true)}
           >
-            {t({ en: 'Clear History', es: 'Borrar historial', fr: "Effacer l'historique" })}
+            {t({ en: 'Clear Log', es: 'Borrar registro', fr: 'Effacer le journal' })}
           </Button>
         </div>
         <InstrumentRepoSyncLogTable logs={syncLogsQuery.data} />
@@ -382,16 +386,16 @@ const RouteComponent = () => {
           <Dialog.Header>
             <Dialog.Title>
               {t({
-                en: 'Clear the sync history?',
-                es: '¿Borrar el historial de sincronización?',
-                fr: "Effacer l'historique de synchronisation ?"
+                en: 'Clear the activity log?',
+                es: '¿Borrar el registro de actividad?',
+                fr: "Effacer le journal d'activité ?"
               })}
             </Dialog.Title>
             <Dialog.Description>
               {t({
-                en: 'Every entry in the sync history will be permanently deleted from the database, including the reasons instruments failed. This cannot be undone. Repositories and their instruments are not affected.',
-                es: 'Todas las entradas del historial de sincronización se eliminarán permanentemente de la base de datos, incluidos los motivos por los que fallaron los instrumentos. Esta acción no se puede deshacer. Los repositorios y sus instrumentos no se verán afectados.',
-                fr: "Toutes les entrées de l'historique de synchronisation seront définitivement supprimées de la base de données, y compris les raisons des échecs des instruments. Cette action est irréversible. Les dépôts et leurs instruments ne sont pas touchés."
+                en: 'Every entry in the activity log will be permanently deleted from the database, including the reasons instruments failed. This cannot be undone. Repositories and their instruments are not affected.',
+                es: 'Todas las entradas del registro de actividad se eliminarán permanentemente de la base de datos, incluidos los motivos por los que fallaron los instrumentos. Esta acción no se puede deshacer. Los repositorios y sus instrumentos no se verán afectados.',
+                fr: "Toutes les entrées du journal d'activité seront définitivement supprimées de la base de données, y compris les raisons des échecs des instruments. Cette action est irréversible. Les dépôts et leurs instruments ne sont pas touchés."
               })}
             </Dialog.Description>
           </Dialog.Header>
@@ -423,11 +427,18 @@ const RouteComponent = () => {
           <Dialog.Header>
             <Dialog.Title>
               {t({
-                en: `Sync history of "${repoToShowLogs.name}"`,
-                es: `Historial de sincronización de "${repoToShowLogs.name}"`,
-                fr: `Historique de synchronisation de « ${repoToShowLogs.name} »`
+                en: `Activity log of "${repoToShowLogs.name}"`,
+                es: `Registro de actividad de "${repoToShowLogs.name}"`,
+                fr: `Journal d'activité de « ${repoToShowLogs.name} »`
               })}
             </Dialog.Title>
+            <Dialog.Description>
+              {t({
+                en: 'Every import and sync of this repository, newest first.',
+                es: 'Todas las importaciones y sincronizaciones de este repositorio, las más recientes primero.',
+                fr: "Tous les imports et synchronisations de ce dépôt, les plus récents d'abord."
+              })}
+            </Dialog.Description>
           </Dialog.Header>
           <div className="max-h-[70vh] overflow-auto">
             <InstrumentRepoSyncLogTable logs={syncLogsQuery.data.filter((log) => log.repoId === repoToShowLogs.id)} />
@@ -612,8 +623,10 @@ const RouteComponent = () => {
 export const Route = createFileRoute('/_app/admin/instrument-repos/')({
   component: RouteComponent,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(instrumentReposQueryOptions());
-    await context.queryClient.ensureQueryData(groupsQueryOptions());
-    await context.queryClient.ensureQueryData(instrumentRepoSyncLogsQueryOptions());
+    await Promise.all([
+      context.queryClient.ensureQueryData(instrumentReposQueryOptions()),
+      context.queryClient.ensureQueryData(groupsQueryOptions()),
+      context.queryClient.ensureQueryData(instrumentRepoSyncLogsQueryOptions())
+    ]);
   }
 });
