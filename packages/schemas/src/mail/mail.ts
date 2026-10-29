@@ -139,6 +139,25 @@ const $SendAssignmentEmailData = z.object({
 });
 
 /**
+ * The most links one email may carry. A subject is assigned one instrument at a time, so this only
+ * has to be larger than any plausible battery; it exists so a single request cannot be made to
+ * render an unbounded message.
+ */
+const MAX_ASSIGNMENT_EMAIL_LINKS = 50;
+
+/**
+ * One email carrying every link assigned to one recipient. A recipient holding several assignments
+ * gets one message listing all of them rather than one message each.
+ */
+const $SendBulkAssignmentEmailData = $SendAssignmentEmailData.extend({
+  assignmentIds: z
+    .array(z.string().min(1))
+    .min(1)
+    .max(MAX_ASSIGNMENT_EMAIL_LINKS)
+    .refine((values) => new Set(values).size === values.length, { message: 'Values must be unique' })
+});
+
+/**
  * The SMTP transporter's failure budget, in milliseconds. The server fails fast on each phase so
  * a bad host or port yields a clear error rather than an open-ended hang.
  */
@@ -220,10 +239,10 @@ const DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE = {
       '',
       'You have been assigned a questionnaire to complete on Open Data Capture.',
       '',
-      'Please complete it using the secure link below:',
+      'Please complete it using the secure link(s) below:',
       '{{url}}',
       '',
-      'This link expires on {{expiresAt}}.',
+      'The link(s) expire on {{expiresAt}}.',
       '',
       'Thank you.'
     ].join('\n'),
@@ -232,10 +251,10 @@ const DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE = {
       '',
       'Se le ha asignado un cuestionario para completar en Open Data Capture.',
       '',
-      'Por favor, complételo utilizando el enlace seguro a continuación:',
+      'Por favor, complételo utilizando el/los enlace(s) seguro(s) a continuación:',
       '{{url}}',
       '',
-      'Este enlace expira el {{expiresAt}}.',
+      'El/los enlace(s) expira(n) el {{expiresAt}}.',
       '',
       'Gracias.'
     ].join('\n'),
@@ -244,10 +263,10 @@ const DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE = {
       '',
       'Un questionnaire vous a été assigné à compléter sur Open Data Capture.',
       '',
-      'Veuillez le compléter en utilisant le lien sécurisé ci-dessous :',
+      'Veuillez le compléter en utilisant le ou les lien(s) sécurisé(s) ci-dessous :',
       '{{url}}',
       '',
-      'Ce lien expire le {{expiresAt}}.',
+      'Le ou les lien(s) expire(nt) le {{expiresAt}}.',
       '',
       'Merci.'
     ].join('\n')
@@ -300,6 +319,7 @@ export type MailErrorCode = z.infer<typeof $MailErrorCode>;
 export type MailSettings = z.infer<typeof $MailSettings>;
 export type MailTemplate = z.infer<typeof $MailTemplate>;
 export type $SendAssignmentEmailData = z.infer<typeof $SendAssignmentEmailData>;
+export type $SendBulkAssignmentEmailData = z.infer<typeof $SendBulkAssignmentEmailData>;
 export type $TestMailData = z.infer<typeof $TestMailData>;
 export type TestMailResult = z.infer<typeof $TestMailResult>;
 export type UpdateMailConfigData = z.infer<typeof $UpdateMailConfigData>;
@@ -312,6 +332,7 @@ export {
   $MailEncryption,
   $MailSettings,
   $SendAssignmentEmailData,
+  $SendBulkAssignmentEmailData,
   $TestMailData,
   $TestMailResult,
   $UpdateMailConfigData,

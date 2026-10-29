@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   $MailConfig,
   $MailConfigDto,
+  $SendBulkAssignmentEmailData,
   $UpdateMailConfigData,
   DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE,
   DEFAULT_NEW_USER_EMAIL_TEMPLATE,
@@ -66,6 +67,33 @@ describe('$UpdateMailConfigData', () => {
 
   it('should normalize a blank password to undefined, so no consumer can mistake it for a new secret', () => {
     expect($UpdateMailConfigData.parse({ ...config, password: '' }).password).toBeUndefined();
+  });
+});
+
+describe('$SendBulkAssignmentEmailData', () => {
+  const base = { assignmentIds: ['a', 'b'], recipient: 'subject@example.com' };
+
+  it('should accept several assignment ids for one recipient', () => {
+    const result = $SendBulkAssignmentEmailData.safeParse(base);
+    expect(result.success).toBe(true);
+    expect(result.data?.language).toBe('en');
+  });
+
+  it('should reject an empty list, since there would be no link to send', () => {
+    expect($SendBulkAssignmentEmailData.safeParse({ ...base, assignmentIds: [] }).success).toBe(false);
+  });
+
+  it('should reject a repeated assignment id, so no link is listed twice', () => {
+    expect($SendBulkAssignmentEmailData.safeParse({ ...base, assignmentIds: ['a', 'a'] }).success).toBe(false);
+  });
+
+  it('should reject more links than one email may carry', () => {
+    const assignmentIds = Array.from({ length: 51 }, (_, index) => String(index));
+    expect($SendBulkAssignmentEmailData.safeParse({ ...base, assignmentIds }).success).toBe(false);
+  });
+
+  it('should reject a recipient that is not an email address', () => {
+    expect($SendBulkAssignmentEmailData.safeParse({ ...base, recipient: 'nobody' }).success).toBe(false);
   });
 });
 

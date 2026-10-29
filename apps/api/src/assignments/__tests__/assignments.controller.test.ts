@@ -138,9 +138,9 @@ describe('AssignmentsController', () => {
       await sendEmail({ language: 'en', recipient: 'p@x.org' });
       expect(groupsService.findById).not.toHaveBeenCalled();
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
+        links: [{ expiresAt: assignment.expiresAt, url: `${assignment.url}?lang=en` }],
         recipient: 'p@x.org',
-        template: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE,
-        url: `${assignment.url}?lang=en`
+        template: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE
       });
     });
 
@@ -150,7 +150,7 @@ describe('AssignmentsController', () => {
       assignmentsService.findById.mockResolvedValueOnce({ ...assignment, groupId: null });
       await sendEmail({ language: 'en', recipient: 'p@x.org' });
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
-        expiresAt: assignment.expiresAt
+        links: [{ expiresAt: assignment.expiresAt, url: `${assignment.url}?lang=en` }]
       });
     });
 
@@ -237,7 +237,7 @@ describe('AssignmentsController', () => {
       await sendEmail({ language: 'fr', recipient: 'p@x.org' });
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
         language: 'fr',
-        url: `${assignment.url}?lang=fr`
+        links: [{ url: `${assignment.url}?lang=fr` }]
       });
     });
 
@@ -299,6 +299,137 @@ describe('AssignmentsController', () => {
       await expect(sendEmail({ language: 'en', recipient: 'participant@x.org' })).resolves.toMatchObject({
         recipient: 'participant@x.org'
       });
+    });
+  });
+
+  describe('sendBulkEmail', () => {
+    const second = {
+      expiresAt: new Date('2026-09-01T12:00:00.000Z'),
+      groupId: 'group-1',
+      id: 'assignment-2',
+      url: 'https://gateway.example.org/assignments/def'
+    };
+
+    const sendBulkEmail = (body: {
+      assignmentIds: string[];
+      language: Language;
+      recipient: string;
+      templateId?: null | string;
+    }) => assignmentsController.sendBulkEmail(body, currentUser);
+
+    const bothAssignments = () => {
+      assignmentsService.findById.mockResolvedValueOnce(assignment).mockResolvedValueOnce(second);
+      groupsService.findById.mockResolvedValueOnce({ emailTemplates: [] });
+    };
+
+    // The whole point of the route: a recipient assigned several instruments is asked once.
+    it('sends one email carrying every link, in the order the ids were given', async () => {
+      bothAssignments();
+      await sendBulkEmail({ assignmentIds: ['assignment-1', 'assignment-2'], language: 'en', recipient: 'p@x.org' });
+      expect(mailService.sendAssignmentEmail).toHaveBeenCalledOnce();
+      expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
+        links: [
+          { expiresAt: assignment.expiresAt, url: `${assignment.url}?lang=en` },
+          { expiresAt: second.expiresAt, url: `${second.url}?lang=en` }
+        ],
+        recipient: 'p@x.org'
+      });
+    });
+
+    it('reads every assignment through the caller ability, so one they cannot see is never mailed', async () => {
+      bothAssignments();
+      await sendBulkEmail({ assignmentIds: ['assignment-1', 'assignment-2'], language: 'en', recipient: 'p@x.org' });
+      expect(assignmentsService.findById).toHaveBeenCalledWith('assignment-1', { ability: currentUser.ability });
+      expect(assignmentsService.findById).toHaveBeenCalledWith('assignment-2', { ability: currentUser.ability });
+    });
+
+    it("uses the group's active template, resolved once for the whole message", async () => {
+      assignmentsService.findById.mockResolvedValueOnce(assignment).mockResolvedValueOnce(second);
+      groupsService.findById.mockResolvedValueOnce({
+        activeAssignmentEmailTemplateId: 'tpl-1',
+        emailTemplates: [customTemplate]
+      });
+      await sendBulkEmail({ assignmentIds: ['assignment-1', 'assignment-2'], language: 'en', recipient: 'p@x.org' });
+      expect(groupsService.findById).toHaveBeenCalledOnce();
+      expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
+        template: { body: customTemplate.body, subject: customTemplate.subject }
+      });
+    });
+
+    it('uses the built-in default template when the assignments have no group', async () => {
+      assignmentsService.findById
+        .mockResolvedValueOnce({ ...assignment, groupId: null })
+        .mockResolvedValueOnce({ ...second, groupId: null });
+      await sendBulkEmail({ assignmentIds: ['assignment-1', 'assignment-2'], language: 'en', recipient: 'p@x.org' });
+      expect(groupsService.findById).not.toHaveBeenCalled();
+      expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
+        template: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE
+      });
+    });
+
+    it('refuses a requested template the group no longer has, rather than substituting wording', async () => {
+      assignmentsService.findById.mockResolvedValueOnce(assignment).mockResolvedValueOnce(second);
+      groupsService.findById.mockResolvedValueOnce({ emailTemplates: [] });
+      await expect(
+        sendBulkEmail({
+          assignmentIds: ['assignment-1', 'assignment-2'],
+          language: 'en',
+          recipient: 'p@x.org',
+          templateId: 'gone'
+        })
+      ).rejects.toThrow(BadRequestException);
+      expect(mailService.sendAssignmentEmail).not.toHaveBeenCalled();
+    });
+
+    // One message is rendered from one group's template and recorded in one group's log, so it
+    // cannot carry links that belong to two.
+    it('refuses assignments from more than one group', async () => {
+      assignmentsService.findById
+        .mockResolvedValueOnce(assignment)
+        .mockResolvedValueOnce({ ...second, groupId: 'group-2' });
+      await expect(
+        sendBulkEmail({ assignmentIds: ['assignment-1', 'assignment-2'], language: 'en', recipient: 'p@x.org' })
+      ).rejects.toThrow(BadRequestException);
+      expect(mailService.sendAssignmentEmail).not.toHaveBeenCalled();
+    });
+
+    // Each link is a credential of its own, however many shared the message.
+    it('records one audit entry per link, each with the masked address', async () => {
+      bothAssignments();
+      await sendBulkEmail({
+        assignmentIds: ['assignment-1', 'assignment-2'],
+        language: 'en',
+        recipient: 'participant@x.org'
+      });
+      expect(auditLogger.log).toHaveBeenCalledTimes(2);
+      expect(auditLogger.log).toHaveBeenCalledWith('SEND_EMAIL', 'ASSIGNMENT', {
+        groupId: 'group-1',
+        metadata: { assignmentId: 'assignment-2', recipient: 'p***@x.org', status: 'SENT' },
+        userId: 'user-1'
+      });
+    });
+
+    it('records nothing when nothing went outbound', async () => {
+      bothAssignments();
+      mailService.sendAssignmentEmail.mockResolvedValueOnce({
+        message: 'rendered',
+        recipient: 'p@x.org',
+        status: 'DISABLED'
+      });
+      await sendBulkEmail({ assignmentIds: ['assignment-1', 'assignment-2'], language: 'en', recipient: 'p@x.org' });
+      expect(auditLogger.log).not.toHaveBeenCalled();
+    });
+
+    it('returns the delivery result from the mail service', async () => {
+      bothAssignments();
+      mailService.sendAssignmentEmail.mockResolvedValueOnce({
+        message: 'rendered',
+        recipient: 'p@x.org',
+        status: 'FAILED'
+      });
+      await expect(
+        sendBulkEmail({ assignmentIds: ['assignment-1', 'assignment-2'], language: 'en', recipient: 'p@x.org' })
+      ).resolves.toMatchObject({ status: 'FAILED' });
     });
   });
 });

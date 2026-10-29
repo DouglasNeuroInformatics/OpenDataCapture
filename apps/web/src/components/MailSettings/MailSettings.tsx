@@ -125,13 +125,14 @@ export const MailSettings = ({ activeLanguages, config, newUserEmailTemplate }: 
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
 
-  const save = async (data: Parameters<typeof updateMutation.mutateAsync>[0]) => {
+  const save = async (data: Parameters<typeof updateMutation.mutateAsync>[0], successMessage?: string) => {
     try {
       const next = await updateMutation.mutateAsync(data);
-      // Re-seed from what the server actually stored, so any normalisation is visible and the
-      // masked password reflects the saved state rather than whatever was typed.
       setValues(initialValues(next.config));
-      addNotification({ type: 'success' });
+      addNotification({
+        ...(successMessage ? { message: successMessage } : {}),
+        type: 'success'
+      });
     } catch {
       addNotification({
         message: t({
@@ -157,10 +158,15 @@ export const MailSettings = ({ activeLanguages, config, newUserEmailTemplate }: 
 
   const handleToggleEnabled = async (checked: boolean) => {
     handleFieldChange('enabled', checked);
-    // Persist a disable immediately so the rest of the app reflects it. Enabling for the first
-    // time only reveals the form — saving a valid configuration is what turns it on.
-    if (!checked && config) {
-      await save({ config: { ...config, enabled: false, senderName: config.senderName ?? undefined } });
+    if (config) {
+      await save(
+        { config: { ...config, enabled: checked, senderName: config.senderName ?? undefined } },
+        t({
+          en: 'Settings saved',
+          es: 'Configuración guardada',
+          fr: 'Paramètres enregistrés'
+        })
+      );
     }
   };
 

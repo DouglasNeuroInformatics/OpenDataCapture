@@ -117,6 +117,76 @@ test.describe('remote assignments wizard', () => {
   });
 });
 
+test.describe('remote assignments wizard refusals', () => {
+  // A refusal above the input left the user reading it while looking at a file they had already
+  // chosen, with the button that produced it a screen below.
+  test('should put a refusal directly above the button that produced it', async ({ isolatedGroupManager, page }) => {
+    await isolatedGroupManager();
+    await page.goto('/group/remote-assignments?mode=create');
+    const wizardPage = new RemoteAssignmentsPage(page);
+    await expect(wizardPage.wizard).toBeVisible();
+
+    await wizardPage.pasteSubjects('subjectId\nduplicated-1\nduplicated-1\n');
+    await expect(wizardPage.mapStep).toBeVisible();
+    await wizardPage.confirmMapping.click();
+
+    await expect(wizardPage.errorList).toContainText('Nothing has been created');
+    const [errors, confirm] = await Promise.all([
+      boundingBox(wizardPage.errorList),
+      boundingBox(wizardPage.confirmMapping)
+    ]);
+    expect(errors.y + errors.height).toBeLessThanOrEqual(confirm.y);
+  });
+
+  test('should return to the tab the data came from, with the data still in it', async ({
+    isolatedGroupManager,
+    page
+  }) => {
+    await isolatedGroupManager();
+    await page.goto('/group/remote-assignments?mode=create');
+    const wizardPage = new RemoteAssignmentsPage(page);
+    await expect(wizardPage.wizard).toBeVisible();
+
+    const pasted = 'subjectId\npasted-1\n';
+    await wizardPage.pasteSubjects(pasted);
+    await expect(wizardPage.mapStep).toBeVisible();
+    await page.getByRole('button', { name: 'Back' }).click();
+
+    await expect(wizardPage.pasteInput).toBeVisible();
+    await expect(wizardPage.pasteInput).toHaveValue(pasted);
+  });
+
+  // A stray row used to stop the whole batch, and only three steps later, as an identifier the user
+  // never typed: it is named here by its row, and can be left out without redoing the file.
+  test('should warn about a row this group cannot place and continue once it is left out', async ({
+    api,
+    isolatedGroupManager,
+    page
+  }) => {
+    const group = await isolatedGroupManager();
+    const subjectId = await api.createSubject(group.id);
+    await page.goto('/group/remote-assignments?mode=create');
+    const wizardPage = new RemoteAssignmentsPage(page);
+    await expect(wizardPage.wizard).toBeVisible();
+
+    await wizardPage.pasteSubjects(`subjectId\n${subjectId}\nstranger-not-in-this-group\n`);
+    await expect(wizardPage.mapStep).toBeVisible();
+    await wizardPage.confirmMapping.click();
+
+    await expect(wizardPage.errorList).toContainText('name a subject this group does not have');
+    await expect(wizardPage.errorList).toContainText('Row 3');
+    await expect(wizardPage.mapStep).toBeVisible();
+
+    await wizardPage.skipUnplaceable.click();
+    await wizardPage.confirmMapping.click();
+
+    await expect(wizardPage.timepointsStep).toBeVisible();
+    // Only the row the group could place travels on. The count is in the step's own description,
+    // which `StepLayout` renders in the card header rather than inside the step body.
+    await expect(page.getByText('all 1 selected subjects')).toBeVisible();
+  });
+});
+
 test.describe('remote assignments wizard parse errors', () => {
   test('should number a malformed pasted line as it is numbered in the pasted text', async ({
     authenticateAs,

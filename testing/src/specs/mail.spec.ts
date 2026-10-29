@@ -1,5 +1,6 @@
 import type { Language } from '@opendatacapture/schemas/core';
 
+import { RemoteAssignmentsPage } from '../pages/_app/group/remote-assignments.page';
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { E2E_MAIL_CONFIG, SEEDED_USER_PASSWORD } from '../support/constants';
 import { expect, test } from '../support/fixtures';
@@ -247,6 +248,62 @@ test.describe('mail delivery', () => {
       // Bulk remote assignments is enabled by default, nesting group links under "Group Actions"
       await dashboardPage.expandNavGroup('Group Actions');
       await expect(page.getByTestId('nav-button-/group/email-templates')).toBeVisible();
+    });
+  });
+
+  // The whole bulk email path, which exists only while mail is on: addresses arrive by uploaded
+  // file, one message per subject carries every link, and a failure stays retryable.
+  test.describe('bulk assignment email', () => {
+    test('should carry uploaded addresses into the batch and keep a failed send retryable', async ({
+      api,
+      isolatedGroupManager,
+      page
+    }) => {
+      // Each send waits out the server's whole SMTP failure budget against an unroutable host.
+      test.setTimeout(180_000);
+      const group = await isolatedGroupManager();
+      const subjectId = await api.createSubject(group.id);
+      await page.goto('/group/remote-assignments?mode=create');
+      const wizardPage = new RemoteAssignmentsPage(page);
+      await expect(wizardPage.wizard).toBeVisible();
+
+      await wizardPage.selectAllSubjects.click();
+      await wizardPage.emailListToggle.click();
+      await wizardPage.uploadEmailList({
+        buffer: Buffer.from(`subject_id,email\n${subjectId},participant@example.org\n`),
+        mimeType: 'text/csv',
+        name: 'emails.csv'
+      });
+      await wizardPage.emailListApply.click();
+      await expect(wizardPage.emailListMatched).toContainText('1');
+
+      await wizardPage.useSelectedSubjects.click();
+      await expect(wizardPage.timepointsStep).toBeVisible();
+      await wizardPage.addFirstInstrument();
+      await expect(wizardPage.submitBatch).toBeEnabled({ timeout: 30_000 });
+      await wizardPage.submitBatch.click();
+
+      // The results table shows the address each link will go to, which is how the upload is proven
+      // to have reached the batch rather than just the panel.
+      await expect(wizardPage.emailTable).toBeVisible({ timeout: 30_000 });
+      await expect(wizardPage.emailTable).toContainText('participant@example.org');
+      await expect(wizardPage.emailAll).toHaveText('Email All (1)');
+
+      // The picker offers the instance's languages and no others: a template is authored in all
+      // three, and a language nobody has enabled cannot be sent in.
+      await wizardPage.emailAll.click();
+      const languageSelect = page.getByTestId('bulk-email-language');
+      await languageSelect.press('Enter');
+      const activeLanguages = await api.findActiveLanguages();
+      await expect(page.getByRole('option')).toHaveCount(activeLanguages.length);
+      await languageSelect.press('Escape');
+
+      await page.getByTestId('bulk-email-confirm').click();
+
+      // `smtp.invalid.test` never accepts the message, so the batch reports one failure - and the
+      // trigger offers that one recipient again rather than retiring with nobody written to.
+      await expect(wizardPage.emailAll).toHaveText('Retry Failed (1)', { timeout: 120_000 });
+      await expect(wizardPage.emailAll).toBeEnabled();
     });
   });
 

@@ -78,27 +78,35 @@ export class MailService {
   }
 
   /**
-   * Email a remote-assignment link to a participant, rendering the chosen template in the
+   * Email a participant's remote-assignment links to them, rendering the chosen template in the
    * requested language.
+   *
+   * Several links are one message, not one message each: a recipient assigned a battery should be
+   * asked once. They expand into `{{url}}` one per line, so a template written for a single link
+   * keeps working, and `{{expiresAt}}` reads the soonest of the expiries, which is the date by
+   * which the recipient has to have acted on all of them.
    */
   async sendAssignmentEmail({
-    expiresAt,
     language,
+    links,
     recipient,
-    template,
-    url
+    template
   }: {
-    expiresAt: Date | number | string;
     language: Language;
+    links: { expiresAt: Date | number | string; url: string }[];
     recipient: string;
     template: MailTemplate;
-    url: string;
   }): Promise<EmailDeliveryResult> {
-    const variables = { expiresAt: formatExpiryDate(expiresAt, language), url };
+    const url = links.map((link) => link.url).join('\n');
+    const soonestExpiry = links.reduce(
+      (soonest, link) => (new Date(link.expiresAt) < new Date(soonest) ? link.expiresAt : soonest),
+      links[0]!.expiresAt
+    );
+    const variables = { expiresAt: formatExpiryDate(soonestExpiry, language), url };
     const rendered = renderTemplate(pickLocale(template.body, language), variables);
     return this.deliver(await this.readState(), {
-      // The assignment link is the whole point of this email, so if a custom template omits the
-      // {{url}} placeholder we append the link rather than send a message the recipient can't act on.
+      // The assignment links are the whole point of this email, so if a custom template omits the
+      // {{url}} placeholder we append them rather than send a message the recipient can't act on.
       message: rendered.includes(url) ? rendered : `${rendered}\n\n${url}`,
       recipient,
       subject: renderTemplate(pickLocale(template.subject, language), variables)

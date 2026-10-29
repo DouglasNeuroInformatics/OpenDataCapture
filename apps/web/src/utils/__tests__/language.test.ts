@@ -1,7 +1,7 @@
 import type { LocalizedString } from '@opendatacapture/schemas/core';
 import { describe, expect, it } from 'vitest';
 
-import { authoredLanguages, getValueForLanguage, omitBlankLanguages } from '../language';
+import { authoredLanguages, getValueForLanguage, omitBlankLanguages, sendableLanguages } from '../language';
 import { UploadError } from '../upload';
 
 describe('authoredLanguages', () => {
@@ -59,5 +59,20 @@ describe('getValueForLanguage', () => {
       fr: `L'enregistrement dans le tableau d'enregistrements n'est pas défini`
     });
     expect(getValueForLanguage(description, 'es')).toBe('Record in the record array was left undefined');
+  });
+});
+
+describe('sendableLanguages', () => {
+  it('should offer only the languages the instance has enabled, so a disabled language cannot be sent', () => {
+    expect(sendableLanguages({ en: 'Hello', es: 'Hola', fr: 'Bonjour' }, ['en', 'fr'])).toEqual(['en', 'fr']);
+  });
+
+  it("should keep the template's own languages when none of them is enabled, since its copy exists nowhere else", () => {
+    expect(sendableLanguages({ es: 'Hola' }, ['en', 'fr'])).toEqual(['es']);
+  });
+
+  it('should offer every enabled language for a template with nothing authored yet', () => {
+    expect(sendableLanguages({}, ['en', 'fr'])).toEqual(['en', 'fr']);
+    expect(sendableLanguages(null, ['en'])).toEqual(['en']);
   });
 });

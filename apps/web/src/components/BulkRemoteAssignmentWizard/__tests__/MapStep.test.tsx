@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import { generateSubjectHash } from '@opendatacapture/subject-utils';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -36,9 +37,23 @@ const byPersonalInformation: BulkParseResult = {
 
 const unmapped: BulkParseResult = { ...byId, mapping: {} };
 
-const renderMapStep = (parsed: BulkParseResult) => {
+/** The ids the fixtures resolve to, so a fixture row names a subject the group actually has. */
+const knownSubjectIds = [
+  'Depression_Clinic$001',
+  'Depression_Clinic$002',
+  'Depression_Clinic$Alice',
+  'Depression_Clinic$Bob',
+  await generateSubjectHash({
+    dateOfBirth: new Date('1979-08-12T00:00:00.000Z'),
+    firstName: 'Alice',
+    lastName: 'Martin',
+    sex: 'FEMALE'
+  })
+];
+
+const renderMapStep = (parsed: BulkParseResult, ids: string[] = knownSubjectIds) => {
   const callbacks = { onBack: vi.fn(), onResolved: vi.fn(), onStepChange: vi.fn() };
-  render(<MapStep groupName="Depression Clinic" parsed={parsed} {...callbacks} />);
+  render(<MapStep groupName="Depression Clinic" knownSubjectIds={ids} parsed={parsed} {...callbacks} />);
   return callbacks;
 };
 
@@ -111,7 +126,8 @@ describe('MapStep', () => {
       'First Name',
       'Last Name',
       'Date of Birth',
-      'Sex at Birth'
+      'Sex at Birth',
+      'Email'
     ]);
   });
 
@@ -138,7 +154,9 @@ describe('MapStep', () => {
   it('should resolve custom identifiers into their group-scoped form, since that is how they are stored', async () => {
     const { onResolved } = renderMapStep(byId);
     fireEvent.click(continueButton());
-    await waitFor(() => expect(onResolved).toHaveBeenCalledWith(['Depression_Clinic$001', 'Depression_Clinic$002']));
+    await waitFor(() => {
+      expect(onResolved).toHaveBeenCalledWith(['Depression_Clinic$001', 'Depression_Clinic$002'], idRows);
+    });
   });
 
   it('should resolve with the mapping the user chose rather than the one detected on parse', async () => {
@@ -146,13 +164,15 @@ describe('MapStep', () => {
     await chooseField('first_name', 'Not Used');
     await chooseField('subject_id', 'Subject ID');
     fireEvent.click(continueButton());
-    await waitFor(() => expect(onResolved).toHaveBeenCalledWith(['Depression_Clinic$001', 'Depression_Clinic$002']));
+    await waitFor(() => {
+      expect(onResolved).toHaveBeenCalledWith(['Depression_Clinic$001', 'Depression_Clinic$002'], idRows);
+    });
   });
 
   it('should derive a subject hash from personal information in the browser', async () => {
     const { onResolved } = renderMapStep(byPersonalInformation);
     fireEvent.click(continueButton());
-    await waitFor(() => expect(onResolved).toHaveBeenCalledWith([expect.stringMatching(/^[0-9a-f]{64}$/)]));
+    await waitFor(() => expect(onResolved).toHaveBeenCalledWith([expect.stringMatching(/^[0-9a-f]{64}$/)], piiRows));
   });
 
   it('should list the rows that could not be resolved instead of continuing', async () => {
@@ -160,6 +180,57 @@ describe('MapStep', () => {
     fireEvent.click(continueButton());
     expect((await screen.findByTestId('bulk-error-list')).textContent).toContain('Row 2: Missing subject ID');
     expect(onResolved).not.toHaveBeenCalled();
+  });
+
+  it('should warn about a row naming a subject the group does not have, rather than carry a stranger forward', async () => {
+    const { onResolved } = renderMapStep(byId, ['Depression_Clinic$001']);
+    fireEvent.click(continueButton());
+    const errorList = await screen.findByTestId('bulk-error-list');
+    expect(errorList.textContent).toContain('1 row(s) name a subject this group does not have');
+    expect(errorList.textContent).toContain('Row 3');
+    expect(onResolved).not.toHaveBeenCalled();
+  });
+
+  it('should continue with the rows it can place once the user asks for the rest to be left out', async () => {
+    const { onResolved } = renderMapStep(byId, ['Depression_Clinic$001']);
+    fireEvent.click(continueButton());
+    await screen.findByTestId('bulk-error-list');
+    fireEvent.click(screen.getByTestId('bulk-skip-unplaceable'));
+    fireEvent.click(continueButton());
+    // Only Alice's row travels on, and it travels with the id it resolved to.
+    await waitFor(() => expect(onResolved).toHaveBeenCalledWith(['Depression_Clinic$001'], [idRows[0]]));
+  });
+
+  it('should name an ambiguous identifier as ambiguous, since the file is too short rather than wrong', async () => {
+    const digest = 'a'.repeat(64);
+    const { onResolved } = renderMapStep(
+      { ...byId, preview: [{ subject_id: 'aaaaaaaaa' }], rows: [{ subject_id: 'aaaaaaaaa' }] },
+      [digest, `${'a'.repeat(63)}b`]
+    );
+    fireEvent.click(continueButton());
+    const errorList = await screen.findByTestId('bulk-error-list');
+    expect(errorList.textContent).toContain('matching more than one subject in this group');
+    expect(onResolved).not.toHaveBeenCalled();
+  });
+
+  it('should refuse to continue when skipping would leave no rows at all', async () => {
+    const { onResolved } = renderMapStep(byId, []);
+    fireEvent.click(continueButton());
+    await screen.findByTestId('bulk-error-list');
+    fireEvent.click(screen.getByTestId('bulk-skip-unplaceable'));
+    fireEvent.click(continueButton());
+    await waitFor(() => {
+      expect(screen.getByTestId('bulk-error-list').textContent).toContain('there is nothing to assign');
+    });
+    expect(onResolved).not.toHaveBeenCalled();
+  });
+
+  it('should render the refusal below the mapping, so it sits directly above Continue', async () => {
+    renderMapStep({ ...byId, rows: [{ first_name: 'Alice', subject_id: '' }] });
+    fireEvent.click(continueButton());
+    const errorList = await screen.findByTestId('bulk-error-list');
+    const mapping = screen.getByTestId('bulk-column-mapping');
+    expect(mapping.compareDocumentPosition(errorList) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('should rethrow an unexpected error rather than show it as a mapping problem, so it is never swallowed', async () => {

@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, Checkbox, DataTable, FileDropzone, Tabs, TextArea } from '@douglasneuroinformatics/libui/components';
+import {
+  Button,
+  Checkbox,
+  DataTable,
+  FileDropzone,
+  Input,
+  Tabs,
+  TextArea
+} from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { BULK_ASSIGNMENT_MAX_SUBJECTS } from '@opendatacapture/schemas/assignment';
 import type { Subject } from '@opendatacapture/schemas/subject';
@@ -16,14 +24,13 @@ import {
   parseDelimitedText,
   parseWorkbook
 } from '@/utils/bulk-assignments';
-import type { BulkParseError, BulkParseResult } from '@/utils/bulk-assignments';
+import type { BulkParseError, BulkParseResult, SubjectEmails } from '@/utils/bulk-assignments';
 
+import { EmailListUpload } from './EmailListUpload';
 import { ErrorList } from './ErrorList';
 import { StepLayout } from './StepLayout';
 
-import type { WizardStep } from './types';
-
-type SourceMode = 'FILE' | 'PASTE' | 'SELECT';
+import type { SourceMode, WizardStep } from './types';
 
 type PickerRow = {
   dateOfBirth: string;
@@ -33,12 +40,22 @@ type PickerRow = {
 };
 
 type SourceStepProps = {
+  emails: SubjectEmails;
+  groupName: string;
+  isMailEnabled: boolean;
+  /** Held by the wizard, so Back from the mapping step returns to the tab the data came from. */
+  mode: SourceMode;
   onBack?: () => void;
+  onEmailsChange: (emails: SubjectEmails) => void;
+  onModeChange: (mode: SourceMode) => void;
   onParsed: (parsed: BulkParseResult) => void;
+  onPastedChange: (pasted: string) => void;
   /** Selection is held by the wizard, so stepping away and back does not discard it. */
   onSelectedChange: (subjectIds: string[]) => void;
   onStepChange: (step: WizardStep) => void;
-  onSubjectsSelected: (subjectIds: string[]) => void;
+  onSubjectsSelected: (subjectIds: string[], emails: SubjectEmails) => void;
+  /** Held by the wizard for the same reason as the tab: Back returns to the text, not an empty box. */
+  pasted: string;
   selectedIds: string[];
   /** Group setting controlling how much of an identifier is shown, as elsewhere in the app. */
   subjectIdDisplayLength: number;
@@ -46,21 +63,25 @@ type SourceStepProps = {
 };
 
 export const SourceStep = ({
+  emails,
+  groupName,
+  isMailEnabled,
+  mode,
   onBack,
+  onEmailsChange,
+  onModeChange,
   onParsed,
+  onPastedChange,
   onSelectedChange,
   onStepChange,
   onSubjectsSelected,
+  pasted,
   selectedIds,
   subjectIdDisplayLength,
   subjects
 }: SourceStepProps) => {
   const { t } = useTranslation();
-  // One source at a time: offering all three at once left it unclear which the wizard would act on,
-  // and a file dropped while text was pasted had no defined precedence.
-  const [mode, setMode] = useState<SourceMode>('SELECT');
   const [errors, setErrors] = useState<BulkParseError[]>([]);
-  const [pasted, setPasted] = useState('');
   const selected = new Set(selectedIds);
 
   const run = async (parse: () => BulkParseResult | Promise<BulkParseResult>) => {
@@ -99,6 +120,29 @@ export const SourceStep = ({
     { label: t({ en: 'Upload a File', es: 'Cargar un archivo', fr: 'Téléverser un fichier' }), value: 'FILE' },
     { label: t({ en: 'Paste Data', es: 'Pegar datos', fr: 'Coller des données' }), value: 'PASTE' }
   ];
+
+  // Both tabs read the same columns, so they state the same expectation. The email column is named
+  // only where mail is configured, since the wizard ignores it otherwise.
+  const formatHint = (
+    <p className="text-muted-foreground text-sm" data-testid="bulk-source-format-hint">
+      {[
+        t({
+          en: 'Comma, tab or semicolon separated, with a header row. Include a subject ID column, or first name, last name, date of birth and sex.',
+          es: 'Separado por comas, tabulaciones o puntos y comas, con una fila de encabezado. Incluya una columna de identificador de sujeto, o nombre, apellido, fecha de nacimiento y sexo.',
+          fr: "Séparé par des virgules, tabulations ou points-virgules, avec une ligne d'en-tête. Incluez une colonne d'identifiant, ou prénom, nom, date de naissance et sexe."
+        }),
+        ...(isMailEnabled
+          ? [
+              t({
+                en: 'An email column is optional.',
+                es: 'Una columna de correo electrónico es opcional.',
+                fr: 'Une colonne de courriel est facultative.'
+              })
+            ]
+          : [])
+      ].join(' ')}
+    </p>
+  );
 
   // Every subject in the group is listed, not only those with a chosen identifier: a hash-identified
   // subject is just as assignable, and excluding them left most of a group invisible. Identifiers are
@@ -161,7 +205,7 @@ export const SourceStep = ({
           data-testid="bulk-use-selected-subjects"
           disabled={selected.size === 0 || selected.size > BULK_ASSIGNMENT_MAX_SUBJECTS}
           type="button"
-          onClick={() => onSubjectsSelected([...selected])}
+          onClick={() => onSubjectsSelected([...selected], emails)}
         >
           {t({ en: 'Continue With Selected', es: 'Continuar con la selección', fr: 'Continuer avec la sélection' })}
           {selected.size > 0 && ` (${selected.size})`}
@@ -183,13 +227,11 @@ export const SourceStep = ({
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-source-step">
-        <ErrorList errors={errors} />
-
         <Tabs
           value={mode}
           onValueChange={(value) => {
             setErrors([]);
-            setMode(value as SourceMode);
+            onModeChange(value as SourceMode);
           }}
         >
           {/* Underlined rather than libui's filled pill: the pill is one page tint on another, and
@@ -225,93 +267,122 @@ export const SourceStep = ({
                 {t({
                   en: 'This group has no subjects.',
                   es: 'Este grupo no tiene sujetos.',
-                  fr: 'Ce groupe n’a aucun sujet.'
+                  fr: "Ce groupe n'a aucun sujet."
                 })}
               </p>
             ) : (
-              <div data-testid="bulk-subject-picker">
-                <DataTable
-                  columns={[
-                    {
-                      cell: ({ row }) => (
-                        <Checkbox
-                          aria-label={row.original.subject}
-                          checked={selected.has(row.original.id)}
-                          data-testid={`bulk-select-subject-${row.original.id}`}
-                          onCheckedChange={() => toggle(row.original.id)}
-                        />
-                      ),
-                      enableSorting: false,
-                      header: ({ table }) => {
-                        const filteredRows = table.getFilteredRowModel().rows.map((row) => row.original);
-                        const allFilteredSelected =
-                          filteredRows.length > 0 && filteredRows.every((row) => selected.has(row.id));
-                        return (
+              <React.Fragment>
+                <div data-testid="bulk-subject-picker">
+                  <DataTable
+                    columns={[
+                      {
+                        cell: ({ row }) => (
                           <Checkbox
-                            aria-label={t({
-                              en: 'Select All Shown',
-                              es: 'Seleccionar todo lo mostrado',
-                              fr: 'Tout sélectionner'
-                            })}
-                            checked={allFilteredSelected}
-                            data-testid="bulk-select-all-subjects"
-                            onCheckedChange={() => toggleFiltered(filteredRows)}
+                            aria-label={row.original.subject}
+                            checked={selected.has(row.original.id)}
+                            data-testid={`bulk-select-subject-${row.original.id}`}
+                            onCheckedChange={() => toggle(row.original.id)}
                           />
-                        );
+                        ),
+                        enableSorting: false,
+                        header: ({ table }) => {
+                          const filteredRows = table.getFilteredRowModel().rows.map((row) => row.original);
+                          const allFilteredSelected =
+                            filteredRows.length > 0 && filteredRows.every((row) => selected.has(row.id));
+                          return (
+                            <Checkbox
+                              aria-label={t({
+                                en: 'Select All Shown',
+                                es: 'Seleccionar todo lo mostrado',
+                                fr: 'Tout sélectionner'
+                              })}
+                              checked={allFilteredSelected}
+                              data-testid="bulk-select-all-subjects"
+                              onCheckedChange={() => toggleFiltered(filteredRows)}
+                            />
+                          );
+                        },
+                        id: 'select',
+                        maxSize: 40,
+                        size: 40
                       },
-                      id: 'select',
-                      maxSize: 40,
-                      size: 40
-                    },
-                    {
-                      accessorKey: 'subject',
-                      header: ({ column }) => (
-                        <SortableHeader column={column} label={t('datahub.index.table.subject')} />
-                      ),
-                      id: 'subject'
-                    },
-                    {
-                      accessorKey: 'dateOfBirth',
-                      header: ({ column }) => (
-                        <SortableHeader column={column} label={t('core.identificationData.dateOfBirth.label')} />
-                      ),
-                      id: 'dateOfBirth'
-                    },
-                    {
-                      accessorKey: 'sex',
-                      cell: ({ getValue }) => {
-                        const value = getValue<string>();
-                        if (value === 'FEMALE') {
-                          return t('core.identificationData.sex.female');
-                        }
-                        if (value === 'MALE') {
-                          return t('core.identificationData.sex.male');
-                        }
-                        return t({ en: 'NULL', es: 'NULO', fr: 'NUL' });
+                      {
+                        accessorKey: 'subject',
+                        header: ({ column }) => (
+                          <SortableHeader column={column} label={t('datahub.index.table.subject')} />
+                        ),
+                        id: 'subject'
                       },
-                      header: ({ column }) => (
-                        <SortableHeader column={column} label={t('core.identificationData.sex.label')} />
-                      ),
-                      id: 'sex'
-                    }
-                  ]}
-                  data={rows}
-                  onRowClick={(row) => toggle(row.id)}
-                />
-              </div>
+                      {
+                        accessorKey: 'dateOfBirth',
+                        header: ({ column }) => (
+                          <SortableHeader column={column} label={t('core.identificationData.dateOfBirth.label')} />
+                        ),
+                        id: 'dateOfBirth'
+                      },
+                      {
+                        accessorKey: 'sex',
+                        cell: ({ getValue }) => {
+                          const value = getValue<string>();
+                          if (value === 'FEMALE') {
+                            return t('core.identificationData.sex.female');
+                          }
+                          if (value === 'MALE') {
+                            return t('core.identificationData.sex.male');
+                          }
+                          return t({ en: 'NULL', es: 'NULO', fr: 'NUL' });
+                        },
+                        header: ({ column }) => (
+                          <SortableHeader column={column} label={t('core.identificationData.sex.label')} />
+                        ),
+                        id: 'sex'
+                      },
+                      ...(isMailEnabled
+                        ? [
+                            {
+                              cell: ({ row }: { row: { original: PickerRow } }) => (
+                                <Input
+                                  className="h-8 min-w-40"
+                                  data-testid={`bulk-email-${row.original.id}`}
+                                  placeholder={t({ en: 'Email', es: 'Correo', fr: 'Courriel' })}
+                                  type="email"
+                                  value={emails[row.original.id] ?? ''}
+                                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                    onEmailsChange({ ...emails, [row.original.id]: event.target.value });
+                                  }}
+                                  onClick={(event: React.MouseEvent) => event.stopPropagation()}
+                                />
+                              ),
+                              enableSorting: false,
+                              header: () => t({ en: 'Email', es: 'Correo electrónico', fr: 'Courriel' }),
+                              id: 'email',
+                              minSize: 200,
+                              size: 220
+                            }
+                          ]
+                        : [])
+                    ]}
+                    data={rows}
+                    onRowClick={(row) => toggle(row.id)}
+                  />
+                </div>
+                {isMailEnabled && (
+                  <EmailListUpload
+                    emails={emails}
+                    groupName={groupName}
+                    knownSubjectIds={subjects.map((subject) => subject.id)}
+                    selectedIds={selectedIds}
+                    onEmailsMerged={(merged) => onEmailsChange({ ...emails, ...merged })}
+                  />
+                )}
+              </React.Fragment>
             )}
           </div>
         )}
 
         {mode === 'FILE' && (
           <div className="flex flex-col gap-3">
-            <p className="text-muted-foreground text-sm">
-              {t({
-                en: 'CSV, TSV or Excel. Include a subject ID column, or first name, last name, date of birth and sex.',
-                es: 'CSV, TSV o Excel. Incluya una columna de identificador de sujeto, o nombre, apellido, fecha de nacimiento y sexo.',
-                fr: 'CSV, TSV ou Excel. Incluez une colonne d’identifiant, ou prénom, nom, date de naissance et sexe.'
-              })}
-            </p>
+            {formatHint}
             <FileDropzone
               acceptedFileTypes={{
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
@@ -329,22 +400,20 @@ export const SourceStep = ({
 
         {mode === 'PASTE' && (
           <div className="flex flex-col gap-3">
-            <p className="text-muted-foreground text-sm">
-              {t({
-                en: 'Comma, tab or semicolon separated, with a header row. Include a subject ID column, or first name, last name, date of birth and sex.',
-                es: 'Separado por comas, tabulaciones o puntos y comas, con una fila de encabezado. Incluya una columna de identificador de sujeto, o nombre, apellido, fecha de nacimiento y sexo.',
-                fr: 'Séparé par des virgules, tabulations ou points-virgules, avec une ligne d’en-tête. Incluez une colonne d’identifiant, ou prénom, nom, date de naissance et sexe.'
-              })}
-            </p>
+            {formatHint}
             <TextArea
               className="bg-background min-h-72"
               data-testid="bulk-paste-input"
               rows={8}
               value={pasted}
-              onChange={(event) => setPasted(event.target.value)}
+              onChange={(event) => onPastedChange(event.target.value)}
             />
           </div>
         )}
+
+        {/* Last in the body, so a refusal sits directly above the action that produced it rather
+            than above the input the user is still looking at. */}
+        <ErrorList errors={errors} />
       </div>
     </StepLayout>
   );
