@@ -11,6 +11,8 @@ import type { BulkParseResult } from '@/utils/bulk-assignments';
 import { SourceStep } from '../SourceStep';
 import { captureUnhandledRejection } from './capture-unhandled-rejection';
 
+import type { SourceMode } from '../types';
+
 import '@/services/i18n';
 
 vi.mock('@/utils/bulk-assignments', async (importOriginal) => ({
@@ -44,15 +46,42 @@ const workbookResult: BulkParseResult = {
   rows: [{ subject_id: '001' }]
 };
 
-const renderSourceStep = (props: Partial<React.ComponentProps<typeof SourceStep>> = {}) => {
+// The tab lives in the wizard, so the harness holds it on the component's behalf exactly as the
+// wizard does and the mode switches in a test the way it does in the app.
+type HarnessProps = Omit<
+  React.ComponentProps<typeof SourceStep>,
+  'mode' | 'onModeChange' | 'onPastedChange' | 'pasted'
+>;
+
+// The tab and the pasted text live in the wizard, so the harness holds them on the component's
+// behalf exactly as the wizard does and both behave in a test the way they do in the app.
+const Harness = (props: HarnessProps) => {
+  const [mode, setMode] = React.useState<SourceMode>('SELECT');
+  const [pasted, setPasted] = React.useState('');
+  return <SourceStep mode={mode} pasted={pasted} onModeChange={setMode} onPastedChange={setPasted} {...props} />;
+};
+
+const renderSourceStep = (props: Partial<HarnessProps> = {}) => {
   const callbacks = {
     onBack: vi.fn(),
+    onEmailsChange: vi.fn(),
     onParsed: vi.fn(),
     onSelectedChange: vi.fn(),
     onStepChange: vi.fn(),
     onSubjectsSelected: vi.fn()
   };
-  render(<SourceStep selectedIds={[]} subjectIdDisplayLength={9} subjects={subjects} {...callbacks} {...props} />);
+  render(
+    <Harness
+      emails={{}}
+      groupName="Depression Clinic"
+      isMailEnabled={false}
+      selectedIds={[]}
+      subjectIdDisplayLength={9}
+      subjects={subjects}
+      {...callbacks}
+      {...props}
+    />
+  );
   return callbacks;
 };
 
@@ -117,7 +146,8 @@ describe('SourceStep', () => {
 
     it('should show missing demographics as null rather than blank', () => {
       renderSourceStep();
-      expect(pickerRow('c'.repeat(64)).textContent).toBe('cccccccccNULLNULL');
+      expect(pickerRow('c'.repeat(64)).textContent).toContain('ccccccccc');
+      expect(pickerRow('c'.repeat(64)).textContent).toContain('NULL');
     });
 
     it('should say so when the group has no subjects instead of rendering an empty table', () => {
@@ -206,13 +236,60 @@ describe('SourceStep', () => {
       const continueButton = screen.getByTestId('bulk-use-selected-subjects');
       expect(continueButton.textContent).toBe('Continue With Selected (2)');
       fireEvent.click(continueButton);
-      expect(onSubjectsSelected).toHaveBeenCalledWith(['Depression_Clinic$001', 'Depression_Clinic$002']);
+      expect(onSubjectsSelected).toHaveBeenCalledWith(['Depression_Clinic$001', 'Depression_Clinic$002'], {});
     });
 
     it('should refuse a selection over the bulk limit and say why', () => {
       renderSourceStep({ selectedIds: Array.from({ length: 501 }, (_, index) => `subject-${index}`) });
       expect(screen.getByText('Selection is limited to 500 subjects')).toBeTruthy();
       expect(screen.getByTestId<HTMLButtonElement>('bulk-use-selected-subjects').disabled).toBe(true);
+    });
+
+    it('should show an email input for each subject when mail is enabled', () => {
+      renderSourceStep({ isMailEnabled: true });
+      expect(screen.getByTestId('bulk-email-Depression_Clinic$002')).toBeTruthy();
+      expect(screen.getByTestId('bulk-email-Depression_Clinic$001')).toBeTruthy();
+    });
+
+    it('should call onEmailsChange when an email is typed', () => {
+      const { onEmailsChange } = renderSourceStep({ isMailEnabled: true });
+      fireEvent.change(screen.getByTestId('bulk-email-Depression_Clinic$002'), {
+        target: { value: 'test@example.com' }
+      });
+      expect(onEmailsChange).toHaveBeenCalledWith({ Depression_Clinic$002: 'test@example.com' });
+    });
+
+    it('should pass emails along when continuing with selected subjects', () => {
+      const { onSubjectsSelected } = renderSourceStep({
+        emails: { Depression_Clinic$001: 'a@x.com' },
+        isMailEnabled: true,
+        selectedIds: ['Depression_Clinic$001']
+      });
+      fireEvent.click(screen.getByTestId('bulk-use-selected-subjects'));
+      expect(onSubjectsSelected).toHaveBeenCalledWith(['Depression_Clinic$001'], { Depression_Clinic$001: 'a@x.com' });
+    });
+
+    it('should stop propagation when clicking the email input, so the row does not toggle', () => {
+      const { onSelectedChange } = renderSourceStep({ isMailEnabled: true });
+      fireEvent.click(screen.getByTestId('bulk-email-Depression_Clinic$002'));
+      expect(onSelectedChange).not.toHaveBeenCalled();
+    });
+
+    it('should merge emails from the email list upload into the existing emails', async () => {
+      const { onEmailsChange } = renderSourceStep({
+        emails: { Depression_Clinic$002: 'existing@x.com' },
+        isMailEnabled: true
+      });
+      fireEvent.click(screen.getByTestId('email-list-upload-toggle'));
+      const file = new File(['subject_id,email\n001,new@x.com'], 'emails.csv', { type: 'text/csv' });
+      const input = screen.getByTestId('email-list-upload').querySelector('input[type="file"]')!;
+      fireEvent.change(input, { target: { files: [file] } });
+      await waitFor(() => expect(screen.getByTestId('email-list-apply')).toBeTruthy());
+      fireEvent.click(screen.getByTestId('email-list-apply'));
+      expect(onEmailsChange).toHaveBeenCalledWith({
+        Depression_Clinic$001: 'new@x.com',
+        Depression_Clinic$002: 'existing@x.com'
+      });
     });
   });
 
@@ -233,6 +310,37 @@ describe('SourceStep', () => {
       expect(screen.queryByText('Back')).toBeNull();
       expect(screen.queryByRole('button', { name: /Continue/ })).toBeNull();
     });
+  });
+
+  describe('expected columns', () => {
+    const formatHint = () => screen.getByTestId('bulk-source-format-hint').textContent;
+
+    it.each(['FILE', 'PASTE'] as const)(
+      'should state the expected columns in the %s tab, so neither source leaves the format unsaid',
+      (mode) => {
+        renderSourceStep();
+        switchTo(mode);
+        expect(formatHint()).toContain('Include a subject ID column');
+      }
+    );
+
+    it.each(['FILE', 'PASTE'] as const)(
+      'should offer an email column in the %s tab when mail is enabled, since the wizard can then send the links',
+      (mode) => {
+        renderSourceStep({ isMailEnabled: true });
+        switchTo(mode);
+        expect(formatHint()).toContain('An email column is optional.');
+      }
+    );
+
+    it.each(['FILE', 'PASTE'] as const)(
+      'should not offer an email column in the %s tab when mail is disabled, since the wizard would ignore it',
+      (mode) => {
+        renderSourceStep();
+        switchTo(mode);
+        expect(formatHint()).not.toContain('email');
+      }
+    );
   });
 
   describe('uploading a file', () => {
@@ -279,6 +387,18 @@ describe('SourceStep', () => {
       dropFile(workbookFile());
       expect((await screen.findByTestId('bulk-error-list')).textContent).toContain('The workbook contains no sheets.');
       expect(onParsed).not.toHaveBeenCalled();
+    });
+
+    it('should render the refusal below the input, so it sits with the action rather than above the file the user chose', async () => {
+      vi.mocked(parseWorkbook).mockRejectedValue(
+        new BulkParseFailure([{ message: 'The workbook contains no sheets.' }])
+      );
+      renderSourceStep();
+      switchTo('FILE');
+      dropFile(workbookFile());
+      const errorList = await screen.findByTestId('bulk-error-list');
+      const fileInput = screen.getByTestId('bulk-source-step').querySelector('input[type="file"]')!;
+      expect(fileInput.compareDocumentPosition(errorList) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
 
     it('should clear parse errors when the user switches to another source', async () => {

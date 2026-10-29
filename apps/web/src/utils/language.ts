@@ -25,6 +25,26 @@ export const authoredLanguages = (value: LocalizedString | null | undefined): La
   LANGUAGES.filter((code) => value?.[code]?.trim());
 
 /**
+ * The languages a template may be sent in: the ones it was written in, scoped to the ones the
+ * instance still has enabled.
+ *
+ * Where the two do not overlap the template's own languages win - its copy exists nowhere else, so
+ * scoping it away would leave the template unsendable. A template with no content at all falls back
+ * to the active languages, which is what a yet-to-be-authored one offers.
+ */
+export const sendableLanguages = (
+  value: LocalizedString | null | undefined,
+  activeLanguages: readonly Language[]
+): readonly Language[] => {
+  const authored = authoredLanguages(value);
+  if (authored.length === 0) {
+    return activeLanguages;
+  }
+  const active = authored.filter((code) => activeLanguages.includes(code));
+  return active.length > 0 ? active : authored;
+};
+
+/**
  * Keep only the languages that were actually authored. Iterating {@link LANGUAGES} rather than the
  * value's own keys is what stops anything but a known language reaching the API.
  */

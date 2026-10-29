@@ -60,7 +60,7 @@ describe('ReviewStep', () => {
 
   it('should summarise the batch as subjects times instruments, so the user sees how many will be created', () => {
     renderReviewStep();
-    expect(screen.getByTestId('bulk-review-summary').textContent).toBe('3 subjects × 2 instruments = 6 assignments');
+    expect(screen.getByText('3 subjects × 2 instruments = 6 assignments')).toBeTruthy();
   });
 
   it('should list every instrument in the batch beside its own expiry', () => {
@@ -76,7 +76,7 @@ describe('ReviewStep', () => {
     const { onSubmit } = renderReviewStep();
     expect(screen.queryByTestId('bulk-error-list')).toBeNull();
     fireEvent.click(submitButton());
-    expect(onSubmit).toHaveBeenCalledWith({ allowDuplicates: false });
+    expect(onSubmit).toHaveBeenCalledWith({ allowDuplicates: false, skipUnavailable: false });
   });
 
   it('should go back when the back button is pressed', () => {
@@ -110,7 +110,7 @@ describe('ReviewStep', () => {
     const { onSubmit } = renderReviewStep({ failure: refusal(conflict) });
     fireEvent.click(screen.getByTestId('bulk-allow-duplicates'));
     fireEvent.click(submitButton());
-    expect(onSubmit).toHaveBeenCalledWith({ allowDuplicates: true });
+    expect(onSubmit).toHaveBeenCalledWith({ allowDuplicates: true, skipUnavailable: false });
   });
 
   it('should block submission again when the user unticks the waiver', () => {
@@ -130,17 +130,37 @@ describe('ReviewStep', () => {
     expect(submitButton().disabled).toBe(true);
   });
 
-  it('should name unavailable subjects and block submission, since no waiver can fix them', () => {
+  it('should name unavailable subjects and block submission until the user opts to skip them', () => {
     renderReviewStep({ failure: refusal({ kind: 'SUBJECT_UNAVAILABLE', subjectIds: ['subject-c'] }) });
     expect(screen.getByTestId('bulk-error-list').textContent).toContain('1 subject(s) are not available');
     expect(errorItems()).toEqual(['described subject-c']);
     expect(submitButton().disabled).toBe(true);
+    fireEvent.click(screen.getByTestId('bulk-skip-unavailable'));
+    expect(submitButton().disabled).toBe(false);
   });
 
-  it('should keep a waivable conflict blocked when it arrives alongside an unavailable subject', () => {
+  it('should submit with skipUnavailable when the user has waived unavailable subjects', () => {
+    const { onSubmit } = renderReviewStep({
+      failure: refusal({ kind: 'SUBJECT_UNAVAILABLE', subjectIds: ['subject-c'] })
+    });
+    fireEvent.click(screen.getByTestId('bulk-skip-unavailable'));
+    fireEvent.click(submitButton());
+    expect(onSubmit).toHaveBeenCalledWith({ allowDuplicates: false, skipUnavailable: true });
+  });
+
+  it('should recalculate the count when skipping unavailable subjects', () => {
+    renderReviewStep({ failure: refusal({ kind: 'SUBJECT_UNAVAILABLE', subjectIds: ['subject-c'] }) });
+    expect(screen.getByText('3 subjects × 2 instruments = 6 assignments')).toBeTruthy();
+    fireEvent.click(screen.getByTestId('bulk-skip-unavailable'));
+    expect(screen.getByText('2 subjects × 2 instruments = 4 assignments')).toBeTruthy();
+  });
+
+  it('should keep a waivable conflict blocked when unavailable subjects have not been skipped', () => {
     renderReviewStep({ failure: refusal(conflict, { kind: 'SUBJECT_UNAVAILABLE', subjectIds: ['subject-c'] }) });
     fireEvent.click(screen.getByTestId('bulk-allow-duplicates'));
     expect(submitButton().disabled).toBe(true);
+    fireEvent.click(screen.getByTestId('bulk-skip-unavailable'));
+    expect(submitButton().disabled).toBe(false);
   });
 
   it('should report a transport error while leaving the batch submittable, so the user can retry', () => {

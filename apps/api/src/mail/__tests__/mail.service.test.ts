@@ -382,11 +382,10 @@ describe('MailService', () => {
     const template = (body: string) => ({ body: { en: body }, subject: { en: 'Assignment' } });
 
     const assignmentArgs = {
-      expiresAt: new Date('2026-01-01T12:00:00.000Z'),
       language: 'en' as const,
+      links: [{ expiresAt: new Date('2026-01-01T12:00:00.000Z'), url: 'https://assign' }],
       recipient: 'p@x.org',
-      template: template('Link: {{url}}'),
-      url: 'https://assign'
+      template: template('Link: {{url}}')
     };
 
     // The rendered message still comes back so the clinician can send it by hand.
@@ -454,11 +453,54 @@ describe('MailService', () => {
       setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
       const result = await mailService.sendAssignmentEmail({
         ...assignmentArgs,
-        template: template('Please complete your assignment.'),
-        url: 'https://assign/xyz'
+        links: [{ expiresAt: new Date('2026-01-01T12:00:00.000Z'), url: 'https://assign/xyz' }],
+        template: template('Please complete your assignment.')
       });
       expect(result.status).toBe('SENT');
       expect(result.message).toContain('https://assign/xyz');
+    });
+
+    it('lists every link in one message, so a recipient with a battery is asked once', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
+      const result = await mailService.sendAssignmentEmail({
+        ...assignmentArgs,
+        links: [
+          { expiresAt: new Date('2026-01-01T12:00:00.000Z'), url: 'https://assign/one' },
+          { expiresAt: new Date('2026-02-01T12:00:00.000Z'), url: 'https://assign/two' }
+        ]
+      });
+      expect(result.status).toBe('SENT');
+      expect(result.message).toContain('Link: https://assign/one\nhttps://assign/two');
+      expect(transporter.sendMail).toHaveBeenCalledOnce();
+    });
+
+    it('appends every link when the template body omits {{url}}', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
+      const result = await mailService.sendAssignmentEmail({
+        ...assignmentArgs,
+        links: [
+          { expiresAt: new Date('2026-01-01T12:00:00.000Z'), url: 'https://assign/one' },
+          { expiresAt: new Date('2026-02-01T12:00:00.000Z'), url: 'https://assign/two' }
+        ],
+        template: template('Please complete your assignments.')
+      });
+      expect(result.message).toContain('https://assign/one');
+      expect(result.message).toContain('https://assign/two');
+    });
+
+    // The recipient has to act by the soonest of them, so a later expiry must not be advertised.
+    it('renders the soonest expiry when the links expire on different dates', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ mailConfig: stored(validConfig) });
+      const result = await mailService.sendAssignmentEmail({
+        ...assignmentArgs,
+        links: [
+          { expiresAt: new Date('2027-06-01T12:00:00.000Z'), url: 'https://assign/late' },
+          { expiresAt: new Date('2026-03-04T12:00:00.000Z'), url: 'https://assign/soon' }
+        ],
+        template: template('{{url}} expires {{expiresAt}}')
+      });
+      expect(result.message).toContain('2026');
+      expect(result.message).not.toContain('2027');
     });
   });
 });

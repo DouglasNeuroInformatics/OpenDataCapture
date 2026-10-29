@@ -1,64 +1,128 @@
 import React, { useState } from 'react';
 
-import { Badge, Button, Select, Table } from '@douglasneuroinformatics/libui/components';
+import { Badge, Button, Checkbox, Table } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { BULK_ASSIGNMENT_MAX_SUBJECTS } from '@opendatacapture/schemas/assignment';
 
 import { BulkParseFailure, detectMode, resolveSubjectIds } from '@/utils/bulk-assignments';
-import type { BulkParseError, BulkParseResult, BulkSourceMode, CanonicalField } from '@/utils/bulk-assignments';
+import type {
+  BulkParseError,
+  BulkParseResult,
+  BulkSourceMode,
+  CanonicalField,
+  SubjectIdResolution
+} from '@/utils/bulk-assignments';
 
+import { ColumnFieldSelect } from './ColumnFieldSelect';
 import { ErrorList } from './ErrorList';
 import { StepLayout } from './StepLayout';
 import { WizardTable } from './WizardTable';
 
 import type { WizardStep } from './types';
 
-const CANONICAL_FIELDS: CanonicalField[] = ['subjectId', 'firstName', 'lastName', 'dateOfBirth', 'sex'];
-
-const FIELD_LABELS: { [K in CanonicalField]: { en: string; es: string; fr: string } } = {
-  dateOfBirth: { en: 'Date of Birth', es: 'Fecha de nacimiento', fr: 'Date de naissance' },
-  firstName: { en: 'First Name', es: 'Nombre', fr: 'Prénom' },
-  lastName: { en: 'Last Name', es: 'Apellido', fr: 'Nom' },
-  sex: { en: 'Sex at Birth', es: 'Sexo al nacer', fr: 'Sexe à la naissance' },
-  subjectId: { en: 'Subject ID', es: 'Identificador del sujeto', fr: 'Identifiant du sujet' }
-} as const;
-
-const NOT_USED = '__not_used__';
+const CANONICAL_FIELDS: CanonicalField[] = ['subjectId', 'firstName', 'lastName', 'dateOfBirth', 'sex', 'email'];
 
 type MapStepProps = {
   groupName: string;
+  knownSubjectIds: string[];
   onBack: () => void;
-  onResolved: (subjectIds: string[]) => void;
+  /** The kept rows travel with their ids, so a skipped row cannot shift the pairing. */
+  onResolved: (subjectIds: string[], rows: BulkParseResult['rows']) => void;
   onStepChange: (step: WizardStep) => void;
   parsed: BulkParseResult;
 };
 
-export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }: MapStepProps) => {
+export const MapStep = ({ groupName, knownSubjectIds, onBack, onResolved, onStepChange, parsed }: MapStepProps) => {
   const { t } = useTranslation();
   const [errors, setErrors] = useState<BulkParseError[]>([]);
   const [mapping, setMapping] = useState<Partial<{ [key: string]: CanonicalField }>>(parsed.mapping);
+  // The rows this group cannot place, once a resolve has found some, and whether the user has said
+  // to leave them out. Held across a second press of Continue, which is how the choice is made.
+  const [unplaceableRowCount, setUnplaceableRowCount] = useState(0);
+  const [skipUnplaceable, setSkipUnplaceable] = useState(false);
 
   const mode: BulkSourceMode | null = detectMode(mapping);
 
-  const claimed = new Set(Object.values(mapping).filter(Boolean));
+  const claimed = new Set(Object.values(mapping).filter((field): field is CanonicalField => Boolean(field)));
 
-  const setHeaderField = (header: string, value: string) => {
+  const setHeaderField = (header: string, field: CanonicalField | undefined) => {
     setMapping((prev) => {
       const next = { ...prev };
-      if (value === NOT_USED) {
-        delete next[header];
+      if (field) {
+        next[header] = field;
       } else {
-        next[header] = value as CanonicalField;
+        delete next[header];
       }
       return next;
     });
+  };
+
+  const rowLabel = (rowNumber: number) =>
+    t({ en: `Row ${rowNumber}`, es: `Fila ${rowNumber}`, fr: `Ligne ${rowNumber}` });
+
+  /**
+   * The group cannot place every row: the file may name a subject it does not have, or an identifier
+   * too short to name one in particular. Reported here rather than left to the API three steps
+   * later, and offered as a skip rather than a dead end, so one stray row does not cost the batch.
+   */
+  const unplaceableWarnings = ({ ambiguousRows, unknownRows }: SubjectIdResolution): BulkParseError[] => {
+    const warnings: BulkParseError[] = [];
+    if (unknownRows.length > 0) {
+      warnings.push({
+        items: unknownRows.map(rowLabel),
+        message: t({
+          en: `${unknownRows.length} row(s) name a subject this group does not have:`,
+          es: `${unknownRows.length} fila(s) nombran a un sujeto que este grupo no tiene:`,
+          fr: `${unknownRows.length} ligne(s) nomment un sujet que ce groupe n’a pas :`
+        })
+      });
+    }
+    if (ambiguousRows.length > 0) {
+      warnings.push({
+        items: ambiguousRows.map(rowLabel),
+        message: t({
+          en: `${ambiguousRows.length} row(s) hold an identifier matching more than one subject in this group:`,
+          es: `${ambiguousRows.length} fila(s) tienen un identificador que coincide con más de un sujeto de este grupo:`,
+          fr: `${ambiguousRows.length} ligne(s) portent un identifiant correspondant à plus d’un sujet de ce groupe :`
+        })
+      });
+    }
+    return warnings;
   };
 
   const resolve = async (sourceMode: BulkSourceMode) => {
     setErrors([]);
     const resolvedParsed: BulkParseResult = { ...parsed, mapping, mode: sourceMode };
     try {
-      onResolved(await resolveSubjectIds(resolvedParsed, { groupName, maxSubjects: BULK_ASSIGNMENT_MAX_SUBJECTS }));
+      const resolution = await resolveSubjectIds(resolvedParsed, {
+        groupName,
+        knownSubjectIds,
+        maxSubjects: BULK_ASSIGNMENT_MAX_SUBJECTS
+      });
+      const unplaceableCount = resolution.ambiguousRows.length + resolution.unknownRows.length;
+      setUnplaceableRowCount(unplaceableCount);
+      if (unplaceableCount > 0 && !skipUnplaceable) {
+        setErrors(unplaceableWarnings(resolution));
+        return;
+      }
+      if (resolution.matched.length === 0) {
+        setErrors([
+          ...unplaceableWarnings(resolution),
+          {
+            message: t({
+              en: 'No row names a subject this group has, so there is nothing to assign.',
+              es: 'Ninguna fila nombra a un sujeto de este grupo, así que no hay nada que asignar.',
+              fr: 'Aucune ligne ne nomme un sujet de ce groupe : il n’y a rien à attribuer.'
+            })
+          }
+        ]);
+        return;
+      }
+      onResolved(
+        resolution.matched.map(({ id }) => id),
+        // The header is row 1, so a row number indexes the data rows one further back.
+        resolution.matched.map(({ rowNumber }) => parsed.rows[rowNumber - 2]!)
+      );
     } catch (err) {
       if (err instanceof BulkParseFailure) {
         setErrors(err.errors);
@@ -104,8 +168,6 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-6" data-testid="bulk-map-step">
-        <ErrorList errors={errors} />
-
         {mode === 'PII' && (
           <p className="text-muted-foreground text-sm">
             {t({
@@ -138,24 +200,13 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
                 <Table.Row key={header}>
                   <Table.Cell className="font-medium">{header}</Table.Cell>
                   <Table.Cell className="py-2">
-                    <Select value={field ?? NOT_USED} onValueChange={(value) => setHeaderField(header, value)}>
-                      <Select.Trigger
-                        className={field ? 'w-48' : 'text-muted-foreground w-48 italic'}
-                        data-testid={`bulk-map-select-${header}`}
-                      >
-                        <Select.Value />
-                      </Select.Trigger>
-                      <Select.Content>
-                        <Select.Item value={NOT_USED}>
-                          {t({ en: 'Not Used', es: 'No utilizada', fr: 'Non utilisée' })}
-                        </Select.Item>
-                        {CANONICAL_FIELDS.filter((f) => !claimed.has(f) || f === field).map((f) => (
-                          <Select.Item key={f} value={f}>
-                            {t(FIELD_LABELS[f])}
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select>
+                    <ColumnFieldSelect
+                      claimed={claimed}
+                      data-testid={`bulk-map-select-${header}`}
+                      fields={CANONICAL_FIELDS}
+                      value={field}
+                      onChange={(next) => setHeaderField(header, next)}
+                    />
                   </Table.Cell>
                 </Table.Row>
               );
@@ -186,6 +237,25 @@ export const MapStep = ({ groupName, onBack, onResolved, onStepChange, parsed }:
             ))}
           </WizardTable>
         </div>
+
+        {/* Last in the body, so a refusal sits directly above Continue rather than above the
+            mapping the user has scrolled past. */}
+        <ErrorList errors={errors} />
+
+        {unplaceableRowCount > 0 && (
+          <label className="flex items-center gap-2 text-sm font-semibold">
+            <Checkbox
+              checked={skipUnplaceable}
+              data-testid="bulk-skip-unplaceable"
+              onCheckedChange={(checked) => setSkipUnplaceable(checked === true)}
+            />
+            {t({
+              en: `Leave out the ${unplaceableRowCount} row(s) this group cannot place and continue with the rest`,
+              es: `Omitir las ${unplaceableRowCount} fila(s) que este grupo no puede ubicar y continuar con el resto`,
+              fr: `Laisser de côté les ${unplaceableRowCount} ligne(s) que ce groupe ne peut pas placer et continuer avec le reste`
+            })}
+          </label>
+        )}
       </div>
     </StepLayout>
   );

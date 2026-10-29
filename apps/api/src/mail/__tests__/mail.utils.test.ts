@@ -54,6 +54,20 @@ describe('redactEmails', () => {
   it('leaves text without an address unchanged', () => {
     expect(redactEmails('getaddrinfo ENOTFOUND smtp.invalid.test')).toBe('getaddrinfo ENOTFOUND smtp.invalid.test');
   });
+
+  it('masks an address that opens the text and one that follows a bracket, so neither escapes', () => {
+    expect(redactEmails('alice@a.org said so')).toBe('a***@a.org said so');
+    expect(redactEmails('[bob@b.org]')).toBe('[b***@b.org]');
+  });
+
+  // The scan starts only where a local part can, so a long run holding no address is read once
+  // rather than from every position inside it.
+  it('returns a long run of ordinary characters unchanged, without rescanning it from each position', () => {
+    const noAddress = '!'.repeat(50_000);
+    const start = performance.now();
+    expect(redactEmails(noAddress)).toBe(noAddress);
+    expect(performance.now() - start).toBeLessThan(1_000);
+  });
 });
 
 describe('pickLocale', () => {

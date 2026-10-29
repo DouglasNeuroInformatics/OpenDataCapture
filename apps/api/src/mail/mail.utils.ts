@@ -48,8 +48,11 @@ export function formatExpiryDate(expiresAt: Date | number | string, language: La
  * back in their error (`550 5.1.1 <bob@example.org>: Recipient address rejected`).
  */
 export function redactEmails(text: string): string {
-  // A local part is any run of characters other than whitespace and the RFC 5322 specials.
-  return text.replace(/([^\s"(),:;<>@[\]])[^\s"(),:;<>@[\]]*@/gu, '$1***@');
+  // A local part is any run of characters other than whitespace and the RFC 5322 specials, and it
+  // may only begin where one of those ends. Without that lookbehind every position inside a long
+  // run is a candidate start, so text holding no `@` at all is rescanned from each of them -
+  // quadratic work on input an SMTP server or an API caller supplies.
+  return text.replace(/(?<=^|[\s"(),:;<>[\]@])([^\s"(),:;<>@[\]])[^\s"(),:;<>@[\]]*@/gu, '$1***@');
 }
 
 /** Pick a language from a localized string, falling back to any available language when the requested one is empty. */

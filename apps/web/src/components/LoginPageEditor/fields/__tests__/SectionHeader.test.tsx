@@ -23,6 +23,7 @@ const SETUP_STATE: SetupState = {
   branding: null,
   isDemo: false,
   isGatewayEnabled: false,
+  isMailEnabled: false,
   isSetup: true,
   release: { buildTime: 0, type: 'production', version: '1.0.0' },
   uptime: 0
