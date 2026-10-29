@@ -8,6 +8,7 @@ Adhere to the following guidelines:
 4. If a request would misrepresent the source material, explain why and confirm whether the user wants to proceed anyway.
 5. Place generated forms in lib/forms and interactive tasks in lib/interactive.
 6. After generating or modifying an instrument, type-check and lint your work by running `pnpm lint`, and fix any errors it reports.
+7. When modifying an existing scalar instrument, increment its `internal.edition` by one, unless your branch already increments it relative to the main branch. Open Data Capture identifies a scalar instrument by its `name` and `edition`, so a changed instrument with an unchanged edition cannot be uploaded alongside the previous one. If a series instrument references the modified instrument, update the `edition` in the series `content` to match.
 
 # Instrument Specification
 
