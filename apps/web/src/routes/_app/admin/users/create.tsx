@@ -40,7 +40,7 @@ const RouteComponent = () => {
   // Clamp to what is offered: a language the instance has since disabled has no template on the
   // mail page any more, and would leave the trigger blank while that language is still posted.
   const activeLanguages = setupStateQuery.data.activeLanguages;
-  const emailLanguage = activeLanguages.includes(emailLanguageChoice) ? emailLanguageChoice : activeLanguages[0]!;
+  const emailLanguage = activeLanguages.includes(emailLanguageChoice) ? emailLanguageChoice : activeLanguages[0];
 
   const handleSubmit = async (data: $CreateUserData) => {
     // check if username exists
