@@ -228,6 +228,28 @@ test.describe('admin instrument repos activity log', () => {
     await expect(reposPage.dataTable.getByTestId('instrument-repo-failed-count')).toHaveText('0');
   });
 
+  test('should clip a long repository name to one line and name it in full on hover', async ({
+    getPageModel,
+    page
+  }) => {
+    const repoName = 'LaboratoireDeRecherchePsychiatrique/instruments-cliniques-internes-du-laboratoire';
+    await page.route(/\/v1\/instrument-repos\/sync\/logs(\?|$)/, (route) =>
+      route.fulfill({ json: { data: [{ ...partialSync, repoName }], pageCount: 1, total: 1 } })
+    );
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    await reposPage.openActivityLog();
+
+    const cell = reposPage.syncLogTable.getByTestId('sync-log-repo-name');
+
+    await expect(cell).toHaveAttribute('title', repoName);
+    const layout = await cell.evaluate((element) => ({
+      clipped: element.scrollWidth > element.clientWidth,
+      lines: Math.round(element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight))
+    }));
+    expect(layout.clipped).toBe(true);
+    expect(layout.lines).toBe(1);
+  });
+
   test('should keep the failure reason out of the activity log row, and show it in full on View', async ({
     getPageModel
   }) => {
