@@ -6,6 +6,7 @@ import type { InstrumentRepoSyncLog, InstrumentRepoSyncStage } from '@opendataca
 
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { SortableHeader } from '@/components/SortableHeader';
+import { TruncatedCell } from '@/components/TruncatedCell';
 import { MIN_TABLE_BODY_HEIGHT } from '@/utils/data-table';
 import { getSyncStatus } from '@/utils/instrument-repo-sync';
 import type { InstrumentRepoSyncStatus } from '@/utils/instrument-repo-sync';
@@ -71,13 +72,17 @@ export const InstrumentRepoSyncLogTable = ({
       <div className={MIN_TABLE_BODY_HEIGHT} data-testid="instrument-repo-sync-log">
         <DataTable
           disableSearch
-          // Server mode accepts no `initialState`, so no column can be pinned to a fixed width; every
-          // breakpoint shows all seven columns at an even share instead of overflowing sideways.
-          columnBreakpoints={{ 0: 7, 512: 7, 768: 7, 1024: 7, 1280: 7 }}
           columns={[
             {
-              cell: (ctx) =>
-                ctx.row.original.createdAt.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' }),
+              cell: (ctx) => (
+                <TruncatedCell
+                  title={ctx.row.original.createdAt.toLocaleString()}
+                  value={ctx.row.original.createdAt.toLocaleString(undefined, {
+                    dateStyle: 'short',
+                    timeStyle: 'short'
+                  })}
+                />
+              ),
               enableSorting: true,
               header: ({ column }) => (
                 <SortableHeader
@@ -87,20 +92,32 @@ export const InstrumentRepoSyncLogTable = ({
                 />
               ),
               id: 'date',
+              size: 170,
               // The rows already arrive newest first, so the table's first toggle of its unsorted
               // column must go to ascending, or the first click would request what is on screen.
               sortDescFirst: false
             },
             {
               accessorKey: 'repoName',
+              cell: (ctx) => (
+                <TruncatedCell
+                  data-testid="sync-log-repo-name"
+                  title={ctx.row.original.repoName}
+                  value={ctx.row.original.repoName}
+                />
+              ),
               enableSorting: false,
               header: t({ en: 'Repository', es: 'Repositorio', fr: 'Dépôt' })
             },
             {
-              accessorFn: (log: InstrumentRepoSyncLog) => actionLabels[log.action],
+              cell: (ctx) => {
+                const label = actionLabels[ctx.row.original.action];
+                return <TruncatedCell title={label} value={label} />;
+              },
               enableSorting: false,
               header: t({ en: 'Action', es: 'Acción', fr: 'Action' }),
-              id: 'action'
+              id: 'action',
+              size: 105
             },
             {
               cell: (ctx) => {
@@ -115,18 +132,28 @@ export const InstrumentRepoSyncLogTable = ({
               },
               enableSorting: false,
               header: t({ en: 'Status', es: 'Estado', fr: 'Statut' }),
-              id: 'status'
+              id: 'status',
+              size: 160
             },
             {
               accessorKey: 'importedCount',
+              cell: (ctx) => {
+                const count = String(ctx.row.original.importedCount);
+                return <TruncatedCell title={count} value={count} />;
+              },
               enableSorting: false,
-              header: t({ en: 'Imported', es: 'Importados', fr: 'Importés' })
+              header: t({ en: 'Imported', es: 'Importados', fr: 'Importés' }),
+              size: 110
             },
             {
-              accessorFn: (log: InstrumentRepoSyncLog) => log.failures.length,
+              cell: (ctx) => {
+                const count = String(ctx.row.original.failures.length);
+                return <TruncatedCell title={count} value={count} />;
+              },
               enableSorting: false,
               header: t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' }),
-              id: 'failedCount'
+              id: 'failedCount',
+              size: 95
             },
             {
               cell: (ctx) => {
@@ -149,10 +176,17 @@ export const InstrumentRepoSyncLogTable = ({
               },
               enableSorting: false,
               header: t({ en: 'Messages', es: 'Mensajes', fr: 'Messages' }),
-              id: 'messages'
+              id: 'messages',
+              size: 105
             }
           ]}
           data={logs}
+          // libui honours `size` only on a pinned column and splits what is left evenly between the
+          // rest, so pinning every column but the repository leaves the repository the room a long
+          // owner/name needs.
+          initialState={{
+            columnPinning: { left: ['date'], right: ['action', 'status', 'importedCount', 'failedCount', 'messages'] }
+          }}
           mode="server"
           pageCount={pageCount}
           onPaginationChange={({ pageIndex }) => onPageChange(pageIndex + 1)}

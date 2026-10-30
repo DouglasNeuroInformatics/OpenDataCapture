@@ -203,6 +203,43 @@ describe('InstrumentRepoSyncLogTable', () => {
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
 
+  it('should hold every cell to one line, so no row can stand taller than the rest', () => {
+    const createdAt = new Date('2026-10-01T12:00:00Z');
+    render(<Table logs={[logFixture({ createdAt, importedCount: 7, repoName: 'A Very Long Repository Name' })]} />);
+    const row = within(rows()[0]!);
+    const cells = [
+      row.getByText(createdAt.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })),
+      row.getByText('A Very Long Repository Name'),
+      row.getByText('Sync'),
+      row.getByText('7')
+    ];
+    cells.forEach((cell) => expect(cell.className).toContain('whitespace-nowrap'));
+  });
+
+  it('should carry the full repository name as a hover title, since the cell may clip it', () => {
+    const repoName = 'LaboratoireDeRecherche/instruments-cliniques-internes';
+    render(<Table logs={[logFixture({ repoName })]} />);
+    expect(screen.getByTestId('sync-log-repo-name').title).toBe(repoName);
+  });
+
+  it('should name the unabbreviated date on hover, since the cell shows a short form', () => {
+    const createdAt = new Date('2026-10-01T12:00:00Z');
+    render(<Table logs={[logFixture({ createdAt })]} />);
+    const cell = within(rows()[0]!).getByText(
+      createdAt.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })
+    );
+    expect(cell.title).toBe(createdAt.toLocaleString());
+  });
+
+  it('should pin every column but the repository, so a long repository name has the leftover room', () => {
+    render(<Table logs={[logFixture()]} />);
+    const head = within(screen.getByTestId('data-table-head'));
+    const cellOf = (label: string) => head.getByText(label).closest('div')!;
+    expect(cellOf('Date').style.position).toBe('sticky');
+    expect(cellOf('Imported').style.position).toBe('sticky');
+    expect(cellOf('Repository').style.position).toBe('');
+  });
+
   it('should colour the status dot for the dark theme when the app is dark', () => {
     theme.current = 'dark';
     render(<Table logs={[logFixture()]} />);
