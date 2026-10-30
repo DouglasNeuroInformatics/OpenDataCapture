@@ -297,8 +297,8 @@ class HttpClient:
 
 
 class AuthCommands:
-    @require_url
     @staticmethod
+    @require_url
     def login(username: str, password: str) -> None:
         response = HttpClient.post(
             f'{config.base_url}/v1/auth/login',
@@ -333,9 +333,9 @@ class AuthCommands:
         for key, value in status_dict.items():
             print(f'{key}: {value}')
 
+    @staticmethod
     @require_url
     @require_token
-    @staticmethod
     def _print_raw_status() -> None:
         assert config.access_token is not None
         token_payload = JWTDecoder.decode_payload(config.access_token)
@@ -354,17 +354,17 @@ class ConfigCommands:
 
 
 class InstrumentRecordsCommands:
+    @staticmethod
     @require_url
     @require_token
-    @staticmethod
     def delete(id: str) -> None:
         url = f'{config.base_url}/v1/instrument-records/{id}'
         response = HttpClient.delete(url)
         print(response)
 
+    @staticmethod
     @require_url
     @require_token
-    @staticmethod
     def find(min_date: datetime | None, instrument_id: str | None, subject_id: str | None) -> None:
         # The API accepts minDate only as an ISO 8601 date-time with a timezone
         if min_date is not None and min_date.tzinfo is None:
@@ -380,9 +380,9 @@ class InstrumentRecordsCommands:
         response = HttpClient.get(url)
         print(response)
 
+    @staticmethod
     @require_url
     @require_token
-    @staticmethod
     def update(id: str, data: Any) -> None:
         url = f'{config.base_url}/v1/instrument-records/{id}'
         response = HttpClient.patch(url, {'data': data})
@@ -390,9 +390,9 @@ class InstrumentRecordsCommands:
 
 
 class SubjectCommands:
+    @staticmethod
     @require_url
     @require_token
-    @staticmethod
     def delete(id: str) -> None:
         entry = input("Are you sure you want to delete this subject? Type DELETE to Confirm: ")
         if entry == "DELETE":
@@ -407,9 +407,9 @@ class SubjectCommands:
         else:
             print("Cancelling delete command")
 
+    @staticmethod
     @require_url
     @require_token
-    @staticmethod
     def find(min_date: datetime | None, subject_id: str | None) -> None:
         if subject_id is not None:
             url = f'{config.base_url}/v1/subjects/{quote(subject_id, safe="")}'
@@ -430,9 +430,9 @@ class SubjectCommands:
 
 
 class InstrumentsCommands:
+    @staticmethod
     @require_url
     @require_token
-    @staticmethod
     def list(kind: str | None) -> None:
         url = build_url_with_params(f'{config.base_url}/v1/instruments/list', {'kind': kind})
         response = HttpClient.get(url)
@@ -440,14 +440,14 @@ class InstrumentsCommands:
 
 
 class SetupCommands:
-    @require_url
     @staticmethod
+    @require_url
     def get_status() -> None:
         response = HttpClient.get(f'{config.base_url}/v1/setup')
         print(response)
 
-    @require_url
     @staticmethod
+    @require_url
     def init(
         admin_first_name: str,
         admin_last_name: str,
