@@ -5,7 +5,11 @@ sidebar:
   order: 3
 ---
 
-Open Data Capture allows you to visualize numeric measures over time in a single subject. These measures must be defined in the instrument.
+import { Steps } from '@astrojs/starlight/components';
+
+Open Data Capture can import records for a form instrument from a CSV file. Each row of the file becomes one record of that instrument for a subject in the currently selected group.
+
+Upload is an experimental feature. The **Upload Data** item appears in the navigation only after an admin turns on **Enable Uploader** under **Admin Panel** > **App Settings**, and only for accounts that can read subjects and create instrument records. The default Group Manager and Standard User roles both have those permissions.
 
 ### Steps
 
@@ -13,31 +17,35 @@ Open Data Capture allows you to visualize numeric measures over time in a single
 
 1.  **Login to Open Data Capture**
 
-    First, login to your instance of Open Data Capture. In order to visualize subject data, you must have adequate permissions. Usually, that means you must be a group manager (or equivalent).
+    First, login to your instance of Open Data Capture. If you do not see **Upload Data** in the navigation, ask an admin to turn on **Enable Uploader** under **Admin Panel** > **App Settings** and to check that your account can read subjects and create instrument records.
 
 2.  **Select Your Group**
 
-    Next, select the group that you were using when you collected the data for this subject
-    (or were using to send the subject a remote assignment). It is very important that
-    you select the correct group, otherwise you will not see the expected data.
+    Next, select the group the records belong to with the group switcher at the top of the sidebar (or at the top of the menu on a small screen). If your account belongs to only one group, the switcher shows that group's name and there is nothing to choose. Switching group ends the current session.
 
-3.  **Select the Upload tab**
+    It is very important that you select the correct group. Uploaded records always go to the current group, and each `subjectID` in the file is read as an ID within that group, so with the wrong group selected the rows are recorded for different subjects.
 
-    Select the upload tab within the side navigation bar. This will reveal a page displaying all the form instruments that are available in the current OpenDataCapture instance.
+3.  **Open Upload Data**
+
+    Select **Upload Data** in the navigation. This will reveal a page displaying all the form instruments that are available in the current Open Data Capture instance.
 
 4.  **Select Instrument to Upload to**
 
-    Select an instrument you would like to upload data to by clicking on its title within the displayed table. This action will bring you to the upload page for the selected instrument
+    Select an instrument you would like to upload data to by clicking on its title within the displayed table. This action will bring you to the upload page for the selected instrument.
 
-5.  **Following Proper Upload Format**
+5.  **Select the Username for the Records**
 
-    In order to properly upload data to the selected instrument, the data must follow a certain format. A sample of the instrument's data format can be seen by clicking the download template button. Once the template is downloaded, one can fill it with external data. The template includes pre-filled columns and sample data that specify data types for each field.
+    On the upload page, select the username to associate with these records for audit and traceability, or **N/A**. The **Filter users by group** select only narrows the list of usernames; it does not change the group the records go to. Choose a user who belongs to the current group, otherwise the upload fails.
 
-6.  **Uploading Using Dropzone**
+6.  **Following Proper Upload Format**
+
+    In order to properly upload data to the selected instrument, the data must follow a certain format. A sample of the instrument's data format can be seen by clicking the **Template** button. Once the template is downloaded, one can fill it with external data. The template includes pre-filled columns and sample data that specify data types for each field.
+
+7.  **Uploading Using Dropzone**
 
     Once a template is filled, it can be dragged and dropped into the file dropzone. After this, click the submit button to verify the data. If the data follows the correct syntax, it is submitted to the instrument's data table; otherwise, an error is displayed indicating which field is filled incorrectly.
 
-7.  **Uploading specific Zod Data**
+8.  **Uploading specific Zod Data**
 
     Some forms may have Zod field types that are challenging to represent in a standard CSV format. Therefore, specific notations must be used to ensure the upload feature can properly parse the data.
 
@@ -78,9 +86,9 @@ This section will present how to properly fill in a template csv from the upload
 | string    | yyyy-mm-dd | yes/no         | SET(A/B/C, ...) | A/B (optional)   | RECORD_ARRAY(testString: A/B/C, testNumber: number;) |
 |           |            |                |                 |                  |                                                      |
 
-<br>
+<br />
 
-Starting with the first column we have **subjectID**, which is a string value containing the identification of the subject taking part in the instrument. This field is required.
+Starting with the first column we have **subjectID**, which is the subject's ID within the current group, with no `$` or whitespace. This field is required. Only custom subject IDs are supported for now: an ID generated from personal information does not match the existing subject and creates a new one.
 
 The second column contains the date of which in instrument was done by the subject, which follows _yyyy-mm-dd_ format. This field is to be filled for each row.
 
@@ -90,10 +98,10 @@ The fourth column is a field which takes in a set of entries, where the options 
 
 The fifth column is an optional string field with the possible options of A or B. This field can hold either A, B, or can remain empty.
 
-Finally, the sixth column is a record array field. This record array object can have the fields testString and testNumber entered within it. These internal field values are entered by including the fieldname and its corresponding value separated by a **":"**. In addition, a record array can also have multiple entries for each internal field within it as long as the new entry is separated by a **";"**. With that in mind, valid entries for this column would be `RECORD_ARRAY(testString: A, testNumber: 1;)` or <br>
+Finally, the sixth column is a record array field. This record array object can have the fields testString and testNumber entered within it. These internal field values are entered by including the fieldname and its corresponding value separated by a **":"**. In addition, a record array can also have multiple entries for each internal field within it as long as the new entry is separated by a **";"**. With that in mind, valid entries for this column would be `RECORD_ARRAY(testString: A, testNumber: 1;)` or <br />
 `RECORD_ARRAY(testString: A, testNumber: 1; testString: 1, testNumber: 2;)`, etc.
 
-<br>
+<br />
 
 A valid CSV file that follows this template can be seen below:
 

@@ -136,6 +136,7 @@ export default defineConfig({
   redirects: {
     '/docs': '/en/docs/introduction/home',
     '/en/docs': '/en/docs/introduction/home',
+    '/en/docs/updating/v2.0.0': '/en/docs/changelog/#200',
     '/fr/docs': '/fr/docs/introduction/home'
   },
   server: {
