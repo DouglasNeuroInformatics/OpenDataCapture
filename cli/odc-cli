@@ -601,7 +601,7 @@ class CLI:
     def _create_instruments_parser(self):
         subparsers = self._create_subcommand_subparsers('instruments')
         get_parser = subparsers.add_parser('list', help='list all instruments, optionally filtered by kind')
-        get_parser.add_argument('--kind', choices=('FORM', 'INTERACTIVE'), help='filter instruments by kind')
+        get_parser.add_argument('--kind', choices=('FILE', 'FORM', 'INTERACTIVE', 'SERIES'), help='filter instruments by kind')
         get_parser.set_defaults(fn=InstrumentsCommands.list)
 
     def _create_setup_parser(self):

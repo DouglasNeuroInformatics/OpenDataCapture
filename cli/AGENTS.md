@@ -25,14 +25,14 @@ Every URL is a hand-written f-string against `config.base_url` and every payload
 There is **no generated client and no compile-time relationship to `packages/schemas`**, so an API
 change breaks this file silently — no test, type error or lint rule in this repo will notice.
 
-The drift is already visible: `odc-cli instruments list --kind` declares
-`choices=('FORM', 'INTERACTIVE')`, while `InstrumentKind` in
-`packages/runtime-core/src/types/instrument.base.ts` is
-`'FILE' | 'FORM' | 'INTERACTIVE' | 'SERIES'`.
+Some values are hand copies too. The `choices` of `odc-cli instruments list --kind` copy
+`$InstrumentKind` in `packages/schemas/src/instrument/instrument.base.ts`, and the API does not
+validate `kind`, so this argparse check is the only thing that rejects a bad one.
 
 ## When to touch it
 
-Only when one of the endpoints below changes shape, or when asked for a new command. If you change
+Only when one of the endpoints below changes shape, when a new instrument kind is added, or when
+asked for a new command. If you change
 the request or response of any of these in `apps/api`, update this file in the same change — nothing
 else will remind you.
 
