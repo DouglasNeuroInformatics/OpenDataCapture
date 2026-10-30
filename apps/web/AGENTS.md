@@ -181,6 +181,34 @@ Put something in `packages/react-core` instead **only if `apps/gateway` also use
 `data-testid` attributes are the Playwright suite's selectors. Don't remove them; add one when you
 add UI that an e2e test will drive.
 
+## Tables
+
+Every table here is the libui `DataTable`. Two of its behaviours are load-bearing and neither is
+visible from the call site.
+
+**A cell wraps unless it truncates itself.** `DataTableBody` wraps cell content in a truncating span
+only when that content is _not_ a React element, and Tanstack's default cell renderer is a function,
+which libui's `flexRender` renders as a component. So that span never applies to an ordinary column:
+one long value makes its row two lines tall. Render `@/components/TruncatedCell` — one line, an
+ellipsis, and the full value in the native `title` — in any column whose content can outgrow it;
+`ColorTagCell` already clips the same way. `src/components/InstrumentRepoSyncLogTable` renders every
+column that way.
+
+**`columnDef.size` is honoured only on a pinned column.** `calculateColumnSizing` gives each pinned
+column its `size` and splits what is left _evenly_ between the unpinned ones, so the way to give one
+column the slack is to pin every other column and leave that one alone — pin them all and the
+function divides the container evenly and ignores every `size`. A column's size has a floor: header
+cells get no truncating span either, so a size under the width of the longest translated header wraps
+the header instead of the cell. Budget against the width the table actually has rather than the
+viewport's: measure it in the browser, or from a spec with
+`locator.evaluate((node) => node.clientWidth)`. The admin pages get 764px of a 1280px viewport once
+the sidebar and the card's padding are taken out, which is what
+`testing/src/specs/admin-instrument-repos.spec.ts` holds both of their tables to.
+
+`initialState` is where pinning goes, which libui 6.16.1 types as `never` in `mode="server"`;
+`patches/@douglasneuroinformatics__libui@6.16.1.patch` carries
+[libui#129](https://github.com/DouglasNeuroInformatics/libui/pull/129) until a release includes it.
+
 ## Tests
 
 `pnpm exec vitest --project web`. Environment is happy-dom. There are no setup files anywhere in the
