@@ -27,7 +27,7 @@ You need:
 - Your account credentials
 - Access to the group where you will collect or review data
 
-Most users belong to one group. At login, ODC selects the first group assigned to your account.
+Most users belong to one group. At login, ODC selects the group you last used in that browser if you still belong to it, and the first group assigned to your account otherwise.
 
 <Screenshot alt="login page" name="login" />
 
@@ -38,8 +38,8 @@ ODC only shows navigation items that your account can access.
 - **Dashboard** shows an overview of data for the selected group. The default Standard User role does not see Dashboard.
 - **Data Hub** finds subjects, reviews records, exports data, graphs measures, and manages assignments. The default Standard User role does not see Data Hub.
 - **Start Session** begins a session for a subject.
-- **Accessible Instruments** shows the instruments available for the selected group and current session.
-- **Upload** imports form instrument data from CSV.
+- **Administer Instrument** shows the instruments available for the selected group and current session.
+- **Upload Data** imports form instrument data from CSV.
 - **Manage Group** configures group-level settings. The default Standard User role does not see Manage Group.
 
 <Screenshot alt="dashboard page" name="dashboard" />
@@ -48,7 +48,9 @@ ODC only shows navigation items that your account can access.
 
 The selected group controls which instruments and data you see.
 
-Group managers use the group selector on Dashboard to change the selected group.
+The group switcher at the top of the sidebar shows the selected group. On a small screen, it is at the top of the navigation menu. If your account belongs to only one group, the switcher shows that group's name as plain text. Otherwise, select it to choose another of your groups. Admins can choose any group on the instance.
+
+Switching group ends the current session without asking, so finish any instrument in progress first.
 
 ## Configure a Group
 
@@ -64,7 +66,7 @@ The default Standard User role does not see Manage Group.
 
 2.  **Select accessible instruments**
 
-    Accessible instruments are the instruments shown to group members in **Accessible Instruments**.
+    Accessible instruments are the instruments shown to group members in **Administer Instrument**.
 
 3.  **Review subject display settings**
 
@@ -106,13 +108,13 @@ Use **Start Session** to begin work with a subject.
 
 </Steps>
 
-ODC allows one active session at a time. Starting a new session will automatically end an existing session.
+ODC allows one active session at a time. While a session is active, Start Session is unavailable. To start another, select **End Current Session** in the sidebar or the navigation menu and confirm.
 
 ## Administer Instruments
 
-Use **Accessible Instruments** after starting a session.
+Use **Administer Instrument** after starting a session.
 
-Accessible Instruments shows the instruments selected for the current group. Select an instrument and complete it.
+Administer Instrument shows the instruments selected for the current group. Select an instrument and complete it.
 
 ## Review and Export Data
 
@@ -129,9 +131,9 @@ For more detail, see:
 
 ## Upload Data
 
-Use **Upload** to import CSV data for form instruments.
+Use **Upload Data** to import CSV data for form instruments.
 
-Upload appears the feature is enabled by the instance admin and your account can read subjects and create instrument records. The default Group Manager and Standard User roles satisfy those permissions.
+Upload Data appears when the instance admin has enabled experimental features (**Enable Uploader** in App Settings) and your account can read subjects and create instrument records. The default Group Manager and Standard User roles satisfy those permissions.
 
 For more detail, see [How to Upload Data](/en/docs/guides/how-to-upload-data/).
 
@@ -153,8 +155,8 @@ Ask an admin for:
 ## Troubleshooting
 
 - **I cannot find an instrument:** Ask a group manager to check the group's accessible instruments.
-- **I see the wrong instruments or data:** A group manager should confirm the selected group on Dashboard.
+- **I see the wrong instruments or data:** Check the selected group in the group switcher at the top of the sidebar.
 - **I do not see Dashboard:** The default Standard User role does not see Dashboard.
 - **I do not see Data Hub:** The default Standard User role does not see Data Hub.
-- **I do not see Upload:** This feature is disabled on your instance or your account does not have the required upload permissions.
+- **I do not see Upload Data:** This feature is disabled on your instance or your account does not have the required upload permissions.
 - **I do not see Assignments:** Gateway support is disabled or your account does not have assignment permissions.
