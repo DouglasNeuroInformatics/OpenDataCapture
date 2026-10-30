@@ -60,32 +60,25 @@ describe('InstrumentRepoSyncLogTable', () => {
     expect(screen.queryByTestId('data-table')).toBeNull();
   });
 
-  it('should summarize one failure as a single plain-text line, clipped rather than wrapped', () => {
-    const message = 'Instrument validation failed - content.0: Series item PHQ_9 edition 2 does not exist';
-    render(<Table logs={[logFixture({ failures: [{ instrumentDir: 'CPP_SERIES', message, stage: 'LOAD' }] })]} />);
-    const summary = screen.getByTestId('sync-log-messages');
-    expect(summary.textContent).toBe(`CPP_SERIES (Load): ${message}`);
-    expect(summary.className).toContain('whitespace-nowrap');
-    expect(summary.className).toContain('text-ellipsis');
+  it('should keep the empty log the colour and height of a table, so it does not vanish into the card', () => {
+    render(<Table logs={[]} />);
+    const empty = screen.getByTestId('instrument-repo-sync-log');
+    expect(empty.className).toContain('bg-background');
+    expect(empty.className).toContain('min-h-60');
   });
 
-  it('should summarize several failures as a count, so the row stays one line however many there are', () => {
-    render(
-      <Table
-        logs={[
-          logFixture({
-            failures: [
-              { instrumentDir: 'A', message: 'broken', stage: 'BUNDLE' },
-              { instrumentDir: 'B', message: 'also broken', stage: 'LOAD' }
-            ]
-          })
-        ]}
-      />
-    );
-    expect(screen.getByTestId('sync-log-messages').textContent).toBe('2 instruments failed');
+  it('should hold the table open to five rows, so a single entry does not collapse it', () => {
+    render(<Table logs={[logFixture()]} />);
+    expect(screen.getByTestId('instrument-repo-sync-log').className).toContain('min-h-[205px]');
   });
 
-  it('should show every failure in full when View is clicked, since the cell only holds a summary', () => {
+  it('should hold no error text in the cell, only a View button, so every row stays one line', () => {
+    render(<Table logs={[logFixture({ failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }] })]} />);
+    expect(within(rows()[0]!).queryByText('broken')).toBeNull();
+    expect(within(rows()[0]!).getByTestId('sync-log-view-messages').textContent).toBe('View');
+  });
+
+  it('should show every failure in full when View is clicked, since the cell holds none of it', () => {
     const message = 'Transform failed with 1 error: /BROKEN_FORM/index.ts:14:22: ERROR: Expected ")" but found "{"';
     render(
       <Table
@@ -127,9 +120,10 @@ describe('InstrumentRepoSyncLogTable', () => {
     render(<Table logs={[logFixture()]} />);
     expect(statuses()).toEqual(['Success']);
     expect(within(rows()[0]!).getByText('-')).toBeTruthy();
+    expect(screen.queryByTestId('sync-log-view-messages')).toBeNull();
   });
 
-  it('should mark a sync that skipped some instruments as a partial success, and say which and why', () => {
+  it('should mark a sync that skipped some instruments as a partial success', () => {
     render(
       <Table
         logs={[
@@ -140,13 +134,11 @@ describe('InstrumentRepoSyncLogTable', () => {
       />
     );
     expect(statuses()).toEqual(['Partial success']);
-    expect(screen.getByTestId('sync-log-messages').textContent).toBe('PHQ_9 (Load): Instrument validation failed');
   });
 
-  it('should mark a sync that could not read the repository as failed, with the reason', () => {
+  it('should mark a sync that could not read the repository as failed', () => {
     render(<Table logs={[logFixture({ importedCount: 0, message: 'Repository not found' })]} />);
     expect(statuses()).toEqual(['Failed']);
-    expect(screen.getByTestId('sync-log-messages').textContent).toBe('Repository not found');
   });
 
   it('should label an import and a compile failure in words rather than as codes', () => {
@@ -156,7 +148,8 @@ describe('InstrumentRepoSyncLogTable', () => {
       />
     );
     expect(within(rows()[0]!).getByText('Import')).toBeTruthy();
-    expect(within(rows()[0]!).getByTestId('sync-log-messages').textContent).toBe('A (Compile): x');
+    fireEvent.click(screen.getByTestId('sync-log-view-messages'));
+    expect(within(screen.getByTestId('sync-log-error-details')).getByText('Compile')).toBeTruthy();
   });
 
   it('should render the page in the order it was given, since the server does the ordering', () => {

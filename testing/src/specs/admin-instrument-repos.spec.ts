@@ -154,36 +154,90 @@ test.describe('admin instrument repos activity log', () => {
     const reposPage = await getPageModel('/admin/instrument-repos');
 
     await expect(reposPage.dataTable.getByTestId('instrument-repo-failed-count')).toHaveText('1');
+    await reposPage.openActivityLog();
     await expect(reposPage.syncLogTable.getByTestId('sync-log-status')).toHaveText('Partial success');
-    const messages = reposPage.syncLogTable.getByTestId('sync-log-messages');
-    await expect(messages).toContainText('CPP_SERIES');
-    await expect(messages).toContainText('Load');
-  });
-
-  test('should keep a long failure reason to one line in its cell, and show it in full on View', async ({
-    getPageModel
-  }) => {
-    const reposPage = await getPageModel('/admin/instrument-repos');
-    const summary = reposPage.syncLogTable.getByTestId('sync-log-messages');
-
-    // Retried: the table re-renders when the second query settles, which can detach the row between
-    // the locator resolving and the measurement, leaving a node that reports no size at all.
-    await expect(async () => {
-      const layout = await summary.evaluate((element) => ({
-        clipped: element.scrollWidth > element.clientWidth,
-        lines: Math.round(
-          element.getBoundingClientRect().height / Number.parseFloat(window.getComputedStyle(element).lineHeight)
-        )
-      }));
-      expect(layout.clipped).toBe(true);
-      expect(layout.lines).toBe(1);
-    }).toPass();
-
     await reposPage.syncLogTable.getByTestId('sync-log-view-messages').click();
-
     const details = reposPage.$ref.getByTestId('sync-log-error-details');
     await expect(details).toContainText('CPP_SERIES');
     await expect(details).toContainText('Load');
+  });
+
+  test('should show one table at a time, switching between them by tab', async ({ getPageModel }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    await expect(reposPage.dataTable.getByTestId('instrument-repo-url')).toBeVisible();
+    await expect(reposPage.syncLogTable).toHaveCount(0);
+
+    await expect(reposPage.sectionTitle).toHaveText('Manage Repositories');
+
+    await reposPage.openActivityLog();
+
+    await expect(reposPage.syncLogTable).toBeVisible();
+    await expect(reposPage.sectionTitle).toHaveText('Review Activity');
+    await expect(reposPage.$ref.getByTestId('instrument-repo-url')).toHaveCount(0);
+  });
+
+  test('should draw no card behind either tab', async ({ getPageModel }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    const expectInvisible = async () => {
+      await expect(reposPage.card).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+      await expect(reposPage.card).toHaveCSS('border-top-color', 'rgba(0, 0, 0, 0)');
+      await expect(reposPage.card).toHaveCSS('box-shadow', 'none');
+    };
+    await expectInvisible();
+
+    await reposPage.openActivityLog();
+
+    await expectInvisible();
+  });
+
+  test('should fit both tables to the page without a horizontal scroll bar', async ({ getPageModel }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    const overflows = (table: typeof reposPage.dataTable) =>
+      table
+        .getByTestId('data-table-body')
+        .evaluate(
+          (body) => body.parentElement!.parentElement!.scrollWidth > body.parentElement!.parentElement!.clientWidth
+        );
+
+    expect(await overflows(reposPage.dataTable)).toBe(false);
+    await reposPage.openActivityLog();
+    expect(await overflows(reposPage.syncLogTable)).toBe(false);
+  });
+
+  test('should hold a one-row table open to five rows, so it does not collapse to a sliver', async ({
+    getPageModel
+  }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    const body = reposPage.dataTable.getByTestId('data-table-body');
+
+    const height = await body.evaluate((element) => element.getBoundingClientRect().height);
+    const rowHeight = await body
+      .getByTestId('data-table-row')
+      .evaluate((element) => element.getBoundingClientRect().height);
+    expect(height).toBeGreaterThanOrEqual(rowHeight * 5);
+  });
+
+  test('should count zero failed instruments when the whole sync failed, rather than its reason', async ({
+    getPageModel,
+    page
+  }) => {
+    const failedSync = { ...partialSync, failures: [], importedCount: 0, message: 'Repository not found' };
+    await page.route(/\/v1\/instrument-repos\/sync\/logs\/latest/, (route) => route.fulfill({ json: [failedSync] }));
+    const reposPage = await getPageModel('/admin/instrument-repos');
+
+    await expect(reposPage.dataTable.getByTestId('instrument-repo-failed-count')).toHaveText('0');
+  });
+
+  test('should keep the failure reason out of the activity log row, and show it in full on View', async ({
+    getPageModel
+  }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    await reposPage.openActivityLog();
+
+    await expect(reposPage.syncLogTable).not.toContainText('PHQ_9');
+    await reposPage.syncLogTable.getByTestId('sync-log-view-messages').click();
+
+    const details = reposPage.$ref.getByTestId('sync-log-error-details');
     await expect(details).toContainText("Series item 'PHQ_9' edition 2 does not exist on this instance");
   });
 
@@ -195,6 +249,7 @@ test.describe('admin instrument repos activity log', () => {
       route.fulfill({ json: { data: [], pageCount: 0, total: 0 } })
     );
     const reposPage = await getPageModel('/admin/instrument-repos');
+    await reposPage.openActivityLog();
 
     await expect(reposPage.syncLogTable).toHaveText('No imports or syncs recorded yet.');
     await expect(reposPage.syncLogTable.getByTestId('data-table')).toHaveCount(0);
@@ -215,6 +270,7 @@ test.describe('admin instrument repos activity log', () => {
       });
     });
     const reposPage = await getPageModel('/admin/instrument-repos');
+    await reposPage.openActivityLog();
     await expect(reposPage.syncLogTable).toContainText('Repo on page 1');
 
     await reposPage.syncLogTable.getByRole('button', { name: '2' }).click();
@@ -268,6 +324,7 @@ test.describe('admin instrument repos activity log', () => {
       (request) => request.method() === 'DELETE' && request.url().endsWith('/v1/instrument-repos/sync/logs')
     );
 
+    await reposPage.openActivityLog();
     await reposPage.clearLogButton.click();
     const dialog = reposPage.$ref.getByRole('dialog');
     await expect(dialog).toContainText('permanently deleted from the database');

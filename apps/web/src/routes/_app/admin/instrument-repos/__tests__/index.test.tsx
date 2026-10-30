@@ -161,6 +161,10 @@ const renderPage = (repos: InstrumentRepo[] = [repoFixture()]) => {
 
 const rows = () => screen.getAllByTestId('data-table-row');
 
+// Radix tabs activate on mouse down, not click.
+const openActivityLog = () =>
+  fireEvent.mouseDown(screen.getByTestId('instrument-repos-section-ACTIVITY'), { button: 0 });
+
 const rowAction = (label: string, rowIndex = 0) => {
   fireEvent.keyDown(within(rows()[rowIndex]!).getByTestId('row-actions-trigger'), { key: 'Enter' });
   return within(screen.getByTestId('row-actions-dropdown')).getByRole('menuitem', { name: label });
@@ -244,21 +248,76 @@ describe('Route', () => {
     expect(within(rows()[0]!).queryByTestId('instrument-repo-failed-count')).toBeNull();
   });
 
-  it('should say the repository could not be read when the whole import or sync failed', () => {
+  it('should count zero failed instruments when the whole import or sync failed, since the reason belongs to the activity log', () => {
     mocks.latestSyncLogs = [syncLogFixture({ message: 'Repository not found' })];
     renderPage();
-    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('Could not be read');
+    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('0');
+  });
+
+  it('should show only the repositories until the activity log tab is chosen, so one table shows at a time', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    expect(screen.queryByTestId('instrument-repo-sync-log')).toBeNull();
+
+    openActivityLog();
+
+    expect(screen.getByTestId('instrument-repo-sync-log')).toBeTruthy();
+    expect(screen.queryByTestId('instrument-repo-url')).toBeNull();
+  });
+
+  it('should title the page after the chosen tab, so each table says what it is for', () => {
+    renderPage();
+    expect(screen.getByTestId('instrument-repos-section-title').textContent).toBe('Manage Repositories');
+
+    openActivityLog();
+
+    expect(screen.getByTestId('instrument-repos-section-title').textContent).toBe('Review Activity');
+  });
+
+  it('should fix the width of every column but the name, so the name alone takes up the slack', () => {
+    renderPage();
+    const urlCell = within(rows()[0]!).getByTestId('instrument-repo-url').closest<HTMLElement>('[style]')!;
+    const nameCell = within(rows()[0]!).getByText('Core Repo').closest<HTMLElement>('[style]')!;
+    expect(urlCell.style.position).toBe('sticky');
+    expect(nameCell.style.position).toBe('');
+  });
+
+  it('should draw no card behind either tab, so the tables sit directly on the page', () => {
+    renderPage();
+    const repositoriesCard = screen.getByTestId('instrument-repos-card').className;
+
+    openActivityLog();
+
+    for (const className of [repositoriesCard, screen.getByTestId('instrument-repos-card').className]) {
+      expect(className).toContain('bg-transparent');
+      expect(className).toContain('border-transparent');
+      expect(className).toContain('shadow-none');
+    }
+  });
+
+  it('should pad the table in its own colour above and beside it, so Sync All and the rows share one edge', () => {
+    renderPage();
+    const wrapperClassName = screen.getByTestId('data-table').parentElement!.className;
+    expect(wrapperClassName).toContain('[&>[data-testid=data-table]]:pt-6');
+    expect(wrapperClassName).toContain('[&>[data-testid=data-table]]:px-6');
+  });
+
+  it('should hold the repositories table open to five rows, so one repository does not collapse it', () => {
+    renderPage();
+    expect(screen.getByTestId('data-table').parentElement!.className).toContain('min-h-[205px]');
   });
 
   it('should render an empty activity log while its first page is still in flight', () => {
     mocks.syncLogsPending = true;
     renderPage();
+    openActivityLog();
     expect(screen.getByText('No imports or syncs recorded yet.')).toBeTruthy();
   });
 
   it('should ask the server for the other order when the activity log is sorted by date', () => {
     mocks.syncLogs = [syncLogFixture()];
     renderPage();
+    openActivityLog();
     const log = within(screen.getByTestId('instrument-repo-sync-log'));
 
     fireEvent.click(within(log.getByTestId('data-table-head')).getByText('Date'));
@@ -286,9 +345,10 @@ describe('Route', () => {
     expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Sync All' }).disabled).toBe(true);
   });
 
-  it('should show the activity log of every repository below the table', () => {
+  it('should show the activity log of every repository on its own tab', () => {
     mocks.syncLogs = [syncLogFixture(), syncLogFixture({ id: 'log-2', repoId: 'repo-2', repoName: 'Other Repo' })];
     renderPage();
+    openActivityLog();
     const history = screen.getByTestId('instrument-repo-sync-log');
     expect(within(history).getByText('Core Repo')).toBeTruthy();
     expect(within(history).getByText('Other Repo')).toBeTruthy();
@@ -296,12 +356,14 @@ describe('Route', () => {
 
   it('should not offer to clear an empty activity log', () => {
     renderPage();
+    openActivityLog();
     expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Clear Log' }).disabled).toBe(true);
   });
 
   it('should warn that clearing the history deletes it from the database before doing so', () => {
     mocks.syncLogs = [syncLogFixture()];
     renderPage();
+    openActivityLog();
     fireEvent.click(screen.getByRole('button', { name: 'Clear Log' }));
     expect(screen.getByText('Clear the activity log?')).toBeTruthy();
     expect(screen.getByRole('dialog').textContent).toContain('permanently deleted from the database');
@@ -311,6 +373,7 @@ describe('Route', () => {
   it('should clear the history once the warning is accepted', () => {
     mocks.syncLogs = [syncLogFixture()];
     renderPage();
+    openActivityLog();
     fireEvent.click(screen.getByRole('button', { name: 'Clear Log' }));
     fireEvent.click(screen.getByRole('button', { name: 'Yes' }));
     expect(mocks.clearSyncLogs).toHaveBeenCalledOnce();
@@ -320,6 +383,7 @@ describe('Route', () => {
   it('should keep the history when the warning is declined', () => {
     mocks.syncLogs = [syncLogFixture()];
     renderPage();
+    openActivityLog();
     fireEvent.click(screen.getByRole('button', { name: 'Clear Log' }));
     fireEvent.click(screen.getByRole('button', { name: 'No' }));
     expect(mocks.clearSyncLogs).not.toHaveBeenCalled();

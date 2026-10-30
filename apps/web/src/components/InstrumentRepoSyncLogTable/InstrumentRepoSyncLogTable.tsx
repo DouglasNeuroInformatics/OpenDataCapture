@@ -6,6 +6,7 @@ import type { InstrumentRepoSyncLog, InstrumentRepoSyncStage } from '@opendataca
 
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { SortableHeader } from '@/components/SortableHeader';
+import { MIN_TABLE_BODY_HEIGHT } from '@/utils/data-table';
 import { getSyncStatus } from '@/utils/instrument-repo-sync';
 import type { InstrumentRepoSyncStatus } from '@/utils/instrument-repo-sync';
 import { getSyncStatusColor } from '@/utils/tag-colors';
@@ -45,37 +46,15 @@ export const InstrumentRepoSyncLogTable = ({
     LOAD: t({ en: 'Load', es: 'Carga', fr: 'Chargement' })
   } satisfies { [K in InstrumentRepoSyncStage]: string };
 
-  /**
-   * The cell holds one line of plain text, so a reason long enough to wrap would otherwise make the
-   * row several times taller than the rest. The whole reason lives in the dialog the View button opens.
-   */
-  const summarize = ({ failures, message }: InstrumentRepoSyncLog): null | string => {
-    if (message) {
-      return message;
-    }
-    if (failures.length > 1) {
-      return t({
-        en: `${failures.length} instruments failed`,
-        es: `${failures.length} instrumentos fallaron`,
-        fr: `${failures.length} instruments ont échoué`
-      });
-    }
-    const [failure] = failures;
-    if (!failure) {
-      return null;
-    }
-    return `${failure.instrumentDir} (${stageLabels[failure.stage]}): ${failure.message}`;
-  };
-
   /** Which import or sync the dialog is showing, since the dialog is detached from its row. */
   const describeLog = (log: InstrumentRepoSyncLog) =>
     `${log.repoName} · ${actionLabels[log.action]} · ${log.createdAt.toLocaleString()}`;
 
   if (logs.length === 0) {
-    // Not an empty DataTable: its own empty state is a fixed 288px tall, which dwarfs the heading.
+    // Not an empty DataTable: its own empty state is a fixed 288px tall, taller than five rows.
     return (
       <p
-        className="text-muted-foreground rounded-md border py-4 text-center text-sm"
+        className="bg-background text-muted-foreground flex min-h-60 items-center justify-center rounded-md border text-sm"
         data-testid="instrument-repo-sync-log"
       >
         {t({
@@ -89,12 +68,16 @@ export const InstrumentRepoSyncLogTable = ({
 
   return (
     <Fragment>
-      <div data-testid="instrument-repo-sync-log">
+      <div className={MIN_TABLE_BODY_HEIGHT} data-testid="instrument-repo-sync-log">
         <DataTable
           disableSearch
+          // Server mode accepts no `initialState`, so no column can be pinned to a fixed width; every
+          // breakpoint shows all seven columns at an even share instead of overflowing sideways.
+          columnBreakpoints={{ 0: 7, 512: 7, 768: 7, 1024: 7, 1280: 7 }}
           columns={[
             {
-              cell: (ctx) => ctx.row.original.createdAt.toLocaleString(),
+              cell: (ctx) =>
+                ctx.row.original.createdAt.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' }),
               enableSorting: true,
               header: ({ column }) => (
                 <SortableHeader
@@ -148,36 +131,25 @@ export const InstrumentRepoSyncLogTable = ({
             {
               cell: (ctx) => {
                 const log = ctx.row.original;
-                const summary = summarize(log);
-                if (!summary) {
+                if (getSyncStatus(log) === 'SUCCESS') {
                   return '-';
                 }
                 return (
-                  <div className="flex w-full items-center gap-2">
-                    <span
-                      className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
-                      data-testid="sync-log-messages"
-                      title={summary}
-                    >
-                      {summary}
-                    </span>
-                    <Button
-                      className="h-6 shrink-0 px-2"
-                      data-testid="sync-log-view-messages"
-                      size="sm"
-                      type="button"
-                      variant="outline"
-                      onClick={() => setLogToView(log)}
-                    >
-                      {t('common.view')}
-                    </Button>
-                  </div>
+                  <Button
+                    className="h-6 px-2"
+                    data-testid="sync-log-view-messages"
+                    size="sm"
+                    type="button"
+                    variant="outline"
+                    onClick={() => setLogToView(log)}
+                  >
+                    {t('common.view')}
+                  </Button>
                 );
               },
               enableSorting: false,
               header: t({ en: 'Messages', es: 'Mensajes', fr: 'Messages' }),
-              id: 'messages',
-              size: 480
+              id: 'messages'
             }
           ]}
           data={logs}
