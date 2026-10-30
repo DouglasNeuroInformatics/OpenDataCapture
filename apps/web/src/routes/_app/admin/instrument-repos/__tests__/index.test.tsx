@@ -1,9 +1,9 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
-import type { InstrumentRepo } from '@opendatacapture/schemas/instrument-repo';
+import type { InstrumentRepo, InstrumentRepoSyncLog } from '@opendatacapture/schemas/instrument-repo';
 import { QueryClient } from '@tanstack/react-query';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/admin/instrument-repos/index';
@@ -11,6 +11,7 @@ import { Route } from '@/routes/_app/admin/instrument-repos/index';
 import '@/services/i18n';
 
 const mocks = vi.hoisted(() => ({
+  clearSyncLogs: vi.fn(),
   createRepo: vi.fn(),
   deleteRepo: vi.fn(),
   groups: [] as Group[],
@@ -18,7 +19,14 @@ const mocks = vi.hoisted(() => ({
   instrumentInfo: { data: undefined as TranslatedInstrumentInfo[] | undefined, isLoading: false },
   instrumentReposQueryOptions: vi.fn(() => ({ queryKey: ['instrument-repos'] })),
   isCreatePending: false,
+  latestSyncLogs: [] as InstrumentRepoSyncLog[],
+  latestSyncLogsQueryOptions: vi.fn(() => ({ queryKey: ['instrument-repo-sync-logs', 'latest'] })),
   repos: [] as InstrumentRepo[],
+  syncAllRepos: vi.fn(),
+  syncLogs: [] as InstrumentRepoSyncLog[],
+  syncLogsParams: [] as { page?: number; repoId?: string; sortOrder?: string }[],
+  syncLogsPending: false,
+  syncLogsQueryOptions: vi.fn(() => ({ queryKey: ['instrument-repo-sync-logs'] })),
   syncRepo: vi.fn()
 }));
 
@@ -31,6 +39,9 @@ vi.mock('@/hooks/useGroupsQuery', () => ({
   useGroupsQuery: () => ({ data: mocks.groups })
 }));
 vi.mock('@/hooks/useInstrumentInfoQuery', () => ({ useInstrumentInfoQuery: () => mocks.instrumentInfo }));
+vi.mock('@/hooks/useClearInstrumentRepoSyncLogsMutation', () => ({
+  useClearInstrumentRepoSyncLogsMutation: () => ({ isPending: false, mutate: mocks.clearSyncLogs })
+}));
 vi.mock('@/hooks/useCreateInstrumentRepoMutation', () => ({
   useCreateInstrumentRepoMutation: () => ({ isPending: mocks.isCreatePending, mutate: mocks.createRepo })
 }));
@@ -39,6 +50,25 @@ vi.mock('@/hooks/useDeleteInstrumentRepoMutation', () => ({
 }));
 vi.mock('@/hooks/useSyncInstrumentRepoMutation', () => ({
   useSyncInstrumentRepoMutation: () => ({ mutate: mocks.syncRepo })
+}));
+vi.mock('@/hooks/useSyncAllInstrumentReposMutation', () => ({
+  useSyncAllInstrumentReposMutation: () => ({ isPending: false, mutate: mocks.syncAllRepos })
+}));
+vi.mock('@/hooks/useInstrumentRepoSyncLogsQuery', () => ({
+  INSTRUMENT_REPO_SYNC_LOGS_QUERY_KEY: 'instrument-repo-sync-logs',
+  instrumentRepoSyncLogsQueryOptions: mocks.syncLogsQueryOptions,
+  useInstrumentRepoSyncLogsQuery: ({ params }: { params?: { repoId?: string } } = {}) => {
+    mocks.syncLogsParams.push(params ?? {});
+    if (mocks.syncLogsPending) {
+      return { data: undefined };
+    }
+    const data = params?.repoId ? mocks.syncLogs.filter((log) => log.repoId === params.repoId) : mocks.syncLogs;
+    return { data: { data, pageCount: 1, total: data.length } };
+  }
+}));
+vi.mock('@/hooks/useLatestInstrumentRepoSyncLogsQuery', () => ({
+  latestInstrumentRepoSyncLogsQueryOptions: mocks.latestSyncLogsQueryOptions,
+  useLatestInstrumentRepoSyncLogsQuery: () => ({ data: mocks.latestSyncLogs })
 }));
 
 const repoFixture = (overrides: Partial<InstrumentRepo> = {}): InstrumentRepo => ({
@@ -52,6 +82,19 @@ const repoFixture = (overrides: Partial<InstrumentRepo> = {}): InstrumentRepo =>
   repoName: 'core',
   updatedAt: new Date('2026-01-01'),
   url: 'https://github.com/douglasneuroinformatics/core',
+  ...overrides
+});
+
+const syncLogFixture = (overrides: Partial<InstrumentRepoSyncLog> = {}): InstrumentRepoSyncLog => ({
+  action: 'SYNC',
+  createdAt: new Date('2026-10-01'),
+  failures: [],
+  id: 'log-1',
+  importedCount: 2,
+  message: null,
+  repoId: 'repo-1',
+  repoName: 'Core Repo',
+  updatedAt: new Date('2026-10-01'),
   ...overrides
 });
 
@@ -118,6 +161,11 @@ const renderPage = (repos: InstrumentRepo[] = [repoFixture()]) => {
 
 const rows = () => screen.getAllByTestId('data-table-row');
 
+// Radix tabs activate on mouse down, not click.
+const openActivityLog = () => {
+  return fireEvent.mouseDown(screen.getByTestId('instrument-repos-section-ACTIVITY'), { button: 0 });
+};
+
 const rowAction = (label: string, rowIndex = 0) => {
   fireEvent.keyDown(within(rows()[rowIndex]!).getByTestId('row-actions-trigger'), { key: 'Enter' });
   return within(screen.getByTestId('row-actions-dropdown')).getByRole('menuitem', { name: label });
@@ -145,16 +193,220 @@ describe('Route', () => {
     mocks.groups = [];
     mocks.instrumentInfo = { data: undefined, isLoading: false };
     mocks.isCreatePending = false;
+    mocks.syncLogs = [];
+    mocks.latestSyncLogs = [];
+    mocks.syncLogsParams = [];
+    mocks.syncLogsPending = false;
     useNotificationsStore.setState({ notifications: [] });
   });
 
   afterEach(cleanup);
 
-  it('should prefetch the repositories and groups in the loader, so the page renders without a waterfall', async () => {
+  it('should prefetch the repositories, groups, first page and latest entries in the loader', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);
     await runLoader(queryClient);
-    expect(ensureQueryData.mock.calls).toEqual([[{ queryKey: ['instrument-repos'] }], [{ queryKey: ['groups'] }]]);
+    expect(ensureQueryData.mock.calls).toEqual([
+      [{ queryKey: ['instrument-repos'] }],
+      [{ queryKey: ['groups'] }],
+      [{ queryKey: ['instrument-repo-sync-logs'] }],
+      [{ queryKey: ['instrument-repo-sync-logs', 'latest'] }]
+    ]);
+  });
+
+  it('should start every prefetch before awaiting any, so the page does not wait out four round trips', async () => {
+    const queryClient = new QueryClient();
+    const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);
+    const loading = runLoader(queryClient);
+    expect(ensureQueryData).toHaveBeenCalledTimes(4);
+    await loading;
+  });
+
+  it('should truncate a long URL in its cell and keep the full URL on hover, so it cannot run into the next column', () => {
+    renderPage();
+    const cell = within(rows()[0]!).getByTestId('instrument-repo-url');
+    expect(cell.className).toContain('text-ellipsis');
+    expect(cell.title).toBe('https://github.com/douglasneuroinformatics/core');
+  });
+
+  it("should count the instruments that failed in each repository's latest entry", () => {
+    mocks.latestSyncLogs = [syncLogFixture({ failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }] })];
+    renderPage();
+    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('1');
+  });
+
+  it('should ignore an entry with no repository, since a failed import is recorded before one exists', () => {
+    mocks.latestSyncLogs = [
+      syncLogFixture({ id: 'orphan', message: 'Repository not found', repoId: null }),
+      syncLogFixture({ failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }], id: 'log-1' })
+    ];
+    renderPage();
+    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('1');
+  });
+
+  it('should show a dash for the failed count of a repository with no activity log', () => {
+    renderPage();
+    expect(within(rows()[0]!).queryByTestId('instrument-repo-failed-count')).toBeNull();
+  });
+
+  it('should count zero failed instruments when the whole import or sync failed, since the reason belongs to the activity log', () => {
+    mocks.latestSyncLogs = [syncLogFixture({ message: 'Repository not found' })];
+    renderPage();
+    expect(within(rows()[0]!).getByTestId('instrument-repo-failed-count').textContent).toBe('0');
+  });
+
+  it('should show only the repositories until the activity log tab is chosen, so one table shows at a time', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    expect(screen.queryByTestId('instrument-repo-sync-log')).toBeNull();
+
+    openActivityLog();
+
+    expect(screen.getByTestId('instrument-repo-sync-log')).toBeTruthy();
+    expect(screen.queryByTestId('instrument-repo-url')).toBeNull();
+  });
+
+  it('should title the page after the chosen tab, so each table says what it is for', () => {
+    renderPage();
+    expect(screen.getByTestId('instrument-repos-section-title').textContent).toBe('Manage Repositories');
+
+    openActivityLog();
+
+    expect(screen.getByTestId('instrument-repos-section-title').textContent).toBe('Review Activity');
+  });
+
+  it('should fix the width of every column but the name, so the name alone takes up the slack', () => {
+    renderPage();
+    const urlCell = within(rows()[0]!).getByTestId('instrument-repo-url').closest<HTMLElement>('[style]')!;
+    const nameCell = within(rows()[0]!).getByText('Core Repo').closest<HTMLElement>('[style]')!;
+    expect(urlCell.style.position).toBe('sticky');
+    expect(nameCell.style.position).toBe('');
+  });
+
+  it('should draw no card behind either tab, so the tables sit directly on the page', () => {
+    renderPage();
+    const repositoriesCard = screen.getByTestId('instrument-repos-card').className;
+
+    openActivityLog();
+
+    for (const className of [repositoriesCard, screen.getByTestId('instrument-repos-card').className]) {
+      expect(className).toContain('bg-transparent');
+      expect(className).toContain('border-transparent');
+      expect(className).toContain('shadow-none');
+    }
+  });
+
+  it('should pad the table in its own colour above and beside it, so Sync All and the rows share one edge', () => {
+    renderPage();
+    const wrapperClassName = screen.getByTestId('data-table').parentElement!.className;
+    expect(wrapperClassName).toContain('[&>[data-testid=data-table]]:pt-6');
+    expect(wrapperClassName).toContain('[&>[data-testid=data-table]]:px-6');
+  });
+
+  it('should hold the repositories table open to five rows, so one repository does not collapse it', () => {
+    renderPage();
+    expect(screen.getByTestId('data-table').parentElement!.className).toContain('min-h-[205px]');
+  });
+
+  it('should render an empty activity log while its first page is still in flight', () => {
+    mocks.syncLogsPending = true;
+    renderPage();
+    openActivityLog();
+    expect(screen.getByText('No imports or syncs recorded yet.')).toBeTruthy();
+  });
+
+  it('should ask the server for the other order when the activity log is sorted by date', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    openActivityLog();
+    const log = within(screen.getByTestId('instrument-repo-sync-log'));
+
+    fireEvent.click(within(log.getByTestId('data-table-head')).getByText('Date'));
+
+    expect(mocks.syncLogsParams.at(-1)).toMatchObject({ page: 1, sortOrder: 'asc' });
+  });
+
+  it("should request one repository's own entries in its dialog, rather than filter the page on screen", () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+
+    fireEvent.click(rowAction('Logs'));
+
+    expect(mocks.syncLogsParams.some((params) => params.repoId === 'repo-1')).toBe(true);
+  });
+
+  it('should sync every repository from the Sync All button', () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: 'Sync All' }));
+    expect(mocks.syncAllRepos).toHaveBeenCalledOnce();
+  });
+
+  it('should disable Sync All when there is no repository to sync', () => {
+    renderPage([]);
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Sync All' }).disabled).toBe(true);
+  });
+
+  it('should show the activity log of every repository on its own tab', () => {
+    mocks.syncLogs = [syncLogFixture(), syncLogFixture({ id: 'log-2', repoId: 'repo-2', repoName: 'Other Repo' })];
+    renderPage();
+    openActivityLog();
+    const history = screen.getByTestId('instrument-repo-sync-log');
+    expect(within(history).getByText('Core Repo')).toBeTruthy();
+    expect(within(history).getByText('Other Repo')).toBeTruthy();
+  });
+
+  it('should not offer to clear an empty activity log', () => {
+    renderPage();
+    openActivityLog();
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Clear Log' }).disabled).toBe(true);
+  });
+
+  it('should warn that clearing the history deletes it from the database before doing so', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    openActivityLog();
+    fireEvent.click(screen.getByRole('button', { name: 'Clear Log' }));
+    expect(screen.getByText('Clear the activity log?')).toBeTruthy();
+    expect(screen.getByRole('dialog').textContent).toContain('permanently deleted from the database');
+    expect(mocks.clearSyncLogs).not.toHaveBeenCalled();
+  });
+
+  it('should clear the history once the warning is accepted', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    openActivityLog();
+    fireEvent.click(screen.getByRole('button', { name: 'Clear Log' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Yes' }));
+    expect(mocks.clearSyncLogs).toHaveBeenCalledOnce();
+    expect(screen.queryByText('Clear the activity log?')).toBeNull();
+  });
+
+  it('should keep the history when the warning is declined', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    openActivityLog();
+    fireEvent.click(screen.getByRole('button', { name: 'Clear Log' }));
+    fireEvent.click(screen.getByRole('button', { name: 'No' }));
+    expect(mocks.clearSyncLogs).not.toHaveBeenCalled();
+    expect(screen.queryByText('Clear the activity log?')).toBeNull();
+  });
+
+  it('should show only the selected repository in its logs dialog', () => {
+    mocks.syncLogs = [syncLogFixture(), syncLogFixture({ id: 'log-2', repoId: 'repo-2', repoName: 'Other Repo' })];
+    renderPage();
+    fireEvent.click(rowAction('Logs'));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText('Activity log of "Core Repo"')).toBeTruthy();
+    expect(within(dialog).queryByText('Other Repo')).toBeNull();
+  });
+
+  it('should describe the logs dialog, since a dialog without one is announced with its title alone', () => {
+    mocks.syncLogs = [syncLogFixture()];
+    renderPage();
+    fireEvent.click(rowAction('Logs'));
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.getAttribute('aria-describedby')).toBeTruthy();
+    expect(within(dialog).getByText('Every import and sync of this repository, newest first.')).toBeTruthy();
   });
 
   it('should count the instruments a repository contributed', () => {
@@ -163,6 +415,8 @@ describe('Route', () => {
   });
 
   it('should show a dash for a repository that has never been synced', () => {
+    // A latest entry keeps the failed count from rendering a dash of its own.
+    mocks.latestSyncLogs = [syncLogFixture()];
     renderPage();
     expect(within(rows()[0]!).getByText('-')).toBeTruthy();
   });
@@ -319,6 +573,38 @@ describe('Route', () => {
     ];
     renderPage([repoFixture({ instrumentIds: ['form-1', 'form-2', 'series-1'] })]);
     expect(within(rows()[0]!).getByText('2')).toBeTruthy();
+  });
+
+  it('should link to the repository source in the view dialog, so it can be opened on GitHub', () => {
+    renderPage();
+    fireEvent.click(rowAction('View'));
+    const link = screen.getByTestId<HTMLAnchorElement>('instrument-repo-source-link');
+    expect(link.href).toBe('https://github.com/douglasneuroinformatics/core');
+    expect(link.target).toBe('_blank');
+  });
+
+  it('should filter the view dialog by instrument title', async () => {
+    mocks.instrumentInfo = {
+      data: [
+        scalarFixture({ id: 'form-1', title: 'Happiness Scale' }),
+        scalarFixture({ id: 'form-2', title: 'Sleep Diary' })
+      ],
+      isLoading: false
+    };
+    renderPage();
+    fireEvent.click(rowAction('View'));
+    fireEvent.change(screen.getByPlaceholderText('Search instruments...'), { target: { value: 'sleep' } });
+    expect(screen.getByText('Sleep Diary')).toBeTruthy();
+    // The list animates an instrument out, so it leaves the DOM once its exit transition ends.
+    await waitFor(() => expect(screen.queryByText('Happiness Scale')).toBeNull());
+  });
+
+  it('should say when no instrument matches the search, rather than that the repository is empty', () => {
+    mocks.instrumentInfo = { data: [scalarFixture({ id: 'form-1', title: 'Happiness Scale' })], isLoading: false };
+    renderPage();
+    fireEvent.click(rowAction('View'));
+    fireEvent.change(screen.getByPlaceholderText('Search instruments...'), { target: { value: 'nothing' } });
+    expect(screen.getByText('No instruments match your search.')).toBeTruthy();
   });
 
   it('should close the view dialog when it is dismissed', () => {
