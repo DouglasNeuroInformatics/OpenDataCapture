@@ -141,6 +141,11 @@ overrides:
   typescript: 6.0.x
   yaml@2: ^2.9.0
 
+patchedDependencies:
+  '@douglasneuroinformatics/libui@6.16.1':
+    hash: 7ca5be437b2472e814db6bb65cb77be821fb401a909497dfac93c9e044f37f3b
+    path: patches/@douglasneuroinformatics__libui@6.16.1.patch
+
 importers:
 
   .:
@@ -382,7 +387,7 @@ importers:
         version: 0.0.6
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.16.1(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 6.16.1(patch_hash=7ca5be437b2472e814db6bb65cb77be821fb401a909497dfac93c9e044f37f3b)(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/react-core':
         specifier: workspace:*
         version: link:../../packages/react-core
@@ -476,7 +481,7 @@ importers:
     dependencies:
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.16.1(immer@11.1.18)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@19.1.0))(zod@vendor+zod@3.x)
+        version: 6.16.1(patch_hash=7ca5be437b2472e814db6bb65cb77be821fb401a909497dfac93c9e044f37f3b)(immer@11.1.18)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@19.1.0))(zod@vendor+zod@3.x)
       '@opendatacapture/licenses':
         specifier: workspace:*
         version: link:../../packages/licenses
@@ -558,7 +563,7 @@ importers:
         version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.16.1(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 6.16.1(patch_hash=7ca5be437b2472e814db6bb65cb77be821fb401a909497dfac93c9e044f37f3b)(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/instrument-bundler':
         specifier: workspace:*
         version: link:../../packages/instrument-bundler
@@ -682,7 +687,7 @@ importers:
         version: 0.0.3(typescript@6.0.3)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.16.1(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 6.16.1(patch_hash=7ca5be437b2472e814db6bb65cb77be821fb401a909497dfac93c9e044f37f3b)(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@vendor+react@19.x)
@@ -982,7 +987,7 @@ importers:
         version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.16.1(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 6.16.1(patch_hash=7ca5be437b2472e814db6bb65cb77be821fb401a909497dfac93c9e044f37f3b)(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/instrument-bundler':
         specifier: workspace:*
         version: link:../instrument-bundler
@@ -1177,7 +1182,7 @@ importers:
         version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
       '@douglasneuroinformatics/libui':
         specifier: 'catalog:'
-        version: 6.16.1(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
+        version: 6.16.1(patch_hash=7ca5be437b2472e814db6bb65cb77be821fb401a909497dfac93c9e044f37f3b)(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)
       '@opendatacapture/instrument-bundler':
         specifier: 'workspace:'
         version: link:../instrument-bundler
@@ -11993,7 +11998,7 @@ snapshots:
     dependencies:
       type-fest: 4.41.0
 
-  '@douglasneuroinformatics/libui@6.16.1(immer@11.1.18)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@19.1.0))(zod@vendor+zod@3.x)':
+  '@douglasneuroinformatics/libui@6.16.1(patch_hash=7ca5be437b2472e814db6bb65cb77be821fb401a909497dfac93c9e044f37f3b)(immer@11.1.18)(neverthrow@8.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@19.1.0))(zod@vendor+zod@3.x)':
     dependencies:
       '@base-ui/react': 1.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@douglasneuroinformatics/libjs': 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
@@ -12050,7 +12055,7 @@ snapshots:
       - neverthrow
       - use-sync-external-store
 
-  '@douglasneuroinformatics/libui@6.16.1(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)':
+  '@douglasneuroinformatics/libui@6.16.1(patch_hash=7ca5be437b2472e814db6bb65cb77be821fb401a909497dfac93c9e044f37f3b)(immer@11.1.18)(neverthrow@8.2.0)(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)(tailwindcss@4.3.3)(use-sync-external-store@1.6.0(react@vendor+react@19.x))(zod@vendor+zod@3.x)':
     dependencies:
       '@base-ui/react': 1.6.0(react-dom@vendor+react-dom@19.x)(react@vendor+react@19.x)
       '@douglasneuroinformatics/libjs': 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
