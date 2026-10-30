@@ -351,10 +351,11 @@ const RouteComponent = () => {
                   size: 370
                 },
                 {
-                  accessorFn: (row: InstrumentRepo) =>
-                    instrumentInfoQuery.data
+                  accessorFn: (row: InstrumentRepo) => {
+                    return instrumentInfoQuery.data
                       ? currentRepoInstruments(instrumentInfoQuery.data, row.id).length
-                      : row.instrumentIds.length,
+                      : row.instrumentIds.length;
+                  },
                   header: t({
                     en: 'Instruments',
                     es: 'Instrumentos',
@@ -376,8 +377,9 @@ const RouteComponent = () => {
                   size: 90
                 },
                 {
-                  accessorFn: (row: InstrumentRepo) =>
-                    row.lastSyncedAt ? new Date(row.lastSyncedAt).toLocaleDateString() : '-',
+                  accessorFn: (row: InstrumentRepo) => {
+                    return row.lastSyncedAt ? new Date(row.lastSyncedAt).toLocaleDateString() : '-';
+                  },
                   header: t({
                     en: 'Last Synced',
                     es: 'Última sincronización',
@@ -593,9 +595,9 @@ const RouteComponent = () => {
             const searchTerm = instrumentSearch.trim().toLowerCase();
             const repoInstruments =
               instrumentInfoQuery.data &&
-              currentRepoInstruments(instrumentInfoQuery.data, repoToView.id).filter((instrument) =>
-                instrument.details.title.toLowerCase().includes(searchTerm)
-              );
+              currentRepoInstruments(instrumentInfoQuery.data, repoToView.id).filter((instrument) => {
+                return instrument.details.title.toLowerCase().includes(searchTerm);
+              });
             if (instrumentInfoQuery.isLoading) {
               return (
                 <div className="flex justify-center py-6">

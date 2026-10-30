@@ -162,8 +162,9 @@ const renderPage = (repos: InstrumentRepo[] = [repoFixture()]) => {
 const rows = () => screen.getAllByTestId('data-table-row');
 
 // Radix tabs activate on mouse down, not click.
-const openActivityLog = () =>
-  fireEvent.mouseDown(screen.getByTestId('instrument-repos-section-ACTIVITY'), { button: 0 });
+const openActivityLog = () => {
+  return fireEvent.mouseDown(screen.getByTestId('instrument-repos-section-ACTIVITY'), { button: 0 });
+};
 
 const rowAction = (label: string, rowIndex = 0) => {
   fireEvent.keyDown(within(rows()[rowIndex]!).getByTestId('row-actions-trigger'), { key: 'Enter' });

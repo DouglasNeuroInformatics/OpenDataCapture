@@ -62,7 +62,9 @@ describe('instrumentRepoSyncLogsQueryOptions', () => {
     mockAxios.get.mockResolvedValue({
       data: { ...PAGE, data: [{ ...LOG, failures: [{ ...LOG.failures[0], stage: 'RENDER' }] }] }
     });
-    await expect(createQueryClient().fetchQuery(instrumentRepoSyncLogsQueryOptions())).rejects.toThrow();
+    await expect(createQueryClient().fetchQuery(instrumentRepoSyncLogsQueryOptions())).rejects.toThrow(
+      /invalid option/i
+    );
   });
 
   it('should key the cache on every parameter, so paging does not serve a stale page', () => {
@@ -83,8 +85,9 @@ describe('useInstrumentRepoSyncLogsQuery', () => {
     vi.clearAllMocks();
     mockAxios.get.mockResolvedValue({ data: PAGE });
     const queryClient = createQueryClient();
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(QueryClientProvider, { client: queryClient }, children);
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(QueryClientProvider, { client: queryClient }, children);
+    };
     const { result } = renderHook(() => useInstrumentRepoSyncLogsQuery(), { wrapper });
     await waitFor(() => expect(result.current.data).toBeTruthy());
     expect(result.current.data?.data.map((log) => log.repoName)).toEqual(['core']);

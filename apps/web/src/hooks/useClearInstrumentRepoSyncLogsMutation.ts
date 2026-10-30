@@ -11,8 +11,9 @@ export function useClearInstrumentRepoSyncLogsMutation() {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const { t } = useTranslation();
   return useMutation({
-    mutationFn: () =>
-      axios.delete('/v1/instrument-repos/sync/logs', { meta: { disableDefaultErrorNotification: true } }),
+    mutationFn: () => {
+      return axios.delete('/v1/instrument-repos/sync/logs', { meta: { disableDefaultErrorNotification: true } });
+    },
     onError(err) {
       addNotification({
         message: getApiErrorMessage(

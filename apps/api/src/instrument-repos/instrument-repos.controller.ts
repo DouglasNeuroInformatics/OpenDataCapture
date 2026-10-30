@@ -25,28 +25,28 @@ export class InstrumentReposController {
   @ApiOperation({ summary: 'Delete Instrument Repo' })
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'InstrumentRepo' })
-  deleteById(@Param('id') id: string, @CurrentUser('ability') ability?: AppAbility) {
+  deleteById(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
     return this.instrumentReposService.deleteById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Clear the Activity Log of Every Instrument Repo' })
   @Delete('sync/logs')
   @RouteAccess(ADMIN_ONLY)
-  deleteSyncLogs(@CurrentUser('ability') ability?: AppAbility) {
+  deleteSyncLogs(@CurrentUser('ability') ability: AppAbility) {
     return this.instrumentReposService.deleteSyncLogs({ ability });
   }
 
   @ApiOperation({ summary: 'Get All Instrument Repos' })
   @Get()
   @RouteAccess({ action: 'read', subject: 'InstrumentRepo' })
-  findAll(@CurrentUser('ability') ability?: AppAbility) {
+  findAll(@CurrentUser('ability') ability: AppAbility) {
     return this.instrumentReposService.findAll({ ability });
   }
 
   @ApiOperation({ summary: 'Get the Latest Activity Log Entry of Every Instrument Repo' })
   @Get('sync/logs/latest')
   @RouteAccess(ADMIN_ONLY)
-  findLatestSyncLogs(@CurrentUser('ability') ability?: AppAbility) {
+  findLatestSyncLogs(@CurrentUser('ability') ability: AppAbility) {
     return this.instrumentReposService.findLatestSyncLogs({ ability });
   }
 
@@ -62,7 +62,7 @@ export class InstrumentReposController {
   findSyncLogs(
     @Query(new ParseSchemaPipe({ schema: $InstrumentRepoSyncLogsQueryParams }))
     query: InstrumentRepoSyncLogsQueryParams,
-    @CurrentUser('ability') ability?: AppAbility
+    @CurrentUser('ability') ability: AppAbility
   ) {
     return this.instrumentReposService.findSyncLogs(query, { ability });
   }
@@ -70,14 +70,14 @@ export class InstrumentReposController {
   @ApiOperation({ summary: 'Sync Instrument Repo' })
   @Post(':id/sync')
   @RouteAccess({ action: 'update', subject: 'InstrumentRepo' })
-  sync(@Param('id') id: string, @CurrentUser('ability') ability?: AppAbility) {
+  sync(@Param('id') id: string, @CurrentUser('ability') ability: AppAbility) {
     return this.instrumentReposService.sync(id, { ability });
   }
 
   @ApiOperation({ summary: 'Sync Every Instrument Repo' })
   @Post('sync/all')
   @RouteAccess({ action: 'update', subject: 'InstrumentRepo' })
-  syncAll(@CurrentUser('ability') ability?: AppAbility) {
+  syncAll(@CurrentUser('ability') ability: AppAbility) {
     return this.instrumentReposService.syncAll({ ability });
   }
 }

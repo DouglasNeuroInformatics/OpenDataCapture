@@ -56,12 +56,13 @@ describe('useLatestInstrumentRepoSyncLogsQuery', () => {
     vi.clearAllMocks();
     mockAxios.get.mockResolvedValue({ data: [LOG] });
     const queryClient = createQueryClient();
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(
+    const wrapper = ({ children }: PropsWithChildren) => {
+      return createElement(
         QueryClientProvider,
         { client: queryClient },
         createElement(Suspense, { fallback: null }, children)
       );
+    };
     const { result } = renderHook(() => useLatestInstrumentRepoSyncLogsQuery(), { wrapper });
     await waitFor(() => expect(result.current).toBeTruthy());
     expect(result.current.data.map((log) => log.repoName)).toEqual(['core']);

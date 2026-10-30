@@ -1,3 +1,4 @@
+import { $NumberLike } from '@douglasneuroinformatics/libjs';
 import { z } from 'zod/v4';
 
 import { $BaseModel, $DateLike } from '../core/core.js';
@@ -58,13 +59,10 @@ export const INSTRUMENT_REPO_SYNC_LOGS_MAX_PAGE_SIZE = 1000;
 
 export type InstrumentRepoSyncLogsQueryParams = z.infer<typeof $InstrumentRepoSyncLogsQueryParams>;
 export const $InstrumentRepoSyncLogsQueryParams = z.object({
-  limit: z.coerce
-    .number()
-    .int()
-    .positive()
-    .max(INSTRUMENT_REPO_SYNC_LOGS_MAX_PAGE_SIZE)
+  limit: $NumberLike
+    .pipe(z.number().int().positive().max(INSTRUMENT_REPO_SYNC_LOGS_MAX_PAGE_SIZE))
     .default(INSTRUMENT_REPO_SYNC_LOGS_PAGE_SIZE),
-  page: z.coerce.number().int().positive().default(1),
+  page: $NumberLike.pipe(z.number().int().positive()).default(1),
   /** Confines the page to one repository, which is what the per-repository dialog asks for. */
   repoId: z.string().optional(),
   sortOrder: z.enum(['asc', 'desc']).default('desc')

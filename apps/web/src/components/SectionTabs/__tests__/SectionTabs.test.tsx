@@ -10,9 +10,9 @@ const tabs = [
   { label: 'Activity Log', value: 'ACTIVITY' }
 ] as const;
 
-afterEach(cleanup);
-
 describe('SectionTabs', () => {
+  afterEach(cleanup);
+
   it('should mark only the current section as active', () => {
     render(<SectionTabs data-testid="tabs" tabs={tabs} value="ACTIVITY" onValueChange={vi.fn()} />);
     expect(screen.getByTestId('tabs-ACTIVITY').dataset.state).toBe('active');

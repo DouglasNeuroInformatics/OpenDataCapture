@@ -184,12 +184,12 @@ export class InstrumentReposService implements OnModuleInit {
       where: accessibleQuery(ability, 'read', 'InstrumentRepo')
     });
     const logs = await Promise.all(
-      repos.map((repo) =>
-        this.instrumentRepoSyncLogModel.findFirst({
+      repos.map((repo) => {
+        return this.instrumentRepoSyncLogModel.findFirst({
           orderBy: { createdAt: 'desc' },
           where: { AND: [accessibleQuery(ability, 'read', 'InstrumentRepoSyncLog')], repoId: repo.id }
-        })
-      )
+        });
+      })
     );
     return logs.filter((log) => log !== null);
   }

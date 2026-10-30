@@ -48,12 +48,12 @@ const rows = () => screen.getAllByTestId('data-table-row');
 
 const statuses = () => screen.getAllByTestId('sync-log-status').map((badge) => badge.textContent);
 
-afterEach(() => {
-  cleanup();
-  theme.current = 'light';
-});
-
 describe('InstrumentRepoSyncLogTable', () => {
+  afterEach(() => {
+    cleanup();
+    theme.current = 'light';
+  });
+
   it('should say so in one line when there is nothing to show, rather than render an empty table', () => {
     render(<Table logs={[]} />);
     expect(screen.getByText('No imports or syncs recorded yet.')).toBeTruthy();

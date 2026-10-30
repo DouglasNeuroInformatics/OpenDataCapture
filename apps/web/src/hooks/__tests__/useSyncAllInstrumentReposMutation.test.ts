@@ -41,8 +41,9 @@ const syncLog = ({
 function renderSyncAllMutation() {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false, throwOnError: true } } });
   const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
-  const wrapper = ({ children }: PropsWithChildren) =>
-    createElement(QueryClientProvider, { children, client: queryClient });
+  const wrapper = ({ children }: PropsWithChildren) => {
+    return createElement(QueryClientProvider, { children, client: queryClient });
+  };
   return { ...renderHook(() => useSyncAllInstrumentReposMutation(), { wrapper }), invalidateQueries };
 }
 
@@ -65,12 +66,16 @@ describe('useSyncAllInstrumentReposMutation', () => {
   });
 
   it('should announce the sync before it finishes, since syncing every repository takes a while', async () => {
-    mockAxios.post.mockReturnValueOnce(new Promise(() => undefined));
+    mockAxios.post.mockReturnValueOnce(
+      new Promise(() => {
+        // never settles, so the mutation stays pending while the notification is asserted
+      })
+    );
     const { result } = renderSyncAllMutation();
     result.current.mutate();
-    await waitFor(() =>
-      expect(addNotification).toHaveBeenCalledExactlyOnceWith({ message: 'Syncing every repository...', type: 'info' })
-    );
+    await waitFor(() => {
+      expect(addNotification).toHaveBeenCalledExactlyOnceWith({ message: 'Syncing every repository...', type: 'info' });
+    });
   });
 
   it('should announce success and refresh the repositories, their history and their instruments', async () => {
