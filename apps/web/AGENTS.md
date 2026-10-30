@@ -205,9 +205,9 @@ viewport's: measure it in the browser, or from a spec with
 the sidebar and the card's padding are taken out, which is what
 `testing/src/specs/admin-instrument-repos.spec.ts` holds both of their tables to.
 
-`initialState` is where pinning goes, which libui 6.16.1 types as `never` in `mode="server"`;
-`patches/@douglasneuroinformatics__libui@6.16.1.patch` carries
-[libui#129](https://github.com/DouglasNeuroInformatics/libui/pull/129) until a release includes it.
+`initialState` is where pinning goes. libui typed it as `never` in `mode="server"` until 6.19.0
+([libui#129](https://github.com/DouglasNeuroInformatics/libui/pull/129)), so the catalog cannot go
+back below that release.
 
 ## Tests
 

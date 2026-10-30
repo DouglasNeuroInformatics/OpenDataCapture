@@ -21,7 +21,7 @@ catalog:
   '@douglasneuroinformatics/libjs': ^3.2.1
   '@douglasneuroinformatics/libpasswd': '^0.0.3'
   '@douglasneuroinformatics/libstats': '^0.2.1'
-  '@douglasneuroinformatics/libui': ^6.16.1
+  '@douglasneuroinformatics/libui': ^6.19.2
   '@douglasneuroinformatics/libui-form-types': ^1.4.0
   '@microsoft/api-extractor': '^7.59.2'
   '@prisma/client': '^6.9.0'
@@ -63,12 +63,6 @@ catalogs:
 hoistPattern:
   - '*'
   - '!@storybook/react'
-# Type-only, and already merged upstream as libui `fix/server-data-table-column-pinning`: a
-# server-mode DataTable typed `initialState` as `never`, so no column could be pinned, and only a
-# pinned column honours `size`. Delete this patch and the `patches/` file when the catalog moves to
-# the libui release that carries it.
-patchedDependencies:
-  '@douglasneuroinformatics/libui@6.16.1': patches/@douglasneuroinformatics__libui@6.16.1.patch
 minimumReleaseAge: 10080 # 7 days
 minimumReleaseAgeExclude:
   - '@douglasneuroinformatics/*'
