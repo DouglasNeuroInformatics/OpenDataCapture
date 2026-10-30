@@ -326,8 +326,8 @@ const RouteComponent = () => {
                   cell: (ctx) => {
                     const repo = ctx.row.original;
                     return (
-                      <span className="flex items-center">
-                        {repo.name}
+                      <span className="flex items-center overflow-hidden">
+                        <TruncatedCell title={repo.name} value={repo.name} />
                         <span className="hidden" data-row-selected={highlightedRowId === repo.id ? 'true' : 'false'} />
                       </span>
                     );
@@ -348,7 +348,7 @@ const RouteComponent = () => {
                     />
                   ),
                   header: 'URL',
-                  size: 370
+                  size: 210
                 },
                 {
                   accessorFn: (row: InstrumentRepo) => {
@@ -362,7 +362,7 @@ const RouteComponent = () => {
                     fr: 'Instruments'
                   }),
                   id: 'instrumentCount',
-                  size: 120
+                  size: 118
                 },
                 {
                   cell: (ctx) => {
@@ -374,7 +374,7 @@ const RouteComponent = () => {
                   },
                   header: t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' }),
                   id: 'failedCount',
-                  size: 90
+                  size: 88
                 },
                 {
                   accessorFn: (row: InstrumentRepo) => {
@@ -386,7 +386,7 @@ const RouteComponent = () => {
                     fr: 'Dernière synchronisation'
                   }),
                   id: 'lastSynced',
-                  size: 150
+                  size: 112
                 }
               ]}
               data={reposQuery.data}

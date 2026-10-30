@@ -123,17 +123,17 @@ test.describe('admin instrument repos activity log', () => {
   };
 
   test.beforeEach(async ({ page }) => {
-    await page.route('**/v1/instrument-repos', (route) =>
-      route.request().method() === 'GET' ? route.fulfill({ json: [repo] }) : route.continue()
-    );
+    await page.route('**/v1/instrument-repos', (route) => {
+      return route.request().method() === 'GET' ? route.fulfill({ json: [repo] }) : route.continue();
+    });
     // Regexes, not globs: the history is now requested with query parameters, and its two routes
     // must not match each other.
     await page.route(/\/v1\/instrument-repos\/sync\/logs\/latest/, (route) => route.fulfill({ json: [partialSync] }));
-    await page.route(/\/v1\/instrument-repos\/sync\/logs(\?|$)/, (route) =>
-      route.request().method() === 'DELETE'
+    await page.route(/\/v1\/instrument-repos\/sync\/logs(\?|$)/, (route) => {
+      return route.request().method() === 'DELETE'
         ? route.fulfill({ json: { count: 1 } })
-        : route.fulfill({ json: { data: [partialSync], pageCount: 1, total: 1 } })
-    );
+        : route.fulfill({ json: { data: [partialSync], pageCount: 1, total: 1 } });
+    });
   });
 
   test('should keep a long repository URL inside its column, even on the selected row', async ({ getPageModel }) => {
@@ -181,7 +181,10 @@ test.describe('admin instrument repos activity log', () => {
     const expectInvisible = async () => {
       await expect(reposPage.card).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
       await expect(reposPage.card).toHaveCSS('border-top-color', 'rgba(0, 0, 0, 0)');
-      await expect(reposPage.card).toHaveCSS('box-shadow', 'none');
+      // Tailwind v4 compiles `shadow-none` to transparent layers rather than the keyword `none`,
+      // so the assertion is that every layer is invisible, not that there are no layers.
+      const shadow = await reposPage.card.evaluate((card) => getComputedStyle(card).boxShadow);
+      expect(shadow.replace(/rgba\(0, 0, 0, 0\)|0px|,|\s/g, '')).toBe('');
     };
     await expectInvisible();
 
@@ -192,12 +195,13 @@ test.describe('admin instrument repos activity log', () => {
 
   test('should fit both tables to the page without a horizontal scroll bar', async ({ getPageModel }) => {
     const reposPage = await getPageModel('/admin/instrument-repos');
-    const overflows = (table: typeof reposPage.dataTable) =>
-      table
+    const overflows = (table: typeof reposPage.dataTable) => {
+      return table
         .getByTestId('data-table-body')
         .evaluate(
           (body) => body.parentElement!.parentElement!.scrollWidth > body.parentElement!.parentElement!.clientWidth
         );
+    };
 
     expect(await overflows(reposPage.dataTable)).toBe(false);
     await reposPage.openActivityLog();
@@ -233,9 +237,9 @@ test.describe('admin instrument repos activity log', () => {
     page
   }) => {
     const repoName = 'LaboratoireDeRecherchePsychiatrique/instruments-cliniques-internes-du-laboratoire';
-    await page.route(/\/v1\/instrument-repos\/sync\/logs(\?|$)/, (route) =>
-      route.fulfill({ json: { data: [{ ...partialSync, repoName }], pageCount: 1, total: 1 } })
-    );
+    await page.route(/\/v1\/instrument-repos\/sync\/logs(\?|$)/, (route) => {
+      return route.fulfill({ json: { data: [{ ...partialSync, repoName }], pageCount: 1, total: 1 } });
+    });
     const reposPage = await getPageModel('/admin/instrument-repos');
     await reposPage.openActivityLog();
 
@@ -267,9 +271,9 @@ test.describe('admin instrument repos activity log', () => {
     getPageModel,
     page
   }) => {
-    await page.route(/\/v1\/instrument-repos\/sync\/logs(\?|$)/, (route) =>
-      route.fulfill({ json: { data: [], pageCount: 0, total: 0 } })
-    );
+    await page.route(/\/v1\/instrument-repos\/sync\/logs(\?|$)/, (route) => {
+      return route.fulfill({ json: { data: [], pageCount: 0, total: 0 } });
+    });
     const reposPage = await getPageModel('/admin/instrument-repos');
     await reposPage.openActivityLog();
 

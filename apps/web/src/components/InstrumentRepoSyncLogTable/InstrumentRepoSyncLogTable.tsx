@@ -92,7 +92,7 @@ export const InstrumentRepoSyncLogTable = ({
                 />
               ),
               id: 'date',
-              size: 170,
+              size: 150,
               // The rows already arrive newest first, so the table's first toggle of its unsorted
               // column must go to ascending, or the first click would request what is on screen.
               sortDescFirst: false
@@ -117,7 +117,7 @@ export const InstrumentRepoSyncLogTable = ({
               enableSorting: false,
               header: t({ en: 'Action', es: 'Acción', fr: 'Action' }),
               id: 'action',
-              size: 105
+              size: 95
             },
             {
               cell: (ctx) => {
@@ -133,7 +133,7 @@ export const InstrumentRepoSyncLogTable = ({
               enableSorting: false,
               header: t({ en: 'Status', es: 'Estado', fr: 'Statut' }),
               id: 'status',
-              size: 160
+              size: 140
             },
             {
               accessorKey: 'importedCount',
@@ -143,7 +143,7 @@ export const InstrumentRepoSyncLogTable = ({
               },
               enableSorting: false,
               header: t({ en: 'Imported', es: 'Importados', fr: 'Importés' }),
-              size: 110
+              size: 105
             },
             {
               cell: (ctx) => {
@@ -153,7 +153,7 @@ export const InstrumentRepoSyncLogTable = ({
               enableSorting: false,
               header: t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' }),
               id: 'failedCount',
-              size: 95
+              size: 85
             },
             {
               cell: (ctx) => {
@@ -177,7 +177,7 @@ export const InstrumentRepoSyncLogTable = ({
               enableSorting: false,
               header: t({ en: 'Messages', es: 'Mensajes', fr: 'Messages' }),
               id: 'messages',
-              size: 105
+              size: 95
             }
           ]}
           data={logs}
