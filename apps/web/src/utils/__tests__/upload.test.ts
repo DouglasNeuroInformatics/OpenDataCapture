@@ -537,6 +537,26 @@ describe('Zod3', () => {
       it('should leave out a field the record does not mention', async () => {
         await expect(processItems('RECORD_ARRAY(name:item1)')).resolves.toMatchObject([{ items: [{ name: 'item1' }] }]);
       });
+
+      it('should reject a record array missing its closing parenthesis, rather than dropping its last character', async () => {
+        await expectRejection(
+          processItems('RECORD_ARRAY(name:item1,quantity:12'),
+          "Syntax error in RECORD_ARRAY declaration: RECORD_ARRAY(name:item1,quantity:12 at column name: 'items' and row number '1'"
+        );
+      });
+
+      it('should keep a colon inside a record array value, splitting each field on its first colon only', async () => {
+        await expect(processItems('RECORD_ARRAY(name:10:30,quantity:1;)')).resolves.toMatchObject([
+          { items: [{ name: '10:30', quantity: 1 }] }
+        ]);
+      });
+
+      it('should reject a record array field with no colon as a malformed record', async () => {
+        await expectRejection(
+          processItems('RECORD_ARRAY(name:item1,quantity)'),
+          "Malformed record at index 1 at column name: 'items' and row number '1'"
+        );
+      });
     });
   });
 });
