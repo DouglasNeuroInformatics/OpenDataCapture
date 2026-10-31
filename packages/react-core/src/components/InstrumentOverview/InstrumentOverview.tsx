@@ -48,7 +48,12 @@ export const InstrumentOverview = ({ beforeBegin, disableBegin, instrument, onNe
                 fr: 'Instructions'
               })}
             </Heading>
-            <p className="text-muted-foreground text-sm">{instructions!.join(', ')}</p>
+            {instructions!.map((instruction, i) => (
+              // entries may repeat, so the index is the only stable key
+              <p className="text-muted-foreground text-sm whitespace-pre-line" key={i}>
+                {instruction}
+              </p>
+            ))}
           </div>
         )}
       </div>
