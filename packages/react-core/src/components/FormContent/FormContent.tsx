@@ -67,7 +67,12 @@ export const FormContent = ({ instrument, onSubmit, submitButtonLabel }: FormCon
               </Dialog.Title>
             </Dialog.Header>
             <Dialog.Body className="py-2">
-              <p className="text-muted-foreground text-sm">{instructions?.join(', ')}</p>
+              {instructions?.map((instruction, i) => (
+                // entries may repeat, so the index is the only stable key
+                <p className="text-muted-foreground text-sm whitespace-pre-line" key={i}>
+                  {instruction}
+                </p>
+              ))}
             </Dialog.Body>
           </Dialog.Content>
         </Dialog>

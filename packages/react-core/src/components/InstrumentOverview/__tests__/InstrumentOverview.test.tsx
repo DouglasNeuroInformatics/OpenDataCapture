@@ -36,7 +36,20 @@ describe('InstrumentOverview', () => {
     render(<InstrumentOverview instrument={instrument} onNext={vi.fn()} />);
     expect(screen.getByText('Estimated Duration')).toBeTruthy();
     expect(screen.getByText('Instructions')).toBeTruthy();
-    expect(screen.getByText('Step one, Step two')).toBeTruthy();
+    expect(screen.getByText('Step one').tagName).toBe('P');
+    expect(screen.getByText('Step two').tagName).toBe('P');
+    expect(screen.queryByText('Step one, Step two')).toBeNull();
+  });
+
+  it('should render repeated instructions as separate paragraphs', () => {
+    const instrument = {
+      details: {
+        instructions: ['Repeat me', 'Repeat me'],
+        title: 'My Instrument'
+      }
+    } as unknown as AnyUnilingualInstrument;
+    render(<InstrumentOverview instrument={instrument} onNext={vi.fn()} />);
+    expect(screen.getAllByText('Repeat me')).toHaveLength(2);
   });
 
   it('should omit the duration and instructions sections when the instrument declares neither', () => {
