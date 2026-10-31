@@ -204,6 +204,9 @@ add it to the `$GroupScopableSubjectName` exclusion.
   `src/core/prisma.ts`. `UsersService.findByUsername` re-enables it via
   `{ includeHashedPassword: true }`, which is how login reads it. Individual `UsersService` methods
   also pass `omit: { hashedPassword: true }` explicitly — redundant, but harmless.
+- **`assignment.encryptionKeyPair` is globally omitted** by the same client, so no query returns an
+  assignment's private key to a client or the gateway. `AssignmentsService.findPrivateKeyById` is
+  the only read of it, and only the gateway synchronizer calls it, to decrypt a submission.
 - **Password policy lives in `UsersService.validatePassword`** (private): strength via
   `estimatePasswordStrength` from libpasswd, rejection when the password equals the username, and a
   Have I Been Pwned breach check that **fails open** if the API is unreachable. It runs on `create`,

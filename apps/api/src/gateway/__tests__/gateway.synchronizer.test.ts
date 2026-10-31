@@ -25,6 +25,7 @@ vi.mock('@douglasneuroinformatics/libcrypto', () => ({
 }));
 
 const CURRENT_EDITION_ID = 'instrument-edition-1';
+const PRIVATE_KEY = new Uint8Array([1, 2, 3]);
 
 describe('GatewaySynchronizer', () => {
   let gatewaySynchronizer: GatewaySynchronizer;
@@ -37,7 +38,6 @@ describe('GatewaySynchronizer', () => {
   let setupService: MockedInstance<SetupService>;
 
   const createAssignment = (id: string, groupId: null | string = null) => ({
-    encryptionKeyPair: { privateKey: 'private-key', publicKey: 'public-key' },
     groupId,
     id,
     instrumentId: CURRENT_EDITION_ID,
@@ -80,6 +80,7 @@ describe('GatewaySynchronizer', () => {
 
     setupService.getState.mockResolvedValue({ isSetup: true });
     assignmentsService.findById.mockImplementation((id: string) => Promise.resolve(createAssignment(id)));
+    assignmentsService.findPrivateKeyById.mockResolvedValue(PRIVATE_KEY);
     instrumentsService.findById.mockResolvedValue({
       id: CURRENT_EDITION_ID,
       internal: { edition: 1, name: 'HAPPINESS_QUESTIONNAIRE' },
@@ -101,6 +102,16 @@ describe('GatewaySynchronizer', () => {
         expect.objectContaining({ instrumentId: CURRENT_EDITION_ID })
       );
       expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledWith('assignment-1');
+    });
+
+    it('should decrypt with the private key read for that assignment alone', async () => {
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([createRemoteAssignment('assignment-1')]);
+      instrumentRecordsService.create.mockResolvedValue({ id: 'record-1' });
+
+      await gatewaySynchronizer.sync();
+
+      expect(assignmentsService.findPrivateKeyById).toHaveBeenCalledExactlyOnceWith('assignment-1');
+      expect(vi.mocked(HybridCrypto).deserializePrivateKey.mock.calls).toEqual([[PRIVATE_KEY]]);
     });
 
     it('should not delete the remote assignment when the data fails validation', async () => {
