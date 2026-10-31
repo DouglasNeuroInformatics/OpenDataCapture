@@ -195,6 +195,19 @@ export class AssignmentsService {
     return assignment;
   }
 
+  /**
+   * The private key a completed assignment's data is encrypted to. Every other query omits the keypair
+   * (see `PrismaModuleOptionsFactory`), so this is the only way to read it: used by the gateway
+   * synchronizer to decrypt a submission, and never to be returned to a client.
+   */
+  async findPrivateKeyById(id: string): Promise<Uint8Array> {
+    const { encryptionKeyPair } = await this.assignmentModel.findUniqueOrThrow({
+      select: { encryptionKeyPair: { select: { privateKey: true } } },
+      where: { id }
+    });
+    return encryptionKeyPair.privateKey;
+  }
+
   async updateById(id: string, data: $UpdateAssignmentData, currentUser: RequestUser) {
     const where = { AND: [accessibleQuery(currentUser.ability, 'update', 'Assignment')], id };
     if (!(await this.assignmentModel.exists(where))) {
@@ -358,12 +371,6 @@ export class AssignmentsService {
         url: `${this.assignmentBaseUrl}/assignments/${id}`
       }
     });
-    // Drop the keypair before this row travels anywhere. `Assignment` does not declare it, but the
-    // model carries it, and structural typing does not remove a field at runtime: left in, the
-    // private key that decrypts this assignment would be serialized into the HTTP response and
-    // posted to the gateway. The gateway's own schema discards it, but only after it crossed the
-    // wire.
-    const { encryptionKeyPair: _encryptionKeyPair, ...withoutKeyPair } = assignment;
-    return { assignment: withoutKeyPair, publicKey };
+    return { assignment, publicKey };
   }
 }

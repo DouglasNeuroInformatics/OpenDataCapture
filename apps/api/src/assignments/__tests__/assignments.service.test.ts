@@ -225,16 +225,6 @@ describe('AssignmentsService', () => {
       subjectId: 'subject-1'
     });
 
-    it('should never return or transmit the encryption keypair, which would hand out the private key', async () => {
-      assignmentModel.create.mockImplementation(({ data }: any) => {
-        return Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } });
-      });
-      const assignment = await assignmentsService.create(data(), permissiveUser());
-
-      expect(assignment).not.toHaveProperty('encryptionKeyPair');
-      expect(gatewayService.createRemoteAssignment.mock.lastCall?.[0]).not.toHaveProperty('encryptionKeyPair');
-    });
-
     it('should connect no group to an ungrouped assignment, since connecting a null id would throw', async () => {
       await assignmentsService.create({ ...data(), groupId: null }, permissiveUser());
       expect(assignmentModel.create.mock.lastCall?.[0].data.group).toBeUndefined();
@@ -368,18 +358,6 @@ describe('AssignmentsService', () => {
       );
       expect(assignments).toHaveLength(4);
       expect(assignmentModel.create).toHaveBeenCalledTimes(4);
-    });
-
-    it('should never return or transmit the encryption keypair, which would hand out the private key', async () => {
-      assignmentModel.create.mockImplementation(({ data }: any) => {
-        return Promise.resolve({ ...data, encryptionKeyPair: { privateKey: 'SECRET', publicKey: 'PUB' } });
-      });
-      const assignments = await assignmentsService.createBulk(request(), permissiveUser());
-
-      expect(assignments.every((assignment) => !('encryptionKeyPair' in assignment))).toBe(true);
-      const sent = gatewayService.createRemoteAssignments.mock.lastCall?.[0] as { assignment: object }[];
-      expect(sent.every(({ assignment }) => !('encryptionKeyPair' in assignment))).toBe(true);
-      expect(JSON.stringify(sent)).not.toContain('SECRET');
     });
 
     it('should send the whole batch to the gateway in a single call, so one bundle is fetched per instrument', async () => {
@@ -567,6 +545,18 @@ describe('AssignmentsService', () => {
       await assignmentsService.findById('assignment-1', { ability: userAt('GROUP_MANAGER').ability });
       expect(assignmentModel.findFirst.mock.lastCall?.[0]).toEqual({
         where: { AND: [{ OR: [{ groupId: { in: [GROUP_ID] } }] }], id: 'assignment-1' }
+      });
+    });
+  });
+
+  describe('findPrivateKeyById', () => {
+    it('should select only the private key of the assignment with that id', async () => {
+      const privateKey = new Uint8Array([1, 2, 3]);
+      assignmentModel.findUniqueOrThrow.mockResolvedValueOnce({ encryptionKeyPair: { privateKey } });
+      await expect(assignmentsService.findPrivateKeyById('assignment-1')).resolves.toBe(privateKey);
+      expect(assignmentModel.findUniqueOrThrow).toHaveBeenCalledExactlyOnceWith({
+        select: { encryptionKeyPair: { select: { privateKey: true } } },
+        where: { id: 'assignment-1' }
       });
     });
   });

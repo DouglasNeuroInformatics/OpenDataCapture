@@ -178,7 +178,9 @@ export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicatio
         try {
           decryptedData = await HybridCrypto.decrypt({
             cipherText: Buffer.from(cipherText, 'base64'),
-            privateKey: await HybridCrypto.deserializePrivateKey(assignment.encryptionKeyPair.privateKey),
+            privateKey: await HybridCrypto.deserializePrivateKey(
+              await this.assignmentsService.findPrivateKeyById(assignment.id)
+            ),
             symmetricKey: Buffer.from(symmetricKey, 'base64')
           });
         } catch (err) {
