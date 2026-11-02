@@ -177,6 +177,9 @@ export class PrismaModuleOptionsFactory implements OnApplicationShutdown {
     const client = new PrismaClient({
       datasourceUrl,
       omit: {
+        assignment: {
+          encryptionKeyPair: true
+        },
         user: {
           hashedPassword: true
         }

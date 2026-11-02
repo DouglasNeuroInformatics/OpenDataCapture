@@ -165,6 +165,32 @@ test.describe('remote assignment', () => {
     expect(assignment).not.toHaveProperty('encryptionKeyPair');
   });
 
+  test('should not return the private key the submission is encrypted to when listing or cancelling assignments', async ({
+    adminToken,
+    api,
+    apiRequestContext
+  }) => {
+    const group = await api.createGroup();
+    const subjectId = await api.createSubject(group.id);
+    const { id } = await api.createAssignment({
+      expiresAt: new Date(Date.now() + 86_400_000),
+      groupId: group.id,
+      instrumentId: await api.findInstrumentId('FORM'),
+      subjectId
+    });
+
+    const listed = await api.findAssignments(subjectId);
+    expect(listed).toHaveLength(1);
+    expect(listed[0]).not.toHaveProperty('encryptionKeyPair');
+
+    const canceled = await apiRequestContext.patch(`/api/v1/assignments/${id}`, {
+      data: { status: 'CANCELED' },
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    expect(canceled.status()).toBe(200);
+    expect(await canceled.json()).not.toHaveProperty('encryptionKeyPair');
+  });
+
   test("should let a group manager cancel an outstanding assignment from the subject's assignments tab", async ({
     getPageModel,
     page,
