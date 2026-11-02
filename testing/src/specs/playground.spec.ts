@@ -154,6 +154,43 @@ export default defineInstrument({
 `;
 }
 
+/**
+ * An SVG with a bare `%` and a `#` on a child. esbuild emits it as percent-encoded text
+ * (`data:image/svg+xml,<svg …>`) that escapes `#` but leaves the `%`, which only a lenient,
+ * Fetch-spec decoder turns back into the original markup.
+ */
+const ICON_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect width="100%" height="100%" fill="#0a0"/></svg>';
+
+/**
+ * An interactive instrument whose HTML loads an SVG through `staticAssets`, so the image is served
+ * by the interactive service worker rather than set from the data URL directly.
+ */
+function staticSvgInstrumentSource(title: string): string {
+  return `
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { z } from '/runtime/v1/zod@3.x';
+
+import icon from './icon.svg';
+
+export default defineInstrument({
+  kind: 'INTERACTIVE',
+  language: 'en',
+  tags: ['Stimulus'],
+  internal: { edition: 1, name: 'STATIC_SVG' },
+  clientDetails: { estimatedDuration: 1, instructions: ['Look at the image'] },
+  content: {
+    html: '<img alt="Icon" src="icon.svg">',
+    render() {},
+    staticAssets: { '/icon.svg': icon }
+  },
+  details: { description: 'SVG static asset', license: 'Apache-2.0', title: '${title}' },
+  measures: {},
+  validationSchema: z.object({})
+});
+`;
+}
+
 // The first paint waits on the 13 MB esbuild download and the toolchain boot; the preview then
 // compiles on a 2 s poll, so the whole chain is slower than the suite's default expect timeout.
 const PREVIEW_TIMEOUT = 60_000;
@@ -231,6 +268,37 @@ test.describe('playground', () => {
       .getByRole('img', { name: 'Stimulus' });
     await expect(stimulus).toBeVisible({ timeout: PREVIEW_TIMEOUT });
     await expect(stimulus).toHaveAttribute('src', `data:image/png;base64,${STIM_PNG_BASE64}`);
+  });
+
+  test('should serve an SVG static asset through the service worker, so the image in its HTML loads', async ({
+    page,
+    uniqueId
+  }) => {
+    const title = `Static SVG ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [
+          { content: staticSvgInstrumentSource(title), name: 'index.ts' },
+          { content: ICON_SVG, name: 'icon.svg' }
+        ],
+        label: title
+      })
+    );
+
+    await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+    await playground.preview.getByRole('button', { name: 'Begin' }).click();
+
+    const icon = playground.preview
+      .frameLocator('iframe[name="interactive-instrument"]')
+      .getByRole('img', { name: 'Icon' });
+    await expect(icon).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+    await expect
+      .poll(() => icon.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth), {
+        timeout: PREVIEW_TIMEOUT
+      })
+      .toBeGreaterThan(0);
   });
 
   // An interactive instrument renders in a frame of its own inside the preview, which reads its

@@ -27,6 +27,12 @@ The served path `/runtime/v1/@opendatacapture/runtime-internal/interactive` is h
 iframe `src` in `packages/react-core/src/components/InteractiveContent/InteractiveContent.tsx`, and as
 the prefix `worker.js` strips off incoming request pathnames. Moving the package renames that URL.
 
+**`worker.js` serves any `data:` URL.** It hands the stored string to `fetch` and answers with
+`new Response(blob)`, so the MIME type comes from the data URL itself and decoding follows the Fetch
+spec (lenient percent-decoding, `;base64`). Adding an asset extension to `instrument-bundler` needs no
+change here. A value that is not a `data:` URL rejects the `respondWith` promise, so that one request
+fails as a network error instead of falling through to the server.
+
 ## Tests
 
 `pnpm exec vitest --project runtime-internal`, in `src/__tests__/index.test.ts` — covers
