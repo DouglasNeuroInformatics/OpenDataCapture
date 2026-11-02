@@ -16,10 +16,12 @@ its `publishConfig`, so a change here is a change to a public API, and `version`
 workspace. `pnpm build` runs `scripts/build.js`, which esbuilds `src/cli.ts` into `dist/cli.js` and
 nothing else — `dist` exists only for the `bin`. A library change needs no build; a CLI change does.
 
-**A share URL can carry UTF-8 text and nothing else.** Files are `JSON.stringify`d and lz-string
-compressed into the URL fragment, so images, audio and video cannot be represented at all. The CLI
-skips them with a warning; `TEXT_FILE_EXT_REGEX` and `BINARY_FILE_EXT_REGEX` in `src/cli.ts` are the
-allowlist and the known-skip list, and both must track what the playground editor accepts.
+**A share URL carries every file as a UTF-8 string.** Files are `JSON.stringify`d and lz-string
+compressed into the URL fragment. The playground holds images, audio and video as base64 strings, so
+its Share button carries them too; the CLI skips them with a warning to keep links short.
+`TEXT_FILE_EXT_REGEX` and `BINARY_FILE_EXT_REGEX` in `src/cli.ts` are the allowlist and the
+known-skip list. They must track `inferFileType` and `isBase64EncodedFileType` in
+`apps/playground/src/utils/file.ts`: an `.svg` is text there, so it is text here.
 
 The encoding is a wire format for links people have already shared. Changing what `encodeFiles`
 writes invalidates every existing link, so `decodeShareURL` has to keep reading the old shape.

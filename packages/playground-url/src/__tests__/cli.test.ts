@@ -44,6 +44,21 @@ describe('cli', () => {
     expect(stderrSpy).toHaveBeenCalledWith(expect.stringContaining("Skipping 'icon.png'"));
   });
 
+  it('should embed an SVG as the text it is, rather than skip it as a binary asset', async () => {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><rect width="1" height="1" /></svg>\n';
+    fs.writeFileSync(path.join(tmpDir, 'index.ts'), "import logo from './logo.svg';\nexport default { logo };");
+    fs.writeFileSync(path.join(tmpDir, 'logo.svg'), svg);
+    process.argv = ['node', 'cli.js', tmpDir];
+    const { decodeShareURL } = await import('../share-url.js');
+    await import('../cli.js');
+    const href = stdoutSpy.mock.calls
+      .map(([chunk]: [unknown]) => chunk)
+      .find((chunk: unknown) => typeof chunk === 'string' && chunk.includes('http'));
+    const decoded = decodeShareURL(new URL((href as string).trim()));
+    expect(decoded?.files.find((file) => file.name === 'logo.svg')?.content).toBe(svg);
+    expect(stderrSpy).not.toHaveBeenCalledWith(expect.stringContaining('Skipping'));
+  });
+
   it('should ignore a subdirectory rather than read it as a file', async () => {
     fs.writeFileSync(path.join(tmpDir, 'index.ts'), 'export default {};');
     fs.mkdirSync(path.join(tmpDir, 'nested'));
