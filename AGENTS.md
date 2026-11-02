@@ -47,8 +47,8 @@ not every tool loads nested files.
   block of `pnpm-workspace.yaml` — reference `"catalog:"` in a `package.json`, never a literal
   version. `minimumReleaseAge` is 7 days, so a freshly published package will be rejected.
 - **Every change needs a unit test _and_ an end-to-end test in `testing/`.** See
-  `.agents/docs/playbooks/add-e2e-test.md`. Utility scripts under `scripts/` are the one exception
-  and need no tests.
+  `.agents/docs/playbooks/add-e2e-test.md`. Utility scripts under `scripts/` and the standalone
+  `cli/odc-cli` script, which has no test harness, are the exceptions and need no tests.
 - **Unit test coverage stays at 100%.** `pnpm test:coverage` fails below 100% statements, branches,
   functions or lines, and CI runs it. Code no test can reach is dead code: prove it dead (the types,
   the callers, the library contract) and delete it. Never add a coverage-ignore comment (eslint

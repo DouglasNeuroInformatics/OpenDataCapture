@@ -15,7 +15,9 @@ directly: `./cli/odc-cli --help`.
 **Standard library only** — `argparse`, `urllib.request`, `json`, `base64`, `datetime`. Do not add a
 third-party import; the whole point is that an admin can copy one file onto a server and run it. It
 targets **Python 3.8** and hard-exits below that, so no `match`, and runtime `X | Y` unions are safe
-only in annotations (the file relies on `from __future__ import annotations`).
+only in annotations (the file relies on `from __future__ import annotations`). Put `@staticmethod`
+above `@require_url` and `@require_token`, never below them: the auth decorators call the function
+they wrap, and a `staticmethod` object is only callable from Python 3.10.
 
 State is a JSON file at `~/.odc-cli.json` holding the base URL and the JWT from `login`.
 
