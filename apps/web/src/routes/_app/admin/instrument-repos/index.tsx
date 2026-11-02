@@ -1,25 +1,50 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 
-import { Button, DataTable, Dialog, Heading, Input, Label, Spinner } from '@douglasneuroinformatics/libui/components';
+import {
+  Button,
+  Card,
+  DataTable,
+  Dialog,
+  Heading,
+  Input,
+  Label,
+  SearchBar,
+  Spinner
+} from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { $CreateInstrumentRepoData } from '@opendatacapture/schemas/instrument-repo';
-import type { InstrumentRepo } from '@opendatacapture/schemas/instrument-repo';
+import type { InstrumentRepo, InstrumentRepoSyncLog } from '@opendatacapture/schemas/instrument-repo';
 import { createFileRoute } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 
+import { InstrumentRepoSyncLogTable } from '@/components/InstrumentRepoSyncLogTable';
 import { PageHeader } from '@/components/PageHeader';
+import { SectionTabs } from '@/components/SectionTabs';
+import { TruncatedCell } from '@/components/TruncatedCell';
+import { useClearInstrumentRepoSyncLogsMutation } from '@/hooks/useClearInstrumentRepoSyncLogsMutation';
 import { useCreateInstrumentRepoMutation } from '@/hooks/useCreateInstrumentRepoMutation';
 import { useDeleteInstrumentRepoMutation } from '@/hooks/useDeleteInstrumentRepoMutation';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { instrumentReposQueryOptions, useInstrumentReposQuery } from '@/hooks/useInstrumentReposQuery';
+import {
+  instrumentRepoSyncLogsQueryOptions,
+  useInstrumentRepoSyncLogsQuery
+} from '@/hooks/useInstrumentRepoSyncLogsQuery';
+import {
+  latestInstrumentRepoSyncLogsQueryOptions,
+  useLatestInstrumentRepoSyncLogsQuery
+} from '@/hooks/useLatestInstrumentRepoSyncLogsQuery';
+import { useSyncAllInstrumentReposMutation } from '@/hooks/useSyncAllInstrumentReposMutation';
 import { useSyncInstrumentRepoMutation } from '@/hooks/useSyncInstrumentRepoMutation';
+import { MIN_TABLE_BODY_HEIGHT } from '@/utils/data-table';
 
 /**
- * The instruments a repository currently provides: only the latest edition of each. A sync never
- * drops superseded editions from a repository (records may still reference them), so without this a
+ * The instruments a repository currently provides: only the latest edition of each. Superseded
+ * editions keep their repository provenance (records may still reference them), so without this a
  * bumped form would be listed once per edition it has ever had.
  */
 function currentRepoInstruments(instruments: TranslatedInstrumentInfo[], repoId: string) {
@@ -135,6 +160,45 @@ const AddRepoForm = ({
   );
 };
 
+/** Keyed by repository, from the one entry per repository the API answers with. */
+function syncLogsByRepoId(logs: InstrumentRepoSyncLog[]) {
+  const byRepoId = new Map<string, InstrumentRepoSyncLog>();
+  for (const log of logs) {
+    if (log.repoId) {
+      byRepoId.set(log.repoId, log);
+    }
+  }
+  return byRepoId;
+}
+
+type InstrumentReposSection = 'ACTIVITY' | 'REPOSITORIES';
+
+const INITIAL_PAGE = 1;
+
+const INITIAL_SORT_ORDER = 'desc';
+
+/**
+ * One page of the activity log, for every repository or for one. It owns its own paging state, so
+ * the dialog's table and the one below the repositories table page independently of each other.
+ */
+const SyncLogTable = ({ repoId }: { repoId?: string }) => {
+  const [page, setPage] = useState<number>(INITIAL_PAGE);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(INITIAL_SORT_ORDER);
+  const syncLogsQuery = useInstrumentRepoSyncLogsQuery({ params: { page, repoId, sortOrder } });
+  return (
+    <InstrumentRepoSyncLogTable
+      logs={syncLogsQuery.data?.data ?? []}
+      pageCount={syncLogsQuery.data?.pageCount ?? 0}
+      sortOrder={sortOrder}
+      onPageChange={setPage}
+      onSortOrderChange={(order) => {
+        setSortOrder(order);
+        setPage(INITIAL_PAGE);
+      }}
+    />
+  );
+};
+
 const RouteComponent = () => {
   const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
@@ -143,6 +207,14 @@ const RouteComponent = () => {
   const createRepoMutation = useCreateInstrumentRepoMutation();
   const deleteRepoMutation = useDeleteInstrumentRepoMutation();
   const syncRepoMutation = useSyncInstrumentRepoMutation();
+  const syncAllReposMutation = useSyncAllInstrumentReposMutation();
+  // The same first page the loader prefetched and `SyncLogTable` mounts on, so reading the total
+  // here costs no extra request.
+  const syncLogsQuery = useInstrumentRepoSyncLogsQuery({
+    params: { page: INITIAL_PAGE, sortOrder: INITIAL_SORT_ORDER }
+  });
+  const latestSyncLogsQuery = useLatestInstrumentRepoSyncLogsQuery();
+  const clearSyncLogsMutation = useClearInstrumentRepoSyncLogsMutation();
   // Every edition, because the default collapses editions across all sources, not per repository;
   // `currentRepoInstruments` then keeps the latest edition each repository provides.
   const instrumentInfoQuery = useInstrumentInfoQuery({ params: { allEditions: true } });
@@ -150,11 +222,35 @@ const RouteComponent = () => {
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [repoToView, setRepoToView] = useState<InstrumentRepo | null>(null);
+  const [instrumentSearch, setInstrumentSearch] = useState('');
+  const [repoToShowLogs, setRepoToShowLogs] = useState<InstrumentRepo | null>(null);
+  const [isConfirmClearHistoryOpen, setIsConfirmClearHistoryOpen] = useState(false);
   const [repoToDelete, setRepoToDelete] = useState<InstrumentRepo | null>(null);
   const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
+  const [section, setSection] = useState<InstrumentReposSection>('REPOSITORIES');
 
   // Compute which repos are currently assigned to at least one (live) group.
   const inUseRepoIds = new Set(groupsQuery.data.flatMap((group) => group.instrumentRepoIds));
+  const latestSyncLogByRepoId = syncLogsByRepoId(latestSyncLogsQuery.data);
+
+  const sectionHeadings = {
+    ACTIVITY: {
+      description: t({
+        en: 'Every import and sync, newest first. Select View on an entry to see why its instruments failed.',
+        es: 'Todas las importaciones y sincronizaciones, las más recientes primero. Seleccione Ver en una entrada para saber por qué fallaron sus instrumentos.',
+        fr: "Tous les imports et synchronisations, les plus récents d'abord. Sélectionnez Voir sur une entrée pour savoir pourquoi ses instruments ont échoué."
+      }),
+      title: t({ en: 'Review Activity', es: 'Revisar la actividad', fr: "Consulter l'activité" })
+    },
+    REPOSITORIES: {
+      description: t({
+        en: 'The GitHub repositories instruments are imported from. Sync a repository to pull its latest instruments, or view the instruments it provides.',
+        es: 'Los repositorios de GitHub desde los que se importan los instrumentos. Sincronice un repositorio para obtener sus instrumentos más recientes, o vea los instrumentos que proporciona.',
+        fr: "Les dépôts GitHub d'où les instruments sont importés. Synchronisez un dépôt pour récupérer ses instruments les plus récents, ou consultez les instruments qu'il fournit."
+      }),
+      title: t({ en: 'Manage Repositories', es: 'Gestionar los repositorios', fr: 'Gérer les dépôts' })
+    }
+  } satisfies { [K in InstrumentReposSection]: { description: string; title: string } };
 
   const handleDeleteClick = (repo: InstrumentRepo) => {
     if (inUseRepoIds.has(repo.id)) {
@@ -174,13 +270,16 @@ const RouteComponent = () => {
 
   return (
     <Dialog
-      open={isDialogOpen || isConfirmDeleteOpen || isViewOpen}
+      open={isDialogOpen || isConfirmDeleteOpen || isViewOpen || isConfirmClearHistoryOpen || repoToShowLogs !== null}
       onOpenChange={() => {
         setIsDialogOpen(false);
         setIsConfirmDeleteOpen(false);
         setIsViewOpen(false);
         setRepoToView(null);
         setRepoToDelete(null);
+        setRepoToShowLogs(null);
+        setIsConfirmClearHistoryOpen(false);
+        setInstrumentSearch('');
       }}
     >
       <PageHeader>
@@ -192,97 +291,248 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <DataTable
-        columns={[
-          {
-            accessorKey: 'name',
-            cell: (ctx) => {
-              const repo = ctx.row.original;
-              return (
-                <span className="flex items-center">
-                  {repo.name}
-                  <span className="hidden" data-row-selected={highlightedRowId === repo.id ? 'true' : 'false'} />
-                </span>
-              );
-            },
-            header: t({
-              en: 'Repository Name',
-              es: 'Nombre del repositorio',
-              fr: 'Nom du dépôt'
-            })
-          },
-          {
-            accessorKey: 'url',
-            header: 'URL'
-          },
-          {
-            accessorFn: (row: InstrumentRepo) => {
-              return instrumentInfoQuery.data
-                ? currentRepoInstruments(instrumentInfoQuery.data, row.id).length
-                : row.instrumentIds.length;
-            },
-            header: t({
-              en: 'Instruments',
-              es: 'Instrumentos',
-              fr: 'Instruments'
-            }),
-            id: 'instrumentCount'
-          },
-          {
-            accessorFn: (row: InstrumentRepo) => {
-              return row.lastSyncedAt ? new Date(row.lastSyncedAt).toLocaleDateString() : '-';
-            },
-            header: t({
-              en: 'Last Synced',
-              es: 'Última sincronización',
-              fr: 'Dernière synchronisation'
-            }),
-            id: 'lastSynced'
-          }
-        ]}
-        data={reposQuery.data}
-        rowActions={[
-          {
-            label: t({
-              en: 'Sync',
-              es: 'Sincronizar',
-              fr: 'Synchroniser'
-            }),
-            onSelect: (repo: InstrumentRepo) => {
-              syncRepoMutation.mutate({ id: repo.id });
+      <Card
+        // Invisible for now: the Card stays so a configurable card colour has an element to tint.
+        className="flex flex-col gap-5 border-transparent bg-transparent px-8 py-7 shadow-none dark:bg-transparent"
+        data-section={section}
+        data-testid="instrument-repos-card"
+      >
+        <div className="flex flex-col gap-1.5">
+          <Card.Title className="text-lg" data-testid="instrument-repos-section-title">
+            {sectionHeadings[section].title}
+          </Card.Title>
+          <Card.Description>{sectionHeadings[section].description}</Card.Description>
+        </div>
+        <SectionTabs
+          data-testid="instrument-repos-section"
+          tabs={[
+            { label: t({ en: 'Repositories', es: 'Repositorios', fr: 'Dépôts' }), value: 'REPOSITORIES' },
+            {
+              label: t({ en: 'Activity Log', es: 'Registro de actividad', fr: "Journal d'activité" }),
+              value: 'ACTIVITY'
             }
-          },
-          {
-            label: t({
-              en: 'View',
-              es: 'Ver',
-              fr: 'Voir'
-            }),
-            onSelect: (repo: InstrumentRepo) => {
-              setRepoToView(repo);
-              setIsViewOpen(true);
-            }
-          },
-          {
-            label: t('core.delete'),
-            onSelect: handleDeleteClick
-          }
-        ]}
-        togglesComponent={() => (
-          <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
-            {t({
-              en: 'Add Repository',
-              es: 'Agregar repositorio',
-              fr: 'Ajouter un dépôt'
-            })}
-          </Button>
+          ]}
+          value={section}
+          onValueChange={setSection}
+        />
+        {section === 'REPOSITORIES' && (
+          <div
+            className={cn('[&>[data-testid=data-table]]:px-6 [&>[data-testid=data-table]]:pt-6', MIN_TABLE_BODY_HEIGHT)}
+          >
+            <DataTable
+              columns={[
+                {
+                  accessorKey: 'name',
+                  cell: (ctx) => {
+                    const repo = ctx.row.original;
+                    return (
+                      <span className="flex items-center overflow-hidden">
+                        <TruncatedCell title={repo.name} value={repo.name} />
+                        <span className="hidden" data-row-selected={highlightedRowId === repo.id ? 'true' : 'false'} />
+                      </span>
+                    );
+                  },
+                  header: t({
+                    en: 'Repository Name',
+                    es: 'Nombre del repositorio',
+                    fr: 'Nom du dépôt'
+                  })
+                },
+                {
+                  accessorKey: 'url',
+                  cell: (ctx) => (
+                    <TruncatedCell
+                      data-testid="instrument-repo-url"
+                      title={ctx.row.original.url}
+                      value={ctx.row.original.url}
+                    />
+                  ),
+                  header: 'URL',
+                  size: 210
+                },
+                {
+                  accessorFn: (row: InstrumentRepo) => {
+                    return instrumentInfoQuery.data
+                      ? currentRepoInstruments(instrumentInfoQuery.data, row.id).length
+                      : row.instrumentIds.length;
+                  },
+                  header: t({
+                    en: 'Instruments',
+                    es: 'Instrumentos',
+                    fr: 'Instruments'
+                  }),
+                  id: 'instrumentCount',
+                  size: 118
+                },
+                {
+                  cell: (ctx) => {
+                    const log = latestSyncLogByRepoId.get(ctx.row.original.id);
+                    if (!log) {
+                      return '-';
+                    }
+                    return <span data-testid="instrument-repo-failed-count">{log.failures.length}</span>;
+                  },
+                  header: t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' }),
+                  id: 'failedCount',
+                  size: 88
+                },
+                {
+                  accessorFn: (row: InstrumentRepo) => {
+                    return row.lastSyncedAt ? new Date(row.lastSyncedAt).toLocaleDateString() : '-';
+                  },
+                  header: t({
+                    en: 'Last Synced',
+                    es: 'Última sincronización',
+                    fr: 'Dernière synchronisation'
+                  }),
+                  id: 'lastSynced',
+                  size: 112
+                }
+              ]}
+              data={reposQuery.data}
+              // libui shares the width evenly between unpinned columns and honours `size` only on pinned
+              // ones, so every column but the name is pinned, leaving the name the room the table has left.
+              initialState={{ columnPinning: { right: ['url', 'instrumentCount', 'failedCount', 'lastSynced'] } }}
+              rowActions={[
+                {
+                  label: t({
+                    en: 'Sync',
+                    es: 'Sincronizar',
+                    fr: 'Synchroniser'
+                  }),
+                  onSelect: (repo: InstrumentRepo) => {
+                    syncRepoMutation.mutate({ id: repo.id });
+                  }
+                },
+                {
+                  label: t({
+                    en: 'View',
+                    es: 'Ver',
+                    fr: 'Voir'
+                  }),
+                  onSelect: (repo: InstrumentRepo) => {
+                    setRepoToView(repo);
+                    setIsViewOpen(true);
+                  }
+                },
+                {
+                  label: t({ en: 'Logs', es: 'Registros', fr: 'Journaux' }),
+                  onSelect: setRepoToShowLogs
+                },
+                {
+                  label: t('core.delete'),
+                  onSelect: handleDeleteClick
+                }
+              ]}
+              togglesComponent={() => (
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
+                    {t({
+                      en: 'Add Repository',
+                      es: 'Agregar repositorio',
+                      fr: 'Ajouter un dépôt'
+                    })}
+                  </Button>
+                  <Button
+                    disabled={syncAllReposMutation.isPending || reposQuery.data.length === 0}
+                    variant="outline"
+                    onClick={() => syncAllReposMutation.mutate()}
+                  >
+                    {t({
+                      en: 'Sync All',
+                      es: 'Sincronizar todo',
+                      fr: 'Tout synchroniser'
+                    })}
+                  </Button>
+                </div>
+              )}
+              onRowClick={(repo) => setHighlightedRowId(repo.id)}
+              onRowDoubleClick={(repo) => {
+                setHighlightedRowId(repo.id);
+                syncRepoMutation.mutate({ id: repo.id });
+              }}
+            />
+          </div>
         )}
-        onRowClick={(repo) => setHighlightedRowId(repo.id)}
-        onRowDoubleClick={(repo) => {
-          setHighlightedRowId(repo.id);
-          syncRepoMutation.mutate({ id: repo.id });
-        }}
-      />
+        {section === 'ACTIVITY' && (
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-end">
+              <Button
+                disabled={!syncLogsQuery.data?.total || clearSyncLogsMutation.isPending}
+                variant="outline"
+                onClick={() => setIsConfirmClearHistoryOpen(true)}
+              >
+                {t({ en: 'Clear Log', es: 'Borrar registro', fr: 'Effacer le journal' })}
+              </Button>
+            </div>
+            <SyncLogTable />
+          </div>
+        )}
+      </Card>
+      {isConfirmClearHistoryOpen && (
+        <Dialog.Content>
+          <Dialog.Header>
+            <Dialog.Title>
+              {t({
+                en: 'Clear the activity log?',
+                es: '¿Borrar el registro de actividad?',
+                fr: "Effacer le journal d'activité ?"
+              })}
+            </Dialog.Title>
+            <Dialog.Description>
+              {t({
+                en: 'Every entry in the activity log will be permanently deleted from the database, including the reasons instruments failed. This cannot be undone. Repositories and their instruments are not affected.',
+                es: 'Todas las entradas del registro de actividad se eliminarán permanentemente de la base de datos, incluidos los motivos por los que fallaron los instrumentos. Esta acción no se puede deshacer. Los repositorios y sus instrumentos no se verán afectados.',
+                fr: "Toutes les entrées du journal d'activité seront définitivement supprimées de la base de données, y compris les raisons des échecs des instruments. Cette action est irréversible. Les dépôts et leurs instruments ne sont pas touchés."
+              })}
+            </Dialog.Description>
+          </Dialog.Header>
+          <Dialog.Footer>
+            <Button
+              className="min-w-16"
+              type="button"
+              variant="danger"
+              onClick={() => {
+                clearSyncLogsMutation.mutate();
+                setIsConfirmClearHistoryOpen(false);
+              }}
+            >
+              {t('core.yes')}
+            </Button>
+            <Button
+              className="min-w-16"
+              type="button"
+              variant="outline"
+              onClick={() => setIsConfirmClearHistoryOpen(false)}
+            >
+              {t('core.no')}
+            </Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      )}
+      {repoToShowLogs && (
+        <Dialog.Content className="sm:max-w-275">
+          <Dialog.Header>
+            <Dialog.Title>
+              {t({
+                en: `Activity log of "${repoToShowLogs.name}"`,
+                es: `Registro de actividad de "${repoToShowLogs.name}"`,
+                fr: `Journal d'activité de « ${repoToShowLogs.name} »`
+              })}
+            </Dialog.Title>
+            <Dialog.Description>
+              {t({
+                en: 'Every import and sync of this repository, newest first.',
+                es: 'Todas las importaciones y sincronizaciones de este repositorio, las más recientes primero.',
+                fr: "Tous les imports et synchronisations de ce dépôt, les plus récents d'abord."
+              })}
+            </Dialog.Description>
+          </Dialog.Header>
+          <div className="max-h-[70vh] overflow-auto">
+            <SyncLogTable repoId={repoToShowLogs.id} />
+          </div>
+        </Dialog.Content>
+      )}
       {isDialogOpen && (
         <Dialog.Content className="sm:max-w-118.75">
           <Dialog.Header>
@@ -319,10 +569,35 @@ const RouteComponent = () => {
                 fr: `Instruments dans « ${repoToView.name} »`
               })}
             </Dialog.Title>
+            <Dialog.Description>
+              {t({ en: 'Source: ', es: 'Fuente: ', fr: 'Source : ' })}
+              <a
+                className="underline underline-offset-4"
+                data-testid="instrument-repo-source-link"
+                href={repoToView.url}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {repoToView.url}
+              </a>
+            </Dialog.Description>
           </Dialog.Header>
+          <SearchBar
+            placeholder={t({
+              en: 'Search instruments...',
+              es: 'Buscar instrumentos...',
+              fr: 'Rechercher des instruments...'
+            })}
+            value={instrumentSearch}
+            onValueChange={setInstrumentSearch}
+          />
           {(() => {
+            const searchTerm = instrumentSearch.trim().toLowerCase();
             const repoInstruments =
-              instrumentInfoQuery.data && currentRepoInstruments(instrumentInfoQuery.data, repoToView.id);
+              instrumentInfoQuery.data &&
+              currentRepoInstruments(instrumentInfoQuery.data, repoToView.id).filter((instrument) => {
+                return instrument.details.title.toLowerCase().includes(searchTerm);
+              });
             if (instrumentInfoQuery.isLoading) {
               return (
                 <div className="flex justify-center py-6">
@@ -333,11 +608,17 @@ const RouteComponent = () => {
             if (!repoInstruments?.length) {
               return (
                 <p className="text-muted-foreground py-4 text-center text-sm">
-                  {t({
-                    en: 'No instruments found in this repository.',
-                    es: 'No se encontraron instrumentos en este repositorio.',
-                    fr: 'Aucun instrument trouvé dans ce dépôt.'
-                  })}
+                  {searchTerm
+                    ? t({
+                        en: 'No instruments match your search.',
+                        es: 'Ningún instrumento coincide con su búsqueda.',
+                        fr: 'Aucun instrument ne correspond à votre recherche.'
+                      })
+                    : t({
+                        en: 'No instruments found in this repository.',
+                        es: 'No se encontraron instrumentos en este repositorio.',
+                        fr: 'Aucun instrument trouvé dans ce dépôt.'
+                      })}
                 </p>
               );
             }
@@ -430,7 +711,13 @@ const RouteComponent = () => {
 export const Route = createFileRoute('/_app/admin/instrument-repos/')({
   component: RouteComponent,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(instrumentReposQueryOptions());
-    await context.queryClient.ensureQueryData(groupsQueryOptions());
+    await Promise.all([
+      context.queryClient.ensureQueryData(instrumentReposQueryOptions()),
+      context.queryClient.ensureQueryData(groupsQueryOptions()),
+      context.queryClient.ensureQueryData(
+        instrumentRepoSyncLogsQueryOptions({ params: { page: INITIAL_PAGE, sortOrder: INITIAL_SORT_ORDER } })
+      ),
+      context.queryClient.ensureQueryData(latestInstrumentRepoSyncLogsQueryOptions())
+    ]);
   }
 });

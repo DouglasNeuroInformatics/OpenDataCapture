@@ -37,6 +37,12 @@ describe('SortableHeader', () => {
     expect(new Set([ascending, descending, unsorted]).size).toBe(3);
   });
 
+  // A server-mode table holds no sorting state, so the column always reads as unsorted.
+  it('should prefer the order it was given over the column, so a server-ordered table is not dimmed', () => {
+    const { container } = render(<SortableHeader<Row> column={columnOf(false)} label="Date" sortOrder="asc" />);
+    expect(container.querySelector('svg')?.getAttribute('class')).not.toContain('opacity-40');
+  });
+
   // Dimming is what tells a user which column the table is actually ordered by.
   it('should dim the icon only while the column is unsorted', () => {
     const { container: unsorted } = render(<SortableHeader<Row> column={columnOf(false)} label="A" />);

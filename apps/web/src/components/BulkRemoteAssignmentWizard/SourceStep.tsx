@@ -1,20 +1,13 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import {
-  Button,
-  Checkbox,
-  DataTable,
-  FileDropzone,
-  Input,
-  Tabs,
-  TextArea
-} from '@douglasneuroinformatics/libui/components';
+import { Button, Checkbox, DataTable, FileDropzone, Input, TextArea } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { BULK_ASSIGNMENT_MAX_SUBJECTS } from '@opendatacapture/schemas/assignment';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
+import { SectionTabs } from '@/components/SectionTabs';
 import { SortableHeader } from '@/components/SortableHeader';
 import {
   ACCEPTED_FILE_EXTENSIONS,
@@ -227,31 +220,15 @@ export const SourceStep = ({
       onStepChange={onStepChange}
     >
       <div className="flex flex-col gap-4" data-testid="bulk-source-step">
-        <Tabs
+        <SectionTabs
+          data-testid="bulk-source-mode"
+          tabs={modes}
           value={mode}
           onValueChange={(value) => {
             setErrors([]);
-            onModeChange(value as SourceMode);
+            onModeChange(value);
           }}
-        >
-          {/* Underlined rather than libui's filled pill: the pill is one page tint on another, and
-              the rule keeps to the card's own vocabulary. */}
-          <Tabs.List
-            className="h-auto w-full justify-start gap-6 rounded-none border-b bg-transparent p-0"
-            data-testid="bulk-source-mode"
-          >
-            {modes.map((option) => (
-              <Tabs.Trigger
-                className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground -mb-px rounded-none border-b-2 border-transparent px-1 pt-1 pb-3 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                data-testid={`bulk-source-mode-${option.value}`}
-                key={option.value}
-                value={option.value}
-              >
-                {option.label}
-              </Tabs.Trigger>
-            ))}
-          </Tabs.List>
-        </Tabs>
+        />
 
         {mode === 'SELECT' && (
           <div className="flex flex-col gap-3">

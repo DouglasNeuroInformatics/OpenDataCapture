@@ -167,7 +167,8 @@ hand-written:
 
 **These two currently agree with each other but not with the derived list.** They contain `all`,
 `Assignment`, `Group`, `Instrument`, `InstrumentRecord`, `InstrumentRepo`, `Session`, `Subject`,
-`User`. The Prisma schema also defines `AuditLog`, `InstrumentRecordFile` and `SetupState`, which
+`User`. The Prisma schema also defines `AuditLog`, `InstrumentRecordFile`, `InstrumentRepoSyncLog`
+and `SetupState`, which
 are therefore valid in `@RouteAccess` and in `AbilityFactory` rules (`InstrumentRecordFile` is used
 in both) but cannot be granted as an `additionalPermission`. Treat that as the existing state, not
 as a licence to widen it silently.
