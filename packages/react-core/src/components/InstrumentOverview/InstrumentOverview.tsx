@@ -4,6 +4,8 @@ import { Button, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { AnyUnilingualInstrument } from '@opendatacapture/runtime-core';
 
+import { InstrumentInstructions } from '../InstrumentInstructions';
+
 export type InstrumentOverviewProps = {
   /** Content rendered directly above the "Begin" button (e.g., a verification gate). */
   beforeBegin?: ReactNode;
@@ -48,12 +50,7 @@ export const InstrumentOverview = ({ beforeBegin, disableBegin, instrument, onNe
                 fr: 'Instructions'
               })}
             </Heading>
-            {instructions!.map((instruction, i) => (
-              // entries may repeat, so the index is the only stable key
-              <p className="text-muted-foreground text-sm whitespace-pre-line" key={i}>
-                {instruction}
-              </p>
-            ))}
+            <InstrumentInstructions instructions={instructions!} />
           </div>
         )}
       </div>

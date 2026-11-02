@@ -32,7 +32,7 @@ const renderFormContent = (props: Partial<FormContentProps> = {}) => {
   return onSubmit;
 };
 
-const getInfoButton = () => screen.getByRole('heading').parentElement!.querySelector('button')!;
+const getInfoButton = () => screen.getByRole<HTMLButtonElement>('button', { name: 'Instructions' });
 
 describe('FormContent', () => {
   beforeAll(() => {
