@@ -32,6 +32,12 @@ function logError(message: string): void {
   console.error(`${timestamp()} ${message}`);
 }
 
+function logFailure(err: unknown, summary: string): void {
+  const formattedError = err instanceof Error ? formatError(err) : err;
+  logError(`${chalk.dim(String(formattedError))}\n`);
+  logError(chalk.red('✘') + chalk.bold.red(` Error: ${summary}`));
+}
+
 class InstrumentLoader {
   private encodedBundle: null | string;
   private readonly watcher: fs.FSWatcher;
@@ -46,6 +52,14 @@ class InstrumentLoader {
       log(chalk.yellow('↺') + chalk.dim(` [${this.label}] File changed, rebuilding...`));
       void this.updateEncodedBundle();
     });
+    this.watcher.on('error', (err) => {
+      this.encodedBundle = null;
+      logFailure(err, `Stopped watching ${this.displayName} for changes, restart to resume`);
+    });
+  }
+
+  private get displayName(): string {
+    return this.label || 'instrument';
   }
 
   close(): void {
@@ -60,32 +74,33 @@ class InstrumentLoader {
   }
 
   private async updateEncodedBundle(): Promise<void> {
-    const inputs: BundlerInput[] = [];
-    const filepaths = await fs.promises
-      .readdir(this.target, 'utf-8')
-      .then((filenames) => filenames.filter((filename) => BUNDLER_FILE_EXT_REGEX.test(filename)))
-      .then((filenames) => filenames.map((filename) => path.resolve(this.target, filename)));
-
-    for (const filepath of filepaths) {
-      const loader = inferLoader(filepath);
-      const content: string | Uint8Array = await fs.promises.readFile(filepath, loader === 'dataurl' ? null : 'utf-8');
-      inputs.push({
-        content: content instanceof Uint8Array ? new Uint8Array(content) : content,
-        name: path.basename(filepath)
-      });
-    }
-    const start = Date.now();
     try {
+      const inputs: BundlerInput[] = [];
+      const filepaths = await fs.promises
+        .readdir(this.target, 'utf-8')
+        .then((filenames) => filenames.filter((filename) => BUNDLER_FILE_EXT_REGEX.test(filename)))
+        .then((filenames) => filenames.map((filename) => path.resolve(this.target, filename)));
+
+      for (const filepath of filepaths) {
+        const loader = inferLoader(filepath);
+        const content: string | Uint8Array = await fs.promises.readFile(
+          filepath,
+          loader === 'dataurl' ? null : 'utf-8'
+        );
+        inputs.push({
+          content: content instanceof Uint8Array ? new Uint8Array(content) : content,
+          name: path.basename(filepath)
+        });
+      }
+      const start = Date.now();
       this.encodedBundle = encodeUnicodeToBase64(await bundle({ inputs }));
       const elapsed = Date.now() - start;
       const timing = this.verbose ? chalk.dim(` (${elapsed}ms)`) : '';
       const labelPart = this.label ? chalk.dim(` [${this.label}]`) : '';
       log(chalk.green('✓') + labelPart + chalk.dim(' Bundle ready') + timing);
     } catch (err) {
-      const formattedError = err instanceof Error ? formatError(err) : err;
-      logError(`${chalk.dim(String(formattedError))}\n`);
-      const labelPart = this.label ? ` ${this.label}` : ' instrument';
-      logError(chalk.red('✘') + chalk.bold.red(` Error: Failed to compile${labelPart}`));
+      this.encodedBundle = null;
+      logFailure(err, `Failed to compile ${this.displayName}`);
     }
   }
 }
@@ -160,8 +175,9 @@ class SingleModeHandler {
     } else if (req.url === '/') {
       const encodedBundle = await this.instrumentLoader.getEncodedBundle();
       if (encodedBundle) {
+        const html = await this.renderPage({ encodedBundle, page: 'single' });
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(`<!DOCTYPE html>${await this.renderPage({ encodedBundle, page: 'single' })}`);
+        res.end(`<!DOCTYPE html>${html}`);
       } else {
         res.writeHead(503, { 'Content-Type': 'text/plain' });
         res.end('Bundle Loading or Error (See Console)');
@@ -234,30 +250,37 @@ class AllModeHandler {
     }
 
     if (req.url === '/') {
-      const props: RootProps = { instruments: this.loaderMap.getInstrumentList(), page: 'index' };
+      const html = await this.renderPage({ instruments: this.loaderMap.getInstrumentList(), page: 'index' });
       res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(`<!DOCTYPE html>${await this.renderPage(props)}`);
+      res.end(`<!DOCTYPE html>${html}`);
       return;
     }
 
     const instrumentMatch = req.url?.match(/^\/(forms|interactive)\/([^/]+)\/?$/);
     if (instrumentMatch) {
       const [, type, name] = instrumentMatch;
-      const decodedName = decodeURIComponent(name!);
+      let decodedName: string;
+      try {
+        decodedName = decodeURIComponent(name!);
+      } catch {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Bad Request');
+        return;
+      }
       const encodedBundle = await this.loaderMap.getEncodedBundle(type!, decodedName);
       if (!encodedBundle) {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('Instrument Not Found');
         return;
       }
-      const props: RootProps = {
+      const html = await this.renderPage({
         encodedBundle,
         instrumentName: decodedName,
         instrumentType: type!,
         page: 'instrument'
-      };
+      });
       res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(`<!DOCTYPE html>${await this.renderPage(props)}`);
+      res.end(`<!DOCTYPE html>${html}`);
       return;
     }
 
@@ -309,7 +332,13 @@ export class Server {
   private constructor(params: { handler: AllModeHandler | SingleModeHandler; port: number }) {
     this.handler = params.handler;
     this.port = params.port;
-    this.server = http.createServer((...args) => void this.handler.handle(...args));
+    this.server = http.createServer((req, res) => {
+      this.handler.handle(req, res).catch((err: unknown) => {
+        logFailure(err, `Failed to handle ${req.method} ${req.url}`);
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('Internal Server Error');
+      });
+    });
   }
 
   static async create({
