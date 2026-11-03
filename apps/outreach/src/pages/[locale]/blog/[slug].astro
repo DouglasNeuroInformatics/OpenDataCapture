@@ -1,15 +1,16 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { getCollection, type CollectionEntry, getEntry } from 'astro:content';
+import { type CollectionEntry, getEntry } from 'astro:content';
 import PostInfoCard from '@/components/blog/PostInfoCard.astro';
 import PageHeading from '@/components/common/PageHeading.astro';
+import { getPublishedPosts } from '@/lib/blog';
 
 type Props = {
   post: CollectionEntry<'blog'>;
 };
 
 export const getStaticPaths = async () => {
-  const posts = await getCollection('blog');
+  const posts = await getPublishedPosts();
 
   const paths = posts.map((post) => ({
     params: {
