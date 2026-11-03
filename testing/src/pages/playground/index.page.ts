@@ -9,6 +9,10 @@ import { playgroundURL } from '../../support/env';
 export class PlaygroundPage {
   readonly $ref: Page;
   readonly editorPane: Locator;
+  /** The instrument list's search box, inside the popover {@link instrumentSelector} opens. */
+  readonly instrumentSearch: Locator;
+  /** The header's button that opens the instrument list. */
+  readonly instrumentSelector: Locator;
   /** The handle between the editor and preview panes, which resizes them. */
   readonly paneSeparator: Locator;
   /** The instrument preview, which runs on another origin than the editor. */
@@ -19,6 +23,8 @@ export class PlaygroundPage {
   constructor(page: Page) {
     this.$ref = page;
     this.editorPane = page.getByTestId('editor-pane');
+    this.instrumentSelector = page.getByRole('combobox', { name: 'Load an instrument...' });
+    this.instrumentSearch = page.getByPlaceholder('Search...');
     this.paneSeparator = page.getByRole('separator');
     this.previewFrame = page.getByTestId('preview-frame');
     this.preview = page.frameLocator('[data-testid="preview-frame"]');
@@ -46,12 +52,20 @@ export class PlaygroundPage {
     await this.$ref.goto(url);
   }
 
-  /**
-   * Picks an example or template from the header's instrument list by its label. The list's search
-   * box matches on instrument ids rather than labels, so the option is clicked without filtering.
-   */
+  /** The option for the instrument with this label in the header's instrument list. */
+  instrumentOption(label: string): Locator {
+    return this.$ref.getByRole('option', { exact: true, name: label });
+  }
+
+  /** Opens the header's instrument list and types `query` into its search box. */
+  async searchInstruments(query: string): Promise<void> {
+    await this.instrumentSelector.click();
+    await this.instrumentSearch.fill(query);
+  }
+
+  /** Picks an example or template from the header's instrument list by its label. */
   async selectInstrument(label: string): Promise<void> {
-    await this.$ref.getByRole('combobox', { name: 'Load an instrument...' }).click();
-    await this.$ref.getByRole('option', { exact: true, name: label }).click();
+    await this.searchInstruments(label);
+    await this.instrumentOption(label).click();
   }
 }
