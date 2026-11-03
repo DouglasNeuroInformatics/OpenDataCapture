@@ -164,6 +164,23 @@ test.describe('playground', () => {
   test.describe.configure({ mode: 'default' });
   test.slow();
 
+  test('should find an instrument by its visible label in the selector', async ({ page }) => {
+    const playground = new PlaygroundPage(page);
+    await playground.goto();
+
+    await playground.searchInstruments('Form Reference');
+    await expect(playground.instrumentOption('Form Reference')).toBeVisible();
+  });
+
+  test('should find nothing for a query only the hidden instrument ids match', async ({ page }) => {
+    const playground = new PlaygroundPage(page);
+    await playground.goto();
+
+    // Every v4 UUID carries a 4 in its version digit, and no built-in label contains one.
+    await playground.searchInstruments('4');
+    await expect(page.getByText('No Instruments Found')).toBeVisible();
+  });
+
   test('should run the preview on an origin other than the editor and render the instrument there @smoke', async ({
     page
   }) => {
