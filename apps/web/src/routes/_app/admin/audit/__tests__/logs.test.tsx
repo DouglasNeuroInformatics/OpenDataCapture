@@ -349,7 +349,7 @@ describe('Route', () => {
     it('should tag the action with its color', () => {
       renderPage();
       const action = within(screen.getByTestId('audit-log-action'));
-      expect(action.getByTestId('color-tag-dot').style.backgroundColor).toBe('#0891b2');
+      expect(action.getByTestId('color-tag-dot').style.backgroundColor).toBe('#c026d3');
     });
 
     it('should leave the entity as plain text', () => {

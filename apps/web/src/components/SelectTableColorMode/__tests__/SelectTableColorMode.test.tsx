@@ -24,7 +24,7 @@ describe('SelectTableColorMode', () => {
 
   it('should show the selected mode on the closed control', () => {
     render(<SelectTableColorMode value="text" onSelect={vi.fn()} />);
-    expect(trigger().textContent).toContain('Colored text');
+    expect(trigger().textContent).toContain('Coloured text');
   });
 
   it('should offer every mode with the default first', () => {

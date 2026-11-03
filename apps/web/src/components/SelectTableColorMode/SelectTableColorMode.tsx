@@ -19,9 +19,9 @@ export const SelectTableColorMode = ({ onSelect, value }: SelectTableColorModePr
   const resolvedTheme = resolveTheme(theme);
 
   const modeLabels: { [K in TableColorMode]: string } = {
-    none: t({ en: 'No color', es: 'Sin color', fr: 'Sans couleur' }),
+    none: t({ en: 'Disabled', es: 'Desactivado', fr: 'Désactivé' }),
     tags: t({ en: 'Tags', es: 'Etiquetas', fr: 'Étiquettes' }),
-    text: t({ en: 'Colored text', es: 'Texto de color', fr: 'Texte coloré' })
+    text: t({ en: 'Coloured text', es: 'Texto de color', fr: 'Texte coloré' })
   };
 
   return (

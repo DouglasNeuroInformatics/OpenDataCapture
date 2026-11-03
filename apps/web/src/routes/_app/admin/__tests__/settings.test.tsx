@@ -345,7 +345,7 @@ describe('Route', () => {
     it('should show the saved mode', () => {
       mocks.state.setupState.tableColorMode = 'none';
       renderPage();
-      expect(screen.getByTestId('table-color-mode-select').textContent).toContain('No color');
+      expect(screen.getByTestId('table-color-mode-select').textContent).toContain('Disabled');
     });
 
     it('should autosave the chosen mode, since the setting has no submit button', () => {

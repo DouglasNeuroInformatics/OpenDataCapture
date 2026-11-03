@@ -47,9 +47,9 @@ const VIOLET = {
   light: { fill: '#7c3aed', text: '#6d28d9' }
 } as const satisfies TagHue;
 
-const CYAN = {
-  dark: { fill: '#06b6d4', text: '#67e8f9' },
-  light: { fill: '#0891b2', text: '#0e7490' }
+const FUCHSIA = {
+  dark: { fill: '#d946ef', text: '#f0abfc' },
+  light: { fill: '#c026d3', text: '#a21caf' }
 } as const satisfies TagHue;
 
 const TEAL = {
@@ -103,7 +103,7 @@ const AUDIT_ACTION_HUES = {
   CREATE: GREEN,
   DELETE: RED,
   LOGIN: VIOLET,
-  SEND_EMAIL: CYAN,
+  SEND_EMAIL: FUCHSIA,
   UNARCHIVE: TEAL,
   UPDATE: BLUE
 } as const satisfies { [K in $AuditLogAction]: TagHue };
