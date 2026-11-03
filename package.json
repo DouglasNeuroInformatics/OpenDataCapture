@@ -68,9 +68,11 @@
   ],
   "pnpm": {
     "overrides": {
+      "@tailwindcss/typography>postcss-selector-parser": "^6.1.5",
       "@types/react": "-",
       "@types/react-dom": "-",
       "find-my-way@9": "^9.7.0",
+      "sharp": "^0.35.5",
       "typescript": "6.0.x",
       "yaml@2": "^2.9.0"
     },
