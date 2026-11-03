@@ -42,6 +42,7 @@ const mocks = vi.hoisted(() => ({
   users: [] as User[]
 }));
 
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
   createFileRoute: () => {
@@ -343,6 +344,18 @@ describe('Route', () => {
     it('should show who acted, in which group, and the translated action and entity', () => {
       renderPage();
       expect(cellTexts().slice(1)).toEqual(['jane', 'Depression Clinic', 'Send Email', 'Instrument Record']);
+    });
+
+    it('should tag the action with its color', () => {
+      renderPage();
+      const action = within(screen.getByTestId('audit-log-action'));
+      expect(action.getByTestId('color-tag-dot').style.backgroundColor).toBe('#0891b2');
+    });
+
+    it('should leave the entity as plain text', () => {
+      renderPage();
+      expect(screen.getByText('Instrument Record').querySelector('[data-testid="color-tag-dot"]')).toBeNull();
+      expect(screen.getByText('Instrument Record').closest('[data-testid="color-tag-label"]')).toBeNull();
     });
 
     it('should show N/A for a log with no user or group', () => {

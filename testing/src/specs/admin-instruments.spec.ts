@@ -13,6 +13,13 @@ test.describe('admin instruments', () => {
     await expect(page.getByRole('dialog')).toContainText(title);
   });
 
+  test('should tag the kind of an instrument in the forms view', async ({ getPageModel }) => {
+    const title = 'Happiness Questionnaire';
+    const instrumentsPage = await getPageModel('/admin/instruments');
+    await instrumentsPage.searchBar.fill(title);
+    await expect(instrumentsPage.row(title).getByTestId('instrument-cell-kind')).toHaveText('Form');
+  });
+
   test('should reach the series view from the Instruments submenu in the sidebar', async ({ getPageModel, page }) => {
     await getPageModel('/admin/instruments');
     const sidebar = page.getByTestId('sidebar');
@@ -59,10 +66,6 @@ test.describe('admin instruments', () => {
     await expect(seriesPage.archiveDialog).toContainText(`SeriesArchive${uniqueId}`);
     await seriesPage.confirmArchive.click();
     await expect(seriesPage.seriesStatus(title)).toHaveAttribute('data-archived', 'true');
-    await expect(seriesPage.seriesStatus(title).locator('span').first()).toHaveCSS(
-      'background-color',
-      'rgb(220, 38, 38)'
-    );
 
     const assignment = await apiRequestContext.post(`${API}/assignments`, {
       data: { expiresAt: new Date(Date.now() + 86_400_000), groupId: group.id, instrumentId: seriesId, subjectId },

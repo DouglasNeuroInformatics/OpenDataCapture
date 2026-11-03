@@ -1,4 +1,5 @@
 import type { Language } from '@opendatacapture/schemas/core';
+import type { TableColorMode } from '@opendatacapture/schemas/setup';
 import type { Locator, Page } from '@playwright/test';
 
 import { AppPage } from '../route.page';
@@ -7,6 +8,7 @@ export class AdminSettingsPage extends AppPage {
   readonly defaultAssignmentDurationInput: Locator;
   readonly groupSwitcherPositionSelect: Locator;
   readonly pageHeader: Locator;
+  readonly tableColorModeSelect: Locator;
   readonly uploaderToggle: Locator;
 
   constructor(page: Page) {
@@ -15,6 +17,7 @@ export class AdminSettingsPage extends AppPage {
     this.uploaderToggle = page.getByRole('switch', { name: 'Enable Uploader' });
     this.defaultAssignmentDurationInput = page.getByTestId('default-assignment-duration-input');
     this.groupSwitcherPositionSelect = page.getByTestId('group-switcher-position-select');
+    this.tableColorModeSelect = page.getByTestId('table-color-mode-select');
   }
 
   /** The labels beside the active-language checkboxes, in the order they are listed. */
@@ -30,6 +33,11 @@ export class AdminSettingsPage extends AppPage {
   async selectLanguage(name: string) {
     await this.sidebar.getByTestId('language-toggle').getByRole('button').click();
     await this.$ref.getByRole('menuitem', { name }).click();
+  }
+
+  async selectTableColorMode(mode: TableColorMode) {
+    await this.tableColorModeSelect.click();
+    await this.$ref.getByTestId(`table-color-mode-option-${mode}`).click();
   }
 
   async setDefaultAssignmentDuration(days: number) {

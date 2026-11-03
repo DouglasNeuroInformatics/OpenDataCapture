@@ -87,6 +87,7 @@ function createSetupState(branding: BrandingConfig | null): SetupState {
     isMailEnabled: false,
     isSetup: true,
     release: { buildTime: 0, type: 'production', version: '1.0.0' },
+    tableColorMode: 'tags',
     uptime: 0
   };
 }

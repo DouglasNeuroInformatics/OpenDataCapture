@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { DEFAULT_ACTIVE_LANGUAGES } from '@opendatacapture/schemas/core';
 import { isMailEnabled } from '@opendatacapture/schemas/mail';
-import { $BrandingConfig } from '@opendatacapture/schemas/setup';
+import { $BrandingConfig, DEFAULT_TABLE_COLOR_MODE } from '@opendatacapture/schemas/setup';
 import type {
   $InitAppOptions,
   $UpdateSetupStateData,
@@ -79,6 +79,7 @@ export class SetupService {
       isMailEnabled: isMailEnabled(savedOptions?.mailConfig),
       isSetup: Boolean(savedOptions?.isSetup),
       release: __RELEASE__,
+      tableColorMode: savedOptions?.tableColorMode ?? DEFAULT_TABLE_COLOR_MODE,
       uptime: Math.round(process.uptime())
     } satisfies SetupState;
   }

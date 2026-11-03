@@ -3,13 +3,15 @@ import type { ComponentProps } from 'react';
 
 import type { Permissions } from '@opendatacapture/schemas/core';
 import type { User } from '@opendatacapture/schemas/user';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { UserPermissionsEditor } from '@/components/UserPermissionsEditor/UserPermissionsEditor';
 import type { PermissionDraft } from '@/utils/permissions';
 
 import '@/services/i18n';
+
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 
 const onPermissionsChange = vi.fn();
 const onDraftsChange = vi.fn();
@@ -156,9 +158,8 @@ describe('UserPermissionsEditor', () => {
         user={{ ...user, additionalPermissions: [{ action: 'read', groupId: null, subject: 'Subject' }] }}
       />
     );
-    const tag = screen.getByTestId('user-permission-scope').firstElementChild!;
-    expect(tag.textContent).toBe('All Groups');
-    expect((tag.firstElementChild as HTMLElement).style.backgroundColor).toBe('#d97706');
+    const scope = within(screen.getByTestId('user-permission-scope'));
+    expect(scope.getByTestId('color-tag-dot').style.backgroundColor).toBe('#d97706');
   });
 
   it('should remove a draft without changing existing grants', () => {

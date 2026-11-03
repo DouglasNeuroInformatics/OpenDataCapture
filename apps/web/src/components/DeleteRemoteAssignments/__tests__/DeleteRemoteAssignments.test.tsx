@@ -24,6 +24,7 @@ const mocks = vi.hoisted(() => {
   return state;
 });
 
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@/hooks/useAssignmentsQuery', () => ({
   ASSIGNMENTS_QUERY_KEY_PREFIX: 'assignments',
   assignmentsQueryOptions: () => ({}),
@@ -284,5 +285,16 @@ describe('DeleteRemoteAssignments', () => {
     openConfirmation('a-1');
     expect(confirmButton().disabled).toBe(true);
     expect(confirmButton().textContent).toBe('Deleting…');
+  });
+
+  it.each([
+    ['OUTSTANDING', 'Outstanding', '#2563eb'],
+    ['EXPIRED', 'Expired', '#d97706']
+  ] as const)('should tag a %s assignment with its color', (status, label, fill) => {
+    mocks.assignments = [makeAssignment({ id: 'a-1', status })];
+    renderComponent();
+    const cell = screen.getByTestId('assignment-status');
+    expect(cell.textContent).toBe(label);
+    expect(cell.querySelector<HTMLElement>('[data-testid="color-tag-dot"]')!.style.backgroundColor).toBe(fill);
   });
 });

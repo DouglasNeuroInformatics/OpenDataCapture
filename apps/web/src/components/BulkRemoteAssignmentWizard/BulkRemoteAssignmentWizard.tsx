@@ -49,6 +49,9 @@ type ResultTableProps = {
  */
 const ResultTable = ({ assignments, emails, statuses, subjectIdDisplayLength, withEmail }: ResultTableProps) => {
   const { t } = useTranslation();
+  const {
+    data: { tableColorMode }
+  } = useSetupStateQuery();
 
   return (
     <WizardTable
@@ -79,7 +82,11 @@ const ResultTable = ({ assignments, emails, statuses, subjectIdDisplayLength, wi
             <Table.Cell>
               <CopyButton size="icon" text={assignment.url} variant="outline" />
             </Table.Cell>
-            {withEmail && <Table.Cell>{status ? STATUS_ICONS[status] : null}</Table.Cell>}
+            {withEmail && (
+              <Table.Cell className={tableColorMode === 'none' ? 'grayscale' : undefined}>
+                {status ? STATUS_ICONS[status] : null}
+              </Table.Cell>
+            )}
           </Table.Row>
         );
       })}

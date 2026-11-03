@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 
 import { Button, Checkbox, DataTable, Dialog, Heading, Sheet } from '@douglasneuroinformatics/libui/components';
-import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $Group } from '@opendatacapture/schemas/group';
 import type { Group } from '@opendatacapture/schemas/group';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import axios from 'axios';
 
+import { ColorTagCell } from '@/components/ColorTagCell';
 import { PageHeader } from '@/components/PageHeader';
 import { useDeleteGroupMutation } from '@/hooks/useDeleteGroupMutation';
 import { GROUPS_QUERY_KEY, groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
@@ -16,10 +17,13 @@ import {
   instrumentReposQueryOptions,
   useInstrumentReposQuery
 } from '@/hooks/useInstrumentReposQuery';
+import { resolveTheme } from '@/utils/chart-theme';
 import { getApiErrorMessage } from '@/utils/error';
+import { getGroupTypeColor } from '@/utils/tag-colors';
 
 const RouteComponent = () => {
   const { t } = useTranslation();
+  const [theme] = useTheme();
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const groupsQuery = useGroupsQuery();
@@ -121,12 +125,17 @@ const RouteComponent = () => {
             accessorKey: 'type',
             cell: (ctx) => {
               const type = ctx.getValue() as Group['type'];
-              if (type === 'CLINICAL') {
-                return t('common.clinical');
-              } else if (type === 'RESEARCH') {
-                return t('common.research');
-              }
-              return type satisfies never;
+              const typeLabels: { [K in Group['type']]: string } = {
+                CLINICAL: t('common.clinical'),
+                RESEARCH: t('common.research')
+              };
+              return (
+                <ColorTagCell
+                  color={getGroupTypeColor(type, resolveTheme(theme))}
+                  data-testid="group-cell-type"
+                  label={typeLabels[type]}
+                />
+              );
             },
             header: t('common.groupType')
           }

@@ -31,6 +31,7 @@ const mocks = vi.hoisted(() => ({
   subjectIdDisplayLength: undefined as number | undefined
 }));
 
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@/hooks/useInstrumentHubRecords', () => ({
   useInstrumentHubRecords: () => ({ dl: vi.fn(), records: mocks.records })
 }));

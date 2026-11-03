@@ -1,5 +1,5 @@
 import type { ActiveLanguages } from '@opendatacapture/schemas/core';
-import type { $UpdateSetupStateData } from '@opendatacapture/schemas/setup';
+import type { $UpdateSetupStateData, TableColorMode } from '@opendatacapture/schemas/setup';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -13,6 +13,7 @@ type SetupStateData = {
   defaultAssignmentDurationDays?: null | number;
   isBulkRemoteAssignmentsEnabled?: boolean | null;
   isExperimentalFeaturesEnabled?: boolean | null;
+  tableColorMode: TableColorMode;
 };
 
 type MutateCallbacks = { onError: () => void; onSuccess: () => void };
@@ -20,7 +21,7 @@ type MutateCallbacks = { onError: () => void; onSuccess: () => void };
 const mocks = vi.hoisted(() => {
   const state: { groupSwitcherPosition: GroupSwitcherPosition; setupState: SetupStateData } = {
     groupSwitcherPosition: 'sidebar',
-    setupState: { activeLanguages: ['en'] }
+    setupState: { activeLanguages: ['en'], tableColorMode: 'tags' }
   };
   return {
     config: { setup: { isGatewayEnabled: true } },
@@ -72,7 +73,7 @@ describe('Route', () => {
     vi.clearAllMocks();
     mocks.config.setup.isGatewayEnabled = true;
     mocks.state.groupSwitcherPosition = 'sidebar';
-    mocks.state.setupState = { activeLanguages: ['en'] };
+    mocks.state.setupState = { activeLanguages: ['en'], tableColorMode: 'tags' };
   });
 
   afterEach(() => {
@@ -337,6 +338,21 @@ describe('Route', () => {
       renderPage();
       fireEvent.click(screen.getByTestId('active-language-en'));
       expect(mocks.mutate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('table colors', () => {
+    it('should show the saved mode', () => {
+      mocks.state.setupState.tableColorMode = 'none';
+      renderPage();
+      expect(screen.getByTestId('table-color-mode-select').textContent).toContain('No color');
+    });
+
+    it('should autosave the chosen mode, since the setting has no submit button', () => {
+      renderPage();
+      fireEvent.keyDown(screen.getByTestId('table-color-mode-select'), { key: 'Enter' });
+      fireEvent.click(screen.getByTestId('table-color-mode-option-text'));
+      expect(savedData()).toEqual([{ tableColorMode: 'text' }]);
     });
   });
 

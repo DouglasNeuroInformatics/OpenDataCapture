@@ -1,7 +1,7 @@
 import type { Group } from '@opendatacapture/schemas/group';
 import type { SeriesInstrumentOverview, TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { QueryClient } from '@tanstack/react-query';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { InstrumentPreviewItem } from '@/components/InstrumentPreviewDialog';
@@ -25,6 +25,7 @@ const mocks = vi.hoisted(() => ({
   seriesOverview: [] as SeriesInstrumentOverview[]
 }));
 
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@/components/InstrumentPreviewDialog', () => ({ InstrumentPreviewDialog: mocks.InstrumentPreviewDialog }));
 vi.mock('@/hooks/useGroupsQuery', () => ({
   groupsQueryOptions: mocks.groupsQueryOptions,
@@ -272,6 +273,27 @@ describe('Route', () => {
     });
   });
 
+  describe('admin instruments forms view kind', () => {
+    it('should tag the kind with its color, matching the datahub instrument table', () => {
+      mocks.instrumentInfo = [scalarFixture({ id: 'task-1', kind: 'INTERACTIVE', title: 'Reaction Task' })];
+      renderPage('forms');
+      const dot = within(screen.getByTestId('instrument-cell-kind')).getByTestId('color-tag-dot');
+      expect(dot.style.backgroundColor).toBe('#dc2626');
+    });
+
+    it('should find an instrument by its translated kind, so searching still sees the tagged column', async () => {
+      mocks.instrumentInfo = [
+        scalarFixture({ id: 'form-1', title: 'Happiness' }),
+        scalarFixture({ id: 'task-1', kind: 'INTERACTIVE', title: 'Reaction Task' })
+      ];
+      renderPage('forms');
+      const search = within(screen.getByTestId('data-table-search-bar')).getByRole('searchbox');
+      fireEvent.change(search, { target: { value: 'Interactive' } });
+      await waitFor(() => expect(rows()).toHaveLength(1));
+      expect(cellTexts()[0]).toBe('Reaction Task');
+    });
+  });
+
   describe('admin instruments series view', () => {
     it('should describe an active series shared across every group', () => {
       mocks.seriesOverview = [overviewFixture()];
@@ -296,14 +318,14 @@ describe('Route', () => {
     it('should tag an active series with a green dot, so the status scans without tinting the label', () => {
       mocks.seriesOverview = [overviewFixture()];
       renderPage('series');
-      const dot = screen.getByTestId('series-status').firstElementChild as HTMLElement;
+      const dot = within(screen.getByTestId('series-status')).getByTestId('color-tag-dot');
       expect(dot.style.backgroundColor).toBe('#16a34a');
     });
 
     it('should tag an archived series with a red dot, so the status scans without tinting the label', () => {
       mocks.seriesOverview = [overviewFixture({ archivedAt: new Date('2026-09-02T12:00:00Z') })];
       renderPage('series');
-      const dot = screen.getByTestId('series-status').firstElementChild as HTMLElement;
+      const dot = within(screen.getByTestId('series-status')).getByTestId('color-tag-dot');
       expect(dot.style.backgroundColor).toBe('#dc2626');
     });
 

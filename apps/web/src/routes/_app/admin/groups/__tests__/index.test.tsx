@@ -14,16 +14,14 @@ import { Route } from '@/routes/_app/admin/groups/index';
 
 import '@/services/i18n';
 
-/** A group as the table receives it, with `type` widened so a value the client does not know can be rendered. */
-type GroupRow = Omit<Group, 'type'> & { type: string };
-
 const mocks = vi.hoisted(() => ({
   deleteGroup: vi.fn(),
-  groups: [] as GroupRow[],
+  groups: [] as Group[],
   patch: vi.fn(),
   repos: [] as InstrumentRepo[]
 }));
 
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('axios', async (importOriginal) => {
   const actual = await importOriginal<typeof import('axios')>();
   return { ...actual, default: { isAxiosError: actual.isAxiosError, patch: mocks.patch } };
@@ -44,7 +42,7 @@ vi.mock('@/hooks/useInstrumentReposQuery', async (importOriginal) => ({
   useInstrumentReposQuery: () => ({ data: mocks.repos })
 }));
 
-const groupFixture = (overrides: Partial<GroupRow> = {}): GroupRow => ({
+const groupFixture = (overrides: Partial<Group> = {}): Group => ({
   accessibleInstrumentIds: [],
   createdAt: new Date('2026-01-01'),
   id: 'group-1',
@@ -145,16 +143,20 @@ describe('Route', () => {
   it.each([
     ['CLINICAL', 'Clinical'],
     ['RESEARCH', 'Research']
-  ])('should translate the %s group type into its display name', (type, label) => {
+  ] as const)('should translate the %s group type into its display name', (type, label) => {
     mocks.groups = [groupFixture({ type })];
     renderPage();
     expect(within(rows()[0]!).getByText(label)).toBeTruthy();
   });
 
-  it('should show a group type the client does not know verbatim rather than hide it', () => {
-    mocks.groups = [groupFixture({ type: 'COMMUNITY' })];
+  it.each([
+    ['CLINICAL', '#2563eb'],
+    ['RESEARCH', '#7c3aed']
+  ] as const)('should tag a %s group with its own color', (type, fill) => {
+    mocks.groups = [groupFixture({ type })];
     renderPage();
-    expect(within(rows()[0]!).getByText('COMMUNITY')).toBeTruthy();
+    const dot = within(within(rows()[0]!).getByTestId('group-cell-type')).getByTestId('color-tag-dot');
+    expect(dot.style.backgroundColor).toBe(fill);
   });
 
   it('should highlight only the row that was clicked', () => {

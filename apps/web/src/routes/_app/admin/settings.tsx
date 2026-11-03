@@ -19,6 +19,7 @@ import { CircleHelpIcon } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
 import { SaveStatus } from '@/components/SaveStatus';
+import { SelectTableColorMode } from '@/components/SelectTableColorMode';
 import { config } from '@/config';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateSetupStateMutation } from '@/hooks/useUpdateSetupStateMutation';
@@ -175,7 +176,7 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto w-full max-w-4xl">
         <Card>
           <Card.Content className="p-0">
             <SettingSection title={t({ en: 'Features', es: 'Funcionalidades', fr: 'Fonctionnalités' })}>
@@ -319,7 +320,9 @@ const RouteComponent = () => {
               </div>
             </SettingSection>
             <Separator />
-            <SettingSection title={t({ en: 'Preferences', es: 'Preferencias', fr: 'Préférences' })}>
+            <SettingSection
+              title={t({ en: 'UI Preferences', es: 'Preferencias de la interfaz', fr: "Préférences de l'interface" })}
+            >
               <div className="flex items-center gap-10">
                 <p className="text-sm font-medium">
                   {t({
@@ -346,6 +349,19 @@ const RouteComponent = () => {
                     </Select.Group>
                   </Select.Content>
                 </Select>
+              </div>
+              <div className="flex items-center gap-10">
+                <p className="text-sm font-medium whitespace-nowrap">
+                  {t({
+                    en: 'Coloured Text In Tables',
+                    es: 'Texto de color en las tablas',
+                    fr: 'Texte coloré dans les tableaux'
+                  })}
+                </p>
+                <SelectTableColorMode
+                  value={setupStateQuery.data.tableColorMode}
+                  onSelect={(tableColorMode) => autosave({ tableColorMode })}
+                />
               </div>
             </SettingSection>
           </Card.Content>

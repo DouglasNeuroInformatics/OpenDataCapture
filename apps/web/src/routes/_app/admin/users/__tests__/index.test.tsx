@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
   usersQueryOptions: vi.fn(() => ({ queryKey: ['users'] }))
 }));
 
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
   Link: ({ children, to }: PropsWithChildren<{ to: string }>) => <a href={to}>{children}</a>,
@@ -128,13 +129,13 @@ describe('Route', () => {
 
   it('should tag an active user with a green dot, so the status scans without tinting the label', () => {
     renderTable([userFixture()]);
-    const dot = screen.getByTestId('user-status-active').firstElementChild as HTMLElement;
+    const dot = within(screen.getByTestId('user-status-active')).getByTestId('color-tag-dot');
     expect(dot.style.backgroundColor).toBe('#16a34a');
   });
 
   it('should tag an archived user with a red dot, so the status scans without tinting the label', () => {
     renderTable([userFixture({ archivedAt: new Date('2026-10-01T00:00:00Z') })]);
-    const dot = screen.getByTestId('user-status-archived').firstElementChild as HTMLElement;
+    const dot = within(screen.getByTestId('user-status-archived')).getByTestId('color-tag-dot');
     expect(dot.style.backgroundColor).toBe('#dc2626');
   });
 

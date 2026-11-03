@@ -1,20 +1,21 @@
 import { useState } from 'react';
-import type { ComponentProps } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { cn } from '@douglasneuroinformatics/libui/utils';
 import { translateInstrumentInfo } from '@opendatacapture/instrument-utils';
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import type { InstrumentInfo, TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute } from '@tanstack/react-router';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { InstrumentKindCell } from '@/components/InstrumentKindCell';
 import { InstrumentPreviewDialog } from '@/components/InstrumentPreviewDialog';
 import type { InstrumentPreviewItem, InstrumentSource } from '@/components/InstrumentPreviewDialog';
 import { PageHeader } from '@/components/PageHeader';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
+import { useInstrumentKindLabels } from '@/hooks/useInstrumentKindLabels';
 import {
   seriesInstrumentsOverviewQueryOptions,
   useSeriesInstrumentsOverviewQuery
@@ -34,8 +35,8 @@ type SeriesRow = SeriesOverviewRow & {
 };
 
 /** One line cut off with an ellipsis, with the whole text shown on hover. */
-const CellText = ({ className, text, ...props }: ComponentProps<'span'> & { text: string }) => (
-  <span className={cn('block min-w-0 truncate', className)} title={text} {...props}>
+const CellText = ({ text }: { text: string }) => (
+  <span className="block min-w-0 truncate" title={text}>
     {text}
   </span>
 );
@@ -88,7 +89,7 @@ type InstrumentRow = {
   edition: number;
   groupNames: string[];
   id: string;
-  kind: string;
+  kind: InstrumentKind;
   preview: InstrumentPreviewItem;
   sourceLabel: string;
   title: string;
@@ -115,6 +116,7 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
   const { t } = useTranslation();
   const groupsQuery = useGroupsQuery();
   const toSource = useInstrumentSource();
+  const kindLabels = useInstrumentKindLabels();
   const [previewItem, setPreviewItem] = useState<InstrumentPreviewItem | null>(null);
 
   const rows: InstrumentRow[] = selectLatestEditions(scalarInstruments)
@@ -170,16 +172,8 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
             id: 'groups'
           },
           {
-            accessorFn: (row: InstrumentRow) => {
-              if (row.kind === 'INTERACTIVE') {
-                return t({ en: 'Interactive', es: 'Interactivo', fr: 'Interactif' });
-              }
-              if (row.kind === 'FILE') {
-                return t({ en: 'File', es: 'Archivo', fr: 'Fichier' });
-              }
-              return t({ en: 'Form', es: 'Formulario', fr: 'Formulaire' });
-            },
-            cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
+            accessorFn: (row: InstrumentRow) => kindLabels[row.kind],
+            cell: (ctx) => <InstrumentKindCell kind={ctx.row.original.kind} />,
             header: t({ en: 'Kind', es: 'Tipo', fr: 'Type' }),
             id: 'kind',
             size: 130
