@@ -116,6 +116,9 @@ const RouteComponent = () => {
       }))
       .reverse() ?? [];
 
+  const recordsLabel = t({ en: 'Records', es: 'Registros', fr: 'Enregistrements' });
+  const sessionsLabel = t({ en: 'Sessions', es: 'Sesiones', fr: 'Sessions' });
+
   let welcome: string;
   if (currentGroup?.type === 'CLINICAL') {
     welcome = t({
@@ -480,20 +483,10 @@ const RouteComponent = () => {
                             </p>
                             <div className="space-y-1">
                               <p className="font-semibold text-blue-600 dark:text-blue-400">
-                                {t({
-                                  en: 'Records',
-                                  es: 'Registros',
-                                  fr: 'Enregistrements'
-                                })}
-                                : {payload.find((p) => p.dataKey === 'records')?.value ?? 0}
+                                {recordsLabel}: {payload.find((p) => p.dataKey === 'records')?.value ?? 0}
                               </p>
                               <p className="font-semibold text-emerald-600 dark:text-emerald-400">
-                                {t({
-                                  en: 'Sessions',
-                                  es: 'Sesiones',
-                                  fr: 'Sessions'
-                                })}
-                                : {payload.find((p) => p.dataKey === 'sessions')?.value ?? 0}
+                                {sessionsLabel}: {payload.find((p) => p.dataKey === 'sessions')?.value ?? 0}
                               </p>
                             </div>
                           </div>
@@ -509,11 +502,7 @@ const RouteComponent = () => {
                     dot={{ fill: chartColors.records.stroke, r: 4, strokeWidth: 2 }}
                     fill="url(#recordsGradient)"
                     legendType="plainline"
-                    name={t({
-                      en: 'Records',
-                      es: 'Registros',
-                      fr: 'Enregistrements'
-                    })}
+                    name={recordsLabel}
                     stroke={chartColors.records.stroke}
                     strokeWidth={3}
                     type="monotone"
@@ -524,11 +513,7 @@ const RouteComponent = () => {
                     dot={{ fill: chartColors.sessions.stroke, r: 4, strokeWidth: 2 }}
                     fill="url(#sessionsGradient)"
                     legendType="plainline"
-                    name={t({
-                      en: 'Sessions',
-                      es: 'Sesiones',
-                      fr: 'Sessions'
-                    })}
+                    name={sessionsLabel}
                     stroke={chartColors.sessions.stroke}
                     strokeDasharray="6 4"
                     strokeWidth={3}
