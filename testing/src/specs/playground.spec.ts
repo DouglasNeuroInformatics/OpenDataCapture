@@ -411,6 +411,44 @@ test.describe('playground interactive examples', () => {
       expect(messages[0]).toContain('"message": "Hello"');
     });
   }
+
+  // The task only submits once the respondent has pressed through every trial, and the preview
+  // reports a submission only if it passes the example's own schema, an array of trials.
+  test('should submit the Interactive With JSPsych example once its timeline finishes', async ({ page }) => {
+    const playground = new PlaygroundPage(page);
+    await playground.goto();
+    await playground.selectInstrument('Interactive With JSPsych');
+
+    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
+    const messages: string[] = [];
+    page.once('dialog', (dialog) => {
+      messages.push(dialog.message());
+      void dialog.dismiss();
+    });
+    const task = playground.preview.frameLocator('iframe[name="interactive-instrument"]');
+    const body = task.locator('body');
+
+    await expect(task.getByText('Welcome to the experiment.')).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+    await body.press('Space');
+    await expect(task.getByText('In this experiment, a circle will appear')).toBeVisible();
+    await body.press('Space');
+
+    // 2 stimuli x 5 repetitions, each shown after a fixation of up to 2 seconds
+    const stimulus = task.locator('#jspsych-image-keyboard-response-stimulus');
+    for (let trial = 0; trial < 10; trial++) {
+      await expect(stimulus).toBeVisible({ timeout: 10_000 });
+      await body.press('f');
+      await expect(stimulus).toBeHidden();
+    }
+
+    await expect(task.getByText('Press any key to complete the experiment.')).toBeVisible({ timeout: 10_000 });
+    await body.press('Space');
+
+    await expect.poll(() => messages).toHaveLength(1);
+    expect(messages[0]).toContain('The following data will be submitted');
+    // the dialog text is cut short (the trials embed the stimuli as data URLs), so only its start is checked
+    expect(messages[0]).toContain('"data": [');
+  });
 });
 
 test.describe('playground save button', () => {

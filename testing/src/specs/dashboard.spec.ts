@@ -19,6 +19,20 @@ test.describe('dashboard', () => {
     await expect(dashboardPage.subjectsGrowthChart).toBeVisible();
   });
 
+  test('should label the trend series in a visible legend without requiring hover', async ({ getPageModel }) => {
+    const dashboardPage = await getPageModel('/dashboard');
+    const legend = dashboardPage.recordsSessionsChart.locator('.recharts-default-legend');
+    await expect(legend).toBeVisible();
+    await expect(legend).toContainText('Records');
+    await expect(legend).toContainText('Sessions');
+
+    const recordsIcon = legend.locator('.recharts-legend-item').filter({ hasText: 'Records' }).locator('line');
+    const sessionsIcon = legend.locator('.recharts-legend-item').filter({ hasText: 'Sessions' }).locator('line');
+
+    await expect(recordsIcon).not.toHaveAttribute('stroke-dasharray', '6 4');
+    await expect(sessionsIcon).toHaveAttribute('stroke-dasharray', '6 4');
+  });
+
   test('should navigate to the data hub when the subjects statistic is clicked', async ({ getPageModel, page }) => {
     const dashboardPage = await getPageModel('/dashboard');
     await dashboardPage.statisticSubjects.click();

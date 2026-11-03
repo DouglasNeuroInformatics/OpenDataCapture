@@ -1,10 +1,11 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
+import { getEntry } from 'astro:content';
 
 import NoContent from '@/components/blog/NoContent.astro';
 import PageHeading from '@/components/common/PageHeading.astro';
 import PostInfoCard from '@/components/blog/PostInfoCard.astro';
 import Page from '@/layouts/Page.astro';
+import { getPublishedPosts } from '@/lib/blog';
 
 import { useTranslations } from '@/i18n';
 
@@ -14,7 +15,7 @@ export const getStaticPaths = () => {
 
 const { resolvedLanguage, t, translatePath } = useTranslations(Astro.url);
 
-const posts = await getCollection('blog', ({ data }) => data.language === resolvedLanguage && !data.isDraft);
+const posts = await getPublishedPosts(resolvedLanguage);
 posts.sort((a, b) => {
   if (a.data.datePublished > b.data.datePublished) {
     return -1;

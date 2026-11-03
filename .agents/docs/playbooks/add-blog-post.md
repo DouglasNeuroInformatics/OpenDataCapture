@@ -36,9 +36,11 @@ Posts published at `opendatacapture.org/<locale>/blog`.
 
 ## Traps
 
-- **`isDraft: true` only hides the post from the index listing.** `[slug].astro` calls
-  `getCollection('blog')` unfiltered, so a draft is still built at its real URL in the published
-  site. It is not a privacy mechanism.
+- **Read posts through `getPublishedPosts()`, never `getCollection('blog')`.** It lives in
+  `apps/outreach/src/lib/blog.ts` and drops every `isDraft: true` post, so a draft is neither built
+  at its URL, listed on the index, nor written to the sitemap. A page that calls `getCollection`
+  directly would publish drafts again. A draft is still public in the repository, so `isDraft` is
+  not a privacy mechanism.
 - **`author` is resolved at build time.** A value with no matching file in
   `apps/outreach/src/content/team/` fails the whole build, not just that page.
 
