@@ -475,20 +475,19 @@ const Walkthrough = () => {
             </Button>
           </Card.Header>
           <Card.Content className="text-muted-foreground text-sm">{currentStep.content}</Card.Content>
-          <Card.Footer className="flex justify-end gap-3">
+          <Card.Footer className="flex items-end justify-end gap-3">
             {/* Hidden on the last step, where "Done" already marks the walkthrough complete. */}
-            {!isLastStep && (
+            {!isLastStep && !index && (
               <Button
-                className="mr-auto"
                 type="button"
-                variant="ghost"
+                variant="outline"
                 onClick={() => {
                   setIsWalkthroughComplete(true);
                   handleClose();
                 }}
               >
                 {t({
-                  en: "Don't show again",
+                  en: "Don't Show Again",
                   es: 'No volver a mostrar',
                   fr: 'Ne plus afficher'
                 })}
