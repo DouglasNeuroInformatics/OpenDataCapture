@@ -59,6 +59,10 @@ test.describe('admin instruments', () => {
     await expect(seriesPage.archiveDialog).toContainText(`SeriesArchive${uniqueId}`);
     await seriesPage.confirmArchive.click();
     await expect(seriesPage.seriesStatus(title)).toHaveAttribute('data-archived', 'true');
+    await expect(seriesPage.seriesStatus(title).locator('span').first()).toHaveCSS(
+      'background-color',
+      'rgb(220, 38, 38)'
+    );
 
     const assignment = await apiRequestContext.post(`${API}/assignments`, {
       data: { expiresAt: new Date(Date.now() + 86_400_000), groupId: group.id, instrumentId: seriesId, subjectId },

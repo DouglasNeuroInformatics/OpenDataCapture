@@ -293,6 +293,20 @@ describe('Route', () => {
       expect(screen.getByTestId('series-status').getAttribute('data-archived')).toBe('true');
     });
 
+    it('should tag an active series with a green dot, so the status scans without tinting the label', () => {
+      mocks.seriesOverview = [overviewFixture()];
+      renderPage('series');
+      const dot = screen.getByTestId('series-status').firstElementChild as HTMLElement;
+      expect(dot.style.backgroundColor).toBe('#16a34a');
+    });
+
+    it('should tag an archived series with a red dot, so the status scans without tinting the label', () => {
+      mocks.seriesOverview = [overviewFixture({ archivedAt: new Date('2026-09-02T12:00:00Z') })];
+      renderPage('series');
+      const dot = screen.getByTestId('series-status').firstElementChild as HTMLElement;
+      expect(dot.style.backgroundColor).toBe('#dc2626');
+    });
+
     it('should list active series before archived ones', () => {
       mocks.seriesOverview = [
         overviewFixture({ archivedAt: new Date('2026-09-02'), id: 'series-a', title: 'Alpha' }),

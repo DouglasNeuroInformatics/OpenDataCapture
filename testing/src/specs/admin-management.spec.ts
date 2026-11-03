@@ -64,6 +64,10 @@ test.describe('admin management', () => {
     await search.fill(enabled.username);
     await expect(page.getByTestId('user-login-status')).toHaveText('Enabled');
     await expect(page.getByTestId('user-status-active')).toBeVisible();
+    await expect(page.getByTestId('user-status-active').locator('span').first()).toHaveCSS(
+      'background-color',
+      'rgb(22, 163, 74)'
+    );
     await search.fill(disabled.username);
     await expect(page.getByTestId('user-login-status')).toHaveText('Disabled');
     await expect(page.getByTestId('user-status-active')).toBeVisible();
@@ -321,6 +325,9 @@ test.describe('admin management', () => {
     await expect(userPage.permissionRows.first()).toContainText('Read');
     await expect(userPage.permissionRows.first()).toContainText('Subject');
     await expect(userPage.permissionRows.first().getByTestId('user-permission-scope')).toContainText('All Groups');
+    await expect(
+      userPage.permissionRows.first().getByTestId('user-permission-scope').locator('span span').first()
+    ).toHaveCSS('background-color', 'rgb(217, 119, 6)');
   });
 
   test('should save a user whose new password was typed and then cleared', async ({ api, getPageModel, uniqueId }) => {

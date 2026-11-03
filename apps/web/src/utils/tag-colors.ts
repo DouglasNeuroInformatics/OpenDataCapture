@@ -35,6 +35,18 @@ const SYNC_STATUS_COLORS = {
   SUCCESS: { dark: '#22c55e', light: '#16a34a' }
 } as const satisfies { [K in InstrumentRepoSyncStatus]: { dark: string; light: string } };
 
+/** The same hues as a sync status: green for in use, red for archived. */
+const ARCHIVE_STATUS_COLORS = {
+  ACTIVE: { dark: '#22c55e', light: '#16a34a' },
+  ARCHIVED: { dark: '#ef4444', light: '#dc2626' }
+} as const;
+
+/** Amber, because a grant across all groups is wider than a grant to one and worth noticing. */
+const ALL_GROUPS_SCOPE_COLOR = {
+  dark: '#f59e0b',
+  light: '#d97706'
+} as const;
+
 const NEUTRAL_COLOR = {
   dark: '#a3a3a3',
   light: '#525252'
@@ -55,4 +67,12 @@ function getSyncStatusColor(status: InstrumentRepoSyncStatus, mode: Mode): strin
   return SYNC_STATUS_COLORS[status][mode];
 }
 
-export { getInstrumentKindColor, getSexColor, getSyncStatusColor };
+function getArchiveStatusColor(isArchived: boolean, mode: Mode): string {
+  return ARCHIVE_STATUS_COLORS[isArchived ? 'ARCHIVED' : 'ACTIVE'][mode];
+}
+
+function getAllGroupsScopeColor(mode: Mode): string {
+  return ALL_GROUPS_SCOPE_COLOR[mode];
+}
+
+export { getAllGroupsScopeColor, getArchiveStatusColor, getInstrumentKindColor, getSexColor, getSyncStatusColor };

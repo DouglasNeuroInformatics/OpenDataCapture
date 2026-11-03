@@ -3,12 +3,13 @@ import type { ComponentProps } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { translateInstrumentInfo } from '@opendatacapture/instrument-utils';
 import type { InstrumentInfo, TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute } from '@tanstack/react-router';
 
+import { ColorTagCell } from '@/components/ColorTagCell';
 import { InstrumentPreviewDialog } from '@/components/InstrumentPreviewDialog';
 import type { InstrumentPreviewItem, InstrumentSource } from '@/components/InstrumentPreviewDialog';
 import { PageHeader } from '@/components/PageHeader';
@@ -20,9 +21,11 @@ import {
 } from '@/hooks/useSeriesInstrumentsOverviewQuery';
 import { useUpdateSeriesInstrumentArchiveMutation } from '@/hooks/useUpdateSeriesInstrumentArchiveMutation';
 import { $AdminInstrumentsSearch } from '@/utils/admin-instruments-search';
+import { resolveTheme } from '@/utils/chart-theme';
 import { selectLatestEditions } from '@/utils/instrument-editions';
 import { sortSeriesOverviewRows } from '@/utils/series-overview';
 import type { SeriesOverviewRow } from '@/utils/series-overview';
+import { getArchiveStatusColor } from '@/utils/tag-colors';
 
 type SeriesRow = SeriesOverviewRow & {
   createdAt: Date | null;
@@ -229,6 +232,7 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
 
 const SeriesInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
   const { resolvedLanguage, t } = useTranslation();
+  const [theme] = useTheme();
   const overviewQuery = useSeriesInstrumentsOverviewQuery();
   const unarchiveMutation = useUpdateSeriesInstrumentArchiveMutation();
   const toSource = useInstrumentSource();
@@ -303,11 +307,11 @@ const SeriesInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
             cell: (ctx) => {
               const row = ctx.row.original;
               return (
-                <CellText
-                  className={row.archivedAt ? 'text-destructive' : 'text-green-700 dark:text-green-300'}
+                <ColorTagCell
+                  color={getArchiveStatusColor(Boolean(row.archivedAt), resolveTheme(theme))}
                   data-archived={row.archivedAt ? 'true' : 'false'}
                   data-testid="series-status"
-                  text={formatStatus(row)}
+                  label={formatStatus(row)}
                 />
               );
             },

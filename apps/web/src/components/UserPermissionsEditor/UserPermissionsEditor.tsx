@@ -1,5 +1,5 @@
 import { Button, Card, Select, Table } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import {
   $AppAction,
@@ -10,9 +10,11 @@ import {
 import type { AppAction, AppSubjectName, Permissions } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { User } from '@opendatacapture/schemas/user';
-import { GlobeIcon, PlusIcon, Trash2Icon, TriangleAlertIcon } from 'lucide-react';
+import { PlusIcon, Trash2Icon, TriangleAlertIcon } from 'lucide-react';
 
 import { Chip } from '@/components/Chip';
+import { ColorTagCell } from '@/components/ColorTagCell';
+import { resolveTheme } from '@/utils/chart-theme';
 import {
   ALL_GROUPS,
   grantableActions,
@@ -21,6 +23,7 @@ import {
   withoutPermission
 } from '@/utils/permissions';
 import type { PermissionDraft } from '@/utils/permissions';
+import { getAllGroupsScopeColor } from '@/utils/tag-colors';
 
 type CellSelectProps = {
   disabled?: boolean;
@@ -107,6 +110,7 @@ export const UserPermissionsEditor = ({
     subject: t({ en: 'Resource', es: 'Recurso', fr: 'Ressource' })
   };
 
+  const [theme] = useTheme();
   const allGroupsLabel = t({ en: 'All Groups', es: 'Todos los grupos', fr: 'Tous les groupes' });
   const placeholder = t({ en: 'Choose…', es: 'Elija…', fr: 'Choisir…' });
 
@@ -190,10 +194,7 @@ export const UserPermissionsEditor = ({
                   </Table.Cell>
                   <Table.Cell data-testid="user-permission-scope">
                     {permission.groupId === null ? (
-                      <span className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
-                        <GlobeIcon aria-hidden className="h-3.5 w-3.5" />
-                        {allGroupsLabel}
-                      </span>
+                      <ColorTagCell color={getAllGroupsScopeColor(resolveTheme(theme))} label={allGroupsLabel} />
                     ) : (
                       (groups.find((group) => group.id === permission.groupId)?.name ?? permission.groupId)
                     )}

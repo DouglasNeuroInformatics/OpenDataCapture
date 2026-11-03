@@ -126,6 +126,18 @@ describe('Route', () => {
     expect(screen.getByTestId('user-status-archived').textContent).toBe('Archived on 2026-10-01');
   });
 
+  it('should tag an active user with a green dot, so the status scans without tinting the label', () => {
+    renderTable([userFixture()]);
+    const dot = screen.getByTestId('user-status-active').firstElementChild as HTMLElement;
+    expect(dot.style.backgroundColor).toBe('#16a34a');
+  });
+
+  it('should tag an archived user with a red dot, so the status scans without tinting the label', () => {
+    renderTable([userFixture({ archivedAt: new Date('2026-10-01T00:00:00Z') })]);
+    const dot = screen.getByTestId('user-status-archived').firstElementChild as HTMLElement;
+    expect(dot.style.backgroundColor).toBe('#dc2626');
+  });
+
   it('should label a user without a base permission level as having none', () => {
     renderTable([userFixture({ basePermissionLevel: null })]);
     expect(within(rows()[0]!).getByText('None')).toBeTruthy();

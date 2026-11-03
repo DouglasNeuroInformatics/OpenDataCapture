@@ -149,6 +149,18 @@ describe('UserPermissionsEditor', () => {
     expect(screen.getByTestId('user-permission-scope').textContent).toBe('group-9');
   });
 
+  it('should tag a grant across all groups with an amber dot, so its wider reach stands out', () => {
+    render(
+      <Editor
+        groups={groups}
+        user={{ ...user, additionalPermissions: [{ action: 'read', groupId: null, subject: 'Subject' }] }}
+      />
+    );
+    const tag = screen.getByTestId('user-permission-scope').firstElementChild!;
+    expect(tag.textContent).toBe('All Groups');
+    expect((tag.firstElementChild as HTMLElement).style.backgroundColor).toBe('#d97706');
+  });
+
   it('should remove a draft without changing existing grants', () => {
     render(<Editor groups={groups} user={user} />);
     fireEvent.click(screen.getByTestId('permission-draft-remove'));
