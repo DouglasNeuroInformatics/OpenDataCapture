@@ -7,7 +7,7 @@ import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@h
 import type { AppSubjectName } from '@opendatacapture/schemas/core';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
@@ -115,6 +115,9 @@ const RouteComponent = () => {
         timestamp: record.timestamp
       }))
       .reverse() ?? [];
+
+  const recordsLabel = t({ en: 'Records', es: 'Registros', fr: 'Enregistrements' });
+  const sessionsLabel = t({ en: 'Sessions', es: 'Sesiones', fr: 'Sessions' });
 
   let welcome: string;
   if (currentGroup?.type === 'CLINICAL') {
@@ -480,20 +483,10 @@ const RouteComponent = () => {
                             </p>
                             <div className="space-y-1">
                               <p className="font-semibold text-blue-600 dark:text-blue-400">
-                                {t({
-                                  en: 'Records',
-                                  es: 'Registros',
-                                  fr: 'Enregistrements'
-                                })}
-                                : {payload.find((p) => p.dataKey === 'records')?.value ?? 0}
+                                {recordsLabel}: {payload.find((p) => p.dataKey === 'records')?.value ?? 0}
                               </p>
                               <p className="font-semibold text-emerald-600 dark:text-emerald-400">
-                                {t({
-                                  en: 'Sessions',
-                                  es: 'Sesiones',
-                                  fr: 'Sessions'
-                                })}
-                                : {payload.find((p) => p.dataKey === 'sessions')?.value ?? 0}
+                                {sessionsLabel}: {payload.find((p) => p.dataKey === 'sessions')?.value ?? 0}
                               </p>
                             </div>
                           </div>
@@ -502,11 +495,14 @@ const RouteComponent = () => {
                       return null;
                     }}
                   />
+                  <Legend />
                   <Area
                     activeDot={{ fill: chartColors.records.stroke, r: 6, stroke: '#fff', strokeWidth: 2 }}
                     dataKey="records"
                     dot={{ fill: chartColors.records.stroke, r: 4, strokeWidth: 2 }}
                     fill="url(#recordsGradient)"
+                    legendType="plainline"
+                    name={recordsLabel}
                     stroke={chartColors.records.stroke}
                     strokeWidth={3}
                     type="monotone"
@@ -516,7 +512,10 @@ const RouteComponent = () => {
                     dataKey="sessions"
                     dot={{ fill: chartColors.sessions.stroke, r: 4, strokeWidth: 2 }}
                     fill="url(#sessionsGradient)"
+                    legendType="plainline"
+                    name={sessionsLabel}
                     stroke={chartColors.sessions.stroke}
+                    strokeDasharray="6 4"
                     strokeWidth={3}
                     type="monotone"
                   />
