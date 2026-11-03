@@ -51,6 +51,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
   Link: ({ children, to, ...props }: PropsWithChildren<{ 'data-testid': string; to: string }>) => (

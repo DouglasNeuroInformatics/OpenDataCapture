@@ -1,28 +1,32 @@
 import { useState } from 'react';
-import type { ComponentProps } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { cn } from '@douglasneuroinformatics/libui/utils';
+import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { translateInstrumentInfo } from '@opendatacapture/instrument-utils';
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import type { InstrumentInfo, TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute } from '@tanstack/react-router';
 
+import { ColorTagCell } from '@/components/ColorTagCell';
+import { InstrumentKindCell } from '@/components/InstrumentKindCell';
 import { InstrumentPreviewDialog } from '@/components/InstrumentPreviewDialog';
 import type { InstrumentPreviewItem, InstrumentSource } from '@/components/InstrumentPreviewDialog';
 import { PageHeader } from '@/components/PageHeader';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
+import { useInstrumentKindLabels } from '@/hooks/useInstrumentKindLabels';
 import {
   seriesInstrumentsOverviewQueryOptions,
   useSeriesInstrumentsOverviewQuery
 } from '@/hooks/useSeriesInstrumentsOverviewQuery';
 import { useUpdateSeriesInstrumentArchiveMutation } from '@/hooks/useUpdateSeriesInstrumentArchiveMutation';
 import { $AdminInstrumentsSearch } from '@/utils/admin-instruments-search';
+import { resolveTheme } from '@/utils/chart-theme';
 import { selectLatestEditions } from '@/utils/instrument-editions';
 import { sortSeriesOverviewRows } from '@/utils/series-overview';
 import type { SeriesOverviewRow } from '@/utils/series-overview';
+import { getArchiveStatusColor } from '@/utils/tag-colors';
 
 type SeriesRow = SeriesOverviewRow & {
   createdAt: Date | null;
@@ -31,8 +35,8 @@ type SeriesRow = SeriesOverviewRow & {
 };
 
 /** One line cut off with an ellipsis, with the whole text shown on hover. */
-const CellText = ({ className, text, ...props }: ComponentProps<'span'> & { text: string }) => (
-  <span className={cn('block min-w-0 truncate', className)} title={text} {...props}>
+const CellText = ({ text }: { text: string }) => (
+  <span className="block min-w-0 truncate" title={text}>
     {text}
   </span>
 );
@@ -85,7 +89,7 @@ type InstrumentRow = {
   edition: number;
   groupNames: string[];
   id: string;
-  kind: string;
+  kind: InstrumentKind;
   preview: InstrumentPreviewItem;
   sourceLabel: string;
   title: string;
@@ -112,6 +116,7 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
   const { t } = useTranslation();
   const groupsQuery = useGroupsQuery();
   const toSource = useInstrumentSource();
+  const kindLabels = useInstrumentKindLabels();
   const [previewItem, setPreviewItem] = useState<InstrumentPreviewItem | null>(null);
 
   const rows: InstrumentRow[] = selectLatestEditions(scalarInstruments)
@@ -167,16 +172,8 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
             id: 'groups'
           },
           {
-            accessorFn: (row: InstrumentRow) => {
-              if (row.kind === 'INTERACTIVE') {
-                return t({ en: 'Interactive', es: 'Interactivo', fr: 'Interactif' });
-              }
-              if (row.kind === 'FILE') {
-                return t({ en: 'File', es: 'Archivo', fr: 'Fichier' });
-              }
-              return t({ en: 'Form', es: 'Formulario', fr: 'Formulaire' });
-            },
-            cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
+            accessorFn: (row: InstrumentRow) => kindLabels[row.kind],
+            cell: (ctx) => <InstrumentKindCell kind={ctx.row.original.kind} />,
             header: t({ en: 'Kind', es: 'Tipo', fr: 'Type' }),
             id: 'kind',
             size: 130
@@ -229,6 +226,7 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
 
 const SeriesInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
   const { resolvedLanguage, t } = useTranslation();
+  const [theme] = useTheme();
   const overviewQuery = useSeriesInstrumentsOverviewQuery();
   const unarchiveMutation = useUpdateSeriesInstrumentArchiveMutation();
   const toSource = useInstrumentSource();
@@ -303,11 +301,11 @@ const SeriesInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
             cell: (ctx) => {
               const row = ctx.row.original;
               return (
-                <CellText
-                  className={row.archivedAt ? 'text-destructive' : 'text-green-700 dark:text-green-300'}
+                <ColorTagCell
+                  color={getArchiveStatusColor(Boolean(row.archivedAt), resolveTheme(theme))}
                   data-archived={row.archivedAt ? 'true' : 'false'}
                   data-testid="series-status"
-                  text={formatStatus(row)}
+                  label={formatStatus(row)}
                 />
               );
             },

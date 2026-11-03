@@ -27,6 +27,7 @@ test.describe('admin audit logs', () => {
     const firstRow = auditLogsPage.dataTable.getByTestId('data-table-row').first();
     await expect(firstRow).toContainText('Login');
     await expect(firstRow).toContainText('User');
+    await expect(firstRow.getByTestId('audit-log-action')).toHaveText('Login');
   });
 
   test('should show the chosen option on its filter button and put it in the URL', async ({ getPageModel }) => {

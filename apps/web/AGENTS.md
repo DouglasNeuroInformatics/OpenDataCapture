@@ -205,6 +205,11 @@ viewport's: measure it in the browser, or from a spec with
 the sidebar and the card's padding are taken out, which is what
 `testing/src/specs/admin-instrument-repos.spec.ts` holds both of their tables to.
 
+**A coloured value in a `DataTable` column goes through `ColorTagCell`, never a tinted class.** It draws in the instance-wide
+`tableColorMode` an admin picks in `/admin/settings` (dot, tinted text or no colour), so a cell that
+sets its own colour ignores that setting. Its colours come from `src/utils/tag-colors.ts`. It reads the
+setting through `useSetupStateQuery`, so a unit test rendering one has to mock that hook.
+
 `initialState` is where pinning goes. libui typed it as `never` in `mode="server"` until 6.19.0
 ([libui#129](https://github.com/DouglasNeuroInformatics/libui/pull/129)), so the catalog cannot go
 back below that release.

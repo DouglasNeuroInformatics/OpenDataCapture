@@ -45,6 +45,16 @@ describe('$BrandingConfig', () => {
 });
 
 describe('$UpdateSetupStateData', () => {
+  describe('tableColorMode', () => {
+    it.each(['tags', 'text', 'none'])('should accept the mode %s', (value) => {
+      expect($UpdateSetupStateData.safeParse({ tableColorMode: value }).success).toBe(true);
+    });
+
+    it('should reject an undeclared mode', () => {
+      expect($UpdateSetupStateData.safeParse({ tableColorMode: 'rainbow' }).success).toBe(false);
+    });
+  });
+
   describe('defaultAssignmentDurationDays', () => {
     it.each([1, 30, 365, 3650])('should accept the positive whole day count %d', (value) => {
       expect($UpdateSetupStateData.safeParse({ defaultAssignmentDurationDays: value }).success).toBe(true);

@@ -2,16 +2,18 @@ import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, Card, Checkbox, DataTable, Dialog } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import { CircleAlertIcon, CircleDotIcon } from 'lucide-react';
 
+import { ColorTagCell } from '@/components/ColorTagCell';
 import { SortableHeader } from '@/components/SortableHeader';
 import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useDeleteBulkAssignmentsMutation } from '@/hooks/useDeleteBulkAssignmentsMutation';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
+import { resolveTheme } from '@/utils/chart-theme';
+import { getAssignmentStatusColor } from '@/utils/tag-colors';
 
 type AssignmentRow = {
   createdAt: string;
@@ -24,19 +26,17 @@ type AssignmentRow = {
 
 const StatusCell = ({ status }: { status: 'EXPIRED' | 'OUTSTANDING' }) => {
   const { t } = useTranslation();
-  if (status === 'OUTSTANDING') {
-    return (
-      <span className="flex items-center gap-1.5">
-        <CircleDotIcon className="h-3.5 w-3.5 text-sky-600" />
-        {t({ en: 'Outstanding', es: 'Pendiente', fr: 'En attente' })}
-      </span>
-    );
-  }
+  const [theme] = useTheme();
+  const labels = {
+    EXPIRED: t({ en: 'Expired', es: 'Expirado', fr: 'Expiré' }),
+    OUTSTANDING: t({ en: 'Outstanding', es: 'Pendiente', fr: 'En attente' })
+  };
   return (
-    <span className="flex items-center gap-1.5">
-      <CircleAlertIcon className="h-3.5 w-3.5 text-amber-500" />
-      {t({ en: 'Expired', es: 'Expirado', fr: 'Expiré' })}
-    </span>
+    <ColorTagCell
+      color={getAssignmentStatusColor(status, resolveTheme(theme))}
+      data-testid="assignment-status"
+      label={labels[status]}
+    />
   );
 };
 

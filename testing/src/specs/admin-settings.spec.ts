@@ -1,4 +1,5 @@
 import { MAX_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/setup';
+import type { TableColorMode } from '@opendatacapture/schemas/setup';
 import type { Page } from '@playwright/test';
 
 import { GroupEmailTemplatesPage } from '../pages/_app/group/email-templates.page';
@@ -45,6 +46,32 @@ test.describe('admin settings', () => {
 
     await page.reload();
     await expect(settingsPage.defaultAssignmentDurationInput).toHaveValue(String(durationDays));
+  });
+
+  // Not `@smoke`, for the reason above. `tableColorMode` is one instance-wide document that every table
+  // reads, so it is restored at the end and no other spec may assert how a tag is drawn.
+  test('should redraw status cells in every table color mode', async ({ getPageModel, page }) => {
+    const settingsPage = await getPageModel('/admin/settings');
+
+    const saveModeAndOpenUsers = async (mode: TableColorMode) => {
+      await page.goto('/admin/settings');
+      const saved = waitForSetupPatch(page);
+      await settingsPage.selectTableColorMode(mode);
+      expect((await saved).ok()).toBe(true);
+      await page.goto('/admin/users');
+      return page.getByTestId('user-status-active').first();
+    };
+
+    const text = await saveModeAndOpenUsers('text');
+    await expect(text.getByTestId('color-tag-dot')).toHaveCount(0);
+    await expect(text.getByTestId('color-tag-label')).toHaveCSS('color', 'rgb(21, 128, 61)');
+
+    const none = await saveModeAndOpenUsers('none');
+    await expect(none.getByTestId('color-tag-dot')).toHaveCount(0);
+    await expect(none.getByTestId('color-tag-label')).not.toHaveCSS('color', 'rgb(21, 128, 61)');
+
+    const tags = await saveModeAndOpenUsers('tags');
+    await expect(tags.getByTestId('color-tag-dot')).toHaveCSS('background-color', 'rgb(22, 163, 74)');
   });
 
   test.describe('active languages', () => {

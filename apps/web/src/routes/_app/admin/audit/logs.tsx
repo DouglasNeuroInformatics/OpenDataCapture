@@ -2,7 +2,7 @@ import React, { Fragment, useCallback, useMemo, useState } from 'react';
 
 import { snakeToCamelCase, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, DropdownMenu, Heading, TanstackTable } from '@douglasneuroinformatics/libui/components';
-import { useDownload, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useDownload, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $AuditLogsQuerySearchParams } from '@opendatacapture/schemas/audit';
 import type {
   $AuditLog,
@@ -13,11 +13,14 @@ import type {
 import { createFileRoute } from '@tanstack/react-router';
 import { ArrowDownIcon, ArrowUpIcon, CalendarIcon, DownloadIcon, XIcon } from 'lucide-react';
 
+import { ColorTagCell } from '@/components/ColorTagCell';
 import { FilterMenu } from '@/components/FilterMenu';
 import { PageHeader } from '@/components/PageHeader';
 import { auditLogsQueryOptions, fetchAllAuditLogs, useAuditLogsQuery } from '@/hooks/useAuditLogsQuery';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
+import { resolveTheme } from '@/utils/chart-theme';
+import { getAuditActionColor } from '@/utils/tag-colors';
 
 type DateFormat = 'iso' | 'local';
 
@@ -194,6 +197,7 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
   const auditLogsQuery = useAuditLogsQuery({ params: { ...search, page, sortOrder } });
 
   const { resolvedLanguage, t } = useTranslation();
+  const [theme] = useTheme();
 
   const [dateFormat, setDateFormat] = useState<DateFormat>('local');
 
@@ -257,9 +261,11 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
           cell: (ctx) => {
             const value = ctx.getValue() as $AuditLogAction;
             return (
-              <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-                {t(`common.${snakeToCamelCase(toLowerCase(value))}`)}
-              </span>
+              <ColorTagCell
+                color={getAuditActionColor(value, resolveTheme(theme))}
+                data-testid="audit-log-action"
+                label={t(`common.${snakeToCamelCase(toLowerCase(value))}`)}
+              />
             );
           },
           header: t('common.action')

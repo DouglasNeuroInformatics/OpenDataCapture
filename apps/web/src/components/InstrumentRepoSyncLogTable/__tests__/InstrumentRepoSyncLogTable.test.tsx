@@ -8,6 +8,7 @@ import '@/services/i18n';
 
 const theme = vi.hoisted(() => ({ current: 'light' }));
 
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/hooks')>()),
   useTheme: () => [theme.current, vi.fn()]

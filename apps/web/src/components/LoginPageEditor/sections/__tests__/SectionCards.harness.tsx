@@ -42,6 +42,7 @@ async function renderWithBrandingEditor(
     isMailEnabled: false,
     isSetup: true,
     release: { buildTime: 0, type: 'production', version: '1.0.0' },
+    tableColorMode: 'tags',
     uptime: 0
   };
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false }, queries: { retry: false } } });

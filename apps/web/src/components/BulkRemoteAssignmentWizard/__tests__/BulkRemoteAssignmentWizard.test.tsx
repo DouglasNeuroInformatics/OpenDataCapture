@@ -5,7 +5,7 @@ import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import type { BulkAssignmentFailure } from '@opendatacapture/schemas/assignment';
 import type { Language } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
-import type { SetupState } from '@opendatacapture/schemas/setup';
+import type { SetupState, TableColorMode } from '@opendatacapture/schemas/setup';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, assert, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -168,9 +168,10 @@ const mockGroup = (group: GroupStub | undefined, { isLoading = false }: { isLoad
 
 const setupMocks = ({
   activeLanguages = ['en', 'es', 'fr'],
-  isMailEnabled = false
-}: { activeLanguages?: Language[]; isMailEnabled?: boolean } = {}) => {
-  mockSetupState({ activeLanguages: activeLanguages as SetupState['activeLanguages'], isMailEnabled });
+  isMailEnabled = false,
+  tableColorMode = 'tags'
+}: { activeLanguages?: Language[]; isMailEnabled?: boolean; tableColorMode?: TableColorMode } = {}) => {
+  mockSetupState({ activeLanguages: activeLanguages as SetupState['activeLanguages'], isMailEnabled, tableColorMode });
   mockGroup({});
   vi.mocked(useSendBulkAssignmentEmailMutation).mockReturnValue({
     mutateAsync: mockMutateAsync
@@ -506,6 +507,16 @@ describe('BulkRemoteAssignmentWizard', () => {
           recipient: 'alice@example.com'
         })
       );
+    });
+
+    it('should drop the color of the status icons when the instance turned table colors off', async () => {
+      setupMocks({ isMailEnabled: true, tableColorMode: 'none' });
+      mockMutateAsync.mockResolvedValue({ status: 'FAILED' });
+      mockWizard('DONE', { assignments: batteryAssignments, emails });
+      renderWizard();
+      sendAll();
+      await waitFor(() => expect(lastNotification()).toBeTruthy());
+      expect(screen.getByTestId('bulk-email-table').querySelector('td.grayscale svg')).not.toBeNull();
     });
 
     it('should mark every row of a subject with the outcome of their one email', async () => {

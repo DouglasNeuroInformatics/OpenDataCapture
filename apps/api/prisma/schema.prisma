@@ -405,6 +405,12 @@ model Session {
 
 // Setup
 
+enum TableColorMode {
+  none
+  tags
+  text
+}
+
 // Mirrors LANGUAGES in @opendatacapture/schemas/core. Values are the language codes themselves,
 // so a document read back through Prisma is already a `Language` with nothing to narrow.
 enum Language {
@@ -493,6 +499,7 @@ model SetupState {
   isSetup                       Boolean
   mailConfig                    MailConfig?
   newUserEmailTemplate          MailTemplate?
+  tableColorMode                TableColorMode?
 
   @@map("SetupStateModel")
 }

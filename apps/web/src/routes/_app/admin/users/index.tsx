@@ -3,17 +3,20 @@ import React, { useState } from 'react';
 import { snakeToCamelCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import type { User } from '@opendatacapture/schemas/user';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from 'lucide-react';
 
+import { ColorTagCell } from '@/components/ColorTagCell';
 import { PageHeader } from '@/components/PageHeader';
 import { useArchiveUserMutation } from '@/hooks/useArchiveUserMutation';
 import { useUnarchiveUserMutation } from '@/hooks/useUnarchiveUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
+import { resolveTheme } from '@/utils/chart-theme';
+import { getArchiveStatusColor } from '@/utils/tag-colors';
 
 type ArchiveAction = { kind: 'archive'; user: User };
 
@@ -36,6 +39,7 @@ const SortableHeader = ({ column, label }: { column: TanstackTable.Column<User>;
 
 const RouteComponent = () => {
   const { t } = useTranslation();
+  const [theme] = useTheme();
   const navigate = useNavigate();
   const usersQuery = useUsersQuery();
   const archiveUserMutation = useArchiveUserMutation();
@@ -113,19 +117,23 @@ const RouteComponent = () => {
               const user = ctx.row.original;
               if (user.archivedAt) {
                 return (
-                  <span className="text-destructive" data-testid="user-status-archived">
-                    {t({
+                  <ColorTagCell
+                    color={getArchiveStatusColor(true, resolveTheme(theme))}
+                    data-testid="user-status-archived"
+                    label={t({
                       en: `Archived on ${toBasicISOString(new Date(user.archivedAt))}`,
                       es: `Archivado el ${toBasicISOString(new Date(user.archivedAt))}`,
                       fr: `Archivé le ${toBasicISOString(new Date(user.archivedAt))}`
                     })}
-                  </span>
+                  />
                 );
               }
               return (
-                <span className="text-emerald-600 dark:text-emerald-400" data-testid="user-status-active">
-                  {t({ en: 'Active', es: 'Activo', fr: 'Actif' })}
-                </span>
+                <ColorTagCell
+                  color={getArchiveStatusColor(false, resolveTheme(theme))}
+                  data-testid="user-status-active"
+                  label={t({ en: 'Active', es: 'Activo', fr: 'Actif' })}
+                />
               );
             },
             header: ({ column }) => (

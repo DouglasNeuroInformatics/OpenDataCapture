@@ -3,24 +3,22 @@ import React, { useMemo, useState } from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, DropdownMenu } from '@douglasneuroinformatics/libui/components';
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
-import { useDownload, useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import { ChevronDownIcon } from 'lucide-react';
 import { unparse } from 'papaparse';
 
 import { CollectedFilterMenu } from '@/components/CollectedFilterMenu';
-import { ColorTagCell } from '@/components/ColorTagCell';
+import { InstrumentKindCell } from '@/components/InstrumentKindCell';
 import { InstrumentPreviewDialog } from '@/components/InstrumentPreviewDialog';
 import type { InstrumentPreviewItem } from '@/components/InstrumentPreviewDialog';
 import { SortableHeader } from '@/components/SortableHeader';
 import { TruncatedCell } from '@/components/TruncatedCell';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentKindLabels } from '@/hooks/useInstrumentKindLabels';
-import { resolveTheme } from '@/utils/chart-theme';
 import { DEFAULT_COLLECTED_FILTER, matchesCollectedFilter } from '@/utils/collected-filter';
 import type { CollectedFilter } from '@/utils/collected-filter';
 import { downloadSubjectTableExcel } from '@/utils/excel';
-import { getInstrumentKindColor } from '@/utils/tag-colors';
 
 /** Listed in the order a reader is most likely to meet them, not the enum's own order. */
 const INSTRUMENT_KINDS = ['FORM', 'INTERACTIVE', 'FILE', 'SERIES'] as const satisfies readonly InstrumentKind[];
@@ -57,19 +55,6 @@ type InstrumentRow = {
 };
 
 type KindFilter = InstrumentKind[];
-
-/** A kind tag, matching the treatment the subject table gives sex. */
-const InstrumentKindCell = ({ kind }: { kind: InstrumentKind }) => {
-  const [theme] = useTheme();
-  const labels = useInstrumentKindLabels();
-  return (
-    <ColorTagCell
-      color={getInstrumentKindColor(kind, resolveTheme(theme))}
-      data-testid="instrument-cell-kind"
-      label={labels[kind]}
-    />
-  );
-};
 
 /**
  * The toolbar every instrument listing shares: filter by kind and by how much was collected, then

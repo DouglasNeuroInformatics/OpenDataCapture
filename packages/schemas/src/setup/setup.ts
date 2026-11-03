@@ -190,6 +190,11 @@ const MAX_ASSIGNMENT_DURATION_DAYS = 3650;
 /** The instance-wide default validity period (in days) applied to new remote assignments. */
 const $DefaultAssignmentDurationDays = z.number().int().positive().max(MAX_ASSIGNMENT_DURATION_DAYS);
 
+/** How a table draws a coloured value: a dot beside the label, the label tinted, or no colour at all. */
+const $TableColorMode = z.enum(['tags', 'text', 'none']);
+
+const DEFAULT_TABLE_COLOR_MODE = 'tags' satisfies z.infer<typeof $TableColorMode>;
+
 const $SetupState = z.object({
   activeLanguages: $ActiveLanguages,
   branding: $BrandingConfig.nullish(),
@@ -211,6 +216,7 @@ const $SetupState = z.object({
   isMailEnabled: z.boolean().default(false),
   isSetup: z.boolean().nullable(),
   release: $ReleaseInfo,
+  tableColorMode: $TableColorMode.default(DEFAULT_TABLE_COLOR_MODE),
   uptime: z.number()
 });
 
@@ -219,7 +225,8 @@ const $UpdateSetupStateData = z.object({
   branding: $BrandingConfig.nullish(),
   defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
   isBulkRemoteAssignmentsEnabled: z.boolean().nullish(),
-  isExperimentalFeaturesEnabled: z.boolean().nullish()
+  isExperimentalFeaturesEnabled: z.boolean().nullish(),
+  tableColorMode: $TableColorMode.optional()
 });
 
 const $CreateAdminData = $CreateUserData.omit({
@@ -251,6 +258,7 @@ export type ProductionReleaseInfo = z.infer<typeof $ProductionReleaseInfo>;
 export type ReleaseInfo = z.infer<typeof $ReleaseInfo>;
 export type ResourceLink = z.infer<typeof $ResourceLink>;
 export type SetupState = z.infer<typeof $SetupState>;
+export type TableColorMode = z.infer<typeof $TableColorMode>;
 export type $UpdateSetupStateData = z.infer<typeof $UpdateSetupStateData>;
 
 export {
@@ -260,7 +268,9 @@ export {
   $ProductionReleaseInfo,
   $ReleaseInfo,
   $SetupState,
+  $TableColorMode,
   $UpdateSetupStateData,
+  DEFAULT_TABLE_COLOR_MODE,
   FONT_SIZES,
   LOGIN_THEMES,
   LOGO_ALIGNMENTS,

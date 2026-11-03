@@ -24,6 +24,7 @@ const mocks = vi.hoisted(() => ({
   preview: { current: null as null | { item: unknown; items: unknown; onClose: () => void } }
 }));
 
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@douglasneuroinformatics/libui/hooks')>()),
   useDownload: () => mocks.download,

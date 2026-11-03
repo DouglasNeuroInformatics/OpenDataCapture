@@ -100,6 +100,7 @@ test.describe('admin management', () => {
     const row = page.getByTestId('data-table-row');
     await expect(row).toHaveCount(1);
     await expect(row).toContainText(group.name);
+    await expect(row.getByTestId('group-cell-type')).toBeVisible();
 
     await row.getByTestId('row-actions-trigger').click();
     await page.getByTestId('row-actions-dropdown').getByRole('menuitem', { name: 'Manage' }).click();

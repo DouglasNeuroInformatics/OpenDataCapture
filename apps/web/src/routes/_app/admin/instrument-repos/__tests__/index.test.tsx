@@ -30,6 +30,7 @@ const mocks = vi.hoisted(() => ({
   syncRepo: vi.fn()
 }));
 
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@/hooks/useInstrumentReposQuery', () => ({
   instrumentReposQueryOptions: mocks.instrumentReposQueryOptions,
   useInstrumentReposQuery: () => ({ data: mocks.repos })

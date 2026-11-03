@@ -67,6 +67,27 @@ describe('SetupService', () => {
     });
   });
 
+  describe('tableColorMode', () => {
+    it('should return the saved mode', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ isDemo: false, isSetup: true, tableColorMode: 'text' });
+      await expect(setupService.getState()).resolves.toMatchObject({ tableColorMode: 'text' });
+    });
+
+    it('should fall back to tags for a document written before the setting existed', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ isDemo: false, isSetup: true });
+      await expect(setupService.getState()).resolves.toMatchObject({ tableColorMode: 'tags' });
+    });
+
+    it('should persist the chosen mode', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ id: '1', isDemo: false, isSetup: true });
+      await setupService.updateState({ tableColorMode: 'none' });
+      expect(setupStateModel.update).toHaveBeenCalledWith({
+        data: { tableColorMode: 'none' },
+        where: { id: '1' }
+      });
+    });
+  });
+
   describe('getState', () => {
     it('should return the saved defaultAssignmentDurationDays', async () => {
       setupStateModel.findFirst.mockResolvedValue({ defaultAssignmentDurationDays: 45, isDemo: false, isSetup: true });
