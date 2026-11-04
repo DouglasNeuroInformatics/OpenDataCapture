@@ -154,6 +154,10 @@ async function beginSeries({ skipProgress }: { skipProgress: boolean }) {
   return { onSubmit };
 }
 
+function getProgressBar() {
+  return screen.getByRole('progressbar', { name: 'Series progress' });
+}
+
 async function answerAndSubmit(value: string, onSubmit: ReturnType<typeof vi.fn>) {
   const submissionCount = onSubmit.mock.calls.length;
   fireEvent.change(getAnswerInput(), { target: { value } });
@@ -322,7 +326,34 @@ describe('SeriesInstrumentRenderer', () => {
       />
     );
     fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
-    expect(await screen.findByText('Instruments Completed: 1/2')).toBeTruthy();
+    expect(await screen.findByText('Instrument 2 of 2')).toBeTruthy();
+    expect(getProgressBar().getAttribute('aria-valuenow')).toBe('1');
+  });
+
+  it('should show progress on the form screen of a skipProgress series, which has no interstitial to show it', async () => {
+    const { onSubmit } = await beginSeries({ skipProgress: true });
+    expect(screen.getByText('Instrument 1 of 2')).toBeTruthy();
+    expect(getProgressBar().getAttribute('aria-valuenow')).toBe('0');
+    await answerAndSubmit('first administration', onSubmit);
+    expect(await screen.findByText('Instrument 2 of 2')).toBeTruthy();
+    expect(getProgressBar().getAttribute('aria-valuenow')).toBe('1');
+  });
+
+  it('should show no progress on the overview screen, before any item is administered', async () => {
+    render(<SeriesInstrumentRenderer target={createTarget({ skipProgress: true })} onSubmit={vi.fn()} />);
+    await screen.findByRole('button', { name: 'Begin' });
+    expect(screen.queryByRole('progressbar')).toBeNull();
+  });
+
+  it('should show no progress on the completion screen, once every item is administered', async () => {
+    const { onSubmit } = await beginSeries({ skipProgress: true });
+    await answerAndSubmit('first administration', onSubmit);
+    await waitFor(() => {
+      expect(getAnswerInput().value).toBe('');
+    });
+    await answerAndSubmit('second administration', onSubmit);
+    await screen.findByText('Thank You!');
+    expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
   it('should refuse an initial series index past the last item', () => {
@@ -409,10 +440,10 @@ describe('SeriesInstrumentRenderer', () => {
       <SeriesInstrumentRenderer target={createParamsTarget([fileItemBundle])} onSubmit={vi.fn()} />
     );
     fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
-    // The container's only child left is its step header once the content area renders nothing,
-    // which a spinner, form, iframe or error placeholder would each add to.
+    // The container's only children left are its step header and the progress bar once the content
+    // area renders nothing, which a spinner, form, iframe or error placeholder would each add to.
     await waitFor(() => {
-      expect(container.firstElementChild?.childElementCount).toBe(1);
+      expect(container.firstElementChild?.childElementCount).toBe(2);
     });
     expect(container.querySelector('.animate-spinner, form, iframe')).toBeNull();
     expect(screen.queryByText('Failed to Load Instrument')).toBeNull();

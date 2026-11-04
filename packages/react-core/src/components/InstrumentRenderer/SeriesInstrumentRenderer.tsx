@@ -16,6 +16,7 @@ import { InstrumentOverview } from '../InstrumentOverview';
 import { InteractiveContent } from '../InteractiveContent';
 import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
+import { SeriesProgressBar } from './SeriesProgressBar';
 import { validateSubmission } from './validateSubmission';
 
 import type { LocalizedText } from '../../types';
@@ -146,7 +147,7 @@ export const SeriesInstrumentRenderer = ({
           />
         ))
         .with({ status: 'DONE' }, ({ instrument }) => {
-          return match({ index, instrument, isInstrumentInProgress })
+          const content = match({ index, instrument, isInstrumentInProgress })
             .with({ index: 0 }, () => (
               <InstrumentOverview
                 beforeBegin={beforeBegin}
@@ -169,13 +170,6 @@ export const SeriesInstrumentRenderer = ({
                     fr: "Série d'instruments en cours"
                   })}
                 </Heading>
-                <p className="text-muted-foreground text-sm">
-                  {t({
-                    en: `Instruments Completed: ${currentItemIndex}/${target.items.length}`,
-                    es: `Instrumentos completados: ${currentItemIndex}/${target.items.length}`,
-                    fr: `Nombre d'instruments complétés : ${currentItemIndex}/${target.items.length}`
-                  })}
-                </p>
                 <div className="pt-2">
                   <Button type="button" onClick={() => setIsInstrumentInProgress(true)}>
                     {t({ en: 'Begin', es: 'Comenzar', fr: 'Commencer' })}
@@ -256,6 +250,18 @@ export const SeriesInstrumentRenderer = ({
               </div>
             ))
             .exhaustive();
+          // Rendered outside `content` so it stays mounted between items and animates each advance.
+          return (
+            <>
+              {index === 1 && (
+                <SeriesProgressBar
+                  completed={Math.min(currentItemIndex, target.items.length)}
+                  total={target.items.length}
+                />
+              )}
+              {content}
+            </>
+          );
         })
         .exhaustive()}
     </InstrumentRendererContainer>
