@@ -6,6 +6,8 @@ import type { AnyUnilingualFormInstrument, FormInstrument, InstrumentKind } from
 import { InfoIcon } from 'lucide-react';
 import type { Promisable } from 'type-fest';
 
+import { InstrumentInstructions } from '../InstrumentInstructions';
+
 import type { LocalizedText } from '../../types';
 
 // libui wraps every field in `data-field-group` and renders that field's errors inside it as
@@ -52,7 +54,16 @@ export const FormContent = ({ instrument, onSubmit, submitButtonLabel }: FormCon
         <Heading variant="h4">{instrument.clientDetails?.title ?? instrument.details.title}</Heading>
         <Dialog>
           <Dialog.Trigger asChild>
-            <Button disabled={!instructions?.length} size="icon" variant="ghost">
+            <Button
+              aria-label={t({
+                en: 'Instructions',
+                es: 'Instrucciones',
+                fr: 'Instructions'
+              })}
+              disabled={!instructions?.length}
+              size="icon"
+              variant="ghost"
+            >
               <InfoIcon />
             </Button>
           </Dialog.Trigger>
@@ -67,7 +78,7 @@ export const FormContent = ({ instrument, onSubmit, submitButtonLabel }: FormCon
               </Dialog.Title>
             </Dialog.Header>
             <Dialog.Body className="py-2">
-              <p className="text-muted-foreground text-sm">{instructions?.join(', ')}</p>
+              <InstrumentInstructions instructions={instructions ?? []} />
             </Dialog.Body>
           </Dialog.Content>
         </Dialog>

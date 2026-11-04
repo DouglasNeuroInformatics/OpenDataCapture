@@ -32,7 +32,7 @@ const renderFormContent = (props: Partial<FormContentProps> = {}) => {
   return onSubmit;
 };
 
-const getInfoButton = () => screen.getByRole('heading').parentElement!.querySelector('button')!;
+const getInfoButton = () => screen.getByRole<HTMLButtonElement>('button', { name: 'Instructions' });
 
 describe('FormContent', () => {
   beforeAll(() => {
@@ -69,8 +69,10 @@ describe('FormContent', () => {
     });
     fireEvent.click(getInfoButton());
     await waitFor(() => {
-      expect(screen.getByText('Answer honestly, Be brief')).toBeTruthy();
+      expect(screen.getByText('Answer honestly').tagName).toBe('P');
+      expect(screen.getByText('Be brief').tagName).toBe('P');
     });
+    expect(screen.queryByText('Answer honestly, Be brief')).toBeNull();
   });
 
   it('should disable the info button when there are no instructions to show', () => {

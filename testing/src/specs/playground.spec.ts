@@ -154,6 +154,29 @@ export default defineInstrument({
 `;
 }
 
+/**
+ * A form with two instructions, the second spanning two lines, so each should render as its own
+ * element and keep its line break.
+ */
+function instructionsInstrumentSource(title: string): string {
+  return `
+import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
+import { z } from '/runtime/v1/zod@3.x';
+
+export default defineInstrument({
+  kind: 'FORM',
+  language: 'en',
+  tags: ['Instructions'],
+  internal: { edition: 1, name: 'INSTRUCTIONS' },
+  clientDetails: { estimatedDuration: 1, instructions: ['Read each question.', 'Answer\\nhonestly.'] },
+  content: { note: { kind: 'string', label: 'Note', variant: 'input' } },
+  details: { description: 'Instructions', license: 'Apache-2.0', title: '${title}' },
+  measures: {},
+  validationSchema: z.object({ note: z.string().optional() })
+});
+`;
+}
+
 // The first paint waits on the 13 MB esbuild download and the toolchain boot; the preview then
 // compiles on a 2 s poll, so the whole chain is slower than the suite's default expect timeout.
 const PREVIEW_TIMEOUT = 60_000;
@@ -402,6 +425,34 @@ test.describe('playground', () => {
     await expect(playground.preview.getByRole('heading', { name: `${title} image/png` })).toBeVisible({
       timeout: PREVIEW_TIMEOUT
     });
+  });
+
+  test('should show each instruction as its own paragraph, keeping its line breaks', async ({ page, uniqueId }) => {
+    const title = `Instructions ${uniqueId}`;
+    const playground = new PlaygroundPage(page);
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [{ content: instructionsInstrumentSource(title), name: 'index.ts' }],
+        label: title
+      })
+    );
+
+    // Without `exact`, a substring match would also accept the old single paragraph joined with ", ".
+    const first = playground.preview.getByText('Read each question.', { exact: true });
+    const second = playground.preview.getByText('Answer honestly.', { exact: true });
+    await expect(first).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+    await expect(second).toBeVisible();
+    // A string would be whitespace-normalized; the regex checks innerText keeps the line break.
+    await expect(second).toHaveText(/^Answer\nhonestly\.$/, { useInnerText: true });
+
+    await playground.preview.getByRole('button', { name: 'Begin' }).click();
+    await playground.preview.getByRole('button', { name: 'Instructions' }).click();
+    const dialog = playground.preview.getByRole('dialog');
+    await expect(dialog.getByText('Read each question.', { exact: true })).toBeVisible();
+    const dialogSecond = dialog.getByText('Answer honestly.', { exact: true });
+    await expect(dialogSecond).toBeVisible();
+    await expect(dialogSecond).toHaveText(/^Answer\nhonestly\.$/, { useInnerText: true });
   });
 });
 
