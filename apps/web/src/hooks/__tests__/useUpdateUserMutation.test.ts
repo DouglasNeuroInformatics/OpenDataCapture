@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { createElement } from 'react';
 
-import type { Permissions } from '@opendatacapture/schemas/core';
+import type { $UpdateUserPermissionsData } from '@opendatacapture/schemas/user';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -16,7 +16,10 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
   }
 }));
 
-const permissions: Permissions = [{ action: 'read', groupId: 'group-1', subject: 'Subject' }];
+const permissions: $UpdateUserPermissionsData = {
+  kind: 'custom',
+  permissions: [{ action: 'read', groupId: 'group-1', subject: 'Subject' }]
+};
 
 function renderUpdateMutation() {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false, throwOnError: true } } });
@@ -39,7 +42,7 @@ describe('useUpdateUserMutation', () => {
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries');
     await result.current.mutateAsync({ data: { email: 'jane@example.org' }, id: 'user-1', permissions });
     expect(mocks.patch).toHaveBeenCalledWith('/v1/users/user-1', { email: 'jane@example.org' }, expect.anything());
-    expect(mocks.put).toHaveBeenCalledWith('/v1/users/user-1/permissions', { permissions }, expect.anything());
+    expect(mocks.put).toHaveBeenCalledWith('/v1/users/user-1/permissions', permissions, expect.anything());
     expect(mocks.addNotification).toHaveBeenCalledExactlyOnceWith({ type: 'success' });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['users'] });
   });
@@ -66,8 +69,19 @@ describe('useUpdateUserMutation', () => {
 
   it('should clear permissions when the last row was removed', async () => {
     const { result } = renderUpdateMutation();
-    await result.current.mutateAsync({ data: {}, id: 'user-1', permissions: [] });
-    expect(mocks.put).toHaveBeenCalledWith('/v1/users/user-1/permissions', { permissions: [] }, expect.anything());
+    await result.current.mutateAsync({ data: {}, id: 'user-1', permissions: { kind: 'custom', permissions: [] } });
+    expect(mocks.put).toHaveBeenCalledWith(
+      '/v1/users/user-1/permissions',
+      { kind: 'custom', permissions: [] },
+      expect.anything()
+    );
+  });
+
+  it('should send a permission set as it was given, so the server replaces any custom grants with it', async () => {
+    const { result } = renderUpdateMutation();
+    const permissionSet: $UpdateUserPermissionsData = { kind: 'permissionSet', permissionSetId: 'set-1' };
+    await result.current.mutateAsync({ data: {}, id: 'user-1', permissions: permissionSet });
+    expect(mocks.put).toHaveBeenCalledWith('/v1/users/user-1/permissions', permissionSet, expect.anything());
   });
 
   it('should show no success confirmation when permissions fail to save', async () => {
@@ -84,7 +98,7 @@ describe('useUpdateUserMutation', () => {
     await result.current.mutateAsync({ data: {}, id: 'user-1', permissions });
     const config = { meta: { disableDefaultErrorNotification: true } };
     expect(mocks.patch).toHaveBeenCalledWith('/v1/users/user-1', {}, config);
-    expect(mocks.put).toHaveBeenCalledWith('/v1/users/user-1/permissions', { permissions }, config);
+    expect(mocks.put).toHaveBeenCalledWith('/v1/users/user-1/permissions', permissions, config);
   });
 
   it('should leave a rejection to its caller without escaping to the route error boundary', async () => {

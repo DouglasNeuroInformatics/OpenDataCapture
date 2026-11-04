@@ -4,7 +4,8 @@ import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Button, CopyButton, Dialog, Form, Heading, Label } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@opendatacapture/schemas/core';
-import { $BasePermissionLevel, $CreateUserData } from '@opendatacapture/schemas/user';
+import { $BasePermissionLevel, $BaseUserData } from '@opendatacapture/schemas/user';
+import type { $CreateUserData } from '@opendatacapture/schemas/user';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 import { z } from 'zod/v4';
@@ -17,13 +18,18 @@ import { useMailErrorMessage } from '@/hooks/useMailErrorMessage';
 import { usePasswordErrorMessage } from '@/hooks/usePasswordErrorMessage';
 import { usePasswordGenerator } from '@/hooks/usePasswordGenerator';
 import type { PasswordFormValues } from '@/hooks/usePasswordGenerator';
+import { permissionSetsQueryOptions, usePermissionSetsQuery } from '@/hooks/usePermissionSetsQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { $Email, $PhoneNumber, omittedIfBlank, requiresGroup } from '@/utils/validation';
+
+/** The option standing for no permission set. A set id is an ObjectId, so the two cannot collide. */
+const NO_PERMISSION_SET = '__none__';
 
 const RouteComponent = () => {
   const { resolvedLanguage, t } = useTranslation();
   const navigate = useNavigate();
   const groupsQuery = useGroupsQuery();
+  const permissionSetsQuery = usePermissionSetsQuery();
   const createUserMutation = useCreateUserMutation();
   const notification = useNotificationsStore();
   const setupStateQuery = useSetupStateQuery();
@@ -231,6 +237,31 @@ const RouteComponent = () => {
                     variant: 'listbox'
                   };
                 }
+              },
+              permissionSetId: {
+                deps: ['basePermissionLevel'],
+                kind: 'dynamic',
+                render({ basePermissionLevel }) {
+                  if (!basePermissionLevel || basePermissionLevel === 'ADMIN' || !permissionSetsQuery.data.length) {
+                    return null;
+                  }
+                  return {
+                    description: t({
+                      en: 'Grants added to the base permission level. Optional, and can be changed later on the user page.',
+                      es: 'Permisos que se suman al nivel de permisos de base. Opcional; puede cambiarse más tarde en la página del usuario.',
+                      fr: "Autorisations qui s'ajoutent au niveau de base. Facultatif, et modifiable plus tard sur la page de l'utilisateur."
+                    }),
+                    kind: 'string',
+                    label: t({ en: 'Permission Set', es: 'Conjunto de permisos', fr: "Ensemble d'autorisations" }),
+                    options: {
+                      [NO_PERMISSION_SET]: t({ en: 'None', es: 'Ninguno', fr: 'Aucun' }),
+                      ...Object.fromEntries(
+                        permissionSetsQuery.data.map((permissionSet) => [permissionSet.id, permissionSet.name])
+                      )
+                    },
+                    variant: 'select'
+                  };
+                }
               }
             },
             title: t({
@@ -286,7 +317,7 @@ const RouteComponent = () => {
           },
           selector: () => generatedPassword
         }}
-        validationSchema={$CreateUserData
+        validationSchema={$BaseUserData
           .omit({
             groupIds: true
           })
@@ -295,6 +326,7 @@ const RouteComponent = () => {
             confirmPassword: z.string().min(1),
             email: $Email(t).optional(),
             groupIds: z.set(z.string()).optional(),
+            permissionSetId: z.string().optional(),
             phoneNumber: $PhoneNumber(t).optional()
           })
           .check((ctx) => {
@@ -337,12 +369,18 @@ const RouteComponent = () => {
               });
             }
           })}
-        onSubmit={({ email, groupIds, phoneNumber, ...data }) => {
+        onSubmit={({ email, groupIds, permissionSetId, phoneNumber, ...data }) => {
           return handleSubmit({
             ...data,
             email: omittedIfBlank(email),
             groupIds: Array.from(groupIds ?? []),
             mustResetPassword: isGeneratedPassword(data.password),
+            // The field is hidden, not cleared, when the level becomes ADMIN, so a set chosen before
+            // then is still in the values -- and the API refuses a set for an administrator.
+            permissionSetId:
+              data.basePermissionLevel === 'ADMIN' || permissionSetId === NO_PERMISSION_SET
+                ? undefined
+                : permissionSetId,
             phoneNumber: omittedIfBlank(phoneNumber)
           });
         }}
@@ -390,5 +428,10 @@ const RouteComponent = () => {
 
 export const Route = createFileRoute('/_app/admin/users/create')({
   component: RouteComponent,
-  loader: ({ context }) => context.queryClient.ensureQueryData(groupsQueryOptions())
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(groupsQueryOptions()),
+      context.queryClient.ensureQueryData(permissionSetsQueryOptions())
+    ]);
+  }
 });

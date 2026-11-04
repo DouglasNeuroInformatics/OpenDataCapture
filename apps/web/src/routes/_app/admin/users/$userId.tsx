@@ -6,6 +6,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { ArchiveBoxArrowDownIcon, ArchiveBoxXMarkIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
 import { isGrantablePermission } from '@opendatacapture/schemas/core';
 import type { Permissions } from '@opendatacapture/schemas/core';
+import type { $UpdateUserPermissionsData } from '@opendatacapture/schemas/user';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { Chip } from '@/components/Chip';
@@ -14,9 +15,11 @@ import { UpdateUserForm } from '@/components/UpdateUserForm';
 import type { UpdateUserFormInputData } from '@/components/UpdateUserForm';
 import { UserIcon } from '@/components/UserIcon';
 import { UserPermissionsEditor } from '@/components/UserPermissionsEditor';
+import type { PermissionSource } from '@/components/UserPermissionsEditor';
 import { useArchiveUserMutation } from '@/hooks/useArchiveUserMutation';
 import { useFindUserQuery, useFindUserQueryOptions } from '@/hooks/useFindUserQuery';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
+import { permissionSetsQueryOptions, usePermissionSetsQuery } from '@/hooks/usePermissionSetsQuery';
 import { useUnarchiveUserMutation } from '@/hooks/useUnarchiveUserMutation';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { useAppStore } from '@/store';
@@ -28,6 +31,7 @@ const UserEditor = ({ userId }: { userId: string }) => {
   const currentUser = useAppStore((store) => store.currentUser);
   const { t } = useTranslation();
   const groupsQuery = useGroupsQuery();
+  const permissionSetsQuery = usePermissionSetsQuery();
   const userQuery = useFindUserQuery(userId);
   const archiveUserMutation = useArchiveUserMutation();
   const unarchiveUserMutation = useUnarchiveUserMutation();
@@ -42,6 +46,10 @@ const UserEditor = ({ userId }: { userId: string }) => {
   const user = userQuery.data;
 
   const [localPermissions, setLocalPermissions] = useState<Permissions>(user.additionalPermissions);
+  const [permissionSource, setPermissionSource] = useState<PermissionSource>(
+    user.permissionSetId ? 'permissionSet' : 'custom'
+  );
+  const [permissionSetId, setPermissionSetId] = useState(user.permissionSetId ?? undefined);
 
   const [permissionDrafts, setPermissionDrafts] = useState<PermissionDraft[]>([
     { scope: user.groupIds.length === 1 ? user.groupIds[0] : undefined }
@@ -209,7 +217,18 @@ const UserEditor = ({ userId }: { userId: string }) => {
                 if (isSaving) {
                   return undefined;
                 }
-                if (permissionDrafts.some(isIncompleteDraft)) {
+                const isPermissionSetMissing = permissionSource === 'permissionSet' && permissionSetId === undefined;
+                if (user.basePermissionLevel !== 'ADMIN' && isPermissionSetMissing) {
+                  setHighlightIncompleteDrafts(true);
+                  const errorMessage = t({
+                    en: 'No permission set is chosen. Choose one, or switch to custom permissions.',
+                    es: 'No se ha elegido ningún conjunto de permisos. Elija uno o cambie a permisos personalizados.',
+                    fr: "Aucun ensemble d'autorisations n'est choisi. Choisissez-en un ou passez aux autorisations personnalisées."
+                  });
+                  setSubmitErrorMessage(errorMessage);
+                  return { errorMessage, success: false };
+                }
+                if (permissionSource === 'custom' && permissionDrafts.some(isIncompleteDraft)) {
                   setHighlightIncompleteDrafts(true);
                   const errorMessage = t({
                     en: 'A permission row is incomplete. Choose its action, resource and scope, or remove it.',
@@ -228,17 +247,27 @@ const UserEditor = ({ userId }: { userId: string }) => {
                   groupIds: Array.from(groupIds),
                   phoneNumber: omittedIfUnchanged(phoneNumber, user.phoneNumber)
                 };
+                const customPermissions = withPermissionDrafts(localPermissions, permissionDrafts)
+                  .filter(isGrantablePermission)
+                  .filter((permission) => permission.groupId === null || groupIds.has(permission.groupId));
+                let permissions: $UpdateUserPermissionsData | undefined;
+                if (user.basePermissionLevel === 'ADMIN') {
+                  permissions = undefined;
+                } else if (permissionSource === 'permissionSet' && permissionSetId !== undefined) {
+                  permissions = { kind: 'permissionSet', permissionSetId };
+                } else {
+                  permissions = { kind: 'custom', permissions: customPermissions };
+                }
                 try {
-                  const permissions = withPermissionDrafts(localPermissions, permissionDrafts)
-                    .filter(isGrantablePermission)
-                    .filter((permission) => permission.groupId === null || groupIds.has(permission.groupId));
-                  await updateUserMutation.mutateAsync({
-                    data: accountData,
-                    id: user.id,
-                    permissions: user.basePermissionLevel === 'ADMIN' ? undefined : permissions
-                  });
+                  await updateUserMutation.mutateAsync({ data: accountData, id: user.id, permissions });
                   await userQuery.refetch();
-                  setLocalPermissions(permissions);
+                  // Each kind of write empties the other on the server, so the editor follows suit.
+                  if (permissions?.kind === 'custom') {
+                    setLocalPermissions(permissions.permissions);
+                    setPermissionSetId(undefined);
+                  } else if (permissions?.kind === 'permissionSet') {
+                    setLocalPermissions([]);
+                  }
                   setPermissionDrafts([{ scope: groupIds.size === 1 ? Array.from(groupIds)[0] : undefined }]);
                   setSavedProfileCount((count) => count + 1);
                   return undefined;
@@ -263,9 +292,14 @@ const UserEditor = ({ userId }: { userId: string }) => {
           highlightIncomplete={highlightIncompleteDrafts}
           isSaving={isSaving}
           permissions={localPermissions}
+          permissionSetId={permissionSetId}
+          permissionSets={permissionSetsQuery.data}
+          source={permissionSource}
           user={user}
           onDraftsChange={setPermissionDrafts}
           onPermissionsChange={setLocalPermissions}
+          onPermissionSetIdChange={setPermissionSetId}
+          onSourceChange={setPermissionSource}
         />
         <Button
           className="w-full"
@@ -292,6 +326,7 @@ export const Route = createFileRoute('/_app/admin/users/$userId')({
   loader: async ({ context, params }) => {
     await Promise.all([
       context.queryClient.ensureQueryData(groupsQueryOptions()),
+      context.queryClient.ensureQueryData(permissionSetsQueryOptions()),
       context.queryClient.ensureQueryData(useFindUserQueryOptions(params.userId))
     ]);
   }

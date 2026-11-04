@@ -1,4 +1,5 @@
 import type { Permissions } from '@opendatacapture/schemas/core';
+import { isPermissionSetGrantable } from '@opendatacapture/schemas/permission-set';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -45,6 +46,10 @@ describe('grantableActions', () => {
   it('should offer only read on User, since every route that writes a user is admin-only', () => {
     expect(grantableActions('User')).toEqual(['read']);
   });
+
+  it('should apply the rule it is given, so a permission set never offers manage on all', () => {
+    expect(grantableActions('all', isPermissionSetGrantable)).toEqual(['create', 'delete', 'read', 'update']);
+  });
 });
 
 describe('grantableSubjects', () => {
@@ -54,6 +59,10 @@ describe('grantableSubjects', () => {
 
   it('should keep User for read', () => {
     expect(grantableSubjects('read')).toContain('User');
+  });
+
+  it('should apply the rule it is given, so a permission set never offers all for manage', () => {
+    expect(grantableSubjects('manage', isPermissionSetGrantable)).not.toContain('all');
   });
 });
 

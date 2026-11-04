@@ -2,11 +2,13 @@ import { useState } from 'react';
 import type { ComponentProps } from 'react';
 
 import type { Permissions } from '@opendatacapture/schemas/core';
+import type { PermissionSetSummary } from '@opendatacapture/schemas/permission-set';
 import type { User } from '@opendatacapture/schemas/user';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { UserPermissionsEditor } from '@/components/UserPermissionsEditor/UserPermissionsEditor';
+import type { PermissionSource } from '@/components/UserPermissionsEditor/UserPermissionsEditor';
 import type { PermissionDraft } from '@/utils/permissions';
 
 import '@/services/i18n';
@@ -15,22 +17,54 @@ vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data
 
 const onPermissionsChange = vi.fn();
 const onDraftsChange = vi.fn();
+const onPermissionSetIdChange = vi.fn();
+const onSourceChange = vi.fn();
+
+const PERMISSION_SETS: PermissionSetSummary[] = [
+  {
+    createdAt: new Date('2026-01-01'),
+    holderCount: 3,
+    id: 'set-1',
+    name: 'Research Assistant',
+    rules: [
+      { action: 'read', scope: 'HOLDER_GROUPS', subject: 'Subject' },
+      { action: 'read', scope: 'ALL_GROUPS', subject: 'Instrument' }
+    ],
+    updatedAt: new Date('2026-01-01')
+  },
+  {
+    createdAt: new Date('2026-01-01'),
+    holderCount: 0,
+    id: 'set-2',
+    name: 'Coordinator',
+    rules: [{ action: 'create', scope: 'HOLDER_GROUPS', subject: 'Session' }],
+    updatedAt: new Date('2026-01-01')
+  }
+];
 
 const Editor = ({
   groups,
   highlightIncomplete,
+  permissionSets = PERMISSION_SETS,
   user
-}: Pick<ComponentProps<typeof UserPermissionsEditor>, 'groups' | 'highlightIncomplete' | 'user'>) => {
+}: Pick<ComponentProps<typeof UserPermissionsEditor>, 'groups' | 'highlightIncomplete' | 'user'> & {
+  permissionSets?: PermissionSetSummary[];
+}) => {
   const [permissions, setPermissions] = useState<Permissions>(user.additionalPermissions);
   const [drafts, setDrafts] = useState<PermissionDraft[]>([
     { scope: user.groupIds.length === 1 ? user.groupIds[0] : undefined }
   ]);
+  const [source, setSource] = useState<PermissionSource>(user.permissionSetId ? 'permissionSet' : 'custom');
+  const [permissionSetId, setPermissionSetId] = useState(user.permissionSetId ?? undefined);
   return (
     <UserPermissionsEditor
       drafts={drafts}
       groups={groups}
       highlightIncomplete={highlightIncomplete}
       permissions={permissions}
+      permissionSetId={permissionSetId}
+      permissionSets={permissionSets}
+      source={source}
       user={user}
       onDraftsChange={(drafts) => {
         setDrafts(drafts);
@@ -40,8 +74,26 @@ const Editor = ({
         setPermissions(permissions);
         onPermissionsChange(permissions);
       }}
+      onPermissionSetIdChange={(permissionSetId) => {
+        setPermissionSetId(permissionSetId);
+        onPermissionSetIdChange(permissionSetId);
+      }}
+      onSourceChange={(source) => {
+        setSource(source);
+        onSourceChange(source);
+      }}
     />
   );
+};
+
+/** Radix tabs activate on a primary-button mouse down, which happy-dom passes through. */
+const chooseSource = (source: PermissionSource) => {
+  fireEvent.mouseDown(screen.getByTestId(`user-permissions-source-${source}`), { button: 0, ctrlKey: false });
+};
+
+const choosePermissionSet = (id: string) => {
+  fireEvent.keyDown(screen.getByTestId('permission-set-select-trigger'), { key: 'Enter' });
+  fireEvent.click(screen.getByTestId(`permission-set-select-item-${id}`));
 };
 
 /** Opens one of the add-row selects from the keyboard, since happy-dom dispatches no pointer capture. */
@@ -228,5 +280,63 @@ describe('UserPermissionsEditor', () => {
     expect(screen.getByTestId('user-permissions-admin-notice')).toBeTruthy();
     expect(screen.queryByTestId('user-permissions-table')).toBeNull();
     expect(screen.queryByTestId('add-permission-row')).toBeNull();
+    expect(screen.queryByTestId('user-permissions-source')).toBeNull();
+  });
+
+  describe('permission source', () => {
+    const custom: User = { ...user, additionalPermissions: [] };
+
+    it('should switch to choosing a permission set, hiding the custom grants', () => {
+      render(<Editor groups={groups} user={custom} />);
+      expect(screen.getByTestId('user-permissions-custom')).toBeTruthy();
+      chooseSource('permissionSet');
+      expect(onSourceChange).toHaveBeenCalledWith('permissionSet');
+      expect(screen.queryByTestId('user-permissions-custom')).toBeNull();
+      expect(screen.getByTestId('permission-set-select-trigger')).toBeTruthy();
+    });
+
+    it('should switch back to the custom grants', () => {
+      render(<Editor groups={groups} user={{ ...custom, permissionSetId: 'set-1' }} />);
+      chooseSource('custom');
+      expect(onSourceChange).toHaveBeenCalledWith('custom');
+      expect(screen.getByTestId('user-permissions-custom')).toBeTruthy();
+    });
+
+    it('should show what the chosen permission set grants, read-only', () => {
+      render(<Editor groups={groups} user={custom} />);
+      chooseSource('permissionSet');
+      choosePermissionSet('set-1');
+      expect(onPermissionSetIdChange).toHaveBeenCalledWith('set-1');
+      expect(screen.getAllByTestId('permission-set-rule-row')).toHaveLength(2);
+      expect(screen.queryByTestId('permission-set-rule-remove')).toBeNull();
+    });
+
+    it('should warn that saving with a set discards the custom grants the user holds', () => {
+      render(<Editor groups={groups} user={user} />);
+      chooseSource('permissionSet');
+      expect(screen.getByTestId('user-permissions-discard-warning')).toBeTruthy();
+    });
+
+    it('should not warn about discarding grants for a user who holds none', () => {
+      render(<Editor groups={groups} user={custom} />);
+      chooseSource('permissionSet');
+      expect(screen.queryByTestId('user-permissions-discard-warning')).toBeNull();
+    });
+
+    it('should say so when no permission set exists to choose from', () => {
+      render(<Editor groups={groups} permissionSets={[]} user={custom} />);
+      chooseSource('permissionSet');
+      expect(screen.getByTestId('user-permission-set-none')).toBeTruthy();
+      expect(screen.queryByTestId('permission-set-select-trigger')).toBeNull();
+    });
+
+    it('should flag a missing choice once a save has been refused', () => {
+      render(<Editor highlightIncomplete groups={groups} user={custom} />);
+      chooseSource('permissionSet');
+      expect(screen.getByTestId('permission-set-required')).toBeTruthy();
+      expect(screen.getByTestId('permission-set-select-trigger').getAttribute('aria-invalid')).toBe('true');
+      choosePermissionSet('set-2');
+      expect(screen.queryByTestId('permission-set-required')).toBeNull();
+    });
   });
 });
