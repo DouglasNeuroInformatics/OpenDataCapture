@@ -12,12 +12,14 @@ import {
   FileTextIcon,
   KeyRoundIcon,
   LayersIcon,
+  LockIcon,
   LogsIcon,
   MailIcon,
   PackageIcon,
   PaletteIcon,
   PlusIcon,
   SendIcon,
+  ServerIcon,
   ShieldIcon,
   Trash2Icon,
   UploadIcon,
@@ -166,71 +168,39 @@ export function useNavItems() {
       }
     }
 
-    if (ability?.can('manage', 'all')) {
-      globalItems.push({
-        icon: UsersIcon,
-        label: t({
-          en: 'Manage Groups',
-          es: 'Gestionar grupos',
-          fr: 'Gérer les groupes'
-        }),
-        url: '/admin/groups'
-      });
-      globalItems.push({
-        icon: UserCogIcon,
-        label: t({
-          en: 'Manage Users',
-          es: 'Gestionar usuarios',
-          fr: 'Gérer les utilisateurs'
-        }),
-        url: '/admin/users'
-      });
-      globalItems.push({
-        icon: KeyRoundIcon,
-        label: t({
-          en: 'Manage Permission Sets',
-          es: 'Gestionar conjuntos de permisos',
-          fr: "Gérer les ensembles d'autorisations"
-        }),
-        url: '/admin/permission-sets'
-      });
-    }
-
     const adminItems: NavItem[] = [];
     if (ability?.can('manage', 'all')) {
       adminItems.push({
         children: [
-          {
-            icon: CogIcon,
-            label: t({
-              en: 'App Settings',
-              es: 'Configuración de la aplicación',
-              fr: "Paramètres de l'application"
-            }),
-            url: '/admin/settings'
-          },
           {
             icon: LogsIcon,
             label: t('common.auditLogs'),
             url: '/admin/audit/logs'
           },
           {
-            icon: PaletteIcon,
-            label: t({
-              en: 'Branding',
-              es: 'Imagen de marca',
-              fr: 'Image de marque'
-            }),
-            url: '/admin/branding'
-          },
-          {
-            icon: PackageIcon,
-            label: t({
-              en: 'Instrument Repos',
-              es: 'Repositorios de instrumentos',
-              fr: "Dépôts d'instruments"
-            }),
-            url: '/admin/instrument-repos'
+            children: [
+              {
+                icon: UsersIcon,
+                label: t({ en: 'Groups', es: 'Grupos', fr: 'Groupes' }),
+                url: '/admin/groups'
+              },
+              {
+                icon: UserCogIcon,
+                label: t({ en: 'Users', es: 'Usuarios', fr: 'Utilisateurs' }),
+                url: '/admin/users'
+              },
+              {
+                icon: KeyRoundIcon,
+                label: t({
+                  en: 'Permission Sets',
+                  es: 'Conjuntos de permisos',
+                  fr: "Ensembles d'autorisations"
+                }),
+                url: '/admin/permission-sets'
+              }
+            ],
+            icon: LockIcon,
+            label: t({ en: 'Access', es: 'Acceso', fr: 'Accès' })
           },
           {
             children: [
@@ -249,15 +219,40 @@ export function useNavItems() {
                 label: t({ en: 'Series', es: 'Series', fr: 'Séries' }),
                 search: { view: 'series' },
                 url: '/admin/instruments'
+              },
+              {
+                icon: PackageIcon,
+                label: t({ en: 'Repositories', es: 'Repositorios', fr: 'Dépôts' }),
+                url: '/admin/instrument-repos'
               }
             ],
             icon: ClipboardListIcon,
             label: t({ en: 'Instruments', es: 'Instrumentos', fr: 'Instruments' })
           },
           {
-            icon: MailIcon,
-            label: t({ en: 'Mail', es: 'Correo', fr: 'Courriel' }),
-            url: '/admin/mail'
+            children: [
+              {
+                icon: CogIcon,
+                label: t({ en: 'Settings', es: 'Configuración', fr: 'Paramètres' }),
+                url: '/admin/settings'
+              },
+              {
+                icon: PaletteIcon,
+                label: t({
+                  en: 'Branding',
+                  es: 'Imagen de marca',
+                  fr: 'Image de marque'
+                }),
+                url: '/admin/branding'
+              },
+              {
+                icon: MailIcon,
+                label: t({ en: 'Mail Server', es: 'Servidor de correo', fr: 'Serveur de courriel' }),
+                url: '/admin/mail'
+              }
+            ],
+            icon: ServerIcon,
+            label: t({ en: 'Instance', es: 'Instancia', fr: 'Instance' })
           }
         ],
         icon: ShieldIcon,

@@ -206,6 +206,45 @@ describe('useNavItems', () => {
     expect(urls.indexOf('/admin/permission-sets')).toBe(urls.indexOf('/admin/users') + 1);
   });
 
+  const adminPanel = () => {
+    return renderHook(() => useNavItems())
+      .result.current.flat()
+      .find((item) => item.label === 'Admin Panel');
+  };
+
+  it('should open the admin panel with the audit logs, ahead of the access, instruments and instance groups', () => {
+    expect(adminPanel()?.children?.map((child) => child.label)).toStrictEqual([
+      'Audit Logs',
+      'Access',
+      'Instruments',
+      'Instance'
+    ]);
+  });
+
+  // The audit logs record activity on every entity, not only access changes, so they sit beside the
+  // groups rather than inside one, one click from the panel.
+  it('should link the audit logs directly from the admin panel rather than from inside a group', () => {
+    const auditLogs = adminPanel()?.children?.[0];
+    expect(auditLogs?.url).toBe('/admin/audit/logs');
+    expect(auditLogs?.children).toBeUndefined();
+  });
+
+  it('should gather the pages that decide who can do what under access', () => {
+    const access = adminPanel()?.children?.find((child) => child.label === 'Access');
+    expect(access?.children?.map((child) => child.url)).toStrictEqual([
+      '/admin/groups',
+      '/admin/users',
+      '/admin/permission-sets'
+    ]);
+  });
+
+  it('should leave no admin page at the top level of the sidebar, so admin links never mix with clinical ones', () => {
+    const topLevelUrls = renderHook(() => useNavItems())
+      .result.current.flat()
+      .map((item) => item.url);
+    expect(topLevelUrls.filter((url) => url?.startsWith('/admin/'))).toStrictEqual([]);
+  });
+
   it('should hide the permission sets from anyone short of an administrator', () => {
     mocks.can.mockImplementation((action, subject) => !(action === 'manage' && subject === 'all'));
     expect(navUrls()).not.toContain('/admin/permission-sets');
