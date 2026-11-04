@@ -18,16 +18,26 @@ describe('$UpdateUserData', () => {
     expect(result.success).toBe(true);
     expect(result.data).not.toHaveProperty('additionalPermissions');
   });
+
+  it('should strip permissionSetId, so a profile update cannot assign a permission set', () => {
+    const result = $UpdateUserData.safeParse({ permissionSetId: 'set-1' });
+    expect(result.success).toBe(true);
+    expect(result.data).not.toHaveProperty('permissionSetId');
+  });
+
+  it('should accept a promotion to administrator, which the create-time permission set rule does not reach', () => {
+    expect($UpdateUserData.safeParse({ basePermissionLevel: 'ADMIN' }).success).toBe(true);
+  });
 });
 
 describe('$UpdateUserPermissionsData', () => {
-  it('should accept an empty set, which is how every grant is revoked', () => {
-    expect($UpdateUserPermissionsData.safeParse({ permissions: [] }).success).toBe(true);
+  it('should accept an empty set of custom grants, which is how every grant is revoked', () => {
+    expect($UpdateUserPermissionsData.safeParse({ kind: 'custom', permissions: [] }).success).toBe(true);
   });
 
   it('should reject a grant confined to a group on a resource that cannot be', () => {
     const permissions = [{ action: 'read', groupId: 'group-1', subject: 'Instrument' }];
-    expect($UpdateUserPermissionsData.safeParse({ permissions }).success).toBe(false);
+    expect($UpdateUserPermissionsData.safeParse({ kind: 'custom', permissions }).success).toBe(false);
   });
 
   it('should reject a grant that writes users, naming the offending entry, since it would do nothing', () => {
@@ -35,9 +45,28 @@ describe('$UpdateUserPermissionsData', () => {
       { action: 'read', groupId: null, subject: 'Subject' },
       { action: 'update', groupId: null, subject: 'User' }
     ];
-    const result = $UpdateUserPermissionsData.safeParse({ permissions });
+    const result = $UpdateUserPermissionsData.safeParse({ kind: 'custom', permissions });
     expect(result.success).toBe(false);
     expect(result.error?.issues[0]?.path).toEqual(['permissions', 1]);
+  });
+
+  it('should accept a permission set by its id', () => {
+    expect($UpdateUserPermissionsData.safeParse({ kind: 'permissionSet', permissionSetId: 'set-1' }).success).toBe(
+      true
+    );
+  });
+
+  it('should reject a body without a kind, the shape every write took before permission sets', () => {
+    expect($UpdateUserPermissionsData.safeParse({ permissions: [] }).success).toBe(false);
+  });
+
+  it('should drop custom grants sent beside a permission set, so a user can never hold both', () => {
+    const result = $UpdateUserPermissionsData.safeParse({
+      kind: 'permissionSet',
+      permissions: [{ action: 'read', groupId: null, subject: 'Subject' }],
+      permissionSetId: 'set-1'
+    });
+    expect(result.data).toStrictEqual({ kind: 'permissionSet', permissionSetId: 'set-1' });
   });
 });
 
@@ -71,6 +100,15 @@ describe('$CreateUserData', () => {
 
   it('should accept a well-formed phone number', () => {
     expect($CreateUserData.safeParse({ ...data, phoneNumber: '(514) 555-1234' }).success).toBe(true);
+  });
+
+  it('should accept a permission set for a user below administrator', () => {
+    expect($CreateUserData.safeParse({ ...data, permissionSetId: 'set-1' }).success).toBe(true);
+  });
+
+  it('should reject a permission set for an administrator, who already holds every permission', () => {
+    const result = $CreateUserData.safeParse({ ...data, basePermissionLevel: 'ADMIN', permissionSetId: 'set-1' });
+    expect(result.error?.issues[0]?.path).toEqual(['permissionSetId']);
   });
 });
 

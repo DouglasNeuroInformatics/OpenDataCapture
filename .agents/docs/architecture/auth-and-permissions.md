@@ -42,6 +42,7 @@ The full inventory of non-ordinary access declarations, current as of writing:
 | `PATCH /v1/users/self-update/:id`                                                                       | `{ action: 'read', subject: 'User' }`                                                         | Deliberately weak; `UsersService.updateSelfById` throws `ForbiddenException` unless `id === currentUser.id`. The controller carries a comment saying so.                                                                                                                                                                                                                                                       |
 | `PUT /v1/users/:id/permissions`                                                                         | `ADMIN_ONLY`                                                                                  | `ADMIN` alone. An `update User` grant is one of the things this route hands out, so it must not be enough to reach it, or the holder could grant themselves `manage all`. `$UpdateUserData` no longer carries the field either.                                                                                                                                                                                |
 | `POST /v1/users`, `PATCH /v1/users/:id`, `PATCH /v1/users/:id/archive`, `PATCH /v1/users/:id/unarchive` | `ADMIN_ONLY`                                                                                  | `ADMIN` alone, whatever `User` action a grant names. Level, groups and password are what the rest of a user's access derives from, so a grantee could otherwise promote themselves, join every group, or log in as an admin whose password they set. `UsersService` also refuses an admin archiving, unarchiving, disabling or demoting their own account, so the last one cannot lock every admin-only route. |
+| `GET`, `POST /v1/permission-sets`, `GET`, `PATCH`, `DELETE /v1/permission-sets/:id`                     | `ADMIN_ONLY`                                                                                  | `ADMIN` alone, reads included. A set's rules are applied to every holder at sign-in, so editing one is a grant to each of them, and only an administrator may grant; holders and group managers have no use for reading it. `PermissionSet` is deliberately absent from `$AppSubjectName`, so no grant can name it either (see below).                                                                         |
 | `GET /v1/summary`                                                                                       | five-element array (`read` on `Instrument`, `InstrumentRecord`, `Session`, `Subject`, `User`) | The only use of the multi-element array form; all five must pass.                                                                                                                                                                                                                                                                                                                                              |
 
 Adding a fourth `'public'` route, or a second `[]`, is a security decision — raise it rather than
@@ -113,11 +114,15 @@ Prisma results already carry `__modelName` — it is a computed field added by
 ## Where an ability comes from
 
 1. `AuthService.login` builds one with `AbilityFactory.createForPayload`, switching on
-   `basePermissionLevel` (`ADMIN` / `GROUP_MANAGER` / `STANDARD`) and then applying the user's
-   `additionalPermissions` on top. A stored rule carrying a `groupId` is applied with that model's
-   group condition from `GROUP_SCOPED_CONDITIONS` (`src/auth/ability.factory.ts`), so it reaches
-   only that group's rows; a `null` `groupId` is an unconditional rule, which is what every rule
-   written before the field existed reads back as.
+   `basePermissionLevel` (`ADMIN` / `GROUP_MANAGER` / `STANDARD`) and then applying, on top, the
+   rules of the user's permission set and the user's `additionalPermissions`. A stored rule
+   carrying a `groupId` is applied with that model's group condition from `GROUP_SCOPED_CONDITIONS`
+   (`src/auth/ability.factory.ts`), so it reaches only that group's rows; a `null` `groupId` is an
+   unconditional rule, which is what every rule written before the field existed reads back as.
+   A permission set rule names no group: `HOLDER_GROUPS` gets the same condition over all of the
+   holder's groups, the way a group manager's own rules do, and `ALL_GROUPS` is unconditional.
+   `login` reads the set through `UsersService.findByUsername` and passes its rules as
+   `createForPayload`'s second, required, parameter; the set itself is not put on the payload.
 2. The **serialized rules** (`ability.rules`) are signed into the JWT alongside the payload,
    `expiresIn: '1h'`.
 3. On every request `JwtStrategy.validate` rebuilds the ability from those rules with
@@ -125,10 +130,11 @@ Prisma results already carry `__modelName` — it is a computed field added by
 
 Consequences worth knowing:
 
-- **Permissions are frozen into the token.** Changing a user's groups, base level or additional
-  permissions has no effect until they obtain a new token. There is no refresh endpoint.
+- **Permissions are frozen into the token.** Changing a user's groups, base level, additional
+  permissions or permission set — or editing the set itself — has no effect until they obtain a new
+  token. There is no refresh endpoint.
 - **`basePermissionLevel` is nullable** and the `switch` has no `default`, so a user with `null` gets
-  only whatever `additionalPermissions` grants — usually nothing.
+  only what their permission set or `additionalPermissions` grants — usually nothing.
 - **JWT expiry is ignored in development.** `ignoreExpiration: configService.getOrThrow('NODE_ENV') === 'development'`
   in `src/auth/strategies/jwt.strategy.ts`. A dev token never expires; do not conclude from local
   testing that expiry works.
@@ -167,11 +173,13 @@ hand-written:
 
 **These two currently agree with each other but not with the derived list.** They contain `all`,
 `Assignment`, `Group`, `Instrument`, `InstrumentRecord`, `InstrumentRepo`, `Session`, `Subject`,
-`User`. The Prisma schema also defines `AuditLog`, `InstrumentRecordFile`, `InstrumentRepoSyncLog`
-and `SetupState`, which
-are therefore valid in `@RouteAccess` and in `AbilityFactory` rules (`InstrumentRecordFile` is used
-in both) but cannot be granted as an `additionalPermission`. Treat that as the existing state, not
-as a licence to widen it silently.
+`User`. The Prisma schema also defines `AuditLog`, `InstrumentRecordFile`, `InstrumentRepoSyncLog`,
+`PermissionSet` and `SetupState`, which are therefore valid in `@RouteAccess` and in
+`AbilityFactory` rules (`InstrumentRecordFile` is used in both) but cannot be granted as an
+`additionalPermission` or as a permission set rule, whose `subject` uses the same enum. Treat that
+as the existing state, not as a licence to widen it silently. `PermissionSet` in particular must
+stay out: a grant on it would let its holder edit a set they hold, and so grant themselves anything
+a set may contain.
 
 A third list, `$GroupScopableSubjectName` in the same schemas file, says which of these a per-user
 permission may be confined to one group on. It is derived from `$AppSubjectName` by excluding `all`
@@ -185,7 +193,9 @@ any other subject at the boundary, and the factory throws on one it meets anyway
 **A pair can be storable and still do nothing.** Every route that writes a user is `ADMIN_ONLY`, so
 a grant of any `User` action but `read` reaches nothing. `isGrantablePermission`
 (`packages/schemas/src/core/core.ts`) is that rule: `$UpdateUserPermissionsData` refuses what it
-refuses, and the web permissions editor offers only what it allows. `$UserPermission` itself does
+refuses, and the web permissions editor offers only what it allows. A permission set applies
+`isPermissionSetGrantable` (`packages/schemas/src/permission-set/permission-set.ts`) instead, which
+also refuses `manage all`: one edit to the set would otherwise make every holder an administrator. `$UserPermission` itself does
 not apply it, because it is also the read model and grants stored before the rule still have to
 parse; the editor marks those "No effect" and leaves them out of its next save. A new admin-only
 route that a grantable pair used to reach belongs in the same predicate.

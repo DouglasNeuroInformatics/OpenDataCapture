@@ -1215,11 +1215,14 @@ describe('InstrumentsService', () => {
     // `create` but not `read`, and this route is gated on `read Instrument`, which they do hold.
     it('should resolve for a caller who may read no records, rather than failing the request', async () => {
       const abilityFactory = new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService);
-      const ability = abilityFactory.createForPayload({
-        basePermissionLevel: 'STANDARD',
-        groups: [{ id: 'group-1' }],
-        id: 'user-1'
-      } as any);
+      const ability = abilityFactory.createForPayload(
+        {
+          basePermissionLevel: 'STANDARD',
+          groups: [{ id: 'group-1' }],
+          id: 'user-1'
+        } as any,
+        []
+      );
 
       await expect(instrumentsService.find({ subjectId: 'subject-1' }, { ability })).resolves.toStrictEqual([]);
 

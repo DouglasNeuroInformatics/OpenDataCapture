@@ -39,12 +39,15 @@ const userAt = (
   additionalPermissions: Permissions = []
 ) => {
   return {
-    ability: new AbilityFactory({ verbose: vi.fn() } as any).createForPayload({
-      additionalPermissions,
-      basePermissionLevel,
-      groups: [{ id: groupId }],
-      id: 'user-1'
-    } as any),
+    ability: new AbilityFactory({ verbose: vi.fn() } as any).createForPayload(
+      {
+        additionalPermissions,
+        basePermissionLevel,
+        groups: [{ id: groupId }],
+        id: 'user-1'
+      } as any,
+      []
+    ),
     id: 'user-1'
   } as any;
 };

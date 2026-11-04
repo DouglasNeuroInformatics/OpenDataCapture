@@ -79,7 +79,7 @@ export default defineSuite('user permissions', function () {
       const response = await this.app.inject({
         headers: adminHeaders,
         method: 'PUT',
-        payload: { permissions: [{ action: 'read', groupId: otherGroup.id, subject: 'Subject' }] },
+        payload: { kind: 'custom', permissions: [{ action: 'read', groupId: otherGroup.id, subject: 'Subject' }] },
         url: `/v1/users/${user.id}/permissions`
       });
       expect(response.statusCode).toBe(400);
@@ -89,7 +89,7 @@ export default defineSuite('user permissions', function () {
       const response = await this.app.inject({
         headers: adminHeaders,
         method: 'PUT',
-        payload: { permissions: [{ action: 'read', groupId: group.id, subject: 'Subject' }] },
+        payload: { kind: 'custom', permissions: [{ action: 'read', groupId: group.id, subject: 'Subject' }] },
         url: `/v1/users/${user.id}/permissions`
       });
       expect(response.statusCode).toBe(200);

@@ -3,7 +3,7 @@ import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { $LoginCredentials, TokenPayload } from '@opendatacapture/schemas/auth';
-import type { Group, User } from '@prisma/client';
+import type { Group, PermissionSet, User } from '@prisma/client';
 
 import { AuditLogger } from '@/audit/audit.logger';
 import { UsersService } from '@/users/users.service';
@@ -41,6 +41,7 @@ export class AuthService {
   async login(credentials: $LoginCredentials): Promise<{ accessToken: string }> {
     let user: User & {
       groups: Group[];
+      permissionSet: null | PermissionSet;
     };
     try {
       user = await this.usersService.findByUsername(credentials.username, { includeHashedPassword: true });
@@ -77,7 +78,9 @@ export class AuthService {
       username: user.username
     };
 
-    const ability = this.abilityFactory.createForPayload(tokenPayload);
+    // The set's rules are resolved here rather than carried on the payload: what they grant is signed
+    // into `permissions` below, so the token grows only as much as equivalent custom grants would.
+    const ability = this.abilityFactory.createForPayload(tokenPayload, user.permissionSet?.rules ?? []);
 
     const accessToken = await this.jwtService.signAsync(
       { ...tokenPayload, permissions: ability.rules },

@@ -10,6 +10,7 @@ import {
   DatabaseIcon,
   EyeIcon,
   FileTextIcon,
+  KeyRoundIcon,
   LayersIcon,
   LogsIcon,
   MailIcon,
@@ -183,6 +184,15 @@ export function useNavItems() {
           fr: 'Gérer les utilisateurs'
         }),
         url: '/admin/users'
+      });
+      globalItems.push({
+        icon: KeyRoundIcon,
+        label: t({
+          en: 'Manage Permission Sets',
+          es: 'Gestionar conjuntos de permisos',
+          fr: "Gérer les ensembles d'autorisations"
+        }),
+        url: '/admin/permission-sets'
       });
     }
 

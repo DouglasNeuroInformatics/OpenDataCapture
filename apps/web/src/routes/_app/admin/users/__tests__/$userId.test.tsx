@@ -2,6 +2,7 @@ import type { ComponentProps, PropsWithChildren } from 'react';
 
 import type { ZodErrorLike } from '@douglasneuroinformatics/libjs';
 import type { Group } from '@opendatacapture/schemas/group';
+import type { PermissionSetSummary } from '@opendatacapture/schemas/permission-set';
 import type { User } from '@opendatacapture/schemas/user';
 import { QueryClient } from '@tanstack/react-query';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
@@ -32,8 +33,9 @@ const mocks = vi.hoisted(() => {
   const state: {
     currentUser: null | { username: string };
     groups: Pick<Group, 'id' | 'name'>[];
+    permissionSets: PermissionSetSummary[];
     user: User;
-  } = { currentUser: null, groups: [], user: makeUser() };
+  } = { currentUser: null, groups: [], permissionSets: [], user: makeUser() };
   const refetch = vi.fn<() => Promise<void>>();
   return {
     archiveMutate: vi.fn<(variables: { id: string }, options: MutateOptions) => void>(),
@@ -42,6 +44,7 @@ const mocks = vi.hoisted(() => {
     makeUser,
     mutateAsync: vi.fn<(variables: unknown) => Promise<void>>(),
     PermissionsEditor: vi.fn((_: UserPermissionsEditorProps) => <div data-testid="user-permissions-editor" />),
+    permissionSetsQueryOptions: vi.fn(() => ({ queryKey: ['permission-sets'] })),
     refetch,
     state,
     unarchiveMutate: vi.fn<(variables: { id: string }) => void>(),
@@ -82,6 +85,10 @@ vi.mock('@/hooks/useGroupsQuery', () => ({
   groupsQueryOptions: mocks.groupsQueryOptions,
   useGroupsQuery: () => ({ data: mocks.state.groups })
 }));
+vi.mock('@/hooks/usePermissionSetsQuery', () => ({
+  permissionSetsQueryOptions: mocks.permissionSetsQueryOptions,
+  usePermissionSetsQuery: () => ({ data: mocks.state.permissionSets })
+}));
 vi.mock('@/hooks/useUnarchiveUserMutation', () => ({
   useUnarchiveUserMutation: () => ({ mutate: mocks.unarchiveMutate })
 }));
@@ -96,6 +103,15 @@ vi.mock('@/store', () => ({
 
 const GROUP_ONE = { id: 'group-1', name: 'Group One' };
 const GROUP_TWO = { id: 'group-2', name: 'Group Two' };
+
+const PERMISSION_SET: PermissionSetSummary = {
+  createdAt: new Date('2026-01-01'),
+  holderCount: 1,
+  id: 'set-1',
+  name: 'Research Assistant',
+  rules: [{ action: 'read', scope: 'HOLDER_GROUPS', subject: 'Subject' }],
+  updatedAt: new Date('2026-01-01')
+};
 
 const submitData = (overrides: Partial<UpdateUserSubmitData> = {}): UpdateUserSubmitData => ({
   confirmPassword: undefined,
@@ -151,6 +167,7 @@ describe('Route', () => {
     mocks.refetch.mockResolvedValue(undefined);
     mocks.state.currentUser = { username: 'admin' };
     mocks.state.groups = [GROUP_ONE, GROUP_TWO];
+    mocks.state.permissionSets = [PERMISSION_SET];
     mocks.state.user = mocks.makeUser();
   });
 
@@ -159,11 +176,12 @@ describe('Route', () => {
     vi.restoreAllMocks();
   });
 
-  it('should prefetch the groups and the user in the loader, so the editor renders without a waterfall', async () => {
+  it('should prefetch the groups, permission sets and user in the loader, so the editor renders without a waterfall', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue(undefined);
     await runLoader(queryClient);
     expect(ensureQueryData).toHaveBeenCalledWith({ queryKey: ['groups'] });
+    expect(ensureQueryData).toHaveBeenCalledWith({ queryKey: ['permission-sets'] });
     expect(ensureQueryData).toHaveBeenCalledWith({ queryKey: ['users', 'user-1'] });
   });
 
@@ -315,6 +333,71 @@ describe('Route', () => {
     });
   });
 
+  describe('permission source', () => {
+    it('should start on custom grants for a user who holds no permission set', () => {
+      renderPage();
+      expect(editorProps()).toMatchObject({ permissionSetId: undefined, source: 'custom' });
+    });
+
+    it('should start on the permission set a user holds, with every set to choose from', () => {
+      mocks.state.user.permissionSetId = 'set-1';
+      renderPage();
+      expect(editorProps()).toMatchObject({
+        permissionSetId: 'set-1',
+        permissionSets: [PERMISSION_SET],
+        source: 'permissionSet'
+      });
+    });
+
+    it('should save the chosen permission set in place of any custom grants', async () => {
+      mocks.state.user.additionalPermissions = [{ action: 'read', groupId: 'group-1', subject: 'Subject' }];
+      renderPage();
+      act(() => editorProps().onSourceChange('permissionSet'));
+      act(() => editorProps().onPermissionSetIdChange('set-1'));
+      await submit();
+      expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({
+        permissionsUpdate: { kind: 'permissionSet', permissionSetId: 'set-1' }
+      });
+      expect(editorProps().permissions).toEqual([]);
+    });
+
+    it('should save a permission set even while a custom row is half filled in, since that row is not being saved', async () => {
+      mocks.state.user.permissionSetId = 'set-1';
+      renderPage();
+      act(() => editorProps().onDraftsChange([{ action: 'create' }]));
+      await submit();
+      expect(mocks.mutateAsync).toHaveBeenCalledOnce();
+    });
+
+    it('should refuse to save the permission set source with no set chosen', async () => {
+      renderPage();
+      act(() => editorProps().onSourceChange('permissionSet'));
+      const result = await submit();
+      expect(result).toEqual({ errorMessage: expect.stringContaining('No permission set is chosen'), success: false });
+      expect(editorProps().highlightIncomplete).toBe(true);
+      expect(mocks.mutateAsync).not.toHaveBeenCalled();
+    });
+
+    it('should drop the permission set once custom grants are saved instead', async () => {
+      mocks.state.user.permissionSetId = 'set-1';
+      renderPage();
+      act(() => editorProps().onSourceChange('custom'));
+      await submit();
+      expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({
+        permissionsUpdate: { kind: 'custom', permissions: [] }
+      });
+      expect(editorProps().permissionSetId).toBeUndefined();
+    });
+
+    it('should save an administrator without asking for a permission set, which they cannot hold', async () => {
+      mocks.state.user.basePermissionLevel = 'ADMIN';
+      renderPage();
+      act(() => editorProps().onSourceChange('permissionSet'));
+      await submit();
+      expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({ permissionsUpdate: undefined });
+    });
+  });
+
   describe('saving', () => {
     it('should refuse to save while a permission row is half filled in', async () => {
       renderPage();
@@ -348,7 +431,7 @@ describe('Route', () => {
           phoneNumber: undefined
         },
         id: 'user-1',
-        permissions: []
+        permissionsUpdate: { kind: 'custom', permissions: [] }
       });
     });
 
@@ -358,10 +441,13 @@ describe('Route', () => {
       act(() => editorProps().onDraftsChange([{ action: 'create', scope: 'group-1', subject: 'Subject' }]));
       await submit();
       expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({
-        permissions: [
-          { action: 'read', groupId: 'group-1', subject: 'Subject' },
-          { action: 'create', groupId: 'group-1', subject: 'Subject' }
-        ]
+        permissionsUpdate: {
+          kind: 'custom',
+          permissions: [
+            { action: 'read', groupId: 'group-1', subject: 'Subject' },
+            { action: 'create', groupId: 'group-1', subject: 'Subject' }
+          ]
+        }
       });
     });
 
@@ -374,7 +460,7 @@ describe('Route', () => {
       renderPage();
       await submit();
       expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({
-        permissions: [{ action: 'read', groupId: null, subject: 'Instrument' }]
+        permissionsUpdate: { kind: 'custom', permissions: [{ action: 'read', groupId: null, subject: 'Instrument' }] }
       });
     });
 
@@ -382,7 +468,7 @@ describe('Route', () => {
       mocks.state.user.basePermissionLevel = 'ADMIN';
       renderPage();
       await submit();
-      expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({ permissions: undefined });
+      expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({ permissionsUpdate: undefined });
     });
 
     it('should reload the user and report success once the save lands', async () => {

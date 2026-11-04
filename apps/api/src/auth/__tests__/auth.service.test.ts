@@ -37,7 +37,7 @@ describe('AuthService', () => {
   let usersService: MockedInstance<UsersService>;
 
   const requestUserFor = (basePermissionLevel: 'ADMIN' | 'GROUP_MANAGER' | 'STANDARD'): RequestUser => {
-    const ability = abilityFactory.createForPayload({ ...BASE_PAYLOAD, basePermissionLevel } as any);
+    const ability = abilityFactory.createForPayload({ ...BASE_PAYLOAD, basePermissionLevel } as any, []);
     return { ...BASE_PAYLOAD, ability, basePermissionLevel } as unknown as RequestUser;
   };
 
@@ -82,6 +82,8 @@ describe('AuthService', () => {
       id: 'user-1',
       lastName: 'User',
       mustResetPassword: null,
+      permissionSet: null,
+      permissionSetId: null,
       phoneNumber: null,
       sex: null,
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -137,6 +139,51 @@ describe('AuthService', () => {
         permissions: expect.arrayContaining([expect.objectContaining({ action: 'read', subject: 'Instrument' })]),
         username: 'test-user'
       });
+    });
+
+    it("should sign the rules of the user's permission set, confined to the user's groups where the set says so", async () => {
+      usersService.findByUsername.mockResolvedValue(
+        storedUser({
+          groups: [{ id: 'group-1' } as StoredUser['groups'][number]],
+          permissionSet: {
+            __modelName: 'PermissionSet',
+            createdAt: new Date('2026-01-01T00:00:00.000Z'),
+            id: 'set-1',
+            name: 'Research Assistant',
+            rules: [{ action: 'read', scope: 'HOLDER_GROUPS', subject: 'InstrumentRecord' }],
+            updatedAt: new Date('2026-01-01T00:00:00.000Z')
+          },
+          permissionSetId: 'set-1'
+        })
+      );
+      cryptoService.comparePassword.mockResolvedValue(true);
+      await authService.login(credentials);
+      expect(jwtService.signAsync.mock.lastCall?.[0]).toMatchObject({
+        permissions: expect.arrayContaining([
+          { action: 'read', conditions: { groupId: { in: ['group-1'] } }, subject: 'InstrumentRecord' }
+        ])
+      });
+    });
+
+    it('should leave the permission set itself off the signed payload, so it does not grow the token', async () => {
+      usersService.findByUsername.mockResolvedValue(
+        storedUser({
+          permissionSet: {
+            __modelName: 'PermissionSet',
+            createdAt: new Date('2026-01-01T00:00:00.000Z'),
+            id: 'set-1',
+            name: 'Research Assistant',
+            rules: [{ action: 'read', scope: 'ALL_GROUPS', subject: 'Subject' }],
+            updatedAt: new Date('2026-01-01T00:00:00.000Z')
+          },
+          permissionSetId: 'set-1'
+        })
+      );
+      cryptoService.comparePassword.mockResolvedValue(true);
+      await authService.login(credentials);
+      const signed = jwtService.signAsync.mock.lastCall?.[0] as object;
+      expect(signed).not.toHaveProperty('permissionSet');
+      expect(signed).not.toHaveProperty('permissionSetId');
     });
 
     it('should treat an account with no reset flag as not needing a reset, since older accounts never stored one', async () => {

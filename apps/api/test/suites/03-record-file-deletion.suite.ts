@@ -91,6 +91,7 @@ export default defineSuite('record file deletion', function () {
       headers: adminHeaders,
       method: 'PUT',
       payload: {
+        kind: 'custom',
         permissions: ['InstrumentRecord', 'Session', 'Subject'].map((subject) => ({
           action: 'delete',
           groupId,

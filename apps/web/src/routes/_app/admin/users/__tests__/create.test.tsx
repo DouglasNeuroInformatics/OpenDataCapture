@@ -18,7 +18,9 @@ const mocks = vi.hoisted(() => ({
   groupsQueryOptions: vi.fn(() => ({ queryKey: ['groups'] })),
   isMailEnabled: false,
   mutateAsync: vi.fn(),
-  navigate: vi.fn()
+  navigate: vi.fn(),
+  permissionSets: [] as { id: string; name: string }[],
+  permissionSetsQueryOptions: vi.fn(() => ({ queryKey: ['permission-sets'] }))
 }));
 
 vi.mock('axios', async (importOriginal) => {
@@ -35,6 +37,10 @@ vi.mock('@/hooks/useCreateUserMutation', () => ({
 vi.mock('@/hooks/useGroupsQuery', () => ({
   groupsQueryOptions: mocks.groupsQueryOptions,
   useGroupsQuery: () => ({ data: mocks.groups })
+}));
+vi.mock('@/hooks/usePermissionSetsQuery', () => ({
+  permissionSetsQueryOptions: mocks.permissionSetsQueryOptions,
+  usePermissionSetsQuery: () => ({ data: mocks.permissionSets })
 }));
 vi.mock('@/hooks/useSetupStateQuery', () => ({
   useSetupStateQuery: () => ({
@@ -121,6 +127,7 @@ describe('Route', () => {
     useNotificationsStore.setState({ notifications: [] });
     mocks.activeLanguages = ['en', 'es', 'fr'];
     mocks.groups = [];
+    mocks.permissionSets = [];
     mocks.isMailEnabled = false;
     mocks.get.mockResolvedValue({ data: { success: false } });
     mocks.mutateAsync.mockResolvedValue({ welcomeEmail: welcomeEmail({ status: 'DISABLED' }) });
@@ -128,11 +135,12 @@ describe('Route', () => {
 
   afterEach(cleanup);
 
-  it('should prefetch the groups in the loader, so the group options render without a waterfall', async () => {
+  it('should prefetch the groups and permission sets in the loader, so their options render without a waterfall', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);
     await runLoader(queryClient);
     expect(ensureQueryData).toHaveBeenCalledWith({ queryKey: ['groups'] });
+    expect(ensureQueryData).toHaveBeenCalledWith({ queryKey: ['permission-sets'] });
   });
 
   it('should escape the username in the existence check, so a slash cannot change the path', async () => {
@@ -432,5 +440,79 @@ describe('Route', () => {
     submit();
     await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
     expect(mocks.mutateAsync.mock.lastCall?.[0].data.groupIds).toEqual(['group-1']);
+  });
+
+  describe('permission set', () => {
+    const PERMISSION_SETS = [
+      { id: 'set-1', name: 'Research Assistant' },
+      { id: 'set-2', name: 'Coordinator' }
+    ];
+
+    const fillStandardUser = () => {
+      mocks.groups = [{ id: 'group-1', name: 'Group One' }];
+      const form = renderPage();
+      fillCredentials(form);
+      choosePermissionLevel(form, 'STANDARD');
+      fireEvent.click(screen.getByLabelText('Group One'));
+      return form;
+    };
+
+    const submittedPermissionSetId = async () => {
+      await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
+      return mocks.mutateAsync.mock.lastCall?.[0].data.permissionSetId;
+    };
+
+    beforeEach(() => {
+      mocks.permissionSets = PERMISSION_SETS;
+    });
+
+    it('should offer every permission set, and none, to a user below administrator', () => {
+      const form = renderPage();
+      choosePermissionLevel(form, 'STANDARD');
+      fireEvent.keyDown(screen.getByTestId('permissionSetId-select-trigger'), { key: 'Enter' });
+      expect(screen.getByTestId('permissionSetId-select-item-set-1').textContent).toBe('Research Assistant');
+      expect(screen.getByTestId('permissionSetId-select-item-set-2').textContent).toBe('Coordinator');
+      expect(screen.getByTestId('permissionSetId-select-item-__none__').textContent).toBe('None');
+    });
+
+    it('should not offer a permission set until a permission level is chosen', () => {
+      renderPage();
+      expect(screen.queryByTestId('permissionSetId-select-trigger')).toBeNull();
+    });
+
+    it('should not offer a permission set to an administrator, who already holds every permission', () => {
+      const form = renderPage();
+      choosePermissionLevel(form, 'ADMIN');
+      expect(screen.queryByTestId('permissionSetId-select-trigger')).toBeNull();
+    });
+
+    it('should not offer a permission set when none exists', () => {
+      mocks.permissionSets = [];
+      const form = renderPage();
+      choosePermissionLevel(form, 'STANDARD');
+      expect(screen.queryByTestId('permissionSetId-select-trigger')).toBeNull();
+    });
+
+    it('should create the user holding the permission set chosen', async () => {
+      const form = fillStandardUser();
+      fireEvent.change(field(form, 'permissionSetId'), { target: { value: 'set-2' } });
+      submit();
+      expect(await submittedPermissionSetId()).toBe('set-2');
+    });
+
+    it('should create the user without a permission set when none is chosen', async () => {
+      const form = fillStandardUser();
+      fireEvent.change(field(form, 'permissionSetId'), { target: { value: '__none__' } });
+      submit();
+      expect(await submittedPermissionSetId()).toBeUndefined();
+    });
+
+    it('should drop a permission set chosen before the level became administrator, which the API would refuse', async () => {
+      const form = fillStandardUser();
+      fireEvent.change(field(form, 'permissionSetId'), { target: { value: 'set-1' } });
+      choosePermissionLevel(form, 'ADMIN');
+      submit();
+      expect(await submittedPermissionSetId()).toBeUndefined();
+    });
   });
 });

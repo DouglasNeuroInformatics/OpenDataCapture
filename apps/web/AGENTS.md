@@ -183,8 +183,10 @@ add UI that an e2e test will drive.
 
 ## Tables
 
-Every table here is the libui `DataTable`. Two of its behaviours are load-bearing and neither is
-visible from the call site.
+A table listing records is the libui `DataTable`. libui's plain `Table` is for a small table the
+component lays out itself, such as the rows of inputs in `UserPermissionsEditor` and
+`PermissionSetRulesEditor`. Two of `DataTable`'s behaviours are load-bearing and neither is visible
+from the call site.
 
 **A cell wraps unless it truncates itself.** `DataTableBody` wraps cell content in a truncating span
 only when that content is _not_ a React element, and Tanstack's default cell renderer is a function,

@@ -1,7 +1,7 @@
 import { z } from 'zod/v4';
 
 import { $ActiveLanguages } from '../core/core.js';
-import { $CreateUserData } from '../user/user.js';
+import { $BaseUserData } from '../user/user.js';
 
 import type { Language } from '../core/core.js';
 
@@ -229,7 +229,7 @@ const $UpdateSetupStateData = z.object({
   tableColorMode: $TableColorMode.optional()
 });
 
-const $CreateAdminData = $CreateUserData.omit({
+const $CreateAdminData = $BaseUserData.omit({
   basePermissionLevel: true,
   groupIds: true
 });

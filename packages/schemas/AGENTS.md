@@ -64,8 +64,14 @@ body is parsed against it; `AuthPayload` and `TokenPayload` are plain types beca
 parses them. Do not add a schema for a shape that only crosses a typed boundary.
 
 Variants are composed with `.extend()` / `.pick()` / `.omit()` / `.partial()` off an existing shape,
-never rewritten — `$UpdateUserData = $CreateUserData.partial().extend({...})`. Rewriting is how the
+never rewritten — `$UpdateUserData = $BaseUserData.partial().extend({...})`. Rewriting is how the
 two drift.
+
+**Derive only from an object without a `.check`.** The vendored zod silently drops a `.check` when
+you `.extend()`, `.pick()`, `.omit()` or `.partial()` the object carrying it, and newer zod releases
+throw on some of these instead. Where a schema needs a rule relating its fields, keep the unchecked
+shape as its own schema and derive every variant from that — `$BaseUserData` is the shape
+`$CreateUserData` checks and `$UpdateUserData` makes partial.
 
 ## src/instrument
 
@@ -88,7 +94,7 @@ shape. Two constraints on anything you write there:
   publish JSON Schema for every kind × language. This is why `$InstrumentValidationSchema` is
   `z.any().refine(...)` rather than `z.custom()`, which cannot be converted.
 
-## Three security-relevant exports
+## Four security-relevant exports
 
 `$AppSubjectName` in `src/core/core.ts` is the hand-maintained list of CASL subject names. It is not
 derived from `schema.prisma` and does not mirror it. A model that needs permission checks has to be
@@ -103,6 +109,11 @@ newly scopable subject's group field is named.
 `isGrantablePermission`, in the same file, says which storable pairs a new grant may name. It is
 applied by `$UpdateUserPermissionsData` and not by `$UserPermission`, which must still parse grants
 stored before it — `.agents/docs/architecture/auth-and-permissions.md` says why.
+
+`isPermissionSetGrantable`, in `src/permission-set/permission-set.ts`, is the same rule for a
+permission set, and also refuses `manage all`: one edit to a set would otherwise make every holder an
+administrator. `$CreatePermissionSetData` and `$UpdatePermissionSetData` apply it, and
+`$PermissionSetRule`, the read model, does not, for the same reason.
 
 ## Tests
 

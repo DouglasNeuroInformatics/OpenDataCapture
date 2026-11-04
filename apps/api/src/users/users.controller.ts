@@ -104,10 +104,10 @@ export class UsersController {
   @RouteAccess(ADMIN_ONLY)
   updatePermissions(
     @Param('id') id: string,
-    @Body() { permissions }: $UpdateUserPermissionsData,
+    @Body() data: $UpdateUserPermissionsData,
     @CurrentUser('ability') ability: AppAbility
   ) {
-    return this.usersService.updatePermissions(id, permissions, { ability });
+    return this.usersService.updatePermissions(id, data, { ability });
   }
 
   @ApiOperation({ summary: 'Self Update User' })

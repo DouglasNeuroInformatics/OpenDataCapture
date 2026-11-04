@@ -9,8 +9,12 @@ import {
   Logger,
   NotFoundException
 } from '@nestjs/common';
-import type { Permissions } from '@opendatacapture/schemas/core';
-import { $CreateUserData, $SelfUpdateUserData, $UpdateUserData } from '@opendatacapture/schemas/user';
+import {
+  $CreateUserData,
+  $SelfUpdateUserData,
+  $UpdateUserData,
+  $UpdateUserPermissionsData
+} from '@opendatacapture/schemas/user';
 import type { PasswordErrorCode } from '@opendatacapture/schemas/user';
 import { pwnedPassword } from 'hibp';
 
@@ -18,6 +22,7 @@ import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
+import { PermissionSetsService } from '@/permission-sets/permission-sets.service';
 
 @Injectable()
 export class UsersService {
@@ -27,7 +32,8 @@ export class UsersService {
     @InjectModel('User') private readonly userModel: Model<'User'>,
     private readonly auditLogger: AuditLogger,
     private readonly cryptoService: CryptoService,
-    private readonly groupsService: GroupsService
+    private readonly groupsService: GroupsService,
+    private readonly permissionSetsService: PermissionSetsService
   ) {}
 
   async archiveById(id: string, currentUser: RequestUser) {
@@ -72,7 +78,7 @@ export class UsersService {
     });
   }
 
-  /** Adds a new user to the database with default permissions, verifying the provided groups exist */
+  /** Adds a new user to the database with default permissions, verifying the provided groups and permission set exist */
   async create(
     {
       basePermissionLevel,
@@ -84,6 +90,7 @@ export class UsersService {
       lastName,
       mustResetPassword,
       password,
+      permissionSetId,
       phoneNumber,
       sex,
       username
@@ -99,6 +106,9 @@ export class UsersService {
     // Check that all group exist and are accessible to the user
     for (const id of groupIds) {
       await this.groupsService.findById(id, options);
+    }
+    if (permissionSetId !== undefined) {
+      await this.permissionSetsService.findById(permissionSetId, options);
     }
 
     const hashedPassword = await this.cryptoService.hashPassword(password);
@@ -117,6 +127,7 @@ export class UsersService {
         hashedPassword,
         lastName,
         mustResetPassword,
+        permissionSet: permissionSetId === undefined ? undefined : { connect: { id: permissionSetId } },
         phoneNumber,
         sex,
         username
@@ -156,7 +167,7 @@ export class UsersService {
     { ability, includeHashedPassword }: EntityOperationOptions & { includeHashedPassword?: boolean } = {}
   ) {
     const user = await this.userModel.findFirst({
-      include: { groups: true },
+      include: { groups: true, permissionSet: true },
       omit: {
         hashedPassword: !includeHashedPassword
       },
@@ -208,7 +219,10 @@ export class UsersService {
         groups: {
           set: groupIds?.map((id) => ({ id }))
         },
-        hashedPassword
+        hashedPassword,
+        // An administrator already holds every permission, so a set they kept would only inflate its
+        // holder count. Relation syntax because `groups` above is one, and Prisma will not mix the two.
+        permissionSet: data.basePermissionLevel === 'ADMIN' ? { disconnect: true } : undefined
       },
       omit: {
         hashedPassword: true
@@ -218,12 +232,28 @@ export class UsersService {
   }
 
   /**
-   * Replaces the user's additional permissions. A grant confined to a group is accepted only when the
-   * user belongs to that group, so what the web client offers and what this accepts are one rule.
+   * Replaces where the user's permissions beyond their base level come from: a permission set, or
+   * custom grants. Each write empties the other, which is what keeps a user from holding both. A
+   * custom grant confined to a group is accepted only when the user belongs to that group, so what
+   * the web client offers and what this accepts are one rule.
    */
-  async updatePermissions(id: string, permissions: Permissions, { ability }: EntityOperationOptions = {}) {
+  async updatePermissions(id: string, data: $UpdateUserPermissionsData, { ability }: EntityOperationOptions = {}) {
     const user = await this.findById(id, { ability });
-    const foreignGroupIds = permissions
+    const where = { AND: [accessibleQuery(ability, 'update', 'User')], id };
+    if (data.kind === 'permissionSet') {
+      if (user.basePermissionLevel === 'ADMIN') {
+        throw new BadRequestException('Administrators hold every permission, so they cannot hold a permission set');
+      }
+      await this.permissionSetsService.findById(data.permissionSetId, { ability });
+      return this.userModel.update({
+        data: { additionalPermissions: [], permissionSet: { connect: { id: data.permissionSetId } } },
+        omit: {
+          hashedPassword: true
+        },
+        where
+      });
+    }
+    const foreignGroupIds = data.permissions
       .map(({ groupId }) => groupId)
       .filter((groupId): groupId is string => groupId !== null && !user.groupIds.includes(groupId));
     if (foreignGroupIds.length) {
@@ -232,11 +262,11 @@ export class UsersService {
       );
     }
     return this.userModel.update({
-      data: { additionalPermissions: permissions },
+      data: { additionalPermissions: data.permissions, permissionSet: { disconnect: true } },
       omit: {
         hashedPassword: true
       },
-      where: { AND: [accessibleQuery(ability, 'update', 'User')], id }
+      where
     });
   }
 

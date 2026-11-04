@@ -39,16 +39,23 @@ const $AddPermissionFormData = z
     }
   });
 
+/** Which action and resource pairs an editor may offer: a per-user grant's rule unless told otherwise. */
+type GrantabilityPredicate = (permission: Pick<UserPermission, 'action' | 'subject'>) => boolean;
+
 /** Every action, or once a resource is chosen, only those a grant on it can use. */
-const grantableActions = (subject: AppSubjectName | undefined): AppAction[] => {
-  return $AppAction.options.filter((action) => subject === undefined || isGrantablePermission({ action, subject }));
+const grantableActions = (
+  subject: AppSubjectName | undefined,
+  isGrantable: GrantabilityPredicate = isGrantablePermission
+): AppAction[] => {
+  return $AppAction.options.filter((action) => subject === undefined || isGrantable({ action, subject }));
 };
 
 /** Every resource, or once an action is chosen, only those a grant of it can reach. */
-const grantableSubjects = (action: AppAction | undefined): AppSubjectName[] => {
-  return $AppSubjectName.options.filter(
-    (subject) => action === undefined || isGrantablePermission({ action, subject })
-  );
+const grantableSubjects = (
+  action: AppAction | undefined,
+  isGrantable: GrantabilityPredicate = isGrantablePermission
+): AppSubjectName[] => {
+  return $AppSubjectName.options.filter((subject) => action === undefined || isGrantable({ action, subject }));
 };
 
 /** The stored form of a grant: null when the resource cannot be scoped, or every group was chosen. */
@@ -82,8 +89,8 @@ const withPermissionDrafts = (permissions: Permissions, drafts: PermissionDraft[
   }, permissions);
 };
 
-const withoutPermission = (permissions: Permissions, index: number): Permissions => {
-  return permissions.filter((_, i) => i !== index);
+const withoutIndex = <TItem>(items: TItem[], index: number): TItem[] => {
+  return items.filter((_, itemIndex) => itemIndex !== index);
 };
 
 export {
@@ -93,7 +100,7 @@ export {
   grantableSubjects,
   isIncompleteDraft,
   toUserPermission,
-  withoutPermission,
+  withoutIndex,
   withPermission,
   withPermissionDrafts
 };

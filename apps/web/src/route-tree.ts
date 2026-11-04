@@ -36,6 +36,9 @@ import { Route as AppAdminBrandingLoginPageRouteImport } from './routes/_app/adm
 import { Route as AppAdminGroupsIndexRouteImport } from './routes/_app/admin/groups/index'
 import { Route as AppAdminGroupsCreateRouteImport } from './routes/_app/admin/groups/create'
 import { Route as AppAdminInstrumentReposIndexRouteImport } from './routes/_app/admin/instrument-repos/index'
+import { Route as AppAdminPermissionSetsIndexRouteImport } from './routes/_app/admin/permission-sets/index'
+import { Route as AppAdminPermissionSetsPermissionSetIdRouteImport } from './routes/_app/admin/permission-sets/$permissionSetId'
+import { Route as AppAdminPermissionSetsCreateRouteImport } from './routes/_app/admin/permission-sets/create'
 import { Route as AppAdminUsersIndexRouteImport } from './routes/_app/admin/users/index'
 import { Route as AppAdminUsersUserIdRouteImport } from './routes/_app/admin/users/$userId'
 import { Route as AppAdminUsersCreateRouteImport } from './routes/_app/admin/users/create'
@@ -191,6 +194,24 @@ const AppAdminInstrumentReposIndexRoute =
     path: '/admin/instrument-repos/',
     getParentRoute: () => AppRouteRoute,
   } as any)
+const AppAdminPermissionSetsIndexRoute =
+  AppAdminPermissionSetsIndexRouteImport.update({
+    id: '/admin/permission-sets/',
+    path: '/admin/permission-sets/',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppAdminPermissionSetsPermissionSetIdRoute =
+  AppAdminPermissionSetsPermissionSetIdRouteImport.update({
+    id: '/admin/permission-sets/$permissionSetId',
+    path: '/admin/permission-sets/$permissionSetId',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppAdminPermissionSetsCreateRoute =
+  AppAdminPermissionSetsCreateRouteImport.update({
+    id: '/admin/permission-sets/create',
+    path: '/admin/permission-sets/create',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
 const AppAdminUsersIndexRoute = AppAdminUsersIndexRouteImport.update({
   id: '/admin/users/',
   path: '/admin/users/',
@@ -303,12 +324,15 @@ export interface FileRoutesByFullPath {
   '/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
+  '/admin/permission-sets/$permissionSetId': typeof AppAdminPermissionSetsPermissionSetIdRoute
+  '/admin/permission-sets/create': typeof AppAdminPermissionSetsCreateRoute
   '/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
   '/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
   '/admin/branding/': typeof AppAdminBrandingIndexRoute
   '/admin/groups/': typeof AppAdminGroupsIndexRoute
   '/admin/instrument-repos/': typeof AppAdminInstrumentReposIndexRoute
+  '/admin/permission-sets/': typeof AppAdminPermissionSetsIndexRoute
   '/admin/users/': typeof AppAdminUsersIndexRoute
   '/datahub/instruments/': typeof AppDatahubInstrumentsIndexRoute
   '/datahub/subjects/': typeof AppDatahubSubjectsIndexRoute
@@ -345,12 +369,15 @@ export interface FileRoutesByTo {
   '/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/admin/groups/create': typeof AppAdminGroupsCreateRoute
+  '/admin/permission-sets/$permissionSetId': typeof AppAdminPermissionSetsPermissionSetIdRoute
+  '/admin/permission-sets/create': typeof AppAdminPermissionSetsCreateRoute
   '/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/admin/users/create': typeof AppAdminUsersCreateRoute
   '/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
   '/admin/branding': typeof AppAdminBrandingIndexRoute
   '/admin/groups': typeof AppAdminGroupsIndexRoute
   '/admin/instrument-repos': typeof AppAdminInstrumentReposIndexRoute
+  '/admin/permission-sets': typeof AppAdminPermissionSetsIndexRoute
   '/admin/users': typeof AppAdminUsersIndexRoute
   '/datahub/instruments': typeof AppDatahubInstrumentsIndexRoute
   '/datahub/subjects': typeof AppDatahubSubjectsIndexRoute
@@ -390,12 +417,15 @@ export interface FileRoutesById {
   '/_app/admin/audit/logs': typeof AppAdminAuditLogsRoute
   '/_app/admin/branding/login-page': typeof AppAdminBrandingLoginPageRoute
   '/_app/admin/groups/create': typeof AppAdminGroupsCreateRoute
+  '/_app/admin/permission-sets/$permissionSetId': typeof AppAdminPermissionSetsPermissionSetIdRoute
+  '/_app/admin/permission-sets/create': typeof AppAdminPermissionSetsCreateRoute
   '/_app/admin/users/$userId': typeof AppAdminUsersUserIdRoute
   '/_app/admin/users/create': typeof AppAdminUsersCreateRoute
   '/_app/instruments/render/$id': typeof AppInstrumentsRenderIdRoute
   '/_app/admin/branding/': typeof AppAdminBrandingIndexRoute
   '/_app/admin/groups/': typeof AppAdminGroupsIndexRoute
   '/_app/admin/instrument-repos/': typeof AppAdminInstrumentReposIndexRoute
+  '/_app/admin/permission-sets/': typeof AppAdminPermissionSetsIndexRoute
   '/_app/admin/users/': typeof AppAdminUsersIndexRoute
   '/_app/datahub/instruments/': typeof AppDatahubInstrumentsIndexRoute
   '/_app/datahub/subjects/': typeof AppDatahubSubjectsIndexRoute
@@ -435,12 +465,15 @@ export interface FileRouteTypes {
     | '/admin/audit/logs'
     | '/admin/branding/login-page'
     | '/admin/groups/create'
+    | '/admin/permission-sets/$permissionSetId'
+    | '/admin/permission-sets/create'
     | '/admin/users/$userId'
     | '/admin/users/create'
     | '/instruments/render/$id'
     | '/admin/branding/'
     | '/admin/groups/'
     | '/admin/instrument-repos/'
+    | '/admin/permission-sets/'
     | '/admin/users/'
     | '/datahub/instruments/'
     | '/datahub/subjects/'
@@ -477,12 +510,15 @@ export interface FileRouteTypes {
     | '/admin/audit/logs'
     | '/admin/branding/login-page'
     | '/admin/groups/create'
+    | '/admin/permission-sets/$permissionSetId'
+    | '/admin/permission-sets/create'
     | '/admin/users/$userId'
     | '/admin/users/create'
     | '/instruments/render/$id'
     | '/admin/branding'
     | '/admin/groups'
     | '/admin/instrument-repos'
+    | '/admin/permission-sets'
     | '/admin/users'
     | '/datahub/instruments'
     | '/datahub/subjects'
@@ -521,12 +557,15 @@ export interface FileRouteTypes {
     | '/_app/admin/audit/logs'
     | '/_app/admin/branding/login-page'
     | '/_app/admin/groups/create'
+    | '/_app/admin/permission-sets/$permissionSetId'
+    | '/_app/admin/permission-sets/create'
     | '/_app/admin/users/$userId'
     | '/_app/admin/users/create'
     | '/_app/instruments/render/$id'
     | '/_app/admin/branding/'
     | '/_app/admin/groups/'
     | '/_app/admin/instrument-repos/'
+    | '/_app/admin/permission-sets/'
     | '/_app/admin/users/'
     | '/_app/datahub/instruments/'
     | '/_app/datahub/subjects/'
@@ -737,6 +776,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminInstrumentReposIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/admin/permission-sets/': {
+      id: '/_app/admin/permission-sets/'
+      path: '/admin/permission-sets'
+      fullPath: '/admin/permission-sets/'
+      preLoaderRoute: typeof AppAdminPermissionSetsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/admin/permission-sets/$permissionSetId': {
+      id: '/_app/admin/permission-sets/$permissionSetId'
+      path: '/admin/permission-sets/$permissionSetId'
+      fullPath: '/admin/permission-sets/$permissionSetId'
+      preLoaderRoute: typeof AppAdminPermissionSetsPermissionSetIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/admin/permission-sets/create': {
+      id: '/_app/admin/permission-sets/create'
+      path: '/admin/permission-sets/create'
+      fullPath: '/admin/permission-sets/create'
+      preLoaderRoute: typeof AppAdminPermissionSetsCreateRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/admin/users/': {
       id: '/_app/admin/users/'
       path: '/admin/users'
@@ -913,12 +973,15 @@ interface AppRouteRouteChildren {
   AppAdminAuditLogsRoute: typeof AppAdminAuditLogsRoute
   AppAdminBrandingLoginPageRoute: typeof AppAdminBrandingLoginPageRoute
   AppAdminGroupsCreateRoute: typeof AppAdminGroupsCreateRoute
+  AppAdminPermissionSetsPermissionSetIdRoute: typeof AppAdminPermissionSetsPermissionSetIdRoute
+  AppAdminPermissionSetsCreateRoute: typeof AppAdminPermissionSetsCreateRoute
   AppAdminUsersUserIdRoute: typeof AppAdminUsersUserIdRoute
   AppAdminUsersCreateRoute: typeof AppAdminUsersCreateRoute
   AppInstrumentsRenderIdRoute: typeof AppInstrumentsRenderIdRoute
   AppAdminBrandingIndexRoute: typeof AppAdminBrandingIndexRoute
   AppAdminGroupsIndexRoute: typeof AppAdminGroupsIndexRoute
   AppAdminInstrumentReposIndexRoute: typeof AppAdminInstrumentReposIndexRoute
+  AppAdminPermissionSetsIndexRoute: typeof AppAdminPermissionSetsIndexRoute
   AppAdminUsersIndexRoute: typeof AppAdminUsersIndexRoute
   AppDatahubInstrumentsIndexRoute: typeof AppDatahubInstrumentsIndexRoute
   AppDatahubSubjectsIndexRoute: typeof AppDatahubSubjectsIndexRoute
@@ -950,12 +1013,16 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAdminAuditLogsRoute: AppAdminAuditLogsRoute,
   AppAdminBrandingLoginPageRoute: AppAdminBrandingLoginPageRoute,
   AppAdminGroupsCreateRoute: AppAdminGroupsCreateRoute,
+  AppAdminPermissionSetsPermissionSetIdRoute:
+    AppAdminPermissionSetsPermissionSetIdRoute,
+  AppAdminPermissionSetsCreateRoute: AppAdminPermissionSetsCreateRoute,
   AppAdminUsersUserIdRoute: AppAdminUsersUserIdRoute,
   AppAdminUsersCreateRoute: AppAdminUsersCreateRoute,
   AppInstrumentsRenderIdRoute: AppInstrumentsRenderIdRoute,
   AppAdminBrandingIndexRoute: AppAdminBrandingIndexRoute,
   AppAdminGroupsIndexRoute: AppAdminGroupsIndexRoute,
   AppAdminInstrumentReposIndexRoute: AppAdminInstrumentReposIndexRoute,
+  AppAdminPermissionSetsIndexRoute: AppAdminPermissionSetsIndexRoute,
   AppAdminUsersIndexRoute: AppAdminUsersIndexRoute,
   AppDatahubInstrumentsIndexRoute: AppDatahubInstrumentsIndexRoute,
   AppDatahubSubjectsIndexRoute: AppDatahubSubjectsIndexRoute,

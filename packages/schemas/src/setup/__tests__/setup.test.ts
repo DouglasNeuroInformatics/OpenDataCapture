@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { $BrandingConfig, $UpdateSetupStateData } from '../setup.js';
+import { $BrandingConfig, $InitAppOptions, $UpdateSetupStateData } from '../setup.js';
 
 describe('$BrandingConfig', () => {
   describe('customLogoSrc', () => {
@@ -105,5 +105,16 @@ describe('$BrandingConfig', () => {
     it('should reject a sectionsOrder containing a duplicate section', () => {
       expect($BrandingConfig.safeParse({ sectionsOrder: ['logo', 'logo'] }).success).toBe(false);
     });
+  });
+});
+
+describe('$InitAppOptions', () => {
+  it('should drop a permission set sent for the first administrator, who holds every permission already', () => {
+    const result = $InitAppOptions.safeParse({
+      admin: { firstName: 'Ada', lastName: 'Admin', password: 'password', permissionSetId: 'set-1', username: 'admin' },
+      enableExperimentalFeatures: false,
+      initDemo: false
+    });
+    expect(result.data?.admin).not.toHaveProperty('permissionSetId');
   });
 });

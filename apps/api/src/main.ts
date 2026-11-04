@@ -11,6 +11,7 @@ import { InstrumentRecordsModule } from './instrument-records/instrument-records
 import { InstrumentReposModule } from './instrument-repos/instrument-repos.module';
 import { InstrumentsModule } from './instruments/instruments.module';
 import { MailModule } from './mail/mail.module';
+import { PermissionSetsModule } from './permission-sets/permission-sets.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { SetupModule } from './setup/setup.module';
 import { StorageModule } from './storage/storage.module';
@@ -47,6 +48,7 @@ export default AppFactory.create({
     InstrumentReposModule,
     InstrumentsModule,
     MailModule,
+    PermissionSetsModule,
     PrismaModule.forRootAsync({
       useClass: PrismaModuleOptionsFactory
     }),

@@ -79,16 +79,19 @@ describe('InstrumentsController', () => {
   // and delete their own group's series, which the guard would not tell apart from any other.
   describe.each(['findSeriesOverview', 'updateSeriesArchive'] as const)('route access for %s', (handlerName) => {
     const abilityFor = (basePermissionLevel: BasePermissionLevel) => {
-      return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
-        basePermissionLevel,
-        firstName: 'Test',
-        groups: [{ id: 'group-1' }] as Group[],
-        id: 'user-1',
-        kind: 'login',
-        lastName: 'User',
-        mustResetPassword: false,
-        username: 'test-user'
-      });
+      return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload(
+        {
+          basePermissionLevel,
+          firstName: 'Test',
+          groups: [{ id: 'group-1' }] as Group[],
+          id: 'user-1',
+          kind: 'login',
+          lastName: 'User',
+          mustResetPassword: false,
+          username: 'test-user'
+        },
+        []
+      );
     };
     const { action, subject } = new Reflector().get<ProtectedRoutePermissionSet>(
       ROUTE_ACCESS_METADATA_KEY,

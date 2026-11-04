@@ -201,6 +201,16 @@ describe('useNavItems', () => {
     expect(navUrls()).toContain('/upload');
   });
 
+  it('should offer the permission sets beside the users to an administrator', () => {
+    const urls = navUrls();
+    expect(urls.indexOf('/admin/permission-sets')).toBe(urls.indexOf('/admin/users') + 1);
+  });
+
+  it('should hide the permission sets from anyone short of an administrator', () => {
+    mocks.can.mockImplementation((action, subject) => !(action === 'manage' && subject === 'all'));
+    expect(navUrls()).not.toContain('/admin/permission-sets');
+  });
+
   it('should offer no navigation to a user without any permissions', () => {
     mocks.can.mockReturnValue(false);
     expect(renderHook(() => useNavItems()).result.current).toEqual([]);

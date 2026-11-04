@@ -60,6 +60,12 @@ describe('useCreateUserMutation', () => {
     });
   });
 
+  it('posts the permission set chosen for the user along with the rest of the account', async () => {
+    const { result } = renderCreateMutation();
+    await result.current.mutateAsync({ data: { ...createUserData, permissionSetId: 'set-1' } });
+    expect(mockAxios.post.mock.lastCall?.[1]).toMatchObject({ permissionSetId: 'set-1' });
+  });
+
   it('parses the created user together with the welcome-email outcome', async () => {
     const { result } = renderCreateMutation();
     const response = await result.current.mutateAsync({ data: createUserData });
