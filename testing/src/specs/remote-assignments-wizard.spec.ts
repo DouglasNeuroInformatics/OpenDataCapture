@@ -158,6 +158,33 @@ test.describe('remote assignments wizard refusals', () => {
 
   // A stray row used to stop the whole batch, and only three steps later, as an identifier the user
   // never typed: it is named here by its row, and can be left out without redoing the file.
+  test('should hold back review until the redirect URL is https, then show it for review', async ({
+    api,
+    isolatedGroupManager,
+    page
+  }) => {
+    const group = await isolatedGroupManager();
+    await api.createSubject(group.id);
+    await page.goto('/group/remote-assignments?mode=create');
+    const wizardPage = new RemoteAssignmentsPage(page);
+    await expect(wizardPage.wizard).toBeVisible();
+
+    await wizardPage.selectAllSubjects.click();
+    await wizardPage.useSelectedSubjects.click();
+    await expect(wizardPage.timepointsStep).toBeVisible();
+    await wizardPage.addFirstTimepoint();
+
+    await wizardPage.redirectUrlInput.fill('http://example.com/done');
+    await wizardPage.redirectUrlInput.blur();
+    await expect(wizardPage.redirectUrlError).toHaveText('Must start with "https://"');
+    await expect(wizardPage.confirmTimepoints).toBeDisabled();
+
+    await wizardPage.redirectUrlInput.fill('https://example.com/done');
+    await expect(wizardPage.redirectUrlError).toBeHidden();
+    await wizardPage.confirmTimepoints.click();
+    await expect(wizardPage.reviewRedirectUrl).toContainText('https://example.com/done');
+  });
+
   test('should warn about a row this group cannot place and continue once it is left out', async ({
     api,
     isolatedGroupManager,

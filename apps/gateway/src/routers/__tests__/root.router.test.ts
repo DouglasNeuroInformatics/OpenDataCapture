@@ -24,11 +24,17 @@ const target = { bundle: 'export default {}', id: 'instrument-1', kind: 'FORM' }
 let baseUrl: string;
 let server: Server;
 
-function storeAssignment(stored: { completedAt?: Date; encryptedData?: null | string; targetStringified?: string }) {
+function storeAssignment(stored: {
+  completedAt?: Date;
+  encryptedData?: null | string;
+  redirectUrl?: null | string;
+  targetStringified?: string;
+}) {
   prisma.remoteAssignmentModel.findFirst.mockResolvedValueOnce({
     completedAt: null,
     encryptedData: null,
     id: 'assignment-1',
+    redirectUrl: null,
     targetStringified: JSON.stringify(target),
     ...stored
   });
@@ -102,6 +108,13 @@ describe('rootRouter', () => {
         language: 'fr',
         target,
         token: generateToken('assignment-1')
+      });
+    });
+
+    it('should hand the page the redirect URL the assignment was created with, so it can send the subject on', async () => {
+      storeAssignment({ redirectUrl: 'https://example.com/done' });
+      expect(await getRootProps('/assignments/assignment-1')).toMatchObject({
+        redirectUrl: 'https://example.com/done'
       });
     });
 

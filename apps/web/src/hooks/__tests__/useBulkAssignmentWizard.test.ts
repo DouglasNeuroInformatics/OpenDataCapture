@@ -100,6 +100,13 @@ describe('useBulkAssignmentWizard', () => {
     expect(result.current.parsed).toBeNull();
   });
 
+  it('should clear the redirect URL when starting a new batch', () => {
+    const { result } = renderWizard();
+    act(() => result.current.setRedirectUrl('https://example.com/done'));
+    act(() => result.current.startOver());
+    expect(result.current.redirectUrl).toBe('');
+  });
+
   it('should keep the source tab while stepping back, so Back from the mapping step returns to the upload or paste', () => {
     const { result } = renderWizard();
     expect(result.current.sourceMode).toBe('SELECT');
@@ -246,6 +253,27 @@ describe('useBulkAssignmentWizard', () => {
     expect(result.current.transportError).toBe(true);
     expect(result.current.failure).toBeNull();
     expect(result.current.step).not.toBe('DONE');
+  });
+
+  it('should send the redirect URL with the batch, for both preflight and create', () => {
+    mocks.createMutate.mockImplementation(() => undefined);
+    const { result } = renderWizard();
+    act(() => result.current.selectSubjects(['alice'], {}));
+    act(() => result.current.setTimepoints([TIMEPOINT]));
+    act(() => result.current.setRedirectUrl('https://example.com/done'));
+    act(() => result.current.confirmTimepoints());
+    act(() => result.current.submit({ allowDuplicates: false, skipUnavailable: false }));
+    expect(mocks.preflightMutate.mock.lastCall?.[0]).toMatchObject({ redirectUrl: 'https://example.com/done' });
+    expect(mocks.createMutate.mock.lastCall?.[0]).toMatchObject({ redirectUrl: 'https://example.com/done' });
+  });
+
+  it('should send no redirect URL when the field is blank', () => {
+    mocks.createMutate.mockImplementation(() => undefined);
+    const { result } = renderWizard();
+    act(() => result.current.selectSubjects(['alice'], {}));
+    act(() => result.current.setTimepoints([TIMEPOINT]));
+    act(() => result.current.submit({ allowDuplicates: false, skipUnavailable: false }));
+    expect(mocks.createMutate.mock.lastCall?.[0].redirectUrl).toBeUndefined();
   });
 
   it('should expire each timepoint at the end of its chosen day, not at midnight before it', () => {

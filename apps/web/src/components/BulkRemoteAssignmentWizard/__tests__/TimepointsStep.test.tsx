@@ -28,12 +28,14 @@ const renderStep = (props: Partial<React.ComponentProps<typeof TimepointsStep>> 
     onBack: vi.fn(),
     onChange: vi.fn(),
     onConfirm: vi.fn(),
+    onRedirectUrlChange: vi.fn(),
     onStepChange: vi.fn()
   };
   const result = render(
     <TimepointsStep
       defaultExpiresAt={DEFAULT_EXPIRY}
       instruments={instruments}
+      redirectUrl=""
       subjectCount={3}
       timepoints={[]}
       {...handlers}
@@ -149,11 +151,13 @@ describe('TimepointsStep', () => {
       <TimepointsStep
         defaultExpiresAt={DEFAULT_EXPIRY}
         instruments={[]}
+        redirectUrl=""
         subjectCount={3}
         timepoints={[]}
         onBack={vi.fn()}
         onChange={onChange}
         onConfirm={vi.fn()}
+        onRedirectUrlChange={vi.fn()}
         onStepChange={vi.fn()}
       />
     );
@@ -189,5 +193,34 @@ describe('TimepointsStep', () => {
     const { onStepChange } = renderStep();
     fireEvent.click(screen.getByTestId('bulk-breadcrumb-SUBJECTS'));
     expect(onStepChange).toHaveBeenCalledWith('SOURCE');
+  });
+
+  it('should report each edit of the redirect URL to the wizard, which holds it for the whole batch', () => {
+    const { onRedirectUrlChange } = renderStep();
+    fireEvent.change(screen.getByTestId('bulk-redirect-url-input'), { target: { value: 'https://example.com' } });
+    expect(onRedirectUrlChange).toHaveBeenCalledWith('https://example.com');
+  });
+
+  it('should hold back review while the redirect URL is not https', () => {
+    renderStep({ redirectUrl: 'http://example.com', timepoints: [happinessTimepoint] });
+    expect(reviewButton().disabled).toBe(true);
+  });
+
+  it('should allow review with an https redirect URL', () => {
+    renderStep({ redirectUrl: 'https://example.com', timepoints: [happinessTimepoint] });
+    expect(reviewButton().disabled).toBe(false);
+  });
+
+  it('should explain what is wrong with the redirect URL once the user leaves the field, not while they type', () => {
+    renderStep({ redirectUrl: 'http://example.com' });
+    expect(screen.queryByTestId('bulk-redirect-url-error')).toBeNull();
+    fireEvent.blur(screen.getByTestId('bulk-redirect-url-input'));
+    expect(screen.getByTestId('bulk-redirect-url-error').textContent).toContain('https://');
+  });
+
+  it('should not call a blank redirect URL invalid, since the batch need not redirect', () => {
+    renderStep();
+    fireEvent.blur(screen.getByTestId('bulk-redirect-url-input'));
+    expect(screen.queryByTestId('bulk-redirect-url-error')).toBeNull();
   });
 });

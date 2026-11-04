@@ -21,6 +21,7 @@ model RemoteAssignmentModel {
   rawPublicKey      Bytes
   symmetricKey      String?
   encryptedData     String?
+  redirectUrl       String?
   targetStringified String
   status            String
   subjectId         String

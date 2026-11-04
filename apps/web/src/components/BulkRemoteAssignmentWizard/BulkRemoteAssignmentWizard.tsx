@@ -171,11 +171,13 @@ export const BulkRemoteAssignmentWizard = ({
           defaultExpiresAt={defaultExpiresAt}
           instruments={instruments}
           isLoading={wizard.isPreflighting}
+          redirectUrl={wizard.redirectUrl}
           subjectCount={wizard.subjectIds.length}
           timepoints={wizard.timepoints}
           onBack={() => wizard.goTo('SOURCE')}
           onChange={wizard.setTimepoints}
           onConfirm={wizard.confirmTimepoints}
+          onRedirectUrlChange={wizard.setRedirectUrl}
           onStepChange={wizard.goTo}
         />
       )}
@@ -185,6 +187,7 @@ export const BulkRemoteAssignmentWizard = ({
           describeSubject={wizard.describeSubject}
           failure={wizard.failure}
           isSubmitting={wizard.isSubmitting}
+          redirectUrl={wizard.redirectUrl}
           subjectCount={wizard.subjectIds.length}
           timepoints={wizard.timepoints}
           transportError={wizard.transportError}

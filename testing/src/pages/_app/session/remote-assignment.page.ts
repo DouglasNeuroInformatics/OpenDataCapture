@@ -9,13 +9,19 @@ export class RemoteAssignmentPage extends AppPage {
   readonly instrumentShowcase: Locator;
   readonly pageHeader: Locator;
   readonly qrCode: Locator;
+  /** The dialog's optional field for where the subject is sent once they finish. */
+  readonly redirectUrlInput: Locator;
   readonly urlInput: Locator;
+  /** The message libui shows under a field that failed validation. */
+  readonly validationError: Locator;
 
   constructor(page: Page) {
     super(page);
     this.pageHeader = page.getByTestId('page-header');
     this.instrumentShowcase = page.getByTestId('instrument-showcase');
     this.createDialog = page.getByRole('dialog');
+    this.redirectUrlInput = this.createDialog.getByLabel('Redirect URL (Optional)');
+    this.validationError = this.createDialog.getByTestId('error-message-text');
     this.urlInput = page.locator('input[readonly]');
     // The copy-to-clipboard button carries no accessible name or testid; it is the only button
     // rendered immediately next to the readonly URL input.

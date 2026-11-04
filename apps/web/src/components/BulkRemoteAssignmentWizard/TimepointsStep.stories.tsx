@@ -21,7 +21,9 @@ export default {
     onBack: noop,
     onChange: noop,
     onConfirm: noop,
+    onRedirectUrlChange: noop,
     onStepChange: noop,
+    redirectUrl: '',
     subjectCount: 3,
     timepoints: []
   },

@@ -134,6 +134,30 @@ describe('apiRouter', () => {
       expect(data).toMatchObject({ id: 'assignment-1', rawPublicKey: Buffer.from([1, 2, 3]) });
       expect(JSON.parse(data.targetStringified)).toEqual(instrumentContainer);
     });
+
+    it('should store the redirect URL, so the page served for the assignment can send the subject on', async () => {
+      const { instrumentId: _instrumentId, ...remoteAssignment } = assignment;
+      const response = await request('POST', '/assignments', {
+        ...remoteAssignment,
+        instrumentContainer,
+        redirectUrl: 'https://example.com/done'
+      });
+      expect(response.status).toBe(201);
+      expect(prisma.remoteAssignmentModel.create.mock.lastCall![0].data).toMatchObject({
+        redirectUrl: 'https://example.com/done'
+      });
+    });
+
+    it('should refuse a redirect URL that is not https, whatever sent it', async () => {
+      const { instrumentId: _instrumentId, ...remoteAssignment } = assignment;
+      const response = await request('POST', '/assignments', {
+        ...remoteAssignment,
+        instrumentContainer,
+        redirectUrl: 'javascript:alert(1)'
+      });
+      expect(response.status).toBe(400);
+      expect(prisma.remoteAssignmentModel.create).not.toHaveBeenCalled();
+    });
   });
 
   describe('POST /assignments/bulk', () => {

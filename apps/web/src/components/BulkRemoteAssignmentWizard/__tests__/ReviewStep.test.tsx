@@ -36,6 +36,7 @@ const renderReviewStep = (props: Partial<React.ComponentProps<typeof ReviewStep>
       describeSubject={(subjectId) => `described ${subjectId}`}
       failure={null}
       isSubmitting={false}
+      redirectUrl=""
       subjectCount={3}
       timepoints={timepoints}
       transportError={false}
@@ -174,5 +175,15 @@ describe('ReviewStep', () => {
     const { onStepChange } = renderReviewStep();
     fireEvent.click(screen.getByTestId('bulk-breadcrumb-SUBJECTS'));
     expect(onStepChange).toHaveBeenCalledWith('SOURCE');
+  });
+
+  it('should show where the batch sends its subjects once they finish', () => {
+    renderReviewStep({ redirectUrl: 'https://example.com/done' });
+    expect(screen.getByTestId('bulk-review-redirect-url').textContent).toContain('https://example.com/done');
+  });
+
+  it('should say nothing about a redirect when the batch has none', () => {
+    renderReviewStep();
+    expect(screen.queryByTestId('bulk-review-redirect-url')).toBeNull();
   });
 });

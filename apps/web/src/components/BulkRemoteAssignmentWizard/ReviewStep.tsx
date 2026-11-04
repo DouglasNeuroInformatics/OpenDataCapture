@@ -21,6 +21,8 @@ type ReviewStepProps = {
   onBack: () => void;
   onStepChange: (step: WizardStep) => void;
   onSubmit: (options: { allowDuplicates: boolean; skipUnavailable: boolean }) => void;
+  /** Applied to every assignment in the batch; blank for none. */
+  redirectUrl: string;
   subjectCount: number;
   timepoints: DraftTimepoint[];
   transportError: boolean;
@@ -75,6 +77,7 @@ export const ReviewStep = ({
   onBack,
   onStepChange,
   onSubmit,
+  redirectUrl,
   subjectCount,
   timepoints,
   transportError
@@ -130,6 +133,19 @@ export const ReviewStep = ({
     >
       <div className="flex flex-col gap-4" data-testid="bulk-review-step">
         <TimepointTable timepoints={timepoints} />
+
+        {redirectUrl && (
+          <p className="text-muted-foreground text-sm break-all" data-testid="bulk-review-redirect-url">
+            {t(
+              {
+                en: 'Once they finish, subjects are sent to {}',
+                es: 'Al terminar, los sujetos se envían a {}',
+                fr: 'Une fois terminé, les sujets sont redirigés vers {}'
+              },
+              { args: [redirectUrl] }
+            )}
+          </p>
+        )}
 
         <ErrorList errors={messages} />
 

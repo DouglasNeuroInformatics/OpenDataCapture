@@ -18,6 +18,7 @@ export default {
     onBack: noop,
     onStepChange: noop,
     onSubmit: noop,
+    redirectUrl: '',
     subjectCount: 3,
     timepoints: [
       { expiresAt: inThirtyDays, instrumentId: 'instrument-1', instrumentTitle: 'Happiness Questionnaire' },

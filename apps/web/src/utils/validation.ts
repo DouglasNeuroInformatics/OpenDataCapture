@@ -1,5 +1,6 @@
 import type { ZodErrorLike } from '@douglasneuroinformatics/libjs';
 import type { TranslateFunction, TranslationKey } from '@douglasneuroinformatics/libui/i18n';
+import { $AssignmentRedirectUrl } from '@opendatacapture/schemas/assignment';
 import { findPhoneNumberError, MIN_PHONE_DIGITS } from '@opendatacapture/schemas/user';
 import type { BasePermissionLevel, PhoneNumberErrorCode } from '@opendatacapture/schemas/user';
 import { z } from 'zod/v4';
@@ -82,6 +83,18 @@ function $PhoneNumber(t: TranslateFunction<TranslationKey>, storedValue?: null |
 }
 
 /**
+ * Why `value` cannot be where an assignment sends its subject once they finish, or null if it can.
+ * The message is the shared schema's own, which the app's zod error map localizes as it parses.
+ */
+function findRedirectUrlError(value: string) {
+  const result = $AssignmentRedirectUrl.safeParse(value);
+  return result.success ? null : result.error.issues[0]!.message;
+}
+
+/** An assignment's optional redirect URL, as a form field that may be left blank. */
+const $RedirectUrl = blankOr(findRedirectUrlError);
+
+/**
  * Whether this user must belong to at least one group, shared by the create and update forms so the
  * two cannot drift apart again.
  *
@@ -113,7 +126,9 @@ export {
   $Email,
   $OptionalPassword,
   $PhoneNumber,
+  $RedirectUrl,
   clearedIfBlank,
+  findRedirectUrlError,
   omittedIfBlank,
   omittedIfUnchanged,
   requiresGroup,
