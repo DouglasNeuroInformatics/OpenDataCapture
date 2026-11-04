@@ -349,6 +349,32 @@ type AuthRule {
   groupId String?    @db.ObjectId
 }
 
+enum PermissionSetScope {
+  ALL_GROUPS
+  HOLDER_GROUPS
+}
+
+/// A rule in a permission set. Its scope is relative to the holder rather than naming a group, so one
+/// set can serve users in different groups; it is resolved against the holder's groups at sign-in.
+type PermissionSetRule {
+  action  AppAction
+  subject AppSubject
+  scope   PermissionSetScope
+}
+
+/// A named list of rules an administrator defines once and links users to. Not in `enum AppSubject`
+/// on purpose: a grant on it would let its holder edit a set they hold, and so grant themselves more.
+model PermissionSet {
+  createdAt   DateTime            @default(now()) @db.Date
+  updatedAt   DateTime            @updatedAt @db.Date
+  id          String              @id @default(auto()) @map("_id") @db.ObjectId
+  name        String              @unique
+  rules       PermissionSetRule[]
+  users       User[]
+
+  @@map("PermissionSetModel")
+}
+
 model User {
   createdAt             DateTime             @default(now()) @db.Date
   updatedAt             DateTime             @updatedAt @db.Date
@@ -373,6 +399,11 @@ model User {
   email                 String?
   disabled              Boolean?
   archivedAt            DateTime?            @db.Date
+  /// The permission set this user holds, if any. Mutually exclusive with a non-empty
+  /// `additionalPermissions`: `PUT /v1/users/:id/permissions` is the one writer of both, and always
+  /// writes them together. Optional, so users created before this field existed read back as none.
+  permissionSetId       String?              @db.ObjectId
+  permissionSet         PermissionSet?       @relation(fields: [permissionSetId], references: [id], onDelete: SetNull)
 
   @@unique([username])
   @@map("UserModel")

@@ -219,10 +219,23 @@ describe('UsersController', () => {
   });
 
   describe('updatePermissions', () => {
-    it('should forward the caller ability, so the write is scoped', async () => {
+    it('should forward custom grants with the caller ability, so the write is scoped', async () => {
       const permissions: Permissions = [{ action: 'read', groupId: 'group-1', subject: 'Subject' }];
-      await usersController.updatePermissions('user-1', { permissions }, ability);
-      expect(usersService.updatePermissions).toHaveBeenCalledWith('user-1', permissions, { ability });
+      await usersController.updatePermissions('user-1', { kind: 'custom', permissions }, ability);
+      expect(usersService.updatePermissions).toHaveBeenCalledWith(
+        'user-1',
+        { kind: 'custom', permissions },
+        { ability }
+      );
+    });
+
+    it('should forward a permission set with the caller ability, so the write is scoped', async () => {
+      await usersController.updatePermissions('user-1', { kind: 'permissionSet', permissionSetId: 'set-1' }, ability);
+      expect(usersService.updatePermissions).toHaveBeenCalledWith(
+        'user-1',
+        { kind: 'permissionSet', permissionSetId: 'set-1' },
+        { ability }
+      );
     });
   });
 
@@ -233,17 +246,20 @@ describe('UsersController', () => {
     const WRITE_HANDLERS = ['archiveById', 'create', 'unarchiveById', 'updateById', 'updatePermissions'] as const;
 
     const abilityFor = (basePermissionLevel: BasePermissionLevel, additionalPermissions: Permissions = []) => {
-      return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
-        additionalPermissions,
-        basePermissionLevel,
-        firstName: 'Test',
-        groups: [{ id: 'group-1' }] as Group[],
-        id: 'user-1',
-        kind: 'login',
-        lastName: 'User',
-        mustResetPassword: false,
-        username: 'test-user'
-      });
+      return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload(
+        {
+          additionalPermissions,
+          basePermissionLevel,
+          firstName: 'Test',
+          groups: [{ id: 'group-1' }] as Group[],
+          id: 'user-1',
+          kind: 'login',
+          lastName: 'User',
+          mustResetPassword: false,
+          username: 'test-user'
+        },
+        []
+      );
     };
 
     const declaredAccess = (handler: (typeof WRITE_HANDLERS)[number]) => {

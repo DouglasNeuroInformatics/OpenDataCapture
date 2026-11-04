@@ -60,18 +60,21 @@ describe('GroupsController', () => {
   // `create Group` declaration admitted every group manager (#1468).
   describe('route access for create', () => {
     const abilityFor = (basePermissionLevel: BasePermissionLevel) => {
-      return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload({
-        basePermissionLevel,
-        firstName: 'Test',
-        groups: [{ id: 'group-1' }] as Group[],
-        id: 'user-1',
-        kind: 'login',
-        lastName: 'User',
-        // This suite is testing basePermissionLevel-driven access, not the forced-reset ability,
-        // which would short-circuit every case below to `read User self` regardless of the role.
-        mustResetPassword: false,
-        username: 'test-user'
-      });
+      return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload(
+        {
+          basePermissionLevel,
+          firstName: 'Test',
+          groups: [{ id: 'group-1' }] as Group[],
+          id: 'user-1',
+          kind: 'login',
+          lastName: 'User',
+          // This suite is testing basePermissionLevel-driven access, not the forced-reset ability,
+          // which would short-circuit every case below to `read User self` regardless of the role.
+          mustResetPassword: false,
+          username: 'test-user'
+        },
+        []
+      );
     };
 
     // `@RouteAccess` stores its metadata on the handler itself, which is what the guard reads

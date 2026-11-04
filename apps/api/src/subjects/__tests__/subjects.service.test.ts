@@ -248,16 +248,19 @@ describe('SubjectsService', () => {
     // for the subject at all, which escapes as a 500 rather than the empty list they should see.
     it('should return an empty list for a caller who may read no records, rather than throwing', async () => {
       const abilityFactory = new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService);
-      const ability = abilityFactory.createForPayload({
-        basePermissionLevel: 'STANDARD',
-        firstName: null,
-        groups: [],
-        id: 'user-1',
-        kind: 'login',
-        lastName: null,
-        mustResetPassword: false,
-        username: 'standard-user'
-      });
+      const ability = abilityFactory.createForPayload(
+        {
+          basePermissionLevel: 'STANDARD',
+          firstName: null,
+          groups: [],
+          id: 'user-1',
+          kind: 'login',
+          lastName: null,
+          mustResetPassword: false,
+          username: 'standard-user'
+        },
+        []
+      );
       subjectModel.findMany.mockResolvedValueOnce([]);
 
       await expect(subjectsService.find({ hasRecord: true }, { ability })).resolves.toStrictEqual([]);

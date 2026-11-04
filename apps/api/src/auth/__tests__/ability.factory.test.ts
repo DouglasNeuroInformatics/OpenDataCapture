@@ -43,22 +43,25 @@ describe('AbilityFactory', () => {
       username: 'admin-user'
     };
 
-    const ability = abilityFactory.createForPayload(payload as any);
+    const ability = abilityFactory.createForPayload(payload as any, []);
 
     expect(ability.can('manage', 'all')).toBe(true);
   });
 
   it('should reduce a user owing a password reset to reading themselves, whatever their permission level', () => {
-    const ability = abilityFactory.createForPayload({
-      additionalPermissions: [{ action: 'read', groupId: null, subject: 'Subject' }],
-      basePermissionLevel: 'ADMIN',
-      firstName: 'Test',
-      groups: [{ id: 'group-1' }],
-      id: 'user-1',
-      lastName: 'User',
-      mustResetPassword: true,
-      username: 'admin-user'
-    } as any);
+    const ability = abilityFactory.createForPayload(
+      {
+        additionalPermissions: [{ action: 'read', groupId: null, subject: 'Subject' }],
+        basePermissionLevel: 'ADMIN',
+        firstName: 'Test',
+        groups: [{ id: 'group-1' }],
+        id: 'user-1',
+        lastName: 'User',
+        mustResetPassword: true,
+        username: 'admin-user'
+      } as any,
+      []
+    );
 
     // Allowed, because `updateSelfById` is gated on it and is the only way out of the reset.
     expect(ability.can('read', subject('User', { id: 'user-1' }) as any)).toBe(true);
@@ -83,7 +86,7 @@ describe('AbilityFactory', () => {
       username: 'admin-user'
     };
 
-    const ability = abilityFactory.createForPayload(payload as any);
+    const ability = abilityFactory.createForPayload(payload as any, []);
 
     expect(ability.can('manage', subject('Group', { id: 'group-1' }) as any)).toBe(true);
     expect(ability.can('manage', subject('Group', { id: 'group-2' }) as any)).toBe(false);
@@ -99,29 +102,35 @@ describe('AbilityFactory', () => {
     ['InstrumentRecord', [], { groupId: { in: [] } }],
     ['Subject', [], { groupIds: { hasSome: [] } }]
   ] as const)("should confine a group manager's %s query to the groups %j", (modelName, groupIds, condition) => {
-    const ability = abilityFactory.createForPayload({
-      additionalPermissions: undefined,
-      basePermissionLevel: 'GROUP_MANAGER',
-      firstName: 'Test',
-      groups: groupIds.map((id) => ({ id })),
-      id: 'user-1',
-      lastName: 'User',
-      username: 'manager-user'
-    } as any);
+    const ability = abilityFactory.createForPayload(
+      {
+        additionalPermissions: undefined,
+        basePermissionLevel: 'GROUP_MANAGER',
+        firstName: 'Test',
+        groups: groupIds.map((id) => ({ id })),
+        id: 'user-1',
+        lastName: 'User',
+        username: 'manager-user'
+      } as any,
+      []
+    );
 
     expect(accessibleQuery(ability, 'read', modelName)).toStrictEqual({ OR: [condition] });
   });
 
   it('should restrict series deletion to the manager group', () => {
-    const ability = abilityFactory.createForPayload({
-      additionalPermissions: undefined,
-      basePermissionLevel: 'GROUP_MANAGER',
-      firstName: 'Test',
-      groups: [{ id: 'group-1' }],
-      id: 'user-1',
-      lastName: 'User',
-      username: 'manager-user'
-    } as any);
+    const ability = abilityFactory.createForPayload(
+      {
+        additionalPermissions: undefined,
+        basePermissionLevel: 'GROUP_MANAGER',
+        firstName: 'Test',
+        groups: [{ id: 'group-1' }],
+        id: 'user-1',
+        lastName: 'User',
+        username: 'manager-user'
+      } as any,
+      []
+    );
 
     expect(ability.can('delete', subject('Instrument', { seriesGroupId: 'group-1' }) as any)).toBe(true);
     expect(ability.can('delete', subject('Instrument', { seriesGroupId: 'group-2' }) as any)).toBe(false);
@@ -141,7 +150,7 @@ describe('AbilityFactory', () => {
       username: 'standard-user'
     };
 
-    const ability = abilityFactory.createForPayload(payload as any);
+    const ability = abilityFactory.createForPayload(payload as any, []);
 
     expect(ability.can('read', subject('User', { id: 'user-1' }) as any)).toBe(true);
     expect(ability.can('read', subject('User', { id: 'user-2' }) as any)).toBe(false);
@@ -159,7 +168,7 @@ describe('AbilityFactory', () => {
       username: 'standard-user'
     };
 
-    const ability = abilityFactory.createForPayload(payload as any);
+    const ability = abilityFactory.createForPayload(payload as any, []);
 
     expect(ability.can('create', subject('InstrumentRecordFile', { groupId: 'group-1' }) as any)).toBe(true);
     expect(ability.can('create', subject('InstrumentRecordFile', { groupId: 'group-2' }) as any)).toBe(false);
@@ -178,7 +187,7 @@ describe('AbilityFactory', () => {
       username: 'manager-user'
     };
 
-    const ability = abilityFactory.createForPayload(payload as any);
+    const ability = abilityFactory.createForPayload(payload as any, []);
 
     expect(ability.can('create', subject('InstrumentRecordFile', { groupId: 'group-1' }) as any)).toBe(true);
     expect(ability.can('create', subject('InstrumentRecordFile', { groupId: 'group-2' }) as any)).toBe(false);
@@ -187,15 +196,18 @@ describe('AbilityFactory', () => {
   it.each(Object.entries(GROUP_SCOPED_ROWS))(
     'should confine a granted %s permission to the group it names',
     (subjectName, { inGroup, outOfGroup }) => {
-      const ability = abilityFactory.createForPayload({
-        additionalPermissions: [{ action: 'read', groupId: 'group-1', subject: subjectName }],
-        basePermissionLevel: null,
-        firstName: 'Test',
-        groups: [],
-        id: 'user-1',
-        lastName: 'User',
-        username: 'granted-user'
-      } as any);
+      const ability = abilityFactory.createForPayload(
+        {
+          additionalPermissions: [{ action: 'read', groupId: 'group-1', subject: subjectName }],
+          basePermissionLevel: null,
+          firstName: 'Test',
+          groups: [],
+          id: 'user-1',
+          lastName: 'User',
+          username: 'granted-user'
+        } as any,
+        []
+      );
 
       expect(ability.can('read', subject(subjectName, inGroup) as any)).toBe(true);
       expect(ability.can('read', subject(subjectName, outOfGroup) as any)).toBe(false);
@@ -203,15 +215,18 @@ describe('AbilityFactory', () => {
   );
 
   it('should apply an unscoped grant to every group, as every grant was before scoping existed', () => {
-    const ability = abilityFactory.createForPayload({
-      additionalPermissions: [{ action: 'read', groupId: null, subject: 'Subject' }],
-      basePermissionLevel: null,
-      firstName: 'Test',
-      groups: [],
-      id: 'user-1',
-      lastName: 'User',
-      username: 'granted-user'
-    } as any);
+    const ability = abilityFactory.createForPayload(
+      {
+        additionalPermissions: [{ action: 'read', groupId: null, subject: 'Subject' }],
+        basePermissionLevel: null,
+        firstName: 'Test',
+        groups: [],
+        id: 'user-1',
+        lastName: 'User',
+        username: 'granted-user'
+      } as any,
+      []
+    );
 
     expect(ability.can('read', subject('Subject', { groupIds: ['group-1'] }) as any)).toBe(true);
     expect(ability.can('read', subject('Subject', { groupIds: ['group-2'] }) as any)).toBe(true);
@@ -219,15 +234,18 @@ describe('AbilityFactory', () => {
   });
 
   it('should add a scoped grant on top of the base level without widening anything else', () => {
-    const ability = abilityFactory.createForPayload({
-      additionalPermissions: [{ action: 'read', groupId: 'group-1', subject: 'InstrumentRecord' }],
-      basePermissionLevel: 'STANDARD',
-      firstName: 'Test',
-      groups: [{ id: 'group-1' }],
-      id: 'user-1',
-      lastName: 'User',
-      username: 'standard-user'
-    } as any);
+    const ability = abilityFactory.createForPayload(
+      {
+        additionalPermissions: [{ action: 'read', groupId: 'group-1', subject: 'InstrumentRecord' }],
+        basePermissionLevel: 'STANDARD',
+        firstName: 'Test',
+        groups: [{ id: 'group-1' }],
+        id: 'user-1',
+        lastName: 'User',
+        username: 'standard-user'
+      } as any,
+      []
+    );
 
     expect(ability.can('read', subject('InstrumentRecord', { groupId: 'group-1' }) as any)).toBe(true);
     expect(ability.can('read', subject('Subject', { groupIds: ['group-1'] }) as any)).toBe(true);
@@ -237,15 +255,18 @@ describe('AbilityFactory', () => {
 
   it('should refuse to build an ability from a stored grant confined to a group on a resource that cannot be', () => {
     const build = () => {
-      return abilityFactory.createForPayload({
-        additionalPermissions: [{ action: 'read', groupId: 'group-1', subject: 'Instrument' }],
-        basePermissionLevel: null,
-        firstName: 'Test',
-        groups: [],
-        id: 'user-1',
-        lastName: 'User',
-        username: 'granted-user'
-      } as any);
+      return abilityFactory.createForPayload(
+        {
+          additionalPermissions: [{ action: 'read', groupId: 'group-1', subject: 'Instrument' }],
+          basePermissionLevel: null,
+          firstName: 'Test',
+          groups: [],
+          id: 'user-1',
+          lastName: 'User',
+          username: 'granted-user'
+        } as any,
+        []
+      );
     };
 
     expect(build).toThrow("Cannot confine permission 'read Instrument' to group 'group-1'");
@@ -269,9 +290,95 @@ describe('AbilityFactory', () => {
         username: 'some-user'
       };
 
-      const ability = abilityFactory.createForPayload(payload as any);
+      const ability = abilityFactory.createForPayload(payload as any, []);
 
       expect(accessibleQuery(ability, 'read', 'Session')).toBeDefined();
     }
   );
+  describe('permission set rules', () => {
+    const holderPayload = (groupIds: string[], overrides: object = {}) => ({
+      additionalPermissions: [],
+      basePermissionLevel: 'STANDARD',
+      firstName: 'Test',
+      groups: groupIds.map((id) => ({ id })),
+      id: 'user-1',
+      lastName: 'User',
+      username: 'holder',
+      ...overrides
+    });
+
+    it.each(Object.entries(GROUP_SCOPED_ROWS))(
+      "should confine a %s rule scoped to the holder's groups to those groups",
+      (subjectName, { inGroup, outOfGroup }) => {
+        const ability = abilityFactory.createForPayload(holderPayload(['group-1']) as any, [
+          { action: 'read', scope: 'HOLDER_GROUPS', subject: subjectName as GroupScopableSubjectName }
+        ]);
+
+        expect(ability.can('read', subject(subjectName, inGroup) as any)).toBe(true);
+        expect(ability.can('read', subject(subjectName, outOfGroup) as any)).toBe(false);
+      }
+    );
+
+    it("should reach every one of the holder's groups, not only the first", () => {
+      const ability = abilityFactory.createForPayload(holderPayload(['group-1', 'group-2']) as any, [
+        { action: 'read', scope: 'HOLDER_GROUPS', subject: 'InstrumentRecord' }
+      ]);
+
+      expect(accessibleQuery(ability, 'read', 'InstrumentRecord')).toStrictEqual({
+        OR: [{ groupId: { in: ['group-1', 'group-2'] } }]
+      });
+    });
+
+    it('should apply a rule scoped to every group to rows in groups the holder is not in', () => {
+      const ability = abilityFactory.createForPayload(holderPayload(['group-1']) as any, [
+        { action: 'read', scope: 'ALL_GROUPS', subject: 'InstrumentRecord' }
+      ]);
+
+      expect(ability.can('read', subject('InstrumentRecord', { groupId: 'group-1' }) as any)).toBe(true);
+      expect(ability.can('read', subject('InstrumentRecord', { groupId: 'group-2' }) as any)).toBe(true);
+      expect(ability.can('update', subject('InstrumentRecord', { groupId: 'group-1' }) as any)).toBe(false);
+    });
+
+    it("should match nothing for a holder in no group when a rule is scoped to the holder's groups", () => {
+      const ability = abilityFactory.createForPayload(holderPayload([], { basePermissionLevel: null }) as any, [
+        { action: 'read', scope: 'HOLDER_GROUPS', subject: 'InstrumentRecord' }
+      ]);
+
+      expect(ability.can('read', subject('InstrumentRecord', { groupId: 'group-1' }) as any)).toBe(false);
+      expect(accessibleQuery(ability, 'read', 'InstrumentRecord')).toStrictEqual({ OR: [{ groupId: { in: [] } }] });
+    });
+
+    it("should refuse to build an ability from a stored rule scoped to the holder's groups on a resource no group owns", () => {
+      const build = () => {
+        return abilityFactory.createForPayload(holderPayload(['group-1']) as any, [
+          { action: 'read', scope: 'HOLDER_GROUPS', subject: 'Instrument' }
+        ]);
+      };
+
+      expect(build).toThrow("Cannot confine permission set rule 'read Instrument' to the holder's groups");
+    });
+
+    it('should apply the set alongside custom grants and the base level, widening nothing else', () => {
+      const ability = abilityFactory.createForPayload(
+        holderPayload(['group-1'], {
+          additionalPermissions: [{ action: 'read', groupId: 'group-1', subject: 'Assignment' }]
+        }) as any,
+        [{ action: 'read', scope: 'HOLDER_GROUPS', subject: 'InstrumentRecord' }]
+      );
+
+      expect(ability.can('read', subject('InstrumentRecord', { groupId: 'group-1' }) as any)).toBe(true);
+      expect(ability.can('read', subject('Assignment', { groupId: 'group-1' }) as any)).toBe(true);
+      expect(ability.can('read', subject('Subject', { groupIds: ['group-1'] }) as any)).toBe(true);
+      expect(ability.can('manage', 'all')).toBe(false);
+    });
+
+    it('should ignore the set for a holder owing a password reset, who may only read themselves', () => {
+      const ability = abilityFactory.createForPayload(holderPayload(['group-1'], { mustResetPassword: true }) as any, [
+        { action: 'read', scope: 'ALL_GROUPS', subject: 'Subject' }
+      ]);
+
+      expect(ability.can('read', 'Subject')).toBe(false);
+      expect(ability.can('read', subject('User', { id: 'user-1' }) as any)).toBe(true);
+    });
+  });
 });

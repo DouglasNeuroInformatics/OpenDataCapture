@@ -121,10 +121,11 @@ CASL subjects are derived automatically from the Prisma `TypeMap`, so every mode
 without you doing anything. But the subjects a user can be _granted_ through `additionalPermissions`
 come from **two hand-maintained lists that must agree with each other**: `enum AppSubject` in
 `prisma/schema.prisma` and `$AppSubjectName` in `packages/schemas/src/core/core.ts`. Both currently
-list the same eight models plus `all`. Four models — `AuditLog`, `InstrumentRecordFile`,
-`InstrumentRepoSyncLog` and `SetupState` — appear in neither, so no user can be granted a permission naming them; they are
-reachable only through rules the ability factory writes itself. Adding a model that users should be
-able to hold a permission on means editing both lists.
+list the same eight models plus `all`. Five models — `AuditLog`, `InstrumentRecordFile`,
+`InstrumentRepoSyncLog`, `PermissionSet` and `SetupState` — appear in neither, so no user can be
+granted a permission naming them; they are reachable only through rules the ability factory writes
+itself. `PermissionSet` must stay that way: a grant on it would let its holder edit a set they hold.
+Adding a model that users should be able to hold a permission on means editing both lists.
 
 A granted permission may be confined to one group. `AuthRule.groupId` names it (`null`, which is
 what every rule written before the field existed reads back as, means every group), and
@@ -136,6 +137,18 @@ compile. Only `PUT /v1/users/:id/permissions` writes the field — it is deliber
 on a `User` action; the route inventory in the architecture doc below says why.
 `UsersService.updatePermissions` accepts a scoped grant only for a group the user belongs to, and
 `updateById` drops the grants scoped to a group the user is removed from.
+
+A user may instead hold a **permission set** (`src/permission-sets/`): an admin-defined, named list
+of rules, linked through `User.permissionSetId`, whose rules `createForPayload` applies alongside the
+base level. It takes them as a **required** second parameter, so the one caller, `AuthService.login`,
+cannot drop them; login reads the set through `UsersService.findByUsername`'s include and never puts
+it on the token payload. A rule's scope is relative — `HOLDER_GROUPS` is the holder's groups at
+sign-in, through the same `GROUP_SCOPED_CONDITIONS` — so a set names no group. A set and custom
+`additionalPermissions` are mutually exclusive: `PUT /v1/users/:id/permissions` takes
+`{ kind: 'permissionSet' }` or `{ kind: 'custom' }` and each write empties the other. An `ADMIN` never
+holds a set — `POST /v1/users` and the permissions route refuse one, and `updateById` disconnects it
+on promotion — and deleting a set clears every holder through `onDelete: SetNull`. Every
+`/v1/permission-sets` route is `ADMIN_ONLY`, because editing a set is a grant to each holder.
 
 Background: `.agents/docs/architecture/auth-and-permissions.md`.
 

@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import type { TokenPayload } from '@opendatacapture/schemas/auth';
 import { isGroupScopableSubject } from '@opendatacapture/schemas/core';
 import type { GroupScopableSubjectName } from '@opendatacapture/schemas/core';
+import type { PermissionSetRule } from '@opendatacapture/schemas/permission-set';
 
 import type { PrismaModelWhereInputMap } from '@/core/prisma';
 
@@ -13,25 +14,30 @@ import { createAppAbility, detectAppSubject } from './ability.utils';
 import type { AppAbility, Permission } from './auth.types';
 
 /**
- * The condition confining a per-user permission to one group, per model that can carry one. The
- * fields are the same ones the group manager rules below use. Typed over the schema's list, so a
- * subject made scopable there fails to compile here until its group field is named.
+ * The condition confining a granted permission to some groups, per model that can carry one: one
+ * group for a per-user grant, the holder's groups for a permission set rule. The fields are the same
+ * ones the group manager rules below use. Typed over the schema's list, so a subject made scopable
+ * there fails to compile here until its group field is named.
  */
 const GROUP_SCOPED_CONDITIONS = {
-  Assignment: (groupId) => ({ groupId: { in: [groupId] } }),
-  Group: (groupId) => ({ id: { in: [groupId] } }),
-  InstrumentRecord: (groupId) => ({ groupId: { in: [groupId] } }),
-  InstrumentRepo: (groupId) => ({ groupIds: { hasSome: [groupId] } }),
-  Session: (groupId) => ({ groupId: { in: [groupId] } }),
-  Subject: (groupId) => ({ groupIds: { hasSome: [groupId] } }),
-  User: (groupId) => ({ groupIds: { hasSome: [groupId] } })
-} satisfies { [K in GroupScopableSubjectName]: (groupId: string) => NonNullable<PrismaModelWhereInputMap[K]> };
+  Assignment: (groupIds) => ({ groupId: { in: groupIds } }),
+  Group: (groupIds) => ({ id: { in: groupIds } }),
+  InstrumentRecord: (groupIds) => ({ groupId: { in: groupIds } }),
+  InstrumentRepo: (groupIds) => ({ groupIds: { hasSome: groupIds } }),
+  Session: (groupIds) => ({ groupId: { in: groupIds } }),
+  Subject: (groupIds) => ({ groupIds: { hasSome: groupIds } }),
+  User: (groupIds) => ({ groupIds: { hasSome: groupIds } })
+} satisfies { [K in GroupScopableSubjectName]: (groupIds: string[]) => NonNullable<PrismaModelWhereInputMap[K]> };
 
 @Injectable()
 export class AbilityFactory {
   constructor(private readonly loggingService: LoggingService) {}
 
-  createForPayload(payload: Omit<TokenPayload, 'permissions'>): AppAbility {
+  /**
+   * `permissionSetRules` are the rules of the set the user holds, read at sign-in rather than carried
+   * on the payload. Required, so the caller cannot leave a holder with only their base level.
+   */
+  createForPayload(payload: Omit<TokenPayload, 'permissions'>, permissionSetRules: PermissionSetRule[]): AppAbility {
     this.loggingService.verbose({
       message: 'Creating Ability From Payload',
       payload
@@ -87,11 +93,22 @@ export class AbilityFactory {
         ability.can('read', 'User', { id: payload.id });
         break;
     }
+    permissionSetRules.forEach(({ action, scope, subject }) => {
+      if (scope === 'ALL_GROUPS') {
+        ability.can(action, subject);
+      } else if (isGroupScopableSubject(subject)) {
+        ability.can(action, subject, GROUP_SCOPED_CONDITIONS[subject](groupIds));
+      } else {
+        // As below: the schema refuses this shape at the boundary, and neither reading of a stored one
+        // is what the set's author asked for.
+        throw new Error(`Cannot confine permission set rule '${action} ${subject}' to the holder's groups`);
+      }
+    });
     payload.additionalPermissions?.forEach(({ action, groupId, subject }) => {
       if (groupId === null) {
         ability.can(action, subject);
       } else if (isGroupScopableSubject(subject)) {
-        ability.can(action, subject, GROUP_SCOPED_CONDITIONS[subject](groupId));
+        ability.can(action, subject, GROUP_SCOPED_CONDITIONS[subject]([groupId]));
       } else {
         // The schema refuses this shape at the boundary; a stored row that has it anyway is applied
         // under neither reading, since either one silently changes what the grant means.

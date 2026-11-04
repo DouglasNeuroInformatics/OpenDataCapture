@@ -909,7 +909,8 @@ describe('InstrumentRecordsService', () => {
             id: 'user-1',
             lastName: 'User',
             username: 'test-user'
-          } as any
+          } as any,
+          []
         );
       };
 

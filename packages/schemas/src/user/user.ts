@@ -77,6 +77,11 @@ export const $User = $BaseModel.extend({
    * themselves. Nullish because it postdates the users already in the database.
    */
   mustResetPassword: z.boolean().nullish(),
+  /**
+   * The permission set this user holds, if any. Never alongside custom `additionalPermissions`:
+   * {@link $UpdateUserPermissionsData} writes the two together, one of them always empty.
+   */
+  permissionSetId: z.string().nullish(),
   // Not `$PhoneNumber`: this is the read model, which must still parse numbers stored before the
   // digit minimum existed. The rule is enforced on the write schemas below.
   phoneNumber: z.string().nullish(),
@@ -88,8 +93,12 @@ export const $User = $BaseModel.extend({
 export type CreateUserResponse = z.infer<typeof $CreateUserResponse>;
 export const $CreateUserResponse = $User.extend({ welcomeEmail: $EmailDeliveryResult });
 
-export type $CreateUserData = z.infer<typeof $CreateUserData>;
-export const $CreateUserData = $User
+/**
+ * The account fields an administrator writes, with none of the rules relating one to another. Every
+ * user write schema derives from this rather than from another write schema, because deriving from
+ * an object drops its `.check` without a word.
+ */
+export const $BaseUserData = $User
   .pick({
     basePermissionLevel: true,
     firstName: true,
@@ -107,33 +116,60 @@ export const $CreateUserData = $User
     sex: $Sex.optional()
   });
 
+export type $CreateUserData = z.infer<typeof $CreateUserData>;
+export const $CreateUserData = $BaseUserData
+  .extend({
+    permissionSetId: z.string().optional()
+  })
+  .check((ctx) => {
+    if (ctx.value.basePermissionLevel === 'ADMIN' && ctx.value.permissionSetId !== undefined) {
+      ctx.issues.push({
+        code: 'custom',
+        input: ctx.value.permissionSetId,
+        message: 'Administrators hold every permission, so they cannot hold a permission set',
+        path: ['permissionSetId']
+      });
+    }
+  });
+
 /**
  * Optional contact details are nullable here, and only here, so an update can clear one.
- * `additionalPermissions` is deliberately absent: it is written only through
- * {@link $UpdateUserPermissionsData}, whose route is gated more tightly than a profile update.
+ * `additionalPermissions` and `permissionSetId` are deliberately absent: they are written only
+ * through {@link $UpdateUserPermissionsData}, whose route is gated more tightly than a profile update.
  */
 export type $UpdateUserData = z.infer<typeof $UpdateUserData>;
-export const $UpdateUserData = $CreateUserData.partial().extend({
+export const $UpdateUserData = $BaseUserData.partial().extend({
   email: z.email().nullish(),
   phoneNumber: $PhoneNumber.nullish()
 });
 
-/** The complete set of a user's additional permissions; a write replaces what is stored. */
+/**
+ * Where a user's permissions beyond their base level come from: a permission set, or their own
+ * custom grants. A write replaces both, so a body naming one empties the other and no user can hold
+ * the two at once.
+ */
 export type $UpdateUserPermissionsData = z.infer<typeof $UpdateUserPermissionsData>;
-export const $UpdateUserPermissionsData = z.object({
-  permissions: $Permissions.check((ctx) => {
-    ctx.value.forEach((permission, index) => {
-      if (!isGrantablePermission(permission)) {
-        ctx.issues.push({
-          code: 'custom',
-          input: permission,
-          message: 'Only an administrator can create, modify or delete users, so this permission would do nothing',
-          path: [index]
-        });
-      }
-    });
+export const $UpdateUserPermissionsData = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('permissionSet'),
+    permissionSetId: z.string()
+  }),
+  z.object({
+    kind: z.literal('custom'),
+    permissions: $Permissions.check((ctx) => {
+      ctx.value.forEach((permission, index) => {
+        if (!isGrantablePermission(permission)) {
+          ctx.issues.push({
+            code: 'custom',
+            input: permission,
+            message: 'Only an administrator can create, modify or delete users, so this permission would do nothing',
+            path: [index]
+          });
+        }
+      });
+    })
   })
-});
+]);
 
 export type $SelfUpdateUserData = z.infer<typeof $SelfUpdateUserData>;
 export const $SelfUpdateUserData = $UpdateUserData

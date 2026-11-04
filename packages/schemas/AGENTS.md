@@ -64,8 +64,14 @@ body is parsed against it; `AuthPayload` and `TokenPayload` are plain types beca
 parses them. Do not add a schema for a shape that only crosses a typed boundary.
 
 Variants are composed with `.extend()` / `.pick()` / `.omit()` / `.partial()` off an existing shape,
-never rewritten — `$UpdateUserData = $CreateUserData.partial().extend({...})`. Rewriting is how the
+never rewritten — `$UpdateUserData = $BaseUserData.partial().extend({...})`. Rewriting is how the
 two drift.
+
+**Derive only from an object without a `.check`.** The vendored zod silently drops a `.check` when
+you `.extend()`, `.pick()`, `.omit()` or `.partial()` the object carrying it, and newer zod releases
+throw on some of these instead. Where a schema needs a rule relating its fields, keep the unchecked
+shape as its own schema and derive every variant from that — `$BaseUserData` is the shape
+`$CreateUserData` checks and `$UpdateUserData` makes partial.
 
 ## src/instrument
 

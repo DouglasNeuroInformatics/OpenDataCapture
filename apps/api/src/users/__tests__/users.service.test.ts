@@ -6,6 +6,7 @@ import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { BadRequestException, ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { Permissions } from '@opendatacapture/schemas/core';
+import type { $UpdateUserPermissionsData } from '@opendatacapture/schemas/user';
 import { pwnedPassword } from 'hibp';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
@@ -14,6 +15,7 @@ import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 
 import { GroupsService } from '../../groups/groups.service';
+import { PermissionSetsService } from '../../permission-sets/permission-sets.service';
 import { UsersService } from '../users.service';
 
 vi.mock('hibp', () => ({ pwnedPassword: vi.fn() }));
@@ -38,6 +40,7 @@ describe('UsersService', () => {
   let userModel: MockedInstance<Model<'User'>>;
   let cryptoService: MockedInstance<CryptoService>;
   let groupsService: MockedInstance<GroupsService>;
+  let permissionSetsService: MockedInstance<PermissionSetsService>;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -47,13 +50,15 @@ describe('UsersService', () => {
         MockFactory.createForModelToken(getModelToken('User')),
         MockFactory.createForService(AuditLogger),
         MockFactory.createForService(CryptoService),
-        MockFactory.createForService(GroupsService)
+        MockFactory.createForService(GroupsService),
+        MockFactory.createForService(PermissionSetsService)
       ]
     }).compile();
     userModel = moduleRef.get(getModelToken('User'));
     usersService = moduleRef.get(UsersService);
     cryptoService = moduleRef.get(CryptoService);
     groupsService = moduleRef.get(GroupsService);
+    permissionSetsService = moduleRef.get(PermissionSetsService);
 
     userModel.exists.mockResolvedValue(false);
     userModel.create.mockResolvedValue({});
@@ -142,6 +147,24 @@ describe('UsersService', () => {
     it('should start the user with no additional permissions, so access comes only from their base level', async () => {
       await usersService.create({ ...baseUser });
       expect(userModel.create.mock.lastCall?.[0].data.additionalPermissions).toEqual([]);
+    });
+
+    it('should start the user with no permission set when none is requested', async () => {
+      await usersService.create({ ...baseUser });
+      expect(userModel.create.mock.lastCall?.[0].data.permissionSet).toBeUndefined();
+      expect(permissionSetsService.findById).not.toHaveBeenCalled();
+    });
+
+    it('should link the requested permission set, looked up with the caller options', async () => {
+      await usersService.create({ ...baseUser, permissionSetId: 'set-1' }, { ability: admin.ability });
+      expect(permissionSetsService.findById).toHaveBeenCalledWith('set-1', { ability: admin.ability });
+      expect(userModel.create.mock.lastCall?.[0].data.permissionSet).toEqual({ connect: { id: 'set-1' } });
+    });
+
+    it('should propagate a permission set lookup that finds nothing, so the user is never created', async () => {
+      permissionSetsService.findById.mockRejectedValue(new NotFoundException());
+      await expect(usersService.create({ ...baseUser, permissionSetId: 'set-1' })).rejects.toThrow(NotFoundException);
+      expect(userModel.create).not.toHaveBeenCalled();
     });
   });
 
@@ -313,6 +336,19 @@ describe('UsersService', () => {
       expect(userModel.findFirst).not.toHaveBeenCalled();
     });
 
+    it('should remove the permission set of a user promoted to administrator, who already holds every permission', async () => {
+      await usersService.updateById('user-1', { basePermissionLevel: 'ADMIN' }, admin);
+      expect(userModel.update.mock.lastCall?.[0].data.permissionSet).toEqual({ disconnect: true });
+    });
+
+    it.each(['GROUP_MANAGER', 'STANDARD', undefined] as const)(
+      'should leave the permission set alone when the level becomes %s',
+      async (basePermissionLevel) => {
+        await usersService.updateById('user-1', { basePermissionLevel, firstName: 'Janet' }, admin);
+        expect(userModel.update.mock.lastCall?.[0].data.permissionSet).toBeUndefined();
+      }
+    );
+
     it('should let an administrator disable and demote another user', async () => {
       await usersService.updateById('user-1', { basePermissionLevel: 'STANDARD', disabled: true }, admin);
       expect(userModel.update.mock.lastCall?.[0].data).toMatchObject({
@@ -357,42 +393,85 @@ describe('UsersService', () => {
 
   describe('updatePermissions', () => {
     beforeEach(() => {
-      userModel.findFirst.mockResolvedValue({ groupIds: ['group-1'], id: 'user-1' });
+      userModel.findFirst.mockResolvedValue({ basePermissionLevel: 'STANDARD', groupIds: ['group-1'], id: 'user-1' });
       userModel.update.mockResolvedValue({});
     });
 
-    it('should write a grant confined to a group the user belongs to', async () => {
-      const permissions: Permissions = [{ action: 'read', groupId: 'group-1', subject: 'Subject' }];
-      await usersService.updatePermissions('user-1', permissions);
-      expect(userModel.update.mock.lastCall?.[0]).toMatchObject({
-        data: { additionalPermissions: permissions },
-        where: { id: 'user-1' }
+    describe('custom grants', () => {
+      it('should write a grant confined to a group the user belongs to', async () => {
+        const permissions: Permissions = [{ action: 'read', groupId: 'group-1', subject: 'Subject' }];
+        await usersService.updatePermissions('user-1', { kind: 'custom', permissions });
+        expect(userModel.update.mock.lastCall?.[0]).toMatchObject({
+          data: { additionalPermissions: permissions },
+          where: { id: 'user-1' }
+        });
+      });
+
+      it('should remove the permission set in the same write, so the user never holds both', async () => {
+        await usersService.updatePermissions('user-1', { kind: 'custom', permissions: [] });
+        expect(userModel.update.mock.lastCall?.[0].data.permissionSet).toEqual({ disconnect: true });
+      });
+
+      it('should reject a grant confined to a group the user does not belong to, before writing anything', async () => {
+        const permissions: Permissions = [{ action: 'read', groupId: 'group-2', subject: 'Subject' }];
+        await expect(usersService.updatePermissions('user-1', { kind: 'custom', permissions })).rejects.toThrow(
+          BadRequestException
+        );
+        expect(userModel.update).not.toHaveBeenCalled();
+      });
+
+      it("should accept an unscoped grant whatever the user's groups", async () => {
+        const permissions: Permissions = [{ action: 'create', groupId: null, subject: 'Instrument' }];
+        await usersService.updatePermissions('user-1', { kind: 'custom', permissions });
+        expect(userModel.update.mock.lastCall?.[0]).toMatchObject({ data: { additionalPermissions: permissions } });
       });
     });
 
-    it('should reject a grant confined to a group the user does not belong to, before writing anything', async () => {
-      const permissions: Permissions = [{ action: 'read', groupId: 'group-2', subject: 'Subject' }];
-      await expect(usersService.updatePermissions('user-1', permissions)).rejects.toThrow(BadRequestException);
-      expect(userModel.update).not.toHaveBeenCalled();
-    });
+    describe('a permission set', () => {
+      const data = { kind: 'permissionSet', permissionSetId: 'set-1' } as const;
 
-    it("should accept an unscoped grant whatever the user's groups", async () => {
-      const permissions: Permissions = [{ action: 'create', groupId: null, subject: 'Instrument' }];
-      await usersService.updatePermissions('user-1', permissions);
-      expect(userModel.update.mock.lastCall?.[0]).toMatchObject({ data: { additionalPermissions: permissions } });
+      it('should link the set and empty the custom grants in the same write, so the user never holds both', async () => {
+        await usersService.updatePermissions('user-1', data);
+        expect(userModel.update.mock.lastCall?.[0]).toMatchObject({
+          data: { additionalPermissions: [], permissionSet: { connect: { id: 'set-1' } } },
+          where: { id: 'user-1' }
+        });
+      });
+
+      it('should look up the set with the caller ability', async () => {
+        await usersService.updatePermissions('user-1', data, { ability: admin.ability });
+        expect(permissionSetsService.findById).toHaveBeenCalledWith('set-1', { ability: admin.ability });
+      });
+
+      it('should propagate a set lookup that finds nothing, before writing anything', async () => {
+        permissionSetsService.findById.mockRejectedValue(new NotFoundException());
+        await expect(usersService.updatePermissions('user-1', data)).rejects.toThrow(NotFoundException);
+        expect(userModel.update).not.toHaveBeenCalled();
+      });
+
+      it('should refuse a set for an administrator, who already holds every permission', async () => {
+        userModel.findFirst.mockResolvedValue({ basePermissionLevel: 'ADMIN', groupIds: [], id: 'user-1' });
+        await expect(usersService.updatePermissions('user-1', data)).rejects.toThrow(BadRequestException);
+        expect(userModel.update).not.toHaveBeenCalled();
+      });
     });
 
     it('should throw when the user cannot be found, rather than creating one', async () => {
       userModel.findFirst.mockResolvedValue(null);
-      await expect(usersService.updatePermissions('user-1', [])).rejects.toThrow(NotFoundException);
+      await expect(usersService.updatePermissions('user-1', { kind: 'custom', permissions: [] })).rejects.toThrow(
+        NotFoundException
+      );
       expect(userModel.update).not.toHaveBeenCalled();
     });
 
-    it('should scope the write to the caller ability', async () => {
+    it.each<$UpdateUserPermissionsData>([
+      { kind: 'custom', permissions: [] },
+      { kind: 'permissionSet', permissionSetId: 'set-1' }
+    ])('should scope a $kind write to the caller ability', async (data) => {
       const ability = createAppAbility([
         { action: 'manage', conditions: { groupIds: { hasSome: ['group-1'] } }, subject: 'User' }
       ]);
-      await usersService.updatePermissions('user-1', [], { ability });
+      await usersService.updatePermissions('user-1', data, { ability });
       expect(userModel.update.mock.lastCall?.[0]).toMatchObject({
         where: { AND: [accessibleQuery(ability, 'update', 'User')], id: 'user-1' }
       });
