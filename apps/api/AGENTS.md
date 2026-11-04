@@ -44,13 +44,11 @@ src/<feature>/
 
 There is no repository layer and no `entity/` folder — `Model<'X'>` _is_ the repository.
 
-**A single-segment route can be shadowed by a `:param` route on the same verb.** `perfectionist/sort-classes`
-is an eslint error, so `eslint --fix` orders controller handlers alphabetically — a handler you wrote
-above `@Get(':id')` does not stay there. Anything that sorts below it, such as a hypothetical
-`@Get('summary')` in `users.controller.ts`, is matched by `:id` instead, and the failure is a
-confusing 404 or cast error rather than a lint or type failure. Give such a route two segments so
-matching cannot depend on declaration order at all — `@Get('/check-username/:username')` is safe for
-exactly that reason.
+**Fastify matches static routes before parameter routes, regardless of declaration order.** The
+API uses `@nestjs/platform-fastify`, whose `find-my-way` router prioritizes a fixed route like
+`@Get('linear-model')` over `@Get(':id')` for the same HTTP method, even if `:id` was registered
+first. `perfectionist/sort-classes` may reorder controller methods without changing this matching
+precedence. A static route does not need an extra path segment merely to avoid an `:id` route.
 
 **A new module must be added to the `imports` array in `src/main.ts`** or its routes will not exist.
 Modules can be imported conditionally with `{ module: XModule, when: 'SOME_BOOLEAN_ENV_KEY' }`.
