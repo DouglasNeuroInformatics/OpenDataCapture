@@ -83,6 +83,21 @@ describe('NavGroup', () => {
     expect(isExpanded()).toBe(false);
   });
 
+  it('should stay expanded and keep the item active on a page beneath it, so the menu does not close mid-task', () => {
+    visit('/datahub', {});
+    const { rerender } = renderGroup();
+    visit('/datahub/subject-1', {});
+    rerender(<NavGroup icon={LayersIcon} items={items} label="Tools" />);
+    expect(isExpanded()).toBe(true);
+    expect([...navButton('/datahub').classList]).toContain('bg-slate-800');
+  });
+
+  it('should not treat a path that only shares a prefix with an item as beneath it', () => {
+    visit('/datahub-archive', {});
+    renderGroup();
+    expect(isExpanded()).toBe(false);
+  });
+
   it('should mark an item active only when the current search params match its own', () => {
     visit('/logs', { status: 'active' });
     renderGroup();
