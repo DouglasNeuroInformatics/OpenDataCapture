@@ -12,9 +12,14 @@ import type {
 } from '@opendatacapture/schemas/instrument-records';
 import { MAIL_CLIENT_TIMEOUT } from '@opendatacapture/schemas/mail';
 import type { $SendAssignmentEmailData, EmailDeliveryResult } from '@opendatacapture/schemas/mail';
+import type {
+  $CreatePermissionSetData,
+  PermissionSet,
+  PermissionSetSummary
+} from '@opendatacapture/schemas/permission-set';
 import type { $CreateSessionData, Session, SessionType } from '@opendatacapture/schemas/session';
 import type { $CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { $CreateUserData, $UpdateUserData, User } from '@opendatacapture/schemas/user';
+import type { $CreateUserData, $UpdateUserData, $UpdateUserPermissionsData, User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
 import { E2E_MAIL_CONFIG, SEEDED_USER_PASSWORD } from './constants';
@@ -99,6 +104,19 @@ export class ApiClient {
       'create instrument'
     );
     return instrument.id;
+  }
+
+  /** Creates a uniquely named permission set holding the given rules. */
+  async createPermissionSet(
+    rules: $CreatePermissionSetData['rules'],
+    overrides: Partial<$CreatePermissionSetData> = {}
+  ): Promise<PermissionSet> {
+    const data: $CreatePermissionSetData = { name: `Permission Set ${randomId()}`, rules, ...overrides };
+    return this.expectJson<PermissionSet>(
+      this.request.post(`${API}/permission-sets`, { data, headers: this.authHeaders }),
+      201,
+      'create permission set'
+    );
   }
 
   /**
@@ -266,6 +284,14 @@ export class ApiClient {
     return instrument.id;
   }
 
+  async findPermissionSetById(id: string): Promise<PermissionSetSummary> {
+    return this.expectJson<PermissionSetSummary>(
+      this.request.get(`${API}/permission-sets/${id}`, { headers: this.authHeaders }),
+      200,
+      `find permission set '${id}'`
+    );
+  }
+
   /** The ids the start-session form suggests for a group: its subjects identified by a custom id. */
   async findSubjectCustomIds(groupId: string): Promise<string[]> {
     return this.expectJson<string[]>(
@@ -313,15 +339,17 @@ export class ApiClient {
   }
 
   /**
-   * Replaces a user's additional permissions. Permissions are not on the create schema, so seeding
-   * a user who holds any is necessarily two calls.
+   * Replaces a user's additional permissions with custom grants, removing any permission set they
+   * held. Custom grants are not on the create schema, so seeding a user who holds any is
+   * necessarily two calls.
    */
   async setUserPermissions(id: string, permissions: Permissions): Promise<User> {
-    return this.expectJson<User>(
-      this.request.put(`${API}/users/${id}/permissions`, { data: { permissions }, headers: this.authHeaders }),
-      200,
-      `set permissions of user '${id}'`
-    );
+    return this.putUserPermissions(id, { kind: 'custom', permissions });
+  }
+
+  /** Links a user to a permission set, removing any custom grants they held. */
+  async setUserPermissionSet(id: string, permissionSetId: string): Promise<User> {
+    return this.putUserPermissions(id, { kind: 'permissionSet', permissionSetId });
   }
 
   /** Updates a user's profile fields, which is everything except their permissions. */
@@ -379,6 +407,14 @@ export class ApiClient {
       this.request.get(`${API}/instruments/info`, { headers: this.authHeaders }),
       200,
       'list instruments'
+    );
+  }
+
+  private async putUserPermissions(id: string, data: $UpdateUserPermissionsData): Promise<User> {
+    return this.expectJson<User>(
+      this.request.put(`${API}/users/${id}/permissions`, { data, headers: this.authHeaders }),
+      200,
+      `set permissions of user '${id}'`
     );
   }
 }

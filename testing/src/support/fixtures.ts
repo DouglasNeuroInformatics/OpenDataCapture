@@ -10,6 +10,9 @@ import { BrandingLoginPagePage } from '../pages/_app/admin/branding/login-page.p
 import { InstrumentReposPage } from '../pages/_app/admin/instrument-repos/index.page';
 import { AdminInstrumentsPage } from '../pages/_app/admin/instruments.page';
 import { MailSettingsPage } from '../pages/_app/admin/mail.page';
+import { PermissionSetPage } from '../pages/_app/admin/permission-sets/$permissionSetId.page';
+import { CreatePermissionSetPage } from '../pages/_app/admin/permission-sets/create.page';
+import { PermissionSetsPage } from '../pages/_app/admin/permission-sets/index.page';
 import { AdminSettingsPage } from '../pages/_app/admin/settings.page';
 import { AdminUserPage } from '../pages/_app/admin/users/$userId.page';
 import { ContactPage } from '../pages/_app/contact.page';
@@ -41,6 +44,9 @@ const pageModels = {
   '/admin/instrument-repos': InstrumentReposPage,
   '/admin/instruments': AdminInstrumentsPage,
   '/admin/mail': MailSettingsPage,
+  '/admin/permission-sets': PermissionSetsPage,
+  '/admin/permission-sets/$permissionSetId': PermissionSetPage,
+  '/admin/permission-sets/create': CreatePermissionSetPage,
   '/admin/settings': AdminSettingsPage,
   '/admin/users/$userId': AdminUserPage,
   '/auth/login': LoginPage,

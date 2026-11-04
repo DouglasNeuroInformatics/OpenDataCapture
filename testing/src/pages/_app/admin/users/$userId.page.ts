@@ -8,8 +8,11 @@ export class AdminUserPage extends AppPage {
   readonly addPermissionRow: Locator;
   readonly adminNotice: Locator;
   readonly backLink: Locator;
+  readonly chosenPermissionSetRules: Locator;
+  readonly discardCustomGrantsWarning: Locator;
   readonly manageAllWarning: Locator;
   readonly permissionRows: Locator;
+  readonly permissionSourceTabs: Locator;
   readonly permissionsTable: Locator;
   readonly profileForm: Locator;
   readonly submitError: Locator;
@@ -24,6 +27,9 @@ export class AdminUserPage extends AppPage {
     this.addPermissionRow = page.getByTestId('add-permission-row').last();
     this.adminNotice = page.getByTestId('user-permissions-admin-notice');
     this.manageAllWarning = page.getByTestId('manage-all-warning');
+    this.permissionSourceTabs = page.getByTestId('user-permissions-source');
+    this.chosenPermissionSetRules = page.getByTestId('permission-set-chosen').getByTestId('permission-set-rule-row');
+    this.discardCustomGrantsWarning = page.getByTestId('user-permissions-discard-warning');
   }
 
   /**
@@ -40,6 +46,16 @@ export class AdminUserPage extends AppPage {
 
   async addPermissionRowAfterCurrent() {
     await this.addPermissionRow.getByRole('button', { name: 'Add Permission' }).click();
+  }
+
+  /** The items render in a portal outside the card, so they are found on the page. */
+  async choosePermissionSet(permissionSetId: string) {
+    await this.$ref.getByTestId('permission-set-select-trigger').click();
+    await this.$ref.getByTestId(`permission-set-select-item-${permissionSetId}`).click();
+  }
+
+  async choosePermissionSource(source: 'custom' | 'permissionSet') {
+    await this.$ref.getByTestId(`user-permissions-source-${source}`).click();
   }
 
   async removePermission(index: number) {
