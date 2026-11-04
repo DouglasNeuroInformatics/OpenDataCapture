@@ -1,6 +1,4 @@
-import type { Group } from '@opendatacapture/schemas/group';
 import type { PermissionSetRule } from '@opendatacapture/schemas/permission-set';
-import type { User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
 import { PermissionSetPage } from '../pages/_app/admin/permission-sets/$permissionSetId.page';
@@ -23,12 +21,12 @@ const RULES: PermissionSetRule[] = [
 /** The users and groups a holder can read, with a token minted now, since permissions are frozen into it at login. */
 async function readAccess(request: APIRequestContext, credentials: { password: string; username: string }) {
   const token = await ApiClient.login(request, credentials);
-  const read = async <T extends { id: string }>(path: string) => {
+  const readIds = async (path: 'groups' | 'users') => {
     const response = await request.get(`${API}/${path}`, { headers: { Authorization: `Bearer ${token}` } });
     expect(response.ok()).toBe(true);
-    return ((await response.json()) as T[]).map(({ id }) => id);
+    return ((await response.json()) as { id: string }[]).map(({ id }) => id);
   };
-  return { groupIds: await read<Group>('groups'), userIds: await read<User>('users') };
+  return { groupIds: await readIds('groups'), userIds: await readIds('users') };
 }
 
 test.describe('permission sets', () => {
@@ -180,6 +178,26 @@ test.describe('permission sets', () => {
 
     await expect(listPage.row(permissionSet.name)).toHaveCount(0);
     expect((await api.findUserById(user.id)).permissionSetId).toBeNull();
+  });
+
+  test('should clip a long permission set name to one line and name it in full on hover', async ({
+    api,
+    getPageModel,
+    uniqueId
+  }) => {
+    const name = `Assistants de recherche cliniques des laboratoires partenaires du programme ${uniqueId}`;
+    await api.createPermissionSet(RULES, { name });
+
+    const listPage = await getPageModel('/admin/permission-sets');
+    const cell = listPage.nameCell(name);
+
+    await expect(cell).toHaveAttribute('title', name);
+    const layout = await cell.evaluate((element) => ({
+      clipped: element.scrollWidth > element.clientWidth,
+      lines: Math.round(element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight))
+    }));
+    expect(layout.clipped).toBe(true);
+    expect(layout.lines).toBe(1);
   });
 
   test('should offer no permission set for an administrator', async ({ api, authenticateAs, getPageModel, page }) => {

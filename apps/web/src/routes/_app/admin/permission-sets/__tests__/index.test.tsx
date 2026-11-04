@@ -88,6 +88,12 @@ describe('Route', () => {
     expect(cellTexts(rows()[0]!).slice(0, 3)).toEqual(['Research Assistant', '2', '3']);
   });
 
+  it('should clip a long name to one line with the full name on hover, so its row stays one line tall', () => {
+    const name = 'Research Assistant With A Name Long Enough To Outgrow Its Column';
+    renderPage([permissionSetFixture({ name })]);
+    expect(within(rows()[0]!).getByTitle(name).className).toContain('whitespace-nowrap');
+  });
+
   it('should highlight a clicked row without leaving the list, as the other admin tables do', () => {
     renderPage([permissionSetFixture()]);
     fireEvent.click(rows()[0]!);

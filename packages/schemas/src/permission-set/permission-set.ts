@@ -82,8 +82,7 @@ const $PermissionSetSummary = $PermissionSet.extend({
   holderCount: z.number().int().nonnegative()
 });
 
-const $CreatePermissionSetData = z.object({
-  name: z.string().min(1),
+const $CreatePermissionSetData = $PermissionSet.pick({ name: true }).extend({
   rules: $GrantablePermissionSetRules
 });
 

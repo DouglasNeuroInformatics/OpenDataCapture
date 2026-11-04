@@ -6,6 +6,7 @@ import type { PermissionSetSummary } from '@opendatacapture/schemas/permission-s
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 
 import { PageHeader } from '@/components/PageHeader';
+import { TruncatedCell } from '@/components/TruncatedCell';
 import { useConfirmPermissionSetDeletion } from '@/hooks/useConfirmPermissionSetDeletion';
 import { permissionSetsQueryOptions, usePermissionSetsQuery } from '@/hooks/usePermissionSetsQuery';
 
@@ -39,8 +40,12 @@ const RouteComponent = () => {
             cell: (ctx) => {
               const permissionSet = ctx.row.original;
               return (
-                <span className="flex items-center">
-                  {permissionSet.name}
+                <span className="flex items-center overflow-hidden">
+                  <TruncatedCell
+                    data-testid="permission-set-name"
+                    title={permissionSet.name}
+                    value={permissionSet.name}
+                  />
                   <span
                     className="hidden"
                     data-row-selected={highlightedRowId === permissionSet.id ? 'true' : 'false'}
@@ -62,7 +67,6 @@ const RouteComponent = () => {
           }
         ]}
         data={permissionSetsQuery.data}
-        data-testid="admin-permission-sets-table"
         emptyStateProps={{
           description: t({
             en: 'A permission set bundles grants an administrator can then give users in one step.',

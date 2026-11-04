@@ -9,7 +9,7 @@ import {
   grantableSubjects,
   isIncompleteDraft,
   toUserPermission,
-  withoutPermission,
+  withoutIndex,
   withPermission,
   withPermissionDrafts
 } from '../permissions';
@@ -100,13 +100,13 @@ describe('withPermission', () => {
   });
 });
 
-describe('withoutPermission', () => {
-  it('should remove only the grant at the given index', () => {
+describe('withoutIndex', () => {
+  it('should remove only the row at the given index', () => {
     const permissions: Permissions = [
       { action: 'read', groupId: 'group-1', subject: 'Subject' },
       { action: 'read', groupId: null, subject: 'Subject' }
     ];
-    expect(withoutPermission(permissions, 0)).toEqual([permissions[1]]);
+    expect(withoutIndex(permissions, 0)).toEqual([permissions[1]]);
   });
 });
 

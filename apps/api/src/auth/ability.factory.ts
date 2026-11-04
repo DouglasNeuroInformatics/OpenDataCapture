@@ -4,7 +4,7 @@ import { LoggingService } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
 import type { TokenPayload } from '@opendatacapture/schemas/auth';
 import { isGroupScopableSubject } from '@opendatacapture/schemas/core';
-import type { GroupScopableSubjectName } from '@opendatacapture/schemas/core';
+import type { GroupScopableSubjectName, UserPermission } from '@opendatacapture/schemas/core';
 import type { PermissionSetRule } from '@opendatacapture/schemas/permission-set';
 
 import type { PrismaModelWhereInputMap } from '@/core/prisma';
@@ -28,6 +28,27 @@ const GROUP_SCOPED_CONDITIONS = {
   Subject: (groupIds) => ({ groupIds: { hasSome: groupIds } }),
   User: (groupIds) => ({ groupIds: { hasSome: groupIds } })
 } satisfies { [K in GroupScopableSubjectName]: (groupIds: string[]) => NonNullable<PrismaModelWhereInputMap[K]> };
+
+/**
+ * Grants a per-user permission or a permission set rule in every group when `groupIds` is null, and
+ * only within `groupIds` otherwise. The schemas refuse a group scope on a resource no group owns; a
+ * stored rule that has one anyway is applied under neither reading, since either one silently changes
+ * what it grants.
+ */
+function grantWithin(
+  ability: AbilityBuilder<AppAbility>,
+  { action, subject }: Pick<UserPermission, 'action' | 'subject'>,
+  groupIds: null | string[],
+  source: 'permission' | 'permission set rule'
+) {
+  if (groupIds === null) {
+    ability.can(action, subject);
+  } else if (isGroupScopableSubject(subject)) {
+    ability.can(action, subject, GROUP_SCOPED_CONDITIONS[subject](groupIds));
+  } else {
+    throw new Error(`Cannot confine ${source} '${action} ${subject}' to groups [${groupIds.join(', ')}]`);
+  }
+}
 
 @Injectable()
 export class AbilityFactory {
@@ -93,27 +114,11 @@ export class AbilityFactory {
         ability.can('read', 'User', { id: payload.id });
         break;
     }
-    permissionSetRules.forEach(({ action, scope, subject }) => {
-      if (scope === 'ALL_GROUPS') {
-        ability.can(action, subject);
-      } else if (isGroupScopableSubject(subject)) {
-        ability.can(action, subject, GROUP_SCOPED_CONDITIONS[subject](groupIds));
-      } else {
-        // As below: the schema refuses this shape at the boundary, and neither reading of a stored one
-        // is what the set's author asked for.
-        throw new Error(`Cannot confine permission set rule '${action} ${subject}' to the holder's groups`);
-      }
+    permissionSetRules.forEach((rule) => {
+      grantWithin(ability, rule, rule.scope === 'ALL_GROUPS' ? null : groupIds, 'permission set rule');
     });
-    payload.additionalPermissions?.forEach(({ action, groupId, subject }) => {
-      if (groupId === null) {
-        ability.can(action, subject);
-      } else if (isGroupScopableSubject(subject)) {
-        ability.can(action, subject, GROUP_SCOPED_CONDITIONS[subject]([groupId]));
-      } else {
-        // The schema refuses this shape at the boundary; a stored row that has it anyway is applied
-        // under neither reading, since either one silently changes what the grant means.
-        throw new Error(`Cannot confine permission '${action} ${subject}' to group '${groupId}'`);
-      }
+    payload.additionalPermissions?.forEach((permission) => {
+      grantWithin(ability, permission, permission.groupId === null ? null : [permission.groupId], 'permission');
     });
     return ability.build({
       detectSubjectType: detectAppSubject

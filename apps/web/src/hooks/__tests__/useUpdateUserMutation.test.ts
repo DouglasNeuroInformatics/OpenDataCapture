@@ -16,7 +16,7 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
   }
 }));
 
-const permissions: $UpdateUserPermissionsData = {
+const permissionsUpdate: $UpdateUserPermissionsData = {
   kind: 'custom',
   permissions: [{ action: 'read', groupId: 'group-1', subject: 'Subject' }]
 };
@@ -40,9 +40,9 @@ describe('useUpdateUserMutation', () => {
   it('should show one confirmation after both account and permissions save', async () => {
     const { queryClient, result } = renderUpdateMutation();
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries');
-    await result.current.mutateAsync({ data: { email: 'jane@example.org' }, id: 'user-1', permissions });
+    await result.current.mutateAsync({ data: { email: 'jane@example.org' }, id: 'user-1', permissionsUpdate });
     expect(mocks.patch).toHaveBeenCalledWith('/v1/users/user-1', { email: 'jane@example.org' }, expect.anything());
-    expect(mocks.put).toHaveBeenCalledWith('/v1/users/user-1/permissions', permissions, expect.anything());
+    expect(mocks.put).toHaveBeenCalledWith('/v1/users/user-1/permissions', permissionsUpdate, expect.anything());
     expect(mocks.addNotification).toHaveBeenCalledExactlyOnceWith({ type: 'success' });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['users'] });
   });
@@ -51,7 +51,7 @@ describe('useUpdateUserMutation', () => {
     const accountSave = Promise.withResolvers<object>();
     mocks.patch.mockReturnValueOnce(accountSave.promise);
     const { result } = renderUpdateMutation();
-    const save = result.current.mutateAsync({ data: { groupIds: ['group-1'] }, id: 'user-1', permissions });
+    const save = result.current.mutateAsync({ data: { groupIds: ['group-1'] }, id: 'user-1', permissionsUpdate });
     await vi.waitFor(() => expect(mocks.patch).toHaveBeenCalled());
     expect(mocks.put).not.toHaveBeenCalled();
     expect(mocks.addNotification).not.toHaveBeenCalled();
@@ -69,7 +69,11 @@ describe('useUpdateUserMutation', () => {
 
   it('should clear permissions when the last row was removed', async () => {
     const { result } = renderUpdateMutation();
-    await result.current.mutateAsync({ data: {}, id: 'user-1', permissions: { kind: 'custom', permissions: [] } });
+    await result.current.mutateAsync({
+      data: {},
+      id: 'user-1',
+      permissionsUpdate: { kind: 'custom', permissions: [] }
+    });
     expect(mocks.put).toHaveBeenCalledWith(
       '/v1/users/user-1/permissions',
       { kind: 'custom', permissions: [] },
@@ -80,14 +84,14 @@ describe('useUpdateUserMutation', () => {
   it('should send a permission set as it was given, so the server replaces any custom grants with it', async () => {
     const { result } = renderUpdateMutation();
     const permissionSet: $UpdateUserPermissionsData = { kind: 'permissionSet', permissionSetId: 'set-1' };
-    await result.current.mutateAsync({ data: {}, id: 'user-1', permissions: permissionSet });
+    await result.current.mutateAsync({ data: {}, id: 'user-1', permissionsUpdate: permissionSet });
     expect(mocks.put).toHaveBeenCalledWith('/v1/users/user-1/permissions', permissionSet, expect.anything());
   });
 
   it('should show no success confirmation when permissions fail to save', async () => {
     mocks.put.mockRejectedValueOnce(new Error('permission save failed'));
     const { result } = renderUpdateMutation();
-    await expect(result.current.mutateAsync({ data: {}, id: 'user-1', permissions })).rejects.toThrow(
+    await expect(result.current.mutateAsync({ data: {}, id: 'user-1', permissionsUpdate })).rejects.toThrow(
       'permission save failed'
     );
     expect(mocks.addNotification).not.toHaveBeenCalled();
@@ -95,10 +99,10 @@ describe('useUpdateUserMutation', () => {
 
   it('should suppress the default error toast on both requests, since the caller shows its own message', async () => {
     const { result } = renderUpdateMutation();
-    await result.current.mutateAsync({ data: {}, id: 'user-1', permissions });
+    await result.current.mutateAsync({ data: {}, id: 'user-1', permissionsUpdate });
     const config = { meta: { disableDefaultErrorNotification: true } };
     expect(mocks.patch).toHaveBeenCalledWith('/v1/users/user-1', {}, config);
-    expect(mocks.put).toHaveBeenCalledWith('/v1/users/user-1/permissions', permissions, config);
+    expect(mocks.put).toHaveBeenCalledWith('/v1/users/user-1/permissions', permissionsUpdate, config);
   });
 
   it('should leave a rejection to its caller without escaping to the route error boundary', async () => {

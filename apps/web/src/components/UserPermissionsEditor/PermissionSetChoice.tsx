@@ -1,9 +1,10 @@
 import { Label, Select } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { PermissionSetSummary } from '@opendatacapture/schemas/permission-set';
-import { TriangleAlertIcon } from 'lucide-react';
 
 import { PermissionSetRulesEditor } from '@/components/PermissionSetRulesEditor';
+
+import { WarningCallout } from './WarningCallout';
 
 type PermissionSetChoiceProps = {
   /** Whether the user holds saved custom grants, which assigning a set removes. */
@@ -84,20 +85,13 @@ export const PermissionSetChoice = ({
         </div>
       )}
       {discardsCustomGrants && (
-        <div
-          className="flex gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-300"
-          data-testid="user-permissions-discard-warning"
-          role="alert"
-        >
-          <TriangleAlertIcon aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
-          <p>
-            {t({
-              en: "This user holds custom grants. Saving with a permission set removes them, since a user's permissions come from one or the other.",
-              es: 'Este usuario tiene permisos personalizados. Guardar con un conjunto de permisos los elimina, ya que los permisos de un usuario provienen de uno u otro.',
-              fr: "Cet utilisateur détient des autorisations personnalisées. Enregistrer avec un ensemble d'autorisations les retire, puisque les autorisations d'un utilisateur proviennent de l'un ou de l'autre."
-            })}
-          </p>
-        </div>
+        <WarningCallout data-testid="user-permissions-discard-warning">
+          {t({
+            en: "This user holds custom grants. Saving with a permission set removes them, since a user's permissions come from one or the other.",
+            es: 'Este usuario tiene permisos personalizados. Guardar con un conjunto de permisos los elimina, ya que los permisos de un usuario provienen de uno u otro.',
+            fr: "Cet utilisateur détient des autorisations personnalisées. Enregistrer avec un ensemble d'autorisations les retire, puisque les autorisations d'un utilisateur proviennent de l'un ou de l'autre."
+          })}
+        </WarningCallout>
       )}
     </div>
   );

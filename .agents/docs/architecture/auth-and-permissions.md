@@ -134,7 +134,7 @@ Consequences worth knowing:
   permissions or permission set — or editing the set itself — has no effect until they obtain a new
   token. There is no refresh endpoint.
 - **`basePermissionLevel` is nullable** and the `switch` has no `default`, so a user with `null` gets
-  only whatever `additionalPermissions` grants — usually nothing.
+  only what their permission set or `additionalPermissions` grants — usually nothing.
 - **JWT expiry is ignored in development.** `ignoreExpiration: configService.getOrThrow('NODE_ENV') === 'development'`
   in `src/auth/strategies/jwt.strategy.ts`. A dev token never expires; do not conclude from local
   testing that expiry works.

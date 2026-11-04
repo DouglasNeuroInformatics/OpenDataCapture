@@ -12,15 +12,15 @@ export function useUpdateUserMutation() {
     mutationFn: async ({
       data,
       id,
-      permissions
+      permissionsUpdate
     }: {
       data: $UpdateUserData;
       id: string;
-      permissions?: $UpdateUserPermissionsData;
+      permissionsUpdate?: $UpdateUserPermissionsData;
     }) => {
       await axios.patch(`/v1/users/${id}`, data, { meta: { disableDefaultErrorNotification: true } });
-      if (permissions !== undefined) {
-        await axios.put(`/v1/users/${id}/permissions`, permissions, {
+      if (permissionsUpdate !== undefined) {
+        await axios.put(`/v1/users/${id}/permissions`, permissionsUpdate, {
           meta: { disableDefaultErrorNotification: true }
         });
       }

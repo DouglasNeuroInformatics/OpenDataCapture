@@ -250,22 +250,22 @@ const UserEditor = ({ userId }: { userId: string }) => {
                 const customPermissions = withPermissionDrafts(localPermissions, permissionDrafts)
                   .filter(isGrantablePermission)
                   .filter((permission) => permission.groupId === null || groupIds.has(permission.groupId));
-                let permissions: $UpdateUserPermissionsData | undefined;
+                let permissionsUpdate: $UpdateUserPermissionsData | undefined;
                 if (user.basePermissionLevel === 'ADMIN') {
-                  permissions = undefined;
+                  permissionsUpdate = undefined;
                 } else if (permissionSource === 'permissionSet' && permissionSetId !== undefined) {
-                  permissions = { kind: 'permissionSet', permissionSetId };
+                  permissionsUpdate = { kind: 'permissionSet', permissionSetId };
                 } else {
-                  permissions = { kind: 'custom', permissions: customPermissions };
+                  permissionsUpdate = { kind: 'custom', permissions: customPermissions };
                 }
                 try {
-                  await updateUserMutation.mutateAsync({ data: accountData, id: user.id, permissions });
+                  await updateUserMutation.mutateAsync({ data: accountData, id: user.id, permissionsUpdate });
                   await userQuery.refetch();
                   // Each kind of write empties the other on the server, so the editor follows suit.
-                  if (permissions?.kind === 'custom') {
-                    setLocalPermissions(permissions.permissions);
+                  if (permissionsUpdate?.kind === 'custom') {
+                    setLocalPermissions(permissionsUpdate.permissions);
                     setPermissionSetId(undefined);
-                  } else if (permissions?.kind === 'permissionSet') {
+                  } else if (permissionsUpdate?.kind === 'permissionSet') {
                     setLocalPermissions([]);
                   }
                   setPermissionDrafts([{ scope: groupIds.size === 1 ? Array.from(groupIds)[0] : undefined }]);

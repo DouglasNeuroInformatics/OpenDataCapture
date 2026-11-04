@@ -10,7 +10,7 @@ import { CellSelect } from '@/components/CellSelect';
 import { usePermissionLabels } from '@/hooks/usePermissionLabels';
 import { createRuleDraft, isIncompleteRuleDraft } from '@/utils/permission-set-rules';
 import type { PermissionSetRuleDraft } from '@/utils/permission-set-rules';
-import { grantableActions, grantableSubjects, withoutPermission } from '@/utils/permissions';
+import { grantableActions, grantableSubjects, withoutIndex } from '@/utils/permissions';
 
 type PermissionSetRulesEditorProps =
   | {
@@ -94,7 +94,7 @@ export const PermissionSetRulesEditor = (props: PermissionSetRulesEditorProps) =
                       size="icon"
                       type="button"
                       variant="ghost"
-                      onClick={() => editor.onRulesChange(withoutPermission(rules, index))}
+                      onClick={() => editor.onRulesChange(withoutIndex(rules, index))}
                     >
                       <Trash2Icon className="h-4 w-4" />
                     </Button>
@@ -169,7 +169,7 @@ export const PermissionSetRulesEditor = (props: PermissionSetRulesEditorProps) =
                         size="icon"
                         type="button"
                         variant="ghost"
-                        onClick={() => editor.onDraftsChange(editor.drafts.filter((_, i) => i !== index))}
+                        onClick={() => editor.onDraftsChange(withoutIndex(editor.drafts, index))}
                       >
                         <Trash2Icon className="h-4 w-4" />
                       </Button>

@@ -11,24 +11,19 @@ import type { Permissions } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { PermissionSetSummary } from '@opendatacapture/schemas/permission-set';
 import type { $UpdateUserPermissionsData, User } from '@opendatacapture/schemas/user';
-import { PlusIcon, Trash2Icon, TriangleAlertIcon } from 'lucide-react';
+import { PlusIcon, Trash2Icon } from 'lucide-react';
 
 import { CellSelect } from '@/components/CellSelect';
 import { Chip } from '@/components/Chip';
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { usePermissionLabels } from '@/hooks/usePermissionLabels';
 import { resolveTheme } from '@/utils/chart-theme';
-import {
-  ALL_GROUPS,
-  grantableActions,
-  grantableSubjects,
-  isIncompleteDraft,
-  withoutPermission
-} from '@/utils/permissions';
+import { ALL_GROUPS, grantableActions, grantableSubjects, isIncompleteDraft, withoutIndex } from '@/utils/permissions';
 import type { PermissionDraft } from '@/utils/permissions';
 import { getAllGroupsScopeColor } from '@/utils/tag-colors';
 
 import { PermissionSetChoice } from './PermissionSetChoice';
+import { WarningCallout } from './WarningCallout';
 
 /** Where the user's permissions beyond their base level come from: a permission set, or their own grants. */
 type PermissionSource = $UpdateUserPermissionsData['kind'];
@@ -197,7 +192,7 @@ export const UserPermissionsEditor = ({
                           size="icon"
                           type="button"
                           variant="ghost"
-                          onClick={() => onPermissionsChange(withoutPermission(permissions, index))}
+                          onClick={() => onPermissionsChange(withoutIndex(permissions, index))}
                         >
                           <Trash2Icon className="h-4 w-4" />
                         </Button>
@@ -267,7 +262,7 @@ export const UserPermissionsEditor = ({
                             size="icon"
                             type="button"
                             variant="ghost"
-                            onClick={() => onDraftsChange(drafts.filter((_, draftIndex) => draftIndex !== index))}
+                            onClick={() => onDraftsChange(withoutIndex(drafts, index))}
                           >
                             <Trash2Icon className="h-4 w-4" />
                           </Button>
@@ -326,20 +321,13 @@ export const UserPermissionsEditor = ({
               </p>
             )}
             {isManageAll && (
-              <div
-                className="mt-3 flex gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-300"
-                data-testid="manage-all-warning"
-                role="alert"
-              >
-                <TriangleAlertIcon aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
-                <p>
-                  {t({
-                    en: "Manage (All) makes this user an administrator: they can read and change every group's data, manage every user's account and permissions, and create instruments, which can run code on the server.",
-                    es: 'Gestionar (todo) convierte a este usuario en administrador: puede consultar y modificar los datos de todos los grupos, gestionar la cuenta y los permisos de cada usuario, y crear instrumentos, los cuales pueden ejecutar código en el servidor.',
-                    fr: 'Gérer (Tout) fait de cet utilisateur un administrateur, qui peut consulter et modifier les données de tous les groupes, gérer le compte et les autorisations de chaque utilisateur, et créer des instruments, lesquels peuvent exécuter du code sur le serveur.'
-                  })}
-                </p>
-              </div>
+              <WarningCallout className="mt-3" data-testid="manage-all-warning">
+                {t({
+                  en: "Manage (All) makes this user an administrator: they can read and change every group's data, manage every user's account and permissions, and create instruments, which can run code on the server.",
+                  es: 'Gestionar (todo) convierte a este usuario en administrador: puede consultar y modificar los datos de todos los grupos, gestionar la cuenta y los permisos de cada usuario, y crear instrumentos, los cuales pueden ejecutar código en el servidor.',
+                  fr: 'Gérer (Tout) fait de cet utilisateur un administrateur, qui peut consulter et modifier les données de tous les groupes, gérer le compte et les autorisations de chaque utilisateur, et créer des instruments, lesquels peuvent exécuter du code sur le serveur.'
+                })}
+              </WarningCallout>
             )}
           </div>
         )}

@@ -269,7 +269,7 @@ describe('AbilityFactory', () => {
       );
     };
 
-    expect(build).toThrow("Cannot confine permission 'read Instrument' to group 'group-1'");
+    expect(build).toThrow("Cannot confine permission 'read Instrument' to groups [group-1]");
   });
 
   // `accessibleQuery` throws a CASL ForbiddenError, rather than returning a restrictive filter, when
@@ -355,7 +355,7 @@ describe('AbilityFactory', () => {
         ]);
       };
 
-      expect(build).toThrow("Cannot confine permission set rule 'read Instrument' to the holder's groups");
+      expect(build).toThrow("Cannot confine permission set rule 'read Instrument' to groups [group-1]");
     });
 
     it('should apply the set alongside custom grants and the base level, widening nothing else', () => {

@@ -356,7 +356,7 @@ describe('Route', () => {
       act(() => editorProps().onPermissionSetIdChange('set-1'));
       await submit();
       expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({
-        permissions: { kind: 'permissionSet', permissionSetId: 'set-1' }
+        permissionsUpdate: { kind: 'permissionSet', permissionSetId: 'set-1' }
       });
       expect(editorProps().permissions).toEqual([]);
     });
@@ -383,7 +383,9 @@ describe('Route', () => {
       renderPage();
       act(() => editorProps().onSourceChange('custom'));
       await submit();
-      expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({ permissions: { kind: 'custom', permissions: [] } });
+      expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({
+        permissionsUpdate: { kind: 'custom', permissions: [] }
+      });
       expect(editorProps().permissionSetId).toBeUndefined();
     });
 
@@ -392,7 +394,7 @@ describe('Route', () => {
       renderPage();
       act(() => editorProps().onSourceChange('permissionSet'));
       await submit();
-      expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({ permissions: undefined });
+      expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({ permissionsUpdate: undefined });
     });
   });
 
@@ -429,7 +431,7 @@ describe('Route', () => {
           phoneNumber: undefined
         },
         id: 'user-1',
-        permissions: { kind: 'custom', permissions: [] }
+        permissionsUpdate: { kind: 'custom', permissions: [] }
       });
     });
 
@@ -439,7 +441,7 @@ describe('Route', () => {
       act(() => editorProps().onDraftsChange([{ action: 'create', scope: 'group-1', subject: 'Subject' }]));
       await submit();
       expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({
-        permissions: {
+        permissionsUpdate: {
           kind: 'custom',
           permissions: [
             { action: 'read', groupId: 'group-1', subject: 'Subject' },
@@ -458,7 +460,7 @@ describe('Route', () => {
       renderPage();
       await submit();
       expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({
-        permissions: { kind: 'custom', permissions: [{ action: 'read', groupId: null, subject: 'Instrument' }] }
+        permissionsUpdate: { kind: 'custom', permissions: [{ action: 'read', groupId: null, subject: 'Instrument' }] }
       });
     });
 
@@ -466,7 +468,7 @@ describe('Route', () => {
       mocks.state.user.basePermissionLevel = 'ADMIN';
       renderPage();
       await submit();
-      expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({ permissions: undefined });
+      expect(mocks.mutateAsync.mock.lastCall?.[0]).toMatchObject({ permissionsUpdate: undefined });
     });
 
     it('should reload the user and report success once the save lands', async () => {

@@ -89,8 +89,8 @@ const withPermissionDrafts = (permissions: Permissions, drafts: PermissionDraft[
   }, permissions);
 };
 
-const withoutPermission = <TPermission>(permissions: TPermission[], index: number): TPermission[] => {
-  return permissions.filter((_, i) => i !== index);
+const withoutIndex = <TItem>(items: TItem[], index: number): TItem[] => {
+  return items.filter((_, itemIndex) => itemIndex !== index);
 };
 
 export {
@@ -100,7 +100,7 @@ export {
   grantableSubjects,
   isIncompleteDraft,
   toUserPermission,
-  withoutPermission,
+  withoutIndex,
   withPermission,
   withPermissionDrafts
 };

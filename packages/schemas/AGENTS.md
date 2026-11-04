@@ -94,7 +94,7 @@ shape. Two constraints on anything you write there:
   publish JSON Schema for every kind × language. This is why `$InstrumentValidationSchema` is
   `z.any().refine(...)` rather than `z.custom()`, which cannot be converted.
 
-## Three security-relevant exports
+## Four security-relevant exports
 
 `$AppSubjectName` in `src/core/core.ts` is the hand-maintained list of CASL subject names. It is not
 derived from `schema.prisma` and does not mirror it. A model that needs permission checks has to be
@@ -109,6 +109,11 @@ newly scopable subject's group field is named.
 `isGrantablePermission`, in the same file, says which storable pairs a new grant may name. It is
 applied by `$UpdateUserPermissionsData` and not by `$UserPermission`, which must still parse grants
 stored before it — `.agents/docs/architecture/auth-and-permissions.md` says why.
+
+`isPermissionSetGrantable`, in `src/permission-set/permission-set.ts`, is the same rule for a
+permission set, and also refuses `manage all`: one edit to a set would otherwise make every holder an
+administrator. `$CreatePermissionSetData` and `$UpdatePermissionSetData` apply it, and
+`$PermissionSetRule`, the read model, does not, for the same reason.
 
 ## Tests
 
