@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-classes -- the single-segment @Get('linear-model') must stay above @Get(':id'), which alphabetical order would put below it, where :id would match it first */
-
 import { ApiOperation, CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
 import {
   Body,
@@ -39,11 +37,20 @@ export class InstrumentRecordsController {
     return this.instrumentRecordsService.create(data, { ability });
   }
 
-  @ApiOperation({ summary: 'Upload Multiple Instrument Records' })
-  @Post('upload')
-  @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
-  upload(@Body() data: $UploadInstrumentRecordsData, @CurrentUser('ability') ability: AppAbility) {
-    return this.instrumentRecordsService.upload(data, { ability });
+  @ApiOperation({ summary: 'Delete Record' })
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @RouteAccess({ action: 'delete', subject: 'InstrumentRecord' })
+  async deleteById(@Param('id', ValidObjectIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+    await this.instrumentRecordsService.deleteById(id, { ability });
+  }
+
+  @ApiOperation({ summary: 'Export Records' })
+  @Get('export')
+  @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
+  @UseInterceptors(MsgpackInterceptor)
+  exportRecords(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string) {
+    return this.instrumentRecordsService.exportRecords({ groupId }, { ability });
   }
 
   @ApiOperation({ summary: 'Get Records for Instrument ' })
@@ -72,20 +79,11 @@ export class InstrumentRecordsController {
     );
   }
 
-  @ApiOperation({ summary: 'Delete Record' })
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @RouteAccess({ action: 'delete', subject: 'InstrumentRecord' })
-  async deleteById(@Param('id', ValidObjectIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
-    await this.instrumentRecordsService.deleteById(id, { ability });
-  }
-
-  @ApiOperation({ summary: 'Export Records' })
-  @Get('export')
+  @ApiOperation({ summary: 'Get Instrument Record' })
+  @Get(':id')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  @UseInterceptors(MsgpackInterceptor)
-  exportRecords(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string) {
-    return this.instrumentRecordsService.exportRecords({ groupId }, { ability });
+  findById(@Param('id', ValidObjectIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
+    return this.instrumentRecordsService.findById(id, { ability });
   }
 
   @ApiOperation({ description: 'Compute a Linear Model', summary: 'Linear Model' })
@@ -131,10 +129,10 @@ export class InstrumentRecordsController {
     return this.instrumentRecordsService.updateById(id, data, { ability });
   }
 
-  @ApiOperation({ summary: 'Get Instrument Record' })
-  @Get(':id')
-  @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  findById(@Param('id', ValidObjectIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
-    return this.instrumentRecordsService.findById(id, { ability });
+  @ApiOperation({ summary: 'Upload Multiple Instrument Records' })
+  @Post('upload')
+  @RouteAccess({ action: 'create', subject: 'InstrumentRecord' })
+  upload(@Body() data: $UploadInstrumentRecordsData, @CurrentUser('ability') ability: AppAbility) {
+    return this.instrumentRecordsService.upload(data, { ability });
   }
 }
