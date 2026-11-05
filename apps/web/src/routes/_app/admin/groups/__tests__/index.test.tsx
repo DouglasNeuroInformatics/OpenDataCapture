@@ -91,6 +91,8 @@ const renderPage = (queryClient = new QueryClient()) => {
 
 const rows = () => screen.getAllByTestId('data-table-row');
 
+const headerButton = (name: string) => within(screen.getByTestId('data-table-head')).getByText(name).closest('button')!;
+
 const openSheet = (rowIndex = 0) => {
   fireEvent.doubleClick(rows()[rowIndex]!);
   return screen.getByRole('dialog');
@@ -125,6 +127,20 @@ describe('Route', () => {
   });
 
   afterEach(cleanup);
+
+  it('should sort the groups by name, then by type, as each header is clicked', () => {
+    mocks.groups = [
+      groupFixture({ id: 'b', name: 'Beta', type: 'RESEARCH' }),
+      groupFixture({ id: 'a', name: 'Alpha', type: 'CLINICAL' })
+    ];
+    renderPage();
+    fireEvent.click(headerButton('Group Name'));
+    expect(rows()[0]!.textContent).toContain('Alpha');
+    fireEvent.click(headerButton('Group Name'));
+    expect(rows()[0]!.textContent).toContain('Beta');
+    fireEvent.click(headerButton('Group Type'));
+    expect(rows()[0]!.textContent).toContain('Alpha');
+  });
 
   it('should prefetch the groups and the instrument repositories, so the sheet never suspends', async () => {
     const queryClient = new QueryClient();

@@ -213,9 +213,11 @@ test.describe('remote assignment', () => {
     await page.getByRole('link', { name: 'Assignments' }).click();
     await page.waitForURL('**/datahub/subjects/**/assignments');
 
-    await page.getByRole('row').filter({ hasText: 'Happiness Questionnaire' }).click();
+    await page.getByTestId('data-table-row').filter({ hasText: 'Happiness Questionnaire' }).click();
     await page.getByRole('button', { name: 'Cancel' }).click();
 
-    await expect(page.getByRole('row').filter({ hasText: 'Happiness Questionnaire' })).toContainText('Canceled');
+    await expect(page.getByTestId('data-table-row').filter({ hasText: 'Happiness Questionnaire' })).toContainText(
+      'Canceled'
+    );
   });
 });

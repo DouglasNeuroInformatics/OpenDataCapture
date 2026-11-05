@@ -21,8 +21,10 @@ import { createFileRoute } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { InstrumentRepoSyncLogTable } from '@/components/InstrumentRepoSyncLogTable';
+import type { InstrumentRepoSyncLogSort } from '@/components/InstrumentRepoSyncLogTable';
 import { PageHeader } from '@/components/PageHeader';
 import { SectionTabs } from '@/components/SectionTabs';
+import { SortableHeader } from '@/components/SortableHeader';
 import { TruncatedCell } from '@/components/TruncatedCell';
 import { useClearInstrumentRepoSyncLogsMutation } from '@/hooks/useClearInstrumentRepoSyncLogsMutation';
 import { useCreateInstrumentRepoMutation } from '@/hooks/useCreateInstrumentRepoMutation';
@@ -175,7 +177,7 @@ type InstrumentReposSection = 'ACTIVITY' | 'REPOSITORIES';
 
 const INITIAL_PAGE = 1;
 
-const INITIAL_SORT_ORDER = 'desc';
+const INITIAL_SORT: InstrumentRepoSyncLogSort = { sortBy: 'createdAt', sortOrder: 'desc' };
 
 /**
  * One page of the activity log, for every repository or for one. It owns its own paging state, so
@@ -183,16 +185,16 @@ const INITIAL_SORT_ORDER = 'desc';
  */
 const SyncLogTable = ({ repoId }: { repoId?: string }) => {
   const [page, setPage] = useState<number>(INITIAL_PAGE);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(INITIAL_SORT_ORDER);
-  const syncLogsQuery = useInstrumentRepoSyncLogsQuery({ params: { page, repoId, sortOrder } });
+  const [sort, setSort] = useState(INITIAL_SORT);
+  const syncLogsQuery = useInstrumentRepoSyncLogsQuery({ params: { page, repoId, ...sort } });
   return (
     <InstrumentRepoSyncLogTable
       logs={syncLogsQuery.data?.data ?? []}
       pageCount={syncLogsQuery.data?.pageCount ?? 0}
-      sortOrder={sortOrder}
+      sort={sort}
       onPageChange={setPage}
-      onSortOrderChange={(order) => {
-        setSortOrder(order);
+      onSortChange={(nextSort) => {
+        setSort(nextSort);
         setPage(INITIAL_PAGE);
       }}
     />
@@ -211,7 +213,7 @@ const RouteComponent = () => {
   // The same first page the loader prefetched and `SyncLogTable` mounts on, so reading the total
   // here costs no extra request.
   const syncLogsQuery = useInstrumentRepoSyncLogsQuery({
-    params: { page: INITIAL_PAGE, sortOrder: INITIAL_SORT_ORDER }
+    params: { page: INITIAL_PAGE, ...INITIAL_SORT }
   });
   const latestSyncLogsQuery = useLatestInstrumentRepoSyncLogsQuery();
   const clearSyncLogsMutation = useClearInstrumentRepoSyncLogsMutation();
@@ -232,6 +234,15 @@ const RouteComponent = () => {
   // Compute which repos are currently assigned to at least one (live) group.
   const inUseRepoIds = new Set(groupsQuery.data.flatMap((group) => group.instrumentRepoIds));
   const latestSyncLogByRepoId = syncLogsByRepoId(latestSyncLogsQuery.data);
+  // Tanstack caches a column's value on the row object, so a value that depends on a separately
+  // loaded query has to be in the row, or the sort would keep what it read before the query settled.
+  const repoRows = reposQuery.data.map((repo) => ({
+    ...repo,
+    failedCount: latestSyncLogByRepoId.get(repo.id)?.failures.length,
+    instrumentCount: instrumentInfoQuery.data
+      ? currentRepoInstruments(instrumentInfoQuery.data, repo.id).length
+      : repo.instrumentIds.length
+  }));
 
   const sectionHeadings = {
     ACTIVITY: {
@@ -332,11 +343,16 @@ const RouteComponent = () => {
                       </span>
                     );
                   },
-                  header: t({
-                    en: 'Repository Name',
-                    es: 'Nombre del repositorio',
-                    fr: 'Nom du dépôt'
-                  })
+                  header: ({ column }) => (
+                    <SortableHeader
+                      column={column}
+                      label={t({
+                        en: 'Repository Name',
+                        es: 'Nombre del repositorio',
+                        fr: 'Nom du dépôt'
+                      })}
+                    />
+                  )
                 },
                 {
                   accessorKey: 'url',
@@ -347,24 +363,26 @@ const RouteComponent = () => {
                       value={ctx.row.original.url}
                     />
                   ),
-                  header: 'URL',
-                  size: 210
+                  header: ({ column }) => <SortableHeader column={column} label="URL" />,
+                  size: 165
                 },
                 {
-                  accessorFn: (row: InstrumentRepo) => {
-                    return instrumentInfoQuery.data
-                      ? currentRepoInstruments(instrumentInfoQuery.data, row.id).length
-                      : row.instrumentIds.length;
-                  },
-                  header: t({
-                    en: 'Instruments',
-                    es: 'Instrumentos',
-                    fr: 'Instruments'
-                  }),
+                  accessorKey: 'instrumentCount',
+                  header: ({ column }) => (
+                    <SortableHeader
+                      column={column}
+                      label={t({
+                        en: 'Instruments',
+                        es: 'Instrumentos',
+                        fr: 'Instruments'
+                      })}
+                    />
+                  ),
                   id: 'instrumentCount',
-                  size: 118
+                  size: 135
                 },
                 {
+                  accessorKey: 'failedCount',
                   cell: (ctx) => {
                     const log = latestSyncLogByRepoId.get(ctx.row.original.id);
                     if (!log) {
@@ -372,24 +390,36 @@ const RouteComponent = () => {
                     }
                     return <span data-testid="instrument-repo-failed-count">{log.failures.length}</span>;
                   },
-                  header: t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' }),
+                  header: ({ column }) => (
+                    <SortableHeader column={column} label={t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' })} />
+                  ),
                   id: 'failedCount',
-                  size: 88
+                  size: 100,
+                  sortUndefined: 'last'
                 },
                 {
-                  accessorFn: (row: InstrumentRepo) => {
-                    return row.lastSyncedAt ? new Date(row.lastSyncedAt).toLocaleDateString() : '-';
+                  accessorFn: (row: InstrumentRepo) =>
+                    row.lastSyncedAt ? new Date(row.lastSyncedAt).getTime() : undefined,
+                  cell: (ctx) => {
+                    const lastSyncedAt = ctx.getValue<null | number | undefined>();
+                    return lastSyncedAt ? new Date(lastSyncedAt).toLocaleDateString() : '-';
                   },
-                  header: t({
-                    en: 'Last Synced',
-                    es: 'Última sincronización',
-                    fr: 'Dernière synchronisation'
-                  }),
+                  header: ({ column }) => (
+                    <SortableHeader
+                      column={column}
+                      label={t({
+                        en: 'Last Synced',
+                        es: 'Última sincronización',
+                        fr: 'Dernière synchronisation'
+                      })}
+                    />
+                  ),
                   id: 'lastSynced',
-                  size: 112
+                  size: 130,
+                  sortUndefined: 'last'
                 }
               ]}
-              data={reposQuery.data}
+              data={repoRows}
               // libui shares the width evenly between unpinned columns and honours `size` only on pinned
               // ones, so every column but the name is pinned, leaving the name the room the table has left.
               initialState={{ columnPinning: { right: ['url', 'instrumentCount', 'failedCount', 'lastSynced'] } }}
@@ -715,7 +745,7 @@ export const Route = createFileRoute('/_app/admin/instrument-repos/')({
       context.queryClient.ensureQueryData(instrumentReposQueryOptions()),
       context.queryClient.ensureQueryData(groupsQueryOptions()),
       context.queryClient.ensureQueryData(
-        instrumentRepoSyncLogsQueryOptions({ params: { page: INITIAL_PAGE, sortOrder: INITIAL_SORT_ORDER } })
+        instrumentRepoSyncLogsQueryOptions({ params: { page: INITIAL_PAGE, ...INITIAL_SORT } })
       ),
       context.queryClient.ensureQueryData(latestInstrumentRepoSyncLogsQueryOptions())
     ]);

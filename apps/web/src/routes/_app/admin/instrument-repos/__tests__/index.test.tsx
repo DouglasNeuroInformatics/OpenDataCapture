@@ -162,6 +162,8 @@ const renderPage = (repos: InstrumentRepo[] = [repoFixture()]) => {
 
 const rows = () => screen.getAllByTestId('data-table-row');
 
+const headerButton = (name: string) => within(screen.getByTestId('data-table-head')).getByText(name).closest('button')!;
+
 // Radix tabs activate on mouse down, not click.
 const openActivityLog = () => {
   return fireEvent.mouseDown(screen.getByTestId('instrument-repos-section-ACTIVITY'), { button: 0 });
@@ -189,6 +191,41 @@ const runLoader = (queryClient: QueryClient) => {
 };
 
 describe('Route', () => {
+  describe('repository table sorting', () => {
+    afterEach(cleanup);
+
+    it('should order the last synced date as a date, since a formatted string sorts by its month or day', () => {
+      renderPage([
+        repoFixture({ id: 'new', lastSyncedAt: new Date('2026-02-01'), name: 'New' }),
+        repoFixture({ id: 'old', lastSyncedAt: new Date('2025-12-15'), name: 'Old' })
+      ]);
+      fireEvent.click(headerButton('Last Synced'));
+      expect(rows()[0]!.textContent).toContain('New');
+      fireEvent.click(headerButton('Last Synced'));
+      expect(rows()[0]!.textContent).toContain('Old');
+    });
+
+    it('should order by the failed count of the latest sync, keeping a never-synced repository last', () => {
+      mocks.latestSyncLogs = [
+        syncLogFixture({ failures: [{ instrumentDir: 'A', message: 'x', stage: 'LOAD' }], repoId: 'one' }),
+        syncLogFixture({ failures: [], repoId: 'none' })
+      ];
+      renderPage([
+        repoFixture({ id: 'never', name: 'Never' }),
+        repoFixture({ id: 'none', name: 'None' }),
+        repoFixture({ id: 'one', name: 'One' })
+      ]);
+      fireEvent.click(headerButton('Failed'));
+      expect(rows().map((row) => /Never|None|One/u.exec(row.textContent)![0])).toEqual(['One', 'None', 'Never']);
+    });
+
+    it.each(['Repository Name', 'URL', 'Instruments'])('should sort by %s when its header is clicked', (name) => {
+      renderPage([repoFixture()]);
+      fireEvent.click(headerButton(name));
+      expect(headerButton(name).querySelector('.lucide-chevrons-up-down')).toBeNull();
+    });
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.groups = [];
@@ -324,7 +361,7 @@ describe('Route', () => {
 
     fireEvent.click(within(log.getByTestId('data-table-head')).getByText('Date'));
 
-    expect(mocks.syncLogsParams.at(-1)).toMatchObject({ page: 1, sortOrder: 'asc' });
+    expect(mocks.syncLogsParams.at(-1)).toMatchObject({ page: 1, sortBy: 'createdAt', sortOrder: 'asc' });
   });
 
   it("should request one repository's own entries in its dialog, rather than filter the page on screen", () => {

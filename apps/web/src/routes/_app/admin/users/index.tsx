@@ -2,15 +2,13 @@ import React, { useState } from 'react';
 
 import { snakeToCamelCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
-import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { cn } from '@douglasneuroinformatics/libui/utils';
 import type { User } from '@opendatacapture/schemas/user';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from 'lucide-react';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { PageHeader } from '@/components/PageHeader';
+import { SortableHeader } from '@/components/SortableHeader';
 import { useArchiveUserMutation } from '@/hooks/useArchiveUserMutation';
 import { useUnarchiveUserMutation } from '@/hooks/useUnarchiveUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
@@ -19,23 +17,6 @@ import { resolveTheme } from '@/utils/chart-theme';
 import { getArchiveStatusColor } from '@/utils/tag-colors';
 
 type ArchiveAction = { kind: 'archive'; user: User };
-
-const SORTED_ICONS = { asc: ChevronUpIcon, desc: ChevronDownIcon };
-
-const SortableHeader = ({ column, label }: { column: TanstackTable.Column<User>; label: string }) => {
-  const sorted = column.getIsSorted();
-  const Icon = sorted ? SORTED_ICONS[sorted] : ChevronsUpDownIcon;
-  return (
-    <button
-      className="hover:text-foreground flex items-center gap-1 transition-colors"
-      type="button"
-      onClick={() => column.toggleSorting()}
-    >
-      {label}
-      <Icon className={cn('h-3.5 w-3.5', !sorted && 'opacity-40')} />
-    </button>
-  );
-};
 
 const RouteComponent = () => {
   const { t } = useTranslation();
