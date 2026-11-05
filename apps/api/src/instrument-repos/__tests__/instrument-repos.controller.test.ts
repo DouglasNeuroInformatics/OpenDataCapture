@@ -58,7 +58,7 @@ describe('InstrumentReposController', () => {
   });
 
   it("should scope the activity log to the current user's ability, and pass the page asked for", async () => {
-    const query = { limit: 10, page: 2, sortOrder: 'desc' } as const;
+    const query = { limit: 10, page: 2, sortBy: 'createdAt', sortOrder: 'desc' } as const;
     const result = { data: [], pageCount: 0, total: 0 };
     service.findSyncLogs.mockResolvedValueOnce(result);
     await expect(controller.findSyncLogs(query, ability)).resolves.toBe(result);

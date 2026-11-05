@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { AuditController } from '../audit.controller';
 import { AuditService } from '../audit.service';
 
-const query: $AuditLogsQueryParams = { limit: AUDIT_LOGS_PAGE_SIZE, page: 2, sortOrder: 'asc' };
+const query: $AuditLogsQueryParams = { limit: AUDIT_LOGS_PAGE_SIZE, page: 2, sortBy: 'timestamp', sortOrder: 'asc' };
 
 describe('AuditController', () => {
   let auditController: AuditController;
