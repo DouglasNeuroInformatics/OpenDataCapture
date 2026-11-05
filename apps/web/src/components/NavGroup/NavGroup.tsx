@@ -18,11 +18,13 @@ type NavGroupProps = {
   onNavigate?: (url: string, search?: { [key: string]: string }) => void;
 };
 
+const isAtOrBeneath = (url: string, pathname: string) => pathname === url || pathname.startsWith(`${url}/`);
+
 const isItemActive = (item: NavItem, pathname: string, searchParams: { [key: string]: unknown }): boolean => {
   if (item.children) {
     return item.children.some((child) => isItemActive(child, pathname, searchParams));
   }
-  if (item.url !== pathname) {
+  if (!isAtOrBeneath(item.url!, pathname)) {
     return false;
   }
   if (!item.search) {

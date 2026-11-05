@@ -19,7 +19,7 @@ export abstract class AppPage extends RootPage {
    * the setup-state query, and clicking an already-open group would collapse it.
    */
   async expandNavGroup(label: string) {
-    const groupButton = this.sidebar.getByRole('button', { name: label });
+    const groupButton = this.sidebar.getByRole('button', { exact: true, name: label });
     await expect(groupButton).toBeVisible();
     if ((await groupButton.getAttribute('aria-expanded')) !== 'true') {
       await groupButton.click();
