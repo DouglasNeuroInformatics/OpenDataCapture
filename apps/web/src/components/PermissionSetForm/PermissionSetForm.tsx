@@ -7,6 +7,7 @@ import { $CreatePermissionSetData } from '@opendatacapture/schemas/permission-se
 import type { PermissionSet } from '@opendatacapture/schemas/permission-set';
 
 import { PermissionSetRulesEditor } from '@/components/PermissionSetRulesEditor';
+import { PAGE_SUBMIT_BUTTON } from '@/utils/card-color';
 import { createRuleDraft, isIncompleteRuleDraft, withRuleDrafts } from '@/utils/permission-set-rules';
 import type { PermissionSetRuleDraft } from '@/utils/permission-set-rules';
 
@@ -44,6 +45,7 @@ export const PermissionSetForm = ({
           variant: 'input'
         }
       }}
+      customStyles={{ submitBtn: PAGE_SUBMIT_BUTTON }}
       data-testid="permission-set-form"
       fieldsFooter={
         <div className="flex flex-col gap-1.5 pb-6">

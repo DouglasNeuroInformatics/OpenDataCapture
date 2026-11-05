@@ -9,6 +9,7 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
 import { AssignmentEmailForm } from '@/components/AssignmentEmailForm';
+import { InstanceCard } from '@/components/InstanceCard';
 import { InstrumentShowcase } from '@/components/InstrumentShowcase';
 import { PageHeader } from '@/components/PageHeader';
 import { QRCode } from '@/components/QRCode';
@@ -125,92 +126,94 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <WithFallback
-        Component={InstrumentShowcase}
-        props={{
-          data: instrumentInfoQuery.data && selectAdministrableInstruments(instrumentInfoQuery.data, currentGroup),
-          onSelect: (instrument) => {
-            setSelectedInstrument(instrument);
-            setIsCreateModalOpen(true);
-          }
-        }}
-      />
-      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <Dialog.Content
-          ref={createDialogRef}
-          onOpenAutoFocus={(event) => {
-            event.preventDefault();
-            createDialogRef.current?.querySelector<HTMLButtonElement>('button[type="submit"]')?.focus();
-          }}
-        >
-          <Dialog.Header>
-            <Dialog.Title>
-              {t({
-                en: 'Create Remote Assignment',
-                es: 'Crear tarea remota',
-                fr: 'Créer une tâche à distance'
-              })}
-            </Dialog.Title>
-            <Dialog.Description>
-              {t(
-                {
-                  en: 'Assign "{}" to the current subject for remote completion.',
-                  es: 'Asignar "{}" al sujeto actual para que la complete de forma remota.',
-                  fr: 'Assigner « {} » au client actuel pour complétion à distance.'
-                },
-                { args: [selectedInstrument?.details.title ?? ''] }
-              )}
-            </Dialog.Description>
-          </Dialog.Header>
-          <Form
-            suspendWhileSubmitting
-            content={{
-              expiresAt: {
-                kind: 'date',
-                label: t({
-                  en: 'Expires At',
-                  es: 'Vence el',
-                  fr: "Date d'expiration"
-                })
-              }
-            }}
-            initialValues={{
-              expiresAt: getDefaultAssignmentExpiry(setupStateQuery.data.defaultAssignmentDurationDays)
-            }}
-            validationSchema={
-              z.object({
-                expiresAt: z.date().min(new Date(), {
-                  message: t({
-                    en: 'Expiry date must be in the future',
-                    es: 'La fecha de vencimiento debe ser futura',
-                    fr: "La date d'expiration doit être dans le futur"
-                  })
-                })
-              }) satisfies z.ZodType<Pick<$CreateAssignmentData, 'expiresAt'>>
+      <InstanceCard className="p-6">
+        <WithFallback
+          Component={InstrumentShowcase}
+          props={{
+            data: instrumentInfoQuery.data && selectAdministrableInstruments(instrumentInfoQuery.data, currentGroup),
+            onSelect: (instrument) => {
+              setSelectedInstrument(instrument);
+              setIsCreateModalOpen(true);
             }
-            onSubmit={async ({ expiresAt }) => {
-              const created = await createAssignmentMutation.mutateAsync({
-                data: {
-                  expiresAt,
-                  groupId: currentGroup?.id,
-                  instrumentId: selectedInstrument!.id,
-                  subjectId: currentSession.subjectId
-                }
-              });
-              setAssignment(created);
-              setIsCreateModalOpen(false);
-              setIsResultSliderOpen(true);
+          }}
+        />
+        <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+          <Dialog.Content
+            ref={createDialogRef}
+            onOpenAutoFocus={(event) => {
+              event.preventDefault();
+              createDialogRef.current?.querySelector<HTMLButtonElement>('button[type="submit"]')?.focus();
             }}
-          />
-        </Dialog.Content>
-      </Dialog>
-      <AssignmentResultSlider
-        assignment={assignment}
-        instrumentLanguages={selectedInstrument?.supportedLanguages}
-        isOpen={isResultSliderOpen}
-        setIsOpen={setIsResultSliderOpen}
-        title={selectedInstrument?.details.title}
-      />
+          >
+            <Dialog.Header>
+              <Dialog.Title>
+                {t({
+                  en: 'Create Remote Assignment',
+                  es: 'Crear tarea remota',
+                  fr: 'Créer une tâche à distance'
+                })}
+              </Dialog.Title>
+              <Dialog.Description>
+                {t(
+                  {
+                    en: 'Assign "{}" to the current subject for remote completion.',
+                    es: 'Asignar "{}" al sujeto actual para que la complete de forma remota.',
+                    fr: 'Assigner « {} » au client actuel pour complétion à distance.'
+                  },
+                  { args: [selectedInstrument?.details.title ?? ''] }
+                )}
+              </Dialog.Description>
+            </Dialog.Header>
+            <Form
+              suspendWhileSubmitting
+              content={{
+                expiresAt: {
+                  kind: 'date',
+                  label: t({
+                    en: 'Expires At',
+                    es: 'Vence el',
+                    fr: "Date d'expiration"
+                  })
+                }
+              }}
+              initialValues={{
+                expiresAt: getDefaultAssignmentExpiry(setupStateQuery.data.defaultAssignmentDurationDays)
+              }}
+              validationSchema={
+                z.object({
+                  expiresAt: z.date().min(new Date(), {
+                    message: t({
+                      en: 'Expiry date must be in the future',
+                      es: 'La fecha de vencimiento debe ser futura',
+                      fr: "La date d'expiration doit être dans le futur"
+                    })
+                  })
+                }) satisfies z.ZodType<Pick<$CreateAssignmentData, 'expiresAt'>>
+              }
+              onSubmit={async ({ expiresAt }) => {
+                const created = await createAssignmentMutation.mutateAsync({
+                  data: {
+                    expiresAt,
+                    groupId: currentGroup?.id,
+                    instrumentId: selectedInstrument!.id,
+                    subjectId: currentSession.subjectId
+                  }
+                });
+                setAssignment(created);
+                setIsCreateModalOpen(false);
+                setIsResultSliderOpen(true);
+              }}
+            />
+          </Dialog.Content>
+        </Dialog>
+        <AssignmentResultSlider
+          assignment={assignment}
+          instrumentLanguages={selectedInstrument?.supportedLanguages}
+          isOpen={isResultSliderOpen}
+          setIsOpen={setIsResultSliderOpen}
+          title={selectedInstrument?.details.title}
+        />
+      </InstanceCard>
     </div>
   );
 };

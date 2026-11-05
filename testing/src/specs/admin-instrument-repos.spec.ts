@@ -176,7 +176,18 @@ test.describe('admin instrument repos activity log', () => {
     await expect(reposPage.$ref.getByTestId('instrument-repo-url')).toHaveCount(0);
   });
 
-  test('should draw no card behind either tab', async ({ getPageModel }) => {
+  test('should draw no card behind either tab', async ({ getPageModel, page }) => {
+    // The card color is one instance-wide value another spec may be changing, so it is pinned here.
+    await page.route('**/v1/setup', async (route) => {
+      if (route.request().method() !== 'GET') {
+        return route.fallback();
+      }
+      const response = await route.fetch();
+      await route.fulfill({
+        json: { ...(await response.json()), darkCardTheme: 'invisible', lightCardTheme: 'invisible' },
+        response
+      });
+    });
     const reposPage = await getPageModel('/admin/instrument-repos');
     const expectInvisible = async () => {
       await expect(reposPage.card).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');

@@ -2,13 +2,14 @@ import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
 
 import { parseDuration } from '@douglasneuroinformatics/libjs';
-import { Card, Heading } from '@douglasneuroinformatics/libui/components';
+import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useInterval, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $GatewayHealthcheckResult } from '@opendatacapture/schemas/gateway';
 import type { ReleaseInfo } from '@opendatacapture/schemas/setup';
 import { createFileRoute } from '@tanstack/react-router';
 import axios from 'axios';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 
@@ -171,18 +172,18 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <Card>
-        <Card.Header className="border-b">
-          <Card.Title className="text-lg">Open Data Capture</Card.Title>
-          <Card.Description>
+      <InstanceCard>
+        <InstanceCard.Header className="border-b">
+          <InstanceCard.Title className="text-lg">Open Data Capture</InstanceCard.Title>
+          <InstanceCard.Description>
             {t({
               en: "This page provides technical information that you can share with your platform administrator if you encounter any issues. Don't worry if you don't understand the content; it's intended for technical support.",
               es: 'Esta página ofrece información técnica que puede compartir con el administrador de su plataforma si tiene algún problema. No se preocupe si no entiende el contenido; está destinado al soporte técnico.',
               fr: "Cette page fournit des informations techniques que vous pouvez partager avec l'administrateur de votre plateforme si vous rencontrez des problèmes. Ne vous inquiétez pas si vous ne comprenez pas le contenu ; il est destiné à l'assistance technique."
             })}
-          </Card.Description>
-        </Card.Header>
-        <Card.Content className="flex flex-col gap-6 p-6 text-sm">
+          </InstanceCard.Description>
+        </InstanceCard.Header>
+        <InstanceCard.Content className="flex flex-col gap-6 p-6 text-sm">
           <InfoBlock
             items={translateReleaseInfo(__RELEASE__)}
             label={t({ en: 'Web Client', es: 'Cliente web', fr: 'Client Web' })}
@@ -209,8 +210,8 @@ const RouteComponent = () => {
             })}
             testId="about-gateway-info"
           />
-        </Card.Content>
-        <Card.Footer className="border-t px-6 py-3">
+        </InstanceCard.Content>
+        <InstanceCard.Footer className="border-t px-6 py-3">
           <p className="text-muted-foreground text-xs">
             {t({
               en: `Generated on ${currentDateString}`,
@@ -218,8 +219,8 @@ const RouteComponent = () => {
               fr: `Généré le ${currentDateString}`
             })}
           </p>
-        </Card.Footer>
-      </Card>
+        </InstanceCard.Footer>
+      </InstanceCard>
     </div>
   );
 };

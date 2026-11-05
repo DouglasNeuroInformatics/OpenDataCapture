@@ -24,6 +24,7 @@ import { EyeIcon, TrashIcon } from 'lucide-react';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { InstrumentPreviewDialog } from '@/components/InstrumentPreviewDialog';
 import type { InstrumentPreviewItem, InstrumentSource } from '@/components/InstrumentPreviewDialog';
 import { PageHeader } from '@/components/PageHeader';
@@ -34,6 +35,7 @@ import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
+import { PAGE_SUBMIT_BUTTON } from '@/utils/card-color';
 import { buildSeriesAvailability } from '@/utils/series-availability';
 
 /**
@@ -797,6 +799,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
             title: t('group.manage.groupSettings')
           }
         ]}
+        customStyles={{ submitBtn: PAGE_SUBMIT_BUTTON }}
         initialValues={settingsInitialValues}
         readOnly={readOnly}
         validationSchema={z
@@ -971,20 +974,22 @@ const RouteComponent = () => {
           {t('manage.pageTitle')}
         </Heading>
       </PageHeader>
-      {/* The key remounts the form on a group switch, the only time its selection may be reseeded:
+      <InstanceCard className="p-6">
+        {/* The key remounts the form on a group switch, the only time its selection may be reseeded:
           `initialSelectedIds` changes identity on every refetch, and reseeding then would drop unsaved edits. */}
-      <WithFallback
-        Component={ManageGroupForm}
-        key={currentGroup?.id}
-        props={{
-          data,
-          onSubmit: async (data) => {
-            const updatedGroup = await updateGroupMutation.mutateAsync(data);
-            changeGroup(updatedGroup);
-          },
-          readOnly: Boolean(setupState.data?.isDemo && import.meta.env.PROD)
-        }}
-      />
+        <WithFallback
+          Component={ManageGroupForm}
+          key={currentGroup?.id}
+          props={{
+            data,
+            onSubmit: async (data) => {
+              const updatedGroup = await updateGroupMutation.mutateAsync(data);
+              changeGroup(updatedGroup);
+            },
+            readOnly: Boolean(setupState.data?.isDemo && import.meta.env.PROD)
+          }}
+        />
+      </InstanceCard>
     </React.Fragment>
   );
 };

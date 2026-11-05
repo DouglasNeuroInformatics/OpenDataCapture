@@ -1,12 +1,14 @@
 import React from 'react';
 
-import { Card, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
+import { Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { licenses } from '@opendatacapture/licenses';
 import { InstrumentIcon } from '@opendatacapture/react-core';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { BadgeAlertIcon, BadgeCheckIcon } from 'lucide-react';
+
+import { InstanceCard } from '@/components/InstanceCard';
 
 type BaseCardItem = { label: string; tooltip?: React.ReactNode };
 
@@ -134,7 +136,7 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
   ];
 
   return (
-    <Card
+    <InstanceCard
       className={cn(
         'group flex gap-8 p-6 transition-transform duration-300 ease-in-out hover:scale-[1.03] hover:cursor-pointer sm:p-8',
         highlighted && 'bg-sky-100/60 ring-2 ring-sky-500/60 dark:bg-sky-900/30'
@@ -180,6 +182,6 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
           })}
         </div>
       </div>
-    </Card>
+    </InstanceCard>
   );
 };

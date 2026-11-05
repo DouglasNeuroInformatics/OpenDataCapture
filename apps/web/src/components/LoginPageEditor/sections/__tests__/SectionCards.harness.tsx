@@ -37,10 +37,12 @@ async function renderWithBrandingEditor(
   const setupState: SetupState = {
     activeLanguages: ['en', 'fr'],
     branding,
+    darkCardTheme: 'invisible',
     isDemo: false,
     isGatewayEnabled: false,
     isMailEnabled: false,
     isSetup: true,
+    lightCardTheme: 'invisible',
     release: { buildTime: 0, type: 'production', version: '1.0.0' },
     tableColorMode: 'tags',
     uptime: 0

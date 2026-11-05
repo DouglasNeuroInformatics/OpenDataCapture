@@ -1,22 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import {
-  Card,
-  Checkbox,
-  Heading,
-  HoverCard,
-  Input,
-  Select,
-  Separator
-} from '@douglasneuroinformatics/libui/components';
+import { Checkbox, Heading, HoverCard, Input, Select, Separator } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { DEFAULT_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/assignment';
 import type { Language } from '@opendatacapture/schemas/core';
-import { MAX_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/setup';
+import { DARK_CARD_THEMES, LIGHT_CARD_THEMES, MAX_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/setup';
+import type { DarkCardTheme, LightCardTheme } from '@opendatacapture/schemas/setup';
 import { createFileRoute } from '@tanstack/react-router';
 import { CircleHelpIcon } from 'lucide-react';
 
+import { InstanceCard } from '@/components/InstanceCard';
+import { HEX_PATTERN } from '@/components/LoginPageEditor/constants';
+import { ColorField } from '@/components/LoginPageEditor/fields/ColorField';
+import { SwatchButton } from '@/components/LoginPageEditor/fields/SwatchButton';
 import { PageHeader } from '@/components/PageHeader';
 import { SaveStatus } from '@/components/SaveStatus';
 import { SelectTableColorMode } from '@/components/SelectTableColorMode';
@@ -26,6 +23,13 @@ import { useUpdateSetupStateMutation } from '@/hooks/useUpdateSetupStateMutation
 import { useAppStore } from '@/store';
 import type { GroupSwitcherPosition } from '@/store/types';
 import { parseDurationDays } from '@/utils/assignment-duration';
+import {
+  CARD_THEME_LABELS,
+  DEFAULT_CUSTOM_CARD_COLOR,
+  getDarkCardShades,
+  getLightCardShades
+} from '@/utils/card-color';
+import type { CardMode, CardShades } from '@/utils/card-color';
 import { LANGUAGE_LABELS, LANGUAGES } from '@/utils/language';
 
 /** libui ships no Switch, so this is hand-rolled — `label` names it for assistive technology. */
@@ -57,6 +61,76 @@ const Toggle = ({
     />
   </button>
 );
+
+const CUSTOM_COLOR_AUTOSAVE_DELAY = 700;
+
+/** The login page's picker: a square per theme, and a hex field once Custom is chosen. */
+const CardThemePicker = <TTheme extends DarkCardTheme | LightCardTheme>({
+  customColor,
+  label,
+  mode,
+  onCustomColorChange,
+  onThemeChange,
+  shades,
+  theme,
+  themes
+}: {
+  customColor: null | string | undefined;
+  label: string;
+  mode: CardMode;
+  onCustomColorChange: (color: string) => void;
+  onThemeChange: (theme: TTheme) => void;
+  shades: CardShades<TTheme>;
+  theme: TTheme;
+  themes: readonly TTheme[];
+}) => {
+  const { t } = useTranslation();
+  const [customDraft, setCustomDraft] = useState(customColor ?? DEFAULT_CUSTOM_CARD_COLOR[mode]);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => () => clearTimeout(debounceRef.current), []);
+
+  const handleCustomDraftChange = (color: string) => {
+    setCustomDraft(color);
+    clearTimeout(debounceRef.current);
+    if (HEX_PATTERN.test(color)) {
+      debounceRef.current = setTimeout(() => onCustomColorChange(color), CUSTOM_COLOR_AUTOSAVE_DELAY);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2" data-testid={`card-theme-${mode}`}>
+      <p className="text-sm font-medium">{label}</p>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {themes.map((option) => {
+          const { border, fill } = shades[option];
+          return (
+            <SwatchButton
+              isSelected={theme === option}
+              key={option}
+              label={t(CARD_THEME_LABELS[option])}
+              style={
+                fill === 'transparent'
+                  ? { border: '1px dashed var(--border)' }
+                  : { backgroundColor: fill, border: `1px solid ${border}` }
+              }
+              onClick={() => onThemeChange(option)}
+            />
+          );
+        })}
+      </div>
+      {theme === 'custom' && (
+        <ColorField
+          id={`custom-card-color-${mode}`}
+          label={t({ en: 'Custom Color', es: 'Color personalizado', fr: 'Couleur personnalisée' })}
+          swatchFallback={DEFAULT_CUSTOM_CARD_COLOR[mode]}
+          value={customDraft}
+          onChange={handleCustomDraftChange}
+        />
+      )}
+    </div>
+  );
+};
 
 const SettingSection = ({ children, title }: { children: React.ReactNode; title: string }) => (
   <section className="flex flex-col gap-4 p-6">
@@ -176,9 +250,9 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <div className="mx-auto w-full max-w-4xl">
-        <Card>
-          <Card.Content className="p-0">
+      <div className="mx-auto w-full max-w-171">
+        <InstanceCard>
+          <InstanceCard.Content className="p-0">
             <SettingSection title={t({ en: 'Features', es: 'Funcionalidades', fr: 'Fonctionnalités' })}>
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
@@ -320,6 +394,37 @@ const RouteComponent = () => {
               </div>
             </SettingSection>
             <Separator />
+            <SettingSection title={t({ en: 'Appearance', es: 'Apariencia', fr: 'Apparence' })}>
+              <CardThemePicker
+                customColor={setupStateQuery.data.customCardColorLight}
+                label={t({
+                  en: 'Card Color (Light Mode)',
+                  es: 'Color de las tarjetas (modo claro)',
+                  fr: 'Couleur des cartes (mode clair)'
+                })}
+                mode="light"
+                shades={getLightCardShades(setupStateQuery.data.customCardColorLight)}
+                theme={setupStateQuery.data.lightCardTheme}
+                themes={LIGHT_CARD_THEMES}
+                onCustomColorChange={(customCardColorLight) => autosave({ customCardColorLight })}
+                onThemeChange={(lightCardTheme) => autosave({ lightCardTheme })}
+              />
+              <CardThemePicker
+                customColor={setupStateQuery.data.customCardColorDark}
+                label={t({
+                  en: 'Card Color (Dark Mode)',
+                  es: 'Color de las tarjetas (modo oscuro)',
+                  fr: 'Couleur des cartes (mode sombre)'
+                })}
+                mode="dark"
+                shades={getDarkCardShades(setupStateQuery.data.customCardColorDark)}
+                theme={setupStateQuery.data.darkCardTheme}
+                themes={DARK_CARD_THEMES}
+                onCustomColorChange={(customCardColorDark) => autosave({ customCardColorDark })}
+                onThemeChange={(darkCardTheme) => autosave({ darkCardTheme })}
+              />
+            </SettingSection>
+            <Separator />
             <SettingSection
               title={t({ en: 'UI Preferences', es: 'Preferencias de la interfaz', fr: "Préférences de l'interface" })}
             >
@@ -364,8 +469,8 @@ const RouteComponent = () => {
                 />
               </div>
             </SettingSection>
-          </Card.Content>
-        </Card>
+          </InstanceCard.Content>
+        </InstanceCard>
       </div>
       <SaveStatus state={saveState} />
     </React.Fragment>

@@ -1,4 +1,4 @@
-import { Button, Card, Table, Tabs } from '@douglasneuroinformatics/libui/components';
+import { Button, Table, Tabs } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import {
@@ -16,6 +16,7 @@ import { PlusIcon, Trash2Icon } from 'lucide-react';
 import { CellSelect } from '@/components/CellSelect';
 import { Chip } from '@/components/Chip';
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { InstanceCard } from '@/components/InstanceCard';
 import { usePermissionLabels } from '@/hooks/usePermissionLabels';
 import { resolveTheme } from '@/utils/chart-theme';
 import { ALL_GROUPS, grantableActions, grantableSubjects, isIncompleteDraft, withoutIndex } from '@/utils/permissions';
@@ -83,34 +84,34 @@ export const UserPermissionsEditor = ({
 
   if (user.basePermissionLevel === 'ADMIN') {
     return (
-      <Card data-testid="user-permissions-card">
-        <Card.Header>
-          <Card.Title>{t({ en: 'Permissions', es: 'Permisos', fr: 'Autorisations' })}</Card.Title>
-          <Card.Description data-testid="user-permissions-admin-notice">
+      <InstanceCard data-testid="user-permissions-card">
+        <InstanceCard.Header>
+          <InstanceCard.Title>{t({ en: 'Permissions', es: 'Permisos', fr: 'Autorisations' })}</InstanceCard.Title>
+          <InstanceCard.Description data-testid="user-permissions-admin-notice">
             {t({
               en: 'Administrators hold every permission, so there is nothing further to grant.',
               es: 'Los administradores tienen todos los permisos, por lo que no hay nada más que conceder.',
               fr: "Les administrateurs détiennent toutes les autorisations, il n'y a donc rien de plus à accorder."
             })}
-          </Card.Description>
-        </Card.Header>
-      </Card>
+          </InstanceCard.Description>
+        </InstanceCard.Header>
+      </InstanceCard>
     );
   }
 
   return (
-    <Card data-testid="user-permissions-card">
-      <Card.Header>
-        <Card.Title>{t({ en: 'Permissions', es: 'Permisos', fr: 'Autorisations' })}</Card.Title>
-        <Card.Description data-testid="user-permissions-signin-note">
+    <InstanceCard data-testid="user-permissions-card">
+      <InstanceCard.Header>
+        <InstanceCard.Title>{t({ en: 'Permissions', es: 'Permisos', fr: 'Autorisations' })}</InstanceCard.Title>
+        <InstanceCard.Description data-testid="user-permissions-signin-note">
           {t({
             en: 'A permission set or custom grants come on top of the base permission level, never both. Changes take effect the next time this user signs in.',
             es: 'Un conjunto de permisos o permisos personalizados se suman al nivel de permisos de base, nunca ambos. Los cambios se aplican la próxima vez que este usuario inicie sesión.',
             fr: "Un ensemble d'autorisations ou des autorisations personnalisées s'ajoutent au niveau de base, jamais les deux. Les modifications prennent effet à la prochaine connexion de cet utilisateur."
           })}
-        </Card.Description>
-      </Card.Header>
-      <Card.Content>
+        </InstanceCard.Description>
+      </InstanceCard.Header>
+      <InstanceCard.Content>
         <Tabs
           className="mb-4"
           value={source}
@@ -331,8 +332,8 @@ export const UserPermissionsEditor = ({
             )}
           </div>
         )}
-      </Card.Content>
-    </Card>
+      </InstanceCard.Content>
+    </InstanceCard>
   );
 };
 

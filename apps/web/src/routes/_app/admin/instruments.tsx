@@ -9,6 +9,7 @@ import type { InstrumentInfo, TranslatedInstrumentInfo } from '@opendatacapture/
 import { createFileRoute } from '@tanstack/react-router';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { InstanceCard } from '@/components/InstanceCard';
 import { InstrumentKindCell } from '@/components/InstrumentKindCell';
 import { InstrumentPreviewDialog } from '@/components/InstrumentPreviewDialog';
 import type { InstrumentPreviewItem, InstrumentSource } from '@/components/InstrumentPreviewDialog';
@@ -381,11 +382,13 @@ const RouteComponent = () => {
               })}
         </Heading>
       </PageHeader>
-      {view === 'series' ? (
-        <SeriesInstrumentsView scalarInstruments={scalarInstruments} />
-      ) : (
-        <FormInstrumentsView scalarInstruments={scalarInstruments} />
-      )}
+      <InstanceCard className="p-6">
+        {view === 'series' ? (
+          <SeriesInstrumentsView scalarInstruments={scalarInstruments} />
+        ) : (
+          <FormInstrumentsView scalarInstruments={scalarInstruments} />
+        )}
+      </InstanceCard>
     </div>
   );
 };

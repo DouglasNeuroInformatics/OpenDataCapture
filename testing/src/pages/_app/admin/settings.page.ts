@@ -29,6 +29,10 @@ export class AdminSettingsPage extends AppPage {
     return this.$ref.getByTestId(`active-language-${language}`);
   }
 
+  cardThemeSwatch(mode: 'dark' | 'light', name: string) {
+    return this.$ref.getByTestId(`card-theme-${mode}`).getByRole('button', { name });
+  }
+
   /** `name` is the language's autonym, which is how the toggle labels its options. */
   async selectLanguage(name: string) {
     await this.sidebar.getByTestId('language-toggle').getByRole('button').click();

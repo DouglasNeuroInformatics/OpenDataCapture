@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { Card } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { CheckIcon } from 'lucide-react';
+
+import { InstanceCard } from '@/components/InstanceCard';
 
 import type { WizardStep } from './types';
 
@@ -50,7 +51,7 @@ const StepLayout = ({ aside, children, description, footer, onStepChange, step, 
   const currentIndex = step ? WIZARD_STEPS.indexOf(step) : -1;
 
   return (
-    <Card className="overflow-hidden">
+    <InstanceCard className="overflow-hidden">
       {currentIndex !== -1 && (
         <nav
           aria-label={t({ en: 'Progress', es: 'Progreso', fr: 'Progression' })}
@@ -113,15 +114,15 @@ const StepLayout = ({ aside, children, description, footer, onStepChange, step, 
       <div className="flex flex-col gap-5 px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex flex-col gap-1.5">
-            <Card.Title className="text-lg">{title}</Card.Title>
-            <Card.Description>{description}</Card.Description>
+            <InstanceCard.Title className="text-lg">{title}</InstanceCard.Title>
+            <InstanceCard.Description>{description}</InstanceCard.Description>
           </div>
           {aside}
         </div>
         {children}
       </div>
       {footer && <div className="flex flex-wrap items-center justify-end gap-2 border-t px-6 py-4">{footer}</div>}
-    </Card>
+    </InstanceCard>
   );
 };
 

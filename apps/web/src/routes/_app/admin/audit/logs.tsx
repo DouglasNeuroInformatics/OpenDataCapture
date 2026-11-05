@@ -15,6 +15,7 @@ import { ArrowDownIcon, ArrowUpIcon, CalendarIcon, DownloadIcon, XIcon } from 'l
 
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { FilterMenu } from '@/components/FilterMenu';
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { auditLogsQueryOptions, fetchAllAuditLogs, useAuditLogsQuery } from '@/hooks/useAuditLogsQuery';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
@@ -309,10 +310,12 @@ const RouteComponent = () => {
           {t('common.auditLogs')}
         </Heading>
       </PageHeader>
-      <AuditLogsToolbar />
-      {/* Remounted when the filters change: in server mode the table owns its page index and offers no
+      <InstanceCard className="p-6">
+        <AuditLogsToolbar />
+        {/* Remounted when the filters change: in server mode the table owns its page index and offers no
           way to set it, so a fresh store is the only way to return it to the first page. */}
-      <AuditLogsTable key={JSON.stringify(search)} search={search} />
+        <AuditLogsTable key={JSON.stringify(search)} search={search} />
+      </InstanceCard>
     </Fragment>
   );
 };

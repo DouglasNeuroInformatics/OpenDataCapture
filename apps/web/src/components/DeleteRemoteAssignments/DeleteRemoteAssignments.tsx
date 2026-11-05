@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, Card, Checkbox, DataTable, Dialog } from '@douglasneuroinformatics/libui/components';
+import { Button, Checkbox, DataTable, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { InstanceCard } from '@/components/InstanceCard';
 import { SortableHeader } from '@/components/SortableHeader';
 import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useDeleteBulkAssignmentsMutation } from '@/hooks/useDeleteBulkAssignmentsMutation';
@@ -109,19 +110,19 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
   };
 
   return (
-    <Card className="overflow-hidden" data-testid="delete-remote-assignments">
+    <InstanceCard className="overflow-hidden" data-testid="delete-remote-assignments">
       <div className="flex flex-col gap-3 px-6 py-4">
         <div className="flex flex-col gap-1.5">
-          <Card.Title className="text-lg">
+          <InstanceCard.Title className="text-lg">
             {t({ en: 'Delete Assignments', es: 'Eliminar tareas', fr: 'Supprimer des tâches' })}
-          </Card.Title>
-          <Card.Description>
+          </InstanceCard.Title>
+          <InstanceCard.Description>
             {t({
               en: 'Select outstanding or expired assignments to delete.',
               es: 'Seleccione las tareas pendientes o expiradas para eliminar.',
               fr: 'Sélectionnez les tâches en attente ou expirées à supprimer.'
             })}
-          </Card.Description>
+          </InstanceCard.Description>
         </div>
 
         {rows.length === 0 ? (
@@ -277,6 +278,6 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
           </Dialog.Footer>
         </Dialog.Content>
       </Dialog>
-    </Card>
+    </InstanceCard>
   );
 };

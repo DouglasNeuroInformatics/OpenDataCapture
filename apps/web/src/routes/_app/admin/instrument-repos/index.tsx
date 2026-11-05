@@ -3,7 +3,6 @@ import type { FormEvent } from 'react';
 
 import {
   Button,
-  Card,
   DataTable,
   Dialog,
   Heading,
@@ -20,6 +19,7 @@ import type { InstrumentRepo, InstrumentRepoSyncLog } from '@opendatacapture/sch
 import { createFileRoute } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { InstrumentRepoSyncLogTable } from '@/components/InstrumentRepoSyncLogTable';
 import { PageHeader } from '@/components/PageHeader';
 import { SectionTabs } from '@/components/SectionTabs';
@@ -291,17 +291,16 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <Card
-        // Invisible for now: the Card stays so a configurable card colour has an element to tint.
-        className="flex flex-col gap-5 border-transparent bg-transparent px-8 py-7 shadow-none dark:bg-transparent"
+      <InstanceCard
+        className="flex flex-col gap-5 px-8 py-7"
         data-section={section}
         data-testid="instrument-repos-card"
       >
         <div className="flex flex-col gap-1.5">
-          <Card.Title className="text-lg" data-testid="instrument-repos-section-title">
+          <InstanceCard.Title className="text-lg" data-testid="instrument-repos-section-title">
             {sectionHeadings[section].title}
-          </Card.Title>
-          <Card.Description>{sectionHeadings[section].description}</Card.Description>
+          </InstanceCard.Title>
+          <InstanceCard.Description>{sectionHeadings[section].description}</InstanceCard.Description>
         </div>
         <SectionTabs
           data-testid="instrument-repos-section"
@@ -468,7 +467,7 @@ const RouteComponent = () => {
             <SyncLogTable />
           </div>
         )}
-      </Card>
+      </InstanceCard>
       {isConfirmClearHistoryOpen && (
         <Dialog.Content>
           <Dialog.Header>

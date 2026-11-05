@@ -1,6 +1,6 @@
-import { Card } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { getRightPanelGradient } from '@/utils/branding';
 
 import { RIGHT_PANEL_LABELS, RIGHT_PANEL_OPTIONS } from '../constants';
@@ -14,24 +14,24 @@ export const RightPanelThemeCard = ({ editor }: { editor: BrandingEditor }) => {
   const { t } = useTranslation();
   const { form, update } = editor;
   return (
-    <Card>
-      <Card.Header>
-        <Card.Title>
+    <InstanceCard>
+      <InstanceCard.Header>
+        <InstanceCard.Title>
           {t({
             en: 'Background Theme - Right Panel',
             es: 'Tema de fondo: panel derecho',
             fr: "Thème d'arrière-plan - Panneau droit"
           })}
-        </Card.Title>
-        <Card.Description>
+        </InstanceCard.Title>
+        <InstanceCard.Description>
           {t({
             en: 'The gradient applied behind the login form.',
             es: 'El degradado aplicado detrás del formulario de inicio de sesión.',
             fr: 'Le dégradé appliqué derrière le formulaire de connexion.'
           })}
-        </Card.Description>
-      </Card.Header>
-      <Card.Content className="flex flex-col gap-4">
+        </InstanceCard.Description>
+      </InstanceCard.Header>
+      <InstanceCard.Content className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {RIGHT_PANEL_OPTIONS.map((option) => {
             const swatchStyle =
@@ -77,7 +77,7 @@ export const RightPanelThemeCard = ({ editor }: { editor: BrandingEditor }) => {
             />
           </div>
         )}
-      </Card.Content>
-    </Card>
+      </InstanceCard.Content>
+    </InstanceCard>
   );
 };

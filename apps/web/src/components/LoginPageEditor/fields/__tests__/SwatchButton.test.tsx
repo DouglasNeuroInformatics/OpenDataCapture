@@ -42,4 +42,9 @@ describe('SwatchButton', () => {
     render(<SwatchButton isSelected={false} label="Ocean" style={{ background: 'red' }} onClick={vi.fn()} />);
     expect(screen.getByRole('button').querySelector('span')!.style.background).toBe('red');
   });
+
+  it('should expose its selection to assistive technology', () => {
+    render(<SwatchButton isSelected label="Sage" style={{}} onClick={vi.fn()} />);
+    expect(screen.getByRole('button', { name: 'Sage' }).getAttribute('aria-pressed')).toBe('true');
+  });
 });

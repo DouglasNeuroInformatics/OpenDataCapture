@@ -5,6 +5,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSearch } from '@/hooks/useSearch';
@@ -65,22 +66,24 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <SearchBar
-        className="mb-3"
-        placeholder={t({
-          en: 'Search by Instrument Title',
-          es: 'Buscar por título del instrumento',
-          fr: "Rechercher par titre de l'instrument"
-        })}
-        value={searchTerm}
-        onValueChange={setSearchTerm}
-      />
-      <UploadSelectTable
-        data={filteredData}
-        onSelect={(instrument) => {
-          void navigate({ params: { instrumentId: instrument.id }, to: '/upload/$instrumentId' });
-        }}
-      />
+      <InstanceCard className="p-6">
+        <SearchBar
+          className="mb-3"
+          placeholder={t({
+            en: 'Search by Instrument Title',
+            es: 'Buscar por título del instrumento',
+            fr: "Rechercher par titre de l'instrument"
+          })}
+          value={searchTerm}
+          onValueChange={setSearchTerm}
+        />
+        <UploadSelectTable
+          data={filteredData}
+          onSelect={(instrument) => {
+            void navigate({ params: { instrumentId: instrument.id }, to: '/upload/$instrumentId' });
+          }}
+        />
+      </InstanceCard>
     </React.Fragment>
   );
 };

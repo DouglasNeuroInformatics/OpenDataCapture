@@ -10,6 +10,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 import { z } from 'zod/v4';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { LanguageSelect } from '@/components/LanguageSelect';
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateUserMutation } from '@/hooks/useCreateUserMutation';
@@ -20,6 +21,7 @@ import { usePasswordGenerator } from '@/hooks/usePasswordGenerator';
 import type { PasswordFormValues } from '@/hooks/usePasswordGenerator';
 import { permissionSetsQueryOptions, usePermissionSetsQuery } from '@/hooks/usePermissionSetsQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
+import { PAGE_SUBMIT_BUTTON } from '@/utils/card-color';
 import { $Email, $PhoneNumber, omittedIfBlank, requiresGroup } from '@/utils/validation';
 
 /** The option standing for no permission set. A set id is an ObjectId, so the two cannot collide. */
@@ -128,263 +130,266 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      {setupStateQuery.data.isMailEnabled && (
-        <div className="mx-auto mb-6 flex max-w-3xl flex-col gap-1.5">
-          <Label>
-            {t({
-              en: 'Welcome email language',
-              es: 'Idioma del correo de bienvenida',
-              fr: 'Langue du courriel de bienvenue'
+      <InstanceCard className="p-6">
+        {setupStateQuery.data.isMailEnabled && (
+          <div className="mx-auto mb-6 flex max-w-3xl flex-col gap-1.5">
+            <Label>
+              {t({
+                en: 'Welcome email language',
+                es: 'Idioma del correo de bienvenida',
+                fr: 'Langue du courriel de bienvenue'
+              })}
+            </Label>
+            <LanguageSelect
+              data-testid="welcome-email-language"
+              options={activeLanguages}
+              value={emailLanguage}
+              onChange={setEmailLanguageChoice}
+            />
+          </div>
+        )}
+        <Form
+          className="mx-auto max-w-3xl"
+          content={[
+            {
+              /* eslint-disable perfectionist/sort-objects -- fields render in key order, so username, password and confirmPassword must stay in that order */
+              fields: {
+                username: {
+                  kind: 'string',
+                  label: t('common.username'),
+                  variant: 'input'
+                },
+                password: {
+                  calculateStrength: (password) => {
+                    return estimatePasswordStrength(password).score;
+                  },
+                  generatePassword,
+                  kind: 'string',
+                  label: t('common.password'),
+                  variant: 'password'
+                },
+                confirmPassword: {
+                  kind: 'string',
+                  label: t('common.confirmPassword'),
+                  variant: 'password'
+                }
+              },
+              /* eslint-enable perfectionist/sort-objects */
+              title: t({
+                en: 'Login Credentials',
+                es: 'Credenciales de acceso',
+                fr: 'Identifiants de connexion'
+              })
+            },
+            {
+              fields: {
+                email: {
+                  kind: 'string',
+                  label: t('common.email'),
+                  variant: 'input'
+                },
+                phoneNumber: {
+                  kind: 'string',
+                  label: t('common.phoneNumber'),
+                  variant: 'input'
+                }
+              },
+              title: t({
+                en: 'Contact information',
+                es: 'Información de contacto',
+                fr: 'Coordonnées'
+              })
+            },
+            {
+              fields: {
+                basePermissionLevel: {
+                  kind: 'string',
+                  label: t('common.basePermissionLevel'),
+                  options: {
+                    ADMIN: t('common.admin'),
+                    GROUP_MANAGER: t('common.groupManager'),
+                    STANDARD: t('common.standard')
+                  },
+                  variant: 'select'
+                },
+                disabled: {
+                  description: t({
+                    en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
+                    es: 'Use esta opción si el usuario no debe iniciar sesión, por ejemplo, cuando la cuenta solo sirve para identificar al autor de los datos cargados.',
+                    fr: "Utilisez cette option si l'utilisateur n'a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l'auteur de données téléversées."
+                  }),
+                  kind: 'boolean',
+                  label: t({
+                    en: 'Disabled',
+                    es: 'Desactivado',
+                    fr: 'Désactivé'
+                  }),
+                  variant: 'radio'
+                },
+                groupIds: {
+                  deps: ['basePermissionLevel'],
+                  kind: 'dynamic',
+                  render({ basePermissionLevel }) {
+                    if (!basePermissionLevel || basePermissionLevel === 'ADMIN') {
+                      return null;
+                    }
+                    return {
+                      kind: 'set',
+                      label: t('common.groups'),
+                      options: Object.fromEntries(groupsQuery.data.map((group) => [group.id, group.name])),
+                      variant: 'listbox'
+                    };
+                  }
+                },
+                permissionSetId: {
+                  deps: ['basePermissionLevel'],
+                  kind: 'dynamic',
+                  render({ basePermissionLevel }) {
+                    if (!basePermissionLevel || basePermissionLevel === 'ADMIN' || !permissionSetsQuery.data.length) {
+                      return null;
+                    }
+                    return {
+                      description: t({
+                        en: 'Grants added to the base permission level. Optional, and can be changed later on the user page.',
+                        es: 'Permisos que se suman al nivel de permisos de base. Opcional; puede cambiarse más tarde en la página del usuario.',
+                        fr: "Autorisations qui s'ajoutent au niveau de base. Facultatif, et modifiable plus tard sur la page de l'utilisateur."
+                      }),
+                      kind: 'string',
+                      label: t({ en: 'Permission Set', es: 'Conjunto de permisos', fr: "Ensemble d'autorisations" }),
+                      options: {
+                        [NO_PERMISSION_SET]: t({ en: 'None', es: 'Ninguno', fr: 'Aucun' }),
+                        ...Object.fromEntries(
+                          permissionSetsQuery.data.map((permissionSet) => [permissionSet.id, permissionSet.name])
+                        )
+                      },
+                      variant: 'select'
+                    };
+                  }
+                }
+              },
+              title: t({
+                en: 'Permissions',
+                es: 'Permisos',
+                fr: 'Autorisations'
+              })
+            },
+            {
+              /* eslint-disable perfectionist/sort-objects -- fields render in key order, and so do the sex options, so sorting would put dateOfBirth before the name fields and FEMALE before MALE */
+              fields: {
+                firstName: {
+                  kind: 'string',
+                  label: t('core.identificationData.firstName.label'),
+                  variant: 'input'
+                },
+                lastName: {
+                  kind: 'string',
+                  label: t('core.identificationData.lastName.label'),
+                  variant: 'input'
+                },
+                sex: {
+                  kind: 'string',
+                  label: t('core.identificationData.sex.label'),
+                  options: {
+                    MALE: t('core.identificationData.sex.male'),
+                    FEMALE: t('core.identificationData.sex.female')
+                  },
+                  variant: 'select'
+                },
+                dateOfBirth: {
+                  kind: 'date',
+                  label: t('core.identificationData.dateOfBirth.label')
+                }
+              },
+              /* eslint-enable perfectionist/sort-objects */
+              title: t({
+                en: 'Additional Information',
+                es: 'Información adicional',
+                fr: 'Informations supplémentaires'
+              })
+            }
+          ]}
+          customStyles={{ submitBtn: PAGE_SUBMIT_BUTTON }}
+          data-testid="create-user-form"
+          initialValues={{
+            disabled: false
+          }}
+          subscribe={{
+            // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
+            // position, so `setValues` is inferred as an error type rather than a setter.
+            onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) => {
+              applyGeneratedPassword(setValues);
+            },
+            selector: () => generatedPassword
+          }}
+          validationSchema={$BaseUserData
+            .omit({
+              groupIds: true
+            })
+            .extend({
+              basePermissionLevel: $BasePermissionLevel,
+              confirmPassword: z.string().min(1),
+              email: $Email(t).optional(),
+              groupIds: z.set(z.string()).optional(),
+              permissionSetId: z.string().optional(),
+              phoneNumber: $PhoneNumber(t).optional()
+            })
+            .check((ctx) => {
+              if (!estimatePasswordStrength(ctx.value.password).success) {
+                ctx.issues.push({
+                  code: 'custom',
+                  fatal: true,
+                  input: ctx.value.password,
+                  message: t('common.insufficientPasswordStrength'),
+                  path: ['password']
+                });
+                return z.NEVER;
+              }
+              if (ctx.value.password.toLowerCase() === ctx.value.username.toLowerCase()) {
+                ctx.issues.push({
+                  code: 'custom',
+                  fatal: true,
+                  input: ctx.value.password,
+                  message: t('common.passwordMatchesUsername'),
+                  path: ['password']
+                });
+                return z.NEVER;
+              }
+              if (ctx.value.confirmPassword !== ctx.value.password) {
+                ctx.issues.push({
+                  code: 'custom',
+                  input: ctx.value.confirmPassword,
+                  message: t('common.passwordsMustMatch'),
+                  path: ['confirmPassword']
+                });
+              }
+            })
+            .check((ctx) => {
+              if (requiresGroup(ctx.value) && !ctx.value.groupIds?.size) {
+                ctx.issues.push({
+                  code: 'custom',
+                  input: ctx.value.groupIds,
+                  message: t('common.groupRequired'),
+                  path: ['groupIds']
+                });
+              }
             })}
-          </Label>
-          <LanguageSelect
-            data-testid="welcome-email-language"
-            options={activeLanguages}
-            value={emailLanguage}
-            onChange={setEmailLanguageChoice}
-          />
-        </div>
-      )}
-      <Form
-        className="mx-auto max-w-3xl"
-        content={[
-          {
-            /* eslint-disable perfectionist/sort-objects -- fields render in key order, so username, password and confirmPassword must stay in that order */
-            fields: {
-              username: {
-                kind: 'string',
-                label: t('common.username'),
-                variant: 'input'
-              },
-              password: {
-                calculateStrength: (password) => {
-                  return estimatePasswordStrength(password).score;
-                },
-                generatePassword,
-                kind: 'string',
-                label: t('common.password'),
-                variant: 'password'
-              },
-              confirmPassword: {
-                kind: 'string',
-                label: t('common.confirmPassword'),
-                variant: 'password'
-              }
-            },
-            /* eslint-enable perfectionist/sort-objects */
-            title: t({
-              en: 'Login Credentials',
-              es: 'Credenciales de acceso',
-              fr: 'Identifiants de connexion'
-            })
-          },
-          {
-            fields: {
-              email: {
-                kind: 'string',
-                label: t('common.email'),
-                variant: 'input'
-              },
-              phoneNumber: {
-                kind: 'string',
-                label: t('common.phoneNumber'),
-                variant: 'input'
-              }
-            },
-            title: t({
-              en: 'Contact information',
-              es: 'Información de contacto',
-              fr: 'Coordonnées'
-            })
-          },
-          {
-            fields: {
-              basePermissionLevel: {
-                kind: 'string',
-                label: t('common.basePermissionLevel'),
-                options: {
-                  ADMIN: t('common.admin'),
-                  GROUP_MANAGER: t('common.groupManager'),
-                  STANDARD: t('common.standard')
-                },
-                variant: 'select'
-              },
-              disabled: {
-                description: t({
-                  en: 'Use this option if the user is not intended to log in, for example, when the account is used solely to identify the author of uploaded data.',
-                  es: 'Use esta opción si el usuario no debe iniciar sesión, por ejemplo, cuando la cuenta solo sirve para identificar al autor de los datos cargados.',
-                  fr: "Utilisez cette option si l'utilisateur n'a pas vocation à se connecter, par exemple lorsque le compte sert uniquement à identifier l'auteur de données téléversées."
-                }),
-                kind: 'boolean',
-                label: t({
-                  en: 'Disabled',
-                  es: 'Desactivado',
-                  fr: 'Désactivé'
-                }),
-                variant: 'radio'
-              },
-              groupIds: {
-                deps: ['basePermissionLevel'],
-                kind: 'dynamic',
-                render({ basePermissionLevel }) {
-                  if (!basePermissionLevel || basePermissionLevel === 'ADMIN') {
-                    return null;
-                  }
-                  return {
-                    kind: 'set',
-                    label: t('common.groups'),
-                    options: Object.fromEntries(groupsQuery.data.map((group) => [group.id, group.name])),
-                    variant: 'listbox'
-                  };
-                }
-              },
-              permissionSetId: {
-                deps: ['basePermissionLevel'],
-                kind: 'dynamic',
-                render({ basePermissionLevel }) {
-                  if (!basePermissionLevel || basePermissionLevel === 'ADMIN' || !permissionSetsQuery.data.length) {
-                    return null;
-                  }
-                  return {
-                    description: t({
-                      en: 'Grants added to the base permission level. Optional, and can be changed later on the user page.',
-                      es: 'Permisos que se suman al nivel de permisos de base. Opcional; puede cambiarse más tarde en la página del usuario.',
-                      fr: "Autorisations qui s'ajoutent au niveau de base. Facultatif, et modifiable plus tard sur la page de l'utilisateur."
-                    }),
-                    kind: 'string',
-                    label: t({ en: 'Permission Set', es: 'Conjunto de permisos', fr: "Ensemble d'autorisations" }),
-                    options: {
-                      [NO_PERMISSION_SET]: t({ en: 'None', es: 'Ninguno', fr: 'Aucun' }),
-                      ...Object.fromEntries(
-                        permissionSetsQuery.data.map((permissionSet) => [permissionSet.id, permissionSet.name])
-                      )
-                    },
-                    variant: 'select'
-                  };
-                }
-              }
-            },
-            title: t({
-              en: 'Permissions',
-              es: 'Permisos',
-              fr: 'Autorisations'
-            })
-          },
-          {
-            /* eslint-disable perfectionist/sort-objects -- fields render in key order, and so do the sex options, so sorting would put dateOfBirth before the name fields and FEMALE before MALE */
-            fields: {
-              firstName: {
-                kind: 'string',
-                label: t('core.identificationData.firstName.label'),
-                variant: 'input'
-              },
-              lastName: {
-                kind: 'string',
-                label: t('core.identificationData.lastName.label'),
-                variant: 'input'
-              },
-              sex: {
-                kind: 'string',
-                label: t('core.identificationData.sex.label'),
-                options: {
-                  MALE: t('core.identificationData.sex.male'),
-                  FEMALE: t('core.identificationData.sex.female')
-                },
-                variant: 'select'
-              },
-              dateOfBirth: {
-                kind: 'date',
-                label: t('core.identificationData.dateOfBirth.label')
-              }
-            },
-            /* eslint-enable perfectionist/sort-objects */
-            title: t({
-              en: 'Additional Information',
-              es: 'Información adicional',
-              fr: 'Informations supplémentaires'
-            })
-          }
-        ]}
-        data-testid="create-user-form"
-        initialValues={{
-          disabled: false
-        }}
-        subscribe={{
-          // Annotated because libui's `FormProps` leaves `TData` uninstantiated in this one
-          // position, so `setValues` is inferred as an error type rather than a setter.
-          onChange: (_, setValues: React.Dispatch<React.SetStateAction<PasswordFormValues>>) => {
-            applyGeneratedPassword(setValues);
-          },
-          selector: () => generatedPassword
-        }}
-        validationSchema={$BaseUserData
-          .omit({
-            groupIds: true
-          })
-          .extend({
-            basePermissionLevel: $BasePermissionLevel,
-            confirmPassword: z.string().min(1),
-            email: $Email(t).optional(),
-            groupIds: z.set(z.string()).optional(),
-            permissionSetId: z.string().optional(),
-            phoneNumber: $PhoneNumber(t).optional()
-          })
-          .check((ctx) => {
-            if (!estimatePasswordStrength(ctx.value.password).success) {
-              ctx.issues.push({
-                code: 'custom',
-                fatal: true,
-                input: ctx.value.password,
-                message: t('common.insufficientPasswordStrength'),
-                path: ['password']
-              });
-              return z.NEVER;
-            }
-            if (ctx.value.password.toLowerCase() === ctx.value.username.toLowerCase()) {
-              ctx.issues.push({
-                code: 'custom',
-                fatal: true,
-                input: ctx.value.password,
-                message: t('common.passwordMatchesUsername'),
-                path: ['password']
-              });
-              return z.NEVER;
-            }
-            if (ctx.value.confirmPassword !== ctx.value.password) {
-              ctx.issues.push({
-                code: 'custom',
-                input: ctx.value.confirmPassword,
-                message: t('common.passwordsMustMatch'),
-                path: ['confirmPassword']
-              });
-            }
-          })
-          .check((ctx) => {
-            if (requiresGroup(ctx.value) && !ctx.value.groupIds?.size) {
-              ctx.issues.push({
-                code: 'custom',
-                input: ctx.value.groupIds,
-                message: t('common.groupRequired'),
-                path: ['groupIds']
-              });
-            }
-          })}
-        onSubmit={({ email, groupIds, permissionSetId, phoneNumber, ...data }) => {
-          return handleSubmit({
-            ...data,
-            email: omittedIfBlank(email),
-            groupIds: Array.from(groupIds ?? []),
-            mustResetPassword: isGeneratedPassword(data.password),
-            // The field is hidden, not cleared, when the level becomes ADMIN, so a set chosen before
-            // then is still in the values -- and the API refuses a set for an administrator.
-            permissionSetId:
-              data.basePermissionLevel === 'ADMIN' || permissionSetId === NO_PERMISSION_SET
-                ? undefined
-                : permissionSetId,
-            phoneNumber: omittedIfBlank(phoneNumber)
-          });
-        }}
-      />
+          onSubmit={({ email, groupIds, permissionSetId, phoneNumber, ...data }) => {
+            return handleSubmit({
+              ...data,
+              email: omittedIfBlank(email),
+              groupIds: Array.from(groupIds ?? []),
+              mustResetPassword: isGeneratedPassword(data.password),
+              // The field is hidden, not cleared, when the level becomes ADMIN, so a set chosen before
+              // then is still in the values -- and the API refuses a set for an administrator.
+              permissionSetId:
+                data.basePermissionLevel === 'ADMIN' || permissionSetId === NO_PERMISSION_SET
+                  ? undefined
+                  : permissionSetId,
+              phoneNumber: omittedIfBlank(phoneNumber)
+            });
+          }}
+        />
+      </InstanceCard>
       <Dialog
         open={fallbackMessage !== null}
         onOpenChange={() => {

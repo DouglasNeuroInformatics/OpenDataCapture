@@ -82,10 +82,12 @@ function createSetupState(branding: BrandingConfig | null): SetupState {
   return {
     activeLanguages: ['en'],
     branding,
+    darkCardTheme: 'invisible',
     isDemo: false,
     isGatewayEnabled: false,
     isMailEnabled: false,
     isSetup: true,
+    lightCardTheme: 'invisible',
     release: { buildTime: 0, type: 'production', version: '1.0.0' },
     tableColorMode: 'tags',
     uptime: 0

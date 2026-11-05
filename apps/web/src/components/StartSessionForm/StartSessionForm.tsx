@@ -17,6 +17,7 @@ import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
 
 import { useSubjectDemographicsLookup } from '@/hooks/useSubjectDemographicsLookup';
+import { PAGE_SUBMIT_BUTTON } from '@/utils/card-color';
 import { getValueForLanguage } from '@/utils/language';
 
 const currentDate = new Date();
@@ -207,6 +208,7 @@ export const StartSessionForm = ({
           }
         }
       ]}
+      customStyles={{ submitBtn: PAGE_SUBMIT_BUTTON }}
       data-testid="start-session-form"
       initialValues={initialValues}
       readOnly={readOnly}

@@ -3,8 +3,10 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { config } from '@/config';
+import { PAGE_SUBMIT_BUTTON } from '@/utils/card-color';
 
 type ContactFormData = {
   contactReason: 'bug' | 'feedback' | 'other' | 'request';
@@ -38,6 +40,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps) => {
           variant: 'textarea'
         }
       }}
+      customStyles={{ submitBtn: PAGE_SUBMIT_BUTTON }}
       validationSchema={z.object({
         contactReason: z.enum(['bug', 'feedback', 'other', 'request']),
         message: z.string().min(1)
@@ -64,7 +67,9 @@ const RouteComponent = () => {
           {t('pageTitle')}
         </Heading>
       </PageHeader>
-      <ContactForm onSubmit={handleSubmit} />
+      <InstanceCard className="p-6">
+        <ContactForm onSubmit={handleSubmit} />
+      </InstanceCard>
     </div>
   );
 };

@@ -399,6 +399,11 @@ describe('Route', () => {
   });
 
   describe('saving', () => {
+    it('should not stretch the save button, which reads as a bar with no card around it', () => {
+      renderPage();
+      expect(saveButton().className.split(' ')).not.toContain('w-full');
+    });
+
     it('should refuse to save while a permission row is half filled in', async () => {
       renderPage();
       act(() => editorProps().onDraftsChange([{ action: 'create' }]));

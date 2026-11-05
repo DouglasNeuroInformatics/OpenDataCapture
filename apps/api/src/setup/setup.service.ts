@@ -66,6 +66,9 @@ export class SetupService {
     return {
       activeLanguages: fallbackLanguage ? [fallbackLanguage, ...otherLanguages] : DEFAULT_ACTIVE_LANGUAGES,
       branding: branding.success ? branding.data : null,
+      customCardColorDark: savedOptions?.customCardColorDark,
+      customCardColorLight: savedOptions?.customCardColorLight,
+      darkCardTheme: savedOptions?.darkCardTheme ?? 'invisible',
       defaultAssignmentDurationDays: savedOptions?.defaultAssignmentDurationDays ?? null,
       // Derived from the gateway rather than reported as stored: a bulk assignment is only a link
       // the gateway serves, so an instance that later dropped the gateway must report this off
@@ -78,6 +81,7 @@ export class SetupService {
       // configuration itself is never exposed here (this is a public route).
       isMailEnabled: isMailEnabled(savedOptions?.mailConfig),
       isSetup: Boolean(savedOptions?.isSetup),
+      lightCardTheme: savedOptions?.lightCardTheme ?? 'invisible',
       release: __RELEASE__,
       tableColorMode: savedOptions?.tableColorMode ?? DEFAULT_TABLE_COLOR_MODE,
       uptime: Math.round(process.uptime())

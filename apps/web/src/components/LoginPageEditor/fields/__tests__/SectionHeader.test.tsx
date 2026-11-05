@@ -21,10 +21,12 @@ type HeaderOptions = Partial<Omit<ComponentProps<typeof SectionHeader>, 'editor'
 const SETUP_STATE: SetupState = {
   activeLanguages: ['en'],
   branding: null,
+  darkCardTheme: 'invisible',
   isDemo: false,
   isGatewayEnabled: false,
   isMailEnabled: false,
   isSetup: true,
+  lightCardTheme: 'invisible',
   release: { buildTime: 0, type: 'production', version: '1.0.0' },
   tableColorMode: 'tags',
   uptime: 0

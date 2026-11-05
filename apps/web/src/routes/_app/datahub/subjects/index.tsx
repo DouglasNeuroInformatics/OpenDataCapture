@@ -23,6 +23,7 @@ import { unparse } from 'papaparse';
 import { CollectedFilterMenu } from '@/components/CollectedFilterMenu';
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { IdentificationForm } from '@/components/IdentificationForm';
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { SearchSubmitGuard } from '@/components/SearchSubmitGuard';
 import { SortableHeader } from '@/components/SortableHeader';
@@ -570,7 +571,7 @@ const RouteComponent = () => {
           {t('datahub.index.title')}
         </Heading>
       </PageHeader>
-      <div className="flex grow flex-col">
+      <InstanceCard className="flex grow flex-col p-6">
         <MasterDataTable
           data={data}
           onRowDoubleClick={(subject) => {
@@ -580,7 +581,7 @@ const RouteComponent = () => {
             void navigate({ to: `./${subject.id}/table` });
           }}
         />
-      </div>
+      </InstanceCard>
     </React.Fragment>
   );
 };

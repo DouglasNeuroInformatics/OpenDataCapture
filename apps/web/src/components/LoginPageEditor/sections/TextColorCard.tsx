@@ -1,5 +1,6 @@
-import { Card } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+
+import { InstanceCard } from '@/components/InstanceCard';
 
 import { DEFAULT_PANEL_TEXT_COLOR } from '../constants';
 import { ColorField } from '../fields/ColorField';
@@ -15,24 +16,24 @@ export const TextColorCard = ({ editor }: { editor: BrandingEditor }) => {
   const { t } = useTranslation();
   const { form, update } = editor;
   return (
-    <Card>
-      <Card.Header>
-        <Card.Title>
+    <InstanceCard>
+      <InstanceCard.Header>
+        <InstanceCard.Title>
           {t({
             en: 'Text Color - Left Panel',
             es: 'Color del texto: panel izquierdo',
             fr: 'Couleur du texte - Panneau gauche'
           })}
-        </Card.Title>
-        <Card.Description>
+        </InstanceCard.Title>
+        <InstanceCard.Description>
           {t({
             en: 'The color applied to all text on the branding panel.',
             es: 'El color aplicado a todo el texto del panel de marca.',
             fr: 'La couleur appliquée à tout le texte du panneau.'
           })}
-        </Card.Description>
-      </Card.Header>
-      <Card.Content>
+        </InstanceCard.Description>
+      </InstanceCard.Header>
+      <InstanceCard.Content>
         <div className="sm:max-w-xs">
           <ColorField
             id="panelTextColor"
@@ -43,7 +44,7 @@ export const TextColorCard = ({ editor }: { editor: BrandingEditor }) => {
             onChange={(v) => update('panelTextColor', v)}
           />
         </div>
-      </Card.Content>
-    </Card>
+      </InstanceCard.Content>
+    </InstanceCard>
   );
 };

@@ -3,6 +3,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { ChevronLeftIcon } from '@heroicons/react/24/solid';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { PermissionSetForm } from '@/components/PermissionSetForm';
 import { useConfirmPermissionSetDeletion } from '@/hooks/useConfirmPermissionSetDeletion';
@@ -29,47 +30,49 @@ const PermissionSetEditor = ({ permissionSetId }: { permissionSetId: string }) =
           })}
         </Heading>
       </PageHeader>
-      <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-6">
-        <Link
-          className="text-muted-foreground focus-visible:ring-ring flex items-center gap-0.5 self-start rounded-sm text-[11px] font-semibold tracking-widest uppercase transition-colors hover:text-blue-600 focus-visible:ring-1 focus-visible:outline-hidden dark:hover:text-blue-400"
-          data-testid="admin-permission-set-back"
-          to="/admin/permission-sets"
-        >
-          <ChevronLeftIcon className="h-3.5 w-3.5" />
-          {t({ en: 'Return', es: 'Volver', fr: 'Retour' })}
-        </Link>
-        <PermissionSetForm
-          initialValues={permissionSet}
-          secondaryAction={
-            <Button
-              className="w-full"
-              data-testid="delete-permission-set"
-              type="button"
-              variant="danger"
-              onClick={() => confirmDeletion(permissionSet, { onDeleted: () => void navigate({ to: '..' }) })}
-            >
-              {t('core.delete')}
-            </Button>
-          }
-          submitLabel={t({ en: 'Save Changes', es: 'Guardar los cambios', fr: 'Enregistrer les modifications' })}
-          onSubmit={async (data) => {
-            try {
-              await updatePermissionSetMutation.mutateAsync({ data, id: permissionSet.id });
-            } catch (err) {
-              const errorMessage = getApiErrorMessage(
-                err,
-                t({
-                  en: 'Failed to save permission set',
-                  es: 'Error al guardar el conjunto de permisos',
-                  fr: "Échec de l'enregistrement de l'ensemble d'autorisations"
-                })
-              );
-              return { errorMessage, success: false };
+      <InstanceCard className="p-6">
+        <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-6">
+          <Link
+            className="text-muted-foreground focus-visible:ring-ring flex items-center gap-0.5 self-start rounded-sm text-[11px] font-semibold tracking-widest uppercase transition-colors hover:text-blue-600 focus-visible:ring-1 focus-visible:outline-hidden dark:hover:text-blue-400"
+            data-testid="admin-permission-set-back"
+            to="/admin/permission-sets"
+          >
+            <ChevronLeftIcon className="h-3.5 w-3.5" />
+            {t({ en: 'Return', es: 'Volver', fr: 'Retour' })}
+          </Link>
+          <PermissionSetForm
+            initialValues={permissionSet}
+            secondaryAction={
+              <Button
+                className="w-full"
+                data-testid="delete-permission-set"
+                type="button"
+                variant="danger"
+                onClick={() => confirmDeletion(permissionSet, { onDeleted: () => void navigate({ to: '..' }) })}
+              >
+                {t('core.delete')}
+              </Button>
             }
-            return undefined;
-          }}
-        />
-      </div>
+            submitLabel={t({ en: 'Save Changes', es: 'Guardar los cambios', fr: 'Enregistrer les modifications' })}
+            onSubmit={async (data) => {
+              try {
+                await updatePermissionSetMutation.mutateAsync({ data, id: permissionSet.id });
+              } catch (err) {
+                const errorMessage = getApiErrorMessage(
+                  err,
+                  t({
+                    en: 'Failed to save permission set',
+                    es: 'Error al guardar el conjunto de permisos',
+                    fr: "Échec de l'enregistrement de l'ensemble d'autorisations"
+                  })
+                );
+                return { errorMessage, success: false };
+              }
+              return undefined;
+            }}
+          />
+        </div>
+      </InstanceCard>
     </div>
   );
 };

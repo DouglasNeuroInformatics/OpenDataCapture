@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { $BrandingConfig, $InitAppOptions, $UpdateSetupStateData } from '../setup.js';
+import {
+  $BrandingConfig,
+  $InitAppOptions,
+  $UpdateSetupStateData,
+  DARK_CARD_THEMES,
+  LIGHT_CARD_THEMES
+} from '../setup.js';
 
 describe('$BrandingConfig', () => {
   describe('customLogoSrc', () => {
@@ -66,6 +72,31 @@ describe('$UpdateSetupStateData', () => {
 
     it('should allow the field to be omitted', () => {
       expect($UpdateSetupStateData.safeParse({}).success).toBe(true);
+    });
+  });
+
+  describe('cardColor', () => {
+    it.each(LIGHT_CARD_THEMES)('should accept the light theme %s', (lightCardTheme) => {
+      expect($UpdateSetupStateData.safeParse({ lightCardTheme }).success).toBe(true);
+    });
+
+    it.each(DARK_CARD_THEMES)('should accept the dark theme %s', (darkCardTheme) => {
+      expect($UpdateSetupStateData.safeParse({ darkCardTheme }).success).toBe(true);
+    });
+
+    it('should reject a theme from the other mode, so a mode only holds what it can paint', () => {
+      expect($UpdateSetupStateData.safeParse({ lightCardTheme: 'midnight' }).success).toBe(false);
+      expect($UpdateSetupStateData.safeParse({ darkCardTheme: 'paper' }).success).toBe(false);
+    });
+
+    it('should reject a custom color that is not a hex, so a card style can only hold a color', () => {
+      expect($UpdateSetupStateData.safeParse({ customCardColorLight: 'red;' }).success).toBe(false);
+      expect($UpdateSetupStateData.safeParse({ customCardColorDark: '#123456' }).success).toBe(true);
+    });
+
+    it('should reject a theme outside the palette, so a card can never be painted arbitrarily', () => {
+      expect($UpdateSetupStateData.safeParse({ darkCardTheme: '#ff0000' }).success).toBe(false);
+      expect($UpdateSetupStateData.safeParse({ lightCardTheme: '#ff0000' }).success).toBe(false);
     });
   });
 

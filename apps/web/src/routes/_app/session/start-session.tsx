@@ -48,17 +48,19 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       {currentSession === null && (
-        <StartSessionForm
-          currentGroup={currentGroup}
-          customSubjectIds={customSubjectIds}
-          initialValues={initialValues}
-          readOnly={currentSession !== null || createSessionMutation.isPending}
-          username={currentUser?.username}
-          onSubmit={async (formData) => {
-            const session = await createSessionMutation.mutateAsync(formData);
-            startSession({ ...session, type: formData.type });
-          }}
-        />
+        <Card className="mx-auto w-full max-w-204 bg-transparent p-6 shadow-none" data-testid="start-session-card">
+          <StartSessionForm
+            currentGroup={currentGroup}
+            customSubjectIds={customSubjectIds}
+            initialValues={initialValues}
+            readOnly={currentSession !== null || createSessionMutation.isPending}
+            username={currentUser?.username}
+            onSubmit={async (formData) => {
+              const session = await createSessionMutation.mutateAsync(formData);
+              startSession({ ...session, type: formData.type });
+            }}
+          />
+        </Card>
       )}
       <AnimatePresence>
         {currentSession !== null && (
@@ -71,7 +73,7 @@ const RouteComponent = () => {
             transition={{ duration: 0.3 }}
           >
             <div className="flex grow items-center justify-center">
-              <Card className="mx-auto flex max-w-2xl flex-col items-center p-12 opacity-70">
+              <Card className="mx-auto flex max-w-2xl flex-col items-center bg-transparent p-12 opacity-70 shadow-none">
                 <svg
                   className="mb-3 size-10 text-green-900 dark:text-green-500"
                   fill="none"
