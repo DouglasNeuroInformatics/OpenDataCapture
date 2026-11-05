@@ -10,10 +10,10 @@ import { DEFAULT_PLAYGROUND_URL, encodeShareURL } from './share-url.js';
 
 import type { EditorFile } from './models.js';
 
-/** Text files the playground can load from a share URL. */
-const TEXT_FILE_EXT_REGEX = /\.(css|html|js|jsx|json|ts|tsx)$/i;
-/** Bundler assets that exist on disk but cannot be embedded in a (string-only) share URL. */
-const BINARY_FILE_EXT_REGEX = /\.(jpeg|jpg|mp3|mp4|png|svg|webp)$/i;
+/** Text files embedded in the share URL as they are on disk, as the playground holds them. */
+const TEXT_FILE_EXT_REGEX = /\.(css|html|js|jsx|json|svg|ts|tsx)$/i;
+/** Binary assets the CLI leaves out to keep links short, although the playground could load them. */
+const BINARY_FILE_EXT_REGEX = /\.(jpeg|jpg|mp3|mp4|png|webp)$/i;
 
 function parseTarget(target: string): string {
   const resolved = path.resolve(target);
@@ -46,7 +46,7 @@ function readInstrumentFiles(target: string): EditorFile[] {
       files.push({ content: fs.readFileSync(filepath, 'utf-8'), name: entry.name });
     } else if (BINARY_FILE_EXT_REGEX.test(entry.name)) {
       process.stderr.write(
-        chalk.yellow(`⚠ Skipping '${entry.name}': binary assets cannot be embedded in a share URL\n`)
+        chalk.yellow(`⚠ Skipping '${entry.name}': the CLI does not embed binary assets in a share URL\n`)
       );
     }
   }

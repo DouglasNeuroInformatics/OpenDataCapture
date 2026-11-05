@@ -164,7 +164,8 @@ Share links come from `@opendatacapture/playground-url`, which lz-string-compres
 the URL fragment. A link that differs only in its fragment does not reload the page, so `IndexPage`
 reads the URL through `useLocationHref`, which re-renders on `hashchange`; reading `location.href`
 directly means pasting a second share link into an open tab does nothing. Its `$EditorFile` requires
-`content` to be a UTF-8 string, so binary assets do not survive a share URL.
+`content` to be a UTF-8 string, which binary assets satisfy because the store already holds them as
+base64; the package's CLI leaves them out of the links it prints to keep them short.
 
 ## Odds and ends
 
