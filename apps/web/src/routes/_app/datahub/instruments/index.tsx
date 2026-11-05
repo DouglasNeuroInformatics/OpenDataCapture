@@ -4,6 +4,7 @@ import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { InstrumentTable } from '@/components/InstrumentTable';
 import type { InstrumentRow } from '@/components/InstrumentTable';
 import { PageHeader } from '@/components/PageHeader';
@@ -63,7 +64,9 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <InstrumentTable data-testid="instrument-hub-table" rows={data} onOpen={handleOpenInstrument} />
+      <InstanceCard className="p-6">
+        <InstrumentTable data-testid="instrument-hub-table" rows={data} onOpen={handleOpenInstrument} />
+      </InstanceCard>
     </React.Fragment>
   );
 };

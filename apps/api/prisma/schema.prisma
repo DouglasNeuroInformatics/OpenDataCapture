@@ -444,6 +444,28 @@ enum TableColorMode {
 
 // Mirrors LANGUAGES in @opendatacapture/schemas/core. Values are the language codes themselves,
 // so a document read back through Prisma is already a `Language` with nothing to narrow.
+enum LightCardTheme {
+  invisible
+  paper
+  ivory
+  fog
+  silver
+  mist
+  heather
+  custom
+}
+
+enum DarkCardTheme {
+  invisible
+  midnight
+  graphite
+  charcoal
+  steel
+  mist
+  heather
+  custom
+}
+
 enum Language {
   en
   es
@@ -523,6 +545,10 @@ model SetupState {
   id                            String          @id @default(auto()) @map("_id") @db.ObjectId
   activeLanguages               Language[]      @default([en, fr])
   branding                      BrandingConfig?
+  darkCardTheme                 DarkCardTheme?
+  lightCardTheme                LightCardTheme?
+  customCardColorDark           String?
+  customCardColorLight          String?
   defaultAssignmentDurationDays Int?
   isBulkRemoteAssignmentsEnabled Boolean?
   isDemo                        Boolean

@@ -1,6 +1,9 @@
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { Outlet } from '@tanstack/react-router';
 
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
+import { getInstanceCardStyle, INSTANCE_CARD_VARIABLES } from '@/utils/card-color';
 
 import { Footer } from '../Footer';
 import { GroupSwitcher, useIsGroupSwitcherVisible } from '../GroupSwitcher';
@@ -10,9 +13,14 @@ import { Sidebar } from '../Sidebar';
 export const Layout = () => {
   const groupSwitcherPosition = useAppStore((store) => store.groupSwitcherPosition);
   const isGroupSwitcherVisible = useIsGroupSwitcherVisible();
+  const setupState = useSetupStateQuery().data;
 
   return (
-    <div className="flex h-screen w-screen flex-col md:flex-row" data-testid="layout">
+    <div
+      className={cn('flex h-screen w-screen flex-col md:flex-row', INSTANCE_CARD_VARIABLES)}
+      data-testid="layout"
+      style={getInstanceCardStyle(setupState)}
+    >
       <div className="absolute md:hidden">
         <Navbar />
       </div>

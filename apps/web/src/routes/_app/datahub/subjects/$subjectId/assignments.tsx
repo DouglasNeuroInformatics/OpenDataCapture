@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, Heading, Input, Label, Sheet, Table } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { Assignment, AssignmentStatus } from '@opendatacapture/schemas/assignment';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
@@ -18,6 +19,7 @@ import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useUpdateAssignment } from '@/hooks/useUpdateAssignment';
+import { INSTANCE_CARD_SURFACE } from '@/utils/card-color';
 
 const AssignmentSlider: React.FC<{
   assignment: Assignment | null;
@@ -113,7 +115,7 @@ const AssignmentsTable: React.FC<{
   };
 
   return (
-    <div className="bg-card text-muted-foreground rounded-md border tracking-tight shadow-xs">
+    <div className={cn(INSTANCE_CARD_SURFACE, 'text-muted-foreground rounded-md tracking-tight')}>
       <Table>
         <Table.Header>
           <Table.Row>

@@ -8,6 +8,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { BadgeHelpIcon, DownloadIcon } from 'lucide-react';
 import z from 'zod/v4';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useUploadInstrumentRecordsMutation } from '@/hooks/useUploadInstrumentRecordsMutation';
@@ -160,112 +161,118 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      {!isLoading ? (
-        <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center gap-2">
-          <div className="space-y-4">
-            <FileDropzone
-              acceptedFileTypes={{ 'text/csv': ['.csv'] }}
-              className="flex h-80 w-full flex-col"
-              file={file}
-              setFile={setFile}
-            />
-          </div>
-          <div className="bg-muted/30 border-muted rounded-lg border p-4 transition-colors">
-            <div className="flex flex-col gap-4 sm:flex-row">
-              {(currentUser?.groups.length ?? 0) > 0 && (
-                <div className="flex w-full shrink-0 flex-col gap-1 sm:w-48">
+      <InstanceCard className="flex grow flex-col p-6">
+        {!isLoading ? (
+          <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center gap-2">
+            <div className="space-y-4">
+              <FileDropzone
+                acceptedFileTypes={{ 'text/csv': ['.csv'] }}
+                className="flex h-80 w-full flex-col"
+                file={file}
+                setFile={setFile}
+              />
+            </div>
+            <div className="bg-muted/30 border-muted rounded-lg border p-4 transition-colors">
+              <div className="flex flex-col gap-4 sm:flex-row">
+                {(currentUser?.groups.length ?? 0) > 0 && (
+                  <div className="flex w-full shrink-0 flex-col gap-1 sm:w-48">
+                    <p className="text-muted-foreground text-xs">
+                      {t({
+                        en: 'Filter users by group.',
+                        es: 'Filtrar los usuarios por grupo.',
+                        fr: 'Filtrer les utilisateurs par groupe.'
+                      })}
+                    </p>
+                    <Select
+                      value={selectedGroupId}
+                      onValueChange={(id) => {
+                        setSelectedGroupId(id);
+                        setSelectedUsername(undefined);
+                      }}
+                    >
+                      <Select.Trigger>
+                        <Select.Value
+                          placeholder={t({
+                            en: 'Select group',
+                            es: 'Seleccione un grupo',
+                            fr: 'Sélectionner un groupe'
+                          })}
+                        />
+                      </Select.Trigger>
+                      <Select.Content>
+                        <Select.Group>
+                          {currentUser?.groups.map((group) => (
+                            <Select.Item key={group.id} value={group.id}>
+                              {group.name}
+                            </Select.Item>
+                          ))}
+                        </Select.Group>
+                      </Select.Content>
+                    </Select>
+                  </div>
+                )}
+                <div className="flex flex-1 flex-col gap-1">
                   <p className="text-muted-foreground text-xs">
                     {t({
-                      en: 'Filter users by group.',
-                      es: 'Filtrar los usuarios por grupo.',
-                      fr: 'Filtrer les utilisateurs par groupe.'
+                      en: 'Select the username to associate with these records for audit and traceability.',
+                      es: 'Seleccione el nombre de usuario que se asociará a estos registros para fines de auditoría y trazabilidad.',
+                      fr: "Sélectionnez le nom d'utilisateur à associer à ces entrées pour l'audit et la traçabilité."
                     })}
                   </p>
-                  <Select
-                    value={selectedGroupId}
-                    onValueChange={(id) => {
-                      setSelectedGroupId(id);
-                      setSelectedUsername(undefined);
-                    }}
-                  >
+                  <Select value={selectedUsername ?? currentUser?.username} onValueChange={setSelectedUsername}>
                     <Select.Trigger>
-                      <Select.Value
-                        placeholder={t({ en: 'Select group', es: 'Seleccione un grupo', fr: 'Sélectionner un groupe' })}
-                      />
+                      <Select.Value placeholder={currentUser?.username} />
                     </Select.Trigger>
                     <Select.Content>
                       <Select.Group>
-                        {currentUser?.groups.map((group) => (
-                          <Select.Item key={group.id} value={group.id}>
-                            {group.name}
+                        {groupUsers.data.map((user) => (
+                          <Select.Item key={user.username} value={user.username}>
+                            {user.username}
                           </Select.Item>
                         ))}
+                        <Select.Item value="N/A">{t({ en: 'N/A', es: 'N/D', fr: 'S.O.' })}</Select.Item>
                       </Select.Group>
                     </Select.Content>
                   </Select>
                 </div>
-              )}
-              <div className="flex flex-1 flex-col gap-1">
-                <p className="text-muted-foreground text-xs">
-                  {t({
-                    en: 'Select the username to associate with these records for audit and traceability.',
-                    es: 'Seleccione el nombre de usuario que se asociará a estos registros para fines de auditoría y trazabilidad.',
-                    fr: "Sélectionnez le nom d'utilisateur à associer à ces entrées pour l'audit et la traçabilité."
-                  })}
-                </p>
-                <Select value={selectedUsername ?? currentUser?.username} onValueChange={setSelectedUsername}>
-                  <Select.Trigger>
-                    <Select.Value placeholder={currentUser?.username} />
-                  </Select.Trigger>
-                  <Select.Content>
-                    <Select.Group>
-                      {groupUsers.data.map((user) => (
-                        <Select.Item key={user.username} value={user.username}>
-                          {user.username}
-                        </Select.Item>
-                      ))}
-                      <Select.Item value="N/A">{t({ en: 'N/A', es: 'N/D', fr: 'S.O.' })}</Select.Item>
-                    </Select.Group>
-                  </Select.Content>
-                </Select>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <Button disabled={!(file && instrument)} variant="primary" onClick={() => void handleInstrumentCSV()}>
+                {t('core.submit')}
+              </Button>
+
+              <div className="flex gap-2">
+                <Button className="gap-2" size="sm" variant="outline" onClick={handleTemplateDownload}>
+                  <DownloadIcon size={16} />
+                  {t({ en: 'Template', es: 'Plantilla', fr: 'Modèle' })}
+                </Button>
+                <Button
+                  className="gap-2"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => window.open('https://opendatacapture.org/en/docs/guides/how-to-upload-data/')}
+                >
+                  <BadgeHelpIcon size={16} />
+                  {t({ en: 'Help', es: 'Ayuda', fr: 'Aide' })}
+                </Button>
               </div>
             </div>
           </div>
-
-          <div className="flex items-center justify-between pt-2">
-            <Button disabled={!(file && instrument)} variant="primary" onClick={() => void handleInstrumentCSV()}>
-              {t('core.submit')}
-            </Button>
-
-            <div className="flex gap-2">
-              <Button className="gap-2" size="sm" variant="outline" onClick={handleTemplateDownload}>
-                <DownloadIcon size={16} />
-                {t({ en: 'Template', es: 'Plantilla', fr: 'Modèle' })}
-              </Button>
-              <Button
-                className="gap-2"
-                size="sm"
-                variant="outline"
-                onClick={() => window.open('https://opendatacapture.org/en/docs/guides/how-to-upload-data/')}
-              >
-                <BadgeHelpIcon size={16} />
-                {t({ en: 'Help', es: 'Ayuda', fr: 'Aide' })}
-              </Button>
-            </div>
+        ) : (
+          <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center">
+            <Spinner className="mx-auto size-24" />
+            <Heading className="mt-4 text-center" variant="h3">
+              {t({
+                en: 'Data currently uploading...',
+                es: 'Cargando datos...',
+                fr: 'Données en cours de téléversement...'
+              })}
+            </Heading>
           </div>
-        </div>
-      ) : (
-        <div className="mx-auto flex w-full max-w-3xl grow flex-col justify-center">
-          <Spinner className="mx-auto size-24" />
-          <Heading className="mt-4 text-center" variant="h3">
-            {t({
-              en: 'Data currently uploading...',
-              es: 'Cargando datos...',
-              fr: 'Données en cours de téléversement...'
-            })}
-          </Heading>
-        </div>
-      )}
+        )}
+      </InstanceCard>
     </React.Fragment>
   );
 };

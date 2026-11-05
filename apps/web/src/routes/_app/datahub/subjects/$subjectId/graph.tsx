@@ -7,6 +7,7 @@ import { useDownload, useNotificationsStore, useTheme, useTranslation } from '@d
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { LineGraph } from '@/components/LineGraph';
 import { SelectChartPalette } from '@/components/SelectChartPalette';
 import { SelectEdition } from '@/components/SelectEdition';
@@ -165,8 +166,8 @@ const RouteComponent = () => {
           </div>
         </div>
       </div>
-      <div
-        className="bg-card text-muted-foreground rounded-md border p-6 tracking-tight shadow-xs"
+      <InstanceCard
+        className="text-muted-foreground rounded-md p-6 tracking-tight"
         data-testid="subject-graph-chart"
         ref={graphContainerRef}
       >
@@ -178,7 +179,7 @@ const RouteComponent = () => {
             label: t('datahub.visualization.xLabel')
           }}
         />
-      </div>
+      </InstanceCard>
     </div>
   );
 };

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Card, Heading } from '@douglasneuroinformatics/libui/components';
+import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { PlusIcon, SendIcon, Trash2Icon } from 'lucide-react';
 
 import { BulkRemoteAssignmentWizard } from '@/components/BulkRemoteAssignmentWizard';
 import { DeleteRemoteAssignments } from '@/components/DeleteRemoteAssignments';
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { config } from '@/config';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
@@ -27,7 +28,7 @@ type ActionCardProps = {
 };
 
 const ActionCard = ({ icon, onClick, testId, title }: ActionCardProps) => (
-  <Card
+  <InstanceCard
     className="hover:border-primary/40 flex cursor-pointer flex-col items-center gap-4 p-8 transition-colors"
     data-testid={testId}
     role="button"
@@ -41,8 +42,8 @@ const ActionCard = ({ icon, onClick, testId, title }: ActionCardProps) => (
     }}
   >
     {icon}
-    <Card.Title className="text-xl">{title}</Card.Title>
-  </Card>
+    <InstanceCard.Title className="text-xl">{title}</InstanceCard.Title>
+  </InstanceCard>
 );
 
 const CompositeIcon = ({ Badge }: { Badge: React.FC<{ className?: string }> }) => (

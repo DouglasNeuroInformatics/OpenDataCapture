@@ -1,6 +1,12 @@
 import type { ActiveLanguages } from '@opendatacapture/schemas/core';
-import type { $UpdateSetupStateData, TableColorMode } from '@opendatacapture/schemas/setup';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { DEFAULT_TABLE_COLOR_MODE } from '@opendatacapture/schemas/setup';
+import type {
+  $UpdateSetupStateData,
+  DarkCardTheme,
+  LightCardTheme,
+  TableColorMode
+} from '@opendatacapture/schemas/setup';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/admin/settings';
@@ -10,9 +16,13 @@ import '@/services/i18n';
 
 type SetupStateData = {
   activeLanguages: ActiveLanguages;
+  customCardColorDark?: string;
+  customCardColorLight?: string;
+  darkCardTheme?: DarkCardTheme;
   defaultAssignmentDurationDays?: null | number;
   isBulkRemoteAssignmentsEnabled?: boolean | null;
   isExperimentalFeaturesEnabled?: boolean | null;
+  lightCardTheme?: LightCardTheme;
   tableColorMode: TableColorMode;
 };
 
@@ -368,6 +378,88 @@ describe('Route', () => {
       fireEvent.keyDown(screen.getByTestId('group-switcher-position-select'), { key: 'Enter' });
       fireEvent.click(screen.getByRole('option', { name: 'Top Right Corner' }));
       expect(mocks.setGroupSwitcherPosition).toHaveBeenCalledWith('topbar');
+    });
+  });
+
+  describe('card color', () => {
+    const NO_COLORS: SetupStateData = {
+      activeLanguages: ['en'],
+      darkCardTheme: 'invisible',
+      lightCardTheme: 'invisible',
+      tableColorMode: DEFAULT_TABLE_COLOR_MODE
+    };
+    const picker = (mode: string) => within(screen.getByTestId(`card-theme-${mode}`));
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should mark the theme the instance has stored for each mode', () => {
+      mocks.state.setupState = { ...NO_COLORS, lightCardTheme: 'mist' };
+      renderPage();
+      expect(picker('light').getByRole('button', { name: 'Mist' }).getAttribute('aria-pressed')).toBe('true');
+      expect(picker('dark').getByRole('button', { name: 'No Color' }).getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('should offer no color, six themes and custom', () => {
+      mocks.state.setupState = NO_COLORS;
+      renderPage();
+      expect(picker('light').getAllByRole('button')).toHaveLength(8);
+    });
+
+    it.each([
+      ['light', 'Silver', { lightCardTheme: 'silver' }],
+      ['dark', 'Midnight', { darkCardTheme: 'midnight' }]
+    ])('should save a theme chosen for %s mode without touching the other mode', (mode, name, saved) => {
+      mocks.state.setupState = NO_COLORS;
+      renderPage();
+      fireEvent.click(picker(mode).getByRole('button', { name }));
+      expect(savedData()).toEqual([saved]);
+    });
+
+    it('should offer each mode its own themes', () => {
+      mocks.state.setupState = NO_COLORS;
+      renderPage();
+      expect(picker('dark').queryByRole('button', { name: 'Paper' })).toBeNull();
+      expect(picker('light').queryByRole('button', { name: 'Midnight' })).toBeNull();
+    });
+
+    it('should hide the hex field until custom is chosen', () => {
+      mocks.state.setupState = NO_COLORS;
+      renderPage();
+      expect(screen.queryByLabelText('Custom Color')).toBeNull();
+    });
+
+    it.each([
+      ['light', 'lightCardTheme', { customCardColorLight: '#123456' }],
+      ['dark', 'darkCardTheme', { customCardColorDark: '#123456' }]
+    ])('should save a custom %s color once typing settles', (mode, themeKey, saved) => {
+      vi.useFakeTimers();
+      mocks.state.setupState = { ...NO_COLORS, [themeKey]: 'custom' };
+      renderPage();
+      fireEvent.change(picker(mode).getByLabelText('Custom Color'), { target: { value: '#123456' } });
+      expect(savedData()).toEqual([]);
+      act(() => {
+        vi.advanceTimersByTime(700);
+      });
+      expect(savedData()).toEqual([saved]);
+    });
+
+    it('should not save a custom color that is not yet a valid hex', () => {
+      vi.useFakeTimers();
+      mocks.state.setupState = { ...NO_COLORS, lightCardTheme: 'custom' };
+      renderPage();
+      fireEvent.change(picker('light').getByLabelText('Custom Color'), { target: { value: '#12' } });
+      act(() => {
+        vi.advanceTimersByTime(700);
+      });
+      expect(savedData()).toEqual([]);
+    });
+
+    it('should start the hex field from the stored custom color', () => {
+      mocks.state.setupState = { ...NO_COLORS, customCardColorLight: '#abcdef', lightCardTheme: 'custom' };
+      renderPage();
+      expect(picker('light').getByLabelText<HTMLInputElement>('Custom Color').value).toBe('#abcdef');
     });
   });
 });

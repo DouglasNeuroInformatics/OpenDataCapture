@@ -212,6 +212,11 @@ describe('Route', () => {
       expect(mocks.useInstrumentRecords).toHaveBeenCalledWith({ enabled: true, params: { groupId: 'group-1' } });
     });
 
+    it('should not put the page on a card, so only its tiles take the instance color', () => {
+      renderPage();
+      expect(document.querySelector('[data-instance-card]')).toBeNull();
+    });
+
     it.each([
       ['CLINICAL', 'Overview of Your Clinic'],
       ['RESEARCH', 'Overview of Your Research Group']

@@ -181,6 +181,26 @@ Put something in `packages/react-core` instead **only if `apps/gateway` also use
 `data-testid` attributes are the Playwright suite's selectors. Don't remove them; add one when you
 add UI that an e2e test will drive.
 
+## Cards
+
+A card on an in-app page is `@/components/InstanceCard`, not libui's `Card`: every in-app page sits on
+one, below its `PageHeader`, and tiles inside a page use it too. It draws nothing until an admin picks a
+theme per mode in the application settings (`SetupState.lightCardTheme`, `darkCardTheme`, and a
+`customCardColor*` hex for the `custom` theme). `Layout` sets each mode's CSS variables with
+`getInstanceCardStyle`, and `INSTANCE_CARD_SURFACE` reads them; pass that constant to a libui component
+that wraps its own `Card`. A new theme is one entry in `LIGHT_CARD_THEMES` or `DARK_CARD_THEMES` in `packages/schemas`, the matching
+enum in the Prisma schema, and the maps in `utils/card-color.ts`, which fail to compile until it is added.
+Removing one needs a data migration, since Prisma throws on a stored value its enum no longer has.
+
+A page's submit button takes `PAGE_SUBMIT_BUTTON`, through `customStyles.submitBtn` on libui's `Form`, since
+a full-width one reads as a bar with no card around it. A form in a dialog or sheet keeps the full width.
+
+Libui's `Card` stays on what is not a page surface: floating UI (the walkthrough), a preview of the login
+page, and pages outside `Layout` (login, password reset, setup). Two in-app pages opt out of the color: the
+dashboard keeps its own tiles, and start session keeps the page's color inside a thin libui `Card`.
+`/instruments/render/$id` has no card, since it is where a form is administered. Nothing here applies to
+`apps/gateway`.
+
 ## Tables
 
 A table listing records is the libui `DataTable`. libui's plain `Table` is for a small table the

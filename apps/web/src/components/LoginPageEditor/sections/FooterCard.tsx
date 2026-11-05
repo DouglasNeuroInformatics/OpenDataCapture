@@ -1,5 +1,7 @@
-import { Card, Checkbox, Label } from '@douglasneuroinformatics/libui/components';
+import { Checkbox, Label } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+
+import { InstanceCard } from '@/components/InstanceCard';
 
 import type { BrandingEditor } from '../hooks';
 
@@ -8,11 +10,11 @@ export const FooterCard = ({ editor }: { editor: BrandingEditor }) => {
   const { t } = useTranslation();
   const { form, update } = editor;
   return (
-    <Card>
-      <Card.Header>
-        <Card.Title>{t({ en: 'Footer', es: 'Pie de página', fr: 'Pied de page' })}</Card.Title>
-      </Card.Header>
-      <Card.Content>
+    <InstanceCard>
+      <InstanceCard.Header>
+        <InstanceCard.Title>{t({ en: 'Footer', es: 'Pie de página', fr: 'Pied de page' })}</InstanceCard.Title>
+      </InstanceCard.Header>
+      <InstanceCard.Content>
         <div className="flex items-center gap-3">
           <Checkbox
             checked={form.showFooterLinks}
@@ -27,7 +29,7 @@ export const FooterCard = ({ editor }: { editor: BrandingEditor }) => {
             })}
           </Label>
         </div>
-      </Card.Content>
-    </Card>
+      </InstanceCard.Content>
+    </InstanceCard>
   );
 };

@@ -2,6 +2,7 @@ import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { PermissionSetForm } from '@/components/PermissionSetForm';
 import { useCreatePermissionSetMutation } from '@/hooks/useCreatePermissionSetMutation';
@@ -23,26 +24,28 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <PermissionSetForm
-        submitLabel={t({ en: 'Create', es: 'Crear', fr: 'Créer' })}
-        onSubmit={async (data) => {
-          try {
-            await createPermissionSetMutation.mutateAsync({ data });
-          } catch (err) {
-            const errorMessage = getApiErrorMessage(
-              err,
-              t({
-                en: 'Failed to create permission set',
-                es: 'Error al crear el conjunto de permisos',
-                fr: "Échec de la création de l'ensemble d'autorisations"
-              })
-            );
-            return { errorMessage, success: false };
-          }
-          void navigate({ to: '..' });
-          return undefined;
-        }}
-      />
+      <InstanceCard className="p-6">
+        <PermissionSetForm
+          submitLabel={t({ en: 'Create', es: 'Crear', fr: 'Créer' })}
+          onSubmit={async (data) => {
+            try {
+              await createPermissionSetMutation.mutateAsync({ data });
+            } catch (err) {
+              const errorMessage = getApiErrorMessage(
+                err,
+                t({
+                  en: 'Failed to create permission set',
+                  es: 'Error al crear el conjunto de permisos',
+                  fr: "Échec de la création de l'ensemble d'autorisations"
+                })
+              );
+              return { errorMessage, success: false };
+            }
+            void navigate({ to: '..' });
+            return undefined;
+          }}
+        />
+      </InstanceCard>
     </div>
   );
 };

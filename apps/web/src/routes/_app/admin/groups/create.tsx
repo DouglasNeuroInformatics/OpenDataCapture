@@ -3,8 +3,10 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $CreateGroupData } from '@opendatacapture/schemas/group';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { useCreateGroupMutation } from '@/hooks/useCreateGroupMutation';
+import { PAGE_SUBMIT_BUTTON } from '@/utils/card-color';
 import { getApiErrorMessage } from '@/utils/error';
 
 const RouteComponent = () => {
@@ -41,27 +43,30 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <Form
-        className="mx-auto max-w-3xl"
-        content={{
-          name: {
-            kind: 'string',
-            label: t('common.groupName'),
-            variant: 'input'
-          },
-          type: {
-            kind: 'string',
-            label: t('common.groupType'),
-            options: {
-              CLINICAL: t('common.clinical'),
-              RESEARCH: t('common.research')
+      <InstanceCard className="p-6">
+        <Form
+          className="mx-auto max-w-3xl"
+          content={{
+            name: {
+              kind: 'string',
+              label: t('common.groupName'),
+              variant: 'input'
             },
-            variant: 'select'
-          }
-        }}
-        validationSchema={$CreateGroupData.omit({ settings: true })}
-        onSubmit={handleSubmit}
-      />
+            type: {
+              kind: 'string',
+              label: t('common.groupType'),
+              options: {
+                CLINICAL: t('common.clinical'),
+                RESEARCH: t('common.research')
+              },
+              variant: 'select'
+            }
+          }}
+          customStyles={{ submitBtn: PAGE_SUBMIT_BUTTON }}
+          validationSchema={$CreateGroupData.omit({ settings: true })}
+          onSubmit={handleSubmit}
+        />
+      </InstanceCard>
     </div>
   );
 };

@@ -9,6 +9,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import axios from 'axios';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { useDeleteGroupMutation } from '@/hooks/useDeleteGroupMutation';
 import { GROUPS_QUERY_KEY, groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
@@ -106,64 +107,66 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <DataTable
-        columns={[
-          {
-            accessorKey: 'name',
-            cell: (ctx) => {
-              const group = ctx.row.original;
-              return (
-                <span className="flex items-center">
-                  {group.name}
-                  <span className="hidden" data-row-selected={highlightedRowId === group.id ? 'true' : 'false'} />
-                </span>
-              );
+      <InstanceCard className="p-6">
+        <DataTable
+          columns={[
+            {
+              accessorKey: 'name',
+              cell: (ctx) => {
+                const group = ctx.row.original;
+                return (
+                  <span className="flex items-center">
+                    {group.name}
+                    <span className="hidden" data-row-selected={highlightedRowId === group.id ? 'true' : 'false'} />
+                  </span>
+                );
+              },
+              header: t('common.groupName')
             },
-            header: t('common.groupName')
-          },
-          {
-            accessorKey: 'type',
-            cell: (ctx) => {
-              const type = ctx.getValue() as Group['type'];
-              const typeLabels: { [K in Group['type']]: string } = {
-                CLINICAL: t('common.clinical'),
-                RESEARCH: t('common.research')
-              };
-              return (
-                <ColorTagCell
-                  color={getGroupTypeColor(type, resolveTheme(theme))}
-                  data-testid="group-cell-type"
-                  label={typeLabels[type]}
-                />
-              );
-            },
-            header: t('common.groupType')
-          }
-        ]}
-        data={groupsQuery.data}
-        rowActions={[
-          {
-            label: t('common.manage'),
-            onSelect: setSelectedGroup
-          }
-        ]}
-        togglesComponent={() => (
-          <Button asChild variant="outline">
-            <Link to="/admin/groups/create">
-              {t({
-                en: 'Add Group',
-                es: 'Agregar grupo',
-                fr: 'Ajouter un groupe'
-              })}
-            </Link>
-          </Button>
-        )}
-        onRowClick={(group) => setHighlightedRowId(group.id)}
-        onRowDoubleClick={(group) => {
-          setHighlightedRowId(group.id);
-          setSelectedGroup(group);
-        }}
-      />
+            {
+              accessorKey: 'type',
+              cell: (ctx) => {
+                const type = ctx.getValue() as Group['type'];
+                const typeLabels: { [K in Group['type']]: string } = {
+                  CLINICAL: t('common.clinical'),
+                  RESEARCH: t('common.research')
+                };
+                return (
+                  <ColorTagCell
+                    color={getGroupTypeColor(type, resolveTheme(theme))}
+                    data-testid="group-cell-type"
+                    label={typeLabels[type]}
+                  />
+                );
+              },
+              header: t('common.groupType')
+            }
+          ]}
+          data={groupsQuery.data}
+          rowActions={[
+            {
+              label: t('common.manage'),
+              onSelect: setSelectedGroup
+            }
+          ]}
+          togglesComponent={() => (
+            <Button asChild variant="outline">
+              <Link to="/admin/groups/create">
+                {t({
+                  en: 'Add Group',
+                  es: 'Agregar grupo',
+                  fr: 'Ajouter un groupe'
+                })}
+              </Link>
+            </Button>
+          )}
+          onRowClick={(group) => setHighlightedRowId(group.id)}
+          onRowDoubleClick={(group) => {
+            setHighlightedRowId(group.id);
+            setSelectedGroup(group);
+          }}
+        />
+      </InstanceCard>
       <Sheet.Content className="flex flex-col p-0">
         <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
           <Sheet.Header className="px-6 pt-6">

@@ -10,6 +10,7 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from 'lucide-react';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { useArchiveUserMutation } from '@/hooks/useArchiveUserMutation';
 import { useUnarchiveUserMutation } from '@/hooks/useUnarchiveUserMutation';
@@ -64,116 +65,118 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <DataTable
-        columns={[
-          {
-            accessorKey: 'username',
-            cell: (ctx) => {
-              const user = ctx.row.original;
-              return (
-                <span className="flex items-center">
-                  {user.username}
-                  <span className="hidden" data-row-selected={highlightedRowId === user.id ? 'true' : 'false'} />
+      <InstanceCard className="p-6">
+        <DataTable
+          columns={[
+            {
+              accessorKey: 'username',
+              cell: (ctx) => {
+                const user = ctx.row.original;
+                return (
+                  <span className="flex items-center">
+                    {user.username}
+                    <span className="hidden" data-row-selected={highlightedRowId === user.id ? 'true' : 'false'} />
+                  </span>
+                );
+              },
+              header: ({ column }) => <SortableHeader column={column} label={t('common.username')} />
+            },
+            {
+              accessorKey: 'basePermissionLevel',
+              cell: (ctx) => {
+                const basePermissionLevel = ctx.getValue() as User['basePermissionLevel'];
+                if (!basePermissionLevel) {
+                  return t({
+                    en: 'None',
+                    es: 'Ninguno',
+                    fr: 'Aucune'
+                  });
+                }
+                return t(`common.${snakeToCamelCase(basePermissionLevel)}`);
+              },
+              header: ({ column }) => <SortableHeader column={column} label={t('common.basePermissionLevel')} />
+            },
+            {
+              accessorFn: (user) => Boolean(user.disabled),
+              cell: ({ row }) => (
+                <span data-testid="user-login-status">
+                  {row.original.disabled
+                    ? t({ en: 'Disabled', es: 'Desactivado', fr: 'Désactivé' })
+                    : t({ en: 'Enabled', es: 'Activado', fr: 'Activé' })}
                 </span>
-              );
+              ),
+              header: ({ column }) => (
+                <SortableHeader
+                  column={column}
+                  label={t({ en: 'Enabled / Disabled', es: 'Activado / Desactivado', fr: 'Activé / Désactivé' })}
+                />
+              ),
+              id: 'disabled'
             },
-            header: ({ column }) => <SortableHeader column={column} label={t('common.username')} />
-          },
-          {
-            accessorKey: 'basePermissionLevel',
-            cell: (ctx) => {
-              const basePermissionLevel = ctx.getValue() as User['basePermissionLevel'];
-              if (!basePermissionLevel) {
-                return t({
-                  en: 'None',
-                  es: 'Ninguno',
-                  fr: 'Aucune'
-                });
-              }
-              return t(`common.${snakeToCamelCase(basePermissionLevel)}`);
-            },
-            header: ({ column }) => <SortableHeader column={column} label={t('common.basePermissionLevel')} />
-          },
-          {
-            accessorFn: (user) => Boolean(user.disabled),
-            cell: ({ row }) => (
-              <span data-testid="user-login-status">
-                {row.original.disabled
-                  ? t({ en: 'Disabled', es: 'Desactivado', fr: 'Désactivé' })
-                  : t({ en: 'Enabled', es: 'Activado', fr: 'Activé' })}
-              </span>
-            ),
-            header: ({ column }) => (
-              <SortableHeader
-                column={column}
-                label={t({ en: 'Enabled / Disabled', es: 'Activado / Desactivado', fr: 'Activé / Désactivé' })}
-              />
-            ),
-            id: 'disabled'
-          },
-          {
-            accessorKey: 'archivedAt',
-            cell: (ctx) => {
-              const user = ctx.row.original;
-              if (user.archivedAt) {
+            {
+              accessorKey: 'archivedAt',
+              cell: (ctx) => {
+                const user = ctx.row.original;
+                if (user.archivedAt) {
+                  return (
+                    <ColorTagCell
+                      color={getArchiveStatusColor(true, resolveTheme(theme))}
+                      data-testid="user-status-archived"
+                      label={t({
+                        en: `Archived on ${toBasicISOString(new Date(user.archivedAt))}`,
+                        es: `Archivado el ${toBasicISOString(new Date(user.archivedAt))}`,
+                        fr: `Archivé le ${toBasicISOString(new Date(user.archivedAt))}`
+                      })}
+                    />
+                  );
+                }
                 return (
                   <ColorTagCell
-                    color={getArchiveStatusColor(true, resolveTheme(theme))}
-                    data-testid="user-status-archived"
-                    label={t({
-                      en: `Archived on ${toBasicISOString(new Date(user.archivedAt))}`,
-                      es: `Archivado el ${toBasicISOString(new Date(user.archivedAt))}`,
-                      fr: `Archivé le ${toBasicISOString(new Date(user.archivedAt))}`
-                    })}
+                    color={getArchiveStatusColor(false, resolveTheme(theme))}
+                    data-testid="user-status-active"
+                    label={t({ en: 'Active', es: 'Activo', fr: 'Actif' })}
                   />
                 );
-              }
-              return (
-                <ColorTagCell
-                  color={getArchiveStatusColor(false, resolveTheme(theme))}
-                  data-testid="user-status-active"
-                  label={t({ en: 'Active', es: 'Activo', fr: 'Actif' })}
-                />
-              );
+              },
+              header: ({ column }) => (
+                <SortableHeader column={column} label={t({ en: 'Status', es: 'Estado', fr: 'Statut' })} />
+              ),
+              id: 'status'
+            }
+          ]}
+          data={usersQuery.data}
+          data-testid="admin-users-table"
+          rowActions={[
+            {
+              label: t('common.manage'),
+              onSelect: handleOpenUser
             },
-            header: ({ column }) => (
-              <SortableHeader column={column} label={t({ en: 'Status', es: 'Estado', fr: 'Statut' })} />
-            ),
-            id: 'status'
-          }
-        ]}
-        data={usersQuery.data}
-        data-testid="admin-users-table"
-        rowActions={[
-          {
-            label: t('common.manage'),
-            onSelect: handleOpenUser
-          },
-          {
-            disabled: (user) => user.username === currentUser?.username || Boolean(user.archivedAt),
-            label: t({ en: 'Archive', es: 'Archivar', fr: 'Archiver' }),
-            onSelect: (user) => setPendingAction({ kind: 'archive', user })
-          },
-          {
-            disabled: (user) => !user.archivedAt,
-            label: t({ en: 'Unarchive', es: 'Desarchivar', fr: 'Désarchiver' }),
-            onSelect: (user) => unarchiveUserMutation.mutate({ id: user.id })
-          }
-        ]}
-        togglesComponent={() => (
-          <Button variant="outline">
-            <Link to="/admin/users/create">
-              {t({
-                en: 'Add User',
-                es: 'Agregar usuario',
-                fr: 'Ajouter un utilisateur'
-              })}
-            </Link>
-          </Button>
-        )}
-        onRowClick={(user) => setHighlightedRowId(user.id)}
-        onRowDoubleClick={handleOpenUser}
-      />
+            {
+              disabled: (user) => user.username === currentUser?.username || Boolean(user.archivedAt),
+              label: t({ en: 'Archive', es: 'Archivar', fr: 'Archiver' }),
+              onSelect: (user) => setPendingAction({ kind: 'archive', user })
+            },
+            {
+              disabled: (user) => !user.archivedAt,
+              label: t({ en: 'Unarchive', es: 'Desarchivar', fr: 'Désarchiver' }),
+              onSelect: (user) => unarchiveUserMutation.mutate({ id: user.id })
+            }
+          ]}
+          togglesComponent={() => (
+            <Button variant="outline">
+              <Link to="/admin/users/create">
+                {t({
+                  en: 'Add User',
+                  es: 'Agregar usuario',
+                  fr: 'Ajouter un utilisateur'
+                })}
+              </Link>
+            </Button>
+          )}
+          onRowClick={(user) => setHighlightedRowId(user.id)}
+          onRowDoubleClick={handleOpenUser}
+        />
+      </InstanceCard>
       <Dialog open={pendingAction !== null} onOpenChange={() => setPendingAction(null)}>
         <Dialog.Content>
           <Dialog.Header>

@@ -7,6 +7,7 @@ import { $SessionType } from '@opendatacapture/schemas/session';
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { PageHeader } from '@/components/PageHeader';
 import { TabLink } from '@/components/TabLink';
@@ -30,32 +31,34 @@ const RouteComponent = () => {
           {title ?? t({ en: 'Instrument', es: 'Instrumento', fr: 'Instrument' })}
         </Heading>
       </PageHeader>
-      <Link
-        className="text-muted-foreground focus-visible:ring-ring mb-3 flex items-center gap-0.5 self-start rounded-sm text-[11px] font-semibold tracking-widest uppercase transition-colors hover:text-blue-600 focus-visible:ring-1 focus-visible:outline-hidden dark:hover:text-blue-400"
-        data-testid="instrument-hub-back"
-        params={search.fromSeries ? { instrumentId: search.fromSeries } : undefined}
-        to={search.fromSeries ? '/datahub/instruments/$instrumentId/table' : '/datahub/instruments'}
-      >
-        <ChevronLeftIcon className="h-3.5 w-3.5" />
-        {t({ en: 'Return', es: 'Volver', fr: 'Retour' })}
-      </Link>
-      {!isSeries && (
-        <div className="mb-5 flex">
-          <TabLink
-            label={t('datahub.layout.tabs.table')}
-            pathname={`${basePathname}/table`}
-            testId="instrument-hub-table-tab"
-          />
-          <TabLink
-            label={t('datahub.layout.tabs.graph')}
-            pathname={`${basePathname}/graph`}
-            testId="instrument-hub-graph-tab"
-          />
-        </div>
-      )}
-      <React.Suspense fallback={<LoadingFallback />}>
-        <Outlet />
-      </React.Suspense>
+      <InstanceCard className="p-6">
+        <Link
+          className="text-muted-foreground focus-visible:ring-ring mb-3 flex items-center gap-0.5 self-start rounded-sm text-[11px] font-semibold tracking-widest uppercase transition-colors hover:text-blue-600 focus-visible:ring-1 focus-visible:outline-hidden dark:hover:text-blue-400"
+          data-testid="instrument-hub-back"
+          params={search.fromSeries ? { instrumentId: search.fromSeries } : undefined}
+          to={search.fromSeries ? '/datahub/instruments/$instrumentId/table' : '/datahub/instruments'}
+        >
+          <ChevronLeftIcon className="h-3.5 w-3.5" />
+          {t({ en: 'Return', es: 'Volver', fr: 'Retour' })}
+        </Link>
+        {!isSeries && (
+          <div className="mb-5 flex">
+            <TabLink
+              label={t('datahub.layout.tabs.table')}
+              pathname={`${basePathname}/table`}
+              testId="instrument-hub-table-tab"
+            />
+            <TabLink
+              label={t('datahub.layout.tabs.graph')}
+              pathname={`${basePathname}/graph`}
+              testId="instrument-hub-graph-tab"
+            />
+          </div>
+        )}
+        <React.Suspense fallback={<LoadingFallback />}>
+          <Outlet />
+        </React.Suspense>
+      </InstanceCard>
     </React.Fragment>
   );
 };

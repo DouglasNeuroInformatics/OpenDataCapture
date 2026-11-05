@@ -1,11 +1,13 @@
 import React from 'react';
 
-import { Button, Card, Input, Label, RadioGroup, Select, TextArea } from '@douglasneuroinformatics/libui/components';
+import { Button, Input, Label, RadioGroup, Select, TextArea } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { LOGO_ALIGNMENTS, LOGO_SIZES } from '@opendatacapture/schemas/setup';
 import type { LogoAlignment, LogoSize, LogoSource, PanelSection } from '@opendatacapture/schemas/setup';
 import { PlusIcon, TrashIcon, UploadIcon, XIcon } from 'lucide-react';
+
+import { InstanceCard } from '@/components/InstanceCard';
 
 import {
   ACCEPTED_LOGO_MIME_TYPES,
@@ -38,7 +40,7 @@ const DetailsCard = ({ editor }: CardProps) => {
   const { t } = useTranslation();
   const { form, update, updateText } = editor;
   return (
-    <Card key="details">
+    <InstanceCard key="details">
       <SectionHeader
         bold={{ checked: form.boldDetails, id: 'boldDetails', onChange: (b) => update('boldDetails', b) }}
         description={t({
@@ -52,7 +54,7 @@ const DetailsCard = ({ editor }: CardProps) => {
         title={t(SECTION_TITLES.details)}
       />
       {form.showDetails && (
-        <Card.Content className="flex flex-col gap-4">
+        <InstanceCard.Content className="flex flex-col gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
               <Label htmlFor="instanceDetails-en">{t({ en: 'English', es: 'Inglés', fr: 'Anglais' })}</Label>
@@ -80,9 +82,9 @@ const DetailsCard = ({ editor }: CardProps) => {
             value={form.detailsFontSize}
             onChange={(v) => update('detailsFontSize', v)}
           />
-        </Card.Content>
+        </InstanceCard.Content>
       )}
-    </Card>
+    </InstanceCard>
   );
 };
 
@@ -90,7 +92,7 @@ const LogoCard = ({ editor }: CardProps) => {
   const { t } = useTranslation();
   const { fileInputRef, form, handleLogoFile, isCustomSizeInvalid, update } = editor;
   return (
-    <Card key="logo">
+    <InstanceCard key="logo">
       <SectionHeader
         description={t({
           en: 'Upload an image up to 2 MB (SVG, PNG, JPEG, WebP) or link to one. PNG and JPEG uploads are converted to WebP to save space.',
@@ -103,7 +105,7 @@ const LogoCard = ({ editor }: CardProps) => {
         title={t(SECTION_TITLES.logo)}
       />
       {form.showLogo && (
-        <Card.Content className="flex flex-col gap-4">
+        <InstanceCard.Content className="flex flex-col gap-4">
           {/*
             An uploaded image and a URL can both be saved at once; the radio
             selects which one the login page actually renders. The inactive
@@ -270,9 +272,9 @@ const LogoCard = ({ editor }: CardProps) => {
               )}
             </div>
           )}
-        </Card.Content>
+        </InstanceCard.Content>
       )}
-    </Card>
+    </InstanceCard>
   );
 };
 
@@ -280,7 +282,7 @@ const NameCard = ({ editor }: CardProps) => {
   const { t } = useTranslation();
   const { form, update, updateText } = editor;
   return (
-    <Card key="name">
+    <InstanceCard key="name">
       <SectionHeader
         bold={{ checked: form.boldName, id: 'boldName', onChange: (b) => update('boldName', b) }}
         description={t({
@@ -292,7 +294,7 @@ const NameCard = ({ editor }: CardProps) => {
         section="name"
         title={t(SECTION_TITLES.name)}
       />
-      <Card.Content className="flex flex-col gap-4">
+      <InstanceCard.Content className="flex flex-col gap-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2">
             <Label htmlFor="instanceName-en">{t({ en: 'English', es: 'Inglés', fr: 'Anglais' })}</Label>
@@ -335,8 +337,8 @@ const NameCard = ({ editor }: CardProps) => {
           </div>
           <FontSizeField id="nameFontSize" value={form.nameFontSize} onChange={(v) => update('nameFontSize', v)} />
         </div>
-      </Card.Content>
-    </Card>
+      </InstanceCard.Content>
+    </InstanceCard>
   );
 };
 
@@ -344,7 +346,7 @@ const ResourcesCard = ({ editor }: CardProps) => {
   const { t } = useTranslation();
   const { addResourceLink, form, removeResourceLink, update, updateResourceLinkHref, updateResourceLinkLabel } = editor;
   return (
-    <Card key="resources">
+    <InstanceCard key="resources">
       <SectionHeader
         bold={{
           checked: form.boldResourceLinks,
@@ -366,7 +368,7 @@ const ResourcesCard = ({ editor }: CardProps) => {
         title={t(SECTION_TITLES.resources)}
       />
       {form.showResourceLinks && (
-        <Card.Content className="flex flex-col gap-3">
+        <InstanceCard.Content className="flex flex-col gap-3">
           {form.resourceLinks.length === 0 && (
             <p className="text-muted-foreground text-sm">
               {t({
@@ -439,9 +441,9 @@ const ResourcesCard = ({ editor }: CardProps) => {
             value={form.resourceLinksFontSize}
             onChange={(v) => update('resourceLinksFontSize', v)}
           />
-        </Card.Content>
+        </InstanceCard.Content>
       )}
-    </Card>
+    </InstanceCard>
   );
 };
 
@@ -449,7 +451,7 @@ const TaglineCard = ({ editor }: CardProps) => {
   const { t } = useTranslation();
   const { form, update, updateText } = editor;
   return (
-    <Card key="tagline">
+    <InstanceCard key="tagline">
       <SectionHeader
         bold={{ checked: form.boldTagline, id: 'boldTagline', onChange: (b) => update('boldTagline', b) }}
         description={t({
@@ -463,7 +465,7 @@ const TaglineCard = ({ editor }: CardProps) => {
         title={t(SECTION_TITLES.tagline)}
       />
       {form.showTagline && (
-        <Card.Content className="flex flex-col gap-4">
+        <InstanceCard.Content className="flex flex-col gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
               <Label htmlFor="instanceTagline-en">{t({ en: 'English', es: 'Inglés', fr: 'Anglais' })}</Label>
@@ -491,9 +493,9 @@ const TaglineCard = ({ editor }: CardProps) => {
             value={form.taglineFontSize}
             onChange={(v) => update('taglineFontSize', v)}
           />
-        </Card.Content>
+        </InstanceCard.Content>
       )}
-    </Card>
+    </InstanceCard>
   );
 };
 

@@ -3,6 +3,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Logo } from '@opendatacapture/react-core';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 
 const LoginPagePreview = () => (
@@ -37,7 +38,7 @@ const RouteComponent = () => {
       </PageHeader>
       <div className="mx-auto w-full max-w-4xl">
         <Link className="group" to="/admin/branding/login-page">
-          <div className="flex items-center gap-5 overflow-hidden rounded-2xl border border-slate-200/60 bg-white/90 p-5 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-sky-300/60 hover:shadow-xl dark:border-slate-700/60 dark:bg-slate-800/90 dark:hover:border-sky-600/60">
+          <InstanceCard className="flex items-center gap-5 overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:border-sky-300/60 dark:hover:border-sky-600/60">
             <LoginPagePreview />
             <div className="min-w-0 flex-1">
               <h3 className="text-foreground font-medium">
@@ -51,7 +52,7 @@ const RouteComponent = () => {
                 })}
               </p>
             </div>
-          </div>
+          </InstanceCard>
         </Link>
       </div>
     </div>

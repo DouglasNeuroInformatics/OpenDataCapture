@@ -284,17 +284,13 @@ describe('Route', () => {
     expect(nameCell.style.position).toBe('');
   });
 
-  it('should draw no card behind either tab, so the tables sit directly on the page', () => {
+  it('should sit both tabs on the instance card, so they take the color chosen for the instance', () => {
     renderPage();
-    const repositoriesCard = screen.getByTestId('instrument-repos-card').className;
+    expect(screen.getByTestId('instrument-repos-card').hasAttribute('data-instance-card')).toBe(true);
 
     openActivityLog();
 
-    for (const className of [repositoriesCard, screen.getByTestId('instrument-repos-card').className]) {
-      expect(className).toContain('bg-transparent');
-      expect(className).toContain('border-transparent');
-      expect(className).toContain('shadow-none');
-    }
+    expect(screen.getByTestId('instrument-repos-card').hasAttribute('data-instance-card')).toBe(true);
   });
 
   it('should pad the table in its own colour above and beside it, so Sync All and the rows share one edge', () => {

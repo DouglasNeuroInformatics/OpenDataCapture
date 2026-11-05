@@ -100,6 +100,43 @@ describe('SetupService', () => {
     });
   });
 
+  describe('cardColor', () => {
+    it("should persist each mode's color", async () => {
+      setupStateModel.findFirst.mockResolvedValue({ id: 'setup-1', isSetup: true });
+      await setupService.updateState({ darkCardTheme: 'invisible', lightCardTheme: 'mist' });
+      expect(setupStateModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { darkCardTheme: 'invisible', lightCardTheme: 'mist' },
+        where: { id: 'setup-1' }
+      });
+    });
+
+    it("should return each mode's saved color", async () => {
+      setupStateModel.findFirst.mockResolvedValue({
+        darkCardTheme: 'midnight',
+        isDemo: false,
+        isSetup: true,
+        lightCardTheme: 'mist'
+      });
+      await expect(setupService.getState()).resolves.toMatchObject({
+        darkCardTheme: 'midnight',
+        lightCardTheme: 'mist'
+      });
+    });
+
+    it("should return each mode's saved custom color", async () => {
+      setupStateModel.findFirst.mockResolvedValue({ customCardColorDark: '#111111', isDemo: false, isSetup: true });
+      await expect(setupService.getState()).resolves.toMatchObject({ customCardColorDark: '#111111' });
+    });
+
+    it('should report invisible cards for an instance that never chose a color', async () => {
+      setupStateModel.findFirst.mockResolvedValue({ isDemo: false, isSetup: true });
+      await expect(setupService.getState()).resolves.toMatchObject({
+        darkCardTheme: 'invisible',
+        lightCardTheme: 'invisible'
+      });
+    });
+  });
+
   describe('isBulkRemoteAssignmentsEnabled', () => {
     it('should persist isBulkRemoteAssignmentsEnabled', async () => {
       configService.get.mockReturnValue(true);

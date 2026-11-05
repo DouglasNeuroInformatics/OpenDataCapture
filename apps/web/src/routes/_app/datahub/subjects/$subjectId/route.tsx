@@ -7,6 +7,7 @@ import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { PageHeader } from '@/components/PageHeader';
 import { TabLink } from '@/components/TabLink';
@@ -37,32 +38,34 @@ const RouteComponent = () => {
           )}
         </Heading>
       </PageHeader>
-      {/* A subject reached from an instrument's record table belongs to that listing, not to the
+      <InstanceCard className="p-6">
+        {/* A subject reached from an instrument's record table belongs to that listing, not to the
           subject index — so the return goes back to where the reader actually was. */}
-      <Link
-        className="text-muted-foreground focus-visible:ring-ring mb-3 flex items-center gap-0.5 self-start rounded-sm text-[11px] font-semibold tracking-widest uppercase transition-colors hover:text-blue-600 focus-visible:ring-1 focus-visible:outline-hidden dark:hover:text-blue-400"
-        data-testid="subject-hub-back"
-        params={search.fromInstrument ? { instrumentId: search.fromInstrument } : undefined}
-        search={search.fromInstrument ? { fromSeries: search.fromSeries } : undefined}
-        to={search.fromInstrument ? '/datahub/instruments/$instrumentId/table' : '/datahub/subjects'}
-      >
-        <ChevronLeftIcon className="h-3.5 w-3.5" />
-        {t({ en: 'Return', es: 'Volver', fr: 'Retour' })}
-      </Link>
-      <div className="mb-5 flex">
-        <TabLink label={t('layout.tabs.table')} pathname={`${basePathname}/table`} testId="subject-table-tab" />
-        <TabLink label={t('layout.tabs.graph')} pathname={`${basePathname}/graph`} testId="subject-graph" />
-        {config.setup.isGatewayEnabled && (
-          <TabLink
-            label={t('layout.tabs.assignments')}
-            pathname={`${basePathname}/assignments`}
-            testId="subject-assignment"
-          />
-        )}
-      </div>
-      <React.Suspense fallback={<LoadingFallback />}>
-        <Outlet />
-      </React.Suspense>
+        <Link
+          className="text-muted-foreground focus-visible:ring-ring mb-3 flex items-center gap-0.5 self-start rounded-sm text-[11px] font-semibold tracking-widest uppercase transition-colors hover:text-blue-600 focus-visible:ring-1 focus-visible:outline-hidden dark:hover:text-blue-400"
+          data-testid="subject-hub-back"
+          params={search.fromInstrument ? { instrumentId: search.fromInstrument } : undefined}
+          search={search.fromInstrument ? { fromSeries: search.fromSeries } : undefined}
+          to={search.fromInstrument ? '/datahub/instruments/$instrumentId/table' : '/datahub/subjects'}
+        >
+          <ChevronLeftIcon className="h-3.5 w-3.5" />
+          {t({ en: 'Return', es: 'Volver', fr: 'Retour' })}
+        </Link>
+        <div className="mb-5 flex">
+          <TabLink label={t('layout.tabs.table')} pathname={`${basePathname}/table`} testId="subject-table-tab" />
+          <TabLink label={t('layout.tabs.graph')} pathname={`${basePathname}/graph`} testId="subject-graph" />
+          {config.setup.isGatewayEnabled && (
+            <TabLink
+              label={t('layout.tabs.assignments')}
+              pathname={`${basePathname}/assignments`}
+              testId="subject-assignment"
+            />
+          )}
+        </div>
+        <React.Suspense fallback={<LoadingFallback />}>
+          <Outlet />
+        </React.Suspense>
+      </InstanceCard>
     </React.Fragment>
   );
 };

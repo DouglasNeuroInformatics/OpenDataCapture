@@ -5,6 +5,7 @@ import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
 import { GroupEmailTemplates } from '@/components/GroupEmailTemplates';
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { config } from '@/config';
 
@@ -18,7 +19,9 @@ const RouteComponent = () => {
           {t({ en: 'Email Templates', es: 'Plantillas de correo', fr: 'Modèles de courriel' })}
         </Heading>
       </PageHeader>
-      <GroupEmailTemplates />
+      <InstanceCard className="p-6">
+        <GroupEmailTemplates />
+      </InstanceCard>
     </React.Fragment>
   );
 };

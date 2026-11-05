@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { snakeToCamelCase } from '@douglasneuroinformatics/libjs';
-import { Button, Card, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { ArchiveBoxArrowDownIcon, ArchiveBoxXMarkIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
 import { isGrantablePermission } from '@opendatacapture/schemas/core';
@@ -10,6 +10,7 @@ import type { $UpdateUserPermissionsData } from '@opendatacapture/schemas/user';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { Chip } from '@/components/Chip';
+import { InstanceCard } from '@/components/InstanceCard';
 import { PageHeader } from '@/components/PageHeader';
 import { UpdateUserForm } from '@/components/UpdateUserForm';
 import type { UpdateUserFormInputData } from '@/components/UpdateUserForm';
@@ -23,6 +24,7 @@ import { permissionSetsQueryOptions, usePermissionSetsQuery } from '@/hooks/useP
 import { useUnarchiveUserMutation } from '@/hooks/useUnarchiveUserMutation';
 import { useUpdateUserMutation } from '@/hooks/useUpdateUserMutation';
 import { useAppStore } from '@/store';
+import { PAGE_SUBMIT_BUTTON } from '@/utils/card-color';
 import { isIncompleteDraft, withPermissionDrafts } from '@/utils/permissions';
 import type { PermissionDraft } from '@/utils/permissions';
 import { clearedIfBlank, omittedIfUnchanged, validationSummary } from '@/utils/validation';
@@ -97,14 +99,14 @@ const UserEditor = ({ userId }: { userId: string }) => {
             <ChevronLeftIcon className="h-3.5 w-3.5" />
             {t({ en: 'Return', es: 'Volver', fr: 'Retour' })}
           </Link>
-          <Card>
-            <Card.Header className="gap-4 space-y-0">
+          <InstanceCard>
+            <InstanceCard.Header className="gap-4 space-y-0">
               <div className="flex items-center gap-4">
                 <UserIcon className="text-muted-foreground h-14 w-14 shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <Card.Title className="text-lg" data-testid="admin-user-username">
+                  <InstanceCard.Title className="text-lg" data-testid="admin-user-username">
                     {user.username}
-                  </Card.Title>
+                  </InstanceCard.Title>
                   <p className="text-muted-foreground mt-1 text-sm" data-testid="admin-user-identity">
                     {identityLine}
                   </p>
@@ -176,21 +178,21 @@ const UserEditor = ({ userId }: { userId: string }) => {
                   </Dialog>
                 )}
               </div>
-            </Card.Header>
-          </Card>
+            </InstanceCard.Header>
+          </InstanceCard>
         </div>
-        <Card>
-          <Card.Header>
-            <Card.Title>{t({ en: 'Account', es: 'Cuenta', fr: 'Compte' })}</Card.Title>
-            <Card.Description>
+        <InstanceCard>
+          <InstanceCard.Header>
+            <InstanceCard.Title>{t({ en: 'Account', es: 'Cuenta', fr: 'Compte' })}</InstanceCard.Title>
+            <InstanceCard.Description>
               {t({
                 en: 'Contact details, group membership, status and password.',
                 es: 'Información de contacto, pertenencia a grupos, estado y contraseña.',
                 fr: 'Coordonnées, appartenance aux groupes, statut et mot de passe.'
               })}
-            </Card.Description>
-          </Card.Header>
-          <Card.Content>
+            </InstanceCard.Description>
+          </InstanceCard.Header>
+          <InstanceCard.Content>
             {submitErrorMessage && (
               <div
                 className="text-destructive mb-6 text-sm font-medium"
@@ -284,8 +286,8 @@ const UserEditor = ({ userId }: { userId: string }) => {
                 }
               }}
             />
-          </Card.Content>
-        </Card>
+          </InstanceCard.Content>
+        </InstanceCard>
         <UserPermissionsEditor
           drafts={permissionDrafts}
           groups={groups}
@@ -302,7 +304,7 @@ const UserEditor = ({ userId }: { userId: string }) => {
           onSourceChange={setPermissionSource}
         />
         <Button
-          className="w-full"
+          className={PAGE_SUBMIT_BUTTON}
           data-testid="save-user-changes"
           disabled={isSaving}
           form="admin-user-account-form"

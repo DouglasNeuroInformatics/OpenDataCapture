@@ -4,6 +4,7 @@ import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { InstrumentShowcase } from '@/components/InstrumentShowcase';
 import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
@@ -29,19 +30,21 @@ const RouteComponent = () => {
           {t('instruments.accessible.title')}
         </Heading>
       </PageHeader>
-      <WithFallback
-        Component={InstrumentShowcase}
-        props={{
-          data: instrumentInfoQuery.data && selectAdministrableInstruments(instrumentInfoQuery.data, currentGroup),
-          onSelect: (instrument) => {
-            void navigate({
-              params: { id: instrument.id },
-              state: { info: instrument },
-              to: `/instruments/render/$id`
-            });
-          }
-        }}
-      />
+      <InstanceCard className="p-6">
+        <WithFallback
+          Component={InstrumentShowcase}
+          props={{
+            data: instrumentInfoQuery.data && selectAdministrableInstruments(instrumentInfoQuery.data, currentGroup),
+            onSelect: (instrument) => {
+              void navigate({
+                params: { id: instrument.id },
+                state: { info: instrument },
+                to: `/instruments/render/$id`
+              });
+            }
+          }}
+        />
+      </InstanceCard>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { ActionDropdown, Select, Tabs } from '@douglasneuroinformatics/libui/com
 import { useDownload, useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute } from '@tanstack/react-router';
 
+import { InstanceCard } from '@/components/InstanceCard';
 import { RecordDistributionChart } from '@/components/RecordDistributionChart';
 import { RecordScatterChart } from '@/components/RecordScatterChart';
 import { SelectChartPalette } from '@/components/SelectChartPalette';
@@ -200,13 +201,13 @@ const RouteComponent = () => {
           />
         </div>
       </div>
-      <div
-        className="bg-card text-muted-foreground rounded-md border p-6 tracking-tight shadow-xs"
+      <InstanceCard
+        className="text-muted-foreground rounded-md p-6 tracking-tight"
         data-testid="instrument-hub-chart"
         ref={chartContainerRef}
       >
         {renderChart()}
-      </div>
+      </InstanceCard>
     </div>
   );
 };

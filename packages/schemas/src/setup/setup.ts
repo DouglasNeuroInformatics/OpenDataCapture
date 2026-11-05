@@ -40,6 +40,27 @@ const LOGO_SOURCES = ['upload', 'url'] as const;
 /** Independently orderable content sections in the login branding panel. */
 const PANEL_SECTIONS = ['logo', 'name', 'tagline', 'details', 'resources'] as const;
 
+/**
+ * The themes an instance's cards can be painted in each mode. `invisible` draws no card at all and is
+ * what an instance that never chose has; `custom` paints the mode's stored hex color.
+ */
+const LIGHT_CARD_THEMES = ['invisible', 'paper', 'ivory', 'fog', 'silver', 'mist', 'heather', 'custom'] as const;
+
+const DARK_CARD_THEMES = [
+  'invisible',
+  'midnight',
+  'graphite',
+  'charcoal',
+  'steel',
+  'mist',
+  'heather',
+  'custom'
+] as const;
+
+const $LightCardTheme = z.enum(LIGHT_CARD_THEMES);
+
+const $DarkCardTheme = z.enum(DARK_CARD_THEMES);
+
 const $HexColor = z.string().regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, 'Must be a valid hex color (e.g. #0ea5e9)');
 
 /**
@@ -198,6 +219,9 @@ const DEFAULT_TABLE_COLOR_MODE = 'tags' satisfies z.infer<typeof $TableColorMode
 const $SetupState = z.object({
   activeLanguages: $ActiveLanguages,
   branding: $BrandingConfig.nullish(),
+  customCardColorDark: $HexColor.nullish(),
+  customCardColorLight: $HexColor.nullish(),
+  darkCardTheme: $DarkCardTheme.default('invisible'),
   defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
   /** Whether the group-scoped bulk remote assignment page is offered. */
   isBulkRemoteAssignmentsEnabled: z.boolean().nullish(),
@@ -215,6 +239,7 @@ const $SetupState = z.object({
    */
   isMailEnabled: z.boolean().default(false),
   isSetup: z.boolean().nullable(),
+  lightCardTheme: $LightCardTheme.default('invisible'),
   release: $ReleaseInfo,
   tableColorMode: $TableColorMode.default(DEFAULT_TABLE_COLOR_MODE),
   uptime: z.number()
@@ -223,9 +248,13 @@ const $SetupState = z.object({
 const $UpdateSetupStateData = z.object({
   activeLanguages: $ActiveLanguages.optional(),
   branding: $BrandingConfig.nullish(),
+  customCardColorDark: $HexColor.optional(),
+  customCardColorLight: $HexColor.optional(),
+  darkCardTheme: $DarkCardTheme.optional(),
   defaultAssignmentDurationDays: $DefaultAssignmentDurationDays.nullish(),
   isBulkRemoteAssignmentsEnabled: z.boolean().nullish(),
   isExperimentalFeaturesEnabled: z.boolean().nullish(),
+  lightCardTheme: $LightCardTheme.optional(),
   tableColorMode: $TableColorMode.optional()
 });
 
@@ -257,21 +286,27 @@ export type PanelSection = (typeof PANEL_SECTIONS)[number];
 export type ProductionReleaseInfo = z.infer<typeof $ProductionReleaseInfo>;
 export type ReleaseInfo = z.infer<typeof $ReleaseInfo>;
 export type ResourceLink = z.infer<typeof $ResourceLink>;
+export type DarkCardTheme = z.infer<typeof $DarkCardTheme>;
+export type LightCardTheme = z.infer<typeof $LightCardTheme>;
 export type SetupState = z.infer<typeof $SetupState>;
 export type TableColorMode = z.infer<typeof $TableColorMode>;
 export type $UpdateSetupStateData = z.infer<typeof $UpdateSetupStateData>;
 
 export {
   $BrandingConfig,
+  $DarkCardTheme,
   $DevelopmentReleaseInfo,
   $InitAppOptions,
+  $LightCardTheme,
   $ProductionReleaseInfo,
   $ReleaseInfo,
   $SetupState,
   $TableColorMode,
   $UpdateSetupStateData,
+  DARK_CARD_THEMES,
   DEFAULT_TABLE_COLOR_MODE,
   FONT_SIZES,
+  LIGHT_CARD_THEMES,
   LOGIN_THEMES,
   LOGO_ALIGNMENTS,
   LOGO_SIZES,
