@@ -83,7 +83,7 @@ describe('UsersService', () => {
       userModel.findFirst.mockResolvedValue(null);
       await usersService.checkUsernameExists('jane.doe', { ability: admin.ability });
       expect(userModel.findFirst.mock.lastCall?.[0].where).toEqual({
-        AND: [accessibleQuery(admin.ability, 'read', 'User'), { username: 'jane.doe' }]
+        AND: [accessibleQuery(admin.ability, 'read', 'User'), { username: { equals: 'jane.doe', mode: 'insensitive' } }]
       });
     });
   });
@@ -109,6 +109,11 @@ describe('UsersService', () => {
       userModel.exists.mockResolvedValue(true);
       await expect(usersService.create({ ...baseUser })).rejects.toThrow(ConflictException);
       expect(cryptoService.hashPassword).not.toHaveBeenCalled();
+    });
+
+    it('should look for a taken username ignoring case, so two users cannot differ only by case', async () => {
+      await usersService.create({ ...baseUser, username: 'Jane.Doe' });
+      expect(userModel.exists).toHaveBeenCalledWith({ username: { equals: 'Jane.Doe', mode: 'insensitive' } });
     });
 
     it('should propagate a group lookup that finds nothing, so the user is never connected to it', async () => {
@@ -219,7 +224,31 @@ describe('UsersService', () => {
 
     it('should throw when no accessible user has the username', async () => {
       userModel.findFirst.mockResolvedValue(null);
+      userModel.findMany.mockResolvedValue([]);
       await expect(usersService.findByUsername('jane.doe')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should prefer an exact-case match, so users differing only by case each stay reachable', async () => {
+      userModel.findFirst.mockResolvedValue({ id: 'user-1', username: 'jane.doe' });
+      await expect(usersService.findByUsername('jane.doe')).resolves.toMatchObject({ id: 'user-1' });
+      expect(userModel.findMany).not.toHaveBeenCalled();
+    });
+
+    it('should fall back to the one user matching ignoring case, so the case typed does not matter', async () => {
+      userModel.findFirst.mockResolvedValue(null);
+      userModel.findMany.mockResolvedValue([{ id: 'user-1', username: 'jane.doe' }]);
+      await expect(usersService.findByUsername('Jane.Doe', { ability: admin.ability })).resolves.toMatchObject({
+        id: 'user-1'
+      });
+      expect(userModel.findMany.mock.lastCall?.[0].where).toEqual({
+        AND: [accessibleQuery(admin.ability, 'read', 'User'), { username: { equals: 'Jane.Doe', mode: 'insensitive' } }]
+      });
+    });
+
+    it('should refuse a username matching several users only when ignoring case, rather than guess between them', async () => {
+      userModel.findFirst.mockResolvedValue(null);
+      userModel.findMany.mockResolvedValue([{ id: 'user-1' }, { id: 'user-2' }]);
+      await expect(usersService.findByUsername('JANE.DOE')).rejects.toThrow(ConflictException);
     });
   });
 
@@ -320,6 +349,23 @@ describe('UsersService', () => {
       expect(cryptoService.hashPassword).toHaveBeenCalledWith('jf8&Kd0!mZq2wLx');
       expect(userModel.update.mock.lastCall?.[0].data).toMatchObject({ hashedPassword: 'hashed-password' });
       expect(userModel.update.mock.lastCall?.[0].data).not.toHaveProperty('password');
+    });
+
+    it('should refuse renaming to a username another user holds in any case', async () => {
+      userModel.exists.mockResolvedValue(true);
+      await expect(usersService.updateById('user-1', { username: 'Jane.Doe' }, admin)).rejects.toThrow(
+        ConflictException
+      );
+      expect(userModel.exists).toHaveBeenCalledWith({
+        id: { not: 'user-1' },
+        username: { equals: 'Jane.Doe', mode: 'insensitive' }
+      });
+      expect(userModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should not check for a taken username when the username is not being changed', async () => {
+      await usersService.updateById('user-1', { firstName: 'Janet' }, admin);
+      expect(userModel.exists).not.toHaveBeenCalled();
     });
 
     it('should check a new password against the stored username when the username is not being changed', async () => {
