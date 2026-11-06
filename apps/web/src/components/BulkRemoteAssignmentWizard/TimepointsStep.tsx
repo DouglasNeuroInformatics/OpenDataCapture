@@ -5,6 +5,8 @@ import { Button, Input, Select } from '@douglasneuroinformatics/libui/components
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { PlusIcon } from 'lucide-react';
 
+import { findRedirectUrlError } from '@/utils/validation';
+
 import { StepLayout } from './StepLayout';
 import { TimepointTable } from './TimepointTable';
 
@@ -20,7 +22,10 @@ type TimepointsStepProps = {
   onBack: () => void;
   onChange: (timepoints: DraftTimepoint[]) => void;
   onConfirm: () => void;
+  onRedirectUrlChange: (redirectUrl: string) => void;
   onStepChange: (step: WizardStep) => void;
+  /** Applied to every assignment in the batch; blank for none. */
+  redirectUrl: string;
   subjectCount: number;
   /** Held by the wizard, so returning from review does not discard the list. */
   timepoints: DraftTimepoint[];
@@ -37,13 +42,18 @@ export const TimepointsStep = ({
   onBack,
   onChange,
   onConfirm,
+  onRedirectUrlChange,
   onStepChange,
+  redirectUrl,
   subjectCount,
   timepoints
 }: TimepointsStepProps) => {
   const { t } = useTranslation();
   const [instrumentId, setInstrumentId] = useState('');
   const [expiresAt, setExpiresAt] = useState(defaultExpiresAt);
+  // Shown once the user leaves the field, so a URL is not called invalid while it is still being typed.
+  const [isRedirectUrlTouched, setIsRedirectUrlTouched] = useState(false);
+  const redirectUrlError = redirectUrl === '' ? null : findRedirectUrlError(redirectUrl);
 
   // An instrument already in the list cannot be added again: two live assignments for the same
   // subject and instrument is exactly the conflict the API refuses.
@@ -77,7 +87,7 @@ export const TimepointsStep = ({
           </Button>
           <Button
             data-testid="bulk-confirm-timepoints"
-            disabled={timepoints.length === 0 || isLoading}
+            disabled={timepoints.length === 0 || isLoading || redirectUrlError !== null}
             type="button"
             onClick={onConfirm}
           >
@@ -160,6 +170,37 @@ export const TimepointsStep = ({
               timepoints={timepoints}
               onRemove={(removed) => onChange(timepoints.filter((item) => item.instrumentId !== removed.instrumentId))}
             />
+          )}
+        </div>
+
+        <div className="flex max-w-xl flex-col gap-1">
+          <label className="text-sm font-medium" htmlFor="bulk-redirect-url">
+            {t({
+              en: 'Redirect URL (Optional)',
+              es: 'URL de redirección (opcional)',
+              fr: 'URL de redirection (facultatif)'
+            })}
+          </label>
+          <p className="text-muted-foreground text-sm">
+            {t({
+              en: 'Where to send each subject once they finish. Must start with https://.',
+              es: 'Adónde enviar a cada sujeto cuando termine. Debe comenzar con https://.',
+              fr: 'Où envoyer chaque sujet une fois terminé. Doit commencer par https://.'
+            })}
+          </p>
+          <Input
+            aria-invalid={isRedirectUrlTouched && redirectUrlError !== null}
+            data-testid="bulk-redirect-url-input"
+            id="bulk-redirect-url"
+            type="url"
+            value={redirectUrl}
+            onBlur={() => setIsRedirectUrlTouched(true)}
+            onChange={(event) => onRedirectUrlChange(event.target.value)}
+          />
+          {isRedirectUrlTouched && redirectUrlError && (
+            <p className="text-destructive text-sm" data-testid="bulk-redirect-url-error">
+              {redirectUrlError}
+            </p>
           )}
         </div>
       </div>

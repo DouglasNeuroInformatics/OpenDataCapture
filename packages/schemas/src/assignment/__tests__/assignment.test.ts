@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  $AssignmentRedirectUrl,
   $BulkAssignmentFailure,
   $BulkAssignmentIssue,
   $BulkAssignmentPreflightData,
@@ -39,9 +40,50 @@ const remoteAssignment = {
   url: 'http://localhost:3500/assignments/assignment-1'
 };
 
+describe('$AssignmentRedirectUrl', () => {
+  it('should accept an https URL', () => {
+    expect($AssignmentRedirectUrl.safeParse('https://example.com/study?id=1').data).toBe(
+      'https://example.com/study?id=1'
+    );
+  });
+
+  it('should normalize a URL to ASCII, so the gateway can embed it in its latin1-only page props', () => {
+    expect($AssignmentRedirectUrl.parse('https://exämple.com/päth')).toBe('https://xn--exmple-cua.com/p%C3%A4th');
+  });
+
+  it('should reject a plain http URL, which would hand the subject over unencrypted', () => {
+    expect($AssignmentRedirectUrl.safeParse('http://example.com').success).toBe(false);
+  });
+
+  it('should reject a URL that runs script or renders a document of its own', () => {
+    expect($AssignmentRedirectUrl.safeParse('javascript:alert(1)').success).toBe(false);
+    expect($AssignmentRedirectUrl.safeParse('data:text/html,<script>alert(1)</script>').success).toBe(false);
+  });
+
+  it('should reject a value that is not a URL', () => {
+    expect($AssignmentRedirectUrl.safeParse('https://').success).toBe(false);
+    expect($AssignmentRedirectUrl.safeParse('example.com').success).toBe(false);
+  });
+
+  it('should reject a URL over 2000 characters', () => {
+    expect($AssignmentRedirectUrl.safeParse(`https://example.com/${'a'.repeat(2000)}`).success).toBe(false);
+  });
+});
+
 describe('$CreateAssignmentData', () => {
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  it('should accept an assignment with no redirect URL, so the subject stays on the completion screen', () => {
+    const result = $CreateAssignmentData.safeParse({ expiresAt: futureDate(), instrumentId: 'i', subjectId: 's' });
+    expect(result.data).not.toHaveProperty('redirectUrl');
+  });
+
+  it('should hold the redirect URL to the https rule', () => {
+    const data = { expiresAt: futureDate(), instrumentId: 'i', subjectId: 's' };
+    expect($CreateAssignmentData.safeParse({ ...data, redirectUrl: 'https://example.com' }).success).toBe(true);
+    expect($CreateAssignmentData.safeParse({ ...data, redirectUrl: 'http://example.com' }).success).toBe(false);
   });
 
   it('should reject an expiry in the past', () => {
@@ -118,6 +160,15 @@ describe('$BulkAssignmentPreflightData', () => {
 });
 
 describe('$CreateBulkAssignmentsData', () => {
+  it('should hold the redirect URL applied to the whole batch to the https rule', () => {
+    expect($CreateBulkAssignmentsData.safeParse({ ...baseRequest, redirectUrl: 'https://example.com' }).success).toBe(
+      true
+    );
+    expect($CreateBulkAssignmentsData.safeParse({ ...baseRequest, redirectUrl: 'http://example.com' }).success).toBe(
+      false
+    );
+  });
+
   it('should reject a timepoint whose expiry is in the past', () => {
     const result = $CreateBulkAssignmentsData.safeParse({
       ...baseRequest,
@@ -176,6 +227,14 @@ describe('$CreateRemoteAssignmentsData', () => {
     expect(result.success).toBe(true);
     expect(result.data?.instruments).toHaveLength(1);
     expect(result.data?.assignments).toHaveLength(3);
+  });
+
+  it('should accept an assignment stored without a redirect URL, which the database holds as null', () => {
+    const result = $CreateRemoteAssignmentsData.safeParse({
+      assignments: [{ ...remoteAssignment, redirectUrl: null }],
+      instruments: [{ instrumentContainer, instrumentId: 'instrument-1' }]
+    });
+    expect(result.success).toBe(true);
   });
 
   it('should reject a batch with no assignments, so an empty request is not a silent no-op', () => {

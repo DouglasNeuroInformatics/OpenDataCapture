@@ -22,6 +22,9 @@ export class RenderInstrumentPage extends AppPage {
   readonly resetButton: Locator;
   /** Shown once every item of a series has been administered, in place of a scalar summary. */
   readonly seriesCompletionHeading: Locator;
+  /** The bar shown above each item of a series, with its "Instrument N of M" label. */
+  readonly seriesProgress: Locator;
+  readonly seriesProgressBar: Locator;
   readonly submitButton: Locator;
   readonly summaryHeading: Locator;
 
@@ -33,6 +36,8 @@ export class RenderInstrumentPage extends AppPage {
     this.leaveDialog = page.getByTestId('blocker-dialog');
     this.resetButton = page.getByRole('button', { name: 'Reset' });
     this.seriesCompletionHeading = page.getByRole('heading', { name: /Thank You/i });
+    this.seriesProgress = page.getByTestId('series-progress');
+    this.seriesProgressBar = this.seriesProgress.getByRole('progressbar');
     this.submitButton = page.getByRole('button', { name: 'Submit' });
     this.summaryHeading = page.getByRole('heading', { name: /Summary of Results/i });
     this.errorMessages = page.getByTestId('error-message-text');

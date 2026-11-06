@@ -82,6 +82,13 @@ state `apps/api` owns — so persisting either would only add a second copy that
 `db:push` before `dev`, `lint`, `test:e2e` and — via the `@opendatacapture/gateway#build` key in
 `turbo.json` — before `build`, so a gateway build needs `GATEWAY_DATABASE_URL` set.
 
+**A deployed gateway applies this schema on every start.** `scripts/run.sh` runs `prisma db push`
+before the server, with a Prisma CLI the `Dockerfile` installs at the version the lockfile resolved.
+That creates the database on an empty volume and brings an existing one up to the image's schema,
+so a new column must be optional or have a default. `db push` refuses a change that would lose
+data, and the container then fails to start: removing or retyping a column needs a plan for the
+rows already on deployed volumes.
+
 ## Build and dev
 
 `pnpm build` is three passes into `dist/`: Vite client build (`dist/client`), Vite SSR build

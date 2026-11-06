@@ -120,6 +120,8 @@ test.describe('gateway remote assignment', () => {
     await gatewayInstrument.submit();
     await expect(gatewayInstrument.summaryHeading).toBeVisible();
     await expect(gatewayInstrument.errorSummary).toHaveCount(0);
+    // Created without a redirect URL, so the subject is left on the completion screen.
+    await expect(gatewayPage.getByTestId('completion-redirect')).toHaveCount(0);
 
     // Revisiting the same link after completion must not serve the instrument again. Reuses this
     // now-completed assignment rather than soloing a second, expensive Cap proof-of-work just to
@@ -142,6 +144,48 @@ test.describe('gateway remote assignment', () => {
       await page.reload();
       await expect(page.getByRole('table')).toContainText('Complete', { timeout: 5_000 });
     }).toPass({ timeout: 90_000 });
+  });
+});
+
+test.describe('gateway completion redirect', () => {
+  test.describe.configure({ timeout: 180_000 });
+
+  test('should send the subject on to the redirect URL the assignment was created with once they complete it', async ({
+    api,
+    context,
+    uniqueId
+  }) => {
+    const redirectUrl = `https://redirect.example.test/done/${uniqueId}`;
+    const group = await api.createGroup();
+    const assignment = await api.createAssignment({
+      expiresAt: new Date(Date.now() + 86_400_000),
+      groupId: group.id,
+      instrumentId: await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE'),
+      redirectUrl,
+      subjectId: await api.createSubject(group.id)
+    });
+
+    const gatewayPage = await context.newPage();
+    // The site the subject is sent back to is not part of the stack, so answer for it here.
+    await gatewayPage.route('https://redirect.example.test/**', (route) => {
+      return route.fulfill({ body: '<h1>Study portal</h1>', contentType: 'text/html' });
+    });
+    await gatewayPage.goto(assignment.url);
+    await gatewayPage.locator('cap-widget').click();
+
+    const gatewayInstrument = new RenderInstrumentPage(gatewayPage);
+    await expect(gatewayInstrument.beginButton).toBeEnabled({ timeout: 120_000 });
+    await gatewayInstrument.begin();
+    await gatewayInstrument.completeHappinessQuestionnaire();
+    await gatewayInstrument.submit();
+
+    // The completion screen stays up through the countdown, so the subject sees it before leaving.
+    await expect(gatewayInstrument.summaryHeading).toBeVisible();
+    await expect(gatewayPage.getByTestId('completion-redirect')).toBeVisible();
+    await gatewayPage.waitForURL(redirectUrl);
+    await expect(gatewayPage.getByRole('heading', { name: 'Study portal' })).toBeVisible();
+
+    await gatewayPage.close();
   });
 });
 

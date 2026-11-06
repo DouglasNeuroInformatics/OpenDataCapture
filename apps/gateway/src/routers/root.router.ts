@@ -51,6 +51,7 @@ router.get(
       initialSeriesIndex,
       kind: 'assignment',
       language: resolveLanguage(req.query.lang),
+      redirectUrl: assignment.redirectUrl ?? undefined,
       target: targetParseResult.data,
       token
     } satisfies RootProps);
