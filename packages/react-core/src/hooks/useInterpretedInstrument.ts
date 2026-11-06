@@ -14,13 +14,16 @@ export type InterpretedInstrumentState<TInstrument extends AnyUnilingualInstrume
   { error: Error; status: 'ERROR' } | { instrument: TInstrument; status: 'DONE' } | { status: 'LOADING' };
 
 /**
- * Interpret an instrument bundle directly in the browser
+ * Interpret an instrument bundle directly in the browser.
  *
- * @param bundle - the JavaScript code to be interpreted directly in the browser
+ * Pass null when there is no bundle. A finished series has no item left, and interpreting that
+ * absence evaluates to undefined, which throws reading `kind`.
+ *
+ * @param bundle - the JavaScript code to be interpreted directly in the browser, or null when there is none
  * @returns The instrument generated from the code, translated into the current locale, if possible, otherwise the default
  */
 export function useInterpretedInstrument<TInstrument extends AnyUnilingualInstrument = AnyUnilingualInstrument>(
-  bundle: string,
+  bundle: null | string,
   options?: InterpretOptions
 ): InterpretedInstrumentState<TInstrument & { supportedLanguages: Language[] }> {
   const interpreter = useMemo(() => new InstrumentInterpreter(), []);
@@ -28,6 +31,9 @@ export function useInterpretedInstrument<TInstrument extends AnyUnilingualInstru
   const { resolvedLanguage } = useTranslation();
 
   useEffect(() => {
+    if (bundle === null) {
+      return;
+    }
     // A bundle that resolves after the hook has moved on to another one would otherwise be reported
     // as the outcome of that other bundle, or leave this stuck reporting LOADING for it forever.
     let isCurrent = true;

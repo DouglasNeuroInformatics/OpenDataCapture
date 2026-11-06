@@ -37,6 +37,29 @@ describe('useInterpretedInstrument', () => {
     expect(result.current.status).toBe('LOADING');
   });
 
+  it('should report LOADING for a null bundle and never interpret it, so a finished series does not evaluate an empty one', () => {
+    const interpret = vi.spyOn(InstrumentInterpreter.prototype, 'interpret');
+    const { result } = renderHook(() => useInterpretedInstrument(null));
+    expect(result.current.status).toBe('LOADING');
+    expect(interpret).not.toHaveBeenCalled();
+  });
+
+  it('should return to LOADING when the bundle becomes null, rather than keep showing the instrument it replaced', async () => {
+    const interpret = vi.spyOn(InstrumentInterpreter.prototype, 'interpret');
+    const { rerender, result } = renderHook<ReturnType<typeof useInterpretedInstrument>, { bundle: null | string }>(
+      ({ bundle }) => useInterpretedInstrument(bundle),
+      { initialProps: { bundle: createBundle({ title: 'First' }) } }
+    );
+    await waitFor(() => {
+      expect(result.current.status).toBe('DONE');
+    });
+
+    const callsBeforeNull = interpret.mock.calls.length;
+    rerender({ bundle: null });
+    expect(result.current.status).toBe('LOADING');
+    expect(interpret).toHaveBeenCalledTimes(callsBeforeNull);
+  });
+
   it('should report the interpreted instrument once it resolves', async () => {
     const { result } = renderHook(() => useInterpretedInstrument(createBundle({ title: 'First' })));
     await waitFor(() => {

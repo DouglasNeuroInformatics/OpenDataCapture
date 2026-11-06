@@ -1,5 +1,6 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
 import type { SeriesInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -227,6 +228,23 @@ describe('SeriesInstrumentRenderer', () => {
     await waitFor(() => {
       expect(screen.getByText('Thank You!')).toBeTruthy();
     });
+  });
+
+  it('should not interpret an empty bundle once every item has been submitted', async () => {
+    const interpret = vi.spyOn(InstrumentInterpreter.prototype, 'interpret');
+    const { onSubmit } = await beginSeries({ skipProgress: true });
+    await answerAndSubmit('first administration', onSubmit);
+    await waitFor(() => {
+      expect(getAnswerInput().value).toBe('');
+    });
+    await answerAndSubmit('second administration', onSubmit);
+
+    await waitFor(() => {
+      expect(screen.getByText('Thank You!')).toBeTruthy();
+    });
+    // `not.toHaveBeenCalledWith('')` passes on the bug too: interpret is also passed options, and
+    // Vitest only matches argument lists of the same length.
+    expect(interpret.mock.calls.map(([bundle]) => bundle)).not.toContain('');
   });
 
   it('should keep blocking navigation between items, so leaving cannot abandon the series partway', async () => {
