@@ -92,7 +92,7 @@ printed your test titles under `[chromium]`, and you have watched one of them fa
 
 ## Pushing proves nothing
 
-CI fires on a `pull_request` to `main` and on `workflow_dispatch`, never on a push
+CI fires on a `pull_request` to `main` or a release branch and on `workflow_dispatch`, never on a push
 (`.agents/docs/architecture/testing-strategy.md` §What CI gates), so until that PR exists the run
 you did locally is the only one there has been. Run `.agents/skills/odc-done/SKILL.md` before you
 open it — that is the sweep that re-runs lint, unit and e2e together.
