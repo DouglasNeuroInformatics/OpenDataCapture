@@ -59,6 +59,8 @@ const renderPage = (permissionSets: PermissionSetSummary[]) => {
 
 const rows = () => screen.getAllByTestId('data-table-row');
 
+const headerButton = (name: string) => within(screen.getByTestId('data-table-head')).getByText(name).closest('button')!;
+
 const cellTexts = (row: HTMLElement) => Array.from(row.children, (cell) => cell.textContent);
 
 const runLoader = (queryClient: QueryClient) => {
@@ -75,6 +77,24 @@ describe('Route', () => {
   });
 
   afterEach(cleanup);
+
+  it('should sort by name and by holder count as each header is clicked', () => {
+    renderPage([
+      permissionSetFixture({ holderCount: 2, id: 'b', name: 'B' }),
+      permissionSetFixture({ holderCount: 1, id: 'a', name: 'A' })
+    ]);
+    const names = () => screen.getAllByTestId('permission-set-name').map((name) => name.textContent);
+    fireEvent.click(headerButton('Name'));
+    expect(names()).toEqual(['A', 'B']);
+    fireEvent.click(headerButton('Holders'));
+    expect(names()).toEqual(['B', 'A']);
+  });
+
+  it('should sort by rule count when its header is clicked', () => {
+    renderPage([permissionSetFixture()]);
+    fireEvent.click(headerButton('Rules'));
+    expect(headerButton('Rules').querySelector('.lucide-chevrons-up-down')).toBeNull();
+  });
 
   it('should prefetch the permission sets in the loader, so the table renders without a waterfall', async () => {
     const queryClient = new QueryClient();

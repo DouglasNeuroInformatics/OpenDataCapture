@@ -193,6 +193,44 @@ test.describe('admin instrument repos activity log', () => {
     await expectInvisible();
   });
 
+  test('should offer a sort on every column of both tables, asking the server to order the activity log', async ({
+    getPageModel,
+    page
+  }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    const repoHead = reposPage.dataTable.getByTestId('data-table-head');
+    for (const name of ['Repository Name', 'URL', 'Instruments', 'Failed', 'Last Synced']) {
+      await expect(repoHead.getByRole('button', { name })).toBeVisible();
+    }
+
+    await reposPage.openActivityLog();
+    const logHead = reposPage.syncLogTable.getByTestId('data-table-head');
+    for (const name of ['Date', 'Repository', 'Action', 'Status', 'Imported', 'Failed']) {
+      await expect(logHead.getByRole('button', { name })).toBeVisible();
+    }
+    const request = page.waitForRequest((req) => req.url().includes('sortBy=status'));
+    await logHead.getByRole('button', { name: 'Status' }).click();
+    await request;
+  });
+
+  test('should leave room for every header beside its sort icon, so none is clipped', async ({ getPageModel }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+    const clippedLabels = (table: typeof reposPage.dataTable) => {
+      return table
+        .getByTestId('data-table-head')
+        .locator('button span')
+        .evaluateAll((labels) => {
+          return labels.filter((label) => label.scrollWidth > label.clientWidth).map((label) => label.textContent);
+        });
+    };
+
+    await expect(reposPage.dataTable.getByTestId('instrument-repo-url')).toBeVisible();
+    expect(await clippedLabels(reposPage.dataTable)).toEqual([]);
+    await reposPage.openActivityLog();
+    await expect(reposPage.syncLogTable.getByTestId('data-table-head')).toBeVisible();
+    expect(await clippedLabels(reposPage.syncLogTable)).toEqual([]);
+  });
+
   test('should fit both tables to the page without a horizontal scroll bar', async ({ getPageModel }) => {
     const reposPage = await getPageModel('/admin/instrument-repos');
     const overflows = (table: typeof reposPage.dataTable) => {

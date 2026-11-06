@@ -57,6 +57,16 @@ export const INSTRUMENT_REPO_SYNC_LOGS_PAGE_SIZE = 10;
 /** Upper bound on `limit`, so a single request can never load an unbounded slice of the collection. */
 export const INSTRUMENT_REPO_SYNC_LOGS_MAX_PAGE_SIZE = 1000;
 
+export type InstrumentRepoSyncLogsSortBy = z.infer<typeof $InstrumentRepoSyncLogsSortBy>;
+export const $InstrumentRepoSyncLogsSortBy = z.enum([
+  'action',
+  'createdAt',
+  'failedCount',
+  'importedCount',
+  'repoName',
+  'status'
+]);
+
 export type InstrumentRepoSyncLogsQueryParams = z.infer<typeof $InstrumentRepoSyncLogsQueryParams>;
 export const $InstrumentRepoSyncLogsQueryParams = z.object({
   limit: $NumberLike
@@ -65,6 +75,7 @@ export const $InstrumentRepoSyncLogsQueryParams = z.object({
   page: $NumberLike.pipe(z.number().int().positive()).default(1),
   /** Confines the page to one repository, which is what the per-repository dialog asks for. */
   repoId: z.string().optional(),
+  sortBy: $InstrumentRepoSyncLogsSortBy.default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc')
 });
 

@@ -44,6 +44,26 @@ type InstrumentRepoRecord = Awaited<ReturnType<Model<'InstrumentRepo'>['findFirs
  * The detail Nest exceptions thrown by `InstrumentsService.create` carry beyond their message: a VM
  * evaluation error as `cause`, schema validation errors as `issues`.
  */
+/**
+ * The trailing id makes the order total, since Mongo may otherwise return tied rows in a different
+ * order per page, repeating some rows and skipping others. Status is derived, not stored: Mongo sorts
+ * a null `message` lowest, so ordering by it and then by failure count runs SUCCESS, PARTIAL, FAILED.
+ */
+const getSyncLogOrderBy = (
+  sortBy: InstrumentRepoSyncLogsQueryParams['sortBy'],
+  sortOrder: InstrumentRepoSyncLogsQueryParams['sortOrder']
+) => {
+  const orderBy = {
+    action: [{ action: sortOrder }],
+    createdAt: [{ createdAt: sortOrder }],
+    failedCount: [{ failures: { _count: sortOrder } }],
+    importedCount: [{ importedCount: sortOrder }],
+    repoName: [{ repoName: sortOrder }],
+    status: [{ message: sortOrder }, { failures: { _count: sortOrder } }]
+  }[sortBy];
+  return [...orderBy, { id: 'desc' as const }];
+};
+
 const $ExceptionDetails = z.object({
   cause: z.object({ message: z.string() }).optional(),
   issues: z.array(z.object({ message: z.string(), path: z.array(z.union([z.string(), z.number()])) })).optional()
@@ -199,13 +219,13 @@ export class InstrumentReposService implements OnModuleInit {
    * returned whole: the client asks for the slice it is showing.
    */
   async findSyncLogs(
-    { limit, page, repoId, sortOrder }: InstrumentRepoSyncLogsQueryParams,
+    { limit, page, repoId, sortBy, sortOrder }: InstrumentRepoSyncLogsQueryParams,
     { ability }: EntityOperationOptions = {}
   ): Promise<InstrumentRepoSyncLogsPage> {
     const where = { AND: [accessibleQuery(ability, 'read', 'InstrumentRepoSyncLog')], repoId };
     const [data, total] = await Promise.all([
       this.instrumentRepoSyncLogModel.findMany({
-        orderBy: { createdAt: sortOrder },
+        orderBy: getSyncLogOrderBy(sortBy, sortOrder),
         skip: (page - 1) * limit,
         take: limit,
         where

@@ -10,6 +10,7 @@ import axios from 'axios';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { PageHeader } from '@/components/PageHeader';
+import { SortableHeader } from '@/components/SortableHeader';
 import { useDeleteGroupMutation } from '@/hooks/useDeleteGroupMutation';
 import { GROUPS_QUERY_KEY, groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import {
@@ -119,7 +120,7 @@ const RouteComponent = () => {
                 </span>
               );
             },
-            header: t('common.groupName')
+            header: ({ column }) => <SortableHeader column={column} label={t('common.groupName')} />
           },
           {
             accessorKey: 'type',
@@ -137,7 +138,7 @@ const RouteComponent = () => {
                 />
               );
             },
-            header: t('common.groupType')
+            header: ({ column }) => <SortableHeader column={column} label={t('common.groupType')} />
           }
         ]}
         data={groupsQuery.data}

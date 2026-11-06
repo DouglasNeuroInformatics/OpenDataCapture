@@ -9,7 +9,7 @@ export class SubjectAssignmentsPage extends AppPage {
 
   constructor(page: Page) {
     super(page);
-    this.assignmentRows = page.getByTestId('assignment-row');
+    this.assignmentRows = page.getByTestId('data-table-row');
     this.assignmentLink = page.getByRole('link', { name: 'Link to Assignment' });
     this.cancelButton = page.getByRole('button', { name: 'Cancel' });
   }

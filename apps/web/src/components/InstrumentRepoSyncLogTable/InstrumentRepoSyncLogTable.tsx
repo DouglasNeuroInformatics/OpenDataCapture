@@ -2,34 +2,47 @@ import { Fragment, useState } from 'react';
 
 import { Badge, Button, DataTable, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { InstrumentRepoSyncLog, InstrumentRepoSyncStage } from '@opendatacapture/schemas/instrument-repo';
+import { $InstrumentRepoSyncLogsSortBy } from '@opendatacapture/schemas/instrument-repo';
+import type {
+  InstrumentRepoSyncLog,
+  InstrumentRepoSyncLogsSortBy,
+  InstrumentRepoSyncStage
+} from '@opendatacapture/schemas/instrument-repo';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { SortableHeader } from '@/components/SortableHeader';
 import { TruncatedCell } from '@/components/TruncatedCell';
-import { MIN_TABLE_BODY_HEIGHT } from '@/utils/data-table';
+import { MIN_TABLE_BODY_HEIGHT, readServerSort } from '@/utils/data-table';
 import { getSyncStatus } from '@/utils/instrument-repo-sync';
 import type { InstrumentRepoSyncStatus } from '@/utils/instrument-repo-sync';
 import { getSyncStatusColor } from '@/utils/tag-colors';
 
-type InstrumentRepoSyncLogTableProps = {
-  logs: InstrumentRepoSyncLog[];
-  onPageChange: (page: number) => void;
-  onSortOrderChange: (sortOrder: 'asc' | 'desc') => void;
-  pageCount: number;
+type InstrumentRepoSyncLogSort = {
+  sortBy: InstrumentRepoSyncLogsSortBy;
   sortOrder: 'asc' | 'desc';
 };
 
-export const InstrumentRepoSyncLogTable = ({
+type InstrumentRepoSyncLogTableProps = {
+  logs: InstrumentRepoSyncLog[];
+  onPageChange: (page: number) => void;
+  onSortChange: (sort: InstrumentRepoSyncLogSort) => void;
+  pageCount: number;
+  sort: InstrumentRepoSyncLogSort;
+};
+
+const InstrumentRepoSyncLogTable = ({
   logs,
   onPageChange,
-  onSortOrderChange,
+  onSortChange,
   pageCount,
-  sortOrder
+  sort
 }: InstrumentRepoSyncLogTableProps) => {
   const { t } = useTranslation();
   const [theme] = useTheme();
   const [logToView, setLogToView] = useState<InstrumentRepoSyncLog | null>(null);
+  // In server mode the table mounts with no sorting state of its own, so the column it is ordered by
+  // is told its direction, or it would read as unsorted.
+  const sortOrderOf = (sortBy: InstrumentRepoSyncLogsSortBy) => (sort.sortBy === sortBy ? sort.sortOrder : undefined);
 
   const statusLabels = {
     FAILED: t({ en: 'Failed', es: 'Fallido', fr: 'Échec' }),
@@ -74,6 +87,7 @@ export const InstrumentRepoSyncLogTable = ({
           disableSearch
           columns={[
             {
+              accessorKey: 'createdAt',
               cell: (ctx) => (
                 <TruncatedCell
                   title={ctx.row.original.createdAt.toLocaleString()}
@@ -83,15 +97,13 @@ export const InstrumentRepoSyncLogTable = ({
                   })}
                 />
               ),
-              enableSorting: true,
               header: ({ column }) => (
                 <SortableHeader
                   column={column}
                   label={t({ en: 'Date', es: 'Fecha', fr: 'Date' })}
-                  sortOrder={sortOrder}
+                  sortOrder={sortOrderOf('createdAt')}
                 />
               ),
-              id: 'date',
               size: 150,
               // The rows already arrive newest first, so the table's first toggle of its unsorted
               // column must go to ascending, or the first click would request what is on screen.
@@ -106,20 +118,31 @@ export const InstrumentRepoSyncLogTable = ({
                   value={ctx.row.original.repoName}
                 />
               ),
-              enableSorting: false,
-              header: t({ en: 'Repository', es: 'Repositorio', fr: 'Dépôt' })
+              header: ({ column }) => (
+                <SortableHeader
+                  column={column}
+                  label={t({ en: 'Repository', es: 'Repositorio', fr: 'Dépôt' })}
+                  sortOrder={sortOrderOf('repoName')}
+                />
+              )
             },
             {
+              accessorKey: 'action',
               cell: (ctx) => {
                 const label = actionLabels[ctx.row.original.action];
                 return <TruncatedCell title={label} value={label} />;
               },
-              enableSorting: false,
-              header: t({ en: 'Action', es: 'Acción', fr: 'Action' }),
-              id: 'action',
+              header: ({ column }) => (
+                <SortableHeader
+                  column={column}
+                  label={t({ en: 'Action', es: 'Acción', fr: 'Action' })}
+                  sortOrder={sortOrderOf('action')}
+                />
+              ),
               size: 95
             },
             {
+              accessorFn: getSyncStatus,
               cell: (ctx) => {
                 const status = getSyncStatus(ctx.row.original);
                 return (
@@ -130,8 +153,13 @@ export const InstrumentRepoSyncLogTable = ({
                   />
                 );
               },
-              enableSorting: false,
-              header: t({ en: 'Status', es: 'Estado', fr: 'Statut' }),
+              header: ({ column }) => (
+                <SortableHeader
+                  column={column}
+                  label={t({ en: 'Status', es: 'Estado', fr: 'Statut' })}
+                  sortOrder={sortOrderOf('status')}
+                />
+              ),
               id: 'status',
               size: 140
             },
@@ -141,19 +169,30 @@ export const InstrumentRepoSyncLogTable = ({
                 const count = String(ctx.row.original.importedCount);
                 return <TruncatedCell title={count} value={count} />;
               },
-              enableSorting: false,
-              header: t({ en: 'Imported', es: 'Importados', fr: 'Importés' }),
-              size: 105
+              header: ({ column }) => (
+                <SortableHeader
+                  column={column}
+                  label={t({ en: 'Imported', es: 'Importados', fr: 'Importés' })}
+                  sortOrder={sortOrderOf('importedCount')}
+                />
+              ),
+              size: 114
             },
             {
+              accessorFn: (log) => log.failures.length,
               cell: (ctx) => {
                 const count = String(ctx.row.original.failures.length);
                 return <TruncatedCell title={count} value={count} />;
               },
-              enableSorting: false,
-              header: t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' }),
+              header: ({ column }) => (
+                <SortableHeader
+                  column={column}
+                  label={t({ en: 'Failed', es: 'Fallidos', fr: 'Échoués' })}
+                  sortOrder={sortOrderOf('failedCount')}
+                />
+              ),
               id: 'failedCount',
-              size: 85
+              size: 92
             },
             {
               cell: (ctx) => {
@@ -185,13 +224,15 @@ export const InstrumentRepoSyncLogTable = ({
           // rest, so pinning every column but the repository leaves the repository the room a long
           // owner/name needs.
           initialState={{
-            columnPinning: { left: ['date'], right: ['action', 'status', 'importedCount', 'failedCount', 'messages'] }
+            columnPinning: {
+              left: ['createdAt'],
+              right: ['action', 'status', 'importedCount', 'failedCount', 'messages']
+            }
           }}
           mode="server"
           pageCount={pageCount}
           onPaginationChange={({ pageIndex }) => onPageChange(pageIndex + 1)}
-          // Date is the only sortable column, so the state describes it or nothing.
-          onSortingChange={(state) => onSortOrderChange(state.some(({ desc }) => desc) ? 'desc' : 'asc')}
+          onSortingChange={(state) => onSortChange(readServerSort(state, $InstrumentRepoSyncLogsSortBy.options))}
         />
       </div>
       <Dialog open={logToView !== null} onOpenChange={() => setLogToView(null)}>
@@ -227,3 +268,5 @@ export const InstrumentRepoSyncLogTable = ({
     </Fragment>
   );
 };
+
+export { type InstrumentRepoSyncLogSort, InstrumentRepoSyncLogTable };

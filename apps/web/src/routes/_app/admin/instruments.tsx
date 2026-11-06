@@ -13,6 +13,7 @@ import { InstrumentKindCell } from '@/components/InstrumentKindCell';
 import { InstrumentPreviewDialog } from '@/components/InstrumentPreviewDialog';
 import type { InstrumentPreviewItem, InstrumentSource } from '@/components/InstrumentPreviewDialog';
 import { PageHeader } from '@/components/PageHeader';
+import { SortableHeader } from '@/components/SortableHeader';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentKindLabels } from '@/hooks/useInstrumentKindLabels';
@@ -154,12 +155,16 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
           {
             accessorKey: 'title',
             cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
-            header: t({ en: 'Name', es: 'Nombre', fr: 'Nom' })
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Name', es: 'Nombre', fr: 'Nom' })} />
+            )
           },
           {
             accessorKey: 'sourceLabel',
             cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
-            header: t({ en: 'Source', es: 'Origen', fr: 'Source' })
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Source', es: 'Origen', fr: 'Source' })} />
+            )
           },
           {
             accessorFn: (row: InstrumentRow) => {
@@ -168,26 +173,37 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
                 : t({ en: 'None', es: 'Ninguno', fr: 'Aucun' });
             },
             cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
-            header: t({ en: 'Groups Using It', es: 'Grupos que lo usan', fr: 'Groupes qui l’utilisent' }),
+            header: ({ column }) => (
+              <SortableHeader
+                column={column}
+                label={t({ en: 'Groups Using It', es: 'Grupos que lo usan', fr: 'Groupes qui l’utilisent' })}
+              />
+            ),
             id: 'groups'
           },
           {
             accessorFn: (row: InstrumentRow) => kindLabels[row.kind],
             cell: (ctx) => <InstrumentKindCell kind={ctx.row.original.kind} />,
-            header: t({ en: 'Kind', es: 'Tipo', fr: 'Type' }),
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Kind', es: 'Tipo', fr: 'Type' })} />
+            ),
             id: 'kind',
             size: 130
           },
           {
             accessorKey: 'edition',
             cell: (ctx) => <CellText text={String(ctx.getValue<number>())} />,
-            header: t({ en: 'Edition', es: 'Edición', fr: 'Édition' }),
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Edition', es: 'Edición', fr: 'Édition' })} />
+            ),
             size: 100
           },
           {
             accessorFn: (row: InstrumentRow) => (row.createdAt ? toBasicISOString(row.createdAt) : '-'),
             cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
-            header: t({ en: 'Added', es: 'Agregado', fr: 'Ajouté' }),
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Added', es: 'Agregado', fr: 'Ajouté' })} />
+            ),
             id: 'createdAt',
             size: 130
           }
@@ -281,18 +297,24 @@ const SeriesInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
           {
             accessorKey: 'title',
             cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
-            header: t({ en: 'Name', es: 'Nombre', fr: 'Nom' })
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Name', es: 'Nombre', fr: 'Nom' })} />
+            )
           },
           {
             accessorFn: (row: SeriesRow) => row.groupName ?? allGroupsLabel,
             cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
-            header: t({ en: 'Group', es: 'Grupo', fr: 'Groupe' }),
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Group', es: 'Grupo', fr: 'Groupe' })} />
+            ),
             id: 'group'
           },
           {
             accessorFn: (row: SeriesRow) => (row.createdAt ? toBasicISOString(row.createdAt) : '-'),
             cell: (ctx) => <CellText text={ctx.getValue<string>()} />,
-            header: t({ en: 'Created', es: 'Creado', fr: 'Créé' }),
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Created', es: 'Creado', fr: 'Créé' })} />
+            ),
             id: 'createdAt',
             size: 130
           },
@@ -309,7 +331,9 @@ const SeriesInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
                 />
               );
             },
-            header: t({ en: 'Status', es: 'Estado', fr: 'Statut' }),
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Status', es: 'Estado', fr: 'Statut' })} />
+            ),
             id: 'status',
             size: 200
           }

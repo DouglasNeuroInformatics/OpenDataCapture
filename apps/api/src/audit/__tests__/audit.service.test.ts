@@ -9,7 +9,12 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AuditService } from '../audit.service';
 
-const defaults: $AuditLogsQueryParams = { limit: AUDIT_LOGS_PAGE_SIZE, page: 1, sortOrder: 'desc' };
+const defaults: $AuditLogsQueryParams = {
+  limit: AUDIT_LOGS_PAGE_SIZE,
+  page: 1,
+  sortBy: 'timestamp',
+  sortOrder: 'desc'
+};
 
 describe('AuditService', () => {
   let auditService: AuditService;
@@ -41,10 +46,27 @@ describe('AuditService', () => {
 
     it('should sort in the database rather than leaving it to the client', async () => {
       await auditService.find(defaults);
-      expect(auditLogModel.findMany.mock.lastCall?.[0]).toMatchObject({ orderBy: { timestamp: 'desc' } });
+      expect(auditLogModel.findMany.mock.lastCall?.[0]).toMatchObject({
+        orderBy: [{ timestamp: 'desc' }, { id: 'desc' }]
+      });
       await auditService.find({ ...defaults, sortOrder: 'asc' });
-      expect(auditLogModel.findMany.mock.lastCall?.[0]).toMatchObject({ orderBy: { timestamp: 'asc' } });
+      expect(auditLogModel.findMany.mock.lastCall?.[0]).toMatchObject({
+        orderBy: [{ timestamp: 'asc' }, { id: 'desc' }]
+      });
     });
+
+    it.each([
+      ['action', { action: 'asc' }],
+      ['entity', { entity: 'asc' }],
+      ['group', { group: { name: 'asc' } }],
+      ['user', { user: { username: 'asc' } }]
+    ] as const)(
+      'should order by %s, breaking ties on the id so pages neither repeat nor skip',
+      async (sortBy, orderBy) => {
+        await auditService.find({ ...defaults, sortBy, sortOrder: 'asc' });
+        expect(auditLogModel.findMany.mock.lastCall?.[0]).toMatchObject({ orderBy: [orderBy, { id: 'desc' }] });
+      }
+    );
 
     it('should apply the filters to both the page and the count', async () => {
       await auditService.find({ ...defaults, action: 'LOGIN', groupId: 'group-1' });

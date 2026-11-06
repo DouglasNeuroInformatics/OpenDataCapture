@@ -8,7 +8,12 @@ describe('$AuditLogsQueryParams', () => {
   });
 
   it('should default to the first page of the standard size, newest first', () => {
-    expect($AuditLogsQueryParams.parse({})).toEqual({ limit: AUDIT_LOGS_PAGE_SIZE, page: 1, sortOrder: 'desc' });
+    expect($AuditLogsQueryParams.parse({})).toEqual({
+      limit: AUDIT_LOGS_PAGE_SIZE,
+      page: 1,
+      sortBy: 'timestamp',
+      sortOrder: 'desc'
+    });
   });
 
   it.each(['', 'ten', '0', '-1', '1.5', String(AUDIT_LOGS_MAX_PAGE_SIZE + 1)])(

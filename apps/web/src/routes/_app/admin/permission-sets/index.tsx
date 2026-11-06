@@ -6,6 +6,7 @@ import type { PermissionSetSummary } from '@opendatacapture/schemas/permission-s
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 
 import { PageHeader } from '@/components/PageHeader';
+import { SortableHeader } from '@/components/SortableHeader';
 import { TruncatedCell } from '@/components/TruncatedCell';
 import { useConfirmPermissionSetDeletion } from '@/hooks/useConfirmPermissionSetDeletion';
 import { permissionSetsQueryOptions, usePermissionSetsQuery } from '@/hooks/usePermissionSetsQuery';
@@ -53,17 +54,23 @@ const RouteComponent = () => {
                 </span>
               );
             },
-            header: t({ en: 'Name', es: 'Nombre', fr: 'Nom' })
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Name', es: 'Nombre', fr: 'Nom' })} />
+            )
           },
           {
             accessorFn: (permissionSet) => permissionSet.rules.length,
-            header: t({ en: 'Rules', es: 'Reglas', fr: 'Règles' }),
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Rules', es: 'Reglas', fr: 'Règles' })} />
+            ),
             id: 'ruleCount'
           },
           {
             accessorKey: 'holderCount',
             cell: ({ row }) => <span data-testid="permission-set-holder-count">{row.original.holderCount}</span>,
-            header: t({ en: 'Holders', es: 'Titulares', fr: 'Titulaires' })
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Holders', es: 'Titulares', fr: 'Titulaires' })} />
+            )
           }
         ]}
         data={permissionSetsQuery.data}
