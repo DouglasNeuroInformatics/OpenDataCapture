@@ -121,6 +121,24 @@ test.describe('authentication', () => {
     });
   });
 
+  // The web origin's /api proxy adds no X-Forwarded-For of its own, so each address below reaches the api the
+  // way the bundled Caddy forwards a distinct client in production.
+  test('should throttle failed logins per client, so one client exhausting the limit does not lock out another', async ({
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const attemptLogin = async (clientAddress: string) => {
+      const response = await apiRequestContext.post('/api/v1/auth/login', {
+        data: { password: `NoSuchAccount${uniqueId}!`, username: `no-such-user-${uniqueId}` },
+        headers: { 'x-forwarded-for': clientAddress }
+      });
+      return response.status();
+    };
+
+    await expect.poll(() => attemptLogin('203.0.113.1'), { intervals: [0] }).toBe(429);
+    expect(await attemptLogin('198.51.100.77')).toBe(401);
+  });
+
   test('should tell an archived user with the right password that their account is archived', async ({
     api,
     getPageModel,

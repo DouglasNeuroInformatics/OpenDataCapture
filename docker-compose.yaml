@@ -12,6 +12,9 @@ services:
     environment:
       - SITE_ADDRESS
       - STORAGE_ENABLED
+      # No default: an .env from before TRUSTED_PROXIES existed may also predate BIND_ADDRESS and listen
+      # on every interface, where private_ranges would trust a client on the local network.
+      - TRUSTED_PROXIES
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
