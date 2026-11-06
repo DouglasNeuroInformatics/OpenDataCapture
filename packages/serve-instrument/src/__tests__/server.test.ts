@@ -1,3 +1,4 @@
+import type { EventEmitter } from 'node:events';
 import * as fs from 'node:fs';
 import * as net from 'node:net';
 import * as os from 'node:os';
@@ -7,23 +8,29 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 
 // A real watcher would keep firing against a deleted temp directory after each test, so `fs.watch`
 // is stubbed. It is a named ESM export, which vitest cannot `spyOn` directly ("Module namespace is
-// not configurable"), so it is replaced at the module level instead. `watchCallbacks` captures what
-// each call registered so a test can trigger the rebuild deliberately, and `watchCloses` records
-// every `close()` so a test can assert `Server.stop()` disposes the handles rather than leaking them.
-const { watchCallbacks, watchCloses } = vi.hoisted(() => ({
-  watchCallbacks: [] as (() => void)[],
-  watchCloses: [] as ReturnType<typeof vi.fn>[]
+// not configurable"), so it is replaced at the module level instead. Each entry in `watchers` keeps the
+// watched directory and the callback it registered, so a test can trigger one instrument's rebuild
+// deliberately; its `close()` mock, so a test can assert `Server.stop()` disposes the handles rather
+// than leaking them; and the returned emitter, so a test can raise the `'error'` a real watcher emits.
+const { watchers } = vi.hoisted(() => ({
+  watchers: [] as {
+    callback: () => void;
+    close: ReturnType<typeof vi.fn>;
+    target: string;
+    watcher: EventEmitter;
+  }[]
 }));
 
 vi.mock('node:fs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('node:fs')>();
+  const { EventEmitter } = await import('node:events');
   return {
     ...actual,
-    watch: (_target: unknown, _options: unknown, callback: () => void) => {
-      watchCallbacks.push(callback);
+    watch: (target: string, _options: unknown, callback: () => void) => {
       const close = vi.fn();
-      watchCloses.push(close);
-      return { close };
+      const watcher = Object.assign(new EventEmitter(), { close });
+      watchers.push({ callback, close, target, watcher });
+      return watcher;
     }
   };
 });
@@ -127,8 +134,7 @@ describe('Server', () => {
     tmpDirs.push(tmpDir);
     port = await getFreePort();
     stubClientBundle();
-    watchCallbacks.length = 0;
-    watchCloses.length = 0;
+    watchers.length = 0;
     vi.mocked(bundle).mockClear();
   });
 
@@ -160,8 +166,8 @@ describe('Server', () => {
       try {
         // Populate the initial bundle first, then simulate the file watcher firing.
         await fetch(`http://localhost:${port}/`);
-        expect(watchCallbacks).toHaveLength(1);
-        watchCallbacks[0]!();
+        expect(watchers).toHaveLength(1);
+        watchers[0]!.callback();
         await vi.waitFor(() => {
           expect(
             logSpy.mock.calls.some(([message]) => typeof message === 'string' && message.includes('rebuilding'))
@@ -177,9 +183,9 @@ describe('Server', () => {
       fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
       const server = await Server.create({ mode: 'single', port, target: tmpDir, verbose: false });
       await server.start();
-      expect(watchCloses).toHaveLength(1);
+      expect(watchers).toHaveLength(1);
       await server.stop();
-      expect(watchCloses[0]).toHaveBeenCalledOnce();
+      expect(watchers[0]!.close).toHaveBeenCalledOnce();
     });
 
     it('should reject a non-GET request with 405', async () => {
@@ -280,6 +286,32 @@ describe('Server', () => {
       });
     });
 
+    it('should answer 500 and keep serving when handling a request fails, rather than crashing', async () => {
+      fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
+      const errors = spyOnLogs('error');
+      await withServer('single', async () => {
+        expect((await fetch(`http://localhost:${port}/`)).status).toBe(200);
+        vi.mocked(fs.promises.readFile).mockRejectedValueOnce(new Error('client bundle unreadable'));
+        expect((await fetch(`http://localhost:${port}/`)).status).toBe(500);
+        expect((await fetch(`http://localhost:${port}/`)).status).toBe(200);
+      });
+      expect(errors.some(/client bundle unreadable/)).toBe(true);
+      expect(errors.some(/Failed to handle GET \//)).toBe(true);
+    });
+
+    it('should log a watcher error and rebuild on the next request, rather than crashing', async () => {
+      fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
+      const errors = spyOnLogs('error');
+      await withServer('single', async () => {
+        await fetch(`http://localhost:${port}/`);
+        expect(bundle).toHaveBeenCalledOnce();
+        watchers[0]!.watcher.emit('error', new Error('EPERM: operation not permitted, watch'));
+        expect(errors.some(/Stopped watching instrument for changes/)).toBe(true);
+        expect((await fetch(`http://localhost:${port}/`)).status).toBe(200);
+        expect(bundle).toHaveBeenCalledTimes(2);
+      });
+    });
+
     it('should reject a second stop, since the http server is no longer running', async () => {
       fs.writeFileSync(path.join(tmpDir, 'index.ts'), FORM_SOURCE);
       const server = await Server.create({ mode: 'single', port, target: tmpDir, verbose: false });
@@ -317,9 +349,9 @@ describe('Server', () => {
       }
       const server = await Server.create({ mode: 'all', port, target: tmpDir, verbose: false });
       await server.start();
-      expect(watchCloses).toHaveLength(2);
+      expect(watchers).toHaveLength(2);
       await server.stop();
-      for (const close of watchCloses) {
+      for (const { close } of watchers) {
         expect(close).toHaveBeenCalledOnce();
       }
     });
@@ -414,6 +446,34 @@ describe('Server', () => {
         const res = await fetch(`http://localhost:${port}/runtime/v1/${MANIFEST_FILENAME}`);
         expect(res.headers.get('content-type')).toBe('application/json');
         expect(await res.json()).toMatchObject({ sources: expect.any(Array) });
+      });
+    });
+
+    it('should keep serving other instruments after an instrument directory is deleted, so a rebuild failure does not kill the server', async () => {
+      for (const name of ['FOO', 'BAR']) {
+        fs.mkdirSync(path.join(tmpDir, 'forms', name), { recursive: true });
+        fs.writeFileSync(path.join(tmpDir, 'forms', name, 'index.ts'), FORM_SOURCE);
+      }
+      const errors = spyOnLogs('error');
+      await withServer('all', async () => {
+        expect((await fetch(`http://localhost:${port}/forms/FOO`)).status).toBe(200);
+        expect((await fetch(`http://localhost:${port}/forms/BAR`)).status).toBe(200);
+        const barDir = path.join(tmpDir, 'forms', 'BAR');
+        fs.rmSync(barDir, { force: true, recursive: true });
+        watchers.find(({ target }) => target === barDir)!.callback();
+        await vi.waitFor(() => {
+          expect(errors.some(/Failed to compile forms\/BAR/)).toBe(true);
+        });
+        expect((await fetch(`http://localhost:${port}/forms/FOO`)).status).toBe(200);
+        expect((await fetch(`http://localhost:${port}/forms/BAR`)).status).toBe(404);
+      });
+    });
+
+    it('should answer 400 to a malformed percent-escape in an instrument URL rather than crashing', async () => {
+      fs.mkdirSync(path.join(tmpDir, 'forms'), { recursive: true });
+      await withServer('all', async () => {
+        expect((await fetch(`http://localhost:${port}/forms/%E0%A4%A`)).status).toBe(400);
+        expect((await fetch(`http://localhost:${port}/`)).status).toBe(200);
       });
     });
   });
