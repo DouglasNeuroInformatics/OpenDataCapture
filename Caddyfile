@@ -1,3 +1,11 @@
+{
+	servers {
+		# Unset trusts no proxy. The api's rate limits rely on what this does to X-Forwarded-For; see
+		# trustProxy in apps/api/src/main.ts.
+		trusted_proxies static {$TRUSTED_PROXIES}
+	}
+}
+
 {$SITE_ADDRESS} {
 	redir /api /api/
 
