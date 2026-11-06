@@ -82,6 +82,18 @@ state `apps/api` owns — so persisting either would only add a second copy that
 `db:push` before `dev`, `lint`, `test:e2e` and — via the `@opendatacapture/gateway#build` key in
 `turbo.json` — before `build`, so a gateway build needs `GATEWAY_DATABASE_URL` set.
 
+**The production image starts as root on purpose and drops to `node` in `scripts/run.sh`.** The
+gateway is the one service published straight to the internet, so its server must not run as root,
+but compose bind-mounts `./sqlite` at `/app/sqlite`, and on deployments made before this change that
+directory and `gateway.db` are owned by root. `run.sh`, while still root, creates the database
+directory, `chown`s anything in it not owned by `node`, then re-executes itself through
+`setpriv --reuid=node --regid=node --init-groups --no-new-privs`. That directory is the only path the
+server writes; `/app/dist` stays root-owned. Do not add `--reset-env`: it would drop
+`GATEWAY_API_KEY` and `GATEWAY_DATABASE_URL`. Started as any other user (`docker run --user`, a
+Kubernetes `runAsUser`), `run.sh` exits with a message if the directory or the database file is not
+writable, instead of failing on the first write. So `docker compose exec gateway id` still prints
+root; check the server's uid with `docker compose exec gateway grep ^Uid /proc/1/status`.
+
 ## Build and dev
 
 `pnpm build` is three passes into `dist/`: Vite client build (`dist/client`), Vite SSR build

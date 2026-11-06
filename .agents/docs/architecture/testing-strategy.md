@@ -23,6 +23,12 @@ of operations.
 | End-to-end | Playwright | `testing/src/specs/`                                                  | `pnpm test:e2e`      |
 | Type-check | `tsc`      | —                                                                     | `pnpm lint`          |
 
+**Image-only changes are the one exception to "unit test and e2e test".** Nothing in either tier
+runs a production image: the e2e suite starts each app's `dev:test` directly. A change confined to
+a `Dockerfile`, a container entrypoint such as `apps/gateway/scripts/run.sh`, or
+`docker-compose.yaml` therefore cannot get a test in this repo. Verify it against the built image
+instead, and list the commands and their results in the PR.
+
 There is no integration tier. `apps/api` unit tests mock the Prisma layer entirely; the only code
 path exercised against a real database is Playwright.
 
