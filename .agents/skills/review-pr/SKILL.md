@@ -1,6 +1,7 @@
 ---
 name: review-pr
 description: Triage pull requests against upstream main — one verdict, action items, and whether it needs the user's eyes. Use when the user asks to review a PR by number, review all the open PRs, or asks whether a PR is worth their time.
+disable-model-invocation: true
 ---
 
 Triage PRs so the user opens only the ones that need them. The run completes unattended: everything for
