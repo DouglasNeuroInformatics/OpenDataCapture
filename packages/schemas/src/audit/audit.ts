@@ -30,6 +30,7 @@ export type AuditedAction<TEntity extends AuditedEntity = AuditedEntity> = (type
 export const AUDITED_ACTIONS = {
   ASSIGNMENT: ['CREATE', 'DELETE', 'SEND_EMAIL', 'UPDATE'],
   INSTRUMENT: ['ARCHIVE', 'CREATE', 'DELETE', 'UNARCHIVE'],
+  INSTRUMENT_RECORD: ['DELETE', 'UPDATE'],
   SUBJECT: ['DELETE'],
   USER: ['ARCHIVE', 'CREATE', 'LOGIN', 'UNARCHIVE', 'UPDATE']
 } as const satisfies { [TEntity in $AuditLogEntity]?: readonly $AuditLogAction[] };

@@ -1,17 +1,22 @@
-import type { ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
+import type { ParseSchemaPipe, RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { createAppAbility } from '@/auth/ability.utils';
 
 import { InstrumentRecordsController } from '../instrument-records.controller';
 import { InstrumentRecordsService } from '../instrument-records.service';
 
 const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+
+const currentUser = { ability, id: 'user-1' } as RequestUser;
+
+const deletedRecord = { groupId: 'group-1', id: 'record-1', instrumentId: 'instrument-1', subjectId: 'subject-1' };
 
 /** The pipe the `find` handler applies to its `minDate` query parameter. */
 function getMinDatePipe(): ParseSchemaPipe<Date> {
@@ -24,14 +29,16 @@ function getMinDatePipe(): ParseSchemaPipe<Date> {
 describe('InstrumentRecordsController', () => {
   let instrumentRecordsController: InstrumentRecordsController;
   let instrumentRecordsService: MockedInstance<InstrumentRecordsService>;
+  let auditLogger: MockedInstance<AuditLogger>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [InstrumentRecordsController],
-      providers: [MockFactory.createForService(InstrumentRecordsService)]
+      providers: [MockFactory.createForService(InstrumentRecordsService), MockFactory.createForService(AuditLogger)]
     }).compile();
     instrumentRecordsController = moduleRef.get(InstrumentRecordsController);
     instrumentRecordsService = moduleRef.get(InstrumentRecordsService);
+    auditLogger = moduleRef.get(AuditLogger);
   });
 
   it('should create the record scoped to the caller ability', async () => {
@@ -98,9 +105,25 @@ describe('InstrumentRecordsController', () => {
   );
 
   it('should delete the record scoped to the caller ability and return no content', async () => {
-    instrumentRecordsService.deleteById.mockResolvedValueOnce(undefined);
-    await expect(instrumentRecordsController.deleteById('record-1', ability)).resolves.toBeUndefined();
+    instrumentRecordsService.deleteById.mockResolvedValueOnce(deletedRecord);
+    await expect(instrumentRecordsController.deleteById('record-1', currentUser)).resolves.toBeUndefined();
     expect(instrumentRecordsService.deleteById).toHaveBeenCalledWith('record-1', { ability });
+  });
+
+  it('should record who deleted the record, in its group, naming what it held data on', async () => {
+    instrumentRecordsService.deleteById.mockResolvedValueOnce(deletedRecord);
+    await instrumentRecordsController.deleteById('record-1', currentUser);
+    expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('DELETE', 'INSTRUMENT_RECORD', {
+      groupId: 'group-1',
+      metadata: { instrumentId: 'instrument-1', recordId: 'record-1', subjectId: 'subject-1' },
+      userId: currentUser.id
+    });
+  });
+
+  it('should record no delete that the service refused', async () => {
+    instrumentRecordsService.deleteById.mockRejectedValueOnce(new NotFoundException());
+    await expect(instrumentRecordsController.deleteById('record-1', currentUser)).rejects.toThrow(NotFoundException);
+    expect(auditLogger.log).not.toHaveBeenCalled();
   });
 
   it('should export the records of the requested group, scoped to the caller ability', async () => {
@@ -140,9 +163,9 @@ describe('InstrumentRecordsController', () => {
     expect(instrumentRecordsService.summarizeBySeries).toHaveBeenCalledWith({ groupId: 'group-1' }, { ability });
   });
 
-  it('should update the record with the unwrapped data, scoped to the caller ability', async () => {
-    await instrumentRecordsController.updateById('record-1', { data: { score: 2 } }, ability);
-    expect(instrumentRecordsService.updateById).toHaveBeenCalledWith('record-1', { score: 2 }, { ability });
+  it('should update the record with the unwrapped data, as the current user so the change is scoped and recorded', async () => {
+    await instrumentRecordsController.updateById('record-1', { data: { score: 2 } }, currentUser);
+    expect(instrumentRecordsService.updateById).toHaveBeenCalledWith('record-1', { score: 2 }, currentUser);
   });
 
   it('should find the record scoped to the caller ability', async () => {

@@ -4,7 +4,7 @@ import { Worker } from 'node:worker_threads';
 
 import { replacer, reviver } from '@douglasneuroinformatics/libjs';
 import { InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { linearRegression } from '@douglasneuroinformatics/libstats';
 import {
   BadRequestException,
@@ -28,8 +28,10 @@ import type {
 } from '@opendatacapture/schemas/instrument-records';
 import { Prisma } from '@prisma/client';
 import type { InstrumentRecord as PrismaInstrumentRecord } from '@prisma/client';
-import { isNumber, mergeWith, pickBy } from 'lodash-es';
+import { cloneDeep, isNumber, mergeWith, pickBy } from 'lodash-es';
 
+import { AuditLogger } from '@/audit/audit.logger';
+import { changedFields } from '@/audit/audit.utils';
 import { accessibleQuery, forcedAppSubject } from '@/auth/ability.utils';
 import type { AppAbility } from '@/auth/auth.types';
 import type { RuntimePrismaClient } from '@/core/prisma';
@@ -74,6 +76,7 @@ export class InstrumentRecordsService {
     private readonly loggingService: LoggingService,
     @InjectModel('InstrumentRecord') private readonly instrumentRecordModel: Model<'InstrumentRecord'>,
     @InjectModel('Session') private readonly sessionModel: Model<'Session'>,
+    private readonly auditLogger: AuditLogger,
     private readonly groupsService: GroupsService,
     private readonly usersService: UsersService,
     private readonly instrumentMeasuresService: InstrumentMeasuresService,
@@ -434,11 +437,8 @@ export class InstrumentRecordsService {
     }));
   }
 
-  async updateById(
-    id: string,
-    data: unknown[] | { [key: string]: unknown },
-    { ability }: Required<Pick<EntityOperationOptions, 'ability'>>
-  ) {
+  async updateById(id: string, data: unknown[] | { [key: string]: unknown }, currentUser: RequestUser) {
+    const { ability } = currentUser;
     const where = { AND: [accessibleQuery(ability, 'update', 'InstrumentRecord')], id };
     const instrumentRecord = await this.instrumentRecordModel.findFirst({ where });
     if (!instrumentRecord) {
@@ -452,6 +452,8 @@ export class InstrumentRecordsService {
     // all records must be attached to scalar instruments
     const instrument = (await this.getInstrumentById(instrumentRecord.instrumentId)) as ScalarInstrument;
 
+    // `mergeWith` writes into the data it merges into, so what was stored is copied first.
+    const storedData = cloneDeep(instrumentRecord.data);
     const updatedData = mergeWith(instrumentRecord.data, data, (updatedValue: unknown, sourceValue: unknown) => {
       if (Array.isArray(sourceValue)) {
         return updatedValue;
@@ -467,7 +469,7 @@ export class InstrumentRecordsService {
       });
     }
 
-    return this.instrumentRecordModel.update({
+    const updated = await this.instrumentRecordModel.update({
       data: {
         computedMeasures: instrument.measures
           ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data as Json)
@@ -476,6 +478,12 @@ export class InstrumentRecordsService {
       },
       where
     });
+    await this.auditLogger.logUpdate('INSTRUMENT_RECORD', changedFields(storedData, parseResult.data), {
+      groupId: instrumentRecord.groupId,
+      metadata: { recordId: id },
+      userId: currentUser.id
+    });
+    return updated;
   }
 
   async upload(

@@ -44,4 +44,9 @@ describe('changedFields', () => {
   it('should name the indices of a list that changed, so array-shaped record data is described too', () => {
     expect(changedFields([{ score: 1 }, { score: 2 }], [{ score: 1 }, { score: 3 }])).toEqual(['1']);
   });
+
+  it.each([null, 'text', 7])('should refuse to compare %j, which has no fields to name', (value) => {
+    expect(() => changedFields(value, {})).toThrow(TypeError);
+    expect(() => changedFields({}, value)).toThrow(TypeError);
+  });
 });

@@ -11,6 +11,7 @@ import type { $CreateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type {
   $CreateInstrumentRecordData,
+  $UpdateInstrumentRecordData,
   InstrumentRecord,
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
@@ -226,6 +227,14 @@ export class ApiClient {
     );
   }
 
+  /** Deletes a record over the API, which no page of the web app does. */
+  async deleteRecord(id: string): Promise<void> {
+    await this.expectOk(
+      this.request.delete(`${API}/instrument-records/${id}`, { headers: this.authHeaders }),
+      `delete record '${id}'`
+    );
+  }
+
   /** Deletes a series through the route the web app's instrument management uses. */
   async deleteSeries(id: string): Promise<void> {
     await this.expectOk(
@@ -409,6 +418,14 @@ export class ApiClient {
     await this.expectOk(
       this.request.patch(`${API}/users/${id}/unarchive`, { headers: this.authHeaders }),
       `unarchive user '${id}'`
+    );
+  }
+
+  /** Merges `data` into a record's data over the API, which no page of the web app does. */
+  async updateRecord(id: string, data: $UpdateInstrumentRecordData['data']): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/instrument-records/${id}`, { data: { data }, headers: this.authHeaders }),
+      `update record '${id}'`
     );
   }
 

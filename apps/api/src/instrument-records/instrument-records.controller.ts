@@ -1,6 +1,7 @@
 /* eslint-disable perfectionist/sort-classes -- the single-segment @Get('linear-model') must stay above @Get(':id'), which alphabetical order would put below it, where :id would match it first */
 
 import { ApiOperation, CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import {
   Body,
   Controller,
@@ -22,6 +23,7 @@ import {
   $UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 import { MsgpackInterceptor } from '@/core/interceptors/msgpack.interceptor';
@@ -30,7 +32,10 @@ import { InstrumentRecordsService } from './instrument-records.service';
 
 @Controller('instrument-records')
 export class InstrumentRecordsController {
-  constructor(private readonly instrumentRecordsService: InstrumentRecordsService) {}
+  constructor(
+    private readonly instrumentRecordsService: InstrumentRecordsService,
+    private readonly auditLogger: AuditLogger
+  ) {}
 
   @ApiOperation({ summary: 'Create Instrument Record' })
   @Post()
@@ -76,8 +81,14 @@ export class InstrumentRecordsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @RouteAccess({ action: 'delete', subject: 'InstrumentRecord' })
-  async deleteById(@Param('id', ValidObjectIdPipe) id: string, @CurrentUser('ability') ability: AppAbility) {
-    await this.instrumentRecordsService.deleteById(id, { ability });
+  async deleteById(@Param('id', ValidObjectIdPipe) id: string, @CurrentUser() currentUser: RequestUser) {
+    const record = await this.instrumentRecordsService.deleteById(id, { ability: currentUser.ability });
+    // Logged here rather than in the service, which the gateway synchronizer also calls to roll back.
+    await this.auditLogger.log('DELETE', 'INSTRUMENT_RECORD', {
+      groupId: record.groupId,
+      metadata: { instrumentId: record.instrumentId, recordId: id, subjectId: record.subjectId },
+      userId: currentUser.id
+    });
   }
 
   @ApiOperation({ summary: 'Export Records' })
@@ -126,9 +137,9 @@ export class InstrumentRecordsController {
   updateById(
     @Param('id', ValidObjectIdPipe) id: string,
     @Body() { data }: $UpdateInstrumentRecordData,
-    @CurrentUser('ability') ability: AppAbility
+    @CurrentUser() currentUser: RequestUser
   ) {
-    return this.instrumentRecordsService.updateById(id, data, { ability });
+    return this.instrumentRecordsService.updateById(id, data, currentUser);
   }
 
   @ApiOperation({ summary: 'Get Instrument Record' })

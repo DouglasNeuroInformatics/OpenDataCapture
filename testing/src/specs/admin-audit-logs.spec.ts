@@ -237,4 +237,40 @@ test.describe('admin audit log coverage', () => {
       expect(matching[0]?.metadata).toMatchObject({ force: 'true', recordCount: '2' });
     });
   });
+
+  test.describe('records', () => {
+    test('should record which data fields an update changed, and none of their values', async ({ api, uniqueId }) => {
+      const group = await api.createGroup();
+      const session = await api.createSession(group.id, { id: `edited-${uniqueId}` });
+      const record = await api.createRecord(
+        group.id,
+        await api.findInstrumentIdByName(HAPPINESS),
+        session,
+        HAPPINESS_RECORD
+      );
+      await api.updateRecord(record.id, { personalLifeSatisfaction: 2 });
+
+      const entries = await api.findAuditLogs({ action: 'UPDATE', entity: 'INSTRUMENT_RECORD' });
+      const entry = entryNaming(entries, 'recordId', record.id);
+      expect(entry?.metadata).toStrictEqual({ fields: 'personalLifeSatisfaction', recordId: record.id });
+      expect(entry?.group?.name).toBe(group.name);
+    });
+
+    test('should record who deleted a record, in its group', async ({ api, uniqueId }) => {
+      const group = await api.createGroup();
+      const session = await api.createSession(group.id, { id: `removed-${uniqueId}` });
+      const record = await api.createRecord(
+        group.id,
+        await api.findInstrumentIdByName(HAPPINESS),
+        session,
+        HAPPINESS_RECORD
+      );
+      await api.deleteRecord(record.id);
+
+      const entries = await api.findAuditLogs({ action: 'DELETE', entity: 'INSTRUMENT_RECORD' });
+      const entry = entryNaming(entries, 'recordId', record.id);
+      expect(entry?.metadata?.subjectId).toBe(session.subjectId);
+      expect(entry?.group?.name).toBe(group.name);
+    });
+  });
 });
