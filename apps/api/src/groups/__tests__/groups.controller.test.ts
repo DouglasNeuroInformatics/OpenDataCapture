@@ -1,4 +1,5 @@
 import { LoggingService } from '@douglasneuroinformatics/libnest';
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { Reflector } from '@nestjs/core';
@@ -54,11 +55,12 @@ describe('GroupsController', () => {
     });
   });
 
-  // What `JwtAuthGuard` itself computes for this route: the declared access, evaluated against a
+  // What `JwtAuthGuard` itself computes for these routes: the declared access, evaluated against a
   // whole role's ability. A group manager's `manage Group` rule is conditioned on their own groups,
   // but the guard checks the subject type, for which CASL ignores conditions -- so the previous
-  // `create Group` declaration admitted every group manager (#1468).
-  describe('route access for create', () => {
+  // `create Group` declaration admitted every group manager (#1468), and any `Group` action on the
+  // archive routes would let one take their own group out of service.
+  describe.each(['archiveById', 'create', 'unarchiveById'] as const)('route access for %s', (handler) => {
     const abilityFor = (basePermissionLevel: BasePermissionLevel) => {
       return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload(
         {
@@ -81,7 +83,7 @@ describe('GroupsController', () => {
     // through `context.getHandler()`.
     const { action, subject } = new Reflector().get<ProtectedRoutePermissionSet>(
       ROUTE_ACCESS_METADATA_KEY,
-      Object.getOwnPropertyDescriptor(GroupsController.prototype, 'create')!.value
+      Object.getOwnPropertyDescriptor(GroupsController.prototype, handler)!.value
     );
 
     it('should refuse a group manager, who may otherwise manage the groups they belong to', () => {
@@ -112,16 +114,33 @@ describe('GroupsController', () => {
     });
   });
 
-  describe('deleteById', () => {
-    it("should scope the deletion to the current user's ability", async () => {
-      const ability = createAbility();
-      await groupsController.deleteById('123', ability);
-      expect(groupsService.deleteById).toHaveBeenCalledWith('123', { ability });
+  describe('archiveById', () => {
+    it('should forward the caller, whose id the audit log records', async () => {
+      const currentUser = { ability: createAbility(), id: 'admin-1' } as RequestUser;
+      await groupsController.archiveById('123', currentUser);
+      expect(groupsService.archiveById).toHaveBeenCalledWith('123', currentUser);
     });
 
-    it('should return the group deleted by the groups service', async () => {
-      groupsService.deleteById.mockResolvedValueOnce({ name: 'Test Group' });
-      await expect(groupsController.deleteById('123')).resolves.toMatchObject({ name: 'Test Group' });
+    it('should return the group archived by the groups service', async () => {
+      groupsService.archiveById.mockResolvedValueOnce({ name: 'Test Group' });
+      await expect(groupsController.archiveById('123', {} as RequestUser)).resolves.toMatchObject({
+        name: 'Test Group'
+      });
+    });
+  });
+
+  describe('unarchiveById', () => {
+    it('should forward the caller, whose id the audit log records', async () => {
+      const currentUser = { ability: createAbility(), id: 'admin-1' } as RequestUser;
+      await groupsController.unarchiveById('123', currentUser);
+      expect(groupsService.unarchiveById).toHaveBeenCalledWith('123', currentUser);
+    });
+
+    it('should return the group unarchived by the groups service', async () => {
+      groupsService.unarchiveById.mockResolvedValueOnce({ name: 'Test Group' });
+      await expect(groupsController.unarchiveById('123', {} as RequestUser)).resolves.toMatchObject({
+        name: 'Test Group'
+      });
     });
   });
 

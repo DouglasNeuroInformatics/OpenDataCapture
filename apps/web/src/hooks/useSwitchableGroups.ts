@@ -6,9 +6,10 @@ import { useAppStore } from '@/store';
 import { groupsQueryOptions } from './useGroupsQuery';
 
 /**
- * The groups the current user may make their current group. An admin may act in any group on the
- * platform, not only the ones they belong to, so theirs are fetched; until that resolves they fall back
- * to their own, so the switcher never blanks out while the chrome around it is already on screen.
+ * The groups the current user may make their current group. An admin may act in any active group on
+ * the platform, not only the ones they belong to, so theirs are fetched; until that resolves they fall
+ * back to their own, so the switcher never blanks out while the chrome around it is already on screen.
+ * The API already leaves archived groups off everyone's token, but an admin's fetch lists them too.
  */
 export function useSwitchableGroups(): Group[] {
   const currentUser = useAppStore((store) => store.currentUser);
@@ -19,7 +20,7 @@ export function useSwitchableGroups(): Group[] {
     return [];
   }
   if (isAdmin && groupsQuery.data) {
-    return groupsQuery.data;
+    return groupsQuery.data.filter((group) => !group.archivedAt);
   }
   return currentUser.groups;
 }

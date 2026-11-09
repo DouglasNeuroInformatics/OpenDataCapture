@@ -85,7 +85,7 @@ test.describe('admin management', () => {
     await expect(page).toHaveURL('/admin/groups/create');
   });
 
-  test('should find a created group by search and delete it from the manage sheet', async ({
+  test('should find a created group by search and open its manage sheet', async ({
     api,
     authenticateAs,
     page,
@@ -101,14 +101,11 @@ test.describe('admin management', () => {
     await expect(row).toHaveCount(1);
     await expect(row).toContainText(group.name);
     await expect(row.getByTestId('group-cell-type')).toBeVisible();
+    await expect(row.getByTestId('group-status-active')).toBeVisible();
 
     await row.getByTestId('row-actions-trigger').click();
     await page.getByTestId('row-actions-dropdown').getByRole('menuitem', { name: 'Manage' }).click();
-    await page.getByRole('button', { name: 'Delete' }).click();
-    await page.getByRole('button', { name: 'Yes' }).click();
-
-    await expect(page.getByRole('heading', { name: 'Success' })).toBeVisible();
-    await expect(page.getByTestId('data-table-row').filter({ hasText: group.name })).toHaveCount(0);
+    await expect(page.getByRole('dialog').getByText(group.name)).toBeVisible();
   });
 
   test('should show validation errors when submitting the user creation form empty', async ({

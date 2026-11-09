@@ -36,11 +36,14 @@ deciding alone.
 **`ADMIN_ONLY` (`manage all`) is the only way to confine a route to administrators**, because a
 conditional rule satisfies a subject-type check. It is used where any narrower grant would let its
 holder escalate (every route that writes a user or their permissions, every `/v1/permission-sets`
-route, `POST /v1/groups` per #1468), and where the data crosses groups with nothing to scope it by
-(audit logs, the instrument series overview, every repository's sync log, mail settings). Most
-handlers carry their reason in a comment; `grep -rn 'RouteAccess(ADMIN_ONLY)' apps/api/src` lists
-them. `UsersService` refuses an admin archiving, disabling or demoting their own account, so the last
-admin cannot lock every `ADMIN_ONLY` route.
+route, `POST /v1/groups` per #1468, and `PATCH /v1/groups/:id/archive` and `/unarchive`, which
+replaced a `DELETE /v1/groups/:id` that a group manager's `manage Group` reached; `$UpdateGroupData`
+omits `archivedAt`, so `PATCH /v1/groups/:id` cannot archive either), and where the data crosses
+groups with nothing to scope it by (audit logs, the instrument series overview, every repository's
+sync log, mail settings). Most handlers carry their reason in a comment;
+`grep -rn 'RouteAccess(ADMIN_ONLY)' apps/api/src` lists them. `UsersService` refuses an admin
+archiving, disabling or demoting their own account, so the last admin cannot lock every `ADMIN_ONLY`
+route.
 
 **Deliberately unscoped service paths:** `AuditService.find` and
 `InstrumentsService.findSeriesOverview` (an administrator belongs to no group), each behind an
@@ -79,7 +82,13 @@ spread silently drops a condition when the generated query and the literal share
 1. `AuthService.login` builds it with `AbilityFactory.createForPayload`: the `basePermissionLevel`
    switch, then the permission set's rules (`HOLDER_GROUPS` conditioned on the holder's groups,
    `ALL_GROUPS` unconditional), then `additionalPermissions` (a `groupId` applies that model's
-   `GROUP_SCOPED_CONDITIONS` entry).
+   `GROUP_SCOPED_CONDITIONS` entry). It first leaves every **archived** group (`Group.archivedAt`
+   set) off the payload's `groups`, so no rule derived from them applies, and drops every grant
+   confined to a group outside the remaining ones; since a grant is accepted only for a group the
+   user belongs to, that is exactly the grants confined to an archived group. A rule that is not
+   confined (a `null` `groupId`, `ALL_GROUPS`, an admin's `manage all`) still reads an archived
+   group's rows, which is how administrators see and unarchive it. Its records, files and series
+   stay where they are.
 2. The serialized rules are signed into the JWT with the payload, `expiresIn: '1h'`.
 3. On every request `JwtStrategy.validate` rebuilds the ability with `createForPermissions` and
    attaches it to `request.user`.
@@ -87,7 +96,8 @@ spread silently drops a condition when the generated query and the literal share
 Consequences:
 
 - **Permissions are frozen into the token.** A change to a user's groups, level, grants or permission
-  set, or to the set itself, takes effect only at their next login. There is no refresh endpoint.
+  set, to the set itself, or the archiving of a group they belong to takes effect only at their next
+  login. There is no refresh endpoint.
 - **`basePermissionLevel` is nullable** and the switch has no `default`, so a `null` user gets only
   what their set or grants give.
 - **JWT expiry is ignored in development** (`ignoreExpiration` in

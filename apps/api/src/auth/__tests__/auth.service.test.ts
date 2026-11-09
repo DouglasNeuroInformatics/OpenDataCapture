@@ -4,13 +4,14 @@ import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { ForbiddenException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import type { TokenPayload } from '@opendatacapture/schemas/auth';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AuditLogger } from '@/audit/audit.logger';
 import { UsersService } from '@/users/users.service';
 
 import { AbilityFactory } from '../ability.factory.js';
-import { createAppAbility } from '../ability.utils.js';
+import { createAppAbility, forcedAppSubject } from '../ability.utils.js';
 import { AuthService } from '../auth.service.js';
 
 import type { Permission } from '../auth.types.js';
@@ -162,6 +163,69 @@ describe('AuthService', () => {
         permissions: expect.arrayContaining([
           { action: 'read', conditions: { groupId: { in: ['group-1'] } }, subject: 'InstrumentRecord' }
         ])
+      });
+    });
+
+    describe('with an archived group', () => {
+      const activeGroup = { archivedAt: null, id: 'group-1' } as StoredUser['groups'][number];
+      const archivedGroup = { archivedAt: new Date(), id: 'group-2' } as StoredUser['groups'][number];
+
+      const signedPayload = async (overrides: Partial<StoredUser>) => {
+        usersService.findByUsername.mockResolvedValue(
+          storedUser({ basePermissionLevel: 'GROUP_MANAGER', groups: [activeGroup, archivedGroup], ...overrides })
+        );
+        cryptoService.comparePassword.mockResolvedValue(true);
+        await authService.login(credentials);
+        return jwtService.signAsync.mock.lastCall?.[0] as Pick<TokenPayload, 'additionalPermissions' | 'groups'> & {
+          permissions: Permission[];
+        };
+      };
+
+      it('should leave the archived group off the token, so it cannot be selected as the current group', async () => {
+        const { groups } = await signedPayload({});
+        expect(groups).toStrictEqual([activeGroup]);
+      });
+
+      it('should confine the rules the base level derives from groups to the active ones', async () => {
+        const ability = createAppAbility((await signedPayload({})).permissions);
+        expect(ability.can('read', forcedAppSubject('InstrumentRecord', { groupId: 'group-1' }))).toBe(true);
+        expect(ability.can('read', forcedAppSubject('InstrumentRecord', { groupId: 'group-2' }))).toBe(false);
+      });
+
+      it("should drop a grant confined to the archived group, which would otherwise keep reading that group's rows", async () => {
+        const { additionalPermissions, permissions } = await signedPayload({
+          additionalPermissions: [
+            { action: 'read', groupId: 'group-1', subject: 'Session' },
+            { action: 'read', groupId: 'group-2', subject: 'Session' },
+            { action: 'read', groupId: null, subject: 'Subject' }
+          ],
+          basePermissionLevel: null
+        });
+        expect(additionalPermissions).toStrictEqual([
+          { action: 'read', groupId: 'group-1', subject: 'Session' },
+          { action: 'read', groupId: null, subject: 'Subject' }
+        ]);
+        const ability = createAppAbility(permissions);
+        expect(ability.can('read', forcedAppSubject('Session', { groupId: 'group-1' }))).toBe(true);
+        expect(ability.can('read', forcedAppSubject('Session', { groupId: 'group-2' }))).toBe(false);
+      });
+
+      it("should confine a permission set's rules for the holder's groups to the active ones", async () => {
+        const { permissions } = await signedPayload({
+          basePermissionLevel: null,
+          permissionSet: {
+            __modelName: 'PermissionSet',
+            createdAt: new Date('2026-01-01T00:00:00.000Z'),
+            id: 'set-1',
+            name: 'Research Assistant',
+            rules: [{ action: 'read', scope: 'HOLDER_GROUPS', subject: 'InstrumentRecord' }],
+            updatedAt: new Date('2026-01-01T00:00:00.000Z')
+          },
+          permissionSetId: 'set-1'
+        });
+        expect(permissions).toStrictEqual([
+          { action: 'read', conditions: { groupId: { in: ['group-1'] } }, subject: 'InstrumentRecord' }
+        ]);
       });
     });
 

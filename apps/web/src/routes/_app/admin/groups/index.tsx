@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { toBasicISOString } from '@douglasneuroinformatics/libjs';
 import { Button, Checkbox, DataTable, Dialog, Heading, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $Group } from '@opendatacapture/schemas/group';
@@ -11,16 +12,17 @@ import axios from 'axios';
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { PageHeader } from '@/components/PageHeader';
 import { SortableHeader } from '@/components/SortableHeader';
-import { useDeleteGroupMutation } from '@/hooks/useDeleteGroupMutation';
+import { useArchiveGroupMutation } from '@/hooks/useArchiveGroupMutation';
 import { GROUPS_QUERY_KEY, groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import {
   INSTRUMENT_REPOS_QUERY_KEY,
   instrumentReposQueryOptions,
   useInstrumentReposQuery
 } from '@/hooks/useInstrumentReposQuery';
+import { useUnarchiveGroupMutation } from '@/hooks/useUnarchiveGroupMutation';
 import { resolveTheme } from '@/utils/chart-theme';
 import { getApiErrorMessage } from '@/utils/error';
-import { getGroupTypeColor } from '@/utils/tag-colors';
+import { getArchiveStatusColor, getGroupTypeColor } from '@/utils/tag-colors';
 
 const RouteComponent = () => {
   const { t } = useTranslation();
@@ -28,11 +30,12 @@ const RouteComponent = () => {
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const groupsQuery = useGroupsQuery();
-  const deleteGroupMutation = useDeleteGroupMutation();
+  const archiveGroupMutation = useArchiveGroupMutation();
+  const unarchiveGroupMutation = useUnarchiveGroupMutation();
   const reposQuery = useInstrumentReposQuery();
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [selectedRepoIds, setSelectedRepoIds] = useState<Set<string>>(new Set());
-  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [isConfirmArchiveOpen, setIsConfirmArchiveOpen] = useState(false);
   const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
 
   const updateGroupReposMutation = useMutation({
@@ -96,6 +99,21 @@ const RouteComponent = () => {
     });
   };
 
+  const handleArchive = () => {
+    if (!selectedGroup) {
+      return;
+    }
+    archiveGroupMutation.mutate(
+      { id: selectedGroup.id },
+      {
+        onSuccess: () => {
+          setIsConfirmArchiveOpen(false);
+          setSelectedGroup(null);
+        }
+      }
+    );
+  };
+
   return (
     <Sheet open={Boolean(selectedGroup)} onOpenChange={() => setSelectedGroup(null)}>
       <PageHeader>
@@ -139,6 +157,31 @@ const RouteComponent = () => {
               );
             },
             header: ({ column }) => <SortableHeader column={column} label={t('common.groupType')} />
+          },
+          {
+            accessorKey: 'archivedAt',
+            cell: (ctx) => {
+              const { archivedAt } = ctx.row.original;
+              if (archivedAt) {
+                const date = toBasicISOString(new Date(archivedAt));
+                return (
+                  <ColorTagCell
+                    color={getArchiveStatusColor(true, resolveTheme(theme))}
+                    data-testid="group-status-archived"
+                    label={t({ en: `Archived on ${date}`, es: `Archivado el ${date}`, fr: `Archivé le ${date}` })}
+                  />
+                );
+              }
+              return (
+                <ColorTagCell
+                  color={getArchiveStatusColor(false, resolveTheme(theme))}
+                  data-testid="group-status-active"
+                  label={t({ en: 'Active', es: 'Activo', fr: 'Actif' })}
+                />
+              );
+            },
+            header: t({ en: 'Status', es: 'Estado', fr: 'Statut' }),
+            id: 'status'
           }
         ]}
         data={groupsQuery.data}
@@ -166,7 +209,7 @@ const RouteComponent = () => {
         }}
       />
       <Sheet.Content className="flex flex-col p-0">
-        <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
+        <Dialog open={isConfirmArchiveOpen} onOpenChange={setIsConfirmArchiveOpen}>
           <Sheet.Header className="px-6 pt-6">
             <Sheet.Title>{selectedGroup?.name}</Sheet.Title>
             <Sheet.Description>
@@ -227,11 +270,27 @@ const RouteComponent = () => {
           </Sheet.Body>
           <div className="border-t px-6 py-4">
             <div className="flex gap-2">
-              <Dialog.Trigger asChild>
-                <Button className="flex-1" type="button" variant="danger">
-                  {t('core.delete')}
+              {selectedGroup?.archivedAt ? (
+                <Button
+                  className="flex-1"
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    unarchiveGroupMutation.mutate(
+                      { id: selectedGroup.id },
+                      { onSuccess: () => setSelectedGroup(null) }
+                    );
+                  }}
+                >
+                  {t({ en: 'Unarchive', es: 'Desarchivar', fr: 'Désarchiver' })}
                 </Button>
-              </Dialog.Trigger>
+              ) : (
+                <Dialog.Trigger asChild>
+                  <Button className="flex-1" type="button" variant="danger">
+                    {t({ en: 'Archive', es: 'Archivar', fr: 'Archiver' })}
+                  </Button>
+                </Dialog.Trigger>
+              )}
               <Button className="flex-1" type="button" onClick={handleSave}>
                 {t('core.save')}
               </Button>
@@ -248,22 +307,19 @@ const RouteComponent = () => {
               </Dialog.Title>
               <Dialog.Description>
                 {t({
-                  en: 'This action will permanently delete this group and cannot be undone.',
-                  es: 'Esta acción eliminará este grupo de forma permanente y no se puede deshacer.',
-                  fr: 'Cette action supprimera définitivement ce groupe et ne pourra pas être annulée.'
+                  en: 'Members of this group will lose access to it the next time they sign in. Its data is kept, and an administrator can unarchive it at any time.',
+                  es: 'Los miembros de este grupo perderán el acceso la próxima vez que inicien sesión. Sus datos se conservan y un administrador puede desarchivarlo en cualquier momento.',
+                  fr: 'Les membres de ce groupe y perdront accès à leur prochaine connexion. Ses données sont conservées et un administrateur peut le désarchiver à tout moment.'
                 })}
               </Dialog.Description>
             </Dialog.Header>
             <Dialog.Footer>
               <Button
                 className="min-w-16"
+                data-testid="confirm-archive-group"
                 type="button"
                 variant="danger"
-                onClick={() => {
-                  deleteGroupMutation.mutate({ id: selectedGroup!.id });
-                  setIsConfirmDeleteOpen(false);
-                  setSelectedGroup(null);
-                }}
+                onClick={handleArchive}
               >
                 {t('core.yes')}
               </Button>
@@ -271,7 +327,7 @@ const RouteComponent = () => {
                 className="min-w-16"
                 type="button"
                 variant="outline"
-                onClick={() => setIsConfirmDeleteOpen(false)}
+                onClick={() => setIsConfirmArchiveOpen(false)}
               >
                 {t('core.no')}
               </Button>

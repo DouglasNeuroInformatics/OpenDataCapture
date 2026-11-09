@@ -18,10 +18,13 @@ const NON_ADMIN_ROLES = ['GROUP_MANAGER', 'STANDARD'] as const satisfies Role[];
 type PrivilegedRequest = {
   /** The admin screen a non-admin role can render by navigating to it directly. */
   screen: string;
-  /** `userId` is a freshly seeded throwaway, so an unexpected success touches nothing another spec reads. */
+  /**
+   * `userId` and `groupId` are a freshly seeded throwaway user and their group, so an unexpected
+   * success touches nothing another spec reads.
+   */
   send: (
     request: APIRequestContext,
-    options: { headers: { Authorization: string }; userId: string }
+    options: { groupId: string; headers: { Authorization: string }; userId: string }
   ) => Promise<APIResponse>;
   /** Completes the sentence "must not be able to ...". */
   what: string;
@@ -91,6 +94,16 @@ const PRIVILEGED_REQUESTS: PrivilegedRequest[] = [
       return request.post(`${API}/groups`, { data: { name: `Escalation Probe ${userId}`, type: 'CLINICAL' }, headers });
     },
     what: 'create a group'
+  },
+  {
+    screen: '/admin/groups',
+    send: (request, { groupId, headers }) => request.patch(`${API}/groups/${groupId}/archive`, { headers }),
+    what: 'archive a group'
+  },
+  {
+    screen: '/admin/groups',
+    send: (request, { groupId, headers }) => request.patch(`${API}/groups/${groupId}/unarchive`, { headers }),
+    what: 'unarchive a group'
   },
   {
     screen: '/admin/instrument-repos',
@@ -379,7 +392,7 @@ test.describe('server-side authorization', () => {
       const headers = { Authorization: `Bearer ${accessToken}` };
 
       for (const { screen, send, what } of PRIVILEGED_REQUESTS) {
-        const response = await send(apiRequestContext, { headers, userId: user.id });
+        const response = await send(apiRequestContext, { groupId: group.id, headers, userId: user.id });
         expect.soft(response.status(), `a ${role} user must not be able to ${what} from ${screen}`).toBe(403);
       }
     });
@@ -487,7 +500,7 @@ test.describe('server-side authorization', () => {
   });
 
   // A group manager holds `manage Group` for their own groups, and `@RouteAccess` sees only the
-  // subject type, so the guard lets these through and the row scoping in `GroupsService` is the
+  // subject type, so the guard lets this through and the row scoping in `GroupsService` is the
   // whole check. Asserted by effect rather than by status code for that reason.
   test('should not let a group manager rename a group they do not belong to', async ({
     api,
@@ -507,21 +520,22 @@ test.describe('server-side authorization', () => {
     expect((await api.findGroupById(group.id)).name).toBe(group.name);
   });
 
-  test('should not let a group manager delete a group they do not belong to', async ({
-    api,
-    apiRequestContext,
-    roleAccount,
-    uniqueId
-  }) => {
-    const group = await api.createGroup({ name: `Foreign Group ${uniqueId}` });
-    const { accessToken } = await roleAccount('GROUP_MANAGER');
+  // Archiving replaced deletion, which a group manager could do to their own group through their
+  // `manage Group` rule. Their own group is the case a `Group` action at the guard would admit, so
+  // the routes must refuse it outright.
+  test('should refuse a group manager archiving or unarchiving their own group', async ({ api, apiRequestContext }) => {
+    const group = await api.createGroup();
+    const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });
+    const headers = { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` };
 
-    const response = await apiRequestContext.delete(`${API}/groups/${group.id}`, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
+    const archived = await apiRequestContext.patch(`${API}/groups/${group.id}/archive`, { headers });
+    expect(archived.status(), 'a group manager must not be able to archive their own group').toBe(403);
+    expect((await api.findGroupById(group.id)).archivedAt).toBeFalsy();
 
-    expect(response.ok()).toBe(false);
-    expect((await api.findGroupById(group.id)).id).toBe(group.id);
+    await api.archiveGroup(group.id);
+    const unarchived = await apiRequestContext.patch(`${API}/groups/${group.id}/unarchive`, { headers });
+    expect(unarchived.status(), 'a group manager must not be able to unarchive their own group').toBe(403);
+    expect((await api.findGroupById(group.id)).archivedAt).toBeTruthy();
   });
 
   // `create Assignment` is satisfied at the guard by a group manager's rule for their own groups, so

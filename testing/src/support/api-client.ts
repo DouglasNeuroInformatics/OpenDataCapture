@@ -52,6 +52,13 @@ export class ApiClient {
     return { Authorization: `Bearer ${this.token}` };
   }
 
+  async archiveGroup(id: string): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/groups/${id}/archive`, { headers: this.authHeaders }),
+      `archive group '${id}'`
+    );
+  }
+
   async archiveUser(id: string): Promise<void> {
     await this.expectOk(
       this.request.patch(`${API}/users/${id}/archive`, { headers: this.authHeaders }),
@@ -359,6 +366,13 @@ export class ApiClient {
   /** Links a user to a permission set, removing any custom grants they held. */
   async setUserPermissionSet(id: string, permissionSetId: string): Promise<User> {
     return this.putUserPermissions(id, { kind: 'permissionSet', permissionSetId });
+  }
+
+  async unarchiveGroup(id: string): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/groups/${id}/unarchive`, { headers: this.authHeaders }),
+      `unarchive group '${id}'`
+    );
   }
 
   /** Updates a user's profile fields, which is everything except their permissions. */

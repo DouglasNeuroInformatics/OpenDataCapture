@@ -35,6 +35,8 @@ export const $Group = $BaseModel.extend({
   accessibleInstrumentIds: z.array(z.string()),
   /** The id of the template within `emailTemplates` sent by default with a remote assignment, if any */
   activeAssignmentEmailTemplateId: z.string().nullish(),
+  /** When an administrator archived the group, which then grants its members nothing; unset while active */
+  archivedAt: $DateLike.nullish(),
   /** Group-manager-authored remote-assignment email templates for this group's participants */
   emailTemplates: z.array($GroupEmailTemplate).optional(),
   instrumentRepoIds: z.array(z.string()),
@@ -55,6 +57,9 @@ export const $CreateGroupData = z.object({
 export type $UpdateGroupData = z.infer<typeof $UpdateGroupData>;
 export const $UpdateGroupData = $Group
   .omit({
+    // Archiving is an administrator's alone, through its own routes. A group manager may update
+    // their own groups, so this route must not be a way to archive or unarchive one.
+    archivedAt: true,
     subjectIds: true,
     userIds: true
   })

@@ -1,11 +1,12 @@
 import { InjectModel } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { $CreateGroupData, $UpdateGroupData } from '@opendatacapture/schemas/group';
 import type { GroupEmailTemplate } from '@opendatacapture/schemas/group';
 import type { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 
@@ -13,8 +14,13 @@ import type { EntityOperationOptions } from '@/core/types';
 export class GroupsService {
   constructor(
     @InjectModel('Group') private readonly groupModel: Model<'Group'>,
-    @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>
+    @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
+    private readonly auditLogger: AuditLogger
   ) {}
+
+  async archiveById(id: string, currentUser: RequestUser) {
+    return this.updateArchivedAt(id, true, currentUser);
+  }
 
   async create({ name, settings, type, ...data }: $CreateGroupData) {
     const exists = await this.groupModel.exists({ name });
@@ -51,12 +57,6 @@ export class GroupsService {
     });
   }
 
-  async deleteById(id: string, { ability }: EntityOperationOptions = {}) {
-    return this.groupModel.delete({
-      where: { AND: [accessibleQuery(ability, 'delete', 'Group')], id }
-    });
-  }
-
   async findAll({ ability }: EntityOperationOptions = {}) {
     return this.groupModel.findMany({
       where: accessibleQuery(ability, 'read', 'Group')
@@ -71,6 +71,10 @@ export class GroupsService {
       throw new NotFoundException(`Failed to find group with ID: ${id}`);
     }
     return group;
+  }
+
+  async unarchiveById(id: string, currentUser: RequestUser) {
+    return this.updateArchivedAt(id, false, currentUser);
   }
 
   async updateById(
@@ -153,6 +157,27 @@ export class GroupsService {
       }
       throw err;
     }
+  }
+
+  /**
+   * Retire a group in place of deleting it, or return it to service. Everything that names the group
+   * keeps naming a real row, so its records, files and series stay where they are and stay its own;
+   * what changes is that membership grants nothing from the next sign-in (`AuthService.login`).
+   * Setting the state it already has changes nothing, so an archive keeps its original date, and is
+   * not audited.
+   */
+  private async updateArchivedAt(id: string, isArchived: boolean, currentUser: RequestUser) {
+    const where = { AND: [accessibleQuery(currentUser.ability, 'update', 'Group')], id };
+    const group = await this.groupModel.findFirst({ where });
+    if (!group) {
+      throw new NotFoundException(`Failed to find group with ID: ${id}`);
+    }
+    if (Boolean(group.archivedAt) === isArchived) {
+      return group;
+    }
+    const updated = await this.groupModel.update({ data: { archivedAt: isArchived ? new Date() : null }, where });
+    await this.auditLogger.log(isArchived ? 'ARCHIVE' : 'UNARCHIVE', 'GROUP', { groupId: id, userId: currentUser.id });
+    return updated;
   }
 
   /**

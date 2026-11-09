@@ -19,4 +19,10 @@ describe('$UpdateGroupData', () => {
   it('should accept an update that omits emailTemplates entirely', () => {
     expect($UpdateGroupData.safeParse({ name: 'New Name' }).success).toBe(true);
   });
+  it.each([null, '2026-01-01T00:00:00.000Z'])(
+    'should drop an archivedAt of %o, so a group manager cannot archive or unarchive a group by updating it',
+    (archivedAt) => {
+      expect($UpdateGroupData.parse({ archivedAt, name: 'New Name' })).not.toHaveProperty('archivedAt');
+    }
+  );
 });

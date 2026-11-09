@@ -154,6 +154,12 @@ holds a set — `POST /v1/users` and the permissions route refuse one, and `upda
 on promotion — and deleting a set clears every holder through `onDelete: SetNull`. Every
 `/v1/permission-sets` route is `ADMIN_ONLY`, because editing a set is a grant to each holder.
 
+A group is never deleted, only **archived**: `PATCH /v1/groups/:id/archive` and `/unarchive` are
+`ADMIN_ONLY`, and `$UpdateGroupData` omits `archivedAt`, so a group manager's update cannot set it.
+Short of `SetupService` dropping the whole database, nothing in this app deletes a group, so every
+`groupId` keeps naming a real row. What an archived group stops granting is decided at sign-in, in
+`AuthService.login` — see the architecture doc below.
+
 Background: `.agents/docs/architecture/auth-and-permissions.md`.
 
 ## Validation
