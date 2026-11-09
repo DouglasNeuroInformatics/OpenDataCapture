@@ -150,7 +150,14 @@ vi.mock('recharts', () => ({
     </svg>
   ),
   CartesianGrid: ({ stroke }: { stroke: string }) => <g data-stroke={stroke} data-testid="grid" />,
-  Legend: () => <g data-testid="chart-legend" />,
+  Legend: ({ wrapperStyle }: { wrapperStyle?: { left?: number; paddingTop?: number; width?: string } }) => (
+    <g
+      data-left={wrapperStyle?.left}
+      data-padding-top={wrapperStyle?.paddingTop}
+      data-testid="chart-legend"
+      data-width={wrapperStyle?.width}
+    />
+  ),
   ResponsiveContainer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   Tooltip: ({ content }: { content: (props: TooltipProps) => ReactNode }) => (
     <foreignObject data-testid="chart-tooltip">{content(mocks.tooltipProps)}</foreignObject>
@@ -411,6 +418,18 @@ describe('Route', () => {
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
       expect(within(dialog).getByText('Error finding records')).toBeTruthy();
+    });
+
+    it('should leave a line of space between the chart and its legend', () => {
+      renderPage();
+      expect(recordsChart().getByTestId('chart-legend').dataset.paddingTop).toBe('16');
+    });
+
+    it('should span the legend across the whole chart, so it centres on the card rather than the plot area', () => {
+      renderPage();
+      const legend = recordsChart().getByTestId('chart-legend');
+      expect(legend.dataset.left).toBe('0');
+      expect(legend.dataset.width).toBe('100%');
     });
 
     it.each([

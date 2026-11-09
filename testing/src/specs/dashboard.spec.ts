@@ -50,6 +50,17 @@ test.describe('dashboard', () => {
 
     await expect(recordsIcon).not.toHaveAttribute('stroke-dasharray', '6 4');
     await expect(sessionsIcon).toHaveAttribute('stroke-dasharray', '6 4');
+
+    await expect(legend.locator('..')).toHaveCSS('padding-top', '16px');
+    const legendItems = legend.locator('.recharts-legend-item');
+    await expect(legendItems.first()).toHaveCSS('margin-right', '16px');
+    await expect(legendItems.first()).toHaveCSS('margin-left', '16px');
+
+    const wrapperBox = (await dashboardPage.recordsSessionsChart.boundingBox())!;
+    const firstItemBox = (await legendItems.first().boundingBox())!;
+    const lastItemBox = (await legendItems.last().boundingBox())!;
+    const itemsCentre = (firstItemBox.x + lastItemBox.x + lastItemBox.width) / 2;
+    expect(Math.abs(itemsCentre - (wrapperBox.x + wrapperBox.width / 2))).toBeLessThan(2);
   });
 
   test('should navigate to the data hub when the subjects statistic is clicked', async ({ getPageModel, page }) => {

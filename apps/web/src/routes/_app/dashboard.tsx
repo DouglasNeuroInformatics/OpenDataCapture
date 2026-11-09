@@ -439,7 +439,9 @@ const RouteComponent = () => {
                 </div>
               </div>
             </div>
-            <div className="p-8 pt-2">
+            {/* recharts spaces legend items with an inline right margin, which also pushes the legend off
+                centre; only an important class can replace it with an even margin on both sides. */}
+            <div className="p-8 pt-2 [&_.recharts-legend-item]:mx-4!">
               <ResponsiveContainer height={320} width="100%">
                 <AreaChart data={combinedTrendsData} margin={{ bottom: 0, left: 0, right: 30, top: 10 }}>
                   <defs>
@@ -504,7 +506,8 @@ const RouteComponent = () => {
                       return null;
                     }}
                   />
-                  <Legend />
+                  {/* recharts sizes the legend to the plot area, which the chart's right margin shifts off the card's centre. */}
+                  <Legend wrapperStyle={{ left: 0, paddingTop: 16, width: '100%' }} />
                   <Area
                     activeDot={{ fill: chartColors.records.stroke, r: 6, stroke: '#fff', strokeWidth: 2 }}
                     dataKey="records"
