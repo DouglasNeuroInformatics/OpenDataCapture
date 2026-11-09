@@ -32,10 +32,27 @@ test.describe('admin audit logs', () => {
 
   test('should show the chosen option on its filter button and put it in the URL', async ({ getPageModel }) => {
     const auditLogsPage = await getPageModel('/admin/audit/logs');
-    await auditLogsPage.filterBy('entity', 'Session');
+    await auditLogsPage.filterBy('entity', 'Instrument');
 
-    await expect(auditLogsPage.filterButton('entity')).toContainText('Session');
-    await expect(auditLogsPage.$ref).toHaveURL(/entity=SESSION/);
+    await expect(auditLogsPage.filterButton('entity')).toContainText('Instrument');
+    await expect(auditLogsPage.$ref).toHaveURL(/entity=INSTRUMENT(&|$)/);
+  });
+
+  test('should not offer an entity nothing writes to the log', async ({ getPageModel }) => {
+    const auditLogsPage = await getPageModel('/admin/audit/logs');
+    await auditLogsPage.filterButton('entity').click();
+
+    await expect(auditLogsPage.filterOption('User')).toBeVisible();
+    await expect(auditLogsPage.filterOption('Session')).toBeHidden();
+  });
+
+  test('should offer only the actions written on the chosen entity', async ({ getPageModel }) => {
+    const auditLogsPage = await getPageModel('/admin/audit/logs');
+    await auditLogsPage.filterBy('entity', 'Assignment');
+    await auditLogsPage.filterButton('action').click();
+
+    await expect(auditLogsPage.filterOption('Send Email')).toBeVisible();
+    await expect(auditLogsPage.filterOption('Login')).toBeHidden();
   });
 
   test('should clear every filter at once', async ({ getPageModel }) => {

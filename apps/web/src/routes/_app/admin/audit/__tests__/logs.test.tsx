@@ -42,6 +42,10 @@ const mocks = vi.hoisted(() => ({
   users: [] as User[]
 }));
 
+vi.mock('@opendatacapture/schemas/audit', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@opendatacapture/schemas/audit')>()),
+  AUDITED_ACTIONS: { ASSIGNMENT: ['CREATE', 'SEND_EMAIL'], USER: ['LOGIN', 'UPDATE'] }
+}));
 vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
@@ -115,7 +119,7 @@ const userFixture = (id: string, username: string, groupIds: string[]): User => 
 
 const logFixture = (overrides: Partial<$AuditLog> = {}): $AuditLog => ({
   action: 'SEND_EMAIL',
-  entity: 'INSTRUMENT_RECORD',
+  entity: 'ASSIGNMENT',
   group: { name: 'Depression Clinic' },
   id: 'log-1',
   timestamp: TIMESTAMP,
@@ -279,18 +283,27 @@ describe('Route', () => {
       expect(navigatedSearch()).toEqual({ action: 'LOGIN', userId: 'user-2' });
     });
 
-    it('should offer every action under its translated name', () => {
+    it('should offer only the actions something writes, under their translated names', () => {
       renderPage();
       expect(filterOptions('audit-logs-filter-action')).toEqual([
         'Any Action',
         'Create',
-        'Delete',
         'Update',
-        'Archive',
-        'Unarchive',
         'Login',
         'Send Email'
       ]);
+    });
+
+    it('should offer only the actions written on the chosen entity, so no combination can match nothing', () => {
+      mocks.search = { entity: 'USER' };
+      renderPage();
+      expect(filterOptions('audit-logs-filter-action')).toEqual(['Any Action', 'Update', 'Login']);
+    });
+
+    it('should offer no action for an entity nothing writes, which an old link can still name', () => {
+      mocks.search = { entity: 'SESSION' };
+      renderPage();
+      expect(filterOptions('audit-logs-filter-action')).toEqual(['Any Action']);
     });
 
     it('should filter by the chosen action', () => {
@@ -299,10 +312,21 @@ describe('Route', () => {
       expect(navigatedSearch()).toEqual({ action: 'SEND_EMAIL' });
     });
 
+    it('should offer only the entities something writes, so an entity that is never logged is not offered', () => {
+      renderPage();
+      expect(filterOptions('audit-logs-filter-entity')).toEqual(['Any Entity', 'Assignment', 'User']);
+    });
+
+    it('should offer only the entities the chosen action is written on, so no combination can match nothing', () => {
+      mocks.search = { action: 'SEND_EMAIL' };
+      renderPage();
+      expect(filterOptions('audit-logs-filter-entity')).toEqual(['Any Entity', 'Assignment']);
+    });
+
     it('should filter by the chosen entity', () => {
       renderPage();
-      chooseFilter('audit-logs-filter-entity', 'Instrument Record');
-      expect(navigatedSearch()).toEqual({ entity: 'INSTRUMENT_RECORD' });
+      chooseFilter('audit-logs-filter-entity', 'User');
+      expect(navigatedSearch()).toEqual({ entity: 'USER' });
     });
 
     it('should hide the clear filters button while no filter is set', () => {
@@ -345,7 +369,7 @@ describe('Route', () => {
 
     it('should show who acted, in which group, and the translated action and entity', () => {
       renderPage();
-      expect(cellTexts().slice(1)).toEqual(['jane', 'Depression Clinic', 'Send Email', 'Instrument Record']);
+      expect(cellTexts().slice(1)).toEqual(['jane', 'Depression Clinic', 'Send Email', 'Assignment']);
     });
 
     it('should tag the action with its color', () => {
@@ -356,8 +380,8 @@ describe('Route', () => {
 
     it('should leave the entity as plain text', () => {
       renderPage();
-      expect(screen.getByText('Instrument Record').querySelector('[data-testid="color-tag-dot"]')).toBeNull();
-      expect(screen.getByText('Instrument Record').closest('[data-testid="color-tag-label"]')).toBeNull();
+      expect(screen.getByText('Assignment').querySelector('[data-testid="color-tag-dot"]')).toBeNull();
+      expect(screen.getByText('Assignment').closest('[data-testid="color-tag-label"]')).toBeNull();
     });
 
     it('should show N/A for a log with no user or group', () => {

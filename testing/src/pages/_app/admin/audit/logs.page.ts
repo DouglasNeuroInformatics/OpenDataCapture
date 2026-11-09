@@ -29,6 +29,11 @@ export class AuditLogsPage extends AppPage {
   /** Opens one filter's menu and picks an option; the menu closes itself once the option is chosen. */
   async filterBy(filter: AuditLogsFilter, optionLabel: string) {
     await this.filterButton(filter).click();
-    await this.$ref.getByRole('menuitemradio', { exact: true, name: optionLabel }).click();
+    await this.filterOption(optionLabel).click();
+  }
+
+  /** An option of whichever filter menu is open. */
+  filterOption(optionLabel: string) {
+    return this.$ref.getByRole('menuitemradio', { exact: true, name: optionLabel });
   }
 }

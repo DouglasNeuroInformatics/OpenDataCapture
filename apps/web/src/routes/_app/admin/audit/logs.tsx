@@ -3,12 +3,14 @@ import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { snakeToCamelCase, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, DropdownMenu, Heading } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { $AuditLogsQuerySearchParams, $AuditLogsSortBy } from '@opendatacapture/schemas/audit';
-import type {
+import {
   $AuditLogAction,
   $AuditLogEntity,
-  $AuditLogsQuerySearchParams as AuditLogsSearchParams
+  $AuditLogsQuerySearchParams,
+  $AuditLogsSortBy,
+  AUDITED_ACTIONS
 } from '@opendatacapture/schemas/audit';
+import type { $AuditLogsQuerySearchParams as AuditLogsSearchParams } from '@opendatacapture/schemas/audit';
 import { createFileRoute } from '@tanstack/react-router';
 import { CalendarIcon, DownloadIcon, XIcon } from 'lucide-react';
 
@@ -31,17 +33,15 @@ const INITIAL_PAGE = 1;
 
 const INITIAL_SORT: { sortBy: $AuditLogsSortBy; sortOrder: SortOrder } = { sortBy: 'timestamp', sortOrder: 'desc' };
 
-const ACTIONS: $AuditLogAction[] = ['CREATE', 'DELETE', 'UPDATE', 'ARCHIVE', 'UNARCHIVE', 'LOGIN', 'SEND_EMAIL'];
+const ACTIONS_BY_ENTITY: { readonly [TEntity in $AuditLogEntity]?: readonly $AuditLogAction[] } = AUDITED_ACTIONS;
 
-const ENTITIES: $AuditLogEntity[] = [
-  'ASSIGNMENT',
-  'GROUP',
-  'INSTRUMENT',
-  'INSTRUMENT_RECORD',
-  'SESSION',
-  'SUBJECT',
-  'USER'
-];
+const isAudited = (entity: $AuditLogEntity, action: $AuditLogAction) => {
+  return ACTIONS_BY_ENTITY[entity]?.includes(action) ?? false;
+};
+
+const ENTITIES = $AuditLogEntity.options.filter((entity) => ACTIONS_BY_ENTITY[entity] !== undefined).sort();
+
+const ACTIONS = $AuditLogAction.options.filter((action) => ENTITIES.some((entity) => isAudited(entity, action)));
 
 const DateFormatMenu = ({ onChange, value }: { onChange: (value: DateFormat) => void; value: DateFormat }) => {
   const { t } = useTranslation();
@@ -89,6 +89,9 @@ const AuditLogsToolbar = () => {
   };
 
   const availableUsers = search.groupId ? users.filter((user) => user.groupIds.includes(search.groupId!)) : users;
+  const { action: selectedAction, entity: selectedEntity } = search;
+  const availableActions = selectedEntity ? ACTIONS.filter((action) => isAudited(selectedEntity, action)) : ACTIONS;
+  const availableEntities = selectedAction ? ENTITIES.filter((entity) => isAudited(entity, selectedAction)) : ENTITIES;
   const hasFilters = Object.values(search).some((value) => value !== undefined);
 
   const localize = (value: $AuditLogAction | $AuditLogEntity) => t(`common.${snakeToCamelCase(toLowerCase(value))}`);
@@ -119,7 +122,7 @@ const AuditLogsToolbar = () => {
         allLabel={t({ en: 'Any Action', es: 'Cualquier acción', fr: 'Toute action' })}
         data-testid="audit-logs-filter-action"
         label={t('common.action')}
-        options={ACTIONS.map((action) => ({ label: localize(action), value: action }))}
+        options={availableActions.map((action) => ({ label: localize(action), value: action }))}
         value={search.action}
         onValueChange={(action) => setSearch({ action })}
       />
@@ -127,7 +130,7 @@ const AuditLogsToolbar = () => {
         allLabel={t({ en: 'Any Entity', es: 'Cualquier entidad', fr: 'Toute entité' })}
         data-testid="audit-logs-filter-entity"
         label={t('common.entity')}
-        options={ENTITIES.map((entity) => ({ label: localize(entity), value: entity }))}
+        options={availableEntities.map((entity) => ({ label: localize(entity), value: entity }))}
         value={search.entity}
         onValueChange={(entity) => setSearch({ entity })}
       />
