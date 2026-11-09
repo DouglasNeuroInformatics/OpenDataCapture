@@ -34,14 +34,14 @@ with `.agents/skills/opening-issues/SKILL.md` and name the issue in your reply.
    | an environment variable                   | the rest of the chain, in the playbook's order                           | `.agents/docs/playbooks/add-env-var.md`        |
    | a `packages/react-core` component         | `src/index.ts` — the barrel is the public API, there are no deep imports | `packages/react-core/AGENTS.md`                |
    | a request or response shape in `apps/api` | `cli/odc-cli`, which nothing links to the API                            | `cli/AGENTS.md`                                |
-   | a new workspace or vitest project         | the tables in `workspace-map.md` and `testing-strategy.md`               | `.agents/skills/odc-agent-docs/SKILL.md`       |
+   | a new workspace or vitest project         | the tables in `workspace-map.md` and `testing-strategy.md`               | `.agents/skills/writing-agent-docs/SKILL.md`   |
 
 6. **If the diff touches `apps/api`, account for every Prisma query, not a sample**: each `where` names
    `accessibleQuery` or your reply says why it is unscoped, and every handler calling a scoped service
    forwards `@CurrentUser('ability')` (`apps/api/AGENTS.md`).
 7. **Re-read the `AGENTS.md` of every package or app you modified** and confirm your change does not
    contradict it. If it does, revise the change, or propose the smallest `AGENTS.md` edit and wait for the
-   user's approval (root `AGENTS.md` hard rule); `.agents/skills/odc-agent-docs/SKILL.md` has the house format.
+   user's approval (root `AGENTS.md` hard rule); `.agents/skills/writing-agent-docs/SKILL.md` has the house format.
 
 **Done when** your reply lists every exception, including any row above you took on trust, or states that
 every check ran green.

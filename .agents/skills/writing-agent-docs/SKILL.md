@@ -1,5 +1,5 @@
 ---
-name: odc-agent-docs
+name: writing-agent-docs
 description: Write or correct this repo's agent documentation — a workspace AGENTS.md (or its CLAUDE.md symlink), a playbook under .agents/docs/playbooks, an architecture doc, the workspace map, or a skill. Use when a documented rule is wrong or missing, when a change contradicts an AGENTS.md, or when another skill needs the house format for these files. Architectural decisions land in .agents/docs/architecture; there is no ADR flow.
 ---
 
