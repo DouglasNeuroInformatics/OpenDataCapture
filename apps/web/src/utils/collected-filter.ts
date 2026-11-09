@@ -10,11 +10,22 @@ type CollectedFilter = {
 
 const DEFAULT_COLLECTED_FILTER: CollectedFilter = { max: null, min: null, preset: 'all' };
 
+/** Subtract whole calendar months while preserving the local clock and clamping the day. */
+function monthsBeforeClamped(now: Date, count: number): Date {
+  const result = new Date(now);
+  const originalDay = result.getDate();
+  result.setDate(1);
+  result.setMonth(result.getMonth() - count);
+  const lastDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+  result.setDate(Math.min(originalDay, lastDay));
+  return result;
+}
+
 /** The earliest date a preset admits, or null for no lower bound */
 function presetMinDate(preset: CollectedPreset): Date | null {
   const now = new Date();
-  const monthsAgo = (count: number) => new Date(new Date(now).setMonth(now.getMonth() - count));
-  const yearsAgo = (count: number) => new Date(new Date(now).setFullYear(now.getFullYear() - count));
+  const monthsAgo = (count: number) => monthsBeforeClamped(now, count);
+  const yearsAgo = (count: number) => monthsBeforeClamped(now, count * 12);
   switch (preset) {
     case 'pastMonth':
       return monthsAgo(1);
@@ -59,5 +70,5 @@ function selectCollectedPreset(preset: CollectedPreset, previous: CollectedFilte
   };
 }
 
-export { DEFAULT_COLLECTED_FILTER, matchesCollectedFilter, presetMinDate, selectCollectedPreset };
+export { DEFAULT_COLLECTED_FILTER, matchesCollectedFilter, monthsBeforeClamped, presetMinDate, selectCollectedPreset };
 export type { CollectedFilter, CollectedPreset };

@@ -1,3 +1,5 @@
+import { monthsBeforeClamped } from '@/utils/collected-filter';
+
 /** The timeframe a record listing can be narrowed to, as stored in the URL. */
 type TimeframeKey = (typeof TIMEFRAME_KEYS)[number];
 
@@ -13,10 +15,10 @@ const TIMEFRAME_KEYS = ['all', 'pastMonth', 'pastYear'] as const;
 function timeframeMinDate(key: TimeframeKey): Date | null {
   const now = new Date();
   if (key === 'pastMonth') {
-    return new Date(new Date(now).setMonth(now.getMonth() - 1));
+    return monthsBeforeClamped(now, 1);
   }
   if (key === 'pastYear') {
-    return new Date(new Date(now).setFullYear(now.getFullYear() - 1));
+    return monthsBeforeClamped(now, 12);
   }
   return null;
 }

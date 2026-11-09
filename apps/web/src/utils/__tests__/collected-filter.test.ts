@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   DEFAULT_COLLECTED_FILTER,
@@ -28,6 +28,20 @@ describe('presetMinDate', () => {
 
   it('should order the windows so a longer one reaches further back', () => {
     expect(presetMinDate('pastWeek')!.getTime()).toBeGreaterThan(presetMinDate('pastYear')!.getTime());
+  });
+
+  it.each([
+    ['pastMonth', new Date(2026, 2, 31, 12, 20), new Date(2026, 1, 28, 12, 20)],
+    ['pastThreeMonths', new Date(2026, 4, 31, 12, 20), new Date(2026, 1, 28, 12, 20)],
+    ['pastMonth', new Date(2024, 2, 31, 12, 20), new Date(2024, 1, 29, 12, 20)],
+    ['pastYear', new Date(2024, 1, 29, 12, 20), new Date(2023, 1, 28, 12, 20)]
+  ] as const)('should clamp %s at month or leap-year boundaries', (preset, now, expected) => {
+    vi.useFakeTimers({ now, toFake: ['Date'] });
+    try {
+      expect(presetMinDate(preset)).toStrictEqual(expected);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
