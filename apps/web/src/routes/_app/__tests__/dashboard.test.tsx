@@ -112,6 +112,7 @@ vi.mock('@/hooks/useInstrumentRecords', () => ({
     return mocks.records;
   }
 }));
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@/hooks/useUsersQuery', () => ({
   useUsersQuery: (options: unknown) => {
     mocks.useUsersQuery(options);
@@ -176,19 +177,18 @@ const openDialog = (statisticTestId: string, dialogTestId: string) => {
   return screen.getByTestId(dialogTestId);
 };
 
-const listItems = (dialog: HTMLElement) => {
-  return within(dialog)
-    .getAllByRole('listitem')
-    .map((item) => item.textContent);
-};
-
-const recordRows = (dialog: HTMLElement) => {
+const tableRows = (dialog: HTMLElement) => {
   return within(dialog)
     .getAllByTestId('data-table-row')
     .map((row) => Array.from(row.children, (cell) => cell.textContent));
 };
 
-const recordsHeader = (dialog: HTMLElement, label: string) => {
+const searchDialogTable = (dialog: HTMLElement, value: string) => {
+  const search = within(within(dialog).getByTestId('data-table-search-bar')).getByRole('searchbox');
+  fireEvent.change(search, { target: { value } });
+};
+
+const tableHeader = (dialog: HTMLElement, label: string) => {
   return within(within(dialog).getByTestId('data-table-head')).getByText(label).closest('button')!;
 };
 
@@ -258,7 +258,22 @@ describe('Route', () => {
     it('should list every user of the group in the users dialog', () => {
       renderPage();
       const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['alice', 'bob']);
+      expect(tableRows(dialog)).toEqual([['alice'], ['bob']]);
+    });
+
+    it('should narrow the users dialog to the usernames matching its search', () => {
+      renderPage();
+      const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
+      searchDialogTable(dialog, 'bo');
+      expect(tableRows(dialog)).toEqual([['bob']]);
+    });
+
+    it('should sort the users dialog by username when its header is clicked', () => {
+      renderPage();
+      const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
+      fireEvent.click(tableHeader(dialog, 'Username'));
+      fireEvent.click(tableHeader(dialog, 'Username'));
+      expect(tableRows(dialog)).toEqual([['bob'], ['alice']]);
     });
 
     it('should show a spinner in the users dialog while users are loading', () => {
@@ -279,13 +294,41 @@ describe('Route', () => {
       mocks.store.currentGroup = RESEARCH_GROUP;
       renderPage();
       const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['Alpha Scale FORM']);
+      expect(tableRows(dialog)).toEqual([['Alpha Scale', 'Form']]);
     });
 
     it('should list every instrument when no group is selected', () => {
       renderPage();
       const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['Alpha Scale FORM', 'Beta Task INTERACTIVE']);
+      expect(tableRows(dialog)).toEqual([
+        ['Alpha Scale', 'Form'],
+        ['Beta Task', 'Interactive']
+      ]);
+    });
+
+    it('should tag each instrument kind with the badge the instrument tables use', () => {
+      renderPage();
+      const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
+      expect(
+        within(dialog)
+          .getAllByTestId('instrument-cell-kind')
+          .map((tag) => tag.textContent)
+      ).toEqual(['Form', 'Interactive']);
+    });
+
+    it('should narrow the instruments dialog to the titles matching its search', () => {
+      renderPage();
+      const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
+      searchDialogTable(dialog, 'Beta');
+      expect(tableRows(dialog)).toEqual([['Beta Task', 'Interactive']]);
+    });
+
+    it('should sort the instruments dialog by kind when its header is clicked', () => {
+      renderPage();
+      const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
+      fireEvent.click(tableHeader(dialog, 'Kind'));
+      fireEvent.click(tableHeader(dialog, 'Kind'));
+      expect(tableRows(dialog).map(([title]) => title)).toEqual(['Beta Task', 'Alpha Scale']);
     });
 
     it('should report a failure to load instruments in the instruments dialog', () => {
@@ -298,7 +341,7 @@ describe('Route', () => {
     it('should count the records of each instrument in the records dialog', () => {
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      expect(recordRows(dialog)).toEqual([
+      expect(tableRows(dialog)).toEqual([
         ['Alpha Scale', '2'],
         ['Beta Task', '1']
       ]);
@@ -308,37 +351,36 @@ describe('Route', () => {
       mocks.records = { data: [{ instrumentId: 'beta' }, { instrumentId: 'beta' }, { instrumentId: 'alpha' }] };
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      expect(recordRows(dialog).map(([title]) => title)).toEqual(['Beta Task', 'Alpha Scale']);
+      expect(tableRows(dialog).map(([title]) => title)).toEqual(['Beta Task', 'Alpha Scale']);
     });
 
     it('should sort the records dialog by title when its header is clicked', () => {
       mocks.records = { data: [{ instrumentId: 'beta' }, { instrumentId: 'beta' }, { instrumentId: 'alpha' }] };
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      fireEvent.click(recordsHeader(dialog, 'Title'));
-      expect(recordRows(dialog).map(([title]) => title)).toEqual(['Alpha Scale', 'Beta Task']);
+      fireEvent.click(tableHeader(dialog, 'Title'));
+      expect(tableRows(dialog).map(([title]) => title)).toEqual(['Alpha Scale', 'Beta Task']);
     });
 
     it('should reverse the record count order when the number header is clicked', () => {
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      fireEvent.click(recordsHeader(dialog, 'Number'));
-      expect(recordRows(dialog).map(([title]) => title)).toEqual(['Beta Task', 'Alpha Scale']);
+      fireEvent.click(tableHeader(dialog, 'Number'));
+      expect(tableRows(dialog).map(([title]) => title)).toEqual(['Beta Task', 'Alpha Scale']);
     });
 
     it('should narrow the records dialog to the instruments matching its search', () => {
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      const search = within(within(dialog).getByTestId('data-table-search-bar')).getByRole('searchbox');
-      fireEvent.change(search, { target: { value: 'Beta' } });
-      expect(recordRows(dialog)).toEqual([['Beta Task', '1']]);
+      searchDialogTable(dialog, 'Beta');
+      expect(tableRows(dialog)).toEqual([['Beta Task', '1']]);
     });
 
     it('should count the records of every edition, so older editions are not dropped from the dialog', () => {
       mocks.records = { data: [{ instrumentId: 'alpha-1' }, { instrumentId: 'alpha-1' }, { instrumentId: 'alpha' }] };
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      expect(recordRows(dialog)).toEqual([
+      expect(tableRows(dialog)).toEqual([
         ['Alpha Scale', '3'],
         ['Beta Task', '0']
       ]);
@@ -348,7 +390,7 @@ describe('Route', () => {
       mocks.allEditions = { data: undefined };
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      expect(recordRows(dialog)).toEqual([
+      expect(tableRows(dialog)).toEqual([
         ['Alpha Scale', '2'],
         ['Beta Task', '1']
       ]);
@@ -358,7 +400,7 @@ describe('Route', () => {
       mocks.records = { data: undefined };
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      expect(recordRows(dialog)).toEqual([
+      expect(tableRows(dialog)).toEqual([
         ['Alpha Scale', '0'],
         ['Beta Task', '0']
       ]);

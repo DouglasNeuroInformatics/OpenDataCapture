@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 import { DataTable, Dialog, Heading, Spinner, StatisticCard } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import type { AppSubjectName } from '@opendatacapture/schemas/core';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
-import { AnimatePresence, motion } from 'motion/react';
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
+import { InstrumentKindCell } from '@/components/InstrumentKindCell';
 import { PageHeader } from '@/components/PageHeader';
 import { SortableHeader } from '@/components/SortableHeader';
 import { TruncatedCell } from '@/components/TruncatedCell';
@@ -17,6 +19,13 @@ import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
 import { useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
+
+// A dialog's table is shown as plain text: libui's frame, row and cell borders are removed, and the
+// column headers are set larger and bold to stand apart from the rows without them.
+const TEXT_ONLY_TABLE = cn(
+  '[&_[data-testid=data-table]>.border]:border-0 [&_[data-testid=data-table]>.border_*]:border-0',
+  '[&_[data-testid=data-table-head]]:text-base [&_[data-testid=data-table-head]]:font-bold'
+);
 
 const RouteComponent = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
@@ -204,39 +213,38 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <hr />
-                  <ul className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
-                    {userInfoQuery.isLoading && <Spinner />}
-                    {userInfoQuery.isError && (
-                      <p>
-                        {t({
-                          en: 'Error finding users',
-                          es: 'Error al buscar los usuarios',
-                          fr: "Erreur lors de la recherche d'utilisateurs"
-                        })}
-                      </p>
-                    )}
-                    {userInfoQuery.data && (
-                      <AnimatePresence mode="popLayout">
-                        {userInfoQuery.data.map((user, i) => {
-                          return (
-                            <motion.li
-                              layout
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0 }}
-                              initial={{ opacity: 0 }}
-                              key={user.username}
-                              transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
-                            >
-                              <div className="flex justify-between gap-4">
-                                <p>{user.username}</p>
-                              </div>
-                            </motion.li>
-                          );
-                        })}
-                      </AnimatePresence>
-                    )}
-                  </ul>
+                  {userInfoQuery.isLoading && <Spinner />}
+                  {userInfoQuery.isError && (
+                    <p>
+                      {t({
+                        en: 'Error finding users',
+                        es: 'Error al buscar los usuarios',
+                        fr: "Erreur lors de la recherche d'utilisateurs"
+                      })}
+                    </p>
+                  )}
+                  {userInfoQuery.data && (
+                    <div className={TEXT_ONLY_TABLE}>
+                      <DataTable
+                        columns={[
+                          {
+                            accessorKey: 'username',
+                            cell: ({ getValue }) => (
+                              <TruncatedCell title={getValue<string>()} value={getValue<string>()} />
+                            ),
+                            header: ({ column }) => (
+                              <SortableHeader
+                                column={column}
+                                label={t({ en: 'Username', es: 'Nombre de usuario', fr: "Nom d'utilisateur" })}
+                              />
+                            ),
+                            id: 'username'
+                          }
+                        ]}
+                        data={userInfoQuery.data}
+                      />
+                    </div>
+                  )}
                 </Dialog.Content>
               </Dialog>
             </div>
@@ -294,48 +302,43 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <ul className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
-                    {!instrumentInfo && (
-                      <p>
-                        {t({
-                          en: 'Error finding instruments',
-                          es: 'Error al buscar los instrumentos',
-                          fr: 'Erreur lors de la recherche des instruments'
-                        })}
-                      </p>
-                    )}
-                    {instrumentInfo && (
-                      <AnimatePresence mode="popLayout">
-                        <div className="flex justify-between gap-4 font-bold">
-                          <p>
-                            {t({
-                              en: 'Title',
-                              es: 'Título',
-                              fr: 'Titre'
-                            })}
-                          </p>{' '}
-                          <p>{t({ en: 'Kind', es: 'Tipo', fr: 'Type' })}</p>
-                        </div>
-                        <hr />
-                        {instrumentInfo.map((instrument, i) => {
-                          return (
-                            <motion.li
-                              layout
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0 }}
-                              initial={{ opacity: 0 }}
-                              key={instrument.id}
-                              transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
-                            >
-                              <div className="flex justify-between gap-4">
-                                <p>{instrument.title}</p> <p>{instrument.kind}</p>
-                              </div>
-                            </motion.li>
-                          );
-                        })}
-                      </AnimatePresence>
-                    )}
-                  </ul>
+                  {instrumentInfo ? (
+                    <div className={TEXT_ONLY_TABLE}>
+                      <DataTable
+                        columns={[
+                          {
+                            accessorKey: 'title',
+                            cell: ({ getValue }) => (
+                              <TruncatedCell title={getValue<string>()} value={getValue<string>()} />
+                            ),
+                            header: ({ column }) => (
+                              <SortableHeader column={column} label={t({ en: 'Title', es: 'Título', fr: 'Titre' })} />
+                            ),
+                            id: 'title'
+                          },
+                          {
+                            accessorKey: 'kind',
+                            cell: ({ getValue }) => <InstrumentKindCell kind={getValue<InstrumentKind>()} />,
+                            header: ({ column }) => (
+                              <SortableHeader column={column} label={t({ en: 'Kind', es: 'Tipo', fr: 'Type' })} />
+                            ),
+                            id: 'kind',
+                            size: 140
+                          }
+                        ]}
+                        data={instrumentInfo}
+                        initialState={{ columnPinning: { right: ['kind'] } }}
+                      />
+                    </div>
+                  ) : (
+                    <p>
+                      {t({
+                        en: 'Error finding instruments',
+                        es: 'Error al buscar los instrumentos',
+                        fr: 'Erreur lors de la recherche des instruments'
+                      })}
+                    </p>
+                  )}
                 </Dialog.Content>
               </Dialog>
             </div>
@@ -368,30 +371,32 @@ const RouteComponent = () => {
                     </Dialog.Title>
                   </Dialog.Header>
                   {instrumentInfo ? (
-                    <DataTable
-                      columns={[
-                        {
-                          accessorKey: 'instrumentTitle',
-                          cell: ({ getValue }) => (
-                            <TruncatedCell title={getValue<string>()} value={getValue<string>()} />
-                          ),
-                          header: ({ column }) => (
-                            <SortableHeader column={column} label={t({ en: 'Title', es: 'Título', fr: 'Titre' })} />
-                          ),
-                          id: 'instrumentTitle'
-                        },
-                        {
-                          accessorKey: 'count',
-                          header: ({ column }) => (
-                            <SortableHeader column={column} label={t({ en: 'Number', es: 'Número', fr: 'Nombre' })} />
-                          ),
-                          id: 'count',
-                          size: 110
-                        }
-                      ]}
-                      data={recordCounter}
-                      initialState={{ columnPinning: { right: ['count'] }, sorting: [{ desc: true, id: 'count' }] }}
-                    />
+                    <div className={TEXT_ONLY_TABLE}>
+                      <DataTable
+                        columns={[
+                          {
+                            accessorKey: 'instrumentTitle',
+                            cell: ({ getValue }) => (
+                              <TruncatedCell title={getValue<string>()} value={getValue<string>()} />
+                            ),
+                            header: ({ column }) => (
+                              <SortableHeader column={column} label={t({ en: 'Title', es: 'Título', fr: 'Titre' })} />
+                            ),
+                            id: 'instrumentTitle'
+                          },
+                          {
+                            accessorKey: 'count',
+                            header: ({ column }) => (
+                              <SortableHeader column={column} label={t({ en: 'Number', es: 'Número', fr: 'Nombre' })} />
+                            ),
+                            id: 'count',
+                            size: 110
+                          }
+                        ]}
+                        data={recordCounter}
+                        initialState={{ columnPinning: { right: ['count'] }, sorting: [{ desc: true, id: 'count' }] }}
+                      />
+                    </div>
                   ) : (
                     <p>
                       {t({

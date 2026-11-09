@@ -65,6 +65,46 @@ test.describe('dashboard', () => {
     await expect(dashboardPage.usersDialog).toContainText('Users');
   });
 
+  test('should find a user of the group by searching the users dialog', async ({ api, authenticateAs, page }) => {
+    const group = await api.createGroup();
+    const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });
+    const { credentials: colleague } = await api.createUser({ groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const dashboardPage = new DashboardPage(page);
+    await dashboardPage.goto('/dashboard');
+    await dashboardPage.statisticUsers.click();
+    const userRows = dashboardPage.usersDialog.getByTestId('data-table-row');
+    await expect(userRows).toHaveCount(2);
+    await dashboardPage.usersDialog.getByRole('searchbox').fill(colleague.username);
+    await expect(userRows).toHaveCount(1);
+    await expect(userRows).toHaveText(colleague.username);
+  });
+
+  // The dialogs show their tables as plain text, with larger bold headers in place of the borders.
+  test('should show the tables in the dashboard dialogs as text, without borders', async ({ getPageModel, page }) => {
+    const dashboardPage = await getPageModel('/dashboard');
+    for (const [statistic, dialog] of [
+      [dashboardPage.statisticUsers, dashboardPage.usersDialog],
+      [dashboardPage.statisticInstruments, dashboardPage.instrumentsDialog],
+      [dashboardPage.statisticRecords, dashboardPage.recordsDialog]
+    ] as const) {
+      await statistic.click();
+      const frame = dialog.getByTestId('data-table').locator('> .border');
+      await expect(frame).toHaveCSS('border-top-width', '0px');
+      for (const cell of [
+        dialog.getByTestId('data-table-row').first(),
+        frame.getByTestId('data-table-head').locator('> div > div').first()
+      ]) {
+        await expect(cell).toHaveCSS('border-bottom-width', '0px');
+        await expect(cell).toHaveCSS('border-right-width', '0px');
+      }
+      await expect(frame.getByTestId('data-table-head')).toHaveCSS('font-weight', '700');
+      await expect(frame.getByTestId('data-table-head')).toHaveCSS('font-size', '16px');
+      await page.keyboard.press('Escape');
+    }
+  });
+
   // A record keeps the id of the edition it was collected with, so the records dialog once counted
   // only the latest edition's records, and the instruments card counted every edition in the database.
   // Edition 2 is stored after the group exists, so the group gains it the way an upgrade does.
@@ -100,9 +140,12 @@ test.describe('dashboard', () => {
     await page.keyboard.press('Escape');
 
     await dashboardPage.statisticInstruments.click();
-    const instrumentRows = dashboardPage.instrumentsDialog.getByRole('listitem');
-    await expect(instrumentRows.filter({ hasText: title })).toHaveCount(1);
-    const instrumentRowCount = await instrumentRows.count();
+    const instrumentRows = dashboardPage.instrumentsDialog.getByTestId('data-table-row');
+    await dashboardPage.instrumentsDialog.getByRole('searchbox').fill(title);
+    await expect(instrumentRows).toHaveCount(1);
+    await expect(instrumentRows.getByTestId('instrument-cell-kind')).toHaveText('Form');
+    await dashboardPage.instrumentsDialog.getByRole('searchbox').fill('');
+    const instrumentRowCount = await dashboardPage.countDialogRows(dashboardPage.instrumentsDialog);
     await page.keyboard.press('Escape');
     await expect(dashboardPage.statisticInstruments.getByRole('heading')).toHaveText(String(instrumentRowCount));
   });
