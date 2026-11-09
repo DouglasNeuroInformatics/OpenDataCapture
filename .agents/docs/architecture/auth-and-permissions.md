@@ -122,8 +122,10 @@ that a grantable pair used to reach belongs in the same predicate.
 
 ## Adjacent, but not the permission system
 
-- **Audit logging is not automatic.** Only explicit `AuditLogger.log` calls write one
-  (`grep -rn 'auditLogger.log' apps/api/src`); do not assume a new mutation is recorded.
+- **Audit logging is not automatic.** Only explicit `AuditLogger.log` calls write one; do not
+  assume a new mutation is recorded. `AUDITED_ACTIONS` (`packages/schemas/src/audit/audit.ts`)
+  declares every pair written: `log` is typed against it, so an undeclared pair does not compile, and
+  the web audit log page derives its filters from it. The Prisma enums are wider.
 - **`user.hashedPassword` and `assignment.encryptionKeyPair` are globally omitted** by the client in
   `src/core/prisma.ts`. `UsersService.findByUsername({ includeHashedPassword: true })` is how login
   reads the hash; `AssignmentsService.findPrivateKeyById`, called only by the gateway synchronizer,
