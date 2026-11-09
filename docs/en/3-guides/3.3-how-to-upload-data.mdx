@@ -49,6 +49,14 @@ Upload is an experimental feature. The **Upload Data** item appears in the navig
 
     Some forms may have Zod field types that are challenging to represent in a standard CSV format. Therefore, specific notations must be used to ensure the upload feature can properly parse the data.
 
+    - **_Fixed-Choice Data_**
+
+      If a form has a field that accepts only certain values, such as a score of 0, 1, 2 or 3, the template lists them separated by "/":
+
+      - 0/1/2/3
+
+      Enter exactly one of the listed values, written as it appears in the template. Any other value is rejected, and the error names its column and row.
+
     - **_Set Data_**
 
       If a form has a field that accepts a set of data, such as a multi-option checklist with options a, b, and c, the proper notation for the data would be:
@@ -70,6 +78,14 @@ Upload is an experimental feature. The **Upload Data** item appears in the navig
       - RECORD_ARRAY(A: dataEntryForA, B: dataEntryForB, C: dataEntryForC ; A: dataEntryForA2, B: dataEntryForB2, C: dataEntryForC2 ;)
 
       Note that every "," notates a new entry in the record, whilst every ";" notates a new record in the record array
+
+    - **_Record Data_**
+
+      If a form has a field that asks the same question about a fixed list of items, such as a mood rating for monday, wednesday and friday, the proper notation gives each item and its value separated by ":":
+
+      - RECORD(monday: 3, wednesday: 4, friday: 2)
+
+      The template lists the items and the values each one accepts, for example `RECORD(monday: 1/2/3/4, wednesday: 1/2/3/4, friday: 1/2/3/4)`. An item that is not in the template is rejected.
 
     - **_Optional Data_**
 

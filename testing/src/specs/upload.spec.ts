@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 
 import { UploadInstrumentPage } from '../pages/_app/upload/$instrumentId.page';
@@ -74,7 +76,23 @@ test.describe('upload', () => {
     uniqueId
   }) => {
     const title = `Record Array Upload ${uniqueId}`;
-    await api.createInstrument(recordArrayFormBundle({ name: `RECORD_ARRAY_UPLOAD_${uniqueId}`, title }));
+    await api.createInstrument(
+      formBundle({
+        content: `{
+          items: {
+            fieldset: {
+              name: { kind: 'string', label: 'Name', variant: 'input' },
+              quantity: { kind: 'number', label: 'Quantity', variant: 'input' }
+            },
+            kind: 'record-array',
+            label: 'Items'
+          }
+        }`,
+        name: `RECORD_ARRAY_UPLOAD_${uniqueId}`,
+        title,
+        validationSchema: 'z.object({ items: z.array(z.object({ name: z.string(), quantity: z.number() })) })'
+      })
+    );
     await isolatedGroupManager();
     const csv = [
       'subjectID,date,items',
@@ -98,6 +116,208 @@ test.describe('upload', () => {
       )
     ).toBeVisible();
   });
+
+  // The template once failed with "Unexpected Error" for any field it could not describe, which named
+  // neither the field nor its type.
+  test('should name the column and Zod type of a field the template cannot describe', async ({
+    api,
+    isolatedGroupManager,
+    page,
+    uniqueId
+  }) => {
+    const title = `Unsupported Field Upload ${uniqueId}`;
+    await api.createInstrument(
+      formBundle({
+        content: `{ pair: { kind: 'string', label: 'Pair', variant: 'input' } }`,
+        name: `UNSUPPORTED_FIELD_UPLOAD_${uniqueId}`,
+        title,
+        validationSchema: 'z.object({ pair: z.tuple([z.string()]) })'
+      })
+    );
+    await isolatedGroupManager();
+
+    const uploadPage = new UploadPage(page);
+    await uploadPage.goto('/upload');
+    await uploadPage.selectInstrument(title);
+    await page.waitForURL('**/upload/**');
+
+    const uploadInstrumentPage = new UploadInstrumentPage(page);
+    await expect(uploadInstrumentPage.pageHeader).toContainText(title);
+    await uploadInstrumentPage.templateButton.click();
+
+    await expect(uploadInstrumentPage.templateErrorHeading).toBeVisible();
+    await expect(page.getByText("Unsupported Zod type 'ZodTuple' at column name: 'pair'")).toBeVisible();
+  });
+
+  // A count recorded as a union of literals, or a native enum, once failed both the template and the
+  // import. Instruments reach the page built against either zod major, and each has its own path.
+  for (const zodEntry of ['index.js', 'v4.js'] as const) {
+    test.describe(`fixed-choice fields of a form written against zod@3.x/${zodEntry}`, () => {
+      let title: string;
+
+      test.beforeEach(async ({ api, uniqueId }) => {
+        title = `Fixed Choice Upload ${uniqueId}`;
+        await api.createInstrument(
+          formBundle({
+            content: `{
+              putbacks: { kind: 'number', label: 'Putbacks', variant: 'input' },
+              severity: { kind: 'number', label: 'Severity', variant: 'input' }
+            }`,
+            name: `FIXED_CHOICE_UPLOAD_${uniqueId}`,
+            title,
+            validationSchema: `z.object({
+              putbacks: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]),
+              severity: z.nativeEnum({ 0: 'Mild', 1: 'Severe', Mild: 0, Severe: 1 })
+            })`,
+            zodEntry
+          })
+        );
+      });
+
+      test('should list the allowed values of each field in the template', async ({ isolatedGroupManager, page }) => {
+        await isolatedGroupManager();
+        const uploadPage = new UploadPage(page);
+        await uploadPage.goto('/upload');
+        await uploadPage.selectInstrument(title);
+        await page.waitForURL('**/upload/**');
+
+        const uploadInstrumentPage = new UploadInstrumentPage(page);
+        const downloadPromise = page.waitForEvent('download');
+        await uploadInstrumentPage.templateButton.click();
+        const download = await downloadPromise;
+
+        const template = (await readFile(await download.path())).toString();
+        expect(template).toBe('subjectID,date,putbacks,severity\r\nstring,yyyy-mm-dd,0/1/2/3,0/1');
+      });
+
+      test('should store an uploaded value as the number its schema declares', async ({
+        adminToken,
+        apiRequestContext,
+        isolatedGroupManager,
+        page,
+        uniqueId
+      }) => {
+        const group = await isolatedGroupManager();
+        const csv = ['subjectID,date,putbacks,severity', `FixedChoice${uniqueId},2024-01-15,2,1`].join('\n');
+
+        const uploadPage = new UploadPage(page);
+        await uploadPage.goto('/upload');
+        await uploadPage.selectInstrument(title);
+        await page.waitForURL('**/upload/**');
+
+        const uploadInstrumentPage = new UploadInstrumentPage(page);
+        await uploadInstrumentPage.uploadFile({ buffer: Buffer.from(csv), mimeType: 'text/csv', name: 'choices.csv' });
+        await uploadInstrumentPage.submitButton.click();
+        await expect(page.getByText('Success')).toBeVisible();
+
+        const records = await apiRequestContext.get(`/api/v1/instrument-records?groupId=${group.id}`, {
+          headers: { Authorization: `Bearer ${adminToken}` }
+        });
+        expect(await records.json()).toMatchObject([{ data: { putbacks: 2, severity: 1 } }]);
+      });
+
+      test('should reject a value outside the allowed ones, naming its column and row', async ({
+        isolatedGroupManager,
+        page,
+        uniqueId
+      }) => {
+        await isolatedGroupManager();
+        const csv = ['subjectID,date,putbacks,severity', `FixedChoice${uniqueId},2024-01-15,7,1`].join('\n');
+
+        const uploadPage = new UploadPage(page);
+        await uploadPage.goto('/upload');
+        await uploadPage.selectInstrument(title);
+        await page.waitForURL('**/upload/**');
+
+        const uploadInstrumentPage = new UploadInstrumentPage(page);
+        await uploadInstrumentPage.uploadFile({ buffer: Buffer.from(csv), mimeType: 'text/csv', name: 'choices.csv' });
+        await uploadInstrumentPage.submitButton.click();
+
+        await expect(uploadInstrumentPage.errorHeading).toBeVisible();
+        await expect(
+          page.getByText("Invalid value '7': expected one of 0/1/2/3 at column name: 'putbacks' and row number '1'")
+        ).toBeVisible();
+      });
+    });
+  }
+
+  // The instrument guide validates a number-record field with a record keyed by an enum, which the
+  // page could neither describe nor import.
+  for (const zodEntry of ['index.js', 'v4.js'] as const) {
+    test.describe(`record field of a form written against zod@3.x/${zodEntry}`, () => {
+      let title: string;
+
+      test.beforeEach(async ({ api, uniqueId }) => {
+        title = `Record Upload ${uniqueId}`;
+        await api.createInstrument(
+          formBundle({
+            content: `{
+              ratings: {
+                items: { friday: { label: 'Friday' }, monday: { label: 'Monday' } },
+                kind: 'number-record',
+                label: 'Ratings',
+                options: { 1: 'Poor', 2: 'Fair', 3: 'Good' },
+                variant: 'likert'
+              }
+            }`,
+            name: `RECORD_UPLOAD_${uniqueId}`,
+            title,
+            validationSchema: `z.object({
+              ratings: z.record(z.enum(['monday', 'friday']), z.union([z.literal(1), z.literal(2), z.literal(3)]))
+            })`,
+            zodEntry
+          })
+        );
+      });
+
+      test('should show every key of the record with its allowed values in the template', async ({
+        isolatedGroupManager,
+        page
+      }) => {
+        await isolatedGroupManager();
+        const uploadPage = new UploadPage(page);
+        await uploadPage.goto('/upload');
+        await uploadPage.selectInstrument(title);
+        await page.waitForURL('**/upload/**');
+
+        const uploadInstrumentPage = new UploadInstrumentPage(page);
+        const downloadPromise = page.waitForEvent('download');
+        await uploadInstrumentPage.templateButton.click();
+        const download = await downloadPromise;
+
+        const template = (await readFile(await download.path())).toString();
+        expect(template).toBe('subjectID,date,ratings\r\nstring,yyyy-mm-dd,"RECORD(monday: 1/2/3, friday: 1/2/3)"');
+      });
+
+      test('should store an uploaded RECORD cell as an object of numbers', async ({
+        adminToken,
+        apiRequestContext,
+        isolatedGroupManager,
+        page,
+        uniqueId
+      }) => {
+        const group = await isolatedGroupManager();
+        const csv = ['subjectID,date,ratings', `Record${uniqueId},2024-01-15,"RECORD(monday: 3, friday: 1)"`].join(
+          '\n'
+        );
+
+        const uploadPage = new UploadPage(page);
+        await uploadPage.goto('/upload');
+        await uploadPage.selectInstrument(title);
+        await page.waitForURL('**/upload/**');
+
+        const uploadInstrumentPage = new UploadInstrumentPage(page);
+        await uploadInstrumentPage.uploadFile({ buffer: Buffer.from(csv), mimeType: 'text/csv', name: 'ratings.csv' });
+        await uploadInstrumentPage.submitButton.click();
+        await expect(page.getByText('Success')).toBeVisible();
+
+        const records = await apiRequestContext.get(`/api/v1/instrument-records?groupId=${group.id}`, {
+          headers: { Authorization: `Bearer ${adminToken}` }
+        });
+        expect(await records.json()).toMatchObject([{ data: { ratings: { friday: 1, monday: 3 } } }]);
+      });
+    });
+  }
 
   // The response was previously every record in the group for the instrument, so a second upload
   // leaked the first one's records back to the caller. An earlier upload to the same group and
@@ -173,28 +393,33 @@ test.describe('upload instrument selection while loading', () => {
 });
 
 /**
- * A form with one record-array field, written as the bundle the api stores: an expression that
- * evaluates to the instrument. Its runtime import resolves through the `__resolveImport` the api's
- * sandbox provides, and against the web origin in the browser, as a bundled import would.
+ * A form written as the bundle the api stores: an expression that evaluates to the instrument. Its
+ * runtime import resolves through the `__resolveImport` the api's sandbox provides, and against the
+ * web origin in the browser, as a bundled import would. `content` and `validationSchema` are source
+ * text, the schema written against the `z` of `zodEntry`: `index.js` is the zod 3 API and `v4.js`
+ * the zod 4 one.
  */
-function recordArrayFormBundle({ name, title }: { name: string; title: string }) {
+function formBundle({
+  content,
+  name,
+  title,
+  validationSchema,
+  zodEntry = 'index.js'
+}: {
+  content: string;
+  name: string;
+  title: string;
+  validationSchema: string;
+  zodEntry?: 'index.js' | 'v4.js';
+}) {
   return `(async () => {
     const runtimeImport = (specifier) => import(globalThis.__resolveImport?.(specifier) ?? specifier);
-    const { z } = await runtimeImport('/runtime/v1/zod@3.x/index.js');
+    const { z } = await runtimeImport('/runtime/v1/zod@3.x/${zodEntry}');
     return {
       __runtimeVersion: 1,
-      content: {
-        items: {
-          fieldset: {
-            name: { kind: 'string', label: 'Name', variant: 'input' },
-            quantity: { kind: 'number', label: 'Quantity', variant: 'input' }
-          },
-          kind: 'record-array',
-          label: 'Items'
-        }
-      },
+      content: ${content},
       details: {
-        description: 'A form with one record-array field',
+        description: 'A form seeded by the upload spec',
         license: 'Apache-2.0',
         title: ${JSON.stringify(title)}
       },
@@ -203,7 +428,7 @@ function recordArrayFormBundle({ name, title }: { name: string; title: string })
       language: 'en',
       measures: null,
       tags: [],
-      validationSchema: z.object({ items: z.array(z.object({ name: z.string(), quantity: z.number() })) })
+      validationSchema: ${validationSchema}
     };
   })()`;
 }
