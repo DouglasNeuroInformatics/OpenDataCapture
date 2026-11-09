@@ -292,6 +292,15 @@ export class ApiClient {
     );
   }
 
+  /** Reads a record back as admin, to check whether a write by another user actually took effect. */
+  async findRecordById(id: string): Promise<InstrumentRecord> {
+    return this.expectJson<InstrumentRecord>(
+      this.request.get(`${API}/instrument-records/${id}`, { headers: this.authHeaders }),
+      200,
+      `find instrument record '${id}'`
+    );
+  }
+
   /** The ids the start-session form suggests for a group: its subjects identified by a custom id. */
   async findSubjectCustomIds(groupId: string): Promise<string[]> {
     return this.expectJson<string[]>(

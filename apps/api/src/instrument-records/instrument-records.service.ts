@@ -434,10 +434,13 @@ export class InstrumentRecordsService {
     }));
   }
 
-  async updateById(id: string, data: unknown[] | { [key: string]: unknown }, { ability }: EntityOperationOptions = {}) {
-    const instrumentRecord = await this.instrumentRecordModel.findFirst({
-      where: { id }
-    });
+  async updateById(
+    id: string,
+    data: unknown[] | { [key: string]: unknown },
+    { ability }: Required<Pick<EntityOperationOptions, 'ability'>>
+  ) {
+    const where = { AND: [accessibleQuery(ability, 'update', 'InstrumentRecord')], id };
+    const instrumentRecord = await this.instrumentRecordModel.findFirst({ where });
     if (!instrumentRecord) {
       throw new NotFoundException(`Could not find record with ID '${id}'`);
     }
@@ -471,7 +474,7 @@ export class InstrumentRecordsService {
           : null,
         data: parseResult.data
       },
-      where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], id }
+      where
     });
   }
 
