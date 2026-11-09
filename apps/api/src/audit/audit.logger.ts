@@ -1,15 +1,15 @@
 import { InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
-import type { $AuditLogAction, $AuditLogEntity } from '@opendatacapture/schemas/audit';
+import type { AuditedAction, AuditedEntity } from '@opendatacapture/schemas/audit';
 
 @Injectable()
 export class AuditLogger {
   constructor(@InjectModel('AuditLog') private readonly auditLogModel: Model<'AuditLog'>) {}
 
-  async log(
-    action: $AuditLogAction,
-    entity: $AuditLogEntity,
+  async log<TEntity extends AuditedEntity>(
+    action: AuditedAction<TEntity>,
+    entity: TEntity,
     params: { groupId: null | string; metadata?: { [key: string]: string }; userId: string }
   ): Promise<void> {
     await this.auditLogModel.create({

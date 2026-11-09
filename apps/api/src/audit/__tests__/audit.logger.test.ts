@@ -46,6 +46,12 @@ describe('AuditLogger', () => {
       expect(auditLogModel.create.mock.lastCall?.[0]?.data.metadata).toStrictEqual({ mode: 'BULK' });
     });
 
+    it('should refuse at compile time a pair AUDITED_ACTIONS does not declare, so the filters cannot miss it', async () => {
+      // @ts-expect-error -- nothing sends an email about a user, so the pair is not declared
+      await auditLogger.log('SEND_EMAIL', 'USER', { groupId: null, userId: 'user-1' });
+      expect(auditLogModel.create).toHaveBeenCalledOnce();
+    });
+
     it('should timestamp the entry when it is written, so the log can be ordered by time', async () => {
       const before = Date.now();
       await auditLogger.log('LOGIN', 'USER', { groupId: null, userId: 'user-1' });
