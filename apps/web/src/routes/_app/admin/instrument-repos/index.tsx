@@ -398,8 +398,9 @@ const RouteComponent = () => {
                   sortUndefined: 'last'
                 },
                 {
-                  accessorFn: (row: InstrumentRepo) =>
-                    row.lastSyncedAt ? new Date(row.lastSyncedAt).getTime() : undefined,
+                  accessorFn: (row: InstrumentRepo) => {
+                    return row.lastSyncedAt ? new Date(row.lastSyncedAt).getTime() : undefined;
+                  },
                   cell: (ctx) => {
                     const lastSyncedAt = ctx.getValue<null | number | undefined>();
                     return lastSyncedAt ? new Date(lastSyncedAt).toLocaleDateString() : '-';

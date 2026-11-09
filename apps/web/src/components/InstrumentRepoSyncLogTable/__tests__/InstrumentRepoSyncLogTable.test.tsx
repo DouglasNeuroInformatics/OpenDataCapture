@@ -167,8 +167,9 @@ describe('InstrumentRepoSyncLogTable', () => {
     expect(within(rows()[0]!).getByText('Newer')).toBeTruthy();
   });
 
-  const headerButton = (name: string) =>
-    within(screen.getByTestId('data-table-head')).getByText(name).closest('button')!;
+  const headerButton = (name: string) => {
+    return within(screen.getByTestId('data-table-head')).getByText(name).closest('button')!;
+  };
 
   it('should ask for the other order when the date header is clicked, rather than sort the page', () => {
     const onSortChange = vi.fn();
