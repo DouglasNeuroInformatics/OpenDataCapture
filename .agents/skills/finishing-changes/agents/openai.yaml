@@ -1,3 +1,3 @@
 interface:
-  display_name: 'ODC Done'
+  display_name: 'Finishing Changes'
   short_description: 'Close out a change before committing or opening a PR'

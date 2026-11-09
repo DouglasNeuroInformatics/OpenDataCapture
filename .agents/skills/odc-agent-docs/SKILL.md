@@ -56,13 +56,13 @@ always loaded.
 
 ## Tables that move together
 
-| You changed                             | These move with it                                                                                                                                |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| a workspace added, renamed or moved     | `workspace-map.md` (section table, Built vs source-only, Published to npm), root `AGENTS.md` "Where to look", the new `AGENTS.md` and its symlink |
-| a vitest project added or removed       | `testing-strategy.md` Vitest projects table, its count and its "no unit tests" list; `workspace-map.md` `Vitest project` column; `## Tests`       |
-| a new playbook                          | root `AGENTS.md` "Step-by-step playbooks"                                                                                                         |
-| a new architecture doc                  | root `AGENTS.md` "Deeper reference, read on demand"                                                                                               |
-| a new `.agents/docs/packages/<name>.md` | `.agents/docs/packages/index.md` (`Docs` link, fidelity table)                                                                                    |
+| You changed                             | These move with it                                                                                                                                       |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| a workspace added, renamed or moved     | `workspace-map.md` (section table, Built vs source-only, Published to npm), `.agents/docs/index.md` "Where to look", the new `AGENTS.md` and its symlink |
+| a vitest project added or removed       | `testing-strategy.md` Vitest projects table, its count and its "no unit tests" list; `workspace-map.md` `Vitest project` column; `## Tests`              |
+| a new playbook                          | `.agents/docs/index.md` "Step-by-step playbooks"                                                                                                         |
+| a new architecture doc                  | `.agents/docs/index.md` "Deeper reference, read on demand"                                                                                               |
+| a new `.agents/docs/packages/<name>.md` | `.agents/docs/packages/index.md` (`Docs` link, fidelity table)                                                                                           |
 
 **Done when** a grep for each fact you wrote finds one statement and any number of pointers, every path you
 cited resolves, every table in the row you triggered is updated, and any `AGENTS.md` your change contradicts
