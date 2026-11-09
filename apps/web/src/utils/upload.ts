@@ -95,7 +95,10 @@ const ZOD_TYPE_NAMES = [
   'ZodEnum',
   'ZodArray',
   'ZodObject',
-  'ZodEffects'
+  'ZodEffects',
+  'ZodLiteral',
+  'ZodNativeEnum',
+  'ZodUnion'
 ] as const;
 
 type UploadErrorDescription = { [L in Language]?: string };
@@ -144,6 +147,51 @@ function locateUploadError(error: UploadError, { column, row }: { column: string
       })
     )
   );
+}
+
+type LiteralOption = boolean | number | string;
+
+function toLiteralOption(value: unknown): LiteralOption {
+  if (typeof value === 'boolean' || typeof value === 'number' || typeof value === 'string') {
+    return value;
+  }
+  throw new UploadError({
+    en: `Unsupported literal value '${String(value)}' of type '${typeof value}'`,
+    es: `Valor literal no compatible '${String(value)}' de tipo '${typeof value}'`,
+    fr: `Valeur littérale non prise en charge '${String(value)}' de type '${typeof value}'`
+  });
+}
+
+// A numeric TypeScript enum also maps each value back to its name, and those reverse entries are not values.
+function enumLikeValues(entries: { [key: string]: number | string }): (number | string)[] {
+  const numericValues = new Set(Object.values(entries).filter((value) => typeof value === 'number'));
+  return Object.entries(entries)
+    .filter(([key]) => !numericValues.has(Number(key)))
+    .map(([, value]) => value);
+}
+
+function nonLiteralUnionError() {
+  return new UploadError({
+    en: 'Unsupported Zod union: every member must be a literal value',
+    es: 'Unión de Zod no compatible: cada miembro debe ser un valor literal',
+    fr: 'Union Zod non prise en charge : chaque membre doit être une valeur littérale'
+  });
+}
+
+function formatOptions(options: readonly LiteralOption[]) {
+  return options.join('/');
+}
+
+function parseOptionEntry(entry: string, options: readonly LiteralOption[]): LiteralOption {
+  const selectedOption = options.find((option) => String(option) === entry);
+  if (selectedOption === undefined) {
+    throw new UploadError({
+      en: `Invalid value '${entry}': expected one of ${formatOptions(options)}`,
+      es: `Valor no válido '${entry}': se esperaba uno de ${formatOptions(options)}`,
+      fr: `Valeur invalide '${entry}' : une des valeurs ${formatOptions(options)} était attendue`
+    });
+  }
+  return selectedOption;
 }
 
 function sampleDataForColumn(column: string, generateSampleData: () => string): string {
@@ -232,13 +280,21 @@ export namespace Zod3 {
 
   type ZodObjectArrayDef = z3.ZodArrayDef & { type: z3.AnyZodObject };
 
-  export type ZodTypeNameResult = {
-    enumValues?: readonly string[];
-    isOptional: boolean;
-    multiKeys?: string[];
-    multiValues?: ZodTypeNameResult[];
-    typeName: RequiredZodTypeName;
-  };
+  type OptionZodTypeName = Extract<RequiredZodTypeName, 'ZodEnum' | 'ZodLiteral' | 'ZodNativeEnum' | 'ZodUnion'>;
+
+  export type ZodTypeNameResult =
+    | {
+        enumValues: readonly LiteralOption[];
+        isOptional: boolean;
+        typeName: OptionZodTypeName;
+      }
+    | {
+        enumValues?: readonly string[];
+        isOptional: boolean;
+        multiKeys?: string[];
+        multiValues?: ZodTypeNameResult[];
+        typeName: Exclude<RequiredZodTypeName, OptionZodTypeName>;
+      };
 
   function isZodEffects(value: unknown): value is z3.ZodEffects<z3.ZodType> {
     return isObjectLike(value) && value.constructor.name === 'ZodEffects';
@@ -268,6 +324,18 @@ export namespace Zod3 {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodEnum;
   }
 
+  function isZodNativeEnumDef(def: AnyZodTypeDef): def is z3.ZodNativeEnumDef {
+    return def.typeName === z3.ZodFirstPartyTypeKind.ZodNativeEnum;
+  }
+
+  function isZodLiteralDef(def: AnyZodTypeDef): def is z3.ZodLiteralDef<unknown> {
+    return def.typeName === z3.ZodFirstPartyTypeKind.ZodLiteral;
+  }
+
+  function isZodUnionDef(def: AnyZodTypeDef): def is z3.ZodUnionDef {
+    return def.typeName === z3.ZodFirstPartyTypeKind.ZodUnion;
+  }
+
   function isZodSetDef(def: AnyZodTypeDef): def is z3.ZodSetDef {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodSet;
   }
@@ -282,6 +350,14 @@ export namespace Zod3 {
 
   function isZodEffectsDef(def: AnyZodTypeDef): def is z3.ZodEffectsDef {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodEffects;
+  }
+
+  function literalValueOfUnionOption(option: z3.ZodTypeAny): LiteralOption {
+    const def: unknown = option._def;
+    if (!(isZodTypeDef(def) && isZodLiteralDef(def))) {
+      throw nonLiteralUnionError();
+    }
+    return toLiteralOption(def.value);
   }
 
   function interpretZodArray(def: ZodObjectArrayDef, isOptional?: boolean): ZodTypeNameResult {
@@ -320,6 +396,24 @@ export namespace Zod3 {
         isOptional: Boolean(isOptional),
         typeName: def.typeName
       };
+    } else if (isZodNativeEnumDef(def)) {
+      return {
+        enumValues: enumLikeValues(def.values),
+        isOptional: Boolean(isOptional),
+        typeName: def.typeName
+      };
+    } else if (isZodLiteralDef(def)) {
+      return {
+        enumValues: [toLiteralOption(def.value)],
+        isOptional: Boolean(isOptional),
+        typeName: def.typeName
+      };
+    } else if (isZodUnionDef(def)) {
+      return {
+        enumValues: def.options.map(literalValueOfUnionOption),
+        isOptional: Boolean(isOptional),
+        typeName: def.typeName
+      };
     } else if (isZodObjectArrayDef(def)) {
       return interpretZodArray(def, isOptional);
     } else if (isZodSetDef(def)) {
@@ -340,28 +434,28 @@ export namespace Zod3 {
     }
     return {
       isOptional: Boolean(isOptional),
-      typeName: def.typeName satisfies ZodTypeName as RequiredZodTypeName
+      typeName: def.typeName satisfies ZodTypeName as Exclude<RequiredZodTypeName, OptionZodTypeName>
     };
   }
 
-  export function generateSampleData({
-    enumValues,
-    isOptional,
-    multiKeys,
-    multiValues,
-    typeName
-  }: ZodTypeNameResult): string {
+  export function generateSampleData(result: ZodTypeNameResult): string {
+    const { isOptional, typeName } = result;
     switch (typeName) {
       case 'ZodBoolean':
         return formatOptionalEntry('true/false', isOptional);
       case 'ZodDate':
         return formatOptionalEntry('yyyy-mm-dd', isOptional);
+      case 'ZodEnum':
+      case 'ZodLiteral':
+      case 'ZodNativeEnum':
+      case 'ZodUnion':
+        return formatOptionalEntry(formatOptions(result.enumValues), isOptional);
       case 'ZodNumber':
         return formatOptionalEntry('number', isOptional);
       case 'ZodSet':
         try {
-          if (enumValues) {
-            return formatOptionalEntry(`SET(${enumValues.join('/')}, ...)`, isOptional);
+          if (result.enumValues) {
+            return formatOptionalEntry(`SET(${result.enumValues.join('/')}, ...)`, isOptional);
           }
           return formatOptionalEntry('SET(a,b,c)', isOptional);
         } catch {
@@ -372,29 +466,10 @@ export namespace Zod3 {
         }
       case 'ZodString':
         return formatOptionalEntry('string', isOptional);
-      case 'ZodEnum':
-        try {
-          let possibleEnumOutputs = '';
-          if (!enumValues) {
-            throw new UploadError({
-              en: 'Enum values do not exist',
-              fr: `Values d'Enum n'existe pas`
-            });
-          }
-          for (const val of enumValues) {
-            possibleEnumOutputs += `${val}/`;
-          }
-          possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
-          return formatOptionalEntry(possibleEnumOutputs, isOptional);
-        } catch {
-          throw new UploadError({
-            en: 'Invalid Enum error',
-            fr: 'Erreur Enum invalide'
-          });
-        }
       case 'ZodArray':
       case 'ZodObject':
         try {
+          const { multiKeys, multiValues } = result;
           let multiString = 'RECORD_ARRAY( ';
           if (!(multiValues && multiKeys)) {
             throw new UploadError({
@@ -432,10 +507,12 @@ export namespace Zod3 {
     if (entry === '' && convertResult.isOptional) {
       return undefined;
     }
-    switch (convertResult.typeName) {
+    const { typeName } = convertResult;
+    switch (typeName) {
       case 'ZodArray':
-      case 'ZodObject':
-        if (!convertResult.multiKeys || !convertResult.multiValues) {
+      case 'ZodObject': {
+        const { multiKeys, multiValues } = convertResult;
+        if (!multiKeys || !multiValues) {
           throw new UploadError({
             en: 'Record Array keys or values do not exist',
             fr: "Les clés ou valeurs du tableau d'enregistrements n'existent pas"
@@ -444,21 +521,25 @@ export namespace Zod3 {
 
         return extractRecordArrayEntry(entry).map((parsedRecord) => {
           const result: { [key: string]: unknown } = {};
-          convertResult.multiKeys!.forEach((key, index) => {
+          multiKeys.forEach((key, index) => {
             const rawValue = parsedRecord[key];
             if (rawValue !== undefined) {
-              result[key] = interpretZodConvertResult(convertResult.multiValues![index]!, rawValue);
+              result[key] = interpretZodConvertResult(multiValues[index]!, rawValue);
             }
           });
           return result;
         });
+      }
 
       case 'ZodBoolean':
         return parseBooleanEntry(entry);
       case 'ZodDate':
         return parseDateEntry(entry);
       case 'ZodEnum':
-        return entry;
+      case 'ZodLiteral':
+      case 'ZodNativeEnum':
+      case 'ZodUnion':
+        return parseOptionEntry(entry, convertResult.enumValues);
       case 'ZodNumber':
         return parseNumberEntry(entry);
       case 'ZodSet':
@@ -466,7 +547,7 @@ export namespace Zod3 {
       case 'ZodString':
         return entry;
       default:
-        throw UnexpectedZodTypeError.forTypeName(convertResult.typeName);
+        throw UnexpectedZodTypeError.forTypeName(typeName);
     }
   }
 
@@ -656,12 +737,12 @@ export namespace Zod3 {
 export namespace Zod4 {
   type TypeName = Extract<
     z4.core.$ZodTypeDef['type'],
-    'array' | 'boolean' | 'date' | 'enum' | 'number' | 'object' | 'optional' | 'set' | 'string'
+    'array' | 'boolean' | 'date' | 'enum' | 'literal' | 'number' | 'object' | 'optional' | 'set' | 'string' | 'union'
   >;
 
   type BaseZodConvertResult = {
     isOptional: boolean;
-    typeName: Exclude<TypeName, 'array' | 'enum' | 'object' | 'set'>;
+    typeName: Exclude<TypeName, 'array' | 'enum' | 'literal' | 'object' | 'set' | 'union'>;
   };
 
   type ArrayZodConvertResult = Merge<
@@ -675,8 +756,8 @@ export namespace Zod4 {
   type EnumZodConvertResult = Merge<
     BaseZodConvertResult,
     {
-      enumValues: readonly string[];
-      typeName: 'enum';
+      enumValues: readonly LiteralOption[];
+      typeName: 'enum' | 'literal' | 'union';
     }
   >;
 
@@ -700,6 +781,13 @@ export namespace Zod4 {
 
   type ZodConvertResult =
     ArrayZodConvertResult | BaseZodConvertResult | EnumZodConvertResult | ObjectZodConvertResult | SetZodConvertResult;
+
+  function literalValuesOfUnionOption(option: unknown): LiteralOption[] {
+    if (!(option instanceof z4.ZodLiteral)) {
+      throw nonLiteralUnionError();
+    }
+    return option.def.values.map(toLiteralOption);
+  }
 
   function parseZodSchema(schema: unknown, isOptional = false): ZodConvertResult {
     switch (true) {
@@ -732,7 +820,19 @@ export namespace Zod4 {
         };
       case schema instanceof z4.ZodEnum:
         return {
-          enumValues: schema.options.map(String),
+          enumValues: enumLikeValues(schema.def.entries),
+          isOptional,
+          typeName: schema.def.type
+        };
+      case schema instanceof z4.ZodLiteral:
+        return {
+          enumValues: schema.def.values.map(toLiteralOption),
+          isOptional,
+          typeName: schema.def.type
+        };
+      case schema instanceof z4.ZodUnion:
+        return {
+          enumValues: schema.def.options.flatMap(literalValuesOfUnionOption),
           isOptional,
           typeName: schema.def.type
         };
@@ -784,7 +884,9 @@ export namespace Zod4 {
       case 'date':
         return parseDateEntry(entry);
       case 'enum':
-        return entry;
+      case 'literal':
+      case 'union':
+        return parseOptionEntry(entry, convertResult.enumValues);
       case 'number':
         return parseNumberEntry(entry);
       case 'set':
@@ -805,14 +907,10 @@ export namespace Zod4 {
         return formatOptionalEntry('true/false', convertResult.isOptional);
       case 'date':
         return formatOptionalEntry('yyyy-mm-dd', convertResult.isOptional);
-      case 'enum': {
-        let possibleEnumOutputs = '';
-        for (const val of convertResult.enumValues) {
-          possibleEnumOutputs += `${val}/`;
-        }
-        possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
-        return formatOptionalEntry(possibleEnumOutputs, convertResult.isOptional);
-      }
+      case 'enum':
+      case 'literal':
+      case 'union':
+        return formatOptionalEntry(formatOptions(convertResult.enumValues), convertResult.isOptional);
       case 'number':
         return formatOptionalEntry('number', convertResult.isOptional);
       case 'object': {

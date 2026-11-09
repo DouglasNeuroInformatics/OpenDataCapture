@@ -46,6 +46,9 @@ function expectRejection(promise: Promise<unknown>, en: string) {
   return expect(promise).rejects.toMatchObject({ description: { en } });
 }
 
+/** A numeric enum as TypeScript compiles it: every value is also mapped back to its name. */
+const Severity = { 0: 'Mild', 1: 'Severe', Mild: 0, Severe: 1 } as const;
+
 let consoleError: ReturnType<typeof vi.spyOn>;
 
 describe('Zod3', () => {
@@ -107,6 +110,56 @@ describe('Zod3', () => {
         enumValues: ['a', 'b', 'c'],
         isOptional: false,
         typeName: 'ZodSet'
+      });
+    });
+
+    it('should read a literal as its one allowed value', () => {
+      expect(Zod3.getZodTypeName(z3.literal(7))).toStrictEqual({
+        enumValues: [7],
+        isOptional: false,
+        typeName: 'ZodLiteral'
+      });
+    });
+
+    it('should read a union of literals as its allowed values, keeping their types', () => {
+      expect(
+        Zod3.getZodTypeName(z3.union([z3.literal(0), z3.literal('n/a'), z3.literal(true)]).optional())
+      ).toStrictEqual({ enumValues: [0, 'n/a', true], isOptional: true, typeName: 'ZodUnion' });
+    });
+
+    it('should read the values of a numeric native enum without its reverse mappings', () => {
+      expect(Zod3.getZodTypeName(z3.nativeEnum(Severity))).toStrictEqual({
+        enumValues: [0, 1],
+        isOptional: false,
+        typeName: 'ZodNativeEnum'
+      });
+    });
+
+    it('should read the values of a string native enum', () => {
+      expect(Zod3.getZodTypeName(z3.nativeEnum({ Left: 'left', Right: 'right' }))).toMatchObject({
+        enumValues: ['left', 'right']
+      });
+    });
+
+    it('should reject a union with a member that is not a literal, since a cell could not say which member it is', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.union([z3.literal(1), z3.string()])))).toStrictEqual({
+        en: 'Unsupported Zod union: every member must be a literal value',
+        es: 'Unión de Zod no compatible: cada miembro debe ser un valor literal',
+        fr: 'Union Zod non prise en charge : chaque membre doit être une valeur littérale'
+      });
+    });
+
+    it('should reject a union with a member of a type it does not know', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.union([z3.literal(1), z3.null()])))).toMatchObject({
+        en: 'Unsupported Zod union: every member must be a literal value'
+      });
+    });
+
+    it('should reject a literal that a cell cannot express', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.literal(null)))).toStrictEqual({
+        en: "Unsupported literal value 'null' of type 'object'",
+        es: "Valor literal no compatible 'null' de tipo 'object'",
+        fr: "Valeur littérale non prise en charge 'null' de type 'object'"
       });
     });
 
@@ -196,10 +249,13 @@ describe('Zod3', () => {
       );
     });
 
-    it('should reject an enum without values', () => {
-      expect(uploadErrorOf(() => Zod3.generateSampleData({ isOptional: false, typeName: 'ZodEnum' }))).toMatchObject({
-        en: 'Invalid Enum error'
-      });
+    it.each([
+      ['a literal', z3.literal('only'), 'only'],
+      ['a union of literals', z3.union([z3.literal(0), z3.literal(1), z3.literal(2)]), '0/1/2'],
+      ['a native enum', z3.nativeEnum(Severity), '0/1'],
+      ['an optional union of literals', z3.union([z3.literal(0), z3.literal(1)]).optional(), '0/1 (optional)']
+    ])('should list the allowed values of %s', (_, schema, sample) => {
+      expect(Zod3.generateSampleData(Zod3.getZodTypeName(schema))).toBe(sample);
     });
 
     it('should describe every field of a record array, separated by commas', () => {
@@ -529,7 +585,59 @@ describe('Zod3', () => {
       ]);
       await expectRejection(
         processInstrumentCSV(file, instrumentWith(z3.object({ big: z3.literal(1n) }))),
-        "Unsupported Zod type 'ZodLiteral' at column name: 'big' and row number '1'"
+        "Unsupported literal value '1' of type 'bigint' at column name: 'big' and row number '1'"
+      );
+    });
+
+    it('should convert a cell to the literal it names, with the type the schema declares', async () => {
+      const instrument = instrumentWith(
+        z3.object({
+          putbacks: z3.union([z3.literal(0), z3.literal(1), z3.literal(2), z3.literal(3)]),
+          retries: z3.union([z3.literal(0), z3.literal(1)]).optional(),
+          severity: z3.nativeEnum(Severity),
+          side: z3.literal('left')
+        })
+      );
+      const file = csvFile([
+        ['subjectID', 'date', 'putbacks', 'retries', 'severity', 'side'],
+        ['subject1', '2024-01-01', '2', '', '1', 'left']
+      ]);
+      await expect(processInstrumentCSV(file, instrument)).resolves.toStrictEqual([
+        {
+          date: new Date('2024-01-01'),
+          putbacks: 2,
+          retries: undefined,
+          severity: 1,
+          side: 'left',
+          subjectID: 'subject1'
+        }
+      ]);
+    });
+
+    it('should reject a value outside the allowed literals, naming them with the column and row', async () => {
+      const instrument = instrumentWith(z3.object({ putbacks: z3.union([z3.literal(0), z3.literal(1)]) }));
+      const file = csvFile([
+        ['subjectID', 'date', 'putbacks'],
+        ['subject1', '2024-01-01', '0'],
+        ['subject2', '2024-01-01', '7']
+      ]);
+      await expect(processInstrumentCSV(file, instrument)).rejects.toMatchObject({
+        description: {
+          en: "Invalid value '7': expected one of 0/1 at column name: 'putbacks' and row number '2'",
+          es: "Valor no válido '7': se esperaba uno de 0/1 en la columna: 'putbacks' y el número de fila '2'",
+          fr: "Valeur invalide '7' : une des valeurs 0/1 était attendue au nom de colonne : 'putbacks' et numéro de ligne '2'"
+        }
+      });
+    });
+
+    it('should reject an enum value outside its options by column and row, rather than as a schema failure', async () => {
+      const file = csvFile([
+        ['subjectID', 'date', 'choice'],
+        ['subject1', '2024-01-01', 'c']
+      ]);
+      await expectRejection(
+        processInstrumentCSV(file, instrumentWith(z3.object({ choice: z3.enum(['a', 'b']) }))),
+        "Invalid value 'c': expected one of a/b at column name: 'choice' and row number '1'"
       );
     });
 
@@ -548,11 +656,11 @@ describe('Zod3', () => {
 
     it('should reject a row the instrument schema does not accept', async () => {
       const file = csvFile([
-        ['subjectID', 'date', 'choice'],
-        ['subject1', '2024-01-01', 'c']
+        ['subjectID', 'date', 'score'],
+        ['subject1', '2024-01-01', '11']
       ]);
       await expectRejection(
-        processInstrumentCSV(file, instrumentWith(z3.object({ choice: z3.enum(['a', 'b']) }))),
+        processInstrumentCSV(file, instrumentWith(z3.object({ score: z3.number().max(10) }))),
         'Schema parsing failed: refer to the browser console for further details'
       );
     });
@@ -607,6 +715,19 @@ describe('Zod3', () => {
           processItems('RECORD_ARRAY(name:item1,quantity)'),
           "Malformed record at index 1 at column name: 'items' and row number '1'"
         );
+      });
+
+      it('should convert a literal field of a record to the literal it names', async () => {
+        const file = csvFile([
+          ['subjectID', 'date', 'trials'],
+          ['subject1', '2024-01-01', 'RECORD_ARRAY(arena:2;arena:4;)']
+        ]);
+        const schema = z3.object({
+          trials: z3.array(z3.object({ arena: z3.union([z3.literal(1), z3.literal(2), z3.literal(4)]) }))
+        });
+        await expect(processInstrumentCSV(file, instrumentWith(schema))).resolves.toMatchObject([
+          { trials: [{ arena: 2 }, { arena: 4 }] }
+        ]);
       });
     });
   });
@@ -737,6 +858,35 @@ describe('Zod4', () => {
       });
     });
 
+    it('should list the allowed values of literal, literal union and native enum fields', () => {
+      const schema = z4.object({
+        arena: z4.union([z4.literal(1), z4.literal(2), z4.literal([3, 4])]),
+        retries: z4.union([z4.literal(0), z4.literal(1)]).optional(),
+        severity: z4.nativeEnum(Severity),
+        side: z4.literal('left')
+      });
+      expect(createUploadTemplateCSV(instrumentWith(schema)).content).toBe(
+        unparse([
+          ['subjectID', 'date', 'arena', 'retries', 'severity', 'side'],
+          ['string', 'yyyy-mm-dd', '1/2/3/4', '0/1 (optional)', '0/1', 'left']
+        ])
+      );
+    });
+
+    it('should reject a union with a member that is not a literal, since a cell could not say which member it is', () => {
+      const schema = z4.object({ mixed: z4.union([z4.literal(1), z4.string()]) });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toMatchObject({
+        en: "Unsupported Zod union: every member must be a literal value at column name: 'mixed'"
+      });
+    });
+
+    it('should reject a literal that a cell cannot express', () => {
+      const schema = z4.object({ nothing: z4.literal(null) });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toMatchObject({
+        en: "Unsupported literal value 'null' of type 'object' at column name: 'nothing'"
+      });
+    });
+
     it('should reject a schema that is not an object', () => {
       expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(z4.string())))).toMatchObject({
         en: 'Expected schema to be instance of ZodObject'
@@ -822,6 +972,46 @@ describe('Zod4', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]?.status).toBe('active');
+    });
+
+    it('should convert a cell to the literal it names, with the type the schema declares', async () => {
+      const instrument = instrumentWith(
+        z4.object({
+          arena: z4.union([z4.literal(1), z4.literal(2), z4.literal(3), z4.literal(4)]),
+          retries: z4.union([z4.literal(0), z4.literal(1)]).optional(),
+          severity: z4.nativeEnum(Severity),
+          side: z4.literal('left')
+        })
+      );
+      const file = csvFile([
+        ['subjectID', 'date', 'arena', 'retries', 'severity', 'side'],
+        ['subject1', '2024-01-01', '3', '', '1', 'left']
+      ]);
+      await expect(processInstrumentCSV(file, instrument)).resolves.toStrictEqual([
+        { arena: 3, date: new Date('2024-01-01'), retries: undefined, severity: 1, side: 'left', subjectID: 'subject1' }
+      ]);
+    });
+
+    it('should reject a value outside the allowed literals, naming them with the column and row', async () => {
+      const file = csvFile([
+        ['subjectID', 'date', 'arena'],
+        ['subject1', '2024-01-01', '5']
+      ]);
+      await expectRejection(
+        processInstrumentCSV(file, instrumentWith(z4.object({ arena: z4.union([z4.literal(1), z4.literal(2)]) }))),
+        "Invalid value '5': expected one of 1/2 at column name: 'arena' and row number '1'"
+      );
+    });
+
+    it('should reject an enum value outside its options by column and row, rather than as a schema failure', async () => {
+      const file = csvFile([
+        ['subjectID', 'date', 'level'],
+        ['subject1', '2024-01-01', 'medium']
+      ]);
+      await expectRejection(
+        processInstrumentCSV(file, instrumentWith(z4.object({ level: z4.enum(['low', 'high']) }))),
+        "Invalid value 'medium': expected one of low/high at column name: 'level' and row number '1'"
+      );
     });
 
     it('should process array of objects', async () => {
@@ -999,11 +1189,11 @@ describe('Zod4', () => {
 
     it('should reject a row the instrument schema does not accept', async () => {
       const file = csvFile([
-        ['subjectID', 'date', 'level'],
-        ['subject1', '2024-01-01', 'medium']
+        ['subjectID', 'date', 'score'],
+        ['subject1', '2024-01-01', '11']
       ]);
       await expectRejection(
-        processInstrumentCSV(file, instrumentWith(z4.object({ level: z4.enum(['low', 'high']) }))),
+        processInstrumentCSV(file, instrumentWith(z4.object({ score: z4.number().max(10) }))),
         'Schema parsing failed: refer to the browser console for further details'
       );
     });
