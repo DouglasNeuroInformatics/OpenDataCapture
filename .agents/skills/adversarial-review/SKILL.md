@@ -37,10 +37,11 @@ When the prosecutor returned anything but `NONE`, spawn one sub-agent with its o
 
 ## 4. Report
 
-Reply with the `CONFIRMED` findings only, worst first, one line each, and nothing else:
+Reply with the `CONFIRMED` findings only, worst first, one line each under the prosecutor's number, and
+nothing else:
 
 ```
-<path>:<line> — <claim> — <fix>
+<n>. <path>:<line> — <claim> — <fix>
 ```
 
 `CLEAN` when nothing survived. A refuted finding is not mentioned.

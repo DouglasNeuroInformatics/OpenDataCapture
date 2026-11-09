@@ -42,6 +42,11 @@ with `.agents/skills/opening-issues/SKILL.md` and name the issue in your reply.
 7. **Re-read the `AGENTS.md` of every package or app you modified** and confirm your change does not
    contradict it. If it does, revise the change, or propose the smallest `AGENTS.md` edit and wait for the
    user's approval (root `AGENTS.md` hard rule); `.agents/skills/writing-agent-docs/SKILL.md` has the house format.
+8. **Before opening a PR, or pushing a follow-up that adds code to one, run
+   `.agents/skills/adversarial-review/SKILL.md`** on the green branch. Fix, or decline with a reason, every confirmed finding,
+   then repeat from step 1; review again only when the fixes added code beyond what the findings named.
+   Then open or update the PR with `.agents/skills/opening-pr/SKILL.md`, which carries the review's
+   result.
 
 **Done when** your reply lists every exception, including any row above you took on trust, or states that
 every check ran green.
