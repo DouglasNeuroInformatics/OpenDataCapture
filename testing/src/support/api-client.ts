@@ -1,4 +1,8 @@
-import type { $CreateAssignmentData, Assignment } from '@opendatacapture/schemas/assignment';
+import type {
+  $CreateAssignmentData,
+  Assignment,
+  DeleteBulkAssignmentsResult
+} from '@opendatacapture/schemas/assignment';
 import { AUDIT_LOGS_MAX_PAGE_SIZE } from '@opendatacapture/schemas/audit';
 import type { $AuditLog, $AuditLogsPage, AuditedAction, AuditedEntity } from '@opendatacapture/schemas/audit';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
@@ -211,6 +215,15 @@ export class ApiClient {
       'create user'
     );
     return { credentials: { password, username }, user };
+  }
+
+  /** Deletes assignments through the bulk route the web app's assignment table uses. */
+  async deleteAssignments(ids: string[]): Promise<DeleteBulkAssignmentsResult> {
+    return this.expectJson<DeleteBulkAssignmentsResult>(
+      this.request.post(`${API}/assignments/bulk/delete`, { data: { ids }, headers: this.authHeaders }),
+      200,
+      'delete assignments'
+    );
   }
 
   /**

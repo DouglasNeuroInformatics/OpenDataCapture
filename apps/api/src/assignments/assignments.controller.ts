@@ -91,9 +91,9 @@ export class AssignmentsController {
   @RouteAccess({ action: 'delete', subject: 'Assignment' })
   deleteBulk(
     @Body() data: $DeleteBulkAssignmentsData,
-    @CurrentUser('ability') ability?: AppAbility
+    @CurrentUser() currentUser: RequestUser
   ): Promise<DeleteBulkAssignmentsResult> {
-    return this.assignmentsService.deleteBulk(data.ids, { ability });
+    return this.assignmentsService.deleteBulk(data.ids, currentUser);
   }
 
   @ApiOperation({ summary: 'Get All Assignments' })

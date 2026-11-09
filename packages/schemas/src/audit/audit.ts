@@ -28,7 +28,7 @@ export type AuditedAction<TEntity extends AuditedEntity = AuditedEntity> = (type
  * stored rows hold.
  */
 export const AUDITED_ACTIONS = {
-  ASSIGNMENT: ['CREATE', 'SEND_EMAIL', 'UPDATE'],
+  ASSIGNMENT: ['CREATE', 'DELETE', 'SEND_EMAIL', 'UPDATE'],
   INSTRUMENT: ['ARCHIVE', 'UNARCHIVE'],
   USER: ['ARCHIVE', 'CREATE', 'LOGIN', 'UNARCHIVE', 'UPDATE']
 } as const satisfies { [TEntity in $AuditLogEntity]?: readonly $AuditLogAction[] };

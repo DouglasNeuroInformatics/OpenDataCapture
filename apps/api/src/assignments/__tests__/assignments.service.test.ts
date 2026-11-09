@@ -16,7 +16,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AuditLogger } from '@/audit/audit.logger';
 import { AbilityFactory } from '@/auth/ability.factory';
-import { createAppAbility } from '@/auth/ability.utils';
+import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 import { GatewayService } from '@/gateway/gateway.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 
@@ -519,7 +519,7 @@ describe('AssignmentsService', () => {
         { id: 'a-2', status: 'OUTSTANDING' }
       ]);
       assignmentModel.delete.mockResolvedValue({});
-      const result = await assignmentsService.deleteBulk(['a-1', 'a-2'], { ability: permissiveUser().ability });
+      const result = await assignmentsService.deleteBulk(['a-1', 'a-2'], permissiveUser());
       expect(result).toEqual({ deletedCount: 2, failedIds: [] });
       expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledTimes(2);
       expect(assignmentModel.delete).toHaveBeenCalledTimes(2);
@@ -528,7 +528,7 @@ describe('AssignmentsService', () => {
     it('should skip the gateway call for expired assignments, since their links are already dead', async () => {
       assignmentModel.findMany.mockResolvedValueOnce([{ id: 'a-1', status: 'EXPIRED' }]);
       assignmentModel.delete.mockResolvedValue({});
-      const result = await assignmentsService.deleteBulk(['a-1'], { ability: permissiveUser().ability });
+      const result = await assignmentsService.deleteBulk(['a-1'], permissiveUser());
       expect(result).toEqual({ deletedCount: 1, failedIds: [] });
       expect(gatewayService.deleteRemoteAssignment).not.toHaveBeenCalled();
       expect(assignmentModel.delete).toHaveBeenCalledTimes(1);
@@ -541,14 +541,14 @@ describe('AssignmentsService', () => {
       ]);
       gatewayService.deleteRemoteAssignment.mockRejectedValueOnce(new Error('gateway down'));
       assignmentModel.delete.mockResolvedValue({});
-      const result = await assignmentsService.deleteBulk(['a-1', 'a-2'], { ability: permissiveUser().ability });
+      const result = await assignmentsService.deleteBulk(['a-1', 'a-2'], permissiveUser());
       expect(result.deletedCount).toBe(1);
       expect(result.failedIds).toEqual(['a-1']);
     });
 
     it('should only find assignments with OUTSTANDING or EXPIRED status', async () => {
       assignmentModel.findMany.mockResolvedValueOnce([]);
-      await assignmentsService.deleteBulk(['a-1'], { ability: permissiveUser().ability });
+      await assignmentsService.deleteBulk(['a-1'], permissiveUser());
       expect(assignmentModel.findMany.mock.lastCall?.[0]).toMatchObject({
         where: { id: { in: ['a-1'] }, status: { in: ['OUTSTANDING', 'EXPIRED'] } }
       });
@@ -558,17 +558,40 @@ describe('AssignmentsService', () => {
       const failure = new Error('gateway down');
       assignmentModel.findMany.mockResolvedValueOnce([{ id: 'a-1', status: 'OUTSTANDING' }]);
       gatewayService.deleteRemoteAssignment.mockRejectedValueOnce(failure);
-      await assignmentsService.deleteBulk(['a-1'], { ability: permissiveUser().ability });
+      await assignmentsService.deleteBulk(['a-1'], permissiveUser());
       expect(loggingService.error).toHaveBeenCalledExactlyOnceWith({
         error: failure,
         message: 'Failed to delete assignment a-1'
       });
     });
 
-    it('should apply no ability restriction for an internal caller that passes none', async () => {
+    it('should scope the assignments it deletes to the caller ability', async () => {
+      const user = userAt('GROUP_MANAGER');
       assignmentModel.findMany.mockResolvedValueOnce([]);
-      await assignmentsService.deleteBulk(['a-1']);
-      expect(assignmentModel.findMany.mock.lastCall?.[0]?.where?.AND).toStrictEqual([{}]);
+      await assignmentsService.deleteBulk(['a-1'], user);
+      expect(assignmentModel.findMany.mock.lastCall?.[0]?.where?.AND).toStrictEqual([
+        accessibleQuery(user.ability, 'delete', 'Assignment')
+      ]);
+    });
+
+    it('should record each deleted assignment in its own group, so the group filter finds it', async () => {
+      assignmentModel.findMany.mockResolvedValueOnce([
+        { groupId: GROUP_ID, id: 'a-1', status: 'EXPIRED' },
+        { groupId: null, id: 'a-2', status: 'EXPIRED' }
+      ]);
+      assignmentModel.delete.mockResolvedValue({});
+      await assignmentsService.deleteBulk(['a-1', 'a-2'], permissiveUser());
+      expect(auditLogger.log.mock.calls).toEqual([
+        ['DELETE', 'ASSIGNMENT', { groupId: GROUP_ID, metadata: { assignmentId: 'a-1' }, userId: 'user-1' }],
+        ['DELETE', 'ASSIGNMENT', { groupId: null, metadata: { assignmentId: 'a-2' }, userId: 'user-1' }]
+      ]);
+    });
+
+    it('should record no deletion for an assignment that failed to delete', async () => {
+      assignmentModel.findMany.mockResolvedValueOnce([{ groupId: GROUP_ID, id: 'a-1', status: 'OUTSTANDING' }]);
+      gatewayService.deleteRemoteAssignment.mockRejectedValueOnce(new Error('gateway down'));
+      await assignmentsService.deleteBulk(['a-1'], permissiveUser());
+      expect(auditLogger.log).not.toHaveBeenCalled();
     });
   });
 

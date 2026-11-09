@@ -89,15 +89,11 @@ describe('AssignmentsController', () => {
   });
 
   describe('deleteBulk', () => {
-    it('should forward the requested ids with the caller ability, so the service can scope the deletion', async () => {
+    it('should forward the requested ids with the current user, so the service can scope and record the deletion', async () => {
       const result = { deletedCount: 2, failedIds: [] };
       assignmentsService.deleteBulk.mockResolvedValueOnce(result);
-      await expect(assignmentsController.deleteBulk({ ids: ['a-1', 'a-2'] }, currentUser.ability)).resolves.toBe(
-        result
-      );
-      expect(assignmentsService.deleteBulk).toHaveBeenCalledExactlyOnceWith(['a-1', 'a-2'], {
-        ability: currentUser.ability
-      });
+      await expect(assignmentsController.deleteBulk({ ids: ['a-1', 'a-2'] }, currentUser)).resolves.toBe(result);
+      expect(assignmentsService.deleteBulk).toHaveBeenCalledExactlyOnceWith(['a-1', 'a-2'], currentUser);
     });
   });
 

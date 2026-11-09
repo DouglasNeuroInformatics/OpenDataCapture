@@ -179,4 +179,20 @@ test.describe('admin audit log coverage', () => {
       expect(entryNaming(entries, 'targetUserId', user.id)).toBeDefined();
     });
   });
+
+  test.describe('assignments', () => {
+    test('should record each deleted assignment in its group', async ({ api }) => {
+      const group = await api.createGroup();
+      const assignment = await api.createAssignment({
+        expiresAt: new Date(Date.now() + 86_400_000),
+        groupId: group.id,
+        instrumentId: await api.findInstrumentId('FORM'),
+        subjectId: await api.createSubject(group.id)
+      });
+      await api.deleteAssignments([assignment.id]);
+
+      const entries = await api.findAuditLogs({ action: 'DELETE', entity: 'ASSIGNMENT' });
+      expect(entryNaming(entries, 'assignmentId', assignment.id)?.group?.name).toBe(group.name);
+    });
+  });
 });
