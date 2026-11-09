@@ -234,6 +234,17 @@ export class ApiClient {
     );
   }
 
+  /** Deletes a subject over the API, which no page of the web app does; `force` also removes its records. */
+  async deleteSubject(id: string, { force }: { force: boolean }): Promise<void> {
+    await this.expectOk(
+      this.request.delete(`${API}/subjects/${encodeURIComponent(id)}`, {
+        headers: this.authHeaders,
+        params: { force }
+      }),
+      `delete subject '${id}'`
+    );
+  }
+
   /**
    * The languages the instance currently offers. Read rather than assumed because
    * `admin-settings.spec.ts` turns one on and off, in a worker of its own.

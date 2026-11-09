@@ -1,16 +1,20 @@
-import type { ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
+import type { ParseSchemaPipe, RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
+import { NotFoundException } from '@nestjs/common';
 import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { createAppAbility } from '@/auth/ability.utils';
 
 import { SubjectsController } from '../subjects.controller';
 import { SubjectsService } from '../subjects.service';
 
 const ability = createAppAbility([{ action: 'manage', subject: 'Subject' }]);
+
+const currentUser = { ability, id: 'user-1' } as RequestUser;
 
 /** The pipe the `deleteById` handler applies to its `:id` route parameter. */
 function getDeleteIdPipe(): ParseSchemaPipe<string> {
@@ -23,27 +27,60 @@ function getDeleteIdPipe(): ParseSchemaPipe<string> {
 describe('SubjectsController', () => {
   let subjectsController: SubjectsController;
   let subjectsService: MockedInstance<SubjectsService>;
+  let auditLogger: MockedInstance<AuditLogger>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [SubjectsController],
-      providers: [MockFactory.createForService(SubjectsService)]
+      providers: [MockFactory.createForService(SubjectsService), MockFactory.createForService(AuditLogger)]
     }).compile();
     subjectsController = moduleRef.get(SubjectsController);
     subjectsService = moduleRef.get(SubjectsService);
+    auditLogger = moduleRef.get(AuditLogger);
   });
 
   it('should delete a subject within what the caller may delete, forcing when asked', async () => {
     subjectsService.deleteById.mockResolvedValue({ id: 'subject-1' });
 
-    await expect(subjectsController.deleteById('subject-1', true, ability)).resolves.toEqual({ id: 'subject-1' });
+    await expect(subjectsController.deleteById('subject-1', true, currentUser)).resolves.toEqual({ id: 'subject-1' });
     expect(subjectsService.deleteById).toHaveBeenCalledWith('subject-1', { ability, force: true });
   });
 
   it('should leave force unset when the query omits it, so a subject with records is not deleted by default', async () => {
-    await subjectsController.deleteById('subject-1', undefined, ability);
+    await subjectsController.deleteById('subject-1', undefined, currentUser);
 
     expect(subjectsService.deleteById).toHaveBeenCalledWith('subject-1', { ability, force: undefined });
+  });
+
+  it('should record a forced delete once, with the number of records it removed, rather than once per record', async () => {
+    subjectsService.countDeletableRecords.mockResolvedValue(3);
+
+    await subjectsController.deleteById('subject-1', true, currentUser);
+
+    expect(subjectsService.countDeletableRecords).toHaveBeenCalledWith('subject-1', { ability });
+    expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('DELETE', 'SUBJECT', {
+      groupId: null,
+      metadata: { force: 'true', recordCount: '3', subjectId: 'subject-1' },
+      userId: currentUser.id
+    });
+  });
+
+  it('should record an unforced delete as removing no records, without reading any', async () => {
+    await subjectsController.deleteById('subject-1', undefined, currentUser);
+
+    expect(subjectsService.countDeletableRecords).not.toHaveBeenCalled();
+    expect(auditLogger.log.mock.lastCall?.[2].metadata).toEqual({
+      force: 'false',
+      recordCount: '0',
+      subjectId: 'subject-1'
+    });
+  });
+
+  it('should record no delete that the service refused', async () => {
+    subjectsService.deleteById.mockRejectedValue(new NotFoundException());
+
+    await expect(subjectsController.deleteById('subject-1', true, currentUser)).rejects.toThrow(NotFoundException);
+    expect(auditLogger.log).not.toHaveBeenCalled();
   });
 
   it('should list the subjects of the requested group within what the caller may read', async () => {

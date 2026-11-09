@@ -1,7 +1,7 @@
 import type { $AuditLog } from '@opendatacapture/schemas/audit';
 
 import { ApiClient } from '../support/api-client';
-import { ADMIN } from '../support/constants';
+import { ADMIN, HAPPINESS_RECORD } from '../support/constants';
 import { expect, test } from '../support/fixtures';
 
 test.describe('admin audit logs', () => {
@@ -121,6 +121,8 @@ test.describe('admin audit logs fetching', () => {
   });
 });
 
+const HAPPINESS = 'DNP_HAPPINESS_QUESTIONNAIRE';
+
 /** The entry among `entries` whose metadata names `value` under `key`, which is how an entry says what it acted on. */
 function entryNaming(entries: $AuditLog[], key: string, value: string) {
   return entries.find(({ metadata }) => metadata?.[key] === value);
@@ -217,6 +219,22 @@ test.describe('admin audit log coverage', () => {
 
       const entries = await api.findAuditLogs({ action: 'DELETE', entity: 'INSTRUMENT' });
       expect(entryNaming(entries, 'instrumentId', seriesId)?.metadata?.title).toBe(`Deleted Series ${uniqueId}`);
+    });
+  });
+
+  test.describe('subjects', () => {
+    test('should record a forced delete once, with the number of records it removed', async ({ api, uniqueId }) => {
+      const group = await api.createGroup();
+      const session = await api.createSession(group.id, { id: `deleted-${uniqueId}` });
+      const instrumentId = await api.findInstrumentIdByName(HAPPINESS);
+      await api.createRecord(group.id, instrumentId, session, HAPPINESS_RECORD);
+      await api.createRecord(group.id, instrumentId, session, HAPPINESS_RECORD);
+      await api.deleteSubject(session.subjectId, { force: true });
+
+      const entries = await api.findAuditLogs({ action: 'DELETE', entity: 'SUBJECT' });
+      const matching = entries.filter(({ metadata }) => metadata?.subjectId === session.subjectId);
+      expect(matching).toHaveLength(1);
+      expect(matching[0]?.metadata).toMatchObject({ force: 'true', recordCount: '2' });
     });
   });
 });

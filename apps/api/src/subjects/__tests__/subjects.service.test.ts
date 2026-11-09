@@ -37,6 +37,7 @@ describe('SubjectsService', () => {
           useValue: {
             $transaction: vi.fn(),
             instrumentRecord: {
+              count: vi.fn(),
               deleteMany: vi.fn(),
               findMany: vi.fn().mockResolvedValue([]),
               groupBy: vi.fn()
@@ -280,6 +281,19 @@ describe('SubjectsService', () => {
           })
         })
       );
+    });
+  });
+
+  describe('countDeletableRecords', () => {
+    it("should count the subject's records the caller may delete, the ones a forced delete removes", async () => {
+      const ability = createAppAbility([
+        { action: 'delete', conditions: { groupId: { in: ['group-1'] } }, subject: 'InstrumentRecord' }
+      ]);
+      prismaClient.instrumentRecord.count.mockResolvedValueOnce(2);
+      await expect(subjectsService.countDeletableRecords('123', { ability })).resolves.toBe(2);
+      expect(prismaClient.instrumentRecord.count).toHaveBeenCalledExactlyOnceWith({
+        where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], subjectId: '123' }
+      });
     });
   });
 

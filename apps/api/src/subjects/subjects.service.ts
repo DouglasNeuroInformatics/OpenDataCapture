@@ -61,6 +61,13 @@ export class SubjectsService {
     });
   }
 
+  /** How many records a forced delete of the subject removes with it, with the same scope it removes them in. */
+  async countDeletableRecords(id: string, { ability }: EntityOperationOptions = {}) {
+    return this.prismaClient.instrumentRecord.count({
+      where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], subjectId: id }
+    });
+  }
+
   async create({
     id,
     ...data
