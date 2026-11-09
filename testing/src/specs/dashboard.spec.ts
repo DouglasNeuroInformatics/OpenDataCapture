@@ -63,6 +63,40 @@ test.describe('dashboard', () => {
     expect(Math.abs(itemsCentre - (wrapperBox.x + wrapperBox.width / 2))).toBeLessThan(2);
   });
 
+  test('should redraw a chart over the time window chosen in its corner', async ({ getPageModel, page }) => {
+    const dashboardPage = await getPageModel('/dashboard');
+    await expect(dashboardPage.recordsTrendWindow).toHaveText('Default');
+    await expect(dashboardPage.subjectsTrendWindow).toHaveText('Default');
+
+    const response = page.waitForResponse((res) => {
+      return res.url().includes('/v1/summary') && res.url().includes('recordTrendWindow=past5Years');
+    });
+    await dashboardPage.recordsTrendWindow.click();
+    await page.getByRole('option', { name: 'Last 5 Years' }).click();
+    const summary = (await (await response).json()) as { trends: { records: unknown[]; subjects: unknown[] } };
+
+    expect(summary.trends.records).toHaveLength(6);
+    expect(summary.trends.subjects).toHaveLength(5);
+    await expect(dashboardPage.recordsTrendWindow).toHaveText('Last 5 Years');
+    await expect(dashboardPage.subjectsTrendWindow).toHaveText('Default');
+    // Only the x axis labels can hold a four-digit year; the y axis counts records.
+    await expect(dashboardPage.recordsSessionsChart.getByRole('application')).toContainText(/\d{4}/);
+  });
+
+  test('should line each time window up with its chart title, near the card edge', async ({ getPageModel }) => {
+    const dashboardPage = await getPageModel('/dashboard');
+    for (const [chart, select] of [
+      [dashboardPage.recordsSessionsChart, dashboardPage.recordsTrendWindow],
+      [dashboardPage.subjectsGrowthChart, dashboardPage.subjectsTrendWindow]
+    ] as const) {
+      const cardBox = (await chart.boundingBox())!;
+      const titleBox = (await chart.getByRole('heading').first().boundingBox())!;
+      const selectBox = (await select.boundingBox())!;
+      expect(Math.abs(selectBox.y + selectBox.height / 2 - (titleBox.y + titleBox.height / 2))).toBeLessThan(2);
+      expect(cardBox.x + cardBox.width - (selectBox.x + selectBox.width)).toBeLessThanOrEqual(17);
+    }
+  });
+
   test('should navigate to the data hub when the subjects statistic is clicked', async ({ getPageModel, page }) => {
     const dashboardPage = await getPageModel('/dashboard');
     await dashboardPage.statisticSubjects.click();

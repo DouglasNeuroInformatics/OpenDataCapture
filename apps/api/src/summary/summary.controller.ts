@@ -1,7 +1,8 @@
-import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import { CurrentUser, ParseSchemaPipe } from '@douglasneuroinformatics/libnest';
 import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { Controller, Get, Query } from '@nestjs/common';
-import type { Summary } from '@opendatacapture/schemas/summary';
+import { $SummaryQueryParams } from '@opendatacapture/schemas/summary';
+import type { Summary, SummaryQueryParams } from '@opendatacapture/schemas/summary';
 
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
@@ -19,7 +20,10 @@ export class SummaryController {
     { action: 'read', subject: 'Subject' },
     { action: 'read', subject: 'User' }
   ])
-  async getSummary(@CurrentUser() currentUser: RequestUser, @Query('groupId') groupId?: string): Promise<Summary> {
-    return this.summaryService.getSummary(currentUser, groupId);
+  async getSummary(
+    @CurrentUser() currentUser: RequestUser,
+    @Query(new ParseSchemaPipe({ schema: $SummaryQueryParams })) query: SummaryQueryParams
+  ): Promise<Summary> {
+    return this.summaryService.getSummary(currentUser, query);
   }
 }

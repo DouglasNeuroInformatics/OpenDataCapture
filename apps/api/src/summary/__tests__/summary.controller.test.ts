@@ -27,7 +27,17 @@ describe('SummaryController', () => {
     const summary = { counts: { instruments: 1, records: 2, sessions: 3, subjects: 4, users: 5 } };
     summaryService.getSummary.mockResolvedValue(summary);
 
-    await expect(summaryController.getSummary(currentUser, 'group-1')).resolves.toBe(summary);
-    expect(summaryService.getSummary).toHaveBeenCalledWith(currentUser, 'group-1');
+    await expect(
+      summaryController.getSummary(currentUser, {
+        groupId: 'group-1',
+        recordTrendWindow: 'pastYear',
+        subjectTrendWindow: 'default'
+      })
+    ).resolves.toBe(summary);
+    expect(summaryService.getSummary).toHaveBeenCalledWith(currentUser, {
+      groupId: 'group-1',
+      recordTrendWindow: 'pastYear',
+      subjectTrendWindow: 'default'
+    });
   });
 });

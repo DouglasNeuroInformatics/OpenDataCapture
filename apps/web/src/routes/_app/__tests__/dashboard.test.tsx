@@ -237,7 +237,9 @@ describe('Route', () => {
     it('should scope every query to the current group', () => {
       mocks.store.currentGroup = RESEARCH_GROUP;
       renderPage();
-      expect(mocks.useSummaryQuery).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
+      expect(mocks.useSummaryQuery).toHaveBeenCalledWith({
+        params: { groupId: 'group-1', recordTrendWindow: 'default', subjectTrendWindow: 'default' }
+      });
       expect(mocks.useUsersQuery).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
       expect(mocks.useInstrumentRecords).toHaveBeenCalledWith({ enabled: true, params: { groupId: 'group-1' } });
     });
@@ -477,6 +479,35 @@ describe('Route', () => {
       expect(subjectsChart().getByTestId('x-axis').textContent).toBe('Mar 2');
     });
 
+    it('should label the x axis ticks with month and year once a trend reaches back more than a year', () => {
+      const twoYearsEarlier = new Date(2023, 2, 2, 12).getTime();
+      mocks.summary = {
+        data: {
+          ...SUMMARY,
+          trends: {
+            ...SUMMARY.trends,
+            records: [
+              { timestamp: DAY_3, value: 3 },
+              { timestamp: twoYearsEarlier, value: 0 }
+            ]
+          }
+        }
+      };
+      renderPage();
+      expect(recordsChart().getByTestId('x-axis').textContent).toBe('Mar 2025');
+      expect(subjectsChart().getByTestId('x-axis').textContent).toBe('Mar 2');
+    });
+
+    it.each([
+      ['dashboard-records-trend-window', { recordTrendWindow: 'pastYear', subjectTrendWindow: 'default' }],
+      ['dashboard-subjects-trend-window', { recordTrendWindow: 'default', subjectTrendWindow: 'pastYear' }]
+    ] as const)('should request the window chosen in %s for its own chart only', (testId, windows) => {
+      renderPage();
+      fireEvent.keyDown(screen.getByTestId(testId), { key: 'Enter' });
+      fireEvent.click(screen.getByRole('option', { name: 'Last Year' }));
+      expect(mocks.useSummaryQuery).toHaveBeenLastCalledWith({ params: { groupId: undefined, ...windows } });
+    });
+
     it('should show nothing in the tooltips while no point is hovered, even if recharts still holds a payload', () => {
       mocks.tooltipProps = {
         active: false,
@@ -586,14 +617,18 @@ describe('Route', () => {
     it('should prefetch the summary of the current group for a user who can read everything', async () => {
       grantRead(READABLE_SUBJECTS);
       expect(await runLoader()).toBeNull();
-      expect(mocks.ensureQueryData).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['summary', 'group-1'] }));
+      expect(mocks.ensureQueryData).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['summary', 'group-1', 'default', 'default'] })
+      );
     });
 
     it('should prefetch the application-wide summary when no group is selected', async () => {
       grantRead(READABLE_SUBJECTS);
       mocks.store.currentGroup = null;
       await runLoader();
-      expect(mocks.ensureQueryData).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['summary', undefined] }));
+      expect(mocks.ensureQueryData).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['summary', undefined, 'default', 'default'] })
+      );
     });
   });
 });

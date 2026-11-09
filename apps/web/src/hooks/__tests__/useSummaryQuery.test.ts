@@ -44,6 +44,21 @@ describe('useSummaryQuery', () => {
     expect(mockAxios.get).toHaveBeenCalledWith('/v1/summary', { params: undefined });
   });
 
+  it('should request the chosen trend windows', async () => {
+    const params = { groupId: 'group-1', recordTrendWindow: 'pastYear', subjectTrendWindow: 'all' } as const;
+    const { result } = renderSummaryQuery({ params });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockAxios.get).toHaveBeenCalledWith('/v1/summary', { params });
+  });
+
+  it('should key an omitted window as the default one, so the loader prefetch serves the page', () => {
+    expect(summaryQueryOptions({ params: { groupId: 'group-1' } }).queryKey).toEqual(
+      summaryQueryOptions({
+        params: { groupId: 'group-1', recordTrendWindow: 'default', subjectTrendWindow: 'default' }
+      }).queryKey
+    );
+  });
+
   it('should reject a summary with a negative count, so a corrupt total never reaches the dashboard', async () => {
     mockAxios.get.mockResolvedValueOnce({ data: { ...summary, counts: { ...summary.counts, users: -1 } } });
     await expect(new QueryClient().fetchQuery(summaryQueryOptions())).rejects.toThrow(z.ZodError);

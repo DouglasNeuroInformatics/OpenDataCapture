@@ -7,12 +7,14 @@ import { cn } from '@douglasneuroinformatics/libui/utils';
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import type { AppSubjectName } from '@opendatacapture/schemas/core';
+import type { Summary, SummaryTrendWindow } from '@opendatacapture/schemas/summary';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { InstrumentKindCell } from '@/components/InstrumentKindCell';
 import { PageHeader } from '@/components/PageHeader';
 import { SortableHeader } from '@/components/SortableHeader';
+import { TrendWindowSelect } from '@/components/TrendWindowSelect';
 import { TruncatedCell } from '@/components/TruncatedCell';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
@@ -27,11 +29,26 @@ const TEXT_ONLY_TABLE = cn(
   '[&_[data-testid=data-table-head]]:text-base [&_[data-testid=data-table-head]]:font-bold'
 );
 
+const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+
+/** A chart axis label: day and month within a year, month and year for a trend reaching further back. */
+const formatTrendTick = (timestamp: number, trend: Summary['trends']['records']) => {
+  const spansYears = trend[0]!.timestamp - trend.at(-1)!.timestamp > ONE_YEAR_MS;
+  return new Date(timestamp).toLocaleDateString(
+    undefined,
+    spansYears ? { month: 'short', year: 'numeric' } : { day: 'numeric', month: 'short' }
+  );
+};
+
 const RouteComponent = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const { t } = useTranslation();
   const [theme] = useTheme();
-  const summaryQuery = useSummaryQuery({ params: { groupId: currentGroup?.id } });
+  const [recordTrendWindow, setRecordTrendWindow] = useState<SummaryTrendWindow>('default');
+  const [subjectTrendWindow, setSubjectTrendWindow] = useState<SummaryTrendWindow>('default');
+  const summaryQuery = useSummaryQuery({
+    params: { groupId: currentGroup?.id, recordTrendWindow, subjectTrendWindow }
+  });
   const navigate = useNavigate();
   const [isInstrumentModalOpen, setIsInstrumentModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -421,14 +438,24 @@ const RouteComponent = () => {
                 <div className="rounded-xl bg-linear-to-br from-blue-500/20 to-indigo-600/20 p-3 transition-all duration-300 group-hover:from-blue-500/30 group-hover:to-indigo-600/30">
                   <DocumentTextIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <div>
-                  <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
-                    {t({
-                      en: 'Records & Sessions Trend',
-                      es: 'Evolución de registros y sesiones',
-                      fr: 'Tendance des enregistrements et des sessions'
-                    })}
-                  </Heading>
+                <div className="grow">
+                  {/* The window picker shares the title row so its label lines up with the title. */}
+                  <div className="-mr-4 flex items-center justify-between gap-4">
+                    <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
+                      {t({
+                        en: 'Records & Sessions Trend',
+                        es: 'Evolución de registros y sesiones',
+                        fr: 'Tendance des enregistrements et des sessions'
+                      })}
+                    </Heading>
+                    <div className="-my-1 shrink-0">
+                      <TrendWindowSelect
+                        data-testid="dashboard-records-trend-window"
+                        value={recordTrendWindow}
+                        onChange={setRecordTrendWindow}
+                      />
+                    </div>
+                  </div>
                   <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                     {t({
                       en: 'Activity over time',
@@ -465,10 +492,7 @@ const RouteComponent = () => {
                     domain={['auto', 'auto']}
                     stroke={strokeColors[theme]}
                     tick={{ fontSize: 12 }}
-                    tickFormatter={(timestamp: number) => {
-                      const date = new Date(timestamp);
-                      return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-                    }}
+                    tickFormatter={(timestamp: number) => formatTrendTick(timestamp, summaryQuery.data.trends.records)}
                     tickLine={false}
                     type="number"
                   />
@@ -544,14 +568,24 @@ const RouteComponent = () => {
                 <div className="rounded-xl bg-linear-to-br from-amber-500/20 to-orange-600/20 p-3 transition-all duration-300 group-hover:from-amber-500/30 group-hover:to-orange-600/30">
                   <UserIcon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                 </div>
-                <div>
-                  <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
-                    {t({
-                      en: 'Subjects Growth',
-                      es: 'Crecimiento de sujetos',
-                      fr: 'Croissance des sujets'
-                    })}
-                  </Heading>
+                <div className="grow">
+                  {/* The window picker shares the title row so its label lines up with the title. */}
+                  <div className="-mr-4 flex items-center justify-between gap-4">
+                    <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
+                      {t({
+                        en: 'Subjects Growth',
+                        es: 'Crecimiento de sujetos',
+                        fr: 'Croissance des sujets'
+                      })}
+                    </Heading>
+                    <div className="-my-1 shrink-0">
+                      <TrendWindowSelect
+                        data-testid="dashboard-subjects-trend-window"
+                        value={subjectTrendWindow}
+                        onChange={setSubjectTrendWindow}
+                      />
+                    </div>
+                  </div>
                   <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                     {t({
                       en: 'Growth trajectory',
@@ -585,10 +619,7 @@ const RouteComponent = () => {
                     domain={['auto', 'auto']}
                     stroke={strokeColors[theme]}
                     tick={{ fontSize: 12 }}
-                    tickFormatter={(timestamp: number) => {
-                      const date = new Date(timestamp);
-                      return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-                    }}
+                    tickFormatter={(timestamp: number) => formatTrendTick(timestamp, summaryQuery.data.trends.subjects)}
                     tickLine={false}
                     type="number"
                   />
